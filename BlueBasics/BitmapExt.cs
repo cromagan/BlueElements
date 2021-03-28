@@ -28,7 +28,7 @@ using static BlueBasics.FileOperations;
 
 namespace BlueBasics
 {
-    //https://stackoverflow.com/questions/24701703/c-sharp-faster-alternatives-to-setpixel-and-getpixel-for-bitmaps-for-windows-f
+    // https://stackoverflow.com/questions/24701703/c-sharp-faster-alternatives-to-setpixel-and-getpixel-for-bitmaps-for-windows-f
 
     // Todo: Obselete Routinen:
     // Image_FromFile
@@ -45,18 +45,18 @@ namespace BlueBasics
         protected GCHandle BitsHandle { get; private set; }
 
         public PixelFormat _pixelformat = PixelFormat.Format32bppArgb;
-        //  public PixelFormat _pixelformat = PixelFormat.Format32bppPArgb;
+        // public PixelFormat _pixelformat = PixelFormat.Format32bppPArgb;
 
         public BitmapExt(string filename) : this((Bitmap)Image_FromFile(filename)) { }
 
         public BitmapExt(string filename, bool setDummyPicIfFails)
         {
-            FromFile(filename, setDummyPicIfFails);
+            this.FromFile(filename, setDummyPicIfFails);
         }
 
         public BitmapExt(int width, int height)
         {
-            EmptyBitmap(width, height);
+            this.EmptyBitmap(width, height);
         }
 
         public BitmapExt(Icon icon) : this(icon.ToBitmap()) { }
@@ -67,7 +67,7 @@ namespace BlueBasics
         /// <param name="bmp"></param>
         public BitmapExt(Bitmap bmp)
         {
-            SetBitmap(bmp);
+            this.SetBitmap(bmp);
         }
 
         /// <summary>
@@ -78,22 +78,22 @@ namespace BlueBasics
         {
             if (bmp == null)
             {
-                Width = -1;
-                Height = -1;
+                this.Width = -1;
+                this.Height = -1;
                 return;
             }
 
             try
             {
-                Width = bmp.Width;
-                Height = bmp.Height;
-                Bits = new int[Width * Height];
-                BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
-                Bitmap = new Bitmap(Width, Height, Width * 4, _pixelformat, BitsHandle.AddrOfPinnedObject());
+                this.Width = bmp.Width;
+                this.Height = bmp.Height;
+                this.Bits = new int[this.Width * this.Height];
+                this.BitsHandle = GCHandle.Alloc(this.Bits, GCHandleType.Pinned);
+                this.Bitmap = new Bitmap(this.Width, this.Height, this.Width * 4, this._pixelformat, this.BitsHandle.AddrOfPinnedObject());
 
-                using (var gr = Graphics.FromImage(Bitmap))
+                using (var gr = Graphics.FromImage(this.Bitmap))
                 {
-                    gr.DrawImage(bmp, new Rectangle(0, 0, Width, Height));
+                    gr.DrawImage(bmp, new Rectangle(0, 0, this.Width, this.Height));
                 }
 
                 bmp.Dispose(); // Sichherheithalber, da es ja nun ein neues Bild ist.
@@ -101,28 +101,28 @@ namespace BlueBasics
             catch (Exception ex)
             {
                 Develop.DebugPrint(ex);
-                Width = -1;
-                Height = -1;
-                Bitmap = null;
+                this.Width = -1;
+                this.Height = -1;
+                this.Bitmap = null;
             }
         }
 
         public void SetPixel(int x, int y, Color colour)
         {
-            Bits[x + (y * Width)] = colour.ToArgb();
+            this.Bits[x + (y * this.Width)] = colour.ToArgb();
         }
 
         public Color GetPixel(int x, int y)
         {
-            return Color.FromArgb(Bits[x + (y * Width)]);
+            return Color.FromArgb(this.Bits[x + (y * this.Width)]);
         }
 
         public void Dispose()
         {
-            if (Disposed) { return; }
-            Disposed = true;
-            Bitmap.Dispose();
-            BitsHandle.Free();
+            if (this.Disposed) { return; }
+            this.Disposed = true;
+            this.Bitmap.Dispose();
+            this.BitsHandle.Free();
         }
 
         public void FromFile(string dateiName, bool setDummyPicIfFails)
@@ -134,7 +134,7 @@ namespace BlueBasics
                 x = QuickImage.Get(enImageCode.Warnung).BMP;
             }
 
-            SetBitmap(x);
+            this.SetBitmap(x);
         }
 
         /// <summary>
@@ -270,7 +270,7 @@ namespace BlueBasics
             {
                 GR.Clear(Color.Transparent);
                 GR.PixelOffsetMode = PixelOffsetMode.Half;
-                GR.DrawImage(Bitmap, new Rectangle(0, 0, re.Width, re.Height), re.Left, re.Top, re.Width, re.Height, GraphicsUnit.Pixel);
+                GR.DrawImage(this.Bitmap, new Rectangle(0, 0, re.Width, re.Height), re.Left, re.Top, re.Width, re.Height, GraphicsUnit.Pixel);
             }
 
             return newBMP;
@@ -278,14 +278,14 @@ namespace BlueBasics
 
         public void Resize(int width, int height, enSizeModes sizeMode, InterpolationMode interpolationMode, bool collectGarbage)
         {
-            if (Bitmap == null) { return; }
+            if (this.Bitmap == null) { return; }
 
             if (collectGarbage) { modAllgemein.CollectGarbage(); }
 
             if (width < 1) { width = 1; }
             if (height < 1) { height = 1; }
 
-            var Scale = Math.Min(width / (double)Width, height / (double)Height);
+            var Scale = Math.Min(width / (double)this.Width, height / (double)this.Height);
 
             switch (sizeMode)
             {
@@ -297,15 +297,15 @@ namespace BlueBasics
 
                 case enSizeModes.Breite_oder_Höhe_Anpassen_MitVergrößern:
                     // Bei diesem Modus werden die Rückgabehöhe oder breite verändert!!!
-                    width = (int)(Scale * Width);
-                    height = (int)(Scale * Height);
+                    width = (int)(Scale * this.Width);
+                    height = (int)(Scale * this.Height);
                     break;
 
                 case enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern:
                     // Bei diesem Modus werden die Rückgabehöhe oder breite verändert!!!
                     if (Scale >= 1) { return; }
-                    width = (int)(Scale * Width);
-                    height = (int)(Scale * Height);
+                    width = (int)(Scale * this.Width);
+                    height = (int)(Scale * this.Height);
                     break;
 
                 case enSizeModes.Verzerren:
@@ -317,8 +317,8 @@ namespace BlueBasics
                     return;
             }
 
-            var nw = (int)(Width * Scale);
-            var nh = (int)(Height * Scale);
+            var nw = (int)(this.Width * Scale);
+            var nh = (int)(this.Height * Scale);
 
             if (sizeMode == enSizeModes.Verzerren)
             {
@@ -328,16 +328,16 @@ namespace BlueBasics
 
             try
             {
-                var oldBMP = Bitmap;
+                var oldBMP = this.Bitmap;
 
-                EmptyBitmap(width, height);
+                this.EmptyBitmap(width, height);
 
-                using var GR = Graphics.FromImage(Bitmap);
+                using var GR = Graphics.FromImage(this.Bitmap);
                 GR.InterpolationMode = interpolationMode;
                 GR.PixelOffsetMode = PixelOffsetMode.Half;
 
                 // 20000 / 4 = 5000, also noch 1000 zum kleiner machen
-                if (Width > 20000 && nw < 4000)
+                if (this.Width > 20000 && nw < 4000)
                 {
                     var tmp = (Bitmap)oldBMP.GetThumbnailImage((int)(oldBMP.Width / 4.0), (int)(oldBMP.Height / 4.0), null, IntPtr.Zero);
                     GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
@@ -366,32 +366,32 @@ namespace BlueBasics
             {
                 Develop.DebugPrint(ex);
 
-                //if (!collectGarbage) { modAllgemein.CollectGarbage(); }
-                //if (sizeMode == enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern)
-                //{
+                // if (!collectGarbage) { modAllgemein.CollectGarbage(); }
+                // if (sizeMode == enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern)
+                // {
                 //    return (Bitmap)bmp.GetThumbnailImage(nw, nh, null, IntPtr.Zero);
-                //}
-                //return null;
+                // }
+                // return null;
             }
         }
 
         private void EmptyBitmap(int width, int height)
         {
-            Width = width;
-            Height = height;
-            Bits = new int[Width * Height];
-            BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
-            Bitmap = new Bitmap(Width, Height, Width * 4, _pixelformat, BitsHandle.AddrOfPinnedObject());
+            this.Width = width;
+            this.Height = height;
+            this.Bits = new int[this.Width * this.Height];
+            this.BitsHandle = GCHandle.Alloc(this.Bits, GCHandleType.Pinned);
+            this.Bitmap = new Bitmap(this.Width, this.Height, this.Width * 4, this._pixelformat, this.BitsHandle.AddrOfPinnedObject());
         }
 
         public void MakeTransparent(Color color)
         {
-            Bitmap.MakeTransparent(color);
+            this.Bitmap.MakeTransparent(color);
         }
 
         public void Save(string name, ImageFormat imageFormat)
         {
-            Bitmap.Save(name, imageFormat);
+            this.Bitmap.Save(name, imageFormat);
         }
     }
 }

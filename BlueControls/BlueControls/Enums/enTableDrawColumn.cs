@@ -18,9 +18,11 @@
 #endregion
 
 
-namespace BlueControls.Enums {
+namespace BlueControls.Enums
+{
 
-    public enum enTableDrawColumn {
+    public enum enTableDrawColumn
+    {
         NonPermament = 0,
         Permament = 1,
         All = 2

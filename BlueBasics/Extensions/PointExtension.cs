@@ -23,20 +23,20 @@ namespace BlueBasics
 {
     public static partial class Extensions
     {
-        public static Point PointParse(string Code)
+        public static Point PointParse(this string code)
         {
-            Code = Code.RemoveChars("{}XYxy= ");
+            code = code.RemoveChars("{}XYxy= ");
 
             var P = new Point();
 
-            if (string.IsNullOrEmpty(Code))
+            if (string.IsNullOrEmpty(code))
             {
                 P.X = 0;
                 P.Y = 0;
                 return P;
             }
 
-            var w = Code.Split(',');
+            var w = code.Split(',');
 
             P.X = int.Parse(w[0]);
             P.Y = int.Parse(w[1]);

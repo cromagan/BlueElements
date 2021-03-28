@@ -24,8 +24,10 @@ using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 
-namespace BlueDatabase {
-    public sealed class RuleActionItem : IParseable, IReadableTextWithChanging, IComparable, ICompareKey, ICloneable {
+namespace BlueDatabase
+{
+    public sealed class RuleActionItem : IParseable, IReadableTextWithChanging, IComparable, ICompareKey, ICloneable
+    {
         #region  Variablen-Deklarationen 
 
         public readonly RuleItem_Old Rule;
@@ -43,7 +45,8 @@ namespace BlueDatabase {
         #region  Construktor + Initialize 
 
 
-        private void Initialize() {
+        private void Initialize()
+        {
             _Action = 0;
             _Text = string.Empty;
             Columns.Clear(); // = New List(Of ColumnItem)
@@ -51,7 +54,8 @@ namespace BlueDatabase {
         }
 
 
-        public RuleActionItem(RuleItem_Old RL, enAction Action, string Text, ColumnItem Column) {
+        public RuleActionItem(RuleItem_Old RL, enAction Action, string Text, ColumnItem Column)
+        {
             Rule = RL;
             Initialize();
             _Action = Action;
@@ -59,14 +63,16 @@ namespace BlueDatabase {
             if (Column != null) { Columns.Add(Column); }
         }
 
-        public RuleActionItem(RuleItem_Old RL, string Code) {
+        public RuleActionItem(RuleItem_Old RL, string Code)
+        {
             Rule = RL;
             Parse(Code);
         }
 
         #endregion
 
-        internal void Columns_ListOrItemChanged(object sender, System.EventArgs e) {
+        internal void Columns_ListOrItemChanged(object sender, System.EventArgs e)
+        {
             OnChanged();
         }
 
@@ -75,9 +81,11 @@ namespace BlueDatabase {
 
         public bool IsParsing { get; private set; }
 
-        public enAction Action {
+        public enAction Action
+        {
             get => _Action;
-            set {
+            set
+            {
                 if (_Action == value) { return; }
                 _Action = value;
                 OnChanged();
@@ -85,9 +93,11 @@ namespace BlueDatabase {
         }
 
 
-        public string Text {
+        public string Text
+        {
             get => _Text;
-            set {
+            set
+            {
                 if (_Text == value) { return; }
                 _Text = value;
                 OnChanged();
@@ -113,11 +123,15 @@ namespace BlueDatabase {
 
 
 
-        public int CompareTo(object obj) {
-            if (obj is RuleActionItem RAI) {
+        public int CompareTo(object obj)
+        {
+            if (obj is RuleActionItem RAI)
+            {
                 // hierist es egal, ob es ein DoAlways ist oder nicht. Es sollen nur Bedingugen VOR Aktionen kommen
                 return CompareKey().CompareTo(RAI.CompareKey());
-            } else {
+            }
+            else
+            {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Objecttyp!");
                 return 0;
             }
@@ -126,18 +140,22 @@ namespace BlueDatabase {
         }
 
 
-        public string CompareKey() {
+        public string CompareKey()
+        {
             var MaxColumnIndex = -1;
             var Co = -1;
 
 
-            foreach (var ThisColumnItem in ColumnsAllUsed()) {
-                if (ThisColumnItem != null) {
+            foreach (var ThisColumnItem in ColumnsAllUsed())
+            {
+                if (ThisColumnItem != null)
+                {
                     MaxColumnIndex = Math.Max(ThisColumnItem.Index(), MaxColumnIndex);
                 }
             }
 
-            switch (_Action) {
+            switch (_Action)
+            {
                 case 0:
                     Co = 0;
                     break;// Neue Action
@@ -232,17 +250,21 @@ namespace BlueDatabase {
             return (Co + 1).ToString(Constants.Format_Integer3) + (MaxColumnIndex + 1).ToString(Constants.Format_Integer3) + ToString();
         }
 
-        public override string ToString() {
+        public override string ToString()
+        {
 
             var Result = "{Action=" + (int)_Action;
 
-            foreach (var t in Columns) {
-                if (t != null) {
+            foreach (var t in Columns)
+            {
+                if (t != null)
+                {
                     Result = Result + ", " + t.ParsableColumnKey();
                 }
             }
 
-            if (!string.IsNullOrEmpty(_Text)) {
+            if (!string.IsNullOrEmpty(_Text))
+            {
                 Result = Result + ", Text=" + _Text.ToNonCritical();
             }
 
@@ -250,12 +272,15 @@ namespace BlueDatabase {
             return Result + "}";
         }
 
-        public void Parse(string ToParse) {
+        public void Parse(string ToParse)
+        {
             IsParsing = true;
             Columns.ThrowEvents = false;
             Initialize();
-            foreach (var pair in ToParse.GetAllTags()) {
-                switch (pair.Key) {
+            foreach (var pair in ToParse.GetAllTags())
+            {
+                switch (pair.Key)
+                {
                     case "identifier": //TODO: Identifier entferneen, altlast. 06.09.2019
                         if (pair.Value != "Action") { Develop.DebugPrint(enFehlerArt.Fehler, "Identifier fehlerhaft: " + pair.Value); }
                         break;
@@ -287,7 +312,8 @@ namespace BlueDatabase {
             IsParsing = false;
         }
 
-        internal (string anfang, string ende) ToScript(List<ColumnItem> c) {
+        internal (string anfang, string ende) ToScript(List<ColumnItem> c)
+        {
 
             var txtList = Text.SplitByCRToList();
             var txtJoinedKomma = "\"" + txtList.JoinWith("\", \"").Trim(", \"") + "\"";
@@ -297,7 +323,8 @@ namespace BlueDatabase {
 
             var ct = "Exception(\"Nicht oder unvollständig konvertiert!\");\r\n// Benutzte Spalten:";
 
-            foreach (var thisc in Columns) {
+            foreach (var thisc in Columns)
+            {
                 ct = ct + " " + thisc.Name;
                 c.Add(thisc);
             }
@@ -306,20 +333,24 @@ namespace BlueDatabase {
 
             var cnl = string.Empty;
 
-            foreach (var thisc in c) {
+            foreach (var thisc in c)
+            {
                 cnl = cnl + thisc.Name + ", ";
             }
             cnl = cnl.Trim(", ");
 
 
-            switch (_Action) {
+            switch (_Action)
+            {
                 case enAction.Ist:
 
-                    if (txtList is null || txtList.Count == 0) {
+                    if (txtList is null || txtList.Count == 0)
+                    {
                         return ("if (IsNullOrEmpty(" + Columns[0].Name + ")) {", "}");
                     }
 
-                    if (txtList.Count > 1) {
+                    if (txtList.Count > 1)
+                    {
                         //var tmpn = "tmpList_" + Columns[0].Name;
                         //var tmpt = "var " + tmpn + " = " + txtListString + ";";
                         return ("if (Contains(" + Columns[0].Name + ", false, " + txtJoinedKomma + ") { ", "} ");
@@ -327,16 +358,20 @@ namespace BlueDatabase {
 
 
 
-                    if (Columns[0].Format.IsZahl()) {
+                    if (Columns[0].Format.IsZahl())
+                    {
                         return ("if (" + Columns[0].Name + " == " + Text + ") {", "}");
                     }
 
-                    if (Columns[0].Format == enDataFormat.Bit) {
+                    if (Columns[0].Format == enDataFormat.Bit)
+                    {
 
-                        if (Text == "+") {
+                        if (Text == "+")
+                        {
                             return ("if (" + Columns[0].Name + ") {", "}");
                         }
-                        if (Text == "-") {
+                        if (Text == "-")
+                        {
                             return ("if (!" + Columns[0].Name + ") {", "}");
                         }
 
@@ -349,18 +384,21 @@ namespace BlueDatabase {
 
                 case enAction.Setze_Fehlerhaft:
 
-                    if (string.IsNullOrEmpty(Text)) {
+                    if (string.IsNullOrEmpty(Text))
+                    {
                         return ("SetError(\"Allgemeiner Fehler.\",  " + cnl + "); // TODO: Text korrigieren", "");
                     }
 
                     return ("SetError(\"" + Text.Replace("\r\n", "").Replace("\r", "") + "\",  " + cnl + ");", "");
 
                 case enAction.Ist_Nicht:
-                    if (txtList is null || txtList.Count == 0) {
+                    if (txtList is null || txtList.Count == 0)
+                    {
                         return ("if (!IsNullOrEmpty(" + Columns[0].Name + ")) {", "}");
                     }
 
-                    if (txtList is null || txtList.Count == 1) {
+                    if (txtList is null || txtList.Count == 1)
+                    {
                         return ("if (" + Columns[0].Name + " != \"" + txtList[0] + "\") {", "}");
                     }
 
@@ -373,30 +411,38 @@ namespace BlueDatabase {
 
 
 
-                    foreach (var thisc in Columns) {
+                    foreach (var thisc in Columns)
+                    {
                         var thist = string.Empty;
 
-                        if (thisc.Format.IsZahl() || thisc.Format == enDataFormat.FarbeInteger) {
+                        if (thisc.Format.IsZahl() || thisc.Format == enDataFormat.FarbeInteger)
+                        {
                             thist = thisc.Name + " = " + txtJoined + ";";
                         }
 
-                        if (thisc.MultiLine) {
+                        if (thisc.MultiLine)
+                        {
                             thist = thisc.Name + " = " + txtList + ";";
                         }
 
 
-                        if (thisc.Format == enDataFormat.Text || thisc.Format == enDataFormat.LinkedCell || thisc.Format == enDataFormat.BildCode || thisc.Format == enDataFormat.Datum_und_Uhrzeit) {
+                        if (thisc.Format == enDataFormat.Text || thisc.Format == enDataFormat.LinkedCell || thisc.Format == enDataFormat.BildCode || thisc.Format == enDataFormat.Datum_und_Uhrzeit)
+                        {
                             thist = thisc.Name + " = \"" + txtJoined + "\";";
                         }
 
-                        if (thisc.Format == enDataFormat.Bit) {
+                        if (thisc.Format == enDataFormat.Bit)
+                        {
                             if (Text == "+") { thist = thisc.Name + " = true;"; }
                             if (Text == "-") { thist = thisc.Name + " = false;"; }
 
                         }
-                        if (!string.IsNullOrEmpty(thist)) {
+                        if (!string.IsNullOrEmpty(thist))
+                        {
                             bigt = bigt + thist + "\r\n";
-                        } else {
+                        }
+                        else
+                        {
                             bigt = bigt + ct;
                         }
 
@@ -416,7 +462,8 @@ namespace BlueDatabase {
                 case enAction.Enthält:
                 case enAction.Enthält_Zeichenkette:
                     var s = "if (";
-                    foreach (var thisc in Columns) {
+                    foreach (var thisc in Columns)
+                    {
                         s = s + "Contains(" + Columns[0].Name + ", false, " + txtJoinedKomma + ") ||";
                     }
                     s = s.TrimEnd(" ||") + ") {";
@@ -424,7 +471,8 @@ namespace BlueDatabase {
 
                 case enAction.Enthält_NICHT_Zeichenkette:
                     var s2 = "if (";
-                    foreach (var thisc in Columns) {
+                    foreach (var thisc in Columns)
+                    {
                         s2 = s2 + "!Contains(" + Columns[0].Name + ", false, " + txtJoinedKomma + ") &&";
                     }
                     s2 = s2.TrimEnd(" &&") + ") {";
@@ -481,22 +529,30 @@ namespace BlueDatabase {
 
 
 
-        public QuickImage SymbolForReadableText() {
+        public QuickImage SymbolForReadableText()
+        {
             //if (!IsOk()) { return QuickImage.Get(enImageCode.Kritisch); }
 
 
-            switch (_Action) {
+            switch (_Action)
+            {
                 case enAction.Ist:
-                    if (string.IsNullOrEmpty(_Text)) {
+                    if (string.IsNullOrEmpty(_Text))
+                    {
                         return QuickImage.Get(enImageCode.Datei, 16, "00FF00", "");
-                    } else {
+                    }
+                    else
+                    {
                         return QuickImage.Get(enImageCode.Textdatei, 16, "0000FF", "");
                     }
 
                 case enAction.Ist_Nicht:
-                    if (string.IsNullOrEmpty(_Text)) {
+                    if (string.IsNullOrEmpty(_Text))
+                    {
                         return QuickImage.Get("Datei|16||1|00FF00");
-                    } else {
+                    }
+                    else
+                    {
                         return QuickImage.Get("Textdatei|16||1|0000FF");
                     }
 
@@ -1096,7 +1152,8 @@ namespace BlueDatabase {
         //}
 
 
-        public string ReadableText() {
+        public string ReadableText()
+        {
 
             var ColsOder = "";
             var ColsUnd = "";
@@ -1105,11 +1162,15 @@ namespace BlueDatabase {
             //if (!string.IsNullOrEmpty(dd)) { return "Aktion fehlerhaft: " + dd; }
 
 
-            for (var z = 0; z < Columns.Count; z++) {
-                if (z == Columns.Count - 2) {
+            for (var z = 0; z < Columns.Count; z++)
+            {
+                if (z == Columns.Count - 2)
+                {
                     ColsOder = ColsOder + "'" + Columns[z].ReadableText() + "' oder ";
                     ColsUnd = ColsUnd + "'" + Columns[z].ReadableText() + "' und ";
-                } else {
+                }
+                else
+                {
                     ColsUnd = ColsUnd + "'" + Columns[z].ReadableText() + "', ";
                     ColsOder = ColsOder + "'" + Columns[z].ReadableText() + "', ";
                 }
@@ -1125,7 +1186,8 @@ namespace BlueDatabase {
             _Text = _Text.Replace("\r\n", "\r"); // sollte eh schon richtig sein...
 
 
-            switch (_Action) {
+            switch (_Action)
+            {
 
                 case enAction.Anmerkung:
                     return " ##### ANMERKUNG ##### ";
@@ -1456,16 +1518,19 @@ namespace BlueDatabase {
         //    return string.Empty;
         //}
 
-        public bool IsBedingung() {
+        public bool IsBedingung()
+        {
             return (int)_Action > 1 && (int)_Action < 1000;
         }
 
 
-        public object Clone() {
+        public object Clone()
+        {
             return (RuleActionItem)MemberwiseClone();
         }
 
-        internal List<ColumnItem> ColumnsAllUsed() {
+        internal List<ColumnItem> ColumnsAllUsed()
+        {
             var l = new List<ColumnItem>();
 
 
@@ -1474,7 +1539,8 @@ namespace BlueDatabase {
             l.AddRange(Columns);
 
 
-            switch (_Action) {
+            switch (_Action)
+            {
                 case enAction.Ist:
                 case enAction.Ist_Nicht:
                 case enAction.Anmerkung:
@@ -1501,10 +1567,14 @@ namespace BlueDatabase {
 
                 case enAction.Berechne:
                 case enAction.Berechnung_ist_True:
-                    if (!string.IsNullOrEmpty(_Text)) {
-                        foreach (var thisColumnItem in Rule.Database.Column) {
-                            if (thisColumnItem != null) {
-                                if (_Text.ToUpper().Contains("&" + thisColumnItem.Name.ToUpper() + ";")) {
+                    if (!string.IsNullOrEmpty(_Text))
+                    {
+                        foreach (var thisColumnItem in Rule.Database.Column)
+                        {
+                            if (thisColumnItem != null)
+                            {
+                                if (_Text.ToUpper().Contains("&" + thisColumnItem.Name.ToUpper() + ";"))
+                                {
                                     l.Add(thisColumnItem);
                                 }
 
@@ -1514,9 +1584,12 @@ namespace BlueDatabase {
                     break;
 
                 case enAction.Substring:
-                    if (!string.IsNullOrEmpty(_Text) && Columns.Count > 0) {
-                        foreach (var thisColumnItem in Rule.Database.Column) {
-                            if (thisColumnItem != null) {
+                    if (!string.IsNullOrEmpty(_Text) && Columns.Count > 0)
+                    {
+                        foreach (var thisColumnItem in Rule.Database.Column)
+                        {
+                            if (thisColumnItem != null)
+                            {
                                 if (_Text.ToUpper().Contains("&" + thisColumnItem.Name.ToUpper() + ";")) { l.Add(thisColumnItem); }
                                 if (_Text.ToUpper().Contains("&" + thisColumnItem.Name.ToUpper() + "(")) { l.Add(thisColumnItem); }
 
@@ -1555,7 +1628,8 @@ namespace BlueDatabase {
 
 
 
-        public void OnChanged() {
+        public void OnChanged()
+        {
             if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
             Changed?.Invoke(this, System.EventArgs.Empty);
         }

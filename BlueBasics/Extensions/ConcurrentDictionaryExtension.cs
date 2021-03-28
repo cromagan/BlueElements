@@ -26,13 +26,13 @@ namespace BlueBasics
 {
     public static partial class Extensions
     {
-        public static bool RemoveNullOrEmpty<T>(this ConcurrentDictionary<int, T> L) where T : ICanBeEmpty
+        public static bool RemoveNullOrEmpty<T>(this ConcurrentDictionary<int, T> l) where T : ICanBeEmpty
         {
-            if (L == null || L.Count == 0) { return false; }
+            if (l == null || l.Count == 0) { return false; }
 
             var remo = new List<int>();
 
-            foreach (var pair in L)
+            foreach (var pair in l)
             {
                 if (pair.Value == null || pair.Value.IsNullOrEmpty()) { remo.Add(pair.Key); }
             }
@@ -42,7 +42,7 @@ namespace BlueBasics
 
             foreach (var ThisInteger in remo)
             {
-                if (!L.TryRemove(ThisInteger, out dummy))
+                if (!l.TryRemove(ThisInteger, out dummy))
                 {
                     Develop.DebugPrint(enFehlerArt.Fehler, "Remove failed: " + ThisInteger);
                 }

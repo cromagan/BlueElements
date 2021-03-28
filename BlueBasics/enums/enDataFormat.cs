@@ -17,59 +17,53 @@
 // DEALINGS IN THE SOFTWARE.
 #endregion
 
-
 namespace BlueBasics.Enums
 {
     public enum enDataFormat
     {
 
-        //Unbekannt = -1,
+        // Unbekannt = -1,
 
-        //Nothing = 0,
+        // Nothing = 0,
 
         Text = 1,
         Bit = 2,
         Ganzzahl = 3,
         Gleitkommazahl = 6,
 
-
         BildCode = 13,
 
         // Date_GermanFormat = 15
         Datum_und_Uhrzeit = 16,
-        //Binärdaten_Bild = 19,
+        // Binärdaten_Bild = 19,
 
-        //Passwort = 20, // String
+        // Passwort = 20, // String
         //  Text_Ohne_Kritische_Zeichen = 21,
 
-
         // Binärdaten = 39,
-
 
         // Link_To_BlueDataSystem = 42
         // Telefonnummer = 43, // Spezielle Formate
 
         FarbeInteger = 45, // Color
-        //Email = 46, // Spezielle Formate
-        //InternetAdresse = 47, // Spezielle Formate
+        // Email = 46, // Spezielle Formate
+        // InternetAdresse = 47, // Spezielle Formate
 
-
-        //Relation = 65,
-        //	Event = 66,
+        // Relation = 65,
+        // Event = 66,
 
         // Tendenz = 67
-        //	Einschätzung = 68,
+        // Einschätzung = 68,
 
         Schrift = 69,
 
         Text_mit_Formatierung = 70,
 
-        //   TextmitFormatierungUndLinkToAnotherDatabase = 71
+        // TextmitFormatierungUndLinkToAnotherDatabase = 71
 
-        //Relation_And_Event_Mixed = 72,
+        // Relation_And_Event_Mixed = 72,
 
         Link_To_Filesystem = 73,
-
 
         LinkedCell = 74,
 
@@ -77,8 +71,7 @@ namespace BlueBasics.Enums
         Values_für_LinkedCellDropdown = 76,
 
         RelationText = 77,
-        //KeyForSame = 78
-
+        // KeyForSame = 78
 
         Button = 79
 

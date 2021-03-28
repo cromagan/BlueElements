@@ -21,7 +21,7 @@ namespace BlueBasics.Interfaces
 {
     public interface IParseable : IChangedFeedback
     {
-        void Parse(string ToParse);
+        void Parse(string toParse);
         string ToString();
 
         bool IsParsing { get; }

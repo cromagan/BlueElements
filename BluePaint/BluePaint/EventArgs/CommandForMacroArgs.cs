@@ -17,11 +17,14 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-namespace BluePaint.EventArgs {
-    public class CommandForMacroArgs : System.EventArgs {
+namespace BluePaint.EventArgs
+{
+    public class CommandForMacroArgs : System.EventArgs
+    {
 
 
-        public CommandForMacroArgs(string Command) {
+        public CommandForMacroArgs(string Command)
+        {
             this.Command = Command;
         }
 

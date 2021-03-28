@@ -25,9 +25,9 @@ namespace BlueBasics
 {
     public static partial class Extensions
     {
-        public static Point PointOf(this Rectangle r, enAlignment P)
+        public static Point PointOf(this Rectangle r, enAlignment p)
         {
-            switch (P)
+            switch (p)
             {
                 case enAlignment.Bottom_Left:
                     return new Point(r.Left, r.Bottom);
@@ -48,22 +48,22 @@ namespace BlueBasics
                 case enAlignment.Horizontal_Vertical_Center:
                     return new Point((int)(r.Left + r.Width / 2.0), (int)(r.Top + r.Height / 2.0));
                 default:
-                    Develop.DebugPrint(P);
+                    Develop.DebugPrint(p);
                     return Point.Empty;
             }
         }
 
-        public static Point NearestCornerOF(this Rectangle r, Point P)
+        public static Point NearestCornerOF(this Rectangle r, Point p)
         {
             var LO = r.PointOf(enAlignment.Top_Left);
             var rO = r.PointOf(enAlignment.Top_Right);
             var ru = r.PointOf(enAlignment.Bottom_Right);
             var lu = r.PointOf(enAlignment.Bottom_Left);
 
-            var llo = Geometry.Länge(P, LO);
-            var lro = Geometry.Länge(P, rO);
-            var llu = Geometry.Länge(P, lu);
-            var lru = Geometry.Länge(P, ru);
+            var llo = Geometry.Länge(p, LO);
+            var lro = Geometry.Länge(p, rO);
+            var llu = Geometry.Länge(p, lu);
+            var lru = Geometry.Länge(p, ru);
 
             var Erg = Math.Min(Math.Min(llo, lro), Math.Min(llu, lru));
 

@@ -17,11 +17,14 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-namespace BlueDatabase.EventArgs {
-    public class CellDoubleClickEventArgs : CellEventArgs {
+namespace BlueDatabase.EventArgs
+{
+    public class CellDoubleClickEventArgs : CellEventArgs
+    {
 
 
-        public CellDoubleClickEventArgs(ColumnItem column, RowItem row, bool startEdit) : base(column, row) {
+        public CellDoubleClickEventArgs(ColumnItem column, RowItem row, bool startEdit) : base(column, row)
+        {
             StartEdit = startEdit;
 
         }

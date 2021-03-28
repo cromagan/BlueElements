@@ -47,52 +47,52 @@ namespace BlueBasics
 
         public bool ThrowEvents
         {
-            get => _ThrowEvents;
+            get => this._ThrowEvents;
             set
             {
-                if (_ThrowEvents == value) { Develop.DebugPrint(enFehlerArt.Fehler, "Set ThrowEvents-Fehler! " + value.ToPlusMinus()); }
+                if (this._ThrowEvents == value) { Develop.DebugPrint(enFehlerArt.Fehler, "Set ThrowEvents-Fehler! " + value.ToPlusMinus()); }
 
-                _ThrowEvents = value;
+                this._ThrowEvents = value;
             }
         }
 
         public new void Clear()
         {
-            if (Count == 0) { return; }
+            if (this.Count == 0) { return; }
 
             foreach (var item in this)
             {
-                OnItemRemoving(item);
+                this.OnItemRemoving(item);
             }
 
             base.Clear();
-            OnItemRemoved();
+            this.OnItemRemoved();
         }
 
         public new void Add(T item)
         {
             base.Add(item);
-            OnItemAdded(item);
+            this.OnItemAdded(item);
         }
 
         public new void Remove(T item)
         {
-            if (!Contains(item)) { return; }
+            if (!this.Contains(item)) { return; }
 
-            OnItemRemoving(item);
+            this.OnItemRemoving(item);
             base.Remove(item);
-            OnItemRemoved();
+            this.OnItemRemoved();
         }
 
         public new void AddRange(IEnumerable<T> collection)
         {
             if (collection is null) { return; }
 
-            //base.AddRange(collection);
+            // base.AddRange(collection);
 
             foreach (var item in collection)
             {
-                Add(item);
+                this.Add(item);
             }
         }
 
@@ -100,15 +100,15 @@ namespace BlueBasics
         {
             foreach (var item in collection)
             {
-                Remove(item);
+                this.Remove(item);
             }
         }
 
         public new void Insert(int index, T item)
         {
-            if (index > Count || index < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Index falsch: " + index); }
+            if (index > this.Count || index < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Index falsch: " + index); }
             base.Insert(index, item);
-            OnItemAdded(item);
+            this.OnItemAdded(item);
         }
 
         public new void InsertRange(int index, IEnumerable<T> collection) { Develop.DebugPrint_NichtImplementiert(); }
@@ -117,9 +117,9 @@ namespace BlueBasics
 
         public new void RemoveAt(int index)
         {
-            OnItemRemoving(base[index]);
+            this.OnItemRemoving(base[index]);
             base.RemoveAt(index);
-            OnItemRemoved();
+            this.OnItemRemoved();
         }
 
         public new void RemoveRange(int index, int count) { Develop.DebugPrint_NichtImplementiert(); }
@@ -128,7 +128,7 @@ namespace BlueBasics
         public new void Reverse()
         {
             base.Reverse();
-            OnChanged();
+            this.OnChanged();
         }
 
         public new void Sort(int index, int count, IComparer<T> comparer) { Develop.DebugPrint_NichtImplementiert(); }
@@ -138,7 +138,7 @@ namespace BlueBasics
         public new void Sort()
         {
             base.Sort();
-            OnChanged();
+            this.OnChanged();
         }
 
         public new void Sort(IComparer<T> comparer) { Develop.DebugPrint_NichtImplementiert(); }
@@ -149,16 +149,16 @@ namespace BlueBasics
         {
             get
             {
-                if (index >= Count || index < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Index falsch: " + index); }
+                if (index >= this.Count || index < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Index falsch: " + index); }
                 return base[index];
             }
             set
             {
                 if (base[index] != null)
                 {
-                    OnItemRemoving(base[index]);
+                    this.OnItemRemoving(base[index]);
                     base[index] = value;
-                    OnItemRemoved();
+                    this.OnItemRemoved();
                 }
                 else
                 {
@@ -167,25 +167,25 @@ namespace BlueBasics
 
                 if (value != null)
                 {
-                    OnItemAdded(base[index]);
-                    OnItemSeted(base[index]);
+                    this.OnItemAdded(base[index]);
+                    this.OnItemSeted(base[index]);
                 }
             }
         }
 
         protected virtual void OnItemAdded(T item)
         {
-            if (item is IChangedFeedback cItem) { cItem.Changed += CItem_Changed; }
+            if (item is IChangedFeedback cItem) { cItem.Changed += this.CItem_Changed; }
 
-            if (!_ThrowEvents) { return; }
-            ItemAdded?.Invoke(this, new ListEventArgs(item));
-            OnChanged();
+            if (!this._ThrowEvents) { return; }
+            this.ItemAdded?.Invoke(this, new ListEventArgs(item));
+            this.OnChanged();
         }
 
         private void CItem_Changed(object sender, System.EventArgs e)
         {
-            if (!_ThrowEvents) { return; }
-            OnItemInternalChanged(sender);
+            if (!this._ThrowEvents) { return; }
+            this.OnItemInternalChanged(sender);
         }
 
         /// <summary>
@@ -194,18 +194,18 @@ namespace BlueBasics
         /// <param name="item"></param>
         protected virtual void OnItemRemoving(T item)
         {
-            if (item is IChangedFeedback cItem) { cItem.Changed -= CItem_Changed; }
+            if (item is IChangedFeedback cItem) { cItem.Changed -= this.CItem_Changed; }
 
-            if (!_ThrowEvents) { return; }
-            ItemRemoving?.Invoke(this, new ListEventArgs(item));
+            if (!this._ThrowEvents) { return; }
+            this.ItemRemoving?.Invoke(this, new ListEventArgs(item));
             // OnListOrItemChanged(); Wird bei REMOVED ausgelöst
         }
 
         protected virtual void OnItemRemoved()
         {
-            if (!_ThrowEvents) { return; }
-            ItemRemoved?.Invoke(this, System.EventArgs.Empty);
-            OnChanged();
+            if (!this._ThrowEvents) { return; }
+            this.ItemRemoved?.Invoke(this, System.EventArgs.Empty);
+            this.OnChanged();
         }
 
         /// <summary>
@@ -214,32 +214,32 @@ namespace BlueBasics
         /// <param name="item"></param>
         private void OnItemSeted(T item)
         {
-            if (!_ThrowEvents) { return; }
-            ItemSeted?.Invoke(this, new ListEventArgs(item));
-            //OnListOrItemChanged();
+            if (!this._ThrowEvents) { return; }
+            this.ItemSeted?.Invoke(this, new ListEventArgs(item));
+            // OnListOrItemChanged();
         }
 
         private void OnItemInternalChanged(object item)
         {
-            if (!_ThrowEvents) { return; }
-            ItemInternalChanged?.Invoke(this, new ListEventArgs(item));
-            OnChanged();
+            if (!this._ThrowEvents) { return; }
+            this.ItemInternalChanged?.Invoke(this, new ListEventArgs(item));
+            this.OnChanged();
         }
 
         public virtual void OnChanged()
         {
-            if (!_ThrowEvents) { return; }
-            Changed?.Invoke(this, System.EventArgs.Empty);
+            if (!this._ThrowEvents) { return; }
+            this.Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
-        public void Swap(int Index1, int Index2)
+        public void Swap(int index1, int index2)
         {
             // Der Swap geht so, und nicht anders! Es müssen die Items im Original-Array geswapt werden!
             // Wichtig auch der Zugriff auf die base (nicht auf this). Dadurch werden keine Add/Remove Event ausgelöst.
-            var tmp = base[Index1];
-            base[Index1] = base[Index2];
-            base[Index2] = tmp;
-            OnChanged();
+            var tmp = base[index1];
+            base[index1] = base[index2];
+            base[index2] = tmp;
+            this.OnChanged();
         }
 
         public override string ToString()
@@ -267,7 +267,7 @@ namespace BlueBasics
             catch (Exception ex)
             {
                 Develop.DebugPrint(ex);
-                return ToString();
+                return this.ToString();
             }
         }
     }

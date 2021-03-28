@@ -23,9 +23,11 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 
-namespace BlueControls.Controls {
+namespace BlueControls.Controls
+{
     [Designer(typeof(BasicDesigner))]
-    public class ProgressBar : GenericControl {
+    public class ProgressBar : GenericControl
+    {
         private int wProzent = 100;
 
 
@@ -34,17 +36,22 @@ namespace BlueControls.Controls {
 
         #endregion
         [DefaultValue(100)]
-        public int Prozent {
+        public int Prozent
+        {
             get => wProzent;
-            set {
-                if (value < 0) {
+            set
+            {
+                if (value < 0)
+                {
                     value = 0;
                 }
-                if (value > 100) {
+                if (value > 100)
+                {
                     value = 100;
                 }
 
-                if (wProzent == value) {
+                if (wProzent == value)
+                {
                     return;
                 }
                 wProzent = value;
@@ -57,11 +64,13 @@ namespace BlueControls.Controls {
         //End Sub
 
         // Private Sub EventDrawControl(GR as graphics, vState As enStates) Handles MyBase.DrawControl
-        protected override void DrawControl(Graphics gr, enStates state) {
+        protected override void DrawControl(Graphics gr, enStates state)
+        {
 
             Skin.Draw_Back(gr, enDesign.Progressbar, state, DisplayRectangle, this, true);
 
-            if (wProzent > 0) {
+            if (wProzent > 0)
+            {
                 var r = new Rectangle(DisplayRectangle.X, DisplayRectangle.Y, (int)(Math.Truncate(DisplayRectangle.Width * wProzent / 100.0)), DisplayRectangle.Height);
                 //r = New Rectangle(DisplayRectangle)
                 //r.Width = CInt(r.Width * wProzent / 100)

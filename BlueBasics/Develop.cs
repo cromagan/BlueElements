@@ -87,13 +87,13 @@ namespace BlueBasics
             _DeleteTraceLog = true;
         }
 
-        public static void TraceLogging_Start(string TraceFileName)
+        public static void TraceLogging_Start(string traceFileName)
         {
             TraceLogging_End();
             _DeleteTraceLog = true;
             if (FileExists(_CurrentTraceLogFile)) { File.Delete(_CurrentTraceLogFile); }
 
-            _CurrentTraceLogFile = TempFile(TraceFileName);
+            _CurrentTraceLogFile = TempFile(traceFileName);
             _TraceListener = new TextWriterTraceListener(_CurrentTraceLogFile);
             Trace.Listeners.Add(_TraceListener);
             try
@@ -144,31 +144,31 @@ namespace BlueBasics
             l.Add("</html>");
         }
 
-        public static void HTML_AddHead(List<string> l, string Title)
+        public static void HTML_AddHead(List<string> l, string title)
         {
             l.Add("<!DOctypex HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"");
             l.Add("\"http://www.w3.org/TR/html4/strict.dtd\">");
             l.Add("<html>");
             l.Add("  <head>");
-            l.Add("    <title>" + Title + "</title>");
+            l.Add("    <title>" + title + "</title>");
             l.Add("  </head>");
             l.Add("<body>");
         }
 
-        public static void DebugPrint(string Warnung)
+        public static void DebugPrint(string warnung)
         {
-            DebugPrint(enFehlerArt.Warnung, Warnung);
+            DebugPrint(enFehlerArt.Warnung, warnung);
         }
 
-        public static void DebugPrint(enFehlerArt Art, Exception ex)
+        public static void DebugPrint(enFehlerArt art, Exception ex)
         {
-            if (Art != enFehlerArt.Info && Art != enFehlerArt.DevelopInfo && IsDevelopment()) { Debugger.Break(); }
-            DebugPrint(Art, "Es wurde ein allgemeiner Fehler abgefangen.\r\nMeldung: " + ex.Message + "\r\n" + ex.StackTrace.ToString());
+            if (art != enFehlerArt.Info && art != enFehlerArt.DevelopInfo && IsDevelopment()) { Debugger.Break(); }
+            DebugPrint(art, "Es wurde ein allgemeiner Fehler abgefangen.\r\nMeldung: " + ex.Message + "\r\n" + ex.StackTrace.ToString());
         }
 
-        public static void DebugPrint(Exception Warnung)
+        public static void DebugPrint(Exception warnung)
         {
-            DebugPrint(enFehlerArt.Warnung, Warnung);
+            DebugPrint(enFehlerArt.Warnung, warnung);
         }
 
         public static void DebugPrint_RoutineMussUeberschriebenWerden()
@@ -193,7 +193,7 @@ namespace BlueBasics
             DebugPrint(enFehlerArt.Warnung, "Ein Wert einer Kontextmenü-Befehls konnte nicht verarbeitet werden.\r\nBefehl: " + comand);
         }
 
-        public static void DebugPrint(enFehlerArt Art, string Meldung)
+        public static void DebugPrint(enFehlerArt art, string meldung)
         {
             lock (_SyncLockObject)
             {
@@ -202,11 +202,11 @@ namespace BlueBasics
                     if (_IsTraceLogging) { return; }
                     _IsTraceLogging = true;
 
-                    if (Art == enFehlerArt.Fehler) { _LastDebugMessage = string.Empty; }
+                    if (art == enFehlerArt.Fehler) { _LastDebugMessage = string.Empty; }
 
                     if (DateTime.Now.Subtract(_LastDebugTime).TotalSeconds > 5) { _LastDebugMessage = string.Empty; }
 
-                    var net = Art + (";" + Meldung);
+                    var net = art + (";" + meldung);
                     if (net == _LastDebugMessage)
                     {
                         _IsTraceLogging = false;
@@ -222,7 +222,7 @@ namespace BlueBasics
                     List<string> l = null;
                     Trace.WriteLine("<tr>");
 
-                    switch (Art)
+                    switch (art)
                     {
                         case enFehlerArt.DevelopInfo:
                             if (!IsDevelopment())
@@ -278,11 +278,11 @@ namespace BlueBasics
                         }
                     }
 
-                    Meldung = Meldung.Replace("<br>", "\r", RegexOptions.IgnoreCase).CreateHtmlCodes(true);
-                    Trace.WriteLine("</th><th ALIGN=LEFT><font size = 3>" + Meldung + "</th>");
+                    meldung = meldung.Replace("<br>", "\r", RegexOptions.IgnoreCase).CreateHtmlCodes(true);
+                    Trace.WriteLine("</th><th ALIGN=LEFT><font size = 3>" + meldung + "</th>");
 
                     Trace.WriteLine("</tr>");
-                    if (Art == enFehlerArt.Fehler)
+                    if (art == enFehlerArt.Fehler)
                     {
                         TraceLogging_End();
                         var endl = new List<string>();
@@ -293,7 +293,7 @@ namespace BlueBasics
                         endl.Add("Das Programm <b>" + AppName() + "</b> musste beendet werden.<br>");
                         endl.Add("<br>");
                         endl.Add("<u><b>Grund:</u></b><br>");
-                        endl.Add(Meldung);
+                        endl.Add(meldung);
                         endl.Add("<br>");
                         endl.Add("<font size = 1>");
                         endl.Add("Datum: " + DateTime.Now);
@@ -343,12 +343,12 @@ namespace BlueBasics
             DebugPrint(enFehlerArt.Fehler, "Das Objekt wurde zur Laufzeit verworfen.");
         }
 
-        public static void DebugPrint_InvokeRequired(bool InvokeRequired, bool Fehler)
+        public static void DebugPrint_InvokeRequired(bool invokeRequired, bool fehler)
         {
-            if (!InvokeRequired) { return; }
+            if (!invokeRequired) { return; }
             if (IsDevelopment()) { Debugger.Break(); }
 
-            if (Fehler)
+            if (fehler)
             {
                 DebugPrint(enFehlerArt.Fehler, "Es wird von einem Unterthread zugegriffen.");
             }

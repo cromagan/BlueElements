@@ -20,9 +20,11 @@
 
 using System;
 
-namespace BlueControls.Enums {
+namespace BlueControls.Enums
+{
     [Flags]
-    public enum enStates {
+    public enum enStates
+    {
         Undefiniert = -1,
 
         Standard = 0,

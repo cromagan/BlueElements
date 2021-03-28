@@ -18,9 +18,11 @@
 #endregion
 
 
-namespace BlueControls.Enums {
+namespace BlueControls.Enums
+{
 
-    public enum enTableDrawType {
+    public enum enTableDrawType
+    {
 
         ColumnBackBody = 0,
         Cells = 1,

@@ -1,16 +1,20 @@
 ﻿using BlueBasics.Enums;
 
-namespace BlueControls.Forms {
-    public partial class InputBox : Forms.DialogWithOkAndCancel {
+namespace BlueControls.Forms
+{
+    public partial class InputBox : Forms.DialogWithOkAndCancel
+    {
         private string GiveBack = string.Empty;
 
         #region Konstruktor
 
-        private InputBox() : base() {
+        private InputBox() : base()
+        {
             InitializeComponent();
         }
 
-        private InputBox(string TXT, string VorschlagsText, enDataFormat Textformat, bool BigMultiLineBox) : this() {
+        private InputBox(string TXT, string VorschlagsText, enDataFormat Textformat, bool BigMultiLineBox) : this()
+        {
 
             txbText.Text = VorschlagsText;
             txbText.Format = Textformat;
@@ -25,15 +29,18 @@ namespace BlueControls.Forms {
 
         #endregion
 
-        public static string Show(string TXT) {
+        public static string Show(string TXT)
+        {
             return Show(TXT, "", enDataFormat.Text, false);
         }
 
-        public static string Show(string TXT, string VorschlagsText, enDataFormat Textformat) {
+        public static string Show(string TXT, string VorschlagsText, enDataFormat Textformat)
+        {
             return Show(TXT, VorschlagsText, Textformat, false);
         }
 
-        public static string Show(string TXT, string VorschlagsText, enDataFormat Textformat, bool BigMultiLineBox) {
+        public static string Show(string TXT, string VorschlagsText, enDataFormat Textformat, bool BigMultiLineBox)
+        {
             var MB = new InputBox(TXT, VorschlagsText, Textformat, BigMultiLineBox);
             MB.ShowDialog();
 
@@ -42,22 +49,29 @@ namespace BlueControls.Forms {
 
 
 
-        private void txbText_ESC(object sender, System.EventArgs e) {
+        private void txbText_ESC(object sender, System.EventArgs e)
+        {
             Cancel();
         }
 
-        private void txbText_Enter(object sender, System.EventArgs e) {
+        private void txbText_Enter(object sender, System.EventArgs e)
+        {
             Ok();
         }
 
-        private void InputBox_Shown(object sender, System.EventArgs e) {
+        private void InputBox_Shown(object sender, System.EventArgs e)
+        {
             txbText.Focus();
         }
 
-        protected override void SetValue(bool canceled) {
-            if (canceled) {
+        protected override void SetValue(bool canceled)
+        {
+            if (canceled)
+            {
                 GiveBack = string.Empty;
-            } else {
+            }
+            else
+            {
                 GiveBack = txbText.Text;
             }
         }

@@ -1,8 +1,10 @@
 ﻿using System;
 
-namespace BlueDatabase.Enums {
+namespace BlueDatabase.Enums
+{
     [Flags]
-    public enum enFilterType {
+    public enum enFilterType
+    {
 
         // Filterarten allgemein -------------------------------------------------------
         KeinFilter = 0,

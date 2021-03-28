@@ -1,14 +1,18 @@
 ﻿using BlueDatabase;
 
-namespace BlueControls.Forms {
-    public partial class EditBoxRow : Forms.DialogWithOkAndCancel {
+namespace BlueControls.Forms
+{
+    public partial class EditBoxRow : Forms.DialogWithOkAndCancel
+    {
 
         #region Konstruktor
-        private EditBoxRow() : base() {
+        private EditBoxRow() : base()
+        {
             InitializeComponent();
         }
 
-        private EditBoxRow(string TXT, RowItem row) : this() {
+        private EditBoxRow(string TXT, RowItem row) : this()
+        {
             formToEdit.Database = row.Database;
             formToEdit.ShowingRowKey = row.Key;
             Setup(TXT, formToEdit, formToEdit.MinimumSize.Width + 50, false, true);
@@ -16,12 +20,16 @@ namespace BlueControls.Forms {
 
         #endregion
 
-        public static void Show(string TXT, RowItem row, bool IsDialog) {
+        public static void Show(string TXT, RowItem row, bool IsDialog)
+        {
             var MB = new EditBoxRow(TXT, row);
 
-            if (IsDialog) {
+            if (IsDialog)
+            {
                 MB.ShowDialog();
-            } else {
+            }
+            else
+            {
                 MB.Show();
             }
         }
@@ -30,7 +38,8 @@ namespace BlueControls.Forms {
 
 
 
-        protected override void SetValue(bool canceled) {
+        protected override void SetValue(bool canceled)
+        {
             // Nix zu tun
         }
     }

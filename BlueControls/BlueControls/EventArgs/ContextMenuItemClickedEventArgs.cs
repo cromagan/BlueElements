@@ -20,11 +20,14 @@
 
 using System.Collections.Generic;
 
-namespace BlueControls.EventArgs {
-    public class ContextMenuItemClickedEventArgs : System.EventArgs {
+namespace BlueControls.EventArgs
+{
+    public class ContextMenuItemClickedEventArgs : System.EventArgs
+    {
 
 
-        public ContextMenuItemClickedEventArgs(string clickedComand, object hotItem, List<string> tags) {
+        public ContextMenuItemClickedEventArgs(string clickedComand, object hotItem, List<string> tags)
+        {
             HotItem = hotItem;
             Tags = tags;
             ClickedComand = clickedComand;

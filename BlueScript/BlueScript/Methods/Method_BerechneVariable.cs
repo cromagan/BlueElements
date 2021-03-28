@@ -22,8 +22,10 @@ using Skript.Enums;
 using System.Collections.Generic;
 using static BlueBasics.Extensions;
 
-namespace BlueScript {
-    internal class Method_BerechneVariable : Method {
+namespace BlueScript
+{
+    internal class Method_BerechneVariable : Method
+    {
 
 
         public override string Syntax => "VariablenName = Berechung;";
@@ -42,11 +44,13 @@ namespace BlueScript {
 
 
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
+        {
 
             var variableName = infos.ComandText.ToLower().ReduceToChars(Constants.Char_az + "_" + Constants.Char_Numerals);
             var variable = s.Variablen.Get(variableName);
-            if (variable == null) {
+            if (variable == null)
+            {
                 return new strDoItFeedback("Variable " + variableName + " nicht gefunden");
             }
 

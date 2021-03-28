@@ -21,8 +21,10 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
 
-namespace BlueDatabase {
-    public static class LanguageTool {
+namespace BlueDatabase
+{
+    public static class LanguageTool
+    {
 
         public static Database Translation = null;
         private static string German = string.Empty;
@@ -38,8 +40,10 @@ namespace BlueDatabase {
         /// <param name="column"></param>
         /// <param name="style"></param>
         /// <returns></returns>
-        public static string ColumnReplace(string txt, ColumnItem column, enShortenStyle style) {
-            if (!string.IsNullOrEmpty(txt)) {
+        public static string ColumnReplace(string txt, ColumnItem column, enShortenStyle style)
+        {
+            if (!string.IsNullOrEmpty(txt))
+            {
                 if (!string.IsNullOrEmpty(column.Prefix)) { txt = DoTranslate(column.Prefix, true) + " " + txt; }
                 if (!string.IsNullOrEmpty(column.Suffix)) { txt = txt + " " + DoTranslate(column.Suffix, true); }
             }
@@ -50,12 +54,17 @@ namespace BlueDatabase {
 
             var OT = txt;
 
-            foreach (var ThisString in column.OpticalReplace) {
+            foreach (var ThisString in column.OpticalReplace)
+            {
                 var x = ThisString.SplitBy("|");
-                if (x.Length == 2) {
-                    if (string.IsNullOrEmpty(x[0])) {
+                if (x.Length == 2)
+                {
+                    if (string.IsNullOrEmpty(x[0]))
+                    {
                         if (string.IsNullOrEmpty(txt)) { txt = x[1]; }
-                    } else {
+                    }
+                    else
+                    {
                         txt = txt.Replace(x[0], x[1]);
                     }
                 }
@@ -66,8 +75,10 @@ namespace BlueDatabase {
             return OT + " (" + txt + ")";
         }
 
-        private static string ColumnReplaceTranslated(string newTXT, ColumnItem column) {
-            switch (column.Format) {
+        private static string ColumnReplaceTranslated(string newTXT, ColumnItem column)
+        {
+            switch (column.Format)
+            {
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.Gleitkommazahl:
                 case enDataFormat.Datum_und_Uhrzeit:
@@ -85,7 +96,8 @@ namespace BlueDatabase {
 
 
 
-        public static string DoTranslate(string txt) {
+        public static string DoTranslate(string txt)
+        {
             return DoTranslate(txt, true, EmptyArgs);
         }
 
@@ -96,9 +108,11 @@ namespace BlueDatabase {
         /// <param name="txt"></param>
         /// <param name="mustTranslate">TRUE erstellt einen Eintrag in der Englisch-Datenbank, falls nicht vorhanden.</param>
         /// <returns></returns>
-        public static string DoTranslate(string txt, bool mustTranslate, params object[] args) {
+        public static string DoTranslate(string txt, bool mustTranslate, params object[] args)
+        {
 
-            try {
+            try
+            {
 
                 if (Translation == null) { return string.Format(txt, args); }
                 if (string.IsNullOrEmpty(txt)) { return string.Empty; }
@@ -112,7 +126,8 @@ namespace BlueDatabase {
 
                 var addend = string.Empty;
 
-                if (txt.EndsWith(":")) {
+                if (txt.EndsWith(":"))
+                {
                     txt = txt.TrimEnd(":");
                     addend = ":";
                 }
@@ -120,7 +135,8 @@ namespace BlueDatabase {
                 txt = txt.Replace("\r\n", "\r");
 
                 var r = Translation.Row[txt];
-                if (r == null) {
+                if (r == null)
+                {
                     if (Translation.ReadOnly) { English = German; return string.Format(English, args); }
                     if (!mustTranslate) { English = German; return string.Format(English, args); }
                     r = Translation.Row.Add(txt);
@@ -132,7 +148,9 @@ namespace BlueDatabase {
                 English = t + addend;
 
                 return string.Format(English, args);
-            } catch {
+            }
+            catch
+            {
                 return txt;
             }
 

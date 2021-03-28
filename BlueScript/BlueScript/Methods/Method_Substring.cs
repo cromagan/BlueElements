@@ -20,8 +20,10 @@
 using Skript.Enums;
 using System.Collections.Generic;
 
-namespace BlueScript {
-    internal class Method_Substring : Method {
+namespace BlueScript
+{
+    internal class Method_Substring : Method
+    {
 
         public override string Syntax => "Substring(String, Start, Anzahl)";
         public override string Description => "Gibt einen Teilstring zurück. Ist der Start oder das Ende keine gültige Position, wird das bestmögliche zurückgegeben und kein Fehler ausgelöst. Subrtring(\"Hallo\", 2,2) gibt ll zurück.";
@@ -33,20 +35,23 @@ namespace BlueScript {
         public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.Integer, enVariableDataType.Integer };
         public override bool EndlessArgs => false;
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
+        {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
             var st = attvar[1].ValueInt;
             var en = attvar[2].ValueInt;
 
-            if (st < 0) {
+            if (st < 0)
+            {
                 en += st;
                 st = 0;
             }
 
 
-            if (st + en > attvar[0].ValueString.Length) {
+            if (st + en > attvar[0].ValueString.Length)
+            {
                 en = attvar[0].ValueString.Length - st;
             }
             return new strDoItFeedback("\"" + attvar[0].ValueString.Substring(st, en) + "\"", string.Empty);

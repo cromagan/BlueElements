@@ -22,15 +22,15 @@ using System.Runtime.InteropServices;
 
 namespace BlueBasics
 
-//TODO: Enums erzeugen
+// TODO: Enums erzeugen
 {
     internal static class modTastaturSimulation
     {
         private const int KEYEVENTF_KEYUP = 0x2; // Release key
         private const int KEYEVENTF_EXTENDEDKEY = 0x1;
         private const int KEYEVENTF_KEYDOWN = 0x0;
-        //    VK_CANCEL = &H3 'Used for control-break processing.
-        //'****************
+        // VK_CANCEL = &H3 'Used for control-break processing.
+        // '****************
         //    VK_CRSEL = &HF7
         //    VK_EREOF = &HF9
         //    VK_EXECUTE = &H2B

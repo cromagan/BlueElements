@@ -21,8 +21,10 @@ using BlueBasics;
 using System;
 using System.Drawing;
 
-namespace BlueControls {
-    public static class GeometryDF {
+namespace BlueControls
+{
+    public static class GeometryDF
+    {
 
 
 
@@ -30,7 +32,8 @@ namespace BlueControls {
 
 
         /// Berechnet, ob sich zwei geraden IRGENDWO treffen.
-        public static PointM LinesIntersect(PointM Line1Start, PointM Line1End, PointM Line2Start, PointM Line2End) {
+        public static PointM LinesIntersect(PointM Line1Start, PointM Line1End, PointM Line2Start, PointM Line2End)
+        {
 
             decimal a1, a2, b1, b2, c1, c2, denom;
 
@@ -45,7 +48,8 @@ namespace BlueControls {
             c2 = Line2End.X * Line2Start.Y - Line2Start.X * Line2End.Y;
 
             denom = a1 * b2 - a2 * b1;
-            if (denom < 0.0000001M && denom > -0.0000001M) {
+            if (denom < 0.0000001M && denom > -0.0000001M)
+            {
                 // Ergibt ansonsten zu große ergebnisse
                 return null;
             }
@@ -55,10 +59,12 @@ namespace BlueControls {
 
         }
 
-        public static PointM LinesIntersect(PointM Line1Start, PointM Line1End, PointM Line2Start, PointM Line2End, bool considerEndpoints) {
+        public static PointM LinesIntersect(PointM Line1Start, PointM Line1End, PointM Line2Start, PointM Line2End, bool considerEndpoints)
+        {
 
             var sp = LinesIntersect(Line1Start, Line1End, Line2Start, Line2End);
-            if (!considerEndpoints) {
+            if (!considerEndpoints)
+            {
                 //    DebugPrint("considerEndpoints = false")
                 return sp;
             }
@@ -88,7 +94,8 @@ namespace BlueControls {
         /// <param name="P1"></param>
         /// <param name="P2"></param>
         /// <returns></returns>
-        public static decimal DistanzZuStrecke(this PointF P, PointM P1, PointM P2) {
+        public static decimal DistanzZuStrecke(this PointF P, PointM P1, PointM P2)
+        {
             return P.DistanzZuStrecke(P1.X, P1.Y, P2.X, P2.Y);
         }
 
@@ -96,7 +103,8 @@ namespace BlueControls {
         //{
         //    return P.DistanzZuStrecke(P1.X, P1.Y, P2.X, P2.Y);
         //}
-        public static PointM ToPointM(this PointF P) {
+        public static PointM ToPointM(this PointF P)
+        {
             return new PointM(P.X, P.Y);
         }
 
@@ -110,7 +118,8 @@ namespace BlueControls {
         /// <param name="X2"></param>
         /// <param name="Y2"></param>
         /// <returns></returns>
-        public static decimal DistanzZuStrecke(this PointF P, decimal X1, decimal Y1, decimal X2, decimal Y2) {
+        public static decimal DistanzZuStrecke(this PointF P, decimal X1, decimal Y1, decimal X2, decimal Y2)
+        {
             var SP = PointOnLine(new PointM(P.X, P.Y), X1, Y1, X2, Y2);
 
 
@@ -125,12 +134,14 @@ namespace BlueControls {
 
         }
 
-        public static PointM PolarToCartesian(decimal R, double Winkel) {
+        public static PointM PolarToCartesian(decimal R, double Winkel)
+        {
             // http://de.wikipedia.org/wiki/Polarkoordinaten
 
             Winkel %= 360;
 
-            switch (Winkel) {
+            switch (Winkel)
+            {
                 case 0:
                     return new PointM(R, 0);
                 case 90:
@@ -144,10 +155,12 @@ namespace BlueControls {
             }
         }
 
-        public static decimal Winkel(PointM Sp, PointM EP) {
+        public static decimal Winkel(PointM Sp, PointM EP)
+        {
             return Geometry.Winkel(Sp.X, Sp.Y, EP.X, EP.Y);
         }
-        public static PointM PointOnLine(PointM Maus, decimal P_X, decimal P_Y, decimal Q_X, decimal Q_Y) {
+        public static PointM PointOnLine(PointM Maus, decimal P_X, decimal P_Y, decimal Q_X, decimal Q_Y)
+        {
             //http://de.wikipedia.org/wiki/Geradengleichung
             // < 0.000001 ist 0 gleich, weil ansonsten zu große ergebnisse rauskommen
             if (Math.Abs(P_Y - Q_Y) < 0.0000001m) // genau Waagerecht
@@ -174,7 +187,8 @@ namespace BlueControls {
 
 
 
-        public static decimal Länge(PointM SP, PointM Ep) {
+        public static decimal Länge(PointM SP, PointM Ep)
+        {
             // Berechnet die Länge einer Strecke
 
             var L1 = SP.X - Ep.X;

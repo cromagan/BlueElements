@@ -22,8 +22,10 @@ using Skript.Enums;
 using System.Collections.Generic;
 using static BlueBasics.Extensions;
 
-namespace BlueScript {
-    internal class Method_Add : Method {
+namespace BlueScript
+{
+    internal class Method_Add : Method
+    {
 
 
         public override string Syntax => "Add(List-Variable, Value1, Value2, ...)";
@@ -38,17 +40,20 @@ namespace BlueScript {
         public override List<enVariableDataType> Args => new() { enVariableDataType.VariableList, enVariableDataType.String };
         public override bool EndlessArgs => true;
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
+        {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
 
 
-            if (attvar[0].Type == Skript.Enums.enVariableDataType.List) {
+            if (attvar[0].Type == Skript.Enums.enVariableDataType.List)
+            {
 
                 var x = attvar[0].ValueString.SplitByCRToList();
 
-                for (var z = 1; z < attvar.Count; z++) {
+                for (var z = 1; z < attvar.Count; z++)
+                {
                     if (attvar[z].Type != Skript.Enums.enVariableDataType.String) { return strDoItFeedback.FalscherDatentyp(); }
                     x.Add(attvar[z].ValueString);
                 }

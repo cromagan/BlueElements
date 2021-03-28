@@ -18,11 +18,14 @@
 #endregion
 
 
-namespace BlueDatabase.EventArgs {
-    public class DatabaseSettingsEventHandler : System.EventArgs {
+namespace BlueDatabase.EventArgs
+{
+    public class DatabaseSettingsEventHandler : System.EventArgs
+    {
 
 
-        public DatabaseSettingsEventHandler(ColumnItem executingColumn, string filenname, bool readOnly) {
+        public DatabaseSettingsEventHandler(ColumnItem executingColumn, string filenname, bool readOnly)
+        {
             ExecutingColumn = executingColumn;
             Filenname = filenname;
             ReadOnly = readOnly;

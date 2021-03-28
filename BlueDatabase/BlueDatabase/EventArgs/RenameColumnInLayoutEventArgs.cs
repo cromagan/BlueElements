@@ -18,9 +18,12 @@
 #endregion
 
 
-namespace BlueDatabase.EventArgs {
-    public class GenerateLayoutInternalEventargs : System.EventArgs {
-        public GenerateLayoutInternalEventargs(RowItem row, string layoutID, string SaveTo) {
+namespace BlueDatabase.EventArgs
+{
+    public class GenerateLayoutInternalEventargs : System.EventArgs
+    {
+        public GenerateLayoutInternalEventargs(RowItem row, string layoutID, string SaveTo)
+        {
             Row = row;
             LayoutID = layoutID;
             Filename = SaveTo;

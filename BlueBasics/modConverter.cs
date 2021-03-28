@@ -23,7 +23,6 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
-using System.Management;
 using System.Text;
 using static BlueBasics.FileOperations;
 
@@ -35,9 +34,9 @@ namespace BlueBasics
         private static string SerialNr2Path_LastSearch = string.Empty;
         private static string SerialNr2Path_LastErgebnis = string.Empty;
 
-        public static string ByteToBin8(byte B)
+        public static string ByteToBin8(byte b)
         {
-            var x = Convert.ToString(B, 2);
+            var x = Convert.ToString(b, 2);
             while (true)
             {
                 if (x.Length == 8) { return x; }
@@ -45,19 +44,19 @@ namespace BlueBasics
             }
         }
 
-        public static byte Bin8ToByte(string BIN8)
+        public static byte Bin8ToByte(string bIN8)
         {
-            return Convert.ToByte(BIN8, 2);
+            return Convert.ToByte(bIN8, 2);
         }
 
-        public static Bitmap StringWIN1525ToBitmap(string TXT)
+        public static Bitmap StringWIN1252ToBitmap(string tXT)
         {
-            if (string.IsNullOrEmpty(TXT))
+            if (string.IsNullOrEmpty(tXT))
             {
                 return null;
             }
 
-            var b = TXT.ToByteWIN1252();
+            var b = tXT.ToByteWIN1252();
             var BMP = ByteToBitmap(b);
             return BMP;
         }
@@ -74,23 +73,23 @@ namespace BlueBasics
             return BMP;
         }
 
-        //public static string UTF8toString(string S) {
+        // public static string UTF8toString(string S) {
 
-        //}
+        // }
 
-        //public static string StringtoUTF8(string S) {
+        // public static string StringtoUTF8(string S) {
         //    return Encoding.Defxault.GetString(Encoding.UTF8.GetBytes(S));
-        //}
+        // }
 
-        public static string BitmapToBase64(Bitmap BMP, ImageFormat BFormat)
+        public static string BitmapToBase64(Bitmap bMP, ImageFormat bFormat)
         {
-            if (BMP == null) { return string.Empty; }
+            if (bMP == null) { return string.Empty; }
 
-            if (BMP.PixelFormat != PixelFormat.Format32bppPArgb) { BMP = Bitmap_ChangePixelFormat(BMP); }
+            if (bMP.PixelFormat != PixelFormat.Format32bppPArgb) { bMP = Bitmap_ChangePixelFormat(bMP); }
 
             string base64 = null;
             var memory = new MemoryStream();
-            BMP.Save(memory, BFormat);
+            bMP.Save(memory, bFormat);
             base64 = Convert.ToBase64String(memory.ToArray());
             memory.Close();
             return base64;
@@ -111,13 +110,13 @@ namespace BlueBasics
             }
         }
 
-        public static byte[] FileToByte(string Dateiname)
+        public static byte[] FileToByte(string dateiname)
         {
             byte[] b = null;
-            var obFi = new FileStream(Dateiname, FileMode.Open, FileAccess.Read);
+            var obFi = new FileStream(dateiname, FileMode.Open, FileAccess.Read);
 
             var r = new BinaryReader(obFi);
-            b = r.ReadBytes((int)new FileInfo(Dateiname).Length);
+            b = r.ReadBytes((int)new FileInfo(dateiname).Length);
 
             r.Close();
             r.Dispose();
@@ -128,16 +127,16 @@ namespace BlueBasics
             return b;
         }
 
-        public static void ByteToFile(string Dateiname, byte[] b)
+        public static void ByteToFile(string dateiname, byte[] b)
         {
-            if (FileExists(Dateiname))
+            if (FileExists(dateiname))
             {
-                Develop.DebugPrint("Datei soll überschrieben werden: " + Dateiname);
+                Develop.DebugPrint("Datei soll überschrieben werden: " + dateiname);
                 return;
             }
 
-            //   Stop
-            var l = File.Create(Dateiname);
+            // Stop
+            var l = File.Create(dateiname);
             l.Write(b, 0, b.Length);
             l.Flush();
             l.Close();
@@ -149,24 +148,24 @@ namespace BlueBasics
             modAllgemein.CollectGarbage();
 
             return new Bitmap(oldBmp);
-            //  Return oldBmp.Clone(New Rectangle(0, 0, oldBmp.Width, oldBmp.Height), NewFormat)
+            // Return oldBmp.Clone(New Rectangle(0, 0, oldBmp.Width, oldBmp.Height), NewFormat)
         }
 
-        public static byte[] BitmapToByte(Bitmap BMP, ImageFormat Format)
+        public static byte[] BitmapToByte(Bitmap bMP, ImageFormat format)
         {
-            if (BMP == null) { return null; }
+            if (bMP == null) { return null; }
 
-            if (BMP.PixelFormat != PixelFormat.Format32bppPArgb) { BMP = Bitmap_ChangePixelFormat(BMP); }
+            if (bMP.PixelFormat != PixelFormat.Format32bppPArgb) { bMP = Bitmap_ChangePixelFormat(bMP); }
 
             var MemSt = new MemoryStream();
-            BMP.Save(MemSt, Format);
+            bMP.Save(MemSt, format);
             return MemSt.ToArray();
         }
 
-        public static string BitmapToStringUnicode(Bitmap BMP, ImageFormat Format)
+        public static string BitmapToStringUnicode(Bitmap bMP, ImageFormat format)
         {
-            if (BMP == null) { return string.Empty; }
-            return new string(Encoding.Unicode.GetChars(BitmapToByte(BMP, Format)));
+            if (bMP == null) { return string.Empty; }
+            return new string(Encoding.Unicode.GetChars(BitmapToByte(bMP, format)));
         }
 
         public static Bitmap ByteToBitmap(byte[] value)
@@ -177,7 +176,7 @@ namespace BlueBasics
             {
                 using var ms = new MemoryStream(value);
                 return new Bitmap(ms);
-                //return (Bitmap)Image.FromStream(fs);
+                // return (Bitmap)Image.FromStream(fs);
             }
             catch
             {
@@ -186,115 +185,112 @@ namespace BlueBasics
             }
         }
 
-        //public static string FileToString(string Dateiname) {
+        // public static string FileToString(string Dateiname) {
         //    try {
         //        var b = FileToByte(Dateiname);
         //        return b.ToStringWIN1252();
         //    } catch {
         //        return string.Empty;
         //    }
-        //}
+        // }
 
-        public static void CartesianToPolar(PointF ko, ref double r, ref double Win)
+        public static void CartesianToPolar(PointF ko, ref double r, ref double win)
         {
             r = Math.Sqrt(ko.X * ko.X + ko.Y * ko.Y);
-            Win = Convert.ToDouble(Geometry.Winkel(0M, 0M, (decimal)ko.X, (decimal)ko.Y));
+            win = Convert.ToDouble(Geometry.Winkel(0M, 0M, (decimal)ko.X, (decimal)ko.Y));
         }
 
         #endregion
 
-        public static decimal PixelToMM(decimal Pixel, int DPI)
+        public static decimal PixelToMM(decimal pixel, int dPI)
         {
-            return Pixel / DPI * 25.4M;
+            return pixel / dPI * 25.4M;
         }
 
-        public static decimal mmToPixel(decimal MM, int DPI)
+        public static decimal mmToPixel(decimal mM, int dPI)
         {
-            return MM * DPI / 25.4M;
+            return mM * dPI / 25.4M;
         }
 
-        private static string GetDriveSerialNumber(string drive)
-        {
-            var driveSerial = string.Empty;
-            var driveFixed = Path.GetPathRoot(drive);
-            driveFixed = driveFixed.Replace("\\", string.Empty);
+        //private static string GetDriveSerialNumber(string drive)
+        //{
+        //    var driveSerial = string.Empty;
+        //    var driveFixed = Path.GetPathRoot(drive);
+        //    driveFixed = driveFixed.Replace("\\", string.Empty);
 
-            using (var querySearch = new ManagementObjectSearcher("SELECT VolumeSerialNumber FROM Win32_LogicalDisk Where Name = '" + driveFixed + "'"))
-            {
-                using var queryCollection = querySearch.Get();
-                foreach (ManagementObject moItem in queryCollection)
-                {
-                    driveSerial = Convert.ToString(moItem["VolumeSerialNumber"]);
-                    break;
-                }
-            }
+        //    using (var querySearch = new ManagementObjectSearcher("SELECT VolumeSerialNumber FROM Win32_LogicalDisk Where Name = '" + driveFixed + "'"))
+        //    {
+        //        using var queryCollection = querySearch.Get();
+        //        foreach (ManagementObject moItem in queryCollection)
+        //        {
+        //            driveSerial = Convert.ToString(moItem["VolumeSerialNumber"]);
+        //            break;
+        //        }
+        //    }
 
-            return driveSerial;
-        }
+        //    return driveSerial;
+        //}
 
-        public static string Path2SerialNr(string Path)
-        {
-            if (Path.Substring(1, 2) != ":\\") { return Path; }
-            if (!PathExists(Path.Substring(0, 3))) { return Path; }
-            return GetDriveSerialNumber(Path) + Path.Substring(1);
-        }
+        //public static string Path2SerialNr(string path)
+        //{
+        //    if (path.Substring(1, 2) != ":\\") { return path; }
+        //    if (!PathExists(path.Substring(0, 3))) { return path; }
+        //    return GetDriveSerialNumber(path) + path.Substring(1);
+        //}
 
-        public static string SerialNr2Path(string Pfad)
-        {
-            var MustSearch = true;
+        //public static string SerialNr2Path(string pfad)
+        //{
+        //    var MustSearch = true;
 
-            if (Pfad.Length > 2 && Pfad.Substring(1, 2) == ":\\") { MustSearch = false; }
-            if (Pfad.Length > 1 && Pfad.Substring(0, 2) == "\\\\") { MustSearch = false; }
+        //    if (pfad.Length > 2 && pfad.Substring(1, 2) == ":\\") { MustSearch = false; }
+        //    if (pfad.Length > 1 && pfad.Substring(0, 2) == "\\\\") { MustSearch = false; }
 
-            if (Pfad.StartsWith("..\\"))
-            {
-                Pfad = System.Windows.Forms.Application.StartupPath + "\\" + Pfad;
-                MustSearch = false;
-            }
+        //    if (pfad.StartsWith("..\\"))
+        //    {
+        //        pfad = System.Windows.Forms.Application.StartupPath + "\\" + pfad;
+        //        MustSearch = false;
+        //    }
 
-            if (Pfad.Length > 8 && Pfad.Substring(0, 9).ToUpper() == "APPPATH:\\")
-            {
-                Pfad = System.Windows.Forms.Application.StartupPath + Pfad.Substring(8);
-                MustSearch = false;
-            }
+        //    if (pfad.Length > 8 && string.Equals(pfad.Substring(0, 9), "APPPATH:\\", StringComparison.OrdinalIgnoreCase))
+        //    {
+        //        pfad = System.Windows.Forms.Application.StartupPath + pfad.Substring(8);
+        //        MustSearch = false;
+        //    }
 
-            var xq = 0; //= Pfad.IndexOf(":\")
-            while (true)
-            {
-                xq = (Pfad + "\\").IndexOf("..\\");
-                if (xq < 0) { break; }
-                Pfad = Pfad.Substring(0, xq).PathParent() + Pfad.Substring(xq + 3);
-            }
+        //    var xq = 0; // = Pfad.IndexOf(":\")
+        //    while (true)
+        //    {
+        //        xq = (pfad + "\\").IndexOf("..\\");
+        //        if (xq < 0) { break; }
+        //        pfad = pfad.Substring(0, xq).PathParent() + pfad.Substring(xq + 3);
+        //    }
 
-            if (!MustSearch) { return Pfad; }
+        //    if (!MustSearch) { return pfad; }
 
-            xq = Pfad.IndexOf(":\\");
-            if (xq < 0) { return Pfad; }
+        //    xq = pfad.IndexOf(":\\");
+        //    if (xq < 0) { return pfad; }
 
-            if (SerialNr2Path_LastSearch == Pfad.Substring(0, xq) && !string.IsNullOrEmpty(SerialNr2Path_LastErgebnis))
-            {
-                return SerialNr2Path_LastErgebnis + Pfad.Substring(xq);
-            }
+        //    if (SerialNr2Path_LastSearch == pfad.Substring(0, xq) && !string.IsNullOrEmpty(SerialNr2Path_LastErgebnis))
+        //    {
+        //        return SerialNr2Path_LastErgebnis + pfad.Substring(xq);
+        //    }
 
-            SerialNr2Path_LastSearch = Pfad.Substring(0, xq);
+        //    SerialNr2Path_LastSearch = pfad.Substring(0, xq);
 
-            var odrive = DriveInfo.GetDrives();
+        //    var odrive = DriveInfo.GetDrives();
 
-            for (var z = 0; z <= odrive.GetUpperBound(0); z++)
-            {
-                if (odrive[z].IsReady)
-                {
-                    if (GetDriveSerialNumber(odrive[z].Name) == Pfad.Substring(0, xq))
-                    {
-                        SerialNr2Path_LastErgebnis = odrive[z].Name.Substring(0, 1);
-                        return SerialNr2Path_LastErgebnis + Pfad.Substring(xq);
-                    }
-                }
-            }
+        //    for (var z = 0; z <= odrive.GetUpperBound(0); z++)
+        //    {
+        //        if (odrive[z].IsReady && GetDriveSerialNumber(odrive[z].Name) == pfad.Substring(0, xq))
+        //        {
+        //            SerialNr2Path_LastErgebnis = odrive[z].Name.Substring(0, 1);
+        //            return SerialNr2Path_LastErgebnis + pfad.Substring(xq);
+        //        }
+        //    }
 
-            SerialNr2Path_LastSearch = string.Empty;
-            return Pfad;
-        }
+        //    SerialNr2Path_LastSearch = string.Empty;
+        //    return pfad;
+        //}
 
         /// <summary>
         /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
@@ -331,7 +327,7 @@ namespace BlueBasics
         {
             if (string.IsNullOrEmpty(s)) { return 0; }
             if (decimal.TryParse(s, out var result)) { return result; }
-            //Develop.DebugPrint(enFehlerArt.Warnung, "Decimal kann nicht geparsed werden: " + s);
+            // Develop.DebugPrint(enFehlerArt.Warnung, "Decimal kann nicht geparsed werden: " + s);
             return 0;
         }
 
@@ -396,8 +392,6 @@ namespace BlueBasics
 
             return false;
         }
-
-
 
     }
 }

@@ -17,11 +17,14 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-namespace BlueControls.EventArgs {
-    public class PositionEventArgs : System.EventArgs {
+namespace BlueControls.EventArgs
+{
+    public class PositionEventArgs : System.EventArgs
+    {
 
 
-        public PositionEventArgs(int x, int y) {
+        public PositionEventArgs(int x, int y)
+        {
             X = x;
             Y = y;
         }

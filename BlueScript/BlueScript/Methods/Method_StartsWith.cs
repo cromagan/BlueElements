@@ -20,8 +20,10 @@
 using Skript.Enums;
 using System.Collections.Generic;
 
-namespace BlueScript {
-    internal class Method_StartsWith : Method {
+namespace BlueScript
+{
+    internal class Method_StartsWith : Method
+    {
 
         public override string Syntax => "StartsWith(String, CaseSensitive, Value1, Value2, ...)";
 
@@ -37,17 +39,24 @@ namespace BlueScript {
         public override bool EndlessArgs => true;
 
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
+        {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
-            for (var z = 2; z < attvar.Count; z++) {
-                if (attvar[1].ValueBool) {
-                    if (attvar[0].ValueString.StartsWith(attvar[z].ValueString)) {
+            for (var z = 2; z < attvar.Count; z++)
+            {
+                if (attvar[1].ValueBool)
+                {
+                    if (attvar[0].ValueString.StartsWith(attvar[z].ValueString))
+                    {
                         return strDoItFeedback.Wahr();
                     }
-                } else {
-                    if (attvar[0].ValueString.ToLower().StartsWith(attvar[z].ValueString.ToLower())) {
+                }
+                else
+                {
+                    if (attvar[0].ValueString.ToLower().StartsWith(attvar[z].ValueString.ToLower()))
+                    {
                         return strDoItFeedback.Wahr();
                     }
                 }

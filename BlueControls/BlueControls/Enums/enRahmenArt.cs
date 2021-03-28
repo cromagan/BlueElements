@@ -1,5 +1,7 @@
-﻿namespace BlueControls.Enums {
-    public enum enRahmenArt {
+﻿namespace BlueControls.Enums
+{
+    public enum enRahmenArt
+    {
         Unbekannt = -1,
         Ohne = 0,
 

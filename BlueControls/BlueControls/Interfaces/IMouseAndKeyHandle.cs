@@ -17,8 +17,10 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-namespace BlueControls.Interfaces {
-    public interface IMouseAndKeyHandle {
+namespace BlueControls.Interfaces
+{
+    public interface IMouseAndKeyHandle
+    {
         bool MouseDown(object sender, System.Windows.Forms.MouseEventArgs e, decimal zoom, decimal shiftX, decimal shiftY);
         bool MouseMove(object sender, System.Windows.Forms.MouseEventArgs e, decimal zoom, decimal shiftX, decimal shiftY);
         bool MouseUp(object sender, System.Windows.Forms.MouseEventArgs e, decimal zoom, decimal shiftX, decimal shiftY);

@@ -19,11 +19,14 @@
 
 using BlueControls.Enums;
 
-namespace BlueControls.Controls {
-    public class TabControl : AbstractTabControl {
+namespace BlueControls.Controls
+{
+    public class TabControl : AbstractTabControl
+    {
 
 
-        public TabControl() : base() {
+        public TabControl() : base()
+        {
             BackColor = Skin.Color_Back(enDesign.TabStrip_Body, enStates.Standard);
         }
 

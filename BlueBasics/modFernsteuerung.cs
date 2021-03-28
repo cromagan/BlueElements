@@ -89,10 +89,10 @@ namespace BlueBasics
         /// <remarks></remarks>
         public static string WinClass(IntPtr handle)
         {
-            var buffer = string.Empty.PadRight(250); //= Space(250)
+            var buffer = string.Empty.PadRight(250); // = Space(250)
             var l = GetClassName(handle, buffer, 250);
 
-            //   If String.IsNullOrEmpty(buffer) Then Return String.Empty
+            // If String.IsNullOrEmpty(buffer) Then Return String.Empty
 
             return buffer.Substring(0, l);
         }
@@ -128,17 +128,16 @@ namespace BlueBasics
         /// </summary>
         /// <param name="wDescr"></param>
         /// <remarks></remarks>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1806:DoNotIgnoreMethodResults", MessageId = "BlueBasics.modFernsteuerung.GetWindowThreadProcessId(System.IntPtr,System.Int32@)")]
         public static void GetWindowInfo(ref strProcess wDescr)
         {
-            //If WorkStationISLocked() Then
+            // If WorkStationISLocked() Then
             //    wDescr = Nothing
             //    Exit Sub
-            //End If
+            // End If
 
             var prid = 0;
             var hParent = IntPtr.Zero;
-            //  Dim PridA As Integer
+            // Dim PridA As Integer
 
             prid = 0;
             hParent = GetAncestor(wDescr.MainWindowHandle);
@@ -192,30 +191,30 @@ namespace BlueBasics
             return hw;
         }
 
-        public static void FensterPosSetzen(IntPtr Handle, int Left, int Top)
+        public static void FensterPosSetzen(IntPtr handle, int left, int top)
         {
             var r = new Rectangle();
-            GetWindowRect(Handle, ref r);
+            GetWindowRect(handle, ref r);
 
             if (r.Width == 0) { return; }
             if (r.Height == 0) { return; }
 
-            SetWindowPos(Handle, 0, Left, Top, r.Width - r.Left, r.Height - r.Top, 0);
+            SetWindowPos(handle, 0, left, top, r.Width - r.Left, r.Height - r.Top, 0);
         }
 
-        public static void FensterMinimieren(IntPtr Handle)
+        public static void FensterMinimieren(IntPtr handle)
         {
-            ShowWindow(Handle, (int)enSW.ShowMinimized);
+            ShowWindow(handle, (int)enSW.ShowMinimized);
         }
 
-        public static void FensterMaximieren(IntPtr Handle)
+        public static void FensterMaximieren(IntPtr handle)
         {
-            ShowWindow(Handle, (int)enSW.ShowMaximized);
+            ShowWindow(handle, (int)enSW.ShowMaximized);
         }
 
-        public static void FensterRestore(IntPtr Handle)
+        public static void FensterRestore(IntPtr handle)
         {
-            ShowWindow(Handle, (int)enSW.Restore);
+            ShowWindow(handle, (int)enSW.Restore);
         }
     }
 }

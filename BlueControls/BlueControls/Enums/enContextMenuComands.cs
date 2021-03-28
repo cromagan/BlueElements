@@ -1,5 +1,7 @@
-﻿namespace BlueControls.Enums {
-    public enum enContextMenuComands {
+﻿namespace BlueControls.Enums
+{
+    public enum enContextMenuComands
+    {
         Nothing = 0,
 
         Ausführen = 1,

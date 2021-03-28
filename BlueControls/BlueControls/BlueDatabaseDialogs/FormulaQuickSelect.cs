@@ -24,13 +24,16 @@ using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
 
-namespace BlueControls.BlueDatabaseDialogs {
+namespace BlueControls.BlueDatabaseDialogs
+{
 
-    public partial class FormulaQuickSelect {
+    public partial class FormulaQuickSelect
+    {
 
         private readonly RowItem Row;
 
-        public FormulaQuickSelect(RowItem RowItem) {
+        public FormulaQuickSelect(RowItem RowItem)
+        {
 
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
@@ -40,7 +43,8 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
 
-        private void Such_TextChanged(object sender, System.EventArgs e) {
+        private void Such_TextChanged(object sender, System.EventArgs e)
+        {
 
 
             Auswahl.Item.Clear();
@@ -52,22 +56,32 @@ namespace BlueControls.BlueDatabaseDialogs {
             t = t.ToLower();
 
 
-            foreach (var ThisColumn in Row.Database.Column) {
-                if (ThisColumn != null) {
-                    if (ThisColumn.EditType == enEditTypeFormula.SwapListBox || ThisColumn.EditType == enEditTypeFormula.Listbox || ThisColumn.EditType == enEditTypeFormula.Textfeld_mit_Auswahlknopf) {
-                        if (ThisColumn.DropdownBearbeitungErlaubt) {
-                            if (CellCollection.UserEditPossible(ThisColumn, Row, BlueBasics.Enums.enErrorReason.OnlyRead)) {
+            foreach (var ThisColumn in Row.Database.Column)
+            {
+                if (ThisColumn != null)
+                {
+                    if (ThisColumn.EditType == enEditTypeFormula.SwapListBox || ThisColumn.EditType == enEditTypeFormula.Listbox || ThisColumn.EditType == enEditTypeFormula.Textfeld_mit_Auswahlknopf)
+                    {
+                        if (ThisColumn.DropdownBearbeitungErlaubt)
+                        {
+                            if (CellCollection.UserEditPossible(ThisColumn, Row, BlueBasics.Enums.enErrorReason.OnlyRead))
+                            {
                                 var ThisView = Formula.SearchColumnView(ThisColumn);
-                                if (ThisView != null) {
-                                    if (Row.Database.PermissionCheck(ThisView.PermissionGroups_Show, null)) {
+                                if (ThisView != null)
+                                {
+                                    if (Row.Database.PermissionCheck(ThisView.PermissionGroups_Show, null))
+                                    {
                                         var dummy = new ItemCollectionList();
 
                                         ItemCollectionList.GetItemCollection(dummy, ThisColumn, Row, enShortenStyle.Replaced, 1000);
-                                        if (dummy.Count > 0) {
+                                        if (dummy.Count > 0)
+                                        {
 
-                                            foreach (var thisItem in dummy) {
+                                            foreach (var thisItem in dummy)
+                                            {
 
-                                                if (thisItem.Internal.ToLower().Contains(t)) {
+                                                if (thisItem.Internal.ToLower().Contains(t))
+                                                {
 
                                                     var ni = Auswahl.Item.Add(ThisColumn.ReadableText() + ": " + thisItem.Internal, ThisColumn.Name.ToUpper() + "|" + thisItem.Internal);
                                                     ni.Checked = thisItem.Checked;
@@ -94,15 +108,18 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         //End Sub
 
-        protected override void OnLoad(System.EventArgs e) {
+        protected override void OnLoad(System.EventArgs e)
+        {
             base.OnLoad(e);
             Init();
         }
 
-        private void Init() {
+        private void Init()
+        {
 
 
-            if (Row == null) {
+            if (Row == null)
+            {
                 Close();
                 return;
             }
@@ -112,25 +129,33 @@ namespace BlueControls.BlueDatabaseDialogs {
             Für.Text = "<b>" + Row.CellFirstString();
         }
 
-        private void Auswahl_ItemClicked(object sender, BasicListItemEventArgs e) {
+        private void Auswahl_ItemClicked(object sender, BasicListItemEventArgs e)
+        {
 
             var x = e.Item.Internal.SplitBy("|");
 
 
-            if (Row.Database.Column[x[0]].MultiLine) {
+            if (Row.Database.Column[x[0]].MultiLine)
+            {
 
                 var val = Row.CellGetList(Row.Database.Column[x[0]]);
-                if (e.Item.Checked) {
+                if (e.Item.Checked)
+                {
                     val.AddIfNotExists(x[1]);
-                } else {
+                }
+                else
+                {
                     val.Remove(x[1]);
                 }
 
                 Row.CellSet(Row.Database.Column[x[0]], val);
-            } else {
+            }
+            else
+            {
 
 
-                if (e.Item.Checked) {
+                if (e.Item.Checked)
+                {
                     Row.CellSet(Row.Database.Column[x[0]], x[1]);
                 }
 

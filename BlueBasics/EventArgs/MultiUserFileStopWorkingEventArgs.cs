@@ -25,7 +25,7 @@ namespace BlueBasics.EventArgs
     {
         public MultiUserFileStopWorkingEventArgs()
         {
-            AllreadyStopped = new List<string>();
+            this.AllreadyStopped = new List<string>();
         }
 
         public List<string> AllreadyStopped { get; }

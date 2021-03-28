@@ -19,12 +19,14 @@
 
 using System;
 
-namespace BlueDatabase.Enums {
+namespace BlueDatabase.Enums
+{
 
     /// <summary>
     /// In welchem Datenformat die Daten gelesen werden.
     /// </summary>
-    public enum enRoutinen : byte {
+    public enum enRoutinen : byte
+    {
         [Obsolete]
         Column = 0,
         [Obsolete]

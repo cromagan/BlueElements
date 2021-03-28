@@ -22,28 +22,35 @@ using BlueBasics.Enums;
 using BlueControls.Forms;
 using System.Drawing;
 
-namespace BluePaint {
-    public partial class Tool_DummyGenerator {
+namespace BluePaint
+{
+    public partial class Tool_DummyGenerator
+    {
 
-        public Tool_DummyGenerator() : base() {
+        public Tool_DummyGenerator() : base()
+        {
             InitializeComponent();
         }
-        private void Erstellen_Click(object sender, System.EventArgs e) {
+        private void Erstellen_Click(object sender, System.EventArgs e)
+        {
             CreateDummy();
             OnZoomFit();
         }
 
-        private void CreateDummy() {
+        private void CreateDummy()
+        {
             var W = modErgebnis.Ergebnis(X.Text);
             var H = modErgebnis.Ergebnis(Y.Text);
 
-            if (W == null || (int)W < 2) {
+            if (W == null || (int)W < 2)
+            {
                 Notification.Show("Bitte Breite eingeben.", enImageCode.Information);
                 return;
             }
 
 
-            if (H == null || (int)H < 2) {
+            if (H == null || (int)H < 2)
+            {
                 Notification.Show("Bitte Höhe eingeben.", enImageCode.Information);
                 return;
             }
@@ -57,7 +64,8 @@ namespace BluePaint {
             gr.Clear(Color.White);
             gr.DrawRectangle(new Pen(Color.Black, 2), 1, 1, newPic.Width - 2, newPic.Height - 2);
 
-            if (!string.IsNullOrEmpty(TXT.Text)) {
+            if (!string.IsNullOrEmpty(TXT.Text))
+            {
 
                 var f = new Font("Arial", 50, FontStyle.Bold);
 

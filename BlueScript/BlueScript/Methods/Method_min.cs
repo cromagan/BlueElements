@@ -21,8 +21,10 @@ using Skript.Enums;
 using System;
 using System.Collections.Generic;
 
-namespace BlueScript {
-    internal class Method_Min : Method {
+namespace BlueScript
+{
+    internal class Method_Min : Method
+    {
 
         public override string Syntax => "Min(Value1, Value2, ...)";
         public override string Description => "Gibt den den angegeben Werten den, mit dem niedrigsten Wert zurück.";
@@ -35,14 +37,16 @@ namespace BlueScript {
         public override List<enVariableDataType> Args => new() { enVariableDataType.Number };
         public override bool EndlessArgs => true;
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
+        {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
 
             var val = double.MaxValue;
 
-            foreach (var thisval in attvar) {
+            foreach (var thisval in attvar)
+            {
                 val = Math.Min(thisval.ValueDouble, val);
             }
 

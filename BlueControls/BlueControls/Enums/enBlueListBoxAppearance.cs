@@ -1,5 +1,7 @@
-﻿namespace BlueControls.Enums {
-    public enum enBlueListBoxAppearance {
+﻿namespace BlueControls.Enums
+{
+    public enum enBlueListBoxAppearance
+    {
         //   Undefiniert = enDesign.Undefiniert
 
         Listbox = enDesign.ListBox,

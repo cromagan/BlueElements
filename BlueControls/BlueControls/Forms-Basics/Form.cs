@@ -26,15 +26,19 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 
-namespace BlueControls.Forms {
-    public partial class Form : System.Windows.Forms.Form, ISupportsBeginnEdit, IUseMyBackColor {
-        public Form() : this(enDesign.Form_Standard) {
+namespace BlueControls.Forms
+{
+    public partial class Form : System.Windows.Forms.Form, ISupportsBeginnEdit, IUseMyBackColor
+    {
+        public Form() : this(enDesign.Form_Standard)
+        {
             //if (Skin.SkinDB == null) { Skin.LoadSkin(); }
             //SkinChanged();
             //InitializeComponent();
         }
 
-        public Form(enDesign design) : base() {
+        public Form(enDesign design) : base()
+        {
             Design = design;
             if (Skin.SkinDB == null) { Skin.LoadSkin(); }
             SkinChanged();
@@ -63,7 +67,8 @@ namespace BlueControls.Forms {
         /// </summary>
         public static readonly int BorderTop = 31;
 
-        protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) {
+        protected override void OnPaint(System.Windows.Forms.PaintEventArgs e)
+        {
             if (!IsClosed && !IsDisposed) { base.OnPaint(e); }
         }
 
@@ -73,15 +78,18 @@ namespace BlueControls.Forms {
 
 
 
-        public new void PerformAutoScale() {
+        public new void PerformAutoScale()
+        {
             // NIX TUN!!!!
         }
 
-        public void Scale() {
+        public void Scale()
+        {
             // NIX TUN!!!!
         }
 
-        protected override void ScaleControl(SizeF factor, System.Windows.Forms.BoundsSpecified specified) {
+        protected override void ScaleControl(SizeF factor, System.Windows.Forms.BoundsSpecified specified)
+        {
             factor = new SizeF(1, 1);
             base.ScaleControl(factor, specified);
         }
@@ -89,13 +97,15 @@ namespace BlueControls.Forms {
         protected override bool ScaleChildren => false; //MyBase.ScaleChildren
 
         [DefaultValue(false)]
-        public override bool AutoSize {
+        public override bool AutoSize
+        {
             get => false; //MyBase.AutoSize
             set => base.AutoSize = false;
         }
 
         [DefaultValue(enDesign.Form_Standard)]
-        public enDesign Design {
+        public enDesign Design
+        {
             get;
             //set
             //{
@@ -115,7 +125,8 @@ namespace BlueControls.Forms {
         public bool CloseButtonEnabled { get; set; } = true;
 
 
-        protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified) {
+        protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified)
+        {
             return bounds; //MyBase.GetScaledBounds(bounds, factor, specified)
         }
         #endregion
@@ -130,48 +141,57 @@ namespace BlueControls.Forms {
         public int BeginnEditCounter { get; set; } = 0;
 
 
-        public new void SuspendLayout() {
+        public new void SuspendLayout()
+        {
             BeginnEdit();
             base.SuspendLayout();
         }
-        public new void ResumeLayout(bool performLayout) {
+        public new void ResumeLayout(bool performLayout)
+        {
             base.ResumeLayout(performLayout);
             EndEdit();
         }
 
-        public new void ResumeLayout() {
+        public new void ResumeLayout()
+        {
             base.ResumeLayout();
             EndEdit();
         }
 
 
-        public void BeginnEdit() {
+        public void BeginnEdit()
+        {
             BeginnEdit(1);
         }
 
-        public void BeginnEdit(int count) {
+        public void BeginnEdit(int count)
+        {
             if (DesignMode) { return; }
 
-            foreach (var ThisControl in Controls) {
+            foreach (var ThisControl in Controls)
+            {
                 if (ThisControl is ISupportsBeginnEdit e) { e.BeginnEdit(count); }
             }
 
             BeginnEditCounter += count;
         }
 
-        public void EndEdit() {
+        public void EndEdit()
+        {
             if (DesignMode) { return; }
             if (BeginnEditCounter < 1) { Develop.DebugPrint(enFehlerArt.Warnung, "Bearbeitungsstapel instabil: " + BeginnEditCounter); }
             BeginnEditCounter--;
 
             if (BeginnEditCounter == 0) { Invalidate(); }
 
-            foreach (var ThisControl in Controls) {
+            foreach (var ThisControl in Controls)
+            {
                 if (ThisControl is ISupportsBeginnEdit e) { e.EndEdit(); }
             }
         }
 
-        protected override void OnControlAdded(System.Windows.Forms.ControlEventArgs e) {
+        protected override void OnControlAdded(System.Windows.Forms.ControlEventArgs e)
+        {
             if (DesignMode) { return; }
             if (e.Control is ISupportsBeginnEdit nc) { nc.BeginnEdit(BeginnEditCounter); }
             base.OnControlAdded(e);
@@ -180,18 +200,21 @@ namespace BlueControls.Forms {
         #endregion
 
 
-        protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
+        protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e)
+        {
             //https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.form.closed?view=netframework-4.8
             if (IsClosed) { return; }
             base.OnFormClosing(e);
-            if (!e.Cancel) {
+            if (!e.Cancel)
+            {
                 IsClosed = true;
             }
         }
 
 
 
-        protected override void OnCreateControl() {
+        protected override void OnCreateControl()
+        {
             Develop.StartService();
             Table.StartDatabaseService();
             base.OnCreateControl();
@@ -199,34 +222,41 @@ namespace BlueControls.Forms {
 
 
 
-        protected override void OnResize(System.EventArgs e) {
+        protected override void OnResize(System.EventArgs e)
+        {
             if (!IsClosed) { base.OnResize(e); }
         }
 
-        protected override void OnSizeChanged(System.EventArgs e) {
+        protected override void OnSizeChanged(System.EventArgs e)
+        {
             if (!IsClosed) { base.OnSizeChanged(e); }
         }
 
 
-        protected override void OnLoad(System.EventArgs e) {
+        protected override void OnLoad(System.EventArgs e)
+        {
             BackColor = Skin.Color_Back(Design, enStates.Standard);
             base.OnLoad(e);
         }
 
 
-        protected override void OnResizeBegin(System.EventArgs e) {
+        protected override void OnResizeBegin(System.EventArgs e)
+        {
             if (!IsClosed) { base.OnResizeBegin(e); }
         }
 
-        protected override void OnResizeEnd(System.EventArgs e) {
+        protected override void OnResizeEnd(System.EventArgs e)
+        {
             if (!IsClosed) { base.OnResizeEnd(e); }
         }
 
-        protected override void OnInvalidated(System.Windows.Forms.InvalidateEventArgs e) {
+        protected override void OnInvalidated(System.Windows.Forms.InvalidateEventArgs e)
+        {
             if (!IsClosed) { base.OnInvalidated(e); }
         }
 
-        private void SkinChanged() {
+        private void SkinChanged()
+        {
             BackColor = Skin.Color_Back(Design, enStates.Standard);
             Invalidate();
         }
@@ -237,23 +267,28 @@ namespace BlueControls.Forms {
 
 
 
-        public List<Button> Generate_Buttons(string[] Names) {
+        public List<Button> Generate_Buttons(string[] Names)
+        {
             var MyX = Width - Skin.Padding - BorderWidth;
             var erT = new ExtText(enDesign.Button, enStates.Standard);
             var Buts = new List<Button>();
 
-            for (var Z = Names.GetUpperBound(0); Z > -1; Z--) {
-                if (!string.IsNullOrEmpty(Names[Z])) {
+            for (var Z = Names.GetUpperBound(0); Z > -1; Z--)
+            {
+                if (!string.IsNullOrEmpty(Names[Z]))
+                {
 
                     erT.TextDimensions = Size.Empty;
                     erT.PlainText = Names[Z];
-                    var B = new Button {
+                    var B = new Button
+                    {
                         Name = Z.ToString(),
                         Text = Names[Z]
                     };
                     var W = 2;
 
-                    switch (B.Text.ToLower()) {
+                    switch (B.Text.ToLower())
+                    {
                         case "ja":
                         case "ok":
                             B.ImageCode = "Häkchen|16";
@@ -305,15 +340,19 @@ namespace BlueControls.Forms {
             return Buts;
         }
 
-        public bool IsMouseInForm() {
+        public bool IsMouseInForm()
+        {
             return new Rectangle(Location, Size).Contains(System.Windows.Forms.Cursor.Position);
         }
 
 
-        protected override System.Windows.Forms.CreateParams CreateParams {
-            get {
+        protected override System.Windows.Forms.CreateParams CreateParams
+        {
+            get
+            {
                 var oParam = base.CreateParams;
-                if (!CloseButtonEnabled) {
+                if (!CloseButtonEnabled)
+                {
                     oParam.ClassStyle |= (int)enCS.NOCLOSE;
                 }
                 return oParam;

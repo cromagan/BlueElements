@@ -21,11 +21,13 @@ using BlueBasics;
 using BlueBasics.Enums;
 using static BlueBasics.Extensions;
 
-namespace BluePaint {
+namespace BluePaint
+{
 
     public partial class Tool_Resize : GenericTool //BlueControls.Forms.Form //
     {
-        public Tool_Resize() : base() {
+        public Tool_Resize() : base()
+        {
             InitializeComponent();
             capInfo.Text = "Bitte Skalierung in Prozent eingeben";
 
@@ -34,10 +36,12 @@ namespace BluePaint {
 
         }
 
-        private void DoCapInfo() {
+        private void DoCapInfo()
+        {
             var p = OnNeedCurrentPic();
 
-            if (p == null) {
+            if (p == null)
+            {
                 capInfo.Text = "Kein Bild gewählt.";
                 return;
             }
@@ -45,7 +49,8 @@ namespace BluePaint {
 
 
 
-            if (!double.TryParse(flxProzent.Value, out var pr)) {
+            if (!double.TryParse(flxProzent.Value, out var pr))
+            {
                 capInfo.Text = "Keine Prozentzahl angegeben.";
                 return;
             }
@@ -55,7 +60,8 @@ namespace BluePaint {
             var wi = (int)(p.Width * pr);
             var he = (int)(p.Height * pr);
 
-            if (pr == 1 || pr < 0.01 || pr > 1000 || wi < 1 || he < 1) {
+            if (pr == 1 || pr < 0.01 || pr > 1000 || wi < 1 || he < 1)
+            {
                 capInfo.Text = "Bitte gültigen Wert angeben.";
                 return;
             }
@@ -68,7 +74,8 @@ namespace BluePaint {
 
         }
 
-        private void btnDoResize_Click(object sender, System.EventArgs e) {
+        private void btnDoResize_Click(object sender, System.EventArgs e)
+        {
             var p = OnNeedCurrentPic();
             if (p == null) { return; }
             if (!double.TryParse(flxProzent.Value, out var pr)) { return; }
@@ -92,26 +99,33 @@ namespace BluePaint {
 
 
 
-        public override string MacroKennung() {
+        public override string MacroKennung()
+        {
             return "Resize";
         }
 
-        public override void ExcuteCommand(string command) {
+        public override void ExcuteCommand(string command)
+        {
             var c = command.SplitBy(";");
 
-            if (c[0] == "ResizeProzent") {
+            if (c[0] == "ResizeProzent")
+            {
                 flxProzent.ValueSet(c[1], true, true);
                 btnDoResize_Click(null, null);
-            } else {
+            }
+            else
+            {
                 Develop.DebugPrint_NichtImplementiert();
             }
         }
 
-        private void flxProzent_ValueChanged(object sender, System.EventArgs e) {
+        private void flxProzent_ValueChanged(object sender, System.EventArgs e)
+        {
             DoCapInfo();
         }
 
-        public override void PictureChangedByMainWindow() {
+        public override void PictureChangedByMainWindow()
+        {
             base.PictureChangedByMainWindow();
             DoCapInfo();
         }

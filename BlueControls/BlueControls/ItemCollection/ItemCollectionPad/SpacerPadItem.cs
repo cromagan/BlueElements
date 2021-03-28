@@ -25,8 +25,10 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace BlueControls.ItemCollection {
-    public class SpacerPadItem : FormPadItemRectangle {
+namespace BlueControls.ItemCollection
+{
+    public class SpacerPadItem : FormPadItemRectangle
+    {
 
 
         #region  Variablen-Deklarationen 
@@ -36,11 +38,13 @@ namespace BlueControls.ItemCollection {
 
         private readonly decimal mm125x; //Math.Round(mmToPixel(1.25D, _DPIx), 1)
 
-        public decimal Größe_Distanzhalter {
+        public decimal Größe_Distanzhalter
+        {
             get => _Größe_Distanzhalter;
 
 
-            set {
+            set
+            {
 
                 if (value < mm125x * 1m) { value = mm125x * 1m; }
 
@@ -70,7 +74,8 @@ namespace BlueControls.ItemCollection {
         public SpacerPadItem(ItemCollectionPad parent) : this(parent, string.Empty) { }
 
 
-        public SpacerPadItem(ItemCollectionPad parent, string internalname) : base(parent, internalname, true) {
+        public SpacerPadItem(ItemCollectionPad parent, string internalname) : base(parent, internalname, true)
+        {
             mm125x = Math.Round(modConverter.mmToPixel(1.25M, ItemCollectionPad.DPI), 1);
 
             Größe_Distanzhalter = mm125x * 2; // 19,68 = 2,5 mm
@@ -90,12 +95,14 @@ namespace BlueControls.ItemCollection {
         #endregion
 
 
-        public override void DesignOrStyleChanged() {
+        public override void DesignOrStyleChanged()
+        {
             // Muss angepasst werden, evtl. wegen 70% größe
             CaluclatePointsWORelations();
         }
 
-        protected override string ClassId() {
+        protected override string ClassId()
+        {
             return "SPACER";
         }
 
@@ -107,7 +114,8 @@ namespace BlueControls.ItemCollection {
 
 
 
-        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
+        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
+        {
             if (ForPrinting) { return; }
 
             GR.DrawEllipse(CreativePad.PenGray, DCoordinates);
@@ -136,10 +144,12 @@ namespace BlueControls.ItemCollection {
 
 
 
-        public override bool ParseThis(string tag, string value) {
+        public override bool ParseThis(string tag, string value)
+        {
             if (base.ParseThis(tag, value)) { return true; }
 
-            switch (tag) {
+            switch (tag)
+            {
                 case "size":
                     Größe_Distanzhalter = BlueBasics.modConverter.DecimalParse(value.FromNonCritical());
                     return true;
@@ -154,7 +164,8 @@ namespace BlueControls.ItemCollection {
 
 
 
-        public override string ToString() {
+        public override string ToString()
+        {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
             return t + "Size=" + Größe_Distanzhalter.ToString(Constants.Format_Float10).ToNonCritical() + "}";
@@ -181,7 +192,8 @@ namespace BlueControls.ItemCollection {
         //}
 
 
-        public override List<FlexiControl> GetStyleOptions() {
+        public override List<FlexiControl> GetStyleOptions()
+        {
             var l = new List<FlexiControl>();
 
 

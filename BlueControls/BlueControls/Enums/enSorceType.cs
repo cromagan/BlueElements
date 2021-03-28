@@ -18,9 +18,11 @@
 #endregion
 
 
-namespace BlueControls.Enums {
+namespace BlueControls.Enums
+{
 
-    public enum enSorceType {
+    public enum enSorceType
+    {
 
         Nichts = 0,
         //Downloaded = 2,

@@ -18,9 +18,12 @@
 #endregion
 
 
-namespace BlueDatabase.EventArgs {
-    public class PasswordEventArgs : System.EventArgs {
-        public PasswordEventArgs() {
+namespace BlueDatabase.EventArgs
+{
+    public class PasswordEventArgs : System.EventArgs
+    {
+        public PasswordEventArgs()
+        {
             Handled = false;
         }
 

@@ -24,17 +24,20 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using static BlueBasics.modAllgemein;
 
-namespace BluePaint {
+namespace BluePaint
+{
     public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserControl // 
     {
 
         private bool _ausricht = false;
 
-        public Tool_Spiegeln() : base() {
+        public Tool_Spiegeln() : base()
+        {
             InitializeComponent();
         }
 
-        private void SpiegelnH_Click(object sender, System.EventArgs e) {
+        private void SpiegelnH_Click(object sender, System.EventArgs e)
+        {
             _ausricht = false;
             var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
@@ -44,7 +47,8 @@ namespace BluePaint {
             OnZoomFit();
         }
 
-        private void SpiegelnV_Click(object sender, System.EventArgs e) {
+        private void SpiegelnV_Click(object sender, System.EventArgs e)
+        {
             _ausricht = false;
             var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
@@ -54,7 +58,8 @@ namespace BluePaint {
             OnZoomFit();
         }
 
-        private void btnDrehenR_Click(object sender, System.EventArgs e) {
+        private void btnDrehenR_Click(object sender, System.EventArgs e)
+        {
             _ausricht = false;
             var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
@@ -65,7 +70,8 @@ namespace BluePaint {
 
         }
 
-        private void btnDrehenL_Click(object sender, System.EventArgs e) {
+        private void btnDrehenL_Click(object sender, System.EventArgs e)
+        {
             _ausricht = false;
             var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
@@ -76,13 +82,15 @@ namespace BluePaint {
 
         }
 
-        private void btnAusrichten_Click(object sender, System.EventArgs e) {
+        private void btnAusrichten_Click(object sender, System.EventArgs e)
+        {
 
             _ausricht = true;
             OnDoInvalidate();
         }
 
-        public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic) {
+        public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic)
+        {
             if (!_ausricht) { return; }
 
 
@@ -91,7 +99,8 @@ namespace BluePaint {
             e.DrawLine(Pen_RedTransp, -1, e.Current.TrimmedY, _Pic.Width, e.Current.TrimmedY);
             e.DrawLine(Pen_RedTransp, e.Current.TrimmedX, -1, e.Current.TrimmedX, _Pic.Height);
 
-            if (e.Current.Button == System.Windows.Forms.MouseButtons.Left && e.MouseDown != null) {
+            if (e.Current.Button == System.Windows.Forms.MouseButtons.Left && e.MouseDown != null)
+            {
                 e.DrawLine(Pen_RedTransp, -1, e.MouseDown.TrimmedY, _Pic.Width, e.MouseDown.TrimmedY);
                 e.DrawLine(Pen_RedTransp, e.MouseDown.TrimmedX, -1, e.MouseDown.TrimmedX, _Pic.Height);
 
@@ -102,17 +111,20 @@ namespace BluePaint {
         }
 
 
-        public override void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap OriginalPic) {
+        public override void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap OriginalPic)
+        {
             if (!_ausricht) { return; }
             MouseMove(new MouseEventArgs1_1DownAndCurrent(e, e), OriginalPic);
         }
 
-        public override void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) {
+        public override void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic)
+        {
             if (!_ausricht) { return; }
             OnDoInvalidate();
         }
 
-        public override void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) {
+        public override void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic)
+        {
 
             if (!_ausricht) { return; }
 
@@ -149,7 +161,8 @@ namespace BluePaint {
 
 
             // Draw the image onto the new bitmap rotated.
-            using (var gr = Graphics.FromImage(nBMP)) {
+            using (var gr = Graphics.FromImage(nBMP))
+            {
                 gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
                 gr.Clear(Color.Magenta);
                 gr.Transform = rotate_at_center;

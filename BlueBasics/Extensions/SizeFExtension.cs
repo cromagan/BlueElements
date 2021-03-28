@@ -23,10 +23,10 @@ namespace BlueBasics
 {
     public static partial class Extensions
     {
-        public static SizeF SizeFParse(string Code)
+        public static SizeF SizeFParse(this string code)
         {
-            Code = Code.RemoveChars("{}WidthHeg= ");
-            var w = Code.Split(',');
+            code = code.RemoveChars("{}WidthHeg= ");
+            var w = code.Split(',');
             return new SizeF(float.Parse(w[0]), float.Parse(w[1]));
         }
     }

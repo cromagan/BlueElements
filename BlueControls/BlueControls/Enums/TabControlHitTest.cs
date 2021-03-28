@@ -1,5 +1,7 @@
-﻿namespace BlueControls.Enums {
-    public enum TabControlHitTest {
+﻿namespace BlueControls.Enums
+{
+    public enum TabControlHitTest
+    {
         TCHT_NOWHERE = 1,
         TCHT_ONITEMICON = 2,
         TCHT_ONITEMLABEL = 4,

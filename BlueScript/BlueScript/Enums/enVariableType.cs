@@ -17,9 +17,11 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-namespace Skript.Enums {
+namespace Skript.Enums
+{
 
-    public enum enVariableType {
+    public enum enVariableType
+    {
 
         ParserValue = 1,
         Methode = 2,

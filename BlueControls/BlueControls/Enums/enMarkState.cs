@@ -18,8 +18,10 @@
 #endregion
 
 
-namespace BlueControls.Enums {
-    public enum enMarkState {
+namespace BlueControls.Enums
+{
+    public enum enMarkState
+    {
         None = 0,
 
         /// <summary>

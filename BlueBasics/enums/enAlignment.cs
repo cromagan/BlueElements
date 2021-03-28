@@ -22,7 +22,7 @@ using System;
 namespace BlueBasics.Enums
 {
     [Flags]
-    public enum enAlignment : int
+    public enum enAlignment
     {
         // Undefiniert = CByte(TextFormatFlags.none)
         Left = System.Windows.Forms.TextFormatFlags.Left,
@@ -35,10 +35,10 @@ namespace BlueBasics.Enums
 
         VerticalCenter = System.Windows.Forms.TextFormatFlags.VerticalCenter,
 
-        //DehnenLR = 64
-        //DehnenOU = 128
+        // DehnenLR = 64
+        // DehnenOU = 128
 
-        //DehnenLROU = DehnenLR Or DehnenOU
+        // DehnenLROU = DehnenLR Or DehnenOU
 
         Top_Left = Left | Top,
         Top_HorizontalCenter = HorizontalCenter | Top,

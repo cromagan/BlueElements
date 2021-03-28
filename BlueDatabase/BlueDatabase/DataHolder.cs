@@ -25,10 +25,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 
 
-namespace BlueDatabase {
+namespace BlueDatabase
+{
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public abstract class DataHolder {
+    public abstract class DataHolder
+    {
 
         public readonly Database InternalDatabase = null;
 
@@ -56,16 +58,20 @@ namespace BlueDatabase {
         //}
 
 
-        public void SetData(string feldname, bool editable, string quickinfo) {
+        public void SetData(string feldname, bool editable, string quickinfo)
+        {
             var c = Column(feldname, string.Empty);
 
             //c.Caption = dataName;
             //c.Format = enDataFormat.Text;
             //c.MultiLine = true;
             c.TextBearbeitungErlaubt = editable;
-            if (editable) {
+            if (editable)
+            {
                 c.PermissionGroups_ChangeCell.AddIfNotExists("#Everybody");
-            } else {
+            }
+            else
+            {
                 c.PermissionGroups_ChangeCell.Remove("#Everybody");
             }
             c.Quickinfo = quickinfo;
@@ -80,9 +86,11 @@ namespace BlueDatabase {
         /// </summary>
         /// <param name="parent"></param>
         /// <param name="id"></param>
-        public DataHolder(DataHolder parent, string id) {
+        public DataHolder(DataHolder parent, string id)
+        {
 
-            if (UseExtraFile()) {
+            if (UseExtraFile())
+            {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Falsche Routine!");
             }
 
@@ -95,9 +103,11 @@ namespace BlueDatabase {
         /// Erzeugt eine eigenständige Datei. Der Typ wird dabei immer auf MAIN gesetzt
         /// </summary>
         /// <param name="id"></param>
-        public DataHolder(string id) {
+        public DataHolder(string id)
+        {
 
-            if (!UseExtraFile()) {
+            if (!UseExtraFile())
+            {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Falsche Routine!");
             }
 
@@ -110,10 +120,12 @@ namespace BlueDatabase {
             Parent = null;
 
 
-            if (InternalDatabase == null) {
+            if (InternalDatabase == null)
+            {
                 InternalDatabase = new Database(filename, false, true);
 
-                if (InternalDatabase.Column.Exists("ID") == null) {
+                if (InternalDatabase.Column.Exists("ID") == null)
+                {
 
 
                     InternalDatabase.Column.Add("ID", "ID", enDataFormat.Text);
@@ -153,11 +165,13 @@ namespace BlueDatabase {
             InternalDatabase.AutoDeleteBAK = true;
         }
 
-        public void Save(bool mustsave) {
+        public void Save(bool mustsave)
+        {
             InternalDatabase.Save(mustsave);
         }
 
-        public static string ColumnName(string originalName) {
+        public static string ColumnName(string originalName)
+        {
 
             originalName = originalName.ToUpper().StarkeVereinfachung(" -_\\*/()");
 
@@ -176,14 +190,16 @@ namespace BlueDatabase {
         }
 
 
-        public ColumnItem Column(string dataName, string message) {
+        public ColumnItem Column(string dataName, string message)
+        {
 
             var nd = ColumnName(dataName);
 
 
 
             var c = InternalDatabase.Column.Exists(nd);
-            if (c == null) {
+            if (c == null)
+            {
                 c = InternalDatabase.Column.Add(nd);
                 c.Caption = dataName;
                 c.Format = enDataFormat.Text;
@@ -193,7 +209,8 @@ namespace BlueDatabase {
                 c.Ueberschrift1 = Typ;
 
 
-                if (!string.IsNullOrEmpty(message)) {
+                if (!string.IsNullOrEmpty(message))
+                {
                     c.Caption = "!!!" + c.Caption;
                     c.Quickinfo = message;
                     Develop.DebugPrint(enFehlerArt.Warnung, "Erzeugungsfehler: " + message);
@@ -208,12 +225,14 @@ namespace BlueDatabase {
             return c;
         }
 
-        public RowItem Row() {
+        public RowItem Row()
+        {
             var rn = Typ + "/" + ID;
 
             var r = InternalDatabase.Row[rn];
 
-            if (r == null) {
+            if (r == null)
+            {
                 r = InternalDatabase.Row.Add(rn);
                 r.CellSet(InternalDatabase.Column.SysChapter, Typ);
             }
@@ -221,19 +240,23 @@ namespace BlueDatabase {
             return r;
         }
 
-        public void Set(string dataName, string value) {
+        public void Set(string dataName, string value)
+        {
             Row().CellSet(Column(dataName, string.Empty), value);
         }
 
-        public void Set(string dataName, List<string> value) {
+        public void Set(string dataName, List<string> value)
+        {
             Row().CellSet(Column(dataName, string.Empty), value);
         }
 
-        public void SetSynchronizedFiles<t>(string dataName, string value, ref t synchronData) where t : DataHolder {
+        public void SetSynchronizedFiles<t>(string dataName, string value, ref t synchronData) where t : DataHolder
+        {
             Row().CellSet(Column(dataName, string.Empty), value);
 
 
-            if (synchronData == null || synchronData.ID.ToUpper() != value.ToUpper()) {
+            if (synchronData == null || synchronData.ID.ToUpper() != value.ToUpper())
+            {
 
                 synchronData = (t)System.Activator.CreateInstance(typeof(t), value);
             }
@@ -266,7 +289,8 @@ namespace BlueDatabase {
 
 
 
-        public void Register<t>(out ListExt<t> data, bool separateFiles) where t : DataHolder {
+        public void Register<t>(out ListExt<t> data, bool separateFiles) where t : DataHolder
+        {
 
             data = new ListExt<t>();
 
@@ -274,12 +298,16 @@ namespace BlueDatabase {
 
             var IDS = GetList(name);
 
-            foreach (var thisID in IDS) {
-                if (!separateFiles) {
+            foreach (var thisID in IDS)
+            {
+                if (!separateFiles)
+                {
 
                     var v = (t)System.Activator.CreateInstance(typeof(t), this, thisID.ToUpper());
                     data.Add(v);
-                } else {
+                }
+                else
+                {
                     var v = (t)System.Activator.CreateInstance(typeof(t), thisID.ToUpper());
                     data.Add(v);
                 }
@@ -290,17 +318,23 @@ namespace BlueDatabase {
 
         }
 
-        private void Data_Changed(object sender, System.EventArgs e) {
+        private void Data_Changed(object sender, System.EventArgs e)
+        {
 
             var IDS = new List<string>();
-            if (sender is IEnumerable enumerable) {
+            if (sender is IEnumerable enumerable)
+            {
 
-                foreach (var thisd in enumerable) {
-                    if (thisd is DataHolder dh) {
+                foreach (var thisd in enumerable)
+                {
+                    if (thisd is DataHolder dh)
+                    {
                         IDS.Add(dh.ID);
                     }
                 }
-            } else {
+            }
+            else
+            {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Typ");
             }
 
@@ -362,53 +396,63 @@ namespace BlueDatabase {
 
 
 
-        public void Set(string dataName, decimal value) {
+        public void Set(string dataName, decimal value)
+        {
             Row().CellSet(Column(dataName, string.Empty), value);
         }
 
-        public void Set(string dataName, double value) {
+        public void Set(string dataName, double value)
+        {
             Row().CellSet(Column(dataName, string.Empty), value);
         }
 
-        public void Set(string dataName, int value) {
+        public void Set(string dataName, int value)
+        {
             Row().CellSet(Column(dataName, string.Empty), value);
         }
 
 
 
-        public string GetString(string dataName) {
+        public string GetString(string dataName)
+        {
             return Row().CellGetString(Column(dataName, string.Empty));
         }
 
-        public List<string> GetList(string dataName) {
+        public List<string> GetList(string dataName)
+        {
             return Row().CellGetList(Column(dataName, string.Empty));
         }
 
 
-        public decimal GetDecimal(string dataName) {
+        public decimal GetDecimal(string dataName)
+        {
             return Row().CellGetDecimal(Column(dataName, string.Empty));
         }
 
 
-        public double GetDouble(string dataName) {
+        public double GetDouble(string dataName)
+        {
             return Row().CellGetDouble(Column(dataName, string.Empty));
         }
 
-        public int GetInt(string dataName) {
+        public int GetInt(string dataName)
+        {
             return Row().CellGetInteger(Column(dataName, string.Empty));
         }
 
 
 
 
-        public string Erstelldatum {
+        public string Erstelldatum
+        {
             get => InternalDatabase.CreateDate;
             set => InternalDatabase.CreateDate = value;
         }
 
 
 
-        public string Ersteller {
+        public string Ersteller
+        {
             get => InternalDatabase.Creator;
             set => InternalDatabase.Creator = value;
         }
@@ -419,9 +463,12 @@ namespace BlueDatabase {
     }
 
 
-    public static class DataHolderExtensions {
-        public static t GetByID<t>(this List<t> items, string id) where t : DataHolder {
-            foreach (var thisit in items) {
+    public static class DataHolderExtensions
+    {
+        public static t GetByID<t>(this List<t> items, string id) where t : DataHolder
+        {
+            foreach (var thisit in items)
+            {
                 if (thisit.ID.ToUpper() == id.ToUpper()) { return thisit; }
             }
             return null;

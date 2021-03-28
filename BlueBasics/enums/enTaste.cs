@@ -21,26 +21,26 @@ namespace BlueBasics.Enums
 {
     public enum enTaste : byte
     {
-        VK_LBUTTON = 0x1, //Left mouse button.
-        VK_RBUTTON = 0x2, //Right mouse button.
+        VK_LBUTTON = 0x1, // Left mouse button.
+        VK_RBUTTON = 0x2, // Right mouse button.
 
-        VK_MBUTTON = 0x4, //Middle mouse button (3-button mouse).
+        VK_MBUTTON = 0x4, // Middle mouse button (3-button mouse).
         VK_BACK = 0x8,
         VK_TAB = 0x9,
         VK_CLEAR = 0xC,
         VK_PRINT = 0x2A,
-        VK_RETURN = 0xD, //enter
+        VK_RETURN = 0xD, // enter
         VK_SHIFT = 0x10,
         VK_CONTROL = 0x11,
         VK_SCROLL = 0x91,
-        VK_MENU = 0x12, //Alt (either one)
+        VK_MENU = 0x12, // Alt (either one)
         VK_PAUSE = 0x13,
         VK_CAPITAL = 0x14,
         VK_ESCAPE = 0x1B,
-        VK_STARTKEY = 0x5B, //Start Menu key
+        VK_STARTKEY = 0x5B, // Start Menu key
         VK_SPACE = 0x20,
-        VK_PRIOR = 0x21, //Page up.
-        VK_NEXT = 0x22, //Page down.
+        VK_PRIOR = 0x21, // Page up.
+        VK_NEXT = 0x22, // Page down.
         VK_END = 0x23,
         VK_HOME = 0x24,
         VK_LEFT = 0x25,
@@ -51,7 +51,7 @@ namespace BlueBasics.Enums
         VK_INSERT = 0x2D,
         VK_DELETE = 0x2E,
         VK_HELP = 0x2F,
-        VK_OEM_COMMA = 0xBC, //, comma
+        VK_OEM_COMMA = 0xBC, // , comma
         VK_NUMLOCK = 0x90, // Num Lock
 
         VK_0 = 0x30,
@@ -108,7 +108,7 @@ namespace BlueBasics.Enums
         VK_DECIMAL = 0x6E,
         VK_DIVIDE = 0x6F,
         VK_OEM_2 = 0xBF, // /
-        VK_OEM_PERIOD = 0xBE, //.
+        VK_OEM_PERIOD = 0xBE, // .
         VK_F1 = 0x70,
         VK_F2 = 0x71,
         VK_F3 = 0x72,

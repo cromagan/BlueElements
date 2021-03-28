@@ -1,5 +1,7 @@
-﻿namespace BlueBasics.Enums {
-    public enum enRelationType {
+﻿namespace BlueBasics.Enums
+{
+    public enum enRelationType
+    {
         None = 0,
 
         // Reihenfolge wichtig für Berechnung.

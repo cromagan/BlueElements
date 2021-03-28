@@ -24,14 +24,17 @@ using System;
 using System.Collections.Generic;
 using static BlueBasics.Extensions;
 
-namespace BlueControls.BlueDatabaseDialogs {
-    public sealed partial class Import {
+namespace BlueControls.BlueDatabaseDialogs
+{
+    public sealed partial class Import
+    {
 
         private readonly Database _Database;
         private readonly string OriTXT = "";
 
 
-        public Import(Database Database, string TXT) {
+        public Import(Database Database, string TXT)
+        {
 
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
@@ -49,23 +52,34 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
 
-        private void Fertig_Click(object sender, System.EventArgs e) {
+        private void Fertig_Click(object sender, System.EventArgs e)
+        {
 
             var TR = string.Empty;
 
-            if (TabStopp.Checked) {
+            if (TabStopp.Checked)
+            {
                 TR = "\t";
-            } else if (Semikolon.Checked) {
+            }
+            else if (Semikolon.Checked)
+            {
                 TR = ";";
-            } else if (Komma.Checked) {
+            }
+            else if (Komma.Checked)
+            {
                 TR = ",";
-            } else if (Leerzeichen.Checked) {
+            }
+            else if (Leerzeichen.Checked)
+            {
                 TR = " ";
-            } else if (Andere.Checked) {
+            }
+            else if (Andere.Checked)
+            {
                 TR = aTXT.Text;
             }
 
-            if (string.IsNullOrEmpty(TR)) {
+            if (string.IsNullOrEmpty(TR))
+            {
                 MessageBox.Show("Bitte Trennzeichen angeben.", enImageCode.Information, "OK");
                 return;
             }
@@ -75,12 +89,14 @@ namespace BlueControls.BlueDatabaseDialogs {
             Close();
         }
 
-        private void Cancel_Click(object sender, System.EventArgs e) {
+        private void Cancel_Click(object sender, System.EventArgs e)
+        {
             Close();
         }
 
 
-        public static void DoImport(Database _Database, string TXT, bool SpalteZuordnenx, bool ZeileZuordnen, string ColumnSplitChar, bool EliminateMultipleSplitter, bool EleminateSplitterAtStart, bool SilentMode) {
+        public static void DoImport(Database _Database, string TXT, bool SpalteZuordnenx, bool ZeileZuordnen, string ColumnSplitChar, bool EliminateMultipleSplitter, bool EleminateSplitterAtStart, bool SilentMode)
+        {
             //DebugPrint_InvokeRequired(InvokeRequired, false);
 
             // Vorbereitung des Textes -----------------------------
@@ -91,19 +107,24 @@ namespace BlueControls.BlueDatabaseDialogs {
             var neuZ = 0;
 
 
-            for (var z = 0; z <= ein.GetUpperBound(0); z++) {
-                if (EliminateMultipleSplitter) {
+            for (var z = 0; z <= ein.GetUpperBound(0); z++)
+            {
+                if (EliminateMultipleSplitter)
+                {
                     ein[z] = ein[z].Replace(ColumnSplitChar + ColumnSplitChar, ColumnSplitChar);
                 }
-                if (EleminateSplitterAtStart) {
+                if (EleminateSplitterAtStart)
+                {
                     ein[z] = ein[z].TrimStart(ColumnSplitChar);
                 }
                 ein[z] = ein[z].TrimEnd(ColumnSplitChar);
                 Zeil.Add(ein[z].SplitBy(ColumnSplitChar));
             }
 
-            if (Zeil.Count == 0) {
-                if (!SilentMode) {
+            if (Zeil.Count == 0)
+            {
+                if (!SilentMode)
+                {
                     MessageBox.Show("Import kann nicht ausgeführt werden.", enImageCode.Information, "Ok");
                 }
                 return;
@@ -117,19 +138,23 @@ namespace BlueControls.BlueDatabaseDialogs {
             // -------------------------------------
             // --- Spalten-Reihenfolge ermitteln ---
             // -------------------------------------
-            if (SpalteZuordnenx) {
+            if (SpalteZuordnenx)
+            {
                 StartZ = 1;
 
 
-                for (var SpaltNo = 0; SpaltNo < Zeil[0].GetUpperBound(0) + 1; SpaltNo++) {
-                    if (string.IsNullOrEmpty(Zeil[0][SpaltNo])) {
+                for (var SpaltNo = 0; SpaltNo < Zeil[0].GetUpperBound(0) + 1; SpaltNo++)
+                {
+                    if (string.IsNullOrEmpty(Zeil[0][SpaltNo]))
+                    {
                         if (!SilentMode) { MessageBox.Show("Abbruch,<br>leerer Spaltenname.", enImageCode.Information, "Ok"); }
                         return;
                     }
 
                     Zeil[0][SpaltNo] = Zeil[0][SpaltNo].Replace(" ", "_");
                     var Col = _Database.Column[Zeil[0][SpaltNo]];
-                    if (Col == null) {
+                    if (Col == null)
+                    {
                         Col = _Database.Column.Add(Zeil[0][SpaltNo]);
                         Col.Caption = Zeil[0][SpaltNo];
                         Col.Format = enDataFormat.Text;
@@ -137,12 +162,16 @@ namespace BlueControls.BlueDatabaseDialogs {
                     columns.Add(Col);
 
                 }
-            } else {
-                foreach (var thisColumn in _Database.Column) {
+            }
+            else
+            {
+                foreach (var thisColumn in _Database.Column)
+                {
                     if (thisColumn != null && string.IsNullOrEmpty(thisColumn.Identifier)) { columns.Add(thisColumn); }
                 }
 
-                while (columns.Count < Zeil[0].GetUpperBound(0) + 1) {
+                while (columns.Count < Zeil[0].GetUpperBound(0) + 1)
+                {
                     var newc = _Database.Column.Add(string.Empty);
                     newc.Caption = newc.Name;
                     newc.Format = enDataFormat.Text;
@@ -162,23 +191,30 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             if (!SilentMode) { P = Progressbar.Show("Importiere...", Zeil.Count - 1); }
 
-            for (var ZeilNo = StartZ; ZeilNo < Zeil.Count; ZeilNo++) {
+            for (var ZeilNo = StartZ; ZeilNo < Zeil.Count; ZeilNo++)
+            {
                 P?.Update(ZeilNo);
 
 
                 var tempVar2 = Math.Min(Zeil[ZeilNo].GetUpperBound(0) + 1, columns.Count);
                 row = null;
-                for (var SpaltNo = 0; SpaltNo < tempVar2; SpaltNo++) {
+                for (var SpaltNo = 0; SpaltNo < tempVar2; SpaltNo++)
+                {
 
-                    if (SpaltNo == 0) {
+                    if (SpaltNo == 0)
+                    {
                         row = null;
                         if (ZeileZuordnen && !string.IsNullOrEmpty(Zeil[ZeilNo][SpaltNo])) { row = _Database.Row[Zeil[ZeilNo][SpaltNo]]; }
-                        if (row == null && !string.IsNullOrEmpty(Zeil[ZeilNo][SpaltNo])) {
+                        if (row == null && !string.IsNullOrEmpty(Zeil[ZeilNo][SpaltNo]))
+                        {
                             row = _Database.Row.Add(Zeil[ZeilNo][SpaltNo]);
                             neuZ++;
                         }
-                    } else {
-                        if (row != null) {
+                    }
+                    else
+                    {
+                        if (row != null)
+                        {
                             row.CellSet(columns[SpaltNo], Zeil[ZeilNo][SpaltNo].SplitBy("|").JoinWithCr());
                         }
                     }
@@ -189,7 +225,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             P?.Close();
 
 
-            if (!SilentMode) {
+            if (!SilentMode)
+            {
                 BlueControls.Forms.MessageBox.Show("<b>Import abgeschlossen.</b>\r\n" + neuZ.ToString() + " neue Zeilen erstellt.");
             }
 

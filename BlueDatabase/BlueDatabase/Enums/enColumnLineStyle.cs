@@ -1,5 +1,7 @@
-﻿namespace BlueDatabase.Enums {
-    public enum enColumnLineStyle {
+﻿namespace BlueDatabase.Enums
+{
+    public enum enColumnLineStyle
+    {
         Ohne = 0,
         Dünn = 1,
         Kräftig = 2,

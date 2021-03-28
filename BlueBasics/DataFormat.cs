@@ -45,8 +45,8 @@ namespace BlueBasics
             }
         }
 
-        //public static bool CompactPossible(this enDataFormat format)
-        //{
+        // public static bool CompactPossible(this enDataFormat format)
+        // {
         //    switch (format)
         //    {
         //        case enDataFormat.Bit:
@@ -57,7 +57,7 @@ namespace BlueBasics
         //        default:
         //            return false;
         //    }
-        //}
+        // }
 
         public static bool SaveSizeData(this enDataFormat format)
         {
@@ -117,17 +117,20 @@ namespace BlueBasics
         /// Dabei wird die Textlänge, die Schablone und die erlaubten Zeichen geprüft.
         /// Ein Logigcheck (z.B. ob ein Datum gültig ist) wird ebenfalls ausgeführt.
         /// </summary>
+        /// <param name="txt"></param>
+        /// <param name="format"></param>
+        /// <param name="multiLine"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static bool IsFormat(this string Txt, enDataFormat Format, bool MultiLine)
+        public static bool IsFormat(this string txt, enDataFormat format, bool multiLine)
         {
-            if (MultiLine)
+            if (multiLine)
             {
-                var ex = Txt.SplitByCR();
-                return ex.All(ThisString => string.IsNullOrEmpty(ThisString) || ThisString.IsFormat(Format));
+                var ex = txt.SplitByCR();
+                return ex.All(thisString => string.IsNullOrEmpty(thisString) || thisString.IsFormat(format));
             }
 
-            return Txt.IsFormat(Format);
+            return txt.IsFormat(format);
         }
 
         /// <summary>
@@ -135,14 +138,16 @@ namespace BlueBasics
         /// Dabei wird die Textlänge, die Schablone und die erlaubten Zeichen geprüft.
         /// Ein Logigcheck (z.B. ob ein Datum gültig ist) wird ebenfalls ausgeführt.
         /// </summary>
+        /// <param name="txt"></param>
+        /// <param name="format"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static bool IsFormat(this string Txt, enDataFormat Format)
+        public static bool IsFormat(this string txt, enDataFormat format)
         {
-            if (!Text_LängeCheck(Txt, Format)) { return false; }
-            if (!Text_SchabloneCheck(Txt, Format)) { return false; }
-            if (!Txt.ContainsOnlyChars(AllowedChars(Format))) { return false; }
-            if (!Text_ValueCheck(Txt, Format)) { return false; }
+            if (!Text_LängeCheck(txt, format)) { return false; }
+            if (!Text_SchabloneCheck(txt, format)) { return false; }
+            if (!txt.ContainsOnlyChars(AllowedChars(format))) { return false; }
+            if (!Text_ValueCheck(txt, format)) { return false; }
             return true;
         }
 
@@ -244,11 +249,11 @@ namespace BlueBasics
             }
         }
 
-        public static bool Text_LängeCheck(string TXT, enDataFormat format)
+        public static bool Text_LängeCheck(string tXT, enDataFormat format)
         {
             var ml = Text_MaximaleLänge(format);
             var il = 0;
-            if (TXT != null) { il = TXT.Length; }
+            if (tXT != null) { il = tXT.Length; }
 
             if (ml > -1 && il > ml) { return false; }
 
@@ -289,9 +294,9 @@ namespace BlueBasics
             }
         }
 
-        public static bool Text_ValueCheck(string TXT, enDataFormat Format)
+        public static bool Text_ValueCheck(string tXT, enDataFormat format)
         {
-            switch (Format)
+            switch (format)
             {
                 case enDataFormat.Text:
                 case enDataFormat.Text_mit_Formatierung:
@@ -305,21 +310,21 @@ namespace BlueBasics
                     return true;
 
                 case enDataFormat.Datum_und_Uhrzeit:
-                    return DateTimeTryParse(TXT, out _);
+                    return DateTimeTryParse(tXT, out _);
 
                 case enDataFormat.Gleitkommazahl:
-                    return float.TryParse(TXT, out _);
+                    return float.TryParse(tXT, out _);
 
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.FarbeInteger:
-                    return long.TryParse(TXT, out _);
+                    return long.TryParse(tXT, out _);
 
                 case enDataFormat.LinkedCell:
                     Develop.DebugPrint(enFehlerArt.Warnung, "LinkedCell kann nicht geprüft werden.");
                     return true;
 
                 default:
-                    Develop.DebugPrint(Format);
+                    Develop.DebugPrint(format);
                     return true;
             }
         }
@@ -327,13 +332,13 @@ namespace BlueBasics
         /// <summary>
         /// Gibt zurück, ob der Text in die vordefinierte Schablone paßt.
         /// </summary>
-        /// <param name="TXT"></param>
-        /// <param name="Format"></param>
+        /// <param name="tXT"></param>
+        /// <param name="format"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static bool Text_SchabloneCheck(string TXT, enDataFormat Format)
+        public static bool Text_SchabloneCheck(string tXT, enDataFormat format)
         {
-            switch (Format)
+            switch (format)
             {
                 case enDataFormat.Text:
                 case enDataFormat.Text_mit_Formatierung:
@@ -346,29 +351,29 @@ namespace BlueBasics
                     return true;
 
                 case enDataFormat.Bit:
-                    return TXT.Length == 1;
+                    return tXT.Length == 1;
 
                 case enDataFormat.Gleitkommazahl:
-                    if (TXT == "0") { return true; }
-                    if (TXT == "-") { return false; }
-                    if (TXT.Length > 1 && TXT.Substring(0, 2) == "00") { return false; }
-                    if (TXT.Length > 2 && TXT.Substring(0, 3) == "-00") { return false; }
-                    if (TXT.Length > 2 && TXT.IndexOf("-", 1) > -1) { return false; }
+                    if (tXT == "0") { return true; }
+                    if (tXT == "-") { return false; }
+                    if (tXT.Length > 1 && tXT.Substring(0, 2) == "00") { return false; }
+                    if (tXT.Length > 2 && tXT.Substring(0, 3) == "-00") { return false; }
+                    if (tXT.Length > 2 && tXT.IndexOf("-", 1) > -1) { return false; }
                     return true;
 
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.FarbeInteger:
-                    if (TXT == "0") { return true; }
-                    if (TXT == "-") { return false; }
-                    if (!string.IsNullOrEmpty(TXT) && TXT.Substring(0, 1) == "0") { return false; }
-                    if (TXT.Length > 1 && TXT.Substring(0, 2) == "-0") { return false; }
-                    if (TXT.Length > 2 && TXT.IndexOf("-", 1) > -1) { return false; }
+                    if (tXT == "0") { return true; }
+                    if (tXT == "-") { return false; }
+                    if (!string.IsNullOrEmpty(tXT) && tXT.Substring(0, 1) == "0") { return false; }
+                    if (tXT.Length > 1 && tXT.Substring(0, 2) == "-0") { return false; }
+                    if (tXT.Length > 2 && tXT.IndexOf("-", 1) > -1) { return false; }
                     return true;
 
                 case enDataFormat.Datum_und_Uhrzeit:
-                    if (new Regex(@"^\d{2}.\d{2}.\d{4}$").IsMatch(TXT)) { return true; }
-                    if (new Regex(@"^\d{2}.\d{2}.\d{4} \d{2}:\d{2}:\d{2}$").IsMatch(TXT)) { return true; }
-                    if (new Regex(@"^\d{2}.\d{2}.\d{4} \d{2}:\d{2}$").IsMatch(TXT)) { return true; }
+                    if (new Regex(@"^\d{2}.\d{2}.\d{4}$").IsMatch(tXT)) { return true; }
+                    if (new Regex(@"^\d{2}.\d{2}.\d{4} \d{2}:\d{2}:\d{2}$").IsMatch(tXT)) { return true; }
+                    if (new Regex(@"^\d{2}.\d{2}.\d{4} \d{2}:\d{2}$").IsMatch(tXT)) { return true; }
                     return false;
 
                 case enDataFormat.LinkedCell:
@@ -376,34 +381,34 @@ namespace BlueBasics
                     return true;
 
                 default:
-                    Develop.DebugPrint(Format);
+                    Develop.DebugPrint(format);
                     return true;
             }
         }
 
-        public static string CompareKey(string IsValue, enDataFormat Format)
+        public static string CompareKey(string isValue, enDataFormat format)
         {
             var CompareKey_S_OK = Constants.SecondSortChar + "X";
             var CompareKey_S_NOK = Constants.SecondSortChar + "A";
 
-            switch (Format)
+            switch (format)
             {
                 case enDataFormat.Ganzzahl:
-                    if (string.IsNullOrEmpty(IsValue)) { return CompareKey_S_NOK + "0000000000"; }
+                    if (string.IsNullOrEmpty(isValue)) { return CompareKey_S_NOK + "0000000000"; }
 
-                    if (int.TryParse(IsValue, out var w))
+                    if (int.TryParse(isValue, out var w))
                     {
                         return CompareKey_S_OK + w.ToString(Constants.Format_Integer10);
                     }
                     else
                     {
-                        return CompareKey_S_NOK + IsValue;
+                        return CompareKey_S_NOK + isValue;
                     }
 
                 case enDataFormat.Bit:
                 case enDataFormat.FarbeInteger:
                 case enDataFormat.Schrift:
-                    return Constants.SecondSortChar + IsValue;
+                    return Constants.SecondSortChar + isValue;
 
                 case enDataFormat.Text:
                 case enDataFormat.BildCode:
@@ -411,44 +416,44 @@ namespace BlueBasics
                 case enDataFormat.Link_To_Filesystem:
                 case enDataFormat.Values_für_LinkedCellDropdown:
                 case enDataFormat.RelationText:
-                    if (string.IsNullOrEmpty(IsValue)) { return string.Empty; }
+                    if (string.IsNullOrEmpty(isValue)) { return string.Empty; }
 
-                    IsValue = IsValue.ToLower();
-                    IsValue = IsValue.Replace("ä", "a");
-                    IsValue = IsValue.Replace("ö", "o");
-                    IsValue = IsValue.Replace("ü", "u");
+                    isValue = isValue.ToLower();
+                    isValue = isValue.Replace("ä", "a");
+                    isValue = isValue.Replace("ö", "o");
+                    isValue = isValue.Replace("ü", "u");
 
-                    IsValue = IsValue.Replace("á", "a");
-                    IsValue = IsValue.Replace("ó", "o");
-                    IsValue = IsValue.Replace("ú", "u");
-                    IsValue = IsValue.Replace("í", "i");
-                    IsValue = IsValue.Replace("é", "e");
+                    isValue = isValue.Replace("á", "a");
+                    isValue = isValue.Replace("ó", "o");
+                    isValue = isValue.Replace("ú", "u");
+                    isValue = isValue.Replace("í", "i");
+                    isValue = isValue.Replace("é", "e");
 
-                    IsValue = IsValue.Replace("à", "a");
-                    IsValue = IsValue.Replace("ò", "o");
-                    IsValue = IsValue.Replace("ù", "u");
-                    IsValue = IsValue.Replace("ì", "i");
-                    IsValue = IsValue.Replace("è", "e");
+                    isValue = isValue.Replace("à", "a");
+                    isValue = isValue.Replace("ò", "o");
+                    isValue = isValue.Replace("ù", "u");
+                    isValue = isValue.Replace("ì", "i");
+                    isValue = isValue.Replace("è", "e");
 
-                    IsValue = IsValue.Replace("â", "a");
-                    IsValue = IsValue.Replace("ô", "o");
-                    IsValue = IsValue.Replace("û", "u");
-                    IsValue = IsValue.Replace("î", "i");
-                    IsValue = IsValue.Replace("ê", "e");
+                    isValue = isValue.Replace("â", "a");
+                    isValue = isValue.Replace("ô", "o");
+                    isValue = isValue.Replace("û", "u");
+                    isValue = isValue.Replace("î", "i");
+                    isValue = isValue.Replace("ê", "e");
 
-                    IsValue = IsValue.Replace("ž", "z");
+                    isValue = isValue.Replace("ž", "z");
 
-                    IsValue = IsValue.Replace("ß", "s");
+                    isValue = isValue.Replace("ß", "s");
 
-                    IsValue = IsValue.TrimStart("\"");
-                    IsValue = IsValue.TrimStart("'");
-                    IsValue = IsValue.TrimStart(" ");
-                    return Constants.SecondSortChar + IsValue;
+                    isValue = isValue.TrimStart("\"");
+                    isValue = isValue.TrimStart("'");
+                    isValue = isValue.TrimStart(" ");
+                    return Constants.SecondSortChar + isValue;
 
                 case enDataFormat.Gleitkommazahl:
-                    if (string.IsNullOrEmpty(IsValue)) { return "0000000000,000"; }
+                    if (string.IsNullOrEmpty(isValue)) { return "0000000000,000"; }
 
-                    if (double.TryParse(IsValue, out var dw))
+                    if (double.TryParse(isValue, out var dw))
                     {
                         var t = dw.ToString(Constants.Format_Float10_3);
                         if (!t.Contains(",")) { t += ",000"; };
@@ -458,28 +463,28 @@ namespace BlueBasics
                     }
                     else
                     {
-                        return CompareKey_S_NOK + IsValue;
+                        return CompareKey_S_NOK + isValue;
                     }
 
                 case enDataFormat.Datum_und_Uhrzeit:
 
-                    if (DateTimeTryParse(IsValue, out var d))
+                    if (DateTimeTryParse(isValue, out var d))
                     {
                         return CompareKey_S_OK + d.ToString("u");
                     }
                     else
                     {
-                        return CompareKey_S_NOK + IsValue;
+                        return CompareKey_S_NOK + isValue;
                     }
 
                 case enDataFormat.LinkedCell:
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                     // Fremdzellen setzen sich aus verschiedenen Spalten zusammen, also nur ganz primitives zurückgeben
-                    return Constants.SecondSortChar + IsValue;
+                    return Constants.SecondSortChar + isValue;
 
                 default:
-                    Develop.DebugPrint(Format);
-                    return Constants.SecondSortChar + IsValue;
+                    Develop.DebugPrint(format);
+                    return Constants.SecondSortChar + isValue;
             }
         }
 
@@ -507,7 +512,7 @@ namespace BlueBasics
             }
         }
 
-        //public static bool NeedUTF8(this enDataFormat format) {
+        // public static bool NeedUTF8(this enDataFormat format) {
         //    switch (format) {
         //        case enDataFormat.Text:
         //        case enDataFormat.RelationText:
@@ -516,7 +521,7 @@ namespace BlueBasics
         //        default:
         //            return false;
         //    }
-        //}
+        // }
 
         public static bool NeedTargetDatabase(this enDataFormat format)
         {

@@ -19,11 +19,14 @@
 
 
 
-namespace BlueDatabase.EventArgs {
+namespace BlueDatabase.EventArgs
+{
 
-    public class RowCancelEventArgs : RowEventArgs {
+    public class RowCancelEventArgs : RowEventArgs
+    {
 
-        public RowCancelEventArgs(RowItem row, string cancelReason) : base(row) {
+        public RowCancelEventArgs(RowItem row, string cancelReason) : base(row)
+        {
             CancelReason = cancelReason;
         }
 

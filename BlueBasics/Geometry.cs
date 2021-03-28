@@ -26,69 +26,69 @@ namespace BlueBasics
     {
         private const decimal Rad = (decimal)(Math.PI / 180);
 
-        public static double Sinus(double Winkel)
+        public static double Sinus(double winkel)
         {
-            return Math.Sin(Winkel * (double)Rad);
+            return Math.Sin(winkel * (double)Rad);
         }
 
-        public static double Cosinus(double Winkel)
+        public static double Cosinus(double winkel)
         {
-            return Math.Cos(Winkel * (double)Rad);
+            return Math.Cos(winkel * (double)Rad);
         }
 
-        public static double Tangens(double Winkel)
+        public static double Tangens(double winkel)
         {
-            return Math.Tan(Winkel * (double)Rad);
+            return Math.Tan(winkel * (double)Rad);
         }
 
-        public static decimal RadToDeg(decimal RadAngle)
+        public static decimal RadToDeg(decimal radAngle)
         {
-            return (decimal)((double)RadAngle * (180 / Math.PI));
+            return (decimal)((double)radAngle * (180 / Math.PI));
         }
 
-        public static decimal DegToRad(decimal DegAngle)
+        public static decimal DegToRad(decimal degAngle)
         {
-            return (decimal)((double)DegAngle * (Math.PI / 180));
+            return (decimal)((double)degAngle * (Math.PI / 180));
         }
 
-        public static decimal ArcTangens(decimal Ta)
+        public static decimal ArcTangens(decimal ta)
         {
-            return (decimal)(Math.Atan(Convert.ToDouble(Ta)) / (double)Rad);
+            return (decimal)(Math.Atan(Convert.ToDouble(ta)) / (double)Rad);
         }
 
-        public static decimal Länge(Point SP, Point Ep)
+        public static decimal Länge(Point sP, Point ep)
         {
             // Berechnet die Länge einer Strecke
 
-            decimal L1 = SP.X - Ep.X;
-            decimal L2 = SP.Y - Ep.Y;
+            decimal L1 = sP.X - ep.X;
+            decimal L2 = sP.Y - ep.Y;
 
             // ^2 ist langsamer, laut Project Analyzer
             return (decimal)Math.Sqrt(Convert.ToDouble(L1 * L1 + L2 * L2));
         }
 
-        public static decimal Länge(PointF SP, PointF Ep)
+        public static decimal Länge(PointF sP, PointF ep)
         {
             // Berechnet die Länge einer Strecke
 
-            var L1 = (decimal)(SP.X - Ep.X);
-            var L2 = (decimal)(SP.Y - Ep.Y);
+            var L1 = (decimal)(sP.X - ep.X);
+            var L2 = (decimal)(sP.Y - ep.Y);
 
             // ^2 ist langsamer, laut Project Analyzer
             return (decimal)Math.Sqrt(Convert.ToDouble(L1 * L1 + L2 * L2));
         }
 
-        public static decimal Winkel(PointF Sp, PointF EP)
+        public static decimal Winkel(PointF sp, PointF eP)
         {
-            return Winkel((decimal)Sp.X, (decimal)Sp.Y, (decimal)EP.X, (decimal)EP.Y);
+            return Winkel((decimal)sp.X, (decimal)sp.Y, (decimal)eP.X, (decimal)eP.Y);
         }
 
-        public static decimal Winkel(decimal X1, decimal Y1, decimal X2, decimal Y2)
+        public static decimal Winkel(decimal x1, decimal y1, decimal x2, decimal y2)
         {
             // http://de.wikipedia.org/wiki/Polarkoordinaten
 
-            var XA = X2 - X1;
-            var YA = Y2 - Y1;
+            var XA = x2 - x1;
+            var YA = y2 - y1;
 
             if (YA == 0M)
             {

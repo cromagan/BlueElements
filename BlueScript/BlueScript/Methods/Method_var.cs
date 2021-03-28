@@ -21,8 +21,10 @@ using Skript.Enums;
 using System.Collections.Generic;
 using static BlueBasics.Extensions;
 
-namespace BlueScript {
-    internal class Method_Var : Method {
+namespace BlueScript
+{
+    internal class Method_Var : Method
+    {
 
         public override string Syntax => "var VariablenName = Wert;";
         public override string Description => "Erstellt eine neue Variable, der Typ wird automtisch bestimmt.";
@@ -34,7 +36,8 @@ namespace BlueScript {
         public override List<enVariableDataType> Args => new() { enVariableDataType.BoolNumString };
         public override bool EndlessArgs => false;
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
+        {
 
             if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
 
@@ -54,19 +57,22 @@ namespace BlueScript {
             var r = new Method_BerechneVariable();
             var f = r.CanDo(infos.AttributText + ";", 0, false, s);
 
-            if (!string.IsNullOrEmpty(f.ErrorMessage)) {
+            if (!string.IsNullOrEmpty(f.ErrorMessage))
+            {
 
                 return new strDoItFeedback("Befehl nicht erkannt, " + f.ErrorMessage + ": " + infos.AttributText);
             }
 
-            if (infos.AttributText.Length != f.ContinueOrErrorPosition - 1) {
+            if (infos.AttributText.Length != f.ContinueOrErrorPosition - 1)
+            {
                 return new strDoItFeedback("Falsch gesetztes Semikolon");
             }
 
 
             var f2 = r.DoIt(f, s);
 
-            if (!string.IsNullOrEmpty(f2.ErrorMessage)) {
+            if (!string.IsNullOrEmpty(f2.ErrorMessage))
+            {
                 return new strDoItFeedback("Berechung fehlerhaft: " + f2.ErrorMessage);
             }
 

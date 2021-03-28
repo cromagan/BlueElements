@@ -23,9 +23,11 @@ using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 
-namespace BlueDatabase {
+namespace BlueDatabase
+{
 
-    public sealed class RowSortDefinition : IParseable {
+    public sealed class RowSortDefinition : IParseable
+    {
         #region  Variablen-Deklarationen 
 
         public Database Database;
@@ -41,17 +43,20 @@ namespace BlueDatabase {
 
         #region  Construktor + Initialize 
 
-        private void Initialize() {
+        private void Initialize()
+        {
             Reverse = false;
             _Columns.Clear();
         }
 
-        public RowSortDefinition(Database database, string code) {
+        public RowSortDefinition(Database database, string code)
+        {
             Database = database;
             Parse(code);
         }
 
-        public RowSortDefinition(Database database, string columnName, bool reverse) {
+        public RowSortDefinition(Database database, string columnName, bool reverse)
+        {
             Database = database;
             Initialize();
 
@@ -59,7 +64,8 @@ namespace BlueDatabase {
             SetColumn(new List<string>() { columnName });
         }
 
-        public RowSortDefinition(Database database, List<string> columnNames, bool reverse) {
+        public RowSortDefinition(Database database, List<string> columnNames, bool reverse)
+        {
             Initialize();
             Database = database;
             Reverse = reverse;
@@ -81,19 +87,26 @@ namespace BlueDatabase {
 
 
 
-        public override string ToString() {
+        public override string ToString()
+        {
 
             var Result = "{";
 
-            if (Reverse) {
+            if (Reverse)
+            {
                 Result += "Direction=Z-A";
-            } else {
+            }
+            else
+            {
                 Result += "Direction=A-Z";
             }
 
-            if (_Columns != null) {
-                foreach (var ThisColumn in _Columns) {
-                    if (ThisColumn != null) {
+            if (_Columns != null)
+            {
+                foreach (var ThisColumn in _Columns)
+                {
+                    if (ThisColumn != null)
+                    {
                         Result = Result + ", " + ThisColumn.ParsableColumnKey();
                     }
                 }
@@ -103,11 +116,14 @@ namespace BlueDatabase {
         }
 
 
-        public void Parse(string ToParse) {
+        public void Parse(string ToParse)
+        {
             IsParsing = true;
             Initialize();
-            foreach (var pair in ToParse.GetAllTags()) {
-                switch (pair.Key) {
+            foreach (var pair in ToParse.GetAllTags())
+            {
+                switch (pair.Key)
+                {
                     case "identifier":
                         if (pair.Value != "SortDefinition") { Develop.DebugPrint(enFehlerArt.Fehler, "Identifier fehlerhaft: " + pair.Value); }
                         break;
@@ -134,26 +150,31 @@ namespace BlueDatabase {
         }
 
 
-        private void SetColumn(List<string> names) {
+        private void SetColumn(List<string> names)
+        {
             _Columns.Clear();
-            for (var z = 0; z < names.Count; z++) {
+            for (var z = 0; z < names.Count; z++)
+            {
                 var c = Database.Column.Exists(names[z]);
 
                 if (c != null) { _Columns.Add(c); }
             }
         }
 
-        public bool UsedForRowSort(ColumnItem vcolumn) {
+        public bool UsedForRowSort(ColumnItem vcolumn)
+        {
 
             if (_Columns.Count == 0) { return false; }
 
-            foreach (var ThisColumn in _Columns) {
+            foreach (var ThisColumn in _Columns)
+            {
                 if (ThisColumn == vcolumn) { return true; }
             }
             return false;
         }
 
-        public void OnChanged() {
+        public void OnChanged()
+        {
             if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
             Changed?.Invoke(this, System.EventArgs.Empty);
         }

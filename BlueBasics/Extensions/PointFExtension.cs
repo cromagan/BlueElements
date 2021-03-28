@@ -24,13 +24,13 @@ namespace BlueBasics
 {
     public static partial class Extensions
     {
-        public static bool PointInRect(PointF P, decimal X1, decimal Y1, decimal X2, decimal Y2, float Toleranz)
+        public static bool PointInRect(this PointF p, decimal x1, decimal y1, decimal x2, decimal y2, float toleranz)
         {
-            var r = new RectangleF((float)Math.Min(X1, X2), (float)Math.Min(Y1, Y2), (float)Math.Abs(X1 - X2), (float)Math.Abs(Y1 - Y2));
+            var r = new RectangleF((float)Math.Min(x1, x2), (float)Math.Min(y1, y2), (float)Math.Abs(x1 - x2), (float)Math.Abs(y1 - y2));
 
-            r.Inflate(Toleranz, Toleranz);
+            r.Inflate(toleranz, toleranz);
 
-            return r.Contains(P);
+            return r.Contains(p);
         }
     }
 }

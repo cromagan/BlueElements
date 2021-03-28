@@ -1,9 +1,12 @@
 ﻿using System.Collections;
 using System.Windows.Forms.Design;
 
-namespace BlueControls.Designer_Support {
-    public class BasicDesigner : ControlDesigner {
-        protected override void PreFilterProperties(IDictionary properties) {
+namespace BlueControls.Designer_Support
+{
+    public class BasicDesigner : ControlDesigner
+    {
+        protected override void PreFilterProperties(IDictionary properties)
+        {
             properties.Remove("BackColor");
             properties.Remove("BackgroundImage");
             properties.Remove("BackgroundImageLayout");

@@ -30,8 +30,10 @@ using System.Drawing.Printing;
 using System.IO;
 using static BlueBasics.FileOperations;
 
-namespace BlueControls.Forms {
-    public sealed partial class ExportDialog {
+namespace BlueControls.Forms
+{
+    public sealed partial class ExportDialog
+    {
 
 
         private string _AdditionalLayoutPath = "";
@@ -44,7 +46,8 @@ namespace BlueControls.Forms {
         private int ItemNrForPrint;
 
 
-        public ExportDialog(Database db, List<RowItem> ListetItems, bool CanChangeItems) {
+        public ExportDialog(Database db, List<RowItem> ListetItems, bool CanChangeItems)
+        {
 
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
@@ -57,7 +60,8 @@ namespace BlueControls.Forms {
         }
 
 
-        public ExportDialog(string vAdditionalLayoutPath, string AutosaveFile) {
+        public ExportDialog(string vAdditionalLayoutPath, string AutosaveFile)
+        {
 
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
@@ -72,26 +76,35 @@ namespace BlueControls.Forms {
         }
 
 
-        public void Init(string vAdditionalLayoutPath, bool CanChangeItems, string AutosaveFile) {
+        public void Init(string vAdditionalLayoutPath, bool CanChangeItems, string AutosaveFile)
+        {
 
             _AdditionalLayoutPath = vAdditionalLayoutPath;
 
-            if (!string.IsNullOrEmpty(AutosaveFile)) {
+            if (!string.IsNullOrEmpty(AutosaveFile))
+            {
                 ZielPfad = AutosaveFile.FilePath();
                 SaveTo = AutosaveFile;
-            } else {
+            }
+            else
+            {
                 ZielPfad = Path.GetTempPath();
             }
 
 
-            try {
-                if (!string.IsNullOrEmpty(_AdditionalLayoutPath) && !PathExists(_AdditionalLayoutPath)) {
+            try
+            {
+                if (!string.IsNullOrEmpty(_AdditionalLayoutPath) && !PathExists(_AdditionalLayoutPath))
+                {
                     Directory.CreateDirectory(_AdditionalLayoutPath);
                 }
-                if (!PathExists(ZielPfad)) {
+                if (!PathExists(ZielPfad))
+                {
                     Directory.CreateDirectory(ZielPfad);
                 }
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
 
             }
 
@@ -102,8 +115,10 @@ namespace BlueControls.Forms {
 
 
 
-        private void EinWahl_Click(object sender, System.EventArgs e) {
-            using (var fr = new frmTableView(Database)) {
+        private void EinWahl_Click(object sender, System.EventArgs e)
+        {
+            using (var fr = new frmTableView(Database))
+            {
                 Liste = fr.GetFilteredItems();
             }
 
@@ -122,14 +137,16 @@ namespace BlueControls.Forms {
 
 
 
-        protected override void OnShown(System.EventArgs e) {
+        protected override void OnShown(System.EventArgs e)
+        {
             base.OnShown(e);
             ShowExportAktion();
         }
 
 
 
-        public void ShowAndCheckLayoutWahl() {
+        public void ShowAndCheckLayoutWahl()
+        {
             Tabs.TabPages[0].Enabled = false;
             Tabs.TabPages[1].Enabled = true;
             Tabs.TabPages[2].Enabled = false;
@@ -138,7 +155,8 @@ namespace BlueControls.Forms {
             Tabs.SelectedIndex = 1;
 
 
-            if (FrmDrucken_Layout1.Item.Count == 0) {
+            if (FrmDrucken_Layout1.Item.Count == 0)
+            {
                 BefülleLayoutDropdowns();
             }
 
@@ -147,7 +165,8 @@ namespace BlueControls.Forms {
             Weiter2.Enabled = !string.IsNullOrEmpty(FrmDrucken_Layout1.Text);
 
 
-            if (FrmDrucken_Layout1.Text.IsLong()) {
+            if (FrmDrucken_Layout1.Text.IsLong())
+            {
 
                 TmpPad.ShowInPrintMode = true;
                 TmpPad.Item = new ItemCollectionPad(FrmDrucken_Layout1.Text, Liste[0].Database, Liste[0].Key);
@@ -158,7 +177,8 @@ namespace BlueControls.Forms {
         }
 
 
-        public void ShowAndCheckTabEinträgeWählen() {
+        public void ShowAndCheckTabEinträgeWählen()
+        {
 
             Tabs.TabPages[0].Enabled = false;
             Tabs.TabPages[1].Enabled = false;
@@ -174,29 +194,39 @@ namespace BlueControls.Forms {
             //  Dim EinzelMöglich As Boolean = True
 
 
-            if (Liste == null || Liste.Count == 0) {
+            if (Liste == null || Liste.Count == 0)
+            {
                 FrmDrucken_Info.Text = "Bitte wählen sie die Einträge für den Export.";
 
-            } else {
-                if (Liste.Count == 1) {
+            }
+            else
+            {
+                if (Liste.Count == 1)
+                {
                     FrmDrucken_Info.Text = "Es ist genau ein Eintrag gewählt:<br> <b>-" + Liste[0].CellFirstString().Replace("\r\n", " ");
                     MultiMöglich = false;
 
-                } else {
+                }
+                else
+                {
                     FrmDrucken_Info.Text = "Es sind <b>" + Liste.Count + "</b> Einträge gewählt.";
 
                 }
             }
 
 
-            if (Speichern.Checked && FrmDrucken_Layout1.Text.IsLong()) {
+            if (Speichern.Checked && FrmDrucken_Layout1.Text.IsLong())
+            {
                 MultiMöglich = false;
             }
 
 
-            if (MultiMöglich) {
+            if (MultiMöglich)
+            {
                 FrmDrucken_Zusammen.Enabled = true;
-            } else {
+            }
+            else
+            {
                 FrmDrucken_Einzeln.Checked = true;
                 FrmDrucken_Zusammen.Enabled = false;
             }
@@ -204,8 +234,10 @@ namespace BlueControls.Forms {
 
 
 
-        private void BefülleLayoutDropdowns() {
-            if (Database != null) {
+        private void BefülleLayoutDropdowns()
+        {
+            if (Database != null)
+            {
                 FrmDrucken_Layout1.Item.AddLayoutsOf(Database, Speichern.Checked, _AdditionalLayoutPath);
             }
         }
@@ -215,7 +247,8 @@ namespace BlueControls.Forms {
         //    GenerateLayout()
         //End Sub
 
-        private void LayoutEditor_Click(object sender, System.EventArgs e) {
+        private void LayoutEditor_Click(object sender, System.EventArgs e)
+        {
 
             Enabled = false;
 
@@ -226,44 +259,55 @@ namespace BlueControls.Forms {
             FrmDrucken_Layout1.Item.Clear();
             BefülleLayoutDropdowns();
 
-            if (FrmDrucken_Layout1.Item[n] != null) {
+            if (FrmDrucken_Layout1.Item[n] != null)
+            {
                 FrmDrucken_Layout1.Text = n;
             }
 
             Enabled = true;
         }
 
-        private void Button1_Click(object sender, System.EventArgs e) {
+        private void Button1_Click(object sender, System.EventArgs e)
+        {
             ExecuteFile(ZielPfad);
         }
 
-        private void WeiterEinträge_Click(object sender, System.EventArgs e) {
+        private void WeiterEinträge_Click(object sender, System.EventArgs e)
+        {
 
 
-            if (Drucken.Checked) {
+            if (Drucken.Checked)
+            {
 
                 ShowDruckenEnde();
-            } else {
+            }
+            else
+            {
 
 
                 ShowSpeichernEnde();
                 List<string> l;
-                if (FrmDrucken_Layout1.Text.IsLong()) {
+                if (FrmDrucken_Layout1.Text.IsLong())
+                {
                     l = Export.SaveAsBitmap(Liste, FrmDrucken_Layout1.Text, ZielPfad);
-                } else {
+                }
+                else
+                {
                     l = Export.GenerateLayout_FileSystem(Liste, FrmDrucken_Layout1.Text, SaveTo, FrmDrucken_Zusammen.Checked, ZielPfad);
                 }
                 Exported.Item.AddRange(l);
             }
         }
 
-        private void Weiter2_Click(object sender, System.EventArgs e) {
+        private void Weiter2_Click(object sender, System.EventArgs e)
+        {
             ShowAndCheckTabEinträgeWählen();
         }
 
 
 
-        public void ShowExportAktion() {
+        public void ShowExportAktion()
+        {
             Tabs.TabPages[0].Enabled = true;
             Tabs.TabPages[1].Enabled = false;
             Tabs.TabPages[2].Enabled = false;
@@ -274,7 +318,8 @@ namespace BlueControls.Forms {
             WeiterAktion.Enabled = Speichern.Checked || Drucken.Checked;
         }
 
-        public void ShowDruckenEnde() {
+        public void ShowDruckenEnde()
+        {
             Tabs.TabPages[0].Enabled = false;
             Tabs.TabPages[1].Enabled = false;
             Tabs.TabPages[2].Enabled = false;
@@ -288,7 +333,8 @@ namespace BlueControls.Forms {
 
         }
 
-        public void ShowSpeichernEnde() {
+        public void ShowSpeichernEnde()
+        {
             Tabs.TabPages[0].Enabled = false;
             Tabs.TabPages[1].Enabled = false;
             Tabs.TabPages[2].Enabled = false;
@@ -298,27 +344,33 @@ namespace BlueControls.Forms {
         }
 
 
-        private void FrmDrucken_Layout1_TextChanged(object sender, System.EventArgs e) {
+        private void FrmDrucken_Layout1_TextChanged(object sender, System.EventArgs e)
+        {
             ShowAndCheckLayoutWahl();
         }
 
-        private void Speichern_CheckedChanged(object sender, System.EventArgs e) {
+        private void Speichern_CheckedChanged(object sender, System.EventArgs e)
+        {
             ShowExportAktion();
         }
 
-        private void WeiterAktion_Click(object sender, System.EventArgs e) {
+        private void WeiterAktion_Click(object sender, System.EventArgs e)
+        {
             ShowAndCheckLayoutWahl();
         }
 
-        private void Exported_ItemClicked(object sender, BasicListItemEventArgs e) {
+        private void Exported_ItemClicked(object sender, BasicListItemEventArgs e)
+        {
             ExecuteFile(e.Item.Internal);
         }
 
-        private void FrmDrucken_Drucken_Click(object sender, System.EventArgs e) {
+        private void FrmDrucken_Drucken_Click(object sender, System.EventArgs e)
+        {
             Close();
         }
 
-        private void Button_PageSetup_Click(object sender, System.EventArgs e) {
+        private void Button_PageSetup_Click(object sender, System.EventArgs e)
+        {
             PrintPad.ShowPrinterPageSetup();
 
             PrintPad.CopyPrinterSettingsToWorkingArea();
@@ -326,13 +378,15 @@ namespace BlueControls.Forms {
             GeneratePrintPad(0);
         }
 
-        private void btnDrucken_Click(object sender, System.EventArgs e) {
+        private void btnDrucken_Click(object sender, System.EventArgs e)
+        {
             PrintPad.Print();
             // Den Rest mach 'PrintPad.PrintPage'
         }
 
 
-        private void PrintPad_PrintPage(object sender, PrintPageEventArgs e) {
+        private void PrintPad_PrintPage(object sender, PrintPageEventArgs e)
+        {
 
             var l = ItemNrForPrint;
 
@@ -345,12 +399,14 @@ namespace BlueControls.Forms {
 
 
 
-        private void Vorschau_Click(object sender, System.EventArgs e) {
+        private void Vorschau_Click(object sender, System.EventArgs e)
+        {
             PrintPad.ShowPrintPreview();
         }
 
 
-        public int GeneratePrintPad(int StartNr) {
+        public int GeneratePrintPad(int StartNr)
+        {
             PrintPad.ShowInPrintMode = false;
             PrintPad.Item.Clear();
             modAllgemein.CollectGarbage();
@@ -367,12 +423,15 @@ namespace BlueControls.Forms {
             var DruckB = PrintPad.Item.DruckbereichRect();
 
             var tempVar = Math.Max(1, (int)Math.Floor(DruckB.Width / (double)OneItem.Width + 0.01));
-            for (var x = 0; x < tempVar; x++) {
+            for (var x = 0; x < tempVar; x++)
+            {
                 var tempVar2 = Math.Max(1, (int)Math.Floor(DruckB.Height / (double)OneItem.Height + 0.01));
-                for (var y = 0; y < tempVar2; y++) {
+                for (var y = 0; y < tempVar2; y++)
+                {
 
 
-                    var It = new ChildPadItem(PrintPad.Item) {
+                    var It = new ChildPadItem(PrintPad.Item)
+                    {
                         PadInternal = new CreativePad(new ItemCollectionPad(FrmDrucken_Layout1.Text, Liste[StartNr].Database, Liste[StartNr].Key))
                     };
 
@@ -386,7 +445,8 @@ namespace BlueControls.Forms {
                     if (FrmDrucken_Einzeln.Checked || StartNr >= Liste.Count) { break; }
                 }
 
-                if (FrmDrucken_Einzeln.Checked || StartNr >= Liste.Count) {
+                if (FrmDrucken_Einzeln.Checked || StartNr >= Liste.Count)
+                {
                     break;
                 }
             }
@@ -396,7 +456,8 @@ namespace BlueControls.Forms {
             return StartNr;
         }
 
-        private void PrintPad_BeginnPrint(object sender, PrintEventArgs e) {
+        private void PrintPad_BeginnPrint(object sender, PrintEventArgs e)
+        {
             ItemNrForPrint = 0;
         }
     }

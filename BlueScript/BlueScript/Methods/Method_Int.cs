@@ -20,8 +20,10 @@
 using Skript.Enums;
 using System.Collections.Generic;
 
-namespace BlueScript {
-    internal class Method_Int : Method {
+namespace BlueScript
+{
+    internal class Method_Int : Method
+    {
 
         public override string Syntax => "Int(Value)";
         public override string Description => "Schneidet Nachkommastellen ab.";
@@ -34,7 +36,8 @@ namespace BlueScript {
         public override bool EndlessArgs => false;
 
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
+        {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
             return new strDoItFeedback(attvar[0].ValueInt.ToString(), string.Empty);

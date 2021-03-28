@@ -25,14 +25,17 @@ using System.Drawing;
 
 
 
-namespace BlueControls.Forms {
-    public partial class PictureView {
+namespace BlueControls.Forms
+{
+    public partial class PictureView
+    {
         protected List<string> _FileList;
         private int _NR = -1;
         private readonly string _Title = string.Empty;
 
 
-        public PictureView() {
+        public PictureView()
+        {
 
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
@@ -43,7 +46,8 @@ namespace BlueControls.Forms {
         }
 
 
-        public PictureView(List<string> FileList, bool MitScreenResize, string WindowCaption) {
+        public PictureView(List<string> FileList, bool MitScreenResize, string WindowCaption)
+        {
 
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
             InitializeComponent();
@@ -58,7 +62,8 @@ namespace BlueControls.Forms {
             Auswahl.Enabled = false;
         }
 
-        public PictureView(Bitmap BMP) {
+        public PictureView(Bitmap BMP)
+        {
 
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
             InitializeComponent();
@@ -77,7 +82,8 @@ namespace BlueControls.Forms {
         }
 
 
-        public PictureView(List<string> FileList, bool MitScreenResize, string WindowCaption, int OpenOnScreen) {
+        public PictureView(List<string> FileList, bool MitScreenResize, string WindowCaption, int OpenOnScreen)
+        {
 
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
             InitializeComponent();
@@ -123,14 +129,19 @@ namespace BlueControls.Forms {
         //}
 
 
-        protected void LoadPic(int Nr) {
+        protected void LoadPic(int Nr)
+        {
             _NR = Nr;
 
 
-            if (_FileList != null && Nr < _FileList.Count) {
-                try {
+            if (_FileList != null && Nr < _FileList.Count)
+            {
+                try
+                {
                     Pad.BMP = (Bitmap)BitmapExt.Image_FromFile(_FileList[Nr]);
-                } catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     Pad.BMP = null;
                     Develop.DebugPrint(ex);
                 }
@@ -142,10 +153,13 @@ namespace BlueControls.Forms {
 
             grpSeiten.Visible = _FileList != null && _FileList.Count > 1;
 
-            if (_FileList == null || _FileList.Count == 0) {
+            if (_FileList == null || _FileList.Count == 0)
+            {
                 Links.Enabled = false;
                 Rechts.Enabled = false;
-            } else {
+            }
+            else
+            {
                 grpSeiten.Enabled = true;
                 Links.Enabled = Convert.ToBoolean(_NR > 0);
                 Rechts.Enabled = Convert.ToBoolean(_NR < _FileList.Count - 1);
@@ -159,14 +173,17 @@ namespace BlueControls.Forms {
         }
 
 
-        private void InitWindow(bool fitWindowToBest, string windowCaption, int openOnScreen) {
+        private void InitWindow(bool fitWindowToBest, string windowCaption, int openOnScreen)
+        {
             //    Me.ShowInTaskbar = False
 
             if (_FileList == null || _FileList.Count < 2) { grpSeiten.Enabled = false; }
 
 
-            if (fitWindowToBest) {
-                if (System.Windows.Forms.Screen.AllScreens.Length == 1 || openOnScreen < 0) {
+            if (fitWindowToBest)
+            {
+                if (System.Windows.Forms.Screen.AllScreens.Length == 1 || openOnScreen < 0)
+                {
                     var OpScNr = modAllgemein.PointOnScreenNr(System.Windows.Forms.Cursor.Position);
 
                     Width = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Width / 1.5);
@@ -174,7 +191,9 @@ namespace BlueControls.Forms {
                     Left = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Left + (System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Width - Width) / 2.0);
                     Top = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Top + (System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Height - Height) / 2.0);
 
-                } else {
+                }
+                else
+                {
                     Width = System.Windows.Forms.Screen.AllScreens[openOnScreen].WorkingArea.Width;
                     Height = System.Windows.Forms.Screen.AllScreens[openOnScreen].WorkingArea.Height;
                     Left = System.Windows.Forms.Screen.AllScreens[openOnScreen].WorkingArea.Left;
@@ -183,7 +202,8 @@ namespace BlueControls.Forms {
             }
 
 
-            if (!string.IsNullOrEmpty(windowCaption)) {
+            if (!string.IsNullOrEmpty(windowCaption))
+            {
                 Text = windowCaption;
             }
 
@@ -192,7 +212,8 @@ namespace BlueControls.Forms {
         }
 
 
-        private void Links_Click(object sender, System.EventArgs e) {
+        private void Links_Click(object sender, System.EventArgs e)
+        {
 
             _NR--;
             if (_NR <= 0) { _NR = 0; }
@@ -200,7 +221,8 @@ namespace BlueControls.Forms {
             LoadPic(_NR);
         }
 
-        private void Rechts_Click(object sender, System.EventArgs e) {
+        private void Rechts_Click(object sender, System.EventArgs e)
+        {
             _NR++;
             if (_NR >= _FileList.Count - 1) { _NR = _FileList.Count - 1; }
 
@@ -208,13 +230,15 @@ namespace BlueControls.Forms {
         }
 
 
-        private void ZoomFitBut_Click(object sender, System.EventArgs e) {
+        private void ZoomFitBut_Click(object sender, System.EventArgs e)
+        {
             Pad.ZoomFit();
         }
 
 
 
-        private void Pad_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
+        private void Pad_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
             if (ZoomIn.Checked) { Pad.ZoomIn(e); }
             if (ZoomOut.Checked) { Pad.ZoomOut(e); }
         }

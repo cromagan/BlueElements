@@ -33,12 +33,15 @@ using System.IO;
 using static BlueBasics.Develop;
 using static BlueBasics.FileOperations;
 
-namespace BlueControls.Forms {
-    public partial class frmTableView {
+namespace BlueControls.Forms
+{
+    public partial class frmTableView
+    {
         public frmTableView() : this(null, true, true) { }
         public frmTableView(Database Database) : this(Database, false, false) { }
 
-        public frmTableView(Database database, bool loadTabVisible, bool adminTabVisible) {
+        public frmTableView(Database database, bool loadTabVisible, bool adminTabVisible)
+        {
             InitializeComponent();
 
 
@@ -72,18 +75,22 @@ namespace BlueControls.Forms {
             btnDrucken.Item.Add("Layout-Editor öffnen", "editor", QuickImage.Get(enImageCode.Layout, 28));
 
 
-            if (!adminTabVisible) {
+            if (!adminTabVisible)
+            {
                 MainRibbon.Controls.Remove(tabAdmin);
                 MainRibbon.Controls.Remove(tabExtras);
                 grpAllgemein.Visible = false;
                 grpBearbeitung.Visible = false;
-            } else {
+            }
+            else
+            {
                 tabAdmin.Table = TableView;
 
             }
 
 
-            if (!loadTabVisible) {
+            if (!loadTabVisible)
+            {
                 MainRibbon.Controls.Remove(tabDatei);
             }
 
@@ -96,31 +103,36 @@ namespace BlueControls.Forms {
         private const string _Version = "1.0001";
 
 
-        private void SetDatabasetoNothing() {
+        private void SetDatabasetoNothing()
+        {
             Formula.Database = null;
             TableView.Database = null;
 
-            if (_Database != null) {
+            if (_Database != null)
+            {
                 _Database.Save(false);
                 _Database = null;
             }
         }
 
 
-        private void zurück_Click(object sender, System.EventArgs e) {
+        private void zurück_Click(object sender, System.EventArgs e)
+        {
             Formula.HideViewEditor();
             SuchEintragNoSave(enDirection.Oben, out var column, out var row);
             TableView.CursorPos_Set(column, row, false);
         }
 
-        private void vor_Click(object sender, System.EventArgs e) {
+        private void vor_Click(object sender, System.EventArgs e)
+        {
             Formula.HideViewEditor();
             SuchEintragNoSave(enDirection.Unten, out var column, out var row);
             TableView.CursorPos_Set(column, row, false);
         }
 
 
-        private void SuchEintragNoSave(enDirection Richtung, out ColumnItem column, out RowItem row) {
+        private void SuchEintragNoSave(enDirection Richtung, out ColumnItem column, out RowItem row)
+        {
 
             column = TableView.Database.Column[0];
             row = null;
@@ -131,12 +143,14 @@ namespace BlueControls.Forms {
             // Temporär berechnen, um geflacker zu vermeiden (Endabled - > Disabled bei Nothing)
 
 
-            if (Convert.ToBoolean(Richtung & enDirection.Unten)) {
+            if (Convert.ToBoolean(Richtung & enDirection.Unten))
+            {
                 row = TableView.View_NextRow(Formula.ShowingRow);
                 if (row == null) { row = TableView.View_RowFirst(); }
             }
 
-            if (Convert.ToBoolean(Richtung & enDirection.Oben)) {
+            if (Convert.ToBoolean(Richtung & enDirection.Oben))
+            {
                 row = TableView.View_PreviousRow(Formula.ShowingRow);
                 if (row == null) { row = TableView.View_RowLast(); }
             }
@@ -146,47 +160,59 @@ namespace BlueControls.Forms {
         }
 
 
-        private void TableView_CursorPosChanged(object sender, CellEventArgs e) {
+        private void TableView_CursorPosChanged(object sender, CellEventArgs e)
+        {
 
 
-            if (InvokeRequired) {
+            if (InvokeRequired)
+            {
                 Invoke(new Action(() => TableView_CursorPosChanged(sender, e)));
                 return;
             }
 
-            if (e.Column == null || _Ansicht == enAnsicht.Nur_Tabelle || e.Row == null) {
+            if (e.Column == null || _Ansicht == enAnsicht.Nur_Tabelle || e.Row == null)
+            {
                 Formula.ShowingRowKey = -1;
-            } else {
+            }
+            else
+            {
                 Formula.ShowingRowKey = e.Row.Key;
             }
 
 
-            if (_Ansicht == enAnsicht.Überschriften_und_Formular) {
+            if (_Ansicht == enAnsicht.Überschriften_und_Formular)
+            {
                 TableView.EnsureVisible(e.Column, e.Row);
             }
 
         }
 
 
-        private void TableView_EditBeforeBeginEdit(object sender, CellCancelEventArgs e) {
-            if (TableView.Design == enBlueTableAppearance.OnlyMainColumnWithoutHead) {
+        private void TableView_EditBeforeBeginEdit(object sender, CellCancelEventArgs e)
+        {
+            if (TableView.Design == enBlueTableAppearance.OnlyMainColumnWithoutHead)
+            {
                 e.CancelReason = "In dieser Ansicht kann der Eintrag nicht bearbeitet werden.";
             }
         }
 
-        private void such_Enter(object sender, System.EventArgs e) {
+        private void such_Enter(object sender, System.EventArgs e)
+        {
             if (SuchB.Enabled) { SuchB_Click(SuchB, null); }
         }
 
-        private void such_TextChanged(object sender, System.EventArgs e) {
+        private void such_TextChanged(object sender, System.EventArgs e)
+        {
             Check_SuchButton();
         }
 
-        private void SuchB_Click(object sender, System.EventArgs e) {
+        private void SuchB_Click(object sender, System.EventArgs e)
+        {
             Formula.HideViewEditor();
             var SuchtT = such.Text.Trim();
 
-            if (string.IsNullOrEmpty(SuchtT)) {
+            if (string.IsNullOrEmpty(SuchtT))
+            {
                 MessageBox.Show("Bitte Text zum Suchen eingeben.", enImageCode.Information, "OK");
                 return;
             }
@@ -262,23 +288,31 @@ namespace BlueControls.Forms {
             //} while (true);
 
 
-            if (GefRow == null) {
+            if (GefRow == null)
+            {
                 MessageBox.Show("Kein Eintrag gefunden!", enImageCode.Information, "OK");
-            } else {
-                if (GefRow == Formula.ShowingRow) {
+            }
+            else
+            {
+                if (GefRow == Formula.ShowingRow)
+                {
                     MessageBox.Show("Text nur im <b>aktuellen Eintrag</b> gefunden,<br>aber sonst keine weiteren Einträge!", enImageCode.Information, "OK");
-                } else {
+                }
+                else
+                {
                     TableView.CursorPos_Set(_Database.Column[0], GefRow, true);
                 }
             }
         }
 
 
-        private void Neu_Click(object sender, System.EventArgs e) {
+        private void Neu_Click(object sender, System.EventArgs e)
+        {
             RowItem vRow;
 
 
-            switch (_Database.Column[0].Format) {
+            switch (_Database.Column[0].Format)
+            {
                 case enDataFormat.Datum_und_Uhrzeit:
                     vRow = _Database.Row.Add(NameRepair(DateTime.Now.ToString(Constants.Format_Date5), null));
                     break;
@@ -291,16 +325,21 @@ namespace BlueControls.Forms {
             TableView.CursorPos_Set(_Database.Column[0], vRow, true);
         }
 
-        private string NameRepair(string IstName, RowItem vRow) {
+        private string NameRepair(string IstName, RowItem vRow)
+        {
             var NewName = IstName;
             var IstZ = 0;
 
-            do {
+            do
+            {
                 var Changed = false;
 
-                foreach (var ThisRow in _Database.Row) {
-                    if (ThisRow != null && ThisRow != vRow) {
-                        if (ThisRow.CellFirstString().ToUpper() == NewName.ToUpper()) {
+                foreach (var ThisRow in _Database.Row)
+                {
+                    if (ThisRow != null && ThisRow != vRow)
+                    {
+                        if (ThisRow.CellFirstString().ToUpper() == NewName.ToUpper())
+                        {
                             IstZ++;
                             NewName = IstName + " (" + IstZ + ")";
                             Changed = true;
@@ -316,12 +355,15 @@ namespace BlueControls.Forms {
         }
 
 
-        public void LöscheZeile(object sender, System.EventArgs e) {
+        public void LöscheZeile(object sender, System.EventArgs e)
+        {
 
             Formula.HideViewEditor();
 
-            if (Ansicht1.Checked) {
-                if (Formula.ShowingRow == null) {
+            if (Ansicht1.Checked)
+            {
+                if (Formula.ShowingRow == null)
+                {
                     MessageBox.Show("Kein Eintrag gewählt.", enImageCode.Information, "OK");
                     return;
                 }
@@ -335,7 +377,9 @@ namespace BlueControls.Forms {
                 SuchEintragNoSave(enDirection.Unten, out var column, out var row);
                 TableView.CursorPos_Set(column, row, false);
                 TableView.Database.Row.Remove(tmpr);
-            } else {
+            }
+            else
+            {
                 Formula.ShowingRowKey = -1;
                 TableView.Database.Row.Remove(TableView.Filter);
             }
@@ -343,14 +387,21 @@ namespace BlueControls.Forms {
 
 
 
-        private void Check_SuchButton() {
+        private void Check_SuchButton()
+        {
 
-            if (_Database == null || _Database.Row.Count < 1) {
+            if (_Database == null || _Database.Row.Count < 1)
+            {
                 SuchB.Enabled = false;
-            } else {
-                if (!string.IsNullOrEmpty(such.Text) && !string.IsNullOrEmpty(such.Text.RemoveChars(" "))) {
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(such.Text) && !string.IsNullOrEmpty(such.Text.RemoveChars(" ")))
+                {
                     SuchB.Enabled = true;
-                } else {
+                }
+                else
+                {
                     SuchB.Enabled = false;
                 }
 
@@ -358,11 +409,13 @@ namespace BlueControls.Forms {
         }
 
 
-        private void DatabaseSet(string Datei) {
+        private void DatabaseSet(string Datei)
+        {
 
             SetDatabasetoNothing();
 
-            if (!FileExists(Datei)) {
+            if (!FileExists(Datei))
+            {
                 CheckButtons();
                 return;
             }
@@ -374,7 +427,8 @@ namespace BlueControls.Forms {
 
             var tmpDatabase = (Database)Database.GetByFilename(Datei, false);
 
-            if (tmpDatabase == null) {
+            if (tmpDatabase == null)
+            {
                 tmpDatabase = new Database(Datei, false, false);
             }
 
@@ -385,7 +439,8 @@ namespace BlueControls.Forms {
         }
 
 
-        private void DatabaseSet(Database cDatabase) {
+        private void DatabaseSet(Database cDatabase)
+        {
             _Database = cDatabase;
             TableView.Database = cDatabase;
             Formula.Database = cDatabase;
@@ -397,11 +452,15 @@ namespace BlueControls.Forms {
 
             BeginnEdit();
 
-            if (_Database == null) {
+            if (_Database == null)
+            {
                 SetDatabasetoNothing();
-            } else {
+            }
+            else
+            {
 
-                if (_Database.Ansicht != enAnsicht.Unverändert) {
+                if (_Database.Ansicht != enAnsicht.Unverändert)
+                {
                     _Ansicht = _Database.Ansicht;
                 }
             }
@@ -412,7 +471,8 @@ namespace BlueControls.Forms {
             CaptionAnzeige();
             CheckButtons();
 
-            if (TableView.View_RowFirst() != null) {
+            if (TableView.View_RowFirst() != null)
+            {
                 TableView.CursorPos_Set(TableView.Database.Column[0], TableView.View_RowFirst(), false);
             }
 
@@ -475,7 +535,8 @@ namespace BlueControls.Forms {
 
 
 
-        protected override void OnLoad(System.EventArgs e) {
+        protected override void OnLoad(System.EventArgs e)
+        {
             base.OnLoad(e);
 
 
@@ -485,10 +546,12 @@ namespace BlueControls.Forms {
         }
 
 
-        private void Drucken_ItemClicked(object sender, BasicListItemEventArgs e) {
+        private void Drucken_ItemClicked(object sender, BasicListItemEventArgs e)
+        {
 
 
-            switch (e.Item.Internal) {
+            switch (e.Item.Internal)
+            {
 
                 case "erweitert":
                     Visible = false;
@@ -498,14 +561,18 @@ namespace BlueControls.Forms {
                     var Ara = new List<RowItem>();
 
 
-                    if (Formula.ShowingRow != null) {
+                    if (Formula.ShowingRow != null)
+                    {
                         Ara.Add(Formula.ShowingRow);
-                    } else {
+                    }
+                    else
+                    {
                         Ara = TableView.SortedRows(); //Database.Column().Liste_SingleRow(0, enListenOptionen.MitFilter_Sortiert_Unique)
                     }
 
 
-                    using (var l = new ExportDialog(_Database, Ara, true)) {
+                    using (var l = new ExportDialog(_Database, Ara, true))
+                    {
                         l.ShowDialog();
                     }
 
@@ -529,7 +596,8 @@ namespace BlueControls.Forms {
             }
         }
 
-        protected override void OnShown(System.EventArgs e) {
+        protected override void OnShown(System.EventArgs e)
+        {
             base.OnShown(e);
             MainRibbon.SelectedIndex = 0;
             InitView();
@@ -538,7 +606,8 @@ namespace BlueControls.Forms {
 
 
 
-        private void InitView() {
+        private void InitView()
+        {
 
             Formula.HideViewEditor();
 
@@ -552,7 +621,8 @@ namespace BlueControls.Forms {
             TableView?.Filter?.Clear();
 
 
-            switch (_Ansicht) {
+            switch (_Ansicht)
+            {
                 case enAnsicht.Nur_Tabelle:
                     grpFormularSteuerung.Visible = false;
 
@@ -613,30 +683,38 @@ namespace BlueControls.Forms {
             }
 
 
-            if (TableView.Visible) {
-                if (TableView.Database != null) {
-                    if (TableView.CursorPosRow() == null && TableView.View_RowFirst() != null) {
+            if (TableView.Visible)
+            {
+                if (TableView.Database != null)
+                {
+                    if (TableView.CursorPosRow() == null && TableView.View_RowFirst() != null)
+                    {
                         TableView.CursorPos_Set(TableView.Database.Column[0], TableView.View_RowFirst(), false);
 
                     }
                     if (TableView.CursorPosRow() != null) { Formula.ShowingRowKey = TableView.CursorPosRow().Key; }
                 }
-            } else {
+            }
+            else
+            {
                 Formula.ShowingRowKey = -1;
             }
         }
 
 
-        private void LoadTab_FileOk(object sender, CancelEventArgs e) {
+        private void LoadTab_FileOk(object sender, CancelEventArgs e)
+        {
             DatabaseSet(LoadTab.FileName);
         }
 
 
-        private void btnNeuDB_SaveAs_Click(object sender, System.EventArgs e) {
+        private void btnNeuDB_SaveAs_Click(object sender, System.EventArgs e)
+        {
 
             var bu = (Button)sender;
 
-            switch (bu.Name) {
+            switch (bu.Name)
+            {
                 case "btnSaveAs":
                     if (_Database == null) { return; }
                     break;
@@ -656,7 +734,8 @@ namespace BlueControls.Forms {
 
             StandardTabx();
 
-            if (bu.Name == "btnNeuDB") {
+            if (bu.Name == "btnNeuDB")
+            {
                 DatabaseSet(new Database(false)); // Ab jetzt in der Variable _Database zu finden
             }
 
@@ -666,23 +745,29 @@ namespace BlueControls.Forms {
 
         }
 
-        private void CaptionAnzeige() {
+        private void CaptionAnzeige()
+        {
 
-            if (_Database == null) {
+            if (_Database == null)
+            {
                 Text = "Be Creative! V" + _Version;
                 return;
             }
 
 
-            if (_Database != null) {
+            if (_Database != null)
+            {
                 Text = _Database.Filename.FileNameWithSuffix() + " - Be Creative! V" + _Version;
-            } else {
+            }
+            else
+            {
                 Text = "[Neue Datenbank] - Be Creative! V" + _Version;
             }
         }
 
 
-        private void CheckButtons() {
+        private void CheckButtons()
+        {
             var DatenbankDa = Convert.ToBoolean(_Database != null);
 
 
@@ -704,11 +789,15 @@ namespace BlueControls.Forms {
 
 
             BeziehungsEditor.Enabled = false;
-            if (DatenbankDa) {
-                foreach (var ThisColumnItem in _Database.Column) {
-                    if (ThisColumnItem != null) {
+            if (DatenbankDa)
+            {
+                foreach (var ThisColumnItem in _Database.Column)
+                {
+                    if (ThisColumnItem != null)
+                    {
 
-                        if (ThisColumnItem.Format == enDataFormat.RelationText) {
+                        if (ThisColumnItem.Format == enDataFormat.RelationText)
+                        {
                             BeziehungsEditor.Enabled = true;
                             break;
                         }
@@ -746,22 +835,26 @@ namespace BlueControls.Forms {
 
 
 
-        private void SuchenUndErsetzen_Click(object sender, System.EventArgs e) {
+        private void SuchenUndErsetzen_Click(object sender, System.EventArgs e)
+        {
             TableView.OpenSearchAndReplace();
         }
 
-        private void AngezeigteZeilenLöschen_Click(object sender, System.EventArgs e) {
+        private void AngezeigteZeilenLöschen_Click(object sender, System.EventArgs e)
+        {
             TableView.Database.Row.Remove(TableView.Filter);
             CheckButtons();
         }
 
 
-        private void TableView_ContextMenu_Init(object sender, ContextMenuInitEventArgs e) {
+        private void TableView_ContextMenu_Init(object sender, ContextMenuInitEventArgs e)
+        {
             var CellKey = e.Tags.TagGet("Cellkey");
             if (string.IsNullOrEmpty(CellKey)) { return; }
             TableView.Database.Cell.DataOfCellKey(CellKey, out var Column, out var Row);
 
-            if (_Ansicht != enAnsicht.Überschriften_und_Formular) {
+            if (_Ansicht != enAnsicht.Überschriften_und_Formular)
+            {
 
                 e.UserMenu.Add("Sortierung", true);
                 e.UserMenu.Add(enContextMenuComands.SpaltenSortierungAZ, Column != null && Column.Format.CanBeChangedByRules());
@@ -802,7 +895,8 @@ namespace BlueControls.Forms {
         }
 
 
-        public void TableView_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
+        public void TableView_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e)
+        {
 
 
             var bt = (Table)sender;
@@ -813,7 +907,8 @@ namespace BlueControls.Forms {
             TableView.Database.Cell.DataOfCellKey(CellKey, out var Column, out var Row);
 
 
-            switch (e.ClickedComand) {
+            switch (e.ClickedComand)
+            {
 
                 case "SpaltenSortierungAZ":
                     bt.SortDefinitionTemporary = new RowSortDefinition(bt.Database, Column.Name, false);
@@ -828,8 +923,10 @@ namespace BlueControls.Forms {
                     break;
 
                 case "ZeileLöschen":
-                    if (Row != null) {
-                        if (MessageBox.Show("Zeile löschen?", enImageCode.Frage, "Ja", "Nein") == 0) {
+                    if (Row != null)
+                    {
+                        if (MessageBox.Show("Zeile löschen?", enImageCode.Frage, "Ja", "Nein") == 0)
+                        {
                             bt.Database.Row.Remove(Row);
                         }
                     }
@@ -858,9 +955,12 @@ namespace BlueControls.Forms {
 
                 case "Summe":
                     var summe = Column.Summe(TableView.Filter);
-                    if (!summe.HasValue) {
+                    if (!summe.HasValue)
+                    {
                         MessageBox.Show("Die Summe konnte nicht berechnet werden.", enImageCode.Summe, "OK");
-                    } else {
+                    }
+                    else
+                    {
                         MessageBox.Show("Summe dieser Spalte, nur angezeigte Zeilen: <br><b>" + summe, enImageCode.Summe, "OK");
                     }
                     break;
@@ -874,8 +974,10 @@ namespace BlueControls.Forms {
                     break;
 
                 case "ColumnContentDelete":
-                    if (Column != null) {
-                        if (MessageBox.Show("Angezeite Inhalt dieser Spalte löschen?", enImageCode.Frage, "Ja", "Nein") == 0) {
+                    if (Column != null)
+                    {
+                        if (MessageBox.Show("Angezeite Inhalt dieser Spalte löschen?", enImageCode.Frage, "Ja", "Nein") == 0)
+                        {
                             Column.DeleteContents(TableView.Filter);
                         }
                     }
@@ -889,10 +991,14 @@ namespace BlueControls.Forms {
 
         }
 
-        private void TableView_RowsSorted(object sender, System.EventArgs e) {
-            if (TableView.Database.Column[0] != null) {
+        private void TableView_RowsSorted(object sender, System.EventArgs e)
+        {
+            if (TableView.Database.Column[0] != null)
+            {
                 Zei.Text = "<ImageCode=Information|16>Zeilen: " + TableView.SortedRows().Count + " St.";
-            } else {
+            }
+            else
+            {
                 Zei.Text = "-";
             }
 
@@ -900,16 +1006,19 @@ namespace BlueControls.Forms {
         }
 
 
-        private void btnOeffnen_Click(object sender, System.EventArgs e) {
+        private void btnOeffnen_Click(object sender, System.EventArgs e)
+        {
             LoadTab.ShowDialog();
         }
 
 
-        private void ÜberDiesesProgramm_Click(object sender, System.EventArgs e) {
+        private void ÜberDiesesProgramm_Click(object sender, System.EventArgs e)
+        {
             MessageBox.Show("(c) Christian Peter<br>V " + _Version, enImageCode.Information, "OK");
         }
 
-        private void Ansicht_Click(object sender, System.EventArgs e) {
+        private void Ansicht_Click(object sender, System.EventArgs e)
+        {
             _Ansicht = (enAnsicht)int.Parse(((Button)sender).Name.Substring(7, 1));
 
 
@@ -917,14 +1026,16 @@ namespace BlueControls.Forms {
             CheckButtons();
         }
 
-        private void TemporärenSpeicherortÖffnen_Click(object sender, System.EventArgs e) {
+        private void TemporärenSpeicherortÖffnen_Click(object sender, System.EventArgs e)
+        {
             StandardTabx();
             ExecuteFile(Path.GetTempPath());
         }
 
 
 
-        private void BeziehungsEditor_Click(object sender, System.EventArgs e) {
+        private void BeziehungsEditor_Click(object sender, System.EventArgs e)
+        {
 
             Hide();
 
@@ -936,13 +1047,15 @@ namespace BlueControls.Forms {
         }
 
 
-        private void Ordn_Click(object sender, System.EventArgs e) {
+        private void Ordn_Click(object sender, System.EventArgs e)
+        {
             StandardTabx();
             ExecuteFile(_Database.Filename.FilePath());
         }
 
 
-        private void Datenüberprüfung_Click(object sender, System.EventArgs e) {
+        private void Datenüberprüfung_Click(object sender, System.EventArgs e)
+        {
             TableView.Database.Row.DoAutomatic(TableView.Filter, true, TableView.PinnedRows, "manual check");
         }
 
@@ -950,19 +1063,22 @@ namespace BlueControls.Forms {
 
 
 
-        private void LastDatabases_ItemClicked(object sender, BasicListItemEventArgs e) {
+        private void LastDatabases_ItemClicked(object sender, BasicListItemEventArgs e)
+        {
             DatabaseSet(e.Item.Internal);
         }
 
 
-        private void StandardTabx() {
+        private void StandardTabx()
+        {
 
             MainRibbon.SelectedIndex = 1;
         }
 
 
 
-        protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
+        protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e)
+        {
             SetDatabasetoNothing();
             Database.SaveAll(true);
             base.OnFormClosing(e);
@@ -972,10 +1088,12 @@ namespace BlueControls.Forms {
 
 
 
-        private void AllgemeinerEditor_Click(object sender, System.EventArgs e) {
+        private void AllgemeinerEditor_Click(object sender, System.EventArgs e)
+        {
             Hide();
 
-            var r = new PadEditor {
+            var r = new PadEditor
+            {
                 WindowState = System.Windows.Forms.FormWindowState.Maximized
             };
             r.ShowDialog();
@@ -986,16 +1104,19 @@ namespace BlueControls.Forms {
 
 
 
-        private void TableView_ColumnArrangementChanged(object sender, System.EventArgs e) {
+        private void TableView_ColumnArrangementChanged(object sender, System.EventArgs e)
+        {
             TableView.WriteColumnArrangementsInto(cbxColumnArr);
         }
 
-        private void cbxColumnArr_ItemClicked(object sender, BasicListItemEventArgs e) {
+        private void cbxColumnArr_ItemClicked(object sender, BasicListItemEventArgs e)
+        {
             if (string.IsNullOrEmpty(cbxColumnArr.Text)) { return; }
             TableView.Arrangement = int.Parse(e.Item.Internal);
         }
 
-        private void TableView_ViewChanged(object sender, System.EventArgs e) {
+        private void TableView_ViewChanged(object sender, System.EventArgs e)
+        {
             TableView.WriteColumnArrangementsInto(cbxColumnArr);
         }
 
@@ -1006,16 +1127,19 @@ namespace BlueControls.Forms {
 
 
 
-        public List<RowItem> GetFilteredItems() {
+        public List<RowItem> GetFilteredItems()
+        {
             ShowDialog();
             return TableView.SortedRows();
         }
 
-        private void btnAlleErweitern_Click(object sender, System.EventArgs e) {
+        private void btnAlleErweitern_Click(object sender, System.EventArgs e)
+        {
             TableView.ExpandAll();
         }
 
-        private void btnAlleSchließen_Click(object sender, System.EventArgs e) {
+        private void btnAlleSchließen_Click(object sender, System.EventArgs e)
+        {
             TableView.CollapesAll();
         }
     }

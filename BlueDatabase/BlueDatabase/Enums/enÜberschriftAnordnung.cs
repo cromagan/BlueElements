@@ -17,8 +17,10 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-namespace BlueDatabase.Enums {
-    public enum enÜberschriftAnordnung {
+namespace BlueDatabase.Enums
+{
+    public enum enÜberschriftAnordnung
+    {
         ohne = 0,
         Links_neben_Dem_Feld = 1,
         Über_dem_Feld = 2,

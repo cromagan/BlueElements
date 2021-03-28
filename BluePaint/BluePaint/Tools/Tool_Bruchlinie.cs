@@ -23,17 +23,21 @@ using System;
 using System.Drawing;
 
 
-namespace BluePaint {
-    public partial class Tool_Bruchlinie {
+namespace BluePaint
+{
+    public partial class Tool_Bruchlinie
+    {
 
 
 
-        public Tool_Bruchlinie() : base() {
+        public Tool_Bruchlinie() : base()
+        {
             InitializeComponent();
         }
 
 
-        private void Bruch_Click(object sender, System.EventArgs e) {
+        private void Bruch_Click(object sender, System.EventArgs e)
+        {
             var _Pic = OnNeedCurrentPic();
 
             if (_Pic == null) { return; }
@@ -50,7 +54,8 @@ namespace BluePaint {
 
             OnForceUndoSaving();
             Point Nach;
-            switch (((Button)sender).Name.ToLower()) {
+            switch (((Button)sender).Name.ToLower())
+            {
                 case "bruch_oben":
                     Nach = new Point(0, 5);
                     YRI = -5;
@@ -89,15 +94,18 @@ namespace BluePaint {
             var gr = Graphics.FromImage(_Pic);
 
 
-            for (var z = 0; z <= 10; z++) {
+            for (var z = 0; z <= 10; z++)
+            {
                 var von = Nach;
 
                 Nach.X += XRi;
                 Nach.Y += YRI;
 
 
-                for (var x1 = -1; x1 <= 1; x1++) {
-                    for (var y1 = -1; y1 <= 1; y1++) {
+                for (var x1 = -1; x1 <= 1; x1++)
+                {
+                    for (var y1 = -1; y1 <= 1; y1++)
+                    {
                         gr.DrawLine(new Pen(Color.FromArgb(255, 255, 255), 8), von.X + ModX + x1, von.Y + ModY + y1, Nach.X + ModX + x1, Nach.Y + ModY + y1);
                     }
                 }

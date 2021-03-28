@@ -19,9 +19,11 @@
 
 using System.Linq;
 
-public struct strCanDoFeedback {
+public struct strCanDoFeedback
+{
 
-    public strCanDoFeedback(int errorposition, string errormessage, bool mustabort) {
+    public strCanDoFeedback(int errorposition, string errormessage, bool mustabort)
+    {
         ContinueOrErrorPosition = errorposition;
         ErrorMessage = errormessage;
         MustAbort = mustabort;
@@ -32,7 +34,8 @@ public struct strCanDoFeedback {
     }
 
 
-    public strCanDoFeedback(int continuePosition, string comandText, string attributtext, string codeblockaftertext) {
+    public strCanDoFeedback(int continuePosition, string comandText, string attributtext, string codeblockaftertext)
+    {
         ContinueOrErrorPosition = continuePosition;
         ErrorMessage = string.Empty;
         MustAbort = false;

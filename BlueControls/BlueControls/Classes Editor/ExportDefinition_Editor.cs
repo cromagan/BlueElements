@@ -28,16 +28,19 @@ using System.Drawing;
 using static BlueBasics.FileOperations;
 using static BlueBasics.modConverter;
 
-namespace BlueControls.Classes_Editor {
+namespace BlueControls.Classes_Editor
+{
     internal sealed partial class ExportDefinition_Editor : AbstractClassEditor<ExportDefinition> //  System.Windows.Forms.UserControl// 
     {
 
 
-        public ExportDefinition_Editor() : base() {
+        public ExportDefinition_Editor() : base()
+        {
             InitializeComponent();
         }
 
-        protected override void DisableAndClearFormula() {
+        protected override void DisableAndClearFormula()
+        {
             Enabled = false;
             ExportCSVFormat.Checked = false;
             ExportHTMLFormat.Checked = false;
@@ -52,9 +55,11 @@ namespace BlueControls.Classes_Editor {
             lsbExportDateien.Item.Clear();
         }
 
-        protected override void EnabledAndFillFormula() {
+        protected override void EnabledAndFillFormula()
+        {
             Enabled = true;
-            switch (Item.Typ) {
+            switch (Item.Typ)
+            {
                 case enExportTyp.DatenbankCSVFormat:
                     ExportCSVFormat.Checked = true;
                     break;
@@ -84,8 +89,10 @@ namespace BlueControls.Classes_Editor {
 
             lbxFilter.Item.Clear();
 
-            foreach (var thisFilter in Item.Filter) {
-                if (thisFilter != null) {
+            foreach (var thisFilter in Item.Filter)
+            {
+                if (thisFilter != null)
+                {
                     lbxFilter.Item.Add(thisFilter);
                 }
             }
@@ -93,13 +100,18 @@ namespace BlueControls.Classes_Editor {
 
             lsbExportDateien.Item.Clear();
 
-            foreach (var t1 in Item.BereitsExportiert) {
-                if (!string.IsNullOrEmpty(t1)) {
+            foreach (var t1 in Item.BereitsExportiert)
+            {
+                if (!string.IsNullOrEmpty(t1))
+                {
                     var t = t1.Split('|');
 
-                    if (!FileExists(t[0])) {
+                    if (!FileExists(t[0]))
+                    {
                         lsbExportDateien.Item.Add(t[0], t1, QuickImage.Get(enImageCode.Kritisch), true, "0000");
-                    } else {
+                    }
+                    else
+                    {
                         var q1 = QuickImage.Get(enImageCode.Kugel, 16, Extensions.MixColor(Color.Red, Color.Green, DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / Item.AutomatischLöschen).ToHTMLCode(), "");
                         lsbExportDateien.Item.Add(t[0], t1, q1, true, DataFormat.CompareKey(t[1], enDataFormat.Datum_und_Uhrzeit));
                     }
@@ -112,22 +124,27 @@ namespace BlueControls.Classes_Editor {
 
         }
 
-        protected override void PrepaireFormula() {
+        protected override void PrepaireFormula()
+        {
 
             cbxExportFormularID.Item.Clear();
             cbxExportFormularID.Item.AddLayoutsOf(Item.Database, true, string.Empty);
 
 
             ExportSpaltenAnsicht.Item.Clear();
-            for (var spa = 0; spa < Item.Database.ColumnArrangements.Count; spa++) {
+            for (var spa = 0; spa < Item.Database.ColumnArrangements.Count; spa++)
+            {
                 ExportSpaltenAnsicht.Item.Add(Item.Database.ColumnArrangements[spa].Name, spa.ToString());
             }
 
-            if (!string.IsNullOrEmpty(Item.Database.GlobalShowPass)) {
+            if (!string.IsNullOrEmpty(Item.Database.GlobalShowPass))
+            {
                 ExportCSVFormat.Enabled = false;
                 ExportHTMLFormat.Enabled = false;
                 ExportalsBild.Enabled = false;
-            } else {
+            }
+            else
+            {
                 ExportCSVFormat.Enabled = true;
                 ExportHTMLFormat.Enabled = true;
                 ExportalsBild.Enabled = true;
@@ -136,23 +153,31 @@ namespace BlueControls.Classes_Editor {
         }
 
 
-        private void ExportVerzeichnis_TextChanged(object sender, System.EventArgs e) {
+        private void ExportVerzeichnis_TextChanged(object sender, System.EventArgs e)
+        {
             UpdateExport(true);
         }
 
-        private void cbxExportFormularID_ItemClicked(object sender, BasicListItemEventArgs e) {
+        private void cbxExportFormularID_ItemClicked(object sender, BasicListItemEventArgs e)
+        {
             UpdateExport(true);
         }
 
-        private void ExportDateien_RemoveClicked(object sender, ListOfBasicListItemEventArgs e) {
-            foreach (var thisItem in e.Items) {
+        private void ExportDateien_RemoveClicked(object sender, ListOfBasicListItemEventArgs e)
+        {
+            foreach (var thisItem in e.Items)
+            {
 
-                if (thisItem is BasicListItem ThisItemBasic) {
+                if (thisItem is BasicListItem ThisItemBasic)
+                {
                     string fil = null;
-                    if (ThisItemBasic.Internal.Contains("|")) {
+                    if (ThisItemBasic.Internal.Contains("|"))
+                    {
                         var f = ThisItemBasic.Internal.SplitBy("|");
                         fil = f[0];
-                    } else {
+                    }
+                    else
+                    {
                         fil = ThisItemBasic.Internal;
 
                     }
@@ -167,27 +192,34 @@ namespace BlueControls.Classes_Editor {
 
 
 
-        private void ExportOriginalFormat_CheckedChanged(object sender, System.EventArgs e) {
+        private void ExportOriginalFormat_CheckedChanged(object sender, System.EventArgs e)
+        {
             UpdateExport(true);
         }
 
-        private void UpdateExport(bool MustDeleteAllExportFiles) {
+        private void UpdateExport(bool MustDeleteAllExportFiles)
+        {
 
-            if (ExportOriginalFormat.Checked) {
+            if (ExportOriginalFormat.Checked)
+            {
                 ExportIntervall.Enabled = true;
                 ExportSpaltenAnsicht.Enabled = false;
                 cbxExportFormularID.Enabled = false;
                 ExportAutomatischLöschen.Enabled = true;
                 lbxFilter.Enabled = false;
 
-            } else if (ExportCSVFormat.Checked || ExportHTMLFormat.Checked) {
+            }
+            else if (ExportCSVFormat.Checked || ExportHTMLFormat.Checked)
+            {
                 ExportIntervall.Enabled = true;
                 ExportSpaltenAnsicht.Enabled = true;
                 cbxExportFormularID.Enabled = false;
                 ExportAutomatischLöschen.Enabled = true;
                 lbxFilter.Enabled = true;
 
-            } else if (ExportalsBild.Checked) {
+            }
+            else if (ExportalsBild.Checked)
+            {
                 ExportIntervall.Enabled = false;
                 ExportSpaltenAnsicht.Enabled = false;
                 cbxExportFormularID.Enabled = true;
@@ -203,28 +235,34 @@ namespace BlueControls.Classes_Editor {
 
             if (Item == null) { return; }
 
-            if (MustDeleteAllExportFiles) {
+            if (MustDeleteAllExportFiles)
+            {
                 Item.DeleteAllBackups();
             }
 
 
             Item.Typ = enExportTyp.DatenbankOriginalFormat;
-            if (ExportCSVFormat.Checked) {
+            if (ExportCSVFormat.Checked)
+            {
                 Item.Typ = enExportTyp.DatenbankCSVFormat;
             }
-            if (ExportHTMLFormat.Checked) {
+            if (ExportHTMLFormat.Checked)
+            {
                 Item.Typ = enExportTyp.DatenbankHTMLFormat;
             }
-            if (ExportalsBild.Checked) {
+            if (ExportalsBild.Checked)
+            {
                 Item.Typ = enExportTyp.EinzelnMitFormular;
             }
 
             Item.Verzeichnis = ExportVerzeichnis.Text;
 
-            if (!string.IsNullOrEmpty(ExportIntervall.Text)) {
+            if (!string.IsNullOrEmpty(ExportIntervall.Text))
+            {
                 Item.Intervall = float.Parse(ExportIntervall.Text);
             }
-            if (!string.IsNullOrEmpty(ExportAutomatischLöschen.Text)) {
+            if (!string.IsNullOrEmpty(ExportAutomatischLöschen.Text))
+            {
                 Item.AutomatischLöschen = float.Parse(ExportAutomatischLöschen.Text);
             }
             Item.ExportFormularID = cbxExportFormularID.Text;
@@ -232,7 +270,8 @@ namespace BlueControls.Classes_Editor {
             Item.ExportSpaltenAnsicht = int.Parse(ExportSpaltenAnsicht.Text);
 
             Item.Filter.Clear();
-            foreach (TextListItem thisFilter in lbxFilter.Item) {
+            foreach (TextListItem thisFilter in lbxFilter.Item)
+            {
                 Item.Filter.Add((FilterItem)thisFilter.Tag);
             }
 
@@ -265,25 +304,30 @@ namespace BlueControls.Classes_Editor {
 
         //}
 
-        private void ExportDateien_ListOrItemChanged(object sender, System.EventArgs e) {
+        private void ExportDateien_ListOrItemChanged(object sender, System.EventArgs e)
+        {
             UpdateExport(false);
         }
 
 
         #region  Filter 
 
-        private void lbxFilter_AddClicked(object sender, System.EventArgs e) {
+        private void lbxFilter_AddClicked(object sender, System.EventArgs e)
+        {
             var NewFilterItem = lbxFilter.Item.Add(new FilterItem(Item.Database, string.Empty));
             NewFilterItem.Checked = true;
         }
 
-        private void lbxFilter_ItemCheckedChanged(object sender, System.EventArgs e) {
-            if (lbxFilter.Item.Checked().Count != 1) {
+        private void lbxFilter_ItemCheckedChanged(object sender, System.EventArgs e)
+        {
+            if (lbxFilter.Item.Checked().Count != 1)
+            {
                 filterItemEditor.Item = null;
                 return;
             }
 
-            if (Item.Database.ReadOnly) {
+            if (Item.Database.ReadOnly)
+            {
                 filterItemEditor.Item = null;
                 return;
             }
@@ -292,7 +336,8 @@ namespace BlueControls.Classes_Editor {
             filterItemEditor.Item = (FilterItem)((TextListItem)lbxFilter.Item.Checked()[0]).Tag;
         }
 
-        private void lbxFilter_ListOrItemChanged(object sender, System.EventArgs e) {
+        private void lbxFilter_ListOrItemChanged(object sender, System.EventArgs e)
+        {
             UpdateExport(false);
         }
 
@@ -302,13 +347,17 @@ namespace BlueControls.Classes_Editor {
 
         #endregion
 
-        private void filterItemEditor_Changed(object sender, System.EventArgs e) {
+        private void filterItemEditor_Changed(object sender, System.EventArgs e)
+        {
             if (IsFilling) { return; }
 
 
-            foreach (var thisitem in lbxFilter.Item) {
-                if (thisitem is TextListItem tli) {
-                    if (tli.Tag == filterItemEditor.Item) {
+            foreach (var thisitem in lbxFilter.Item)
+            {
+                if (thisitem is TextListItem tli)
+                {
+                    if (tli.Tag == filterItemEditor.Item)
+                    {
                         tli.Text = filterItemEditor.Item.ReadableText();
                         tli.Symbol = filterItemEditor.Item.SymbolForReadableText();
                     }

@@ -17,8 +17,10 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-namespace BlueDatabase.Enums {
-    public enum enBildTextVerhalten {
+namespace BlueDatabase.Enums
+{
+    public enum enBildTextVerhalten
+    {
         Nur_Text = 0,
         Wenn_möglich_Bild_und_immer_Text = 1,
         Nur_Bild = 110,

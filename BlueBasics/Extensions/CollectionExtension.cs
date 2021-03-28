@@ -25,30 +25,30 @@ namespace BlueBasics
 {
     public static partial class Extensions
     {
-        public static bool Contains(this ICollection<string> IC, string SearchKeyword, bool CaseSensitive)
+        public static bool Contains(this ICollection<string> iC, string searchKeyword, bool caseSensitive)
         {
-            if (CaseSensitive) { Develop.DebugPrint(enFehlerArt.Fehler, "CaseSensitive = True"); }
+            if (caseSensitive) { Develop.DebugPrint(enFehlerArt.Fehler, "CaseSensitive = True"); }
 
-            return IC.Any(Item => Item.ToUpper() == SearchKeyword.ToUpper());
+            return iC.Any(item => string.Equals(item, searchKeyword, System.StringComparison.OrdinalIgnoreCase));
         }
 
-        public static string JoinWithCr(this ICollection<string> IC)
+        public static string JoinWithCr(this ICollection<string> iC)
         {
-            if (IC == null || IC.Count == 0) { return string.Empty; }
+            if (iC == null || iC.Count == 0) { return string.Empty; }
 
-            return IC.JoinWith("\r");
+            return iC.JoinWith("\r");
         }
 
-        public static string JoinWith(this ICollection<string> IC, string JoinChar)
+        public static string JoinWith(this ICollection<string> iC, string joinChar)
         {
-            return string.Join(JoinChar, IC.ToArray()); // .TrimEnd(JoinChar);
+            return string.Join(joinChar, iC.ToArray()); // .TrimEnd(JoinChar);
         }
 
-        public static void RemoveRange<t>(this ICollection<t> IC, List<t> remove)
+        public static void RemoveRange<t>(this ICollection<t> iC, List<t> remove)
         {
             foreach (var thisItem in remove)
             {
-                IC.Remove(thisItem);
+                iC.Remove(thisItem);
             }
         }
     }

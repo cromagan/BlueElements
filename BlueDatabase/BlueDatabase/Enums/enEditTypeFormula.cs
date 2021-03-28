@@ -17,8 +17,10 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-namespace BlueDatabase.Enums {
-    public enum enEditTypeFormula {
+namespace BlueDatabase.Enums
+{
+    public enum enEditTypeFormula
+    {
         None = -1,
         Textfeld = 0,
         Textfeld_mit_Auswahlknopf = 1,

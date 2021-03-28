@@ -24,11 +24,14 @@ using System;
 using System.Diagnostics;
 using System.Windows.Forms;
 
-namespace BlueControls.Designer_Support {
-    internal sealed class frmQuickPic : Panel {
+namespace BlueControls.Designer_Support
+{
+    internal sealed class frmQuickPic : Panel
+    {
         #region  Vom Windows Form Designer generierter Code 
 
-        public frmQuickPic() {
+        public frmQuickPic()
+        {
 
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
             InitializeComponent();
@@ -37,8 +40,10 @@ namespace BlueControls.Designer_Support {
         }
 
         // Die Form überschreibt den Deletevorgang der Basisklasse, um Komponenten zu bereinigen.
-        protected override void Dispose(bool NowDisposing) {
-            if (NowDisposing) {
+        protected override void Dispose(bool NowDisposing)
+        {
+            if (NowDisposing)
+            {
 
             }
             base.Dispose(NowDisposing);
@@ -81,7 +86,8 @@ namespace BlueControls.Designer_Support {
         private TextBox PicName;
 
         [DebuggerStepThrough]
-        private void InitializeComponent() {
+        private void InitializeComponent()
+        {
             LB = new System.Windows.Forms.ListBox();
             ButOK = new System.Windows.Forms.Button();
             PicName = new System.Windows.Forms.TextBox();
@@ -467,12 +473,14 @@ namespace BlueControls.Designer_Support {
 
         #endregion
 
-        public void StartAll(string C) {
+        public void StartAll(string C)
+        {
 
             LB.Items.Clear();
 
             const enImageCode tempVar = (enImageCode)9999;
-            for (enImageCode z = 0; z <= tempVar; z++) {
+            for (enImageCode z = 0; z <= tempVar; z++)
+            {
                 var w = Enum.GetName(z.GetType(), z);
                 if (!string.IsNullOrEmpty(w)) { LB.Items.Add(w); }
             }
@@ -507,29 +515,37 @@ namespace BlueControls.Designer_Support {
         }
 
 
-        private void LB_DoubleClick(object sender, System.EventArgs e) {
+        private void LB_DoubleClick(object sender, System.EventArgs e)
+        {
             PicName.Text = Convert.ToString(LB.SelectedItem);
         }
 
 
-        public void GeneratePreview() {
-            try {
+        public void GeneratePreview()
+        {
+            try
+            {
                 Preview.Image = QuickImage.Get(ICode()).BMP;
-            } catch {
+            }
+            catch
+            {
                 Preview.Image = null;
             }
         }
 
-        public string ICode() {
+        public string ICode()
+        {
             var e = (enImageCodeEffect)(((chkbGrauStufen.Checked ? -1 : 0) * -(int)enImageCodeEffect.Graustufen) | ((chkbDurchgestrichen.Checked ? -1 : 0) * -(int)enImageCodeEffect.Durchgestrichen) | ((chkbMEDisabled.Checked ? -1 : 0) * -(int)enImageCodeEffect.WindowsMEDisabled) | ((chkbXPDisabled.Checked ? -1 : 0) * -(int)enImageCodeEffect.WindowsXPDisabled));
             return QuickImage.GenerateCode(PicName.Text, int.Parse(GrX.Text), int.Parse(GrY.Text), e, Färb.Text, grün.Text, SAT.Value, Hell.Value, 0, Transp.Value, txbZweitsymbol.Text);
         }
 
-        private void SomethingCheckedChanged(object sender, System.EventArgs e) {
+        private void SomethingCheckedChanged(object sender, System.EventArgs e)
+        {
 
         }
 
-        private void SomethingChanged(object sender, System.EventArgs e) {
+        private void SomethingChanged(object sender, System.EventArgs e)
+        {
             Helll.Text = Hell.Value + "%";
             SATL.Text = SAT.Value + "%";
             Transpl.Text = Transp.Value + "%";

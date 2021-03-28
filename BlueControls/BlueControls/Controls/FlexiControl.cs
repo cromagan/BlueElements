@@ -32,10 +32,12 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace BlueControls.Controls {
+namespace BlueControls.Controls
+{
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("ValueChanged")]
-    public partial class FlexiControl : GenericControl, IUseMyBackColor {
+    public partial class FlexiControl : GenericControl, IUseMyBackColor
+    {
 
 
         ///// <summary>
@@ -87,7 +89,8 @@ namespace BlueControls.Controls {
 
         #region  Constructor 
 
-        public FlexiControl() : base(false, false) {
+        public FlexiControl() : base(false, false)
+        {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
 
@@ -106,7 +109,8 @@ namespace BlueControls.Controls {
         /// Einfacher Info Text. Wird nirgends mehr zurück gegeben.
         /// </summary>
         /// <param name="CaptionText"></param>
-        public FlexiControl(string CaptionText) : base(false, false) {
+        public FlexiControl(string CaptionText) : base(false, false)
+        {
 
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             _EditType = enEditTypeFormula.None;
@@ -128,9 +132,11 @@ namespace BlueControls.Controls {
         #region  Properties 
 
         [DefaultValue(false)]
-        public bool ShowInfoWhenDisabled {
+        public bool ShowInfoWhenDisabled
+        {
             get => _ShowInfoWhenDisabled;
-            set {
+            set
+            {
                 if (_ShowInfoWhenDisabled == value) { return; }
                 _ShowInfoWhenDisabled = value;
                 Invalidate();
@@ -159,8 +165,10 @@ namespace BlueControls.Controls {
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public new bool Enabled {
-            get {
+        public new bool Enabled
+        {
+            get
+            {
                 if (DesignMode) { return false; }
                 return string.IsNullOrEmpty(_disabledReason);
             }
@@ -190,12 +198,15 @@ namespace BlueControls.Controls {
 
 
         [DefaultValue("")]
-        public string DisabledReason {
-            get {
+        public string DisabledReason
+        {
+            get
+            {
                 if (_disabledReason == null) { return string.Empty; }
                 return _disabledReason;
             }
-            set {
+            set
+            {
                 if (value == null) { value = string.Empty; }
                 if (_disabledReason == null && string.IsNullOrEmpty(value)) { return; }
                 if (_disabledReason == value) { return; }
@@ -205,10 +216,14 @@ namespace BlueControls.Controls {
 
 
 
-                foreach (System.Windows.Forms.Control ThisControl in Controls) {
-                    if (ThisControl != _InfoCaption) {
+                foreach (System.Windows.Forms.Control ThisControl in Controls)
+                {
+                    if (ThisControl != _InfoCaption)
+                    {
                         ThisControl.Enabled = Enabled;
-                    } else {
+                    }
+                    else
+                    {
                         ThisControl.Enabled = true;
                     }
                 }
@@ -232,8 +247,10 @@ namespace BlueControls.Controls {
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public string Value {
-            get {
+        public string Value
+        {
+            get
+            {
                 if (_Value == null) { return string.Empty; }
                 return _Value;
             }
@@ -247,9 +264,11 @@ namespace BlueControls.Controls {
         /// Falls das Steuerelement eine Suffix unterstützt, wird dieser angezeigt
         /// </summary>
         [DefaultValue("")]
-        public string Suffix {
+        public string Suffix
+        {
             get => _Suffix;
-            set {
+            set
+            {
 
                 if (_Suffix == value) { return; }
                 _Suffix = value;
@@ -261,9 +280,11 @@ namespace BlueControls.Controls {
         /// Falls das Steuerelement Multiline unterstützt, wird dieser angezeigt
         /// </summary>
         [DefaultValue(false)]
-        public bool MultiLine {
+        public bool MultiLine
+        {
             get => _MultiLine;
-            set {
+            set
+            {
 
                 if (_MultiLine == value) { return; }
                 _MultiLine = value;
@@ -277,9 +298,11 @@ namespace BlueControls.Controls {
         /// Falls das Steuerelement eine InstantChangeEvent unterstützt, wird dieses umgesetzt
         /// </summary>
         [DefaultValue(false)]
-        public bool InstantChangedEvent {
+        public bool InstantChangedEvent
+        {
             get => _InstantChangedEvent;
-            set {
+            set
+            {
 
                 if (_InstantChangedEvent == value) { return; }
                 _InstantChangedEvent = value;
@@ -295,9 +318,11 @@ namespace BlueControls.Controls {
         /// Falls das Steuerelement eine Suffix unterstützt, wird dieser angezeigt
         /// </summary>
         [DefaultValue(enDataFormat.Text)]
-        public enDataFormat Format {
+        public enDataFormat Format
+        {
             get => _Format;
-            set {
+            set
+            {
                 if (_Format == value) { return; }
                 _Format = value;
                 UpdateControls();
@@ -305,9 +330,11 @@ namespace BlueControls.Controls {
         }
 
         [DefaultValue(enEditTypeFormula.None)]
-        public enEditTypeFormula EditType {
+        public enEditTypeFormula EditType
+        {
             get => _EditType;
-            set {
+            set
+            {
                 if (_EditType == value) { return; }
                 RemoveAll(); // Controls and Events entfernen!
                 _EditType = value;
@@ -320,9 +347,11 @@ namespace BlueControls.Controls {
         /// Ab welchen Wert in Pixel das Eingabesteuerelement beginnen darf.
         /// </summary>
         [DefaultValue(-1)]
-        public int ControlX {
+        public int ControlX
+        {
             get => _ControlX;
-            set {
+            set
+            {
                 if (_ControlX == value) { return; }
                 RemoveAll(); // Controls and Events entfernen!
                 _ControlX = value;
@@ -331,9 +360,11 @@ namespace BlueControls.Controls {
 
 
         [DefaultValue("")]
-        public string InfoText {
+        public string InfoText
+        {
             get => _InfoText;
-            set {
+            set
+            {
                 if (_InfoText == value) { return; }
                 _InfoText = value;
                 Invalidate();
@@ -342,9 +373,11 @@ namespace BlueControls.Controls {
 
 
         [DefaultValue(enÜberschriftAnordnung.ohne)]
-        public enÜberschriftAnordnung CaptionPosition {
+        public enÜberschriftAnordnung CaptionPosition
+        {
             get => _CaptionPosition;
-            set {
+            set
+            {
                 if (_CaptionPosition == value) { return; }
                 RemoveAll(); // Controls and Events entfernen!
                 _CaptionPosition = value;
@@ -352,9 +385,11 @@ namespace BlueControls.Controls {
         }
 
         [DefaultValue("")]
-        public string Caption {
+        public string Caption
+        {
             get => _Caption;
-            set {
+            set
+            {
                 if (_Caption == value) { return; }
                 RemoveAll(); // Controls and Events entfernen!
                 _Caption = value;
@@ -373,7 +408,8 @@ namespace BlueControls.Controls {
 
 
 
-        protected override void DrawControl(Graphics gr, enStates state) {
+        protected override void DrawControl(Graphics gr, enStates state)
+        {
 
             // Enabled wurde verdeckt!
             if (!Enabled) { state = enStates.Standard_Disabled; }
@@ -421,12 +457,18 @@ namespace BlueControls.Controls {
 
 
 
-            if (!string.IsNullOrEmpty(_disabledReason)) {
+            if (!string.IsNullOrEmpty(_disabledReason))
+            {
                 DoInfoTextCaption(_disabledReason);
-            } else {
-                if (state.HasFlag(enStates.Standard_Disabled)) {
+            }
+            else
+            {
+                if (state.HasFlag(enStates.Standard_Disabled))
+                {
                     DoInfoTextCaption("Übergeordnetes Steuerlement ist deaktiviert.");
-                } else {
+                }
+                else
+                {
                     DoInfoTextCaption(string.Empty);
                 }
             }
@@ -437,13 +479,16 @@ namespace BlueControls.Controls {
         /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Die Filling-Variable wird währenddessen umgesetzt.
         /// sollte vor StandardBehandlung kommen, da dort das Objekt gesetzt wird und dann die Handler generiert werden.
         /// </summary>
-        private void UpdateValueToControl() {
+        private void UpdateValueToControl()
+        {
             if (!_allinitialized) { CreateSubControls(); }
 
             _IsFilling = true;
 
-            foreach (System.Windows.Forms.Control Control in Controls) {
-                switch (Control) {
+            foreach (System.Windows.Forms.Control Control in Controls)
+            {
+                switch (Control)
+                {
 
                     case ComboBox ComboBox:
                         UpdateValueTo_Combobox(ComboBox);
@@ -474,7 +519,8 @@ namespace BlueControls.Controls {
                         break;
 
                     case Line _:
-                        if (!string.IsNullOrEmpty(_Value)) {
+                        if (!string.IsNullOrEmpty(_Value))
+                        {
                             Develop.DebugPrint(enFehlerArt.Fehler, "Line kann keine Value erhalten: '" + _Value + "'");
                         }
                         break;
@@ -494,10 +540,12 @@ namespace BlueControls.Controls {
 
 
 
-        protected override void OnControlAdded(ControlEventArgs e) {
+        protected override void OnControlAdded(ControlEventArgs e)
+        {
             base.OnControlAdded(e);
 
-            switch (e.Control) {
+            switch (e.Control)
+            {
                 case ComboBox ComboBox:
                     //ComboBox.ItemClicked += ComboBoxItemClicked;
                     ComboBox.TextChanged += ValueChanged_ComboBox;
@@ -532,7 +580,8 @@ namespace BlueControls.Controls {
                     break;
 
                 case Button Button:
-                    switch (_EditType) {
+                    switch (_EditType)
+                    {
                         case enEditTypeFormula.Ja_Nein_Knopf:
                             Button.CheckedChanged += YesNoButton_CheckedChanged;
                             break;
@@ -558,14 +607,17 @@ namespace BlueControls.Controls {
             UpdateControls();
         }
 
-        private void TextEditControl_LostFocus(object sender, System.EventArgs e) {
+        private void TextEditControl_LostFocus(object sender, System.EventArgs e)
+        {
             CheckIfChanged();
         }
 
-        protected override void OnControlRemoved(System.Windows.Forms.ControlEventArgs e) {
+        protected override void OnControlRemoved(System.Windows.Forms.ControlEventArgs e)
+        {
             base.OnControlRemoved(e);
 
-            switch (e.Control) {
+            switch (e.Control)
+            {
                 case ComboBox ComboBox:
                     //ComboBox.ItemClicked -= ComboBoxItemClicked;
                     ComboBox.TextChanged -= ValueChanged_ComboBox;
@@ -598,7 +650,8 @@ namespace BlueControls.Controls {
                     break;
 
                 case Button Button:
-                    switch (_EditType) {
+                    switch (_EditType)
+                    {
                         case enEditTypeFormula.Ja_Nein_Knopf:
                             Button.CheckedChanged -= YesNoButton_CheckedChanged;
                             break;
@@ -633,7 +686,8 @@ namespace BlueControls.Controls {
         /// <summary>
         /// Entfernt alle Controls und löst dessen die Events auf. Setzt _allinitialized auf false.
         /// </summary>
-        protected virtual void RemoveAll() {
+        protected virtual void RemoveAll()
+        {
 
 
             //if (Controls.Count > 0) { OnRemovingAll(); }
@@ -647,10 +701,12 @@ namespace BlueControls.Controls {
 
 
 
-            foreach (var thisc in l) {
+            foreach (var thisc in l)
+            {
                 thisc.Visible = false;
 
-                if (thisc != _CaptionObject && thisc != _InfoCaption) {
+                if (thisc != _CaptionObject && thisc != _InfoCaption)
+                {
                     thisc.Dispose(); // Dispose entfernt da Control aus der Collection // Controls.Remove(Controls[0]);
                 }
             }
@@ -672,7 +728,8 @@ namespace BlueControls.Controls {
         //    RemovingAll?.Invoke(this, System.EventArgs.Empty);
         //}
 
-        protected virtual void OnNeedRefresh() {
+        protected virtual void OnNeedRefresh()
+        {
             NeedRefresh?.Invoke(this, System.EventArgs.Empty);
         }
 
@@ -680,11 +737,13 @@ namespace BlueControls.Controls {
         #region  Caption 
 
 
-        private void Control_Create_Caption() {
+        private void Control_Create_Caption()
+        {
             if (_CaptionPosition == enÜberschriftAnordnung.ohne) { return; }
 
 
-            if (_CaptionObject == null) {
+            if (_CaptionObject == null)
+            {
                 _CaptionObject = new Caption();
                 Controls.Add(_CaptionObject);
             }
@@ -700,9 +759,12 @@ namespace BlueControls.Controls {
 
             _CaptionObject.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left;
 
-            if (_CaptionPosition == enÜberschriftAnordnung.Ohne_mit_Abstand) {
+            if (_CaptionPosition == enÜberschriftAnordnung.Ohne_mit_Abstand)
+            {
                 _CaptionObject.Visible = false;
-            } else {
+            }
+            else
+            {
                 _CaptionObject.Visible = true;
             }
 
@@ -714,7 +776,8 @@ namespace BlueControls.Controls {
         /// <summary>
         /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.
         /// </summary>
-        private void UpdateValueTo_Caption() {
+        private void UpdateValueTo_Caption()
+        {
             //if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
             //if (Column == null) { return; } // nur mögloch bei verbundenen Datenbanken
 
@@ -736,8 +799,10 @@ namespace BlueControls.Controls {
         /// <summary>
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt. 
         /// </summary>
-        private Line Control_Create_Line() {
-            var Control = new Line {
+        private Line Control_Create_Line()
+        {
+            var Control = new Line
+            {
                 Enabled = Enabled,
                 Orientation = enOrientation.Waagerecht
             };
@@ -756,8 +821,10 @@ namespace BlueControls.Controls {
         /// <summary>
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt. 
         /// </summary>
-        private EasyPic Control_Create_EasyPic() {
-            var Control = new EasyPic {
+        private EasyPic Control_Create_EasyPic()
+        {
+            var Control = new EasyPic
+            {
                 Enabled = Enabled
             };
 
@@ -770,7 +837,8 @@ namespace BlueControls.Controls {
         /// <summary>
         /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling  muss TRUE sein.
         /// </summary>
-        private void UpdateValueTo_EasyPic(EasyPic Control) {
+        private void UpdateValueTo_EasyPic(EasyPic Control)
+        {
             //if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
             Control.FromFile(_Value);
         }
@@ -783,7 +851,8 @@ namespace BlueControls.Controls {
         /// <summary>
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
         /// </summary>
-        private ComboBox Control_Create_ComboBox() {
+        private ComboBox Control_Create_ComboBox()
+        {
             var Control = new ComboBox();
 
             StyleComboBox(Control, null, System.Windows.Forms.ComboBoxStyle.DropDownList);
@@ -793,7 +862,8 @@ namespace BlueControls.Controls {
             return Control;
         }
 
-        protected void StyleComboBox(ComboBox Control, ItemCollectionList list, System.Windows.Forms.ComboBoxStyle Style) {
+        protected void StyleComboBox(ComboBox Control, ItemCollectionList list, System.Windows.Forms.ComboBoxStyle Style)
+        {
             Control.Enabled = Enabled;
             Control.Format = _Format;
             Control.Suffix = _Suffix;
@@ -806,12 +876,14 @@ namespace BlueControls.Controls {
         /// <summary>
         /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.
         /// </summary>
-        private void UpdateValueTo_Combobox(ComboBox Control) {
+        private void UpdateValueTo_Combobox(ComboBox Control)
+        {
             //if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
             Control.Text = _Value;
         }
 
-        private void ValueChanged_ComboBox(object sender, System.EventArgs e) {
+        private void ValueChanged_ComboBox(object sender, System.EventArgs e)
+        {
             if (_IsFilling) { return; }
             ValueSet(((ComboBox)sender).Text, false, ((ComboBox)sender).DropDownStyle == ComboBoxStyle.DropDownList);
         }
@@ -823,8 +895,10 @@ namespace BlueControls.Controls {
 
         // Nimmt Teilweise die Routinen der Listbox her
 
-        private SwapListBox Control_Create_SwapListBox() {
-            var Control = new SwapListBox {
+        private SwapListBox Control_Create_SwapListBox()
+        {
+            var Control = new SwapListBox
+            {
                 Enabled = Enabled,
             };
 
@@ -835,7 +909,8 @@ namespace BlueControls.Controls {
             return Control;
         }
 
-        protected void StyleSwapListBox(SwapListBox Control, ColumnItem Column) {
+        protected void StyleSwapListBox(SwapListBox Control, ColumnItem Column)
+        {
             Control.Enabled = Enabled;
 
             Control.Item.Clear();
@@ -858,12 +933,14 @@ namespace BlueControls.Controls {
 
 
 
-        private void SwapListBox_ItemRemoved(object sender, System.EventArgs e) {
+        private void SwapListBox_ItemRemoved(object sender, System.EventArgs e)
+        {
             if (_IsFilling) { return; }
             ValueSet(((SwapListBox)sender).Item.ToListOfString().JoinWithCr(), false, true);
         }
 
-        private void SwapListBox_ItemAdded(object sender, ListEventArgs e) {
+        private void SwapListBox_ItemAdded(object sender, ListEventArgs e)
+        {
             if (_IsFilling) { return; }
             ValueSet(((SwapListBox)sender).Item.ToListOfString().JoinWithCr(), false, true);
         }
@@ -875,12 +952,14 @@ namespace BlueControls.Controls {
 
 
 
-        private void ListBox_ItemRemoved(object sender, System.EventArgs e) {
+        private void ListBox_ItemRemoved(object sender, System.EventArgs e)
+        {
             if (_IsFilling) { return; }
             ValueSet(((ListBox)sender).Item.ToListOfString().JoinWithCr(), false, true);
         }
 
-        private void ListBox_ItemAdded(object sender, ListEventArgs e) {
+        private void ListBox_ItemAdded(object sender, ListEventArgs e)
+        {
             if (_IsFilling) { return; }
             ValueSet(((ListBox)sender).Item.ToListOfString().JoinWithCr(), false, true);
         }
@@ -888,8 +967,10 @@ namespace BlueControls.Controls {
         /// <summary>
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
         /// </summary>
-        private ListBox Control_Create_ListBox() {
-            var Control = new ListBox {
+        private ListBox Control_Create_ListBox()
+        {
+            var Control = new ListBox
+            {
                 Enabled = Enabled,
             };
 
@@ -901,7 +982,8 @@ namespace BlueControls.Controls {
         }
 
 
-        protected void StyleListBox(ListBox Control, ColumnItem Column) {
+        protected void StyleListBox(ListBox Control, ColumnItem Column)
+        {
             Control.Enabled = Enabled;
 
             Control.Item.Clear();
@@ -911,15 +993,20 @@ namespace BlueControls.Controls {
 
             var Item = new ItemCollectionList();
 
-            if (Column.DropdownBearbeitungErlaubt) {
+            if (Column.DropdownBearbeitungErlaubt)
+            {
                 ItemCollectionList.GetItemCollection(Item, Column, null, enShortenStyle.Both, 10000);
 
-                if (!Column.DropdownWerteAndererZellenAnzeigen) {
+                if (!Column.DropdownWerteAndererZellenAnzeigen)
+                {
                     bool again;
-                    do {
+                    do
+                    {
                         again = false;
-                        foreach (var ThisItem in Item) {
-                            if (!Column.DropDownItems.Contains(ThisItem.Internal)) {
+                        foreach (var ThisItem in Item)
+                        {
+                            if (!Column.DropDownItems.Contains(ThisItem.Internal))
+                            {
                                 again = true;
                                 Item.Remove(ThisItem);
                                 break;
@@ -934,7 +1021,8 @@ namespace BlueControls.Controls {
             Control.FilterAllowed = false;
             Control.MoveAllowed = false;
 
-            switch (_EditType) {
+            switch (_EditType)
+            {
                 case enEditTypeFormula.Gallery:
                     Control.Appearance = enBlueListBoxAppearance.Gallery;
                     Control.RemoveAllowed = true;
@@ -954,7 +1042,8 @@ namespace BlueControls.Controls {
         /// <summary>
         /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.
         /// </summary>
-        private void UpdateValueTo_ListBox(ItemCollectionList Main) {
+        private void UpdateValueTo_ListBox(ItemCollectionList Main)
+        {
             Main.SetValuesTo(_Value.SplitByCRToList(), FileEncryptionKey);
         }
 
@@ -964,13 +1053,15 @@ namespace BlueControls.Controls {
 
 
 
-        private void ComandButton_Click(object sender, System.EventArgs e) {
+        private void ComandButton_Click(object sender, System.EventArgs e)
+        {
             if (_EditType != enEditTypeFormula.Button) { return; }
             ValueSet(true.ToPlusMinus(), false, true); // Geklickt, wurde hiermit vermerkt
             OnButtonClicked();
         }
 
-        private void ColorButton_Click(object sender, System.EventArgs e) {
+        private void ColorButton_Click(object sender, System.EventArgs e)
+        {
 
             Develop.DebugPrint_NichtImplementiert(); // TODO: Erstellen!
                                                      //if (_EditType != enEditTypeFormula.Button) { return; }
@@ -980,19 +1071,23 @@ namespace BlueControls.Controls {
 
         }
 
-        protected virtual void OnButtonClicked() {
+        protected virtual void OnButtonClicked()
+        {
             ButtonClicked?.Invoke(this, System.EventArgs.Empty);
         }
 
-        private void YesNoButton_CheckedChanged(object sender, System.EventArgs e) {
+        private void YesNoButton_CheckedChanged(object sender, System.EventArgs e)
+        {
             ValueSet(((Button)sender).Checked.ToPlusMinus(), false, true);
         }
 
         /// <summary>
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
         /// </summary>
-        private Button Control_Create_ButtonComand() {
-            var Control = new Button {
+        private Button Control_Create_ButtonComand()
+        {
+            var Control = new Button
+            {
                 Enabled = Enabled,
                 Name = "ComandButton",
                 Checked = false,
@@ -1009,8 +1104,10 @@ namespace BlueControls.Controls {
         /// <summary>
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
         /// </summary>
-        private Button Control_Create_ButtonColor() {
-            var Control = new Button {
+        private Button Control_Create_ButtonColor()
+        {
+            var Control = new Button
+            {
                 Enabled = Enabled,
                 Name = "ColorButton",
                 Checked = false,
@@ -1028,8 +1125,10 @@ namespace BlueControls.Controls {
         /// <summary>
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt. 
         /// </summary>
-        private Button Control_Create_ButtonYesNo() {
-            var Control = new Button {
+        private Button Control_Create_ButtonYesNo()
+        {
+            var Control = new Button
+            {
                 Enabled = Enabled,
                 Name = "YesNoButton",
                 ButtonStyle = enButtonStyle.Yes_or_No,
@@ -1046,11 +1145,13 @@ namespace BlueControls.Controls {
         /// <summary>
         /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.
         /// </summary>
-        private void UpdateValueTo_Button(Button Control) {
+        private void UpdateValueTo_Button(Button Control)
+        {
 
             //if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling und Creating False!"); }
 
-            switch (_EditType) {
+            switch (_EditType)
+            {
                 case enEditTypeFormula.Ja_Nein_Knopf:
                     Control.Checked = _Value.FromPlusMinus();
                     break;
@@ -1059,9 +1160,12 @@ namespace BlueControls.Controls {
                     break;
 
                 case enEditTypeFormula.Farb_Auswahl_Dialog:
-                    if (string.IsNullOrEmpty(_Value)) {
+                    if (string.IsNullOrEmpty(_Value))
+                    {
                         Control.ImageCode = "Fragezeichen|24";
-                    } else {
+                    }
+                    else
+                    {
                         Control.ImageCode = "Kreis|24|||" + Color.FromArgb(int.Parse(_Value)).ToHTMLCode();
                     }
                     break;
@@ -1081,7 +1185,8 @@ namespace BlueControls.Controls {
         /// <summary>
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
         /// </summary>
-        private TextBox Control_Create_TextBox() {
+        private TextBox Control_Create_TextBox()
+        {
             var Control = new TextBox();
             StyleTextBox(Control, string.Empty, false);
             UpdateValueToControl();
@@ -1092,7 +1197,8 @@ namespace BlueControls.Controls {
 
 
 
-        protected void StyleTextBox(TextBox Control, string AllowedChars, bool SpellChecking) {
+        protected void StyleTextBox(TextBox Control, string AllowedChars, bool SpellChecking)
+        {
             Control.Enabled = Enabled;
             Control.Format = _Format;
             Control.Suffix = _Suffix;
@@ -1100,9 +1206,12 @@ namespace BlueControls.Controls {
             Control.MultiLine = _MultiLine;
             Control.SpellChecking = SpellChecking;
 
-            if (_MultiLine || Height > 20) {
+            if (_MultiLine || Height > 20)
+            {
                 Control.Verhalten = enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
-            } else {
+            }
+            else
+            {
                 Control.Verhalten = enSteuerelementVerhalten.Scrollen_ohne_Textumbruch;
             }
 
@@ -1111,7 +1220,8 @@ namespace BlueControls.Controls {
         /// <summary>
         /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.
         /// </summary>
-        private void UpdateValueTo_TextBox(TextBox Control) {
+        private void UpdateValueTo_TextBox(TextBox Control)
+        {
             //if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
 
             Control.Text = _Value;
@@ -1120,7 +1230,8 @@ namespace BlueControls.Controls {
 
 
 
-        private void ValueChanged_TextBox(object sender, System.EventArgs e) {
+        private void ValueChanged_TextBox(object sender, System.EventArgs e)
+        {
             if (_IsFilling) { return; }
             ValueSet(((TextBox)sender).Text, false, false);
         }
@@ -1138,11 +1249,13 @@ namespace BlueControls.Controls {
         /// Konext-Menü-Events werden ebenfalls registriert, die andern Events werden nicht registriert und sollten nach dieser Rountine registert werden.
         /// </summary>
         /// <param name="Control"></param>
-        private void StandardBehandlung(GenericControl Control) {
+        private void StandardBehandlung(GenericControl Control)
+        {
 
             Control_Create_Caption();
 
-            switch (_CaptionPosition) {
+            switch (_CaptionPosition)
+            {
                 case enÜberschriftAnordnung.ohne:
                     Control.Left = 0;
                     Control.Top = 0;
@@ -1188,9 +1301,12 @@ namespace BlueControls.Controls {
 
 
 
-        public override bool Focused {
-            get {
-                foreach (System.Windows.Forms.Control ThisControl in Controls) {
+        public override bool Focused
+        {
+            get
+            {
+                foreach (System.Windows.Forms.Control ThisControl in Controls)
+                {
                     if (ThisControl.Focused) { return true; }
                 }
 
@@ -1198,31 +1314,41 @@ namespace BlueControls.Controls {
             }
         }
 
-        private void CheckIfChanged() {
+        private void CheckIfChanged()
+        {
             if (_LastTextChange == null) { return; }
             _LastTextChange = null;
             OnValueChanged();
         }
 
 
-        protected virtual void OnValueChanged() {
+        protected virtual void OnValueChanged()
+        {
             ValueChanged?.Invoke(this, System.EventArgs.Empty);
         }
 
 
-        private void DoInfoTextCaption(string disabledReason) {
+        private void DoInfoTextCaption(string disabledReason)
+        {
             var txt = string.Empty;
             var symbol = string.Empty;
-            if (string.IsNullOrEmpty(disabledReason) && string.IsNullOrEmpty(_InfoText)) {
+            if (string.IsNullOrEmpty(disabledReason) && string.IsNullOrEmpty(_InfoText))
+            {
                 txt = string.Empty;
                 symbol = string.Empty;
-            } else if (!string.IsNullOrEmpty(disabledReason) && string.IsNullOrEmpty(_InfoText)) {
+            }
+            else if (!string.IsNullOrEmpty(disabledReason) && string.IsNullOrEmpty(_InfoText))
+            {
                 symbol = "  <ImageCode=Schloss|10|||||150||20>";
                 txt = disabledReason;
-            } else if (string.IsNullOrEmpty(disabledReason) && !string.IsNullOrEmpty(_InfoText)) {
+            }
+            else if (string.IsNullOrEmpty(disabledReason) && !string.IsNullOrEmpty(_InfoText))
+            {
                 symbol = "<ImageCode=Warnung|16>";
                 txt = _InfoText;
-            } else {
+            }
+            else
+            {
                 symbol = "<ImageCode=Information|16>";
                 txt = "<b>Der Wert kann nicht bearbeitet werden:</b><br>" + disabledReason + "<br><br><b>Enthält aber einen Fehler:</b><br>" + _InfoText;
             }
@@ -1235,7 +1361,8 @@ namespace BlueControls.Controls {
 
 
 
-            if (!string.IsNullOrEmpty(txt) && _InfoCaption != null) {
+            if (!string.IsNullOrEmpty(txt) && _InfoCaption != null)
+            {
                 _InfoCaption.Left = Width - 18;
                 _InfoCaption.Top = 0;
                 _InfoCaption.QuickInfo = txt;
@@ -1247,14 +1374,18 @@ namespace BlueControls.Controls {
             }
             if (string.IsNullOrEmpty(txt) && _InfoCaption == null) { return; }
 
-            if (string.IsNullOrEmpty(txt)) {
+            if (string.IsNullOrEmpty(txt))
+            {
                 //Controls.Remove(_InfoCaption);
                 //_InfoCaption.Click -= _InfoCaption_Click;
                 //_InfoCaption.Dispose();
                 //_InfoCaption = null;
                 _InfoCaption.Visible = false;
-            } else {
-                _InfoCaption = new Caption {
+            }
+            else
+            {
+                _InfoCaption = new Caption
+                {
                     Name = "Info",
                     QuickInfo = txt,
                     Enabled = true,
@@ -1275,10 +1406,13 @@ namespace BlueControls.Controls {
 
         }
 
-        private void _InfoCaption_Click(object sender, System.EventArgs e) {
+        private void _InfoCaption_Click(object sender, System.EventArgs e)
+        {
 
-            foreach (var thisc in Controls) {
-                if (thisc is ComboBox cbx) {
+            foreach (var thisc in Controls)
+            {
+                if (thisc is ComboBox cbx)
+                {
                     cbx.Focus();
                     cbx.ShowMenu(null, null);
                     return;
@@ -1294,15 +1428,18 @@ namespace BlueControls.Controls {
         /// Erstellt die Steuerelemente zur Bearbeitung und auch die Caption und alles was gebrauch wird.
         /// Die Events werden Registriert und auch der Wert gesetzt.
         /// </summary>
-        protected GenericControl CreateSubControls() {
+        protected GenericControl CreateSubControls()
+        {
 
-            if (_allinitialized) {
+            if (_allinitialized)
+            {
                 Develop.DebugPrint(enFehlerArt.Warnung, "Bereits initialisiert");
                 return null;
             }
 
 
-            if (Width < 5 || Height < 5) {
+            if (Width < 5 || Height < 5)
+            {
                 Develop.DebugPrint(enFehlerArt.Warnung, "Width / Height zu klein");
                 return null;
             }
@@ -1313,7 +1450,8 @@ namespace BlueControls.Controls {
             GenericControl c = null;
 
 
-            switch (_EditType) {
+            switch (_EditType)
+            {
                 case enEditTypeFormula.Line:
                     c = Control_Create_Line();
                     break;
@@ -1372,7 +1510,8 @@ namespace BlueControls.Controls {
         }
 
 
-        private void _IdleTimer_Tick(object sender, System.EventArgs e) {
+        private void _IdleTimer_Tick(object sender, System.EventArgs e)
+        {
             if (_LastTextChange == null) { return; }
             if (DateTime.UtcNow.Subtract((DateTime)_LastTextChange).TotalSeconds < 20) { return; }
 
@@ -1385,7 +1524,8 @@ namespace BlueControls.Controls {
         }
 
 
-        protected override void OnQuickInfoChanged() {
+        protected override void OnQuickInfoChanged()
+        {
             base.OnQuickInfoChanged();
             UpdateControls();
         }
@@ -1396,14 +1536,16 @@ namespace BlueControls.Controls {
         /// <param name="newvalue"></param>
         /// <param name="updateControls"></param>
         /// <param name="alwaysValueChanged">Steuerelemente, wie Button, Checkboxen, DropDownListen müssen hier TRUE setzen. Auch Texte, die in einem Stück gesetzt werden.</param>
-        public void ValueSet(string newvalue, bool updateControls, bool alwaysValueChanged) {
+        public void ValueSet(string newvalue, bool updateControls, bool alwaysValueChanged)
+        {
             if (newvalue == null) { newvalue = string.Empty; }
             if (_Value == null && string.IsNullOrEmpty(newvalue)) { return; }
             if (_Value == newvalue) { return; }
             _LastTextChange = DateTime.UtcNow;
             _Value = newvalue;
 
-            if (updateControls) {
+            if (updateControls)
+            {
                 UpdateValueToControl();
                 //return; // kein CheckedIfChanged. Der Wert kommt ja von der Zelle / Property / etc. und ist somit gesetzt und wir nicht geändert
 
@@ -1416,21 +1558,27 @@ namespace BlueControls.Controls {
 
 
 
-        private void UpdateControls() {
+        private void UpdateControls()
+        {
 
 
-            foreach (System.Windows.Forms.Control Control in Controls) {
+            foreach (System.Windows.Forms.Control Control in Controls)
+            {
 
 
-                if (Control != _InfoCaption) {
+                if (Control != _InfoCaption)
+                {
                     if (Control is GenericControl QI) { QI.QuickInfo = QuickInfo; }
                     Control.Enabled = Enabled;
-                } else {
+                }
+                else
+                {
                     Control.Enabled = true;
                 }
 
 
-                switch (Control) {
+                switch (Control)
+                {
 
                     case ComboBox ComboBox:
                         ComboBox.Suffix = _Suffix;

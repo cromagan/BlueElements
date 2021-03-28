@@ -20,8 +20,10 @@
 using Skript.Enums;
 using System.Collections.Generic;
 
-namespace BlueScript {
-    internal class Method_IsNullOrEmpty : Method {
+namespace BlueScript
+{
+    internal class Method_IsNullOrEmpty : Method
+    {
 
         public override string Description => "Gibt TRUE zurück, wenn die Variable nicht existiert, fehlerhaft ist oder keinen Inhalt hat.";
         public override string Syntax => "isNullOrEmpty(Variable)";
@@ -34,16 +36,19 @@ namespace BlueScript {
         public override bool EndlessArgs => false;
 
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
+        {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.Wahr(); }
 
-            if (string.IsNullOrEmpty(attvar[0].ValueString)) {
+            if (string.IsNullOrEmpty(attvar[0].ValueString))
+            {
                 return strDoItFeedback.Wahr();
             }
 
 
-            if (attvar[0].Type == enVariableDataType.Null || attvar[0].Type == enVariableDataType.Error || attvar[0].Type == enVariableDataType.NotDefinedYet) {
+            if (attvar[0].Type == enVariableDataType.Null || attvar[0].Type == enVariableDataType.Error || attvar[0].Type == enVariableDataType.NotDefinedYet)
+            {
                 return strDoItFeedback.Wahr();
             }
 

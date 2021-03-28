@@ -22,31 +22,37 @@ using BlueControls.EventArgs;
 using System.Drawing;
 using static BlueBasics.Extensions;
 
-namespace BluePaint {
+namespace BluePaint
+{
     public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserControl //
     {
 
-        public Tool_Kontrast() : base() {
+        public Tool_Kontrast() : base()
+        {
             InitializeComponent();
         }
 
-        public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic) {
+        public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic)
+        {
 
             if (OriginalPic == null) { return; }
 
-            if (sldKontrast.Value != 0) {
+            if (sldKontrast.Value != 0)
+            {
                 var _PicPreview = OriginalPic.AdjustContrast((float)sldKontrast.Value);
                 e.DrawImage(_PicPreview);
                 return;
             }
 
-            if (sldGamma.Value != 1) {
+            if (sldGamma.Value != 1)
+            {
                 var _PicPreview = OriginalPic.AdjustGamma((float)sldGamma.Value);
                 e.DrawImage(_PicPreview);
                 return;
             }
 
-            if (sldHelligkeit.Value != 1) {
+            if (sldHelligkeit.Value != 1)
+            {
                 var _PicPreview = OriginalPic.AdjustBrightness((float)sldHelligkeit.Value);
                 e.DrawImage(_PicPreview);
                 return;
@@ -55,7 +61,8 @@ namespace BluePaint {
         }
 
 
-        private void btnKontrastErhoehen_Click(object sender, System.EventArgs e) {
+        private void btnKontrastErhoehen_Click(object sender, System.EventArgs e)
+        {
             var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
             OnOverridePic(_Pic.AdjustContrast((float)sldKontrast.Value));
@@ -66,7 +73,8 @@ namespace BluePaint {
             sldHelligkeit.Value = 1f;
         }
 
-        private void btnGraustufen_Click(object sender, System.EventArgs e) {
+        private void btnGraustufen_Click(object sender, System.EventArgs e)
+        {
             var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
 
@@ -78,7 +86,8 @@ namespace BluePaint {
             OnCommandForMacro("Graustufen");
         }
 
-        private void btnAlleFarbenSchwarz_Click(object sender, System.EventArgs e) {
+        private void btnAlleFarbenSchwarz_Click(object sender, System.EventArgs e)
+        {
             var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
             OnForceUndoSaving();
@@ -94,13 +103,16 @@ namespace BluePaint {
             OnDoInvalidate();
         }
 
-        private void btnPixelHinzu_Click(object sender, System.EventArgs e) {
+        private void btnPixelHinzu_Click(object sender, System.EventArgs e)
+        {
             var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
             OnForceUndoSaving();
 
-            for (var x = 0; x < _Pic.Width - 1; x++) {
-                for (var y = 0; y < _Pic.Height - 1; y++) {
+            for (var x = 0; x < _Pic.Width - 1; x++)
+            {
+                for (var y = 0; y < _Pic.Height - 1; y++)
+                {
                     if (!_Pic.GetPixel(x + 1, y + 1).IsNearWhite(0.9)) { _Pic.SetPixel(x, y, Color.Black); }
                     if (!_Pic.GetPixel(x + 1, y).IsNearWhite(0.9)) { _Pic.SetPixel(x, y, Color.Black); }
                     if (!_Pic.GetPixel(x, y + 1).IsNearWhite(0.9)) { _Pic.SetPixel(x, y, Color.Black); }
@@ -115,7 +127,8 @@ namespace BluePaint {
 
         }
 
-        private void btnAusdünnen_Click(object sender, System.EventArgs e) {
+        private void btnAusdünnen_Click(object sender, System.EventArgs e)
+        {
             var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
             OnForceUndoSaving();
@@ -136,7 +149,8 @@ namespace BluePaint {
 
 
 
-        private void btnHelligkeit_Click(object sender, System.EventArgs e) {
+        private void btnHelligkeit_Click(object sender, System.EventArgs e)
+        {
             var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
             OnOverridePic(_Pic.AdjustBrightness((float)sldHelligkeit.Value));
@@ -146,7 +160,8 @@ namespace BluePaint {
             sldHelligkeit.Value = 1f;
         }
 
-        private void btnGamma_Click(object sender, System.EventArgs e) {
+        private void btnGamma_Click(object sender, System.EventArgs e)
+        {
             var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
             OnOverridePic(_Pic.AdjustGamma((float)sldGamma.Value));
@@ -159,7 +174,8 @@ namespace BluePaint {
 
         }
 
-        private void sldHelligkeit_ValueChanged(object sender, System.EventArgs e) {
+        private void sldHelligkeit_ValueChanged(object sender, System.EventArgs e)
+        {
             sldGamma.Value = 1f;
             sldKontrast.Value = 0f;
             //sldHelligkeit.Value = 0f;
@@ -170,7 +186,8 @@ namespace BluePaint {
         }
 
 
-        private void sldKontrast_ValueChanged(object sender, System.EventArgs e) {
+        private void sldKontrast_ValueChanged(object sender, System.EventArgs e)
+        {
             sldGamma.Value = 1f;
             //sldKontrast.Value = 0f;
             sldHelligkeit.Value = 1f;
@@ -179,7 +196,8 @@ namespace BluePaint {
             OnDoInvalidate();
         }
 
-        private void sldGamma_ValueChanged(object sender, System.EventArgs e) {
+        private void sldGamma_ValueChanged(object sender, System.EventArgs e)
+        {
             //sldGamma.Value = 1f;
             sldKontrast.Value = 0f;
             sldHelligkeit.Value = 1f;
@@ -188,14 +206,17 @@ namespace BluePaint {
             OnDoInvalidate();
         }
 
-        public override string MacroKennung() {
+        public override string MacroKennung()
+        {
             return "Kontrast";
         }
 
-        public override void ExcuteCommand(string command) {
+        public override void ExcuteCommand(string command)
+        {
             var c = command.SplitBy(";");
 
-            switch (c[0]) {
+            switch (c[0])
+            {
                 case "Kontrast":
                     sldKontrast.Value = double.Parse(c[1]);
                     btnKontrastErhoehen_Click(null, System.EventArgs.Empty);

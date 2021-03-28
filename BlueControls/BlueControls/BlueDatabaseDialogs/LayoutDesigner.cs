@@ -27,16 +27,19 @@ using BlueDatabase;
 using System.Drawing;
 using static BlueBasics.FileOperations;
 
-namespace BlueControls.BlueDatabaseDialogs {
+namespace BlueControls.BlueDatabaseDialogs
+{
 
-    internal partial class LayoutDesigner : BlueControls.Forms.PadEditor {
+    internal partial class LayoutDesigner : BlueControls.Forms.PadEditor
+    {
         public readonly Database Database;
 
         private string _LoadedLayout = string.Empty;
         private string _AdditionalLayoutPath = "";
 
 
-        public LayoutDesigner(Database cDatabase, string cvAdditionalLayoutPath) : base() {
+        public LayoutDesigner(Database cDatabase, string cvAdditionalLayoutPath) : base()
+        {
 
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
@@ -56,33 +59,43 @@ namespace BlueControls.BlueDatabaseDialogs {
             CheckButtons();
         }
 
-        protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
+        protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e)
+        {
             base.OnFormClosing(e);
             SaveCurrentLayout();
         }
 
-        private void CheckButtons() {
+        private void CheckButtons()
+        {
 
-            if (Layout1.Item.Count > 0) {
+            if (Layout1.Item.Count > 0)
+            {
                 Layout1.Enabled = true;
-            } else {
+            }
+            else
+            {
                 Layout1.Enabled = false;
                 Layout1.Text = string.Empty;
                 _LoadedLayout = string.Empty;
             }
 
-            if (Database != null) {
+            if (Database != null)
+            {
                 Hinzu.Enabled = true;
-                if (Database.Layouts.Count == 0) {
+                if (Database.Layouts.Count == 0)
+                {
                     _LoadedLayout = string.Empty;
                 }
-            } else {
+            }
+            else
+            {
                 Hinzu.Enabled = true;
                 _LoadedLayout = string.Empty;
             }
 
 
-            if (Layout1.Text.FileSuffix().ToUpper() != "BCR" && FileExists(Layout1.Text)) {
+            if (Layout1.Text.FileSuffix().ToUpper() != "BCR" && FileExists(Layout1.Text))
+            {
                 _LoadedLayout = string.Empty;
                 LayBearb.Enabled = true;
                 LayOpen.Enabled = true;
@@ -90,14 +103,17 @@ namespace BlueControls.BlueDatabaseDialogs {
                 Abma.Enabled = true;
                 Base64.Enabled = true;
                 Area_Drucken.Enabled = false;
-            } else {
+            }
+            else
+            {
                 LayBearb.Enabled = false;
                 LayOpen.Enabled = false;
                 Abma.Enabled = false;
                 Base64.Enabled = false;
             }
 
-            if (!string.IsNullOrEmpty(_LoadedLayout)) {
+            if (!string.IsNullOrEmpty(_LoadedLayout))
+            {
                 tabPageControl.Enabled = true;
 
                 grpDateiSystem.Enabled = true;
@@ -106,7 +122,9 @@ namespace BlueControls.BlueDatabaseDialogs {
                 weg.Enabled = true;
                 NamB.Enabled = true;
                 Area_Drucken.Enabled = true;
-            } else {
+            }
+            else
+            {
                 Area_Drucken.Enabled = false;
                 tabPageControl.Enabled = false;
 
@@ -118,7 +136,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
         }
 
-        private void Hinzu_Click(object sender, System.EventArgs e) {
+        private void Hinzu_Click(object sender, System.EventArgs e)
+        {
             SaveCurrentLayout();
 
             var ex = InputBox.Show("Geben sie den Namen<br>des neuen Layouts ein:", "", enDataFormat.Text);
@@ -140,7 +159,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             CheckButtons();
         }
 
-        private void weg_Click(object sender, System.EventArgs e) {
+        private void weg_Click(object sender, System.EventArgs e)
+        {
             SaveCurrentLayout();
 
 
@@ -164,7 +184,8 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         }
 
-        private void NamB_Click(object sender, System.EventArgs e) {
+        private void NamB_Click(object sender, System.EventArgs e)
+        {
             SaveCurrentLayout();
             if (string.IsNullOrEmpty(_LoadedLayout)) { return; }
 
@@ -178,28 +199,34 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         }
 
-        private void Layout1_ItemClicked(object sender, BasicListItemEventArgs e) {
+        private void Layout1_ItemClicked(object sender, BasicListItemEventArgs e)
+        {
             LoadLayout(e.Item.Internal);
         }
 
 
 
-        internal void LoadLayout(string fileOrLayoutID) {
+        internal void LoadLayout(string fileOrLayoutID)
+        {
             SaveCurrentLayout();
 
 
             Layout1.Text = fileOrLayoutID;
 
-            if (!fileOrLayoutID.StartsWith("#")) {
+            if (!fileOrLayoutID.StartsWith("#"))
+            {
 
-                if (fileOrLayoutID.FileSuffix().ToUpper() == "BCR") {
+                if (fileOrLayoutID.FileSuffix().ToUpper() == "BCR")
+                {
                     Pad.Enabled = true;
                     _LoadedLayout = fileOrLayoutID;
                     var l = LoadFromDiskWIN1252(fileOrLayoutID);
                     Pad.Item = new ItemCollectionPad(l, string.Empty);
                     ItemChanged();
 
-                } else {
+                }
+                else
+                {
                     _LoadedLayout = string.Empty;
                     Pad.Item.Clear();
                     Pad.Item.SheetSizeInMM = SizeF.Empty;
@@ -210,7 +237,9 @@ namespace BlueControls.BlueDatabaseDialogs {
                     ItemChanged();
                     Pad.Enabled = false;
                 }
-            } else {
+            }
+            else
+            {
                 Pad.Enabled = true;
                 _LoadedLayout = fileOrLayoutID;
                 var ind = Database.LayoutIDToIndex(_LoadedLayout);
@@ -222,7 +251,8 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
 
-        public override void ItemChanged() {
+        public override void ItemChanged()
+        {
             base.ItemChanged();
 
             CheckButtons();
@@ -231,7 +261,8 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
 
-        private void SaveCurrentLayout() {
+        private void SaveCurrentLayout()
+        {
             if (Database == null) { return; }
             if (string.IsNullOrEmpty(_LoadedLayout)) { return; }
 
@@ -239,11 +270,14 @@ namespace BlueControls.BlueDatabaseDialogs {
             var newl = Pad.Item.ToString();
             Pad.Grid = ckbRaster.Checked;
 
-            if (_LoadedLayout.StartsWith("#")) {
+            if (_LoadedLayout.StartsWith("#"))
+            {
                 var ind = Database.LayoutIDToIndex(_LoadedLayout);
                 if (Database.Layouts[ind] == newl) { return; }
                 Database.Layouts[ind] = newl;
-            } else if (_LoadedLayout.FileSuffix().ToUpper() == "BCR") {
+            }
+            else if (_LoadedLayout.FileSuffix().ToUpper() == "BCR")
+            {
                 SaveToDisk(_LoadedLayout, newl, false, System.Text.Encoding.UTF8);
             }
 
@@ -254,15 +288,18 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
 
-        private void CodeGeneratorChanges_Click(object sender, System.EventArgs e) {
+        private void CodeGeneratorChanges_Click(object sender, System.EventArgs e)
+        {
             GenerateText();
         }
 
-        private void CodeGeneratorChanges_TextChanged(object sender, System.EventArgs e) {
+        private void CodeGeneratorChanges_TextChanged(object sender, System.EventArgs e)
+        {
             GenerateText();
         }
 
-        private void GenerateText() {
+        private void GenerateText()
+        {
 
             ColumnItem c = null;
             if (Database != null) { c = Database.Column[Spaltx.Text]; }
@@ -273,9 +310,12 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             string Nam;
 
-            if (c != null) {
+            if (c != null)
+            {
                 Nam = c.Name;
-            } else {
+            }
+            else
+            {
                 Nam = i.Internal;
             }
 
@@ -283,7 +323,8 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             string T = null;
 
-            if (!string.IsNullOrEmpty(Nam) && txt.Enabled && FomAx.SelectedIndex == 0) {
+            if (!string.IsNullOrEmpty(Nam) && txt.Enabled && FomAx.SelectedIndex == 0)
+            {
                 T = "//TS/000" + Nam;
 
                 // Auf die Reihenfolge kommt es an!
@@ -300,8 +341,11 @@ namespace BlueControls.BlueDatabaseDialogs {
                 T += "/E";
                 Code.Text = T;
 
-            } else if (!string.IsNullOrEmpty(Nam) && Pic.Enabled && FomAx.SelectedIndex == 1) {
-                if (Abma.Enabled) {
+            }
+            else if (!string.IsNullOrEmpty(Nam) && Pic.Enabled && FomAx.SelectedIndex == 1)
+            {
+                if (Abma.Enabled)
+                {
                     T = "//TS/001" + Nam;
                     if (int.Parse(Wi.Text) > 5) { T = T + "/200" + int.Parse(Wi.Text); }
                     if (int.Parse(He.Text) > 5) { T = T + "/201" + int.Parse(He.Text); }
@@ -309,7 +353,9 @@ namespace BlueControls.BlueDatabaseDialogs {
                     if (ExactMi.Checked) { T += "/211"; }
                     if (GroMi.Checked) { T += "/212"; }
                     if (Base64.Checked) { T += "/220"; }
-                } else {
+                }
+                else
+                {
                     T = "//TS/000" + Nam;
                 }
 
@@ -317,18 +363,24 @@ namespace BlueControls.BlueDatabaseDialogs {
                 T += "/E";
                 Code.Text = T;
 
-            } else if (FomAx.SelectedIndex == 2) {
+            }
+            else if (FomAx.SelectedIndex == 2)
+            {
                 if (BefE2.Item.Checked().Count == 1) { Code.Text = BefE2.Item.Checked()[0].Internal; }
-            } else {
+            }
+            else
+            {
                 Code.Text = "";
             }
         }
 
-        private void BefE2_Item_CheckedChanged(object sender, System.EventArgs e) {
+        private void BefE2_Item_CheckedChanged(object sender, System.EventArgs e)
+        {
             GenerateText();
         }
 
-        public void AndereSpalteGewählt() {
+        public void AndereSpalteGewählt()
+        {
 
             ColumnItem c = null;
             if (Database != null) { c = Database.Column[Spaltx.Text]; }
@@ -340,25 +392,33 @@ namespace BlueControls.BlueDatabaseDialogs {
             var LeerM = false;
             var Nam = "UNBEKANNT";
 
-            if (c != null) {
+            if (c != null)
+            {
                 Nam = c.Name;
                 TextB = c.Format.TextboxEditPossible();
 
                 //if (c.Format == enDataFormat.Relation) { TextB = true; }
 
-                if (TextB) {
+                if (TextB)
+                {
                     MultiL = c.MultiLine;
                     LeerM = true;
-                } else {
-                    if (c.Format == enDataFormat.Link_To_Filesystem) {
+                }
+                else
+                {
+                    if (c.Format == enDataFormat.Link_To_Filesystem)
+                    {
                         if (c.MultiLine == false) { PicB = true; }
                     }
                 }
 
 
 
-            } else {
-                switch (i) {
+            }
+            else
+            {
+                switch (i)
+                {
                     case TextListItem _:
                         Nam = i.Internal;
                         TextB = true; //Not String.IsNullOrEmpty(.Text)
@@ -376,24 +436,32 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
 
 
-            if (TextB) {
+            if (TextB)
+            {
                 txt.Enabled = true;
                 if (FomAx.SelectedIndex == 1) { FomAx.SelectedIndex = 0; }
                 Pic.Enabled = false;
-            } else if (PicB) {
+            }
+            else if (PicB)
+            {
                 Pic.Enabled = true;
                 if (FomAx.SelectedIndex == 0) { FomAx.SelectedIndex = 1; }
                 txt.Enabled = false;
-            } else {
+            }
+            else
+            {
                 FomAx.SelectedIndex = 2;
                 Pic.Enabled = false;
                 txt.Enabled = false;
             }
 
-            if (MultiL) {
+            if (MultiL)
+            {
                 ZeilUmbruch.Enabled = true;
                 ZeilCap.Enabled = true;
-            } else {
+            }
+            else
+            {
                 ZeilUmbruch.Enabled = false;
                 ZeilUmbruch.Text = "";
                 ZeilCap.Enabled = false;
@@ -406,7 +474,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             BefE2.Item.Add("Bereinigung Start", "//XS/302", enImageCode.Pinsel);
             BefE2.Item.Add("Bereinigung Ende", "/XE", enImageCode.Pinsel);
 
-            if (LeerM) {
+            if (LeerM)
+            {
                 BefE2.Item.AddSeparator();
                 BefE2.Item.Add("Wenn der Inhalt nicht leer ist, dann...", "//AS/003" + Nam.ToUpper() + "/310", QuickImage.Get("Gänsefüßchen|16|12"));
                 BefE2.Item.Add("...Ende der Abfrage", "/AE", QuickImage.Get("Gänsefüßchen|16|12|6"));
@@ -417,30 +486,37 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
 
-        private void Spalt_ItemClicked(object sender, BasicListItemEventArgs e) {
+        private void Spalt_ItemClicked(object sender, BasicListItemEventArgs e)
+        {
             AndereSpalteGewählt();
         }
 
 
 
-        private void BefülleSpaltenDropdown() {
+        private void BefülleSpaltenDropdown()
+        {
             Spaltx.Item.Clear();
 
-            if (Database != null) {
+            if (Database != null)
+            {
                 Spaltx.Item.AddRange(Database.Column, true, true, false);
                 Spaltx.Item.Sort();
             }
 
 
-            if (Spaltx.Item.Count > 0) {
+            if (Spaltx.Item.Count > 0)
+            {
                 Spaltx.Enabled = true;
                 Spaltx.Text = Spaltx.Item[0].Internal;
-            } else {
+            }
+            else
+            {
                 Spaltx.Enabled = false;
             }
         }
 
-        private void BefülleRestlicheDropDowns() {
+        private void BefülleRestlicheDropDowns()
+        {
             Leer.Item.Clear();
             Leer.Item.Add("k. A.");
             Leer.Item.Add("-");
@@ -459,35 +535,42 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
 
-        private void Clip_Click(object sender, System.EventArgs e) {
+        private void Clip_Click(object sender, System.EventArgs e)
+        {
             System.Windows.Forms.Clipboard.SetDataObject(Code.Text, true);
 
             Notification.Show("Der gewählte Platzhalter<br>befindet sich nun in der<br>Zwischenablage und kann<br>nun in einer anderen Anwendung<br>verwendet werden.", enImageCode.Clipboard);
 
         }
 
-        private void LayBearb_Click(object sender, System.EventArgs e) {
+        private void LayBearb_Click(object sender, System.EventArgs e)
+        {
             ExecuteFile("notepad.exe", Layout1.Text, false);
         }
 
-        private void LayOpen_Click(object sender, System.EventArgs e) {
+        private void LayOpen_Click(object sender, System.EventArgs e)
+        {
             ExecuteFile(Layout1.Text, null, false);
         }
 
-        private void LayVZ_Click(object sender, System.EventArgs e) {
+        private void LayVZ_Click(object sender, System.EventArgs e)
+        {
 
             if (string.IsNullOrEmpty(_AdditionalLayoutPath) && Database != null) { _AdditionalLayoutPath = Database.Filename.FilePath() + "Layouts\\"; }
 
             ExecuteFile(_AdditionalLayoutPath);
         }
 
-        private void befülleLayoutDropdown() {
-            if (Database != null) {
+        private void befülleLayoutDropdown()
+        {
+            if (Database != null)
+            {
                 Layout1.Item.Clear();
                 Layout1.Item.AddLayoutsOf(Database, true, _AdditionalLayoutPath);
             }
         }
-        private void Pad_ClickedItemChanged(object sender, System.EventArgs e) {
+        private void Pad_ClickedItemChanged(object sender, System.EventArgs e)
+        {
 
             tabElementEigenschaften.Controls.Clear();
             if (Pad.LastClickedItem == null) { return; }
@@ -497,7 +580,8 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
             var top = Skin.Padding;
-            foreach (var ThisFlexi in Flexis) {
+            foreach (var ThisFlexi in Flexis)
+            {
                 tabElementEigenschaften.Controls.Add(ThisFlexi);
                 ThisFlexi.DisabledReason = string.Empty;
                 ThisFlexi.Left = Skin.Padding;

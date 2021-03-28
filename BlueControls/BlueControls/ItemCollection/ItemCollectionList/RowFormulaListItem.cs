@@ -25,8 +25,10 @@ using BlueDatabase;
 using System;
 using System.Drawing;
 
-namespace BlueControls.ItemCollection {
-    public class RowFormulaListItem : BasicListItem {
+namespace BlueControls.ItemCollection
+{
+    public class RowFormulaListItem : BasicListItem
+    {
         #region  Variablen-Deklarationen 
 
         private RowItem _Row;
@@ -44,7 +46,8 @@ namespace BlueControls.ItemCollection {
         #region  Construktor + Initialize 
 
 
-        public RowFormulaListItem(RowItem row, string layoutID, string userDefCompareKey) : base(string.Empty) {
+        public RowFormulaListItem(RowItem row, string layoutID, string userDefCompareKey) : base(string.Empty)
+        {
             _Row = row;
             _LayoutID = layoutID;
             UserDefCompareKey = userDefCompareKey;
@@ -54,23 +57,28 @@ namespace BlueControls.ItemCollection {
         #endregion
 
 
-        public override string QuickInfo {
-            get {
+        public override string QuickInfo
+        {
+            get
+            {
                 if (_Row == null) { return string.Empty; }
                 return _Row.CellFirstString().CreateHtmlCodes(true);
             }
         }
 
-        public string LayoutID {
+        public string LayoutID
+        {
             get => _LayoutID;
-            set {
+            set
+            {
 
                 if (value == _LayoutID) { return; }
 
                 _LayoutID = value;
 
 
-                if (_tmpBMP != null) {
+                if (_tmpBMP != null)
+                {
                     _tmpBMP.Dispose();
                     _tmpBMP = null;
                 }
@@ -79,9 +87,11 @@ namespace BlueControls.ItemCollection {
         }
 
 
-        public RowItem Row {
+        public RowItem Row
+        {
             get => _Row;
-            set {
+            set
+            {
 
                 if (_Row == value) { return; }
 
@@ -94,30 +104,36 @@ namespace BlueControls.ItemCollection {
         }
 
 
-        private void removePic() {
-            if (_tmpBMP != null) {
+        private void removePic()
+        {
+            if (_tmpBMP != null)
+            {
                 _tmpBMP.Dispose();
                 _tmpBMP = null;
             }
         }
 
 
-        protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, bool Translate) {
+        protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, bool Translate)
+        {
             if (_tmpBMP == null) { GeneratePic(); }
 
-            if (DrawBorderAndBack) {
+            if (DrawBorderAndBack)
+            {
                 Skin.Draw_Back(GR, itemdesign, vState, PositionModified, null, false);
             }
 
 
-            if (_tmpBMP != null) {
+            if (_tmpBMP != null)
+            {
                 var scale = (float)Math.Min(PositionModified.Width / (double)_tmpBMP.Width, PositionModified.Height / (double)_tmpBMP.Height);
                 var r2 = new RectangleF((PositionModified.Width - _tmpBMP.Width * scale) / 2 + PositionModified.Left, (PositionModified.Height - _tmpBMP.Height * scale) / 2 + PositionModified.Top, _tmpBMP.Width * scale, _tmpBMP.Height * scale);
 
                 GR.DrawImage(_tmpBMP, r2, new RectangleF(0, 0, _tmpBMP.Width, _tmpBMP.Height), GraphicsUnit.Pixel);
             }
 
-            if (DrawBorderAndBack) {
+            if (DrawBorderAndBack)
+            {
                 Skin.Draw_Border(GR, itemdesign, vState, PositionModified);
             }
         }
@@ -126,9 +142,11 @@ namespace BlueControls.ItemCollection {
 
 
 
-        private void GeneratePic() {
+        private void GeneratePic()
+        {
 
-            if (string.IsNullOrEmpty(_LayoutID) || !_LayoutID.StartsWith("#")) {
+            if (string.IsNullOrEmpty(_LayoutID) || !_LayoutID.StartsWith("#"))
+            {
                 _tmpBMP = (Bitmap)QuickImage.Get(enImageCode.Warnung, 128).BMP.Clone();
                 return;
             }
@@ -138,8 +156,10 @@ namespace BlueControls.ItemCollection {
 
             var mb = _pad.Item.MaxBounds(null);
 
-            if (_tmpBMP != null) {
-                if (_tmpBMP.Width != mb.Width || _tmpBMP.Height != mb.Height) {
+            if (_tmpBMP != null)
+            {
+                if (_tmpBMP.Width != mb.Width || _tmpBMP.Height != mb.Height)
+                {
                     _tmpBMP.Dispose();
                     _tmpBMP = null;
                 }
@@ -161,18 +181,21 @@ namespace BlueControls.ItemCollection {
 
         }
 
-        protected override Size ComputeSizeUntouchedForListBox() {
+        protected override Size ComputeSizeUntouchedForListBox()
+        {
             return new Size(300, 300);
 
         }
 
 
-        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) {
+        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth)
+        {
             return (int)(columnWidth * 0.8);
         }
 
 
-        protected override string GetCompareKey() {
+        protected override string GetCompareKey()
+        {
             return _Row.CellFirstString();
         }
     }

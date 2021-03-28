@@ -1,5 +1,7 @@
-﻿namespace BlueControls.Enums {
-    public enum enDesign {
+﻿namespace BlueControls.Enums
+{
+    public enum enDesign
+    {
         Undefiniert = -1, // Braucht man
 
 

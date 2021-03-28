@@ -25,12 +25,15 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace BlueControls.Controls {
+namespace BlueControls.Controls
+{
     [Designer(typeof(BasicDesigner))]
-    public partial class ZoomPad : GenericControl {
+    public partial class ZoomPad : GenericControl
+    {
 
         #region Constructor
-        public ZoomPad() : base(true, true) {
+        public ZoomPad() : base(true, true)
+        {
             InitializeComponent();
         }
         #endregion
@@ -65,7 +68,8 @@ namespace BlueControls.Controls {
 
 
 
-        protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
+        protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e)
+        {
 
             MousePos_1_1 = KoordinatesUnscaled(e);
             MouseDownPos_1_1 = KoordinatesUnscaled(e);
@@ -73,35 +77,41 @@ namespace BlueControls.Controls {
         }
 
 
-        protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
+        protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e)
+        {
             MousePos_1_1 = KoordinatesUnscaled(e);
             base.OnMouseUp(e);
             MouseDownPos_1_1 = Point.Empty;
         }
 
 
-        protected override void OnMouseMove(MouseEventArgs e) {
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
             MousePos_1_1 = KoordinatesUnscaled(e);
             base.OnMouseMove(e);
         }
 
-        protected override void OnMouseLeave(System.EventArgs e) {
+        protected override void OnMouseLeave(System.EventArgs e)
+        {
             MousePos_1_1 = Point.Empty;
             base.OnMouseLeave(e);
         }
 
 
-        public void ZoomIn(System.Windows.Forms.MouseEventArgs e) {
+        public void ZoomIn(System.Windows.Forms.MouseEventArgs e)
+        {
             var x = new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, e.X, e.Y, 1);
             OnMouseWheel(x);
         }
 
-        public void ZoomOut(System.Windows.Forms.MouseEventArgs e) {
+        public void ZoomOut(System.Windows.Forms.MouseEventArgs e)
+        {
             var x = new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, e.X, e.Y, -1);
             OnMouseWheel(x);
         }
 
-        public void ZoomFit() {
+        public void ZoomFit()
+        {
             _Fitting = true;
 
             var mb = MaxBounds();
@@ -114,7 +124,8 @@ namespace BlueControls.Controls {
             Invalidate();
         }
 
-        public void Zoom100() {
+        public void Zoom100()
+        {
             _Fitting = true;
 
             var mb = MaxBounds();
@@ -128,17 +139,22 @@ namespace BlueControls.Controls {
 
         }
 
-        public decimal ZoomCurrent() {
+        public decimal ZoomCurrent()
+        {
             return _Zoom;
         }
 
 
-        public decimal ZoomFitValue(RectangleM MaxBounds, bool sliderShowing, Size sizeOfPaintArea) {
+        public decimal ZoomFitValue(RectangleM MaxBounds, bool sliderShowing, Size sizeOfPaintArea)
+        {
             if (MaxBounds == null || MaxBounds.Width < 0.01m || MaxBounds.Height < 0.01m) { return 1m; }
 
-            if (sliderShowing) {
+            if (sliderShowing)
+            {
                 return Math.Min((sizeOfPaintArea.Width - SliderY.Width - 32) / MaxBounds.Width, (sizeOfPaintArea.Height - SliderX.Height - 32) / MaxBounds.Height);
-            } else {
+            }
+            else
+            {
                 return Math.Min(sizeOfPaintArea.Width / MaxBounds.Width, sizeOfPaintArea.Height / MaxBounds.Height);
             }
         }
@@ -150,12 +166,14 @@ namespace BlueControls.Controls {
         /// </summary>
         /// <remarks>
         /// </remarks>
-        protected Point KoordinatesUnscaled(System.Windows.Forms.MouseEventArgs e) {
+        protected Point KoordinatesUnscaled(System.Windows.Forms.MouseEventArgs e)
+        {
             return new Point((int)((e.X + _shiftX) / _Zoom), (int)((e.Y + _shiftY) / _Zoom));
         }
 
 
-        protected virtual RectangleM MaxBounds() {
+        protected virtual RectangleM MaxBounds()
+        {
             Develop.DebugPrint_RoutineMussUeberschriebenWerden();
             return null;
         }
@@ -163,16 +181,20 @@ namespace BlueControls.Controls {
 
 
 
-        protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e) {
+        protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e)
+        {
             base.OnMouseWheel(e);
 
             _Fitting = false;
 
             var m = KoordinatesUnscaled(e);
 
-            if (e.Delta > 0) {
+            if (e.Delta > 0)
+            {
                 _Zoom *= 1.5m;
-            } else {
+            }
+            else
+            {
                 _Zoom *= (1m / 1.5m);
             }
 
@@ -207,7 +229,8 @@ namespace BlueControls.Controls {
         }
 
 
-        protected override void OnSizeChanged(System.EventArgs e) {
+        protected override void OnSizeChanged(System.EventArgs e)
+        {
             ZoomFit();
             base.OnSizeChanged(e);
         }
@@ -216,23 +239,27 @@ namespace BlueControls.Controls {
 
 
 
-        private void SliderX_ValueChanged(object sender, System.EventArgs e) {
+        private void SliderX_ValueChanged(object sender, System.EventArgs e)
+        {
             _shiftX = (decimal)SliderX.Value;
             ZoomOrShiftChanged();
             Invalidate();
         }
 
-        private void SliderY_ValueChanged(object sender, System.EventArgs e) {
+        private void SliderY_ValueChanged(object sender, System.EventArgs e)
+        {
             _shiftY = (decimal)SliderY.Value;
             ZoomOrShiftChanged();
             Invalidate();
         }
 
-        internal PointF SliderValues(RectangleM bounds, decimal ZoomToUse, Point TopLeftPos) {
+        internal PointF SliderValues(RectangleM bounds, decimal ZoomToUse, Point TopLeftPos)
+        {
             return new PointF((float)(bounds.Left * ZoomToUse - TopLeftPos.X / 2m), (float)(bounds.Top * ZoomToUse - TopLeftPos.Y / 2m));
         }
 
-        private void ComputeSliders(RectangleM maxBounds) {
+        private void ComputeSliders(RectangleM maxBounds)
+        {
 
 
             if (maxBounds == null || maxBounds.Width == 0) { return; }
@@ -242,29 +269,37 @@ namespace BlueControls.Controls {
 
 
 
-            if (p.X < 0) {
+            if (p.X < 0)
+            {
                 SliderX.Enabled = true;
                 SliderX.Minimum = (double)(maxBounds.Left * _Zoom - Width * 0.6m);
                 SliderX.Maximum = (double)(maxBounds.Right * _Zoom - Width + Width * 0.6m);
 
-            } else {
+            }
+            else
+            {
                 SliderX.Enabled = false;
 
-                if (MousePressing() == false) {
+                if (MousePressing() == false)
+                {
                     SliderX.Minimum = sliderv.X;
                     SliderX.Maximum = sliderv.X;
                     SliderX.Value = sliderv.X;
                 }
             }
 
-            if (p.Y < 0) {
+            if (p.Y < 0)
+            {
                 SliderY.Enabled = true;
                 SliderY.Minimum = (double)(maxBounds.Top * _Zoom - Height * 0.6m);
                 SliderY.Maximum = (double)(maxBounds.Bottom * _Zoom - Height + Height * 0.6m);
 
-            } else {
+            }
+            else
+            {
                 SliderY.Enabled = false;
-                if (MousePressing() == false) {
+                if (MousePressing() == false)
+                {
                     SliderY.Minimum = sliderv.Y;
                     SliderY.Maximum = sliderv.Y;
                     SliderY.Value = sliderv.Y;
@@ -276,7 +311,8 @@ namespace BlueControls.Controls {
 
 
 
-        public void SetZoom(decimal Zoom) {
+        public void SetZoom(decimal Zoom)
+        {
             _Zoom = Zoom;
 
             SliderX.Minimum = 0;
@@ -297,15 +333,19 @@ namespace BlueControls.Controls {
         /// <param name="sizeOfPaintArea"></param>
         /// <param name="ZoomToUse"></param>
         /// <returns></returns>
-        public Point CenterPos(RectangleM MaxBounds, bool SliderShowing, Size sizeOfPaintArea, decimal ZoomToUse) {
+        public Point CenterPos(RectangleM MaxBounds, bool SliderShowing, Size sizeOfPaintArea, decimal ZoomToUse)
+        {
             var w = 0;
             var h = 0;
 
 
-            if (SliderShowing) {
+            if (SliderShowing)
+            {
                 w = (int)(sizeOfPaintArea.Width - SliderY.Width - MaxBounds.Width * ZoomToUse);
                 h = (int)(sizeOfPaintArea.Height - SliderX.Height - MaxBounds.Height * ZoomToUse);
-            } else {
+            }
+            else
+            {
                 w = (int)(sizeOfPaintArea.Width - MaxBounds.Width * ZoomToUse);
                 h = (int)(sizeOfPaintArea.Height - MaxBounds.Height * ZoomToUse);
             }
@@ -315,7 +355,8 @@ namespace BlueControls.Controls {
 
 
 
-        public Rectangle AvailablePaintArea() {
+        public Rectangle AvailablePaintArea()
+        {
 
             var wi = Size.Width;
             if (SliderY.Visible) { wi -= SliderY.Width; }

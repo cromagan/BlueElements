@@ -16,8 +16,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-namespace BlueDatabase.Enums {
-    public enum enShortenStyle {
+namespace BlueDatabase.Enums
+{
+    public enum enShortenStyle
+    {
         Replaced = 0,
         Unreplaced = 1,
         Both = 2,

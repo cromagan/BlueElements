@@ -23,13 +23,16 @@ using System.ComponentModel;
 using System.Drawing.Design;
 using System.Windows.Forms.Design;
 
-namespace BlueControls.Designer_Support {
-    public sealed class QuickPicSelector : UITypeEditor {
+namespace BlueControls.Designer_Support
+{
+    public sealed class QuickPicSelector : UITypeEditor
+    {
         private IWindowsFormsEditorService edSvc;
         private readonly frmQuickPic fqp = new();
         private string C;
 
-        public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value) {
+        public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
+        {
 
             edSvc = (IWindowsFormsEditorService)provider.GetService(typeof(IWindowsFormsEditorService));
 
@@ -45,15 +48,18 @@ namespace BlueControls.Designer_Support {
         }
 
 
-        private void Click(object sender, System.EventArgs e) {
-            if (edSvc != null) {
+        private void Click(object sender, System.EventArgs e)
+        {
+            if (edSvc != null)
+            {
                 C = fqp.ICode();
                 edSvc.CloseDropDown();
             }
         }
 
 
-        public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context) {
+        public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
+        {
             return UITypeEditorEditStyle.Modal;
         }
     }

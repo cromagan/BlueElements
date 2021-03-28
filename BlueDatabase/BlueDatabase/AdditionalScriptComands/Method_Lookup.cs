@@ -23,8 +23,10 @@ using Skript.Enums;
 using System.Collections.Generic;
 using static BlueBasics.Extensions;
 
-namespace BlueScript {
-    public class Method_Lookup : BlueScript.Method {
+namespace BlueScript
+{
+    public class Method_Lookup : BlueScript.Method
+    {
 
 
         //public Method_Lookup(Script parent) : base(parent) { }
@@ -41,7 +43,8 @@ namespace BlueScript {
         public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.String, enVariableDataType.String, enVariableDataType.String, enVariableDataType.String };
         public override bool EndlessArgs => false;
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
+        {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
@@ -49,7 +52,8 @@ namespace BlueScript {
             var f = s.Variablen.GetSystem("filename");
             if (f == null) { return new strDoItFeedback("System-Variable 'Filename' nicht gefunden."); }
 
-            foreach (var thisv in attvar) {
+            foreach (var thisv in attvar)
+            {
                 if (thisv.Type != Skript.Enums.enVariableDataType.String) { return strDoItFeedback.FalscherDatentyp(); }
             }
 
@@ -58,10 +62,13 @@ namespace BlueScript {
             var db2 = BlueBasics.MultiUserFile.clsMultiUserFile.GetByFilename(newf, true);
             BlueDatabase.Database db;
 
-            if (db2 == null) {
+            if (db2 == null)
+            {
                 if (!FileOperations.FileExists(newf)) { return new strDoItFeedback("Datenbank nicht gefunden: " + newf); }
                 db = new BlueDatabase.Database(newf, false, false);
-            } else {
+            }
+            else
+            {
                 db = (BlueDatabase.Database)db2;
             }
 
@@ -71,12 +78,14 @@ namespace BlueScript {
 
             var r = RowCollection.MatchesTo(new FilterItem(db.Column[0], BlueDatabase.Enums.enFilterType.Istgleich_GroßKleinEgal, attvar[1].ValueString));
 
-            if (r == null || r.Count == 0) {
+            if (r == null || r.Count == 0)
+            {
                 if (attvar.Count > 3) { return new strDoItFeedback(attvar[3].ValueString, string.Empty); }
                 return new strDoItFeedback(string.Empty, string.Empty);
             }
 
-            if (r.Count > 1) {
+            if (r.Count > 1)
+            {
                 if (attvar.Count > 4) { return new strDoItFeedback(attvar[4].ValueString, string.Empty); }
                 return new strDoItFeedback(string.Empty, string.Empty);
             }

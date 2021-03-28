@@ -28,16 +28,16 @@ namespace BlueBasics
 {
     public static partial class Extensions
     {
-        public static Bitmap Area(this Bitmap SourceBitmap, Rectangle R)
+        public static Bitmap Area(this Bitmap sourceBitmap, Rectangle r)
         {
-            if (R.Width < 2 || R.Height < 2) { return null; }
+            if (r.Width < 2 || r.Height < 2) { return null; }
 
-            var ClipedArea = new Bitmap(R.Width, R.Height);
+            var ClipedArea = new Bitmap(r.Width, r.Height);
 
             using (var GR = Graphics.FromImage(ClipedArea))
             {
                 GR.Clear(Color.Black);
-                GR.DrawImage(SourceBitmap, 0, 0, R, GraphicsUnit.Pixel);
+                GR.DrawImage(sourceBitmap, 0, 0, r, GraphicsUnit.Pixel);
             }
 
             return ClipedArea;
@@ -138,14 +138,14 @@ namespace BlueBasics
             }
         }
 
-        public static Bitmap Image_Clone(this Bitmap SourceBMP)
+        public static Bitmap Image_Clone(this Bitmap sourceBMP)
         {
-            if (SourceBMP == null) { return null; }
+            if (sourceBMP == null) { return null; }
 
-            var bmp = new Bitmap(SourceBMP.Width, SourceBMP.Height, PixelFormat.Format32bppArgb);
+            var bmp = new Bitmap(sourceBMP.Width, sourceBMP.Height, PixelFormat.Format32bppArgb);
             using (var g = Graphics.FromImage(bmp))
             {
-                g.DrawImage(SourceBMP, 0, 0, SourceBMP.Width, SourceBMP.Height); // Unerklärlich, orgiImage.Width, orgiImage.Height muss stehen bleiben!
+                g.DrawImage(sourceBMP, 0, 0, sourceBMP.Width, sourceBMP.Height); // Unerklärlich, orgiImage.Width, orgiImage.Height muss stehen bleiben!
             }
 
             return bmp;
@@ -153,10 +153,10 @@ namespace BlueBasics
 
         public static Bitmap Invert(this Bitmap source)
         {
-            //create a blank bitmap the same size as original
+            // create a blank bitmap the same size as original
             var newBitmap = new Bitmap(source.Width, source.Height);
 
-            //get a graphics object from the new image
+            // get a graphics object from the new image
             var g = Graphics.FromImage(newBitmap);
 
             // create the negative color matrix
@@ -177,41 +177,41 @@ namespace BlueBasics
             g.DrawImage(source, new Rectangle(0, 0, source.Width, source.Height),
                         0, 0, source.Width, source.Height, GraphicsUnit.Pixel, attributes);
 
-            //dispose the Graphics object
+            // dispose the Graphics object
             g.Dispose();
 
             return newBitmap;
         }
 
-        public static Bitmap Crop(this Bitmap _Pic, Rectangle R)
+        public static Bitmap Crop(this Bitmap _Pic, Rectangle r)
         {
-            return _Pic.Crop(R.Left, -(_Pic.Width - R.Right), R.Top, -(_Pic.Height - R.Bottom));
+            return _Pic.Crop(r.Left, -(_Pic.Width - r.Right), r.Top, -(_Pic.Height - r.Bottom));
         }
 
         /// <summary>
         ///
         /// </summary>
         /// <param name="_Pic"></param>
-        /// <param name="Left">Positiver Wert schneidet diese Anzahl von Pixel vom linken Rand weg.</param>
-        /// <param name="Right">Negativer Wert schneidet diese Anzahl von Pixel vom rechten Rand weg.</param>
-        /// <param name="Top">Positiver Wert schneidet diese Anzahl von Pixel vom oberen Rand weg.</param>
-        /// <param name="Bottom">Negativer Wert schneidet diese Anzahl von Pixel vom unteren Rand weg.</param>
+        /// <param name="left">Positiver Wert schneidet diese Anzahl von Pixel vom linken Rand weg.</param>
+        /// <param name="right">Negativer Wert schneidet diese Anzahl von Pixel vom rechten Rand weg.</param>
+        /// <param name="top">Positiver Wert schneidet diese Anzahl von Pixel vom oberen Rand weg.</param>
+        /// <param name="bottom">Negativer Wert schneidet diese Anzahl von Pixel vom unteren Rand weg.</param>
         /// <returns></returns>
-        public static Bitmap Crop(this Bitmap _Pic, int Left, int Right, int Top, int Bottom)
+        public static Bitmap Crop(this Bitmap _Pic, int left, int right, int top, int bottom)
         {
-            if (Left == 0 && Right == 0 && Top == 0 && Bottom == 0) { return _Pic; }
+            if (left == 0 && right == 0 && top == 0 && bottom == 0) { return _Pic; }
 
             if (_Pic == null) { return null; }
 
             modAllgemein.CollectGarbage();
 
-            var w = Math.Max(_Pic.Width - Left + Right, 1);
-            var h = Math.Max(_Pic.Height - Top + Bottom, 1);
+            var w = Math.Max(_Pic.Width - left + right, 1);
+            var h = Math.Max(_Pic.Height - top + bottom, 1);
 
             var _BMP2 = new Bitmap(w, h);
             using (var GR = Graphics.FromImage(_BMP2))
             {
-                GR.DrawImage(_Pic, -Left, -Top, _Pic.Width, _Pic.Height); // Width und Height MUSS angegeben werden. Manche Bilder (Falsches Format?) schlagen fehl, wenn es fehlt.
+                GR.DrawImage(_Pic, -left, -top, _Pic.Width, _Pic.Height); // Width und Height MUSS angegeben werden. Manche Bilder (Falsches Format?) schlagen fehl, wenn es fehlt.
             }
 
             modAllgemein.CollectGarbage();
@@ -219,13 +219,13 @@ namespace BlueBasics
             return _BMP2;
         }
 
-        public static Bitmap AutoCrop(this Bitmap _Pic, double MinBrightness)
+        public static Bitmap AutoCrop(this Bitmap _Pic, double minBrightness)
         {
-            var pa = _Pic.GetAutoValuesForCrop(MinBrightness);
+            var pa = _Pic.GetAutoValuesForCrop(minBrightness);
             return Crop(_Pic, pa.Left, pa.Right, pa.Top, pa.Bottom);
         }
 
-        public static System.Windows.Forms.Padding GetAutoValuesForCrop(this Bitmap _Pic, double MinBrightness)
+        public static System.Windows.Forms.Padding GetAutoValuesForCrop(this Bitmap _Pic, double minBrightness)
         {
             var pa = new System.Windows.Forms.Padding(0, 0, 0, 0);
             if (_Pic == null) { return pa; }
@@ -238,7 +238,7 @@ namespace BlueBasics
             {
                 for (Y = 0; Y < _Pic.Height; Y++)
                 {
-                    if (!_Pic.GetPixel(x, Y).IsNearWhite(MinBrightness))
+                    if (!_Pic.GetPixel(x, Y).IsNearWhite(minBrightness))
                     {
                         ExitNow = true;
                         break;
@@ -261,7 +261,7 @@ namespace BlueBasics
             {
                 for (Y = 0; Y < _Pic.Height; Y++)
                 {
-                    if (!_Pic.GetPixel(x, Y).IsNearWhite(MinBrightness))
+                    if (!_Pic.GetPixel(x, Y).IsNearWhite(minBrightness))
                     {
                         ExitNow = true;
                         break;
@@ -282,7 +282,7 @@ namespace BlueBasics
             {
                 for (x = 0; x < _Pic.Width; x++)
                 {
-                    if (!_Pic.GetPixel(x, Y).IsNearWhite(MinBrightness))
+                    if (!_Pic.GetPixel(x, Y).IsNearWhite(minBrightness))
                     {
                         ExitNow = true;
                         break;
@@ -303,7 +303,7 @@ namespace BlueBasics
             {
                 for (x = 0; x < _Pic.Width; x++)
                 {
-                    if (!_Pic.GetPixel(x, Y).IsNearWhite(MinBrightness))
+                    if (!_Pic.GetPixel(x, Y).IsNearWhite(minBrightness))
                     {
                         ExitNow = true;
                         break;
@@ -322,7 +322,7 @@ namespace BlueBasics
 
         public static Bitmap AdjustGamma(this Bitmap image, float gamma)
         {
-            //http://csharphelper.com/blog/2016/12/provide-gamma-correction-for-an-image-in-c/
+            // http://csharphelper.com/blog/2016/12/provide-gamma-correction-for-an-image-in-c/
             // Set the ImageAttributes object's gamma value.
             var attributes = new ImageAttributes();
             attributes.SetGamma(Math.Max(gamma, 0.001f));
@@ -388,11 +388,11 @@ namespace BlueBasics
             return bm;
         }
 
-        public static Bitmap AdjustContrast(this Bitmap Image, float Value)
+        public static Bitmap AdjustContrast(this Bitmap image, float value)
         {
-            Value = (100.0f + Value) / 100.0f;
-            Value *= Value;
-            var NewBitmap = Image_Clone(Image);
+            value = (100.0f + value) / 100.0f;
+            value *= value;
+            var NewBitmap = Image_Clone(image);
             var data = NewBitmap.LockBits(new Rectangle(0, 0, NewBitmap.Width, NewBitmap.Height), ImageLockMode.ReadWrite, NewBitmap.PixelFormat);
             var Height = NewBitmap.Height;
             var Width = NewBitmap.Width;
@@ -412,9 +412,9 @@ namespace BlueBasics
                         var Red = R / 255.0f;
                         var Green = G / 255.0f;
                         var Blue = B / 255.0f;
-                        Red = (((Red - 0.5f) * Value) + 0.5f) * 255.0f;
-                        Green = (((Green - 0.5f) * Value) + 0.5f) * 255.0f;
-                        Blue = (((Blue - 0.5f) * Value) + 0.5f) * 255.0f;
+                        Red = (((Red - 0.5f) * value) + 0.5f) * 255.0f;
+                        Green = (((Green - 0.5f) * value) + 0.5f) * 255.0f;
+                        Blue = (((Blue - 0.5f) * value) + 0.5f) * 255.0f;
 
                         var iR = (int)Red;
                         iR = iR > 255 ? 255 : iR;
@@ -516,37 +516,37 @@ namespace BlueBasics
         /// <summary>
         /// Helligkeit, Kontrast und Gammawert eines Bitmaps ändern
         /// </summary>
-        /// <param name="InBitmap">Bitmap-Objekt</param>
-        /// <param name="Brightness">Heligkeit (-1 bis 1) 0 = Normal</param>
-        /// <param name="Contrast">Kontrast (-1 bis 1) 0 = Normal</param>
-        /// <param name="Gamma">Gammawert (0 bis 2) 1 = Normal</param>
+        /// <param name="inBitmap">Bitmap-Objekt</param>
+        /// <param name="brightness">Heligkeit (-1 bis 1) 0 = Normal</param>
+        /// <param name="contrast">Kontrast (-1 bis 1) 0 = Normal</param>
+        /// <param name="gamma">Gammawert (0 bis 2) 1 = Normal</param>
         /// <returns>Bitmap-Objekt</returns>
-        public static Bitmap SetBrightnessContrastGamma(this Bitmap InBitmap, float Brightness, float Contrast, float Gamma)
+        public static Bitmap SetBrightnessContrastGamma(this Bitmap inBitmap, float brightness, float contrast, float gamma)
         {
             // Min/Max
-            if (Brightness > 1) { Brightness = 1; }
-            if (Brightness < -1) { Brightness = -1; }
-            if (Contrast > 1) { Contrast = 1; }
-            if (Contrast < -1) { Contrast = -1; }
+            if (brightness > 1) { brightness = 1; }
+            if (brightness < -1) { brightness = -1; }
+            if (contrast > 1) { contrast = 1; }
+            if (contrast < -1) { contrast = -1; }
 
             // Gammawert darf nicht = 0 sein (Bug in GDI+)
-            if (Gamma == 0) { Gamma = Convert.ToSingle(Gamma + 1.0E-45); }
+            if (gamma == 0) { gamma = Convert.ToSingle(gamma + 1.0E-45); }
 
             // Zur korrekten Darstellung:
-            var Diff = Brightness / 2 - Contrast / 2;
+            var Diff = brightness / 2 - contrast / 2;
 
             // ColorMatrix erstellen
             var Matrix = new ColorMatrix(new[]
             {
-                new[] {1 + Contrast, 0, 0, 0, 0},
-                new[] {0, 1 + Contrast, 0, 0, 0},
-                new[] {0, 0, 1 + Contrast, 0, 0},
+                new[] {1 + contrast, 0, 0, 0, 0},
+                new[] {0, 1 + contrast, 0, 0, 0},
+                new[] {0, 0, 1 + contrast, 0, 0},
                 new float[] {0, 0, 0, 1, 0},
-                new[] {Brightness + Diff, Brightness + Diff, Brightness + Diff, 0, 1}
+                new[] {brightness + Diff, brightness + Diff, brightness + Diff, 0, 1}
             });
 
             // Neue Bitmap erstellen
-            var NewBmp = new Bitmap(InBitmap.Width, InBitmap.Height, PixelFormat.Format24bppRgb);
+            var NewBmp = new Bitmap(inBitmap.Width, inBitmap.Height, PixelFormat.Format24bppRgb);
 
             // ImageAttribute-Objekt erstellen
             using (var ImageAttr = new ImageAttributes())
@@ -555,15 +555,15 @@ namespace BlueBasics
                 ImageAttr.SetColorMatrix(Matrix);
 
                 // Gamma für das ImageAttribute-Objekt setzen
-                ImageAttr.SetGamma(Gamma);
+                ImageAttr.SetGamma(gamma);
 
                 // Graphics-Objekt von NewBmp erstellen
                 using (var NewBmpGra = Graphics.FromImage(NewBmp))
                 {
                     // InBitmap in das Graphics-Objekt zeichnen
-                    NewBmpGra.DrawImage(InBitmap, new Rectangle(0, 0, InBitmap.Width, InBitmap.Height), 0, 0, InBitmap.Width, InBitmap.Height, GraphicsUnit.Pixel, ImageAttr);
+                    NewBmpGra.DrawImage(inBitmap, new Rectangle(0, 0, inBitmap.Width, inBitmap.Height), 0, 0, inBitmap.Width, inBitmap.Height, GraphicsUnit.Pixel, ImageAttr);
 
-                    //Graphics-Objekt löschen
+                    // Graphics-Objekt löschen
                 }
 
                 // ImageAttribute-Objekt löschen
@@ -572,19 +572,19 @@ namespace BlueBasics
             return NewBmp;
         }
 
-        public static void FillCircle(this Bitmap BMP, Color C, int X, int Y, int R)
+        public static void FillCircle(this Bitmap bMP, Color c, int x, int y, int r)
         {
-            for (var adx = -R; adx <= R; adx++)
+            for (var adx = -r; adx <= r; adx++)
             {
-                for (var ady = -R; ady <= R; ady++)
+                for (var ady = -r; ady <= r; ady++)
                 {
                     var d = Math.Sqrt(Convert.ToDouble(adx * adx + ady * ady)) - 0.5;
 
-                    var px = X + adx;
-                    var py = Y + ady;
-                    if (px >= 0 && py >= 0 && px < BMP.Width && py < BMP.Height)
+                    var px = x + adx;
+                    var py = y + ady;
+                    if (px >= 0 && py >= 0 && px < bMP.Width && py < bMP.Height && d <= r)
                     {
-                        if (d <= R) { BMP.SetPixel(px, py, C); }
+                        bMP.SetPixel(px, py, c);
                     }
                 }
             }
@@ -800,7 +800,7 @@ namespace BlueBasics
             var red = 0.0;
 
             var filterWidth = filterMatrix.GetLength(1);
-            //var filterHeight = filterMatrix.GetLength(0);
+            // var filterHeight = filterMatrix.GetLength(0);
 
             var filterOffset = (filterWidth - 1) / 2;
             var calcOffset = 0;

@@ -3,8 +3,10 @@ using BlueBasics.Enums;
 using System.Collections.Generic;
 using static BlueBasics.FileOperations;
 
-namespace BlueControls.Forms {
-    public static class FileDialogs {
+namespace BlueControls.Forms
+{
+    public static class FileDialogs
+    {
 
 
         //#region FileDialogs
@@ -59,10 +61,12 @@ namespace BlueControls.Forms {
         /// <param name="Filelist"></param>
         /// <param name="Meldungen"></param>
         /// <returns>True, wenn mindestens eine DAtei gelöscht wurde.</returns>
-        public static bool DeleteFile(List<string> Filelist, bool Meldungen) {
+        public static bool DeleteFile(List<string> Filelist, bool Meldungen)
+        {
             var ButtonNumber = 0;
 
-            for (var Z = 0; Z < Filelist.Count; Z++) {
+            for (var Z = 0; Z < Filelist.Count; Z++)
+            {
                 if (!FileExists(Filelist[Z])) { Filelist[Z] = ""; }
             }
 
@@ -71,16 +75,21 @@ namespace BlueControls.Forms {
             if (Filelist.Count == 0) { return false; }
 
 
-            if (Meldungen) {
-                if (Filelist.Count == 1) {
+            if (Meldungen)
+            {
+                if (Filelist.Count == 1)
+                {
                     ButtonNumber = MessageBox.Show("Soll die Datei<br>\"" + Filelist[0] + "\"<br>wirklich <b>gelöscht</b> werden?\"", enImageCode.Warnung, "Ja - löschen", "Nein - abbrechen");
-                } else {
+                }
+                else
+                {
                     ButtonNumber = MessageBox.Show("Sollen wirklich " + Filelist.Count + " Dateien<br><b>gelöscht</b> werden?\"", enImageCode.Warnung, "Ja - löschen", "Nein - abbrechen");
                 }
 
             }
 
-            if (ButtonNumber == 0) {
+            if (ButtonNumber == 0)
+            {
                 return FileOperations.DeleteFile(Filelist);
             }
             return false; //nein geklickt
@@ -92,7 +101,8 @@ namespace BlueControls.Forms {
         /// <param name="Filelist"></param>
         /// <param name="Meldungen"></param>
         /// <returns>True, wenn mindestens eine DAtei gelöscht wurde.</returns>
-        public static bool DeleteFile(string File, bool Rückfrage) {
+        public static bool DeleteFile(string File, bool Rückfrage)
+        {
             var f = new List<string>
             {
                 File

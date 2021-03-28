@@ -23,9 +23,9 @@ namespace BlueBasics.EventArgs
     {
         public object Item { get; }
 
-        public ListEventArgs(object Item)
+        public ListEventArgs(object item)
         {
-            this.Item = Item;
+            this.Item = item;
         }
     }
 }

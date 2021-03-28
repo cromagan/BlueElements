@@ -23,8 +23,10 @@ using BlueControls.ItemCollection;
 using System;
 using System.Collections.Generic;
 
-namespace BlueControls.Interfaces {
-    public interface IContextMenu {
+namespace BlueControls.Interfaces
+{
+    public interface IContextMenu
+    {
 
         event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
         event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;

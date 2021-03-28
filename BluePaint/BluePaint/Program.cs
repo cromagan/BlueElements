@@ -20,13 +20,16 @@
 using System;
 using System.Globalization;
 
-namespace BluePaint {
-    internal static class Program {
+namespace BluePaint
+{
+    internal static class Program
+    {
         /// <summary>
         /// Der Haupteinstiegspunkt für die Anwendung.
         /// </summary>
         [STAThread]
-        private static void Main() {
+        private static void Main()
+        {
             var culture = new System.Globalization.CultureInfo("de-DE");
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;

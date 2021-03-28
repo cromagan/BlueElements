@@ -18,11 +18,14 @@
 #endregion
 
 
-namespace BlueDatabase.EventArgs {
-    public class CellCancelEventArgs : CellEventArgs {
+namespace BlueDatabase.EventArgs
+{
+    public class CellCancelEventArgs : CellEventArgs
+    {
 
 
-        public CellCancelEventArgs(ColumnItem Column, RowItem Row, string CancelReason) : base(Column, Row) {
+        public CellCancelEventArgs(ColumnItem Column, RowItem Row, string CancelReason) : base(Column, Row)
+        {
             this.CancelReason = CancelReason;
         }
 

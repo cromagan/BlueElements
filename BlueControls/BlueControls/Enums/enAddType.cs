@@ -18,9 +18,11 @@
 #endregion
 
 
-namespace BlueControls.Enums {
+namespace BlueControls.Enums
+{
 
-    public enum enAddType {
+    public enum enAddType
+    {
 
         /// <summary>
         /// Add-Button wird nicht angezeigt, und auch niemals das Add-Ereignis ausgelöst.

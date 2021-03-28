@@ -22,7 +22,7 @@ using System;
 namespace BlueBasics.Enums
 {
     [Flags]
-    public enum enAlignmentHorizontal : int
+    public enum enAlignmentHorizontal
     {
         Keine_Präferenz = -1,
         Links = System.Windows.Forms.TextFormatFlags.Left,

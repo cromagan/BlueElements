@@ -20,9 +20,11 @@
 
 using System;
 
-namespace BlueControls.Enums {
+namespace BlueControls.Enums
+{
     [Flags]
-    public enum enHelpers {
+    public enum enHelpers
+    {
         Ohne = 0,
         SmallCircle = 1,
         SymetricalHorizontal = 2,

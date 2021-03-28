@@ -23,8 +23,10 @@ using System;
 using System.Drawing;
 using System.Drawing.Text;
 
-namespace BlueControls {
-    public class ExtChar {
+namespace BlueControls
+{
+    public class ExtChar
+    {
         #region  Variablen-Deklarationen 
 
         public PointF Pos = PointF.Empty;
@@ -54,7 +56,8 @@ namespace BlueControls {
 
 
 
-        internal ExtChar(char charcode, enDesign cDesign, enStates cState, BlueFont cFont, int Stufe, enMarkState cMarkState) {
+        internal ExtChar(char charcode, enDesign cDesign, enStates cState, BlueFont cFont, int Stufe, enMarkState cMarkState)
+        {
             _Design = cDesign;
             _Char = charcode;
             Font = cFont;
@@ -75,16 +78,23 @@ namespace BlueControls {
 
 
 
-        public SizeF Size {
-            get {
+        public SizeF Size
+        {
+            get
+            {
 
                 if (!_Size.IsEmpty) { return _Size; }
 
-                if (Font == null) {
+                if (Font == null)
+                {
                     _Size = new SizeF(0, 16);
-                } else if (_Char < 0) {
+                }
+                else if (_Char < 0)
+                {
                     _Size = Font.CharSize(0f);
-                } else {
+                }
+                else
+                {
                     _Size = Font.CharSize(_Char);
 
                 }
@@ -100,7 +110,8 @@ namespace BlueControls {
         /// <param name="zoom"></param>
         /// <param name="drawingPos">Muss bereits Skaliert sein</param>
         /// <returns></returns>
-        public bool IsVisible(float zoom, Point drawingPos, Rectangle drawingArea) {
+        public bool IsVisible(float zoom, Point drawingPos, Rectangle drawingArea)
+        {
             if (drawingArea.Width < 1 && drawingArea.Height < 1) { return true; }
 
             if (drawingArea.Width > 0 && Pos.X * zoom + drawingPos.X > drawingArea.Right) { return false; }
@@ -112,18 +123,22 @@ namespace BlueControls {
             return true;
         }
 
-        public enDesign Design {
+        public enDesign Design
+        {
             get => _Design;
-            set {
+            set
+            {
                 if (value == _Design) { return; }
                 ChangeState(value, _State, _Stufe);
             }
         }
 
 
-        public enStates State {
+        public enStates State
+        {
             get => _State;
-            set {
+            set
+            {
                 if (value == _State) { return; }
                 ChangeState(_Design, value, _Stufe);
             }
@@ -132,9 +147,11 @@ namespace BlueControls {
 
         public enMarkState Marking { get; set; }
 
-        public int Stufe {
+        public int Stufe
+        {
             get => _Stufe;
-            set {
+            set
+            {
                 if (_Stufe == value) { return; }
                 ChangeState(_Design, _State, value);
             }
@@ -147,7 +164,8 @@ namespace BlueControls {
 
 
 
-        private void ChangeState(enDesign vDesign, enStates vState, int vStufe) {
+        private void ChangeState(enDesign vDesign, enStates vState, int vStufe)
+        {
             if (vState == _State && vStufe == _Stufe && vDesign == _Design) { return; }
 
             _Size = SizeF.Empty;
@@ -155,16 +173,21 @@ namespace BlueControls {
             _State = vState;
             _Stufe = vStufe;
 
-            if (vDesign == enDesign.Undefiniert || vState == enStates.Undefiniert) {
+            if (vDesign == enDesign.Undefiniert || vState == enStates.Undefiniert)
+            {
                 Font = null;
-            } else {
+            }
+            else
+            {
                 Font = Skin.GetBlueFont(vDesign, vState, vStufe);
             }
         }
 
 
-        public bool isSpace() {
-            switch ((int)_Char) {
+        public bool isSpace()
+        {
+            switch ((int)_Char)
+            {
                 case 32:
                 case 0:
                 case 9:
@@ -174,16 +197,20 @@ namespace BlueControls {
             }
         }
 
-        public bool isPossibleLineBreak() {
+        public bool isPossibleLineBreak()
+        {
             return _Char.isPossibleLineBreak();
         }
 
-        public bool isWordSeperator() {
+        public bool isWordSeperator()
+        {
             return _Char.isWordSeperator();
         }
 
-        public bool isLineBreak() {
-            switch ((int)_Char) {
+        public bool isLineBreak()
+        {
+            switch ((int)_Char)
+            {
                 case 11:
                 case 13:
                 case Top:
@@ -195,7 +222,8 @@ namespace BlueControls {
 
 
 
-        public void Draw(Graphics GR, Point PosModificator, float czoom) {
+        public void Draw(Graphics GR, Point PosModificator, float czoom)
+        {
 
             if (_Char < 20) { return; }
 
@@ -210,57 +238,74 @@ namespace BlueControls {
             var IsCap = false;
 
 
-            if (_Char < (int)enASCIIKey.ImageStart) {
+            if (_Char < (int)enASCIIKey.ImageStart)
+            {
                 GR.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
 
 
                 var c = _Char;
-                if (Font.Kapitälchen && c != char.ToUpper(c)) {
+                if (Font.Kapitälchen && c != char.ToUpper(c))
+                {
                     IsCap = true;
                     f = Font.FontWithoutLinesForCapitals(czoom);
                     c = char.ToUpper(c);
-                } else if (Font.OnlyUpper) {
+                }
+                else if (Font.OnlyUpper)
+                {
                     c = char.ToUpper(c);
-                } else if (Font.OnlyLower) {
+                }
+                else if (Font.OnlyLower)
+                {
                     c = char.ToLower(c);
                 }
-                if (Font.Underline) {
+                if (Font.Underline)
+                {
                     GR.DrawLine(Font.Pen(czoom), DrawX, (int)(DrawY + Font.Oberlänge(czoom) + (Font.Pen(1f).Width + 1) * czoom + 0.5), DrawX + (1 + Size.Width) * czoom, (int)(DrawY + Font.Oberlänge(czoom) + (Font.Pen(1f).Width + 1) * czoom + 0.5));
                 }
 
-                if (IsCap) {
+                if (IsCap)
+                {
                     DrawY += Font.KapitälchenPlus(czoom);
                 }
 
 
-                try {
-                    if (Font.Outline) {
-                        for (var PX = -1; PX <= 1; PX++) {
-                            for (var PY = -1; PY <= 1; PY++) {
+                try
+                {
+                    if (Font.Outline)
+                    {
+                        for (var PX = -1; PX <= 1; PX++)
+                        {
+                            for (var PY = -1; PY <= 1; PY++)
+                            {
                                 GR.DrawString(c.ToString(), f, Font.Brush_Color_Outline, DrawX + PX, DrawY + PY, StringFormat.GenericTypographic);
                             }
                         }
                     }
 
 
-                    if (IsCap) {
+                    if (IsCap)
+                    {
                         GR.DrawString(c.ToString(), f, Font.Brush_Color_Main, DrawX + 0.3F * czoom, DrawY, StringFormat.GenericTypographic);
                     }
 
                     GR.DrawString(c.ToString(), f, Font.Brush_Color_Main, DrawX, DrawY, StringFormat.GenericTypographic);
 
 
-                    if (Font.StrikeOut) {
+                    if (Font.StrikeOut)
+                    {
                         GR.DrawLine(Font.Pen(czoom), DrawX - 1, (int)(DrawY + Size.Height * 0.55), (int)(DrawX + 1 + Size.Width), (int)(DrawY + Size.Height * 0.55));
                     }
 
 
-                    if (_Size.Width < 1) {
+                    if (_Size.Width < 1)
+                    {
                         GR.DrawLine(new Pen(Color.Red), DrawX + 1, DrawY - 4, DrawX + 1, DrawY + 16);
                     }
 
 
-                } catch (Exception) {
+                }
+                catch (Exception)
+                {
                     //Develop.DebugPrint(Ex);
                 }
 
@@ -272,16 +317,20 @@ namespace BlueControls {
             {
                 // Sind es KEINE Integer bei DrawX / DrawY, kommt es zu extrem unschönen Effekten. Gerade Linien scheinen verschwommen zu sein. (Checkbox-Kästchen)
 
-                if (Math.Abs(czoom - 1) < 0.001) {
+                if (Math.Abs(czoom - 1) < 0.001)
+                {
                     var BNR = QuickImage.Get(_Char - (int)enASCIIKey.ImageStart);
                     if (BNR == null) { return; }
                     GR.DrawImage(BNR.BMP, (int)DrawX, (int)DrawY);
-                } else {
+                }
+                else
+                {
                     var l = QuickImage.Get(_Char - (int)enASCIIKey.ImageStart);
 
                     if (l == null || l.Width == 0) { l = QuickImage.Get("Warnung|16"); }
 
-                    if (l.Width > 0) {
+                    if (l.Width > 0)
+                    {
                         GR.DrawImage(QuickImage.Get(l.Name, (int)(l.Width * czoom)).BMP, (int)DrawX, (int)DrawY);
                     }
 
@@ -290,9 +339,11 @@ namespace BlueControls {
             }
         }
 
-        public string ToHTML() {
+        public string ToHTML()
+        {
 
-            switch ((int)_Char) {
+            switch ((int)_Char)
+            {
                 case 13:
                     return "<br>";
                 //case enEtxtCodes.HorizontalLine:

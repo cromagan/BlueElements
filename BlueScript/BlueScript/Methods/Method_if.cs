@@ -22,8 +22,10 @@ using Skript.Enums;
 using System.Collections.Generic;
 using static BlueBasics.Extensions;
 
-namespace BlueScript {
-    internal class Method_if : Method {
+namespace BlueScript
+{
+    internal class Method_if : Method
+    {
 
         public override string Syntax => "if (true) { Code zum ausführen }";
         public override string Description => "Nur wenn der Wert in der Klammer TRUE ist, wird der nachfolgende Codeblock ausgeführt.";
@@ -36,14 +38,18 @@ namespace BlueScript {
         public override bool EndlessArgs => false;
 
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
+        {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
-            if (attvar[0].ValueBool) {
+            if (attvar[0].ValueBool)
+            {
                 (var err, var ermess2) = Script.Parse(infos.CodeBlockAfterText, false, s);
                 if (!string.IsNullOrEmpty(err)) { return new strDoItFeedback(err); }
-            } else {
+            }
+            else
+            {
                 s.Line += infos.LineBreakInCodeBlock;
             }
             return new strDoItFeedback(string.Empty, string.Empty);
@@ -51,10 +57,12 @@ namespace BlueScript {
 
 
 
-        public static string? GetBool(string txt) {
+        public static string? GetBool(string txt)
+        {
             txt = txt.DeKlammere(true, false, false);
 
-            switch (txt.ToLower()) {
+            switch (txt.ToLower())
+            {
                 case "true":
                     return "true";
                 case "false":
@@ -84,7 +92,8 @@ namespace BlueScript {
 
             #region Klammern zuerst berechnen
             (var posa, var _) = Script.NextText(txt, 0, new List<string>() { "(" }, false, false);
-            if (posa > -1) {
+            if (posa > -1)
+            {
                 (var pose, var _) = Script.NextText(txt, posa, new List<string>() { ")" }, false, false);
 
                 if (pose < posa) { return null; }
@@ -134,7 +143,8 @@ namespace BlueScript {
 
         }
 
-        private static string GetBoolTMP(string txt, string check) {
+        private static string GetBoolTMP(string txt, string check)
+        {
             (var i, var _) = Script.NextText(txt, 0, new List<string>() { check }, false, false);
 
 
@@ -150,7 +160,8 @@ namespace BlueScript {
 
             var gans = false;
 
-            do {
+            do
+            {
                 if (start < 0) { break; }
                 var ze = txt.Substring(start, 1);
                 if (!gans && trenn.Contains(ze)) { break; }
@@ -158,7 +169,8 @@ namespace BlueScript {
                 start--;
             } while (true);
 
-            do {
+            do
+            {
                 if (ende >= txt.Length) { break; }
                 var ze = txt.Substring(ende, 1);
                 if (!gans && trenn.Contains(ze)) { break; }
@@ -180,20 +192,24 @@ namespace BlueScript {
 
 
             // V2 braucht nicht gepürft werden, muss ja eh der gleiche TYpe wie V1 sein
-            if (v1 != null) {
+            if (v1 != null)
+            {
                 if (v1.Type != v2.Type) { return string.Empty; }
 
                 if (v1.Type != Skript.Enums.enVariableDataType.Bool &&
                     v1.Type != Skript.Enums.enVariableDataType.Number &&
                     v1.Type != Skript.Enums.enVariableDataType.String) { return string.Empty; }
-            } else {
+            }
+            else
+            {
                 if (v2.Type != Skript.Enums.enVariableDataType.Bool) { return string.Empty; }
             }
 
 
             var replacer = string.Empty;
 
-            switch (check) {
+            switch (check)
+            {
                 case "==":
                     replacer = "false";
                     if (v1.ValueString == v2.ValueString) { replacer = "true"; }

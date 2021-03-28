@@ -26,17 +26,21 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace BlueControls.Forms {
+namespace BlueControls.Forms
+{
 
     /// <summary>
     /// Typischerweise für Dropdownmenüs oder dem KontextMenu
     /// </summary>
-    public partial class FloatingInputBoxListBoxStyle : BlueControls.Forms.FloatingForm {
-        private FloatingInputBoxListBoxStyle() : base(enDesign.Form_QuickInfo) {
+    public partial class FloatingInputBoxListBoxStyle : BlueControls.Forms.FloatingForm
+    {
+        private FloatingInputBoxListBoxStyle() : base(enDesign.Form_QuickInfo)
+        {
             InitializeComponent();
         }
 
-        private FloatingInputBoxListBoxStyle(ItemCollectionList Items, int Xpos, int Ypos, int SteuerWi, object Tag, System.Windows.Forms.Control ConnectedControl, bool Translate) : base(ConnectedControl, Items.ControlDesign) {
+        private FloatingInputBoxListBoxStyle(ItemCollectionList Items, int Xpos, int Ypos, int SteuerWi, object Tag, System.Windows.Forms.Control ConnectedControl, bool Translate) : base(ConnectedControl, Items.ControlDesign)
+        {
             InitializeComponent();
             this.Tag = Tag;
             // Design = Items.ControlDesign;
@@ -72,18 +76,21 @@ namespace BlueControls.Forms {
         private bool _MouseWasDown = false;
 
 
-        public static FloatingInputBoxListBoxStyle Show(ItemCollectionList Items, object Tag, System.Windows.Forms.Control ConnectedControl, bool Translate) {
+        public static FloatingInputBoxListBoxStyle Show(ItemCollectionList Items, object Tag, System.Windows.Forms.Control ConnectedControl, bool Translate)
+        {
             return new FloatingInputBoxListBoxStyle(Items, System.Windows.Forms.Cursor.Position.X - 8, System.Windows.Forms.Cursor.Position.Y - 8, -1, Tag, ConnectedControl, Translate);
         }
 
 
-        public static FloatingInputBoxListBoxStyle Show(ItemCollectionList Items, int Xpos, int Ypos, int SteuerWi, object Tag, System.Windows.Forms.Control ConnectedControl, bool Translate) {
+        public static FloatingInputBoxListBoxStyle Show(ItemCollectionList Items, int Xpos, int Ypos, int SteuerWi, object Tag, System.Windows.Forms.Control ConnectedControl, bool Translate)
+        {
             return new FloatingInputBoxListBoxStyle(Items, Xpos, Ypos, SteuerWi, Tag, ConnectedControl, Translate);
         }
 
         #region  ListBox1 
 
-        public void Generate_ListBox1(ItemCollectionList ItemsOri, int MinWidth, enAddType AddNewAllowed, bool Translate) {
+        public void Generate_ListBox1(ItemCollectionList ItemsOri, int MinWidth, enAddType AddNewAllowed, bool Translate)
+        {
 
             var itemsClone = (ItemCollectionList)ItemsOri.Clone();
 
@@ -118,7 +125,8 @@ namespace BlueControls.Forms {
 
             if (BiggestItemX > MaxWi) { BiggestItemX = MaxWi; }
 
-            if (HeightAdded > MaxHe) {
+            if (HeightAdded > MaxHe)
+            {
                 HeightAdded = MaxHe;
                 BiggestItemX += 20;
             }
@@ -132,20 +140,23 @@ namespace BlueControls.Forms {
             lstbx.Item.AddRange(itemsClone);
         }
 
-        private void ListBox1_ItemClicked(object sender, BasicListItemEventArgs e) {
+        private void ListBox1_ItemClicked(object sender, BasicListItemEventArgs e)
+        {
 
             // Selectet Chanched bringt nix, da es ja drum geht, ob eine Node angeklickt wurde.
             // Nur Listboxen können überhaupt erst Checked werden!
             // Ob sie Checked wird, ist egal!
 
 
-            if (e.Item != null) {
+            if (e.Item != null)
+            {
 
                 // Einen Klick auf Überschriften einfach ignorieren, zB. kontextmenü
                 if (!e.Item.IsClickable()) { return; }
 
 
-                if (lstbx.Appearance != enBlueListBoxAppearance.Listbox && lstbx.Appearance != enBlueListBoxAppearance.Gallery && lstbx.Appearance != enBlueListBoxAppearance.FileSystem) {
+                if (lstbx.Appearance != enBlueListBoxAppearance.Listbox && lstbx.Appearance != enBlueListBoxAppearance.Gallery && lstbx.Appearance != enBlueListBoxAppearance.FileSystem)
+                {
                     OnItemClicked(new ContextMenuItemClickedEventArgs(e.Item.Internal, Tag, null)); // Das Tag hier ist eigentlich das HotItem
                     if (!IsDisposed) { Close(); }
                     return;
@@ -153,7 +164,8 @@ namespace BlueControls.Forms {
             }
         }
 
-        private void OnItemClicked(ContextMenuItemClickedEventArgs e) {
+        private void OnItemClicked(ContextMenuItemClickedEventArgs e)
+        {
             ItemClicked?.Invoke(this, e);
         }
 
@@ -161,22 +173,26 @@ namespace BlueControls.Forms {
         #endregion
 
 
-        private void OnCancel() {
+        private void OnCancel()
+        {
             Cancel?.Invoke(this, System.EventArgs.Empty);
         }
 
-        private void timer1_Tick(object sender, System.EventArgs e) {
+        private void timer1_Tick(object sender, System.EventArgs e)
+        {
 
             var MouseIsDown = !string.IsNullOrEmpty(modAllgemein.LastMouseButton());
 
-            if (MouseIsDown && !_MouseWasDown && !IsMouseInForm()) {
+            if (MouseIsDown && !_MouseWasDown && !IsMouseInForm())
+            {
                 // erster Klick ausserhalb des Forms
                 Close();
                 OnCancel();
                 return;
             }
 
-            if (_MouseWasDown && !MouseIsDown && IsMouseInForm()) {
+            if (_MouseWasDown && !MouseIsDown && IsMouseInForm())
+            {
                 // Maus ausserhalb der Form ausgelassen
                 _MouseWasDown = false;
                 return;
@@ -186,14 +202,16 @@ namespace BlueControls.Forms {
 
         }
 
-        public override void Refresh() {
+        public override void Refresh()
+        {
             Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
             base.Refresh();
             OnPaint(null);
         }
 
 
-        public static void ContextMenuShow(IContextMenu Control, System.Windows.Forms.MouseEventArgs e) {
+        public static void ContextMenuShow(IContextMenu Control, System.Windows.Forms.MouseEventArgs e)
+        {
 
             FloatingInputBoxListBoxStyle.Close(enBlueListBoxAppearance.KontextMenu);
             FloatingInputBoxListBoxStyle.Close(Control);
@@ -224,10 +242,12 @@ namespace BlueControls.Forms {
 
 
 
-            if (ThisContextMenu.Count > 0) {
+            if (ThisContextMenu.Count > 0)
+            {
 
 
-                if (par != null) {
+                if (par != null)
+                {
                     ThisContextMenu.AddSeparator();
                     ThisContextMenu.Add(enContextMenuComands.WeitereBefehle);
                 }
@@ -245,15 +265,19 @@ namespace BlueControls.Forms {
 
                 var _ContextMenu = FloatingInputBoxListBoxStyle.Show(ThisContextMenu, Infos, (System.Windows.Forms.Control)Control, Translate);
                 _ContextMenu.ItemClicked += _ContextMenu_ItemClicked;
-            } else {
-                if (par != null) {
+            }
+            else
+            {
+                if (par != null)
+                {
                     ContextMenuShow(par, e);
                 }
 
             }
         }
 
-        private static void _ContextMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
+        private static void _ContextMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e)
+        {
             var Infos = (List<object>)e.HotItem;
             var UserMmenu = (ItemCollectionList)Infos[0];
             var HotItem = Infos[1];
@@ -263,10 +287,12 @@ namespace BlueControls.Forms {
             FloatingInputBoxListBoxStyle.Close(enBlueListBoxAppearance.KontextMenu);
             FloatingInputBoxListBoxStyle.Close(ob);
 
-            if (e.ClickedComand.ToLower() == "weiterebefehle") {
+            if (e.ClickedComand.ToLower() == "weiterebefehle")
+            {
                 var par = ob.ParentControlWithCommands();
 
-                if (par != null) {
+                if (par != null)
+                {
                     ContextMenuShow(par, null);
 
                 }
@@ -282,14 +308,18 @@ namespace BlueControls.Forms {
             var ex = new ContextMenuItemClickedEventArgs(e.ClickedComand, HotItem, Tags);
             var done = false;
 
-            if (UserMmenu[e.ClickedComand] == null) {
+            if (UserMmenu[e.ClickedComand] == null)
+            {
                 done = ob.ContextMenuItemClickedInternalProcessig(sender, ex);
-            } else {
+            }
+            else
+            {
                 done = true; //keine Prüfung implementiert
                 ob.OnContextMenuItemClicked(ex);
             }
 
-            if (!done) {
+            if (!done)
+            {
                 Develop.DebugPrint("Kontextmenu-Befehl nicht ausgeführt: " + e.ClickedComand);
             }
 

@@ -26,19 +26,23 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 
-namespace BlueControls.ItemCollection {
-    public class SymbolPadItem : FormPadItemRectangle {
+namespace BlueControls.ItemCollection
+{
+    public class SymbolPadItem : FormPadItemRectangle
+    {
         public SymbolPadItem(ItemCollectionPad parent) : this(parent, string.Empty) { }
 
 
-        public SymbolPadItem(ItemCollectionPad parent, string internalname) : base(parent, internalname, false) {
+        public SymbolPadItem(ItemCollectionPad parent, string internalname) : base(parent, internalname, false)
+        {
             Symbol = enSymbol.Pfeil;
             Hintergrundfarbe = Color.White;
             Randfarbe = Color.Black;
             Randdicke = 1;
         }
 
-        protected override string ClassId() {
+        protected override string ClassId()
+        {
             return "Symbol";
         }
 
@@ -52,7 +56,8 @@ namespace BlueControls.ItemCollection {
 
 
 
-        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
+        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
+        {
 
             var trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
 
@@ -68,7 +73,8 @@ namespace BlueControls.ItemCollection {
             d2.X = -DCoordinates.Width / 2;
             d2.Y = -DCoordinates.Height / 2;
 
-            switch (Symbol) {
+            switch (Symbol)
+            {
                 case enSymbol.Ohne:
                     break;
 
@@ -86,7 +92,8 @@ namespace BlueControls.ItemCollection {
 
             }
 
-            if (p != null) {
+            if (p != null)
+            {
                 GR.FillPath(new SolidBrush(Hintergrundfarbe), p);
                 GR.DrawPath(new Pen(Randfarbe, (float)(Randdicke * cZoom * Parent.SheetStyleScale)), p);
             }
@@ -101,7 +108,8 @@ namespace BlueControls.ItemCollection {
 
 
 
-        public override List<FlexiControl> GetStyleOptions() {
+        public override List<FlexiControl> GetStyleOptions()
+        {
             var l = new List<FlexiControl>
             {
                 new FlexiControl()
@@ -143,7 +151,8 @@ namespace BlueControls.ItemCollection {
         //}
 
 
-        public override string ToString() {
+        public override string ToString()
+        {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
             t = t + "Symbol=" + (int)Symbol + ", ";
@@ -155,10 +164,12 @@ namespace BlueControls.ItemCollection {
         }
 
 
-        public override bool ParseThis(string tag, string value) {
+        public override bool ParseThis(string tag, string value)
+        {
             if (base.ParseThis(tag, value)) { return true; }
 
-            switch (tag) {
+            switch (tag)
+            {
                 case "symbol":
                     Symbol = (enSymbol)int.Parse(value);
                     return true;

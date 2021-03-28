@@ -21,13 +21,13 @@ namespace BlueBasics.Interfaces
 {
     public static class IntegerArrayExtension
     {
-        public static string[] ToStringArray(this int[] Ar)
+        public static string[] ToStringArray(this int[] ar)
         {
-            var sar = new string[Ar.GetUpperBound(0) + 1];
+            var sar = new string[ar.GetUpperBound(0) + 1];
 
-            for (var z = 0; z <= Ar.GetUpperBound(0); z++)
+            for (var z = 0; z <= ar.GetUpperBound(0); z++)
             {
-                sar[z] = Ar[z].ToString().Trim();
+                sar[z] = ar[z].ToString().Trim();
             }
 
             return sar;

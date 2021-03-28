@@ -20,9 +20,12 @@
 
 using BlueControls.ItemCollection;
 
-namespace BlueControls.EventArgs {
-    public class BasicListItemEventArgs : System.EventArgs {
-        public BasicListItemEventArgs(BasicListItem item) {
+namespace BlueControls.EventArgs
+{
+    public class BasicListItemEventArgs : System.EventArgs
+    {
+        public BasicListItemEventArgs(BasicListItem item)
+        {
             Item = item;
         }
 

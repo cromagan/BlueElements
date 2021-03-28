@@ -19,7 +19,7 @@
 
 namespace BlueBasics.Enums
 {
-    public enum BlurType : int
+    public enum BlurType
     {
         Mean3x3,
         Mean5x5,

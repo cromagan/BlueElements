@@ -30,17 +30,15 @@ namespace BlueBasics.Enums
 
         Durchgestrichen = 1,
 
-        //SpiegelnX = 2,
-        //SpiegelnY = 4,
+        // SpiegelnX = 2,
+        // SpiegelnY = 4,
 
         Graustufen = 8,
 
-
         WindowsMEDisabled = 16,
 
-
-        //StdDarken = 32
-        //StdLighten = 64
+        // StdDarken = 32
+        // StdLighten = 64
 
         WindowsXPDisabled = 128
 

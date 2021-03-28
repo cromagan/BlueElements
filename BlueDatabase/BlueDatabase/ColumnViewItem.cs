@@ -24,8 +24,10 @@ using BlueDatabase.Enums;
 using System;
 using System.Drawing;
 
-namespace BlueDatabase {
-    public sealed class ColumnViewItem : IParseable {
+namespace BlueDatabase
+{
+    public sealed class ColumnViewItem : IParseable
+    {
         #region  Variablen-Deklarationen 
 
         private readonly Database DatabaseForParse;
@@ -72,7 +74,8 @@ namespace BlueDatabase {
         /// <summary>
         /// Info: Es wird keine Änderung ausgelöst
         /// </summary>
-        private void Initialize() {
+        private void Initialize()
+        {
             _ViewType = enViewType.None;
             Column = null;
             _Spalte_X1 = 0;
@@ -89,7 +92,8 @@ namespace BlueDatabase {
         /// <summary>
         /// Info: Es wird keine Änderung ausgelöst
         /// </summary>
-        public ColumnViewItem(ColumnItem Column, enViewType Type) {
+        public ColumnViewItem(ColumnItem Column, enViewType Type)
+        {
             Initialize();
             this.Column = Column;
             _ViewType = Type;
@@ -99,7 +103,8 @@ namespace BlueDatabase {
         /// <summary>
         /// Info: Es wird keine Änderung ausgelöst
         /// </summary>
-        public ColumnViewItem(ColumnItem Column, enÜberschriftAnordnung Überschrift) {
+        public ColumnViewItem(ColumnItem Column, enÜberschriftAnordnung Überschrift)
+        {
             Initialize();
             this.Column = Column;
             _ViewType = enViewType.Column;
@@ -112,7 +117,8 @@ namespace BlueDatabase {
         /// <summary>
         /// Info: Es wird keine Änderung ausgelöst
         /// </summary>
-        public ColumnViewItem(Database Database, string Code) {
+        public ColumnViewItem(Database Database, string Code)
+        {
             DatabaseForParse = Database;
             Parse(Code);
             DatabaseForParse = null;
@@ -125,18 +131,22 @@ namespace BlueDatabase {
 
         public bool IsParsing { get; private set; }
 
-        public enViewType ViewType {
+        public enViewType ViewType
+        {
             get => _ViewType;
-            set {
+            set
+            {
                 if (value == _ViewType) { return; }
                 _ViewType = value;
                 OnChanged();
             }
         }
 
-        public enÜberschriftAnordnung ÜberschriftAnordnung {
+        public enÜberschriftAnordnung ÜberschriftAnordnung
+        {
             get => _ÜberschriftAnordnung;
-            set {
+            set
+            {
                 if (value == _ÜberschriftAnordnung) { return; }
                 _ÜberschriftAnordnung = value;
                 OnChanged();
@@ -147,9 +157,11 @@ namespace BlueDatabase {
         /// <summary>
         /// Nur wichtig für Formular
         /// </summary>
-        public int Spalte_X1 {
+        public int Spalte_X1
+        {
             get => _Spalte_X1;
-            set {
+            set
+            {
                 if (value == _Spalte_X1) { return; }
                 _Spalte_X1 = value;
                 OnChanged();
@@ -159,18 +171,22 @@ namespace BlueDatabase {
         /// <summary>
         /// Nur wichtig für Formular
         /// </summary>
-        public int Width {
+        public int Width
+        {
             get => _Spalte_Width;
-            set {
+            set
+            {
                 if (value == _Spalte_Width) { return; }
                 _Spalte_Width = value;
                 OnChanged();
             }
         }
 
-        public int Height {
+        public int Height
+        {
             get => _Spalte_Height;
-            set {
+            set
+            {
                 if (value == _Spalte_Height) { return; }
                 _Spalte_Height = value;
                 OnChanged();
@@ -191,7 +207,8 @@ namespace BlueDatabase {
         /// <summary>
         /// Info: Es wird keine Änderung ausgelöst
         /// </summary>
-        public void KoordÄndern(int ModX, int ModW, int ModH) {
+        public void KoordÄndern(int ModX, int ModW, int ModH)
+        {
             _Spalte_X1 += ModX;
             _Spalte_Width += ModW;
             _Spalte_Height += ModH;
@@ -203,7 +220,8 @@ namespace BlueDatabase {
             if (_Spalte_Width > 20) { _Spalte_Width = 20; }
 
             if (_Spalte_Height < 1) { _Spalte_Height = 1; }
-            if (_Spalte_Height > 30 && ModH > 0) {
+            if (_Spalte_Height > 30 && ModH > 0)
+            {
 
                 //if (MessageBox.Show("Resthöhe benutzen?", enImageCode.Frage, "Ja", "Nein") == 1)
                 //{
@@ -223,7 +241,8 @@ namespace BlueDatabase {
 
 
 
-        public override string ToString() {
+        public override string ToString()
+        {
             var Result = "{Type=" + (int)(_ViewType);
             if (Column != null) { Result = Result + ", " + Column.ParsableColumnKey(); }
             if (_Spalte_X1 > 0) { Result = Result + ", X=" + _Spalte_X1; }
@@ -234,11 +253,14 @@ namespace BlueDatabase {
         }
 
 
-        public void Parse(string ToParse) {
+        public void Parse(string ToParse)
+        {
             IsParsing = true;
             Initialize();
-            foreach (var pair in ToParse.GetAllTags()) {
-                switch (pair.Key) {
+            foreach (var pair in ToParse.GetAllTags())
+            {
+                switch (pair.Key)
+                {
                     case "column":
                     case "columnname":// Columname wichtg, wegen CopyLayout
                         Column = DatabaseForParse.Column[pair.Value];
@@ -290,16 +312,19 @@ namespace BlueDatabase {
 
 
 
-        public ColumnViewItem PreviewsVisible(ColumnViewCollection _Parent) {
+        public ColumnViewItem PreviewsVisible(ColumnViewCollection _Parent)
+        {
             return _Parent?.PreviousVisible(this);
         }
 
-        public ColumnViewItem NextVisible(ColumnViewCollection _Parent) {
+        public ColumnViewItem NextVisible(ColumnViewCollection _Parent)
+        {
             return _Parent?.NextVisible(this);
         }
 
 
-        public void OnChanged() {
+        public void OnChanged()
+        {
             if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
             Changed?.Invoke(this, System.EventArgs.Empty);
         }

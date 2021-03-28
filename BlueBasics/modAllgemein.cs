@@ -40,7 +40,7 @@ namespace BlueBasics
 {
     public static class modAllgemein
     {
-        //private static readonly object Pause_Sleeper = new object();
+        // private static readonly object Pause_Sleeper = new object();
         private static string _GotUserName = string.Empty;
 
         [DllImport("user32", EntryPoint = "GetAsyncKeyState", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
@@ -57,29 +57,29 @@ namespace BlueBasics
         /// <summary>
         /// Pixelgenaue Collisionsanalyse zweier Bitmaps
         /// </summary>
-        /// <param name="Image1"></param>
-        /// <param name="Pos1">Linke obere Eckte des 1. Bildes</param>
-        /// <param name="Image2"></param>
-        /// <param name="Pos2">Linke obere Eckte des 2. Bildes</param>
-        /// <param name="Accuracy">Genauigkeit der Prüfung. Bei 1 wird jeder Pixel geprüft. Bei z.B. 3 wird nur jeder dritte Pixel geprüft.</param>
+        /// <param name="image1"></param>
+        /// <param name="pos1">Linke obere Eckte des 1. Bildes</param>
+        /// <param name="image2"></param>
+        /// <param name="pos2">Linke obere Eckte des 2. Bildes</param>
+        /// <param name="accuracy">Genauigkeit der Prüfung. Bei 1 wird jeder Pixel geprüft. Bei z.B. 3 wird nur jeder dritte Pixel geprüft.</param>
         /// <returns></returns>
-        public static bool IntersectsWith(Bitmap Image1, Point Pos1, Bitmap Image2, Point Pos2, int Accuracy)
+        public static bool IntersectsWith(Bitmap image1, Point pos1, Bitmap image2, Point pos2, int accuracy)
         {
-            if (Image1 == null || Image2 == null) { return false; }
+            if (image1 == null || image2 == null) { return false; }
 
-            var Koord1 = new Rectangle(Pos1, Image1.Size);
-            var Koord2 = new Rectangle(Pos2, Image2.Size);
+            var Koord1 = new Rectangle(pos1, image1.Size);
+            var Koord2 = new Rectangle(pos2, image2.Size);
 
             if (!Koord1.IntersectsWith(Koord2)) { return false; }
 
             var Schnitt = new Rectangle(Koord1.Location, Koord1.Size);
             Schnitt.Intersect(Koord2);
 
-            for (var x = Schnitt.Left; x < Schnitt.Right; x += Accuracy)
+            for (var x = Schnitt.Left; x < Schnitt.Right; x += accuracy)
             {
-                for (var y = Schnitt.Top; y < Schnitt.Bottom; y += Accuracy)
+                for (var y = Schnitt.Top; y < Schnitt.Bottom; y += accuracy)
                 {
-                    if (!Image1.GetPixel(x - Koord1.X, y - Koord1.Y).IsNearWhite(0.9) && !Image2.GetPixel(x - Koord2.X, y - Koord2.Y).IsNearWhite(0.9))
+                    if (!image1.GetPixel(x - Koord1.X, y - Koord1.Y).IsNearWhite(0.9) && !image2.GetPixel(x - Koord2.X, y - Koord2.Y).IsNearWhite(0.9))
                     {
                         return true;
                     }
@@ -89,7 +89,7 @@ namespace BlueBasics
             return false;
         }
 
-        public static List<Bitmap> SplitTiff(string fileName, int MaxSize)
+        public static List<Bitmap> SplitTiff(string fileName, int maxSize)
         {
             // Open a Stream and decode a TIFF image
             var imageStreamSource = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
@@ -103,7 +103,7 @@ namespace BlueBasics
 
                 foreach (var frame in decoder.Frames)
                 {
-                    l.Add(GetBitmap(frame, MaxSize));
+                    l.Add(GetBitmap(frame, maxSize));
                 }
             }
             catch
@@ -114,7 +114,7 @@ namespace BlueBasics
                     CollectGarbage();
 
                     var x = (Bitmap)BitmapExt.Image_FromFile(fileName);
-                    l.Add(BitmapExt.Resize(x, MaxSize, MaxSize, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true));
+                    l.Add(BitmapExt.Resize(x, maxSize, maxSize, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true));
 
                     if (frames > 1)
                     {
@@ -145,16 +145,16 @@ namespace BlueBasics
             return l;
         }
 
-        //public static Bitmap GetBitmap(BitmapSource source)
-        //{
+        // public static Bitmap GetBitmap(BitmapSource source)
+        // {
         //    var bmp = new Bitmap(source.PixelWidth, source.PixelHeight, PixelFormat.Format32bppPArgb);
         //    var data = bmp.LockBits(new Rectangle(Point.Empty, bmp.Size), ImageLockMode.WriteOnly, PixelFormat.Format32bppPArgb);
         //    source.CopyPixels(System.Windows.Int32Rect.Empty, data.Scan0, data.Height * data.Stride, data.Stride);
         //    bmp.UnlockBits(data);
         //    return bmp;
-        //}
+        // }
 
-        public static Bitmap GetBitmap(BitmapSource bitmapsource, int MaxSize)
+        public static Bitmap GetBitmap(BitmapSource bitmapsource, int maxSize)
         {
             CollectGarbage();
             Pause(0.1, true);
@@ -168,34 +168,34 @@ namespace BlueBasics
                 bitmap = new Bitmap(outStream);
             }
 
-            if (MaxSize > 0)
+            if (maxSize > 0)
             {
-                bitmap = BitmapExt.Resize(bitmap, MaxSize, MaxSize, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true);
+                bitmap = BitmapExt.Resize(bitmap, maxSize, maxSize, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true);
             }
 
             return bitmap;
         }
 
-        public static void Magnify(Bitmap Screenshot, Point Point, Graphics GR, bool SwapX)
+        public static void Magnify(Bitmap screenshot, Point point, Graphics gR, bool swapX)
         {
             const int w1 = 200; // Größe des Rechteckes
             const int w5 = 10; // Pixel zum vergrößerm
 
             var x = 0;
 
-            if (!SwapX)
+            if (!swapX)
             {
                 x = 150 - (int)(w1 / 2.0);
-                if (Point.X < Screenshot.Width / 2.0) { x = Screenshot.Width - 150 - (int)(w1 / 2.0); }
+                if (point.X < screenshot.Width / 2.0) { x = screenshot.Width - 150 - (int)(w1 / 2.0); }
             }
             else
             {
-                x = Screenshot.Width - 150 - (int)(w1 / 2.0);
-                if (Point.X < Screenshot.Width / 2.0) { x = 150 - (int)(w1 / 2.0); }
+                x = screenshot.Width - 150 - (int)(w1 / 2.0);
+                if (point.X < screenshot.Width / 2.0) { x = 150 - (int)(w1 / 2.0); }
             }
 
             var y = 150 - (int)(w1 / 2.0);
-            if (Point.Y < Screenshot.Height / 2.0) { y = Screenshot.Height - 150 - (int)(w1 / 2.0); }
+            if (point.Y < screenshot.Height / 2.0) { y = screenshot.Height - 150 - (int)(w1 / 2.0); }
 
             var r = new Rectangle(x, y, w1, w1);
 
@@ -204,26 +204,26 @@ namespace BlueBasics
                 r.Inflate(1, 1);
                 // r.Expand(0, 0, 1, 1)
                 var w = Convert.ToByte(255 / (double)10 * z);
-                GR.DrawRectangle(new Pen(Color.FromArgb(w, 0, 0, 0)), r);
+                gR.DrawRectangle(new Pen(Color.FromArgb(w, 0, 0, 0)), r);
             }
 
             r.Inflate(-5, -5);
 
-            GR.InterpolationMode = InterpolationMode.NearestNeighbor;
-            GR.PixelOffsetMode = PixelOffsetMode.Half;
-            GR.DrawImage(Screenshot, r, new Rectangle(Point.X - w5, Point.Y - w5, w5 * 2 + 1, w5 * 2 + 1), GraphicsUnit.Pixel);
-            GR.DrawRectangle(Pens.Black, r);
+            gR.InterpolationMode = InterpolationMode.NearestNeighbor;
+            gR.PixelOffsetMode = PixelOffsetMode.Half;
+            gR.DrawImage(screenshot, r, new Rectangle(point.X - w5, point.Y - w5, w5 * 2 + 1, w5 * 2 + 1), GraphicsUnit.Pixel);
+            gR.DrawRectangle(Pens.Black, r);
 
             var Mitte = r.PointOf(enAlignment.Horizontal_Vertical_Center);
 
-            GR.DrawLine(new Pen(Color.FromArgb(128, 255, 255, 255), 3), Mitte.X, Mitte.Y - 7, Mitte.X, Mitte.Y + 6);
-            GR.DrawLine(new Pen(Color.FromArgb(128, 255, 255, 255), 3), Mitte.X - 7, Mitte.Y, Mitte.X + 6, Mitte.Y);
+            gR.DrawLine(new Pen(Color.FromArgb(128, 255, 255, 255), 3), Mitte.X, Mitte.Y - 7, Mitte.X, Mitte.Y + 6);
+            gR.DrawLine(new Pen(Color.FromArgb(128, 255, 255, 255), 3), Mitte.X - 7, Mitte.Y, Mitte.X + 6, Mitte.Y);
 
-            GR.DrawLine(new Pen(Color.FromArgb(20, 255, 0, 0)), Mitte.X, r.Top, Mitte.X, r.Bottom);
-            GR.DrawLine(new Pen(Color.FromArgb(20, 255, 0, 0)), r.Left, Mitte.Y, r.Right, Mitte.Y);
+            gR.DrawLine(new Pen(Color.FromArgb(20, 255, 0, 0)), Mitte.X, r.Top, Mitte.X, r.Bottom);
+            gR.DrawLine(new Pen(Color.FromArgb(20, 255, 0, 0)), r.Left, Mitte.Y, r.Right, Mitte.Y);
 
-            GR.DrawLine(Pens.Red, Mitte.X, Mitte.Y - 6, Mitte.X, Mitte.Y + 5);
-            GR.DrawLine(Pens.Red, Mitte.X - 6, Mitte.Y, Mitte.X + 5, Mitte.Y);
+            gR.DrawLine(Pens.Red, Mitte.X, Mitte.Y - 6, Mitte.X, Mitte.Y + 5);
+            gR.DrawLine(Pens.Red, Mitte.X - 6, Mitte.Y, Mitte.X + 5, Mitte.Y);
         }
 
         public static Rectangle RectangleOfAllScreens()
@@ -252,12 +252,12 @@ namespace BlueBasics
 
         #region  Polygone
 
-        public static GraphicsPath Poly_Triangle(PointF P1, PointF P2, PointF P3)
+        public static GraphicsPath Poly_Triangle(PointF p1, PointF p2, PointF p3)
         {
             var P = new GraphicsPath();
 
-            P.AddLine(P1, P2);
-            P.AddLine(P2, P3);
+            P.AddLine(p1, p2);
+            P.AddLine(p2, p3);
 
             P.CloseFigure();
 
@@ -297,7 +297,7 @@ namespace BlueBasics
 
             return tempPoly_RoundRec;
 
-            void AddRad90(int MxX, int MxY, int Radius, int GradStart) => tempPoly_RoundRec.AddArc(MxX, MxY, Radius, Radius, GradStart, 90);
+            void AddRad90(int mxX, int mxY, int Radius, int gradStart) => tempPoly_RoundRec.AddArc(mxX, mxY, Radius, Radius, gradStart, 90);
         }
 
         public static GraphicsPath Poly_Rechteck(Rectangle rect)
@@ -357,75 +357,75 @@ namespace BlueBasics
             return p;
         }
 
-        public static void AddRad(this GraphicsPath GP, PointF middle, PointF startP, float Wink)
+        public static void AddRad(this GraphicsPath gP, PointF middle, PointF startP, float wink)
         {
             var radius = (float)Math.Abs(Geometry.Länge(middle, startP));
             var startw = (float)Geometry.Winkel(middle, startP);
 
-            GP.AddArc(middle.X - radius, middle.Y - radius, radius * 2, radius * 2, -startw, -Wink);
+            gP.AddArc(middle.X - radius, middle.Y - radius, radius * 2, radius * 2, -startw, -wink);
         }
 
         #endregion
 
         #region  Variablen und String
 
-        public static void Swap<T>(ref T W1, ref T W2)
+        public static void Swap<T>(ref T w1, ref T w2)
         {
-            var W3 = W1;
-            W1 = W2;
-            W2 = W3;
+            var W3 = w1;
+            w1 = w2;
+            w2 = W3;
         }
 
         #region  Nummer
 
-        public static string Nummer(this string Nr, int Stellen)
+        public static string Nummer(this string nr, int stellen)
         {
             var M = string.Empty;
-            if (Nr[0] == '-')
+            if (nr[0] == '-')
             {
                 M = "-";
-                Nr = Nr.Remove(0, 1);
+                nr = nr.Remove(0, 1);
             }
 
             var x = new StringBuilder();
 
-            for (var z = 1; z <= Stellen - Nr.Length; z++)
+            for (var z = 1; z <= stellen - nr.Length; z++)
             {
                 x.Append("0");
             }
 
-            x.Append(Nr);
+            x.Append(nr);
             return M + x;
         }
 
-        //public static string Nummer(this decimal Nr, int Stellen, int NachKomma)
-        //{
+        // public static string Nummer(this decimal Nr, int Stellen, int NachKomma)
+        // {
         //    return Nummer(Nr.ToString(), Stellen, NachKomma);
-        //}
+        // }
 
-        //public static string Nummer(this double Nr, int Stellen, int NachKomma)
-        //{
+        // public static string Nummer(this double Nr, int Stellen, int NachKomma)
+        // {
         //    return Nummer(Nr.ToString(), Stellen, NachKomma);
-        //}
+        // }
 
-        //public static string Nummer(this string Nrs, int Stellen, int NachKomma)
-        //{
+        // public static string Nummer(this string Nrs, int Stellen, int NachKomma)
+        // {
 
-        //    if (!Nrs.Contains(","))
+        // if (!Nrs.Contains(","))
         //    {
         //        Nrs = Nrs + ",0";
         //    }
 
-        //    var T = Nrs.Split(',');
+        // var T = Nrs.Split(',');
 
-        //    T[0] = Nummer(T[0], Stellen);
+        // T[0] = Nummer(T[0], Stellen);
 
-        //    if (T[1].Length > NachKomma)
+        // if (T[1].Length > NachKomma)
         //    {
         //        T[1] = T[1].TrimEnd('0');
         //    }
 
-        //    do
+        // do
         //    {
         //        if (T[1].Length < NachKomma)
         //        {
@@ -437,14 +437,14 @@ namespace BlueBasics
         //        }
         //    } while (true);
 
-        //    if (T[1].Length > 0)
+        // if (T[1].Length > 0)
         //    {
         //        return T[0] + "," + T[1];
         //    }
 
-        //    return T[0];
+        // return T[0];
 
-        //}
+        // }
 
         #endregion
 
@@ -469,7 +469,7 @@ namespace BlueBasics
             {
                 Develop.DoEvents();
                 AkTimer = DateTime.Now.Subtract(FirstTimer);
-            } while (!(AkTimer.TotalSeconds >= sekunden));
+            } while (AkTimer.TotalSeconds < sekunden);
         }
 
         #endregion
@@ -514,37 +514,37 @@ namespace BlueBasics
             return string.Empty;
         }
 
-        public static string Download(string Url)
+        public static string Download(string url)
         {
-            //  My.Computer.Network.DownloadFile("http://.png", "C:\TMP\a.png")
+            // My.Computer.Network.DownloadFile("http://.png", "C:\TMP\a.png")
 
             using var wc = new WebClient();
             wc.Encoding = Encoding.UTF8;
-            return wc.DownloadString(Url);
+            return wc.DownloadString(url);
         }
 
-        public static bool CreateInternetLink(string SaveTo, string linkUrl)
+        public static bool CreateInternetLink(string saveTo, string linkUrl)
         {
             var Title = "unbekannt";
 
-            //string deskDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+            // string deskDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
             try
             {
-                var x = new WebClient();
+                using var x = new WebClient();
                 var source = x.DownloadString(linkUrl);
                 Title = Regex.Match(source, @"\<title\b[^>]*\>\s*(?<Title>[\s\S]*?)\</title\>", RegexOptions.IgnoreCase).Groups["Title"].Value;
                 Title = Title.RemoveChars(Constants.Char_DateiSonderZeichen);
             }
-            catch (Exception)
+            catch
             {
-                //Title = "unbekannt";
-                //DebugPrint(enFehlerArt.Warnung, ex);
-                //return false;
+                // Title = "unbekannt";
+                // DebugPrint(enFehlerArt.Warnung, ex);
+                // return false;
             }
 
             Title = Title.ReduceToChars(Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + "!.,()+-_ " + Constants.Char_Numerals);
 
-            using (var writer = new StreamWriter(TempFile(SaveTo.TrimEnd("\\") + "\\" + Title + ".url")))
+            using (var writer = new StreamWriter(TempFile(saveTo.TrimEnd("\\") + "\\" + Title + ".url")))
             {
                 writer.WriteLine("[InternetShortcut]");
                 writer.WriteLine("URL=" + linkUrl);
@@ -554,19 +554,19 @@ namespace BlueBasics
             return true;
         }
 
-        public static string GetUrlFileDestination(string Filename)
+        public static string GetUrlFileDestination(string filename)
         {
-            var D = LoadFromDiskUTF8(Filename).SplitByCRToList();
+            var D = LoadFromDiskUTF8(filename).SplitByCRToList();
             return D.TagGet("URL");
         }
 
-        public static bool CreateShortCut(string SaveTo, string linkName)
+        public static bool CreateShortCut(string saveTo, string linkName)
         {
             try
             {
-                //string deskDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+                // string deskDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
 
-                using (var writer = new StreamWriter(TempFile(SaveTo + linkName + ".url")))
+                using (var writer = new StreamWriter(TempFile(saveTo + linkName + ".url")))
                 {
                     var app = Assembly.GetExecutingAssembly().Location;
                     writer.WriteLine("[InternetShortcut]");
@@ -586,12 +586,12 @@ namespace BlueBasics
             }
         }
 
-        public static Image DownloadImage(string Url)
+        public static Image DownloadImage(string url)
         {
             WebResponse response = null;
             Stream remoteStream = null;
             StreamReader readStream = null;
-            var request = WebRequest.Create(Url);
+            var request = WebRequest.Create(url);
             response = request.GetResponse();
             remoteStream = response.GetResponseStream();
             readStream = new StreamReader(remoteStream);
@@ -612,36 +612,36 @@ namespace BlueBasics
                 var progIdValue = userChoiceKey?.GetValue("Progid");
                 if (progIdValue != null)
                 {
-                    if (progIdValue.ToString().ToLower().Contains("chrome"))
+                    if (progIdValue.ToString().IndexOf("chrome", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
                         browserName = "chrome.exe";
                     }
-                    else if (progIdValue.ToString().ToLower().Contains("firefox"))
+                    else if (progIdValue.ToString().IndexOf("firefox", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
                         browserName = "firefox.exe";
-                        //adds = "-private-window -url";
+                        // adds = "-private-window -url";
                     }
-                    else if (progIdValue.ToString().ToLower().Contains("safari"))
+                    else if (progIdValue.ToString().IndexOf("safari", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
                         browserName = "safari.exe";
                     }
-                    else if (progIdValue.ToString().ToLower().Contains("opera"))
+                    else if (progIdValue.ToString().IndexOf("opera", StringComparison.OrdinalIgnoreCase) >= 0)
                     {
                         browserName = "opera.exe";
                     }
                 }
             }
 
-            //browserName = "edge.exe";
+            // browserName = "edge.exe";
 
             Process.Start(new ProcessStartInfo(browserName, adds + " " + url));
         }
 
-        public static int PointOnScreenNr(Point CP)
+        public static int PointOnScreenNr(Point cP)
         {
             for (var zSC = 0; zSC <= System.Windows.Forms.Screen.AllScreens.GetUpperBound(0); zSC++)
             {
-                if (CP.X >= System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Left && CP.Y >= System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Top && CP.X < System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Right && CP.Y < System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Bottom)
+                if (cP.X >= System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Left && cP.Y >= System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Top && cP.X < System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Right && cP.Y < System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Bottom)
                 {
                     return zSC;
                 }
@@ -650,43 +650,43 @@ namespace BlueBasics
             return 0;
         }
 
-        //public static string ChecksumFileName(string name)
-        //{
+        // public static string ChecksumFileName(string name)
+        // {
 
-        //    name = name.Replace("\\", "}");
+        // name = name.Replace("\\", "}");
         //    name = name.Replace("/", "}");
         //    name = name.Replace(":", "}");
         //    name = name.Replace("?", "}");
 
-        //    name = name.Replace("\r", "");
+        // name = name.Replace("\r", "");
 
-        //    if (name.Length < 100) { return name; }
+        // if (name.Length < 100) { return name; }
 
-        //    var nn = "";
+        // var nn = "";
 
-        //    for (var z = 0; z <= name.Length - 21; z++)
+        // for (var z = 0; z <= name.Length - 21; z++)
         //    {
         //        nn = nn + name.Substring(z, 1);
         //    }
         //    nn = nn + name.Substring(name.Length - 20);
 
-        //    return nn;
-        //}
+        // return nn;
+        // }
 
-        public static Stream GetEmmbedResource(Assembly assembly, string Name)
+        public static Stream GetEmmbedResource(Assembly assembly, string name)
         {
-            return (from ThisString in assembly.GetManifestResourceNames() where ThisString.EndsWith("." + Name) select assembly.GetManifestResourceStream(ThisString)).FirstOrDefault();
+            return (from ThisString in assembly.GetManifestResourceNames() where ThisString.EndsWith("." + name) select assembly.GetManifestResourceStream(ThisString)).FirstOrDefault();
         }
 
-        public static BitmapExt GetEmmbedBitmap(Assembly assembly, string Name)
+        public static BitmapExt GetEmmbedBitmap(Assembly assembly, string name)
         {
-            if (Name.Contains("|")) { return null; }
-            if (Name.Contains("[")) { return null; }
+            if (name.Contains("|")) { return null; }
+            if (name.Contains("[")) { return null; }
 
-            using var d = GetEmmbedResource(assembly, Name);
+            using var d = GetEmmbedResource(assembly, name);
             if (d == null) { return null; }
 
-            switch (Name.FileType())
+            switch (name.FileType())
             {
                 case enFileFormat.Image:
                     return new BitmapExt(new Bitmap(d));
@@ -695,7 +695,7 @@ namespace BlueBasics
                     return new BitmapExt(new Icon(d));
 
                 default:
-                    Develop.DebugPrint(GetEmmbedResource(assembly, Name));
+                    Develop.DebugPrint(GetEmmbedResource(assembly, name));
                     return null;
             }
         }
@@ -740,14 +740,14 @@ namespace BlueBasics
             return d[l1, l2];
         }
 
-        public static void IntensifyBitmap(ref Bitmap BMP)
+        public static void IntensifyBitmap(ref Bitmap bMP)
         {
-            for (var X = 0; X < BMP.Width; X++)
+            for (var X = 0; X < bMP.Width; X++)
             {
-                for (var Y = 0; Y < BMP.Height; Y++)
+                for (var Y = 0; Y < bMP.Height; Y++)
                 {
-                    var c = BMP.GetPixel(X, Y);
-                    if (c.A > 0.5 && BMP.GetPixel(X, Y).GetBrightness() < 0.9) { BMP.SetPixel(X, Y, Color.Black); }
+                    var c = bMP.GetPixel(X, Y);
+                    if (c.A > 0.5 && bMP.GetPixel(X, Y).GetBrightness() < 0.9) { bMP.SetPixel(X, Y, Color.Black); }
                 }
             }
         }
@@ -775,14 +775,14 @@ namespace BlueBasics
             return et / (1 + et) * 2 - 1;
         }
 
-        public static byte[] SimpleCrypt(byte[] b, string Pass, int Direction, int Start, int End)
+        public static byte[] SimpleCrypt(byte[] b, string pass, int direction, int start, int end)
         {
-            if (string.IsNullOrEmpty(Pass)) { return b; }
-            if (End <= Start) { return b; }
+            if (string.IsNullOrEmpty(pass)) { return b; }
+            if (end <= start) { return b; }
 
-            for (var z = Start; z <= End; z++)
+            for (var z = start; z <= end; z++)
             {
-                var TMP = b[z] + Pass[z % Pass.Length] * Direction;
+                var TMP = b[z] + pass[z % pass.Length] * direction;
                 if (TMP < 0) { TMP += 256; }
                 if (TMP > 255) { TMP -= 256; }
                 b[z] = (byte)TMP;
@@ -791,19 +791,19 @@ namespace BlueBasics
             return b;
         }
 
-        public static byte[] SimpleCrypt(byte[] b, string Pass, int Direction)
+        public static byte[] SimpleCrypt(byte[] b, string pass, int direction)
         {
-            return SimpleCrypt(b, Pass, Direction, 0, b.GetUpperBound(0));
+            return SimpleCrypt(b, pass, direction, 0, b.GetUpperBound(0));
         }
 
-        public static List<byte> SimpleCrypt(List<byte> b, string Pass, int Direction, int Start, int End)
+        public static List<byte> SimpleCrypt(List<byte> b, string pass, int direction, int start, int end)
         {
-            if (string.IsNullOrEmpty(Pass)) { return b; }
-            if (End <= Start) { return b; }
+            if (string.IsNullOrEmpty(pass)) { return b; }
+            if (end <= start) { return b; }
 
-            for (var z = Start; z <= End; z++)
+            for (var z = start; z <= end; z++)
             {
-                var TMP = b[z] + Pass[z % Pass.Length] * Direction;
+                var TMP = b[z] + pass[z % pass.Length] * direction;
                 if (TMP < 0) { TMP += 256; }
                 if (TMP > 255) { TMP -= 256; }
                 b[z] = (byte)TMP;
@@ -812,9 +812,9 @@ namespace BlueBasics
             return b;
         }
 
-        public static List<byte> SimpleCrypt(List<byte> b, string Pass, int Direction)
+        public static List<byte> SimpleCrypt(List<byte> b, string pass, int direction)
         {
-            return SimpleCrypt(b, Pass, Direction, 0, b.Count - 1);
+            return SimpleCrypt(b, pass, direction, 0, b.Count - 1);
         }
     }
 }

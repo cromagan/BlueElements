@@ -32,14 +32,17 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 
-namespace BlueControls.Controls {
+namespace BlueControls.Controls
+{
 
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("ItemClicked")]
-    public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone {
+    public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone
+    {
 
         #region Constructor
-        public ListBox() : base(true, false) {
+        public ListBox() : base(true, false)
+        {
 
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
@@ -97,7 +100,8 @@ namespace BlueControls.Controls {
         #region  Properties 
 
         [DefaultValue(enCheckBehavior.SingleSelection)]
-        public enCheckBehavior CheckBehavior {
+        public enCheckBehavior CheckBehavior
+        {
             get => Item.CheckBehavior;
             set => Item.CheckBehavior = value;
         }
@@ -115,9 +119,11 @@ namespace BlueControls.Controls {
         public ItemCollectionList Suggestions { get; } = new ItemCollectionList();
 
         [DefaultValue(enBlueListBoxAppearance.Listbox)]
-        public enBlueListBoxAppearance Appearance {
+        public enBlueListBoxAppearance Appearance
+        {
             get => _Appearance;
-            set {
+            set
+            {
                 if (_Appearance == value) { return; }
                 _Appearance = value;
                 Item.Appearance = value;
@@ -126,9 +132,11 @@ namespace BlueControls.Controls {
 
 
         [DefaultValue(false)]
-        public bool RemoveAllowed {
+        public bool RemoveAllowed
+        {
             get => _RemoveAllowed;
-            set {
+            set
+            {
                 if (_RemoveAllowed == value) { return; }
                 _RemoveAllowed = value;
                 CheckButtons();
@@ -136,9 +144,11 @@ namespace BlueControls.Controls {
         }
 
         [DefaultValue(true)]
-        public enAddType AddAllowed {
+        public enAddType AddAllowed
+        {
             get => _AddAlloweds;
-            set {
+            set
+            {
                 if (_AddAlloweds == value) { return; }
                 _AddAlloweds = value;
                 CheckButtons();
@@ -146,9 +156,11 @@ namespace BlueControls.Controls {
         }
 
         [DefaultValue(false)]
-        public bool MoveAllowed {
+        public bool MoveAllowed
+        {
             get => _MoveAllowed;
-            set {
+            set
+            {
                 if (_MoveAllowed == value) { return; }
                 _MoveAllowed = value;
                 ////if (_MoveAllowed) { _FilterAllowed = false; }
@@ -158,9 +170,11 @@ namespace BlueControls.Controls {
 
 
         [DefaultValue(false)]
-        public bool FilterAllowed {
+        public bool FilterAllowed
+        {
             get => _FilterAllowed;
-            set {
+            set
+            {
                 //  if (_MoveAllowed) { value = false; }
                 if (_FilterAllowed == value) { return; }
                 _FilterAllowed = value;
@@ -175,12 +189,14 @@ namespace BlueControls.Controls {
         #endregion
 
 
-        protected override void OnVisibleChanged(System.EventArgs e) {
+        protected override void OnVisibleChanged(System.EventArgs e)
+        {
             CheckButtons();
             base.OnVisibleChanged(e);
         }
 
-        private void CheckButtons() {
+        private void CheckButtons()
+        {
             if (!Visible) { return; }
             if (Parent == null) { return; }
 
@@ -195,30 +211,41 @@ namespace BlueControls.Controls {
             FilterCap.Visible = _FilterAllowed;
 
 
-            if (_MoveAllowed && _FilterAllowed) {
+            if (_MoveAllowed && _FilterAllowed)
+            {
                 FilterCap.Left = Down.Right;
 
-            } else {
+            }
+            else
+            {
                 FilterCap.Left = 0;
             }
 
             FilterTxt.Left = FilterCap.Right;
             FilterTxt.Width = Minus.Left - FilterTxt.Left;
 
-            if (_RemoveAllowed) {
-                if (nr.Count == 0) {
+            if (_RemoveAllowed)
+            {
+                if (nr.Count == 0)
+                {
                     Minus.Enabled = false;
-                } else {
+                }
+                else
+                {
                     Minus.Enabled = true;
                 }
             }
 
 
-            if (_MoveAllowed) {
-                if (nr.Count != 1) {
+            if (_MoveAllowed)
+            {
+                if (nr.Count != 1)
+                {
                     Up.Enabled = false;
                     Down.Enabled = false;
-                } else {
+                }
+                else
+                {
                     Up.Enabled = Item[0] != nr[0];
                     Down.Enabled = Item[Item.Count - 1] != nr[0];
                 }
@@ -226,7 +253,8 @@ namespace BlueControls.Controls {
         }
 
 
-        protected override void OnParentEnabledChanged(System.EventArgs e) {
+        protected override void OnParentEnabledChanged(System.EventArgs e)
+        {
             if (IsDisposed) { return; }
 
             Down.Invalidate();
@@ -245,28 +273,33 @@ namespace BlueControls.Controls {
 
 
 
-        protected override void OnHandleCreated(System.EventArgs e) {
+        protected override void OnHandleCreated(System.EventArgs e)
+        {
             base.OnHandleCreated(e);
             // Um den allerersten Check nicht zu verpassen
             CheckButtons();
         }
 
 
-        public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
+        public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e)
+        {
             return false;
         }
 
-        public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) {
+        public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e)
+        {
             ContextMenuItemClicked?.Invoke(this, e);
         }
 
-        private BasicListItem MouseOverNode(int X, int Y) {
+        private BasicListItem MouseOverNode(int X, int Y)
+        {
             if (ButtonsVisible() && Y >= Height - Plus.Height) { return null; }
             return Item[X, (int)(Y + SliderY.Value)];
         }
 
 
-        protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
+        protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e)
+        {
             base.OnMouseUp(e);
             if (!Enabled) { return; }
 
@@ -274,10 +307,13 @@ namespace BlueControls.Controls {
 
             if (ND != null && !ND.Enabled) { return; }
 
-            switch (e.Button) {
+            switch (e.Button)
+            {
                 case System.Windows.Forms.MouseButtons.Left:
-                    if (ND != null) {
-                        if (Appearance == enBlueListBoxAppearance.Listbox || Appearance == enBlueListBoxAppearance.Autofilter || Appearance == enBlueListBoxAppearance.Gallery || Appearance == enBlueListBoxAppearance.FileSystem) {
+                    if (ND != null)
+                    {
+                        if (Appearance == enBlueListBoxAppearance.Listbox || Appearance == enBlueListBoxAppearance.Autofilter || Appearance == enBlueListBoxAppearance.Gallery || Appearance == enBlueListBoxAppearance.FileSystem)
+                        {
                             if (ND.IsClickable()) { ND.Checked = !ND.Checked; }
                         }
                         OnItemClicked(new BasicListItemEventArgs(ND));
@@ -292,11 +328,13 @@ namespace BlueControls.Controls {
 
         }
 
-        private void OnItemClicked(BasicListItemEventArgs e) {
+        private void OnItemClicked(BasicListItemEventArgs e)
+        {
             ItemClicked?.Invoke(this, e);
         }
 
-        protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e) {
+        protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e)
+        {
             base.OnMouseWheel(e);
             if (!SliderY.Visible) { return; }
             SliderY.DoMouseWheel(e);
@@ -305,7 +343,8 @@ namespace BlueControls.Controls {
 
 
 
-        protected override void OnDoubleClick(System.EventArgs e) {
+        protected override void OnDoubleClick(System.EventArgs e)
+        {
             if (!Enabled) { return; }
 
             var ND = MouseOverNode(MousePos().X, MousePos().Y);
@@ -316,11 +355,13 @@ namespace BlueControls.Controls {
         }
 
 
-        private void OnItemDoubleClick(BasicListItemEventArgs e) {
+        private void OnItemDoubleClick(BasicListItemEventArgs e)
+        {
             ItemDoubleClick?.Invoke(this, e);
         }
 
-        private bool ButtonsVisible() {
+        private bool ButtonsVisible()
+        {
             if (Plus.Visible) { return true; }
             if (Minus.Visible) { return true; }
             if (Up.Visible) { return true; }
@@ -330,7 +371,8 @@ namespace BlueControls.Controls {
         }
 
 
-        protected override void DrawControl(Graphics gr, enStates state) {
+        protected override void DrawControl(Graphics gr, enStates state)
+        {
             if (Item != null) { Item.Appearance = _Appearance; }
             var tmp = enDesign.ListBox;
             if (_Appearance != enBlueListBoxAppearance.Gallery && _Appearance != enBlueListBoxAppearance.FileSystem) { tmp = (enDesign)_Appearance; }
@@ -343,7 +385,8 @@ namespace BlueControls.Controls {
             if (Convert.ToBoolean(vStateBox & enStates.Standard_MousePressed)) { vStateBox ^= enStates.Standard_MousePressed; }
             if (Convert.ToBoolean(vStateBox & enStates.Standard_HasFocus)) { vStateBox ^= enStates.Standard_HasFocus; }
 
-            if (Item.Count == 0) {
+            if (Item.Count == 0)
+            {
                 SliderY.Visible = false;
                 SliderY.Value = 0;
             }
@@ -362,7 +405,8 @@ namespace BlueControls.Controls {
             var VisArea = new Rectangle(BorderCoords.X, (int)(BorderCoords.Y + SliderY.Value), BorderCoords.Width, BorderCoords.Height);
 
 
-            if (BorderCoords.Height > 0) {
+            if (BorderCoords.Height > 0)
+            {
                 //// Kann sein, wenn PaintModY größer als die Höhe ist
                 //if (_Appearance == enBlueListBoxAppearance.Listbox)
                 //{
@@ -379,15 +423,18 @@ namespace BlueControls.Controls {
             var _locker = new object();
 
 
-            System.Threading.Tasks.Parallel.ForEach(Item, ThisItem => {
+            System.Threading.Tasks.Parallel.ForEach(Item, ThisItem =>
+            {
 
-                if (ThisItem.Pos.IntersectsWith(VisArea)) {
+                if (ThisItem.Pos.IntersectsWith(VisArea))
+                {
                     var vStateItem = vStateBox;
                     if (_MouseOverItem == ThisItem && Enabled) { vStateItem |= enStates.Standard_MouseOver; }
                     if (!ThisItem.Enabled) { vStateItem = enStates.Standard_Disabled; }
                     if (ThisItem.Checked) { vStateItem |= enStates.Checked; }
 
-                    lock (_locker) {
+                    lock (_locker)
+                    {
                         ThisItem.Draw(gr, 0, (int)SliderY.Value, Item.ControlDesign, Item.ItemDesign, vStateItem, true, FilterTxt.Text, false); // Items müssen beim Erstellen ersetzt werden!!!!
                     }
                 }
@@ -395,7 +442,8 @@ namespace BlueControls.Controls {
 
 
 
-            if (BorderCoords.Height > 0) {
+            if (BorderCoords.Height > 0)
+            {
                 // Kann sein, wenn PaintModY größer als die Höhe ist
                 if (tmp == enDesign.ListBox) { Skin.Draw_Border(gr, tmp, vStateBox, BorderCoords); }
             }
@@ -403,12 +451,14 @@ namespace BlueControls.Controls {
             if (PaintModYx > 0) { Skin.Draw_Back_Transparent(gr, new Rectangle(0, BorderCoords.Bottom, Width, PaintModYx), this); }
         }
 
-        private void SliderY_ValueChange(object sender, System.EventArgs e) {
+        private void SliderY_ValueChange(object sender, System.EventArgs e)
+        {
             if (IsDisposed) { return; }
             Invalidate();
         }
 
-        private void _Item_ListOrItemChanged(object sender, System.EventArgs e) {
+        private void _Item_ListOrItemChanged(object sender, System.EventArgs e)
+        {
             if (IsDisposed) { return; }
             Invalidate();
             OnListOrItemChanged();
@@ -416,22 +466,26 @@ namespace BlueControls.Controls {
 
 
 
-        protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
+        protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e)
+        {
             base.OnMouseMove(e);
 
             var ND = MouseOverNode(MousePos().X, MousePos().Y);
 
 
-            if (ND != _MouseOverItem) {
+            if (ND != _MouseOverItem)
+            {
                 _MouseOverItem = ND;
                 Invalidate();
                 DoQuickInfo();
             }
         }
 
-        protected override void OnMouseLeave(System.EventArgs e) {
+        protected override void OnMouseLeave(System.EventArgs e)
+        {
             base.OnMouseLeave(e);
-            if (_MouseOverItem != null) {
+            if (_MouseOverItem != null)
+            {
                 _MouseOverItem = null;
                 Invalidate();
             }
@@ -439,19 +493,26 @@ namespace BlueControls.Controls {
 
 
 
-        public override string QuickInfoText {
-            get {
+        public override string QuickInfoText
+        {
+            get
+            {
                 var t1 = base.QuickInfoText;
                 var t2 = string.Empty;
 
                 if (_MouseOverItem != null) { t2 = _MouseOverItem.QuickInfo; }
 
 
-                if (string.IsNullOrEmpty(t1) && string.IsNullOrEmpty(t2)) {
+                if (string.IsNullOrEmpty(t1) && string.IsNullOrEmpty(t2))
+                {
                     return string.Empty;
-                } else if (string.IsNullOrEmpty(t1) && string.IsNullOrEmpty(t2)) {
+                }
+                else if (string.IsNullOrEmpty(t1) && string.IsNullOrEmpty(t2))
+                {
                     return t1 + "<br><hr><br>" + t2;
-                } else {
+                }
+                else
+                {
                     return t1 + t2; // Eins davon ist leer
                 }
 
@@ -460,7 +521,8 @@ namespace BlueControls.Controls {
 
 
 
-        private void _Item_ItemCheckedChanged(object sender, System.EventArgs e) {
+        private void _Item_ItemCheckedChanged(object sender, System.EventArgs e)
+        {
             if (IsDisposed) { return; }
 
             CheckButtons();
@@ -469,7 +531,8 @@ namespace BlueControls.Controls {
 
         }
 
-        private void OnItemCheckedChanged() {
+        private void OnItemCheckedChanged()
+        {
             ItemCheckedChanged?.Invoke(this, System.EventArgs.Empty);
         }
 
@@ -480,13 +543,17 @@ namespace BlueControls.Controls {
         //}
 
 
-        private void Up_Click(object sender, System.EventArgs e) {
+        private void Up_Click(object sender, System.EventArgs e)
+        {
             BasicListItem LN = null;
 
-            foreach (var thisItem in Item) {
-                if (thisItem != null) {
+            foreach (var thisItem in Item)
+            {
+                if (thisItem != null)
+                {
 
-                    if (thisItem.Checked) {
+                    if (thisItem.Checked)
+                    {
                         if (LN == null) { return; }// Befehl verwerfen...
                         Item.Swap(Item.IndexOf(LN), Item.IndexOf(thisItem));
                         CheckButtons();
@@ -501,14 +568,18 @@ namespace BlueControls.Controls {
 
         }
 
-        private void Down_Click(object sender, System.EventArgs e) {
+        private void Down_Click(object sender, System.EventArgs e)
+        {
 
             var LN = -1;
 
-            for (var z = Item.Count - 1; z >= 0; z--) {
-                if (Item[z] != null) {
+            for (var z = Item.Count - 1; z >= 0; z--)
+            {
+                if (Item[z] != null)
+                {
 
-                    if (Item[z].Checked) {
+                    if (Item[z].Checked)
+                    {
                         if (LN < 0) { return; }// Befehl verwerfen...
                         Item.Swap(LN, z);
                         CheckButtons();
@@ -523,25 +594,30 @@ namespace BlueControls.Controls {
 
 
 
-        private void Minus_Click(object sender, System.EventArgs e) {
+        private void Minus_Click(object sender, System.EventArgs e)
+        {
 
             OnRemoveClicked(new ListOfBasicListItemEventArgs(Item.Checked()));
 
-            foreach (var ThisItem in Item.Checked()) {
+            foreach (var ThisItem in Item.Checked())
+            {
                 Item.Remove(ThisItem);
             }
 
             CheckButtons();
         }
 
-        private void OnRemoveClicked(ListOfBasicListItemEventArgs e) {
+        private void OnRemoveClicked(ListOfBasicListItemEventArgs e)
+        {
             RemoveClicked?.Invoke(this, e);
         }
 
 
-        public BasicListItem Add_FromFileSystem() {
+        public BasicListItem Add_FromFileSystem()
+        {
 
-            using (var f = new System.Windows.Forms.OpenFileDialog()) {
+            using (var f = new System.Windows.Forms.OpenFileDialog())
+            {
                 f.CheckFileExists = true;
                 f.CheckPathExists = true;
                 f.Multiselect = false;
@@ -556,9 +632,12 @@ namespace BlueControls.Controls {
                 //Item.Add(x);
                 var Picture = BitmapExt.Image_FromFile(f.FileNames[0]);
 
-                if (Picture != null) {
+                if (Picture != null)
+                {
                     return Item.Add((Bitmap)Picture, f.FileNames[0]);
-                } else {
+                }
+                else
+                {
                     return Item.Add(modConverter.FileToByte(f.FileNames[0]), f.FileNames[0]);
                 }
 
@@ -568,8 +647,10 @@ namespace BlueControls.Controls {
         }
 
 
-        public BasicListItem Add_TextBySuggestion() {
-            if (Suggestions == null || Suggestions.Count == 0) {
+        public BasicListItem Add_TextBySuggestion()
+        {
+            if (Suggestions == null || Suggestions.Count == 0)
+            {
                 MessageBox.Show("Keine (weiteren) Werte vorhanden.", enImageCode.Information, "OK");
                 return null;
             }
@@ -580,10 +661,12 @@ namespace BlueControls.Controls {
             return Add_Text(rück[0]);
         }
 
-        public TextListItem Add_Text(string Val) {
+        public TextListItem Add_Text(string Val)
+        {
             if (string.IsNullOrEmpty(Val)) { return null; }
 
-            foreach (var thisItem in Item) {
+            foreach (var thisItem in Item)
+            {
                 if (thisItem != null && thisItem.Internal.ToUpper() == Val.ToUpper()) { return null; }
             }
 
@@ -594,17 +677,20 @@ namespace BlueControls.Controls {
             return i;
         }
 
-        public TextListItem Add_Text() {
+        public TextListItem Add_Text()
+        {
             var Val = InputBoxComboStyle.Show("Bitte geben sie einen Wert ein:", Suggestions, true);
             return Add_Text(Val);
         }
 
 
 
-        private void Plus_Click(object sender, System.EventArgs e) {
+        private void Plus_Click(object sender, System.EventArgs e)
+        {
             OnAddClicked();
 
-            switch (_AddAlloweds) {
+            switch (_AddAlloweds)
+            {
                 case enAddType.UserDef:
                     break;
 
@@ -633,25 +719,30 @@ namespace BlueControls.Controls {
         }
 
 
-        private void OnAddClicked() {
+        private void OnAddClicked()
+        {
             AddClicked?.Invoke(this, System.EventArgs.Empty);
         }
 
 
 
-        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
+        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate)
+        {
             HotItem = MouseOverNode(e.X, e.Y);
         }
-        public void OnContextMenuInit(ContextMenuInitEventArgs e) {
+        public void OnContextMenuInit(ContextMenuInitEventArgs e)
+        {
             ContextMenuInit?.Invoke(this, e);
         }
 
-        public new void Focus() {
+        public new void Focus()
+        {
             if (Focused()) { return; }
             base.Focus();
         }
 
-        public new bool Focused() {
+        public new bool Focused()
+        {
             if (base.Focused) { return true; }
             if (Plus.Focused) { return true; }
             if (Minus.Focused) { return true; }
@@ -664,7 +755,8 @@ namespace BlueControls.Controls {
             return false;
         }
 
-        private void _Item_ItemAdded(object sender, ListEventArgs e) {
+        private void _Item_ItemAdded(object sender, ListEventArgs e)
+        {
             if (IsDisposed) { return; }
 
             //Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
@@ -676,36 +768,43 @@ namespace BlueControls.Controls {
         }
 
 
-        protected void OnItemAdded(ListEventArgs e) {
+        protected void OnItemAdded(ListEventArgs e)
+        {
             ItemAdded?.Invoke(this, e);
         }
 
 
-        protected void OnItemRemoved(System.EventArgs e) {
+        protected void OnItemRemoved(System.EventArgs e)
+        {
             ItemRemoved?.Invoke(this, e);
         }
-        protected void OnItemRemoving(ListEventArgs e) {
+        protected void OnItemRemoving(ListEventArgs e)
+        {
             ItemRemoving?.Invoke(this, e);
         }
 
 
-        private void _Item_ItemRemoving(object sender, ListEventArgs e) {
+        private void _Item_ItemRemoving(object sender, ListEventArgs e)
+        {
             if (IsDisposed) { return; }
             Invalidate();
             OnItemRemoving(e);
         }
 
-        private void _Item_ItemRemoved(object sender, System.EventArgs e) {
+        private void _Item_ItemRemoved(object sender, System.EventArgs e)
+        {
             if (IsDisposed) { return; }
             Invalidate();
             OnItemRemoved(e);
         }
 
-        private void FilterTxt_TextChanged(object sender, System.EventArgs e) {
+        private void FilterTxt_TextChanged(object sender, System.EventArgs e)
+        {
             Invalidate();
         }
 
-        public void OnListOrItemChanged() {
+        public void OnListOrItemChanged()
+        {
             ListOrItemChanged?.Invoke(this, System.EventArgs.Empty);
         }
 

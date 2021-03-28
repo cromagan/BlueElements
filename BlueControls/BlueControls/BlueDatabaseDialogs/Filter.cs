@@ -19,15 +19,18 @@
 
 using BlueControls.Controls;
 
-namespace BlueControls.BlueDatabaseDialogs {
+namespace BlueControls.BlueDatabaseDialogs
+{
 
-    public sealed partial class Filter : BlueControls.Forms.Form {
+    public sealed partial class Filter : BlueControls.Forms.Form
+    {
 
 
 
 
 
-        public Filter(Table table) {
+        public Filter(Table table)
+        {
 
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();

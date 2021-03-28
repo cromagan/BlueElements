@@ -17,8 +17,10 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-namespace BlueControls.ItemCollection {
-    internal class clsKraft {
+namespace BlueControls.ItemCollection
+{
+    internal class clsKraft
+    {
 
         //public PointM Wirkpunkt;
 

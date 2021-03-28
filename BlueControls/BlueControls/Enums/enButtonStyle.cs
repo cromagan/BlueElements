@@ -1,5 +1,7 @@
-﻿namespace BlueControls.Enums {
-    public enum enButtonStyle {
+﻿namespace BlueControls.Enums
+{
+    public enum enButtonStyle
+    {
         Button = 1,
         Button_RibbonBar = 1001,
 

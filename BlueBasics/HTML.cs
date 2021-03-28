@@ -9,19 +9,19 @@ namespace BlueBasics
 
         // https://www.w3schools.com/html/html_tables.asp
 
-        public HTML(string Title)
+        public HTML(string title)
         {
-            Code = new List<string>
+            this.Code = new List<string>
             {
                 "<!DOctypex HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"",
                 "\"http://www.w3.org/TR/html4/strict.dtd\">",
                 "<html>",
                 "  <head>",
-                "    <title>" + Title + "</title>",
+                "    <title>" + title + "</title>",
                 "    <style type=\"text/css\">",
 
                 "      table {",
-                //Code.Add("              border-spacing: 5px;");// If the table has collapsed borders, border-spacing has no effect.
+                // Code.Add("              border-spacing: 5px;");// If the table has collapsed borders, border-spacing has no effect.
                 "              border: 1px solid gray;",
                 "              border-collapse: collapse;",
                 "            }",
@@ -53,61 +53,61 @@ namespace BlueBasics
 
         public void AddFoot()
         {
-            Code.Add("  </body>");
-            Code.Add("</html>");
+            this.Code.Add("  </body>");
+            this.Code.Add("</html>");
         }
 
         public void AddCaption(string _Caption)
         {
-            AddCaption(_Caption, 1);
+            this.AddCaption(_Caption, 1);
         }
 
         public void Add(string what)
         {
-            Code.Add(what);
+            this.Code.Add(what);
         }
 
         public void RowBeginn()
         {
-            Code.Add("      <tr>");
+            this.Code.Add("      <tr>");
         }
 
         public void RowEnd()
         {
-            Code.Add("      </tr>");
+            this.Code.Add("      </tr>");
         }
 
         public void Save(string filename, bool executeafter)
         {
-            Code.Save(filename, executeafter, System.Text.Encoding.UTF8);
+            this.Code.Save(filename, executeafter, System.Text.Encoding.UTF8);
         }
 
         public void TableBeginn()
         {
-            //da.Add("  <Font face=\"Arial\" Size=\"2\"><table border=\"1\" BORDERCOLOR=\"#aaaaaa\" cellspacing=\"0\" cellpadding=\"0\" align=\"left\">");
+            // da.Add("  <Font face=\"Arial\" Size=\"2\"><table border=\"1\" BORDERCOLOR=\"#aaaaaa\" cellspacing=\"0\" cellpadding=\"0\" align=\"left\">");
 
-            Code.Add("<Font face=\"Arial\" Size=\"2\">");
+            this.Code.Add("<Font face=\"Arial\" Size=\"2\">");
 
-            Code.Add("  <table>");
+            this.Code.Add("  <table>");
 
-            //da.Add("  <Font face=\"Arial\" Size=\"2\"><table border=\"1\" BORDERCOLOR=\"#aaaaaa\" cellspacing=\"0\" cellpadding=\"0\" align=\"left\">");
+            // da.Add("  <Font face=\"Arial\" Size=\"2\"><table border=\"1\" BORDERCOLOR=\"#aaaaaa\" cellspacing=\"0\" cellpadding=\"0\" align=\"left\">");
 
-            //Code.Add("      </tr>");
+            // Code.Add("      </tr>");
         }
 
         public void TableEnd()
         {
-            Code.Add("    </table>");
+            this.Code.Add("    </table>");
         }
 
         public void CellAdd(string content)
         {
-            Code.Add("              <th>" + content + "</th>");
+            this.Code.Add("              <th>" + content + "</th>");
         }
 
         public void CellAdd(string content, Color c)
         {
-            Code.Add("        <th  bgcolor=\"#" + c.ToHTMLCode() + "\">" + content + "</th>");
+            this.Code.Add("        <th  bgcolor=\"#" + c.ToHTMLCode() + "\">" + content + "</th>");
         }
 
         public void AddCaption(string _caption, int size)
@@ -115,14 +115,14 @@ namespace BlueBasics
             switch (size)
             {
                 case 1:
-                    Code.Add("  <h1>" + _caption + "</h1><br>");
+                    this.Code.Add("  <h1>" + _caption + "</h1><br>");
                     break;
 
                 case 2:
-                    Code.Add("  <h2>" + _caption + "</h2><br>");
+                    this.Code.Add("  <h2>" + _caption + "</h2><br>");
                     break;
                 case 3:
-                    Code.Add("  <h3>" + _caption + "</h3><br>");
+                    this.Code.Add("  <h3>" + _caption + "</h3><br>");
                     break;
 
                 default:
@@ -133,14 +133,14 @@ namespace BlueBasics
 
         public void ListAdd(List<string> items)
         {
-            Code.Add("<ul>");
+            this.Code.Add("<ul>");
 
             foreach (var thisitem in items)
             {
-                Code.Add("  <li>" + thisitem + "</li>");
+                this.Code.Add("  <li>" + thisitem + "</li>");
             }
 
-            Code.Add("</ul>");
+            this.Code.Add("</ul>");
         }
     }
 }

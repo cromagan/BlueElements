@@ -23,8 +23,10 @@ using System.Collections.Generic;
 using System.Linq;
 using static BlueBasics.Extensions;
 
-namespace BlueScript {
-    internal class Method_Contains : Method {
+namespace BlueScript
+{
+    internal class Method_Contains : Method
+    {
 
 
         //public Method_Contains(Script parent) : base(parent) { }
@@ -45,37 +47,48 @@ namespace BlueScript {
 
 
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
+        {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
 
-            if (attvar[0].Type == Skript.Enums.enVariableDataType.List) {
+            if (attvar[0].Type == Skript.Enums.enVariableDataType.List)
+            {
                 var x = attvar[0].ValueListString;
 
-                for (var z = 2; z < attvar.Count; z++) {
+                for (var z = 2; z < attvar.Count; z++)
+                {
                     if (attvar[z].Type != Skript.Enums.enVariableDataType.String) { return strDoItFeedback.AttributFehler(); }
 
-                    if (x.Contains(attvar[z].ValueString, attvar[1].ValueBool)) {
+                    if (x.Contains(attvar[z].ValueString, attvar[1].ValueBool))
+                    {
                         return strDoItFeedback.Wahr();
                     }
                 }
                 return strDoItFeedback.Falsch();
             }
 
-            if (attvar[0].Type == Skript.Enums.enVariableDataType.String) {
+            if (attvar[0].Type == Skript.Enums.enVariableDataType.String)
+            {
 
 
-                for (var z = 2; z < attvar.Count; z++) {
+                for (var z = 2; z < attvar.Count; z++)
+                {
                     if (attvar[z].Type != Skript.Enums.enVariableDataType.String) { return strDoItFeedback.FalscherDatentyp(); }
 
 
-                    if (attvar[1].ValueBool) {
-                        if (attvar[0].ValueString.Contains(attvar[z].ValueString)) {
+                    if (attvar[1].ValueBool)
+                    {
+                        if (attvar[0].ValueString.Contains(attvar[z].ValueString))
+                        {
                             return strDoItFeedback.Wahr();
                         }
-                    } else {
-                        if (attvar[0].ValueString.ToLower().Contains(attvar[z].ValueString.ToLower())) {
+                    }
+                    else
+                    {
+                        if (attvar[0].ValueString.ToLower().Contains(attvar[z].ValueString.ToLower()))
+                        {
                             return strDoItFeedback.Wahr();
                         }
                     }

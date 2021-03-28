@@ -23,8 +23,10 @@ using BlueControls.ItemCollection;
 using System;
 using System.Drawing;
 
-namespace BlueControls.Forms {
-    public partial class FontSelectDialog {
+namespace BlueControls.Forms
+{
+    public partial class FontSelectDialog
+    {
         private bool Adding;
 
 
@@ -32,7 +34,8 @@ namespace BlueControls.Forms {
         private static ItemCollectionList FSList;
 
 
-        public FontSelectDialog() {
+        public FontSelectDialog()
+        {
 
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
@@ -40,17 +43,24 @@ namespace BlueControls.Forms {
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
 
-            if (FNList == null) {
+            if (FNList == null)
+            {
                 FNList = new ItemCollectionList();
-                foreach (var f in FontFamily.Families) {
-                    if (!string.IsNullOrEmpty(f.Name)) {
-                        if (f.IsStyleAvailable(FontStyle.Regular)) {
+                foreach (var f in FontFamily.Families)
+                {
+                    if (!string.IsNullOrEmpty(f.Name))
+                    {
+                        if (f.IsStyleAvailable(FontStyle.Regular))
+                        {
                             var fo = new Font(f.Name, 100);
 
-                            try {
+                            try
+                            {
                                 BlueFont.MeasureString("T", fo);
                                 FNList.Add(string.Empty, f.Name, BlueFont.Get(f, 12).NameInStyle(), true);
-                            } catch (Exception) {
+                            }
+                            catch (Exception)
+                            {
 
                             }
 
@@ -97,9 +107,11 @@ namespace BlueControls.Forms {
         }
 
 
-        public new BlueFont Font {
+        public new BlueFont Font
+        {
             get => BlueFont.Get(FName.Item.Checked()[0].Internal, float.Parse(FSize.Item.Checked()[0].Internal), fFett.Checked, fKursiv.Checked, fUnterstrichen.Checked, fDurchge.Checked, fOutline.Checked, QuickImage.Get(cFarbe.ImageCode).ChangeGreenTo, QuickImage.Get(cRandF.ImageCode).ChangeGreenTo, fKap.Checked, OnlyUpper.Checked, OnlyLow.Checked);
-            set {
+            set
+            {
 
                 Adding = true;
                 if (value == null) { value = BlueFont.Get(Skin.DummyStandardFont); }
@@ -130,30 +142,35 @@ namespace BlueControls.Forms {
         }
 
 
-        private void UpdateSampleText() {
+        private void UpdateSampleText()
+        {
             if (Adding) { return; }
 
             Sample.Image = Font.SampleText().Bitmap;
         }
 
 
-        private void FName_Item_CheckedChanged(object sender, System.EventArgs e) {
+        private void FName_Item_CheckedChanged(object sender, System.EventArgs e)
+        {
             UpdateSampleText();
         }
 
-        private void fFett_CheckedChanged(object sender, System.EventArgs e) {
+        private void fFett_CheckedChanged(object sender, System.EventArgs e)
+        {
             UpdateSampleText();
         }
 
 
-        private void cFarbe_Click(object sender, System.EventArgs e) {
+        private void cFarbe_Click(object sender, System.EventArgs e)
+        {
             ColorDia.Color = QuickImage.Get(cFarbe.ImageCode).ChangeGreenTo.FromHTMLCode();
             ColorDia.ShowDialog();
             cFarbe.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", ColorDia.Color.ToHTMLCode()).ToString();
             UpdateSampleText();
         }
 
-        private void cRandF_Click(object sender, System.EventArgs e) {
+        private void cRandF_Click(object sender, System.EventArgs e)
+        {
             ColorDia.Color = QuickImage.Get(cRandF.ImageCode).ChangeGreenTo.FromHTMLCode();
             ColorDia.ShowDialog();
             cRandF.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", ColorDia.Color.ToHTMLCode()).ToString();
@@ -161,7 +178,8 @@ namespace BlueControls.Forms {
         }
 
 
-        private void Ok_Click(object sender, System.EventArgs e) {
+        private void Ok_Click(object sender, System.EventArgs e)
+        {
             Close();
         }
     }

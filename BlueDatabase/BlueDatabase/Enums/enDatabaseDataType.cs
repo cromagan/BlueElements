@@ -18,8 +18,10 @@
 #endregion
 using System;
 
-namespace BlueDatabase.Enums {
-    public enum enDatabaseDataType : byte {
+namespace BlueDatabase.Enums
+{
+    public enum enDatabaseDataType : byte
+    {
         // Fehler = 0
 
         Version = 1,

@@ -21,11 +21,11 @@ namespace BlueBasics
 {
     public static partial class Extensions
     {
-        public static System.Windows.Forms.Padding PaddingParse(string Code)
+        public static System.Windows.Forms.Padding PaddingParse(this string code)
         {
-            Code = Code.RemoveChars("{}LeftTopRightBm= ");
+            code = code.RemoveChars("{}LeftTopRightBm= ");
 
-            var w = Code.Split(',');
+            var w = code.Split(',');
 
             var P = new System.Windows.Forms.Padding
             {

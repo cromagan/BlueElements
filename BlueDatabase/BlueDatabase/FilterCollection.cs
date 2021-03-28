@@ -23,8 +23,10 @@ using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using System.Collections.Generic;
 
-namespace BlueDatabase {
-    public sealed class FilterCollection : ListExt<FilterItem>, IParseable {
+namespace BlueDatabase
+{
+    public sealed class FilterCollection : ListExt<FilterItem>, IParseable
+    {
         #region  Variablen-Deklarationen 
 
         //private readonly ListExt<FilterItem> _Internal = new ListExt<FilterItem>();
@@ -43,11 +45,13 @@ namespace BlueDatabase {
         #region  Construktor + Initialize 
 
 
-        public FilterCollection(Database database) {
+        public FilterCollection(Database database)
+        {
             Database = database;
         }
 
-        public FilterCollection(Database database, string filterCodes) {
+        public FilterCollection(Database database, string filterCodes)
+        {
             Database = database;
 
             Parse(filterCodes);
@@ -59,10 +63,14 @@ namespace BlueDatabase {
         #region Properties
 
 
-        public FilterItem this[ColumnItem column] {
-            get {
-                foreach (var ThisFilterItem in this) {
-                    if (ThisFilterItem != null && ThisFilterItem.FilterType != enFilterType.KeinFilter) {
+        public FilterItem this[ColumnItem column]
+        {
+            get
+            {
+                foreach (var ThisFilterItem in this)
+                {
+                    if (ThisFilterItem != null && ThisFilterItem.FilterType != enFilterType.KeinFilter)
+                    {
                         if (ThisFilterItem.Column == column) { return ThisFilterItem; }
                     }
                 }
@@ -87,11 +95,13 @@ namespace BlueDatabase {
 
 
 
-        public void Remove(ColumnItem column) {
+        public void Remove(ColumnItem column)
+        {
 
             var toDel = new List<FilterItem>();
 
-            foreach (var thisFilter in this) {
+            foreach (var thisFilter in this)
+            {
                 if (thisFilter.Column == column) { toDel.Add(thisFilter); }
 
             }
@@ -100,7 +110,8 @@ namespace BlueDatabase {
             RemoveRange(toDel);
         }
 
-        public void Remove(string columnName) {
+        public void Remove(string columnName)
+        {
 
             var tmp = Database.Column[columnName];
             if (tmp == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte '" + columnName + "' nicht vorhanden."); }
@@ -108,41 +119,49 @@ namespace BlueDatabase {
             Remove(tmp);
         }
 
-        public void Remove_RowFilter() {
+        public void Remove_RowFilter()
+        {
             Remove((ColumnItem)null);
         }
 
 
 
-        public void Add(enFilterType filterType, string filterBy) {
+        public void Add(enFilterType filterType, string filterBy)
+        {
             AddIfNotExists(new FilterItem(Database, filterType, filterBy));
         }
 
-        public void Add(enFilterType filterType, List<string> filterBy) {
+        public void Add(enFilterType filterType, List<string> filterBy)
+        {
             AddIfNotExists(new FilterItem(Database, filterType, filterBy));
         }
 
 
 
-        public void Add(string columnName, enFilterType filterType, string filterBy) {
+        public void Add(string columnName, enFilterType filterType, string filterBy)
+        {
             Add(Database.Column[columnName], filterType, filterBy);
         }
 
-        public void Add(string columnName, enFilterType filterType, List<string> filterBy) {
+        public void Add(string columnName, enFilterType filterType, List<string> filterBy)
+        {
 
             Add(Database.Column[columnName], filterType, filterBy);
         }
 
-        public void Add(ColumnItem column, enFilterType filterType, List<string> filterBy) {
+        public void Add(ColumnItem column, enFilterType filterType, List<string> filterBy)
+        {
             AddIfNotExists(new FilterItem(column, filterType, filterBy));
         }
 
 
-        public void Add(ColumnItem column, enFilterType filterType, string filterBy) {
+        public void Add(ColumnItem column, enFilterType filterType, string filterBy)
+        {
             AddIfNotExists(new FilterItem(column, filterType, filterBy));
         }
 
-        private void AddIfNotExists(FilterItem filterItem) {
+        private void AddIfNotExists(FilterItem filterItem)
+        {
             if (Exists(filterItem)) { return; }
             Add(filterItem);
         }
@@ -258,24 +277,29 @@ namespace BlueDatabase {
         //}
 
 
-        public bool IsRowFilterActiv() {
+        public bool IsRowFilterActiv()
+        {
             return this[null] != null;
         }
 
-        public string RowFilterText {
+        public string RowFilterText
+        {
 
-            get {
+            get
+            {
 
                 var f = this[null];
                 if (f != null) { return f.SearchValue[0]; }
 
                 return string.Empty;
             }
-            set {
+            set
+            {
 
                 var f = this[null];
 
-                if (f != null) {
+                if (f != null)
+                {
                     if (f.SearchValue[0].ToLower() == value.ToLower()) { return; }
                     f.SearchValue[0] = value;
                     //OnChanged();
@@ -298,21 +322,25 @@ namespace BlueDatabase {
 
 
 
-        public bool MayHasRowFilter(ColumnItem Column) {
+        public bool MayHasRowFilter(ColumnItem Column)
+        {
 
             if (Column.IgnoreAtRowFilter) { return false; }
             return IsRowFilterActiv();
         }
 
 
-        public void Parse(string ToParse) {
+        public void Parse(string ToParse)
+        {
 
             IsParsing = true;
             ThrowEvents = false;
             // Initialize();
 
-            foreach (var pair in ToParse.GetAllTags()) {
-                switch (pair.Key) {
+            foreach (var pair in ToParse.GetAllTags())
+            {
+                switch (pair.Key)
+                {
                     case "filter":
                         AddIfNotExists(new FilterItem(Database, pair.Value));
                         break;
@@ -327,11 +355,14 @@ namespace BlueDatabase {
 
         }
 
-        public override string ToString() {
+        public override string ToString()
+        {
             var w = "{";
 
-            foreach (var ThisFilterItem in this) {
-                if (ThisFilterItem != null) {
+            foreach (var ThisFilterItem in this)
+            {
+                if (ThisFilterItem != null)
+                {
                     w = w + "Filter=" + ThisFilterItem + ", ";
                 }
             }
@@ -349,17 +380,20 @@ namespace BlueDatabase {
         //    return _Internal.GetEnumerator();
         //}
 
-        public override void OnChanged() {
+        public override void OnChanged()
+        {
             if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
             base.OnChanged();
         }
 
-        public void RemoveOtherAndAddIfNotExists(ColumnItem column, enFilterType filterType, string filterBy, string herkunft) {
+        public void RemoveOtherAndAddIfNotExists(ColumnItem column, enFilterType filterType, string filterBy, string herkunft)
+        {
 
             RemoveOtherAndAddIfNotExists(new FilterItem(column, filterType, filterBy, herkunft));
         }
 
-        public void RemoveOtherAndAddIfNotExists(string columName, enFilterType filterType, string filterBy, string herkunft) {
+        public void RemoveOtherAndAddIfNotExists(string columName, enFilterType filterType, string filterBy, string herkunft)
+        {
 
             var column = Database.Column[columName];
             if (column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte '" + columName + "' nicht vorhanden."); }
@@ -368,7 +402,8 @@ namespace BlueDatabase {
             RemoveOtherAndAddIfNotExists(column, filterType, filterBy, herkunft);
         }
 
-        public void RemoveOtherAndAddIfNotExists(FilterItem filterItem) {
+        public void RemoveOtherAndAddIfNotExists(FilterItem filterItem)
+        {
 
             if (Exists(filterItem)) { return; }
 
@@ -380,14 +415,20 @@ namespace BlueDatabase {
 
         }
 
-        public bool Exists(FilterItem filterItem) {
-            foreach (var thisFilter in this) {
-                if (thisFilter.FilterType == filterItem.FilterType) {
-                    if (thisFilter.Column == filterItem.Column) {
+        public bool Exists(FilterItem filterItem)
+        {
+            foreach (var thisFilter in this)
+            {
+                if (thisFilter.FilterType == filterItem.FilterType)
+                {
+                    if (thisFilter.Column == filterItem.Column)
+                    {
 
 
-                        if (thisFilter.Herkunft == filterItem.Herkunft) {
-                            if (thisFilter.SearchValue.JoinWithCr() == filterItem.SearchValue.JoinWithCr()) {
+                        if (thisFilter.Herkunft == filterItem.Herkunft)
+                        {
+                            if (thisFilter.SearchValue.JoinWithCr() == filterItem.SearchValue.JoinWithCr())
+                            {
                                 return true;
                             }
                         }
@@ -400,7 +441,8 @@ namespace BlueDatabase {
             return false;
         }
 
-        public void RemoveOtherAndAddIfNotExists(string columName, enFilterType filterType, List<string> filterBy, string herkunft) {
+        public void RemoveOtherAndAddIfNotExists(string columName, enFilterType filterType, List<string> filterBy, string herkunft)
+        {
 
             var tmp = Database.Column[columName];
             if (tmp == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte '" + columName + "' nicht vorhanden."); }

@@ -17,9 +17,11 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-namespace Skript.Enums {
+namespace Skript.Enums
+{
 
-    public enum enVariableDataType {
+    public enum enVariableDataType
+    {
 
         NotDefinedYet = 0,
         Bool = 1,

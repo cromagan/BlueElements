@@ -18,8 +18,10 @@
 #endregion
 
 
-namespace BlueControls.Enums {
-    public enum enKontur {
+namespace BlueControls.Enums
+{
+    public enum enKontur
+    {
         Unbekannt = -1,
         Ohne = 0,
         Rechteck = 1,
