@@ -27,6 +27,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Text.RegularExpressions;
 using static BlueBasics.FileOperations;
 
@@ -725,13 +726,13 @@ namespace BlueDatabase
             {
                 Row
             };
-            InternalCreateLayout(TMPList, LoadFromDiskWIN1252(LoadFile), SaveFile, false);
+            InternalCreateLayout(TMPList, File.ReadAllText(LoadFile, Constants.Win1252), SaveFile, false);
         }
 
         public static void CreateLayout(List<RowItem> Rows, string LoadFile, string SaveFile)
         {
             if (!FileExists(LoadFile)) { return; }
-            InternalCreateLayout(Rows, LoadFromDiskWIN1252(LoadFile), SaveFile, false);
+            InternalCreateLayout(Rows, File.ReadAllText(LoadFile, Constants.Win1252), SaveFile, false);
         }
 
 

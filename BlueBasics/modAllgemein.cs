@@ -556,7 +556,7 @@ namespace BlueBasics
 
         public static string GetUrlFileDestination(string filename)
         {
-            var D = LoadFromDiskUTF8(filename).SplitByCRToList();
+            var D = File.ReadAllText(filename, System.Text.Encoding.UTF8).SplitByCRToList();
             return D.TagGet("URL");
         }
 

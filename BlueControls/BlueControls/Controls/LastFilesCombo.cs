@@ -26,6 +26,7 @@ using BlueControls.ItemCollection;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.IO;
 using static BlueBasics.FileOperations;
 
 namespace BlueControls.Controls
@@ -237,7 +238,7 @@ namespace BlueControls.Controls
 
             if (FileExists(SaveFile()))
             {
-                var t = FileOperations.LoadFromDiskWIN1252(SaveFile());
+                var t = File.ReadAllText(SaveFile(), Constants.Win1252);
                 t = t.RemoveChars("\n");
                 LastD.AddRange(t.SplitByCR());
             }

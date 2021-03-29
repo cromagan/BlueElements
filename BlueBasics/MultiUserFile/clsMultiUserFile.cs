@@ -564,7 +564,7 @@ namespace BlueBasics.MultiUserFile
 
             try
             {
-                var Inhalt2 = LoadFromDiskUTF8(this.Blockdateiname());
+                var Inhalt2 = File.ReadAllText(this.Blockdateiname(), System.Text.Encoding.UTF8);
                 if (this._inhaltBlockdatei != Inhalt2)
                 {
                     Develop.DebugPrint("Block-Datei Konflikt 3\r\n" + this.Filename + "\r\nSoll: " + this._inhaltBlockdatei + "\r\n\r\nIst: " + Inhalt2);
@@ -830,7 +830,7 @@ namespace BlueBasics.MultiUserFile
                 {
                     if (!FileExists(this.Filename)) { return; }
 
-                    var x = LoadFromDiskUTF8(this.Blockdateiname());
+                    var x = File.ReadAllText(this.Blockdateiname(), System.Text.Encoding.UTF8);
                     Develop.DebugPrint(enFehlerArt.Info, "Repariere MultiUserFile: " + this.Filename + " \r\n" + x);
 
                     if (!this.CreateBlockDatei()) { return; }
@@ -1234,7 +1234,7 @@ namespace BlueBasics.MultiUserFile
             //  Generelle Prüfung, die eigentlich immer benötigt wird. Mehr allgemeine Fehler, wo sich nicht so schnell ändern
             //  und eine Prüfung, die nicht auf die Sekunde genau wichtig ist.
             if (this.ReadOnly) { return "Die Datei wurde schreibgeschützt geöffnet."; }
-            if (!this.ReadOnly) { return "Die Datei wurde schreibgeschützt geöffnet."; }
+
             if (CheckForLastError(ref this._EditNormalyNextCheckUTC, ref this._EditNormalyError)) { return this._EditNormalyError; }
 
             if (!string.IsNullOrEmpty(this.Filename))
@@ -1272,6 +1272,7 @@ namespace BlueBasics.MultiUserFile
 
             if (mode.HasFlag(enErrorReason.Save))
             {
+                if (true) { return "Allgemeine Speicher-Sperre."; }
                 if (this.IsLoading) { return "Speichern aktuell nicht möglich, da gerade Daten geladen werden."; }
 
                 if (DateTime.UtcNow.Subtract(this.UserEditedAktionUTC).TotalSeconds < 6) { return "Aktuell werden Daten berabeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4

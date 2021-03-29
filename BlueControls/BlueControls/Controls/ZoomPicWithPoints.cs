@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
 using static BlueBasics.Extensions;
 using static BlueBasics.FileOperations;
@@ -290,7 +291,7 @@ namespace BlueControls.Controls
 
             if (FileExists(ftxt))
             {
-                tags = FileOperations.LoadFromDiskUTF8(ftxt).SplitByCRToList();
+                tags = File.ReadAllText(ftxt, System.Text.Encoding.UTF8).SplitByCRToList();
             }
 
 

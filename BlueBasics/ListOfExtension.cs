@@ -22,6 +22,7 @@ using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using static BlueBasics.FileOperations;
 using static BlueBasics.modConverter;
@@ -206,9 +207,9 @@ namespace BlueBasics
             return Did;
         }
 
-        public static void LoadWIN1252(this List<string> l, string filename)
+        public static void Load(this List<string> l, string filename, System.Text.Encoding code)
         {
-            var t = LoadFromDiskWIN1252(filename);
+            var t = File.ReadAllText(filename, code);
 
             l.Clear();
             l.AddRange(t.SplitByCR());

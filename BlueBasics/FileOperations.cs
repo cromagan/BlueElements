@@ -469,15 +469,15 @@ namespace BlueBasics
 
         // }
 
-        public static string LoadFromDiskUTF8(string dateiName)
-        {
-            return File.ReadAllText(dateiName, Encoding.UTF8);
-        }
+        //public static string LoadFromDiskUTF8(string dateiName)
+        //{
+        //    return File.ReadAllText(dateiName, Encoding.UTF8);
+        //}
 
-        public static string LoadFromDiskWIN1252(string dateiName)
-        {
-            return File.ReadAllText(dateiName, Encoding.GetEncoding(1252));
-        }
+        //public static string LoadFromDisk(string dateiName,Encoding code)
+        //{
+        //    return File.ReadAllText(dateiName, code);
+        //}
 
         public static string GetFileInfo(string filename, bool mustDo)
         {

@@ -25,6 +25,7 @@ using BlueControls.Forms;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using System.Drawing;
+using System.IO;
 using static BlueBasics.FileOperations;
 
 namespace BlueControls.BlueDatabaseDialogs
@@ -220,7 +221,7 @@ namespace BlueControls.BlueDatabaseDialogs
                 {
                     Pad.Enabled = true;
                     _LoadedLayout = fileOrLayoutID;
-                    var l = LoadFromDiskWIN1252(fileOrLayoutID);
+                    var l = File.ReadAllText(fileOrLayoutID, Constants.Win1252);
                     Pad.Item = new ItemCollectionPad(l, string.Empty);
                     ItemChanged();
 

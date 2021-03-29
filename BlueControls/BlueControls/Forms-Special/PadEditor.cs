@@ -24,6 +24,7 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
 using System.Drawing;
+using System.IO;
 using static BlueBasics.FileOperations;
 
 
@@ -360,7 +361,7 @@ namespace BlueControls.Forms
         private void LoadFile(string fileName)
         {
             Pad.Item.Clear();
-            var t = LoadFromDiskWIN1252(fileName);
+            var t = File.ReadAllText(fileName, Constants.Win1252);
 
             Pad.Item = new ItemCollectionPad(t, fileName);
             ItemChanged();
