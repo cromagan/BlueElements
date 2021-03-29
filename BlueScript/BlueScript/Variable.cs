@@ -34,7 +34,8 @@ namespace BlueScript
 
 
             var zusatz = string.Empty;
-            if (Readonly) { zusatz = " [Read Only] "; }
+            if (Readonly)
+            { zusatz = " [Read Only] "; }
 
 
             switch (Type)
@@ -110,10 +111,12 @@ namespace BlueScript
             {
                 (var pose, var _) = Script.NextText(txt, posa, new List<string>() { ")" }, false, false);
 
-                if (pose < posa) { return strDoItFeedback.Klammerfehler(); }
+                if (pose < posa)
+                { return strDoItFeedback.Klammerfehler(); }
 
                 var tmp = AttributeAuflösen(txt.Substring(posa + 1, pose - posa - 1), s);
-                if (!string.IsNullOrEmpty(tmp.ErrorMessage)) { return tmp; }
+                if (!string.IsNullOrEmpty(tmp.ErrorMessage))
+                { return tmp; }
 
                 return AttributeAuflösen(txt.Substring(0, posa) + tmp.Value + txt.Substring(pose + 1), s);
 
@@ -137,7 +140,8 @@ namespace BlueScript
             var txt = AttributeAuflösen(attributesText, s);
 
 
-            if (!string.IsNullOrEmpty(txt.ErrorMessage)) { SetError(); return; }
+            if (!string.IsNullOrEmpty(txt.ErrorMessage))
+            { SetError(); return; }
 
 
 
@@ -147,9 +151,11 @@ namespace BlueScript
 
             if (pos >= 0)
             {
-                if (Type != enVariableDataType.NotDefinedYet && Type != enVariableDataType.Bool) { SetError(); return; }//return new strDoItFeedback("Variable ist kein Boolean");
+                if (Type != enVariableDataType.NotDefinedYet && Type != enVariableDataType.Bool)
+                { SetError(); return; }//return new strDoItFeedback("Variable ist kein Boolean");
                 var b = Method_if.GetBool(txt.Value);
-                if (b == null) { SetError(); return; }//return new strDoItFeedback("Berechnungsfehler der Formel: " + txt); 
+                if (b == null)
+                { SetError(); return; }//return new strDoItFeedback("Berechnungsfehler der Formel: " + txt); 
                 ValueString = b;
                 Type = enVariableDataType.Bool;
                 return;
@@ -172,10 +178,12 @@ namespace BlueScript
 
 
 
-            if (Type != enVariableDataType.NotDefinedYet && Type != enVariableDataType.Number) { SetError(); return; } //return new strDoItFeedback("Variable ist keine Zahl");
+            if (Type != enVariableDataType.NotDefinedYet && Type != enVariableDataType.Number)
+            { SetError(); return; } //return new strDoItFeedback("Variable ist keine Zahl");
 
             var erg = modErgebnis.Ergebnis(txt.Value);
-            if (erg == null) { SetError(); return; }//return new strDoItFeedback("Berechnungsfehler der Formel: " + txt); 
+            if (erg == null)
+            { SetError(); return; }//return new strDoItFeedback("Berechnungsfehler der Formel: " + txt); 
 
 
             ValueDouble = (double)erg;
@@ -272,7 +280,8 @@ namespace BlueScript
             get => _ValueString;
             set
             {
-                if (Readonly) { return; }
+                if (Readonly)
+                { return; }
                 _ValueString = value;
             }
         }
@@ -282,7 +291,8 @@ namespace BlueScript
             get => _ValueString.SplitByCRToList();
             set
             {
-                if (Readonly) { return; }
+                if (Readonly)
+                { return; }
                 _ValueString = value.JoinWithCr();
             }
         }
@@ -296,7 +306,8 @@ namespace BlueScript
             get => DoubleParse(_ValueString);
             set
             {
-                if (Readonly) { return; }
+                if (Readonly)
+                { return; }
                 _ValueString = value.ToString();
             }
         }
@@ -314,9 +325,11 @@ namespace BlueScript
             v = v.ReduceToChars(Constants.Char_az + "_" + Constants.Char_Numerals);
 
 
-            if (v != vo) { return false; }
+            if (v != vo)
+            { return false; }
 
-            if (string.IsNullOrEmpty(v)) { return false; }
+            if (string.IsNullOrEmpty(v))
+            { return false; }
 
             return true;
 
@@ -351,7 +364,8 @@ namespace BlueScript
         public static List<string> GetList(this List<Variable> vars, string name)
         {
             var v = vars.Get(name);
-            if (v == null) { return new List<string>(); }
+            if (v == null)
+            { return new List<string>(); }
             return v.ValueListString;
         }
 
@@ -363,7 +377,8 @@ namespace BlueScript
         public static double GetDouble(this List<Variable> vars, string name)
         {
             var v = vars.Get(name);
-            if (v == null) { return 0f; }
+            if (v == null)
+            { return 0f; }
             return v.ValueDouble;
         }
 
@@ -375,7 +390,8 @@ namespace BlueScript
         public static int GetInt(this List<Variable> vars, string name)
         {
             var v = vars.Get(name);
-            if (v == null) { return 0; }
+            if (v == null)
+            { return 0; }
             return v.ValueInt;
         }
 
@@ -388,7 +404,8 @@ namespace BlueScript
         public static decimal GetDecimal(this List<Variable> vars, string name)
         {
             var v = vars.Get(name);
-            if (v == null) { return 0m; }
+            if (v == null)
+            { return 0m; }
             return (decimal)v.ValueDouble;
         }
 
@@ -401,7 +418,8 @@ namespace BlueScript
         public static string GetString(this List<Variable> vars, string name)
         {
             var v = vars.Get(name);
-            if (v == null) { return string.Empty; }
+            if (v == null)
+            { return string.Empty; }
             return v.ValueString;
         }
 

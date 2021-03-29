@@ -27,13 +27,10 @@ using System;
 using System.Collections.Generic;
 using static BlueBasics.Extensions;
 
-namespace BlueControls
-{
-    public static class Allgemein
-    {
+namespace BlueControls {
+    public static class Allgemein {
 
-        public static IContextMenu ParentControlWithCommands(this object o)
-        {
+        public static IContextMenu ParentControlWithCommands(this object o) {
             var par = o.ParentControl<IContextMenu>();
 
             if (par == null) { return null; }
@@ -61,19 +58,15 @@ namespace BlueControls
             return null;
         }
 
-        public static t ParentControl<t>(this object o)
-        {
+        public static t ParentControl<t>(this object o) {
 
-            if (o is System.Windows.Forms.Control co)
-            {
+            if (o is System.Windows.Forms.Control co) {
 
 
 
-                do
-                {
+                do {
                     co = co.Parent;
-                    switch (co)
-                    {
+                    switch (co) {
                         case null:
                             return default;
                         case t ctr:
@@ -88,8 +81,7 @@ namespace BlueControls
             return default;
 
         }
-        public static List<string> SplitByWidth(this string Text, float MaxWidth, int MaxLines, enDesign design, enStates state)
-        {
+        public static List<string> SplitByWidth(this string Text, float MaxWidth, int MaxLines, enDesign design, enStates state) {
 
             var _broken = new List<string>();
 
@@ -104,8 +96,7 @@ namespace BlueControls
 
 
 
-            do
-            {
+            do {
                 pos++;
                 var ToTEst = Rest.Substring(0, pos);
                 var s = BlueFont.MeasureString(ToTEst, F.Font());
@@ -114,24 +105,20 @@ namespace BlueControls
                 if (pos < Rest.Length && Convert.ToChar(Rest.Substring(pos, 1)).isPossibleLineBreak()) { FoundCut = pos; }
 
 
-                if (s.Width > MaxWidth || pos == Rest.Length)
-                {
+                if (s.Width > MaxWidth || pos == Rest.Length) {
 
-                    if (pos == Rest.Length)
-                    {
+                    if (pos == Rest.Length) {
                         _broken.Add(Rest);
                         return _broken;
                     } // Alles untergebracht
 
-                    if (_broken.Count == MaxLines - 1)
-                    {
+                    if (_broken.Count == MaxLines - 1) {
                         // Ok, werden zu viele Zeilen. Also diese Kürzen.
                         _broken.Add(Rest.TrimByWidth(MaxWidth, F));
                         return _broken;
                     }
 
-                    if (FoundCut > 1)
-                    {
+                    if (FoundCut > 1) {
                         pos = FoundCut + 1;
                         ToTEst = Rest.Substring(0, pos);
                         FoundCut = 0;
@@ -168,36 +155,29 @@ namespace BlueControls
 
         }
 
-        public static string TrimByWidth(this string TXT, float MaxWidth, BlueFont F)
-        {
+        public static string TrimByWidth(this string TXT, float MaxWidth, BlueFont F) {
             if (F == null) { return TXT; }
             var tSize = BlueFont.MeasureString(TXT, F.Font());
 
-            if (tSize.Width - 1 > MaxWidth && TXT.Length > 1)
-            {
+            if (tSize.Width - 1 > MaxWidth && TXT.Length > 1) {
                 var Min = 0;
                 var Max = TXT.Length;
                 var Middle = 0;
 
-                do
-                {
+                do {
                     Middle = (int)(Min + (Max - Min) / 2.0);
                     tSize = BlueFont.MeasureString(TXT.Substring(0, Middle) + "...", F.Font());
 
-                    if (tSize.Width + 3 > MaxWidth)
-                    {
+                    if (tSize.Width + 3 > MaxWidth) {
                         Max = Middle;
-                    }
-                    else
-                    {
+                    } else {
                         Min = Middle;
                     }
 
                 } while (Max - Min > 1);
 
 
-                if (Middle == 1 && tSize.Width - 2 > MaxWidth)
-                {
+                if (Middle == 1 && tSize.Width - 2 > MaxWidth) {
                     return string.Empty;  // ACHTUNG: 5 Pixel breiter (Beachte oben +4 und hier +2)
                 }
 
@@ -208,17 +188,13 @@ namespace BlueControls
             return TXT;
         }
 
-        public static List<string> ToListOfString(this List<BasicListItem> Items)
-        {
+        public static List<string> ToListOfString(this List<BasicListItem> Items) {
             var w = new List<string>();
             if (Items == null) { return w; }
 
-            foreach (var ThisItem in Items)
-            {
-                if (ThisItem != null)
-                {
-                    if (!string.IsNullOrEmpty(ThisItem.Internal))
-                    {
+            foreach (var ThisItem in Items) {
+                if (ThisItem != null) {
+                    if (!string.IsNullOrEmpty(ThisItem.Internal)) {
                         w.Add(ThisItem.Internal);
                     }
                 }

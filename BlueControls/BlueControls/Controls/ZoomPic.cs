@@ -27,11 +27,9 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
-namespace BlueControls.Controls
-{
+namespace BlueControls.Controls {
     [Designer(typeof(BasicDesigner))]
-    public partial class ZoomPic : ZoomPad
-    {
+    public partial class ZoomPic : ZoomPad {
         private MouseEventArgs1_1 _MouseDown = null;
         private MouseEventArgs1_1 _MouseCurrent = null;
 
@@ -42,13 +40,11 @@ namespace BlueControls.Controls
         public bool AlwaysSmooth { get; set; } = false;
 
 
-        public Bitmap BMP
-        {
+        public Bitmap BMP {
             get => _bmp;
 
 
-            set
-            {
+            set {
 
                 if (value == _bmp) { return; }
 
@@ -61,8 +57,7 @@ namespace BlueControls.Controls
         }
 
         #region Constructor
-        public ZoomPic() : base()
-        {
+        public ZoomPic() : base() {
             InitializeComponent();
             _MouseHighlight = false;
         }
@@ -74,15 +69,13 @@ namespace BlueControls.Controls
         public event EventHandler<AdditionalDrawing> DoAdditionalDrawing;
         public event EventHandler<PositionEventArgs> OverwriteMouseImageData;
 
-        protected override RectangleM MaxBounds()
-        {
+        protected override RectangleM MaxBounds() {
             if (_bmp != null) { return new RectangleM(0, 0, _bmp.Width, _bmp.Height); }
             return new RectangleM(0, 0, 0, 0);
         }
 
 
-        protected override void DrawControl(Graphics gr, enStates state)
-        {
+        protected override void DrawControl(Graphics gr, enStates state) {
             //if (_BitmapOfControl == null)
             //{
             //    _BitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb);
@@ -94,19 +87,15 @@ namespace BlueControls.Controls
 
             gr.FillRectangle(lgb, ClientRectangle);
 
-            if (_bmp != null)
-            {
+            if (_bmp != null) {
 
                 var r = new RectangleM(0, 0, _bmp.Width, _bmp.Height).ZoomAndMoveRect(_Zoom, _shiftX, _shiftY);
 
 
-                if (_Zoom < 1 || AlwaysSmooth)
-                {
+                if (_Zoom < 1 || AlwaysSmooth) {
                     gr.SmoothingMode = SmoothingMode.AntiAlias;
                     gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                }
-                else
-                {
+                } else {
                     gr.SmoothingMode = SmoothingMode.HighSpeed;
                     gr.InterpolationMode = InterpolationMode.NearestNeighbor;
                 }
@@ -136,14 +125,12 @@ namespace BlueControls.Controls
         }
 
 
-        protected virtual void OnDoAdditionalDrawing(AdditionalDrawing e)
-        {
+        protected virtual void OnDoAdditionalDrawing(AdditionalDrawing e) {
             DoAdditionalDrawing?.Invoke(this, e);
         }
 
 
-        protected override void OnMouseDown(MouseEventArgs e)
-        {
+        protected override void OnMouseDown(MouseEventArgs e) {
             base.OnMouseDown(e);
             _MouseCurrent = GenerateNewMouseEventArgs(e);
             _MouseDown = _MouseCurrent;
@@ -151,8 +138,7 @@ namespace BlueControls.Controls
         }
 
 
-        private MouseEventArgs1_1 GenerateNewMouseEventArgs(MouseEventArgs e)
-        {
+        private MouseEventArgs1_1 GenerateNewMouseEventArgs(MouseEventArgs e) {
 
             var en = new PositionEventArgs(MousePos_1_1.X, MousePos_1_1.Y);
             OnOverwriteMouseImageData(en);
@@ -162,13 +148,11 @@ namespace BlueControls.Controls
 
         }
 
-        protected void OnOverwriteMouseImageData(PositionEventArgs e)
-        {
+        protected void OnOverwriteMouseImageData(PositionEventArgs e) {
             OverwriteMouseImageData?.Invoke(this, e);
         }
 
-        private void OnImageMouseDown(MouseEventArgs1_1 e)
-        {
+        private void OnImageMouseDown(MouseEventArgs1_1 e) {
             ImageMouseDown?.Invoke(this, e);
         }
 
@@ -176,14 +160,12 @@ namespace BlueControls.Controls
         /// Zuerst ImageMouseUp, dann MouseUp
         /// </summary>
         /// <param name="e"></param>
-        protected virtual void OnImageMouseUp(MouseEventArgs1_1 e)
-        {
+        protected virtual void OnImageMouseUp(MouseEventArgs1_1 e) {
             ImageMouseUp?.Invoke(this, new MouseEventArgs1_1DownAndCurrent(_MouseDown, e));
         }
 
 
-        private bool IsInBitmap(int X, int Y)
-        {
+        private bool IsInBitmap(int X, int Y) {
             if (_bmp == null) { return false; }
             if (X < 0 || Y < 0) { return false; }
             if (X > _bmp.Width || Y > _bmp.Height) { return false; }
@@ -200,16 +182,14 @@ namespace BlueControls.Controls
         /// Zuerst ImageMouseUp, dann MouseUp
         /// </summary>
         /// <param name="e"></param>
-        protected override void OnMouseUp(MouseEventArgs e)
-        {
+        protected override void OnMouseUp(MouseEventArgs e) {
             _MouseCurrent = GenerateNewMouseEventArgs(e);
             OnImageMouseUp(_MouseCurrent);
             base.OnMouseUp(e);
             _MouseDown = null;
         }
 
-        protected override void OnMouseMove(MouseEventArgs e)
-        {
+        protected override void OnMouseMove(MouseEventArgs e) {
             base.OnMouseMove(e);
 
             _MouseCurrent = GenerateNewMouseEventArgs(e);
@@ -217,15 +197,13 @@ namespace BlueControls.Controls
             OnImageMouseMove(_MouseCurrent);
         }
 
-        private void OnImageMouseMove(MouseEventArgs1_1 e)
-        {
+        private void OnImageMouseMove(MouseEventArgs1_1 e) {
             ImageMouseMove?.Invoke(this, new MouseEventArgs1_1DownAndCurrent(_MouseDown, e));
         }
 
 
 
-        public Point PointInsidePic(int x, int y)
-        {
+        public Point PointInsidePic(int x, int y) {
 
             if (_bmp == null) { return Point.Empty; }
 

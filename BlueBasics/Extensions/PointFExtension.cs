@@ -20,12 +20,9 @@
 using System;
 using System.Drawing;
 
-namespace BlueBasics
-{
-    public static partial class Extensions
-    {
-        public static bool PointInRect(this PointF p, decimal x1, decimal y1, decimal x2, decimal y2, float toleranz)
-        {
+namespace BlueBasics {
+    public static partial class Extensions {
+        public static bool PointInRect(this PointF p, decimal x1, decimal y1, decimal x2, decimal y2, float toleranz) {
             var r = new RectangleF((float)Math.Min(x1, x2), (float)Math.Min(y1, y2), (float)Math.Abs(x1 - x2), (float)Math.Abs(y1 - y2));
 
             r.Inflate(toleranz, toleranz);

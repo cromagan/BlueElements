@@ -19,14 +19,11 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace BlueBasics
-{
-    public static partial class Extensions
-    {
+namespace BlueBasics {
+    public static partial class Extensions {
         // static Encoding enc1252 = CodePagesEncodingProvider.Instance.GetEncoding(1252);
 
-        public static string ToStringWIN1252(this byte[] b)
-        {
+        public static string ToStringWIN1252(this byte[] b) {
             // https://stackoverflow.com/questions/37870084/net-core-doesnt-know-about-windows-1252-how-to-fix
 
             // Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -35,13 +32,11 @@ namespace BlueBasics
             return Encoding.GetEncoding(1252).GetString(b);
         }
 
-        public static string ToStringUTF8(this byte[] b)
-        {
+        public static string ToStringUTF8(this byte[] b) {
             return Encoding.UTF8.GetString(b);
         }
 
-        public static string ToStringUTF8(this List<byte> b)
-        {
+        public static string ToStringUTF8(this List<byte> b) {
             return Encoding.UTF8.GetString(b.ToArray());
         }
     }

@@ -96,9 +96,12 @@ namespace BlueScript
 
                             do
                             {
-                                if (cont >= maxl) { return new strCanDoFeedback(f.ContinuePosition, "Kein nachfolgender Codeblock bei " + comandtext, true); }
-                                if (scriptText.Substring(cont, 1) == "{") { break; }
-                                if (scriptText.Substring(cont, 1) != "¶") { return new strCanDoFeedback(f.ContinuePosition, "Kein nachfolgender Codeblock bei " + comandtext, true); }
+                                if (cont >= maxl)
+                                { return new strCanDoFeedback(f.ContinuePosition, "Kein nachfolgender Codeblock bei " + comandtext, true); }
+                                if (scriptText.Substring(cont, 1) == "{")
+                                { break; }
+                                if (scriptText.Substring(cont, 1) != "¶")
+                                { return new strCanDoFeedback(f.ContinuePosition, "Kein nachfolgender Codeblock bei " + comandtext, true); }
                                 cont++;
                                 s.Line++;
                             } while (true);
@@ -292,7 +295,8 @@ namespace BlueScript
 
                 (var pos, var witch) = Script.NextText(txt, posc, c, true, false);
 
-                if (pos < 0) { return new strGetEndFeedback(0, txt); }
+                if (pos < 0)
+                { return new strGetEndFeedback(0, txt); }
 
                 var f = Script.ComandOnPosition(txt, pos, s, true);
 
@@ -335,10 +339,12 @@ namespace BlueScript
 
                 (var pos, var witch) = Script.NextText(txt, posc, v, true, true);
 
-                if (pos < 0) { return new strGetEndFeedback(0, txt); }
+                if (pos < 0)
+                { return new strGetEndFeedback(0, txt); }
 
                 var thisV = vars.Get(witch);
-                if (thisV == null) { return new strGetEndFeedback("Variablen-Fehler " + witch); }
+                if (thisV == null)
+                { return new strGetEndFeedback("Variablen-Fehler " + witch); }
 
                 if (thisV.Type == Skript.Enums.enVariableDataType.NotDefinedYet)
                 {
@@ -400,7 +406,8 @@ namespace BlueScript
 
         public List<string> SplitAttributeToString(string attributtext)
         {
-            if (string.IsNullOrEmpty(attributtext)) { return null; }
+            if (string.IsNullOrEmpty(attributtext))
+            { return null; }
 
             var attributes = new List<string>();
 
@@ -430,10 +437,13 @@ namespace BlueScript
         public List<Variable> SplitAttributeToVars(string attributtext, Script s, List<enVariableDataType> types)
         {
             var attributes = SplitAttributeToString(attributtext);
-            if (attributes == null || attributes.Count == 0) { return null; }
+            if (attributes == null || attributes.Count == 0)
+            { return null; }
 
-            if (attributes.Count < types.Count) { return null; }
-            if (!EndlessArgs && attributes.Count > types.Count) { return null; }
+            if (attributes.Count < types.Count)
+            { return null; }
+            if (!EndlessArgs && attributes.Count > types.Count)
+            { return null; }
 
 
             //  Variablen und Routinen ersetzen
@@ -469,15 +479,18 @@ namespace BlueScript
                     v = new Variable("dummy", attributes[n], s);
                 }
 
-                if (v == null) { return null; }
+                if (v == null)
+                { return null; }
 
                 if (!exceptetType.HasFlag(v.Type))
                 {
 
                     if (exceptetType == enVariableDataType.Integer)
                     {
-                        if (v.Type != enVariableDataType.Number) { return null; }
-                        if (v.ValueDouble != (int)v.ValueDouble) { return null; }
+                        if (v.Type != enVariableDataType.Number)
+                        { return null; }
+                        if (v.ValueDouble != (int)v.ValueDouble)
+                        { return null; }
                     }
                     else
                     {

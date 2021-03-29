@@ -50,7 +50,8 @@ namespace BlueScript
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
         {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
-            if (attvar == null) { return strDoItFeedback.AttributFehler(); }
+            if (attvar == null)
+            { return strDoItFeedback.AttributFehler(); }
 
 
             if (attvar[0].Type == Skript.Enums.enVariableDataType.List)
@@ -59,7 +60,8 @@ namespace BlueScript
 
                 for (var z = 2; z < attvar.Count; z++)
                 {
-                    if (attvar[z].Type != Skript.Enums.enVariableDataType.String) { return strDoItFeedback.AttributFehler(); }
+                    if (attvar[z].Type != Skript.Enums.enVariableDataType.String)
+                    { return strDoItFeedback.AttributFehler(); }
 
                     if (x.Contains(attvar[z].ValueString, attvar[1].ValueBool))
                     {
@@ -75,7 +77,8 @@ namespace BlueScript
 
                 for (var z = 2; z < attvar.Count; z++)
                 {
-                    if (attvar[z].Type != Skript.Enums.enVariableDataType.String) { return strDoItFeedback.FalscherDatentyp(); }
+                    if (attvar[z].Type != Skript.Enums.enVariableDataType.String)
+                    { return strDoItFeedback.FalscherDatentyp(); }
 
 
                     if (attvar[1].ValueBool)

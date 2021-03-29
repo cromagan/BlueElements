@@ -23,32 +23,23 @@ using System.Drawing;
 using System.Globalization;
 using System.Linq;
 
-namespace BlueBasics
-{
-    public static partial class Extensions
-    {
-        public static Color FromHSB(this float hue, float satuation, float brightness, byte alpha)
-        {
+namespace BlueBasics {
+    public static partial class Extensions {
+        public static Color FromHSB(this float hue, float satuation, float brightness, byte alpha) {
             hue /= 360;
             double r, g, b;
 
             if (Math.Abs(brightness) < 0.001) { return Color.FromArgb(alpha, 0, 0, 0); }
 
-            if (Math.Abs(satuation) < 0.001)
-            {
+            if (Math.Abs(satuation) < 0.001) {
                 r = brightness;
                 g = brightness;
                 b = brightness;
-            }
-            else
-            {
+            } else {
                 double temp2;
-                if (brightness <= 0.5F)
-                {
+                if (brightness <= 0.5F) {
                     temp2 = brightness * (1.0 + satuation);
-                }
-                else
-                {
+                } else {
                     temp2 = brightness + satuation - brightness * satuation;
                 }
 
@@ -57,24 +48,16 @@ namespace BlueBasics
                 double[] t3 = { hue + 1.0 / 3.0, hue, hue - 1.0 / 3.0 };
                 double[] clr = { 0, 0, 0 };
 
-                for (var i = 0; i <= 2; i++)
-                {
+                for (var i = 0; i <= 2; i++) {
                     if (t3[i] < 0) { t3[i] += 1.0; }
                     if (t3[i] > 1) { t3[i] -= 1.0; }
-                    if (6.0 * t3[i] < 1.0)
-                    {
+                    if (6.0 * t3[i] < 1.0) {
                         clr[i] = temp1 + (temp2 - temp1) * t3[i] * 6.0;
-                    }
-                    else if (2.0 * t3[i] < 1.0)
-                    {
+                    } else if (2.0 * t3[i] < 1.0) {
                         clr[i] = temp2;
-                    }
-                    else if (3.0 * t3[i] < 2.0)
-                    {
+                    } else if (3.0 * t3[i] < 2.0) {
                         clr[i] = temp1 + (temp2 - temp1) * (2.0 / 3.0 - t3[i]) * 6.0;
-                    }
-                    else
-                    {
+                    } else {
                         clr[i] = temp1;
                     }
                 }
@@ -94,15 +77,13 @@ namespace BlueBasics
             return Color.FromArgb(alpha, (int)(255 * r), (int)(255 * g), (int)(255 * b));
         }
 
-        public static Color SoftLightMix(this Color baseColor, Color blendColor, double opacity)
-        {
+        public static Color SoftLightMix(this Color baseColor, Color blendColor, double opacity) {
             return MixColor(Color.FromArgb((int)SoftLightMath(baseColor.R, blendColor.R),
                                            (int)SoftLightMath(baseColor.G, blendColor.G),
                                            (int)SoftLightMath(baseColor.B, blendColor.B)), baseColor, opacity);
         }
 
-        public static Color OverlayMix(this Color baseColor, Color blendColor, double opacity)
-        {
+        public static Color OverlayMix(this Color baseColor, Color blendColor, double opacity) {
             return MixColor(Color.FromArgb((int)OverlayMath(baseColor.R, blendColor.R),
                                            (int)OverlayMath(baseColor.G, blendColor.G),
                                            (int)OverlayMath(baseColor.B, blendColor.B)), baseColor, opacity);
@@ -110,26 +91,22 @@ namespace BlueBasics
 
         #region  Blend Mode Mathematics
 
-        private static double SoftLightMath(int @base, int blend)
-        {
+        private static double SoftLightMath(int @base, int blend) {
             var dbase = @base / 255.0;
             var dblend = blend / 255.0;
 
-            if (dblend < 0.5)
-            {
+            if (dblend < 0.5) {
                 return (2 * dbase * dblend + Math.Pow(dbase, 2) * (1 - 2 * dblend)) * 255;
             }
 
             return (Math.Sqrt(dbase) * (2 * dblend - 1) + 2 * dbase * (1 - dblend)) * 255;
         }
 
-        public static double OverlayMath(this int @base, int blend)
-        {
+        public static double OverlayMath(this int @base, int blend) {
             var dbase = @base / 255.0;
             var dblend = blend / 255.0;
 
-            if (dbase < 0.5)
-            {
+            if (dbase < 0.5) {
                 return 2 * dbase * dblend * 255;
             }
 
@@ -138,8 +115,7 @@ namespace BlueBasics
 
         #endregion
 
-        public static Color MixColor(this Color color1, Color color2, double color1Prozent)
-        {
+        public static Color MixColor(this Color color1, Color color2, double color1Prozent) {
             if (color1Prozent > 1) { color1Prozent = 1; }
             if (color1Prozent < 0) { color1Prozent = 0; }
             var Color2Prozent = 1 - color1Prozent;
@@ -149,24 +125,21 @@ namespace BlueBasics
                                   (int)(color1.B * color1Prozent + color2.B * Color2Prozent));
         }
 
-        public static bool IsNearWhite(this Color col, double minBrightness)
-        {
+        public static bool IsNearWhite(this Color col, double minBrightness) {
             if (col.ToArgb() == -1) { return true; }
             if (col.A == 0) { return true; }
             if (col.GetBrightness() >= minBrightness) { return true; }
             return false;
         }
 
-        public static bool IsNearBlack(this Color color, double maxBrightness)
-        {
+        public static bool IsNearBlack(this Color color, double maxBrightness) {
             if (color.A == 0) { return false; }
             if (color.ToArgb() == 0) { return true; }
             if (color.GetBrightness() <= maxBrightness) { return true; }
             return false;
         }
 
-        public static Color ToSepia(this Color color)
-        {
+        public static Color ToSepia(this Color color) {
             var r = (int)Math.Min(255, color.R * 0.393 + color.G * 0.769 + color.B * 0.189);
             var g = (int)Math.Min(255, color.R * 0.349 + color.G * 0.686 + color.B * 0.168);
             var b = (int)Math.Min(255, color.R * 0.272 + color.G * 0.534 + color.B * 0.131);
@@ -174,8 +147,7 @@ namespace BlueBasics
             return Color.FromArgb(255, r, g, b);
         }
 
-        public static string ToHTMLCode(this Color color)
-        {
+        public static string ToHTMLCode(this Color color) {
             var r = Convert.ToString(color.R, 16);
             if (r.Length < 2) { r = "0" + r; }
             var g = Convert.ToString(color.G, 16);
@@ -184,8 +156,7 @@ namespace BlueBasics
             if (b.Length < 2) { b = "0" + b; }
 
             var a = string.Empty;
-            if (color.A != 255)
-            {
+            if (color.A != 255) {
                 a = Convert.ToString(color.A, 16);
                 if (a.Length < 2) { a = "0" + a; }
             }
@@ -193,18 +164,15 @@ namespace BlueBasics
             return a + r + g + b;
         }
 
-        public static Color FromHTMLCode(this string color)
-        {
-            if (!color.IsHTMLColorCode())
-            {
+        public static Color FromHTMLCode(this string color) {
+            if (!color.IsHTMLColorCode()) {
                 Develop.DebugPrint("Farbcode ungültig: " + color);
                 return Color.Magenta;
             }
 
             var a = 255;
             var PL = 0;
-            if (color.Length > 6)
-            {
+            if (color.Length > 6) {
                 a = int.Parse(color.Substring(0, 2), NumberStyles.HexNumber);
                 PL = 2;
             }
@@ -216,29 +184,24 @@ namespace BlueBasics
             return Color.FromArgb(a, r, g, b);
         }
 
-        public static bool IsMagenta(this Color col)
-        {
+        public static bool IsMagenta(this Color col) {
             return (col.ToArgb() == -65281);
         }
 
-        public static bool IsMagentaOrTransparent(this Color col)
-        {
+        public static bool IsMagentaOrTransparent(this Color col) {
             if (col.ToArgb() == -65281) { return true; }
             if (col.A == 0) { return true; }
             return false;
         }
 
-        public static bool IsTransparent(this Color col)
-        {
+        public static bool IsTransparent(this Color col) {
             return (col.A == 0);
         }
 
-        public static string ColorName(this Color col)
-        {
+        public static string ColorName(this Color col) {
             var c = col.ToHTMLCode().ToLower();
 
-            switch (c)
-            {
+            switch (c) {
                 case "0000ff":
                     return "Blue";
                 case "ff00ff":
@@ -384,29 +347,24 @@ namespace BlueBasics
             }
         }
 
-        public static Color SetAlpha(this Color color, byte newAlpha)
-        {
+        public static Color SetAlpha(this Color color, byte newAlpha) {
             return Color.FromArgb(newAlpha, color.R, color.G, color.B);
         }
 
-        public static Color ToGrey(this Color color)
-        {
+        public static Color ToGrey(this Color color) {
             var W = (int)Math.Min(255, (color.R * 77 + color.G * 150 + color.B * 28) / 255.0);
             return Color.FromArgb(color.A, W, W, W);
         }
 
-        public static Color Brighten(this Color color, double value)
-        {
+        public static Color Brighten(this Color color, double value) {
             return FromHSB(color.GetHue(), color.GetSaturation(), (float)(color.GetBrightness() * (1 + value)), color.A);
         }
 
-        public static Color Darken(this Color color, double value)
-        {
+        public static Color Darken(this Color color, double value) {
             return FromHSB(color.GetHue(), color.GetSaturation(), (float)(color.GetBrightness() * (1 - value)), color.A);
         }
 
-        public static Color ClosestHueColor(this Color target, List<Color> colors)
-        {
+        public static Color ClosestHueColor(this Color target, List<Color> colors) {
             // https://stackoverflow.com/questions/27374550/how-to-compare-color-object-and-get-closest-color-in-an-color/27375621
             var hue1 = target.GetHue();
             var diffs = colors.Select(n => getHueDistance(n.GetHue(), hue1));
@@ -414,16 +372,14 @@ namespace BlueBasics
             return colors[diffs.ToList().FindIndex(n => n == diffMin)];
         }
 
-        public static Color ClosestRGBColor(this Color target, List<Color> colors)
-        {
+        public static Color ClosestRGBColor(this Color target, List<Color> colors) {
             // https://stackoverflow.com/questions/27374550/how-to-compare-color-object-and-get-closest-color-in-an-color/27375621
             var colorDiffs = colors.Select(n => ColorDiff(n, target)).Min(n => n);
             return colors[colors.FindIndex(n => ColorDiff(n, target) == colorDiffs)];
         }
 
         // weighed distance using hue, saturation and brightness
-        public static Color ClosestHSVColor(this Color target, List<Color> colors, float factorSat, float factorBri)
-        {
+        public static Color ClosestHSVColor(this Color target, List<Color> colors, float factorSat, float factorBri) {
             // https://stackoverflow.com/questions/27374550/how-to-compare-color-object-and-get-closest-color-in-an-color/27375621
             var hue1 = target.GetHue();
             var num1 = ColorNum(target, factorSat, factorBri);
@@ -433,27 +389,23 @@ namespace BlueBasics
         }
 
         // color brightness as perceived:
-        public static float getBrightness(this Color c)
-        {
+        public static float getBrightness(this Color c) {
             return (c.R * 0.299f + c.G * 0.587f + c.B * 0.114f) / 256f;
         }
 
         // distance between two hues:
-        public static float getHueDistance(this float hue1, float hue2)
-        {
+        public static float getHueDistance(this float hue1, float hue2) {
             var d = Math.Abs(hue1 - hue2);
             return d > 180 ? 360 - d : d;
         }
 
         // weighed only by saturation and brightness (from my trackbars)
-        public static float ColorNum(this Color c, float factorSat, float factorBri)
-        {
+        public static float ColorNum(this Color c, float factorSat, float factorBri) {
             return c.GetSaturation() * factorSat + getBrightness(c) * factorBri;
         }
 
         // distance in RGB space
-        public static int ColorDiff(this Color c1, Color c2)
-        {
+        public static int ColorDiff(this Color c1, Color c2) {
             return (int)Math.Sqrt((c1.R - c2.R) * (c1.R - c2.R)
                                    + (c1.G - c2.G) * (c1.G - c2.G)
                                    + (c1.B - c2.B) * (c1.B - c2.B));

@@ -19,11 +19,9 @@
 
 using System;
 
-namespace BlueBasics.Enums
-{
+namespace BlueBasics.Enums {
     [Flags]
-    public enum enDirection : byte
-    {
+    public enum enDirection : byte {
         Nichts = 0,
         Oben = 1,
         Unten = 2,

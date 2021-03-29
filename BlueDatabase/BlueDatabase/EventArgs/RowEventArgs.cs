@@ -18,12 +18,9 @@
 #endregion
 
 
-namespace BlueDatabase.EventArgs
-{
-    public class RowEventArgs : System.EventArgs
-    {
-        public RowEventArgs(RowItem Row)
-        {
+namespace BlueDatabase.EventArgs {
+    public class RowEventArgs : System.EventArgs {
+        public RowEventArgs(RowItem Row) {
             this.Row = Row;
         }
 

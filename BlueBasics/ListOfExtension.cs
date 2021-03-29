@@ -27,10 +27,8 @@ using System.Linq;
 using static BlueBasics.FileOperations;
 using static BlueBasics.modConverter;
 
-namespace BlueBasics
-{
-    public static class ListOfExtension
-    {
+namespace BlueBasics {
+    public static class ListOfExtension {
         /// <summary>
         /// Führt bei allem Typen ein ToString aus und addiert diese mittels \r. Enthält ein ToString ein \r, dann wird abgebrochen.
         /// </summary>
@@ -38,22 +36,19 @@ namespace BlueBasics
         /// <param name="l"></param>
         /// <param name="removeEmpty"></param>
         /// <returns></returns>
-        public static string ToString<T>(this List<T> l, bool removeEmpty) where T : IParseable
-        {
+        public static string ToString<T>(this List<T> l, bool removeEmpty) where T : IParseable {
             // Remove Empty sollte eigentlich selbstverständlich seih. Ist nur als Dummy drinnen, dass der Interpreter zwischen der Internen und Extension unterscheiden kann.
 
             var tmp = string.Empty;
 
-            foreach (var Item in l)
-            {
+            foreach (var Item in l) {
                 var tmp2 = string.Empty;
 
                 if (Item != null) { tmp2 = Item.ToString(); }
 
                 if (tmp2.Contains("\r")) { Develop.DebugPrint(enFehlerArt.Fehler, "List.Tostring hat einen Zeilenumbruch gefunden."); }
 
-                if (!removeEmpty || !string.IsNullOrEmpty(tmp2))
-                {
+                if (!removeEmpty || !string.IsNullOrEmpty(tmp2)) {
                     tmp = tmp + tmp2 + "\r";
                 }
             }
@@ -61,8 +56,7 @@ namespace BlueBasics
             return tmp.TrimCr();
         }
 
-        public static void SplitByCR(this List<string> list, string textToSplit)
-        {
+        public static void SplitByCR(this List<string> list, string textToSplit) {
             var l = new List<string>();
             l.AddRange(textToSplit.SplitByCR());
 
@@ -72,8 +66,7 @@ namespace BlueBasics
             list.AddRange(l);
         }
 
-        public static void SplitByCR_QuickSortAndRemoveDouble(this List<string> list, string textToSplit)
-        {
+        public static void SplitByCR_QuickSortAndRemoveDouble(this List<string> list, string textToSplit) {
             var l = new List<string>();
             l.AddRange(textToSplit.SplitByCR());
             l = l.SortedDistinctList();
@@ -84,23 +77,18 @@ namespace BlueBasics
             list.AddRange(l);
         }
 
-        public static bool RemoveNullOrEmpty<T>(this List<T> l) where T : ICanBeEmpty
-        {
+        public static bool RemoveNullOrEmpty<T>(this List<T> l) where T : ICanBeEmpty {
             if (l == null || l.Count == 0) { return false; }
 
             var Did = false;
 
             var z = 0;
 
-            while (z < l.Count)
-            {
-                if (l[z] == null || l[z].IsNullOrEmpty())
-                {
+            while (z < l.Count) {
+                if (l[z] == null || l[z].IsNullOrEmpty()) {
                     l.RemoveAt(z);
                     Did = true;
-                }
-                else
-                {
+                } else {
                     z++;
                 }
             }
@@ -108,8 +96,7 @@ namespace BlueBasics
             return Did;
         }
 
-        public static bool IsDifferentTo<T>(this List<T> list1, List<T> list2)
-        {
+        public static bool IsDifferentTo<T>(this List<T> list1, List<T> list2) {
             // https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.sequenceequal?redirectedfrom=MSDN&view=netcore-3.1#System_Linq_Enumerable_SequenceEqual__1_System_Collections_Generic_IEnumerable___0__System_Collections_Generic_IEnumerable___0__
             if (list1 == list2) { return false; }
             if (list1 is null || list2 is null) { return true; }
@@ -136,13 +123,10 @@ namespace BlueBasics
         // return List1.Where((t, Count) => t != List2[Count]).Any();
         // }
 
-        public static void Shuffle<T>(this IList<T> list)
-        {
-            for (var i1 = 0; i1 < list.Count; i1++)
-            {
+        public static void Shuffle<T>(this IList<T> list) {
+            for (var i1 = 0; i1 < list.Count; i1++) {
                 var i2 = Constants.GlobalRND.Next(i1, list.Count);
-                if (i1 != i2)
-                {
+                if (i1 != i2) {
                     var v1 = list[i1];
                     var v2 = list[i2];
                     // modAllgemein.Swap(ref tempVar, ref tempVar2);
@@ -166,40 +150,30 @@ namespace BlueBasics
         //    }
         // }
 
-        public static void RemoveNullOrEmpty(this List<string> l)
-        {
+        public static void RemoveNullOrEmpty(this List<string> l) {
             var z = 0;
 
-            while (z < l.Count)
-            {
-                if (string.IsNullOrEmpty(l[z]))
-                {
+            while (z < l.Count) {
+                if (string.IsNullOrEmpty(l[z])) {
                     l.RemoveAt(z);
-                }
-                else
-                {
+                } else {
                     z++;
                 }
             }
         }
 
-        public static bool RemoveNull<T>(this List<T> l)
-        {
+        public static bool RemoveNull<T>(this List<T> l) {
             if (l == null || l.Count == 0) { return false; }
 
             var Did = false;
 
             var z = 0;
 
-            while (z < l.Count)
-            {
-                if (l[z] == null || l[z].Equals(default(T)))
-                {
+            while (z < l.Count) {
+                if (l[z] == null || l[z].Equals(default(T))) {
                     l.RemoveAt(z);
                     Did = true;
-                }
-                else
-                {
+                } else {
                     z++;
                 }
             }
@@ -207,20 +181,17 @@ namespace BlueBasics
             return Did;
         }
 
-        public static void Load(this List<string> l, string filename, System.Text.Encoding code)
-        {
+        public static void Load(this List<string> l, string filename, System.Text.Encoding code) {
             var t = File.ReadAllText(filename, code);
 
             l.Clear();
             l.AddRange(t.SplitByCR());
         }
 
-        public static void Save(this List<string> l, string dateiName, bool executeAfter, System.Text.Encoding code)
-        {
+        public static void Save(this List<string> l, string dateiName, bool executeAfter, System.Text.Encoding code) {
             var t = l.JoinWith("\r\n").TrimEnd("\r\n");
 
-            if (!FileOperations.PathExists(dateiName.FilePath()))
-            {
+            if (!FileOperations.PathExists(dateiName.FilePath())) {
                 System.IO.Directory.CreateDirectory(dateiName.FilePath());
             }
 
@@ -233,73 +204,54 @@ namespace BlueBasics
         /// <typeparam name="T"></typeparam>
         /// <param name="l"></param>
         /// <param name="value"></param>
-        public static void Remove<T>(this List<T> l, T value) where T : IComparable
-        {
+        public static void Remove<T>(this List<T> l, T value) where T : IComparable {
             do { } while (l.Remove(value));
         }
 
-        public static void RemoveString(this List<string> l, string value, bool caseSensitive)
-        {
+        public static void RemoveString(this List<string> l, string value, bool caseSensitive) {
             if (caseSensitive) { Develop.DebugPrint(enFehlerArt.Fehler, "CaseSensitive = True"); }
 
             var z = 0;
 
-            while (z < l.Count)
-            {
-                if (string.Equals(l[z], value, StringComparison.OrdinalIgnoreCase))
-                {
+            while (z < l.Count) {
+                if (string.Equals(l[z], value, StringComparison.OrdinalIgnoreCase)) {
                     l.RemoveAt(z);
-                }
-                else
-                {
+                } else {
                     z++;
                 }
             }
         }
 
-        public static void RemoveString(this List<string> l, List<string> value, bool caseSensitive)
-        {
-            foreach (var t in value)
-            {
+        public static void RemoveString(this List<string> l, List<string> value, bool caseSensitive) {
+            foreach (var t in value) {
                 l.RemoveString(t, caseSensitive);
             }
         }
 
-        public static void RemoveString(this List<string> l, string[] value, bool caseSensitive)
-        {
-            for (var z = 0; z <= value.GetUpperBound(0); z++)
-            {
+        public static void RemoveString(this List<string> l, string[] value, bool caseSensitive) {
+            for (var z = 0; z <= value.GetUpperBound(0); z++) {
                 l.RemoveString(value[z], caseSensitive);
             }
         }
 
-        public static List<string> TagGetAll(this ICollection<string> _String, string tagName)
-        {
+        public static List<string> TagGetAll(this ICollection<string> _String, string tagName) {
             var l = new List<string>();
 
             if (_String == null) { return l; }
 
             var uTagName = tagName.ToUpper();
 
-            foreach (var ThisString in _String)
-            {
-                if (ThisString.ToUpper().StartsWith(uTagName))
-                {
-                    if (ThisString.ToUpper().StartsWith(uTagName + ": "))
-                    {
+            foreach (var ThisString in _String) {
+                if (ThisString.ToUpper().StartsWith(uTagName)) {
+                    if (ThisString.ToUpper().StartsWith(uTagName + ": ")) {
                         l.Add(ThisString.Substring(uTagName.Length + 2));
-                    }
-                    else
-                    {
+                    } else {
                         if (ThisString.ToUpper().StartsWith(uTagName + ":")) { l.Add(ThisString.Substring(uTagName.Length + 1)); }
                     }
 
-                    if (ThisString.ToUpper().StartsWith(uTagName + " = "))
-                    {
+                    if (ThisString.ToUpper().StartsWith(uTagName + " = ")) {
                         l.Add(ThisString.Substring(uTagName.Length + 3));
-                    }
-                    else
-                    {
+                    } else {
                         if (ThisString.ToUpper().StartsWith(uTagName + "=")) { l.Add(ThisString.Substring(uTagName.Length + 1)); }
                     }
                 }
@@ -308,31 +260,25 @@ namespace BlueBasics
             return l;
         }
 
-        public static int TagGetInt(this ICollection<string> _String, string tagName)
-        {
+        public static int TagGetInt(this ICollection<string> _String, string tagName) {
             return IntParse(TagGet(_String, tagName));
         }
 
-        public static decimal TagGetDecimal(this ICollection<string> _String, string tagName)
-        {
+        public static decimal TagGetDecimal(this ICollection<string> _String, string tagName) {
             return DecimalParse(TagGet(_String, tagName));
         }
 
-        public static double TagGetDouble(this ICollection<string> _String, string tagName)
-        {
+        public static double TagGetDouble(this ICollection<string> _String, string tagName) {
             return DoubleParse(TagGet(_String, tagName));
         }
 
-        public static string TagGet(this ICollection<string> _String, string tagName)
-        {
+        public static string TagGet(this ICollection<string> _String, string tagName) {
             if (_String == null) { return string.Empty; }
 
             var uTagName = tagName.ToUpper().Trim();
 
-            foreach (var ThisString in _String)
-            {
-                if (ThisString.ToUpper().StartsWith(uTagName))
-                {
+            foreach (var ThisString in _String) {
+                if (ThisString.ToUpper().StartsWith(uTagName)) {
                     if (ThisString.ToUpper().StartsWith(uTagName + ": ")) { return ThisString.Substring(uTagName.Length + 2); }
                     if (ThisString.ToUpper().StartsWith(uTagName + ":")) { return ThisString.Substring(uTagName.Length + 1); }
                     if (ThisString.ToUpper().StartsWith(uTagName + " = ")) { return ThisString.Substring(uTagName.Length + 3); }
@@ -343,21 +289,17 @@ namespace BlueBasics
             return string.Empty;
         }
 
-        public static void TagSet(this ICollection<string> _String, string tagNamex, string value)
-        {
+        public static void TagSet(this ICollection<string> _String, string tagNamex, string value) {
             var uTagName = tagNamex.ToUpper() + ":";
             var Found = -1;
 
-            for (var z = 0; z < _String.Count; z++)
-            {
-                if (_String.ElementAtOrDefault(z)?.Length > uTagName.Length + 1 && _String.ElementAtOrDefault(z)?.Substring(0, uTagName.Length + 1).ToUpper() == uTagName + " ")
-                {
+            for (var z = 0; z < _String.Count; z++) {
+                if (_String.ElementAtOrDefault(z)?.Length > uTagName.Length + 1 && _String.ElementAtOrDefault(z)?.Substring(0, uTagName.Length + 1).ToUpper() == uTagName + " ") {
                     Found = z;
                     break;
                 }
 
-                if (_String.ElementAtOrDefault(z)?.Length > uTagName.Length && _String.ElementAtOrDefault(z)?.Substring(0, uTagName.Length).ToUpper() == uTagName)
-                {
+                if (_String.ElementAtOrDefault(z)?.Length > uTagName.Length && _String.ElementAtOrDefault(z)?.Substring(0, uTagName.Length).ToUpper() == uTagName) {
                     Found = z;
                     break;
                 }
@@ -365,10 +307,8 @@ namespace BlueBasics
 
             var n = tagNamex + ": " + value;
 
-            if (Found >= 0)
-            {
-                if (_String.ElementAtOrDefault(Found) == n)
-                {
+            if (Found >= 0) {
+                if (_String.ElementAtOrDefault(Found) == n) {
                     return;
                 }
 
@@ -378,16 +318,13 @@ namespace BlueBasics
             _String.Add(n);
         }
 
-        public static bool AddIfNotExists<T>(this List<T> l, BindingList<T> values)
-        {
+        public static bool AddIfNotExists<T>(this List<T> l, BindingList<T> values) {
             if (values == null || values.Count == 0) { return false; }
 
             var ok1 = false;
 
-            foreach (var thivalue in values)
-            {
-                if (l.AddIfNotExists(thivalue))
-                {
+            foreach (var thivalue in values) {
+                if (l.AddIfNotExists(thivalue)) {
                     ok1 = true;
                 }
             }
@@ -395,16 +332,13 @@ namespace BlueBasics
             return ok1;
         }
 
-        public static bool AddIfNotExists<T>(this List<T> l, List<T> values)
-        {
+        public static bool AddIfNotExists<T>(this List<T> l, List<T> values) {
             if (values == null || values.Count == 0) { return false; }
 
             var ok1 = false;
 
-            foreach (var thivalue in values)
-            {
-                if (l.AddIfNotExists(thivalue))
-                {
+            foreach (var thivalue in values) {
+                if (l.AddIfNotExists(thivalue)) {
                     ok1 = true;
                 }
             }
@@ -412,10 +346,8 @@ namespace BlueBasics
             return ok1;
         }
 
-        public static bool AddIfNotExists<T>(this List<T> l, T value)
-        {
-            if (!l.Contains(value))
-            {
+        public static bool AddIfNotExists<T>(this List<T> l, T value) {
+            if (!l.Contains(value)) {
                 l.Add(value);
                 return true;
             }

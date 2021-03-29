@@ -27,10 +27,8 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 
-namespace BlueControls
-{
-    public sealed class BlueFont : IParseable, IReadableTextWithChanging
-    {
+namespace BlueControls {
+    public sealed class BlueFont : IParseable, IReadableTextWithChanging {
         #region  Variablen-Deklarationen 
 
         private string _Code;
@@ -74,8 +72,7 @@ namespace BlueControls
 
 
 
-        private void Initialize()
-        {
+        private void Initialize() {
             _Code = "";
 
             _Font = null;
@@ -101,14 +98,12 @@ namespace BlueControls
             _CharSize = new SizeF[0];
 
             _CharSize = new SizeF[256];
-            for (var z = 0; z <= _CharSize.GetUpperBound(0); z++)
-            {
+            for (var z = 0; z <= _CharSize.GetUpperBound(0); z++) {
                 _CharSize[z] = new SizeF(-1, -1);
             }
         }
 
-        private BlueFont(string Code)
-        {
+        private BlueFont(string Code) {
             Initialize();
             Parse(Code);
         }
@@ -121,45 +116,39 @@ namespace BlueControls
 
         public bool IsParsing { get; private set; }
 
-        public Font Font(decimal Zoom)
-        {
+        public Font Font(decimal Zoom) {
 
             if (Math.Abs(Zoom - 1) < 0.001m && SizeOK(_Font.Size)) { return _Font; }
 
             var GR = _FontOL.Size * (float)Zoom / Skin.Scale;
 
 
-            if (SizeOK(GR))
-            {
+            if (SizeOK(GR)) {
                 return new Font(FontName, GR, _Font.Style, _Font.Unit);
             }
 
             return new Font("Arial", GR, _Font.Style, _Font.Unit);
         }
-        public Font Font()
-        {
+        public Font Font() {
             if (SizeOK(_Font.Size)) { return _Font; }
             return new Font("Arial", _FontOL.Size, _Font.Style, _Font.Unit);
         }
 
 
-        public Font FontWithoutLines(float Zoom)
-        {
+        public Font FontWithoutLines(float Zoom) {
 
             if (Math.Abs(Zoom - 1) < 0.001 && SizeOK(_FontOL.Size)) { return _FontOL; }
 
             var GR = _FontOL.Size * Zoom / Skin.Scale;
 
 
-            if (SizeOK(GR))
-            {
+            if (SizeOK(GR)) {
                 return new Font(FontName, GR, _FontOL.Style, _FontOL.Unit);
             }
 
             return new Font("Arial", GR, _FontOL.Style, _FontOL.Unit);
         }
-        public Font FontWithoutLinesForCapitals(float Zoom)
-        {
+        public Font FontWithoutLinesForCapitals(float Zoom) {
             return new Font(_FontOL.Name, _FontOL.Size * Zoom * 0.8F / Skin.Scale, _FontOL.Style, _FontOL.Unit);
         }
 
@@ -186,15 +175,13 @@ namespace BlueControls
         public string FontName { get; private set; }
 
 
-        public Pen Pen(float czoom)
-        {
+        public Pen Pen(float czoom) {
             if (Math.Abs(czoom - 1) < 0.001) { return _Pen; }
             return GeneratePen(czoom);
         }
 
 
-        public Pen Pen(decimal czoom)
-        {
+        public Pen Pen(decimal czoom) {
             if (Math.Abs(czoom - 1) < 0.001m) { return _Pen; }
             return GeneratePen((float)czoom);
         }
@@ -209,41 +196,34 @@ namespace BlueControls
         public Color Color_Outline { get; private set; }
 
 
-        public SizeF CharSize(float DummyWidth)
-        {
+        public SizeF CharSize(float DummyWidth) {
             return new SizeF(DummyWidth, _Zeilenabstand);
         }
 
 
-        internal float Oberl‰nge(float Zoom)
-        {
+        internal float Oberl‰nge(float Zoom) {
             return _Oberl‰ngex * Zoom;
         }
 
 
 
-        internal float Kapit‰lchenPlus(float Zoom)
-        {
+        internal float Kapit‰lchenPlus(float Zoom) {
             return _Kapit‰lchenPlus * Zoom;
         }
 
 
 
 
-        internal SizeF CharSize(char vChar)
-        {
+        internal SizeF CharSize(char vChar) {
 
 
-            if (vChar <= _CharSize.GetUpperBound(0))
-            {
+            if (vChar <= _CharSize.GetUpperBound(0)) {
 
-                if (_CharSize[vChar].Height <= 0)
-                {
+                if (_CharSize[vChar].Height <= 0) {
                     _CharSize[vChar] = Compute_Size(vChar);
                 }
 
-                if (_CharSize[vChar].Width < 1 && vChar > 30)
-                {
+                if (_CharSize[vChar].Width < 1 && vChar > 30) {
                     return _CharSize[vChar];
                 }
 
@@ -257,23 +237,19 @@ namespace BlueControls
         #endregion
 
 
-        private bool SizeOK(float S)
-        {
+        private bool SizeOK(float S) {
             // Windwos mach seltsamerweiﬂe bei manchen Schriften einen Fehler. Seit dem neuen Firmen-Windows-Update vom 08.06.2015
 
             if (S <= TestesOK) { return true; }
             if (S >= FehlerSchwelle) { return false; }
 
 
-            try
-            {
+            try {
                 MeasureString("x", new Font(_Font.Name, S / Skin.Scale, _Font.Style, _Font.Unit));
                 TestesOK = S;
                 return true;
 
-            }
-            catch
-            {
+            } catch {
                 FehlerSchwelle = S;
                 return false;
             }
@@ -282,12 +258,10 @@ namespace BlueControls
 
 
 
-        internal SizeF Compute_Size(char vChar)
-        {
+        internal SizeF Compute_Size(char vChar) {
 
             if (vChar >= 0 && vChar <= 31) { return new SizeF(0, _Zeilenabstand); }
-            if (vChar >= (int)enASCIIKey.ImageStart)
-            {
+            if (vChar >= (int)enASCIIKey.ImageStart) {
                 var BNR = QuickImage.Get(vChar - (int)enASCIIKey.ImageStart);
                 if (BNR == null) { return new SizeF(0, 0); }
                 return new SizeF(BNR.BMP.Width + 1, BNR.BMP.Height + 1);
@@ -301,18 +275,15 @@ namespace BlueControls
 
             // var c = Convert.ToChar(vChar).ToString();
 
-            if (Kapit‰lchen && char.ToUpper(vChar) != vChar)
-            {
+            if (Kapit‰lchen && char.ToUpper(vChar) != vChar) {
                 return new SizeF((MeasureString("." + char.ToUpper(vChar) + ".", _FontOL).Width - _WidthOf2Points) * 0.8F, _Zeilenabstand);
             }
 
-            if (OnlyUpper)
-            {
+            if (OnlyUpper) {
                 return new SizeF(MeasureString("." + char.ToUpper(vChar) + ".", _FontOL).Width - _WidthOf2Points, _Zeilenabstand);
             }
 
-            if (OnlyLower)
-            {
+            if (OnlyLower) {
                 return new SizeF(MeasureString("." + char.ToLower(vChar) + ".", _FontOL).Width - _WidthOf2Points, _Zeilenabstand);
             }
 
@@ -320,8 +291,7 @@ namespace BlueControls
         }
 
 
-        public void Parse(string ToParse)
-        {
+        public void Parse(string ToParse) {
             IsParsing = true;
             Initialize();
 
@@ -329,10 +299,8 @@ namespace BlueControls
             var ftst2 = FontStyle.Regular;
 
 
-            foreach (var pair in ToParse.GetAllTags())
-            {
-                switch (pair.Key)
-                {
+            foreach (var pair in ToParse.GetAllTags()) {
+                switch (pair.Key) {
                     case "name":
                     case "fontname":
                         FontName = pair.Value;
@@ -409,11 +377,9 @@ namespace BlueControls
             var bmp = new Bitmap((int)(f.Width + 1), (int)(f.Height + 1));
             var gr = Graphics.FromImage(bmp);
 
-            for (var du = 0; du <= 1; du++)
-            {
+            for (var du = 0; du <= 1; du++) {
                 gr.Clear(Color.White);
-                if (du == 1)
-                {
+                if (du == 1) {
                     tmpfont = new Font(_FontOL.Name, _FontOL.Size * Multi * 0.8F / Skin.Scale, _FontOL.Style);
                 }
                 gr.DrawString("Z", tmpfont, Brushes.Black, 0, 0);
@@ -421,22 +387,17 @@ namespace BlueControls
                 var miny = (int)(f.Height / 2.0);
 
                 //var tempVar = (int)(f.Width - 1);
-                for (var x = 1; x <= (f.Width - 1); x++)
-                {
-                    for (var y = (int)(f.Height - 1); y >= miny; y--)
-                    {
+                for (var x = 1; x <= (f.Width - 1); x++) {
+                    for (var y = (int)(f.Height - 1); y >= miny; y--) {
                         if (y > miny && bmp.GetPixel(x, y).R == 0) { miny = y; }
 
                     }
                 }
 
-                if (du == 0)
-                {
+                if (du == 0) {
                     _Oberl‰ngex = miny / Multi;
                     if (!Kapit‰lchen) { break; }
-                }
-                else
-                {
+                } else {
                     _Kapit‰lchenPlus = _Oberl‰ngex - miny / Multi;
                 }
             }
@@ -460,14 +421,12 @@ namespace BlueControls
             _Code = ToString(FontName, FontSize, Bold, Italic, Underline, StrikeOut, Outline, Color_Main.ToHTMLCode(), Color_Outline.ToHTMLCode(), Kapit‰lchen, OnlyUpper, OnlyLower);
         }
 
-        internal BlueFont Scale(double fontScale)
-        {
+        internal BlueFont Scale(double fontScale) {
             if (Math.Abs(1 - fontScale) < 0.01) { return this; }
             return Get(FontName, (float)(FontSize * fontScale), Bold, Italic, Underline, StrikeOut, Outline, Color_Main, Color_Outline, Kapit‰lchen, OnlyUpper, OnlyLower);
         }
 
-        private Pen GeneratePen(float cZoom)
-        {
+        private Pen GeneratePen(float cZoom) {
 
             var linDi = _Zeilenabstand / 10 * cZoom;
 
@@ -477,14 +436,12 @@ namespace BlueControls
         }
 
 
-        public new string ToString()
-        {
+        public new string ToString() {
             return _Code;
         }
 
 
-        private static string ToString(string FontName, float FontSize, bool Bold, bool Italic, bool Underline, bool Strikeout, bool OutLine, string Color_Main, string Color_Outline, bool vKapit‰lchen, bool vonlyuppe, bool vonlylower)
-        {
+        private static string ToString(string FontName, float FontSize, bool Bold, bool Italic, bool Underline, bool Strikeout, bool OutLine, string Color_Main, string Color_Outline, bool vKapit‰lchen, bool vonlyuppe, bool vonlylower) {
             var c = "{Name=" + FontName + ", Size=" + FontSize.ToString().ToNonCritical();
             if (Bold) { c += ", Bold=True"; }
             if (Italic) { c += ", Italic=True"; }
@@ -501,41 +458,35 @@ namespace BlueControls
 
 
 
-        public static BlueFont Get(FontFamily vFont, float Size)
-        {
+        public static BlueFont Get(FontFamily vFont, float Size) {
             return Get(vFont.Name, Size, false, false, false, false, false, "000000", "FFFFFF", false, false, false);
         }
 
 
-        public static BlueFont Get(string FontName, float FontSize, bool Bold, bool Italic, bool Underline, bool Strikeout, bool OutLine, string Color_Main, string Color_Outline, bool Kapit‰lchen, bool OnlyUpper, bool OnlyLower)
-        {
+        public static BlueFont Get(string FontName, float FontSize, bool Bold, bool Italic, bool Underline, bool Strikeout, bool OutLine, string Color_Main, string Color_Outline, bool Kapit‰lchen, bool OnlyUpper, bool OnlyLower) {
             return Get(ToString(FontName, FontSize, Bold, Italic, Underline, Strikeout, OutLine, Color_Main, Color_Outline, Kapit‰lchen, OnlyUpper, OnlyLower));
         }
 
-        public static BlueFont Get(string FontName, float FontSize, bool Bold, bool Italic, bool Underline, bool Strikeout, bool OutLine, Color Color_Main, Color Color_Outline, bool Kapit‰lchen, bool OnlyUpper, bool OnlyLower)
-        {
+        public static BlueFont Get(string FontName, float FontSize, bool Bold, bool Italic, bool Underline, bool Strikeout, bool OutLine, Color Color_Main, Color Color_Outline, bool Kapit‰lchen, bool OnlyUpper, bool OnlyLower) {
             return Get(FontName, FontSize, Bold, Italic, Underline, Strikeout, OutLine, Color_Main.ToHTMLCode(), Color_Outline.ToHTMLCode(), Kapit‰lchen, OnlyUpper, OnlyLower);
         }
 
 
-        public static BlueFont Get(string Code)
-        {
+        public static BlueFont Get(string Code) {
             if (string.IsNullOrEmpty(Code)) { return null; }
 
 
             if (!Code.Contains("{")) { Code = "{Name=Arial, Size=10, Color=ff0000}"; }
 
 
-            foreach (var Thisfont in _FontsAll)
-            {
+            foreach (var Thisfont in _FontsAll) {
                 if (Thisfont.ToString().ToUpper() == Code.ToUpper()) { return Thisfont; }
             }
 
             var f = new BlueFont(Code);
             _FontsAll.Add(f);
 
-            if (f._Code.ToUpper() != Code.ToUpper())
-            {
+            if (f._Code.ToUpper() != Code.ToUpper()) {
                 Develop.DebugPrint("Schrift-Fehlerhaft: " + Code + " (" + f._Code + ")");
             }
 
@@ -544,8 +495,7 @@ namespace BlueControls
         }
 
 
-        public string ReadableText()
-        {
+        public string ReadableText() {
             var t = FontName + ", " + FontSize + " pt, ";
 
 
@@ -561,25 +511,18 @@ namespace BlueControls
         }
 
 
-        private BitmapExt Symbol(string Text, bool Transparent)
-        {
+        private BitmapExt Symbol(string Text, bool Transparent) {
 
             var s = BlueFont.MeasureString(Text, Font());
             var bmp = new BitmapExt((int)(s.Width + 1), (int)(s.Height + 1));
 
 
-            using (var gr = Graphics.FromImage(bmp.Bitmap))
-            {
-                if (Transparent)
-                {
+            using (var gr = Graphics.FromImage(bmp.Bitmap)) {
+                if (Transparent) {
                     gr.Clear(Color.FromArgb(180, 180, 180));
-                }
-                else if (Color_Main.GetBrightness() > 0.9F)
-                {
+                } else if (Color_Main.GetBrightness() > 0.9F) {
                     gr.Clear(Color.FromArgb(200, 200, 200));
-                }
-                else
-                {
+                } else {
                     gr.Clear(Color.White);
                 }
 
@@ -605,8 +548,7 @@ namespace BlueControls
             }
 
 
-            if (Transparent)
-            {
+            if (Transparent) {
                 bmp.Bitmap.MakeTransparent(Color.FromArgb(180, 180, 180));
             }
 
@@ -614,10 +556,8 @@ namespace BlueControls
         }
 
 
-        public QuickImage SymbolForReadableText()
-        {
-            if (SymbolForReadableText_sym != null)
-            {
+        public QuickImage SymbolForReadableText() {
+            if (SymbolForReadableText_sym != null) {
                 return SymbolForReadableText_sym;
             }
             QuickImage.Add("Font-" + ToString(), Symbol("Abc", false));
@@ -626,37 +566,30 @@ namespace BlueControls
         }
 
 
-        public QuickImage NameInStyle()
-        {
+        public QuickImage NameInStyle() {
             if (NameInStyle_sym != null) { return NameInStyle_sym; }
             QuickImage.Add("FontName-" + ToString(), Symbol(Font().Name, true));
             NameInStyle_sym = QuickImage.Get("FontName-" + ToString());
             return NameInStyle_sym;
         }
 
-        public BitmapExt SampleText()
-        {
+        public BitmapExt SampleText() {
             if (SampleText_sym != null) { return SampleText_sym; }
             SampleText_sym = Symbol("AaBbCcƒ‰.,?!", false);
             return SampleText_sym;
         }
 
 
-        public QuickImage SymbolOfLine()
-        {
+        public QuickImage SymbolOfLine() {
             if (SymbolOfLine_sym != null) { return SymbolOfLine_sym; }
 
             var bmp = new BitmapExt(32, 12);
 
-            using (var gr = Graphics.FromImage(bmp.Bitmap))
-            {
+            using (var gr = Graphics.FromImage(bmp.Bitmap)) {
 
-                if (Color_Main.GetBrightness() > 0.9F)
-                {
+                if (Color_Main.GetBrightness() > 0.9F) {
                     gr.Clear(Color.FromArgb(200, 200, 200));
-                }
-                else
-                {
+                } else {
                     gr.Clear(Color.White);
                 }
 
@@ -672,26 +605,22 @@ namespace BlueControls
 
 
 
-        public void OnChanged()
-        {
+        public void OnChanged() {
             if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
 
-        public SizeF MeasureString(string s)
-        {
+        public SizeF MeasureString(string s) {
             return MeasureString(s, _FontOL);
         }
 
-        public static SizeF MeasureString(string s, Font f)
-        {
+        public static SizeF MeasureString(string s, Font f) {
             using var g = Graphics.FromHwnd(IntPtr.Zero);
             return g.MeasureString(s, f);
         }
 
-        public static SizeF MeasureStringOfCaption(string s)
-        {
+        public static SizeF MeasureStringOfCaption(string s) {
             return BlueFont.MeasureString(s, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
         }
 

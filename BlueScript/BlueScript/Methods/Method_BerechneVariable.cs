@@ -56,9 +56,11 @@ namespace BlueScript
 
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
 
-            if (attvar == null || attvar.Count != 1) { return strDoItFeedback.AttributFehler(); }
+            if (attvar == null || attvar.Count != 1)
+            { return strDoItFeedback.AttributFehler(); }
 
-            if (variable.Type != enVariableDataType.NotDefinedYet && attvar[0].Type != variable.Type) { return strDoItFeedback.FalscherDatentyp(); }
+            if (variable.Type != enVariableDataType.NotDefinedYet && attvar[0].Type != variable.Type)
+            { return strDoItFeedback.FalscherDatentyp(); }
 
             variable.ValueString = attvar[0].ValueString;
             variable.Type = attvar[0].Type;

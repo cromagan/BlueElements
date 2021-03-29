@@ -21,14 +21,10 @@ using BlueBasics.Enums;
 using System;
 using System.Drawing;
 
-namespace BlueBasics
-{
-    public static partial class Extensions
-    {
-        public static PointF PointOf(this RectangleF r, enAlignment p)
-        {
-            switch (p)
-            {
+namespace BlueBasics {
+    public static partial class Extensions {
+        public static PointF PointOf(this RectangleF r, enAlignment p) {
+            switch (p) {
                 case enAlignment.Bottom_Left:
                     return new PointF(r.Left, r.Bottom);
                 case enAlignment.Bottom_Right:
@@ -53,8 +49,7 @@ namespace BlueBasics
             }
         }
 
-        public static PointF NearestCornerOF(this RectangleF r, Point p)
-        {
+        public static PointF NearestCornerOF(this RectangleF r, Point p) {
             var LO = r.PointOf(enAlignment.Top_Left);
             var rO = r.PointOf(enAlignment.Top_Right);
             var ru = r.PointOf(enAlignment.Bottom_Right);
@@ -74,8 +69,7 @@ namespace BlueBasics
             return Point.Empty;
         }
 
-        public static Rectangle ToRect(this RectangleF r)
-        {
+        public static Rectangle ToRect(this RectangleF r) {
             return new Rectangle((int)r.X, (int)r.Y, (int)r.Width, (int)r.Height);
         }
     }

@@ -21,10 +21,8 @@ using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
 
-namespace BlueScript
-{
-    public class Method_SetError : BlueScript.Method
-    {
+namespace BlueScript {
+    public class Method_SetError : BlueScript.Method {
 
 
         //public Method_SetError(Script parent) : base(parent) { }
@@ -41,18 +39,15 @@ namespace BlueScript
         public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.VariableListOrStringNumBool };
         public override bool EndlessArgs => true;
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
-        {
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
-            for (var z = 1; z < attvar.Count; z++)
-            {
+            for (var z = 1; z < attvar.Count; z++) {
                 var n = attvar[z].Name.ToLower() + "_error";
                 var ve = s.Variablen.GetSystem(n);
 
-                if (ve == null)
-                {
+                if (ve == null) {
                     ve = new Variable(n, string.Empty, Skript.Enums.enVariableDataType.List, false, true, string.Empty);
                     s.Variablen.Add(ve);
                 }

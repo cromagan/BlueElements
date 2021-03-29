@@ -16,10 +16,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 #endregion
-namespace BlueBasics.Enums
-{
-    public enum enMouseEvent
-    {
+namespace BlueBasics.Enums {
+    public enum enMouseEvent {
         LEFTDOWN = 0x2,
         LEFTUP = 0x4,
         MOVE = 0x1,

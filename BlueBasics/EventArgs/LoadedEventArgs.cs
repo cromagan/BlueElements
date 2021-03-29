@@ -17,13 +17,10 @@
 // DEALINGS IN THE SOFTWARE.
 #endregion
 
-namespace BlueBasics.EventArgs
-{
-    public class LoadedEventArgs : System.EventArgs
-    {
-        public LoadedEventArgs(bool onlyReload)
-        {
-            this.OnlyReload = onlyReload;
+namespace BlueBasics.EventArgs {
+    public class LoadedEventArgs : System.EventArgs {
+        public LoadedEventArgs(bool onlyReload) {
+            OnlyReload = onlyReload;
         }
 
         public bool OnlyReload { get; private set; }

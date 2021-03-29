@@ -195,7 +195,8 @@ namespace BlueScript
             set
             {
 
-                if (_ScriptText == value) { return; }
+                if (_ScriptText == value)
+                { return; }
                 //_parsed = false;
                 _ScriptText = value;
             }
@@ -222,18 +223,21 @@ namespace BlueScript
                 switch (c)
                 {
                     case "\"":
-                        if (!comment) { gänsef = !gänsef; }
+                        if (!comment)
+                        { gänsef = !gänsef; }
                         break;
 
                     case "/":
                         if (!gänsef)
                         {
-                            if (pos < txt.Length - 1 && txt.Substring(pos, 2) == "//") { comment = true; }
+                            if (pos < txt.Length - 1 && txt.Substring(pos, 2) == "//")
+                            { comment = true; }
                         }
                         break;
 
                     case "\r":
-                        if (gänsef) { s.Append("\";Exception(\"Fehler mit Anführungsstrichen\");"); }
+                        if (gänsef)
+                        { s.Append("\";Exception(\"Fehler mit Anführungsstrichen\");"); }
                         s.Append("¶");
                         comment = false;
                         addt = false;
@@ -243,7 +247,8 @@ namespace BlueScript
                     case " ":
                     case "\n":
                     case "\t":
-                        if (!gänsef) { addt = false; }
+                        if (!gänsef)
+                        { addt = false; }
                         break;
                 }
 
@@ -280,7 +285,8 @@ namespace BlueScript
 
             do
             {
-                if (pos >= tmptxt.Length || s.EndSkript) { return (string.Empty, string.Empty); }
+                if (pos >= tmptxt.Length || s.EndSkript)
+                { return (string.Empty, string.Empty); }
 
 
 
@@ -320,7 +326,8 @@ namespace BlueScript
 
                 var f = thisC.CanDo(txt, pos, expectedvariablefeedback, s);
 
-                if (f.MustAbort) { return new strDoItWithEndedPosFeedback(f.ErrorMessage); }
+                if (f.MustAbort)
+                { return new strDoItWithEndedPosFeedback(f.ErrorMessage); }
 
                 if (string.IsNullOrEmpty(f.ErrorMessage))
                 {
@@ -348,7 +355,8 @@ namespace BlueScript
 
             do
             {
-                if (pos >= maxl) { return (-1, string.Empty); ; }
+                if (pos >= maxl)
+                { return (-1, string.Empty); ; }
 
 
 
@@ -372,7 +380,8 @@ namespace BlueScript
                     case "]":
                         if (!Gans)
                         {
-                            if (EckigeKlammern < 1) { return (-1, string.Empty); }
+                            if (EckigeKlammern < 1)
+                            { return (-1, string.Empty); }
                             EckigeKlammern--;
                         }
                         break;
@@ -382,7 +391,8 @@ namespace BlueScript
                     case "(":
                         if (!Gans)
                         {
-                            if (EckigeKlammern > 0) { return (-1, string.Empty); }
+                            if (EckigeKlammern > 0)
+                            { return (-1, string.Empty); }
 
                             if (klammern == 0 && GeschwKlammern == 0 && searchfor.Contains("("))
                             {
@@ -396,8 +406,10 @@ namespace BlueScript
                     case ")":
                         if (!Gans)
                         {
-                            if (EckigeKlammern > 0) { return (-1, string.Empty); }
-                            if (klammern < 1) { return (-1, string.Empty); }
+                            if (EckigeKlammern > 0)
+                            { return (-1, string.Empty); }
+                            if (klammern < 1)
+                            { return (-1, string.Empty); }
                             klammern--;
                         }
                         break;
@@ -407,8 +419,10 @@ namespace BlueScript
                     case "{":
                         if (!Gans)
                         {
-                            if (klammern > 0) { return (-1, string.Empty); }
-                            if (EckigeKlammern > 0) { return (-1, string.Empty); }
+                            if (klammern > 0)
+                            { return (-1, string.Empty); }
+                            if (EckigeKlammern > 0)
+                            { return (-1, string.Empty); }
                             //if (GeschwKlammern) { return (-1, string.Empty); }
                             GeschwKlammern++;
                         }
@@ -417,9 +431,12 @@ namespace BlueScript
                     case "}":
                         if (!Gans)
                         {
-                            if (klammern > 0) { return (-1, string.Empty); }
-                            if (EckigeKlammern > 0) { return (-1, string.Empty); }
-                            if (GeschwKlammern < 1) { return (-1, string.Empty); }
+                            if (klammern > 0)
+                            { return (-1, string.Empty); }
+                            if (EckigeKlammern > 0)
+                            { return (-1, string.Empty); }
+                            if (GeschwKlammern < 1)
+                            { return (-1, string.Empty); }
                             GeschwKlammern--;
                         }
                         break;

@@ -39,17 +39,21 @@ namespace BlueScript
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
         {
 
-            if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
+            if (string.IsNullOrEmpty(infos.AttributText))
+            { return new strDoItFeedback("Kein Text angekommen."); }
 
             var bs = infos.AttributText.SplitBy("=");
 
-            if (bs.GetUpperBound(0) != 1) { return new strDoItFeedback("Fehler mit = - Zeichen"); }
+            if (bs.GetUpperBound(0) != 1)
+            { return new strDoItFeedback("Fehler mit = - Zeichen"); }
 
-            if (!Variable.IsValidName(bs[0])) { return new strDoItFeedback(bs[0] + "ist kein gültiger Variablen-Name"); }
+            if (!Variable.IsValidName(bs[0]))
+            { return new strDoItFeedback(bs[0] + "ist kein gültiger Variablen-Name"); }
 
             var v = s.Variablen.Get(bs[0]);
 
-            if (v != null) { return new strDoItFeedback("Variable " + bs[0] + " ist bereits vorhanden."); }
+            if (v != null)
+            { return new strDoItFeedback("Variable " + bs[0] + " ist bereits vorhanden."); }
 
             s.Variablen.Add(new Variable(bs[0]));
 

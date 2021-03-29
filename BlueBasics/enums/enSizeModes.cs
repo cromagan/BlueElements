@@ -16,10 +16,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 #endregion
-namespace BlueBasics.Enums
-{
-    public enum enSizeModes
-    {
+namespace BlueBasics.Enums {
+    public enum enSizeModes {
 
         EmptySpace = 1,
         BildAbschneiden = 2,

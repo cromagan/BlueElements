@@ -24,22 +24,19 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace BlueDatabase
-{
+namespace BlueDatabase {
 
 
     /// <summary>
     /// Diese Klasse enthält nur das Aussehen und gibt keinerlei Events ab. Deswegen INTERNAL!
     /// </summary>
-    public class CellItem
-    {
+    public class CellItem {
         private string _value = string.Empty;
 
 
         #region Konstruktor
 
-        public CellItem(string value, int width, int height)
-        {
+        public CellItem(string value, int width, int height) {
             _value = value;
             if (width > 0) { Size = new Size(width, height); }
         }
@@ -58,11 +55,9 @@ namespace BlueDatabase
 
         //public byte Symbol { get; set; }
 
-        public string Value
-        {
+        public string Value {
             get => _value;
-            set
-            {
+            set {
                 if (_value == value) { return; }
 
                 _value = value;
@@ -73,8 +68,7 @@ namespace BlueDatabase
 
         #endregion
 
-        internal void InvalidateSize()
-        {
+        internal void InvalidateSize() {
             Size = Size.Empty;
         }
 
@@ -83,11 +77,9 @@ namespace BlueDatabase
         /// Jede Zeile für sich richtig formatiert.
         /// </summary>
         /// <returns></returns>
-        public static List<string> ValuesReadable(ColumnItem column, RowItem Row, enShortenStyle Style)
-        {
+        public static List<string> ValuesReadable(ColumnItem column, RowItem Row, enShortenStyle Style) {
 
-            if (column.Format == enDataFormat.LinkedCell)
-            {
+            if (column.Format == enDataFormat.LinkedCell) {
                 //var LinkedData = CellCollection.LinkedCellData(column, Row, false, false);
                 //if (LinkedData.Item1 != null && LinkedData.Item2 != null) { return ValuesReadable(LinkedData.Item1, LinkedData.Item2, Style); }
                 //return new List<string>();
@@ -96,20 +88,17 @@ namespace BlueDatabase
 
             var ret = new List<string>();
 
-            if (!column.MultiLine)
-            {
+            if (!column.MultiLine) {
                 ret.Add(ValueReadable(column, Row.CellGetString(column), Style, column.BildTextVerhalten, true));
                 return ret;
             }
 
             var x = Row.CellGetList(column);
-            foreach (var thisstring in x)
-            {
+            foreach (var thisstring in x) {
                 ret.Add(ValueReadable(column, thisstring, Style, column.BildTextVerhalten, true));
             }
 
-            if (x.Count == 0)
-            {
+            if (x.Count == 0) {
                 var tmp = ValueReadable(column, string.Empty, Style, column.BildTextVerhalten, true);
                 if (!string.IsNullOrEmpty(tmp)) { ret.Add(tmp); }
             }
@@ -120,17 +109,14 @@ namespace BlueDatabase
 
 
 
-        public static Tuple<string, enAlignment, QuickImage> GetDrawingData(ColumnItem column, string originalText, enShortenStyle style, enBildTextVerhalten bildTextverhalten)
-        {
+        public static Tuple<string, enAlignment, QuickImage> GetDrawingData(ColumnItem column, string originalText, enShortenStyle style, enBildTextVerhalten bildTextverhalten) {
             var tmpText = CellItem.ValueReadable(column, originalText, style, bildTextverhalten, true);
             var tmpAlign = CellItem.StandardAlignment(column, bildTextverhalten);
             var tmpImageCode = CellItem.StandardImage(column, originalText, tmpText, style, bildTextverhalten);
 
-            if (bildTextverhalten == enBildTextVerhalten.Bild_oder_Text)
-            {
+            if (bildTextverhalten == enBildTextVerhalten.Bild_oder_Text) {
                 if (tmpImageCode != null) { tmpText = string.Empty; }
-                if (tmpImageCode == null && string.IsNullOrEmpty(tmpText) && !string.IsNullOrEmpty(originalText))
-                {
+                if (tmpImageCode == null && string.IsNullOrEmpty(tmpText) && !string.IsNullOrEmpty(originalText)) {
                     tmpImageCode = StandardErrorImage(16, enBildTextVerhalten.Fehlendes_Bild_zeige_Kritischzeichen);
                 }
             }
@@ -146,13 +132,11 @@ namespace BlueDatabase
         /// <param name="style"></param>
         /// <param name="removeLineBreaks">bei TRUE werden Zeilenumbrüche mit Leerzeichen ersetzt</param>
         /// <returns></returns>
-        public static string ValueReadable(ColumnItem column, string txt, enShortenStyle style, enBildTextVerhalten bildTextverhalten, bool removeLineBreaks)
-        {
+        public static string ValueReadable(ColumnItem column, string txt, enShortenStyle style, enBildTextVerhalten bildTextverhalten, bool removeLineBreaks) {
             if (bildTextverhalten == enBildTextVerhalten.Nur_Bild && style != enShortenStyle.HTML) { return string.Empty; }
 
 
-            switch (column.Format)
-            {
+            switch (column.Format) {
                 case enDataFormat.Text:
                 case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.Datum_und_Uhrzeit:
@@ -165,8 +149,7 @@ namespace BlueDatabase
                     txt = LanguageTool.ColumnReplace(txt, column, style);
 
 
-                    if (removeLineBreaks)
-                    {
+                    if (removeLineBreaks) {
                         txt = txt.Replace("\r\n", " ");
                         txt = txt.Replace("\r", " ");
                     }
@@ -178,25 +161,18 @@ namespace BlueDatabase
                     break;
 
                 case enDataFormat.Bit:
-                    if (txt == true.ToPlusMinus())
-                    {
+                    if (txt == true.ToPlusMinus()) {
                         txt = "Ja";
                         if (column == column.Database.Column.SysCorrect) { return "Ok"; }
                         if (column == column.Database.Column.SysLocked) { return "gesperrt"; }
 
-                    }
-                    else if (txt == false.ToPlusMinus())
-                    {
+                    } else if (txt == false.ToPlusMinus()) {
                         txt = "Nein";
                         if (column == column.Database.Column.SysCorrect) { return "fehlerhaft"; }
                         if (column == column.Database.Column.SysLocked) { return "bearbeitbar"; }
-                    }
-                    else if (txt == "o" || txt == "O")
-                    {
+                    } else if (txt == "o" || txt == "O") {
                         txt = "Neutral";
-                    }
-                    else if (txt == "?")
-                    {
+                    } else if (txt == "?") {
                         txt = "Unbekannt";
                     }
                     txt = LanguageTool.ColumnReplace(txt, column, style);
@@ -204,8 +180,7 @@ namespace BlueDatabase
 
 
                 case enDataFormat.FarbeInteger:
-                    if (!string.IsNullOrEmpty(txt) && txt.IsFormat(enDataFormat.FarbeInteger))
-                    {
+                    if (!string.IsNullOrEmpty(txt) && txt.IsFormat(enDataFormat.FarbeInteger)) {
                         var col = Color.FromArgb(int.Parse(txt));
                         txt = col.ColorName();
                     }
@@ -248,8 +223,7 @@ namespace BlueDatabase
             //if (txt.Contains("\n")) { Develop.DebugPrint(enFehlerArt.Info, "\\n enthalten:" + txt); }
 
 
-            while (txt.StartsWith(" ") || txt.StartsWith("<br>") || txt.EndsWith(" ") || txt.EndsWith("<br>"))
-            {
+            while (txt.StartsWith(" ") || txt.StartsWith("<br>") || txt.EndsWith(" ") || txt.EndsWith("<br>")) {
                 txt = txt.Trim();
                 txt = txt.Trim("<br>");
             }
@@ -257,11 +231,9 @@ namespace BlueDatabase
             return txt;
         }
 
-        public static QuickImage StandardErrorImage(int gr, enBildTextVerhalten bildTextverhalten)
-        {
+        public static QuickImage StandardErrorImage(int gr, enBildTextVerhalten bildTextverhalten) {
 
-            switch (bildTextverhalten)
-            {
+            switch (bildTextverhalten) {
                 case enBildTextVerhalten.Fehlendes_Bild_zeige_Fragezeichen:
                     return QuickImage.Get("Fragezeichen|" + gr + "|||||200|||80");
                 case enBildTextVerhalten.Fehlendes_Bild_zeige_Kreis:
@@ -284,8 +256,7 @@ namespace BlueDatabase
         }
 
 
-        private static QuickImage StandardImage(ColumnItem column, string originalText, string replacedText, enShortenStyle style, enBildTextVerhalten bildTextverhalten)
-        {
+        private static QuickImage StandardImage(ColumnItem column, string originalText, string replacedText, enShortenStyle style, enBildTextVerhalten bildTextverhalten) {
 
             // replacedText kann auch empty sein. z.B. wenn er nicht angezeigt wird
 
@@ -295,38 +266,26 @@ namespace BlueDatabase
             if (bildTextverhalten == enBildTextVerhalten.Nur_Bild) { replacedText = ValueReadable(column, originalText, style, enBildTextVerhalten.Nur_Text, true); }
 
 
-            switch (column.Format)
-            {
+            switch (column.Format) {
                 case enDataFormat.Text:
                 case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.RelationText:
                     return null; // z.B. KontextMenu
 
                 case enDataFormat.Bit:
-                    if (originalText == true.ToPlusMinus())
-                    {
+                    if (originalText == true.ToPlusMinus()) {
                         if (column == column.Database.Column.SysCorrect) { return QuickImage.Get("Häkchen|16||||||||80"); }
                         return QuickImage.Get(enImageCode.Häkchen, 16);
-                    }
-                    else if (originalText == false.ToPlusMinus())
-                    {
+                    } else if (originalText == false.ToPlusMinus()) {
                         if (column == column.Database.Column.SysCorrect) { return QuickImage.Get(enImageCode.Warnung, 16); }
                         return QuickImage.Get(enImageCode.Kreuz, 16);
-                    }
-                    else if (originalText == "o" || replacedText == "O")
-                    {
+                    } else if (originalText == "o" || replacedText == "O") {
                         return QuickImage.Get(enImageCode.Kreis2, 16);
-                    }
-                    else if (originalText == "?")
-                    {
+                    } else if (originalText == "?") {
                         return QuickImage.Get(enImageCode.Fragezeichen, 16);
-                    }
-                    else if (string.IsNullOrEmpty(replacedText))
-                    { // Hier Replaced Text
+                    } else if (string.IsNullOrEmpty(replacedText)) { // Hier Replaced Text
                         return null;
-                    }
-                    else
-                    {
+                    } else {
                         return StandardErrorImage(16, bildTextverhalten);
                     }
 
@@ -351,8 +310,7 @@ namespace BlueDatabase
 
                 case enDataFormat.FarbeInteger:
 
-                    if (!string.IsNullOrEmpty(replacedText) && replacedText.IsFormat(enDataFormat.FarbeInteger))
-                    {
+                    if (!string.IsNullOrEmpty(replacedText) && replacedText.IsFormat(enDataFormat.FarbeInteger)) {
                         var col = Color.FromArgb(int.Parse(replacedText));
                         return QuickImage.Get(enImageCode.Kreis, 16, "", col.ToHTMLCode());
                     }
@@ -389,11 +347,9 @@ namespace BlueDatabase
 
 
 
-        public static enAlignment StandardAlignment(ColumnItem column, enBildTextVerhalten bildTextverhalten)
-        {
+        public static enAlignment StandardAlignment(ColumnItem column, enBildTextVerhalten bildTextverhalten) {
 
-            switch (column.Align)
-            {
+            switch (column.Align) {
                 case enAlignmentHorizontal.Links:
                     return enAlignment.Top_Left;
                 case enAlignmentHorizontal.Rechts:
@@ -403,8 +359,7 @@ namespace BlueDatabase
             }
 
 
-            switch (column.Format)
-            {
+            switch (column.Format) {
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.Gleitkommazahl:
                     return enAlignment.Top_Right;

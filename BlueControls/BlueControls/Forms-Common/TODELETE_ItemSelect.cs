@@ -25,41 +25,33 @@ using BlueDatabase;
 using System.Collections.Generic;
 
 
-namespace BlueControls.Forms
-{
-    public sealed partial class ItemSelect
-    {
-        public ItemSelect()
-        {
+namespace BlueControls.Forms {
+    public sealed partial class ItemSelect {
+        public ItemSelect() {
             InitializeComponent();
         }
 
         private BasicListItem ClickedItem;
 
 
-        private void List_ItemClicked(object sender, BasicListItemEventArgs e)
-        {
+        private void List_ItemClicked(object sender, BasicListItemEventArgs e) {
             ClickedItem = e.Item;
             Close();
         }
 
-        public string SelectOne_OfDataSystem(List<string> Files, string FileEncryptionKey)
-        {
+        public string SelectOne_OfDataSystem(List<string> Files, string FileEncryptionKey) {
 
             //    Dim l As List(Of String) = DataSystem.GetFiles()
 
-            foreach (var ThisString in Files)
-            {
-                if (ThisString.FileType() == enFileFormat.Image)
-                {
+            foreach (var ThisString in Files) {
+                if (ThisString.FileType() == enFileFormat.Image) {
                     List.Item.Add(ThisString, ThisString, ThisString.FileNameWithoutSuffix(), FileEncryptionKey);
                 }
             }
 
             ShowDialog();
 
-            if (ClickedItem != null)
-            {
+            if (ClickedItem != null) {
                 return ClickedItem.Internal;
             }
 
@@ -68,24 +60,20 @@ namespace BlueControls.Forms
         }
 
 
-        public RowItem SelectOne_OfRow(List<RowItem> rows, string textOfNewRow, string layoutID, bool allowClose)
-        {
+        public RowItem SelectOne_OfRow(List<RowItem> rows, string textOfNewRow, string layoutID, bool allowClose) {
 
             List.Item.Clear();
 
-            foreach (var ThisRow in rows)
-            {
+            foreach (var ThisRow in rows) {
                 List.Item.Add(ThisRow, layoutID);
             }
 
 
-            if (!string.IsNullOrEmpty(textOfNewRow))
-            {
+            if (!string.IsNullOrEmpty(textOfNewRow)) {
                 List.Item.Add(QuickImage.Get("Kreuz|128").BMP, textOfNewRow);
             }
 
-            do
-            {
+            do {
                 ShowDialog();
                 if (ClickedItem != null) { break; }
                 if (allowClose) { break; }

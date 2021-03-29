@@ -69,7 +69,8 @@ namespace BluePaint
         private void LoadFromDisk(string filename)
         {
 
-            if (!IsSaved()) { return; }
+            if (!IsSaved())
+            { return; }
 
             if (FileExists(filename))
             {
@@ -108,7 +109,8 @@ namespace BluePaint
         private bool AreSame(object a, object b)
         {
 
-            if (a == null || b == null) { return false; }
+            if (a == null || b == null)
+            { return false; }
             var t = a.GetType();
             var u = b.GetType();
 
@@ -202,7 +204,8 @@ namespace BluePaint
 
         private void CurrentTool_CommandForMacro(object sender, CommandForMacroArgs e)
         {
-            if (!_aufnahme) { return; }
+            if (!_aufnahme)
+            { return; }
 
             _macro.Add(CurrentTool.MacroKennung().ToNonCritical() + ";" + e.Command.ToNonCritical());
 
@@ -306,7 +309,8 @@ namespace BluePaint
         private void Rückg_Click(object sender, System.EventArgs e)
         {
 
-            if (_PicUndo == null) { return; }
+            if (_PicUndo == null)
+            { return; }
             btnRückgänig.Enabled = false;
             _isSaved = false;
 
@@ -374,7 +378,8 @@ namespace BluePaint
 
         public new Bitmap ShowDialog()
         {
-            if (Visible) { Visible = false; }
+            if (Visible)
+            { Visible = false; }
 
             base.ShowDialog();
             return P.BMP;
@@ -403,7 +408,8 @@ namespace BluePaint
 
         private void btnNeu_Click(object sender, System.EventArgs e)
         {
-            if (!IsSaved()) { return; }
+            if (!IsSaved())
+            { return; }
 
             SetPic(new Bitmap(100, 100));
             _filename = "*";
@@ -412,7 +418,8 @@ namespace BluePaint
 
         private void btnOeffnen_Click(object sender, System.EventArgs e)
         {
-            if (!IsSaved()) { return; }
+            if (!IsSaved())
+            { return; }
             LoadTab.ShowDialog();
         }
 
@@ -421,12 +428,15 @@ namespace BluePaint
 
             SaveTab.ShowDialog();
 
-            if (!PathExists(SaveTab.FileName.FilePath())) { return; }
-            if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
+            if (!PathExists(SaveTab.FileName.FilePath()))
+            { return; }
+            if (string.IsNullOrEmpty(SaveTab.FileName))
+            { return; }
 
             if (FileExists(SaveTab.FileName))
             {
-                if (BlueControls.Forms.MessageBox.Show("Datei bereits vorhanden.<br>Überschreiben?", BlueBasics.Enums.enImageCode.Frage, "Ja", "Nein") != 0) { return; }
+                if (BlueControls.Forms.MessageBox.Show("Datei bereits vorhanden.<br>Überschreiben?", BlueBasics.Enums.enImageCode.Frage, "Ja", "Nein") != 0)
+                { return; }
             }
 
             _filename = SaveTab.FileName;
@@ -437,16 +447,19 @@ namespace BluePaint
 
         private void btnLetzteDateien_ItemClicked(object sender, BlueControls.EventArgs.BasicListItemEventArgs e)
         {
-            if (!IsSaved()) { return; }
+            if (!IsSaved())
+            { return; }
             LoadFromDisk(e.Item.Internal);
 
         }
 
         private bool IsSaved()
         {
-            if (_isSaved) { return true; }
+            if (_isSaved)
+            { return true; }
 
-            if (string.IsNullOrEmpty(_filename)) { return true; }
+            if (string.IsNullOrEmpty(_filename))
+            { return true; }
 
 
             switch (MessageBox.Show("Es sind ungespeicherte Änderungen vorhanden.<br>Was möchten sie tun?", BlueBasics.Enums.enImageCode.Diskette, "Speichern", "Verwerfen", "Abbrechen"))
@@ -525,7 +538,8 @@ namespace BluePaint
 
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e)
         {
-            if (!IsSaved()) { e.Cancel = true; }
+            if (!IsSaved())
+            { e.Cancel = true; }
 
             base.OnFormClosing(e);
         }
@@ -606,7 +620,8 @@ namespace BluePaint
 
         private void btnEinfügen_Click(object sender, System.EventArgs e)
         {
-            if (!IsSaved()) { return; }
+            if (!IsSaved())
+            { return; }
 
             if (!System.Windows.Forms.Clipboard.ContainsImage())
             {

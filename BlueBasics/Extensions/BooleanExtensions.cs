@@ -16,12 +16,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 #endregion
-namespace BlueBasics
-{
-    public static partial class Extensions
-    {
-        public static string ToPlusMinus(this bool value)
-        {
+namespace BlueBasics {
+    public static partial class Extensions {
+        public static string ToPlusMinus(this bool value) {
             return value ? "+" : "-";
         }
     }

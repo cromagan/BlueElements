@@ -17,10 +17,8 @@
 // DEALINGS IN THE SOFTWARE.
 #endregion
 
-namespace BlueBasics.Interfaces
-{
-    public interface ICanBeEmpty
-    {
+namespace BlueBasics.Interfaces {
+    public interface ICanBeEmpty {
         bool IsNullOrEmpty();
     }
 }

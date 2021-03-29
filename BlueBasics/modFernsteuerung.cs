@@ -23,10 +23,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
 
-namespace BlueBasics
-{
-    public static partial class modFernsteuerung
-    {
+namespace BlueBasics {
+    public static partial class modFernsteuerung {
         [DllImport("user32", EntryPoint = "GetClassNameA", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         private static extern int GetClassName(IntPtr hWnd, string lpClassName, int nMaxCount);
         [DllImport("user32", EntryPoint = "GetWindowTextA", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
@@ -72,8 +70,7 @@ namespace BlueBasics
         /// <param name="handle"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static string WinTitle(IntPtr handle)
-        {
+        public static string WinTitle(IntPtr handle) {
             var l = GetWindowTextLength(handle) + 1;
             var buffer = string.Empty.PadRight(l);
             l = GetWindowText(handle, buffer, l);
@@ -87,8 +84,7 @@ namespace BlueBasics
         /// <param name="handle"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static string WinClass(IntPtr handle)
-        {
+        public static string WinClass(IntPtr handle) {
             var buffer = string.Empty.PadRight(250); // = Space(250)
             var l = GetClassName(handle, buffer, 250);
 
@@ -103,17 +99,14 @@ namespace BlueBasics
         /// <param name="handle"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static string WinExeName(IntPtr handle)
-        {
+        public static string WinExeName(IntPtr handle) {
             var l = 0;
             var buffer = string.Empty.PadRight(250);
             l = GetWindowModuleFileName(handle, buffer, 250);
 
-            if (l > 0)
-            {
+            if (l > 0) {
                 buffer = buffer.Substring(0, l);
-                if (buffer.Substring(buffer.Length - 1) == "\0")
-                {
+                if (buffer.Substring(buffer.Length - 1) == "\0") {
                     return buffer.Substring(0, buffer.Length - 1);
                 }
 
@@ -128,8 +121,7 @@ namespace BlueBasics
         /// </summary>
         /// <param name="wDescr"></param>
         /// <remarks></remarks>
-        public static void GetWindowInfo(ref strProcess wDescr)
-        {
+        public static void GetWindowInfo(ref strProcess wDescr) {
             // If WorkStationISLocked() Then
             //    wDescr = Nothing
             //    Exit Sub
@@ -155,44 +147,35 @@ namespace BlueBasics
         /// </summary>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static List<strProcess> exProzesse()
-        {
+        public static List<strProcess> exProzesse() {
             var wDescr = new List<strProcess>();
             var hh = GetTopWindow((IntPtr)0);
 
-            while (true)
-            {
+            while (true) {
                 hh = GetWindow(hh, 2);
-                if (hh.ToInt32() != 0)
-                {
-                    var l = new strProcess
-                    {
+                if (hh.ToInt32() != 0) {
+                    var l = new strProcess {
                         MainWindowHandle = hh
                     };
                     GetWindowInfo(ref l);
                     wDescr.Add(l);
-                }
-                else
-                {
+                } else {
                     return wDescr;
                 }
             }
         }
 
-        public static IntPtr GetAncestor(IntPtr hWnd)
-        {
+        public static IntPtr GetAncestor(IntPtr hWnd) {
             var hParent = IntPtr.Zero;
             var hw = hWnd;
-            do
-            {
+            do {
                 hParent = GetParent(hw);
                 if (hParent.ToInt32() != 0) { hw = hParent; }
             } while (hParent.ToInt32() != 0);
             return hw;
         }
 
-        public static void FensterPosSetzen(IntPtr handle, int left, int top)
-        {
+        public static void FensterPosSetzen(IntPtr handle, int left, int top) {
             var r = new Rectangle();
             GetWindowRect(handle, ref r);
 
@@ -202,18 +185,15 @@ namespace BlueBasics
             SetWindowPos(handle, 0, left, top, r.Width - r.Left, r.Height - r.Top, 0);
         }
 
-        public static void FensterMinimieren(IntPtr handle)
-        {
+        public static void FensterMinimieren(IntPtr handle) {
             ShowWindow(handle, (int)enSW.ShowMinimized);
         }
 
-        public static void FensterMaximieren(IntPtr handle)
-        {
+        public static void FensterMaximieren(IntPtr handle) {
             ShowWindow(handle, (int)enSW.ShowMaximized);
         }
 
-        public static void FensterRestore(IntPtr handle)
-        {
+        public static void FensterRestore(IntPtr handle) {
             ShowWindow(handle, (int)enSW.Restore);
         }
     }

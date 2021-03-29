@@ -17,10 +17,8 @@
 // DEALINGS IN THE SOFTWARE.
 #endregion
 
-namespace BlueBasics.Interfaces
-{
-    public interface IParseable : IChangedFeedback
-    {
+namespace BlueBasics.Interfaces {
+    public interface IParseable : IChangedFeedback {
         void Parse(string toParse);
         string ToString();
 

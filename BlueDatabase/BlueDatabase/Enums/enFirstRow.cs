@@ -18,10 +18,8 @@
 #endregion
 
 
-namespace BlueDatabase.Enums
-{
-    public enum enFirstRow
-    {
+namespace BlueDatabase.Enums {
+    public enum enFirstRow {
         /// <summary>
         /// Gibt an, das der Spaltenkopf nicht exportiert wird und die Daten sofort beginnen
         /// </summary>

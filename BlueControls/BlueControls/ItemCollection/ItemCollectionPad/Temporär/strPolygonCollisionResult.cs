@@ -1,8 +1,7 @@
 ﻿using BlueControls;
 using BlueControls.ItemCollection;
 
-public struct strPolygonCollisionResult
-{
+public struct strPolygonCollisionResult {
     /// <summary>
     /// Are the polygons going to intersect forward in time?
     /// </summary>

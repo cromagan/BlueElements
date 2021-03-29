@@ -34,11 +34,9 @@ using System.ComponentModel;
 using System.Drawing;
 using static BlueBasics.FileOperations;
 
-namespace BlueControls.Controls
-{
+namespace BlueControls.Controls {
     [Designer(typeof(BasicDesigner))]
-    public partial class FlexiControlForFilter : FlexiControl, IContextMenu
-    {
+    public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
 
 
         /// <summary>
@@ -52,14 +50,12 @@ namespace BlueControls.Controls
         public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
         public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
 
-        public FlexiControlForFilter() : this(null, null, null)
-        {
+        public FlexiControlForFilter() : this(null, null, null) {
             // Dieser Aufruf ist für den Designer erforderlich.
             // InitializeComponent();
         }
 
-        public FlexiControlForFilter(Table tableView, FilterItem filter, Filterleiste myParent)
-        {
+        public FlexiControlForFilter(Table tableView, FilterItem filter, Filterleiste myParent) {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
 
@@ -74,66 +70,48 @@ namespace BlueControls.Controls
             Filter.Changed += Filter_Changed;
         }
 
-        private void Filter_Changed(object sender, System.EventArgs e)
-        {
+        private void Filter_Changed(object sender, System.EventArgs e) {
             UpdateFilterData((Filterleiste)Parent);
         }
 
-        private void UpdateFilterData(Filterleiste myParent)
-        {
+        private void UpdateFilterData(Filterleiste myParent) {
 
 
-            if (Filter == null || Filter.Column == null)
-            {
+            if (Filter == null || Filter.Column == null) {
                 DisabledReason = "Bezug zum Filter verloren.";
                 Caption = string.Empty;
                 EditType = enEditTypeFormula.None;
                 QuickInfo = string.Empty;
                 FileEncryptionKey = string.Empty;
                 ValueSet(string.Empty, true, true);
-            }
-            else
-            {
-                if (string.IsNullOrEmpty(Filter.Herkunft))
-                {
+            } else {
+                if (string.IsNullOrEmpty(Filter.Herkunft)) {
                     DisabledReason = string.Empty;
-                }
-                else
-                {
+                } else {
                     DisabledReason = "Dieser Filter ist automatisch<br>gesetzt worden.";
                 }
 
                 var qi = Filter.Column.QuickInfoText(string.Empty);
 
-                if (string.IsNullOrEmpty(qi))
-                {
+                if (string.IsNullOrEmpty(qi)) {
                     QuickInfo = "<b>Filter:</b><br>" + Filter.ReadableText();
-                }
-                else
-                {
+                } else {
                     QuickInfo = "<b>Filter:</b><br>" + Filter.ReadableText() + "<br><br><b>Info:</b><br>" + qi;
                 }
 
 
 
-                if (!Filter.Column.AutoFilterSymbolPossible())
-                {
+                if (!Filter.Column.AutoFilterSymbolPossible()) {
                     EditType = enEditTypeFormula.None;
-                }
-                else
-                {
+                } else {
 
                     var ShowDelFilterButton = true;
 
-                    if (Filter.FilterType == enFilterType.Instr_GroßKleinEgal && Filter.SearchValue != null && Filter.SearchValue.Count == 1)
-                    {
+                    if (Filter.FilterType == enFilterType.Instr_GroßKleinEgal && Filter.SearchValue != null && Filter.SearchValue.Count == 1) {
 
-                        if (myParent == null || myParent.Orientation == enOrientation.Waagerecht || Filter.Column.DauerFilterPos.IsEmpty)
-                        {
+                        if (myParent == null || myParent.Orientation == enOrientation.Waagerecht || Filter.Column.DauerFilterPos.IsEmpty) {
                             CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
-                        }
-                        else
-                        {
+                        } else {
                             CaptionPosition = enÜberschriftAnordnung.Über_dem_Feld;
 
                         }
@@ -144,8 +122,7 @@ namespace BlueControls.Controls
                     }
 
 
-                    if (Filter.Column.FilterOptions == enFilterOptions.Enabled_OnlyAndAllowed || Filter.Column.FilterOptions == enFilterOptions.Enabled_OnlyOrAllowed)
-                    {
+                    if (Filter.Column.FilterOptions == enFilterOptions.Enabled_OnlyAndAllowed || Filter.Column.FilterOptions == enFilterOptions.Enabled_OnlyOrAllowed) {
                         ShowDelFilterButton = false;
                         CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
                         Caption = Filter.Column.ReadableText() + ":";
@@ -153,8 +130,7 @@ namespace BlueControls.Controls
                     }
 
 
-                    if (ShowDelFilterButton)
-                    {
+                    if (ShowDelFilterButton) {
                         CaptionPosition = enÜberschriftAnordnung.ohne;
                         EditType = enEditTypeFormula.Button;
                     }
@@ -165,15 +141,13 @@ namespace BlueControls.Controls
 
 
 
-        protected override void OnControlAdded(System.Windows.Forms.ControlEventArgs e)
-        {
+        protected override void OnControlAdded(System.Windows.Forms.ControlEventArgs e) {
 
             base.OnControlAdded(e);
 
             e.Control.MouseUp += Control_MouseUp;
 
-            if (e.Control is ComboBox cbx)
-            {
+            if (e.Control is ComboBox cbx) {
                 var Item2 = new ItemCollectionList
                 {
                     { "Keine weiteren Einträge vorhanden", "|~" }
@@ -191,23 +165,16 @@ namespace BlueControls.Controls
             }
 
 
-            if (e.Control is Button btn)
-            {
+            if (e.Control is Button btn) {
 
-                if (CaptionPosition == enÜberschriftAnordnung.ohne)
-                {
+                if (CaptionPosition == enÜberschriftAnordnung.ohne) {
                     btn.ImageCode = "Trichter|16||1";
                     btn.Text = Filter.ReadableText();
-                }
-                else
-                {
-                    if (Filter != null && Filter.SearchValue != null && Filter.SearchValue.Count > 0 && !string.IsNullOrEmpty(Filter.SearchValue[0]))
-                    {
+                } else {
+                    if (Filter != null && Filter.SearchValue != null && Filter.SearchValue.Count > 0 && !string.IsNullOrEmpty(Filter.SearchValue[0])) {
                         btn.ImageCode = "Trichter|16";
                         btn.Text = "wählen (" + Filter.SearchValue.Count.ToString() + ")";
-                    }
-                    else
-                    {
+                    } else {
                         btn.ImageCode = "Trichter|16";
                         btn.Text = "wählen";
                     }
@@ -217,67 +184,53 @@ namespace BlueControls.Controls
             }
         }
 
-        private void Control_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
+        private void Control_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
 
-            if (e.Button == System.Windows.Forms.MouseButtons.Right)
-            {
+            if (e.Button == System.Windows.Forms.MouseButtons.Right) {
 
                 FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
             }
 
         }
 
-        protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e)
-        {
+        protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseUp(e);
-            if (e.Button == System.Windows.Forms.MouseButtons.Right)
-            {
+            if (e.Button == System.Windows.Forms.MouseButtons.Right) {
 
                 FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
             }
         }
 
-        private void Cbx_DropDownShowing(object sender, System.EventArgs e)
-        {
+        private void Cbx_DropDownShowing(object sender, System.EventArgs e) {
             var cbx = (ComboBox)sender;
 
             cbx.Item.Clear();
             cbx.Item.CheckBehavior = enCheckBehavior.MultiSelection;
 
 
-            if (TableView == null)
-            {
+            if (TableView == null) {
                 cbx.Item.Add("Anzeigefehler", "|~", enImageCode.Kreuz, false);
                 return;
             }
 
             var List_FilterString = Filter.Column.Autofilter_ItemList(TableView.Filter);
 
-            if (List_FilterString.Count == 0)
-            {
+            if (List_FilterString.Count == 0) {
 
                 cbx.Item.Add("Keine weiteren Einträge vorhanden", "|~", enImageCode.Kreuz, false);
-            }
-            else if (List_FilterString.Count < 400)
-            {
+            } else if (List_FilterString.Count < 400) {
                 cbx.Item.AddRange(List_FilterString, Filter.Column, enShortenStyle.Replaced, Filter.Column.BildTextVerhalten);
                 cbx.Item.Sort(); // Wichtig, dieser Sort kümmert sich, dass das Format (z. B.  Zahlen) berücksichtigt wird
-            }
-            else
-            {
+            } else {
                 cbx.Item.Add("Zu viele Einträge", "|~", enImageCode.Kreuz, false);
             }
 
         }
 
-        internal ComboBox GetComboBox()
-        {
+        internal ComboBox GetComboBox() {
 
-            foreach (var thisc in Controls)
-            {
-                if (thisc is ComboBox cbx)
-                {
+            foreach (var thisc in Controls) {
+                if (thisc is ComboBox cbx) {
 
                     return cbx;
                 }
@@ -286,15 +239,13 @@ namespace BlueControls.Controls
 
         }
 
-        internal bool WasThisValueClicked()
-        {
+        internal bool WasThisValueClicked() {
             var cb = GetComboBox();
             if (cb == null) { return false; }
             return cb.WasThisValueClicked();
         }
 
-        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate)
-        {
+        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
             HotItem = null;
 
             if (Filter == null) { return; }
@@ -312,11 +263,9 @@ namespace BlueControls.Controls
             Items.Add("Spalte bearbeiten", "#ColumnEdit", QuickImage.Get(enImageCode.Spalte));
 
 
-            if (Parent is Filterleiste f)
-            {
+            if (Parent is Filterleiste f) {
 
-                if (f.pic.Visible)
-                {
+                if (f.pic.Visible) {
                     Items.Add("Filter verschieben", "#FilterVerschieben", QuickImage.Get(enImageCode.Trichter));
 
                     Items.Add("Bild-Pfad öffnen", "#BildPfad", QuickImage.Get(enImageCode.Ordner));
@@ -332,25 +281,20 @@ namespace BlueControls.Controls
 
         }
 
-        public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e)
-        {
-            switch (e.ClickedComand.ToLower())
-            {
+        public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
+            switch (e.ClickedComand.ToLower()) {
                 case "#columnedit":
-                    if (e.HotItem is ColumnItem col)
-                    {
+                    if (e.HotItem is ColumnItem col) {
                         tabAdministration.OpenColumnEditor(col, null);
                     }
 
                     return true;
 
                 case "#filterverschieben":
-                    if (e.HotItem is ColumnItem col2)
-                    {
+                    if (e.HotItem is ColumnItem col2) {
                         var pc = (Filterleiste)Parent; // Parent geht verlren, wenn der Filter selbst disposed und neu erzeugt wird
 
-                        while (true)
-                        {
+                        while (true) {
 
                             var nx = InputBox.Show("X, von 0 bis 10000", col2.DauerFilterPos.X.ToString(), enDataFormat.Ganzzahl);
                             if (string.IsNullOrEmpty(nx)) { return true; }
@@ -378,8 +322,7 @@ namespace BlueControls.Controls
 
                 default:
 
-                    if (Parent is Formula f)
-                    {
+                    if (Parent is Formula f) {
                         return f.ContextMenuItemClickedInternalProcessig(sender, e);
                     }
                     break;
@@ -389,14 +332,12 @@ namespace BlueControls.Controls
         }
 
 
-        public void OnContextMenuInit(ContextMenuInitEventArgs e)
-        {
+        public void OnContextMenuInit(ContextMenuInitEventArgs e) {
             ContextMenuInit?.Invoke(this, e);
         }
 
 
-        public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e)
-        {
+        public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) {
             ContextMenuItemClicked?.Invoke(this, e);
         }
     }

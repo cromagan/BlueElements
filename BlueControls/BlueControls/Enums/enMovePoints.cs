@@ -18,11 +18,9 @@
 #endregion
 
 
-namespace BlueControls.Enums
-{
+namespace BlueControls.Enums {
 
-    public enum enMovePoints
-    {
+    public enum enMovePoints {
         LO_to_RU = 0,
         MO_to_MU = 1
 

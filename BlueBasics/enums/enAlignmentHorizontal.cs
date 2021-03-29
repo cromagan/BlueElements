@@ -19,11 +19,9 @@
 
 using System;
 
-namespace BlueBasics.Enums
-{
+namespace BlueBasics.Enums {
     [Flags]
-    public enum enAlignmentHorizontal
-    {
+    public enum enAlignmentHorizontal {
         Keine_Präferenz = -1,
         Links = System.Windows.Forms.TextFormatFlags.Left,
         Rechts = System.Windows.Forms.TextFormatFlags.Right,

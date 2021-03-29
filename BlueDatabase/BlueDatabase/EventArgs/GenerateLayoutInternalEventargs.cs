@@ -18,12 +18,9 @@
 #endregion
 
 
-namespace BlueDatabase.EventArgs
-{
-    public class RenameColumnInLayoutEventArgs : System.EventArgs
-    {
-        public RenameColumnInLayoutEventArgs(string layoutCode, string oldName, ColumnItem column)
-        {
+namespace BlueDatabase.EventArgs {
+    public class RenameColumnInLayoutEventArgs : System.EventArgs {
+        public RenameColumnInLayoutEventArgs(string layoutCode, string oldName, ColumnItem column) {
             Column = column;
             OldName = oldName;
             LayoutCode = layoutCode;

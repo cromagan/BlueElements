@@ -28,10 +28,8 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace BlueControls.ItemCollection
-{
-    public class RowFormulaPadItem : FormPadItemRectangle
-    {
+namespace BlueControls.ItemCollection {
+    public class RowFormulaPadItem : FormPadItemRectangle {
 
 
 
@@ -49,10 +47,8 @@ namespace BlueControls.ItemCollection
 
         #endregion
 
-        public override string QuickInfo
-        {
-            get
-            {
+        public override string QuickInfo {
+            get {
 
                 var r = Row;
                 if (r == null) { return string.Empty; }
@@ -67,8 +63,7 @@ namespace BlueControls.ItemCollection
                 return _tmpQuickInfo;
             }
 
-            set
-            {
+            set {
                 // Werte zurücksetzen
                 _lastQuickInfo = string.Empty;
                 _tmpQuickInfo = string.Empty;
@@ -86,13 +81,11 @@ namespace BlueControls.ItemCollection
 
         public RowFormulaPadItem(ItemCollectionPad parent, Database database, int rowkey, string layoutID) : this(parent, string.Empty, database, rowkey, layoutID) { }
 
-        public RowFormulaPadItem(ItemCollectionPad parent, string internalname, Database database, int rowkey, string layoutID) : base(parent, internalname, true)
-        {
+        public RowFormulaPadItem(ItemCollectionPad parent, string internalname, Database database, int rowkey, string layoutID) : base(parent, internalname, true) {
             _Database = database;
             _RowKey = rowkey;
 
-            if (_Database != null && string.IsNullOrEmpty(layoutID))
-            {
+            if (_Database != null && string.IsNullOrEmpty(layoutID)) {
                 var p = new ItemCollectionPad(_Database.Layouts[0], string.Empty);
                 layoutID = p.ID;
             }
@@ -105,11 +98,9 @@ namespace BlueControls.ItemCollection
         #endregion
 
         // Namen so lassen, wegen Kontextmenu
-        public string Layout_ID
-        {
+        public string Layout_ID {
             get => _LayoutID;
-            set
-            {
+            set {
                 if (value == _LayoutID) { return; }
                 Größe_fixiert = true;
                 _LayoutID = value;
@@ -118,10 +109,8 @@ namespace BlueControls.ItemCollection
             }
         }
 
-        public RowItem Row
-        {
-            get
-            {
+        public RowItem Row {
+            get {
                 if (_Database is null) { return null; }
                 return _Database.Row.SearchByKey(_RowKey);
             }
@@ -133,44 +122,36 @@ namespace BlueControls.ItemCollection
             //}
         }
 
-        private void removePic()
-        {
+        private void removePic() {
             if (GeneratedBitmap != null) { GeneratedBitmap.Dispose(); }
             GeneratedBitmap = null;
         }
 
-        public override void DesignOrStyleChanged()
-        {
+        public override void DesignOrStyleChanged() {
             removePic();
         }
 
 
-        protected override string ClassId()
-        {
+        protected override string ClassId() {
             return "ROW";
         }
 
 
 
 
-        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
-        {
+        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
 
             if (GeneratedBitmap == null) { GeneratePic(false); }
 
 
-            if (GeneratedBitmap != null)
-            {
+            if (GeneratedBitmap != null) {
                 var scale = (float)Math.Min(DCoordinates.Width / (double)GeneratedBitmap.Width, DCoordinates.Height / (double)GeneratedBitmap.Height);
                 var r2 = new RectangleF(DCoordinates.Left, DCoordinates.Top, GeneratedBitmap.Width * scale, GeneratedBitmap.Height * scale);
 
-                if (ForPrinting)
-                {
+                if (ForPrinting) {
                     GR.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
                     GR.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
-                }
-                else
-                {
+                } else {
                     GR.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Low;
                     GR.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
                 }
@@ -183,12 +164,10 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public override bool ParseThis(string tag, string value)
-        {
+        public override bool ParseThis(string tag, string value) {
             if (base.ParseThis(tag, value)) { return true; }
 
-            switch (tag)
-            {
+            switch (tag) {
 
                 case "layoutid":
                     _LayoutID = value.FromNonCritical();
@@ -196,8 +175,7 @@ namespace BlueControls.ItemCollection
 
                 case "database":
                     _Database = (Database)Database.GetByFilename(value, false);
-                    if (_Database == null)
-                    {
+                    if (_Database == null) {
                         _Database = new Database(value, false, false);
                     }
                     return true;
@@ -212,10 +190,8 @@ namespace BlueControls.ItemCollection
                 case "firstvalue":
                     var n = value.FromNonCritical();
 
-                    if (Row != null)
-                    {
-                        if (Row.CellFirstString().ToUpper() != n.ToUpper())
-                        {
+                    if (Row != null) {
+                        if (Row.CellFirstString().ToUpper() != n.ToUpper()) {
                             MessageBox.Show("<b><u>Eintrag hat sich geändert:</b></u><br><b>Von: </b> " + n + "<br><b>Nach: </b>" + Row.CellFirstString(), enImageCode.Information, "OK");
                         }
                         return true; // Alles beim Alten
@@ -223,12 +199,9 @@ namespace BlueControls.ItemCollection
 
                     var Rowtmp = _Database.Row[n];
 
-                    if (Rowtmp == null)
-                    {
+                    if (Rowtmp == null) {
                         MessageBox.Show("<b><u>Eintrag nicht hinzugefügt</b></u><br>" + n, enImageCode.Warnung, "OK");
-                    }
-                    else
-                    {
+                    } else {
                         _RowKey = Rowtmp.Key;
                         MessageBox.Show("<b><u>Eintrag neu gefunden:</b></u><br>" + n, enImageCode.Warnung, "OK");
                     }
@@ -240,8 +213,7 @@ namespace BlueControls.ItemCollection
             return false;
         }
 
-        public override string ToString()
-        {
+        public override string ToString() {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
 
@@ -278,11 +250,9 @@ namespace BlueControls.ItemCollection
 
 
 
-        private void GeneratePic(bool SizeChangeAllowed)
-        {
+        private void GeneratePic(bool SizeChangeAllowed) {
 
-            if (string.IsNullOrEmpty(_LayoutID) || !_LayoutID.StartsWith("#"))
-            {
+            if (string.IsNullOrEmpty(_LayoutID) || !_LayoutID.StartsWith("#")) {
                 GeneratedBitmap = (Bitmap)QuickImage.Get(enImageCode.Warnung, 128).BMP.Clone();
                 RecalculateAndOnChanged();
                 if (SizeChangeAllowed) { p_RU.SetTo(p_LO.X + GeneratedBitmap.Width, p_LO.Y + GeneratedBitmap.Height); }
@@ -297,10 +267,8 @@ namespace BlueControls.ItemCollection
             var re = _pad.Item.MaxBounds(null);
 
 
-            if (GeneratedBitmap != null)
-            {
-                if (GeneratedBitmap.Width != re.Width || GeneratedBitmap.Height != re.Height)
-                {
+            if (GeneratedBitmap != null) {
+                if (GeneratedBitmap.Width != re.Width || GeneratedBitmap.Height != re.Height) {
                     removePic();
                 }
             }
@@ -363,13 +331,11 @@ namespace BlueControls.ItemCollection
         //    Return False
         //End Function
 
-        protected override void ParseFinished()
-        {
+        protected override void ParseFinished() {
             GeneratePic(true);
         }
 
-        public override List<FlexiControl> GetStyleOptions()
-        {
+        public override List<FlexiControl> GetStyleOptions() {
             var l = new List<FlexiControl>
             {
                 new FlexiControlForProperty(this, "Datensatz bearbeiten", enImageCode.Stift),
@@ -379,8 +345,7 @@ namespace BlueControls.ItemCollection
 
 
             var Layouts = new ItemCollectionList();
-            foreach (var thisLayouts in Row.Database.Layouts)
-            {
+            foreach (var thisLayouts in Row.Database.Layouts) {
                 var p = new ItemCollectionPad(thisLayouts, string.Empty);
                 Layouts.Add(p.Caption, p.ID, enImageCode.Stern);
             }
@@ -396,8 +361,7 @@ namespace BlueControls.ItemCollection
 
 
 
-        public void Datensatz_bearbeiten()
-        {
+        public void Datensatz_bearbeiten() {
             _tmpQuickInfo = string.Empty; // eigentlich unnötig, da RowChanged anschlagen müsste
             EditBoxRow.Show("Datensatz bearbeiten:", Row, true);
         }

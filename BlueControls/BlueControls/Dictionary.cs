@@ -27,10 +27,8 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 
-namespace BlueControls
-{
-    internal static class Dictionary
-    {
+namespace BlueControls {
+    internal static class Dictionary {
         internal static object Lock_SpellChecking = new();
 
 
@@ -39,8 +37,7 @@ namespace BlueControls
         public static bool IsSpellChecking;
 
 
-        private static void Init()
-        {
+        private static void Init() {
             _DictWords = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Deutsch.MDB", "Dictionary", true, false);
         }
 
@@ -55,26 +52,22 @@ namespace BlueControls
         //End Sub
 
 
-        public static bool DictionaryRunning(bool TryToInit)
-        {
-            if (TryToInit && _DictWords == null)
-            {
+        public static bool DictionaryRunning(bool TryToInit) {
+            if (TryToInit && _DictWords == null) {
                 Init();
             }
             return _DictWords != null;
         }
 
 
-        public static bool IsWriteable()
-        {
+        public static bool IsWriteable() {
             if (_DictWords == null) { return false; }
             if (string.IsNullOrEmpty(_DictWords.Filename)) { return false; }
             return true;
         }
 
 
-        public static bool IsWordOk(string Word)
-        {
+        public static bool IsWordOk(string Word) {
             if (!DictionaryRunning(true)) { return true; }
             if (string.IsNullOrEmpty(Word)) { return true; }
             if (Word.Length == 1) { return true; }
@@ -84,8 +77,7 @@ namespace BlueControls
 
             if (Word != Word.ToLower() && Word != Word.ToUpper() && Word != Word.Substring(0, 1).ToUpper() + Word.Substring(1).ToLower()) { return false; }
 
-            if (Word == Word.ToLower())
-            {
+            if (Word == Word.ToLower()) {
                 // Wenn ein Wort klein geschrieben ist, mu0ß auch das kleingeschriebene in der Datenbank sein!
                 return _DictWords.Row[new FilterItem(_DictWords.Column[0], enFilterType.Istgleich, Word)] != null;
             }
@@ -95,23 +87,19 @@ namespace BlueControls
         }
 
 
-        public static List<string> SimilarTo(string Word)
-        {
+        public static List<string> SimilarTo(string Word) {
             if (IsWordOk(Word)) { return null; }
 
             var l = new List<string>();
 
 
-            foreach (var ThisRowItem in _DictWords.Row)
-            {
+            foreach (var ThisRowItem in _DictWords.Row) {
 
-                if (ThisRowItem != null)
-                {
+                if (ThisRowItem != null) {
                     var w = ThisRowItem.CellFirstString();
                     var di = modAllgemein.LevenshteinDistance(Word.ToLower(), w.ToLower());
 
-                    if (di < Word.Length / 2.0 || di < w.Length / 2.0)
-                    {
+                    if (di < Word.Length / 2.0 || di < w.Length / 2.0) {
                         l.Add(di.ToString(Constants.Format_Integer5) + w);
                     }
 
@@ -123,8 +111,7 @@ namespace BlueControls
             l.Sort();
             var L2 = new List<string>();
 
-            foreach (var Thisstring in l)
-            {
+            foreach (var Thisstring in l) {
                 L2.Add(Thisstring.Substring(5));
 
                 if (L2.Count == 10) { return L2; }
@@ -135,22 +122,19 @@ namespace BlueControls
         }
 
 
-        public static void SpellCheckingAll(ExtText _ETXT, bool AllOK)
-        {
+        public static void SpellCheckingAll(ExtText _ETXT, bool AllOK) {
 
             var Can = Monitor.TryEnter(Lock_SpellChecking);
             if (Can) { Monitor.Exit(Lock_SpellChecking); }
 
 
-            if (!Can || IsSpellChecking)
-            {
+            if (!Can || IsSpellChecking) {
                 MessageBox.Show("Die Rechtschreibprüfung steht<br>nicht zur Verfügung.", enImageCode.Information, "OK");
                 return;
             }
 
 
-            lock (Lock_SpellChecking)
-            {
+            lock (Lock_SpellChecking) {
 
 
                 var Pos = 0;
@@ -160,45 +144,35 @@ namespace BlueControls
                 IsSpellChecking = true;
 
 
-                do
-                {
+                do {
                     Pos = Math.Max(woEnd + 1, Pos + 1);
 
                     if (Pos >= _ETXT.Chars.Count) { break; }
 
                     var woStart = _ETXT.WordStart(Pos);
 
-                    if (woStart > -1)
-                    {
+                    if (woStart > -1) {
                         woEnd = _ETXT.WordEnd(Pos);
                         var wort = _ETXT.Word(Pos);
 
-                        if (!IsWordOk(wort))
-                        {
+                        if (!IsWordOk(wort)) {
 
 
                             var butt = 0;
 
-                            if (wort.ToLower() != wort)
-                            {
+                            if (wort.ToLower() != wort) {
                                 butt = MessageBox.Show("<b>" + wort + "</b>", enImageCode.Stift, "'" + wort + "' aufnehmen", "'" + wort.ToLower() + "' aufnehmen", "Ignorieren", "Beenden");
-                            }
-                            else
-                            {
+                            } else {
 
-                                if (AllOK)
-                                {
+                                if (AllOK) {
                                     butt = 1;
-                                }
-                                else
-                                {
+                                } else {
                                     butt = MessageBox.Show("<b>" + wort + "</b>", enImageCode.Stift, "'" + wort + "' aufnehmen", "Ignorieren", "Beenden") + 1;
                                     // Egal, das wort ist eh schon ein "ToLower", also kann das tolower es gar nicht mehr ändern
                                 }
                             }
 
-                            switch (butt)
-                            {
+                            switch (butt) {
                                 case 0:
                                     WordAdd(wort);
                                     break;
@@ -221,8 +195,7 @@ namespace BlueControls
             }
         }
 
-        public static void WordAdd(string Wort)
-        {
+        public static void WordAdd(string Wort) {
 
             if (_DictWords.Row[Wort] != null) { _DictWords.Row.Remove(_DictWords.Row[Wort]); }
 

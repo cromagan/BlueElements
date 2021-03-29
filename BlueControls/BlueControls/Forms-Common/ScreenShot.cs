@@ -28,18 +28,15 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Runtime.CompilerServices;
 
-namespace BlueControls
-{
+namespace BlueControls {
     /// <summary>
     /// Eine Klasse, die alle möglichen Arten von Screenshots zurückgibt.
     /// </summary>
-    public sealed partial class ScreenShot
-    {
+    public sealed partial class ScreenShot {
 
 
 
-        private ScreenShot()
-        {
+        private ScreenShot() {
             InitializeComponent();
         }
 
@@ -64,15 +61,12 @@ namespace BlueControls
 
         [AccessedThroughProperty(nameof(Hook))]
         private SystemInputHook _Hook;
-        private SystemInputHook Hook
-        {
+        private SystemInputHook Hook {
             [DebuggerNonUserCode]
             get => _Hook;
             [MethodImpl(MethodImplOptions.Synchronized), DebuggerNonUserCode]
-            set
-            {
-                if (_Hook != null)
-                {
+            set {
+                if (_Hook != null) {
                     _Hook.MouseUp -= Hook_MouseUp;
                     _Hook.MouseDown -= Hook_MouseDown;
                     _Hook.MouseMove -= Hook_MouseMove;
@@ -80,8 +74,7 @@ namespace BlueControls
 
                 _Hook = value;
 
-                if (value != null)
-                {
+                if (value != null) {
                     _Hook.MouseUp += Hook_MouseUp;
                     _Hook.MouseDown += Hook_MouseDown;
                     _Hook.MouseMove += Hook_MouseMove;
@@ -100,13 +93,10 @@ namespace BlueControls
         #endregion
 
 
-        public static Bitmap GrabAllScreens()
-        {
-            do
-            {
+        public static Bitmap GrabAllScreens() {
+            do {
 
-                try
-                {
+                try {
 
 
 
@@ -114,17 +104,14 @@ namespace BlueControls
 
                     var b = new Bitmap(r.Width, r.Height, PixelFormat.Format32bppPArgb);
 
-                    using (var GR = Graphics.FromImage(b))
-                    {
+                    using (var GR = Graphics.FromImage(b)) {
                         GR.CopyFromScreen(r.X, r.Y, 0, 0, b.Size);
                     }
 
                     return b;
 
 
-                }
-                catch
-                {
+                } catch {
                     modAllgemein.CollectGarbage();
                 }
 
@@ -134,10 +121,8 @@ namespace BlueControls
 
 
 
-        public static Bitmap GrabArea(Rectangle R)
-        {
-            if (R.Width < 2 || R.Height < 2)
-            {
+        public static Bitmap GrabArea(Rectangle R) {
+            if (R.Width < 2 || R.Height < 2) {
                 return null;
             }
             return GrabAllScreens().Area(R);
@@ -145,8 +130,7 @@ namespace BlueControls
         }
 
 
-        public static strScreenData GrabArea()
-        {
+        public static strScreenData GrabArea() {
             return GrabArea(null, -1, -1);
         }
 
@@ -160,12 +144,10 @@ namespace BlueControls
         /// <param name="MaxH">Die Maximale Höhe des Bildes. Evtl. wird das Bild herunterskaliert.</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static strScreenData GrabArea(System.Windows.Forms.Form frm, int MaxW, int MaxH)
-        {
+        public static strScreenData GrabArea(System.Windows.Forms.Form frm, int MaxW, int MaxH) {
 
 
-            using (var x = new ScreenShot())
-            {
+            using (var x = new ScreenShot()) {
                 x.DrawText = "Bitte ziehen sie einen Rahmen\r\num den gewünschten Bereich.";
 
 
@@ -174,8 +156,7 @@ namespace BlueControls
 
         }
 
-        public static Bitmap GrabContinuus()
-        {
+        public static Bitmap GrabContinuus() {
             var x = new ScreenShot();
             var im = x.GrabContinuusIntern();
 
@@ -192,8 +173,7 @@ namespace BlueControls
 
 
 
-        private Bitmap GrabContinuusIntern()
-        {
+        private Bitmap GrabContinuusIntern() {
             AllS = new List<strScreenData>();
 
             DrawText = "Bitte ziehen sie einen Rahmen um den gewünschten Bereich.\r\nDieser wird anschließend nach jedem Mauszug abfotografiert.\r\nBeendet wird der Modus mit der rechten Maustaste.";
@@ -213,24 +193,20 @@ namespace BlueControls
 
             Rahm.Show();
 
-            do
-            {
+            do {
                 Develop.DoEvents();
 
 
                 if (HookFinish) { break; }
 
 
-                if (HookStartPoint.X > int.MinValue && HookEndPoint.X > int.MinValue)
-                {
+                if (HookStartPoint.X > int.MinValue && HookEndPoint.X > int.MinValue) {
 
                     Hook.RemoveHook();
-                    if (HookStartPoint.ToString() != HookEndPoint.ToString())
-                    {
+                    if (HookStartPoint.ToString() != HookEndPoint.ToString()) {
                         Rahm.Visible = false;
 
-                        var l = new strScreenData
-                        {
+                        var l = new strScreenData {
                             Pic = GrabArea(AllS[0].GrabedArea()),
                             HookP1 = HookStartPoint,
                             HookP2 = HookEndPoint
@@ -270,8 +246,7 @@ namespace BlueControls
             var VersY = 0;
 
 
-            for (var z = 1; z < AllS.Count; z++)
-            {
+            for (var z = 1; z < AllS.Count; z++) {
 
                 VersX = VersX + AllS[z].HookP1.X - AllS[z].HookP2.X;
                 VersY = VersY + AllS[z].HookP1.Y - AllS[z].HookP2.Y;
@@ -296,8 +271,7 @@ namespace BlueControls
             VersX = MinX * -1;
             VersY = MinY * -1;
 
-            for (var z = 0; z < AllS.Count; z++)
-            {
+            for (var z = 0; z < AllS.Count; z++) {
 
                 VersX = VersX + AllS[z].HookP1.X - AllS[z].HookP2.X;
                 VersY = VersY + AllS[z].HookP1.Y - AllS[z].HookP2.Y;
@@ -314,10 +288,8 @@ namespace BlueControls
 
 
 
-        private strScreenData GrabAreaInternal(System.Windows.Forms.Form frm, int MaxW, int MaxH)
-        {
-            try
-            {
+        private strScreenData GrabAreaInternal(System.Windows.Forms.Form frm, int MaxW, int MaxH) {
+            try {
 
                 System.Windows.Forms.FormWindowState WS = 0;
 
@@ -326,8 +298,7 @@ namespace BlueControls
                 QuickInfo.Close();
 
 
-                if (frm != null)
-                {
+                if (frm != null) {
                     WS = frm.WindowState;
                     frm.WindowState = System.Windows.Forms.FormWindowState.Minimized;
                     modAllgemein.Pause(0.5, true); // 0.3 ist zu wenig!
@@ -355,15 +326,12 @@ namespace BlueControls
 
 
                 // New Bitmap davor, um die Bitmaptiefe zu korrigiern
-                if (MaxW > 0 && MaxH > 0)
-                {
+                if (MaxW > 0 && MaxH > 0) {
                     // Auch hier NEW Bitmap, da evtl. das Original-Bild zurück gegeben wird.
                     FeedBack.Pic = new Bitmap(BitmapExt.Resize(ClipedArea, MaxW, MaxH, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true));
 
                     FeedBack.IsResized = true;
-                }
-                else
-                {
+                } else {
                     FeedBack.Pic = new Bitmap(ClipedArea);
                     FeedBack.IsResized = false;
                 }
@@ -372,9 +340,7 @@ namespace BlueControls
 
                 return FeedBack;
 
-            }
-            catch
-            {
+            } catch {
                 return new strScreenData();
             }
 
@@ -389,19 +355,16 @@ namespace BlueControls
 
         #region  Form-Ereignisse 
 
-        protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e)
-        {
+        protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseDown(e);
             if (!MousesWasUp) { return; }
             FeedBack.Point1 = new Point(e.X, e.Y);
         }
 
-        protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e)
-        {
+        protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseUp(e);
 
-            if (!MousesWasUp)
-            {
+            if (!MousesWasUp) {
                 MousesWasUp = true;
                 return;
             }
@@ -415,8 +378,7 @@ namespace BlueControls
 
             ClipedArea = new Bitmap(r.Width, r.Height, PixelFormat.Format32bppPArgb);
 
-            using (var GR = Graphics.FromImage(ClipedArea))
-            {
+            using (var GR = Graphics.FromImage(ClipedArea)) {
                 GR.Clear(Color.Black);
                 GR.DrawImage(ScreenShotBMP, 0, 0, r, GraphicsUnit.Pixel);
             }
@@ -430,13 +392,11 @@ namespace BlueControls
         }
 
 
-        protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e)
-        {
+        protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseMove(e);
 
 
-            if (e != null && e.Button == System.Windows.Forms.MouseButtons.None && !MousesWasUp)
-            {
+            if (e != null && e.Button == System.Windows.Forms.MouseButtons.None && !MousesWasUp) {
                 MousesWasUp = true;
                 return;
             }
@@ -450,13 +410,11 @@ namespace BlueControls
 
 
 
-            using (var GR = Graphics.FromImage(BackgroundImage))
-            {
+            using (var GR = Graphics.FromImage(BackgroundImage)) {
                 GR.Clear(Color.Black);
                 GR.DrawImage(ScreenShotBMP, 0, 0);
 
-                if (e != null)
-                {
+                if (e != null) {
 
 
 
@@ -468,17 +426,14 @@ namespace BlueControls
                     modAllgemein.Magnify(ScreenShotBMP, new Point(e.X, e.Y), GR, false);
 
 
-                    if (e.Button != System.Windows.Forms.MouseButtons.None)
-                    {
+                    if (e.Button != System.Windows.Forms.MouseButtons.None) {
                         GR.DrawLine(new Pen(Color.Red), 0, FeedBack.Point1.Y, Width, FeedBack.Point1.Y);
                         GR.DrawLine(new Pen(Color.Red), FeedBack.Point1.X, 0, FeedBack.Point1.X, Height);
 
                         GR.DrawLine(new Pen(Color.Red), 0, e.Y, Width, e.Y);
                         GR.DrawLine(new Pen(Color.Red), e.X, 0, e.X, Height);
 
-                    }
-                    else
-                    {
+                    } else {
                         GR.DrawLine(new Pen(Color.Red), 0, e.Y, Width, e.Y);
                         GR.DrawLine(new Pen(Color.Red), e.X, 0, e.X, Height);
                     }
@@ -495,8 +450,7 @@ namespace BlueControls
 
 
 
-        private void PrintText(Graphics GR, System.Windows.Forms.MouseEventArgs e)
-        {
+        private void PrintText(Graphics GR, System.Windows.Forms.MouseEventArgs e) {
 
 
             Brush bs = new SolidBrush(Color.FromArgb(150, 0, 0, 0));
@@ -506,19 +460,13 @@ namespace BlueControls
 
             var yPos = 0;
 
-            if (e == null)
-            {
+            if (e == null) {
                 yPos = 0;
-            }
-            else
-            {
+            } else {
 
-                if (e.Y > f.Height + 50)
-                {
+                if (e.Y > f.Height + 50) {
                     yPos = 0;
-                }
-                else
-                {
+                } else {
                     yPos = (int)(Height - f.Height - 5);
                 }
 
@@ -536,25 +484,21 @@ namespace BlueControls
         /// Vorbereitende Routine, die das Backgroundimage mit dem Screenshot füllt.
         /// </summary>
         /// <remarks></remarks>
-        private void PrepareForm()
-        {
+        private void PrepareForm() {
             ScreenShotBMP = GrabAllScreens();
 
             BackgroundImage = new Bitmap(ScreenShotBMP.Width, ScreenShotBMP.Height, PixelFormat.Format32bppPArgb);
 
-            using (var GR = Graphics.FromImage(BackgroundImage))
-            {
+            using (var GR = Graphics.FromImage(BackgroundImage)) {
                 GR.DrawImage(ScreenShotBMP, 0, 0);
             }
 
         }
 
-        private void Hook_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
+        private void Hook_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
 
 
-            if (e.Button == System.Windows.Forms.MouseButtons.Right)
-            {
+            if (e.Button == System.Windows.Forms.MouseButtons.Right) {
                 HookFinish = true;
                 return;
             }
@@ -565,11 +509,9 @@ namespace BlueControls
 
         }
 
-        private void Hook_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
+        private void Hook_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e) {
 
-            if (e.Button == System.Windows.Forms.MouseButtons.Right)
-            {
+            if (e.Button == System.Windows.Forms.MouseButtons.Right) {
                 HookFinish = true;
                 return;
             }
@@ -584,12 +526,10 @@ namespace BlueControls
 
         }
 
-        private void Hook_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
+        private void Hook_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e) {
 
             LastMouse = new Point(e.X, e.Y);
-            if (Rahm != null)
-            {
+            if (Rahm != null) {
                 Rahm.Left = (int)(e.X - Rahm.Width / 2.0);
                 Rahm.Top = (int)(e.Y - Rahm.Width / 2.0);
             }

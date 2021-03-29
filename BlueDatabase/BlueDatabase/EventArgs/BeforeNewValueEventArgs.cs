@@ -18,13 +18,10 @@
 #endregion
 
 
-namespace BlueDatabase.EventArgs
-{
-    public class BeforeNewValueEventArgs : CellCancelEventArgs
-    {
+namespace BlueDatabase.EventArgs {
+    public class BeforeNewValueEventArgs : CellCancelEventArgs {
         //   ColumnItem Column, RowItem Row, Point MousePos, string NewVal, ref string CancelReason
-        public BeforeNewValueEventArgs(ColumnItem column, RowItem row, string newVal, string cancelReason) : base(column, row, cancelReason)
-        {
+        public BeforeNewValueEventArgs(ColumnItem column, RowItem row, string newVal, string cancelReason) : base(column, row, cancelReason) {
             NewVal = newVal;
         }
 

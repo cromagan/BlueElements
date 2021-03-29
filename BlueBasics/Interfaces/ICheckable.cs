@@ -17,10 +17,8 @@
 // DEALINGS IN THE SOFTWARE.
 #endregion
 
-namespace BlueBasics.Interfaces
-{
-    public interface ICheckable
-    {
+namespace BlueBasics.Interfaces {
+    public interface ICheckable {
         bool IsOk();
         string ErrorReason();
     }

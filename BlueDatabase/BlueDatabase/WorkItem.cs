@@ -24,10 +24,8 @@ using BlueDatabase.Enums;
 using System;
 using static BlueBasics.modConverter;
 
-namespace BlueDatabase
-{
-    public class WorkItem : IParseable, ICompareKey
-    {
+namespace BlueDatabase {
+    public class WorkItem : IParseable, ICompareKey {
 
 
 
@@ -51,12 +49,10 @@ namespace BlueDatabase
 
         public bool IsParsing { get; private set; }
 
-        internal enItemState State
-        {
+        internal enItemState State {
             get => _state;
 
-            set
-            {
+            set {
                 if (value == _state) { return; }
                 _state = value;
                 OnChanged();
@@ -67,12 +63,10 @@ namespace BlueDatabase
 
         public enDatabaseDataType Comand { get; private set; }
 
-        public int ColKey
-        {
+        public int ColKey {
             get => _colKey;
 
-            set
-            {
+            set {
                 if (value == _colKey) { return; }
                 _colKey = value;
                 OnChanged();
@@ -80,12 +74,10 @@ namespace BlueDatabase
 
         }
 
-        public int RowKey
-        {
+        public int RowKey {
             get => _rowKey;
 
-            set
-            {
+            set {
                 if (value == _rowKey) { return; }
                 _rowKey = value;
                 OnChanged();
@@ -99,22 +91,18 @@ namespace BlueDatabase
 
         public string PreviousValue { get; private set; }
 
-        public string ChangedTo
-        {
+        public string ChangedTo {
             get => _changedTo;
 
-            set
-            {
+            set {
                 if (value == _changedTo) { return; }
                 _changedTo = value;
                 OnChanged();
             }
         }
 
-        public bool HistorischRelevant
-        {
-            get
-            {
+        public bool HistorischRelevant {
+            get {
                 if (State == enItemState.Pending || State == enItemState.Undo) { return true; }
                 return false;
             }
@@ -123,8 +111,7 @@ namespace BlueDatabase
 
         #endregion
 
-        public WorkItem(enDatabaseDataType Comand, int ColKey, int RowKey, string PreviousValue, string ChangedTo, string User)
-        {
+        public WorkItem(enDatabaseDataType Comand, int ColKey, int RowKey, string PreviousValue, string ChangedTo, string User) {
 
             _state = enItemState.Pending;
 
@@ -140,19 +127,15 @@ namespace BlueDatabase
         }
 
 
-        public WorkItem(string s)
-        {
+        public WorkItem(string s) {
             Parse(s);
         }
 
 
-        public void Parse(string ToParse)
-        {
+        public void Parse(string ToParse) {
             IsParsing = true;
-            foreach (var pair in ToParse.GetAllTags())
-            {
-                switch (pair.Key)
-                {
+            foreach (var pair in ToParse.GetAllTags()) {
+                switch (pair.Key) {
                     case "st":
                         _state = (enItemState)int.Parse(pair.Value);
                         break;
@@ -181,8 +164,7 @@ namespace BlueDatabase
 
                         var x = _CellKey.SplitBy("|");
 
-                        if (x.GetUpperBound(0) == 1)
-                        {
+                        if (x.GetUpperBound(0) == 1) {
                             int.TryParse(x[0], out _colKey);
                             int.TryParse(x[1], out _rowKey);
                         }
@@ -229,8 +211,7 @@ namespace BlueDatabase
             IsParsing = false;
         }
 
-        public new string ToString()
-        {
+        public new string ToString() {
 
             return "{ST=" + (int)_state +
                    ", CO=" + (int)Comand +
@@ -244,8 +225,7 @@ namespace BlueDatabase
             // ", G=" + Group.ToNonCritical() +
         }
 
-        public string UndoTextTableMouseOver()
-        {
+        public string UndoTextTableMouseOver() {
 
 
             var a = "'" + PreviousValue + "'";
@@ -260,17 +240,14 @@ namespace BlueDatabase
         }
 
 
-        public string CompareKey()
-        {
+        public string CompareKey() {
 
             return Date.ToString(Constants.Format_Date) + ColKey;
 
         }
 
-        public void OnChanged()
-        {
-            if (IsParsing)
-            {
+        public void OnChanged() {
+            if (IsParsing) {
                 Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!");
                 return;
             }
@@ -278,8 +255,7 @@ namespace BlueDatabase
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
-        internal bool LogsUndo(Database database)
-        {
+        internal bool LogsUndo(Database database) {
             return database.Column.SearchByKey(ColKey) is ColumnItem C && C.ShowUndo;
 
         }

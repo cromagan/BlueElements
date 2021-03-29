@@ -19,11 +19,9 @@
 
 using System;
 
-namespace BlueBasics.Enums
-{
+namespace BlueBasics.Enums {
     [Flags]
-    public enum enAlignment
-    {
+    public enum enAlignment {
         // Undefiniert = CByte(TextFormatFlags.none)
         Left = System.Windows.Forms.TextFormatFlags.Left,
         Right = System.Windows.Forms.TextFormatFlags.Right,

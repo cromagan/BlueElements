@@ -17,10 +17,8 @@
 // DEALINGS IN THE SOFTWARE.
 #endregion
 
-namespace BlueBasics.EventArgs
-{
-    public class LoadingEventArgs : LoadedEventArgs
-    {
+namespace BlueBasics.EventArgs {
+    public class LoadingEventArgs : LoadedEventArgs {
         public LoadingEventArgs(bool onlyReload) : base(onlyReload) { }
 
         public bool TryCancel { get; set; }

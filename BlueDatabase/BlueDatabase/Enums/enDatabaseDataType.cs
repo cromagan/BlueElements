@@ -18,10 +18,8 @@
 #endregion
 using System;
 
-namespace BlueDatabase.Enums
-{
-    public enum enDatabaseDataType : byte
-    {
+namespace BlueDatabase.Enums {
+    public enum enDatabaseDataType : byte {
         // Fehler = 0
 
         Version = 1,
@@ -196,6 +194,7 @@ namespace BlueDatabase.Enums
         co_DauerFilterPos = 194,
         co_AfterEdit_AutoReplace = 195,
         co_FilterOptions = 196,
+        co_CaptionBitmapTXT = 197,
 
 
 

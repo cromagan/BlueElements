@@ -22,10 +22,8 @@ using BlueBasics.Enums;
 using System;
 using System.Drawing;
 
-namespace BlueControls.Forms
-{
-    public partial class Notification : FloatingForm
-    {
+namespace BlueControls.Forms {
+    public partial class Notification : FloatingForm {
 
         private int _Timer_Tick_count;
         private bool _Timer_Tick_WasVisible;
@@ -36,13 +34,11 @@ namespace BlueControls.Forms
         internal int FloatInAndOutMilliSek = -999;
 
 
-        private Notification() : base(Enums.enDesign.Form_DesktopBenachrichtigung)
-        {
+        private Notification() : base(Enums.enDesign.Form_DesktopBenachrichtigung) {
             InitializeComponent();
         }
 
-        private Notification(string Text) : this()
-        {
+        private Notification(string Text) : this() {
             //InitializeComponent();
 
 
@@ -64,8 +60,7 @@ namespace BlueControls.Forms
         }
 
 
-        public static void Show(string Text)
-        {
+        public static void Show(string Text) {
             CloseAll();
             if (string.IsNullOrEmpty(Text)) { return; }
             var x = new Notification(Text);
@@ -73,11 +68,9 @@ namespace BlueControls.Forms
         }
 
 
-        public static void Show(string TXT, enImageCode Pic)
-        {
+        public static void Show(string TXT, enImageCode Pic) {
 
-            if (Pic != enImageCode.None)
-            {
+            if (Pic != enImageCode.None) {
                 TXT = "<ImageCode=" + Enum.GetName(Pic.GetType(), Pic) + "|32> <zbx_store><top>" + TXT;
             }
 
@@ -87,21 +80,15 @@ namespace BlueControls.Forms
 
 
 
-        public static void CloseAll()
-        {
+        public static void CloseAll() {
 
-            foreach (var ThisForm in AllBoxes)
-            {
-                if (!ThisForm.IsDisposed && ThisForm is Notification)
-                {
-                    try
-                    {
+            foreach (var ThisForm in AllBoxes) {
+                if (!ThisForm.IsDisposed && ThisForm is Notification) {
+                    try {
                         ThisForm.Close();
                         CloseAll();
                         return;
-                    }
-                    catch (Exception ex)
-                    {
+                    } catch (Exception ex) {
                         Develop.DebugPrint(ex);
                     }
                 }
@@ -109,21 +96,15 @@ namespace BlueControls.Forms
         }
 
 
-        public new void Close()
-        {
+        public new void Close() {
 
 
-            foreach (var ThisForm in AllBoxes)
-            {
-                if (!ThisForm.IsDisposed && ThisForm is Notification)
-                {
-                    try
-                    {
+            foreach (var ThisForm in AllBoxes) {
+                if (!ThisForm.IsDisposed && ThisForm is Notification) {
+                    try {
                         base.Close();
                         return;
-                    }
-                    catch (Exception ex)
-                    {
+                    } catch (Exception ex) {
                         Develop.DebugPrint(ex);
                     }
                 }
@@ -132,15 +113,12 @@ namespace BlueControls.Forms
 
 
 
-        private void timNote_Tick(object sender, System.EventArgs e)
-        {
+        private void timNote_Tick(object sender, System.EventArgs e) {
             var MS = DateTime.Now.Subtract(_FirstTimer).TotalMilliseconds;
             _Timer_Tick_count++;
 
-            if (Tag is System.Windows.Forms.Control tempVar)
-            {
-                if (!tempVar.Visible)
-                {
+            if (Tag is System.Windows.Forms.Control tempVar) {
+                if (!tempVar.Visible) {
                     _Timer_Tick_count = 0;
                     Close();
                     return;
@@ -148,11 +126,9 @@ namespace BlueControls.Forms
             }
 
 
-            if (FloatInAndOutMilliSek > 0)
-            {
+            if (FloatInAndOutMilliSek > 0) {
                 // Da das System oft ausgelastet ist, erst ein paar Dummy-Leerläufe, daß das Fenster dann angezeigt wird, wenn das System Luft hat
-                if (_Timer_Tick_count == 6)
-                {
+                if (_Timer_Tick_count == 6) {
                     _Timer_Tick_WasVisible = false;
                     _FirstTimer = DateTime.Now;
                 }
@@ -165,33 +141,24 @@ namespace BlueControls.Forms
 
 
 
-            if (FloatInAndOutMilliSek > 0)
-            {
+            if (FloatInAndOutMilliSek > 0) {
                 double _Proz = 0;
 
-                if (MS > UpDownSpeed + FloatInAndOutMilliSek * 0.3 && !_Timer_Tick_WasVisible)
-                {
+                if (MS > UpDownSpeed + FloatInAndOutMilliSek * 0.3 && !_Timer_Tick_WasVisible) {
                     _FirstTimer = DateTime.Now.Subtract(new TimeSpan(0, 0, 0, 0, UpDownSpeed));
                     MS = UpDownSpeed;
                 }
 
-                if (MS < UpDownSpeed)
-                {
+                if (MS < UpDownSpeed) {
                     _Proz = MS / UpDownSpeed;
-                }
-                else if (MS >= UpDownSpeed && MS <= UpDownSpeed + FloatInAndOutMilliSek)
-                {
+                } else if (MS >= UpDownSpeed && MS <= UpDownSpeed + FloatInAndOutMilliSek) {
                     _Proz = 1;
                     _Timer_Tick_WasVisible = true;
 
-                }
-                else if (MS > UpDownSpeed + FloatInAndOutMilliSek && MS < FloatInAndOutMilliSek + UpDownSpeed * 2)
-                {
+                } else if (MS > UpDownSpeed + FloatInAndOutMilliSek && MS < FloatInAndOutMilliSek + UpDownSpeed * 2) {
                     _Proz = (FloatInAndOutMilliSek + UpDownSpeed * 2 - MS) / UpDownSpeed;
                     //Going = true;
-                }
-                else
-                {
+                } else {
                     _Timer_Tick_count = 0;
                     timNote.Enabled = false;
                     Close();
@@ -309,12 +276,9 @@ namespace BlueControls.Forms
         //    }
         //}
 
-        public void FadeOut()
-        {
-            if (FloatInAndOutMilliSek > 300)
-            {
-                if (DateTime.Now.Subtract(_FirstTimer).TotalMilliseconds > UpDownSpeed && DateTime.Now.Subtract(_FirstTimer).TotalMilliseconds < FloatInAndOutMilliSek + UpDownSpeed)
-                {
+        public void FadeOut() {
+            if (FloatInAndOutMilliSek > 300) {
+                if (DateTime.Now.Subtract(_FirstTimer).TotalMilliseconds > UpDownSpeed && DateTime.Now.Subtract(_FirstTimer).TotalMilliseconds < FloatInAndOutMilliSek + UpDownSpeed) {
                     _FirstTimer = DateTime.Now.Subtract(new TimeSpan(0, 0, 0, 0, UpDownSpeed + 10));
                 }
 
@@ -322,8 +286,7 @@ namespace BlueControls.Forms
             }
         }
 
-        private void capTXT_Click(object sender, System.EventArgs e)
-        {
+        private void capTXT_Click(object sender, System.EventArgs e) {
             FadeOut();
         }
     }

@@ -19,12 +19,9 @@
 
 using System;
 
-namespace BlueBasics
-{
-    public static class modErgebnis
-    {
-        public static double? Ergebnis(string formel)
-        {
+namespace BlueBasics {
+    public static class modErgebnis {
+        public static double? Ergebnis(string formel) {
             formel = formel.ToUpper();
             formel = formel.Replace(" ", string.Empty);
             if (string.IsNullOrEmpty(formel)) { return null; }
@@ -33,14 +30,12 @@ namespace BlueBasics
             return ErgebnisCore(formel);
         }
 
-        private static double? ErgebnisCore(string formel)
-        {
+        private static double? ErgebnisCore(string formel) {
             // var TMP = 0;
 
             formel = formel.DeKlammere(true, false, false);
             // Das alles kann nur möglich sein, WENN eine Klammer vorhanden ist
-            if (formel.Contains("("))
-            {
+            if (formel.Contains("(")) {
                 // --------------------------------------------------------------------------------------------------------------------------------
                 // --- Eine Klammer auflösen, im Formelstring ersetzen und         mittels Rekursivität die nun einfachere Formel berechnen.
                 // --------------------------------------------------------------------------------------------------------------------------------
@@ -170,8 +165,7 @@ namespace BlueBasics
             var w2 = ErgebnisCore(formel.Substring(TMP + Seperator.Length));
             if (w2 == null) { return null; }
 
-            switch (Seperator)
-            {
+            switch (Seperator) {
                 case "/":
                     if (w2 == 0) { return null; }
                     return w1 / w2;
@@ -207,15 +201,13 @@ namespace BlueBasics
             return null;
         }
 
-        public static int LastMinusIndex(string formel)
-        {
+        public static int LastMinusIndex(string formel) {
             if (!formel.Contains("-")) { return -1; }
 
             var LastMin = 1;
             var OkMin = -1;
 
-            while (true)
-            {
+            while (true) {
                 LastMin = formel.IndexOf("-", LastMin);
                 if (LastMin < 1) { break; }
 

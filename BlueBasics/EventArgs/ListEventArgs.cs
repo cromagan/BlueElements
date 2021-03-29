@@ -17,15 +17,12 @@
 // DEALINGS IN THE SOFTWARE.
 #endregion
 
-namespace BlueBasics.EventArgs
-{
-    public class ListEventArgs : System.EventArgs
-    {
+namespace BlueBasics.EventArgs {
+    public class ListEventArgs : System.EventArgs {
         public object Item { get; }
 
-        public ListEventArgs(object item)
-        {
-            this.Item = item;
+        public ListEventArgs(object item) {
+            Item = item;
         }
     }
 }

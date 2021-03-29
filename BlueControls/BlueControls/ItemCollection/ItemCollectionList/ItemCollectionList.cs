@@ -33,10 +33,8 @@ using System.Linq;
 using static BlueBasics.Extensions;
 using static BlueBasics.FileOperations;
 
-namespace BlueControls.ItemCollection
-{
-    public class ItemCollectionList : ListExt<BasicListItem>, ICloneable
-    {
+namespace BlueControls.ItemCollection {
+    public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
 
 
         #region  Variablen-Deklarationen 
@@ -57,11 +55,9 @@ namespace BlueControls.ItemCollection
 
         #region  Properties 
 
-        public enCheckBehavior CheckBehavior
-        {
+        public enCheckBehavior CheckBehavior {
             get => _CheckBehavior;
-            set
-            {
+            set {
 
                 if (value == _CheckBehavior) { return; }
                 _CheckBehavior = value;
@@ -75,8 +71,7 @@ namespace BlueControls.ItemCollection
         /// <returns></returns>
         public enDesign ItemDesign //Implements IDesignAble.Design
         {
-            get
-            {
+            get {
                 if (_ItemDesign == enDesign.Undefiniert) { Develop.DebugPrint(enFehlerArt.Fehler, "ItemDesign undefiniert!"); }
                 return _ItemDesign;
             }
@@ -88,8 +83,7 @@ namespace BlueControls.ItemCollection
         /// <returns></returns>
         public enDesign ControlDesign //Implements IDesignAble.Design
         {
-            get
-            {
+            get {
                 if (_ControlDesign == enDesign.Undefiniert) { Develop.DebugPrint(enFehlerArt.Fehler, "ControlDesign undefiniert!"); }
                 return _ControlDesign;
             }
@@ -99,11 +93,9 @@ namespace BlueControls.ItemCollection
 
         public int BreakAfterItems { get; private set; }
 
-        public enBlueListBoxAppearance Appearance
-        {
+        public enBlueListBoxAppearance Appearance {
             get => _Appearance;
-            set
-            {
+            set {
                 if (value == _Appearance && _ItemDesign != enDesign.Undefiniert) { return; }
                 _Appearance = value;
 
@@ -122,8 +114,7 @@ namespace BlueControls.ItemCollection
 
         public ItemCollectionList() : this(enBlueListBoxAppearance.Listbox) { }
 
-        public ItemCollectionList(enBlueListBoxAppearance design) : base()
-        {
+        public ItemCollectionList(enBlueListBoxAppearance design) : base() {
             _CellposCorrect = Size.Empty;
             _Appearance = enBlueListBoxAppearance.Listbox;
             _ItemDesign = enDesign.Undefiniert;
@@ -142,12 +133,10 @@ namespace BlueControls.ItemCollection
         public event EventHandler DoInvalidate;
         #endregion
 
-        private void GetDesigns()
-        {
+        private void GetDesigns() {
             _ControlDesign = (enDesign)_Appearance;
 
-            switch (_Appearance)
-            {
+            switch (_Appearance) {
                 case enBlueListBoxAppearance.Autofilter:
                     _ItemDesign = enDesign.Item_Autofilter;
                     break;
@@ -188,61 +177,46 @@ namespace BlueControls.ItemCollection
 
 
 
-        public void Check(ListExt<string> vItems, bool Checked)
-        {
+        public void Check(ListExt<string> vItems, bool Checked) {
             Check(vItems.ToArray(), Checked);
         }
 
-        public void Check(List<string> vItems, bool Checked)
-        {
+        public void Check(List<string> vItems, bool Checked) {
             Check(vItems.ToArray(), Checked);
         }
 
-        public void Check(string[] vItems, bool Checked)
-        {
-            for (var z = 0; z <= vItems.GetUpperBound(0); z++)
-            {
-                if (this[vItems[z]] != null)
-                {
+        public void Check(string[] vItems, bool Checked) {
+            for (var z = 0; z <= vItems.GetUpperBound(0); z++) {
+                if (this[vItems[z]] != null) {
                     this[vItems[z]].Checked = Checked;
                 }
             }
         }
 
-        public void UncheckAll()
-        {
-            foreach (var ThisItem in this)
-            {
-                if (ThisItem != null)
-                {
+        public void UncheckAll() {
+            foreach (var ThisItem in this) {
+                if (ThisItem != null) {
                     ThisItem.Checked = false;
                 }
             }
         }
 
-        public void CheckAll()
-        {
-            foreach (var ThisItem in this)
-            {
-                if (ThisItem != null)
-                {
+        public void CheckAll() {
+            foreach (var ThisItem in this) {
+                if (ThisItem != null) {
                     ThisItem.Checked = true;
                 }
             }
         }
 
-        internal void SetNewCheckState(BasicListItem This, bool value, ref bool CheckVariable)
-        {
+        internal void SetNewCheckState(BasicListItem This, bool value, ref bool CheckVariable) {
 
             if (!This.IsClickable()) { value = false; }
 
 
-            if (_CheckBehavior == enCheckBehavior.NoSelection)
-            {
+            if (_CheckBehavior == enCheckBehavior.NoSelection) {
                 value = false;
-            }
-            else if (CheckVariable && value == false && _CheckBehavior == enCheckBehavior.AlwaysSingleSelection)
-            {
+            } else if (CheckVariable && value == false && _CheckBehavior == enCheckBehavior.AlwaysSingleSelection) {
                 if (Checked().Count == 1) { value = true; }
             }
 
@@ -262,28 +236,23 @@ namespace BlueControls.ItemCollection
 
 
 
-        private void OnItemCheckedChanged()
-        {
+        private void OnItemCheckedChanged() {
             ItemCheckedChanged?.Invoke(this, System.EventArgs.Empty);
         }
 
-        public void OnDoInvalidate()
-        {
+        public void OnDoInvalidate() {
             DoInvalidate?.Invoke(this, System.EventArgs.Empty);
         }
 
-        public override void OnChanged()
-        {
+        public override void OnChanged() {
             _CellposCorrect = Size.Empty;
             base.OnChanged();
             OnDoInvalidate();
         }
 
 
-        protected override void OnItemAdded(BasicListItem item)
-        {
-            if (string.IsNullOrEmpty(item.Internal))
-            {
+        protected override void OnItemAdded(BasicListItem item) {
+            if (string.IsNullOrEmpty(item.Internal)) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Der Auflistung soll ein Item hinzugefügt werden, welches keinen Namen hat " + item.Internal);
             }
 
@@ -292,12 +261,10 @@ namespace BlueControls.ItemCollection
             OnDoInvalidate();
         }
 
-        public List<BasicListItem> Checked()
-        {
+        public List<BasicListItem> Checked() {
             var p = new List<BasicListItem>();
 
-            foreach (var ThisItem in this)
-            {
+            foreach (var ThisItem in this) {
                 if (ThisItem != null && ThisItem.Checked) { p.Add(ThisItem); }
             }
 
@@ -321,22 +288,17 @@ namespace BlueControls.ItemCollection
 
 
 
-            foreach (var ThisItem in this)
-            {
-                if (ThisItem != null)
-                {
+            foreach (var ThisItem in this) {
+                if (ThisItem != null) {
                     var s = ThisItem.SizeUntouchedForListBox();
 
                     w = Math.Max(w, s.Width);
                     h = Math.Max(h, s.Height);
                     hall += s.Height;
 
-                    if (sameh < 0)
-                    {
+                    if (sameh < 0) {
                         sameh = ThisItem.SizeUntouchedForListBox().Height;
-                    }
-                    else
-                    {
+                    } else {
                         if (sameh != ThisItem.SizeUntouchedForListBox().Height) { or = enOrientation.Waagerecht; }
                         sameh = ThisItem.SizeUntouchedForListBox().Height;
                     }
@@ -351,17 +313,14 @@ namespace BlueControls.ItemCollection
             return (w, h, hall, or);
         }
 
-        private void PreComputeSize()
-        {
-            System.Threading.Tasks.Parallel.ForEach(this, ThisItem =>
-            {
+        private void PreComputeSize() {
+            System.Threading.Tasks.Parallel.ForEach(this, ThisItem => {
 
                 ThisItem.SizeUntouchedForListBox();
             });
         }
 
-        public Size CalculateColumnAndSize()
-        {
+        public Size CalculateColumnAndSize() {
             (var BiggestItemX, var BiggestItemY, var HeightAdded, var SenkrechtAllowed) = ItemData();
 
             if (SenkrechtAllowed == enOrientation.Waagerecht) { return ComputeAllItemPositions(new Size(300, 300), null, BiggestItemX, HeightAdded, SenkrechtAllowed); }
@@ -371,19 +330,16 @@ namespace BlueControls.ItemCollection
             return ComputeAllItemPositions(new Size(1, 30), null, BiggestItemX, HeightAdded, SenkrechtAllowed);
         }
 
-        internal Size ComputeAllItemPositions(Size controlDrawingArea, Slider sliderY, int biggestItemX, int heightAdded, enOrientation senkrechtAllowed)
-        {
+        internal Size ComputeAllItemPositions(Size controlDrawingArea, Slider sliderY, int biggestItemX, int heightAdded, enOrientation senkrechtAllowed) {
 
 
 
-            if (Math.Abs(LastCheckedMaxSize.Width - controlDrawingArea.Width) > 0.1 || Math.Abs(LastCheckedMaxSize.Height - controlDrawingArea.Height) > 0.1)
-            {
+            if (Math.Abs(LastCheckedMaxSize.Width - controlDrawingArea.Width) > 0.1 || Math.Abs(LastCheckedMaxSize.Height - controlDrawingArea.Height) > 0.1) {
                 LastCheckedMaxSize = controlDrawingArea;
                 _CellposCorrect = Size.Empty;
             }
             if (!_CellposCorrect.IsEmpty) { return _CellposCorrect; }
-            if (Count == 0)
-            {
+            if (Count == 0) {
                 _CellposCorrect = Size.Empty;
                 return Size.Empty;
             }
@@ -397,18 +353,15 @@ namespace BlueControls.ItemCollection
             if (BreakAfterItems < 1) { senkrechtAllowed = enOrientation.Waagerecht; }
 
             var SliderWidth = 0;
-            if (sliderY != null)
-            {
-                if (BreakAfterItems < 1 && heightAdded > controlDrawingArea.Height)
-                {
+            if (sliderY != null) {
+                if (BreakAfterItems < 1 && heightAdded > controlDrawingArea.Height) {
                     SliderWidth = sliderY.Width;
                 }
             }
 
             int colWidth;
 
-            switch (_Appearance)
-            {
+            switch (_Appearance) {
                 case enBlueListBoxAppearance.Gallery:
                     colWidth = 200;
                     break;
@@ -419,22 +372,16 @@ namespace BlueControls.ItemCollection
 
                 default:
                     // u.a. Autofilter
-                    if (BreakAfterItems < 1)
-                    {
+                    if (BreakAfterItems < 1) {
                         colWidth = controlDrawingArea.Width - SliderWidth;
-                    }
-                    else
-                    {
+                    } else {
                         var colCount = Count / BreakAfterItems;
                         var r = Count % colCount;
                         if (r != 0) { colCount++; }
 
-                        if (controlDrawingArea.Width < 5)
-                        {
+                        if (controlDrawingArea.Width < 5) {
                             colWidth = biggestItemX;
-                        }
-                        else
-                        {
+                        } else {
                             colWidth = (controlDrawingArea.Width - SliderWidth) / colCount;
                         }
 
@@ -457,11 +404,9 @@ namespace BlueControls.ItemCollection
 
 
             BasicListItem previtem = null;
-            foreach (var ThisItem in this)
-            {
+            foreach (var ThisItem in this) {
                 // PaintmodX kann immer abgezogen werden, da es eh nur bei einspaltigen Listboxen verändert wird!
-                if (ThisItem != null)
-                {
+                if (ThisItem != null) {
                     var cx = 0;
                     var cy = 0;
 
@@ -470,41 +415,28 @@ namespace BlueControls.ItemCollection
                     itenc++;
 
 
-                    if (senkrechtAllowed == enOrientation.Waagerecht)
-                    {
+                    if (senkrechtAllowed == enOrientation.Waagerecht) {
                         if (ThisItem.IsCaption) { wi = controlDrawingArea.Width - SliderWidth; }
                         he = ThisItem.HeightForListBox(_Appearance, wi);
-                    }
-                    else
-                    {
+                    } else {
                         he = ThisItem.HeightForListBox(_Appearance, wi);
                     }
 
 
-                    if (previtem != null)
-                    {
-                        if (senkrechtAllowed == enOrientation.Waagerecht)
-                        {
-                            if (previtem.Pos.Right + colWidth > controlDrawingArea.Width || ThisItem.IsCaption)
-                            {
+                    if (previtem != null) {
+                        if (senkrechtAllowed == enOrientation.Waagerecht) {
+                            if (previtem.Pos.Right + colWidth > controlDrawingArea.Width || ThisItem.IsCaption) {
                                 cx = 0;
                                 cy = previtem.Pos.Bottom;
-                            }
-                            else
-                            {
+                            } else {
                                 cx = previtem.Pos.Right;
                                 cy = previtem.Pos.Top;
                             }
-                        }
-                        else
-                        {
-                            if (itenc % BreakAfterItems == 0)
-                            {
+                        } else {
+                            if (itenc % BreakAfterItems == 0) {
                                 cx = previtem.Pos.Right;
                                 cy = 0;
-                            }
-                            else
-                            {
+                            } else {
                                 cx = previtem.Pos.Left;
                                 cy = previtem.Pos.Bottom;
                             }
@@ -521,20 +453,15 @@ namespace BlueControls.ItemCollection
             }
 
 
-            if (sliderY != null)
-            {
+            if (sliderY != null) {
 
                 var SetTo0 = false;
 
-                if (SliderWidth > 0)
-                {
-                    if (Maxy - controlDrawingArea.Height <= 0)
-                    {
+                if (SliderWidth > 0) {
+                    if (Maxy - controlDrawingArea.Height <= 0) {
                         sliderY.Enabled = false;
                         SetTo0 = true;
-                    }
-                    else
-                    {
+                    } else {
                         sliderY.Enabled = true;
                         sliderY.Minimum = 0;
                         sliderY.SmallChange = 16;
@@ -546,15 +473,12 @@ namespace BlueControls.ItemCollection
 
                     sliderY.Height = controlDrawingArea.Height;
                     sliderY.Visible = true;
-                }
-                else
-                {
+                } else {
                     SetTo0 = true;
                     sliderY.Visible = false;
                 }
 
-                if (SetTo0)
-                {
+                if (SetTo0) {
                     sliderY.Minimum = 0;
                     sliderY.Maximum = 0;
                     sliderY.Value = 0;
@@ -565,11 +489,9 @@ namespace BlueControls.ItemCollection
             return _CellposCorrect;
         }
 
-        private int CalculateColumnCount(int BiggestItemWidth, int AllItemsHeight, enOrientation orientation)
-        {
+        private int CalculateColumnCount(int BiggestItemWidth, int AllItemsHeight, enOrientation orientation) {
 
-            if (orientation != enOrientation.Senkrecht)
-            {
+            if (orientation != enOrientation.Senkrecht) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Nur 'senkrecht' erlaubt mehrere Spalten");
             }
 
@@ -578,8 +500,7 @@ namespace BlueControls.ItemCollection
 
             var dithemh = AllItemsHeight / Count;
 
-            for (var TestSP = 10; TestSP >= 1; TestSP--)
-            {
+            for (var TestSP = 10; TestSP >= 1; TestSP--) {
 
                 var colc = Count / TestSP;
                 var rest = Count % colc;
@@ -597,8 +518,7 @@ namespace BlueControls.ItemCollection
                 if ((colc * (float)dithemh) / (TestSP * (float)BiggestItemWidth) < 0.5) { ok = false; }
 
 
-                if (ok)
-                {
+                if (ok) {
                     return colc;
                 }
             }
@@ -611,24 +531,20 @@ namespace BlueControls.ItemCollection
         /// <param name="t">Beispiel: GetType(enDesign)</param>
         /// <param name="ZumDropdownHinzuAb">Erster Wert der Enumeration, der Hinzugefügt werden soll. Inklusive deses Wertes</param>
         /// <param name="ZumDropdownHinzuBis">Letzter Wert der Enumeration, der nicht mehr hinzugefügt wird, also exklusives diese Wertes</param>
-        public void GetValuesFromEnum(System.Type t, int ZumDropdownHinzuAb, int ZumDropdownHinzuBis)
-        {
+        public void GetValuesFromEnum(System.Type t, int ZumDropdownHinzuAb, int ZumDropdownHinzuBis) {
 
             var items = System.Enum.GetValues(t);
 
             Clear();
 
-            foreach (var thisItem in items)
-            {
+            foreach (var thisItem in items) {
 
                 var te = System.Enum.GetName(t, thisItem);
                 var th = (int)thisItem;
 
-                if (!string.IsNullOrEmpty(te))
-                {
+                if (!string.IsNullOrEmpty(te)) {
                     //NewReplacer.Add(th.ToString() + "|" + te);
-                    if (th >= ZumDropdownHinzuAb && th < ZumDropdownHinzuBis)
-                    {
+                    if (th >= ZumDropdownHinzuAb && th < ZumDropdownHinzuBis) {
                         Add(te, th.ToString());
                     }
                 }
@@ -642,8 +558,7 @@ namespace BlueControls.ItemCollection
 
 
 
-        public TextListItem Add(string internalAndReadableText)
-        {
+        public TextListItem Add(string internalAndReadableText) {
             return Add(internalAndReadableText, internalAndReadableText, null, false, true, string.Empty);
         }
 
@@ -652,8 +567,7 @@ namespace BlueControls.ItemCollection
         /// Fügt das übergebende Object den Tags hinzu.
         /// </summary>
         /// <param name="readableObject"></param>
-        public TextListItem Add(IReadableText readableObject)
-        {
+        public TextListItem Add(IReadableText readableObject) {
             var i = Add(readableObject, string.Empty, string.Empty);
             i.Tag = readableObject;
             return i;
@@ -664,8 +578,7 @@ namespace BlueControls.ItemCollection
         /// </summary>
         /// <param name="readableObject"></param>
         /// <param name="internalname"></param>
-        public TextListItem Add(IReadableText readableObject, string internalname)
-        {
+        public TextListItem Add(IReadableText readableObject, string internalname) {
             var i = Add(readableObject, internalname, string.Empty);
             i.Tag = readableObject;
             return i;
@@ -676,90 +589,75 @@ namespace BlueControls.ItemCollection
         /// </summary>
         /// <param name="internalname"></param>
         /// <param name="readableObject"></param>
-        public TextListItem Add(IReadableText readableObject, string internalname, string userDefCompareKey)
-        {
+        public TextListItem Add(IReadableText readableObject, string internalname, string userDefCompareKey) {
             var i = Add(readableObject.ReadableText(), internalname, readableObject.SymbolForReadableText(), true, userDefCompareKey);
             i.Tag = readableObject;
             return i;
         }
 
 
-        public TextListItem Add(string readableText, string internalname, bool isCaption, string userDefCompareKey)
-        {
+        public TextListItem Add(string readableText, string internalname, bool isCaption, string userDefCompareKey) {
             return Add(readableText, internalname, null, isCaption, true, userDefCompareKey);
         }
 
 
 
-        public TextListItem Add(string internalAndReadableText, bool isCaption)
-        {
+        public TextListItem Add(string internalAndReadableText, bool isCaption) {
             return Add(internalAndReadableText, internalAndReadableText, null, isCaption, true, string.Empty);
         }
 
 
 
-        public TextListItem Add(string internalAndReadableText, enDataFormat format)
-        {
+        public TextListItem Add(string internalAndReadableText, enDataFormat format) {
             return Add(internalAndReadableText, internalAndReadableText, null, false, true, DataFormat.CompareKey(internalAndReadableText, format));
         }
 
-        public TextListItem Add(string internalAndReadableText, enImageCode symbol)
-        {
+        public TextListItem Add(string internalAndReadableText, enImageCode symbol) {
             return Add(internalAndReadableText, internalAndReadableText, symbol, false, true, string.Empty);
         }
 
 
-        public TextListItem Add(string readableText, string internalname, bool enabled)
-        {
+        public TextListItem Add(string readableText, string internalname, bool enabled) {
             return Add(readableText, internalname, null, false, enabled, string.Empty);
         }
 
-        public TextListItem Add(string readableText, string internalname, enImageCode symbol, bool enabled)
-        {
+        public TextListItem Add(string readableText, string internalname, enImageCode symbol, bool enabled) {
             return Add(readableText, internalname, symbol, false, enabled, string.Empty);
         }
 
-        public TextListItem Add(string readableText, string internalname, enImageCode symbol, bool enabled, string userDefCompareKey)
-        {
+        public TextListItem Add(string readableText, string internalname, enImageCode symbol, bool enabled, string userDefCompareKey) {
             return Add(readableText, internalname, symbol, false, enabled, userDefCompareKey);
         }
 
-        public TextListItem Add(string readableText, string internalname, QuickImage symbol, bool enabled)
-        {
+        public TextListItem Add(string readableText, string internalname, QuickImage symbol, bool enabled) {
             return Add(readableText, internalname, symbol, false, enabled, string.Empty);
         }
 
-        public TextListItem Add(string readableText, string internalname, QuickImage symbol, bool enabled, string userDefCompareKey)
-        {
+        public TextListItem Add(string readableText, string internalname, QuickImage symbol, bool enabled, string userDefCompareKey) {
             return Add(readableText, internalname, symbol, false, enabled, userDefCompareKey);
         }
 
 
-        public TextListItem Add(string readableText, string internalname)
-        {
+        public TextListItem Add(string readableText, string internalname) {
             return Add(readableText, internalname, null, false, true, string.Empty);
 
         }
 
-        public TextListItem Add(string readableText, string internalname, enImageCode symbol)
-        {
+        public TextListItem Add(string readableText, string internalname, enImageCode symbol) {
             return Add(readableText, internalname, symbol, false, true, string.Empty);
         }
 
 
-        public TextListItem Add(string readableText, string internalname, QuickImage symbol)
-        {
+        public TextListItem Add(string readableText, string internalname, QuickImage symbol) {
             return Add(readableText, internalname, symbol, false, true, string.Empty);
         }
 
 
-        public TextListItem Add(string readableText, string internalname, enImageCode symbol, bool isCaption, bool enabled, string userDefCompareKey)
-        {
+        public TextListItem Add(string readableText, string internalname, enImageCode symbol, bool isCaption, bool enabled, string userDefCompareKey) {
             return Add(readableText, internalname, QuickImage.Get(symbol, 16), isCaption, enabled, userDefCompareKey);
         }
 
-        public TextListItem Add(string readableText, string internalname, QuickImage symbol, bool isCaption, bool enabled, string userDefCompareKey)
-        {
+        public TextListItem Add(string readableText, string internalname, QuickImage symbol, bool isCaption, bool enabled, string userDefCompareKey) {
 
             var x = new TextListItem(readableText, internalname, symbol, isCaption, enabled, userDefCompareKey);
             Add(x);
@@ -771,8 +669,7 @@ namespace BlueControls.ItemCollection
 
 
         #region  BitmapListItem
-        public DataListItem Add(byte[] b, string caption)
-        {
+        public DataListItem Add(byte[] b, string caption) {
             var i = new DataListItem(b, string.Empty, caption);
             Add(i);
             return i;
@@ -783,8 +680,7 @@ namespace BlueControls.ItemCollection
         #region  BitmapListItem
 
 
-        public BitmapListItem Add(Bitmap bmp, string caption)
-        {
+        public BitmapListItem Add(Bitmap bmp, string caption) {
             var i = new BitmapListItem(bmp, string.Empty, caption);
             Add(i);
             return i;
@@ -792,8 +688,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public new void Add(BasicListItem item)
-        {
+        public new void Add(BasicListItem item) {
 
             if (Contains(item)) { Develop.DebugPrint(enFehlerArt.Fehler, "Bereits vorhanden!"); return; }
 
@@ -804,8 +699,7 @@ namespace BlueControls.ItemCollection
 
 
 
-        public BitmapListItem Add(string filename, string internalname, string caption, string EncryptionKey)
-        {
+        public BitmapListItem Add(string filename, string internalname, string caption, string EncryptionKey) {
             var i = new BitmapListItem(filename, internalname, caption, EncryptionKey);
             Add(i);
             return i;
@@ -818,8 +712,7 @@ namespace BlueControls.ItemCollection
         #region CellLikeListItem
 
 
-        public CellLikeListItem Add(string internalAndReadableText, ColumnItem columnStyle, enShortenStyle style, enBildTextVerhalten bildTextverhaltent, bool enabled)
-        {
+        public CellLikeListItem Add(string internalAndReadableText, ColumnItem columnStyle, enShortenStyle style, enBildTextVerhalten bildTextverhaltent, bool enabled) {
 
 
             var i = new CellLikeListItem(internalAndReadableText, columnStyle, style, enabled, bildTextverhaltent);
@@ -835,16 +728,14 @@ namespace BlueControls.ItemCollection
         #region LineListItem
 
 
-        public LineListItem AddSeparator(string userDefCompareKey)
-        {
+        public LineListItem AddSeparator(string userDefCompareKey) {
             var i = new LineListItem(string.Empty, userDefCompareKey);
             Add(i);
             return i;
         }
 
 
-        public LineListItem AddSeparator()
-        {
+        public LineListItem AddSeparator() {
             return AddSeparator(string.Empty);
         }
 
@@ -854,19 +745,16 @@ namespace BlueControls.ItemCollection
 
         #region RowFormulaItem
 
-        public RowFormulaListItem Add(RowItem row)
-        {
+        public RowFormulaListItem Add(RowItem row) {
             return Add(row, string.Empty, string.Empty);
         }
 
-        public RowFormulaListItem Add(RowItem row, string layoutID)
-        {
+        public RowFormulaListItem Add(RowItem row, string layoutID) {
             return Add(row, layoutID, string.Empty);
         }
 
 
-        public RowFormulaListItem Add(RowItem row, string layoutID, string userDefCompareKey)
-        {
+        public RowFormulaListItem Add(RowItem row, string layoutID, string userDefCompareKey) {
             var i = new RowFormulaListItem(row, layoutID, userDefCompareKey);
             Add(i);
             return i;
@@ -883,28 +771,22 @@ namespace BlueControls.ItemCollection
         //    }
         //}
 
-        public TextListItem Add(ColumnItem column, bool doCaptionSort)
-        {
-            if (doCaptionSort)
-            {
+        public TextListItem Add(ColumnItem column, bool doCaptionSort) {
+            if (doCaptionSort) {
                 return Add(column, column.Name, column.Ueberschriften + Constants.SecondSortChar + column.Name);
-            }
-            else
-            {
+            } else {
                 return Add(column, column.Name, string.Empty);
             }
 
         }
 
-        public TextListItem Add(enContextMenuComands comand, bool enabled = true)
-        {
+        public TextListItem Add(enContextMenuComands comand, bool enabled = true) {
 
             var _Internal = comand.ToString();
             QuickImage _Symbol;
             string _ReadableText;
 
-            switch (comand)
-            {
+            switch (comand) {
                 case enContextMenuComands.Abbruch:
                     _ReadableText = "Abbrechen";
                     _Symbol = QuickImage.Get("TasteESC|16");
@@ -1002,29 +884,23 @@ namespace BlueControls.ItemCollection
 
 
 
-        public void AddRange(ColumnCollection Columns, bool OnlyExportableTextformatForLayout, bool NoCritical, bool DoCaptionSort)
-        {
+        public void AddRange(ColumnCollection Columns, bool OnlyExportableTextformatForLayout, bool NoCritical, bool DoCaptionSort) {
 
-            foreach (var ThisColumnItem in Columns)
-            {
-                if (ThisColumnItem != null)
-                {
+            foreach (var ThisColumnItem in Columns) {
+                if (ThisColumnItem != null) {
                     var addx = true;
                     if (addx && OnlyExportableTextformatForLayout && !ThisColumnItem.ExportableTextformatForLayout()) { addx = false; }
                     if (addx && NoCritical && !ThisColumnItem.Format.CanBeCheckedByRules()) { addx = false; }
                     if (addx && this[ThisColumnItem.Name] != null) { addx = false; }
 
-                    if (addx)
-                    {
+                    if (addx) {
                         Add(ThisColumnItem, DoCaptionSort);
 
-                        if (DoCaptionSort)
-                        {
+                        if (DoCaptionSort) {
                             var capt = ThisColumnItem.Ueberschriften;
 
 
-                            if (this[capt] == null)
-                            {
+                            if (this[capt] == null) {
                                 Add(new TextListItem(capt, capt, null, true, true, capt + Constants.FirstSortChar));
                             }
                         }
@@ -1033,8 +909,7 @@ namespace BlueControls.ItemCollection
             }
         }
 
-        internal void SetValuesTo(List<string> values, string fileEncryptionKey)
-        {
+        internal void SetValuesTo(List<string> values, string fileEncryptionKey) {
 
 
             var _Ist = this.ToListOfString();
@@ -1043,95 +918,73 @@ namespace BlueControls.ItemCollection
 
 
             // Zu viele im Mains aus der Liste löschen
-            foreach (var ThisString in _zuviel)
-            {
+            foreach (var ThisString in _zuviel) {
                 if (!values.Contains(ThisString)) { Remove(ThisString); }
             }
 
             // und die Mains auffüllen
-            foreach (var ThisString in _zuwenig)
-            {
-                if (FileOperations.FileExists(ThisString))
-                {
-                    if (ThisString.FileType() == enFileFormat.Image)
-                    {
+            foreach (var ThisString in _zuwenig) {
+                if (FileOperations.FileExists(ThisString)) {
+                    if (ThisString.FileType() == enFileFormat.Image) {
                         Add(ThisString, ThisString, ThisString.FileNameWithoutSuffix(), fileEncryptionKey);
-                    }
-                    else
-                    {
+                    } else {
                         Add(ThisString.FileNameWithSuffix(), ThisString, QuickImage.Get(ThisString.FileType(), 48));
                     }
-                }
-                else
-                {
+                } else {
                     Add(ThisString);
                 }
             }
         }
 
-        public void AddRange(Type type)
-        {
-            foreach (int z1 in Enum.GetValues(type))
-            {
+        public void AddRange(Type type) {
+            foreach (int z1 in Enum.GetValues(type)) {
                 if (this[z1.ToString()] == null) { Add(Enum.GetName(type, z1).Replace("_", " "), z1.ToString()); }
             }
 
             Sort();
         }
 
-        public void AddRange(string[] Values)
-        {
+        public void AddRange(string[] Values) {
             if (Values == null) { return; }
 
-            foreach (var thisstring in Values)
-            {
+            foreach (var thisstring in Values) {
                 if (this[thisstring] == null) { Add(thisstring); }
             }
         }
 
-        public void AddRange(ListExt<string> Values)
-        {
+        public void AddRange(ListExt<string> Values) {
 
             if (Values == null) { return; }
 
-            foreach (var thisstring in Values)
-            {
+            foreach (var thisstring in Values) {
                 if (this[thisstring] == null) { Add(thisstring, thisstring); }
             }
         }
 
-        public void AddRange(List<string> Values, ColumnItem ColumnStyle, enShortenStyle Style, enBildTextVerhalten bildTextverhalten)
-        {
+        public void AddRange(List<string> Values, ColumnItem ColumnStyle, enShortenStyle Style, enBildTextVerhalten bildTextverhalten) {
 
             if (Values == null) { return; }
 
 
-            if (Values.Count > 10000)
-            {
+            if (Values.Count > 10000) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Values > 100000");
                 return;
             }
 
 
-            foreach (var thisstring in Values)
-            {
+            foreach (var thisstring in Values) {
                 Add(thisstring, ColumnStyle, Style, bildTextverhalten); // If Item(thisstring) Is Nothing Then Add(New CellLikeItem(thisstring, ColumnStyle))
             }
 
         }
 
-        public BasicListItem Add(string Value, ColumnItem ColumnStyle, enShortenStyle Style, enBildTextVerhalten bildTextverhalten)
-        {
+        public BasicListItem Add(string Value, ColumnItem ColumnStyle, enShortenStyle Style, enBildTextVerhalten bildTextverhalten) {
 
 
-            if (this[Value] == null)
-            {
-                if (ColumnStyle.Format == enDataFormat.Link_To_Filesystem && Value.FileType() == enFileFormat.Image)
-                {
+            if (this[Value] == null) {
+                if (ColumnStyle.Format == enDataFormat.Link_To_Filesystem && Value.FileType() == enFileFormat.Image) {
                     return Add(ColumnStyle.BestFile(Value, false), Value, Value, ColumnStyle.Database.FileEncryptionKey);
-                }
-                else
-                {
+                } else {
                     var i = new CellLikeListItem(Value, ColumnStyle, Style, true, bildTextverhalten);
                     Add(i);
                     return i;
@@ -1158,14 +1011,11 @@ namespace BlueControls.ItemCollection
         //}
 
 
-        public void AddRange(List<string> list)
-        {
+        public void AddRange(List<string> list) {
             if (list == null) { return; }
 
-            foreach (var thisstring in list)
-            {
-                if (!string.IsNullOrEmpty(thisstring))
-                {
+            foreach (var thisstring in list) {
+                if (!string.IsNullOrEmpty(thisstring)) {
                     if (this[thisstring] == null) { Add(thisstring, thisstring); }
                 }
             }
@@ -1173,11 +1023,9 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public void AddLayoutsOf(Database vLayoutDatabase, bool vDoDiscLayouts, string vAdditionalLayoutPath)
-        {
+        public void AddLayoutsOf(Database vLayoutDatabase, bool vDoDiscLayouts, string vAdditionalLayoutPath) {
 
-            for (var z = 0; z < vLayoutDatabase.Layouts.Count; z++)
-            {
+            for (var z = 0; z < vLayoutDatabase.Layouts.Count; z++) {
                 var p = new ItemCollectionPad(vLayoutDatabase.Layouts[z], string.Empty);
                 Add(p.Caption, p.ID, enImageCode.Stern);
             }
@@ -1186,13 +1034,10 @@ namespace BlueControls.ItemCollection
 
             var du = 0;
 
-            do
-            {
-                if (PathExists(vAdditionalLayoutPath))
-                {
+            do {
+                if (PathExists(vAdditionalLayoutPath)) {
                     var e = Directory.GetFiles(vAdditionalLayoutPath);
-                    foreach (var ThisFile in e)
-                    {
+                    foreach (var ThisFile in e) {
 
 
                         if (ThisFile.FilePath() == vLayoutDatabase.DefaultLayoutPath()) { ThisFile.TrimStart(vLayoutDatabase.DefaultLayoutPath()); }
@@ -1235,13 +1080,10 @@ namespace BlueControls.ItemCollection
         #region  Standard-Such-Properties 
 
 
-        public BasicListItem this[int X, int Y]
-        {
-            get
-            {
+        public BasicListItem this[int X, int Y] {
+            get {
 
-                foreach (var ThisItem in this)
-                {
+                foreach (var ThisItem in this) {
                     if (ThisItem != null && ThisItem.Contains(X, Y)) { return ThisItem; }
                 }
 
@@ -1253,38 +1095,29 @@ namespace BlueControls.ItemCollection
         #endregion
 
 
-        public void Remove(string Internal)
-        {
+        public void Remove(string Internal) {
             Remove(this[Internal]);
         }
 
-        public void RemoveRange(List<string> Internal)
-        {
-            foreach (var item in Internal)
-            {
+        public void RemoveRange(List<string> Internal) {
+            foreach (var item in Internal) {
                 Remove(item);
             }
         }
 
 
-        public BasicListItem this[string Internal]
-        {
-            get
-            {
+        public BasicListItem this[string Internal] {
+            get {
 
-                try
-                {
+                try {
 
                     if (string.IsNullOrEmpty(Internal)) { return null; }
 
-                    foreach (var ThisItem in this)
-                    {
+                    foreach (var ThisItem in this) {
                         if (ThisItem != null && Internal.ToUpper() == ThisItem.Internal.ToUpper()) { return ThisItem; }
                     }
                     return null;
-                }
-                catch
-                {
+                } catch {
                     return this[Internal];
                 }
 
@@ -1292,8 +1125,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        private void ValidateCheckStates(BasicListItem ThisMustBeChecked)
-        {
+        private void ValidateCheckStates(BasicListItem ThisMustBeChecked) {
 
             _Validating = true;
             var SomethingDonex = false;
@@ -1301,8 +1133,7 @@ namespace BlueControls.ItemCollection
             var Done = false;
             BasicListItem F = null;
 
-            switch (_CheckBehavior)
-            {
+            switch (_CheckBehavior) {
                 case enCheckBehavior.NoSelection:
                     UncheckAll();
                     break;
@@ -1312,36 +1143,25 @@ namespace BlueControls.ItemCollection
 
                 case enCheckBehavior.SingleSelection:
                 case enCheckBehavior.AlwaysSingleSelection:
-                    foreach (var ThisItem in this)
-                    {
-                        if (ThisItem != null)
-                        {
+                    foreach (var ThisItem in this) {
+                        if (ThisItem != null) {
 
-                            if (ThisMustBeChecked == null)
-                            {
+                            if (ThisMustBeChecked == null) {
                                 if (F == null) { F = ThisItem; }
 
-                                if (ThisItem.Checked)
-                                {
-                                    if (!Done)
-                                    {
+                                if (ThisItem.Checked) {
+                                    if (!Done) {
                                         Done = true;
-                                    }
-                                    else
-                                    {
-                                        if (ThisItem.Checked)
-                                        {
+                                    } else {
+                                        if (ThisItem.Checked) {
                                             ThisItem.Checked = false;
                                             SomethingDonex = true;
                                         }
                                     }
                                 }
-                            }
-                            else
-                            {
+                            } else {
                                 Done = true;
-                                if (ThisItem != ThisMustBeChecked && ThisItem.Checked)
-                                {
+                                if (ThisItem != ThisMustBeChecked && ThisItem.Checked) {
                                     SomethingDonex = true;
                                     ThisItem.Checked = false;
                                 }
@@ -1350,8 +1170,7 @@ namespace BlueControls.ItemCollection
                         }
                     }
 
-                    if (_CheckBehavior == enCheckBehavior.AlwaysSingleSelection && !Done && F != null && !F.Checked)
-                    {
+                    if (_CheckBehavior == enCheckBehavior.AlwaysSingleSelection && !Done && F != null && !F.Checked) {
                         F.Checked = true;
                         SomethingDonex = true;
                     }
@@ -1367,25 +1186,21 @@ namespace BlueControls.ItemCollection
             if (SomethingDonex) { OnDoInvalidate(); }
         }
 
-        public object Clone()
-        {
+        public object Clone() {
 
-            var x = new ItemCollectionList(_Appearance)
-            {
+            var x = new ItemCollectionList(_Appearance) {
                 CheckBehavior = _CheckBehavior
             };
 
 
-            foreach (var ThisItem in this)
-            {
+            foreach (var ThisItem in this) {
                 ThisItem.CloneToNewCollection(x);
             }
             return x;
         }
 
 
-        public static void GetItemCollection(ItemCollectionList e, ColumnItem column, RowItem checkedItemsAtRow, enShortenStyle style, int maxItems)
-        {
+        public static void GetItemCollection(ItemCollectionList e, ColumnItem column, RowItem checkedItemsAtRow, enShortenStyle style, int maxItems) {
 
             var Marked = new List<string>();
             var l = new List<string>();
@@ -1395,26 +1210,21 @@ namespace BlueControls.ItemCollection
             e.CheckBehavior = enCheckBehavior.MultiSelection; // Es kann ja mehr als nur eines angewählt sein, auch wenn nicht erlaubt!
 
             l.AddRange(column.DropDownItems);
-            if (column.DropdownWerteAndererZellenAnzeigen)
-            {
-                if (column.DropdownKey >= 0 && checkedItemsAtRow != null)
-                {
+            if (column.DropdownWerteAndererZellenAnzeigen) {
+                if (column.DropdownKey >= 0 && checkedItemsAtRow != null) {
                     var cc = column.Database.Column.SearchByKey(column.DropdownKey);
                     var F = new FilterCollection(column.Database)
                     {
                         new FilterItem(cc, enFilterType.Istgleich_GroßKleinEgal, checkedItemsAtRow.CellGetString(cc))
                     };
                     l.AddRange(column.Contents(F));
-                }
-                else
-                {
+                } else {
                     l.AddRange(column.Contents(null));
                 }
             }
 
 
-            switch (column.Format)
-            {
+            switch (column.Format) {
                 case enDataFormat.Bit:
                     l.Add(true.ToPlusMinus());
                     l.Add(false.ToPlusMinus());
@@ -1422,18 +1232,14 @@ namespace BlueControls.ItemCollection
 
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                     var DB = column.LinkedDatabase();
-                    if (DB != null && !string.IsNullOrEmpty(column.LinkedKeyKennung))
-                    {
-                        foreach (var ThisColumn in DB.Column)
-                        {
-                            if (ThisColumn.Name.ToLower().StartsWith(column.LinkedKeyKennung.ToLower()))
-                            {
+                    if (DB != null && !string.IsNullOrEmpty(column.LinkedKeyKennung)) {
+                        foreach (var ThisColumn in DB.Column) {
+                            if (ThisColumn.Name.ToLower().StartsWith(column.LinkedKeyKennung.ToLower())) {
                                 l.Add(ThisColumn.Key.ToString());
                             }
                         }
                     }
-                    if (l.Count == 0)
-                    {
+                    if (l.Count == 0) {
                         Notification.Show("Keine Spalten gefunden, die<br>mit '" + column.LinkedKeyKennung + "' beginnen.", enImageCode.Information);
                     }
                     break;
@@ -1441,25 +1247,18 @@ namespace BlueControls.ItemCollection
                 case enDataFormat.Values_für_LinkedCellDropdown:
                     var DB2 = column.LinkedDatabase();
                     l.AddRange(DB2.Column[0].Contents(null));
-                    if (l.Count == 0)
-                    {
+                    if (l.Count == 0) {
                         Notification.Show("Keine Zeilen in der Quell-Datenbank vorhanden.", enImageCode.Information);
                     }
                     break;
             }
 
-            if (column.Database.Row.Count > 0)
-            {
-                if (checkedItemsAtRow != null)
-                {
-                    if (!checkedItemsAtRow.CellIsNullOrEmpty(column))
-                    {
-                        if (column.MultiLine)
-                        {
+            if (column.Database.Row.Count > 0) {
+                if (checkedItemsAtRow != null) {
+                    if (!checkedItemsAtRow.CellIsNullOrEmpty(column)) {
+                        if (column.MultiLine) {
                             Marked = checkedItemsAtRow.CellGetList(column);
-                        }
-                        else
-                        {
+                        } else {
                             Marked.Add(checkedItemsAtRow.CellGetString(column));
                         }
                     }
@@ -1478,10 +1277,8 @@ namespace BlueControls.ItemCollection
             e.AddRange(l, column, style, column.BildTextVerhalten);
 
 
-            if (checkedItemsAtRow != null)
-            {
-                foreach (var t in Marked)
-                {
+            if (checkedItemsAtRow != null) {
+                foreach (var t in Marked) {
                     if (e[t] is BasicListItem bli) { bli.Checked = true; }
                 }
             }

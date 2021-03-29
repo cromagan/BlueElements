@@ -1,24 +1,20 @@
 ﻿using System.Collections.Generic;
 
 
-namespace BlueControls.ItemCollection
-{
-    internal class clsPhysicPadItem : clsAbstractPhysicPadItem
-    {
+namespace BlueControls.ItemCollection {
+    internal class clsPhysicPadItem : clsAbstractPhysicPadItem {
 
 
         public readonly List<clsKraft> Kraft = new();
 
 
 
-        public clsPhysicPadItem(ItemCollectionPad parent) : base(parent, string.Empty)
-        {
+        public clsPhysicPadItem(ItemCollectionPad parent) : base(parent, string.Empty) {
 
         }
 
 
-        protected override string ClassId()
-        {
+        protected override string ClassId() {
             return "Physics-Object";
         }
         //public override bool Contains(PointF value, decimal zoomfactor)

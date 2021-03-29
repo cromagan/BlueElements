@@ -47,7 +47,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnEinzeiligDarstellen = new BlueControls.Controls.Button();
             this.capEinheit = new BlueControls.Controls.Caption();
             this.cbxEinheit = new BlueControls.Controls.ComboBox();
-            this.Caption6 = new BlueControls.Controls.Caption();
+            this.capSpaltenbild = new BlueControls.Controls.Caption();
             this.cbxFormat = new BlueControls.Controls.ComboBox();
             this.Caption16 = new BlueControls.Controls.Caption();
             this.H_Colorx = new BlueControls.Controls.Button();
@@ -155,6 +155,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.caption5 = new BlueControls.Controls.Caption();
             this.butAktuellVor = new BlueControls.Controls.Button();
             this.butAktuellZurueck = new BlueControls.Controls.Button();
+            this.txbSpaltenbild = new BlueControls.Controls.TextBox();
             this.tabDesign.SuspendLayout();
             this.grpBildCode.SuspendLayout();
             this.tabRechte.SuspendLayout();
@@ -180,6 +181,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // tabDesign
             // 
             this.tabDesign.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabDesign.Controls.Add(this.txbSpaltenbild);
             this.tabDesign.Controls.Add(this.cbxBildTextVerhalten);
             this.tabDesign.Controls.Add(this.cbxAlign);
             this.tabDesign.Controls.Add(this.txbReplacer);
@@ -198,7 +200,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabDesign.Controls.Add(this.btnEinzeiligDarstellen);
             this.tabDesign.Controls.Add(this.capEinheit);
             this.tabDesign.Controls.Add(this.cbxEinheit);
-            this.tabDesign.Controls.Add(this.Caption6);
+            this.tabDesign.Controls.Add(this.capSpaltenbild);
             this.tabDesign.Controls.Add(this.cbxFormat);
             this.tabDesign.Controls.Add(this.Caption16);
             this.tabDesign.Controls.Add(this.H_Colorx);
@@ -373,14 +375,14 @@ namespace BlueControls.BlueDatabaseDialogs
             this.cbxEinheit.Size = new System.Drawing.Size(168, 24);
             this.cbxEinheit.TabIndex = 31;
             // 
-            // Caption6
+            // capSpaltenbild
             // 
-            this.Caption6.CausesValidation = false;
-            this.Caption6.Location = new System.Drawing.Point(528, 80);
-            this.Caption6.Name = "Caption6";
-            this.Caption6.Size = new System.Drawing.Size(152, 24);
-            this.Caption6.Text = "Spaltenbild:";
-            this.Caption6.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            this.capSpaltenbild.CausesValidation = false;
+            this.capSpaltenbild.Location = new System.Drawing.Point(528, 80);
+            this.capSpaltenbild.Name = "capSpaltenbild";
+            this.capSpaltenbild.Size = new System.Drawing.Size(152, 24);
+            this.capSpaltenbild.Text = "Spaltenbild:";
+            this.capSpaltenbild.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // cbxFormat
             // 
@@ -1515,6 +1517,16 @@ namespace BlueControls.BlueDatabaseDialogs
             this.butAktuellZurueck.TabIndex = 18;
             this.butAktuellZurueck.Click += new System.EventHandler(this.butAktuellZurueck_Click);
             // 
+            // txbSpaltenbild
+            // 
+            this.txbSpaltenbild.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txbSpaltenbild.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbSpaltenbild.Location = new System.Drawing.Point(528, 104);
+            this.txbSpaltenbild.Name = "txbSpaltenbild";
+            this.txbSpaltenbild.Size = new System.Drawing.Size(384, 24);
+            this.txbSpaltenbild.TabIndex = 40;
+            // 
             // ColumnEditor
             // 
             this.ClientSize = new System.Drawing.Size(926, 671);
@@ -1600,7 +1612,7 @@ namespace BlueControls.BlueDatabaseDialogs
 			private Button btnIgnoreLock;
 			private Button btnLogUndo;
 			private Button btnSpellChecking;
-			private Caption Caption6;
+			private Caption capSpaltenbild;
 			private Caption capEinheit;
 			private ComboBox cbxEinheit;
 			private TextBox tbxJoker;
@@ -1677,5 +1689,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private Button chkFilterOnlyAND;
         private Button chkFilterOnlyOr;
         private Button btnVerwendung;
+        private TextBox txbSpaltenbild;
     }
 	}

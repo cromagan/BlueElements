@@ -40,12 +40,15 @@ namespace BlueScript
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
         {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
-            if (attvar == null) { return strDoItFeedback.AttributFehler(); }
+            if (attvar == null)
+            { return strDoItFeedback.AttributFehler(); }
 
             var n = (int)attvar[1].ValueDouble;
 
-            if (n < 0) { n = 0; }
-            if (n > 10) { n = 10; }
+            if (n < 0)
+            { n = 0; }
+            if (n > 10)
+            { n = 10; }
 
             var val = Math.Round(attvar[0].ValueDouble, n);
 

@@ -6,21 +6,18 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace BlueControls.Controls
-{
+namespace BlueControls.Controls {
     public partial class EasyPicMulti : GenericControl, IBackgroundNone // System.Windows.Forms.UserControl //
     {
         private int _nr = 0;
         private readonly List<BlueBasics.BitmapExt> pic = new();
         private List<string> files = new();
 
-        public List<string> Files
-        {
+        public List<string> Files {
             get => files;
 
 
-            set
-            {
+            set {
                 pic.Clear();
                 files = value;
                 _nr = 0;
@@ -31,8 +28,7 @@ namespace BlueControls.Controls
             }
         }
 
-        public EasyPicMulti()
-        {
+        public EasyPicMulti() {
             InitializeComponent();
 
             // pic.ItemInternalChanged += Pic_ItemInternalChanged;
@@ -44,8 +40,7 @@ namespace BlueControls.Controls
         //    Invalidate();
         //}
 
-        private void btnRight_Click(object sender, System.EventArgs e)
-        {
+        private void btnRight_Click(object sender, System.EventArgs e) {
 
             _nr++;
 
@@ -55,8 +50,7 @@ namespace BlueControls.Controls
 
         }
 
-        private void btnLeft_Click(object sender, System.EventArgs e)
-        {
+        private void btnLeft_Click(object sender, System.EventArgs e) {
             _nr--;
 
             if (_nr < 0) { _nr = 0; }
@@ -64,26 +58,22 @@ namespace BlueControls.Controls
 
         }
 
-        private void btnSchnittView_Click(object sender, System.EventArgs e)
-        {
+        private void btnSchnittView_Click(object sender, System.EventArgs e) {
             var x = new PictureView(Files, false, string.Empty);
             x.Show();
         }
 
 
-        private void SetPic()
-        {
+        private void SetPic() {
             Bitmap _Bitmap = null;
 
 
 
 
 
-            if (pic.Count > 0)
-            {
+            if (pic.Count > 0) {
 
-                if (pic[_nr] == null)
-                {
+                if (pic[_nr] == null) {
 
                     pic[_nr] = new BitmapExt(files[_nr], true);
                 }
@@ -98,8 +88,7 @@ namespace BlueControls.Controls
         }
 
 
-        protected override void DrawControl(Graphics GR, enStates vState)
-        {
+        protected override void DrawControl(Graphics GR, enStates vState) {
             if (Convert.ToBoolean(vState & enStates.Standard_MouseOver)) { vState ^= enStates.Standard_MouseOver; }
             if (Convert.ToBoolean(vState & enStates.Standard_MousePressed)) { vState ^= enStates.Standard_MousePressed; }
 

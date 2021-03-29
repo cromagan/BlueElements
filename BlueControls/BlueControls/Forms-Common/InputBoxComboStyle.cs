@@ -21,23 +21,19 @@
 using BlueControls.ItemCollection;
 using System.Collections.Generic;
 
-namespace BlueControls.Forms
-{
-    public partial class InputBoxComboStyle : Forms.DialogWithOkAndCancel
-    {
+namespace BlueControls.Forms {
+    public partial class InputBoxComboStyle : Forms.DialogWithOkAndCancel {
         private string GiveBack = string.Empty;
 
 
         #region Konstruktor
 
 
-        private InputBoxComboStyle() : base()
-        {
+        private InputBoxComboStyle() : base() {
             InitializeComponent();
         }
 
-        private InputBoxComboStyle(string TXT, string VorschlagsText, ItemCollectionList SuggestOriginal, bool TexteingabeErlaubt) : this()
-        {
+        private InputBoxComboStyle(string TXT, string VorschlagsText, ItemCollectionList SuggestOriginal, bool TexteingabeErlaubt) : this() {
             cbxText.Text = VorschlagsText;
 
             var SuggestClone = (ItemCollectionList)SuggestOriginal.Clone();
@@ -46,12 +42,9 @@ namespace BlueControls.Forms
             cbxText.Item.AddRange(SuggestClone);
 
 
-            if (TexteingabeErlaubt)
-            {
+            if (TexteingabeErlaubt) {
                 cbxText.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown;
-            }
-            else
-            {
+            } else {
                 cbxText.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             }
 
@@ -64,8 +57,7 @@ namespace BlueControls.Forms
 
         #endregion
 
-        public static string Show(string TXT, ItemCollectionList Suggest, bool TexteingabeErlaubt)
-        {
+        public static string Show(string TXT, ItemCollectionList Suggest, bool TexteingabeErlaubt) {
             return Show(TXT, string.Empty, Suggest, TexteingabeErlaubt);
         }
 
@@ -76,8 +68,7 @@ namespace BlueControls.Forms
         /// <param name="VorschlagsText"></param>
         /// <param name="SuggestOriginal">Wird geklont, es kann auch aus einer Listbox kommen, und dann stimmen die Events nicht mehr. Es muss auch einbe ItemCollection bleiben, damit aus der Datenbank auch Bilder etc. angezeigt werden können.</param>
         /// <returns></returns>
-        private static string Show(string TXT, string VorschlagsText, ItemCollectionList SuggestOriginal, bool TexteingabeErlaubt)
-        {
+        private static string Show(string TXT, string VorschlagsText, ItemCollectionList SuggestOriginal, bool TexteingabeErlaubt) {
 
 
             var MB = new InputBoxComboStyle(TXT, VorschlagsText, SuggestOriginal, TexteingabeErlaubt);
@@ -86,37 +77,29 @@ namespace BlueControls.Forms
             return MB.GiveBack;
         }
 
-        public static string Show(string TXT, List<string> Suggest, bool TexteingabeErlaubt)
-        {
+        public static string Show(string TXT, List<string> Suggest, bool TexteingabeErlaubt) {
             var cSuggest = new ItemCollectionList();
             cSuggest.AddRange(Suggest);
             cSuggest.Sort();
             return Show(TXT, string.Empty, cSuggest, TexteingabeErlaubt);
         }
 
-        private void cbxText_ESC(object sender, System.EventArgs e)
-        {
+        private void cbxText_ESC(object sender, System.EventArgs e) {
             Cancel();
         }
 
-        private void cbxText_Enter(object sender, System.EventArgs e)
-        {
+        private void cbxText_Enter(object sender, System.EventArgs e) {
             Ok();
         }
 
-        private void InputComboBox_Shown(object sender, System.EventArgs e)
-        {
+        private void InputComboBox_Shown(object sender, System.EventArgs e) {
             cbxText.Focus();
         }
 
-        protected override void SetValue(bool canceled)
-        {
-            if (canceled)
-            {
+        protected override void SetValue(bool canceled) {
+            if (canceled) {
                 GiveBack = string.Empty;
-            }
-            else
-            {
+            } else {
                 GiveBack = cbxText.Text;
             }
         }

@@ -17,10 +17,8 @@
 // DEALINGS IN THE SOFTWARE.
 #endregion
 
-namespace BlueBasics.Enums
-{
-    public enum BlurType
-    {
+namespace BlueBasics.Enums {
+    public enum BlurType {
         Mean3x3,
         Mean5x5,
         Mean7x7,

@@ -40,7 +40,8 @@ namespace BluePaint
         {
             _ausricht = false;
             var _Pic = OnNeedCurrentPic();
-            if (_Pic == null) { return; }
+            if (_Pic == null)
+            { return; }
             CollectGarbage();
             _Pic.RotateFlip(RotateFlipType.RotateNoneFlipY);
             OnOverridePic(_Pic);
@@ -51,7 +52,8 @@ namespace BluePaint
         {
             _ausricht = false;
             var _Pic = OnNeedCurrentPic();
-            if (_Pic == null) { return; }
+            if (_Pic == null)
+            { return; }
             CollectGarbage();
             _Pic.RotateFlip(RotateFlipType.RotateNoneFlipX);
             OnOverridePic(_Pic);
@@ -62,7 +64,8 @@ namespace BluePaint
         {
             _ausricht = false;
             var _Pic = OnNeedCurrentPic();
-            if (_Pic == null) { return; }
+            if (_Pic == null)
+            { return; }
             CollectGarbage();
             _Pic.RotateFlip(RotateFlipType.Rotate90FlipNone);
             OnOverridePic(_Pic);
@@ -74,7 +77,8 @@ namespace BluePaint
         {
             _ausricht = false;
             var _Pic = OnNeedCurrentPic();
-            if (_Pic == null) { return; }
+            if (_Pic == null)
+            { return; }
             CollectGarbage();
             _Pic.RotateFlip(RotateFlipType.Rotate270FlipNone);
             OnOverridePic(_Pic);
@@ -91,7 +95,8 @@ namespace BluePaint
 
         public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic)
         {
-            if (!_ausricht) { return; }
+            if (!_ausricht)
+            { return; }
 
 
             var _Pic = OnNeedCurrentPic();
@@ -113,20 +118,23 @@ namespace BluePaint
 
         public override void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap OriginalPic)
         {
-            if (!_ausricht) { return; }
+            if (!_ausricht)
+            { return; }
             MouseMove(new MouseEventArgs1_1DownAndCurrent(e, e), OriginalPic);
         }
 
         public override void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic)
         {
-            if (!_ausricht) { return; }
+            if (!_ausricht)
+            { return; }
             OnDoInvalidate();
         }
 
         public override void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic)
         {
 
-            if (!_ausricht) { return; }
+            if (!_ausricht)
+            { return; }
 
             _ausricht = false;
             CollectGarbage();

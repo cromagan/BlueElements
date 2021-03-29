@@ -17,17 +17,15 @@
 // DEALINGS IN THE SOFTWARE.
 #endregion
 
-namespace BlueBasics.EventArgs
-{
-    public class NeedImageEventArgs : System.EventArgs
-    {
-        public string Name { get; }
-        public bool Done { get; set; }
 
-        public NeedImageEventArgs(string name)
-        {
-            this.Name = name;
-            this.Done = false;
+namespace BlueBasics.EventArgs {
+    public class NeedImageEventArgs : System.EventArgs {
+        public string Name { get; }
+        public BitmapExt BMP { get; set; }
+
+        public NeedImageEventArgs(string name) {
+            Name = name;
+            BMP = null;
         }
     }
 }

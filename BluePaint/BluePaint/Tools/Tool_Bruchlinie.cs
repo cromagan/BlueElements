@@ -40,7 +40,8 @@ namespace BluePaint
         {
             var _Pic = OnNeedCurrentPic();
 
-            if (_Pic == null) { return; }
+            if (_Pic == null)
+            { return; }
 
 
             var XRi = Convert.ToInt32(_Pic.Width / 10.0);
@@ -114,8 +115,10 @@ namespace BluePaint
                 gr.DrawLine(new Pen(Color.FromArgb(128, 128, 128)), von, Nach);
 
 
-                if (ChangeX) { XRi *= -1; }
-                if (ChangeY) { YRI *= -1; }
+                if (ChangeX)
+                { XRi *= -1; }
+                if (ChangeY)
+                { YRI *= -1; }
             }
 
             OnDoInvalidate();

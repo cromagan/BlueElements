@@ -17,10 +17,8 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-namespace BlueDatabase.Enums
-{
-    public enum enExportTyp
-    {
+namespace BlueDatabase.Enums {
+    public enum enExportTyp {
         Undefiniert = 0,
 
         DatenbankOriginalFormat = 1,

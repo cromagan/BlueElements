@@ -66,7 +66,8 @@ namespace BluePaint
 
         public override void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic)
         {
-            if (OriginalPic == null) { return; }
+            if (OriginalPic == null)
+            { return; }
 
             Links.Value = Math.Min(e.Current.TrimmedX, e.MouseDown.TrimmedX) + 1;
             Recht.Value = -(OriginalPic.Width - Math.Max(e.Current.TrimmedX, e.MouseDown.TrimmedX));
@@ -78,7 +79,8 @@ namespace BluePaint
         }
         public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic)
         {
-            if (OriginalPic == null) { return; }
+            if (OriginalPic == null)
+            { return; }
 
             var Pen_Blau = new Pen(Color.FromArgb(150, 0, 0, 255));
 
@@ -86,7 +88,8 @@ namespace BluePaint
             DrawZusatz(e, OriginalPic);
 
 
-            if (e.Current == null) { return; }
+            if (e.Current == null)
+            { return; }
 
             e.DrawLine(Pen_Blau, e.Current.TrimmedX, -1, e.Current.TrimmedX, OriginalPic.Height);
             e.DrawLine(Pen_Blau, -1, e.Current.TrimmedY, OriginalPic.Width, e.Current.TrimmedY);
@@ -189,7 +192,8 @@ namespace BluePaint
         {
             var _Pic = OnNeedCurrentPic();
 
-            if (_Pic == null) { return; }
+            if (_Pic == null)
+            { return; }
             Links.Maximum = _Pic.Width - 1;
             Recht.Minimum = -_Pic.Width + 1;
             Oben.Maximum = _Pic.Height - 1;

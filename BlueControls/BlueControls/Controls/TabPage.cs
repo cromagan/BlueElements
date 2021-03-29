@@ -25,12 +25,10 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms.Design;
 
-namespace BlueControls.Controls
-{
+namespace BlueControls.Controls {
     [ToolboxBitmap(typeof(System.Windows.Forms.TabPage))]
     [Designer(typeof(ScrollableControlDesigner))]
-    public class TabPage : System.Windows.Forms.TabPage, IUseMyBackColor, ISupportsBeginnEdit
-    {
+    public class TabPage : System.Windows.Forms.TabPage, IUseMyBackColor, ISupportsBeginnEdit {
 
         #region Constructor
 
@@ -120,25 +118,18 @@ namespace BlueControls.Controls
         //#endregion
 
 
-        protected override void OnParentChanged(System.EventArgs e)
-        {
+        protected override void OnParentChanged(System.EventArgs e) {
             base.OnParentChanged(e);
             SetBackColor();
         }
 
-        public void SetBackColor()
-        {
+        public void SetBackColor() {
 
-            if (Parent is RibbonBar)
-            {
+            if (Parent is RibbonBar) {
                 BackColor = Skin.Color_Back(enDesign.RibbonBar_Body, enStates.Standard);
-            }
-            else if (Parent is TabControl)
-            {
+            } else if (Parent is TabControl) {
                 BackColor = Skin.Color_Back(enDesign.TabStrip_Body, enStates.Standard);
-            }
-            else
-            {
+            } else {
                 BackColor = Color.Red;
             }
             Invalidate();
@@ -242,57 +233,48 @@ namespace BlueControls.Controls
         public int BeginnEditCounter { get; set; } = 0;
 
 
-        public new void SuspendLayout()
-        {
+        public new void SuspendLayout() {
             BeginnEdit();
             base.SuspendLayout();
         }
-        public new void ResumeLayout(bool performLayout)
-        {
+        public new void ResumeLayout(bool performLayout) {
             base.ResumeLayout(performLayout);
             EndEdit();
         }
 
-        public new void ResumeLayout()
-        {
+        public new void ResumeLayout() {
             base.ResumeLayout();
             EndEdit();
         }
 
 
-        public void BeginnEdit()
-        {
+        public void BeginnEdit() {
             BeginnEdit(1);
         }
 
-        public void BeginnEdit(int count)
-        {
+        public void BeginnEdit(int count) {
             if (DesignMode) { return; }
 
-            foreach (var ThisControl in Controls)
-            {
+            foreach (var ThisControl in Controls) {
                 if (ThisControl is ISupportsBeginnEdit e) { e.BeginnEdit(count); }
             }
 
             BeginnEditCounter += count;
         }
 
-        public void EndEdit()
-        {
+        public void EndEdit() {
             if (DesignMode) { return; }
             if (BeginnEditCounter < 1) { Develop.DebugPrint(enFehlerArt.Warnung, "Bearbeitungsstapel instabil: " + BeginnEditCounter); }
             BeginnEditCounter--;
 
             if (BeginnEditCounter == 0) { Invalidate(); }
 
-            foreach (var ThisControl in Controls)
-            {
+            foreach (var ThisControl in Controls) {
                 if (ThisControl is ISupportsBeginnEdit e) { e.EndEdit(); }
             }
         }
 
-        protected override void OnControlAdded(System.Windows.Forms.ControlEventArgs e)
-        {
+        protected override void OnControlAdded(System.Windows.Forms.ControlEventArgs e) {
             if (DesignMode) { return; }
             if (e.Control is ISupportsBeginnEdit nc) { nc.BeginnEdit(BeginnEditCounter); }
             base.OnControlAdded(e);

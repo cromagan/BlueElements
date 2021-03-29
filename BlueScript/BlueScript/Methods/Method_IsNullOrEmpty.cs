@@ -39,7 +39,8 @@ namespace BlueScript
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
         {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
-            if (attvar == null) { return strDoItFeedback.Wahr(); }
+            if (attvar == null)
+            { return strDoItFeedback.Wahr(); }
 
             if (string.IsNullOrEmpty(attvar[0].ValueString))
             {

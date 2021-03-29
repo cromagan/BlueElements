@@ -19,18 +19,14 @@
 
 using System.Drawing;
 
-namespace BlueBasics
-{
-    public static partial class Extensions
-    {
-        public static Point PointParse(this string code)
-        {
+namespace BlueBasics {
+    public static partial class Extensions {
+        public static Point PointParse(this string code) {
             code = code.RemoveChars("{}XYxy= ");
 
             var P = new Point();
 
-            if (string.IsNullOrEmpty(code))
-            {
+            if (string.IsNullOrEmpty(code)) {
                 P.X = 0;
                 P.Y = 0;
                 return P;

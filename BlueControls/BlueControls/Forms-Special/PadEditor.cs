@@ -29,17 +29,14 @@ using static BlueBasics.FileOperations;
 
 
 
-namespace BlueControls.Forms
-{
-    public partial class PadEditor : Form
-    {
+namespace BlueControls.Forms {
+    public partial class PadEditor : Form {
 
         private readonly string _Title = string.Empty;
 
 
 
-        public PadEditor() : base()
-        {
+        public PadEditor() : base() {
 
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
@@ -53,13 +50,10 @@ namespace BlueControls.Forms
 
 
 
-        private void InitWindow(bool FitWindowToBest, string WindowCaption, int OpenOnScreen, string DesignName)
-        {
+        private void InitWindow(bool FitWindowToBest, string WindowCaption, int OpenOnScreen, string DesignName) {
 
-            if (FitWindowToBest)
-            {
-                if (System.Windows.Forms.Screen.AllScreens.Length == 1 || OpenOnScreen < 0)
-                {
+            if (FitWindowToBest) {
+                if (System.Windows.Forms.Screen.AllScreens.Length == 1 || OpenOnScreen < 0) {
                     var OpScNr = modAllgemein.PointOnScreenNr(System.Windows.Forms.Cursor.Position);
 
                     Width = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Width / 1.5);
@@ -67,9 +61,7 @@ namespace BlueControls.Forms
                     Left = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Left + (System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Width - Width) / 2.0);
                     Top = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Top + (System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Height - Height) / 2.0);
 
-                }
-                else
-                {
+                } else {
                     Width = System.Windows.Forms.Screen.AllScreens[OpenOnScreen].WorkingArea.Width;
                     Height = System.Windows.Forms.Screen.AllScreens[OpenOnScreen].WorkingArea.Height;
                     Left = System.Windows.Forms.Screen.AllScreens[OpenOnScreen].WorkingArea.Left;
@@ -78,8 +70,7 @@ namespace BlueControls.Forms
             }
 
 
-            if (!string.IsNullOrEmpty(WindowCaption))
-            {
+            if (!string.IsNullOrEmpty(WindowCaption)) {
                 Text = WindowCaption;
             }
 
@@ -89,12 +80,9 @@ namespace BlueControls.Forms
             PadDesign.Item.Clear();
             PadDesign.Item.AddRange(Skin.AllStyles());
 
-            if (string.IsNullOrEmpty(DesignName))
-            {
+            if (string.IsNullOrEmpty(DesignName)) {
                 PadDesign.Text = PadDesign.Item[0].Internal;
-            }
-            else
-            {
+            } else {
                 PadDesign.Text = DesignName;
             }
 
@@ -124,15 +112,13 @@ namespace BlueControls.Forms
 
 
 
-        private void btnZoomFit_Click(object sender, System.EventArgs e)
-        {
+        private void btnZoomFit_Click(object sender, System.EventArgs e) {
             Pad.ZoomFit();
         }
 
 
 
-        private void Pad_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
+        private void Pad_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
             if (btnZoomIn.Checked) { Pad.ZoomIn(e); }
             if (btnZoomOut.Checked) { Pad.ZoomOut(e); }
         }
@@ -140,8 +126,7 @@ namespace BlueControls.Forms
 
 
 
-        private void btnAddLine_Click(object sender, System.EventArgs e)
-        {
+        private void btnAddLine_Click(object sender, System.EventArgs e) {
 
             var P = Pad.MiddleOfVisiblesScreen();
             var w = (int)(300 / Pad.ZoomCurrent());
@@ -151,24 +136,20 @@ namespace BlueControls.Forms
             Pad.Item.Add(b);
         }
 
-        private void btnAddDistance_Click(object sender, System.EventArgs e)
-        {
+        private void btnAddDistance_Click(object sender, System.EventArgs e) {
             var b = new SpacerPadItem(Pad.Item);
             Pad.Item.Add(b);
             b.SetCoordinates(new RectangleM(10, 10, 20, 20), false);
         }
 
-        private void btnAddImage_Click(object sender, System.EventArgs e)
-        {
+        private void btnAddImage_Click(object sender, System.EventArgs e) {
             var b = new BitmapPadItem(Pad.Item, QuickImage.Get(enImageCode.Fragezeichen).BMP, new Size(1000, 1000));
             Pad.Item.Add(b);
         }
 
 
-        private void AddText_Click(object sender, System.EventArgs e)
-        {
-            var b = new TextPadItem(Pad.Item)
-            {
+        private void AddText_Click(object sender, System.EventArgs e) {
+            var b = new TextPadItem(Pad.Item) {
                 Interner_Text = string.Empty,
                 Stil = PadStyles.Style_Standard
             };
@@ -177,118 +158,96 @@ namespace BlueControls.Forms
         }
 
 
-        private void btnAddDimension_Click(object sender, System.EventArgs e)
-        {
+        private void btnAddDimension_Click(object sender, System.EventArgs e) {
             var b = new DimensionPadItem(Pad.Item, new PointF(300, 300), new PointF(400, 300), 30);
             Pad.Item.Add(b);
         }
 
 
-        private void Bild_Click(object sender, System.EventArgs e)
-        {
+        private void Bild_Click(object sender, System.EventArgs e) {
             Pad.SaveAsBitmap(_Title, string.Empty);
         }
 
 
-        private void ButtonPageSetup_Click(object sender, System.EventArgs e)
-        {
+        private void ButtonPageSetup_Click(object sender, System.EventArgs e) {
             Pad.ShowPrinterPageSetup();
         }
 
 
-        private void Drucken_Click(object sender, System.EventArgs e)
-        {
+        private void Drucken_Click(object sender, System.EventArgs e) {
             Pad.Print();
         }
 
-        private void Vorschau_Click(object sender, System.EventArgs e)
-        {
+        private void Vorschau_Click(object sender, System.EventArgs e) {
             Pad.ShowPrintPreview();
         }
 
-        private void PadDesign_ItemClicked(object sender, BasicListItemEventArgs e)
-        {
+        private void PadDesign_ItemClicked(object sender, BasicListItemEventArgs e) {
             Pad.Item.SheetStyle = Skin.StyleDB.Row[e.Item.Internal];
         }
 
 
-        private void ckbRaster_CheckedChanged(object sender, System.EventArgs e)
-        {
+        private void ckbRaster_CheckedChanged(object sender, System.EventArgs e) {
             Pad.Grid = ckbRaster.Checked;
         }
 
-        private void txbRasterAnzeige_TextChanged(object sender, System.EventArgs e)
-        {
+        private void txbRasterAnzeige_TextChanged(object sender, System.EventArgs e) {
 
             if (!txbRasterAnzeige.Text.IsNumeral()) { return; }
 
             Pad.GridShow = float.Parse(txbRasterAnzeige.Text);
         }
 
-        private void RasterFangen_TextChanged(object sender, System.EventArgs e)
-        {
+        private void RasterFangen_TextChanged(object sender, System.EventArgs e) {
             if (!txbRasterFangen.Text.IsNumeral()) { return; }
 
             Pad.GridSnap = float.Parse(txbRasterFangen.Text);
         }
 
 
-        private void BezMode_CheckedChanged(object sender, System.EventArgs e)
-        {
+        private void BezMode_CheckedChanged(object sender, System.EventArgs e) {
             CheckBezMode();
         }
 
 
-        private void CheckBezMode()
-        {
-            if (Bez_None.Checked)
-            {
+        private void CheckBezMode() {
+            if (Bez_None.Checked) {
                 Pad.AutoRelation = enAutoRelationMode.None;
-            }
-            else if (Bez_Direkt.Checked)
-            {
+            } else if (Bez_Direkt.Checked) {
                 Pad.AutoRelation = enAutoRelationMode.DirektVerbindungen_Erhalten;
-            }
-            else if (Bez_All.Checked)
-            {
+            } else if (Bez_All.Checked) {
                 Pad.AutoRelation = enAutoRelationMode.Alle_Erhalten;
 
             }
         }
 
 
-        protected override void OnLoad(System.EventArgs e)
-        {
+        protected override void OnLoad(System.EventArgs e) {
             base.OnLoad(e);
             CheckBezMode();
         }
 
-        private void SchriftGröße_ItemClicked(object sender, BasicListItemEventArgs e)
-        {
+        private void SchriftGröße_ItemClicked(object sender, BasicListItemEventArgs e) {
             Pad.Item.SheetStyleScale = decimal.Parse(SchriftGröße.Text) / 100m;
         }
 
-        private void ArbeitsbreichSetup_Click(object sender, System.EventArgs e)
-        {
+        private void ArbeitsbreichSetup_Click(object sender, System.EventArgs e) {
             Pad.ShowWorkingAreaSetup();
         }
 
-        private void btnAddUnterStufe_Click(object sender, System.EventArgs e)
-        {
+        private void btnAddUnterStufe_Click(object sender, System.EventArgs e) {
             var b = new ChildPadItem(Pad.Item);
             b.SetCoordinates(new RectangleM(100, 100, 300, 300), true);
             Pad.Item.Add(b);
         }
 
-        private void btnAddSymbol_Click(object sender, System.EventArgs e)
-        {
+        private void btnAddSymbol_Click(object sender, System.EventArgs e) {
             var b = new SymbolPadItem(Pad.Item);
             b.SetCoordinates(new RectangleM(100, 100, 300, 300), true);
             Pad.Item.Add(b);
         }
 
-        public virtual void ItemChanged()
-        {
+        public virtual void ItemChanged() {
 
             Pad.ZoomFit();
             Ribbon.SelectedIndex = 1;
@@ -298,33 +257,28 @@ namespace BlueControls.Forms
 
         }
 
-        private void btnPhsyik_Click(object sender, System.EventArgs e)
-        {
+        private void btnPhsyik_Click(object sender, System.EventArgs e) {
             var b = new clsPhysicPadItem(Pad.Item);
             //b.SetCoordinates(new RectangleM(100, 100, 300, 300));
             Pad.Item.Add(b);
         }
 
-        private void btnVorschauModus_CheckedChanged(object sender, System.EventArgs e)
-        {
+        private void btnVorschauModus_CheckedChanged(object sender, System.EventArgs e) {
             Pad.ShowInPrintMode = btnVorschauModus.Checked;
         }
 
-        private void Pad_PreviewModChanged(object sender, System.EventArgs e)
-        {
+        private void Pad_PreviewModChanged(object sender, System.EventArgs e) {
             btnVorschauModus.Checked = Pad.ShowInPrintMode;
         }
 
 
         #region Load / Save
-        private void LoadTab_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
-        {
+        private void LoadTab_FileOk(object sender, System.ComponentModel.CancelEventArgs e) {
             LoadFile(LoadTab.FileName);
             Ribbon.SelectedIndex = 1;
         }
 
-        private void SaveTab_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
-        {
+        private void SaveTab_FileOk(object sender, System.ComponentModel.CancelEventArgs e) {
             Pad.Grid = false;
             var t = Pad.Item.ToString();
             Pad.Grid = ckbRaster.Checked;
@@ -336,30 +290,25 @@ namespace BlueControls.Forms
 
         }
 
-        private void btnOeffnen_Click(object sender, System.EventArgs e)
-        {
+        private void btnOeffnen_Click(object sender, System.EventArgs e) {
             LoadTab.ShowDialog();
         }
 
-        private void btnSpeichern_Click(object sender, System.EventArgs e)
-        {
+        private void btnSpeichern_Click(object sender, System.EventArgs e) {
             SaveTab.ShowDialog();
         }
 
-        private void btnNeu_Click(object sender, System.EventArgs e)
-        {
+        private void btnNeu_Click(object sender, System.EventArgs e) {
             Pad.Item.Clear();
             Pad.ZoomFit();
             Ribbon.SelectedIndex = 1;
         }
 
-        private void btnLastFiles_ItemClicked(object sender, BasicListItemEventArgs e)
-        {
+        private void btnLastFiles_ItemClicked(object sender, BasicListItemEventArgs e) {
             LoadFile(e.Item.Internal);
         }
 
-        private void LoadFile(string fileName)
-        {
+        private void LoadFile(string fileName) {
             Pad.Item.Clear();
             var t = File.ReadAllText(fileName, Constants.Win1252);
 
@@ -372,8 +321,7 @@ namespace BlueControls.Forms
 
         #endregion
 
-        private void btnHintergrundFarbe_Click(object sender, System.EventArgs e)
-        {
+        private void btnHintergrundFarbe_Click(object sender, System.EventArgs e) {
 
             ColorDia.Color = Pad.Item.BackColor;
             ColorDia.ShowDialog();

@@ -16,10 +16,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-namespace BlueDatabase.Enums
-{
-    public enum enViewType
-    {
+namespace BlueDatabase.Enums {
+    public enum enViewType {
         None = 0,
         Column = 1,
         PermanentColumn = 2

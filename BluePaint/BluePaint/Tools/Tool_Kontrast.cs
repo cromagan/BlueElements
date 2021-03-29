@@ -35,7 +35,8 @@ namespace BluePaint
         public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic)
         {
 
-            if (OriginalPic == null) { return; }
+            if (OriginalPic == null)
+            { return; }
 
             if (sldKontrast.Value != 0)
             {
@@ -64,7 +65,8 @@ namespace BluePaint
         private void btnKontrastErhoehen_Click(object sender, System.EventArgs e)
         {
             var _Pic = OnNeedCurrentPic();
-            if (_Pic == null) { return; }
+            if (_Pic == null)
+            { return; }
             OnOverridePic(_Pic.AdjustContrast((float)sldKontrast.Value));
             OnCommandForMacro("Kontrast;" + (float)sldKontrast.Value);
 
@@ -76,7 +78,8 @@ namespace BluePaint
         private void btnGraustufen_Click(object sender, System.EventArgs e)
         {
             var _Pic = OnNeedCurrentPic();
-            if (_Pic == null) { return; }
+            if (_Pic == null)
+            { return; }
 
             OnOverridePic(_Pic.Grayscale());
             sldGamma.Value = 1f;
@@ -89,7 +92,8 @@ namespace BluePaint
         private void btnAlleFarbenSchwarz_Click(object sender, System.EventArgs e)
         {
             var _Pic = OnNeedCurrentPic();
-            if (_Pic == null) { return; }
+            if (_Pic == null)
+            { return; }
             OnForceUndoSaving();
 
             _Pic.AllePixelZuSchwarz(1f);
@@ -106,16 +110,20 @@ namespace BluePaint
         private void btnPixelHinzu_Click(object sender, System.EventArgs e)
         {
             var _Pic = OnNeedCurrentPic();
-            if (_Pic == null) { return; }
+            if (_Pic == null)
+            { return; }
             OnForceUndoSaving();
 
             for (var x = 0; x < _Pic.Width - 1; x++)
             {
                 for (var y = 0; y < _Pic.Height - 1; y++)
                 {
-                    if (!_Pic.GetPixel(x + 1, y + 1).IsNearWhite(0.9)) { _Pic.SetPixel(x, y, Color.Black); }
-                    if (!_Pic.GetPixel(x + 1, y).IsNearWhite(0.9)) { _Pic.SetPixel(x, y, Color.Black); }
-                    if (!_Pic.GetPixel(x, y + 1).IsNearWhite(0.9)) { _Pic.SetPixel(x, y, Color.Black); }
+                    if (!_Pic.GetPixel(x + 1, y + 1).IsNearWhite(0.9))
+                    { _Pic.SetPixel(x, y, Color.Black); }
+                    if (!_Pic.GetPixel(x + 1, y).IsNearWhite(0.9))
+                    { _Pic.SetPixel(x, y, Color.Black); }
+                    if (!_Pic.GetPixel(x, y + 1).IsNearWhite(0.9))
+                    { _Pic.SetPixel(x, y, Color.Black); }
                 }
             }
 
@@ -130,7 +138,8 @@ namespace BluePaint
         private void btnAusdünnen_Click(object sender, System.EventArgs e)
         {
             var _Pic = OnNeedCurrentPic();
-            if (_Pic == null) { return; }
+            if (_Pic == null)
+            { return; }
             OnForceUndoSaving();
 
             OnCommandForMacro("Ausdünnen");
@@ -152,7 +161,8 @@ namespace BluePaint
         private void btnHelligkeit_Click(object sender, System.EventArgs e)
         {
             var _Pic = OnNeedCurrentPic();
-            if (_Pic == null) { return; }
+            if (_Pic == null)
+            { return; }
             OnOverridePic(_Pic.AdjustBrightness((float)sldHelligkeit.Value));
             OnCommandForMacro("Helligkeit;" + (float)sldHelligkeit.Value);
             sldGamma.Value = 1f;
@@ -163,7 +173,8 @@ namespace BluePaint
         private void btnGamma_Click(object sender, System.EventArgs e)
         {
             var _Pic = OnNeedCurrentPic();
-            if (_Pic == null) { return; }
+            if (_Pic == null)
+            { return; }
             OnOverridePic(_Pic.AdjustGamma((float)sldGamma.Value));
 
             OnCommandForMacro("Gamma;" + (float)sldGamma.Value);

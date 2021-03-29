@@ -17,10 +17,8 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-namespace BlueDatabase.Enums
-{
-    public enum enEditTypeTable
-    {
+namespace BlueDatabase.Enums {
+    public enum enEditTypeTable {
 
         None = -1,
         Textfeld = 1,

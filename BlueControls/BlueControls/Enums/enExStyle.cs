@@ -1,7 +1,5 @@
-﻿namespace BlueControls.Enums
-{
-    public enum enExStyle
-    {
+﻿namespace BlueControls.Enums {
+    public enum enExStyle {
 
         // 3x  &H0? Kann nicht sein! Sicherheitshalber auskommentuert!
 

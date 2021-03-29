@@ -18,10 +18,8 @@
 #endregion
 
 
-namespace BlueControls.Enums
-{
-    public enum enSymbol
-    {
+namespace BlueControls.Enums {
+    public enum enSymbol {
         Ohne = 0,
         Pfeil = 1,
         Bruchlinie = 2

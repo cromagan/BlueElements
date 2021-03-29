@@ -18,10 +18,8 @@
 #endregion
 
 
-namespace BlueControls.Enums
-{
-    public enum enComboboxStyle
-    {
+namespace BlueControls.Enums {
+    public enum enComboboxStyle {
         TextBox = enDesign.TextBox,
         RibbonBar = enDesign.Ribbonbar_Button,
         Button = enDesign.Button

@@ -17,10 +17,8 @@
 // DEALINGS IN THE SOFTWARE.
 #endregion
 
-namespace BlueBasics.Enums
-{
-    public enum enFileFormat
-    {
+namespace BlueBasics.Enums {
+    public enum enFileFormat {
         Unknown = -1,
 
         WordKind = 1,

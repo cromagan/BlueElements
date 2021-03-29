@@ -26,33 +26,26 @@ using System.IO;
 using System.Text;
 using static BlueBasics.FileOperations;
 
-namespace BlueBasics
-{
-    public static class modConverter
-    {
+namespace BlueBasics {
+    public static class modConverter {
         #region  Konvertier-Routinen
-        private static string SerialNr2Path_LastSearch = string.Empty;
-        private static string SerialNr2Path_LastErgebnis = string.Empty;
+        private static readonly string SerialNr2Path_LastSearch = string.Empty;
+        private static readonly string SerialNr2Path_LastErgebnis = string.Empty;
 
-        public static string ByteToBin8(byte b)
-        {
+        public static string ByteToBin8(byte b) {
             var x = Convert.ToString(b, 2);
-            while (true)
-            {
+            while (true) {
                 if (x.Length == 8) { return x; }
                 x = "0" + x;
             }
         }
 
-        public static byte Bin8ToByte(string bIN8)
-        {
+        public static byte Bin8ToByte(string bIN8) {
             return Convert.ToByte(bIN8, 2);
         }
 
-        public static Bitmap StringWIN1252ToBitmap(string tXT)
-        {
-            if (string.IsNullOrEmpty(tXT))
-            {
+        public static Bitmap StringWIN1252ToBitmap(string tXT) {
+            if (string.IsNullOrEmpty(tXT)) {
                 return null;
             }
 
@@ -61,10 +54,8 @@ namespace BlueBasics
             return BMP;
         }
 
-        public static Bitmap StringUnicodeToBitmap(string unicodeTXT)
-        {
-            if (string.IsNullOrEmpty(unicodeTXT))
-            {
+        public static Bitmap StringUnicodeToBitmap(string unicodeTXT) {
+            if (string.IsNullOrEmpty(unicodeTXT)) {
                 return null;
             }
 
@@ -81,8 +72,7 @@ namespace BlueBasics
         //    return Encoding.Defxault.GetString(Encoding.UTF8.GetBytes(S));
         // }
 
-        public static string BitmapToBase64(Bitmap bMP, ImageFormat bFormat)
-        {
+        public static string BitmapToBase64(Bitmap bMP, ImageFormat bFormat) {
             if (bMP == null) { return string.Empty; }
 
             if (bMP.PixelFormat != PixelFormat.Format32bppPArgb) { bMP = Bitmap_ChangePixelFormat(bMP); }
@@ -95,23 +85,18 @@ namespace BlueBasics
             return base64;
         }
 
-        public static Bitmap Base64ToBitmap(string base64)
-        {
-            try
-            {
+        public static Bitmap Base64ToBitmap(string base64) {
+            try {
                 using var memory = new MemoryStream(Convert.FromBase64String(base64));
                 var oBitmap = new Bitmap(memory);
                 memory.Close();
                 return oBitmap;
-            }
-            catch
-            {
+            } catch {
                 return null;
             }
         }
 
-        public static byte[] FileToByte(string dateiname)
-        {
+        public static byte[] FileToByte(string dateiname) {
             byte[] b = null;
             var obFi = new FileStream(dateiname, FileMode.Open, FileAccess.Read);
 
@@ -127,10 +112,8 @@ namespace BlueBasics
             return b;
         }
 
-        public static void ByteToFile(string dateiname, byte[] b)
-        {
-            if (FileExists(dateiname))
-            {
+        public static void ByteToFile(string dateiname, byte[] b) {
+            if (FileExists(dateiname)) {
                 Develop.DebugPrint("Datei soll überschrieben werden: " + dateiname);
                 return;
             }
@@ -143,16 +126,14 @@ namespace BlueBasics
             l.Dispose();
         }
 
-        private static Bitmap Bitmap_ChangePixelFormat(Bitmap oldBmp)
-        {
+        private static Bitmap Bitmap_ChangePixelFormat(Bitmap oldBmp) {
             modAllgemein.CollectGarbage();
 
             return new Bitmap(oldBmp);
             // Return oldBmp.Clone(New Rectangle(0, 0, oldBmp.Width, oldBmp.Height), NewFormat)
         }
 
-        public static byte[] BitmapToByte(Bitmap bMP, ImageFormat format)
-        {
+        public static byte[] BitmapToByte(Bitmap bMP, ImageFormat format) {
             if (bMP == null) { return null; }
 
             if (bMP.PixelFormat != PixelFormat.Format32bppPArgb) { bMP = Bitmap_ChangePixelFormat(bMP); }
@@ -162,24 +143,19 @@ namespace BlueBasics
             return MemSt.ToArray();
         }
 
-        public static string BitmapToStringUnicode(Bitmap bMP, ImageFormat format)
-        {
+        public static string BitmapToStringUnicode(Bitmap bMP, ImageFormat format) {
             if (bMP == null) { return string.Empty; }
             return new string(Encoding.Unicode.GetChars(BitmapToByte(bMP, format)));
         }
 
-        public static Bitmap ByteToBitmap(byte[] value)
-        {
+        public static Bitmap ByteToBitmap(byte[] value) {
             if (value == null || value.GetUpperBound(0) == 0) { return null; }
 
-            try
-            {
+            try {
                 using var ms = new MemoryStream(value);
                 return new Bitmap(ms);
                 // return (Bitmap)Image.FromStream(fs);
-            }
-            catch
-            {
+            } catch {
                 Develop.DebugPrint("Fehler bei der Umwandlung!");
                 return null;
             }
@@ -194,21 +170,18 @@ namespace BlueBasics
         //    }
         // }
 
-        public static void CartesianToPolar(PointF ko, ref double r, ref double win)
-        {
+        public static void CartesianToPolar(PointF ko, ref double r, ref double win) {
             r = Math.Sqrt(ko.X * ko.X + ko.Y * ko.Y);
             win = Convert.ToDouble(Geometry.Winkel(0M, 0M, (decimal)ko.X, (decimal)ko.Y));
         }
 
         #endregion
 
-        public static decimal PixelToMM(decimal pixel, int dPI)
-        {
+        public static decimal PixelToMM(decimal pixel, int dPI) {
             return pixel / dPI * 25.4M;
         }
 
-        public static decimal mmToPixel(decimal mM, int dPI)
-        {
+        public static decimal mmToPixel(decimal mM, int dPI) {
             return mM * dPI / 25.4M;
         }
 
@@ -297,8 +270,7 @@ namespace BlueBasics
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        public static int IntParse(string s)
-        {
+        public static int IntParse(string s) {
             if (string.IsNullOrEmpty(s)) { return 0; }
             if (int.TryParse(s, out var result)) { return result; }
             Develop.DebugPrint(enFehlerArt.Warnung, "Int kann nicht geparsed werden: " + s);
@@ -310,8 +282,7 @@ namespace BlueBasics
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        public static long LongParse(string s)
-        {
+        public static long LongParse(string s) {
             if (string.IsNullOrEmpty(s)) { return 0; }
             if (long.TryParse(s, out var result)) { return result; }
             Develop.DebugPrint(enFehlerArt.Warnung, "Long kann nicht geparsed werden: " + s);
@@ -323,8 +294,7 @@ namespace BlueBasics
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        public static decimal DecimalParse(string s)
-        {
+        public static decimal DecimalParse(string s) {
             if (string.IsNullOrEmpty(s)) { return 0; }
             if (decimal.TryParse(s, out var result)) { return result; }
             // Develop.DebugPrint(enFehlerArt.Warnung, "Decimal kann nicht geparsed werden: " + s);
@@ -336,8 +306,7 @@ namespace BlueBasics
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        public static double DoubleParse(string s)
-        {
+        public static double DoubleParse(string s) {
             if (string.IsNullOrEmpty(s)) { return 0; }
             if (double.TryParse(s, out var result)) { return result; }
 
@@ -353,8 +322,7 @@ namespace BlueBasics
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        public static float FloatParse(string s)
-        {
+        public static float FloatParse(string s) {
             if (string.IsNullOrEmpty(s)) { return 0; }
             if (float.TryParse(s, out var result)) { return result; }
 
@@ -370,15 +338,13 @@ namespace BlueBasics
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        public static DateTime DateTimeParse(string s)
-        {
+        public static DateTime DateTimeParse(string s) {
             if (DateTimeTryParse(s, out var result)) { return result; }
             Develop.DebugPrint(enFehlerArt.Warnung, "Datum kann nicht geparsed werden: " + s);
             return DateTime.Now;
         }
 
-        public static bool DateTimeTryParse(string s, out DateTime result)
-        {
+        public static bool DateTimeTryParse(string s, out DateTime result) {
             // https://docs.microsoft.com/de-de/dotnet/standard/base-types/standard-date-and-time-format-strings?view=netframework-4.8
             if (DateTime.TryParseExact(s, Constants.Format_Date5, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)) { return true; }
             if (DateTime.TryParseExact(s, Constants.Format_Date6, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)) { return true; }

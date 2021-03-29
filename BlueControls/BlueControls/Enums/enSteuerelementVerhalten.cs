@@ -20,11 +20,9 @@
 
 using System;
 
-namespace BlueControls.Enums
-{
+namespace BlueControls.Enums {
     [Flags]
-    public enum enSteuerelementVerhalten
-    {
+    public enum enSteuerelementVerhalten {
 
 
         Text_Abschneiden = 0,

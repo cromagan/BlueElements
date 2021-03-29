@@ -17,24 +17,19 @@
 // DEALINGS IN THE SOFTWARE.
 #endregion
 
-namespace BlueBasics.Interfaces
-{
-    public interface IVersionable
-    {
+namespace BlueBasics.Interfaces {
+    public interface IVersionable {
         public string SollVersion { get; }
 
         public string Version { get; set; }
     }
 
-    public static class IVersionableExtensions
-    {
-        public static bool NeedUpdate(this IVersionable i)
-        {
+    public static class IVersionableExtensions {
+        public static bool NeedUpdate(this IVersionable i) {
             return i.Version != i.SollVersion;
         }
 
-        public static void VersionIsNowCorrect(this IVersionable i)
-        {
+        public static void VersionIsNowCorrect(this IVersionable i) {
             i.Version = i.SollVersion;
         }
     }

@@ -1,17 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
 
-namespace BlueBasics
-{
-    public class HTML
-    {
+namespace BlueBasics {
+    public class HTML {
         private List<string> Code { get; set; }
 
         // https://www.w3schools.com/html/html_tables.asp
 
-        public HTML(string title)
-        {
-            this.Code = new List<string>
+        public HTML(string title) {
+            Code = new List<string>
             {
                 "<!DOctypex HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"",
                 "\"http://www.w3.org/TR/html4/strict.dtd\">",
@@ -51,78 +48,66 @@ namespace BlueBasics
             };
         }
 
-        public void AddFoot()
-        {
-            this.Code.Add("  </body>");
-            this.Code.Add("</html>");
+        public void AddFoot() {
+            Code.Add("  </body>");
+            Code.Add("</html>");
         }
 
-        public void AddCaption(string _Caption)
-        {
-            this.AddCaption(_Caption, 1);
+        public void AddCaption(string _Caption) {
+            AddCaption(_Caption, 1);
         }
 
-        public void Add(string what)
-        {
-            this.Code.Add(what);
+        public void Add(string what) {
+            Code.Add(what);
         }
 
-        public void RowBeginn()
-        {
-            this.Code.Add("      <tr>");
+        public void RowBeginn() {
+            Code.Add("      <tr>");
         }
 
-        public void RowEnd()
-        {
-            this.Code.Add("      </tr>");
+        public void RowEnd() {
+            Code.Add("      </tr>");
         }
 
-        public void Save(string filename, bool executeafter)
-        {
-            this.Code.Save(filename, executeafter, System.Text.Encoding.UTF8);
+        public void Save(string filename, bool executeafter) {
+            Code.Save(filename, executeafter, System.Text.Encoding.UTF8);
         }
 
-        public void TableBeginn()
-        {
+        public void TableBeginn() {
             // da.Add("  <Font face=\"Arial\" Size=\"2\"><table border=\"1\" BORDERCOLOR=\"#aaaaaa\" cellspacing=\"0\" cellpadding=\"0\" align=\"left\">");
 
-            this.Code.Add("<Font face=\"Arial\" Size=\"2\">");
+            Code.Add("<Font face=\"Arial\" Size=\"2\">");
 
-            this.Code.Add("  <table>");
+            Code.Add("  <table>");
 
             // da.Add("  <Font face=\"Arial\" Size=\"2\"><table border=\"1\" BORDERCOLOR=\"#aaaaaa\" cellspacing=\"0\" cellpadding=\"0\" align=\"left\">");
 
             // Code.Add("      </tr>");
         }
 
-        public void TableEnd()
-        {
-            this.Code.Add("    </table>");
+        public void TableEnd() {
+            Code.Add("    </table>");
         }
 
-        public void CellAdd(string content)
-        {
-            this.Code.Add("              <th>" + content + "</th>");
+        public void CellAdd(string content) {
+            Code.Add("              <th>" + content + "</th>");
         }
 
-        public void CellAdd(string content, Color c)
-        {
-            this.Code.Add("        <th  bgcolor=\"#" + c.ToHTMLCode() + "\">" + content + "</th>");
+        public void CellAdd(string content, Color c) {
+            Code.Add("        <th  bgcolor=\"#" + c.ToHTMLCode() + "\">" + content + "</th>");
         }
 
-        public void AddCaption(string _caption, int size)
-        {
-            switch (size)
-            {
+        public void AddCaption(string _caption, int size) {
+            switch (size) {
                 case 1:
-                    this.Code.Add("  <h1>" + _caption + "</h1><br>");
+                    Code.Add("  <h1>" + _caption + "</h1><br>");
                     break;
 
                 case 2:
-                    this.Code.Add("  <h2>" + _caption + "</h2><br>");
+                    Code.Add("  <h2>" + _caption + "</h2><br>");
                     break;
                 case 3:
-                    this.Code.Add("  <h3>" + _caption + "</h3><br>");
+                    Code.Add("  <h3>" + _caption + "</h3><br>");
                     break;
 
                 default:
@@ -131,16 +116,14 @@ namespace BlueBasics
             }
         }
 
-        public void ListAdd(List<string> items)
-        {
-            this.Code.Add("<ul>");
+        public void ListAdd(List<string> items) {
+            Code.Add("<ul>");
 
-            foreach (var thisitem in items)
-            {
-                this.Code.Add("  <li>" + thisitem + "</li>");
+            foreach (var thisitem in items) {
+                Code.Add("  <li>" + thisitem + "</li>");
             }
 
-            this.Code.Add("</ul>");
+            Code.Add("</ul>");
         }
     }
 }

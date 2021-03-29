@@ -25,12 +25,10 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace BlueControls.ItemCollection
-{
+namespace BlueControls.ItemCollection {
 
 
-    public class LinePadItem : BasicPadItem
-    {
+    public class LinePadItem : BasicPadItem {
 
 
         #region  Variablen-Deklarationen 
@@ -60,8 +58,7 @@ namespace BlueControls.ItemCollection
         public LinePadItem(ItemCollectionPad parent) : this(parent, PadStyles.Style_Standard, Point.Empty, Point.Empty) { }
         public LinePadItem(ItemCollectionPad parent, PadStyles format, Point point1, Point point2) : this(parent, string.Empty, PadStyles.Style_Standard, point1, point2) { }
 
-        public LinePadItem(ItemCollectionPad parent, string internalname, PadStyles format, Point point1, Point point2) : base(parent, internalname)
-        {
+        public LinePadItem(ItemCollectionPad parent, string internalname, PadStyles format, Point point1, Point point2) : base(parent, internalname) {
             Point1 = new PointM(this, "Punkt 1", 0, 0);
             Point2 = new PointM(this, "Punkt 2", 0, 0);
 
@@ -104,13 +101,11 @@ namespace BlueControls.ItemCollection
         #endregion
 
 
-        protected override string ClassId()
-        {
+        protected override string ClassId() {
             return "LINE";
         }
 
-        public override bool Contains(PointF value, decimal zoomfactor)
-        {
+        public override bool Contains(PointF value, decimal zoomfactor) {
             var ne = 5 / zoomfactor;
 
             if (Point1.X == 0M && Point2.X == 0M && Point1.Y == 0M && Point2.Y == 0M) { return false; }
@@ -120,8 +115,7 @@ namespace BlueControls.ItemCollection
 
             if (_TempPoints.Count == 0) { return false; }
 
-            for (var z = 0; z <= _TempPoints.Count - 2; z++)
-            {
+            for (var z = 0; z <= _TempPoints.Count - 2; z++) {
                 if (value.DistanzZuStrecke(_TempPoints[z], _TempPoints[z + 1]) < ne) { return true; }
             }
 
@@ -129,8 +123,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override RectangleM CalculateUsedArea()
-        {
+        protected override RectangleM CalculateUsedArea() {
             if (Point1.X == 0M && Point2.X == 0M && Point1.Y == 0M && Point2.Y == 0M) { return new RectangleM(); }
 
             if (_TempPoints.Count == 0) { CalcTempPoints(); }
@@ -142,8 +135,7 @@ namespace BlueControls.ItemCollection
             var y2 = decimal.MinValue;
 
 
-            foreach (var ThisPoint in _TempPoints)
-            {
+            foreach (var ThisPoint in _TempPoints) {
                 x1 = Math.Min(ThisPoint.X, x1);
                 y1 = Math.Min(ThisPoint.Y, y1);
 
@@ -158,8 +150,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting)
-        {
+        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
             if (Stil == PadStyles.Undefiniert) { return; }
 
 
@@ -167,15 +158,13 @@ namespace BlueControls.ItemCollection
             if (_TempPoints.Count == 0) { return; }
 
 
-            for (var z = 0; z <= _TempPoints.Count - 2; z++)
-            {
+            for (var z = 0; z <= _TempPoints.Count - 2; z++) {
                 GR.DrawLine(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(cZoom * Parent.SheetStyleScale), _TempPoints[z].ZoomAndMove(cZoom, shiftX, shiftY), _TempPoints[z + 1].ZoomAndMove(cZoom, shiftX, shiftY));
             }
 
         }
 
-        public override void Move(decimal x, decimal y)
-        {
+        public override void Move(decimal x, decimal y) {
             _LastRecalc = DateTime.Now.AddHours(-1);
             Point1.SetTo(Point1.X + x, Point1.Y + y);
             Point2.SetTo(Point2.X + x, Point2.Y + y);
@@ -196,12 +185,10 @@ namespace BlueControls.ItemCollection
         //}
 
 
-        public override bool ParseThis(string tag, string value)
-        {
+        public override bool ParseThis(string tag, string value) {
             if (base.ParseThis(tag, value)) { return true; }
 
-            switch (tag)
-            {
+            switch (tag) {
                 case "connection":
                     Linien_Verhalten = (enConectorStyle)int.Parse(value);
                     return true;
@@ -211,8 +198,7 @@ namespace BlueControls.ItemCollection
 
         protected override void ParseFinished() { }
 
-        public override string ToString()
-        {
+        public override string ToString() {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
 
@@ -222,24 +208,19 @@ namespace BlueControls.ItemCollection
 
         protected override void GenerateInternalRelationExplicit() { }
 
-        private void CalcTempPoints()
-        {
+        private void CalcTempPoints() {
             var NewCode = Point1 + Point2.ToString();
 
-            if (CalcTempPoints_Code != NewCode)
-            {
+            if (CalcTempPoints_Code != NewCode) {
                 CalcTempPoints_Code = NewCode;
                 _TempPoints = null;
             }
 
 
-            if (Linien_Verhalten != enConectorStyle.Direct && _TempPoints != null)
-            {
-                if (DateTime.Now.Subtract(_LastRecalc).TotalSeconds > 5)
-                {
+            if (Linien_Verhalten != enConectorStyle.Direct && _TempPoints != null) {
+                if (DateTime.Now.Subtract(_LastRecalc).TotalSeconds > 5) {
 
-                    if (DateTime.Now.Subtract(_LastRecalc).TotalSeconds > 5 + Constants.GlobalRND.Next(10))
-                    {
+                    if (DateTime.Now.Subtract(_LastRecalc).TotalSeconds > 5 + Constants.GlobalRND.Next(10)) {
                         _TempPoints = null;
                     }
                     // r = Nothing
@@ -262,41 +243,33 @@ namespace BlueControls.ItemCollection
 
             var count = 0;
 
-            do
-            {
+            do {
                 count++;
                 var again = false;
-                if (_TempPoints.Count > 100)
-                {
+                if (_TempPoints.Count > 100) {
                     break;
                 }
 
-                for (var z = 0; z < _TempPoints.Count; z++)
-                {
-                    if (LöscheVerdeckte(z))
-                    {
+                for (var z = 0; z < _TempPoints.Count; z++) {
+                    if (LöscheVerdeckte(z)) {
                         again = true;
                         break;
                     }
 
-                    if (Linien_Verhalten == enConectorStyle.AusweichenUndGerade && Begradige(z))
-                    {
+                    if (Linien_Verhalten == enConectorStyle.AusweichenUndGerade && Begradige(z)) {
                         again = true;
                         break;
                     }
 
 
-                    if (Linien_Verhalten == enConectorStyle.AusweichenUndGerade || Linien_Verhalten == enConectorStyle.Ausweichenx)
-                    {
-                        if (WeicheAus(z))
-                        {
+                    if (Linien_Verhalten == enConectorStyle.AusweichenUndGerade || Linien_Verhalten == enConectorStyle.Ausweichenx) {
+                        if (WeicheAus(z)) {
                             again = true;
                             break;
                         }
                     }
 
-                    if (Vereinfache(z))
-                    {
+                    if (Vereinfache(z)) {
                         again = true;
                         break;
                     }
@@ -309,22 +282,17 @@ namespace BlueControls.ItemCollection
         }
 
 
-        private bool IsVerdeckt(decimal X, decimal Y)
-        {
+        private bool IsVerdeckt(decimal X, decimal Y) {
 
-            foreach (var ThisBasicItem in Parent)
-            {
-                if (ThisBasicItem != null)
-                {
+            foreach (var ThisBasicItem in Parent) {
+                if (ThisBasicItem != null) {
 
 
-                    if (!(ThisBasicItem is LinePadItem))
-                    {
+                    if (!(ThisBasicItem is LinePadItem)) {
 
                         var a = (RectangleM)ThisBasicItem.UsedArea().Clone();
 
-                        if (a.Width > 0 && a.Height > 0)
-                        {
+                        if (a.Width > 0 && a.Height > 0) {
                             a.Inflate(2, 2);
                             if (a.Contains(X, Y)) { return true; }
                         }
@@ -336,14 +304,12 @@ namespace BlueControls.ItemCollection
             return false;
         }
 
-        private bool SchneidetWas(decimal X1, decimal Y1, decimal X2, decimal Y2)
-        {
+        private bool SchneidetWas(decimal X1, decimal Y1, decimal X2, decimal Y2) {
 
             var p1 = new PointM(X1, Y1);
             var p2 = new PointM(X2, Y2);
 
-            foreach (var ThisItemBasic in Parent)
-            {
+            foreach (var ThisItemBasic in Parent) {
                 if (SchneidetDas(ThisItemBasic, p1, p2)) { return true; }
             }
 
@@ -351,28 +317,24 @@ namespace BlueControls.ItemCollection
         }
 
 
-        private bool SchneidetDas(BasicPadItem ThisBasicItem, PointM P1, PointM P2)
-        {
+        private bool SchneidetDas(BasicPadItem ThisBasicItem, PointM P1, PointM P2) {
 
 
             if (ThisBasicItem == null) { return false; }
 
 
-            if (!(ThisBasicItem is LinePadItem))
-            {
+            if (!(ThisBasicItem is LinePadItem)) {
 
                 var a = (RectangleM)ThisBasicItem.UsedArea().Clone();
 
-                if (a.Width > 0 && a.Height > 0)
-                {
+                if (a.Width > 0 && a.Height > 0) {
                     a.Inflate(2, 2);
 
                     var lo = a.PointOf(enAlignment.Top_Left);
                     var ro = a.PointOf(enAlignment.Top_Right);
                     var lu = a.PointOf(enAlignment.Bottom_Left);
                     var ru = a.PointOf(enAlignment.Bottom_Right);
-                    if (GeometryDF.LinesIntersect(P1, P2, lo, ro, true) != null || GeometryDF.LinesIntersect(P1, P2, lu, ru, true) != null || GeometryDF.LinesIntersect(P1, P2, lo, lu, true) != null || GeometryDF.LinesIntersect(P1, P2, ro, ru, true) != null)
-                    {
+                    if (GeometryDF.LinesIntersect(P1, P2, lo, ro, true) != null || GeometryDF.LinesIntersect(P1, P2, lu, ru, true) != null || GeometryDF.LinesIntersect(P1, P2, lo, lu, true) != null || GeometryDF.LinesIntersect(P1, P2, ro, ru, true) != null) {
                         return true;
                     }
 
@@ -382,15 +344,11 @@ namespace BlueControls.ItemCollection
         }
 
 
-        private bool Vereinfache(int P1)
-        {
+        private bool Vereinfache(int P1) {
 
-            if (Linien_Verhalten != enConectorStyle.AusweichenUndGerade)
-            {
-                if (P1 > 0 && P1 < _TempPoints.Count - 1)
-                {
-                    if (!SchneidetWas(_TempPoints[P1 - 1].X, _TempPoints[P1 - 1].Y, _TempPoints[P1 + 1].X, _TempPoints[P1 + 1].Y))
-                    {
+            if (Linien_Verhalten != enConectorStyle.AusweichenUndGerade) {
+                if (P1 > 0 && P1 < _TempPoints.Count - 1) {
+                    if (!SchneidetWas(_TempPoints[P1 - 1].X, _TempPoints[P1 - 1].Y, _TempPoints[P1 + 1].X, _TempPoints[P1 + 1].Y)) {
                         _TempPoints.RemoveAt(P1);
                         return true;
                     }
@@ -399,34 +357,26 @@ namespace BlueControls.ItemCollection
             }
 
 
-            if (P1 < _TempPoints.Count - 3)
-            {
+            if (P1 < _TempPoints.Count - 3) {
 
 
-                if ((int)_TempPoints[P1].X == (int)_TempPoints[P1 + 1].X && (int)_TempPoints[P1].X == (int)_TempPoints[P1 + 2].X)
-                {
+                if ((int)_TempPoints[P1].X == (int)_TempPoints[P1 + 1].X && (int)_TempPoints[P1].X == (int)_TempPoints[P1 + 2].X) {
                     _TempPoints.RemoveAt(P1 + 1);
                     return true;
                 }
 
-                if ((int)_TempPoints[P1].Y == (int)_TempPoints[P1 + 1].Y && (int)_TempPoints[P1].Y == (int)_TempPoints[P1 + 2].Y)
-                {
+                if ((int)_TempPoints[P1].Y == (int)_TempPoints[P1 + 1].Y && (int)_TempPoints[P1].Y == (int)_TempPoints[P1 + 2].Y) {
                     _TempPoints.RemoveAt(P1 + 1);
                     return true;
                 }
             }
 
-            if (P1 > 0 && P1 < _TempPoints.Count - 3)
-            {
-                if ((int)_TempPoints[P1].X == (int)_TempPoints[P1 + 1].X && (int)_TempPoints[P1 + 1].Y == (int)_TempPoints[P1 + 2].Y)
-                {
-                    if (!IsVerdeckt(_TempPoints[P1 + 2].X, _TempPoints[P1].Y))
-                    {
+            if (P1 > 0 && P1 < _TempPoints.Count - 3) {
+                if ((int)_TempPoints[P1].X == (int)_TempPoints[P1 + 1].X && (int)_TempPoints[P1 + 1].Y == (int)_TempPoints[P1 + 2].Y) {
+                    if (!IsVerdeckt(_TempPoints[P1 + 2].X, _TempPoints[P1].Y)) {
 
-                        if (!SchneidetWas(_TempPoints[P1 - 1].X, _TempPoints[P1 - 1].Y, _TempPoints[P1 + 2].X, _TempPoints[P1].Y))
-                        {
-                            if (!SchneidetWas(_TempPoints[P1 + 3].X, _TempPoints[P1 + 3].Y, _TempPoints[P1 + 2].X, _TempPoints[P1].Y))
-                            {
+                        if (!SchneidetWas(_TempPoints[P1 - 1].X, _TempPoints[P1 - 1].Y, _TempPoints[P1 + 2].X, _TempPoints[P1].Y)) {
+                            if (!SchneidetWas(_TempPoints[P1 + 3].X, _TempPoints[P1 + 3].Y, _TempPoints[P1 + 2].X, _TempPoints[P1].Y)) {
                                 _TempPoints[P1].X = _TempPoints[P1 + 2].X;
                                 _TempPoints.RemoveAt(P1 + 1);
                                 _TempPoints.RemoveAt(P1 + 1);
@@ -437,15 +387,11 @@ namespace BlueControls.ItemCollection
                     }
                 }
 
-                if ((int)_TempPoints[P1].Y == (int)_TempPoints[P1 + 1].Y && (int)_TempPoints[P1 + 1].X == (int)_TempPoints[P1 + 2].X)
-                {
-                    if (!IsVerdeckt(_TempPoints[P1].X, _TempPoints[P1 + 2].Y))
-                    {
+                if ((int)_TempPoints[P1].Y == (int)_TempPoints[P1 + 1].Y && (int)_TempPoints[P1 + 1].X == (int)_TempPoints[P1 + 2].X) {
+                    if (!IsVerdeckt(_TempPoints[P1].X, _TempPoints[P1 + 2].Y)) {
 
-                        if (!SchneidetWas(_TempPoints[P1 - 1].X, _TempPoints[P1 - 1].Y, _TempPoints[P1].X, _TempPoints[P1 + 2].Y))
-                        {
-                            if (!SchneidetWas(_TempPoints[P1 + 3].X, _TempPoints[P1 + 3].Y, _TempPoints[P1].X, _TempPoints[P1 + 2].Y))
-                            {
+                        if (!SchneidetWas(_TempPoints[P1 - 1].X, _TempPoints[P1 - 1].Y, _TempPoints[P1].X, _TempPoints[P1 + 2].Y)) {
+                            if (!SchneidetWas(_TempPoints[P1 + 3].X, _TempPoints[P1 + 3].Y, _TempPoints[P1].X, _TempPoints[P1 + 2].Y)) {
                                 _TempPoints[P1].Y = _TempPoints[P1 + 2].Y;
                                 _TempPoints.RemoveAt(P1 + 1);
                                 _TempPoints.RemoveAt(P1 + 1);
@@ -459,26 +405,21 @@ namespace BlueControls.ItemCollection
         }
 
 
-        private bool WeicheAus(int P1)
-        {
+        private bool WeicheAus(int P1) {
 
             if (_TempPoints.Count > 100) { return false; }
             if (P1 >= _TempPoints.Count - 1) { return false; }
             //   If _TempPoints.Count > 4 Then Return False
 
-            foreach (var ThisItemBasic in Parent)
-            {
-                if (ThisItemBasic != null)
-                {
+            foreach (var ThisItemBasic in Parent) {
+                if (ThisItemBasic != null) {
                     //    If ThisBasicItem IsNot Object1 AndAlso ThisBasicItem IsNot Object2 Then
 
-                    if (!(ThisItemBasic is LinePadItem))
-                    {
+                    if (!(ThisItemBasic is LinePadItem)) {
 
                         var a = (RectangleM)ThisItemBasic.UsedArea().Clone(); // Umwandeln, um den Bezu zu brechen
 
-                        if (a.Width > 0 && a.Height > 0)
-                        {
+                        if (a.Width > 0 && a.Height > 0) {
                             a.Inflate(2, 2);
 
                             var lo = a.PointOf(enAlignment.Top_Left);
@@ -494,8 +435,7 @@ namespace BlueControls.ItemCollection
                             //    If DirectCast(Object2, RowFormulaItem).Row.CellFirst().String.Contains("Lilo") AndAlso DirectCast(Object1, RowFormulaItem).Row.CellFirst().String.Contains("Karl") Then Stop
 
 
-                            if (tOben != null || tUnten != null || tLinks != null || trechts != null)
-                            {
+                            if (tOben != null || tUnten != null || tLinks != null || trechts != null) {
                                 a.Inflate(-50, -50);
                                 lo = a.PointOf(enAlignment.Top_Left);
                                 ro = a.PointOf(enAlignment.Top_Right);
@@ -507,38 +447,29 @@ namespace BlueControls.ItemCollection
                                 var rechts = GeometryDF.LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], ro, ru, true);
 
 
-                                if (Oben == null && tOben != null)
-                                {
+                                if (Oben == null && tOben != null) {
                                     Oben = tOben;
                                 }
-                                if (Unten == null && tUnten != null)
-                                {
+                                if (Unten == null && tUnten != null) {
                                     Unten = tUnten;
                                 }
-                                if (Links == null && tLinks != null)
-                                {
+                                if (Links == null && tLinks != null) {
                                     Links = tLinks;
                                 }
-                                if (rechts == null && trechts != null)
-                                {
+                                if (rechts == null && trechts != null) {
                                     rechts = trechts;
                                 }
 
 
-                                if (Oben != null && Unten != null)
-                                {
-                                    if (_TempPoints[P1].Y < _TempPoints[P1 + 1].Y)
-                                    {
+                                if (Oben != null && Unten != null) {
+                                    if (_TempPoints[P1].Y < _TempPoints[P1 + 1].Y) {
                                         // Schneidet durch, von oben nach unten
                                         _TempPoints.Insert(P1 + 1, Oben);
 
-                                        if (Math.Abs(_TempPoints[P1].X - lo.X) > Math.Abs(_TempPoints[P1].X - ro.X))
-                                        {
+                                        if (Math.Abs(_TempPoints[P1].X - lo.X) > Math.Abs(_TempPoints[P1].X - ro.X)) {
                                             _TempPoints.Insert(P1 + 2, ro);
                                             _TempPoints.Insert(P1 + 3, ru);
-                                        }
-                                        else
-                                        {
+                                        } else {
                                             _TempPoints.Insert(P1 + 2, lo);
                                             _TempPoints.Insert(P1 + 3, lu);
                                         }
@@ -550,13 +481,10 @@ namespace BlueControls.ItemCollection
                                     // Schneidet durch, von unten nach oben
                                     _TempPoints.Insert(P1 + 1, Unten);
 
-                                    if (Math.Abs(_TempPoints[P1].X - lo.X) > Math.Abs(_TempPoints[P1].X - ro.X))
-                                    {
+                                    if (Math.Abs(_TempPoints[P1].X - lo.X) > Math.Abs(_TempPoints[P1].X - ro.X)) {
                                         _TempPoints.Insert(P1 + 2, ru);
                                         _TempPoints.Insert(P1 + 3, ro);
-                                    }
-                                    else
-                                    {
+                                    } else {
                                         _TempPoints.Insert(P1 + 2, lu);
                                         _TempPoints.Insert(P1 + 3, lo);
                                     }
@@ -568,19 +496,14 @@ namespace BlueControls.ItemCollection
 
                                 }
 
-                                if (Links != null && rechts != null)
-                                {
-                                    if (_TempPoints[P1].X < _TempPoints[P1 + 1].X)
-                                    {
+                                if (Links != null && rechts != null) {
+                                    if (_TempPoints[P1].X < _TempPoints[P1 + 1].X) {
                                         // Schneidet durch, von links nach rechts
                                         _TempPoints.Insert(P1 + 1, Links);
-                                        if (Math.Abs(_TempPoints[P1].Y - lo.Y) > Math.Abs(_TempPoints[P1].Y - lu.Y))
-                                        {
+                                        if (Math.Abs(_TempPoints[P1].Y - lo.Y) > Math.Abs(_TempPoints[P1].Y - lu.Y)) {
                                             _TempPoints.Insert(P1 + 2, lu);
                                             _TempPoints.Insert(P1 + 3, ru);
-                                        }
-                                        else
-                                        {
+                                        } else {
                                             _TempPoints.Insert(P1 + 2, lo);
                                             _TempPoints.Insert(P1 + 3, ro);
                                         }
@@ -590,13 +513,10 @@ namespace BlueControls.ItemCollection
 
                                     // Schneidet durch, von rechts nach links
                                     _TempPoints.Insert(P1 + 1, rechts);
-                                    if (Math.Abs(_TempPoints[P1].Y - lo.Y) > Math.Abs(_TempPoints[P1].Y - lu.Y))
-                                    {
+                                    if (Math.Abs(_TempPoints[P1].Y - lo.Y) > Math.Abs(_TempPoints[P1].Y - lu.Y)) {
                                         _TempPoints.Insert(P1 + 2, ru);
                                         _TempPoints.Insert(P1 + 3, lu);
-                                    }
-                                    else
-                                    {
+                                    } else {
                                         _TempPoints.Insert(P1 + 2, ro);
                                         _TempPoints.Insert(P1 + 3, lo);
                                     }
@@ -607,10 +527,8 @@ namespace BlueControls.ItemCollection
 
                                 }
 
-                                if (Unten != null && rechts != null)
-                                {
-                                    if (_TempPoints[P1].X < _TempPoints[P1 + 1].X)
-                                    {
+                                if (Unten != null && rechts != null) {
+                                    if (_TempPoints[P1].X < _TempPoints[P1 + 1].X) {
                                         _TempPoints.Insert(P1 + 1, Unten);
                                         _TempPoints.Insert(P1 + 2, ru);
                                         _TempPoints.Insert(P1 + 3, rechts);
@@ -624,10 +542,8 @@ namespace BlueControls.ItemCollection
 
                                 }
 
-                                if (Oben != null && rechts != null)
-                                {
-                                    if (_TempPoints[P1].X < _TempPoints[P1 + 1].X)
-                                    {
+                                if (Oben != null && rechts != null) {
+                                    if (_TempPoints[P1].X < _TempPoints[P1 + 1].X) {
                                         _TempPoints.Insert(P1 + 1, Oben);
                                         _TempPoints.Insert(P1 + 2, ro);
                                         _TempPoints.Insert(P1 + 3, rechts);
@@ -642,10 +558,8 @@ namespace BlueControls.ItemCollection
 
                                 }
 
-                                if (Unten != null && Links != null)
-                                {
-                                    if (_TempPoints[P1].X < _TempPoints[P1 + 1].X)
-                                    {
+                                if (Unten != null && Links != null) {
+                                    if (_TempPoints[P1].X < _TempPoints[P1 + 1].X) {
                                         _TempPoints.Insert(P1 + 1, Links);
                                         _TempPoints.Insert(P1 + 2, lu);
                                         _TempPoints.Insert(P1 + 3, Unten);
@@ -658,10 +572,8 @@ namespace BlueControls.ItemCollection
                                     return true;
                                 }
 
-                                if (Oben != null && Links != null)
-                                {
-                                    if (_TempPoints[P1].X < _TempPoints[P1 + 1].X)
-                                    {
+                                if (Oben != null && Links != null) {
+                                    if (_TempPoints[P1].X < _TempPoints[P1 + 1].X) {
                                         _TempPoints.Insert(P1 + 1, Links);
                                         _TempPoints.Insert(P1 + 2, lo);
                                         _TempPoints.Insert(P1 + 3, Oben);
@@ -685,8 +597,7 @@ namespace BlueControls.ItemCollection
         }
 
 
-        private bool Begradige(int P1)
-        {
+        private bool Begradige(int P1) {
 
             if (P1 >= _TempPoints.Count - 1) { return false; }
 
@@ -695,8 +606,7 @@ namespace BlueControls.ItemCollection
             PointM NP1;
             PointM NP2;
 
-            if ((int)(_TempPoints[P1].X - _TempPoints[P1 + 1].X) > (int)(_TempPoints[P1].Y - _TempPoints[P1 + 1].Y))
-            {
+            if ((int)(_TempPoints[P1].X - _TempPoints[P1 + 1].X) > (int)(_TempPoints[P1].Y - _TempPoints[P1 + 1].Y)) {
 
 
                 NP1 = new PointM(_TempPoints[P1].X, (_TempPoints[P1].Y + _TempPoints[P1 + 1].Y) / 2);
@@ -705,9 +615,7 @@ namespace BlueControls.ItemCollection
                 _TempPoints.Insert(P1 + 2, NP2);
 
 
-            }
-            else
-            {
+            } else {
 
                 NP1 = new PointM((_TempPoints[P1].X + _TempPoints[P1 + 1].X) / 2, _TempPoints[P1].Y);
                 NP2 = new PointM((_TempPoints[P1].X + _TempPoints[P1 + 1].X) / 2, _TempPoints[P1 + 1].Y);
@@ -721,21 +629,17 @@ namespace BlueControls.ItemCollection
         }
 
 
-        private bool LöscheVerdeckte(int P1)
-        {
+        private bool LöscheVerdeckte(int P1) {
 
-            if (_TempPoints[P1] == Point1)
-            {
+            if (_TempPoints[P1] == Point1) {
                 return false;
             }
-            if (_TempPoints[P1] == Point2)
-            {
+            if (_TempPoints[P1] == Point2) {
                 return false;
             }
 
 
-            if (IsVerdeckt(_TempPoints[P1].X, _TempPoints[P1].Y))
-            {
+            if (IsVerdeckt(_TempPoints[P1].X, _TempPoints[P1].Y)) {
                 _TempPoints.RemoveAt(P1);
                 return true;
             }
@@ -744,14 +648,12 @@ namespace BlueControls.ItemCollection
         }
 
 
-        public override void CaluclatePointsWORelations()
-        {
+        public override void CaluclatePointsWORelations() {
             CalcTempPoints();
             base.CaluclatePointsWORelations();
         }
 
-        public override List<FlexiControl> GetStyleOptions()
-        {
+        public override List<FlexiControl> GetStyleOptions() {
             var l = new List<FlexiControl>();
 
 
@@ -781,8 +683,7 @@ namespace BlueControls.ItemCollection
         //}
 
 
-        public void SetCoordinates(decimal px1, decimal py1, decimal px2, decimal py2)
-        {
+        public void SetCoordinates(decimal px1, decimal py1, decimal px2, decimal py2) {
             Point1.SetTo(px1, py1);
             Point2.SetTo(px2, py2);
 

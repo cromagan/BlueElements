@@ -3,10 +3,8 @@ using BlueControls.Enums;
 using System;
 using System.Drawing;
 
-namespace BlueControls
-{
-    public partial class Overlay : System.Windows.Forms.Form
-    {
+namespace BlueControls {
+    public partial class Overlay : System.Windows.Forms.Form {
 
         private int Count;
 
@@ -14,8 +12,7 @@ namespace BlueControls
 
         private readonly GenericControl Control;
 
-        public Overlay()
-        {
+        public Overlay() {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
 
@@ -38,8 +35,7 @@ namespace BlueControls
         }
 
 
-        public Overlay(GenericControl OverControl)
-        {
+        public Overlay(GenericControl OverControl) {
 
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
@@ -55,8 +51,7 @@ namespace BlueControls
         }
 
 
-        public void SetControl()
-        {
+        public void SetControl() {
             Width = Control.Width;
             Height = Control.Height;
 
@@ -66,14 +61,12 @@ namespace BlueControls
             Top = p.Y;
         }
 
-        protected override void OnPaint(System.Windows.Forms.PaintEventArgs e)
-        {
+        protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) {
             if (IsDisposed) { return; }
 
             base.OnPaint(e);
 
-            switch (Modus)
-            {
+            switch (Modus) {
                 case 1:
                     Paint_RoterRahmenUmControlUndBlinken();
                     break;
@@ -92,8 +85,7 @@ namespace BlueControls
         }
 
 
-        public void Paint_Radius()
-        {
+        public void Paint_Radius() {
             var g = CreateGraphics();
             g.Clear(Color.Magenta);
             g.DrawEllipse(new Pen(Color.Black, 3), 1, 1, Width - 3, Height - 3);
@@ -102,8 +94,7 @@ namespace BlueControls
         }
 
 
-        private void Paint_RoterRahmenUmControlUndBlinken()
-        {
+        private void Paint_RoterRahmenUmControlUndBlinken() {
             SetControl();
 
             var g = CreateGraphics();
@@ -121,32 +112,25 @@ namespace BlueControls
 
         }
 
-        private void Blinker_Tick(object sender, System.EventArgs e)
-        {
+        private void Blinker_Tick(object sender, System.EventArgs e) {
 
-            if (Opacity > 0.5)
-            {
+            if (Opacity > 0.5) {
                 Opacity = 0.01;
-            }
-            else
-            {
+            } else {
                 Opacity = 1;
             }
 
 
             Count++;
 
-            if (Count > 4)
-            {
+            if (Count > 4) {
                 Blinker.Enabled = false;
                 Dispose();
             }
         }
 
-        protected override System.Windows.Forms.CreateParams CreateParams
-        {
-            get
-            {
+        protected override System.Windows.Forms.CreateParams CreateParams {
+            get {
                 var oParam = base.CreateParams;
                 oParam.ExStyle |= (int)enExStyle.EX_NOACTIVATE | (int)enExStyle.EX_TOOLWINDOW | (int)enExStyle.EX_TOPMOST;
                 oParam.Parent = IntPtr.Zero;

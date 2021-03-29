@@ -17,10 +17,8 @@
 // DEALINGS IN THE SOFTWARE.
 #endregion
 
-namespace BlueBasics.Enums
-{
-    public enum enSW
-    {
+namespace BlueBasics.Enums {
+    public enum enSW {
         Hide = 0,
         Normal = 1,
         ShowMinimized = 2,

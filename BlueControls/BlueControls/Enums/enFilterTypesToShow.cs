@@ -20,11 +20,9 @@
 
 using System;
 
-namespace BlueControls.Enums
-{
+namespace BlueControls.Enums {
     [Flags]
-    public enum enFilterTypesToShow
-    {
+    public enum enFilterTypesToShow {
 
 
         None = 0,

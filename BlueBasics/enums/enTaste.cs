@@ -17,10 +17,8 @@
 // DEALINGS IN THE SOFTWARE.
 #endregion
 
-namespace BlueBasics.Enums
-{
-    public enum enTaste : byte
-    {
+namespace BlueBasics.Enums {
+    public enum enTaste : byte {
         VK_LBUTTON = 0x1, // Left mouse button.
         VK_RBUTTON = 0x2, // Right mouse button.
 

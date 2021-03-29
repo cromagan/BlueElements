@@ -39,7 +39,8 @@ namespace BlueScript
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
         {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
-            if (attvar == null) { return strDoItFeedback.AttributFehler(); }
+            if (attvar == null)
+            { return strDoItFeedback.AttributFehler(); }
 
             attvar[0].Readonly = false;
             attvar[0].ValueString = attvar[0].ValueString.Replace(attvar[1].ValueString, "\r");

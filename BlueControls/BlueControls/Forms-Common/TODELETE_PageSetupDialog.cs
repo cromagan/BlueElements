@@ -25,10 +25,8 @@ using System;
 using System.Drawing;
 using System.Drawing.Printing;
 
-namespace BlueControls.Forms
-{
-    public partial class PageSetupDialog
-    {
+namespace BlueControls.Forms {
+    public partial class PageSetupDialog {
         private bool Doing;
 
         private readonly PrintDocument OriD;
@@ -38,8 +36,7 @@ namespace BlueControls.Forms
         private bool cancelx = true;
 
 
-        public PageSetupDialog(PrintDocument _PrintDocument1, bool NurHochformat)
-        {
+        public PageSetupDialog(PrintDocument _PrintDocument1, bool NurHochformat) {
 
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
@@ -54,11 +51,9 @@ namespace BlueControls.Forms
 
             Format.Item.Clear();
 
-            foreach (PaperSize ps in _PrintDocument1.PrinterSettings.PaperSizes)
-            {
+            foreach (PaperSize ps in _PrintDocument1.PrinterSettings.PaperSizes) {
                 var nn = ps.Width + ";" + ps.Height;
-                if (Format.Item[nn] == null)
-                {
+                if (Format.Item[nn] == null) {
                     Format.Item.Add(ps.PaperName, nn, QuickImage.Get(enImageCode.Datei), true, ps.PaperName);
                 }
             }
@@ -66,13 +61,10 @@ namespace BlueControls.Forms
             Format.Item.Add("Manuelle Eingabe", "neu", enImageCode.Stern, true, Constants.FirstSortChar.ToString());
             Format.Item.Sort();
 
-            if (NurHochformat)
-            {
+            if (NurHochformat) {
                 Hochformat.Checked = true;
                 Querformat.Enabled = false;
-            }
-            else
-            {
+            } else {
                 Hochformat.Checked = !_PrintDocument1.DefaultPageSettings.Landscape;
             }
 
@@ -104,14 +96,12 @@ namespace BlueControls.Forms
         }
 
 
-        private void Ok_Click(object sender, System.EventArgs e)
-        {
+        private void Ok_Click(object sender, System.EventArgs e) {
             cancelx = false;
             Close();
         }
 
-        private void Something_TextChanged(object sender, System.EventArgs e)
-        {
+        private void Something_TextChanged(object sender, System.EventArgs e) {
 
             if (Doing) { return; }
             Doing = true;
@@ -122,13 +112,11 @@ namespace BlueControls.Forms
         }
 
 
-        public bool Canceled()
-        {
+        public bool Canceled() {
             return cancelx;
         }
 
-        public new void ShowDialog()
-        {
+        public new void ShowDialog() {
             cancelx = true;
 
             base.ShowDialog();
@@ -144,26 +132,21 @@ namespace BlueControls.Forms
             OriD.DefaultPageSettings.Margins.Right = (int)(float.Parse(Rechts.Text) / 0.254);
         }
 
-        private void canc_Click(object sender, System.EventArgs e)
-        {
+        private void canc_Click(object sender, System.EventArgs e) {
             cancelx = true;
             Close();
         }
 
-        private void Format_ItemClicked(object sender, BasicListItemEventArgs e)
-        {
+        private void Format_ItemClicked(object sender, BasicListItemEventArgs e) {
 
             if (Doing) { return; }
             Doing = true;
 
 
-            if (Format.Text.Contains(";"))
-            {
+            if (Format.Text.Contains(";")) {
                 var l = Format.Text.SplitBy(";");
                 FillHöheBreite(int.Parse(l[0]), int.Parse(l[1]));
-            }
-            else
-            {
+            } else {
                 Format.Text = "neu";
                 FillHöheBreite(-1, -1);
             }
@@ -176,10 +159,8 @@ namespace BlueControls.Forms
         }
 
 
-        private double Inch1000ToMM(double Inch)
-        {
-            switch (Inch)
-            {
+        private double Inch1000ToMM(double Inch) {
+            switch (Inch) {
                 case 8:
                     return 2.0F;
                 case 16:
@@ -216,39 +197,27 @@ namespace BlueControls.Forms
         }
 
 
-        private void FillHöheBreite(double B, double h)
-        {
+        private void FillHöheBreite(double B, double h) {
             var nn1 = B + ";" + h;
             var nn2 = h + ";" + B;
 
-            if (Format.Item[nn1] != null)
-            {
+            if (Format.Item[nn1] != null) {
                 Format.Text = nn1;
-            }
-            else if (Format.Item[nn2] != null)
-            {
+            } else if (Format.Item[nn2] != null) {
                 Format.Text = nn2;
-            }
-            else
-            {
+            } else {
                 Format.Text = "neu";
                 Breite.Enabled = true;
                 Höhe.Enabled = true;
-                if (B < 0 && !string.IsNullOrEmpty(Breite.Text))
-                {
+                if (B < 0 && !string.IsNullOrEmpty(Breite.Text)) {
                     B = double.Parse(Breite.Text);
-                }
-                else
-                {
+                } else {
                     B = Inch1000ToMM(B);
                 }
 
-                if (h < 0 && !string.IsNullOrEmpty(Höhe.Text))
-                {
+                if (h < 0 && !string.IsNullOrEmpty(Höhe.Text)) {
                     h = double.Parse(Höhe.Text);
-                }
-                else
-                {
+                } else {
                     h = Inch1000ToMM(h);
                 }
 
@@ -256,8 +225,7 @@ namespace BlueControls.Forms
             }
 
 
-            if (Format.Text != "neu")
-            {
+            if (Format.Text != "neu") {
 
                 B = Inch1000ToMM(B);
                 h = Inch1000ToMM(h);
@@ -266,8 +234,7 @@ namespace BlueControls.Forms
                 Höhe.Enabled = false;
 
 
-                switch (Format.Text)
-                {
+                switch (Format.Text) {
                     case "827;1169":
                         //A4
                         h = 297;
@@ -298,16 +265,14 @@ namespace BlueControls.Forms
         }
 
 
-        private void Abmasse_TextChanged(object sender, System.EventArgs e)
-        {
+        private void Abmasse_TextChanged(object sender, System.EventArgs e) {
             if (Doing) { return; }
             Doing = true;
             DrawSampleAndCheckButton();
             Doing = false;
         }
 
-        private void HochQuer_CheckedChanged(object sender, System.EventArgs e)
-        {
+        private void HochQuer_CheckedChanged(object sender, System.EventArgs e) {
 
             if (Doing) { return; }
             if (!((Button)sender).Checked) { return; }
@@ -319,8 +284,7 @@ namespace BlueControls.Forms
         }
 
 
-        private void DrawSampleAndCheckButton()
-        {
+        private void DrawSampleAndCheckButton() {
 
             var makeP = true;
 
@@ -335,8 +299,7 @@ namespace BlueControls.Forms
             double br = 0;
             double ho = 0;
 
-            if (makeP)
-            {
+            if (makeP) {
                 br = double.Parse(Breite.Text);
                 if (br < 5) { makeP = false; }
                 ho = double.Parse(Höhe.Text);
@@ -346,8 +309,7 @@ namespace BlueControls.Forms
             if (Querformat.Checked) { modAllgemein.Swap(ref br, ref ho); }
 
 
-            if (makeP)
-            {
+            if (makeP) {
                 Ok.Enabled = true;
 
 
@@ -374,9 +336,7 @@ namespace BlueControls.Forms
                 Sample.Image = i;
 
 
-            }
-            else
-            {
+            } else {
                 Ok.Enabled = false;
                 Sample.Image = null;
 

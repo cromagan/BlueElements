@@ -37,12 +37,13 @@ namespace BlueScript
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.Number;
         public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.Number };
-        public override bool EndlessArgs => true;
+        public override bool EndlessArgs => false;
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
         {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
-            if (attvar == null) { return strDoItFeedback.AttributFehler(); }
+            if (attvar == null)
+            { return strDoItFeedback.AttributFehler(); }
 
             if (attvar[0].ValueString.IsNumeral())
             {

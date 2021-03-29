@@ -89,7 +89,8 @@ namespace BluePaint
         public override void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic)
         {
 
-            if (Razi.Checked) { return; }
+            if (Razi.Checked)
+            { return; }
 
             var _Pic = OnNeedCurrentPic();
 
@@ -101,7 +102,8 @@ namespace BluePaint
                 {
                     var cc = _Pic.GetPixel(e.Current.X, e.Current.Y);
 
-                    if (cc.ToArgb() == 0) { return; }
+                    if (cc.ToArgb() == 0)
+                    { return; }
 
                     OnCommandForMacro("Replace;" + cc.ToArgb());
 
