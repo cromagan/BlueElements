@@ -20,10 +20,8 @@
 using Skript.Enums;
 using System.Collections.Generic;
 
-namespace BlueScript
-{
-    internal class Method_Exception : Method
-    {
+namespace BlueScript {
+    internal class Method_Exception : Method {
 
         public override string Syntax => "Exception(\"Unbehandelter Programmcode!\");";
         public override string Description => "Unterbricht das Skript mit einer Fehlermeldung.";
@@ -37,16 +35,13 @@ namespace BlueScript
 
 
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
-        {
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
 
-            if (string.IsNullOrEmpty(infos.AttributText))
-            { return new strDoItFeedback("Die Ausführung wurde absichtlich abgebrochen."); }
+            if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Die Ausführung wurde absichtlich abgebrochen."); }
 
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
 
-            if (attvar == null || attvar.Count != 1)
-            { return new strDoItFeedback("Die Ausführung wurde absichtlich abgebrochen."); }
+            if (attvar == null || attvar.Count != 1) { return new strDoItFeedback("Die Ausführung wurde absichtlich abgebrochen."); }
 
             return new strDoItFeedback(string.Empty, attvar[0].ValueString);
         }

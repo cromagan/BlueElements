@@ -296,15 +296,17 @@ namespace BlueControls.ItemCollection {
 
         public bool ReplaceVariable(string VariableName, object Value) {
 
-            var ot = Text;
-            Text = Export.ParseVariable(Text, VariableName, Value);
 
-            if (ot == Text) { return false; }
-
-            MakeNewETxt();
-            RecalculateAndOnChanged();
-
-            return true;
+            var nt = Export.ParseVariable(Text, VariableName, Value);
+            if (nt is string txt) {
+                if (txt == Text) { return false; }
+                Text = txt;
+                MakeNewETxt();
+                RecalculateAndOnChanged();
+                return true;
+            } else {
+                return false;
+            }
         }
 
 

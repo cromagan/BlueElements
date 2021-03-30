@@ -23,10 +23,8 @@ using System.Collections.Generic;
 using static BlueBasics.Extensions;
 
 
-namespace BlueScript
-{
-    internal class Method_Number : Method
-    {
+namespace BlueScript {
+    internal class Method_Number : Method {
 
         public override string Syntax => "Number(string, number)";
 
@@ -39,14 +37,11 @@ namespace BlueScript
         public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.Number };
         public override bool EndlessArgs => false;
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
-        {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
-            if (attvar == null)
-            { return strDoItFeedback.AttributFehler(); }
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+            if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
-            if (attvar[0].ValueString.IsNumeral())
-            {
+            if (attvar[0].ValueString.IsNumeral()) {
                 return new strDoItFeedback(attvar[0].ValueString, string.Empty);
             }
 

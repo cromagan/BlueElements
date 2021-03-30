@@ -21,10 +21,8 @@ using Skript.Enums;
 using System.Collections.Generic;
 
 
-namespace BlueScript
-{
-    internal class Method_Split : Method
-    {
+namespace BlueScript {
+    internal class Method_Split : Method {
 
         public override string Syntax => "Split(String, Trennzeichen)";
         public override string Description => "Wandelt einen Text in eine Liste um. Es Trennt den Text dabei mitteles dem angegebenen Trennzeichen";
@@ -36,11 +34,9 @@ namespace BlueScript
         public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.String };
         public override bool EndlessArgs => false;
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
-        {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
-            if (attvar == null)
-            { return strDoItFeedback.AttributFehler(); }
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+            if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
             attvar[0].Readonly = false;
             attvar[0].ValueString = attvar[0].ValueString.Replace(attvar[1].ValueString, "\r");

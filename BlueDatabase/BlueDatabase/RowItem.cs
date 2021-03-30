@@ -337,24 +337,23 @@ namespace BlueDatabase {
 
 
             if (thisCol.MultiLine) {
-                return new Variable(thisCol.Name, r.CellGetString(thisCol), enVariableDataType.List, ro, false, thisCol.ReadableText());
+                return new Variable(thisCol.Name, r.CellGetString(thisCol), enVariableDataType.List, ro, false, "Spalte: " + thisCol.ReadableText() + "\r\nMehrzeilige Spalten können nur als Liste bearbeitet werdern.");
             }
-
 
             switch (thisCol.Format) {
                 case enDataFormat.Bit:
                     if (r.CellGetString(thisCol) == "+") {
-                        return new Variable(thisCol.Name, "true", enVariableDataType.Bool, ro, false, thisCol.ReadableText());
+                        return new Variable(thisCol.Name, "true", enVariableDataType.Bool, ro, false, "Spalte: " + thisCol.ReadableText());
                     } else {
-                        return new Variable(thisCol.Name, "false", enVariableDataType.Bool, ro, false, thisCol.ReadableText());
+                        return new Variable(thisCol.Name, "false", enVariableDataType.Bool, ro, false, "Spalte: " + thisCol.ReadableText());
                     }
 
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.Gleitkommazahl:
-                    return new Variable(thisCol.Name, r.CellGetString(thisCol), enVariableDataType.Number, ro, false, thisCol.ReadableText());
+                    return new Variable(thisCol.Name, r.CellGetString(thisCol), enVariableDataType.Number, ro, false, "Spalte: " + thisCol.ReadableText());
 
                 default:
-                    return new Variable(thisCol.Name, r.CellGetString(thisCol), enVariableDataType.String, ro, false, thisCol.ReadableText());
+                    return new Variable(thisCol.Name, r.CellGetString(thisCol), enVariableDataType.String, ro, false, "Spalte: " + thisCol.ReadableText());
 
             }
 

@@ -20,10 +20,8 @@
 using Skript.Enums;
 using System.Collections.Generic;
 
-namespace BlueScript
-{
-    internal class Method_Exists : Method
-    {
+namespace BlueScript {
+    internal class Method_Exists : Method {
 
         public override string Description => "Gibt TRUE zurück, wenn die Variable existiert,";
         public override string Syntax => "Exists(Variable)";
@@ -36,11 +34,9 @@ namespace BlueScript
         public override bool EndlessArgs => false;
 
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
-        {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
-            if (attvar == null)
-            { return strDoItFeedback.Falsch(); }
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+            if (attvar == null) { return strDoItFeedback.Falsch(); }
             return strDoItFeedback.Wahr();
         }
     }

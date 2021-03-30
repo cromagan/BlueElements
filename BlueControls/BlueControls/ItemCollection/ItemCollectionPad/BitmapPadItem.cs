@@ -280,13 +280,13 @@ namespace BlueControls.ItemCollection {
 
             var ot = Export.ParseVariable(Platzhalter_für_Layout, VariableName, Value);
 
-            if (ot == Platzhalter_für_Layout) { return false; }
-
-            Bitmap = modConverter.StringUnicodeToBitmap(ot);
-
-            OnChanged();
-
-            return true;
+            if (ot is Bitmap bmp) {
+                Bitmap = bmp;
+                OnChanged();
+                return true;
+            } else {
+                return false;
+            }
         }
 
 

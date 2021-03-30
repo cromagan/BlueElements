@@ -22,10 +22,8 @@ using Skript.Enums;
 using System.Collections.Generic;
 using static BlueBasics.Extensions;
 
-namespace BlueScript
-{
-    internal class Method_if : Method
-    {
+namespace BlueScript {
+    internal class Method_if : Method {
 
         public override string Syntax => "if (true) { Code zum ausführen }";
         public override string Description => "Nur wenn der Wert in der Klammer TRUE ist, wird der nachfolgende Codeblock ausgeführt.";
@@ -38,20 +36,14 @@ namespace BlueScript
         public override bool EndlessArgs => false;
 
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
-        {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
-            if (attvar == null)
-            { return strDoItFeedback.AttributFehler(); }
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+            if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
-            if (attvar[0].ValueBool)
-            {
+            if (attvar[0].ValueBool) {
                 (var err, var ermess2) = Script.Parse(infos.CodeBlockAfterText, false, s);
-                if (!string.IsNullOrEmpty(err))
-                { return new strDoItFeedback(err); }
-            }
-            else
-            {
+                if (!string.IsNullOrEmpty(err)) { return new strDoItFeedback(err); }
+            } else {
                 s.Line += infos.LineBreakInCodeBlock;
             }
             return new strDoItFeedback(string.Empty, string.Empty);
@@ -59,12 +51,10 @@ namespace BlueScript
 
 
 
-        public static string? GetBool(string txt)
-        {
+        public static string? GetBool(string txt) {
             txt = txt.DeKlammere(true, false, false);
 
-            switch (txt.ToLower())
-            {
+            switch (txt.ToLower()) {
                 case "true":
                     return "true";
                 case "false":
@@ -94,16 +84,13 @@ namespace BlueScript
 
             #region Klammern zuerst berechnen
             (var posa, var _) = Script.NextText(txt, 0, new List<string>() { "(" }, false, false);
-            if (posa > -1)
-            {
+            if (posa > -1) {
                 (var pose, var _) = Script.NextText(txt, posa, new List<string>() { ")" }, false, false);
 
-                if (pose < posa)
-                { return null; }
+                if (pose < posa) { return null; }
 
                 var tmp = GetBool(txt.Substring(posa + 1, pose - posa - 1));
-                if (tmp == null)
-                { return null; }
+                if (tmp == null) { return null; }
 
                 return GetBool(txt.Substring(0, posa) + tmp + txt.Substring(pose + 1));
 
@@ -117,58 +104,48 @@ namespace BlueScript
 
 
             ntxt = GetBoolTMP(txt, "==");
-            if (!string.IsNullOrEmpty(ntxt))
-            { return GetBool(ntxt); }
+            if (!string.IsNullOrEmpty(ntxt)) { return GetBool(ntxt); }
 
             ntxt = GetBoolTMP(txt, ">=");
-            if (!string.IsNullOrEmpty(ntxt))
-            { return GetBool(ntxt); }
+            if (!string.IsNullOrEmpty(ntxt)) { return GetBool(ntxt); }
 
             ntxt = GetBoolTMP(txt, "<=");
-            if (!string.IsNullOrEmpty(ntxt))
-            { return GetBool(ntxt); }
+            if (!string.IsNullOrEmpty(ntxt)) { return GetBool(ntxt); }
 
             ntxt = GetBoolTMP(txt, "!=");
-            if (!string.IsNullOrEmpty(ntxt))
-            { return GetBool(ntxt); }
+            if (!string.IsNullOrEmpty(ntxt)) { return GetBool(ntxt); }
 
             ntxt = GetBoolTMP(txt, "<");
-            if (!string.IsNullOrEmpty(ntxt))
-            { return GetBool(ntxt); }
+            if (!string.IsNullOrEmpty(ntxt)) { return GetBool(ntxt); }
 
             ntxt = GetBoolTMP(txt, ">");
-            if (!string.IsNullOrEmpty(ntxt))
-            { return GetBool(ntxt); }
+            if (!string.IsNullOrEmpty(ntxt)) { return GetBool(ntxt); }
 
+            // https://de.wikipedia.org/wiki/Operatorrangfolge
+            // Negation
             ntxt = GetBoolTMP(txt, "!");
-            if (!string.IsNullOrEmpty(ntxt))
-            { return GetBool(ntxt); }
+            if (!string.IsNullOrEmpty(ntxt)) { return GetBool(ntxt); }
 
-            ntxt = GetBoolTMP(txt, "||");
-            if (!string.IsNullOrEmpty(ntxt))
-            { return GetBool(ntxt); }
-
+            //Konjunktion
             ntxt = GetBoolTMP(txt, "&&");
-            if (!string.IsNullOrEmpty(ntxt))
-            { return GetBool(ntxt); }
+            if (!string.IsNullOrEmpty(ntxt)) { return GetBool(ntxt); }
+
+            //Disjunktion
+            ntxt = GetBoolTMP(txt, "||");
+            if (!string.IsNullOrEmpty(ntxt)) { return GetBool(ntxt); }
 
             return null;
-
         }
 
-        private static string GetBoolTMP(string txt, string check)
-        {
+        private static string GetBoolTMP(string txt, string check) {
             (var i, var _) = Script.NextText(txt, 0, new List<string>() { check }, false, false);
 
 
-            if (i < 0)
-            { return string.Empty; }
+            if (i < 0) { return string.Empty; }
 
-            if (i < 1 && check != "!")
-            { return string.Empty; } // <1, weil ja mindestens ein Zeichen vorher sein MUSS!
+            if (i < 1 && check != "!") { return string.Empty; } // <1, weil ja mindestens ein Zeichen vorher sein MUSS!
 
-            if (i >= txt.Length - 1)
-            { return string.Empty; } // siehe oben
+            if (i >= txt.Length - 1) { return string.Empty; } // siehe oben
 
             var start = i - 1;
             var ende = i + check.Length;
@@ -176,27 +153,19 @@ namespace BlueScript
 
             var gans = false;
 
-            do
-            {
-                if (start < 0)
-                { break; }
+            do {
+                if (start < 0) { break; }
                 var ze = txt.Substring(start, 1);
-                if (!gans && trenn.Contains(ze))
-                { break; }
-                if (ze == "\"")
-                { gans = !gans; }
+                if (!gans && trenn.Contains(ze)) { break; }
+                if (ze == "\"") { gans = !gans; }
                 start--;
             } while (true);
 
-            do
-            {
-                if (ende >= txt.Length)
-                { break; }
+            do {
+                if (ende >= txt.Length) { break; }
                 var ze = txt.Substring(ende, 1);
-                if (!gans && trenn.Contains(ze))
-                { break; }
-                if (ze == "\"")
-                { gans = !gans; }
+                if (!gans && trenn.Contains(ze)) { break; }
+                if (ze == "\"") { gans = !gans; }
                 ende++;
             } while (true);
 
@@ -204,44 +173,33 @@ namespace BlueScript
             var s2 = txt.Substring(i + check.Length, ende - check.Length - i);
 
 
-            if (string.IsNullOrEmpty(s1) && check != "!")
-            { return string.Empty; }
-            if (string.IsNullOrEmpty(s2))
-            { return string.Empty; }
+            if (string.IsNullOrEmpty(s1) && check != "!") { return string.Empty; }
+            if (string.IsNullOrEmpty(s2)) { return string.Empty; }
 
 
             Variable v1 = null;
-            if (check != "!")
-            { v1 = new Variable("dummy", s1, null); }
+            if (check != "!") { v1 = new Variable("dummy", s1, null); }
             var v2 = new Variable("dummy", s2, null);
 
 
             // V2 braucht nicht gepürft werden, muss ja eh der gleiche TYpe wie V1 sein
-            if (v1 != null)
-            {
-                if (v1.Type != v2.Type)
-                { return string.Empty; }
+            if (v1 != null) {
+                if (v1.Type != v2.Type) { return string.Empty; }
 
                 if (v1.Type != Skript.Enums.enVariableDataType.Bool &&
                     v1.Type != Skript.Enums.enVariableDataType.Number &&
-                    v1.Type != Skript.Enums.enVariableDataType.String)
-                { return string.Empty; }
-            }
-            else
-            {
-                if (v2.Type != Skript.Enums.enVariableDataType.Bool)
-                { return string.Empty; }
+                    v1.Type != Skript.Enums.enVariableDataType.String) { return string.Empty; }
+            } else {
+                if (v2.Type != Skript.Enums.enVariableDataType.Bool) { return string.Empty; }
             }
 
 
             var replacer = string.Empty;
 
-            switch (check)
-            {
+            switch (check) {
                 case "==":
                     replacer = "false";
-                    if (v1.ValueString == v2.ValueString)
-                    { replacer = "true"; }
+                    if (v1.ValueString == v2.ValueString) { replacer = "true"; }
 
                     //if (s1.IsNumeral()) {
                     //    if (s2.IsNumeral()) {
@@ -255,8 +213,7 @@ namespace BlueScript
 
                 case "!=":
                     replacer = "false";
-                    if (v1.ValueString != v2.ValueString)
-                    { replacer = "true"; }
+                    if (v1.ValueString != v2.ValueString) { replacer = "true"; }
 
                     //if (s1.IsNumeral()) {
                     //    if (s2.IsNumeral()) {
@@ -269,61 +226,47 @@ namespace BlueScript
                     break;
 
                 case ">=":
-                    if (v1.Type != Skript.Enums.enVariableDataType.Number)
-                    { return string.Empty; }
+                    if (v1.Type != Skript.Enums.enVariableDataType.Number) { return string.Empty; }
                     replacer = "false";
-                    if (v1.ValueDouble >= v2.ValueDouble)
-                    { replacer = "true"; }
+                    if (v1.ValueDouble >= v2.ValueDouble) { replacer = "true"; }
                     break;
 
                 case "<=":
-                    if (v1.Type != Skript.Enums.enVariableDataType.Number)
-                    { return string.Empty; }
+                    if (v1.Type != Skript.Enums.enVariableDataType.Number) { return string.Empty; }
                     replacer = "false";
-                    if (v1.ValueDouble <= v2.ValueDouble)
-                    { replacer = "true"; }
+                    if (v1.ValueDouble <= v2.ValueDouble) { replacer = "true"; }
                     break;
 
                 case "<":
-                    if (v1.Type != Skript.Enums.enVariableDataType.Number)
-                    { return string.Empty; }
+                    if (v1.Type != Skript.Enums.enVariableDataType.Number) { return string.Empty; }
                     replacer = "false";
-                    if (v1.ValueDouble < v2.ValueDouble)
-                    { replacer = "true"; }
+                    if (v1.ValueDouble < v2.ValueDouble) { replacer = "true"; }
                     break;
 
                 case ">":
-                    if (v1.Type != Skript.Enums.enVariableDataType.Number)
-                    { return string.Empty; }
+                    if (v1.Type != Skript.Enums.enVariableDataType.Number) { return string.Empty; }
                     replacer = "false";
-                    if (v1.ValueDouble > v2.ValueDouble)
-                    { replacer = "true"; }
+                    if (v1.ValueDouble > v2.ValueDouble) { replacer = "true"; }
                     break;
 
                 case "||":
-                    if (v1.Type != Skript.Enums.enVariableDataType.Bool)
-                    { return string.Empty; }
+                    if (v1.Type != Skript.Enums.enVariableDataType.Bool) { return string.Empty; }
                     replacer = "false";
-                    if (v1.ValueBool || v2.ValueBool)
-                    { replacer = "true"; }
+                    if (v1.ValueBool || v2.ValueBool) { replacer = "true"; }
                     break;
 
                 case "&&":
-                    if (v1.Type != Skript.Enums.enVariableDataType.Bool)
-                    { return string.Empty; }
+                    if (v1.Type != Skript.Enums.enVariableDataType.Bool) { return string.Empty; }
                     replacer = "false";
-                    if (v1.ValueBool && v2.ValueBool)
-                    { replacer = "true"; }
+                    if (v1.ValueBool && v2.ValueBool) { replacer = "true"; }
                     break;
 
                 case "!":
                     // S1 dürfte eigentlich nie was sein: !False||!false
                     // entwederist es ganz am anfang, oder direkt nach einem Trenneichen
-                    if (v2.Type != Skript.Enums.enVariableDataType.Bool)
-                    { return string.Empty; }
+                    if (v2.Type != Skript.Enums.enVariableDataType.Bool) { return string.Empty; }
                     replacer = "false";
-                    if (!v2.ValueBool)
-                    { replacer = "true"; }
+                    if (!v2.ValueBool) { replacer = "true"; }
 
                     break;
 
@@ -334,8 +277,7 @@ namespace BlueScript
             }
 
 
-            if (string.IsNullOrEmpty(replacer))
-            { return string.Empty; }
+            if (string.IsNullOrEmpty(replacer)) { return string.Empty; }
 
 
             return txt.Substring(0, start + 1) + replacer + txt.Substring(ende);

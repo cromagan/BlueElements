@@ -21,10 +21,8 @@ using Skript.Enums;
 using System;
 using System.Collections.Generic;
 
-namespace BlueScript
-{
-    internal class Method_Round : Method
-    {
+namespace BlueScript {
+    internal class Method_Round : Method {
 
         public override string Syntax => "Round(Value, Nachkommastellen)";
         public override string Description => "Rundet den Zahlenwert mathematisch korrekt.";
@@ -37,18 +35,14 @@ namespace BlueScript
         public override bool EndlessArgs => false;
 
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
-        {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
-            if (attvar == null)
-            { return strDoItFeedback.AttributFehler(); }
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+            if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
             var n = (int)attvar[1].ValueDouble;
 
-            if (n < 0)
-            { n = 0; }
-            if (n > 10)
-            { n = 10; }
+            if (n < 0) { n = 0; }
+            if (n > 10) { n = 10; }
 
             var val = Math.Round(attvar[0].ValueDouble, n);
 

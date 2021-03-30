@@ -21,10 +21,8 @@ using Skript.Enums;
 using System.Collections.Generic;
 
 
-namespace BlueScript
-{
-    internal class Method_ChangeType : Method
-    {
+namespace BlueScript {
+    internal class Method_ChangeType : Method {
 
         public override string Syntax => "ChangeType(Variable, num / str / lst / dat / bol)";
 
@@ -35,20 +33,15 @@ namespace BlueScript
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.Null;
-
         public override List<enVariableDataType> Args => new() { enVariableDataType.VariableNumStrListDateBool, enVariableDataType.String };
         public override bool EndlessArgs => false;
 
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
-        {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
-            if (attvar == null)
-            { return strDoItFeedback.AttributFehler(); }
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+            if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
-
-            switch (attvar[1].ValueString.ToLower())
-            {
+            switch (attvar[1].ValueString.ToLower()) {
 
                 case "num":
                     attvar[0].Type = enVariableDataType.Number;

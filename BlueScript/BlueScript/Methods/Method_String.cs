@@ -21,10 +21,8 @@ using Skript.Enums;
 using System.Collections.Generic;
 
 
-namespace BlueScript
-{
-    internal class Method_String : Method
-    {
+namespace BlueScript {
+    internal class Method_String : Method {
 
         public override string Syntax => "String(numeral)";
         public override string Description => "Wandelt die Zahl in einen Text um.";
@@ -37,11 +35,9 @@ namespace BlueScript
         public override bool EndlessArgs => false;
 
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
-        {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
-            if (attvar == null)
-            { return strDoItFeedback.AttributFehler(); }
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+            if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
             attvar[0].Type = enVariableDataType.String;
             return new strDoItFeedback(attvar[0].ValueForReplace, string.Empty);

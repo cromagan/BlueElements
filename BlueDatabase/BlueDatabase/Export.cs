@@ -57,67 +57,67 @@ namespace BlueDatabase {
             Row.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventargs(Row, LayoutID, Filename));
         }
 
+        public static object ParseVariable(string platzhaltertxt, string variablename, object value) {
 
+            var kennungstart = 0;
 
-
-
-
-
-
-        public static string ParseVariable(string txt, string variablename, object value) {
-
-            var x = 0;
-
-            if (string.IsNullOrEmpty(txt)) { return txt; }
-            if (string.IsNullOrEmpty(variablename)) { return txt; }
-            if (txt.Length < variablename.Length + 4) { return txt; }
+            if (string.IsNullOrEmpty(platzhaltertxt)) { return platzhaltertxt; }
+            if (string.IsNullOrEmpty(variablename)) { return platzhaltertxt; }
+            if (platzhaltertxt.Length < variablename.Length + 4) { return platzhaltertxt; }
             ColumnItem Col = null;
 
 
             do {
-                var TMP = txt.ToUpper().IndexOf("//TS/000" + variablename.ToUpper() + "/", x);
+                var tmpKennungstart = platzhaltertxt.ToUpper().IndexOf("//TS/000" + variablename.ToUpper() + "/", kennungstart);
 
-                if (TMP < 0) { return txt; }
+                if (tmpKennungstart < 0) { return platzhaltertxt; }
 
-                x = TMP;
+                kennungstart = tmpKennungstart;
 
-                var e = txt.ToUpper().IndexOf("/E", x + 1);
+                var kennungende = platzhaltertxt.ToUpper().IndexOf("/E", kennungstart + 1);
 
-                if (e < 0) { return txt; }
+                if (kennungende < 0) { return platzhaltertxt; }
 
-                var TX = value;
+                var obj = value;
 
-                var Ges = txt.Substring(x, e - x + 2);
-                var ToParse = txt.Substring(x + 8 + variablename.Length, e - x - 8 - variablename.Length) + "/END";
+                var Ges = platzhaltertxt.Substring(kennungstart, kennungende - kennungstart + 2);
+                var ToParse = platzhaltertxt.Substring(kennungstart + 8 + variablename.Length, kennungende - kennungstart - 8 - variablename.Length) + "/END";
 
                 ToParse = ToParse.Trim('/');
 
-                var c = ToParse.Split('/');
-                var z = -1;
+                var codes = ToParse.Split('/');
+                var current = -1;
                 var Ended = false;
                 do {
-                    z++;
-                    if (z > c.GetUpperBound(0) || c[z].Length < 3) {
-                        TX = "/FehlerTS/";
+                    current++;
+                    if (current > codes.GetUpperBound(0) || codes[current].Length < 3) {
+                        obj = "/FehlerTS/";
                         break;
                     }
 
 
-                    c[z] = c[z].FromNonCritical().FromNonCritical().GenerateSlash();
+                    codes[current] = codes[current].FromNonCritical().FromNonCritical().GenerateSlash();
 
 
                     var tempVar2 = 0;
                     var tempVar3 = 0;
                     string tempVar5 = null;
-                    DoSingleCode(c[z], ref TX, null, ref Col, ref tempVar2, ref tempVar3, ref tempVar5, Ges, ref Ended);
+                    DoSingleCode(codes[current], ref obj, null, ref Col, ref tempVar2, ref tempVar3, ref tempVar5, Ges, ref Ended);
 
 
                 } while (!Ended);
 
-                if (TX is string ttt) {
-                    txt = txt.Replace(Ges, ttt);
+                if (obj is string ttt) {
+                    platzhaltertxt = platzhaltertxt.Replace(Ges, ttt);
                 }
-                x = 0;
+
+                if (obj is Bitmap bmp) {
+                    // Dann ist sozusagen kein Text mehr vorhanden, also das Bild zurückgeben
+                    return bmp;
+                }
+
+
+                kennungstart = 0;
 
 
 
@@ -504,7 +504,7 @@ namespace BlueDatabase {
             Code = Code.TrimEnd("XE");
             Code = Code.TrimEnd("AE");
             Code = Code.TrimEnd('E') + "END";
-            var c = Code.Split('/');
+            var codes = Code.Split('/');
             var z = -1;
             object Tx = string.Empty;
             var BT = "";
@@ -516,12 +516,12 @@ namespace BlueDatabase {
             ColumnItem Col = null;
             do {
                 z++;
-                if (z > c.GetUpperBound(0) || c[z].Length < 3) { return "/FehlerTS/"; }
+                if (z > codes.GetUpperBound(0) || codes[z].Length < 3) { return "/FehlerTS/"; }
 
 
-                c[z] = c[z].FromNonCritical().FromNonCritical().GenerateSlash();
+                codes[z] = codes[z].FromNonCritical().FromNonCritical().GenerateSlash();
 
-                DoSingleCode(c[z], ref Tx, vRow, ref Col, ref Wi, ref He, ref BT, Code, ref Ended);
+                DoSingleCode(codes[z], ref Tx, vRow, ref Col, ref Wi, ref He, ref BT, Code, ref Ended);
 
                 if (Ended) {
 

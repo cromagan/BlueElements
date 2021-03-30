@@ -38,7 +38,7 @@ namespace Skript.Enums
         NumString = Number | String,
 
         BoolNumString = Bool | Number | String,
-
+        BoolNumStringList = Bool | Number | String | List,
 
         Variable = 1024,
 

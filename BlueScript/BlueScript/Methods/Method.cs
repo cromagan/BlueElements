@@ -23,10 +23,8 @@ using System.Collections.Generic;
 using System.Linq;
 using static BlueBasics.Extensions;
 
-namespace BlueScript
-{
-    public abstract class Method
-    {
+namespace BlueScript {
+    public abstract class Method {
 
         public abstract List<string> Comand(Script s);
 
@@ -44,17 +42,14 @@ namespace BlueScript
         public abstract strDoItFeedback DoIt(strCanDoFeedback infos, Script s);
 
 
-        public strCanDoFeedback CanDo(string scriptText, int pos, bool expectedvariablefeedback, Script s)
-        {
+        public strCanDoFeedback CanDo(string scriptText, int pos, bool expectedvariablefeedback, Script s) {
 
 
-            if (!expectedvariablefeedback && Returns != enVariableDataType.Null)
-            {
+            if (!expectedvariablefeedback && Returns != enVariableDataType.Null) {
                 return new strCanDoFeedback(pos, "Befehl an dieser Stelle nicht möglich", false);
             }
 
-            if (expectedvariablefeedback && Returns == enVariableDataType.Null)
-            {
+            if (expectedvariablefeedback && Returns == enVariableDataType.Null) {
                 return new strCanDoFeedback(pos, "Befehl an dieser Stelle nicht möglich", false);
             }
 
@@ -68,48 +63,38 @@ namespace BlueScript
             //    }
             //}
 
-            foreach (var thiscomand in Comand(s))
-            {
+            foreach (var thiscomand in Comand(s)) {
 
 
                 var comandtext = thiscomand + StartSequence;
                 var l = comandtext.Length;
 
-                if (pos + l < maxl)
-                {
+                if (pos + l < maxl) {
 
 
-                    if (scriptText.Substring(pos, l).ToLower() == comandtext.ToLower())
-                    {
+                    if (scriptText.Substring(pos, l).ToLower() == comandtext.ToLower()) {
 
                         var f = GetEnd(scriptText, pos + thiscomand.Length, StartSequence.Length);
-                        if (!string.IsNullOrEmpty(f.ErrorMessage))
-                        {
+                        if (!string.IsNullOrEmpty(f.ErrorMessage)) {
                             return new strCanDoFeedback(f.ContinuePosition, "Fehler bei " + comandtext + ": " + f.ErrorMessage, true);
                         }
 
                         var cont = f.ContinuePosition;
                         var codebltxt = string.Empty;
 
-                        if (GetCodeBlockAfter)
-                        {
+                        if (GetCodeBlockAfter) {
 
-                            do
-                            {
-                                if (cont >= maxl)
-                                { return new strCanDoFeedback(f.ContinuePosition, "Kein nachfolgender Codeblock bei " + comandtext, true); }
-                                if (scriptText.Substring(cont, 1) == "{")
-                                { break; }
-                                if (scriptText.Substring(cont, 1) != "¶")
-                                { return new strCanDoFeedback(f.ContinuePosition, "Kein nachfolgender Codeblock bei " + comandtext, true); }
+                            do {
+                                if (cont >= maxl) { return new strCanDoFeedback(f.ContinuePosition, "Kein nachfolgender Codeblock bei " + comandtext, true); }
+                                if (scriptText.Substring(cont, 1) == "{") { break; }
+                                if (scriptText.Substring(cont, 1) != "¶") { return new strCanDoFeedback(f.ContinuePosition, "Kein nachfolgender Codeblock bei " + comandtext, true); }
                                 cont++;
                                 s.Line++;
                             } while (true);
 
 
                             (var posek, var witch) = Script.NextText(scriptText, cont, new List<string>() { "}" }, false, false);
-                            if (posek < cont)
-                            {
+                            if (posek < cont) {
                                 return new strCanDoFeedback(cont, "Kein Codeblock Ende bei " + comandtext, true);
                             }
 
@@ -128,14 +113,12 @@ namespace BlueScript
             return new strCanDoFeedback(pos, "Kann nicht geparst werden", false);
         }
 
-        private strGetEndFeedback GetEnd(string scriptText, int startpos, int lenghtStartSequence)
-        {
+        private strGetEndFeedback GetEnd(string scriptText, int startpos, int lenghtStartSequence) {
 
             (var pos, var witch) = Script.NextText(scriptText, startpos, new List<string>() { EndSequence }, false, false);
 
 
-            if (pos < startpos)
-            {
+            if (pos < startpos) {
                 return new strGetEndFeedback("Keinen Endpunkt gefunden.");
             }
 
@@ -272,16 +255,12 @@ namespace BlueScript
         //    return txtBTW;
         //}
 
-        public static strGetEndFeedback ReplaceComands(string txt, IEnumerable<Method> comands, Script s)
-        {
+        public static strGetEndFeedback ReplaceComands(string txt, IEnumerable<Method> comands, Script s) {
             var c = new List<string>();
-            foreach (var thisc in comands)
-            {
+            foreach (var thisc in comands) {
 
-                if (thisc.Returns != enVariableDataType.Null)
-                {
-                    foreach (var thiscs in thisc.Comand(s))
-                    {
+                if (thisc.Returns != enVariableDataType.Null) {
+                    foreach (var thiscs in thisc.Comand(s)) {
                         c.Add(thiscs + thisc.StartSequence);
                     }
                 }
@@ -290,18 +269,15 @@ namespace BlueScript
 
             var posc = 0;
 
-            do
-            {
+            do {
 
                 (var pos, var witch) = Script.NextText(txt, posc, c, true, false);
 
-                if (pos < 0)
-                { return new strGetEndFeedback(0, txt); }
+                if (pos < 0) { return new strGetEndFeedback(0, txt); }
 
                 var f = Script.ComandOnPosition(txt, pos, s, true);
 
-                if (!string.IsNullOrEmpty(f.ErrorMessage))
-                {
+                if (!string.IsNullOrEmpty(f.ErrorMessage)) {
                     return new strGetEndFeedback(f.ErrorMessage);
                 }
 
@@ -326,28 +302,23 @@ namespace BlueScript
 
         }
 
-        public static strGetEndFeedback ReplaceVariable(string txt, List<Variable> vars)
-        {
+        public static strGetEndFeedback ReplaceVariable(string txt, List<Variable> vars) {
 
 
             var posc = 0;
 
             var v = vars.AllNames();
 
-            do
-            {
+            do {
 
                 (var pos, var witch) = Script.NextText(txt, posc, v, true, true);
 
-                if (pos < 0)
-                { return new strGetEndFeedback(0, txt); }
+                if (pos < 0) { return new strGetEndFeedback(0, txt); }
 
                 var thisV = vars.Get(witch);
-                if (thisV == null)
-                { return new strGetEndFeedback("Variablen-Fehler " + witch); }
+                if (thisV == null) { return new strGetEndFeedback("Variablen-Fehler " + witch); }
 
-                if (thisV.Type == Skript.Enums.enVariableDataType.NotDefinedYet)
-                {
+                if (thisV.Type == Skript.Enums.enVariableDataType.NotDefinedYet) {
                     return new strGetEndFeedback("Variable " + witch + " ist keinem Typ zugeordnet");
                 }
 
@@ -404,21 +375,17 @@ namespace BlueScript
 
         }
 
-        public List<string> SplitAttributeToString(string attributtext)
-        {
-            if (string.IsNullOrEmpty(attributtext))
-            { return null; }
+        public static List<string> SplitAttributeToString(string attributtext) {
+            if (string.IsNullOrEmpty(attributtext)) { return null; }
 
             var attributes = new List<string>();
 
             #region Liste der Attribute splitten
             var posc = 0;
             var v = new List<string>() { "," };
-            do
-            {
+            do {
                 (var pos, var witch) = Script.NextText(attributtext, posc, v, false, false);
-                if (pos < 0)
-                {
+                if (pos < 0) {
                     attributes.Add((attributtext.Substring(posc)).DeKlammere(true, true, false));
                     break;
                 }
@@ -434,66 +401,48 @@ namespace BlueScript
         }
 
 
-        public List<Variable> SplitAttributeToVars(string attributtext, Script s, List<enVariableDataType> types)
-        {
+        public static List<Variable> SplitAttributeToVars(string attributtext, Script s, List<enVariableDataType> types, bool EndlessArgs) {
             var attributes = SplitAttributeToString(attributtext);
-            if (attributes == null || attributes.Count == 0)
-            { return null; }
+            if (attributes == null || attributes.Count == 0) { return null; }
 
-            if (attributes.Count < types.Count)
-            { return null; }
-            if (!EndlessArgs && attributes.Count > types.Count)
-            { return null; }
+            if (attributes.Count < types.Count) { return null; }
+            if (!EndlessArgs && attributes.Count > types.Count) { return null; }
 
 
             //  Variablen und Routinen ersetzen
             var vars = new List<Variable>();
 
 
-            for (var n = 0; n < attributes.Count; n++)
-            {
+            for (var n = 0; n < attributes.Count; n++) {
 
                 var lb = attributes[n].Count(c => c == '¶');
 
                 attributes[n] = attributes[n].RemoveChars("¶");
 
                 enVariableDataType exceptetType;
-                if (n < types.Count)
-                {
+                if (n < types.Count) {
                     exceptetType = types[n];
-                }
-                else
-                {
+                } else {
                     exceptetType = types[types.Count - 1];
                 }
 
                 Variable v = null;
 
 
-                if (exceptetType.HasFlag(enVariableDataType.Variable))
-                {
+                if (exceptetType.HasFlag(enVariableDataType.Variable)) {
                     v = s.Variablen.Get(attributes[n]);
-                }
-                else
-                {
+                } else {
                     v = new Variable("dummy", attributes[n], s);
                 }
 
-                if (v == null)
-                { return null; }
+                if (v == null) { return null; }
 
-                if (!exceptetType.HasFlag(v.Type))
-                {
+                if (!exceptetType.HasFlag(v.Type)) {
 
-                    if (exceptetType == enVariableDataType.Integer)
-                    {
-                        if (v.Type != enVariableDataType.Number)
-                        { return null; }
-                        if (v.ValueDouble != (int)v.ValueDouble)
-                        { return null; }
-                    }
-                    else
-                    {
+                    if (exceptetType == enVariableDataType.Integer) {
+                        if (v.Type != enVariableDataType.Number) { return null; }
+                        if (v.ValueDouble != (int)v.ValueDouble) { return null; }
+                    } else {
                         return null;
                     }
                 }
@@ -502,28 +451,7 @@ namespace BlueScript
 
             }
 
-
-            //#region Liste der Variablen erstellen
-
-            //for (var n = 0; n < attributes.Count; n++) {
-            //    if (n < modifiyab) {
-            //        vars.Add(s.Variablen.Get(attributes[n]));
-            //    }
-            //    else {
-
-
-            //    }
-            //}
-
-
-            //#endregion
-
             return vars;
-
         }
-
-
     }
-
-
 }

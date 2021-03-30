@@ -42,7 +42,7 @@ namespace BlueScript {
         public override bool EndlessArgs => false;
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
 

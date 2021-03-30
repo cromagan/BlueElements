@@ -21,10 +21,8 @@ using Skript.Enums;
 using System.Collections.Generic;
 
 
-namespace BlueScript
-{
-    internal class Method_Join : Method
-    {
+namespace BlueScript {
+    internal class Method_Join : Method {
 
         public override string Syntax => "Join(VariableListe, Verbindungszeichen)";
         public override string Description => "Wandelt eine Liste in einen Text um. Es verbindet den Text dabei mitteles dem angegebenen Verbindungszeichen";
@@ -35,11 +33,9 @@ namespace BlueScript
         public override enVariableDataType Returns => enVariableDataType.String;
         public override List<enVariableDataType> Args => new() { enVariableDataType.VariableList, enVariableDataType.String };
         public override bool EndlessArgs => false;
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
-        {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
-            if (attvar == null)
-            { return strDoItFeedback.AttributFehler(); }
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+            if (attvar == null) { return strDoItFeedback.AttributFehler(); }
             return new strDoItFeedback("\"" + attvar[0].ValueString.Replace("\r", attvar[1].ValueString) + "\"", string.Empty);
         }
     }

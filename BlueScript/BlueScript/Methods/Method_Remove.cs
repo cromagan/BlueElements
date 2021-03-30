@@ -22,10 +22,8 @@ using Skript.Enums;
 using System.Collections.Generic;
 using static BlueBasics.Extensions;
 
-namespace BlueScript
-{
-    internal class Method_Remove : Method
-    {
+namespace BlueScript {
+    internal class Method_Remove : Method {
 
         public override string Syntax => "Remove(ListVariable, CaseSensitive, Value1, Value2, ...);";
         public override string Description => "Entfernt aus der Liste die angegebenen Werte.";
@@ -37,22 +35,17 @@ namespace BlueScript
         public override List<enVariableDataType> Args => new() { enVariableDataType.VariableList, enVariableDataType.String, enVariableDataType.String };
         public override bool EndlessArgs => true;
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
-        {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
-            if (attvar == null)
-            { return strDoItFeedback.AttributFehler(); }
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+            if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
 
-            if (attvar[0].Type == Skript.Enums.enVariableDataType.List)
-            {
+            if (attvar[0].Type == Skript.Enums.enVariableDataType.List) {
 
                 var x = attvar[0].ValueString.SplitByCRToList();
 
-                for (var z = 2; z < attvar.Count; z++)
-                {
-                    if (attvar[z].Type != Skript.Enums.enVariableDataType.String)
-                    { return strDoItFeedback.FalscherDatentyp(); }
+                for (var z = 2; z < attvar.Count; z++) {
+                    if (attvar[z].Type != Skript.Enums.enVariableDataType.String) { return strDoItFeedback.FalscherDatentyp(); }
                     x.RemoveString(attvar[z].ValueString, attvar[1].ValueBool);
                 }
 

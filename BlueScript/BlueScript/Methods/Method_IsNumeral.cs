@@ -23,12 +23,10 @@ using System.Collections.Generic;
 using static BlueBasics.Extensions;
 
 
-namespace BlueScript
-{
-    internal class Method_IsNumeral : Method
-    {
+namespace BlueScript {
+    internal class Method_IsNumeral : Method {
 
-        public override string Description => "Püft, ob der Inhalt der Variable eine gültige Zahl ist. ";
+        public override string Description => "Prüft, ob der Inhalt der Variable eine gültige Zahl ist. ";
         public override string Syntax => "isNumeral(Value)";
         public override List<string> Comand(Script s) { return new() { "isnumeral" }; }
         public override string StartSequence => "(";
@@ -38,20 +36,15 @@ namespace BlueScript
         public override List<enVariableDataType> Args => new() { enVariableDataType.NumString };
         public override bool EndlessArgs => false;
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
-        {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
-            if (attvar == null)
-            { return strDoItFeedback.Falsch(); }
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+            if (attvar == null) { return strDoItFeedback.Falsch(); }
 
-            if (attvar[0].Type == Skript.Enums.enVariableDataType.Number)
-            { return strDoItFeedback.Wahr(); }
+            if (attvar[0].Type == Skript.Enums.enVariableDataType.Number) { return strDoItFeedback.Wahr(); }
 
-            if (attvar[0].Type == Skript.Enums.enVariableDataType.String)
-            {
+            if (attvar[0].Type == Skript.Enums.enVariableDataType.String) {
 
-                if (attvar[0].ValueString.IsNumeral())
-                {
+                if (attvar[0].ValueString.IsNumeral()) {
                     return strDoItFeedback.Wahr();
                 }
             }

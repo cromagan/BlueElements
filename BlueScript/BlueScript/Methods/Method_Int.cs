@@ -20,13 +20,11 @@
 using Skript.Enums;
 using System.Collections.Generic;
 
-namespace BlueScript
-{
-    internal class Method_Int : Method
-    {
+namespace BlueScript {
+    internal class Method_Int : Method {
 
-        public override string Syntax => "Int(Value)";
-        public override string Description => "Schneidet Nachkommastellen ab.";
+        public override string Syntax => "Int(Number)";
+        public override string Description => "Schneidet Nachkommastellen ab. Um einen Text in einen Zahlenwert zu verwandeln, ist der Befehl Number() zu benutzen.";
         public override List<string> Comand(Script s) { return new() { "int" }; }
         public override string StartSequence => "(";
         public override string EndSequence => ")";
@@ -36,11 +34,9 @@ namespace BlueScript
         public override bool EndlessArgs => false;
 
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
-        {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
-            if (attvar == null)
-            { return strDoItFeedback.AttributFehler(); }
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+            if (attvar == null) { return strDoItFeedback.AttributFehler(); }
             return new strDoItFeedback(attvar[0].ValueInt.ToString(), string.Empty);
         }
     }

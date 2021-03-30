@@ -183,12 +183,13 @@ namespace BlueControls.ItemCollection {
 
             ScaledImagePosition = new RectangleF(ScaledImagePosition.Left - trp.X, ScaledImagePosition.Top - trp.Y, ScaledImagePosition.Width, ScaledImagePosition.Height);
 
+            lock (GR) {
+                GR.TranslateTransform(trp.X, trp.Y);
+                if (_Bitmap != null) { GR.DrawImage(_Bitmap, ScaledImagePosition, AreaOfWholeImage, GraphicsUnit.Pixel); }
 
-            GR.TranslateTransform(trp.X, trp.Y);
-            if (_Bitmap != null) { GR.DrawImage(_Bitmap, ScaledImagePosition, AreaOfWholeImage, GraphicsUnit.Pixel); }
-
-            foreach (var thisQI in Overlays) {
-                GR.DrawImage(thisQI.BMP, ScaledImagePosition.Left + 8, ScaledImagePosition.Top + 8);
+                foreach (var thisQI in Overlays) {
+                    GR.DrawImage(thisQI.BMP, ScaledImagePosition.Left + 8, ScaledImagePosition.Top + 8);
+                }
             }
 
             if (!string.IsNullOrEmpty(_caption)) {

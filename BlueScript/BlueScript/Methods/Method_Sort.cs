@@ -22,10 +22,8 @@ using Skript.Enums;
 using System.Collections.Generic;
 using static BlueBasics.Extensions;
 
-namespace BlueScript
-{
-    internal class Method_Sort : Method
-    {
+namespace BlueScript {
+    internal class Method_Sort : Method {
 
 
         //public Method_Sort(Script parent) : base(parent) { }
@@ -45,20 +43,15 @@ namespace BlueScript
 
 
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
-        {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
-            if (attvar == null)
-            { return strDoItFeedback.AttributFehler(); }
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+            if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
             var x = attvar[0].ValueListString;
 
-            if (attvar[1].ValueBool)
-            {
+            if (attvar[1].ValueBool) {
                 x = x.SortedDistinctList();
-            }
-            else
-            {
+            } else {
                 x.Sort();
             }
 

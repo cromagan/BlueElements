@@ -22,10 +22,8 @@ using Skript.Enums;
 using System.Collections.Generic;
 using static BlueBasics.Extensions;
 
-namespace BlueScript
-{
-    internal class Method_BerechneVariable : Method
-    {
+namespace BlueScript {
+    internal class Method_BerechneVariable : Method {
 
 
         public override string Syntax => "VariablenName = Berechung;";
@@ -37,30 +35,26 @@ namespace BlueScript
         public override string EndSequence => ";";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.Null;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.BoolNumString };
+        public override List<enVariableDataType> Args => new() { enVariableDataType.BoolNumStringList };
         public override bool EndlessArgs => false;
 
 
 
 
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
-        {
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
 
             var variableName = infos.ComandText.ToLower().ReduceToChars(Constants.Char_az + "_" + Constants.Char_Numerals);
             var variable = s.Variablen.Get(variableName);
-            if (variable == null)
-            {
+            if (variable == null) {
                 return new strDoItFeedback("Variable " + variableName + " nicht gefunden");
             }
 
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args);
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
 
-            if (attvar == null || attvar.Count != 1)
-            { return strDoItFeedback.AttributFehler(); }
+            if (attvar == null || attvar.Count != 1) { return strDoItFeedback.AttributFehler(); }
 
-            if (variable.Type != enVariableDataType.NotDefinedYet && attvar[0].Type != variable.Type)
-            { return strDoItFeedback.FalscherDatentyp(); }
+            if (variable.Type != enVariableDataType.NotDefinedYet && attvar[0].Type != variable.Type) { return strDoItFeedback.FalscherDatentyp(); }
 
             variable.ValueString = attvar[0].ValueString;
             variable.Type = attvar[0].Type;
