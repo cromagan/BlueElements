@@ -209,12 +209,15 @@ namespace BlueBasics {
         }
 
         public static void RemoveString(this List<string> l, string value, bool caseSensitive) {
-            if (caseSensitive) { Develop.DebugPrint(enFehlerArt.Fehler, "CaseSensitive = True"); }
+
+            var cas = StringComparison.OrdinalIgnoreCase;
+
+            if (!caseSensitive) { cas = StringComparison.Ordinal; }
 
             var z = 0;
 
             while (z < l.Count) {
-                if (string.Equals(l[z], value, StringComparison.OrdinalIgnoreCase)) {
+                if (string.Equals(l[z], value, cas)) {
                     l.RemoveAt(z);
                 } else {
                     z++;

@@ -41,10 +41,10 @@ namespace BlueScript {
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (attvar == null) { return strDoItFeedback.AttributFehler(); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
-            for (var z = 1; z < attvar.Count; z++) {
-                var n = attvar[z].Name.ToLower() + "_error";
+            for (var z = 1; z < attvar.Attributes.Count; z++) {
+                var n = attvar.Attributes[z].Name.ToLower() + "_error";
                 var ve = s.Variablen.GetSystem(n);
 
                 if (ve == null) {
@@ -53,7 +53,7 @@ namespace BlueScript {
                 }
 
                 var l = ve.ValueListString;
-                l.AddIfNotExists(attvar[0].ValueString);
+                l.AddIfNotExists(attvar.Attributes[0].ValueString);
                 ve.ValueListString = l;
 
             }

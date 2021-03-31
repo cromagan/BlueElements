@@ -41,9 +41,9 @@ namespace BlueScript {
 
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
 
-            if (attvar == null || attvar.Count != 1) { return new strDoItFeedback("Die Ausführung wurde absichtlich abgebrochen."); }
+            if (attvar.Attributes == null || attvar.Attributes.Count != 1) { return new strDoItFeedback("Die Ausführung wurde absichtlich abgebrochen."); }
 
-            return new strDoItFeedback(string.Empty, attvar[0].ValueString);
+            return new strDoItFeedback(string.Empty, attvar.Attributes[0].ValueString);
         }
     }
 }

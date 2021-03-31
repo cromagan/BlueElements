@@ -32,28 +32,21 @@ namespace BlueScript {
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.Null;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.VariableList, enVariableDataType.String, enVariableDataType.String };
+        public override List<enVariableDataType> Args => new() { enVariableDataType.VariableList, enVariableDataType.Bool, enVariableDataType.String };
         public override bool EndlessArgs => true;
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (attvar == null) { return strDoItFeedback.AttributFehler(); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
+            var tmpList = attvar.Attributes[0].ValueListString;
 
-            if (attvar[0].Type == Skript.Enums.enVariableDataType.List) {
-
-                var x = attvar[0].ValueString.SplitByCRToList();
-
-                for (var z = 2; z < attvar.Count; z++) {
-                    if (attvar[z].Type != Skript.Enums.enVariableDataType.String) { return strDoItFeedback.FalscherDatentyp(); }
-                    x.RemoveString(attvar[z].ValueString, attvar[1].ValueBool);
-                }
-
-                attvar[0].ValueString = x.JoinWithCr();
-                return new strDoItFeedback();
+            for (var z = 2; z < attvar.Attributes.Count; z++) {
+                tmpList.RemoveString(attvar.Attributes[z].ValueString, attvar.Attributes[1].ValueBool);
             }
 
-            return strDoItFeedback.FalscherDatentyp();
+            attvar.Attributes[0].ValueListString = tmpList;
+            return new strDoItFeedback();
 
         }
     }

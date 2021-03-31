@@ -17,6 +17,8 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using BlueScript;
+
 public struct strDoItFeedback
 {
 
@@ -42,9 +44,9 @@ public struct strDoItFeedback
         return new strDoItFeedback("Falscher Datentyp.");
     }
 
-    public static strDoItFeedback AttributFehler()
+    public static strDoItFeedback AttributFehler(Method method, strSplittedAttributesFeedback f)
     {
-        return new strDoItFeedback("Attributfehler.");
+        return new strDoItFeedback(f.ErrorMessage + " > " + method.Syntax);
     }
 
     public static strDoItFeedback VariableNichtGefunden()

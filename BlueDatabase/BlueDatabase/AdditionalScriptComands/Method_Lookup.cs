@@ -29,12 +29,12 @@ namespace BlueScript {
 
         //public Method_Lookup(Script parent) : base(parent) { }
 
-        public override string Syntax => "Lookup(Database, KeyValue, Column, NothingFoundMessage, FoundToMuchMessage);";
+        public override string Syntax => "Lookup(Database, KeyValue, Column, NothingFoundValue, FoundToMuchValue)";
 
-        public override string Description => "Lädt eine andere Datenbank (Database), sucht eine Zeile (KeyValue) und gibt den Inhalt einer Spalte (Column) als Liste zurück. Wird der Wert nicht gefunden, wird NothingFoundMessage zurück gegeben. Ist der Wert mehrfach vorhanden, wird FoundToMuchMessage zurückgegeben.";
+        public override string Description => "Lädt eine andere Datenbank (Database), sucht eine Zeile (KeyValue) und gibt den Inhalt einer Spalte (Column) als Liste zurück. Wird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben. Ist der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.";
         public override List<string> Comand(Script s) { return new() { "lookup" }; }
         public override string StartSequence => "(";
-        public override string EndSequence => ");";
+        public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.List;
 
@@ -43,17 +43,17 @@ namespace BlueScript {
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (attvar == null) { return strDoItFeedback.AttributFehler(); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
 
             var f = s.Variablen.GetSystem("filename");
             if (f == null) { return new strDoItFeedback("System-Variable 'Filename' nicht gefunden."); }
 
-            foreach (var thisv in attvar) {
+            foreach (var thisv in attvar.Attributes) {
                 if (thisv.Type != Skript.Enums.enVariableDataType.String) { return strDoItFeedback.FalscherDatentyp(); }
             }
 
-            var newf = f.ValueString.FilePath() + attvar[0].ValueString + ".mdb";
+            var newf = f.ValueString.FilePath() + attvar.Attributes[0].ValueString + ".mdb";
 
             var db2 = BlueBasics.MultiUserFile.clsMultiUserFile.GetByFilename(newf, true);
             BlueDatabase.Database db;
@@ -65,25 +65,36 @@ namespace BlueScript {
                 db = (BlueDatabase.Database)db2;
             }
 
-            var c = db.Column.Exists(attvar[2].ValueString);
+            var c = db.Column.Exists(attvar.Attributes[2].ValueString);
 
-            if (c == null) { return new strDoItFeedback("Spalte nicht gefunden: " + attvar[2].ValueString); }
+            if (c == null) { return new strDoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[2].ValueString); }
 
-            var r = RowCollection.MatchesTo(new FilterItem(db.Column[0], BlueDatabase.Enums.enFilterType.Istgleich_GroßKleinEgal, attvar[1].ValueString));
+            var r = RowCollection.MatchesTo(new FilterItem(db.Column[0], BlueDatabase.Enums.enFilterType.Istgleich_GroßKleinEgal, attvar.Attributes[1].ValueString));
 
             if (r == null || r.Count == 0) {
-                if (attvar.Count > 3) { return new strDoItFeedback(attvar[3].ValueString, string.Empty); }
+                if (attvar.Attributes.Count > 3) {
+                    attvar.Attributes[3].Readonly = false;
+                    attvar.Attributes[3].Type = enVariableDataType.List;
+                    return new strDoItFeedback(attvar.Attributes[3].ValueForReplace, string.Empty);
+                }
                 return new strDoItFeedback(string.Empty, string.Empty);
             }
 
             if (r.Count > 1) {
-                if (attvar.Count > 4) { return new strDoItFeedback(attvar[4].ValueString, string.Empty); }
+                if (attvar.Attributes.Count > 4) {
+                    attvar.Attributes[4].Readonly = false;
+                    attvar.Attributes[4].Type = enVariableDataType.List;
+                    return new strDoItFeedback(attvar.Attributes[4].ValueForReplace, string.Empty);
+                }
                 return new strDoItFeedback(string.Empty, string.Empty);
             }
 
 
             var v = RowItem.CellToVariable(c, r[0]);
-            if (v == null) { return new strDoItFeedback("Wert konnte nicht erzeugt werden: " + attvar[2].ValueString); }
+            if (v == null) { return new strDoItFeedback("Wert konnte nicht erzeugt werden: " + attvar.Attributes[2].ValueString); }
+
+            v.Readonly = false;
+            v.Type = enVariableDataType.List;
 
             return new strDoItFeedback(v.ValueForReplace, string.Empty);
         }

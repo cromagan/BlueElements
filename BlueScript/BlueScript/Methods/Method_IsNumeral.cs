@@ -33,18 +33,18 @@ namespace BlueScript {
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.Bool;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.NumString };
+        public override List<enVariableDataType> Args => new() { enVariableDataType.Number_or_String };
         public override bool EndlessArgs => false;
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (attvar == null) { return strDoItFeedback.Falsch(); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) {  return strDoItFeedback.Falsch(); }
 
-            if (attvar[0].Type == Skript.Enums.enVariableDataType.Number) { return strDoItFeedback.Wahr(); }
+            if (attvar.Attributes[0].Type == Skript.Enums.enVariableDataType.Number) { return strDoItFeedback.Wahr(); }
 
-            if (attvar[0].Type == Skript.Enums.enVariableDataType.String) {
+            if (attvar.Attributes[0].Type == Skript.Enums.enVariableDataType.String) {
 
-                if (attvar[0].ValueString.IsNumeral()) {
+                if (attvar.Attributes[0].ValueString.IsNumeral()) {
                     return strDoItFeedback.Wahr();
                 }
             }

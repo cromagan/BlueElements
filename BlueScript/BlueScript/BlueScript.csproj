@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="Methods\Method.cs" />
     <Compile Include="Enums\enVariableType.cs" />
+    <Compile Include="Methods\Method_Count.cs" />
     <Compile Include="Methods\Method_StartsWith.cs" />
     <Compile Include="Methods\Method_IsType.cs" />
     <Compile Include="Methods\Method_EndsWith.cs" />
@@ -68,6 +69,7 @@
     <Compile Include="Script.cs" />
     <Compile Include="Enums\enVariableDataType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Structuren\strSplittedAttributesFeedback.cs" />
     <Compile Include="Structuren\strDoItWithEndedPosFeedback.cs" />
     <Compile Include="Structuren\strGetEndFeedback.cs" />
     <Compile Include="Structuren\strDoItFeedback.cs" />

@@ -146,8 +146,16 @@ namespace BlueControls.Forms {
             UpdateInternal(Text);
         }
 
-        public void Update(int Current) {
-            UpdateInternal(CalculateText(_baseText, Current, _count));
+        public void Update(int current) {
+
+            if (InvokeRequired) {
+                // Es kommt zwar die ganze Berechnung durcheinander, aber besser als ein Fehler
+                Invoke(new Action(() => Update(current)));
+                return;
+            }
+
+
+            UpdateInternal(CalculateText(_baseText, current, _count));
         }
 
         private void UpdateInternal(string Text) {

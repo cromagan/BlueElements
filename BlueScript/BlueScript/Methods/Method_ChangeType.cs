@@ -39,27 +39,27 @@ namespace BlueScript {
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (attvar == null) { return strDoItFeedback.AttributFehler(); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
-            switch (attvar[1].ValueString.ToLower()) {
+            switch (attvar.Attributes[1].ValueString.ToLower()) {
 
                 case "num":
-                    attvar[0].Type = enVariableDataType.Number;
+                    attvar.Attributes[0].Type = enVariableDataType.Number;
                     break;
                 case "str":
-                    attvar[0].Type = enVariableDataType.String;
+                    attvar.Attributes[0].Type = enVariableDataType.String;
                     break;
                 case "lst":
-                    attvar[0].Type = enVariableDataType.List;
+                    attvar.Attributes[0].Type = enVariableDataType.List;
                     break;
                 case "dat":
-                    attvar[0].Type = enVariableDataType.Date;
+                    attvar.Attributes[0].Type = enVariableDataType.Date;
                     break;
                 case "bol":
-                    attvar[0].Type = enVariableDataType.Bool;
+                    attvar.Attributes[0].Type = enVariableDataType.Bool;
                     break;
                 default:
-                    return strDoItFeedback.AttributFehler();
+                    return new strDoItFeedback("Es wir als zweites Attribut ein String mit dem Inhalt num, str, lst, dat oder bol erwartet.");
             }
 
 

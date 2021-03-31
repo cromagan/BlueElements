@@ -18,13 +18,14 @@
 #endregion
 
 using BlueBasics;
+using BlueBasics.Interfaces;
 using Skript.Enums;
 using System.Collections.Generic;
 using System.Linq;
 using static BlueBasics.Extensions;
 
 namespace BlueScript {
-    public abstract class Method {
+    public abstract class Method : IReadableText {
 
         public abstract List<string> Comand(Script s);
 
@@ -386,7 +387,7 @@ namespace BlueScript {
             do {
                 (var pos, var witch) = Script.NextText(attributtext, posc, v, false, false);
                 if (pos < 0) {
-                    attributes.Add((attributtext.Substring(posc)).DeKlammere(true, true, false));
+                    attributes.Add((attributtext.Substring(posc)).DeKlammere(true, false, false));
                     break;
                 }
 
@@ -401,12 +402,12 @@ namespace BlueScript {
         }
 
 
-        public static List<Variable> SplitAttributeToVars(string attributtext, Script s, List<enVariableDataType> types, bool EndlessArgs) {
+        public static strSplittedAttributesFeedback SplitAttributeToVars(string attributtext, Script s, List<enVariableDataType> types, bool EndlessArgs) {
             var attributes = SplitAttributeToString(attributtext);
-            if (attributes == null || attributes.Count == 0) { return null; }
+            if (attributes == null || attributes.Count == 0) { return new strSplittedAttributesFeedback("Allgemeiner Fehler."); }
 
-            if (attributes.Count < types.Count) { return null; }
-            if (!EndlessArgs && attributes.Count > types.Count) { return null; }
+            if (attributes.Count < types.Count) { return new strSplittedAttributesFeedback("Zu wenige Attribute erhalten."); ; }
+            if (!EndlessArgs && attributes.Count > types.Count) { return new strSplittedAttributesFeedback("Zu viele Attribute erhalten."); }
 
 
             //  Variablen und Routinen ersetzen
@@ -435,23 +436,31 @@ namespace BlueScript {
                     v = new Variable("dummy", attributes[n], s);
                 }
 
-                if (v == null) { return null; }
+                if (v == null) { return new strSplittedAttributesFeedback("Berechnungsfehler bei Attribut " + (n + 1).ToString()); }
 
                 if (!exceptetType.HasFlag(v.Type)) {
 
-                    if (exceptetType == enVariableDataType.Integer) {
-                        if (v.Type != enVariableDataType.Number) { return null; }
-                        if (v.ValueDouble != (int)v.ValueDouble) { return null; }
-                    } else {
-                        return null;
+                    if (v.Type == enVariableDataType.Error) {
+                        return new strSplittedAttributesFeedback("Attribut " + (n + 1).ToString() + ": " + v.Coment);
                     }
+
+
+                    if (exceptetType == enVariableDataType.Integer) {
+                        if (v.Type != enVariableDataType.Number) { return new strSplittedAttributesFeedback("Attribut " + (n + 1).ToString() + " ist keine Ganzahl."); }
+                        if (v.ValueDouble != (int)v.ValueDouble) { return new strSplittedAttributesFeedback("Attribut " + (n + 1).ToString() + " ist keine Ganzahl."); }
+                    } else {
+                        return new strSplittedAttributesFeedback("Attribut " + (n + 1).ToString() + " ist nicht der erwartete Typ");
+                    }
+
                 }
                 vars.Add(v);
-                s.Line += lb;
-
+                if (s != null) { s.Line += lb; }
             }
 
-            return vars;
+            return new strSplittedAttributesFeedback(vars);
         }
+
+        public string ReadableText() => Syntax;
+        public QuickImage SymbolForReadableText() => null;
     }
 }

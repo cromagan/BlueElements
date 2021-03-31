@@ -73,7 +73,7 @@ namespace BlueScript {
         public static strDoItFeedback AttributeAuflösen(string txt, Script s) {
 
             // Die Trims werden benötigtn, wenn eine Liste kommt, dass die Leerzeichen vor und nach den Kommas weggeschnitten werden.
-            txt = txt.Trim(" ").DeKlammere(true, true, false).Trim(" ");
+            txt = txt.Trim(" ").DeKlammere(true, false, false).Trim(" ");
 
             if (s != null) {
                 #region Variablen ersetzen
@@ -110,13 +110,13 @@ namespace BlueScript {
             #endregion
 
             #region Vergleichsoperatoren ersetzen und vereinfachen
-            var bl = new List<string>() { "!", "||", "&&", "==", "!=", "<", ">", ">=", "<=" };
 
-            (var pos, var witch) = Script.NextText(txt, 0, bl, false, false);
+
+            (var pos, var witch) = Script.NextText(txt, 0, Method_if.VergleichsOperatoren, false, false);
 
             if (pos >= 0) {
                 txt = Method_if.GetBool(txt);
-                if (txt == null) { return strDoItFeedback.AttributFehler(); }
+                if (txt == null) { return new strDoItFeedback("Der Inhalt zwischen den Klammern () konnte nicht berechnet werden."); }
             }
 
 
@@ -139,13 +139,13 @@ namespace BlueScript {
             var txt = AttributeAuflösen(attributesText, s);
 
 
-            if (!string.IsNullOrEmpty(txt.ErrorMessage)) { SetError(); return; }
+            if (!string.IsNullOrEmpty(txt.ErrorMessage)) { SetError(txt.ErrorMessage); return; }
 
 
             #region Testen auf bool
             if (txt.Value.Equals("true", System.StringComparison.InvariantCultureIgnoreCase) ||
                 txt.Value.Equals("false", System.StringComparison.InvariantCultureIgnoreCase)) {
-                if (Type != enVariableDataType.NotDefinedYet && Type != enVariableDataType.Bool) { SetError(); return; }//return new strDoItFeedback("Variable ist kein Boolean");
+                if (Type != enVariableDataType.NotDefinedYet && Type != enVariableDataType.Bool) { SetError("Variable ist kein Boolean"); return; }
                 ValueString = txt.Value;
                 Type = enVariableDataType.Bool;
                 Readonly = true;
@@ -155,7 +155,7 @@ namespace BlueScript {
 
             #region Testen auf String
             if (txt.Value.StartsWith("\"") && txt.Value.EndsWith("\"")) {
-                if (Type != enVariableDataType.NotDefinedYet && Type != enVariableDataType.String) { SetError(); return; } //return new strDoItFeedback("Variable ist kein String");
+                if (Type != enVariableDataType.NotDefinedYet && Type != enVariableDataType.String) { SetError("Variable ist kein String"); return; } 
                 ValueString = txt.Value.Trim("\"").Replace("\"+\"", string.Empty); // Erst trimmen! dann verketten! Ansonsten wird "+" mit nix ersetzte, anstelle einem  +
                 Type = enVariableDataType.String;
                 Readonly = true;
@@ -165,12 +165,11 @@ namespace BlueScript {
 
             #region Testen auf Liste mit Strings
             if (txt.Value.StartsWith("{\"") && txt.Value.EndsWith("\"}")) {
-                if (Type != enVariableDataType.NotDefinedYet && Type != enVariableDataType.List) { SetError(); return; } //return new strDoItFeedback("Variable ist keine Liste");
+                if (Type != enVariableDataType.NotDefinedYet && Type != enVariableDataType.List) { SetError("Variable ist keine Liste"); return; }
                 var t = txt.Value.DeKlammere(false, true, false);
                 var l = Method.SplitAttributeToVars(t, s, new List<enVariableDataType>() { enVariableDataType.String }, true);
-                if (l == null) { SetError(); return; }//return new strDoItFeedback("Berechnungsfehler der Formel: " + txt); 
-
-                ValueListString = l.AllValues();
+                if (!string.IsNullOrEmpty(l.ErrorMessage)) { SetError(l.ErrorMessage); return; }
+                ValueListString = l.Attributes.AllValues();
                 Type = enVariableDataType.List;
                 Readonly = true;
                 return;// new strDoItFeedback();
@@ -182,10 +181,10 @@ namespace BlueScript {
 
 
             #region Testen auf Number
-            if (Type != enVariableDataType.NotDefinedYet && Type != enVariableDataType.Number) { SetError(); return; } //return new strDoItFeedback("Variable ist keine Zahl");
+            if (Type != enVariableDataType.NotDefinedYet && Type != enVariableDataType.Number) { SetError("Variable ist keine Zahl"); return; } 
 
             var erg = modErgebnis.Ergebnis(txt.Value);
-            if (erg == null) { SetError(); return; }//return new strDoItFeedback("Berechnungsfehler der Formel: " + txt); 
+            if (erg == null) { SetError("Berechnungsfehler der Formel: " + txt.ErrorMessage); return; }//return new strDoItFeedback(); 
 
 
             ValueDouble = (double)erg;
@@ -194,11 +193,12 @@ namespace BlueScript {
             #endregion
         }
 
-        private void SetError() {
+        private void SetError(string coment) {
             Readonly = false;
             Type = enVariableDataType.Error;
             ValueString = string.Empty;
             Readonly = true;
+            Coment = coment;
         }
 
 

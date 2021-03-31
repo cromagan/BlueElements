@@ -37,12 +37,12 @@ namespace BlueScript {
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (attvar == null) { return strDoItFeedback.AttributFehler(); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
 
             var val = double.MaxValue;
 
-            foreach (var thisval in attvar) {
+            foreach (var thisval in attvar.Attributes) {
                 val = Math.Min(thisval.ValueDouble, val);
             }
 

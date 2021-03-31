@@ -35,8 +35,8 @@ namespace BlueScript {
         public override bool EndlessArgs => false;
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (attvar == null) { return strDoItFeedback.AttributFehler(); }
-            return new strDoItFeedback("\"" + attvar[0].ValueString.Replace("\r", attvar[1].ValueString) + "\"", string.Empty);
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+            return new strDoItFeedback("\"" + attvar.Attributes[0].ValueString.Replace("\r", attvar.Attributes[1].ValueString) + "\"", string.Empty);
         }
     }
 }

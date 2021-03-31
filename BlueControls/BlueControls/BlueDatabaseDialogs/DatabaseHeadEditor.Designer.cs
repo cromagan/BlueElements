@@ -52,6 +52,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Caption11 = new BlueControls.Controls.Caption();
             this.GlobalTab = new BlueControls.Controls.TabControl();
             this.Tab_Allgemein = new BlueControls.Controls.TabPage();
+            this.txbAdditionalFiles = new BlueControls.Controls.TextBox();
+            this.capAdditional = new BlueControls.Controls.Caption();
             this.txbZeilenQuickInfo = new BlueControls.Controls.TextBox();
             this.capZeilenQuickInfo = new BlueControls.Controls.Caption();
             this.txbFilterImagePath = new BlueControls.Controls.TextBox();
@@ -74,6 +76,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.txtSkript = new BlueControls.Controls.TextBox();
             this.tabBefehle = new BlueControls.Controls.TabPage();
             this.txbComms = new BlueControls.Controls.TextBox();
+            this.lstComands = new BlueControls.Controls.ListBox();
             this.tabVariablen = new BlueControls.Controls.TabPage();
             this.tableVariablen = new BlueControls.Controls.Table();
             this.filterVariablen = new BlueControls.BlueDatabaseDialogs.Filterleiste();
@@ -100,8 +103,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capExperimentellWarnung = new BlueControls.Controls.Caption();
             this.capBinInfo = new BlueControls.Controls.Caption();
             this.ExternTimer = new System.Windows.Forms.Timer(this.components);
-            this.capAdditional = new BlueControls.Controls.Caption();
-            this.txbAdditionalFiles = new BlueControls.Controls.TextBox();
             this.grpBenutzergruppen.SuspendLayout();
             this.grpKennwort.SuspendLayout();
             this.GlobalTab.SuspendLayout();
@@ -403,6 +404,26 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Allgemein.TabIndex = 1;
             this.Tab_Allgemein.Text = "Allgemein";
             // 
+            // txbAdditionalFiles
+            // 
+            this.txbAdditionalFiles.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.txbAdditionalFiles.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbAdditionalFiles.Location = new System.Drawing.Point(8, 416);
+            this.txbAdditionalFiles.Name = "txbAdditionalFiles";
+            this.txbAdditionalFiles.Size = new System.Drawing.Size(552, 24);
+            this.txbAdditionalFiles.TabIndex = 45;
+            this.txbAdditionalFiles.Verhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            // 
+            // capAdditional
+            // 
+            this.capAdditional.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.capAdditional.CausesValidation = false;
+            this.capAdditional.Location = new System.Drawing.Point(8, 400);
+            this.capAdditional.Name = "capAdditional";
+            this.capAdditional.Size = new System.Drawing.Size(152, 18);
+            this.capAdditional.Text = "Zugehörige-Dateien-Pfad:";
+            // 
             // txbZeilenQuickInfo
             // 
             this.txbZeilenQuickInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -588,6 +609,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnExtern
             // 
+            this.btnExtern.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnExtern.Location = new System.Drawing.Point(888, 0);
             this.btnExtern.Name = "btnExtern";
             this.btnExtern.Size = new System.Drawing.Size(112, 40);
@@ -609,6 +631,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.tabBefehle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabBefehle.Controls.Add(this.txbComms);
+            this.tabBefehle.Controls.Add(this.lstComands);
             this.tabBefehle.Location = new System.Drawing.Point(4, 25);
             this.tabBefehle.Name = "tabBefehle";
             this.tabBefehle.Size = new System.Drawing.Size(1025, 480);
@@ -619,11 +642,23 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.txbComms.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbComms.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txbComms.Location = new System.Drawing.Point(0, 0);
+            this.txbComms.Location = new System.Drawing.Point(488, 0);
             this.txbComms.Name = "txbComms";
-            this.txbComms.Size = new System.Drawing.Size(1025, 480);
+            this.txbComms.Size = new System.Drawing.Size(537, 480);
             this.txbComms.TabIndex = 2;
             this.txbComms.Verhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            // 
+            // lstComands
+            // 
+            this.lstComands.AddAllowed = BlueControls.Enums.enAddType.None;
+            this.lstComands.Dock = System.Windows.Forms.DockStyle.Left;
+            this.lstComands.FilterAllowed = true;
+            this.lstComands.LastFilePath = null;
+            this.lstComands.Location = new System.Drawing.Point(0, 0);
+            this.lstComands.Name = "lstComands";
+            this.lstComands.Size = new System.Drawing.Size(488, 480);
+            this.lstComands.TabIndex = 3;
+            this.lstComands.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.lstComands_ItemClicked);
             // 
             // tabVariablen
             // 
@@ -909,26 +944,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.ExternTimer.Interval = 1000;
             this.ExternTimer.Tick += new System.EventHandler(this.ExternTimer_Tick);
             // 
-            // capAdditional
-            // 
-            this.capAdditional.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.capAdditional.CausesValidation = false;
-            this.capAdditional.Location = new System.Drawing.Point(8, 400);
-            this.capAdditional.Name = "capAdditional";
-            this.capAdditional.Size = new System.Drawing.Size(152, 18);
-            this.capAdditional.Text = "Zugehörige-Dateien-Pfad:";
-            // 
-            // txbAdditionalFiles
-            // 
-            this.txbAdditionalFiles.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.txbAdditionalFiles.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbAdditionalFiles.Location = new System.Drawing.Point(8, 416);
-            this.txbAdditionalFiles.Name = "txbAdditionalFiles";
-            this.txbAdditionalFiles.Size = new System.Drawing.Size(552, 24);
-            this.txbAdditionalFiles.TabIndex = 45;
-            this.txbAdditionalFiles.Verhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
-            // 
             // DatabaseHeadEditor
             // 
             this.ClientSize = new System.Drawing.Size(1050, 677);
@@ -1034,5 +1049,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private Filterleiste filterVariablen;
         private TextBox txbAdditionalFiles;
         private Caption capAdditional;
+        private ListBox lstComands;
     }
 }

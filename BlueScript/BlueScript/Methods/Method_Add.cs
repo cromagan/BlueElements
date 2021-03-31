@@ -35,29 +35,28 @@ namespace BlueScript {
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.Null;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.VariableList, enVariableDataType.String };
+        public override List<enVariableDataType> Args => new() { enVariableDataType.VariableList, enVariableDataType.String_or_List };
         public override bool EndlessArgs => true;
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (attvar == null) { return strDoItFeedback.AttributFehler(); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+
+            var tmpList = attvar.Attributes[0].ValueListString;
 
 
-
-            if (attvar[0].Type == Skript.Enums.enVariableDataType.List) {
-
-                var x = attvar[0].ValueString.SplitByCRToList();
-
-                for (var z = 1; z < attvar.Count; z++) {
-                    if (attvar[z].Type != Skript.Enums.enVariableDataType.String) { return strDoItFeedback.FalscherDatentyp(); }
-                    x.Add(attvar[z].ValueString);
+            for (var z = 1; z < attvar.Attributes.Count; z++) {
+                if (attvar.Attributes[z].Type == Skript.Enums.enVariableDataType.String) {
+                    tmpList.Add(attvar.Attributes[z].ValueString);
                 }
-
-                attvar[0].ValueString = x.JoinWithCr();
-                return new strDoItFeedback();
+                if (attvar.Attributes[z].Type == Skript.Enums.enVariableDataType.List) {
+                    tmpList.AddRange(attvar.Attributes[z].ValueListString);
+                }
             }
 
-            return strDoItFeedback.FalscherDatentyp();
+            attvar.Attributes[0].ValueListString = tmpList;
+            return new strDoItFeedback();
+
         }
     }
 }

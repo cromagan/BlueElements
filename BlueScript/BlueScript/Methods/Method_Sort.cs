@@ -30,7 +30,7 @@ namespace BlueScript {
 
         public override string Syntax => "Sort(ListVariable, EliminateDupes);";
 
-        public override string Description => "Sortiert die Liste und falls der zweite Wert TRUE ist, entfernt Doubletten.";
+        public override string Description => "Sortiert die Liste und falls das zweite Attribut TRUE ist, entfernt Doubletten.";
 
         public override List<string> Comand(Script s) { return new() { "sort" }; }
         public override string StartSequence => "(";
@@ -45,17 +45,17 @@ namespace BlueScript {
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (attvar == null) { return strDoItFeedback.AttributFehler(); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
-            var x = attvar[0].ValueListString;
+            var x = attvar.Attributes[0].ValueListString;
 
-            if (attvar[1].ValueBool) {
+            if (attvar.Attributes[1].ValueBool) {
                 x = x.SortedDistinctList();
             } else {
                 x.Sort();
             }
 
-            attvar[0].ValueListString = x;
+            attvar.Attributes[0].ValueListString = x;
             return new strDoItFeedback();
         }
     }

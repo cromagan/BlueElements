@@ -21,23 +21,25 @@ using Skript.Enums;
 using System.Collections.Generic;
 
 namespace BlueScript {
-    internal class Method_Int : Method {
+    internal class Method_Count : Method {
 
-        public override string Syntax => "Int(Number)";
-        public override string Description => "Schneidet Nachkommastellen ab. Um einen Text in einen Zahlenwert zu verwandeln, ist der Befehl Number() zu benutzen.";
-        public override List<string> Comand(Script s) { return new() { "int" }; }
+
+        public override string Syntax => "Count(List-Variable)";
+
+
+        public override string Description => "Gibt die Anzahl der Elemente der Liste zurück";
+        public override List<string> Comand(Script s) { return new() { "count" }; }
         public override string StartSequence => "(";
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.Number;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Number };
+        public override List<enVariableDataType> Args => new() { enVariableDataType.VariableList};
         public override bool EndlessArgs => false;
-
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
-            return new strDoItFeedback(attvar.Attributes[0].ValueInt.ToString(), string.Empty);
+            return new strDoItFeedback(attvar.Attributes[0].ValueListString.Count.ToString(), string.Empty);
         }
     }
 }

@@ -25,6 +25,7 @@ using BlueControls.Forms;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using BlueScript;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -686,28 +687,17 @@ namespace BlueControls.BlueDatabaseDialogs {
                 }
             }
 
-            var co = string.Empty;
+            lstComands.Item.Clear();
 
             if (s != null && BlueScript.Script.Comands != null) {
 
                 foreach (var thisc in BlueScript.Script.Comands) {
-
-                    co = co + "#################################################################" + "\r\n";
-                    co = co + thisc.Syntax + "\r\n";
-                    co = co + "  - Rückgabetyp: " + thisc.Returns.ToString() + "\r\n";
-                    for (var z = 0; z < thisc.Args.Count(); z++) {
-                        co = co + "  - Argument " + (z + 1).ToString() + ": " + thisc.Args[z].ToString();
-                        if (z == thisc.Args.Count() - 1 && thisc.EndlessArgs) {
-                            co = co + " -> Dieses Argument kann beliebig oft wiederholt werden";
-                        }
-                        co = co + "\r\n";
-                    }
-                    co = co + thisc.Description + "\r\n";
+                    lstComands.Item.Add(thisc, thisc.Syntax.ToLower());
                 }
 
             }
 
-            txbComms.Text = co;
+            lstComands.Item.Sort();
 
 
             if (!string.IsNullOrEmpty(message)) {
@@ -805,6 +795,42 @@ namespace BlueControls.BlueDatabaseDialogs {
                 _FileState = "Fehler";
                 ExternTimer.Enabled = true;
             }
+        }
+
+        private void lstComands_ItemClicked(object sender, BasicListItemEventArgs e) {
+            var co = string.Empty;
+
+
+            if (e.Item.Tag is Method thisc) {
+                co = co + "Syntax:\r\n";
+                co = co + "~~~~~~\r\n";
+                co = co +  thisc.Syntax + "\r\n";
+                co = co + "\r\n";
+                co = co + "Argumente:\r\n";
+                co = co + "~~~~~~~~~~\r\n";
+                for (var z = 0; z < thisc.Args.Count(); z++) {
+                    co = co + "  - Argument " + (z + 1).ToString() + ": " + thisc.Args[z].ToString();
+                    if (z == thisc.Args.Count() - 1 && thisc.EndlessArgs) {
+                        co = co + " -> Dieses Argument kann beliebig oft wiederholt werden";
+                    }
+                    co = co + "\r\n";
+                }
+                co = co + "\r\n";
+                co = co + "Rückgabe:\r\n";
+                co = co + "~~~~~~~~~\r\n";
+
+                co = co + "  - Rückgabetyp: " + thisc.Returns.ToString() + "\r\n";
+
+                co = co + "\r\n";
+                co = co + "Beschreibung:\r\n";
+                co = co + "~~~~~~~~~~~~\r\n";
+                co = co + thisc.Description + "\r\n";
+            }
+
+
+
+            txbComms.Text = co;
+
         }
     }
 }

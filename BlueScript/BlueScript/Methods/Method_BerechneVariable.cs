@@ -35,7 +35,7 @@ namespace BlueScript {
         public override string EndSequence => ";";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.Null;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.BoolNumStringList };
+        public override List<enVariableDataType> Args => new() { enVariableDataType.Bool_Number_String_or_List };
         public override bool EndlessArgs => false;
 
 
@@ -46,18 +46,16 @@ namespace BlueScript {
 
             var variableName = infos.ComandText.ToLower().ReduceToChars(Constants.Char_az + "_" + Constants.Char_Numerals);
             var variable = s.Variablen.Get(variableName);
-            if (variable == null) {
-                return new strDoItFeedback("Variable " + variableName + " nicht gefunden");
-            }
+            if (variable == null) { return new strDoItFeedback("Variable " + variableName + " nicht gefunden"); }
 
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
 
-            if (attvar == null || attvar.Count != 1) { return strDoItFeedback.AttributFehler(); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
-            if (variable.Type != enVariableDataType.NotDefinedYet && attvar[0].Type != variable.Type) { return strDoItFeedback.FalscherDatentyp(); }
+            if (variable.Type != enVariableDataType.NotDefinedYet && attvar.Attributes[0].Type != variable.Type) { return strDoItFeedback.FalscherDatentyp(); }
 
-            variable.ValueString = attvar[0].ValueString;
-            variable.Type = attvar[0].Type;
+            variable.ValueString = attvar.Attributes[0].ValueString;
+            variable.Type = attvar.Attributes[0].Type;
 
             return new strDoItFeedback();
         }

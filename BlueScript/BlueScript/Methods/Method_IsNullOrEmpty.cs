@@ -36,14 +36,14 @@ namespace BlueScript {
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (attvar == null) { return strDoItFeedback.Wahr(); }
+            if (attvar.Attributes == null) { return strDoItFeedback.Wahr(); }
 
-            if (string.IsNullOrEmpty(attvar[0].ValueString)) {
-                return strDoItFeedback.Wahr();
-            }
+            if (string.IsNullOrEmpty(attvar.Attributes[0].ValueString)) { return strDoItFeedback.Wahr(); }
 
 
-            if (attvar[0].Type == enVariableDataType.Null || attvar[0].Type == enVariableDataType.Error || attvar[0].Type == enVariableDataType.NotDefinedYet) {
+            if (attvar.Attributes[0].Type == enVariableDataType.Null ||
+                attvar.Attributes[0].Type == enVariableDataType.Error ||
+                attvar.Attributes[0].Type == enVariableDataType.NotDefinedYet) {
                 return strDoItFeedback.Wahr();
             }
 

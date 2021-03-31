@@ -25,8 +25,8 @@ using static BlueBasics.Extensions;
 namespace BlueScript {
     internal class Method_if : Method {
 
-        public override string Syntax => "if (true) { Code zum ausführen }";
-        public override string Description => "Nur wenn der Wert in der Klammer TRUE ist, wird der nachfolgende Codeblock ausgeführt.";
+        public override string Syntax => "if (true) { Code zum Ausführen }";
+        public override string Description => "Nur wenn der Wert in der Klammer TRUE ist, wird der nachfolgende Codeblock ausgeführt. Es werden IMMER alle Vergleichsoperatoren aufgelöst. Deswegen sind Verschachtelungen mit Voricht zu verwenden - z.B. mir einem Exists-Befehl.";
         public override List<string> Comand(Script s) { return new() { "if" }; }
         public override string StartSequence => "(";
         public override string EndSequence => ")";
@@ -36,11 +36,27 @@ namespace BlueScript {
         public override bool EndlessArgs => false;
 
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (attvar == null) { return strDoItFeedback.AttributFehler(); }
 
-            if (attvar[0].ValueBool) {
+        public static readonly List<string> VergleichsOperatoren = new List<string>() { "!", "||", "&&", "==", "!=", "<", ">", ">=", "<=" };
+        public static readonly List<string> VergleichsOperatoren2 = new List<string>() { "||", "&&", "==", "!=", "<", ">", ">=", "<=" };
+        public static readonly List<string> Vorbidden = new List<string>() { "exists", "istype" };
+
+
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+
+            var txt = infos.AttributText.Replace("(", string.Empty).Replace(")", string.Empty);
+            (var pos, var witch) = Script.NextText(txt, 0, Vorbidden, false, false);
+            if (pos >= 0) {
+                (var pos2, var witch2) = Script.NextText(txt, 0, VergleichsOperatoren2, false, false);
+                if (pos2 >= 0) {
+                    return new strDoItFeedback("Der Befehl " + witch + " in Kombination mit " + witch2 + " nicht erlaubt.");
+                }
+            }
+
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+
+            if (attvar.Attributes[0].ValueBool) {
                 (var err, var ermess2) = Script.Parse(infos.CodeBlockAfterText, false, s);
                 if (!string.IsNullOrEmpty(err)) { return new strDoItFeedback(err); }
             } else {
@@ -48,8 +64,6 @@ namespace BlueScript {
             }
             return new strDoItFeedback(string.Empty, string.Empty);
         }
-
-
 
         public static string? GetBool(string txt) {
             txt = txt.DeKlammere(true, false, false);

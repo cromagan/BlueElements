@@ -35,10 +35,12 @@ namespace Skript.Enums
         /// </summary>
         Integer = 256,
 
-        NumString = Number | String,
+        Number_or_String = Number | String,
 
-        BoolNumString = Bool | Number | String,
-        BoolNumStringList = Bool | Number | String | List,
+        String_or_List = String | List,
+
+        Bool_Number_or_String = Bool | Number | String,
+        Bool_Number_String_or_List = Bool | Number | String | List,
 
         Variable = 1024,
 

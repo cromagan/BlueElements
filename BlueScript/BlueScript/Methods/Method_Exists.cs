@@ -23,7 +23,7 @@ using System.Collections.Generic;
 namespace BlueScript {
     internal class Method_Exists : Method {
 
-        public override string Description => "Gibt TRUE zurück, wenn die Variable existiert,";
+        public override string Description => "Gibt TRUE zurück, wenn die Variable existiert. Dieser Befehl sollte niemals mit einem Vergleichsoperator verwendet werden.";
         public override string Syntax => "Exists(Variable)";
         public override List<string> Comand(Script s) { return new() { "exists" }; }
         public override string StartSequence => "(";
@@ -36,7 +36,7 @@ namespace BlueScript {
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (attvar == null) { return strDoItFeedback.Falsch(); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.Falsch();  }
             return strDoItFeedback.Wahr();
         }
     }
