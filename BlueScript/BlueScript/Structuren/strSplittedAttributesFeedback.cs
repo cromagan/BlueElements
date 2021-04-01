@@ -18,6 +18,7 @@
 #endregion
 
 using BlueScript;
+using Skript.Enums;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -27,14 +28,17 @@ public struct strSplittedAttributesFeedback {
     {
         Attributes = atts;
         ErrorMessage = string.Empty;
+        FehlerTyp = enSkriptFehlerTyp.ohne;
     }
 
-    public strSplittedAttributesFeedback(string error) {
+    public strSplittedAttributesFeedback(enSkriptFehlerTyp type, string error) {
         Attributes = null;
         ErrorMessage = error;
+        FehlerTyp = type;
     }
 
 
+    public enSkriptFehlerTyp FehlerTyp;
 
     public List<Variable> Attributes;
 

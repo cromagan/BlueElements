@@ -30,7 +30,7 @@ namespace BlueScript {
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.Null;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.VariableAny, enVariableDataType.String };
+        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_Any, enVariableDataType.String };
         public override bool EndlessArgs => false;
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
@@ -39,7 +39,7 @@ namespace BlueScript {
             switch (attvar.Attributes[1].ValueString.ToLower()) {
 
                 case "num":
-                    if (attvar.Attributes[0].Type == enVariableDataType.Number) { return strDoItFeedback.Wahr(); }
+                    if (attvar.Attributes[0].Type == enVariableDataType.Numeral) { return strDoItFeedback.Wahr(); }
                     return strDoItFeedback.Falsch();
                 case "str":
                     if (attvar.Attributes[0].Type == enVariableDataType.String) { return strDoItFeedback.Wahr(); }

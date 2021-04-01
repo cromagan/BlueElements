@@ -39,7 +39,7 @@ namespace BlueScript {
                 case enVariableDataType.String:
                     return "{str} " + zusatz + Name + " = " + ValueForReplace;
 
-                case enVariableDataType.Number:
+                case enVariableDataType.Numeral:
                     return "{num} " + zusatz + Name + " = " + ValueForReplace;
 
                 case enVariableDataType.Date:
@@ -181,14 +181,14 @@ namespace BlueScript {
 
 
             #region Testen auf Number
-            if (Type != enVariableDataType.NotDefinedYet && Type != enVariableDataType.Number) { SetError("Variable ist keine Zahl"); return; } 
+            if (Type != enVariableDataType.NotDefinedYet && Type != enVariableDataType.Numeral) { SetError("Variable ist keine Zahl"); return; } 
 
             var erg = modErgebnis.Ergebnis(txt.Value);
             if (erg == null) { SetError("Berechnungsfehler der Formel: " + txt.ErrorMessage); return; }//return new strDoItFeedback(); 
 
 
             ValueDouble = (double)erg;
-            Type = enVariableDataType.Number;
+            Type = enVariableDataType.Numeral;
             Readonly = true;
             #endregion
         }
@@ -244,7 +244,7 @@ namespace BlueScript {
                     case enVariableDataType.String:
                         return "\"" + ValueString + "\"";
 
-                    case enVariableDataType.Number:
+                    case enVariableDataType.Numeral:
                         return ValueString;
                     case enVariableDataType.Bool:
                         return ValueString;
@@ -427,7 +427,7 @@ namespace BlueScript {
                 vars.Add(v);
             }
 
-            v.Type = enVariableDataType.Number;
+            v.Type = enVariableDataType.Numeral;
             v.ValueDouble = value;
             v.Readonly = true;
         }

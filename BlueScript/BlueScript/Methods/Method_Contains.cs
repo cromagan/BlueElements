@@ -39,7 +39,7 @@ namespace BlueScript {
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.Bool;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.VariableListOrString, enVariableDataType.Bool, enVariableDataType.String };
+        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List_Or_String, enVariableDataType.Bool, enVariableDataType.String };
         public override bool EndlessArgs => true;
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {

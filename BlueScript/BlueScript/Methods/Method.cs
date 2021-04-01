@@ -404,10 +404,10 @@ namespace BlueScript {
 
         public static strSplittedAttributesFeedback SplitAttributeToVars(string attributtext, Script s, List<enVariableDataType> types, bool EndlessArgs) {
             var attributes = SplitAttributeToString(attributtext);
-            if (attributes == null || attributes.Count == 0) { return new strSplittedAttributesFeedback("Allgemeiner Fehler."); }
+            if (attributes == null || attributes.Count == 0) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Allgemeiner Fehler."); }
 
-            if (attributes.Count < types.Count) { return new strSplittedAttributesFeedback("Zu wenige Attribute erhalten."); ; }
-            if (!EndlessArgs && attributes.Count > types.Count) { return new strSplittedAttributesFeedback("Zu viele Attribute erhalten."); }
+            if (attributes.Count < types.Count) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Zu wenige Attribute erhalten."); ; }
+            if (!EndlessArgs && attributes.Count > types.Count) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Zu viele Attribute erhalten."); }
 
 
             //  Variablen und Routinen ersetzen
@@ -431,25 +431,29 @@ namespace BlueScript {
 
 
                 if (exceptetType.HasFlag(enVariableDataType.Variable)) {
+                    if (!Variable.IsValidName(attributes[n])) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.VariableErwartet, "Variablenname erwartet bei Attribut " + (n + 1).ToString()); }
                     v = s.Variablen.Get(attributes[n]);
+                    if (v == null) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1).ToString()); }
+
                 } else {
                     v = new Variable("dummy", attributes[n], s);
+                    if (v == null) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.BerechnungFehlgeschlagen, "Berechnungsfehler bei Attribut " + (n + 1).ToString()); }
+
                 }
 
-                if (v == null) { return new strSplittedAttributesFeedback("Berechnungsfehler bei Attribut " + (n + 1).ToString()); }
 
                 if (!exceptetType.HasFlag(v.Type)) {
 
                     if (v.Type == enVariableDataType.Error) {
-                        return new strSplittedAttributesFeedback("Attribut " + (n + 1).ToString() + ": " + v.Coment);
+                        return new strSplittedAttributesFeedback(enSkriptFehlerTyp.BerechnungFehlgeschlagen, "Attribut " + (n + 1).ToString() + ": " + v.Coment);
                     }
 
 
                     if (exceptetType == enVariableDataType.Integer) {
-                        if (v.Type != enVariableDataType.Number) { return new strSplittedAttributesFeedback("Attribut " + (n + 1).ToString() + " ist keine Ganzahl."); }
-                        if (v.ValueDouble != (int)v.ValueDouble) { return new strSplittedAttributesFeedback("Attribut " + (n + 1).ToString() + " ist keine Ganzahl."); }
+                        if (v.Type != enVariableDataType.Numeral) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.FalscherDatentyp, "Attribut " + (n + 1).ToString() + " ist keine Ganzahl."); }
+                        if (v.ValueDouble != (int)v.ValueDouble) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.FalscherDatentyp, "Attribut " + (n + 1).ToString() + " ist keine Ganzahl."); }
                     } else {
-                        return new strSplittedAttributesFeedback("Attribut " + (n + 1).ToString() + " ist nicht der erwartete Typ");
+                        return new strSplittedAttributesFeedback(enSkriptFehlerTyp.FalscherDatentyp, "Attribut " + (n + 1).ToString() + " ist nicht der erwartete Typ");
                     }
 
                 }

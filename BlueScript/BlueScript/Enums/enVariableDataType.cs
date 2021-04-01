@@ -25,7 +25,7 @@ namespace Skript.Enums
 
         NotDefinedYet = 0,
         Bool = 1,
-        Number = 2,
+        Numeral = 2,
         String = 4,
         Date = 8,
         List = 16,
@@ -35,12 +35,12 @@ namespace Skript.Enums
         /// </summary>
         Integer = 256,
 
-        Number_or_String = Number | String,
+        Nummeral_or_String = Numeral | String,
 
         String_or_List = String | List,
 
-        Bool_Number_or_String = Bool | Number | String,
-        Bool_Number_String_or_List = Bool | Number | String | List,
+        Bool_Numeral_or_String = Bool | Numeral | String,
+        Bool_Numeral_String_or_List = Bool | Numeral | String | List,
 
         Variable = 1024,
 
@@ -51,14 +51,15 @@ namespace Skript.Enums
         //VariableBool = 128,
         //VariableNum = 256,
         //VariableString = 512,
-        VariableList = Variable | List,
-        VariableString = Variable | String,
+        Variable_Numeral = Variable | Numeral,
+        Variable_List = Variable | List,
+        Variable_String = Variable | String,
 
-        VariableListOrString = Variable | String | List,
-        VariableListOrStringNumBool = Variable | String | List | Number | Bool,
-        VariableStringNum = Variable | String | List | Number,
-        VariableNumStrListDateBool = Variable | String | List | Number | Bool | Date,
-        VariableAny = Variable | String | List | Number | Bool | Date | Error | NotDefinedYet
+        Variable_List_Or_String = Variable | String | List,
+        Variable_List_String_Numeral_or_Bool = Variable | String | List | Numeral | Bool,
+        Variable_String_or_Numeral = Variable | String | List | Numeral,
+        Variable_List_String_Numeral_Date_or_Bool = Variable | String | List | Numeral | Bool | Date,
+        Variable_Any = Variable | String | List | Numeral | Bool | Date | Error | NotDefinedYet
     }
 
 }

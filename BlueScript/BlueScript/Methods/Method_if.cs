@@ -39,7 +39,7 @@ namespace BlueScript {
 
         public static readonly List<string> VergleichsOperatoren = new List<string>() { "!", "||", "&&", "==", "!=", "<", ">", ">=", "<=" };
         public static readonly List<string> VergleichsOperatoren2 = new List<string>() { "||", "&&", "==", "!=", "<", ">", ">=", "<=" };
-        public static readonly List<string> Vorbidden = new List<string>() { "exists", "istype" };
+        public static readonly List<string> Vorbidden = new List<string>() { "exists", "istype", "isnullorempty", "isnullorzero" };
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
@@ -201,7 +201,7 @@ namespace BlueScript {
                 if (v1.Type != v2.Type) { return string.Empty; }
 
                 if (v1.Type != Skript.Enums.enVariableDataType.Bool &&
-                    v1.Type != Skript.Enums.enVariableDataType.Number &&
+                    v1.Type != Skript.Enums.enVariableDataType.Numeral &&
                     v1.Type != Skript.Enums.enVariableDataType.String) { return string.Empty; }
             } else {
                 if (v2.Type != Skript.Enums.enVariableDataType.Bool) { return string.Empty; }
@@ -240,25 +240,25 @@ namespace BlueScript {
                     break;
 
                 case ">=":
-                    if (v1.Type != Skript.Enums.enVariableDataType.Number) { return string.Empty; }
+                    if (v1.Type != Skript.Enums.enVariableDataType.Numeral) { return string.Empty; }
                     replacer = "false";
                     if (v1.ValueDouble >= v2.ValueDouble) { replacer = "true"; }
                     break;
 
                 case "<=":
-                    if (v1.Type != Skript.Enums.enVariableDataType.Number) { return string.Empty; }
+                    if (v1.Type != Skript.Enums.enVariableDataType.Numeral) { return string.Empty; }
                     replacer = "false";
                     if (v1.ValueDouble <= v2.ValueDouble) { replacer = "true"; }
                     break;
 
                 case "<":
-                    if (v1.Type != Skript.Enums.enVariableDataType.Number) { return string.Empty; }
+                    if (v1.Type != Skript.Enums.enVariableDataType.Numeral) { return string.Empty; }
                     replacer = "false";
                     if (v1.ValueDouble < v2.ValueDouble) { replacer = "true"; }
                     break;
 
                 case ">":
-                    if (v1.Type != Skript.Enums.enVariableDataType.Number) { return string.Empty; }
+                    if (v1.Type != Skript.Enums.enVariableDataType.Numeral) { return string.Empty; }
                     replacer = "false";
                     if (v1.ValueDouble > v2.ValueDouble) { replacer = "true"; }
                     break;

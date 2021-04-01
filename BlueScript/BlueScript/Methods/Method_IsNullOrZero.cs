@@ -21,11 +21,11 @@ using Skript.Enums;
 using System.Collections.Generic;
 
 namespace BlueScript {
-    internal class Method_IsNullOrEmpty : Method {
+    internal class Method_IsNullOrZero : Method {
 
-        public override string Description => "Gibt TRUE zurück, wenn die Variable nicht existiert, fehlerhaft ist oder keinen Inhalt hat.";
-        public override string Syntax => "isNullOrEmpty(Variable)";
-        public override List<string> Comand(Script s) { return new() { "isnullorempty" }; }
+        public override string Description => "Gibt TRUE zurück, wenn die Variable nicht existiert, fehlerhaft ist, keinen Inhalt hat,  oder dem Zahlenwert 0 entspricht. Falls die Variable existiert, muss diese dem Typ Numeral entsprechen.";
+        public override string Syntax => "isNullOrZero(Variable)";
+        public override List<string> Comand(Script s) { return new() { "isnullorzero" }; }
         public override string StartSequence => "(";
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
@@ -50,6 +50,11 @@ namespace BlueScript {
                 attvar.Attributes[0].Type == enVariableDataType.NotDefinedYet) {
                 return strDoItFeedback.Wahr();
             }
+
+
+            if (attvar.Attributes[0].Type != enVariableDataType.Numeral) { return new strDoItFeedback("Variable existiert, ist aber nicht vom Datentyp Numeral."); }
+
+            if (attvar.Attributes[0].ValueDouble == 0) { return strDoItFeedback.Wahr(); }
 
             return strDoItFeedback.Falsch();
         }

@@ -350,7 +350,7 @@ namespace BlueDatabase {
 
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.Gleitkommazahl:
-                    return new Variable(thisCol.Name, r.CellGetString(thisCol), enVariableDataType.Number, ro, false, "Spalte: " + thisCol.ReadableText());
+                    return new Variable(thisCol.Name, r.CellGetString(thisCol), enVariableDataType.Numeral, ro, false, "Spalte: " + thisCol.ReadableText());
 
                 default:
                     return new Variable(thisCol.Name, r.CellGetString(thisCol), enVariableDataType.String, ro, false, "Spalte: " + thisCol.ReadableText());

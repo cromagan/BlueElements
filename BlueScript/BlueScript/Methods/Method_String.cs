@@ -31,7 +31,7 @@ namespace BlueScript {
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.String;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Number };
+        public override List<enVariableDataType> Args => new() { enVariableDataType.Numeral };
         public override bool EndlessArgs => false;
 
 

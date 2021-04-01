@@ -33,7 +33,7 @@ namespace BlueScript {
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.Null;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.VariableNumStrListDateBool, enVariableDataType.String };
+        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List_String_Numeral_Date_or_Bool, enVariableDataType.String };
         public override bool EndlessArgs => false;
 
 
@@ -44,7 +44,7 @@ namespace BlueScript {
             switch (attvar.Attributes[1].ValueString.ToLower()) {
 
                 case "num":
-                    attvar.Attributes[0].Type = enVariableDataType.Number;
+                    attvar.Attributes[0].Type = enVariableDataType.Numeral;
                     break;
                 case "str":
                     attvar.Attributes[0].Type = enVariableDataType.String;
