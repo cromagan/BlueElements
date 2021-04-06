@@ -414,47 +414,64 @@ namespace BlueDatabase {
         //    return Result.TrimEnd(", ") + "}";
         //}
         public override string ToString() {
+            try
+            {
 
-            var shortener = GetShortener();
+                var shortener = GetShortener();
 
-            var Result = "{";
-            Result = Result + "sho=" + shortener.ToNonCritical() + ", ";
-            Result = Result + "dest=" + _Verzeichnis.ToNonCritical() + ", ";
-            Result = Result + "typ=" + (int)_Typ + ", ";
-            Result = Result + "let=" + _LastExportTimeUTC.ToString(Constants.Format_Date5) + ", ";
+                var Result = "{";
+                Result = Result + "sho=" + shortener.ToNonCritical() + ", ";
+                Result = Result + "dest=" + _Verzeichnis.ToNonCritical() + ", ";
+                Result = Result + "typ=" + (int)_Typ + ", ";
+                Result = Result + "let=" + _LastExportTimeUTC.ToString(Constants.Format_Date5) + ", ";
 
-            Result = Result + "itv=" + _Intervall + ", ";
+                Result = Result + "itv=" + _Intervall + ", ";
 
-            if (_Typ == enExportTyp.DatenbankCSVFormat || _Typ == enExportTyp.DatenbankHTMLFormat || _Typ == enExportTyp.DatenbankOriginalFormat) {
-                Result = Result + "aud=" + _AutomatischLöschen + ", ";
+                if (_Typ == enExportTyp.DatenbankCSVFormat || _Typ == enExportTyp.DatenbankHTMLFormat || _Typ == enExportTyp.DatenbankOriginalFormat)
+                {
+                    Result = Result + "aud=" + _AutomatischLöschen + ", ";
 
 
-                if (_Typ != enExportTyp.DatenbankOriginalFormat) {
-                    Result = Result + "exc=" + _ExportSpaltenAnsicht + ", ";
-                }
-
-            } else {
-                Result = Result + "exid=" + _ExportFormularID.ToNonCritical() + ", ";
-            }
-
-            if (Filter.Count > 0) {
-                Result = Result + "flt=" + Filter + ", ";
-            }
-
-            if (_BereitsExportiert.Count > 0) {
-                Result += "exp=";
-                foreach (var thise in _BereitsExportiert) {
-                    if (!string.IsNullOrEmpty(shortener) && thise.StartsWith(shortener)) {
-                        Result = Result + "@" + thise.TrimStart(shortener) + "#";
-                    } else {
-                        Result = Result + thise + "#";
+                    if (_Typ != enExportTyp.DatenbankOriginalFormat)
+                    {
+                        Result = Result + "exc=" + _ExportSpaltenAnsicht + ", ";
                     }
+
+                }
+                else
+                {
+                    Result = Result + "exid=" + _ExportFormularID.ToNonCritical() + ", ";
                 }
 
-                Result = Result.TrimEnd("#") + ", ";
-            }
+                if (Filter.Count > 0)
+                {
+                    Result = Result + "flt=" + Filter + ", ";
+                }
 
-            return Result.TrimEnd(", ") + "}";
+                if (_BereitsExportiert.Count > 0)
+                {
+                    Result += "exp=";
+                    foreach (var thise in _BereitsExportiert)
+                    {
+                        if (!string.IsNullOrEmpty(shortener) && thise.StartsWith(shortener))
+                        {
+                            Result = Result + "@" + thise.TrimStart(shortener) + "#";
+                        }
+                        else
+                        {
+                            Result = Result + thise + "#";
+                        }
+                    }
+
+                    Result = Result.TrimEnd("#") + ", ";
+                }
+
+                return Result.TrimEnd(", ") + "}";
+            }
+            catch
+            {
+                return ToString();
+            }
         }
 
         private string GetShortener() {

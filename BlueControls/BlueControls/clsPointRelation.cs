@@ -118,7 +118,7 @@ namespace BlueControls {
                             }
                         }
                         if (!added) {
-                            Develop.DebugPrint(enFehlerArt.Warnung, "Punkt nicht gefunden: " + pair.Value);
+                            Develop.DebugPrint(enFehlerArt.Info, "Punkt nicht gefunden: " + pair.Value);
                         }
 
                         break;
@@ -543,8 +543,8 @@ namespace BlueControls {
             if (R1._relationtype != R2._relationtype) { return false; }
 
 
-            if (R1._Richtmaß.Count > -1 & R1._Richtmaß[0] != R2._Richtmaß[0]) { return false; }
-            if (R1._Richtmaß.Count > 0 & R1._Richtmaß[1] != R2._Richtmaß[1]) { return false; }
+            if (R1._Richtmaß.Count > 0 && R1._Richtmaß[0] != R2._Richtmaß[0]) { return false; }
+            if (R1._Richtmaß.Count > 1 && R1._Richtmaß[1] != R2._Richtmaß[1]) { return false; }
 
             return UsesSamePoints(R1, R2);
         }
