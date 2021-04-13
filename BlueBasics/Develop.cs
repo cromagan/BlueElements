@@ -169,7 +169,10 @@ namespace BlueBasics {
         public static void DebugPrint(enFehlerArt art, string meldung) {
             lock (_SyncLockObject) {
                 try {
-                    if (_IsTraceLogging) { return; }
+                    if (_IsTraceLogging) {
+                        if (art == enFehlerArt.Fehler) { AbortExe(); }
+                        return;
+                    }
                     _IsTraceLogging = true;
 
                     if (art == enFehlerArt.Fehler) { _LastDebugMessage = string.Empty; }
@@ -340,7 +343,9 @@ namespace BlueBasics {
         private static void CloseAfter12Hours(object sender, System.EventArgs e) {
             if (DateTime.Now.Subtract(_ProgrammStarted).TotalHours > 12) {
                 if (IsDevelopment()) { return; }
-                DebugPrint(enFehlerArt.Fehler, "Das Programm wird nach 12 Stunden automatisch geschlossen.");
+                DebugPrint(enFehlerArt.Info, "Das Programm wird nach 12 Stunden automatisch geschlossen.");
+                TraceLogging_End();
+                AbortExe();
             }
         }
 
