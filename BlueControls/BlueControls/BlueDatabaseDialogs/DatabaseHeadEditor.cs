@@ -523,6 +523,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             x.RepairAfterParse();
 
+            x.ColumnArrangements[1].ShowAllColumns(x);
             x.ColumnArrangements[1].HideSystemColumns();
 
 
@@ -625,7 +626,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
             tblUndo.Database = x;
-            tblUndo.Arrangement = 0;
+            tblUndo.Arrangement = 1;
         }
 
         private void btnSperreAufheben_Click(object sender, System.EventArgs e) {

@@ -277,7 +277,7 @@ namespace BlueScript {
             get => _ValueString;
             set {
                 if (Readonly) { return; }
-                _ValueString = value;
+                _ValueString = value.Replace("\"", "''");
             }
         }
 
@@ -285,7 +285,7 @@ namespace BlueScript {
             get => _ValueString.SplitByCRToList();
             set {
                 if (Readonly) { return; }
-                _ValueString = value.JoinWithCr();
+                ValueString = value.JoinWithCr();
             }
         }
 
@@ -297,7 +297,7 @@ namespace BlueScript {
             get => DoubleParse(_ValueString);
             set {
                 if (Readonly) { return; }
-                _ValueString = value.ToString();
+                ValueString = value.ToString();
             }
         }
 
