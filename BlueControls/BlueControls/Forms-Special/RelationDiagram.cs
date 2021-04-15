@@ -59,7 +59,7 @@ namespace BlueControls.Forms {
         private void Hinzu_Click(object sender, System.EventArgs e) {
 
             var il = new ItemCollectionList();
-            il.AddRange(_Database.Column[0].Contents(null));
+            il.AddRange(_Database.Column[0].Contents());
             il.Sort();
             il.CheckBehavior = enCheckBehavior.SingleSelection;
 

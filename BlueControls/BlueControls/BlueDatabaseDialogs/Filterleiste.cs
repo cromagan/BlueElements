@@ -470,7 +470,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             //f.Enabled = false;
 
-            var autofilter = new AutoFilter(f.Filter.Column, _TableView.Filter);
+            var autofilter = new AutoFilter(f.Filter.Column, _TableView.Filter, _TableView.PinnedRows);
             var p = f.PointToScreen(Point.Empty);
 
             autofilter.Position_LocateToPosition(new Point(p.X, p.Y + f.Height));

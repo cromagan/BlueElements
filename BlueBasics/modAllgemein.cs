@@ -436,9 +436,9 @@ namespace BlueBasics {
 
         public static void CollectGarbage() {
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
-            GC.WaitForPendingFinalizers();
-            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
-            GC.WaitForFullGCComplete();
+            //GC.WaitForPendingFinalizers();
+            //GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
+            GC.WaitForFullGCComplete(1000);
         }
 
         public static string UserName() {

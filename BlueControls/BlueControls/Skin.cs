@@ -1082,7 +1082,7 @@ namespace BlueControls {
         public static List<string> AllStyles() {
             if (StyleDB == null) { InitStyles(); }
 
-            return StyleDB?.Column[0].Contents(null);
+            return StyleDB?.Column[0].Contents(null, null);
         }
 
 

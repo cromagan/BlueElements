@@ -66,6 +66,12 @@ namespace BluePaint
         /// </summary>
         /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
         public new virtual void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) { }
+     
+        /// <summary>
+        /// 
+        /// </summary>
+        public virtual void OnToolChanging() { }
+
 
         /// <summary>
         /// 
@@ -74,8 +80,8 @@ namespace BluePaint
         public virtual void DoAdditionalDrawing(BlueControls.EventArgs.AdditionalDrawing e, Bitmap OriginalPic) { }
 
         /// <summary>
-        /// Falls es während einer Makro aufzeichnung benutzt werden kann, gibt es eine eindeutige kennug zurück.
-        /// Wenn keine BEnutzung möglich ist, wird string.empty zurückgegebenm
+        /// Falls es während einer Makro aufzeichnung benutzt werden kann, gibt es eine eindeutige Kennung zurück.
+        /// Wenn keine Benutzung möglich ist, wird string.empty zurückgegebenm
         /// </summary>
         /// <returns></returns>
         public virtual string MacroKennung()

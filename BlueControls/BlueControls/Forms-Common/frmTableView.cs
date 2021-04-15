@@ -875,8 +875,8 @@ namespace BlueControls.Forms {
 
                 case "ColumnContentDelete":
                     if (Column != null) {
-                        if (MessageBox.Show("Angezeite Inhalt dieser Spalte löschen?", enImageCode.Frage, "Ja", "Nein") == 0) {
-                            Column.DeleteContents(TableView.Filter);
+                        if (MessageBox.Show("Angezeite Inhalte dieser Spalte löschen?", enImageCode.Frage, "Ja", "Nein") == 0) {
+                            Column.DeleteContents(TableView.Filter, TableView.PinnedRows);
                         }
                     }
 

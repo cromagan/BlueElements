@@ -213,7 +213,7 @@ namespace BlueControls.Controls {
                 return;
             }
 
-            var List_FilterString = Filter.Column.Autofilter_ItemList(TableView.Filter);
+            var List_FilterString = Filter.Column.Autofilter_ItemList(TableView.Filter, TableView.PinnedRows);
 
             if (List_FilterString.Count == 0) {
 

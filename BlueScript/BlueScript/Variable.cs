@@ -395,6 +395,19 @@ namespace BlueScript {
             return v.ValueString;
         }
 
+        /// <summary>
+        /// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten string.Empty
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static bool GetBool(this List<Variable> vars, string name) {
+            var v = vars.Get(name);
+            if (v == null) { return false; }
+            return v.ValueBool;
+        }
+
+
 
         /// <summary>
         /// Erstellt bei Bedarf eine neue Variable und setzt den Wert und auch ReadOnly

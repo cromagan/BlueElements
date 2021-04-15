@@ -35,7 +35,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
 
-        public AutoFilter(ColumnItem vColumn, FilterCollection vFilter) : base(enDesign.Form_AutoFilter) {
+        public AutoFilter(ColumnItem column, FilterCollection filter, List<RowItem> pinned) : base(enDesign.Form_AutoFilter) {
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
             InitializeComponent();
 
@@ -58,19 +58,19 @@ namespace BlueControls.BlueDatabaseDialogs {
             SetStyle(System.Windows.Forms.ControlStyles.UserPaint, true);
 
 
-            Column = vColumn;
+            Column = column;
 
-            GenerateAll(vFilter);
+            GenerateAll(filter, pinned);
 
 
         }
 
 
-        public void GenerateAll(FilterCollection filter) {
+        public void GenerateAll(FilterCollection filter, List<RowItem> pinned) {
 
             var nochOk = true;
 
-            var List_FilterString = Column.Autofilter_ItemList(filter);
+            var List_FilterString = Column.Autofilter_ItemList(filter, pinned);
 
 
             var F = Skin.GetBlueFont(enDesign.Table_Cell, enStates.Standard);

@@ -79,7 +79,6 @@ namespace BluePaint
             this.grpZeichnen.SuspendLayout();
             this.grpSteuerung.SuspendLayout();
             this.tabExperimentell.SuspendLayout();
-            this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Split)).BeginInit();
             this.Split.Panel1.SuspendLayout();
             this.Split.Panel2.SuspendLayout();
@@ -102,6 +101,7 @@ namespace BluePaint
             // 
             // Tab_Start
             // 
+            this.Tab_Start.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.Tab_Start.Controls.Add(this.grpBearbteitung);
             this.Tab_Start.Controls.Add(this.grpDatei);
             this.Tab_Start.Location = new System.Drawing.Point(4, 25);
@@ -112,6 +112,7 @@ namespace BluePaint
             // 
             // grpBearbteitung
             // 
+            this.grpBearbteitung.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpBearbteitung.CausesValidation = false;
             this.grpBearbteitung.Controls.Add(this.btnStop);
             this.grpBearbteitung.Controls.Add(this.btnAufnahme);
@@ -119,6 +120,8 @@ namespace BluePaint
             this.grpBearbteitung.Location = new System.Drawing.Point(544, 0);
             this.grpBearbteitung.Name = "grpBearbteitung";
             this.grpBearbteitung.Size = new System.Drawing.Size(248, 81);
+            this.grpBearbteitung.TabIndex = 0;
+            this.grpBearbteitung.TabStop = false;
             this.grpBearbteitung.Text = "Serienbearbeitung";
             // 
             // btnStop
@@ -144,6 +147,7 @@ namespace BluePaint
             // 
             // grpDatei
             // 
+            this.grpDatei.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpDatei.CausesValidation = false;
             this.grpDatei.Controls.Add(this.btnEinfügen);
             this.grpDatei.Controls.Add(this.btnCopy);
@@ -156,6 +160,8 @@ namespace BluePaint
             this.grpDatei.Location = new System.Drawing.Point(0, 0);
             this.grpDatei.Name = "grpDatei";
             this.grpDatei.Size = new System.Drawing.Size(544, 81);
+            this.grpDatei.TabIndex = 1;
+            this.grpDatei.TabStop = false;
             this.grpDatei.Text = "Datei";
             // 
             // btnEinfügen
@@ -234,6 +240,7 @@ namespace BluePaint
             // 
             // Tab_Werkzeug
             // 
+            this.Tab_Werkzeug.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.Tab_Werkzeug.Controls.Add(this.btnOK);
             this.Tab_Werkzeug.Controls.Add(this.grpNeu);
             this.Tab_Werkzeug.Controls.Add(this.grpSonstiges);
@@ -257,6 +264,7 @@ namespace BluePaint
             // 
             // grpNeu
             // 
+            this.grpNeu.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpNeu.CausesValidation = false;
             this.grpNeu.Controls.Add(this.btnDummy);
             this.grpNeu.Controls.Add(this.btnScreenshot);
@@ -264,6 +272,8 @@ namespace BluePaint
             this.grpNeu.Location = new System.Drawing.Point(632, 0);
             this.grpNeu.Name = "grpNeu";
             this.grpNeu.Size = new System.Drawing.Size(120, 81);
+            this.grpNeu.TabIndex = 2;
+            this.grpNeu.TabStop = false;
             this.grpNeu.Text = "Neu";
             // 
             // btnDummy
@@ -288,6 +298,7 @@ namespace BluePaint
             // 
             // grpSonstiges
             // 
+            this.grpSonstiges.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpSonstiges.CausesValidation = false;
             this.grpSonstiges.Controls.Add(this.btnGrößeÄndern);
             this.grpSonstiges.Controls.Add(this.btnKontrast);
@@ -298,6 +309,8 @@ namespace BluePaint
             this.grpSonstiges.Location = new System.Drawing.Point(328, 0);
             this.grpSonstiges.Name = "grpSonstiges";
             this.grpSonstiges.Size = new System.Drawing.Size(304, 81);
+            this.grpSonstiges.TabIndex = 3;
+            this.grpSonstiges.TabStop = false;
             this.grpSonstiges.Text = "Sonstiges";
             // 
             // btnGrößeÄndern
@@ -352,6 +365,7 @@ namespace BluePaint
             // 
             // grpZeichnen
             // 
+            this.grpZeichnen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpZeichnen.CausesValidation = false;
             this.grpZeichnen.Controls.Add(this.btnZeichnen);
             this.grpZeichnen.Controls.Add(this.btnRadiergummi);
@@ -359,6 +373,8 @@ namespace BluePaint
             this.grpZeichnen.Location = new System.Drawing.Point(192, 0);
             this.grpZeichnen.Name = "grpZeichnen";
             this.grpZeichnen.Size = new System.Drawing.Size(136, 81);
+            this.grpZeichnen.TabIndex = 4;
+            this.grpZeichnen.TabStop = false;
             this.grpZeichnen.Text = "Zeichnen";
             // 
             // btnZeichnen
@@ -383,6 +399,7 @@ namespace BluePaint
             // 
             // grpSteuerung
             // 
+            this.grpSteuerung.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpSteuerung.CausesValidation = false;
             this.grpSteuerung.Controls.Add(this.btn100);
             this.grpSteuerung.Controls.Add(this.btnZoomFit);
@@ -391,6 +408,8 @@ namespace BluePaint
             this.grpSteuerung.Location = new System.Drawing.Point(0, 0);
             this.grpSteuerung.Name = "grpSteuerung";
             this.grpSteuerung.Size = new System.Drawing.Size(192, 81);
+            this.grpSteuerung.TabIndex = 5;
+            this.grpSteuerung.TabStop = false;
             this.grpSteuerung.Text = "Steuerung";
             // 
             // btn100
@@ -426,6 +445,7 @@ namespace BluePaint
             // 
             // tabExperimentell
             // 
+            this.tabExperimentell.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.tabExperimentell.Controls.Add(this.groupBox1);
             this.tabExperimentell.Location = new System.Drawing.Point(4, 25);
             this.tabExperimentell.Name = "tabExperimentell";
@@ -435,16 +455,19 @@ namespace BluePaint
             // 
             // groupBox1
             // 
+            this.groupBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.groupBox1.CausesValidation = false;
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Left;
             this.groupBox1.Location = new System.Drawing.Point(0, 0);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(136, 81);
+            this.groupBox1.TabIndex = 0;
+            this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Experimentel";
             // 
             // P
             // 
-            this.P.AlwaysSmooth = false;
+            this.P.BMP = null;
             this.P.Dock = System.Windows.Forms.DockStyle.Fill;
             this.P.Location = new System.Drawing.Point(0, 0);
             this.P.Name = "P";
@@ -484,6 +507,8 @@ namespace BluePaint
             this.BLupe.Location = new System.Drawing.Point(0, 176);
             this.BLupe.Name = "BLupe";
             this.BLupe.Size = new System.Drawing.Size(275, 164);
+            this.BLupe.TabIndex = 0;
+            this.BLupe.TabStop = false;
             this.BLupe.Text = "Information";
             // 
             // InfoText
@@ -491,6 +516,7 @@ namespace BluePaint
             this.InfoText.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.InfoText.CausesValidation = false;
             this.InfoText.Location = new System.Drawing.Point(8, 16);
             this.InfoText.Name = "InfoText";
             this.InfoText.Size = new System.Drawing.Size(256, 144);
@@ -527,7 +553,6 @@ namespace BluePaint
             this.grpZeichnen.ResumeLayout(false);
             this.grpSteuerung.ResumeLayout(false);
             this.tabExperimentell.ResumeLayout(false);
-            this.groupBox1.ResumeLayout(false);
             this.Split.Panel1.ResumeLayout(false);
             this.Split.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.Split)).EndInit();

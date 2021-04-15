@@ -492,7 +492,7 @@ namespace BlueDatabase {
         public List<string> GetUcaseNamesSortedByLenght() {
 
             if (_UcaseNamesSortedByLenght != null) { return _UcaseNamesSortedByLenght; }
-            var tmp = Contents(null);
+            var tmp = Contents(null, null);
 
 
             for (var Z = 0; Z < tmp.Count; Z++) {
@@ -1148,12 +1148,18 @@ namespace BlueDatabase {
             return ColumnCollection.ParsableColumnKey(this);
         }
 
-        public List<string> Contents(FilterCollection Filter) {
+        public List<string> Contents() => Contents(null, null);
+
+        public List<string> Contents(FilterCollection filter, List<RowItem> pinned) {
             var list = new List<string>();
 
             foreach (var ThisRowItem in Database.Row) {
                 if (ThisRowItem != null) {
-                    if (ThisRowItem.MatchesTo(Filter)) {
+
+                    var add = ThisRowItem.MatchesTo(filter);
+                    if (!add && pinned != null) { add = pinned.Contains(ThisRowItem); }
+
+                    if (add) {
                         if (_MultiLine) {
                             list.AddRange(ThisRowItem.CellGetList(this));
                         } else {
@@ -1169,10 +1175,10 @@ namespace BlueDatabase {
         }
 
 
-        public void DeleteContents(FilterCollection Filter) {
+        public void DeleteContents(FilterCollection filter, List<RowItem> pinned) {
 
             foreach (var ThisRowItem in Database.Row) {
-                if (ThisRowItem != null && ThisRowItem.MatchesTo(Filter)) { ThisRowItem.CellSet(this, ""); }
+                if (ThisRowItem != null && ThisRowItem.MatchesTo(filter)) { ThisRowItem.CellSet(this, ""); }
             }
         }
 
@@ -2543,16 +2549,16 @@ namespace BlueDatabase {
         }
 
 
-        public List<string> Autofilter_ItemList(FilterCollection vFilter) {
-            if (vFilter == null || vFilter.Count < 0) { return Contents(null); }
+        public List<string> Autofilter_ItemList(FilterCollection filter, List<RowItem> pinned) {
+            if (filter == null || filter.Count < 0) { return Contents(null, pinned); }
 
             var tfilter = new FilterCollection(Database);
 
-            foreach (var ThisFilter in vFilter) {
+            foreach (var ThisFilter in filter) {
                 if (ThisFilter != null && this != ThisFilter.Column) { tfilter.Add(ThisFilter); }
             }
 
-            return Contents(tfilter);
+            return Contents(tfilter, pinned);
         }
 
         public static enEditTypeTable UserEditDialogTypeInTable(ColumnItem vColumn, bool DoDropDown) {

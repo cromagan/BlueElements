@@ -54,6 +54,11 @@ namespace BluePaint
         }
 
 
+        public override void OnToolChanging() {
+            WollenSieDenZuschnittÜbernehmen();
+        }
+
+
         public override void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap OriginalPic)
         {
             OnDoInvalidate();
@@ -158,6 +163,8 @@ namespace BluePaint
         private void AutoZ_Click(object sender, System.EventArgs e)
         {
 
+            WollenSieDenZuschnittÜbernehmen();
+
             var _Pic = base.OnNeedCurrentPic();
             OnZoomFit();
 
@@ -170,6 +177,12 @@ namespace BluePaint
 
             OnDoInvalidate();
 
+        }
+
+        private void WollenSieDenZuschnittÜbernehmen() {
+            if (Links.Value <=0 && Recht.Value >= 0 && Oben.Value <= 0 && Unten.Value >= 0) { return; }          
+            if (MessageBox.Show("Soll der <b>aktuelle</b> Zuschnitt<br>übernommen werden?", enImageCode.Zuschneiden, "Ja","Nein") ==1) { return; }
+            ZuschnittOK_Click(null, System.EventArgs.Empty);
         }
 
         public void Set(int Left, int Top, int Right, int Bottom)

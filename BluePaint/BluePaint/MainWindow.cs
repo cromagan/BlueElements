@@ -137,6 +137,7 @@ namespace BluePaint
 
             if (CurrentTool != null)
             {
+                CurrentTool.OnToolChanging();
                 CurrentTool.Dispose();
                 Split.Panel1.Controls.Remove(CurrentTool);
 
@@ -388,6 +389,7 @@ namespace BluePaint
 
         private void OK_Click(object sender, System.EventArgs e)
         {
+            SetTool(null, false); // um OnToolChangeAuszulösen
             Close();
         }
 
@@ -489,6 +491,7 @@ namespace BluePaint
 
         private void Speichern()
         {
+            SetTool(null, false); // um OnToolChangeAuszulösen
             if (_filename == "*")
             {
                 btnSaveAs_Click(null, System.EventArgs.Empty);
@@ -608,6 +611,7 @@ namespace BluePaint
 
         private void btnCopy_Click(object sender, System.EventArgs e)
         {
+            SetTool(null, false); // um OnToolChangeAuszulösen
             if (P.BMP == null)
             {
                 MessageBox.Show("Kein Bild vorhanden.");

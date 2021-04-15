@@ -1217,9 +1217,9 @@ namespace BlueControls.ItemCollection {
                     {
                         new FilterItem(cc, enFilterType.Istgleich_GroßKleinEgal, checkedItemsAtRow.CellGetString(cc))
                     };
-                    l.AddRange(column.Contents(F));
+                    l.AddRange(column.Contents(F, null));
                 } else {
-                    l.AddRange(column.Contents(null));
+                    l.AddRange(column.Contents());
                 }
             }
 
@@ -1246,7 +1246,7 @@ namespace BlueControls.ItemCollection {
 
                 case enDataFormat.Values_für_LinkedCellDropdown:
                     var DB2 = column.LinkedDatabase();
-                    l.AddRange(DB2.Column[0].Contents(null));
+                    l.AddRange(DB2.Column[0].Contents());
                     if (l.Count == 0) {
                         Notification.Show("Keine Zeilen in der Quell-Datenbank vorhanden.", enImageCode.Information);
                     }

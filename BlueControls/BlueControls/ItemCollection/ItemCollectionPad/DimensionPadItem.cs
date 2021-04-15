@@ -88,8 +88,8 @@ namespace BlueControls.ItemCollection {
         public DimensionPadItem(ItemCollectionPad parent, string internalname, PointM cPoint1, PointM cPoint2, int AbstandinMM) : base(parent, internalname) {
 
 
-            Point1.SetTo(cPoint1.X, cPoint1.Y);
-            Point2.SetTo(cPoint2.X, cPoint2.Y);
+            if (cPoint1 != null) { Point1.SetTo(cPoint1.X, cPoint1.Y); }
+            if (cPoint2 != null) { Point2.SetTo(cPoint2.X, cPoint2.Y); }
 
             ComputeData();
 

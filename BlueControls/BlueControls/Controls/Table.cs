@@ -2055,7 +2055,7 @@ namespace BlueControls.Controls {
             Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
             //OnBeforeAutoFilterShow(new ColumnEventArgs(columnviewitem.Column));
 
-            _AutoFilter = new AutoFilter(columnviewitem.Column, Filter);
+            _AutoFilter = new AutoFilter(columnviewitem.Column, Filter, PinnedRows);
 
 
             _AutoFilter.Position_LocateToPosition(new Point(screenx + (int)columnviewitem.OrderTMP_Spalte_X1, screeny + HeadSize()));

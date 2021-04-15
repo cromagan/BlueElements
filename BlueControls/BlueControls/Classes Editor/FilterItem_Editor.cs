@@ -52,7 +52,7 @@ namespace BlueControls.Classes_Editor {
             var tmpfc = new FilterCollection(Item.Database);
             if (Item.FilterType != enFilterType.KeinFilter) { tmpfc.Add(Item); }
 
-            autofilter = new AutoFilter(c, tmpfc);
+            autofilter = new AutoFilter(c, tmpfc, null);
 
             var p = FiltWahl.PointToScreen(Point.Empty);
 
