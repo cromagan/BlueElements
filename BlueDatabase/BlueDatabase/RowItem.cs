@@ -68,7 +68,6 @@ namespace BlueDatabase {
 
         #endregion
 
-
         #region  Properties 
         public int Key { get; }
 
@@ -275,21 +274,16 @@ namespace BlueDatabase {
             _tmpQuickInfo = null;
         }
 
-
-
         private void VariableToCell(ColumnItem thisCol, List<Variable> vars) {
-
             var s = vars.Get(thisCol.Name);
 
             if (s == null) { return; }
             if (s.Readonly) { return; }
 
-
             if (thisCol.MultiLine) {
                 CellSet(thisCol, s.ValueString);
                 return;
             }
-
 
             switch (thisCol.Format) {
                 case enDataFormat.Bit:
@@ -322,9 +316,7 @@ namespace BlueDatabase {
             }
         }
 
-
         public static Variable CellToVariable(ColumnItem thisCol, RowItem r) {
-
             if (!thisCol.Format.CanBeCheckedByRules()) { return null; }
 
             var ro = !thisCol.Format.CanBeChangedByRules();
@@ -356,20 +348,16 @@ namespace BlueDatabase {
                     return new Variable(thisCol.Name, r.CellGetString(thisCol), enVariableDataType.String, ro, false, "Spalte: " + thisCol.ReadableText());
 
             }
-
-
         }
-
-
 
         /// <summary>
         /// Führt alle Regeln aus und löst das Ereignis DoSpecialRules aus. Setzt ansonsten keine Änderungen, wie z.B. SysCorrect oder Runden-Befehle.
         /// </summary>
         /// <returns>Gibt Regeln, die einen Fehler verursachen zurück. z.B. SPALTE1|Die Splate darf nicht leer sein.</returns>
         private BlueScript.Script DoRules(bool onlyTest, string startRoutine) {
-
-            var vars = new List<Variable>
-            {
+            try {
+                var vars = new List<Variable>
+                 {
 
                 //var x = new BeginnRowAutomaticEventArgs(this, vars);
 
@@ -377,122 +365,71 @@ namespace BlueDatabase {
                 new Variable("Startroutine", startRoutine, enVariableDataType.String, true, false, "ACHTUNG: Keinesfalls dürfen Startroutinenabhängig Werte verändert werden.\r\nMögliche Werte: new row, value changed, script testing, manual check, to be sure")
             };
 
-
-
-            #region Variablen für Skript erstellen
-            foreach (var thisCol in Database.Column) {
-                var v = CellToVariable(thisCol, this);
-                if (v != null) { vars.Add(v); }
-            }
-
-
-            vars.Add(new Variable("User", modAllgemein.UserName(), enVariableDataType.String, true, false, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
-
-
-            vars.Add(new Variable("Usergroup", Database.UserGroup, enVariableDataType.String, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
-
-
-
-
-            if (Database.IsAdministrator()) {
-                vars.Add(new Variable("Administrator", "true", enVariableDataType.Bool, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
-            } else {
-                vars.Add(new Variable("Administrator", "false", enVariableDataType.Bool, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
-            }
-
-
-
-            //if (Database.ReadOnly) {
-            //    vars.Add(new Variable("ReadOnly", "true", enVariableDataType.Bool, true, false, "Gibt an, ob die Datenbank schreibgeschützt));
-            //}
-            //else {
-            //    vars.Add(new Variable("ReadOnly", "false", enVariableDataType.Bool, true, false));
-            //}
-
-            vars.Add(new Variable("Filename", Database.Filename, enVariableDataType.String, true, true, string.Empty));
-
-            #endregion
-
-
-            //if (BlueScript.Script.Comands == null) { }
-            //BlueScript.Script.AddScriptComands();
-            //Database.AddScriptComands();
-            //]
-
-
-            var script = new BlueScript.Script(vars) {
-                ScriptText = Database.RulesScript
-            };
-
-            script.Parse();
-
-            if (!onlyTest) {
-
-                if (!string.IsNullOrEmpty(script.Error)) {
-                    return script;
-                }
-
+                #region Variablen für Skript erstellen
                 foreach (var thisCol in Database.Column) {
-                    VariableToCell(thisCol, vars);
+                    var v = CellToVariable(thisCol, this);
+                    if (v != null) { vars.Add(v); }
                 }
 
 
-                //Develop.DebugPrint_NichtImplementiert();
-
-                //foreach (var ThisRule in Database.Rules) {
-                //    if (ThisRule != null) {
-                //        if (ThisRule.TrifftZu(this)) {
-                //            var tmpMessage = ThisRule.Execute(this, true);
-
-                //            if (!string.IsNullOrEmpty(tmpMessage)) {
-                //                var tmpColumNames = tmpMessage.ReduceToMulti("'#Spalte:*'");
-                //                if (tmpMessage.Contains("<DELETE>")) { tmpMessage = tmpMessage.Substring(0, tmpMessage.IndexOf("<DELETE>")); }
-
-                //                foreach (var t in tmpColumNames) {
-                //                    var Column = Database.Column[t];
-                //                    if (Column != null) { tmpMessage = tmpMessage.Replace("#Spalte:" + Column.Name, Column.ReadableText(), RegexOptions.IgnoreCase); }
-                //                }
+                vars.Add(new Variable("User", modAllgemein.UserName(), enVariableDataType.String, true, false, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
 
 
-                //                if (tmpColumNames.Count > 0) {
-                //                    foreach (var t in tmpColumNames) {
-                //                        ColumnAndErrors.Add(t + "|" + tmpMessage);
-                //                    }
-                //                }
-                //                else {
-                //                    ColumnAndErrors.Add("|" + tmpMessage); // Sie gehören zur Nutzergruppe...
-                //                }
+                vars.Add(new Variable("Usergroup", Database.UserGroup, enVariableDataType.String, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
 
-                //            }
-                //        }
-                //    }
+
+
+
+                if (Database.IsAdministrator()) {
+                    vars.Add(new Variable("Administrator", "true", enVariableDataType.Bool, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
+                } else {
+                    vars.Add(new Variable("Administrator", "false", enVariableDataType.Bool, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
+                }
+
+
+
+                //if (Database.ReadOnly) {
+                //    vars.Add(new Variable("ReadOnly", "true", enVariableDataType.Bool, true, false, "Gibt an, ob die Datenbank schreibgeschützt));
+                //}
+                //else {
+                //    vars.Add(new Variable("ReadOnly", "false", enVariableDataType.Bool, true, false));
                 //}
 
-                // Gucken, ob noch ein Fehler da ist, der von einer besonderen anderen Routine kommt. Beispiel Bildzeichen-Liste: Bandart und Einläufe
-                var e = new DoRowAutomaticEventArgs(this);
-                OnDoSpecialRules(e);
+                vars.Add(new Variable("Filename", Database.Filename, enVariableDataType.String, true, true, string.Empty));
 
+                #endregion
 
-                //if (!string.IsNullOrEmpty(e.Feedback) && e.FeedbackColumn == null) { e.FeedbackColumn = Database.Column[0]; }
+                var script = new BlueScript.Script(vars) {
+                    ScriptText = Database.RulesScript
+                };
 
-                //if (e.FeedbackColumn != null) {
-                //    if (string.IsNullOrEmpty(e.Feedback)) { e.Feedback = "Allgemeiner Fehler in '" + e.FeedbackColumn.ReadableText() + "'."; }
-                //    ColumnAndErrors.Add(e.FeedbackColumn.Name + "|" + e.Feedback);
-                //}
+                script.Parse();
 
+                if (!onlyTest) {
+
+                    if (!string.IsNullOrEmpty(script.Error)) {
+                        return script;
+                    }
+
+                    foreach (var thisCol in Database.Column) {
+                        VariableToCell(thisCol, vars);
+                    }
+
+                    // Gucken, ob noch ein Fehler da ist, der von einer besonderen anderen Routine kommt. Beispiel Bildzeichen-Liste: Bandart und Einläufe
+                    var e = new DoRowAutomaticEventArgs(this);
+                    OnDoSpecialRules(e);
+                }
+
+                return script;
+
+            } catch {
+                return DoRules(onlyTest, startRoutine);
             }
-
-            return script;
-
-            //return ColumnAndErrors.SortedDistinctList();
         }
-
 
         public (bool didSuccesfullyCheck, string error, BlueScript.Script script) DoAutomatic(bool onlyTest, string startroutine) {
             return DoAutomatic(false, false, onlyTest, startroutine);
         }
-
-
 
         /// <summary>
         /// Führt Regeln aus, löst Ereignisses, setzt SysCorrect und auch die initalwerte der Zellen.
@@ -503,9 +440,7 @@ namespace BlueDatabase {
         /// <param name="tryforsceonds"></param>
         /// <returns></returns>
         public (bool didSuccesfullyCheck, string error, BlueScript.Script script) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, float tryforsceonds, string startroutine) {
-
             if (Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
-
 
             var t = DateTime.Now;
             do {
@@ -567,7 +502,6 @@ namespace BlueDatabase {
                 }
             }
 
-
             var cols = new List<string>();
             //var _Info = new List<string>();
             var _InfoTXT = "<b><u>" + CellGetString(Database.Column[0]) + "</b></u><br><br>";
@@ -592,46 +526,11 @@ namespace BlueDatabase {
             }
             OnRowChecked(new RowCheckedEventArgs(this, cols));
 
-
             return (true, _InfoTXT, script);
-            ;
-
         }
-
-
-
-        ///// <summary>
-        ///// Überprüft auf ungültige Werte in einer Zelle und korrigiert diese. Es werden keine Regeln ausgelöst.
-        ///// </summary>
-        //internal void Repair()
-        //{
-        //    if (Database.Column.SysCorrect == null) { Database.Column.GetSystems(); }
-
-        //    if (Key < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Key < 0"); }
-
-        //    if (Database.ReadOnly) { return; }
-
-        //    if (CellIsNullOrEmpty(Database.Column.SysLocked))
-        //    {
-        //        Database.Cell.SystemSet(Database.Column.SysLocked, this, false.ToPlusMinus(), false);
-        //    }
-
-
-        //    if (CellIsNullOrEmpty(Database.Column.SysCorrect))
-        //    {
-        //        Database.Cell.SystemSet(Database.Column.SysCorrect, this, true.ToPlusMinus(), false);
-        //    }
-
-
-        //    if (CellIsNullOrEmpty(Database.Column.SysRowChangeDate))
-        //    {
-        //        Database.Cell.SystemSet(Database.Column.SysRowChangeDate, this, DateTime.Now.ToString(Constants.Format_Date5), false);
-        //    }
-        //}
 
         public bool MatchesTo(FilterItem Filter) {
             if (Filter != null) {
-
 
                 if (Filter.FilterType == enFilterType.KeinFilter || Filter.FilterType == enFilterType.GroßKleinEgal) { return true; } // Filter ohne Funktion
 
@@ -664,11 +563,6 @@ namespace BlueDatabase {
             return true;
         }
 
-
-
-
-
-
         private bool RowFilterMatch(string searchText) {
             if (string.IsNullOrEmpty(searchText)) { return true; }
 
@@ -686,7 +580,6 @@ namespace BlueDatabase {
             }
             return false;
         }
-
 
         public bool IsNullOrEmpty() {
 
@@ -708,10 +601,6 @@ namespace BlueDatabase {
             return Database.Cell.IsNullOrEmpty(Database.Column[columnName], this);
         }
 
-
-
-
-
         public bool CellIsNullOrEmpty(string columnName) {
             return Database.Cell.IsNullOrEmpty(Database.Column[columnName], this);
         }
@@ -719,38 +608,13 @@ namespace BlueDatabase {
             return Database.Cell.IsNullOrEmpty(column, this);
         }
 
-
-
-
-
         internal void OnRowChecked(RowCheckedEventArgs e) {
             RowChecked?.Invoke(this, e);
         }
 
-
         internal void OnDoSpecialRules(DoRowAutomaticEventArgs e) {
             DoSpecialRules?.Invoke(this, e);
         }
-
-        ///// <summary>
-        ///// Ersetzt Spaltennamen mit dem dementsprechenden Wert der Zelle. Format: &Spaltenname; Leere ZEllen werden mit 0 ersetzt.
-        ///// </summary>
-        ///// <param name="formel"></param>
-        ///// <returns></returns>
-        //public string ReplaceVariablesForMath(string formel) {
-
-        //    // Variablen ersetzen
-        //    foreach (var thisColumnItem in Database.Column) {
-        //        if (thisColumnItem != null) {
-        //            var w = "0";
-        //            if (!CellIsNullOrEmpty(thisColumnItem)) { w = CellGetString(thisColumnItem); }
-        //            formel = formel.Replace("&" + thisColumnItem.Name.ToUpper() + ";", w);
-        //        }
-
-        //    }
-
-        //    return formel;
-        //}
 
         /// <summary>
         /// Ersetzt Spaltennamen mit dem dementsprechenden Wert der Zelle. Format: &Spaltenname; oder &Spaltenname(L,8);
@@ -759,7 +623,6 @@ namespace BlueDatabase {
         /// <param name="fulltext">Bei TRUE wird der Text so zurückgegeben, wie er in der Zelle angezeigt werden würde: Mit Suffix und Ersetzungen. Zeilenumbrüche werden eleminiert!</param>
         /// <returns></returns>
         public string ReplaceVariables(string formel, bool fulltext, bool removeLineBreaks) {
-
             var erg = formel;
 
             // Variablen ersetzen
@@ -799,12 +662,8 @@ namespace BlueDatabase {
                 }
             }
 
-
             return erg;
         }
-
-
-
 
         /// <summary>
         /// Erstellt einen Sortierfähigen String eine Zeile
@@ -827,8 +686,6 @@ namespace BlueDatabase {
         }
 
         public string CaptionReadable() {
-
-
             var c = CellGetString(Database.Column.SysChapter);
 
             if (string.IsNullOrEmpty(c)) {
