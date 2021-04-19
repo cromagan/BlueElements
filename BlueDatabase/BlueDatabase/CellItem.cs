@@ -2,7 +2,7 @@
 // Authors: 
 // Christian Peter
 // 
-// Copyright (c) 2020 Christian Peter
+// Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
 // 
 // License: GNU Affero General Public License v3.0
@@ -182,7 +182,7 @@ namespace BlueDatabase {
                 case enDataFormat.FarbeInteger:
                     if (!string.IsNullOrEmpty(txt) && txt.IsFormat(enDataFormat.FarbeInteger)) {
                         var col = Color.FromArgb(int.Parse(txt));
-                        txt = col.ColorName();
+                        txt = col.ToHTMLCode().ToUpper();
                     }
                     txt = LanguageTool.ColumnReplace(txt, column, style);
                     break;

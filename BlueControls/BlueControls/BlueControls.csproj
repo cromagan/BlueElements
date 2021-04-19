@@ -133,6 +133,7 @@
     <Compile Include="Controls\ZoomPicWithPoints.Designer.cs">
       <DependentUpon>ZoomPicWithPoints.cs</DependentUpon>
     </Compile>
+    <Compile Include="Enums\enDesign.cs" />
     <Compile Include="Enums\enXY.cs" />
     <Compile Include="Enums\enFilterTypesToShow.cs" />
     <Compile Include="Enums\enGroupBoxStyle.cs" />
@@ -156,7 +157,6 @@
     <Compile Include="Enums\enMarkState.cs" />
     <Compile Include="Enums\enRahmenArt.cs" />
     <Compile Include="Enums\enRelationType.cs" />
-    <Compile Include="Enums\enDesign.cs" />
     <Compile Include="Enums\enStates.cs" />
     <Compile Include="Enums\enWndProc.cs" />
     <Compile Include="Enums\PadStyles.cs" />
@@ -247,7 +247,6 @@
     <Compile Include="Forms-Special\PictureView.designer.cs">
       <DependentUpon>PictureView.cs</DependentUpon>
     </Compile>
-    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Interfaces\IUseMyBackColor.cs" />
     <Compile Include="Interfaces\ISupportsBeginnEdit.cs" />
     <Compile Include="Forms-Common\Notification.cs">
@@ -267,6 +266,7 @@
     <Compile Include="Controls\RibbonBar.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="clsDesign.cs" />
     <Compile Include="SystemInputHook.cs" />
     <Compile Include="Controls\Button.cs">
       <SubType>Component</SubType>
@@ -766,9 +766,6 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Ressourcen\Dictionary\Deutsch.MDB" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Ressourcen\Skin\Windows10.skn" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Styles\Styles.MDB" />

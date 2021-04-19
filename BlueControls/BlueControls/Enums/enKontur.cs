@@ -2,7 +2,7 @@
 // Authors: 
 // Christian Peter
 // 
-// Copyright (c) 2020 Christian Peter
+// Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
 // 
 // License: GNU Affero General Public License v3.0
@@ -18,13 +18,17 @@
 #endregion
 
 
+using System;
+
 namespace BlueControls.Enums {
     public enum enKontur {
         Unbekannt = -1,
         Ohne = 0,
         Rechteck = 1,
         Rechteck_R4 = 50,
+        [Obsolete]
         Rechteck_R11 = 60,
+        [Obsolete]
         Rechteck_R20 = 70
     }
 }

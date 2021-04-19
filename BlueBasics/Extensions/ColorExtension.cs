@@ -2,7 +2,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2020 Christian Peter
+// Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -139,13 +139,13 @@ namespace BlueBasics {
             return false;
         }
 
-        public static Color ToSepia(this Color color) {
-            var r = (int)Math.Min(255, color.R * 0.393 + color.G * 0.769 + color.B * 0.189);
-            var g = (int)Math.Min(255, color.R * 0.349 + color.G * 0.686 + color.B * 0.168);
-            var b = (int)Math.Min(255, color.R * 0.272 + color.G * 0.534 + color.B * 0.131);
+        //public static Color ToSepia(this Color color) {
+        //    var r = (int)Math.Min(255, color.R * 0.393 + color.G * 0.769 + color.B * 0.189);
+        //    var g = (int)Math.Min(255, color.R * 0.349 + color.G * 0.686 + color.B * 0.168);
+        //    var b = (int)Math.Min(255, color.R * 0.272 + color.G * 0.534 + color.B * 0.131);
 
-            return Color.FromArgb(255, r, g, b);
-        }
+        //    return Color.FromArgb(255, r, g, b);
+        //}
 
         public static string ToHTMLCode(this Color color) {
             var r = Convert.ToString(color.R, 16);
@@ -184,9 +184,9 @@ namespace BlueBasics {
             return Color.FromArgb(a, r, g, b);
         }
 
-        public static bool IsMagenta(this Color col) {
-            return (col.ToArgb() == -65281);
-        }
+        //public static bool IsMagenta(this Color col) {
+        //    return (col.ToArgb() == -65281);
+        //}
 
         public static bool IsMagentaOrTransparent(this Color col) {
             if (col.ToArgb() == -65281) { return true; }
@@ -194,158 +194,158 @@ namespace BlueBasics {
             return false;
         }
 
-        public static bool IsTransparent(this Color col) {
-            return (col.A == 0);
-        }
+        //public static bool IsTransparent(this Color col) {
+        //    return (col.A == 0);
+        //}
 
-        public static string ColorName(this Color col) {
-            var c = col.ToHTMLCode().ToLower();
+        //public static string ColorName(this Color col) {
+        //    var c = col.ToHTMLCode().ToLower();
 
-            switch (c) {
-                case "0000ff":
-                    return "Blue";
-                case "ff00ff":
-                    return "Magenta";
+        //    switch (c) {
+        //        case "0000ff":
+        //            return "Blue";
+        //        case "ff00ff":
+        //            return "Magenta";
 
-                case "ffffff":
-                    return "White";
-                case "000000":
-                    return "Black";
-                case "d394b4":
-                    return "Pale Pink";
-                case "ffaed7":
-                    return "Light Pink";
+        //        case "ffffff":
+        //            return "White";
+        //        case "000000":
+        //            return "Black";
+        //        case "d394b4":
+        //            return "Pale Pink";
+        //        case "ffaed7":
+        //            return "Light Pink";
 
-                case "ff69b4":
-                    return "Hot Pink";
-                case "f5f4ea":
-                    return "Disabled XP-Button";
-                case "0095dd":
-                    return "Glossy Cyan Button Color";
-                case "919b9c":
-                    return "XP Frame Border Grey";
-                case "f8dfb1":
-                    return "Glossy Orange Disabled";
-                case "87b7cd":
-                    return "Glossy Cyan Disabled Button Color";
-                case "2fbbff":
-                    return "Glossy Cyan Highlight Button Color";
-                case "d7e7ee":
-                    return "Glossy Cyan Form Color";
-                case "003c74":
-                    return "XP Button Border Dark Blue";
-                case "7f9db9":
-                    return "XP Text Border Light Blue";
-                case "c9c7ba":
-                    return "XP Disabled Border Grey";
-                case "f7fafb":
-                    return "Glossy Cyan Light Form Color";
-                // break; case Is = "96ff96" : Return "Unipaint Calender Green"
-                // break; case Is = "c8ffc8" : Return "Unipaint Saturday Green"
-                // break; case Is = "ff8080" : Return "Unipaint Today Red"
-                case "d1ccc1":
-                    return "XP Pressed Button Dark Grey";
-                case "e3e2da":
-                    return "XP Pressed Button Middle Grey";
-                case "efeeea":
-                    return "XP Pressed Button Light Grey";
-                case "ffb834":
-                    return "XP Mouseover Button Dark Orange";
-                case "ffda8c":
-                    return "XP Mouseover Button Middle Orange";
-                case "ffe696":
-                    return "XP Mouseover Button Light Orange";
-                case "ffffee":
-                    return "XP Quickinfo Pale Yellow";
-                case "ffffe1":
-                    return "XP Ballon ToolTip Pale Yellow";
-                case "fdffff":
-                    return "XP Cyan Button Light";
-                case "d2eafe":
-                    return "XP Cyan Button Middle";
-                case "b9ddfb":
-                    return "XP Cyan Button Dark";
-                case "97aee2":
-                    return "XP Cyan Button Border Light Blue";
-                case "f7f7f4":
-                    return "XP Blue Button Disabled Light Grey";
-                case "edede6":
-                    return "XP Blue Button Disabled Middle Grey";
-                case "e6e6dd":
-                    return "XP Blue Button Disabled Dark Grey";
-                case "f4f3ee":
-                    return "XP Blue Tabstrip Grey";
-                case "f3f3ec":
-                    return "XP Slider Body Grey Darker";
-                case "fefefb":
-                    return "XP Slider Body Grey Lighter";
-                case "ece9d8":
-                    return "XP Form Grey";
-                case "e6eefc":
-                    return "XP Blue Button Light";
-                case "c1d3fb":
-                    return "XP Blue Button Middle";
-                case "aec8f7":
-                    return "XP Blue Button Dark";
-                case "bdbaa2":
-                    return "XP Disabled Toolbar Dark Button Grey";
-                case "316ac5":
-                    return "XP Text Marker Dark Blue";
-                case "f4f2e8":
-                    return "XP Button Middle Grey";
-                case "dcd7cb":
-                    return "XP Button Dark Grey";
+        //        case "ff69b4":
+        //            return "Hot Pink";
+        //        case "f5f4ea":
+        //            return "Disabled XP-Button";
+        //        case "0095dd":
+        //            return "Glossy Cyan Button Color";
+        //        case "919b9c":
+        //            return "XP Frame Border Grey";
+        //        case "f8dfb1":
+        //            return "Glossy Orange Disabled";
+        //        case "87b7cd":
+        //            return "Glossy Cyan Disabled Button Color";
+        //        case "2fbbff":
+        //            return "Glossy Cyan Highlight Button Color";
+        //        case "d7e7ee":
+        //            return "Glossy Cyan Form Color";
+        //        case "003c74":
+        //            return "XP Button Border Dark Blue";
+        //        case "7f9db9":
+        //            return "XP Text Border Light Blue";
+        //        case "c9c7ba":
+        //            return "XP Disabled Border Grey";
+        //        case "f7fafb":
+        //            return "Glossy Cyan Light Form Color";
+        //        // break; case Is = "96ff96" : Return "Unipaint Calender Green"
+        //        // break; case Is = "c8ffc8" : Return "Unipaint Saturday Green"
+        //        // break; case Is = "ff8080" : Return "Unipaint Today Red"
+        //        case "d1ccc1":
+        //            return "XP Pressed Button Dark Grey";
+        //        case "e3e2da":
+        //            return "XP Pressed Button Middle Grey";
+        //        case "efeeea":
+        //            return "XP Pressed Button Light Grey";
+        //        case "ffb834":
+        //            return "XP Mouseover Button Dark Orange";
+        //        case "ffda8c":
+        //            return "XP Mouseover Button Middle Orange";
+        //        case "ffe696":
+        //            return "XP Mouseover Button Light Orange";
+        //        case "ffffee":
+        //            return "XP Quickinfo Pale Yellow";
+        //        case "ffffe1":
+        //            return "XP Ballon ToolTip Pale Yellow";
+        //        case "fdffff":
+        //            return "XP Cyan Button Light";
+        //        case "d2eafe":
+        //            return "XP Cyan Button Middle";
+        //        case "b9ddfb":
+        //            return "XP Cyan Button Dark";
+        //        case "97aee2":
+        //            return "XP Cyan Button Border Light Blue";
+        //        case "f7f7f4":
+        //            return "XP Blue Button Disabled Light Grey";
+        //        case "edede6":
+        //            return "XP Blue Button Disabled Middle Grey";
+        //        case "e6e6dd":
+        //            return "XP Blue Button Disabled Dark Grey";
+        //        case "f4f3ee":
+        //            return "XP Blue Tabstrip Grey";
+        //        case "f3f3ec":
+        //            return "XP Slider Body Grey Darker";
+        //        case "fefefb":
+        //            return "XP Slider Body Grey Lighter";
+        //        case "ece9d8":
+        //            return "XP Form Grey";
+        //        case "e6eefc":
+        //            return "XP Blue Button Light";
+        //        case "c1d3fb":
+        //            return "XP Blue Button Middle";
+        //        case "aec8f7":
+        //            return "XP Blue Button Dark";
+        //        case "bdbaa2":
+        //            return "XP Disabled Toolbar Dark Button Grey";
+        //        case "316ac5":
+        //            return "XP Text Marker Dark Blue";
+        //        case "f4f2e8":
+        //            return "XP Button Middle Grey";
+        //        case "dcd7cb":
+        //            return "XP Button Dark Grey";
 
-                case "eeede5":
-                    return "XP Slider Border Grey";
-                case "e8e8df":
-                    return "XP Disabled Button Border Grey";
-                case "a6a6a6":
-                    return "XP Disabled Text Grey";
+        //        case "eeede5":
+        //            return "XP Slider Border Grey";
+        //        case "e8e8df":
+        //            return "XP Disabled Button Border Grey";
+        //        case "a6a6a6":
+        //            return "XP Disabled Text Grey";
 
-                case "777777":
-                    return "XP Text Marker Disabled Grey";
-                case "c2dbff":
-                    return "XP Focus Blue 1";
-                case "8cb4f2":
-                    return "XP Focus Blue 2";
-                case "404040":
-                    return "XP Focus Dot Line Grey";
+        //        case "777777":
+        //            return "XP Text Marker Disabled Grey";
+        //        case "c2dbff":
+        //            return "XP Focus Blue 1";
+        //        case "8cb4f2":
+        //            return "XP Focus Blue 2";
+        //        case "404040":
+        //            return "XP Focus Dot Line Grey";
 
-                case "dbdbdb":
-                    return "Glossy Cyan Disabled Text";
-                case "0046d5":
-                    return "Glossy Cyan Text";
-                case "498dab":
-                    return "Glossy Cyan Form Border Color";
+        //        case "dbdbdb":
+        //            return "Glossy Cyan Disabled Text";
+        //        case "0046d5":
+        //            return "Glossy Cyan Text";
+        //        case "498dab":
+        //            return "Glossy Cyan Form Border Color";
 
-                case "00000000":
-                    return "Transparent";
+        //        case "00000000":
+        //            return "Transparent";
 
-                case "eaeaea":
-                    return "Win 10 Button Grey";
-                case "b6b6b6":
-                    return "Win 10 Button Border Grey";
-                case "efefef":
-                    return "Win 10 Disabled Button Grey";
-                case "d8d8d8":
-                    return "Win 10 Disabled Button Border Grey";
-                case "9d9d9d":
-                    return "Win 10 Disabled Text Grey";
+        //        case "eaeaea":
+        //            return "Win 10 Button Grey";
+        //        case "b6b6b6":
+        //            return "Win 10 Button Border Grey";
+        //        case "efefef":
+        //            return "Win 10 Disabled Button Grey";
+        //        case "d8d8d8":
+        //            return "Win 10 Disabled Button Border Grey";
+        //        case "9d9d9d":
+        //            return "Win 10 Disabled Text Grey";
 
-                case "f0f0f0":
-                    return "Win 10 Form Grey";
-                case "acacac":
-                    return "Win 10 Border Frame Grey";
-                case "bababa":
-                    return "Win 10 Border Slider Grey";
-                case "dddddd":
-                    return "Win 10 Background Slider Grey";
-                default:
+        //        case "f0f0f0":
+        //            return "Win 10 Form Grey";
+        //        case "acacac":
+        //            return "Win 10 Border Frame Grey";
+        //        case "bababa":
+        //            return "Win 10 Border Slider Grey";
+        //        case "dddddd":
+        //            return "Win 10 Background Slider Grey";
+        //        default:
 
-                    return c;
-            }
-        }
+        //            return c;
+        //    }
+        //}
 
         public static Color SetAlpha(this Color color, byte newAlpha) {
             return Color.FromArgb(newAlpha, color.R, color.G, color.B);

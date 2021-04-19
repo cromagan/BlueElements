@@ -2,7 +2,7 @@
 // Authors: 
 // Christian Peter
 // 
-// Copyright (c) 2020 Christian Peter
+// Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
 // 
 // License: GNU Affero General Public License v3.0
@@ -570,15 +570,14 @@ namespace BlueControls.Controls {
                     if (!string.IsNullOrEmpty(CurrentRow.TMP_Chapter)) {
                         var si = GR.MeasureString(CurrentRow.TMP_Chapter, _Chapter_Font.Font());
                         GR.FillRectangle(new SolidBrush(Skin.Color_Back(enDesign.Table_And_Pad, enStates.Standard).SetAlpha(50)), 1, (int)CurrentRow.TMP_Y - RowCaptionSizeY, displayRectangleWOSlider.Width - 2, RowCaptionSizeY);
-                        RowItem r2 = null;
 
                         CurrentRow.TMP_CaptionPos = new Rectangle(1, (int)CurrentRow.TMP_Y - RowCaptionFontY, (int)si.Width + 28, (int)si.Height);
 
                         if (CurrentRow.TMP_Expanded) {
-                            Button.DrawButton(this, GR, ref r2, enDesign.Button_CheckBox, enStates.Checked, null, enAlignment.Horizontal_Vertical_Center, false, null, string.Empty, (Rectangle)CurrentRow.TMP_CaptionPos, false);
+                            Button.DrawButton(this, GR, enDesign.Button_CheckBox, enStates.Checked, null, enAlignment.Horizontal_Vertical_Center, false, null, string.Empty, (Rectangle)CurrentRow.TMP_CaptionPos, false);
                             GR.DrawImage(QuickImage.Get("Pfeil_Unten_Scrollbar|14|||FF0000||200|200").BMP, 5, (int)CurrentRow.TMP_Y - RowCaptionFontY + 6);
                         } else {
-                            Button.DrawButton(this, GR, ref r2, enDesign.Button_CheckBox, enStates.Standard, null, enAlignment.Horizontal_Vertical_Center, false, null, string.Empty, (Rectangle)CurrentRow.TMP_CaptionPos, false);
+                            Button.DrawButton(this, GR, enDesign.Button_CheckBox, enStates.Standard, null, enAlignment.Horizontal_Vertical_Center, false, null, string.Empty, (Rectangle)CurrentRow.TMP_CaptionPos, false);
                             GR.DrawImage(QuickImage.Get("Pfeil_Rechts_Scrollbar|14|||||0").BMP, 5, (int)CurrentRow.TMP_Y - RowCaptionFontY + 6);
                         }
 
@@ -4018,11 +4017,6 @@ namespace BlueControls.Controls {
         /// <param name="deleteBack"></param>
         /// <param name="font"></param>
         private static void Draw_FormatedText(Graphics gr, ColumnItem column, string originalText, Rectangle fitInRect, bool deleteBack, BlueFont font, enShortenStyle style, enStates state, enBildTextVerhalten bildTextverhalten) {
-
-            //var tmpText = CellItem.ValueReadable(column, originalText, style, compact);
-            //var tmpAlign = CellItem.StandardAlignment(column, compact);
-            //var tmpImageCode = CellItem.StandardImage(column, originalText, tmpText, style, compact);
-
             var tmpData = CellItem.GetDrawingData(column, originalText, style, bildTextverhalten);
             var tmpImageCode = tmpData.Item3;
 
@@ -4038,23 +4032,12 @@ namespace BlueControls.Controls {
         /// </summary>
         public static void Draw_FormatedText(ColumnItem column, string Txt, Graphics GR, Rectangle FitInRect, bool DeleteBack, enShortenStyle Style, enDesign vDesign, enStates vState, enBildTextVerhalten bildTextverhalten) {
             if (string.IsNullOrEmpty(Txt)) { return; }
-
-            var SkinRow = Skin.SkinRow(vDesign, vState);
-
-            if (SkinRow == null) { return; }
-
-            BlueFont f = null;
-            if (!string.IsNullOrEmpty(Txt)) { f = Skin.GetBlueFont(SkinRow); }
-
-            Draw_FormatedText(GR, column, Txt, FitInRect, DeleteBack, f, Style, vState, bildTextverhalten);
+            var d = Skin.DesignOf(vDesign, vState);
+            Draw_FormatedText(GR, column, Txt, FitInRect, DeleteBack, d.bFont, Style, vState, bildTextverhalten);
         }
 
         public static Size FormatedText_NeededSize(ColumnItem column, string originalText, BlueFont font, enShortenStyle style, int minSize, enBildTextVerhalten bildTextverhalten) {
-            //var tmpText = CellItem.ValueReadable(column, originalText, style, compact);
-            //var tmpImageCode = CellItem.StandardImage(column, tmpText, originalText, style, compact);
-
             var tmpData = CellItem.GetDrawingData(column, originalText, style, bildTextverhalten);
-
             return Skin.FormatedText_NeededSize(tmpData.Item1, tmpData.Item3, font, minSize);
         }
 

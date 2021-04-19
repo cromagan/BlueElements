@@ -2,7 +2,7 @@
 // Authors: 
 // Christian Peter
 // 
-// Copyright (c) 2020 Christian Peter
+// Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
 // 
 // License: GNU Affero General Public License v3.0
@@ -239,22 +239,19 @@ namespace BlueControls.Controls {
                 }
 
 
-                if (tmpSkinRow == null) { tmpSkinRow = Skin.SkinRow(_design, state); }
-
-
 
                 if (!string.IsNullOrEmpty(_Text)) {
                     if (QuickModePossible()) {
                         if (gr == null) { return; }
                         Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
 
-                        Skin.Draw_FormatedText(gr, _Text, null, tmpSkinRow, state, enAlignment.Top_Left, new Rectangle(), null, false, Translate);
+                        Skin.Draw_FormatedText(gr, _Text, _design, state, null, enAlignment.Top_Left, new Rectangle(), null, false, Translate);
                         return;
                     }
 
 
                     if (eText == null) {
-                        eText = new ExtText(_design, state, tmpSkinRow) {
+                        eText = new ExtText(_design, state) {
                             HtmlText = BlueDatabase.LanguageTool.DoTranslate(_Text, Translate)
                         };
                         //eText.Zeilenabstand = _Zeilenabstand;

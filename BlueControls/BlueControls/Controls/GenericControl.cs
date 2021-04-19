@@ -2,7 +2,7 @@
 // Authors: 
 // Christian Peter
 // 
-// Copyright (c) 2020 Christian Peter
+// Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
 // 
 // License: GNU Affero General Public License v3.0
@@ -78,7 +78,6 @@ namespace BlueControls.Controls {
         #region  Standard-Variablen 
         private bool _MousePressing;
         protected bool _MouseHighlight = true;
-        protected RowItem tmpSkinRow;
         private enPartentType _MyParentType = enPartentType.Unbekannt;
 
         private readonly bool _UseBackBitmap = false;
@@ -267,7 +266,6 @@ namespace BlueControls.Controls {
             }
 
             if (IsDisposed) { return; }
-            tmpSkinRow = null;
             base.OnEnabledChanged(e);
             Invalidate();
         }
@@ -390,7 +388,6 @@ namespace BlueControls.Controls {
             if (!GetStyle(System.Windows.Forms.ControlStyles.Selectable)) {
                 Parent.SelectNextControl(this, true, true, true, true);
             } else {
-                tmpSkinRow = null;
                 base.OnGotFocus(e);
                 Invalidate();
             }
@@ -402,7 +399,6 @@ namespace BlueControls.Controls {
             if (GetStyle(System.Windows.Forms.ControlStyles.Selectable)) {
                 //if (_MousePressing) { OnMouseUp(new System.Windows.Forms.MouseEventArgs(System.Windows.Forms.MouseButtons.None, 0, 0, 0, 0)); }
                 _MouseHighlight = false;
-                tmpSkinRow = null;
                 base.OnLostFocus(e);
                 Invalidate();
             }
@@ -444,7 +440,6 @@ namespace BlueControls.Controls {
                 Forms.QuickInfo.Close();
 
                 if (Enabled) {
-                    tmpSkinRow = null;
                     if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && Focus()) { Focus(); }
                 }
 
@@ -458,9 +453,7 @@ namespace BlueControls.Controls {
 
         protected override void OnMouseLeave(System.EventArgs e) {
             if (IsDisposed) { return; }
-            if (Enabled) { tmpSkinRow = null; }
             base.OnMouseLeave(e);
-
             DoQuickInfo();
         }
 
@@ -493,9 +486,6 @@ namespace BlueControls.Controls {
             if (!_MousePressing) { return; }
 
             _MousePressing = false;
-            if (Enabled) { tmpSkinRow = null; }
-
-            tmpSkinRow = null;
             base.OnMouseUp(e);
         }
 
@@ -508,8 +498,6 @@ namespace BlueControls.Controls {
 
         protected override void OnMouseEnter(System.EventArgs e) {
             if (IsDisposed) { return; }
-
-            if (Enabled) { tmpSkinRow = null; }
             base.OnMouseEnter(e);
             if (!string.IsNullOrEmpty(_QuickInfo) || !string.IsNullOrEmpty(QuickInfoText)) { Forms.QuickInfo.Show(QuickInfoText); }
         }

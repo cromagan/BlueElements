@@ -2,7 +2,7 @@
 // Authors: 
 // Christian Peter
 // 
-// Copyright (c) 2020 Christian Peter
+// Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
 // 
 // License: GNU Affero General Public License v3.0
@@ -32,7 +32,7 @@ namespace BlueScript {
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.Null;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List, enVariableDataType.Bool, enVariableDataType.String };
+        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List, enVariableDataType.Bool, enVariableDataType.String_or_List };
         public override bool EndlessArgs => true;
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
@@ -42,7 +42,12 @@ namespace BlueScript {
             var tmpList = attvar.Attributes[0].ValueListString;
 
             for (var z = 2; z < attvar.Attributes.Count; z++) {
-                tmpList.RemoveString(attvar.Attributes[z].ValueString, attvar.Attributes[1].ValueBool);
+                if (attvar.Attributes[z].Type == Skript.Enums.enVariableDataType.String) {
+                    tmpList.RemoveString(attvar.Attributes[z].ValueString, attvar.Attributes[1].ValueBool);
+                }
+                if (attvar.Attributes[z].Type == Skript.Enums.enVariableDataType.List) {
+                    tmpList.RemoveString(attvar.Attributes[z].ValueListString, attvar.Attributes[1].ValueBool);
+                }
             }
 
             attvar.Attributes[0].ValueListString = tmpList;

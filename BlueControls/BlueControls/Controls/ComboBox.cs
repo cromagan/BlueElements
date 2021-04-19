@@ -2,7 +2,7 @@
 // Authors: 
 // Christian Peter
 // 
-// Copyright (c) 2020 Christian Peter
+// Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
 // 
 // License: GNU Affero General Public License v3.0
@@ -171,8 +171,7 @@ namespace BlueControls.Controls {
 
             if (_DrawStyle != enComboboxStyle.TextBox) {
                 if (string.IsNullOrEmpty(_Initialtext) && !string.IsNullOrEmpty(Text)) { _Initialtext = Text; }
-                RowItem tempVar = null;
-                Button.DrawButton(this, gr, ref tempVar, (enDesign)_DrawStyle, state, QuickImage.Get(_ImageCode), enAlignment.Horizontal_Vertical_Center, true, null, _Initialtext, DisplayRectangle, Translate);
+                Button.DrawButton(this, gr, (enDesign)_DrawStyle, state, QuickImage.Get(_ImageCode), enAlignment.Horizontal_Vertical_Center, true, null, _Initialtext, DisplayRectangle, Translate);
                 DoReturn();
                 return;
             }

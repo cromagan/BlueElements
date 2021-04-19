@@ -17,45 +17,26 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
-using static BlueBasics.Extensions;
+
 
 namespace BlueScript {
-    internal class Method_Sort : Method {
+    internal class Method_Clear : Method {
 
-
-        //public Method_Sort(Script parent) : base(parent) { }
-
-        public override string Syntax => "Sort(ListVariable, EliminateDupes);";
-
-        public override string Description => "Sortiert die Liste und falls das zweite Attribut TRUE ist, entfernt Doubletten.";
-
-        public override List<string> Comand(Script s) { return new() { "sort" }; }
+        public override string Syntax => "Clear(VariableListe);";
+        public override string Description => "Entfernt alle Einträge einer Liste";
+        public override List<string> Comand(Script s) { return new() { "clear" }; }
         public override string StartSequence => "(";
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.Null;
-
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List, enVariableDataType.Bool };
+        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List };
         public override bool EndlessArgs => false;
-
-
-
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
-
-            var x = attvar.Attributes[0].ValueListString;
-
-            if (attvar.Attributes[1].ValueBool) {
-                x = x.SortedDistinctList();
-            } else {
-                x.Sort();
-            }
-
-            attvar.Attributes[0].ValueListString = x;
+            attvar.Attributes[0].ValueListString = new List<string>();
             return new strDoItFeedback();
         }
     }

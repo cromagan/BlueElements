@@ -2,7 +2,7 @@
 // Authors: 
 // Christian Peter
 // 
-// Copyright (c) 2020 Christian Peter
+// Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
 // 
 // License: GNU Affero General Public License v3.0
@@ -113,11 +113,11 @@ namespace BlueControls {
         }
 
 
-        public ExtText(enDesign vDesign, enStates state, RowItem SkinRow = null) {
+        public ExtText(enDesign vDesign, enStates state) {
             Initialize();
             _Design = vDesign;
             _State = state;
-            _Row = SkinRow;
+            _Row = null;
         }
 
         public ExtText(PadStyles vDesign, RowItem SkinRow) {
@@ -126,8 +126,8 @@ namespace BlueControls {
             _State = enStates.Standard;
             _Row = SkinRow;
 
-            if ((int)_Design > 10000 && _Row == null) {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Row fehlt!");
+            if ((int)_Design < 10000 || _Row == null) {
+                Develop.DebugPrint(enFehlerArt.Fehler, "Fehler!");
             }
         }
 
