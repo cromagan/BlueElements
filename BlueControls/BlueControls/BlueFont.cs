@@ -29,7 +29,7 @@ using System.Drawing.Text;
 
 namespace BlueControls
 {
-    public sealed class BlueFont : IParseable, IReadableTextWithChanging
+    public sealed class BlueFont : IReadableTextWithChanging
     {
         #region  Variablen-Deklarationen 
 
@@ -74,7 +74,7 @@ namespace BlueControls
 
 
 
-        private void Initialize()
+        private BlueFont()
         {
             _Code = "";
 
@@ -107,10 +107,9 @@ namespace BlueControls
             }
         }
 
-        private BlueFont(string Code)
+        private BlueFont(string codeToParse) : this()
         {
-            Initialize();
-            Parse(Code);
+            Parse(codeToParse);
         }
 
 
@@ -119,7 +118,6 @@ namespace BlueControls
 
         #region  Properties 
 
-        public bool IsParsing { get; private set; }
 
         public Font Font(decimal Zoom)
         {
@@ -320,14 +318,13 @@ namespace BlueControls
         }
 
 
-        public void Parse(string ToParse)
+        private void Parse(string ToParse)
         {
-            IsParsing = true;
-            Initialize();
-
             var ftst = FontStyle.Regular;
             var ftst2 = FontStyle.Regular;
 
+
+            ToParse = ToParse.Replace(",", ", "); // TODO: Entferen wenn inv bei den exports repariert wurde
 
             foreach (var pair in ToParse.GetAllTags())
             {
@@ -395,8 +392,6 @@ namespace BlueControls
                         break;
                 }
             }
-            IsParsing = false;
-
 
             _Font = new Font(FontName, FontSize / Skin.Scale, ftst);
             _FontOL = new Font(FontName, FontSize / Skin.Scale, ftst2);
@@ -525,12 +520,15 @@ namespace BlueControls
 
             if (!Code.Contains("{")) { Code = "{Name=Arial, Size=10, Color=ff0000}"; }
 
+            var searchcode = Code.ToUpper().Replace(" ", "");
+
+
             try
             {
 
                 foreach (var Thisfont in _FontsAll)
                 {
-                    if (Thisfont.ToString().ToUpper() == Code.ToUpper()) { return Thisfont; }
+                    if (Thisfont.ToString().Replace(" ", "").ToUpper() == searchcode) { return Thisfont; }
                 }
 
 
@@ -543,7 +541,7 @@ namespace BlueControls
             var f = new BlueFont(Code);
             _FontsAll.Add(f);
 
-            if (f._Code.ToUpper() != Code.ToUpper())
+            if (f._Code.Replace(" ", "").ToUpper() != Code.Replace(" ", "").ToUpper())
             {
                 Develop.DebugPrint("Schrift-Fehlerhaft: " + Code + " (" + f._Code + ")");
             }
@@ -683,7 +681,6 @@ namespace BlueControls
 
         public void OnChanged()
         {
-            if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
 

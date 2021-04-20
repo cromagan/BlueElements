@@ -73,7 +73,7 @@ namespace BlueScript {
         public static strDoItFeedback AttributeAuflösen(string txt, Script s) {
 
             // Die Trims werden benötigtn, wenn eine Liste kommt, dass die Leerzeichen vor und nach den Kommas weggeschnitten werden.
-            txt = txt.Trim(" ").DeKlammere(true, false, false).Trim(" ");
+            txt = txt.Trim(" ").DeKlammere(true, false, false, true);
 
             if (s != null) {
                 #region Variablen ersetzen
@@ -95,9 +95,9 @@ namespace BlueScript {
 
 
             #region Klammern am ende berechnen, das ansonsten Min(x,y,z) falsch anschlägt
-            (var posa, var _) = Script.NextText(txt, 0, new List<string>() { "(" }, false, false);
+            (var posa, var _) = NextText(txt, 0, KlammerAuf, false, false);
             if (posa > -1) {
-                (var pose, var _) = Script.NextText(txt, posa, new List<string>() { ")" }, false, false);
+                (var pose, var _) = NextText(txt, posa, KlammerZu, false, false);
 
                 if (pose < posa) { return strDoItFeedback.Klammerfehler(); }
 
@@ -112,7 +112,7 @@ namespace BlueScript {
             #region Vergleichsoperatoren ersetzen und vereinfachen
 
 
-            (var pos, var witch) = Script.NextText(txt, 0, Method_if.VergleichsOperatoren, false, false);
+            (var pos, var witch) = NextText(txt, 0, Method_if.VergleichsOperatoren, false, false);
 
             if (pos >= 0) {
                 txt = Method_if.GetBool(txt);
@@ -155,7 +155,7 @@ namespace BlueScript {
 
             #region Testen auf String
             if (txt.Value.StartsWith("\"") && txt.Value.EndsWith("\"")) {
-                if (Type != enVariableDataType.NotDefinedYet && Type != enVariableDataType.String) { SetError("Variable ist kein String"); return; } 
+                if (Type != enVariableDataType.NotDefinedYet && Type != enVariableDataType.String) { SetError("Variable ist kein String"); return; }
                 ValueString = txt.Value.Trim("\"").Replace("\"+\"", string.Empty); // Erst trimmen! dann verketten! Ansonsten wird "+" mit nix ersetzte, anstelle einem  +
                 Type = enVariableDataType.String;
                 Readonly = true;
@@ -166,7 +166,7 @@ namespace BlueScript {
             #region Testen auf Liste mit Strings
             if (txt.Value.StartsWith("{\"") && txt.Value.EndsWith("\"}")) {
                 if (Type != enVariableDataType.NotDefinedYet && Type != enVariableDataType.List) { SetError("Variable ist keine Liste"); return; }
-                var t = txt.Value.DeKlammere(false, true, false);
+                var t = txt.Value.DeKlammere(false, true, false, true);
                 var l = Method.SplitAttributeToVars(t, s, new List<enVariableDataType>() { enVariableDataType.String }, true);
                 if (!string.IsNullOrEmpty(l.ErrorMessage)) { SetError(l.ErrorMessage); return; }
                 ValueListString = l.Attributes.AllValues();
@@ -181,7 +181,7 @@ namespace BlueScript {
 
 
             #region Testen auf Number
-            if (Type != enVariableDataType.NotDefinedYet && Type != enVariableDataType.Numeral) { SetError("Variable ist keine Zahl"); return; } 
+            if (Type != enVariableDataType.NotDefinedYet && Type != enVariableDataType.Numeral) { SetError("Variable ist keine Zahl"); return; }
 
             var erg = modErgebnis.Ergebnis(txt.Value);
             if (erg == null) { SetError("Berechnungsfehler der Formel: " + txt.ErrorMessage); return; }//return new strDoItFeedback(); 

@@ -94,7 +94,7 @@ namespace BlueScript {
                             } while (true);
 
 
-                            (var posek, var witch) = Script.NextText(scriptText, cont, new List<string>() { "}" }, false, false);
+                            (var posek, var witch) = NextText(scriptText, cont, GeschKlammerAuf, false, false);
                             if (posek < cont) {
                                 return new strCanDoFeedback(cont, "Kein Codeblock Ende bei " + comandtext, true);
                             }
@@ -116,7 +116,7 @@ namespace BlueScript {
 
         private strGetEndFeedback GetEnd(string scriptText, int startpos, int lenghtStartSequence) {
 
-            (var pos, var witch) = Script.NextText(scriptText, startpos, new List<string>() { EndSequence }, false, false);
+            (var pos, var witch) = NextText(scriptText, startpos, new List<string>() { EndSequence }, false, false);
 
 
             if (pos < startpos) {
@@ -272,7 +272,7 @@ namespace BlueScript {
 
             do {
 
-                (var pos, var witch) = Script.NextText(txt, posc, c, true, false);
+                (var pos, var witch) = NextText(txt, posc, c, true, false);
 
                 if (pos < 0) { return new strGetEndFeedback(0, txt); }
 
@@ -312,7 +312,7 @@ namespace BlueScript {
 
             do {
 
-                (var pos, var witch) = Script.NextText(txt, posc, v, true, true);
+                (var pos, var witch) = NextText(txt, posc, v, true, true);
 
                 if (pos < 0) { return new strGetEndFeedback(0, txt); }
 
@@ -383,15 +383,14 @@ namespace BlueScript {
 
             #region Liste der Attribute splitten
             var posc = 0;
-            var v = new List<string>() { "," };
             do {
-                (var pos, var witch) = Script.NextText(attributtext, posc, v, false, false);
+                (var pos, var witch) = NextText(attributtext, posc, Komma, false, false);
                 if (pos < 0) {
-                    attributes.Add((attributtext.Substring(posc)).DeKlammere(true, false, false));
+                    attributes.Add((attributtext.Substring(posc)).DeKlammere(true, false, false, true));
                     break;
                 }
 
-                attributes.Add((attributtext.Substring(posc, pos - posc)).DeKlammere(true, true, false));
+                attributes.Add((attributtext.Substring(posc, pos - posc)).DeKlammere(true, true, false, true));
                 posc = pos + 1;
 
             } while (true);

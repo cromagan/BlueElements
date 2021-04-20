@@ -341,7 +341,7 @@ namespace BlueControls.Controls {
 
             var d = Skin.DesignOf(vButtonTypex, vStatex);
 
-            Skin.Draw_Back(GR, d, DisplayRectangle, con);
+            Skin.Draw_Back(GR, d, DisplayRectangle, con, true);
             Skin.Draw_Border(GR, d, DisplayRectangle);
 
 

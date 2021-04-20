@@ -262,7 +262,16 @@ namespace BlueDatabase {
             while (x.Count > 0) {
 
                 Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", all - x.Count(), all, false, false));
-                if (x[0].DoAutomatic(true, fullCheck, false, startroutine).didSuccesfullyCheck) {
+                var (didSuccesfullyCheck, error, skript) = x[0].DoAutomatic(true, fullCheck, false, startroutine);
+
+                if (!string.IsNullOrEmpty(skript.Error)) {
+                    x.Clear();
+                    Database.OnDropMessage("Skript fehlerhaft: " + skript.Error);
+                    break;
+                }
+
+
+                if (didSuccesfullyCheck) {
                     x.RemoveAt(0);
                 }
 

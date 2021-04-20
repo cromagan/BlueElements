@@ -224,6 +224,7 @@ namespace BlueControls.Controls {
                     _Database.SavedToDisk -= _Database_SavedToDisk;
                     _Database.ColumnArrangements.ItemInternalChanged -= ColumnArrangements_ItemInternalChanged;
                     _Database.ProgressbarInfo -= _Database_ProgressbarInfo;
+                    _Database.DropMessage -= _Database_DropMessage;
 
                     _Database.Save(false);         // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
 
@@ -248,6 +249,7 @@ namespace BlueControls.Controls {
                     _Database.SavedToDisk += _Database_SavedToDisk;
                     _Database.ColumnArrangements.ItemInternalChanged += ColumnArrangements_ItemInternalChanged;
                     _Database.ProgressbarInfo += _Database_ProgressbarInfo;
+                    _Database.DropMessage += _Database_DropMessage;
                 }
 
                 _Database_DatabaseLoaded(this, new LoadedEventArgs(false));
@@ -256,6 +258,8 @@ namespace BlueControls.Controls {
 
             }
         }
+
+
 
         private void _Database_Row_RowAdded(object sender, RowEventArgs e) {
 
@@ -946,7 +950,7 @@ namespace BlueControls.Controls {
             if (e.Cecked) { s |= enStates.Checked; }
 
             RowItem tempVar = null;
-            Button.DrawButton(this, gR, ref tempVar, enDesign.Button_CheckBox, s, e.Image, enAlignment.Horizontal_Vertical_Center, false, null, e.Text, r, true);
+            Button.DrawButton(this, gR, enDesign.Button_CheckBox, s, e.Image, enAlignment.Horizontal_Vertical_Center, false, null, e.Text, r, true);
 
 
         }
@@ -3657,6 +3661,14 @@ namespace BlueControls.Controls {
 
         private void _Database_SavedToDisk(object sender, System.EventArgs e) {
             Invalidate();
+        }
+
+
+        private void _Database_DropMessage(object sender, MessageEventArgs e) {
+            if (_Database.IsAdministrator()) {
+                MessageBox.Show(e.Message);
+            }
+
         }
 
         private void _Database_ProgressbarInfo(object sender, ProgressbarEventArgs e) {

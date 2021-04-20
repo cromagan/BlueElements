@@ -37,17 +37,17 @@ namespace BlueScript {
 
 
 
-        public static readonly List<string> VergleichsOperatoren = new List<string>() { "!", "||", "&&", "==", "!=", "<", ">", ">=", "<=" };
-        public static readonly List<string> VergleichsOperatoren2 = new List<string>() { "||", "&&", "==", "!=", "<", ">", ">=", "<=" };
-        public static readonly List<string> Vorbidden = new List<string>() { "exists", "istype", "isnullorempty", "isnullorzero" };
+        public static readonly List<string> VergleichsOperatoren = new() { "!", "||", "&&", "==", "!=", "<", ">", ">=", "<=" };
+        public static readonly List<string> VergleichsOperatoren2 = new() { "||", "&&", "==", "!=", "<", ">", ">=", "<=" };
+        public static readonly List<string> Vorbidden = new() { "exists", "istype", "isnullorempty", "isnullorzero" };
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
 
             var txt = infos.AttributText.Replace("(", string.Empty).Replace(")", string.Empty);
-            (var pos, var witch) = Script.NextText(txt, 0, Vorbidden, false, false);
+            (var pos, var witch) = NextText(txt, 0, Vorbidden, false, false);
             if (pos >= 0) {
-                (var pos2, var witch2) = Script.NextText(txt, 0, VergleichsOperatoren2, false, false);
+                (var pos2, var witch2) = NextText(txt, 0, VergleichsOperatoren2, false, false);
                 if (pos2 >= 0) {
                     return new strDoItFeedback("Der Befehl " + witch + " in Kombination mit " + witch2 + " nicht erlaubt.");
                 }
@@ -66,7 +66,7 @@ namespace BlueScript {
         }
 
         public static string? GetBool(string txt) {
-            txt = txt.DeKlammere(true, false, false);
+            txt = txt.DeKlammere(true, false, false, true);
 
             switch (txt.ToLower()) {
                 case "true":
@@ -97,9 +97,9 @@ namespace BlueScript {
 
 
             #region Klammern zuerst berechnen
-            (var posa, var _) = Script.NextText(txt, 0, new List<string>() { "(" }, false, false);
+            (var posa, var _) = NextText(txt, 0, KlammerAuf, false, false);
             if (posa > -1) {
-                (var pose, var _) = Script.NextText(txt, posa, new List<string>() { ")" }, false, false);
+                (var pose, var _) = NextText(txt, posa, KlammerZu, false, false);
 
                 if (pose < posa) { return null; }
 
@@ -152,7 +152,7 @@ namespace BlueScript {
         }
 
         private static string GetBoolTMP(string txt, string check) {
-            (var i, var _) = Script.NextText(txt, 0, new List<string>() { check }, false, false);
+            (var i, var _) = NextText(txt, 0, new List<string>() { check }, false, false);
 
 
             if (i < 0) { return string.Empty; }

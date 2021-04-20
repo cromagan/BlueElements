@@ -27,24 +27,26 @@ using System.Text.RegularExpressions;
 namespace BlueBasics {
     public static partial class Extensions {
         /// <summary>
-        /// Entfernt ( und ), { und } und " "
+        /// Entfernt ( und ), { und } und " und leerzeichen am Anfang/Ende
         /// </summary>
         /// <param name="txt"></param>
         /// <param name="klammern"></param>
         /// <param name="geschklammern"></param>
         /// <param name="gänsef"></param>
         /// <returns></returns>
-        public static string DeKlammere(this string txt, bool klammern, bool geschklammern, bool gänsef) {
-            if (klammern && txt.StartsWith("(") && txt.IndexOf(")") == txt.Length - 1) {
-                return txt.Substring(1, txt.Length - 2).DeKlammere(klammern, geschklammern, gänsef); // Unnötige Klammern entfernen und noch Ne Runde!!!!
+        public static string DeKlammere(this string txt, bool klammern, bool geschklammern, bool gänsef, bool trimspace) {
+            if (trimspace) { txt = txt.Trim(); }
+
+            if (klammern && txt.StartsWith("(") && txt.EndsWith(")")) {
+                return txt.Substring(1, txt.Length - 2).DeKlammere(klammern, geschklammern, gänsef, trimspace); // Unnötige Klammern entfernen und noch Ne Runde!!!!
             }
 
-            if (geschklammern && txt.StartsWith("{") && txt.IndexOf("}") == txt.Length - 1) {
-                return txt.Substring(1, txt.Length - 2).DeKlammere(klammern, geschklammern, gänsef); // Unnötige Klammern entfernen und noch Ne Runde!!!!
+            if (geschklammern && txt.StartsWith("{") && txt.EndsWith("}")) {
+                return txt.Substring(1, txt.Length - 2).DeKlammere(klammern, geschklammern, gänsef, trimspace); // Unnötige Klammern entfernen und noch Ne Runde!!!!
             }
 
-            if (gänsef && txt.StartsWith("\"") && txt.IndexOf("\"", 1) == txt.Length - 1) {
-                return txt.Substring(1, txt.Length - 2).DeKlammere(klammern, geschklammern, gänsef); // Unnötige Klammern entfernen und noch Ne Runde!!!!
+            if (gänsef && txt.StartsWith("\"") && txt.EndsWith("\"")) {
+                return txt.Substring(1, txt.Length - 2).DeKlammere(klammern, geschklammern, gänsef, trimspace); // Unnötige Klammern entfernen und noch Ne Runde!!!!
             }
 
             return txt;
@@ -181,86 +183,261 @@ namespace BlueBasics {
             if (string.IsNullOrEmpty(value) || value.Length < 3) { return Result; }
             if (value.Substring(0, 1) != "{") { return Result; }
 
-            var Beg = 0;
+            //var Beg = 0;
 
-            while (true) {
-                Beg++;
-                if (Beg > value.Length) { break; }
-                var T = value.ParseTag(Beg);
-                var V = value.ParseValue(T, Beg);
-                if (!string.IsNullOrEmpty(T) && !string.IsNullOrEmpty(V)) {
-                    Result.Add(new KeyValuePair<string, string>(T, V));
+            //while (true) {
+            //    Beg++;
+            //    if (Beg > value.Length) { break; }
+            //    var T = value.ParseTag(Beg);
+            //    var V = value.ParseValue(T, Beg);
+            //    if (!string.IsNullOrEmpty(T) && !string.IsNullOrEmpty(V)) {
+            //        Result.Add(new KeyValuePair<string, string>(T, V));
+            //    }
+
+            //    Beg = Beg + T.Length + V.Length + 2;
+            //}
+
+
+            value = value.DeKlammere(false, true, false, true);
+
+            var start = 0;
+            var noarunde = true;
+
+
+            do {
+
+                var (gleichpos, _) = NextText(value, start, Gleich, false, false);
+
+                if (gleichpos < 0) {
+                    Develop.DebugPrint(enFehlerArt.Fehler, "Parsen nicht möglich:" + value);
+                }
+                var tag = value.Substring(start, gleichpos - start).Trim().ToLower();
+
+                if (string.IsNullOrEmpty(tag)) {
+                    Develop.DebugPrint(enFehlerArt.Fehler, "Parsen nicht möglich:" + value);
                 }
 
-                Beg = Beg + T.Length + V.Length + 2;
+                var (kommapos, _) = NextText(value, gleichpos, Komma, false, true);
+                string tagval;
+                if (kommapos < 0) {
+                    tagval = value.Substring(gleichpos + 1).Trim();
+                    noarunde = false;
+                } else {
+                    tagval = value.Substring(gleichpos + 1, kommapos - gleichpos - 1).Trim();
+                }
+
+
+                Result.Add(new KeyValuePair<string, string>(tag, tagval));
+
+                start = kommapos + 1;
+
+
             }
+            while (noarunde);
 
             return Result;
+
+
         }
 
-        public static string ParseTag(this string tXT, int startIndex) {
-            var IG = tXT.IndexOf("=", startIndex);
-            if (IG < 1) { return string.Empty; }
+        public static List<string> Komma = new() { "," };
+        public static List<string> Gleich = new() { "=" };
+        public static List<string> KlammerAuf = new() { "(" };
+        public static List<string> KlammerZu = new() { "(" };
+        public static List<string> GeschKlammerAuf = new() { "{" };
+        public static (int pos, string witch) NextText(string txt, int startpos, List<string> searchfor, bool checkforSeparatorbefore, bool checkforSeparatorafter) {
 
-            var BG = IG - 1;
-            while (BG >= 1) {
-                if (" ,{".Contains(tXT.Substring(BG, 1))) { break; }
-                BG--;
-            }
+            var klammern = 0;
+            var Gans = false;
+            var GeschwKlammern = 0;
+            var EckigeKlammern = 0;
 
-            return tXT.Substring(BG + 1, IG - BG - 1).ToLower();
-        }
+            var pos = startpos;
+            var maxl = txt.Length;
+            const string TR = "&.,;\\?!\" ~|=<>+-(){}[]/*`´\r\n\t";
 
-        public static string ParseValue(this string tXT, string offTag, int startIndex) {
-            if (string.IsNullOrEmpty(tXT)) { return string.Empty; }
-            if (string.IsNullOrEmpty(offTag)) { return string.Empty; }
 
-            var FirstCharAfterEquals = tXT.ToLower().IndexOf(offTag.ToLower() + "=", startIndex);
+            do {
+                if (pos >= maxl) { return (-1, string.Empty); ; }
 
-            if (FirstCharAfterEquals < 0) { return string.Empty; }
-            FirstCharAfterEquals = FirstCharAfterEquals + offTag.Length + 1;
 
-            // while (TXT.Substring(FirstCharAfterEquals, 1) == " ")
-            // {
-            //    FirstCharAfterEquals++;
-            // }
 
-            var OpenBraketCount = 0;
-            var CurrentChar = FirstCharAfterEquals - 1; // Wird im ersten Step wieder erhöht
+                #region Klammer und " erledigen
+                switch (txt.Substring(pos, 1)) {
 
-            var ExitDo = false;
+                    // Gänsefüsschen, immer erlaubt
+                    case "\"":
+                        Gans = !Gans;
+                        break;
 
-            while (!ExitDo && CurrentChar < tXT.Length - 1) {
-                CurrentChar++;
+                    // Ekige klammern könne in { oder ( vorkommen, immer erlaubt
+                    case "[":
+                        if (!Gans) {
+                            EckigeKlammern++;
+                        }
+                        break;
 
-                switch (tXT.Substring(CurrentChar, 1)) {
-                    case " ":
-                        if (tXT.Substring(CurrentChar - 1, 1) == "," && OpenBraketCount == 0) {
-                            CurrentChar -= 2;
-                            ExitDo = true;
+                    case "]":
+                        if (!Gans) {
+                            if (EckigeKlammern < 1) { return (-1, string.Empty); }
+                            EckigeKlammern--;
+                        }
+                        break;
+
+
+                    // Runde klammern können in { vorkommen
+                    case "(":
+                        if (!Gans) {
+                            if (EckigeKlammern > 0) { return (-1, string.Empty); }
+
+                            if (klammern == 0 && GeschwKlammern == 0 && searchfor.Contains("(")) {
+                                return (pos, "(");
+                            }
+                            klammern++;
                         }
 
                         break;
 
+                    case ")":
+                        if (!Gans) {
+                            if (EckigeKlammern > 0) { return (-1, string.Empty); }
+                            if (klammern < 1) { return (-1, string.Empty); }
+                            klammern--;
+                        }
+                        break;
+
+
+                    // Gescheifte klammern müssen immer sauber auf und zu gemacht werdrn!
                     case "{":
-                        OpenBraketCount++;
+                        if (!Gans) {
+                            if (klammern > 0) { return (-1, string.Empty); }
+                            if (EckigeKlammern > 0) { return (-1, string.Empty); }
+                            //if (GeschwKlammern) { return (-1, string.Empty); }
+                            GeschwKlammern++;
+                        }
                         break;
 
                     case "}":
-                        if (OpenBraketCount == 0) {
-                            CurrentChar--;
-                            ExitDo = true;
-                        } else {
-                            OpenBraketCount--;
+                        if (!Gans) {
+                            if (klammern > 0) { return (-1, string.Empty); }
+                            if (EckigeKlammern > 0) { return (-1, string.Empty); }
+                            if (GeschwKlammern < 1) { return (-1, string.Empty); }
+                            GeschwKlammern--;
                         }
-
                         break;
                 }
-            }
+                #endregion
 
-            if (OpenBraketCount != 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Parse Fehler: " + tXT); }
-            return tXT.Substring(FirstCharAfterEquals, CurrentChar - FirstCharAfterEquals + 1);
+                #region Den Text suchen
+                if (klammern == 0 && !Gans && GeschwKlammern == 0 && EckigeKlammern == 0) {
+                    if (!checkforSeparatorbefore || pos == 0 || TR.Contains(txt.Substring(pos - 1, 1))) {
+                        foreach (var thisEnd in searchfor) {
+                            if (pos + thisEnd.Length <= maxl) {
+
+                                if (txt.Substring(pos, thisEnd.Length).ToLower() == thisEnd.ToLower()) {
+                                    if (!checkforSeparatorafter || pos + thisEnd.Length >= maxl || TR.Contains(txt.Substring(pos + thisEnd.Length, 1))) {
+                                        return (pos, thisEnd);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                #endregion
+
+
+                pos++;
+            } while (true);
+
+
         }
+
+
+
+        //public static string ParseTag(this string tXT, int startIndex) {
+        //    var IG = tXT.IndexOf("=", startIndex);
+        //    if (IG < 1) { return string.Empty; }
+
+        //    var BG = IG - 1;
+        //    while (BG >= 1) {
+        //        if (" ,{".Contains(tXT.Substring(BG, 1))) { break; }
+        //        BG--;
+        //    }
+
+        //    return tXT.Substring(BG + 1, IG - BG - 1).ToLower();
+        //}
+
+        //public static string ParseValue(this string tXT, string offTag, int startIndex) {
+        //    if (string.IsNullOrEmpty(tXT)) { return string.Empty; }
+        //    if (string.IsNullOrEmpty(offTag)) { return string.Empty; }
+
+        //    var FirstCharAfterEquals = tXT.ToLower().IndexOf(offTag.ToLower() + "=", startIndex);
+
+        //    if (FirstCharAfterEquals < 0) { return string.Empty; }
+        //    FirstCharAfterEquals = FirstCharAfterEquals + offTag.Length + 1;
+
+        //    // while (TXT.Substring(FirstCharAfterEquals, 1) == " ")
+        //    // {
+        //    //    FirstCharAfterEquals++;
+        //    // }
+
+        //    var OpenBraketCount = 0;
+        //    var CurrentChar = FirstCharAfterEquals - 1; // Wird im ersten Step wieder erhöht
+
+        //    var ExitDo = false;
+
+        //    while (!ExitDo && CurrentChar < tXT.Length - 1) {
+        //        CurrentChar++;
+
+        //        switch (tXT.Substring(CurrentChar, 1)) {
+        //            case ",":
+        //                if (OpenBraketCount == 0) {
+
+        //                    if (CurrentChar < tXT.Length - 2) {
+        //                        if (!Constants.Char_Numerals.Contains(tXT.Substring(CurrentChar + 1, 1))) {
+        //                            CurrentChar -= 1;
+        //                            ExitDo = true;
+        //                        }
+
+        //                    } else {
+        //                        Develop.DebugPrint(enFehlerArt.Warnung, "Unerlaubtes Zeichen nach Komma: " + tXT);
+        //                    }
+
+
+
+
+        //                }
+
+        //                break;
+
+
+        //            case " ":
+        //                if (tXT.Substring(CurrentChar - 1, 1) == "," && OpenBraketCount == 0) {
+        //                    CurrentChar -= 2;
+        //                    ExitDo = true;
+        //                }
+
+        //                break;
+
+        //            case "{":
+        //                OpenBraketCount++;
+        //                break;
+
+        //            case "}":
+        //                if (OpenBraketCount == 0) {
+        //                    CurrentChar--;
+        //                    ExitDo = true;
+        //                } else {
+        //                    OpenBraketCount--;
+        //                }
+
+        //                break;
+        //        }
+        //    }
+
+        //    if (OpenBraketCount != 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Parse Fehler: " + tXT); }
+        //    return tXT.Substring(FirstCharAfterEquals, CurrentChar - FirstCharAfterEquals + 1);
+        //}
 
         public static string StarkeVereinfachung(this string tXT, string additinalAllowed) {
             tXT = tXT.ToLower().ReduceToChars(Constants.Char_Numerals + Constants.Char_Buchstaben + additinalAllowed);

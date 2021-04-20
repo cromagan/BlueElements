@@ -357,13 +357,9 @@ namespace BlueDatabase {
         private BlueScript.Script DoRules(bool onlyTest, string startRoutine) {
             try {
                 var vars = new List<Variable>
-                 {
-
-                //var x = new BeginnRowAutomaticEventArgs(this, vars);
-
-                //OnBeginnRowAutomatic(x);
+                {
                 new Variable("Startroutine", startRoutine, enVariableDataType.String, true, false, "ACHTUNG: Keinesfalls dürfen Startroutinenabhängig Werte verändert werden.\r\nMögliche Werte: new row, value changed, script testing, manual check, to be sure")
-            };
+                };
 
                 #region Variablen für Skript erstellen
                 foreach (var thisCol in Database.Column) {

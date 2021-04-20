@@ -34,27 +34,10 @@ namespace BlueControls.Forms {
             //InitializeComponent();
         }
 
-
-
-        public static Dictionary<enStates, clsDesign> Form_Standard = new();
-        public static Dictionary<enStates, clsDesign> Form_MsgBox = new();
-        public static Dictionary<enStates, clsDesign> Form_QuickInfo = new();
-        public static Dictionary<enStates, clsDesign> Form_DesktopBenachrichtigung = new();
-        public static Dictionary<enStates, clsDesign> Form_BitteWarten = new();
-        public static Dictionary<enStates, clsDesign> Form_KontextMenu = new();
-        public static Dictionary<enStates, clsDesign> Form_SelectBox_Dropdown = new();
-        public static Dictionary<enStates, clsDesign> Form_AutoFilter = new();
-
-        public Dictionary<enStates, clsDesign> DesignSet = Form_Standard;
-
-
-
-
-
-        enDesign _design = enDesign.Form_Standard;
-
         public Form(enDesign design) : base() {
             Design = design;
+            if (!Skin.inited) { Skin.LoadSkin(); }
+            SkinChanged();
             InitializeComponent();
         }
 
@@ -111,39 +94,22 @@ namespace BlueControls.Forms {
             set => base.AutoSize = false;
         }
 
-
         [DefaultValue(enDesign.Form_Standard)]
         public enDesign Design {
-            get => _design;
-            private set {
-                _design = value;
+            get;
+            //set
+            //{
+            //    if (value == _design) { return; }
+            //    _design = value;
 
-                switch (_design) {
-                    case enDesign.Form_QuickInfo:
-                        DesignSet = Form_QuickInfo;
-                        break;
-                    case enDesign.Form_DesktopBenachrichtigung:
-                        DesignSet = Form_DesktopBenachrichtigung;
-                        break;
-                    case enDesign.Form_BitteWarten:
-                        DesignSet = Form_BitteWarten;
-                        break;
-                    case enDesign.Form_KontextMenu:
-                        DesignSet = Form_KontextMenu;
-                        break;
-                    case enDesign.Form_SelectBox_Dropdown:
-                        DesignSet = Form_SelectBox_Dropdown;
-                        break;
-                    case enDesign.Form_AutoFilter:
-                        DesignSet = Form_SelectBox_Dropdown;
-                        break;
+            //    if (Skin.SkinDB == null) { Skin.LoadSkin(); }
 
-                }
+            //    SkinChanged();
 
 
-            }
-        }
 
+            //}
+        } = enDesign.Form_Standard;
 
         [DefaultValue(true)]
         public bool CloseButtonEnabled { get; set; } = true;
@@ -243,7 +209,7 @@ namespace BlueControls.Forms {
 
 
         protected override void OnLoad(System.EventArgs e) {
-            BackColor = DesignSet[enStates.Standard].BackColor1;
+            BackColor = Skin.Color_Back(Design, enStates.Standard);
             base.OnLoad(e);
         }
 
@@ -259,6 +225,16 @@ namespace BlueControls.Forms {
         protected override void OnInvalidated(System.Windows.Forms.InvalidateEventArgs e) {
             if (!IsClosed) { base.OnInvalidated(e); }
         }
+
+        private void SkinChanged() {
+            BackColor = Skin.Color_Back(Design, enStates.Standard);
+            Invalidate();
+        }
+
+
+
+
+
 
 
         public List<Button> Generate_Buttons(string[] Names) {

@@ -224,14 +224,14 @@ namespace BlueDatabase {
                         _Typ = (enExportTyp)int.Parse(pair.Value);
                         break;
 
-                    case "itv": // ALT, 02.10.2019
-                    case "interval":
-                        _Intervall = float.Parse(pair.Value);
+                    case "itv": 
+                    case "interval":// ALT, 02.10.2019
+                        _Intervall = float.Parse(pair.Value.FromNonCritical());
                         break;
 
                     case "aud":
                     case "autodelete":// ALT, 02.10.2019
-                        _AutomatischLöschen = float.Parse(pair.Value);
+                        _AutomatischLöschen = float.Parse(pair.Value.FromNonCritical());
                         break;
 
                     case "exportformula":
@@ -425,11 +425,11 @@ namespace BlueDatabase {
                 Result = Result + "typ=" + (int)_Typ + ", ";
                 Result = Result + "let=" + _LastExportTimeUTC.ToString(Constants.Format_Date5) + ", ";
 
-                Result = Result + "itv=" + _Intervall + ", ";
+                Result = Result + "itv=" + _Intervall.ToString().ToNonCritical()+ ", ";
 
                 if (_Typ == enExportTyp.DatenbankCSVFormat || _Typ == enExportTyp.DatenbankHTMLFormat || _Typ == enExportTyp.DatenbankOriginalFormat)
                 {
-                    Result = Result + "aud=" + _AutomatischLöschen + ", ";
+                    Result = Result + "aud=" + _AutomatischLöschen.ToString().ToNonCritical() + ", ";
 
 
                     if (_Typ != enExportTyp.DatenbankOriginalFormat)

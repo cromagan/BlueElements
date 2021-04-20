@@ -296,7 +296,7 @@ namespace BlueControls.Controls {
 
             lock (this) {
 
-                if (Skin.SkinDB == null) {
+                if (!Skin.inited) {
                     if (DesignMode) {
                         Skin.LoadSkin();
                     } else {

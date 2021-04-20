@@ -187,6 +187,8 @@ namespace BlueDatabase {
         public event EventHandler<KeyChangedEventArgs> ColumnKeyChanged;
         public event EventHandler<ProgressbarEventArgs> ProgressbarInfo;
 
+        public event EventHandler<MessageEventArgs> DropMessage;
+
         public event EventHandler<PasswordEventArgs> NeedPassword;
         public event EventHandler<RenameColumnInLayoutEventArgs> RenameColumnInLayout;
         public event EventHandler<GenerateLayoutInternalEventargs> GenerateLayoutInternal;
@@ -571,6 +573,9 @@ namespace BlueDatabase {
             return string.Empty;
         }
 
+        internal void OnDropMessage(string message) {
+            DropMessage?.Invoke(this, new MessageEventArgs(message));
+        }
 
 
         internal void OnProgressbarInfo(ProgressbarEventArgs e) {

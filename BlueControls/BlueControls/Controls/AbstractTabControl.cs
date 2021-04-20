@@ -252,7 +252,7 @@ namespace BlueControls.Controls {
                 e.Graphics.Clear(Color.LightBlue);
                 return;
             }
-            if (Skin.SkinDB == null) { return; }
+            //if (Skin.SkinDB == null) { return; }
 
 
 

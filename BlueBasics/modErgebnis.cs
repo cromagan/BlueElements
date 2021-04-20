@@ -33,7 +33,7 @@ namespace BlueBasics {
         private static double? ErgebnisCore(string formel) {
             // var TMP = 0;
 
-            formel = formel.DeKlammere(true, false, false);
+            formel = formel.DeKlammere(true, false, false, true);
             // Das alles kann nur möglich sein, WENN eine Klammer vorhanden ist
             if (formel.Contains("(")) {
                 // --------------------------------------------------------------------------------------------------------------------------------
