@@ -45,13 +45,13 @@ namespace BlueScript {
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var variableName = infos.ComandText.ToLower().ReduceToChars(Constants.Char_az + "_" + Constants.Char_Numerals);
             var variable = s.Variablen.Get(variableName);
-            if (variable == null) { return new strDoItFeedback("Variable " + variableName + " nicht gefunden"); }
+            if (variable == null) { return new strDoItFeedback("Variable '" + variableName + "' nicht gefunden"); }
 
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
 
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
-            if (variable.Type != enVariableDataType.NotDefinedYet && attvar.Attributes[0].Type != variable.Type) { return strDoItFeedback.FalscherDatentyp(); }
+            if (variable.Type != enVariableDataType.NotDefinedYet && attvar.Attributes[0].Type != variable.Type) { return new strDoItFeedback("Variable '" + variableName + "' ist nicht der erwartete Typ: " + variable.Type.ToString()); }
 
             variable.ValueString = attvar.Attributes[0].ValueString;
             variable.Type = attvar.Attributes[0].Type;

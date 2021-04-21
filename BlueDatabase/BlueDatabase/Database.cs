@@ -2310,8 +2310,21 @@ namespace BlueDatabase {
         protected override void DoBackGroundWork(BackgroundWorker listenToMyCancel) {
             if (ReadOnly) { return; }
 
-            if (!HasPendingChanges()) {
+            try {
 
+                foreach (var ThisExport in Export) {
+                    if (string.IsNullOrEmpty(ThisExport.Verzeichnis)) { return; }
+                    if (!PathExists(ThisExport.Verzeichnis)) { return; }
+                    if (listenToMyCancel.CancellationPending) { break; }
+                    if (!CanWriteInDirectory(ThisExport.Verzeichnis)) { return; }
+                    if (listenToMyCancel.CancellationPending) { break; }
+                }
+
+            } catch { return; }
+
+
+
+            if (!HasPendingChanges()) {
                 var ec = new CancelEventArgs(false);
                 OnExporting(ec);
                 if (ec.Cancel) { return; }

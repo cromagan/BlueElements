@@ -200,6 +200,8 @@ namespace BlueBasics {
 
             value = value.DeKlammere(false, true, false, true);
 
+            value = value.TrimEnd(",");
+
             var start = 0;
             var noarunde = true;
 
@@ -245,6 +247,7 @@ namespace BlueBasics {
         public static List<string> KlammerAuf = new() { "(" };
         public static List<string> KlammerZu = new() { "(" };
         public static List<string> GeschKlammerAuf = new() { "{" };
+        public static List<string> GeschKlammerZu = new() { "}" };
         public static (int pos, string witch) NextText(string txt, int startpos, List<string> searchfor, bool checkforSeparatorbefore, bool checkforSeparatorafter) {
 
             var klammern = 0;

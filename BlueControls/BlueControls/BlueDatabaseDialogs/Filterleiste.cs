@@ -388,7 +388,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                             Controls.Add(flx);
                         }
 
-                        if (showPic && !FilterItem.Column.DauerFilterPos.IsEmpty) {
+                        if (showPic && !FilterItem.Column.DauerFilterPos.IsEmpty && pic.Image != null) {
                             flx.Height = consthe * 2;
 
 

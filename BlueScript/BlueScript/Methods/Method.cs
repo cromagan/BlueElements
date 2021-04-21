@@ -94,7 +94,7 @@ namespace BlueScript {
                             } while (true);
 
 
-                            (var posek, var witch) = NextText(scriptText, cont, GeschKlammerAuf, false, false);
+                            (var posek, var witch) = NextText(scriptText, cont, GeschKlammerZu, false, false);
                             if (posek < cont) {
                                 return new strCanDoFeedback(cont, "Kein Codeblock Ende bei " + comandtext, true);
                             }

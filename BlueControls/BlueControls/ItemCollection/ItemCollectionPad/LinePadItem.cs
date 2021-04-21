@@ -203,7 +203,7 @@ namespace BlueControls.ItemCollection {
             t = t.Substring(0, t.Length - 1) + ", ";
 
             if (Linien_Verhalten != enConectorStyle.Direct) { t = t + "Connection=" + (int)Linien_Verhalten + ", "; }
-            return t + "}";
+            return t.TrimEnd(", ") + "}";
         }
 
         protected override void GenerateInternalRelationExplicit() { }
