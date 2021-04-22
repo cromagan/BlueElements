@@ -403,22 +403,25 @@ namespace BlueControls.Controls {
         }
 
         public void SaveData() {
+
             WritePointsInTags();
             var Path = Tags.TagGet("ImageFile");
 
-
             var pathtxt = FilenameTXT(Path);
 
+            try {
+                if (BMP != null) {
+                    BMP.Save(Path, System.Drawing.Imaging.ImageFormat.Png);
+                }
 
-            if (BMP != null) {
-                BMP.Save(Path, System.Drawing.Imaging.ImageFormat.Png);
-
-            }
-
-            if (Tags != null) {
-                Tags.TagSet("Erstellt", modAllgemein.UserName());
-                Tags.TagSet("Datum", DateTime.Now.ToString(Constants.Format_Date5));
-                Tags.Save(pathtxt, false, System.Text.Encoding.GetEncoding(1252));
+                if (Tags != null) {
+                    Tags.TagSet("Erstellt", modAllgemein.UserName());
+                    Tags.TagSet("Datum", DateTime.Now.ToString(Constants.Format_Date5));
+                    Tags.Save(pathtxt, false, System.Text.Encoding.GetEncoding(1252));
+                }
+            } catch {
+                Develop.DebugPrint("Fehler beim Speichern: " + pathtxt);
+                MessageBox.Show("Fehler beim Speichern");
             }
         }
 

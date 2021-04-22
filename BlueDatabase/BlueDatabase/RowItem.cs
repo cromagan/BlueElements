@@ -316,36 +316,43 @@ namespace BlueDatabase {
             }
         }
 
-        public static Variable CellToVariable(ColumnItem thisCol, RowItem r) {
-            if (!thisCol.Format.CanBeCheckedByRules()) { return null; }
 
-            var ro = !thisCol.Format.CanBeChangedByRules();
+        /// <summary>
+        /// Diese Routine konvertiert den Inhalt der Zelle in eine vom Skript lesbaren Variable
+        /// </summary>
+        /// <param name="column"></param>
+        /// <param name="row"></param>
+        /// <returns></returns>
+        public static Variable CellToVariable(ColumnItem column, RowItem row) {
+            if (!column.Format.CanBeCheckedByRules()) { return null; }
 
-            if (thisCol == thisCol.Database.Column.SysCorrect) { ro = true; }
-            if (thisCol == thisCol.Database.Column[0]) { ro = true; }
-            if (thisCol == thisCol.Database.Column.SysRowChanger) { ro = true; }
-            if (thisCol == thisCol.Database.Column.SysRowChangeDate) { ro = true; }
+           
+            var ro = !column.Format.CanBeChangedByRules();
+
+            if (column == column.Database.Column.SysCorrect) { ro = true; }
+            if (column == column.Database.Column.SysRowChanger) { ro = true; }
+            if (column == column.Database.Column.SysRowChangeDate) { ro = true; }
 
 
 
-            if (thisCol.MultiLine) {
-                return new Variable(thisCol.Name, r.CellGetString(thisCol), enVariableDataType.List, ro, false, "Spalte: " + thisCol.ReadableText() + "\r\nMehrzeilige Spalten können nur als Liste bearbeitet werdern.");
+            if (column.MultiLine) {
+                return new Variable(column.Name, row.CellGetString(column), enVariableDataType.List, ro, false, "Spalte: " + column.ReadableText() + "\r\nMehrzeilige Spalten können nur als Liste bearbeitet werdern.");
             }
 
-            switch (thisCol.Format) {
+            switch (column.Format) {
                 case enDataFormat.Bit:
-                    if (r.CellGetString(thisCol) == "+") {
-                        return new Variable(thisCol.Name, "true", enVariableDataType.Bool, ro, false, "Spalte: " + thisCol.ReadableText());
+                    if (row.CellGetString(column) == "+") {
+                        return new Variable(column.Name, "true", enVariableDataType.Bool, ro, false, "Spalte: " + column.ReadableText());
                     } else {
-                        return new Variable(thisCol.Name, "false", enVariableDataType.Bool, ro, false, "Spalte: " + thisCol.ReadableText());
+                        return new Variable(column.Name, "false", enVariableDataType.Bool, ro, false, "Spalte: " + column.ReadableText());
                     }
 
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.Gleitkommazahl:
-                    return new Variable(thisCol.Name, r.CellGetString(thisCol), enVariableDataType.Numeral, ro, false, "Spalte: " + thisCol.ReadableText());
+                    return new Variable(column.Name, row.CellGetString(column), enVariableDataType.Numeral, ro, false, "Spalte: " + column.ReadableText());
 
                 default:
-                    return new Variable(thisCol.Name, r.CellGetString(thisCol), enVariableDataType.String, ro, false, "Spalte: " + thisCol.ReadableText());
+                    return new Variable(column.Name, row.CellGetString(column), enVariableDataType.String, ro, false, "Spalte: " + column.ReadableText());
 
             }
         }
