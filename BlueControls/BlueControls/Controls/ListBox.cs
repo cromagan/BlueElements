@@ -563,8 +563,6 @@ namespace BlueControls.Controls {
                 }
 
             }
-
-            return null;
         }
 
 
@@ -688,7 +686,6 @@ namespace BlueControls.Controls {
             ItemRemoving?.Invoke(this, e);
         }
 
-
         private void _Item_ItemRemoving(object sender, ListEventArgs e) {
             if (IsDisposed) { return; }
             Invalidate();
@@ -708,11 +705,6 @@ namespace BlueControls.Controls {
         public void OnListOrItemChanged() {
             ListOrItemChanged?.Invoke(this, System.EventArgs.Empty);
         }
-
-
-
-
-
 
     }
 }
