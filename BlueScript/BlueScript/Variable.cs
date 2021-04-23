@@ -73,7 +73,7 @@ namespace BlueScript {
         public static strDoItFeedback AttributeAuflösen(string txt, Script s) {
 
             // Die Trims werden benötigtn, wenn eine Liste kommt, dass die Leerzeichen vor und nach den Kommas weggeschnitten werden.
-            txt = txt.Trim(" ").DeKlammere(true, false, false, true);
+            txt = txt.DeKlammere(true, false, false, true);
 
             if (s != null) {
                 #region Variablen ersetzen
@@ -81,6 +81,36 @@ namespace BlueScript {
                 if (!string.IsNullOrEmpty(t.ErrorMessage)) {
                     return new strDoItFeedback("Variablen-Berechnungsfehler: " + t.ErrorMessage);
                 }
+                #endregion
+
+                #region auf Boolsche Operatoren prüfen
+
+                #region AndAlso
+                (var uu, var _) = NextText(txt, 0, Method_if.UndUnd, false, false);
+                if (uu > 0) {
+                    var txt1 = AttributeAuflösen(txt.Substring(0, uu), s);
+                    if (!string.IsNullOrEmpty(txt1.ErrorMessage)) {
+                        return new strDoItFeedback("Befehls-Berechnungsfehler vor &&: " + txt1.ErrorMessage);
+                    }
+                    if (txt1.Value == "false") { return txt1; }
+
+                    return AttributeAuflösen(txt.Substring(uu + 2), s);
+                }
+                #endregion
+
+                #region OrElse
+                (var oo, var _) = NextText(txt, 0, Method_if.OderOder, false, false);
+                if (oo > 0) {
+                    var txt1 = AttributeAuflösen(txt.Substring(0, oo), s);
+                    if (!string.IsNullOrEmpty(txt1.ErrorMessage)) {
+                        return new strDoItFeedback("Befehls-Berechnungsfehler vor ||: " + txt1.ErrorMessage);
+                    }
+                    if (txt1.Value == "true") { return txt1; }
+
+                    return AttributeAuflösen(txt.Substring(oo + 2), s);
+                }
+                #endregion
+
                 #endregion
 
                 #region Routinen ersetzen, vor den Klammern, das ansonsten Min(x,y,z) falsch anschlägt
@@ -118,19 +148,12 @@ namespace BlueScript {
                 txt = Method_if.GetBool(txt);
                 if (txt == null) { return new strDoItFeedback("Der Inhalt zwischen den Klammern () konnte nicht berechnet werden."); }
             }
-
-
             #endregion
 
-
-
             return new strDoItFeedback(txt, string.Empty);
-
         }
 
-
         public Variable(string name, string attributesText, Script s) {
-
             if (!IsValidName(name)) {
                 Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Fehler, "Ungültiger Variablenname: " + name);
             }
@@ -140,7 +163,6 @@ namespace BlueScript {
 
 
             if (!string.IsNullOrEmpty(txt.ErrorMessage)) { SetError(txt.ErrorMessage); return; }
-
 
             #region Testen auf bool
             if (txt.Value.Equals("true", System.StringComparison.InvariantCultureIgnoreCase) ||
@@ -175,17 +197,13 @@ namespace BlueScript {
                 return;// new strDoItFeedback();
             }
 
-
             #endregion
-
-
 
             #region Testen auf Number
             if (Type != enVariableDataType.NotDefinedYet && Type != enVariableDataType.Numeral) { SetError("Variable ist keine Zahl"); return; }
 
             var erg = modErgebnis.Ergebnis(txt.Value);
             if (erg == null) { SetError("Berechnungsfehler der Formel: " + txt.ErrorMessage); return; }//return new strDoItFeedback(); 
-
 
             ValueDouble = (double)erg;
             Type = enVariableDataType.Numeral;
@@ -202,7 +220,6 @@ namespace BlueScript {
         }
 
 
-
         public Variable(string name, string value, enVariableDataType type, bool ronly, bool system, string coment) {
 
             if (!IsValidName(name)) {
@@ -216,14 +233,12 @@ namespace BlueScript {
                 Name = name.ToLower();
             }
 
-
             ValueString = value;
             Type = type;
             Readonly = ronly;
             SystemVariable = system;
             Coment = coment;
         }
-
 
         public Variable(string name, string value, enVariableDataType type) {
 
@@ -235,7 +250,6 @@ namespace BlueScript {
             Type = type;
         }
 
-
         public string ValueForReplace {
             get {
 
@@ -246,6 +260,7 @@ namespace BlueScript {
 
                     case enVariableDataType.Numeral:
                         return ValueString;
+
                     case enVariableDataType.Bool:
                         return ValueString;
 
@@ -255,11 +270,9 @@ namespace BlueScript {
                     default:
                         Develop.DebugPrint_NichtImplementiert();
                         return ValueString;
-
                 }
             }
         }
-
 
         public bool SystemVariable { get; set; }
         public bool Readonly { get; set; }
@@ -267,7 +280,6 @@ namespace BlueScript {
         public string Coment { get; set; }
 
         private string _ValueString = string.Empty;
-
 
         /// <summary>
         /// Der direkte Text, der in der Variabel gespeichert ist.
@@ -289,7 +301,6 @@ namespace BlueScript {
             }
         }
 
-
         public enVariableDataType Type { get; set; }
         public bool ValueBool => _ValueString == "true";
 
@@ -302,7 +313,6 @@ namespace BlueScript {
         }
 
         public int ValueInt => IntParse(_ValueString);
-
 
 
         public static bool IsValidName(string v) {
@@ -520,9 +530,3 @@ namespace BlueScript {
         }
     }
 }
-
-
-
-
-
-

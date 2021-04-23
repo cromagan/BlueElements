@@ -34,7 +34,7 @@ namespace BlueBasics {
         /// <param name="geschklammern"></param>
         /// <param name="gänsef"></param>
         /// <returns></returns>
-        public static string DeKlammere(this string txt, bool klammern, bool geschklammern, bool gänsef, bool trimspace) {
+        public static string DeKlammere(this string txt, bool klammern, bool geschklammern, bool gänsef, bool trimspace) { 
             if (trimspace) { txt = txt.Trim(); }
 
             if (klammern && txt.StartsWith("(") && txt.EndsWith(")")) {

@@ -38,20 +38,22 @@ namespace BlueScript {
 
 
         public static readonly List<string> VergleichsOperatoren = new() { "!", "||", "&&", "==", "!=", "<", ">", ">=", "<=" };
-        public static readonly List<string> VergleichsOperatoren2 = new() { "||", "&&", "==", "!=", "<", ">", ">=", "<=" };
-        public static readonly List<string> Vorbidden = new() { "exists", "istype", "isnullorempty", "isnullorzero" };
+        //public static readonly List<string> VergleichsOperatoren2 = new() { "||", "&&", "==", "!=", "<", ">", ">=", "<=" };
+        public static readonly List<string> UndUnd = new() { "&&" };
+        public static readonly List<string> OderOder = new() { "||" };
+        //public static readonly List<string> Vorbidden = new() { "exists", "istype", "isnullorempty", "isnullorzero" };
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
 
-            var txt = infos.AttributText.Replace("(", string.Empty).Replace(")", string.Empty);
-            (var pos, var witch) = NextText(txt, 0, Vorbidden, false, false);
-            if (pos >= 0) {
-                (var pos2, var witch2) = NextText(txt, 0, VergleichsOperatoren2, false, false);
-                if (pos2 >= 0) {
-                    return new strDoItFeedback("Der Befehl " + witch + " in Kombination mit " + witch2 + " nicht erlaubt.");
-                }
-            }
+            //var txt = infos.AttributText.Replace("(", string.Empty).Replace(")", string.Empty);
+            //(var pos, var witch) = NextText(txt, 0, Vorbidden, false, false);
+            //if (pos >= 0) {
+            //    (var pos2, var witch2) = NextText(txt, 0, VergleichsOperatoren2, false, false);
+            //    if (pos2 >= 0) {
+            //        return new strDoItFeedback("Der Befehl " + witch + " in Kombination mit " + witch2 + " nicht erlaubt.");
+            //    }
+            //}
 
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
