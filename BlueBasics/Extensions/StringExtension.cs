@@ -245,7 +245,7 @@ namespace BlueBasics {
         public static List<string> Komma = new() { "," };
         public static List<string> Gleich = new() { "=" };
         public static List<string> KlammerAuf = new() { "(" };
-        public static List<string> KlammerZu = new() { "(" };
+        public static List<string> KlammerZu = new() { ")" };
         public static List<string> GeschKlammerAuf = new() { "{" };
         public static List<string> GeschKlammerZu = new() { "}" };
         public static (int pos, string witch) NextText(string txt, int startpos, List<string> searchfor, bool checkforSeparatorbefore, bool checkforSeparatorafter) {

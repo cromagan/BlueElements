@@ -99,7 +99,7 @@ namespace BlueScript {
             if (posa > -1) {
                 (var pose, var _) = NextText(txt, posa, KlammerZu, false, false);
 
-                if (pose < posa) { return strDoItFeedback.Klammerfehler(); }
+                if (pose <= posa) { return strDoItFeedback.Klammerfehler(); }
 
                 var tmp = AttributeAuflösen(txt.Substring(posa + 1, pose - posa - 1), s);
                 if (!string.IsNullOrEmpty(tmp.ErrorMessage)) { return tmp; }
