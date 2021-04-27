@@ -531,7 +531,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
 
-            for (var n = 0; n < _Database.Works.Count; n++) {
+            for (var n = 0; n < Math.Min(_Database.Works.Count, 3000); n++) {
 
 
                 if (_Database.Works[n].HistorischRelevant) {
@@ -805,7 +805,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (e.Item.Tag is Method thisc) {
                 co = co + "Syntax:\r\n";
                 co = co + "~~~~~~\r\n";
-                co = co +  thisc.Syntax + "\r\n";
+                co = co + thisc.Syntax + "\r\n";
                 co = co + "\r\n";
                 co = co + "Argumente:\r\n";
                 co = co + "~~~~~~~~~~\r\n";

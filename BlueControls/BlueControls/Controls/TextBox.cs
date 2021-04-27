@@ -456,6 +456,7 @@ namespace BlueControls.Controls {
 
 
         public void InsertText(string nt) {
+            if (nt == null) { nt = string.Empty; }
             nt = nt.Replace(Constants.beChrW1.ToString(), "\r");
             nt = nt.RemoveChars(Constants.Char_NotFromClip);
 
