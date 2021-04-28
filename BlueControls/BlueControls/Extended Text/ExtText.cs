@@ -60,8 +60,7 @@ namespace BlueControls {
         private enDesign _Design;
         private RowItem _Row;
         private enStates _State;
-        private double _Zeilenabstand = 1;
-        private double vZBX_Pixel;
+        private float _Zeilenabstand = 1;
 
 
 
@@ -101,7 +100,6 @@ namespace BlueControls {
             Multiline = true;
             AllowedChars = string.Empty;
             Chars = new List<ExtChar>();
-            vZBX_Pixel = 0;
             DrawingArea = new Rectangle(0, 0, -1, -1);
             _TextDimensions = Size.Empty;
 
@@ -139,7 +137,7 @@ namespace BlueControls {
 
         public List<ExtChar> Chars { get; private set; }
 
-        public double Zeilenabstand {
+        public float Zeilenabstand {
             get => _Zeilenabstand;
             set {
                 if (value == _Zeilenabstand) { return; }
@@ -277,21 +275,17 @@ namespace BlueControls {
         /// </summary>
         /// <remarks></remarks>
         private void ReBreak() {
-            var ZB_Char = 0;
-            double IsX = 0;
-            double IsY = 0;
-            var RI = new List<string>();
+           
             _Width = 0;
             _Height = 0;
 
-            // if (_AutoUmbruch && _MaxWidth < 1) { return; }
-
             if (Chars.Count == 0) { return; }
 
-            vZBX_Pixel = 0;
-            IsX = vZBX_Pixel;
-            IsY = 0;
-            ZB_Char = 0;
+            var RI = new List<string>();
+            var vZBX_Pixel = 0f;
+            var IsX = 0f;
+            var IsY = 0f;
+            var ZB_Char = 0;
 
             var Akt = -1;
 
@@ -310,33 +304,10 @@ namespace BlueControls {
 
                     case ExtChar.StoreX:
                         vZBX_Pixel = IsX;
-                        //Chars[Akt].Width = 0;
                         break;
-
-                    //case (int)enEtxtCodes.ZBX_RESET:
-                    //    vZBX_Pixel = 0;
-                    //    Chars[Akt].Width = 0;
-                    //    break;
-
                     case ExtChar.Top:
                         IsY = 0;
-                        //Chars[Akt].Width = 0;
                         break;
-
-                        //case (int)enEtxtCodes.ZBY_STORE:
-                        //    vZBY_Pixel = IsY;
-                        //    Chars[Akt].Width = 0;
-                        //    break;
-
-                        //case (int)enEtxtCodes.ZBY_RESET:
-                        //    vZBY_Pixel = 0;
-                        //    Chars[Akt].Width = 0;
-                        //    break;
-
-                        //case (int)enEtxtCodes.Left:
-                        //    IsX = 0;
-                        //    Chars[Akt].Width = 0;
-                        //    break;
                 }
 
                 if (!Chars[Akt].isSpace()) {
@@ -396,8 +367,7 @@ namespace BlueControls {
                     if (Convert.ToBoolean(Ausrichtung & enAlignment.Right)) { KX = _TextDimensions.Width - Chars[Z2].Pos.X - Chars[Z2].Size.Width; }
                     if (Convert.ToBoolean(Ausrichtung & enAlignment.HorizontalCenter)) { KX = (_TextDimensions.Width - Chars[Z2].Pos.X - Chars[Z2].Size.Width) / 2; }
 
-                    var Z3 = 0;
-                    for (Z3 = Z1; Z3 <= Z2; Z3++) {
+                    for (var Z3 = Z1; Z3 <= Z2; Z3++) {
                         Chars[Z3].Pos.X += KX;
                         Chars[Z3].Pos.Y += KY;
                     }
@@ -607,7 +577,7 @@ namespace BlueControls {
             Chars = new List<ExtChar>();
             ResetPosition(false);
 
-            BlueFont BF = null;
+            BlueFont BF;
 
             if ((int)_Design > 10000) {
                 BF = Skin.GetBlueFont((PadStyles)_Design, _Row);
@@ -803,14 +773,8 @@ namespace BlueControls {
         }
 
         private void DoHTMLCode(string HTMLText, int StartPos, ref int Position, ref BlueFont PF, ref int Stufe, ref enMarkState MarkState) {
-            var Istgleich = 0;
-            string Cod = null;
-            string Attribut = null;
-
-
 
             if (PF == null) { return; }  // wenn die Datenbanken entladen wurden bei Programmende
-
 
             var Endpos = HTMLText.IndexOf('>', StartPos + 1);
 
@@ -822,7 +786,8 @@ namespace BlueControls {
             var Oricode = HTMLText.Substring(StartPos + 1, Endpos - StartPos - 1);
 
 
-            Istgleich = Oricode.IndexOf('=');
+            var Istgleich = Oricode.IndexOf('=');
+            string Cod, Attribut;
 
             if (Istgleich < 0) {
                 // <H4> wird durch autoprüfung zu <H4 >
@@ -940,7 +905,7 @@ namespace BlueControls {
                 //    break;
 
                 case "IMAGECODE":
-                    QuickImage x = null;
+                    QuickImage x;
                     if (!Attribut.Contains("|") && PF != null) {
                         x = QuickImage.Get(Attribut, (int)PF.Oberlänge(1));
                     } else {

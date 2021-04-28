@@ -20,10 +20,8 @@
 using Skript.Enums;
 using System.Collections.Generic;
 
-namespace BlueScript
-{
-    internal class Method_Break : Method
-    {
+namespace BlueScript {
+    internal class Method_Break : Method {
 
 
         //public Method_var(Script parent) : base(parent) { }
@@ -41,8 +39,7 @@ namespace BlueScript
         public override bool EndlessArgs => false;
 
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
-        {
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
 
             s.EndSkript = true;
             return new strDoItFeedback();

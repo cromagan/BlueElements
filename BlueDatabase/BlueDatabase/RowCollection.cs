@@ -262,7 +262,7 @@ namespace BlueDatabase {
             while (x.Count > 0) {
 
                 Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", all - x.Count(), all, false, false));
-                var (didSuccesfullyCheck, error, skript) = x[0].DoAutomatic(true, fullCheck, false, startroutine);
+                var (didSuccesfullyCheck, _, skript) = x[0].DoAutomatic(true, fullCheck, false, startroutine);
 
                 if (!string.IsNullOrEmpty(skript.Error)) {
                     x.Clear();
@@ -423,7 +423,7 @@ namespace BlueDatabase {
             TMP.Sort();
 
 
-            var cc = 0;
+            int cc;
             if (rowSortDefinition == null || !rowSortDefinition.Reverse) {
                 foreach (var t in TMP) {
                     if (!string.IsNullOrEmpty(t)) {

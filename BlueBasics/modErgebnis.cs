@@ -44,7 +44,6 @@ namespace BlueBasics {
 
                 if (a >= e) { return null; }
 
-                double? Replacer = 0;
 
                 // if (a > 2 && Formel.IndexOf(",", a) > a && Formel.IndexOf(",", a) < e)
                 // {
@@ -126,7 +125,7 @@ namespace BlueBasics {
                 // }
                 // else // Es ist KEINE Funktion, also den Inhalt der Klammer normal berechnen
                 // {
-                Replacer = ErgebnisCore(formel.Substring(a + 1, e - a - 1));
+                var Replacer = ErgebnisCore(formel.Substring(a + 1, e - a - 1));
                 // }
 
                 if (Replacer == null) { return null; }

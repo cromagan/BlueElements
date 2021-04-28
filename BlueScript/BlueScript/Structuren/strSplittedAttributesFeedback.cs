@@ -20,12 +20,10 @@
 using BlueScript;
 using Skript.Enums;
 using System.Collections.Generic;
-using System.Linq;
 
 public struct strSplittedAttributesFeedback {
 
-    public strSplittedAttributesFeedback(List<Variable> atts)
-    {
+    public strSplittedAttributesFeedback(List<Variable> atts) {
         Attributes = atts;
         ErrorMessage = string.Empty;
         FehlerTyp = enSkriptFehlerTyp.ohne;

@@ -22,7 +22,6 @@ using BlueBasics.Enums;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueDatabase;
 using System;
 using System.ComponentModel;
 using System.Drawing;
@@ -356,11 +355,11 @@ namespace BlueControls.Controls {
 
                 var Zoom = Math.Min((con.Width - 6) / (double)p.BMP.Width, 28 / (double)p.BMP.Height);
                 var p2 = QuickImage.Get(QuickImage.GenerateCode(p.Name, (int)(p.BMP.Width * Zoom), (int)(p.BMP.Height * Zoom), p.Effekt, p.Färbung, p.ChangeGreenTo, p.Sättigung, p.Helligkeit, p.DrehWinkel, p.Transparenz, p.Zweitsymbol));
-                Skin.Draw_FormatedText(GR, "", p2,d, enAlignment.Horizontal_Vertical_Center, new Rectangle(0, 0, con.Width, 44), con, false, Translate);
+                Skin.Draw_FormatedText(GR, "", p2, d, enAlignment.Horizontal_Vertical_Center, new Rectangle(0, 0, con.Width, 44), con, false, Translate);
 
                 if (etxt == null) { etxt = new ExtText(vButtonTypex, vStatex); }
                 etxt.State = vStatex; // Fall es nicht nothing ist
-                etxt.Zeilenabstand = 0.65;
+                etxt.Zeilenabstand = 0.65f;
                 etxt.DrawingPos = new Point(0, 43);
                 //etxt.DrawingArea = DisplayRectangle;
                 //etxt.DrawingArea = DisplayRectangle;
@@ -370,7 +369,7 @@ namespace BlueControls.Controls {
                 etxt.Draw(GR, 1);
 
             } else if (vButtonTypex != enDesign.OptionButton_TextStyle && vButtonTypex != enDesign.CheckBox_TextStyle) {
-                Skin.Draw_FormatedText(GR, vtext, p, d,Align, DisplayRectangle, con, false, Translate);
+                Skin.Draw_FormatedText(GR, vtext, p, d, Align, DisplayRectangle, con, false, Translate);
             } else {
 
 

@@ -19,38 +19,31 @@
 
 using BlueControls;
 
-namespace BluePaint
-{
-    public partial class Tool_Screenshot
-    {
+namespace BluePaint {
+    public partial class Tool_Screenshot {
 
-        public Tool_Screenshot() : base()
-        {
+        public Tool_Screenshot() : base() {
             InitializeComponent();
         }
 
-        private void NeuerScreenshot_Click(object sender, System.EventArgs e)
-        {
+        private void NeuerScreenshot_Click(object sender, System.EventArgs e) {
 
             DoScreenShot();
             OnZoomFit();
         }
 
-        private void DoScreenShot()
-        {
+        private void DoScreenShot() {
             OnHideMainWindow();
 
             BlueBasics.modAllgemein.Pause(1, true);
 
             var _Pic = ScreenShot.GrabArea(null, 0, 0).Pic;
 
-            if (_Pic != null)
-            { OnOverridePic(_Pic); }
+            if (_Pic != null) { OnOverridePic(_Pic); }
             OnShowMainWindow();
         }
 
-        public override void ToolFirstShown()
-        {
+        public override void ToolFirstShown() {
             DoScreenShot();
             OnZoomFit();
         }

@@ -48,10 +48,6 @@ namespace BlueBasics {
         [DefaultValue(false)]
         public static bool ServiceStarted { get; private set; } = false;
 
-        public static bool IsDevelopment() {
-            return IsHostRunning(); // { return true; }
-                                    //   return System.Windows.Forms.Application.StartupPath.ToLower().Contains("\\bin\\") && IsPeterChr();
-        }
 
         public static bool IsHostRunning() {
             return Debugger.IsAttached;
@@ -140,7 +136,7 @@ namespace BlueBasics {
         }
 
         public static void DebugPrint(enFehlerArt art, Exception ex) {
-            if (art != enFehlerArt.Info && art != enFehlerArt.DevelopInfo && IsDevelopment()) { Debugger.Break(); }
+            if (art != enFehlerArt.Info && art != enFehlerArt.DevelopInfo && IsHostRunning()) { Debugger.Break(); }
             DebugPrint(art, "Es wurde ein allgemeiner Fehler abgefangen.\r\nMeldung: " + ex.Message + "\r\n" + ex.StackTrace.ToString());
         }
 
@@ -149,12 +145,12 @@ namespace BlueBasics {
         }
 
         public static void DebugPrint_RoutineMussUeberschriebenWerden() {
-            if (IsDevelopment()) { Debugger.Break(); }
+            if (IsHostRunning()) { Debugger.Break(); }
             DebugPrint(enFehlerArt.Warnung, "Diese Funktion muss noch überschrieben werden.");
         }
 
         public static void DebugPrint_NichtImplementiert() {
-            if (IsDevelopment()) { Debugger.Break(); }
+            if (IsHostRunning()) { Debugger.Break(); }
             DebugPrint(enFehlerArt.Fehler, "Diese Funktion ist vom Entwickler noch nicht implementiert.");
         }
 
@@ -196,7 +192,7 @@ namespace BlueBasics {
 
                     switch (art) {
                         case enFehlerArt.DevelopInfo:
-                            if (!IsDevelopment()) {
+                            if (!IsHostRunning()) {
                                 _IsTraceLogging = false;
                                 return;
                             }
@@ -211,14 +207,14 @@ namespace BlueBasics {
                             break;
 
                         case enFehlerArt.Warnung:
-                            if (IsDevelopment()) { Debugger.Break(); }
+                            if (IsHostRunning()) { Debugger.Break(); }
 
                             Trace.WriteLine("<th><font color =777700>Warnung<font color =000000>");
                             _DeleteTraceLog = false;
                             break;
 
                         case enFehlerArt.Fehler:
-                            if (IsDevelopment()) { Debugger.Break(); }
+                            if (IsHostRunning()) { Debugger.Break(); }
 
                             if (!FileExists(tmp)) { l = new List<string>(); }
 
@@ -298,13 +294,13 @@ namespace BlueBasics {
 
         public static void DebugPrint_Disposed(bool disposedValue) {
             if (!disposedValue) { return; }
-            if (IsDevelopment()) { Debugger.Break(); }
+            if (IsHostRunning()) { Debugger.Break(); }
             DebugPrint(enFehlerArt.Fehler, "Das Objekt wurde zur Laufzeit verworfen.");
         }
 
         public static void DebugPrint_InvokeRequired(bool invokeRequired, bool fehler) {
             if (!invokeRequired) { return; }
-            if (IsDevelopment()) { Debugger.Break(); }
+            if (IsHostRunning()) { Debugger.Break(); }
 
             if (fehler) {
                 DebugPrint(enFehlerArt.Fehler, "Es wird von einem Unterthread zugegriffen.");
@@ -342,7 +338,7 @@ namespace BlueBasics {
 
         private static void CloseAfter12Hours(object sender, System.EventArgs e) {
             if (DateTime.Now.Subtract(_ProgrammStarted).TotalHours > 12) {
-                if (IsDevelopment()) { return; }
+                if (IsHostRunning()) { return; }
                 DebugPrint(enFehlerArt.Info, "Das Programm wird nach 12 Stunden automatisch geschlossen.");
                 TraceLogging_End();
                 AbortExe();

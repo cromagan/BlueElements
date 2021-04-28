@@ -455,7 +455,7 @@ namespace BlueControls.ItemCollection {
 
             if (sliderY != null) {
 
-                var SetTo0 = false;
+                bool SetTo0;
 
                 if (SliderWidth > 0) {
                     if (Maxy - controlDrawingArea.Height <= 0) {

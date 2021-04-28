@@ -298,19 +298,19 @@ namespace BlueControls.Controls {
         /// <param name="ZoomToUse"></param>
         /// <returns></returns>
         public Point CenterPos(RectangleM MaxBounds, bool SliderShowing, Size sizeOfPaintArea, decimal ZoomToUse) {
-            var w = 0;
-            var h = 0;
+            decimal w;
+            decimal h;
 
 
             if (SliderShowing) {
-                w = (int)(sizeOfPaintArea.Width - SliderY.Width - MaxBounds.Width * ZoomToUse);
-                h = (int)(sizeOfPaintArea.Height - SliderX.Height - MaxBounds.Height * ZoomToUse);
+                w = sizeOfPaintArea.Width - SliderY.Width - MaxBounds.Width * ZoomToUse;
+                h = sizeOfPaintArea.Height - SliderX.Height - MaxBounds.Height * ZoomToUse;
             } else {
-                w = (int)(sizeOfPaintArea.Width - MaxBounds.Width * ZoomToUse);
-                h = (int)(sizeOfPaintArea.Height - MaxBounds.Height * ZoomToUse);
+                w = sizeOfPaintArea.Width - MaxBounds.Width * ZoomToUse;
+                h = sizeOfPaintArea.Height - MaxBounds.Height * ZoomToUse;
             }
 
-            return new Point(w, h);
+            return new Point((int)w, (int)h);
         }
 
 

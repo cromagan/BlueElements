@@ -142,7 +142,7 @@ namespace BlueScript {
             #region Vergleichsoperatoren ersetzen und vereinfachen
 
 
-            (var pos, var witch) = NextText(txt, 0, Method_if.VergleichsOperatoren, false, false);
+            (var pos, var _) = NextText(txt, 0, Method_if.VergleichsOperatoren, false, false);
 
             if (pos >= 0) {
                 txt = Method_if.GetBool(txt);

@@ -24,7 +24,6 @@ using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueDatabase;
 using System;
 using System.ComponentModel;
 using System.Drawing;

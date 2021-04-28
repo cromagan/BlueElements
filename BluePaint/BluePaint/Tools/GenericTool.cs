@@ -21,8 +21,7 @@ using BlueControls.Controls;
 using BluePaint.EventArgs;
 using System.Drawing;
 
-namespace BluePaint
-{
+namespace BluePaint {
 
 
     public abstract partial class GenericTool : GroupBox // System.Windows.Forms.UserControl //
@@ -33,8 +32,7 @@ namespace BluePaint
         protected static Pen Pen_RedTransp = new(ColorRedTransp);
         protected static Pen Pen_LightWhite = new(Color.FromArgb(150, 255, 255, 255), 3);
 
-        public GenericTool() : base()
-        {
+        public GenericTool() : base() {
             InitializeComponent();
         }
 
@@ -66,7 +64,7 @@ namespace BluePaint
         /// </summary>
         /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
         public new virtual void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) { }
-     
+
         /// <summary>
         /// 
         /// </summary>
@@ -84,8 +82,7 @@ namespace BluePaint
         /// Wenn keine Benutzung möglich ist, wird string.empty zurückgegebenm
         /// </summary>
         /// <returns></returns>
-        public virtual string MacroKennung()
-        {
+        public virtual string MacroKennung() {
             return string.Empty;
         }
 
@@ -93,34 +90,28 @@ namespace BluePaint
         /// Z.B: bei Undo
         /// </summary>
         /// <returns></returns>
-        public virtual void PictureChangedByMainWindow()
-        {
+        public virtual void PictureChangedByMainWindow() {
 
         }
 
 
-        protected virtual void OnHideMainWindow()
-        {
+        protected virtual void OnHideMainWindow() {
             HideMainWindow?.Invoke(this, System.EventArgs.Empty);
         }
 
-        protected virtual void OnZoomFit()
-        {
+        protected virtual void OnZoomFit() {
             ZoomFit?.Invoke(this, System.EventArgs.Empty);
         }
 
-        protected virtual void OnShowMainWindow()
-        {
+        protected virtual void OnShowMainWindow() {
             ShowMainWindow?.Invoke(this, System.EventArgs.Empty);
         }
 
-        public virtual void ExcuteCommand(string command)
-        {
+        public virtual void ExcuteCommand(string command) {
             BlueBasics.Develop.DebugPrint_RoutineMussUeberschriebenWerden();
         }
 
-        protected virtual Bitmap OnNeedCurrentPic()
-        {
+        protected virtual Bitmap OnNeedCurrentPic() {
             var e = new BitmapEventArgs(null);
             NeedCurrentPic?.Invoke(this, e);
             return e.BMP;
@@ -131,23 +122,19 @@ namespace BluePaint
         /// Wird benutzt, wenn ein neues Bild erstellt wurde und dieses in den Speicher soll.
         /// </summary>
         /// <param name="BMP"></param>
-        protected virtual void OnOverridePic(Bitmap BMP)
-        {
+        protected virtual void OnOverridePic(Bitmap BMP) {
             OverridePic?.Invoke(this, new BitmapEventArgs(BMP));
         }
 
-        protected virtual void OnForceUndoSaving()
-        {
+        protected virtual void OnForceUndoSaving() {
             ForceUndoSaving?.Invoke(this, System.EventArgs.Empty);
         }
 
-        protected virtual void OnDoInvalidate()
-        {
+        protected virtual void OnDoInvalidate() {
             DoInvalidate?.Invoke(this, System.EventArgs.Empty);
         }
 
-        protected virtual void OnCommandForMacro(string command)
-        {
+        protected virtual void OnCommandForMacro(string command) {
             CommandForMacro?.Invoke(this, new CommandForMacroArgs(command));
         }
     }

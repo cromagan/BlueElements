@@ -1084,9 +1084,6 @@ namespace BlueControls.Controls {
         }
 
         private void AddAllAutoRelations(PointM PMoveX, PointM PSnapToX, PointM PMoveY, PointM PSnapToY) {
-            clsPointRelation tmpRl = null;
-
-
             if (!Convert.ToBoolean(_AutoRelation | enAutoRelationMode.NurBeziehungenErhalten)) { return; }
 
 
@@ -1108,9 +1105,10 @@ namespace BlueControls.Controls {
 
 
 
+            clsPointRelation tmpRl;
             if (PMoveX != null && PMoveY != null) {
-                PointM BP1 = null;
-                PointM BP2 = null;
+                PointM BP1;
+                PointM BP2;
                 if (PMoveX == PMoveY) {
                     BP1 = PMoveX; // kann NichtSnapable sein
                     BP2 = _Item.Getbetterpoint(Convert.ToDouble(PSnapToX.X), Convert.ToDouble(PSnapToY.Y), BP1, true); // muß Snapable sein

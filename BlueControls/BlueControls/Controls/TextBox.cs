@@ -934,7 +934,7 @@ namespace BlueControls.Controls {
 
 
 
-            var sliderVisible = false;
+            bool sliderVisible;
             var effectWidth = Width;
             if (_Multiline) {
                 sliderVisible = _eTxt.Height() > (Height - 16);
@@ -1511,7 +1511,7 @@ namespace BlueControls.Controls {
             }
 
 
-            if (!(this is ComboBox cbx) || cbx.DropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDown) {
+            if (this is not ComboBox cbx || cbx.DropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDown) {
                 Items.Add(enContextMenuComands.Ausschneiden, Convert.ToBoolean(_MarkStart >= 0) && Enabled);
                 Items.Add(enContextMenuComands.Kopieren, Convert.ToBoolean(_MarkStart >= 0));
                 Items.Add(enContextMenuComands.Einfügen, System.Windows.Forms.Clipboard.ContainsText() && Enabled);

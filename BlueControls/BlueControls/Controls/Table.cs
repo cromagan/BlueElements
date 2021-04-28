@@ -949,7 +949,6 @@ namespace BlueControls.Controls {
             if (!Enabled) { s = enStates.Standard_Disabled; }
             if (e.Cecked) { s |= enStates.Checked; }
 
-            RowItem tempVar = null;
             Button.DrawButton(this, gR, enDesign.Button_CheckBox, s, e.Image, enAlignment.Horizontal_Vertical_Center, false, null, e.Text, r, true);
 
 

@@ -18,14 +18,11 @@
 #endregion
 using System.Drawing;
 
-namespace BluePaint.EventArgs
-{
-    public class BitmapEventArgs : System.EventArgs
-    {
+namespace BluePaint.EventArgs {
+    public class BitmapEventArgs : System.EventArgs {
 
 
-        public BitmapEventArgs(Bitmap BMP)
-        {
+        public BitmapEventArgs(Bitmap BMP) {
             this.BMP = BMP;
         }
 

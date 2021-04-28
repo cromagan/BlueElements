@@ -94,7 +94,7 @@ namespace BlueScript {
                             } while (true);
 
 
-                            (var posek, var witch) = NextText(scriptText, cont, GeschKlammerZu, false, false);
+                            (var posek, var _) = NextText(scriptText, cont, GeschKlammerZu, false, false);
                             if (posek < cont) {
                                 return new strCanDoFeedback(cont, "Kein Codeblock Ende bei " + comandtext, true);
                             }
@@ -272,7 +272,7 @@ namespace BlueScript {
 
             do {
 
-                (var pos, var witch) = NextText(txt, posc, c, true, false);
+                (var pos, var _) = NextText(txt, posc, c, true, false);
 
                 if (pos < 0) { return new strGetEndFeedback(0, txt); }
 
@@ -384,7 +384,7 @@ namespace BlueScript {
             #region Liste der Attribute splitten
             var posc = 0;
             do {
-                (var pos, var witch) = NextText(attributtext, posc, Komma, false, false);
+                (var pos, var _) = NextText(attributtext, posc, Komma, false, false);
                 if (pos < 0) {
                     attributes.Add((attributtext.Substring(posc)).DeKlammere(true, false, false, true));
                     break;

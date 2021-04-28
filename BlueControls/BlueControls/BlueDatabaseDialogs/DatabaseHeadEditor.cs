@@ -673,7 +673,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             _Database.RulesScript = txtSkript.Text;
 
-            (var ok, var message, var s) = r.DoAutomatic(true, "script testing");
+            (var _, var message, var s) = r.DoAutomatic(true, "script testing");
 
             if (s != null && s.Variablen != null) {
                 foreach (var thisv in s.Variablen) {

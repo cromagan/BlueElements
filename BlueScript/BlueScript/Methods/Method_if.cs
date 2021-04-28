@@ -59,7 +59,7 @@ namespace BlueScript {
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
             if (attvar.Attributes[0].ValueBool) {
-                (var err, var ermess2) = Script.Parse(infos.CodeBlockAfterText, false, s);
+                (var err, var _) = Script.Parse(infos.CodeBlockAfterText, false, s);
                 if (!string.IsNullOrEmpty(err)) { return new strDoItFeedback(err); }
             } else {
                 s.Line += infos.LineBreakInCodeBlock;
@@ -75,22 +75,22 @@ namespace BlueScript {
                     return "true";
                 case "false":
                     return "false";
-                case "true&&true":
-                    return "true";
-                case "true&&false":
-                    return "false";
-                case "false&&true":
-                    return "false";
-                case "false&&false":
-                    return "false";
-                case "true||true":
-                    return "true";
-                case "true||false":
-                    return "true";
-                case "false||true":
-                    return "true";
-                case "false||false":
-                    return "false";
+                //case "true&&true":
+                //    return "true";
+                //case "true&&false":
+                //    return "false";
+                //case "false&&true":
+                //    return "false";
+                //case "false&&false":
+                //    return "false";
+                //case "true||true":
+                //    return "true";
+                //case "true||false":
+                //    return "true";
+                //case "false||true":
+                //    return "true";
+                //case "false||false":
+                //    return "false";
                 case "!true":
                     return "false";
                 case "!false":

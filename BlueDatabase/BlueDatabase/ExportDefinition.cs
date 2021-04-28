@@ -224,7 +224,7 @@ namespace BlueDatabase {
                         _Typ = (enExportTyp)int.Parse(pair.Value);
                         break;
 
-                    case "itv": 
+                    case "itv":
                     case "interval":// ALT, 02.10.2019
                         _Intervall = float.Parse(pair.Value.FromNonCritical());
                         break;
@@ -414,8 +414,7 @@ namespace BlueDatabase {
         //    return Result.TrimEnd(", ") + "}";
         //}
         public override string ToString() {
-            try
-            {
+            try {
 
                 var shortener = GetShortener();
 
@@ -425,40 +424,30 @@ namespace BlueDatabase {
                 Result = Result + "typ=" + (int)_Typ + ", ";
                 Result = Result + "let=" + _LastExportTimeUTC.ToString(Constants.Format_Date5) + ", ";
 
-                Result = Result + "itv=" + _Intervall.ToString().ToNonCritical()+ ", ";
+                Result = Result + "itv=" + _Intervall.ToString().ToNonCritical() + ", ";
 
-                if (_Typ == enExportTyp.DatenbankCSVFormat || _Typ == enExportTyp.DatenbankHTMLFormat || _Typ == enExportTyp.DatenbankOriginalFormat)
-                {
+                if (_Typ == enExportTyp.DatenbankCSVFormat || _Typ == enExportTyp.DatenbankHTMLFormat || _Typ == enExportTyp.DatenbankOriginalFormat) {
                     Result = Result + "aud=" + _AutomatischLöschen.ToString().ToNonCritical() + ", ";
 
 
-                    if (_Typ != enExportTyp.DatenbankOriginalFormat)
-                    {
+                    if (_Typ != enExportTyp.DatenbankOriginalFormat) {
                         Result = Result + "exc=" + _ExportSpaltenAnsicht + ", ";
                     }
 
-                }
-                else
-                {
+                } else {
                     Result = Result + "exid=" + _ExportFormularID.ToNonCritical() + ", ";
                 }
 
-                if (Filter.Count > 0)
-                {
+                if (Filter.Count > 0) {
                     Result = Result + "flt=" + Filter + ", ";
                 }
 
-                if (_BereitsExportiert.Count > 0)
-                {
+                if (_BereitsExportiert.Count > 0) {
                     Result += "exp=";
-                    foreach (var thise in _BereitsExportiert)
-                    {
-                        if (!string.IsNullOrEmpty(shortener) && thise.StartsWith(shortener))
-                        {
+                    foreach (var thise in _BereitsExportiert) {
+                        if (!string.IsNullOrEmpty(shortener) && thise.StartsWith(shortener)) {
                             Result = Result + "@" + thise.TrimStart(shortener) + "#";
-                        }
-                        else
-                        {
+                        } else {
                             Result = Result + thise + "#";
                         }
                     }
@@ -467,9 +456,7 @@ namespace BlueDatabase {
                 }
 
                 return Result.TrimEnd(", ") + "}";
-            }
-            catch
-            {
+            } catch {
                 return ToString();
             }
         }

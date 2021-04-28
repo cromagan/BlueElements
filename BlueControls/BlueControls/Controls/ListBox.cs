@@ -541,27 +541,25 @@ namespace BlueControls.Controls {
 
         public BasicListItem Add_FromFileSystem() {
 
-            using (var f = new System.Windows.Forms.OpenFileDialog()) {
-                f.CheckFileExists = true;
-                f.CheckPathExists = true;
-                f.Multiselect = false;
-                f.InitialDirectory = LastFilePath;
-                f.Title = "Datei hinzufügen:";
-                f.ShowDialog();
+            using var f = new System.Windows.Forms.OpenFileDialog();
+            f.CheckFileExists = true;
+            f.CheckPathExists = true;
+            f.Multiselect = false;
+            f.InitialDirectory = LastFilePath;
+            f.Title = "Datei hinzufügen:";
+            f.ShowDialog();
 
-                if (f.FileNames == null || f.FileNames.Length != 1) { return null; }
+            if (f.FileNames == null || f.FileNames.Length != 1) { return null; }
 
-                //var x = new clsNamedBinary();
-                //x.LoadFromFile(f.FileNames[0]);
-                //Item.Add(x);
-                var Picture = BitmapExt.Image_FromFile(f.FileNames[0]);
+            //var x = new clsNamedBinary();
+            //x.LoadFromFile(f.FileNames[0]);
+            //Item.Add(x);
+            var Picture = BitmapExt.Image_FromFile(f.FileNames[0]);
 
-                if (Picture != null) {
-                    return Item.Add((Bitmap)Picture, f.FileNames[0]);
-                } else {
-                    return Item.Add(modConverter.FileToByte(f.FileNames[0]), f.FileNames[0]);
-                }
-
+            if (Picture != null) {
+                return Item.Add((Bitmap)Picture, f.FileNames[0]);
+            } else {
+                return Item.Add(modConverter.FileToByte(f.FileNames[0]), f.FileNames[0]);
             }
         }
 

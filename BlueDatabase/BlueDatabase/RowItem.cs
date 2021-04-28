@@ -326,7 +326,7 @@ namespace BlueDatabase {
         public static Variable CellToVariable(ColumnItem column, RowItem row) {
             if (!column.Format.CanBeCheckedByRules()) { return null; }
 
-           
+
             var ro = !column.Format.CanBeChangedByRules();
 
             if (column == column.Database.Column.SysCorrect) { ro = true; }

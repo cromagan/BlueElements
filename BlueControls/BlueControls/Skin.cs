@@ -22,18 +22,15 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
-using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
 using BlueDatabase;
-using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.Reflection;
-using static clsDesignExtensions;
 
 
 //  = A3 & ".Design.Add(enStates."&B3&", enKontur."& C3 & ", " &D3&", "&E3&", "&F3&","&G3&", enHintergrundArt."&H3&","&I3&",'"&J3&"','"&K3&"','"&L3&"',enRahmenArt."&M3&",'"&N3&"','"&O3&"','"&P3&"','"&Q3&"','"&R3&"');"
@@ -843,7 +840,7 @@ namespace BlueControls {
         //public static Database SkinDB;
         public static Database StyleDB;
 
-        public static bool  inited = false;
+        public static bool inited = false;
 
         private static readonly enImageCodeEffect[] ST = new enImageCodeEffect[1];
         internal static Pen Pen_LinieDünn;
@@ -1313,13 +1310,14 @@ namespace BlueControls {
 
 
             } catch {
-                var d = new clsDesign();
-                d.BackColor1 = Color.White;
-                d.BorderColor1 = Color.Red;
-                d.bFont = BlueFont.Get("Arial", 10f, false, false, false, false, false, Color.Red, Color.Black, false, false, false);
-                d.HintergrundArt = enHintergrundArt.Solide;
-                d.RahmenArt = enRahmenArt.Solide_1px;
-                d.Kontur = enKontur.Rechteck;
+                var d = new clsDesign {
+                    BackColor1 = Color.White,
+                    BorderColor1 = Color.Red,
+                    bFont = BlueFont.Get("Arial", 10f, false, false, false, false, false, Color.Red, Color.Black, false, false, false),
+                    HintergrundArt = enHintergrundArt.Solide,
+                    RahmenArt = enRahmenArt.Solide_1px,
+                    Kontur = enKontur.Rechteck
+                };
                 return d;
 
 
@@ -1667,7 +1665,6 @@ namespace BlueControls {
 
         #region  Border 
 
-        [Obsolete]
         public static void Draw_Border(Graphics GR, enDesign vDesign, enStates vState, Rectangle r) {
             Draw_Border(GR, DesignOf(vDesign, vState), r);
         }

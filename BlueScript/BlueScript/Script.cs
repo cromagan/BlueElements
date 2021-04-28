@@ -22,10 +22,8 @@ using BlueBasics;
 using System;
 using System.Collections.Generic;
 
-namespace BlueScript
-{
-    public class Script
-    {
+namespace BlueScript {
+    public class Script {
 
         private string _error;
         private string _errorCode;
@@ -35,13 +33,11 @@ namespace BlueScript
 
         public int Line { get; internal set; }
 
-        public string Error
-        {
+        public string Error {
             get => _error;
             private set => _error = value.Replace("{", "").Replace("}", "");
         }
-        public string ErrorCode
-        {
+        public string ErrorCode {
             get => _errorCode;
             private set => _errorCode = value.Replace("{", "").Replace("}", "");
         }
@@ -56,27 +52,20 @@ namespace BlueScript
 
 
 
-        public static List<T> GetEnumerableOfType<T>(params object[] constructorArgs) where T : class
-        {
+        public static List<T> GetEnumerableOfType<T>(params object[] constructorArgs) where T : class {
 
             var l = new List<T>();
 
-            foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies())
-            {
+            foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {
 
 
-                try
-                {
-                    foreach (var thist in thisas.GetTypes())
-                    {
-                        if (thist.IsClass && !thist.IsAbstract && thist.IsSubclassOf(typeof(T)))
-                        {
+                try {
+                    foreach (var thist in thisas.GetTypes()) {
+                        if (thist.IsClass && !thist.IsAbstract && thist.IsSubclassOf(typeof(T))) {
                             l.Add((T)Activator.CreateInstance(thist, constructorArgs));
                         }
                     }
-                }
-                catch (Exception ex)
-                {
+                } catch (Exception ex) {
                     Develop.DebugPrint(ex);
                 }
 
@@ -177,26 +166,21 @@ namespace BlueScript
         //}
 
 
-        public Script(List<Variable> variablen)
-        {
+        public Script(List<Variable> variablen) {
 
 
-            if (Comands == null)
-            {
+            if (Comands == null) {
                 Comands = GetEnumerableOfType<Method>();
             }
 
             Variablen = variablen;
         }
 
-        public string ScriptText
-        {
+        public string ScriptText {
             get => _ScriptText;
-            set
-            {
+            set {
 
-                if (_ScriptText == value)
-                { return; }
+                if (_ScriptText == value) { return; }
                 //_parsed = false;
                 _ScriptText = value;
             }
@@ -204,8 +188,7 @@ namespace BlueScript
 
 
 
-        private static string ReduceText(string txt)
-        {
+        private static string ReduceText(string txt) {
 
 
             var s = new System.Text.StringBuilder();
@@ -214,30 +197,24 @@ namespace BlueScript
             var comment = false;
 
 
-            for (var pos = 0; pos < txt.Length; pos++)
-            {
+            for (var pos = 0; pos < txt.Length; pos++) {
 
                 var c = txt.Substring(pos, 1);
                 var addt = true;
 
-                switch (c)
-                {
+                switch (c) {
                     case "\"":
-                        if (!comment)
-                        { gänsef = !gänsef; }
+                        if (!comment) { gänsef = !gänsef; }
                         break;
 
                     case "/":
-                        if (!gänsef)
-                        {
-                            if (pos < txt.Length - 1 && txt.Substring(pos, 2) == "//")
-                            { comment = true; }
+                        if (!gänsef) {
+                            if (pos < txt.Length - 1 && txt.Substring(pos, 2) == "//") { comment = true; }
                         }
                         break;
 
                     case "\r":
-                        if (gänsef)
-                        { s.Append("\";Exception(\"Fehler mit Anführungsstrichen\");"); }
+                        if (gänsef) { s.Append("\";Exception(\"Fehler mit Anführungsstrichen\");"); }
                         s.Append("¶");
                         comment = false;
                         addt = false;
@@ -247,13 +224,11 @@ namespace BlueScript
                     case " ":
                     case "\n":
                     case "\t":
-                        if (!gänsef)
-                        { addt = false; }
+                        if (!gänsef) { addt = false; }
                         break;
                 }
 
-                if (!comment && addt)
-                {
+                if (!comment && addt) {
                     s.Append(c);
                 }
 
@@ -263,44 +238,34 @@ namespace BlueScript
         }
 
 
-        public static (string, string) Parse(string scriptText, bool reduce, Script s)
-        {
+        public static (string, string) Parse(string scriptText, bool reduce, Script s) {
             var pos = 0;
             s.EndSkript = false;
 
 
             string tmptxt;
 
-            if (reduce)
-            {
+            if (reduce) {
                 tmptxt = ReduceText(scriptText);
                 s.Line = 1;
-            }
-            else
-            {
+            } else {
                 tmptxt = scriptText;
 
             }
 
 
-            do
-            {
-                if (pos >= tmptxt.Length || s.EndSkript)
-                { return (string.Empty, string.Empty); }
+            do {
+                if (pos >= tmptxt.Length || s.EndSkript) { return (string.Empty, string.Empty); }
 
 
 
-                if (tmptxt.Substring(pos, 1) == "¶")
-                {
+                if (tmptxt.Substring(pos, 1) == "¶") {
                     s.Line++;
                     pos++;
-                }
-                else
-                {
+                } else {
                     var f = ComandOnPosition(tmptxt, pos, s, false);
 
-                    if (!string.IsNullOrEmpty(f.ErrorMessage))
-                    {
+                    if (!string.IsNullOrEmpty(f.ErrorMessage)) {
                         return (f.ErrorMessage, tmptxt.Substring(pos, Math.Min(30, tmptxt.Length - pos)));
                     }
                     pos = f.Position;
@@ -310,27 +275,22 @@ namespace BlueScript
             } while (true);
         }
 
-        public bool Parse()
-        {
+        public bool Parse() {
             (Error, ErrorCode) = Parse(_ScriptText, true, this);
             return !string.IsNullOrEmpty(Error);
         }
 
 
-        public static strDoItWithEndedPosFeedback ComandOnPosition(string txt, int pos, Script s, bool expectedvariablefeedback)
-        {
-            foreach (var thisC in Comands)
-            {
+        public static strDoItWithEndedPosFeedback ComandOnPosition(string txt, int pos, Script s, bool expectedvariablefeedback) {
+            foreach (var thisC in Comands) {
 
                 //if (!mustHaveFeedback || !thisC.ReturnsVoid) {
 
                 var f = thisC.CanDo(txt, pos, expectedvariablefeedback, s);
 
-                if (f.MustAbort)
-                { return new strDoItWithEndedPosFeedback(f.ErrorMessage); }
+                if (f.MustAbort) { return new strDoItWithEndedPosFeedback(f.ErrorMessage); }
 
-                if (string.IsNullOrEmpty(f.ErrorMessage))
-                {
+                if (string.IsNullOrEmpty(f.ErrorMessage)) {
                     var fn = thisC.DoIt(f, s);
                     return new strDoItWithEndedPosFeedback(fn.ErrorMessage, fn.Value, f.ContinueOrErrorPosition);
                 }

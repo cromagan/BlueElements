@@ -24,6 +24,6 @@ namespace BlueDatabase.EventArgs {
             Message = message;
         }
 
-       public string Message { get; }
+        public string Message { get; }
     }
 }

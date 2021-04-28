@@ -63,10 +63,9 @@ public static class clsDesignExtensions {
         Dictionary<enStates, clsDesign> l2;
 
 
-        if (l.TryGetValue(ds, out var lg )) {
+        if (l.TryGetValue(ds, out var lg)) {
             l2 = lg;
-        }
-        else {
+        } else {
             l2 = new Dictionary<enStates, clsDesign>();
             l.Add(ds, l2);
         }
@@ -81,15 +80,16 @@ public static class clsDesignExtensions {
 
     public static void Add(this Dictionary<enStates, clsDesign> l, enStates status, enKontur enKontur, int x1, int y1, int x2, int y2, enHintergrundArt hint, float verlauf, string bc1, string bc2, string bc3, enRahmenArt rahm, string boc1, string boc2, string boc3, string f, string pic) {
 
-        var des = new clsDesign();
-        des.Need = true; 
-        des.Kontur = enKontur;
-        des.X1 = x1;
-        des.Y1 = y1;
-        des.X2 = x2;
-        des.Y2 = y2;
-        des.HintergrundArt = hint;
-        des.Verlauf = verlauf;
+        var des = new clsDesign {
+            Need = true,
+            Kontur = enKontur,
+            X1 = x1,
+            Y1 = y1,
+            X2 = x2,
+            Y2 = y2,
+            HintergrundArt = hint,
+            Verlauf = verlauf
+        };
 
 
         if (!string.IsNullOrEmpty(bc1)) { des.BackColor1 = bc1.FromHTMLCode(); }
