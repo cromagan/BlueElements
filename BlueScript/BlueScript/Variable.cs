@@ -432,6 +432,7 @@ namespace BlueScript {
                 vars.Add(v);
             }
 
+            v.Readonly = false; // sonst werden keine Daten geschrieben
             v.Type = enVariableDataType.String;
             v.ValueString = value;
             v.Readonly = true;
@@ -450,6 +451,7 @@ namespace BlueScript {
                 vars.Add(v);
             }
 
+            v.Readonly = false; // sonst werden keine Daten geschrieben
             v.Type = enVariableDataType.Numeral;
             v.ValueDouble = value;
             v.Readonly = true;
@@ -469,6 +471,7 @@ namespace BlueScript {
                 vars.Add(v);
             }
 
+            v.Readonly = false; // sonst werden keine Daten geschrieben
             v.Type = enVariableDataType.List;
             v.ValueListString = value;
             v.Readonly = true;
@@ -488,6 +491,7 @@ namespace BlueScript {
                 vars.Add(v);
             }
 
+            v.Readonly = false; // sonst werden keine Daten geschrieben
             v.Type = enVariableDataType.Bool;
 
             if (value) {
