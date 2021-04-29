@@ -217,7 +217,8 @@ namespace BlueControls.Controls {
                     _Database.ColumnKeyChanged -= _Database_ColumnKeyChanged;
                     _Database.Column.ItemInternalChanged -= _Database_ColumnContentChanged;
                     _Database.SortParameterChanged -= _Database_SortParameterChanged;
-                    _Database.Row.RowRemoved -= _Database_RowCountChanged;
+                    _Database.Row.RowRemoving -= Row_RowRemoving;
+                    _Database.Row.RowRemoved -= _Database_RowRemoved;
                     _Database.Row.RowAdded -= _Database_Row_RowAdded;
                     _Database.Column.ItemRemoved -= _Database_ViewChanged;
                     _Database.Column.ItemAdded -= _Database_ViewChanged;
@@ -242,9 +243,11 @@ namespace BlueControls.Controls {
                     _Database.ColumnKeyChanged += _Database_ColumnKeyChanged;
                     _Database.Column.ItemInternalChanged += _Database_ColumnContentChanged;
                     _Database.SortParameterChanged += _Database_SortParameterChanged;
-                    _Database.Row.RowRemoved += _Database_RowCountChanged;
+                    _Database.Row.RowRemoving += Row_RowRemoving;
+                    _Database.Row.RowRemoved += _Database_RowRemoved;
                     _Database.Row.RowAdded += _Database_Row_RowAdded;
                     _Database.Column.ItemAdded += _Database_ViewChanged;
+                    _Database.Column.ItemRemoving += Column_ItemRemoving;
                     _Database.Column.ItemRemoved += _Database_ViewChanged;
                     _Database.SavedToDisk += _Database_SavedToDisk;
                     _Database.ColumnArrangements.ItemInternalChanged += ColumnArrangements_ItemInternalChanged;
@@ -259,12 +262,32 @@ namespace BlueControls.Controls {
             }
         }
 
+        private void Column_ItemRemoving(object sender, ListEventArgs e) {
+            if (e.Item == _CursorPosColumn) {
+                CursorPos_Set(null, null, false);
+            }
 
+            if (e.Item == _MouseOverColumn) {
+                _MouseOverColumn = null;
+            }
+
+        }
+
+        private void Row_RowRemoving(object sender, RowEventArgs e) {
+            if (e.Row == _CursorPosRow) {
+                CursorPos_Set(null, null, false);
+            }
+
+            if (e.Row == _MouseOverRow) {
+                _MouseOverRow = null;
+            }
+        }
 
         private void _Database_Row_RowAdded(object sender, RowEventArgs e) {
 
             OnRowAdded(sender, e);
-            _Database_RowCountChanged(sender, e);
+            Invalidate_RowSort();
+            Invalidate();
 
         }
 
@@ -3629,9 +3652,8 @@ namespace BlueControls.Controls {
         }
 
 
-        private void _Database_RowCountChanged(object sender, System.EventArgs e) {
+        private void _Database_RowRemoved(object sender, System.EventArgs e) {
             Invalidate_RowSort();
-            CursorPos_Set(_CursorPosColumn, _CursorPosRow, false);
             Invalidate();
         }
 
