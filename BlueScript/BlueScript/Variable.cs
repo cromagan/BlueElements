@@ -339,6 +339,8 @@ namespace BlueScript {
 
 
         public static Variable Get(this List<Variable> vars, string name) {
+            if (vars == null || vars.Count == 0) { return null; }
+
             foreach (var thisv in vars) {
                 if (!thisv.SystemVariable && thisv.Name.ToUpper() == name.ToUpper()) {
                     return thisv;

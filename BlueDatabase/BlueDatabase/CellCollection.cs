@@ -871,12 +871,21 @@ namespace BlueDatabase {
                 case enFilterType.Instr:
                     return IstValue.Contains(FilterValue);
 
-                case enFilterType.Berechne:
-                    if (string.IsNullOrEmpty(IstValue)) { return false; }
-                    if (!FilterValue.ToUpper().Contains("VALUE")) { return false; }
-                    var d = modErgebnis.Ergebnis(FilterValue.Replace("VALUE", IstValue.Replace(",", "."), RegexOptions.IgnoreCase));
-                    if (d == null) { return false; }
-                    return Convert.ToBoolean(d == -1);
+                case enFilterType.Between:
+                   if (!IstValue.IsNumeral()) { return false; }
+                    var ival = DoubleParse(IstValue);
+
+                    var fval = FilterValue.SplitBy("|");
+                    if (ival < DoubleParse(fval[0])) { return false; }
+                    if (ival > DoubleParse(fval[1])) { return false; }
+
+                    //if (double.Parse)
+                    //if (string.IsNullOrEmpty(IstValue)) { return false; }
+                    //if (!FilterValue.ToUpper().Contains("VALUE")) { return false; }
+                    //var d = modErgebnis.Ergebnis(FilterValue.Replace("VALUE", IstValue.Replace(",", "."), RegexOptions.IgnoreCase));
+                    //if (d == null) { return false; }
+                    //return Convert.ToBoolean(d == -1);
+                    return true;
 
 
                 case enFilterType.KeinFilter:

@@ -263,19 +263,9 @@ namespace BlueDatabase {
                     return nam + " beinhaltet den Text '" + SearchValue[0] + "'";
 
 
-                case enFilterType.Berechne:
-                case (enFilterType.Berechne | enFilterType.UND):
-
-                    if (SearchValue[0].ToUpper().StartsWith("BTW(VALUE, ")) {
-                        var l = SearchValue[0].ToUpper().TrimStart("BTW(VALUE, ");
-                        l = l.TrimEnd(")");
-                        l = "von " + l.Replace(",", " bis ");
-
-                        return nam + ": " + l;
-                    }
-
-
-                    return nam + ": Spezial-Filter";
+                case enFilterType.Between:
+                case (enFilterType.Between | enFilterType.UND):
+                    return nam + ": von " + SearchValue[0].Replace("|", " bis ");
 
                 default:
                     return nam + ": Spezial-Filter";

@@ -192,8 +192,6 @@ namespace BlueControls.Controls {
             set {
                 if (_Database == value) { return; }
 
-                //OnDatabaseChanging();
-
                 CloseAllComponents();
 
                 _collapsed.Clear();
@@ -230,8 +228,12 @@ namespace BlueControls.Controls {
                     _Database.Save(false);         // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
 
                 }
+
+                ShowWaitScreen = true;
+                Refresh(); // um die Uhr anzuzeigen
+
                 _Database = value;
-                InitializeSkin();
+                InitializeSkin(); // Neue Schriftgrößen 
 
                 if (_Database != null) {
                     _Database.Cell.CellValueChanged += _Database_CellValueChanged;
@@ -257,10 +259,16 @@ namespace BlueControls.Controls {
 
                 _Database_DatabaseLoaded(this, new LoadedEventArgs(false));
 
+                ShowWaitScreen = false;
+                Invalidate();
+
                 OnDatabaseChanged();
 
             }
         }
+
+
+        public bool ShowWaitScreen { get; set; } = true;
 
         private void Column_ItemRemoving(object sender, ListEventArgs e) {
             if (e.Item == _CursorPosColumn) {
@@ -280,6 +288,10 @@ namespace BlueControls.Controls {
 
             if (e.Row == _MouseOverRow) {
                 _MouseOverRow = null;
+            }
+
+            if (_PinnedRows.Contains(e.Row)) {
+                _PinnedRows.Remove(e.Row);
             }
         }
 
@@ -387,10 +399,16 @@ namespace BlueControls.Controls {
 
         #region  Draw 
 
-        private void DrawWhite(Graphics GR) {
+        private void DrawWeitScreen(Graphics GR) {
             if (SliderX != null) { SliderX.Enabled = false; }
             if (SliderY != null) { SliderY.Enabled = false; }
             Skin.Draw_Back(GR, enDesign.Table_And_Pad, enStates.Standard_Disabled, DisplayRectangle, this, true);
+
+
+            var i = QuickImage.Get(enImageCode.Uhr, 64).BMP;
+
+            GR.DrawImage(i, (Width - 64) / 2, (Height - 64) / 2);
+
             Skin.Draw_Border(GR, enDesign.Table_And_Pad, enStates.Standard_Disabled, DisplayRectangle);
         }
 
@@ -444,8 +462,8 @@ namespace BlueControls.Controls {
                 state ^= enStates.Standard_HasFocus;
             }
 
-            if (_Database == null || DesignMode) {
-                DrawWhite(gr);
+            if (_Database == null || DesignMode || ShowWaitScreen) {
+                DrawWeitScreen(gr);
                 return;
             }
 
@@ -461,7 +479,7 @@ namespace BlueControls.Controls {
                 gr.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
 
                 if (!ComputeAllCellPositions()) {
-                    DrawWhite(gr);
+                    DrawWeitScreen(gr);
                     return;
                 }
 

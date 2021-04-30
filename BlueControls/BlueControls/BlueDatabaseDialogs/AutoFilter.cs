@@ -322,7 +322,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                             if (Zd2 < Zd1) {
                                 modAllgemein.Swap(ref Zd1, ref Zd2);
                             }
-                            CloseAndDispose("Filter", new FilterItem(Column, enFilterType.Berechne | enFilterType.UND, "BTW(VALUE, " + Zd1.ToString().Replace(",", ".") + "," + Zd2.ToString().Replace(",", ".") + ")"));
+                            CloseAndDispose("Filter", new FilterItem(Column, enFilterType.Between | enFilterType.UND, Zd1.ToString(Constants.Format_Float9)+ "|" + Zd2.ToString(Constants.Format_Float9)));
                             return;
                         }
                     }

@@ -37,7 +37,7 @@ namespace BlueDatabase.Enums {
         //  EigenschaftTendenz = 8,
 
 
-        Berechne = 16,
+        Between = 16,
         BeginntMit = 32,
 
 
