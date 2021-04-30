@@ -45,6 +45,7 @@
     <Compile Include="Methods\Method_Count.cs" />
     <Compile Include="Methods\Method_IsNullOrZero.cs" />
     <Compile Include="Methods\Method_Clear.cs" />
+    <Compile Include="Methods\Method_Element.cs" />
     <Compile Include="Methods\Method_StartsWith.cs" />
     <Compile Include="Methods\Method_IsType.cs" />
     <Compile Include="Methods\Method_EndsWith.cs" />
