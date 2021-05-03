@@ -66,7 +66,7 @@ namespace BlueDatabase {
         public new ColumnItem this[int index] {
             get {
                 if (Database == null) { return null; }
-                Database.BlockReload();
+                Database.BlockReload(false);
 
                 if (index < 0 || index >= Count) {
                     Database.DevelopWarnung("Spalten-Index nicht gefunden: " + index.ToString());
@@ -82,7 +82,7 @@ namespace BlueDatabase {
             try {
                 if (Database == null) { return null; }
                 if (key < 0) { return null; } // Evtl. Gelöschte Spalte in irgendeiner Order
-                Database.BlockReload();
+                Database.BlockReload(false);
 
                 foreach (var ThisColumn in this) {
                     if (ThisColumn != null && ThisColumn.Key == key) {
@@ -106,7 +106,7 @@ namespace BlueDatabase {
         public ColumnItem this[string columnName] {
             get {
 
-                Database.BlockReload();
+                Database.BlockReload(false);
 
                 var colum = Exists(columnName);
                 if (colum is null) { Database.DevelopWarnung("Spalte nicht gefunden: " + columnName); }

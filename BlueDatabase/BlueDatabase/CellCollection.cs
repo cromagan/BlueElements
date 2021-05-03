@@ -241,7 +241,7 @@ namespace BlueDatabase {
 
             /// --------Subroutine---------------------------
             (ColumnItem column, RowItem row) Ergebnis(string fehler) {
-                column.Database.BlockReload();
+                column.Database.BlockReload(false);
                 if (string.IsNullOrEmpty(fehler)) {
                     column.Database.Cell.SetValueBehindLinkedValue(column, row, CellCollection.KeyOfCell(targetColumn.Key, targetRow.Key));
                     return (targetColumn, targetRow);
@@ -610,7 +610,7 @@ namespace BlueDatabase {
         }
 
         internal void SetValueBehindLinkedValue(ColumnItem Column, RowItem Row, string Value) {
-            Database.BlockReload();
+            Database.BlockReload(false);
 
             if (Column == null || Database.Column.SearchByKey(Column.Key) == null) {
                 Database?.DevelopWarnung("Spalte ungültig!");
@@ -1047,7 +1047,7 @@ namespace BlueDatabase {
 
         public void Set(ColumnItem column, RowItem row, string value) // Main Method
         {
-            Database.BlockReload();
+            Database.BlockReload(false);
 
             if (column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + Database.Filename); }
             if (row == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeile ungültig!!<br>" + Database.Filename); }

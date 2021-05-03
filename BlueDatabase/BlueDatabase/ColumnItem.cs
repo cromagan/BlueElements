@@ -1052,7 +1052,7 @@ namespace BlueDatabase {
         }
 
         private void _TMP_LinkedDatabase_ColumnKeyChanged(object sender, KeyChangedEventArgs e) {
-            Database.BlockReload();
+            Database.BlockReload(false);
 
             if (_Format != enDataFormat.Columns_für_LinkedCellDropdown) {
                 var os = e.KeyOld.ToString();
