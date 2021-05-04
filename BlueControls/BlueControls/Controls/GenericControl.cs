@@ -26,7 +26,9 @@ using BlueControls.Forms;
 using BlueControls.Interfaces;
 using System;
 using System.ComponentModel;
+using System.ComponentModel.Design;
 using System.Drawing;
+using System.Drawing.Design;
 using System.Drawing.Imaging;
 
 
@@ -169,6 +171,7 @@ namespace BlueControls.Controls {
         private string _QuickInfo = "";
         [Category("Darstellung")]
         [DefaultValue("")]
+        [Editor(typeof(MultilineStringEditor), typeof(UITypeEditor))]
         [Description("QuickInfo des Steuerelementes - im extTXT-Format")]
         public string QuickInfo {
             get => _QuickInfo;

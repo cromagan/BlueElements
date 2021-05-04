@@ -146,6 +146,8 @@ namespace BlueBasics.MultiUserFile {
 
         private int Checker_Tick_count = -5;
 
+        private bool _InitialLoadDone = false;
+
         #endregion
 
         public void BlockReload(bool crashisiscurrentlyloading) {
@@ -240,17 +242,16 @@ namespace BlueBasics.MultiUserFile {
         /// Hier wird auch nochmal geprüft, ob ein Laden überhaupt möglich ist.
         /// Es kann auch NULL zurück gegeben werden, wenn es ein Reload ist und die Daten inzwischen aktuell sind.
         /// </summary>
-        /// <param name="onlyReload"></param>
         /// <param name="checkmode"></param>
         /// <returns></returns>
-        private (byte[] data, string fileinfo) LoadBytesFromDisk(bool onlyReload, enErrorReason checkmode) {
+        private (byte[] data, string fileinfo) LoadBytesFromDisk(enErrorReason checkmode) {
             string tmpLastSaveCode2;
 
             var StartTime = DateTime.UtcNow;
             byte[] _BLoaded;
             while (true) {
                 try {
-                    if (onlyReload && !ReloadNeeded) { return (null, string.Empty); } // Problem hat sich aufgelöst
+                    if (_InitialLoadDone && !ReloadNeeded) { return (null, string.Empty); } // Problem hat sich aufgelöst
 
                     var f = ErrorReason(checkmode);
 
@@ -339,19 +340,19 @@ namespace BlueBasics.MultiUserFile {
             IsLoading = true;
             _loadingThreadId = Thread.CurrentThread.ManagedThreadId;
 
-            // Wichtig, das _LastSaveCode geprüft wird, das ReloadNeeded im EasyMode immer false zurück gibt.
-            if (!string.IsNullOrEmpty(_LastSaveCode) && !ReloadNeeded) { IsLoading = false; return; }
+            //// Wichtig, das _LastSaveCode geprüft wird, das ReloadNeeded im EasyMode immer false zurück gibt.
+            //if (!string.IsNullOrEmpty(_LastSaveCode) && !ReloadNeeded) { IsLoading = false; return; }
 
-            var OnlyReload = !string.IsNullOrEmpty(_LastSaveCode);
+            //var OnlyReload = !string.IsNullOrEmpty(_LastSaveCode);
 
-            if (OnlyReload && !ReloadNeeded) { IsLoading = false; return; } // Wird in der Schleife auch geprüft
+            if (_InitialLoadDone && !ReloadNeeded) { IsLoading = false; return; } // Wird in der Schleife auch geprüft
 
-            var ec = new LoadingEventArgs(OnlyReload);
+            var ec = new LoadingEventArgs(_InitialLoadDone);
             OnLoading(ec);
 
-            if (OnlyReload && ReadOnly && ec.TryCancel) { IsLoading = false; return; }
+            if (_InitialLoadDone && ReadOnly && ec.TryCancel) { IsLoading = false; return; }
 
-            (var _BLoaded, var tmpLastSaveCode) = LoadBytesFromDisk(OnlyReload, enErrorReason.Load);
+            (var _BLoaded, var tmpLastSaveCode) = LoadBytesFromDisk(enErrorReason.Load);
             if (_BLoaded == null) { IsLoading = false; return; }
 
             _dataOnDisk = _BLoaded;
@@ -359,6 +360,8 @@ namespace BlueBasics.MultiUserFile {
             PrepeareDataForCheckingBeforeLoad();
             ParseInternal(_BLoaded);
             _LastSaveCode = tmpLastSaveCode; // initialize setzt zurück
+            var OnlyReload = _InitialLoadDone;
+            _InitialLoadDone = true;
             _CheckedAndReloadNeed = false;
 
             CheckDataAfterReload();
@@ -367,6 +370,7 @@ namespace BlueBasics.MultiUserFile {
             RepairOldBlockFiles();
 
             IsLoading = false;
+            WaitLoaded(true); // nur um BlockRelaod neu zu setzen
         }
 
         /// <summary>
@@ -490,7 +494,7 @@ namespace BlueBasics.MultiUserFile {
             }
 
             // --- nun Sollte alles auf der Festplatte sein, prüfen! ---
-            (var data, var fileinfo) = LoadBytesFromDisk(false, enErrorReason.LoadForCheckingOnly);
+            (var data, var fileinfo) = LoadBytesFromDisk(enErrorReason.LoadForCheckingOnly);
             if (!savedDataUncompressed.SequenceEqual(data)) {
                 // OK, es sind andere Daten auf der Festplatte?!? Seltsam, zählt als sozusagen ungespeichter und ungeladen.
                 _CheckedAndReloadNeed = true;
@@ -1076,7 +1080,7 @@ namespace BlueBasics.MultiUserFile {
 
             if (mode == enErrorReason.Load) {
                 var x = DateTime.UtcNow.Subtract(_BlockReload).TotalSeconds;
-                if (x < 5) { return "Laden noch " + (5 - x).ToString() + " Sekunden blockiert."; }
+                if (x < 5 && _InitialLoadDone) { return "Laden noch " + (5 - x).ToString() + " Sekunden blockiert."; }
 
                 if (DateTime.UtcNow.Subtract(UserEditedAktionUTC).TotalSeconds < 6) { return "Aktuell werden Daten berabeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen
 
