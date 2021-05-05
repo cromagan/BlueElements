@@ -147,8 +147,7 @@ namespace BlueDatabase {
 
         internal List<string> _UcaseNamesSortedByLenght = null;
 
-        public const string AllowedCharsInternalName = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"; // Klammern, Semikolon etc. verboten, da es im Regeln bei Substring verwendet wird
-
+      
         #endregion
 
 
@@ -1987,10 +1986,7 @@ namespace BlueDatabase {
 
             if (string.IsNullOrEmpty(_Name)) { return "Spaltenname nicht definiert."; }
 
-
-            // Diese Routine ist nicht ganz so streng und erlaubgt auch Ä' und so.
-            // Beim Editor eingeben wird das allerdings unterbunden.
-            if (!Name.ContainsOnlyChars(AllowedCharsInternalName)) { return "Spaltenname enthält ungültige Zeichen. Erlaubt sind A-Z, 0-9 und _"; }
+            if (!Name.ContainsOnlyChars(Constants.AllowedCharsVariableName)) { return "Spaltenname enthält ungültige Zeichen. Erlaubt sind A-Z, 0-9 und _"; }
 
 
             foreach (var ThisColumn in Database.Column) {

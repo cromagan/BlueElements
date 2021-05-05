@@ -20,7 +20,6 @@
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.IO.Compression;
@@ -32,7 +31,7 @@ using static BlueBasics.modAllgemein;
 namespace BlueBasics.MultiUserFile {
     public abstract class clsMultiUserFile : IDisposable {
         #region Shareds
-        public static readonly List<clsMultiUserFile> AllFiles = new();
+        public static readonly ListExt<clsMultiUserFile> AllFiles = new();
 
         /// <summary>
         ///
@@ -163,7 +162,7 @@ namespace BlueBasics.MultiUserFile {
         public event EventHandler<LoadingEventArgs> Loading;
         public event EventHandler SavedToDisk;
         public event EventHandler<MultiUserFileStopWorkingEventArgs> ConnectedControlsStopAllWorking;
-        public static event EventHandler<MultiUserFileGiveBackEventArgs> MultiUserFileCreated;
+        //public static event EventHandler<MultiUserFileGiveBackEventArgs> MultiUserFileCreated;
 
         /// <summary>
         /// Wird ausgegeben, sobald isParsed false ist, noch vor den automatischen Reperaturen.
@@ -176,8 +175,8 @@ namespace BlueBasics.MultiUserFile {
         protected clsMultiUserFile(bool readOnly, bool zipped) {
             _zipped = zipped;
 
-            AllFiles.Add(this);
-            OnMultiUserFileCreated(this);
+            AllFiles.Add(this); 
+            //OnMultiUserFileCreated(this); // Ruft ein statisches Event auf, deswegen geht das.
 
             PureBinSaver = new System.ComponentModel.BackgroundWorker {
                 WorkerReportsProgress = true
@@ -297,15 +296,15 @@ namespace BlueBasics.MultiUserFile {
             while (IsLoading) {
                 Develop.DoEvents();
 
-                //if (!hardmode && !IsParsing) {
-                //    if (DateTime.Now.Subtract(x).TotalSeconds > 5) { return; }
-                //}
+                if (!hardmode && !IsParsing) {
+                    if (DateTime.Now.Subtract(x).TotalSeconds > 0.1) { return; }
+                }
 
                 if (DateTime.Now.Subtract(x).TotalMinutes > 1) {
                     if (hardmode) {
-                        Develop.DebugPrint(enFehlerArt.Fehler, "WaitLoaded hängt: " + Filename);
+                        Develop.DebugPrint(enFehlerArt.Warnung, "WaitLoaded hängt: " + Filename);
                     }
-                    Develop.DebugPrint(enFehlerArt.Warnung, "WaitLoaded hängt: " + Filename);
+                    //Develop.DebugPrint(enFehlerArt.Warnung, "WaitLoaded hängt: " + Filename);
                     return;
                 }
             }
@@ -1219,12 +1218,12 @@ namespace BlueBasics.MultiUserFile {
         }
         #endregion
 
-        protected static void OnMultiUserFileCreated(clsMultiUserFile file) {
-            var e = new MultiUserFileGiveBackEventArgs {
-                File = file
-            };
-            MultiUserFileCreated?.Invoke(null, e);
-        }
+        //protected static void OnMultiUserFileCreated(clsMultiUserFile file) {
+        //    var e = new MultiUserFileGiveBackEventArgs {
+        //        File = file
+        //    };
+        //    MultiUserFileCreated?.Invoke(null, e);
+        //}
 
         protected bool IsFileAllowedToLoad(string fileName) {
             foreach (var ThisFile in AllFiles) {

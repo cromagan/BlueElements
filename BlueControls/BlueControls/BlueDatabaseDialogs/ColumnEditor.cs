@@ -119,7 +119,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
             tbxName.Text = _Column.Name;
-            tbxName.AllowedChars = ColumnItem.AllowedCharsInternalName;
+            tbxName.AllowedChars = Constants.AllowedCharsVariableName;
 
 
             tbxCaption.Text = _Column.Caption;

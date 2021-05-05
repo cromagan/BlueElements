@@ -43,7 +43,7 @@ namespace BlueScript {
 
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            var variableName = infos.ComandText.ToLower().ReduceToChars(Constants.Char_az + "_" + Constants.Char_Numerals);
+            var variableName = infos.ComandText.ToLower().ReduceToChars(Constants.AllowedCharsVariableName);
             var variable = s.Variablen.Get(variableName);
             if (variable == null) { return new strDoItFeedback("Variable '" + variableName + "' nicht gefunden"); }
 

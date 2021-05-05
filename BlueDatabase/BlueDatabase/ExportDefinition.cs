@@ -49,6 +49,8 @@ namespace BlueDatabase {
         public ListExt<string> _BereitsExportiert;
         private DateTime _LastExportTimeUTC;
 
+        private FilterCollection _Filter;
+
 
         #region  Event-Deklarationen + Delegaten 
 
@@ -121,7 +123,23 @@ namespace BlueDatabase {
             }
         }
 
-        public FilterCollection Filter { get; private set; }
+        public FilterCollection Filter {
+            get => _Filter;
+            set {
+
+                if (_Filter == value) { return; }
+
+                if (_Filter != null) {
+                    _Filter.Changed -= _Filter_Changed;
+                }
+                _Filter = value;
+                if (_Filter != null) {
+                    _Filter.Changed += _Filter_Changed;
+                }
+
+                OnChanged();
+            }
+        }
 
 
         public List<string> BereitsExportiert => _BereitsExportiert;
@@ -153,30 +171,26 @@ namespace BlueDatabase {
             _ExportFormularID = string.Empty;
             _ExportSpaltenAnsicht = 0;
             Filter = new FilterCollection(Database);
-            Filter.Changed += _Filter_Changed;
+
             _BereitsExportiert = new ListExt<string>();
             _BereitsExportiert.Changed += _BereitsExportiert_ListOrItemChanged;
 
             _LastExportTimeUTC = new DateTime(1900, 1, 1);
         }
 
-        private void _Filter_Changed(object sender, System.EventArgs e) {
-            OnChanged();
+        public ExportDefinition(Database database, string verzeichnis, enExportTyp typ, float intervall, float automatischlöschen) : this(database) {
+            _Verzeichnis = verzeichnis;
+            _Typ = typ;
+            _Intervall = intervall;
+            _AutomatischLöschen = automatischlöschen;
+        
         }
 
-        private void _BereitsExportiert_ListOrItemChanged(object sender, System.EventArgs e) {
-            OnChanged();
-        }
+        public ExportDefinition(Database database, string toParse) : this(database, toParse, false) { }
 
-        public ExportDefinition(Database DB, string Code) {
-            Database = DB;
-            Parse(Code);
-        }
+        public ExportDefinition(Database database, string toParse, bool DeleteLastExportInfos): this(database) {
 
-        public ExportDefinition(Database DB, string Code, bool DeleteLastExportInfos) {
-            Database = DB;
-            // Initialize()
-            Parse(Code);
+            Parse(toParse);
 
             if (DeleteLastExportInfos) {
                 _BereitsExportiert.Clear();
@@ -192,10 +206,16 @@ namespace BlueDatabase {
 
         #endregion
 
+        private void _Filter_Changed(object sender, System.EventArgs e) {
+            OnChanged();
+        }
 
+        private void _BereitsExportiert_ListOrItemChanged(object sender, System.EventArgs e) {
+            OnChanged();
+        }
 
         public void OnChanged() {
-            if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
+            //if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
@@ -340,7 +360,7 @@ namespace BlueDatabase {
             }
 
 
-            if (Filter.Count > 0) {
+            if (_Filter.Count > 0) {
                 t += " Nur bestimmte Einträge.";
             }
 
@@ -438,8 +458,8 @@ namespace BlueDatabase {
                     Result = Result + "exid=" + _ExportFormularID.ToNonCritical() + ", ";
                 }
 
-                if (Filter.Count > 0) {
-                    Result = Result + "flt=" + Filter + ", ";
+                if (_Filter.Count > 0) {
+                    Result = Result + "flt=" + _Filter.ToString() + ", ";
                 }
 
                 if (_BereitsExportiert.Count > 0) {
@@ -592,7 +612,7 @@ namespace BlueDatabase {
                     if (worker != null && worker.CancellationPending) { break; }
                     if (Thisrow != null) {
 
-                        if (Filter != null && Filter.Count > 0 && !Thisrow.MatchesTo(Filter)) {
+                        if (_Filter != null && _Filter.Count > 0 && !Thisrow.MatchesTo(_Filter)) {
                             var tmp = DeleteId(Thisrow.Key, worker);
                             if (tmp) { Did = true; }
                         }
@@ -746,21 +766,21 @@ namespace BlueDatabase {
                     case enExportTyp.DatenbankCSVFormat:
                         if (_Intervall > (float)DateTime.UtcNow.Subtract(_LastExportTimeUTC).TotalDays) { return false; }
                         SingleFileExport = TempFile(SingleFileExport + ".CSV");
-                        if (!FileExists(SingleFileExport)) { SaveToDisk(SingleFileExport, Database.Export_CSV(enFirstRow.ColumnInternalName, _ExportSpaltenAnsicht, Filter, null), false, System.Text.Encoding.GetEncoding(1252)); }
+                        if (!FileExists(SingleFileExport)) { SaveToDisk(SingleFileExport, Database.Export_CSV(enFirstRow.ColumnInternalName, _ExportSpaltenAnsicht, _Filter, null), false, System.Text.Encoding.GetEncoding(1252)); }
                         Added.Add(SingleFileExport + "|" + tim);
                         break;
 
                     case enExportTyp.DatenbankHTMLFormat:
                         if (_Intervall > (float)DateTime.UtcNow.Subtract(_LastExportTimeUTC).TotalDays) { return false; }
                         SingleFileExport = TempFile(SingleFileExport + ".HTML");
-                        if (!FileExists(SingleFileExport)) { Database.Export_HTML(SingleFileExport, _ExportSpaltenAnsicht, Filter, null); }
+                        if (!FileExists(SingleFileExport)) { Database.Export_HTML(SingleFileExport, _ExportSpaltenAnsicht, _Filter, null); }
                         Added.Add(SingleFileExport + "|" + tim);
                         break;
 
                     case enExportTyp.EinzelnMitFormular:
                         foreach (var Thisrow in Database.Row) {
                             if (Thisrow != null) {
-                                if (Filter == null || Filter.Count < 1 || Thisrow.MatchesTo(Filter)) {
+                                if (_Filter == null || _Filter.Count < 1 || Thisrow.MatchesTo(_Filter)) {
 
                                     var Id = Thisrow.Key.ToString();
                                     var Found = false;

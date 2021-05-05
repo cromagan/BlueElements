@@ -1308,15 +1308,17 @@ namespace BlueControls.Controls {
         internal static void StartDatabaseService() {
             if (ServiceStarted) { return; }
             ServiceStarted = true;
+           
+         BlueBasics.MultiUserFile.clsMultiUserFile.AllFiles.ItemAdded += Database_DatabaseAdded;
 
 
-            Database.MultiUserFileCreated += Database_DatabaseAdded;
+            //Database.MultiUserFileCreated += Database_DatabaseAdded;
 
         }
 
-        private static void Database_DatabaseAdded(object sender, MultiUserFileGiveBackEventArgs e) {
+        private static void Database_DatabaseAdded(object sender, ListEventArgs e) {
 
-            if (e.File is Database DB) {
+            if (e.Item is Database DB) {
                 DB.NeedPassword += Database_NeedPassword;
                 DB.GenerateLayoutInternal += DB_GenerateLayoutInternal;
                 DB.RenameColumnInLayout += DB_RenameColumnInLayout;
@@ -3041,7 +3043,7 @@ namespace BlueControls.Controls {
                         break;
 
                     case "filters":
-                        Filter.Parse(pair.Value);
+                        Filter = new FilterCollection(Database, pair.Value);
                         break;
 
                     case "sliderx":

@@ -569,7 +569,7 @@ namespace BlueDatabase {
         public string Freename(string wunschname) {
             var nr = 0;
 
-            wunschname = wunschname.ReduceToChars(ColumnItem.AllowedCharsInternalName);
+            wunschname = wunschname.ReduceToChars(Constants.AllowedCharsVariableName);
             if (string.IsNullOrEmpty(wunschname)) { wunschname = "NewColumn"; }
 
             if (Exists(wunschname) == null) { return wunschname; }

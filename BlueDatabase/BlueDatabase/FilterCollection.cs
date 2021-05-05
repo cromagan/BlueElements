@@ -26,31 +26,19 @@ using System.Collections.Generic;
 namespace BlueDatabase {
     public sealed class FilterCollection : ListExt<FilterItem>, IParseable {
         #region  Variablen-Deklarationen 
-
-        //private readonly ListExt<FilterItem> _Internal = new ListExt<FilterItem>();
         public readonly Database Database;
-
         #endregion
 
-
         public bool IsParsing { get; private set; }
-
-        //#region  Event-Deklarationen + Delegaten 
-        //public event EventHandler Changed;
-        //#endregion
-
-
         #region  Construktor + Initialize 
-
 
         public FilterCollection(Database database) {
             Database = database;
         }
 
-        public FilterCollection(Database database, string filterCodes) {
-            Database = database;
+        public FilterCollection(Database database, string toParse) : this(database) {
 
-            Parse(filterCodes);
+            Parse(toParse);
         }
 
         #endregion
@@ -73,19 +61,6 @@ namespace BlueDatabase {
 
 
         #endregion
-
-
-        //protected override void OnChanged()
-        //{
-        //    base.OnChanged();
-        //    OnChanged();
-        //}
-
-
-
-
-
-
 
         public void Remove(ColumnItem column) {
 
@@ -112,8 +87,6 @@ namespace BlueDatabase {
             Remove((ColumnItem)null);
         }
 
-
-
         public void Add(enFilterType filterType, string filterBy) {
             AddIfNotExists(new FilterItem(Database, filterType, filterBy));
         }
@@ -121,8 +94,6 @@ namespace BlueDatabase {
         public void Add(enFilterType filterType, List<string> filterBy) {
             AddIfNotExists(new FilterItem(Database, filterType, filterBy));
         }
-
-
 
         public void Add(string columnName, enFilterType filterType, string filterBy) {
             Add(Database.Column[columnName], filterType, filterBy);
@@ -147,125 +118,12 @@ namespace BlueDatabase {
             Add(filterItem);
         }
 
-        //protected override void OnItemAdded(FilterItem item)
-        //{
-        //    base.OnItemAdded(item);
-
-        //    if (item.FilterType == enFilterType.KeinFilter)
-        //    {
-        //        //Develop.DebugPrint("Kein Filter!");
-        //        return;
-        //    }
-
-
-
-
-        //    var f = this[item.Column];
-        //    if (f != null && item != f)
-        //    {
-        //        Develop.DebugPrint(enFehlerArt.Warnung, "Doppelter Filter!");
-        //    }
-
-
-
-        //    if (item.SearchValue != null && item.SearchValue.Count > 1)
-        //    {
-        //        if (!item.FilterType.HasFlag(enFilterType.UND) && !item.FilterType.HasFlag(enFilterType.ODER))
-        //        {
-        //            Develop.DebugPrint(enFehlerArt.Warnung, "UND/ODER fehlt");
-        //        }
-        //    }
-
-        //    if (item.FilterType.HasFlag(enFilterType.UND) && item.FilterType.HasFlag(enFilterType.ODER))
-        //    {
-        //        Develop.DebugPrint(enFehlerArt.Warnung, "UND/ODER zu viel");
-        //    }
-
-
-        //    //var Oder1 = false;
-        //    //var Und1 = false;
-        //    //var TMPFilter1 = filterType;
-
-        //    //var Oder2 = false;
-        //    //var Und2 = false;
-
-        //    //if (Convert.ToBoolean(TMPFilter1 & enFilterType.UND))
-        //    //{
-        //    //    Und1 = true;
-        //    //    TMPFilter1 = TMPFilter1 ^ enFilterType.UND;
-        //    //}
-        //    //if (Convert.ToBoolean(TMPFilter1 & enFilterType.ODER))
-        //    //{
-        //    //    Oder1 = true;
-        //    //    TMPFilter1 = TMPFilter1 ^ enFilterType.ODER;
-        //    //}
-
-
-        //    //foreach (var ThisFilterItem in this)
-        //    //{
-        //    //    if (ThisFilterItem != null)
-        //    //    {
-
-
-        //    //        if (ThisFilterItem.Column == Column)
-        //    //        {
-        //    //            var TMPFilter2 = ThisFilterItem.filterType;
-        //    //            if (Convert.ToBoolean(TMPFilter2 & enFilterType.UND))
-        //    //            {
-        //    //                Und2 = true;
-        //    //                TMPFilter2 = TMPFilter2 ^ enFilterType.UND;
-        //    //            }
-        //    //            if (Convert.ToBoolean(TMPFilter2 & enFilterType.ODER))
-        //    //            {
-        //    //                Oder2 = true;
-        //    //                TMPFilter2 = TMPFilter2 ^ enFilterType.ODER;
-        //    //            }
-
-        //    //            if (TMPFilter1 == TMPFilter2)
-        //    //            {
-        //    //                if (ThisFilterItem.SearchValue.Contains(FilterValue) && Und1 == Und2 && Oder1 == Oder2) { return; }// Filter genau so schon im gebrauch
-
-        //    //                if (Und1 == false && Und2 == false && Oder1 == false && Oder2 == false) { Develop.DebugPrint(enFehlerArt.Fehler, "Unbekannte Vergleichmethode!"); }
-        //    //                if (Und1 != Und2) { Und1 = true; }
-        //    //                if (Oder1 != Oder2) { Oder1 = true; }
-        //    //                if (Und1 == Oder1) { Develop.DebugPrint(enFehlerArt.Fehler, "Doppelte Vergleichmethode!"); }
-
-        //    //                if (Und1) { ThisFilterItem.filterType = TMPFilter1 | enFilterType.UND; }
-        //    //                if (Oder1) { ThisFilterItem.filterType = TMPFilter1 | enFilterType.ODER; }
-        //    //                ThisFilterItem.SearchValue.Add(FilterValue); // KEIN Cutend, es kann ja sein, daß nach LEEREN auch gesucht wird!
-
-        //    //                return;
-        //    //            }
-        //    //        }
-
-        //    //    }
-        //    //}
-
-
-        //    //if (Column == null)
-        //    //{
-        //    //    base.Add(new FilterItem(Database, filterType, FilterValue));
-        //    //}
-        //    //else
-        //    //{
-        //    //    base.Add(new FilterItem(Column, filterType, FilterValue));
-        //    //}
-
-
-
-
-
-        //}
-
-
         public bool IsRowFilterActiv() {
             return this[null] != null;
         }
 
         public string RowFilterText {
-
             get {
-
                 var f = this[null];
                 if (f != null) { return f.SearchValue[0]; }
 
@@ -278,24 +136,13 @@ namespace BlueDatabase {
                 if (f != null) {
                     if (f.SearchValue[0].ToLower() == value.ToLower()) { return; }
                     f.SearchValue[0] = value;
-                    //OnChanged();
                     return;
                 }
                 var fi = new FilterItem(Database, enFilterType.Instr_UND_GroßKleinEgal, value);
-                //{
-                //    Tag = "RowFilter"
-                //};
                 Add(fi);
             }
 
         }
-
-
-
-
-
-
-
 
 
         public bool MayHasRowFilter(ColumnItem Column) {
@@ -303,7 +150,6 @@ namespace BlueDatabase {
             if (Column.IgnoreAtRowFilter) { return false; }
             return IsRowFilterActiv();
         }
-
 
         public void Parse(string ToParse) {
 
@@ -339,23 +185,7 @@ namespace BlueDatabase {
             return w.TrimEnd(", ") + "}";
         }
 
-        //public IEnumerator<FilterItem> GetEnumerator()
-        //{
-        //    return _Internal.GetEnumerator();
-        //}
-
-        //IEnumerator IEnumerable.GetEnumerator()
-        //{
-        //    return _Internal.GetEnumerator();
-        //}
-
-        public override void OnChanged() {
-            if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
-            base.OnChanged();
-        }
-
         public void RemoveOtherAndAddIfNotExists(ColumnItem column, enFilterType filterType, string filterBy, string herkunft) {
-
             RemoveOtherAndAddIfNotExists(new FilterItem(column, filterType, filterBy, herkunft));
         }
 
@@ -369,13 +199,9 @@ namespace BlueDatabase {
         }
 
         public void RemoveOtherAndAddIfNotExists(FilterItem filterItem) {
-
             if (Exists(filterItem)) { return; }
-
             Remove(filterItem.Column);
-
             if (Exists(filterItem)) { return; } // Falls ein Event ausgelöst wurde, und es nun doch schon das ist
-
             Add(filterItem);
 
         }
@@ -384,19 +210,14 @@ namespace BlueDatabase {
             foreach (var thisFilter in this) {
                 if (thisFilter.FilterType == filterItem.FilterType) {
                     if (thisFilter.Column == filterItem.Column) {
-
-
                         if (thisFilter.Herkunft == filterItem.Herkunft) {
                             if (thisFilter.SearchValue.JoinWithCr() == filterItem.SearchValue.JoinWithCr()) {
                                 return true;
                             }
                         }
-
                     }
-
                 }
             }
-
             return false;
         }
 

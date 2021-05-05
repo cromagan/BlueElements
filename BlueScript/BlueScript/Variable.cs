@@ -320,7 +320,7 @@ namespace BlueScript {
             v = v.ToLower();
 
             var vo = v;
-            v = v.ReduceToChars(Constants.Char_az + "_" + Constants.Char_Numerals);
+            v = v.ReduceToChars(Constants.AllowedCharsVariableName);
 
 
             if (v != vo) { return false; }
