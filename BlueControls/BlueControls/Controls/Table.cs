@@ -3043,7 +3043,7 @@ namespace BlueControls.Controls {
                         break;
 
                     case "filters":
-                        Filter = new FilterCollection(Database, pair.Value);
+                        Filter.Parse(pair.Value);
                         break;
 
                     case "sliderx":
