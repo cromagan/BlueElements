@@ -100,7 +100,10 @@ namespace BlueDatabase {
 
             try {
 
-                if (Translation == null) { return string.Format(txt, args); }
+                if (Translation == null) {
+                    if (!txt.Contains("{0}")) { return txt; }
+                    return string.Format(txt, args);
+                }
                 if (string.IsNullOrEmpty(txt)) { return string.Empty; }
 
                 if (German == txt) { return string.Format(English, args); }
