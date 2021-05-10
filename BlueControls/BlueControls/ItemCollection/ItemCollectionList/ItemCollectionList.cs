@@ -314,10 +314,15 @@ namespace BlueControls.ItemCollection {
         }
 
         private void PreComputeSize() {
-            System.Threading.Tasks.Parallel.ForEach(this, ThisItem => {
+            try {
+                System.Threading.Tasks.Parallel.ForEach(this, ThisItem => {
 
-                ThisItem.SizeUntouchedForListBox();
-            });
+                    ThisItem.SizeUntouchedForListBox();
+                });
+            }
+            catch {
+                PreComputeSize();
+            }
         }
 
         public Size CalculateColumnAndSize() {

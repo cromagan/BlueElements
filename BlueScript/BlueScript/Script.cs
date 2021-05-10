@@ -283,9 +283,6 @@ namespace BlueScript {
 
         public static strDoItWithEndedPosFeedback ComandOnPosition(string txt, int pos, Script s, bool expectedvariablefeedback) {
             foreach (var thisC in Comands) {
-
-                //if (!mustHaveFeedback || !thisC.ReturnsVoid) {
-
                 var f = thisC.CanDo(txt, pos, expectedvariablefeedback, s);
 
                 if (f.MustAbort) { return new strDoItWithEndedPosFeedback(f.ErrorMessage); }
@@ -294,8 +291,28 @@ namespace BlueScript {
                     var fn = thisC.DoIt(f, s);
                     return new strDoItWithEndedPosFeedback(fn.ErrorMessage, fn.Value, f.ContinueOrErrorPosition);
                 }
-                //}
             }
+
+
+            #region Prüfen für bessere Fehlermeldung, ob der Rückgabetyp falsch gesetzt wurde
+            foreach (var thisC in Comands) {
+                var f = thisC.CanDo(txt, pos, !expectedvariablefeedback, s);
+
+                if (f.MustAbort) { return new strDoItWithEndedPosFeedback(f.ErrorMessage); }
+
+                if (string.IsNullOrEmpty(f.ErrorMessage)) {
+                    if (expectedvariablefeedback) {
+                        return new strDoItWithEndedPosFeedback("Dieser Befehl hat keinen Rückgabewert: " + txt.Substring(pos));
+                    } else {
+                        return new strDoItWithEndedPosFeedback("Dieser Befehl hat einen Rückgabewert, der nicht verwendet wird: " + txt.Substring(pos));
+                    }
+
+                }
+            }
+            #endregion
+
+
+
             return new strDoItWithEndedPosFeedback("Kann nicht geparsed werden: " + txt.Substring(pos));
         }
 
