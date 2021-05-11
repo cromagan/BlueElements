@@ -39,11 +39,10 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnSpaltenUebersicht = new BlueControls.Controls.Button();
             this.btnClipboardImport = new BlueControls.Controls.Button();
             this.grpTabellenAnsicht = new BlueControls.Controls.GroupBox();
-            this.btnScripting = new BlueControls.Controls.Button();
             this.grpBearbeitung = new BlueControls.Controls.GroupBox();
-            this.btnAdminMenu = new BlueControls.Controls.Button();
-            this.btnDatenüberprüfung = new BlueControls.Controls.Button();
             this.btnZeileLöschen = new BlueControls.Controls.Button();
+            this.btnDatenüberprüfung = new BlueControls.Controls.Button();
+            this.btnAdminMenu = new BlueControls.Controls.Button();
             this.grpAllgemein.SuspendLayout();
             this.grpTabellenAnsicht.SuspendLayout();
             this.grpBearbeitung.SuspendLayout();
@@ -122,26 +121,14 @@ namespace BlueControls.BlueDatabaseDialogs
             // grpTabellenAnsicht
             // 
             this.grpTabellenAnsicht.CausesValidation = false;
-            this.grpTabellenAnsicht.Controls.Add(this.btnScripting);
             this.grpTabellenAnsicht.Controls.Add(this.btnClipboardImport);
             this.grpTabellenAnsicht.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpTabellenAnsicht.Location = new System.Drawing.Point(272, 0);
             this.grpTabellenAnsicht.Name = "grpTabellenAnsicht";
-            this.grpTabellenAnsicht.Size = new System.Drawing.Size(136, 81);
+            this.grpTabellenAnsicht.Size = new System.Drawing.Size(72, 81);
             this.grpTabellenAnsicht.TabIndex = 3;
             this.grpTabellenAnsicht.TabStop = false;
             this.grpTabellenAnsicht.Text = "Import";
-            // 
-            // btnScripting
-            // 
-            this.btnScripting.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_RibbonBar;
-            this.btnScripting.ImageCode = "Formel||||||||||Pfeil_Links";
-            this.btnScripting.Location = new System.Drawing.Point(64, 0);
-            this.btnScripting.Name = "btnScripting";
-            this.btnScripting.Size = new System.Drawing.Size(56, 72);
-            this.btnScripting.TabIndex = 43;
-            this.btnScripting.Text = "Import-Skript";
-            this.btnScripting.Click += new System.EventHandler(this.btnScripting_Click);
             // 
             // grpBearbeitung
             // 
@@ -150,12 +137,36 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpBearbeitung.Controls.Add(this.btnDatenüberprüfung);
             this.grpBearbeitung.Controls.Add(this.btnAdminMenu);
             this.grpBearbeitung.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpBearbeitung.Location = new System.Drawing.Point(408, 0);
+            this.grpBearbeitung.Location = new System.Drawing.Point(344, 0);
             this.grpBearbeitung.Name = "grpBearbeitung";
             this.grpBearbeitung.Size = new System.Drawing.Size(224, 81);
             this.grpBearbeitung.TabIndex = 5;
             this.grpBearbeitung.TabStop = false;
             this.grpBearbeitung.Text = "Bearbeitung";
+            // 
+            // btnZeileLöschen
+            // 
+            this.btnZeileLöschen.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_RibbonBar;
+            this.btnZeileLöschen.ImageCode = "Zeile||||||||||Kreuz";
+            this.btnZeileLöschen.Location = new System.Drawing.Point(144, 0);
+            this.btnZeileLöschen.Name = "btnZeileLöschen";
+            this.btnZeileLöschen.QuickInfo = "Angezeigte Zeilen löschen";
+            this.btnZeileLöschen.Size = new System.Drawing.Size(72, 72);
+            this.btnZeileLöschen.TabIndex = 42;
+            this.btnZeileLöschen.Text = "Zeilen löschen";
+            this.btnZeileLöschen.Click += new System.EventHandler(this.btnZeileLöschen_Click);
+            // 
+            // btnDatenüberprüfung
+            // 
+            this.btnDatenüberprüfung.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_RibbonBar;
+            this.btnDatenüberprüfung.ImageCode = "Zeile||||||||||Häkchen";
+            this.btnDatenüberprüfung.Location = new System.Drawing.Point(72, 0);
+            this.btnDatenüberprüfung.Name = "btnDatenüberprüfung";
+            this.btnDatenüberprüfung.QuickInfo = "Aktuell angezeigte Zeilen<br>automatisch überprüfen.";
+            this.btnDatenüberprüfung.Size = new System.Drawing.Size(64, 72);
+            this.btnDatenüberprüfung.TabIndex = 41;
+            this.btnDatenüberprüfung.Text = "Datenüber-prüfung";
+            this.btnDatenüberprüfung.Click += new System.EventHandler(this.btnDatenüberprüfung_Click);
             // 
             // btnAdminMenu
             // 
@@ -167,28 +178,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnAdminMenu.TabIndex = 40;
             this.btnAdminMenu.Text = "Admin-Menu";
             this.btnAdminMenu.Click += new System.EventHandler(this.btnAdminMenu_Click);
-            // 
-            // btnDatenüberprüfung
-            // 
-            this.btnDatenüberprüfung.ImageCode = "Zeile||||||||||Häkchen";
-            this.btnDatenüberprüfung.Location = new System.Drawing.Point(72, 0);
-            this.btnDatenüberprüfung.Name = "btnDatenüberprüfung";
-            this.btnDatenüberprüfung.QuickInfo = "Aktuell angezeigte Zeilen<br>automatisch überprüfen.";
-            this.btnDatenüberprüfung.Size = new System.Drawing.Size(64, 72);
-            this.btnDatenüberprüfung.TabIndex = 41;
-            this.btnDatenüberprüfung.Text = "Datenüber-prüfung";
-            this.btnDatenüberprüfung.Click += new System.EventHandler(this.btnDatenüberprüfung_Click);
-            // 
-            // btnZeileLöschen
-            // 
-            this.btnZeileLöschen.ImageCode = "Zeile||||||||||Kreuz";
-            this.btnZeileLöschen.Location = new System.Drawing.Point(144, 0);
-            this.btnZeileLöschen.Name = "btnZeileLöschen";
-            this.btnZeileLöschen.QuickInfo = "Angezeigte Zeilen löschen";
-            this.btnZeileLöschen.Size = new System.Drawing.Size(72, 72);
-            this.btnZeileLöschen.TabIndex = 42;
-            this.btnZeileLöschen.Text = "Zeilen löschen";
-            this.btnZeileLöschen.Click += new System.EventHandler(this.btnZeileLöschen_Click);
             // 
             // tabAdministration
             // 
@@ -215,7 +204,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private Button btnClipboardImport;
         private Button btnVorherigeVersion;
         private GroupBox grpTabellenAnsicht;
-        private Button btnScripting;
         private GroupBox grpBearbeitung;
         private Button btnAdminMenu;
         private Button btnDatenüberprüfung;

@@ -137,7 +137,6 @@ namespace BlueDatabase {
         private string _Caption;
         private enJoinTyp _JoinTyp;
         private enVerwaisteDaten _VerwaisteDaten;
-        private string _ImportScript;
         private string _RulesScript;
         private enAnsicht _Ansicht;
         private double _GlobalScale;
@@ -291,7 +290,6 @@ namespace BlueDatabase {
             _JoinTyp = enJoinTyp.Zeilen_verdoppeln;
             _VerwaisteDaten = enVerwaisteDaten.Ignorieren;
             LoadedVersion = DatabaseVersion;
-            _ImportScript = string.Empty;
             _RulesScript = string.Empty;
 
             _GlobalScale = 1f;
@@ -483,13 +481,13 @@ namespace BlueDatabase {
             }
         }
 
-        public string ImportScript {
-            get => _ImportScript;
-            set {
-                if (_ImportScript == value) { return; }
-                AddPending(enDatabaseDataType.ImportScript, -1, -1, _ImportScript, value, true);
-            }
-        }
+        //public string ImportScript {
+        //    get => _ImportScript;
+        //    set {
+        //        if (_ImportScript == value) { return; }
+        //        AddPending(enDatabaseDataType.ImportScript, -1, -1, _ImportScript, value, true);
+        //    }
+        //}
 
         public string RulesScript {
             get => _RulesScript;
@@ -536,42 +534,42 @@ namespace BlueDatabase {
             return -1;
         }
 
-        public string DoImportScript(string TextToImport, RowItem row, bool MeldeFehlgeschlageneZeilen) {
-            if (string.IsNullOrEmpty(_ImportScript)) { return "Kein Import-Skript vorhanden."; }
-            if (string.IsNullOrEmpty(TextToImport)) { return "Kein Text zum Importieren angegeben."; }
+        //public string DoImportScript(string TextToImport, RowItem row, bool MeldeFehlgeschlageneZeilen) {
+        //    if (string.IsNullOrEmpty(_ImportScript)) { return "Kein Import-Skript vorhanden."; }
+        //    if (string.IsNullOrEmpty(TextToImport)) { return "Kein Text zum Importieren angegeben."; }
 
 
-            var cmds = _ImportScript.FromNonCritical().SplitByCRToList();
+        //    var cmds = _ImportScript.FromNonCritical().SplitByCRToList();
 
-            //if (row == null)
-            //{
-            //    row = Row.Add(DateTime.Now.ToString(Constants.Format_Date));
-            //}
-            //else
-            //{
-            if (row != null && row.CellGetBoolean(row.Database.Column.SysLocked)) { return "Die Zeile ist gesperrt (abgeschlossen)."; }
-            //}
+        //    //if (row == null)
+        //    //{
+        //    //    row = Row.Add(DateTime.Now.ToString(Constants.Format_Date));
+        //    //}
+        //    //else
+        //    //{
+        //    if (row != null && row.CellGetBoolean(row.Database.Column.SysLocked)) { return "Die Zeile ist gesperrt (abgeschlossen)."; }
+        //    //}
 
 
 
-            foreach (var thiscmd in cmds) {
-                (var fehlertext, var bigfailure, var importrow) = DoImportScript(TextToImport, thiscmd.Replace(";cr;", "\r").Replace(";tab;", "\t").SplitBy("|"), row);
+        //    foreach (var thiscmd in cmds) {
+        //        (var fehlertext, var bigfailure, var importrow) = DoImportScript(TextToImport, thiscmd.Replace(";cr;", "\r").Replace(";tab;", "\t").SplitBy("|"), row);
 
-                if (importrow == null) { return "Es konnte keine neue Zeile erzeugt werden."; }
+        //        if (importrow == null) { return "Es konnte keine neue Zeile erzeugt werden."; }
 
-                if (row == null) {
-                    row = importrow;
-                } else {
-                    if (row != importrow) { return "Zeilen-Inkonsistenz festgestellt."; }
-                }
+        //        if (row == null) {
+        //            row = importrow;
+        //        } else {
+        //            if (row != importrow) { return "Zeilen-Inkonsistenz festgestellt."; }
+        //        }
 
-                if (!string.IsNullOrEmpty(fehlertext)) {
-                    if (bigfailure) { return fehlertext + "<br><br>Zeile:<br>" + thiscmd; }
-                    if (MeldeFehlgeschlageneZeilen) { return fehlertext + "<br><br>Zeile:<br>" + thiscmd; }
-                }
-            }
-            return string.Empty;
-        }
+        //        if (!string.IsNullOrEmpty(fehlertext)) {
+        //            if (bigfailure) { return fehlertext + "<br><br>Zeile:<br>" + thiscmd; }
+        //            if (MeldeFehlgeschlageneZeilen) { return fehlertext + "<br><br>Zeile:<br>" + thiscmd; }
+        //        }
+        //    }
+        //    return string.Empty;
+        //}
 
         internal void OnDropMessage(string message) {
             DropMessage?.Invoke(this, new MessageEventArgs(message));
@@ -1162,8 +1160,7 @@ namespace BlueDatabase {
                     _VerwaisteDaten = (enVerwaisteDaten)int.Parse(content);
                     break;
 
-                case enDatabaseDataType.ImportScript:
-                    _ImportScript = content;
+                case (enDatabaseDataType)63://                    enDatabaseDataType.ImportScript:
                     break;
 
                 case enDatabaseDataType.RulesScript:
@@ -1296,7 +1293,7 @@ namespace BlueDatabase {
             if (cola) { t += " - Benutzerdefinierte Spalten-Anordnungen<br>"; }
 
 
-            if (ImportScript.ToUpper().Contains(column.Name.ToUpper())) { t += " - Import-Skript<br>"; }
+            //if (ImportScript.ToUpper().Contains(column.Name.ToUpper())) { t += " - Import-Skript<br>"; }
 
             if (RulesScript.ToUpper().Contains(column.Name.ToUpper())) { t += " - Regeln-Skript<br>"; }
 
@@ -1355,22 +1352,22 @@ namespace BlueDatabase {
 
 
 
-            // ImportScript -----------------------------------------
-            var x = ImportScript.FromNonCritical().SplitByCRToList();
-            var xn = new List<string>();
+            //// ImportScript -----------------------------------------
+            //var x = ImportScript.FromNonCritical().SplitByCRToList();
+            //var xn = new List<string>();
 
-            foreach (var thisstring in x) {
-                if (!string.IsNullOrEmpty(thisstring)) {
-                    var x2 = thisstring.SplitBy("|");
-                    if (x2.Length > 2 && x2[1].ToUpper() == oldName.ToUpper()) {
-                        x2[1] = newName.Name.ToUpper();
-                        xn.Add(x2.JoinWith("|"));
-                    } else {
-                        xn.Add(thisstring);
-                    }
-                }
-            }
-            ImportScript = xn.JoinWithCr().ToNonCritical();
+            //foreach (var thisstring in x) {
+            //    if (!string.IsNullOrEmpty(thisstring)) {
+            //        var x2 = thisstring.SplitBy("|");
+            //        if (x2.Length > 2 && x2[1].ToUpper() == oldName.ToUpper()) {
+            //            x2[1] = newName.Name.ToUpper();
+            //            xn.Add(x2.JoinWith("|"));
+            //        } else {
+            //            xn.Add(thisstring);
+            //        }
+            //    }
+            //}
+            //ImportScript = xn.JoinWithCr().ToNonCritical();
 
 
 
@@ -1875,7 +1872,7 @@ namespace BlueDatabase {
                 SaveToByteList(l, enDatabaseDataType.GlobalScale, _GlobalScale.ToString());
                 SaveToByteList(l, enDatabaseDataType.Ansicht, ((int)_Ansicht).ToString());
                 SaveToByteList(l, enDatabaseDataType.ReloadDelaySecond, _ReloadDelaySecond.ToString());
-                SaveToByteList(l, enDatabaseDataType.ImportScript, _ImportScript);
+                //SaveToByteList(l, enDatabaseDataType.ImportScript, _ImportScript);
                 SaveToByteList(l, enDatabaseDataType.RulesScript, _RulesScript);
 
                 //SaveToByteList(l, enDatabaseDataType.BinaryDataInOne, Bins.ToString(true));

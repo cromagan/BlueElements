@@ -93,12 +93,6 @@
     <Compile Include="BlueDatabaseDialogs\Search.designer.cs">
       <DependentUpon>Search.cs</DependentUpon>
     </Compile>
-    <Compile Include="BlueDatabaseDialogs\Skript.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="BlueDatabaseDialogs\Skript.Designer.cs">
-      <DependentUpon>Skript.cs</DependentUpon>
-    </Compile>
     <Compile Include="BlueDatabaseDialogs\Filterleiste.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -555,9 +549,6 @@
     <EmbeddedResource Include="BlueDatabaseDialogs\Search.resx">
       <DependentUpon>Search.cs</DependentUpon>
       <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="BlueDatabaseDialogs\Skript.resx">
-      <DependentUpon>Skript.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="BlueDatabaseDialogs\Filterleiste.resx">
       <DependentUpon>Filterleiste.cs</DependentUpon>

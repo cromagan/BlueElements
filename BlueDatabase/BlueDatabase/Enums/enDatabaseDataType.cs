@@ -82,7 +82,7 @@ namespace BlueDatabase.Enums {
         BinaryDataInOne = 60,
         JoinTyp = 61,
         VerwaisteDaten = 62,
-        ImportScript = 63,
+        //ImportScript = 63,
         GlobalScale = 64,
         FilterImagePfad = 65,
         ZeilenQuickInfo = 66,

@@ -303,10 +303,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             btnVorherigeVersion.Enabled = true;
         }
 
-        private void btnScripting_Click(object sender, System.EventArgs e) {
-            var o = new Skript(_TableView);
-            o.Show();
-        }
 
         private void btnAdminMenu_Click(object sender, System.EventArgs e) {
             if (_TableView == null) { return; }
