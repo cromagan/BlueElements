@@ -261,6 +261,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="clsDesign.cs" />
+    <Compile Include="clsRowDrawData.cs" />
     <Compile Include="SystemInputHook.cs" />
     <Compile Include="Controls\Button.cs">
       <SubType>Component</SubType>

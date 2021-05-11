@@ -36,13 +36,8 @@ namespace BlueDatabase {
         #region  Variablen-Deklarationen 
 
         public readonly Database Database;
-        public string TMP_Chapter;
-        public bool TMP_Expanded;
-        public Rectangle? TMP_CaptionPos;
-        public int? TMP_Y = null;
-        public int? TMP_DrawHeight = null;
+        private string? _tmpQuickInfo;
 
-        private string? _tmpQuickInfo = null;
 
         #endregion
 
@@ -54,11 +49,6 @@ namespace BlueDatabase {
         public RowItem(Database database, int key) {
             Database = database;
             Key = key;
-            TMP_Chapter = string.Empty;
-            TMP_Y = null;
-            TMP_DrawHeight = null;
-            TMP_Expanded = true;
-            TMP_CaptionPos = null;
             _tmpQuickInfo = null;
 
             Database.Cell.CellValueChanged += Cell_CellValueChanged;

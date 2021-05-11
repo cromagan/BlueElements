@@ -175,7 +175,7 @@ namespace BlueBasics.MultiUserFile {
         protected clsMultiUserFile(bool readOnly, bool zipped) {
             _zipped = zipped;
 
-            AllFiles.Add(this); 
+            AllFiles.Add(this);
             //OnMultiUserFileCreated(this); // Ruft ein statisches Event auf, deswegen geht das.
 
             PureBinSaver = new System.ComponentModel.BackgroundWorker {
@@ -296,9 +296,7 @@ namespace BlueBasics.MultiUserFile {
             while (IsLoading) {
                 Develop.DoEvents();
 
-                if (!hardmode && !IsParsing) {
-                    if (DateTime.Now.Subtract(x).TotalSeconds > 0.1) { return; }
-                }
+                if (!hardmode && !IsParsing) { return; }
 
                 if (DateTime.Now.Subtract(x).TotalMinutes > 1) {
                     if (hardmode) {
@@ -310,21 +308,6 @@ namespace BlueBasics.MultiUserFile {
             }
         }
 
-        // private void WaitSaved()
-        // {
-        //    var x = DateTime.Now;
-
-        // while (_IsSaving)
-        //    {
-        //        Develop.DoEvents();
-        //        if (DateTime.Now.Subtract(x).TotalMinutes > 2)
-        //        {
-        //            Develop.DebugPrint(enFehlerArt.Fehler, "WaitSaved hängt");
-        //            return;
-        //        }
-
-        // }
-        // }
 
         /// <summary>
         /// Führt - falls nötig - einen Reload der Datei aus.
