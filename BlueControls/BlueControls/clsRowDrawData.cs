@@ -24,7 +24,6 @@ using System.Drawing;
 namespace BlueControls.Controls {
     public class clsRowDrawData {
 
-
         public RowItem Row;
         public bool Pinned;
         public int Y;
@@ -32,9 +31,6 @@ namespace BlueControls.Controls {
         public bool Expanded;
         public Rectangle CaptionPos;
         public int DrawHeight;
-
-
-
 
         public clsRowDrawData(BlueDatabase.RowItem row) {
             Row = row;
@@ -46,13 +42,12 @@ namespace BlueControls.Controls {
             CaptionPos = Rectangle.Empty;
         }
 
-
     }
 
     public static class clsRowDrawDataExtensions {
 
 
-        public static clsRowDrawData? Get(this List<clsRowDrawData> l, RowItem row) {
+        public static clsRowDrawData Get(this List<clsRowDrawData> l, RowItem row) {
 
             foreach (var thisr in l) {
                 if (thisr.Row == row) { return thisr; }
@@ -60,12 +55,11 @@ namespace BlueControls.Controls {
             return null;
         }
 
-        public static int IndexOf(this List<clsRowDrawData> l, RowItem row) {
-            for (var z = 0; z < l.Count; z++) {
-                if (l[z].Row == row) { return z; }
-            }
-            return -1;
-        }
+        //public static int IndexOf(this List<clsRowDrawData> l, RowItem row) {
+        //    for (var z = 0; z < l.Count; z++) {
+        //        if (l[z].Row == row) { return z; }
+        //    }
+        //    return -1;
+        //}
     }
-
 }
