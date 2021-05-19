@@ -220,16 +220,12 @@ namespace BlueDatabase {
             Views.Changed += Views_ListOrItemChanged;
             PermissionGroups_NewRow.Changed += PermissionGroups_NewRow_ListOrItemChanged;
             Tags.Changed += DatabaseTags_ListOrItemChanged;
-            //Bins.Changed += Bins_ListOrItemChanged;
             Export.Changed += Export_ListOrItemChanged;
             DatenbankAdmin.Changed += DatabaseAdmin_ListOrItemChanged;
-
-
 
             Row.RowRemoving += Row_BeforeRemoveRow;
             Row.RowAdded += Row_RowAdded;
 
-            //Column.ItemAdded += Column_ItemAdded;
             Column.ItemRemoving += Column_ItemRemoving;
             Column.ItemRemoved += Column_ItemRemoved;
 
@@ -510,6 +506,59 @@ namespace BlueDatabase {
         #endregion
 
 
+        protected override void Dispose(bool disposing) {
+            if (!Disposed) { return; }
+
+
+            base.Dispose(disposing); // speichert und löscht die ganzen Worker. setzt auch disposedValue und ReadOnly auf true
+
+
+            if (disposing) {
+                // TODO: verwalteten Zustand (verwaltete Objekte) entsorgen.
+            }
+
+            // TODO: nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer weiter unten überschreiben.
+            // TODO: große Felder auf Null setzen.
+
+
+            ColumnArrangements.Changed -= ColumnArrangements_ListOrItemChanged;
+            Layouts.Changed -= Layouts_ListOrItemChanged;
+            Layouts.ItemSeted -= Layouts_ItemSeted;
+
+            Views.Changed -= Views_ListOrItemChanged;
+            PermissionGroups_NewRow.Changed -= PermissionGroups_NewRow_ListOrItemChanged;
+            Tags.Changed -= DatabaseTags_ListOrItemChanged;
+            Export.Changed -= Export_ListOrItemChanged;
+            DatenbankAdmin.Changed -= DatabaseAdmin_ListOrItemChanged;
+
+            Row.RowRemoving -= Row_BeforeRemoveRow;
+            Row.RowAdded -= Row_RowAdded;
+
+            Column.ItemRemoving -= Column_ItemRemoving;
+            Column.ItemRemoved -= Column_ItemRemoved;
+
+
+            Column.Dispose();
+            Cell.Dispose();
+            Row.Dispose();
+            Works.Dispose();
+
+            ColumnArrangements.Dispose();
+            Views.Dispose();
+            Tags.Dispose();
+
+            Export.Dispose();
+
+
+            DatenbankAdmin.Dispose();
+            PermissionGroups_NewRow.Dispose();
+            Layouts.Dispose();
+
+        }
+
+
+
+
         internal void DevelopWarnung(string t) {
 
             try {
@@ -572,11 +621,13 @@ namespace BlueDatabase {
         //}
 
         internal void OnDropMessage(string message) {
+            if (Disposed) { return; }
             DropMessage?.Invoke(this, new MessageEventArgs(message));
         }
 
 
         internal void OnProgressbarInfo(ProgressbarEventArgs e) {
+            if (Disposed) { return; }
             ProgressbarInfo?.Invoke(this, e);
         }
 
@@ -745,88 +796,88 @@ namespace BlueDatabase {
 
             switch ((enRoutinen)_BLoaded[Pointer]) {
                 case enRoutinen.CellFormat: {
-                    Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
-                    Les = NummerCode3(_BLoaded, Pointer + 2);
-                    ColNR = NummerCode3(_BLoaded, Pointer + 5);
-                    RowNR = NummerCode3(_BLoaded, Pointer + 8);
-                    var b = new byte[Les];
-                    Buffer.BlockCopy(_BLoaded, Pointer + 11, b, 0, Les);
-                    Wert = b.ToStringWIN1252();
-                    X = NummerCode2(_BLoaded, Pointer + 11 + Les);
-                    Y = NummerCode2(_BLoaded, Pointer + 11 + Les + 2);
-                    Pointer += 11 + Les + 4;
-                    break;
-                }
+                        Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
+                        Les = NummerCode3(_BLoaded, Pointer + 2);
+                        ColNR = NummerCode3(_BLoaded, Pointer + 5);
+                        RowNR = NummerCode3(_BLoaded, Pointer + 8);
+                        var b = new byte[Les];
+                        Buffer.BlockCopy(_BLoaded, Pointer + 11, b, 0, Les);
+                        Wert = b.ToStringWIN1252();
+                        X = NummerCode2(_BLoaded, Pointer + 11 + Les);
+                        Y = NummerCode2(_BLoaded, Pointer + 11 + Les + 2);
+                        Pointer += 11 + Les + 4;
+                        break;
+                    }
                 case enRoutinen.CellFormatUTF8: {
-                    Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
-                    Les = NummerCode3(_BLoaded, Pointer + 2);
-                    ColNR = NummerCode3(_BLoaded, Pointer + 5);
-                    RowNR = NummerCode3(_BLoaded, Pointer + 8);
-                    var b = new byte[Les];
-                    Buffer.BlockCopy(_BLoaded, Pointer + 11, b, 0, Les);
-                    Wert = b.ToStringUTF8();
-                    X = NummerCode2(_BLoaded, Pointer + 11 + Les);
-                    Y = NummerCode2(_BLoaded, Pointer + 11 + Les + 2);
-                    Pointer += 11 + Les + 4;
-                    break;
-                }
+                        Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
+                        Les = NummerCode3(_BLoaded, Pointer + 2);
+                        ColNR = NummerCode3(_BLoaded, Pointer + 5);
+                        RowNR = NummerCode3(_BLoaded, Pointer + 8);
+                        var b = new byte[Les];
+                        Buffer.BlockCopy(_BLoaded, Pointer + 11, b, 0, Les);
+                        Wert = b.ToStringUTF8();
+                        X = NummerCode2(_BLoaded, Pointer + 11 + Les);
+                        Y = NummerCode2(_BLoaded, Pointer + 11 + Les + 2);
+                        Pointer += 11 + Les + 4;
+                        break;
+                    }
                 case enRoutinen.DatenAllgemein: {
-                    Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
-                    Les = NummerCode3(_BLoaded, Pointer + 2);
-                    ColNR = -1;
-                    RowNR = -1;
-                    var b = new byte[Les];
-                    Buffer.BlockCopy(_BLoaded, Pointer + 5, b, 0, Les);
-                    Wert = b.ToStringWIN1252();
-                    X = 0;
-                    Y = 0;
-                    Pointer += 5 + Les;
-                    break;
-                }
+                        Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
+                        Les = NummerCode3(_BLoaded, Pointer + 2);
+                        ColNR = -1;
+                        RowNR = -1;
+                        var b = new byte[Les];
+                        Buffer.BlockCopy(_BLoaded, Pointer + 5, b, 0, Les);
+                        Wert = b.ToStringWIN1252();
+                        X = 0;
+                        Y = 0;
+                        Pointer += 5 + Les;
+                        break;
+                    }
                 case enRoutinen.DatenAllgemeinUTF8: {
-                    Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
-                    Les = NummerCode3(_BLoaded, Pointer + 2);
-                    ColNR = -1;
-                    RowNR = -1;
-                    var b = new byte[Les];
-                    Buffer.BlockCopy(_BLoaded, Pointer + 5, b, 0, Les);
-                    Wert = b.ToStringUTF8();
-                    X = 0;
-                    Y = 0;
-                    Pointer += 5 + Les;
-                    break;
-                }
+                        Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
+                        Les = NummerCode3(_BLoaded, Pointer + 2);
+                        ColNR = -1;
+                        RowNR = -1;
+                        var b = new byte[Les];
+                        Buffer.BlockCopy(_BLoaded, Pointer + 5, b, 0, Les);
+                        Wert = b.ToStringUTF8();
+                        X = 0;
+                        Y = 0;
+                        Pointer += 5 + Les;
+                        break;
+                    }
 
                 case enRoutinen.Column: {
-                    Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
-                    Les = NummerCode3(_BLoaded, Pointer + 2);
-                    ColNR = NummerCode3(_BLoaded, Pointer + 5);
-                    RowNR = NummerCode3(_BLoaded, Pointer + 8);
-                    var b = new byte[Les];
-                    Buffer.BlockCopy(_BLoaded, Pointer + 11, b, 0, Les);
-                    Wert = b.ToStringWIN1252();
-                    X = 0;
-                    Y = 0;
-                    Pointer += 11 + Les;
-                    break;
-                }
+                        Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
+                        Les = NummerCode3(_BLoaded, Pointer + 2);
+                        ColNR = NummerCode3(_BLoaded, Pointer + 5);
+                        RowNR = NummerCode3(_BLoaded, Pointer + 8);
+                        var b = new byte[Les];
+                        Buffer.BlockCopy(_BLoaded, Pointer + 11, b, 0, Les);
+                        Wert = b.ToStringWIN1252();
+                        X = 0;
+                        Y = 0;
+                        Pointer += 11 + Les;
+                        break;
+                    }
                 case enRoutinen.ColumnUTF8: {
-                    Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
-                    Les = NummerCode3(_BLoaded, Pointer + 2);
-                    ColNR = NummerCode3(_BLoaded, Pointer + 5);
-                    RowNR = NummerCode3(_BLoaded, Pointer + 8);
-                    var b = new byte[Les];
-                    Buffer.BlockCopy(_BLoaded, Pointer + 11, b, 0, Les);
-                    Wert = b.ToStringUTF8();
-                    X = 0;
-                    Y = 0;
-                    Pointer += 11 + Les;
-                    break;
-                }
+                        Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
+                        Les = NummerCode3(_BLoaded, Pointer + 2);
+                        ColNR = NummerCode3(_BLoaded, Pointer + 5);
+                        RowNR = NummerCode3(_BLoaded, Pointer + 8);
+                        var b = new byte[Les];
+                        Buffer.BlockCopy(_BLoaded, Pointer + 11, b, 0, Les);
+                        Wert = b.ToStringUTF8();
+                        X = 0;
+                        Y = 0;
+                        Pointer += 11 + Les;
+                        break;
+                    }
                 default: {
-                    Develop.DebugPrint(enFehlerArt.Fehler, "Laderoutine nicht definiert: " + _BLoaded[Pointer]);
-                    break;
-                }
+                        Develop.DebugPrint(enFehlerArt.Fehler, "Laderoutine nicht definiert: " + _BLoaded[Pointer]);
+                        break;
+                    }
             }
         }
 
@@ -1038,7 +1089,7 @@ namespace BlueDatabase {
                     } else {
                         //Cell.RemoveOrphans();
                         Row.RemoveNullOrEmpty();
-                        Cell.SetAllValuesToEmpty();
+                        Cell.Clear();
                     }
                     break;
 
@@ -1106,12 +1157,12 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.Rules_ALT:
-                    var Rules = new List<RuleItem_Old>();
-                    var RU = content.SplitByCR();
-                    for (var z = 0; z <= RU.GetUpperBound(0); z++) {
-                        Rules.Add(new RuleItem_Old(this, RU[z]));
-                    }
-                    _RulesScript = GenerateScriptFromRules(Rules);
+                    //var Rules = new List<RuleItem_Old>();
+                    //var RU = content.SplitByCR();
+                    //for (var z = 0; z <= RU.GetUpperBound(0); z++) {
+                    //    Rules.Add(new RuleItem_Old(this, RU[z]));
+                    //}
+                    _RulesScript = string.Empty;
                     break;
 
                 case enDatabaseDataType.ColumnArrangement:
@@ -1234,24 +1285,24 @@ namespace BlueDatabase {
             return "";
         }
 
-        [Obsolete]
-        private string GenerateScriptFromRules(List<RuleItem_Old> rules) {
-            if (rules is null || rules.Count == 0) { return string.Empty; }
+        //[Obsolete]
+        //private string GenerateScriptFromRules(List<RuleItem_Old> rules) {
+        //    if (rules is null || rules.Count == 0) { return string.Empty; }
 
 
-            var txt = "// Automatische Umwandlung des alten Regel-Systems in die neue Skript-Sprache.\r\n";
-            txt += "// - Zur Bearbeitung wird NOTEPAD++ empfohlen.\r\n";
-            txt += "// - Zur Verschönerung der Optik wird https://codebeautify.org/javaviewer empfohlen.\r\n\r\n\r\n";
+        //    var txt = "// Automatische Umwandlung des alten Regel-Systems in die neue Skript-Sprache.\r\n";
+        //    txt += "// - Zur Bearbeitung wird NOTEPAD++ empfohlen.\r\n";
+        //    txt += "// - Zur Verschönerung der Optik wird https://codebeautify.org/javaviewer empfohlen.\r\n\r\n\r\n";
 
-            foreach (var thisRegel in rules) {
-                txt = txt + thisRegel.ToScript();
-            }
-
-
-            return txt;
+        //    foreach (var thisRegel in rules) {
+        //        txt = txt + thisRegel.ToScript();
+        //    }
 
 
-        }
+        //    return txt;
+
+
+        //}
 
         //public void LoadPicsIntoImageChache() {
         //    foreach (var bmp in Bins) {
@@ -1946,25 +1997,31 @@ namespace BlueDatabase {
 
 
         internal void OnViewChanged() {
+            if (Disposed) { return; }
             ViewChanged?.Invoke(this, System.EventArgs.Empty);
         }
 
         private void OnExporting(CancelEventArgs e) {
+            if (Disposed) { return; }
             Exporting?.Invoke(this, e);
         }
 
         internal void OnLoadingLinkedDatabase(DatabaseSettingsEventHandler e) {
+            if (Disposed) { return; }
             LoadingLinkedDatabase?.Invoke(this, e);
         }
         internal void OnGenerateLayoutInternal(GenerateLayoutInternalEventargs e) {
+            if (Disposed) { return; }
             GenerateLayoutInternal?.Invoke(this, e);
         }
 
         private void OnSortParameterChanged() {
+            if (Disposed) { return; }
             SortParameterChanged?.Invoke(this, System.EventArgs.Empty);
         }
 
         private void OnRenameColumnInLayout(RenameColumnInLayoutEventArgs e) {
+            if (Disposed) { return; }
             RenameColumnInLayout?.Invoke(this, e);
         }
 
@@ -2103,17 +2160,17 @@ namespace BlueDatabase {
                 if (ThisPending.State == enItemState.Pending) {
                     switch (ThisPending.Comand) {
                         case enDatabaseDataType.dummyComand_AddRow when _JoinTyp == enJoinTyp.Intelligent_zusammenfassen: {
-                            var Value = SearchKeyValueInPendingsOf(ThisPending.RowKey);
-                            var fRow = Row[Value];
+                                var Value = SearchKeyValueInPendingsOf(ThisPending.RowKey);
+                                var fRow = Row[Value];
 
-                            if (!string.IsNullOrEmpty(Value) && fRow != null) {
-                                ChangeRowKeyInPending(ThisPending.RowKey, fRow.Key);
-                            } else {
-                                ChangeRowKeyInPending(ThisPending.RowKey, Row.NextRowKey());
+                                if (!string.IsNullOrEmpty(Value) && fRow != null) {
+                                    ChangeRowKeyInPending(ThisPending.RowKey, fRow.Key);
+                                } else {
+                                    ChangeRowKeyInPending(ThisPending.RowKey, Row.NextRowKey());
+                                }
+
+                                break;
                             }
-
-                            break;
-                        }
                         case enDatabaseDataType.dummyComand_AddRow:
                             ChangeRowKeyInPending(ThisPending.RowKey, Row.NextRowKey());
                             break;
@@ -2218,10 +2275,12 @@ namespace BlueDatabase {
         }
 
         private void OnRowKeyChanged(KeyChangedEventArgs e) {
+            if (Disposed) { return; }
             RowKeyChanged?.Invoke(this, e);
         }
 
         private void OnNeedPassword(PasswordEventArgs e) {
+            if (Disposed) { return; }
             NeedPassword?.Invoke(this, e);
         }
 
@@ -2269,6 +2328,7 @@ namespace BlueDatabase {
         }
 
         private void OnColumnKeyChanged(KeyChangedEventArgs e) {
+            if (Disposed) { return; }
             ColumnKeyChanged?.Invoke(this, e);
         }
 
@@ -2489,146 +2549,3 @@ namespace BlueDatabase {
     }
 }
 
-
-
-
-//using BlueBasics.Enums;
-//using BlueBasics.Interfaces;
-//using System;
-//using System.Drawing;
-//using System.Drawing.Imaging;
-//using static BlueBasics.FileOperations;
-
-//namespace BlueBasics
-//{
-//    public sealed class clsNamedBinary 
-//    {
-//        #region  Variablen-Deklarationen 
-
-//        private string _binary;
-//        public Bitmap _picture;
-//        private string _name;
-
-//        #endregion
-
-
-//        #region  Construktor + Initialize 
-
-//        public clsNamedBinary(string CodeToParse)
-//        {
-//            Parse(CodeToParse);
-//        }
-
-
-
-//        public clsNamedBinary()
-//        {
-//            Initialize();
-//        }
-
-
-
-
-//        public void Initialize()
-//        {
-//            _name = string.Empty;
-//            _binary = string.Empty;
-//            _picture = null;
-//        }
-
-//        #endregion
-
-//        #region  Properties 
-//        public bool IsParsing { get; private set; }
-
-//        public string Binary
-//        {
-//            get
-//            {
-//                return _binary;
-//            }
-
-//            set
-//            {
-//                if (_binary == value) { return; }
-//                _binary = value;
-
-//            }
-//        }
-
-//        public Bitmap Picture
-//        {
-//            get
-//            {
-//                return _picture;
-//            }
-
-//            set
-//            {
-//                if (_picture == value) { return; }
-//                _picture = value;
-
-//            }
-//        }
-
-//        public string Name
-//        {
-//            get
-//            {
-//                return _name;
-//            }
-
-//            set
-//            {
-//                if (_name == value) { return; }
-//                _name = value;
-
-//            }
-//        }
-//        #endregion
-
-
-
-//        public bool IsNullOrEmpty()
-//        {
-//            if (_picture == null && string.IsNullOrEmpty(_binary)) { return true; }
-//            return false;
-//        }
-
-//        public void Parse(string ToParse)
-//        {
-//            IsParsing = true;
-//            Initialize();
-
-//            if (string.IsNullOrEmpty(ToParse) || ToParse.Length < 10)
-//            {
-//                IsParsing = false;
-//                return;
-//            }
-
-//            foreach (var pair in ToParse.GetAllTags())
-//            {
-//                switch (pair.Key)
-//                {
-//                    case "name":
-//                        _name = pair.Value.FromNonCritical();
-//                        break;
-//                    case "png":
-//                        _picture = modConverter.StringWIN1252ToBitmap(pair.Value.FromNonCritical());
-//                        break;
-//                    case "bin":
-//                        _binary = pair.Value.FromNonCritical();
-//                        break;
-//                    default:
-//                        Develop.DebugPrint(enFehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
-//                        break;
-//                }
-//            }
-//            IsParsing = false;
-//        }
-
-
-
-
-//    }
-//}

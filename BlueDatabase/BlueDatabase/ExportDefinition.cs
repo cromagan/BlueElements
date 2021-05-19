@@ -35,10 +35,10 @@ namespace BlueDatabase {
     //Der Export wird nur Intern verwaltet und gibt keine Ereignisse aus.
     //Wenn mal ein LAyout geändert wird, sind es gleich 100 und mehr AddPenduings mit imensen Daten.
 
-    public class ExportDefinition : IParseable, IReadableTextWithChanging, ICompareKey, ICheckable {
+    public class ExportDefinition : IParseable, IReadableTextWithChanging, ICompareKey, ICheckable, System.IDisposable {
 
 
-        public readonly Database Database;
+        public Database Database { get; private set; }
 
         private string _Verzeichnis;
         private enExportTyp _Typ;
@@ -50,6 +50,7 @@ namespace BlueDatabase {
         private DateTime _LastExportTimeUTC;
 
         private FilterCollection _Filter;
+        private bool disposedValue;
 
 
         #region  Event-Deklarationen + Delegaten 
@@ -199,9 +200,14 @@ namespace BlueDatabase {
         }
 
 
-        public ExportDefinition(Database DB) {
-            Database = DB;
+        public ExportDefinition(Database database) {
+            Database = database;
+            Database.Disposing += Database_Disposing;
             Initialize();
+        }
+
+        private void Database_Disposing(object sender, System.EventArgs e) {
+            Dispose();
         }
 
         #endregion
@@ -871,9 +877,37 @@ namespace BlueDatabase {
             return new ExportDefinition(Database, ToString());
         }
 
+        protected virtual void Dispose(bool disposing) {
+            if (!disposedValue) {
+                if (disposing) {
+                    // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
+                }
 
 
+      
+                Database.Disposing -= Database_Disposing;
+                Database = null;
+                Filter.Dispose();
+
+                _BereitsExportiert = new ListExt<string>();
+                _BereitsExportiert.Changed -= _BereitsExportiert_ListOrItemChanged;
+                _BereitsExportiert.Dispose();
 
 
+                disposedValue = true;
+            }
+        }
+
+        // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
+        ~ExportDefinition() {
+            // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+            Dispose(disposing: false);
+        }
+
+        public void Dispose() {
+            // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
     }
 }

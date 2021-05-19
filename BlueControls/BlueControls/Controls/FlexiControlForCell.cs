@@ -140,6 +140,7 @@ namespace BlueControls.Controls {
                     _Database.RowKeyChanged -= _Database_RowKeyChanged;
                     _Database.ColumnKeyChanged -= _Database_ColumnKeyChanged;
                     _Database.Loaded -= _Database_Loaded;
+                    _Database.Disposing -= _Database_Disposing;
                 }
 
                 _Database = value;
@@ -156,6 +157,7 @@ namespace BlueControls.Controls {
                     _Database.RowKeyChanged += _Database_RowKeyChanged;
                     _Database.Loaded += _Database_Loaded;
                     _Database.ColumnKeyChanged += _Database_ColumnKeyChanged;
+                    _Database.Disposing += _Database_Disposing;
 
                 }
 
@@ -163,6 +165,10 @@ namespace BlueControls.Controls {
 
                 CheckEnabledState();
             }
+        }
+
+        private void _Database_Disposing(object sender, System.EventArgs e) {
+            Database = null;
         }
 
         private void Row_RowRemoving(object sender, RowEventArgs e) {

@@ -83,6 +83,7 @@ namespace BlueControls.ItemCollection {
 
         public RowFormulaPadItem(ItemCollectionPad parent, string internalname, Database database, int rowkey, string layoutID) : base(parent, internalname, true) {
             _Database = database;
+            _Database.Disposing += _Database_Disposing;
             _RowKey = rowkey;
 
             if (_Database != null && string.IsNullOrEmpty(layoutID)) {
@@ -91,9 +92,11 @@ namespace BlueControls.ItemCollection {
             }
 
             _LayoutID = layoutID;
-            removePic();
+            RemovePic();
             GeneratePic(true);
         }
+
+
 
         #endregion
 
@@ -104,7 +107,7 @@ namespace BlueControls.ItemCollection {
                 if (value == _LayoutID) { return; }
                 Größe_fixiert = true;
                 _LayoutID = value;
-                removePic();
+                RemovePic();
                 GeneratePic(true);
             }
         }
@@ -122,13 +125,13 @@ namespace BlueControls.ItemCollection {
             //}
         }
 
-        private void removePic() {
+        private void RemovePic() {
             if (GeneratedBitmap != null) { GeneratedBitmap.Dispose(); }
             GeneratedBitmap = null;
         }
 
         public override void DesignOrStyleChanged() {
-            removePic();
+            RemovePic();
         }
 
 
@@ -178,6 +181,7 @@ namespace BlueControls.ItemCollection {
                     if (_Database == null) {
                         _Database = new Database(value, false, false);
                     }
+                    _Database.Disposing += _Database_Disposing;
                     return true;
 
                 case "rowid": // TODO: alt
@@ -269,7 +273,7 @@ namespace BlueControls.ItemCollection {
 
             if (GeneratedBitmap != null) {
                 if (GeneratedBitmap.Width != re.Width || GeneratedBitmap.Height != re.Height) {
-                    removePic();
+                    RemovePic();
                 }
             }
 
@@ -364,6 +368,14 @@ namespace BlueControls.ItemCollection {
         public void Datensatz_bearbeiten() {
             _tmpQuickInfo = string.Empty; // eigentlich unnötig, da RowChanged anschlagen müsste
             EditBoxRow.Show("Datensatz bearbeiten:", Row, true);
+        }
+
+
+
+        private void _Database_Disposing(object sender, System.EventArgs e) {
+            _Database.Disposing -= _Database_Disposing;
+            _Database = null;
+            RemovePic();
         }
 
         //public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)

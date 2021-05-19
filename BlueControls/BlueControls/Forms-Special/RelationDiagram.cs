@@ -28,7 +28,7 @@ using System.Collections.Generic;
 
 namespace BlueControls.Forms {
     public partial class RelationDiagram : PadEditor {
-        private readonly Database _Database;
+        private Database Database;
         private readonly ColumnItem _column;
 
         //private bool RelationsValid;
@@ -37,15 +37,16 @@ namespace BlueControls.Forms {
         //   Dim ItS As New Size(60, 80)
 
 
-        public RelationDiagram(Database DB) {
+        public RelationDiagram(Database database) {
 
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
 
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            _Database = DB;
+            Database = database;
+            Database.Disposing += Database_Disposing;
 
-            foreach (var ThisColumnItem in _Database.Column) {
+            foreach (var ThisColumnItem in Database.Column) {
                 if (ThisColumnItem != null) {
                     if (ThisColumnItem.Format == enDataFormat.RelationText) {
                         _column = ThisColumnItem;
@@ -55,11 +56,14 @@ namespace BlueControls.Forms {
             }
         }
 
+        private void Database_Disposing(object sender, System.EventArgs e) {
+            Close();
+        }
 
         private void Hinzu_Click(object sender, System.EventArgs e) {
 
             var il = new ItemCollectionList();
-            il.AddRange(_Database.Column[0].Contents());
+            il.AddRange(Database.Column[0].Contents());
             il.Sort();
             il.CheckBehavior = enCheckBehavior.SingleSelection;
 
@@ -97,7 +101,7 @@ namespace BlueControls.Forms {
 
             if (Pad.Item[What] != null) { return null; }
 
-            var r = _Database.Row[What];
+            var r = Database.Row[What];
 
             if (r == null) {
                 MessageBox.Show("<b>" + What + "</B> konnte nicht hinzugefügt werden.", enImageCode.Information, "OK");
@@ -106,7 +110,7 @@ namespace BlueControls.Forms {
             if (ItemOfRow(r) != null) { return null; }
 
 
-            var i2 = new RowFormulaPadItem(Pad.Item, _Database, r.Key, layoutID);
+            var i2 = new RowFormulaPadItem(Pad.Item, Database, r.Key, layoutID);
             Pad.Item.Add(i2);
             //  Pad.Invalidate()
             i2.SetCoordinates(new RectangleM(xPos, Ypos, i2.UsedArea().Width, i2.UsedArea().Height), false);
@@ -165,7 +169,7 @@ namespace BlueControls.Forms {
 
             // Alle möglichen Namen holen
             var Names = new List<string>();
-            Names.AddRange(_Database.Column[0].GetUcaseNamesSortedByLenght());
+            Names.AddRange(Database.Column[0].GetUcaseNamesSortedByLenght());
 
 
             // Namen ermitteln, die relevant sind
@@ -184,7 +188,7 @@ namespace BlueControls.Forms {
             foreach (var thisn in bez) {
 
 
-                var ro = _Database.Row[thisn];
+                var ro = Database.Row[thisn];
                 var it = ItemOfRow(ro);
 
 
@@ -465,6 +469,11 @@ namespace BlueControls.Forms {
 
         }
 
+        protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
+            base.OnFormClosing(e);
+            Database.Disposing -= Database_Disposing;
+            Database = null;
+        }
 
         //Private Sub Entwirren()
 

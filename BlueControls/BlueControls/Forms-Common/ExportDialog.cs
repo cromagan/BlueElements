@@ -28,6 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing.Printing;
 using System.IO;
+using System.Windows.Forms;
 using static BlueBasics.FileOperations;
 
 namespace BlueControls.Forms {
@@ -36,7 +37,7 @@ namespace BlueControls.Forms {
 
         private string _AdditionalLayoutPath = "";
         private List<RowItem> Liste;
-        private readonly Database Database;
+        private Database _Database;
         private string ZielPfad = "";
 
         private string SaveTo = "";
@@ -50,12 +51,16 @@ namespace BlueControls.Forms {
             InitializeComponent();
 
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            Database = db;
+            _Database = db;
+            _Database.Disposing += _Database_Disposing;
             Liste = ListetItems;
 
             Init(string.Empty, CanChangeItems, string.Empty);
         }
 
+        private void _Database_Disposing(object sender, System.EventArgs e) {
+            Close();
+        }
 
         public ExportDialog(string vAdditionalLayoutPath, string AutosaveFile) {
 
@@ -63,7 +68,7 @@ namespace BlueControls.Forms {
             InitializeComponent();
 
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            Database = null;
+            _Database = null;
             Liste = null;
 
             //   Vars = Variablen
@@ -103,7 +108,7 @@ namespace BlueControls.Forms {
 
 
         private void EinWahl_Click(object sender, System.EventArgs e) {
-            using (var fr = new frmTableView(Database)) {
+            using (var fr = new frmTableView(_Database)) {
                 Liste = fr.GetFilteredItems();
             }
 
@@ -205,8 +210,8 @@ namespace BlueControls.Forms {
 
 
         private void BefülleLayoutDropdowns() {
-            if (Database != null) {
-                FrmDrucken_Layout1.Item.AddLayoutsOf(Database, Speichern.Checked, _AdditionalLayoutPath);
+            if (_Database != null) {
+                FrmDrucken_Layout1.Item.AddLayoutsOf(_Database, Speichern.Checked, _AdditionalLayoutPath);
             }
         }
 
@@ -222,7 +227,7 @@ namespace BlueControls.Forms {
             var n = FrmDrucken_Layout1.Text;
 
             FrmDrucken_Layout1.Text = string.Empty;
-            tabAdministration.OpenLayoutEditor(Database, _AdditionalLayoutPath, n);
+            tabAdministration.OpenLayoutEditor(_Database, _AdditionalLayoutPath, n);
             FrmDrucken_Layout1.Item.Clear();
             BefülleLayoutDropdowns();
 
@@ -399,5 +404,13 @@ namespace BlueControls.Forms {
         private void PrintPad_BeginnPrint(object sender, PrintEventArgs e) {
             ItemNrForPrint = 0;
         }
+
+
+        protected override void OnFormClosing(FormClosingEventArgs e) {
+            _Database.Disposing -= _Database_Disposing;
+            _Database = null;
+            base.OnFormClosing(e);
+        }
+
     }
 }

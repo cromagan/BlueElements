@@ -26,7 +26,7 @@ using System.Collections.Generic;
 namespace BlueDatabase {
     public sealed class FilterCollection : ListExt<FilterItem>, IParseable {
         #region  Variablen-Deklarationen 
-        public readonly Database Database;
+        public Database Database { get; private set; }
         #endregion
 
         public bool IsParsing { get; private set; }
@@ -34,6 +34,11 @@ namespace BlueDatabase {
 
         public FilterCollection(Database database) {
             Database = database;
+            Database.Disposing += Database_Disposing;
+        }
+
+        private void Database_Disposing(object sender, System.EventArgs e) {
+            Dispose();
         }
 
         public FilterCollection(Database database, string toParse) : this(database) {
@@ -228,5 +233,15 @@ namespace BlueDatabase {
 
             RemoveOtherAndAddIfNotExists(new FilterItem(tmp, filterType, filterBy, herkunft));
         }
+
+
+        protected override void Dispose(bool disposing) {
+            base.Dispose(disposing);
+            if (Database != null) {
+                Database.Disposing += Database_Disposing;
+                Database = null;
+            }
+        }
+
     }
 }

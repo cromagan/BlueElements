@@ -25,7 +25,7 @@ using System;
 using System.Collections.Generic;
 
 namespace BlueDatabase {
-    public sealed class FilterItem : IParseable, ICompareKey, IReadableTextWithChanging, ICanBeEmpty {
+    public sealed class FilterItem : IParseable, ICompareKey, IReadableTextWithChanging, ICanBeEmpty, IDisposable {
 
         #region  Variablen-Deklarationen 
 
@@ -33,12 +33,13 @@ namespace BlueDatabase {
         /// <summary>
         /// Der Edit-Dialog braucht die Datenbank, um mit Texten die Spalte zu suchen.
         /// </summary>
-        public readonly Database Database;
+        public Database Database { get; private set; }
 
         private ColumnItem _Column;
         private enFilterType _FilterType = enFilterType.KeinFilter;
 
         public string Herkunft = string.Empty;
+        private bool disposedValue;
 
         #endregion
 
@@ -53,6 +54,7 @@ namespace BlueDatabase {
         public FilterItem(Database database, enFilterType filterType, string searchValue) : this(database, filterType, new List<string>() { searchValue }) { }
         public FilterItem(Database database, enFilterType filterType, List<string> searchValue) {
             Database = database;
+            Database.Disposing += Database_Disposing;
             _FilterType = filterType;
             if (searchValue != null && searchValue.Count > 0) { SearchValue.AddRange(searchValue); }
             SearchValue.Changed += SearchValue_ListOrItemChanged;
@@ -60,6 +62,7 @@ namespace BlueDatabase {
 
         public FilterItem(Database database, string FilterCode) {
             Database = database;
+            Database.Disposing += Database_Disposing;
             Parse(FilterCode);
             SearchValue.Changed += SearchValue_ListOrItemChanged;
         }
@@ -309,6 +312,43 @@ namespace BlueDatabase {
             _FilterType = type;
             SearchValue.ThrowEvents = true;
             OnChanged();
+        }
+
+
+        private void Database_Disposing(object sender, System.EventArgs e) {
+            Dispose();
+        }
+
+        private void Dispose(bool disposing) {
+            if (!disposedValue) {
+                if (disposing) {
+                    // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
+                }
+
+                Column = null;
+                if (Database != null) {
+                    Database.Disposing -= Database_Disposing;
+                    Database = null;
+                }
+
+
+                // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
+                // TODO: Große Felder auf NULL setzen
+                disposedValue = true;
+            }
+        }
+
+        // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
+        // ~FilterItem()
+        // {
+        //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+        //     Dispose(disposing: false);
+        // }
+
+        public void Dispose() {
+            // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

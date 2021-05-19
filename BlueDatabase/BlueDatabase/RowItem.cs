@@ -31,12 +31,13 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 namespace BlueDatabase {
-    public sealed class RowItem : ICanBeEmpty {
+    public sealed class RowItem : ICanBeEmpty, IDisposable {
 
         #region  Variablen-Deklarationen 
 
-        public readonly Database Database;
+        public Database Database { get; private set; }
         private string? _tmpQuickInfo;
+        private bool disposedValue;
 
 
         #endregion
@@ -52,6 +53,11 @@ namespace BlueDatabase {
             _tmpQuickInfo = null;
 
             Database.Cell.CellValueChanged += Cell_CellValueChanged;
+            Database.Disposing += Database_Disposing;
+        }
+
+        private void Database_Disposing(object sender, System.EventArgs e) {
+            Dispose();
         }
 
         public RowItem(Database database) : this(database, database.Row.NextRowKey()) { }
@@ -687,6 +693,36 @@ namespace BlueDatabase {
                 return c.Replace("\r", ", ");
             }
 
+        }
+
+        private void Dispose(bool disposing) {
+            if (!disposedValue) {
+                if (disposing) {
+                    // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
+                }
+
+                // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
+                // TODO: Große Felder auf NULL setzen
+
+                Database.Cell.CellValueChanged -= Cell_CellValueChanged;
+                Database.Disposing -= Database_Disposing;
+                Database = null;
+                _tmpQuickInfo = null;
+
+                disposedValue = true;
+            }
+        }
+
+        // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
+        ~RowItem() {
+            // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+            Dispose(disposing: false);
+        }
+
+        public void Dispose() {
+            // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

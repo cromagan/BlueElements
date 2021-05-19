@@ -36,7 +36,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
 
     internal sealed partial class DatabaseHeadEditor {
-        private readonly Database _Database;
+        private Database _Database;
 
 
 
@@ -54,11 +54,22 @@ namespace BlueControls.BlueDatabaseDialogs {
             InitializeComponent();
 
             _Database = cDatabase;
+            _Database.Disposing += _Database_Disposing;
+
+        }
+
+        private void _Database_Disposing(object sender, System.EventArgs e) {
+            _Database.Disposing -= _Database_Disposing;
+            _Database = null;
+            Close();
 
         }
 
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
             base.OnFormClosing(e);
+            if (_Database == null) { return; } // Disposed
+
+            _Database.Disposing -= _Database_Disposing;
 
             if (IgnoreAll) { return; }
             if (_Database.ReadOnly) { return; }
@@ -143,6 +154,8 @@ namespace BlueControls.BlueDatabaseDialogs {
                 _Database.Export.Clear();
                 _Database.Export.AddRange(NewExports);
             }
+
+            _Database = null;
         }
 
 

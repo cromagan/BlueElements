@@ -29,14 +29,15 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace BlueDatabase {
-    public sealed class RowCollection : IEnumerable<RowItem> {
+    public sealed class RowCollection : IEnumerable<RowItem>, IDisposable {
         #region  Variablen-Deklarationen 
 
         private readonly ConcurrentDictionary<int, RowItem> _Internal = new();
 
-        public readonly Database Database;
+        public Database Database { get; private set; }
 
         private int _LastRowKey;
+        private bool disposedValue;
 
         #endregion
 
@@ -62,8 +63,9 @@ namespace BlueDatabase {
             _LastRowKey = 0;
         }
 
-        public RowCollection(Database cDatabase) {
-            Database = cDatabase;
+        public RowCollection(Database database) {
+            Database = database;
+            Database.Disposing += Database_Disposing;
             Initialize();
         }
 
@@ -104,6 +106,10 @@ namespace BlueDatabase {
 
 
         #endregion
+
+        private void Database_Disposing(object sender, System.EventArgs e) {
+            Dispose();
+        }
 
 
         internal int NextRowKey() {
@@ -146,33 +152,12 @@ namespace BlueDatabase {
         public bool Remove(FilterCollection Filter) {
 
             var x = (from thisrowitem in _Internal.Values where thisrowitem != null && thisrowitem.MatchesTo(Filter) select thisrowitem.Key).Select(dummy => (long)dummy).ToList();
-            //var x = new List<long>();
-            //foreach (var thisrowitem in _Internal.Values)
-            //{
-            //    if (thisrowitem != null && thisrowitem.MatchesTo(Filter))
-            //    {
-            //        x.Add(thisrowitem.Key);
-            //    }
-            //}
-
-
-
-
-            //if (x.Count == 0)
-            //{
-            //    if (Abfrage) { MessageBox.Show("Keine Zeilen gelöscht.", enImageCode.Information, "OK"); }
-            //    return false;
-            //}
-
-            //if (Abfrage && MessageBox.Show(x.Count.ToString() + " Zeile(n) <b>löschen</b>?", enImageCode.Frage, "Ja", "Nein") != 0) { return false; }
-
 
             foreach (int ThisKey in x) {
                 Remove(ThisKey);
             }
 
             return true;
-
         }
 
         internal string Load_310(enDatabaseDataType Art, string Wert) {
@@ -463,6 +448,35 @@ namespace BlueDatabase {
                 }
             }
             return l;
+        }
+
+        private void Dispose(bool disposing) {
+            if (!disposedValue) {
+                if (disposing) {
+                    // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
+                }
+
+           
+                Database.Disposing -= Database_Disposing;
+                Database = null;
+                _Internal.Clear();
+
+                      // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
+                      // TODO: Große Felder auf NULL setzen
+                      disposedValue = true;
+            }
+        }
+
+        // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
+        ~RowCollection() {
+            // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+            Dispose(disposing: false);
+        }
+
+        public void Dispose() {
+            // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

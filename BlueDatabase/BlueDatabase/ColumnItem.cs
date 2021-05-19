@@ -33,18 +33,16 @@ using static BlueBasics.Extensions;
 using static BlueBasics.FileOperations;
 
 namespace BlueDatabase {
-    public sealed class ColumnItem : IReadableTextWithChanging, ICompareKey, ICheckable {
+    public sealed class ColumnItem : IReadableTextWithChanging, ICompareKey, ICheckable, IDisposable {
         #region  Variablen-Deklarationen 
 
-        public readonly Database Database;
+        public Database Database { get; private set; }
 
 
         private string _Name;
         private bool _MultiLine;
         private string _Caption;
-        //private Bitmap _CaptionBitmap;
         private string _QuickInfo;
-        //private string _Intelligenter_Multifilter;
         private Point _DauerFilterPos;
         private string _Ueberschrift1;
         private string _Ueberschrift2;
@@ -70,11 +68,7 @@ namespace BlueDatabase {
         private string _CaptionBitmapTXT;
         public Bitmap TMP_CaptionBitmap;
         private enFilterOptions _FilterOptions;
-        //private bool _AutofilterErlaubt;
-        //private bool _AutofilterTextFilterErlaubt;
-        //private bool _AutoFilterErweitertErlaubt;
         private bool _IgnoreAtRowFilter;
-        //private bool _CompactView;
         private bool _ShowMultiLineInOneLine;
         private bool _DropdownBearbeitungErlaubt;
         private bool _DropdownAllesAbwählenErlaubt;
@@ -146,8 +140,9 @@ namespace BlueDatabase {
         public int? TMP_IfFilterRemoved = null;
 
         internal List<string> _UcaseNamesSortedByLenght = null;
+        private bool disposedValue;
 
-      
+
         #endregion
 
 
@@ -161,6 +156,7 @@ namespace BlueDatabase {
 
         public ColumnItem(Database database, int columnkey) {
             Database = database;
+            Database.Disposing += Database_Disposing;
             if (columnkey < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "ColumnKey <0"); }
 
             var ex = Database.Column.SearchByKey(columnkey);
@@ -264,6 +260,11 @@ namespace BlueDatabase {
 
 
             Invalidate_TmpVariables();
+        }
+
+        private void Database_Disposing(object sender, System.EventArgs e) {
+            Dispose();
+
         }
         #endregion
 
@@ -1043,11 +1044,16 @@ namespace BlueDatabase {
                     _TMP_LinkedDatabase.RowKeyChanged += _TMP_LinkedDatabase_RowKeyChanged;
                     _TMP_LinkedDatabase.ColumnKeyChanged += _TMP_LinkedDatabase_ColumnKeyChanged;
                     _TMP_LinkedDatabase.ConnectedControlsStopAllWorking += _TMP_LinkedDatabase_ConnectedControlsStopAllWorking;
-                    //_TMP_LinkedDatabase.Disposed += _TMP_LinkedDatabase_Disposed;
                     _TMP_LinkedDatabase.Cell.CellValueChanged += _TMP_LinkedDatabase_Cell_CellValueChanged;
+                    _TMP_LinkedDatabase.Disposing += _TMP_LinkedDatabase_Disposing;
                 }
 
             }
+        }
+
+        private void _TMP_LinkedDatabase_Disposing(object sender, System.EventArgs e) {
+            Invalidate_TmpVariables();
+            Database.Dispose();
         }
 
         private void _TMP_LinkedDatabase_ColumnKeyChanged(object sender, KeyChangedEventArgs e) {
@@ -1667,8 +1673,8 @@ namespace BlueDatabase {
                 _TMP_LinkedDatabase.RowKeyChanged -= _TMP_LinkedDatabase_RowKeyChanged;
                 _TMP_LinkedDatabase.ColumnKeyChanged -= _TMP_LinkedDatabase_ColumnKeyChanged;
                 _TMP_LinkedDatabase.ConnectedControlsStopAllWorking -= _TMP_LinkedDatabase_ConnectedControlsStopAllWorking;
-                //_TMP_LinkedDatabase.Disposed -= _TMP_LinkedDatabase_Disposed;
                 _TMP_LinkedDatabase.Cell.CellValueChanged -= _TMP_LinkedDatabase_Cell_CellValueChanged;
+                _TMP_LinkedDatabase.Disposing -= _TMP_LinkedDatabase_Disposing;
                 _TMP_LinkedDatabase = null;
             }
 
@@ -2686,6 +2692,43 @@ namespace BlueDatabase {
                 DropDownItems.AddRange(NewAuswahl);
             }
 
+        }
+
+        private void Dispose(bool disposing) {
+            if (!disposedValue) {
+                if (disposing) {
+                    // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
+                }
+
+                Database.Disposing += Database_Disposing;
+                Invalidate_TmpVariables();
+                Database = null;
+
+
+
+                DropDownItems.Dispose();
+                Tags.Dispose();
+                PermissionGroups_ChangeCell.Dispose();
+                OpticalReplace.Dispose();
+                AfterEdit_AutoReplace.Dispose();
+
+
+                // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
+                // TODO: Große Felder auf NULL setzen
+                disposedValue = true;
+            }
+        }
+
+        // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
+        ~ColumnItem() {
+            // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+            Dispose(disposing: false);
+        }
+
+        public void Dispose() {
+            // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

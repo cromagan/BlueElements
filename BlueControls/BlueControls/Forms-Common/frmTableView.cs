@@ -91,7 +91,6 @@ namespace BlueControls.Forms {
             DatabaseSet(database);
         }
 
-        private Database _Database;
         private enAnsicht _Ansicht = enAnsicht.Nur_Tabelle;
         private const string _Version = "1.0001";
 
@@ -99,11 +98,6 @@ namespace BlueControls.Forms {
         private void SetDatabasetoNothing() {
             Formula.Database = null;
             TableView.Database = null;
-
-            if (_Database != null) {
-                _Database.Save(false);
-                _Database = null;
-            }
         }
 
 
@@ -268,7 +262,7 @@ namespace BlueControls.Forms {
                 if (GefRow == Formula.ShowingRow) {
                     MessageBox.Show("Text nur im <b>aktuellen Eintrag</b> gefunden,<br>aber sonst keine weiteren Einträge!", enImageCode.Information, "OK");
                 } else {
-                    TableView.CursorPos_Set(_Database.Column[0], GefRow, true);
+                    TableView.CursorPos_Set(TableView.Database.Column[0], GefRow, true);
                 }
             }
         }
@@ -278,17 +272,17 @@ namespace BlueControls.Forms {
             RowItem vRow;
 
 
-            switch (_Database.Column[0].Format) {
+            switch (TableView.Database.Column[0].Format) {
                 case enDataFormat.Datum_und_Uhrzeit:
-                    vRow = _Database.Row.Add(NameRepair(DateTime.Now.ToString(Constants.Format_Date5), null));
+                    vRow = TableView.Database.Row.Add(NameRepair(DateTime.Now.ToString(Constants.Format_Date5), null));
                     break;
                 default:
-                    vRow = _Database.Row.Add(NameRepair("Neuer Eintrag", null));
+                    vRow = TableView.Database.Row.Add(NameRepair("Neuer Eintrag", null));
                     break;
             }
 
 
-            TableView.CursorPos_Set(_Database.Column[0], vRow, true);
+            TableView.CursorPos_Set(TableView.Database.Column[0], vRow, true);
         }
 
         private string NameRepair(string IstName, RowItem vRow) {
@@ -298,7 +292,7 @@ namespace BlueControls.Forms {
             do {
                 var Changed = false;
 
-                foreach (var ThisRow in _Database.Row) {
+                foreach (var ThisRow in TableView.Database.Row) {
                     if (ThisRow != null && ThisRow != vRow) {
                         if (ThisRow.CellFirstString().ToUpper() == NewName.ToUpper()) {
                             IstZ++;
@@ -345,7 +339,7 @@ namespace BlueControls.Forms {
 
         private void Check_SuchButton() {
 
-            if (_Database == null || _Database.Row.Count < 1) {
+            if (TableView.Database == null || TableView.Database.Row.Count < 1) {
                 SuchB.Enabled = false;
             } else {
                 if (!string.IsNullOrEmpty(such.Text) && !string.IsNullOrEmpty(such.Text.RemoveChars(" "))) {
@@ -386,7 +380,6 @@ namespace BlueControls.Forms {
 
 
         private void DatabaseSet(Database cDatabase) {
-            _Database = cDatabase;
             TableView.Database = cDatabase;
             Formula.Database = cDatabase;
             Filter.Table = TableView;
@@ -397,12 +390,12 @@ namespace BlueControls.Forms {
 
             BeginnEdit();
 
-            if (_Database == null) {
+            if (TableView.Database == null) {
                 SetDatabasetoNothing();
             } else {
 
-                if (_Database.Ansicht != enAnsicht.Unverändert) {
-                    _Ansicht = _Database.Ansicht;
+                if (TableView.Database.Ansicht != enAnsicht.Unverändert) {
+                    _Ansicht = TableView.Database.Ansicht;
                 }
             }
 
@@ -505,7 +498,7 @@ namespace BlueControls.Forms {
                     }
 
 
-                    using (var l = new ExportDialog(_Database, Ara, true)) {
+                    using (var l = new ExportDialog(TableView.Database, Ara, true)) {
                         l.ShowDialog();
                     }
 
@@ -638,10 +631,10 @@ namespace BlueControls.Forms {
 
             switch (bu.Name) {
                 case "btnSaveAs":
-                    if (_Database == null) { return; }
+                    if (TableView.Database == null) { return; }
                     break;
                 case "btnNeuDB":
-                    if (_Database != null) { SetDatabasetoNothing(); }
+                    if (TableView.Database != null) { SetDatabasetoNothing(); }
                     break;
                 default:
                     DebugPrint(enFehlerArt.Fehler, "Ungültiger Aufruf!");
@@ -661,21 +654,21 @@ namespace BlueControls.Forms {
             }
 
             if (FileExists(SaveTab.FileName)) { DeleteFile(SaveTab.FileName, true); }
-            _Database.SaveAsAndChangeTo(SaveTab.FileName);
+            TableView.Database.SaveAsAndChangeTo(SaveTab.FileName);
             DatabaseSet(SaveTab.FileName);
 
         }
 
         private void CaptionAnzeige() {
 
-            if (_Database == null) {
+            if (TableView.Database == null) {
                 Text = "Be Creative! V" + _Version;
                 return;
             }
 
 
-            if (_Database != null) {
-                Text = _Database.Filename.FileNameWithSuffix() + " - Be Creative! V" + _Version;
+            if (TableView.Database != null) {
+                Text = TableView.Database.Filename.FileNameWithSuffix() + " - Be Creative! V" + _Version;
             } else {
                 Text = "[Neue Datenbank] - Be Creative! V" + _Version;
             }
@@ -683,7 +676,7 @@ namespace BlueControls.Forms {
 
 
         private void CheckButtons() {
-            var DatenbankDa = Convert.ToBoolean(_Database != null);
+            var DatenbankDa = Convert.ToBoolean(TableView.Database != null);
 
 
             btnNeuDB.Enabled = true;
@@ -691,21 +684,21 @@ namespace BlueControls.Forms {
             btnOeffnen.Enabled = true;
 
 
-            btnNeu.Enabled = DatenbankDa && _Ansicht == enAnsicht.Überschriften_und_Formular && _Database.PermissionCheck(_Database.PermissionGroups_NewRow, null);
+            btnNeu.Enabled = DatenbankDa && _Ansicht == enAnsicht.Überschriften_und_Formular && TableView.Database.PermissionCheck(TableView.Database.PermissionGroups_NewRow, null);
             btnLoeschen.Enabled = DatenbankDa;
             btnDrucken.Enabled = DatenbankDa;
             Ansicht0.Enabled = DatenbankDa;
             Ansicht1.Enabled = DatenbankDa;
             Ansicht2.Enabled = DatenbankDa;
             Ansicht3.Enabled = DatenbankDa;
-            btnDatenbanken.Enabled = DatenbankDa && !string.IsNullOrEmpty(_Database.Filename);
+            btnDatenbanken.Enabled = DatenbankDa && !string.IsNullOrEmpty(TableView.Database.Filename);
 
 
 
 
             BeziehungsEditor.Enabled = false;
             if (DatenbankDa) {
-                foreach (var ThisColumnItem in _Database.Column) {
+                foreach (var ThisColumnItem in TableView.Database.Column) {
                     if (ThisColumnItem != null) {
 
                         if (ThisColumnItem.Format == enDataFormat.RelationText) {
@@ -928,7 +921,7 @@ namespace BlueControls.Forms {
 
             Hide();
 
-            var r = new RelationDiagram(_Database);
+            var r = new RelationDiagram(TableView.Database);
 
             r.ShowDialog();
 
@@ -938,7 +931,7 @@ namespace BlueControls.Forms {
 
         private void Ordn_Click(object sender, System.EventArgs e) {
             StandardTabx();
-            ExecuteFile(_Database.Filename.FilePath());
+            ExecuteFile(TableView.Database.Filename.FilePath());
         }
 
 

@@ -28,14 +28,15 @@ using System.ComponentModel;
 namespace BlueDatabase {
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public abstract class DataHolder {
+    public abstract class DataHolder: System.IDisposable {
 
-        public readonly Database InternalDatabase = null;
+        public Database InternalDatabase { get; set; }
 
 
         public readonly DataHolder Parent = null;
         public readonly string Typ = string.Empty;
         public readonly string ID = string.Empty;
+        private bool disposedValue;
 
         public abstract string MyDefaultFileName();
         public abstract string MyDefaultSubTyp();
@@ -87,8 +88,13 @@ namespace BlueDatabase {
             }
 
             InternalDatabase = parent.InternalDatabase;
+            InternalDatabase.Disposing += InternalDatabase_Disposing;
             Typ = parent.Row().CellFirstString() + "/" + MyDefaultSubTyp();
             ID = id;
+        }
+
+        private void InternalDatabase_Disposing(object sender, System.EventArgs e) {
+            Dispose();
         }
 
         /// <summary>
@@ -151,6 +157,8 @@ namespace BlueDatabase {
             InternalDatabase.Caption = id;
             InternalDatabase.ReloadDelaySecond = 240;
             InternalDatabase.AutoDeleteBAK = true;
+
+            InternalDatabase.Disposing += InternalDatabase_Disposing;
         }
 
         public void Save(bool mustsave) {
@@ -413,9 +421,34 @@ namespace BlueDatabase {
             set => InternalDatabase.Creator = value;
         }
 
+        protected virtual void Dispose(bool disposing) {
+            if (!disposedValue) {
+                if (disposing) {
+                    // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
+                }
+
+                InternalDatabase.Disposing -= InternalDatabase_Disposing;
+                InternalDatabase.Dispose();
+                InternalDatabase = null;
 
 
+                // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
+                // TODO: Große Felder auf NULL setzen
+                disposedValue = true;
+            }
+        }
 
+        // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
+        ~DataHolder() {
+            // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+            Dispose(disposing: false);
+        }
+
+        public void Dispose() {
+            // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+            Dispose(disposing: true);
+            System.GC.SuppressFinalize(this);
+        }
     }
 
 

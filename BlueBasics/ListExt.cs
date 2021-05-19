@@ -24,8 +24,9 @@ using System;
 using System.Collections.Generic;
 
 namespace BlueBasics {
-    public class ListExt<T> : List<T>, IChangedFeedback {
+    public class ListExt<T> : List<T>, IChangedFeedback, IDisposable {
         private bool _ThrowEvents = true;
+        public bool Disposed { get; private set; } = false;
 
         public event EventHandler<System.EventArgs> ItemRemoved;
         public event EventHandler<ListEventArgs> ItemRemoving;
@@ -42,7 +43,10 @@ namespace BlueBasics {
         }
 
         public bool ThrowEvents {
-            get => _ThrowEvents;
+            get {
+                if (Disposed) { return false; }
+                return _ThrowEvents;
+            }
             set {
                 if (_ThrowEvents == value) { Develop.DebugPrint(enFehlerArt.Fehler, "Set ThrowEvents-Fehler! " + value.ToPlusMinus()); }
 
@@ -229,6 +233,33 @@ namespace BlueBasics {
                 Develop.DebugPrint(ex);
                 return ToString();
             }
+        }
+
+        protected virtual void Dispose(bool disposing) {
+            if (!Disposed) {
+                if (disposing) {
+                    // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
+                }
+                Disposed = true;  // Keine Events, fix!
+                _ThrowEvents = false;
+
+                base.Clear();
+                // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
+                // TODO: Große Felder auf NULL setzen
+
+            }
+        }
+
+        // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
+        ~ListExt() {
+            // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+            Dispose(disposing: false);
+        }
+
+        public void Dispose() {
+            // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

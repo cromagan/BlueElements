@@ -24,13 +24,13 @@ using BlueDatabase.Enums;
 using System.Collections.Generic;
 
 namespace BlueDatabase {
-    public sealed class ColumnViewCollection : ListExt<ColumnViewItem>, IParseable //, IEnumerable
+    public sealed class ColumnViewCollection : ListExt<ColumnViewItem>, IParseable
     {
         //NICHT IReadableText, das gibt zu viele Probleme (Dropdownboxen)
 
         #region  Variablen-Deklarationen 
 
-        public readonly Database Database;
+        public Database Database { get; private set; }
         private string _Name;
 
         #endregion
@@ -45,12 +45,18 @@ namespace BlueDatabase {
 
         public ColumnViewCollection(Database database, string code) {
             Database = database;
+            Database.Disposing += Database_Disposing;
             Parse(code);
 
         }
 
+        private void Database_Disposing(object sender, System.EventArgs e) {
+            Dispose();
+        }
+
         public ColumnViewCollection(Database database, string code, string newname) {
             Database = database;
+            Database.Disposing += Database_Disposing;
             Parse(code);
             _Name = newname;
         }
@@ -329,5 +335,14 @@ namespace BlueDatabase {
                 PermissionGroups_Show.AddRange(tmp);
             }
         }
+
+        protected override void Dispose(bool disposing) {
+            PermissionGroups_Show.Changed -= _PermissionGroups_Show_ListOrItemChanged;
+            PermissionGroups_Show.Clear();
+            Database.Disposing += Database_Disposing;
+            Database = null;
+            base.Dispose(disposing);
+        }
+
     }
 }

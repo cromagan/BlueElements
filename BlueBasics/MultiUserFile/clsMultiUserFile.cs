@@ -157,7 +157,7 @@ namespace BlueBasics.MultiUserFile {
         }
 
         #region  Event-Deklarationen
-
+        public event EventHandler Disposing; // Disposing leider als Variable vorhanden
         public event EventHandler<LoadedEventArgs> Loaded;
         public event EventHandler<LoadingEventArgs> Loading;
         public event EventHandler SavedToDisk;
@@ -703,14 +703,17 @@ namespace BlueBasics.MultiUserFile {
         }
 
         private void OnLoading(LoadingEventArgs e) {
+            if(Disposed) { return; }
             Loading?.Invoke(this, e);
         }
 
         protected virtual void OnLoaded(LoadedEventArgs e) {
+            if (Disposed) { return; }
             Loaded?.Invoke(this, e);
         }
 
         private void OnSavedToDisk() {
+            if (Disposed) { return; }
             SavedToDisk?.Invoke(this, System.EventArgs.Empty);
         }
 
@@ -746,7 +749,13 @@ namespace BlueBasics.MultiUserFile {
         }
 
         private void OnParsed() {
+            if (Disposed) { return; }
             Parsed?.Invoke(this, System.EventArgs.Empty);
+        }
+
+        private void OnDisposing() {
+            if (Disposed) { return; }
+            Disposing?.Invoke(this, System.EventArgs.Empty);
         }
 
         /// <summary>
@@ -939,6 +948,7 @@ namespace BlueBasics.MultiUserFile {
         }
 
         public void OnConnectedControlsStopAllWorking(MultiUserFileStopWorkingEventArgs e) {
+            if (Disposed) { return; }
             if (e.AllreadyStopped.Contains(Filename.ToLower())) { return; }
             e.AllreadyStopped.Add(Filename.ToLower());
             ConnectedControlsStopAllWorking?.Invoke(this, e);
@@ -1161,10 +1171,15 @@ namespace BlueBasics.MultiUserFile {
         }
 
         #region IDisposable Support
-        private bool disposedValue = false; // Dient zur Erkennung redundanter Aufrufe.
+        public bool Disposed { get; private set; } = false; // Dient zur Erkennung redundanter Aufrufe.
 
         protected virtual void Dispose(bool disposing) {
-            if (!disposedValue) {
+            if (!Disposed) {
+
+                OnDisposing();
+                AllFiles.Remove(this);
+
+
                 if (disposing) {
                     // TODO: verwalteten Zustand (verwaltete Objekte) entsorgen.
                 }
@@ -1174,6 +1189,7 @@ namespace BlueBasics.MultiUserFile {
 
                 Save(false);
                 while (PureBinSaver.IsBusy) { Pause(0.5, true); }
+                SetReadOnly(); // Ja nix mehr speichern!!!
 
                 // https://stackoverflow.com/questions/2542326/proper-way-to-dispose-of-a-backgroundworker
 
@@ -1181,8 +1197,8 @@ namespace BlueBasics.MultiUserFile {
                 Checker.Dispose();
 
                 Checker.Dispose();
-
-                disposedValue = true;
+                
+                Disposed = true;
             }
         }
 
@@ -1201,18 +1217,12 @@ namespace BlueBasics.MultiUserFile {
         }
         #endregion
 
-        //protected static void OnMultiUserFileCreated(clsMultiUserFile file) {
-        //    var e = new MultiUserFileGiveBackEventArgs {
-        //        File = file
-        //    };
-        //    MultiUserFileCreated?.Invoke(null, e);
-        //}
 
         protected bool IsFileAllowedToLoad(string fileName) {
             foreach (var ThisFile in AllFiles) {
                 if (ThisFile != null && string.Equals(ThisFile.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
                     ThisFile.Save(true);
-                    Develop.DebugPrint(enFehlerArt.Fehler, "Doppletes Laden von " + fileName);
+                    Develop.DebugPrint(enFehlerArt.Warnung, "Doppletes Laden von " + fileName);
                     return false;
                 }
             }

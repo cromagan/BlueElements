@@ -31,20 +31,21 @@ using static BlueBasics.FileOperations;
 namespace BlueControls.BlueDatabaseDialogs {
 
     internal partial class LayoutDesigner : BlueControls.Forms.PadEditor {
-        public readonly Database Database;
+        public  Database Database { get; private set; }
 
         private string _LoadedLayout = string.Empty;
         private string _AdditionalLayoutPath = "";
 
 
-        public LayoutDesigner(Database cDatabase, string cvAdditionalLayoutPath) : base() {
+        public LayoutDesigner(Database database, string additionalLayoutPath) : base() {
 
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
 
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            Database = cDatabase;
-            _AdditionalLayoutPath = cvAdditionalLayoutPath;
+            Database = database;
+            Database.Disposing += Database_Disposing;  
+            _AdditionalLayoutPath = additionalLayoutPath;
 
 
             BefülleSpaltenDropdown();
@@ -55,6 +56,12 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             AndereSpalteGewählt();
             CheckButtons();
+        }
+
+        private void Database_Disposing(object sender, System.EventArgs e) {
+            Database.Disposing -= Database_Disposing;
+            Database = null;
+            Close();
         }
 
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {

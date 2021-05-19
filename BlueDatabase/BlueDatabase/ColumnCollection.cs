@@ -32,7 +32,7 @@ namespace BlueDatabase {
 
         #region  Variablen-Deklarationen 
 
-        public readonly Database Database;
+        public Database Database { get; private set; }
 
         private int _LastColumnKey;
 
@@ -48,14 +48,17 @@ namespace BlueDatabase {
         #region  Construktor + Initialize 
 
         public void Initialize() {
-            _LastColumnKey = 0;
-            Clear();
-            ResetSystems();
+
         }
 
-        public ColumnCollection(Database cDatabase) {
-            Database = cDatabase;
+        public ColumnCollection(Database database) {
+            Database = database;
+            Database.Disposing += Database_Disposing;
             Initialize();
+        }
+
+        private void Database_Disposing(object sender, System.EventArgs e) {
+            Dispose();
         }
 
         #endregion
@@ -652,5 +655,13 @@ namespace BlueDatabase {
             c.Name = internalName;
             return c;
         }
+
+
+        protected override void Dispose(bool disposing) {
+            Database.Disposing -= Database_Disposing;
+            Database = null;
+            base.Dispose(disposing);
+        }
+
     }
 }

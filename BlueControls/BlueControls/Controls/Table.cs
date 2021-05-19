@@ -225,6 +225,7 @@ namespace BlueControls.Controls {
                     _Database.ColumnArrangements.ItemInternalChanged -= ColumnArrangements_ItemInternalChanged;
                     _Database.ProgressbarInfo -= _Database_ProgressbarInfo;
                     _Database.DropMessage -= _Database_DropMessage;
+                    _Database.Disposing -= _Database_Disposing;
 
                     _Database.Save(false);         // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
 
@@ -256,6 +257,7 @@ namespace BlueControls.Controls {
                     _Database.ColumnArrangements.ItemInternalChanged += ColumnArrangements_ItemInternalChanged;
                     _Database.ProgressbarInfo += _Database_ProgressbarInfo;
                     _Database.DropMessage += _Database_DropMessage;
+                    _Database.Disposing += _Database_Disposing;
                 }
 
                 _Database_DatabaseLoaded(this, new LoadedEventArgs(false));
@@ -268,6 +270,9 @@ namespace BlueControls.Controls {
             }
         }
 
+        private void _Database_Disposing(object sender, System.EventArgs e) {
+            Database = null;
+        }
 
         public bool ShowWaitScreen { get; set; } = true;
 
@@ -1244,14 +1249,20 @@ namespace BlueControls.Controls {
             if (ServiceStarted) { return; }
             ServiceStarted = true;
 
-            BlueBasics.MultiUserFile.clsMultiUserFile.AllFiles.ItemAdded += Database_DatabaseAdded;
-
-
-            //Database.MultiUserFileCreated += Database_DatabaseAdded;
-
+            BlueBasics.MultiUserFile.clsMultiUserFile.AllFiles.ItemAdded += AllFiles_ItemAdded;
+            BlueBasics.MultiUserFile.clsMultiUserFile.AllFiles.ItemRemoving += AllFiles_ItemRemoving;
         }
 
-        private static void Database_DatabaseAdded(object sender, ListEventArgs e) {
+        private static void AllFiles_ItemRemoving(object sender, ListEventArgs e) {
+            if (e.Item is Database DB) {
+                DB.NeedPassword -= Database_NeedPassword;
+                DB.GenerateLayoutInternal -= DB_GenerateLayoutInternal;
+                DB.RenameColumnInLayout -= DB_RenameColumnInLayout;
+                DB.Loaded -= tabAdministration.CheckDatabase;
+            }
+        }
+
+        private static void AllFiles_ItemAdded(object sender, ListEventArgs e) {
 
             if (e.Item is Database DB) {
                 DB.NeedPassword += Database_NeedPassword;
@@ -1260,15 +1271,12 @@ namespace BlueControls.Controls {
                 DB.Loaded += tabAdministration.CheckDatabase;
             }
         }
+
         public static void Database_NeedPassword(object sender, PasswordEventArgs e) {
             if (e.Handled) { return; }
             e.Handled = true;
             e.Password = InputBox.Show("Bitte geben sie das Passwort ein,<br>um Zugriff auf diese Datenbank<br>zu erhalten:", string.Empty, enDataFormat.Text);
         }
-
-
-
-
 
         private static void DB_RenameColumnInLayout(object sender, RenameColumnInLayoutEventArgs e) {
             if (e.Handled) { return; }
@@ -1479,7 +1487,7 @@ namespace BlueControls.Controls {
                 }
             } else {
                 ContentHolderCellColumn = cellInThisDatabaseColumn;
-                ContentHolderCellRow = cellInThisDatabaseRow.Row;
+                ContentHolderCellRow = cellInThisDatabaseRow?.Row;
             }
 
 
@@ -1676,7 +1684,7 @@ namespace BlueControls.Controls {
             Box.Format = ContentHolderCellColumn.Format;
             Box.AllowedChars = ContentHolderCellColumn.AllowedChars;
             Box.MultiLine = ContentHolderCellColumn.MultiLine;
-            Box.Tag = CellCollection.KeyOfCell(cellInThisDatabaseColumn, cellInThisDatabaseRow.Row); // ThisDatabase, der Wert wird beim einchecken in die Fremdzelle geschrieben
+            Box.Tag = CellCollection.KeyOfCell(cellInThisDatabaseColumn, cellInThisDatabaseRow?.Row); // ThisDatabase, der Wert wird beim einchecken in die Fremdzelle geschrieben
 
 
 

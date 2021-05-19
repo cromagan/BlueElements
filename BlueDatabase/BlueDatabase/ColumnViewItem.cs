@@ -19,16 +19,15 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using System;
 using System.Drawing;
 
 namespace BlueDatabase {
-    public sealed class ColumnViewItem : IParseable {
+    public sealed class ColumnViewItem  {
         #region  Variablen-Deklarationen 
 
-        private readonly Database DatabaseForParse;
+
         private enViewType _ViewType;
 
         /// <summary>
@@ -112,10 +111,57 @@ namespace BlueDatabase {
         /// <summary>
         /// Info: Es wird keine Änderung ausgelöst
         /// </summary>
-        public ColumnViewItem(Database Database, string Code) {
-            DatabaseForParse = Database;
-            Parse(Code);
-            DatabaseForParse = null;
+        public ColumnViewItem(Database database, string codeToParse) {
+
+            Initialize();
+            foreach (var pair in codeToParse.GetAllTags()) {
+                switch (pair.Key) {
+                    case "column":
+                    case "columnname":// Columname wichtg, wegen CopyLayout
+                        Column = database.Column[pair.Value];
+                        break;
+
+                    case "columnkey":
+                        Column = database.Column.SearchByKey(int.Parse(pair.Value));
+                        break;
+
+                    case "x":
+                        _Spalte_X1 = int.Parse(pair.Value);
+                        break;
+
+                    case "width":
+                        _Spalte_Width = int.Parse(pair.Value);
+                        break;
+
+                    case "height":
+                        _Spalte_Height = int.Parse(pair.Value);
+                        break;
+
+                    case "caption": // Todo: Alt 06.09.2019
+                        _ÜberschriftAnordnung = (enÜberschriftAnordnung)int.Parse(pair.Value);
+                        break;
+
+                    case "permanent": // Todo: Alten Code Entfernen, Permanent wird nicht mehr verstringt 06.09.2019
+                        _ViewType = enViewType.PermanentColumn;
+                        break;
+
+                    case "type":
+                        _ViewType = (enViewType)int.Parse(pair.Value);
+                        break;
+
+                    default:
+                        Develop.DebugPrint(enFehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
+                        break;
+                }
+
+            }
+
+
+
+            if (Column != null && _ViewType == enViewType.None) { _ViewType = enViewType.Column; }
+            if (Column != null && _ViewType != enViewType.None) { Column.CheckFormulaEditType(); }
+
+
         }
 
         #endregion
@@ -123,7 +169,6 @@ namespace BlueDatabase {
 
         #region  Properties 
 
-        public bool IsParsing { get; private set; }
 
         public enViewType ViewType {
             get => _ViewType;
@@ -223,7 +268,7 @@ namespace BlueDatabase {
 
 
 
-        public override string ToString() {
+        public string ToString() {
             var Result = "{Type=" + (int)(_ViewType);
             if (Column != null) { Result = Result + ", " + Column.ParsableColumnKey(); }
             if (_Spalte_X1 > 0) { Result = Result + ", X=" + _Spalte_X1; }
@@ -231,61 +276,6 @@ namespace BlueDatabase {
             if (_Spalte_Height > 1) { Result = Result + ", Height=" + _Spalte_Height; }
             if (_ÜberschriftAnordnung != enÜberschriftAnordnung.Über_dem_Feld) { Result = Result + ", Caption=" + (int)(_ÜberschriftAnordnung); }
             return Result + "}";
-        }
-
-
-        public void Parse(string ToParse) {
-            IsParsing = true;
-            Initialize();
-            foreach (var pair in ToParse.GetAllTags()) {
-                switch (pair.Key) {
-                    case "column":
-                    case "columnname":// Columname wichtg, wegen CopyLayout
-                        Column = DatabaseForParse.Column[pair.Value];
-                        break;
-
-                    case "columnkey":
-                        Column = DatabaseForParse.Column.SearchByKey(int.Parse(pair.Value));
-                        break;
-
-                    case "x":
-                        _Spalte_X1 = int.Parse(pair.Value);
-                        break;
-
-                    case "width":
-                        _Spalte_Width = int.Parse(pair.Value);
-                        break;
-
-                    case "height":
-                        _Spalte_Height = int.Parse(pair.Value);
-                        break;
-
-                    case "caption": // Todo: Alt 06.09.2019
-                        _ÜberschriftAnordnung = (enÜberschriftAnordnung)int.Parse(pair.Value);
-                        break;
-
-                    case "permanent": // Todo: Alten Code Entfernen, Permanent wird nicht mehr verstringt 06.09.2019
-                        _ViewType = enViewType.PermanentColumn;
-                        break;
-
-                    case "type":
-                        _ViewType = (enViewType)int.Parse(pair.Value);
-                        break;
-
-                    default:
-                        Develop.DebugPrint(enFehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
-                        break;
-                }
-
-            }
-            IsParsing = false;
-
-
-            if (Column != null && _ViewType == enViewType.None) { _ViewType = enViewType.Column; }
-            if (Column != null && _ViewType != enViewType.None) { Column.CheckFormulaEditType(); }
-
-            IsParsing = false;
-
         }
 
 
@@ -300,7 +290,6 @@ namespace BlueDatabase {
 
 
         public void OnChanged() {
-            if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
 

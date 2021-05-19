@@ -39,7 +39,6 @@ namespace BlueControls.BlueDatabaseDialogs {
     {
 
         private Table _TableView;
-        private Database _database;
         private Database _originalDB;
 
 
@@ -108,13 +107,20 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void ChangeDatabase(Database database) {
+
+            if (_originalDB != null) {
+                _originalDB.Disposing -= _originalDB_Disposing;
+            }
+
             _originalDB = null;
             btnVorherigeVersion.Text = "Vorherige Version";
-            _database = database;
             CheckDatabase(database, null);
             Check_OrderButtons();
         }
 
+        private void _originalDB_Disposing(object sender, System.EventArgs e) {
+            ChangeDatabase(null);
+        }
 
         public static void OpenColumnEditor(ColumnItem column, RowItem Row, Table tableview) {
             if (column == null) { return; }
@@ -240,6 +246,9 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             if (_originalDB != null && _TableView.Database != _originalDB) {
                 _TableView.Database = _originalDB;
+                _originalDB.Disposing -= _originalDB_Disposing;
+
+
                 _originalDB = null;
                 btnVorherigeVersion.Text = "Vorherige Version";
                 btnVorherigeVersion.Enabled = true;
@@ -299,6 +308,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             _TableView.Database = tmp;
 
             _originalDB = _merker;
+            _originalDB.Disposing += _originalDB_Disposing;
+
             btnVorherigeVersion.Text = "zurück";
             btnVorherigeVersion.Enabled = true;
         }

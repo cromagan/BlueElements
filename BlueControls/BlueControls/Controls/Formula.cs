@@ -100,9 +100,8 @@ namespace BlueControls.Controls {
                     _Database.Row.RowChecked -= _Database_RowChecked;
                     _Database.Column.ItemRemoved -= _Database_ColumnRemoved;
                     _Database.Column.ItemInternalChanged -= _Database_ColumnContentChanged;
-                    //_Database.StoreView -= _Database_StoreView;
                     _Database.RowKeyChanged -= _Database_RowKeyChanged;
-                    //_Database.RestoreView -= _Database_RestoreView;
+                    _Database.Disposing -= _Database_Disposing;
 
                     _Database.Save(false); // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
 
@@ -115,9 +114,8 @@ namespace BlueControls.Controls {
                     _Database.Row.RowChecked += _Database_RowChecked;
                     _Database.Column.ItemRemoved += _Database_ColumnRemoved;
                     _Database.Column.ItemInternalChanged += _Database_ColumnContentChanged;
-                    //_Database.StoreView += _Database_StoreView;
                     _Database.RowKeyChanged += _Database_RowKeyChanged;
-                    //_Database.RestoreView += _Database_RestoreView;
+                    _Database.Disposing += _Database_Disposing;
                 }
 
                 _Inited = false;
@@ -126,6 +124,9 @@ namespace BlueControls.Controls {
             }
         }
 
+        private void _Database_Disposing(object sender, System.EventArgs e) {
+            Database = null;
+        }
 
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]

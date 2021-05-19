@@ -74,7 +74,6 @@
     <Compile Include="DataHolder.cs" />
     <Compile Include="Enums\enFilterOptions.cs" />
     <Compile Include="Enums\enItemState.cs" />
-    <Compile Include="Enums\enAction.cs" />
     <Compile Include="Enums\enFilterType.cs" />
     <Compile Include="Enums\enShortenStyle.cs" />
     <Compile Include="Enums\enVerwaisteDaten.cs" />
@@ -116,8 +115,6 @@
     <Compile Include="RowCollection.cs" />
     <Compile Include="RowItem.cs" />
     <Compile Include="RowSortDefinition.cs" />
-    <Compile Include="RuleActionItem.cs" />
-    <Compile Include="RuleItem.cs" />
     <Compile Include="WorkItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

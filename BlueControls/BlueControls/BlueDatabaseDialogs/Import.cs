@@ -27,27 +27,29 @@ using static BlueBasics.Extensions;
 namespace BlueControls.BlueDatabaseDialogs {
     public sealed partial class Import {
 
-        private readonly Database _Database;
-        private readonly string OriTXT = "";
+        public Database Database { get; private set; }
+        private readonly string _originalImportText = string.Empty;
 
 
-        public Import(Database Database, string TXT) {
+        public Import(Database database, string importtext) : base() {
 
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
 
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            OriTXT = TXT.Replace("\r\n", "\r").Trim("\r");
+            _originalImportText = importtext.Replace("\r\n", "\r").Trim("\r");
 
-            var Ein = new List<string>();
-
-            Ein.AddRange(OriTXT.SplitByCR());
+            var Ein = _originalImportText.SplitByCRToList();
             Eintr.Text = Ein.Count + " zum Importieren bereit.";
 
-            _Database = Database;
+            Database = database;
+            Database.Disposing += Database_Disposing;
         }
 
-
+        private void Database_Disposing(object sender, System.EventArgs e) {
+            Database.Disposing -= Database_Disposing;
+            Close();
+        }
 
         private void Fertig_Click(object sender, System.EventArgs e) {
 
@@ -70,7 +72,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 return;
             }
 
-            DoImport(_Database, OriTXT, SpalteZuordnen.Checked, ZeilenZuorden.Checked, TR, Aufa.Checked, AnfTre.Checked, false);
+            DoImport(Database, _originalImportText, SpalteZuordnen.Checked, ZeilenZuorden.Checked, TR, Aufa.Checked, AnfTre.Checked, false);
 
             Close();
         }
@@ -194,9 +196,5 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
 
         }
-
-
-
-
     }
 }
