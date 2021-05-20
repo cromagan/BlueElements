@@ -201,7 +201,7 @@ namespace BlueDatabase {
             Column1.Invalidate_ColumAndContent();
             Column2.Invalidate_ColumAndContent();
 
-            Database.ColumnArrangements[0].ShowAllColumns(Database); // Damit die Datenbank mitbekommt, das sich da was geändert hat
+            Database.ColumnArrangements[0].ShowAllColumns(); // Damit die Datenbank mitbekommt, das sich da was geändert hat
         }
 
 

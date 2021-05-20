@@ -66,6 +66,7 @@ namespace BlueBasics {
         }
 
         public new void Add(T item) {
+            Develop.DebugPrint_Disposed(Disposed);
             base.Add(item);
             OnItemAdded(item);
         }
@@ -79,6 +80,7 @@ namespace BlueBasics {
         }
 
         public new void AddRange(IEnumerable<T> collection) {
+            Develop.DebugPrint_Disposed(Disposed);
             if (collection is null) { return; }
 
             // base.AddRange(collection);
@@ -133,10 +135,12 @@ namespace BlueBasics {
 
         public new T this[int index] {
             get {
+                Develop.DebugPrint_Disposed(Disposed);
                 if (index >= Count || index < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Index falsch: " + index); }
                 return base[index];
             }
             set {
+                Develop.DebugPrint_Disposed(Disposed);
                 if (base[index] != null) {
                     OnItemRemoving(base[index]);
                     base[index] = value;
@@ -205,6 +209,7 @@ namespace BlueBasics {
         }
 
         public void Swap(int index1, int index2) {
+            Develop.DebugPrint_Disposed(Disposed);
             // Der Swap geht so, und nicht anders! Es müssen die Items im Original-Array geswapt werden!
             // Wichtig auch der Zugriff auf die base (nicht auf this). Dadurch werden keine Add/Remove Event ausgelöst.
             var tmp = base[index1];
@@ -214,6 +219,7 @@ namespace BlueBasics {
         }
 
         public override string ToString() {
+            Develop.DebugPrint_Disposed(Disposed);
             try {
                 if (typeof(IParseable).IsAssignableFrom(typeof(T))) {
                     var a = new System.Text.StringBuilder();

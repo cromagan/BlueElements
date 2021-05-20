@@ -136,7 +136,7 @@ namespace BlueDatabase {
                     InternalDatabase.Column.SysRowCreateDate.ShowUndo = false;
                     InternalDatabase.Column.SysRowCreator.ShowUndo = false;
 
-                    InternalDatabase.ColumnArrangements[1].ShowAllColumns(InternalDatabase);
+                    InternalDatabase.ColumnArrangements[1].ShowAllColumns();
                     InternalDatabase.ColumnArrangements[1].HideSystemColumns();
                     //InternalDatabase.ColumnArrangements[1].Remove(t.ColumnArrangements[1][t.Column["dummy"]]);
                     //InternalDatabase.ColumnArrangements[1].Remove(t.ColumnArrangements[1][t.Column["GebindeMatNr"]]);
@@ -207,7 +207,7 @@ namespace BlueDatabase {
                     Develop.DebugPrint(enFehlerArt.Warnung, "Erzeugungsfehler: " + message);
                 }
 
-                InternalDatabase.ColumnArrangements[1].ShowAllColumns(InternalDatabase);
+                InternalDatabase.ColumnArrangements[1].ShowAllColumns();
                 InternalDatabase.ColumnArrangements[1].HideSystemColumns();
 
 

@@ -268,7 +268,7 @@ namespace BlueDatabase {
 
 
 
-        public string ToString() {
+        public override string ToString() {
             var Result = "{Type=" + (int)(_ViewType);
             if (Column != null) { Result = Result + ", " + Column.ParsableColumnKey(); }
             if (_Spalte_X1 > 0) { Result = Result + ", X=" + _Spalte_X1; }

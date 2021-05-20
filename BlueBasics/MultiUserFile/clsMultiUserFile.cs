@@ -812,7 +812,7 @@ namespace BlueBasics.MultiUserFile {
             return true;
         }
 
-        private byte[] UnzipIt(byte[] data) {
+        public static byte[] UnzipIt(byte[] data) {
             using var originalFileStream = new MemoryStream(data);
             using var zipArchive = new ZipArchive(originalFileStream);
             var entry = zipArchive.GetEntry("Main.bin");

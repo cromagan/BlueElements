@@ -19,6 +19,7 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.MultiUserFile;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
@@ -403,8 +404,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (_Database.ReadOnly) { return; }
 
             var en = new System.Windows.Forms.FormClosingEventArgs(System.Windows.Forms.CloseReason.None, false);
+            var d = _Database;
 
             OnFormClosing(en);
+            _Database = d;
             if (en.Cancel) { return; }
 
 
@@ -429,11 +432,13 @@ namespace BlueControls.BlueDatabaseDialogs {
                 //I.Add("Regeln", ((int)enDatabaseDataType.Rules_ALT).ToString());
                 { "Undo-Speicher", ((int)enDatabaseDataType.UndoInOne).ToString() },
                 { "Auto-Export", ((int)enDatabaseDataType.AutoExport).ToString() },
-                { "Binäre Daten im Kopf der Datenbank", ((int)enDatabaseDataType.BinaryDataInOne).ToString() },
+                //{ "Binäre Daten im Kopf der Datenbank", ((int)enDatabaseDataType.BinaryDataInOne).ToString() },
                 { "Eingebettete Layouts", ((int)enDatabaseDataType.Layouts).ToString() },
                 { "Tags des Datenbankkopfes", ((int)enDatabaseDataType.Tags).ToString() },
                 { "Standard-Sortierung", ((int)enDatabaseDataType.SortDefinition).ToString() }
             };
+
+
 
 
             I.Sort();
@@ -443,7 +448,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (string.IsNullOrEmpty(What)) { return; }
 
 
-            var B = File.ReadAllBytes(GetFromFile);
+            var B = clsMultiUserFile.UnzipIt(File.ReadAllBytes(GetFromFile));
 
 
             enDatabaseDataType Art = 0;
@@ -494,7 +499,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             x.RepairAfterParse();
 
-            x.ColumnArrangements[1].ShowAllColumns(x);
+            x.ColumnArrangements[1].ShowAllColumns();
             x.ColumnArrangements[1].HideSystemColumns();
 
 
@@ -536,7 +541,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             x.RepairAfterParse();
 
-            x.ColumnArrangements[1].ShowAllColumns(x);
+            x.ColumnArrangements[1].ShowAllColumns();
             x.ColumnArrangements[1].HideSystemColumns();
 
 

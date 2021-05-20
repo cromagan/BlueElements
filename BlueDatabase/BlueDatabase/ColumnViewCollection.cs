@@ -143,6 +143,9 @@ namespace BlueDatabase {
         }
 
         public override string ToString() {
+
+            Develop.DebugPrint_Disposed(Disposed);
+
             var Result = "{Name=" + _Name.ToNonCritical();
 
             foreach (var ThisViewItem in this) {
@@ -163,17 +166,17 @@ namespace BlueDatabase {
             return Result + "}";
         }
 
-        public void ShowAllColumns(Database OfDatabase) {
-            if (OfDatabase.IsParsing) { return; }
+        public void ShowAllColumns() {
+            if (Database.IsParsing) { return; }
 
             var OK = true;
-            for (var z = 0; z < OfDatabase.Column.Count; z++) {
+            for (var z = 0; z < Database.Column.Count; z++) {
                 if (z >= Count) {
                     OK = false;
                     break;
                 }
 
-                if (this[z].Column != OfDatabase.Column[z]) {
+                if (this[z].Column != Database.Column[z]) {
                     OK = false;
                     break;
                 }
@@ -185,7 +188,7 @@ namespace BlueDatabase {
 
             Clear();
 
-            foreach (var ThisColumnItem in OfDatabase.Column) {
+            foreach (var ThisColumnItem in Database.Column) {
                 if (ThisColumnItem != null) {
                     Add(new ColumnViewItem(ThisColumnItem, enViewType.Column));
                 }
@@ -194,7 +197,7 @@ namespace BlueDatabase {
             if (Count > 0) { this[0].ViewType = enViewType.PermanentColumn; }
         }
 
-        public ColumnItem PreviousVisible(ColumnItem OfColumn) {
+        public ColumnItem PreviousVisible(ColumnItem column) {
             var ViewItemNo = Count - 1;
             var Found = false;
 
@@ -203,14 +206,14 @@ namespace BlueDatabase {
 
                 if (this[ViewItemNo] != null && this[ViewItemNo].Column != null) {
                     if (Found) { return this[ViewItemNo].Column; }
-                    if (this[ViewItemNo].Column == OfColumn) { Found = true; }
+                    if (this[ViewItemNo].Column == column) { Found = true; }
                 }
 
                 ViewItemNo--;
             } while (true);
         }
 
-        public ColumnItem NextVisible(ColumnItem OfColumn) {
+        public ColumnItem NextVisible(ColumnItem column) {
             var ViewItemNo = 0;
             var Found = false;
 
@@ -219,7 +222,7 @@ namespace BlueDatabase {
 
                 if (this[ViewItemNo] != null && this[ViewItemNo].Column != null) {
                     if (Found) { return this[ViewItemNo].Column; }
-                    if (this[ViewItemNo].Column == OfColumn) { Found = true; }
+                    if (this[ViewItemNo].Column == column) { Found = true; }
                 }
 
                 ViewItemNo++;
@@ -227,8 +230,8 @@ namespace BlueDatabase {
 
         }
 
-        public ColumnViewItem PreviousVisible(ColumnViewItem OfViewItem) {
-            var ViewItemNo = IndexOf(OfViewItem);
+        public ColumnViewItem PreviousVisible(ColumnViewItem viewItem) {
+            var ViewItemNo = IndexOf(viewItem);
 
             do {
                 ViewItemNo--;
@@ -239,8 +242,8 @@ namespace BlueDatabase {
             } while (true);
         }
 
-        public ColumnViewItem NextVisible(ColumnViewItem OfViewItem) {
-            var ViewItemNo = IndexOf(OfViewItem);
+        public ColumnViewItem NextVisible(ColumnViewItem viewItem) {
+            var ViewItemNo = IndexOf(viewItem);
 
             if (ViewItemNo < 0) { return null; }
 
@@ -254,14 +257,14 @@ namespace BlueDatabase {
 
         }
 
-        public void Swap(ColumnViewItem View1, ColumnViewItem View2) {
-            // Absichtlich anderer Name, um klarzustellen, dass hier nicht der Standard-Swap angewandt wird
-            if (View1 == null) { return; }
-            if (View2 == null) { return; }
-            if (View1 == View2) { return; }
 
-            var Col1 = IndexOf(View1);
-            var Col2 = IndexOf(View2);
+        public void Swap(ColumnViewItem viewItem1, ColumnViewItem viewItem2) {
+            if (viewItem1 == null) { return; }
+            if (viewItem2 == null) { return; }
+            if (viewItem1 == viewItem2) { return; }
+
+            var Col1 = IndexOf(viewItem1);
+            var Col2 = IndexOf(viewItem2);
             if (Col1 < 0 || Col2 < 0) { return; }
 
 

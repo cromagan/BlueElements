@@ -1029,7 +1029,7 @@ namespace BlueDatabase {
                     switch (z) {
                         case 0:
                             ColumnArrangements[z].Name = "Alle Spalten";
-                            if (ColumnArrangements[z].Count < 1) { ColumnArrangements[z].ShowAllColumns(this); }
+                            if (ColumnArrangements[z].Count < 1) { ColumnArrangements[z].ShowAllColumns(); }
                             break;
                         case 1:
                             ColumnArrangements[z].Name = "Standard";

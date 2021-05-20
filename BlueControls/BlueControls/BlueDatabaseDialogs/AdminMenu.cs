@@ -227,7 +227,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void btnAlleSpaltenEinblenden_Click(object sender, System.EventArgs e) {
             if (MessageBox.Show("Alle Spalten anzeigen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-            _TableView.CurrentArrangement.ShowAllColumns(_TableView.Database);
+            _TableView.CurrentArrangement.ShowAllColumns();
         }
 
         private void btnSystemspaltenAusblenden_Click(object sender, System.EventArgs e) {

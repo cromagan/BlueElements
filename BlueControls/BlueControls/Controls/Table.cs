@@ -3498,7 +3498,7 @@ namespace BlueControls.Controls {
 
 
                         if (_Database.ColumnArrangements.IndexOf(ThisArrangement) == 0) {
-                            _Database.ColumnArrangements[0].ShowAllColumns(_Database);
+                            _Database.ColumnArrangements[0].ShowAllColumns();
                         }
                     }
                 }
