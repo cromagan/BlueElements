@@ -288,8 +288,8 @@ namespace BlueControls.Controls {
         }
 
         private void Row_RowRemoving(object sender, RowEventArgs e) {
-            if (e.Row == _CursorPosRow.Row) { CursorPos_Reset(); }
-            if (e.Row == _MouseOverRow.Row) { _MouseOverRow = null; }
+            if (e.Row == _CursorPosRow?.Row) { CursorPos_Reset(); }
+            if (e.Row == _MouseOverRow?.Row) { _MouseOverRow = null; }
             if (_PinnedRows.Contains(e.Row)) { _PinnedRows.Remove(e.Row); }
         }
 
@@ -856,10 +856,20 @@ namespace BlueControls.Controls {
             //    If Not Editablexx("Import gerade nicht möglich") Then Exit Sub
             var nt = Convert.ToString(System.Windows.Forms.Clipboard.GetDataObject().GetData(System.Windows.Forms.DataFormats.Text));
 
+            ImportCSV(nt);
 
-            using var x = new Import(_Database, nt);
+        }
+
+        public void ImportCSV(string csvtxt) {
+            using var x = new Import(_Database, csvtxt);
             x.ShowDialog();
         }
+
+        public void ImportCSV(List<string> csvtxt) {
+            ImportCSV(csvtxt.JoinWithCr());
+        }
+
+
 
         /// <summary>
         /// Zeichnet die gesamte Zelle ohne Hintergrund. Die verlinkte Zelle ist bereits bekannt.

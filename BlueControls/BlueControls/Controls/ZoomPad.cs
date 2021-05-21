@@ -151,7 +151,7 @@ namespace BlueControls.Controls {
         /// <remarks>
         /// </remarks>
         protected Point KoordinatesUnscaled(System.Windows.Forms.MouseEventArgs e) {
-            return new Point((int)((e.X + _shiftX) / _Zoom), (int)((e.Y + _shiftY) / _Zoom));
+            return new Point((int)Math.Round((e.X + _shiftX) / _Zoom, 0) - 1, (int)Math.Round((e.Y + _shiftY) / _Zoom, 0) - 1);
         }
 
 

@@ -48,10 +48,20 @@ namespace BlueControls.Controls {
 
                 if (value == _bmp) { return; }
 
-                _bmp = value;
-                ZoomFit();
-                //  Invalidate();
+                var dozoomfit = true;
 
+                if (_bmp != null && value != null) {
+                    dozoomfit = value.Width != _bmp.Width || value.Height != _bmp.Height;
+                }
+
+
+                _bmp = value;
+
+                if (dozoomfit) {
+                    ZoomFit();
+                } else {
+                    Invalidate();
+                }
 
             }
         }

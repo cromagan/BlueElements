@@ -89,7 +89,9 @@
     <Compile Include="BitmapExt.cs" />
     <Compile Include="clsImageMatrix.cs" />
     <Compile Include="Enums\enBlurType.cs" />
+    <Compile Include="Enums\enEditTypeFormula.cs" />
     <Compile Include="Enums\enErrorReason.cs" />
+    <Compile Include="Enums\enÜberschriftAnordnung.cs" />
     <Compile Include="EventArgs\NeedImageEventArgs.cs" />
     <Compile Include="EventArgs\MultiUserFileGiveBackEventArgs.cs" />
     <Compile Include="Extensions\RectangleFExtension.cs" />

@@ -79,7 +79,6 @@
     <Compile Include="Enums\enVerwaisteDaten.cs" />
     <Compile Include="Enums\enJoinTyp.cs" />
     <Compile Include="Enums\enColumnLineStyle.cs" />
-    <Compile Include="Enums\enEditTypeFormula.cs" />
     <Compile Include="Enums\enEditTypeTable.cs" />
     <Compile Include="Enums\enExportTyp.cs" />
     <Compile Include="Enums\enAnsicht.cs" />
@@ -88,7 +87,6 @@
     <Compile Include="Enums\enRoutinen.cs" />
     <Compile Include="Enums\enDatabaseDataType.cs" />
     <Compile Include="Enums\enViewType.cs" />
-    <Compile Include="Enums\enÜberschriftAnordnung.cs" />
     <Compile Include="EventArgs\BeforeNewValueEventArgs.cs" />
     <Compile Include="EventArgs\ButtonCellEventArgs.cs" />
     <Compile Include="EventArgs\CellCancelEventArgs.cs" />

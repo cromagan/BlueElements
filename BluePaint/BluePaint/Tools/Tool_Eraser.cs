@@ -19,6 +19,7 @@
 
 using BlueBasics;
 using BlueControls.EventArgs;
+using System;
 using System.Drawing;
 using static BlueBasics.Extensions;
 
@@ -43,18 +44,40 @@ namespace BluePaint {
                 e.FillCircle(ColorRedTransp, e.Current.TrimmedX, e.Current.TrimmedY, 3);
             }
 
+            //e.FillRectangle(Brush_RedTransp, new Rectangle(e.Current.TrimmedX, e.Current.TrimmedY, 1, 1));
+
 
             if (DrawBox.Checked && e.Current != null) {
                 var _Pic = OnNeedCurrentPic();
 
-                e.DrawLine(Pen_RedTransp, -1, e.Current.TrimmedY, _Pic.Width, e.Current.TrimmedY);
-                e.DrawLine(Pen_RedTransp, e.Current.TrimmedX, -1, e.Current.TrimmedX, _Pic.Height);
+
+                Point p1, p2;
+
 
                 if (e.Current.Button == System.Windows.Forms.MouseButtons.Left && e.MouseDown != null) {
-                    e.DrawLine(Pen_RedTransp, -1, e.MouseDown.TrimmedY, _Pic.Width, e.MouseDown.TrimmedY);
-                    e.DrawLine(Pen_RedTransp, e.MouseDown.TrimmedX, -1, e.MouseDown.TrimmedX, _Pic.Height);
+
+                    p1 = new Point(Math.Min(e.Current.TrimmedX, e.MouseDown.TrimmedX), Math.Min(e.Current.TrimmedY, e.MouseDown.TrimmedY));
+                    p2 = new Point(Math.Max(e.Current.TrimmedX, e.MouseDown.TrimmedX), Math.Max(e.Current.TrimmedY, e.MouseDown.TrimmedY));
                     e.FillRectangle(Brush_RedTransp, e.TrimmedRectangle());
+                } else {
+                    p1 = new Point(e.Current.TrimmedX, e.Current.TrimmedY);
+                    p2 = new Point(e.Current.TrimmedX, e.Current.TrimmedY);
                 }
+
+                e.DrawLine(Pen_RedTransp, 0, p1.Y, _Pic.Width, p1.Y);
+                e.DrawLine(Pen_RedTransp, p1.X, 0, p1.X, _Pic.Height);
+
+                e.DrawLine(Pen_RedTransp, 0, p2.Y+1, _Pic.Width, p2.Y+1);
+                e.DrawLine(Pen_RedTransp, p2.X+1, 0, p2.X+1, _Pic.Height);
+
+
+
+
+                //if (e.Current.Button == System.Windows.Forms.MouseButtons.Left && e.MouseDown != null) {
+                //    e.DrawLine(Pen_RedTransp, -1, e.MouseDown.TrimmedY, _Pic.Width, e.MouseDown.TrimmedY);
+                //    e.DrawLine(Pen_RedTransp, e.MouseDown.TrimmedX, -1, e.MouseDown.TrimmedX, _Pic.Height);
+                //    e.FillRectangle(Brush_RedTransp, e.TrimmedRectangle());
+                //}
             }
         }
 
@@ -75,6 +98,12 @@ namespace BluePaint {
         }
 
         public override void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) {
+
+
+            if (e== null) {
+                Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Warnung, "e = null");
+                return;
+            }
 
             if (Razi.Checked) { return; }
 

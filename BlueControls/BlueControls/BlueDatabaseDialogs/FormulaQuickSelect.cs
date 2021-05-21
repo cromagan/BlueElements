@@ -23,6 +23,7 @@ using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using BlueBasics.Enums;
 
 namespace BlueControls.BlueDatabaseDialogs {
 

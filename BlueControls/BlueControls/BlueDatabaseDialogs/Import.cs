@@ -129,8 +129,8 @@ namespace BlueControls.BlueDatabaseDialogs {
                         return;
                     }
 
-                    Zeil[0][SpaltNo] = Zeil[0][SpaltNo].Replace(" ", "_");
-                    var Col = _Database.Column[Zeil[0][SpaltNo]];
+                    Zeil[0][SpaltNo] = Zeil[0][SpaltNo].Replace(" ", "_").ReduceToChars(BlueBasics.Constants.AllowedCharsVariableName);
+                    var Col = _Database.Column.Exists(Zeil[0][SpaltNo]);
                     if (Col == null) {
                         Col = _Database.Column.Add(Zeil[0][SpaltNo]);
                         Col.Caption = Zeil[0][SpaltNo];
