@@ -40,15 +40,17 @@ namespace BlueControls.ItemCollection {
         private SizeF _SheetSizeInMM = SizeF.Empty;
         private System.Windows.Forms.Padding _RandinMM = System.Windows.Forms.Padding.Empty;
 
-
         public PointM P_rLO;
         public PointM P_rLU;
         public PointM P_rRU;
         public PointM P_rRO;
 
 
-        private bool _OrdersValid;
-        private bool ComputeOrders_isin;
+        private enSnapMode _SnapMode = enSnapMode.SnapToGrid;
+        private float _GridShow = 10;
+        private float _Gridsnap = 1;
+
+
 
         public string Caption = string.Empty;
 
@@ -60,15 +62,6 @@ namespace BlueControls.ItemCollection {
         private readonly int IDCount = 0;
 
 
-        /// <summary>
-        /// Alle Punkte. Im Regelfall nach Wichtigkeit aufsteigend sortiert
-        /// </summary>
-        public readonly ListExt<PointM> AllPoints = new();
-
-        /// <summary>
-        /// Alle Beziehungen. Im Regelfall nach Wichtigkeit aufsteigens sortiert
-        /// </summary>
-        public readonly ListExt<clsPointRelation> AllRelations = new();
 
 
         #endregion
@@ -78,6 +71,44 @@ namespace BlueControls.ItemCollection {
         [DefaultValue(true)]
         public bool IsSaved { get; set; }
 
+
+
+        [DefaultValue(false)]
+        public enSnapMode SnapMode {
+            get => _SnapMode;
+            set {
+                if (_SnapMode == value) { return; }
+
+                _SnapMode = value;
+                CheckGrid();
+            }
+        }
+
+
+
+        [DefaultValue(10.0)]
+        public float GridShow {
+            get => _GridShow;
+            set {
+
+                if (_GridShow == value) { return; }
+
+                _GridShow = value;
+                CheckGrid();
+            }
+        }
+
+        [DefaultValue(10.0)]
+        public float GridSnap {
+            get => _Gridsnap;
+            set {
+
+                if (_Gridsnap == value) { return; }
+
+                _Gridsnap = value;
+                CheckGrid();
+            }
+        }
 
 
         public Color BackColor { get; set; } = Color.White;
@@ -152,22 +183,9 @@ namespace BlueControls.ItemCollection {
 
         public ItemCollectionPad(string layoutID, Database database, int rowkey) : this(database.Layouts[database.LayoutIDToIndex(layoutID)], string.Empty) {
 
-
             // Wenn nur die Row ankommt und diese null ist, kann gar nix generiert werden
             ResetVariables();
             ParseVariableAndSpecialCodes(database.Row.SearchByKey(rowkey));
-
-
-
-            var Count = 0;
-            do {
-                Count++;
-                PerformAllRelations();
-                if (NotPerforming(false) == 0) { break; }
-                if (Count > 20) { break; }
-            } while (true);
-
-
         }
 
 
@@ -203,8 +221,8 @@ namespace BlueControls.ItemCollection {
                     //    Parse(pvalue);
                     //    break;
 
-                    case "relation":
-                        AllRelations.Add(new clsPointRelation(this, null, pair.Value));
+                    case "relation": // TODO: Entfernt, 24.05.2021
+                        //AllRelations.Add(new clsPointRelation(this, null, pair.Value));
                         break;
 
                     case "caption":
@@ -229,17 +247,22 @@ namespace BlueControls.ItemCollection {
                         _SheetStyleScale = decimal.Parse(pair.Value);
                         break;
 
+                    case "snapmode":
+                        _SnapMode = (enSnapMode)int.Parse(pair.Value);
+                        break;
+
                     case "grid":
                         //_Grid = pair.Value.FromPlusMinus();
                         break;
 
                     case "gridshow":
-                        //_GridShow = float.Parse(pair.Value);
+                        _GridShow = float.Parse(pair.Value);
                         break;
 
                     case "gridsnap":
-                        //_Gridsnap = float.Parse(pair.Value);
+                        _Gridsnap = float.Parse(pair.Value);
                         break;
+
                     case "format": //_Format = DirectCast(Integer.Parse(pair.Value.Value), enDataFormat)
                         break;
 
@@ -271,16 +294,6 @@ namespace BlueControls.ItemCollection {
             }
 
 
-            //   _AutoSort = False ' False beim Parsen was anderes Rauskommt
-
-            //OnDoInvalidate();
-
-
-            //CheckGrid();
-
-            PerformAllRelations();
-
-            //if (needPrinterData) { RepairPrinterData(); }
         }
 
         private void ParseItems(string ToParse) {
@@ -337,7 +350,8 @@ namespace BlueControls.ItemCollection {
                     //    break;
 
                     case "item":
-                        Add(BasicPadItem.NewByParsing(this, pair.Value));
+                        var i = BasicPadItem.NewByParsing(this, pair.Value);
+                        if (i != null) { Add(i); }
                         break;
 
                     case "dpi": // TODO: LÖschen 26.02.2020
@@ -479,12 +493,8 @@ namespace BlueControls.ItemCollection {
 
                 _SheetStyleScale = value;
 
-                //if (_isParsing) { return; }
-
-
                 DesignOrStyleChanged();
 
-                PerformAllRelations();
                 OnDoInvalidate();
             }
         }
@@ -501,11 +511,6 @@ namespace BlueControls.ItemCollection {
             }
 
             if (!did) { return false; }
-
-
-            PerformAllRelations();
-            PerformAllRelations();
-
             return true;
         }
 
@@ -523,111 +528,28 @@ namespace BlueControls.ItemCollection {
 
 
         protected override void OnItemAdded(BasicPadItem item) {
+            if (item == null) {
+                Develop.DebugPrint(enFehlerArt.Fehler, "Null Item soll hinzugefügt werden!");
+            }
+
             if (string.IsNullOrEmpty(item.Internal)) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Der Auflistung soll ein Item hinzugefügt werden, welches keinen Namen hat " + item.Internal);
             }
 
             base.OnItemAdded(item);
-            item.RecalculateAndOnChanged();
-
-            AllPoints.AddIfNotExists(item.Points);
-            AllRelations.AddIfNotExists(item.Relations); // Eigentlich überflüssig
+            item.PointMoved(null);
 
             IsSaved = false;
 
 
             item.Changed += Item_Changed;
-            item.PointOrRelationsChanged += Item_PointOrRelationsChanged;
-
-            //RecomputePointAndRelations();
 
             if (item.Parent != this) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Parent ungleich!");
 
             }
             OnDoInvalidate();
-
         }
-
-        private void Item_PointOrRelationsChanged(object sender, System.EventArgs e) {
-
-            var ni = (BasicPadItem)sender;
-
-            InvalidateOrder();
-
-            AllPoints.AddIfNotExists(ni.Points);
-            AllRelations.AddIfNotExists(ni.Relations);
-
-            RemoveInvalidPoints();
-            RemoveInvalidRelations();
-        }
-
-        public void RemoveInvalidPoints() {
-
-            /// Zuerst die Punkte
-            foreach (var ThisPoint in AllPoints) {
-
-                if (ThisPoint != null) {
-
-                    if (ThisPoint.Parent is BasicPadItem Pad) {
-                        if (!Contains(Pad)) {
-                            AllPoints.Remove(ThisPoint);
-                            RemoveInvalidPoints(); //Rekursiv
-                            return;
-                        }
-                    } else if (ThisPoint.Parent is ItemCollectionPad ICP) {
-                        if (ICP != this) {
-                            AllPoints.Remove(ThisPoint);
-                            RemoveInvalidPoints(); //Rekursiv
-                            return;
-                        }
-                    } else {
-                        AllPoints.Remove(ThisPoint);
-                        RemoveInvalidPoints(); //Rekursiv
-                        return;
-                    }
-
-
-                }
-            }
-
-        }
-
-        public bool RemoveInvalidRelations() {
-            var z = -1;
-            var SomethingChanged = false;
-
-
-            do {
-                z++;
-                if (z > AllRelations.Count - 1) { break; }
-
-                if (!AllRelations[z].IsOk(false)) {
-                    AllRelations.Remove(AllRelations[z]);
-                    z = -1;
-                    SomethingChanged = true;
-                }
-            } while (true);
-
-            return SomethingChanged;
-        }
-
-        /// <summary>
-        /// Ermittelt die anzahl der Beziehungen, die nicht korrekt sind.
-        /// </summary>
-        /// <param name="Strongmode"></param>
-        /// <returns></returns>
-        public int NotPerforming(bool Strongmode) {
-
-            var f = 0;
-
-            foreach (var ThisRelation in AllRelations) {
-                if (!ThisRelation.Performs(Strongmode)) { f++; }
-            }
-
-            return f;
-        }
-
 
         private void Item_Changed(object sender, System.EventArgs e) {
             IsSaved = false;
@@ -696,26 +618,20 @@ namespace BlueControls.ItemCollection {
         }
 
 
-
-
         private void GenPoints() {
 
             if (Math.Abs(_SheetSizeInMM.Width) < 0.001 || Math.Abs(_SheetSizeInMM.Height) < 0.001) {
                 if (P_rLO != null) {
                     P_rLO.Parent = null;
-                    AllPoints.Remove(P_rLO);
                     P_rLO = null;
 
                     P_rRO.Parent = null;
-                    AllPoints.Remove(P_rRO);
                     P_rRO = null;
 
                     P_rRU.Parent = null;
-                    AllPoints.Remove(P_rRU);
                     P_rRU = null;
 
                     P_rLU.Parent = null;
-                    AllPoints.Remove(P_rLU);
                     P_rLU = null;
                 }
 
@@ -724,18 +640,10 @@ namespace BlueControls.ItemCollection {
 
 
             if (P_rLO == null) {
-
-                P_rLO = new PointM(this, "Druckbereich LO", 0, 0, true);
-                AllPoints.AddIfNotExists(P_rLO);
-
-                P_rRO = new PointM(this, "Druckbereich RO", 0, 0, true);
-                AllPoints.AddIfNotExists(P_rRO);
-
-                P_rRU = new PointM(this, "Druckbereich RU", 0, 0, true);
-                AllPoints.AddIfNotExists(P_rRU);
-
-                P_rLU = new PointM(this, "Druckbereich LU", 0, 0, true);
-                AllPoints.AddIfNotExists(P_rLU);
+                P_rLO = new PointM(this, "Druckbereich LO", 0, 0);
+                P_rRO = new PointM(this, "Druckbereich RO", 0, 0);
+                P_rRU = new PointM(this, "Druckbereich RU", 0, 0);
+                P_rLU = new PointM(this, "Druckbereich LU", 0, 0);
             }
 
             var SSW = Math.Round(modConverter.mmToPixel((decimal)_SheetSizeInMM.Width, DPI), 1);
@@ -749,26 +657,28 @@ namespace BlueControls.ItemCollection {
             P_rRO.SetTo(SSW - rr, ro);
             P_rRU.SetTo(SSW - rr, SSH - ru);
             P_rLU.SetTo(rl, SSH - ru);
+            CheckGrid();
             OnDoInvalidate();
         }
 
+        private void CheckGrid() {
+
+
+            // Todo: bei erschiedenen SnapModes muss hier evtl. was gemacht werden.
+
+
+        }
 
         protected override void OnItemRemoving(BasicPadItem item) {
             item.Changed -= Item_Changed;
-            item.PointOrRelationsChanged -= Item_PointOrRelationsChanged;
-
-
             base.OnItemRemoving(item);
-            AllPoints.RemoveRange(item.Points);
-            AllRelations.RemoveRange(item.Relations);
+            OnDoInvalidate();
         }
 
 
         protected override void OnItemRemoved() {
             base.OnItemRemoved();
-            RemoveInvalidPoints();
-            RemoveInvalidRelations();
-            InvalidateOrder();
+            OnDoInvalidate();
         }
 
         public override void OnChanged() {
@@ -778,50 +688,10 @@ namespace BlueControls.ItemCollection {
         }
 
 
-        public List<PointM> ConnectsWith(PointM Point, enXY toCheck, bool IgnoreInternals) {
-
-            var Points = new List<PointM>
-            {
-                Point
-            };
-
-            var Ist = -1;
-
-            // Nur, wenn eine Beziehung gut ist, kann man mit sicherheit sagen, daß das zusammenhängt. Deswegen auch ein Performs test
-
-            do {
-                Ist++;
-                if (Ist >= Points.Count) { break; }
-
-
-                foreach (var ThisRelation in AllRelations) {
-                    if (ThisRelation != null && ThisRelation.Points.Contains(Points[Ist]) && ThisRelation.Performs(false) && ThisRelation.Connects().HasFlag(toCheck)) {
-
-
-                        if (!IgnoreInternals || !ThisRelation.IsInternal()) {
-                            Points.AddIfNotExists(ThisRelation.Points);
-                        }
-                    }
-                }
-            } while (true);
-
-
-
-            return Points;
-        }
-
-
-
-
-
-
 
         public new string ToString() {
 
-            PerformAllRelations();
-
             var t = "{";
-
 
             if (!string.IsNullOrEmpty(ID)) { t = t + "ID=" + ID.ToNonCritical() + ", "; }
 
@@ -855,24 +725,9 @@ namespace BlueControls.ItemCollection {
             t = t.TrimEnd(", ") + "}, ";
 
 
-
-
-
-
-            //t = t + "Grid=" + _Grid + ", ";
-            //t = t + "GridShow=" + _GridShow + ", ";
-            //t = t + "GridSnap=" + _Gridsnap + ", ";
-
-            //Dim One As Boolean
-
-            foreach (var ThisRelation in AllRelations) {
-                if (ThisRelation != null) {
-                    if (!ThisRelation.IsInternal() && ThisRelation.IsOk(false)) {
-                        t = t + "Relation=" + ThisRelation + ", ";
-                    }
-                }
-            }
-
+            t = t + "SnapMode=" + ((int)_SnapMode).ToString() + ", ";
+            t = t + "GridShow=" + _GridShow + ", ";
+            t = t + "GridSnap=" + _Gridsnap + ", ";
 
             return t.TrimEnd(", ") + "}";
 
@@ -980,8 +835,6 @@ namespace BlueControls.ItemCollection {
                     if (variables.ReplaceVariable(VariableName, Value)) { did = true; }
                 }
             }
-
-            if (did) { PerformAllRelations(); }
             return did;
         }
 
@@ -1082,418 +935,10 @@ namespace BlueControls.ItemCollection {
         }
 
 
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        ///// <param name="Level">Level 0 = Hart / Reparier alles mit Gewalt; 
-        ///// Level 1 = Normal / Reparier nur die neuen Sachen;
-        /////  Level 2 = Leicht / Reparier nur die neuen Sachen mit schnelleren Abbruchbedingungen</param>
-        ///// <param name="AllowBigChanges"></param>
-        ///// <returns></returns>
 
-        //public bool RepairAll(int Level, bool AllowBigChanges)
-        //{
-        //    //InvalidateOrder();
 
-        //    //if (Level == 0)
-        //    //{
-        //    //    //RepairAll_OldItemc = Itemc + 1; // Löst eine Kettenreaktion aus
-        //    //    RecomputePointAndRelations();
-        //    //}
 
-        //    return PerformAll(Level, AllowBigChanges);
-        //}
 
-
-        public void PerformAllRelations() {
-            ComputeOrders(null);
-            foreach (var ThisRelation in AllRelations) {
-                ThisRelation.Perform(AllPoints);
-            }
-        }
-
-
-        public void ComputeOrders(List<PointM> selectedPoints) {
-            if (_OrdersValid) { return; }
-
-            if (ComputeOrders_isin) { return; }
-            ComputeOrders_isin = true;
-
-
-            RemoveInvalidPoints();
-            RemoveInvalidRelations();
-
-            ComputePointOrder(selectedPoints);
-
-            _OrdersValid = true;
-            ComputeOrders_isin = false;
-        }
-        public void Relations_Optimize() {
-            if (NotPerforming(true) > 0) { return; }
-
-
-            var Cb = new List<PointM>();
-            var DobR = new List<clsPointRelation>();
-
-
-            foreach (var thisPoint in AllPoints) {
-                var CX = ConnectsWith(thisPoint, enXY.X, true);
-                var CY = ConnectsWith(thisPoint, enXY.Y, true);
-
-                // Ermitteln, die auf X und Y miteinander verbunden sind
-                Cb.Clear();
-                foreach (var thisPoint2 in CX) {
-                    if (CY.Contains(thisPoint2)) { Cb.Add(thisPoint2); }
-                }
-
-
-                if (Cb.Count > 1) {
-
-                    DobR.Clear();
-                    foreach (var ThisRelation in AllRelations) {
-
-
-                        // Wenn Punkte nicht direct verbunden sind, aber trotzdem Fix zueinander, die Beziehung optimieren
-                        if (ThisRelation.RelationType == enRelationType.WaagerechtSenkrecht && !ThisRelation.IsInternal()) {
-                            if (Cb.Contains(ThisRelation.Points[0]) && Cb.Contains(ThisRelation.Points[1])) {
-                                ThisRelation.RelationType = enRelationType.PositionZueinander;
-                                ThisRelation.OverrideSavedRichtmaß(false, false);
-                                Relations_Optimize();
-                                return;
-                            }
-                        }
-
-
-                        // Für nachher, die doppelten fixen Beziehungen merken
-                        if (ThisRelation.RelationType == enRelationType.PositionZueinander) {
-                            if (Cb.Contains(ThisRelation.Points[0]) && Cb.Contains(ThisRelation.Points[1])) { DobR.Add(ThisRelation); }
-                        }
-
-
-                    }
-
-
-                    // Und nun beziehungen löschen, die auf gleiche Objecte zugreifen
-                    if (DobR.Count > 1) {
-                        foreach (var R1 in DobR) {
-                            // Mindestens eine muss external sein!!!
-                            if (!R1.IsInternal()) {
-                                foreach (var R2 in DobR) {
-                                    if (!R1.SinngemäßIdenitisch(R2)) {
-
-                                        if (R1.Points[0].Parent == R2.Points[0].Parent && R1.Points[1].Parent == R2.Points[1].Parent) {
-                                            AllRelations.Remove(R1);
-                                            Relations_Optimize();
-                                            return;
-                                        }
-
-                                        if (R1.Points[0].Parent == R2.Points[1].Parent && R1.Points[1].Parent == R2.Points[0].Parent) {
-                                            AllRelations.Remove(R1);
-                                            Relations_Optimize();
-                                            return;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-
-
-            // und nun direct nach doppelten suchen
-            foreach (var r1 in AllRelations) {
-                if (!r1.IsInternal()) {
-                    foreach (var r2 in AllRelations) {
-                        if (!r1.SinngemäßIdenitisch(r2) && !r2.IsInternal()) {
-                            if (r1.SinngemäßIdenitisch(r2)) {
-                                AllRelations.Remove(r2);
-                                Relations_Optimize();
-                                return;
-
-                            }
-
-                            if (r1.UsesSamePoints(r2)) {
-                                switch (r1.RelationType) {
-                                    case enRelationType.PositionZueinander:
-                                        // Beziehungen mit gleichen punkten, aber einer mächtigen PositionZueinander -> andere löschen
-                                        AllRelations.Remove(r2);
-                                        Relations_Optimize();
-                                        return;
-                                    case enRelationType.WaagerechtSenkrecht when r2.RelationType == enRelationType.WaagerechtSenkrecht && r1._Richtmaß[0] != r2._Richtmaß[0]:
-                                        // Beziehungen mit gleichen punkten, aber spearat mit X und Y -> PositionZueinander konvertieren 
-                                        r1.RelationType = enRelationType.PositionZueinander;
-                                        r1.OverrideSavedRichtmaß(false, false);
-                                        AllRelations.Remove(r2);
-                                        Relations_Optimize();
-                                        return;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-        }
-
-        public void InvalidateOrder() {
-            _OrdersValid = false;
-        }
-        public PointM Getbetterpoint(double X, double Y, PointM notPoint, bool MustUsableForAutoRelation) {
-
-            foreach (var thispoint in AllPoints) {
-
-                if (thispoint != null) {
-
-                    if (!MustUsableForAutoRelation || thispoint.CanUsedForAutoRelation) {
-
-                        if (thispoint != notPoint) {
-                            if (Math.Abs((double)thispoint.X - X) < 0.01 && Math.Abs((double)thispoint.Y - Y) < 0.01) { return thispoint; }
-                        }
-
-                    }
-
-                }
-            }
-
-            return null;
-        }
-
-        //public PointM GetPointWithLowerIndex(PointM NotPoint, PointM ErsatzFür, bool MustUsableForAutoRelation)
-        //{
-        //    if (NotPoint != null && NotPoint.Parent == ErsatzFür.Parent) { return ErsatzFür; }
-
-
-
-        //    foreach (var thispoint in PointOrder)
-        //    {
-        //        if (thispoint != null)
-        //        {
-        //            if (!MustUsableForAutoRelation || thispoint.CanUsedForAutoRelation)
-        //            {
-        //                if (thispoint != NotPoint)
-        //                {
-        //                    if (Math.Abs(thispoint.X - ErsatzFür.X) < 0.01m && Math.Abs(thispoint.Y - ErsatzFür.Y) < 0.01m)
-        //                    {
-        //                        return thispoint; // der erste Punkt ist der niedrigste im Index - kann auch der "ErsatzFür" sein
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    }
-
-        //    return ErsatzFür;
-        //}
-
-
-        private void ComputePointOrder(List<PointM> Sel_P) {
-            var Modus = 0;
-            var done = false;
-
-            #region Punkte vorbereiten
-            var _Points = new List<PointM>();
-            _Points.AddRange(AllPoints);
-
-            AllPoints.Clear();
-            #endregion
-
-            #region Beziehungen ermitteln, wie sie was verbinden
-
-            var RelationNone = new List<clsPointRelation>();
-            var RelationY = new List<clsPointRelation>();
-            var RelationX = new List<clsPointRelation>();
-            var RelationXY = new List<clsPointRelation>();
-
-            foreach (var thisRelation in AllRelations) {
-                switch (thisRelation.Connects()) {
-                    case enXY.XY:
-                        RelationXY.Add(thisRelation);
-                        break;
-                    case enXY.X:
-                        RelationX.Add(thisRelation);
-                        break;
-                    case enXY.Y:
-                        RelationY.Add(thisRelation);
-                        break;
-                    default:
-                        RelationNone.Add(thisRelation);
-                        break;
-                }
-            }
-
-
-            AllRelations.Clear();
-            #endregion
-
-            do {
-
-                var z = 0;
-                while (z < _Points.Count) {
-
-                    var Thispoint = _Points[z];
-
-                    switch (Modus) {
-                        case 0: // Unbewegliche Punkte hinzufügen
-                            if (Thispoint.Fix) { AllPoints.Add(Thispoint); }
-                            break;
-
-                        case 1: // Verbundene Punkte, die durch verbindungen X und Y Fix sind
-                            foreach (var thisRelation in RelationXY) {
-                                if (thisRelation.NeedCount(Thispoint, AllPoints)) {
-                                    AllPoints.Add(Thispoint);
-                                    AllRelations.Add(thisRelation);
-                                    RelationXY.Remove(thisRelation);
-                                    break;
-
-                                }
-                            }
-                            break;
-
-
-
-                        //case 2: // Y-Unbewegliche Punkte hinzufügen
-                        //    if (!Thispoint.Moveable.HasFlag(enXY.Y)) { AllPoints.Add(Thispoint); }
-                        //    break;
-
-                        case 2: // Fixe Y-Punkte hinzufügen
-                            foreach (var thisRelation in RelationY) {
-                                if (thisRelation.NeedCount(Thispoint, AllPoints)) {
-                                    AllPoints.Add(Thispoint);
-                                    AllRelations.Add(thisRelation);
-                                    RelationY.Remove(thisRelation);
-                                    break;
-                                }
-                            }
-
-                            break;
-
-                        //case 4: // X-Unbewegliche Punkte hinzufügen
-                        //    if (!Thispoint.Moveable.HasFlag(enXY.X)) { AllPoints.Add(Thispoint); }
-                        //    break;
-
-                        case 3: // Fixe X-Punkte hinzufügen
-                            foreach (var thisRelation in RelationX) {
-                                if (thisRelation.NeedCount(Thispoint, AllPoints)) {
-                                    AllPoints.Add(Thispoint);
-                                    AllRelations.Add(thisRelation);
-                                    RelationX.Remove(thisRelation);
-                                    break;
-                                }
-                            }
-                            break;
-
-                        case 4: // Punkte hinzufügen, die in einer Beziehung sind UND ein Punkt bereits einen Order hat
-
-                            foreach (var thisRelation in RelationNone) {
-                                if (thisRelation.NeedCount(Thispoint, AllPoints)) {
-                                    AllPoints.Add(Thispoint);
-                                    AllRelations.Add(thisRelation);
-                                    RelationNone.Remove(thisRelation);
-                                    break;
-                                }
-                            }
-                            break;
-
-                        case 5: // Selectierte Punkte bevorzugen
-                            if (Sel_P != null && Sel_P.Contains(Thispoint)) {
-                                AllPoints.Add(Thispoint);
-                            }
-
-                            break;
-
-                        case 6: // Der gute Rest
-                            AllPoints.Add(Thispoint);
-                            break;
-
-                        default:
-                            done = true;
-                            break;
-                    }
-
-                    if (AllPoints.Contains(Thispoint)) {
-                        Modus = 0;
-                        z = 0;
-                        _Points.Remove(Thispoint);
-                    } else {
-                        z++;
-
-                        if (z >= _Points.Count) { Modus++; }
-                    }
-
-
-                }
-
-                if (_Points.Count == 0) { done = true; }
-
-            } while (!done);
-
-            AllRelations.AddRange(RelationXY);
-            AllRelations.AddRange(RelationX);
-            AllRelations.AddRange(RelationY);
-            AllRelations.AddRange(RelationNone);
-
-            AllPoints.AddRange(_Points);
-
-
-        }
-
-        //public void ComputeRelationOrder()
-        //{
-        //    var Count = 0;
-
-        //    // Zurücksetzen ---- 
-        //    foreach (var ThisRelation in AllRelations)
-        //    {
-        //        ThisRelation.Order = -1;
-        //    }
-
-
-        //    for (var Durch = 0; Durch <= 1; Durch++)
-        //    {
-
-        //        do
-        //        {
-        //            clsPointRelation NextRel = null;
-        //            var RelPO = int.MaxValue;
-
-        //            foreach (var ThisRelation in AllRelations)
-        //            {
-        //                if (ThisRelation.Order < 0)
-        //                {
-        //                    if (Durch > 0 || ThisRelation.IsInternal())
-        //                    {
-        //                        if (LowestOrder(ThisRelation.Points) < RelPO)
-        //                        {
-        //                            NextRel = ThisRelation;
-        //                            RelPO = LowestOrder(ThisRelation.Points);
-        //                        }
-        //                    }
-        //                }
-        //            }
-
-        //            if (NextRel == null) { break; }
-
-        //            Count++;
-        //            NextRel.Order = Count;
-        //        } while (true);
-
-        //    }
-
-        //    AllRelations.Sort();
-        //}
-
-        //public int LowestOrder(ListExt<PointM> ThisPoints)
-        //{
-        //    var l = int.MaxValue;
-
-        //    foreach (var Thispouint in ThisPoints)
-        //    {
-        //        l = Math.Min(l, Thispouint.Order);
-        //    }
-
-        //    return l;
-        //}
 
         public void SaveAsBitmap(string Filename) {
 

@@ -29,9 +29,9 @@ namespace BlueControls.ItemCollection {
     public class DimensionPadItem : BasicPadItem {
         #region  Variablen-Deklarationen 
 
-        private readonly PointM Point1 = new(null, "Punkt 1", 0, 0, false, false);
-        private readonly PointM Point2 = new(null, "Punkt 2", 0, 0, false, false);
-        private readonly PointM TextPointx = new(null, "Mitte Text", 0, 0, false, false);
+        private readonly PointM Point1 = new(null, "Punkt 1", 0, 0);
+        private readonly PointM Point2 = new(null, "Punkt 2", 0, 0);
+        private readonly PointM TextPointx = new(null, "Mitte Text", 0, 0);
 
         private readonly PointM _SchnittPunkt1 = new(null, "Schnittpunkt 1, Zeigt der Pfeil hin", 0, 0);
         private readonly PointM _SchnittPunkt2 = new(null, "Schnittpunkt 2, Zeigt der Pfeil hin", 0, 0);
@@ -116,9 +116,11 @@ namespace BlueControls.ItemCollection {
             _Bezugslinie2.Parent = this;
 
 
-            Points.Add(Point1);
-            Points.Add(Point2);
-            Points.Add(TextPointx);
+            MovablePoint.Add(Point1);
+            MovablePoint.Add(Point2);
+            MovablePoint.Add(TextPointx);
+
+            PointsForSuccesfullyMove.AddRange(MovablePoint);
         }
 
         public DimensionPadItem(ItemCollectionPad parent, PointF cPoint1, PointF cPoint2, int AbstandInMM) : this(parent, new PointM(cPoint1), new PointM(cPoint2), AbstandInMM) { }
@@ -183,7 +185,7 @@ namespace BlueControls.ItemCollection {
         protected override void ParseFinished() { }
 
 
-        protected override void GenerateInternalRelationExplicit() { }
+
 
         public override string ToString() {
             var t = base.ToString();
@@ -337,7 +339,7 @@ namespace BlueControls.ItemCollection {
             _Winkel = GeometryDF.Winkel(Point1, Point2);
         }
 
-        public override void CaluclatePointsWORelations() {
+        public override void PointMoved(PointM point) {
             //Gegeben sind:
             // Point1, Point2 und Textpoint
 
@@ -361,7 +363,7 @@ namespace BlueControls.ItemCollection {
             _Bezugslinie1.SetTo(_SchnittPunkt1, MHLAb, _Winkel + tmppW);
             _Bezugslinie2.SetTo(_SchnittPunkt2, MHLAb, _Winkel + tmppW);
 
-            base.CaluclatePointsWORelations();
+
         }
 
 

@@ -98,7 +98,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Pad
             // 
-            this.Pad.AutoRelation = ((BlueControls.Enums.enAutoRelationMode)((BlueControls.Enums.enAutoRelationMode.DirektVerbindungen | BlueControls.Enums.enAutoRelationMode.NurBeziehungenErhalten)));
             this.Pad.Size = new System.Drawing.Size(816, 502);
             this.Pad.ClickedItemChanged += new System.EventHandler(this.Pad_ClickedItemChanged);
             // 

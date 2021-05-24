@@ -253,7 +253,7 @@ namespace BlueBasics {
             var klammern = 0;
             var Gans = false;
             var GeschwKlammern = 0;
-            var EckigeKlammern = 0;
+            //var EckigeKlammern = 0;
 
             var pos = startpos;
             var maxl = txt.Length;
@@ -273,25 +273,25 @@ namespace BlueBasics {
                         Gans = !Gans;
                         break;
 
-                    // Ekige klammern könne in { oder ( vorkommen, immer erlaubt
-                    case "[":
-                        if (!Gans) {
-                            EckigeKlammern++;
-                        }
-                        break;
+                    //// Ekige klammern könne in { oder ( vorkommen, immer erlaubt
+                    //case "[":
+                    //    if (!Gans) {
+                    //        EckigeKlammern++;
+                    //    }
+                    //    break;
 
-                    case "]":
-                        if (!Gans) {
-                            if (EckigeKlammern < 1) { return (-1, string.Empty); }
-                            EckigeKlammern--;
-                        }
-                        break;
+                    //case "]":
+                    //    if (!Gans) {
+                    //        if (EckigeKlammern < 1) { return (-1, string.Empty); }
+                    //        EckigeKlammern--;
+                    //    }
+                    //    break;
 
 
                     // Runde klammern können in { vorkommen
                     case "(":
                         if (!Gans) {
-                            if (EckigeKlammern > 0) { return (-1, string.Empty); }
+                            //if (EckigeKlammern > 0) { return (-1, string.Empty); }
 
                             if (klammern == 0 && GeschwKlammern == 0 && searchfor.Contains("(")) {
                                 return (pos, "(");
@@ -303,7 +303,7 @@ namespace BlueBasics {
 
                     case ")":
                         if (!Gans) {
-                            if (EckigeKlammern > 0) { return (-1, string.Empty); }
+                            //if (EckigeKlammern > 0) { return (-1, string.Empty); }
                             if (klammern < 1) { return (-1, string.Empty); }
                             klammern--;
                         }
@@ -314,7 +314,7 @@ namespace BlueBasics {
                     case "{":
                         if (!Gans) {
                             if (klammern > 0) { return (-1, string.Empty); }
-                            if (EckigeKlammern > 0) { return (-1, string.Empty); }
+                            //if (EckigeKlammern > 0) { return (-1, string.Empty); }
                             //if (GeschwKlammern) { return (-1, string.Empty); }
                             GeschwKlammern++;
                         }
@@ -323,7 +323,7 @@ namespace BlueBasics {
                     case "}":
                         if (!Gans) {
                             if (klammern > 0) { return (-1, string.Empty); }
-                            if (EckigeKlammern > 0) { return (-1, string.Empty); }
+                            //if (EckigeKlammern > 0) { return (-1, string.Empty); }
                             if (GeschwKlammern < 1) { return (-1, string.Empty); }
                             GeschwKlammern--;
                         }
@@ -332,7 +332,7 @@ namespace BlueBasics {
                 #endregion
 
                 #region Den Text suchen
-                if (klammern == 0 && !Gans && GeschwKlammern == 0 && EckigeKlammern == 0) {
+                if (klammern == 0 && !Gans && GeschwKlammern == 0) {
                     if (!checkforSeparatorbefore || pos == 0 || TR.Contains(txt.Substring(pos - 1, 1))) {
                         foreach (var thisEnd in searchfor) {
                             if (pos + thisEnd.Length <= maxl) {

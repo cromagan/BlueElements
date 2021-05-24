@@ -92,7 +92,7 @@ namespace BlueControls.ItemCollection {
 
         public ChildPadItem(ItemCollectionPad parent) : this(parent, string.Empty) { }
 
-        public ChildPadItem(ItemCollectionPad parent, string internalname) : base(parent, internalname, false) {
+        public ChildPadItem(ItemCollectionPad parent, string internalname) : base(parent, internalname) {
             PadInternal = null; // new CreativePad();
             _tmpBMP = null;
 
@@ -251,8 +251,8 @@ namespace BlueControls.ItemCollection {
                 //    _VariableText = _ReadableText;
                 //    return true;
 
-                case "fixsize":
-                    Größe_fixiert = value.FromPlusMinus();
+                case "fixsize": // TODO: Entfernt am 24.05.2021
+                    //Größe_fixiert = value.FromPlusMinus();
                     return true;
                 case "name":
                     _Name = value.FromNonCritical();

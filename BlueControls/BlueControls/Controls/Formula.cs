@@ -28,7 +28,6 @@ using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
 using BlueDatabase;
-using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using System;
 using System.Collections.Generic;

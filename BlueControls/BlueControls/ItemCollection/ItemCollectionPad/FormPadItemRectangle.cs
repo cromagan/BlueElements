@@ -40,7 +40,7 @@ namespace BlueControls.ItemCollection {
         internal PointM p_L;
         internal PointM p_R;
         private int _drehwinkel = 0;
-        private bool _größe_fixiert = false;
+        //private bool _größe_fixiert = false;
 
         public int Drehwinkel {
             get => _drehwinkel;
@@ -50,28 +50,7 @@ namespace BlueControls.ItemCollection {
                 OnChanged();
             }
         }
-        public bool Größe_fixiert {
-            get => _größe_fixiert;
-            set {
-                if (_größe_fixiert == value) { return; }
 
-                _größe_fixiert = value;
-
-                //if (Größe_fixiert) {
-                //    Points.AddIfNotExists(p_L);
-                //    Points.AddIfNotExists(p_R);
-                //    Points.AddIfNotExists(p_O);
-                //    Points.AddIfNotExists(p_U);
-                //} else {
-                //    Points.Remove(p_L);
-                //    Points.Remove(p_R);
-                //    Points.Remove(p_O);
-                //    Points.Remove(p_U);
-                //}
-
-                RecalculateAndOnChanged();
-            }
-        }
         #endregion
 
         #region  Event-Deklarationen + Delegaten 
@@ -79,35 +58,29 @@ namespace BlueControls.ItemCollection {
         #endregion
         #region  Construktor 
 
-        public FormPadItemRectangle(ItemCollectionPad parent, string internalname, bool sizefix) : base(parent, internalname) {
-            p_LO = new PointM(this, "LO", 0, 0, false, true, true);
-            p_RO = new PointM(this, "RO", 0, 0, false);
+        public FormPadItemRectangle(ItemCollectionPad parent, string internalname) : base(parent, internalname) {
+            p_LO = new PointM(this, "LO", 0, 0);
+            p_RO = new PointM(this, "RO", 0, 0);
             p_RU = new PointM(this, "RU", 0, 0);
             p_LU = new PointM(this, "LU", 0, 0);
 
-            p_L = new PointM(this, "L", 0, 0, false) {
-                UserSelectable = false
-            };
-            p_R = new PointM(this, "R", 0, 0, false) {
-                UserSelectable = false
-            };
-            p_O = new PointM(this, "O", 0, 0, false) {
-                UserSelectable = false
-            };
-            p_U = new PointM(this, "U", 0, 0, false) {
-                UserSelectable = false
-            };
+            p_L = new PointM(this, "L", 0, 0);
+            p_R = new PointM(this, "R", 0, 0);
+            p_O = new PointM(this, "O", 0, 0);
+            p_U = new PointM(this, "U", 0, 0);
 
-            Points.Add(p_LO);
-            Points.Add(p_RO);
-            Points.Add(p_LU);
-            Points.Add(p_RU);
-            Points.Add(p_L);
-            Points.Add(p_R);
-            Points.Add(p_U);
-            Points.Add(p_O);
+            MovablePoint.Add(p_LO);
+            MovablePoint.Add(p_RO);
+            MovablePoint.Add(p_LU);
+            MovablePoint.Add(p_RU);
+            MovablePoint.Add(p_L);
+            MovablePoint.Add(p_R);
+            MovablePoint.Add(p_U);
+            MovablePoint.Add(p_O);
 
-            Größe_fixiert = sizefix;
+
+            PointsForSuccesfullyMove.Add(p_LO);
+            PointsForSuccesfullyMove.Add(p_RU);
 
 
             Drehwinkel = 0;
@@ -115,34 +88,7 @@ namespace BlueControls.ItemCollection {
 
         #endregion
 
-        public override void Move(decimal x, decimal y) {
-            p_LO.SetTo(p_LO.X + x, p_LO.Y + y);
-            p_RU.SetTo(p_RU.X + x, p_RU.Y + y);
-            base.Move(x, y);
-        }
 
-
-
-        protected override void GenerateInternalRelationExplicit() {
-            if (Größe_fixiert) {
-                Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_RO));
-                Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_RU));
-                Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_LU));
-
-                Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_L));
-                Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_R));
-                Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_O));
-                Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_U));
-
-            } else {
-                Relations.Add(new clsPointRelation(Parent, this, enRelationType.WaagerechtSenkrecht, p_LO, p_RO));
-                Relations.Add(new clsPointRelation(Parent, this, enRelationType.WaagerechtSenkrecht, p_RU, p_LU));
-
-                Relations.Add(new clsPointRelation(Parent, this, enRelationType.WaagerechtSenkrecht, p_LO, p_LU));
-                Relations.Add(new clsPointRelation(Parent, this, enRelationType.WaagerechtSenkrecht, p_RO, p_RU));
-
-            }
-        }
 
         public override List<FlexiControl> GetStyleOptions() {
             var l = new List<FlexiControl>
@@ -151,12 +97,9 @@ namespace BlueControls.ItemCollection {
                 new FlexiControlForProperty(this, "Drehwinkel")
             };
 
-            if (!Größe_fixiert && !p_LO.CanMove(Parent.AllRelations) && !p_RU.CanMove(Parent.AllRelations)) {
-                l.Add(new FlexiControl());
-                l.Add(new FlexiControl("Objekt fest definiert,<br>Größe kann nicht fixiert werden"));
-            } else {
-                l.Add(new FlexiControlForProperty(this, "Größe_fixiert"));
-            }
+
+            l.Add(new FlexiControlForProperty(this, "Größe_fixiert"));
+
 
             l.AddRange(base.GetStyleOptions());
             return l;
@@ -165,7 +108,7 @@ namespace BlueControls.ItemCollection {
 
         public void SetCoordinates(RectangleM r, bool overrideFixedSize) {
 
-            if (_größe_fixiert && !overrideFixedSize) {
+            if (!overrideFixedSize) {
                 var vr = r.PointOf(enAlignment.Horizontal_Vertical_Center);
                 var ur = UsedArea();
 
@@ -178,7 +121,6 @@ namespace BlueControls.ItemCollection {
                 p_RU.SetTo(r.PointOf(enAlignment.Bottom_Right));
             }
 
-            RecalculateAndOnChanged();
         }
 
 
@@ -187,19 +129,84 @@ namespace BlueControls.ItemCollection {
             return new RectangleM(Math.Min(p_LO.X, p_RU.X), Math.Min(p_LO.Y, p_RU.Y), Math.Abs(p_RU.X - p_LO.X), Math.Abs(p_RU.Y - p_LO.Y));
         }
 
-        public override void CaluclatePointsWORelations() {
-            p_RO.SetTo(p_RU.X, p_LO.Y);
-            p_LU.SetTo(p_LO.X, p_RU.Y);
+        public override void PointMoved(PointM point) {
+
+            //PointM Second = null;
+
+            var x = 0m;
+            var y = 0m;
+
+            if (point != null) {
+                x = point.X;
+                y = point.Y;
+            }
+
+
+            if (point == p_LO) {
+                p_O.Y = y;
+                p_L.X = x;
+
+            }
+
+            if (point == p_RO) {
+                p_O.Y = y;
+                p_R.X = x;
+            }
+
+            if (point == p_LU) {
+                p_L.X = x;
+                p_U.Y = y;
+            }
+
+            if (point == p_RU) {
+                p_R.X = x;
+                p_U.Y = y;
+
+            }
+
+            if (point == p_O) {
+                p_LO.Y = y;
+                p_RO.Y = y;
+            }
+
+            if (point == p_U) {
+                p_LU.Y = y;
+                p_RU.Y = y;
+            }
+
+            if (point == p_L) {
+                p_LO.X = x;
+                p_LU.X = x;
+            }
+
+            if (point == p_R) {
+                p_RO.X = x;
+                p_RU.X = x;
+            }
+
+            if (point is null) {
+                //  Wichtig, weil wenn p_r, p_l, p_o, p_u mittig gesetzt werde und diese auf null sind, ist das schlecht.
+                var x1 = p_RU.X;
+                var y1 = p_RU.Y;
+
+                PointMoved(p_LO);
+                p_RU.SetTo(x1, y1);
+                return;
+            }
+
+            //p_RO.SetTo(p_RU.X, p_LO.Y);
+            //p_LU.SetTo(p_LO.X, p_RU.Y);
 
 
 
-            p_L.SetTo(p_LO.X, p_LO.Y + (p_LU.Y - p_LO.Y) / 2);
-            p_R.SetTo(p_RO.X, p_L.Y);
+            p_L.Y = p_LO.Y + (p_LU.Y - p_LO.Y) / 2;
+            p_R.Y = p_L.Y;
 
-            p_O.SetTo(p_LO.X + (p_RO.X - p_LO.X) / 2, p_LO.Y);
-            p_U.SetTo(p_O.X, p_LU.Y);
+            p_O.X = p_LO.X + (p_RO.X - p_LO.X) / 2;
+            p_U.X = p_O.X;
 
-            base.CaluclatePointsWORelations();
+
+
         }
 
 
@@ -207,21 +214,22 @@ namespace BlueControls.ItemCollection {
             if (base.ParseThis(tag, value)) { return true; }
 
             switch (tag) {
-                case "fixsize":
-                    _größe_fixiert = value.FromPlusMinus();
+                case "fixsize": // TODO: Entfernt am 24.05.2021
+                    //_größe_fixiert = value.FromPlusMinus();
                     return true;
+
 
                 case "rotation":
                     _drehwinkel = int.Parse(value);
                     return true;
             }
+
             return false;
         }
         public override string ToString() {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
             if (Drehwinkel != 0) { t = t + "Rotation=" + Drehwinkel + ", "; }
-            t = t + "Fixsize=" + Größe_fixiert.ToPlusMinus() + ", ";
             return t.Trim(", ") + "}";
         }
 
@@ -233,6 +241,11 @@ namespace BlueControls.ItemCollection {
                         GR.DrawRectangle(new Pen(Color.Gray, (float)cZoom), DCoordinates);
                     } else {
                         GR.DrawRectangle(CreativePad.PenGray, DCoordinates);
+                    }
+
+
+                    if (DCoordinates.Width < 1 || DCoordinates.Height < 1) {
+                        GR.DrawEllipse(new Pen(Color.Gray, 3), DCoordinates.Left - 5, DCoordinates.Top + 5, 10, 10);
                     }
 
 

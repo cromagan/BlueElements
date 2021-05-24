@@ -134,9 +134,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             var c = new CreativePad();
 
             c.Item.Caption = ex;
-            Pad.Grid = false;
             Database.Layouts.Add(c.Item.ToString());
-            Pad.Grid = ckbRaster.Checked;
 
             befülleLayoutDropdown();
 
@@ -243,9 +241,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (Database == null) { return; }
             if (string.IsNullOrEmpty(_LoadedLayout)) { return; }
 
-            Pad.Grid = false;
             var newl = Pad.Item.ToString();
-            Pad.Grid = ckbRaster.Checked;
 
             if (_LoadedLayout.StartsWith("#")) {
                 var ind = Database.LayoutIDToIndex(_LoadedLayout);

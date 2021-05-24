@@ -65,8 +65,10 @@ namespace BlueControls.ItemCollection {
             Point1.SetTo(point1);
             Point2.SetTo(point2);
 
-            Points.Add(Point1);
-            Points.Add(Point2);
+            MovablePoint.Add(Point1);
+            MovablePoint.Add(Point2);
+
+            PointsForSuccesfullyMove.AddRange(MovablePoint);
 
 
             Stil = format;
@@ -164,11 +166,10 @@ namespace BlueControls.ItemCollection {
 
         }
 
-        public override void Move(decimal x, decimal y) {
+        public void Move(decimal x, decimal y) {
             _LastRecalc = DateTime.Now.AddHours(-1);
             Point1.SetTo(Point1.X + x, Point1.Y + y);
             Point2.SetTo(Point2.X + x, Point2.Y + y);
-            base.Move(x, y);
         }
 
 
@@ -206,7 +207,6 @@ namespace BlueControls.ItemCollection {
             return t.TrimEnd(", ") + "}";
         }
 
-        protected override void GenerateInternalRelationExplicit() { }
 
         private void CalcTempPoints() {
             var NewCode = Point1 + Point2.ToString();
@@ -648,9 +648,8 @@ namespace BlueControls.ItemCollection {
         }
 
 
-        public override void CaluclatePointsWORelations() {
+        public override void PointMoved(PointM point) {
             CalcTempPoints();
-            base.CaluclatePointsWORelations();
         }
 
         public override List<FlexiControl> GetStyleOptions() {

@@ -837,7 +837,6 @@ using System.Reflection;
 
 namespace BlueControls {
     public static class Skin {
-        //public static Database SkinDB;
         public static Database StyleDB;
 
         public static bool inited = false;
@@ -847,67 +846,15 @@ namespace BlueControls {
         internal static Pen Pen_LinieKräftig;
         internal static Pen Pen_LinieDick;
 
-        //private static string _SkinString = string.Empty;
-
-
         public static readonly float Scale = (float)Math.Round(System.Windows.Forms.SystemInformation.VirtualScreen.Width / System.Windows.SystemParameters.VirtualScreenWidth, 2);
-
 
         public static string ErrorFont = "<Name=Arial, Size=8, Color=FF0000>";
         public static string DummyStandardFont = "<Name=Arial, Size=10>";
 
-
         public static readonly int PaddingSmal = 3; // Der Abstand von z.B. in Textboxen: Text Linke Koordinate
         public static readonly int Padding = 9;
 
-
         public static readonly Dictionary<enDesign, Dictionary<enStates, clsDesign>> Design = new();
-
-
-        //[Obsolete]
-        //private static enStates SkinRow_LastState = enStates.Undefiniert;
-        //[Obsolete]
-        //private static enDesign SkinRow_LastType = enDesign.Undefiniert;
-        //[Obsolete]
-        //private static RowItem SkinRow_LastRow;
-
-
-        //[Obsolete]
-        //private static ColumnItem ColX1 = null;
-        //[Obsolete]
-        //private static ColumnItem ColX2 = null;
-        //[Obsolete]
-        //private static ColumnItem ColY2 = null;
-        //[Obsolete]
-        //private static ColumnItem ColY1 = null;
-
-        //[Obsolete]
-        //private static ColumnItem col_Color_Back_1 = null;
-        //[Obsolete]
-        //private static ColumnItem col_Color_Back_2 = null;
-        ////private static ColumnItem col_Color_Back_3 = null;
-        //[Obsolete]
-        //private static ColumnItem col_Color_Border_1 = null;
-        //[Obsolete]
-        //private static ColumnItem col_Color_Border_2 = null;
-        //[Obsolete]
-        //private static ColumnItem col_Color_Border_3 = null;
-        //[Obsolete]
-        //private static ColumnItem col_Kontur = null;
-        //[Obsolete]
-        //private static ColumnItem col_Draw_Back = null;
-        //[Obsolete]
-        //private static ColumnItem col_Verlauf_Mitte = null;
-        //[Obsolete]
-        //private static ColumnItem col_Border_Style = null;
-
-        //[Obsolete]
-        //private static ColumnItem col_Font = null;
-        //[Obsolete]
-        //private static ColumnItem col_StandardPic = null;
-
-
-
 
         public static void LoadSkin() {
             //_SkinString = "Windows10";
@@ -1214,10 +1161,6 @@ namespace BlueControls {
         }
 
 
-
-
-
-
         public static enImageCodeEffect AdditionalState(enStates vState) {
             if (vState.HasFlag(enStates.Standard_Disabled)) { return ST[0]; }
             return enImageCodeEffect.Ohne;
@@ -1231,66 +1174,6 @@ namespace BlueControls {
         internal static Color Color_Border(enDesign vDesign, enStates vState) {
             return DesignOf(vDesign, vState).BorderColor1;
         }
-
-        //private static int Value(RowItem row, ColumnItem column, int defaultValue) {
-        //    if (SkinDB == null || row == null) { return defaultValue; }
-
-
-        //    //if (row.CellIsNullOrEmpty(column))
-        //    //{
-        //    //    Develop.DebugPrint("Skin-Fehler: " + row.Database.Filename + " - " + column.Caption + " - " + row.CellFirstString());
-        //    //    return defaultValue;
-        //    //}
-
-        //    return row.CellGetInteger(column);
-        //}
-
-        //private static float Value(RowItem row, ColumnItem column, float defaultValue) {
-        //    if (SkinDB == null || row == null) { return defaultValue; }
-
-
-        //    //if (row.CellIsNullOrEmpty(column))
-        //    //{
-        //    //    Develop.DebugPrint("Skin-Fehler: " + row.Database.Filename + " - " + column.Caption + " - " + row.CellFirstString());
-        //    //    return defaultValue;
-        //    //}
-
-        //    return (float)row.CellGetDouble(column);
-        //}
-
-
-
-        //private static string Value(RowItem row, ColumnItem column, string defaultValue) {
-        //    if (SkinDB == null || row == null) { return defaultValue; }
-
-
-        //    //if (row.CellIsNullOrEmpty(column))
-        //    //{
-        //    //    Develop.DebugPrint("Skin-Fehler: " + row.Database.Filename + " - " + column.Caption + " - " + row.CellFirstString());
-        //    //    return defaultValue;
-        //    //}
-
-        //    return row.CellGetString(column);
-        //}
-
-
-        //internal static RowItem SkinRow(enDesign vDesign, enStates vState) {
-
-        //    //Kann vorkommen, wenn die Database zweck Userwechsel neu geladen wird
-        //    if (SkinDB == null) { return null; }
-
-
-        //    if (SkinRow_LastType == vDesign && SkinRow_LastState == vState && SkinRow_LastRow == null) { return SkinRow_LastRow; }
-
-        //    SkinRow_LastRow = SkinDB.Row[new FilterItem(SkinDB.Column[0], enFilterType.Istgleich, ((int)vDesign).ToString()),
-        //                                 new FilterItem(SkinDB.Column[1], enFilterType.Istgleich, ((int)vState).ToString())];
-        //    SkinRow_LastState = vState;
-        //    SkinRow_LastType = vDesign;
-
-        //    if (SkinRow_LastRow == null) { Develop.DebugPrint("Unbekanntes Skin: " + SkinDB.Filename.FileNameWithoutSuffix() + "/" + vDesign + "/" + vState); }
-
-        //    return SkinRow_LastRow;
-        //}
 
 
 
@@ -1840,28 +1723,6 @@ namespace BlueControls {
             Draw_FormatedText(gr, txt, tmpImage, align, fitInRect, child, deleteBack, design.bFont, translate);
         }
 
-        ///// <summary>
-        ///// Status des Bildes (Disabled) wird geändert
-        ///// </summary>
-        ///// <param name="GR"></param>
-        ///// <param name="TXT"></param>
-        ///// <param name="QI"></param>
-        ///// <param name="SkinRow"></param>
-        ///// <param name="vAlign"></param>
-        ///// <param name="FitInRect"></param>
-        ///// <param name="Child"></param>
-        ///// <param name="DeleteBack"></param>
-        //public static void Draw_FormatedText(Graphics GR, string TXT, QuickImage QI, clsDesign design,  enAlignment vAlign, Rectangle FitInRect, System.Windows.Forms.Control Child, bool DeleteBack, bool Translate) {
-        //    if (string.IsNullOrEmpty(TXT) && QI == null) { return; }
-
-
-        //    //  var State = (enStates)Value(SkinRow, col_Status, -1);
-        //    QuickImage tmpImage = null;
-        //    if (QI != null) { tmpImage = QuickImage.Get(QI, AdditionalState(design.Status)); }
-
-        //    Draw_FormatedText(GR, TXT, tmpImage, vAlign, FitInRect, Child, DeleteBack, design.bFont, Translate);
-        //}
-
         public static ItemCollectionList GetRahmenArt(RowItem SheetStyle, bool MitOhne) {
 
             var Rahms = new ItemCollectionList();
@@ -1973,50 +1834,58 @@ namespace BlueControls {
 
 
 
-        public static Size FormatedText_NeededSize(string tmpText, QuickImage tmpImageCode, BlueFont F, int MinSize) {
-            var pSize = SizeF.Empty;
-            var tSize = SizeF.Empty;
+        public static Size FormatedText_NeededSize(string text, QuickImage image, BlueFont font, int minSie) {
+            try {
 
-            if (F == null) { return new Size(3, 3); }
 
-            if (tmpImageCode != null) { pSize = tmpImageCode.BMP.Size; }
-            if (!string.IsNullOrEmpty(tmpText)) { tSize = BlueFont.MeasureString(tmpText, F.Font()); }
+                var pSize = SizeF.Empty;
+                var tSize = SizeF.Empty;
 
-            if (!string.IsNullOrEmpty(tmpText)) {
-                if (tmpImageCode == null) {
-                    return new Size((int)(tSize.Width + 1), Math.Max((int)tSize.Height, MinSize));
+                if (font == null) { return new Size(3, 3); }
+
+                if (image != null) { pSize = image.BMP.Size; }
+                if (!string.IsNullOrEmpty(text)) { tSize = BlueFont.MeasureString(text, font.Font()); }
+
+                if (!string.IsNullOrEmpty(text)) {
+                    if (image == null) {
+                        return new Size((int)(tSize.Width + 1), Math.Max((int)tSize.Height, minSie));
+                    }
+
+                    return new Size((int)(tSize.Width + 2 + pSize.Width + 1), Math.Max((int)tSize.Height, (int)pSize.Height));
                 }
 
-                return new Size((int)(tSize.Width + 2 + pSize.Width + 1), Math.Max((int)tSize.Height, (int)pSize.Height));
+                if (image != null) {
+                    return new Size((int)pSize.Width, (int)pSize.Height);
+                }
+
+                return new Size(minSie, minSie);
+            } catch {
+                // tmpImageCode wird an anderer Stelle verwendet
+                return FormatedText_NeededSize(text, image, font, minSie);
             }
 
-            if (tmpImageCode != null) {
-                return new Size((int)pSize.Width, (int)pSize.Height);
-            }
-
-            return new Size(MinSize, MinSize);
         }
 
 
-        internal static BlueFont GetBlueFont(int _Design, enStates vState, RowItem RowOfStyle, int Stufe) {
-            if (_Design > 10000) {
-                return Skin.GetBlueFont((PadStyles)_Design, RowOfStyle, Stufe);
+        internal static BlueFont GetBlueFont(int design, enStates state, RowItem rowOfStyle, int stufe) {
+            if (design > 10000) {
+                return Skin.GetBlueFont((PadStyles)design, rowOfStyle, stufe);
             }
 
-            return Skin.GetBlueFont((enDesign)_Design, vState, Stufe);
+            return Skin.GetBlueFont((enDesign)design, state, stufe);
         }
 
-        internal static BlueFont GetBlueFont(PadStyles padStyle, RowItem RowOfStyle, int Stufe) {
-            switch (Stufe) {
+        internal static BlueFont GetBlueFont(PadStyles padStyle, RowItem rowOfStyle, int stufe) {
+            switch (stufe) {
                 case 4:
-                    return GetBlueFont(padStyle, RowOfStyle);
+                    return GetBlueFont(padStyle, rowOfStyle);
 
                 case 3:
                     switch (padStyle) {
                         case PadStyles.Style_Standard:
-                            return GetBlueFont(PadStyles.Style_Überschrift_Kapitel, RowOfStyle);
+                            return GetBlueFont(PadStyles.Style_Überschrift_Kapitel, rowOfStyle);
                         case PadStyles.Style_StandardFett:
-                            return GetBlueFont(PadStyles.Style_Überschrift_Kapitel, RowOfStyle);
+                            return GetBlueFont(PadStyles.Style_Überschrift_Kapitel, rowOfStyle);
                             //    Case Else : Return BlueFont(vDesign, vState)
                     }
                     break;
@@ -2024,9 +1893,9 @@ namespace BlueControls {
                 case 2:
                     switch (padStyle) {
                         case PadStyles.Style_Standard:
-                            return GetBlueFont(PadStyles.Style_Überschrift_Untertitel, RowOfStyle);
+                            return GetBlueFont(PadStyles.Style_Überschrift_Untertitel, rowOfStyle);
                         case PadStyles.Style_StandardFett:
-                            return GetBlueFont(PadStyles.Style_Überschrift_Untertitel, RowOfStyle);
+                            return GetBlueFont(PadStyles.Style_Überschrift_Untertitel, rowOfStyle);
                             //    Case Else : Return BlueFont(vDesign, vState)
                     }
                     break;
@@ -2034,9 +1903,9 @@ namespace BlueControls {
                 case 1:
                     switch (padStyle) {
                         case PadStyles.Style_Standard:
-                            return GetBlueFont(PadStyles.Style_Überschrift_Haupt, RowOfStyle);
+                            return GetBlueFont(PadStyles.Style_Überschrift_Haupt, rowOfStyle);
                         case PadStyles.Style_StandardFett:
-                            return GetBlueFont(PadStyles.Style_Überschrift_Haupt, RowOfStyle);
+                            return GetBlueFont(PadStyles.Style_Überschrift_Haupt, rowOfStyle);
                             //  Case Else : Return BlueFont(vDesign, vState)
                     }
                     break;
@@ -2044,76 +1913,68 @@ namespace BlueControls {
                 case 7:
                     switch (padStyle) {
                         case PadStyles.Style_Standard:
-                            return GetBlueFont(PadStyles.Style_StandardFett, RowOfStyle);
+                            return GetBlueFont(PadStyles.Style_StandardFett, rowOfStyle);
                         case PadStyles.Style_StandardFett:
-                            return GetBlueFont(PadStyles.Style_Standard, RowOfStyle);
+                            return GetBlueFont(PadStyles.Style_Standard, rowOfStyle);
                             //default: : Return BlueFont(vDesign, vState)
                     }
                     break;
 
             }
 
-            Develop.DebugPrint(enFehlerArt.Fehler, "Stufe " + Stufe + " nicht definiert.");
+            Develop.DebugPrint(enFehlerArt.Fehler, "Stufe " + stufe + " nicht definiert.");
             return null;
         }
 
 
-        internal static BlueFont GetBlueFont(enDesign vDesign, enStates vState, int Stufe) {
+        internal static BlueFont GetBlueFont(enDesign design, enStates state, int stufe) {
 
-            if (Stufe != 4 && vDesign != enDesign.TextBox) {
-                if (vDesign == enDesign.Form_QuickInfo) { return GetBlueFont(vDesign, vState); } // QuickInfo kann jeden Text enthatlten
+            if (stufe != 4 && design != enDesign.TextBox) {
+                if (design == enDesign.Form_QuickInfo) { return GetBlueFont(design, state); } // QuickInfo kann jeden Text enthatlten
 
-                Develop.DebugPrint(enFehlerArt.Warnung, "Design unbekannt: " + (int)vDesign);
-                return GetBlueFont(vDesign, vState);
+                Develop.DebugPrint(enFehlerArt.Warnung, "Design unbekannt: " + (int)design);
+                return GetBlueFont(design, state);
             }
 
 
-            switch (Stufe) {
+            switch (stufe) {
                 case 4:
-                    return GetBlueFont(vDesign, vState);
+                    return GetBlueFont(design, state);
 
                 case 3:
-                    return GetBlueFont(enDesign.TextBox_Stufe3, vState);
+                    return GetBlueFont(enDesign.TextBox_Stufe3, state);
 
                 case 2:
-                    return GetBlueFont(enDesign.TextBox_Stufe3, vState);
+                    return GetBlueFont(enDesign.TextBox_Stufe3, state);
 
                 case 1:
-                    return GetBlueFont(enDesign.TextBox_Stufe3, vState);
+                    return GetBlueFont(enDesign.TextBox_Stufe3, state);
                 case 7:
-                    return GetBlueFont(enDesign.TextBox_Bold, vState);
+                    return GetBlueFont(enDesign.TextBox_Bold, state);
             }
 
-            Develop.DebugPrint(enFehlerArt.Fehler, "Stufe " + Stufe + " nicht definiert.");
-            return GetBlueFont(vDesign, vState);
+            Develop.DebugPrint(enFehlerArt.Fehler, "Stufe " + stufe + " nicht definiert.");
+            return GetBlueFont(design, state);
         }
 
 
 
 
-
-
-
-
-
-
-
-
-        public static BlueFont GetBlueFont(PadStyles vFormat, RowItem RowOfStyle) {
+        public static BlueFont GetBlueFont(PadStyles format, RowItem rowOfStyle) {
             if (StyleDB == null) { InitStyles(); }
-            if (StyleDB == null || RowOfStyle == null) { return BlueFont.Get(ErrorFont); }
+            if (StyleDB == null || rowOfStyle == null) { return BlueFont.Get(ErrorFont); }
 
-            return GetBlueFont(StyleDB, ((int)vFormat).ToString(), RowOfStyle);
+            return GetBlueFont(StyleDB, ((int)format).ToString(), rowOfStyle);
         }
 
-        public static BlueFont GetBlueFont(Database StyleDB, string ColumnName, RowItem Row) {
-            return GetBlueFont(StyleDB, StyleDB.Column[ColumnName], Row);
+        public static BlueFont GetBlueFont(Database styleDB, string column, RowItem row) {
+            return GetBlueFont(styleDB, styleDB.Column[column], row);
         }
 
-        public static BlueFont GetBlueFont(Database StyleDB, ColumnItem Column, RowItem Row) {
-            var _String = StyleDB.Cell.GetString(Column, Row);
+        public static BlueFont GetBlueFont(Database styleDB, ColumnItem column, RowItem row) {
+            var _String = styleDB.Cell.GetString(column, row);
             if (string.IsNullOrEmpty(_String)) {
-                Develop.DebugPrint("Schrift nicht definiert: " + StyleDB.Filename + " - " + Column.Name + " - " + Row.CellFirstString());
+                Develop.DebugPrint("Schrift nicht definiert: " + styleDB.Filename + " - " + column.Name + " - " + row.CellFirstString());
                 return null;
             }
             return BlueFont.Get(_String);
@@ -2121,39 +1982,10 @@ namespace BlueControls {
 
 
 
-        public static BlueFont GetBlueFont(enDesign vDesign, enStates vState) {
-            return DesignOf(vDesign, vState).bFont;
+        public static BlueFont GetBlueFont(enDesign design, enStates state) {
+            return DesignOf(design, state).bFont;
         }
 
-
-        //public static BlueFont GetBlueFont(RowItem Row) {
-        //    return BlueFont.Get(Value(Row, col_Font, ErrorFont));
-        //}
-
-
-        //private static void Draw_Back_Verlauf_Vertical_3(Graphics GR, RowItem Row, Rectangle r) {
-
-        //    var cb = new ColorBlend();
-
-        //    var c1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
-        //    var c2 = Color.FromArgb(Value(Row, col_Color_Back_2, 0));
-        //    var c3 = Color.FromArgb(Value(Row, col_Color_Back_3, 0));
-        //    var PR = Value(Row, col_Verlauf_Mitte, 0.5f);
-        //    var lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Bottom), c1, c3);
-
-        //    cb.Colors = new[] { c1, c2, c3 };
-        //    cb.Positions = new[] { 0.0F, PR, 1.0F };
-
-        //    lgb.InterpolationColors = cb;
-        //    lgb.GammaCorrection = true;
-
-        //    GR.FillRectangle(lgb, r);
-        //}
-
-
-        //public static string PicCode(RowItem _Row) {
-        //    return Value(_Row, col_StandardPic, "Kreuz|16");
-        //}
 
 
         #region  Styles 
@@ -2170,12 +2002,5 @@ namespace BlueControls {
         }
 
         #endregion
-
-
-
-
-
-
-
     }
 }

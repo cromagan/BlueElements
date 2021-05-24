@@ -47,21 +47,17 @@ namespace BlueControls.Forms
             this.btnAddUnterStufe = new BlueControls.Controls.Button();
             this.btnAddText = new BlueControls.Controls.Button();
             this.btnAddImage = new BlueControls.Controls.Button();
-            this.btnAddDistance = new BlueControls.Controls.Button();
             this.btnAddDimension = new BlueControls.Controls.Button();
             this.btnAddLine = new BlueControls.Controls.Button();
             this.grpWerkzeuge = new BlueControls.Controls.GroupBox();
             this.btnAuswahl = new BlueControls.Controls.Button();
             this.Page_Settings = new BlueControls.Controls.TabPage();
             this.Area_Assistent = new BlueControls.Controls.GroupBox();
-            this.Bez_None = new BlueControls.Controls.Button();
-            this.Bez_Direkt = new BlueControls.Controls.Button();
             this.capRasterFangen = new BlueControls.Controls.Caption();
             this.capRasterAnzeige = new BlueControls.Controls.Caption();
             this.txbRasterFangen = new BlueControls.Controls.TextBox();
             this.txbRasterAnzeige = new BlueControls.Controls.TextBox();
             this.ckbRaster = new BlueControls.Controls.Button();
-            this.Bez_All = new BlueControls.Controls.Button();
             this.Area_Design = new BlueControls.Controls.GroupBox();
             this.btnHintergrundFarbe = new BlueControls.Controls.Button();
             this.btnVorschauModus = new BlueControls.Controls.Button();
@@ -118,8 +114,6 @@ namespace BlueControls.Forms
             // Pad
             // 
             this.Pad.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.Pad.GridShow = 10F;
-            this.Pad.GridSnap = 1F;
             this.Pad.Location = new System.Drawing.Point(0, 110);
             this.Pad.Name = "Pad";
             this.Pad.Size = new System.Drawing.Size(1334, 571);
@@ -290,7 +284,6 @@ namespace BlueControls.Forms
             this.grpKomponenteHinzufügen.Controls.Add(this.btnAddUnterStufe);
             this.grpKomponenteHinzufügen.Controls.Add(this.btnAddText);
             this.grpKomponenteHinzufügen.Controls.Add(this.btnAddImage);
-            this.grpKomponenteHinzufügen.Controls.Add(this.btnAddDistance);
             this.grpKomponenteHinzufügen.Controls.Add(this.btnAddDimension);
             this.grpKomponenteHinzufügen.Controls.Add(this.btnAddLine);
             this.grpKomponenteHinzufügen.Dock = System.Windows.Forms.DockStyle.Left;
@@ -351,16 +344,6 @@ namespace BlueControls.Forms
             this.btnAddImage.TabIndex = 2;
             this.btnAddImage.Text = "Bild";
             this.btnAddImage.Click += new System.EventHandler(this.btnAddImage_Click);
-            // 
-            // btnAddDistance
-            // 
-            this.btnAddDistance.ImageCode = "Kreis2|16|||||124|0";
-            this.btnAddDistance.Location = new System.Drawing.Point(96, 46);
-            this.btnAddDistance.Name = "btnAddDistance";
-            this.btnAddDistance.Size = new System.Drawing.Size(72, 22);
-            this.btnAddDistance.TabIndex = 5;
-            this.btnAddDistance.Text = "Distanz";
-            this.btnAddDistance.Click += new System.EventHandler(this.btnAddDistance_Click);
             // 
             // btnAddDimension
             // 
@@ -424,14 +407,11 @@ namespace BlueControls.Forms
             // 
             this.Area_Assistent.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.Area_Assistent.CausesValidation = false;
-            this.Area_Assistent.Controls.Add(this.Bez_None);
-            this.Area_Assistent.Controls.Add(this.Bez_Direkt);
             this.Area_Assistent.Controls.Add(this.capRasterFangen);
             this.Area_Assistent.Controls.Add(this.capRasterAnzeige);
             this.Area_Assistent.Controls.Add(this.txbRasterFangen);
             this.Area_Assistent.Controls.Add(this.txbRasterAnzeige);
             this.Area_Assistent.Controls.Add(this.ckbRaster);
-            this.Area_Assistent.Controls.Add(this.Bez_All);
             this.Area_Assistent.Dock = System.Windows.Forms.DockStyle.Left;
             this.Area_Assistent.Location = new System.Drawing.Point(464, 0);
             this.Area_Assistent.Name = "Area_Assistent";
@@ -439,27 +419,6 @@ namespace BlueControls.Forms
             this.Area_Assistent.TabIndex = 0;
             this.Area_Assistent.TabStop = false;
             this.Area_Assistent.Text = "Assistenten";
-            // 
-            // Bez_None
-            // 
-            this.Bez_None.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox_Text;
-            this.Bez_None.Location = new System.Drawing.Point(152, 46);
-            this.Bez_None.Name = "Bez_None";
-            this.Bez_None.Size = new System.Drawing.Size(256, 22);
-            this.Bez_None.TabIndex = 10;
-            this.Bez_None.Text = "Automatische Beziehungen deaktivieren";
-            this.Bez_None.CheckedChanged += new System.EventHandler(this.BezMode_CheckedChanged);
-            // 
-            // Bez_Direkt
-            // 
-            this.Bez_Direkt.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox_Text;
-            this.Bez_Direkt.Checked = true;
-            this.Bez_Direkt.Location = new System.Drawing.Point(152, 24);
-            this.Bez_Direkt.Name = "Bez_Direkt";
-            this.Bez_Direkt.Size = new System.Drawing.Size(256, 22);
-            this.Bez_Direkt.TabIndex = 9;
-            this.Bez_Direkt.Text = "Nur Direktverbindungen erstellen";
-            this.Bez_Direkt.CheckedChanged += new System.EventHandler(this.BezMode_CheckedChanged);
             // 
             // capRasterFangen
             // 
@@ -500,7 +459,7 @@ namespace BlueControls.Forms
             this.txbRasterAnzeige.TabIndex = 5;
             this.txbRasterAnzeige.Text = "10";
             this.txbRasterAnzeige.TextChanged += new System.EventHandler(this.txbRasterAnzeige_TextChanged);
-            // 
+            //
             // ckbRaster
             // 
             this.ckbRaster.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox;
@@ -511,16 +470,6 @@ namespace BlueControls.Forms
             this.ckbRaster.TabIndex = 4;
             this.ckbRaster.Text = "Raster";
             this.ckbRaster.CheckedChanged += new System.EventHandler(this.ckbRaster_CheckedChanged);
-            // 
-            // Bez_All
-            // 
-            this.Bez_All.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox_Text;
-            this.Bez_All.Location = new System.Drawing.Point(152, 2);
-            this.Bez_All.Name = "Bez_All";
-            this.Bez_All.Size = new System.Drawing.Size(256, 22);
-            this.Bez_All.TabIndex = 3;
-            this.Bez_All.Text = "Alle Beziehungen erstellen";
-            this.Bez_All.CheckedChanged += new System.EventHandler(this.BezMode_CheckedChanged);
             // 
             // Area_Design
             // 
@@ -657,7 +606,6 @@ namespace BlueControls.Forms
 			private Button btnAuswahl;
 			private Button btnAddText;
 			private Button btnAddImage;
-			private Button btnAddDistance;
 			private Button btnAddDimension;
 			private Button btnAddLine;
 			public CreativePad Pad;
@@ -676,14 +624,11 @@ namespace BlueControls.Forms
 			private Button Bild;
 			private Button Vorschau;
 			private ComboBox PadDesign;
-			private Button Bez_All;
-			protected Button ckbRaster;
-			private Caption capRasterFangen;
+            protected Button ckbRaster;
+            private Caption capRasterFangen;
 			private Caption capRasterAnzeige;
 			private TextBox txbRasterFangen;
 			private TextBox txbRasterAnzeige;
-			private Button Bez_None;
-			private Button Bez_Direkt;
 			internal ComboBox SchriftGröße;
 			internal Caption sscchrifthgöße;
 			protected internal Button Button_PageSetup;

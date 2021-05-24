@@ -18,23 +18,16 @@
 #endregion
 
 
-namespace BlueBasics.Enums {
-    public enum enRelationType {
-        None = 0,
+namespace BlueControls.Enums {
 
-        // Reihenfolge wichtig für Berechnung.
-        // Zuerst die mächtigsten, die die am einfachsten erfüllt werden können.
+    public enum enSnapMode {
 
 
-        PositionZueinander = 10,
-        YPositionZueinander = 11,
-        WaagerechtSenkrecht = 20,
-
-        AbstandZueinander = 30,
+        Ohne =0,
+        SnapToGrid =1,
+        //SnapToObjetcs =2
 
 
 
-
-        Dummy = 1000
     }
 }

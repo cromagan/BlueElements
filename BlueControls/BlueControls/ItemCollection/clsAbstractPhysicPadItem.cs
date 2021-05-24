@@ -31,9 +31,12 @@ namespace BlueControls.ItemCollection {
         public readonly List<PointM> Edges = new();
 
         protected clsAbstractPhysicPadItem(ItemCollectionPad parent, string internalname) : base(parent, internalname) {
-            Points.Add(new PointM(5, 0));
-            Points.Add(new PointM(10, 10));
-            Points.Add(new PointM(0, 10));
+            MovablePoint.Add(new PointM(5, 0));
+            MovablePoint.Add(new PointM(10, 10));
+            MovablePoint.Add(new PointM(0, 10));
+
+
+            PointsForSuccesfullyMove.AddRange(MovablePoint);
 
             Edges.Clear();
         }
@@ -45,7 +48,7 @@ namespace BlueControls.ItemCollection {
             var maxy = decimal.MinValue;
 
 
-            foreach (var thisP in Points) {
+            foreach (var thisP in MovablePoint) {
                 minx = Math.Min(minx, thisP.X);
                 maxx = Math.Max(maxx, thisP.X);
                 miny = Math.Min(miny, thisP.Y);
@@ -63,11 +66,11 @@ namespace BlueControls.ItemCollection {
 
         protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
 
-            if (Points.Count < 1) { return; }
+            if (MovablePoint.Count < 1) { return; }
 
-            var lastP = Points[Points.Count - 1];
+            var lastP = MovablePoint[MovablePoint.Count - 1];
 
-            foreach (var thisP in Points) {
+            foreach (var thisP in MovablePoint) {
                 GR.DrawLine(Pens.Black, lastP.ZoomAndMove(cZoom, shiftX, shiftY), thisP.ZoomAndMove(cZoom, shiftX, shiftY));
                 lastP = thisP;
             }
@@ -76,7 +79,6 @@ namespace BlueControls.ItemCollection {
 
         }
 
-        protected override void GenerateInternalRelationExplicit() { }
 
         protected override void ParseFinished() { }
 
@@ -84,11 +86,11 @@ namespace BlueControls.ItemCollection {
         public void BuildEdges() {
 
             Edges.Clear();
-            for (var i = 0; i < Points.Count; i++) {
-                if (i + 1 >= Points.Count) {
-                    Edges.Add(Points[0] - Points[i]);
+            for (var i = 0; i < MovablePoint.Count; i++) {
+                if (i + 1 >= MovablePoint.Count) {
+                    Edges.Add(MovablePoint[0] - MovablePoint[i]);
                 } else {
-                    Edges.Add(Points[i + 1] - Points[i]);
+                    Edges.Add(MovablePoint[i + 1] - MovablePoint[i]);
                 }
             }
         }
@@ -97,12 +99,12 @@ namespace BlueControls.ItemCollection {
             get {
                 decimal totalX = 0;
                 decimal totalY = 0;
-                for (var i = 0; i < Points.Count; i++) {
-                    totalX += Points[i].X;
-                    totalY += Points[i].Y;
+                for (var i = 0; i < MovablePoint.Count; i++) {
+                    totalX += MovablePoint[i].X;
+                    totalY += MovablePoint[i].Y;
                 }
 
-                return new PointM(totalX / Points.Count, totalY / Points.Count);
+                return new PointM(totalX / MovablePoint.Count, totalY / MovablePoint.Count);
             }
         }
 
@@ -110,16 +112,7 @@ namespace BlueControls.ItemCollection {
             Move(v.X, v.Y);
         }
 
-        public override void Move(decimal x, decimal y) {
-            for (var i = 0; i < Points.Count; i++) {
-                Points[i].X += x;
-                Points[i].Y += y;
-            }
 
-            base.Move(x, y);
-
-            // Edges nicht neu berechnen, da diese sich nicht verändern
-        }
 
         #region Polygon Union
 
@@ -439,11 +432,11 @@ namespace BlueControls.ItemCollection {
         // Calculate the projection of a polygon on an axis and returns it as a [min, max] interval
         public static void ProjectPolygon(PointM axis, clsAbstractPhysicPadItem polygon, ref decimal min, ref decimal max) {
             // To project a point on an axis use the dot product
-            var d = axis.DotProduct(polygon.Points[0]);
+            var d = axis.DotProduct(polygon.MovablePoint[0]);
             min = d;
             max = d;
-            for (var i = 0; i < polygon.Points.Count; i++) {
-                d = polygon.Points[i].DotProduct(axis);
+            for (var i = 0; i < polygon.MovablePoint.Count; i++) {
+                d = polygon.MovablePoint[i].DotProduct(axis);
                 if (d < min) {
                     min = d;
                 } else {
@@ -463,10 +456,10 @@ namespace BlueControls.ItemCollection {
         // Find the polygon's centroid.
         public PointM FindCentroid() {
             // Add the first point at the end of the array.
-            var num_points = Points.Count - 1;
+            var num_points = MovablePoint.Count - 1;
             var pts = new PointM[num_points + 1];
-            Points.CopyTo(pts, 0);
-            pts[num_points] = Points[0];
+            MovablePoint.CopyTo(pts, 0);
+            pts[num_points] = MovablePoint[0];
 
             // Find the centroid.
             decimal X = 0;
@@ -505,10 +498,10 @@ namespace BlueControls.ItemCollection {
         // oriented clockwise.
         private decimal SignedPolygonArea() {
             // Add the first point to the end.
-            var num_points = Points.Count - 1;
+            var num_points = MovablePoint.Count - 1;
             var pts = new PointM[num_points + 1];
-            Points.CopyTo(pts, 0);
-            pts[num_points] = Points[0];
+            MovablePoint.CopyTo(pts, 0);
+            pts[num_points] = MovablePoint[0];
 
             // Get the areas.
             decimal area = 0;
@@ -539,15 +532,15 @@ namespace BlueControls.ItemCollection {
         public bool PointInPolygon(decimal X, decimal Y) {
             // Get the angle between the point and the
             // first and last vertices.
-            var max_point = Points.Count - 2;
-            var total_angle = GetAngle(Points[max_point].X, Points[max_point].Y, X, Y, Points[0].X, Points[0].Y);
+            var max_point = MovablePoint.Count - 2;
+            var total_angle = GetAngle(MovablePoint[max_point].X, MovablePoint[max_point].Y, X, Y, MovablePoint[0].X, MovablePoint[0].Y);
             // Add the angles from the point
             // to each other pair of vertices.
             for (var i = 0; i < max_point; i++) {
                 total_angle += GetAngle(
-                    Points[i].X, Points[i].Y,
+                    MovablePoint[i].X, MovablePoint[i].Y,
                     X, Y,
-                    Points[i + 1].X, Points[i + 1].Y);
+                    MovablePoint[i + 1].X, MovablePoint[i + 1].Y);
             }
 
             // The total angle should be 2 * PI or -2 * PI if
@@ -603,7 +596,7 @@ namespace BlueControls.ItemCollection {
             // is convex.
             var got_negative = false;
             var got_positive = false;
-            var num_points = Points.Count - 1;
+            var num_points = MovablePoint.Count - 1;
             int B, C;
             for (var A = 0; A < num_points; A++) {
                 B = (A + 1) % num_points;
@@ -611,9 +604,9 @@ namespace BlueControls.ItemCollection {
 
                 var cross_product =
                     CrossProductLength(
-                        Points[A].X, Points[A].Y,
-                        Points[B].X, Points[B].Y,
-                        Points[C].X, Points[C].Y);
+                        MovablePoint[A].X, MovablePoint[A].Y,
+                        MovablePoint[B].X, MovablePoint[B].Y,
+                        MovablePoint[C].X, MovablePoint[C].Y);
                 if (cross_product < 0) {
                     got_negative = true;
                 } else if (cross_product > 0) {

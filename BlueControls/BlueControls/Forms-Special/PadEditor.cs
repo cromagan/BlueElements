@@ -136,11 +136,11 @@ namespace BlueControls.Forms {
             Pad.Item.Add(b);
         }
 
-        private void btnAddDistance_Click(object sender, System.EventArgs e) {
-            var b = new SpacerPadItem(Pad.Item);
-            Pad.Item.Add(b);
-            b.SetCoordinates(new RectangleM(10, 10, 20, 20), false);
-        }
+        //private void btnAddDistance_Click(object sender, System.EventArgs e) {
+        //    var b = new SpacerPadItem(Pad.Item);
+        //    Pad.Item.Add(b);
+        //    b.SetCoordinates(new RectangleM(10, 10, 20, 20), false);
+        //}
 
         private void btnAddImage_Click(object sender, System.EventArgs e) {
             var b = new BitmapPadItem(Pad.Item, QuickImage.Get(enImageCode.Fragezeichen).BMP, new Size(1000, 1000));
@@ -188,44 +188,30 @@ namespace BlueControls.Forms {
 
 
         private void ckbRaster_CheckedChanged(object sender, System.EventArgs e) {
-            Pad.Grid = ckbRaster.Checked;
+
+            if (ckbRaster.Checked) {
+                Pad.Item.SnapMode = enSnapMode.SnapToGrid;
+            } else {
+                Pad.Item.SnapMode = enSnapMode.Ohne;
+            }
+
         }
 
         private void txbRasterAnzeige_TextChanged(object sender, System.EventArgs e) {
 
             if (!txbRasterAnzeige.Text.IsNumeral()) { return; }
 
-            Pad.GridShow = float.Parse(txbRasterAnzeige.Text);
+            Pad.Item.GridShow = float.Parse(txbRasterAnzeige.Text);
         }
 
         private void RasterFangen_TextChanged(object sender, System.EventArgs e) {
             if (!txbRasterFangen.Text.IsNumeral()) { return; }
 
-            Pad.GridSnap = float.Parse(txbRasterFangen.Text);
+            Pad.Item.GridSnap = float.Parse(txbRasterFangen.Text);
         }
 
 
-        private void BezMode_CheckedChanged(object sender, System.EventArgs e) {
-            CheckBezMode();
-        }
 
-
-        private void CheckBezMode() {
-            if (Bez_None.Checked) {
-                Pad.AutoRelation = enAutoRelationMode.None;
-            } else if (Bez_Direkt.Checked) {
-                Pad.AutoRelation = enAutoRelationMode.DirektVerbindungen_Erhalten;
-            } else if (Bez_All.Checked) {
-                Pad.AutoRelation = enAutoRelationMode.Alle_Erhalten;
-
-            }
-        }
-
-
-        protected override void OnLoad(System.EventArgs e) {
-            base.OnLoad(e);
-            CheckBezMode();
-        }
 
         private void SchriftGröße_ItemClicked(object sender, BasicListItemEventArgs e) {
             Pad.Item.SheetStyleScale = decimal.Parse(SchriftGröße.Text) / 100m;
@@ -279,15 +265,9 @@ namespace BlueControls.Forms {
         }
 
         private void SaveTab_FileOk(object sender, System.ComponentModel.CancelEventArgs e) {
-            Pad.Grid = false;
             var t = Pad.Item.ToString();
-            Pad.Grid = ckbRaster.Checked;
-
             SaveToDisk(SaveTab.FileName, t, false, System.Text.Encoding.GetEncoding(1252));
-
-
             btnLastFiles.AddFileName(SaveTab.FileName, string.Empty);
-
         }
 
         private void btnOeffnen_Click(object sender, System.EventArgs e) {

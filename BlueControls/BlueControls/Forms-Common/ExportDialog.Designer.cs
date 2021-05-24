@@ -194,8 +194,6 @@ namespace BlueControls.Forms
             this.TmpPad.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.TmpPad.GridShow = 10F;
-            this.TmpPad.GridSnap = 1F;
             this.TmpPad.Location = new System.Drawing.Point(8, 72);
             this.TmpPad.Name = "TmpPad";
             this.TmpPad.Size = new System.Drawing.Size(706, 568);
@@ -422,8 +420,6 @@ namespace BlueControls.Forms
             this.PrintPad.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.PrintPad.GridShow = 10F;
-            this.PrintPad.GridSnap = 1F;
             this.PrintPad.Location = new System.Drawing.Point(5, 60);
             this.PrintPad.Name = "PrintPad";
             this.PrintPad.Size = new System.Drawing.Size(706, 568);

@@ -98,9 +98,9 @@ namespace BlueControls.Controls {
             /// Punkte
             foreach (var ThisPoint in points) {
                 if (_Helper.HasFlag(enHelpers.PointNames)) {
-                    ThisPoint.Draw(e.G, e.Zoom, e.ShiftX, e.ShiftY, enDesign.Button_EckpunktSchieber, enStates.Standard, ThisPoint.Name);
+                    ThisPoint.Draw(e.G, e.Zoom, e.ShiftX, e.ShiftY, enDesign.Button_EckpunktSchieber, enStates.Standard);
                 } else {
-                    ThisPoint.Draw(e.G, e.Zoom, e.ShiftX, e.ShiftY, enDesign.Button_EckpunktSchieber, enStates.Standard, string.Empty);
+                    ThisPoint.Draw(e.G, e.Zoom, e.ShiftX, e.ShiftY, enDesign.Button_EckpunktSchieber, enStates.Standard);
                 }
 
             }

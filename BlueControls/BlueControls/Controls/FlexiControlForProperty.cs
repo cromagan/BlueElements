@@ -3,7 +3,6 @@ using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.ItemCollection;
 using BlueDatabase;
-using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

@@ -127,8 +127,8 @@
     <Compile Include="Controls\ZoomPicWithPoints.Designer.cs">
       <DependentUpon>ZoomPicWithPoints.cs</DependentUpon>
     </Compile>
+    <Compile Include="Enums\enSnapMode.cs" />
     <Compile Include="Enums\enDesign.cs" />
-    <Compile Include="Enums\enXY.cs" />
     <Compile Include="Enums\enFilterTypesToShow.cs" />
     <Compile Include="Enums\enGroupBoxStyle.cs" />
     <Compile Include="Enums\enPartentType.cs" />
@@ -142,7 +142,6 @@
     <Compile Include="Enums\enASCIIKey.cs" />
     <Compile Include="Enums\enComboboxStyle.cs" />
     <Compile Include="Enums\enBlueListBoxAppearance.cs" />
-    <Compile Include="Enums\enAutoRelationMode.cs" />
     <Compile Include="Enums\enAddType.cs" />
     <Compile Include="Enums\enContextMenuComands.cs" />
     <Compile Include="Enums\enCS.cs" />
@@ -150,7 +149,6 @@
     <Compile Include="Enums\enKontur.cs" />
     <Compile Include="Enums\enMarkState.cs" />
     <Compile Include="Enums\enRahmenArt.cs" />
-    <Compile Include="Enums\enRelationType.cs" />
     <Compile Include="Enums\enStates.cs" />
     <Compile Include="Enums\enWndProc.cs" />
     <Compile Include="Enums\PadStyles.cs" />
@@ -241,6 +239,7 @@
     <Compile Include="Forms-Special\PictureView.designer.cs">
       <DependentUpon>PictureView.cs</DependentUpon>
     </Compile>
+    <Compile Include="Interfaces\IMoveable.cs" />
     <Compile Include="Interfaces\IUseMyBackColor.cs" />
     <Compile Include="Interfaces\ISupportsBeginnEdit.cs" />
     <Compile Include="Forms-Common\Notification.cs">
@@ -298,7 +297,6 @@
     <Compile Include="Enums\enSteuerelementVerhalten.cs" />
     <Compile Include="Extended Text\ExtChar.cs" />
     <Compile Include="Extended Text\ExtText.cs" />
-    <Compile Include="clsPointRelation.cs" />
     <Compile Include="Skin.cs" />
     <Compile Include="Controls\ComboBox.cs">
       <SubType>Component</SubType>
@@ -465,11 +463,9 @@
     <Compile Include="ItemCollection\ItemCollectionPad\BitmapPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\ChildPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\DimensionPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\GridPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\ItemCollectionPad.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\LinePadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\RowFormulaPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\SpacerPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\TextPadItem.cs" />
     <Compile Include="Controls\LastFilesCombo.cs">
       <SubType>Component</SubType>

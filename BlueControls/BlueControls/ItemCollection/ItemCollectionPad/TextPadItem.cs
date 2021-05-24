@@ -42,7 +42,8 @@ namespace BlueControls.ItemCollection {
                 _VariableText = value;
                 Text = value;
                 MakeNewETxt();
-                RecalculateAndOnChanged();
+                PointMoved(null);
+                OnChanged();
             }
         }
 
@@ -70,7 +71,7 @@ namespace BlueControls.ItemCollection {
         #region  Construktor + Initialize 
         public TextPadItem(ItemCollectionPad parent) : this(parent, string.Empty, string.Empty) { }
 
-        public TextPadItem(ItemCollectionPad parent, string internalname, string readableText) : base(parent, internalname, false) {
+        public TextPadItem(ItemCollectionPad parent, string internalname, string readableText) : base(parent, internalname) {
             Text = readableText;
             _VariableText = readableText;
 
@@ -163,11 +164,13 @@ namespace BlueControls.ItemCollection {
 
             if (Stil == PadStyles.Undefiniert) { return; }
 
-
+            GR.SetClip(DCoordinates);
 
             var trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
             GR.TranslateTransform(trp.X, trp.Y);
             GR.RotateTransform(-Drehwinkel);
+
+
 
 
             if (etxt != null) {
@@ -183,7 +186,7 @@ namespace BlueControls.ItemCollection {
             GR.TranslateTransform(-trp.X, -trp.Y);
             GR.ResetTransform();
 
-
+            GR.ResetClip();
             base.DrawExplicit(GR, DCoordinates, cZoom, shiftX, shiftY, vState, SizeOfParentControl, ForPrinting);
         }
 
@@ -279,19 +282,18 @@ namespace BlueControls.ItemCollection {
 
         }
 
-        public override void CaluclatePointsWORelations() {
+        //public override void PointMoved(PointM point) {
 
-            if (etxt == null || etxt.Height() < 8) {
-                p_RU.Y = Math.Max(p_LO.Y + 8 * Skalierung * Parent.SheetStyleScale, p_LO.Y + 10);
-            } else {
-                p_RU.Y = Math.Max(p_LO.Y + etxt.Height() * Skalierung * Parent.SheetStyleScale, p_LO.Y + 10);
-            }
+        //    if (etxt == null || etxt.Height() < 8) {
+        //        p_RU.Y = Math.Max(p_LO.Y + 8 * Skalierung * Parent.SheetStyleScale, p_LO.Y + 10);
+        //    } else {
+        //        p_RU.Y = Math.Max(p_LO.Y + etxt.Height() * Skalierung * Parent.SheetStyleScale, p_LO.Y + 10);
+        //    }
 
 
-            p_RU.X = Math.Max(p_RU.X, p_LO.X + 10m * Skalierung * Parent.SheetStyleScale);
+        //    p_RU.X = Math.Max(p_RU.X, p_LO.X + 10m * Skalierung * Parent.SheetStyleScale);
 
-            base.CaluclatePointsWORelations();
-        }
+        //}
 
 
         public bool ReplaceVariable(string VariableName, object Value) {
@@ -302,7 +304,8 @@ namespace BlueControls.ItemCollection {
                 if (txt == Text) { return false; }
                 Text = txt;
                 MakeNewETxt();
-                RecalculateAndOnChanged();
+                PointMoved(null);
+                OnChanged();
                 return true;
             } else {
                 return false;
@@ -314,7 +317,8 @@ namespace BlueControls.ItemCollection {
             if (_VariableText == Text) { return false; }
             Text = _VariableText;
             MakeNewETxt();
-            RecalculateAndOnChanged();
+            PointMoved(null);
+            OnChanged();
 
             return true;
         }
@@ -326,7 +330,8 @@ namespace BlueControls.ItemCollection {
 
             if (ot == Text) { return false; }
             MakeNewETxt();
-            RecalculateAndOnChanged();
+            PointMoved(null);
+            OnChanged();
 
             return true;
         }
@@ -340,7 +345,8 @@ namespace BlueControls.ItemCollection {
 
             Text = _VariableText;
             MakeNewETxt();
-            RecalculateAndOnChanged();
+            PointMoved(null);
+            OnChanged();
             return true;
         }
 

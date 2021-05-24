@@ -17,25 +17,11 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+namespace BlueControls.Interfaces {
 
-using System;
+    public interface IMoveable {
 
-namespace BlueControls.Enums {
-    [Flags]
-    public enum enAutoRelationMode {
-        None = 0,
-        DirektVerbindungen = 1,
-        Waagerecht = 2,
-        Senkrecht = 4,
-        NurBeziehungenErhalten = 8,
-        WaagerechtSenkrecht = Waagerecht + Senkrecht,
+        public void Move(decimal x, decimal y);
 
-        DirektVerbindungen_Erhalten = DirektVerbindungen | NurBeziehungenErhalten,
-        //WaagerechtSenkrecht_Erhalten = WaagerechtSenkrecht | NurBeziehungenErhalten,
-
-
-        Alle = WaagerechtSenkrecht | DirektVerbindungen,
-
-        Alle_Erhalten = Alle + NurBeziehungenErhalten
     }
 }

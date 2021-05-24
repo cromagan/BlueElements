@@ -22,13 +22,14 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using BlueControls.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 
 namespace BlueControls.ItemCollection {
-    public abstract class BasicPadItem : IParseable, System.ICloneable, IChangedFeedback {
+    public abstract class BasicPadItem : IParseable, System.ICloneable, IChangedFeedback, IMoveable {
 
         private static string UniqueInternal_LastTime = "InitialDummy";
         private static int UniqueInternal_Count;
@@ -40,7 +41,6 @@ namespace BlueControls.ItemCollection {
 
 
         #region  Event-Deklarationen + Delegaten 
-        public event System.EventHandler PointOrRelationsChanged;
         public event EventHandler Changed;
         #endregion
 
@@ -85,10 +85,10 @@ namespace BlueControls.ItemCollection {
                     i = new TextPadItem(parent, name, string.Empty);
                     break;
 
-                case "blueelements.clsitemdistanz":
-                case "blueelements.distanzitem":
-                case "spacer":
-                    i = new SpacerPadItem(parent, name);
+                case "blueelements.clsitemdistanz": // Todo: Entfernt am 24.05.2021
+                case "blueelements.distanzitem": // Todo: Entfernt am 24.05.2021
+                case "spacer": // Todo: Entfernt am 24.05.2021
+                    i = null;
                     break;
 
                 case "blueelements.clsitemimage":
@@ -115,11 +115,10 @@ namespace BlueControls.ItemCollection {
                     i = new ChildPadItem(parent, name);
                     break;
 
-
-                case "blueelements.clsitemgrid":
-                case "blueelements.itemgrid":
-                case "grid":
-                    i = new GridPadItem(parent, name);
+                case "blueelements.clsitemgrid": // Todo: Entfernt am 24.05.2021
+                case "blueelements.itemgrid": // Todo: Entfernt am 24.05.2021
+                case "grid": // Todo: Entfernt am 24.05.2021
+                    i = null;// new GridPadItem(parent, name);
                     break;
 
                 case "blueelements.rowformulaitem":
@@ -159,9 +158,30 @@ namespace BlueControls.ItemCollection {
 
             if (string.IsNullOrEmpty(Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
 
+
+
+            MovablePoint.ItemAdded += Points_ItemAdded;
+            MovablePoint.ItemRemoving += Points_ItemRemoving;
+
         }
 
+        private void Points_ItemRemoving(object sender, BlueBasics.EventArgs.ListEventArgs e) {
+            if (e.Item is PointM P) {
+                P.Moved -= Point_Moved;
+            }
 
+        }
+
+        private void Point_Moved(object sender, System.EventArgs e) {
+            PointMoved((PointM)sender);
+            OnChanged();
+        }
+
+        private void Points_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
+            if (e.Item is PointM P) {
+                P.Moved += Point_Moved;
+            }
+        }
 
         public static string UniqueInternal() {
 
@@ -179,14 +199,9 @@ namespace BlueControls.ItemCollection {
         }
 
 
-        /// <summary>
-        /// Erstellt alle internen Beziehungen. Punkte müssen stimmen und Relations muss leer sein.
-        /// </summary>
-        /// <remarks></remarks>
-        protected abstract void GenerateInternalRelationExplicit();
 
 
-        public virtual void CaluclatePointsWORelations() { }
+        public virtual void PointMoved(PointM point) { }
 
 
         /// <summary>
@@ -205,10 +220,6 @@ namespace BlueControls.ItemCollection {
 
         protected abstract string ClassId();
 
-
-        public virtual void Move(decimal x, decimal y) {
-            RecalculateAndOnChanged();
-        }
 
 
         /// <summary>
@@ -236,8 +247,8 @@ namespace BlueControls.ItemCollection {
 
         protected int _ZoomPadding = 0;
 
-        public readonly List<clsPointRelation> Relations = new();
-        public readonly List<PointM> Points = new();
+        public readonly ListExt<PointM> MovablePoint = new();
+        public readonly List<PointM> PointsForSuccesfullyMove = new();
 
         private PadStyles _Style = PadStyles.Undefiniert;
 
@@ -275,7 +286,7 @@ namespace BlueControls.ItemCollection {
                 if (_Style == value) { return; }
                 _Style = value;
                 DesignOrStyleChanged();
-                RecalculateAndOnChanged();
+                PointMoved(null);
             }
 
         }
@@ -299,9 +310,9 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "point":
-                    foreach (var ThisPoint in Points) {
+                    foreach (var ThisPoint in MovablePoint) {
                         if (value.Contains("Name=" + ThisPoint.Name + ",")) {
-                            ThisPoint.Parse(value, this);
+                            ThisPoint.Parse(value);
                         }
                     }
                     return true;
@@ -355,9 +366,14 @@ namespace BlueControls.ItemCollection {
                 }
             }
 
+            PointMoved(null);
             ParseFinished();
 
             IsParsing = false;
+
+
+
+
         }
 
         protected abstract void ParseFinished();
@@ -406,7 +422,7 @@ namespace BlueControls.ItemCollection {
             }
 
 
-            foreach (var ThisPoint in Points) {
+            foreach (var ThisPoint in MovablePoint) {
                 t = t + "Point=" + ThisPoint + ", ";
             }
 
@@ -458,14 +474,6 @@ namespace BlueControls.ItemCollection {
         }
 
 
-        protected void OverrideSavedRichtmaßOfAllRelations() {
-            if (Relations == null || Relations.Count == 0) {
-                foreach (var ThisRelation in Relations) {
-                    ThisRelation.OverrideSavedRichtmaß(false, false);
-                }
-            }
-        }
-
 
         public void Draw(Graphics gr, decimal zoom, decimal shiftX, decimal shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
             if (Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent nicht definiert"); }
@@ -477,7 +485,7 @@ namespace BlueControls.ItemCollection {
 
             if (Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent = null"); }
 
-            if (!IsInDrawingArea(DCoordinates, sizeOfParentControl) && !(this is GridPadItem)) { return; }
+            if (!IsInDrawingArea(DCoordinates, sizeOfParentControl)) { return; }
 
             DrawExplicit(gr, DCoordinates, zoom, shiftX, shiftY, state, sizeOfParentControl, forPrinting);
 
@@ -553,60 +561,31 @@ namespace BlueControls.ItemCollection {
         }
 
 
-        //public void OnChanged(bool checkLogic)
-        //{
-        //    if (!Parent.Contains(this)) { return; } // Wir sind nich im Konstruktor, also ignorieren
-        //    if (checkLogic) { GenerateInternalRelation(); }
-        //    OnChanged();
+
+        ///// <summary>
+        ///// OnChanged wird nicht im Parsing gemacht
+        ///// </summary>
+        //[Obsolete]
+        //public void RecalculateAndOnChanged() {
+        //    CaluclatePointsWORelations();
+        //    if (!IsParsing) { OnChanged(); }
         //}
-
-        /// <summary>
-        /// OnChanged wird nicht im Parsing gemacht
-        /// </summary>
-        public void RecalculateAndOnChanged() {
-            Relations.Clear();
-            CaluclatePointsWORelations();
-            GenerateInternalRelationExplicit();
-            OverrideSavedRichtmaßOfAllRelations();
-
-            if (!IsParsing) {
-                OnPointOrRelationsChanged();
-                OnChanged();
-            }
-        }
 
 
         public void OnChanged() {
-            if (this is IParseable O && O.IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
+            //if (this is IParseable O && O.IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
             tmpUsedArea = null;
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
-        protected void OnPointOrRelationsChanged() {
-            PointOrRelationsChanged?.Invoke(this, System.EventArgs.Empty);
-        }
+        public void Move(decimal x, decimal y) {
+            if(x==0 && y==0) { return; }
 
-        public void RelationDeleteExternal() {
-
-            foreach (var ThisRelation in Parent.AllRelations) {
-                if (ThisRelation != null) {
-
-                    if (!ThisRelation.IsInternal()) {
-                        foreach (var Thispoint in ThisRelation.Points) {
-
-                            if (Thispoint.Parent is BasicPadItem tItem) {
-                                if (tItem == this) {
-                                    Parent.AllRelations.Remove(ThisRelation);
-                                    RelationDeleteExternal(); // 'Rekursiv
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                }
+            for (var i = 0; i < PointsForSuccesfullyMove.Count; i++) {
+                PointsForSuccesfullyMove[i].X += x;
+                PointsForSuccesfullyMove[i].Y += y;
             }
-
+            OnChanged();
         }
-
     }
 }

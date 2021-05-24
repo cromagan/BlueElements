@@ -81,7 +81,7 @@ namespace BlueControls.ItemCollection {
 
         public RowFormulaPadItem(ItemCollectionPad parent, Database database, int rowkey, string layoutID) : this(parent, string.Empty, database, rowkey, layoutID) { }
 
-        public RowFormulaPadItem(ItemCollectionPad parent, string internalname, Database database, int rowkey, string layoutID) : base(parent, internalname, true) {
+        public RowFormulaPadItem(ItemCollectionPad parent, string internalname, Database database, int rowkey, string layoutID) : base(parent, internalname) {
             _Database = database;
             _Database.Disposing += _Database_Disposing;
             _RowKey = rowkey;
@@ -105,7 +105,6 @@ namespace BlueControls.ItemCollection {
             get => _LayoutID;
             set {
                 if (value == _LayoutID) { return; }
-                Größe_fixiert = true;
                 _LayoutID = value;
                 RemovePic();
                 GeneratePic(true);
@@ -232,33 +231,11 @@ namespace BlueControls.ItemCollection {
 
 
 
-
-        //public override void CaluclatePointsWORelations() {
-        //    base.CaluclatePointsWORelations();
-
-
-
-        //}
-
-
-        //protected override void GenerateInternalRelationExplicit() {
-        //    Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_RO));
-        //    Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_RU));
-        //    Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_LU));
-
-        //    //Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_R));
-        //    //Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_L));
-        //    //Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_U));
-        //    //Relations.Add(new clsPointRelation(Parent, this, enRelationType.PositionZueinander, p_LO, p_O));
-        //}
-
-
-
         private void GeneratePic(bool SizeChangeAllowed) {
 
             if (string.IsNullOrEmpty(_LayoutID) || !_LayoutID.StartsWith("#")) {
                 GeneratedBitmap = (Bitmap)QuickImage.Get(enImageCode.Warnung, 128).BMP.Clone();
-                RecalculateAndOnChanged();
+                PointMoved(null);
                 if (SizeChangeAllowed) { p_RU.SetTo(p_LO.X + GeneratedBitmap.Width, p_LO.Y + GeneratedBitmap.Height); }
                 return;
             }
@@ -297,7 +274,7 @@ namespace BlueControls.ItemCollection {
 
             if (SizeChangeAllowed) { p_RU.SetTo(p_LO.X + GeneratedBitmap.Width, p_LO.Y + GeneratedBitmap.Height); }
 
-            RecalculateAndOnChanged();
+            PointMoved(null);
         }
 
 

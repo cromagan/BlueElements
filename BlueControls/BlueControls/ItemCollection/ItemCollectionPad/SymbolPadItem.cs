@@ -31,7 +31,7 @@ namespace BlueControls.ItemCollection {
         public SymbolPadItem(ItemCollectionPad parent) : this(parent, string.Empty) { }
 
 
-        public SymbolPadItem(ItemCollectionPad parent, string internalname) : base(parent, internalname, false) {
+        public SymbolPadItem(ItemCollectionPad parent, string internalname) : base(parent, internalname) {
             Symbol = enSymbol.Pfeil;
             Hintergrundfarbe = Color.White;
             Randfarbe = Color.Black;

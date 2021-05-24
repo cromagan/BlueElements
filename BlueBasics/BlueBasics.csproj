@@ -231,12 +231,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Ressourcen\Image\Beziehungen\Doppelkreis.png" />
-    <EmbeddedResource Include="Ressourcen\Image\Beziehungen\Istgleich.png" />
-    <EmbeddedResource Include="Ressourcen\Image\Beziehungen\KreisMittelPunkt.png" />
-    <EmbeddedResource Include="Ressourcen\Image\Beziehungen\PfeilLinksRechts.png" />
-    <EmbeddedResource Include="Ressourcen\Image\Beziehungen\PfeilObenUnten.png" />
-    <EmbeddedResource Include="Ressourcen\Image\Beziehungen\WaagerechtSenkrecht.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\BildmodusAbschneiden.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\BildmodusEinpassen.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\BildmodusVerzerren.png" />
