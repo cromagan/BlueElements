@@ -135,10 +135,24 @@ namespace BlueControls {
             return true;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cZoom"></param>
+        /// <param name="shiftX"></param>
+        /// <param name="shiftY"></param>
+        /// <param name="outline">true = die Punkte komplett umschlossen (für Fills), false = Mitte der Punkte</param>
+        /// <returns></returns>
+        public RectangleF ZoomAndMoveRect(decimal cZoom, decimal shiftX, decimal shiftY, bool outline) {
 
-        public RectangleF ZoomAndMoveRect(decimal cZoom, decimal shiftX, decimal shiftY) {
-            return new RectangleF((float)(X * cZoom - shiftX + cZoom / 2), (float)(Y * cZoom - shiftY + cZoom / 2), (float)(Width * cZoom), (float)(Height * cZoom));
+
+            var add = 0m;
+            if (!outline) { add = cZoom / 2; }
+
+            return new RectangleF((float)(X * cZoom - shiftX + add), (float)(Y * cZoom - shiftY + add), (float)(Width * cZoom - add * 2), (float)(Height * cZoom - add * 2));
         }
+
+
 
         /// <summary>
         /// Erweitert das Rechteck, dass ein Kreis mit den angegebenen Parametern ebenfalls umschlossen wird.

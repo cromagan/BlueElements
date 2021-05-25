@@ -99,7 +99,7 @@ namespace BlueControls.Controls {
 
             if (_bmp != null) {
 
-                var r = new RectangleM(0, 0, _bmp.Width, _bmp.Height).ZoomAndMoveRect(_Zoom, _shiftX, _shiftY);
+                var r = new RectangleM(0, 0, _bmp.Width, _bmp.Height).ZoomAndMoveRect(_Zoom, _shiftX, _shiftY, true);
 
 
                 if (_Zoom < 1 || AlwaysSmooth) {

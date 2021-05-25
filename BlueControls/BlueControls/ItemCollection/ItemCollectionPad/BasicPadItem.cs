@@ -480,7 +480,7 @@ namespace BlueControls.ItemCollection {
 
             if (forPrinting && !_Bei_Export_sichtbar) { return; }
 
-            var DCoordinates = UsedArea().ZoomAndMoveRect(zoom, shiftX, shiftY);
+            var DCoordinates = UsedArea().ZoomAndMoveRect(zoom, shiftX, shiftY, false);
 
 
             if (Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent = null"); }
@@ -526,7 +526,7 @@ namespace BlueControls.ItemCollection {
 
 
         public void DrawOutline(Graphics GR, decimal cZoom, decimal shiftX, decimal shiftY, Color c) {
-            GR.DrawRectangle(new Pen(c), UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY));
+            GR.DrawRectangle(new Pen(c), UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY, false));
         }
 
         protected bool IsInDrawingArea(RectangleF DrawingKoordinates, Size SizeOfParentControl) {
@@ -579,11 +579,10 @@ namespace BlueControls.ItemCollection {
         }
 
         public void Move(decimal x, decimal y) {
-            if(x==0 && y==0) { return; }
+            if (x == 0 && y == 0) { return; }
 
             for (var i = 0; i < PointsForSuccesfullyMove.Count; i++) {
-                PointsForSuccesfullyMove[i].X += x;
-                PointsForSuccesfullyMove[i].Y += y;
+                PointsForSuccesfullyMove[i].Move(x, y);
             }
             OnChanged();
         }

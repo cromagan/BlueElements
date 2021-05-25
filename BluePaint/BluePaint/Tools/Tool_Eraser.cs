@@ -64,11 +64,11 @@ namespace BluePaint {
                     p2 = new Point(e.Current.TrimmedX, e.Current.TrimmedY);
                 }
 
-                e.DrawLine(Pen_RedTransp, 0, p1.Y, _Pic.Width, p1.Y);
-                e.DrawLine(Pen_RedTransp, p1.X, 0, p1.X, _Pic.Height);
+                e.DrawLine(Pen_RedTransp, -0.5m, p1.Y - 0.5m, _Pic.Width + 0.5m, p1.Y - 0.5m);
+                e.DrawLine(Pen_RedTransp, p1.X - 0.5m, -0.5m, p1.X - 0.5m, _Pic.Height + 0.5m);
 
-                e.DrawLine(Pen_RedTransp, 0, p2.Y+1, _Pic.Width, p2.Y+1);
-                e.DrawLine(Pen_RedTransp, p2.X+1, 0, p2.X+1, _Pic.Height);
+                e.DrawLine(Pen_RedTransp, -0.5m, p2.Y + 0.5m, _Pic.Width + 0.5m, p2.Y + 0.5m);
+                e.DrawLine(Pen_RedTransp, p2.X + 0.5m, 0, p2.X + 0.5m, _Pic.Height + 0.5m);
 
 
 
@@ -100,7 +100,7 @@ namespace BluePaint {
         public override void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) {
 
 
-            if (e== null) {
+            if (e == null) {
                 Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Warnung, "e = null");
                 return;
             }

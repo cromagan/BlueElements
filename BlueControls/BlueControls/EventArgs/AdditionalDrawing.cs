@@ -36,12 +36,12 @@ namespace BlueControls.EventArgs {
         public decimal ShiftY { get; }
 
         public void FillRectangle(Brush brush, Rectangle rectangle) {
-            var x = new RectangleM(rectangle).ZoomAndMoveRect(Zoom, ShiftX, ShiftY);
+            var x = new RectangleM(rectangle).ZoomAndMoveRect(Zoom, ShiftX, ShiftY, true);
             G.FillRectangle(brush, x);
         }
 
         public void DrawImage(Bitmap BMP) {
-            var r = new RectangleM(0, 0, BMP.Width, BMP.Height).ZoomAndMoveRect(Zoom, ShiftX, ShiftY);
+            var r = new RectangleM(0, 0, BMP.Width, BMP.Height).ZoomAndMoveRect(Zoom, ShiftX, ShiftY, true);
 
             G.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
 
@@ -67,7 +67,7 @@ namespace BlueControls.EventArgs {
             }
         }
 
-        public void DrawLine(Pen pen, int x1, int y1, int x2, int y2) {
+        public void DrawLine(Pen pen, decimal x1, decimal y1, decimal x2, decimal y2) {
             var p1 = new PointM(x1, y1).ZoomAndMove(this);
             var p2 = new PointM(x2, y2).ZoomAndMove(this);
             G.DrawLine(pen, p1, p2);

@@ -193,7 +193,7 @@ namespace BlueControls.ItemCollection {
                                 var p = new Pen(Pad.Randfarbe, (float)(8.7m * cZoom));
                                 var p2 = new Pen(Color.White, (float)(8.7m * cZoom) + 2f);
                                 p.DashPattern = new float[] { 5, 1, 1, 1 };
-                                var DC2 = mb2.ZoomAndMoveRect(zoomv, (decimal)slidervalues.X, (decimal)slidervalues.Y);
+                                var DC2 = mb2.ZoomAndMoveRect(zoomv, (decimal)slidervalues.X, (decimal)slidervalues.Y, false);
                                 tmpG.DrawRectangle(p2, DC2);
                                 tmpG.DrawRectangle(p, DC2);
 
@@ -314,7 +314,7 @@ namespace BlueControls.ItemCollection {
         public bool MouseDown(object sender, System.Windows.Forms.MouseEventArgs e, decimal cZoom, decimal shiftX, decimal shiftY) {
             if (PadInternal == null || PadInternal.Item.Count == 0) { return false; }
 
-            var l1 = UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY);
+            var l1 = UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY, false);
             var l2 = PadInternal.Item.MaxBounds(ZoomItems);
 
 
@@ -352,7 +352,7 @@ namespace BlueControls.ItemCollection {
         public bool MouseMove(object sender, System.Windows.Forms.MouseEventArgs e, decimal cZoom, decimal shiftX, decimal shiftY) {
             if (PadInternal == null || PadInternal.Item.Count == 0) { return false; }
 
-            var l1 = UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY);
+            var l1 = UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY, false);
             var l2 = PadInternal.Item.MaxBounds(ZoomItems);
 
             if (l1.Width <= 0 || l2.Height <= 0) { return false; }
@@ -393,7 +393,7 @@ namespace BlueControls.ItemCollection {
 
             if (PadInternal.Item.Count == 0) { return false; }
 
-            var l1 = UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY);
+            var l1 = UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY, false);
             var l2 = PadInternal.Item.MaxBounds(ZoomItems);
 
             if (l1.Width <= 0 || l2.Height <= 0) { return false; }

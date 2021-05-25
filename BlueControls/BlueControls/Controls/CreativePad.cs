@@ -446,7 +446,7 @@ namespace BlueControls.Controls {
 
 
                 if (_GivesMouseComandsTo is BasicPadItem PA) {
-                    var DCoordinates = PA.UsedArea().ZoomAndMoveRect(zoom, X, Y);
+                    var DCoordinates = PA.UsedArea().ZoomAndMoveRect(zoom, X, Y, false);
 
                     gr.DrawRectangle(new Pen(Brushes.Red, 3), DCoordinates);
                 }
