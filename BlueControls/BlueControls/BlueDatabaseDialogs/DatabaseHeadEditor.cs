@@ -27,6 +27,7 @@ using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueScript;
+using FastColoredTextBoxNS;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -40,9 +41,8 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Database _Database;
 
 
-
-        private string _ExternCode = string.Empty;
-        private string _FileState = string.Empty;
+        AutocompleteMenu popupMenu;
+        bool menuDone = false;
 
 
         private bool frmHeadEditor_FormClosing_isin;
@@ -77,12 +77,6 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             if (frmHeadEditor_FormClosing_isin) { return; }
             frmHeadEditor_FormClosing_isin = true;
-
-            if (ExternTimer.Enabled) {
-                ExternTimer.Enabled = false;
-                ExternTimer_Tick(null, System.EventArgs.Empty);
-            }
-
 
             _Database.GlobalShowPass = txbKennwort.Text;
             _Database.Caption = txbCaption.Text;
@@ -261,6 +255,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             CryptStatus();
 
             GenerateInfoText();
+
+            menuDone = false;
+            btnTest_Click(null, null);
         }
 
 
@@ -274,9 +271,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             t = t + "<b>Zeilen:</b><tab>" + (_Database.Row.Count() - 1);
             capInfo.Text = t.TrimEnd("<br>");
         }
-
-
-
 
         #region  Export 
 
@@ -719,6 +713,33 @@ namespace BlueControls.BlueDatabaseDialogs {
             lstComands.Item.Sort();
 
 
+
+
+            if (!menuDone) {
+                menuDone = true;
+                popupMenu = new AutocompleteMenu(txtSkript);
+                //popupMenu.Items.ImageList = imageList1;
+                popupMenu.SearchPattern = @"[\w\.:=!<>]";
+                popupMenu.AllowTabKey = true;
+
+                List<AutocompleteItem> items = new List<AutocompleteItem>();
+
+                if (s != null && BlueScript.Script.Comands != null) {
+
+                    foreach (var thisc in BlueScript.Script.Comands) {
+                        items.Add(new SnippetAutocompleteItem(thisc.Syntax.ToLower()));
+
+                        foreach (var thiscom in thisc.Comand(s)) {
+                            items.Add(new AutocompleteItem(thiscom));
+                        }
+                    }
+
+                }
+
+                //set as autocomplete source
+                popupMenu.Items.SetAutocompleteItems(items);
+            }
+
             if (!string.IsNullOrEmpty(message)) {
                 txbSkriptInfo.Text = "[" + DateTime.Now.ToLongTimeString() + "] Allgemeiner Fehler: " + message;
                 return;
@@ -738,118 +759,55 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         }
 
-        private void tabCSckript_SelectedIndexChanged(object sender, System.EventArgs e) {
-
-        }
-
-        private void btnExtern_Click(object sender, System.EventArgs e) {
-            txtSkript.Enabled = false;
-
-
-            var f = string.Empty;
-            var l = new List<string>() { @"C:\Program Files (x86)\Notepad++\notepad++.exe",
-                                         @"C:\Program Files\Notepad++\notepad++.exe" };
-
-
-            foreach (var thisf in l) {
-                if (FileExists(thisf)) {
-                    f = thisf;
-                    break;
-                }
-            }
-
-
-            if (string.IsNullOrEmpty(_ExternCode)) {
-                if (string.IsNullOrEmpty(f)) {
-                    _ExternCode = TempFile(string.Empty, string.Empty, "txt");
-                } else {
-                    _ExternCode = TempFile(string.Empty, string.Empty, "cs");
-                }
-
-            } else {
-                ExternTimer_Tick(null, System.EventArgs.Empty);
-            }
-
-
-            SaveToDisk(_ExternCode, txtSkript.Text, false, System.Text.Encoding.GetEncoding(1252));
-
-            _FileState = GetFileInfo(_ExternCode, true);
-
-            if (string.IsNullOrEmpty(f)) {
-                ExecuteFile(_ExternCode, string.Empty, false, true);
-            } else {
-                ExecuteFile(f, _ExternCode, false, true);
-            }
-
-
-
-            ExternTimer.Enabled = true;
-
-
-        }
-
-        private void ExternTimer_Tick(object sender, System.EventArgs e) {
-            ExternTimer.Enabled = false;
-
-            try {
-                if (!FileExists(_ExternCode)) {
-
-                    txtSkript.Enabled = true;
-                    return;
-                }
-
-
-                var nfilestate = GetFileInfo(_ExternCode, true);
-
-                if (_FileState == nfilestate) { ExternTimer.Enabled = true; return; }
-
-                _FileState = nfilestate;
-
-                txtSkript.Text = File.ReadAllText(_ExternCode, Constants.Win1252);
-
-
-                ExternTimer.Enabled = true;
-
-            } catch {
-                _FileState = "Fehler";
-                ExternTimer.Enabled = true;
-            }
-        }
-
         private void lstComands_ItemClicked(object sender, BasicListItemEventArgs e) {
             var co = string.Empty;
 
-
             if (e.Item.Tag is Method thisc) {
-                co = co + "Syntax:\r\n";
-                co = co + "~~~~~~\r\n";
-                co = co + thisc.Syntax + "\r\n";
-                co = co + "\r\n";
-                co = co + "Argumente:\r\n";
-                co = co + "~~~~~~~~~~\r\n";
-                for (var z = 0; z < thisc.Args.Count(); z++) {
-                    co = co + "  - Argument " + (z + 1).ToString() + ": " + thisc.Args[z].ToString();
-                    if (z == thisc.Args.Count() - 1 && thisc.EndlessArgs) {
-                        co = co + " -> Dieses Argument kann beliebig oft wiederholt werden";
-                    }
-                    co = co + "\r\n";
-                }
-                co = co + "\r\n";
-                co = co + "Rückgabe:\r\n";
-                co = co + "~~~~~~~~~\r\n";
-
-                co = co + "  - Rückgabetyp: " + thisc.Returns.ToString() + "\r\n";
-
-                co = co + "\r\n";
-                co = co + "Beschreibung:\r\n";
-                co = co + "~~~~~~~~~~~~\r\n";
-                co = co + thisc.Description + "\r\n";
+                co = co + thisc.HintText();
             }
-
 
 
             txbComms.Text = co;
 
+        }
+
+        private void txtSkript_ToolTipNeeded(object sender, ToolTipNeededEventArgs e) {
+
+
+
+            foreach (var thisc in lstComands.Item) {
+                if (thisc.Tag is Method m) {
+
+                    if (m.Comand(null).Contains(e.HoveredWord, false)) {
+                        e.ToolTipTitle = m.Syntax;
+                        e.ToolTipText = m.HintText();
+                        return;
+                    }
+                }
+            }
+
+
+            //x.Column.Add("Name", "Name", enDataFormat.Text);
+            //x.Column.Add("Typ", "Typ", enDataFormat.Text);
+            //x.Column.Add("RO", "Schreibgeschützt", enDataFormat.Bit);
+            //x.Column.Add("System", "Systemspalte", enDataFormat.Bit);
+            //x.Column.Add("Inhalt", "Inhalt", enDataFormat.Text);
+            //x.Column.Add("Kommentar", "Kommentar", enDataFormat.Text);
+
+            foreach (var r in tableVariablen.Database.Row) {
+                if (r.CellFirstString().ToLower() == e.HoveredWord.ToLower()) {
+                    var inh = r.CellGetString("Inhalt");
+                    inh = inh.Replace("\r", ";");
+                    inh = inh.Replace("\n", ";");
+                    if (inh.Length > 15) { inh = inh.Substring(0, 10) + "..."; }
+
+                    e.ToolTipTitle = "(" + r.CellGetString("Typ") + ") " + e.HoveredWord + " = " + inh;
+
+                    e.ToolTipText = r.CellGetString("Kommentar");
+                    return;
+                }
+
+            }
         }
     }
 }

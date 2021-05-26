@@ -860,16 +860,14 @@ namespace BlueControls.Controls {
 
         }
 
-        public void ImportCSV(string csvtxt) {
+        public static void ImportCSV(Database _Database, string csvtxt) {
             using var x = new Import(_Database, csvtxt);
             x.ShowDialog();
         }
 
-        public void ImportCSV(List<string> csvtxt) {
-            ImportCSV(csvtxt.JoinWithCr());
+        public void ImportCSV(string csvtxt) {
+            Table.ImportCSV(_Database, csvtxt);
         }
-
-
 
         /// <summary>
         /// Zeichnet die gesamte Zelle ohne Hintergrund. Die verlinkte Zelle ist bereits bekannt.

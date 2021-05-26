@@ -465,5 +465,33 @@ namespace BlueScript {
 
         public string ReadableText() => Syntax;
         public QuickImage SymbolForReadableText() => null;
+
+        public string HintText() {
+            var co = "Syntax:\r\n";
+            co = co + "~~~~~~\r\n";
+            co = co + Syntax + "\r\n";
+            co = co + "\r\n";
+            co = co + "Argumente:\r\n";
+            co = co + "~~~~~~~~~~\r\n";
+            for (var z = 0; z < Args.Count(); z++) {
+                co = co + "  - Argument " + (z + 1).ToString() + ": " + Args[z].ToString();
+                if (z == Args.Count() - 1 && EndlessArgs) {
+                    co = co + " -> Dieses Argument kann beliebig oft wiederholt werden";
+                }
+                co = co + "\r\n";
+            }
+            co = co + "\r\n";
+            co = co + "Rückgabe:\r\n";
+            co = co + "~~~~~~~~~\r\n";
+
+            co = co + "  - Rückgabetyp: " + Returns.ToString() + "\r\n";
+
+            co = co + "\r\n";
+            co = co + "Beschreibung:\r\n";
+            co = co + "~~~~~~~~~~~~\r\n";
+            co = co + Description + "\r\n";
+
+            return co;
+        }
     }
 }

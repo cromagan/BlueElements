@@ -72,8 +72,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Regeln = new BlueControls.Controls.TabPage();
             this.tabCSckript = new BlueControls.Controls.TabControl();
             this.tabScriptAnzeige = new BlueControls.Controls.TabPage();
-            this.btnExtern = new BlueControls.Controls.Button();
-            this.txtSkript = new BlueControls.Controls.TextBox();
+            this.txtSkript = new FastColoredTextBoxNS.FastColoredTextBox();
             this.tabBefehle = new BlueControls.Controls.TabPage();
             this.txbComms = new BlueControls.Controls.TextBox();
             this.lstComands = new BlueControls.Controls.ListBox();
@@ -102,7 +101,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnFremdImport = new BlueControls.Controls.Button();
             this.capExperimentellWarnung = new BlueControls.Controls.Caption();
             this.capBinInfo = new BlueControls.Controls.Caption();
-            this.ExternTimer = new System.Windows.Forms.Timer(this.components);
             this.grpBenutzergruppen.SuspendLayout();
             this.grpKennwort.SuspendLayout();
             this.GlobalTab.SuspendLayout();
@@ -110,6 +108,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Regeln.SuspendLayout();
             this.tabCSckript.SuspendLayout();
             this.tabScriptAnzeige.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.txtSkript)).BeginInit();
             this.tabBefehle.SuspendLayout();
             this.tabVariablen.SuspendLayout();
             this.grpTextAllgemein.SuspendLayout();
@@ -599,7 +598,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // tabScriptAnzeige
             // 
             this.tabScriptAnzeige.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabScriptAnzeige.Controls.Add(this.btnExtern);
             this.tabScriptAnzeige.Controls.Add(this.txtSkript);
             this.tabScriptAnzeige.Location = new System.Drawing.Point(4, 25);
             this.tabScriptAnzeige.Name = "tabScriptAnzeige";
@@ -607,25 +605,45 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabScriptAnzeige.TabIndex = 0;
             this.tabScriptAnzeige.Text = "Skript-Text";
             // 
-            // btnExtern
-            // 
-            this.btnExtern.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnExtern.Location = new System.Drawing.Point(888, 0);
-            this.btnExtern.Name = "btnExtern";
-            this.btnExtern.Size = new System.Drawing.Size(112, 40);
-            this.btnExtern.TabIndex = 1;
-            this.btnExtern.Text = "Extern öffnen";
-            this.btnExtern.Click += new System.EventHandler(this.btnExtern_Click);
-            // 
             // txtSkript
             // 
+            this.txtSkript.AutoCompleteBracketsList = new char[] {
+        '(',
+        ')',
+        '{',
+        '}',
+        '[',
+        ']',
+        '\"',
+        '\"',
+        '\'',
+        '\''};
+            this.txtSkript.AutoIndentCharsPatterns = "\r\n^\\s*[\\w\\.]+(\\s\\w+)?\\s*(?<range>=)\\s*(?<range>[^;]+);\r\n^\\s*(case|default)\\s*[^:]" +
+    "*(?<range>:)\\s*(?<range>[^;]+);\r\n";
+            this.txtSkript.AutoScrollMinSize = new System.Drawing.Size(27, 14);
+            this.txtSkript.BackBrush = null;
+            this.txtSkript.BracketsHighlightStrategy = FastColoredTextBoxNS.BracketsHighlightStrategy.Strategy2;
+            this.txtSkript.CharHeight = 14;
+            this.txtSkript.CharWidth = 8;
             this.txtSkript.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txtSkript.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
             this.txtSkript.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txtSkript.Font = new System.Drawing.Font("Courier New", 9.75F);
+            this.txtSkript.IsReplaceMode = false;
+            this.txtSkript.Language = FastColoredTextBoxNS.Language.CSharp;
+            this.txtSkript.LeftBracket = '(';
+            this.txtSkript.LeftBracket2 = '{';
             this.txtSkript.Location = new System.Drawing.Point(0, 0);
-            this.txtSkript.MultiLine = true;
             this.txtSkript.Name = "txtSkript";
+            this.txtSkript.Paddings = new System.Windows.Forms.Padding(0);
+            this.txtSkript.RightBracket = ')';
+            this.txtSkript.RightBracket2 = '}';
+            this.txtSkript.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
+            this.txtSkript.ServiceColors = ((FastColoredTextBoxNS.ServiceColors)(resources.GetObject("txtSkript.ServiceColors")));
             this.txtSkript.Size = new System.Drawing.Size(1025, 480);
-            this.txtSkript.TabIndex = 0;
+            this.txtSkript.TabIndex = 2;
+            this.txtSkript.Zoom = 100;
+            this.txtSkript.ToolTipNeeded += new System.EventHandler<FastColoredTextBoxNS.ToolTipNeededEventArgs>(this.txtSkript_ToolTipNeeded);
             // 
             // tabBefehle
             // 
@@ -676,6 +694,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tableVariablen.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableVariablen.Location = new System.Drawing.Point(0, 40);
             this.tableVariablen.Name = "tableVariablen";
+            this.tableVariablen.ShowWaitScreen = true;
             this.tableVariablen.Size = new System.Drawing.Size(1025, 440);
             this.tableVariablen.TabIndex = 2;
             this.tableVariablen.Text = "tabVariablen";
@@ -897,6 +916,7 @@ namespace BlueControls.BlueDatabaseDialogs
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tblUndo.Location = new System.Drawing.Point(0, 56);
             this.tblUndo.Name = "tblUndo";
+            this.tblUndo.ShowWaitScreen = true;
             this.tblUndo.Size = new System.Drawing.Size(1039, 562);
             this.tblUndo.TabIndex = 0;
             this.tblUndo.Text = "UndoTab";
@@ -939,11 +959,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capBinInfo.Text = "Die hier aufgeführten Binärdaten können - falls es ein Bild ist - mit DB_Dateinam" +
     "e mit Suffix angesprochen werden.";
             // 
-            // ExternTimer
-            // 
-            this.ExternTimer.Interval = 1000;
-            this.ExternTimer.Tick += new System.EventHandler(this.ExternTimer_Tick);
-            // 
             // DatabaseHeadEditor
             // 
             this.ClientSize = new System.Drawing.Size(1050, 677);
@@ -961,6 +976,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Regeln.ResumeLayout(false);
             this.tabCSckript.ResumeLayout(false);
             this.tabScriptAnzeige.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.txtSkript)).EndInit();
             this.tabBefehle.ResumeLayout(false);
             this.tabVariablen.ResumeLayout(false);
             this.grpTextAllgemein.ResumeLayout(false);
@@ -1033,14 +1049,11 @@ namespace BlueControls.BlueDatabaseDialogs
         private Caption capBinInfo;
         private TabControl tabCSckript;
         private TabPage tabScriptAnzeige;
-        private TextBox txtSkript;
         private TabPage tabVariablen;
         private TabPage tabBefehle;
         private GroupBox grpTextAllgemein;
         private TextBox txbSkriptInfo;
         private Button btnTest;
-        private Button btnExtern;
-        private System.Windows.Forms.Timer ExternTimer;
         private System.ComponentModel.IContainer components;
         private TextBox txbComms;
         private TextBox txbTestZeile;
@@ -1050,5 +1063,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private TextBox txbAdditionalFiles;
         private Caption capAdditional;
         private ListBox lstComands;
+        private FastColoredTextBoxNS.FastColoredTextBox txtSkript;
     }
 }

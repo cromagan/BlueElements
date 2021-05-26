@@ -72,8 +72,8 @@ namespace BlueControls.BlueDatabaseDialogs {
                 return;
             }
 
-            DoImport(Database, _originalImportText, SpalteZuordnen.Checked, ZeilenZuorden.Checked, TR, Aufa.Checked, AnfTre.Checked, false);
-
+            var m = Database.Import(_originalImportText, SpalteZuordnen.Checked, ZeilenZuorden.Checked, TR, Aufa.Checked, AnfTre.Checked);
+            MessageBox.Show(m, enImageCode.Information, "OK");
             Close();
         }
 
@@ -82,119 +82,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
 
-        public static void DoImport(Database _Database, string TXT, bool SpalteZuordnenx, bool ZeileZuordnen, string ColumnSplitChar, bool EliminateMultipleSplitter, bool EleminateSplitterAtStart, bool SilentMode) {
-            //DebugPrint_InvokeRequired(InvokeRequired, false);
 
-            // Vorbereitung des Textes -----------------------------
-            TXT = TXT.Replace("\r\n", "\r").Trim("\r");
-
-            var ein = TXT.SplitByCR();
-            var Zeil = new List<string[]>();
-            var neuZ = 0;
-
-
-            for (var z = 0; z <= ein.GetUpperBound(0); z++) {
-                if (EliminateMultipleSplitter) {
-                    ein[z] = ein[z].Replace(ColumnSplitChar + ColumnSplitChar, ColumnSplitChar);
-                }
-                if (EleminateSplitterAtStart) {
-                    ein[z] = ein[z].TrimStart(ColumnSplitChar);
-                }
-                ein[z] = ein[z].TrimEnd(ColumnSplitChar);
-                Zeil.Add(ein[z].SplitBy(ColumnSplitChar));
-            }
-
-            if (Zeil.Count == 0) {
-                if (!SilentMode) {
-                    MessageBox.Show("Import kann nicht ausgeführt werden.", enImageCode.Information, "Ok");
-                }
-                return;
-            }
-
-
-            var columns = new List<ColumnItem>();
-            RowItem row = null;
-            var StartZ = 0;
-
-            // -------------------------------------
-            // --- Spalten-Reihenfolge ermitteln ---
-            // -------------------------------------
-            if (SpalteZuordnenx) {
-                StartZ = 1;
-
-
-                for (var SpaltNo = 0; SpaltNo < Zeil[0].GetUpperBound(0) + 1; SpaltNo++) {
-                    if (string.IsNullOrEmpty(Zeil[0][SpaltNo])) {
-                        if (!SilentMode) { MessageBox.Show("Abbruch,<br>leerer Spaltenname.", enImageCode.Information, "Ok"); }
-                        return;
-                    }
-
-                    Zeil[0][SpaltNo] = Zeil[0][SpaltNo].Replace(" ", "_").ReduceToChars(BlueBasics.Constants.AllowedCharsVariableName);
-                    var Col = _Database.Column.Exists(Zeil[0][SpaltNo]);
-                    if (Col == null) {
-                        Col = _Database.Column.Add(Zeil[0][SpaltNo]);
-                        Col.Caption = Zeil[0][SpaltNo];
-                        Col.Format = enDataFormat.Text;
-                    }
-                    columns.Add(Col);
-
-                }
-            } else {
-                foreach (var thisColumn in _Database.Column) {
-                    if (thisColumn != null && string.IsNullOrEmpty(thisColumn.Identifier)) { columns.Add(thisColumn); }
-                }
-
-                while (columns.Count < Zeil[0].GetUpperBound(0) + 1) {
-                    var newc = _Database.Column.Add(string.Empty);
-                    newc.Caption = newc.Name;
-                    newc.Format = enDataFormat.Text;
-                    newc.MultiLine = true;
-                    columns.Add(newc);
-                }
-
-            }
-
-
-            // -------------------------------------
-            // --- Importieren ---
-            // -------------------------------------
-
-
-            Progressbar P = null;
-
-            if (!SilentMode) { P = Progressbar.Show("Importiere...", Zeil.Count - 1); }
-
-            for (var ZeilNo = StartZ; ZeilNo < Zeil.Count; ZeilNo++) {
-                P?.Update(ZeilNo);
-
-
-                var tempVar2 = Math.Min(Zeil[ZeilNo].GetUpperBound(0) + 1, columns.Count);
-                row = null;
-                for (var SpaltNo = 0; SpaltNo < tempVar2; SpaltNo++) {
-
-                    if (SpaltNo == 0) {
-                        row = null;
-                        if (ZeileZuordnen && !string.IsNullOrEmpty(Zeil[ZeilNo][SpaltNo])) { row = _Database.Row[Zeil[ZeilNo][SpaltNo]]; }
-                        if (row == null && !string.IsNullOrEmpty(Zeil[ZeilNo][SpaltNo])) {
-                            row = _Database.Row.Add(Zeil[ZeilNo][SpaltNo]);
-                            neuZ++;
-                        }
-                    } else {
-                        if (row != null) {
-                            row.CellSet(columns[SpaltNo], Zeil[ZeilNo][SpaltNo].SplitBy("|").JoinWithCr());
-                        }
-                    }
-
-                }
-            }
-
-            P?.Close();
-
-
-            if (!SilentMode) {
-                BlueControls.Forms.MessageBox.Show("<b>Import abgeschlossen.</b>\r\n" + neuZ.ToString() + " neue Zeilen erstellt.");
-            }
-
-        }
     }
 }

@@ -30,7 +30,10 @@ namespace BlueScript {
 
 
         public override string Description => "Berechnet eine Variable. Der Typ der Variable und des Ergebnisses müssen übereinstimmen.";
-        public override List<string> Comand(Script s) { return s.Variablen.AllNames(); }
+        public override List<string> Comand(Script s) {
+            if (s == null) { return new(); }
+            return s.Variablen.AllNames();
+        }
         public override string StartSequence => "=";
         public override string EndSequence => ";";
         public override bool GetCodeBlockAfter => false;

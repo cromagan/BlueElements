@@ -2546,6 +2546,104 @@ namespace BlueDatabase {
             } catch { }
         }
 
+        public string Import(string TXT, bool SpalteZuordnenx, bool ZeileZuordnen, string ColumnSplitChar, bool EliminateMultipleSplitter, bool EleminateSplitterAtStart) {
+
+            // Vorbereitung des Textes -----------------------------
+            TXT = TXT.Replace("\r\n", "\r").Trim("\r");
+
+            var ein = TXT.SplitByCR();
+            var Zeil = new List<string[]>();
+            var neuZ = 0;
+
+            for (var z = 0; z <= ein.GetUpperBound(0); z++) {
+                if (EliminateMultipleSplitter) {
+                    ein[z] = ein[z].Replace(ColumnSplitChar + ColumnSplitChar, ColumnSplitChar);
+                }
+                if (EleminateSplitterAtStart) {
+                    ein[z] = ein[z].TrimStart(ColumnSplitChar);
+                }
+                ein[z] = ein[z].TrimEnd(ColumnSplitChar);
+                Zeil.Add(ein[z].SplitBy(ColumnSplitChar));
+            }
+
+            if (Zeil.Count == 0) {
+                OnDropMessage("Import kann nicht ausgeführt werden.");
+                return "Import kann nicht ausgeführt werden.";
+            }
+
+            var columns = new List<ColumnItem>();
+            RowItem row = null;
+            var StartZ = 0;
+
+            // -------------------------------------
+            // --- Spalten-Reihenfolge ermitteln ---
+            // -------------------------------------
+            if (SpalteZuordnenx) {
+                StartZ = 1;
+
+                for (var SpaltNo = 0; SpaltNo < Zeil[0].GetUpperBound(0) + 1; SpaltNo++) {
+                    if (string.IsNullOrEmpty(Zeil[0][SpaltNo])) {
+                        OnDropMessage("Abbruch,<br>leerer Spaltenname.");
+                        return "Abbruch,<br>leerer Spaltenname.";
+                    }
+
+                    Zeil[0][SpaltNo] = Zeil[0][SpaltNo].Replace(" ", "_").ReduceToChars(BlueBasics.Constants.AllowedCharsVariableName);
+                    var Col = Column.Exists(Zeil[0][SpaltNo]);
+                    if (Col == null) {
+                        Col = Column.Add(Zeil[0][SpaltNo]);
+                        Col.Caption = Zeil[0][SpaltNo];
+                        Col.Format = enDataFormat.Text;
+                    }
+                    columns.Add(Col);
+
+                }
+            } else {
+                foreach (var thisColumn in Column) {
+                    if (thisColumn != null && string.IsNullOrEmpty(thisColumn.Identifier)) { columns.Add(thisColumn); }
+                }
+
+                while (columns.Count < Zeil[0].GetUpperBound(0) + 1) {
+                    var newc = Column.Add(string.Empty);
+                    newc.Caption = newc.Name;
+                    newc.Format = enDataFormat.Text;
+                    newc.MultiLine = true;
+                    columns.Add(newc);
+                }
+            }
+
+            // -------------------------------------
+            // --- Importieren ---
+            // -------------------------------------
+
+
+            OnDropMessage("Importiere...");
+
+            for (var ZeilNo = StartZ; ZeilNo < Zeil.Count; ZeilNo++) {
+                //P?.Update(ZeilNo);
+
+
+                var tempVar2 = Math.Min(Zeil[ZeilNo].GetUpperBound(0) + 1, columns.Count);
+                row = null;
+                for (var SpaltNo = 0; SpaltNo < tempVar2; SpaltNo++) {
+
+                    if (SpaltNo == 0) {
+                        row = null;
+                        if (ZeileZuordnen && !string.IsNullOrEmpty(Zeil[ZeilNo][SpaltNo])) { row = Row[Zeil[ZeilNo][SpaltNo]]; }
+                        if (row == null && !string.IsNullOrEmpty(Zeil[ZeilNo][SpaltNo])) {
+                            row = Row.Add(Zeil[ZeilNo][SpaltNo]);
+                            neuZ++;
+                        }
+                    } else {
+                        if (row != null) {
+                            row.CellSet(columns[SpaltNo], Zeil[ZeilNo][SpaltNo].SplitBy("|").JoinWithCr());
+                        }
+                    }
+                }
+            }
+
+            OnDropMessage("<b>Import abgeschlossen.</b>\r\n" + neuZ.ToString() + " neue Zeilen erstellt.");
+            return string.Empty;
+        }
     }
 }
 
