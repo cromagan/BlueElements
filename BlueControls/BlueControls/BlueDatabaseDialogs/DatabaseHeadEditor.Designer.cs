@@ -593,7 +593,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabCSckript.SelectedIndex = 0;
             this.tabCSckript.Size = new System.Drawing.Size(1033, 509);
             this.tabCSckript.TabIndex = 0;
-            this.tabCSckript.SelectedIndexChanged += new System.EventHandler(this.tabCSckript_SelectedIndexChanged);
             // 
             // tabScriptAnzeige
             // 

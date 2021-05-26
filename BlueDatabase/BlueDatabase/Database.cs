@@ -957,7 +957,7 @@ namespace BlueDatabase {
                         OnNeedPassword(e);
 
                         B = modAllgemein.SimpleCrypt(B, e.Password, -1, Pointer, B.Length - 1);
-                        if (B[Pointer] != 1 || B[Pointer + 1] != 3 || B[Pointer + 2] != 0 || B[Pointer + 3] != 0 || B[Pointer + 4] != 2 || B[Pointer + 5] != 79 || B[Pointer + 6] != 75 || B[Pointer + 7] != 1) {
+                        if ( B[Pointer + 1] != 3 || B[Pointer + 2] != 0 || B[Pointer + 3] != 0 || B[Pointer + 4] != 2 || B[Pointer + 5] != 79 || B[Pointer + 6] != 75) {
                             RemoveFilename();
                             LoadedVersion = "9.99";
                             //MessageBox.Show("Zugriff verweigrt, Passwort falsch!", enImageCode.Kritisch, "OK");
