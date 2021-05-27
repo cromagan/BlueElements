@@ -632,49 +632,6 @@ namespace BlueDatabase {
         }
 
 
-
-        private (string fehlertext, bool bigfailure, RowItem importrow) DoImportScript(string textToImport, string[] cmd, RowItem row) {
-
-            if (cmd == null) { return ("Kein Befehl übergeben", true, row); }
-            if (cmd.GetUpperBound(0) != 3) { return ("Format muss 4 | haben.", true, row); }
-
-            var c = Column[cmd[1]];
-            if (c == null) { return ("Spalte nicht in der Datenbank gefunden.", true, row); }
-
-            if (string.IsNullOrEmpty(cmd[2])) { return ("Suchtext 'vorher' ist nicht angegeben", true, row); }
-            if (string.IsNullOrEmpty(cmd[3])) { return ("Suchtext 'nachher' ist nicht angegeben", true, row); }
-
-            var vh = textToImport.IndexOf(cmd[2]);
-            if (vh < 0) { return ("Suchtext 'vorher' im Text nicht vorhanden.", false, row); }
-
-            var nh = textToImport.IndexOf(cmd[3], vh + cmd[2].Length);
-            if (nh < 0) { return ("Suchtext 'nachher' im Text nicht vorhanden.", false, row); }
-
-            var txt = textToImport.Substring(vh + cmd[2].Length, nh - vh - cmd[2].Length);
-
-            switch (cmd[0].ToUpper()) {
-                case "IMPORT1":
-                    if (c.IsFirst() && row == null) {
-                        row = Row.Add(txt);
-                    } else {
-                        if (row == null) { return ("Keine Zeile angegeben.", true, row); }
-                        row.CellSet(c, txt);
-                    }
-                    return (string.Empty, false, row);
-
-                case "IMPORT2":
-                    if (row == null) { return ("Keine Zeile angegeben.", true, row); }
-                    var l = row.CellGetList(c);
-                    l.Add(txt);
-                    row.CellSet(c, l);
-                    return (string.Empty, false, row);
-
-                default:
-                    return ("Befehl nicht erkannt.", true, row);
-            }
-
-        }
-
         private void Column_ItemRemoved(object sender, System.EventArgs e) {
             if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Parsing Falsch!"); }
             CheckViewsAndArrangements();
@@ -957,7 +914,7 @@ namespace BlueDatabase {
                         OnNeedPassword(e);
 
                         B = modAllgemein.SimpleCrypt(B, e.Password, -1, Pointer, B.Length - 1);
-                        if ( B[Pointer + 1] != 3 || B[Pointer + 2] != 0 || B[Pointer + 3] != 0 || B[Pointer + 4] != 2 || B[Pointer + 5] != 79 || B[Pointer + 6] != 75) {
+                        if (B[Pointer + 1] != 3 || B[Pointer + 2] != 0 || B[Pointer + 3] != 0 || B[Pointer + 4] != 2 || B[Pointer + 5] != 79 || B[Pointer + 6] != 75) {
                             RemoveFilename();
                             LoadedVersion = "9.99";
                             //MessageBox.Show("Zugriff verweigrt, Passwort falsch!", enImageCode.Kritisch, "OK");
@@ -2546,24 +2503,24 @@ namespace BlueDatabase {
             } catch { }
         }
 
-        public string Import(string TXT, bool SpalteZuordnenx, bool ZeileZuordnen, string ColumnSplitChar, bool EliminateMultipleSplitter, bool EleminateSplitterAtStart) {
+        public string Import(string importText, bool spalteZuordnen, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart, bool dorowautmatic) {
 
             // Vorbereitung des Textes -----------------------------
-            TXT = TXT.Replace("\r\n", "\r").Trim("\r");
+            importText = importText.Replace("\r\n", "\r").Trim("\r");
 
-            var ein = TXT.SplitByCR();
+            var ein = importText.SplitByCR();
             var Zeil = new List<string[]>();
             var neuZ = 0;
 
             for (var z = 0; z <= ein.GetUpperBound(0); z++) {
-                if (EliminateMultipleSplitter) {
-                    ein[z] = ein[z].Replace(ColumnSplitChar + ColumnSplitChar, ColumnSplitChar);
+                if (eliminateMultipleSplitter) {
+                    ein[z] = ein[z].Replace(splitChar + splitChar, splitChar);
                 }
-                if (EleminateSplitterAtStart) {
-                    ein[z] = ein[z].TrimStart(ColumnSplitChar);
+                if (eleminateSplitterAtStart) {
+                    ein[z] = ein[z].TrimStart(splitChar);
                 }
-                ein[z] = ein[z].TrimEnd(ColumnSplitChar);
-                Zeil.Add(ein[z].SplitBy(ColumnSplitChar));
+                ein[z] = ein[z].TrimEnd(splitChar);
+                Zeil.Add(ein[z].SplitBy(splitChar));
             }
 
             if (Zeil.Count == 0) {
@@ -2572,13 +2529,13 @@ namespace BlueDatabase {
             }
 
             var columns = new List<ColumnItem>();
-            RowItem row = null;
+
             var StartZ = 0;
 
             // -------------------------------------
             // --- Spalten-Reihenfolge ermitteln ---
             // -------------------------------------
-            if (SpalteZuordnenx) {
+            if (spalteZuordnen) {
                 StartZ = 1;
 
                 for (var SpaltNo = 0; SpaltNo < Zeil[0].GetUpperBound(0) + 1; SpaltNo++) {
@@ -2617,18 +2574,18 @@ namespace BlueDatabase {
 
 
             OnDropMessage("Importiere...");
-
+   
             for (var ZeilNo = StartZ; ZeilNo < Zeil.Count; ZeilNo++) {
                 //P?.Update(ZeilNo);
 
 
                 var tempVar2 = Math.Min(Zeil[ZeilNo].GetUpperBound(0) + 1, columns.Count);
-                row = null;
+                RowItem row = null;
                 for (var SpaltNo = 0; SpaltNo < tempVar2; SpaltNo++) {
 
                     if (SpaltNo == 0) {
                         row = null;
-                        if (ZeileZuordnen && !string.IsNullOrEmpty(Zeil[ZeilNo][SpaltNo])) { row = Row[Zeil[ZeilNo][SpaltNo]]; }
+                        if (zeileZuordnen && !string.IsNullOrEmpty(Zeil[ZeilNo][SpaltNo])) { row = Row[Zeil[ZeilNo][SpaltNo]]; }
                         if (row == null && !string.IsNullOrEmpty(Zeil[ZeilNo][SpaltNo])) {
                             row = Row.Add(Zeil[ZeilNo][SpaltNo]);
                             neuZ++;
@@ -2638,6 +2595,10 @@ namespace BlueDatabase {
                             row.CellSet(columns[SpaltNo], Zeil[ZeilNo][SpaltNo].SplitBy("|").JoinWithCr());
                         }
                     }
+
+
+                    if (row != null && dorowautmatic) { row.DoAutomatic(true, true, false, "import"); }
+
                 }
             }
 

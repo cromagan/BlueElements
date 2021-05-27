@@ -19,27 +19,37 @@
 
 using Skript.Enums;
 using System.Collections.Generic;
+using BlueBasics;
+using static BlueBasics.Constants;
+using static BlueBasics.modConverter;
 
 namespace BlueScript {
-    internal class Method_Count : Method {
+    internal class Method_AddDays : Method {
 
 
-        public override string Syntax => "Count(List-Variable)";
+        public override string Syntax => "AddDays(DateTimeString, Days)";
 
 
-        public override string Description => "Gibt die Anzahl der Elemente der Liste zurück.";
-        public override List<string> Comand(Script s) { return new() { "count" }; }
+        public override string Description => "Fügt dem Datum die angegeben Anzahl Tage hinzu. Dabei können auch Gleitkommazahlen benutzt werden, so werden z.B. bei 0.25 nur 6 Stunden hinzugefügt. Der Rückgabwert erfolgt immer im Format " + Format_Date7;
+        public override List<string> Comand(Script s) { return new() { "adddays" }; }
         public override string StartSequence => "(";
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.Numeral;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List };
+        public override enVariableDataType Returns => enVariableDataType.String;
+        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.Numeral };
         public override bool EndlessArgs => false;
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
-            return new strDoItFeedback(attvar.Attributes[0].ValueListString.Count.ToString(), string.Empty);
+
+            var ok = DateTimeTryParse(attvar.Attributes[0].ValueString, out var d);
+            if (!ok) {
+                return new strDoItFeedback("Der Wert '" + attvar.Attributes[0].ValueString + "' wurde nicht als Zeitformat erkannt.");
+            }
+
+            d = d.AddDays(attvar.Attributes[1].ValueDouble);
+            return new strDoItFeedback("\"" + d.ToString(Constants.Format_Date7) + "\"", string.Empty);
         }
     }
 }

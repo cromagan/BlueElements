@@ -72,7 +72,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 return;
             }
 
-            var m = Database.Import(_originalImportText, SpalteZuordnen.Checked, ZeilenZuorden.Checked, TR, Aufa.Checked, AnfTre.Checked);
+            var m = Database.Import(_originalImportText, SpalteZuordnen.Checked, ZeilenZuorden.Checked, TR, Aufa.Checked, AnfTre.Checked, false);
             MessageBox.Show(m, enImageCode.Information, "OK");
             Close();
         }

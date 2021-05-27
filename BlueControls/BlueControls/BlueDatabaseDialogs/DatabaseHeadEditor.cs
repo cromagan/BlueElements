@@ -257,7 +257,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             GenerateInfoText();
 
             menuDone = false;
-            btnTest_Click(null, null);
+
         }
 
 
@@ -727,7 +727,12 @@ namespace BlueControls.BlueDatabaseDialogs {
                 if (s != null && BlueScript.Script.Comands != null) {
 
                     foreach (var thisc in BlueScript.Script.Comands) {
-                        items.Add(new SnippetAutocompleteItem(thisc.Syntax.ToLower()));
+                        items.Add(new SnippetAutocompleteItem(thisc.Syntax + " "));
+
+                        if (thisc.Returns != Skript.Enums.enVariableDataType.Null) {
+                            items.Add(new SnippetAutocompleteItem("var " + thisc.Returns.ToString() + " = " + thisc.Syntax + "; "));
+                        }
+
 
                         foreach (var thiscom in thisc.Comand(s)) {
                             items.Add(new AutocompleteItem(thiscom));
@@ -773,38 +778,58 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void txtSkript_ToolTipNeeded(object sender, ToolTipNeededEventArgs e) {
 
+            try {
 
+                foreach (var thisc in lstComands.Item) {
+                    if (thisc.Tag is Method m) {
 
-            foreach (var thisc in lstComands.Item) {
-                if (thisc.Tag is Method m) {
-
-                    if (m.Comand(null).Contains(e.HoveredWord, false)) {
-                        e.ToolTipTitle = m.Syntax;
-                        e.ToolTipText = m.HintText();
-                        return;
+                        if (m.Comand(null).Contains(e.HoveredWord, false)) {
+                            e.ToolTipTitle = m.Syntax;
+                            e.ToolTipText = m.HintText();
+                            return;
+                        }
                     }
                 }
+
+
+                //x.Column.Add("Name", "Name", enDataFormat.Text);
+                //x.Column.Add("Typ", "Typ", enDataFormat.Text);
+                //x.Column.Add("RO", "Schreibgeschützt", enDataFormat.Bit);
+                //x.Column.Add("System", "Systemspalte", enDataFormat.Bit);
+                //x.Column.Add("Inhalt", "Inhalt", enDataFormat.Text);
+                //x.Column.Add("Kommentar", "Kommentar", enDataFormat.Text);
+
+
+                var hoveredWordnew = new Range(txtSkript, e.Place, e.Place).GetFragment("[A-Za-z0-9_]").Text;
+
+
+                foreach (var r in tableVariablen.Database.Row) {
+                    if (r.CellFirstString().ToLower() == hoveredWordnew.ToLower()) {
+                        var inh = r.CellGetString("Inhalt");
+                        inh = inh.Replace("\r", ";");
+                        inh = inh.Replace("\n", ";");
+                        inh = inh.Replace("\"", string.Empty);
+                        if (inh.Length > 25) { inh = inh.Substring(0, 20) + "..."; }
+
+                        e.ToolTipTitle = "(" + r.CellGetString("Typ") + ") " + hoveredWordnew + " = " + inh;
+
+                        e.ToolTipText = r.CellGetString("Kommentar") + " ";
+                        return;
+                    }
+
+                }
+
+
+            } catch (Exception ex) {
+                Develop.DebugPrint(ex);
             }
+        }
 
+        private void GlobalTab_Selecting(object sender, System.Windows.Forms.TabControlCancelEventArgs e) {
+            if (e.TabPageIndex == 1) {
 
-            //x.Column.Add("Name", "Name", enDataFormat.Text);
-            //x.Column.Add("Typ", "Typ", enDataFormat.Text);
-            //x.Column.Add("RO", "Schreibgeschützt", enDataFormat.Bit);
-            //x.Column.Add("System", "Systemspalte", enDataFormat.Bit);
-            //x.Column.Add("Inhalt", "Inhalt", enDataFormat.Text);
-            //x.Column.Add("Kommentar", "Kommentar", enDataFormat.Text);
-
-            foreach (var r in tableVariablen.Database.Row) {
-                if (r.CellFirstString().ToLower() == e.HoveredWord.ToLower()) {
-                    var inh = r.CellGetString("Inhalt");
-                    inh = inh.Replace("\r", ";");
-                    inh = inh.Replace("\n", ";");
-                    if (inh.Length > 15) { inh = inh.Substring(0, 10) + "..."; }
-
-                    e.ToolTipTitle = "(" + r.CellGetString("Typ") + ") " + e.HoveredWord + " = " + inh;
-
-                    e.ToolTipText = r.CellGetString("Kommentar");
-                    return;
+                if (!menuDone) {
+                    btnTest_Click(null, null);
                 }
 
             }

@@ -25,7 +25,7 @@ namespace Skript.Enums {
         Bool = 1,
         Numeral = 2,
         String = 4,
-        Date = 8,
+        //Date = 8, // Werden einfach die Strings manipuliert
         List = 16,
 
         /// <summary>
@@ -56,8 +56,7 @@ namespace Skript.Enums {
         Variable_List_Or_String = Variable | String | List,
         Variable_List_String_Numeral_or_Bool = Variable | String | List | Numeral | Bool,
         Variable_String_or_Numeral = Variable | String | List | Numeral,
-        Variable_List_String_Numeral_Date_or_Bool = Variable | String | List | Numeral | Bool | Date,
-        Variable_Any = Variable | String | List | Numeral | Bool | Date | Error | NotDefinedYet
+        Variable_Any = Variable | String | List | Numeral | Bool | Error | NotDefinedYet
     }
 
 }

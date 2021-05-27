@@ -369,6 +369,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.GlobalTab.SelectedIndex = 0;
             this.GlobalTab.Size = new System.Drawing.Size(1047, 645);
             this.GlobalTab.TabIndex = 21;
+            this.GlobalTab.Selecting += new System.Windows.Forms.TabControlCancelEventHandler(this.GlobalTab_Selecting);
             // 
             // Tab_Allgemein
             // 
@@ -606,6 +607,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // txtSkript
             // 
+            this.txtSkript.AllowMacroRecording = false;
             this.txtSkript.AutoCompleteBracketsList = new char[] {
         '(',
         ')',
@@ -627,7 +629,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.txtSkript.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txtSkript.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
             this.txtSkript.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txtSkript.Font = new System.Drawing.Font("Courier New", 9.75F);
             this.txtSkript.IsReplaceMode = false;
             this.txtSkript.Language = FastColoredTextBoxNS.Language.CSharp;
             this.txtSkript.LeftBracket = '(';

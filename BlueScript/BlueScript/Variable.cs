@@ -42,8 +42,8 @@ namespace BlueScript {
                 case enVariableDataType.Numeral:
                     return "{num} " + zusatz + Name + " = " + ValueForReplace;
 
-                case enVariableDataType.Date:
-                    return "{dat} " + zusatz + Name + " = " + ValueForReplace;
+                //case enVariableDataType.Date:
+                //    return "{dat} " + zusatz + Name + " = " + ValueForReplace;
 
                 case enVariableDataType.Bool:
                     return "{bol} " + zusatz + Name + " = " + ValueForReplace;

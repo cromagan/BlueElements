@@ -23,7 +23,7 @@ using System.Collections.Generic;
 namespace BlueScript {
     internal class Method_IsType : Method {
 
-        public override string Syntax => "isType(Variable, num / str / lst / dat / bol / err / ukn)";
+        public override string Syntax => "isType(Variable, num / str / lst / bol / err / ukn)";
         public override string Description => "Prüft, ob der Variablenntyp dem hier angegeben Wert entspricht. Es wird keine Inhaltsprüfung ausgeführt!";
         public override List<string> Comand(Script s) { return new() { "istype" }; }
         public override string StartSequence => "(";
@@ -47,9 +47,9 @@ namespace BlueScript {
                 case "lst":
                     if (attvar.Attributes[0].Type == enVariableDataType.List) { return strDoItFeedback.Wahr(); }
                     return strDoItFeedback.Falsch();
-                case "dat":
-                    if (attvar.Attributes[0].Type == enVariableDataType.Date) { return strDoItFeedback.Wahr(); }
-                    return strDoItFeedback.Falsch();
+                //case "dat":
+                //    if (attvar.Attributes[0].Type == enVariableDataType.Date) { return strDoItFeedback.Wahr(); }
+                //    return strDoItFeedback.Falsch();
                 case "bol":
                     if (attvar.Attributes[0].Type == enVariableDataType.Bool) { return strDoItFeedback.Wahr(); }
                     return strDoItFeedback.Falsch();

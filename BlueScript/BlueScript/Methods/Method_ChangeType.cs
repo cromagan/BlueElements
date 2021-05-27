@@ -24,7 +24,7 @@ using System.Collections.Generic;
 namespace BlueScript {
     internal class Method_ChangeType : Method {
 
-        public override string Syntax => "ChangeType(Variable, num / str / lst / dat / bol)";
+        public override string Syntax => "ChangeType(Variable, num / str / lst / dat / bol);";
 
         public override string Description => "Ändert den Variabelntyp einfach um. Ohne jegliche Prüfung. Alle Variablen werden Intern als Text gespeichert, weshalb diese Änderung möglich ist. Evtl. entstehen dadurch Variablen, die an sich kaputt sind, aber nicht als solches markiert sind.";
 
@@ -33,7 +33,7 @@ namespace BlueScript {
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.Null;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List_String_Numeral_Date_or_Bool, enVariableDataType.String };
+        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List_String_Numeral_or_Bool, enVariableDataType.String };
         public override bool EndlessArgs => false;
 
 
@@ -52,14 +52,14 @@ namespace BlueScript {
                 case "lst":
                     attvar.Attributes[0].Type = enVariableDataType.List;
                     break;
-                case "dat":
-                    attvar.Attributes[0].Type = enVariableDataType.Date;
-                    break;
+                //case "dat":
+                //    attvar.Attributes[0].Type = enVariableDataType.Date;
+                //    break;
                 case "bol":
                     attvar.Attributes[0].Type = enVariableDataType.Bool;
                     break;
                 default:
-                    return new strDoItFeedback("Es wir als zweites Attribut ein String mit dem Inhalt num, str, lst, dat oder bol erwartet.");
+                    return new strDoItFeedback("Es wir als zweites Attribut ein String mit dem Inhalt num, str, lst oder bol erwartet.");
             }
 
 

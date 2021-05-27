@@ -77,6 +77,7 @@ namespace BlueBasics {
         public const string Format_Date4 = "yyyy-MM-dd_HH-mm-ss";
         public const string Format_Date5 = "dd.MM.yyyy HH:mm:ss";
         public const string Format_Date6 = "dd.MM.yyyy";
+        public const string Format_Date7 = "dd.MM.yyyy HH:mm:ss.fff";
 
         public const string Format_Integer20 = "00000000000000000000";
         public const string Format_Integer10 = "0000000000";

@@ -24,7 +24,7 @@ namespace BlueScript {
     internal class Method_Add : Method {
 
 
-        public override string Syntax => "Add(List-Variable, Value1, Value2, ...)";
+        public override string Syntax => "Add(List-Variable, Value1, Value2, ...);";
 
 
         public override string Description => "Fügt einer Liste einen oder mehrere Werte hinzu.";

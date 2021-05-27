@@ -19,27 +19,29 @@
 
 using Skript.Enums;
 using System.Collections.Generic;
+using static BlueBasics.modConverter;
+
 
 namespace BlueScript {
-    internal class Method_Count : Method {
+    internal class Method_IsDateTime : Method {
 
-
-        public override string Syntax => "Count(List-Variable)";
-
-
-        public override string Description => "Gibt die Anzahl der Elemente der Liste zurück.";
-        public override List<string> Comand(Script s) { return new() { "count" }; }
+        public override string Description => "Prüft, ob der Inhalt der Variable ein gültiges Datum/Zeit-Format ist. ";
+        public override string Syntax => "IsDateTime(Value)";
+        public override List<string> Comand(Script s) { return new() { "isdatetime" }; }
         public override string StartSequence => "(";
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.Numeral;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List };
+        public override enVariableDataType Returns => enVariableDataType.Bool;
+        public override List<enVariableDataType> Args => new() { enVariableDataType.String };
         public override bool EndlessArgs => false;
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
-            return new strDoItFeedback(attvar.Attributes[0].ValueListString.Count.ToString(), string.Empty);
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.Falsch(); }
+
+            var ok = DateTimeTryParse(attvar.Attributes[0].ValueString, out var _);
+            if (ok) { return strDoItFeedback.Wahr(); }
+            return strDoItFeedback.Falsch();
         }
     }
 }
