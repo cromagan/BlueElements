@@ -36,7 +36,7 @@ namespace BlueBasics.MultiUserFile {
         /// <summary>
         ///
         /// </summary>
-        /// <param name="mustSave">Falls TRUE wird erst ein Speichervorgang mit Fals eingeleitet, um so viel wie mögloch zu speichern, falls eine Datei blockiert ist.</param>
+        /// <param name="mustSave">Falls TRUE wird zuvor automatisch ein Speichervorgang mit FALSE eingeleitet, um so viel wie möglich zu speichern - falls eine Datei blockiert ist.</param>
         public static void SaveAll(bool mustSave) {
             if (mustSave) { SaveAll(false); } // Beenden, was geht, dann erst der muss
 

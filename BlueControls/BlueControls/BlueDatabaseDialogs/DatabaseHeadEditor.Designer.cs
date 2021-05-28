@@ -101,6 +101,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnFremdImport = new BlueControls.Controls.Button();
             this.capExperimentellWarnung = new BlueControls.Controls.Caption();
             this.capBinInfo = new BlueControls.Controls.Caption();
+            this.btnSave = new BlueControls.Controls.Button();
             this.grpBenutzergruppen.SuspendLayout();
             this.grpKennwort.SuspendLayout();
             this.GlobalTab.SuspendLayout();
@@ -621,7 +622,7 @@ namespace BlueControls.BlueDatabaseDialogs
         '\''};
             this.txtSkript.AutoIndentCharsPatterns = "\r\n^\\s*[\\w\\.]+(\\s\\w+)?\\s*(?<range>=)\\s*(?<range>[^;]+);\r\n^\\s*(case|default)\\s*[^:]" +
     "*(?<range>:)\\s*(?<range>[^;]+);\r\n";
-            this.txtSkript.AutoScrollMinSize = new System.Drawing.Size(27, 14);
+            this.txtSkript.AutoScrollMinSize = new System.Drawing.Size(2, 14);
             this.txtSkript.BackBrush = null;
             this.txtSkript.BracketsHighlightStrategy = FastColoredTextBoxNS.BracketsHighlightStrategy.Strategy2;
             this.txtSkript.CharHeight = 14;
@@ -629,6 +630,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.txtSkript.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txtSkript.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
             this.txtSkript.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txtSkript.Font = new System.Drawing.Font("Courier New", 9.75F);
             this.txtSkript.IsReplaceMode = false;
             this.txtSkript.Language = FastColoredTextBoxNS.Language.CSharp;
             this.txtSkript.LeftBracket = '(';
@@ -959,9 +961,21 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capBinInfo.Text = "Die hier aufgeführten Binärdaten können - falls es ein Bild ist - mit DB_Dateinam" +
     "e mit Suffix angesprochen werden.";
             // 
+            // btnSave
+            // 
+            this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSave.ImageCode = "Diskette|16";
+            this.btnSave.Location = new System.Drawing.Point(840, 651);
+            this.btnSave.Name = "btnSave";
+            this.btnSave.Size = new System.Drawing.Size(112, 24);
+            this.btnSave.TabIndex = 22;
+            this.btnSave.Text = "Speichern";
+            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            // 
             // DatabaseHeadEditor
             // 
             this.ClientSize = new System.Drawing.Size(1050, 677);
+            this.Controls.Add(this.btnSave);
             this.Controls.Add(this.GlobalTab);
             this.Controls.Add(this.btnOk);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
@@ -1064,5 +1078,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private Caption capAdditional;
         private ListBox lstComands;
         private FastColoredTextBoxNS.FastColoredTextBox txtSkript;
+        private Button btnSave;
     }
 }

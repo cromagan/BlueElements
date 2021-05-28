@@ -293,9 +293,11 @@ namespace BlueControls.Controls {
 
                     ValueSet(tmp2.JoinWithCr(), true, true);
 
-                    if (Value.ToUpper() != tmp2.JoinWithCr().ToUpper()) {
-                        Develop.DebugPrint(enFehlerArt.Warnung, "Werte ungleich: " + Value + " - " + tmp2.JoinWithCr());
-                    }
+                    //if (Value.ToUpper() != tmp2.JoinWithCr().ToUpper()) {
+                    //    // Dieser Fehler tritt auf, wenn ein BestFile nicht gefunden wurde, weil es auf der Festplatte nicht (mehr) existiert
+                    //  Ode noch ni existiert hat
+                    //    Develop.DebugPrint(enFehlerArt.Warnung, "Werte ungleich: " + Value + " - " + tmp2.JoinWithCr());
+                    //}
                     break;
 
                 default:

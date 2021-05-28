@@ -47,8 +47,6 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private bool frmHeadEditor_FormClosing_isin;
 
-        private bool IgnoreAll;
-
         public DatabaseHeadEditor(Database cDatabase) {
 
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
@@ -60,23 +58,35 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void _Database_Disposing(object sender, System.EventArgs e) {
-            _Database.Disposing -= _Database_Disposing;
-            _Database = null;
+            RemoveDatabase();
             Close();
 
         }
 
-        protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
-            base.OnFormClosing(e);
-            if (_Database == null) { return; } // Disposed
-
+        private void RemoveDatabase() {
+            if (_Database == null) { return; }
             _Database.Disposing -= _Database_Disposing;
+            _Database = null;
 
-            if (IgnoreAll) { return; }
-            if (_Database.ReadOnly) { return; }
+        }
+
+        protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
 
             if (frmHeadEditor_FormClosing_isin) { return; }
             frmHeadEditor_FormClosing_isin = true;
+
+            base.OnFormClosing(e);
+
+            if (_Database != null) {
+                WriteInfosBack();
+                RemoveDatabase();
+            }
+        }
+
+        private void WriteInfosBack() {
+            if (_Database == null) { return; } // Disposed
+            if (_Database.ReadOnly) { return; }
+
 
             _Database.GlobalShowPass = txbKennwort.Text;
             _Database.Caption = txbCaption.Text;
@@ -150,9 +160,8 @@ namespace BlueControls.BlueDatabaseDialogs {
                 _Database.Export.AddRange(NewExports);
             }
 
-            _Database = null;
-        }
 
+        }
 
         protected override void OnLoad(System.EventArgs e) {
             base.OnLoad(e);
@@ -397,15 +406,8 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void btnFremdImport_Click(object sender, System.EventArgs e) {
             if (_Database.ReadOnly) { return; }
 
-            var en = new System.Windows.Forms.FormClosingEventArgs(System.Windows.Forms.CloseReason.None, false);
-            var d = _Database;
 
-            OnFormClosing(en);
-            _Database = d;
-            if (en.Cancel) { return; }
-
-
-
+            WriteInfosBack();
 
 
             string GetFromFile;
@@ -468,7 +470,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 }
             } while (Art != enDatabaseDataType.EOF);
 
-            IgnoreAll = true;
+            RemoveDatabase();
             Close();
         }
 
@@ -833,6 +835,21 @@ namespace BlueControls.BlueDatabaseDialogs {
                 }
 
             }
+        }
+
+        private void btnSave_Click(object sender, System.EventArgs e) {
+            var ok = false;
+
+            if(_Database != null) {
+                WriteInfosBack();
+               ok =  _Database.Save(false);
+            }
+
+            if(!ok) {
+                MessageBox.Show("Speichern fehlgeschlagen!");
+            }
+
+
         }
     }
 }

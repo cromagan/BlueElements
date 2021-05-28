@@ -77,6 +77,7 @@ namespace BlueControls.Controls {
 
         private bool RepairPrinterData_Prepaired;
 
+        public bool _editAllowed = true;
 
 
         #region  Events 
@@ -107,6 +108,13 @@ namespace BlueControls.Controls {
                 Invalidate();
             }
         }
+
+        [DefaultValue(true)]
+        public bool EditAllowed {
+            get => _editAllowed;
+            set => _editAllowed = value;
+        }
+
 
 
         [Browsable(false)]
@@ -186,6 +194,8 @@ namespace BlueControls.Controls {
 
             if (hasbase) { base.OnKeyUp(e); }
 
+            if (!_editAllowed) { return; }
+
 
             if (_GivesMouseComandsTo != null) {
                 if (_GivesMouseComandsTo.KeyUp(this, e, _Zoom, _shiftX, _shiftY)) { return; }
@@ -240,6 +250,7 @@ namespace BlueControls.Controls {
 
             CheckHotItem(e, true);
 
+            if (!_editAllowed) { return; }
 
             _LastQuickInfo = string.Empty;
 
@@ -292,6 +303,8 @@ namespace BlueControls.Controls {
             if (e.Button == System.Windows.Forms.MouseButtons.None) {
                 CheckHotItem(e, false); // Für QuickInfo usw.
             }
+
+            if(!_editAllowed) { return; }
 
             if (_GivesMouseComandsTo != null) {
                 if (e.Button == System.Windows.Forms.MouseButtons.None && HotItem != _GivesMouseComandsTo) {
@@ -354,6 +367,7 @@ namespace BlueControls.Controls {
 
             switch (e.Button) {
                 case System.Windows.Forms.MouseButtons.Left:
+                    if (!_editAllowed) { return; }
                     // Da ja evtl. nur ein Punkt verschoben wird, das Ursprüngliche Element wieder komplett auswählen.
                     BasicPadItem select = null;
 
