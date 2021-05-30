@@ -181,7 +181,7 @@ namespace BlueControls.ItemCollection {
         }
 
 
-        public ItemCollectionPad(string layoutID, Database database, int rowkey) : this(database.Layouts[database.LayoutIDToIndex(layoutID)], string.Empty) {
+        public ItemCollectionPad(string layoutID, Database database, int rowkey) : this(database.Layouts[database.Layouts.LayoutIDToIndex(layoutID)], string.Empty) {
 
             // Wenn nur die Row ankommt und diese null ist, kann gar nix generiert werden
             ResetVariables();

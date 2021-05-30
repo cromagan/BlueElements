@@ -690,7 +690,7 @@ namespace BlueDatabase {
 
                 if (_ExportFormularID.StartsWith("#")) {
 
-                    var LNo = Database.LayoutIDToIndex(_ExportFormularID);
+                    var LNo = Database.Layouts.LayoutIDToIndex(_ExportFormularID);
                     if (LNo < 0) {
                         return "Layout-Vorlage nicht vorhanden.";
                     }

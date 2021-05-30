@@ -91,7 +91,6 @@
     <Compile Include="EventArgs\ButtonCellEventArgs.cs" />
     <Compile Include="EventArgs\CellCancelEventArgs.cs" />
     <Compile Include="EventArgs\CellDoubleClickEventArgs.cs" />
-    <Compile Include="EventArgs\GenerateLayoutInternalEventargs.cs" />
     <Compile Include="EventArgs\MessageEventArgs.cs" />
     <Compile Include="EventArgs\RenameColumnInLayoutEventArgs.cs" />
     <Compile Include="EventArgs\PasswordEventArgs.cs" />
@@ -110,6 +109,7 @@
     <Compile Include="FilterCollection.cs" />
     <Compile Include="FilterItem.cs" />
     <Compile Include="LanguageTool.cs" />
+    <Compile Include="LayoutCollection.cs" />
     <Compile Include="RowCollection.cs" />
     <Compile Include="RowItem.cs" />
     <Compile Include="RowSortDefinition.cs" />

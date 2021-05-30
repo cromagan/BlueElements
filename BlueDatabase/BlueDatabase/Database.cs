@@ -115,8 +115,6 @@ namespace BlueDatabase {
 
         #region  Variablen-Deklarationen 
 
-        //private IContainer components;
-
         public readonly ColumnCollection Column;
         public readonly CellCollection Cell;
         public readonly RowCollection Row;
@@ -155,10 +153,11 @@ namespace BlueDatabase {
         /// </summary>
         public readonly ListExt<ExportDefinition> Export = new();
 
-        //public readonly ListExt<clsNamedBinary> Bins = new();
         public readonly ListExt<string> DatenbankAdmin = new();
         public readonly ListExt<string> PermissionGroups_NewRow = new();
-        public readonly ListExt<string> Layouts = new(); // Print Views werden nicht immer benötigt. Deswegen werden sie als String gespeichert. Der Richtige Typ wäre CreativePad
+
+
+        public readonly LayoutCollection Layouts = new(); 
 
         public string UserGroup = "#Administrator";
         public readonly string UserName = modAllgemein.UserName().ToUpper();
@@ -189,7 +188,7 @@ namespace BlueDatabase {
         public event EventHandler<MessageEventArgs> DropMessage;
 
         public event EventHandler<PasswordEventArgs> NeedPassword;
-        public event EventHandler<RenameColumnInLayoutEventArgs> RenameColumnInLayout;
+        //public event EventHandler<RenameColumnInLayoutEventArgs> RenameColumnInLayout;
         public event EventHandler<GenerateLayoutInternalEventargs> GenerateLayoutInternal;
         #endregion
 
@@ -223,7 +222,7 @@ namespace BlueDatabase {
             Export.Changed += Export_ListOrItemChanged;
             DatenbankAdmin.Changed += DatabaseAdmin_ListOrItemChanged;
 
-            Row.RowRemoving += Row_BeforeRemoveRow;
+            Row.RowRemoving += Row_RowRemoving;
             Row.RowAdded += Row_RowAdded;
 
             Column.ItemRemoving += Column_ItemRemoving;
@@ -531,7 +530,7 @@ namespace BlueDatabase {
             Export.Changed -= Export_ListOrItemChanged;
             DatenbankAdmin.Changed -= DatabaseAdmin_ListOrItemChanged;
 
-            Row.RowRemoving -= Row_BeforeRemoveRow;
+            Row.RowRemoving -= Row_RowRemoving;
             Row.RowAdded -= Row_RowAdded;
 
             Column.ItemRemoving -= Column_ItemRemoving;
@@ -574,63 +573,17 @@ namespace BlueDatabase {
 
         }
 
-        public int LayoutIDToIndex(string exportFormularID) {
 
-            for (var z = 0; z < Layouts.Count; z++) {
-                if (Layouts[z].Contains("ID=" + exportFormularID + ",")) { return z; }
-            }
-
-            return -1;
-        }
-
-        //public string DoImportScript(string TextToImport, RowItem row, bool MeldeFehlgeschlageneZeilen) {
-        //    if (string.IsNullOrEmpty(_ImportScript)) { return "Kein Import-Skript vorhanden."; }
-        //    if (string.IsNullOrEmpty(TextToImport)) { return "Kein Text zum Importieren angegeben."; }
-
-
-        //    var cmds = _ImportScript.FromNonCritical().SplitByCRToList();
-
-        //    //if (row == null)
-        //    //{
-        //    //    row = Row.Add(DateTime.Now.ToString(Constants.Format_Date));
-        //    //}
-        //    //else
-        //    //{
-        //    if (row != null && row.CellGetBoolean(row.Database.Column.SysLocked)) { return "Die Zeile ist gesperrt (abgeschlossen)."; }
-        //    //}
-
-
-
-        //    foreach (var thiscmd in cmds) {
-        //        (var fehlertext, var bigfailure, var importrow) = DoImportScript(TextToImport, thiscmd.Replace(";cr;", "\r").Replace(";tab;", "\t").SplitBy("|"), row);
-
-        //        if (importrow == null) { return "Es konnte keine neue Zeile erzeugt werden."; }
-
-        //        if (row == null) {
-        //            row = importrow;
-        //        } else {
-        //            if (row != importrow) { return "Zeilen-Inkonsistenz festgestellt."; }
-        //        }
-
-        //        if (!string.IsNullOrEmpty(fehlertext)) {
-        //            if (bigfailure) { return fehlertext + "<br><br>Zeile:<br>" + thiscmd; }
-        //            if (MeldeFehlgeschlageneZeilen) { return fehlertext + "<br><br>Zeile:<br>" + thiscmd; }
-        //        }
-        //    }
-        //    return string.Empty;
-        //}
 
         internal void OnDropMessage(string message) {
             if (Disposed) { return; }
             DropMessage?.Invoke(this, new MessageEventArgs(message));
         }
 
-
         internal void OnProgressbarInfo(ProgressbarEventArgs e) {
             if (Disposed) { return; }
             ProgressbarInfo?.Invoke(this, e);
         }
-
 
         private void Column_ItemRemoved(object sender, System.EventArgs e) {
             if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Parsing Falsch!"); }
@@ -640,7 +593,6 @@ namespace BlueDatabase {
         private void Column_ItemRemoving(object sender, ListEventArgs e) {
             var Key = ((ColumnItem)e.Item).Key;
             AddPending(enDatabaseDataType.dummyComand_RemoveColumn, Key, -1, string.Empty, Key.ToString(), false);
-
         }
 
         private void Row_RowAdded(object sender, RowEventArgs e) {
@@ -649,7 +601,7 @@ namespace BlueDatabase {
             }
         }
 
-        private void Row_BeforeRemoveRow(object sender, RowEventArgs e) {
+        private void Row_RowRemoving(object sender, RowEventArgs e) {
             AddPending(enDatabaseDataType.dummyComand_RemoveRow, -1, e.Row.Key, "", e.Row.Key.ToString(), false);
         }
 
@@ -681,11 +633,7 @@ namespace BlueDatabase {
                 if (Views.Count > 1 && !Views[1].PermissionGroups_Show.Contains("#Everybody")) { Views[1].PermissionGroups_Show.Add("#Everybody"); }
             }
 
-            for (var z = 0; z < Layouts.Count; z++) {
-                if (!Layouts[z].StartsWith("{ID=#")) {
-                    Layouts[z] = "{ID=#Converted" + z.ToString() + ", " + Layouts[z].Substring(1);
-                }
-            }
+            Layouts.Check();
         }
 
         private void DatabaseTags_ListOrItemChanged(object sender, System.EventArgs e) {
@@ -1276,11 +1224,11 @@ namespace BlueDatabase {
         internal string Column_UsedIn(ColumnItem column) {
 
             var t = string.Empty;
-            var layout = false;
-            foreach (var thisLayout in Layouts) {
-                if (thisLayout.ToUpper().Contains(column.Name.ToUpper())) { layout = true; }
-            }
-            if (layout) { t += " - Layouts (für Export)"; }
+            //var layout = false;
+            //foreach (var thisLayout in Layoutsx) {
+            //    if (thisLayout.ToUpper().Contains(column.Name.ToUpper())) { layout = true; }
+            //}
+            //if (layout) { t += " - Layouts (für Export)"; }
 
 
 
@@ -1338,16 +1286,7 @@ namespace BlueDatabase {
             // Nicht nötig, da die Spalten als Verweiß gespeichert sind
 
             // Layouts -----------------------------------------
-            if (Layouts != null && Layouts.Count > 0) {
-                for (var cc = 0; cc < Layouts.Count; cc++) {
-
-                    var e = new RenameColumnInLayoutEventArgs(Layouts[cc], oldName, newName);
-                    OnRenameColumnInLayout(e);
-
-                    Layouts[cc] = e.LayoutCode;
-                }
-            }
-
+            // Werden über das Skript gesteuert
 
             // Sortierung -----------------------------------------
             // Nicht nötig, da die Spalten als Verweiß gespeichert sind
@@ -1359,31 +1298,9 @@ namespace BlueDatabase {
             // Nicht nötig, da die Spalten als Verweiß gespeichert sind
 
 
-
-            //// ImportScript -----------------------------------------
-            //var x = ImportScript.FromNonCritical().SplitByCRToList();
-            //var xn = new List<string>();
-
-            //foreach (var thisstring in x) {
-            //    if (!string.IsNullOrEmpty(thisstring)) {
-            //        var x2 = thisstring.SplitBy("|");
-            //        if (x2.Length > 2 && x2[1].ToUpper() == oldName.ToUpper()) {
-            //            x2[1] = newName.Name.ToUpper();
-            //            xn.Add(x2.JoinWith("|"));
-            //        } else {
-            //            xn.Add(thisstring);
-            //        }
-            //    }
-            //}
-            //ImportScript = xn.JoinWithCr().ToNonCritical();
-
-
-
             // Zeilen-Quick-Info -----------------------------------------
             ZeilenQuickInfo = ZeilenQuickInfo.Replace("&" + oldName + ";", "&" + newName.Name + ";", RegexOptions.IgnoreCase);
             ZeilenQuickInfo = ZeilenQuickInfo.Replace("&" + oldName + "(", "&" + newName.Name + "(", RegexOptions.IgnoreCase);
-
-
         }
 
 
@@ -1977,10 +1894,10 @@ namespace BlueDatabase {
             SortParameterChanged?.Invoke(this, System.EventArgs.Empty);
         }
 
-        private void OnRenameColumnInLayout(RenameColumnInLayoutEventArgs e) {
-            if (Disposed) { return; }
-            RenameColumnInLayout?.Invoke(this, e);
-        }
+        //private void OnRenameColumnInLayout(RenameColumnInLayoutEventArgs e) {
+        //    if (Disposed) { return; }
+        //    RenameColumnInLayout?.Invoke(this, e);
+        //}
 
 
         public List<string> AllConnectedFilesLCase() {

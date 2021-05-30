@@ -19,6 +19,7 @@
 
 
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
@@ -143,19 +144,19 @@ namespace BlueControls.Forms {
             Tabs.SelectedIndex = 1;
 
 
-            if (FrmDrucken_Layout1.Item.Count == 0) {
+            if (cbxDrucken_Layout1.Item.Count == 0) {
                 BefülleLayoutDropdowns();
             }
 
 
 
-            Weiter2.Enabled = !string.IsNullOrEmpty(FrmDrucken_Layout1.Text);
+            Weiter2.Enabled = !string.IsNullOrEmpty(cbxDrucken_Layout1.Text);
 
 
-            if (FrmDrucken_Layout1.Text.IsLong()) {
+            if (_Database.Layouts.LayoutIDToIndex(cbxDrucken_Layout1.Text) > -1) {
 
                 TmpPad.ShowInPrintMode = true;
-                TmpPad.Item = new ItemCollectionPad(FrmDrucken_Layout1.Text, Liste[0].Database, Liste[0].Key);
+                TmpPad.Item = new ItemCollectionPad(cbxDrucken_Layout1.Text, Liste[0].Database, Liste[0].Key);
 
                 TmpPad.ZoomFit();
             }
@@ -194,7 +195,7 @@ namespace BlueControls.Forms {
             }
 
 
-            if (Speichern.Checked && FrmDrucken_Layout1.Text.IsLong()) {
+            if (Speichern.Checked && _Database.Layouts.LayoutIDToIndex(cbxDrucken_Layout1.Text) > -1) {
                 MultiMöglich = false;
             }
 
@@ -207,32 +208,61 @@ namespace BlueControls.Forms {
             }
         }
 
+        public static void AddLayoutsOff(ItemCollectionList items, Database database, bool doDiscLayouts, string additionalLayoutPath) {
 
+            for (var z = 0; z < database.Layouts.Count; z++) {
+                var p = new ItemCollectionPad(database.Layouts[z], string.Empty);
+                items.Add(p.Caption, p.ID, enImageCode.Stern);
+            }
+
+            if (!doDiscLayouts) { return; }
+
+
+            var du = 0; // Beim zweiten Durchlauf wird additionalLayoutPath geändert.
+
+            do {
+                if (PathExists(additionalLayoutPath)) {
+                    var e = Directory.GetFiles(additionalLayoutPath);
+                    foreach (var ThisFile in e) {
+
+
+                        if (ThisFile.FilePath() == database.DefaultLayoutPath()) { ThisFile.TrimStart(database.DefaultLayoutPath()); }
+
+                        if (items[ThisFile] == null) { items.Add(ThisFile.FileNameWithSuffix(), ThisFile, QuickImage.Get(ThisFile.FileType(), 16)); }
+                    }
+                }
+
+                if (database == null) { break; }
+
+                du++;
+                if (du >= 2) { break; }
+                additionalLayoutPath = database.DefaultLayoutPath();
+
+            } while (true);
+
+        }
 
         private void BefülleLayoutDropdowns() {
             if (_Database != null) {
-                FrmDrucken_Layout1.Item.AddLayoutsOf(_Database, Speichern.Checked, _AdditionalLayoutPath);
+                ExportDialog.AddLayoutsOff(cbxDrucken_Layout1.Item, _Database, Speichern.Checked, _AdditionalLayoutPath);
             }
         }
 
 
-        //Private Sub Drucken_Click(sender As Object, e As System.Windows.Forms.MouseEventArgs) Handles FrmDrucken_Drucken.Click
-        //    GenerateLayout()
-        //End Sub
 
         private void LayoutEditor_Click(object sender, System.EventArgs e) {
 
             Enabled = false;
 
-            var n = FrmDrucken_Layout1.Text;
+            var n = cbxDrucken_Layout1.Text;
 
-            FrmDrucken_Layout1.Text = string.Empty;
+            cbxDrucken_Layout1.Text = string.Empty;
             tabAdministration.OpenLayoutEditor(_Database, _AdditionalLayoutPath, n);
-            FrmDrucken_Layout1.Item.Clear();
+            cbxDrucken_Layout1.Item.Clear();
             BefülleLayoutDropdowns();
 
-            if (FrmDrucken_Layout1.Item[n] != null) {
-                FrmDrucken_Layout1.Text = n;
+            if (cbxDrucken_Layout1.Item[n] != null) {
+                cbxDrucken_Layout1.Text = n;
             }
 
             Enabled = true;
@@ -253,10 +283,10 @@ namespace BlueControls.Forms {
 
                 ShowSpeichernEnde();
                 List<string> l;
-                if (FrmDrucken_Layout1.Text.IsLong()) {
-                    l = Export.SaveAsBitmap(Liste, FrmDrucken_Layout1.Text, ZielPfad);
+                if (_Database.Layouts.LayoutIDToIndex(cbxDrucken_Layout1.Text) > -1) {
+                    l = Export.SaveAsBitmap(Liste, cbxDrucken_Layout1.Text, ZielPfad);
                 } else {
-                    l = Export.GenerateLayout_FileSystem(Liste, FrmDrucken_Layout1.Text, SaveTo, FrmDrucken_Zusammen.Checked, ZielPfad);
+                    l = Export.GenerateLayout_FileSystem(Liste, cbxDrucken_Layout1.Text, SaveTo, FrmDrucken_Zusammen.Checked, ZielPfad);
                 }
                 Exported.Item.AddRange(l);
             }
@@ -303,7 +333,7 @@ namespace BlueControls.Forms {
         }
 
 
-        private void FrmDrucken_Layout1_TextChanged(object sender, System.EventArgs e) {
+        private void cbxDrucken_Layout1_TextChanged(object sender, System.EventArgs e) {
             ShowAndCheckLayoutWahl();
         }
 
@@ -360,7 +390,7 @@ namespace BlueControls.Forms {
             PrintPad.Item.Clear();
             modAllgemein.CollectGarbage();
 
-            var tmp = new CreativePad(new ItemCollectionPad(FrmDrucken_Layout1.Text, Liste[0].Database, Liste[0].Key));
+            var tmp = new CreativePad(new ItemCollectionPad(cbxDrucken_Layout1.Text, Liste[0].Database, Liste[0].Key));
 
             var OneItem = tmp.Item.MaxBounds(null);
 
@@ -378,7 +408,7 @@ namespace BlueControls.Forms {
 
 
                     var It = new ChildPadItem(PrintPad.Item) {
-                        PadInternal = new CreativePad(new ItemCollectionPad(FrmDrucken_Layout1.Text, Liste[StartNr].Database, Liste[StartNr].Key))
+                        PadInternal = new CreativePad(new ItemCollectionPad(cbxDrucken_Layout1.Text, Liste[StartNr].Database, Liste[StartNr].Key))
                     };
 
                     //Dim it As New RowFormulaPadItem(Liste(StartNr), Integer.Parse(FrmDrucken_Layout1.Text))

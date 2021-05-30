@@ -31,7 +31,7 @@ using static BlueBasics.FileOperations;
 namespace BlueControls.BlueDatabaseDialogs {
 
     internal partial class LayoutDesigner : BlueControls.Forms.PadEditor {
-        public  Database Database { get; private set; }
+        public Database Database { get; private set; }
 
         private string _LoadedLayout = string.Empty;
         private string _AdditionalLayoutPath = "";
@@ -44,7 +44,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             Database = database;
-            Database.Disposing += Database_Disposing;  
+            Database.Disposing += Database_Disposing;
             _AdditionalLayoutPath = additionalLayoutPath;
 
 
@@ -156,7 +156,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (MessageBox.Show("Layout <b>'" + Pad.Item.Caption + "'</b><br>wirklich löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
 
             Pad.Item.Clear();
-            var ind = Database.LayoutIDToIndex(_LoadedLayout);
+            var ind = Database.Layouts.LayoutIDToIndex(_LoadedLayout);
 
             Database.Layouts.RemoveAt(ind);
             _LoadedLayout = string.Empty;
@@ -219,7 +219,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             } else {
                 Pad.Enabled = true;
                 _LoadedLayout = fileOrLayoutID;
-                var ind = Database.LayoutIDToIndex(_LoadedLayout);
+                var ind = Database.Layouts.LayoutIDToIndex(_LoadedLayout);
                 Pad.Item = new ItemCollectionPad(Database.Layouts[ind], string.Empty);
                 ItemChanged();
             }
@@ -244,7 +244,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             var newl = Pad.Item.ToString();
 
             if (_LoadedLayout.StartsWith("#")) {
-                var ind = Database.LayoutIDToIndex(_LoadedLayout);
+                var ind = Database.Layouts.LayoutIDToIndex(_LoadedLayout);
                 if (Database.Layouts[ind] == newl) { return; }
                 Database.Layouts[ind] = newl;
             } else if (_LoadedLayout.FileSuffix().ToUpper() == "BCR") {
@@ -488,7 +488,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void befülleLayoutDropdown() {
             if (Database != null) {
                 Layout1.Item.Clear();
-                Layout1.Item.AddLayoutsOf(Database, true, _AdditionalLayoutPath);
+                ExportDialog.AddLayoutsOff(Layout1.Item, Database, true, _AdditionalLayoutPath);
             }
         }
         private void Pad_ClickedItemChanged(object sender, System.EventArgs e) {

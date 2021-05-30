@@ -28,10 +28,8 @@ using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 using System.Linq;
 using static BlueBasics.Extensions;
-using static BlueBasics.FileOperations;
 
 namespace BlueControls.ItemCollection {
     public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
@@ -1024,40 +1022,6 @@ namespace BlueControls.ItemCollection {
                     if (this[thisstring] == null) { Add(thisstring, thisstring); }
                 }
             }
-
-        }
-
-
-        public void AddLayoutsOf(Database vLayoutDatabase, bool vDoDiscLayouts, string vAdditionalLayoutPath) {
-
-            for (var z = 0; z < vLayoutDatabase.Layouts.Count; z++) {
-                var p = new ItemCollectionPad(vLayoutDatabase.Layouts[z], string.Empty);
-                Add(p.Caption, p.ID, enImageCode.Stern);
-            }
-
-            if (!vDoDiscLayouts) { return; }
-
-            var du = 0;
-
-            do {
-                if (PathExists(vAdditionalLayoutPath)) {
-                    var e = Directory.GetFiles(vAdditionalLayoutPath);
-                    foreach (var ThisFile in e) {
-
-
-                        if (ThisFile.FilePath() == vLayoutDatabase.DefaultLayoutPath()) { ThisFile.TrimStart(vLayoutDatabase.DefaultLayoutPath()); }
-
-                        if (this[ThisFile] == null) { Add(ThisFile.FileNameWithSuffix(), ThisFile, QuickImage.Get(ThisFile.FileType(), 16)); }
-                    }
-                }
-
-                if (vLayoutDatabase == null) { break; }
-
-                du++;
-                if (du >= 2) { break; }
-                vAdditionalLayoutPath = vLayoutDatabase.DefaultLayoutPath();
-
-            } while (true);
 
         }
 

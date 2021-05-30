@@ -36,7 +36,7 @@ namespace BlueControls.Forms
             this.FrmDrucken_Einzeln = new BlueControls.Controls.Button();
             this.FrmDrucken_EinWahl = new BlueControls.Controls.Button();
             this.FrmDrucken_Info = new BlueControls.Controls.Caption();
-            this.FrmDrucken_Layout1 = new BlueControls.Controls.ComboBox();
+            this.cbxDrucken_Layout1 = new BlueControls.Controls.ComboBox();
             this.c_Layoutx = new BlueControls.Controls.Caption();
             this.Caption3 = new BlueControls.Controls.Caption();
             this.MachZu = new BlueControls.Controls.Button();
@@ -119,17 +119,17 @@ namespace BlueControls.Forms
             this.FrmDrucken_Info.Size = new System.Drawing.Size(618, 96);
             this.FrmDrucken_Info.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
-            // FrmDrucken_Layout1
+            // cbxDrucken_Layout1
             // 
-            this.FrmDrucken_Layout1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.cbxDrucken_Layout1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.FrmDrucken_Layout1.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.FrmDrucken_Layout1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.FrmDrucken_Layout1.Location = new System.Drawing.Point(96, 8);
-            this.FrmDrucken_Layout1.Name = "FrmDrucken_Layout1";
-            this.FrmDrucken_Layout1.Size = new System.Drawing.Size(618, 24);
-            this.FrmDrucken_Layout1.TabIndex = 80;
-            this.FrmDrucken_Layout1.TextChanged += new System.EventHandler(this.FrmDrucken_Layout1_TextChanged);
+            this.cbxDrucken_Layout1.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxDrucken_Layout1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxDrucken_Layout1.Location = new System.Drawing.Point(96, 8);
+            this.cbxDrucken_Layout1.Name = "cbxDrucken_Layout1";
+            this.cbxDrucken_Layout1.Size = new System.Drawing.Size(618, 24);
+            this.cbxDrucken_Layout1.TabIndex = 80;
+            this.cbxDrucken_Layout1.TextChanged += new System.EventHandler(this.cbxDrucken_Layout1_TextChanged);
             // 
             // c_Layoutx
             // 
@@ -272,7 +272,7 @@ namespace BlueControls.Forms
             this.TabLayout.Controls.Add(this.FrmDrucken_LayoutEditor);
             this.TabLayout.Controls.Add(this.Caption1);
             this.TabLayout.Controls.Add(this.TmpPad);
-            this.TabLayout.Controls.Add(this.FrmDrucken_Layout1);
+            this.TabLayout.Controls.Add(this.cbxDrucken_Layout1);
             this.TabLayout.Controls.Add(this.Captionxx1);
             this.TabLayout.Location = new System.Drawing.Point(4, 25);
             this.TabLayout.Name = "TabLayout";
@@ -448,7 +448,7 @@ namespace BlueControls.Forms
             this.ResumeLayout(false);
 
 			}
-			private ComboBox FrmDrucken_Layout1;
+			private ComboBox cbxDrucken_Layout1;
 			private Caption c_Layoutx;
 			private Caption FrmDrucken_Info;
 			private Button FrmDrucken_EinWahl;
