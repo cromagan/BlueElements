@@ -155,10 +155,10 @@ namespace BlueControls.Forms {
 
             if (_Database.Layouts.LayoutIDToIndex(cbxDrucken_Layout1.Text) > -1) {
 
-                TmpPad.ShowInPrintMode = true;
-                TmpPad.Item = new ItemCollectionPad(cbxDrucken_Layout1.Text, Liste[0].Database, Liste[0].Key);
+                padVorschau.ShowInPrintMode = true;
+                padVorschau.Item = new ItemCollectionPad(cbxDrucken_Layout1.Text, Liste[0].Database, Liste[0].Key);
 
-                TmpPad.ZoomFit();
+                padVorschau.ZoomFit();
             }
 
         }
@@ -195,7 +195,7 @@ namespace BlueControls.Forms {
             }
 
 
-            if (Speichern.Checked && _Database.Layouts.LayoutIDToIndex(cbxDrucken_Layout1.Text) > -1) {
+            if (optSpeichern.Checked && _Database.Layouts.LayoutIDToIndex(cbxDrucken_Layout1.Text) > -1) {
                 MultiMöglich = false;
             }
 
@@ -244,7 +244,7 @@ namespace BlueControls.Forms {
 
         private void BefülleLayoutDropdowns() {
             if (_Database != null) {
-                ExportDialog.AddLayoutsOff(cbxDrucken_Layout1.Item, _Database, Speichern.Checked, _AdditionalLayoutPath);
+                ExportDialog.AddLayoutsOff(cbxDrucken_Layout1.Item, _Database, optSpeichern.Checked, _AdditionalLayoutPath);
             }
         }
 
@@ -275,7 +275,7 @@ namespace BlueControls.Forms {
         private void WeiterEinträge_Click(object sender, System.EventArgs e) {
 
 
-            if (Drucken.Checked) {
+            if (optDrucken.Checked) {
 
                 ShowDruckenEnde();
             } else {
@@ -306,7 +306,7 @@ namespace BlueControls.Forms {
             Tabs.TabPages[4].Enabled = false;
             Tabs.SelectedIndex = 0;
 
-            WeiterAktion.Enabled = Speichern.Checked || Drucken.Checked;
+            WeiterAktion.Enabled = optSpeichern.Checked || optDrucken.Checked;
         }
 
         public void ShowDruckenEnde() {
