@@ -2351,7 +2351,7 @@ namespace BlueDatabase {
             const char h1 = (char)1001; // überschrift
             const char h7 = (char)1007; // bold
 
-            if (_Format == enDataFormat.Text_mit_Formatierung) { TXT = TXT.HTMLSpecialToNormalChar(); }
+            if (_Format == enDataFormat.Text_mit_Formatierung) { TXT = TXT.HTMLSpecialToNormalChar(false); }
 
             string oTXT;
 

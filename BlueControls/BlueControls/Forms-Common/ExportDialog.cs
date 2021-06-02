@@ -421,7 +421,8 @@ namespace BlueControls.Forms {
                 if (_ItemNrForPrint >= _RowsForExport.Count) { break; }
 
                 var x = TempFile(_ZielPfad, "Schachteln", "png");
-                padSchachteln.Item.SaveAsBitmap(x, System.Drawing.Color.Transparent);
+                padSchachteln.Item.BackColor = System.Drawing.Color.Transparent;
+                padSchachteln.Item.SaveAsBitmap(x);
 
                 l.Add(x);
 

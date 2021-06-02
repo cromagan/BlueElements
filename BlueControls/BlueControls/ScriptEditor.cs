@@ -112,7 +112,16 @@ namespace BlueControls {
             filterVariablen.Table = tableVariablen;
         }
 
+        internal void WriteScriptBack() {
+            if (_Database == null) { return; }
+            _Database.RulesScript = txtSkript.Text;
+        }
+
         private void btnTest_Click(object sender, System.EventArgs e) {
+            if (_Database == null) {
+                MessageBox.Show("Keine Datenbank geladen.", enImageCode.Information, "OK");
+                return;
+            }
             _Database.RulesScript = txtSkript.Text;
             txbSkriptInfo.Text = string.Empty;
 

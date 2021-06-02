@@ -22,7 +22,6 @@ using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueDatabase;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -427,9 +426,9 @@ namespace BlueControls.ItemCollection {
             return true;
         }
 
-        public bool ReplaceVariable(string VariableName, object Value) {
+        public bool ReplaceVariable(BlueScript.Variable variable) {
             if (PadInternal == null) { return false; }
-            var b = PadInternal.Item.ParseVariable(VariableName, Value);
+            var b = PadInternal.Item.ParseVariable(variable);
 
             if (b) { OnChanged(); }
             return b;
@@ -438,13 +437,6 @@ namespace BlueControls.ItemCollection {
 
 
 
-        public bool DoSpecialCodes() {
-            if (PadInternal == null) { return false; }
-            var b = PadInternal.Item.ParseSpecialCodes();
-
-            if (b) { OnChanged(); }
-            return b;
-        }
 
 
         public bool KeyUp(object sender, System.Windows.Forms.KeyEventArgs e, decimal cZoom, decimal shiftX, decimal shiftY) {
@@ -460,13 +452,6 @@ namespace BlueControls.ItemCollection {
             var b = PadInternal.Item.ResetVariables();
             if (b) { OnChanged(); }
             return b;
-        }
-
-
-
-        public bool RenameColumn(string oldName, ColumnItem cColumnItem) {
-            if (PadInternal == null) { return false; }
-            return PadInternal.Item.RenameColumn(oldName, cColumnItem);
         }
 
 

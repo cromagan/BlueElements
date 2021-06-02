@@ -794,7 +794,7 @@ namespace BlueControls.Controls {
             OnPrintPage(e);
 
 
-            var i = _Item.ToBitmap(3, Color.White);
+            var i = _Item.ToBitmap(3);
             if (i == null) { return; }
             e.Graphics.DrawImageInRectAspectRatio(i, 0, 0, e.PageBounds.Width, e.PageBounds.Height);
         }
@@ -895,7 +895,7 @@ namespace BlueControls.Controls {
 
         private void PicsSave_FileOk(object sender, CancelEventArgs e) {
             if (e.Cancel) { return; }
-            _Item.SaveAsBitmap(PicsSave.FileName, Color.White);
+            _Item.SaveAsBitmap(PicsSave.FileName);
         }
 
 

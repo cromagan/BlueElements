@@ -345,10 +345,10 @@ namespace BlueDatabase {
 
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.Gleitkommazahl:
-                    return new Variable(column.Name, row.CellGetString(column), enVariableDataType.Numeral, ro, false, "Spalte: " + column.ReadableText());
+                    return new Variable(column.Name, row.CellGetString(column).Replace("\"", "''"), enVariableDataType.Numeral, ro, false, "Spalte: " + column.ReadableText());
 
                 default:
-                    return new Variable(column.Name, row.CellGetString(column), enVariableDataType.String, ro, false, "Spalte: " + column.ReadableText());
+                    return new Variable(column.Name, row.CellGetString(column).Replace("\"", "''"), enVariableDataType.String, ro, false, "Spalte: " + column.ReadableText());
 
             }
         }

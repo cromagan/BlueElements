@@ -1265,7 +1265,6 @@ namespace BlueControls.Controls {
             if (e.Item is Database DB) {
                 DB.NeedPassword -= Database_NeedPassword;
                 DB.GenerateLayoutInternal -= DB_GenerateLayoutInternal;
-                //DB.RenameColumnInLayout -= DB_RenameColumnInLayout;
                 DB.Loaded -= tabAdministration.CheckDatabase;
             }
         }
@@ -1275,7 +1274,6 @@ namespace BlueControls.Controls {
             if (e.Item is Database DB) {
                 DB.NeedPassword += Database_NeedPassword;
                 DB.GenerateLayoutInternal += DB_GenerateLayoutInternal;
-                //DB.RenameColumnInLayout += DB_RenameColumnInLayout;
                 DB.Loaded += tabAdministration.CheckDatabase;
             }
         }
@@ -1286,20 +1284,13 @@ namespace BlueControls.Controls {
             e.Password = InputBox.Show("Bitte geben sie das Passwort ein,<br>um Zugriff auf diese Datenbank<br>zu erhalten:", string.Empty, enDataFormat.Text);
         }
 
-        //private static void DB_RenameColumnInLayout(object sender, RenameColumnInLayoutEventArgs e) {
-        //    if (e.Handled) { return; }
-        //    e.Handled = true;
-        //    var Padx = new ItemCollectionPad(e.LayoutCode, string.Empty);
-        //    Padx.RenameColumn(e.OldName, e.Column);
-        //    e.LayoutCode = Padx.ToString();
-        //}
 
         private static void DB_GenerateLayoutInternal(object sender, GenerateLayoutInternalEventargs e) {
             if (e.Handled) { return; }
             e.Handled = true;
 
             var Pad = new ItemCollectionPad(e.LayoutID, e.Row.Database, e.Row.Key);
-            Pad.SaveAsBitmap(e.Filename, Color.White);
+            Pad.SaveAsBitmap(e.Filename);
         }
 
 

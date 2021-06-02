@@ -23,14 +23,12 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueDatabase;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-using System.Text.RegularExpressions;
 using static BlueBasics.FileOperations;
 
 namespace BlueControls.ItemCollection {
@@ -274,11 +272,16 @@ namespace BlueControls.ItemCollection {
 
 
 
-        public bool ReplaceVariable(string VariableName, object Value) {
+        public bool ReplaceVariable(BlueScript.Variable variable) {
 
             if (string.IsNullOrEmpty(Platzhalter_für_Layout)) { return false; }
 
-            var ot = Export.ParseVariable(Platzhalter_für_Layout, VariableName, Value);
+      
+            if ("&" + variable.Name.ToLower() + ";" != Platzhalter_für_Layout.ToLower()) { return false; }
+
+            if (variable.Type !=  Skript.Enums.enVariableDataType.Bitmap) { return false; }
+
+            var ot = variable.ValueBitmap;
 
             if (ot is Bitmap bmp) {
                 Bitmap = bmp;
@@ -290,9 +293,6 @@ namespace BlueControls.ItemCollection {
         }
 
 
-        public bool DoSpecialCodes() {
-            return false;
-        }
 
 
         public bool ResetVariables() {
@@ -307,16 +307,6 @@ namespace BlueControls.ItemCollection {
             return false;
         }
 
-        public bool RenameColumn(string oldName, ColumnItem cColumnItem) {
-            var ot = Platzhalter_für_Layout;
-
-            Platzhalter_für_Layout = Platzhalter_für_Layout.Replace("//TS/000" + oldName + "/", "//TS/000" + cColumnItem.Name + "/", RegexOptions.IgnoreCase);
-            Platzhalter_für_Layout = Platzhalter_für_Layout.Replace("//TS/001" + oldName + "/", "//TS/001" + cColumnItem.Name + "/", RegexOptions.IgnoreCase);
-            Platzhalter_für_Layout = Platzhalter_für_Layout.Replace("//TS/002" + oldName + "/", "//TS/002" + cColumnItem.Name + "/", RegexOptions.IgnoreCase);
-            Platzhalter_für_Layout = Platzhalter_für_Layout.Replace("//TS/003" + oldName + "/", "//TS/003" + cColumnItem.Name + "/", RegexOptions.IgnoreCase); // Spaltenname für Bedingungen
-            Platzhalter_für_Layout = Platzhalter_für_Layout.Replace("//TS/302" + oldName + "/", "//TS/302" + cColumnItem.Name + "/", RegexOptions.IgnoreCase);
-            return ot != Platzhalter_für_Layout;
-        }
 
         public override List<FlexiControl> GetStyleOptions() {
 

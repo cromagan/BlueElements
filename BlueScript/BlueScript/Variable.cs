@@ -20,6 +20,7 @@
 using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
+using System.Drawing;
 using static BlueBasics.Extensions;
 using static BlueBasics.modConverter;
 
@@ -50,6 +51,9 @@ namespace BlueScript {
 
                 case enVariableDataType.List:
                     return "{lst} " + zusatz + Name + " = " + ValueForReplace;
+
+                case enVariableDataType.Bitmap:
+                    return "{bmp} " + zusatz + Name + " = [BitmapData]";
 
                 case enVariableDataType.Error:
                     return "{err} " + zusatz + Name + " = " + ValueString;
@@ -178,7 +182,8 @@ namespace BlueScript {
             #region Testen auf String
             if (txt.Value.StartsWith("\"") && txt.Value.EndsWith("\"")) {
                 if (Type != enVariableDataType.NotDefinedYet && Type != enVariableDataType.String) { SetError("Variable ist kein String"); return; }
-                ValueString = txt.Value.Trim("\"").Replace("\"+\"", string.Empty); // Erst trimmen! dann verketten! Ansonsten wird "+" mit nix ersetzte, anstelle einem  +
+                ValueString = txt.Value.Substring(1, txt.Value.Length - 2); // Nicht Trimmen! Ansonsten wird sowas falsch: "X=" + "";
+                ValueString = ValueString.Replace("\"+\"", string.Empty); // Zuvor die " entfernen! dann verketten! Ansonsten wird "+" mit nix ersetzte, anstelle einem  +
                 Type = enVariableDataType.String;
                 Readonly = true;
                 return;// new strDoItFeedback();
@@ -276,6 +281,10 @@ namespace BlueScript {
 
         public bool SystemVariable { get; set; }
         public bool Readonly { get; set; }
+
+        /// <summary>
+        /// Variablen-Namen werden immer in Kleinbuchstaben gespeichert.
+        /// </summary>
         public string Name { get; set; }
         public string Coment { get; set; }
 
@@ -289,7 +298,7 @@ namespace BlueScript {
             get => _ValueString;
             set {
                 if (Readonly) { return; }
-                _ValueString = value.Replace("\"", "''");
+                _ValueString = value;
             }
         }
 
@@ -298,6 +307,14 @@ namespace BlueScript {
             set {
                 if (Readonly) { return; }
                 ValueString = value.JoinWithCr();
+            }
+        }
+
+        public Bitmap ValueBitmap {
+            get => StringUnicodeToBitmap(_ValueString);
+            set {
+                if (Readonly) { return; }
+                ValueString = BitmapToStringUnicode(value, System.Drawing.Imaging.ImageFormat.Png);
             }
         }
 
@@ -342,7 +359,7 @@ namespace BlueScript {
             if (vars == null || vars.Count == 0) { return null; }
 
             foreach (var thisv in vars) {
-                if (!thisv.SystemVariable && thisv.Name.ToUpper() == name.ToUpper()) {
+                if (!thisv.SystemVariable && thisv.Name.ToLower() == name.ToLower()) {
                     return thisv;
                 }
             }

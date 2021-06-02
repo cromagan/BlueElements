@@ -37,11 +37,11 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Enums\enSkriptFehlerTyp.cs" />
     <Compile Include="Methods\Method.cs" />
-    <Compile Include="Enums\enVariableType.cs" />
     <Compile Include="Methods\Method_ChangeDateTimeFormat.cs" />
     <Compile Include="Methods\Method_AddDays.cs" />
     <Compile Include="Methods\Method_Count.cs" />
@@ -58,6 +58,11 @@
     <Compile Include="Methods\Method_Join.cs" />
     <Compile Include="Methods\Method_Int.cs" />
     <Compile Include="Methods\Method_ChangeType.cs" />
+    <Compile Include="Methods\Method_Replace.cs" />
+    <Compile Include="Methods\Method_StringAsciiToHTML.cs" />
+    <Compile Include="Methods\Method_StringHTMLToAscii.cs" />
+    <Compile Include="Methods\Method_StringShortenWord.cs" />
+    <Compile Include="Methods\Method_StringToPhone.cs" />
     <Compile Include="Methods\Method_Substring.cs" />
     <Compile Include="Methods\Method_Split.cs" />
     <Compile Include="Methods\Method_String.cs" />

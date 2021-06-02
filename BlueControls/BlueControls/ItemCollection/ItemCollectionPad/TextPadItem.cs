@@ -23,12 +23,9 @@ using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueDatabase;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Text.RegularExpressions;
 
 namespace BlueControls.ItemCollection {
     public class TextPadItem : FormPadItemRectangle, ICanHaveColumnVariables {
@@ -190,66 +187,66 @@ namespace BlueControls.ItemCollection {
             base.DrawExplicit(GR, DCoordinates, cZoom, shiftX, shiftY, vState, SizeOfParentControl, ForPrinting);
         }
 
-        private string ChangeText(string tmpBody) {
+        //private string ChangeText(string tmpBody) {
 
 
-            var nt = tmpBody;
+        //    var nt = tmpBody;
 
 
-            do {
-                var stx = nt.ToUpper().IndexOf("//TS/");
-                if (stx < 0) { break; }
-                var enx = nt.ToUpper().IndexOf("/E", stx + 4);
-                if (enx < 0) { break; }
-                var t1 = nt.Substring(stx, enx - stx + 2);
+        //    //do {
+        //    //    var stx = nt.ToUpper().IndexOf("//TS/");
+        //    //    if (stx < 0) { break; }
+        //    //    var enx = nt.ToUpper().IndexOf("/E", stx + 4);
+        //    //    if (enx < 0) { break; }
+        //    //    var t1 = nt.Substring(stx, enx - stx + 2);
 
-                if (string.IsNullOrEmpty(t1)) { break; }
-                if (!t1.Contains("//TS/000")) { break; }
+        //    //    if (string.IsNullOrEmpty(t1)) { break; }
+        //    //    if (!t1.Contains("//TS/000")) { break; }
 
-                var l = t1.SplitBy("/");
-                if (l.Length < 3) { break; }
+        //    //    var l = t1.SplitBy("/");
+        //    //    if (l.Length < 3) { break; }
 
-                var Nam = "";
-                var Vor = "";
-                var Nach = "";
+        //    //    var Nam = "";
+        //    //    var Vor = "";
+        //    //    var Nach = "";
 
-                for (var tec = 0; tec <= l.GetUpperBound(0); tec++) {
+        //    //    for (var tec = 0; tec <= l.GetUpperBound(0); tec++) {
 
-                    if (l[tec].Length > 3) {
-                        switch (l[tec].Substring(0, 3)) {
-                            case "000":
-                                Nam = l[tec].Substring(3).FromNonCritical().GenerateSlash();
-                                break;
+        //    //        if (l[tec].Length > 3) {
+        //    //            switch (l[tec].Substring(0, 3)) {
+        //    //                case "000":
+        //    //                    Nam = l[tec].Substring(3).FromNonCritical().GenerateSlash();
+        //    //                    break;
 
-                            case "103":
-                                Vor = l[tec].Substring(3).FromNonCritical().GenerateSlash();
-                                break;
+        //    //                case "103":
+        //    //                    Vor = l[tec].Substring(3).FromNonCritical().GenerateSlash();
+        //    //                    break;
 
-                            case "104":
-                                Nach = l[tec].Substring(3).FromNonCritical().GenerateSlash();
-                                break;
-                        }
-                    }
-                }
-
-
-                var t2 = "<MarkState=2>" + Vor + Nam + Nach + "<MarkState=0>";
-
-                nt = nt.Replace(t1, t2);
-
-            } while (true);
+        //    //                case "104":
+        //    //                    Nach = l[tec].Substring(3).FromNonCritical().GenerateSlash();
+        //    //                    break;
+        //    //            }
+        //    //        }
+        //    //    }
 
 
+        //    //    var t2 = "<MarkState=2>" + Vor + Nam + Nach + "<MarkState=0>";
+
+        //    //    nt = nt.Replace(t1, t2);
+
+        //    //} while (true);
 
 
-            if (!string.IsNullOrEmpty(nt)) {
-                nt = nt.Replace("//XS/302", "<MarkState=2><ImageCode=Pinsel|16>{<MarkState=0>");
-                nt = nt.Replace("/XE", "<MarkState=2>}<MarkState=0>");
-            }
 
 
-            return nt;
-        }
+        //    //if (!string.IsNullOrEmpty(nt)) {
+        //    //    nt = nt.Replace("//XS/302", "<MarkState=2><ImageCode=Pinsel|16>{<MarkState=0>");
+        //    //    nt = nt.Replace("/XE", "<MarkState=2>}<MarkState=0>");
+        //    //}
+
+
+        //    return nt;
+        //}
 
         private void MakeNewETxt() {
             etxt = null;
@@ -264,7 +261,7 @@ namespace BlueControls.ItemCollection {
 
 
                 if (!string.IsNullOrEmpty(Text)) {
-                    etxt.HtmlText = ChangeText(Text);
+                    etxt.HtmlText = Text;
                 } else {
                     etxt.HtmlText = "{Text}";
                 }
@@ -296,10 +293,22 @@ namespace BlueControls.ItemCollection {
         //}
 
 
-        public bool ReplaceVariable(string VariableName, object Value) {
+        public bool ReplaceVariable(BlueScript.Variable variable) {
 
 
-            var nt = Export.ParseVariable(Text, VariableName, Value);
+
+
+            if ("&" + variable.Name.ToLower() + ";" != Text.ToLower()) { return false; }
+
+            if (variable.Type != Skript.Enums.enVariableDataType.String &&
+                variable.Type != Skript.Enums.enVariableDataType.List &&
+                variable.Type != Skript.Enums.enVariableDataType.String &&
+                variable.Type != Skript.Enums.enVariableDataType.Numeral) { return false; }
+
+
+
+
+            var nt = variable.ValueString;
             if (nt is string txt) {
                 if (txt == Text) { return false; }
                 Text = txt;
@@ -320,33 +329,6 @@ namespace BlueControls.ItemCollection {
             PointMoved(null);
             OnChanged();
 
-            return true;
-        }
-
-
-        public bool DoSpecialCodes() {
-            var ot = Text;
-            Text = Export.DoLayoutCode("XS", Text, null, "XE", false);
-
-            if (ot == Text) { return false; }
-            MakeNewETxt();
-            PointMoved(null);
-            OnChanged();
-
-            return true;
-        }
-
-        public bool RenameColumn(string oldName, ColumnItem cColumnItem) {
-            var ot = _VariableText;
-            _VariableText = _VariableText.Replace("//TS/000" + oldName + "/", "//TS/000" + cColumnItem.Name + "/", RegexOptions.IgnoreCase);
-            _VariableText = _VariableText.Replace("//TS/001" + oldName + "/", "//TS/001" + cColumnItem.Name + "/", RegexOptions.IgnoreCase);
-
-            if (ot == _VariableText) { return false; }
-
-            Text = _VariableText;
-            MakeNewETxt();
-            PointMoved(null);
-            OnChanged();
             return true;
         }
 

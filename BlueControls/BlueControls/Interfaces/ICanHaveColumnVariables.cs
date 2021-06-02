@@ -17,13 +17,9 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using BlueDatabase;
-
 namespace BlueControls.Interfaces {
     public interface ICanHaveColumnVariables {
-        bool ReplaceVariable(string VariableName, object Value);
-        bool DoSpecialCodes();
+        bool ReplaceVariable(BlueScript.Variable variable);
         bool ResetVariables();
-        bool RenameColumn(string oldName, ColumnItem cColumnItem);
     }
 }

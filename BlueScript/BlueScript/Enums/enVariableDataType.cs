@@ -27,6 +27,7 @@ namespace Skript.Enums {
         String = 4,
         //Date = 8, // Werden einfach die Strings manipuliert
         List = 16,
+        Bitmap = 32, 
 
         /// <summary>
         /// Nur für Attribute

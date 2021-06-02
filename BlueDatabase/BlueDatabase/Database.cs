@@ -188,7 +188,6 @@ namespace BlueDatabase {
         public event EventHandler<MessageEventArgs> DropMessage;
 
         public event EventHandler<PasswordEventArgs> NeedPassword;
-        //public event EventHandler<RenameColumnInLayoutEventArgs> RenameColumnInLayout;
         public event EventHandler<GenerateLayoutInternalEventargs> GenerateLayoutInternal;
         #endregion
 
@@ -1893,12 +1892,6 @@ namespace BlueDatabase {
             if (Disposed) { return; }
             SortParameterChanged?.Invoke(this, System.EventArgs.Empty);
         }
-
-        //private void OnRenameColumnInLayout(RenameColumnInLayoutEventArgs e) {
-        //    if (Disposed) { return; }
-        //    RenameColumnInLayout?.Invoke(this, e);
-        //}
-
 
         public List<string> AllConnectedFilesLCase() {
             var Column_All = new List<string>();

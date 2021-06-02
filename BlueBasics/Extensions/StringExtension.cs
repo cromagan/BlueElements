@@ -520,7 +520,7 @@ namespace BlueBasics {
             return txt.Replace("[Slash]", "/");
         }
 
-        public static string HTMLSpecialToNormalChar(this string tXT) {
+        public static string HTMLSpecialToNormalChar(this string tXT, bool ignoreBR) {
             // http://sonderzeichentabelle.de/
             // http://www.htmlhelp.com/reference/html40/entities/special.html
 
@@ -546,7 +546,9 @@ namespace BlueBasics {
             tXT = tXT.Replace("&oslash;", "ø");
             tXT = tXT.Replace("&bull;", "•");
 
-            tXT = tXT.Replace("<br>", "\r");
+            if (!ignoreBR) {
+                tXT = tXT.Replace("<br>", "\r");
+            }
 
             tXT = tXT.Replace("<", ((char)1020).ToString());
             tXT = tXT.Replace(">", ((char)1021).ToString());

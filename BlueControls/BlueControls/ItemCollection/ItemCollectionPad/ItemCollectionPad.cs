@@ -185,7 +185,7 @@ namespace BlueControls.ItemCollection {
 
             // Wenn nur die Row ankommt und diese null ist, kann gar nix generiert werden
             ResetVariables();
-            ParseVariableAndSpecialCodes(database.Row.SearchByKey(rowkey));
+            ParseVariable(database.Row.SearchByKey(rowkey));
         }
 
 
@@ -501,21 +501,6 @@ namespace BlueControls.ItemCollection {
 
 
 
-        internal bool RenameColumn(string oldName, ColumnItem newName) {
-            var did = false;
-
-            foreach (var thisItem in this) {
-                if (thisItem is ICanHaveColumnVariables variables) {
-                    if (variables.RenameColumn(oldName, newName)) { did = true; }
-                }
-            }
-
-            if (!did) { return false; }
-            return true;
-        }
-
-
-
 
         #endregion
 
@@ -735,7 +720,7 @@ namespace BlueControls.ItemCollection {
 
 
 
-        public Bitmap ToBitmap(decimal scale, Color backColor) {
+        public Bitmap ToBitmap(decimal scale) {
             var r = MaxBounds(null);
             if (r.Width == 0) { return null; }
 
@@ -759,10 +744,10 @@ namespace BlueControls.ItemCollection {
 
 
             using (var gr = Graphics.FromImage(I)) {
-                gr.Clear(backColor);
+                gr.Clear(BackColor);
 
                 if (!Draw(gr, scale, r.Left * scale, r.Top * scale, Size.Empty, true, null)) {
-                    return ToBitmap(scale, backColor);
+                    return ToBitmap(scale);
                 }
 
             }
@@ -826,90 +811,74 @@ namespace BlueControls.ItemCollection {
         }
 
 
-        public bool ParseVariable(string VariableName, object Value) {
+        public bool ParseVariable(BlueScript.Variable variable) {
 
             var did = false;
 
             foreach (var thisItem in this) {
                 if (thisItem is ICanHaveColumnVariables variables) {
-                    if (variables.ReplaceVariable(VariableName, Value)) { did = true; }
+                    if (variables.ReplaceVariable(variable)) { did = true; }
                 }
             }
             return did;
         }
 
-        public void ParseVariableAndSpecialCodes(RowItem row) {
-
+        public void ParseVariable(RowItem row) {
 
             if (row != null) {
 
-                foreach (var thiscolumnitem in row.Database.Column) {
-                    if (thiscolumnitem != null) {
-                        ParseVariable(thiscolumnitem.Name, thiscolumnitem, row);
-                    }
-                }
-            }
-            ParseSpecialCodes();
-        }
-
-        private void ParseVariable(string VariableName, ColumnItem Column, RowItem Row) {
-
-
-            switch (Column.Format) {
-                case enDataFormat.Text:
-                case enDataFormat.Text_mit_Formatierung:
-                case enDataFormat.Gleitkommazahl:
-                case enDataFormat.Datum_und_Uhrzeit:
-                case enDataFormat.Bit:
-                case enDataFormat.Ganzzahl:
-                case enDataFormat.RelationText:
-                    ParseVariable(VariableName, Row.CellGetString(Column));
-                    break;
-
-                case enDataFormat.Link_To_Filesystem:
-
-                    if (!Column.MultiLine) {
-                        var f = Column.BestFile(Row.CellGetString(Column), false);
-
-                        if (FileExists(f)) {
-                            if (Column.MultiLine) {
-                                ParseVariable(VariableName, f);
-                            } else {
-                                var x = (Bitmap)BitmapExt.Image_FromFile(f);
-                                ParseVariable(VariableName, x);
-                            }
-                        }
-                    }
-                    break;
-
-
-                //case enDataFormat.Relation:
-                //    ParseVariable(VariableName, enValueType.Unknown, "Nicht implementiert");
-                //    break;
-
-                default:
-                    Develop.DebugPrint("Format unbekannt: " + Column.Format);
-                    break;
-
-            }
-        }
-
-
-
-
-        public bool ParseSpecialCodes() {
-            var did = false;
-
-            foreach (var thisItem in this) {
-                if (thisItem is ICanHaveColumnVariables variables) {
-                    if (variables.DoSpecialCodes()) { did = true; }
+                (bool didSuccesfullyCheck, string error, BlueScript.Script script) = row.DoAutomatic(false, "export");
+                foreach (var thisV in script.Variablen) {
+                    ParseVariable(thisV);
                 }
             }
 
-            if (did) { OnDoInvalidate(); }
-
-            return did;
         }
+
+        //private void ParseVariable(string VariableName, ColumnItem Column, RowItem Row) {
+
+
+        //    switch (Column.Format) {
+        //        case enDataFormat.Text:
+        //        case enDataFormat.Text_mit_Formatierung:
+        //        case enDataFormat.Gleitkommazahl:
+        //        case enDataFormat.Datum_und_Uhrzeit:
+        //        case enDataFormat.Bit:
+        //        case enDataFormat.Ganzzahl:
+        //        case enDataFormat.RelationText:
+        //            ParseVariable(VariableName, Row.CellGetString(Column));
+        //            break;
+
+        //        case enDataFormat.Link_To_Filesystem:
+
+        //            if (!Column.MultiLine) {
+        //                var f = Column.BestFile(Row.CellGetString(Column), false);
+
+        //                if (FileExists(f)) {
+        //                    if (Column.MultiLine) {
+        //                        ParseVariable(VariableName, f);
+        //                    } else {
+        //                        var x = (Bitmap)BitmapExt.Image_FromFile(f);
+        //                        ParseVariable(VariableName, x);
+        //                    }
+        //                }
+        //            }
+        //            break;
+
+
+        //        //case enDataFormat.Relation:
+        //        //    ParseVariable(VariableName, enValueType.Unknown, "Nicht implementiert");
+        //        //    break;
+
+        //        default:
+        //            Develop.DebugPrint("Format unbekannt: " + Column.Format);
+        //            break;
+
+        //    }
+        //}
+
+
+
 
         public bool ResetVariables() {
             var did = false;
@@ -940,9 +909,9 @@ namespace BlueControls.ItemCollection {
 
 
 
-        public void SaveAsBitmap(string filename, Color backColor) {
+        public void SaveAsBitmap(string filename) {
 
-            var i = ToBitmap(1, backColor);
+            var i = ToBitmap(1);
 
             if (i == null) { return; }
 

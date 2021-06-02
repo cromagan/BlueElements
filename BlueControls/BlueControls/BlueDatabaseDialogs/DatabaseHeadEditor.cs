@@ -83,8 +83,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (_Database == null) { return; } // Disposed
             if (_Database.ReadOnly) { return; }
 
-            scriptEditor.Database = null; // Schreibt das Script sicher zurück
-            scriptEditor.Database = _Database; // Schreibt das Script sicher zurück
+            scriptEditor.WriteScriptBack();
+
 
             _Database.GlobalShowPass = txbKennwort.Text;
             _Database.Caption = txbCaption.Text;
