@@ -68,6 +68,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
@@ -263,6 +264,12 @@
     </Compile>
     <Compile Include="clsDesign.cs" />
     <Compile Include="clsRowDrawData.cs" />
+    <Compile Include="ScriptEditor.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ScriptEditor.Designer.cs">
+      <DependentUpon>ScriptEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="SystemInputHook.cs" />
     <Compile Include="Controls\Button.cs">
       <SubType>Component</SubType>
@@ -734,6 +741,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\ZoomPad.resx">
       <DependentUpon>ZoomPad.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ScriptEditor.resx">
+      <DependentUpon>ScriptEditor.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

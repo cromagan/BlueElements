@@ -26,13 +26,10 @@ using BlueControls.Forms;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using BlueScript;
-using FastColoredTextBoxNS;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using static BlueBasics.FileOperations;
 
 namespace BlueControls.BlueDatabaseDialogs {
 
@@ -41,8 +38,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Database _Database;
 
 
-        AutocompleteMenu popupMenu;
-        bool menuDone = false;
+
 
 
         private bool frmHeadEditor_FormClosing_isin;
@@ -87,6 +83,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (_Database == null) { return; } // Disposed
             if (_Database.ReadOnly) { return; }
 
+            scriptEditor.Database = null; // Schreibt das Script sicher zurück
+            scriptEditor.Database = _Database; // Schreibt das Script sicher zurück
 
             _Database.GlobalShowPass = txbKennwort.Text;
             _Database.Caption = txbCaption.Text;
@@ -125,7 +123,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 _Database.Tags.AddRange(tbxTags.Text.SplitByCR());
             }
 
-            _Database.RulesScript = txtSkript.Text;
+
 
 
 
@@ -191,7 +189,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             txbKennwort.Text = _Database.GlobalShowPass;
 
-            txtSkript.Text = _Database.RulesScript;
+
 
             lbxSortierSpalten.Item.Clear();
             if (_Database.SortDefinition != null) {
@@ -258,14 +256,11 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             GenerateUndoTabelle();
 
-            GenerateVariableTable();
-
 
             CryptStatus();
 
             GenerateInfoText();
 
-            menuDone = false;
 
         }
 
@@ -474,42 +469,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             Close();
         }
 
-        private void GenerateVariableTable() {
-
-            var x = new Database(true);
-            x.Column.Add("Name", "Name", enDataFormat.Text);
-            x.Column.Add("Typ", "Typ", enDataFormat.Text);
-            x.Column.Add("RO", "Schreibgeschützt", enDataFormat.Bit);
-            x.Column.Add("System", "Systemspalte", enDataFormat.Bit);
-            x.Column.Add("Inhalt", "Inhalt", enDataFormat.Text);
-            x.Column.Add("Kommentar", "Kommentar", enDataFormat.Text);
-
-            foreach (var ThisColumn in x.Column) {
-                if (string.IsNullOrEmpty(ThisColumn.Identifier)) {
-                    ThisColumn.MultiLine = true;
-                    ThisColumn.TextBearbeitungErlaubt = false;
-                    ThisColumn.DropdownBearbeitungErlaubt = false;
-                    ThisColumn.BildTextVerhalten = enBildTextVerhalten.Bild_oder_Text;
-                }
-            }
-
-            x.RepairAfterParse();
-
-            x.ColumnArrangements[1].ShowAllColumns();
-            x.ColumnArrangements[1].HideSystemColumns();
-
-
-            x.SortDefinition = new RowSortDefinition(x, "Name", true);
-
-
-
-
-
-
-            tableVariablen.Database = x;
-            tableVariablen.Arrangement = 1;
-            filterVariablen.Table = tableVariablen;
-        }
         private void GenerateUndoTabelle() {
 
             var x = new Database(true);
@@ -638,7 +597,6 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             }
 
-
             tblUndo.Database = x;
             tblUndo.Arrangement = 1;
         }
@@ -662,190 +620,22 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
         }
 
-        private void btnTest_Click(object sender, System.EventArgs e) {
-            txbSkriptInfo.Text = string.Empty;
-
-            tableVariablen.Database.Row.Clear();
-
-            if (_Database.Row.Count == 0) {
-                MessageBox.Show("Zum Test wird zumindest eine Zeile benötigt.", enImageCode.Information, "OK");
-                return;
-            }
-
-            if (string.IsNullOrEmpty(txbTestZeile.Text)) {
-                txbTestZeile.Text = _Database.Row.First().CellFirstString();
-            }
-
-
-            var r = _Database.Row[txbTestZeile.Text];
-
-            if (r == null) {
-                MessageBox.Show("Zeile nicht gefunden.", enImageCode.Information, "OK");
-                return;
-            }
-
-
-            _Database.RulesScript = txtSkript.Text;
-
-            (var _, var message, var s) = r.DoAutomatic(true, "script testing");
-
-            if (s != null && s.Variablen != null) {
-                foreach (var thisv in s.Variablen) {
-
-                    var ro = tableVariablen.Database.Row.Add(thisv.Name);
-                    ro.CellSet("typ", thisv.Type.ToString());
-                    ro.CellSet("RO", thisv.Readonly);
-                    ro.CellSet("System", thisv.SystemVariable);
-                    ro.CellSet("Inhalt", thisv.ValueString);
-                    ro.CellSet("Kommentar", thisv.Coment);
-
-                }
-            }
-
-            lstComands.Item.Clear();
-
-            if (s != null && BlueScript.Script.Comands != null) {
-
-                foreach (var thisc in BlueScript.Script.Comands) {
-                    lstComands.Item.Add(thisc, thisc.Syntax.ToLower());
-                }
-
-            }
-
-            lstComands.Item.Sort();
-
-
-
-
-            if (!menuDone) {
-                menuDone = true;
-                popupMenu = new AutocompleteMenu(txtSkript);
-                //popupMenu.Items.ImageList = imageList1;
-                popupMenu.SearchPattern = @"[\w\.:=!<>]";
-                popupMenu.AllowTabKey = true;
-
-                List<AutocompleteItem> items = new List<AutocompleteItem>();
-
-                if (s != null && BlueScript.Script.Comands != null) {
-
-                    foreach (var thisc in BlueScript.Script.Comands) {
-                        items.Add(new SnippetAutocompleteItem(thisc.Syntax + " "));
-
-                        if (thisc.Returns != Skript.Enums.enVariableDataType.Null) {
-                            items.Add(new SnippetAutocompleteItem("var " + thisc.Returns.ToString() + " = " + thisc.Syntax + "; "));
-                        }
-
-
-                        foreach (var thiscom in thisc.Comand(s)) {
-                            items.Add(new AutocompleteItem(thiscom));
-                        }
-                    }
-
-                }
-
-                //set as autocomplete source
-                popupMenu.Items.SetAutocompleteItems(items);
-            }
-
-            if (!string.IsNullOrEmpty(message)) {
-                txbSkriptInfo.Text = "[" + DateTime.Now.ToLongTimeString() + "] Allgemeiner Fehler: " + message;
-                return;
-            }
-
-
-            if (string.IsNullOrEmpty(s.Error)) {
-
-                txbSkriptInfo.Text = "[" + DateTime.Now.ToLongTimeString() + "] Erfolgreich, wenn auch IF-Routinen nicht geprüft wurden.";
-
-            } else {
-                txbSkriptInfo.Text = "[" + DateTime.Now.ToLongTimeString() + "] Fehler in Zeile: " + s.Line.ToString() + "\r\n" + s.Error + "\r\n >>> " + s.ErrorCode;
-            }
-
-
-
-
-        }
-
-        private void lstComands_ItemClicked(object sender, BasicListItemEventArgs e) {
-            var co = string.Empty;
-
-            if (e.Item.Tag is Method thisc) {
-                co = co + thisc.HintText();
-            }
-
-
-            txbComms.Text = co;
-
-        }
-
-        private void txtSkript_ToolTipNeeded(object sender, ToolTipNeededEventArgs e) {
-
-            try {
-
-                foreach (var thisc in lstComands.Item) {
-                    if (thisc.Tag is Method m) {
-
-                        if (m.Comand(null).Contains(e.HoveredWord, false)) {
-                            e.ToolTipTitle = m.Syntax;
-                            e.ToolTipText = m.HintText();
-                            return;
-                        }
-                    }
-                }
-
-
-                //x.Column.Add("Name", "Name", enDataFormat.Text);
-                //x.Column.Add("Typ", "Typ", enDataFormat.Text);
-                //x.Column.Add("RO", "Schreibgeschützt", enDataFormat.Bit);
-                //x.Column.Add("System", "Systemspalte", enDataFormat.Bit);
-                //x.Column.Add("Inhalt", "Inhalt", enDataFormat.Text);
-                //x.Column.Add("Kommentar", "Kommentar", enDataFormat.Text);
-
-
-                var hoveredWordnew = new Range(txtSkript, e.Place, e.Place).GetFragment("[A-Za-z0-9_]").Text;
-
-
-                foreach (var r in tableVariablen.Database.Row) {
-                    if (r.CellFirstString().ToLower() == hoveredWordnew.ToLower()) {
-                        var inh = r.CellGetString("Inhalt");
-                        inh = inh.Replace("\r", ";");
-                        inh = inh.Replace("\n", ";");
-                        inh = inh.Replace("\"", string.Empty);
-                        if (inh.Length > 25) { inh = inh.Substring(0, 20) + "..."; }
-
-                        e.ToolTipTitle = "(" + r.CellGetString("Typ") + ") " + hoveredWordnew + " = " + inh;
-
-                        e.ToolTipText = r.CellGetString("Kommentar") + " ";
-                        return;
-                    }
-
-                }
-
-
-            } catch (Exception ex) {
-                Develop.DebugPrint(ex);
-            }
-        }
 
         private void GlobalTab_Selecting(object sender, System.Windows.Forms.TabControlCancelEventArgs e) {
             if (e.TabPageIndex == 1) {
-
-                if (!menuDone) {
-                    btnTest_Click(null, null);
-                }
-
+                scriptEditor.Database = _Database;
             }
         }
 
         private void btnSave_Click(object sender, System.EventArgs e) {
             var ok = false;
 
-            if(_Database != null) {
+            if (_Database != null) {
                 WriteInfosBack();
-               ok =  _Database.Save(false);
+                ok = _Database.Save(false);
             }
 
-            if(!ok) {
+            if (!ok) {
                 MessageBox.Show("Speichern fehlgeschlagen!");
             }
 
