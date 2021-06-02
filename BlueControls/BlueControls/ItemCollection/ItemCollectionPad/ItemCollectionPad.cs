@@ -735,19 +735,19 @@ namespace BlueControls.ItemCollection {
 
 
 
-        public Bitmap ToBitmap(decimal Scale) {
+        public Bitmap ToBitmap(decimal scale, Color backColor) {
             var r = MaxBounds(null);
             if (r.Width == 0) { return null; }
 
             modAllgemein.CollectGarbage();
 
             do {
-                if ((int)(r.Width * Scale) > 15000) {
-                    Scale *= 0.8m;
-                } else if ((int)(r.Height * Scale) > 15000) {
-                    Scale *= 0.8m;
-                } else if ((int)(r.Height * Scale) * (int)(r.Height * Scale) > 90000000) {
-                    Scale *= 0.8m;
+                if ((int)(r.Width * scale) > 15000) {
+                    scale *= 0.8m;
+                } else if ((int)(r.Height * scale) > 15000) {
+                    scale *= 0.8m;
+                } else if ((int)(r.Height * scale) * (int)(r.Height * scale) > 90000000) {
+                    scale *= 0.8m;
                 } else {
                     break;
                 }
@@ -755,14 +755,14 @@ namespace BlueControls.ItemCollection {
 
 
 
-            var I = new Bitmap((int)(r.Width * Scale), (int)(r.Height * Scale));
+            var I = new Bitmap((int)(r.Width * scale), (int)(r.Height * scale));
 
 
             using (var gr = Graphics.FromImage(I)) {
-                gr.Clear(Color.White);
+                gr.Clear(backColor);
 
-                if (!Draw(gr, Scale, r.Left * Scale, r.Top * Scale, Size.Empty, true, null)) {
-                    return ToBitmap(Scale);
+                if (!Draw(gr, scale, r.Left * scale, r.Top * scale, Size.Empty, true, null)) {
+                    return ToBitmap(scale, backColor);
                 }
 
             }
@@ -940,30 +940,30 @@ namespace BlueControls.ItemCollection {
 
 
 
-        public void SaveAsBitmap(string Filename) {
+        public void SaveAsBitmap(string filename, Color backColor) {
 
-            var i = ToBitmap(1);
+            var i = ToBitmap(1, backColor);
 
             if (i == null) { return; }
 
 
-            switch (Filename.FileSuffix().ToUpper()) {
+            switch (filename.FileSuffix().ToUpper()) {
 
                 case "JPG":
                 case "JPEG":
-                    i.Save(Filename, ImageFormat.Jpeg);
+                    i.Save(filename, ImageFormat.Jpeg);
                     break;
 
                 case "PNG":
-                    i.Save(Filename, ImageFormat.Png);
+                    i.Save(filename, ImageFormat.Png);
                     break;
 
                 case "BMP":
-                    i.Save(Filename, ImageFormat.Bmp);
+                    i.Save(filename, ImageFormat.Bmp);
                     break;
 
                 default:
-                    MessageBox.Show("Dateiformat unbekannt: " + Filename.FileSuffix().ToUpper(), enImageCode.Warnung, "OK");
+                    MessageBox.Show("Dateiformat unbekannt: " + filename.FileSuffix().ToUpper(), enImageCode.Warnung, "OK");
                     return;
             }
         }

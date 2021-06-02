@@ -794,7 +794,7 @@ namespace BlueControls.Controls {
             OnPrintPage(e);
 
 
-            var i = _Item.ToBitmap(3);
+            var i = _Item.ToBitmap(3, Color.White);
             if (i == null) { return; }
             e.Graphics.DrawImageInRectAspectRatio(i, 0, 0, e.PageBounds.Width, e.PageBounds.Height);
         }
@@ -883,16 +883,11 @@ namespace BlueControls.Controls {
             DruckerDokument.DefaultPageSettings.Margins = new Margins((int)(_Item.RandinMM.Left / 25.4 * 100), (int)(_Item.RandinMM.Right / 25.4 * 100), (int)(_Item.RandinMM.Top / 25.4 * 100), (int)(_Item.RandinMM.Bottom / 25.4 * 100));
         }
 
-        public void SaveAsBitmap(string Title, string OptionalFileName) {
+        public void OpenSaveDialog(string title, string optionalFileName) {
 
-            if (!string.IsNullOrEmpty(OptionalFileName)) {
-                _Item.SaveAsBitmap(OptionalFileName);
-                return;
-            }
+            title = title.RemoveChars(Constants.Char_DateiSonderZeichen);
 
-            Title = Title.RemoveChars(Constants.Char_DateiSonderZeichen);
-
-            PicsSave.FileName = Title + ".png";
+            PicsSave.FileName = title + ".png";
 
             PicsSave.ShowDialog();
         }
@@ -900,7 +895,7 @@ namespace BlueControls.Controls {
 
         private void PicsSave_FileOk(object sender, CancelEventArgs e) {
             if (e.Cancel) { return; }
-            _Item.SaveAsBitmap(PicsSave.FileName);
+            _Item.SaveAsBitmap(PicsSave.FileName, Color.White);
         }
 
 

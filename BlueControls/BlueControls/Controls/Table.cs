@@ -1299,7 +1299,7 @@ namespace BlueControls.Controls {
             e.Handled = true;
 
             var Pad = new ItemCollectionPad(e.LayoutID, e.Row.Database, e.Row.Key);
-            Pad.SaveAsBitmap(e.Filename);
+            Pad.SaveAsBitmap(e.Filename, Color.White);
         }
 
 

@@ -498,7 +498,7 @@ namespace BlueControls.Forms {
                     }
 
 
-                    using (var l = new ExportDialog(TableView.Database, Ara, true)) {
+                    using (var l = new ExportDialog(TableView.Database, Ara)) {
                         l.ShowDialog();
                     }
 

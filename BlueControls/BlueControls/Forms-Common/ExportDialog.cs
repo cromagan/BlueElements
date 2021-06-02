@@ -31,22 +31,25 @@ using System.Drawing.Printing;
 using System.IO;
 using System.Windows.Forms;
 using static BlueBasics.FileOperations;
+using static BlueBasics.modConverter;
 
 namespace BlueControls.Forms {
     public sealed partial class ExportDialog {
 
 
-        private string _AdditionalLayoutPath = "";
-        private List<RowItem> Liste;
+        private readonly string _AdditionalLayoutPath = "";
+        private readonly List<RowItem> _RowsForExport;
         private Database _Database;
-        private string ZielPfad = "";
+        private readonly string _ZielPfad = "";
+        private readonly string _SaveTo = "";
 
-        private string SaveTo = "";
-
-        private int ItemNrForPrint;
+        private int _ItemNrForPrint;
 
 
-        public ExportDialog(Database db, List<RowItem> ListetItems, bool CanChangeItems) {
+        public ExportDialog(Database db, string additionalLayoutPath, string autosaveFile) : this(db, null, additionalLayoutPath, autosaveFile) { }
+        public ExportDialog(Database db, List<RowItem> rows) : this(db, rows, string.Empty, string.Empty) { }
+        public ExportDialog(Database db, List<RowItem> rows, string additionalLayoutPath, string autosaveFile) {
+
 
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
@@ -54,39 +57,15 @@ namespace BlueControls.Forms {
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             _Database = db;
             _Database.Disposing += _Database_Disposing;
-            Liste = ListetItems;
+            _RowsForExport = rows;
 
-            Init(string.Empty, CanChangeItems, string.Empty);
-        }
+            _AdditionalLayoutPath = additionalLayoutPath;
 
-        private void _Database_Disposing(object sender, System.EventArgs e) {
-            Close();
-        }
-
-        public ExportDialog(string vAdditionalLayoutPath, string AutosaveFile) {
-
-            // Dieser Aufruf ist für den Designer erforderlich.
-            InitializeComponent();
-
-            // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            _Database = null;
-            Liste = null;
-
-            //   Vars = Variablen
-
-            Init(vAdditionalLayoutPath, false, AutosaveFile);
-        }
-
-
-        public void Init(string vAdditionalLayoutPath, bool CanChangeItems, string AutosaveFile) {
-
-            _AdditionalLayoutPath = vAdditionalLayoutPath;
-
-            if (!string.IsNullOrEmpty(AutosaveFile)) {
-                ZielPfad = AutosaveFile.FilePath();
-                SaveTo = AutosaveFile;
+            if (!string.IsNullOrEmpty(autosaveFile)) {
+                _ZielPfad = autosaveFile.FilePath();
+                _SaveTo = autosaveFile;
             } else {
-                ZielPfad = Path.GetTempPath();
+                _ZielPfad = Path.GetTempPath();
             }
 
 
@@ -94,255 +73,193 @@ namespace BlueControls.Forms {
                 if (!string.IsNullOrEmpty(_AdditionalLayoutPath) && !PathExists(_AdditionalLayoutPath)) {
                     Directory.CreateDirectory(_AdditionalLayoutPath);
                 }
-                if (!PathExists(ZielPfad)) {
-                    Directory.CreateDirectory(ZielPfad);
+                if (!PathExists(_ZielPfad)) {
+                    Directory.CreateDirectory(_ZielPfad);
                 }
             } catch (Exception) {
 
             }
 
 
-            FrmDrucken_EinWahl.Enabled = CanChangeItems;
+            BefülleLayoutDropdowns();
+            EintragsText();
+
+            NurStartEnablen();
 
         }
 
 
-
-        private void EinWahl_Click(object sender, System.EventArgs e) {
-            using (var fr = new frmTableView(_Database)) {
-                Liste = fr.GetFilteredItems();
-            }
+        private void NurStartEnablen() {
 
 
-            FrmDrucken_Zusammen.Checked = false;
-            FrmDrucken_Einzeln.Checked = false;
+            tabStart.Enabled = true;
+            tabDrucken.Enabled = false;
+            tabDateiExport.Enabled = false;
+            tabBildSchachteln.Enabled = false;
 
-            ShowAndCheckTabEinträgeWählen();
+        }
 
-            //   LayoutAusSysSpalteHolen("")
-
-            // InfoUndHauptButtons()
+        private void _Database_Disposing(object sender, System.EventArgs e) {
+            Close();
         }
 
 
 
 
 
-        protected override void OnShown(System.EventArgs e) {
-            base.OnShown(e);
-            ShowExportAktion();
-        }
 
 
 
-        public void ShowAndCheckLayoutWahl() {
-            Tabs.TabPages[0].Enabled = false;
-            Tabs.TabPages[1].Enabled = true;
-            Tabs.TabPages[2].Enabled = false;
-            Tabs.TabPages[3].Enabled = false;
-            Tabs.TabPages[4].Enabled = false;
-            Tabs.SelectedIndex = 1;
+        private string Fehler() {
 
+            if (_RowsForExport == null || _RowsForExport.Count == 0) { return "Es sind keine Einträge für den Export gewählt."; }
 
-            if (cbxDrucken_Layout1.Item.Count == 0) {
-                BefülleLayoutDropdowns();
+            if (string.IsNullOrEmpty(cbxLayoutWahl.Text)) { return "Es sind keine Layout für den Export gewählt."; }
+
+            if (_Database.Layouts.LayoutIDToIndex(cbxLayoutWahl.Text) > -1) {
+                if (!optBildSchateln.Checked && !optDrucken.Checked && !optSpeichern.Checked) { return "Das gewählte Layout kann nur gedruckt, geschachtelt oder gespeichtert werden."; }
+            } else {
+                if (!optSpezialFormat.Checked && !optSpeichern.Checked) { return "Das gewählte Layout kann nur gespeichtert oder im Spezialformat bearbeitet werden."; }
             }
 
 
 
-            Weiter2.Enabled = !string.IsNullOrEmpty(cbxDrucken_Layout1.Text);
 
-
-            if (_Database.Layouts.LayoutIDToIndex(cbxDrucken_Layout1.Text) > -1) {
-
-                padVorschau.ShowInPrintMode = true;
-                padVorschau.Item = new ItemCollectionPad(cbxDrucken_Layout1.Text, Liste[0].Database, Liste[0].Key);
-
-                padVorschau.ZoomFit();
-            }
-
+            return string.Empty;
         }
 
-
-        public void ShowAndCheckTabEinträgeWählen() {
-
-            Tabs.TabPages[0].Enabled = false;
-            Tabs.TabPages[1].Enabled = false;
-            Tabs.TabPages[2].Enabled = true;
-            Tabs.TabPages[3].Enabled = false;
-            Tabs.TabPages[4].Enabled = false;
-            Tabs.SelectedIndex = 2;
-
-            WeiterEinträge.Enabled = Convert.ToBoolean(Liste.Count > 0);
-
-
-            var MultiMöglich = true;
-            //  Dim EinzelMöglich As Boolean = True
-
-
-            if (Liste == null || Liste.Count == 0) {
+        private void EintragsText() {
+            if (_RowsForExport == null || _RowsForExport.Count == 0) {
                 FrmDrucken_Info.Text = "Bitte wählen sie die Einträge für den Export.";
 
             } else {
-                if (Liste.Count == 1) {
-                    FrmDrucken_Info.Text = "Es ist genau ein Eintrag gewählt:<br> <b>-" + Liste[0].CellFirstString().Replace("\r\n", " ");
-                    MultiMöglich = false;
+                if (_RowsForExport.Count == 1) {
+                    FrmDrucken_Info.Text = "Es ist genau ein Eintrag gewählt:<br> <b>-" + _RowsForExport[0].CellFirstString().Replace("\r\n", " ");
+
 
                 } else {
-                    FrmDrucken_Info.Text = "Es sind <b>" + Liste.Count + "</b> Einträge gewählt.";
+                    FrmDrucken_Info.Text = "Es sind <b>" + _RowsForExport.Count + "</b> Einträge gewählt.";
 
                 }
             }
 
-
-            if (optSpeichern.Checked && _Database.Layouts.LayoutIDToIndex(cbxDrucken_Layout1.Text) > -1) {
-                MultiMöglich = false;
-            }
-
-
-            if (MultiMöglich) {
-                FrmDrucken_Zusammen.Enabled = true;
-            } else {
-                FrmDrucken_Einzeln.Checked = true;
-                FrmDrucken_Zusammen.Enabled = false;
-            }
         }
 
-        public static void AddLayoutsOff(ItemCollectionList items, Database database, bool doDiscLayouts, string additionalLayoutPath) {
 
-            for (var z = 0; z < database.Layouts.Count; z++) {
-                var p = new ItemCollectionPad(database.Layouts[z], string.Empty);
-                items.Add(p.Caption, p.ID, enImageCode.Stern);
+
+
+        public static void AddLayoutsOff(ItemCollectionList addHere, Database database, bool addDiskLayouts, string additionalLayoutPath) {
+
+            if (database != null) {
+                for (var z = 0; z < database.Layouts.Count; z++) {
+                    var p = new ItemCollectionPad(database.Layouts[z], string.Empty);
+                    addHere.Add(p.Caption, p.ID, enImageCode.Stern);
+                }
             }
 
-            if (!doDiscLayouts) { return; }
+            if (!addDiskLayouts) { return; }
+
+            var path = new List<string>();
+            if (database != null) { path.Add(database.DefaultLayoutPath()); }
+            if (!string.IsNullOrEmpty(additionalLayoutPath)) { path.Add(additionalLayoutPath); }
 
 
-            var du = 0; // Beim zweiten Durchlauf wird additionalLayoutPath geändert.
-
-            do {
-                if (PathExists(additionalLayoutPath)) {
-                    var e = Directory.GetFiles(additionalLayoutPath);
+            foreach (var thisP in path) {
+                if (PathExists(thisP)) {
+                    var e = Directory.GetFiles(thisP);
                     foreach (var ThisFile in e) {
-
-
-                        if (ThisFile.FilePath() == database.DefaultLayoutPath()) { ThisFile.TrimStart(database.DefaultLayoutPath()); }
-
-                        if (items[ThisFile] == null) { items.Add(ThisFile.FileNameWithSuffix(), ThisFile, QuickImage.Get(ThisFile.FileType(), 16)); }
+                        //if (ThisFile.FilePath() == database.DefaultLayoutPath()) { ThisFile.TrimStart(database.DefaultLayoutPath()); }
+                        if (addHere[ThisFile] == null) { addHere.Add(ThisFile.FileNameWithSuffix(), ThisFile, QuickImage.Get(ThisFile.FileType(), 16)); }
                     }
                 }
-
-                if (database == null) { break; }
-
-                du++;
-                if (du >= 2) { break; }
-                additionalLayoutPath = database.DefaultLayoutPath();
-
-            } while (true);
+            }
 
         }
 
         private void BefülleLayoutDropdowns() {
-            if (_Database != null) {
-                ExportDialog.AddLayoutsOff(cbxDrucken_Layout1.Item, _Database, optSpeichern.Checked, _AdditionalLayoutPath);
-            }
+            cbxLayoutWahl.Item.Clear();
+            ExportDialog.AddLayoutsOff(cbxLayoutWahl.Item, _Database, true, _AdditionalLayoutPath);
         }
-
 
 
         private void LayoutEditor_Click(object sender, System.EventArgs e) {
 
             Enabled = false;
 
-            var n = cbxDrucken_Layout1.Text;
+            var n = cbxLayoutWahl.Text;
 
-            cbxDrucken_Layout1.Text = string.Empty;
+            cbxLayoutWahl.Text = string.Empty;
             tabAdministration.OpenLayoutEditor(_Database, _AdditionalLayoutPath, n);
-            cbxDrucken_Layout1.Item.Clear();
+
             BefülleLayoutDropdowns();
 
-            if (cbxDrucken_Layout1.Item[n] != null) {
-                cbxDrucken_Layout1.Text = n;
+            if (cbxLayoutWahl.Item[n] != null) {
+                cbxLayoutWahl.Text = n;
             }
 
             Enabled = true;
         }
 
         private void Button1_Click(object sender, System.EventArgs e) {
-            ExecuteFile(ZielPfad);
+            ExecuteFile(_ZielPfad);
         }
 
-        private void WeiterEinträge_Click(object sender, System.EventArgs e) {
 
 
-            if (optDrucken.Checked) {
 
-                ShowDruckenEnde();
+        private void cbxLayoutWahl_TextChanged(object sender, System.EventArgs e) {
+
+            if (_Database.Layouts.LayoutIDToIndex(cbxLayoutWahl.Text) > -1) {
+
+                padVorschau.ShowInPrintMode = true;
+                padVorschau.Item = new ItemCollectionPad(cbxLayoutWahl.Text, _RowsForExport[0].Database, _RowsForExport[0].Key);
+
+                padVorschau.ZoomFit();
             } else {
-
-
-                ShowSpeichernEnde();
-                List<string> l;
-                if (_Database.Layouts.LayoutIDToIndex(cbxDrucken_Layout1.Text) > -1) {
-                    l = Export.SaveAsBitmap(Liste, cbxDrucken_Layout1.Text, ZielPfad);
-                } else {
-                    l = Export.GenerateLayout_FileSystem(Liste, cbxDrucken_Layout1.Text, SaveTo, FrmDrucken_Zusammen.Checked, ZielPfad);
-                }
-                Exported.Item.AddRange(l);
+                padVorschau.Item.Clear();
             }
         }
 
-        private void Weiter2_Click(object sender, System.EventArgs e) {
-            ShowAndCheckTabEinträgeWählen();
-        }
 
-
-
-        public void ShowExportAktion() {
-            Tabs.TabPages[0].Enabled = true;
-            Tabs.TabPages[1].Enabled = false;
-            Tabs.TabPages[2].Enabled = false;
-            Tabs.TabPages[3].Enabled = false;
-            Tabs.TabPages[4].Enabled = false;
-            Tabs.SelectedIndex = 0;
-
-            WeiterAktion.Enabled = optSpeichern.Checked || optDrucken.Checked;
-        }
-
-        public void ShowDruckenEnde() {
-            Tabs.TabPages[0].Enabled = false;
-            Tabs.TabPages[1].Enabled = false;
-            Tabs.TabPages[2].Enabled = false;
-            Tabs.TabPages[3].Enabled = false;
-            Tabs.TabPages[4].Enabled = true;
-            Tabs.SelectedIndex = 4;
-
-            Button_PageSetup_Click(null, System.EventArgs.Empty);
-            GeneratePrintPad(0);
-
-
-        }
-
-        public void ShowSpeichernEnde() {
-            Tabs.TabPages[0].Enabled = false;
-            Tabs.TabPages[1].Enabled = false;
-            Tabs.TabPages[2].Enabled = false;
-            Tabs.TabPages[3].Enabled = true;
-            Tabs.TabPages[4].Enabled = false;
-            Tabs.SelectedIndex = 3;
-        }
-
-
-        private void cbxDrucken_Layout1_TextChanged(object sender, System.EventArgs e) {
-            ShowAndCheckLayoutWahl();
-        }
-
-        private void Speichern_CheckedChanged(object sender, System.EventArgs e) {
-            ShowExportAktion();
-        }
 
         private void WeiterAktion_Click(object sender, System.EventArgs e) {
-            ShowAndCheckLayoutWahl();
+
+            var f = Fehler();
+
+            if (!string.IsNullOrEmpty(f)) {
+                MessageBox.Show(f);
+                return;
+            }
+
+
+
+
+            if (optBildSchateln.Checked) {
+                tabBildSchachteln.Enabled = true;
+                Tabs.SelectedTab = tabBildSchachteln;
+                Attribute_Changed(null, System.EventArgs.Empty);
+            }
+            if (optDrucken.Checked) {
+                tabDrucken.Enabled = true;
+                Tabs.SelectedTab = tabDrucken;
+                Button_PageSetup_Click(null, System.EventArgs.Empty);
+                GeneratePrintPad(padPrint, 0, cbxLayoutWahl.Text, _RowsForExport, 0);
+            }
+
+
+            if (optSpeichern.Checked || optSpezialFormat.Checked) {
+                tabStart.Enabled = false; // Geht ja gleich los
+                tabDateiExport.Enabled = true;
+                Tabs.SelectedTab = tabDateiExport;
+
+                List<string> l;
+                if (_Database.Layouts.LayoutIDToIndex(cbxLayoutWahl.Text) > -1) {
+                    l = Export.SaveAsBitmap(_RowsForExport, cbxLayoutWahl.Text, _ZielPfad);
+                } else {
+                    l = Export.GenerateLayout_FileSystem(_RowsForExport, cbxLayoutWahl.Text, _SaveTo, optSpezialFormat.Checked, _ZielPfad);
+                }
+                Exported.Item.AddRange(l);
+            }
         }
 
         private void Exported_ItemClicked(object sender, BasicListItemEventArgs e) {
@@ -354,93 +271,173 @@ namespace BlueControls.Forms {
         }
 
         private void Button_PageSetup_Click(object sender, System.EventArgs e) {
-            PrintPad.ShowPrinterPageSetup();
+            padPrint.ShowPrinterPageSetup();
 
-            PrintPad.CopyPrinterSettingsToWorkingArea();
+            padPrint.CopyPrinterSettingsToWorkingArea();
 
-            GeneratePrintPad(0);
+            GeneratePrintPad(padPrint, 0, cbxLayoutWahl.Text, _RowsForExport, 0);
         }
 
         private void btnDrucken_Click(object sender, System.EventArgs e) {
-            PrintPad.Print();
+            padPrint.Print();
             // Den Rest mach 'PrintPad.PrintPage'
         }
 
 
         private void PrintPad_PrintPage(object sender, PrintPageEventArgs e) {
 
-            var l = ItemNrForPrint;
+            var l = _ItemNrForPrint;
 
-            ItemNrForPrint = GeneratePrintPad(ItemNrForPrint);
+            _ItemNrForPrint = GeneratePrintPad(padPrint, _ItemNrForPrint, cbxLayoutWahl.Text, _RowsForExport, 0);
 
-            if (l == ItemNrForPrint) { return; }
+            if (l == _ItemNrForPrint) { return; }
 
-            e.HasMorePages = Convert.ToBoolean(ItemNrForPrint < Liste.Count);
+            e.HasMorePages = Convert.ToBoolean(_ItemNrForPrint < _RowsForExport.Count);
         }
 
 
 
         private void Vorschau_Click(object sender, System.EventArgs e) {
-            PrintPad.ShowPrintPreview();
+            padPrint.ShowPrintPreview();
         }
 
 
-        public int GeneratePrintPad(int StartNr) {
-            PrintPad.ShowInPrintMode = false;
-            PrintPad.Item.Clear();
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pad"></param>
+        /// <param name="startNr"></param>
+        /// <param name="layout"></param>
+        /// <param name="rowsForExport"></param>
+        /// <returns>Gibt das Item zurück, dass nicht mehr auf den Druckbereich gepasst hat</returns>
+        public static int GeneratePrintPad(CreativePad pad, int startNr, string layout, List<RowItem> rowsForExport, float abstandMM) {
+            pad.ShowInPrintMode = false;
+            pad.Item.Clear();
             modAllgemein.CollectGarbage();
 
-            var tmp = new CreativePad(new ItemCollectionPad(cbxDrucken_Layout1.Text, Liste[0].Database, Liste[0].Key));
+            var tmp = new CreativePad(new ItemCollectionPad(layout, rowsForExport[0].Database, rowsForExport[0].Key));
 
             var OneItem = tmp.Item.MaxBounds(null);
 
-            PrintPad.Item.SheetStyle = tmp.Item.SheetStyle;
-            PrintPad.Item.SheetStyleScale = tmp.Item.SheetStyleScale;
+            pad.Item.SheetStyle = tmp.Item.SheetStyle;
+            pad.Item.SheetStyleScale = tmp.Item.SheetStyleScale;
 
             tmp.Dispose();
 
-            var DruckB = PrintPad.Item.DruckbereichRect();
+            var DruckB = pad.Item.DruckbereichRect();
 
-            var tempVar = Math.Max(1, (int)Math.Floor(DruckB.Width / (double)OneItem.Width + 0.01));
+
+            var abstand = Math.Round(modConverter.mmToPixel((decimal)abstandMM, ItemCollectionPad.DPI), 1);
+
+
+
+            var tempVar = Math.Max(1, (int)Math.Floor(DruckB.Width / (double)(OneItem.Width + abstand) + 0.01));
             for (var x = 0; x < tempVar; x++) {
-                var tempVar2 = Math.Max(1, (int)Math.Floor(DruckB.Height / (double)OneItem.Height + 0.01));
+                var tempVar2 = Math.Max(1, (int)Math.Floor(DruckB.Height / (double)(OneItem.Height + abstand) + 0.01));
                 for (var y = 0; y < tempVar2; y++) {
 
 
-                    var It = new ChildPadItem(PrintPad.Item) {
-                        PadInternal = new CreativePad(new ItemCollectionPad(cbxDrucken_Layout1.Text, Liste[StartNr].Database, Liste[StartNr].Key))
+                    var It = new ChildPadItem(pad.Item) {
+                        PadInternal = new CreativePad(new ItemCollectionPad(layout, rowsForExport[startNr].Database, rowsForExport[startNr].Key))
                     };
+                    pad.Item.Add(It);
+                    It.SetCoordinates(new RectangleM(DruckB.Left + x * (OneItem.Width + abstand), DruckB.Top + y * (OneItem.Height + abstand), OneItem.Width, OneItem.Height), true);
 
-                    //Dim it As New RowFormulaPadItem(Liste(StartNr), Integer.Parse(FrmDrucken_Layout1.Text))
-                    PrintPad.Item.Add(It);
-                    It.SetCoordinates(new RectangleM(DruckB.Left + x * OneItem.Width, DruckB.Top + y * OneItem.Height, OneItem.Width, OneItem.Height), true);
+                    startNr++;
 
-
-                    StartNr++;
-
-                    if (FrmDrucken_Einzeln.Checked || StartNr >= Liste.Count) { break; }
+                    if (startNr >= rowsForExport.Count) { break; }
                 }
 
-                if (FrmDrucken_Einzeln.Checked || StartNr >= Liste.Count) {
-                    break;
-                }
+                if (startNr >= rowsForExport.Count) { break; }
             }
 
-            PrintPad.ZoomFit();
+            pad.ZoomFit();
 
-            return StartNr;
+            return startNr;
         }
 
         private void PrintPad_BeginnPrint(object sender, PrintEventArgs e) {
-            ItemNrForPrint = 0;
+            _ItemNrForPrint = 0;
         }
 
 
         protected override void OnFormClosing(FormClosingEventArgs e) {
-            _Database.Disposing -= _Database_Disposing;
-            _Database = null;
+
+            if (_Database != null) {
+                _Database.Disposing -= _Database_Disposing;
+                _Database = null;
+            }
             base.OnFormClosing(e);
         }
 
+        private void Tabs_SelectedIndexChanged(object sender, System.EventArgs e) {
+
+            if (Tabs.SelectedTab == tabStart && tabStart.Enabled) {
+                NurStartEnablen();
+            }
+
+        }
+
+        private void Attribute_Changed(object sender, System.EventArgs e) {
+
+
+            var b = FloatParse(flxBreite.Value);
+            var h = FloatParse(flxHöhe.Value);
+            var ab = FloatParse(flxAbstand.Value);
+            if (ab < 1) { ab = 0; }
+            if (b < 10) { b = 10; }
+            if (h < 10) { h = 10; }
+
+            padSchachteln.Item.SheetSizeInMM = new System.Drawing.SizeF(b, h);
+            padSchachteln.Item.RandinMM = Padding.Empty;
+
+
+            GeneratePrintPad(padSchachteln, 0, cbxLayoutWahl.Text, _RowsForExport, ab);
+
+
+        }
+
+        private void btnSchachtelnSpeichern_Click(object sender, System.EventArgs e) {
+            var b = FloatParse(flxBreite.Value);
+            var h = FloatParse(flxHöhe.Value);
+            var ab = FloatParse(flxAbstand.Value);
+            if (ab < 1) { ab = 0; }
+            if (b < 10) { b = 10; }
+            if (h < 10) { h = 10; }
+
+            padSchachteln.Item.SheetSizeInMM = new System.Drawing.SizeF(b, h);
+            padSchachteln.Item.RandinMM = Padding.Empty;
+
+
+            List<string> l = new();
+            _ItemNrForPrint = 0;
+
+            do {
+                var nr = _ItemNrForPrint;
+
+                _ItemNrForPrint = GeneratePrintPad(padSchachteln, _ItemNrForPrint, cbxLayoutWahl.Text, _RowsForExport, ab);
+                if (nr == _ItemNrForPrint) { break; }
+
+                if (_ItemNrForPrint >= _RowsForExport.Count) { break; }
+
+                var x = TempFile(_ZielPfad, "Schachteln", "png");
+                padSchachteln.Item.SaveAsBitmap(x, System.Drawing.Color.Transparent);
+
+                l.Add(x);
+
+            } while (true);
+
+
+
+
+
+
+            tabStart.Enabled = false;
+            tabBildSchachteln.Enabled = false;
+            tabDateiExport.Enabled = true;
+            Tabs.SelectedTab = tabDateiExport;
+
+            Exported.Item.AddRange(l);
+        }
     }
 }

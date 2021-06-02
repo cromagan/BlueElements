@@ -220,6 +220,9 @@ namespace BlueControls.Controls {
             }
         }
 
+        /// <summary>
+        /// Value benutzen!
+        /// </summary>
         [Obsolete]
         [DefaultValue("")]
         [Browsable(false)]
@@ -237,9 +240,6 @@ namespace BlueControls.Controls {
                 if (_Value == null) { return string.Empty; }
                 return _Value;
             }
-
-
-
         }
 
 
@@ -331,6 +331,7 @@ namespace BlueControls.Controls {
 
 
         [DefaultValue("")]
+        [Description("Zeigt rechts oben im Eck ein kleines Symbol an, dessen hier eingegebener Text angezeigt wird.")]
         public string InfoText {
             get => _InfoText;
             set {

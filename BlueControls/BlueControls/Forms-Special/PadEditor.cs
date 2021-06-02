@@ -165,7 +165,7 @@ namespace BlueControls.Forms {
 
 
         private void Bild_Click(object sender, System.EventArgs e) {
-            Pad.SaveAsBitmap(_Title, string.Empty);
+            Pad.OpenSaveDialog(_Title, string.Empty);
         }
 
 
