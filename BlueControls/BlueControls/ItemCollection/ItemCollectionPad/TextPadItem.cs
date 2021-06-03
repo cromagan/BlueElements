@@ -261,7 +261,7 @@ namespace BlueControls.ItemCollection {
 
         public bool ReplaceVariable(BlueScript.Variable variable) {
 
-            if ("&" + variable.Name.ToLower() + ";" != Text.ToLower()) { return false; }
+            if ("&" + variable.Name.ToLower() + ";" != Text.ToLower().TrimCr()) { return false; }
 
             if (variable.Type != Skript.Enums.enVariableDataType.String &&
                 variable.Type != Skript.Enums.enVariableDataType.List &&

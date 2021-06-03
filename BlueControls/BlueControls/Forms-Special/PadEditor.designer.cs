@@ -59,6 +59,7 @@ namespace BlueControls.Forms
             this.txbRasterAnzeige = new BlueControls.Controls.TextBox();
             this.ckbRaster = new BlueControls.Controls.Button();
             this.Area_Design = new BlueControls.Controls.GroupBox();
+            this.btnKeinHintergrund = new BlueControls.Controls.Button();
             this.btnHintergrundFarbe = new BlueControls.Controls.Button();
             this.btnVorschauModus = new BlueControls.Controls.Button();
             this.ArbeitsbreichSetup = new BlueControls.Controls.Button();
@@ -130,7 +131,7 @@ namespace BlueControls.Forms
             this.Ribbon.HotTrack = true;
             this.Ribbon.Location = new System.Drawing.Point(0, 0);
             this.Ribbon.Name = "Ribbon";
-            this.Ribbon.SelectedIndex = 2;
+            this.Ribbon.SelectedIndex = 0;
             this.Ribbon.Size = new System.Drawing.Size(1334, 110);
             this.Ribbon.TabIndex = 2;
             // 
@@ -147,13 +148,14 @@ namespace BlueControls.Forms
             // 
             // Area_Drucken
             // 
-            this.Area_Drucken.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.Area_Drucken.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.Area_Drucken.CausesValidation = false;
             this.Area_Drucken.Controls.Add(this.Vorschau);
             this.Area_Drucken.Controls.Add(this.Button_PageSetup);
             this.Area_Drucken.Controls.Add(this.Bild);
             this.Area_Drucken.Controls.Add(this.Drucken);
             this.Area_Drucken.Dock = System.Windows.Forms.DockStyle.Left;
+            this.Area_Drucken.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
             this.Area_Drucken.Location = new System.Drawing.Point(312, 0);
             this.Area_Drucken.Name = "Area_Drucken";
             this.Area_Drucken.Size = new System.Drawing.Size(296, 81);
@@ -367,13 +369,14 @@ namespace BlueControls.Forms
             // 
             // grpWerkzeuge
             // 
-            this.grpWerkzeuge.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.grpWerkzeuge.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpWerkzeuge.CausesValidation = false;
             this.grpWerkzeuge.Controls.Add(this.btnAuswahl);
             this.grpWerkzeuge.Controls.Add(this.btnZoomFit);
             this.grpWerkzeuge.Controls.Add(this.btnZoomOut);
             this.grpWerkzeuge.Controls.Add(this.btnZoomIn);
             this.grpWerkzeuge.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpWerkzeuge.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
             this.grpWerkzeuge.Location = new System.Drawing.Point(0, 0);
             this.grpWerkzeuge.Name = "grpWerkzeuge";
             this.grpWerkzeuge.Size = new System.Drawing.Size(240, 81);
@@ -405,7 +408,7 @@ namespace BlueControls.Forms
             // 
             // Area_Assistent
             // 
-            this.Area_Assistent.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.Area_Assistent.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.Area_Assistent.CausesValidation = false;
             this.Area_Assistent.Controls.Add(this.capRasterFangen);
             this.Area_Assistent.Controls.Add(this.capRasterAnzeige);
@@ -413,9 +416,10 @@ namespace BlueControls.Forms
             this.Area_Assistent.Controls.Add(this.txbRasterAnzeige);
             this.Area_Assistent.Controls.Add(this.ckbRaster);
             this.Area_Assistent.Dock = System.Windows.Forms.DockStyle.Left;
-            this.Area_Assistent.Location = new System.Drawing.Point(464, 0);
+            this.Area_Assistent.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
+            this.Area_Assistent.Location = new System.Drawing.Point(648, 0);
             this.Area_Assistent.Name = "Area_Assistent";
-            this.Area_Assistent.Size = new System.Drawing.Size(426, 81);
+            this.Area_Assistent.Size = new System.Drawing.Size(152, 81);
             this.Area_Assistent.TabIndex = 0;
             this.Area_Assistent.TabStop = false;
             this.Area_Assistent.Text = "Assistenten";
@@ -459,7 +463,7 @@ namespace BlueControls.Forms
             this.txbRasterAnzeige.TabIndex = 5;
             this.txbRasterAnzeige.Text = "10";
             this.txbRasterAnzeige.TextChanged += new System.EventHandler(this.txbRasterAnzeige_TextChanged);
-            //
+            // 
             // ckbRaster
             // 
             this.ckbRaster.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox;
@@ -475,6 +479,7 @@ namespace BlueControls.Forms
             // 
             this.Area_Design.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.Area_Design.CausesValidation = false;
+            this.Area_Design.Controls.Add(this.btnKeinHintergrund);
             this.Area_Design.Controls.Add(this.btnHintergrundFarbe);
             this.Area_Design.Controls.Add(this.btnVorschauModus);
             this.Area_Design.Controls.Add(this.ArbeitsbreichSetup);
@@ -486,17 +491,27 @@ namespace BlueControls.Forms
             this.Area_Design.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
             this.Area_Design.Location = new System.Drawing.Point(0, 0);
             this.Area_Design.Name = "Area_Design";
-            this.Area_Design.Size = new System.Drawing.Size(464, 81);
+            this.Area_Design.Size = new System.Drawing.Size(648, 81);
             this.Area_Design.TabIndex = 1;
             this.Area_Design.TabStop = false;
             this.Area_Design.Text = "Design";
             // 
+            // btnKeinHintergrund
+            // 
+            this.btnKeinHintergrund.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnKeinHintergrund.Location = new System.Drawing.Point(464, 2);
+            this.btnKeinHintergrund.Name = "btnKeinHintergrund";
+            this.btnKeinHintergrund.Size = new System.Drawing.Size(112, 22);
+            this.btnKeinHintergrund.TabIndex = 16;
+            this.btnKeinHintergrund.Text = "kein Hintergrund";
+            this.btnKeinHintergrund.Click += new System.EventHandler(this.btnKeinHintergrund_Click);
+            // 
             // btnHintergrundFarbe
             // 
             this.btnHintergrundFarbe.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnHintergrundFarbe.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_RibbonBar;
+            this.btnHintergrundFarbe.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_RibbonBar;
             this.btnHintergrundFarbe.ImageCode = "Farben";
-            this.btnHintergrundFarbe.Location = new System.Drawing.Point(320, 2);
+            this.btnHintergrundFarbe.Location = new System.Drawing.Point(376, 2);
             this.btnHintergrundFarbe.Name = "btnHintergrundFarbe";
             this.btnHintergrundFarbe.Size = new System.Drawing.Size(80, 66);
             this.btnHintergrundFarbe.TabIndex = 15;
@@ -508,7 +523,7 @@ namespace BlueControls.Forms
             this.btnVorschauModus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnVorschauModus.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_RibbonBar;
             this.btnVorschauModus.ImageCode = "Textdatei";
-            this.btnVorschauModus.Location = new System.Drawing.Point(400, 2);
+            this.btnVorschauModus.Location = new System.Drawing.Point(584, 2);
             this.btnVorschauModus.Name = "btnVorschauModus";
             this.btnVorschauModus.Size = new System.Drawing.Size(56, 66);
             this.btnVorschauModus.TabIndex = 14;
@@ -533,7 +548,7 @@ namespace BlueControls.Forms
             this.SchriftGröße.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.SchriftGröße.Location = new System.Drawing.Point(208, 46);
             this.SchriftGröße.Name = "SchriftGröße";
-            this.SchriftGröße.Size = new System.Drawing.Size(104, 22);
+            this.SchriftGröße.Size = new System.Drawing.Size(168, 22);
             this.SchriftGröße.TabIndex = 3;
             this.SchriftGröße.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.SchriftGröße_ItemClicked);
             // 
@@ -553,7 +568,7 @@ namespace BlueControls.Forms
             this.PadDesign.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.PadDesign.Location = new System.Drawing.Point(112, 24);
             this.PadDesign.Name = "PadDesign";
-            this.PadDesign.Size = new System.Drawing.Size(200, 22);
+            this.PadDesign.Size = new System.Drawing.Size(264, 22);
             this.PadDesign.TabIndex = 1;
             this.PadDesign.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.PadDesign_ItemClicked);
             // 
@@ -649,5 +664,6 @@ namespace BlueControls.Forms
         protected Button btnSpeichern;
         private Button btnHintergrundFarbe;
         private System.Windows.Forms.ColorDialog ColorDia;
+        private Button btnKeinHintergrund;
     }
 	}

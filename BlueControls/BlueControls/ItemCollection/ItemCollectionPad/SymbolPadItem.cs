@@ -40,11 +40,11 @@ namespace BlueControls.ItemCollection {
             return "Symbol";
         }
 
-        public enSymbol Symbol = enSymbol.Pfeil;
+        public enSymbol Symbol { get; set; } = enSymbol.Pfeil;
 
-        public Color Hintergrundfarbe;
-        public Color Randfarbe;
-        public decimal Randdicke;
+        public Color Hintergrundfarbe { get; set; }
+        public Color Randfarbe { get; set; }
+        public decimal Randdicke { get; set; }
 
         protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
 
@@ -57,8 +57,8 @@ namespace BlueControls.ItemCollection {
 
             var d2 = DCoordinates;
             d2.X = -DCoordinates.Width / 2;
-            d2.X = -DCoordinates.Width / 2;
             d2.Y = -DCoordinates.Height / 2;
+
 
             switch (Symbol) {
                 case enSymbol.Ohne:
@@ -70,6 +70,14 @@ namespace BlueControls.ItemCollection {
 
                 case enSymbol.Bruchlinie:
                     p = modAllgemein.Poly_Bruchlinie(d2.ToRect());
+                    break;
+
+                case enSymbol.Rechteck:
+                    p = modAllgemein.Poly_Rechteck(d2.ToRect());
+                    break;
+
+                case enSymbol.Rechteck_gerundet:
+                    p = modAllgemein.Poly_RoundRec(d2.ToRect(), (int)(20 * cZoom));
                     break;
 
                 default:
@@ -98,6 +106,8 @@ namespace BlueControls.ItemCollection {
             var Comms = new ItemCollectionList
             {
                 { "Ohne", ((int)enSymbol.Ohne).ToString(), QuickImage.Get("Datei|32") },
+                { "Rechteck", ((int)enSymbol.Rechteck).ToString() , QuickImage.Get("Stop|32")},
+                { "Rechteck gerundet", ((int)enSymbol.Rechteck_gerundet).ToString()},
                 { "Pfeil", ((int)enSymbol.Pfeil).ToString(), QuickImage.Get("Pfeil_Rechts|32") },
                 { "Bruchlinie", ((int)enSymbol.Bruchlinie).ToString() }
             };
@@ -113,24 +123,13 @@ namespace BlueControls.ItemCollection {
             return l;
         }
 
-        //public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
-        //{
-        //    base.DoStyleCommands(sender, Tags, ref CloseMenu);
-
-        //    BackColor = Tags.TagGet("Hintergrundfarbe").FromHTMLCode();
-        //    BorderColor = Tags.TagGet("Randfarbe").FromHTMLCode();
-        //    decimal.TryParse(Tags.TagGet("Randdicke"), out BorderWidth);
-        //    Symbol = (enSymbol)int.Parse(Tags.TagGet("Symbol"));
-        //    //Style = (PadStyles)int.Parse(Tags.TagGet("Farbe"));
-
-        //}
 
         public override string ToString() {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
             t = t + "Symbol=" + (int)Symbol + ", ";
-            t = t + "Backcolor=" + Randfarbe.ToHTMLCode() + ", ";
-            t = t + "BorderColor=" + Hintergrundfarbe.ToHTMLCode() + ", ";
+            t = t + "Backcolor=" + Hintergrundfarbe.ToHTMLCode() + ", ";
+            t = t + "BorderColor=" + Randfarbe.ToHTMLCode() + ", ";
             t = t + "BorderWidth=" + Randdicke.ToString().ToNonCritical() + ", ";
 
             return t.Trim(", ") + "}";
@@ -150,7 +149,8 @@ namespace BlueControls.ItemCollection {
                     Randfarbe = value.FromHTMLCode();
                     return true;
                 case "borderwidth":
-                    decimal.TryParse(value.FromNonCritical(), out Randdicke);
+                    decimal.TryParse(value.FromNonCritical(), out var tRanddicke);
+                    Randdicke = tRanddicke;
                     return true;
                 case "fill": // alt: 28.11.2019
                 case "whiteback": // alt: 28.11.2019

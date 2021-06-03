@@ -267,5 +267,10 @@ namespace BlueControls.Forms {
             Pad.Invalidate();
 
         }
+
+        private void btnKeinHintergrund_Click(object sender, System.EventArgs e) {
+            Pad.Item.BackColor = Color.Transparent;
+            Pad.Invalidate();
+        }
     }
 }

@@ -21,6 +21,8 @@ namespace BlueControls.Enums {
     public enum enSymbol {
         Ohne = 0,
         Pfeil = 1,
-        Bruchlinie = 2
+        Bruchlinie = 2,
+        Rechteck = 3,
+        Rechteck_gerundet = 4
     }
 }

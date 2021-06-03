@@ -32,14 +32,14 @@ namespace BlueControls.Forms
 			[DebuggerStepThrough()]
 			private void InitializeComponent()
 			{
-            this.FrmDrucken_Info = new BlueControls.Controls.Caption();
+            this.capAnzahlInfo = new BlueControls.Controls.Caption();
             this.cbxLayoutWahl = new BlueControls.Controls.ComboBox();
             this.c_Layoutx = new BlueControls.Controls.Caption();
             this.Caption3 = new BlueControls.Controls.Caption();
             this.MachZu = new BlueControls.Controls.Button();
             this.btnLayoutEditorÖffnen = new BlueControls.Controls.Button();
             this.FrmDrucken_ExportVerzeichniss = new BlueControls.Controls.Button();
-            this.Captionxx1 = new BlueControls.Controls.Caption();
+            this.capLayout = new BlueControls.Controls.Caption();
             this.padVorschau = new BlueControls.Controls.CreativePad();
             this.Tabs = new BlueControls.Controls.TabControl();
             this.tabStart = new BlueControls.Controls.TabPage();
@@ -74,15 +74,15 @@ namespace BlueControls.Forms
             this.tabDateiExport.SuspendLayout();
             this.SuspendLayout();
             // 
-            // FrmDrucken_Info
+            // capAnzahlInfo
             // 
-            this.FrmDrucken_Info.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.capAnzahlInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.FrmDrucken_Info.CausesValidation = false;
-            this.FrmDrucken_Info.Location = new System.Drawing.Point(8, 16);
-            this.FrmDrucken_Info.Name = "FrmDrucken_Info";
-            this.FrmDrucken_Info.Size = new System.Drawing.Size(847, 40);
-            this.FrmDrucken_Info.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            this.capAnzahlInfo.CausesValidation = false;
+            this.capAnzahlInfo.Location = new System.Drawing.Point(8, 16);
+            this.capAnzahlInfo.Name = "capAnzahlInfo";
+            this.capAnzahlInfo.Size = new System.Drawing.Size(847, 40);
+            this.capAnzahlInfo.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // cbxLayoutWahl
             // 
@@ -145,14 +145,14 @@ namespace BlueControls.Forms
             this.FrmDrucken_ExportVerzeichniss.Text = "Export Verzeichnis öffnen";
             this.FrmDrucken_ExportVerzeichniss.Click += new System.EventHandler(this.Button1_Click);
             // 
-            // Captionxx1
+            // capLayout
             // 
-            this.Captionxx1.CausesValidation = false;
-            this.Captionxx1.Location = new System.Drawing.Point(232, 24);
-            this.Captionxx1.Name = "Captionxx1";
-            this.Captionxx1.Size = new System.Drawing.Size(82, 22);
-            this.Captionxx1.Text = "Layout:";
-            this.Captionxx1.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_ohne_Textumbruch;
+            this.capLayout.CausesValidation = false;
+            this.capLayout.Location = new System.Drawing.Point(232, 24);
+            this.capLayout.Name = "capLayout";
+            this.capLayout.Size = new System.Drawing.Size(82, 22);
+            this.capLayout.Text = "Layout:";
+            this.capLayout.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_ohne_Textumbruch;
             // 
             // padVorschau
             // 
@@ -162,6 +162,7 @@ namespace BlueControls.Forms
             this.padVorschau.EditAllowed = false;
             this.padVorschau.Location = new System.Drawing.Point(232, 80);
             this.padVorschau.Name = "padVorschau";
+            this.padVorschau.ShowInPrintMode = true;
             this.padVorschau.Size = new System.Drawing.Size(623, 480);
             this.padVorschau.TabIndex = 1;
             // 
@@ -203,7 +204,7 @@ namespace BlueControls.Forms
             this.grpArt.Controls.Add(this.btnLayoutEditorÖffnen);
             this.grpArt.Controls.Add(this.optSpezialFormat);
             this.grpArt.Controls.Add(this.optBildSchateln);
-            this.grpArt.Controls.Add(this.Captionxx1);
+            this.grpArt.Controls.Add(this.capLayout);
             this.grpArt.Controls.Add(this.optSpeichern);
             this.grpArt.Controls.Add(this.optDrucken);
             this.grpArt.Location = new System.Drawing.Point(0, 64);
@@ -271,7 +272,7 @@ namespace BlueControls.Forms
             this.grpEinträge.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.grpEinträge.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.grpEinträge.Controls.Add(this.FrmDrucken_Info);
+            this.grpEinträge.Controls.Add(this.capAnzahlInfo);
             this.grpEinträge.Location = new System.Drawing.Point(0, 0);
             this.grpEinträge.Name = "grpEinträge";
             this.grpEinträge.Size = new System.Drawing.Size(860, 64);
@@ -489,12 +490,12 @@ namespace BlueControls.Forms
 			}
 			private ComboBox cbxLayoutWahl;
 			private Caption c_Layoutx;
-			private Caption FrmDrucken_Info;
+			private Caption capAnzahlInfo;
 			private Caption Caption3;
 			internal Button MachZu;
 			internal Button btnLayoutEditorÖffnen;
 			internal Button FrmDrucken_ExportVerzeichniss;
-			internal Caption Captionxx1;
+			internal Caption capLayout;
 			internal CreativePad padVorschau;
 			internal TabPage tabDateiExport;
 			internal TabPage tabStart;

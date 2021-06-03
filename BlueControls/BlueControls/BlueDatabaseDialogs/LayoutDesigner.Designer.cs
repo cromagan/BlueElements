@@ -67,7 +67,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Ribbon
             // 
-            this.Ribbon.SelectedIndex = 0;
             this.Ribbon.Size = new System.Drawing.Size(1340, 110);
             // 
             // tabPageStart
@@ -79,6 +78,30 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabPageStart.Controls.SetChildIndex(this.Area_Drucken, 0);
             this.tabPageStart.Controls.SetChildIndex(this.grpLayoutSelection, 0);
             this.tabPageStart.Controls.SetChildIndex(this.grpExterneLayouts, 0);
+            // 
+            // Button_PageSetup
+            // 
+            this.Button_PageSetup.ButtonStyle = BlueControls.Enums.enButtonStyle.Button;
+            // 
+            // ArbeitsbreichSetup
+            // 
+            this.ArbeitsbreichSetup.ButtonStyle = BlueControls.Enums.enButtonStyle.Button;
+            // 
+            // btnLastFiles
+            // 
+            this.btnLastFiles.Verhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_ohne_Textumbruch;
+            // 
+            // btnNeu
+            // 
+            this.btnNeu.ButtonStyle = BlueControls.Enums.enButtonStyle.Button;
+            // 
+            // btnOeffnen
+            // 
+            this.btnOeffnen.ButtonStyle = BlueControls.Enums.enButtonStyle.Button;
+            // 
+            // btnSpeichern
+            // 
+            this.btnSpeichern.ButtonStyle = BlueControls.Enums.enButtonStyle.Button;
             // 
             // grpLayoutSelection
             // 

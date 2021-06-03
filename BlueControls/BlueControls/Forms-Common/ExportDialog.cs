@@ -111,7 +111,7 @@ namespace BlueControls.Forms {
         }
 
         private void EintragsText() {
-            FrmDrucken_Info.Text = _RowsForExport == null || _RowsForExport.Count == 0
+            capAnzahlInfo.Text = _RowsForExport == null || _RowsForExport.Count == 0
                 ? "Bitte wählen sie die Einträge für den Export."
                 : _RowsForExport.Count == 1
                     ? "Es ist genau ein Eintrag gewählt:<br> <b>-" + _RowsForExport[0].CellFirstString().Replace("\r\n", " ")
@@ -262,7 +262,6 @@ namespace BlueControls.Forms {
         /// <param name="rowsForExport"></param>
         /// <returns>Gibt das Item zurück, dass nicht mehr auf den Druckbereich gepasst hat</returns>
         public static int GeneratePrintPad(CreativePad pad, int startNr, string layout, List<RowItem> rowsForExport, float abstandMM) {
-            pad.ShowInPrintMode = false;
             pad.Item.Clear();
             modAllgemein.CollectGarbage();
 

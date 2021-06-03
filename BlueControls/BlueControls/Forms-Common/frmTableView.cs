@@ -402,6 +402,7 @@ namespace BlueControls.Forms {
         }
 
         private void Drucken_ItemClicked(object sender, BasicListItemEventArgs e) {
+            Database.SaveAll(false);
 
             switch (e.Item.Internal) {
 
@@ -536,7 +537,7 @@ namespace BlueControls.Forms {
         }
 
         private void btnNeuDB_SaveAs_Click(object sender, System.EventArgs e) {
-
+            Database.SaveAll(false);
             var bu = (Button)sender;
 
             switch (bu.Name) {
@@ -766,10 +767,12 @@ namespace BlueControls.Forms {
         }
 
         private void btnOeffnen_Click(object sender, System.EventArgs e) {
+            Database.SaveAll(false);
             LoadTab.ShowDialog();
         }
 
         private void ‹berDiesesProgramm_Click(object sender, System.EventArgs e) {
+            Database.SaveAll(false);
             MessageBox.Show("(c) Christian Peter<br>V " + _Version, enImageCode.Information, "OK");
         }
 
@@ -781,6 +784,7 @@ namespace BlueControls.Forms {
         }
 
         private void Tempor‰renSpeicherort÷ffnen_Click(object sender, System.EventArgs e) {
+            Database.SaveAll(false);
             StandardTabx();
             ExecuteFile(Path.GetTempPath());
         }
@@ -797,6 +801,7 @@ namespace BlueControls.Forms {
         }
 
         private void Ordn_Click(object sender, System.EventArgs e) {
+            Database.SaveAll(false);
             StandardTabx();
             ExecuteFile(TableView.Database.Filename.FilePath());
         }
@@ -806,6 +811,7 @@ namespace BlueControls.Forms {
         }
 
         private void LastDatabases_ItemClicked(object sender, BasicListItemEventArgs e) {
+            Database.SaveAll(false);
             DatabaseSet(e.Item.Internal);
         }
 

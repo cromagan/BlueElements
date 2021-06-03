@@ -29,6 +29,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Printing;
 
 namespace BlueControls.Controls {
@@ -122,6 +123,7 @@ namespace BlueControls.Controls {
                 }
 
                 _Item = value;
+
 
                 if (_Item != null) {
                     _Item.ItemRemoved += _Item_ItemRemoved;
@@ -352,16 +354,17 @@ namespace BlueControls.Controls {
                 gr.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.None;
 
                 if (_Item.SheetSizeInMM.Width > 0 && _Item.SheetSizeInMM.Height > 0) {
-                    Skin.Draw_Back(gr, enDesign.Table_And_Pad, state, DisplayRectangle, this, true);
+                    //Skin.Draw_Back(gr, enDesign.Table_And_Pad, state, DisplayRectangle, this, true);
                     var SSW = Math.Round(modConverter.mmToPixel((decimal)_Item.SheetSizeInMM.Width, ItemCollectionPad.DPI), 1);
                     var SSH = Math.Round(modConverter.mmToPixel((decimal)_Item.SheetSizeInMM.Height, ItemCollectionPad.DPI), 1);
                     var LO = new PointM(0m, 0m).ZoomAndMove(zoom, X, Y);
                     var RU = new PointM(SSW, SSH).ZoomAndMove(zoom, X, Y);
 
-                    var R = new Rectangle((int)LO.X, (int)LO.Y, (int)(RU.X - LO.X), (int)(RU.Y - LO.Y));
-                    gr.FillRectangle(Brushes.White, R);
-                    gr.FillRectangle(new SolidBrush(Item.BackColor), R);
-                    gr.DrawRectangle(PenGray, R);
+                    qqq
+                    //var R = new Rectangle((int)LO.X, (int)LO.Y, (int)(RU.X - LO.X), (int)(RU.Y - LO.Y));
+                    //gr.FillRectangle(Brushes.White, R);
+                    //gr.FillRectangle(new SolidBrush(Item.BackColor), R);
+                    //gr.DrawRectangle(PenGray, R);
 
                     if (!_ShowInPrintMode) {
                         var rLO = new PointM(_Item.P_rLO.X, _Item.P_rLO.Y).ZoomAndMove(zoom, X, Y);
@@ -370,8 +373,9 @@ namespace BlueControls.Controls {
                         gr.DrawRectangle(PenGray, Rr);
                     }
                 } else {
-                    gr.Clear(Color.White);
-                    gr.Clear(Item.BackColor);
+                    qq
+                    //gr.Clear(Color.White);
+                    //gr.Clear(Item.BackColor);
                 }
                 gr.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.None;
                 if (!_Item.Draw(gr, zoom, X, Y, maxs, _ShowInPrintMode, visibleItems)) {
@@ -420,6 +424,12 @@ namespace BlueControls.Controls {
         }
 
         protected override void DrawControl(Graphics gr, enStates state) {
+            var lgb = new LinearGradientBrush(ClientRectangle, Color.White, Color.LightGray, LinearGradientMode.Vertical);
+
+            gr.FillRectangle(lgb, ClientRectangle);
+
+
+
             DrawCreativePadTo(gr, Size, state, _Zoom, _shiftX, _shiftY, null);
             Skin.Draw_Border(gr, enDesign.Table_And_Pad, state, DisplayRectangle);
         }

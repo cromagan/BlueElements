@@ -144,6 +144,7 @@ namespace BlueControls.Forms
             this.TableView.Dock = System.Windows.Forms.DockStyle.Left;
             this.TableView.Location = new System.Drawing.Point(0, 152);
             this.TableView.Name = "TableView";
+            this.TableView.ShowWaitScreen = true;
             this.TableView.Size = new System.Drawing.Size(192, 562);
             this.TableView.TabIndex = 73;
             this.TableView.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.TableView_ContextMenu_Init);
@@ -201,11 +202,12 @@ namespace BlueControls.Forms
             // 
             // grpInformation
             // 
-            this.grpInformation.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.grpInformation.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpInformation.CausesValidation = false;
             this.grpInformation.Controls.Add(this.Copyright);
             this.grpInformation.Controls.Add(this.btnInformation);
             this.grpInformation.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpInformation.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
             this.grpInformation.Location = new System.Drawing.Point(488, 0);
             this.grpInformation.Name = "grpInformation";
             this.grpInformation.Size = new System.Drawing.Size(280, 81);
@@ -235,11 +237,12 @@ namespace BlueControls.Forms
             // 
             // grpOrdner
             // 
-            this.grpOrdner.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.grpOrdner.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpOrdner.CausesValidation = false;
             this.grpOrdner.Controls.Add(this.btnDatenbanken);
             this.grpOrdner.Controls.Add(this.btnTemporärenSpeicherortÖffnen);
             this.grpOrdner.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpOrdner.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
             this.grpOrdner.Location = new System.Drawing.Point(304, 0);
             this.grpOrdner.Name = "grpOrdner";
             this.grpOrdner.Size = new System.Drawing.Size(184, 81);
@@ -271,13 +274,14 @@ namespace BlueControls.Forms
             // 
             // grpDatei
             // 
-            this.grpDatei.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.grpDatei.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpDatei.CausesValidation = false;
             this.grpDatei.Controls.Add(this.btnLetzteDateien);
             this.grpDatei.Controls.Add(this.btnOeffnen);
             this.grpDatei.Controls.Add(this.btnSaveAs);
             this.grpDatei.Controls.Add(this.btnNeuDB);
             this.grpDatei.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpDatei.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
             this.grpDatei.Location = new System.Drawing.Point(0, 0);
             this.grpDatei.Name = "grpDatei";
             this.grpDatei.Size = new System.Drawing.Size(304, 81);
@@ -608,11 +612,12 @@ namespace BlueControls.Forms
             // 
             // grpEditor
             // 
-            this.grpEditor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.grpEditor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpEditor.CausesValidation = false;
             this.grpEditor.Controls.Add(this.AllgemeinerEditor);
             this.grpEditor.Controls.Add(this.BeziehungsEditor);
             this.grpEditor.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpEditor.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
             this.grpEditor.Location = new System.Drawing.Point(0, 0);
             this.grpEditor.Name = "grpEditor";
             this.grpEditor.Size = new System.Drawing.Size(152, 81);

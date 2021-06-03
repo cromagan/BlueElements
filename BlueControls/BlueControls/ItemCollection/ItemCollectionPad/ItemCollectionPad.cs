@@ -496,7 +496,6 @@ namespace BlueControls.ItemCollection {
         private void Item_Changed(object sender, System.EventArgs e) {
             IsSaved = false;
             OnDoInvalidate();
-
         }
 
         public void DesignOrStyleChanged() {
