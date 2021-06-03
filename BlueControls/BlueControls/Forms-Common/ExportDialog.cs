@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.BlueDatabaseDialogs;
@@ -36,7 +35,6 @@ using static BlueBasics.modConverter;
 namespace BlueControls.Forms {
     public sealed partial class ExportDialog {
 
-
         private readonly string _AdditionalLayoutPath = "";
         private readonly List<RowItem> _RowsForExport;
         private Database _Database;
@@ -45,11 +43,9 @@ namespace BlueControls.Forms {
 
         private int _ItemNrForPrint;
 
-
         public ExportDialog(Database db, string additionalLayoutPath, string autosaveFile) : this(db, null, additionalLayoutPath, autosaveFile) { }
         public ExportDialog(Database db, List<RowItem> rows) : this(db, rows, string.Empty, string.Empty) { }
         public ExportDialog(Database db, List<RowItem> rows, string additionalLayoutPath, string autosaveFile) {
-
 
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
@@ -68,7 +64,6 @@ namespace BlueControls.Forms {
                 _ZielPfad = Path.GetTempPath();
             }
 
-
             try {
                 if (!string.IsNullOrEmpty(_AdditionalLayoutPath) && !PathExists(_AdditionalLayoutPath)) {
                     Directory.CreateDirectory(_AdditionalLayoutPath);
@@ -80,7 +75,6 @@ namespace BlueControls.Forms {
 
             }
 
-
             BefülleLayoutDropdowns();
             EintragsText();
 
@@ -88,9 +82,7 @@ namespace BlueControls.Forms {
 
         }
 
-
         private void NurStartEnablen() {
-
 
             tabStart.Enabled = true;
             tabDrucken.Enabled = false;
@@ -102,13 +94,6 @@ namespace BlueControls.Forms {
         private void _Database_Disposing(object sender, System.EventArgs e) {
             Close();
         }
-
-
-
-
-
-
-
 
         private string Fehler() {
 
@@ -122,31 +107,16 @@ namespace BlueControls.Forms {
                 if (!optSpezialFormat.Checked && !optSpeichern.Checked) { return "Das gewählte Layout kann nur gespeichtert oder im Spezialformat bearbeitet werden."; }
             }
 
-
-
-
             return string.Empty;
         }
 
         private void EintragsText() {
-            if (_RowsForExport == null || _RowsForExport.Count == 0) {
-                FrmDrucken_Info.Text = "Bitte wählen sie die Einträge für den Export.";
-
-            } else {
-                if (_RowsForExport.Count == 1) {
-                    FrmDrucken_Info.Text = "Es ist genau ein Eintrag gewählt:<br> <b>-" + _RowsForExport[0].CellFirstString().Replace("\r\n", " ");
-
-
-                } else {
-                    FrmDrucken_Info.Text = "Es sind <b>" + _RowsForExport.Count + "</b> Einträge gewählt.";
-
-                }
-            }
-
+            FrmDrucken_Info.Text = _RowsForExport == null || _RowsForExport.Count == 0
+                ? "Bitte wählen sie die Einträge für den Export."
+                : _RowsForExport.Count == 1
+                    ? "Es ist genau ein Eintrag gewählt:<br> <b>-" + _RowsForExport[0].CellFirstString().Replace("\r\n", " ")
+                    : "Es sind <b>" + _RowsForExport.Count + "</b> Einträge gewählt.";
         }
-
-
-
 
         public static void AddLayoutsOff(ItemCollectionList addHere, Database database, bool addDiskLayouts, string additionalLayoutPath) {
 
@@ -163,7 +133,6 @@ namespace BlueControls.Forms {
             if (database != null) { path.Add(database.DefaultLayoutPath()); }
             if (!string.IsNullOrEmpty(additionalLayoutPath)) { path.Add(additionalLayoutPath); }
 
-
             foreach (var thisP in path) {
                 if (PathExists(thisP)) {
                     var e = Directory.GetFiles(thisP);
@@ -173,14 +142,12 @@ namespace BlueControls.Forms {
                     }
                 }
             }
-
         }
 
         private void BefülleLayoutDropdowns() {
             cbxLayoutWahl.Item.Clear();
             ExportDialog.AddLayoutsOff(cbxLayoutWahl.Item, _Database, true, _AdditionalLayoutPath);
         }
-
 
         private void LayoutEditor_Click(object sender, System.EventArgs e) {
 
@@ -204,9 +171,6 @@ namespace BlueControls.Forms {
             ExecuteFile(_ZielPfad);
         }
 
-
-
-
         private void cbxLayoutWahl_TextChanged(object sender, System.EventArgs e) {
 
             if (_Database.Layouts.LayoutIDToIndex(cbxLayoutWahl.Text) > -1) {
@@ -220,8 +184,6 @@ namespace BlueControls.Forms {
             }
         }
 
-
-
         private void WeiterAktion_Click(object sender, System.EventArgs e) {
 
             var f = Fehler();
@@ -230,9 +192,6 @@ namespace BlueControls.Forms {
                 MessageBox.Show(f);
                 return;
             }
-
-
-
 
             if (optBildSchateln.Checked) {
                 tabBildSchachteln.Enabled = true;
@@ -246,18 +205,14 @@ namespace BlueControls.Forms {
                 GeneratePrintPad(padPrint, 0, cbxLayoutWahl.Text, _RowsForExport, 0);
             }
 
-
             if (optSpeichern.Checked || optSpezialFormat.Checked) {
                 tabStart.Enabled = false; // Geht ja gleich los
                 tabDateiExport.Enabled = true;
                 Tabs.SelectedTab = tabDateiExport;
 
-                List<string> l;
-                if (_Database.Layouts.LayoutIDToIndex(cbxLayoutWahl.Text) > -1) {
-                    l = Export.SaveAsBitmap(_RowsForExport, cbxLayoutWahl.Text, _ZielPfad);
-                } else {
-                    l = Export.GenerateLayout_FileSystem(_RowsForExport, cbxLayoutWahl.Text, _SaveTo, optSpezialFormat.Checked, _ZielPfad);
-                }
+                var l = _Database.Layouts.LayoutIDToIndex(cbxLayoutWahl.Text) > -1
+                    ? Export.SaveAsBitmap(_RowsForExport, cbxLayoutWahl.Text, _ZielPfad)
+                    : Export.GenerateLayout_FileSystem(_RowsForExport, cbxLayoutWahl.Text, _SaveTo, optSpezialFormat.Checked, _ZielPfad);
                 Exported.Item.AddRange(l);
             }
         }
@@ -283,7 +238,6 @@ namespace BlueControls.Forms {
             // Den Rest mach 'PrintPad.PrintPage'
         }
 
-
         private void PrintPad_PrintPage(object sender, PrintPageEventArgs e) {
 
             var l = _ItemNrForPrint;
@@ -295,12 +249,9 @@ namespace BlueControls.Forms {
             e.HasMorePages = Convert.ToBoolean(_ItemNrForPrint < _RowsForExport.Count);
         }
 
-
-
         private void Vorschau_Click(object sender, System.EventArgs e) {
             padPrint.ShowPrintPreview();
         }
-
 
         /// <summary>
         /// 
@@ -326,22 +277,18 @@ namespace BlueControls.Forms {
 
             var DruckB = pad.Item.DruckbereichRect();
 
-
             var abstand = Math.Round(modConverter.mmToPixel((decimal)abstandMM, ItemCollectionPad.DPI), 1);
 
-
-
-            var tempVar = Math.Max(1, (int)Math.Floor(DruckB.Width / (double)(OneItem.Width + abstand) + 0.01));
+            var tempVar = Math.Max(1, (int)Math.Floor((DruckB.Width / (double)(OneItem.Width + abstand)) + 0.01));
             for (var x = 0; x < tempVar; x++) {
-                var tempVar2 = Math.Max(1, (int)Math.Floor(DruckB.Height / (double)(OneItem.Height + abstand) + 0.01));
+                var tempVar2 = Math.Max(1, (int)Math.Floor((DruckB.Height / (double)(OneItem.Height + abstand)) + 0.01));
                 for (var y = 0; y < tempVar2; y++) {
-
 
                     var It = new ChildPadItem(pad.Item) {
                         PadInternal = new CreativePad(new ItemCollectionPad(layout, rowsForExport[startNr].Database, rowsForExport[startNr].Key))
                     };
                     pad.Item.Add(It);
-                    It.SetCoordinates(new RectangleM(DruckB.Left + x * (OneItem.Width + abstand), DruckB.Top + y * (OneItem.Height + abstand), OneItem.Width, OneItem.Height), true);
+                    It.SetCoordinates(new RectangleM(DruckB.Left + (x * (OneItem.Width + abstand)), DruckB.Top + (y * (OneItem.Height + abstand)), OneItem.Width, OneItem.Height), true);
 
                     startNr++;
 
@@ -360,7 +307,6 @@ namespace BlueControls.Forms {
             _ItemNrForPrint = 0;
         }
 
-
         protected override void OnFormClosing(FormClosingEventArgs e) {
 
             if (_Database != null) {
@@ -375,11 +321,9 @@ namespace BlueControls.Forms {
             if (Tabs.SelectedTab == tabStart && tabStart.Enabled) {
                 NurStartEnablen();
             }
-
         }
 
         private void Attribute_Changed(object sender, System.EventArgs e) {
-
 
             var b = FloatParse(flxBreite.Value);
             var h = FloatParse(flxHöhe.Value);
@@ -391,9 +335,7 @@ namespace BlueControls.Forms {
             padSchachteln.Item.SheetSizeInMM = new System.Drawing.SizeF(b, h);
             padSchachteln.Item.RandinMM = Padding.Empty;
 
-
             GeneratePrintPad(padSchachteln, 0, cbxLayoutWahl.Text, _RowsForExport, ab);
-
 
         }
 
@@ -407,7 +349,6 @@ namespace BlueControls.Forms {
 
             padSchachteln.Item.SheetSizeInMM = new System.Drawing.SizeF(b, h);
             padSchachteln.Item.RandinMM = Padding.Empty;
-
 
             List<string> l = new();
             _ItemNrForPrint = 0;
@@ -427,11 +368,6 @@ namespace BlueControls.Forms {
                 l.Add(x);
 
             } while (true);
-
-
-
-
-
 
             tabStart.Enabled = false;
             tabBildSchachteln.Enabled = false;

@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
@@ -41,10 +40,8 @@ namespace BlueDatabase {
 
         #endregion
 
-
         #region  Event-Deklarationen + Delegaten 
         public event EventHandler<RowCheckedEventArgs> RowChecked;
-
 
         public event EventHandler<DoRowAutomaticEventArgs> DoSpecialRules;
 
@@ -55,9 +52,7 @@ namespace BlueDatabase {
         public event EventHandler<RowEventArgs> RowAdded;
         #endregion
 
-
         #region  Construktor + Initialize 
-
 
         public void Initialize() {
             _LastRowKey = 0;
@@ -71,9 +66,7 @@ namespace BlueDatabase {
 
         #endregion
 
-
         #region  Properties 
-
 
         /// <summary>
         /// Durchsucht die erste (interne) Spalte der Datenbank nach dem hier angegebenen Prmärschlüssel.
@@ -96,21 +89,17 @@ namespace BlueDatabase {
             }
         }
 
-
         public RowItem this[FilterCollection filter] {
             get {
-                if (Database == null) { return null; }
-                return _Internal.Values.FirstOrDefault(ThisRow => ThisRow != null && ThisRow.MatchesTo(filter));
+                return Database == null ? null : _Internal.Values.FirstOrDefault(ThisRow => ThisRow != null && ThisRow.MatchesTo(filter));
             }
         }
-
 
         #endregion
 
         private void Database_Disposing(object sender, System.EventArgs e) {
             Dispose();
         }
-
 
         internal int NextRowKey() {
             do {
@@ -120,8 +109,6 @@ namespace BlueDatabase {
 
             return _LastRowKey;
         }
-
-
 
         public void Remove(int Key) {
             var e = SearchByKey(Key);
@@ -163,7 +150,6 @@ namespace BlueDatabase {
         internal string Load_310(enDatabaseDataType Art, string Wert) {
             switch (Art) {
 
-
                 case enDatabaseDataType.LastRowKey:
                     _LastRowKey = int.Parse(Wert);
 
@@ -182,7 +168,6 @@ namespace BlueDatabase {
             return "";
 
         }
-
 
         public RowItem Add(RowItem Row) {
             if (!_Internal.TryAdd(Row.Key, Row)) { Develop.DebugPrint(enFehlerArt.Fehler, "Add Failed"); }
@@ -205,13 +190,11 @@ namespace BlueDatabase {
                 return null;
             }
 
-
             var Row = new RowItem(Database);
 
             Add(Row);
 
             Row.CellSet(Database.Column[0], ValueOfCellInFirstColumn);
-
 
             Database.Cell.SystemSet(Database.Column.SysRowCreator, Row, Database.UserName);
             Database.Cell.SystemSet(Database.Column.SysRowCreateDate, Row, DateTime.Now.ToString(Constants.Format_Date5));
@@ -223,16 +206,13 @@ namespace BlueDatabase {
 
             Row.DoAutomatic(false, false, 1, "new row");
 
-
             return Row;
         }
-
 
         public void DoAutomatic(FilterCollection filter, bool fullCheck, List<RowItem> pinned, string startroutine) {
             if (Database.ReadOnly) { return; }
 
             DoAutomatic(CalculateSortedRows(filter, null, pinned), fullCheck, startroutine);
-
 
         }
 
@@ -247,7 +227,7 @@ namespace BlueDatabase {
             while (x.Count > 0) {
 
                 Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", all - x.Count(), all, false, false));
-                var (didSuccesfullyCheck, _, skript) = x[0].DoAutomatic(true, fullCheck, false, startroutine);
+                (var didSuccesfullyCheck, var _, var skript) = x[0].DoAutomatic(true, fullCheck, false, startroutine);
 
                 if (skript != null && !string.IsNullOrEmpty(skript.Error)) {
                     x.Clear();
@@ -255,19 +235,13 @@ namespace BlueDatabase {
                     break;
                 }
 
-
                 if (didSuccesfullyCheck) {
                     x.RemoveAt(0);
                 }
-
             }
 
             Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", x.Count(), x.Count(), false, true));
         }
-
-
-
-
 
         public void Remove(RowItem Row) {
 
@@ -281,7 +255,6 @@ namespace BlueDatabase {
             Remove(Row.Key);
         }
 
-
         internal void Repair() {
 
             foreach (var ThisRowItem in _Internal.Values) {
@@ -289,12 +262,8 @@ namespace BlueDatabase {
                     //ThisRowItem.Repair();
                     _LastRowKey = Math.Max(_LastRowKey, ThisRowItem.Key); // Die Letzte ID ermitteln,falls der gleadene Wert fehlerhaft ist
                 }
-
             }
         }
-
-
-
 
         internal void SaveToByteList(List<byte> l) {
             Database.SaveToByteList(l, enDatabaseDataType.LastRowKey, _LastRowKey.ToString());
@@ -302,15 +271,11 @@ namespace BlueDatabase {
 
         public RowItem SearchByKey(int Key) {
             try {
-                if (Key < 0) { return null; }
-                if (!_Internal.ContainsKey(Key)) { return null; }
-                return _Internal[Key];
+                return Key < 0 ? null : !_Internal.ContainsKey(Key) ? null : _Internal[Key];
             } catch {
                 // Develop.DebugPrint(ex);
                 return SearchByKey(Key);
             }
-
-
         }
 
         public RowItem First() {
@@ -334,7 +299,6 @@ namespace BlueDatabase {
         private IEnumerator IEnumerable_GetEnumerator() {
             return _Internal.Values.GetEnumerator();
         }
-
 
         public int Count => _Internal.Count;
 
@@ -371,12 +335,7 @@ namespace BlueDatabase {
             //    }
             //}
 
-
-
-
             if (x.Count == 0) { return false; }
-
-
 
             foreach (int ThisKey in x) {
                 Remove(ThisKey);
@@ -384,7 +343,6 @@ namespace BlueDatabase {
 
             return true;
         }
-
 
         public List<RowItem> CalculateSortedRows(List<FilterItem> Filter, RowSortDefinition rowSortDefinition, List<RowItem> pinnedRows) {
             var TMP = new List<string>();
@@ -404,9 +362,7 @@ namespace BlueDatabase {
                 }
             }
 
-
             TMP.Sort();
-
 
             int cc;
             if (rowSortDefinition == null || !rowSortDefinition.Reverse) {
@@ -423,7 +379,6 @@ namespace BlueDatabase {
                         _tmpSortedRows.Add(Database.Row.SearchByKey(int.Parse(TMP[z].Substring(cc + 6))));
                     }
                 }
-
             }
 
             var newPinned = new List<RowItem>();
@@ -433,7 +388,6 @@ namespace BlueDatabase {
                     newPinned.Add(thisPinned);
                 }
             }
-
 
             _tmpSortedRows.InsertRange(0, newPinned);
             return _tmpSortedRows;
@@ -456,14 +410,13 @@ namespace BlueDatabase {
                     // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
                 }
 
-           
                 Database.Disposing -= Database_Disposing;
                 Database = null;
                 _Internal.Clear();
 
-                      // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
-                      // TODO: Große Felder auf NULL setzen
-                      disposedValue = true;
+                // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
+                // TODO: Große Felder auf NULL setzen
+                disposedValue = true;
             }
         }
 

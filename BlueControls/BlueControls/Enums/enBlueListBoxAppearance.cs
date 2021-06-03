@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 namespace BlueControls.Enums {
     public enum enBlueListBoxAppearance {
         //   Undefiniert = enDesign.Undefiniert
@@ -27,7 +26,6 @@ namespace BlueControls.Enums {
         Autofilter = enDesign.Form_AutoFilter,
 
         KontextMenu = enDesign.Form_KontextMenu,
-
 
         ComboBox_Textbox = enDesign.ComboBox_Textbox,
 

@@ -42,15 +42,12 @@ namespace BluePaint {
                 return;
             }
 
-
             if (H == null || (int)H < 2) {
                 Notification.Show("Bitte Höhe eingeben.", enImageCode.Information);
                 return;
             }
 
-
             var newPic = new Bitmap((int)W, (int)H);
-
 
             var gr = Graphics.FromImage(newPic);
 
@@ -69,11 +66,9 @@ namespace BluePaint {
 
                 gr.DrawString(TXT.Text, f, new SolidBrush(Color.Black), new PointF((float)(-fs.Width / 2.0), (float)(-fs.Height / 2.0)));
 
-
             }
 
             OnOverridePic(newPic);
         }
-
     }
 }

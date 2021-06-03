@@ -38,7 +38,6 @@ namespace BlueControls.Controls {
     [Designer(typeof(BasicDesigner))]
     public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
 
-
         /// <summary>
         /// ACHTUNG: Das Control wird niemals den Filter selbst ändern.
         /// Der Filter wird nur zur einfacheren Identifizierung der nachfolgenden Steuerelemente behalten.
@@ -76,7 +75,6 @@ namespace BlueControls.Controls {
 
         private void UpdateFilterData(Filterleiste myParent) {
 
-
             if (Filter == null || Filter.Column == null) {
                 DisabledReason = "Bezug zum Filter verloren.";
                 Caption = string.Empty;
@@ -85,21 +83,12 @@ namespace BlueControls.Controls {
                 FileEncryptionKey = string.Empty;
                 ValueSet(string.Empty, true, true);
             } else {
-                if (string.IsNullOrEmpty(Filter.Herkunft)) {
-                    DisabledReason = string.Empty;
-                } else {
-                    DisabledReason = "Dieser Filter ist automatisch<br>gesetzt worden.";
-                }
+                DisabledReason = !string.IsNullOrEmpty(Filter.Herkunft) ? "Dieser Filter ist automatisch<br>gesetzt worden." : string.Empty;
 
                 var qi = Filter.Column.QuickInfoText(string.Empty);
 
-                if (string.IsNullOrEmpty(qi)) {
-                    QuickInfo = "<b>Filter:</b><br>" + Filter.ReadableText();
-                } else {
-                    QuickInfo = "<b>Filter:</b><br>" + Filter.ReadableText() + "<br><br><b>Info:</b><br>" + qi;
-                }
-
-
+                QuickInfo = string.IsNullOrEmpty(qi) ? "<b>Filter:</b><br>" + Filter.ReadableText()
+                                                     : "<b>Filter:</b><br>" + Filter.ReadableText() + "<br><br><b>Info:</b><br>" + qi;
 
                 if (!Filter.Column.AutoFilterSymbolPossible()) {
                     EditType = enEditTypeFormula.None;
@@ -109,18 +98,13 @@ namespace BlueControls.Controls {
 
                     if (Filter.FilterType == enFilterType.Instr_GroßKleinEgal && Filter.SearchValue != null && Filter.SearchValue.Count == 1) {
 
-                        if (myParent == null || myParent.Orientation == enOrientation.Waagerecht || Filter.Column.DauerFilterPos.IsEmpty) {
-                            CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
-                        } else {
-                            CaptionPosition = enÜberschriftAnordnung.Über_dem_Feld;
-
-                        }
+                        CaptionPosition = myParent == null || myParent.Orientation == enOrientation.Waagerecht || Filter.Column.DauerFilterPos.IsEmpty ? enÜberschriftAnordnung.Links_neben_Dem_Feld
+                                                                                                                                                       : enÜberschriftAnordnung.Über_dem_Feld;
                         ShowDelFilterButton = false;
                         Caption = Filter.Column.ReadableText() + ":";
                         EditType = enEditTypeFormula.Textfeld_mit_Auswahlknopf;
                         ValueSet(Filter.SearchValue[0], true, true);
                     }
-
 
                     if (Filter.Column.FilterOptions == enFilterOptions.Enabled_OnlyAndAllowed || Filter.Column.FilterOptions == enFilterOptions.Enabled_OnlyOrAllowed) {
                         ShowDelFilterButton = false;
@@ -129,17 +113,13 @@ namespace BlueControls.Controls {
                         EditType = enEditTypeFormula.Button;
                     }
 
-
                     if (ShowDelFilterButton) {
                         CaptionPosition = enÜberschriftAnordnung.ohne;
                         EditType = enEditTypeFormula.Button;
                     }
                 }
-
             }
         }
-
-
 
         protected override void OnControlAdded(System.Windows.Forms.ControlEventArgs e) {
 
@@ -164,7 +144,6 @@ namespace BlueControls.Controls {
                 cbx.DropDownShowing += Cbx_DropDownShowing;
             }
 
-
             if (e.Control is Button btn) {
 
                 if (CaptionPosition == enÜberschriftAnordnung.ohne) {
@@ -179,8 +158,6 @@ namespace BlueControls.Controls {
                         btn.Text = "wählen";
                     }
                 }
-
-
             }
         }
 
@@ -190,7 +167,6 @@ namespace BlueControls.Controls {
 
                 FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
             }
-
         }
 
         protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
@@ -206,7 +182,6 @@ namespace BlueControls.Controls {
 
             cbx.Item.Clear();
             cbx.Item.CheckBehavior = enCheckBehavior.MultiSelection;
-
 
             if (TableView == null) {
                 cbx.Item.Add("Anzeigefehler", "|~", enImageCode.Kreuz, false);
@@ -224,7 +199,6 @@ namespace BlueControls.Controls {
             } else {
                 cbx.Item.Add("Zu viele Einträge", "|~", enImageCode.Kreuz, false);
             }
-
         }
 
         internal ComboBox GetComboBox() {
@@ -241,8 +215,7 @@ namespace BlueControls.Controls {
 
         internal bool WasThisValueClicked() {
             var cb = GetComboBox();
-            if (cb == null) { return false; }
-            return cb.WasThisValueClicked();
+            return cb != null && cb.WasThisValueClicked();
         }
 
         public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
@@ -254,14 +227,9 @@ namespace BlueControls.Controls {
 
             if (!Filter.Column.Database.IsAdministrator()) { return; }
 
-
             HotItem = Filter.Column;
 
-
-
-
             Items.Add("Spalte bearbeiten", "#ColumnEdit", QuickImage.Get(enImageCode.Spalte));
-
 
             if (Parent is Filterleiste f) {
 
@@ -270,15 +238,7 @@ namespace BlueControls.Controls {
 
                     Items.Add("Bild-Pfad öffnen", "#BildPfad", QuickImage.Get(enImageCode.Ordner));
                 }
-
-
-
             }
-
-
-
-
-
         }
 
         public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
@@ -331,11 +291,9 @@ namespace BlueControls.Controls {
             return false;
         }
 
-
         public void OnContextMenuInit(ContextMenuInitEventArgs e) {
             ContextMenuInit?.Invoke(this, e);
         }
-
 
         public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) {
             ContextMenuItemClicked?.Invoke(this, e);

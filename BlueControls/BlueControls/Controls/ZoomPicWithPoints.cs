@@ -23,10 +23,7 @@ namespace BlueControls.Controls {
         }
         #endregion
 
-
         private readonly List<PointM> points = new();
-
-
 
         public event EventHandler PointSetByUser;
 
@@ -41,20 +38,16 @@ namespace BlueControls.Controls {
 
         private enHelpers _Helper = enHelpers.Ohne;
 
-
         [DefaultValue((enOrientation)(-1))]
         public enOrientation Mittellinie {
             get => _MittelLinie;
             set {
 
-
                 if (_MittelLinie == value) { return; }
                 _MittelLinie = value;
                 Invalidate();
             }
-
         }
-
 
         [DefaultValue(enHelpers.Ohne)]
         public enHelpers Helper {
@@ -65,8 +58,6 @@ namespace BlueControls.Controls {
                 Invalidate();
             }
         }
-
-
 
         protected override RectangleM MaxBounds() {
 
@@ -88,12 +79,10 @@ namespace BlueControls.Controls {
         //    base.DrawControl(gr, state);
         //}
 
-
         protected override void OnDoAdditionalDrawing(AdditionalDrawing e) {
             base.OnDoAdditionalDrawing(e);
 
             DrawMittelLinien(e);
-
 
             /// Punkte
             foreach (var ThisPoint in points) {
@@ -102,10 +91,8 @@ namespace BlueControls.Controls {
                 } else {
                     ThisPoint.Draw(e.G, e.Zoom, e.ShiftX, e.ShiftY, enDesign.Button_EckpunktSchieber, enStates.Standard);
                 }
-
             }
         }
-
 
         public void LoadData(string PathOfPicture) {
             var x = LoadFromDisk(PathOfPicture);
@@ -198,7 +185,6 @@ namespace BlueControls.Controls {
                 return;
             }
 
-
             if (p.X != x || p.Y != y) {
                 p.X = x;
                 p.Y = y;
@@ -208,7 +194,6 @@ namespace BlueControls.Controls {
             WritePointsInTags();
 
         }
-
 
         protected override void OnMouseMove(MouseEventArgs e) {
             base.OnMouseMove(e);
@@ -227,7 +212,6 @@ namespace BlueControls.Controls {
             Invalidate();
         }
 
-
         public static string FilenameTXT(string PathOfPicture) {
 
             return PathOfPicture.FilePath() + PathOfPicture.FileNameWithoutSuffix() + ".txt";
@@ -235,14 +219,10 @@ namespace BlueControls.Controls {
             //            return PathOfPicture.TrimEnd(".PNG").TrimEnd(".JPG").TrimEnd(".JPG") + ".txt";
         }
 
-
         public static Tuple<Bitmap, List<string>> LoadFromDisk(string PathOfPicture) {
-
-
 
             Bitmap bmp = null;
             var tags = new List<string>();
-
 
             if (FileExists(PathOfPicture)) {
                 bmp = (Bitmap)BitmapExt.Image_FromFile(PathOfPicture);
@@ -250,11 +230,9 @@ namespace BlueControls.Controls {
 
             var ftxt = FilenameTXT(PathOfPicture);
 
-
             if (FileExists(ftxt)) {
                 tags = File.ReadAllText(ftxt, System.Text.Encoding.UTF8).SplitByCRToList();
             }
-
 
             tags.TagSet("ImageFile", PathOfPicture);
 
@@ -266,10 +244,8 @@ namespace BlueControls.Controls {
 
             if (BMP == null) { return; }
 
-
             var e = new PositionEventArgs(MousePos_1_1.X, MousePos_1_1.Y);
             OnOverwriteMouseImageData(e);
-
 
             ///// Punkte
             //foreach (var ThisPoint in points)
@@ -280,7 +256,6 @@ namespace BlueControls.Controls {
             //{
             //    OverlayBMP = new Bitmap(BMP.Width, BMP.Height);
             //}
-
 
             //var TMPGR = Graphics.FromImage(BMP);
 
@@ -303,9 +278,7 @@ namespace BlueControls.Controls {
                 eg.G.DrawLine(new Pen(Color.FromArgb(220, 100, 255, 100)), p1, p2);
             }
 
-
             if (MousePos_1_1.IsEmpty) { return; }
-
 
             if (_Helper.HasFlag(enHelpers.HorizontalLine)) {
                 var p1 = new PointM(0, e.Y).ZoomAndMove(eg);
@@ -318,8 +291,6 @@ namespace BlueControls.Controls {
                 var p2 = new PointM(e.X, BMP.Height).ZoomAndMove(eg);
                 eg.G.DrawLine(Pen_RotTransp, p1, p2);
             }
-
-
 
             if (_Helper.HasFlag(enHelpers.SymetricalHorizontal)) {
                 var h = BMP.Width / 2;
@@ -345,10 +316,7 @@ namespace BlueControls.Controls {
                     eg.G.DrawEllipse(Pen_RotTransp, new RectangleF(md1.X - 3, md1.Y - 3, 6, 6));
                     eg.G.DrawLine(Pen_RotTransp, mc1, md1);
                 }
-
             }
-
-
 
             if (_Helper.HasFlag(enHelpers.FilledRectancle)) {
                 if (!MouseDownPos_1_1.IsEmpty) {
@@ -358,8 +326,6 @@ namespace BlueControls.Controls {
                     eg.G.FillRectangle(Brush_RotTransp, r);
                 }
             }
-
-
         }
 
         public void PointRemove(string name) {
@@ -380,10 +346,7 @@ namespace BlueControls.Controls {
 
         }
 
-
-
         protected override void OnImageMouseUp(MouseEventArgs1_1 e) {
-
 
             if (_PointAdding && !string.IsNullOrEmpty(Feedback)) {
                 PointSet(Feedback, e.X, e.Y);
@@ -396,7 +359,6 @@ namespace BlueControls.Controls {
             //Feedback = string.Empty;
 
         }
-
 
         protected virtual void OnPointSetByUser() {
             PointSetByUser?.Invoke(this, System.EventArgs.Empty);
@@ -425,21 +387,16 @@ namespace BlueControls.Controls {
             }
         }
 
-
         public static Tuple<Bitmap, List<string>> ResizeData(Bitmap pic, List<string> tags, int width, int height) {
 
             var zoomx = (decimal)width / pic.Width;
             var zoomy = (decimal)height / pic.Height;
 
-
             var pic2 = BitmapExt.Resize(pic, width, height, enSizeModes.Verzerren, System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic, true);
 
             var tags2 = new List<string>(tags);
 
-
             var Names = tags2.TagGet("AllPointNames").FromNonCritical().SplitBy("|");
-
-
 
             foreach (var thisO in Names) {
                 var s = tags2.TagGet(thisO);
@@ -449,7 +406,6 @@ namespace BlueControls.Controls {
                 ThisP.Y *= zoomy;
                 tags2.TagSet(ThisP.Name, ThisP.ToString());
             }
-
 
             return new Tuple<Bitmap, List<string>>(pic2, tags2);
 

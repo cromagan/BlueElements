@@ -26,7 +26,6 @@ public struct strGetEndFeedback {
         //ComandText = string.Empty;
     }
 
-
     public strGetEndFeedback(int continuePosition, string attributetext) {
         ContinuePosition = continuePosition;
         ErrorMessage = string.Empty;
@@ -42,6 +41,5 @@ public struct strGetEndFeedback {
     public int ContinuePosition;
     public string ErrorMessage;
     public string AttributeText;
-
 
 }

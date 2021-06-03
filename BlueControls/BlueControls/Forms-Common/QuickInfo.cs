@@ -24,12 +24,10 @@ using System.Drawing;
 namespace BlueControls.Forms {
     public partial class QuickInfo : FloatingForm {
 
-
         public static string _shownTXT = string.Empty;
         public static string _AutoClosedTXT = string.Empty;
 
         private bool _Shown = false;
-
 
         private int Counter = 0;
 
@@ -40,22 +38,18 @@ namespace BlueControls.Forms {
         private QuickInfo(string Text) : this() {
             //InitializeComponent();
 
-
             capTXT.Text = Text;
-
 
             var He = Math.Min(capTXT.TextRequiredSize().Height, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height * 0.7));
             var Wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
 
-
-            Size = new Size(Wi + capTXT.Left * 2, He + capTXT.Top * 2);
+            Size = new Size(Wi + (capTXT.Left * 2), He + (capTXT.Top * 2));
 
             Visible = false;
 
             timQI.Enabled = true;
 
         }
-
 
         public static void Show(string Text) {
 
@@ -64,20 +58,15 @@ namespace BlueControls.Forms {
 
             if (Text == _AutoClosedTXT) { return; }
 
-
-
-
             _shownTXT = Text;
             if (string.IsNullOrEmpty(Text)) { return; }
 
             new QuickInfo(Text);
         }
 
-
         public static new void Close() {
             Close(false);
         }
-
 
         private static void Close(bool AutoClose) {
 
@@ -87,8 +76,6 @@ namespace BlueControls.Forms {
                 _shownTXT = string.Empty;
                 _AutoClosedTXT = string.Empty;
             }
-
-
 
             foreach (var ThisForm in AllBoxes) {
                 if (!ThisForm.IsDisposed && ThisForm is QuickInfo QI) {
@@ -104,8 +91,6 @@ namespace BlueControls.Forms {
             }
         }
 
-
-
         private void timQI_Tick(object sender, System.EventArgs e) {
             Position_LocateToMouse();
 
@@ -114,7 +99,6 @@ namespace BlueControls.Forms {
                 Show();
                 timQI.Interval = 15;
             }
-
 
             Counter++;
 

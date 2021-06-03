@@ -24,8 +24,7 @@ using BlueDatabase.Enums;
 using System.Collections.Generic;
 
 namespace BlueDatabase {
-    public sealed class ColumnViewCollection : ListExt<ColumnViewItem>, IParseable
-    {
+    public sealed class ColumnViewCollection : ListExt<ColumnViewItem>, IParseable {
         //NICHT IReadableText, das gibt zu viele Probleme (Dropdownboxen)
 
         #region  Variablen-Deklarationen 
@@ -61,7 +60,6 @@ namespace BlueDatabase {
             _Name = newname;
         }
 
-
         #endregion
 
         #region  Properties 
@@ -76,9 +74,7 @@ namespace BlueDatabase {
             }
         }
 
-
         public ListExt<string> PermissionGroups_Show { get; } = new ListExt<string>();
-
 
         public ColumnViewItem this[ColumnItem vColumn] {
 
@@ -95,8 +91,6 @@ namespace BlueDatabase {
 
         #endregion
 
-
-
         private void _PermissionGroups_Show_ListOrItemChanged(object sender, System.EventArgs e) {
             OnChanged();
         }
@@ -107,7 +101,6 @@ namespace BlueDatabase {
                 Add(new ColumnViewItem(Column, enViewType.Column));
             }
         }
-
 
         public void Insert(int index, ColumnItem Column) {
             Insert(index, new ColumnViewItem(Column, enViewType.Column));
@@ -135,7 +128,6 @@ namespace BlueDatabase {
                         break;
                 }
             }
-
 
             PermissionGroups_Show.ThrowEvents = true;
             ThrowEvents = true;
@@ -238,7 +230,6 @@ namespace BlueDatabase {
                 if (ViewItemNo < 0) { return null; }
 
                 if (this[ViewItemNo] != null && this[ViewItemNo].Column != null) { return this[ViewItemNo]; }
-
             } while (true);
         }
 
@@ -246,7 +237,6 @@ namespace BlueDatabase {
             var ViewItemNo = IndexOf(viewItem);
 
             if (ViewItemNo < 0) { return null; }
-
 
             do {
                 ViewItemNo++;
@@ -257,7 +247,6 @@ namespace BlueDatabase {
 
         }
 
-
         public void Swap(ColumnViewItem viewItem1, ColumnViewItem viewItem2) {
             if (viewItem1 == null) { return; }
             if (viewItem2 == null) { return; }
@@ -267,11 +256,9 @@ namespace BlueDatabase {
             var Col2 = IndexOf(viewItem2);
             if (Col1 < 0 || Col2 < 0) { return; }
 
-
             Swap(Col1, Col2);
 
             if (this[Col1].ViewType != enViewType.PermanentColumn) { this[Col2].ViewType = enViewType.Column; }
-
         }
 
         public List<ColumnItem> ListOfUsedColumn() {
@@ -290,7 +277,6 @@ namespace BlueDatabase {
             base.OnChanged();
             //Changed?.Invoke(this, System.EventArgs.Empty);
         }
-
 
         public void HideSystemColumns() {
             foreach (var ThisViewItem in this) {
@@ -315,7 +301,6 @@ namespace BlueDatabase {
                 }
             }
         }
-
 
         internal void Repair() {
 
@@ -346,6 +331,5 @@ namespace BlueDatabase {
             Database = null;
             base.Dispose(disposing);
         }
-
     }
 }

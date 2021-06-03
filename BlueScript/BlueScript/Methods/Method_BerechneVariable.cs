@@ -25,14 +25,11 @@ using static BlueBasics.Extensions;
 namespace BlueScript {
     internal class Method_BerechneVariable : Method {
 
-
         public override string Syntax => "VariablenName = Berechung;";
-
 
         public override string Description => "Berechnet eine Variable. Der Typ der Variable und des Ergebnisses müssen übereinstimmen.";
         public override List<string> Comand(Script s) {
-            if (s == null) { return new(); }
-            return s.Variablen.AllNames();
+            return s == null ? (new()) : s.Variablen.AllNames();
         }
         public override string StartSequence => "=";
         public override string EndSequence => ";";
@@ -40,10 +37,6 @@ namespace BlueScript {
         public override enVariableDataType Returns => enVariableDataType.Null;
         public override List<enVariableDataType> Args => new() { enVariableDataType.Bool_Numeral_String_or_List };
         public override bool EndlessArgs => false;
-
-
-
-
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var variableName = infos.ComandText.ToLower().ReduceToChars(Constants.AllowedCharsVariableName);

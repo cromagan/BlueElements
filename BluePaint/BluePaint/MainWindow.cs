@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Forms;
@@ -42,7 +41,6 @@ namespace BluePaint {
         private static List<GenericTool> _merker = null;
         private bool _aufnahme = false;
 
-
         private MainWindow() : this(true) {
 
         }
@@ -55,7 +53,6 @@ namespace BluePaint {
             tabRibbonbar.SelectedIndex = 1;
 
         }
-
 
         public MainWindow(string filename, bool LoadSaveEnabled) : this(LoadSaveEnabled) {
             LoadFromDisk(filename);
@@ -93,7 +90,6 @@ namespace BluePaint {
             CurrentTool_OverridePic(this, new BitmapEventArgs(bmp));
             _filename = string.Empty;
         }
-
 
         private bool AreSame(object a, object b) {
 
@@ -138,7 +134,6 @@ namespace BluePaint {
                 CurrentTool = null;
             }
 
-
             P.Invalidate();
 
             if (NewTool != null) {
@@ -155,7 +150,6 @@ namespace BluePaint {
                 Split.Panel1.Controls.Add(NewTool);
                 NewTool.Dock = System.Windows.Forms.DockStyle.Fill;
 
-
                 //CurrentTool.SetPics(P.BMP, P.OverlayBMP);
                 CurrentTool.ZoomFit += CurrentTool_ZoomFit;
                 CurrentTool.HideMainWindow += CurrentTool_HideMainWindow;
@@ -171,14 +165,10 @@ namespace BluePaint {
                     NewTool.ToolFirstShown();
                 }
 
-
                 if (_aufnahme && _merker.Contains(NewTool)) {
                     _merker.Add(NewTool);
                 }
-
             }
-
-
         }
 
         private void CurrentTool_CommandForMacro(object sender, CommandForMacroArgs e) {
@@ -224,7 +214,6 @@ namespace BluePaint {
 
             P.Invalidate();
 
-
             //if (CurrentTool != null) { CurrentTool.SetPics(P.BMP, P.OverlayBMP); }
         }
 
@@ -237,7 +226,6 @@ namespace BluePaint {
                 _PicUndo = null;
                 GC.Collect();
             }
-
 
             if (P.BMP == null) {
                 btnRückgänig.Enabled = false;
@@ -280,7 +268,6 @@ namespace BluePaint {
 
             P.BMP = _bmp;
 
-
             if (P.BMP.Width != _PicUndo.Width || P.BMP.Height != _PicUndo.Height) {
                 P.ZoomFit();
             } else {
@@ -291,13 +278,10 @@ namespace BluePaint {
                 _macro.RemoveAt(_macro.Count - 1);
             }
 
-
             if (CurrentTool != null) {
                 CurrentTool.PictureChangedByMainWindow();
             }
         }
-
-
 
         private void P_ImageMouseDown(object sender, BlueControls.EventArgs.MouseEventArgs1_1 e) {
             CurrentTool?.MouseDown(e, P.BMP);
@@ -305,9 +289,7 @@ namespace BluePaint {
 
         private void P_ImageMouseMove(object sender, BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e) {
 
-
             CurrentTool?.MouseMove(e, P.BMP);
-
 
             if (e.Current.IsInPic) {
                 var c = P.BMP.GetPixel(e.Current.TrimmedX, e.Current.TrimmedY);
@@ -319,7 +301,6 @@ namespace BluePaint {
                 InfoText.Text = "";
 
             }
-
         }
 
         private void P_ImageMouseUp(object sender, BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e) {
@@ -392,9 +373,7 @@ namespace BluePaint {
 
             if (string.IsNullOrEmpty(_filename)) { return true; }
 
-
             switch (MessageBox.Show("Es sind ungespeicherte Änderungen vorhanden.<br>Was möchten sie tun?", BlueBasics.Enums.enImageCode.Diskette, "Speichern", "Verwerfen", "Abbrechen")) {
-
 
                 case 0:
                     Speichern();
@@ -422,7 +401,6 @@ namespace BluePaint {
                 btnSaveAs_Click(null, System.EventArgs.Empty);
                 return;
             }
-
 
             try {
 
@@ -452,7 +430,6 @@ namespace BluePaint {
             } catch {
                 _isSaved = false;
             }
-
         }
 
         private void LoadTab_FileOk(object sender, System.ComponentModel.CancelEventArgs e) {
@@ -478,13 +455,11 @@ namespace BluePaint {
 
             SetTool(null, false);
 
-
             _macro = new List<string>();
             _merker = new List<GenericTool>();
             _aufnahme = true;
             _PicUndo = null;
             btnRückgänig.Enabled = false;
-
 
             btnAufnahme.Enabled = false;
             btnStop.Enabled = true;
@@ -507,10 +482,7 @@ namespace BluePaint {
 
                 SetTool(new Tool_Abspielen(_macro, _merker), false);
             }
-
-
         }
-
 
         private void btnGrößeÄndern_Click(object sender, System.EventArgs e) {
             SetTool(new Tool_Resize(), !_aufnahme);

@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -31,8 +30,6 @@ using System.Drawing;
 namespace BlueControls.ItemCollection {
     public class RowFormulaPadItem : FormPadItemRectangle {
 
-
-
         #region  Variablen-Deklarationen 
         private Database _Database;
         private int _RowKey;
@@ -41,7 +38,6 @@ namespace BlueControls.ItemCollection {
         private string _tmpQuickInfo;
         private string _lastQuickInfo;
         #endregion
-
 
         #region  Event-Deklarationen + Delegaten 
 
@@ -59,7 +55,6 @@ namespace BlueControls.ItemCollection {
 
                 _tmpQuickInfo = _lastQuickInfo.Replace(r.CellFirstString(), "<b>[<imagecode=Stern|16>" + Row.CellFirstString() + "]</b>");
 
-
                 return _tmpQuickInfo;
             }
 
@@ -69,9 +64,6 @@ namespace BlueControls.ItemCollection {
                 _tmpQuickInfo = string.Empty;
             }
         }
-
-
-
 
         #region  Construktor 
 
@@ -96,8 +88,6 @@ namespace BlueControls.ItemCollection {
             GeneratePic(true);
         }
 
-
-
         #endregion
 
         // Namen so lassen, wegen Kontextmenu
@@ -113,8 +103,7 @@ namespace BlueControls.ItemCollection {
 
         public RowItem Row {
             get {
-                if (_Database is null) { return null; }
-                return _Database.Row.SearchByKey(_RowKey);
+                return _Database?.Row.SearchByKey(_RowKey);
             }
             //set {
             //    if (_Row == value) { return; }
@@ -133,18 +122,13 @@ namespace BlueControls.ItemCollection {
             RemovePic();
         }
 
-
         protected override string ClassId() {
             return "ROW";
         }
 
-
-
-
         protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
 
             if (GeneratedBitmap == null) { GeneratePic(false); }
-
 
             if (GeneratedBitmap != null) {
                 var scale = (float)Math.Min(DCoordinates.Width / (double)GeneratedBitmap.Width, DCoordinates.Height / (double)GeneratedBitmap.Height);
@@ -164,7 +148,6 @@ namespace BlueControls.ItemCollection {
             base.DrawExplicit(GR, DCoordinates, cZoom, shiftX, shiftY, vState, SizeOfParentControl, ForPrinting);
 
         }
-
 
         public override bool ParseThis(string tag, string value) {
             if (base.ParseThis(tag, value)) { return true; }
@@ -229,8 +212,6 @@ namespace BlueControls.ItemCollection {
             return t.Trim(", ") + "}";
         }
 
-
-
         private void GeneratePic(bool SizeChangeAllowed) {
 
             if (string.IsNullOrEmpty(_LayoutID) || !_LayoutID.StartsWith("#")) {
@@ -240,13 +221,9 @@ namespace BlueControls.ItemCollection {
                 return;
             }
 
-
             var _pad = new CreativePad(new ItemCollectionPad(_LayoutID, _Database, _RowKey));
 
-
-
             var re = _pad.Item.MaxBounds(null);
-
 
             if (GeneratedBitmap != null) {
                 if (GeneratedBitmap.Width != re.Width || GeneratedBitmap.Height != re.Height) {
@@ -265,24 +242,16 @@ namespace BlueControls.ItemCollection {
             _pad.ShowInPrintMode = true;
             _pad.Unselect();
 
-
             if (Parent.SheetStyle != null) { _pad.Item.SheetStyle = Parent.SheetStyle; }
 
-
             _pad.DrawCreativePadToBitmap(GeneratedBitmap, enStates.Standard, zoomv, (decimal)slidervalues.X, (decimal)slidervalues.Y, null);
-
 
             if (SizeChangeAllowed) { p_RU.SetTo(p_LO.X + GeneratedBitmap.Width, p_LO.Y + GeneratedBitmap.Height); }
 
             PointMoved(null);
         }
 
-
-
-
         //Public Overrides Function ContextMenuItemClicked(sender As Object, ClickedComand As ItemCollection.BasicListItem) As Boolean
-
-
 
         //    If ClickedComand.StartsWith("Layout;") Then
         //        _LayoutNr = Integer.Parse(ClickedComand.Substring(7))
@@ -299,7 +268,6 @@ namespace BlueControls.ItemCollection {
         //        Return True
 
         //    End If
-
 
         //   switch (ClickedComand
         //        Case Is = "Bearbeiten"
@@ -324,13 +292,11 @@ namespace BlueControls.ItemCollection {
                 new FlexiControl()
             };
 
-
             var Layouts = new ItemCollectionList();
             foreach (var thisLayouts in Row.Database.Layouts) {
                 var p = new ItemCollectionPad(thisLayouts, string.Empty);
                 Layouts.Add(p.Caption, p.ID, enImageCode.Stern);
             }
-
 
             l.Add(new FlexiControlForProperty(this, "Layout-ID", Layouts));
 
@@ -338,16 +304,10 @@ namespace BlueControls.ItemCollection {
             return l;
         }
 
-
-
-
-
         public void Datensatz_bearbeiten() {
             _tmpQuickInfo = string.Empty; // eigentlich unnötig, da RowChanged anschlagen müsste
             EditBoxRow.Show("Datensatz bearbeiten:", Row, true);
         }
-
-
 
         private void _Database_Disposing(object sender, System.EventArgs e) {
             _Database.Disposing -= _Database_Disposing;
@@ -366,7 +326,6 @@ namespace BlueControls.ItemCollection {
         //        return;
         //    }
 
-
         //    var newl = Tags.TagGet("LayoutId");
 
         //    if (newl != _LayoutID)
@@ -379,9 +338,6 @@ namespace BlueControls.ItemCollection {
         //        }
         //        KeepInternalLogic();
         //    }
-
-
-
 
         //}
     }

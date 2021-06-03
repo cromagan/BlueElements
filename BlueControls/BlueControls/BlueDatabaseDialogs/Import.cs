@@ -20,8 +20,6 @@
 using BlueBasics.Enums;
 using BlueControls.Forms;
 using BlueDatabase;
-using System;
-using System.Collections.Generic;
 using static BlueBasics.Extensions;
 
 namespace BlueControls.BlueDatabaseDialogs {
@@ -29,7 +27,6 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         public Database Database { get; private set; }
         private readonly string _originalImportText = string.Empty;
-
 
         public Import(Database database, string importtext) : base() {
 
@@ -80,8 +77,5 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void Cancel_Click(object sender, System.EventArgs e) {
             Close();
         }
-
-
-
     }
 }

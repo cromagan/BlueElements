@@ -19,20 +19,15 @@ namespace BlueControls.Designer_Support {
             AutoShow = true;
         }
 
-
         public bool Checked {
             get => ReverenceControl.Checked;
             set => SetControlProperty("Checked", value);
         }
 
-
-
-
         public enButtonStyle ButtonStyle {
             get => ReverenceControl.ButtonStyle;
             set => SetControlProperty("ButtonStyle", value);
         }
-
 
         // Set a control property. This method makes Undo/Redo
         // work properly and marks the form as modified in the IDE.
@@ -40,14 +35,10 @@ namespace BlueControls.Designer_Support {
             TypeDescriptor.GetProperties(ReverenceControl)[property_name].SetValue(ReverenceControl, Value);
         }
 
-
-
-
         public override DesignerActionItemCollection GetSortedActionItems() {
             var items = new DesignerActionItemCollection
             {
                 new DesignerActionHeaderItem("Allgemein"),
-
 
                 new DesignerActionPropertyItem("ButtonStyle", "ButtonStyle", "Allgemein", "Das Verhalten des Buttons.")
             };
@@ -56,11 +47,8 @@ namespace BlueControls.Designer_Support {
                 items.Add(new DesignerActionPropertyItem("Checked", "Checked", "Allgemein", "Der Checked-Status."));
             }
 
-
-
             return items;
         }
     }
 }
-
 

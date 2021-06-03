@@ -34,7 +34,6 @@ namespace BlueControls {
             Top = -Radius * 3;
         }
 
-
         public Overlay(GenericControl OverControl) {
 
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -49,7 +48,6 @@ namespace BlueControls {
             Control = OverControl;
             SetControl();
         }
-
 
         public void SetControl() {
             Width = Control.Width;
@@ -79,11 +77,7 @@ namespace BlueControls {
                     Dispose();
                     break;
             }
-
-
-
         }
-
 
         public void Paint_Radius() {
             var g = CreateGraphics();
@@ -92,7 +86,6 @@ namespace BlueControls {
             g.DrawEllipse(Pens.Red, 1, 1, Width - 3, Height - 3);
             g.Dispose();
         }
-
 
         private void Paint_RoterRahmenUmControlUndBlinken() {
             SetControl();
@@ -114,12 +107,7 @@ namespace BlueControls {
 
         private void Blinker_Tick(object sender, System.EventArgs e) {
 
-            if (Opacity > 0.5) {
-                Opacity = 0.01;
-            } else {
-                Opacity = 1;
-            }
-
+            Opacity = Opacity > 0.5 ? 0.01 : 1;
 
             Count++;
 
@@ -137,8 +125,5 @@ namespace BlueControls {
                 return oParam;
             }
         }
-
-
-
     }
 }

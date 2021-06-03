@@ -23,9 +23,7 @@ using System.Collections.Generic;
 namespace BlueScript {
     internal class Method_Add : Method {
 
-
         public override string Syntax => "Add(List-Variable, Value1, Value2, ...);";
-
 
         public override string Description => "Fügt einer Liste einen oder mehrere Werte hinzu.";
         public override List<string> Comand(Script s) { return new() { "add" }; }
@@ -41,7 +39,6 @@ namespace BlueScript {
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
             var tmpList = attvar.Attributes[0].ValueListString;
-
 
             for (var z = 1; z < attvar.Attributes.Count; z++) {
                 if (attvar.Attributes[z].Type == Skript.Enums.enVariableDataType.String) {

@@ -27,7 +27,6 @@ namespace BlueControls.EventArgs {
             Current = current;
         }
 
-
         public MouseEventArgs1_1 MouseDown { get; }
         public MouseEventArgs1_1 Current { get; }
 

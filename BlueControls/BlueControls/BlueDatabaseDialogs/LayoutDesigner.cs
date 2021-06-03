@@ -36,7 +36,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private string _LoadedLayout = string.Empty;
         private string _AdditionalLayoutPath = "";
 
-
         public LayoutDesigner(Database database, string additionalLayoutPath) : base() {
 
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -47,7 +46,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             scriptEditor.Database = database;
             Database.Disposing += Database_Disposing;
             _AdditionalLayoutPath = additionalLayoutPath;
-
 
             befülleLayoutDropdown();
 
@@ -86,7 +84,6 @@ namespace BlueControls.BlueDatabaseDialogs {
                 _LoadedLayout = string.Empty;
             }
 
-
             if (cbxLayout.Text.FileSuffix().ToUpper() != "BCR" && FileExists(cbxLayout.Text)) {
                 _LoadedLayout = string.Empty;
                 btnTextEditor.Enabled = true;
@@ -103,7 +100,6 @@ namespace BlueControls.BlueDatabaseDialogs {
 
                 grpDateiSystem.Enabled = true;
 
-
                 btnLayoutLöschen.Enabled = true;
                 btnLayoutUmbenennen.Enabled = true;
                 Area_Drucken.Enabled = true;
@@ -112,7 +108,6 @@ namespace BlueControls.BlueDatabaseDialogs {
                 tabPageControl.Enabled = false;
 
                 grpDateiSystem.Enabled = false;
-
 
                 btnLayoutLöschen.Enabled = false;
                 btnLayoutUmbenennen.Enabled = false;
@@ -131,7 +126,6 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             befülleLayoutDropdown();
 
-
             _LoadedLayout = string.Empty;
 
             LoadLayout(c.Item.ID);
@@ -142,9 +136,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void btnLayoutLöschen_Click(object sender, System.EventArgs e) {
             SaveCurrentLayout();
 
-
             if (string.IsNullOrEmpty(_LoadedLayout)) { return; }
-
 
             if (MessageBox.Show("Layout <b>'" + Pad.Item.Caption + "'</b><br>wirklich löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
 
@@ -153,7 +145,6 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             Database.Layouts.RemoveAt(ind);
             _LoadedLayout = string.Empty;
-
 
             befülleLayoutDropdown();
 
@@ -181,17 +172,12 @@ namespace BlueControls.BlueDatabaseDialogs {
             LoadLayout(e.Item.Internal);
         }
 
-
-
         internal void LoadLayout(string fileOrLayoutID) {
             SaveCurrentLayout();
 
-
             cbxLayout.Text = fileOrLayoutID;
 
-
             var ind = Database.Layouts.LayoutIDToIndex(fileOrLayoutID);
-
 
             if (ind < 0) {
 
@@ -219,19 +205,15 @@ namespace BlueControls.BlueDatabaseDialogs {
                 Pad.Item = new ItemCollectionPad(Database.Layouts[ind], string.Empty);
                 ItemChanged();
             }
-
-
         }
-
 
         public override void ItemChanged() {
             base.ItemChanged();
             CheckButtons();
         }
 
-
         private void SaveCurrentLayout() {
-            scriptEditor.WriteScriptBack(); 
+            scriptEditor.WriteScriptBack();
             if (Database == null) { return; }
             if (string.IsNullOrEmpty(_LoadedLayout)) { return; }
 
@@ -244,7 +226,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             } else if (_LoadedLayout.FileSuffix().ToUpper() == "BCR") {
                 SaveToDisk(_LoadedLayout, newl, false, System.Text.Encoding.UTF8);
             }
-
 
             Pad.ZoomFit();
         }
@@ -278,7 +259,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             var Flexis = Pad.LastClickedItem.GetStyleOptions();
             if (Flexis.Count == 0) { return; }
 
-
             var top = Skin.Padding;
             foreach (var ThisFlexi in Flexis) {
                 tabElementEigenschaften.Controls.Add(ThisFlexi);
@@ -288,11 +268,9 @@ namespace BlueControls.BlueDatabaseDialogs {
                 ThisFlexi.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
                 top = top + Skin.Padding + ThisFlexi.Height;
 
-                ThisFlexi.Width = tabElementEigenschaften.Width - Skin.Padding * 4;
+                ThisFlexi.Width = tabElementEigenschaften.Width - (Skin.Padding * 4);
                 //ThisFlexi.ButtonClicked += FlexiButtonClick;
             }
-
         }
-
     }
 }

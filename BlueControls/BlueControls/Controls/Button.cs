@@ -36,9 +36,6 @@ namespace BlueControls.Controls {
         public Button() : base(true, false) { }
         #endregion
 
-
-
-
         #region  Variablen 
         private string _Text = "";
         private enButtonStyle _ButtonStyle = enButtonStyle.Button;
@@ -60,20 +57,9 @@ namespace BlueControls.Controls {
         private const int _FirstIntervall = 500;
         private bool _IsFireing;
 
-
-
-
-
-
         #endregion
 
         #region  Properties 
-
-
-
-
-
-
 
         [Category("Darstellung")]
         [Editor(typeof(QuickPicSelector), typeof(UITypeEditor))]
@@ -119,14 +105,12 @@ namespace BlueControls.Controls {
                 if (_ButtonStyle == value) { return; }
                 _ButtonStyle = value;
 
-
                 if (_ClickFirerer != null) {
                     _ClickFirerer.Enabled = false;
                     _ClickFirerer.Tick -= _ClickFirerer_Tick;
                     _ClickFirerer.Dispose();
                     _ClickFirerer = null;
                 }
-
 
                 if (value == enButtonStyle.SliderButton) {
                     if (_ClickFirerer != null) { return; }
@@ -135,7 +119,6 @@ namespace BlueControls.Controls {
                     };
                     _ClickFirerer.Tick += _ClickFirerer_Tick;
                 }
-
 
                 if (DesignMode) { DisableOtherOptionButtons(); }
 
@@ -152,8 +135,7 @@ namespace BlueControls.Controls {
         [DefaultValue(false)]
         public bool Checked {
             get {
-                if (_ButtonStyle == enButtonStyle.Button || _ButtonStyle == enButtonStyle.SliderButton) { return false; }
-                return _Checked;
+                return _ButtonStyle != enButtonStyle.Button && _ButtonStyle != enButtonStyle.SliderButton && _Checked;
             }
             set {
 
@@ -168,21 +150,15 @@ namespace BlueControls.Controls {
             }
         }
 
-
-
-
         #endregion
 
         #region  Event-Deklarationen 
-
-
 
         public event EventHandler CheckedChanged;
 
         #endregion
 
         #region  Form-Ereignisse 
-
 
         private void OnCheckedChanged() {
             CheckedChanged?.Invoke(this, System.EventArgs.Empty);
@@ -244,12 +220,9 @@ namespace BlueControls.Controls {
 
             Invalidate();
 
-
         }
 
-
         #endregion
-
 
         private void DisableOtherOptionButtons() {
             if (_ButtonStyle != enButtonStyle.Optionbox && _ButtonStyle != enButtonStyle.Optionbox_Text && _ButtonStyle != enButtonStyle.Optionbox_RibbonBar) { return; }
@@ -258,15 +231,11 @@ namespace BlueControls.Controls {
             if (Parent == null) { return; }
             if (string.IsNullOrEmpty(Name)) { return; }
 
-
             foreach (var CLT in Parent.Controls) {
                 if (CLT is Button tempVar) {
                     if (tempVar.ButtonStyle == _ButtonStyle && tempVar != this && tempVar.Checked) { tempVar.Checked = false; }
-
                 }
             }
-
-
         }
         private void _ClickFirerer_Tick(object sender, System.EventArgs e) {
 
@@ -275,8 +244,6 @@ namespace BlueControls.Controls {
             if (!ContainsMouse()) { ok = false; }
 
             // Focus egal, DauerFeuerbutton - Slider - Design kann keinen Focus erhalten!
-
-
 
             if (ok) {
                 _ClickFired = false;
@@ -287,7 +254,6 @@ namespace BlueControls.Controls {
             } else {
                 _ClickFirerer.Enabled = false;
             }
-
         }
 
         protected override void OnClick(System.EventArgs e) {
@@ -299,7 +265,6 @@ namespace BlueControls.Controls {
 
             _ClickFired = true;
             _IsFireing = true;
-
 
             switch ((enButtonStyle)((int)_ButtonStyle % 1000)) {
                 case enButtonStyle.Button:
@@ -334,15 +299,12 @@ namespace BlueControls.Controls {
             _IsFireing = false;
         }
 
-
         internal static void DrawButton(System.Windows.Forms.Control con, Graphics GR, enDesign vButtonTypex, enStates vStatex, QuickImage p, enAlignment Align, bool PicHeight44, ExtText etxt, string vtext, Rectangle DisplayRectangle, bool Translate) {
-
 
             var d = Skin.DesignOf(vButtonTypex, vStatex);
 
             Skin.Draw_Back(GR, d, DisplayRectangle, con, true);
             Skin.Draw_Border(GR, d, DisplayRectangle);
-
 
             if (PicHeight44 && con.Height < 40) { PicHeight44 = false; }
             if (PicHeight44 && p == null) { PicHeight44 = false; }
@@ -350,8 +312,6 @@ namespace BlueControls.Controls {
             if (PicHeight44) {
 
                 if (p.Width != -1 || p.Height != -1) { Develop.DebugPrint("Bei Bildcode " + p + " die Größenangabe entfernen, da es ein grosses Bild wird!"); }
-
-
 
                 var Zoom = Math.Min((con.Width - 6) / (double)p.BMP.Width, 28 / (double)p.BMP.Height);
                 var p2 = QuickImage.Get(QuickImage.GenerateCode(p.Name, (int)(p.BMP.Width * Zoom), (int)(p.BMP.Height * Zoom), p.Effekt, p.Färbung, p.ChangeGreenTo, p.Sättigung, p.Helligkeit, p.DrehWinkel, p.Transparenz, p.Zweitsymbol));
@@ -363,7 +323,7 @@ namespace BlueControls.Controls {
                 etxt.DrawingPos = new Point(0, 43);
                 //etxt.DrawingArea = DisplayRectangle;
                 //etxt.DrawingArea = DisplayRectangle;
-                etxt.TextDimensions = new Size(DisplayRectangle.Width - Skin.PaddingSmal / 2, 22);
+                etxt.TextDimensions = new Size(DisplayRectangle.Width - (Skin.PaddingSmal / 2), 22);
                 etxt.Ausrichtung = enAlignment.Horizontal_Vertical_Center;
                 etxt.HtmlText = BlueDatabase.LanguageTool.DoTranslate(vtext, Translate);
                 etxt.Draw(GR, 1);
@@ -371,7 +331,6 @@ namespace BlueControls.Controls {
             } else if (vButtonTypex != enDesign.OptionButton_TextStyle && vButtonTypex != enDesign.CheckBox_TextStyle) {
                 Skin.Draw_FormatedText(GR, vtext, p, d, Align, DisplayRectangle, con, false, Translate);
             } else {
-
 
                 var tt = "<ImageCode=" + d.Image + "> <zbx_store><top>" + BlueDatabase.LanguageTool.DoTranslate(vtext, Translate); //Skin.ZusatzTextAdder(vText, vButtonType, vState)
 
@@ -384,38 +343,23 @@ namespace BlueControls.Controls {
             }
         }
 
-
-
         private void GetPic() {
 
             switch ((enButtonStyle)((int)_ButtonStyle % 1000)) {
 
                 case enButtonStyle.Yes_or_No:
-                    if (_Checked || MousePressing()) {
-                        _Pic = QuickImage.Get(enImageCode.Häkchen);
-                    } else {
-                        _Pic = QuickImage.Get(enImageCode.Kreuz);
-                    }
+                    _Pic = _Checked || MousePressing() ? QuickImage.Get(enImageCode.Häkchen) : QuickImage.Get(enImageCode.Kreuz);
                     break;
 
                 case enButtonStyle.Pic1_or_Pic2:
-                    if (_Checked || MousePressing()) {
-                        _Pic = QuickImage.Get(_ImageCode_Checked);
-                    } else {
-                        _Pic = QuickImage.Get(_ImageCode);
-                    }
+                    _Pic = _Checked || MousePressing() ? QuickImage.Get(_ImageCode_Checked) : QuickImage.Get(_ImageCode);
                     break;
 
                 default:
-                    if (string.IsNullOrEmpty(ImageCode)) {
-                        _Pic = null;
-                    } else {
-                        _Pic = QuickImage.Get(_ImageCode);
-                    }
+                    _Pic = string.IsNullOrEmpty(ImageCode) ? null : QuickImage.Get(_ImageCode);
                     break;
             }
         }
-
 
         protected override void DrawControl(Graphics gr, enStates state) {
 
@@ -429,13 +373,11 @@ namespace BlueControls.Controls {
                     if (_Checked || MousePressing()) { state |= enStates.Checked; }
                 }
 
-
                 // Groß machen?
                 if (Par == enPartentType.RibbonPage || Par == enPartentType.RibbonGroupBox) {
                     DesignToolbar = true;
                     PicHeight44 = true;
                 }
-
 
                 if ((int)_ButtonStyle > 1000 && (int)_ButtonStyle < 2000) { PicHeight44 = true; }
                 if ((int)_ButtonStyle > 2000) {
@@ -443,7 +385,6 @@ namespace BlueControls.Controls {
                     DesignToolbar = false;
                     PicHeight44 = false;
                 }
-
 
                 switch ((enButtonStyle)((int)_ButtonStyle % 1000)) {
                     case enButtonStyle.Button:
@@ -508,21 +449,15 @@ namespace BlueControls.Controls {
                         Develop.DebugPrint("Button-Design nicht definiert!");
                         break;
                 }
-
             } catch {
             }
-
-
         }
-
-
 
         protected override void OnLocationChanged(System.EventArgs e) {
 
             base.OnLocationChanged(e);
             if (DesignMode) { DisableOtherOptionButtons(); }
         }
-
 
         protected override void OnSizeChanged(System.EventArgs e) {
             base.OnSizeChanged(e);

@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.BlueDatabaseDialogs;
@@ -31,21 +30,17 @@ using System.Drawing;
 using System.Drawing.Design;
 using System.Drawing.Imaging;
 
-
 //Inherits UserControl ' -> Gibt Focus an Child!
 //Inherits ContainerControl -> ?
 //Inherits Panel '-> Alles ist ein Container!
 //Inherits ScrollableControl - > keine Tastatur/Mouseabfragen
 
-
 namespace BlueControls.Controls {
     public class GenericControl : System.Windows.Forms.Control, ISupportsBeginnEdit {
-
 
         #region Constructor
 
         protected GenericControl() : this(false, false) { }
-
 
         protected GenericControl(bool DoubleBuffer, bool UseBackgroundBitmap) : base() {
 
@@ -68,13 +63,11 @@ namespace BlueControls.Controls {
                 SetDoubleBuffering();
             }
 
-
             _UseBackBitmap = UseBackgroundBitmap;
             Translate = true;
 
         }
         #endregion
-
 
         #region  Standard-Variablen 
         private bool _MousePressing;
@@ -86,7 +79,6 @@ namespace BlueControls.Controls {
         private bool _GeneratingBitmapOfControl;
 
         #endregion
-
 
         protected override void Dispose(bool disposing) {
             base.Dispose(disposing);
@@ -101,9 +93,6 @@ namespace BlueControls.Controls {
 
         }
 
-
-
-
         protected virtual void DrawControl(Graphics gr, enStates state) {
 
             Develop.DebugPrint_RoutineMussUeberschriebenWerden();
@@ -112,11 +101,8 @@ namespace BlueControls.Controls {
         [DefaultValue(true)]
         public bool Translate { get; set; }
 
-
         #region  AutoScale deaktivieren 
         // https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
-
-
 
         public void PerformAutoScale() {
             // NIX TUN!!!!
@@ -125,8 +111,6 @@ namespace BlueControls.Controls {
         public void Scale() {
             // NIX TUN!!!!
         }
-
-
 
         protected override void ScaleControl(SizeF factor, System.Windows.Forms.BoundsSpecified specified) {
             factor = new SizeF(1, 1);
@@ -140,8 +124,6 @@ namespace BlueControls.Controls {
             get => false; //MyBase.AutoSize
             set => base.AutoSize = false;
         }
-
-
 
         protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified) {
             return bounds; //MyBase.GetScaledBounds(bounds, factor, specified)
@@ -158,13 +140,10 @@ namespace BlueControls.Controls {
             }
         }
 
-
         protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) {
             // MyBase.OnPaint(e) - comment out - do not call  http://stackoverflow.com/questions/592538/how-to-create-a-transparent-control-which-works-when-on-top-of-other-controls
             DoDraw(e.Graphics);
         }
-
-
 
         #region  QuickInfo 
         // Dieser Codeblock ist im Interface IQuickInfo herauskopiert und muss überall Identisch sein.
@@ -188,9 +167,7 @@ namespace BlueControls.Controls {
             // Dummy, dass die angeleeiteten Controls reagieren können.
         }
 
-
         public virtual string QuickInfoText => _QuickInfo;
-
 
         #endregion
 
@@ -215,7 +192,6 @@ namespace BlueControls.Controls {
             base.ResumeLayout();
             EndEdit();
         }
-
 
         public void BeginnEdit() {
             BeginnEdit(1);
@@ -260,7 +236,6 @@ namespace BlueControls.Controls {
             DoDraw(CreateGraphics());
         }
 
-
         protected override void OnEnabledChanged(System.EventArgs e) {
             if (InvokeRequired) {
                 Invoke(new Action(() => OnEnabledChanged(e)));
@@ -272,17 +247,12 @@ namespace BlueControls.Controls {
             Invalidate();
         }
 
-
         protected override void OnPaintBackground(System.Windows.Forms.PaintEventArgs pevent) {
             // do not allow the background to be painted
             // Um flimmern zu vermeiden!
         }
 
-
-
-
         private void DoDraw(Graphics gr) {
-
 
             if (IsDisposed) {
                 gr.Clear(Color.Red);
@@ -306,7 +276,6 @@ namespace BlueControls.Controls {
                     }
                 }
 
-
                 if (Width < 1 || Height < 1) { return; }
 
                 try {
@@ -322,13 +291,9 @@ namespace BlueControls.Controls {
                     } else {
                         DrawControl(gr, IsStatus());
                     }
-
                 } catch {
                     return;
                 }
-
-
-
 
                 // UmRandung für DesignMode ------------
                 if (DesignMode) {
@@ -343,9 +308,6 @@ namespace BlueControls.Controls {
 
             }
         }
-
-
-
 
         public Point MousePos() {
             if (InvokeRequired) {
@@ -364,7 +326,6 @@ namespace BlueControls.Controls {
             return ClientRectangle.Contains(PointToClient(System.Windows.Forms.Cursor.Position));
         }
 
-
         private enStates IsStatus() {
             if (!Enabled) { return enStates.Standard_Disabled; }
 
@@ -380,8 +341,6 @@ namespace BlueControls.Controls {
 
             return S;
         }
-
-
 
         #region  Focus-Verwaltung 
         protected override void OnGotFocus(System.EventArgs e) {
@@ -406,7 +365,6 @@ namespace BlueControls.Controls {
             }
         }
 
-
         #endregion
 
         #region  Key-Verwaltung 
@@ -420,7 +378,6 @@ namespace BlueControls.Controls {
             base.OnKeyPress(e);
         }
 
-
         protected override void OnKeyUp(System.Windows.Forms.KeyEventArgs e) {
             if (IsDisposed) { return; }
             base.OnKeyUp(e);
@@ -429,7 +386,6 @@ namespace BlueControls.Controls {
         #endregion
 
         #region  MousePos-Verwaltung 
-
 
         protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
 
@@ -445,20 +401,16 @@ namespace BlueControls.Controls {
                     if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && Focus()) { Focus(); }
                 }
 
-
-
                 base.OnMouseDown(e);
 
             }
         }
-
 
         protected override void OnMouseLeave(System.EventArgs e) {
             if (IsDisposed) { return; }
             base.OnMouseLeave(e);
             DoQuickInfo();
         }
-
 
         public void DoQuickInfo() {
             if (string.IsNullOrEmpty(_QuickInfo) && string.IsNullOrEmpty(QuickInfoText)) {
@@ -471,7 +423,6 @@ namespace BlueControls.Controls {
                 }
             }
         }
-
 
         protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
 
@@ -491,7 +442,6 @@ namespace BlueControls.Controls {
             base.OnMouseUp(e);
         }
 
-
         protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e) {
             if (IsDisposed) { return; }
             _MousePressing = false;
@@ -504,11 +454,9 @@ namespace BlueControls.Controls {
             if (!string.IsNullOrEmpty(_QuickInfo) || !string.IsNullOrEmpty(QuickInfoText)) { Forms.QuickInfo.Show(QuickInfoText); }
         }
 
-
         protected override void OnSizeChanged(System.EventArgs e) {
             if (IsDisposed) { return; }
             Invalidate();
-
 
             if (_BitmapOfControl != null) {
                 if (_BitmapOfControl.Width < Width || _BitmapOfControl.Height < Height) {
@@ -517,13 +465,9 @@ namespace BlueControls.Controls {
                 }
             }
 
-
-
             base.OnSizeChanged(e);
         }
         #endregion
-
-
 
         public Bitmap BitmapOfControl() {
             if (!_UseBackBitmap || _GeneratingBitmapOfControl) { return null; }
@@ -535,15 +479,8 @@ namespace BlueControls.Controls {
             return _BitmapOfControl;
         }
 
-
-
-
-
         internal static bool AllEnabled(System.Windows.Forms.Control control) {
             Develop.DebugPrint_Disposed(control.IsDisposed);
-
-
-
 
             do {
                 if (control == null) { return true; }
@@ -555,21 +492,20 @@ namespace BlueControls.Controls {
 
         }
 
-
         public static enPartentType Typ(System.Windows.Forms.Control control) {
 
             switch (control) {
                 case null:
                     return enPartentType.Nothing;
                 case GroupBox _: {
-                    if (control.Parent is TabPage TP) {
+                        if (control.Parent is TabPage TP) {
 
-                        if (TP.Parent == null) { return enPartentType.Unbekannt; }
+                            if (TP.Parent == null) { return enPartentType.Unbekannt; }
 
-                        if (TP.Parent is RibbonBar) { return enPartentType.RibbonGroupBox; }
+                            if (TP.Parent is RibbonBar) { return enPartentType.RibbonGroupBox; }
+                        }
+                        return enPartentType.GroupBox;
                     }
-                    return enPartentType.GroupBox;
-                }
                 case LastFilesCombo _:
                     return enPartentType.LastFilesCombo;
                 //Is = "BlueBasics.ComboBox"
@@ -649,7 +585,6 @@ namespace BlueControls.Controls {
         public static System.Windows.Forms.Form ParentForm(System.Windows.Forms.Control o) {
             Develop.DebugPrint_Disposed(o.IsDisposed);
 
-
             do {
                 switch (o) {
                     case null:
@@ -663,7 +598,5 @@ namespace BlueControls.Controls {
             } while (true);
 
         }
-
-
     }
 }

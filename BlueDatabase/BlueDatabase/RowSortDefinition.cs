@@ -33,11 +33,9 @@ namespace BlueDatabase {
 
         #endregion
 
-
         #region  Event-Deklarationen + Delegaten 
         public event EventHandler Changed;
         #endregion
-
 
         #region  Construktor + Initialize 
 
@@ -68,7 +66,6 @@ namespace BlueDatabase {
 
         #endregion
 
-
         #region  Properties 
         public bool IsParsing { get; private set; }
 
@@ -77,9 +74,6 @@ namespace BlueDatabase {
         public List<ColumnItem> Columns => _Columns;
 
         #endregion
-
-
-
 
         public override string ToString() {
 
@@ -101,7 +95,6 @@ namespace BlueDatabase {
 
             return Result + "}";
         }
-
 
         public void Parse(string ToParse) {
             IsParsing = true;
@@ -133,7 +126,6 @@ namespace BlueDatabase {
             IsParsing = false;
         }
 
-
         private void SetColumn(List<string> names) {
             _Columns.Clear();
             for (var z = 0; z < names.Count; z++) {
@@ -157,7 +149,5 @@ namespace BlueDatabase {
             if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
-
-
     }
 }

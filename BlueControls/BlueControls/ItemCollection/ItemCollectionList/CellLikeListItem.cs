@@ -34,7 +34,6 @@ namespace BlueControls.ItemCollection {
 
         #region  Variablen-Deklarationen 
 
-
         /// <summary>
         /// Nach welche Spalte sich der Stil richten muss.
         /// Wichtig, dass es ein Spalten-item ist, da bei neuen Datenbanken zwar die Spalte vorhnden ist, aber wenn keine Zeile Vorhanden ist, logischgerweise auch keine Zelle da ist.
@@ -49,16 +48,11 @@ namespace BlueControls.ItemCollection {
 
         #endregion
 
-
         #region  Event-Deklarationen + Delegaten 
 
         #endregion
 
-
         #region  Construktor + Initialize 
-
-
-
 
         public CellLikeListItem(string internalAndReadableText, ColumnItem columnStyle, enShortenStyle style, bool enabled, enBildTextVerhalten bildTextverhalten) : base(internalAndReadableText) {
             _StyleLikeThis = columnStyle;
@@ -68,25 +62,17 @@ namespace BlueControls.ItemCollection {
 
             _bildTextverhalten = bildTextverhalten;
 
-
         }
 
-
-
-
         #endregion
-
 
         #region  Properties 
 
         #endregion
 
-
-
         protected override Size ComputeSizeUntouchedForListBox() {
             return Table.FormatedText_NeededSize(_StyleLikeThis, Internal, Skin.GetBlueFont(Parent.ItemDesign, enStates.Standard), _style, 16, _bildTextverhalten);
         }
-
 
         protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, bool Translate) {
 
@@ -101,18 +87,15 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-
         protected override string GetCompareKey() {
             // Die hauptklasse frägt nach diesem Kompare-Key
             //    var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, enShortenStyle.HTML, true); // Muss Kompakt sein, um Suffixe zu vermeiden
             return DataFormat.CompareKey(Internal, _StyleLikeThis.Format) + "|" + Internal;
         }
 
-
         public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) {
             return SizeUntouchedForListBox().Height;
         }
-
 
         public override void CloneToNewCollection(ItemCollectionList newParent) {
             CloneToNewCollection(newParent, new CellLikeListItem(Internal, _StyleLikeThis, _style, _Enabled, _bildTextverhalten));
@@ -123,6 +106,5 @@ namespace BlueControls.ItemCollection {
             var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, enShortenStyle.Both, _StyleLikeThis.BildTextVerhalten, true);
             return txt.ToUpper().Contains(FilterText.ToUpper());
         }
-
     }
 }

@@ -78,17 +78,13 @@ namespace BlueControls.ItemCollection {
             MovablePoint.Add(p_U);
             MovablePoint.Add(p_O);
 
-
             PointsForSuccesfullyMove.Add(p_LO);
             PointsForSuccesfullyMove.Add(p_RU);
-
 
             Drehwinkel = 0;
         }
 
         #endregion
-
-
 
         public override List<FlexiControl> GetStyleOptions() {
             var l = new List<FlexiControl>
@@ -97,14 +93,11 @@ namespace BlueControls.ItemCollection {
                 new FlexiControlForProperty(this, "Drehwinkel")
             };
 
-
             l.Add(new FlexiControlForProperty(this, "Größe_fixiert"));
-
 
             l.AddRange(base.GetStyleOptions());
             return l;
         }
-
 
         public void SetCoordinates(RectangleM r, bool overrideFixedSize) {
 
@@ -112,7 +105,7 @@ namespace BlueControls.ItemCollection {
                 var vr = r.PointOf(enAlignment.Horizontal_Vertical_Center);
                 var ur = UsedArea();
 
-                p_LO.SetTo(vr.X - ur.Width / 2, vr.Y - ur.Height / 2);
+                p_LO.SetTo(vr.X - (ur.Width / 2), vr.Y - (ur.Height / 2));
                 p_RU.SetTo(p_LO.X + ur.Width, p_LO.Y + ur.Height);
 
             } else {
@@ -120,13 +113,12 @@ namespace BlueControls.ItemCollection {
                 p_LO.SetTo(r.PointOf(enAlignment.Top_Left));
                 p_RU.SetTo(r.PointOf(enAlignment.Bottom_Right));
             }
-
         }
 
-
         protected override RectangleM CalculateUsedArea() {
-            if (p_LO == null || p_RU == null) { return new RectangleM(); }
-            return new RectangleM(Math.Min(p_LO.X, p_RU.X), Math.Min(p_LO.Y, p_RU.Y), Math.Abs(p_RU.X - p_LO.X), Math.Abs(p_RU.Y - p_LO.Y));
+            return p_LO == null || p_RU == null
+                ? new RectangleM()
+                : new RectangleM(Math.Min(p_LO.X, p_RU.X), Math.Min(p_LO.Y, p_RU.Y), Math.Abs(p_RU.X - p_LO.X), Math.Abs(p_RU.Y - p_LO.Y));
         }
 
         public override void PointMoved(PointM point) {
@@ -140,7 +132,6 @@ namespace BlueControls.ItemCollection {
                 x = point.X;
                 y = point.Y;
             }
-
 
             if (point == p_LO) {
                 p_O.Y = y;
@@ -197,18 +188,13 @@ namespace BlueControls.ItemCollection {
             //p_RO.SetTo(p_RU.X, p_LO.Y);
             //p_LU.SetTo(p_LO.X, p_RU.Y);
 
-
-
-            p_L.Y = p_LO.Y + (p_LU.Y - p_LO.Y) / 2;
+            p_L.Y = p_LO.Y + ((p_LU.Y - p_LO.Y) / 2);
             p_R.Y = p_L.Y;
 
-            p_O.X = p_LO.X + (p_RO.X - p_LO.X) / 2;
+            p_O.X = p_LO.X + ((p_RO.X - p_LO.X) / 2);
             p_U.X = p_O.X;
 
-
-
         }
-
 
         public override bool ParseThis(string tag, string value) {
             if (base.ParseThis(tag, value)) { return true; }
@@ -217,7 +203,6 @@ namespace BlueControls.ItemCollection {
                 case "fixsize": // TODO: Entfernt am 24.05.2021
                     //_größe_fixiert = value.FromPlusMinus();
                     return true;
-
 
                 case "rotation":
                     _drehwinkel = int.Parse(value);
@@ -243,18 +228,12 @@ namespace BlueControls.ItemCollection {
                         GR.DrawRectangle(CreativePad.PenGray, DCoordinates);
                     }
 
-
                     if (DCoordinates.Width < 1 || DCoordinates.Height < 1) {
                         GR.DrawEllipse(new Pen(Color.Gray, 3), DCoordinates.Left - 5, DCoordinates.Top + 5, 10, 10);
                     }
-
-
                 }
             } catch { }
         }
-
-
-
 
         //internal PointM PointOf(enAlignment P)
         //{

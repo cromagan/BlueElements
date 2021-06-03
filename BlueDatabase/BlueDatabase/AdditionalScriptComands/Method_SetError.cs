@@ -24,7 +24,6 @@ using System.Collections.Generic;
 namespace BlueScript {
     public class Method_SetError : BlueScript.Method {
 
-
         //public Method_SetError(Script parent) : base(parent) { }
 
         public override string Syntax => "SetError(Nachricht, Column1, Colum2, ...);";
@@ -57,8 +56,6 @@ namespace BlueScript {
                 ve.ValueListString = l;
 
             }
-
-
 
             return new strDoItFeedback();
         }

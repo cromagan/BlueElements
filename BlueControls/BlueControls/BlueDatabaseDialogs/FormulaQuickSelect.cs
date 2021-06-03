@@ -18,12 +18,12 @@
 #endregion
 
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using BlueBasics.Enums;
 
 namespace BlueControls.BlueDatabaseDialogs {
 
@@ -40,9 +40,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             Row = RowItem;
         }
 
-
         private void Such_TextChanged(object sender, System.EventArgs e) {
-
 
             Auswahl.Item.Clear();
 
@@ -51,7 +49,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (string.IsNullOrEmpty(t)) { return; }
 
             t = t.ToLower();
-
 
             foreach (var ThisColumn in Row.Database.Column) {
                 if (ThisColumn != null) {
@@ -74,9 +71,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                                                     ni.Checked = thisItem.Checked;
 
                                                 }
-
                                             }
-
                                         }
                                     }
                                 }
@@ -89,10 +84,6 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         //Private Sub Auswahl_Item_CheckedChanged(sender As Object) Handles Auswahl.Item_CheckedChanged
 
-
-
-
-
         //End Sub
 
         protected override void OnLoad(System.EventArgs e) {
@@ -102,13 +93,10 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void Init() {
 
-
             if (Row == null) {
                 Close();
                 return;
             }
-
-
 
             Für.Text = "<b>" + Row.CellFirstString();
         }
@@ -116,7 +104,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void Auswahl_ItemClicked(object sender, BasicListItemEventArgs e) {
 
             var x = e.Item.Internal.SplitBy("|");
-
 
             if (Row.Database.Column[x[0]].MultiLine) {
 
@@ -130,18 +117,14 @@ namespace BlueControls.BlueDatabaseDialogs {
                 Row.CellSet(Row.Database.Column[x[0]], val);
             } else {
 
-
                 if (e.Item.Checked) {
                     Row.CellSet(Row.Database.Column[x[0]], x[1]);
                 }
-
             }
-
 
             //       End If
 
             Such_TextChanged(null, System.EventArgs.Empty);
-
 
         }
     }

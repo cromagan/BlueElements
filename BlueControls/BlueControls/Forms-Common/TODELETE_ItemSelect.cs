@@ -24,7 +24,6 @@ using BlueControls.ItemCollection;
 using BlueDatabase;
 using System.Collections.Generic;
 
-
 namespace BlueControls.Forms {
     public sealed partial class ItemSelect {
         public ItemSelect() {
@@ -32,7 +31,6 @@ namespace BlueControls.Forms {
         }
 
         private BasicListItem ClickedItem;
-
 
         private void List_ItemClicked(object sender, BasicListItemEventArgs e) {
             ClickedItem = e.Item;
@@ -51,14 +49,8 @@ namespace BlueControls.Forms {
 
             ShowDialog();
 
-            if (ClickedItem != null) {
-                return ClickedItem.Internal;
-            }
-
-
-            return string.Empty;
+            return ClickedItem != null ? ClickedItem.Internal : string.Empty;
         }
-
 
         public RowItem SelectOne_OfRow(List<RowItem> rows, string textOfNewRow, string layoutID, bool allowClose) {
 
@@ -68,7 +60,6 @@ namespace BlueControls.Forms {
                 List.Item.Add(ThisRow, layoutID);
             }
 
-
             if (!string.IsNullOrEmpty(textOfNewRow)) {
                 List.Item.Add(QuickImage.Get("Kreuz|128").BMP, textOfNewRow);
             }
@@ -77,7 +68,6 @@ namespace BlueControls.Forms {
                 ShowDialog();
                 if (ClickedItem != null) { break; }
                 if (allowClose) { break; }
-
             } while (true);
 
             return (ClickedItem as RowFormulaListItem)?.Row;

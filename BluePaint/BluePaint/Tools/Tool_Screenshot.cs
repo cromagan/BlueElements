@@ -47,7 +47,5 @@ namespace BluePaint {
             DoScreenShot();
             OnZoomFit();
         }
-
-
     }
 }

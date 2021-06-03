@@ -33,7 +33,6 @@ namespace BlueScript {
         public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_Any };
         public override bool EndlessArgs => false;
 
-
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
 
@@ -44,13 +43,11 @@ namespace BlueScript {
 
             if (string.IsNullOrEmpty(attvar.Attributes[0].ValueString)) { return strDoItFeedback.Wahr(); }
 
-
-            if (attvar.Attributes[0].Type == enVariableDataType.Null ||
-                attvar.Attributes[0].Type == enVariableDataType.Error ||
-                attvar.Attributes[0].Type == enVariableDataType.NotDefinedYet) {
+            if (attvar.Attributes[0].Type is enVariableDataType.Null or
+                enVariableDataType.Error or
+                enVariableDataType.NotDefinedYet) {
                 return strDoItFeedback.Wahr();
             }
-
 
             if (attvar.Attributes[0].Type != enVariableDataType.Numeral) { return new strDoItFeedback("Variable existiert, ist aber nicht vom Datentyp Numeral."); }
 

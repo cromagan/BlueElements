@@ -44,21 +44,17 @@ namespace BlueControls.Controls {
 
         #endregion
 
-
         private Database _Database;
-
 
         private RowItem _tmpShowingRow = null;
         private int _ShowingRowKey = -1;
         private bool _Inited;
-
 
         public event EventHandler<RowEventArgs> ShowingRowChanged;
         public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
         public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
 
         private List<FlexiControlForCell> _Control;
-
 
         private int _savedRowKey = int.MinValue;
 
@@ -77,8 +73,6 @@ namespace BlueControls.Controls {
                 base.Dispose(disposing);
             }
         }
-
-
 
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -143,19 +137,15 @@ namespace BlueControls.Controls {
 
                 if (value > -1 && _Database == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Database is nothing"); }
 
-
                 if (!_Inited) {
                     if (value < 0) { return; }
                     View_Init();
                 }
 
-
                 BeginnEdit();
-
 
                 _ShowingRowKey = value;
                 _tmpShowingRow = _Database?.Row.SearchByKey(_ShowingRowKey);
-
 
                 //Parallel.ForEach(_Control, thisFlex => {
                 //    if (thisFlex != null && !thisFlex.IsDisposed) {
@@ -180,11 +170,6 @@ namespace BlueControls.Controls {
             ShowingRowChanged?.Invoke(this, e);
         }
 
-
-
-
-
-
         // <Obsolete("Database darf nicht im Designer gesetzt werden.", True)>
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -195,9 +180,6 @@ namespace BlueControls.Controls {
                 return _tmpShowingRow;
             }
         }
-
-
-
 
         private void View_Init() {
             if (_Database == null) { return; }
@@ -232,7 +214,6 @@ namespace BlueControls.Controls {
 
         }
 
-
         private void _DatabaseLoaded(object sender, LoadedEventArgs e) {
             if (InvokeRequired) {
                 Invoke(new Action(() => _DatabaseLoaded(sender, e)));
@@ -243,27 +224,17 @@ namespace BlueControls.Controls {
             ShowingRowKey = _savedRowKey;
         }
 
-
-
         private void _Database_RowChecked(object sender, RowCheckedEventArgs e) {
             if (e.Row.Key != _ShowingRowKey) { return; }
 
-
-
-            string[] p = null;
             var nr = int.MaxValue;
             var ColNr = int.MaxValue;
 
-
-
             for (var cc = 0; cc < e.ColumnsWithErrors.Count; cc++) {
-                p = e.ColumnsWithErrors[cc].Split('|');
-
-
+                var p = e.ColumnsWithErrors[cc].Split('|');
 
                 foreach (var ThisColumnItem in e.Row.Database.Column) {
                     if (ThisColumnItem != null) {
-
 
                         if (p[0].ToUpper() == ThisColumnItem.Name.ToUpper()) {
 
@@ -271,20 +242,13 @@ namespace BlueControls.Controls {
                             var CD = SearchViewItem(ThisColumnItem);
                             var View = SearchColumnView(ThisColumnItem);
 
-                            var tmp = 0;
-                            if (CD == null) {
-                                tmp = ThisColumnItem.Index() + 200000;
-                            } else if (View == CurrentView()) {
-                                tmp = ThisColumnItem.Index();
-                            } else {
-                                tmp = ThisColumnItem.Index() + 100000;
-                            }
-
+                            var tmp = CD == null
+                                ? ThisColumnItem.Index() + 200000
+                                : View == CurrentView() ? ThisColumnItem.Index() : ThisColumnItem.Index() + 100000;
                             if (tmp < ColNr) {
                                 ColNr = tmp;
                                 nr = cc;
                             }
-
                         }
                     }
                 }
@@ -293,9 +257,7 @@ namespace BlueControls.Controls {
             if (nr < int.MaxValue) {
                 _ = e.ColumnsWithErrors[nr].Split('|');
             }
-
         }
-
 
         /// <summary>
         /// Ermittelt, wie viele Spalten die Ansicht benutzt.
@@ -326,7 +288,6 @@ namespace BlueControls.Controls {
 
                 var ViewN = _Database.Views.IndexOf(ThisView);
 
-
                 var WidthInPixelOfParent = 0;
                 var HeightOfParent = 0;
                 var MoveIn = 0;
@@ -337,20 +298,19 @@ namespace BlueControls.Controls {
                     MoveIn = 0;
                 } else {
                     HeightOfParent = Tabs.Height - Tabs.TabPages[Count - 1].Top;
-                    WidthInPixelOfParent = Tabs.Width - 10 - Skin.PaddingSmal * 4;
+                    WidthInPixelOfParent = Tabs.Width - 10 - (Skin.PaddingSmal * 4);
                     MoveIn = Skin.PaddingSmal * 2;
                 }
 
-                var WidthInPixelOfColumn = (WidthInPixelOfParent - View_Spalten * Skin.PaddingSmal) / (View_Spalten + 1);
-
+                var WidthInPixelOfColumn = (WidthInPixelOfParent - (View_Spalten * Skin.PaddingSmal)) / (View_Spalten + 1);
 
                 foreach (var ThisViewItem in ThisView) {
 
                     if (ThisViewItem?.Column != null) {
 
                         var ObjPX = new Rectangle {
-                            Width = ThisViewItem.Width * WidthInPixelOfColumn + (ThisViewItem.Width - 1) * Skin.PaddingSmal,
-                            X = ThisViewItem.Spalte_X1 * WidthInPixelOfColumn + ThisViewItem.Spalte_X1 * Skin.PaddingSmal + MoveIn,
+                            Width = (ThisViewItem.Width * WidthInPixelOfColumn) + ((ThisViewItem.Width - 1) * Skin.PaddingSmal),
+                            X = (ThisViewItem.Spalte_X1 * WidthInPixelOfColumn) + (ThisViewItem.Spalte_X1 * Skin.PaddingSmal) + MoveIn,
 
                             Y = MoveIn
                         }; // Die Koordinaten in Pixel des Steuerelements
@@ -359,29 +319,23 @@ namespace BlueControls.Controls {
                             ObjPX.Y = Math.Max(_BelegterBereichTop[z], ObjPX.Y);
                         }
 
-
-
                         if (ObjPX.Y > 0) { ObjPX.Y += 8; }
-                        ObjPX.Height = Math.Max(ThisViewItem.Height, 0) * 16 + 8;
+                        ObjPX.Height = (Math.Max(ThisViewItem.Height, 0) * 16) + 8;
 
                         if (ThisViewItem.ÜberschriftAnordnung == enÜberschriftAnordnung.Ohne_mit_Abstand || ThisViewItem.ÜberschriftAnordnung == enÜberschriftAnordnung.Über_dem_Feld) {
                             ObjPX.Height += Skin.PaddingSmal + 16;
 
                         }
 
-
-
                         if (ThisViewItem.Height == 31) {
-                            ObjPX.Height = HeightOfParent - ObjPX.Y - Skin.PaddingSmal * 3;
+                            ObjPX.Height = HeightOfParent - ObjPX.Y - (Skin.PaddingSmal * 3);
                             if (ObjPX.Height < 16) { ObjPX.Height = 16; }
                         }
-
 
                         for (var z = ThisViewItem.Spalte_X1; z < ThisViewItem.Spalte_X1 + ThisViewItem.Width; z++) // Spalte_X2
                         {
                             _BelegterBereichTop[z] = Math.Max(_BelegterBereichTop[z], ObjPX.Bottom);
                         }
-
 
                         GenericControl ConVI = ControlOf(ThisViewItem);
 
@@ -391,7 +345,6 @@ namespace BlueControls.Controls {
                             ConVI.Visible = true;
                             ConVI.BringToFront();
                         }
-
                     }
                 }
 
@@ -400,8 +353,6 @@ namespace BlueControls.Controls {
 
             EndEdit();
         }
-
-
 
         private void Control_Create(ColumnViewItem cd, System.Windows.Forms.Control vParent) {
             if (cd?.Column == null) { return; }
@@ -444,13 +395,12 @@ namespace BlueControls.Controls {
             if (SPF >= SPH || SPF == 0) {
                 Tabs.Width = WidthOfParent;
             } else {
-                var WidthOfColum = (WidthOfParent - SPH * Skin.PaddingSmal) / (SPH + 1);
-                Tabs.Width = WidthOfColum * (SPF + 1) + SPF * Skin.PaddingSmal;
+                var WidthOfColum = (WidthOfParent - (SPH * Skin.PaddingSmal)) / (SPH + 1);
+                Tabs.Width = (WidthOfColum * (SPF + 1)) + (SPF * Skin.PaddingSmal);
             }
 
             Tabs.Height = Height - TopPos;
         }
-
 
         private void Control_Create_All() {
             var Count = -1;
@@ -489,7 +439,6 @@ namespace BlueControls.Controls {
             EndEdit();
         }
 
-
         public void HideViewEditor() {
             if (!Editor.Visible) { return; }
             Editor.Visible = false;
@@ -501,19 +450,15 @@ namespace BlueControls.Controls {
             if (_Database == null) { return; }
             if (Editor.Visible) { return; }
 
-
             if (!_Database.IsAdministrator()) { return; }
 
             _Database.Load_Reload();
-
 
             _Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
 
             if (!_Inited) { View_Init(); }
 
-
             ShowingRowKey = -1;
-
 
             lbxColumns.Item.Clear();
             lbxColumns.Item.AddRange(_Database.Column, false, false, false);
@@ -527,18 +472,14 @@ namespace BlueControls.Controls {
 
             Editor.Visible = true;
 
-
-
             View_Init();
             ColumnsEinfärben();
         }
 
         private void ColumnsEinfärben() {
-            var ItC = 0;
-
-
+            int ItC;
             for (ItC = -1; ItC <= Tabs.TabCount + 100; ItC++) {
-                string Nam = null;
+                string Nam;
                 switch (ItC) {
                     case -1:
                         Nam = "Unbenutzt";
@@ -547,17 +488,17 @@ namespace BlueControls.Controls {
                         Nam = "Kopfbereich";
                         break;
                     default: {
-                        if (ItC >= 1 && ItC <= _Database.Views.Count - 1) {
-                            if (_Database.Views[ItC] == null) {
-                                Nam = string.Empty;
+                            if (ItC >= 1 && ItC <= _Database.Views.Count - 1) {
+                                if (_Database.Views[ItC] == null) {
+                                    Nam = string.Empty;
+                                } else {
+                                    Nam = _Database.Views[ItC].Name + " "; // Leerzeichen wegen evtl. leeren namen
+                                }
                             } else {
-                                Nam = _Database.Views[ItC].Name + " "; // Leerzeichen wegen evtl. leeren namen
+                                Nam = string.Empty;
                             }
-                        } else {
-                            Nam = string.Empty;
+                            break;
                         }
-                        break;
-                    }
                 }
 
                 var intName = "@Ansicht" + ItC.ToString();
@@ -569,16 +510,12 @@ namespace BlueControls.Controls {
                 }
             }
 
-
-
-
             ItC = -1;
             do {
                 if (lbxColumns.Item.RemoveNull()) { ItC = -1; }
 
                 ItC++;
                 if (ItC > lbxColumns.Item.Count - 1) { break; }
-
 
                 if (lbxColumns.Item[ItC] != null) {
 
@@ -591,35 +528,23 @@ namespace BlueControls.Controls {
                         } else {
 
                             var cv = SearchColumnView(co);
-                            var Sort = 0;
-                            if (cv == null) {
-                                Sort = 0;
-                            } else {
-                                Sort = _Database.Views.IndexOf(cv) + 1;
-                            }
-
+                            var Sort = cv == null ? 0 : _Database.Views.IndexOf(cv) + 1;
                             ThisItem.UserDefCompareKey = Sort.ToString(Constants.Format_Integer3) + "|Z" + ThisItem.CompareKey(); // ObjectReadable.ReadableText
                         }
-
                     }
-
                 }
-
             } while (true);
 
             lbxColumns.Item.Sort();
             lbxColumns.Invalidate();
         }
 
-
         private void Generate_Tabs() {
             if (_Database.Views.Count < 1) { return; }
-
 
             BeginnEdit();
 
             foreach (var ThisView in _Database.Views) {
-
 
                 if (ThisView != null && ThisView != _Database.Views[0]) {
                     TabGeneratorCount++;
@@ -640,11 +565,9 @@ namespace BlueControls.Controls {
 
         }
 
-
         protected override void DrawControl(Graphics gr, enStates state) {
             Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
         }
-
 
         protected override void OnSizeChanged(System.EventArgs e) {
             if (IsDisposed) { return; }
@@ -665,8 +588,6 @@ namespace BlueControls.Controls {
 
             View_Init();
         }
-
-
 
         private void Editor_CheckButtons(bool Blinki) {
             if (!Editor.Visible) { return; }
@@ -720,9 +641,7 @@ namespace BlueControls.Controls {
             } else {
                 e.UserMenu.Add("Dieses Feld ausblenden", "#RemoveColumnFromView", enImageCode.Kreuz, Convert.ToBoolean(cd != null));
             }
-
         }
-
 
         private void lbxColumns_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
             //if (_Database.Views.Count == 0) { _Database.Views.Add(new ColumnViewCollection(_Database, "")); }
@@ -732,7 +651,6 @@ namespace BlueControls.Controls {
             var ViewItem = SearchViewItem(Column);
 
             var CurrView = CurrentView();
-
 
             switch (e.ClickedComand) {
                 case "#RemoveColumnFromView":
@@ -761,22 +679,16 @@ namespace BlueControls.Controls {
             ColumnsEinfärben();
         }
 
-
         private string EditorSelectedColumn() {
-            if (lbxColumns.Item.Checked().Count != 1) { return string.Empty; }
-            return lbxColumns.Item.Checked()[0].Internal;
+            return lbxColumns.Item.Checked().Count != 1 ? string.Empty : lbxColumns.Item.Checked()[0].Internal;
         }
-
 
         private void lbxColumns_ItemCheckedChanged(object sender, System.EventArgs e) {
             Editor_CheckButtons(true);
         }
 
-
-
         private void RedoView() {
             var i = Tabs.SelectedIndex;
-
 
             BeginnEdit();
             _Inited = false;
@@ -793,7 +705,6 @@ namespace BlueControls.Controls {
             EndEdit();
         }
 
-
         private void Arrangement_Swap(int Ri) {
             var vn = _Database.Views.IndexOf(CurrentView());
 
@@ -803,7 +714,6 @@ namespace BlueControls.Controls {
 
             if (vn < 2 && Ri < 0) { return; }
             if (vn >= _Database.Views.Count - 1 && Ri > 0) { return; }
-
 
             var tmpx1 = _Database.Views[vn];
             var tmpx2 = _Database.Views[vn + Ri];
@@ -815,15 +725,11 @@ namespace BlueControls.Controls {
             _Inited = false;
         }
 
-
-
-
         private void Rename_Click(object sender, System.EventArgs e) {
             var CurrView = CurrentView();
             if (CurrView == null || CurrView == _Database.Views[0]) { return; }
             var n = InputBox.Show("Umbenennen:", CurrView.Name, enDataFormat.Text);
             if (!string.IsNullOrEmpty(n)) { CurrView.Name = n; }
-
 
             RedoView();
             ColumnsEinfärben();
@@ -831,7 +737,6 @@ namespace BlueControls.Controls {
         }
         private void Rechte_Click(object sender, System.EventArgs e) {
             var CurrView = CurrentView();
-
 
             var aa = new ItemCollectionList();
             aa.AddRange(_Database.Permission_AllUsed(true));
@@ -847,14 +752,12 @@ namespace BlueControls.Controls {
             var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, enAddType.Text, true);
             if (b == null) { return; }
 
-
             CurrView.PermissionGroups_Show.Clear();
             CurrView.PermissionGroups_Show.AddRange(b.ToArray());
 
             CurrView.PermissionGroups_Show.RemoveString("#Administrator", false);
             if (CurrView == _Database.Views[1]) { CurrView.PermissionGroups_Show.Add("#Everybody"); }
         }
-
 
         private void OrderDelete_Click(object sender, System.EventArgs e) {
             var CurrView = CurrentView();
@@ -865,13 +768,10 @@ namespace BlueControls.Controls {
             if (MessageBox.Show("Ansicht <b>'" + CurrView.Name + "'</b><br>wirklich löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
             _Database.Views.RemoveAt(i);
 
-
             RedoView();
             ColumnsEinfärben();
 
-
         }
-
 
         private void OrderAdd_Click(object sender, System.EventArgs e) {
 
@@ -890,9 +790,7 @@ namespace BlueControls.Controls {
             _ = SearchColumnView(Column);
             var ViewItem = SearchViewItem(Column);
 
-
             if (ViewItem != null) { ViewItem.ÜberschriftAnordnung = (enÜberschriftAnordnung)int.Parse(cbxCaptionPosition.Text); }
-
 
             RedoView();
             ColumnsEinfärben();
@@ -908,7 +806,6 @@ namespace BlueControls.Controls {
             RedoView();
             ColumnsEinfärben();
         }
-
 
         private void SLinks_Click(object sender, System.EventArgs e) {
             var Column = _Database.Column[EditorSelectedColumn()];
@@ -937,7 +834,6 @@ namespace BlueControls.Controls {
             var View = SearchColumnView(Column);
             var ViewItem = SearchViewItem(Column);
 
-
             if (ViewItem != null) { View.Swap(ViewItem, ViewItem.PreviewsVisible(View)); }
 
             RedoView();
@@ -954,7 +850,6 @@ namespace BlueControls.Controls {
             RedoView();
             ColumnsEinfärben();
 
-
         }
 
         private void EOben_Click(object sender, System.EventArgs e) {
@@ -967,8 +862,6 @@ namespace BlueControls.Controls {
             RedoView();
             ColumnsEinfärben();
 
-
-
         }
 
         private void EUnten_Click(object sender, System.EventArgs e) {
@@ -979,11 +872,8 @@ namespace BlueControls.Controls {
 
             ViewItem?.KoordÄndern(0, 0, 1);
 
-
             RedoView();
             ColumnsEinfärben();
-
-
 
         }
 
@@ -994,11 +884,8 @@ namespace BlueControls.Controls {
 
             ViewItem?.KoordÄndern(0, -1, 0);
 
-
             RedoView();
             ColumnsEinfärben();
-
-
 
         }
 
@@ -1012,15 +899,7 @@ namespace BlueControls.Controls {
             RedoView();
             ColumnsEinfärben();
 
-
-
-
-
         }
-
-
-
-
 
         public void Control_Remove_All() {
 
@@ -1028,7 +907,6 @@ namespace BlueControls.Controls {
                 Invoke(new Action(() => Control_Remove_All()));
                 return;
             }
-
 
             var R = false;
             BeginnEdit();
@@ -1054,15 +932,12 @@ namespace BlueControls.Controls {
                             break;
                     }
                 }
-
             } while (R);
-
 
             _Control?.Clear();
             EndEdit();
 
         }
-
 
         private void RemoveControl(System.Windows.Forms.Control vObject) {
             if (vObject == null || vObject.IsDisposed) { return; }
@@ -1103,7 +978,6 @@ namespace BlueControls.Controls {
             Arrangement_Swap(1);
         }
 
-
         private void _Database_ColumnRemoved(object sender, System.EventArgs e) {
             if (IsDisposed) { return; }
             View_Init();
@@ -1131,7 +1005,6 @@ namespace BlueControls.Controls {
             return ThisView?[Column];
         }
 
-
         public static ColumnViewCollection SearchColumnView(ColumnItem Column) {
 
             if (Column == null) { return null; }
@@ -1146,7 +1019,6 @@ namespace BlueControls.Controls {
                         }
                     }
                 }
-
             }
             return null;
         }
@@ -1178,9 +1050,7 @@ namespace BlueControls.Controls {
                 return;
             }
 
-
             Items.Add("Allgemeine Schnelleingabe öffnen", "#Schnelleingabe", QuickImage.Get(enImageCode.Lupe), _Database != null && ShowingRow != null);
-
 
             if (_Database.IsAdministrator()) {
                 Items.AddSeparator();
@@ -1225,7 +1095,6 @@ namespace BlueControls.Controls {
             // Ist aktuell nur möglich,wenn Pending Changes eine neue Zeile machen
             // Jedes FlexControl beachtet für sich die Änderung
             if (e.KeyOld == _savedRowKey) { _savedRowKey = e.KeyNew; }
-
         }
 
         #endregion

@@ -28,7 +28,6 @@ namespace BlueControls.Controls {
     public class ProgressBar : GenericControl {
         private int wProzent = 100;
 
-
         #region Constructor
         public ProgressBar() : base(false, false) { }
 
@@ -62,7 +61,7 @@ namespace BlueControls.Controls {
             Skin.Draw_Back(gr, enDesign.Progressbar, state, DisplayRectangle, this, true);
 
             if (wProzent > 0) {
-                var r = new Rectangle(DisplayRectangle.X, DisplayRectangle.Y, (int)(Math.Truncate(DisplayRectangle.Width * wProzent / 100.0)), DisplayRectangle.Height);
+                var r = new Rectangle(DisplayRectangle.X, DisplayRectangle.Y, (int)Math.Truncate(DisplayRectangle.Width * wProzent / 100.0), DisplayRectangle.Height);
                 //r = New Rectangle(DisplayRectangle)
                 //r.Width = CInt(r.Width * wProzent / 100)
 
@@ -70,11 +69,7 @@ namespace BlueControls.Controls {
                 Skin.Draw_Border(gr, enDesign.Progressbar_Füller, state, r);
             }
 
-
             Skin.Draw_Border(gr, enDesign.Progressbar, state, DisplayRectangle);
         }
-
-
-
     }
 }

@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -50,20 +49,15 @@ namespace BlueControls.ItemCollection {
         private string _VariableText;
         private enAlignment _ausrichtung;
 
-
-
         //http://www.kurztutorial.info/programme/punkt-mm/rechner.html
         // Dim Ausgleich As Double = mmToPixel(1 / 72 * 25.4, 300)
         public decimal Skalierung { get; set; } = 3.07m;
 
-
         #endregion
-
 
         #region  Event-Deklarationen + Delegaten 
 
         #endregion
-
 
         #region  Construktor + Initialize 
         public TextPadItem(ItemCollectionPad parent) : this(parent, string.Empty, string.Empty) { }
@@ -80,7 +74,6 @@ namespace BlueControls.ItemCollection {
         }
 
         #endregion
-
 
         #region  Properties 
 
@@ -105,14 +98,11 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-
         #endregion
-
 
         public override void DesignOrStyleChanged() {
             MakeNewETxt();
         }
-
 
         public override bool ParseThis(string tag, string value) {
             if (base.ParseThis(tag, value)) { return true; }
@@ -139,7 +129,6 @@ namespace BlueControls.ItemCollection {
             return false;
         }
 
-
         public override string ToString() {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
@@ -150,12 +139,9 @@ namespace BlueControls.ItemCollection {
             return t.Trim(", ") + "}";
         }
 
-
         protected override string ClassId() {
             return "TEXT";
         }
-
-
 
         protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
 
@@ -167,9 +153,6 @@ namespace BlueControls.ItemCollection {
             GR.TranslateTransform(trp.X, trp.Y);
             GR.RotateTransform(-Drehwinkel);
 
-
-
-
             if (etxt != null) {
                 etxt.DrawingPos = new Point((int)(DCoordinates.Left - trp.X), (int)(DCoordinates.Top - trp.Y));
                 etxt.DrawingArea = Rectangle.Empty; // new Rectangle(DCoordinates.Left, DCoordinates.Top, DCoordinates.Width, DCoordinates.Height);
@@ -178,7 +161,6 @@ namespace BlueControls.ItemCollection {
                     etxt.Draw(GR, (float)(cZoom * Skalierung * Parent.SheetStyleScale));
                 }
             }
-
 
             GR.TranslateTransform(-trp.X, -trp.Y);
             GR.ResetTransform();
@@ -189,9 +171,7 @@ namespace BlueControls.ItemCollection {
 
         //private string ChangeText(string tmpBody) {
 
-
         //    var nt = tmpBody;
-
 
         //    //do {
         //    //    var stx = nt.ToUpper().IndexOf("//TS/");
@@ -229,21 +209,16 @@ namespace BlueControls.ItemCollection {
         //    //        }
         //    //    }
 
-
         //    //    var t2 = "<MarkState=2>" + Vor + Nam + Nach + "<MarkState=0>";
 
         //    //    nt = nt.Replace(t1, t2);
 
         //    //} while (true);
 
-
-
-
         //    //if (!string.IsNullOrEmpty(nt)) {
         //    //    nt = nt.Replace("//XS/302", "<MarkState=2><ImageCode=Pinsel|16>{<MarkState=0>");
         //    //    nt = nt.Replace("/XE", "<MarkState=2>}<MarkState=0>");
         //    //}
-
 
         //    return nt;
         //}
@@ -259,13 +234,7 @@ namespace BlueControls.ItemCollection {
                     etxt = new ExtText(Stil, Parent.SheetStyle);
                 }
 
-
-                if (!string.IsNullOrEmpty(Text)) {
-                    etxt.HtmlText = Text;
-                } else {
-                    etxt.HtmlText = "{Text}";
-                }
-
+                etxt.HtmlText = !string.IsNullOrEmpty(Text) ? Text : "{Text}";
 
                 //// da die Font 1:1 berechnet wird, aber bei der Ausgabe evtl. skaliert,
                 //// muss etxt vorgegaukelt werden, daß der Drawberehich xxx% größer ist
@@ -276,7 +245,6 @@ namespace BlueControls.ItemCollection {
                 etxt.Ausrichtung = _ausrichtung;
 
             }
-
         }
 
         //public override void PointMoved(PointM point) {
@@ -287,16 +255,11 @@ namespace BlueControls.ItemCollection {
         //        p_RU.Y = Math.Max(p_LO.Y + etxt.Height() * Skalierung * Parent.SheetStyleScale, p_LO.Y + 10);
         //    }
 
-
         //    p_RU.X = Math.Max(p_RU.X, p_LO.X + 10m * Skalierung * Parent.SheetStyleScale);
 
         //}
 
-
         public bool ReplaceVariable(BlueScript.Variable variable) {
-
-
-
 
             if ("&" + variable.Name.ToLower() + ";" != Text.ToLower()) { return false; }
 
@@ -304,9 +267,6 @@ namespace BlueControls.ItemCollection {
                 variable.Type != Skript.Enums.enVariableDataType.List &&
                 variable.Type != Skript.Enums.enVariableDataType.String &&
                 variable.Type != Skript.Enums.enVariableDataType.Numeral) { return false; }
-
-
-
 
             var nt = variable.ValueString;
             if (nt is string txt) {
@@ -321,7 +281,6 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-
         public bool ResetVariables() {
             if (_VariableText == Text) { return false; }
             Text = _VariableText;
@@ -332,13 +291,11 @@ namespace BlueControls.ItemCollection {
             return true;
         }
 
-
         public override List<FlexiControl> GetStyleOptions() {
             var l = new List<FlexiControl>
             {
                 new FlexiControlForProperty(this, "Interner-Text", 5)
             };
-
 
             var Aursicht = new ItemCollectionList
             {
@@ -350,7 +307,6 @@ namespace BlueControls.ItemCollection {
 
             l.Add(new FlexiControlForProperty(this, "Ausrichtung", Aursicht));
             l.Add(new FlexiControlForProperty(this, "Skalierung"));
-
 
             AddStyleOption(l);
 
@@ -378,7 +334,6 @@ namespace BlueControls.ItemCollection {
         //        RecomputePointAndRelations();
         //    }
 
-
         //    var tmps = (PadStyles)int.Parse(Tags.TagGet("Stil"));
 
         //    if (tmps != Stil)
@@ -386,7 +341,6 @@ namespace BlueControls.ItemCollection {
         //        Stil = tmps;
         //        etxt = null;
         //    }
-
 
         //    var tmpa = (enAlignment)int.Parse(Tags.TagGet("Ausrichtung"));
 
@@ -396,13 +350,9 @@ namespace BlueControls.ItemCollection {
         //        etxt = null;
         //    }
 
-
         //    AdditionalScale = decimal.Parse(Tags.TagGet("Skalierung").FromNonCritical());
 
-
         //}
-
-
 
     }
 }

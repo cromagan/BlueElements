@@ -27,42 +27,22 @@ using static BlueBasics.modConverter;
 namespace BlueScript {
     public class Variable {
 
-
         public override string ToString() {
-
 
             var zusatz = string.Empty;
             if (Readonly) { zusatz = " [Read Only] "; }
 
-
-            switch (Type) {
-
-                case enVariableDataType.String:
-                    return "{str} " + zusatz + Name + " = " + ValueForReplace;
-
-                case enVariableDataType.Numeral:
-                    return "{num} " + zusatz + Name + " = " + ValueForReplace;
-
+            return Type switch {
+                enVariableDataType.String => "{str} " + zusatz + Name + " = " + ValueForReplace,
+                enVariableDataType.Numeral => "{num} " + zusatz + Name + " = " + ValueForReplace,
                 //case enVariableDataType.Date:
                 //    return "{dat} " + zusatz + Name + " = " + ValueForReplace;
-
-                case enVariableDataType.Bool:
-                    return "{bol} " + zusatz + Name + " = " + ValueForReplace;
-
-                case enVariableDataType.List:
-                    return "{lst} " + zusatz + Name + " = " + ValueForReplace;
-
-                case enVariableDataType.Bitmap:
-                    return "{bmp} " + zusatz + Name + " = [BitmapData]";
-
-                case enVariableDataType.Error:
-                    return "{err} " + zusatz + Name + " = " + ValueString;
-
-                default:
-                    return "{ukn} " + zusatz + Name + " = " + ValueString;
-
-            }
-
+                enVariableDataType.Bool => "{bol} " + zusatz + Name + " = " + ValueForReplace,
+                enVariableDataType.List => "{lst} " + zusatz + Name + " = " + ValueForReplace,
+                enVariableDataType.Bitmap => "{bmp} " + zusatz + Name + " = [BitmapData]",
+                enVariableDataType.Error => "{err} " + zusatz + Name + " = " + ValueString,
+                _ => "{ukn} " + zusatz + Name + " = " + ValueString,
+            };
         }
 
         public Variable(string name) {
@@ -72,7 +52,6 @@ namespace BlueScript {
             }
             Name = name.ToLower();
         }
-
 
         public static strDoItFeedback AttributeAuflösen(string txt, Script s) {
 
@@ -93,12 +72,9 @@ namespace BlueScript {
                 (var uu, var _) = NextText(txt, 0, Method_if.UndUnd, false, false);
                 if (uu > 0) {
                     var txt1 = AttributeAuflösen(txt.Substring(0, uu), s);
-                    if (!string.IsNullOrEmpty(txt1.ErrorMessage)) {
-                        return new strDoItFeedback("Befehls-Berechnungsfehler vor &&: " + txt1.ErrorMessage);
-                    }
-                    if (txt1.Value == "false") { return txt1; }
-
-                    return AttributeAuflösen(txt.Substring(uu + 2), s);
+                    return !string.IsNullOrEmpty(txt1.ErrorMessage) ? new strDoItFeedback("Befehls-Berechnungsfehler vor &&: " + txt1.ErrorMessage)
+                        : txt1.Value == "false" ? txt1
+                        : AttributeAuflösen(txt.Substring(uu + 2), s);
                 }
                 #endregion
 
@@ -106,12 +82,9 @@ namespace BlueScript {
                 (var oo, var _) = NextText(txt, 0, Method_if.OderOder, false, false);
                 if (oo > 0) {
                     var txt1 = AttributeAuflösen(txt.Substring(0, oo), s);
-                    if (!string.IsNullOrEmpty(txt1.ErrorMessage)) {
-                        return new strDoItFeedback("Befehls-Berechnungsfehler vor ||: " + txt1.ErrorMessage);
-                    }
-                    if (txt1.Value == "true") { return txt1; }
-
-                    return AttributeAuflösen(txt.Substring(oo + 2), s);
+                    return !string.IsNullOrEmpty(txt1.ErrorMessage)
+                        ? new strDoItFeedback("Befehls-Berechnungsfehler vor ||: " + txt1.ErrorMessage)
+                        : txt1.Value == "true" ? txt1 : AttributeAuflösen(txt.Substring(oo + 2), s);
                 }
                 #endregion
 
@@ -127,7 +100,6 @@ namespace BlueScript {
                 txt = t2.AttributeText;
             }
 
-
             #region Klammern am ende berechnen, das ansonsten Min(x,y,z) falsch anschlägt
             (var posa, var _) = NextText(txt, 0, KlammerAuf, false, false);
             if (posa > -1) {
@@ -136,15 +108,13 @@ namespace BlueScript {
                 if (pose <= posa) { return strDoItFeedback.Klammerfehler(); }
 
                 var tmp = AttributeAuflösen(txt.Substring(posa + 1, pose - posa - 1), s);
-                if (!string.IsNullOrEmpty(tmp.ErrorMessage)) { return tmp; }
-
-                return AttributeAuflösen(txt.Substring(0, posa) + tmp.Value + txt.Substring(pose + 1), s);
-
+                return !string.IsNullOrEmpty(tmp.ErrorMessage)
+                    ? tmp
+                    : AttributeAuflösen(txt.Substring(0, posa) + tmp.Value + txt.Substring(pose + 1), s);
             }
             #endregion
 
             #region Vergleichsoperatoren ersetzen und vereinfachen
-
 
             (var pos, var _) = NextText(txt, 0, Method_if.VergleichsOperatoren, false, false);
 
@@ -164,7 +134,6 @@ namespace BlueScript {
             Name = name.ToLower();
 
             var txt = AttributeAuflösen(attributesText, s);
-
 
             if (!string.IsNullOrEmpty(txt.ErrorMessage)) { SetError(txt.ErrorMessage); return; }
 
@@ -224,19 +193,13 @@ namespace BlueScript {
             Coment = coment;
         }
 
-
         public Variable(string name, string value, enVariableDataType type, bool ronly, bool system, string coment) {
 
             if (!IsValidName(name)) {
                 Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Fehler, "Ungültiger Variablenname: " + name);
             }
 
-            if (system) {
-                Name = "*" + name.ToLower();
-            } else {
-
-                Name = name.ToLower();
-            }
+            Name = system ? "*" + name.ToLower() : name.ToLower();
 
             ValueString = value;
             Type = type;
@@ -331,7 +294,6 @@ namespace BlueScript {
 
         public int ValueInt => IntParse(_ValueString);
 
-
         public static bool IsValidName(string v) {
 
             v = v.ToLower();
@@ -339,21 +301,11 @@ namespace BlueScript {
             var vo = v;
             v = v.ReduceToChars(Constants.AllowedCharsVariableName);
 
-
-            if (v != vo) { return false; }
-
-            if (string.IsNullOrEmpty(v)) { return false; }
-
-            return true;
-
-
+            return v == vo && !string.IsNullOrEmpty(v);
         }
     }
 
-
     public static class VariableExtensions {
-
-
 
         public static Variable Get(this List<Variable> vars, string name) {
             if (vars == null || vars.Count == 0) { return null; }
@@ -366,7 +318,6 @@ namespace BlueScript {
             return null;
         }
 
-
         /// <summary>
         /// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten eine leere Liste
         /// </summary>
@@ -374,8 +325,7 @@ namespace BlueScript {
         /// <param name="name"></param>
         public static List<string> GetList(this List<Variable> vars, string name) {
             var v = vars.Get(name);
-            if (v == null) { return new List<string>(); }
-            return v.ValueListString;
+            return v == null ? new List<string>() : v.ValueListString;
         }
 
         /// <summary>
@@ -385,8 +335,7 @@ namespace BlueScript {
         /// <param name="name"></param>
         public static double GetDouble(this List<Variable> vars, string name) {
             var v = vars.Get(name);
-            if (v == null) { return 0f; }
-            return v.ValueDouble;
+            return v == null ? 0f : v.ValueDouble;
         }
 
         /// <summary>
@@ -396,10 +345,8 @@ namespace BlueScript {
         /// <param name="name"></param>
         public static int GetInt(this List<Variable> vars, string name) {
             var v = vars.Get(name);
-            if (v == null) { return 0; }
-            return v.ValueInt;
+            return v == null ? 0 : v.ValueInt;
         }
-
 
         /// <summary>
         /// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten 0
@@ -408,8 +355,7 @@ namespace BlueScript {
         /// <param name="name"></param>
         public static decimal GetDecimal(this List<Variable> vars, string name) {
             var v = vars.Get(name);
-            if (v == null) { return 0m; }
-            return (decimal)v.ValueDouble;
+            return v == null ? 0m : (decimal)v.ValueDouble;
         }
 
         /// <summary>
@@ -420,8 +366,7 @@ namespace BlueScript {
         /// <returns></returns>
         public static string GetString(this List<Variable> vars, string name) {
             var v = vars.Get(name);
-            if (v == null) { return string.Empty; }
-            return v.ValueString;
+            return v == null ? string.Empty : v.ValueString;
         }
 
         /// <summary>
@@ -432,11 +377,8 @@ namespace BlueScript {
         /// <returns></returns>
         public static bool GetBool(this List<Variable> vars, string name) {
             var v = vars.Get(name);
-            if (v == null) { return false; }
-            return v.ValueBool;
+            return v != null && v.ValueBool;
         }
-
-
 
         /// <summary>
         /// Erstellt bei Bedarf eine neue Variable und setzt den Wert und auch ReadOnly
@@ -476,7 +418,6 @@ namespace BlueScript {
             v.Readonly = true;
         }
 
-
         /// <summary>
         /// Erstellt bei Bedarf eine neue Variable und setzt den Wert und auch ReadOnly
         /// </summary>
@@ -496,7 +437,6 @@ namespace BlueScript {
             v.Readonly = true;
         }
 
-
         /// <summary>
         /// Erstellt bei Bedarf eine neue Variable und setzt den Wert und auch ReadOnly
         /// </summary>
@@ -513,11 +453,7 @@ namespace BlueScript {
             v.Readonly = false; // sonst werden keine Daten geschrieben
             v.Type = enVariableDataType.Bool;
 
-            if (value) {
-                v.ValueString = "true";
-            } else {
-                v.ValueString = "false";
-            }
+            v.ValueString = value ? "true" : "false";
             v.Readonly = true;
         }
 
@@ -527,7 +463,6 @@ namespace BlueScript {
                 if (thisv.SystemVariable && thisv.Name.ToUpper() == "*" + name.ToUpper()) {
                     return thisv;
                 }
-
             }
             return null;
         }

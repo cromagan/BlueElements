@@ -45,7 +45,6 @@ namespace BlueScript {
                 st = 0;
             }
 
-
             if (st + en > attvar.Attributes[0].ValueString.Length) {
                 en = attvar.Attributes[0].ValueString.Length - st;
             }

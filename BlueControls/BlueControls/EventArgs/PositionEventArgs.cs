@@ -20,7 +20,6 @@
 namespace BlueControls.EventArgs {
     public class PositionEventArgs : System.EventArgs {
 
-
         public PositionEventArgs(int x, int y) {
             X = x;
             Y = y;
@@ -28,6 +27,5 @@ namespace BlueControls.EventArgs {
 
         public int X { get; set; }
         public int Y { get; set; }
-
     }
 }

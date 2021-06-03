@@ -41,11 +41,9 @@ namespace BlueControls.Controls {
             DrawHeight = 0;
             CaptionPos = Rectangle.Empty;
         }
-
     }
 
     public static class clsRowDrawDataExtensions {
-
 
         public static clsRowDrawData Get(this List<clsRowDrawData> l, RowItem row) {
 

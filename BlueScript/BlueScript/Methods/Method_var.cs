@@ -50,7 +50,6 @@ namespace BlueScript {
 
             s.Variablen.Add(new Variable(bs[0]));
 
-
             var r = new Method_BerechneVariable();
             var f = r.CanDo(infos.AttributText + ";", 0, false, s);
 
@@ -63,14 +62,11 @@ namespace BlueScript {
                 return new strDoItFeedback("Falsch gesetztes Semikolon");
             }
 
-
             var f2 = r.DoIt(f, s);
 
-            if (!string.IsNullOrEmpty(f2.ErrorMessage)) {
-                return new strDoItFeedback("Berechung fehlerhaft: " + f2.ErrorMessage);
-            }
-
-            return new strDoItFeedback();
+            return !string.IsNullOrEmpty(f2.ErrorMessage)
+                ? new strDoItFeedback("Berechung fehlerhaft: " + f2.ErrorMessage)
+                : new strDoItFeedback();
         }
     }
 }

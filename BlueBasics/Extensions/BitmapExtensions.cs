@@ -106,9 +106,7 @@ namespace BlueBasics {
             }
 
             bool IsWhite(int x, int y) {
-                if (x < 0 || y < 0) { return true; }
-                if (x >= pic.Width || y >= pic.Height) { return true; }
-                return pic.GetPixel(x, y).IsNearWhite(0.9);
+                return x < 0 || y < 0 || x >= pic.Width || y >= pic.Height || pic.GetPixel(x, y).IsNearWhite(0.9);
             }
         }
 
@@ -197,9 +195,9 @@ namespace BlueBasics {
             if (_Pic == null) { return pa; }
 
             var x = 0;
-            var Y = 0;
             var ExitNow = false;
 
+            int Y;
             while (true) {
                 for (Y = 0; Y < _Pic.Height; Y++) {
                     if (!_Pic.GetPixel(x, Y).IsNearWhite(minBrightness)) {
@@ -403,10 +401,10 @@ namespace BlueBasics {
                     var targetRow = (byte*)targetData.Scan0 + (y * targetData.Stride);
 
                     for (var x = 0; x < source.Width; ++x) {
-                        var b = sourceRow[x * pixelSize + 0];
-                        var g = sourceRow[x * pixelSize + 1];
-                        var r = sourceRow[x * pixelSize + 2];
-                        var a = sourceRow[x * pixelSize + 3];
+                        var b = sourceRow[(x * pixelSize) + 0];
+                        var g = sourceRow[(x * pixelSize) + 1];
+                        var r = sourceRow[(x * pixelSize) + 2];
+                        var a = sourceRow[(x * pixelSize) + 3];
 
                         if (toReplace.R == r && toReplace.G == g && toReplace.B == b && toReplace.A == a) {
                             r = replacement.R;
@@ -415,10 +413,10 @@ namespace BlueBasics {
                             a = replacement.A;
                         }
 
-                        targetRow[x * pixelSize + 0] = b;
-                        targetRow[x * pixelSize + 1] = g;
-                        targetRow[x * pixelSize + 2] = r;
-                        targetRow[x * pixelSize + 3] = a;
+                        targetRow[(x * pixelSize) + 0] = b;
+                        targetRow[(x * pixelSize) + 1] = g;
+                        targetRow[(x * pixelSize) + 2] = r;
+                        targetRow[(x * pixelSize) + 3] = a;
                     }
                 }
             } finally {
@@ -470,7 +468,7 @@ namespace BlueBasics {
             if (gamma == 0) { gamma = Convert.ToSingle(gamma + 1.0E-45); }
 
             // Zur korrekten Darstellung:
-            var Diff = brightness / 2 - contrast / 2;
+            var Diff = (brightness / 2) - (contrast / 2);
 
             // ColorMatrix erstellen
             var Matrix = new ColorMatrix(new[]
@@ -494,12 +492,10 @@ namespace BlueBasics {
                 ImageAttr.SetGamma(gamma);
 
                 // Graphics-Objekt von NewBmp erstellen
-                using (var NewBmpGra = Graphics.FromImage(NewBmp)) {
-                    // InBitmap in das Graphics-Objekt zeichnen
-                    NewBmpGra.DrawImage(inBitmap, new Rectangle(0, 0, inBitmap.Width, inBitmap.Height), 0, 0, inBitmap.Width, inBitmap.Height, GraphicsUnit.Pixel, ImageAttr);
+                using var NewBmpGra = Graphics.FromImage(NewBmp);                     // InBitmap in das Graphics-Objekt zeichnen
+                NewBmpGra.DrawImage(inBitmap, new Rectangle(0, 0, inBitmap.Width, inBitmap.Height), 0, 0, inBitmap.Width, inBitmap.Height, GraphicsUnit.Pixel, ImageAttr);
 
-                    // Graphics-Objekt löschen
-                }
+                // Graphics-Objekt löschen
 
                 // ImageAttribute-Objekt löschen
             }
@@ -510,7 +506,7 @@ namespace BlueBasics {
         public static void FillCircle(this Bitmap bMP, Color c, int x, int y, int r) {
             for (var adx = -r; adx <= r; adx++) {
                 for (var ady = -r; ady <= r; ady++) {
-                    var d = Math.Sqrt(Convert.ToDouble(adx * adx + ady * ady)) - 0.5;
+                    var d = Math.Sqrt(Convert.ToDouble((adx * adx) + (ady * ady))) - 0.5;
 
                     var px = x + adx;
                     var py = y + ady;
@@ -526,105 +522,105 @@ namespace BlueBasics {
 
             switch (blurType) {
                 case BlurType.Mean3x3: {
-                    resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.Mean3x3, 1.0 / 9.0, 0);
-                }
+                        resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.Mean3x3, 1.0 / 9.0, 0);
+                    }
 
-                break;
+                    break;
                 case BlurType.Mean5x5: {
-                    resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.Mean5x5, 1.0 / 25.0, 0);
-                }
+                        resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.Mean5x5, 1.0 / 25.0, 0);
+                    }
 
-                break;
+                    break;
                 case BlurType.Mean7x7: {
-                    resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.Mean7x7, 1.0 / 49.0, 0);
-                }
+                        resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.Mean7x7, 1.0 / 49.0, 0);
+                    }
 
-                break;
+                    break;
                 case BlurType.Mean9x9: {
-                    resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.Mean9x9, 1.0 / 81.0, 0);
-                }
+                        resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.Mean9x9, 1.0 / 81.0, 0);
+                    }
 
-                break;
+                    break;
                 case BlurType.GaussianBlur3x3: {
-                    resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.GaussianBlur3x3, 1.0 / 16.0, 0);
-                }
+                        resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.GaussianBlur3x3, 1.0 / 16.0, 0);
+                    }
 
-                break;
+                    break;
                 case BlurType.GaussianBlur5x5: {
-                    resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.GaussianBlur5x5, 1.0 / 159.0, 0);
-                }
+                        resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.GaussianBlur5x5, 1.0 / 159.0, 0);
+                    }
 
-                break;
+                    break;
                 case BlurType.MotionBlur5x5: {
-                    resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.MotionBlur5x5, 1.0 / 10.0, 0);
-                }
+                        resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.MotionBlur5x5, 1.0 / 10.0, 0);
+                    }
 
-                break;
+                    break;
                 case BlurType.MotionBlur5x5At45Degrees: {
-                    resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.MotionBlur5x5At45Degrees, 1.0 / 5.0, 0);
-                }
+                        resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.MotionBlur5x5At45Degrees, 1.0 / 5.0, 0);
+                    }
 
-                break;
+                    break;
                 case BlurType.MotionBlur5x5At135Degrees: {
-                    resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.MotionBlur5x5At135Degrees, 1.0 / 5.0, 0);
-                }
+                        resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.MotionBlur5x5At135Degrees, 1.0 / 5.0, 0);
+                    }
 
-                break;
+                    break;
                 case BlurType.MotionBlur7x7: {
-                    resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.MotionBlur7x7, 1.0 / 14.0, 0);
-                }
+                        resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.MotionBlur7x7, 1.0 / 14.0, 0);
+                    }
 
-                break;
+                    break;
                 case BlurType.MotionBlur7x7At45Degrees: {
-                    resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.MotionBlur7x7At45Degrees, 1.0 / 7.0, 0);
-                }
+                        resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.MotionBlur7x7At45Degrees, 1.0 / 7.0, 0);
+                    }
 
-                break;
+                    break;
                 case BlurType.MotionBlur7x7At135Degrees: {
-                    resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.MotionBlur7x7At135Degrees, 1.0 / 7.0, 0);
-                }
+                        resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.MotionBlur7x7At135Degrees, 1.0 / 7.0, 0);
+                    }
 
-                break;
+                    break;
                 case BlurType.MotionBlur9x9: {
-                    resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.MotionBlur9x9, 1.0 / 18.0, 0);
-                }
+                        resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.MotionBlur9x9, 1.0 / 18.0, 0);
+                    }
 
-                break;
+                    break;
                 case BlurType.MotionBlur9x9At45Degrees: {
-                    resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.MotionBlur9x9At45Degrees, 1.0 / 9.0, 0);
-                }
+                        resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.MotionBlur9x9At45Degrees, 1.0 / 9.0, 0);
+                    }
 
-                break;
+                    break;
                 case BlurType.MotionBlur9x9At135Degrees: {
-                    resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.MotionBlur9x9At135Degrees, 1.0 / 9.0, 0);
-                }
+                        resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.MotionBlur9x9At135Degrees, 1.0 / 9.0, 0);
+                    }
 
-                break;
+                    break;
                 case BlurType.Median3x3: {
-                    resultBitmap = sourceBitmap.MedianFilter(3);
-                }
+                        resultBitmap = sourceBitmap.MedianFilter(3);
+                    }
 
-                break;
+                    break;
                 case BlurType.Median5x5: {
-                    resultBitmap = sourceBitmap.MedianFilter(5);
-                }
+                        resultBitmap = sourceBitmap.MedianFilter(5);
+                    }
 
-                break;
+                    break;
                 case BlurType.Median7x7: {
-                    resultBitmap = sourceBitmap.MedianFilter(7);
-                }
+                        resultBitmap = sourceBitmap.MedianFilter(7);
+                    }
 
-                break;
+                    break;
                 case BlurType.Median9x9: {
-                    resultBitmap = sourceBitmap.MedianFilter(9);
-                }
+                        resultBitmap = sourceBitmap.MedianFilter(9);
+                    }
 
-                break;
+                    break;
                 case BlurType.Median11x11: {
-                    resultBitmap = sourceBitmap.MedianFilter(11);
-                }
+                        resultBitmap = sourceBitmap.MedianFilter(11);
+                    }
 
-                break;
+                    break;
             }
 
             return resultBitmap;
@@ -646,23 +642,17 @@ namespace BlueBasics {
             sourceBitmap.UnlockBits(sourceData);
 
             var filterOffset = (matrixSize - 1) / 2;
-            var calcOffset = 0;
-
-            var byteOffset = 0;
-
             var neighbourPixels = new List<int>();
             byte[] middlePixel;
 
             for (var offsetY = filterOffset; offsetY < sourceBitmap.Height - filterOffset; offsetY++) {
                 for (var offsetX = filterOffset; offsetX < sourceBitmap.Width - filterOffset; offsetX++) {
-                    byteOffset = offsetY * sourceData.Stride + offsetX * 4;
-
+                    var byteOffset = (offsetY * sourceData.Stride) + (offsetX * 4);
                     neighbourPixels.Clear();
 
                     for (var filterY = -filterOffset; filterY <= filterOffset; filterY++) {
                         for (var filterX = -filterOffset; filterX <= filterOffset; filterX++) {
-                            calcOffset = byteOffset + (filterX * 4) + (filterY * sourceData.Stride);
-
+                            var calcOffset = byteOffset + (filterX * 4) + (filterY * sourceData.Stride);
                             neighbourPixels.Add(BitConverter.ToInt32(pixelBuffer, calcOffset));
                         }
                     }
@@ -697,31 +687,19 @@ namespace BlueBasics {
 
             Marshal.Copy(sourceData.Scan0, pixelBuffer, 0, pixelBuffer.Length);
             sourceBitmap.UnlockBits(sourceData);
-
-            var blue = 0.0;
-            var green = 0.0;
-            var red = 0.0;
-
             var filterWidth = filterMatrix.GetLength(1);
             // var filterHeight = filterMatrix.GetLength(0);
 
             var filterOffset = (filterWidth - 1) / 2;
-            var calcOffset = 0;
-
-            var byteOffset = 0;
-
             for (var offsetY = filterOffset; offsetY < sourceBitmap.Height - filterOffset; offsetY++) {
                 for (var offsetX = filterOffset; offsetX < sourceBitmap.Width - filterOffset; offsetX++) {
-                    blue = 0;
-                    green = 0;
-                    red = 0;
-
-                    byteOffset = offsetY * sourceData.Stride + offsetX * 4;
-
+                    double blue = 0;
+                    double green = 0;
+                    double red = 0;
+                    var byteOffset = (offsetY * sourceData.Stride) + (offsetX * 4);
                     for (var filterY = -filterOffset; filterY <= filterOffset; filterY++) {
                         for (var filterX = -filterOffset; filterX <= filterOffset; filterX++) {
-                            calcOffset = byteOffset + (filterX * 4) + (filterY * sourceData.Stride);
-
+                            var calcOffset = byteOffset + (filterX * 4) + (filterY * sourceData.Stride);
                             blue += pixelBuffer[calcOffset] * filterMatrix[filterY + filterOffset, filterX + filterOffset];
 
                             green += pixelBuffer[calcOffset + 1] * filterMatrix[filterY + filterOffset, filterX + filterOffset];
@@ -730,9 +708,9 @@ namespace BlueBasics {
                         }
                     }
 
-                    blue = factor * blue + bias;
-                    green = factor * green + bias;
-                    red = factor * red + bias;
+                    blue = (factor * blue) + bias;
+                    green = (factor * green) + bias;
+                    red = (factor * red) + bias;
 
                     blue = blue > 255 ? 255 : (blue < 0 ? 0 : blue);
 

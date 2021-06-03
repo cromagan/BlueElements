@@ -28,7 +28,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
-using static BlueBasics.FileOperations;
 
 namespace BlueControls.ItemCollection {
     public class ItemCollectionPad : ListExt<BasicPadItem> {
@@ -45,12 +44,9 @@ namespace BlueControls.ItemCollection {
         public PointM P_rRU;
         public PointM P_rRO;
 
-
         private enSnapMode _SnapMode = enSnapMode.SnapToGrid;
         private float _GridShow = 10;
         private float _Gridsnap = 1;
-
-
 
         public string Caption = string.Empty;
 
@@ -61,17 +57,12 @@ namespace BlueControls.ItemCollection {
         /// </summary>
         private readonly int IDCount = 0;
 
-
-
-
         #endregion
 
         public bool IsParsing { get; private set; }
 
         [DefaultValue(true)]
         public bool IsSaved { get; set; }
-
-
 
         [DefaultValue(false)]
         public enSnapMode SnapMode {
@@ -83,8 +74,6 @@ namespace BlueControls.ItemCollection {
                 CheckGrid();
             }
         }
-
-
 
         [DefaultValue(10.0)]
         public float GridShow {
@@ -110,7 +99,6 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-
         public Color BackColor { get; set; } = Color.White;
 
         public RowItem SheetStyle {
@@ -135,8 +123,6 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-
-
         public SizeF SheetSizeInMM {
             get => _SheetSizeInMM;
             set {
@@ -154,8 +140,6 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-
-
         #region  Construktor + Initialize 
 
         public ItemCollectionPad() : base() {
@@ -164,7 +148,6 @@ namespace BlueControls.ItemCollection {
 
             SheetSizeInMM = Size.Empty;
             RandinMM = System.Windows.Forms.Padding.Empty;
-
 
             Caption = "";
 
@@ -177,9 +160,7 @@ namespace BlueControls.ItemCollection {
             _SheetStyleScale = 1.0m;
 
             if (Skin.StyleDB != null) { _SheetStyle = Skin.StyleDB.Row.First(); }
-
         }
-
 
         public ItemCollectionPad(string layoutID, Database database, int rowkey) : this(database.Layouts[database.Layouts.LayoutIDToIndex(layoutID)], string.Empty) {
 
@@ -187,8 +168,6 @@ namespace BlueControls.ItemCollection {
             ResetVariables();
             ParseVariable(database.Row.SearchByKey(rowkey));
         }
-
-
 
         /// <summary>
         /// 
@@ -200,7 +179,6 @@ namespace BlueControls.ItemCollection {
 
             if (string.IsNullOrEmpty(ToParse) || ToParse.Length < 3) { return; }
             if (ToParse.Substring(0, 1) != "{") { return; }// Alte Daten gehen eben verloren.
-
 
             ID = useThisID;
 
@@ -228,7 +206,6 @@ namespace BlueControls.ItemCollection {
                     case "caption":
                         Caption = pair.Value.FromNonCritical();
                         break;
-
 
                     case "backcolor":
                         BackColor = Color.FromArgb(int.Parse(pair.Value));
@@ -292,8 +269,6 @@ namespace BlueControls.ItemCollection {
                         break;
                 }
             }
-
-
         }
 
         private void ParseItems(string ToParse) {
@@ -378,19 +353,12 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-
-
-
-
-
         #endregion
-
 
         #region  Event-Deklarationen + Delegaten 
 
         public event EventHandler DoInvalidate;
         #endregion
-
 
         internal void InDenVordergrund(BasicPadItem ThisItem) {
             if (IndexOf(ThisItem) == Count - 1) { return; }
@@ -418,7 +386,6 @@ namespace BlueControls.ItemCollection {
             OnDoInvalidate();
         }
 
-
         //public void RecomputePointAndRelations()
         //{
         //    foreach (var thisItem in this)
@@ -426,7 +393,6 @@ namespace BlueControls.ItemCollection {
         //        thisItem?.GenerateInternalRelation();
         //    }
         //}
-
 
         public void Swap(BasicPadItem Nr1, BasicPadItem Nr2) {
             var g1 = Nr1.Gruppenzugehörigkeit;
@@ -441,7 +407,6 @@ namespace BlueControls.ItemCollection {
             Nr2.Gruppenzugehörigkeit = g2;
             OnDoInvalidate();
         }
-
 
         #region  Standard-Such-Properties 
 
@@ -499,18 +464,11 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-
-
-
         #endregion
-
 
         public void OnDoInvalidate() {
             DoInvalidate?.Invoke(this, System.EventArgs.Empty);
         }
-
-
-
 
         protected override void OnItemAdded(BasicPadItem item) {
             if (item == null) {
@@ -525,7 +483,6 @@ namespace BlueControls.ItemCollection {
             item.PointMoved(null);
 
             IsSaved = false;
-
 
             item.Changed += Item_Changed;
 
@@ -549,7 +506,6 @@ namespace BlueControls.ItemCollection {
             OnDoInvalidate();
         }
 
-
         public void Remove(string internalname) {
             Remove(this[internalname]);
         }
@@ -561,7 +517,6 @@ namespace BlueControls.ItemCollection {
 
             if (string.IsNullOrEmpty(item.Gruppenzugehörigkeit)) { return; }
 
-
             foreach (var ThisToo in this) {
                 if (item.Gruppenzugehörigkeit.ToLower() == ThisToo.Gruppenzugehörigkeit?.ToLower()) {
                     Remove(ThisToo);
@@ -570,7 +525,6 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-
         public RectangleM MaximumBounds(List<BasicPadItem> ZoomItems) {
             var x1 = decimal.MaxValue;
             var y1 = decimal.MaxValue;
@@ -578,7 +532,6 @@ namespace BlueControls.ItemCollection {
             var y2 = decimal.MinValue;
 
             var Done = false;
-
 
             foreach (var ThisItem in this) {
                 if (ThisItem != null) {
@@ -596,12 +549,8 @@ namespace BlueControls.ItemCollection {
                 }
             }
 
-
-            if (!Done) { return new RectangleM(); }
-
-            return new RectangleM(x1, y1, x2 - x1, y2 - y1);
+            return !Done ? new RectangleM() : new RectangleM(x1, y1, x2 - x1, y2 - y1);
         }
-
 
         private void GenPoints() {
 
@@ -622,7 +571,6 @@ namespace BlueControls.ItemCollection {
 
                 return;
             }
-
 
             if (P_rLO == null) {
                 P_rLO = new PointM(this, "Druckbereich LO", 0, 0);
@@ -648,9 +596,7 @@ namespace BlueControls.ItemCollection {
 
         private void CheckGrid() {
 
-
             // Todo: bei erschiedenen SnapModes muss hier evtl. was gemacht werden.
-
 
         }
 
@@ -659,7 +605,6 @@ namespace BlueControls.ItemCollection {
             base.OnItemRemoving(item);
             OnDoInvalidate();
         }
-
 
         protected override void OnItemRemoved() {
             base.OnItemRemoved();
@@ -672,8 +617,6 @@ namespace BlueControls.ItemCollection {
             OnDoInvalidate();
         }
 
-
-
         public new string ToString() {
 
             var t = "{";
@@ -685,7 +628,6 @@ namespace BlueControls.ItemCollection {
             if (SheetStyle != null) { t = t + "Style=" + SheetStyle.CellFirstString().ToNonCritical() + ", "; }
 
             if (SheetStyleScale < 0.1m) { SheetStyleScale = 1.0m; }
-
 
             t = t + "BackColor=" + BackColor.ToArgb() + ", ";
 
@@ -700,7 +642,6 @@ namespace BlueControls.ItemCollection {
 
             t += "Items={";
 
-
             foreach (var Thisitem in this) {
                 if (Thisitem != null) {
                     t = t + "Item=" + Thisitem.ToString() + ", ";
@@ -709,7 +650,6 @@ namespace BlueControls.ItemCollection {
 
             t = t.TrimEnd(", ") + "}, ";
 
-
             t = t + "SnapMode=" + ((int)_SnapMode).ToString() + ", ";
             t = t + "GridShow=" + _GridShow + ", ";
             t = t + "GridSnap=" + _Gridsnap + ", ";
@@ -717,8 +657,6 @@ namespace BlueControls.ItemCollection {
             return t.TrimEnd(", ") + "}";
 
         }
-
-
 
         public Bitmap ToBitmap(decimal scale) {
             var r = MaxBounds(null);
@@ -738,10 +676,7 @@ namespace BlueControls.ItemCollection {
                 }
             } while (true);
 
-
-
             var I = new Bitmap((int)(r.Width * scale), (int)(r.Height * scale));
-
 
             using (var gr = Graphics.FromImage(I)) {
                 gr.Clear(BackColor);
@@ -749,17 +684,14 @@ namespace BlueControls.ItemCollection {
                 if (!Draw(gr, scale, r.Left * scale, r.Top * scale, Size.Empty, true, null)) {
                     return ToBitmap(scale);
                 }
-
             }
             return I;
         }
 
         public bool Draw(Graphics gr, decimal zoom, decimal shiftX, decimal shiftY, Size sizeOfParentControl, bool forPrinting, List<BasicPadItem> visibleItems) {
 
-
             try {
                 if (SheetStyle == null || SheetStyleScale < 0.1m) { return true; }
-
 
                 foreach (var thisItem in this) {
                     if (thisItem != null) {
@@ -775,10 +707,7 @@ namespace BlueControls.ItemCollection {
                 modAllgemein.CollectGarbage();
                 return false;
             }
-
-
         }
-
 
         protected RectangleM MaxBounds() {
             return MaxBounds(null);
@@ -786,18 +715,11 @@ namespace BlueControls.ItemCollection {
 
         internal RectangleM MaxBounds(List<BasicPadItem> ZoomItems) {
 
-            RectangleM r;
-            if (Count == 0) {
-                r = new RectangleM(0, 0, 0, 0);
-            } else {
-                r = MaximumBounds(ZoomItems);
-            }
-
+            var r = Count == 0 ? new RectangleM(0, 0, 0, 0) : MaximumBounds(ZoomItems);
             if (SheetSizeInMM.Width > 0 && SheetSizeInMM.Height > 0) {
 
                 var X1 = Math.Min(r.Left, 0);
                 var y1 = Math.Min(r.Top, 0);
-
 
                 var x2 = Math.Max(r.Right, modConverter.mmToPixel((decimal)SheetSizeInMM.Width, ItemCollectionPad.DPI));
                 var y2 = Math.Max(r.Bottom, modConverter.mmToPixel((decimal)SheetSizeInMM.Height, ItemCollectionPad.DPI));
@@ -807,9 +729,7 @@ namespace BlueControls.ItemCollection {
 
             return r;
 
-
         }
-
 
         public bool ParseVariable(BlueScript.Variable variable) {
 
@@ -827,16 +747,14 @@ namespace BlueControls.ItemCollection {
 
             if (row != null) {
 
-                (bool didSuccesfullyCheck, string error, BlueScript.Script script) = row.DoAutomatic(false, "export");
+                (var didSuccesfullyCheck, var error, var script) = row.DoAutomatic(false, "export");
                 foreach (var thisV in script.Variablen) {
                     ParseVariable(thisV);
                 }
             }
-
         }
 
         //private void ParseVariable(string VariableName, ColumnItem Column, RowItem Row) {
-
 
         //    switch (Column.Format) {
         //        case enDataFormat.Text:
@@ -865,7 +783,6 @@ namespace BlueControls.ItemCollection {
         //            }
         //            break;
 
-
         //        //case enDataFormat.Relation:
         //        //    ParseVariable(VariableName, enValueType.Unknown, "Nicht implementiert");
         //        //    break;
@@ -877,9 +794,6 @@ namespace BlueControls.ItemCollection {
         //    }
         //}
 
-
-
-
         public bool ResetVariables() {
             var did = false;
 
@@ -889,32 +803,22 @@ namespace BlueControls.ItemCollection {
                 }
             }
 
-
             if (did) { OnDoInvalidate(); }
             return did;
 
         }
 
-
-
-
         internal Rectangle DruckbereichRect() {
-            if (P_rLO == null) { return new Rectangle(0, 0, 0, 0); }
-            return new Rectangle((int)P_rLO.X, (int)P_rLO.Y, (int)(P_rRU.X - P_rLO.X), (int)(P_rRU.Y - P_rLO.Y));
+            return P_rLO == null
+                ? new Rectangle(0, 0, 0, 0)
+                : new Rectangle((int)P_rLO.X, (int)P_rLO.Y, (int)(P_rRU.X - P_rLO.X), (int)(P_rRU.Y - P_rLO.Y));
         }
-
-
-
-
-
-
 
         public void SaveAsBitmap(string filename) {
 
             var i = ToBitmap(1);
 
             if (i == null) { return; }
-
 
             switch (filename.FileSuffix().ToUpper()) {
 
@@ -936,7 +840,5 @@ namespace BlueControls.ItemCollection {
                     return;
             }
         }
-
-
     }
 }

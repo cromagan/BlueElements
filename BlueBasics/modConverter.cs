@@ -29,8 +29,8 @@ using static BlueBasics.FileOperations;
 namespace BlueBasics {
     public static class modConverter {
         #region  Konvertier-Routinen
-        private static readonly string SerialNr2Path_LastSearch = string.Empty;
-        private static readonly string SerialNr2Path_LastErgebnis = string.Empty;
+        //private static readonly string SerialNr2Path_LastSearch = string.Empty;
+        //private static readonly string SerialNr2Path_LastErgebnis = string.Empty;
 
         public static string ByteToBin8(byte b) {
             var x = Convert.ToString(b, 2);
@@ -77,10 +77,9 @@ namespace BlueBasics {
 
             if (bMP.PixelFormat != PixelFormat.Format32bppPArgb) { bMP = Bitmap_ChangePixelFormat(bMP); }
 
-            string base64 = null;
             var memory = new MemoryStream();
             bMP.Save(memory, bFormat);
-            base64 = Convert.ToBase64String(memory.ToArray());
+            var base64 = Convert.ToBase64String(memory.ToArray());
             memory.Close();
             return base64;
         }
@@ -97,11 +96,10 @@ namespace BlueBasics {
         }
 
         public static byte[] FileToByte(string dateiname) {
-            byte[] b = null;
             var obFi = new FileStream(dateiname, FileMode.Open, FileAccess.Read);
 
             var r = new BinaryReader(obFi);
-            b = r.ReadBytes((int)new FileInfo(dateiname).Length);
+            var b = r.ReadBytes((int)new FileInfo(dateiname).Length);
 
             r.Close();
             r.Dispose();
@@ -144,8 +142,7 @@ namespace BlueBasics {
         }
 
         public static string BitmapToStringUnicode(Bitmap bMP, ImageFormat format) {
-            if (bMP == null) { return string.Empty; }
-            return new string(Encoding.Unicode.GetChars(BitmapToByte(bMP, format)));
+            return bMP == null ? string.Empty : new string(Encoding.Unicode.GetChars(BitmapToByte(bMP, format)));
         }
 
         public static Bitmap ByteToBitmap(byte[] value) {
@@ -171,7 +168,7 @@ namespace BlueBasics {
         // }
 
         public static void CartesianToPolar(PointF ko, ref double r, ref double win) {
-            r = Math.Sqrt(ko.X * ko.X + ko.Y * ko.Y);
+            r = Math.Sqrt((ko.X * ko.X) + (ko.Y * ko.Y));
             win = Convert.ToDouble(Geometry.Winkel(0M, 0M, (decimal)ko.X, (decimal)ko.Y));
         }
 
@@ -346,19 +343,17 @@ namespace BlueBasics {
 
         public static bool DateTimeTryParse(string s, out DateTime result) {
             // https://docs.microsoft.com/de-de/dotnet/standard/base-types/standard-date-and-time-format-strings?view=netframework-4.8
-            if (DateTime.TryParseExact(s, Constants.Format_Date5, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)) { return true; }
-            if (DateTime.TryParseExact(s, Constants.Format_Date6, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)) { return true; }
-            if (DateTime.TryParseExact(s, "dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)) { return true; }
-            if (DateTime.TryParseExact(s, "dd.MM.yyyy H:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)) { return true; }
-            if (DateTime.TryParseExact(s, "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)) { return true; }
-            if (DateTime.TryParseExact(s, Constants.Format_Date2, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)) { return true; }
-            if (DateTime.TryParseExact(s, "MM/dd/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)) { return true; }
-            if (DateTime.TryParseExact(s, "dd.MM.yy", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)) { return true; }
-            if (DateTime.TryParseExact(s, "d.M.yy", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)) { return true; }
-            if (DateTime.TryParseExact(s, Constants.Format_Date7, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)) { return true; }
-            if (DateTime.TryParseExact(s, Constants.Format_Date, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)) { return true; }
-            return false;
+            return DateTime.TryParseExact(s, Constants.Format_Date5, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
+                    || DateTime.TryParseExact(s, Constants.Format_Date6, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
+                    || DateTime.TryParseExact(s, "dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
+                    || DateTime.TryParseExact(s, "dd.MM.yyyy H:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
+                    || DateTime.TryParseExact(s, "MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
+                    || DateTime.TryParseExact(s, Constants.Format_Date2, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
+                    || DateTime.TryParseExact(s, "MM/dd/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
+                    || DateTime.TryParseExact(s, "dd.MM.yy", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
+                    || DateTime.TryParseExact(s, "d.M.yy", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
+                    || DateTime.TryParseExact(s, Constants.Format_Date7, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
+                    || DateTime.TryParseExact(s, Constants.Format_Date, CultureInfo.InvariantCulture, DateTimeStyles.None, out result);
         }
-
     }
 }

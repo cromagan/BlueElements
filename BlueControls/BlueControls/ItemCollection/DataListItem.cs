@@ -29,7 +29,6 @@ namespace BlueControls.ItemCollection {
     public class DataListItem : BasicListItem {
         #region  Variablen-Deklarationen 
 
-
         private byte[] _bin;
         private string _caption;
         private List<string> _captiontmp = new();
@@ -46,11 +45,9 @@ namespace BlueControls.ItemCollection {
 
         #endregion
 
-
         #region  Event-Deklarationen + Delegaten 
 
         #endregion
-
 
         #region  Construktor + Initialize 
 
@@ -65,7 +62,6 @@ namespace BlueControls.ItemCollection {
             _overlays.Clear();
         }
 
-
         public DataListItem(string Filename, string internalname, string caption, string encryptionKey) : base(internalname) {
 
             _caption = caption;
@@ -79,14 +75,9 @@ namespace BlueControls.ItemCollection {
             _overlays.Clear();
         }
 
-
-
-
         #endregion
 
-
         #region  Properties 
-
 
         public byte[] Bin {
             get {
@@ -137,11 +128,7 @@ namespace BlueControls.ItemCollection {
 
         public override string QuickInfo => string.Empty;
 
-
         #endregion
-
-
-
 
         protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, bool Translate) {
 
@@ -157,26 +144,22 @@ namespace BlueControls.ItemCollection {
 
             if (!string.IsNullOrEmpty(_caption) && _captiontmp.Count == 0) { _captiontmp = _caption.SplitByWidth(DCoordinates.Width, _captionlines, enDesign.Item_Listbox, enStates.Standard); }
 
-
             var binim = QuickImage.Get(_filename.FileType(), 48).BMP;
-
 
             if (_bin != null) {
                 AreaOfWholeImage = new RectangleF(0, 0, binim.Width, binim.Height);
-                var scale = (float)Math.Min((DCoordinates.Width - _padding * 2) / (double)binim.Width,
-                                              (DCoordinates.Height - _padding * 2 - _captionlines * ConstMY) / (double)binim.Height);
+                var scale = (float)Math.Min((DCoordinates.Width - (_padding * 2)) / (double)binim.Width,
+                                              (DCoordinates.Height - (_padding * 2) - (_captionlines * ConstMY)) / (double)binim.Height);
 
-                ScaledImagePosition = new RectangleF((DCoordinates.Width - binim.Width * scale) / 2 + DCoordinates.Left,
-                                                     (DCoordinates.Height - binim.Height * scale) / 2 + DCoordinates.Top - _captionlines * ConstMY / 2,
+                ScaledImagePosition = new RectangleF(((DCoordinates.Width - (binim.Width * scale)) / 2) + DCoordinates.Left,
+                                                     ((DCoordinates.Height - (binim.Height * scale)) / 2) + DCoordinates.Top - (_captionlines * ConstMY / 2),
                                                     binim.Width * scale,
                                                     binim.Height * scale);
             }
 
-
             var trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
 
             ScaledImagePosition = new RectangleF(ScaledImagePosition.Left - trp.X, ScaledImagePosition.Top - trp.Y, ScaledImagePosition.Width, ScaledImagePosition.Height);
-
 
             GR.TranslateTransform(trp.X, trp.Y);
             if (_bin != null) { GR.DrawImage(binim, ScaledImagePosition, AreaOfWholeImage, GraphicsUnit.Pixel); }
@@ -187,22 +170,19 @@ namespace BlueControls.ItemCollection {
 
             if (!string.IsNullOrEmpty(_caption)) {
 
-
                 var c = _captiontmp.Count;
 
                 var Ausgl = (c - _captionlines) * ConstMY / 2;
 
-
                 foreach (var ThisCap in _captiontmp) {
                     c--;
                     var s = Skin.FormatedText_NeededSize(ThisCap, null, Skin.GetBlueFont(enDesign.Item_Listbox, vState), 16);
-                    var r = new Rectangle((int)(DCoordinates.Left + (DCoordinates.Width - s.Width) / 2.0), DCoordinates.Bottom - s.Height - 3, s.Width, s.Height);
+                    var r = new Rectangle((int)(DCoordinates.Left + ((DCoordinates.Width - s.Width) / 2.0)), DCoordinates.Bottom - s.Height - 3, s.Width, s.Height);
 
                     r.X -= trp.X;
                     r.Y -= trp.Y;
 
-                    r.Y = r.Y - ConstMY * c + Ausgl;
-
+                    r.Y = r.Y - (ConstMY * c) + Ausgl;
 
                     //r = new Rectangle(r.Left - trp.X, r.Top - trp.Y, r.Width, r.Height);
                     //GenericControl.Skin.Draw_Back(GR, enDesign.Item_Listbox_Unterschrift, vState, r, null, false);
@@ -212,18 +192,13 @@ namespace BlueControls.ItemCollection {
                 }
             }
 
-
             GR.TranslateTransform(-trp.X, -trp.Y);
             GR.ResetTransform();
-
 
             if (DrawBorderAndBack) {
                 Skin.Draw_Border(GR, itemdesign, vState, PositionModified);
             }
-
         }
-
-
 
         protected override Size ComputeSizeUntouchedForListBox() {
             return new Size(300, 300);
@@ -240,35 +215,25 @@ namespace BlueControls.ItemCollection {
 
                         _bin = modAllgemein.SimpleCrypt(_bin, _EncryptionKey, -1);
                     }
-
                 }
             } catch (Exception ex) {
                 Develop.DebugPrint(ex);
             }
         }
 
-
-
         public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) {
-            switch (style) {
-                case enBlueListBoxAppearance.FileSystem:
-                    return (110 + _captionlines * ConstMY);
-                default:
-                    return (int)(columnWidth * 0.8);
-            }
+            return style switch {
+                enBlueListBoxAppearance.FileSystem => 110 + (_captionlines * ConstMY),
+                _ => (int)(columnWidth * 0.8),
+            };
         }
-
-
 
         protected override string GetCompareKey() {
             return Internal;
         }
 
         public override bool FilterMatch(string FilterText) {
-            if (base.FilterMatch(FilterText)) { return true; }
-            if (Caption.ToUpper().Contains(FilterText.ToUpper())) { return true; }
-            if (_filename.ToUpper().Contains(FilterText.ToUpper())) { return true; }
-            return false;
+            return base.FilterMatch(FilterText) || Caption.ToUpper().Contains(FilterText.ToUpper()) || _filename.ToUpper().Contains(FilterText.ToUpper());
         }
     }
 }

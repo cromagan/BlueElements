@@ -100,17 +100,12 @@ namespace BlueBasics {
         /// <returns></returns>
         /// <remarks></remarks>
         public static string WinExeName(IntPtr handle) {
-            var l = 0;
             var buffer = string.Empty.PadRight(250);
-            l = GetWindowModuleFileName(handle, buffer, 250);
+            var l = GetWindowModuleFileName(handle, buffer, 250);
 
             if (l > 0) {
                 buffer = buffer.Substring(0, l);
-                if (buffer.Substring(buffer.Length - 1) == "\0") {
-                    return buffer.Substring(0, buffer.Length - 1);
-                }
-
-                return buffer;
+                return buffer.Substring(buffer.Length - 1) == "\0" ? buffer.Substring(0, buffer.Length - 1) : buffer;
             }
 
             return string.Empty;
@@ -127,12 +122,10 @@ namespace BlueBasics {
             //    Exit Sub
             // End If
 
-            var prid = 0;
-            var hParent = IntPtr.Zero;
             // Dim PridA As Integer
 
-            prid = 0;
-            hParent = GetAncestor(wDescr.MainWindowHandle);
+            var prid = 0;
+            var hParent = GetAncestor(wDescr.MainWindowHandle);
 
             GetWindowThreadProcessId(hParent, ref prid);
 
@@ -166,8 +159,8 @@ namespace BlueBasics {
         }
 
         public static IntPtr GetAncestor(IntPtr hWnd) {
-            var hParent = IntPtr.Zero;
             var hw = hWnd;
+            IntPtr hParent;
             do {
                 hParent = GetParent(hw);
                 if (hParent.ToInt32() != 0) { hw = hParent; }

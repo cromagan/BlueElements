@@ -25,7 +25,6 @@ namespace Skript.Enums {
         FalscherDatentyp = 1,
         AttributAnzahl = 2,
 
-
         /// <summary>
         /// Es ist eine Rechenformel / BoolscheOperation vorhanden und diese ist Fehgeschlagen
         /// </summary>
@@ -34,7 +33,5 @@ namespace Skript.Enums {
         VariableNichtGefunden = 4,
         VariableErwartet = 5
 
-
     }
-
 }

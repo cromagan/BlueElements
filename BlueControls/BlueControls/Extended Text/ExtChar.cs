@@ -35,24 +35,17 @@ namespace BlueControls {
         private SizeF _Size = SizeF.Empty;
         private int _Stufe = 4;
 
-
         //  public const int ImagesStart = 5000;
         public const char Top = (char)4;
         public const char StoreX = (char)5;
 
-
-
         #endregion
-
 
         #region  Event-Deklarationen + Delegaten 
 
         #endregion
 
-
         #region  Construktor + Initialize 
-
-
 
         internal ExtChar(char charcode, enDesign cDesign, enStates cState, BlueFont cFont, int Stufe, enMarkState cMarkState) {
             _Design = cDesign;
@@ -65,34 +58,21 @@ namespace BlueControls {
 
         #endregion
 
-
         #region  Properties 
 
         internal BlueFont Font { get; private set; } = null;
 
-
         public int Char => _Char;
-
-
 
         public SizeF Size {
             get {
 
                 if (!_Size.IsEmpty) { return _Size; }
 
-                if (Font == null) {
-                    _Size = new SizeF(0, 16);
-                } else if (_Char < 0) {
-                    _Size = Font.CharSize(0f);
-                } else {
-                    _Size = Font.CharSize(_Char);
-
-                }
-
+                _Size = Font == null ? new SizeF(0, 16) : _Char < 0 ? Font.CharSize(0f) : Font.CharSize(_Char);
                 return _Size;
             }
         }
-
 
         /// <summary>
         /// 
@@ -101,15 +81,11 @@ namespace BlueControls {
         /// <param name="drawingPos">Muss bereits Skaliert sein</param>
         /// <returns></returns>
         public bool IsVisible(float zoom, Point drawingPos, Rectangle drawingArea) {
-            if (drawingArea.Width < 1 && drawingArea.Height < 1) { return true; }
-
-            if (drawingArea.Width > 0 && Pos.X * zoom + drawingPos.X > drawingArea.Right) { return false; }
-            if (drawingArea.Height > 0 && Pos.Y * zoom + drawingPos.Y > drawingArea.Bottom) { return false; }
-
-            if ((Pos.X + Size.Width) * zoom + drawingPos.X < drawingArea.Left) { return false; }
-            if ((Pos.Y + Size.Height) * zoom + drawingPos.Y < drawingArea.Top) { return false; }
-
-            return true;
+            return (drawingArea.Width < 1 && drawingArea.Height < 1)
+                    || ((drawingArea.Width <= 0 || (Pos.X * zoom) + drawingPos.X <= drawingArea.Right)
+                    && (drawingArea.Height <= 0 || (Pos.Y * zoom) + drawingPos.Y <= drawingArea.Bottom)
+                    && ((Pos.X + Size.Width) * zoom) + drawingPos.X >= drawingArea.Left
+                    && ((Pos.Y + Size.Height) * zoom) + drawingPos.Y >= drawingArea.Top);
         }
 
         public enDesign Design {
@@ -120,7 +96,6 @@ namespace BlueControls {
             }
         }
 
-
         public enStates State {
             get => _State;
             set {
@@ -128,7 +103,6 @@ namespace BlueControls {
                 ChangeState(_Design, value, _Stufe);
             }
         }
-
 
         public enMarkState Marking { get; set; }
 
@@ -140,12 +114,7 @@ namespace BlueControls {
             }
         }
 
-
         #endregion
-
-
-
-
 
         private void ChangeState(enDesign vDesign, enStates vState, int vStufe) {
             if (vState == _State && vStufe == _Stufe && vDesign == _Design) { return; }
@@ -155,23 +124,14 @@ namespace BlueControls {
             _State = vState;
             _Stufe = vStufe;
 
-            if (vDesign == enDesign.Undefiniert || vState == enStates.Undefiniert) {
-                Font = null;
-            } else {
-                Font = Skin.GetBlueFont(vDesign, vState, vStufe);
-            }
+            Font = vDesign == enDesign.Undefiniert || vState == enStates.Undefiniert ? null : Skin.GetBlueFont(vDesign, vState, vStufe);
         }
 
-
         public bool isSpace() {
-            switch ((int)_Char) {
-                case 32:
-                case 0:
-                case 9:
-                    return true;
-                default:
-                    return false;
-            }
+            return (int)_Char switch {
+                32 or 0 or 9 => true,
+                _ => false,
+            };
         }
 
         public bool isPossibleLineBreak() {
@@ -183,24 +143,18 @@ namespace BlueControls {
         }
 
         public bool isLineBreak() {
-            switch ((int)_Char) {
-                case 11:
-                case 13:
-                case Top:
-                    return true;
-                default:
-                    return false;
-            }
+            return (int)_Char switch {
+                11 or 13 or Top => true,
+                _ => false,
+            };
         }
-
-
 
         public void Draw(Graphics GR, Point PosModificator, float czoom) {
 
             if (_Char < 20) { return; }
 
-            var DrawX = Pos.X * czoom + PosModificator.X;
-            var DrawY = Pos.Y * czoom + PosModificator.Y;
+            var DrawX = (Pos.X * czoom) + PosModificator.X;
+            var DrawY = (Pos.Y * czoom) + PosModificator.Y;
 
             Font f = null;
 
@@ -209,10 +163,8 @@ namespace BlueControls {
 
             var IsCap = false;
 
-
             if (_Char < (int)enASCIIKey.ImageStart) {
                 GR.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
-
 
                 var c = _Char;
                 if (Font.Kapitälchen && c != char.ToUpper(c)) {
@@ -225,13 +177,12 @@ namespace BlueControls {
                     c = char.ToLower(c);
                 }
                 if (Font.Underline) {
-                    GR.DrawLine(Font.Pen(czoom), DrawX, (int)(DrawY + Font.Oberlänge(czoom) + (Font.Pen(1f).Width + 1) * czoom + 0.5), DrawX + (1 + Size.Width) * czoom, (int)(DrawY + Font.Oberlänge(czoom) + (Font.Pen(1f).Width + 1) * czoom + 0.5));
+                    GR.DrawLine(Font.Pen(czoom), DrawX, (int)(DrawY + Font.Oberlänge(czoom) + ((Font.Pen(1f).Width + 1) * czoom) + 0.5), DrawX + ((1 + Size.Width) * czoom), (int)(DrawY + Font.Oberlänge(czoom) + ((Font.Pen(1f).Width + 1) * czoom) + 0.5));
                 }
 
                 if (IsCap) {
                     DrawY += Font.KapitälchenPlus(czoom);
                 }
-
 
                 try {
                     if (Font.Outline) {
@@ -242,24 +193,19 @@ namespace BlueControls {
                         }
                     }
 
-
                     if (IsCap) {
-                        GR.DrawString(c.ToString(), f, Font.Brush_Color_Main, DrawX + 0.3F * czoom, DrawY, StringFormat.GenericTypographic);
+                        GR.DrawString(c.ToString(), f, Font.Brush_Color_Main, DrawX + (0.3F * czoom), DrawY, StringFormat.GenericTypographic);
                     }
 
                     GR.DrawString(c.ToString(), f, Font.Brush_Color_Main, DrawX, DrawY, StringFormat.GenericTypographic);
 
-
                     if (Font.StrikeOut) {
-                        GR.DrawLine(Font.Pen(czoom), DrawX - 1, (int)(DrawY + Size.Height * 0.55), (int)(DrawX + 1 + Size.Width), (int)(DrawY + Size.Height * 0.55));
+                        GR.DrawLine(Font.Pen(czoom), DrawX - 1, (int)(DrawY + (Size.Height * 0.55)), (int)(DrawX + 1 + Size.Width), (int)(DrawY + (Size.Height * 0.55)));
                     }
-
 
                     if (_Size.Width < 1) {
                         GR.DrawLine(new Pen(Color.Red), DrawX + 1, DrawY - 4, DrawX + 1, DrawY + 16);
                     }
-
-
                 } catch (Exception) {
                     //Develop.DebugPrint(Ex);
                 }
@@ -267,7 +213,6 @@ namespace BlueControls {
                 return;
 
             }
-
 
             {
                 // Sind es KEINE Integer bei DrawX / DrawY, kommt es zu extrem unschönen Effekten. Gerade Linien scheinen verschwommen zu sein. (Checkbox-Kästchen)
@@ -284,26 +229,20 @@ namespace BlueControls {
                     if (l.Width > 0) {
                         GR.DrawImage(QuickImage.Get(l.Name, (int)(l.Width * czoom)).BMP, (int)DrawX, (int)DrawY);
                     }
-
                 }
-
             }
         }
 
         public string ToHTML() {
 
-            switch ((int)_Char) {
-                case 13:
-                    return "<br>";
+            return (int)_Char switch {
+                13 => "<br>",
                 //case enEtxtCodes.HorizontalLine:
                 //    return "<hr>";
-                case 11:
-                    return string.Empty;
-                default:
-                    return Convert.ToChar(_Char).ToString().CreateHtmlCodes(true);
-            }
+                11 => string.Empty,
+                _ => Convert.ToChar(_Char).ToString().CreateHtmlCodes(true),
+            };
         }
     }
 }
-
 

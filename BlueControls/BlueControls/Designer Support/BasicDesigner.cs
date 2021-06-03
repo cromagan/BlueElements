@@ -24,7 +24,6 @@ namespace BlueControls.Designer_Support {
             properties.Remove("(AppicationSettings)");
             base.PreFilterProperties(properties);
         }
-
     }
 }
 

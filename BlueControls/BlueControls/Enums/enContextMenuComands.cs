@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 namespace BlueControls.Enums {
     public enum enContextMenuComands {
         Nothing = 0,
@@ -33,10 +32,8 @@ namespace BlueControls.Enums {
         Kopieren = 8,
         Ausschneiden = 9,
 
-
         SpaltenSortierungZA = 10,
         SpaltenSortierungAZ = 11,
-
 
         Information = 12,
 
@@ -44,7 +41,6 @@ namespace BlueControls.Enums {
         ZellenInhaltPaste = 14,
 
         // UserDef1 = 100
-
 
         SpaltenEigenschaftenBearbeiten = 15,
         Speichern = 16,

@@ -20,7 +20,6 @@
 using Skript.Enums;
 using System.Collections.Generic;
 
-
 namespace BlueScript {
     internal class Method_ChangeType : Method {
 
@@ -35,7 +34,6 @@ namespace BlueScript {
         public override enVariableDataType Returns => enVariableDataType.Null;
         public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List_String_Numeral_or_Bool, enVariableDataType.String };
         public override bool EndlessArgs => false;
-
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
@@ -61,7 +59,6 @@ namespace BlueScript {
                 default:
                     return new strDoItFeedback("Es wir als zweites Attribut ein String mit dem Inhalt num, str, lst oder bol erwartet.");
             }
-
 
             return new strDoItFeedback();
         }

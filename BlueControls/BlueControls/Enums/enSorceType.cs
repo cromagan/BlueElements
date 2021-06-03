@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 namespace BlueControls.Enums {
 
     public enum enSorceType {
@@ -31,7 +30,6 @@ namespace BlueControls.Enums {
         LoadedFromDisk = 6,
 
         EntryWithoutPic = 7
-
 
     }
 }

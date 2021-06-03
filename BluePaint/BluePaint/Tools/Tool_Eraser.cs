@@ -28,16 +28,13 @@ namespace BluePaint {
         public Tool_Eraser(bool Aufnahme) : base() {
             InitializeComponent();
 
-
             DrawBox.Enabled = !Aufnahme;
             Razi.Enabled = !Aufnahme;
 
             if (Aufnahme) {
                 Eleminate.Checked = true;
             }
-
         }
-
 
         public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic) {
             if (Razi.Checked) {
@@ -46,13 +43,10 @@ namespace BluePaint {
 
             //e.FillRectangle(Brush_RedTransp, new Rectangle(e.Current.TrimmedX, e.Current.TrimmedY, 1, 1));
 
-
             if (DrawBox.Checked && e.Current != null) {
                 var _Pic = OnNeedCurrentPic();
 
-
                 Point p1, p2;
-
 
                 if (e.Current.Button == System.Windows.Forms.MouseButtons.Left && e.MouseDown != null) {
 
@@ -69,9 +63,6 @@ namespace BluePaint {
 
                 e.DrawLine(Pen_RedTransp, -0.5m, p2.Y + 0.5m, _Pic.Width + 0.5m, p2.Y + 0.5m);
                 e.DrawLine(Pen_RedTransp, p2.X + 0.5m, 0, p2.X + 0.5m, _Pic.Height + 0.5m);
-
-
-
 
                 //if (e.Current.Button == System.Windows.Forms.MouseButtons.Left && e.MouseDown != null) {
                 //    e.DrawLine(Pen_RedTransp, -1, e.MouseDown.TrimmedY, _Pic.Width, e.MouseDown.TrimmedY);
@@ -99,7 +90,6 @@ namespace BluePaint {
 
         public override void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) {
 
-
             if (e == null) {
                 Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Warnung, "e = null");
                 return;
@@ -108,7 +98,6 @@ namespace BluePaint {
             if (Razi.Checked) { return; }
 
             var _Pic = OnNeedCurrentPic();
-
 
             if (Eleminate.Checked) {
 
@@ -122,9 +111,7 @@ namespace BluePaint {
                     OnOverridePic(OriginalPic.ReplaceColor(cc, Color.Transparent));
                     return;
                 }
-
             }
-
 
             if (DrawBox.Checked) {
                 var g = Graphics.FromImage(_Pic);
@@ -152,7 +139,5 @@ namespace BluePaint {
                 Develop.DebugPrint_NichtImplementiert();
             }
         }
-
     }
-
 }

@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 namespace BlueDatabase.EventArgs {
     public class BeforeNewValueEventArgs : CellCancelEventArgs {
         //   ColumnItem Column, RowItem Row, Point MousePos, string NewVal, ref string CancelReason
@@ -26,9 +25,5 @@ namespace BlueDatabase.EventArgs {
         }
 
         public string NewVal { get; }
-
-
-
-
     }
 }

@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 namespace BlueControls.Enums {
     public enum enWndProc {
         WM_NULL = 0x0,

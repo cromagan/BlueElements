@@ -42,9 +42,8 @@ namespace BlueControls.Forms {
             capTXT.Text = Text;
             var He = Math.Min(capTXT.TextRequiredSize().Height, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height * 0.7));
             var Wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
-            Size = new Size(Wi + capTXT.Left * 2, He + capTXT.Top * 2);
+            Size = new Size(Wi + (capTXT.Left * 2), He + (capTXT.Top * 2));
         }
-
 
         public static Progressbar Show(string Text) {
             var P = new Progressbar(Text) {
@@ -66,9 +65,6 @@ namespace BlueControls.Forms {
         }
 
         private string CalculateText(string BaseText, int Current, int Count) {
-
-            var tmpCalculatedSeconds = 0;
-
             if (Current < eProgressbar_LastCurrent) {
                 eProgressbar_TimeDic.Clear();
                 eProgressbar_LastTimeUpdate = DateTime.Now;
@@ -81,7 +77,7 @@ namespace BlueControls.Forms {
 
             if (double.IsNaN(PR)) { PR = 0; }
 
-
+            int tmpCalculatedSeconds;
             if (Current > 0) {
                 if (eProgressbar_TimeDic.ContainsKey(Math.Max(0, Current - 100))) {
                     var d = eProgressbar_TimeDic[Math.Max(0, Current - 100)];
@@ -94,13 +90,11 @@ namespace BlueControls.Forms {
                 tmpCalculatedSeconds = 0;
             }
 
-
             eProgressbar_LastCurrent = Current;
 
             if (!eProgressbar_TimeDic.ContainsKey(Current)) {
                 eProgressbar_TimeDic.Add(Current, DateTime.Now);
             }
-
 
             if (eProgressbar_LastCalulatedSeconds != tmpCalculatedSeconds && DateTime.Now.Subtract(eProgressbar_LastTimeUpdate).TotalSeconds > 5) {
                 eProgressbar_LastTimeUpdate = DateTime.Now;
@@ -119,8 +113,7 @@ namespace BlueControls.Forms {
             if (PRT > 100) { PRT = 100; }
             if (PRT < 0) { PRT = 0; }
 
-
-            string T = null;
+            string T;
             if (Count < 1) {
                 T = string.Empty;
             } else if (Current <= 3) {
@@ -128,16 +121,14 @@ namespace BlueControls.Forms {
             } else if (eProgressbar_LastCalulatedSeconds < -10) {
                 T = "<br>Restzeit wird ermittelt<tab>";
             } else if (eProgressbar_LastCalulatedSeconds > 94) {
-                T = "<br>" + PRT + " % - Geschätzte Restzeit:   " + eProgressbar_LastCalulatedSeconds / 60 + " Minuten<tab>";
-            } else if (eProgressbar_LastCalulatedSeconds > 10) {
-                T = "<br>" + PRT + " % - Geschätzte Restzeit: " + eProgressbar_LastCalulatedSeconds / 5 * 5 + " Sekunden<tab>";
-            } else if (eProgressbar_LastCalulatedSeconds > 0) {
-                T = "<br>" + PRT + " % - Geschätzte Restzeit: <<> 10 Sekunden<tab>";
+                T = "<br>" + PRT + " % - Geschätzte Restzeit:   " + (eProgressbar_LastCalulatedSeconds / 60) + " Minuten<tab>";
             } else {
-                T = "<br>100 % - ...abgeschlossen!<tab>";
+                T = eProgressbar_LastCalulatedSeconds > 10
+                    ? "<br>" + PRT + " % - Geschätzte Restzeit: " + (eProgressbar_LastCalulatedSeconds / 5 * 5) + " Sekunden<tab>"
+                    : eProgressbar_LastCalulatedSeconds > 0
+                                    ? "<br>" + PRT + " % - Geschätzte Restzeit: <<> 10 Sekunden<tab>"
+                                    : "<br>100 % - ...abgeschlossen!<tab>";
             }
-
-
             return BaseText + "</b></i></u>" + T;
         }
 
@@ -154,21 +145,18 @@ namespace BlueControls.Forms {
                 return;
             }
 
-
             UpdateInternal(CalculateText(_baseText, current, _count));
         }
 
         private void UpdateInternal(string Text) {
             if (Text != capTXT.Text) {
                 capTXT.Text = Text;
-                var Wi = Math.Max(Size.Width, capTXT.Width + Skin.Padding * 2);
-                var He = Math.Max(Size.Height, capTXT.Height + Skin.Padding * 2);
+                var Wi = Math.Max(Size.Width, capTXT.Width + (Skin.Padding * 2));
+                var He = Math.Max(Size.Height, capTXT.Height + (Skin.Padding * 2));
 
                 Size = new Size(Wi, He);
                 Refresh();
             }
         }
-
-
     }
 }

@@ -39,7 +39,6 @@ namespace BlueScript {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
-
             var val = double.MaxValue;
 
             foreach (var thisval in attvar.Attributes) {

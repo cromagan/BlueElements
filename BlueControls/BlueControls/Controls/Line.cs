@@ -29,7 +29,6 @@ namespace BlueControls.Controls {
     [Designer(typeof(BasicDesigner))]
     public class Line : GenericControl, IBackgroundNone {
 
-
         #region Constructor
         public Line() : base(false, false) {
 
@@ -42,11 +41,7 @@ namespace BlueControls.Controls {
         }
         #endregion
 
-
-
-
         private enOrientation _Orientation = enOrientation.Waagerecht;
-
 
         [DefaultValue(enOrientation.Waagerecht)]
         public enOrientation Orientation {
@@ -75,8 +70,6 @@ namespace BlueControls.Controls {
             set => base.TabStop = false;
         }
 
-
-
         public void CheckSize() {
             if (_Orientation == enOrientation.Waagerecht) {
                 if (Width < 10) { Width = 10; }
@@ -85,10 +78,7 @@ namespace BlueControls.Controls {
                 Width = 2;
                 if (Height < 10) { Height = 10; }
             }
-
-
         }
-
 
         protected override void DrawControl(Graphics gr, enStates state) {
             CheckSize();

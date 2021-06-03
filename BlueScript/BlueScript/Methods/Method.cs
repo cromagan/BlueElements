@@ -42,9 +42,7 @@ namespace BlueScript {
 
         public abstract strDoItFeedback DoIt(strCanDoFeedback infos, Script s);
 
-
         public strCanDoFeedback CanDo(string scriptText, int pos, bool expectedvariablefeedback, Script s) {
-
 
             if (!expectedvariablefeedback && Returns != enVariableDataType.Null) {
                 return new strCanDoFeedback(pos, "Befehl an dieser Stelle nicht möglich", false);
@@ -53,7 +51,6 @@ namespace BlueScript {
             if (expectedvariablefeedback && Returns == enVariableDataType.Null) {
                 return new strCanDoFeedback(pos, "Befehl an dieser Stelle nicht möglich", false);
             }
-
 
             var maxl = scriptText.Length;
 
@@ -66,12 +63,10 @@ namespace BlueScript {
 
             foreach (var thiscomand in Comand(s)) {
 
-
                 var comandtext = thiscomand + StartSequence;
                 var l = comandtext.Length;
 
                 if (pos + l < maxl) {
-
 
                     if (scriptText.Substring(pos, l).ToLower() == comandtext.ToLower()) {
 
@@ -92,7 +87,6 @@ namespace BlueScript {
                                 cont++;
                                 s.Line++;
                             } while (true);
-
 
                             (var posek, var _) = NextText(scriptText, cont, GeschKlammerZu, false, false);
                             if (posek < cont) {
@@ -118,7 +112,6 @@ namespace BlueScript {
 
             (var pos, var witch) = NextText(scriptText, startpos, new List<string>() { EndSequence }, false, false);
 
-
             if (pos < startpos) {
                 return new strGetEndFeedback("Keinen Endpunkt gefunden.");
             }
@@ -126,135 +119,7 @@ namespace BlueScript {
             var txtBTW = scriptText.Substring(startpos + lenghtStartSequence, pos - startpos - lenghtStartSequence);
             return new strGetEndFeedback(pos + witch.Length, txtBTW);
 
-
-
-            //var klammern = 0;
-            //var Gans = false;
-            //var GeschwKlammern = false;
-            //var EckigeKlammern = 0;
-
-            //var pos = startpos - 1; // Letztes Zeichen noch berücksichtigen, könnte ja Klammer auf oder zu sein
-
-            //var maxl = scriptText.Length;
-
-            //do {
-
-            //    if (pos > maxl) { return new strGetEndFeedback("Lesen über Textende"); }
-
-            //    #region Klammer und " erledigen
-            //    switch (scriptText.Substring(pos)) {
-
-            //        // Gänsefüsschen, immer erlaubt
-            //        case "\"":
-            //            Gans = !Gans;
-            //            break;
-
-            //        // Ekige klammern könne in { oder ( vorkommen, immer erlaubt
-            //        case "[":
-            //            if (!Gans) {
-            //                EckigeKlammern++;
-            //            }
-            //            break;
-
-            //        case "]":
-            //            if (!Gans) {
-            //                if (EckigeKlammern <= 0) { return new strGetEndFeedback("] nicht gültig"); }
-            //                EckigeKlammern--;
-            //            }
-            //            break;
-
-
-            //        // Runde klammern können in { vorkommen
-            //        case "(":
-            //            if (!Gans) {
-            //                if (EckigeKlammern > 0) { return new strGetEndFeedback("( nicht gültig"); }
-            //                klammern++;
-            //            }
-
-            //            break;
-
-            //        case ")":
-            //            if (!Gans) {
-            //                if (EckigeKlammern > 0) { return new strGetEndFeedback(") nicht gültig"); }
-            //                if (klammern <= 0) { return new strGetEndFeedback(") nicht gültig"); }
-            //                klammern--;
-            //            }
-            //            break;
-
-
-            //        // Gescheifte klammern müssen immer sauber auf und zu gemacht werdrn!
-            //        case "{":
-            //            if (!Gans) {
-            //                if (klammern > 0) { return new strGetEndFeedback("{ nicht gültig"); }
-            //                if (EckigeKlammern > 0) { return new strGetEndFeedback("{ nicht gültig"); }
-            //                if (GeschwKlammern) { return new strGetEndFeedback("{ nicht gültig"); }
-            //                GeschwKlammern = true;
-            //            }
-            //            break;
-
-            //        case "}":
-            //            if (!Gans) {
-            //                if (klammern > 0) { return new strGetEndFeedback("} nicht gültig"); }
-            //                if (EckigeKlammern > 0) { return new strGetEndFeedback("} nicht gültig"); }
-            //                if (!GeschwKlammern) { return new strGetEndFeedback("} nicht gültig"); }
-            //                GeschwKlammern = false;
-            //            }
-            //            break;
-            //    }
-            //    #endregion
-
-
-
-            //    if (klammern == 0 && !Gans && !GeschwKlammern && EckigeKlammern == 0) {
-
-            //        foreach (var thisEnd in EndSequence) {
-
-
-            //            if (pos + thisEnd.Length <= maxl) {
-
-            //                if (scriptText.Substring(pos, thisEnd.Length).ToLower() == thisEnd.ToLower()) {
-
-            //                    var txtBTW = DeKlammere(scriptText.Substring(startpos, pos - startpos));
-            //                    return new strGetEndFeedback(pos + thisEnd.Length, txtBTW);
-            //                }
-
-            //            }
-
-            //        }
-
-
-
-            //    }
-
-            //    pos++;
-            //} while (true);
-
-
         }
-
-
-        //public string DeKlammere(string txtBTW) {
-
-        //    string otxt;
-
-        //    do {
-        //        otxt = txtBTW;
-        //        txtBTW = txtBTW.Trim(" ");
-        //        if (otxt.StartsWith("(") && otxt.EndsWith(")")) {
-        //            BlueBasics.Develop.DebugPrint_NichtImplementiert();
-        //        }
-        //        if (otxt.StartsWith("{") && otxt.EndsWith("}")) {
-        //            BlueBasics.Develop.DebugPrint_NichtImplementiert();
-        //        }
-        //        if (otxt.StartsWith("[") && otxt.EndsWith("]")) {
-        //            BlueBasics.Develop.DebugPrint_NichtImplementiert();
-        //        }
-
-
-        //    } while (otxt != txtBTW);
-
-        //    return txtBTW;
-        //}
 
         public static strGetEndFeedback ReplaceComands(string txt, IEnumerable<Method> comands, Script s) {
             var c = new List<string>();
@@ -266,7 +131,6 @@ namespace BlueScript {
                     }
                 }
             }
-
 
             var posc = 0;
 
@@ -285,26 +149,11 @@ namespace BlueScript {
                 txt = txt.Substring(0, pos) + f.Value + txt.Substring(f.Position);
                 posc = pos;
 
-
             } while (true);
-
-
-
-            //var pos = -1;
-
-            //do {
-            //    Alle Routinen ohne Void übergeben und ausführen und ersetzen
-            //    if (Script.ComandOnPosition(txt,))
-            //        Develop.DebugPrint_NichtImplementiert();
-
-            //}
-
-
 
         }
 
         public static strGetEndFeedback ReplaceVariable(string txt, List<Variable> vars) {
-
 
             var posc = 0;
 
@@ -323,56 +172,10 @@ namespace BlueScript {
                     return new strGetEndFeedback("Variable " + witch + " ist keinem Typ zugeordnet");
                 }
 
-
                 txt = txt.Substring(0, pos) + thisV.ValueForReplace + txt.Substring(pos + witch.Length);
                 posc = pos;
 
             } while (true);
-
-
-
-
-
-
-
-
-
-            //var t = "¶";
-            //if (txt.Contains(t)) {
-            //    return new strGetEndFeedback("Unerlaubtes Zeichen");
-            //}
-
-            //txt = txt.Replace(" ", t + " " + t);
-            //txt = txt.Replace("\t", t + "\t" + t);
-            //txt = txt.Replace("\r", t + "\r" + t);
-            //txt = txt.Replace("\n", t + "\n" + t);
-            //txt = txt.Replace("+", t + "+" + t);
-            //txt = txt.Replace("-", t + "-" + t);
-            //txt = txt.Replace("*", t + "*" + t);
-            //txt = txt.Replace("/", t + "/" + t);
-            //txt = txt.Replace("(", t + "(" + t);
-            //txt = txt.Replace(")", t + ")" + t);
-            //txt = txt.Replace("|", t + "|" + t);
-            //txt = txt.Replace("&", t + "&" + t);
-            //txt = txt.Replace("=", t + "=" + t);
-            //txt = txt.Replace("!", t + "!" + t);
-            //txt = txt.Replace("<", t + "<" + t);
-            //txt = txt.Replace(">", t + ">" + t);
-            //txt = txt.Replace("\"", t + "\"" + t);
-            //txt = txt.Replace(",", t + "," + t);
-
-            //foreach (var thisV in vars) {
-            //    if (thisV.Type == Skript.Enums.enVariableDataType.NotDefinedYet) {
-            //        if (txt.ToLower().Contains(t + thisV.Name.ToLower() + t)) {
-            //            return new strGetEndFeedback("Variable " + thisV + " ist keinem Typ zugeordnet");
-            //        }
-            //    }
-
-            //    txt = txt.Replace(t + thisV.Name + t, t + thisV.ValueString + t);
-            //}
-
-            //txt = txt.Replace(t, string.Empty);
-            //return new strGetEndFeedback(0, txt);
 
         }
 
@@ -386,11 +189,11 @@ namespace BlueScript {
             do {
                 (var pos, var _) = NextText(attributtext, posc, Komma, false, false);
                 if (pos < 0) {
-                    attributes.Add((attributtext.Substring(posc)).DeKlammere(true, false, false, true));
+                    attributes.Add(attributtext.Substring(posc).DeKlammere(true, false, false, true));
                     break;
                 }
 
-                attributes.Add((attributtext.Substring(posc, pos - posc)).DeKlammere(true, true, false, true));
+                attributes.Add(attributtext.Substring(posc, pos - posc).DeKlammere(true, true, false, true));
                 posc = pos + 1;
 
             } while (true);
@@ -400,7 +203,6 @@ namespace BlueScript {
             return attributes;
         }
 
-
         public static strSplittedAttributesFeedback SplitAttributeToVars(string attributtext, Script s, List<enVariableDataType> types, bool EndlessArgs) {
             var attributes = SplitAttributeToString(attributtext);
             if (attributes == null || attributes.Count == 0) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Allgemeiner Fehler."); }
@@ -408,10 +210,8 @@ namespace BlueScript {
             if (attributes.Count < types.Count) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Zu wenige Attribute erhalten."); ; }
             if (!EndlessArgs && attributes.Count > types.Count) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Zu viele Attribute erhalten."); }
 
-
             //  Variablen und Routinen ersetzen
             var vars = new List<Variable>();
-
 
             for (var n = 0; n < attributes.Count; n++) {
 
@@ -419,27 +219,17 @@ namespace BlueScript {
 
                 attributes[n] = attributes[n].RemoveChars("¶");
 
-                enVariableDataType exceptetType;
-                if (n < types.Count) {
-                    exceptetType = types[n];
-                } else {
-                    exceptetType = types[types.Count - 1];
-                }
-
+                var exceptetType = n < types.Count ? types[n] : types[types.Count - 1];
                 Variable v = null;
-
 
                 if (exceptetType.HasFlag(enVariableDataType.Variable)) {
                     if (!Variable.IsValidName(attributes[n])) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.VariableErwartet, "Variablenname erwartet bei Attribut " + (n + 1).ToString()); }
                     v = s.Variablen.Get(attributes[n]);
                     if (v == null) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1).ToString()); }
-
                 } else {
                     v = new Variable("dummy", attributes[n], s);
                     if (v == null) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.BerechnungFehlgeschlagen, "Berechnungsfehler bei Attribut " + (n + 1).ToString()); }
-
                 }
-
 
                 if (!exceptetType.HasFlag(v.Type)) {
 
@@ -447,14 +237,12 @@ namespace BlueScript {
                         return new strSplittedAttributesFeedback(enSkriptFehlerTyp.BerechnungFehlgeschlagen, "Attribut " + (n + 1).ToString() + ": " + v.Coment);
                     }
 
-
                     if (exceptetType == enVariableDataType.Integer) {
                         if (v.Type != enVariableDataType.Numeral) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.FalscherDatentyp, "Attribut " + (n + 1).ToString() + " ist keine Ganzahl."); }
                         if (v.ValueDouble != (int)v.ValueDouble) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.FalscherDatentyp, "Attribut " + (n + 1).ToString() + " ist keine Ganzahl."); }
                     } else {
                         return new strSplittedAttributesFeedback(enSkriptFehlerTyp.FalscherDatentyp, "Attribut " + (n + 1).ToString() + " ist nicht der erwartete Typ");
                     }
-
                 }
                 vars.Add(v);
                 if (s != null) { s.Line += lb; }
@@ -468,27 +256,27 @@ namespace BlueScript {
 
         public string HintText() {
             var co = "Syntax:\r\n";
-            co = co + "~~~~~~\r\n";
+            co += "~~~~~~\r\n";
             co = co + Syntax + "\r\n";
-            co = co + "\r\n";
-            co = co + "Argumente:\r\n";
-            co = co + "~~~~~~~~~~\r\n";
+            co += "\r\n";
+            co += "Argumente:\r\n";
+            co += "~~~~~~~~~~\r\n";
             for (var z = 0; z < Args.Count(); z++) {
                 co = co + "  - Argument " + (z + 1).ToString() + ": " + Args[z].ToString();
                 if (z == Args.Count() - 1 && EndlessArgs) {
-                    co = co + " -> Dieses Argument kann beliebig oft wiederholt werden";
+                    co += " -> Dieses Argument kann beliebig oft wiederholt werden";
                 }
-                co = co + "\r\n";
+                co += "\r\n";
             }
-            co = co + "\r\n";
-            co = co + "Rückgabe:\r\n";
-            co = co + "~~~~~~~~~\r\n";
+            co += "\r\n";
+            co += "Rückgabe:\r\n";
+            co += "~~~~~~~~~\r\n";
 
             co = co + "  - Rückgabetyp: " + Returns.ToString() + "\r\n";
 
-            co = co + "\r\n";
-            co = co + "Beschreibung:\r\n";
-            co = co + "~~~~~~~~~~~~\r\n";
+            co += "\r\n";
+            co += "Beschreibung:\r\n";
+            co += "~~~~~~~~~~~~\r\n";
             co = co + Description + "\r\n";
 
             return co;

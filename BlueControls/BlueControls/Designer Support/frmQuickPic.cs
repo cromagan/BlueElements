@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 using BlueBasics;
 using BlueBasics.Enums;
 using System;
@@ -43,8 +42,6 @@ namespace BlueControls.Designer_Support {
             }
             base.Dispose(NowDisposing);
         }
-
-
 
         //HINWEIS: Die folgende Prozedur ist für den Windows Form-Designer erforderlich
         //Sie kann mit dem Windows Form-Designer modifiziert werden.
@@ -115,19 +112,19 @@ namespace BlueControls.Designer_Support {
             GroupBox1.SuspendLayout();
             GroupBox2.SuspendLayout();
             GroupBox4.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(Preview)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(SAT)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(Hell)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(Transp)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)Preview).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)SAT).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)Hell).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)Transp).BeginInit();
             GroupBox3.SuspendLayout();
             ZweitSymbol.SuspendLayout();
             SuspendLayout();
             // 
             // LB
             // 
-            LB.Anchor = (((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right);
+            LB.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom
+            | System.Windows.Forms.AnchorStyles.Left
+            | System.Windows.Forms.AnchorStyles.Right;
             LB.Location = new System.Drawing.Point(8, 16);
             LB.Name = "LB";
             LB.Size = new System.Drawing.Size(192, 303);
@@ -136,7 +133,7 @@ namespace BlueControls.Designer_Support {
             // 
             // ButOK
             // 
-            ButOK.Anchor = (System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right);
+            ButOK.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
             ButOK.Location = new System.Drawing.Point(519, 331);
             ButOK.Name = "ButOK";
             ButOK.Size = new System.Drawing.Size(64, 24);
@@ -145,8 +142,8 @@ namespace BlueControls.Designer_Support {
             // 
             // PicName
             // 
-            PicName.Anchor = ((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right);
+            PicName.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left
+            | System.Windows.Forms.AnchorStyles.Right;
             PicName.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             PicName.Location = new System.Drawing.Point(8, 334);
             PicName.Name = "PicName";
@@ -157,8 +154,8 @@ namespace BlueControls.Designer_Support {
             // 
             // GroupBox1
             // 
-            GroupBox1.Anchor = ((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left);
+            GroupBox1.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom
+            | System.Windows.Forms.AnchorStyles.Left;
             GroupBox1.Controls.Add(LB);
             GroupBox1.Controls.Add(PicName);
             GroupBox1.Location = new System.Drawing.Point(0, 0);
@@ -394,8 +391,8 @@ namespace BlueControls.Designer_Support {
             // 
             // GroupBox3
             // 
-            GroupBox3.Anchor = ((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right);
+            GroupBox3.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left
+            | System.Windows.Forms.AnchorStyles.Right;
             GroupBox3.Controls.Add(grün);
             GroupBox3.Controls.Add(Färb);
             GroupBox3.Controls.Add(Label5);
@@ -418,8 +415,8 @@ namespace BlueControls.Designer_Support {
             // 
             // ZweitSymbol
             // 
-            ZweitSymbol.Anchor = ((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right);
+            ZweitSymbol.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left
+            | System.Windows.Forms.AnchorStyles.Right;
             ZweitSymbol.Controls.Add(txbZweitsymbol);
             ZweitSymbol.Location = new System.Drawing.Point(384, 88);
             ZweitSymbol.Name = "ZweitSymbol";
@@ -453,10 +450,10 @@ namespace BlueControls.Designer_Support {
             GroupBox2.ResumeLayout(false);
             GroupBox2.PerformLayout();
             GroupBox4.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(Preview)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(SAT)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(Hell)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(Transp)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)Preview).EndInit();
+            ((System.ComponentModel.ISupportInitialize)SAT).EndInit();
+            ((System.ComponentModel.ISupportInitialize)Hell).EndInit();
+            ((System.ComponentModel.ISupportInitialize)Transp).EndInit();
             GroupBox3.ResumeLayout(false);
             GroupBox3.PerformLayout();
             ZweitSymbol.ResumeLayout(false);
@@ -477,9 +474,7 @@ namespace BlueControls.Designer_Support {
                 if (!string.IsNullOrEmpty(w)) { LB.Items.Add(w); }
             }
 
-
             var l = new QuickImage(C);
-
 
             PicName.Text = l.Name;
             Färb.Text = l.Färbung;
@@ -493,24 +488,19 @@ namespace BlueControls.Designer_Support {
 
             if (l.Effekt < 0) { l.Effekt = 0; }
 
-
             chkbDurchgestrichen.Checked = Convert.ToBoolean(l.Effekt & enImageCodeEffect.Durchgestrichen);
             chkbMEDisabled.Checked = Convert.ToBoolean(l.Effekt & enImageCodeEffect.WindowsMEDisabled);
             chkbXPDisabled.Checked = Convert.ToBoolean(l.Effekt & enImageCodeEffect.WindowsXPDisabled);
 
-
             GrX.Text = l.Width.ToString();
             GrY.Text = l.Height.ToString();
-
 
             txbZweitsymbol.Text = l.Zweitsymbol;
         }
 
-
         private void LB_DoubleClick(object sender, System.EventArgs e) {
             PicName.Text = Convert.ToString(LB.SelectedItem);
         }
-
 
         public void GeneratePreview() {
             try {

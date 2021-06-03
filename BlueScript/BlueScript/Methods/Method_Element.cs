@@ -20,7 +20,6 @@
 using Skript.Enums;
 using System.Collections.Generic;
 
-
 namespace BlueScript {
     internal class Method_Element : Method {
 
@@ -38,8 +37,9 @@ namespace BlueScript {
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
             var i = attvar.Attributes[1].ValueInt;
             var list = attvar.Attributes[0].ValueListString;
-            if (i < 0 || i >= list.Count) { return new strDoItFeedback("Element nicht in Liste"); }
-            return new strDoItFeedback("\"" + list[i] + "\"", string.Empty);
+            return i < 0 || i >= list.Count
+                ? new strDoItFeedback("Element nicht in Liste")
+                : new strDoItFeedback("\"" + list[i] + "\"", string.Empty);
         }
     }
 }

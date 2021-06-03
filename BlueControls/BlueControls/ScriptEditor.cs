@@ -33,26 +33,18 @@ using System.Linq;
 namespace BlueControls {
     public partial class ScriptEditor : GroupBox // System.Windows.Forms.UserControl
         {
-
-
-
-        Database _Database = null;
-        AutocompleteMenu popupMenu;
-        bool menuDone = false;
-
-
+        private Database _Database = null;
+        private AutocompleteMenu popupMenu;
+        private bool menuDone = false;
 
         public ScriptEditor() {
             InitializeComponent();
             GenerateVariableTable();
         }
 
-
-
         public Database Database {
             get => _Database;
             set {
-
 
                 if (_Database != null) {
                     _Database.RulesScript = txtSkript.Text;
@@ -65,9 +57,6 @@ namespace BlueControls {
                     txtSkript.Text = _Database.RulesScript;
                     _Database.Disposing += _Database_Disposing;
                 }
-
-
-
             }
         }
 
@@ -99,13 +88,7 @@ namespace BlueControls {
             x.ColumnArrangements[1].ShowAllColumns();
             x.ColumnArrangements[1].HideSystemColumns();
 
-
             x.SortDefinition = new RowSortDefinition(x, "Name", true);
-
-
-
-
-
 
             tableVariablen.Database = x;
             tableVariablen.Arrangement = 1;
@@ -136,16 +119,12 @@ namespace BlueControls {
                 txbTestZeile.Text = _Database.Row.First().CellFirstString();
             }
 
-
             var r = _Database.Row[txbTestZeile.Text];
 
             if (r == null) {
                 MessageBox.Show("Zeile nicht gefunden.", enImageCode.Information, "OK");
                 return;
             }
-
-
-
 
             (var _, var message, var s) = r.DoAutomatic(true, "script testing");
 
@@ -169,22 +148,19 @@ namespace BlueControls {
                 foreach (var thisc in BlueScript.Script.Comands) {
                     lstComands.Item.Add(thisc, thisc.Syntax.ToLower());
                 }
-
             }
 
             lstComands.Item.Sort();
 
-
-
-
             if (!menuDone) {
                 menuDone = true;
-                popupMenu = new AutocompleteMenu(txtSkript);
-                //popupMenu.Items.ImageList = imageList1;
-                popupMenu.SearchPattern = @"[\w\.:=!<>]";
-                popupMenu.AllowTabKey = true;
+                popupMenu = new AutocompleteMenu(txtSkript) {
+                    //popupMenu.Items.ImageList = imageList1;
+                    SearchPattern = @"[\w\.:=!<>]",
+                    AllowTabKey = true
+                };
 
-                List<AutocompleteItem> items = new List<AutocompleteItem>();
+                var items = new List<AutocompleteItem>();
 
                 if (s != null && BlueScript.Script.Comands != null) {
 
@@ -195,12 +171,10 @@ namespace BlueControls {
                             items.Add(new SnippetAutocompleteItem("var " + thisc.Returns.ToString() + " = " + thisc.Syntax + "; "));
                         }
 
-
                         foreach (var thiscom in thisc.Comand(s)) {
                             items.Add(new AutocompleteItem(thiscom));
                         }
                     }
-
                 }
 
                 //set as autocomplete source
@@ -212,18 +186,9 @@ namespace BlueControls {
                 return;
             }
 
-
-            if (string.IsNullOrEmpty(s.Error)) {
-
-                txbSkriptInfo.Text = "[" + DateTime.Now.ToLongTimeString() + "] Erfolgreich, wenn auch IF-Routinen nicht geprüft wurden.";
-
-            } else {
-                txbSkriptInfo.Text = "[" + DateTime.Now.ToLongTimeString() + "] Fehler in Zeile: " + s.Line.ToString() + "\r\n" + s.Error + "\r\n >>> " + s.ErrorCode;
-            }
-
-
-
-
+            txbSkriptInfo.Text = string.IsNullOrEmpty(s.Error)
+                ? "[" + DateTime.Now.ToLongTimeString() + "] Erfolgreich, wenn auch IF-Routinen nicht geprüft wurden."
+                : "[" + DateTime.Now.ToLongTimeString() + "] Fehler in Zeile: " + s.Line.ToString() + "\r\n" + s.Error + "\r\n >>> " + s.ErrorCode;
         }
 
         private void txtSkript_ToolTipNeeded(object sender, ToolTipNeededEventArgs e) {
@@ -241,7 +206,6 @@ namespace BlueControls {
                     }
                 }
 
-
                 //x.Column.Add("Name", "Name", enDataFormat.Text);
                 //x.Column.Add("Typ", "Typ", enDataFormat.Text);
                 //x.Column.Add("RO", "Schreibgeschützt", enDataFormat.Bit);
@@ -249,9 +213,7 @@ namespace BlueControls {
                 //x.Column.Add("Inhalt", "Inhalt", enDataFormat.Text);
                 //x.Column.Add("Kommentar", "Kommentar", enDataFormat.Text);
 
-
                 var hoveredWordnew = new Range(txtSkript, e.Place, e.Place).GetFragment("[A-Za-z0-9_]").Text;
-
 
                 foreach (var r in tableVariablen.Database.Row) {
                     if (r.CellFirstString().ToLower() == hoveredWordnew.ToLower()) {
@@ -266,10 +228,7 @@ namespace BlueControls {
                         e.ToolTipText = r.CellGetString("Kommentar") + " ";
                         return;
                     }
-
                 }
-
-
             } catch (Exception ex) {
                 Develop.DebugPrint(ex);
             }
@@ -279,7 +238,7 @@ namespace BlueControls {
             var co = string.Empty;
 
             if (e.Item.Tag is Method thisc) {
-                co = co + thisc.HintText();
+                co += thisc.HintText();
             }
             txbComms.Text = co;
         }

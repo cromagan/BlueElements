@@ -162,8 +162,7 @@ namespace BlueBasics {
             const int w1 = 200; // Größe des Rechteckes
             const int w5 = 10; // Pixel zum vergrößerm
 
-            var x = 0;
-
+            int x;
             if (!swapX) {
                 x = 150 - (int)(w1 / 2.0);
                 if (point.X < screenshot.Width / 2.0) { x = screenshot.Width - 150 - (int)(w1 / 2.0); }
@@ -188,7 +187,7 @@ namespace BlueBasics {
 
             gR.InterpolationMode = InterpolationMode.NearestNeighbor;
             gR.PixelOffsetMode = PixelOffsetMode.Half;
-            gR.DrawImage(screenshot, r, new Rectangle(point.X - w5, point.Y - w5, w5 * 2 + 1, w5 * 2 + 1), GraphicsUnit.Pixel);
+            gR.DrawImage(screenshot, r, new Rectangle(point.X - w5, point.Y - w5, (w5 * 2) + 1, (w5 * 2) + 1), GraphicsUnit.Pixel);
             gR.DrawRectangle(Pens.Black, r);
 
             var Mitte = r.PointOf(enAlignment.Horizontal_Vertical_Center);
@@ -246,8 +245,8 @@ namespace BlueBasics {
             if (width < 1 || height < 1) { return null; }
 
             var tempPoly_RoundRec = new GraphicsPath();
-            if (radius > height / 2.0 + 2) { radius = (int)(height / 2.0) + 2; }
-            if (radius > width / 2.0 + 2) { radius = (int)(width / 2.0) + 2; }
+            if (radius > (height / 2.0) + 2) { radius = (int)(height / 2.0) + 2; }
+            if (radius > (width / 2.0) + 2) { radius = (int)(width / 2.0) + 2; }
 
             tempPoly_RoundRec.AddLine(x + radius, y, x + width - radius, y);
 
@@ -269,20 +268,20 @@ namespace BlueBasics {
 
             return tempPoly_RoundRec;
 
-            void AddRad90(int mxX, int mxY, int Radius, int gradStart) => tempPoly_RoundRec.AddArc(mxX, mxY, Radius, Radius, gradStart, 90);
+            void AddRad90(int mxX, int mxY, int Radius, int gradStart) {
+                tempPoly_RoundRec.AddArc(mxX, mxY, Radius, Radius, gradStart, 90);
+            }
         }
 
         public static GraphicsPath Poly_Rechteck(Rectangle rect) {
-            GraphicsPath tempPoly_Rechteck = null;
-            tempPoly_Rechteck = new GraphicsPath();
+            var tempPoly_Rechteck = new GraphicsPath();
             tempPoly_Rechteck.AddRectangle(rect);
             tempPoly_Rechteck.CloseFigure();
             return tempPoly_Rechteck;
         }
 
         public static GraphicsPath Poly_Bruchlinie(Rectangle rect) {
-            GraphicsPath p = null;
-            p = new GraphicsPath();
+            var p = new GraphicsPath();
             p.AddLine(rect.PointOf(enAlignment.Top_Left), rect.PointOf(enAlignment.Top_Right));
             p.AddLine(p.GetLastPoint(), rect.PointOf(enAlignment.Bottom_Right));
             p.AddLine(p.GetLastPoint(), rect.PointOf(enAlignment.Bottom_Left));
@@ -311,8 +310,8 @@ namespace BlueBasics {
             ///         | /
             ///         |/
             ///
-            var plusOben = new PointF((float)(rect.Left + rect.Width * 0.5), (float)(rect.PointOf(enAlignment.VerticalCenter_Right).Y - rect.Height * 0.18));
-            var plusUnten = new PointF((float)(rect.Left + rect.Width * 0.5), (float)(rect.PointOf(enAlignment.VerticalCenter_Right).Y + rect.Height * 0.18));
+            var plusOben = new PointF((float)(rect.Left + (rect.Width * 0.5)), (float)(rect.PointOf(enAlignment.VerticalCenter_Right).Y - (rect.Height * 0.18)));
+            var plusUnten = new PointF((float)(rect.Left + (rect.Width * 0.5)), (float)(rect.PointOf(enAlignment.VerticalCenter_Right).Y + (rect.Height * 0.18)));
 
             p.AddLine(rect.PointOf(enAlignment.VerticalCenter_Right), new PointF(plusUnten.X, rect.Bottom));
             p.AddLine(p.GetLastPoint(), plusUnten);
@@ -449,23 +448,10 @@ namespace BlueBasics {
         }
 
         public static string LastMouseButton() {
-            const int VK_LBUTTON = 0x1;
-            const int VK_RBUTTON = 0x2;
-            const int VK_MBUTTON = 0x4;
-
-            if (Convert.ToBoolean(GetAsyncKeyState(VK_LBUTTON))) {
-                return "Links";
-            }
-
-            if (Convert.ToBoolean(GetAsyncKeyState(VK_RBUTTON))) {
-                return "Rechts";
-            }
-
-            if (Convert.ToBoolean(GetAsyncKeyState(VK_MBUTTON))) {
-                return "Mitte";
-            }
-
-            return string.Empty;
+            return Convert.ToBoolean(GetAsyncKeyState(0x1)) ? "Links"
+                 : Convert.ToBoolean(GetAsyncKeyState(0x2)) ? "Rechts"
+                 : Convert.ToBoolean(GetAsyncKeyState(0x4)) ? "Mitte"
+                 : string.Empty;
         }
 
         public static string Download(string url) {
@@ -529,13 +515,10 @@ namespace BlueBasics {
         }
 
         public static Image DownloadImage(string url) {
-            WebResponse response = null;
-            Stream remoteStream = null;
-            StreamReader readStream = null;
             var request = WebRequest.Create(url);
-            response = request.GetResponse();
-            remoteStream = response.GetResponseStream();
-            readStream = new StreamReader(remoteStream);
+            var response = request.GetResponse();
+            var remoteStream = response.GetResponseStream();
+            var readStream = new StreamReader(remoteStream);
             var img = Image.FromStream(remoteStream);
             response.Close();
             remoteStream.Close();
@@ -643,13 +626,7 @@ namespace BlueBasics {
 
             for (var i = 1; i <= l1; i++) {
                 for (var j = 1; j <= l2; j++) {
-                    var cost = 0;
-                    if (txt2[j - 1].ToString()[0] == txt1[i - 1]) {
-                        cost = 0;
-                    } else {
-                        cost = 1;
-                    }
-
+                    var cost = txt2[j - 1].ToString()[0] == txt1[i - 1] ? 0 : 1;
                     d[i, j] = Math.Min(Math.Min(d[i - 1, j] + 1, d[i, j - 1] + 1), d[i - 1, j - 1] + cost);
                 }
             }
@@ -684,7 +661,7 @@ namespace BlueBasics {
             if (x > 20) { return 1; }
 
             var et = (float)Math.Pow(Math.E, x);
-            return et / (1 + et) * 2 - 1;
+            return (et / (1 + et) * 2) - 1;
         }
 
         public static byte[] SimpleCrypt(byte[] b, string pass, int direction, int start, int end) {
@@ -692,7 +669,7 @@ namespace BlueBasics {
             if (end <= start) { return b; }
 
             for (var z = start; z <= end; z++) {
-                var TMP = b[z] + pass[z % pass.Length] * direction;
+                var TMP = b[z] + (pass[z % pass.Length] * direction);
                 if (TMP < 0) { TMP += 256; }
                 if (TMP > 255) { TMP -= 256; }
                 b[z] = (byte)TMP;
@@ -710,7 +687,7 @@ namespace BlueBasics {
             if (end <= start) { return b; }
 
             for (var z = start; z <= end; z++) {
-                var TMP = b[z] + pass[z % pass.Length] * direction;
+                var TMP = b[z] + (pass[z % pass.Length] * direction);
                 if (TMP < 0) { TMP += 256; }
                 if (TMP > 255) { TMP -= 256; }
                 b[z] = (byte)TMP;

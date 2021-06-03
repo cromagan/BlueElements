@@ -36,27 +36,21 @@ namespace BlueBasics {
                 g = brightness;
                 b = brightness;
             } else {
-                double temp2;
-                if (brightness <= 0.5F) {
-                    temp2 = brightness * (1.0 + satuation);
-                } else {
-                    temp2 = brightness + satuation - brightness * satuation;
-                }
+                var temp2 = brightness <= 0.5F ? brightness * (1.0 + satuation) : brightness + satuation - (brightness * satuation);
+                var temp1 = (2.0 * brightness) - temp2;
 
-                var temp1 = 2.0 * brightness - temp2;
-
-                double[] t3 = { hue + 1.0 / 3.0, hue, hue - 1.0 / 3.0 };
+                double[] t3 = { hue + (1.0 / 3.0), hue, hue - (1.0 / 3.0) };
                 double[] clr = { 0, 0, 0 };
 
                 for (var i = 0; i <= 2; i++) {
                     if (t3[i] < 0) { t3[i] += 1.0; }
                     if (t3[i] > 1) { t3[i] -= 1.0; }
                     if (6.0 * t3[i] < 1.0) {
-                        clr[i] = temp1 + (temp2 - temp1) * t3[i] * 6.0;
+                        clr[i] = temp1 + ((temp2 - temp1) * t3[i] * 6.0);
                     } else if (2.0 * t3[i] < 1.0) {
                         clr[i] = temp2;
                     } else if (3.0 * t3[i] < 2.0) {
-                        clr[i] = temp1 + (temp2 - temp1) * (2.0 / 3.0 - t3[i]) * 6.0;
+                        clr[i] = temp1 + ((temp2 - temp1) * ((2.0 / 3.0) - t3[i]) * 6.0);
                     } else {
                         clr[i] = temp1;
                     }
@@ -95,22 +89,16 @@ namespace BlueBasics {
             var dbase = @base / 255.0;
             var dblend = blend / 255.0;
 
-            if (dblend < 0.5) {
-                return (2 * dbase * dblend + Math.Pow(dbase, 2) * (1 - 2 * dblend)) * 255;
-            }
-
-            return (Math.Sqrt(dbase) * (2 * dblend - 1) + 2 * dbase * (1 - dblend)) * 255;
+            return dblend < 0.5
+                ? ((2 * dbase * dblend) + (Math.Pow(dbase, 2) * (1 - (2 * dblend)))) * 255
+                : ((Math.Sqrt(dbase) * ((2 * dblend) - 1)) + (2 * dbase * (1 - dblend))) * 255;
         }
 
         public static double OverlayMath(this int @base, int blend) {
             var dbase = @base / 255.0;
             var dblend = blend / 255.0;
 
-            if (dbase < 0.5) {
-                return 2 * dbase * dblend * 255;
-            }
-
-            return (1 - 2 * (1 - dbase) * (1 - dblend)) * 255;
+            return dbase < 0.5 ? 2 * dbase * dblend * 255 : (1 - (2 * (1 - dbase) * (1 - dblend))) * 255;
         }
 
         #endregion
@@ -120,23 +108,17 @@ namespace BlueBasics {
             if (color1Prozent < 0) { color1Prozent = 0; }
             var Color2Prozent = 1 - color1Prozent;
 
-            return Color.FromArgb((int)(color1.R * color1Prozent + color2.R * Color2Prozent),
-                                  (int)(color1.G * color1Prozent + color2.G * Color2Prozent),
-                                  (int)(color1.B * color1Prozent + color2.B * Color2Prozent));
+            return Color.FromArgb((int)((color1.R * color1Prozent) + (color2.R * Color2Prozent)),
+                                  (int)((color1.G * color1Prozent) + (color2.G * Color2Prozent)),
+                                  (int)((color1.B * color1Prozent) + (color2.B * Color2Prozent)));
         }
 
         public static bool IsNearWhite(this Color col, double minBrightness) {
-            if (col.ToArgb() == -1) { return true; }
-            if (col.A == 0) { return true; }
-            if (col.GetBrightness() >= minBrightness) { return true; }
-            return false;
+            return col.ToArgb() == -1 || col.A == 0 || col.GetBrightness() >= minBrightness;
         }
 
         public static bool IsNearBlack(this Color color, double maxBrightness) {
-            if (color.A == 0) { return false; }
-            if (color.ToArgb() == 0) { return true; }
-            if (color.GetBrightness() <= maxBrightness) { return true; }
-            return false;
+            return color.A != 0 && (color.ToArgb() == 0 || color.GetBrightness() <= maxBrightness);
         }
 
         //public static Color ToSepia(this Color color) {
@@ -189,9 +171,7 @@ namespace BlueBasics {
         //}
 
         public static bool IsMagentaOrTransparent(this Color col) {
-            if (col.ToArgb() == -65281) { return true; }
-            if (col.A == 0) { return true; }
-            return false;
+            return col.ToArgb() == -65281 || col.A == 0;
         }
 
         //public static bool IsTransparent(this Color col) {
@@ -352,7 +332,7 @@ namespace BlueBasics {
         }
 
         public static Color ToGrey(this Color color) {
-            var W = (int)Math.Min(255, (color.R * 77 + color.G * 150 + color.B * 28) / 255.0);
+            var W = (int)Math.Min(255, ((color.R * 77) + (color.G * 150) + (color.B * 28)) / 255.0);
             return Color.FromArgb(color.A, W, W, W);
         }
 
@@ -390,7 +370,7 @@ namespace BlueBasics {
 
         // color brightness as perceived:
         public static float getBrightness(this Color c) {
-            return (c.R * 0.299f + c.G * 0.587f + c.B * 0.114f) / 256f;
+            return ((c.R * 0.299f) + (c.G * 0.587f) + (c.B * 0.114f)) / 256f;
         }
 
         // distance between two hues:
@@ -401,14 +381,14 @@ namespace BlueBasics {
 
         // weighed only by saturation and brightness (from my trackbars)
         public static float ColorNum(this Color c, float factorSat, float factorBri) {
-            return c.GetSaturation() * factorSat + getBrightness(c) * factorBri;
+            return (c.GetSaturation() * factorSat) + (getBrightness(c) * factorBri);
         }
 
         // distance in RGB space
         public static int ColorDiff(this Color c1, Color c2) {
-            return (int)Math.Sqrt((c1.R - c2.R) * (c1.R - c2.R)
-                                   + (c1.G - c2.G) * (c1.G - c2.G)
-                                   + (c1.B - c2.B) * (c1.B - c2.B));
+            return (int)Math.Sqrt(((c1.R - c2.R) * (c1.R - c2.R))
+                                   + ((c1.G - c2.G) * (c1.G - c2.G))
+                                   + ((c1.B - c2.B) * (c1.B - c2.B)));
         }
     }
 }

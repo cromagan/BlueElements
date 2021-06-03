@@ -44,14 +44,12 @@ namespace BlueControls.Designer_Support {
             return C;
         }
 
-
         private void Click(object sender, System.EventArgs e) {
             if (edSvc != null) {
                 C = fqp.ICode();
                 edSvc.CloseDropDown();
             }
         }
-
 
         public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context) {
             return UITypeEditorEditStyle.Modal;

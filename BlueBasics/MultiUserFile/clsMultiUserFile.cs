@@ -308,7 +308,6 @@ namespace BlueBasics.MultiUserFile {
             }
         }
 
-
         /// <summary>
         /// Führt - falls nötig - einen Reload der Datei aus.
         /// Der Prozess wartet solange, bis der Reload erfolgreich war.
@@ -703,7 +702,7 @@ namespace BlueBasics.MultiUserFile {
         }
 
         private void OnLoading(LoadingEventArgs e) {
-            if(Disposed) { return; }
+            if (Disposed) { return; }
             Loading?.Invoke(this, e);
         }
 
@@ -879,11 +878,7 @@ namespace BlueBasics.MultiUserFile {
                 FileInfoBeforeSaving = GetFileInfo(Filename, true);
 
                 DataUncompressed = ToListOfByte();
-                if (_zipped) {
-                    Writer_BinaryData = ZipIt(DataUncompressed);
-                } else {
-                    Writer_BinaryData = DataUncompressed;
-                }
+                Writer_BinaryData = _zipped ? ZipIt(DataUncompressed) : DataUncompressed;
 
                 TMPFileName = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + modAllgemein.UserName().ToUpper());
 
@@ -924,13 +919,11 @@ namespace BlueBasics.MultiUserFile {
         }
 
         private string Backupdateiname() {
-            if (string.IsNullOrEmpty(Filename)) { return string.Empty; }
-            return Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".bak";
+            return string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".bak";
         }
 
         private string Blockdateiname() {
-            if (string.IsNullOrEmpty(Filename)) { return string.Empty; }
-            return Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".blk";
+            return string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".blk";
         }
 
         /// <summary>
@@ -972,8 +965,6 @@ namespace BlueBasics.MultiUserFile {
             }
         }
 
-
-
         private void Checker_Tick(object state) {
             if (DateTime.UtcNow.Subtract(_BlockReload).TotalSeconds < 5) { return; }
 
@@ -999,8 +990,8 @@ namespace BlueBasics.MultiUserFile {
             // Zeiten berechnen
             _ReloadDelaySecond = Math.Max(_ReloadDelaySecond, 10);
             var Count_BackUp = Math.Min((int)(_ReloadDelaySecond / 10.0) + 1, 10); // Soviele Sekunden können vergehen, bevor Backups gemacht werden. Der Wert muss kleiner sein, als Count_Save
-            var Count_Save = Count_BackUp * 2 + 1; // Soviele Sekunden können vergehen, bevor gespeichert werden muss. Muss größer sein, als Backup. Weil ansonsten der Backup-BackgroundWorker beendet wird
-            var Count_UserWork = Count_Save / 5 + 2; // Soviele Sekunden hat die User-Bearbeitung vorrang. Verhindert, dass die Bearbeitung des Users spontan abgebrochen wird.
+            var Count_Save = (Count_BackUp * 2) + 1; // Soviele Sekunden können vergehen, bevor gespeichert werden muss. Muss größer sein, als Backup. Weil ansonsten der Backup-BackgroundWorker beendet wird
+            var Count_UserWork = (Count_Save / 5) + 2; // Soviele Sekunden hat die User-Bearbeitung vorrang. Verhindert, dass die Bearbeitung des Users spontan abgebrochen wird.
 
             if (DateTime.UtcNow.Subtract(UserEditedAktionUTC).TotalSeconds < Count_UserWork) { return; } // Benutzer arbeiten lassen
             if (Checker_Tick_count > Count_Save && _MustSave) { CancelBackGroundWorker(); }
@@ -1074,14 +1065,12 @@ namespace BlueBasics.MultiUserFile {
                 var x = DateTime.UtcNow.Subtract(_BlockReload).TotalSeconds;
                 if (x < 5 && _InitialLoadDone) { return "Laden noch " + (5 - x).ToString() + " Sekunden blockiert."; }
 
-                if (DateTime.UtcNow.Subtract(UserEditedAktionUTC).TotalSeconds < 6) { return "Aktuell werden Daten berabeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen
-
-                if (PureBinSaver.IsBusy) { return "Aktuell werden im Hintergrund Daten gespeichert."; }
-                if (BackgroundWorker.IsBusy) { return "Ein Hintergrundprozess verhindert aktuell das Neuladen."; }
-                if (IsParsing) { return "Es werden aktuell Daten geparsed."; }
-
-                if (isSomethingDiscOperatingsBlocking()) { return "Reload unmöglich, vererbte Klasse gab Fehler zurück"; }
-                return string.Empty;
+                return DateTime.UtcNow.Subtract(UserEditedAktionUTC).TotalSeconds < 6 ? "Aktuell werden Daten berabeitet."
+                        : PureBinSaver.IsBusy ? "Aktuell werden im Hintergrund Daten gespeichert."
+                        : BackgroundWorker.IsBusy ? "Ein Hintergrundprozess verhindert aktuell das Neuladen."
+                        : IsParsing ? "Es werden aktuell Daten geparsed."
+                        : isSomethingDiscOperatingsBlocking() ? "Reload unmöglich, vererbte Klasse gab Fehler zurück"
+                        : string.Empty; // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen
             }
 
             //----------Alle Edits und Save ------------------------------------------------------------------------
@@ -1155,7 +1144,7 @@ namespace BlueBasics.MultiUserFile {
             return string.Empty;
 
             // Gibt true zurück, wenn die letzte Prüfung noch gülig ist
-            bool CheckForLastError(ref DateTime nextCheckUTC, ref string lastMessage) {
+            static bool CheckForLastError(ref DateTime nextCheckUTC, ref string lastMessage) {
                 if (DateTime.UtcNow.Subtract(nextCheckUTC).TotalSeconds < 0) { return true; }
                 lastMessage = string.Empty;
                 nextCheckUTC = DateTime.UtcNow.AddSeconds(5);
@@ -1179,7 +1168,6 @@ namespace BlueBasics.MultiUserFile {
                 OnDisposing();
                 AllFiles.Remove(this);
 
-
                 if (disposing) {
                     // TODO: verwalteten Zustand (verwaltete Objekte) entsorgen.
                 }
@@ -1197,7 +1185,7 @@ namespace BlueBasics.MultiUserFile {
                 Checker.Dispose();
 
                 Checker.Dispose();
-                
+
                 Disposed = true;
             }
         }
@@ -1216,7 +1204,6 @@ namespace BlueBasics.MultiUserFile {
             GC.SuppressFinalize(this);
         }
         #endregion
-
 
         protected bool IsFileAllowedToLoad(string fileName) {
             foreach (var ThisFile in AllFiles) {

@@ -29,7 +29,6 @@ namespace BlueDatabase {
 
         #region  Variablen-Deklarationen 
 
-
         /// <summary>
         /// Der Edit-Dialog braucht die Datenbank, um mit Texten die Spalte zu suchen.
         /// </summary>
@@ -43,11 +42,9 @@ namespace BlueDatabase {
 
         #endregion
 
-
         #region  Event-Deklarationen + Delegaten 
         public event EventHandler Changed;
         #endregion
-
 
         #region  Construktor + Initialize 
 
@@ -71,9 +68,7 @@ namespace BlueDatabase {
 
         public FilterItem(ColumnItem column, enFilterType filterType, string searchValue, string tag) : this(column, filterType, new List<string>() { searchValue }, tag) { }
 
-
         public FilterItem(ColumnItem column, enFilterType filterType, List<string> searchValue) : this(column, filterType, searchValue, string.Empty) { }
-
 
         public FilterItem(ColumnItem column, enFilterType filterType, List<string> searchValue, string herkunft) {
 
@@ -91,7 +86,6 @@ namespace BlueDatabase {
 
         #endregion
 
-
         #region  Properties 
 
         public bool IsParsing { get; private set; }
@@ -104,7 +98,6 @@ namespace BlueDatabase {
             }
         }
 
-
         public ListExt<string> SearchValue { get; private set; } = new ListExt<string>();
 
         public enFilterType FilterType {
@@ -115,7 +108,6 @@ namespace BlueDatabase {
             }
         }
 
-
         public void OnChanged() {
             if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
             Changed?.Invoke(this, System.EventArgs.Empty);
@@ -123,17 +115,13 @@ namespace BlueDatabase {
 
         #endregion
 
-
-
         public override string ToString() {
 
             if (!IsOk()) { return string.Empty; }
 
-
             var Result = "{Type=" + (int)_FilterType;
 
             if (_Column != null) { Result = Result + ", " + _Column.ParsableColumnKey(); }
-
 
             foreach (var t in SearchValue) {
                 Result = Result + ", Value=" + t.ToNonCritical();
@@ -143,7 +131,6 @@ namespace BlueDatabase {
 
             return Result + "}";
         }
-
 
         public void Parse(string ToParse) {
             IsParsing = true;
@@ -175,16 +162,11 @@ namespace BlueDatabase {
                 }
             }
 
-
             if (ToParse.Contains(", Value=}") || ToParse.Contains(", Value=,")) { SearchValue.Add(""); }
 
             IsParsing = false;
 
         }
-
-
-
-
 
         public string CompareKey() {
             return ((int)_FilterType).ToString(Constants.Format_Integer10);
@@ -192,49 +174,26 @@ namespace BlueDatabase {
 
         public string ReadableText() {
 
-
             if (_FilterType == enFilterType.KeinFilter) { return "Filter ohne Funktion"; }
 
-
             if (_Column == null) { return "Zeilen-Filter"; }
-
-
-
-
-
 
             var nam = _Column.ReadableText();
 
             if (SearchValue == null || SearchValue.Count < 1) { return "#### Filter-Fehler ####"; }
 
             if (SearchValue.Count > 1) {
-                switch (_FilterType) {
-                    case enFilterType.Istgleich:
-                    case enFilterType.IstGleich_ODER:
-                    case enFilterType.Istgleich_GroßKleinEgal:
-                    case enFilterType.Istgleich_ODER_GroßKleinEgal:
-                        return nam + " - eins davon: '" + SearchValue.JoinWith("', '") + "'";
-
-                    case enFilterType.IstGleich_UND:
-                    case enFilterType.Istgleich_UND_GroßKleinEgal:
-                        return nam + " - alle: '" + SearchValue.JoinWith("', '") + "'";
-
-                    default:
-
-
-                        return nam + ": Spezial-Filter";
-                }
-
+                return _FilterType switch {
+                    enFilterType.Istgleich or enFilterType.IstGleich_ODER or enFilterType.Istgleich_GroßKleinEgal or enFilterType.Istgleich_ODER_GroßKleinEgal => nam + " - eins davon: '" + SearchValue.JoinWith("', '") + "'",
+                    enFilterType.IstGleich_UND or enFilterType.Istgleich_UND_GroßKleinEgal => nam + " - alle: '" + SearchValue.JoinWith("', '") + "'",
+                    _ => nam + ": Spezial-Filter",
+                };
             }
-
-
-
 
             if (_Column == Database.Column.SysCorrect && _FilterType.HasFlag(enFilterType.Istgleich)) {
                 if (SearchValue[0].FromPlusMinus()) { return "Fehlerfreie Zeilen"; }
                 if (!SearchValue[0].FromPlusMinus()) { return "Fehlerhafte Zeilen"; }
             }
-
 
             switch (_FilterType) {
                 case enFilterType.Istgleich:
@@ -252,12 +211,10 @@ namespace BlueDatabase {
                     if (string.IsNullOrEmpty(SearchValue[0])) { return nam + " muss befüllt sein"; }
                     return nam + " <> " + LanguageTool.ColumnReplace(SearchValue[0], Column, enShortenStyle.Replaced);
 
-
                 case enFilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren:
                 case enFilterType.Istgleich_MultiRowIgnorieren:
                     if (SearchValue.Count == 1 && string.IsNullOrEmpty(SearchValue[0])) { return nam + " muss leer sein"; }
                     return "Spezial-Filter";
-
 
                 case enFilterType.Instr:
                 case enFilterType.Instr_GroßKleinEgal:
@@ -265,9 +222,8 @@ namespace BlueDatabase {
 
                     return nam + " beinhaltet den Text '" + SearchValue[0] + "'";
 
-
                 case enFilterType.Between:
-                case (enFilterType.Between | enFilterType.UND):
+                case enFilterType.Between | enFilterType.UND:
                     return nam + ": von " + SearchValue[0].Replace("|", " bis ");
 
                 default:
@@ -281,11 +237,8 @@ namespace BlueDatabase {
         }
 
         public bool IsNullOrEmpty() {
-            if (_FilterType == enFilterType.KeinFilter) { return true; }
-            return false;
+            return _FilterType == enFilterType.KeinFilter;
         }
-
-
 
         public object Clone() {
             return new FilterItem(Database, ToString());
@@ -296,8 +249,7 @@ namespace BlueDatabase {
         }
 
         public string ErrorReason() {
-            if (_FilterType == enFilterType.KeinFilter) { return "'Kein Filter' angegeben"; }
-            return string.Empty;
+            return _FilterType == enFilterType.KeinFilter ? "'Kein Filter' angegeben" : string.Empty;
         }
 
         private void SearchValue_ListOrItemChanged(object sender, System.EventArgs e) {
@@ -314,7 +266,6 @@ namespace BlueDatabase {
             OnChanged();
         }
 
-
         private void Database_Disposing(object sender, System.EventArgs e) {
             Dispose();
         }
@@ -330,7 +281,6 @@ namespace BlueDatabase {
                     Database.Disposing -= Database_Disposing;
                     Database = null;
                 }
-
 
                 // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
                 // TODO: Große Felder auf NULL setzen

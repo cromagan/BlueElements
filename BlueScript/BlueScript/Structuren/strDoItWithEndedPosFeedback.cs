@@ -17,9 +17,7 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 public struct strDoItWithEndedPosFeedback {
-
 
     public strDoItWithEndedPosFeedback(string errormessage, string value, int endpos) {
         ErrorMessage = errormessage;

@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -39,10 +38,8 @@ namespace BlueControls.Controls {
         [DefaultValue(false)]
         public bool AlwaysSmooth { get; set; } = false;
 
-
         public Bitmap BMP {
             get => _bmp;
-
 
             set {
 
@@ -54,7 +51,6 @@ namespace BlueControls.Controls {
                     dozoomfit = value.Width != _bmp.Width || value.Height != _bmp.Height;
                 }
 
-
                 _bmp = value;
 
                 if (dozoomfit) {
@@ -62,7 +58,6 @@ namespace BlueControls.Controls {
                 } else {
                     Invalidate();
                 }
-
             }
         }
 
@@ -80,10 +75,8 @@ namespace BlueControls.Controls {
         public event EventHandler<PositionEventArgs> OverwriteMouseImageData;
 
         protected override RectangleM MaxBounds() {
-            if (_bmp != null) { return new RectangleM(0, 0, _bmp.Width, _bmp.Height); }
-            return new RectangleM(0, 0, 0, 0);
+            return _bmp != null ? new RectangleM(0, 0, _bmp.Width, _bmp.Height) : new RectangleM(0, 0, 0, 0);
         }
-
 
         protected override void DrawControl(Graphics gr, enStates state) {
             //if (_BitmapOfControl == null)
@@ -101,7 +94,6 @@ namespace BlueControls.Controls {
 
                 var r = new RectangleM(0, 0, _bmp.Width, _bmp.Height).ZoomAndMoveRect(_Zoom, _shiftX, _shiftY, true);
 
-
                 if (_Zoom < 1 || AlwaysSmooth) {
                     gr.SmoothingMode = SmoothingMode.AntiAlias;
                     gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
@@ -112,33 +104,24 @@ namespace BlueControls.Controls {
 
                 gr.PixelOffsetMode = PixelOffsetMode.Half;
 
-
-
                 gr.DrawImage(_bmp, r);
-
 
                 //if (OverlayBMP != null)
                 //{
                 //    TMPGR.DrawImage(OverlayBMP, r);
                 //}
 
-
             }
 
-
-
             OnDoAdditionalDrawing(new AdditionalDrawing(gr, _Zoom, _shiftX, _shiftY, _MouseDown, _MouseCurrent));
-
 
             Skin.Draw_Border(gr, enDesign.Table_And_Pad, state, new Rectangle(1, 1, Size.Width - SliderY.Width, Size.Height - SliderX.Height));
             //gr.DrawImage(_BitmapOfControl, 0, 0);
         }
 
-
         protected virtual void OnDoAdditionalDrawing(AdditionalDrawing e) {
             DoAdditionalDrawing?.Invoke(this, e);
         }
-
 
         protected override void OnMouseDown(MouseEventArgs e) {
             base.OnMouseDown(e);
@@ -146,7 +129,6 @@ namespace BlueControls.Controls {
             _MouseDown = _MouseCurrent;
             OnImageMouseDown(_MouseDown);
         }
-
 
         private MouseEventArgs1_1 GenerateNewMouseEventArgs(MouseEventArgs e) {
 
@@ -174,12 +156,8 @@ namespace BlueControls.Controls {
             ImageMouseUp?.Invoke(this, new MouseEventArgs1_1DownAndCurrent(_MouseDown, e));
         }
 
-
         private bool IsInBitmap(int X, int Y) {
-            if (_bmp == null) { return false; }
-            if (X < 0 || Y < 0) { return false; }
-            if (X > _bmp.Width || Y > _bmp.Height) { return false; }
-            return true;
+            return _bmp != null && X >= 0 && Y >= 0 && X <= _bmp.Width && Y <= _bmp.Height;
         }
 
         //private bool IsInBitmap() {
@@ -210,8 +188,6 @@ namespace BlueControls.Controls {
         private void OnImageMouseMove(MouseEventArgs1_1 e) {
             ImageMouseMove?.Invoke(this, new MouseEventArgs1_1DownAndCurrent(_MouseDown, e));
         }
-
-
 
         public Point PointInsidePic(int x, int y) {
 

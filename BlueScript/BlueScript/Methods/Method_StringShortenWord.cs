@@ -41,7 +41,6 @@ namespace BlueScript {
 
             var TXT = attvar.Attributes[0].ValueString;
 
-
             if (!string.IsNullOrEmpty(TXT)) {
                 //TXT = TXT.HTMLSpecialToNormalChar();
                 TXT = TXT.Replace("Sekunden", "Sek.");
@@ -106,8 +105,6 @@ namespace BlueScript {
                 TXT = TXT.Replace("Tiefkühl", "TK-");
                 //TXT = TXT.CreateHtmlCodes(true);
             }
-
-
 
             return new strDoItFeedback("\"" + TXT + "\"", string.Empty);
         }

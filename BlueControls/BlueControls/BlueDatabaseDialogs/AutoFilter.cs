@@ -33,38 +33,30 @@ namespace BlueControls.BlueDatabaseDialogs {
     public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserControl //
     {
 
-
-
         public AutoFilter(ColumnItem column, FilterCollection filter, List<RowItem> pinned) : base(enDesign.Form_AutoFilter) {
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
             InitializeComponent();
-
 
             //Me.SetNotFocusable()
             SetStyle(System.Windows.Forms.ControlStyles.Selectable, false);
             SetStyle(System.Windows.Forms.ControlStyles.StandardClick, false);
             SetStyle(System.Windows.Forms.ControlStyles.StandardDoubleClick, false);
 
-
             // Initialisierungen nach dem Aufruf InitializeComponent() hinzufügen
             SetStyle(System.Windows.Forms.ControlStyles.ResizeRedraw, false);
             SetStyle(System.Windows.Forms.ControlStyles.SupportsTransparentBackColor, false);
             SetStyle(System.Windows.Forms.ControlStyles.Opaque, false);
-
 
             //The next 3 styles are allefor double buffering
             SetStyle(System.Windows.Forms.ControlStyles.DoubleBuffer, true);
             SetStyle(System.Windows.Forms.ControlStyles.AllPaintingInWmPaint, true);
             SetStyle(System.Windows.Forms.ControlStyles.UserPaint, true);
 
-
             Column = column;
 
             GenerateAll(filter, pinned);
 
-
         }
-
 
         public void GenerateAll(FilterCollection filter, List<RowItem> pinned) {
 
@@ -72,10 +64,9 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             var List_FilterString = Column.Autofilter_ItemList(filter, pinned);
 
-
             var F = Skin.GetBlueFont(enDesign.Table_Cell, enStates.Standard);
 
-            Width = Math.Max(txbEingabe.Width + Skin.Padding * 2, Table.tmpColumnContentWidth(null, Column, F, 16));
+            Width = Math.Max(txbEingabe.Width + (Skin.Padding * 2), Table.tmpColumnContentWidth(null, Column, F, 16));
 
             lsbFilterItems.Item.Clear();
             lsbFilterItems.CheckBehavior = enCheckBehavior.MultiSelection;
@@ -88,15 +79,14 @@ namespace BlueControls.BlueDatabaseDialogs {
                 nochOk = false;
             }
 
-
             var PrefSize = lsbFilterItems.Item.CalculateColumnAndSize();
             lsbFilterItems.Anchor = System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Top;
-            lsbFilterItems.Width = Math.Min(Table.tmpColumnContentWidth(null, Column, F, 16), Width - Skin.PaddingSmal * 2);
+            lsbFilterItems.Width = Math.Min(Table.tmpColumnContentWidth(null, Column, F, 16), Width - (Skin.PaddingSmal * 2));
 
             lsbFilterItems.Width = Math.Max(lsbFilterItems.Width, PrefSize.Width);
             lsbFilterItems.Height = Math.Max(lsbFilterItems.Height, PrefSize.Height);
 
-            lsbFilterItems.Width = Math.Max(lsbFilterItems.Width, Width - Skin.PaddingSmal * 2);
+            lsbFilterItems.Width = Math.Max(lsbFilterItems.Width, Width - (Skin.PaddingSmal * 2));
 
             lsbFilterItems.Height = Math.Min(lsbFilterItems.Height, 560);
 
@@ -109,7 +99,6 @@ namespace BlueControls.BlueDatabaseDialogs {
                     capWas.Text = "...oder von-bis:";
                 }
 
-
                 lsbStandardFilter.Item.Clear();
                 if (filter != null) {
                     lsbStandardFilter.Item.Add("Filter löschen", "filterlöschen", QuickImage.Get("Trichter|16||1"), filter[Column] != null, Constants.FirstSortChar + "01");
@@ -117,9 +106,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                     lsbStandardFilter.Item.Add("Filter löschen", "filterlöschen", QuickImage.Get("Trichter|16||1"), false, Constants.FirstSortChar + "01");
                 }
 
-
                 var tmp = CellItem.ValueReadable(Column, string.Empty, enShortenStyle.Replaced, enBildTextVerhalten.Nur_Text, true);
-
 
                 if (string.IsNullOrEmpty(tmp)) {
                     lsbStandardFilter.Item.Add("leere", "filterleere", QuickImage.Get("TasteABC|20|16|1"), true, Constants.FirstSortChar + "02");
@@ -128,11 +115,6 @@ namespace BlueControls.BlueDatabaseDialogs {
                     lsbStandardFilter.Item.Add(tmp + " (= leere)", "filterleere", QuickImage.Get("TasteABC|20|16|1"), true, Constants.FirstSortChar + "02");
                     lsbStandardFilter.Item.Add("nicht leere", "filternichtleere", QuickImage.Get("TasteABC|20|16"), false, Constants.FirstSortChar + "03");
                 }
-
-
-
-
-
 
                 lsbStandardFilter.Item.Add("aus der Zwischenablage", "clipboard", QuickImage.Get(enImageCode.Clipboard, 17), Column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled), Constants.FirstSortChar + "05");
                 lsbStandardFilter.Item.Add("NICHT in der Zwischenablage", "nichtclipboard", QuickImage.Get("Clipboard|17||1"), Column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled) && !Column.MultiLine && string.IsNullOrEmpty(tmp), Constants.FirstSortChar + "06");
@@ -143,19 +125,16 @@ namespace BlueControls.BlueDatabaseDialogs {
                 lsbStandardFilter.Item.Add("Nicht Einzigartige Einträge", "NichtEinzigartig", QuickImage.Get("Eins|17||1"), Column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled), Constants.FirstSortChar + "11");
                 lsbStandardFilter.Item.Add("Vergleiche mit anderer Spalte", "Spaltenvergleich", QuickImage.Get(enImageCode.Spalte, 17), Column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled) && filter[Column.Database.Column[0]] == null, Constants.FirstSortChar + "12");
 
-
             }
 
-            Width = Math.Max(lsbFilterItems.Right + Skin.PaddingSmal * 2, Width);
+            Width = Math.Max(lsbFilterItems.Right + (Skin.PaddingSmal * 2), Width);
             Height = lsbFilterItems.Bottom + Skin.PaddingSmal;
-
 
             if (filter != null) {
 
                 foreach (var Thisfilter in filter) {
                     if (Thisfilter != null && Thisfilter.FilterType != enFilterType.KeinFilter) {
                         if (Thisfilter.Column == Column) {
-
 
                             if (Thisfilter.FilterType.HasFlag(enFilterType.Istgleich)) {
                                 foreach (var ThisValue in Thisfilter.SearchValue) {
@@ -164,34 +143,25 @@ namespace BlueControls.BlueDatabaseDialogs {
                                     } else if (string.IsNullOrEmpty(ThisValue)) {
                                         lsbStandardFilter.Item["filterleere"].Checked = true;
                                     }
-
                                 }
-
                             } else if (Thisfilter.FilterType.HasFlag(enFilterType.Instr)) {
                                 txbEingabe.Text = Thisfilter.SearchValue[0];
-
 
                             } else if (Convert.ToBoolean((int)Thisfilter.FilterType & 2)) {
                                 if (Thisfilter.SearchValue.Count == 1 && string.IsNullOrEmpty(Thisfilter.SearchValue[0])) {
                                     lsbStandardFilter.Item["filternichtleere"].Checked = true;
                                 }
                             }
-
                         }
                     }
                 }
             }
 
-
             if (nochOk) {
                 if (Column.FilterOptions == enFilterOptions.Enabled_OnlyAndAllowed) { ChangeToMultiUnd(); }
                 if (Column.FilterOptions == enFilterOptions.Enabled_OnlyOrAllowed) { ChangeToMultiOder(); }
             }
-
         }
-
-
-
 
         #region  Variablen 
 
@@ -203,14 +173,10 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         #endregion
 
-
         #region  Events 
         public event System.EventHandler<FilterComandEventArgs> FilterComand;
 
         #endregion
-
-
-
 
         private void CloseAndDispose(string Comand, FilterItem NewFilter) {
             if (IsClosed) { return; }
@@ -232,7 +198,6 @@ namespace BlueControls.BlueDatabaseDialogs {
                     if (!txbEingabe.Focused()) { txbEingabe.Focus(); }
                 }
             }
-
         }
 
         private void FiltItems_ItemClicked(object sender, BasicListItemEventArgs e) {
@@ -244,15 +209,12 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (string.IsNullOrEmpty(Column.AutoFilterJoker)) { DoJoker = false; }
             if (NegativAuswahl) { DoJoker = false; }
 
-
             var l = new List<string>
                 {
                     e.Item.Internal
                 };
 
-
             if (DoJoker) { l.Add(Column.AutoFilterJoker); }
-
 
             if (NegativAuswahl) {
                 // Nur Ohne Multirow
@@ -260,7 +222,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             } else {
                 CloseAndDispose("Filter", new FilterItem(Column, enFilterType.Istgleich_ODER_GroßKleinEgal, l));
             }
-
         }
 
         protected override void OnLostFocus(System.EventArgs e) {
@@ -305,7 +266,6 @@ namespace BlueControls.BlueDatabaseDialogs {
                 return;
             }
 
-
             if (Column.Format.IsZahl()) {
                 if (txbEingabe.Text.Contains("-")) {
                     var tmp = txbEingabe.Text.Replace(" ", "");
@@ -322,7 +282,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                             if (Zd2 < Zd1) {
                                 modAllgemein.Swap(ref Zd1, ref Zd2);
                             }
-                            CloseAndDispose("Filter", new FilterItem(Column, enFilterType.Between | enFilterType.UND, Zd1.ToString(Constants.Format_Float9)+ "|" + Zd2.ToString(Constants.Format_Float9)));
+                            CloseAndDispose("Filter", new FilterItem(Column, enFilterType.Between | enFilterType.UND, Zd1.ToString(Constants.Format_Float9) + "|" + Zd2.ToString(Constants.Format_Float9)));
                             return;
                         }
                     }
@@ -334,74 +294,69 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void sFilter_ItemClicked(object sender, BasicListItemEventArgs e) {
 
-
             switch (e.Item.Internal.ToLower()) {
                 case "filterleere": {
-                    CloseAndDispose("Filter", new FilterItem(Column, enFilterType.Istgleich | enFilterType.MultiRowIgnorieren, ""));
-                    break;
-                }
+                        CloseAndDispose("Filter", new FilterItem(Column, enFilterType.Istgleich | enFilterType.MultiRowIgnorieren, ""));
+                        break;
+                    }
                 case "filternichtleere": {
-                    CloseAndDispose("Filter", new FilterItem(Column, enFilterType.Ungleich_MultiRowIgnorieren, ""));
-                    break;
-                }
+                        CloseAndDispose("Filter", new FilterItem(Column, enFilterType.Ungleich_MultiRowIgnorieren, ""));
+                        break;
+                    }
                 case "clipboard": {
-                    CloseAndDispose("DoClipboard", null);
-                    break;
-                }
+                        CloseAndDispose("DoClipboard", null);
+                        break;
+                    }
                 case "nichtclipboard": {
-                    CloseAndDispose("DoNotClipboard", null);
-                    break;
-                }
+                        CloseAndDispose("DoNotClipboard", null);
+                        break;
+                    }
 
                 case "filterlöschen": {
-                    CloseAndDispose("FilterDelete", null);
-                    break;
-                }
+                        CloseAndDispose("FilterDelete", null);
+                        break;
+                    }
                 case "modusmultiund": {
-                    ChangeToMultiUnd();
-                    break;
-                }
+                        ChangeToMultiUnd();
+                        break;
+                    }
                 case "modusmultioder": {
-                    ChangeToMultiOder();
+                        ChangeToMultiOder();
 
-                    break;
-                }
+                        break;
+                    }
 
                 case "modusnegativ": {
-                    NegativAuswahl = true;
-                    MultiAuswahlUND = false;
-                    MultiAuswahlODER = false;
-                    lsbStandardFilter.Item["FilterLeere"].Enabled = false;
-                    lsbStandardFilter.Item["FilterNichtLeere"].Enabled = false;
-                    lsbStandardFilter.Item["Clipboard"].Enabled = false;
-                    lsbStandardFilter.Item["ModusMultiUnd"].Enabled = false;
-                    lsbStandardFilter.Item["ModusMultiOder"].Enabled = false;
+                        NegativAuswahl = true;
+                        MultiAuswahlUND = false;
+                        MultiAuswahlODER = false;
+                        lsbStandardFilter.Item["FilterLeere"].Enabled = false;
+                        lsbStandardFilter.Item["FilterNichtLeere"].Enabled = false;
+                        lsbStandardFilter.Item["Clipboard"].Enabled = false;
+                        lsbStandardFilter.Item["ModusMultiUnd"].Enabled = false;
+                        lsbStandardFilter.Item["ModusMultiOder"].Enabled = false;
 
-
-                    break;
-                }
+                        break;
+                    }
                 case "einzigartig": {
-                    CloseAndDispose("DoEinzigartig", null);
-                    break;
-                }
+                        CloseAndDispose("DoEinzigartig", null);
+                        break;
+                    }
                 case "nichteinzigartig": {
-                    CloseAndDispose("DoNichtEinzigartig", null);
-                    break;
-                }
+                        CloseAndDispose("DoNichtEinzigartig", null);
+                        break;
+                    }
                 case "spaltenvergleich": {
-                    CloseAndDispose("DoSpaltenvergleich", null);
-                    break;
-                }
-
+                        CloseAndDispose("DoSpaltenvergleich", null);
+                        break;
+                    }
 
                 default: {
-                    Develop.DebugPrint("Unbekannter Filter: " + e.Item.Internal);
+                        Develop.DebugPrint("Unbekannter Filter: " + e.Item.Internal);
 
-                    break;
-                }
+                        break;
+                    }
             }
-
-
         }
 
         private void ChangeToMultiOder() {
@@ -411,14 +366,11 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             ChangeDesign();
 
-
-
         }
 
         private void ChangeDesign() {
 
             lsbStandardFilter.Visible = false;
-
 
             capWas.Visible = false;
             txbEingabe.Visible = false;
@@ -436,11 +388,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             capInfo.Text = LanguageTool.DoTranslate("<fontsize=15><b><u>UND-Filterung:</u></b><fontsize=" + F.FontSize.ToString() + "><br><br>Wählen sie welche Einträge <b>alle</b> zutreffen müssen:");
             ChangeDesign();
 
-
         }
 
         private void butFertig_Click(object sender, System.EventArgs e) {
-
 
             var _SearchValue = lsbFilterItems.Item.Checked().ToListOfString();
 
@@ -453,8 +403,6 @@ namespace BlueControls.BlueDatabaseDialogs {
                 CloseAndDispose("Filter", new FilterItem(Column, enFilterType.Istgleich_ODER_GroßKleinEgal, _SearchValue));
                 return;
             }
-
-
 
             if (MultiAuswahlUND) {
                 CloseAndDispose("Filter", new FilterItem(Column, enFilterType.Istgleich_UND_GroßKleinEgal, _SearchValue));

@@ -25,7 +25,6 @@ using static BlueBasics.Extensions;
 namespace BlueScript {
     internal class Method_Sort : Method {
 
-
         //public Method_Sort(Script parent) : base(parent) { }
 
         public override string Syntax => "Sort(ListVariable, EliminateDupes);";
@@ -40,8 +39,6 @@ namespace BlueScript {
 
         public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List, enVariableDataType.Bool };
         public override bool EndlessArgs => false;
-
-
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);

@@ -36,17 +36,12 @@ namespace BlueControls {
 
         public RectangleM(PointM p1, PointM p2) : this(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Abs(p1.X - p2.X), Math.Abs(p1.Y - p2.Y)) { }
 
-
         public RectangleM(decimal x, decimal y, decimal width, decimal height) {
             X = x;
             Y = y;
             Width = width;
             Height = height;
         }
-
-
-
-
 
         public decimal Left => X;
 
@@ -78,15 +73,15 @@ namespace BlueControls {
                 case enAlignment.Top_Right:
                     return new PointM(Right, Top);
                 case enAlignment.Bottom_HorizontalCenter:
-                    return new PointM(Left + Width / 2m, Bottom);
+                    return new PointM(Left + (Width / 2m), Bottom);
                 case enAlignment.Top_HorizontalCenter:
-                    return new PointM(Left + Width / 2m, Top);
+                    return new PointM(Left + (Width / 2m), Top);
                 case enAlignment.VerticalCenter_Left:
-                    return new PointM(Left, Top + Height / 2m);
+                    return new PointM(Left, Top + (Height / 2m));
                 case enAlignment.VerticalCenter_Right:
-                    return new PointM(Right, Top + Height / 2m);
+                    return new PointM(Right, Top + (Height / 2m));
                 case enAlignment.Horizontal_Vertical_Center:
-                    return new PointM(Left + Width / 2m, Top + Height / 2m);
+                    return new PointM(Left + (Width / 2m), Top + (Height / 2m));
                 default:
                     Develop.DebugPrint(P);
                     return new PointM();
@@ -94,15 +89,12 @@ namespace BlueControls {
             }
         }
 
-
-
         public PointM NearestCornerOF(PointM P) {
 
             var LO = PointOf(enAlignment.Top_Left);
             var rO = PointOf(enAlignment.Top_Right);
             var ru = PointOf(enAlignment.Bottom_Right);
             var lu = PointOf(enAlignment.Bottom_Left);
-
 
             var llo = GeometryDF.Länge(P, LO);
             var lro = GeometryDF.Länge(P, rO);
@@ -112,27 +104,15 @@ namespace BlueControls {
             var Erg = Math.Min(Math.Min(llo, lro), Math.Min(llu, lru));
 
             if (Erg == llo) { return LO; }
-            if (Erg == lro) { return rO; }
-            if (Erg == llu) { return lu; }
-            if (Erg == lru) { return ru; }
-
-            return null;
-
+            return Erg == lro ? rO : Erg == llu ? lu : Erg == lru ? ru : null;
         }
-
 
         public bool Contains(PointM P) {
             return Contains(P.X, P.Y);
         }
 
-
         public bool Contains(decimal PX, decimal PY) {
-            if (PX < X) { return false; }
-            if (PY < Y) { return false; }
-            if (PX > X + Width) { return false; }
-            if (PY > Y + Height) { return false; }
-
-            return true;
+            return PX >= X && PY >= Y && PX <= X + Width && PY <= Y + Height;
         }
 
         /// <summary>
@@ -145,14 +125,11 @@ namespace BlueControls {
         /// <returns></returns>
         public RectangleF ZoomAndMoveRect(decimal cZoom, decimal shiftX, decimal shiftY, bool outline) {
 
-
             var add = 0m;
             if (!outline) { add = cZoom / 2; }
 
-            return new RectangleF((float)(X * cZoom - shiftX + add), (float)(Y * cZoom - shiftY + add), (float)(Width * cZoom - add * 2), (float)(Height * cZoom - add * 2));
+            return new RectangleF((float)((X * cZoom) - shiftX + add), (float)((Y * cZoom) - shiftY + add), (float)((Width * cZoom) - (add * 2)), (float)((Height * cZoom) - (add * 2)));
         }
-
-
 
         /// <summary>
         /// Erweitert das Rechteck, dass ein Kreis mit den angegebenen Parametern ebenfalls umschlossen wird.
@@ -165,9 +142,6 @@ namespace BlueControls {
             ExpandTo(new PointM(middle.X + radius, middle.Y));
             ExpandTo(new PointM(middle.X - radius, middle.Y));
         }
-
-
-
 
         /// <summary>
         /// Erweitert das Rechteck, dass der Angegebene Punkt ebenfalls umschlossen wird.
@@ -184,7 +158,6 @@ namespace BlueControls {
                 Y = P.Y;
             }
 
-
             if (P.X > Right) {
                 Width = P.X - X;
             }
@@ -192,9 +165,6 @@ namespace BlueControls {
             if (P.Y > Bottom) {
                 Height = P.Y - Y;
             }
-
-
-
         }
 
         public object Clone() {

@@ -33,7 +33,6 @@ namespace BlueBasics.Enums {
 
         ////   FileHandling_InDataSystem = 8
 
-
         ////Dropdown_Multi = 9,
         //Dropdown_Single = 10,
 
@@ -44,21 +43,16 @@ namespace BlueBasics.Enums {
 
         ////Einschätzung = 14,
 
-
         Gallery = 15, // = Ist auch nur ne Listbox
 
         ////	EventEditor = 16,
 
         ////	RelationOrEventEditor = 17,
 
-
         //FileHandling_InDateiSystem = 18,
 
         ////ListBox_MitFilter = 19,
         ////ListBox_MarkedUp_MitFilter = 20,
-
-
-
 
         //tmpOptionButtonsPic = 21,
         nur_als_Text_anzeigen = 22,
@@ -67,9 +61,6 @@ namespace BlueBasics.Enums {
 
         //Listbox_3_Zeilen = 25,
         Listbox = 26,
-
-
-
 
         Line = 1000,
         Button = 1001

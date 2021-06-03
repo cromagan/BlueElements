@@ -27,9 +27,6 @@ using static BlueBasics.modConverter;
 namespace BlueDatabase {
     public class WorkItem : IParseable, ICompareKey {
 
-
-
-
         public event EventHandler Changed;
 
         #region  Variablen-Deklarationen 
@@ -40,10 +37,6 @@ namespace BlueDatabase {
         private string _changedTo;
 
         #endregion
-
-
-
-
 
         #region Properties
 
@@ -71,7 +64,6 @@ namespace BlueDatabase {
                 _colKey = value;
                 OnChanged();
             }
-
         }
 
         public int RowKey {
@@ -82,7 +74,6 @@ namespace BlueDatabase {
                 _rowKey = value;
                 OnChanged();
             }
-
         }
 
         public DateTime Date { get; private set; }
@@ -103,11 +94,9 @@ namespace BlueDatabase {
 
         public bool HistorischRelevant {
             get {
-                if (State == enItemState.Pending || State == enItemState.Undo) { return true; }
-                return false;
+                return State == enItemState.Pending || State == enItemState.Undo;
             }
         }
-
 
         #endregion
 
@@ -126,11 +115,9 @@ namespace BlueDatabase {
             Date = DateTime.UtcNow;
         }
 
-
         public WorkItem(string s) {
             Parse(s);
         }
-
 
         public void Parse(string ToParse) {
             IsParsing = true;
@@ -227,7 +214,6 @@ namespace BlueDatabase {
 
         public string UndoTextTableMouseOver() {
 
-
             var a = "'" + PreviousValue + "'";
             var n = "'" + ChangedTo + "'";
 
@@ -236,9 +222,7 @@ namespace BlueDatabase {
 
             return "<b>alt: </b>" + a + "<b> <IMAGECODE=Pfeil_Rechts_Scrollbar|8|16> neu: </b>" + n + "     <i>(" + Date + ", " + User + ")</i>";
 
-
         }
-
 
         public string CompareKey() {
 

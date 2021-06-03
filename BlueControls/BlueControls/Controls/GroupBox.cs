@@ -33,7 +33,6 @@ namespace BlueControls.Controls {
         #region Constructor
         public GroupBox() : base() {
 
-
             //// Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             //SetNotFocusable();
             //_MouseHighlight = false;
@@ -47,12 +46,9 @@ namespace BlueControls.Controls {
         private enGroupBoxStyle _GroupBoxStyle = enGroupBoxStyle.Normal;
         #endregion
 
-
         #region  Events 
         //public new event EventHandler TextChanged;
         #endregion
-
-
 
         #region  Properties 
 
@@ -66,7 +62,6 @@ namespace BlueControls.Controls {
                 Invalidate();
             }
         }
-
 
         //[DefaultValue(0)]
         //public new int TabIndex
@@ -98,7 +93,6 @@ namespace BlueControls.Controls {
         //    }
         //}
 
-
         //[DefaultValue("")]
         //public new string Text
         //{
@@ -116,9 +110,7 @@ namespace BlueControls.Controls {
         //    }
         //}
 
-
         #endregion
-
 
         protected override void OnParentChanged(System.EventArgs e) {
             base.OnParentChanged(e);
@@ -131,7 +123,6 @@ namespace BlueControls.Controls {
             SetStandardValues();
             ChildControls_RibbonBar();
         }
-
 
         protected override void OnControlRemoved(ControlEventArgs e) {
             base.OnControlRemoved(e);
@@ -150,7 +141,6 @@ namespace BlueControls.Controls {
 
             if (_GroupBoxStyle == enGroupBoxStyle.RibbonBar) { l = enPartentType.RibbonPage; }
 
-
             switch (l) {
                 case enPartentType.RibbonPage:
                     GroupBoxStyle = enGroupBoxStyle.RibbonBar;
@@ -165,7 +155,6 @@ namespace BlueControls.Controls {
                     break;
 
             }
-
         }
 
         protected override void OnPaintBackground(PaintEventArgs pevent) {
@@ -209,9 +198,7 @@ namespace BlueControls.Controls {
                     break;
             }
 
-
             if (DesignMode) { ChildControls_RibbonBar(); }
-
         }
 
         private void ChildControls_RibbonBar() {
@@ -224,17 +211,16 @@ namespace BlueControls.Controls {
 
             foreach (System.Windows.Forms.Control thisControl in Controls) {
 
-
                 switch (thisControl) {
 
                     case Caption Caption:
                         if (Caption.TextAnzeigeVerhalten == enSteuerelementVerhalten.Steuerelement_Anpassen) { Caption.TextAnzeigeVerhalten = enSteuerelementVerhalten.Text_Abschneiden; }
-                        thisControl.Top = (int)(thisControl.Top / 22.0) * 22 + 2;
+                        thisControl.Top = ((int)(thisControl.Top / 22.0) * 22) + 2;
                         thisControl.Height = Math.Max((int)(thisControl.Height / 22.0) * 22, 22);
                         break;
 
                     case Line _:
-                        thisControl.Top = (int)(thisControl.Top / 22.0) * 22 + 2;
+                        thisControl.Top = ((int)(thisControl.Top / 22.0) * 22) + 2;
                         thisControl.Height = Math.Max((int)(thisControl.Height / 22.0) * 22, 22);
                         break;
 
@@ -242,7 +228,7 @@ namespace BlueControls.Controls {
                     case ComboBox _:
                     case ListBox _:
                     case TextBox _:
-                        thisControl.Top = (int)(thisControl.Top / 22.0) * 22 + 2;
+                        thisControl.Top = ((int)(thisControl.Top / 22.0) * 22) + 2;
                         thisControl.Height = Math.Max((int)(thisControl.Height / 22.0) * 22, 22);
                         break;
                 }

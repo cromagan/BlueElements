@@ -57,22 +57,17 @@ namespace BlueControls.Controls {
         private enDesign _BackStyle;
         private enDesign _SliderStyle;
 
-
         private Rectangle _ClickArea;
         private bool _ClickAreaContainsMouse;
 
         private Rectangle _Slider;
         private bool _SliderContainsMouse;
 
-
         private const int _ButtonSize = 18;
-
 
         #endregion
 
-
         #region  Properties 
-
 
         [DefaultValue(0)]
         public new int TabIndex {
@@ -87,8 +82,6 @@ namespace BlueControls.Controls {
 
             set => base.TabStop = false;
         }
-
-
 
         [DefaultValue(enOrientation.Waagerecht)]
         public enOrientation Orientation {
@@ -128,7 +121,6 @@ namespace BlueControls.Controls {
         [DefaultValue(10.0D)]
         public double LargeChange { get; set; } = 10;
 
-
         [DefaultValue(1.0D)]
         public double SmallChange { get; set; } = 1;
 
@@ -158,23 +150,19 @@ namespace BlueControls.Controls {
                     LastFiredValue = _Value;
                     OnValueChanged();
                 }
-
             }
         }
 
         #endregion
-
 
         #region  Event-Deklarationen 
 
         public event EventHandler ValueChanged;
         #endregion
 
-
         private void OnValueChanged() {
             ValueChanged?.Invoke(this, System.EventArgs.Empty);
         }
-
 
         private void But1_Click(object sender, System.EventArgs e) {
             lock (Lock_UserAction) {
@@ -195,7 +183,6 @@ namespace BlueControls.Controls {
             }
         }
 
-
         protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseDown(e);
 
@@ -215,12 +202,10 @@ namespace BlueControls.Controls {
                 _SliderContainsMouse = _Slider.Contains(e.X, e.Y);
                 _ClickAreaContainsMouse = _ClickArea.Contains(e.X, e.Y);
 
-
                 if (!Enabled) { return; }
                 if (e.Button == System.Windows.Forms.MouseButtons.Left) { DoMouseAction(e, true); }
             }
         }
-
 
         protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseUp(e);
@@ -236,14 +221,9 @@ namespace BlueControls.Controls {
             }
         }
 
-
         public new bool Focused() {
-            if (base.Focused) { return true; }
-            if (But1.Focused) { return true; }
-            if (But2.Focused) { return true; }
-            return false;
+            return base.Focused || But1.Focused || But2.Focused;
         }
-
 
         private void GenerateButtons() {
 
@@ -275,52 +255,32 @@ namespace BlueControls.Controls {
 
         }
 
-
-
-
-
         private double CheckMinMax(double ValueToCheck) {
             var _Min = Math.Min(_Minimum, _Maximum);
             var _Max = Math.Max(_Minimum, _Maximum);
 
-            if (ValueToCheck < _Min) { return _Min; }
-            if (ValueToCheck > _Max) { return _Max; }
-            return ValueToCheck;
+            return ValueToCheck < _Min ? _Min : ValueToCheck > _Max ? _Max : ValueToCheck;
         }
 
         private void DoMouseAction(System.Windows.Forms.MouseEventArgs e, bool MouseisMoving) {
-            double TestVal = 0;
-
             _ClickAreaContainsMouse = _ClickArea.Contains(e.X, e.Y);
             if (!_ClickAreaContainsMouse && !MouseisMoving) { return; }
             if (_SliderContainsMouse && !MouseisMoving) { return; }
             if (_ClickArea.Width <= 0 || _ClickArea.Height <= 0) { return; }
 
-
-            if (_Orientation == enOrientation.Waagerecht) {
-                TestVal = Minimum + (e.X - _ClickArea.Left - _Slider.Width / 2.0) / (_ClickArea.Width - _Slider.Width) * (Maximum - Minimum);
-            } else {
-                TestVal = Minimum + (e.Y - _ClickArea.Top - _Slider.Height / 2.0) / (_ClickArea.Height - _Slider.Height) * (Maximum - Minimum);
-            }
-
-
+            var TestVal = _Orientation == enOrientation.Waagerecht
+                ? Minimum + ((e.X - _ClickArea.Left - (_Slider.Width / 2.0)) / (_ClickArea.Width - _Slider.Width) * (Maximum - Minimum))
+                : Minimum + ((e.Y - _ClickArea.Top - (_Slider.Height / 2.0)) / (_ClickArea.Height - _Slider.Height) * (Maximum - Minimum));
             TestVal = CheckMinMax((int)(TestVal / MouseChange) * MouseChange);
 
-
             if (!MouseisMoving) {
-                if (TestVal > _Value) {
-                    TestVal = _Value + LargeChange;
-                } else {
-                    TestVal = _Value - LargeChange;
-                }
+                TestVal = TestVal > _Value ? _Value + LargeChange : _Value - LargeChange;
             }
 
             if (Math.Abs(TestVal - _Value) < 0.00001) { return; }
 
             Value = TestVal;
         }
-
-
 
         protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseWheel(e);
@@ -339,11 +299,9 @@ namespace BlueControls.Controls {
 
             if (Maximum - Minimum > 0) {
 
-                if (_Orientation == enOrientation.Waagerecht) {
-                    _Slider = new Rectangle((int)(_ClickArea.Left + Proz * (_ClickArea.Width - But1.Width)), 0, But1.Width, But1.Height);
-                } else {
-                    _Slider = new Rectangle(0, (int)(_ClickArea.Top + Proz * (_ClickArea.Height - But1.Height)), But1.Width, But1.Height);
-                }
+                _Slider = _Orientation == enOrientation.Waagerecht
+                    ? new Rectangle((int)(_ClickArea.Left + (Proz * (_ClickArea.Width - But1.Width))), 0, But1.Width, But1.Height)
+                    : new Rectangle(0, (int)(_ClickArea.Top + (Proz * (_ClickArea.Height - But1.Height))), But1.Width, But1.Height);
 
                 _SliderContainsMouse = _Slider.Contains(MousePos());
 
@@ -352,7 +310,6 @@ namespace BlueControls.Controls {
                 _Slider.Height = 0;
                 _SliderContainsMouse = false;
             }
-
 
             if (Convert.ToBoolean(state & enStates.Standard_MouseOver)) {
                 if (_SliderContainsMouse) {
@@ -373,13 +330,10 @@ namespace BlueControls.Controls {
             Skin.Draw_Back(gr, _BackStyle, vState_Back, _ClickArea, this, true);
             Skin.Draw_Border(gr, _BackStyle, vState_Back, _ClickArea);
 
-
             if (Maximum - Minimum > 0) {
                 Skin.Draw_Back(gr, _SliderStyle, vState_Slider, _Slider, this, false);
                 Skin.Draw_Border(gr, _SliderStyle, vState_Slider, _Slider);
             }
-
-
         }
 
         protected override void OnMouseEnter(System.EventArgs e) {
@@ -392,7 +346,6 @@ namespace BlueControls.Controls {
             Invalidate();
         }
 
-
         protected override void OnMouseLeave(System.EventArgs e) {
             base.OnMouseLeave(e);
 
@@ -402,7 +355,6 @@ namespace BlueControls.Controls {
             if (!Enabled) { return; }
             Invalidate();
         }
-
 
         protected override void OnSizeChanged(System.EventArgs e) {
             base.OnSizeChanged(e);
@@ -414,7 +366,6 @@ namespace BlueControls.Controls {
             base.OnEnabledChanged(e);
             CheckButtonEnabledState();
         }
-
 
         private void CheckButtonEnabledState() {
 
@@ -437,7 +388,6 @@ namespace BlueControls.Controls {
 
             if (ol1 != But1.Enabled) { But1.Invalidate(); }
             if (ol2 != But2.Enabled) { But2.Invalidate(); }
-
         }
 
         internal void DoMouseWheel(System.Windows.Forms.MouseEventArgs e) {

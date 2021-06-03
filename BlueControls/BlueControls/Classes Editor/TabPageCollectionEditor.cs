@@ -9,6 +9,5 @@ namespace BlueControls.Controls {
         protected override Type CreateCollectionItemType() {
             return typeof(TabPage);
         }
-
     }
 }

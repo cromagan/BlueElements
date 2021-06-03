@@ -15,7 +15,6 @@ namespace BlueControls.Classes_Editor {
 
         private AutoFilter autofilter;
 
-
         protected override void PrepaireFormula() {
             Col.Item.AddRange(Item.Database.Column, false, false, true);
         }
@@ -37,15 +36,9 @@ namespace BlueControls.Classes_Editor {
             Col.Text = string.Empty;
         }
 
-
-
-
-
-
         private void FiltWahl_Click(object sender, System.EventArgs e) {
 
             var c = Item.Database.Column[Col.Text];
-
 
             if (c == null || !c.AutoFilterSymbolPossible()) { return; }
 
@@ -63,9 +56,7 @@ namespace BlueControls.Classes_Editor {
             autofilter.FilterComand += AutoFilter_FilterComand;
             Develop.Debugprint_BackgroundThread();
 
-
         }
-
 
         private void AutoFilter_FilterComand(object sender, FilterComandEventArgs e) {
             if (IsFilling) { return; }
@@ -74,7 +65,6 @@ namespace BlueControls.Classes_Editor {
                 Notification.Show("Diese Funktion wird nicht unterstützt,<br>abbruch.");
                 return;
             }
-
 
             Item.FilterType = e.Filter.FilterType;
             Item.SearchValue.Clear();
@@ -88,18 +78,11 @@ namespace BlueControls.Classes_Editor {
 
             var c = Item.Database.Column[Col.Text];
 
-
-            if (c == null || c.AutoFilterSymbolPossible()) {
-                FiltWahl.Enabled = true;
-            } else {
-                FiltWahl.Enabled = true;
-            }
-
+            FiltWahl.Enabled = c == null || c.AutoFilterSymbolPossible() || true;
 
             Item.Column = c;
             Item.FilterType = enFilterType.KeinFilter;
             Item.SearchValue.Clear();
-
 
             OnChanged(Item);
         }

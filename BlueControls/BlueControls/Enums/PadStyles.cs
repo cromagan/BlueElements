@@ -17,18 +17,15 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 namespace BlueControls.Enums {
     public enum PadStyles : int {
         Undefiniert = -1, // Braucht man
-
 
         // 10000 = Grenze für UniPaint, diese Objecte werden mit der Poligon-Routine erzeugt
         //Linie = 10004
         //Oval = 10005
         //Rechteck = 10007
         // TextFeld = 10008
-
 
         Style_Überschrift_Haupt = 10001,
         Style_Überschrift_Untertitel = 10002,

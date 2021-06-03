@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 namespace BlueDatabase.EventArgs {
     public class DoRowAutomaticEventArgs : RowEventArgs {
 
@@ -29,7 +28,5 @@ namespace BlueDatabase.EventArgs {
         public ColumnItem FeedbackColumn { get; set; }
 
         public bool Done { get; set; }
-
-
     }
 }

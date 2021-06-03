@@ -24,34 +24,26 @@ using System.Drawing;
 namespace BlueControls {
     public static class GeometryDF {
 
-
-
-
-
-
         /// Berechnet, ob sich zwei geraden IRGENDWO treffen.
         public static PointM LinesIntersect(PointM Line1Start, PointM Line1End, PointM Line2Start, PointM Line2End) {
 
             decimal a1, a2, b1, b2, c1, c2, denom;
 
-
-
             a1 = Line1End.Y - Line1Start.Y;
             b1 = Line1Start.X - Line1End.X;
-            c1 = Line1End.X * Line1Start.Y - Line1Start.X * Line1End.Y;
+            c1 = (Line1End.X * Line1Start.Y) - (Line1Start.X * Line1End.Y);
 
             a2 = Line2End.Y - Line2Start.Y;
             b2 = Line2Start.X - Line2End.X;
-            c2 = Line2End.X * Line2Start.Y - Line2Start.X * Line2End.Y;
+            c2 = (Line2End.X * Line2Start.Y) - (Line2Start.X * Line2End.Y);
 
-            denom = a1 * b2 - a2 * b1;
+            denom = (a1 * b2) - (a2 * b1);
             if (denom < 0.0000001M && denom > -0.0000001M) {
                 // Ergibt ansonsten zu große ergebnisse
                 return null;
             }
 
-            return new PointM((b1 * c2 - b2 * c1) / denom, (a2 * c1 - a1 * c2) / denom);
-
+            return new PointM(((b1 * c2) - (b2 * c1)) / denom, ((a2 * c1) - (a1 * c2)) / denom);
 
         }
 
@@ -73,13 +65,10 @@ namespace BlueControls {
             if (sp.X > Math.Max(Line2Start.X, Line2End.X) + tol) { return null; }
 
             if (sp.Y < Math.Min(Line1Start.Y, Line1End.Y) - tol) { return null; }
-            if (sp.Y > Math.Max(Line1Start.Y, Line1End.Y) + tol) { return null; }
-            if (sp.Y < Math.Min(Line2Start.Y, Line2End.Y) - tol) { return null; }
-            if (sp.Y > Math.Max(Line2Start.Y, Line2End.Y) + tol) { return null; }
-
-            return sp;
+            return sp.Y > Math.Max(Line1Start.Y, Line1End.Y) + tol
+                ? null
+                : sp.Y < Math.Min(Line2Start.Y, Line2End.Y) - tol ? null : sp.Y > Math.Max(Line2Start.Y, Line2End.Y) + tol ? null : sp;
         }
-
 
         /// <summary>
         ///  Calculate the distance between the point and the segment
@@ -100,7 +89,6 @@ namespace BlueControls {
             return new PointM(P.X, P.Y);
         }
 
-
         /// <summary>
         /// Calculate the distance between the point and the segment
         /// </summary>
@@ -113,16 +101,11 @@ namespace BlueControls {
         public static decimal DistanzZuStrecke(this PointF P, decimal X1, decimal Y1, decimal X2, decimal Y2) {
             var SP = PointOnLine(new PointM(P.X, P.Y), X1, Y1, X2, Y2);
 
-
             var P1 = new PointM(P.X, P.Y);
 
-
-            if (Extensions.PointInRect((PointF)SP, X1, Y1, X2, Y2, 5)) { return Länge(P1, SP); }
-
-            return Math.Min(Länge(new PointM(X1, Y1), P1), Länge(new PointM(X2, X2), P1));
-
-
-
+            return Extensions.PointInRect((PointF)SP, X1, Y1, X2, Y2, 5)
+                ? Länge(P1, SP)
+                : Math.Min(Länge(new PointM(X1, Y1), P1), Länge(new PointM(X2, X2), P1));
         }
 
         public static PointM PolarToCartesian(decimal R, double Winkel) {
@@ -130,18 +113,13 @@ namespace BlueControls {
 
             Winkel %= 360;
 
-            switch (Winkel) {
-                case 0:
-                    return new PointM(R, 0);
-                case 90:
-                    return new PointM(0, -R);
-                case 180:
-                    return new PointM(-R, 0);
-                case 270:
-                    return new PointM(0, R);
-                default:
-                    return new PointM((double)R * Geometry.Cosinus(Winkel), -(double)R * Geometry.Sinus(Winkel));
-            }
+            return Winkel switch {
+                0 => new PointM(R, 0),
+                90 => new PointM(0, -R),
+                180 => new PointM(-R, 0),
+                270 => new PointM(0, R),
+                _ => new PointM((double)R * Geometry.Cosinus(Winkel), -(double)R * Geometry.Sinus(Winkel)),
+            };
         }
 
         public static decimal Winkel(PointM Sp, PointM EP) {
@@ -162,17 +140,14 @@ namespace BlueControls {
             var m1 = (P_Y - Q_Y) / (P_X - Q_X);
             var m2 = -1 / m1;
 
-            var T2 = Maus.Y + Maus.X / m1;
-            var T1 = P_Y - m1 * P_X;
+            var T2 = Maus.Y + (Maus.X / m1);
+            var T1 = P_Y - (m1 * P_X);
 
             var SchnittX = (T2 - T1) / (m1 - m2);
-            var Schnitty = m1 * SchnittX + T1;
+            var Schnitty = (m1 * SchnittX) + T1;
 
             return new PointM(SchnittX, Schnitty);
         }
-
-
-
 
         public static decimal Länge(PointM SP, PointM Ep) {
             // Berechnet die Länge einer Strecke
@@ -181,16 +156,8 @@ namespace BlueControls {
             var L2 = SP.Y - Ep.Y;
 
             // ^ 2 ist langsamer, laut Project Analyzer
-            return (decimal)Math.Sqrt(Convert.ToDouble(L1 * L1 + L2 * L2));
+            return (decimal)Math.Sqrt(Convert.ToDouble((L1 * L1) + (L2 * L2)));
         }
-
-
-
-
-
-
-
     }
 }
-
 

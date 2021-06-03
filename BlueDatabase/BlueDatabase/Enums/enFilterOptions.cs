@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 using System;
 
 namespace BlueDatabase.Enums {
@@ -33,7 +32,6 @@ namespace BlueDatabase.Enums {
 
         Enabled_OnlyAndAllowed = OnlyAndAllowed | Enabled,
         Enabled_OnlyOrAllowed = OnlyOrAllowed | Enabled
-
 
     }
 }

@@ -25,7 +25,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 
-
 // VTextTyp-Hirachie
 // ~~~~~~~~~~~~~~~~~
 // HTMLText, PlainText = Diese Texte wurden in den Speicher geschrieben und führen
@@ -62,8 +61,6 @@ namespace BlueControls {
         private enStates _State;
         private float _Zeilenabstand = 1;
 
-
-
         private Size _TextDimensions;
         private int? _Width = null;
         private int? _Height = null;
@@ -81,15 +78,11 @@ namespace BlueControls {
 
         #endregion
 
-
         #region  Event-Deklarationen + Delegaten 
 
         #endregion
 
-
         #region  Construktor + Initialize 
-
-
 
         private void Initialize() {
             _Design = enDesign.Undefiniert;
@@ -110,7 +103,6 @@ namespace BlueControls {
             _TMPPlainText = string.Empty;
         }
 
-
         public ExtText(enDesign vDesign, enStates state) {
             Initialize();
             _Design = vDesign;
@@ -129,9 +121,7 @@ namespace BlueControls {
             }
         }
 
-
         #endregion
-
 
         #region  Properties 
 
@@ -159,11 +149,6 @@ namespace BlueControls {
             }
         }
 
-
-
-
-
-
         public string HtmlText {
             get {
                 if (string.IsNullOrEmpty(_TMPHtmlText)) {
@@ -178,7 +163,6 @@ namespace BlueControls {
             }
         }
 
-
         public string PlainText {
             get {
                 if (string.IsNullOrEmpty(_TMPPlainText)) {
@@ -191,7 +175,6 @@ namespace BlueControls {
                 ConvertTextToChar(value, false);
             }
         }
-
 
         public enDesign Design {
             get => _Design;
@@ -217,7 +200,6 @@ namespace BlueControls {
 
         #endregion
 
-
         internal int WordStart(int Pos) {
             if (Chars.Count == 0) { return -1; }
             if (Pos < 0 || Pos >= Chars.Count) { return -1; }
@@ -232,7 +214,6 @@ namespace BlueControls {
 
         }
 
-
         internal int WordEnd(int Pos) {
             if (Chars.Count == 0) { return -1; }
             if (Pos < 0 || Pos >= Chars.Count) { return -1; }
@@ -246,13 +227,11 @@ namespace BlueControls {
 
         }
 
-
         public string Word(int Pos) {
             var S = WordStart(Pos);
             var E = WordEnd(Pos);
             return Substring(S, E - S);
         }
-
 
         private void ResetPosition(bool AndTmpText) {
 
@@ -265,9 +244,7 @@ namespace BlueControls {
             }
         }
 
-
         #region  Für Formatierung 
-
 
         /// <summary>
         /// Berechnet die Zeichen-Positionen mit korrekten Umbrüchen. Die enAlignment wird ebefalls mit eingerechnet.
@@ -275,7 +252,7 @@ namespace BlueControls {
         /// </summary>
         /// <remarks></remarks>
         private void ReBreak() {
-           
+
             _Width = 0;
             _Height = 0;
 
@@ -288,7 +265,6 @@ namespace BlueControls {
             var ZB_Char = 0;
 
             var Akt = -1;
-
 
             do {
                 Akt++;
@@ -322,7 +298,6 @@ namespace BlueControls {
                         }
                     }
 
-
                     _Width = Math.Max((int)_Width, (int)(IsX + Chars[Akt].Size.Width + 0.5));
                     _Height = Math.Max((int)_Height, (int)(IsY + Chars[Akt].Size.Height + 0.5));
                 }
@@ -332,7 +307,6 @@ namespace BlueControls {
 
                 // Diese Zeile garantiert, dass immer genau EIN Pixel frei ist zwischen zwei Buchstaben.
                 IsX = (float)(IsX + Math.Truncate(Chars[Akt].Size.Width + 0.5));
-
 
                 if (Chars[Akt].isLineBreak()) {
                     IsX = vZBX_Pixel;
@@ -346,12 +320,9 @@ namespace BlueControls {
 
                     ZB_Char = Akt + 1;
                 }
-
             } while (true);
 
-
             //    vHeight = CInt(Math.Max(vHeight, _Chars(ZB_Char).Pos.Y + _Chars(ZB_Char).Size.Height))
-
 
             // enAlignment berechnen -------------------------------------
             if (Ausrichtung != enAlignment.Top_Left) {
@@ -373,16 +344,10 @@ namespace BlueControls {
                     }
                 }
             }
-
-
         }
-
-
-
 
         private float Row_SetOnLine(int Von, int Nach) {
             float Abstand = 0;
-
 
             for (var z = Von; z <= Nach; z++) {
                 Abstand = Math.Max(Abstand, Chars[z].Size.Height);
@@ -401,20 +366,16 @@ namespace BlueControls {
 
             if (Chars.Count == 1) { return 0; }
 
-
             if (MinZeichen < 0) { MinZeichen = 0; }
             if (AugZeichen > Chars.Count - 1) { AugZeichen = Chars.Count - 1; }
 
             if (AugZeichen < MinZeichen + 1) { AugZeichen = MinZeichen + 1; }
 
-
             // AusnahmeFall auschließen:
             // Space-Zeichen - Dann Buchstabe
             if (Chars[AugZeichen - 1].isSpace() && !Chars[AugZeichen].isPossibleLineBreak()) { return AugZeichen; }
 
-
             var Started = AugZeichen;
-
 
             // Das Letzte Zeichen Search, das kein Trennzeichen ist
             do {
@@ -426,7 +387,6 @@ namespace BlueControls {
 
                 if (AugZeichen <= MinZeichen) { return Started; }
             } while (true);
-
 
             do {
                 if (Chars[AugZeichen].isPossibleLineBreak()) { return AugZeichen + 1; }
@@ -440,7 +400,6 @@ namespace BlueControls {
 
         #endregion
 
-
         public void Draw(Graphics gr, float zoom) {
 
             while (_Width == null) { ReBreak(); }
@@ -450,8 +409,6 @@ namespace BlueControls {
             foreach (var t in Chars) {
                 if (t.Char > 0 && t.IsVisible(zoom, DrawingPos, DrawingArea)) { t.Draw(gr, DrawingPos, zoom); }
             }
-
-
         }
         private void DrawStates(Graphics GR, float czoom) {
             DrawState(GR, czoom, enMarkState.Field);
@@ -460,9 +417,6 @@ namespace BlueControls {
             DrawState(GR, czoom, enMarkState.Ringelchen);
         }
 
-
-
-
         private void DrawState(Graphics GR, float czoom, enMarkState state) {
 
             var tmas = -1;
@@ -470,7 +424,6 @@ namespace BlueControls {
             for (var Pos = 0; Pos < Chars.Count; Pos++) {
                 var tempVar = Chars[Pos];
                 var marked = tempVar.Marking.HasFlag(state);
-
 
                 if (marked && tmas < 0) {
                     tmas = Pos;
@@ -486,30 +439,23 @@ namespace BlueControls {
 
                         tmas = -1;
                     }
-
-
-
                 }
             }
         }
 
-
-
-
         private void DrawZone(Graphics GR, float czoom, enMarkState ThisState, int MarkStart, int MarkEnd) {
 
-            var StartX = Chars[MarkStart].Pos.X * czoom + DrawingPos.X;
-            var StartY = Chars[MarkStart].Pos.Y * czoom + DrawingPos.Y;
-            var EndX = Chars[MarkEnd].Pos.X * czoom + DrawingPos.X + Chars[MarkEnd].Size.Width * czoom;
-            var Endy = Chars[MarkEnd].Pos.Y * czoom + DrawingPos.Y + Chars[MarkEnd].Size.Height * czoom;
-
+            var StartX = (Chars[MarkStart].Pos.X * czoom) + DrawingPos.X;
+            var StartY = (Chars[MarkStart].Pos.Y * czoom) + DrawingPos.Y;
+            var EndX = (Chars[MarkEnd].Pos.X * czoom) + DrawingPos.X + (Chars[MarkEnd].Size.Width * czoom);
+            var Endy = (Chars[MarkEnd].Pos.Y * czoom) + DrawingPos.Y + (Chars[MarkEnd].Size.Height * czoom);
 
             switch (ThisState) {
                 case enMarkState.None:
                     break;
 
                 case enMarkState.Ringelchen:
-                    GR.DrawLine(new Pen(Color.Red, 3 * czoom), StartX, (int)(StartY + Chars[MarkStart].Size.Height * czoom * 0.9), EndX, (int)(StartY + Chars[MarkStart].Size.Height * czoom * 0.9));
+                    GR.DrawLine(new Pen(Color.Red, 3 * czoom), StartX, (int)(StartY + (Chars[MarkStart].Size.Height * czoom * 0.9)), EndX, (int)(StartY + (Chars[MarkStart].Size.Height * czoom * 0.9)));
                     break;
 
                 case enMarkState.Field:
@@ -529,7 +475,6 @@ namespace BlueControls {
                     break;
             }
         }
-
 
         public Rectangle CursorPixelPosx(int CharPos) {
 
@@ -551,7 +496,6 @@ namespace BlueControls {
                 Y = Chars[CharPos].Pos.Y;
                 He = Chars[CharPos].Size.Height;
 
-
             } else if (CharPos > 0 && CharPos < Chars.Count + 1 && Chars[CharPos - 1].Char == 13) {
                 // Vorzeichen = Zeilenumbruch
                 Y = Chars[CharPos - 1].Pos.Y + Chars[CharPos - 1].Size.Height;
@@ -566,36 +510,22 @@ namespace BlueControls {
             return new Rectangle((int)X, (int)(Y - 1), 0, (int)(He + 2));
         }
 
-
         private void ConvertTextToChar(string cactext, bool IsRich) {
             var Pos = 0;
             var Zeichen = -1;
             var Stufe = 4;
             var Markstate = enMarkState.None;
 
-
             Chars = new List<ExtChar>();
             ResetPosition(false);
 
-            BlueFont BF;
-
-            if ((int)_Design > 10000) {
-                BF = Skin.GetBlueFont((PadStyles)_Design, _Row);
-            } else {
-                BF = Skin.GetBlueFont(_Design, _State);
-            }
-
+            var BF = (int)_Design > 10000 ? Skin.GetBlueFont((PadStyles)_Design, _Row) : Skin.GetBlueFont(_Design, _State);
             if (BF == null) {
                 return;
             }// Wenn die DAtenbanken entladen wurde, bei Programmende
 
             if (!string.IsNullOrEmpty(cactext)) {
-                if (IsRich) {
-                    cactext = cactext.ConvertFromHtmlToRich();
-                } else {
-                    cactext = cactext.Replace("\r\n", "\r");
-                }
-
+                cactext = IsRich ? cactext.ConvertFromHtmlToRich() : cactext.Replace("\r\n", "\r");
 
                 var Lang = cactext.Length - 1;
 
@@ -603,23 +533,21 @@ namespace BlueControls {
                     if (Pos > Lang) { break; }
                     var CH = cactext[Pos];
 
-
                     if (IsRich) {
                         switch (CH) {
                             case '<': {
-                                DoHTMLCode(cactext, Pos, ref Zeichen, ref BF, ref Stufe, ref Markstate);
-                                var OP = 1;
-                                do {
-                                    Pos++;
-                                    if (Pos > Lang) { break; }
-                                    if (cactext[Pos] == '>') { OP--; }
-                                    if (cactext[Pos] == '<') { OP++; }
-                                    if (OP == 0) { break; }
+                                    DoHTMLCode(cactext, Pos, ref Zeichen, ref BF, ref Stufe, ref Markstate);
+                                    var OP = 1;
+                                    do {
+                                        Pos++;
+                                        if (Pos > Lang) { break; }
+                                        if (cactext[Pos] == '>') { OP--; }
+                                        if (cactext[Pos] == '<') { OP++; }
+                                        if (OP == 0) { break; }
+                                    } while (true);
 
-                                } while (true);
-
-                                break;
-                            }
+                                    break;
+                                }
                             case '&':
                                 DoSpecialEntities(cactext, ref Pos, ref Zeichen, ref BF, ref Stufe, ref Markstate);
                                 break;
@@ -635,7 +563,6 @@ namespace BlueControls {
                         Chars.Add(new ExtChar(CH, _Design, _State, BF, Stufe, Markstate));
                     }
 
-
                     Pos++;
                 } while (true);
             }
@@ -643,16 +570,13 @@ namespace BlueControls {
             ResetPosition(false);
         }
 
-
         private string ConvertCharToHTMLText(int Von, int Bis) {
             var T = "";
             var cZ = Von;
 
-
             Bis = Math.Min(Bis, Chars.Count - 1);
 
             var LastStufe = 4;
-
 
             while (cZ <= Bis && Chars[cZ].Char > 0) {
                 if (Chars[cZ].Char < (int)enASCIIKey.ImageStart) {
@@ -666,15 +590,12 @@ namespace BlueControls {
                     var index = Chars[cZ].Char - (int)enASCIIKey.ImageStart;
                     var x = QuickImage.Get(index);
                     if (x != null) { T += "<ImageCode=" + x.Name + ">"; }
-
                 }
                 cZ++;
             }
 
-
             return T;
         }
-
 
         internal string ConvertCharToPlainText(int Von, int Bis) {
             try {
@@ -698,7 +619,6 @@ namespace BlueControls {
                 // Wenn Chars geändter wird (und dann der Count nimmer stimmt)
                 return ConvertCharToPlainText(Von, Bis);
             }
-
         }
 
         private void DoSpecialEntities(string xHTMLTextx, ref int xStartPosx, ref int xPosition, ref BlueFont f, ref int Stufe, ref enMarkState MarkState) {
@@ -768,7 +688,6 @@ namespace BlueControls {
                     return;
             }
 
-
             xStartPosx = Endpos;
         }
 
@@ -785,7 +704,6 @@ namespace BlueControls {
 
             var Oricode = HTMLText.Substring(StartPos + 1, Endpos - StartPos - 1);
 
-
             var Istgleich = Oricode.IndexOf('=');
             string Cod, Attribut;
 
@@ -797,8 +715,6 @@ namespace BlueControls {
                 Cod = Oricode.Substring(0, Istgleich).Replace(" ", "").ToUpper().Trim();
                 Attribut = Oricode.Substring(Istgleich + 1).Trim('\"');
             }
-
-
 
             switch (Cod) {
                 case "B":
@@ -906,11 +822,7 @@ namespace BlueControls {
 
                 case "IMAGECODE":
                     QuickImage x;
-                    if (!Attribut.Contains("|") && PF != null) {
-                        x = QuickImage.Get(Attribut, (int)PF.Oberlänge(1));
-                    } else {
-                        x = QuickImage.Get(Attribut);
-                    }
+                    x = !Attribut.Contains("|") && PF != null ? QuickImage.Get(Attribut, (int)PF.Oberlänge(1)) : QuickImage.Get(Attribut);
 
                     Position++;
 
@@ -922,24 +834,20 @@ namespace BlueControls {
                 //    Chars.Add(new ExtChar((int)((int)enEtxtCodes.ProgressBar0 + int.Parse(Attribut)), _Design, _State, PF, Stufe, MarkState));
                 //    break;
 
-
                 case "H7":
                     Stufe = 7;
                     PF = Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
-
 
                 case "H6":
                     Stufe = 6;
                     PF = Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
 
-
                 case "H5":
                     Stufe = 5;
                     PF = Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
-
 
                 case "H4":
                     Stufe = 4;
@@ -950,7 +858,6 @@ namespace BlueControls {
                     Stufe = 3;
                     PF = Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
-
 
                 case "H2":
                     Stufe = 2;
@@ -974,18 +881,7 @@ namespace BlueControls {
                     // Develop.DebugPrint("Unbekannter HTML-Code: " + Oricode);
                     break;
             }
-
-
         }
-
-
-
-
-
-
-
-
-
 
         public int Width() {
             while (_Width == null) { ReBreak(); }
@@ -1001,11 +897,8 @@ namespace BlueControls {
 
             while (_Width == null) { ReBreak(); }
 
-            if (_Width < 5 || _Height < 5) { return new Size(32, 16); }
-
-            return new Size((int)_Width, (int)_Height);
+            return _Width < 5 || _Height < 5 ? new Size(32, 16) : new Size((int)_Width, (int)_Height);
         }
-
 
         /// <summary>
         ///     Sucht den aktuellen Buchstaben, der unter den angegeben Koordinaten liegt.
@@ -1019,7 +912,6 @@ namespace BlueControls {
 
             var XNr = -1;
             var YNr = -1;
-
 
             // Passiert dann, wenn wäherend des Klickens der Text geändert wird, z.B. PLZ ->Ort
             //  If Not CBool(_TextTyp And enTextTyp.Converted) Then HTML2Char()
@@ -1040,20 +932,19 @@ namespace BlueControls {
                     //If PixX >= Left + vChars(cZ).Pos.X AndAlso PixX <= Left + vChars(cZ).Pos.X + vChars(cZ).Size.Width Then X = True
                     //If PixY >= Top + vChars(cZ).Pos.Y AndAlso PixY <= Top + vChars(cZ).Pos.Y + vChars(cZ).Size.Height Then Y = True
 
-
                     if (X && Y) {
                         return cZ;
                     }
 
                     double TmpDi;
                     if (X == false && Y) {
-                        TmpDi = Math.Abs(PixX - (DrawingPos.X + Chars[cZ].Pos.X + Chars[cZ].Size.Width / 2.0));
+                        TmpDi = Math.Abs(PixX - (DrawingPos.X + Chars[cZ].Pos.X + (Chars[cZ].Size.Width / 2.0)));
                         if (TmpDi < XDi) {
                             XNr = cZ;
                             XDi = TmpDi;
                         }
                     } else if (X && Y == false) {
-                        TmpDi = Math.Abs(PixY - (DrawingPos.Y + Chars[cZ].Pos.Y + Chars[cZ].Size.Height / 2.0));
+                        TmpDi = Math.Abs(PixY - (DrawingPos.Y + Chars[cZ].Pos.Y + (Chars[cZ].Size.Height / 2.0)));
                         if (TmpDi < YDi) {
                             YNr = cZ;
                             YDi = TmpDi;
@@ -1062,25 +953,11 @@ namespace BlueControls {
                 }
             } while (true);
 
-
             //   Dim RN As Integer = cZ
 
             cZ--;
 
-            if (XNr >= 0) {
-                return XNr;
-            }
-
-            if (YNr >= 0) {
-                return YNr;
-            }
-
-            if (cZ >= 0) {
-                return cZ;
-            }
-
-            return 0;
-
+            return XNr >= 0 ? XNr : YNr >= 0 ? YNr : cZ >= 0 ? cZ : 0;
 
             //Do
             //    If RN < 1 Then Return 0
@@ -1100,7 +977,6 @@ namespace BlueControls {
             ResetPosition(true);
         }
 
-
         public bool InsertImage(string Img, int Position) {
             return InsertAnything(enASCIIKey.Undefined, Img, Position);
         }
@@ -1108,7 +984,6 @@ namespace BlueControls {
         public bool InsertChar(enASCIIKey KeyAscii, int Position) {
             return InsertAnything(KeyAscii, string.Empty, Position);
         }
-
 
         private bool InsertAnything(enASCIIKey KeyAscii, string img, int Position) {
 
@@ -1124,7 +999,6 @@ namespace BlueControls {
 
             if ((int)_Design > 10000) { Develop.DebugPrint(enFehlerArt.Fehler, "Falsche Art"); }
 
-
             if (Position < Chars.Count && Chars[Position].Char > 0) {
                 tmpFont = Chars[Position].Font;
                 tmpState = Chars[Position].State;
@@ -1139,7 +1013,6 @@ namespace BlueControls {
                 tmpMarkState = enMarkState.None;
             }
 
-
             if (KeyAscii != enASCIIKey.Undefined) {
                 if (KeyAscii == enASCIIKey.ENTER) {
                     if (!Multiline) { return false; }
@@ -1150,15 +1023,13 @@ namespace BlueControls {
                 Chars.Insert(Position, new ExtChar((char)KeyAscii, _Design, tmpState, tmpFont, tmpStufe, tmpMarkState));
 
             } else if (!string.IsNullOrEmpty(img)) {
-                var x = QuickImage.Get(img, (int)(tmpFont.Oberlänge(1)));
+                var x = QuickImage.Get(img, (int)tmpFont.Oberlänge(1));
                 Chars.Insert(Position, new ExtChar((char)(QuickImage.GetIndex(x) + (int)enASCIIKey.ImageStart), _Design, tmpState, tmpFont, tmpStufe, tmpMarkState));
             } else {
                 return false;
             }
 
-
             ResetPosition(true);
-
 
             return true;
         }
@@ -1175,9 +1046,6 @@ namespace BlueControls {
             } catch (Exception) {
                 Mark(markstate, first, last);
             }
-
-
-
         }
 
         internal void Unmark(enMarkState markstate) {
@@ -1212,11 +1080,8 @@ namespace BlueControls {
             ResetPosition(true);
         }
 
-
-
         public string Substring(int StartIndex, int lenght) {
             return ConvertCharToPlainText(StartIndex, StartIndex + lenght - 1);
         }
-
     }
 }

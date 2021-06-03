@@ -16,7 +16,6 @@ namespace BlueControls.Controls {
         public List<string> Files {
             get => files;
 
-
             set {
                 pic.Clear();
                 files = value;
@@ -47,7 +46,6 @@ namespace BlueControls.Controls {
             if (_nr > pic.Count - 1) { _nr = pic.Count - 1; }
             SetPic();
 
-
         }
 
         private void btnLeft_Click(object sender, System.EventArgs e) {
@@ -63,13 +61,8 @@ namespace BlueControls.Controls {
             x.Show();
         }
 
-
         private void SetPic() {
             Bitmap _Bitmap = null;
-
-
-
-
 
             if (pic.Count > 0) {
 
@@ -80,26 +73,19 @@ namespace BlueControls.Controls {
 
                 _Bitmap = pic[_nr].Bitmap;
 
-
             }
 
             zoompic.BMP = _Bitmap;
 
         }
 
-
         protected override void DrawControl(Graphics GR, enStates vState) {
             if (Convert.ToBoolean(vState & enStates.Standard_MouseOver)) { vState ^= enStates.Standard_MouseOver; }
             if (Convert.ToBoolean(vState & enStates.Standard_MousePressed)) { vState ^= enStates.Standard_MousePressed; }
 
-
             Skin.Draw_Back(GR, enDesign.EasyPic, vState, DisplayRectangle, this, true);
 
             //Bitmap _Bitmap = null;
-
-
-
-
 
             //if (pic.Count > 0) {
 
@@ -110,9 +96,7 @@ namespace BlueControls.Controls {
 
             //    _Bitmap = pic[_nr].Bitmap;
 
-
             //}
-
 
             //if (_Bitmap != null) {
             //    GR.DrawImageInRectAspectRatio(_Bitmap, 1, pnlControls.Height, Width - 2, Height - 2 - pnlControls.Height);

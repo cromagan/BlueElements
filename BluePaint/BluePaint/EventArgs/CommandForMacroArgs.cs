@@ -20,13 +20,10 @@
 namespace BluePaint.EventArgs {
     public class CommandForMacroArgs : System.EventArgs {
 
-
         public CommandForMacroArgs(string Command) {
             this.Command = Command;
         }
 
         public string Command { get; set; }
-
-
     }
 }

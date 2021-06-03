@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
 using System;
@@ -35,18 +34,13 @@ namespace BlueControls.Interfaces {
         //    ContextMenuInit?.Invoke(this, e);
         //}
 
-
         void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e);
         //public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e)
         //{
         //    ContextMenuItemClicked?.Invoke(this, e);
         //}
 
-
-
-
         void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate);
-
 
         bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e);
 

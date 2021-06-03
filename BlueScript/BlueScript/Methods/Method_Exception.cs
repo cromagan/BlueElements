@@ -33,17 +33,15 @@ namespace BlueScript {
         public override List<enVariableDataType> Args => new() { enVariableDataType.String };
         public override bool EndlessArgs => false;
 
-
-
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
 
             if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Die Ausführung wurde absichtlich abgebrochen."); }
 
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
 
-            if (attvar.Attributes == null || attvar.Attributes.Count != 1) { return new strDoItFeedback("Die Ausführung wurde absichtlich abgebrochen."); }
-
-            return new strDoItFeedback(string.Empty, attvar.Attributes[0].ValueString);
+            return attvar.Attributes == null || attvar.Attributes.Count != 1
+                ? new strDoItFeedback("Die Ausführung wurde absichtlich abgebrochen.")
+                : new strDoItFeedback(string.Empty, attvar.Attributes[0].ValueString);
         }
     }
 }

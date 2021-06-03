@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 using BlueControls.ItemCollection;
 using System.Collections.Generic;
 
@@ -25,9 +24,7 @@ namespace BlueControls.Forms {
     public partial class InputBoxComboStyle : Forms.DialogWithOkAndCancel {
         private string GiveBack = string.Empty;
 
-
         #region Konstruktor
-
 
         private InputBoxComboStyle() : base() {
             InitializeComponent();
@@ -41,19 +38,12 @@ namespace BlueControls.Forms {
             cbxText.Item.CheckBehavior = SuggestClone.CheckBehavior;
             cbxText.Item.AddRange(SuggestClone);
 
-
-            if (TexteingabeErlaubt) {
-                cbxText.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown;
-            } else {
-                cbxText.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            }
-
+            cbxText.DropDownStyle = TexteingabeErlaubt ? System.Windows.Forms.ComboBoxStyle.DropDown : System.Windows.Forms.ComboBoxStyle.DropDownList;
 
             Setup(TXT, cbxText, 250, true, true);
 
             GiveBack = VorschlagsText;
         }
-
 
         #endregion
 
@@ -69,7 +59,6 @@ namespace BlueControls.Forms {
         /// <param name="SuggestOriginal">Wird geklont, es kann auch aus einer Listbox kommen, und dann stimmen die Events nicht mehr. Es muss auch einbe ItemCollection bleiben, damit aus der Datenbank auch Bilder etc. angezeigt werden können.</param>
         /// <returns></returns>
         private static string Show(string TXT, string VorschlagsText, ItemCollectionList SuggestOriginal, bool TexteingabeErlaubt) {
-
 
             var MB = new InputBoxComboStyle(TXT, VorschlagsText, SuggestOriginal, TexteingabeErlaubt);
             MB.ShowDialog();
@@ -97,11 +86,7 @@ namespace BlueControls.Forms {
         }
 
         protected override void SetValue(bool canceled) {
-            if (canceled) {
-                GiveBack = string.Empty;
-            } else {
-                GiveBack = cbxText.Text;
-            }
+            GiveBack = canceled ? string.Empty : cbxText.Text;
         }
     }
 }

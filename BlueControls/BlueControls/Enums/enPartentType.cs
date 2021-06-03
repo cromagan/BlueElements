@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 namespace BlueControls.Enums {
 
     public enum enPartentType {
@@ -45,7 +44,6 @@ namespace BlueControls.Enums {
         RibbonControl = 17,
         RibbonPage = 18,
 
-
         RibbonGroupBox = 19,
 
         LastFilesCombo = 20,
@@ -59,7 +57,6 @@ namespace BlueControls.Enums {
         FlexiControl = 24,
 
         FlexiControlForCell = 25
-
 
     }
 }

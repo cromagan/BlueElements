@@ -55,7 +55,7 @@ namespace BlueBasics {
             decimal L2 = sP.Y - ep.Y;
 
             // ^2 ist langsamer, laut Project Analyzer
-            return (decimal)Math.Sqrt(Convert.ToDouble(L1 * L1 + L2 * L2));
+            return (decimal)Math.Sqrt(Convert.ToDouble((L1 * L1) + (L2 * L2)));
         }
 
         public static decimal Länge(PointF sP, PointF ep) {
@@ -65,7 +65,7 @@ namespace BlueBasics {
             var L2 = (decimal)(sP.Y - ep.Y);
 
             // ^2 ist langsamer, laut Project Analyzer
-            return (decimal)Math.Sqrt(Convert.ToDouble(L1 * L1 + L2 * L2));
+            return (decimal)Math.Sqrt(Convert.ToDouble((L1 * L1) + (L2 * L2)));
         }
 
         public static decimal Winkel(PointF sp, PointF eP) {

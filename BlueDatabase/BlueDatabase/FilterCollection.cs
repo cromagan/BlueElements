@@ -48,9 +48,7 @@ namespace BlueDatabase {
 
         #endregion
 
-
         #region Properties
-
 
         public FilterItem this[ColumnItem column] {
             get {
@@ -64,7 +62,6 @@ namespace BlueDatabase {
             }
         }
 
-
         #endregion
 
         public void Remove(ColumnItem column) {
@@ -73,7 +70,6 @@ namespace BlueDatabase {
 
             foreach (var thisFilter in this) {
                 if (thisFilter.Column == column) { toDel.Add(thisFilter); }
-
             }
 
             if (toDel.Count == 0) { return; }
@@ -113,7 +109,6 @@ namespace BlueDatabase {
             AddIfNotExists(new FilterItem(column, filterType, filterBy));
         }
 
-
         public void Add(ColumnItem column, enFilterType filterType, string filterBy) {
             AddIfNotExists(new FilterItem(column, filterType, filterBy));
         }
@@ -130,9 +125,7 @@ namespace BlueDatabase {
         public string RowFilterText {
             get {
                 var f = this[null];
-                if (f != null) { return f.SearchValue[0]; }
-
-                return string.Empty;
+                return f != null ? f.SearchValue[0] : string.Empty;
             }
             set {
 
@@ -146,14 +139,11 @@ namespace BlueDatabase {
                 var fi = new FilterItem(Database, enFilterType.Instr_UND_GroﬂKleinEgal, value);
                 Add(fi);
             }
-
         }
-
 
         public bool MayHasRowFilter(ColumnItem Column) {
 
-            if (Column.IgnoreAtRowFilter) { return false; }
-            return IsRowFilterActiv();
+            return !Column.IgnoreAtRowFilter && IsRowFilterActiv();
         }
 
         public void Parse(string ToParse) {
@@ -199,7 +189,6 @@ namespace BlueDatabase {
             var column = Database.Column[columName];
             if (column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte '" + columName + "' nicht vorhanden."); }
 
-
             RemoveOtherAndAddIfNotExists(column, filterType, filterBy, herkunft);
         }
 
@@ -234,7 +223,6 @@ namespace BlueDatabase {
             RemoveOtherAndAddIfNotExists(new FilterItem(tmp, filterType, filterBy, herkunft));
         }
 
-
         protected override void Dispose(bool disposing) {
             base.Dispose(disposing);
             if (Database != null) {
@@ -242,6 +230,5 @@ namespace BlueDatabase {
                 Database = null;
             }
         }
-
     }
 }

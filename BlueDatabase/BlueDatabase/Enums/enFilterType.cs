@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 using System;
 
 namespace BlueDatabase.Enums {
@@ -27,7 +26,6 @@ namespace BlueDatabase.Enums {
         // Filterarten allgemein -------------------------------------------------------
         KeinFilter = 0,
 
-
         Istgleich = 1,
         //  ZUR INFO:  Ungleich = 2 
         Instr = 4,
@@ -36,10 +34,8 @@ namespace BlueDatabase.Enums {
 
         //  EigenschaftTendenz = 8,
 
-
         Between = 16,
         BeginntMit = 32,
-
 
         // Filter - Bits -----------------------------------------------------------------
         GroßKleinEgal = 128,
@@ -48,7 +44,6 @@ namespace BlueDatabase.Enums {
         MultiRowIgnorieren = 1024,
         // FormatStandardisieren = 2048
 
-
         // Std-Filter - Kombinationen ----------------------------------------------------
         Istgleich_GroßKleinEgal = Istgleich | GroßKleinEgal,
         IstGleich_ODER = Istgleich | ODER,
@@ -56,14 +51,12 @@ namespace BlueDatabase.Enums {
         Istgleich_ODER_GroßKleinEgal = Istgleich_GroßKleinEgal | ODER,
         Istgleich_UND_GroßKleinEgal = Istgleich_GroßKleinEgal | UND,
 
-
         Istgleich_GroßKleinEgal_MultiRowIgnorieren = Istgleich | GroßKleinEgal | MultiRowIgnorieren,
         Istgleich_MultiRowIgnorieren = Istgleich | MultiRowIgnorieren,
 
         Ungleich_MultiRowIgnorieren = 2 | MultiRowIgnorieren,
         Ungleich_MultiRowIgnorieren_UND_GroßKleinEgal = Ungleich_MultiRowIgnorieren | UND | GroßKleinEgal,
         Ungleich_MultiRowIgnorieren_GroßKleinEgal = Ungleich_MultiRowIgnorieren | GroßKleinEgal,
-
 
         Instr_GroßKleinEgal = Instr | GroßKleinEgal,
         Instr_ODER_GroßKleinEgal = Instr | GroßKleinEgal | ODER,

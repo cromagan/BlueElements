@@ -21,7 +21,6 @@ using Skript.Enums;
 using System.Collections.Generic;
 using static BlueBasics.modConverter;
 
-
 namespace BlueScript {
     internal class Method_IsDateTime : Method {
 
@@ -40,8 +39,7 @@ namespace BlueScript {
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.Falsch(); }
 
             var ok = DateTimeTryParse(attvar.Attributes[0].ValueString, out var _);
-            if (ok) { return strDoItFeedback.Wahr(); }
-            return strDoItFeedback.Falsch();
+            return ok ? strDoItFeedback.Wahr() : strDoItFeedback.Falsch();
         }
     }
 }

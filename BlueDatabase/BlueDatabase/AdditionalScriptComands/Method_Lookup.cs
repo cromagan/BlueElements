@@ -26,7 +26,6 @@ using static BlueBasics.Extensions;
 namespace BlueScript {
     public class Method_Lookup : BlueScript.Method {
 
-
         //public Method_Lookup(Script parent) : base(parent) { }
 
         public override string Syntax => "Lookup(Database, KeyValue, Column, NothingFoundValue, FoundToMuchValue)";
@@ -44,7 +43,6 @@ namespace BlueScript {
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
-
 
             var f = s.Variablen.GetSystem("filename");
             if (f == null) { return new strDoItFeedback("System-Variable 'Filename' nicht gefunden."); }
@@ -88,7 +86,6 @@ namespace BlueScript {
                 }
                 return new strDoItFeedback(string.Empty, string.Empty);
             }
-
 
             var v = RowItem.CellToVariable(c, r[0]);
             if (v == null) { return new strDoItFeedback("Wert konnte nicht erzeugt werden: " + attvar.Attributes[2].ValueString); }

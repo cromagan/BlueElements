@@ -26,10 +26,6 @@ namespace BlueControls.Forms {
             }
         }
 
-
-
-
-
         protected override void SetValue(bool canceled) {
             // Nix zu tun
         }

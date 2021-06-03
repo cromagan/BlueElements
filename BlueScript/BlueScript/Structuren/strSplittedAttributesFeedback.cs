@@ -35,11 +35,9 @@ public struct strSplittedAttributesFeedback {
         FehlerTyp = type;
     }
 
-
     public enSkriptFehlerTyp FehlerTyp;
 
     public List<Variable> Attributes;
-
 
     ///// <summary>
     ///// Die Position, wo der Fehler stattgefunfden hat ODER die Position wo weiter geparsesd werden muss

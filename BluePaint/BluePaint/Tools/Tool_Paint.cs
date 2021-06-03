@@ -28,7 +28,6 @@ namespace BluePaint {
             InitializeComponent();
         }
 
-
         public override void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap OriginalPic) {
             OnForceUndoSaving();
             MouseMove(new MouseEventArgs1_1DownAndCurrent(e, e), OriginalPic);
@@ -48,6 +47,5 @@ namespace BluePaint {
             var c = Color.FromArgb(50, 255, 0, 0);
             e.FillCircle(c, e.Current.TrimmedX, e.Current.TrimmedY, 2);
         }
-
     }
 }

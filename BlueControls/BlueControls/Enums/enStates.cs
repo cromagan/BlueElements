@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 using System;
 
 namespace BlueControls.Enums {
@@ -26,7 +25,6 @@ namespace BlueControls.Enums {
         Undefiniert = -1,
 
         Standard = 0,
-
 
         Standard_Disabled = 1,
         Standard_MouseOver = 2,
@@ -40,7 +38,6 @@ namespace BlueControls.Enums {
         Standard_MouseOver_HasFocus = Standard_MouseOver | Standard_HasFocus,
         Standard_MouseOver_MousePressed = Standard_MousePressed | Standard_MouseOver,
 
-
         Checked_Disabled = Standard_Disabled | Checked,
         Checked_MouseOver = Standard_MouseOver | Checked,
         Checked_HasFocus = Standard_HasFocus | Checked,
@@ -51,13 +48,11 @@ namespace BlueControls.Enums {
         Checked_MouseOver_HasFocus = Standard_MouseOver_HasFocus | Checked,
         Checked_MouseOver_MousePressed = Standard_MouseOver_MousePressed | Checked
 
-
         //Checked_Disabled = Checked Or Standard_Disabled
         //Checked_MouseOver = Checked Or Standard_MouseOverx
         //Checked_HasFocus = Checked Or Standard_HasFocus
         //Checked_MousePressed = Checked Or Standard_MousePressed
         //Checked_HasFocus_MousePressed = Standard_HasFocus Or Standard_MousePressed Or Checked
-
 
         //Checked_MouseOver_HasFocus = Checked Or Standard_HasFocus Or Standard_MouseOver
 

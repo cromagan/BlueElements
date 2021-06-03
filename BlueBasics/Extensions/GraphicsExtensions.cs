@@ -26,7 +26,7 @@ namespace BlueBasics {
             var Sc = Math.Min((float)width / bmp.Width, (float)height / bmp.Height);
             var dw = (int)(bmp.Width * Sc);
             var dh = (int)(bmp.Height * Sc);
-            gR.DrawImage(bmp, x + (width - dw) / 2, y + (height - dh) / 2, dw, dh);
+            gR.DrawImage(bmp, x + ((width - dw) / 2), y + ((height - dh) / 2), dw, dh);
         }
 
         public static void DrawImageInRectAspectRatio(this Graphics gR, Bitmap bmp, Rectangle r) {

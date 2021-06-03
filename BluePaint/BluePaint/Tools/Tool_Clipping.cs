@@ -40,7 +40,6 @@ namespace BluePaint {
                 MessageBox.Show("Automatisch zugeschnitten.");
                 OnCommandForMacro("AutoZuschnitt");
             }
-
         }
 
         public override void ToolFirstShown() {
@@ -48,11 +47,9 @@ namespace BluePaint {
             AutoZ_Click(null, null);
         }
 
-
         public override void OnToolChanging() {
             WollenSieDenZuschnittÜbernehmen();
         }
-
 
         public override void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap OriginalPic) {
             OnDoInvalidate();
@@ -78,9 +75,7 @@ namespace BluePaint {
 
             var Pen_Blau = new Pen(Color.FromArgb(150, 0, 0, 255));
 
-
             DrawZusatz(e, OriginalPic);
-
 
             if (e.Current == null) { return; }
 
@@ -91,9 +86,7 @@ namespace BluePaint {
                 e.DrawLine(Pen_Blau, e.MouseDown.X, -1, e.MouseDown.X, OriginalPic.Height);
                 e.DrawLine(Pen_Blau, -1, e.MouseDown.Y, OriginalPic.Width, e.MouseDown.Y);
             }
-
         }
-
 
         private void ValueChangedByClicking(object sender, System.EventArgs e) {
             OnDoInvalidate();
@@ -101,7 +94,6 @@ namespace BluePaint {
 
         public void DrawZusatz(AdditionalDrawing e, Bitmap OriginalPic) {
             var Brush_Blau = new SolidBrush(Color.FromArgb(120, 0, 0, 255));
-
 
             if (Links.Value != 0) {
                 e.FillRectangle(Brush_Blau, new Rectangle(0, 0, Convert.ToInt32(Links.Value), OriginalPic.Height));
@@ -116,16 +108,12 @@ namespace BluePaint {
             if (Unten.Value != 0) {
                 e.FillRectangle(Brush_Blau, new Rectangle(0, OriginalPic.Height + Convert.ToInt32(Unten.Value), OriginalPic.Width, (int)-Unten.Value));
             }
-
-
         }
-
 
         private void ZuschnittOK_Click(object sender, System.EventArgs e) {
             var _Pic = OnNeedCurrentPic();
 
             var _BMP2 = _Pic.Crop((int)Links.Value, (int)Recht.Value, (int)Oben.Value, (int)Unten.Value);
-
 
             OnOverridePic(_BMP2);
             Links.Value = 0;
@@ -171,7 +159,6 @@ namespace BluePaint {
             }
             CheckMinMax();
 
-
             Links.Value = Left;
             Oben.Value = Top;
             Recht.Value = Right;
@@ -203,7 +190,5 @@ namespace BluePaint {
                 Develop.DebugPrint_NichtImplementiert();
             }
         }
-
     }
-
 }

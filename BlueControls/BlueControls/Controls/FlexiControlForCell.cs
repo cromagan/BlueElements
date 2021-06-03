@@ -41,8 +41,6 @@ namespace BlueControls.Controls {
     [Designer(typeof(BasicDesigner))]
     public partial class FlexiControlForCell : FlexiControl, IContextMenu {
 
-
-
         #region Constructor
         public FlexiControlForCell() : this(null, -1, enÜberschriftAnordnung.Über_dem_Feld) { }
 
@@ -66,7 +64,6 @@ namespace BlueControls.Controls {
         private Database _Database = null;
         private string _ColumnName = string.Empty;
 
-
         private ColumnItem _tmpColumn = null;
         private RowItem _tmpRow = null;
 
@@ -87,11 +84,6 @@ namespace BlueControls.Controls {
             }
         }
 
-
-
-
-
-
         public int RowKey {
             get => _RowKey;
             set {
@@ -104,7 +96,6 @@ namespace BlueControls.Controls {
                 CheckEnabledState();
             }
         }
-
 
         [Description("Falls ein Key und ein Name befüllt sind, ist der Name führend.")]
         public int ColumnKey {
@@ -176,9 +167,7 @@ namespace BlueControls.Controls {
                 _RowKey = -1;
                 GetTmpVariables();
             }
-
         }
-
 
         private void _Database_Loaded(object sender, LoadedEventArgs e) {
             if (InvokeRequired) {
@@ -193,20 +182,15 @@ namespace BlueControls.Controls {
         private void GetTmpVariables() {
 
             if (_Database != null) {
-                if (!string.IsNullOrEmpty(_ColumnName)) {
-                    _tmpColumn = _Database.Column[DataHolder.ColumnName(_ColumnName)];
-                } else {
-                    _tmpColumn = _Database.Column.SearchByKey(_ColKey);
-                }
+                _tmpColumn = !string.IsNullOrEmpty(_ColumnName)
+                    ? _Database.Column[DataHolder.ColumnName(_ColumnName)]
+                    : _Database.Column.SearchByKey(_ColKey);
                 _tmpRow = _Database.Row.SearchByKey(_RowKey);
             } else {
                 _tmpColumn = null;
                 _tmpRow = null;
             }
-
         }
-
-
 
         private void UpdateColumnData() {
             if (_tmpColumn == null) {
@@ -231,7 +215,6 @@ namespace BlueControls.Controls {
                     _tmpColumn.EditType = EditType;
                     //_tmpColumn.Quickinfo = QuickInfo;
                 }
-
             }
         }
 
@@ -247,7 +230,6 @@ namespace BlueControls.Controls {
                     if (!string.IsNullOrEmpty(InfoText)) { InfoText += "<br><hr><br>"; }
                     NewT += X[1];
                 }
-
             }
             InfoText = NewT;
         }
@@ -255,28 +237,22 @@ namespace BlueControls.Controls {
         private void Database_CellValueChanged(object sender, CellEventArgs e) {
             if (e.Row != _tmpRow) { return; }
 
-
             if (e.Column == _tmpColumn) {
                 SetValueFromCell();
             }
 
-
             if (e.Column == _tmpColumn || e.Column == e.Column.Database.Column.SysLocked) {
                 CheckEnabledState();
             }
-
         }
 
         private void SetValueFromCell() {
-
 
             if (_tmpColumn == null || _tmpRow == null) {
                 ValueSet(string.Empty, true, true);
                 InfoText = string.Empty;
                 return;
             }
-
-
 
             switch (_tmpColumn.Format) {
                 case enDataFormat.Link_To_Filesystem:
@@ -318,12 +294,7 @@ namespace BlueControls.Controls {
             }
         }
 
-
-
-
-
         internal void CheckEnabledState() {
-
 
             if (Parent == null || !Parent.Enabled || _tmpColumn == null || _tmpRow == null) {
                 DisabledReason = "Bezug zur Zelle verloren.";
@@ -333,13 +304,11 @@ namespace BlueControls.Controls {
             DisabledReason = CellCollection.ErrorReason(_tmpColumn, _tmpRow, enErrorReason.EditNormaly); // Rechteverwaltung einfliesen lassen.
         }
 
-
         private void FillCellNow() {
             if (_IsFilling) { return; }
 
             if (!Enabled) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.
             GetTmpVariables(); // Falls der Key inzwischen nicht mehr in der Collection ist, deswegen neu prüfen. RowREmoved greift zwar, kann aber durchaus erst nach RowSortesd/CursorposChanges auftreten.
-
 
             if (_tmpColumn == null || _tmpRow == null) { return; }
 
@@ -370,7 +339,6 @@ namespace BlueControls.Controls {
             if (OldVal != _tmpRow.CellGetString(_tmpColumn)) { _tmpRow.DoAutomatic(false, false, 1, "value changed"); }
         }
 
-
         private void textBox_NeedDatabaseOfAdditinalSpecialChars(object sender, MultiUserFileGiveBackEventArgs e) {
             e.File = _Database;
         }
@@ -380,7 +348,6 @@ namespace BlueControls.Controls {
 
             if (e.Control is Caption) { return; } // z.B. Info Caption
 
-
             var column1 = _tmpColumn;
 
             if (column1 == null) {
@@ -388,7 +355,6 @@ namespace BlueControls.Controls {
                 // Bei Steuerelementen, die manuell hinzugefügt werden
                 return;
             }
-
 
             if (column1.Format == enDataFormat.LinkedCell) {
                 column1 = null;
@@ -401,9 +367,7 @@ namespace BlueControls.Controls {
                     Develop.DebugPrint("Column nicht gefunden");
                     return;
                 }
-
             }
-
 
             Suffix = column1.Suffix;
             Format = column1.Format;
@@ -456,13 +420,11 @@ namespace BlueControls.Controls {
                 //case Caption _:
                 //    break;
 
-
                 default:
                     Develop.DebugPrint("Control unbekannt");
                     break;
             }
         }
-
 
         private void TextBox_TextChanged(object sender, System.EventArgs e) {
             while (Marker.IsBusy) {
@@ -502,13 +464,11 @@ namespace BlueControls.Controls {
                     listBox.AddClicked -= ListBox_AddClicked;
                     break;
 
-
                 case SwapListBox swaplistBox:
                     //swaplistBox.ContextMenuInit -= ListBox_ContextMenuInit;
                     //swaplistBox.ContextMenuItemClicked -= ListBox_ContextMenuItemClicked;
                     swaplistBox.AddClicked -= ListBox_AddClicked;
                     break;
-
 
                 case Caption _:
                     break;
@@ -523,11 +483,8 @@ namespace BlueControls.Controls {
                     Develop.DebugPrint("Control unbekannt");
                     break;
 
-
             }
         }
-
-
 
         private void EasyPicImageChanged(object sender, System.EventArgs e) {
 
@@ -536,8 +493,6 @@ namespace BlueControls.Controls {
                 if (ThisControl is EasyPic ep) {
                     if (_tmpColumn == null && _tmpRow == null) { Develop.DebugPrint_NichtImplementiert(); }
                     if (_tmpColumn.Format != enDataFormat.Link_To_Filesystem) { Develop.DebugPrint_NichtImplementiert(); }
-
-
 
                     switch (ep.SorceType) {
                         case enSorceType.ScreenShot:
@@ -559,8 +514,6 @@ namespace BlueControls.Controls {
                                 return;
                             }
 
-
-
                             var fil2 = _tmpColumn.BestFile(_tmpColumn.Name + ".png", true);
 
                             if (fil2.FilePath().ToUpper() != ep.SorceName.FilePath().ToUpper()) {
@@ -578,13 +531,11 @@ namespace BlueControls.Controls {
                             // Oder datenbank wird von einem andern PC aus gestartet
                             return;
 
-
                     }
                 }
             }
             Develop.DebugPrint_NichtImplementiert();
         }
-
 
         private void EasyPicConnectedDatabase(object sender, MultiUserFileGiveBackEventArgs e) {
             e.File = _Database;
@@ -596,22 +547,16 @@ namespace BlueControls.Controls {
             ValueSet(CellCollection.AutomaticInitalValue(_tmpColumn, _tmpRow), true, true);
         }
 
-
-
         private void GotFocus_TextBox(object sender, System.EventArgs e) {
             if (_tmpColumn == null || _tmpRow == null) { return; }
             if (!string.IsNullOrEmpty(((TextBox)sender).Text)) { return; }
             ValueSet(CellCollection.AutomaticInitalValue(_tmpColumn, _tmpRow), true, true);
         }
 
-
-
-
         protected override void OnValueChanged() {
             base.OnValueChanged();
             FillCellNow();
         }
-
 
         private void ListBox_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
 
@@ -648,8 +593,6 @@ namespace BlueControls.Controls {
                     break;
 
             }
-
-
         }
 
         private void ListBox_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
@@ -667,7 +610,6 @@ namespace BlueControls.Controls {
                 //}
             }
         }
-
 
         private void ListBox_AddClicked(object sender, System.EventArgs e) {
 
@@ -692,7 +634,6 @@ namespace BlueControls.Controls {
                         f.ShowDialog();
 
                         if (f.FileNames == null || f.FileNames.Length == 0) { return; }
-
 
                         for (var z = 0; z <= f.FileNames.GetUpperBound(0); z++) {
                             var b = modConverter.FileToByte(f.FileNames[z]);
@@ -721,16 +662,11 @@ namespace BlueControls.Controls {
                     lbx.Add_TextBySuggestion();
                     return;
 
-
                 default:
                     Develop.DebugPrint(Dia);
                     return;
             }
-
-
         }
-
-
 
         private void Marker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e) {
             TextBox TXB = null;
@@ -741,8 +677,6 @@ namespace BlueControls.Controls {
 
             if (Marker.CancellationPending) { return; }
             if (TXB == null) { return; }
-
-
 
             if (_tmpRow == null) { return; }
 
@@ -785,14 +719,10 @@ namespace BlueControls.Controls {
 
                         } while (true);
                     }
-
-
                 } catch {
                     Ok = false;
                 }
-
             } while (!Ok);
-
 
         }
 
@@ -824,13 +754,10 @@ namespace BlueControls.Controls {
                     TXB.Invalidate();
                     break;
 
-
-
                 default:
                     Develop.DebugPrint((string)x[1]);
                     break;
             }
-
         }
 
         private void _Database_RowKeyChanged(object sender, KeyChangedEventArgs e) {
@@ -846,7 +773,6 @@ namespace BlueControls.Controls {
             GetTmpVariables();
             SetValueFromCell();
         }
-
 
         protected override void RemoveAll() {
             FillCellNow();
@@ -866,8 +792,6 @@ namespace BlueControls.Controls {
 
                 Items.Add(enContextMenuComands.VorherigenInhaltWiederherstellen);
             }
-
-
 
             if (Parent is Formula f) {
 
@@ -916,7 +840,6 @@ namespace BlueControls.Controls {
             }
 
             return false;
-
 
         }
 

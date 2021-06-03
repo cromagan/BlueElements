@@ -47,7 +47,6 @@ namespace BlueControls.Controls {
         }
         #endregion
 
-
         #region  Variablen 
 
         private string _Text = string.Empty;
@@ -55,26 +54,12 @@ namespace BlueControls.Controls {
         private enSteuerelementVerhalten _TextAnzeigeverhalten = enSteuerelementVerhalten.Text_Abschneiden;
         private enDesign _design = enDesign.Undefiniert;
 
-
-
-
         #endregion
 
         public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
         public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
 
-
-
-
-
-
         #region  Properties 
-
-
-
-
-
-
 
         /// <summary>
         /// Benötigt, dass der Designer das nicht erstellt
@@ -85,7 +70,6 @@ namespace BlueControls.Controls {
 
             set => base.TabIndex = 0;
         }
-
 
         /// <summary>
         /// Benötigt, dass der Designer das nicht erstellt
@@ -108,7 +92,6 @@ namespace BlueControls.Controls {
             }
         }
 
-
         [DefaultValue(enSteuerelementVerhalten.Text_Abschneiden)]
         public enSteuerelementVerhalten TextAnzeigeVerhalten {
             get => _TextAnzeigeverhalten;
@@ -121,9 +104,7 @@ namespace BlueControls.Controls {
 
         public new Size Size {
             get {
-                if (Convert.ToBoolean(_TextAnzeigeverhalten & enSteuerelementVerhalten.Steuerelement_Anpassen)) { return TextRequiredSize(); }
-
-                return base.Size;
+                return Convert.ToBoolean(_TextAnzeigeverhalten & enSteuerelementVerhalten.Steuerelement_Anpassen) ? TextRequiredSize() : base.Size;
             }
             set {
                 GetDesign();
@@ -134,9 +115,9 @@ namespace BlueControls.Controls {
 
         public new int Width {
             get {
-                if (Convert.ToBoolean(_TextAnzeigeverhalten & enSteuerelementVerhalten.Steuerelement_Anpassen)) { return TextRequiredSize().Width; }
-
-                return base.Width;
+                return Convert.ToBoolean(_TextAnzeigeverhalten & enSteuerelementVerhalten.Steuerelement_Anpassen)
+                    ? TextRequiredSize().Width
+                    : base.Width;
             }
             set {
                 GetDesign();
@@ -147,8 +128,9 @@ namespace BlueControls.Controls {
 
         public new int Height {
             get {
-                if (Convert.ToBoolean(_TextAnzeigeverhalten & enSteuerelementVerhalten.Steuerelement_Anpassen)) { return TextRequiredSize().Height; }
-                return base.Height;
+                return Convert.ToBoolean(_TextAnzeigeverhalten & enSteuerelementVerhalten.Steuerelement_Anpassen)
+                    ? TextRequiredSize().Height
+                    : base.Height;
             }
             set {
                 GetDesign();
@@ -157,18 +139,12 @@ namespace BlueControls.Controls {
             }
         }
 
-
-
         #endregion
-
-
 
         protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseUp(e);
             if (e.Button == System.Windows.Forms.MouseButtons.Right) { FloatingInputBoxListBoxStyle.ContextMenuShow(this, e); }
         }
-
-
 
         public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
             return false;
@@ -194,7 +170,6 @@ namespace BlueControls.Controls {
                     return;
             }
 
-
             switch (ParentType()) {
                 case enPartentType.RibbonGroupBox:
                 case enPartentType.RibbonPage:
@@ -217,14 +192,11 @@ namespace BlueControls.Controls {
             }
         }
 
-
         public void ResetETextAndInvalidate() {
             eText = null;
             if (!QuickModePossible()) { SetDoubleBuffering(); }
             Invalidate();
         }
-
-
 
         protected override void DrawControl(Graphics gr, enStates state) {
             try {
@@ -238,8 +210,6 @@ namespace BlueControls.Controls {
                     return;
                 }
 
-
-
                 if (!string.IsNullOrEmpty(_Text)) {
                     if (QuickModePossible()) {
                         if (gr == null) { return; }
@@ -248,7 +218,6 @@ namespace BlueControls.Controls {
                         Skin.Draw_FormatedText(gr, _Text, _design, state, null, enAlignment.Top_Left, new Rectangle(), null, false, Translate);
                         return;
                     }
-
 
                     if (eText == null) {
                         eText = new ExtText(_design, state) {
@@ -286,20 +255,15 @@ namespace BlueControls.Controls {
                 Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
 
                 if (!string.IsNullOrEmpty(_Text)) { eText.Draw(gr, 1); }
-
             } catch {
             }
-
         }
 
         private bool QuickModePossible() {
             if (_TextAnzeigeverhalten != enSteuerelementVerhalten.Text_Abschneiden) { return false; }
             //if (Math.Abs(_Zeilenabstand - 1) > 0.01) { return false; }
-            if (_Text.Contains("<")) { return false; }
-            return true;
+            return !_Text.Contains("<");
         }
-
-
 
         public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
             HotItem = null;
@@ -309,8 +273,6 @@ namespace BlueControls.Controls {
             ContextMenuInit?.Invoke(this, e);
         }
 
-
-
         public Size TextRequiredSize() {
             if (QuickModePossible()) {
                 if (_design == enDesign.Undefiniert) { GetDesign(); }
@@ -318,19 +280,12 @@ namespace BlueControls.Controls {
                 return new Size((int)(s.Width + 1), (int)(s.Height + 1));
             }
 
-
             if (eText == null) {
                 if (DesignMode) { Refresh(); }// Damit das skin Geinittet wird
                 DrawControl(null, enStates.Standard);
             }
 
-            if (eText != null) {
-                return eText.LastSize();
-            }
-
-            return new Size(1, 1);
-
+            return eText != null ? eText.LastSize() : new Size(1, 1);
         }
-
     }
 }

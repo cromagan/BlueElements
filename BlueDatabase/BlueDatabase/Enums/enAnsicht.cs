@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 namespace BlueDatabase.Enums {
     public enum enAnsicht {
         Unverändert = -1,

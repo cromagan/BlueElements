@@ -20,7 +20,6 @@
 using Skript.Enums;
 using System.Collections.Generic;
 
-
 namespace BlueScript {
     internal class Method_String : Method {
 
@@ -33,7 +32,6 @@ namespace BlueScript {
         public override enVariableDataType Returns => enVariableDataType.String;
         public override List<enVariableDataType> Args => new() { enVariableDataType.Numeral };
         public override bool EndlessArgs => false;
-
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);

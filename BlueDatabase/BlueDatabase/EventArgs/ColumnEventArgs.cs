@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 namespace BlueDatabase.EventArgs {
     public class ColumnEventArgs : System.EventArgs {
 

@@ -22,7 +22,6 @@ namespace BlueControls.Forms {
             GiveBack = VorschlagsText;
         }
 
-
         #endregion
 
         public static string Show(string TXT) {
@@ -40,8 +39,6 @@ namespace BlueControls.Forms {
             return MB.GiveBack;
         }
 
-
-
         private void txbText_ESC(object sender, System.EventArgs e) {
             Cancel();
         }
@@ -55,11 +52,7 @@ namespace BlueControls.Forms {
         }
 
         protected override void SetValue(bool canceled) {
-            if (canceled) {
-                GiveBack = string.Empty;
-            } else {
-                GiveBack = txbText.Text;
-            }
+            GiveBack = canceled ? string.Empty : txbText.Text;
         }
     }
 }

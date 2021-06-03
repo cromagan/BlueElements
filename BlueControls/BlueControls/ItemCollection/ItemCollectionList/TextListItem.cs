@@ -30,18 +30,13 @@ namespace BlueControls.ItemCollection {
         private QuickImage _Symbol;
         //private readonly enDataFormat _Format = enDataFormat.Text;
 
-
         #endregion
-
 
         #region  Event-Deklarationen + Delegaten 
 
         #endregion
 
-
         #region  Construktor + Initialize 
-
-
 
         public TextListItem(string readableText, string internalname, QuickImage symbol, bool isCaption, bool enabled, string userDefCompareKey) : base(internalname) {
             IsCaption = isCaption;
@@ -52,11 +47,7 @@ namespace BlueControls.ItemCollection {
             UserDefCompareKey = userDefCompareKey;
         }
 
-
-
-
         #endregion
-
 
         #region  Properties 
 
@@ -71,7 +62,6 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-
         public QuickImage Symbol {
             get => _Symbol;
             set {
@@ -81,10 +71,7 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-
         #endregion
-
-
 
         private enDesign tempDesign(enDesign itemdesign) {
             if (IsCaption) {
@@ -96,10 +83,8 @@ namespace BlueControls.ItemCollection {
                 }
             }
 
-
             return itemdesign;
         }
-
 
         protected override Size ComputeSizeUntouchedForListBox() {
             return Skin.FormatedText_NeededSize(_ReadableText, _Symbol, Skin.GetBlueFont(tempDesign(Parent.ItemDesign), enStates.Standard), 16);
@@ -120,26 +105,20 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-
-
         protected override string GetCompareKey() {
             return DataFormat.CompareKey(Internal, enDataFormat.Text);
         }
 
-
         public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) {
             return SizeUntouchedForListBox().Height;
         }
-
-
 
         public override void CloneToNewCollection(ItemCollectionList newParent) {
             CloneToNewCollection(newParent, new TextListItem(_ReadableText, Internal, _Symbol, IsCaption, _Enabled, UserDefCompareKey));
         }
 
         public override bool FilterMatch(string FilterText) {
-            if (base.FilterMatch(FilterText)) { return true; }
-            return _ReadableText.ToUpper().Contains(FilterText.ToUpper());
+            return base.FilterMatch(FilterText) || _ReadableText.ToUpper().Contains(FilterText.ToUpper());
         }
     }
 }

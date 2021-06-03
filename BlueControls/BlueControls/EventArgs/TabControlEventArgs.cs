@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 namespace BlueControls.EventArgs {
     public sealed class TabControlEventArgs : System.EventArgs {
         public bool Cancel = false;
@@ -30,6 +29,5 @@ namespace BlueControls.EventArgs {
             this.TabPage = TabPage;
             this.TabPageIndex = TabPageIndex;
         }
-
     }
 }

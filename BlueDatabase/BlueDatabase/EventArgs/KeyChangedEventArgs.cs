@@ -17,11 +17,8 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
-
 namespace BlueDatabase.EventArgs {
     public class KeyChangedEventArgs : System.EventArgs {
-
 
         public KeyChangedEventArgs(int KeyOld, int KeyNew) {
             this.KeyOld = KeyOld;
@@ -30,6 +27,5 @@ namespace BlueDatabase.EventArgs {
 
         public int KeyOld { get; set; }
         public int KeyNew { get; set; }
-
     }
 }

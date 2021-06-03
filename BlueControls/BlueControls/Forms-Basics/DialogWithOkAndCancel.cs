@@ -7,24 +7,18 @@ using static BlueBasics.Develop;
 namespace BlueControls.Forms {
     public partial class DialogWithOkAndCancel : BlueControls.Forms.Form {
 
-
-
-
         #region Konstruktor
         public DialogWithOkAndCancel() : this(Enums.enDesign.Form_MsgBox) {
 
         }
 
-
         public DialogWithOkAndCancel(enDesign design) : base(design) {
             InitializeComponent();
             SetTopLevel(true);
 
-
             if (Owner == null) {
                 StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             }
-
         }
 
         #endregion
@@ -34,7 +28,6 @@ namespace BlueControls.Forms {
             Text = Develop.AppName();
 
             MinWidth = Math.Max(Width, MinWidth);
-
 
             Size = new System.Drawing.Size(MinWidth, BottomOfLowestControl + butOK.Height + BorderHeight + Skin.Padding);
 
@@ -48,16 +41,11 @@ namespace BlueControls.Forms {
                 butOK.Left = MinWidth - Skin.Padding - butOK.Width - BorderWidth;
             }
 
-
-
-
             butOK.Top = BottomOfLowestControl;
             butAbbrechen.Top = BottomOfLowestControl;
             if (Sizeable) {
                 FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             }
-
-
         }
 
         public void Setup(string TXT, GenericControl CenterControl, int MinWidth, bool CancelPossible, bool Sizeable) {
@@ -73,13 +61,10 @@ namespace BlueControls.Forms {
                 he += capText.Height;
             }
 
-
             if (CenterControl != null) {
                 CenterControl.Top = he;
                 he = he + CenterControl.Height + Skin.Padding;
             }
-
-
 
             wi = Math.Max(wi + BorderWidth, MinWidth);
 
@@ -88,9 +73,7 @@ namespace BlueControls.Forms {
             if (CenterControl != null) {
                 CenterControl.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             }
-
         }
-
 
         /// <summary>
         /// Diese Routine wird aufgerufen, nachdem OK oder Cancel gedrückt wurde.

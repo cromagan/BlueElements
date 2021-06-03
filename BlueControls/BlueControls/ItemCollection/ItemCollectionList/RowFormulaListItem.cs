@@ -35,14 +35,11 @@ namespace BlueControls.ItemCollection {
 
         #endregion
 
-
         #region  Event-Deklarationen + Delegaten 
 
         #endregion
 
-
         #region  Construktor + Initialize 
-
 
         public RowFormulaListItem(RowItem row, string layoutID, string userDefCompareKey) : base(string.Empty) {
             _Row = row;
@@ -50,14 +47,11 @@ namespace BlueControls.ItemCollection {
             UserDefCompareKey = userDefCompareKey;
         }
 
-
         #endregion
-
 
         public override string QuickInfo {
             get {
-                if (_Row == null) { return string.Empty; }
-                return _Row.CellFirstString().CreateHtmlCodes(true);
+                return _Row == null ? string.Empty : _Row.CellFirstString().CreateHtmlCodes(true);
             }
         }
 
@@ -69,7 +63,6 @@ namespace BlueControls.ItemCollection {
 
                 _LayoutID = value;
 
-
                 if (_tmpBMP != null) {
                     _tmpBMP.Dispose();
                     _tmpBMP = null;
@@ -77,7 +70,6 @@ namespace BlueControls.ItemCollection {
                 //OnChanged();
             }
         }
-
 
         public RowItem Row {
             get => _Row;
@@ -93,14 +85,12 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-
         private void removePic() {
             if (_tmpBMP != null) {
                 _tmpBMP.Dispose();
                 _tmpBMP = null;
             }
         }
-
 
         protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, bool Translate) {
             if (_tmpBMP == null) { GeneratePic(); }
@@ -109,10 +99,9 @@ namespace BlueControls.ItemCollection {
                 Skin.Draw_Back(GR, itemdesign, vState, PositionModified, null, false);
             }
 
-
             if (_tmpBMP != null) {
                 var scale = (float)Math.Min(PositionModified.Width / (double)_tmpBMP.Width, PositionModified.Height / (double)_tmpBMP.Height);
-                var r2 = new RectangleF((PositionModified.Width - _tmpBMP.Width * scale) / 2 + PositionModified.Left, (PositionModified.Height - _tmpBMP.Height * scale) / 2 + PositionModified.Top, _tmpBMP.Width * scale, _tmpBMP.Height * scale);
+                var r2 = new RectangleF(((PositionModified.Width - (_tmpBMP.Width * scale)) / 2) + PositionModified.Left, ((PositionModified.Height - (_tmpBMP.Height * scale)) / 2) + PositionModified.Top, _tmpBMP.Width * scale, _tmpBMP.Height * scale);
 
                 GR.DrawImage(_tmpBMP, r2, new RectangleF(0, 0, _tmpBMP.Width, _tmpBMP.Height), GraphicsUnit.Pixel);
             }
@@ -122,17 +111,12 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-
-
-
-
         private void GeneratePic() {
 
             if (string.IsNullOrEmpty(_LayoutID) || !_LayoutID.StartsWith("#")) {
                 _tmpBMP = (Bitmap)QuickImage.Get(enImageCode.Warnung, 128).BMP.Clone();
                 return;
             }
-
 
             var _pad = new CreativePad(new ItemCollectionPad(_LayoutID, Row.Database, Row.Key));
 
@@ -147,7 +131,6 @@ namespace BlueControls.ItemCollection {
 
             if (_tmpBMP == null) { _tmpBMP = new Bitmap((int)mb.Width, (int)mb.Height); }
 
-
             var zoomv = _pad.ZoomFitValue(mb, false, _tmpBMP.Size);
             var centerpos = _pad.CenterPos(mb, false, _tmpBMP.Size, zoomv);
             var slidervalues = _pad.SliderValues(mb, zoomv, centerpos);
@@ -157,8 +140,6 @@ namespace BlueControls.ItemCollection {
 
             _pad.DrawCreativePadToBitmap(_tmpBMP, enStates.Standard, zoomv, (decimal)slidervalues.X, (decimal)slidervalues.Y, null);
 
-
-
         }
 
         protected override Size ComputeSizeUntouchedForListBox() {
@@ -166,11 +147,9 @@ namespace BlueControls.ItemCollection {
 
         }
 
-
         public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) {
             return (int)(columnWidth * 0.8);
         }
-
 
         protected override string GetCompareKey() {
             return _Row.CellFirstString();

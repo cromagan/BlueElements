@@ -28,7 +28,6 @@ namespace BlueControls {
 
         #region  Variablen-Deklarationen 
 
-
         [AccessedThroughProperty(nameof(Tim))]
         private System.Windows.Forms.Timer _Tim;
         private System.Windows.Forms.Timer Tim {
@@ -59,7 +58,6 @@ namespace BlueControls {
 
         #endregion
 
-
         #region  Event-Deklarationen + Delegaten 
         public event System.EventHandler<System.Windows.Forms.MouseEventArgs> MouseDown;
         public event System.EventHandler<System.Windows.Forms.MouseEventArgs> MouseUp;
@@ -67,7 +65,6 @@ namespace BlueControls {
         public event System.EventHandler<System.Windows.Forms.KeyEventArgs> KeyDown;
         public event System.EventHandler<System.Windows.Forms.KeyEventArgs> KeyUp;
         #endregion
-
 
         #region  Construktor + Initialize 
 
@@ -83,18 +80,15 @@ namespace BlueControls {
             Key_LastKey = 0;
         }
 
-
         public SystemInputHook() {
             Initialize();
         }
 
         #endregion
 
-
         #region  Properties 
 
         #endregion
-
 
         public void InstallHook() {
 
@@ -113,24 +107,19 @@ namespace BlueControls {
             Tim.Enabled = false;
         }
 
-
         public void CheckNow() {
             Tim_Tick(null, null);
         }
-
 
         private void Tim_Tick(object sender, System.EventArgs e) {
 
             Tim.Enabled = false;
 
-
             DoMouse();
             DoKeyboard();
 
-
             Tim.Enabled = true;
         }
-
 
         public void DoMouse() {
             var B = System.Windows.Forms.MouseButtons.None;
@@ -142,16 +131,13 @@ namespace BlueControls {
                 B |= System.Windows.Forms.MouseButtons.Right;
             }
 
-
             var mev = new System.Windows.Forms.MouseEventArgs(B, 0, System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y, 0);
             var mevold = new System.Windows.Forms.MouseEventArgs(Mouse_LastButton, 0, System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y, 0);
-
 
             if (Mouse_LastX != mev.X || Mouse_LastY != mev.Y) {
                 OnMouseMove(mev);
 
             }
-
 
             if (Mouse_IsPressing) {
                 if (B == System.Windows.Forms.MouseButtons.None) {
@@ -184,9 +170,7 @@ namespace BlueControls {
 
         public void DoKeyboard() {
 
-
             var k = System.Windows.Forms.Keys.None;
-
 
             if (GetAsyncKeyState(System.Windows.Forms.Keys.D1) != 0) {
                 k |= System.Windows.Forms.Keys.D1;
@@ -219,7 +203,6 @@ namespace BlueControls {
                 k |= System.Windows.Forms.Keys.D0;
             }
 
-
             if (GetAsyncKeyState(System.Windows.Forms.Keys.NumPad1) != 0) {
                 k |= System.Windows.Forms.Keys.NumPad1;
             }
@@ -250,7 +233,6 @@ namespace BlueControls {
             if (GetAsyncKeyState(System.Windows.Forms.Keys.NumPad0) != 0) {
                 k |= System.Windows.Forms.Keys.NumPad0;
             }
-
 
             if (GetAsyncKeyState(System.Windows.Forms.Keys.X) != 0) {
                 k |= System.Windows.Forms.Keys.X;
@@ -303,7 +285,6 @@ namespace BlueControls {
                 k |= System.Windows.Forms.Keys.Space;
             }
 
-
             if (GetAsyncKeyState(System.Windows.Forms.Keys.Add) != 0) {
                 k |= System.Windows.Forms.Keys.Add;
             }
@@ -326,7 +307,6 @@ namespace BlueControls {
             if (GetAsyncKeyState(System.Windows.Forms.Keys.Oemcomma) != 0) {
                 k |= System.Windows.Forms.Keys.Oemcomma;
             }
-
 
             if (GetAsyncKeyState(System.Windows.Forms.Keys.F1) != 0) {
                 k |= System.Windows.Forms.Keys.F1;
@@ -365,7 +345,6 @@ namespace BlueControls {
                 k |= System.Windows.Forms.Keys.F12;
             }
 
-
             if (GetAsyncKeyState(System.Windows.Forms.Keys.Pause) != 0) {
                 k |= System.Windows.Forms.Keys.Pause;
             }
@@ -373,7 +352,6 @@ namespace BlueControls {
             {
                 k |= System.Windows.Forms.Keys.Oem5;
             }
-
 
             var kev = new System.Windows.Forms.KeyEventArgs(k);
             var kevold = new System.Windows.Forms.KeyEventArgs(Key_LastKey);
@@ -402,7 +380,5 @@ namespace BlueControls {
         private void OnKeyUp(System.Windows.Forms.KeyEventArgs e) {
             KeyUp?.Invoke(null, e);
         }
-
     }
-
 }

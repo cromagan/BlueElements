@@ -21,7 +21,6 @@ using BlueScript;
 
 public struct strDoItFeedback {
 
-
     public strDoItFeedback(string errormessage) {
         ErrorMessage = errormessage;
         Value = string.Empty;
@@ -34,7 +33,6 @@ public struct strDoItFeedback {
 
     public string Value;
     public string ErrorMessage;
-
 
     public static strDoItFeedback FalscherDatentyp() {
         return new strDoItFeedback("Falscher Datentyp.");
@@ -51,7 +49,6 @@ public struct strDoItFeedback {
     public static strDoItFeedback Klammerfehler() {
         return new strDoItFeedback("Fehler bei der Klammersetzung.");
     }
-
 
     public static strDoItFeedback Wahr() {
         return new strDoItFeedback("true", string.Empty);

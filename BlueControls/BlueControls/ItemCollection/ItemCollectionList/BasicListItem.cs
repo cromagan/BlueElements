@@ -37,13 +37,10 @@ namespace BlueControls.ItemCollection {
 
         protected abstract Size ComputeSizeUntouchedForListBox();
 
-
         public ItemCollectionList Parent { get; private set; }
         public string Internal { get; set; }
 
-
         public abstract int HeightForListBox(enBlueListBoxAppearance style, int columnWidth);
-
 
         protected abstract string GetCompareKey();
 
@@ -56,7 +53,6 @@ namespace BlueControls.ItemCollection {
         public object Tag;
 
         private Size _SizeUntouchedForListBox = Size.Empty;
-
 
         /// <summary>
         /// Ist das Item markiert/selektiert?
@@ -75,9 +71,7 @@ namespace BlueControls.ItemCollection {
         /// <remarks></remarks>
         protected bool _Enabled = true;
 
-
         protected BasicListItem(string internalname) {
-
 
             if (string.IsNullOrEmpty(internalname)) {
                 Internal = BasicPadItem.UniqueInternal(); // Wiederverwenden ;-)
@@ -92,26 +86,18 @@ namespace BlueControls.ItemCollection {
             _UserDefCompareKey = string.Empty;
         }
 
-
         public virtual bool IsClickable() {
             return !IsCaption;
         }
-
-
 
         public bool Contains(int x, int y) {
             return Pos.Contains(x, y);
         }
 
-
-
-
-
         public void SetCoordinates(Rectangle r) {
             Pos = r;
             Parent?.OnDoInvalidate();
         }
-
 
         public bool Enabled {
             get => _Enabled;
@@ -123,7 +109,6 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-
         public string CompareKey() {
 
             if (!string.IsNullOrEmpty(_UserDefCompareKey)) {
@@ -134,7 +119,6 @@ namespace BlueControls.ItemCollection {
             return GetCompareKey();
         }
 
-
         public string UserDefCompareKey {
             get => _UserDefCompareKey;
             set {
@@ -144,7 +128,6 @@ namespace BlueControls.ItemCollection {
                 //OnChanged();
             }
         }
-
 
         public bool Checked {
             get => _Checked;
@@ -160,18 +143,12 @@ namespace BlueControls.ItemCollection {
 
         public void Draw(Graphics GR, int xModifier, int YModifier, enDesign controldesign, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, string FilterText, bool Translate) {
 
-
             if (Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent nicht definiert"); }
             if (itemdesign == enDesign.Undefiniert) { return; }
 
-
             var PositionModified = new Rectangle(Pos.X - xModifier, Pos.Y - YModifier, Pos.Width, Pos.Height);
 
-
-
-
             DrawExplicit(GR, PositionModified, itemdesign, vState, DrawBorderAndBack, Translate);
-
 
             if (DrawBorderAndBack) {
                 if (!string.IsNullOrEmpty(FilterText) && !FilterMatch(FilterText)) {
@@ -180,7 +157,6 @@ namespace BlueControls.ItemCollection {
                     GR.FillRectangle(new SolidBrush(c1), PositionModified);
                 }
             }
-
         }
 
         public int CompareTo(object obj) {
@@ -218,9 +194,7 @@ namespace BlueControls.ItemCollection {
         }
 
         public virtual bool FilterMatch(string FilterText) {
-            if (Internal.ToUpper().Contains(FilterText.ToUpper())) { return true; }
-            return false;
+            return Internal.ToUpper().Contains(FilterText.ToUpper());
         }
-
     }
 }

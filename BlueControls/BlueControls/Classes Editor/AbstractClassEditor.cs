@@ -36,8 +36,6 @@ namespace BlueControls.Classes_Editor {
 
         public event EventHandler Changed;
 
-
-
         /// <summary>
         /// Das Objekt, das im Original bearbeitet wird.
         /// </summary>
@@ -66,8 +64,6 @@ namespace BlueControls.Classes_Editor {
             }
         }
 
-
-
         public bool IsFilling { get; private set; }
         public bool Inited { get; private set; }
 
@@ -94,7 +90,6 @@ namespace BlueControls.Classes_Editor {
             Develop.DebugPrint_RoutineMussUeberschriebenWerden();
         }
 
-
         protected void OnChanged(T Obj) {
             if (IsFilling) { return; }
 
@@ -107,16 +102,13 @@ namespace BlueControls.Classes_Editor {
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
-
         protected override void OnVisibleChanged(System.EventArgs e) {
             base.OnVisibleChanged(e);
 
             // Damit das Formular nach der Anzeige erstmal deaktiviert ist.
 
-
             if (_VisibleChanged_Done) { return; }
             _VisibleChanged_Done = true;
-
 
             if (_Item == null) {
                 IsFilling = true;

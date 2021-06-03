@@ -25,20 +25,10 @@ using static BlueBasics.modConverter;
 namespace BlueBasics {
     public static class DataFormat {
         public static bool MultilinePossible(this enDataFormat format) {
-            switch (format) {
-                case enDataFormat.Text:
-                case enDataFormat.Ganzzahl:
-                case enDataFormat.Gleitkommazahl:
-                case enDataFormat.BildCode:
-                case enDataFormat.Datum_und_Uhrzeit:
-                case enDataFormat.RelationText:
-                case enDataFormat.Text_mit_Formatierung:
-                case enDataFormat.Link_To_Filesystem:
-                case enDataFormat.LinkedCell:
-                    return true;
-                default:
-                    return false;
-            }
+            return format switch {
+                enDataFormat.Text or enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl or enDataFormat.BildCode or enDataFormat.Datum_und_Uhrzeit or enDataFormat.RelationText or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell => true,
+                _ => false,
+            };
         }
 
         // public static bool CompactPossible(this enDataFormat format)
@@ -56,50 +46,24 @@ namespace BlueBasics {
         // }
 
         public static bool SaveSizeData(this enDataFormat format) {
-            switch (format) {
-                case enDataFormat.Text:
-                case enDataFormat.Bit:
-                case enDataFormat.Ganzzahl:
-                case enDataFormat.Gleitkommazahl:
-                case enDataFormat.BildCode:
-                case enDataFormat.Datum_und_Uhrzeit:
-                case enDataFormat.FarbeInteger:
-                case enDataFormat.RelationText:
-                case enDataFormat.Schrift:
-                case enDataFormat.Text_mit_Formatierung:
-                case enDataFormat.Values_für_LinkedCellDropdown:
-                    return true;
-                default:
-                    return false;
-            }
+            return format switch {
+                enDataFormat.Text or enDataFormat.Bit or enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl or enDataFormat.BildCode or enDataFormat.Datum_und_Uhrzeit or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.Values_für_LinkedCellDropdown => true,
+                _ => false,
+            };
         }
 
         public static bool SpellCheckingPossible(this enDataFormat format) {
-            switch (format) {
-                case enDataFormat.Text:
-                case enDataFormat.Text_mit_Formatierung:
-                case enDataFormat.RelationText:
-                    return true;
-                default:
-                    return false;
-            }
+            return format switch {
+                enDataFormat.Text or enDataFormat.Text_mit_Formatierung or enDataFormat.RelationText => true,
+                _ => false,
+            };
         }
 
         public static bool TextboxEditPossible(this enDataFormat format) {
-            switch (format) {
-                case enDataFormat.Text:
-                case enDataFormat.Ganzzahl:
-                case enDataFormat.Gleitkommazahl:
-                case enDataFormat.BildCode:
-                case enDataFormat.Datum_und_Uhrzeit:
-                case enDataFormat.Text_mit_Formatierung:
-                case enDataFormat.LinkedCell:
-                case enDataFormat.RelationText:
-                    return true;
-
-                default:
-                    return false;
-            }
+            return format switch {
+                enDataFormat.Text or enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl or enDataFormat.BildCode or enDataFormat.Datum_und_Uhrzeit or enDataFormat.Text_mit_Formatierung or enDataFormat.LinkedCell or enDataFormat.RelationText => true,
+                _ => false,
+            };
         }
 
         /// <summary>
@@ -131,11 +95,7 @@ namespace BlueBasics {
         /// <returns></returns>
         /// <remarks></remarks>
         public static bool IsFormat(this string txt, enDataFormat format) {
-            if (!Text_LängeCheck(txt, format)) { return false; }
-            if (!Text_SchabloneCheck(txt, format)) { return false; }
-            if (!txt.ContainsOnlyChars(AllowedChars(format))) { return false; }
-            if (!Text_ValueCheck(txt, format)) { return false; }
-            return true;
+            return Text_LängeCheck(txt, format) && Text_SchabloneCheck(txt, format) && txt.ContainsOnlyChars(AllowedChars(format)) && Text_ValueCheck(txt, format);
         }
 
         public static string AllowedChars(this enDataFormat format) {
@@ -178,24 +138,10 @@ namespace BlueBasics {
         }
 
         public static bool ExportableForLayout(this enDataFormat format) {
-            switch (format) {
-                case enDataFormat.Text:
-                case enDataFormat.Bit:
-                case enDataFormat.Ganzzahl:
-                case enDataFormat.Gleitkommazahl:
-                case enDataFormat.BildCode:
-                case enDataFormat.Datum_und_Uhrzeit:
-                case enDataFormat.RelationText:
-                case enDataFormat.Schrift:
-                case enDataFormat.Text_mit_Formatierung:
-                case enDataFormat.Link_To_Filesystem:
-                case enDataFormat.LinkedCell:
-                case enDataFormat.Columns_für_LinkedCellDropdown:
-                case enDataFormat.Values_für_LinkedCellDropdown:
-                    return true;
-                default:
-                    return false;
-            }
+            return format switch {
+                enDataFormat.Text or enDataFormat.Bit or enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl or enDataFormat.BildCode or enDataFormat.Datum_und_Uhrzeit or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown => true,
+                _ => false,
+            };
         }
 
         public static int Text_MaximaleLänge(this enDataFormat format) {
@@ -369,11 +315,7 @@ namespace BlueBasics {
                 case enDataFormat.Ganzzahl:
                     if (string.IsNullOrEmpty(isValue)) { return CompareKey_S_NOK + "0000000000"; }
 
-                    if (int.TryParse(isValue, out var w)) {
-                        return CompareKey_S_OK + w.ToString(Constants.Format_Integer10);
-                    } else {
-                        return CompareKey_S_NOK + isValue;
-                    }
+                    return int.TryParse(isValue, out var w) ? CompareKey_S_OK + w.ToString(Constants.Format_Integer10) : CompareKey_S_NOK + isValue;
 
                 case enDataFormat.Bit:
                 case enDataFormat.FarbeInteger:
@@ -434,12 +376,7 @@ namespace BlueBasics {
                     }
 
                 case enDataFormat.Datum_und_Uhrzeit:
-
-                    if (DateTimeTryParse(isValue, out var d)) {
-                        return CompareKey_S_OK + d.ToString("u");
-                    } else {
-                        return CompareKey_S_NOK + isValue;
-                    }
+                    return DateTimeTryParse(isValue, out var d) ? CompareKey_S_OK + d.ToString("u") : CompareKey_S_NOK + isValue;
 
                 case enDataFormat.LinkedCell:
                 case enDataFormat.Columns_für_LinkedCellDropdown:
@@ -453,25 +390,10 @@ namespace BlueBasics {
         }
 
         public static bool Autofilter_möglich(this enDataFormat format) {
-            switch (format) {
-                case enDataFormat.Text:
-                case enDataFormat.Bit:
-                case enDataFormat.Ganzzahl:
-                case enDataFormat.Gleitkommazahl:
-                case enDataFormat.BildCode:
-                case enDataFormat.Datum_und_Uhrzeit:
-                case enDataFormat.FarbeInteger:
-                case enDataFormat.Schrift:
-                case enDataFormat.Text_mit_Formatierung:
-                case enDataFormat.Link_To_Filesystem:
-                case enDataFormat.LinkedCell:
-                case enDataFormat.Columns_für_LinkedCellDropdown:
-                case enDataFormat.Values_für_LinkedCellDropdown:
-                case enDataFormat.RelationText:
-                    return true;
-                default:
-                    return false;
-            }
+            return format switch {
+                enDataFormat.Text or enDataFormat.Bit or enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl or enDataFormat.BildCode or enDataFormat.Datum_und_Uhrzeit or enDataFormat.FarbeInteger or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown or enDataFormat.RelationText => true,
+                _ => false,
+            };
         }
 
         // public static bool NeedUTF8(this enDataFormat format) {
@@ -486,130 +408,59 @@ namespace BlueBasics {
         // }
 
         public static bool NeedTargetDatabase(this enDataFormat format) {
-            switch (format) {
-                case enDataFormat.LinkedCell:
-                case enDataFormat.Columns_für_LinkedCellDropdown:
-                case enDataFormat.Values_für_LinkedCellDropdown:
-                    return true;
-                default:
-                    return false;
-            }
+            return format switch {
+                enDataFormat.LinkedCell or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown => true,
+                _ => false,
+            };
         }
 
         public static bool IsZahl(this enDataFormat format) {
-            switch (format) {
-                case enDataFormat.Ganzzahl:
-                case enDataFormat.Gleitkommazahl:
-                    return true;
-                default:
-                    return false;
-            }
+            return format switch {
+                enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl => true,
+                _ => false,
+            };
         }
 
         public static bool DropdownItemsOfOtherCellsAllowed(this enDataFormat format) {
-            switch (format) {
-                case enDataFormat.Text:
-                case enDataFormat.Ganzzahl:
-                case enDataFormat.Gleitkommazahl:
-                case enDataFormat.BildCode:
-                case enDataFormat.Datum_und_Uhrzeit:
-                case enDataFormat.FarbeInteger:
-                case enDataFormat.Schrift:
-                case enDataFormat.Text_mit_Formatierung:
-                case enDataFormat.LinkedCell:
-                case enDataFormat.RelationText:
-                    return true;
-                default:
-                    return false;
-            }
+            return format switch {
+                enDataFormat.Text or enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl or enDataFormat.BildCode or enDataFormat.Datum_und_Uhrzeit or enDataFormat.FarbeInteger or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.LinkedCell or enDataFormat.RelationText => true,
+                _ => false,
+            };
         }
 
         public static bool NeedLinkedKeyKennung(this enDataFormat format) {
-            switch (format) {
-                case enDataFormat.Columns_für_LinkedCellDropdown:
-                    return true;
-                default:
-                    return false;
-            }
+            return format switch {
+                enDataFormat.Columns_für_LinkedCellDropdown => true,
+                _ => false,
+            };
         }
 
         public static bool DropdownUnselectAllAllowed(this enDataFormat format) {
-            switch (format) {
-                case enDataFormat.Text:
-                case enDataFormat.Ganzzahl:
-                case enDataFormat.Gleitkommazahl:
-                case enDataFormat.BildCode:
-                case enDataFormat.Datum_und_Uhrzeit:
-                case enDataFormat.FarbeInteger:
-                case enDataFormat.RelationText:
-                case enDataFormat.Schrift:
-                case enDataFormat.Text_mit_Formatierung:
-                case enDataFormat.Link_To_Filesystem:
-                case enDataFormat.LinkedCell:
-                    return true;
-                default:
-                    return false;
-            }
+            return format switch {
+                enDataFormat.Text or enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl or enDataFormat.BildCode or enDataFormat.Datum_und_Uhrzeit or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell => true,
+                _ => false,
+            };
         }
 
         public static bool DropdownItemsAllowed(this enDataFormat format) {
-            switch (format) {
-                case enDataFormat.Text:
-                case enDataFormat.Bit:
-                case enDataFormat.Ganzzahl:
-                case enDataFormat.Gleitkommazahl:
-                case enDataFormat.BildCode:
-                case enDataFormat.Datum_und_Uhrzeit:
-                case enDataFormat.Text_mit_Formatierung:
-                case enDataFormat.Link_To_Filesystem:
-                case enDataFormat.Columns_für_LinkedCellDropdown:
-                case enDataFormat.Values_für_LinkedCellDropdown:
-                case enDataFormat.RelationText:
-                    return true;
-                default:
-                    return false;
-            }
+            return format switch {
+                enDataFormat.Text or enDataFormat.Bit or enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl or enDataFormat.BildCode or enDataFormat.Datum_und_Uhrzeit or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown or enDataFormat.RelationText => true,
+                _ => false,
+            };
         }
 
         public static bool CanBeChangedByRules(this enDataFormat format) {
-            switch (format) {
-                case enDataFormat.Text:
-                case enDataFormat.Bit:
-                case enDataFormat.Ganzzahl:
-                case enDataFormat.Gleitkommazahl:
-                case enDataFormat.BildCode:
-                case enDataFormat.Datum_und_Uhrzeit:
-                case enDataFormat.FarbeInteger:
-                case enDataFormat.RelationText:
-                case enDataFormat.Schrift:
-                case enDataFormat.Text_mit_Formatierung:
-                case enDataFormat.LinkedCell:
-                    return true;
-                default:
-                    return false;
-            }
+            return format switch {
+                enDataFormat.Text or enDataFormat.Bit or enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl or enDataFormat.BildCode or enDataFormat.Datum_und_Uhrzeit or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.LinkedCell => true,
+                _ => false,
+            };
         }
 
         public static bool CanBeCheckedByRules(this enDataFormat format) {
-            switch (format) {
-                case enDataFormat.Text:
-                case enDataFormat.Bit:
-                case enDataFormat.Ganzzahl:
-                case enDataFormat.Gleitkommazahl:
-                case enDataFormat.BildCode:
-                case enDataFormat.Datum_und_Uhrzeit:
-                case enDataFormat.FarbeInteger:
-                case enDataFormat.RelationText:
-                case enDataFormat.Schrift:
-                case enDataFormat.Text_mit_Formatierung:
-                case enDataFormat.Link_To_Filesystem:
-                case enDataFormat.LinkedCell:
-                case enDataFormat.Columns_für_LinkedCellDropdown:
-                case enDataFormat.Values_für_LinkedCellDropdown:
-                    return true;
-                default:
-                    return false;
-            }
+            return format switch {
+                enDataFormat.Text or enDataFormat.Bit or enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl or enDataFormat.BildCode or enDataFormat.Datum_und_Uhrzeit or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown => true,
+                _ => false,
+            };
         }
     }
 }

@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 namespace BlueControls.Enums {
     public enum enASCIIKey {
         Undefined = -1,
@@ -45,10 +44,7 @@ namespace BlueControls.Enums {
         Space = 32,
         //Chr255 = 255,
 
-
         Euro = 8364,
-
-
 
         ImageStart = 20000
     }

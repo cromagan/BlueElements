@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -31,7 +30,6 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.Reflection;
-
 
 //  = A3 & ".Design.Add(enStates."&B3&", enKontur."& C3 & ", " &D3&", "&E3&", "&F3&","&G3&", enHintergrundArt."&H3&","&I3&",'"&J3&"','"&K3&"','"&L3&"',enRahmenArt."&M3&",'"&N3&"','"&O3&"','"&P3&"','"&Q3&"','"&R3&"');"
 #region Win 10
@@ -832,7 +830,6 @@ using System.Reflection;
 //	Table_Column	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9,4, Bold=True, Color=0046d5}	
 //	Table_Cell_Chapter	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=13, Bold=True, Underline=True, Color=0046d5}	
 
-
 #endregion
 
 namespace BlueControls {
@@ -859,11 +856,7 @@ namespace BlueControls {
         public static void LoadSkin() {
             //_SkinString = "Windows10";
 
-
             //SkinDB = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), _SkinString + ".skn", "Skin", true, Convert.ToBoolean(Develop.AppName() == "SkinDesigner"));
-
-
-
 
             //="Design.Add(enDesign."& A3 & ",enStates."&B3&", enKontur."& C3 & ", " &D3&", "&E3&", "&F3&","&G3&", enHintergrundArt."&H3&","&I3&",'"&J3&"','"&K3&"','"&L3&"',enRahmenArt."&M3&",'"&N3&"','"&O3&"','"&P3&"','"&Q3&"','"&R3&"');"
 
@@ -1160,12 +1153,9 @@ namespace BlueControls {
 
         }
 
-
         public static enImageCodeEffect AdditionalState(enStates vState) {
-            if (vState.HasFlag(enStates.Standard_Disabled)) { return ST[0]; }
-            return enImageCodeEffect.Ohne;
+            return vState.HasFlag(enStates.Standard_Disabled) ? ST[0] : enImageCodeEffect.Ohne;
         }
-
 
         public static Color Color_Back(enDesign vDesign, enStates vState) {
             return DesignOf(vDesign, vState).BackColor1;
@@ -1175,11 +1165,7 @@ namespace BlueControls {
             return DesignOf(vDesign, vState).BorderColor1;
         }
 
-
-
         #region  Back 
-
-
 
         public static void Draw_Back(Graphics gr, enDesign design, enStates state, Rectangle r, System.Windows.Forms.Control control, bool needTransparenz) {
             Draw_Back(gr, DesignOf(design, state), r, control, needTransparenz);
@@ -1189,8 +1175,6 @@ namespace BlueControls {
 
             try {
                 return Design[design][state];
-
-
 
             } catch {
                 var d = new clsDesign {
@@ -1203,17 +1187,11 @@ namespace BlueControls {
                 };
                 return d;
 
-
             }
-
-
-
         }
 
         public static void Draw_Back(Graphics gr, clsDesign design, Rectangle r, System.Windows.Forms.Control control, bool needTransparenz) {
             try {
-
-
 
                 if (design.Need) {
                     if (!needTransparenz) { design.Need = false; }
@@ -1223,7 +1201,6 @@ namespace BlueControls {
                             if (design.Kontur == enKontur.Rechteck && design.X1 >= 0 && design.X2 >= 0 && design.Y1 >= 0 && design.Y2 >= 0) { design.Need = false; }
                             if (design.Kontur == enKontur.Rechteck_R4 && design.X1 >= 1 && design.X2 >= 1 && design.Y1 >= 1 && design.Y2 >= 1) { design.Need = false; }
                         }
-
                     }
                 }
 
@@ -1231,16 +1208,12 @@ namespace BlueControls {
 
                 if (design.HintergrundArt == enHintergrundArt.Ohne || design.Kontur == enKontur.Ohne) { return; }
 
-
                 r.X -= design.X1;
                 r.Y -= design.Y1;
                 r.Width += design.X1 + design.X2;
                 r.Height += design.Y1 + design.Y2;
 
                 if (r.Width < 1 || r.Height < 1) { return; }// Durchaus möglich, Creative-Pad, usereingabe
-
-
-
 
                 switch (design.HintergrundArt) {
                     case enHintergrundArt.Ohne:
@@ -1309,19 +1282,10 @@ namespace BlueControls {
             } catch (Exception ex) {
                 Develop.DebugPrint(ex);
             }
-
-
-
         }
-
-
-
-
-
 
         public static void Draw_Back_Transparent(Graphics gr, Rectangle r, System.Windows.Forms.Control control) {
             if (control?.Parent == null) { return; }
-
 
             switch (control.Parent) {
                 case IUseMyBackColor _:
@@ -1362,7 +1326,6 @@ namespace BlueControls {
                     Develop.DebugPrint("Unbekannter Typ: " + control.Parent.Name);
                     break;
             }
-
         }
 
         //private static void Draw_Back_Verlauf_Vertical_Glanzpunkt(Graphics GR, RowItem Row, Rectangle r) {
@@ -1373,19 +1336,16 @@ namespace BlueControls {
         //    var c2 = Color.FromArgb(Value(Row, col_Color_Back_2, 0));
         //    var PR = Value(Row, col_Verlauf_Mitte, 0.05f);
 
-
         //    if (PR < 0.06F) { PR = 0.06F; }
         //    if (PR > 0.94F) { PR = 0.94F; }
 
         //    var lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Bottom), c1, c1);
-
 
         //    cb.Colors = new[] { c1, c2, c1, c1, c1.Darken(0.3), c1 };
         //    cb.Positions = new[]
         //    {
         //        0.0F, (float) (PR - 0.05), (float) (PR + 0.05), (float) (1 - PR - 0.05), (float) (1 - PR + 0.05), 1.0F
         //    };
-
 
         //    lgb.InterpolationColors = cb;
         //    lgb.GammaCorrection = true;
@@ -1410,7 +1370,6 @@ namespace BlueControls {
         //    var c3 = Color.FromArgb(Value(Row, col_Color_Back_3, 0));
         //    var PR = Value(Row, col_Verlauf_Mitte, 0.5f);
 
-
         //    var lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Right, r.Top), c1, c3);
 
         //    cb.Colors = new[] { c1, c2, c3 };
@@ -1426,7 +1385,6 @@ namespace BlueControls {
         //private static void Draw_Back_Glossy(Graphics GR, RowItem Row, Rectangle r) {
         //    var col1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
 
-
         //    var cb = new ColorBlend();
 
         //    var c1 = Extensions.MixColor(Color.White, Extensions.SoftLightMix(col1, Color.Black, 1), 0.4);
@@ -1434,7 +1392,6 @@ namespace BlueControls {
         //    var c3 = Extensions.SoftLightMix(col1, Color.FromArgb(128, 128, 128), 1);
         //    var c4 = Extensions.SoftLightMix(col1, Color.FromArgb(192, 192, 192), 1);
         //    var c5 = Extensions.OverlayMix(Extensions.SoftLightMix(col1, Color.White, 1), Color.White, 0.75);
-
 
         //    cb.Colors = new[] { c1, c2, c3, c4, c5 };
         //    cb.Positions = new[] { 0.0F, 0.25F, 0.5F, 0.75F, 1 };
@@ -1460,7 +1417,6 @@ namespace BlueControls {
 
         //    var col1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
 
-
         //    var cb = new ColorBlend();
 
         //    var c5 = Extensions.MixColor(Color.White, Extensions.SoftLightMix(col1, Color.Black, 1), 0.4);
@@ -1468,7 +1424,6 @@ namespace BlueControls {
         //    var c3 = Extensions.SoftLightMix(col1, Color.FromArgb(128, 128, 128), 1);
         //    var c2 = Extensions.SoftLightMix(col1, Color.FromArgb(192, 192, 192), 1);
         //    var c1 = Extensions.OverlayMix(Extensions.SoftLightMix(col1, Color.White, 1), Color.White, 0.75);
-
 
         //    cb.Colors = new[] { c1, c2, c3, c4, c5 };
         //    cb.Positions = new[] { 0.0F, 0.25F, 0.5F, 0.75F, 1 };
@@ -1483,7 +1438,6 @@ namespace BlueControls {
         //    lgb = new LinearGradientBrush(new Point(r.Left + 1, r.Top), new Point(r.Left + 1, r.Top + r.Height - 1), c2, c5) {
         //        InterpolationColors = cb
         //    };
-
 
         //    r.Inflate(-4, -4);
         //    GR.SmoothingMode = SmoothingMode.HighQuality;
@@ -1506,44 +1460,22 @@ namespace BlueControls {
         //    GR.FillRectangle(b, new Rectangle(rect.Left, rect.Top + r2, rect.Width, rect.Height - r));
         //}
 
-
         #endregion
-
 
         private static GraphicsPath Kontur(enKontur Kon, Rectangle r) {
 
-
-            switch (Kon) {
-                case enKontur.Rechteck:
-                    // GR.SmoothingModex = Drawing2D.SmoothingMode.None
-                    return modAllgemein.Poly_Rechteck(r);
-
-                case enKontur.Rechteck_R4:
-                    // GR.SmoothingModex = Drawing2D.SmoothingMode.HighQuality
-                    return modAllgemein.Poly_RoundRec(r, 4);
-
-                case enKontur.Rechteck_R11:
-                    //  GR.SmoothingModex = Drawing2D.SmoothingMode.HighQuality
-                    return modAllgemein.Poly_RoundRec(r, 11);
-
-                case enKontur.Rechteck_R20:
-                    //    GR.SmoothingModex = Drawing2D.SmoothingMode.HighQuality
-                    return modAllgemein.Poly_RoundRec(r, 20);
-
-
-                //break; case Is = enKontur.Rechteck_R4_NurOben
-                //    r.Y2 += 4
-                //    GR.SmoothingModex = Drawing2D.SmoothingMode.HighQuality
-                //    Return Poly_RoundRec(r, 4)
-
-
-                case enKontur.Ohne:
-                    return null;
-
-                default:
-                    //  GR.SmoothingModex = Drawing2D.SmoothingMode.None
-                    return modAllgemein.Poly_Rechteck(r);
-            }
+            return Kon switch {
+                enKontur.Rechteck => modAllgemein.Poly_Rechteck(r),// GR.SmoothingModex = Drawing2D.SmoothingMode.None
+                enKontur.Rechteck_R4 => modAllgemein.Poly_RoundRec(r, 4),// GR.SmoothingModex = Drawing2D.SmoothingMode.HighQuality
+                enKontur.Rechteck_R11 => modAllgemein.Poly_RoundRec(r, 11),//  GR.SmoothingModex = Drawing2D.SmoothingMode.HighQuality
+                enKontur.Rechteck_R20 => modAllgemein.Poly_RoundRec(r, 20),//    GR.SmoothingModex = Drawing2D.SmoothingMode.HighQuality
+                                                                           //break; case Is = enKontur.Rechteck_R4_NurOben
+                                                                           //    r.Y2 += 4
+                                                                           //    GR.SmoothingModex = Drawing2D.SmoothingMode.HighQuality
+                                                                           //    Return Poly_RoundRec(r, 4)
+                enKontur.Ohne => null,
+                _ => modAllgemein.Poly_Rechteck(r),//  GR.SmoothingModex = Drawing2D.SmoothingMode.None
+            };
         }
 
         #region  Border 
@@ -1551,7 +1483,6 @@ namespace BlueControls {
         public static void Draw_Border(Graphics GR, enDesign vDesign, enStates vState, Rectangle r) {
             Draw_Border(GR, DesignOf(vDesign, vState), r);
         }
-
 
         //[Obsolete]
         //public static void Draw_Border(Graphics GR, RowItem row, Rectangle r) {
@@ -1566,7 +1497,6 @@ namespace BlueControls {
         //    d.RahmenArt = (enRahmenArt)Value(row, col_Border_Style, -1);
         //    if (d.RahmenArt == enRahmenArt.Ohne) { return; }
 
-
         //    d.X1 = Value(row, ColX1, 0);
         //    d.Y1 = Value(row, ColY1, 0);
         //    d.X2 = Value(row, ColX2, 0);
@@ -1577,14 +1507,10 @@ namespace BlueControls {
         //    Draw_Border(GR, d, r);
         //}
 
-
-
         public static void Draw_Border(Graphics GR, clsDesign design, Rectangle r) {
-
 
             if (design.Kontur == enKontur.Ohne) { return; }
             if (design.RahmenArt == enRahmenArt.Ohne) { return; }
-
 
             if (design.Kontur == enKontur.Unbekannt) {
                 design.Kontur = enKontur.Rechteck;
@@ -1599,12 +1525,10 @@ namespace BlueControls {
 
             if (r.Width < 1 || r.Height < 1) { return; }
 
-
             // PathX kann durch die ganzen Expand mal zu klein werden, dann wird nothing zurückgegeben
             GraphicsPath PathX;
             Pen PenX;
             try {
-
 
                 switch (design.RahmenArt) {
                     case enRahmenArt.Solide_1px:
@@ -1642,8 +1566,6 @@ namespace BlueControls {
                         if (PathX != null) { GR.DrawPath(PenX, PathX); }
                         break;
 
-
-
                     default:
                         PathX = Kontur(design.Kontur, r);
                         PenX = new Pen(Color.Red);
@@ -1651,15 +1573,12 @@ namespace BlueControls {
                         Develop.DebugPrint(design.RahmenArt);
                         break;
                 }
-
             } catch (Exception ex) {
                 Develop.DebugPrint(ex);
             }
         }
 
-
         //private static void Draw_Border_DuoColor(Graphics GR, RowItem Row, Rectangle r, bool NurOben) {
-
 
         //    var c1 = Color.FromArgb(Value(Row, col_Color_Border_2, 0));
         //    var c2 = Color.FromArgb(Value(Row, col_Color_Border_3, 0));
@@ -1682,11 +1601,7 @@ namespace BlueControls {
         //    GR.SmoothingMode = x;
         //}
 
-
         #endregion
-
-
-
 
         /// <summary>
         /// Bild wird in dieser Routine nicht mehr gändert, aber in der nachfolgenden
@@ -1703,7 +1618,6 @@ namespace BlueControls {
         public static void Draw_FormatedText(Graphics gr, string txt, enDesign design, enStates state, QuickImage imageCode, enAlignment align, Rectangle fitInRect, System.Windows.Forms.Control child, bool deleteBack, bool translate) {
             Draw_FormatedText(gr, txt, imageCode, DesignOf(design, state), align, fitInRect, child, deleteBack, translate);
         }
-
 
         /// <summary>
         /// Status des Bildes (Disabled) wird geändert
@@ -1730,7 +1644,6 @@ namespace BlueControls {
                 Rahms.Add("Ohne Rahmen", ((int)PadStyles.Undefiniert).ToString(), enImageCode.Kreuz);
             }
 
-
             Rahms.Add("Haupt-Überschrift", ((int)PadStyles.Style_Überschrift_Haupt).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Haupt, SheetStyle).SymbolOfLine());
             Rahms.Add("Untertitel für Haupt-Überschrift", ((int)PadStyles.Style_Überschrift_Untertitel).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Untertitel, SheetStyle).SymbolOfLine());
             Rahms.Add("Überschrift für Kapitel", ((int)PadStyles.Style_Überschrift_Kapitel).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Kapitel, SheetStyle).SymbolOfLine());
@@ -1743,8 +1656,6 @@ namespace BlueControls {
             return Rahms;
 
         }
-
-
 
         public static ItemCollectionList GetFonts(RowItem SheetStyle) {
 
@@ -1781,7 +1692,6 @@ namespace BlueControls {
                 gr.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
             }
 
-
             //  GR.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit
 
             var pSize = SizeF.Empty;
@@ -1793,16 +1703,12 @@ namespace BlueControls {
 
             if (qi != null) { pSize = qi.BMP.Size; }
 
-
             if (LanguageTool.Translation != null) { txt = LanguageTool.DoTranslate(txt, Translate); }
-
-
 
             if (F != null) {
                 if (FitInRect.Width > 0) { txt = txt.TrimByWidth(FitInRect.Width - pSize.Width, F); }
                 tSize = gr.MeasureString(txt, F.Font());
             }
-
 
             if (vAlign.HasFlag(enAlignment.Right)) { XP = FitInRect.Width - pSize.Width - tSize.Width; }
             if (vAlign.HasFlag(enAlignment.HorizontalCenter)) { XP = (float)((FitInRect.Width - pSize.Width - tSize.Width) / 2.0); }
@@ -1815,7 +1721,6 @@ namespace BlueControls {
                 YP1 = FitInRect.Height - pSize.Height;
                 YP2 = FitInRect.Height - tSize.Height;
             }
-
 
             if (DeleteBack) {
                 if (!string.IsNullOrEmpty(txt)) { Draw_Back_Transparent(gr, new Rectangle((int)(FitInRect.X + pSize.Width + XP - 1), (int)(FitInRect.Y + YP2 - 1), (int)(tSize.Width + 2), (int)(tSize.Height + 2)), Child); }
@@ -1832,11 +1737,8 @@ namespace BlueControls {
             }
         }
 
-
-
         public static Size FormatedText_NeededSize(string text, QuickImage image, BlueFont font, int minSie) {
             try {
-
 
                 var pSize = SizeF.Empty;
                 var tSize = SizeF.Empty;
@@ -1846,33 +1748,19 @@ namespace BlueControls {
                 if (image != null) { pSize = image.BMP.Size; }
                 if (!string.IsNullOrEmpty(text)) { tSize = BlueFont.MeasureString(text, font.Font()); }
 
-                if (!string.IsNullOrEmpty(text)) {
-                    if (image == null) {
-                        return new Size((int)(tSize.Width + 1), Math.Max((int)tSize.Height, minSie));
-                    }
-
-                    return new Size((int)(tSize.Width + 2 + pSize.Width + 1), Math.Max((int)tSize.Height, (int)pSize.Height));
-                }
-
-                if (image != null) {
-                    return new Size((int)pSize.Width, (int)pSize.Height);
-                }
-
-                return new Size(minSie, minSie);
+                return !string.IsNullOrEmpty(text)
+                    ? image == null
+                        ? new Size((int)(tSize.Width + 1), Math.Max((int)tSize.Height, minSie))
+                        : new Size((int)(tSize.Width + 2 + pSize.Width + 1), Math.Max((int)tSize.Height, (int)pSize.Height))
+                    : image != null ? new Size((int)pSize.Width, (int)pSize.Height) : new Size(minSie, minSie);
             } catch {
                 // tmpImageCode wird an anderer Stelle verwendet
                 return FormatedText_NeededSize(text, image, font, minSie);
             }
-
         }
 
-
         internal static BlueFont GetBlueFont(int design, enStates state, RowItem rowOfStyle, int stufe) {
-            if (design > 10000) {
-                return Skin.GetBlueFont((PadStyles)design, rowOfStyle, stufe);
-            }
-
-            return Skin.GetBlueFont((enDesign)design, state, stufe);
+            return design > 10000 ? Skin.GetBlueFont((PadStyles)design, rowOfStyle, stufe) : Skin.GetBlueFont((enDesign)design, state, stufe);
         }
 
         internal static BlueFont GetBlueFont(PadStyles padStyle, RowItem rowOfStyle, int stufe) {
@@ -1926,7 +1814,6 @@ namespace BlueControls {
             return null;
         }
 
-
         internal static BlueFont GetBlueFont(enDesign design, enStates state, int stufe) {
 
             if (stufe != 4 && design != enDesign.TextBox) {
@@ -1935,7 +1822,6 @@ namespace BlueControls {
                 Develop.DebugPrint(enFehlerArt.Warnung, "Design unbekannt: " + (int)design);
                 return GetBlueFont(design, state);
             }
-
 
             switch (stufe) {
                 case 4:
@@ -1957,14 +1843,9 @@ namespace BlueControls {
             return GetBlueFont(design, state);
         }
 
-
-
-
         public static BlueFont GetBlueFont(PadStyles format, RowItem rowOfStyle) {
             if (StyleDB == null) { InitStyles(); }
-            if (StyleDB == null || rowOfStyle == null) { return BlueFont.Get(ErrorFont); }
-
-            return GetBlueFont(StyleDB, ((int)format).ToString(), rowOfStyle);
+            return StyleDB == null || rowOfStyle == null ? BlueFont.Get(ErrorFont) : GetBlueFont(StyleDB, ((int)format).ToString(), rowOfStyle);
         }
 
         public static BlueFont GetBlueFont(Database styleDB, string column, RowItem row) {
@@ -1980,13 +1861,9 @@ namespace BlueControls {
             return BlueFont.Get(_String);
         }
 
-
-
         public static BlueFont GetBlueFont(enDesign design, enStates state) {
             return DesignOf(design, state).bFont;
         }
-
-
 
         #region  Styles 
 
@@ -1995,7 +1872,6 @@ namespace BlueControls {
 
             return StyleDB?.Column[0].Contents(null, null);
         }
-
 
         public static void InitStyles() {
             StyleDB = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Styles.MDB", "Styles", true, false);

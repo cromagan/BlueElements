@@ -34,10 +34,9 @@ namespace BlueBasics {
             }
 
             if (remo.Count == 0) { return false; }
-            var dummy = default(T);
 
             foreach (var ThisInteger in remo) {
-                if (!l.TryRemove(ThisInteger, out dummy)) {
+                if (!l.TryRemove(ThisInteger, out _)) {
                     Develop.DebugPrint(enFehlerArt.Fehler, "Remove failed: " + ThisInteger);
                 }
             }

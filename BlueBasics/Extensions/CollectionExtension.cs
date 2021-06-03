@@ -30,9 +30,7 @@ namespace BlueBasics {
         }
 
         public static string JoinWithCr(this ICollection<string> iC) {
-            if (iC == null || iC.Count == 0) { return string.Empty; }
-
-            return iC.JoinWith("\r");
+            return iC == null || iC.Count == 0 ? string.Empty : iC.JoinWith("\r");
         }
 
         public static string JoinWith(this ICollection<string> iC, string joinChar) {

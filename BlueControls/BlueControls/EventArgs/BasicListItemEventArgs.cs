@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 using BlueControls.ItemCollection;
 
 namespace BlueControls.EventArgs {
@@ -27,7 +26,5 @@ namespace BlueControls.EventArgs {
         }
 
         public BasicListItem Item { get; }
-
-
     }
 }

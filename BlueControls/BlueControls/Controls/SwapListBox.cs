@@ -13,13 +13,10 @@ namespace BlueControls.Controls {
             InitializeComponent();
         }
 
-
-
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public ItemCollectionList Item => Main.Item;
-
 
         public event EventHandler<ListEventArgs> ItemAdded;
 
@@ -29,15 +26,7 @@ namespace BlueControls.Controls {
         /// </summary>
         public event EventHandler ItemRemoved;
 
-
         public event EventHandler AddClicked;
-
-
-
-
-
-
-
 
         public enAddType AddAllowed {
             get => Main.AddAllowed;
@@ -49,41 +38,32 @@ namespace BlueControls.Controls {
             ItemAdded?.Invoke(this, e);
         }
 
-
         protected void OnItemRemoved(System.EventArgs e) {
             if (IsDisposed) { return; }
             ItemRemoved?.Invoke(this, e);
         }
-
-
 
         private void Main_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
             MoveItemBetweenList(Suggest, Main, ((BasicListItem)e.Item).Internal, true);
             OnItemAdded(e);
         }
 
-
         private void Main_ItemRemoving(object sender, BlueBasics.EventArgs.ListEventArgs e) {
             MoveItemBetweenList(Main, Suggest, ((BasicListItem)e.Item).Internal, false);
         }
-
 
         private void Main_ItemRemoved(object sender, System.EventArgs e) {
 
             OnItemRemoved(e);
         }
 
-
-
         private void Main_ItemClicked(object sender, EventArgs.BasicListItemEventArgs e) {
             MoveItemBetweenList(Main, Suggest, e.Item.Internal, true);
         }
 
-
         private void Suggest_ItemClicked(object sender, EventArgs.BasicListItemEventArgs e) {
             MoveItemBetweenList(Suggest, Main, e.Item.Internal, true);
         }
-
 
         protected void MoveItemBetweenList(ListBox Source, ListBox Target, string Internal, bool doRemove) {
             var SourceItem = Source.Item[Internal];
@@ -104,8 +84,6 @@ namespace BlueControls.Controls {
             //    TargetItem = new TextListItem(Internal);
             //    Target.Item.Add(TargetItem);
             //}
-
-
 
             Target.Item.Sort();
 
@@ -130,7 +108,6 @@ namespace BlueControls.Controls {
             OnAddClicked();
         }
 
-
         public void OnAddClicked() {
             AddClicked?.Invoke(this, System.EventArgs.Empty);
         }
@@ -139,14 +116,12 @@ namespace BlueControls.Controls {
 
             foreach (var thisi in item) {
 
-
                 if (Main.Item[thisi.Internal] == null && Suggest.Item[thisi.Internal] == null) {
                     thisi.Checked = false;
                     thisi.CloneToNewCollection(Suggest.Item);
 
                 }
             }
-
         }
 
         protected override void DrawControl(Graphics gr, enStates state) { }

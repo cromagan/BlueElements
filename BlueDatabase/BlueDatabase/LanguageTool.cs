@@ -30,7 +30,6 @@ namespace BlueDatabase {
 
         private static readonly object[] EmptyArgs = new object[0];
 
-
         /// <summary>
         /// Fügt Präfix und Suffix hinzu und ersetzt den Text nach dem gewünschten Stil.
         /// </summary>
@@ -62,33 +61,19 @@ namespace BlueDatabase {
                 if (x.Length == 1 && !ThisString.StartsWith("|")) { txt = txt.Replace(x[0], string.Empty); }
             }
 
-            if (style == enShortenStyle.Replaced || style == enShortenStyle.HTML || OT == txt) { return txt; }
-            return OT + " (" + txt + ")";
+            return style == enShortenStyle.Replaced || style == enShortenStyle.HTML || OT == txt ? txt : OT + " (" + txt + ")";
         }
 
         private static string ColumnReplaceTranslated(string newTXT, ColumnItem column) {
-            switch (column.Format) {
-                case enDataFormat.Ganzzahl:
-                case enDataFormat.Gleitkommazahl:
-                case enDataFormat.Datum_und_Uhrzeit:
-                case enDataFormat.FarbeInteger:
-                case enDataFormat.Schrift:
-                case enDataFormat.Text_mit_Formatierung:
-                case enDataFormat.Link_To_Filesystem:
-                    return newTXT;
-                default:
-                    return DoTranslate(newTXT, false);
-            }
-
+            return column.Format switch {
+                enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl or enDataFormat.Datum_und_Uhrzeit or enDataFormat.FarbeInteger or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem => newTXT,
+                _ => DoTranslate(newTXT, false),
+            };
         }
-
-
-
 
         public static string DoTranslate(string txt) {
             return DoTranslate(txt, true, EmptyArgs);
         }
-
 
         /// <summary>
         /// 
@@ -101,8 +86,7 @@ namespace BlueDatabase {
             try {
 
                 if (Translation == null) {
-                    if (!txt.Contains("{0}")) { return txt; }
-                    return string.Format(txt, args);
+                    return !txt.Contains("{0}") ? txt : string.Format(txt, args);
                 }
                 if (string.IsNullOrEmpty(txt)) { return string.Empty; }
 
@@ -129,7 +113,6 @@ namespace BlueDatabase {
                     r = Translation.Row.Add(txt);
                 }
 
-
                 var t = r.CellGetString("Translation");
                 if (string.IsNullOrEmpty(t)) { English = German; return string.Format(English, args); }
                 English = t + addend;
@@ -138,8 +121,6 @@ namespace BlueDatabase {
             } catch {
                 return txt;
             }
-
         }
-
     }
 }

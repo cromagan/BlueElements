@@ -23,10 +23,6 @@ namespace BlueControls.BlueDatabaseDialogs {
 
     public sealed partial class Filter : BlueControls.Forms.Form {
 
-
-
-
-
         public Filter(Table table) {
 
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -36,11 +32,5 @@ namespace BlueControls.BlueDatabaseDialogs {
             filterleiste.Table = table;
 
         }
-
-
-
-
-
-
     }
 }

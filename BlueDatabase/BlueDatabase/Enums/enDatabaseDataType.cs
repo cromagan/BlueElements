@@ -29,7 +29,6 @@ namespace BlueDatabase.Enums {
         //CheckOutTime = 4,
         //CheckOutUser = 5,
 
-
         // Zugriffanzahl = 6
         // TotalSperrbit = 7
         // TotalSperrer = 8
@@ -88,7 +87,6 @@ namespace BlueDatabase.Enums {
         ZeilenQuickInfo = 66,
         RulesScript = 67,
         AdditionaFilesPfad = 68,
-
 
         Info_ColumDataSart = 100,
         Info_ColumnDataEnd = 199,
@@ -196,9 +194,6 @@ namespace BlueDatabase.Enums {
         co_FilterOptions = 196,
         co_CaptionBitmapTXT = 197,
 
-
-
-
         ce_Value_withoutSizeData = 200,
         ce_Value_withSizeData = 201,
 
@@ -207,7 +202,6 @@ namespace BlueDatabase.Enums {
         [Obsolete]
         ce_UTF8Value_withSizeData = 203,
         //Dummy_ce_ValueWithoutSizeUncrypted = 204,
-
 
         dummyComand_RemoveRow = 220,
         dummyComand_AddRow = 221,
@@ -219,8 +213,6 @@ namespace BlueDatabase.Enums {
         //PendingsInOne = 250,
         UndoInOne = 251,
         //   StatisticInOneOld = 252
-
-
 
         //StatisticOld = 253
         //UndoOld = 254

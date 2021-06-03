@@ -20,7 +20,6 @@
 using Skript.Enums;
 using System.Collections.Generic;
 
-
 namespace BlueScript {
     internal class Method_Join : Method {
 
@@ -35,8 +34,9 @@ namespace BlueScript {
         public override bool EndlessArgs => false;
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
-            return new strDoItFeedback("\"" + attvar.Attributes[0].ValueString.Replace("\r", attvar.Attributes[1].ValueString) + "\"", string.Empty);
+            return !string.IsNullOrEmpty(attvar.ErrorMessage)
+                   ? strDoItFeedback.AttributFehler(this, attvar)
+                   : new strDoItFeedback("\"" + attvar.Attributes[0].ValueString.Replace("\r", attvar.Attributes[1].ValueString) + "\"", string.Empty);
         }
     }
 }

@@ -46,16 +46,10 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         }
 
-
-
-
         private void CursorPosChanged(object sender, CellEventArgs e) {
 
-            if (e.Column == null) {
-                NurinAktuellerSpalte.Text = "Nur in der <b>aktuell gewählten Spalte</b> ersetzen.";
-            } else {
-                NurinAktuellerSpalte.Text = "Nur in Spalte <b>'" + e.Column.ReadableText() + "'</b> ersetzen.";
-            }
+            NurinAktuellerSpalte.Text = e.Column == null ? "Nur in der <b>aktuell gewählten Spalte</b> ersetzen."
+                                                         : "Nur in Spalte <b>'" + e.Column.ReadableText() + "'</b> ersetzen.";
 
             Checkbuttons();
         }
@@ -69,7 +63,6 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             _BlueTable.Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
 
-
             var sp = new List<ColumnItem>();
             var ro = new List<RowItem>();
 
@@ -81,7 +74,6 @@ namespace BlueControls.BlueDatabaseDialogs {
                 }
             }
 
-
             foreach (var ThisRow in _BlueTable.Database.Row) {
                 if (ThisRow != null) {
                     if (!AktuelleFilterung.Checked || ThisRow.MatchesTo(_BlueTable.Filter)) {
@@ -89,7 +81,6 @@ namespace BlueControls.BlueDatabaseDialogs {
                     }
                 }
             }
-
 
             var count = 0;
             var GeändeterText = "";
@@ -102,7 +93,6 @@ namespace BlueControls.BlueDatabaseDialogs {
                 var RowChanged = false;
                 co++;
                 P.Update(co);
-
 
                 foreach (var Thiscolumn in sp) {
 
@@ -119,7 +109,6 @@ namespace BlueControls.BlueDatabaseDialogs {
                         trifft = true;
                     }
 
-
                     if (trifft) {
                         if (ErsetzeMit.Checked) {
                             GeändeterText = OriginalText.Replace(SuchText, ErsetzText);
@@ -133,15 +122,12 @@ namespace BlueControls.BlueDatabaseDialogs {
                             GeändeterText = tmp.SortedDistinctList().JoinWithCr();
                         }
 
-
                         if (GeändeterText != OriginalText) {
                             RowChanged = true;
                             count++;
                             ThisRow.CellSet(Thiscolumn, GeändeterText);
                         }
                     }
-
-
                 }
 
                 if (RowChanged) { ThisRow.DoAutomatic(true, false, 10, "value changed"); }
@@ -150,12 +136,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             P?.Close();
             MessageBox.Show(count + " Ersetzung(en) vorgenommen.", enImageCode.Information, "OK");
 
-
             IsWorking = false;
 
         }
-
-
 
         private void Alt_TextChange(object sender, System.EventArgs e) {
             Checkbuttons();
@@ -165,11 +148,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             Checkbuttons();
         }
 
-
         private void Checkbuttons() {
             var CanDo = true;
             if (_BlueTable == null) { return; }
-
 
             if (!_BlueTable.Database.IsAdministrator()) { CanDo = false; }
 
@@ -185,7 +166,6 @@ namespace BlueControls.BlueDatabaseDialogs {
                 if (ErsetzeMit.Checked) { CanDo = false; }
                 NurinAktuellerSpalte.Enabled = true;
 
-
             } else if (InhaltEgal.Checked) {
                 Alt.Enabled = false;
                 ErsetzeMit.Enabled = false;
@@ -194,29 +174,22 @@ namespace BlueControls.BlueDatabaseDialogs {
                 if (!NurinAktuellerSpalte.Checked) { CanDo = false; }// Zu Riskant
 
                 if (ErsetzeMit.Checked) { CanDo = false; }
-
             } else {
                 CanDo = false;
             }
 
-
-
             if (ErsetzeMit.Checked) {
-
 
             } else if (ErsetzeKomplett.Checked) {
                 NurinAktuellerSpalte.Enabled = false; // Zu Riskant
                 if (!NurinAktuellerSpalte.Checked) { CanDo = false; }// Zu Riskant
-
             } else if (FügeHinzu.Checked) {
                 if (string.IsNullOrEmpty(Neu.Text)) { CanDo = false; }
             } else {
                 CanDo = true;
             }
 
-
             if (NurinAktuellerSpalte.Checked) {
-
 
                 if (_BlueTable.CursorPosColumn() == null) {
                     CanDo = false;
@@ -224,7 +197,6 @@ namespace BlueControls.BlueDatabaseDialogs {
                     if (!_BlueTable.CursorPosColumn().Format.CanBeChangedByRules()) { CanDo = false; }
                 }
             }
-
 
             if (Alt.Text == Neu.Text) {
                 if (!InhaltEgal.Checked) { CanDo = false; }
@@ -238,6 +210,5 @@ namespace BlueControls.BlueDatabaseDialogs {
             base.OnFormClosing(e);
             _BlueTable.CursorPosChanged -= CursorPosChanged;
         }
-
     }
 }

@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 using BlueBasics;
 using System;
 using System.Collections.Generic;
@@ -29,7 +28,6 @@ namespace BlueScript {
         private string _errorCode;
 
         public bool EndSkript = false;
-
 
         public int Line { get; internal set; }
 
@@ -48,16 +46,11 @@ namespace BlueScript {
 
         public readonly List<Variable> Variablen;
 
-
-
-
-
         public static List<T> GetEnumerableOfType<T>(params object[] constructorArgs) where T : class {
 
             var l = new List<T>();
 
             foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {
-
 
                 try {
                     foreach (var thist in thisas.GetTypes()) {
@@ -68,15 +61,8 @@ namespace BlueScript {
                 } catch (Exception ex) {
                     Develop.DebugPrint(ex);
                 }
-
-
             }
             return l;
-
-
-
-
-
 
             //    var objects = new List<T>();
 
@@ -97,16 +83,13 @@ namespace BlueScript {
             //        return objects;
             //    }
 
-
             //    foreach (var type in types.Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(T)))) {
             //        objects.Add((T)Activator.CreateInstance(type, constructorArgs));
 
             //    }
 
-
             //    //foreach( var thisa in  AppDomain.CurrentDomain.GetAssemblies())
             //    //       {
-
 
             //    //   foreach (var type in
             //    //       Assembly.GetAssembly(typeof(T)).GetTypes()
@@ -116,14 +99,6 @@ namespace BlueScript {
             //    //   //objects.Sort();
             //    return objects;
         }
-
-
-
-
-
-
-
-
 
         //public static IEnumerable<T> GetEnumerableOfType<T>(params object[] constructorArgs) where T : class {
         //    var objects = new List<T>();
@@ -145,16 +120,13 @@ namespace BlueScript {
         //        return objects;
         //    }
 
-
         //    foreach (var type in types.Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(T)))) {
         //        objects.Add((T)Activator.CreateInstance(type, constructorArgs));
 
         //    }
 
-
         //    //foreach( var thisa in  AppDomain.CurrentDomain.GetAssemblies())
         //    //       {
-
 
         //    //   foreach (var type in
         //    //       Assembly.GetAssembly(typeof(T)).GetTypes()
@@ -165,9 +137,7 @@ namespace BlueScript {
         //    return objects;
         //}
 
-
         public Script(List<Variable> variablen) {
-
 
             if (Comands == null) {
                 Comands = GetEnumerableOfType<Method>();
@@ -186,16 +156,12 @@ namespace BlueScript {
             }
         }
 
-
-
         private static string ReduceText(string txt) {
-
 
             var s = new System.Text.StringBuilder();
 
             var gänsef = false;
             var comment = false;
-
 
             for (var pos = 0; pos < txt.Length; pos++) {
 
@@ -231,17 +197,14 @@ namespace BlueScript {
                 if (!comment && addt) {
                     s.Append(c);
                 }
-
             }
 
             return s.ToString();
         }
 
-
         public static (string, string) Parse(string scriptText, bool reduce, Script s) {
             var pos = 0;
             s.EndSkript = false;
-
 
             string tmptxt;
 
@@ -253,11 +216,8 @@ namespace BlueScript {
 
             }
 
-
             do {
                 if (pos >= tmptxt.Length || s.EndSkript) { return (string.Empty, string.Empty); }
-
-
 
                 if (tmptxt.Substring(pos, 1) == "¶") {
                     s.Line++;
@@ -270,8 +230,6 @@ namespace BlueScript {
                     }
                     pos = f.Position;
                 }
-
-
             } while (true);
         }
 
@@ -279,7 +237,6 @@ namespace BlueScript {
             (Error, ErrorCode) = Parse(_ScriptText, true, this);
             return !string.IsNullOrEmpty(Error);
         }
-
 
         public static strDoItWithEndedPosFeedback ComandOnPosition(string txt, int pos, Script s, bool expectedvariablefeedback) {
             foreach (var thisC in Comands) {
@@ -293,7 +250,6 @@ namespace BlueScript {
                 }
             }
 
-
             #region Prüfen für bessere Fehlermeldung, ob der Rückgabetyp falsch gesetzt wurde
             foreach (var thisC in Comands) {
                 var f = thisC.CanDo(txt, pos, !expectedvariablefeedback, s);
@@ -301,22 +257,15 @@ namespace BlueScript {
                 if (f.MustAbort) { return new strDoItWithEndedPosFeedback(f.ErrorMessage); }
 
                 if (string.IsNullOrEmpty(f.ErrorMessage)) {
-                    if (expectedvariablefeedback) {
-                        return new strDoItWithEndedPosFeedback("Dieser Befehl hat keinen Rückgabewert: " + txt.Substring(pos));
-                    } else {
-                        return new strDoItWithEndedPosFeedback("Dieser Befehl hat einen Rückgabewert, der nicht verwendet wird: " + txt.Substring(pos));
-                    }
-
+                    return expectedvariablefeedback
+                        ? new strDoItWithEndedPosFeedback("Dieser Befehl hat keinen Rückgabewert: " + txt.Substring(pos))
+                        : new strDoItWithEndedPosFeedback("Dieser Befehl hat einen Rückgabewert, der nicht verwendet wird: " + txt.Substring(pos));
                 }
             }
             #endregion
 
-
-
             return new strDoItWithEndedPosFeedback("Kann nicht geparsed werden: " + txt.Substring(pos));
         }
-
-
 
         //public static void AddScriptComands() {
 

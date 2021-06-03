@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Designer_Support;
@@ -44,7 +43,6 @@ namespace BlueControls.Controls {
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
             InitializeComponent();
 
-
             // Initialisierungen nach dem Aufruf InitializeComponent() hinzufügen
 
             Item = itemCollectionPad;
@@ -52,8 +50,6 @@ namespace BlueControls.Controls {
             Unselect();
             _MouseHighlight = false;
         }
-
-
 
         public CreativePad() : this(new ItemCollectionPad()) { }
 
@@ -68,17 +64,14 @@ namespace BlueControls.Controls {
         //private readonly List<BasicPadItem> _ItemsSelected = new();
         private readonly List<IMoveable> _ItemsToMove = new();
 
-
         private string _LastQuickInfo = string.Empty;
 
         public BasicPadItem HotItem { get; private set; } = null;
         public BasicPadItem LastClickedItem { get; private set; } = null;
 
-
         private bool RepairPrinterData_Prepaired;
 
         public bool _editAllowed = true;
-
 
         #region  Events 
         public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
@@ -92,7 +85,6 @@ namespace BlueControls.Controls {
         public event EventHandler PreviewModeChanged;
         public event EventHandler ClickedItemChanged;
         #endregion
-
 
         #region  Properties 
 
@@ -115,8 +107,6 @@ namespace BlueControls.Controls {
             set => _editAllowed = value;
         }
 
-
-
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -125,7 +115,6 @@ namespace BlueControls.Controls {
             set {
 
                 if (_Item == value) { return; }
-
 
                 if (_Item != null) {
                     _Item.ItemRemoved -= _Item_ItemRemoved;
@@ -142,50 +131,35 @@ namespace BlueControls.Controls {
             }
         }
 
-
         #endregion
-
 
         private void OnPreviewModeChanged() {
             PreviewModeChanged?.Invoke(this, System.EventArgs.Empty);
         }
 
-
-
         internal Point MiddleOfVisiblesScreen() {
-            return new Point((int)((Width / 2 + _shiftX) / _Zoom), (int)((Height / 2 + _shiftY) / _Zoom));
+            return new Point((int)(((Width / 2) + _shiftX) / _Zoom), (int)(((Height / 2) + _shiftY) / _Zoom));
         }
-
-
 
         private void Item_DoInvalidate(object sender, System.EventArgs e) {
             Invalidate();
         }
 
         protected override RectangleM MaxBounds() {
-            if (_Item == null) { return new RectangleM(0, 0, 0, 0); }
-
-            return _Item.MaxBounds(null);
+            return _Item == null ? new RectangleM(0, 0, 0, 0) : _Item.MaxBounds(null);
         }
         protected override bool IsInputKey(System.Windows.Forms.Keys keyData) {
             // Ganz wichtig diese Routine!
             // Wenn diese NICHT ist, geht der Fokus weg, sobald der cursor gedrückt wird.
             // http://technet.microsoft.com/de-de/subscriptions/control.isinputkey%28v=vs.100%29
 
-            switch (keyData) {
-                case System.Windows.Forms.Keys.Up:
-                case System.Windows.Forms.Keys.Down:
-                case System.Windows.Forms.Keys.Left:
-                case System.Windows.Forms.Keys.Right:
-                    return true;
-            }
-
-            return false;
-
+            return keyData switch {
+                System.Windows.Forms.Keys.Up or System.Windows.Forms.Keys.Down or System.Windows.Forms.Keys.Left or System.Windows.Forms.Keys.Right => true,
+                _ => false,
+            };
         }
 
         protected override void OnKeyUp(System.Windows.Forms.KeyEventArgs e) => DoKeyUp(e, true); // Kann nicht public gemacht werden, deswegen Umleitung
-
 
         public void DoKeyUp(System.Windows.Forms.KeyEventArgs e, bool hasbase) {
 
@@ -195,7 +169,6 @@ namespace BlueControls.Controls {
             if (hasbase) { base.OnKeyUp(e); }
 
             if (!_editAllowed) { return; }
-
 
             if (_GivesMouseComandsTo != null) {
                 if (_GivesMouseComandsTo.KeyUp(this, e, _Zoom, _shiftX, _shiftY)) { return; }
@@ -208,7 +181,6 @@ namespace BlueControls.Controls {
             }
 
             if (Multi < 1) { Multi = 1m; }
-
 
             switch (e.KeyCode) {
                 case System.Windows.Forms.Keys.Delete:
@@ -247,7 +219,6 @@ namespace BlueControls.Controls {
         internal void DoMouseDown(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseDown(e);
 
-
             CheckHotItem(e, true);
 
             if (!_editAllowed) { return; }
@@ -260,7 +231,6 @@ namespace BlueControls.Controls {
                     return;
                 }
             }
-
 
             if (e.Button == System.Windows.Forms.MouseButtons.Left) {
                 var p = KoordinatesUnscaled(e);
@@ -281,7 +251,6 @@ namespace BlueControls.Controls {
             }
         }
 
-
         public void SelectItem(IMoveable item, bool additional) {
             if (!additional) { Unselect(); }
             if (item == null) { return; }
@@ -293,9 +262,7 @@ namespace BlueControls.Controls {
             _ItemsToMove.Clear();
         }
 
-
         protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) => DoMouseMove(e); // Kann nicht public gemacht werden, deswegen Umleitung
-
 
         internal void DoMouseMove(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseMove(e);
@@ -304,7 +271,7 @@ namespace BlueControls.Controls {
                 CheckHotItem(e, false); // Für QuickInfo usw.
             }
 
-            if(!_editAllowed) { return; }
+            if (!_editAllowed) { return; }
 
             if (_GivesMouseComandsTo != null) {
                 if (e.Button == System.Windows.Forms.MouseButtons.None && HotItem != _GivesMouseComandsTo) {
@@ -327,15 +294,7 @@ namespace BlueControls.Controls {
                     }
                 }
 
-                if (HotItem != null && e.Button == System.Windows.Forms.MouseButtons.None) {
-
-                    _LastQuickInfo = HotItem.QuickInfo;
-                } else {
-                    _LastQuickInfo = string.Empty;
-                }
-
-
-
+                _LastQuickInfo = HotItem != null && e.Button == System.Windows.Forms.MouseButtons.None ? HotItem.QuickInfo : string.Empty;
             }
 
             if (e.Button == System.Windows.Forms.MouseButtons.Left) {
@@ -345,14 +304,12 @@ namespace BlueControls.Controls {
             }
         }
 
-
         protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
             DoMouseUp(e); // Kann nicht public gemacht werden, deswegen Umleitung
         }
 
         internal void DoMouseUp(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseUp(e);
-
 
             if (_GivesMouseComandsTo != null) {
                 if (!_GivesMouseComandsTo.MouseUp(this, e, _Zoom, _shiftX, _shiftY)) {
@@ -361,9 +318,6 @@ namespace BlueControls.Controls {
                     return;
                 }
             }
-
-
-
 
             switch (e.Button) {
                 case System.Windows.Forms.MouseButtons.Left:
@@ -390,10 +344,8 @@ namespace BlueControls.Controls {
                     break;
             }
 
-
             Invalidate();
         }
-
 
         internal void DrawCreativePadTo(Graphics gr, Size maxs, enStates state, decimal zoom, decimal X, decimal Y, List<BasicPadItem> visibleItems) {
             try {
@@ -417,7 +369,6 @@ namespace BlueControls.Controls {
                         var Rr = new Rectangle((int)rLO.X, (int)rLO.Y, (int)(rRU.X - rLO.X), (int)(rRU.Y - rLO.Y));
                         gr.DrawRectangle(PenGray, Rr);
                     }
-
                 } else {
                     gr.Clear(Color.White);
                     gr.Clear(Item.BackColor);
@@ -427,9 +378,6 @@ namespace BlueControls.Controls {
                     DrawCreativePadTo(gr, maxs, state, zoom, X, Y, visibleItems);
                     return;
                 }
-
-
-
 
                 // Dann die selectiereren Punkte
 
@@ -442,7 +390,6 @@ namespace BlueControls.Controls {
 
                     if (thisItem is PointM P2) {
 
-
                         if (P2.Parent is BasicPadItem BPI2) {
                             foreach (var P in BPI2.MovablePoint) {
                                 P.Draw(gr, zoom, X, Y, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard);
@@ -451,13 +398,7 @@ namespace BlueControls.Controls {
 
                         P2.Draw(gr, zoom, X, Y, enDesign.Button_EckpunktSchieber, enStates.Standard);
                     }
-
-
                 }
-
-
-
-
 
                 if (_GivesMouseComandsTo is BasicPadItem PA) {
                     var DCoordinates = PA.UsedArea().ZoomAndMoveRect(zoom, X, Y, false);
@@ -490,7 +431,6 @@ namespace BlueControls.Controls {
             Invalidate();
         }
 
-
         private void MoveItemsWithMouse() => MoveItems(MousePos_1_1.X - MouseDownPos_1_1.X, MousePos_1_1.Y - MouseDownPos_1_1.Y, true, true);
 
         private void MoveItems(decimal x, decimal y, bool doSnap, bool modifyMouseDown) {
@@ -513,10 +453,7 @@ namespace BlueControls.Controls {
                         pointToMove = BPI.PointsForSuccesfullyMove[0]; break;
                     }
                 }
-
             }
-
-
 
             if (pointToMove != null && x != 0m) {
                 x = SnapToGrid(true, pointToMove, x);
@@ -542,8 +479,6 @@ namespace BlueControls.Controls {
 
             if (x == 0M && y == 0M) { return; }
 
-
-
             //if (MoveSelectedPoints(move.X, move.Y)) {
             //    // Wenn Strongmode true ist es für den Anwender unerklärlich, warum er denn nix macht,obwohl kein Fehler da ist...
             //    if (_Item.NotPerforming(false) == 0) {
@@ -556,7 +491,6 @@ namespace BlueControls.Controls {
             foreach (var thisIt in _ItemsToMove) {
                 thisIt.Move(x, y);
             }
-
 
             if (doSnap && modifyMouseDown) {
                 // Maus-Daten modifizieren, da ja die tasächliche Bewegung wegen der SnapPoints abweichen kann.
@@ -608,11 +542,9 @@ namespace BlueControls.Controls {
             return Value - movedPoint.Y;
         }
 
-
         //private void SnapToPoint(enXY toCheck, List<PointM> movedPoints, PointM move, ref PointM thisPointSnaps, ref PointM snapedToPoint) {
         //    decimal ShortestDist = 10;
         //    var Nearest = decimal.MaxValue;
-
 
         //    if (!_AutoRelation.HasFlag(enAutoRelationMode.Senkrecht) &&
         //        !_AutoRelation.HasFlag(enAutoRelationMode.Waagerecht) &&
@@ -628,18 +560,12 @@ namespace BlueControls.Controls {
 
         //    }
 
-
         //    // Berechne, welcher Punkt snappt
         //    foreach (var thisPoint in movedPoints) {
         //        SnapToPoint(toCheck, thisPoint, move, ref ShortestDist, ref thisPointSnaps, ref snapedToPoint, ref Nearest);
         //    }
 
         //}
-
-
-
-
-
 
         public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
 
@@ -696,7 +622,6 @@ namespace BlueControls.Controls {
 
             if (e == null) { return new List<BasicPadItem>(); }
 
-
             var P = new Point((int)((e.X + _shiftX) / _Zoom), (int)((e.Y + _shiftY) / _Zoom));
 
             var l = new List<BasicPadItem>();
@@ -708,7 +633,6 @@ namespace BlueControls.Controls {
             }
             return l;
         }
-
 
         private void CheckHotItem(System.Windows.Forms.MouseEventArgs e, bool doLastClicked) {
             var OldClicked = LastClickedItem;
@@ -731,21 +655,16 @@ namespace BlueControls.Controls {
                 }
             }
 
-
             if (doLastClicked && HotItem != OldClicked) {
                 LastClickedItem = HotItem;
                 OnClickedItemChanged();
             }
-
-
         }
-
 
         public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object selectedHotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
 
             CheckHotItem(e, true);
             selectedHotItem = HotItem;
-
 
             if (selectedHotItem != null) {
                 Items.Add("Allgemeine Element-Aktionen", true);
@@ -754,24 +673,17 @@ namespace BlueControls.Controls {
 
                 Items.Add("Objekt duplizieren", "#Duplicate", enImageCode.Kopieren, selectedHotItem is ICloneable);
 
-
                 Items.AddSeparator();
                 Items.Add("In den Vordergrund", "#Vordergrund", enImageCode.InDenVordergrund);
                 Items.Add("In den Hintergrund", "#Hintergrund", enImageCode.InDenHintergrund);
                 Items.Add("Eine Ebene nach vorne", "#Vorne", enImageCode.EbeneNachVorne);
                 Items.Add("Eine Ebene nach hinten", "#Hinten", enImageCode.EbeneNachHinten);
             }
-
-
         }
 
         public void OnContextMenuInit(ContextMenuInitEventArgs e) {
             ContextMenuInit?.Invoke(this, e);
         }
-
-
-
-
 
         public void Print() {
             DruckerDokument.DefaultPageSettings.Margins = new Margins(0, 0, 0, 0);
@@ -787,12 +699,10 @@ namespace BlueControls.Controls {
             RepairPrinterData();
         }
 
-
         private void DruckerDokument_PrintPage(object sender, PrintPageEventArgs e) {
             e.HasMorePages = false;
 
             OnPrintPage(e);
-
 
             var i = _Item.ToBitmap(3);
             if (i == null) { return; }
@@ -815,25 +725,20 @@ namespace BlueControls.Controls {
 
         public void CopyPrinterSettingsToWorkingArea() {
 
-
             if (DruckerDokument.DefaultPageSettings.Landscape) {
                 _Item.SheetSizeInMM = new SizeF((int)(DruckerDokument.DefaultPageSettings.PaperSize.Height * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.PaperSize.Width * 25.4 / 100));
                 _Item.RandinMM = new System.Windows.Forms.Padding((int)(DruckerDokument.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
-
 
             } else {
                 // Hochformat
                 _Item.SheetSizeInMM = new SizeF((int)(DruckerDokument.DefaultPageSettings.PaperSize.Width * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.PaperSize.Height * 25.4 / 100));
                 _Item.RandinMM = new System.Windows.Forms.Padding((int)(DruckerDokument.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
             }
-
         }
-
 
         public void ShowWorkingAreaSetup() {
 
             var OriD = new PrintDocument();
-
 
             OriD.DefaultPageSettings.Landscape = false;
             OriD.DefaultPageSettings.PaperSize = new PaperSize("Benutzerdefiniert", (int)(_Item.SheetSizeInMM.Width / 25.4 * 100), (int)(_Item.SheetSizeInMM.Height / 25.4 * 100));
@@ -842,21 +747,15 @@ namespace BlueControls.Controls {
             OriD.DefaultPageSettings.Margins.Left = (int)(_Item.RandinMM.Left / 25.4 * 100);
             OriD.DefaultPageSettings.Margins.Right = (int)(_Item.RandinMM.Right / 25.4 * 100);
 
-
-
-
             using (var x = new BlueControls.Forms.PageSetupDialog(OriD, true)) {
                 x.ShowDialog();
                 if (x.Canceled()) { return; }
             }
 
-
             _Item.SheetSizeInMM = new SizeF((int)(OriD.DefaultPageSettings.PaperSize.Width * 25.4 / 100), (int)(OriD.DefaultPageSettings.PaperSize.Height * 25.4 / 100));
             _Item.RandinMM = new System.Windows.Forms.Padding((int)(OriD.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(OriD.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(OriD.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(OriD.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
 
         }
-
-
 
         private void RepairPrinterData() {
 
@@ -883,7 +782,7 @@ namespace BlueControls.Controls {
             DruckerDokument.DefaultPageSettings.Margins = new Margins((int)(_Item.RandinMM.Left / 25.4 * 100), (int)(_Item.RandinMM.Right / 25.4 * 100), (int)(_Item.RandinMM.Top / 25.4 * 100), (int)(_Item.RandinMM.Bottom / 25.4 * 100));
         }
 
-        public void OpenSaveDialog(string title, string optionalFileName) {
+        public void OpenSaveDialog(string title) {
 
             title = title.RemoveChars(Constants.Char_DateiSonderZeichen);
 
@@ -892,17 +791,10 @@ namespace BlueControls.Controls {
             PicsSave.ShowDialog();
         }
 
-
         private void PicsSave_FileOk(object sender, CancelEventArgs e) {
             if (e.Cancel) { return; }
             _Item.SaveAsBitmap(PicsSave.FileName);
         }
-
-
-
-
-
-
 
         public void ShowErweitertMenü(BasicPadItem Item) {
             var l = Item.GetStyleOptions();
@@ -915,15 +807,12 @@ namespace BlueControls.Controls {
             EditBoxFlexiControl.Show(l);
         }
 
-
         private void DruckerDokument_BeginPrint(object sender, PrintEventArgs e) => OnBeginnPrint(e);
         private void DruckerDokument_EndPrint(object sender, PrintEventArgs e) => OnEndPrint(e);
         private void OnClickedItemChanged() => ClickedItemChanged?.Invoke(this, System.EventArgs.Empty);
         private void OnBeginnPrint(PrintEventArgs e) => BeginnPrint?.Invoke(this, e);
         private void OnEndPrint(PrintEventArgs e) => EndPrint?.Invoke(this, e);
         public override string QuickInfoText => _LastQuickInfo;
-
-
 
     }
 }

@@ -31,7 +31,6 @@ public struct strCanDoFeedback {
         LineBreakInCodeBlock = 0;
     }
 
-
     public strCanDoFeedback(int continuePosition, string comandText, string attributtext, string codeblockaftertext) {
         ContinueOrErrorPosition = continuePosition;
         ErrorMessage = string.Empty;

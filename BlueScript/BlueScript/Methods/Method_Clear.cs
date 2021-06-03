@@ -20,7 +20,6 @@
 using Skript.Enums;
 using System.Collections.Generic;
 
-
 namespace BlueScript {
     internal class Method_Clear : Method {
 

@@ -21,7 +21,6 @@ using BlueControls.Enums;
 namespace BlueControls.Controls {
     public class RibbonBar : AbstractTabControl {
 
-
         public RibbonBar() : base() {
             Height = 110;
             SendToBack();
@@ -29,6 +28,5 @@ namespace BlueControls.Controls {
             BackColor = Skin.Color_Back(enDesign.RibbonBar_Body, enStates.Standard);
 
         }
-
     }
 }

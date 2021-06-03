@@ -17,22 +17,16 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 using System.Collections.Generic;
-
 
 namespace BlueControls.ItemCollection {
     internal class clsPhysicPadItem : clsAbstractPhysicPadItem {
 
-
         public readonly List<clsKraft> Kraft = new();
-
-
 
         public clsPhysicPadItem(ItemCollectionPad parent) : base(parent, string.Empty) {
 
         }
-
 
         protected override string ClassId() {
             return "Physics-Object";
@@ -41,7 +35,6 @@ namespace BlueControls.ItemCollection {
         //{
         //    throw new NotImplementedException();
         //}
-
 
         //public override RectangleM UsedArea()
         //{
@@ -52,8 +45,6 @@ namespace BlueControls.ItemCollection {
         //{
         //    throw new NotImplementedException();
         //}
-
-
 
         //protected override void GenerateInternalRelationExplicit()
         //{

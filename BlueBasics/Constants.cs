@@ -104,14 +104,11 @@ namespace BlueBasics {
         public const string Format_Float10_3 = "0000000000.###";
         public const string Format_Float5_1 = "00000.0";
 
-
         public const string AllowedCharsVariableName = Char_az + Char_AZ + "_" + Char_Numerals; // Klammern, Semikolon etc. verboten, da es im Regeln bei Substring verwendet wird
-
 
         //Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         //    var enc1252 = Encoding.GetEncoding(1252);
         public static readonly System.Text.Encoding Win1252 = System.Text.Encoding.GetEncoding(1252);
-
 
     }
 }

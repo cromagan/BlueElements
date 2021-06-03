@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 namespace BlueDatabase.EventArgs {
     public class ProgressbarEventArgs : System.EventArgs {
         public ProgressbarEventArgs(string name, int current, int count, bool beginns, bool ends) {

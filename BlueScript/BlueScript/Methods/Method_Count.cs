@@ -23,9 +23,7 @@ using System.Collections.Generic;
 namespace BlueScript {
     internal class Method_Count : Method {
 
-
         public override string Syntax => "Count(List-Variable)";
-
 
         public override string Description => "Gibt die Anzahl der Elemente der Liste zurück.";
         public override List<string> Comand(Script s) { return new() { "count" }; }
@@ -38,8 +36,9 @@ namespace BlueScript {
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
-            return new strDoItFeedback(attvar.Attributes[0].ValueListString.Count.ToString(), string.Empty);
+            return !string.IsNullOrEmpty(attvar.ErrorMessage)
+                ? strDoItFeedback.AttributFehler(this, attvar)
+                : new strDoItFeedback(attvar.Attributes[0].ValueListString.Count.ToString(), string.Empty);
         }
     }
 }

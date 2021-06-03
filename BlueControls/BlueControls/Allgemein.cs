@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 using BlueBasics;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -35,7 +34,6 @@ namespace BlueControls {
 
             if (par == null) { return null; }
 
-
             var ThisContextMenu = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
             var UserMenu = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
             var tags = new List<string>();
@@ -46,23 +44,17 @@ namespace BlueControls {
 
             if (Cancel) { return null; }
 
-
-
             var ec = new ContextMenuInitEventArgs(HotItem, tags, UserMenu);
             par.OnContextMenuInit(ec);
-            if (ec.Cancel) { return null; }
-
-            if (ThisContextMenu != null && ThisContextMenu.Count > 0) { return par; }
-            if (UserMenu.Count > 0) { return par; }
-
-            return null;
+            return ec.Cancel ? null
+                : ThisContextMenu != null && ThisContextMenu.Count > 0 ? par
+                : UserMenu.Count > 0 ? par
+                : null;
         }
 
         public static t ParentControl<t>(this object o) {
 
             if (o is System.Windows.Forms.Control co) {
-
-
 
                 do {
                     co = co.Parent;
@@ -93,17 +85,12 @@ namespace BlueControls {
 
             var F = Skin.GetBlueFont(design, state);
 
-
-
-
             do {
                 pos++;
                 var ToTEst = Rest.Substring(0, pos);
                 var s = BlueFont.MeasureString(ToTEst, F.Font());
 
-
                 if (pos < Rest.Length && Convert.ToChar(Rest.Substring(pos, 1)).isPossibleLineBreak()) { FoundCut = pos; }
-
 
                 if (s.Width > MaxWidth || pos == Rest.Length) {
 
@@ -124,18 +111,12 @@ namespace BlueControls {
                         FoundCut = 0;
                     }
 
-
                     _broken.Add(ToTEst);
                     Rest = Rest.Substring(pos);
                     pos = -1; // wird gleich erhöht
 
                 }
-
-
-
-
             } while (true);
-
 
             //foreach (string ThisCap in _captiontmp)
             //{
@@ -150,9 +131,6 @@ namespace BlueControls {
 
             //}
 
-
-
-
         }
 
         public static string TrimByWidth(this string TXT, float MaxWidth, BlueFont F) {
@@ -162,10 +140,9 @@ namespace BlueControls {
             if (tSize.Width - 1 > MaxWidth && TXT.Length > 1) {
                 var Min = 0;
                 var Max = TXT.Length;
-                var Middle = 0;
-
+                int Middle;
                 do {
-                    Middle = (int)(Min + (Max - Min) / 2.0);
+                    Middle = (int)(Min + ((Max - Min) / 2.0));
                     tSize = BlueFont.MeasureString(TXT.Substring(0, Middle) + "...", F.Font());
 
                     if (tSize.Width + 3 > MaxWidth) {
@@ -173,9 +150,7 @@ namespace BlueControls {
                     } else {
                         Min = Middle;
                     }
-
                 } while (Max - Min > 1);
-
 
                 if (Middle == 1 && tSize.Width - 2 > MaxWidth) {
                     return string.Empty;  // ACHTUNG: 5 Pixel breiter (Beachte oben +4 und hier +2)

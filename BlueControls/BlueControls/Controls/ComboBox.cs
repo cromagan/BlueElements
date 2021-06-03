@@ -60,7 +60,6 @@ namespace BlueControls.Controls {
 
         #endregion
 
-
         #region  Variablen 
 
         private string _Initialtext;
@@ -71,7 +70,6 @@ namespace BlueControls.Controls {
         private string _LastClickedText = "####~~~~|||||";
 
         #endregion
-
 
         #region  Properties 
 
@@ -89,8 +87,6 @@ namespace BlueControls.Controls {
                 SetStyle();
             }
         }
-
-
 
         public ItemCollectionList Item { get; }
 
@@ -119,8 +115,6 @@ namespace BlueControls.Controls {
             }
         }
 
-
-
         #endregion
 
         #region  Events 
@@ -128,14 +122,11 @@ namespace BlueControls.Controls {
         public event EventHandler DropDownShowing;
         #endregion
 
-
-
         private void DropDownMenu_Cancel(object sender, object MouseOver) {
             Item.UncheckAll();
             FloatingInputBoxListBoxStyle.Close(this);
             Focus();
         }
-
 
         private void DropDownMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
             Item.UncheckAll();
@@ -157,16 +148,13 @@ namespace BlueControls.Controls {
             ItemClicked?.Invoke(this, e);
         }
 
-
-
         protected override enDesign GetDesign() {
-            if (ParentType() == enPartentType.RibbonGroupBox || ParentType() == enPartentType.RibbonPage) { return enDesign.Ribbon_ComboBox_Textbox; }
-            return enDesign.ComboBox_Textbox;
+            return ParentType() == enPartentType.RibbonGroupBox || ParentType() == enPartentType.RibbonPage
+                ? enDesign.Ribbon_ComboBox_Textbox
+                : enDesign.ComboBox_Textbox;
         }
 
-
         protected override void DrawControl(Graphics gr, enStates state) {
-
 
             if (_DrawStyle != enComboboxStyle.TextBox) {
                 if (string.IsNullOrEmpty(_Initialtext) && !string.IsNullOrEmpty(Text)) { _Initialtext = Text; }
@@ -175,15 +163,12 @@ namespace BlueControls.Controls {
                 return;
             }
 
-
             btnDropDown.Enabled = Item.Count > 0;
 
             var vType = enDesign.ComboBox_Textbox;
             if (ParentType() == enPartentType.RibbonGroupBox || ParentType() == enPartentType.RibbonPage) {
                 vType = enDesign.Ribbon_ComboBox_Textbox;
             }
-
-
 
             var i = Item[Text];
             if (i == null) {
@@ -194,14 +179,12 @@ namespace BlueControls.Controls {
 
             i.SetParent(Item); // Um den Stil zu wissen
 
-
             if (Focused() && _DropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDown) {
                 // Focused = Bearbeitung erwünscht, Cursor anzeigen und KEINE Items zeichnen
                 base.DrawControl(gr, state);
                 DoReturn();
                 return;
             }
-
 
             if (_DropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDown) {
                 if (i is TextListItem tempVar2) {
@@ -212,7 +195,6 @@ namespace BlueControls.Controls {
                     }
                 }
             }
-
 
             Skin.Draw_Back(gr, vType, state, DisplayRectangle, this, true);
 
@@ -225,17 +207,15 @@ namespace BlueControls.Controls {
                 i.SetCoordinates(r);
             }
 
-
-
-
             Skin.Draw_Border(gr, vType, state, DisplayRectangle);
 
             DoReturn();
 
-            void DoReturn() =>
+            void DoReturn() {
                 //gr.DrawImage(_BitmapOfControl, 0, 0);
                 //TMPGR.Dispose();
                 btnDropDown.Invalidate();
+            }
         }
 
         internal bool WasThisValueClicked() {
@@ -251,8 +231,6 @@ namespace BlueControls.Controls {
             btnDropDown.Invalidate();
         }
 
-
-
         public void ShowMenu(object sender, System.Windows.Forms.MouseEventArgs ex) {
 
             if (_btnDropDownIsIn) { return; }
@@ -265,11 +243,7 @@ namespace BlueControls.Controls {
 
             if (Item.Count == 0) { _btnDropDownIsIn = false; return; }
 
-
-
             int X, Y;
-
-
 
             if (sender is Button But) {
                 X = System.Windows.Forms.Cursor.Position.X - But.MousePos().X - But.Location.X;
@@ -278,7 +252,6 @@ namespace BlueControls.Controls {
                 X = System.Windows.Forms.Cursor.Position.X - MousePos().X;
                 Y = System.Windows.Forms.Cursor.Position.Y - MousePos().Y + Height; //Identisch
             }
-
 
             Item.UncheckAll();
 
@@ -313,7 +286,6 @@ namespace BlueControls.Controls {
 
         protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
 
-
             if (e.Button != System.Windows.Forms.MouseButtons.Right) {
                 // nicht bei rechts, ansonsten gibt's evtl. Kontextmenü (von der Textbox aus gesteuert) UND den Auswahldialog
                 if (_DropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDownList) {
@@ -324,10 +296,7 @@ namespace BlueControls.Controls {
             } else {
                 base.OnMouseUp(e);
             }
-
-
         }
-
 
         private void btnDropDown_LostFocus(object sender, System.EventArgs e) {
             CheckLostFocus(e);
@@ -338,7 +307,6 @@ namespace BlueControls.Controls {
             try {
                 if (btnDropDown == null) { return; }
                 if (!btnDropDown.Focused && !Focused() && !FloatingInputBoxListBoxStyle.IsShowing(this)) { base.OnLostFocus(e); }
-
             } catch (Exception) {
 
             }
@@ -377,14 +345,12 @@ namespace BlueControls.Controls {
         //    Invalidate();
         //}
 
-
         //protected override void OnMouseLeave(System.EventArgs e)
         //{
         //    base.OnMouseLeave(e);
         //    if (_DrawStyle == enComboboxStyle.TextBox || !Enabled) { return; }
         //    Invalidate();
         //}
-
 
         protected override void OnTextChanged(System.EventArgs e) {
             base.OnTextChanged(e);
@@ -404,9 +370,7 @@ namespace BlueControls.Controls {
                     Text = text;
                     return;
                 }
-
             }
-
         }
     }
 }

@@ -42,10 +42,8 @@ namespace BlueControls.Controls {
         public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
         public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
 
-
         #region Constructor
         public AbstractTabControl() : base() {
-
 
             //This call is required by the Windows Form Designer.
 
@@ -64,8 +62,6 @@ namespace BlueControls.Controls {
 
         }
         #endregion
-
-
 
         #region  Interop for SelectedIndexChanging event 
 
@@ -89,7 +85,6 @@ namespace BlueControls.Controls {
 
         #endregion
 
-
         #region  AutoScale deaktivieren 
         // https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
 
@@ -103,12 +98,9 @@ namespace BlueControls.Controls {
             // NIX TUN!!!!
         }
 
-
-
         protected override void ScaleControl(SizeF factor, System.Windows.Forms.BoundsSpecified specified) {
             factor = new SizeF(1, 1);
             base.ScaleControl(factor, specified);
-
 
         }
 
@@ -125,18 +117,12 @@ namespace BlueControls.Controls {
         }
         #endregion
 
-
-
         #region  Properties 
 
         [Editor(typeof(TabPageCollectionEditor), typeof(UITypeEditor))]
         public new TabPageCollection TabPages => base.TabPages;
 
-
-
-
         #endregion
-
 
         #region  SelectedIndexChanging event Implementation 
         protected override void WndProc(ref System.Windows.Forms.Message m) {
@@ -163,8 +149,6 @@ namespace BlueControls.Controls {
             } catch {
 
             }
-
-
         }
 
         private void OnSelectedIndexChanging(TabControlEventArgs e) {
@@ -172,7 +156,6 @@ namespace BlueControls.Controls {
         }
 
         #endregion
-
 
         protected override void OnMouseLeave(System.EventArgs e) {
             base.OnMouseLeave(e);
@@ -190,14 +173,6 @@ namespace BlueControls.Controls {
             base.OnMouseUp(e);
             if (e.Button == System.Windows.Forms.MouseButtons.Right) { FloatingInputBoxListBoxStyle.ContextMenuShow(this, e); }
         }
-
-
-
-
-
-
-
-
 
         #region  Custom Methods 
 
@@ -239,13 +214,10 @@ namespace BlueControls.Controls {
 
         #endregion
 
-
         protected override void OnPaintBackground(System.Windows.Forms.PaintEventArgs pevent) {
             // do not allow the background to be painted
             // Um flimmern zu vermeiden!
         }
-
-
 
         protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) {
             if (BeginnEditCounter > 0) {
@@ -254,28 +226,20 @@ namespace BlueControls.Controls {
             }
             //if (Skin.SkinDB == null) { return; }
 
-
-
-
             if (this is RibbonBar) {
                 Skin.Draw_Back(e.Graphics, enDesign.RibbonBar_Back, enStates.Standard, new Rectangle(0, 0, Width, Height), this, true);
             } else {
                 Skin.Draw_Back(e.Graphics, enDesign.TabStrip_Back, enStates.Standard, new Rectangle(0, 0, Width, Height), this, true);
             }
 
-
-
             if (TabCount == 0 && DesignMode) {
                 e.Graphics.DrawRectangle(Pens.Magenta, new Rectangle(0, 0, Width - 1, Height - 1));
                 return;
             }
 
-
-
             for (var id = 0; id < TabCount; id++) {
                 if (id != SelectedIndex) { DrawTabHead(e.Graphics, id); }
             }
-
 
             for (var id = 0; id < TabCount; id++) {
                 if (id == SelectedIndex) {
@@ -285,23 +249,15 @@ namespace BlueControls.Controls {
             }
         }
 
-
-
-
         private void DrawTabHead(Graphics graphics, int id) {
 
             try {
                 var tmpState = enStates.Standard;
                 if (!TabPages[id].Enabled) { tmpState = enStates.Standard_Disabled; }
 
-
                 if (id == SelectedIndex) { tmpState |= enStates.Checked; }
 
-
                 if (TabPages[id].Enabled && _HotTab == TabPages[id]) { tmpState |= enStates.Standard_MouseOver; }
-
-
-
 
                 var r = GetTabRect(id);
 
@@ -317,12 +273,9 @@ namespace BlueControls.Controls {
                     Skin.Draw_FormatedText(graphics, TabPages[id].Text, enDesign.TabStrip_Head, tmpState, null, enAlignment.Horizontal_Vertical_Center, r, this, false, true);
                     Skin.Draw_Border(graphics, enDesign.TabStrip_Head, tmpState, r);
                 }
-
             } catch {
 
             }
-
-
         }
 
         private void DrawTabBody(Graphics graphics, int id) {
@@ -341,12 +294,7 @@ namespace BlueControls.Controls {
                 Skin.Draw_Back(graphics, enDesign.TabStrip_Body, w, r, this, true);
                 Skin.Draw_Border(graphics, enDesign.TabStrip_Body, w, r);
             }
-
-
         }
-
-
-
 
         public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
             return false;
@@ -363,7 +311,6 @@ namespace BlueControls.Controls {
             _IndexChanged = false;
         }
 
-
         public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
 
             if (e != null) {
@@ -375,15 +322,11 @@ namespace BlueControls.Controls {
             } else {
                 HotItem = null;
             }
-
         }
 
         public void OnContextMenuInit(ContextMenuInitEventArgs e) {
             ContextMenuInit?.Invoke(this, e);
         }
-
-
-
 
         #region ISupportsEdit
 
@@ -392,7 +335,6 @@ namespace BlueControls.Controls {
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public int BeginnEditCounter { get; set; } = 0;
-
 
         public new void SuspendLayout() {
             BeginnEdit();
@@ -407,7 +349,6 @@ namespace BlueControls.Controls {
             base.ResumeLayout();
             EndEdit();
         }
-
 
         public void BeginnEdit() {
             BeginnEdit(1);
@@ -445,9 +386,5 @@ namespace BlueControls.Controls {
 
         #endregion
 
-
     }
-
-
-
 }

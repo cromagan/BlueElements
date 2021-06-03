@@ -39,7 +39,6 @@ namespace BlueDatabase {
         private string? _tmpQuickInfo;
         private bool disposedValue;
 
-
         #endregion
 
         public event EventHandler<RowCheckedEventArgs> RowChecked;
@@ -74,7 +73,6 @@ namespace BlueDatabase {
                 return _tmpQuickInfo;
 
             }
-
         }
 
         private void GenerateQuickInfo() {
@@ -249,15 +247,11 @@ namespace BlueDatabase {
         //    Database.Cell.Set(column, this, value);
         //}
 
-
-
-
         public int CellGetColorBGR(ColumnItem column) {
             return Database.Cell.GetColorBGR(column, this);
         }
 
         #endregion
-
 
         #endregion
 
@@ -312,7 +306,6 @@ namespace BlueDatabase {
             }
         }
 
-
         /// <summary>
         /// Diese Routine konvertiert den Inhalt der Zelle in eine vom Skript lesbaren Variable
         /// </summary>
@@ -322,35 +315,21 @@ namespace BlueDatabase {
         public static Variable CellToVariable(ColumnItem column, RowItem row) {
             if (!column.Format.CanBeCheckedByRules()) { return null; }
 
-
             var ro = !column.Format.CanBeChangedByRules();
 
             if (column == column.Database.Column.SysCorrect) { ro = true; }
             if (column == column.Database.Column.SysRowChanger) { ro = true; }
             if (column == column.Database.Column.SysRowChangeDate) { ro = true; }
 
-
-
-            if (column.MultiLine) {
-                return new Variable(column.Name, row.CellGetString(column), enVariableDataType.List, ro, false, "Spalte: " + column.ReadableText() + "\r\nMehrzeilige Spalten können nur als Liste bearbeitet werdern.");
-            }
-
-            switch (column.Format) {
-                case enDataFormat.Bit:
-                    if (row.CellGetString(column) == "+") {
-                        return new Variable(column.Name, "true", enVariableDataType.Bool, ro, false, "Spalte: " + column.ReadableText());
-                    } else {
-                        return new Variable(column.Name, "false", enVariableDataType.Bool, ro, false, "Spalte: " + column.ReadableText());
-                    }
-
-                case enDataFormat.Ganzzahl:
-                case enDataFormat.Gleitkommazahl:
-                    return new Variable(column.Name, row.CellGetString(column).Replace("\"", "''"), enVariableDataType.Numeral, ro, false, "Spalte: " + column.ReadableText());
-
-                default:
-                    return new Variable(column.Name, row.CellGetString(column).Replace("\"", "''"), enVariableDataType.String, ro, false, "Spalte: " + column.ReadableText());
-
-            }
+            return column.MultiLine
+                ? new Variable(column.Name, row.CellGetString(column), enVariableDataType.List, ro, false, "Spalte: " + column.ReadableText() + "\r\nMehrzeilige Spalten können nur als Liste bearbeitet werdern.")
+                : column.Format switch {
+                    enDataFormat.Bit => row.CellGetString(column) == "+"
+                     ? new Variable(column.Name, "true", enVariableDataType.Bool, ro, false, "Spalte: " + column.ReadableText())
+                     : new Variable(column.Name, "false", enVariableDataType.Bool, ro, false, "Spalte: " + column.ReadableText()),
+                    enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl => new Variable(column.Name, row.CellGetString(column).Replace("\"", "''"), enVariableDataType.Numeral, ro, false, "Spalte: " + column.ReadableText()),
+                    _ => new Variable(column.Name, row.CellGetString(column).Replace("\"", "''"), enVariableDataType.String, ro, false, "Spalte: " + column.ReadableText()),
+                };
         }
 
         /// <summary>
@@ -370,22 +349,15 @@ namespace BlueDatabase {
                     if (v != null) { vars.Add(v); }
                 }
 
-
                 vars.Add(new Variable("User", modAllgemein.UserName(), enVariableDataType.String, true, false, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
 
-
                 vars.Add(new Variable("Usergroup", Database.UserGroup, enVariableDataType.String, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
-
-
-
 
                 if (Database.IsAdministrator()) {
                     vars.Add(new Variable("Administrator", "true", enVariableDataType.Bool, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
                 } else {
                     vars.Add(new Variable("Administrator", "false", enVariableDataType.Bool, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
                 }
-
-
 
                 //if (Database.ReadOnly) {
                 //    vars.Add(new Variable("ReadOnly", "true", enVariableDataType.Bool, true, false, "Gibt an, ob die Datenbank schreibgeschützt));
@@ -472,7 +444,6 @@ namespace BlueDatabase {
             /// didSuccesfullyCheck geht von Dateisystemfehlern aus
             if (!string.IsNullOrEmpty(script.Error)) { return (true, "<b>Das Skript ist fehlerhaft:</b>\r\n" + "Zeile: " + script.Line.ToString() + "\r\n" + script.Error + "\r\n" + script.ErrorCode, script); }
 
-
             // Dann die Abschließenden Korrekturen vornehmen
             foreach (var ThisColum in Database.Column) {
                 if (ThisColum != null) {
@@ -518,7 +489,6 @@ namespace BlueDatabase {
             if (cols.Count == 0) {
                 _InfoTXT += "Diese Zeile ist fehlerfrei.";
             }
-
 
             if (Database.Column.SysCorrect.SaveContent) {
                 if (IsNullOrEmpty(Database.Column.SysCorrect) || cols.Count == 0 != CellGetBoolean(Database.Column.SysCorrect)) { CellSet(Database.Column.SysCorrect, cols.Count == 0); }
@@ -575,7 +545,6 @@ namespace BlueDatabase {
                         if (!string.IsNullOrEmpty(_String) && _String.ToUpper().Contains(searchText)) { return true; }
                     }
                 }
-
             }
             return false;
         }
@@ -590,7 +559,6 @@ namespace BlueDatabase {
 
             return true;
         }
-
 
         public bool IsNullOrEmpty(ColumnItem column) {
             return Database.Cell.IsNullOrEmpty(column, this);
@@ -633,14 +601,12 @@ namespace BlueDatabase {
 
                     if (fulltext) { txt = CellItem.ValueReadable(thisColumnItem, txt, enShortenStyle.Replaced, enBildTextVerhalten.Nur_Text, removeLineBreaks); }
 
-
                     if (removeLineBreaks && !fulltext) {
                         txt = txt.Replace("\r\n", " ");
                         txt = txt.Replace("\r", " ");
                     }
 
                     erg = erg.Replace("&" + thisColumnItem.Name.ToUpper() + ";", txt, RegexOptions.IgnoreCase);
-
 
                     while (erg.ToUpper().Contains("&" + thisColumnItem.Name.ToUpper() + "(")) {
                         var x = erg.ToUpper().IndexOf("&" + thisColumnItem.Name.ToUpper() + "(");
@@ -687,12 +653,7 @@ namespace BlueDatabase {
         public string CaptionReadable() {
             var c = CellGetString(Database.Column.SysChapter);
 
-            if (string.IsNullOrEmpty(c)) {
-                return "- ohne " + Database.Column.SysChapter.Caption + " -";
-            } else {
-                return c.Replace("\r", ", ");
-            }
-
+            return string.IsNullOrEmpty(c) ? "- ohne " + Database.Column.SysChapter.Caption + " -" : c.Replace("\r", ", ");
         }
 
         private void Dispose(bool disposing) {

@@ -34,15 +34,15 @@ namespace BlueBasics {
                 case enAlignment.Top_Right:
                     return new Point(r.Right, r.Top);
                 case enAlignment.Bottom_HorizontalCenter:
-                    return new Point((int)(r.Left + r.Width / 2.0), r.Bottom);
+                    return new Point((int)(r.Left + (r.Width / 2.0)), r.Bottom);
                 case enAlignment.Top_HorizontalCenter:
-                    return new Point((int)(r.Left + r.Width / 2.0), r.Top);
+                    return new Point((int)(r.Left + (r.Width / 2.0)), r.Top);
                 case enAlignment.VerticalCenter_Left:
-                    return new Point(r.Left, (int)(r.Top + r.Height / 2.0));
+                    return new Point(r.Left, (int)(r.Top + (r.Height / 2.0)));
                 case enAlignment.VerticalCenter_Right:
-                    return new Point(r.Right, (int)(r.Top + r.Height / 2.0));
+                    return new Point(r.Right, (int)(r.Top + (r.Height / 2.0)));
                 case enAlignment.Horizontal_Vertical_Center:
-                    return new Point((int)(r.Left + r.Width / 2.0), (int)(r.Top + r.Height / 2.0));
+                    return new Point((int)(r.Left + (r.Width / 2.0)), (int)(r.Top + (r.Height / 2.0)));
                 default:
                     Develop.DebugPrint(p);
                     return Point.Empty;
@@ -62,11 +62,7 @@ namespace BlueBasics {
 
             var Erg = Math.Min(Math.Min(llo, lro), Math.Min(llu, lru));
 
-            if (Erg == llo) { return LO; }
-            if (Erg == lro) { return rO; }
-            if (Erg == llu) { return lu; }
-            if (Erg == lru) { return ru; }
-            return Point.Empty;
+            return Erg == llo ? LO : Erg == lro ? rO : Erg == llu ? lu : Erg == lru ? ru : Point.Empty;
         }
     }
 }

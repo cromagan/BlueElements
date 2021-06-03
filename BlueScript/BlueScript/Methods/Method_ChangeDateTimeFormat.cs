@@ -19,16 +19,13 @@
 
 using Skript.Enums;
 using System.Collections.Generic;
-using BlueBasics;
 using static BlueBasics.Constants;
 using static BlueBasics.modConverter;
 
 namespace BlueScript {
     internal class Method_ChangeDateTimeFormat : Method {
 
-
         public override string Syntax => "ChangeDateTimeFormat(DateTimeString, string)";
-
 
         public override string Description => "Gibt einen neuen DateTime-String zurück, der mittels des zweiten String definiert ist. Beispiel eine solchen Strings:  " + Format_Date7 + " Achtung: Groß-Kleinschreibung ist wichtig!";
         public override List<string> Comand(Script s) { return new() { "changedatetimeformat" }; }
@@ -48,11 +45,9 @@ namespace BlueScript {
                 return new strDoItFeedback("Der Wert '" + attvar.Attributes[0].ValueString + "' wurde nicht als Zeitformat erkannt.");
             }
 
-
             if (string.IsNullOrEmpty(d.ToString(attvar.Attributes[1].ValueString))) {
                 return new strDoItFeedback("Kein Unwandlungs-String erhalten.");
             }
-
 
             try {
                 return new strDoItFeedback("\"" + d.ToString(attvar.Attributes[1].ValueString) + "\"", string.Empty);

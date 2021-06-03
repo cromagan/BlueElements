@@ -26,9 +26,6 @@ namespace BlueControls.Interfaces {
 
         //Function BlueCreativePad_MouseWheel(sender As Object, e As System.Windows.Forms.MouseEventArgs) As Boolean
 
-
-
-
         //Function MouseClick(sender As Object, e As System.Windows.Forms.MouseEventArgs) As Boolean
         //Function MouseDoubleClick(sender As Object, e As System.Windows.Forms.MouseEventArgs) As Boolean
         //Function MouseEnter(sender As Object, e As System.EventArgs) As Boolean

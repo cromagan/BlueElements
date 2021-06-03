@@ -28,22 +28,17 @@ using static BlueBasics.FileOperations;
 namespace BlueDatabase {
     public sealed class ColumnCollection : ListExt<ColumnItem> {
 
-
-
         #region  Variablen-Deklarationen 
 
         public Database Database { get; private set; }
 
         private int _LastColumnKey;
 
-
         #endregion
-
 
         #region  Event-Deklarationen + Delegaten 
 
         #endregion
-
 
         #region  Construktor + Initialize 
 
@@ -63,7 +58,6 @@ namespace BlueDatabase {
 
         #endregion
 
-
         #region  Properties 
 
         public new ColumnItem this[int index] {
@@ -78,8 +72,6 @@ namespace BlueDatabase {
                 return base[index];
             }
         }
-
-
 
         public ColumnItem SearchByKey(int key) {
             try {
@@ -102,10 +94,6 @@ namespace BlueDatabase {
             }
         }
 
-
-
-
-
         public ColumnItem this[string columnName] {
             get {
 
@@ -117,9 +105,7 @@ namespace BlueDatabase {
             }
         }
 
-
         #endregion
-
 
         public ColumnItem Exists(string columnName) {
 
@@ -141,7 +127,6 @@ namespace BlueDatabase {
 
             return null;
         }
-
 
         public void ResetSystems() {
             SysLocked = null;
@@ -173,7 +158,6 @@ namespace BlueDatabase {
             return "";
         }
 
-
         public ColumnItem SysChapter { get; private set; }
 
         public ColumnItem SysCorrect { get; private set; }
@@ -187,7 +171,6 @@ namespace BlueDatabase {
         public ColumnItem SysRowCreateDate { get; private set; }
 
         public ColumnItem SysRowCreator { get; private set; }
-
 
         public void Swap(ColumnItem Column1, ColumnItem Column2) {
 
@@ -204,7 +187,6 @@ namespace BlueDatabase {
             Database.ColumnArrangements[0].ShowAllColumns(); // Damit die Datenbank mitbekommt, das sich da was geändert hat
         }
 
-
         private void AddSystems(string Kennung) {
 
             foreach (var ThisColumn in this) {
@@ -217,11 +199,9 @@ namespace BlueDatabase {
 
         }
 
-
         internal void SaveToByteList(List<byte> List) {
 
             Database.SaveToByteList(List, enDatabaseDataType.LastColumnKey, _LastColumnKey.ToString());
-
 
             for (var ColumnCount = 0; ColumnCount < Count; ColumnCount++) {
                 if (this[ColumnCount] != null && !string.IsNullOrEmpty(this[ColumnCount].Name)) {
@@ -229,7 +209,6 @@ namespace BlueDatabase {
                 }
             }
         }
-
 
         public void GetSystems() {
 
@@ -282,7 +261,6 @@ namespace BlueDatabase {
                 "System: Locked"
             };
 
-
             // Die Letzte ID ermitteln,falls der gleadene Wert fehlerhaft ist
             // Den Wert Am I a Key Column ermitteln
             foreach (var ThisColumnItem in this) {
@@ -293,13 +271,11 @@ namespace BlueDatabase {
                 }
             }
 
-
             foreach (var thisstring in w) {
                 AddSystems(thisstring);
             }
 
             GetSystems();
-
 
             for (var s1 = 0; s1 < Count; s1++) {
                 if (base[s1] != null) {
@@ -316,7 +292,6 @@ namespace BlueDatabase {
                             if (!string.IsNullOrEmpty(base[s1].Identifier) && base[s1].Identifier.ToUpper() == base[s2].Identifier.ToUpper()) {
                                 base[s2].Load(enDatabaseDataType.co_Identifier, string.Empty);
                             }
-
                         }
                     }
 
@@ -324,7 +299,6 @@ namespace BlueDatabase {
 
                 }
             }
-
 
             // Reihengolge reparieren
             var ColN = -1;
@@ -353,7 +327,6 @@ namespace BlueDatabase {
             } while (true);
         }
 
-
         internal int NextColumnKey() {
 
             do {
@@ -363,17 +336,13 @@ namespace BlueDatabase {
             } while (true);
         }
 
-
         internal static string ParsableColumnKey(ColumnItem Column) {
-            if (Column == null) { return "ColumnKey=?"; }
-            return ParsableColumnKey(Column.Key);
+            return Column == null ? "ColumnKey=?" : ParsableColumnKey(Column.Key);
         }
-
 
         internal static string ParsableColumnKey(int Key) {
             return "ColumnKey=" + Key;
         }
-
 
         public static string ChangeKeysInString(string OriginalString, int OldKey, int NewKey) {
 
@@ -382,19 +351,16 @@ namespace BlueDatabase {
 
             var n = ParsableColumnKey(NewKey);
 
-
             if (OldKey == NewKey) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Schlüssel gleich:  " + OldKey);
                 return OriginalString;
             }
-
 
             OriginalString = OriginalString.Replace(o + "}", n + "}");
             OriginalString = OriginalString.Replace(o + ",", n + ",");
             OriginalString = OriginalString.Replace(o + " ", n + " ");
 
             if (OriginalString.EndsWith(o)) { OriginalString = OriginalString.TrimEnd(o) + n; }
-
 
             if (OriginalString.Contains(o)) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "String nicht ersetzt: " + OriginalString);
@@ -422,7 +388,6 @@ namespace BlueDatabase {
 
             c.EditTrotzSperreErlaubt = Source.EditTrotzSperreErlaubt;
 
-
             c.EditType = Source.EditType;
             c.Identifier = Source.Identifier;
 
@@ -431,7 +396,6 @@ namespace BlueDatabase {
 
             c.Tags.Clear();
             c.Tags.AddRange(Source.Tags);
-
 
             c.AllowedChars = Source.AllowedChars;
             c.AdminInfo = Source.AdminInfo;
@@ -465,7 +429,6 @@ namespace BlueDatabase {
             c.Align = Source.Align;
             c.SortMask = Source.SortMask;
 
-
             c.DropDownItems.Clear();
             c.DropDownItems.AddRange(Source.DropDownItems);
 
@@ -477,7 +440,6 @@ namespace BlueDatabase {
 
             c.Regex.Clear();
             c.Regex.AddRange(Source.Regex);
-
 
             //c.CompactView = Source.CompactView;
             c.ShowUndo = Source.ShowUndo;
@@ -502,7 +464,6 @@ namespace BlueDatabase {
             c.Prefix = Source.Prefix;
 
             return c;
-
 
         }
 
@@ -542,7 +503,6 @@ namespace BlueDatabase {
             da.CellAdd("Änderungs-Rechte");
 
             da.RowEnd();
-
 
             var lfdn = 0;
             foreach (var ThisColumnItem in Database.Column) {
@@ -616,7 +576,6 @@ namespace BlueDatabase {
             return column;
         }
 
-
         /// <summary>
         /// Diese Routine sollte nur bei einem Load oder Reload benutzt werden.
         /// </summary>
@@ -656,12 +615,10 @@ namespace BlueDatabase {
             return c;
         }
 
-
         protected override void Dispose(bool disposing) {
             Database.Disposing -= Database_Disposing;
             Database = null;
             base.Dispose(disposing);
         }
-
     }
 }

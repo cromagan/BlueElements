@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 using BlueBasics;
 using BlueControls.Enums;
 using System.Collections.Generic;
@@ -25,7 +24,6 @@ using System.Drawing;
 using static BlueBasics.Extensions;
 
 public class clsDesign {
-
 
     public enKontur Kontur;
     public enHintergrundArt HintergrundArt;
@@ -49,19 +47,13 @@ public class clsDesign {
 
 }
 
-
-
 public static class clsDesignExtensions {
 
-
     // Button.Design.Add(enStates.Standard, enKontur.Rechteck, 0, 0, 0, 0, enHintergrundArt.Solide, 0, "EAEAEA", "", "", enRahmenArt.Solide_1px, "B6B6B6", "", "", "{Name=Calibri, Size=10[K]15}", "");
-
-
 
     public static void Add(this Dictionary<enDesign, Dictionary<enStates, clsDesign>> l, enDesign ds, enStates status, enKontur enKontur, int x1, int y1, int x2, int y2, enHintergrundArt hint, float verlauf, string bc1, string bc2, string bc3, enRahmenArt rahm, string boc1, string boc2, string boc3, string f, string pic) {
 
         Dictionary<enStates, clsDesign> l2;
-
 
         if (l.TryGetValue(ds, out var lg)) {
             l2 = lg;
@@ -70,11 +62,7 @@ public static class clsDesignExtensions {
             l.Add(ds, l2);
         }
 
-
-
         l2.Add(status, enKontur, x1, x2, y1, y2, hint, verlauf, bc1, bc2, bc3, rahm, boc1, boc2, boc3, f, pic);
-
-
 
     }
 
@@ -91,7 +79,6 @@ public static class clsDesignExtensions {
             Verlauf = verlauf
         };
 
-
         if (!string.IsNullOrEmpty(bc1)) { des.BackColor1 = bc1.FromHTMLCode(); }
         if (!string.IsNullOrEmpty(bc2)) { des.BackColor2 = bc2.FromHTMLCode(); }
         if (!string.IsNullOrEmpty(bc3)) { des.BackColor3 = bc3.FromHTMLCode(); }
@@ -104,7 +91,6 @@ public static class clsDesignExtensions {
 
         if (!string.IsNullOrEmpty(f)) { des.bFont = BlueControls.BlueFont.Get(f); }
 
-
         //if (!string.IsNullOrEmpty(pic)) { des.Image = QuickImage.Get(pic); }
         des.Image = pic;
 
@@ -112,10 +98,5 @@ public static class clsDesignExtensions {
 
         l.Add(status, des);
 
-
     }
-
-
-
-
 }

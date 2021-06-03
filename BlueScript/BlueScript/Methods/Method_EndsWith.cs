@@ -36,7 +36,6 @@ namespace BlueScript {
         public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.Bool, enVariableDataType.String };
         public override bool EndlessArgs => true;
 
-
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
@@ -51,7 +50,6 @@ namespace BlueScript {
                         return strDoItFeedback.Wahr();
                     }
                 }
-
             }
             return strDoItFeedback.Falsch();
         }

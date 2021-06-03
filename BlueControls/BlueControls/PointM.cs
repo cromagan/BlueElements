@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -40,9 +39,6 @@ namespace BlueControls {
 
         #endregion
 
-
-
-
         #region  Event-Deklarationen + Delegaten 
 
         public event System.EventHandler Moved;
@@ -51,11 +47,7 @@ namespace BlueControls {
 
         #region  Construktor + Initialize 
 
-
-
         public PointM(object parent, string name, decimal startX, decimal startY, decimal laenge, decimal alpha) : this(parent) {
-
-
 
             Name = name;
             var tempVar = GeometryDF.PolarToCartesian(laenge, Convert.ToDouble(alpha));
@@ -66,16 +58,11 @@ namespace BlueControls {
         public PointM(PointM startPoint, decimal laenge, decimal alpha) : this(null, string.Empty, startPoint.X, startPoint.Y, laenge, alpha) { }
         public PointM(PointF startPoint, decimal laenge, decimal alpha) : this(null, string.Empty, (decimal)startPoint.X, (decimal)startPoint.Y, laenge, alpha) { }
 
-
         public PointM(object parent, string codeToParse) : this(parent) {
 
             Parse(codeToParse);
 
-
         }
-
-
-
 
         public PointM(object parent, string name, decimal x, decimal y, string tag) {
             _parent = parent;
@@ -96,9 +83,6 @@ namespace BlueControls {
         public PointM(PointM point) : this(null, string.Empty, point.X, point.Y, string.Empty) { }
         public PointM(object parent, PointM template) : this(parent, template.Name, template.X, template.Y, template.Tag) { }
 
-
-
-
         #endregion
 
         #region  Properties 
@@ -108,12 +92,10 @@ namespace BlueControls {
         public object Parent {
             get => _parent;
 
-
             set {
                 if (_parent == value) { return; }
                 _parent = value;
             }
-
         }
 
         public decimal X {
@@ -135,9 +117,6 @@ namespace BlueControls {
                 OnMoved();
             }
         }
-
-
-
 
         public string Tag {
             get => _tag;
@@ -199,16 +178,12 @@ namespace BlueControls {
             return new((int)p.X, (int)p.Y);
         }
 
-
         public static PointM Empty() {
             return new PointM(0m, 0m);
         }
 
-
-
         public override string ToString() {
             var t = "{";
-
 
             if (_parent != null) {
                 switch (_parent) {
@@ -237,7 +212,6 @@ namespace BlueControls {
 
             //t = t + "Fix=" + Fix.ToPlusMinus() + ", ";
 
-
             //if (!_canUsedForAutoRelation) {
             //    t = t + "GetSnapped=" + _canUsedForAutoRelation + ", ";
             //}
@@ -245,40 +219,30 @@ namespace BlueControls {
             //    t = t + "PrimaryGridSnapPoint=" + _primaryGridSnapPoint + ", ";
             //}
 
-
             return t.Trim(", ") + "}";
         }
 
-
         public bool IsOnScreen(decimal zoom, decimal shiftX, decimal shiftY, Rectangle displayRectangle) {
 
-            var tx = _x * zoom - shiftX;
-            var ty = _y * zoom - shiftY;
+            var tx = (_x * zoom) - shiftX;
+            var ty = (_y * zoom) - shiftY;
 
-            if (tx < displayRectangle.Left || ty < displayRectangle.Top) { return false; }
-            if (tx > displayRectangle.Right || ty > displayRectangle.Bottom) { return false; }
-            return true;
-
+            return tx >= displayRectangle.Left && ty >= displayRectangle.Top && tx <= displayRectangle.Right && ty <= displayRectangle.Bottom;
         }
 
-
         public void Draw(Graphics gr, decimal zoom, decimal shiftX, decimal shiftY, enDesign type, enStates state) {
-            var tx = _x * zoom - shiftX + zoom / 2;
-            var ty = _y * zoom - shiftY + zoom / 2;
+            var tx = (_x * zoom) - shiftX + (zoom / 2);
+            var ty = (_y * zoom) - shiftY + (zoom / 2);
 
             var r = new Rectangle((int)(tx - 4), (int)(ty - 4), 9, 9);
-
 
             //if (!_UserSelectable) {
             //    type = enDesign.Button_EckpunktSchieber_Phantom;
             //    state = enStates.Standard;
             //}
 
-
             Skin.Draw_Back(gr, type, state, r, null, false);
             Skin.Draw_Border(gr, type, state, r);
-
-
 
             //if (!string.IsNullOrEmpty(textToDraw)) {
             //    for (var x = -1; x < 2; x++) {
@@ -297,9 +261,8 @@ namespace BlueControls {
         }
 
         public PointF ZoomAndMove(decimal zoom, decimal shiftX, decimal shiftY) {
-            return new PointF((float)(_x * zoom - shiftX + zoom / 2), (float)(_y * zoom - shiftY + zoom / 2));
+            return new PointF((float)((_x * zoom) - shiftX + (zoom / 2)), (float)((_y * zoom) - shiftY + (zoom / 2)));
         }
-
 
         public void SetTo(decimal x, decimal y) {
             if (x == _x && y == _y) { return; }
@@ -317,9 +280,9 @@ namespace BlueControls {
 
         public void SetTo(PointM Point) => SetTo(Point.X, Point.Y);
 
-        public void SetTo(Point point) => SetTo((decimal)point.X, (decimal)point.Y);
+        public void SetTo(Point point) => SetTo(point.X, (decimal)point.Y);
 
-        public void SetTo(int x, int y) => SetTo((decimal)x, (decimal)y);
+        public void SetTo(int x, int y) => SetTo(x, (decimal)y);
 
         public int CompareTo(object obj) {
             if (obj is PointM tobj) {
@@ -331,12 +294,10 @@ namespace BlueControls {
             }
         }
 
-
         internal string CompareKey() {
             //if (_x > int.MaxValue / 10.0m || _y > int.MaxValue / 10.0m || _x < int.MinValue / 10.0m || _y < int.MinValue / 10.0m) { return "ZZZ-ZZZ"; }
             return _y.ToString(Constants.Format_Float5_1) + "-" + _x.ToString(Constants.Format_Float5_1);
         }
-
 
         public decimal DistanzZuLinie(PointM P1, PointM P2) {
             return DistanzZuLinie(P1.X, P1.Y, P2.X, P2.Y);
@@ -351,7 +312,7 @@ namespace BlueControls {
             Moved?.Invoke(this, System.EventArgs.Empty);
         }
 
-        public decimal Magnitude => (decimal)Math.Sqrt((double)(_x * _x + _y * _y));
+        public decimal Magnitude => (decimal)Math.Sqrt((double)((_x * _x) + (_y * _y)));
 
         public void Normalize() {
             var magnitude = Magnitude;
@@ -359,9 +320,8 @@ namespace BlueControls {
             _y /= magnitude;
         }
 
-
         public decimal DotProduct(PointM vector) {
-            return _x * vector._x + _y * vector._y;
+            return (_x * vector._x) + (_y * vector._y);
         }
 
         public void Move(decimal x, decimal y) {

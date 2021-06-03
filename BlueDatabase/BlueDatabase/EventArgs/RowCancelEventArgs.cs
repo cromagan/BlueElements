@@ -17,8 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
-
 namespace BlueDatabase.EventArgs {
 
     public class RowCancelEventArgs : RowEventArgs {
@@ -28,7 +26,5 @@ namespace BlueDatabase.EventArgs {
         }
 
         public string CancelReason { get; set; }
-
     }
-
 }

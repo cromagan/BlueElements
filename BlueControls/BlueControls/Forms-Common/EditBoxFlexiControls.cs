@@ -7,7 +7,6 @@ namespace BlueControls.Forms {
     public partial class EditBoxFlexiControl : Forms.DialogWithOkAndCancel {
         private List<string> GiveBack = null;
 
-
         #region Konstruktor
         private EditBoxFlexiControl() : base() {
             InitializeComponent();
@@ -16,7 +15,7 @@ namespace BlueControls.Forms {
         private EditBoxFlexiControl(List<FlexiControl> Flexis) : this() {
 
             var top = Skin.Padding;
-            var we = 300 + Skin.Padding * 4;
+            var we = 300 + (Skin.Padding * 4);
 
             foreach (var ThisFlexi in Flexis) {
                 Controls.Add(ThisFlexi);
@@ -25,7 +24,7 @@ namespace BlueControls.Forms {
                 ThisFlexi.Top = top;
                 ThisFlexi.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
                 top = top + Skin.Padding + ThisFlexi.Height;
-                we = Math.Max(we, ThisFlexi.Width + Skin.Padding * 4);
+                we = Math.Max(we, ThisFlexi.Width + (Skin.Padding * 4));
 
                 ThisFlexi.ButtonClicked += FlexiButtonClick;
             }
@@ -33,26 +32,19 @@ namespace BlueControls.Forms {
             we = Math.Min(we, 1500);
 
             foreach (var ThisFlexi in Flexis) {
-                ThisFlexi.Width = Width - Skin.Padding * 4;
+                ThisFlexi.Width = Width - (Skin.Padding * 4);
             }
-
 
             Setup(we, top, true, false);
         }
 
         #endregion
 
-
-
         public static List<string> Show(List<FlexiControl> Flexis) {
             var MB = new EditBoxFlexiControl(Flexis);
             MB.ShowDialog();
             return MB.GiveBack;
         }
-
-
-
-
 
         protected override void SetValue(bool canceled) {
             GiveBack = new List<string>();

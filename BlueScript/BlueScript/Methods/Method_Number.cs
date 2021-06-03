@@ -22,7 +22,6 @@ using Skript.Enums;
 using System.Collections.Generic;
 using static BlueBasics.Extensions;
 
-
 namespace BlueScript {
     internal class Method_Number : Method {
 
@@ -39,13 +38,11 @@ namespace BlueScript {
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
-
-            if (attvar.Attributes[0].ValueString.IsNumeral()) {
-                return new strDoItFeedback(attvar.Attributes[0].ValueString, string.Empty);
-            }
-
-            return new strDoItFeedback(attvar.Attributes[1].ValueString, string.Empty);
+            return !string.IsNullOrEmpty(attvar.ErrorMessage)
+                ? strDoItFeedback.AttributFehler(this, attvar)
+                : attvar.Attributes[0].ValueString.IsNumeral()
+                ? new strDoItFeedback(attvar.Attributes[0].ValueString, string.Empty)
+                : new strDoItFeedback(attvar.Attributes[1].ValueString, string.Empty);
         }
     }
 }

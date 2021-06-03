@@ -29,7 +29,6 @@ namespace BlueControls.Controls {
         private readonly bool _FehlerFormatCheck = true;
         private bool _enabled = true;
 
-
         ///// <summary>
         ///// Die Hauptklasse wird zwar beibehalten, aber Unterklassen müssen evtl. neu definiert werden.
         ///// </summary>
@@ -52,7 +51,6 @@ namespace BlueControls.Controls {
 
         public FlexiControlForProperty(object propertyObject, string propertyName) : this(propertyObject, propertyName, 1, null, enImageCode.None) { }
 
-
         #endregion
 
         public FlexiControlForProperty() : base() {
@@ -67,12 +65,10 @@ namespace BlueControls.Controls {
 
             _IdleTimer.Tick += Checker_Tick;
 
-
             CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
             EditType = enEditTypeFormula.Textfeld;
             Size = new Size(200, 24);
         }
-
 
         private void Checker_Tick(object sender, System.EventArgs e) {
             //if (_IsFilling) { return; }
@@ -82,7 +78,6 @@ namespace BlueControls.Controls {
 
             SetValueFromProperty();
         }
-
 
         /// <summary>
         /// Der Getter/Setter des UserControls. Dabei werden Sonderzeichen in _ umgewandelt. Punkte gelöscht. Zwei __ werden zu einem geändert, und die Anzegige nach den beiden _ wird optisch abgeschnitten.
@@ -100,7 +95,6 @@ namespace BlueControls.Controls {
             }
         }
 
-
         [DefaultValue(true)]
         public new bool Enabled {
             get => _enabled;
@@ -111,7 +105,6 @@ namespace BlueControls.Controls {
                 GenFehlerText();
             }
         }
-
 
         [DefaultValue(null)]
         public object PropertyObject {
@@ -129,7 +122,6 @@ namespace BlueControls.Controls {
                 UpdateControlData(false, 1, null, enImageCode.None);
                 CheckEnabledState();
 
-
                 //if (_propertyObject is IReloadable LSn) {
                 //    LSn.LoadedFromDisk += OnLoadedFromDisk;
                 //}
@@ -146,18 +138,13 @@ namespace BlueControls.Controls {
         //    LoadedFromDisk?.Invoke(this, System.EventArgs.Empty);
         //}
 
-
-
-
         private void SetValueFromProperty() {
-
 
             if (_propertyObject == null || string.IsNullOrEmpty(_propertyName) || _propInfo == null || !_propInfo.CanRead) {
                 ValueSet(string.Empty, true, false);
                 InfoText = string.Empty;
                 return;
             }
-
 
             var x = _propInfo.GetValue(_propertyObject, null);
             if (x is null) {
@@ -181,7 +168,6 @@ namespace BlueControls.Controls {
             } else {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Art unbekannt!");
             }
-
         }
 
         private void FillPropertyNow() {
@@ -191,7 +177,6 @@ namespace BlueControls.Controls {
             if (!CheckEnabledState()) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.
 
             if (_propertyObject == null || string.IsNullOrEmpty(_propertyName) || _propInfo == null || !_propInfo.CanRead) { return; }
-
 
             var OldVal = string.Empty;
             var x = _propInfo.GetValue(_propertyObject, null);
@@ -227,7 +212,6 @@ namespace BlueControls.Controls {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Art unbekannt!");
             }
 
-
             if (OldVal == Value) { return; }
 
             _propInfo.SetValue(_propertyObject, toSet, null);
@@ -239,7 +223,6 @@ namespace BlueControls.Controls {
                 base.DisabledReason = string.Empty;
                 return true;
             }
-
 
             if (_propertyObject == null) {
                 base.DisabledReason = "Kein zugehöriges Objekt definiert.";
@@ -258,7 +241,6 @@ namespace BlueControls.Controls {
                 return false;
             }
 
-
             if (_propInfo != null && !_propInfo.CanWrite) {
                 base.DisabledReason = "Feld kann generell nicht beschrieben werdern.";
                 return false;
@@ -273,18 +255,15 @@ namespace BlueControls.Controls {
             return true;
         }
 
-
         protected override void OnValueChanged() {
             FillPropertyNow(); // erst befüllen, bevor das Event ausgelöst wird
             GenFehlerText(); // erst Standard fehler Text, bevor das Event ausgelöst wird
             base.OnValueChanged();
         }
 
-
         private void UpdateControlData(bool withCreate, int TextLines, ItemCollectionList list, enImageCode image) {
 
             #region propInfo & _propertynamecpl befüllen
-
 
             if (string.IsNullOrEmpty(_propertyName) || _propertyObject == null) {
                 _methInfo = null;
@@ -334,7 +313,6 @@ namespace BlueControls.Controls {
                 }
             }
 
-
             if (withCreate && _propInfo != null) {
 
                 switch (_propInfo.PropertyType.FullName.ToLower()) {
@@ -342,83 +320,67 @@ namespace BlueControls.Controls {
                     //case "system.int32":
                     //case "system.decimal":
 
-
-
                     case "system.boolean": {
-                        EditType = enEditTypeFormula.Ja_Nein_Knopf;
-                        var s = BlueFont.MeasureStringOfCaption(_Caption);
-                        Size = new Size((int)s.Width + 30, 22);
-                        break;
-                    }
+                            EditType = enEditTypeFormula.Ja_Nein_Knopf;
+                            var s = BlueFont.MeasureStringOfCaption(_Caption);
+                            Size = new Size((int)s.Width + 30, 22);
+                            break;
+                        }
 
                     default: // Alle enums sind ein eigener Typ.... deswegen alles in die Textbox
                     {
 
-                        if (list != null) {
-                            EditType = enEditTypeFormula.Textfeld_mit_Auswahlknopf;
-                            list.Appearance = enBlueListBoxAppearance.ComboBox_Textbox;
-                            var s = BlueFont.MeasureStringOfCaption(_Caption);
+                            if (list != null) {
+                                EditType = enEditTypeFormula.Textfeld_mit_Auswahlknopf;
+                                list.Appearance = enBlueListBoxAppearance.ComboBox_Textbox;
+                                var s = BlueFont.MeasureStringOfCaption(_Caption);
 
-                            (var BiggestItemX, var BiggestItemY, var _, var _) = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
+                                (var BiggestItemX, var BiggestItemY, var _, var _) = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
 
-                            var x = Math.Max((int)(BiggestItemX + 20 + s.Width), 200);
-                            var y = Math.Max(BiggestItemY + Skin.PaddingSmal * 2, 24);
-                            Size = new Size(x, y);
-                            var c = (ComboBox)CreateSubControls();
-                            StyleComboBox(c, list, System.Windows.Forms.ComboBoxStyle.DropDownList);
+                                var x = Math.Max((int)(BiggestItemX + 20 + s.Width), 200);
+                                var y = Math.Max(BiggestItemY + (Skin.PaddingSmal * 2), 24);
+                                Size = new Size(x, y);
+                                var c = (ComboBox)CreateSubControls();
+                                StyleComboBox(c, list, System.Windows.Forms.ComboBoxStyle.DropDownList);
 
-                        }
-                        //else if (image != enImageCode.None)
-                        //{
-                        //    EditType = enEditTypeFormula.Button;
-                        //    CaptionPosition = enÜberschriftAnordnung.ohne;
-                        //    Size = new Size((int)BlueFont.MeasureStringOfCaption(_Caption).Width + 50, 30);
-                        //    var c = (Button)CreateSubControls();
-                        //    c.ImageCode = QuickImage.Get(image).ToString();
-
-                        //}
-                        else {
-                            _EditType = enEditTypeFormula.Textfeld;
-
-                            var tmpName = _propInfo.PropertyType.FullName.ToLower();
-
-
-                            if (TextLines >= 2) {
-                                _CaptionPosition = enÜberschriftAnordnung.Über_dem_Feld;
-                                Size = new Size(200, 16 + 24 * TextLines);
-                                _MultiLine = true;
-                                tmpName = "system.string";
-                            } else {
-                                _CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
-                                Size = new Size(200, 24);
-                                _MultiLine = false;
                             }
+                            //else if (image != enImageCode.None)
+                            //{
+                            //    EditType = enEditTypeFormula.Button;
+                            //    CaptionPosition = enÜberschriftAnordnung.ohne;
+                            //    Size = new Size((int)BlueFont.MeasureStringOfCaption(_Caption).Width + 50, 30);
+                            //    var c = (Button)CreateSubControls();
+                            //    c.ImageCode = QuickImage.Get(image).ToString();
 
+                            //}
+                            else {
+                                _EditType = enEditTypeFormula.Textfeld;
 
-                            switch (tmpName) {
-                                case "system.string":
-                                    Format = enDataFormat.Text;
-                                    break;
-                                case "system.int32":
-                                    Format = enDataFormat.Ganzzahl;
-                                    break;
-                                case "system.decimal":
-                                    Format = enDataFormat.Gleitkommazahl;
-                                    break;
-                                case "system.drawing.color":
-                                    Format = enDataFormat.Text;
-                                    break; // HTML-Farbcode noch nicht programmiert
-                                default:
-                                    Format = enDataFormat.Text;
-                                    break;
+                                var tmpName = _propInfo.PropertyType.FullName.ToLower();
+
+                                if (TextLines >= 2) {
+                                    _CaptionPosition = enÜberschriftAnordnung.Über_dem_Feld;
+                                    Size = new Size(200, 16 + (24 * TextLines));
+                                    _MultiLine = true;
+                                    tmpName = "system.string";
+                                } else {
+                                    _CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
+                                    Size = new Size(200, 24);
+                                    _MultiLine = false;
+                                }
+
+                                Format = tmpName switch {
+                                    "system.string" => enDataFormat.Text,
+                                    "system.int32" => enDataFormat.Ganzzahl,
+                                    "system.decimal" => enDataFormat.Gleitkommazahl,
+                                    "system.drawing.color" => enDataFormat.Text,
+                                    _ => enDataFormat.Text,
+                                };
+                                var c = CreateSubControls();
+                                StyleTextBox((TextBox)c, string.Empty, false);
                             }
-
-                            var c = CreateSubControls();
-                            StyleTextBox((TextBox)c, string.Empty, false);
+                            break;
                         }
-                        break;
-                    }
-
                 }
             }
             //else
@@ -442,7 +404,6 @@ namespace BlueControls.Controls {
 
                 var done = false;
 
-
                 IEnumerable<Attribute> ca = null;
 
                 if (_propInfo != null) { ca = _propInfo.GetCustomAttributes(); }
@@ -461,15 +422,12 @@ namespace BlueControls.Controls {
                 if (!done) {
                     QuickInfo = string.Empty;
                 }
-
-
             }
             #endregion
 
             SetValueFromProperty();
             GenFehlerText();
         }
-
 
         public static void SetAllFlexControls(System.Windows.Forms.Control _in, object _to) {
 
@@ -489,8 +447,6 @@ namespace BlueControls.Controls {
                 }
             }
         }
-
-
 
         protected override void OnControlAdded(ControlEventArgs e) {
             CheckEnabledState();
@@ -527,7 +483,6 @@ namespace BlueControls.Controls {
 
             if (!_allinitialized) { return null; }
 
-
             foreach (var thiscon in Controls) {
                 if (thiscon is ComboBox cbx) { return cbx; }
             }
@@ -539,8 +494,6 @@ namespace BlueControls.Controls {
             base.OnHandleDestroyed(e);
         }
 
-
-
         protected override void OnButtonClicked() {
 
             base.OnButtonClicked();
@@ -548,9 +501,7 @@ namespace BlueControls.Controls {
             if (_methInfo != null) {
                 _methInfo.Invoke(_propertyObject, null);
             }
-
         }
-
 
         protected override void Dispose(bool disposing) {
             _IdleTimer.Tick -= Checker_Tick;
@@ -558,7 +509,6 @@ namespace BlueControls.Controls {
 
             base.Dispose(disposing);
         }
-
     }
 }
 

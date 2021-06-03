@@ -36,5 +36,4 @@ namespace BlueDatabase.Enums {
         CellFormatUTF8 = 4,
         ColumnUTF8 = 5
     }
-
 }

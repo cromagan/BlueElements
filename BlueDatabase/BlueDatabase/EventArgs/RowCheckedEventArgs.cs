@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 using System.Collections.Generic;
 
 namespace BlueDatabase.EventArgs {
@@ -27,6 +26,5 @@ namespace BlueDatabase.EventArgs {
         }
 
         public List<string> ColumnsWithErrors { get; }
-
     }
 }

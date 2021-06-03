@@ -17,13 +17,11 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 using BlueControls.ItemCollection;
 using System.Collections.Generic;
 
 namespace BlueControls.EventArgs {
     public class ContextMenuInitEventArgs : System.EventArgs {
-
 
         public ContextMenuInitEventArgs(object hotItem, List<string> tags, ItemCollectionList userMenu) {
             UserMenu = userMenu;
@@ -31,7 +29,6 @@ namespace BlueControls.EventArgs {
             Tags = tags;
             Translate = true;
             Cancel = false;
-
 
         }
         public bool Cancel { get; }
@@ -43,6 +40,5 @@ namespace BlueControls.EventArgs {
         public object HotItem { get; }
 
         public List<string> Tags { get; }
-
     }
 }

@@ -31,7 +31,6 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private readonly Table _BlueTable;
 
-
         private RowItem _row = null;
         private ColumnItem _col = null;
 
@@ -47,18 +46,11 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         }
 
-
-
-
         private void CursorPosChanged(object sender, CellEventArgs e) {
 
             _row = e.Row;
             _col = e.Column;
         }
-
-
-
-
 
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
             base.OnFormClosing(e);
@@ -100,12 +92,10 @@ namespace BlueControls.BlueDatabaseDialogs {
                     }
                 }
 
-
                 if (columnStarted == found) {
                     found = null;
                     break;
                 }
-
             } while (true);
 
             if (found == null) {
@@ -126,7 +116,6 @@ namespace BlueControls.BlueDatabaseDialogs {
                 return string.Empty;
             }
 
-
             return SuchtT.Replace(";cr;", "\r").Replace(";tab;", "\t").ToLower();
         }
         private void btnSuchInCell_Click(object sender, System.EventArgs e) {
@@ -135,9 +124,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             if (string.IsNullOrEmpty(SuchtT)) { return; }
 
-
             Table.SearchNextText(SuchtT, _BlueTable, _col, _row, out var found, out var GefRow, btnAehnliches.Checked);
-
 
             if (found == null) {
                 MessageBox.Show("Text nicht gefunden", enImageCode.Information, "OK");

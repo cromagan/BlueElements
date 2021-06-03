@@ -20,7 +20,6 @@
 using Skript.Enums;
 using System.Collections.Generic;
 
-
 namespace BlueScript {
     internal class Method_Split : Method {
 
@@ -44,7 +43,5 @@ namespace BlueScript {
 
             return new strDoItFeedback(attvar.Attributes[0].ValueForReplace, string.Empty);
         }
-
-
     }
 }

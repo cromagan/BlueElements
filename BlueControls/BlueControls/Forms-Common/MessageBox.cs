@@ -37,17 +37,13 @@ namespace BlueControls.Forms {
         private MessageBox(string TXT, enImageCode Pic, params string[] Buttons) : base(Enums.enDesign.Form_MsgBox) {
             InitializeComponent();
 
-
             Text = Develop.AppName();
 
-            if (Pic != enImageCode.None) {
-                capText.Text = "<ImageCode=" + QuickImage.Get(Pic, 32) + "> <zbx_store><top>" + BlueDatabase.LanguageTool.DoTranslate(TXT, false);
-            } else {
-                capText.Text = BlueDatabase.LanguageTool.DoTranslate(TXT, false);
-            }
+            capText.Text = Pic != enImageCode.None
+                ? "<ImageCode=" + QuickImage.Get(Pic, 32) + "> <zbx_store><top>" + BlueDatabase.LanguageTool.DoTranslate(TXT, false)
+                : BlueDatabase.LanguageTool.DoTranslate(TXT, false);
 
-            Size = new System.Drawing.Size(capText.Left * 2 + capText.Width + BorderWidth, capText.Top * 3 + capText.Height + 35 + BorderHeight);
-
+            Size = new System.Drawing.Size((capText.Left * 2) + capText.Width + BorderWidth, (capText.Top * 3) + capText.Height + 35 + BorderHeight);
 
             if (Buttons.Length == 0) { Buttons = new[] { "OK" }; }
 
@@ -57,7 +53,7 @@ namespace BlueControls.Forms {
                 ThisButton.Click += ThisButton_Click;
 
                 if (ThisButton.Left < BorderWidth) {
-                    Width = (Width - ThisButton.Left) + BorderWidth;
+                    Width = Width - ThisButton.Left + BorderWidth;
                 }
             }
             Pressed = null;
@@ -76,16 +72,13 @@ namespace BlueControls.Forms {
             Show(TXT, enImageCode.None, true, "OK");
         }
 
-
         public static void Show(string TXT, enImageCode Pic, string Buttons) {
             Show(TXT, Pic, true, Buttons);
         }
 
-
         public static int Show(string TXT, enImageCode Pic, params string[] Buttons) {
             return Show(TXT, Pic, true, Buttons);
         }
-
 
         public static int Show(string TXT, enImageCode Pic, bool Dialog, params string[] Buttons) {
 
@@ -99,9 +92,7 @@ namespace BlueControls.Forms {
                 while (MB.Pressed == null) {
                     modAllgemein.Pause(0.1, true);
                 }
-
             }
-
 
             return int.Parse(MB.Pressed.Name);
         }

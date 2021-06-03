@@ -17,20 +17,16 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 using BlueBasics;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-
-
 
 namespace BlueControls.Forms {
     public partial class PictureView {
         protected List<string> _FileList;
         private int _NR = -1;
         private readonly string _Title = string.Empty;
-
 
         public PictureView() {
 
@@ -42,7 +38,6 @@ namespace BlueControls.Forms {
             InitWindow(false, "", -1);
         }
 
-
         public PictureView(List<string> FileList, bool MitScreenResize, string WindowCaption) {
 
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
@@ -52,7 +47,6 @@ namespace BlueControls.Forms {
             LoadPic(0);
 
             InitWindow(MitScreenResize, WindowCaption, -1);
-
 
             ZoomIn.Checked = true;
             Auswahl.Enabled = false;
@@ -65,7 +59,6 @@ namespace BlueControls.Forms {
 
             _FileList = new List<string>();
 
-
             InitWindow(false, "", -1);
 
             Pad.BMP = BMP;
@@ -75,7 +68,6 @@ namespace BlueControls.Forms {
             ZoomIn.Checked = true;
             Auswahl.Enabled = false;
         }
-
 
         public PictureView(List<string> FileList, bool MitScreenResize, string WindowCaption, int OpenOnScreen) {
 
@@ -105,9 +97,7 @@ namespace BlueControls.Forms {
 
         //    Pad.ParseData(CodeToParse, true, true);
 
-
         //    var Count = 0;
-
 
         //    do
         //    {
@@ -118,14 +108,11 @@ namespace BlueControls.Forms {
 
         //    Pad.RepairAll(1, true);
 
-
         //    InitWindow(false, Title, Title, -1, Pad.SheetStyle);
         //}
 
-
         protected void LoadPic(int Nr) {
             _NR = Nr;
-
 
             if (_FileList != null && Nr < _FileList.Count) {
                 try {
@@ -134,11 +121,8 @@ namespace BlueControls.Forms {
                     Pad.BMP = null;
                     Develop.DebugPrint(ex);
                 }
-
-
             }
             Ribbon.SelectedIndex = 1;
-
 
             grpSeiten.Visible = _FileList != null && _FileList.Count > 1;
 
@@ -152,18 +136,14 @@ namespace BlueControls.Forms {
 
             }
 
-
-
             Pad.ZoomFit();
 
         }
-
 
         private void InitWindow(bool fitWindowToBest, string windowCaption, int openOnScreen) {
             //    Me.ShowInTaskbar = False
 
             if (_FileList == null || _FileList.Count < 2) { grpSeiten.Enabled = false; }
-
 
             if (fitWindowToBest) {
                 if (System.Windows.Forms.Screen.AllScreens.Length == 1 || openOnScreen < 0) {
@@ -171,8 +151,8 @@ namespace BlueControls.Forms {
 
                     Width = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Width / 1.5);
                     Height = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Height / 1.5);
-                    Left = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Left + (System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Width - Width) / 2.0);
-                    Top = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Top + (System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Height - Height) / 2.0);
+                    Left = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Left + ((System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Width - Width) / 2.0));
+                    Top = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Top + ((System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Height - Height) / 2.0));
 
                 } else {
                     Width = System.Windows.Forms.Screen.AllScreens[openOnScreen].WorkingArea.Width;
@@ -182,15 +162,12 @@ namespace BlueControls.Forms {
                 }
             }
 
-
             if (!string.IsNullOrEmpty(windowCaption)) {
                 Text = windowCaption;
             }
 
-
             if (Develop.IsHostRunning()) { TopMost = false; }
         }
-
 
         private void Links_Click(object sender, System.EventArgs e) {
 
@@ -207,17 +184,13 @@ namespace BlueControls.Forms {
             LoadPic(_NR);
         }
 
-
         private void ZoomFitBut_Click(object sender, System.EventArgs e) {
             Pad.ZoomFit();
         }
-
-
 
         private void Pad_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
             if (ZoomIn.Checked) { Pad.ZoomIn(e); }
             if (ZoomOut.Checked) { Pad.ZoomOut(e); }
         }
-
     }
 }

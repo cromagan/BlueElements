@@ -48,7 +48,6 @@ namespace BlueBasics {
         [DefaultValue(false)]
         public static bool ServiceStarted { get; private set; } = false;
 
-
         public static bool IsHostRunning() {
             return Debugger.IsAttached;
         }

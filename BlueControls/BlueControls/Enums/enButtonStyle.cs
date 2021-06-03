@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 namespace BlueControls.Enums {
     public enum enButtonStyle {
         Button = 1,
@@ -27,11 +26,9 @@ namespace BlueControls.Enums {
         Yes_or_No = 3,
         Pic1_or_Pic2 = 4,
 
-
         Checkbox = 5,
         Checkbox_RibbonBar = 1005,
         Checkbox_Text = 2005,
-
 
         Optionbox = 6,
         Optionbox_RibbonBar = 1006,

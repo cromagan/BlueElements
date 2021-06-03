@@ -24,9 +24,8 @@ using System;
 using System.Drawing;
 
 namespace BlueDatabase {
-    public sealed class ColumnViewItem  {
+    public sealed class ColumnViewItem {
         #region  Variablen-Deklarationen 
-
 
         private enViewType _ViewType;
 
@@ -57,15 +56,11 @@ namespace BlueDatabase {
 
         public bool _TMP_Reduced;
 
-
-
         #endregion
-
 
         #region  Event-Deklarationen + Delegaten 
         public event EventHandler Changed;
         #endregion
-
 
         #region  Construktor + Initialize 
         /// <summary>
@@ -105,8 +100,6 @@ namespace BlueDatabase {
             _ÜberschriftAnordnung = Überschrift;
             this.Column.CheckFormulaEditType();
         }
-
-
 
         /// <summary>
         /// Info: Es wird keine Änderung ausgelöst
@@ -153,22 +146,15 @@ namespace BlueDatabase {
                         Develop.DebugPrint(enFehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
                         break;
                 }
-
             }
-
-
 
             if (Column != null && _ViewType == enViewType.None) { _ViewType = enViewType.Column; }
             if (Column != null && _ViewType != enViewType.None) { Column.CheckFormulaEditType(); }
-
-
         }
 
         #endregion
 
-
         #region  Properties 
-
 
         public enViewType ViewType {
             get => _ViewType;
@@ -187,7 +173,6 @@ namespace BlueDatabase {
                 OnChanged();
             }
         }
-
 
         /// <summary>
         /// Nur wichtig für Formular
@@ -222,16 +207,9 @@ namespace BlueDatabase {
             }
         }
 
-
-
-
         public ColumnItem Column { get; private set; }
 
         #endregion
-
-
-
-
 
         /// <summary>
         /// Info: Es wird keine Änderung ausgelöst
@@ -240,7 +218,6 @@ namespace BlueDatabase {
             _Spalte_X1 += ModX;
             _Spalte_Width += ModW;
             _Spalte_Height += ModH;
-
 
             if (_Spalte_X1 < 0) { _Spalte_X1 = 0; }
             if (_Spalte_X1 > 18) { _Spalte_X1 = 18; }
@@ -263,22 +240,15 @@ namespace BlueDatabase {
             OnChanged();
         }
 
-
-
-
-
-
         public override string ToString() {
-            var Result = "{Type=" + (int)(_ViewType);
+            var Result = "{Type=" + (int)_ViewType;
             if (Column != null) { Result = Result + ", " + Column.ParsableColumnKey(); }
             if (_Spalte_X1 > 0) { Result = Result + ", X=" + _Spalte_X1; }
             if (_Spalte_Width > 1) { Result = Result + ", Width=" + _Spalte_Width; }
             if (_Spalte_Height > 1) { Result = Result + ", Height=" + _Spalte_Height; }
-            if (_ÜberschriftAnordnung != enÜberschriftAnordnung.Über_dem_Feld) { Result = Result + ", Caption=" + (int)(_ÜberschriftAnordnung); }
+            if (_ÜberschriftAnordnung != enÜberschriftAnordnung.Über_dem_Feld) { Result = Result + ", Caption=" + (int)_ÜberschriftAnordnung; }
             return Result + "}";
         }
-
-
 
         public ColumnViewItem PreviewsVisible(ColumnViewCollection _Parent) {
             return _Parent?.PreviousVisible(this);
@@ -288,11 +258,8 @@ namespace BlueDatabase {
             return _Parent?.NextVisible(this);
         }
 
-
         public void OnChanged() {
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
-
-
     }
 }

@@ -35,14 +35,11 @@ namespace BlueScript {
         public override List<enVariableDataType> Args => new() { enVariableDataType.Bool };
         public override bool EndlessArgs => false;
 
-
-
         public static readonly List<string> VergleichsOperatoren = new() { "!", "||", "&&", "==", "!=", "<", ">", ">=", "<=" };
         //public static readonly List<string> VergleichsOperatoren2 = new() { "||", "&&", "==", "!=", "<", ">", ">=", "<=" };
         public static readonly List<string> UndUnd = new() { "&&" };
         public static readonly List<string> OderOder = new() { "||" };
         //public static readonly List<string> Vorbidden = new() { "exists", "istype", "isnullorempty", "isnullorzero" };
-
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
 
@@ -97,7 +94,6 @@ namespace BlueScript {
                     return "true";
             }
 
-
             #region Klammern zuerst berechnen
             (var posa, var _) = NextText(txt, 0, KlammerAuf, false, false);
             if (posa > -1) {
@@ -106,18 +102,11 @@ namespace BlueScript {
                 if (pose < posa) { return null; }
 
                 var tmp = GetBool(txt.Substring(posa + 1, pose - posa - 1));
-                if (tmp == null) { return null; }
-
-                return GetBool(txt.Substring(0, posa) + tmp + txt.Substring(pose + 1));
-
+                return tmp == null ? null : GetBool(txt.Substring(0, posa) + tmp + txt.Substring(pose + 1));
             }
             #endregion
 
-
-
-
             string ntxt;
-
 
             ntxt = GetBoolTMP(txt, "==");
             if (!string.IsNullOrEmpty(ntxt)) { return GetBool(ntxt); }
@@ -148,14 +137,11 @@ namespace BlueScript {
 
             //Disjunktion
             ntxt = GetBoolTMP(txt, "||");
-            if (!string.IsNullOrEmpty(ntxt)) { return GetBool(ntxt); }
-
-            return null;
+            return !string.IsNullOrEmpty(ntxt) ? GetBool(ntxt) : null;
         }
 
         private static string GetBoolTMP(string txt, string check) {
             (var i, var _) = NextText(txt, 0, new List<string>() { check }, false, false);
-
 
             if (i < 0) { return string.Empty; }
 
@@ -188,15 +174,12 @@ namespace BlueScript {
             var s1 = txt.Substring(start + 1, i - start - 1);
             var s2 = txt.Substring(i + check.Length, ende - check.Length - i);
 
-
             if (string.IsNullOrEmpty(s1) && check != "!") { return string.Empty; }
             if (string.IsNullOrEmpty(s2)) { return string.Empty; }
-
 
             Variable v1 = null;
             if (check != "!") { v1 = new Variable("dummy", s1, null); }
             var v2 = new Variable("dummy", s2, null);
-
 
             // V2 braucht nicht gepürft werden, muss ja eh der gleiche TYpe wie V1 sein
             if (v1 != null) {
@@ -208,7 +191,6 @@ namespace BlueScript {
             } else {
                 if (v2.Type != Skript.Enums.enVariableDataType.Bool) { return string.Empty; }
             }
-
 
             var replacer = string.Empty;
 
@@ -292,15 +274,7 @@ namespace BlueScript {
 
             }
 
-
-            if (string.IsNullOrEmpty(replacer)) { return string.Empty; }
-
-
-            return txt.Substring(0, start + 1) + replacer + txt.Substring(ende);
-
-
-
+            return string.IsNullOrEmpty(replacer) ? string.Empty : txt.Substring(0, start + 1) + replacer + txt.Substring(ende);
         }
-
     }
 }

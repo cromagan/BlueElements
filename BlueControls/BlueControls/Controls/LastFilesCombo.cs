@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 using BlueBasics;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
@@ -51,7 +50,6 @@ namespace BlueControls.Controls {
         #region  Events 
         //public event System.EventHandler SpecialCommandClicked;
         #endregion
-
 
         /// <summary>
         /// Wohin die Datei gespeichtert werden soll, welche Dateien zuletzt benutzt wurden.
@@ -87,7 +85,6 @@ namespace BlueControls.Controls {
         //    }
         //}
 
-
         [DefaultValue(true)]
         public bool MustExist {
             get => _mustExists;
@@ -110,8 +107,6 @@ namespace BlueControls.Controls {
             }
         }
 
-
-
         private void GenerateMenu() {
 
             var NR = -1;
@@ -119,11 +114,9 @@ namespace BlueControls.Controls {
 
             Item.Clear();
 
-
             for (var Z = LastD.Count - 1; Z >= 0; Z--) {
 
                 var x = LastD[Z].SplitBy("|");
-
 
                 if (x != null && x.GetUpperBound(0) >= 0 && !string.IsNullOrEmpty(x[0]) && Item[x[0]] is null) {
 
@@ -161,16 +154,12 @@ namespace BlueControls.Controls {
                 }
             }
 
-
-
             Enabled = Vis;
         }
-
 
         public void AddFileName(string FileName, string AdditionalText) {
 
             var s = FileName + "|" + AdditionalText;
-
 
             s = s.Replace("\r\n", ";");
             s = s.Replace("\r", ";");
@@ -186,7 +175,6 @@ namespace BlueControls.Controls {
             GenerateMenu();
         }
 
-
         protected override void DrawControl(Graphics gr, enStates state) {
             SetLastFilesStyle();
             base.DrawControl(gr, state);
@@ -198,13 +186,9 @@ namespace BlueControls.Controls {
             GenerateMenu();
         }
 
-
         private string SaveFile() {
-            if (!string.IsNullOrEmpty(_filename)) { return _filename; }
-
-            return System.Windows.Forms.Application.StartupPath + Name + "-Files.laf";
+            return !string.IsNullOrEmpty(_filename) ? _filename : System.Windows.Forms.Application.StartupPath + Name + "-Files.laf";
         }
-
 
         private void LoadFromDisk() {
             LastD = new List<string>();
@@ -216,7 +200,6 @@ namespace BlueControls.Controls {
             }
         }
 
-
         private void SetLastFilesStyle() {
             if (DrawStyle == enComboboxStyle.TextBox) {
                 DrawStyle = enComboboxStyle.Button;
@@ -224,8 +207,6 @@ namespace BlueControls.Controls {
             if (string.IsNullOrEmpty(ImageCode)) { ImageCode = "Ordner"; }
             if (string.IsNullOrEmpty(Text)) { Text = "zuletzt geöffnete Dateien"; }
         }
-
-
 
         protected override void OnItemClicked(BasicListItemEventArgs e) {
 
@@ -242,12 +223,10 @@ namespace BlueControls.Controls {
             AddFileName(e.Item.Internal, t[0]);
         }
 
-
         //private void OnSpecialCommandClicked()
         //{
         //    SpecialCommandClicked?.Invoke(this, System.EventArgs.Empty);
         //}
-
 
     }
 }

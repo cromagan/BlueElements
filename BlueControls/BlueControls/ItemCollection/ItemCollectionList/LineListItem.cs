@@ -26,19 +26,15 @@ namespace BlueControls.ItemCollection {
 
     //'Imports Microsoft.VisualBasic
 
-
     public class LineListItem : BasicListItem {
-
 
         #region  Variablen-Deklarationen 
 
         #endregion
 
-
         #region  Event-Deklarationen + Delegaten 
 
         #endregion
-
 
         #region  Construktor + Initialize 
 
@@ -46,39 +42,24 @@ namespace BlueControls.ItemCollection {
             UserDefCompareKey = userDefCompareKey;
         }
 
-
-
-
         #endregion
-
 
         #region  Properties 
 
         public override string QuickInfo => string.Empty;
         #endregion
 
-
-
-
         protected override Size ComputeSizeUntouchedForListBox() {
-            if (Pos.X == 0 && Pos.X == 0 && Pos.Width == 0 && Pos.Height == 0) {
-
-                return new Size(4, 4);
-            }
-
-            return Pos.Size;
+            return Pos.X == 0 && Pos.X == 0 && Pos.Width == 0 && Pos.Height == 0 ? new Size(4, 4) : Pos.Size;
         }
 
         protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, bool Translate) {
-            GR.DrawLine(Skin.GetBlueFont(itemdesign, enStates.Standard).Pen(1f), PositionModified.Left, (int)(PositionModified.Top + PositionModified.Height / 2.0), PositionModified.Right, (int)(PositionModified.Top + PositionModified.Height / 2.0));
+            GR.DrawLine(Skin.GetBlueFont(itemdesign, enStates.Standard).Pen(1f), PositionModified.Left, (int)(PositionModified.Top + (PositionModified.Height / 2.0)), PositionModified.Right, (int)(PositionModified.Top + (PositionModified.Height / 2.0)));
         }
-
-
 
         public override bool IsClickable() {
             return false;
         }
-
 
         public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) {
             return 4;

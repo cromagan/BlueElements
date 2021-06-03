@@ -32,6 +32,5 @@ namespace BlueDatabase.Enums {
         Fehlendes_Bild_zeige_Warnung = 7,
         Fehlendes_Bild_zeige_Kritischzeichen = 8,
 
-
     }
 }

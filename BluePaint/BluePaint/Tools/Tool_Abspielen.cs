@@ -30,18 +30,13 @@ namespace BluePaint {
         private readonly List<string> _macro;
         private readonly List<GenericTool> _merker;
 
-
         public Tool_Abspielen(List<string> macro, List<GenericTool> merker) : base() {
             InitializeComponent();
             OnOverridePic(null);
 
-
             _macro = macro;
             _merker = merker;
         }
-
-
-
 
         public override void ToolFirstShown() {
             OnZoomFit();
@@ -73,7 +68,6 @@ namespace BluePaint {
                 return;
             }
 
-
             if (!PathExists(txbQuelle.Text)) {
                 MessageBox.Show("Quellverzeichniss existiert nicht.");
                 return;
@@ -91,14 +85,11 @@ namespace BluePaint {
                 p = txbZielordner.Text;
             }
 
-
-
             var f = System.IO.Directory.GetFiles(txbQuelle.Text, "*.PNG", System.IO.SearchOption.TopDirectoryOnly);
             if (f == null || f.GetUpperBound(0) < 0) {
                 MessageBox.Show("Keine Dateien im Quellverzeichniss gefunden.");
                 return;
             }
-
 
             foreach (var thisf in f) {
                 OnOverridePic((Bitmap)BitmapExt.Image_FromFile(thisf));
@@ -111,20 +102,16 @@ namespace BluePaint {
                     Develop.DoEvents();
                 }
 
-
                 var newf = TempFile(p, thisf.FileNameWithoutSuffix(), "PNG");
                 var B = OnNeedCurrentPic();
 
                 B.Save(newf, System.Drawing.Imaging.ImageFormat.Png);
-                B = null;
                 modAllgemein.CollectGarbage();
 
             }
-
         }
 
         private void DoMakro(string thisS) {
-
 
             var t = thisS.SplitBy(";");
 

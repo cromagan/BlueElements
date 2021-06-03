@@ -27,7 +27,7 @@ namespace Skript.Enums {
         String = 4,
         //Date = 8, // Werden einfach die Strings manipuliert
         List = 16,
-        Bitmap = 32, 
+        Bitmap = 32,
 
         /// <summary>
         /// Nur für Attribute
@@ -46,7 +46,6 @@ namespace Skript.Enums {
         Error = 2048,
         Null = 4096,
 
-
         //VariableBool = 128,
         //VariableNum = 256,
         //VariableString = 512,
@@ -59,5 +58,4 @@ namespace Skript.Enums {
         Variable_String_or_Numeral = Variable | String | List | Numeral,
         Variable_Any = Variable | String | List | Numeral | Bool | Error | NotDefinedYet
     }
-
 }

@@ -17,27 +17,15 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 using BlueBasics;
-using BlueBasics.Enums;
-using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
-using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using System.IO;
-using System.Text.RegularExpressions;
 using static BlueBasics.FileOperations;
 
 namespace BlueDatabase {
 
-
-
     public static class Export {
-
-
 
         public static List<string> SaveAsBitmap(List<RowItem> Row, string LayoutID, string Path) {
             var l = new List<string>();
@@ -51,8 +39,6 @@ namespace BlueDatabase {
             return l;
         }
 
-
-
         public static void SaveAsBitmap(RowItem Row, string LayoutID, string Filename) {
             Row.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventargs(Row, LayoutID, Filename));
         }
@@ -65,7 +51,6 @@ namespace BlueDatabase {
         //    if (string.IsNullOrEmpty(variablename)) { return platzhaltertxt; }
         //    if (platzhaltertxt.Length < variablename.Length + 4) { return platzhaltertxt; }
         //    ColumnItem Col = null;
-
 
         //    do {
         //        var tmpKennungstart = platzhaltertxt.ToUpper().IndexOf("//TS/000" + variablename.ToUpper() + "/", kennungstart);
@@ -95,15 +80,12 @@ namespace BlueDatabase {
         //                break;
         //            }
 
-
         //            codes[current] = codes[current].FromNonCritical().FromNonCritical().GenerateSlash();
-
 
         //            var tempVar2 = 0;
         //            var tempVar3 = 0;
         //            string tempVar5 = null;
         //            DoSingleCode(codes[current], ref obj, null, ref Col, ref tempVar2, ref tempVar3, ref tempVar5, Ges, ref Ended);
-
 
         //        } while (!Ended);
 
@@ -116,16 +98,10 @@ namespace BlueDatabase {
         //            return bmp;
         //        }
 
-
         //        kennungstart = 0;
-
-
 
         //    } while (true);
         //}
-
-
-
 
         //private static void DoSingleCode(string CodeNr, ref object value, RowItem row, ref ColumnItem column, ref int Wi, ref int He, ref string BT, string Code, ref bool Ended) {
         //    var TXT = string.Empty;
@@ -382,7 +358,6 @@ namespace BlueDatabase {
         //                TXT = TXT.Replace("zwei EL", "2 EL", RegexOptions.IgnoreCase);
         //                TXT = TXT.Replace("zwei TL", "2 TL", RegexOptions.IgnoreCase);
 
-
         //                for (var t = 0; t <= A.GetUpperBound(0); t++) {
         //                    TXT = TXT.Replace("gerieben" + A[t], "ger.");
         //                    //tx = tx.Replace("groß" + A[t], "gr.");
@@ -400,13 +375,11 @@ namespace BlueDatabase {
         //            Ended = true;
         //            break;
 
-
         //        default:
         //            value = "/Fehler/ " + Code;
         //            Ended = true;
         //            break;
         //    }
-
 
         //    if (TextReturn) {
         //        value = TXT;
@@ -414,10 +387,7 @@ namespace BlueDatabase {
         //        value = BMP;
         //    }
 
-
-
         //}
-
 
         //private static string CleanUpLayout(string t2) {
 
@@ -455,8 +425,6 @@ namespace BlueDatabase {
         //    return t2.ToNonCritical();
         //}
 
-
-
         //public static string DoLayoutCode(string Welcher, string tmpBody, RowItem vRow, string EndCode, bool ToNonCriticalText) {
         //    Welcher = Welcher.ToUpper();
         //    EndCode = EndCode.ToUpper();
@@ -473,7 +441,6 @@ namespace BlueDatabase {
         //        var T1 = tmpBody.Substring(stx, enx - stx + 1 + EndCode.Length);
         //        var T2 = GenerateLayoutString(T1, vRow, Welcher);
 
-
         //        T2 = T2.FromNonCritical(); // Sicherhethalber, daß der Text auf jeden Fall lesbar ist
 
         //        // Es kann vorkommen, daß ein Base64 Bild GENAU die nötigen Steuercodes hat!!!!
@@ -481,11 +448,9 @@ namespace BlueDatabase {
         //            return tmpBody;
         //        }
 
-
         //        if (ToNonCriticalText) {
         //            T2 = T2.ToNonCritical();
         //        }
-
 
         //        tmpBody = tmpBody.Replace(T1, T2);
         //        //  If Not tmpBody.Contains("{Type=BlueBasics.TextItem, InternalName=05.03.2015 12:31:071741881, DPI=300,") Then Stop
@@ -493,13 +458,10 @@ namespace BlueDatabase {
         //    } while (true);
         //}
 
-
         //private static string GenerateLayoutString(string Code, RowItem vRow, string Art) {
-
 
         //    var Wi = 8;
         //    var He = 8;
-
 
         //    Code = Code.TrimStart("//" + Art + "/");
         //    Code = Code.TrimEnd("XE");
@@ -511,14 +473,11 @@ namespace BlueDatabase {
         //    var BT = "";
         //    var Ended = false;
 
-
-
         //    //http://de.selfhtml.org/html/referenz/zeichen.htm#benannte_iso8859_1
         //    ColumnItem Col = null;
         //    do {
         //        z++;
         //        if (z > codes.GetUpperBound(0) || codes[z].Length < 3) { return "/FehlerTS/"; }
-
 
         //        codes[z] = codes[z].FromNonCritical().FromNonCritical().GenerateSlash();
 
@@ -532,18 +491,9 @@ namespace BlueDatabase {
         //            return "/FehlerTS/";
         //        }
 
-
         //    } while (true);
 
         //}
-
-
-
-
-
-
-
-
 
         public static List<string> SaveAs(RowItem Row, string Layout, string DestinationFile) {
 
@@ -575,41 +525,26 @@ namespace BlueDatabase {
         //    '   End If
         //End Sub
 
-
-
-
-
-
-
-
         public static List<string> GenerateLayout_FileSystem(List<RowItem> Liste, string Lad, string OptionalFileName, bool EineGrosseDatei, string ZielPfad) {
-
-            string sav = null;
-
             var l = new List<string>();
 
             if (Liste == null) { return l; }
 
-
+            string sav;
             if (Liste.Count == 1 || EineGrosseDatei) {
-                if (!string.IsNullOrEmpty(OptionalFileName)) {
-                    sav = TempFile(OptionalFileName.FilePath(), OptionalFileName.FileNameWithoutSuffix(), Lad.FileSuffix());
-                } else {
-                    sav = TempFile(ZielPfad, Liste[0].CellFirstString(), Lad.FileSuffix());
-                }
+                sav = !string.IsNullOrEmpty(OptionalFileName)
+                    ? TempFile(OptionalFileName.FilePath(), OptionalFileName.FileNameWithoutSuffix(), Lad.FileSuffix())
+                    : TempFile(ZielPfad, Liste[0].CellFirstString(), Lad.FileSuffix());
                 CreateLayout(Liste, Lad, sav);
                 l.Add(sav);
             } else {
                 foreach (var ThisRow in Liste) {
-                    if (!string.IsNullOrEmpty(OptionalFileName)) {
-                        sav = TempFile(OptionalFileName.FilePath(), OptionalFileName.FileNameWithoutSuffix(), Lad.FileSuffix());
-                    } else {
-                        sav = TempFile(ZielPfad, ThisRow.CellFirstString(), Lad.FileSuffix());
-                    }
+                    sav = !string.IsNullOrEmpty(OptionalFileName)
+                        ? TempFile(OptionalFileName.FilePath(), OptionalFileName.FileNameWithoutSuffix(), Lad.FileSuffix())
+                        : TempFile(ZielPfad, ThisRow.CellFirstString(), Lad.FileSuffix());
                     CreateLayout(ThisRow, Lad, sav);
                     l.Add(sav);
                 }
-
 
                 //    If OpenIt Then ExecuteFile(ZielPfad)
 
@@ -626,30 +561,22 @@ namespace BlueDatabase {
             return l;
         }
 
+        //public static string CreateLayout(RowItem Row, string LoadedFile, bool ToNonCriticalText) {
+        //    if (string.IsNullOrEmpty(LoadedFile)) {
+        //        return string.Empty;
+        //    }
 
+        //    if (LoadedFile.Contains("BlueBasics")) {
+        //        Develop.DebugPrint(enFehlerArt.Fehler, "Nur für externe Elemente erlaubt!");
+        //        return string.Empty;
+        //    }
 
-
-
-
-        public static string CreateLayout(RowItem Row, string LoadedFile, bool ToNonCriticalText) {
-            if (string.IsNullOrEmpty(LoadedFile)) {
-                return string.Empty;
-            }
-
-
-            if (LoadedFile.Contains("BlueBasics")) {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Nur für externe Elemente erlaubt!");
-                return string.Empty;
-            }
-
-
-            var TMPList = new List<RowItem>
-            {
-                Row
-            };
-            return InternalCreateLayout(TMPList, LoadedFile, string.Empty, ToNonCriticalText);
-        }
-
+        //    var TMPList = new List<RowItem>
+        //    {
+        //        Row
+        //    };
+        //    return InternalCreateLayout(TMPList, LoadedFile, string.Empty, ToNonCriticalText);
+        //}
 
         public static void CreateLayout(RowItem Row, string LoadFile, string SaveFile) {
             if (!FileExists(LoadFile)) { return; }
@@ -666,27 +593,21 @@ namespace BlueDatabase {
             InternalCreateLayout(Rows, File.ReadAllText(LoadFile, Constants.Win1252), SaveFile, false);
         }
 
-
         private static string InternalCreateLayout(List<RowItem> Rows, string FileLoaded, string SaveFile, bool ToNonCriticalText) {
-
-
-            string tmpSave = null;
             var Head = "";
-            var Body = FileLoaded;
             var Foot = "";
             var stx = FileLoaded.ToUpper().IndexOf("//AS/300/AE");
             var enx = FileLoaded.ToUpper().IndexOf("//AS/301/AE");
 
             if (stx > -1 && enx > stx) {
                 Head = FileLoaded.Substring(0, stx);
-                Body = FileLoaded.Substring(stx + 11, enx - stx - 11);
+                var Body = FileLoaded.Substring(stx + 11, enx - stx - 11);
                 Foot = FileLoaded.Substring(enx + 11);
             }
 
-            tmpSave = Head;
+            var tmpSave = Head;
 
             if (Rows != null) {
-
 
                 foreach (var ThisRow in Rows) // As Integer = 0 To Rows.GetUpperBound(0)
                 {
@@ -699,9 +620,7 @@ namespace BlueDatabase {
                         //tmpSave += tmpBody;
                     }
                 }
-
             }
-
 
             tmpSave += Foot;
             if (!string.IsNullOrEmpty(SaveFile)) // Dateien ohne SUfiix-Angabe könenn nicht gespeichert werden
@@ -711,11 +630,5 @@ namespace BlueDatabase {
 
             return tmpSave;
         }
-
-
-
-
     }
-
-
 }

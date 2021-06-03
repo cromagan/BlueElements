@@ -85,7 +85,6 @@ namespace BluePaint {
         public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic) {
             if (!_ausricht) { return; }
 
-
             var _Pic = OnNeedCurrentPic();
 
             e.DrawLine(Pen_RedTransp, -1, e.Current.TrimmedY, _Pic.Width, e.Current.TrimmedY);
@@ -100,7 +99,6 @@ namespace BluePaint {
 
             }
         }
-
 
         public override void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap OriginalPic) {
             if (!_ausricht) { return; }
@@ -123,8 +121,6 @@ namespace BluePaint {
 
             var Wink = (float)GeometryDF.Winkel(new PointM(e.MouseDown.X, e.MouseDown.Y), new PointM(e.Current.X, e.Current.Y));
 
-
-
             // Make a Matrix to represent rotation by this angle.
             var rotate_at_origin = new Matrix();
             rotate_at_origin.Rotate(Wink);
@@ -132,7 +128,6 @@ namespace BluePaint {
             // Rotate the image's corners to see how big it will be after rotation.
             PointF[] p = { new PointF(0, 0), new PointF(_Pic.Width, 0), new PointF(_Pic.Width, _Pic.Height), new PointF(0, _Pic.Height), };
             rotate_at_origin.TransformPoints(p);
-
 
             var MinX = Math.Min(Math.Min(p[0].X, p[1].X), Math.Min(p[2].X, p[3].X));
             var MinY = Math.Min(Math.Min(p[0].Y, p[1].Y), Math.Min(p[2].Y, p[3].Y));
@@ -146,7 +141,6 @@ namespace BluePaint {
             // Create the real rotation transformation.
             var rotate_at_center = new Matrix();
             rotate_at_center.RotateAt(Wink, new PointF(B / 2f, H / 2f));
-
 
             // Draw the image onto the new bitmap rotated.
             using (var gr = Graphics.FromImage(nBMP)) {
@@ -162,8 +156,5 @@ namespace BluePaint {
             OnOverridePic(nBMP);
 
         }
-
-
-
     }
 }

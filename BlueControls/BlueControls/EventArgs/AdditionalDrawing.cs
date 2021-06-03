@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 using System;
 using System.Drawing;
 
@@ -45,24 +44,20 @@ namespace BlueControls.EventArgs {
 
             G.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
 
-
-
             G.DrawImage(BMP, r);
 
             //            G.DrawImage(BMP, p1.X, p1.Y, p2.X - p1.X, p2.Y - p1.Y);
 
         }
 
-
         public void FillCircle(Color C, int X, int Y, int R) {
             var B = new SolidBrush(C);
             for (var adx = -R; adx <= R; adx++) {
                 for (var ady = -R; ady <= R; ady++) {
 
-                    var d = Math.Sqrt(Convert.ToDouble(adx * adx + ady * ady)) - 0.5;
+                    var d = Math.Sqrt(Convert.ToDouble((adx * adx) + (ady * ady))) - 0.5;
 
                     if (d <= R) { FillRectangle(B, new Rectangle(X + adx, Y + ady, 1, 1)); }
-
                 }
             }
         }

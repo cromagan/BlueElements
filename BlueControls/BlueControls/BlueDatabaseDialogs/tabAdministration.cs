@@ -41,7 +41,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Table _TableView;
         private Database _originalDB;
 
-
         public tabAdministration() : base() {
             InitializeComponent();
             Check_OrderButtons();
@@ -63,7 +62,6 @@ namespace BlueControls.BlueDatabaseDialogs {
                 _TableView = value;
                 Check_OrderButtons();
 
-
                 if (_TableView != null) {
                     ChangeDatabase(_TableView.Database);
                     _TableView.DatabaseChanged += _TableView_DatabaseChanged;
@@ -75,8 +73,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void _TableView_EnabledChanged(object sender, System.EventArgs e) {
             Check_OrderButtons();
         }
-
-
 
         private void _TableView_DatabaseChanged(object sender, System.EventArgs e) {
             ChangeDatabase(_TableView.Database);
@@ -93,7 +89,6 @@ namespace BlueControls.BlueDatabaseDialogs {
                     //    MessageBox.Show("Bitte reparieren sie<br>die fehlerhaften Regeln.", enImageCode.Information, "OK");
                     //    OpenDatabaseHeadEditor(_database);
                     //}
-
 
                     foreach (var ThisColumnItem in _database.Column) {
                         while (!ThisColumnItem.IsOk()) {
@@ -133,7 +128,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             ColumnItem column2 = null;
             var PosError = false;
 
-
             switch (column.Format) {
 
                 case enDataFormat.Columns_für_LinkedCellDropdown:
@@ -150,9 +144,6 @@ namespace BlueControls.BlueDatabaseDialogs {
                     break;
             }
 
-
-
-
             if (column2 != null) {
                 if (MessageBox.Show("Welche Spalte bearbeiten?", enImageCode.Frage, "Spalte in dieser Datenbank", "Verlinkte Spalte") == 1) { column = column2; }
             } else {
@@ -160,7 +151,6 @@ namespace BlueControls.BlueDatabaseDialogs {
                     Notification.Show("Keine aktive Verlinkung.<br>Spalte in dieser Datenbank wird angezeigt.<br><br>Ist die Ziel-Zelle in der Ziel-Datenbank vorhanden?", enImageCode.Information);
                 }
             }
-
 
             OpenColumnEditor(column, tableview);
         }
@@ -200,14 +190,12 @@ namespace BlueControls.BlueDatabaseDialogs {
             Enabled = true;
         }
 
-
         /// <summary>
         /// Löst das DatabaseLoadedEvengt aus, weil es fast einem Neuladen gleichkommt.
         /// </summary>
         /// <param name="DB"></param>
         public static void OpenDatabaseHeadEditor(Database DB) {
             DB.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
-
 
             if (!DB.IsLoading) { DB.Load_Reload(); } // Die Routine wird evtl. in der Laderoutine aufgerufen. z.B. bei Fehlerhaften Regeln
             using var w = new DatabaseHeadEditor(DB);
@@ -231,7 +219,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             w.ShowDialog();
         }
 
-
         private void btnDatenbankKopf_Click(object sender, System.EventArgs e) {
             OpenDatabaseHeadEditor(_TableView.Database);
         }
@@ -243,11 +230,9 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void btnVorherigeVersion_Click(object sender, System.EventArgs e) {
             btnVorherigeVersion.Enabled = false;
 
-
             if (_originalDB != null && _TableView.Database != _originalDB) {
                 _TableView.Database = _originalDB;
                 _originalDB.Disposing -= _originalDB_Disposing;
-
 
                 _originalDB = null;
                 btnVorherigeVersion.Text = "Vorherige Version";
@@ -258,7 +243,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             var _merker = _TableView.Database;
 
             var Zusatz = new List<string>();
-
 
             var L = new ItemCollectionList();
 
@@ -276,15 +260,12 @@ namespace BlueControls.BlueDatabaseDialogs {
                 }
             }
 
-
             foreach (var ThisString in Zusatz) {
 
                 if (L[ThisString] == null) {
                     L.Add(ThisString.FileNameWithSuffix(), ThisString, QuickImage.Get(enImageCode.Warnung), true, DataFormat.CompareKey(new FileInfo(ThisString).CreationTime.ToString(), enDataFormat.Datum_und_Uhrzeit));
                 }
-
             }
-
 
             if (L.Count == 0) {
                 MessageBox.Show("Kein Backup vorhanden.", enImageCode.Information, "OK");
@@ -313,7 +294,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             btnVorherigeVersion.Text = "zurück";
             btnVorherigeVersion.Enabled = true;
         }
-
 
         private void btnAdminMenu_Click(object sender, System.EventArgs e) {
             if (_TableView == null) { return; }

@@ -31,7 +31,6 @@ namespace BluePaint {
 
             flxProzent.ValueSet("100", true, false);
 
-
         }
 
         private void DoCapInfo() {
@@ -41,9 +40,6 @@ namespace BluePaint {
                 capInfo.Text = "Kein Bild gewählt.";
                 return;
             }
-
-
-
 
             if (!double.TryParse(flxProzent.Value, out var pr)) {
                 capInfo.Text = "Keine Prozentzahl angegeben.";
@@ -60,11 +56,7 @@ namespace BluePaint {
                 return;
             }
 
-
-
             capInfo.Text = "Zielgröße: " + (int)(p.Width * pr) + " x " + (int)(p.Height * pr) + " Pixel";
-
-
 
         }
 
@@ -90,8 +82,6 @@ namespace BluePaint {
 
         }
 
-
-
         public override string MacroKennung() {
             return "Resize";
         }
@@ -115,7 +105,5 @@ namespace BluePaint {
             base.PictureChangedByMainWindow();
             DoCapInfo();
         }
-
     }
-
 }

@@ -50,10 +50,8 @@ namespace BlueControls.Forms {
 
             Position_SetWindowIntoScreen(modAllgemein.PointOnScreenNr(new Point(Xpos, Ypos)), Xpos, Ypos);
 
-
             //Develop.DoEvents();
             Show();
-
 
             while (!string.IsNullOrEmpty(modAllgemein.LastMouseButton())) { Develop.DoEvents(); }
 
@@ -63,19 +61,14 @@ namespace BlueControls.Forms {
 
         }
 
-
-
         public event EventHandler<ContextMenuItemClickedEventArgs> ItemClicked;
         public event EventHandler Cancel;
 
-
         private bool _MouseWasDown = false;
-
 
         public static FloatingInputBoxListBoxStyle Show(ItemCollectionList Items, object Tag, System.Windows.Forms.Control ConnectedControl, bool Translate) {
             return new FloatingInputBoxListBoxStyle(Items, System.Windows.Forms.Cursor.Position.X - 8, System.Windows.Forms.Cursor.Position.Y - 8, -1, Tag, ConnectedControl, Translate);
         }
-
 
         public static FloatingInputBoxListBoxStyle Show(ItemCollectionList Items, int Xpos, int Ypos, int SteuerWi, object Tag, System.Windows.Forms.Control ConnectedControl, bool Translate) {
             return new FloatingInputBoxListBoxStyle(Items, Xpos, Ypos, SteuerWi, Tag, ConnectedControl, Translate);
@@ -90,7 +83,6 @@ namespace BlueControls.Forms {
             (var BiggestItemX, var _, var HeightAdded, var _) = itemsClone.ItemData();
 
             if (AddNewAllowed != enAddType.None) { HeightAdded += 24; }
-
 
             lstbx.Appearance = (enBlueListBoxAppearance)itemsClone.ControlDesign;
             lstbx.Translate = Translate;
@@ -114,8 +106,6 @@ namespace BlueControls.Forms {
             var MaxWi = (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7);
             var MaxHe = (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height * 0.7);
 
-
-
             if (BiggestItemX > MaxWi) { BiggestItemX = MaxWi; }
 
             if (HeightAdded > MaxHe) {
@@ -123,10 +113,7 @@ namespace BlueControls.Forms {
                 BiggestItemX += 20;
             }
 
-
-            Size = new Size(BiggestItemX + lstbx.Left * 2, HeightAdded + lstbx.Top * 2);
-
-
+            Size = new Size(BiggestItemX + (lstbx.Left * 2), HeightAdded + (lstbx.Top * 2));
 
             lstbx.Item.CheckBehavior = itemsClone.CheckBehavior;
             lstbx.Item.AddRange(itemsClone);
@@ -138,12 +125,10 @@ namespace BlueControls.Forms {
             // Nur Listboxen können überhaupt erst Checked werden!
             // Ob sie Checked wird, ist egal!
 
-
             if (e.Item != null) {
 
                 // Einen Klick auf Überschriften einfach ignorieren, zB. kontextmenü
                 if (!e.Item.IsClickable()) { return; }
-
 
                 if (lstbx.Appearance != enBlueListBoxAppearance.Listbox && lstbx.Appearance != enBlueListBoxAppearance.Gallery && lstbx.Appearance != enBlueListBoxAppearance.FileSystem) {
                     OnItemClicked(new ContextMenuItemClickedEventArgs(e.Item.Internal, Tag, null)); // Das Tag hier ist eigentlich das HotItem
@@ -157,9 +142,7 @@ namespace BlueControls.Forms {
             ItemClicked?.Invoke(this, e);
         }
 
-
         #endregion
-
 
         private void OnCancel() {
             Cancel?.Invoke(this, System.EventArgs.Empty);
@@ -183,7 +166,6 @@ namespace BlueControls.Forms {
             }
 
             if (MouseIsDown) { _MouseWasDown = true; }
-
         }
 
         public override void Refresh() {
@@ -191,7 +173,6 @@ namespace BlueControls.Forms {
             base.Refresh();
             OnPaint(null);
         }
-
 
         public static void ContextMenuShow(IContextMenu Control, System.Windows.Forms.MouseEventArgs e) {
 
@@ -208,7 +189,6 @@ namespace BlueControls.Forms {
 
             if (Cancel) { return; }
 
-
             var ec = new ContextMenuInitEventArgs(HotItem, tags, UserMenu);
             Control.OnContextMenuInit(ec);
 
@@ -219,13 +199,9 @@ namespace BlueControls.Forms {
             if (ThisContextMenu.Count > 0 && UserMenu.Count > 0) { ThisContextMenu.AddSeparator(); }
             if (UserMenu.Count > 0) { ThisContextMenu.AddRange(UserMenu); }
 
-
             var par = Control.ParentControlWithCommands();
 
-
-
             if (ThisContextMenu.Count > 0) {
-
 
                 if (par != null) {
                     ThisContextMenu.AddSeparator();
@@ -249,7 +225,6 @@ namespace BlueControls.Forms {
                 if (par != null) {
                     ContextMenuShow(par, e);
                 }
-
             }
         }
 
@@ -274,14 +249,10 @@ namespace BlueControls.Forms {
 
             }
 
-
             if (e.ClickedComand.ToLower() == "abbruch") { return; }
 
-
-
             var ex = new ContextMenuItemClickedEventArgs(e.ClickedComand, HotItem, Tags);
-            var done = false;
-
+            bool done;
             if (UserMmenu[e.ClickedComand] == null) {
                 done = ob.ContextMenuItemClickedInternalProcessig(sender, ex);
             } else {
@@ -292,7 +263,6 @@ namespace BlueControls.Forms {
             if (!done) {
                 Develop.DebugPrint("Kontextmenu-Befehl nicht ausgeführt: " + e.ClickedComand);
             }
-
         }
     }
 }

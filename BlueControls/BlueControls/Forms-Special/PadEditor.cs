@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
@@ -27,14 +26,10 @@ using System.Drawing;
 using System.IO;
 using static BlueBasics.FileOperations;
 
-
-
 namespace BlueControls.Forms {
     public partial class PadEditor : Form {
 
         private readonly string _Title = string.Empty;
-
-
 
         public PadEditor() : base() {
 
@@ -46,10 +41,6 @@ namespace BlueControls.Forms {
             InitWindow(false, "", -1, "");
         }
 
-
-
-
-
         private void InitWindow(bool FitWindowToBest, string WindowCaption, int OpenOnScreen, string DesignName) {
 
             if (FitWindowToBest) {
@@ -58,8 +49,8 @@ namespace BlueControls.Forms {
 
                     Width = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Width / 1.5);
                     Height = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Height / 1.5);
-                    Left = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Left + (System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Width - Width) / 2.0);
-                    Top = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Top + (System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Height - Height) / 2.0);
+                    Left = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Left + ((System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Width - Width) / 2.0));
+                    Top = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Top + ((System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Height - Height) / 2.0));
 
                 } else {
                     Width = System.Windows.Forms.Screen.AllScreens[OpenOnScreen].WorkingArea.Width;
@@ -69,22 +60,14 @@ namespace BlueControls.Forms {
                 }
             }
 
-
             if (!string.IsNullOrEmpty(WindowCaption)) {
                 Text = WindowCaption;
             }
 
-
-
-
             PadDesign.Item.Clear();
             PadDesign.Item.AddRange(Skin.AllStyles());
 
-            if (string.IsNullOrEmpty(DesignName)) {
-                PadDesign.Text = PadDesign.Item[0].Internal;
-            } else {
-                PadDesign.Text = DesignName;
-            }
+            PadDesign.Text = string.IsNullOrEmpty(DesignName) ? PadDesign.Item[0].Internal : DesignName;
 
             Pad.Item.SheetStyle = Skin.StyleDB.Row[PadDesign.Text];
 
@@ -109,28 +92,19 @@ namespace BlueControls.Forms {
             if (Develop.IsHostRunning()) { TopMost = false; }
         }
 
-
-
-
         private void btnZoomFit_Click(object sender, System.EventArgs e) {
             Pad.ZoomFit();
         }
-
-
 
         private void Pad_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
             if (btnZoomIn.Checked) { Pad.ZoomIn(e); }
             if (btnZoomOut.Checked) { Pad.ZoomOut(e); }
         }
 
-
-
-
         private void btnAddLine_Click(object sender, System.EventArgs e) {
 
             var P = Pad.MiddleOfVisiblesScreen();
             var w = (int)(300 / Pad.ZoomCurrent());
-
 
             var b = new LinePadItem(Pad.Item, PadStyles.Style_Standard, new Point(P.X - w, P.Y), new Point(P.X + w, P.Y));
             Pad.Item.Add(b);
@@ -147,7 +121,6 @@ namespace BlueControls.Forms {
             Pad.Item.Add(b);
         }
 
-
         private void AddText_Click(object sender, System.EventArgs e) {
             var b = new TextPadItem(Pad.Item) {
                 Interner_Text = string.Empty,
@@ -157,22 +130,18 @@ namespace BlueControls.Forms {
             b.SetCoordinates(new RectangleM(10, 10, 200, 200), true);
         }
 
-
         private void btnAddDimension_Click(object sender, System.EventArgs e) {
             var b = new DimensionPadItem(Pad.Item, new PointF(300, 300), new PointF(400, 300), 30);
             Pad.Item.Add(b);
         }
 
-
         private void Bild_Click(object sender, System.EventArgs e) {
-            Pad.OpenSaveDialog(_Title, string.Empty);
+            Pad.OpenSaveDialog(_Title);
         }
-
 
         private void ButtonPageSetup_Click(object sender, System.EventArgs e) {
             Pad.ShowPrinterPageSetup();
         }
-
 
         private void Drucken_Click(object sender, System.EventArgs e) {
             Pad.Print();
@@ -186,15 +155,9 @@ namespace BlueControls.Forms {
             Pad.Item.SheetStyle = Skin.StyleDB.Row[e.Item.Internal];
         }
 
-
         private void ckbRaster_CheckedChanged(object sender, System.EventArgs e) {
 
-            if (ckbRaster.Checked) {
-                Pad.Item.SnapMode = enSnapMode.SnapToGrid;
-            } else {
-                Pad.Item.SnapMode = enSnapMode.Ohne;
-            }
-
+            Pad.Item.SnapMode = ckbRaster.Checked ? enSnapMode.SnapToGrid : enSnapMode.Ohne;
         }
 
         private void txbRasterAnzeige_TextChanged(object sender, System.EventArgs e) {
@@ -209,9 +172,6 @@ namespace BlueControls.Forms {
 
             Pad.Item.GridSnap = float.Parse(txbRasterFangen.Text);
         }
-
-
-
 
         private void SchriftGröße_ItemClicked(object sender, BasicListItemEventArgs e) {
             Pad.Item.SheetStyleScale = decimal.Parse(SchriftGröße.Text) / 100m;
@@ -257,7 +217,6 @@ namespace BlueControls.Forms {
             btnVorschauModus.Checked = Pad.ShowInPrintMode;
         }
 
-
         #region Load / Save
         private void LoadTab_FileOk(object sender, System.ComponentModel.CancelEventArgs e) {
             LoadFile(LoadTab.FileName);
@@ -298,7 +257,6 @@ namespace BlueControls.Forms {
             btnLastFiles.AddFileName(fileName, string.Empty);
         }
 
-
         #endregion
 
         private void btnHintergrundFarbe_Click(object sender, System.EventArgs e) {
@@ -307,7 +265,6 @@ namespace BlueControls.Forms {
             ColorDia.ShowDialog();
             Pad.Item.BackColor = ColorDia.Color;
             Pad.Invalidate();
-
 
         }
     }

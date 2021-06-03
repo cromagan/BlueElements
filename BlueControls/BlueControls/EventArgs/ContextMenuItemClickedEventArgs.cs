@@ -17,12 +17,10 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 using System.Collections.Generic;
 
 namespace BlueControls.EventArgs {
     public class ContextMenuItemClickedEventArgs : System.EventArgs {
-
 
         public ContextMenuItemClickedEventArgs(string clickedComand, object hotItem, List<string> tags) {
             HotItem = hotItem;
@@ -30,12 +28,8 @@ namespace BlueControls.EventArgs {
             ClickedComand = clickedComand;
         }
 
-
-
         public string ClickedComand { get; }
         public object HotItem { get; }
         public List<string> Tags { get; }
-
-
     }
 }

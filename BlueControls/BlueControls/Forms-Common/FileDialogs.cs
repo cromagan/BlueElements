@@ -6,7 +6,6 @@ using static BlueBasics.FileOperations;
 namespace BlueControls.Forms {
     public static class FileDialogs {
 
-
         //#region FileDialogs
 
         //public static void DeleteDir(string Pfad, bool Meldungen = true)
@@ -16,7 +15,6 @@ namespace BlueControls.Forms {
         //    Pfad = Pfad.CheckPath();
 
         //    if (!PathExists(Pfad)) { return; }
-
 
         //    if (Meldungen)
         //    {
@@ -52,7 +50,6 @@ namespace BlueControls.Forms {
         //    }
         //}
 
-
         /// <summary>
         /// 
         /// </summary>
@@ -70,14 +67,10 @@ namespace BlueControls.Forms {
 
             if (Filelist.Count == 0) { return false; }
 
-
             if (Meldungen) {
-                if (Filelist.Count == 1) {
-                    ButtonNumber = MessageBox.Show("Soll die Datei<br>\"" + Filelist[0] + "\"<br>wirklich <b>gelöscht</b> werden?\"", enImageCode.Warnung, "Ja - löschen", "Nein - abbrechen");
-                } else {
-                    ButtonNumber = MessageBox.Show("Sollen wirklich " + Filelist.Count + " Dateien<br><b>gelöscht</b> werden?\"", enImageCode.Warnung, "Ja - löschen", "Nein - abbrechen");
-                }
-
+                ButtonNumber = Filelist.Count == 1
+                    ? MessageBox.Show("Soll die Datei<br>\"" + Filelist[0] + "\"<br>wirklich <b>gelöscht</b> werden?\"", enImageCode.Warnung, "Ja - löschen", "Nein - abbrechen")
+                    : MessageBox.Show("Sollen wirklich " + Filelist.Count + " Dateien<br><b>gelöscht</b> werden?\"", enImageCode.Warnung, "Ja - löschen", "Nein - abbrechen");
             }
 
             if (ButtonNumber == 0) {
@@ -104,13 +97,11 @@ namespace BlueControls.Forms {
 
         //    if (OldN == NewN) { return string.Empty; }
 
-
         //    DateTime StartTime = DateTime.Now;
         //    do
         //    {
         //        if (!FileExists(OldN)) { return "Quelldatei existiert nicht: " + OldN; }
         //        if (FileExists(NewN)) { return "Zieldatei existiert bereits: " + NewN; }
-
 
         //        try
         //        {
@@ -126,7 +117,6 @@ namespace BlueControls.Forms {
         //            }
         //        }
 
-
         //    } while (true);
         //}
         //public static string CopyFile(string OldN, string NewN)
@@ -138,7 +128,6 @@ namespace BlueControls.Forms {
         //    {
         //        if (!FileExists(OldN)) { return "Quelldatei existiert nicht: " + OldN; }
         //        if (FileExists(NewN)) { return "Zieldatei existiert bereits: " + NewN; }
-
 
         //        try
         //        {
@@ -153,7 +142,6 @@ namespace BlueControls.Forms {
         //                return "Datei konnte nicht kopiert werden: " + OldN + "<br>" + ex.Message;
         //            }
         //        }
-
 
         //    } while (true);
         //}

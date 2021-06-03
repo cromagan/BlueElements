@@ -17,18 +17,16 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
-using BlueBasics;
 using static BlueBasics.Constants;
 using static BlueBasics.modConverter;
 
 namespace BlueScript {
     internal class Method_AddDays : Method {
 
-
         public override string Syntax => "AddDays(DateTimeString, Days)";
-
 
         public override string Description => "Fügt dem Datum die angegeben Anzahl Tage hinzu. Dabei können auch Gleitkommazahlen benutzt werden, so werden z.B. bei 0.25 nur 6 Stunden hinzugefügt. Der Rückgabwert erfolgt immer im Format " + Format_Date7;
         public override List<string> Comand(Script s) { return new() { "adddays" }; }

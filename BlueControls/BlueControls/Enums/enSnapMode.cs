@@ -17,17 +17,13 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 namespace BlueControls.Enums {
 
     public enum enSnapMode {
 
-
-        Ohne =0,
-        SnapToGrid =1,
+        Ohne = 0,
+        SnapToGrid = 1,
         //SnapToObjetcs =2
-
-
 
     }
 }

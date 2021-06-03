@@ -32,8 +32,6 @@ namespace BlueControls.Controls {
 
         #region Constructor
 
-
-
         //public TabPage() : base()
         //{
 
@@ -54,21 +52,12 @@ namespace BlueControls.Controls {
 
         //    //SetBackColor();
 
-
         //}
 
         #endregion
 
-
-
-
-
-
-
         //#region  AutoScale deaktivieren 
         //// https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
-
-
 
         //public void PerformAutoScale()
         //{
@@ -80,13 +69,10 @@ namespace BlueControls.Controls {
         //    // NIX TUN!!!!
         //}
 
-
-
         //protected override void ScaleControl(SizeF factor, System.Windows.Forms.BoundsSpecified specified)
         //{
         //    factor = new SizeF(1, 1);
         //    base.ScaleControl(factor, specified);
-
 
         //}
 
@@ -117,7 +103,6 @@ namespace BlueControls.Controls {
         //}
         //#endregion
 
-
         protected override void OnParentChanged(System.EventArgs e) {
             base.OnParentChanged(e);
             SetBackColor();
@@ -125,16 +110,11 @@ namespace BlueControls.Controls {
 
         public void SetBackColor() {
 
-            if (Parent is RibbonBar) {
-                BackColor = Skin.Color_Back(enDesign.RibbonBar_Body, enStates.Standard);
-            } else if (Parent is TabControl) {
-                BackColor = Skin.Color_Back(enDesign.TabStrip_Body, enStates.Standard);
-            } else {
-                BackColor = Color.Red;
-            }
+            BackColor = Parent is RibbonBar
+                ? Skin.Color_Back(enDesign.RibbonBar_Body, enStates.Standard)
+                : Parent is TabControl ? Skin.Color_Back(enDesign.TabStrip_Body, enStates.Standard) : Color.Red;
             Invalidate();
         }
-
 
         //protected override void OnPaintBackground(System.Windows.Forms.PaintEventArgs pevent)
         //{
@@ -172,9 +152,7 @@ namespace BlueControls.Controls {
         //    //GR.DrawImage(_BitmapOfControl, 0, 0);
         //    //TMPGR.Dispose();
 
-
         //}
-
 
         //protected override void OnEnabledChanged(System.EventArgs e)
         //{
@@ -185,17 +163,10 @@ namespace BlueControls.Controls {
         //        return;
         //    }
 
-
         //    base.OnEnabledChanged(e);
         //    Invalidate();
         //    Parent?.Invalidate();
         //}
-
-
-
-
-
-
 
         ///// <summary>
         ///// Veranlaßt, das das Control neu gezeichnet wird.
@@ -206,7 +177,6 @@ namespace BlueControls.Controls {
         //    if (IsDisposed) { return; }
         //    DoDraw(CreateGraphics());
         //}
-
 
         //protected override void WndProc(ref System.Windows.Forms.Message m)
         //{
@@ -232,7 +202,6 @@ namespace BlueControls.Controls {
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public int BeginnEditCounter { get; set; } = 0;
 
-
         public new void SuspendLayout() {
             BeginnEdit();
             base.SuspendLayout();
@@ -246,7 +215,6 @@ namespace BlueControls.Controls {
             base.ResumeLayout();
             EndEdit();
         }
-
 
         public void BeginnEdit() {
             BeginnEdit(1);

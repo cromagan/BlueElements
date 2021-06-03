@@ -23,7 +23,6 @@ using System.Drawing;
 
 namespace BluePaint {
 
-
     public abstract partial class GenericTool : GroupBox // System.Windows.Forms.UserControl //
     {
 
@@ -45,9 +44,7 @@ namespace BluePaint {
         public event System.EventHandler<BitmapEventArgs> NeedCurrentPic;
         public event System.EventHandler<CommandForMacroArgs> CommandForMacro;
 
-
         public virtual void ToolFirstShown() { }
-
 
         /// <summary>
         /// 
@@ -69,7 +66,6 @@ namespace BluePaint {
         /// 
         /// </summary>
         public virtual void OnToolChanging() { }
-
 
         /// <summary>
         /// 
@@ -93,7 +89,6 @@ namespace BluePaint {
         public virtual void PictureChangedByMainWindow() {
 
         }
-
 
         protected virtual void OnHideMainWindow() {
             HideMainWindow?.Invoke(this, System.EventArgs.Empty);
@@ -138,5 +133,4 @@ namespace BluePaint {
             CommandForMacro?.Invoke(this, new CommandForMacroArgs(command));
         }
     }
-
 }

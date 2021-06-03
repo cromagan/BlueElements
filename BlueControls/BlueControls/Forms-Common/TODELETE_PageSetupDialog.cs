@@ -35,7 +35,6 @@ namespace BlueControls.Forms {
 
         private bool cancelx = true;
 
-
         public PageSetupDialog(PrintDocument _PrintDocument1, bool NurHochformat) {
 
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -70,7 +69,6 @@ namespace BlueControls.Forms {
 
             Querformat.Checked = !Hochformat.Checked;
 
-
             FillHöheBreite(_PrintDocument1.DefaultPageSettings.PaperSize.Width, _PrintDocument1.DefaultPageSettings.PaperSize.Height);
 
             //   CheckHochQuer()
@@ -86,15 +84,11 @@ namespace BlueControls.Forms {
             Links.Text = Inch1000ToMM(_PrintDocument1.DefaultPageSettings.Margins.Left).ToString();
             Rechts.Text = Inch1000ToMM(_PrintDocument1.DefaultPageSettings.Margins.Right).ToString();
 
-
-
-
             DrawSampleAndCheckButton();
             // PrepareForShowing(Controls)
 
             Doing = false;
         }
-
 
         private void Ok_Click(object sender, System.EventArgs e) {
             cancelx = false;
@@ -111,7 +105,6 @@ namespace BlueControls.Forms {
             //generatePic()
         }
 
-
         public bool Canceled() {
             return cancelx;
         }
@@ -122,7 +115,6 @@ namespace BlueControls.Forms {
             base.ShowDialog();
 
             if (cancelx) { return; }
-
 
             OriD.DefaultPageSettings.Landscape = Querformat.Checked;
             OriD.DefaultPageSettings.PaperSize = new PaperSize("Benutzerdefiniert", (int)(float.Parse(Breite.Text) / 0.254), (int)(float.Parse(Höhe.Text) / 0.254));
@@ -142,7 +134,6 @@ namespace BlueControls.Forms {
             if (Doing) { return; }
             Doing = true;
 
-
             if (Format.Text.Contains(";")) {
                 var l = Format.Text.SplitBy(";");
                 FillHöheBreite(int.Parse(l[0]), int.Parse(l[1]));
@@ -151,51 +142,31 @@ namespace BlueControls.Forms {
                 FillHöheBreite(-1, -1);
             }
 
-
             DrawSampleAndCheckButton();
-
 
             Doing = false;
         }
 
-
         private double Inch1000ToMM(double Inch) {
-            switch (Inch) {
-                case 8:
-                    return 2.0F;
-                case 16:
-                    return 4.0F;
-                case 20:
-                    return 5.0F;
-                case 39:
-                    return 10.0F;
-                case 79:
-                    return 20.0F;
-                case 98:
-                    return 25.0F;
-                case 394:
-                    return 100.0F;
-                case 413:
-                    return 105.0F;
-                case 432:
-                    return 110.0F;
-                case 583:
-                    return 148.0F;
-                case 591:
-                    return 150.0F;
-                case 787:
-                    return 200.0F;
-                case 827:
-                    return 210.0F;
-                case 1169:
-                    return 297.0F;
-                case 1654:
-                    return 420.0F;
-                default:
-                    return Math.Round(Inch * 0.254, 1);
-            }
+            return Inch switch {
+                8 => 2.0F,
+                16 => 4.0F,
+                20 => 5.0F,
+                39 => 10.0F,
+                79 => 20.0F,
+                98 => 25.0F,
+                394 => 100.0F,
+                413 => 105.0F,
+                432 => 110.0F,
+                583 => 148.0F,
+                591 => 150.0F,
+                787 => 200.0F,
+                827 => 210.0F,
+                1169 => 297.0F,
+                1654 => 420.0F,
+                _ => Math.Round(Inch * 0.254, 1),
+            };
         }
-
 
         private void FillHöheBreite(double B, double h) {
             var nn1 = B + ";" + h;
@@ -209,21 +180,10 @@ namespace BlueControls.Forms {
                 Format.Text = "neu";
                 Breite.Enabled = true;
                 Höhe.Enabled = true;
-                if (B < 0 && !string.IsNullOrEmpty(Breite.Text)) {
-                    B = double.Parse(Breite.Text);
-                } else {
-                    B = Inch1000ToMM(B);
-                }
+                B = B < 0 && !string.IsNullOrEmpty(Breite.Text) ? double.Parse(Breite.Text) : Inch1000ToMM(B);
 
-                if (h < 0 && !string.IsNullOrEmpty(Höhe.Text)) {
-                    h = double.Parse(Höhe.Text);
-                } else {
-                    h = Inch1000ToMM(h);
-                }
-
-
+                h = h < 0 && !string.IsNullOrEmpty(Höhe.Text) ? double.Parse(Höhe.Text) : Inch1000ToMM(h);
             }
-
 
             if (Format.Text != "neu") {
 
@@ -232,7 +192,6 @@ namespace BlueControls.Forms {
 
                 Breite.Enabled = false;
                 Höhe.Enabled = false;
-
 
                 switch (Format.Text) {
                     case "827;1169":
@@ -256,14 +215,11 @@ namespace BlueControls.Forms {
                         B = 105;
                         break;
                 }
-
             }
-
 
             Breite.Text = Math.Round(B, 1).ToString();
             Höhe.Text = Math.Round(h, 1).ToString();
         }
-
 
         private void Abmasse_TextChanged(object sender, System.EventArgs e) {
             if (Doing) { return; }
@@ -283,11 +239,9 @@ namespace BlueControls.Forms {
             Doing = false;
         }
 
-
         private void DrawSampleAndCheckButton() {
 
             var makeP = true;
-
 
             if (!Breite.Text.IsFormat(enDataFormat.Gleitkommazahl)) { makeP = false; }
             if (!Höhe.Text.IsFormat(enDataFormat.Gleitkommazahl)) { makeP = false; }
@@ -308,33 +262,26 @@ namespace BlueControls.Forms {
 
             if (Querformat.Checked) { modAllgemein.Swap(ref br, ref ho); }
 
-
             if (makeP) {
                 Ok.Enabled = true;
 
-
                 var Z = Math.Min(Sample.Width / br, Sample.Height / ho);
-
 
                 var l = (float)(float.Parse(Links.Text) * Z);
                 var o = (float)(float.Parse(Oben.Text) * Z);
                 var r = (float)(float.Parse(Rechts.Text) * Z);
                 var u = (float)(float.Parse(Unten.Text) * Z);
 
-
-                var i = new Bitmap((int)(br * Z - 1), (int)(ho * Z - 1));
+                var i = new Bitmap((int)((br * Z) - 1), (int)((ho * Z) - 1));
 
                 var gr = Graphics.FromImage(i);
 
                 gr.Clear(Color.White);
                 gr.DrawRectangle(Pens.Black, 0, 0, i.Width - 1, i.Height - 1);
 
-
                 gr.DrawRectangle(Pens.Gray, l, o, i.Width - r - l, i.Height - u - o);
 
-
                 Sample.Image = i;
-
 
             } else {
                 Ok.Enabled = false;
@@ -342,6 +289,5 @@ namespace BlueControls.Forms {
 
             }
         }
-
     }
 }

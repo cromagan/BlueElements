@@ -44,7 +44,6 @@ namespace BlueBasics {
 
                 if (a >= e) { return null; }
 
-
                 // if (a > 2 && Formel.IndexOf(",", a) > a && Formel.IndexOf(",", a) < e)
                 // {
 

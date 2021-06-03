@@ -30,14 +30,11 @@ using BlueDatabase.EventArgs;
 using System;
 using static BlueBasics.FileOperations;
 
-
 namespace BlueControls.BlueDatabaseDialogs {
 
     public sealed partial class AdminMenu : BlueControls.Forms.Form {
 
-
         private readonly Table _TableView;
-
 
         public AdminMenu(Table table) {
 
@@ -46,9 +43,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
-
             _TableView = table;
-
 
             if (_TableView != null) {
                 _TableView.DatabaseChanged += _TableView_DatabaseChanged;
@@ -59,9 +54,6 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             UpdateViewControls();
             Check_OrderButtons();
-
-
-
 
         }
 
@@ -86,7 +78,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             Check_OrderButtons();
         }
 
-
         private void _TableView_EnabledChanged(object sender, System.EventArgs e) {
             UpdateViewControls();
             Check_OrderButtons();
@@ -101,7 +92,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void btnNeueSpalteErstellen_Click(object sender, System.EventArgs e) {
-
 
             if (_TableView.Database.ReadOnly) { return; }
 
@@ -127,7 +117,6 @@ namespace BlueControls.BlueDatabaseDialogs {
                 }
             }
 
-
             ColumnItem newc;
 
             if (Vorlage != null) {
@@ -138,18 +127,14 @@ namespace BlueControls.BlueDatabaseDialogs {
                         thisR.CellSet(newc, thisR.CellGetString(Vorlage));
                     }
                 }
-
-
             } else {
                 newc = _TableView.Database.Column.Add();
             }
-
 
             using (var w = new ColumnEditor(newc, _TableView)) {
                 w.ShowDialog();
                 newc.Invalidate_ColumAndContent();
             }
-
 
             _TableView.Database.Column.Repair();
 
@@ -160,8 +145,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void OrderAdd_Click(object sender, System.EventArgs e) {
-            string newname = null;
-
             var MitVorlage = false;
 
             if (_TableView.Arrangement > 0 && _TableView.CurrentArrangement != null) {
@@ -172,6 +155,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 _TableView.Database.ColumnArrangements.Add(new ColumnViewCollection(_TableView.Database, "", ""));
             }
 
+            string newname;
             if (MitVorlage) {
                 newname = InputBox.Show("Die aktuelle Ansicht wird <b>kopiert</b>.<br><br>Geben sie den Namen<br>der neuen Anordnung ein:", "", enDataFormat.Text);
                 if (string.IsNullOrEmpty(newname)) { return; }
@@ -207,9 +191,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             foreach (var ThisColumnItem in _TableView.Database.Column) {
                 if (ThisColumnItem != null && _TableView.CurrentArrangement[ThisColumnItem] == null) { ic.Add(ThisColumnItem, false); }
-
             }
-
 
             if (ic.Count == 0) {
                 if (MessageBox.Show("Es werden bereits alle<br>Spalten angezeigt.<br><br>Wollen sie eine neue Spalte erstellen?", enImageCode.Frage, "Ja", "Nein") == 0) { btnNeueSpalteErstellen_Click(sender, e); }
@@ -240,7 +222,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             aa.Sort();
             aa.CheckBehavior = enCheckBehavior.MultiSelection;
             aa.Check(_TableView.CurrentArrangement.PermissionGroups_Show, true);
-
 
             var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, enAddType.Text, true);
             if (b == null) { return; }
@@ -278,11 +259,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             if (ViewItem == null) { return; }
 
-            if (btnPermanent.Checked) {
-                ViewItem.ViewType = enViewType.PermanentColumn;
-            } else {
-                ViewItem.ViewType = enViewType.Column;
-            }
+            ViewItem.ViewType = btnPermanent.Checked ? enViewType.PermanentColumn : enViewType.Column;
             Check_OrderButtons();
         }
 
@@ -294,9 +271,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             if (c == null) { return; }
 
-
             var p = InputBox.Show("<b>" + _TableView.CursorPosColumn().ReadableText() + "</b><br>Auf welche Position verschieben?<br>Info: Nummerierung beginnt mit 1", "", enDataFormat.Ganzzahl);
-
 
             if (int.TryParse(p, out var index)) {
                 if (index < 1) { return; }
@@ -349,7 +324,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             var P = _TableView.Database.Filename.FilePath();
 
             if (PathExists(P)) { ExecuteFile(P); }
-
         }
 
         private void Check_OrderButtons() {
@@ -373,14 +347,12 @@ namespace BlueControls.BlueDatabaseDialogs {
                 enAktuelleSpalte = false;
             }
 
-
             ColumnViewItem ViewItem = null;
             var column = _TableView.CursorPosColumn();
 
             if (column != null) { ViewItem = _TableView.CurrentArrangement[column]; }
             var IndexOfViewItem = -1;
             if (_TableView.Arrangement <= _TableView.Database.ColumnArrangements.Count) { IndexOfViewItem = _TableView.CurrentArrangement.IndexOf(ViewItem); }
-
 
             var enLayoutEditable = Convert.ToBoolean(_TableView.Arrangement > 0); // Hauptansicht (0) kann nicht bearbeitet werden
             var enLayoutDeletable = Convert.ToBoolean(_TableView.Arrangement > 1); // Hauptansicht (0) und Allgemeine Ansicht (1) können nicht gelöscht werden
@@ -394,7 +366,6 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             btnSpalteDauerhaftloeschen.Enabled = Convert.ToBoolean(column != null && string.IsNullOrEmpty(column.Identifier));
 
-
             if (column == null || ViewItem == null) {
                 enAktuelleSpalte = false;
                 //grpAktuelleSpalte.Text = "Spalte: -";
@@ -402,8 +373,6 @@ namespace BlueControls.BlueDatabaseDialogs {
                 // grpAktuelleSpalte.Text = "Spalte: " + column.ReadableText();
                 btnSpalteNachLinks.Enabled = Convert.ToBoolean(IndexOfViewItem > 0);
                 btnSpalteNachRechts.Enabled = Convert.ToBoolean(IndexOfViewItem >= 0) && Convert.ToBoolean(IndexOfViewItem < _TableView.CurrentArrangement.Count - 1);
-
-
 
                 btnPosEingeben.Enabled = _TableView.Arrangement > 0;
 
@@ -417,9 +386,6 @@ namespace BlueControls.BlueDatabaseDialogs {
                     btnPermanent.Enabled = false;
                     btnPermanent.Checked = false;
                 }
-
-
-
             }
 
             grpAnsichtsVerwaltung.Enabled = enAnsichtsVerwaltung;
@@ -427,7 +393,5 @@ namespace BlueControls.BlueDatabaseDialogs {
             grpAktuelleSpalte.Enabled = enAktuelleSpalte;
             Enabled = true;
         }
-
-
     }
 }

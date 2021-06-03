@@ -23,7 +23,6 @@ using System.Collections.Generic;
 namespace BlueScript {
     internal class Method_Break : Method {
 
-
         //public Method_var(Script parent) : base(parent) { }
 
         public override string Syntax => "End;";
@@ -37,7 +36,6 @@ namespace BlueScript {
 
         public override List<enVariableDataType> Args => new() { };
         public override bool EndlessArgs => false;
-
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
 

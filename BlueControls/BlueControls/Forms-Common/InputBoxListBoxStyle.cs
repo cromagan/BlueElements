@@ -29,7 +29,6 @@ namespace BlueControls.Forms {
 
         #region Konstruktor
 
-
         private InputBoxListBoxStyle() : base() {
             InitializeComponent();
         }
@@ -38,8 +37,6 @@ namespace BlueControls.Forms {
             if (ItemsOriginal.Appearance != enBlueListBoxAppearance.Listbox) {
                 Develop.DebugPrint("Design nicht Listbox");
             }
-
-
 
             var itemsClone = (ItemCollectionList)ItemsOriginal.Clone();
             txbText.Item.CheckBehavior = itemsClone.CheckBehavior;
@@ -53,7 +50,6 @@ namespace BlueControls.Forms {
 
             Setup(TXT, txbText, 250, CancelErl, true);
 
-
         }
 
         #endregion
@@ -64,7 +60,6 @@ namespace BlueControls.Forms {
                 return InputBox.Show(TXT, "", enDataFormat.Text);
             }
 
-
             var x = new ItemCollectionList(enBlueListBoxAppearance.Listbox) {
                 CheckBehavior = enCheckBehavior.AlwaysSingleSelection
             };
@@ -73,11 +68,8 @@ namespace BlueControls.Forms {
 
             var erg = Show(TXT, x, enAddType.None, true);
 
-
-            if (erg is null || erg.Count != 1) { return string.Empty; }
-            return erg[0];
+            return erg is null || erg.Count != 1 ? string.Empty : erg[0];
         }
-
 
         public static List<string> Show(string TXT, ItemCollectionList ItemsOriginal, enAddType AddNewAllowed, bool CancelErl) {
             var MB = new InputBoxListBoxStyle(TXT, ItemsOriginal, AddNewAllowed, CancelErl);
@@ -86,20 +78,12 @@ namespace BlueControls.Forms {
             return MB.GiveBack;
         }
 
-
-
-
-
         private void InputBox_Shown(object sender, System.EventArgs e) {
             txbText.Focus();
         }
 
         protected override void SetValue(bool canceled) {
-            if (canceled) {
-                GiveBack = null;
-            } else {
-                GiveBack = txbText.Item.Checked().ToListOfString();
-            }
+            GiveBack = canceled ? null : txbText.Item.Checked().ToListOfString();
         }
     }
 }

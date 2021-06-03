@@ -26,9 +26,7 @@ using static BlueBasics.Extensions;
 namespace BlueScript {
     internal class Method_Contains : Method {
 
-
         //public Method_Contains(Script parent) : base(parent) { }
-
 
         public override string Syntax => "Contains(ListVariable/StringVariable, CaseSensitive, Value1, Value2, ...)";
 
@@ -46,7 +44,6 @@ namespace BlueScript {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
-
             if (attvar.Attributes[0].Type == Skript.Enums.enVariableDataType.List) {
                 var x = attvar.Attributes[0].ValueListString;
 
@@ -62,10 +59,8 @@ namespace BlueScript {
 
             if (attvar.Attributes[0].Type == Skript.Enums.enVariableDataType.String) {
 
-
                 for (var z = 2; z < attvar.Attributes.Count; z++) {
                     if (attvar.Attributes[z].Type != Skript.Enums.enVariableDataType.String) { return strDoItFeedback.FalscherDatentyp(); }
-
 
                     if (attvar.Attributes[1].ValueBool) {
                         if (attvar.Attributes[0].ValueString.Contains(attvar.Attributes[z].ValueString)) {

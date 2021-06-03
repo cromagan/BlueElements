@@ -17,21 +17,18 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 using BlueBasics;
 using BlueBasics.Enums;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 
-
 namespace BlueDatabase {
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public abstract class DataHolder: System.IDisposable {
+    public abstract class DataHolder : System.IDisposable {
 
         public Database InternalDatabase { get; set; }
-
 
         public readonly DataHolder Parent = null;
         public readonly string Typ = string.Empty;
@@ -45,8 +42,6 @@ namespace BlueDatabase {
 
         //private List<(ColumnItem, ListExt<object>)> syncs = new List<(ColumnItem, ListExt<object>)>();
 
-
-
         //public void Sync<t>(string columnname, ListExt<object> data) {
         //    var c = Column(columnname, string.Empty);
 
@@ -55,7 +50,6 @@ namespace BlueDatabase {
         //    data.Changed += Data_Changed;
 
         //}
-
 
         public void SetData(string feldname, bool editable, string quickinfo) {
             var c = Column(feldname, string.Empty);
@@ -71,10 +65,7 @@ namespace BlueDatabase {
             }
             c.Quickinfo = quickinfo;
 
-
-
         }
-
 
         /// <summary>
         /// Speichert die Daten in dem Parent ab
@@ -115,12 +106,10 @@ namespace BlueDatabase {
 
             Parent = null;
 
-
             if (InternalDatabase == null) {
                 InternalDatabase = new Database(filename, false, true);
 
                 if (InternalDatabase.Column.Exists("ID") == null) {
-
 
                     InternalDatabase.Column.Add("ID", "ID", enDataFormat.Text);
                     InternalDatabase.RepairAfterParse();
@@ -152,7 +141,6 @@ namespace BlueDatabase {
                     InternalDatabase.SortDefinition = new RowSortDefinition(InternalDatabase, new List<string>() { "ID" }, false);
 
                 }
-
             }
             InternalDatabase.Caption = id;
             InternalDatabase.ReloadDelaySecond = 240;
@@ -180,15 +168,11 @@ namespace BlueDatabase {
 
             return originalName;
 
-
         }
-
 
         public ColumnItem Column(string dataName, string message) {
 
             var nd = ColumnName(dataName);
-
-
 
             var c = InternalDatabase.Column.Exists(nd);
             if (c == null) {
@@ -200,7 +184,6 @@ namespace BlueDatabase {
                 c.PermissionGroups_ChangeCell.Add("#Everybody");
                 c.Ueberschrift1 = Typ;
 
-
                 if (!string.IsNullOrEmpty(message)) {
                     c.Caption = "!!!" + c.Caption;
                     c.Quickinfo = message;
@@ -209,7 +192,6 @@ namespace BlueDatabase {
 
                 InternalDatabase.ColumnArrangements[1].ShowAllColumns();
                 InternalDatabase.ColumnArrangements[1].HideSystemColumns();
-
 
             }
 
@@ -240,13 +222,11 @@ namespace BlueDatabase {
         public void SetSynchronizedFiles<t>(string dataName, string value, ref t synchronData) where t : DataHolder {
             Row().CellSet(Column(dataName, string.Empty), value);
 
-
             if (synchronData == null || synchronData.ID.ToUpper() != value.ToUpper()) {
 
                 synchronData = (t)System.Activator.CreateInstance(typeof(t), value);
             }
         }
-
 
         //public void SetSynchronizedFiles<t>(string dataName, List<string> value, List<t> synchronData) where t : DataHolder {
         //    Row().CellSet(Column(dataName, string.Empty), value);
@@ -271,9 +251,6 @@ namespace BlueDatabase {
         //    }
         //}
 
-
-
-
         public void Register<t>(out ListExt<t> data, bool separateFiles) where t : DataHolder {
 
             data = new ListExt<t>();
@@ -291,7 +268,6 @@ namespace BlueDatabase {
                     var v = (t)System.Activator.CreateInstance(typeof(t), thisID.ToUpper());
                     data.Add(v);
                 }
-
             }
 
             data.Changed += Data_Changed;
@@ -315,13 +291,6 @@ namespace BlueDatabase {
             var name = sender.GetType().ToString();
             Set(name, IDS);
         }
-
-
-
-
-
-
-
 
         ///// <summary>
         ///// Setz die Synchronen Daten in dieser Datei mit ab
@@ -368,8 +337,6 @@ namespace BlueDatabase {
         //    #endregion
         //}
 
-
-
         public void Set(string dataName, decimal value) {
             Row().CellSet(Column(dataName, string.Empty), value);
         }
@@ -382,8 +349,6 @@ namespace BlueDatabase {
             Row().CellSet(Column(dataName, string.Empty), value);
         }
 
-
-
         public string GetString(string dataName) {
             return Row().CellGetString(Column(dataName, string.Empty));
         }
@@ -392,11 +357,9 @@ namespace BlueDatabase {
             return Row().CellGetList(Column(dataName, string.Empty));
         }
 
-
         public decimal GetDecimal(string dataName) {
             return Row().CellGetDecimal(Column(dataName, string.Empty));
         }
-
 
         public double GetDouble(string dataName) {
             return Row().CellGetDouble(Column(dataName, string.Empty));
@@ -406,15 +369,10 @@ namespace BlueDatabase {
             return Row().CellGetInteger(Column(dataName, string.Empty));
         }
 
-
-
-
         public string Erstelldatum {
             get => InternalDatabase.CreateDate;
             set => InternalDatabase.CreateDate = value;
         }
-
-
 
         public string Ersteller {
             get => InternalDatabase.Creator;
@@ -430,7 +388,6 @@ namespace BlueDatabase {
                 InternalDatabase.Disposing -= InternalDatabase_Disposing;
                 InternalDatabase.Dispose();
                 InternalDatabase = null;
-
 
                 // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
                 // TODO: Große Felder auf NULL setzen
@@ -451,7 +408,6 @@ namespace BlueDatabase {
         }
     }
 
-
     public static class DataHolderExtensions {
         public static t GetByID<t>(this List<t> items, string id) where t : DataHolder {
             foreach (var thisit in items) {
@@ -460,8 +416,5 @@ namespace BlueDatabase {
             return null;
 
         }
-
     }
-
-
 }

@@ -86,8 +86,7 @@ namespace BlueBasics {
         }
 
         public static bool DeleteFile(string file, bool toBeSure) {
-            if (!FileExists(file)) { return true; }
-            return ProcessFile(TryDeleteFile, file, file, toBeSure);
+            return !FileExists(file) || ProcessFile(TryDeleteFile, file, file, toBeSure);
         }
 
         public static bool RenameFile(string oldName, string newName, bool toBeSure) {
@@ -154,10 +153,7 @@ namespace BlueBasics {
         }
 
         public static bool FileExists(string file) {
-            if (file == null) { return false; }
-            if (string.IsNullOrEmpty(file)) { return false; }
-            if (file.ContainsChars(Constants.Char_PfadSonderZeichen)) { return false; }
-            return File.Exists(file);
+            return file != null && !string.IsNullOrEmpty(file) && !file.ContainsChars(Constants.Char_PfadSonderZeichen) && File.Exists(file);
         }
 
         // public static bool CanWriteInDirectory(string DirectoryPath)
@@ -261,8 +257,7 @@ namespace BlueBasics {
         }
 
         public static bool PathExists(string pfad) {
-            if (pfad.Length < 3) { return false; }
-            return Directory.Exists(pfad.CheckPath());
+            return pfad.Length >= 3 && Directory.Exists(pfad.CheckPath());
         }
 
         public static string TempFile(string newPath, string filename) {
@@ -298,11 +293,7 @@ namespace BlueBasics {
 
             do {
                 z++;
-                if (z > 0) {
-                    filename = pfad + wunschname + "_" + z.ToString(Constants.Format_Integer5) + "." + suffix;
-                } else {
-                    filename = pfad + wunschname + "." + suffix;
-                }
+                filename = z > 0 ? pfad + wunschname + "_" + z.ToString(Constants.Format_Integer5) + "." + suffix : pfad + wunschname + "." + suffix;
             } while (FileExists(filename));
 
             return filename;
@@ -321,14 +312,7 @@ namespace BlueBasics {
             try {
                 if (string.IsNullOrEmpty(fileName) && string.IsNullOrEmpty(arguments)) { return false; }
 
-                Process Processx = null;
-
-                if (arguments == null) {
-                    Processx = Process.Start(fileName);
-                } else {
-                    Processx = Process.Start(fileName, arguments);
-                }
-
+                var Processx = arguments == null ? Process.Start(fileName) : Process.Start(fileName, arguments);
                 if (waitForExit) {
                     if (Processx == null) { return true; }// Windows 8, DANKE!
 

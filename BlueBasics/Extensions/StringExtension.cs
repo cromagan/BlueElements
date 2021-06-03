@@ -111,10 +111,7 @@ namespace BlueBasics {
         public static bool isWordSeperator(this char value) {
             const string TR = "~|=<>+`´\r\n\t";
 
-            if (char.IsPunctuation(value)) { return true; }
-            if (char.IsSeparator(value)) { return true; }
-
-            return TR.Contains(value.ToString());
+            return char.IsPunctuation(value) || char.IsSeparator(value) || TR.Contains(value.ToString());
         }
 
         public static string Insert(this string tXT, string insertTxt, string afterTXT, string WhenNotContais) {
@@ -143,21 +140,15 @@ namespace BlueBasics {
         }
 
         public static bool IsHTMLColorCode(this string col) {
-            if (string.IsNullOrEmpty(col)) { return false; }
-            if (col.Length != 6 && col.Length != 8) { return false; }
-
-            return col.ContainsOnlyChars(Constants.Char_Numerals + "abcdefABCDEF");
+            return !string.IsNullOrEmpty(col) && (col.Length == 6 || col.Length == 8) && col.ContainsOnlyChars(Constants.Char_Numerals + "abcdefABCDEF");
         }
 
         public static bool IsNumeral(this string tXT) {
-            if (tXT.IsFormat(enDataFormat.Ganzzahl)) { return true; }
-            if (tXT.IsFormat(enDataFormat.Gleitkommazahl)) { return true; }
-            return false;
+            return tXT.IsFormat(enDataFormat.Ganzzahl) || tXT.IsFormat(enDataFormat.Gleitkommazahl);
         }
 
         public static bool IsLong(this string tXT) {
-            if (tXT is null) { return false; }
-            return tXT.IsFormat(enDataFormat.Ganzzahl);
+            return tXT is not null && tXT.IsFormat(enDataFormat.Ganzzahl);
         }
 
         public static bool IsDouble(this string tXT) {
@@ -197,7 +188,6 @@ namespace BlueBasics {
             //    Beg = Beg + T.Length + V.Length + 2;
             //}
 
-
             value = value.DeKlammere(false, true, false, true);
 
             value = value.TrimEnd(",");
@@ -205,10 +195,9 @@ namespace BlueBasics {
             var start = 0;
             var noarunde = true;
 
-
             do {
 
-                var (gleichpos, _) = NextText(value, start, Gleich, false, false);
+                (var gleichpos, var _) = NextText(value, start, Gleich, false, false);
 
                 if (gleichpos < 0) {
                     Develop.DebugPrint(enFehlerArt.Fehler, "Parsen nicht möglich:" + value);
@@ -219,7 +208,7 @@ namespace BlueBasics {
                     Develop.DebugPrint(enFehlerArt.Fehler, "Parsen nicht möglich:" + value);
                 }
 
-                var (kommapos, _) = NextText(value, gleichpos, Komma, false, true);
+                (var kommapos, var _) = NextText(value, gleichpos, Komma, false, true);
                 string tagval;
                 if (kommapos < 0) {
                     tagval = value.Substring(gleichpos + 1).Trim();
@@ -228,17 +217,14 @@ namespace BlueBasics {
                     tagval = value.Substring(gleichpos + 1, kommapos - gleichpos - 1).Trim();
                 }
 
-
                 Result.Add(new KeyValuePair<string, string>(tag, tagval));
 
                 start = kommapos + 1;
-
 
             }
             while (noarunde);
 
             return Result;
-
 
         }
 
@@ -259,11 +245,8 @@ namespace BlueBasics {
             var maxl = txt.Length;
             const string TR = "&.,;\\?!\" ~|=<>+-(){}[]/*`´\r\n\t";
 
-
             do {
                 if (pos >= maxl) { return (-1, string.Empty); ; }
-
-
 
                 #region Klammer und " erledigen
                 switch (txt.Substring(pos, 1)) {
@@ -287,7 +270,6 @@ namespace BlueBasics {
                     //    }
                     //    break;
 
-
                     // Runde klammern können in { vorkommen
                     case "(":
                         if (!Gans) {
@@ -308,7 +290,6 @@ namespace BlueBasics {
                             klammern--;
                         }
                         break;
-
 
                     // Gescheifte klammern müssen immer sauber auf und zu gemacht werdrn!
                     case "{":
@@ -348,14 +329,10 @@ namespace BlueBasics {
                 }
                 #endregion
 
-
                 pos++;
             } while (true);
 
-
         }
-
-
 
         //public static string ParseTag(this string tXT, int startIndex) {
         //    var IG = tXT.IndexOf("=", startIndex);
@@ -406,13 +383,9 @@ namespace BlueBasics {
         //                        Develop.DebugPrint(enFehlerArt.Warnung, "Unerlaubtes Zeichen nach Komma: " + tXT);
         //                    }
 
-
-
-
         //                }
 
         //                break;
-
 
         //            case " ":
         //                if (tXT.Substring(CurrentChar - 1, 1) == "," && OpenBraketCount == 0) {
@@ -668,17 +641,9 @@ namespace BlueBasics {
         }
 
         public static enFileFormat FileType(this string filename) {
-            string Suffix;
-
             if (string.IsNullOrEmpty(filename)) { return enFileFormat.Unknown; }
 
-            if (filename.IndexOf(".") > 1 && filename.IndexOf(".") < filename.Length) {
-                Suffix = filename.FileSuffix();
-            } else {
-                Suffix = filename;
-            }
-
-            return Suffix switch {
+            return filename.FileSuffix() switch {
                 "DOC" or "DOCX" or "RTF" or "ODT" => enFileFormat.WordKind,
                 "TXT" or "INI" or "INFO" => enFileFormat.Textdocument,
                 "XLS" or "CSV" or "XLA" or "XLSX" or "XLSM" or "ODS" => enFileFormat.ExcelKind,
@@ -771,8 +736,7 @@ namespace BlueBasics {
             name = name.Replace("/", "\\");
 
             var z = name.LastIndexOf("\\");
-            if (z < 0) { return string.Empty; }
-            return name.Substring(0, z + 1);
+            return z < 0 ? string.Empty : name.Substring(0, z + 1);
         }
 
         public static string FileSuffix(this string name) {
@@ -780,14 +744,11 @@ namespace BlueBasics {
             if (!name.Contains(".")) { return string.Empty; }
 
             var l = Path.GetExtension(name);
-            if (string.IsNullOrEmpty(l)) { return string.Empty; }
-
-            return l.Substring(1).ToUpper();
+            return string.IsNullOrEmpty(l) ? string.Empty : l.Substring(1).ToUpper();
         }
 
         public static string FileNameWithSuffix(this string name) {
-            if (string.IsNullOrEmpty(name)) { return string.Empty; }
-            return Path.GetFileName(name);
+            return string.IsNullOrEmpty(name) ? string.Empty : Path.GetFileName(name);
         }
 
         /// <summary>
@@ -797,15 +758,13 @@ namespace BlueBasics {
         /// <returns>Dateiname ohne Suffix</returns>
         /// <remarks></remarks>
         public static string FileNameWithoutSuffix(this string name) {
-            if (string.IsNullOrEmpty(name)) { return string.Empty; }
-            return Path.GetFileNameWithoutExtension(name);
+            return string.IsNullOrEmpty(name) ? string.Empty : Path.GetFileNameWithoutExtension(name);
         }
 
         public static string Trim(this string tXT, string was) {
             if (string.IsNullOrEmpty(tXT)) { return string.Empty; }
             tXT = tXT.TrimEnd(was);
-            if (string.IsNullOrEmpty(tXT)) { return string.Empty; }
-            return tXT.TrimStart(was);
+            return string.IsNullOrEmpty(tXT) ? string.Empty : tXT.TrimStart(was);
         }
 
         public static string TrimEnd(this string tXT, string was) {
@@ -911,8 +870,7 @@ namespace BlueBasics {
         }
 
         public static string TrimCr(this string tXT) {
-            if (string.IsNullOrEmpty(tXT)) { return string.Empty; }
-            return tXT.Trim("\r");
+            return string.IsNullOrEmpty(tXT) ? string.Empty : tXT.Trim("\r");
         }
 
         public static string TrimStart(this string tXT, string was) {
@@ -1010,9 +968,7 @@ namespace BlueBasics {
         }
 
         public static string SetLenght(this string s, int anzahl) {
-            if (s.Length == anzahl) { return s; }
-            if (s.Length < anzahl) { return s.PadRight(anzahl); }
-            return s.Substring(0, anzahl);
+            return s.Length == anzahl ? s : s.Length < anzahl ? s.PadRight(anzahl) : s.Substring(0, anzahl);
         }
     }
 }

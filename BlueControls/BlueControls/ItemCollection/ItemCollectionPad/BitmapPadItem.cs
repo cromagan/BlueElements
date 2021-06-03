@@ -34,9 +34,7 @@ using static BlueBasics.FileOperations;
 namespace BlueControls.ItemCollection {
     public class BitmapPadItem : FormPadItemRectangle, ICanHaveColumnVariables {
 
-
         #region  Variablen-Deklarationen 
-
 
         public bool Hintergrund_weiß_füllen { get; set; }
         public int Padding;
@@ -47,14 +45,11 @@ namespace BlueControls.ItemCollection {
         public string Platzhalter_für_Layout { get; set; }
         #endregion
 
-
         #region  Event-Deklarationen + Delegaten 
 
         #endregion
 
-
         #region  Construktor + Initialize 
-
 
         public BitmapPadItem(ItemCollectionPad parent) : this(parent, string.Empty, null, Size.Empty) { }
 
@@ -68,7 +63,6 @@ namespace BlueControls.ItemCollection {
 
         public BitmapPadItem(ItemCollectionPad parent, string internalname, Bitmap bmp, Size size) : base(parent, internalname) {
 
-
             Bitmap = bmp;
             SetCoordinates(new RectangleM(0, 0, size.Width, size.Height), true);
 
@@ -79,14 +73,10 @@ namespace BlueControls.ItemCollection {
             Stil = PadStyles.Undefiniert; // Kein Rahmen
         }
 
-
         #endregion
-
 
         #region  Properties 
         public Bitmap Bitmap { get; set; }
-
-
 
         public void Bildschirmbereich_wählen() {
             if (Bitmap != null) {
@@ -117,65 +107,56 @@ namespace BlueControls.ItemCollection {
 
         #endregion
 
-
         protected override string ClassId() {
             return "IMAGE";
         }
 
-
         protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
             DCoordinates.Inflate(-Padding, -Padding);
 
-            var r1 = new RectangleF(DCoordinates.Left + Padding, DCoordinates.Top + Padding, DCoordinates.Width - Padding * 2, DCoordinates.Height - Padding * 2);
+            var r1 = new RectangleF(DCoordinates.Left + Padding, DCoordinates.Top + Padding, DCoordinates.Width - (Padding * 2), DCoordinates.Height - (Padding * 2));
             var r2 = new RectangleF();
             var r3 = new RectangleF();
 
             if (Bitmap != null) {
                 r3 = new RectangleF(0, 0, Bitmap.Width, Bitmap.Height);
 
-
                 switch (Bild_Modus) {
                     case enSizeModes.Verzerren: {
-                        r2 = r1;
+                            r2 = r1;
 
-                        break;
-                    }
+                            break;
+                        }
                     case enSizeModes.BildAbschneiden: {
-                        var scale = (float)Math.Max((DCoordinates.Width - Padding * 2) / (double)Bitmap.Width, (DCoordinates.Height - Padding * 2) / (double)Bitmap.Height);
-                        var tmpw = (DCoordinates.Width - Padding * 2) / scale;
-                        var tmph = (DCoordinates.Height - Padding * 2) / scale;
-                        r3 = new RectangleF((Bitmap.Width - tmpw) / 2, (Bitmap.Height - tmph) / 2, tmpw, tmph);
-                        r2 = r1;
+                            var scale = (float)Math.Max((DCoordinates.Width - (Padding * 2)) / (double)Bitmap.Width, (DCoordinates.Height - (Padding * 2)) / (double)Bitmap.Height);
+                            var tmpw = (DCoordinates.Width - (Padding * 2)) / scale;
+                            var tmph = (DCoordinates.Height - (Padding * 2)) / scale;
+                            r3 = new RectangleF((Bitmap.Width - tmpw) / 2, (Bitmap.Height - tmph) / 2, tmpw, tmph);
+                            r2 = r1;
 
-
-                        break;
-                    }
+                            break;
+                        }
                     default: // Is = enSizeModes.WeißerRand
                     {
-                        var scale = (float)Math.Min((DCoordinates.Width - Padding * 2) / (double)Bitmap.Width, (DCoordinates.Height - Padding * 2) / (double)Bitmap.Height);
-                        r2 = new RectangleF((DCoordinates.Width - Bitmap.Width * scale) / 2 + DCoordinates.Left, (DCoordinates.Height - Bitmap.Height * scale) / 2 + DCoordinates.Top, Bitmap.Width * scale, Bitmap.Height * scale);
+                            var scale = (float)Math.Min((DCoordinates.Width - (Padding * 2)) / (double)Bitmap.Width, (DCoordinates.Height - (Padding * 2)) / (double)Bitmap.Height);
+                            r2 = new RectangleF(((DCoordinates.Width - (Bitmap.Width * scale)) / 2) + DCoordinates.Left, ((DCoordinates.Height - (Bitmap.Height * scale)) / 2) + DCoordinates.Top, Bitmap.Width * scale, Bitmap.Height * scale);
 
-                        break;
-                    }
+                            break;
+                        }
                 }
-
             }
-
 
             var trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
 
             GR.TranslateTransform(trp.X, trp.Y);
             GR.RotateTransform(-Drehwinkel);
 
-
             r1 = new RectangleF(r1.Left - trp.X, r1.Top - trp.Y, r1.Width, r1.Height);
             r2 = new RectangleF(r2.Left - trp.X, r2.Top - trp.Y, r2.Width, r2.Height);
-
 
             if (Hintergrund_weiß_füllen) {
                 GR.FillRectangle(Brushes.White, r1);
             }
-
 
             try {
                 if (Bitmap != null) {
@@ -193,7 +174,6 @@ namespace BlueControls.ItemCollection {
                 modAllgemein.CollectGarbage();
             }
 
-
             if (Stil != PadStyles.Undefiniert) {
                 if (Parent.SheetStyleScale > 0 && Parent.SheetStyle != null) {
                     GR.DrawRectangle(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(cZoom * Parent.SheetStyleScale), r1);
@@ -204,7 +184,6 @@ namespace BlueControls.ItemCollection {
                 GR.DrawImage(thisQI.BMP, r2.Left + 8, r2.Top + 8);
             }
 
-
             GR.TranslateTransform(-trp.X, -trp.Y);
             GR.ResetTransform();
             if (!ForPrinting) {
@@ -212,13 +191,11 @@ namespace BlueControls.ItemCollection {
                     var f = new Font("Arial", 8);
                     GR.DrawString(Platzhalter_für_Layout, f, Brushes.Black, DCoordinates.Left, DCoordinates.Top);
                 }
-
             }
 
             base.DrawExplicit(GR, DCoordinates, cZoom, shiftX, shiftY, vState, SizeOfParentControl, ForPrinting);
 
         }
-
 
         public override bool ParseThis(string tag, string value) {
             if (base.ParseThis(tag, value)) { return true; }
@@ -270,16 +247,13 @@ namespace BlueControls.ItemCollection {
             return t.Trim(", ") + "}";
         }
 
-
-
         public bool ReplaceVariable(BlueScript.Variable variable) {
 
             if (string.IsNullOrEmpty(Platzhalter_für_Layout)) { return false; }
 
-      
             if ("&" + variable.Name.ToLower() + ";" != Platzhalter_für_Layout.ToLower()) { return false; }
 
-            if (variable.Type !=  Skript.Enums.enVariableDataType.Bitmap) { return false; }
+            if (variable.Type != Skript.Enums.enVariableDataType.Bitmap) { return false; }
 
             var ot = variable.ValueBitmap;
 
@@ -291,9 +265,6 @@ namespace BlueControls.ItemCollection {
                 return false;
             }
         }
-
-
-
 
         public bool ResetVariables() {
 
@@ -307,7 +278,6 @@ namespace BlueControls.ItemCollection {
             return false;
         }
 
-
         public override List<FlexiControl> GetStyleOptions() {
 
             var l = new List<FlexiControl>
@@ -316,7 +286,6 @@ namespace BlueControls.ItemCollection {
                 new FlexiControlForProperty(this, "Datei_laden", enImageCode.Ordner),
                 new FlexiControl(),
                 new FlexiControlForProperty(this, "Platzhalter_für_Layout", 2),
-
 
                 new FlexiControl()
             };
@@ -330,20 +299,15 @@ namespace BlueControls.ItemCollection {
 
             l.Add(new FlexiControlForProperty(this, "Bild-Modus", Comms));
 
-
             l.Add(new FlexiControl());
 
             AddLineStyleOption(l);
-
 
             l.Add(new FlexiControlForProperty(this, "Hintergrund_weiß_füllen"));
 
             l.AddRange(base.GetStyleOptions());
             return l;
         }
-
-
-
 
         //public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
         //{
@@ -387,7 +351,6 @@ namespace BlueControls.ItemCollection {
         //        return;
         //    }
 
-
         //    if (Tags.TagGet("Skalieren").FromPlusMinus())
         //    {
         //        CloseMenu = false;
@@ -403,15 +366,12 @@ namespace BlueControls.ItemCollection {
         //        var x = p_RU.X - p_LO.X;
         //        var y = p_RU.Y - p_LO.Y;
 
-
         //        p_RU.X = (decimal)((double)p_LO.X + (double)x * sc);
         //        p_RU.Y = (decimal)((double)p_LO.Y + (double)y * sc);
 
         //        KeepInternalLogic();
         //        return;
         //    }
-
-
 
         //    Hintergrund_weiß_füllen = Tags.TagGet("Hintergrund weiß füllen").FromPlusMinus();
         //    Bild_Modus = (enSizeModes)int.Parse(Tags.TagGet("Bild-Modus"));

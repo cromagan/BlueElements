@@ -217,11 +217,9 @@ namespace BlueBasics {
                 return ImageResize;
             } catch {
                 if (!collectGarbage) { modAllgemein.CollectGarbage(); }
-                if (sizeMode == enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern) {
-                    return (Bitmap)bmp.GetThumbnailImage(nw, nh, null, IntPtr.Zero);
-                }
-
-                return null;
+                return sizeMode == enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern
+                       ? (Bitmap)bmp.GetThumbnailImage(nw, nh, null, IntPtr.Zero)
+                       : null;
             }
         }
 

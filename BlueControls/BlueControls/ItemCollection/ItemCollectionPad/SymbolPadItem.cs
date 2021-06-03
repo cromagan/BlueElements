@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -29,7 +28,6 @@ using System.Drawing.Drawing2D;
 namespace BlueControls.ItemCollection {
     public class SymbolPadItem : FormPadItemRectangle {
         public SymbolPadItem(ItemCollectionPad parent) : this(parent, string.Empty) { }
-
 
         public SymbolPadItem(ItemCollectionPad parent, string internalname) : base(parent, internalname) {
             Symbol = enSymbol.Pfeil;
@@ -48,10 +46,6 @@ namespace BlueControls.ItemCollection {
         public Color Randfarbe;
         public decimal Randdicke;
 
-
-
-
-
         protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
 
             var trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
@@ -59,9 +53,7 @@ namespace BlueControls.ItemCollection {
             GR.TranslateTransform(trp.X, trp.Y);
             GR.RotateTransform(-Drehwinkel);
 
-
             GraphicsPath p = null;
-
 
             var d2 = DCoordinates;
             d2.X = -DCoordinates.Width / 2;
@@ -91,15 +83,11 @@ namespace BlueControls.ItemCollection {
                 GR.DrawPath(new Pen(Randfarbe, (float)(Randdicke * cZoom * Parent.SheetStyleScale)), p);
             }
 
-
             GR.TranslateTransform(-trp.X, -trp.Y);
             GR.ResetTransform();
 
             base.DrawExplicit(GR, DCoordinates, cZoom, shiftX, shiftY, vState, SizeOfParentControl, ForPrinting);
         }
-
-
-
 
         public override List<FlexiControl> GetStyleOptions() {
             var l = new List<FlexiControl>
@@ -117,13 +105,9 @@ namespace BlueControls.ItemCollection {
             l.Add(new FlexiControl());
             l.Add(new FlexiControlForProperty(this, "Symbol", Comms));
 
-
-
-
             l.Add(new FlexiControlForProperty(this, "Randdicke"));
             l.Add(new FlexiControlForProperty(this, "Randfarbe"));
             l.Add(new FlexiControlForProperty(this, "Hintergrundfarbe"));
-
 
             l.AddRange(base.GetStyleOptions());
             return l;
@@ -133,7 +117,6 @@ namespace BlueControls.ItemCollection {
         //{
         //    base.DoStyleCommands(sender, Tags, ref CloseMenu);
 
-
         //    BackColor = Tags.TagGet("Hintergrundfarbe").FromHTMLCode();
         //    BorderColor = Tags.TagGet("Randfarbe").FromHTMLCode();
         //    decimal.TryParse(Tags.TagGet("Randdicke"), out BorderWidth);
@@ -141,7 +124,6 @@ namespace BlueControls.ItemCollection {
         //    //Style = (PadStyles)int.Parse(Tags.TagGet("Farbe"));
 
         //}
-
 
         public override string ToString() {
             var t = base.ToString();
@@ -153,7 +135,6 @@ namespace BlueControls.ItemCollection {
 
             return t.Trim(", ") + "}";
         }
-
 
         public override bool ParseThis(string tag, string value) {
             if (base.ParseThis(tag, value)) { return true; }
@@ -178,6 +159,5 @@ namespace BlueControls.ItemCollection {
             return false;
         }
         protected override void ParseFinished() { }
-
     }
 }

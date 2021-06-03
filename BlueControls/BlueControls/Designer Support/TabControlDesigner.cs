@@ -84,7 +84,6 @@ namespace BlueControls.Designer_Support {
             //Don't want DrawGrid dots.
         }
 
-
         public void OnInsertPage(object sender, System.EventArgs e) {
 
             var ParentControl = (AbstractTabControl)Control;
@@ -170,7 +169,6 @@ namespace BlueControls.Designer_Support {
             }
         }
 
-
         private const int TCM_HITTEST = 0x130D;
 
         private struct TCHITTESTINFO {
@@ -198,18 +196,15 @@ namespace BlueControls.Designer_Support {
                 Marshal.FreeHGlobal(lparam);
 
                 if (m.Result.ToInt32() != -1) { return hti.flags != TabControlHitTest.TCHT_NOWHERE; }
-
             }
 
             return false;
         }
 
-
         //Fix the AllSizable selectiorule on System.Windows.Forms.DockStyle.Fill
         public override SelectionRules SelectionRules {
             get {
-                if (Control.Dock == System.Windows.Forms.DockStyle.Fill) { return SelectionRules.Visible; }
-                return base.SelectionRules;
+                return Control.Dock == System.Windows.Forms.DockStyle.Fill ? SelectionRules.Visible : base.SelectionRules;
             }
         }
     }

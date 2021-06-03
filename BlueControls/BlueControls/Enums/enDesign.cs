@@ -21,7 +21,6 @@ namespace BlueControls.Enums {
     public enum enDesign {
         Undefiniert = -1, // Braucht man
 
-
         // Buttons 1000
         Button = 1000,
         Button_CheckBox = 1001,
@@ -38,7 +37,6 @@ namespace BlueControls.Enums {
 
         TabStrip_Head = 1030,
         RibbonBar_Head = 1031,
-
 
         // Texte 1100
         Caption = 1100,
@@ -61,7 +59,6 @@ namespace BlueControls.Enums {
         //TextBox_FürPasswort = 1225,
 
         //Sidebar = 1230
-
 
         // Toolbars 1400
         // ToolBar = 1400
@@ -114,7 +111,6 @@ namespace BlueControls.Enums {
         Progressbar = 2210,
         Progressbar_Füller = 2211,
 
-
         //Sidebar_Level_0 = 2230
         //Sidebar_Level_1 = 2231
 
@@ -133,7 +129,6 @@ namespace BlueControls.Enums {
 
         //TextBox_Cursor = 2270
 
-
         // Unipaint-Verhalten 9800
         // UniPaint_Verhalten_PowerPoint = 9800
         //  UniPaint_Verhalten_Menukarte = 9801
@@ -145,7 +140,6 @@ namespace BlueControls.Enums {
 
         //UniPaint_Verhalten_Kalender = 9820
         //UniPaint_Verhalten_WochenKalender = 9821
-
 
         // Unipaint-Items 9900
         // UniPaint_Item_DateiKästchen = 9900

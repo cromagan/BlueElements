@@ -51,9 +51,7 @@ namespace BluePaint {
                 e.DrawImage(_PicPreview);
                 return;
             }
-
         }
-
 
         private void btnKontrastErhoehen_Click(object sender, System.EventArgs e) {
             var _Pic = OnNeedCurrentPic();
@@ -132,10 +130,6 @@ namespace BluePaint {
             return;
         }
 
-
-
-
-
         private void btnHelligkeit_Click(object sender, System.EventArgs e) {
             var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
@@ -168,7 +162,6 @@ namespace BluePaint {
             OnDoInvalidate();
 
         }
-
 
         private void sldKontrast_ValueChanged(object sender, System.EventArgs e) {
             sldGamma.Value = 1f;
@@ -225,7 +218,6 @@ namespace BluePaint {
                     break;
             }
 
-
             //if (c[0] == "Replace")
             //{
             //    var OriginalPic = OnNeedCurrentPic();
@@ -237,8 +229,5 @@ namespace BluePaint {
             //    Develop.DebugPrint_NichtImplementiert();
             //}
         }
-
-
     }
-
 }

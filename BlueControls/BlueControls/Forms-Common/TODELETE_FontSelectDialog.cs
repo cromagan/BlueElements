@@ -27,10 +27,8 @@ namespace BlueControls.Forms {
     public partial class FontSelectDialog {
         private bool Adding;
 
-
         private static ItemCollectionList FNList;
         private static ItemCollectionList FSList;
-
 
         public FontSelectDialog() {
 
@@ -38,7 +36,6 @@ namespace BlueControls.Forms {
             InitializeComponent();
 
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-
 
             if (FNList == null) {
                 FNList = new ItemCollectionList();
@@ -53,8 +50,6 @@ namespace BlueControls.Forms {
                             } catch (Exception) {
 
                             }
-
-
                         }
                     }
                 }
@@ -83,10 +78,8 @@ namespace BlueControls.Forms {
                 FSList.Sort();
             }
 
-
             FName.Item.AddRange(FNList);
             FName.Item.Sort();
-
 
             FSize.Item.AddRange(FSList);
             FSize.Item.Sort();
@@ -96,7 +89,6 @@ namespace BlueControls.Forms {
             UpdateSampleText();
         }
 
-
         public new BlueFont Font {
             get => BlueFont.Get(FName.Item.Checked()[0].Internal, float.Parse(FSize.Item.Checked()[0].Internal), fFett.Checked, fKursiv.Checked, fUnterstrichen.Checked, fDurchge.Checked, fOutline.Checked, QuickImage.Get(cFarbe.ImageCode).ChangeGreenTo, QuickImage.Get(cRandF.ImageCode).ChangeGreenTo, fKap.Checked, OnlyUpper.Checked, OnlyLow.Checked);
             set {
@@ -104,11 +96,9 @@ namespace BlueControls.Forms {
                 Adding = true;
                 if (value == null) { value = BlueFont.Get(Skin.DummyStandardFont); }
 
-
                 if (FName.Item[value.FontName] == null) { FName.Item.Add(value.FontName, value.FontName, QuickImage.Get(enImageCode.Warnung, 20)); }
                 FName.Item.UncheckAll();
                 FName.Item[value.FontName].Checked = true;
-
 
                 if (FSize.Item[value.FontSize.ToString()] == null) { FSize.Item.Add(value.FontSize.ToString()); }
                 FSize.Item.UncheckAll();
@@ -129,13 +119,11 @@ namespace BlueControls.Forms {
             }
         }
 
-
         private void UpdateSampleText() {
             if (Adding) { return; }
 
             Sample.Image = Font.SampleText().Bitmap;
         }
-
 
         private void FName_Item_CheckedChanged(object sender, System.EventArgs e) {
             UpdateSampleText();
@@ -144,7 +132,6 @@ namespace BlueControls.Forms {
         private void fFett_CheckedChanged(object sender, System.EventArgs e) {
             UpdateSampleText();
         }
-
 
         private void cFarbe_Click(object sender, System.EventArgs e) {
             ColorDia.Color = QuickImage.Get(cFarbe.ImageCode).ChangeGreenTo.FromHTMLCode();
@@ -159,7 +146,6 @@ namespace BlueControls.Forms {
             cRandF.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", ColorDia.Color.ToHTMLCode()).ToString();
             UpdateSampleText();
         }
-
 
         private void Ok_Click(object sender, System.EventArgs e) {
             Close();

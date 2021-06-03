@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE.
 #endregion
 
-
 namespace BlueBasics.EventArgs {
     public class NeedImageEventArgs : System.EventArgs {
         public string Name { get; }

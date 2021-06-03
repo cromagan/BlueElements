@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 using BlueDatabase;
 using BlueDatabase.EventArgs;
 
@@ -32,6 +31,5 @@ namespace BlueControls.EventArgs {
 
         public string Comand { get; }
         public ColumnItem Column { get; }
-
     }
 }

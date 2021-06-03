@@ -39,7 +39,6 @@ namespace BlueControls.ItemCollection {
         private readonly PointM _Bezugslinie1 = new(null, "Bezugslinie 1, Ende der Hilfslinie", 0, 0);
         private readonly PointM _Bezugslinie2 = new(null, "Bezugslinie 2, Ende der Hilfslinien", 0, 0);
 
-
         private decimal _Winkel;
         private decimal _Länge;
         private string _text_oben = string.Empty;
@@ -56,37 +55,26 @@ namespace BlueControls.ItemCollection {
         }
         public string Text_unten { get; set; } = string.Empty;
 
-
         //http://www.kurztutorial.info/programme/punkt-mm/rechner.html
         // Dim Ausgleich As Double = mmToPixel(1 / 72 * 25.4, 300)
         public decimal Skalierung { get; set; } = 3.07m;
 
-
         public string Präfix { get; set; } = string.Empty;
         public string Suffix { get; set; } = string.Empty;
 
-
-
         #endregion
-
 
         #region  Event-Deklarationen + Delegaten 
 
         #endregion
 
-
         #region  Construktor + Initialize 
 
         public DimensionPadItem(ItemCollectionPad parent) : this(parent, string.Empty, null, null, 0) { }
 
-
         public DimensionPadItem(ItemCollectionPad parent, PointM cPoint1, PointM cPoint2, int AbstandinMM) : this(parent, string.Empty, cPoint1, cPoint2, AbstandinMM) { }
 
-
-
-
         public DimensionPadItem(ItemCollectionPad parent, string internalname, PointM cPoint1, PointM cPoint2, int AbstandinMM) : base(parent, internalname) {
-
 
             if (cPoint1 != null) { Point1.SetTo(cPoint1.X, cPoint1.Y); }
             if (cPoint2 != null) { Point2.SetTo(cPoint2.X, cPoint2.Y); }
@@ -115,7 +103,6 @@ namespace BlueControls.ItemCollection {
             _Bezugslinie1.Parent = this;
             _Bezugslinie2.Parent = this;
 
-
             MovablePoint.Add(Point1);
             MovablePoint.Add(Point2);
             MovablePoint.Add(TextPointx);
@@ -125,17 +112,11 @@ namespace BlueControls.ItemCollection {
 
         public DimensionPadItem(ItemCollectionPad parent, PointF cPoint1, PointF cPoint2, int AbstandInMM) : this(parent, new PointM(cPoint1), new PointM(cPoint2), AbstandInMM) { }
 
-
         #endregion
-
 
         #region  Properties 
 
-
         #endregion
-
-
-
 
         public override bool ParseThis(string tag, string value) {
             if (base.ParseThis(tag, value)) { return true; }
@@ -184,9 +165,6 @@ namespace BlueControls.ItemCollection {
 
         protected override void ParseFinished() { }
 
-
-
-
         public override string ToString() {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
@@ -199,7 +177,6 @@ namespace BlueControls.ItemCollection {
                    ", Suffix=" + Suffix.ToNonCritical() +
                    ", AdditionalScale=" + Skalierung.ToString().ToNonCritical() + "}";
         }
-
 
         public string AngezeigterText1() {
             if (!string.IsNullOrEmpty(Text_oben)) { return Text_oben; }
@@ -222,24 +199,18 @@ namespace BlueControls.ItemCollection {
         public override bool Contains(PointF value, decimal zoomfactor) {
             var ne = 5 / zoomfactor;
 
-            if (value.DistanzZuStrecke(Point1, _Bezugslinie1) < ne) { return true; }
-            if (value.DistanzZuStrecke(Point2, _Bezugslinie2) < ne) { return true; }
-            if (value.DistanzZuStrecke(_SchnittPunkt1, _SchnittPunkt2) < ne) { return true; }
-            if (value.DistanzZuStrecke(_SchnittPunkt1, TextPointx) < ne) { return true; }
-            if (GeometryDF.Länge(new PointM(value), TextPointx) < ne * 10) { return true; }
-
-            return false;
+            return value.DistanzZuStrecke(Point1, _Bezugslinie1) < ne
+                    || value.DistanzZuStrecke(Point2, _Bezugslinie2) < ne
+                    || value.DistanzZuStrecke(_SchnittPunkt1, _SchnittPunkt2) < ne
+                    || value.DistanzZuStrecke(_SchnittPunkt1, TextPointx) < ne
+                    || GeometryDF.Länge(new PointM(value), TextPointx) < ne * 10;
         }
 
         protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
 
             if (Stil == PadStyles.Undefiniert) { return; }
 
-
-
-
             var geszoom = Parent.SheetStyleScale * Skalierung * cZoom;
-
 
             var f = Skin.GetBlueFont(Stil, Parent.SheetStyle);
 
@@ -251,17 +222,12 @@ namespace BlueControls.ItemCollection {
             GR.DrawLine(pen2, _SchnittPunkt1.ZoomAndMove(cZoom, shiftX, shiftY), _SchnittPunkt2.ZoomAndMove(cZoom, shiftX, shiftY)); // Maßhilfslinie
             GR.DrawLine(pen2, _SchnittPunkt1.ZoomAndMove(cZoom, shiftX, shiftY), TextPointx.ZoomAndMove(cZoom, shiftX, shiftY)); // Maßhilfslinie
 
-
             var sz1 = GR.MeasureString(AngezeigterText1(), f.Font(geszoom));
             var sz2 = GR.MeasureString(Text_unten, f.Font(geszoom));
             var P1 = _SchnittPunkt1.ZoomAndMove(cZoom, shiftX, shiftY);
             var P2 = _SchnittPunkt2.ZoomAndMove(cZoom, shiftX, shiftY);
 
-
-
-
-
-            if ((decimal)sz1.Width + PfeilG * 2m < Geometry.Länge(P1, P2)) {
+            if ((decimal)sz1.Width + (PfeilG * 2m) < Geometry.Länge(P1, P2)) {
                 DrawPfeil(GR, P1, Convert.ToDouble(_Winkel), f.Color_Main, PfeilG);
                 DrawPfeil(GR, P2, Convert.ToDouble(_Winkel + 180), f.Color_Main, PfeilG);
             } else {
@@ -269,18 +235,13 @@ namespace BlueControls.ItemCollection {
                 DrawPfeil(GR, P2, Convert.ToDouble(_Winkel), f.Color_Main, PfeilG);
             }
 
-
-
             var Mitte = TextPointx.ZoomAndMove(cZoom, shiftX, shiftY);
-
 
             var TextWinkel = (float)(_Winkel % 360);
 
             if (TextWinkel > 90 && TextWinkel <= 270) { TextWinkel = (float)(_Winkel - 180); }
 
-
             if (geszoom < 0.15m) { return; } // Schrift zu klein, würde abstürzen
-
 
             var Mitte1 = new PointM(Mitte, (decimal)(sz1.Height / 2.1), (decimal)(TextWinkel + 90));
             var x = GR.Save();
@@ -299,8 +260,6 @@ namespace BlueControls.ItemCollection {
             GR.Restore(x);
         }
 
-
-
         protected override RectangleM CalculateUsedArea() {
             if (Stil == PadStyles.Undefiniert) { return new RectangleM(0, 0, 0, 0); }
             var geszoom = Parent.SheetStyleScale * Skalierung;
@@ -310,18 +269,13 @@ namespace BlueControls.ItemCollection {
             var sz1 = BlueFont.MeasureString(AngezeigterText1(), f.Font(geszoom));
             var sz2 = BlueFont.MeasureString(Text_unten, f.Font(geszoom));
 
-            var maxrad = (decimal)(Math.Max(Math.Max(sz1.Width, sz1.Height), Math.Max(sz2.Width, sz2.Height)) / 2 + 10);
-
+            var maxrad = (decimal)((Math.Max(Math.Max(sz1.Width, sz1.Height), Math.Max(sz2.Width, sz2.Height)) / 2) + 10);
 
             var X = new RectangleM(Point1, Point2);
             X.ExpandTo(_Bezugslinie1);
             X.ExpandTo(_Bezugslinie2);
 
             X.ExpandTo(TextPointx, maxrad);
-
-
-
-
 
             //return new RectangleM(P1_x - 2, P1_y - 2, P2_x - P1_x + 4, P2_y - P1_y + 4); 
 
@@ -331,28 +285,23 @@ namespace BlueControls.ItemCollection {
 
         }
 
-
-
-
         private void ComputeData() {
             _Länge = GeometryDF.Länge(Point1, Point2);
             _Winkel = GeometryDF.Winkel(Point1, Point2);
         }
 
         public override void PointMoved(PointM point) {
-            //Gegeben sind:
-            // Point1, Point2 und Textpoint
-
-            var MaßL = 0M;
             var tmppW = -90;
             var MHLAb = modConverter.mmToPixel(1.5M * Skalierung / 3.07m, ItemCollectionPad.DPI); // Den Abstand der Maßhilsfline, in echten MM
             ComputeData();
 
-            MaßL = TextPointx.DistanzZuLinie(Point1, Point2);
+            //Gegeben sind:
+            // Point1, Point2 und Textpoint
+
+            var MaßL = TextPointx.DistanzZuLinie(Point1, Point2);
 
             _SchnittPunkt1.SetTo(Point1, MaßL, _Winkel - 90);
             _SchnittPunkt2.SetTo(Point2, MaßL, _Winkel - 90);
-
 
             if (TextPointx.DistanzZuLinie(_SchnittPunkt1, _SchnittPunkt2) > 0.5M) {
                 _SchnittPunkt1.SetTo(Point1, MaßL, _Winkel + 90);
@@ -363,10 +312,7 @@ namespace BlueControls.ItemCollection {
             _Bezugslinie1.SetTo(_SchnittPunkt1, MHLAb, _Winkel + tmppW);
             _Bezugslinie2.SetTo(_SchnittPunkt2, MHLAb, _Winkel + tmppW);
 
-
         }
-
-
 
         public override List<FlexiControl> GetStyleOptions() {
             var l = new List<FlexiControl>
@@ -379,12 +325,9 @@ namespace BlueControls.ItemCollection {
                 new FlexiControlForProperty(this, "Präfix")
             };
 
-
             AddStyleOption(l);
 
-
             l.Add(new FlexiControlForProperty(this, "Skalierung"));
-
 
             l.AddRange(base.GetStyleOptions());
             return l;
@@ -402,8 +345,6 @@ namespace BlueControls.ItemCollection {
 
         //    Stil = (PadStyles)int.Parse(Tags.TagGet("Stil"));
         //}
-
-
 
         public static void DrawPfeil(Graphics GR, PointF Point, double Winkel, Color Col, decimal FontSize) {
             var m1 = FontSize * 1.5m;

@@ -231,8 +231,8 @@ namespace BlueBasics {
         }
 
         public static QuickImage Get(QuickImage imageCode, enImageCodeEffect additionalState) {
-            if (additionalState == enImageCodeEffect.Ohne) { return imageCode; }
-            return Get(GenerateCode(imageCode.Name, imageCode.Width, imageCode.Height, imageCode.Effekt | additionalState, imageCode.Färbung, imageCode.ChangeGreenTo, imageCode.Sättigung, imageCode.Helligkeit, imageCode.DrehWinkel, imageCode.Transparenz, imageCode.Zweitsymbol));
+            return additionalState == enImageCodeEffect.Ohne ? imageCode
+                : Get(GenerateCode(imageCode.Name, imageCode.Width, imageCode.Height, imageCode.Effekt | additionalState, imageCode.Färbung, imageCode.ChangeGreenTo, imageCode.Sättigung, imageCode.Helligkeit, imageCode.DrehWinkel, imageCode.Transparenz, imageCode.Zweitsymbol));
         }
 
         public static QuickImage Get(string imageCode) {
@@ -273,13 +273,13 @@ namespace BlueBasics {
         }
 
         public static QuickImage Get(enImageCode image, int squareWidth) {
-            if (image == enImageCode.None) { return null; }
-            return Get(GenerateCode(Enum.GetName(image.GetType(), image), squareWidth, 0, enImageCodeEffect.Ohne, string.Empty, string.Empty, 100, 100, 0, 0, string.Empty));
+            return image == enImageCode.None ? null
+                : Get(GenerateCode(Enum.GetName(image.GetType(), image), squareWidth, 0, enImageCodeEffect.Ohne, string.Empty, string.Empty, 100, 100, 0, 0, string.Empty));
         }
 
         public static QuickImage Get(enImageCode image, int squareWidth, string färbung, string changeGreenTo) {
-            if (image == enImageCode.None) { return null; }
-            return Get(GenerateCode(Enum.GetName(image.GetType(), image), squareWidth, 0, enImageCodeEffect.Ohne, färbung, changeGreenTo, 100, 100, 0, 0, string.Empty));
+            return image == enImageCode.None ? null
+                : Get(GenerateCode(Enum.GetName(image.GetType(), image), squareWidth, 0, enImageCodeEffect.Ohne, färbung, changeGreenTo, 100, 100, 0, 0, string.Empty));
         }
 
         public static QuickImage Get(int index) {
@@ -430,7 +430,6 @@ namespace BlueBasics {
                 // Evtl. hat die "OnNeedImage" das Bild auch in den Stack hochgeladen
                 var i2 = GetIndex(tmpname);
                 if (i2 < 0) { QuickImage.Add(tmpname, e.BMP); }
-
             }
 
             return e.BMP;
@@ -508,7 +507,7 @@ namespace BlueBasics {
                             if (_effekt.HasFlag(enImageCodeEffect.WindowsXPDisabled)) {
                                 var w = (int)(c.GetBrightness() * 100);
                                 w = (int)(w / 2.8);
-                                c = Extensions.FromHSB(0, 0, (float)(w / 100.0 + 0.5), c.A);
+                                c = Extensions.FromHSB(0, 0, (float)((w / 100.0) + 0.5), c.A);
                             }
 
                             if (_effekt.HasFlag(enImageCodeEffect.Graustufen)) { c = c.ToGrey(); }
@@ -572,17 +571,9 @@ namespace BlueBasics {
             var w = (toParse + "||||||||||").Split('|');
             _name = w[0];
 
-            if (string.IsNullOrEmpty(w[1])) {
-                _width = -1;
-            } else {
-                _width = IntParse(w[1]);
-            }
+            _width = string.IsNullOrEmpty(w[1]) ? -1 : IntParse(w[1]);
 
-            if (string.IsNullOrEmpty(w[2])) {
-                _height = -1;
-            } else {
-                _height = IntParse(w[2]);
-            }
+            _height = string.IsNullOrEmpty(w[2]) ? -1 : IntParse(w[2]);
 
             if (!string.IsNullOrEmpty(w[3])) {
                 _effekt = (enImageCodeEffect)IntParse(w[3]);
@@ -591,35 +582,15 @@ namespace BlueBasics {
             _färbung = w[4];
             _changeGreenTo = w[5];
 
-            if (string.IsNullOrEmpty(w[6])) {
-                _helligkeit = 100;
-            } else {
-                _helligkeit = int.Parse(w[6]);
-            }
+            _helligkeit = string.IsNullOrEmpty(w[6]) ? 100 : int.Parse(w[6]);
 
-            if (string.IsNullOrEmpty(w[7])) {
-                _sättigung = 100;
-            } else {
-                _sättigung = int.Parse(w[7]);
-            }
+            _sättigung = string.IsNullOrEmpty(w[7]) ? 100 : int.Parse(w[7]);
 
-            if (string.IsNullOrEmpty(w[8])) {
-                _drehWinkel = 0;
-            } else {
-                _drehWinkel = int.Parse(w[8]);
-            }
+            _drehWinkel = string.IsNullOrEmpty(w[8]) ? 0 : int.Parse(w[8]);
 
-            if (string.IsNullOrEmpty(w[9])) {
-                _transparenz = 0;
-            } else {
-                _transparenz = int.Parse(w[9]);
-            }
+            _transparenz = string.IsNullOrEmpty(w[9]) ? 0 : int.Parse(w[9]);
 
-            if (string.IsNullOrEmpty(w[10])) {
-                _Zweitsymbol = string.Empty;
-            } else {
-                _Zweitsymbol = w[10];
-            }
+            _Zweitsymbol = string.IsNullOrEmpty(w[10]) ? string.Empty : w[10];
 
             if (_width > 0 && _height < 0) {
                 _height = _width;

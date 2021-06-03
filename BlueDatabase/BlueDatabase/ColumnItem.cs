@@ -17,7 +17,6 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -37,7 +36,6 @@ namespace BlueDatabase {
         #region  Variablen-Deklarationen 
 
         public Database Database { get; private set; }
-
 
         private string _Name;
         private bool _MultiLine;
@@ -79,7 +77,6 @@ namespace BlueDatabase {
         private bool _SpellCheckingEnabled;
         private string _Suffix;
         private bool _ShowUndo;
-
 
         private string _LinkedKeyKennung;
         private string _LinkedDatabaseFile;
@@ -142,17 +139,13 @@ namespace BlueDatabase {
         internal List<string> _UcaseNamesSortedByLenght = null;
         private bool disposedValue;
 
-
         #endregion
-
 
         #region  Event-Deklarationen + Delegaten 
         public event EventHandler Changed;
         #endregion
 
-
         #region  Construktor + Initialize 
-
 
         public ColumnItem(Database database, int columnkey) {
             Database = database;
@@ -163,7 +156,6 @@ namespace BlueDatabase {
             if (ex != null) { Develop.DebugPrint(enFehlerArt.Fehler, "Key existiert bereits"); }
 
             Key = columnkey;
-
 
             #region Standard-Werte
 
@@ -194,16 +186,10 @@ namespace BlueDatabase {
             _VorschlagsColumn = -1;
             _Align = enAlignmentHorizontal.Keine_Präferenz;
 
-
-
             _KeyColumnKey = -1;
-
-
 
             _EditType = enEditTypeFormula.Textfeld;
             _Identifier = string.Empty;
-
-
 
             _AllowedChars = string.Empty;
             _AdminInfo = string.Empty;
@@ -248,16 +234,12 @@ namespace BlueDatabase {
 
             #endregion
 
-
             DropDownItems.Changed += DropDownItems_ListOrItemChanged;
             OpticalReplace.Changed += OpticalReplacer_ListOrItemChanged;
             AfterEdit_AutoReplace.Changed += AfterEdit_AutoReplace_ListOrItemChanged;
             Regex.Changed += Regex_ListOrItemChanged;
             PermissionGroups_ChangeCell.Changed += PermissionGroups_ChangeCell_ListOrItemChanged;
             Tags.Changed += Tags_ListOrItemChanged;
-
-
-
 
             Invalidate_TmpVariables();
         }
@@ -268,17 +250,11 @@ namespace BlueDatabase {
         }
         #endregion
 
-
-
-
         #region  Properties 
-
-
 
         public int Key { get; }
 
         public string I_Am_A_Key_For_Other_Column { get; private set; }
-
 
         internal void CheckIfIAmAKeyColumn() {
             I_Am_A_Key_For_Other_Column = string.Empty;
@@ -288,13 +264,10 @@ namespace BlueDatabase {
                 if (ThisColumn.KeyColumnKey == Key) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; } // Werte Gleichhalten
                 if (ThisColumn.LinkedCell_RowKey == Key) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
                 if (ThisColumn.LinkedCell_ColumnValueFoundIn == Key) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
-
             }
 
             if (_Format == enDataFormat.Columns_für_LinkedCellDropdown) { I_Am_A_Key_For_Other_Column = "Die Spalte selbst durch das Format"; }
         }
-
-
 
         public string Caption {
             get => _Caption;
@@ -307,8 +280,6 @@ namespace BlueDatabase {
             }
         }
 
-
-
         public string AutoFilterJoker {
             get => _AutoFilterJoker;
             set {
@@ -317,7 +288,6 @@ namespace BlueDatabase {
                 OnChanged();
             }
         }
-
 
         public string Name {
             get => _Name.ToUpper();
@@ -330,7 +300,6 @@ namespace BlueDatabase {
                 var old = _Name;
 
                 Database.AddPending(enDatabaseDataType.co_Name, this, _Name, value, true);
-
 
                 //_Name = value;
                 Database.Column_NameChanged(old, this);
@@ -369,7 +338,6 @@ namespace BlueDatabase {
             }
         }
 
-
         //public bool ZellenZusammenfassen
         //{
         //    get
@@ -384,7 +352,6 @@ namespace BlueDatabase {
         //    }
         //}
 
-
         public string QuickInfoText(string AdditionalText) {
             var T = string.Empty;
             if (!string.IsNullOrEmpty(_QuickInfo)) { T += _QuickInfo; }
@@ -394,7 +361,6 @@ namespace BlueDatabase {
             T = T.Trim();
             T = T.Trim("<br>");
             T = T.Trim();
-
 
             if (!string.IsNullOrEmpty(T) && !string.IsNullOrEmpty(AdditionalText)) {
                 T = "<b><u>" + AdditionalText + "</b></u><br><br>" + T;
@@ -441,7 +407,6 @@ namespace BlueDatabase {
             }
         }
 
-
         public string Ueberschrift2 {
             get => _Ueberschrift2;
             set {
@@ -460,8 +425,6 @@ namespace BlueDatabase {
             }
         }
 
-
-
         public string CaptionBitmap {
 
             get => _CaptionBitmapTXT;
@@ -470,15 +433,12 @@ namespace BlueDatabase {
                 if (_CaptionBitmapTXT == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_CaptionBitmapTXT, this, _CaptionBitmapTXT, value, false);
 
-
                 _CaptionBitmapTXT = value;
-
 
                 Invalidate_TmpVariables();
                 OnChanged();
             }
         }
-
 
         public string AdminInfo {
             get => _AdminInfo;
@@ -494,11 +454,9 @@ namespace BlueDatabase {
             if (_UcaseNamesSortedByLenght != null) { return _UcaseNamesSortedByLenght; }
             var tmp = Contents(null, null);
 
-
             for (var Z = 0; Z < tmp.Count; Z++) {
                 tmp[Z] = tmp[Z].Length.ToString(Constants.Format_Integer10) + tmp[Z].ToUpper();
             }
-
 
             tmp.Sort();
 
@@ -524,8 +482,6 @@ namespace BlueDatabase {
             }
         }
 
-
-
         public string Prefix {
             get => _Prefix;
             set {
@@ -536,8 +492,6 @@ namespace BlueDatabase {
             }
         }
 
-
-
         public string LinkedDatabaseFile {
             get => _LinkedDatabaseFile;
             set {
@@ -547,7 +501,6 @@ namespace BlueDatabase {
                 OnChanged();
             }
         }
-
 
         public string LinkedKeyKennung {
             get => _LinkedKeyKennung;
@@ -586,13 +539,10 @@ namespace BlueDatabase {
             }
         }
 
-
         public string Ueberschriften {
             get {
                 var txt = _Ueberschrift1 + "/" + _Ueberschrift2 + "/" + _Ueberschrift3;
-                if (txt == "//") { return "###"; }
-                return txt.TrimEnd("/");
-
+                return txt == "//" ? "###" : txt.TrimEnd("/");
             }
         }
 
@@ -623,8 +573,6 @@ namespace BlueDatabase {
                 OnChanged();
             }
         }
-
-
 
         public enAlignmentHorizontal Align {
             get => _Align;
@@ -691,11 +639,9 @@ namespace BlueDatabase {
         //    }
         //}
 
-
         public bool IgnoreAtRowFilter {
             get {
-                if (!_Format.Autofilter_möglich()) { return true; }
-                return _IgnoreAtRowFilter;
+                return !_Format.Autofilter_möglich() || _IgnoreAtRowFilter;
             }
             set {
                 if (_IgnoreAtRowFilter == value) { return; }
@@ -721,7 +667,6 @@ namespace BlueDatabase {
                 OnChanged();
             }
         }
-
 
         public bool DropdownBearbeitungErlaubt {
             get => _DropdownBearbeitungErlaubt;
@@ -752,8 +697,7 @@ namespace BlueDatabase {
 
         public bool AfterEdit_QuickSortRemoveDouble {
             get {
-                if (!_MultiLine) { return false; }
-                return _AfterEdit_QuickSortRemoveDouble;
+                return _MultiLine && _AfterEdit_QuickSortRemoveDouble;
             }
             set {
                 if (_AfterEdit_QuickSortRemoveDouble == value) { return; }
@@ -770,7 +714,6 @@ namespace BlueDatabase {
                 OnChanged();
             }
         }
-
 
         public bool AfterEdit_AutoCorrect {
             get => _AfterEdit_AutoCorrect;
@@ -789,7 +732,6 @@ namespace BlueDatabase {
                 OnChanged();
             }
         }
-
 
         public string SortMask {
             get => _SortMask;
@@ -832,8 +774,6 @@ namespace BlueDatabase {
         //    }
         //}
 
-
-
         public int DropdownKey {
             get => _DropDownKey;
             set {
@@ -852,7 +792,6 @@ namespace BlueDatabase {
             }
         }
 
-
         public int LinkedCell_RowKey {
             get => _LinkedCell_RowKey;
             set {
@@ -862,7 +801,6 @@ namespace BlueDatabase {
                 OnChanged();
             }
         }
-
 
         public int LinkedCell_ColumnKey {
             get => _LinkedCell_ColumnKey;
@@ -894,8 +832,6 @@ namespace BlueDatabase {
             }
         }
 
-
-
         /// <summary>
         /// Hält Werte, dieser Spalte gleich, bezugnehmend der KeyColumn(key)
         /// </summary>
@@ -916,7 +852,6 @@ namespace BlueDatabase {
             }
         }
 
-
         public int AfterEdit_Runden {
             get => _AfterEdit_Runden;
             set {
@@ -925,7 +860,6 @@ namespace BlueDatabase {
                 OnChanged();
             }
         }
-
 
         public bool ShowUndo {
             get => _ShowUndo;
@@ -936,11 +870,9 @@ namespace BlueDatabase {
             }
         }
 
-
         public bool ShowMultiLineInOneLine {
             get {
-                if (!_MultiLine) { return false; }
-                return _ShowMultiLineInOneLine;
+                return _MultiLine && _ShowMultiLineInOneLine;
             }
             set {
                 if (_ShowMultiLineInOneLine == value) { return; }
@@ -950,7 +882,6 @@ namespace BlueDatabase {
             }
         }
 
-
         public string AllowedChars {
             get => _AllowedChars;
             set {
@@ -959,7 +890,6 @@ namespace BlueDatabase {
                 OnChanged();
             }
         }
-
 
         public enDataFormat Format {
             get => _Format;
@@ -980,7 +910,6 @@ namespace BlueDatabase {
             }
         }
 
-
         public Color BackColor {
             get => _BackColor;
             set {
@@ -990,7 +919,6 @@ namespace BlueDatabase {
             }
         }
 
-
         public bool EditTrotzSperreErlaubt {
             get => _EditTrotzSperreErlaubt;
             set {
@@ -999,7 +927,6 @@ namespace BlueDatabase {
                 OnChanged();
             }
         }
-
 
         public enColumnLineStyle LineLeft {
             get => _LineLeft;
@@ -1026,11 +953,7 @@ namespace BlueDatabase {
         //    }
         //}
 
-
-
-
         #endregion
-
 
         private Database TMP_LinkedDatabase {
             set {
@@ -1047,7 +970,6 @@ namespace BlueDatabase {
                     _TMP_LinkedDatabase.Cell.CellValueChanged += _TMP_LinkedDatabase_Cell_CellValueChanged;
                     _TMP_LinkedDatabase.Disposing += _TMP_LinkedDatabase_Disposing;
                 }
-
             }
         }
 
@@ -1079,7 +1001,6 @@ namespace BlueDatabase {
                     }
                 }
             }
-
         }
 
         private void _TMP_LinkedDatabase_RowKeyChanged(object sender, KeyChangedEventArgs e) {
@@ -1117,16 +1038,9 @@ namespace BlueDatabase {
             if (_TMP_LinkedDatabase != null) { return _TMP_LinkedDatabase; }
             if (string.IsNullOrEmpty(_LinkedDatabaseFile)) { return null; }
 
-            DatabaseSettingsEventHandler el;
-
-            if (FileExists(_LinkedDatabaseFile)) {
-                el = new DatabaseSettingsEventHandler(this, _LinkedDatabaseFile, Database.ReadOnly);
-
-            } else {
-                el = new DatabaseSettingsEventHandler(this, Database.Filename.FilePath() + _LinkedDatabaseFile, Database.ReadOnly);
-
-            }
-
+            var el = FileExists(_LinkedDatabaseFile)
+                ? new DatabaseSettingsEventHandler(this, _LinkedDatabaseFile, Database.ReadOnly)
+                : new DatabaseSettingsEventHandler(this, Database.Filename.FilePath() + _LinkedDatabaseFile, Database.ReadOnly);
             TMP_LinkedDatabase = (Database)clsMultiUserFile.GetByFilename(el.Filenname, true);
             if (_TMP_LinkedDatabase == null) {
                 Database.OnLoadingLinkedDatabase(el);
@@ -1144,7 +1058,6 @@ namespace BlueDatabase {
             if (_TMP_LinkedDatabase != null) { _TMP_LinkedDatabase.UserGroup = Database.UserGroup; }
             return _TMP_LinkedDatabase;
         }
-
 
         public void OnChanged() {
             Changed?.Invoke(this, System.EventArgs.Empty);
@@ -1179,21 +1092,18 @@ namespace BlueDatabase {
             return list.SortedDistinctList();
         }
 
-
         public void DeleteContents(FilterCollection filter, List<RowItem> pinned) {
 
             foreach (var ThisRowItem in Database.Row) {
-                if (ThisRowItem != null && ThisRowItem.MatchesTo(filter)) { ThisRowItem.CellSet(this, ""); }
+                if (ThisRowItem != null) {
+                    if (ThisRowItem.MatchesTo(filter) || pinned.Contains(ThisRowItem)) { ThisRowItem.CellSet(this, ""); }
+                }
             }
         }
-
-
-
 
         public bool IsFirst() {
             return Convert.ToBoolean(Database.Column[0] == this);
         }
-
 
         public ColumnItem Previous() {
 
@@ -1208,17 +1118,14 @@ namespace BlueDatabase {
 
         public ColumnItem Next() {
 
-
             var ColumnCount = Index();
 
             do {
                 ColumnCount++;
                 if (ColumnCount >= Database.Column.Count) { return null; }
                 if (Database.Column[ColumnCount] != null) { return Database.Column[ColumnCount]; }
-
             } while (true);
         }
-
 
         internal string Load(enDatabaseDataType Art, string Wert) {
             switch (Art) {
@@ -1441,7 +1348,6 @@ namespace BlueDatabase {
                     break;
             }
 
-
             return string.Empty;
         }
 
@@ -1597,15 +1503,11 @@ namespace BlueDatabase {
 
             var t = "<b><u>Verwendung von " + ReadableText() + "</b></u><br>";
 
-
             if (!string.IsNullOrEmpty(_Identifier)) {
                 t += " - Systemspalte<br>";
             }
 
-
             return t + Database.Column_UsedIn(this);
-
-
 
         }
 
@@ -1637,7 +1539,6 @@ namespace BlueDatabase {
             return summ;
         }
 
-
         public bool ExportableTextformatForLayout() {
             return _Format.ExportableForLayout();
         }
@@ -1667,7 +1568,6 @@ namespace BlueDatabase {
         internal void Invalidate_TmpVariables() {
             TMP_CaptionText_Size = new SizeF(-1, -1);
             TMP_CaptionBitmap = null;
-
 
             if (_TMP_LinkedDatabase != null) {
                 _TMP_LinkedDatabase.RowKeyChanged -= _TMP_LinkedDatabase_RowKeyChanged;
@@ -1751,15 +1651,9 @@ namespace BlueDatabase {
 
             Database.SaveToByteList(l, enDatabaseDataType.co_DauerFilterPos, _DauerFilterPos.ToString(), Key);
 
-
             //Kennung UNBEDINGT zum Schluss, damit die Standard-Werte gesetzt werden können
             Database.SaveToByteList(l, enDatabaseDataType.co_Identifier, _Identifier, Key);
         }
-
-
-
-
-
 
         internal void CheckFormulaEditType() {
 
@@ -1778,47 +1672,28 @@ namespace BlueDatabase {
             _EditType = enEditTypeFormula.None;
         }
 
-
         public QuickImage SymbolForReadableText() {
-            if (this == Database.Column.SysRowChanger) { return QuickImage.Get(enImageCode.Person); }
-            if (this == Database.Column.SysRowCreator) { return QuickImage.Get(enImageCode.Person); }
-
-
-            switch (_Format) {
-                case enDataFormat.Link_To_Filesystem:
-                    return QuickImage.Get(enImageCode.Datei, 16);
-                case enDataFormat.RelationText:
-                    return QuickImage.Get(enImageCode.Herz, 16);
-                case enDataFormat.Datum_und_Uhrzeit:
-                    return QuickImage.Get(enImageCode.Uhr, 16);
-                case enDataFormat.Bit:
-                    return QuickImage.Get(enImageCode.Häkchen, 16);
-                case enDataFormat.FarbeInteger:
-                    return QuickImage.Get(enImageCode.Pinsel, 16);
-                case enDataFormat.Ganzzahl:
-                    return QuickImage.Get(enImageCode.Ganzzahl, 16);
-                case enDataFormat.Gleitkommazahl:
-                    return QuickImage.Get(enImageCode.Gleitkommazahl, 16);
-                case enDataFormat.BildCode:
-                    return QuickImage.Get(enImageCode.Smiley, 16);
-                case enDataFormat.LinkedCell:
-                    return QuickImage.Get(enImageCode.Fernglas, 16);
-                case enDataFormat.Columns_für_LinkedCellDropdown:
-                    return QuickImage.Get(enImageCode.Fernglas, 16, "FF0000", "");
-                case enDataFormat.Values_für_LinkedCellDropdown:
-                    return QuickImage.Get(enImageCode.Fernglas, 16, "00FF00", "");
-                case enDataFormat.Button:
-                    return QuickImage.Get(enImageCode.Kugel, 16);
-            }
-
-
-            if (_Format.TextboxEditPossible()) {
-                if (_MultiLine) { return QuickImage.Get(enImageCode.Textfeld, 16, "FF0000", ""); }
-                return QuickImage.Get(enImageCode.Textfeld);
-            }
-
-            return QuickImage.Get("Pfeil_Unten_Scrollbar|14|||||0");
-
+            return this == Database.Column.SysRowChanger
+                ? QuickImage.Get(enImageCode.Person)
+                : this == Database.Column.SysRowCreator
+                ? QuickImage.Get(enImageCode.Person)
+                : _Format switch {
+                    enDataFormat.Link_To_Filesystem => QuickImage.Get(enImageCode.Datei, 16),
+                    enDataFormat.RelationText => QuickImage.Get(enImageCode.Herz, 16),
+                    enDataFormat.Datum_und_Uhrzeit => QuickImage.Get(enImageCode.Uhr, 16),
+                    enDataFormat.Bit => QuickImage.Get(enImageCode.Häkchen, 16),
+                    enDataFormat.FarbeInteger => QuickImage.Get(enImageCode.Pinsel, 16),
+                    enDataFormat.Ganzzahl => QuickImage.Get(enImageCode.Ganzzahl, 16),
+                    enDataFormat.Gleitkommazahl => QuickImage.Get(enImageCode.Gleitkommazahl, 16),
+                    enDataFormat.BildCode => QuickImage.Get(enImageCode.Smiley, 16),
+                    enDataFormat.LinkedCell => QuickImage.Get(enImageCode.Fernglas, 16),
+                    enDataFormat.Columns_für_LinkedCellDropdown => QuickImage.Get(enImageCode.Fernglas, 16, "FF0000", ""),
+                    enDataFormat.Values_für_LinkedCellDropdown => QuickImage.Get(enImageCode.Fernglas, 16, "00FF00", ""),
+                    enDataFormat.Button => QuickImage.Get(enImageCode.Kugel, 16),
+                    _ => _Format.TextboxEditPossible()
+    ? _MultiLine ? QuickImage.Get(enImageCode.Textfeld, 16, "FF0000", "") : QuickImage.Get(enImageCode.Textfeld)
+    : QuickImage.Get("Pfeil_Unten_Scrollbar|14|||||0"),
+                };
         }
 
         public string ReadableText() {
@@ -1846,7 +1721,6 @@ namespace BlueDatabase {
                             ret = _Name; //_Caption + " (" + _Name + ")";
                         }
 
-
                         break;
                     }
                 }
@@ -1861,29 +1735,19 @@ namespace BlueDatabase {
                 if (tzei.ToLower() == tzei) {
                     ret = ret.Substring(0, i) + ret.Substring(i + 2);
                 }
-
             }
 
             return ret.Replace("\r", " ").Replace("  ", " ").TrimEnd(":");
         }
 
         public string CompareKey() {
-            string tmp;
-
-            if (string.IsNullOrEmpty(_Caption)) {
-                tmp = _Name + Constants.FirstSortChar + _Name;
-            } else {
-                tmp = _Caption + Constants.FirstSortChar + _Name;
-            }
-
-
+            var tmp = string.IsNullOrEmpty(_Caption) ? _Name + Constants.FirstSortChar + _Name : _Caption + Constants.FirstSortChar + _Name;
             tmp = tmp.Trim(' ');
             tmp = tmp.TrimStart('-');
             tmp = tmp.Trim(' ');
 
             return tmp;
         }
-
 
         public bool UserEditDialogTypeInFormula(enEditTypeFormula EditType_To_Check) {
 
@@ -1907,7 +1771,6 @@ namespace BlueDatabase {
 
                     return false;
 
-
                 case enDataFormat.LinkedCell:
                     if (EditType_To_Check == enEditTypeFormula.None) { return true; }
                     //if (EditType_To_Check != enEditTypeFormula.Textfeld &&
@@ -1922,7 +1785,6 @@ namespace BlueDatabase {
 
                     return col.UserEditDialogTypeInFormula(EditType_To_Check);
 
-
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                 case enDataFormat.Values_für_LinkedCellDropdown:
                     if (EditType_To_Check == enEditTypeFormula.Textfeld_mit_Auswahlknopf) { return true; }
@@ -1931,9 +1793,7 @@ namespace BlueDatabase {
                 case enDataFormat.Bit:
                     if (_MultiLine) { return false; }
                     if (EditType_To_Check == enEditTypeFormula.Ja_Nein_Knopf) {
-                        if (_DropdownWerteAndererZellenAnzeigen) { return false; }
-                        if (DropDownItems.Count > 0) { return false; }
-                        return true;
+                        return !_DropdownWerteAndererZellenAnzeigen && DropDownItems.Count <= 0;
                     }
                     if (EditType_To_Check == enEditTypeFormula.Textfeld_mit_Auswahlknopf) { return true; }
                     return false;
@@ -1946,7 +1806,6 @@ namespace BlueDatabase {
                         if (EditType_To_Check == enEditTypeFormula.EasyPic) { return true; }
                     }
                     return false;
-
 
                 //case enDataFormat.Relation:
                 //    switch (EditType_To_Check)
@@ -1963,8 +1822,6 @@ namespace BlueDatabase {
                     if (EditType_To_Check == enEditTypeFormula.Farb_Auswahl_Dialog) { return true; }
                     return false;
 
-
-
                 case enDataFormat.Schrift:
                     if (EditType_To_Check == enEditTypeFormula.Font_AuswahlDialog) { return true; }
                     return false;
@@ -1979,7 +1836,6 @@ namespace BlueDatabase {
                     return false;
 
             }
-
         }
 
         public int Index() {
@@ -1994,7 +1850,6 @@ namespace BlueDatabase {
 
             if (!Name.ContainsOnlyChars(Constants.AllowedCharsVariableName)) { return "Spaltenname enthält ungültige Zeichen. Erlaubt sind A-Z, 0-9 und _"; }
 
-
             foreach (var ThisColumn in Database.Column) {
                 if (ThisColumn != this && ThisColumn != null) {
                     if (_Name.ToUpper() == ThisColumn.Name.ToUpper()) { return "Spalten-Name bereits vorhanden."; }
@@ -2003,10 +1858,8 @@ namespace BlueDatabase {
 
             if (string.IsNullOrEmpty(_Caption)) { return "Spalten Beschriftung fehlt."; }
 
-
             if (!_SaveContent && string.IsNullOrEmpty(_Identifier)) { return "Inhalt der Spalte muss gespeichert werden."; }
             if (!_SaveContent && _ShowUndo) { return "Wenn der Inhalt der Spalte nicht gespeichert wird, darf auch kein Undo geloggt werden."; }
-
 
             if (((int)_Format).ToString() == _Format.ToString()) { return "Format fehlerhaft."; }
 
@@ -2014,7 +1867,6 @@ namespace BlueDatabase {
                 if (LinkedDatabase() == null) { return "Verknüpfte Datenbank fehlt oder existiert nicht."; }
                 if (LinkedDatabase() == Database) { return "Zirkelbezug mit verknüpfter Datenbank."; }
             }
-
 
             if (!_Format.Autofilter_möglich() && _FilterOptions != enFilterOptions.None) { return "Bei diesem Format keine Filterung erlaubt."; }
 
@@ -2028,7 +1880,6 @@ namespace BlueDatabase {
                     return "Dieser Filter kann nur bei Mehrzeiligen Spalten benutzt werden.";
                 }
             }
-
 
             switch (_Format) {
 
@@ -2066,8 +1917,6 @@ namespace BlueDatabase {
                         if (!_MultiLine) { return "Dieses Format muss mehrzeilig sein, da es von der Ziel-Spalte gesteuert wird."; }
                     }
 
-
-
                     break;
 
                 case enDataFormat.Values_für_LinkedCellDropdown:
@@ -2075,7 +1924,6 @@ namespace BlueDatabase {
                     if (KeyColumnKey > -1) { return "Dieses Format darf keine Verknüpfung zu einer Schlüsselspalte haben."; }
                     if (_VorschlagsColumn > 0) { return "Dieses Format kann keine Vorschlags-Spalte haben."; }
                     break;
-
 
                 case enDataFormat.Link_To_Filesystem:
                     if (!string.IsNullOrEmpty(_CellInitValue)) { return "Dieses Format kann keinen Initial-Text haben."; }
@@ -2088,14 +1936,11 @@ namespace BlueDatabase {
                     if (AfterEdit_AutoReplace.Count > 0) { return "Dieses Format darf keine Autokorrektur-Maßnahmen haben haben."; }
                     break;
 
-
                 case enDataFormat.Text_mit_Formatierung:
                     if (_AfterEdit_QuickSortRemoveDouble) { return "Format darf nicht sortiert werden."; }
                     break;
 
             }
-
-
 
             if (_MultiLine) {
                 if (!_Format.MultilinePossible()) { return "Format unterstützt keine mehrzeiligen Texte."; }
@@ -2107,12 +1952,7 @@ namespace BlueDatabase {
 
             if (_SpellCheckingEnabled && !_Format.SpellCheckingPossible()) { return "Rechtschreibprüfung bei diesem Format nicht möglich."; }
 
-
-
             if (_EditTrotzSperreErlaubt && !_TextBearbeitungErlaubt && !_DropdownBearbeitungErlaubt) { return "Wenn die Zeilensperre ignoriert werden soll, muss eine Bearbeitungsmethode definiert sein."; }
-
-
-
 
             var TMP_EditDialog = UserEditDialogTypeInTable(_Format, false, true, _MultiLine);
             if (_TextBearbeitungErlaubt) {
@@ -2127,7 +1967,6 @@ namespace BlueDatabase {
                 if (_SpellCheckingEnabled) { return "Entweder Dropdownmenü oder Rechtschreibprüfung."; }
                 if (TMP_EditDialog == enEditTypeTable.None) { return "Format unterstützt keine Auswahlmenü-Bearbeitung."; }
             }
-
 
             if (!_DropdownBearbeitungErlaubt && !_TextBearbeitungErlaubt) {
                 if (PermissionGroups_ChangeCell.Count > 0) { return "Bearbeitungsberechtigungen entfernen, wenn keine Bearbeitung erlaubt ist."; }
@@ -2148,21 +1987,16 @@ namespace BlueDatabase {
                 if (_Format != enDataFormat.Bit && _Format != enDataFormat.Columns_für_LinkedCellDropdown && _Format != enDataFormat.Values_für_LinkedCellDropdown) {
                     if (!_DropdownWerteAndererZellenAnzeigen && DropDownItems.Count == 0) { return "Keine Dropdown-Items vorhanden bzw. Alles hinzufügen nicht angewählt."; }
                 }
-
             } else {
 
                 if (_DropdownWerteAndererZellenAnzeigen) { return "Dropdownmenu nicht ausgewählt, 'alles hinzufügen' prüfen."; }
                 if (_DropdownAllesAbwählenErlaubt) { return "Dropdownmenu nicht ausgewählt, 'alles abwählen' prüfen."; }
                 if (DropDownItems.Count > 0) { return "Dropdownmenu nicht ausgewählt, Dropdown-Items vorhanden."; }
-
             }
-
 
             if (_DropdownWerteAndererZellenAnzeigen && !_Format.DropdownItemsOfOtherCellsAllowed()) { return "'Dropdownmenu alles hinzufügen' bei diesem Format nicht erlaubt."; }
             if (_DropdownAllesAbwählenErlaubt && !_Format.DropdownUnselectAllAllowed()) { return "'Dropdownmenu alles abwählen' bei diesem Format nicht erlaubt."; }
             if (DropDownItems.Count > 0 && !_Format.DropdownItemsAllowed()) { return "Manuelle 'Dropdow-Items' bei diesem Format nicht erlaubt."; }
-
-
 
             if (_BildTextVerhalten != enBildTextVerhalten.Nur_Text) {
 
@@ -2181,27 +2015,17 @@ namespace BlueDatabase {
                 }
             }
 
-
-
-
             if (!string.IsNullOrEmpty(_Suffix)) {
                 if (_MultiLine) { return "Einheiten und Mehrzeilig darf nicht kombiniert werden."; }
             }
 
-
             if (_AfterEdit_Runden > 6) { return "Beim Runden maximal 6 Nachkommastellen möglich"; }
-
 
             if (_FilterOptions == enFilterOptions.None) {
                 if (!string.IsNullOrEmpty(_AutoFilterJoker)) { return "Wenn kein Autofilter erlaubt ist, immer anzuzeigende Werte entfernen"; }
             }
 
-
-
-
-
             if (string.IsNullOrEmpty(_LinkedKeyKennung) && _Format.NeedLinkedKeyKennung()) { return "Spaltenkennung für verlinkte Datenbanken fehlt."; }
-
 
             if (OpticalReplace.Count > 0) {
                 if (_Format != enDataFormat.Text &&
@@ -2219,13 +2043,10 @@ namespace BlueDatabase {
                 if (!string.IsNullOrEmpty(I_Am_A_Key_For_Other_Column)) { return "Eine Schlüsselspalte darf selbst keine Verknüpfung zu einer anderen Spalte haben: " + I_Am_A_Key_For_Other_Column; }
                 var c = Database.Column.SearchByKey(_KeyColumnKey);
                 if (c == null) { return "Die verknüpfte Schlüsselspalte existiert nicht."; }
-
             }
-
 
             if (IsFirst()) {
                 if (_KeyColumnKey > -1) { return "Die (intern) erste Spalte darf keine Verknüpfung zu einer andern Schlüsselspalte haben."; }
-
             }
 
             if (_Format != enDataFormat.LinkedCell) {
@@ -2234,10 +2055,8 @@ namespace BlueDatabase {
                 if (_LinkedCell_ColumnValueFoundIn > -1) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
             }
 
-
             return string.Empty;
         }
-
 
         public bool IsOk() {
             return string.IsNullOrEmpty(ErrorReason());
@@ -2247,7 +2066,6 @@ namespace BlueDatabase {
             Database.AddPending(enDatabaseDataType.co_Tags, Key, Tags.JoinWithCr(), false);
             OnChanged();
         }
-
 
         private void DropDownItems_ListOrItemChanged(object sender, System.EventArgs e) {
             Database.AddPending(enDatabaseDataType.co_DropDownItems, Key, DropDownItems.JoinWithCr(), false);
@@ -2275,8 +2093,6 @@ namespace BlueDatabase {
             OnChanged();
         }
 
-
-
         public string AutoCorrect(string Value) {
 
             if (Format == enDataFormat.Link_To_Filesystem) {
@@ -2290,12 +2106,9 @@ namespace BlueDatabase {
                 Value = l2.SortedDistinctList().JoinWithCr();
             }
 
-
             if (_AfterEdit_DoUCase) { Value = Value.ToUpper(); }
 
             if (!string.IsNullOrEmpty(_AutoRemove)) { Value = Value.RemoveChars(_AutoRemove); }
-
-
 
             if (AfterEdit_AutoReplace.Count > 0) {
                 var l = new List<string>(Value.SplitByCR());
@@ -2309,7 +2122,6 @@ namespace BlueDatabase {
                         if (rep.Length > 1) { r = rep[1].Replace(";cr;", "\r"); }
                         var op = string.Empty;
                         if (rep.Length > 2) { op = rep[2].ToLower(); }
-
 
                         if (op == "casesensitive") {
                             if (l[z] == rep[0]) { l[z] = r; }
@@ -2332,7 +2144,6 @@ namespace BlueDatabase {
                 Value = erg.ToString();
             }
 
-
             if (_AfterEdit_QuickSortRemoveDouble) {
                 var l = new List<string>(Value.SplitByCR()).SortedDistinctList();
                 Value = l.JoinWithCr();
@@ -2340,7 +2151,6 @@ namespace BlueDatabase {
 
             return Value;
         }
-
 
         private string KleineFehlerCorrect(string TXT) {
             if (string.IsNullOrEmpty(TXT)) { return string.Empty; }
@@ -2372,10 +2182,7 @@ namespace BlueDatabase {
                 // 3-5 Stunden
                 // 180°C
 
-
                 // Nach Zahlen KEINE leerzeichen einfügen. Es gibgt so viele dinge.... 90er Schichtsalat
-
-
 
                 TXT = TXT.Insert(" ", ",", "1234567890, \r");
                 TXT = TXT.Insert(" ", "!", " !?)\r");
@@ -2384,7 +2191,6 @@ namespace BlueDatabase {
                 TXT = TXT.Insert(" ", ")", " .;!?\r");
                 TXT = TXT.Insert(" ", ";", " 1234567890\r");
                 TXT = TXT.Insert(" ", ":", "1234567890 \\/\r"); // auch 3:50 Uhr
-
 
                 // H4= Normaler Text
                 TXT = TXT.Replace(" " + h4, h4 + " "); // H4 = Normaler Text, nach links rutschen
@@ -2396,7 +2202,6 @@ namespace BlueDatabase {
                 TXT = TXT.Replace(h1 + " ", " " + h1); // Überschrift, nach Rechts
                 TXT = TXT.Replace(h7 + " ", " " + h7); // Bold, nach Rechts
 
-
                 TXT = TXT.Replace(h3 + "\r", "\r" + h3); // Überschrift, nach Rechts
                 TXT = TXT.Replace(h2 + "\r", "\r" + h2); // Überschrift, nach Rechts
                 TXT = TXT.Replace(h1 + "\r", "\r" + h1); // Überschrift, nach Rechts
@@ -2407,7 +2212,6 @@ namespace BlueDatabase {
                 TXT = TXT.Replace(h2 + h4.ToString(), h4.ToString());
                 TXT = TXT.Replace(h1 + h4.ToString(), h4.ToString());
                 TXT = TXT.Replace(h4 + h4.ToString(), h4.ToString());
-
 
                 TXT = TXT.Replace(" °", "°");
                 TXT = TXT.Replace(" .", ".");
@@ -2421,7 +2225,6 @@ namespace BlueDatabase {
                 TXT = TXT.Replace("/ ", "/");
                 TXT = TXT.Replace(" /", "/");
 
-
                 TXT = TXT.Replace("\r ", "\r");
                 TXT = TXT.Replace(" \r", "\r");
 
@@ -2429,7 +2232,6 @@ namespace BlueDatabase {
                 TXT = TXT.Replace("    ", " ");
                 TXT = TXT.Replace("   ", " "); // Wenn das hier nicht da ist, passieren wirklich fehler...
                 TXT = TXT.Replace("  ", " ");
-
 
                 TXT = TXT.Trim(' ');
                 TXT = TXT.Trim("\r");
@@ -2445,8 +2247,6 @@ namespace BlueDatabase {
             return TXT;
         }
 
-
-
         public string SimplyFile(string fullFileName) {
             if (_Format != enDataFormat.Link_To_Filesystem) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Nur bei Link_To_Filesystem erlaubt!");
@@ -2457,12 +2257,10 @@ namespace BlueDatabase {
             if (BestFile(tmpfile, false).ToLower() == fullFileName.ToLower()) { return tmpfile; }
 
             tmpfile = fullFileName.FileNameWithSuffix();
-            if (tmpfile.ToLower() == fullFileName.ToLower()) { return tmpfile; }
-            if (BestFile(tmpfile, false).ToLower() == fullFileName.ToLower()) { return tmpfile; }
-
-            return fullFileName;
+            return tmpfile.ToLower() == fullFileName.ToLower()
+                ? tmpfile
+                : BestFile(tmpfile, false).ToLower() == fullFileName.ToLower() ? tmpfile : fullFileName;
         }
-
 
         /// <summary>
         /// Gibt den Dateinamen mit Pfad und Suffix zurück, der sich aus dem Standard-Angaben der Zelle und dem hier übergebebenen Dateinamen zusammensetzt.
@@ -2490,8 +2288,6 @@ namespace BlueDatabase {
 
             if (filename.Contains("\r")) { Develop.DebugPrint_NichtImplementiert(); }
 
-
-
             // Wenn FileNameWithoutPath kein Suffix hat, das Standard Suffix hinzufügen
             var suffix = filename.FileSuffix();
             var cleanfilename = filename;
@@ -2505,11 +2301,8 @@ namespace BlueDatabase {
             var directory = _BestFile_StandardFolder.Trim("\\");
             if (string.IsNullOrEmpty(directory)) { directory = "Files"; }
 
-
             // Ist nur ein Unterferzeichniss angegeben, den Datenbankpfad benutzen und das Unterverzeichniss anhängen
             if (directory.Substring(1, 1) != ":" && directory.Substring(0, 1) != "\\") { directory = Database.Filename.FilePath() + directory; }
-
-
 
             if (!mustBeFree) {
                 return (directory.TrimEnd("\\") + "\\" + cleanfilename + "." + suffix.ToLower()).TrimEnd(".");
@@ -2532,24 +2325,18 @@ namespace BlueDatabase {
                             break;
                         }
                     }
-
                 }
 
                 if (ok) {
                     var tmp = (directory.TrimEnd("\\") + "\\" + tmpname + "." + suffix.ToLower()).TrimEnd(".");
                     if (!FileExists(tmp)) { return tmp; }
                 }
-
-
             } while (true);
         }
 
-
         public bool AutoFilterSymbolPossible() {
-            if (!FilterOptions.HasFlag(enFilterOptions.Enabled)) { return false; }
-            return Format.Autofilter_möglich();
+            return FilterOptions.HasFlag(enFilterOptions.Enabled) && Format.Autofilter_möglich();
         }
-
 
         public List<string> Autofilter_ItemList(FilterCollection filter, List<RowItem> pinned) {
             if (filter == null || filter.Count < 0) { return Contents(null, pinned); }
@@ -2596,18 +2383,17 @@ namespace BlueDatabase {
 
                 default:
                     if (Format.TextboxEditPossible()) {
-                        if (!DoDropDown) { return enEditTypeTable.Textfeld; }
-
-                        if (isMultiline) { return enEditTypeTable.Dropdown_Single; }
-                        if (KeybordInputAllowed) { return enEditTypeTable.Textfeld_mit_Auswahlknopf; }
-                        return enEditTypeTable.Dropdown_Single;
+                        return !DoDropDown
+                            ? enEditTypeTable.Textfeld
+                            : isMultiline
+                            ? enEditTypeTable.Dropdown_Single
+                            : KeybordInputAllowed ? enEditTypeTable.Textfeld_mit_Auswahlknopf : enEditTypeTable.Dropdown_Single;
                     }
 
                     Develop.DebugPrint(Format);
                     return enEditTypeTable.None;
 
             }
-
         }
 
         //public void Parse(string ToParse) {
@@ -2624,21 +2410,13 @@ namespace BlueDatabase {
         //    return new ColumnItem(this, false);
         //}
 
-
         public void GetUniques(List<RowItem> rows, out List<string> Einzigartig, out List<string> NichtEinzigartig) {
-
 
             Einzigartig = new List<string>();
             NichtEinzigartig = new List<string>();
 
             foreach (var ThisRow in rows) {
-                List<string> TMP = null;
-                if (MultiLine) {
-                    TMP = ThisRow.CellGetList(this);
-                } else {
-                    TMP = new List<string> { ThisRow.CellGetString(this) };
-                }
-
+                var TMP = MultiLine ? ThisRow.CellGetList(this) : new List<string> { ThisRow.CellGetString(this) };
                 foreach (var ThisString in TMP) {
                     if (Einzigartig.Contains(ThisString)) {
                         NichtEinzigartig.AddIfNotExists(ThisString);
@@ -2651,9 +2429,6 @@ namespace BlueDatabase {
             Einzigartig.RemoveString(NichtEinzigartig, false);
 
         }
-
-
-
 
         /// <summary>
         /// Füllt die Ersetzungen mittels eines übergebenen Enums aus.
@@ -2686,12 +2461,10 @@ namespace BlueDatabase {
                 OpticalReplace.AddRange(NewReplacer);
             }
 
-
             if (DropDownItems.IsDifferentTo(NewAuswahl)) {
                 DropDownItems.Clear();
                 DropDownItems.AddRange(NewAuswahl);
             }
-
         }
 
         private void Dispose(bool disposing) {
@@ -2704,14 +2477,11 @@ namespace BlueDatabase {
                 Invalidate_TmpVariables();
                 Database = null;
 
-
-
                 DropDownItems.Dispose();
                 Tags.Dispose();
                 PermissionGroups_ChangeCell.Dispose();
                 OpticalReplace.Dispose();
                 AfterEdit_AutoReplace.Dispose();
-
 
                 // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
                 // TODO: Große Felder auf NULL setzen
