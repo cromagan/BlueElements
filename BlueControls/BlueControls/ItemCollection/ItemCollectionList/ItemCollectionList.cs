@@ -283,7 +283,7 @@ namespace BlueControls.ItemCollection {
                         sameh = ThisItem.SizeUntouchedForListBox().Height;
                     }
 
-                    if (!(ThisItem is TextListItem) && !(ThisItem is CellLikeListItem)) { or = enOrientation.Waagerecht; }
+                    if (ThisItem is not TextListItem and not CellLikeListItem) { or = enOrientation.Waagerecht; }
                 }
             }
 

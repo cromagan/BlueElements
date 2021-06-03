@@ -641,30 +641,30 @@ namespace BlueBasics {
         }
 
         public static enFileFormat FileType(this string filename) {
-            if (string.IsNullOrEmpty(filename)) { return enFileFormat.Unknown; }
-
-            return filename.FileSuffix() switch {
-                "DOC" or "DOCX" or "RTF" or "ODT" => enFileFormat.WordKind,
-                "TXT" or "INI" or "INFO" => enFileFormat.Textdocument,
-                "XLS" or "CSV" or "XLA" or "XLSX" or "XLSM" or "ODS" => enFileFormat.ExcelKind,
-                "PPT" or "PPS" or "PPA" => enFileFormat.PowerPointKind,
-                "MSG" or "EML" => enFileFormat.EMail,
-                "PDF" => enFileFormat.Pdf,
-                "HTM" or "HTML" => enFileFormat.HTML,
-                "JPG" or "JPEG" or "BMP" or "TIFF" or "TIF" or "GIF" or "PNG" => enFileFormat.Image,
-                "ICO" => enFileFormat.Icon,
-                "ZIP" or "RAR" or "7Z" => enFileFormat.CompressedArchive,
-                "AVI" or "DIVX" or "MPG" or "MPEG" or "WMV" or "FLV" or "MP4" or "MKV" or "M4V" => enFileFormat.Movie,
-                "EXE" or "BAT" or "SCR" => enFileFormat.Executable,
-                "CHM" => enFileFormat.HelpFile,
-                "XML" => enFileFormat.XMLFile,
-                "VCF" => enFileFormat.Visitenkarte,
-                "MP3" or "WAV" or "AAC" => enFileFormat.Sound,
-                "B4A" or "BAS" or "CS" => enFileFormat.ProgrammingCode,// case "DLL":
-                "DB" or "MDB" => enFileFormat.Database,
-                "LNK" or "URL" => enFileFormat.Link,
-                _ => enFileFormat.Unknown,
-            };
+            return string.IsNullOrEmpty(filename)
+                ? enFileFormat.Unknown
+                : filename.FileSuffix() switch {
+                    "DOC" or "DOCX" or "RTF" or "ODT" => enFileFormat.WordKind,
+                    "TXT" or "INI" or "INFO" => enFileFormat.Textdocument,
+                    "XLS" or "CSV" or "XLA" or "XLSX" or "XLSM" or "ODS" => enFileFormat.ExcelKind,
+                    "PPT" or "PPS" or "PPA" => enFileFormat.PowerPointKind,
+                    "MSG" or "EML" => enFileFormat.EMail,
+                    "PDF" => enFileFormat.Pdf,
+                    "HTM" or "HTML" => enFileFormat.HTML,
+                    "JPG" or "JPEG" or "BMP" or "TIFF" or "TIF" or "GIF" or "PNG" => enFileFormat.Image,
+                    "ICO" => enFileFormat.Icon,
+                    "ZIP" or "RAR" or "7Z" => enFileFormat.CompressedArchive,
+                    "AVI" or "DIVX" or "MPG" or "MPEG" or "WMV" or "FLV" or "MP4" or "MKV" or "M4V" => enFileFormat.Movie,
+                    "EXE" or "BAT" or "SCR" => enFileFormat.Executable,
+                    "CHM" => enFileFormat.HelpFile,
+                    "XML" => enFileFormat.XMLFile,
+                    "VCF" => enFileFormat.Visitenkarte,
+                    "MP3" or "WAV" or "AAC" => enFileFormat.Sound,
+                    "B4A" or "BAS" or "CS" => enFileFormat.ProgrammingCode,// case "DLL":
+                    "DB" or "MDB" => enFileFormat.Database,
+                    "LNK" or "URL" => enFileFormat.Link,
+                    _ => enFileFormat.Unknown,
+                };
         }
 
         public static string PathParent(this string pfad, int anzahlParents) {

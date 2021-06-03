@@ -117,7 +117,7 @@ namespace BlueControls.ItemCollection {
 
         protected override RectangleM CalculateUsedArea() {
             return p_LO == null || p_RU == null ? new RectangleM()
-                : new RectangleM(Math.Min(p_LO.X, p_RU.X), Math.Min(p_LO.Y, p_RU.Y), Math.Abs(p_RU.X - p_LO.X)+1, Math.Abs(p_RU.Y - p_LO.Y)+1);
+                : new RectangleM(Math.Min(p_LO.X, p_RU.X), Math.Min(p_LO.Y, p_RU.Y), Math.Abs(p_RU.X - p_LO.X) + 1, Math.Abs(p_RU.Y - p_LO.Y) + 1);
         }
 
         public override void PointMoved(PointM point) {

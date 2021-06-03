@@ -26,16 +26,20 @@ using System.Drawing;
 using System.Drawing.Printing;
 
 namespace BlueControls.Forms {
-    public partial class PageSetupDialog {
+    public partial class PageSetupDialog : DialogWithOkAndCancel {
         private bool Doing;
 
         private readonly PrintDocument OriD;
+        private PrintDocument GiveBack = null;
 
-        //  ReadOnly _NurHoch As Boolean
+        public static PrintDocument Show(PrintDocument _PrintDocument1, bool NurHochformat) {
+            var MB = new PageSetupDialog(_PrintDocument1, NurHochformat);
+            MB.ShowDialog();
 
-        private bool cancelx = true;
+            return MB.GiveBack;
+        }
 
-        public PageSetupDialog(PrintDocument _PrintDocument1, bool NurHochformat) {
+        private PageSetupDialog(PrintDocument _PrintDocument1, bool NurHochformat) : base() {
 
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
@@ -90,10 +94,7 @@ namespace BlueControls.Forms {
             Doing = false;
         }
 
-        private void Ok_Click(object sender, System.EventArgs e) {
-            cancelx = false;
-            Close();
-        }
+
 
         private void Something_TextChanged(object sender, System.EventArgs e) {
 
@@ -105,29 +106,9 @@ namespace BlueControls.Forms {
             //generatePic()
         }
 
-        public bool Canceled() {
-            return cancelx;
-        }
 
-        public new void ShowDialog() {
-            cancelx = true;
 
-            base.ShowDialog();
 
-            if (cancelx) { return; }
-
-            OriD.DefaultPageSettings.Landscape = Querformat.Checked;
-            OriD.DefaultPageSettings.PaperSize = new PaperSize("Benutzerdefiniert", (int)(float.Parse(Breite.Text) / 0.254), (int)(float.Parse(Höhe.Text) / 0.254));
-            OriD.DefaultPageSettings.Margins.Top = (int)(float.Parse(Oben.Text) / 0.254);
-            OriD.DefaultPageSettings.Margins.Bottom = (int)(float.Parse(Unten.Text) / 0.254);
-            OriD.DefaultPageSettings.Margins.Left = (int)(float.Parse(Links.Text) / 0.254);
-            OriD.DefaultPageSettings.Margins.Right = (int)(float.Parse(Rechts.Text) / 0.254);
-        }
-
-        private void canc_Click(object sender, System.EventArgs e) {
-            cancelx = true;
-            Close();
-        }
 
         private void Format_ItemClicked(object sender, BasicListItemEventArgs e) {
 
@@ -147,8 +128,8 @@ namespace BlueControls.Forms {
             Doing = false;
         }
 
-        private double Inch1000ToMM(double Inch) {
-            return Inch switch {
+        private double Inch1000ToMM(double inch) {
+            return inch switch {
                 8 => 2.0F,
                 16 => 4.0F,
                 20 => 5.0F,
@@ -164,7 +145,7 @@ namespace BlueControls.Forms {
                 827 => 210.0F,
                 1169 => 297.0F,
                 1654 => 420.0F,
-                _ => Math.Round(Inch * 0.254, 1),
+                _ => Math.Round(inch * 0.254, 1),
             };
         }
 
@@ -263,7 +244,7 @@ namespace BlueControls.Forms {
             if (Querformat.Checked) { modAllgemein.Swap(ref br, ref ho); }
 
             if (makeP) {
-                Ok.Enabled = true;
+                OK_Enabled = true;
 
                 var Z = Math.Min(Sample.Width / br, Sample.Height / ho);
 
@@ -284,10 +265,23 @@ namespace BlueControls.Forms {
                 Sample.Image = i;
 
             } else {
-                Ok.Enabled = false;
+                OK_Enabled = false;
                 Sample.Image = null;
 
             }
+        }
+
+        protected override void SetValue(bool canceled) {
+            if (canceled) { GiveBack = null; return; }
+
+            GiveBack = new PrintDocument();
+
+            GiveBack.DefaultPageSettings.Landscape = Querformat.Checked;
+            GiveBack.DefaultPageSettings.PaperSize = new PaperSize("Benutzerdefiniert", (int)(float.Parse(Breite.Text) / 0.254), (int)(float.Parse(Höhe.Text) / 0.254));
+            GiveBack.DefaultPageSettings.Margins.Top = (int)(float.Parse(Oben.Text) / 0.254);
+            GiveBack.DefaultPageSettings.Margins.Bottom = (int)(float.Parse(Unten.Text) / 0.254);
+            GiveBack.DefaultPageSettings.Margins.Left = (int)(float.Parse(Links.Text) / 0.254);
+            GiveBack.DefaultPageSettings.Margins.Right = (int)(float.Parse(Rechts.Text) / 0.254);
         }
     }
 }

@@ -3245,7 +3245,7 @@ namespace BlueControls.Controls {
             newRow = row;
 
             if (_Design == enBlueTableAppearance.OnlyMainColumnWithoutHead) {
-                if (direction != enDirection.Oben && direction != enDirection.Unten) {
+                if (direction is not enDirection.Oben and not enDirection.Unten) {
                     newColumn = _Database.Column[0];
                     return;
                 }

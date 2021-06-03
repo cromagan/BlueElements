@@ -103,8 +103,7 @@ namespace BlueControls {
 
             var Erg = Math.Min(Math.Min(llo, lro), Math.Min(llu, lru));
 
-            if (Erg == llo) { return LO; }
-            return Erg == lro ? rO : Erg == llu ? lu : Erg == lru ? ru : null;
+            return Erg == llo ? LO : Erg == lro ? rO : Erg == llu ? lu : Erg == lru ? ru : null;
         }
 
         public bool Contains(PointM P) {

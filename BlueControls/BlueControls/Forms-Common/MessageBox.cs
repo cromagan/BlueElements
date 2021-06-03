@@ -19,6 +19,9 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
+using BlueControls.Enums;
+using System.Collections.Generic;
+using System.Drawing;
 
 namespace BlueControls.Forms {
     public partial class MessageBox : Forms.Form {
@@ -61,6 +64,72 @@ namespace BlueControls.Forms {
             if (Owner == null) {
                 StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             }
+        }
+        public List<Button> Generate_Buttons(string[] Names) {
+            var MyX = Width - Skin.Padding - BorderWidth;
+            var erT = new ExtText(enDesign.Button, enStates.Standard);
+            var Buts = new List<Button>();
+
+            for (var Z = Names.GetUpperBound(0); Z > -1; Z--) {
+                if (!string.IsNullOrEmpty(Names[Z])) {
+
+                    erT.TextDimensions = Size.Empty;
+                    erT.PlainText = Names[Z];
+                    var B = new Button {
+                        Name = Z.ToString(),
+                        Text = Names[Z]
+                    };
+                    var W = 2;
+
+                    switch (B.Text.ToLower()) {
+                        case "ja":
+                        case "ok":
+                            B.ImageCode = "Häkchen|16";
+                            W = 4;
+                            break;
+
+                        case "nein":
+                        case "abbrechen":
+                        case "abbruch":
+                            B.ImageCode = "Kreuz|16";
+                            W = 4;
+                            break;
+
+                        case "verwerfen":
+                        case "löschen":
+                            B.ImageCode = "Papierkorb|16";
+                            W = 4;
+                            break;
+
+                        case "speichern":
+                        case "sichern":
+                            B.ImageCode = "Diskette|16";
+                            W = 4;
+                            break;
+
+                        case "laden":
+                            B.ImageCode = "Ordner|16";
+                            W = 4;
+                            break;
+
+                        default:
+                            B.ImageCode = string.Empty;
+                            break;
+                    }
+
+                    B.Size = new Size(erT.Width() + (Skin.Padding * W), erT.Height() + (Skin.Padding * 2));
+                    B.Location = new Point(MyX - B.Width, Height - BorderHeight - Skin.Padding - B.Height);
+                    MyX = B.Location.X - Skin.Padding;
+
+                    B.ButtonStyle = enButtonStyle.Button;
+                    B.Visible = true;
+                    B.Anchor = System.Windows.Forms.AnchorStyles.Right | System.Windows.Forms.AnchorStyles.Bottom;
+                    Controls.Add(B);
+                    Buts.Add(B);
+
+                }
+            }
+            return Buts;
         }
 
         private void ThisButton_Click(object sender, System.EventArgs e) {

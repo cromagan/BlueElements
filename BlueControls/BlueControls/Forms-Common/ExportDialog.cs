@@ -333,6 +333,7 @@ namespace BlueControls.Forms {
 
             padSchachteln.Item.SheetSizeInMM = new System.Drawing.SizeF(b, h);
             padSchachteln.Item.RandinMM = Padding.Empty;
+            padSchachteln.Item.BackColor = System.Drawing.Color.Transparent;
 
             GeneratePrintPad(padSchachteln, 0, cbxLayoutWahl.Text, _RowsForExport, ab);
 

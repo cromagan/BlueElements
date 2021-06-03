@@ -245,7 +245,7 @@ namespace BlueControls.Controls {
             switch (e.Button) {
                 case System.Windows.Forms.MouseButtons.Left:
                     if (ND != null) {
-                        if (Appearance == enBlueListBoxAppearance.Listbox || Appearance == enBlueListBoxAppearance.Autofilter || Appearance == enBlueListBoxAppearance.Gallery || Appearance == enBlueListBoxAppearance.FileSystem) {
+                        if (Appearance is enBlueListBoxAppearance.Listbox or enBlueListBoxAppearance.Autofilter or enBlueListBoxAppearance.Gallery or enBlueListBoxAppearance.FileSystem) {
                             if (ND.IsClickable()) { ND.Checked = !ND.Checked; }
                         }
                         OnItemClicked(new BasicListItemEventArgs(ND));

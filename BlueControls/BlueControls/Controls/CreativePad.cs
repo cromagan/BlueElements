@@ -360,11 +360,11 @@ namespace BlueControls.Controls {
                     var LO = new PointM(0m, 0m).ZoomAndMove(zoom, X, Y);
                     var RU = new PointM(SSW, SSH).ZoomAndMove(zoom, X, Y);
 
-                    qqq
-                    //var R = new Rectangle((int)LO.X, (int)LO.Y, (int)(RU.X - LO.X), (int)(RU.Y - LO.Y));
-                    //gr.FillRectangle(Brushes.White, R);
-                    //gr.FillRectangle(new SolidBrush(Item.BackColor), R);
-                    //gr.DrawRectangle(PenGray, R);
+                    if (Item.BackColor.A > 0) {
+                        var R = new Rectangle((int)LO.X, (int)LO.Y, (int)(RU.X - LO.X), (int)(RU.Y - LO.Y));
+                        gr.FillRectangle(new SolidBrush(Item.BackColor), R);
+                    }
+
 
                     if (!_ShowInPrintMode) {
                         var rLO = new PointM(_Item.P_rLO.X, _Item.P_rLO.Y).ZoomAndMove(zoom, X, Y);
@@ -373,9 +373,9 @@ namespace BlueControls.Controls {
                         gr.DrawRectangle(PenGray, Rr);
                     }
                 } else {
-                    qq
-                    //gr.Clear(Color.White);
-                    //gr.Clear(Item.BackColor);
+                    if (Item.BackColor.A > 0) {
+                        gr.Clear(Item.BackColor);
+                    }
                 }
                 gr.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.None;
                 if (!_Item.Draw(gr, zoom, X, Y, maxs, _ShowInPrintMode, visibleItems)) {
@@ -727,9 +727,9 @@ namespace BlueControls.Controls {
 
             RepairPrinterData();
 
-            var x = new BlueControls.Forms.PageSetupDialog(DruckerDokument, false);
-            x.ShowDialog();
-            x.Dispose();
+            var x = BlueControls.Forms.PageSetupDialog.Show(DruckerDokument, false);
+            if (x == null) { return; }
+            DruckerDokument = x;
 
         }
 
@@ -757,13 +757,14 @@ namespace BlueControls.Controls {
             OriD.DefaultPageSettings.Margins.Left = (int)(_Item.RandinMM.Left / 25.4 * 100);
             OriD.DefaultPageSettings.Margins.Right = (int)(_Item.RandinMM.Right / 25.4 * 100);
 
-            using (var x = new BlueControls.Forms.PageSetupDialog(OriD, true)) {
-                x.ShowDialog();
-                if (x.Canceled()) { return; }
-            }
 
-            _Item.SheetSizeInMM = new SizeF((int)(OriD.DefaultPageSettings.PaperSize.Width * 25.4 / 100), (int)(OriD.DefaultPageSettings.PaperSize.Height * 25.4 / 100));
-            _Item.RandinMM = new System.Windows.Forms.Padding((int)(OriD.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(OriD.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(OriD.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(OriD.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
+            var nOriD = BlueControls.Forms.PageSetupDialog.Show(OriD, true);
+            if (nOriD == null) { return; }
+            _Item.SheetSizeInMM = new SizeF((int)(nOriD.DefaultPageSettings.PaperSize.Width * 25.4 / 100), (int)(nOriD.DefaultPageSettings.PaperSize.Height * 25.4 / 100));
+            _Item.RandinMM = new System.Windows.Forms.Padding((int)(nOriD.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(nOriD.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(nOriD.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(nOriD.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
+
+
+
 
         }
 

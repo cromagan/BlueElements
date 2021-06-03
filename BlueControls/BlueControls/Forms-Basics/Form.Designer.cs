@@ -1,47 +1,45 @@
-﻿using System.Diagnostics;
+﻿using BlueControls.Enums;
+using System.Diagnostics;
 
-namespace BlueControls.Forms
-{
+namespace BlueControls.Forms {
 
+    partial class Form {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
 
-    public partial class Form 
-    {
-        //Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
-        [DebuggerNonUserCode()]
-        protected override void Dispose(bool disposing)
-        {
-            try
-            {
-                if (disposing)
-                {
-
-                }
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing) {
+            if (disposing && (components != null)) {
+                components.Dispose();
             }
-            finally
-            {
-                base.Dispose(disposing);
-            }
+            base.Dispose(disposing);
         }
 
+        #region Windows Form Designer generated code
 
-
-        //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
-        //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
-        //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
-        [DebuggerStepThrough()]
-        private void InitializeComponent()
-        {
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent() {
             this.SuspendLayout();
             // 
             // Form
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.ClientSize = new System.Drawing.Size(184, 161);
+            this.ClientSize = new System.Drawing.Size(263, 224);
             this.Name = "Form";
             this.Text = "Form";
             this.ResumeLayout(false);
 
         }
+        #endregion
     }
+
 }

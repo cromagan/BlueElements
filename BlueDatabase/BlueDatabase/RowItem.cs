@@ -340,7 +340,7 @@ namespace BlueDatabase {
             try {
                 var vars = new List<Variable>
                 {
-                new Variable("Startroutine", startRoutine, enVariableDataType.String, true, false, "ACHTUNG: Keinesfalls dürfen Startroutinenabhängig Werte verändert werden.\r\nMögliche Werte: new row, value changed, script testing, manual check, to be sure, import")
+                new Variable("Startroutine", startRoutine, enVariableDataType.String, true, false, "ACHTUNG: Keinesfalls dürfen Startroutinenabhängig Werte verändert werden.\r\nMögliche Werte:\r\new row\r\nvalue changed\r\nscript testing\r\nmanual check\r\nto be sure\r\nimport, export")
                 };
 
                 #region Variablen für Skript erstellen

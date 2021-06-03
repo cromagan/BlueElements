@@ -7,6 +7,7 @@ using static BlueBasics.Develop;
 namespace BlueControls.Forms {
     public partial class DialogWithOkAndCancel : BlueControls.Forms.Form {
 
+        bool _cancelPossible = false;
         #region Konstruktor
         public DialogWithOkAndCancel() : this(Enums.enDesign.Form_MsgBox) {
 
@@ -26,6 +27,8 @@ namespace BlueControls.Forms {
         public void Setup(int MinWidth, int BottomOfLowestControl, bool CancelPossible, bool Sizeable) {
 
             Text = Develop.AppName();
+
+            _cancelPossible = CancelPossible;
 
             MinWidth = Math.Max(Width, MinWidth);
 
@@ -51,6 +54,8 @@ namespace BlueControls.Forms {
         public void Setup(string TXT, GenericControl CenterControl, int MinWidth, bool CancelPossible, bool Sizeable) {
             var wi = Skin.Padding * 2;
             var he = Skin.Padding * 2;
+
+            _cancelPossible = CancelPossible;
 
             if (!string.IsNullOrEmpty(TXT)) {
                 capText.Visible = true;
@@ -101,6 +106,32 @@ namespace BlueControls.Forms {
         }
         private void butOK_Click(object sender, System.EventArgs e) {
             Ok();
+        }
+
+
+        /// <summary>
+        /// Must handle some layout operations manually because Visual Studio 
+        /// 2005 arbitrarily changes some properties of inherited controls.
+        /// </summary>
+        /// <param name="e">Data for event.</param>
+        protected override void OnResize(System.EventArgs e) {
+            base.OnResize(e);
+            // https://stackoverflow.com/questions/4971768/incorrect-behavior-of-panel-on-inherited-windows-form
+            if (butOK != null) {
+                if (_cancelPossible) {
+                    butOK.Top = Height - 87;
+                    butOK.Left = Width - 193;
+
+                    butAbbrechen.Top = butOK.Top;
+                    butAbbrechen.Left = butOK.Right + Skin.Padding;
+                } else {
+                    butOK.Top = Height - 87;
+                    butOK.Left = Width - 193 + butAbbrechen.Width + Skin.Padding;
+                    butAbbrechen.Visible = false;
+                }
+
+
+            }
         }
     }
 }

@@ -239,7 +239,7 @@ namespace BlueControls.ItemCollection {
 
             var TextWinkel = (float)(_Winkel % 360);
 
-            if (TextWinkel > 90 && TextWinkel <= 270) { TextWinkel = (float)(_Winkel - 180); }
+            if (TextWinkel is > 90 and <= 270) { TextWinkel = (float)(_Winkel - 180); }
 
             if (geszoom < 0.15m) { return; } // Schrift zu klein, würde abstürzen
 

@@ -45,15 +45,10 @@ namespace BlueBasics {
                 for (var i = 0; i <= 2; i++) {
                     if (t3[i] < 0) { t3[i] += 1.0; }
                     if (t3[i] > 1) { t3[i] -= 1.0; }
-                    if (6.0 * t3[i] < 1.0) {
-                        clr[i] = temp1 + ((temp2 - temp1) * t3[i] * 6.0);
-                    } else if (2.0 * t3[i] < 1.0) {
-                        clr[i] = temp2;
-                    } else if (3.0 * t3[i] < 2.0) {
-                        clr[i] = temp1 + ((temp2 - temp1) * ((2.0 / 3.0) - t3[i]) * 6.0);
-                    } else {
-                        clr[i] = temp1;
-                    }
+                    clr[i] = 6.0 * t3[i] < 1.0 ? temp1 + ((temp2 - temp1) * t3[i] * 6.0)
+                            : 2.0 * t3[i] < 1.0 ? temp2
+                            : 3.0 * t3[i] < 2.0 ? temp1 + ((temp2 - temp1) * ((2.0 / 3.0) - t3[i]) * 6.0)
+                            : temp1;
                 }
 
                 r = clr[0];

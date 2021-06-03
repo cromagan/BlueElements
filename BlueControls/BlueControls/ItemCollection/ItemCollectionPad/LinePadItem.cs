@@ -233,7 +233,7 @@ namespace BlueControls.ItemCollection {
                         break;
                     }
 
-                    if (Linien_Verhalten == enConectorStyle.AusweichenUndGerade || Linien_Verhalten == enConectorStyle.Ausweichenx) {
+                    if (Linien_Verhalten is enConectorStyle.AusweichenUndGerade or enConectorStyle.Ausweichenx) {
                         if (WeicheAus(z)) {
                             again = true;
                             break;
@@ -256,7 +256,7 @@ namespace BlueControls.ItemCollection {
             foreach (var ThisBasicItem in Parent) {
                 if (ThisBasicItem != null) {
 
-                    if (!(ThisBasicItem is LinePadItem)) {
+                    if (ThisBasicItem is not LinePadItem) {
 
                         var a = (RectangleM)ThisBasicItem.UsedArea().Clone();
 
@@ -287,7 +287,7 @@ namespace BlueControls.ItemCollection {
 
             if (ThisBasicItem == null) { return false; }
 
-            if (!(ThisBasicItem is LinePadItem)) {
+            if (ThisBasicItem is not LinePadItem) {
 
                 var a = (RectangleM)ThisBasicItem.UsedArea().Clone();
 
