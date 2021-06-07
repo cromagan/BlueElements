@@ -53,9 +53,7 @@ namespace BlueControls.Forms {
             }
         }
 
-        private void Database_Disposing(object sender, System.EventArgs e) {
-            Close();
-        }
+        private void Database_Disposing(object sender, System.EventArgs e) => Close();
 
         private void Hinzu_Click(object sender, System.EventArgs e) {
 
@@ -118,7 +116,7 @@ namespace BlueControls.Forms {
 
             //Dim i As BasicItem = DirectCast(MouseOver, BasicItem)
 
-            if (!(e.HotItem is RowFormulaPadItem)) { return; }
+            if (e.HotItem is not RowFormulaPadItem) { return; }
 
             e.UserMenu.Add("Alle Einträge hinzufügen, die mit diesem hier Beziehungen haben", "Bez+", enImageCode.PlusZeichen);
         }
@@ -127,7 +125,7 @@ namespace BlueControls.Forms {
 
             if (e.HotItem == null) { return; }
 
-            if (!(e.HotItem is RowFormulaPadItem)) { return; }
+            if (e.HotItem is not RowFormulaPadItem) { return; }
 
             var i = (RowFormulaPadItem)e.HotItem;
 

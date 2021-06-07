@@ -24,14 +24,14 @@ using System.Collections.Generic;
 using static BlueBasics.Extensions;
 
 namespace BlueScript {
-    public class Method_Lookup : BlueScript.Method {
+    public class Method_Lookup : Method {
 
         //public Method_Lookup(Script parent) : base(parent) { }
 
         public override string Syntax => "Lookup(Database, KeyValue, Column, NothingFoundValue, FoundToMuchValue)";
 
         public override string Description => "Lädt eine andere Datenbank (Database), sucht eine Zeile (KeyValue) und gibt den Inhalt einer Spalte (Column) als Liste zurück. Wird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben. Ist der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.";
-        public override List<string> Comand(Script s) { return new() { "lookup" }; }
+        public override List<string> Comand(Script s) => new() { "lookup" };
         public override string StartSequence => "(";
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
@@ -48,19 +48,19 @@ namespace BlueScript {
             if (f == null) { return new strDoItFeedback("System-Variable 'Filename' nicht gefunden."); }
 
             foreach (var thisv in attvar.Attributes) {
-                if (thisv.Type != Skript.Enums.enVariableDataType.String) { return strDoItFeedback.FalscherDatentyp(); }
+                if (thisv.Type != enVariableDataType.String) { return strDoItFeedback.FalscherDatentyp(); }
             }
 
             var newf = f.ValueString.FilePath() + attvar.Attributes[0].ValueString + ".mdb";
 
             var db2 = BlueBasics.MultiUserFile.clsMultiUserFile.GetByFilename(newf, true);
-            BlueDatabase.Database db;
+            Database db;
 
             if (db2 == null) {
                 if (!FileOperations.FileExists(newf)) { return new strDoItFeedback("Datenbank nicht gefunden: " + newf); }
-                db = new BlueDatabase.Database(newf, false, false);
+                db = new Database(newf, false, false);
             } else {
-                db = (BlueDatabase.Database)db2;
+                db = (Database)db2;
             }
 
             var c = db.Column.Exists(attvar.Attributes[2].ValueString);
@@ -73,18 +73,18 @@ namespace BlueScript {
                 if (attvar.Attributes.Count > 3) {
                     attvar.Attributes[3].Readonly = false;
                     attvar.Attributes[3].Type = enVariableDataType.List;
-                    return new strDoItFeedback(attvar.Attributes[3].ValueForReplace, string.Empty);
+                    return new strDoItFeedback(attvar.Attributes[3].ValueString, enVariableDataType.List);
                 }
-                return new strDoItFeedback(string.Empty, string.Empty);
+                return new strDoItFeedback(string.Empty);
             }
 
             if (r.Count > 1) {
                 if (attvar.Attributes.Count > 4) {
                     attvar.Attributes[4].Readonly = false;
                     attvar.Attributes[4].Type = enVariableDataType.List;
-                    return new strDoItFeedback(attvar.Attributes[4].ValueForReplace, string.Empty);
+                    return new strDoItFeedback(attvar.Attributes[4].ValueString, enVariableDataType.List);
                 }
-                return new strDoItFeedback(string.Empty, string.Empty);
+                return new strDoItFeedback(string.Empty);
             }
 
             var v = RowItem.CellToVariable(c, r[0]);
@@ -93,7 +93,7 @@ namespace BlueScript {
             v.Readonly = false;
             v.Type = enVariableDataType.List;
 
-            return new strDoItFeedback(v.ValueForReplace, string.Empty);
+            return new strDoItFeedback(v.ValueString, enVariableDataType.List);
         }
     }
 }

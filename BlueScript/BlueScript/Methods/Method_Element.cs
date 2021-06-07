@@ -25,7 +25,7 @@ namespace BlueScript {
 
         public override string Syntax => "Element(VariableListe, Indexnummer)";
         public override string Description => "Gibt ein das Element der Liste mit der Indexnummer als Text zurück. Die Liste beginnt mit dem Element 0.";
-        public override List<string> Comand(Script s) { return new() { "element" }; }
+        public override List<string> Comand(Script s) => new() { "element" };
         public override string StartSequence => "(";
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
@@ -37,9 +37,8 @@ namespace BlueScript {
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
             var i = attvar.Attributes[1].ValueInt;
             var list = attvar.Attributes[0].ValueListString;
-            return i < 0 || i >= list.Count
-                ? new strDoItFeedback("Element nicht in Liste")
-                : new strDoItFeedback("\"" + list[i] + "\"", string.Empty);
+            return i < 0 || i >= list.Count ? new strDoItFeedback("Element nicht in Liste")
+                                            : new strDoItFeedback(list[i], enVariableDataType.String);
         }
     }
 }

@@ -28,9 +28,7 @@ namespace BlueControls.ItemCollection {
 
         }
 
-        protected override string ClassId() {
-            return "Physics-Object";
-        }
+        protected override string ClassId() => "Physics-Object";
         //public override bool Contains(PointF value, decimal zoomfactor)
         //{
         //    throw new NotImplementedException();

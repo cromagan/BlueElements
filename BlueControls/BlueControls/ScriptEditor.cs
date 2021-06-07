@@ -60,9 +60,7 @@ namespace BlueControls {
             }
         }
 
-        private void _Database_Disposing(object sender, System.EventArgs e) {
-            Database = null;
-        }
+        private void _Database_Disposing(object sender, System.EventArgs e) => Database = null;
 
         private void GenerateVariableTable() {
 
@@ -143,9 +141,9 @@ namespace BlueControls {
 
             lstComands.Item.Clear();
 
-            if (s != null && BlueScript.Script.Comands != null) {
+            if (s != null && Script.Comands != null) {
 
-                foreach (var thisc in BlueScript.Script.Comands) {
+                foreach (var thisc in Script.Comands) {
                     lstComands.Item.Add(thisc, thisc.Syntax.ToLower());
                 }
             }
@@ -162,9 +160,9 @@ namespace BlueControls {
 
                 var items = new List<AutocompleteItem>();
 
-                if (s != null && BlueScript.Script.Comands != null) {
+                if (s != null && Script.Comands != null) {
 
-                    foreach (var thisc in BlueScript.Script.Comands) {
+                    foreach (var thisc in Script.Comands) {
                         items.Add(new SnippetAutocompleteItem(thisc.Syntax + " "));
 
                         if (thisc.Returns != Skript.Enums.enVariableDataType.Null) {

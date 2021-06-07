@@ -73,9 +73,7 @@ namespace BlueBasics {
             }
         }
 
-        public static string RemoveHTMLCodes(this string html) {
-            return Regex.Replace(html, "<.*?>", string.Empty);
-        }
+        public static string RemoveHTMLCodes(this string html) => Regex.Replace(html, "<.*?>", string.Empty);
 
         public static string Reverse(this string tXT) {
             var charArray = tXT.ToCharArray();
@@ -83,18 +81,13 @@ namespace BlueBasics {
             return new string(charArray);
         }
 
-        public static byte[] UTF8_ToByte(this string tXT) {
-            return Encoding.UTF8.GetBytes(tXT);
-        }
+        public static byte[] UTF8_ToByte(this string tXT) => Encoding.UTF8.GetBytes(tXT);
 
-        public static byte[] Unicode_ToByte(this string tXT) {
-            return Encoding.Unicode.GetBytes(tXT);
-        }
+        public static byte[] Unicode_ToByte(this string tXT) => Encoding.Unicode.GetBytes(tXT);
 
-        public static byte[] ToByteWIN1252(this string tXT) {
+        public static byte[] ToByteWIN1252(this string tXT) =>
             // var enc1252 = CodePagesEncodingProvider.Instance.GetEncoding(1252);
-            return Encoding.GetEncoding(1252).GetBytes(tXT);
-        }
+            Encoding.GetEncoding(1252).GetBytes(tXT);
 
         // public static List<byte> ToByteList(this string TXT) {
         //    var x = new List<byte>();
@@ -139,29 +132,17 @@ namespace BlueBasics {
             return tXT;
         }
 
-        public static bool IsHTMLColorCode(this string col) {
-            return !string.IsNullOrEmpty(col) && (col.Length == 6 || col.Length == 8) && col.ContainsOnlyChars(Constants.Char_Numerals + "abcdefABCDEF");
-        }
+        public static bool IsHTMLColorCode(this string col) => !string.IsNullOrEmpty(col) && (col.Length == 6 || col.Length == 8) && col.ContainsOnlyChars(Constants.Char_Numerals + "abcdefABCDEF");
 
-        public static bool IsNumeral(this string tXT) {
-            return tXT.IsFormat(enDataFormat.Ganzzahl) || tXT.IsFormat(enDataFormat.Gleitkommazahl);
-        }
+        public static bool IsNumeral(this string tXT) => tXT is not null && tXT.IsFormat(enDataFormat.Ganzzahl) || tXT.IsFormat(enDataFormat.Gleitkommazahl);
 
-        public static bool IsLong(this string tXT) {
-            return tXT is not null && tXT.IsFormat(enDataFormat.Ganzzahl);
-        }
+        public static bool IsLong(this string tXT) => tXT is not null && tXT.IsFormat(enDataFormat.Ganzzahl);
 
-        public static bool IsDouble(this string tXT) {
-            return tXT.IsFormat(enDataFormat.Gleitkommazahl);
-        }
+        public static bool IsDouble(this string tXT) => tXT is not null && tXT.IsFormat(enDataFormat.Gleitkommazahl);
 
-        public static bool ContainsChars(this string tXT, string chars) {
-            return chars.Where((_, z) => tXT.Contains(chars.Substring(z, 1))).Any();
-        }
+        public static bool ContainsChars(this string tXT, string chars) => chars.Where((_, z) => tXT.Contains(chars.Substring(z, 1))).Any();
 
-        public static bool ContainsOnlyChars(this string tXT, string chars) {
-            return !tXT.Where((_, z) => !chars.Contains(tXT.Substring(z, 1))).Any();
-        }
+        public static bool ContainsOnlyChars(this string tXT, string chars) => !tXT.Where((_, z) => !chars.Contains(tXT.Substring(z, 1))).Any();
 
         /// <summary>
         /// Teilt einen String, der geparsed werden kann in seine Bestandteile auf.
@@ -485,13 +466,9 @@ namespace BlueBasics {
             return tXT;
         }
 
-        public static string EleminateSlash(this string txt) {
-            return txt.Replace("/", "[Slash]");
-        }
+        public static string EleminateSlash(this string txt) => txt.Replace("/", "[Slash]");
 
-        public static string GenerateSlash(this string txt) {
-            return txt.Replace("[Slash]", "/");
-        }
+        public static string GenerateSlash(this string txt) => txt.Replace("[Slash]", "/");
 
         public static string HTMLSpecialToNormalChar(this string tXT, bool ignoreBR) {
             // http://sonderzeichentabelle.de/
@@ -640,8 +617,7 @@ namespace BlueBasics {
             return txt;
         }
 
-        public static enFileFormat FileType(this string filename) {
-            return string.IsNullOrEmpty(filename)
+        public static enFileFormat FileType(this string filename) => string.IsNullOrEmpty(filename)
                 ? enFileFormat.Unknown
                 : filename.FileSuffix() switch {
                     "DOC" or "DOCX" or "RTF" or "ODT" => enFileFormat.WordKind,
@@ -665,7 +641,6 @@ namespace BlueBasics {
                     "LNK" or "URL" => enFileFormat.Link,
                     _ => enFileFormat.Unknown,
                 };
-        }
 
         public static string PathParent(this string pfad, int anzahlParents) {
             for (var z = 1; z <= anzahlParents; z++) {
@@ -747,9 +722,7 @@ namespace BlueBasics {
             return string.IsNullOrEmpty(l) ? string.Empty : l.Substring(1).ToUpper();
         }
 
-        public static string FileNameWithSuffix(this string name) {
-            return string.IsNullOrEmpty(name) ? string.Empty : Path.GetFileName(name);
-        }
+        public static string FileNameWithSuffix(this string name) => string.IsNullOrEmpty(name) ? string.Empty : Path.GetFileName(name);
 
         /// <summary>
         /// Gibt den Dateinamen ohne Suffix zurück.
@@ -757,9 +730,7 @@ namespace BlueBasics {
         /// <param name="name">Der ganze Pfad der Datei.</param>
         /// <returns>Dateiname ohne Suffix</returns>
         /// <remarks></remarks>
-        public static string FileNameWithoutSuffix(this string name) {
-            return string.IsNullOrEmpty(name) ? string.Empty : Path.GetFileNameWithoutExtension(name);
-        }
+        public static string FileNameWithoutSuffix(this string name) => string.IsNullOrEmpty(name) ? string.Empty : Path.GetFileNameWithoutExtension(name);
 
         public static string Trim(this string tXT, string was) {
             if (string.IsNullOrEmpty(tXT)) { return string.Empty; }
@@ -801,9 +772,7 @@ namespace BlueBasics {
             }
         }
 
-        public static bool ContainsWord(this string input, string value, RegexOptions options) {
-            return input.IndexOfWord(value, 0, options) >= 0;
-        }
+        public static bool ContainsWord(this string input, string value, RegexOptions options) => input.IndexOfWord(value, 0, options) >= 0;
 
         public static List<string> AllWords(this string input) {
             input = " " + input + " ";
@@ -869,9 +838,7 @@ namespace BlueBasics {
             }
         }
 
-        public static string TrimCr(this string tXT) {
-            return string.IsNullOrEmpty(tXT) ? string.Empty : tXT.Trim("\r");
-        }
+        public static string TrimCr(this string tXT) => string.IsNullOrEmpty(tXT) ? string.Empty : tXT.Trim("\r");
 
         public static string TrimStart(this string tXT, string was) {
             if (string.IsNullOrEmpty(tXT)) { return string.Empty; }
@@ -967,8 +934,6 @@ namespace BlueBasics {
             return txt;
         }
 
-        public static string SetLenght(this string s, int anzahl) {
-            return s.Length == anzahl ? s : s.Length < anzahl ? s.PadRight(anzahl) : s.Substring(0, anzahl);
-        }
+        public static string SetLenght(this string s, int anzahl) => s.Length == anzahl ? s : s.Length < anzahl ? s.PadRight(anzahl) : s.Substring(0, anzahl);
     }
 }

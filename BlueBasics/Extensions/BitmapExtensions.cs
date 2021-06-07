@@ -152,9 +152,7 @@ namespace BlueBasics {
             return newBitmap;
         }
 
-        public static Bitmap Crop(this Bitmap _Pic, Rectangle r) {
-            return _Pic.Crop(r.Left, -(_Pic.Width - r.Right), r.Top, -(_Pic.Height - r.Bottom));
-        }
+        public static Bitmap Crop(this Bitmap _Pic, Rectangle r) => _Pic.Crop(r.Left, -(_Pic.Width - r.Right), r.Top, -(_Pic.Height - r.Bottom));
 
         /// <summary>
         ///

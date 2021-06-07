@@ -70,9 +70,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
         }
 
-        private void _TableView_EnabledChanged(object sender, System.EventArgs e) {
-            Check_OrderButtons();
-        }
+        private void _TableView_EnabledChanged(object sender, System.EventArgs e) => Check_OrderButtons();
 
         private void _TableView_DatabaseChanged(object sender, System.EventArgs e) {
             ChangeDatabase(_TableView.Database);
@@ -113,9 +111,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             Check_OrderButtons();
         }
 
-        private void _originalDB_Disposing(object sender, System.EventArgs e) {
-            ChangeDatabase(null);
-        }
+        private void _originalDB_Disposing(object sender, System.EventArgs e) => ChangeDatabase(null);
 
         public static void OpenColumnEditor(ColumnItem column, RowItem Row, Table tableview) {
             if (column == null) { return; }
@@ -163,9 +159,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         }
 
-        private void btnSpaltenUebersicht_Click(object sender, System.EventArgs e) {
-            _TableView.Database.Column.GenerateOverView();
-        }
+        private void btnSpaltenUebersicht_Click(object sender, System.EventArgs e) => _TableView.Database.Column.GenerateOverView();
 
         private void Check_OrderButtons() {
             if (InvokeRequired) {
@@ -219,13 +213,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             w.ShowDialog();
         }
 
-        private void btnDatenbankKopf_Click(object sender, System.EventArgs e) {
-            OpenDatabaseHeadEditor(_TableView.Database);
-        }
+        private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => OpenDatabaseHeadEditor(_TableView.Database);
 
-        private void btnClipboardImport_Click(object sender, System.EventArgs e) {
-            _TableView.ImportClipboard();
-        }
+        private void btnClipboardImport_Click(object sender, System.EventArgs e) => _TableView.ImportClipboard();
 
         private void btnVorherigeVersion_Click(object sender, System.EventArgs e) {
             btnVorherigeVersion.Enabled = false;
@@ -242,30 +232,9 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             var _merker = _TableView.Database;
 
-            var Zusatz = new List<string>();
 
-            var L = new ItemCollectionList();
 
-            foreach (var ThisExport in _TableView.Database.Export) {
-                if (ThisExport.Typ == enExportTyp.DatenbankOriginalFormat) {
-                    foreach (var ThisString in ThisExport._BereitsExportiert) {
-                        var t = ThisString.SplitBy("|");
-                        if (FileExists(t[0])) {
-                            var q1 = QuickImage.Get(enImageCode.Kugel, 16, Extensions.MixColor(Color.Red, Color.Green, DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / ThisExport.AutomatischLöschen).ToHTMLCode(), "");
-                            L.Add(t[1], t[0], q1, true, DataFormat.CompareKey(t[1], enDataFormat.Datum_und_Uhrzeit));
-                        }
-                    }
-
-                    Zusatz.AddRange(Directory.GetFiles(ThisExport.Verzeichnis, _TableView.Database.Filename.FileNameWithoutSuffix() + "_*.MDB"));
-                }
-            }
-
-            foreach (var ThisString in Zusatz) {
-
-                if (L[ThisString] == null) {
-                    L.Add(ThisString.FileNameWithSuffix(), ThisString, QuickImage.Get(enImageCode.Warnung), true, DataFormat.CompareKey(new FileInfo(ThisString).CreationTime.ToString(), enDataFormat.Datum_und_Uhrzeit));
-                }
-            }
+            var L = Vorgängervsersionen(_TableView.Database);
 
             if (L.Count == 0) {
                 MessageBox.Show("Kein Backup vorhanden.", enImageCode.Information, "OK");
@@ -273,7 +242,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 return;
             }
 
-            L.Sort();
+
 
             var Files = InputBoxListBoxStyle.Show("Stand wählen:", L, enAddType.None, true);
             if (Files == null || Files.Count != 1) {
@@ -281,7 +250,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 return;
             }
 
-            var tmp = (Database)Database.GetByFilename(Files[0], false);
+            var tmp = (Database)BlueBasics.MultiUserFile.clsMultiUserFile.GetByFilename(Files[0], false);
             if (tmp == null) {
                 tmp = new Database(Files[0], true, false);
             }
@@ -293,6 +262,37 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             btnVorherigeVersion.Text = "zurück";
             btnVorherigeVersion.Enabled = true;
+        }
+
+        public static ItemCollectionList Vorgängervsersionen(Database db) {
+
+            var Zusatz = new List<string>();
+
+            var L = new ItemCollectionList();
+
+            foreach (var ThisExport in db.Export) {
+                if (ThisExport.Typ == enExportTyp.DatenbankOriginalFormat) {
+                    foreach (var ThisString in ThisExport._BereitsExportiert) {
+                        var t = ThisString.SplitBy("|");
+                        if (FileExists(t[0])) {
+                            var q1 = QuickImage.Get(enImageCode.Kugel, 16, Extensions.MixColor(Color.Red, Color.Green, DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / ThisExport.AutomatischLöschen).ToHTMLCode(), "");
+                            L.Add(t[1], t[0], q1, true, DataFormat.CompareKey(t[1], enDataFormat.Datum_und_Uhrzeit));
+                        }
+                    }
+
+                    Zusatz.AddRange(Directory.GetFiles(ThisExport.Verzeichnis, db.Filename.FileNameWithoutSuffix() + "_*.MDB"));
+                }
+            }
+
+            foreach (var ThisString in Zusatz) {
+
+                if (L[ThisString] == null) {
+                    L.Add(ThisString.FileNameWithSuffix(), ThisString, QuickImage.Get(enImageCode.Warnung), true, DataFormat.CompareKey(new FileInfo(ThisString).CreationTime.ToString(), enDataFormat.Datum_und_Uhrzeit));
+                }
+            }
+
+            L.Sort();
+            return L;
         }
 
         private void btnAdminMenu_Click(object sender, System.EventArgs e) {

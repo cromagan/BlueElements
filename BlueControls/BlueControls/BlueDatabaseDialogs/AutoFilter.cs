@@ -174,7 +174,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         #endregion
 
         #region  Events 
-        public event System.EventHandler<FilterComandEventArgs> FilterComand;
+        public event EventHandler<FilterComandEventArgs> FilterComand;
 
         #endregion
 
@@ -185,9 +185,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         }
 
-        private void OnFilterComand(FilterComandEventArgs e) {
-            FilterComand?.Invoke(this, e);
-        }
+        private void OnFilterComand(FilterComandEventArgs e) => FilterComand?.Invoke(this, e);
 
         private void Timer1_Tick(object sender, System.EventArgs e) {
             BringToFront();

@@ -45,10 +45,7 @@ namespace BlueDatabase {
 
         #region  Construktor + Initialize 
 
-        public void Initialize() {
-            Clear();
-
-        }
+        public void Initialize() => Clear();
 
         public CellCollection(Database database) : base() {
             _database = database;
@@ -87,9 +84,7 @@ namespace BlueDatabase {
             }
         }
 
-        public static string KeyOfCell(int ColKey, int RowKey) {
-            return ColKey + "|" + RowKey;
-        }
+        public static string KeyOfCell(int ColKey, int RowKey) => ColKey + "|" + RowKey;
 
         public void DataOfCellKey(string CellKey, out ColumnItem Column, out RowItem Row) {
 
@@ -209,7 +204,7 @@ namespace BlueDatabase {
             (ColumnItem column, RowItem row) Ergebnis(string fehler) {
                 column.Database.BlockReload(false);
                 if (string.IsNullOrEmpty(fehler)) {
-                    column.Database.Cell.SetValueBehindLinkedValue(column, row, CellCollection.KeyOfCell(targetColumn.Key, targetRow.Key));
+                    column.Database.Cell.SetValueBehindLinkedValue(column, row, KeyOfCell(targetColumn.Key, targetRow.Key));
                     return (targetColumn, targetRow);
 
                 } else {
@@ -307,7 +302,7 @@ namespace BlueDatabase {
             List<RowItem> Rows;
             var ownRow = _database.Row.SearchByKey(rowKey);
             Rows = keyc.Format == enDataFormat.RelationText
-                ? CellCollection.ConnectedRowsOfRelations(ownRow.CellGetString(keyc), ownRow)
+                ? ConnectedRowsOfRelations(ownRow.CellGetString(keyc), ownRow)
                 : RowCollection.MatchesTo(new FilterItem(keyc, enFilterType.Istgleich_GroﬂKleinEgal, ownRow.CellGetString(keyc)));
             Rows.Remove(ownRow);
             if (Rows.Count < 1) { return; }
@@ -338,7 +333,7 @@ namespace BlueDatabase {
 
                     if (Rows == null) {
                         Rows = column.Format == enDataFormat.RelationText
-                            ? CellCollection.ConnectedRowsOfRelations(currentvalue, ownRow)
+                            ? ConnectedRowsOfRelations(currentvalue, ownRow)
                             : RowCollection.MatchesTo(new FilterItem(column, enFilterType.Istgleich_GroﬂKleinEgal, currentvalue));
                         Rows.Remove(ownRow);
                     }
@@ -791,7 +786,7 @@ namespace BlueDatabase {
         /// <param name="Row"></param>
         /// <param name="DateiRechtePr¸fen"></param>
         /// <returns></returns>
-        public static bool UserEditPossible(ColumnItem Column, RowItem Row, enErrorReason mode) {
+        public static bool UserEditPossible(ColumnItem Column, RowItem Row, enErrorReason mode) =>
             //if (Column.Format == enDataFormat.LinkedCell)
             //{
             //    var LinkedData = LinkedCellData(Column, Row, false, true, false);
@@ -799,8 +794,7 @@ namespace BlueDatabase {
             //    return false;
             //}
 
-            return string.IsNullOrEmpty(ErrorReason(Column, Row, mode));
-        }
+            string.IsNullOrEmpty(ErrorReason(Column, Row, mode));
 
         /// <summary>
         /// Gibt einen Fehlergrund zur¸ck, ob die Zelle bearbeitet werden kann.
@@ -865,9 +859,7 @@ namespace BlueDatabase {
         #region Get / Set
 
         #region String
-        public string GetString(string columnName, RowItem row) {
-            return GetString(_database.Column[columnName], row);
-        }
+        public string GetString(string columnName, RowItem row) => GetString(_database.Column[columnName], row);
         public string GetString(ColumnItem column, RowItem row) // Main Method
         {
             try {
@@ -888,9 +880,7 @@ namespace BlueDatabase {
             }
         }
 
-        public void Set(string columnName, RowItem row, string value) {
-            Set(_database.Column[columnName], row, value);
-        }
+        public void Set(string columnName, RowItem row, string value) => Set(_database.Column[columnName], row, value);
 
         public void Set(ColumnItem column, RowItem row, string value) // Main Method
         {
@@ -909,153 +899,101 @@ namespace BlueDatabase {
         #endregion
 
         #region Boolean
-        public bool GetBoolean(string columnName, RowItem row) {
-            return GetBoolean(_database.Column[columnName], row);
-        }
+        public bool GetBoolean(string columnName, RowItem row) => GetBoolean(_database.Column[columnName], row);
         public bool GetBoolean(ColumnItem column, RowItem row) // Main Method
-        {
-            return GetString(column, row).FromPlusMinus();
-        }
+=> GetString(column, row).FromPlusMinus();
 
-        public void Set(string columnName, RowItem row, bool value) {
-            Set(_database.Column[columnName], row, value.ToPlusMinus());
-        }
+        public void Set(string columnName, RowItem row, bool value) => Set(_database.Column[columnName], row, value.ToPlusMinus());
 
-        public void Set(ColumnItem column, RowItem row, bool value) {
-            Set(column, row, value.ToPlusMinus());
-        }
+        public void Set(ColumnItem column, RowItem row, bool value) => Set(column, row, value.ToPlusMinus());
 
         #endregion
 
         #region DateTime
-        public DateTime GetDateTime(string columnName, RowItem row) {
-            return GetDateTime(_database.Column[columnName], row);
-        }
+        public DateTime GetDateTime(string columnName, RowItem row) => GetDateTime(_database.Column[columnName], row);
         public DateTime GetDateTime(ColumnItem column, RowItem row) // Main Method
         {
             var _String = GetString(column, row);
             return string.IsNullOrEmpty(_String) ? default : DateTimeTryParse(_String, out var d) ? d : default;
         }
 
-        public void Set(string columnName, RowItem row, DateTime value) {
-            Set(_database.Column[columnName], row, value.ToString(Constants.Format_Date5));
-        }
+        public void Set(string columnName, RowItem row, DateTime value) => Set(_database.Column[columnName], row, value.ToString(Constants.Format_Date5));
 
-        public void Set(ColumnItem column, RowItem row, DateTime value) {
-            Set(column, row, value.ToString(Constants.Format_Date5));
-        }
+        public void Set(ColumnItem column, RowItem row, DateTime value) => Set(column, row, value.ToString(Constants.Format_Date5));
 
         #endregion
 
         #region List<String>
-        public List<string> GetList(string columnName, RowItem row) {
-            return GetList(_database.Column[columnName], row);
-        }
+        public List<string> GetList(string columnName, RowItem row) => GetList(_database.Column[columnName], row);
         public List<string> GetList(ColumnItem column, RowItem row) // Main Method
-        {
-            return GetString(column, row).SplitByCRToList();
-        }
+=> GetString(column, row).SplitByCRToList();
 
-        public void Set(string columnName, RowItem row, List<string> value) {
-            Set(_database.Column[columnName], row, value);
-        }
+        public void Set(string columnName, RowItem row, List<string> value) => Set(_database.Column[columnName], row, value);
 
-        public void Set(ColumnItem column, RowItem row, List<string> value) {
-            Set(column, row, value.JoinWithCr());
-        }
+        public void Set(ColumnItem column, RowItem row, List<string> value) => Set(column, row, value.JoinWithCr());
 
         #endregion
 
         #region Point
-        public Point GetPoint(string columnName, RowItem row) {
-            return GetPoint(_database.Column[columnName], row);
-        }
+        public Point GetPoint(string columnName, RowItem row) => GetPoint(_database.Column[columnName], row);
         public Point GetPoint(ColumnItem column, RowItem row) // Main Method
         {
             var _String = GetString(column, row);
             return string.IsNullOrEmpty(_String) ? Point.Empty : Extensions.PointParse(_String);
         }
 
-        public void Set(string columnName, RowItem row, Point value) {
-            Set(_database.Column[columnName], row, value);
-        }
+        public void Set(string columnName, RowItem row, Point value) => Set(_database.Column[columnName], row, value);
 
         public void Set(ColumnItem column, RowItem row, Point value) // Main Method
-        {
+=>
             // {X=253,Y=194} MUSS ES SEIN, pr¸fen
             Set(column, row, value.ToString());
-
-        }
         #endregion
 
         #region int
-        public int GetInteger(string columnName, RowItem row) {
-            return GetInteger(_database.Column[columnName], row);
-        }
+        public int GetInteger(string columnName, RowItem row) => GetInteger(_database.Column[columnName], row);
         public int GetInteger(ColumnItem column, RowItem row) // Main Method
         {
             var x = GetString(column, row);
             return string.IsNullOrEmpty(x) ? 0 : int.Parse(x);
         }
 
-        public void Set(string columnName, RowItem row, int value) {
-            Set(_database.Column[columnName], row, value.ToString());
-        }
+        public void Set(string columnName, RowItem row, int value) => Set(_database.Column[columnName], row, value.ToString());
 
-        public void Set(ColumnItem column, RowItem row, int value) {
-            Set(column, row, value.ToString());
-        }
+        public void Set(ColumnItem column, RowItem row, int value) => Set(column, row, value.ToString());
 
         #endregion
 
         #region double
-        public double GetDouble(string columnName, RowItem row) {
-            return GetDouble(_database.Column[columnName], row);
-        }
+        public double GetDouble(string columnName, RowItem row) => GetDouble(_database.Column[columnName], row);
         public double GetDouble(ColumnItem column, RowItem row) // Main Method
         {
             var x = GetString(column, row);
             return string.IsNullOrEmpty(x) ? 0 : double.Parse(x);
         }
 
-        public void Set(string columnName, RowItem row, double value) {
-            Set(_database.Column[columnName], row, value.ToString());
-        }
+        public void Set(string columnName, RowItem row, double value) => Set(_database.Column[columnName], row, value.ToString());
 
-        public void Set(ColumnItem column, RowItem row, double value) {
-            Set(column, row, value.ToString());
-
-        }
+        public void Set(ColumnItem column, RowItem row, double value) => Set(column, row, value.ToString());
         #endregion
 
         #region decimal
-        public decimal GetDecimal(string columnName, RowItem row) {
-            return GetDecimal(_database.Column[columnName], row);
-        }
+        public decimal GetDecimal(string columnName, RowItem row) => GetDecimal(_database.Column[columnName], row);
         public decimal GetDecimal(ColumnItem column, RowItem row) // Main Method
         {
             var x = GetString(column, row);
             return string.IsNullOrEmpty(x) ? 0 : decimal.Parse(x);
         }
 
-        public void Set(string columnName, RowItem row, decimal value) {
-            Set(_database.Column[columnName], row, value.ToString());
-        }
+        public void Set(string columnName, RowItem row, decimal value) => Set(_database.Column[columnName], row, value.ToString());
 
-        public void Set(ColumnItem column, RowItem row, decimal value) {
-            Set(column, row, value.ToString());
-
-        }
+        public void Set(ColumnItem column, RowItem row, decimal value) => Set(column, row, value.ToString());
         #endregion
 
         #region Color
-        public Color GetColor(string columnName, RowItem row) {
-            return GetColor(_database.Column[columnName], row);
-        }
+        public Color GetColor(string columnName, RowItem row) => GetColor(_database.Column[columnName], row);
         public Color GetColor(ColumnItem column, RowItem row) // Main Method
-        {
-            return Color.FromArgb(GetInteger(column, row));
-        }
+=> Color.FromArgb(GetInteger(column, row));
 
         //public void Set(string columnName, RowItem row, Color value)
         //{
@@ -1094,9 +1032,7 @@ namespace BlueDatabase {
         /// <param name="column"></param>
         /// <param name="row"></param>
         /// <returns></returns>
-        public string BestFile(ColumnItem column, RowItem row) {
-            return column.BestFile(GetString(column, row), false);
-        }
+        public string BestFile(ColumnItem column, RowItem row) => column.BestFile(GetString(column, row), false);
 
         public int GetColorBGR(ColumnItem Column, RowItem Row) {
             var c = GetColor(Column, Row);
@@ -1108,9 +1044,7 @@ namespace BlueDatabase {
 
         #endregion
 
-        public bool IsNullOrEmpty(string ColumnName, RowItem Row) {
-            return IsNullOrEmpty(_database.Column[ColumnName], Row);
-        }
+        public bool IsNullOrEmpty(string ColumnName, RowItem Row) => IsNullOrEmpty(_database.Column[ColumnName], Row);
 
         public bool IsNullOrEmpty(string CellKey) {
             DataOfCellKey(CellKey, out var Column, out var Row);
@@ -1129,9 +1063,7 @@ namespace BlueDatabase {
             return Size.Empty;
         }
 
-        internal string CompareKey(ColumnItem Column, RowItem Row) {
-            return DataFormat.CompareKey(GetString(Column, Row), Column.Format);
-        }
+        internal string CompareKey(ColumnItem Column, RowItem Row) => DataFormat.CompareKey(GetString(Column, Row), Column.Format);
 
         internal void SaveToByteList(ref List<byte> l) {
 
@@ -1147,9 +1079,7 @@ namespace BlueDatabase {
             CellValueChanged?.Invoke(this, e);
         }
 
-        public List<string> ValuesReadable(ColumnItem Column, RowItem Row, enShortenStyle style) {
-            return CellItem.ValuesReadable(Column, Row, style);
-        }
+        public List<string> ValuesReadable(ColumnItem Column, RowItem Row, enShortenStyle style) => CellItem.ValuesReadable(Column, Row, style);
 
         public Size GetSizeOfCellContent(ColumnItem Column, RowItem Row) {
             var CellKey = KeyOfCell(Column, Row);
@@ -1169,10 +1099,7 @@ namespace BlueDatabase {
             this[CellKey].Size = ContentSize;
         }
 
-        private void _database_Disposing(object sender, System.EventArgs e) {
-            Dispose();
-
-        }
+        private void _database_Disposing(object sender, System.EventArgs e) => Dispose();
 
         private void Dispose(bool disposing) {
             if (!disposedValue) {

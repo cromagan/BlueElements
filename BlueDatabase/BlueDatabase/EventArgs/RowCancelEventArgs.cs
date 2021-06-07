@@ -21,9 +21,7 @@ namespace BlueDatabase.EventArgs {
 
     public class RowCancelEventArgs : RowEventArgs {
 
-        public RowCancelEventArgs(RowItem row, string cancelReason) : base(row) {
-            CancelReason = cancelReason;
-        }
+        public RowCancelEventArgs(RowItem row, string cancelReason) : base(row) => CancelReason = cancelReason;
 
         public string CancelReason { get; set; }
     }

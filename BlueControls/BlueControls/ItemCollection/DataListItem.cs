@@ -200,9 +200,7 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        protected override Size ComputeSizeUntouchedForListBox() {
-            return new Size(300, 300);
-        }
+        protected override Size ComputeSizeUntouchedForListBox() => new(300, 300);
 
         private void GetBin() {
             if (string.IsNullOrEmpty(_filename)) { return; }
@@ -221,19 +219,13 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) {
-            return style switch {
-                enBlueListBoxAppearance.FileSystem => 110 + (_captionlines * ConstMY),
-                _ => (int)(columnWidth * 0.8),
-            };
-        }
+        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) => style switch {
+            enBlueListBoxAppearance.FileSystem => 110 + (_captionlines * ConstMY),
+            _ => (int)(columnWidth * 0.8),
+        };
 
-        protected override string GetCompareKey() {
-            return Internal;
-        }
+        protected override string GetCompareKey() => Internal;
 
-        public override bool FilterMatch(string FilterText) {
-            return base.FilterMatch(FilterText) || Caption.ToUpper().Contains(FilterText.ToUpper()) || _filename.ToUpper().Contains(FilterText.ToUpper());
-        }
+        public override bool FilterMatch(string FilterText) => base.FilterMatch(FilterText) || Caption.ToUpper().Contains(FilterText.ToUpper()) || _filename.ToUpper().Contains(FilterText.ToUpper());
     }
 }

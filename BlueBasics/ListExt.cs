@@ -43,9 +43,7 @@ namespace BlueBasics {
         }
 
         public bool ThrowEvents {
-            get {
-                return !Disposed && _ThrowEvents;
-            }
+            get => !Disposed && _ThrowEvents;
             set {
                 if (_ThrowEvents == value) { Develop.DebugPrint(enFehlerArt.Fehler, "Set ThrowEvents-Fehler! " + value.ToPlusMinus()); }
 
@@ -101,9 +99,9 @@ namespace BlueBasics {
             OnItemAdded(item);
         }
 
-        public new void InsertRange(int index, IEnumerable<T> collection) { Develop.DebugPrint_NichtImplementiert(); }
+        public new void InsertRange(int index, IEnumerable<T> collection) => Develop.DebugPrint_NichtImplementiert();
 
-        public new void RemoveAll(Predicate<T> match) { Develop.DebugPrint_NichtImplementiert(); }
+        public new void RemoveAll(Predicate<T> match) => Develop.DebugPrint_NichtImplementiert();
 
         public new void RemoveAt(int index) {
             OnItemRemoving(base[index]);
@@ -111,26 +109,26 @@ namespace BlueBasics {
             OnItemRemoved();
         }
 
-        public new void RemoveRange(int index, int count) { Develop.DebugPrint_NichtImplementiert(); }
+        public new void RemoveRange(int index, int count) => Develop.DebugPrint_NichtImplementiert();
 
-        public new void Reverse(int index, int count) { Develop.DebugPrint_NichtImplementiert(); }
+        public new void Reverse(int index, int count) => Develop.DebugPrint_NichtImplementiert();
         public new void Reverse() {
             base.Reverse();
             OnChanged();
         }
 
-        public new void Sort(int index, int count, IComparer<T> comparer) { Develop.DebugPrint_NichtImplementiert(); }
+        public new void Sort(int index, int count, IComparer<T> comparer) => Develop.DebugPrint_NichtImplementiert();
 
-        public new void Sort(Comparison<T> comparison) { Develop.DebugPrint_NichtImplementiert(); }
+        public new void Sort(Comparison<T> comparison) => Develop.DebugPrint_NichtImplementiert();
 
         public new void Sort() {
             base.Sort();
             OnChanged();
         }
 
-        public new void Sort(IComparer<T> comparer) { Develop.DebugPrint_NichtImplementiert(); }
+        public new void Sort(IComparer<T> comparer) => Develop.DebugPrint_NichtImplementiert();
 
-        public new void TrimExcess() { Develop.DebugPrint_NichtImplementiert(); }
+        public new void TrimExcess() => Develop.DebugPrint_NichtImplementiert();
 
         public new T this[int index] {
             get {

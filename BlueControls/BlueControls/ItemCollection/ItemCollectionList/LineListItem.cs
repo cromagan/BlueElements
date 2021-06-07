@@ -38,9 +38,7 @@ namespace BlueControls.ItemCollection {
 
         #region  Construktor + Initialize 
 
-        public LineListItem(string internalname, string userDefCompareKey) : base(internalname) {
-            UserDefCompareKey = userDefCompareKey;
-        }
+        public LineListItem(string internalname, string userDefCompareKey) : base(internalname) => UserDefCompareKey = userDefCompareKey;
 
         #endregion
 
@@ -49,28 +47,16 @@ namespace BlueControls.ItemCollection {
         public override string QuickInfo => string.Empty;
         #endregion
 
-        protected override Size ComputeSizeUntouchedForListBox() {
-            return Pos.X == 0 && Pos.X == 0 && Pos.Width == 0 && Pos.Height == 0 ? new Size(4, 4) : Pos.Size;
-        }
+        protected override Size ComputeSizeUntouchedForListBox() => Pos.X == 0 && Pos.X == 0 && Pos.Width == 0 && Pos.Height == 0 ? new Size(4, 4) : Pos.Size;
 
-        protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, bool Translate) {
-            GR.DrawLine(Skin.GetBlueFont(itemdesign, enStates.Standard).Pen(1f), PositionModified.Left, (int)(PositionModified.Top + (PositionModified.Height / 2.0)), PositionModified.Right, (int)(PositionModified.Top + (PositionModified.Height / 2.0)));
-        }
+        protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, bool Translate) => GR.DrawLine(Skin.GetBlueFont(itemdesign, enStates.Standard).Pen(1f), PositionModified.Left, (int)(PositionModified.Top + (PositionModified.Height / 2.0)), PositionModified.Right, (int)(PositionModified.Top + (PositionModified.Height / 2.0)));
 
-        public override bool IsClickable() {
-            return false;
-        }
+        public override bool IsClickable() => false;
 
-        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) {
-            return 4;
-        }
+        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) => 4;
 
-        protected override string GetCompareKey() {
-            return Pos.ToString();
-        }
+        protected override string GetCompareKey() => Pos.ToString();
 
-        public override void CloneToNewCollection(ItemCollectionList newParent) {
-            CloneToNewCollection(newParent, new LineListItem(Internal, UserDefCompareKey));
-        }
+        public override void CloneToNewCollection(ItemCollectionList newParent) => CloneToNewCollection(newParent, new LineListItem(Internal, UserDefCompareKey));
     }
 }

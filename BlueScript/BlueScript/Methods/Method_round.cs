@@ -26,7 +26,7 @@ namespace BlueScript {
 
         public override string Syntax => "Round(Value, Nachkommastellen)";
         public override string Description => "Rundet den Zahlenwert mathematisch korrekt.";
-        public override List<string> Comand(Script s) { return new() { "round" }; }
+        public override List<string> Comand(Script s) => new() { "round" };
         public override string StartSequence => "(";
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
@@ -45,7 +45,7 @@ namespace BlueScript {
 
             var val = Math.Round(attvar.Attributes[0].ValueDouble, n);
 
-            return new strDoItFeedback(val.ToString(), string.Empty);
+            return new strDoItFeedback(val.ToString(), enVariableDataType.Numeral);
         }
     }
 }

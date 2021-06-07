@@ -110,9 +110,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        private void OnImageChanged() {
-            ImageChanged?.Invoke(this, System.EventArgs.Empty);
-        }
+        private void OnImageChanged() => ImageChanged?.Invoke(this, System.EventArgs.Empty);
 
         private void MakePic_Click(object sender, System.EventArgs e) {
             if (_Bitmap != null) {
@@ -141,9 +139,7 @@ namespace BlueControls.Controls {
             OpenDia.ShowDialog();
         }
 
-        private void OpenDia_FileOk(object sender, CancelEventArgs e) {
-            FromFile(OpenDia.FileName);
-        }
+        private void OpenDia_FileOk(object sender, CancelEventArgs e) => FromFile(OpenDia.FileName);
 
         private void ZoomFitInvalidateAndCheckButtons() {
             _Richt = -1;
@@ -256,9 +252,7 @@ namespace BlueControls.Controls {
             if (ThrowEvent) { OnImageChanged(); }
         }
 
-        private void OnConnectedDatabase(MultiUserFileGiveBackEventArgs e) {
-            ConnectedDatabase?.Invoke(this, e);
-        }
+        private void OnConnectedDatabase(MultiUserFileGiveBackEventArgs e) => ConnectedDatabase?.Invoke(this, e);
 
         protected override void OnMouseLeave(System.EventArgs e) {
             base.OnMouseLeave(e);
@@ -301,9 +295,7 @@ namespace BlueControls.Controls {
             return false;
         }
 
-        public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) {
-            ContextMenuItemClicked?.Invoke(this, e);
-        }
+        public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
         private void EditPanel_Tick(object sender, System.EventArgs e) {
 
@@ -351,9 +343,7 @@ namespace BlueControls.Controls {
             ZoomFitInvalidateAndCheckButtons();
         }
 
-        public void OnContextMenuInit(ContextMenuInitEventArgs e) {
-            ContextMenuInit?.Invoke(this, e);
-        }
+        public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
         private void AusDatenbank_Click(object sender, System.EventArgs e) {
 

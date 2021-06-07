@@ -41,9 +41,7 @@ namespace BlueControls.Controls {
         //public string _specialcommand = string.Empty;
 
         #region Constructor
-        public LastFilesCombo() : base() {
-            SetLastFilesStyle();
-        }
+        public LastFilesCombo() : base() => SetLastFilesStyle();
 
         #endregion
 
@@ -186,9 +184,7 @@ namespace BlueControls.Controls {
             GenerateMenu();
         }
 
-        private string SaveFile() {
-            return !string.IsNullOrEmpty(_filename) ? _filename : System.Windows.Forms.Application.StartupPath + Name + "-Files.laf";
-        }
+        private string SaveFile() => !string.IsNullOrEmpty(_filename) ? _filename : System.Windows.Forms.Application.StartupPath + Name + "-Files.laf";
 
         private void LoadFromDisk() {
             LastD = new List<string>();

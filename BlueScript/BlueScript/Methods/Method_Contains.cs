@@ -32,7 +32,7 @@ namespace BlueScript {
 
         public override string Description => "Bei Listen: Prüft, ob einer der Werte in der Liste steht. Bei String: Prüft ob eine der Zeichenketten vorkommt.";
 
-        public override List<string> Comand(Script s) { return new() { "contains" }; }
+        public override List<string> Comand(Script s) => new() { "contains" };
         public override string StartSequence => "(";
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
@@ -44,11 +44,11 @@ namespace BlueScript {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
-            if (attvar.Attributes[0].Type == Skript.Enums.enVariableDataType.List) {
+            if (attvar.Attributes[0].Type == enVariableDataType.List) {
                 var x = attvar.Attributes[0].ValueListString;
 
                 for (var z = 2; z < attvar.Attributes.Count; z++) {
-                    if (attvar.Attributes[z].Type != Skript.Enums.enVariableDataType.String) { return strDoItFeedback.FalscherDatentyp(); }
+                    if (attvar.Attributes[z].Type != enVariableDataType.String) { return strDoItFeedback.FalscherDatentyp(); }
 
                     if (x.Contains(attvar.Attributes[z].ValueString, attvar.Attributes[1].ValueBool)) {
                         return strDoItFeedback.Wahr();
@@ -57,10 +57,10 @@ namespace BlueScript {
                 return strDoItFeedback.Falsch();
             }
 
-            if (attvar.Attributes[0].Type == Skript.Enums.enVariableDataType.String) {
+            if (attvar.Attributes[0].Type == enVariableDataType.String) {
 
                 for (var z = 2; z < attvar.Attributes.Count; z++) {
-                    if (attvar.Attributes[z].Type != Skript.Enums.enVariableDataType.String) { return strDoItFeedback.FalscherDatentyp(); }
+                    if (attvar.Attributes[z].Type != enVariableDataType.String) { return strDoItFeedback.FalscherDatentyp(); }
 
                     if (attvar.Attributes[1].ValueBool) {
                         if (attvar.Attributes[0].ValueString.Contains(attvar.Attributes[z].ValueString)) {

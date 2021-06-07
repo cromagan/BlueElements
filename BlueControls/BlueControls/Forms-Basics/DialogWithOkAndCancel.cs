@@ -1,15 +1,14 @@
-﻿using BlueBasics;
-using BlueControls.Controls;
+﻿using BlueControls.Controls;
 using BlueControls.Enums;
 using System;
 using static BlueBasics.Develop;
 
 namespace BlueControls.Forms {
-    public partial class DialogWithOkAndCancel : BlueControls.Forms.Form {
+    public partial class DialogWithOkAndCancel : Form {
 
         bool _cancelPossible = false;
         #region Konstruktor
-        public DialogWithOkAndCancel() : this(Enums.enDesign.Form_MsgBox) {
+        public DialogWithOkAndCancel() : this(enDesign.Form_MsgBox) {
 
         }
 
@@ -26,7 +25,7 @@ namespace BlueControls.Forms {
 
         public void Setup(int MinWidth, int BottomOfLowestControl, bool CancelPossible, bool Sizeable) {
 
-            Text = Develop.AppName();
+            Text = AppName();
 
             _cancelPossible = CancelPossible;
 
@@ -83,9 +82,7 @@ namespace BlueControls.Forms {
         /// <summary>
         /// Diese Routine wird aufgerufen, nachdem OK oder Cancel gedrückt wurde.
         /// </summary>
-        protected virtual void SetValue(bool canceled) {
-            DebugPrint_RoutineMussUeberschriebenWerden();
-        }
+        protected virtual void SetValue(bool canceled) => DebugPrint_RoutineMussUeberschriebenWerden();
 
         protected void Ok() {
             SetValue(false);
@@ -97,16 +94,12 @@ namespace BlueControls.Forms {
             Close();
         }
 
-        private void butAbbrechen_Click(object sender, System.EventArgs e) {
-            Cancel();
-        }
+        private void butAbbrechen_Click(object sender, System.EventArgs e) => Cancel();
         protected bool OK_Enabled {
             get => butOK.Enabled;
             set => butOK.Enabled = value;
         }
-        private void butOK_Click(object sender, System.EventArgs e) {
-            Ok();
-        }
+        private void butOK_Click(object sender, System.EventArgs e) => Ok();
 
 
         /// <summary>

@@ -25,7 +25,7 @@ namespace BlueScript {
 
         public override string Syntax => "String(numeral)";
         public override string Description => "Wandelt die Zahl in einen Text um.";
-        public override List<string> Comand(Script s) { return new() { "string" }; }
+        public override List<string> Comand(Script s) => new() { "string" };
         public override string StartSequence => "(";
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
@@ -38,7 +38,7 @@ namespace BlueScript {
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
             attvar.Attributes[0].Type = enVariableDataType.String;
-            return new strDoItFeedback(attvar.Attributes[0].ValueForReplace, string.Empty);
+            return new strDoItFeedback(attvar.Attributes[0].ValueString, enVariableDataType.String);
         }
     }
 }

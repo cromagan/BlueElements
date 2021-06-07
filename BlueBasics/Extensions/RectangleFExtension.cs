@@ -65,8 +65,6 @@ namespace BlueBasics {
             return Erg == llo ? LO : Erg == lro ? rO : Erg == llu ? lu : Erg == lru ? ru : Point.Empty;
         }
 
-        public static Rectangle ToRect(this RectangleF r) {
-            return new Rectangle((int)r.X, (int)r.Y, (int)r.Width, (int)r.Height);
-        }
+        public static Rectangle ToRect(this RectangleF r) => new((int)r.X, (int)r.Y, (int)r.Width, (int)r.Height);
     }
 }

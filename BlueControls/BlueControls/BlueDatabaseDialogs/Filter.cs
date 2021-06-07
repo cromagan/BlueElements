@@ -21,7 +21,7 @@ using BlueControls.Controls;
 
 namespace BlueControls.BlueDatabaseDialogs {
 
-    public sealed partial class Filter : BlueControls.Forms.Form {
+    public sealed partial class Filter : Forms.Form {
 
         public Filter(Table table) {
 

@@ -230,10 +230,8 @@ namespace BlueBasics {
             return null;
         }
 
-        public static QuickImage Get(QuickImage imageCode, enImageCodeEffect additionalState) {
-            return additionalState == enImageCodeEffect.Ohne ? imageCode
+        public static QuickImage Get(QuickImage imageCode, enImageCodeEffect additionalState) => additionalState == enImageCodeEffect.Ohne ? imageCode
                 : Get(GenerateCode(imageCode.Name, imageCode.Width, imageCode.Height, imageCode.Effekt | additionalState, imageCode.Färbung, imageCode.ChangeGreenTo, imageCode.Sättigung, imageCode.Helligkeit, imageCode.DrehWinkel, imageCode.Transparenz, imageCode.Zweitsymbol));
-        }
 
         public static QuickImage Get(string imageCode) {
             if (string.IsNullOrEmpty(imageCode)) { return null; }
@@ -268,19 +266,13 @@ namespace BlueBasics {
             return Get(GenerateCode(image, squareWidth, 0, enImageCodeEffect.Ohne, string.Empty, string.Empty, 100, 100, 0, 0, string.Empty));
         }
 
-        public static QuickImage Get(enImageCode image) {
-            return Get(image, 16);
-        }
+        public static QuickImage Get(enImageCode image) => Get(image, 16);
 
-        public static QuickImage Get(enImageCode image, int squareWidth) {
-            return image == enImageCode.None ? null
+        public static QuickImage Get(enImageCode image, int squareWidth) => image == enImageCode.None ? null
                 : Get(GenerateCode(Enum.GetName(image.GetType(), image), squareWidth, 0, enImageCodeEffect.Ohne, string.Empty, string.Empty, 100, 100, 0, 0, string.Empty));
-        }
 
-        public static QuickImage Get(enImageCode image, int squareWidth, string färbung, string changeGreenTo) {
-            return image == enImageCode.None ? null
+        public static QuickImage Get(enImageCode image, int squareWidth, string färbung, string changeGreenTo) => image == enImageCode.None ? null
                 : Get(GenerateCode(Enum.GetName(image.GetType(), image), squareWidth, 0, enImageCodeEffect.Ohne, färbung, changeGreenTo, 100, 100, 0, 0, string.Empty));
-        }
 
         public static QuickImage Get(int index) {
             lock (_locker) {
@@ -336,9 +328,7 @@ namespace BlueBasics {
             }
         }
 
-        public static QuickImage Get(enFileFormat file, int size) {
-            return Get(FileTypeImage(file), size);
-        }
+        public static QuickImage Get(enFileFormat file, int size) => Get(FileTypeImage(file), size);
 
         public static int GetIndex(QuickImage img) {
             lock (_locker) {
@@ -429,7 +419,7 @@ namespace BlueBasics {
             lock (_locker) {
                 // Evtl. hat die "OnNeedImage" das Bild auch in den Stack hochgeladen
                 var i2 = GetIndex(tmpname);
-                if (i2 < 0) { QuickImage.Add(tmpname, e.BMP); }
+                if (i2 < 0) { Add(tmpname, e.BMP); }
             }
 
             return e.BMP;
@@ -599,26 +589,18 @@ namespace BlueBasics {
             IsParsing = false;
         }
 
-        public QuickImage SymbolForReadableText() {
-            return this;
-        }
+        public QuickImage SymbolForReadableText() => this;
 
-        public string ReadableText() {
-            return string.Empty;
-        }
+        public string ReadableText() => string.Empty;
 
-        public string CompareKey() {
-            return ToString();
-        }
+        public string CompareKey() => ToString();
 
         public void OnChanged() {
             if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
-        public void OnNeedImage(NeedImageEventArgs e) {
-            NeedImage?.Invoke(this, e);
-        }
+        public void OnNeedImage(NeedImageEventArgs e) => NeedImage?.Invoke(this, e);
     }
 }
 

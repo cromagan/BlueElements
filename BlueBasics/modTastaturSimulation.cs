@@ -42,25 +42,15 @@ namespace BlueBasics
         [DllImport("user32.dll", EntryPoint = "keybd_event", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         private static extern int keybd_event(byte bVk, byte bScan, int dwFlags, int dwExtraInfo);
 
-        public static void KeyDown(enTaste k) {
-            keybd_event((byte)k, 0, KEYEVENTF_KEYDOWN, 0);
-        }
+        public static void KeyDown(enTaste k) => keybd_event((byte)k, 0, KEYEVENTF_KEYDOWN, 0);
 
-        public static void KeyUp(enTaste k) {
-            keybd_event((byte)k, 0, KEYEVENTF_KEYUP, 0);
-        }
+        public static void KeyUp(enTaste k) => keybd_event((byte)k, 0, KEYEVENTF_KEYUP, 0);
         #region shift ,altgr and alt release sub
-        public static void shiftrelease() {
-            keybd_event((byte)enTaste.VK_SHIFT, 0, 2, 0);
-        }
+        public static void shiftrelease() => keybd_event((byte)enTaste.VK_SHIFT, 0, 2, 0);
 
-        public static void altrelease() {
-            keybd_event((byte)enTaste.VK_MENU, 0, KEYEVENTF_EXTENDEDKEY | 2, 0);
-        }
+        public static void altrelease() => keybd_event((byte)enTaste.VK_MENU, 0, KEYEVENTF_EXTENDEDKEY | 2, 0);
 
-        public static void leftaltrelease() {
-            keybd_event((byte)enTaste.VK_MENU, 0, KEYEVENTF_KEYUP, 0);
-        }
+        public static void leftaltrelease() => keybd_event((byte)enTaste.VK_MENU, 0, KEYEVENTF_KEYUP, 0);
         #endregion
 
     }

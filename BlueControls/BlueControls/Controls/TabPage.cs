@@ -216,9 +216,7 @@ namespace BlueControls.Controls {
             EndEdit();
         }
 
-        public void BeginnEdit() {
-            BeginnEdit(1);
-        }
+        public void BeginnEdit() => BeginnEdit(1);
 
         public void BeginnEdit(int count) {
             if (DesignMode) { return; }

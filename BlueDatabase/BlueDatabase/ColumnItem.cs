@@ -244,10 +244,7 @@ namespace BlueDatabase {
             Invalidate_TmpVariables();
         }
 
-        private void Database_Disposing(object sender, System.EventArgs e) {
-            Dispose();
-
-        }
+        private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
         #endregion
 
         #region  Properties 
@@ -640,9 +637,7 @@ namespace BlueDatabase {
         //}
 
         public bool IgnoreAtRowFilter {
-            get {
-                return !_Format.Autofilter_möglich() || _IgnoreAtRowFilter;
-            }
+            get => !_Format.Autofilter_möglich() || _IgnoreAtRowFilter;
             set {
                 if (_IgnoreAtRowFilter == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_BeiZeilenfilterIgnorieren, this, _IgnoreAtRowFilter.ToPlusMinus(), value.ToPlusMinus(), true);
@@ -696,9 +691,7 @@ namespace BlueDatabase {
         }
 
         public bool AfterEdit_QuickSortRemoveDouble {
-            get {
-                return _MultiLine && _AfterEdit_QuickSortRemoveDouble;
-            }
+            get => _MultiLine && _AfterEdit_QuickSortRemoveDouble;
             set {
                 if (_AfterEdit_QuickSortRemoveDouble == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_AfterEdit_QuickSortAndRemoveDouble, this, _AfterEdit_QuickSortRemoveDouble.ToPlusMinus(), value.ToPlusMinus(), true);
@@ -871,9 +864,7 @@ namespace BlueDatabase {
         }
 
         public bool ShowMultiLineInOneLine {
-            get {
-                return _MultiLine && _ShowMultiLineInOneLine;
-            }
+            get => _MultiLine && _ShowMultiLineInOneLine;
             set {
                 if (_ShowMultiLineInOneLine == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_ShowMultiLineInOneLine, this, _ShowMultiLineInOneLine.ToPlusMinus(), value.ToPlusMinus(), true);
@@ -1030,9 +1021,7 @@ namespace BlueDatabase {
             }
         }
 
-        private void _TMP_LinkedDatabase_ConnectedControlsStopAllWorking(object sender, MultiUserFileStopWorkingEventArgs e) {
-            Database.OnConnectedControlsStopAllWorking(e);
-        }
+        private void _TMP_LinkedDatabase_ConnectedControlsStopAllWorking(object sender, MultiUserFileStopWorkingEventArgs e) => Database.OnConnectedControlsStopAllWorking(e);
 
         public Database LinkedDatabase() {
             if (_TMP_LinkedDatabase != null) { return _TMP_LinkedDatabase; }
@@ -1059,12 +1048,8 @@ namespace BlueDatabase {
             return _TMP_LinkedDatabase;
         }
 
-        public void OnChanged() {
-            Changed?.Invoke(this, System.EventArgs.Empty);
-        }
-        internal string ParsableColumnKey() {
-            return ColumnCollection.ParsableColumnKey(this);
-        }
+        public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
+        internal string ParsableColumnKey() => ColumnCollection.ParsableColumnKey(this);
 
         public List<string> Contents() => Contents(null, null);
 
@@ -1101,9 +1086,7 @@ namespace BlueDatabase {
             }
         }
 
-        public bool IsFirst() {
-            return Convert.ToBoolean(Database.Column[0] == this);
-        }
+        public bool IsFirst() => Convert.ToBoolean(Database.Column[0] == this);
 
         public ColumnItem Previous() {
 
@@ -1159,7 +1142,7 @@ namespace BlueDatabase {
                     break;
                 //case enDatabaseDataType.co_Intelligenter_Multifilter: _Intelligenter_Multifilter = Wert; break;
                 case enDatabaseDataType.co_DauerFilterPos:
-                    _DauerFilterPos = BlueBasics.Extensions.PointParse(Wert);
+                    _DauerFilterPos = Extensions.PointParse(Wert);
                     break;
                 case enDatabaseDataType.co_Ueberschrift1:
                     _Ueberschrift1 = Wert;
@@ -1539,9 +1522,7 @@ namespace BlueDatabase {
             return summ;
         }
 
-        public bool ExportableTextformatForLayout() {
-            return _Format.ExportableForLayout();
-        }
+        public bool ExportableTextformatForLayout() => _Format.ExportableForLayout();
 
         /// <summary>
         /// Der Invalidate, der am meisten invalidiert: Alle temporären Variablen und auch jede Zell-Größe der Spalte.
@@ -1561,9 +1542,7 @@ namespace BlueDatabase {
         /// <summary>
         /// Wenn sich ein Zelleninhalt verändert hat, muss die Spalte neu berechnet werden.
         /// </summary>
-        internal void Invalidate_TmpColumnContentWidth() {
-            TMP_ColumnContentWidth = null;
-        }
+        internal void Invalidate_TmpColumnContentWidth() => TMP_ColumnContentWidth = null;
 
         internal void Invalidate_TmpVariables() {
             TMP_CaptionText_Size = new SizeF(-1, -1);
@@ -1672,8 +1651,7 @@ namespace BlueDatabase {
             _EditType = enEditTypeFormula.None;
         }
 
-        public QuickImage SymbolForReadableText() {
-            return this == Database.Column.SysRowChanger
+        public QuickImage SymbolForReadableText() => this == Database.Column.SysRowChanger
                 ? QuickImage.Get(enImageCode.Person)
                 : this == Database.Column.SysRowCreator
                 ? QuickImage.Get(enImageCode.Person)
@@ -1694,7 +1672,6 @@ namespace BlueDatabase {
     ? _MultiLine ? QuickImage.Get(enImageCode.Textfeld, 16, "FF0000", "") : QuickImage.Get(enImageCode.Textfeld)
     : QuickImage.Get("Pfeil_Unten_Scrollbar|14|||||0"),
                 };
-        }
 
         public string ReadableText() {
             var ret = _Caption;
@@ -1838,9 +1815,7 @@ namespace BlueDatabase {
             }
         }
 
-        public int Index() {
-            return Database.Column.IndexOf(this);
-        }
+        public int Index() => Database.Column.IndexOf(this);
 
         public string ErrorReason() {
 
@@ -1984,7 +1959,7 @@ namespace BlueDatabase {
 
             if (_DropdownBearbeitungErlaubt || TMP_EditDialog == enEditTypeTable.Dropdown_Single) {
 
-                if (_Format != enDataFormat.Bit && _Format != enDataFormat.Columns_für_LinkedCellDropdown && _Format != enDataFormat.Values_für_LinkedCellDropdown) {
+                if (_Format is not enDataFormat.Bit and not enDataFormat.Columns_für_LinkedCellDropdown and not enDataFormat.Values_für_LinkedCellDropdown) {
                     if (!_DropdownWerteAndererZellenAnzeigen && DropDownItems.Count == 0) { return "Keine Dropdown-Items vorhanden bzw. Alles hinzufügen nicht angewählt."; }
                 }
             } else {
@@ -2000,17 +1975,17 @@ namespace BlueDatabase {
 
             if (_BildTextVerhalten != enBildTextVerhalten.Nur_Text) {
 
-                if (_Format == enDataFormat.Datum_und_Uhrzeit ||
-                    _Format == enDataFormat.Ganzzahl ||
-                    _Format == enDataFormat.Gleitkommazahl ||
-                    _Format == enDataFormat.Text ||
-                    _Format == enDataFormat.Text_mit_Formatierung) {
+                if (_Format is enDataFormat.Datum_und_Uhrzeit or
+                               enDataFormat.Ganzzahl or
+                               enDataFormat.Gleitkommazahl or
+                               enDataFormat.Text or
+                               enDataFormat.Text_mit_Formatierung) {
                     // Performance-Teschnische Gründe
                     _BildTextVerhalten = enBildTextVerhalten.Nur_Text;
                     //return "Bei diesem Format muss das Bild/Text-Verhalten 'Nur Text' sein.";
                 }
             } else {
-                if (_Format == enDataFormat.BildCode || _Format == enDataFormat.FarbeInteger) {
+                if (_Format is enDataFormat.BildCode or enDataFormat.FarbeInteger) {
                     return "Bei diesem Format darf das Bild/Text-Verhalten nicht 'Nur Text' sein.";
                 }
             }
@@ -2028,12 +2003,12 @@ namespace BlueDatabase {
             if (string.IsNullOrEmpty(_LinkedKeyKennung) && _Format.NeedLinkedKeyKennung()) { return "Spaltenkennung für verlinkte Datenbanken fehlt."; }
 
             if (OpticalReplace.Count > 0) {
-                if (_Format != enDataFormat.Text &&
-                    _Format != enDataFormat.Columns_für_LinkedCellDropdown &&
-                    _Format != enDataFormat.BildCode &&
-                    _Format != enDataFormat.Ganzzahl &&
-                    _Format != enDataFormat.Gleitkommazahl &&
-                    _Format != enDataFormat.RelationText) { return "Format unterstützt keine Ersetzungen."; }
+                if (_Format is not enDataFormat.Text and
+                    not enDataFormat.Columns_für_LinkedCellDropdown and
+                    not enDataFormat.BildCode and
+                    not enDataFormat.Ganzzahl and
+                    not enDataFormat.Gleitkommazahl and
+                    not enDataFormat.RelationText) { return "Format unterstützt keine Ersetzungen."; }
 
                 if (_FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled)) { return "Entweder 'Ersetzungen' oder 'erweiternden Autofilter'"; }
                 if (!string.IsNullOrEmpty(_AutoFilterJoker)) { return "Entweder 'Ersetzungen' oder 'Autofilter Joker'"; }
@@ -2058,9 +2033,7 @@ namespace BlueDatabase {
             return string.Empty;
         }
 
-        public bool IsOk() {
-            return string.IsNullOrEmpty(ErrorReason());
-        }
+        public bool IsOk() => string.IsNullOrEmpty(ErrorReason());
 
         private void Tags_ListOrItemChanged(object sender, System.EventArgs e) {
             Database.AddPending(enDatabaseDataType.co_Tags, Key, Tags.JoinWithCr(), false);
@@ -2266,9 +2239,7 @@ namespace BlueDatabase {
         /// Gibt den Dateinamen mit Pfad und Suffix zurück, der sich aus dem Standard-Angaben der Zelle und dem hier übergebebenen Dateinamen zusammensetzt.
         /// Existiert in keiner Spalte und auch nicht auf der Festplatte.
         /// </summary>
-        public string BestFile() {
-            return BestFile(string.Empty, true);
-        }
+        public string BestFile() => BestFile(string.Empty, true);
 
         /// <summary>
         /// Gibt den Dateinamen mit Pfad und Suffix zurück, der sich aus dem Standard-Angaben der Zelle und dem hier übergebebenen Dateinamen zusammensetzt.
@@ -2334,9 +2305,7 @@ namespace BlueDatabase {
             } while (true);
         }
 
-        public bool AutoFilterSymbolPossible() {
-            return FilterOptions.HasFlag(enFilterOptions.Enabled) && Format.Autofilter_möglich();
-        }
+        public bool AutoFilterSymbolPossible() => FilterOptions.HasFlag(enFilterOptions.Enabled) && Format.Autofilter_möglich();
 
         public List<string> Autofilter_ItemList(FilterCollection filter, List<RowItem> pinned) {
             if (filter == null || filter.Count < 0) { return Contents(null, pinned); }
@@ -2350,9 +2319,7 @@ namespace BlueDatabase {
             return Contents(tfilter, pinned);
         }
 
-        public static enEditTypeTable UserEditDialogTypeInTable(ColumnItem vColumn, bool DoDropDown) {
-            return UserEditDialogTypeInTable(vColumn.Format, DoDropDown, vColumn.TextBearbeitungErlaubt, vColumn.MultiLine);
-        }
+        public static enEditTypeTable UserEditDialogTypeInTable(ColumnItem vColumn, bool DoDropDown) => UserEditDialogTypeInTable(vColumn.Format, DoDropDown, vColumn.TextBearbeitungErlaubt, vColumn.MultiLine);
 
         public static enEditTypeTable UserEditDialogTypeInTable(enDataFormat Format, bool DoDropDown, bool KeybordInputAllowed, bool isMultiline) {
             if (!DoDropDown && !KeybordInputAllowed) { return enEditTypeTable.None; }
@@ -2436,14 +2403,14 @@ namespace BlueDatabase {
         /// <param name="t">Beispiel: GetType(enDesign)</param>
         /// <param name="ZumDropdownHinzuAb">Erster Wert der Enumeration, der Hinzugefügt werden soll. Inklusive deses Wertes</param>
         /// <param name="ZumDropdownHinzuBis">Letzter Wert der Enumeration, der nicht mehr hinzugefügt wird, also exklusives diese Wertes</param>
-        public void GetValuesFromEnum(System.Type t, int ZumDropdownHinzuAb, int ZumDropdownHinzuBis) {
+        public void GetValuesFromEnum(Type t, int ZumDropdownHinzuAb, int ZumDropdownHinzuBis) {
             var NewReplacer = new List<string>();
             var NewAuswahl = new List<string>();
-            var items = System.Enum.GetValues(t);
+            var items = Enum.GetValues(t);
 
             foreach (var thisItem in items) {
 
-                var te = System.Enum.GetName(t, thisItem);
+                var te = Enum.GetName(t, thisItem);
                 var th = (int)thisItem;
 
                 if (!string.IsNullOrEmpty(te)) {

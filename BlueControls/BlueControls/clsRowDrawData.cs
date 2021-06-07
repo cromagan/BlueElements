@@ -32,7 +32,7 @@ namespace BlueControls.Controls {
         public Rectangle CaptionPos;
         public int DrawHeight;
 
-        public clsRowDrawData(BlueDatabase.RowItem row) {
+        public clsRowDrawData(RowItem row) {
             Row = row;
             Pinned = false;
             Y = -1;

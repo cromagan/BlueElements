@@ -18,8 +18,6 @@
 #endregion
 namespace BlueBasics {
     public static partial class Extensions {
-        public static string ToPlusMinus(this bool value) {
-            return value ? "+" : "-";
-        }
+        public static string ToPlusMinus(this bool value) => value ? "+" : "-";
     }
 }

@@ -31,7 +31,7 @@ namespace BlueScript {
 
         public override string Description => "Sortiert die Liste und falls das zweite Attribut TRUE ist, entfernt Doubletten.";
 
-        public override List<string> Comand(Script s) { return new() { "sort" }; }
+        public override List<string> Comand(Script s) => new() { "sort" };
         public override string StartSequence => "(";
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;

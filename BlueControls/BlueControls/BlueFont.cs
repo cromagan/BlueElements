@@ -94,9 +94,7 @@ namespace BlueControls {
             }
         }
 
-        private BlueFont(string codeToParse) : this() {
-            Parse(codeToParse);
-        }
+        private BlueFont(string codeToParse) : this() => Parse(codeToParse);
 
         #endregion
 
@@ -110,9 +108,7 @@ namespace BlueControls {
 
             return SizeOK(GR) ? new Font(FontName, GR, _Font.Style, _Font.Unit) : new Font("Arial", GR, _Font.Style, _Font.Unit);
         }
-        public Font Font() {
-            return SizeOK(_Font.Size) ? _Font : new Font("Arial", _FontOL.Size, _Font.Style, _Font.Unit);
-        }
+        public Font Font() => SizeOK(_Font.Size) ? _Font : new Font("Arial", _FontOL.Size, _Font.Style, _Font.Unit);
 
         public Font FontWithoutLines(float Zoom) {
 
@@ -122,9 +118,7 @@ namespace BlueControls {
 
             return SizeOK(GR) ? new Font(FontName, GR, _FontOL.Style, _FontOL.Unit) : new Font("Arial", GR, _FontOL.Style, _FontOL.Unit);
         }
-        public Font FontWithoutLinesForCapitals(float Zoom) {
-            return new Font(_FontOL.Name, _FontOL.Size * Zoom * 0.8F / Skin.Scale, _FontOL.Style, _FontOL.Unit);
-        }
+        public Font FontWithoutLinesForCapitals(float Zoom) => new(_FontOL.Name, _FontOL.Size * Zoom * 0.8F / Skin.Scale, _FontOL.Style, _FontOL.Unit);
 
         public bool Italic { get; private set; }
 
@@ -146,13 +140,9 @@ namespace BlueControls {
 
         public string FontName { get; private set; }
 
-        public Pen Pen(float czoom) {
-            return Math.Abs(czoom - 1) < 0.001 ? _Pen : GeneratePen(czoom);
-        }
+        public Pen Pen(float czoom) => Math.Abs(czoom - 1) < 0.001 ? _Pen : GeneratePen(czoom);
 
-        public Pen Pen(decimal czoom) {
-            return Math.Abs(czoom - 1) < 0.001m ? _Pen : GeneratePen((float)czoom);
-        }
+        public Pen Pen(decimal czoom) => Math.Abs(czoom - 1) < 0.001m ? _Pen : GeneratePen((float)czoom);
 
         public Brush Brush_Color_Main { get; private set; }
 
@@ -162,17 +152,11 @@ namespace BlueControls {
 
         public Color Color_Outline { get; private set; }
 
-        public SizeF CharSize(float DummyWidth) {
-            return new SizeF(DummyWidth, _Zeilenabstand);
-        }
+        public SizeF CharSize(float DummyWidth) => new(DummyWidth, _Zeilenabstand);
 
-        internal float Oberl‰nge(float Zoom) {
-            return _Oberl‰ngex * Zoom;
-        }
+        internal float Oberl‰nge(float Zoom) => _Oberl‰ngex * Zoom;
 
-        internal float Kapit‰lchenPlus(float Zoom) {
-            return _Kapit‰lchenPlus * Zoom;
-        }
+        internal float Kapit‰lchenPlus(float Zoom) => _Kapit‰lchenPlus * Zoom;
 
         internal SizeF CharSize(char vChar) {
 
@@ -307,7 +291,7 @@ namespace BlueControls {
             var Multi = 50 / _FontOL.Size; // Zu groﬂe Schriften verursachen bei manchen Fonts Fehler!!!
 
             var tmpfont = new Font(_FontOL.Name, _FontOL.Size * Multi / Skin.Scale, _FontOL.Style);
-            var f = BlueFont.MeasureString("Z", tmpfont);
+            var f = MeasureString("Z", tmpfont);
             var bmp = new Bitmap((int)(f.Width + 1), (int)(f.Height + 1));
             var gr = Graphics.FromImage(bmp);
 
@@ -353,9 +337,7 @@ namespace BlueControls {
             _Code = ToString(FontName, FontSize, Bold, Italic, Underline, StrikeOut, Outline, Color_Main.ToHTMLCode(), Color_Outline.ToHTMLCode(), Kapit‰lchen, OnlyUpper, OnlyLower);
         }
 
-        internal BlueFont Scale(double fontScale) {
-            return Math.Abs(1 - fontScale) < 0.01 ? this : Get(FontName, (float)(FontSize * fontScale), Bold, Italic, Underline, StrikeOut, Outline, Color_Main, Color_Outline, Kapit‰lchen, OnlyUpper, OnlyLower);
-        }
+        internal BlueFont Scale(double fontScale) => Math.Abs(1 - fontScale) < 0.01 ? this : Get(FontName, (float)(FontSize * fontScale), Bold, Italic, Underline, StrikeOut, Outline, Color_Main, Color_Outline, Kapit‰lchen, OnlyUpper, OnlyLower);
 
         private Pen GeneratePen(float cZoom) {
 
@@ -366,9 +348,7 @@ namespace BlueControls {
             return new Pen(Color_Main, linDi);
         }
 
-        public new string ToString() {
-            return _Code;
-        }
+        public new string ToString() => _Code;
 
         private static string ToString(string FontName, float FontSize, bool Bold, bool Italic, bool Underline, bool Strikeout, bool OutLine, string Color_Main, string Color_Outline, bool vKapit‰lchen, bool vonlyuppe, bool vonlylower) {
             var c = "{Name=" + FontName + ", Size=" + FontSize.ToString().ToNonCritical();
@@ -385,17 +365,11 @@ namespace BlueControls {
             return c + "}";
         }
 
-        public static BlueFont Get(FontFamily vFont, float Size) {
-            return Get(vFont.Name, Size, false, false, false, false, false, "000000", "FFFFFF", false, false, false);
-        }
+        public static BlueFont Get(FontFamily vFont, float Size) => Get(vFont.Name, Size, false, false, false, false, false, "000000", "FFFFFF", false, false, false);
 
-        public static BlueFont Get(string FontName, float FontSize, bool Bold, bool Italic, bool Underline, bool Strikeout, bool OutLine, string Color_Main, string Color_Outline, bool Kapit‰lchen, bool OnlyUpper, bool OnlyLower) {
-            return Get(ToString(FontName, FontSize, Bold, Italic, Underline, Strikeout, OutLine, Color_Main, Color_Outline, Kapit‰lchen, OnlyUpper, OnlyLower));
-        }
+        public static BlueFont Get(string FontName, float FontSize, bool Bold, bool Italic, bool Underline, bool Strikeout, bool OutLine, string Color_Main, string Color_Outline, bool Kapit‰lchen, bool OnlyUpper, bool OnlyLower) => Get(ToString(FontName, FontSize, Bold, Italic, Underline, Strikeout, OutLine, Color_Main, Color_Outline, Kapit‰lchen, OnlyUpper, OnlyLower));
 
-        public static BlueFont Get(string FontName, float FontSize, bool Bold, bool Italic, bool Underline, bool Strikeout, bool OutLine, Color Color_Main, Color Color_Outline, bool Kapit‰lchen, bool OnlyUpper, bool OnlyLower) {
-            return Get(FontName, FontSize, Bold, Italic, Underline, Strikeout, OutLine, Color_Main.ToHTMLCode(), Color_Outline.ToHTMLCode(), Kapit‰lchen, OnlyUpper, OnlyLower);
-        }
+        public static BlueFont Get(string FontName, float FontSize, bool Bold, bool Italic, bool Underline, bool Strikeout, bool OutLine, Color Color_Main, Color Color_Outline, bool Kapit‰lchen, bool OnlyUpper, bool OnlyLower) => Get(FontName, FontSize, Bold, Italic, Underline, Strikeout, OutLine, Color_Main.ToHTMLCode(), Color_Outline.ToHTMLCode(), Kapit‰lchen, OnlyUpper, OnlyLower);
 
         public static BlueFont Get(string Code) {
             if (string.IsNullOrEmpty(Code)) { return null; }
@@ -439,7 +413,7 @@ namespace BlueControls {
 
         private BitmapExt Symbol(string Text, bool Transparent) {
 
-            var s = BlueFont.MeasureString(Text, Font());
+            var s = MeasureString(Text, Font());
             var bmp = new BitmapExt((int)(s.Width + 1), (int)(s.Height + 1));
 
             using (var gr = Graphics.FromImage(bmp.Bitmap)) {
@@ -520,21 +494,15 @@ namespace BlueControls {
             return SymbolOfLine_sym;
         }
 
-        public void OnChanged() {
-            Changed?.Invoke(this, System.EventArgs.Empty);
-        }
+        public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 
-        public SizeF MeasureString(string s) {
-            return MeasureString(s, _FontOL);
-        }
+        public SizeF MeasureString(string s) => MeasureString(s, _FontOL);
 
         public static SizeF MeasureString(string s, Font f) {
             using var g = Graphics.FromHwnd(IntPtr.Zero);
             return g.MeasureString(s, f);
         }
 
-        public static SizeF MeasureStringOfCaption(string s) {
-            return BlueFont.MeasureString(s, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
-        }
+        public static SizeF MeasureStringOfCaption(string s) => MeasureString(s, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
     }
 }

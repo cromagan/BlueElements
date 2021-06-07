@@ -25,7 +25,7 @@ namespace BlueScript {
 
         public override string Syntax => "Replace(OriginalString, SearchString, ReplaceString)";
         public override string Description => "Ersetzt in einem Text einen Text durch einen anderen Text";
-        public override List<string> Comand(Script s) { return new() { "replace" }; }
+        public override List<string> Comand(Script s) => new() { "replace" };
         public override string StartSequence => "(";
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
@@ -35,9 +35,8 @@ namespace BlueScript {
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            return !string.IsNullOrEmpty(attvar.ErrorMessage)
-                ? strDoItFeedback.AttributFehler(this, attvar)
-                : new strDoItFeedback("\"" + attvar.Attributes[0].ValueString.Replace(attvar.Attributes[1].ValueString, attvar.Attributes[2].ValueString) + "\"", string.Empty);
+            return !string.IsNullOrEmpty(attvar.ErrorMessage) ? strDoItFeedback.AttributFehler(this, attvar)
+                                                              : new strDoItFeedback(attvar.Attributes[0].ValueString.Replace(attvar.Attributes[1].ValueString, attvar.Attributes[2].ValueString), enVariableDataType.String);
         }
     }
 }

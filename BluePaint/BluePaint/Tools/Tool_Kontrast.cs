@@ -181,9 +181,7 @@ namespace BluePaint {
             OnDoInvalidate();
         }
 
-        public override string MacroKennung() {
-            return "Kontrast";
-        }
+        public override string MacroKennung() => "Kontrast";
 
         public override void ExcuteCommand(string command) {
             var c = command.SplitBy(";");

@@ -25,7 +25,7 @@ namespace BlueScript {
 
         public override string Description => "Gibt TRUE zurück, wenn die Variable nicht existiert, fehlerhaft ist oder keinen Inhalt hat.";
         public override string Syntax => "isNullOrEmpty(Variable)";
-        public override List<string> Comand(Script s) { return new() { "isnullorempty" }; }
+        public override List<string> Comand(Script s) => new() { "isnullorempty" };
         public override string StartSequence => "(";
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
@@ -35,18 +35,17 @@ namespace BlueScript {
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-
-            return attvar.Attributes == null
-                ? attvar.FehlerTyp != enSkriptFehlerTyp.VariableNichtGefunden
-                    ? strDoItFeedback.AttributFehler(this, attvar)
-                    : strDoItFeedback.Wahr()
-                : string.IsNullOrEmpty(attvar.Attributes[0].ValueString)
-                ? strDoItFeedback.Wahr()
-                : attvar.Attributes[0].Type == enVariableDataType.Null ||
+            if (attvar.Attributes == null) {
+                if (attvar.FehlerTyp != enSkriptFehlerTyp.VariableNichtGefunden) { return strDoItFeedback.AttributFehler(this, attvar); }
+                return strDoItFeedback.Wahr();
+            }
+            if (string.IsNullOrEmpty(attvar.Attributes[0].ValueString)) { return strDoItFeedback.Wahr(); }
+            if (attvar.Attributes[0].Type == enVariableDataType.Null ||
                 attvar.Attributes[0].Type == enVariableDataType.Error ||
-                attvar.Attributes[0].Type == enVariableDataType.NotDefinedYet
-                ? strDoItFeedback.Wahr()
-                : strDoItFeedback.Falsch();
+                attvar.Attributes[0].Type == enVariableDataType.NotDefinedYet) {
+                return strDoItFeedback.Wahr();
+            }
+            return strDoItFeedback.Falsch();
         }
     }
 }

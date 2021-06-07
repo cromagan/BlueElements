@@ -48,9 +48,7 @@ namespace BlueBasics {
         [DefaultValue(false)]
         public static bool ServiceStarted { get; private set; } = false;
 
-        public static bool IsHostRunning() {
-            return Debugger.IsAttached;
-        }
+        public static bool IsHostRunning() => Debugger.IsAttached;
 
         public static void TraceLogging_End() {
             try {
@@ -64,7 +62,7 @@ namespace BlueBasics {
                     _TraceListener.Close();
                     _TraceListener.Dispose();
                     _TraceListener = null;
-                    if (_DeleteTraceLog && FileExists(_CurrentTraceLogFile)) { BlueBasics.FileOperations.DeleteFile(_CurrentTraceLogFile, false); }
+                    if (_DeleteTraceLog && FileExists(_CurrentTraceLogFile)) { DeleteFile(_CurrentTraceLogFile, false); }
                 }
             } catch {
             }
@@ -111,9 +109,7 @@ namespace BlueBasics {
             }
         }
 
-        public static string AppExe() {
-            return System.Windows.Forms.Application.StartupPath + "\\" + AppName() + ".exe";
-        }
+        public static string AppExe() => System.Windows.Forms.Application.StartupPath + "\\" + AppName() + ".exe";
 
         public static void HTML_AddFoot(List<string> l) {
             l.Add("  </body>");
@@ -130,18 +126,14 @@ namespace BlueBasics {
             l.Add("<body>");
         }
 
-        public static void DebugPrint(string warnung) {
-            DebugPrint(enFehlerArt.Warnung, warnung);
-        }
+        public static void DebugPrint(string warnung) => DebugPrint(enFehlerArt.Warnung, warnung);
 
         public static void DebugPrint(enFehlerArt art, Exception ex) {
             if (art != enFehlerArt.Info && art != enFehlerArt.DevelopInfo && IsHostRunning()) { Debugger.Break(); }
             DebugPrint(art, "Es wurde ein allgemeiner Fehler abgefangen.\r\nMeldung: " + ex.Message + "\r\n" + ex.StackTrace.ToString());
         }
 
-        public static void DebugPrint(Exception warnung) {
-            DebugPrint(enFehlerArt.Warnung, warnung);
-        }
+        public static void DebugPrint(Exception warnung) => DebugPrint(enFehlerArt.Warnung, warnung);
 
         public static void DebugPrint_RoutineMussUeberschriebenWerden() {
             if (IsHostRunning()) { Debugger.Break(); }
@@ -153,13 +145,9 @@ namespace BlueBasics {
             DebugPrint(enFehlerArt.Fehler, "Diese Funktion ist vom Entwickler noch nicht implementiert.");
         }
 
-        public static void DebugPrint(object _Enum) {
-            DebugPrint(enFehlerArt.Warnung, "Ein Wert einer Enumeration konnte nicht verarbeitet werden.\r\nEnumeration: " + _Enum.GetType().FullName + "\r\nParameter: " + _Enum);
-        }
+        public static void DebugPrint(object _Enum) => DebugPrint(enFehlerArt.Warnung, "Ein Wert einer Enumeration konnte nicht verarbeitet werden.\r\nEnumeration: " + _Enum.GetType().FullName + "\r\nParameter: " + _Enum);
 
-        public static void DebugPrint_MissingCommand(string comand) {
-            DebugPrint(enFehlerArt.Warnung, "Ein Wert einer Kontextmenü-Befehls konnte nicht verarbeitet werden.\r\nBefehl: " + comand);
-        }
+        public static void DebugPrint_MissingCommand(string comand) => DebugPrint(enFehlerArt.Warnung, "Ein Wert einer Kontextmenü-Befehls konnte nicht verarbeitet werden.\r\nBefehl: " + comand);
 
         public static void DebugPrint(enFehlerArt art, string meldung) {
             lock (_SyncLockObject) {
@@ -277,13 +265,9 @@ namespace BlueBasics {
             }
         }
 
-        public static bool IsRunning() {
-            return Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).GetUpperBound(0) > 0;
-        }
+        public static bool IsRunning() => Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).GetUpperBound(0) > 0;
 
-        public static void DoEvents() {
-            System.Windows.Forms.Application.DoEvents();
-        }
+        public static void DoEvents() => System.Windows.Forms.Application.DoEvents();
 
         public static void Debugprint_BackgroundThread() {
             if (!Thread.CurrentThread.IsBackground) { return; }

@@ -250,16 +250,10 @@ namespace BlueDatabase {
             return Result + "}";
         }
 
-        public ColumnViewItem PreviewsVisible(ColumnViewCollection _Parent) {
-            return _Parent?.PreviousVisible(this);
-        }
+        public ColumnViewItem PreviewsVisible(ColumnViewCollection _Parent) => _Parent?.PreviousVisible(this);
 
-        public ColumnViewItem NextVisible(ColumnViewCollection _Parent) {
-            return _Parent?.NextVisible(this);
-        }
+        public ColumnViewItem NextVisible(ColumnViewCollection _Parent) => _Parent?.NextVisible(this);
 
-        public void OnChanged() {
-            Changed?.Invoke(this, System.EventArgs.Empty);
-        }
+        public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
     }
 }

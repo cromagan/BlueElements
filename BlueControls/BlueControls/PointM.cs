@@ -41,7 +41,7 @@ namespace BlueControls {
 
         #region  Event-Deklarationen + Delegaten 
 
-        public event System.EventHandler Moved;
+        public event EventHandler Moved;
 
         #endregion
 
@@ -58,11 +58,7 @@ namespace BlueControls {
         public PointM(PointM startPoint, decimal laenge, decimal alpha) : this(null, string.Empty, startPoint.X, startPoint.Y, laenge, alpha) { }
         public PointM(PointF startPoint, decimal laenge, decimal alpha) : this(null, string.Empty, (decimal)startPoint.X, (decimal)startPoint.Y, laenge, alpha) { }
 
-        public PointM(object parent, string codeToParse) : this(parent) {
-
-            Parse(codeToParse);
-
-        }
+        public PointM(object parent, string codeToParse) : this(parent) => Parse(codeToParse);
 
         public PointM(object parent, string name, decimal x, decimal y, string tag) {
             _parent = parent;
@@ -170,17 +166,11 @@ namespace BlueControls {
             }
         }
 
-        public static explicit operator PointF(PointM p) {
-            return new((float)p.X, (float)p.Y);
-        }
+        public static explicit operator PointF(PointM p) => new((float)p.X, (float)p.Y);
 
-        public static explicit operator Point(PointM p) {
-            return new((int)p.X, (int)p.Y);
-        }
+        public static explicit operator Point(PointM p) => new((int)p.X, (int)p.Y);
 
-        public static PointM Empty() {
-            return new PointM(0m, 0m);
-        }
+        public static PointM Empty() => new(0m, 0m);
 
         public override string ToString() {
             var t = "{";
@@ -256,13 +246,9 @@ namespace BlueControls {
 
         }
 
-        public PointF ZoomAndMove(AdditionalDrawing e) {
-            return ZoomAndMove(e.Zoom, e.ShiftX, e.ShiftY);
-        }
+        public PointF ZoomAndMove(AdditionalDrawing e) => ZoomAndMove(e.Zoom, e.ShiftX, e.ShiftY);
 
-        public PointF ZoomAndMove(decimal zoom, decimal shiftX, decimal shiftY) {
-            return new PointF((float)((_x * zoom) - shiftX + (zoom / 2)), (float)((_y * zoom) - shiftY + (zoom / 2)));
-        }
+        public PointF ZoomAndMove(decimal zoom, decimal shiftX, decimal shiftY) => new((float)((_x * zoom) - shiftX + (zoom / 2)), (float)((_y * zoom) - shiftY + (zoom / 2)));
 
         public void SetTo(decimal x, decimal y) {
             if (x == _x && y == _y) { return; }
@@ -294,23 +280,18 @@ namespace BlueControls {
             }
         }
 
-        internal string CompareKey() {
+        internal string CompareKey() =>
             //if (_x > int.MaxValue / 10.0m || _y > int.MaxValue / 10.0m || _x < int.MinValue / 10.0m || _y < int.MinValue / 10.0m) { return "ZZZ-ZZZ"; }
-            return _y.ToString(Constants.Format_Float5_1) + "-" + _x.ToString(Constants.Format_Float5_1);
-        }
+            _y.ToString(Constants.Format_Float5_1) + "-" + _x.ToString(Constants.Format_Float5_1);
 
-        public decimal DistanzZuLinie(PointM P1, PointM P2) {
-            return DistanzZuLinie(P1.X, P1.Y, P2.X, P2.Y);
-        }
+        public decimal DistanzZuLinie(PointM P1, PointM P2) => DistanzZuLinie(P1.X, P1.Y, P2.X, P2.Y);
 
         public decimal DistanzZuLinie(decimal X1, decimal Y1, decimal X2, decimal Y2) {
             var pal = GeometryDF.PointOnLine(this, X1, Y1, X2, Y2);
             return GeometryDF.Länge(this, pal);
         }
 
-        public void OnMoved() {
-            Moved?.Invoke(this, System.EventArgs.Empty);
-        }
+        public void OnMoved() => Moved?.Invoke(this, System.EventArgs.Empty);
 
         public decimal Magnitude => (decimal)Math.Sqrt((double)((_x * _x) + (_y * _y)));
 
@@ -320,9 +301,7 @@ namespace BlueControls {
             _y /= magnitude;
         }
 
-        public decimal DotProduct(PointM vector) {
-            return (_x * vector._x) + (_y * vector._y);
-        }
+        public decimal DotProduct(PointM vector) => (_x * vector._x) + (_y * vector._y);
 
         public void Move(decimal x, decimal y) {
 
@@ -332,21 +311,13 @@ namespace BlueControls {
             OnMoved();
         }
 
-        public static PointM operator +(PointM a, PointM b) {
-            return new PointM(a._x + b._x, a._y + b._y);
-        }
+        public static PointM operator +(PointM a, PointM b) => new(a._x + b._x, a._y + b._y);
 
-        public static PointM operator -(PointM a) {
-            return new PointM(-a._x, -a._y);
-        }
+        public static PointM operator -(PointM a) => new(-a._x, -a._y);
 
-        public static PointM operator -(PointM a, PointM b) {
-            return new PointM(a._x - b._x, a._y - b._y);
-        }
+        public static PointM operator -(PointM a, PointM b) => new(a._x - b._x, a._y - b._y);
 
-        public static PointM operator *(PointM a, decimal b) {
-            return new PointM(a._x * b, a._y * b);
-        }
+        public static PointM operator *(PointM a, decimal b) => new(a._x * b, a._y * b);
     }
 }
 

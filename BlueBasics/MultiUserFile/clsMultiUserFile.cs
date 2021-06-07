@@ -89,8 +89,8 @@ namespace BlueBasics.MultiUserFile {
 
         #region Variablen und Properties
 
-        private readonly System.ComponentModel.BackgroundWorker BackgroundWorker;
-        private readonly System.ComponentModel.BackgroundWorker PureBinSaver;
+        private readonly BackgroundWorker BackgroundWorker;
+        private readonly BackgroundWorker PureBinSaver;
         private readonly Timer Checker;
         private FileSystemWatcher Watcher;
 
@@ -178,13 +178,13 @@ namespace BlueBasics.MultiUserFile {
             AllFiles.Add(this);
             //OnMultiUserFileCreated(this); // Ruft ein statisches Event auf, deswegen geht das.
 
-            PureBinSaver = new System.ComponentModel.BackgroundWorker {
+            PureBinSaver = new BackgroundWorker {
                 WorkerReportsProgress = true
             };
             PureBinSaver.DoWork += PureBinSaver_DoWork;
             PureBinSaver.ProgressChanged += PureBinSaver_ProgressChanged;
 
-            BackgroundWorker = new System.ComponentModel.BackgroundWorker {
+            BackgroundWorker = new BackgroundWorker {
                 WorkerReportsProgress = true,
                 WorkerSupportsCancellation = true,
             };
@@ -476,7 +476,7 @@ namespace BlueBasics.MultiUserFile {
 
             // --- nun Sollte alles auf der Festplatte sein, prüfen! ---
             (var data, var fileinfo) = LoadBytesFromDisk(enErrorReason.LoadForCheckingOnly);
-            if (!savedDataUncompressed.SequenceEqual(data)) {
+            if (data == null || !savedDataUncompressed.SequenceEqual(data)) {
                 // OK, es sind andere Daten auf der Festplatte?!? Seltsam, zählt als sozusagen ungespeichter und ungeladen.
                 _CheckedAndReloadNeed = true;
                 _LastSaveCode = "Fehler";
@@ -655,10 +655,9 @@ namespace BlueBasics.MultiUserFile {
             }
         }
 
-        private void Watcher_Error(object sender, ErrorEventArgs e) {
+        private void Watcher_Error(object sender, ErrorEventArgs e) =>
             // Im Verzeichnis wurden zu viele Änderungen gleichzeitig vorgenommen...
             _CheckedAndReloadNeed = true;
-        }
 
         private void Watcher_Renamed(object sender, RenamedEventArgs e) {
             if (!string.Equals(e.FullPath, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
@@ -880,7 +879,7 @@ namespace BlueBasics.MultiUserFile {
                 DataUncompressed = ToListOfByte();
                 Writer_BinaryData = _zipped ? ZipIt(DataUncompressed) : DataUncompressed;
 
-                TMPFileName = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + modAllgemein.UserName().ToUpper());
+                TMPFileName = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName().ToUpper());
 
                 try {
                     using var x = new FileStream(TMPFileName, FileMode.Create, FileAccess.Write, FileShare.None);
@@ -918,13 +917,9 @@ namespace BlueBasics.MultiUserFile {
             }
         }
 
-        private string Backupdateiname() {
-            return string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".bak";
-        }
+        private string Backupdateiname() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".bak";
 
-        private string Blockdateiname() {
-            return string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".blk";
-        }
+        private string Blockdateiname() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".blk";
 
         /// <summary>
         ///
@@ -1039,13 +1034,9 @@ namespace BlueBasics.MultiUserFile {
             if (!BackgroundWorker.IsBusy) { BackgroundWorker.RunWorkerAsync(); }
         }
 
-        private void Backup_ProgressChanged(object sender, ProgressChangedEventArgs e) {
-            BackgroundWorkerMessage(e);
-        }
+        private void Backup_ProgressChanged(object sender, ProgressChangedEventArgs e) => BackgroundWorkerMessage(e);
 
-        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
-            DoBackGroundWork((BackgroundWorker)sender);
-        }
+        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) => DoBackGroundWork((BackgroundWorker)sender);
 
         protected abstract void DoBackGroundWork(BackgroundWorker listenToMyCancel);
         protected abstract void BackgroundWorkerMessage(ProgressChangedEventArgs e);
@@ -1055,10 +1046,10 @@ namespace BlueBasics.MultiUserFile {
             if (mode == enErrorReason.OnlyRead) { return string.Empty; }
 
             //----------Load, vereinfachte Prüfung ------------------------------------------------------------------------
-            if (mode == enErrorReason.Load || mode == enErrorReason.LoadForCheckingOnly) {
+            if (mode is enErrorReason.Load or enErrorReason.LoadForCheckingOnly) {
                 if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
                 var sec = AgeOfBlockDatei();
-                if (sec >= 0 && sec < 10) { return "Ein anderer Computer speichert gerade Daten ab."; }
+                if (sec is >= 0 and < 10) { return "Ein anderer Computer speichert gerade Daten ab."; }
             }
 
             if (mode == enErrorReason.Load) {

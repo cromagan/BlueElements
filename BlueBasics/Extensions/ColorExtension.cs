@@ -66,17 +66,13 @@ namespace BlueBasics {
             return Color.FromArgb(alpha, (int)(255 * r), (int)(255 * g), (int)(255 * b));
         }
 
-        public static Color SoftLightMix(this Color baseColor, Color blendColor, double opacity) {
-            return MixColor(Color.FromArgb((int)SoftLightMath(baseColor.R, blendColor.R),
+        public static Color SoftLightMix(this Color baseColor, Color blendColor, double opacity) => MixColor(Color.FromArgb((int)SoftLightMath(baseColor.R, blendColor.R),
                                            (int)SoftLightMath(baseColor.G, blendColor.G),
                                            (int)SoftLightMath(baseColor.B, blendColor.B)), baseColor, opacity);
-        }
 
-        public static Color OverlayMix(this Color baseColor, Color blendColor, double opacity) {
-            return MixColor(Color.FromArgb((int)OverlayMath(baseColor.R, blendColor.R),
+        public static Color OverlayMix(this Color baseColor, Color blendColor, double opacity) => MixColor(Color.FromArgb((int)OverlayMath(baseColor.R, blendColor.R),
                                            (int)OverlayMath(baseColor.G, blendColor.G),
                                            (int)OverlayMath(baseColor.B, blendColor.B)), baseColor, opacity);
-        }
 
         #region  Blend Mode Mathematics
 
@@ -108,13 +104,9 @@ namespace BlueBasics {
                                   (int)((color1.B * color1Prozent) + (color2.B * Color2Prozent)));
         }
 
-        public static bool IsNearWhite(this Color col, double minBrightness) {
-            return col.ToArgb() == -1 || col.A == 0 || col.GetBrightness() >= minBrightness;
-        }
+        public static bool IsNearWhite(this Color col, double minBrightness) => col.ToArgb() == -1 || col.A == 0 || col.GetBrightness() >= minBrightness;
 
-        public static bool IsNearBlack(this Color color, double maxBrightness) {
-            return color.A != 0 && (color.ToArgb() == 0 || color.GetBrightness() <= maxBrightness);
-        }
+        public static bool IsNearBlack(this Color color, double maxBrightness) => color.A != 0 && (color.ToArgb() == 0 || color.GetBrightness() <= maxBrightness);
 
         //public static Color ToSepia(this Color color) {
         //    var r = (int)Math.Min(255, color.R * 0.393 + color.G * 0.769 + color.B * 0.189);
@@ -165,9 +157,7 @@ namespace BlueBasics {
         //    return (col.ToArgb() == -65281);
         //}
 
-        public static bool IsMagentaOrTransparent(this Color col) {
-            return col.ToArgb() == -65281 || col.A == 0;
-        }
+        public static bool IsMagentaOrTransparent(this Color col) => col.ToArgb() == -65281 || col.A == 0;
 
         //public static bool IsTransparent(this Color col) {
         //    return (col.A == 0);
@@ -322,22 +312,16 @@ namespace BlueBasics {
         //    }
         //}
 
-        public static Color SetAlpha(this Color color, byte newAlpha) {
-            return Color.FromArgb(newAlpha, color.R, color.G, color.B);
-        }
+        public static Color SetAlpha(this Color color, byte newAlpha) => Color.FromArgb(newAlpha, color.R, color.G, color.B);
 
         public static Color ToGrey(this Color color) {
             var W = (int)Math.Min(255, ((color.R * 77) + (color.G * 150) + (color.B * 28)) / 255.0);
             return Color.FromArgb(color.A, W, W, W);
         }
 
-        public static Color Brighten(this Color color, double value) {
-            return FromHSB(color.GetHue(), color.GetSaturation(), (float)(color.GetBrightness() * (1 + value)), color.A);
-        }
+        public static Color Brighten(this Color color, double value) => FromHSB(color.GetHue(), color.GetSaturation(), (float)(color.GetBrightness() * (1 + value)), color.A);
 
-        public static Color Darken(this Color color, double value) {
-            return FromHSB(color.GetHue(), color.GetSaturation(), (float)(color.GetBrightness() * (1 - value)), color.A);
-        }
+        public static Color Darken(this Color color, double value) => FromHSB(color.GetHue(), color.GetSaturation(), (float)(color.GetBrightness() * (1 - value)), color.A);
 
         public static Color ClosestHueColor(this Color target, List<Color> colors) {
             // https://stackoverflow.com/questions/27374550/how-to-compare-color-object-and-get-closest-color-in-an-color/27375621
@@ -364,9 +348,7 @@ namespace BlueBasics {
         }
 
         // color brightness as perceived:
-        public static float getBrightness(this Color c) {
-            return ((c.R * 0.299f) + (c.G * 0.587f) + (c.B * 0.114f)) / 256f;
-        }
+        public static float getBrightness(this Color c) => ((c.R * 0.299f) + (c.G * 0.587f) + (c.B * 0.114f)) / 256f;
 
         // distance between two hues:
         public static float getHueDistance(this float hue1, float hue2) {
@@ -375,15 +357,11 @@ namespace BlueBasics {
         }
 
         // weighed only by saturation and brightness (from my trackbars)
-        public static float ColorNum(this Color c, float factorSat, float factorBri) {
-            return (c.GetSaturation() * factorSat) + (getBrightness(c) * factorBri);
-        }
+        public static float ColorNum(this Color c, float factorSat, float factorBri) => (c.GetSaturation() * factorSat) + (getBrightness(c) * factorBri);
 
         // distance in RGB space
-        public static int ColorDiff(this Color c1, Color c2) {
-            return (int)Math.Sqrt(((c1.R - c2.R) * (c1.R - c2.R))
+        public static int ColorDiff(this Color c1, Color c2) => (int)Math.Sqrt(((c1.R - c2.R) * (c1.R - c2.R))
                                    + ((c1.G - c2.G) * (c1.G - c2.G))
                                    + ((c1.B - c2.B) * (c1.B - c2.B)));
-        }
     }
 }

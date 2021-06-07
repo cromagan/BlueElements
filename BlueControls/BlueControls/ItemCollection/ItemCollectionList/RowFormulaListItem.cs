@@ -49,11 +49,7 @@ namespace BlueControls.ItemCollection {
 
         #endregion
 
-        public override string QuickInfo {
-            get {
-                return _Row == null ? string.Empty : _Row.CellFirstString().CreateHtmlCodes(true);
-            }
-        }
+        public override string QuickInfo => _Row == null ? string.Empty : _Row.CellFirstString().CreateHtmlCodes(true);
 
         public string LayoutID {
             get => _LayoutID;
@@ -142,17 +138,10 @@ namespace BlueControls.ItemCollection {
 
         }
 
-        protected override Size ComputeSizeUntouchedForListBox() {
-            return new Size(300, 300);
+        protected override Size ComputeSizeUntouchedForListBox() => new(300, 300);
 
-        }
+        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) => (int)(columnWidth * 0.8);
 
-        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) {
-            return (int)(columnWidth * 0.8);
-        }
-
-        protected override string GetCompareKey() {
-            return _Row.CellFirstString();
-        }
+        protected override string GetCompareKey() => _Row.CellFirstString();
     }
 }

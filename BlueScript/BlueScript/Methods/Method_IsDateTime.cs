@@ -26,7 +26,7 @@ namespace BlueScript {
 
         public override string Description => "Prüft, ob der Inhalt der Variable ein gültiges Datum/Zeit-Format ist. ";
         public override string Syntax => "IsDateTime(Value)";
-        public override List<string> Comand(Script s) { return new() { "isdatetime" }; }
+        public override List<string> Comand(Script s) => new() { "isdatetime" };
         public override string StartSequence => "(";
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;

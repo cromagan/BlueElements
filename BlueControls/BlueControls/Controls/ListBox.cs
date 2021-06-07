@@ -222,17 +222,11 @@ namespace BlueControls.Controls {
             CheckButtons();
         }
 
-        public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
-            return false;
-        }
+        public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) => false;
 
-        public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) {
-            ContextMenuItemClicked?.Invoke(this, e);
-        }
+        public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
-        private BasicListItem MouseOverNode(int X, int Y) {
-            return ButtonsVisible() && Y >= Height - Plus.Height ? null : Item[X, (int)(Y + SliderY.Value)];
-        }
+        private BasicListItem MouseOverNode(int X, int Y) => ButtonsVisible() && Y >= Height - Plus.Height ? null : Item[X, (int)(Y + SliderY.Value)];
 
         protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseUp(e);
@@ -259,9 +253,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        private void OnItemClicked(BasicListItemEventArgs e) {
-            ItemClicked?.Invoke(this, e);
-        }
+        private void OnItemClicked(BasicListItemEventArgs e) => ItemClicked?.Invoke(this, e);
 
         protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseWheel(e);
@@ -279,13 +271,9 @@ namespace BlueControls.Controls {
             OnItemDoubleClick(new BasicListItemEventArgs(ND));
         }
 
-        private void OnItemDoubleClick(BasicListItemEventArgs e) {
-            ItemDoubleClick?.Invoke(this, e);
-        }
+        private void OnItemDoubleClick(BasicListItemEventArgs e) => ItemDoubleClick?.Invoke(this, e);
 
-        private bool ButtonsVisible() {
-            return Plus.Visible || Minus.Visible || Up.Visible || Down.Visible || FilterTxt.Visible;
-        }
+        private bool ButtonsVisible() => Plus.Visible || Minus.Visible || Up.Visible || Down.Visible || FilterTxt.Visible;
 
         protected override void DrawControl(Graphics gr, enStates state) {
             if (Item != null) { Item.Appearance = _Appearance; }
@@ -411,9 +399,7 @@ namespace BlueControls.Controls {
 
         }
 
-        private void OnItemCheckedChanged() {
-            ItemCheckedChanged?.Invoke(this, System.EventArgs.Empty);
-        }
+        private void OnItemCheckedChanged() => ItemCheckedChanged?.Invoke(this, System.EventArgs.Empty);
 
         //private void SwapItems(BasicListItem Nr1, BasicListItem Nr2)
         //{
@@ -469,9 +455,7 @@ namespace BlueControls.Controls {
             CheckButtons();
         }
 
-        private void OnRemoveClicked(ListOfBasicListItemEventArgs e) {
-            RemoveClicked?.Invoke(this, e);
-        }
+        private void OnRemoveClicked(ListOfBasicListItemEventArgs e) => RemoveClicked?.Invoke(this, e);
 
         public BasicListItem Add_FromFileSystem() {
 
@@ -555,25 +539,17 @@ namespace BlueControls.Controls {
             CheckButtons();
         }
 
-        private void OnAddClicked() {
-            AddClicked?.Invoke(this, System.EventArgs.Empty);
-        }
+        private void OnAddClicked() => AddClicked?.Invoke(this, System.EventArgs.Empty);
 
-        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
-            HotItem = MouseOverNode(e.X, e.Y);
-        }
-        public void OnContextMenuInit(ContextMenuInitEventArgs e) {
-            ContextMenuInit?.Invoke(this, e);
-        }
+        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) => HotItem = MouseOverNode(e.X, e.Y);
+        public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
         public new void Focus() {
             if (Focused()) { return; }
             base.Focus();
         }
 
-        public new bool Focused() {
-            return base.Focused || Plus.Focused || Minus.Focused || Up.Focused || Down.Focused || SliderY.Focused() || FilterCap.Focused || FilterTxt.Focused();
-        }
+        public new bool Focused() => base.Focused || Plus.Focused || Minus.Focused || Up.Focused || Down.Focused || SliderY.Focused() || FilterCap.Focused || FilterTxt.Focused();
 
         private void _Item_ItemAdded(object sender, ListEventArgs e) {
             if (IsDisposed) { return; }
@@ -586,16 +562,10 @@ namespace BlueControls.Controls {
 
         }
 
-        protected void OnItemAdded(ListEventArgs e) {
-            ItemAdded?.Invoke(this, e);
-        }
+        protected void OnItemAdded(ListEventArgs e) => ItemAdded?.Invoke(this, e);
 
-        protected void OnItemRemoved(System.EventArgs e) {
-            ItemRemoved?.Invoke(this, e);
-        }
-        protected void OnItemRemoving(ListEventArgs e) {
-            ItemRemoving?.Invoke(this, e);
-        }
+        protected void OnItemRemoved(System.EventArgs e) => ItemRemoved?.Invoke(this, e);
+        protected void OnItemRemoving(ListEventArgs e) => ItemRemoving?.Invoke(this, e);
 
         private void _Item_ItemRemoving(object sender, ListEventArgs e) {
             if (IsDisposed) { return; }
@@ -609,12 +579,8 @@ namespace BlueControls.Controls {
             OnItemRemoved(e);
         }
 
-        private void FilterTxt_TextChanged(object sender, System.EventArgs e) {
-            Invalidate();
-        }
+        private void FilterTxt_TextChanged(object sender, System.EventArgs e) => Invalidate();
 
-        public void OnListOrItemChanged() {
-            ListOrItemChanged?.Invoke(this, System.EventArgs.Empty);
-        }
+        public void OnListOrItemChanged() => ListOrItemChanged?.Invoke(this, System.EventArgs.Empty);
     }
 }

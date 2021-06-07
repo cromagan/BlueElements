@@ -115,10 +115,8 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        protected override RectangleM CalculateUsedArea() {
-            return p_LO == null || p_RU == null ? new RectangleM()
+        protected override RectangleM CalculateUsedArea() => p_LO == null || p_RU == null ? new RectangleM()
                 : new RectangleM(Math.Min(p_LO.X, p_RU.X), Math.Min(p_LO.Y, p_RU.Y), Math.Abs(p_RU.X - p_LO.X) + 1, Math.Abs(p_RU.Y - p_LO.Y) + 1);
-        }
 
         public override void PointMoved(PointM point) {
 
@@ -224,7 +222,7 @@ namespace BlueControls.ItemCollection {
                     if (cZoom > 1) {
                         GR.DrawRectangle(new Pen(Color.Gray, (float)cZoom), DCoordinates);
                     } else {
-                        GR.DrawRectangle(CreativePad.PenGray, DCoordinates);
+                        GR.DrawRectangle(ZoomPad.PenGray, DCoordinates);
                     }
 
                     if (DCoordinates.Width < 1 || DCoordinates.Height < 1) {

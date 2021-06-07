@@ -168,9 +168,7 @@ namespace BlueDatabase {
 
         }
 
-        public string CompareKey() {
-            return ((int)_FilterType).ToString(Constants.Format_Integer10);
-        }
+        public string CompareKey() => ((int)_FilterType).ToString(Constants.Format_Integer10);
 
         public string ReadableText() {
 
@@ -232,29 +230,17 @@ namespace BlueDatabase {
             }
         }
 
-        public QuickImage SymbolForReadableText() {
-            return null;
-        }
+        public QuickImage SymbolForReadableText() => null;
 
-        public bool IsNullOrEmpty() {
-            return _FilterType == enFilterType.KeinFilter;
-        }
+        public bool IsNullOrEmpty() => _FilterType == enFilterType.KeinFilter;
 
-        public object Clone() {
-            return new FilterItem(Database, ToString());
-        }
+        public object Clone() => new FilterItem(Database, ToString());
 
-        public bool IsOk() {
-            return string.IsNullOrEmpty(ErrorReason());
-        }
+        public bool IsOk() => string.IsNullOrEmpty(ErrorReason());
 
-        public string ErrorReason() {
-            return _FilterType == enFilterType.KeinFilter ? "'Kein Filter' angegeben" : string.Empty;
-        }
+        public string ErrorReason() => _FilterType == enFilterType.KeinFilter ? "'Kein Filter' angegeben" : string.Empty;
 
-        private void SearchValue_ListOrItemChanged(object sender, System.EventArgs e) {
-            OnChanged();
-        }
+        private void SearchValue_ListOrItemChanged(object sender, System.EventArgs e) => OnChanged();
 
         public void Changeto(enFilterType type, string searchvalue) {
             SearchValue.ThrowEvents = false;
@@ -266,9 +252,7 @@ namespace BlueDatabase {
             OnChanged();
         }
 
-        private void Database_Disposing(object sender, System.EventArgs e) {
-            Dispose();
-        }
+        private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
 
         private void Dispose(bool disposing) {
             if (!disposedValue) {

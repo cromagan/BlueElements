@@ -216,9 +216,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         }
 
-        private void OkBut_Click(object sender, System.EventArgs e) {
-            Close();
-        }
+        private void OkBut_Click(object sender, System.EventArgs e) => Close();
 
         private void GenerateInfoText() {
             var t = "<b>Datei:</b><tab>" + _Database.Filename + "<br>";
@@ -260,8 +258,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void Bilder_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-            if (e.HotItem == null) { return; }
-            if (!(e.HotItem is BitmapListItem)) { return; }
+            if (e.HotItem is not BitmapListItem) { return; }
             e.UserMenu.Add(enContextMenuComands.Umbenennen);
         }
 
@@ -269,7 +266,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             if (e.HotItem == null) { return; }
 
-            if (!(e.HotItem is BitmapListItem)) { return; }
+            if (e.HotItem is not BitmapListItem) { return; }
 
             var l = (BitmapListItem)e.HotItem;
 
@@ -285,9 +282,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
         }
 
-        private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) {
-            _Database.Column.GenerateOverView();
-        }
+        private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => _Database.Column.GenerateOverView();
 
         private void DateienSchlüssel_Click(object sender, System.EventArgs e) {
             btnDateiSchluessel.Enabled = false;
@@ -400,18 +395,20 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void GenerateUndoTabelle() {
 
             var x = new Database(true);
+            x.Column.Add("hidden", "hidden", enDataFormat.Text);
             x.Column.Add("Index", "Index", enDataFormat.Ganzzahl);
             x.Column.Add("ColumnKey", "Spalten-<br>Schlüssel", enDataFormat.Ganzzahl);
             x.Column.Add("ColumnName", "Spalten-<br>Name", enDataFormat.Text);
             x.Column.Add("ColumnCaption", "Spalten-<br>Beschriftung", enDataFormat.Text);
             x.Column.Add("RowKey", "Zeilen-<br>Schlüssel", enDataFormat.Ganzzahl);
             x.Column.Add("RowFirst", "Zeile, Wert der<br>1. Spalte", enDataFormat.Text);
-            x.Column.Add("Aenderzeit", "Änder-<br>Zeit", enDataFormat.Text);
+            x.Column.Add("Aenderzeit", "Änder-<br>Zeit", enDataFormat.Datum_und_Uhrzeit);
             x.Column.Add("Aenderer", "Änderer", enDataFormat.Text);
             x.Column.Add("Symbol", "Symbol", enDataFormat.BildCode);
             x.Column.Add("Aenderung", "Änderung", enDataFormat.Text);
             x.Column.Add("WertAlt", "Wert alt", enDataFormat.Text);
             x.Column.Add("WertNeu", "Wert neu", enDataFormat.Text);
+
 
             foreach (var ThisColumn in x.Column) {
                 if (string.IsNullOrEmpty(ThisColumn.Identifier)) {
@@ -425,96 +422,107 @@ namespace BlueControls.BlueDatabaseDialogs {
             x.RepairAfterParse();
 
             x.ColumnArrangements[1].ShowAllColumns();
+            x.ColumnArrangements[1].Hide("hidden");
             x.ColumnArrangements[1].HideSystemColumns();
 
-            x.SortDefinition = new RowSortDefinition(x, "Index", true);
-
-            for (var n = 0; n < Math.Min(_Database.Works.Count, 3000); n++) {
-
-                if (_Database.Works[n].HistorischRelevant) {
-
-                    var cd = _Database.Works[n].CellKey.SplitBy("|");
-
-                    _Database.Cell.DataOfCellKey(_Database.Works[n].CellKey, out var Col, out var Row);
-
-                    var r = x.Row.Add(n.ToString());
-
-                    r.CellSet("ColumnKey", cd[0]);
-                    r.CellSet("RowKey", cd[1]);
-
-                    if (Col != null) {
-                        r.CellSet("ColumnName", Col.Name);
-                        r.CellSet("columnCaption", Col.Caption);
-                    }
-
-                    if (Row != null) {
-                        r.CellSet("RowFirst", Row.CellFirstString());
-                    } else if (cd[1] != "-1") {
-                        r.CellSet("RowFirst", "[gelöscht]");
-                    }
-
-                    r.CellSet("Aenderer", _Database.Works[n].User);
-                    r.CellSet("AenderZeit", _Database.Works[n].CompareKey());
-
-                    var Symb = enImageCode.Fragezeichen;
-                    var alt = _Database.Works[n].PreviousValue;
-                    var neu = _Database.Works[n].ChangedTo;
-                    var aenderung = _Database.Works[n].Comand.ToString();
-
-                    switch (_Database.Works[n].Comand) {
-                        case enDatabaseDataType.ce_UTF8Value_withoutSizeData:
-                        case enDatabaseDataType.ce_Value_withoutSizeData:
-                            Symb = enImageCode.Textfeld;
-                            aenderung = "Wert geändert";
-                            break;
-
-                        case enDatabaseDataType.AutoExport:
-                            aenderung = "Export ausgeführt oder geändert";
-                            alt = "";
-                            neu = "";
-                            Symb = enImageCode.Karton;
-                            break;
-
-                        case enDatabaseDataType.dummyComand_AddRow:
-                            aenderung = "Neue Zeile";
-                            Symb = enImageCode.PlusZeichen;
-                            break;
-
-                        case enDatabaseDataType.RulesScript:
-                        case enDatabaseDataType.Rules_ALT:
-                            aenderung = "Regeln verändert";
-                            Symb = enImageCode.Formel;
-                            alt = "";
-                            neu = "";
-                            break;
-
-                        case enDatabaseDataType.ColumnArrangement:
-                            aenderung = "Spalten-Anordnungen verändert";
-                            Symb = enImageCode.Spalte;
-                            alt = "";
-                            neu = "";
-                            break;
-
-                        case enDatabaseDataType.dummyComand_RemoveRow:
-                            aenderung = "Zeile gelöscht";
-                            Symb = enImageCode.MinusZeichen;
-                            break;
-
-                    }
-                    r.CellSet("Aenderung", aenderung);
-                    r.CellSet("symbol", Symb + "|24");
-
-                    r.CellSet("Wertalt", alt);
-                    r.CellSet("Wertneu", neu);
-
-                }
-            }
-
+            x.SortDefinition = new RowSortDefinition(x, "Aenderzeit", true);
             tblUndo.Database = x;
             tblUndo.Arrangement = 1;
+            for (var n = 0; n < _Database.Works.Count; n++) {
+                AddUndoToTable(_Database.Works[n], n.ToString());
+            }
+
+
+        }
+
+        private void AddUndoToTable(WorkItem work, string sorttxt) {
+            if (work.HistorischRelevant) {
+
+                var l = tblUndo.Database.Row[work.ToString()];
+                if (l != null) { return; }
+
+
+                var cd = work.CellKey.SplitBy("|");
+
+                _Database.Cell.DataOfCellKey(work.CellKey, out var Col, out var Row);
+
+                var r = tblUndo.Database.Row.Add(work.ToString());
+
+                r.CellSet("ColumnKey", cd[0]);
+                r.CellSet("RowKey", cd[1]);
+                r.CellSet("index", sorttxt);
+
+                if (Col != null) {
+                    r.CellSet("ColumnName", Col.Name);
+                    r.CellSet("columnCaption", Col.Caption);
+                }
+
+                if (Row != null) {
+                    r.CellSet("RowFirst", Row.CellFirstString());
+                } else if (cd[1] != "-1") {
+                    r.CellSet("RowFirst", "[gelöscht]");
+                }
+
+                r.CellSet("Aenderer", work.User);
+                r.CellSet("AenderZeit", work.CompareKey());
+
+                var Symb = enImageCode.Fragezeichen;
+                var alt = work.PreviousValue;
+                var neu = work.ChangedTo;
+                var aenderung = work.Comand.ToString();
+
+                switch (work.Comand) {
+                    case enDatabaseDataType.ce_UTF8Value_withoutSizeData:
+                    case enDatabaseDataType.ce_Value_withoutSizeData:
+                        Symb = enImageCode.Textfeld;
+                        aenderung = "Wert geändert";
+                        break;
+
+                    case enDatabaseDataType.AutoExport:
+                        aenderung = "Export ausgeführt oder geändert";
+                        alt = "";
+                        neu = "";
+                        Symb = enImageCode.Karton;
+                        break;
+
+                    case enDatabaseDataType.dummyComand_AddRow:
+                        aenderung = "Neue Zeile";
+                        Symb = enImageCode.PlusZeichen;
+                        break;
+
+                    case enDatabaseDataType.RulesScript:
+                    case enDatabaseDataType.Rules_ALT:
+                        aenderung = "Regeln verändert";
+                        Symb = enImageCode.Formel;
+                        alt = "";
+                        neu = "";
+                        break;
+
+                    case enDatabaseDataType.ColumnArrangement:
+                        aenderung = "Spalten-Anordnungen verändert";
+                        Symb = enImageCode.Spalte;
+                        alt = "";
+                        neu = "";
+                        break;
+
+                    case enDatabaseDataType.dummyComand_RemoveRow:
+                        aenderung = "Zeile gelöscht";
+                        Symb = enImageCode.MinusZeichen;
+                        break;
+
+                }
+                r.CellSet("Aenderung", aenderung);
+                r.CellSet("symbol", Symb + "|24");
+
+                r.CellSet("Wertalt", alt);
+                r.CellSet("Wertneu", neu);
+
+            }
+
         }
 
         private void btnSperreAufheben_Click(object sender, System.EventArgs e) {
+            tblUndo.Database.Export_HTML(@"C:\01_Data\texxxxst.html", tblUndo.Database.ColumnArrangements[0], tblUndo.SortedRows(), false);
             _Database.UnlockHard();
             MessageBox.Show("Erledigt.", enImageCode.Information, "OK");
         }
@@ -547,6 +555,47 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (!ok) {
                 MessageBox.Show("Speichern fehlgeschlagen!");
             }
+        }
+
+        private void btnClipboard_Click(object sender, System.EventArgs e) => System.Windows.Forms.Clipboard.SetDataObject(tblUndo.Export_CSV(enFirstRow.ColumnCaption), true);
+
+        private void btnAlleUndos_Click(object sender, System.EventArgs e) {
+
+            btnAlleUndos.Enabled = false;
+            var L = tabAdministration.Vorgängervsersionen(_Database);
+
+            if (L.Count < 1) {
+                MessageBox.Show("Keine Vorgänger gefunden.");
+                return;
+            }
+
+
+            var nDB = 0;
+            var x = Progressbar.Show("Lade Vorgänger Datenbanken", L.Count);
+
+            foreach (var thisf in L) {
+                nDB++;
+                x.Update(nDB);
+
+                var db = (Database)Database.GetByFilename(thisf.Internal, false);
+
+                var disp = db == null;
+                if (db == null) {
+                    db = new Database(thisf.Internal, true, false);
+                }
+
+                if (db.Caption == _Database.Caption) {
+                    for (var n = 0; n < db.Works.Count; n++) {
+                        AddUndoToTable(db.Works[n], db.Filename.FileNameWithoutSuffix() + "-" + n.ToString());
+                    }
+                }
+
+                if (disp) { db.Dispose(); }
+
+            }
+            x.Close();
+
+
         }
     }
 }

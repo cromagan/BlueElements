@@ -92,11 +92,7 @@ namespace BlueDatabase {
             }
         }
 
-        public bool HistorischRelevant {
-            get {
-                return State == enItemState.Pending || State == enItemState.Undo;
-            }
-        }
+        public bool HistorischRelevant => State == enItemState.Pending || State == enItemState.Undo;
 
         #endregion
 
@@ -115,9 +111,7 @@ namespace BlueDatabase {
             Date = DateTime.UtcNow;
         }
 
-        public WorkItem(string s) {
-            Parse(s);
-        }
+        public WorkItem(string s) => Parse(s);
 
         public void Parse(string ToParse) {
             IsParsing = true;
@@ -198,9 +192,7 @@ namespace BlueDatabase {
             IsParsing = false;
         }
 
-        public new string ToString() {
-
-            return "{ST=" + (int)_state +
+        public new string ToString() => "{ST=" + (int)_state +
                    ", CO=" + (int)Comand +
                    ", CK=" + _colKey +
                    ", RK=" + _rowKey +
@@ -208,9 +200,7 @@ namespace BlueDatabase {
                    ", U=" + User.ToNonCritical() +
                    ", PV=" + PreviousValue.ToNonCritical() +
                    ", CT=" + _changedTo.ToNonCritical() +
-                   "}";
-            // ", G=" + Group.ToNonCritical() +
-        }
+                   "}";// ", G=" + Group.ToNonCritical() +
 
         public string UndoTextTableMouseOver() {
 
@@ -224,11 +214,7 @@ namespace BlueDatabase {
 
         }
 
-        public string CompareKey() {
-
-            return Date.ToString(Constants.Format_Date) + ColKey;
-
-        }
+        public string CompareKey() => Date.ToString(Constants.Format_Date) + ColKey;
 
         public void OnChanged() {
             if (IsParsing) {
@@ -239,9 +225,6 @@ namespace BlueDatabase {
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
-        internal bool LogsUndo(Database database) {
-            return database.Column.SearchByKey(ColKey) is ColumnItem C && C.ShowUndo;
-
-        }
+        internal bool LogsUndo(Database database) => database.Column.SearchByKey(ColKey) is ColumnItem C && C.ShowUndo;
     }
 }

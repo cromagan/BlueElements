@@ -9,9 +9,7 @@ using System.Drawing;
 namespace BlueControls.Controls {
     public partial class SwapListBox : GenericControl, IBackgroundNone {
 
-        public SwapListBox() {
-            InitializeComponent();
-        }
+        public SwapListBox() => InitializeComponent();
 
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -43,27 +41,18 @@ namespace BlueControls.Controls {
             ItemRemoved?.Invoke(this, e);
         }
 
-        private void Main_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
+        private void Main_ItemAdded(object sender, ListEventArgs e) {
             MoveItemBetweenList(Suggest, Main, ((BasicListItem)e.Item).Internal, true);
             OnItemAdded(e);
         }
 
-        private void Main_ItemRemoving(object sender, BlueBasics.EventArgs.ListEventArgs e) {
-            MoveItemBetweenList(Main, Suggest, ((BasicListItem)e.Item).Internal, false);
-        }
+        private void Main_ItemRemoving(object sender, ListEventArgs e) => MoveItemBetweenList(Main, Suggest, ((BasicListItem)e.Item).Internal, false);
 
-        private void Main_ItemRemoved(object sender, System.EventArgs e) {
+        private void Main_ItemRemoved(object sender, System.EventArgs e) => OnItemRemoved(e);
 
-            OnItemRemoved(e);
-        }
+        private void Main_ItemClicked(object sender, EventArgs.BasicListItemEventArgs e) => MoveItemBetweenList(Main, Suggest, e.Item.Internal, true);
 
-        private void Main_ItemClicked(object sender, EventArgs.BasicListItemEventArgs e) {
-            MoveItemBetweenList(Main, Suggest, e.Item.Internal, true);
-        }
-
-        private void Suggest_ItemClicked(object sender, EventArgs.BasicListItemEventArgs e) {
-            MoveItemBetweenList(Suggest, Main, e.Item.Internal, true);
-        }
+        private void Suggest_ItemClicked(object sender, EventArgs.BasicListItemEventArgs e) => MoveItemBetweenList(Suggest, Main, e.Item.Internal, true);
 
         protected void MoveItemBetweenList(ListBox Source, ListBox Target, string Internal, bool doRemove) {
             var SourceItem = Source.Item[Internal];
@@ -104,13 +93,9 @@ namespace BlueControls.Controls {
             Suggest.Enabled = Enabled;
         }
 
-        private void Main_AddClicked(object sender, System.EventArgs e) {
-            OnAddClicked();
-        }
+        private void Main_AddClicked(object sender, System.EventArgs e) => OnAddClicked();
 
-        public void OnAddClicked() {
-            AddClicked?.Invoke(this, System.EventArgs.Empty);
-        }
+        public void OnAddClicked() => AddClicked?.Invoke(this, System.EventArgs.Empty);
 
         internal void SuggestionsAdd(ItemCollectionList item) {
 

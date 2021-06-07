@@ -24,14 +24,12 @@ using BlueControls.ItemCollection;
 using System.Collections.Generic;
 
 namespace BlueControls.Forms {
-    public partial class InputBoxListBoxStyle : Forms.DialogWithOkAndCancel {
+    public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
         private List<string> GiveBack = null;
 
         #region Konstruktor
 
-        private InputBoxListBoxStyle() : base() {
-            InitializeComponent();
-        }
+        private InputBoxListBoxStyle() : base() => InitializeComponent();
 
         private InputBoxListBoxStyle(string TXT, ItemCollectionList ItemsOriginal, enAddType AddNewAllowed, bool CancelErl) : this() {
             if (ItemsOriginal.Appearance != enBlueListBoxAppearance.Listbox) {
@@ -78,12 +76,8 @@ namespace BlueControls.Forms {
             return MB.GiveBack;
         }
 
-        private void InputBox_Shown(object sender, System.EventArgs e) {
-            txbText.Focus();
-        }
+        private void InputBox_Shown(object sender, System.EventArgs e) => txbText.Focus();
 
-        protected override void SetValue(bool canceled) {
-            GiveBack = canceled ? null : txbText.Item.Checked().ToListOfString();
-        }
+        protected override void SetValue(bool canceled) => GiveBack = canceled ? null : txbText.Item.Checked().ToListOfString();
     }
 }

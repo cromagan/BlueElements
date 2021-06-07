@@ -125,13 +125,9 @@ namespace BlueControls.Forms {
             Sample.Image = Font.SampleText().Bitmap;
         }
 
-        private void FName_Item_CheckedChanged(object sender, System.EventArgs e) {
-            UpdateSampleText();
-        }
+        private void FName_Item_CheckedChanged(object sender, System.EventArgs e) => UpdateSampleText();
 
-        private void fFett_CheckedChanged(object sender, System.EventArgs e) {
-            UpdateSampleText();
-        }
+        private void fFett_CheckedChanged(object sender, System.EventArgs e) => UpdateSampleText();
 
         private void cFarbe_Click(object sender, System.EventArgs e) {
             ColorDia.Color = QuickImage.Get(cFarbe.ImageCode).ChangeGreenTo.FromHTMLCode();
@@ -147,8 +143,6 @@ namespace BlueControls.Forms {
             UpdateSampleText();
         }
 
-        private void Ok_Click(object sender, System.EventArgs e) {
-            Close();
-        }
+        private void Ok_Click(object sender, System.EventArgs e) => Close();
     }
 }

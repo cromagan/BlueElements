@@ -100,17 +100,17 @@ namespace BluePaint {
             }
         }
 
-        public override void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap OriginalPic) {
+        public override void MouseDown(MouseEventArgs1_1 e, Bitmap OriginalPic) {
             if (!_ausricht) { return; }
             MouseMove(new MouseEventArgs1_1DownAndCurrent(e, e), OriginalPic);
         }
 
-        public override void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) {
+        public override void MouseMove(MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) {
             if (!_ausricht) { return; }
             OnDoInvalidate();
         }
 
-        public override void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) {
+        public override void MouseUp(MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) {
 
             if (!_ausricht) { return; }
 

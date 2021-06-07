@@ -158,9 +158,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        private void _Database_Disposing(object sender, System.EventArgs e) {
-            Database = null;
-        }
+        private void _Database_Disposing(object sender, System.EventArgs e) => Database = null;
 
         private void Row_RowRemoving(object sender, RowEventArgs e) {
             if (e.Row.Key == _RowKey) {
@@ -282,9 +280,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        private void Database_ConnectedControlsStopAllWorking(object sender, System.EventArgs e) {
-            FillCellNow();
-        }
+        private void Database_ConnectedControlsStopAllWorking(object sender, System.EventArgs e) => FillCellNow();
 
         private void Column_ItemInternalChanged(object sender, ListEventArgs e) {
             if ((ColumnItem)e.Item == _tmpColumn) {
@@ -339,11 +335,9 @@ namespace BlueControls.Controls {
             if (OldVal != _tmpRow.CellGetString(_tmpColumn)) { _tmpRow.DoAutomatic(false, false, 1, "value changed"); }
         }
 
-        private void textBox_NeedDatabaseOfAdditinalSpecialChars(object sender, MultiUserFileGiveBackEventArgs e) {
-            e.File = _Database;
-        }
+        private void textBox_NeedDatabaseOfAdditinalSpecialChars(object sender, MultiUserFileGiveBackEventArgs e) => e.File = _Database;
 
-        protected override void OnControlAdded(System.Windows.Forms.ControlEventArgs e) {
+        protected override void OnControlAdded(ControlEventArgs e) {
             base.OnControlAdded(e);
 
             if (e.Control is Caption) { return; } // z.B. Info Caption
@@ -379,9 +373,9 @@ namespace BlueControls.Controls {
                     ItemCollectionList.GetItemCollection(Item2, column1, null, enShortenStyle.Replaced, 10000);
 
                     if (column1.TextBearbeitungErlaubt) {
-                        StyleComboBox(comboBox, Item2, System.Windows.Forms.ComboBoxStyle.DropDown);
+                        StyleComboBox(comboBox, Item2, ComboBoxStyle.DropDown);
                     } else {
-                        StyleComboBox(comboBox, Item2, System.Windows.Forms.ComboBoxStyle.DropDownList);
+                        StyleComboBox(comboBox, Item2, ComboBoxStyle.DropDownList);
                     }
 
                     comboBox.GotFocus += GotFocus_ComboBox;
@@ -439,7 +433,7 @@ namespace BlueControls.Controls {
             Marker.RunWorkerAsync();
         }
 
-        protected override void OnControlRemoved(System.Windows.Forms.ControlEventArgs e) {
+        protected override void OnControlRemoved(ControlEventArgs e) {
             base.OnControlRemoved(e);
 
             switch (e.Control) {
@@ -488,7 +482,7 @@ namespace BlueControls.Controls {
 
         private void EasyPicImageChanged(object sender, System.EventArgs e) {
 
-            foreach (System.Windows.Forms.Control ThisControl in Controls) {
+            foreach (Control ThisControl in Controls) {
 
                 if (ThisControl is EasyPic ep) {
                     if (_tmpColumn == null && _tmpRow == null) { Develop.DebugPrint_NichtImplementiert(); }
@@ -537,9 +531,7 @@ namespace BlueControls.Controls {
             Develop.DebugPrint_NichtImplementiert();
         }
 
-        private void EasyPicConnectedDatabase(object sender, MultiUserFileGiveBackEventArgs e) {
-            e.File = _Database;
-        }
+        private void EasyPicConnectedDatabase(object sender, MultiUserFileGiveBackEventArgs e) => e.File = _Database;
 
         private void GotFocus_ComboBox(object sender, System.EventArgs e) {
             if (_tmpColumn == null || _tmpRow == null) { return; }
@@ -578,7 +570,7 @@ namespace BlueControls.Controls {
                 case "bild öffnen":
                     if (e.HotItem is BitmapListItem bi) {
                         if (bi.ImageLoaded()) {
-                            var x = new BlueControls.Forms.PictureView(bi.Bitmap);
+                            var x = new Forms.PictureView(bi.Bitmap);
                             x.Show();
 
                             //var b = modConverter.FileToByte(t.Internal);
@@ -625,7 +617,7 @@ namespace BlueControls.Controls {
                     // korrektheit der Zelle bereits geprüft
                     if (_tmpColumn != null && string.IsNullOrEmpty(lbx.LastFilePath)) { lbx.LastFilePath = _Database.Filename.FilePath(); }
                     var DelList = new List<string>();
-                    using (var f = new System.Windows.Forms.OpenFileDialog()) {
+                    using (var f = new OpenFileDialog()) {
                         f.CheckFileExists = true;
                         f.CheckPathExists = true;
                         f.Multiselect = true;
@@ -668,7 +660,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        private void Marker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e) {
+        private void Marker_DoWork(object sender, DoWorkEventArgs e) {
             TextBox TXB = null;
 
             foreach (var Control in Controls) {
@@ -726,7 +718,7 @@ namespace BlueControls.Controls {
 
         }
 
-        private void Marker_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e) {
+        private void Marker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
             //Ja, Multithreading ist kompliziert...
             if (Marker.CancellationPending) { return; }
 
@@ -843,12 +835,8 @@ namespace BlueControls.Controls {
 
         }
 
-        public void OnContextMenuInit(ContextMenuInitEventArgs e) {
-            ContextMenuInit?.Invoke(this, e);
-        }
+        public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
-        public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) {
-            ContextMenuItemClicked?.Invoke(this, e);
-        }
+        public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
     }
 }

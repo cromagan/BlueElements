@@ -90,9 +90,7 @@ namespace BlueControls.ItemCollection {
 
         #endregion
 
-        protected override string ClassId() {
-            return "LINE";
-        }
+        protected override string ClassId() => "LINE";
 
         public override bool Contains(PointF value, decimal zoomfactor) {
             var ne = 5 / zoomfactor;
@@ -590,9 +588,7 @@ namespace BlueControls.ItemCollection {
             return false;
         }
 
-        public override void PointMoved(PointM point) {
-            CalcTempPoints();
-        }
+        public override void PointMoved(PointM point) => CalcTempPoints();
 
         public override List<FlexiControl> GetStyleOptions() {
             var l = new List<FlexiControl>();

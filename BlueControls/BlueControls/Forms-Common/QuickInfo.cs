@@ -31,9 +31,7 @@ namespace BlueControls.Forms {
 
         private int Counter = 0;
 
-        private QuickInfo() : base(Enums.enDesign.Form_QuickInfo) {
-            InitializeComponent();
-        }
+        private QuickInfo() : base(Enums.enDesign.Form_QuickInfo) => InitializeComponent();
 
         private QuickInfo(string Text) : this() {
             //InitializeComponent();
@@ -64,9 +62,7 @@ namespace BlueControls.Forms {
             new QuickInfo(Text);
         }
 
-        public static new void Close() {
-            Close(false);
-        }
+        public static new void Close() => Close(false);
 
         private static void Close(bool AutoClose) {
 

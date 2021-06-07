@@ -128,26 +128,24 @@ namespace BlueControls.Forms {
             Doing = false;
         }
 
-        private double Inch1000ToMM(double inch) {
-            return inch switch {
-                8 => 2.0F,
-                16 => 4.0F,
-                20 => 5.0F,
-                39 => 10.0F,
-                79 => 20.0F,
-                98 => 25.0F,
-                394 => 100.0F,
-                413 => 105.0F,
-                432 => 110.0F,
-                583 => 148.0F,
-                591 => 150.0F,
-                787 => 200.0F,
-                827 => 210.0F,
-                1169 => 297.0F,
-                1654 => 420.0F,
-                _ => Math.Round(inch * 0.254, 1),
-            };
-        }
+        private double Inch1000ToMM(double inch) => inch switch {
+            8 => 2.0F,
+            16 => 4.0F,
+            20 => 5.0F,
+            39 => 10.0F,
+            79 => 20.0F,
+            98 => 25.0F,
+            394 => 100.0F,
+            413 => 105.0F,
+            432 => 110.0F,
+            583 => 148.0F,
+            591 => 150.0F,
+            787 => 200.0F,
+            827 => 210.0F,
+            1169 => 297.0F,
+            1654 => 420.0F,
+            _ => Math.Round(inch * 0.254, 1),
+        };
 
         private void FillHöheBreite(double B, double h) {
             var nn1 = B + ";" + h;

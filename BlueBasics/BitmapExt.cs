@@ -96,13 +96,9 @@ namespace BlueBasics {
             }
         }
 
-        public void SetPixel(int x, int y, Color colour) {
-            Bits[x + (y * Width)] = colour.ToArgb();
-        }
+        public void SetPixel(int x, int y, Color colour) => Bits[x + (y * Width)] = colour.ToArgb();
 
-        public Color GetPixel(int x, int y) {
-            return Color.FromArgb(Bits[x + (y * Width)]);
-        }
+        public Color GetPixel(int x, int y) => Color.FromArgb(Bits[x + (y * Width)]);
 
         public void Dispose() {
             if (Disposed) { return; }
@@ -327,12 +323,8 @@ namespace BlueBasics {
             Bitmap = new Bitmap(Width, Height, Width * 4, _pixelformat, BitsHandle.AddrOfPinnedObject());
         }
 
-        public void MakeTransparent(Color color) {
-            Bitmap.MakeTransparent(color);
-        }
+        public void MakeTransparent(Color color) => Bitmap.MakeTransparent(color);
 
-        public void Save(string name, ImageFormat imageFormat) {
-            Bitmap.Save(name, imageFormat);
-        }
+        public void Save(string name, ImageFormat imageFormat) => Bitmap.Save(name, imageFormat);
     }
 }

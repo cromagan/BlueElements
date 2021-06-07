@@ -107,9 +107,7 @@ namespace BlueControls.ItemCollection {
 
         #endregion
 
-        protected override string ClassId() {
-            return "IMAGE";
-        }
+        protected override string ClassId() => "IMAGE";
 
         protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
             DCoordinates.Inflate(-Padding, -Padding);

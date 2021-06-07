@@ -24,11 +24,9 @@ using System.ComponentModel;
 
 namespace BlueControls.Classes_Editor {
     [DefaultEvent("Changed")]
-    internal partial class AbstractClassEditor<T> : BlueControls.Controls.GroupBox where T : IParseable {
+    internal partial class AbstractClassEditor<T> : Controls.GroupBox where T : IParseable {
 
-        public AbstractClassEditor() : base() {
-            InitializeComponent();
-        }
+        public AbstractClassEditor() : base() => InitializeComponent();
 
         private T _Item;
         private string _LastState = string.Empty;
@@ -71,24 +69,18 @@ namespace BlueControls.Classes_Editor {
         /// Sperrt die komplette Bearbeitung des Formulars und löscht alle Einträge.
         /// Typischerweiße, wenn das zu bearbeitende Objekt 'null' ist oder beim erstmaligen Initialiseren des Steuerelementes.
         /// </summary>
-        protected virtual void DisableAndClearFormula() {
-            Develop.DebugPrint_RoutineMussUeberschriebenWerden();
-        }
+        protected virtual void DisableAndClearFormula() => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
 
         /// <summary>
         /// Erlaubt die Bearbeitung des Objektes und füllt den aktuellen Zustand in das Formular.
         /// </summary>
-        protected virtual void EnabledAndFillFormula() {
-            Develop.DebugPrint_RoutineMussUeberschriebenWerden();
-        }
+        protected virtual void EnabledAndFillFormula() => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
 
         /// <summary>
         /// Bereitet das Formular vor. Z.B. werden in den Auswahldialog-Boxen die voreingestellten Werte hineingeschrieben.
         /// Diese Routine wird aufgerufen, wenn das Item zum ersten Mal empfangen wurde.
         /// </summary>
-        protected virtual void PrepaireFormula() {
-            Develop.DebugPrint_RoutineMussUeberschriebenWerden();
-        }
+        protected virtual void PrepaireFormula() => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
 
         protected void OnChanged(T Obj) {
             if (IsFilling) { return; }

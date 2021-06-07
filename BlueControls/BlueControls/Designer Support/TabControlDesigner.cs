@@ -202,11 +202,7 @@ namespace BlueControls.Designer_Support {
         }
 
         //Fix the AllSizable selectiorule on System.Windows.Forms.DockStyle.Fill
-        public override SelectionRules SelectionRules {
-            get {
-                return Control.Dock == System.Windows.Forms.DockStyle.Fill ? SelectionRules.Visible : base.SelectionRules;
-            }
-        }
+        public override SelectionRules SelectionRules => Control.Dock == System.Windows.Forms.DockStyle.Fill ? SelectionRules.Visible : base.SelectionRules;
     }
 }
 

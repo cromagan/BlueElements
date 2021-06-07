@@ -27,7 +27,7 @@ namespace BlueScript {
 
         public override string Description => "Prüft, ob der String mit einem der angegeben Strings startet.";
 
-        public override List<string> Comand(Script s) { return new() { "startswith" }; }
+        public override List<string> Comand(Script s) => new() { "startswith" };
         public override string StartSequence => "(";
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;

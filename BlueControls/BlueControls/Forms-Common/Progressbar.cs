@@ -33,9 +33,7 @@ namespace BlueControls.Forms {
         private int _count = 0;
         private string _baseText = string.Empty;
 
-        private Progressbar() : base(Enums.enDesign.Form_BitteWarten) {
-            InitializeComponent();
-        }
+        private Progressbar() : base(Enums.enDesign.Form_BitteWarten) => InitializeComponent();
 
         private Progressbar(string Text) : this() {
             // InitializeComponent();

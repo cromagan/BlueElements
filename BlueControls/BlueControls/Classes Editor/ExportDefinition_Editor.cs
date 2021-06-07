@@ -32,9 +32,7 @@ namespace BlueControls.Classes_Editor {
     internal sealed partial class ExportDefinition_Editor : AbstractClassEditor<ExportDefinition> //  System.Windows.Forms.UserControl// 
     {
 
-        public ExportDefinition_Editor() : base() {
-            InitializeComponent();
-        }
+        public ExportDefinition_Editor() : base() => InitializeComponent();
 
         protected override void DisableAndClearFormula() {
             Enabled = false;
@@ -108,7 +106,7 @@ namespace BlueControls.Classes_Editor {
         protected override void PrepaireFormula() {
 
             cbxExportFormularID.Item.Clear();
-            BlueControls.Forms.ExportDialog.AddLayoutsOff(cbxExportFormularID.Item, Item.Database, true, string.Empty);
+            Forms.ExportDialog.AddLayoutsOff(cbxExportFormularID.Item, Item.Database, true, string.Empty);
 
             ExportSpaltenAnsicht.Item.Clear();
             for (var spa = 0; spa < Item.Database.ColumnArrangements.Count; spa++) {
@@ -126,13 +124,9 @@ namespace BlueControls.Classes_Editor {
             }
         }
 
-        private void ExportVerzeichnis_TextChanged(object sender, System.EventArgs e) {
-            UpdateExport(true);
-        }
+        private void ExportVerzeichnis_TextChanged(object sender, System.EventArgs e) => UpdateExport(true);
 
-        private void cbxExportFormularID_ItemClicked(object sender, BasicListItemEventArgs e) {
-            UpdateExport(true);
-        }
+        private void cbxExportFormularID_ItemClicked(object sender, BasicListItemEventArgs e) => UpdateExport(true);
 
         private void ExportDateien_RemoveClicked(object sender, ListOfBasicListItemEventArgs e) {
             foreach (var thisItem in e.Items) {
@@ -147,14 +141,12 @@ namespace BlueControls.Classes_Editor {
 
                     }
 
-                    if (FileExists(fil)) { FileOperations.DeleteFile(fil, false); }
+                    if (FileExists(fil)) { DeleteFile(fil, false); }
                 }
             }
         }
 
-        private void ExportOriginalFormat_CheckedChanged(object sender, System.EventArgs e) {
-            UpdateExport(true);
-        }
+        private void ExportOriginalFormat_CheckedChanged(object sender, System.EventArgs e) => UpdateExport(true);
 
         private void UpdateExport(bool MustDeleteAllExportFiles) {
 
@@ -240,9 +232,7 @@ namespace BlueControls.Classes_Editor {
 
         //}
 
-        private void ExportDateien_ListOrItemChanged(object sender, System.EventArgs e) {
-            UpdateExport(false);
-        }
+        private void ExportDateien_ListOrItemChanged(object sender, System.EventArgs e) => UpdateExport(false);
 
         #region  Filter 
 
@@ -265,9 +255,7 @@ namespace BlueControls.Classes_Editor {
             filterItemEditor.Item = (FilterItem)((TextListItem)lbxFilter.Item.Checked()[0]).Tag;
         }
 
-        private void lbxFilter_ListOrItemChanged(object sender, System.EventArgs e) {
-            UpdateExport(false);
-        }
+        private void lbxFilter_ListOrItemChanged(object sender, System.EventArgs e) => UpdateExport(false);
 
         #endregion
 

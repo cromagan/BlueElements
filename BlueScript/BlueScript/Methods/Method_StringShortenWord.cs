@@ -27,7 +27,7 @@ namespace BlueScript {
 
         public override string Syntax => "StringShortenWord(String)";
         public override string Description => "Versucht den String zu kürzen, indem Abkürzungen verwendet werden.";
-        public override List<string> Comand(Script s) { return new() { "stringshortenword" }; }
+        public override List<string> Comand(Script s) => new() { "stringshortenword" };
         public override string StartSequence => "(";
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
@@ -106,7 +106,7 @@ namespace BlueScript {
                 //TXT = TXT.CreateHtmlCodes(true);
             }
 
-            return new strDoItFeedback("\"" + TXT + "\"", string.Empty);
+            return new strDoItFeedback(TXT, enVariableDataType.String);
         }
     }
 }

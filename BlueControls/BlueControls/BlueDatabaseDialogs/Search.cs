@@ -27,7 +27,7 @@ using BlueDatabase.EventArgs;
 
 namespace BlueControls.BlueDatabaseDialogs {
 
-    public sealed partial class Search : BlueControls.Forms.Form {
+    public sealed partial class Search : Form {
 
         private readonly Table _BlueTable;
 
@@ -137,16 +137,12 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         }
 
-        private void Search_Load(object sender, System.EventArgs e) {
-            txbSuchText.Focus();
-        }
+        private void Search_Load(object sender, System.EventArgs e) => txbSuchText.Focus();
 
         private void txbSuchText_TextChanged(object sender, System.EventArgs e) {
 
         }
 
-        private void txbSuchText_Enter(object sender, System.EventArgs e) {
-            btnSuchInCell_Click(null, System.EventArgs.Empty);
-        }
+        private void txbSuchText_Enter(object sender, System.EventArgs e) => btnSuchInCell_Click(null, System.EventArgs.Empty);
     }
 }

@@ -199,7 +199,7 @@ namespace BlueScript {
                 }
             }
 
-            return s.ToString();
+            return s.ToString().Replace("\\\"", Constants.GänsefüßchenReplace);
         }
 
         public static (string, string) Parse(string scriptText, bool reduce, Script s) {
@@ -211,13 +211,17 @@ namespace BlueScript {
             if (reduce) {
                 tmptxt = ReduceText(scriptText);
                 s.Line = 1;
+                s.Variablen.PrepareForScript();
             } else {
                 tmptxt = scriptText;
 
             }
 
             do {
-                if (pos >= tmptxt.Length || s.EndSkript) { return (string.Empty, string.Empty); }
+                if (pos >= tmptxt.Length || s.EndSkript) {
+                    if (reduce) { s.Variablen.ScriptFinished(); }
+                    return (string.Empty, string.Empty);
+                }
 
                 if (tmptxt.Substring(pos, 1) == "¶") {
                     s.Line++;
@@ -226,6 +230,7 @@ namespace BlueScript {
                     var f = ComandOnPosition(tmptxt, pos, s, false);
 
                     if (!string.IsNullOrEmpty(f.ErrorMessage)) {
+                        if (reduce) { s.Variablen.ScriptFinished(); }
                         return (f.ErrorMessage, tmptxt.Substring(pos, Math.Min(30, tmptxt.Length - pos)));
                     }
                     pos = f.Position;

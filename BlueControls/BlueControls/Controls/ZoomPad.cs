@@ -29,9 +29,7 @@ namespace BlueControls.Controls {
     public partial class ZoomPad : GenericControl {
 
         #region Constructor
-        public ZoomPad() : base(true, true) {
-            InitializeComponent();
-        }
+        public ZoomPad() : base(true, true) => InitializeComponent();
         #endregion
 
         public static readonly Pen PenGray = new(Color.FromArgb(40, 0, 0, 0));
@@ -55,14 +53,14 @@ namespace BlueControls.Controls {
         /// </summary>
         public Point MousePos_1_1;
 
-        protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
+        protected override void OnMouseDown(MouseEventArgs e) {
 
             MousePos_1_1 = KoordinatesUnscaled(e);
             MouseDownPos_1_1 = KoordinatesUnscaled(e);
             base.OnMouseDown(e);
         }
 
-        protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
+        protected override void OnMouseUp(MouseEventArgs e) {
             MousePos_1_1 = KoordinatesUnscaled(e);
             base.OnMouseUp(e);
             MouseDownPos_1_1 = Point.Empty;
@@ -78,13 +76,13 @@ namespace BlueControls.Controls {
             base.OnMouseLeave(e);
         }
 
-        public void ZoomIn(System.Windows.Forms.MouseEventArgs e) {
-            var x = new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, e.X, e.Y, 1);
+        public void ZoomIn(MouseEventArgs e) {
+            var x = new MouseEventArgs(e.Button, e.Clicks, e.X, e.Y, 1);
             OnMouseWheel(x);
         }
 
-        public void ZoomOut(System.Windows.Forms.MouseEventArgs e) {
-            var x = new System.Windows.Forms.MouseEventArgs(e.Button, e.Clicks, e.X, e.Y, -1);
+        public void ZoomOut(MouseEventArgs e) {
+            var x = new MouseEventArgs(e.Button, e.Clicks, e.X, e.Y, -1);
             OnMouseWheel(x);
         }
 
@@ -115,17 +113,13 @@ namespace BlueControls.Controls {
 
         }
 
-        public decimal ZoomCurrent() {
-            return _Zoom;
-        }
+        public decimal ZoomCurrent() => _Zoom;
 
-        public decimal ZoomFitValue(RectangleM MaxBounds, bool sliderShowing, Size sizeOfPaintArea) {
-            return MaxBounds == null || MaxBounds.Width < 0.01m || MaxBounds.Height < 0.01m
+        public decimal ZoomFitValue(RectangleM MaxBounds, bool sliderShowing, Size sizeOfPaintArea) => MaxBounds == null || MaxBounds.Width < 0.01m || MaxBounds.Height < 0.01m
                 ? 1m
                 : sliderShowing
                 ? Math.Min((sizeOfPaintArea.Width - SliderY.Width - 32) / MaxBounds.Width, (sizeOfPaintArea.Height - SliderX.Height - 32) / MaxBounds.Height)
                 : Math.Min(sizeOfPaintArea.Width / MaxBounds.Width, sizeOfPaintArea.Height / MaxBounds.Height);
-        }
 
         /// <summary>
         /// Berechnet Maus Koordinaten des Steuerelements in in Koordinaten um, als ob auf dem unscalierten Inhalt direkt gewählt werden würde.
@@ -133,9 +127,7 @@ namespace BlueControls.Controls {
         /// </summary>
         /// <remarks>
         /// </remarks>
-        protected Point KoordinatesUnscaled(System.Windows.Forms.MouseEventArgs e) {
-            return new Point((int)Math.Round(((e.X + _shiftX) / _Zoom) - 0.5m, 0), (int)Math.Round(((e.Y + _shiftY) / _Zoom) - 0.5m, 0));
-        }
+        protected Point KoordinatesUnscaled(MouseEventArgs e) => new((int)Math.Round(((e.X + _shiftX) / _Zoom) - 0.5m, 0), (int)Math.Round(((e.Y + _shiftY) / _Zoom) - 0.5m, 0));
 
         protected virtual RectangleM MaxBounds() {
             Develop.DebugPrint_RoutineMussUeberschriebenWerden();
@@ -143,7 +135,7 @@ namespace BlueControls.Controls {
         }
         protected virtual void ZoomOrShiftChanged() { }
 
-        protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e) {
+        protected override void OnMouseWheel(MouseEventArgs e) {
             base.OnMouseWheel(e);
 
             _Fitting = false;
@@ -198,9 +190,7 @@ namespace BlueControls.Controls {
             Invalidate();
         }
 
-        internal PointF SliderValues(RectangleM bounds, decimal ZoomToUse, Point TopLeftPos) {
-            return new PointF((float)((bounds.Left * ZoomToUse) - (TopLeftPos.X / 2m)), (float)((bounds.Top * ZoomToUse) - (TopLeftPos.Y / 2m)));
-        }
+        internal PointF SliderValues(RectangleM bounds, decimal ZoomToUse, Point TopLeftPos) => new((float)((bounds.Left * ZoomToUse) - (TopLeftPos.X / 2m)), (float)((bounds.Top * ZoomToUse) - (TopLeftPos.Y / 2m)));
 
         private void ComputeSliders(RectangleM maxBounds) {
 

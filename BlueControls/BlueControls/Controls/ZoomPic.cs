@@ -74,9 +74,7 @@ namespace BlueControls.Controls {
         public event EventHandler<AdditionalDrawing> DoAdditionalDrawing;
         public event EventHandler<PositionEventArgs> OverwriteMouseImageData;
 
-        protected override RectangleM MaxBounds() {
-            return _bmp != null ? new RectangleM(0, 0, _bmp.Width, _bmp.Height) : new RectangleM(0, 0, 0, 0);
-        }
+        protected override RectangleM MaxBounds() => _bmp != null ? new RectangleM(0, 0, _bmp.Width, _bmp.Height) : new RectangleM(0, 0, 0, 0);
 
         protected override void DrawControl(Graphics gr, enStates state) {
             //if (_BitmapOfControl == null)
@@ -119,9 +117,7 @@ namespace BlueControls.Controls {
             //gr.DrawImage(_BitmapOfControl, 0, 0);
         }
 
-        protected virtual void OnDoAdditionalDrawing(AdditionalDrawing e) {
-            DoAdditionalDrawing?.Invoke(this, e);
-        }
+        protected virtual void OnDoAdditionalDrawing(AdditionalDrawing e) => DoAdditionalDrawing?.Invoke(this, e);
 
         protected override void OnMouseDown(MouseEventArgs e) {
             base.OnMouseDown(e);
@@ -140,25 +136,17 @@ namespace BlueControls.Controls {
 
         }
 
-        protected void OnOverwriteMouseImageData(PositionEventArgs e) {
-            OverwriteMouseImageData?.Invoke(this, e);
-        }
+        protected void OnOverwriteMouseImageData(PositionEventArgs e) => OverwriteMouseImageData?.Invoke(this, e);
 
-        private void OnImageMouseDown(MouseEventArgs1_1 e) {
-            ImageMouseDown?.Invoke(this, e);
-        }
+        private void OnImageMouseDown(MouseEventArgs1_1 e) => ImageMouseDown?.Invoke(this, e);
 
         /// <summary>
         /// Zuerst ImageMouseUp, dann MouseUp
         /// </summary>
         /// <param name="e"></param>
-        protected virtual void OnImageMouseUp(MouseEventArgs1_1 e) {
-            ImageMouseUp?.Invoke(this, new MouseEventArgs1_1DownAndCurrent(_MouseDown, e));
-        }
+        protected virtual void OnImageMouseUp(MouseEventArgs1_1 e) => ImageMouseUp?.Invoke(this, new MouseEventArgs1_1DownAndCurrent(_MouseDown, e));
 
-        private bool IsInBitmap(int X, int Y) {
-            return _bmp != null && X >= 0 && Y >= 0 && X <= _bmp.Width && Y <= _bmp.Height;
-        }
+        private bool IsInBitmap(int X, int Y) => _bmp != null && X >= 0 && Y >= 0 && X <= _bmp.Width && Y <= _bmp.Height;
 
         //private bool IsInBitmap() {
         //    if (_bmp == null) { return false; }
@@ -185,9 +173,7 @@ namespace BlueControls.Controls {
             OnImageMouseMove(_MouseCurrent);
         }
 
-        private void OnImageMouseMove(MouseEventArgs1_1 e) {
-            ImageMouseMove?.Invoke(this, new MouseEventArgs1_1DownAndCurrent(_MouseDown, e));
-        }
+        private void OnImageMouseMove(MouseEventArgs1_1 e) => ImageMouseMove?.Invoke(this, new MouseEventArgs1_1DownAndCurrent(_MouseDown, e));
 
         public Point PointInsidePic(int x, int y) {
 

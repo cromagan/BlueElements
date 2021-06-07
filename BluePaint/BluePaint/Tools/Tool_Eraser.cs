@@ -72,12 +72,12 @@ namespace BluePaint {
             }
         }
 
-        public override void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap OriginalPic) {
+        public override void MouseDown(MouseEventArgs1_1 e, Bitmap OriginalPic) {
             OnForceUndoSaving();
             MouseMove(new MouseEventArgs1_1DownAndCurrent(e, e), OriginalPic);
         }
 
-        public override void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) {
+        public override void MouseMove(MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) {
             if (e.Current.Button == System.Windows.Forms.MouseButtons.Left) {
 
                 if (Razi.Checked) {
@@ -88,7 +88,7 @@ namespace BluePaint {
             OnDoInvalidate();
         }
 
-        public override void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) {
+        public override void MouseUp(MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) {
 
             if (e == null) {
                 Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Warnung, "e = null");
@@ -120,13 +120,9 @@ namespace BluePaint {
             }
         }
 
-        private void DrawBox_CheckedChanged(object sender, System.EventArgs e) {
-            OnDoInvalidate();
-        }
+        private void DrawBox_CheckedChanged(object sender, System.EventArgs e) => OnDoInvalidate();
 
-        public override string MacroKennung() {
-            return "Eraser";
-        }
+        public override string MacroKennung() => "Eraser";
 
         public override void ExcuteCommand(string command) {
             var c = command.SplitBy(";");

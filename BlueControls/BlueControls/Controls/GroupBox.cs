@@ -31,13 +31,12 @@ namespace BlueControls.Controls {
     public partial class GroupBox : System.Windows.Forms.GroupBox, IUseMyBackColor {
 
         #region Constructor
-        public GroupBox() : base() {
+        public GroupBox() : base() =>
 
             //// Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             //SetNotFocusable();
             //_MouseHighlight = false;
             SetStandardValues();
-        }
 
         #endregion
 
@@ -209,7 +208,7 @@ namespace BlueControls.Controls {
             if (Width < 10 || Height < 10) { return; }
             if (Controls.Count == 0) { return; }
 
-            foreach (System.Windows.Forms.Control thisControl in Controls) {
+            foreach (Control thisControl in Controls) {
 
                 switch (thisControl) {
 

@@ -26,7 +26,7 @@ namespace BlueScript {
         public override string Syntax => "Count(List-Variable)";
 
         public override string Description => "Gibt die Anzahl der Elemente der Liste zurück.";
-        public override List<string> Comand(Script s) { return new() { "count" }; }
+        public override List<string> Comand(Script s) => new() { "count" };
         public override string StartSequence => "(";
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
@@ -38,7 +38,7 @@ namespace BlueScript {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             return !string.IsNullOrEmpty(attvar.ErrorMessage)
                 ? strDoItFeedback.AttributFehler(this, attvar)
-                : new strDoItFeedback(attvar.Attributes[0].ValueListString.Count.ToString(), string.Empty);
+                : new strDoItFeedback(attvar.Attributes[0].ValueListString.Count.ToString(), enVariableDataType.Numeral);
         }
     }
 }

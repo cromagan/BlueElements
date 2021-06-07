@@ -220,38 +220,38 @@ namespace BlueControls.Controls {
         internal bool CheckEnabledState() {
 
             if (DesignMode) {
-                base.DisabledReason = string.Empty;
+                DisabledReason = string.Empty;
                 return true;
             }
 
             if (_propertyObject == null) {
-                base.DisabledReason = "Kein zugehöriges Objekt definiert.";
+                DisabledReason = "Kein zugehöriges Objekt definiert.";
                 return false;
             }
             if (string.IsNullOrEmpty(_propertyName)) {
-                base.DisabledReason = "Kein Feld-Name angegeben.";
+                DisabledReason = "Kein Feld-Name angegeben.";
                 return false;
             }
             if (_propInfo == null && _methInfo == null) {
-                base.DisabledReason = "Feld existiert im zugehörigen Objekt nicht.";
+                DisabledReason = "Feld existiert im zugehörigen Objekt nicht.";
                 return false;
             }
             if (!_enabled) {
-                base.DisabledReason = "Das Feld ist deaktiviert.";
+                DisabledReason = "Das Feld ist deaktiviert.";
                 return false;
             }
 
             if (_propInfo != null && !_propInfo.CanWrite) {
-                base.DisabledReason = "Feld kann generell nicht beschrieben werdern.";
+                DisabledReason = "Feld kann generell nicht beschrieben werdern.";
                 return false;
             }
 
             if (_alwaysDiabled) {
-                base.DisabledReason = "Feld ist schreibgeschützt.";
+                DisabledReason = "Feld ist schreibgeschützt.";
                 return false;
             }
 
-            base.DisabledReason = string.Empty;
+            DisabledReason = string.Empty;
             return true;
         }
 
@@ -341,7 +341,7 @@ namespace BlueControls.Controls {
                                 var y = Math.Max(BiggestItemY + (Skin.PaddingSmal * 2), 24);
                                 Size = new Size(x, y);
                                 var c = (ComboBox)CreateSubControls();
-                                StyleComboBox(c, list, System.Windows.Forms.ComboBoxStyle.DropDownList);
+                                StyleComboBox(c, list, ComboBoxStyle.DropDownList);
 
                             }
                             //else if (image != enImageCode.None)
@@ -429,7 +429,7 @@ namespace BlueControls.Controls {
             GenFehlerText();
         }
 
-        public static void SetAllFlexControls(System.Windows.Forms.Control _in, object _to) {
+        public static void SetAllFlexControls(Control _in, object _to) {
 
             if (_in == null || _in.IsDisposed) { return; }
 

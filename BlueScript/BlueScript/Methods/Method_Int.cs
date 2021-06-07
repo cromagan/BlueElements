@@ -25,7 +25,7 @@ namespace BlueScript {
 
         public override string Syntax => "Int(Number)";
         public override string Description => "Schneidet Nachkommastellen ab. Um einen Text in einen Zahlenwert zu verwandeln, ist der Befehl Number() zu benutzen.";
-        public override List<string> Comand(Script s) { return new() { "int" }; }
+        public override List<string> Comand(Script s) => new() { "int" };
         public override string StartSequence => "(";
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
@@ -37,7 +37,7 @@ namespace BlueScript {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             return !string.IsNullOrEmpty(attvar.ErrorMessage)
                 ? strDoItFeedback.AttributFehler(this, attvar)
-                : new strDoItFeedback(attvar.Attributes[0].ValueInt.ToString(), string.Empty);
+                : new strDoItFeedback(attvar.Attributes[0].ValueInt.ToString(), enVariableDataType.Numeral);
         }
     }
 }

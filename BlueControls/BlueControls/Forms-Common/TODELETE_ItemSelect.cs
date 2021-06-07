@@ -26,9 +26,7 @@ using System.Collections.Generic;
 
 namespace BlueControls.Forms {
     public sealed partial class ItemSelect {
-        public ItemSelect() {
-            InitializeComponent();
-        }
+        public ItemSelect() => InitializeComponent();
 
         private BasicListItem ClickedItem;
 

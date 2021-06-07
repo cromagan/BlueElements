@@ -37,7 +37,7 @@ namespace BlueControls.Controls {
     [Designer(typeof(TabControlDesigner))]
     public abstract class AbstractTabControl : System.Windows.Forms.TabControl, IContextMenu, IUseMyBackColor, ISupportsBeginnEdit {
 
-        public event System.EventHandler<TabControlEventArgs> SelectedIndexChanging;
+        public event EventHandler<TabControlEventArgs> SelectedIndexChanging;
         private TabPage _HotTab;
         public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
         public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
@@ -70,9 +70,7 @@ namespace BlueControls.Controls {
             private readonly int HWND;
             private readonly int idFrom;
             public readonly int code;
-            public override string ToString() {
-                return string.Format("Hwnd: {0}, ControlID: {1}, Code: {2}", HWND, idFrom, code);
-            }
+            public override string ToString() => string.Format("Hwnd: {0}, ControlID: {1}, Code: {2}", HWND, idFrom, code);
         }
 
         private const int TCN_FIRST = -550; //&HFFFFFFFFFFFFFDDA& unchecked((int)0xFFFFFFFFFFFFFDDA) & ;
@@ -112,9 +110,7 @@ namespace BlueControls.Controls {
             set => base.AutoSize = false;
         }
 
-        protected override Rectangle GetScaledBounds(Rectangle tbounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified) {
-            return tbounds; //MyBase.GetScaledBounds(bounds, factor, specified)
-        }
+        protected override Rectangle GetScaledBounds(Rectangle tbounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified) => tbounds; //MyBase.GetScaledBounds(bounds, factor, specified)
         #endregion
 
         #region  Properties 
@@ -151,9 +147,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        private void OnSelectedIndexChanging(TabControlEventArgs e) {
-            SelectedIndexChanging?.Invoke(this, e);
-        }
+        private void OnSelectedIndexChanging(TabControlEventArgs e) => SelectedIndexChanging?.Invoke(this, e);
 
         #endregion
 
@@ -296,13 +290,9 @@ namespace BlueControls.Controls {
             }
         }
 
-        public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
-            return false;
-        }
+        public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) => false;
 
-        public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) {
-            ContextMenuItemClicked?.Invoke(this, e);
-        }
+        public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
         protected override void OnSelectedIndexChanged(System.EventArgs e) {
             if (_IndexChanged) { return; }
@@ -324,9 +314,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        public void OnContextMenuInit(ContextMenuInitEventArgs e) {
-            ContextMenuInit?.Invoke(this, e);
-        }
+        public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
         #region ISupportsEdit
 
@@ -350,9 +338,7 @@ namespace BlueControls.Controls {
             EndEdit();
         }
 
-        public void BeginnEdit() {
-            BeginnEdit(1);
-        }
+        public void BeginnEdit() => BeginnEdit(1);
 
         public void BeginnEdit(int count) {
             if (DesignMode) { return; }

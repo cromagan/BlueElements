@@ -89,9 +89,7 @@ namespace BlueControls.Forms {
 
 
 
-        protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified) {
-            return bounds; //MyBase.GetScaledBounds(bounds, factor, specified)
-        }
+        protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified) => bounds; //MyBase.GetScaledBounds(bounds, factor, specified)
         #endregion
 
 
@@ -125,9 +123,7 @@ namespace BlueControls.Forms {
             EndEdit();
         }
 
-        public void BeginnEdit() {
-            BeginnEdit(1);
-        }
+        public void BeginnEdit() => BeginnEdit(1);
 
         public void BeginnEdit(int count) {
             if (DesignMode) { return; }
@@ -206,9 +202,7 @@ namespace BlueControls.Forms {
 
 
 
-        public bool IsMouseInForm() {
-            return new Rectangle(Location, Size).Contains(System.Windows.Forms.Cursor.Position);
-        }
+        public bool IsMouseInForm() => new Rectangle(Location, Size).Contains(System.Windows.Forms.Cursor.Position);
 
         protected override System.Windows.Forms.CreateParams CreateParams {
             get {

@@ -31,10 +31,8 @@ namespace BlueControls.Forms {
     /// <summary>
     /// Typischerweise für Dropdownmenüs oder dem KontextMenu
     /// </summary>
-    public partial class FloatingInputBoxListBoxStyle : BlueControls.Forms.FloatingForm {
-        private FloatingInputBoxListBoxStyle() : base(enDesign.Form_QuickInfo) {
-            InitializeComponent();
-        }
+    public partial class FloatingInputBoxListBoxStyle : FloatingForm {
+        private FloatingInputBoxListBoxStyle() : base(enDesign.Form_QuickInfo) => InitializeComponent();
 
         private FloatingInputBoxListBoxStyle(ItemCollectionList Items, int Xpos, int Ypos, int SteuerWi, object Tag, System.Windows.Forms.Control ConnectedControl, bool Translate) : base(ConnectedControl, Items.ControlDesign) {
             InitializeComponent();
@@ -66,13 +64,9 @@ namespace BlueControls.Forms {
 
         private bool _MouseWasDown = false;
 
-        public static FloatingInputBoxListBoxStyle Show(ItemCollectionList Items, object Tag, System.Windows.Forms.Control ConnectedControl, bool Translate) {
-            return new FloatingInputBoxListBoxStyle(Items, System.Windows.Forms.Cursor.Position.X - 8, System.Windows.Forms.Cursor.Position.Y - 8, -1, Tag, ConnectedControl, Translate);
-        }
+        public static FloatingInputBoxListBoxStyle Show(ItemCollectionList Items, object Tag, System.Windows.Forms.Control ConnectedControl, bool Translate) => new(Items, System.Windows.Forms.Cursor.Position.X - 8, System.Windows.Forms.Cursor.Position.Y - 8, -1, Tag, ConnectedControl, Translate);
 
-        public static FloatingInputBoxListBoxStyle Show(ItemCollectionList Items, int Xpos, int Ypos, int SteuerWi, object Tag, System.Windows.Forms.Control ConnectedControl, bool Translate) {
-            return new FloatingInputBoxListBoxStyle(Items, Xpos, Ypos, SteuerWi, Tag, ConnectedControl, Translate);
-        }
+        public static FloatingInputBoxListBoxStyle Show(ItemCollectionList Items, int Xpos, int Ypos, int SteuerWi, object Tag, System.Windows.Forms.Control ConnectedControl, bool Translate) => new(Items, Xpos, Ypos, SteuerWi, Tag, ConnectedControl, Translate);
 
         #region  ListBox1 
 
@@ -138,15 +132,11 @@ namespace BlueControls.Forms {
             }
         }
 
-        private void OnItemClicked(ContextMenuItemClickedEventArgs e) {
-            ItemClicked?.Invoke(this, e);
-        }
+        private void OnItemClicked(ContextMenuItemClickedEventArgs e) => ItemClicked?.Invoke(this, e);
 
         #endregion
 
-        private void OnCancel() {
-            Cancel?.Invoke(this, System.EventArgs.Empty);
-        }
+        private void OnCancel() => Cancel?.Invoke(this, System.EventArgs.Empty);
 
         private void timer1_Tick(object sender, System.EventArgs e) {
 
@@ -176,8 +166,8 @@ namespace BlueControls.Forms {
 
         public static void ContextMenuShow(IContextMenu Control, System.Windows.Forms.MouseEventArgs e) {
 
-            FloatingInputBoxListBoxStyle.Close(enBlueListBoxAppearance.KontextMenu);
-            FloatingInputBoxListBoxStyle.Close(Control);
+            Close(enBlueListBoxAppearance.KontextMenu);
+            Close(Control);
 
             var ThisContextMenu = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
             var UserMenu = new ItemCollectionList(enBlueListBoxAppearance.KontextMenu);
@@ -219,7 +209,7 @@ namespace BlueControls.Forms {
                     Control
                 };
 
-                var _ContextMenu = FloatingInputBoxListBoxStyle.Show(ThisContextMenu, Infos, (System.Windows.Forms.Control)Control, Translate);
+                var _ContextMenu = Show(ThisContextMenu, Infos, (System.Windows.Forms.Control)Control, Translate);
                 _ContextMenu.ItemClicked += _ContextMenu_ItemClicked;
             } else {
                 if (par != null) {
@@ -235,8 +225,8 @@ namespace BlueControls.Forms {
             var Tags = (List<string>)Infos[2];
             var ob = (IContextMenu)Infos[3];
 
-            FloatingInputBoxListBoxStyle.Close(enBlueListBoxAppearance.KontextMenu);
-            FloatingInputBoxListBoxStyle.Close(ob);
+            Close(enBlueListBoxAppearance.KontextMenu);
+            Close(ob);
 
             if (e.ClickedComand.ToLower() == "weiterebefehle") {
                 var par = ob.ParentControlWithCommands();

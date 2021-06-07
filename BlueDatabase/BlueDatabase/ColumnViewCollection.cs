@@ -49,9 +49,7 @@ namespace BlueDatabase {
 
         }
 
-        private void Database_Disposing(object sender, System.EventArgs e) {
-            Dispose();
-        }
+        private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
 
         public ColumnViewCollection(Database database, string code, string newname) {
             Database = database;
@@ -91,9 +89,7 @@ namespace BlueDatabase {
 
         #endregion
 
-        private void _PermissionGroups_Show_ListOrItemChanged(object sender, System.EventArgs e) {
-            OnChanged();
-        }
+        private void _PermissionGroups_Show_ListOrItemChanged(object sender, System.EventArgs e) => OnChanged();
         public void Add(ColumnItem Column, bool Permanent) {
             if (Permanent) {
                 Add(new ColumnViewItem(Column, enViewType.PermanentColumn));
@@ -102,9 +98,7 @@ namespace BlueDatabase {
             }
         }
 
-        public void Insert(int index, ColumnItem Column) {
-            Insert(index, new ColumnViewItem(Column, enViewType.Column));
-        }
+        public void Insert(int index, ColumnItem Column) => Insert(index, new ColumnViewItem(Column, enViewType.Column));
 
         public void Parse(string ToParse) {
             IsParsing = true;

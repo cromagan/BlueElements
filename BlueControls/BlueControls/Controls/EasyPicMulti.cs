@@ -10,7 +10,7 @@ namespace BlueControls.Controls {
     public partial class EasyPicMulti : GenericControl, IBackgroundNone // System.Windows.Forms.UserControl //
     {
         private int _nr = 0;
-        private readonly List<BlueBasics.BitmapExt> pic = new();
+        private readonly List<BitmapExt> pic = new();
         private List<string> files = new();
 
         public List<string> Files {
@@ -27,12 +27,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        public EasyPicMulti() {
-            InitializeComponent();
-
-            // pic.ItemInternalChanged += Pic_ItemInternalChanged;
-
-        }
+        public EasyPicMulti() => InitializeComponent();// pic.ItemInternalChanged += Pic_ItemInternalChanged;
 
         //private void Pic_ItemInternalChanged(object sender, BlueBasics.EventArgs.ListEventArgs e) {
         //    _nr = 0;

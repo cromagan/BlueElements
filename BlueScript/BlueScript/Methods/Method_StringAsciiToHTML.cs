@@ -26,7 +26,7 @@ namespace BlueScript {
 
         public override string Syntax => "Method_StringAsciiToHTML(String, IgnoreBRbool)";
         public override string Description => "Ersetzt einen ASCII-String zu einem HTML-String. Beispiel: aus ä wird &auml;  Dabei kann der Zeilenumbuch explicit ausgenommen werden.";
-        public override List<string> Comand(Script s) { return new() { "stringasciitohtml" }; }
+        public override List<string> Comand(Script s) => new() { "stringasciitohtml" };
         public override string StartSequence => "(";
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
@@ -36,9 +36,8 @@ namespace BlueScript {
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            return !string.IsNullOrEmpty(attvar.ErrorMessage)
-                ? strDoItFeedback.AttributFehler(this, attvar)
-                : new strDoItFeedback("\"" + attvar.Attributes[0].ValueString.CreateHtmlCodes(!attvar.Attributes[1].ValueBool) + "\"", string.Empty);
+            return !string.IsNullOrEmpty(attvar.ErrorMessage) ? strDoItFeedback.AttributFehler(this, attvar)
+                                                              : new strDoItFeedback(attvar.Attributes[0].ValueString.CreateHtmlCodes(!attvar.Attributes[1].ValueBool), enVariableDataType.String);
         }
     }
 }

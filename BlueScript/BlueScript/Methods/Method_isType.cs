@@ -25,7 +25,7 @@ namespace BlueScript {
 
         public override string Syntax => "isType(Variable, num / str / lst / bol / err / ukn)";
         public override string Description => "Prüft, ob der Variablenntyp dem hier angegeben Wert entspricht. Es wird keine Inhaltsprüfung ausgeführt!";
-        public override List<string> Comand(Script s) { return new() { "istype" }; }
+        public override List<string> Comand(Script s) => new() { "istype" };
         public override string StartSequence => "(";
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;

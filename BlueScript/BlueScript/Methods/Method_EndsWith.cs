@@ -27,12 +27,11 @@ namespace BlueScript {
 
         public override string Description => "Prüft, ob der String mit einem der angegeben Strings endet.";
 
-        public override List<string> Comand(Script s) { return new() { "endswith" }; }
+        public override List<string> Comand(Script s) => new() { "endswith" };
         public override string StartSequence => "(";
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.Bool;
-
         public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.Bool, enVariableDataType.String };
         public override bool EndlessArgs => true;
 

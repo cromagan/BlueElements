@@ -25,7 +25,7 @@ namespace BlueScript {
 
         public override string Syntax => "Substring(String, Start, Anzahl)";
         public override string Description => "Gibt einen Teilstring zurück. Ist der Start oder das Ende keine gültige Position, wird das bestmögliche zurückgegeben und kein Fehler ausgelöst. Subrtring(\"Hallo\", 2,2) gibt ll zurück.";
-        public override List<string> Comand(Script s) { return new() { "substring" }; }
+        public override List<string> Comand(Script s) => new() { "substring" };
         public override string StartSequence => "(";
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
@@ -48,7 +48,8 @@ namespace BlueScript {
             if (st + en > attvar.Attributes[0].ValueString.Length) {
                 en = attvar.Attributes[0].ValueString.Length - st;
             }
-            return new strDoItFeedback("\"" + attvar.Attributes[0].ValueString.Substring(st, en) + "\"", string.Empty);
+
+            return new strDoItFeedback(attvar.Attributes[0].ValueString.Substring(st, en), enVariableDataType.String);
         }
     }
 }

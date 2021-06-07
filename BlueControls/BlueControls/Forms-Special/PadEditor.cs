@@ -92,9 +92,7 @@ namespace BlueControls.Forms {
             if (Develop.IsHostRunning()) { TopMost = false; }
         }
 
-        private void btnZoomFit_Click(object sender, System.EventArgs e) {
-            Pad.ZoomFit();
-        }
+        private void btnZoomFit_Click(object sender, System.EventArgs e) => Pad.ZoomFit();
 
         private void Pad_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
             if (btnZoomIn.Checked) { Pad.ZoomIn(e); }
@@ -135,30 +133,17 @@ namespace BlueControls.Forms {
             Pad.Item.Add(b);
         }
 
-        private void Bild_Click(object sender, System.EventArgs e) {
-            Pad.OpenSaveDialog(_Title);
-        }
+        private void Bild_Click(object sender, System.EventArgs e) => Pad.OpenSaveDialog(_Title);
 
-        private void ButtonPageSetup_Click(object sender, System.EventArgs e) {
-            Pad.ShowPrinterPageSetup();
-        }
+        private void ButtonPageSetup_Click(object sender, System.EventArgs e) => Pad.ShowPrinterPageSetup();
 
-        private void Drucken_Click(object sender, System.EventArgs e) {
-            Pad.Print();
-        }
+        private void Drucken_Click(object sender, System.EventArgs e) => Pad.Print();
 
-        private void Vorschau_Click(object sender, System.EventArgs e) {
-            Pad.ShowPrintPreview();
-        }
+        private void Vorschau_Click(object sender, System.EventArgs e) => Pad.ShowPrintPreview();
 
-        private void PadDesign_ItemClicked(object sender, BasicListItemEventArgs e) {
-            Pad.Item.SheetStyle = Skin.StyleDB.Row[e.Item.Internal];
-        }
+        private void PadDesign_ItemClicked(object sender, BasicListItemEventArgs e) => Pad.Item.SheetStyle = Skin.StyleDB.Row[e.Item.Internal];
 
-        private void ckbRaster_CheckedChanged(object sender, System.EventArgs e) {
-
-            Pad.Item.SnapMode = ckbRaster.Checked ? enSnapMode.SnapToGrid : enSnapMode.Ohne;
-        }
+        private void ckbRaster_CheckedChanged(object sender, System.EventArgs e) => Pad.Item.SnapMode = ckbRaster.Checked ? enSnapMode.SnapToGrid : enSnapMode.Ohne;
 
         private void txbRasterAnzeige_TextChanged(object sender, System.EventArgs e) {
 
@@ -173,13 +158,9 @@ namespace BlueControls.Forms {
             Pad.Item.GridSnap = float.Parse(txbRasterFangen.Text);
         }
 
-        private void SchriftGröße_ItemClicked(object sender, BasicListItemEventArgs e) {
-            Pad.Item.SheetStyleScale = decimal.Parse(SchriftGröße.Text) / 100m;
-        }
+        private void SchriftGröße_ItemClicked(object sender, BasicListItemEventArgs e) => Pad.Item.SheetStyleScale = decimal.Parse(SchriftGröße.Text) / 100m;
 
-        private void ArbeitsbreichSetup_Click(object sender, System.EventArgs e) {
-            Pad.ShowWorkingAreaSetup();
-        }
+        private void ArbeitsbreichSetup_Click(object sender, System.EventArgs e) => Pad.ShowWorkingAreaSetup();
 
         private void btnAddUnterStufe_Click(object sender, System.EventArgs e) {
             var b = new ChildPadItem(Pad.Item);
@@ -209,13 +190,9 @@ namespace BlueControls.Forms {
             Pad.Item.Add(b);
         }
 
-        private void btnVorschauModus_CheckedChanged(object sender, System.EventArgs e) {
-            Pad.ShowInPrintMode = btnVorschauModus.Checked;
-        }
+        private void btnVorschauModus_CheckedChanged(object sender, System.EventArgs e) => Pad.ShowInPrintMode = btnVorschauModus.Checked;
 
-        private void Pad_PreviewModChanged(object sender, System.EventArgs e) {
-            btnVorschauModus.Checked = Pad.ShowInPrintMode;
-        }
+        private void Pad_PreviewModChanged(object sender, System.EventArgs e) => btnVorschauModus.Checked = Pad.ShowInPrintMode;
 
         #region Load / Save
         private void LoadTab_FileOk(object sender, System.ComponentModel.CancelEventArgs e) {
@@ -229,13 +206,9 @@ namespace BlueControls.Forms {
             btnLastFiles.AddFileName(SaveTab.FileName, string.Empty);
         }
 
-        private void btnOeffnen_Click(object sender, System.EventArgs e) {
-            LoadTab.ShowDialog();
-        }
+        private void btnOeffnen_Click(object sender, System.EventArgs e) => LoadTab.ShowDialog();
 
-        private void btnSpeichern_Click(object sender, System.EventArgs e) {
-            SaveTab.ShowDialog();
-        }
+        private void btnSpeichern_Click(object sender, System.EventArgs e) => SaveTab.ShowDialog();
 
         private void btnNeu_Click(object sender, System.EventArgs e) {
             Pad.Item.Clear();
@@ -243,9 +216,7 @@ namespace BlueControls.Forms {
             Ribbon.SelectedIndex = 1;
         }
 
-        private void btnLastFiles_ItemClicked(object sender, BasicListItemEventArgs e) {
-            LoadFile(e.Item.Internal);
-        }
+        private void btnLastFiles_ItemClicked(object sender, BasicListItemEventArgs e) => LoadFile(e.Item.Internal);
 
         private void LoadFile(string fileName) {
             Pad.Item.Clear();

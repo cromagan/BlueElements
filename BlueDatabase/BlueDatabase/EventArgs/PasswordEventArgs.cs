@@ -19,9 +19,7 @@
 
 namespace BlueDatabase.EventArgs {
     public class PasswordEventArgs : System.EventArgs {
-        public PasswordEventArgs() {
-            Handled = false;
-        }
+        public PasswordEventArgs() => Handled = false;
 
         public bool Handled { get; set; }
         public string Password { get; set; }

@@ -28,7 +28,7 @@ namespace BlueScript {
         public override string Syntax => "End;";
 
         public override string Description => "Beendet das Skript ohne Fehler.";
-        public override List<string> Comand(Script s) { return new() { "end" }; }
+        public override List<string> Comand(Script s) => new() { "end" };
         public override string StartSequence => "";
         public override string EndSequence => ";";
         public override bool GetCodeBlockAfter => false;

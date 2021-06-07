@@ -165,13 +165,9 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public void Check(ListExt<string> vItems, bool Checked) {
-            Check(vItems.ToArray(), Checked);
-        }
+        public void Check(ListExt<string> vItems, bool Checked) => Check(vItems.ToArray(), Checked);
 
-        public void Check(List<string> vItems, bool Checked) {
-            Check(vItems.ToArray(), Checked);
-        }
+        public void Check(List<string> vItems, bool Checked) => Check(vItems.ToArray(), Checked);
 
         public void Check(string[] vItems, bool Checked) {
             for (var z = 0; z <= vItems.GetUpperBound(0); z++) {
@@ -219,13 +215,9 @@ namespace BlueControls.ItemCollection {
             OnDoInvalidate();
         }
 
-        private void OnItemCheckedChanged() {
-            ItemCheckedChanged?.Invoke(this, System.EventArgs.Empty);
-        }
+        private void OnItemCheckedChanged() => ItemCheckedChanged?.Invoke(this, System.EventArgs.Empty);
 
-        public void OnDoInvalidate() {
-            DoInvalidate?.Invoke(this, System.EventArgs.Empty);
-        }
+        public void OnDoInvalidate() => DoInvalidate?.Invoke(this, System.EventArgs.Empty);
 
         public override void OnChanged() {
             _CellposCorrect = Size.Empty;
@@ -302,7 +294,7 @@ namespace BlueControls.ItemCollection {
         }
 
         public Size CalculateColumnAndSize() {
-            var (BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed) = ItemData();
+            var (BiggestItemX, _, HeightAdded, SenkrechtAllowed) = ItemData();
 
             if (SenkrechtAllowed == enOrientation.Waagerecht) { return ComputeAllItemPositions(new Size(300, 300), null, BiggestItemX, HeightAdded, SenkrechtAllowed); }
 
@@ -488,15 +480,15 @@ namespace BlueControls.ItemCollection {
         /// <param name="t">Beispiel: GetType(enDesign)</param>
         /// <param name="ZumDropdownHinzuAb">Erster Wert der Enumeration, der Hinzugefügt werden soll. Inklusive deses Wertes</param>
         /// <param name="ZumDropdownHinzuBis">Letzter Wert der Enumeration, der nicht mehr hinzugefügt wird, also exklusives diese Wertes</param>
-        public void GetValuesFromEnum(System.Type t, int ZumDropdownHinzuAb, int ZumDropdownHinzuBis) {
+        public void GetValuesFromEnum(Type t, int ZumDropdownHinzuAb, int ZumDropdownHinzuBis) {
 
-            var items = System.Enum.GetValues(t);
+            var items = Enum.GetValues(t);
 
             Clear();
 
             foreach (var thisItem in items) {
 
-                var te = System.Enum.GetName(t, thisItem);
+                var te = Enum.GetName(t, thisItem);
                 var th = (int)thisItem;
 
                 if (!string.IsNullOrEmpty(te)) {
@@ -512,9 +504,7 @@ namespace BlueControls.ItemCollection {
 
         #region TextListItem
 
-        public TextListItem Add(string internalAndReadableText) {
-            return Add(internalAndReadableText, internalAndReadableText, null, false, true, string.Empty);
-        }
+        public TextListItem Add(string internalAndReadableText) => Add(internalAndReadableText, internalAndReadableText, null, false, true, string.Empty);
 
         /// <summary>
         /// Fügt das übergebende Object den Tags hinzu.
@@ -548,58 +538,31 @@ namespace BlueControls.ItemCollection {
             return i;
         }
 
-        public TextListItem Add(string readableText, string internalname, bool isCaption, string userDefCompareKey) {
-            return Add(readableText, internalname, null, isCaption, true, userDefCompareKey);
-        }
+        public TextListItem Add(string readableText, string internalname, bool isCaption, string userDefCompareKey) => Add(readableText, internalname, null, isCaption, true, userDefCompareKey);
 
-        public TextListItem Add(string internalAndReadableText, bool isCaption) {
-            return Add(internalAndReadableText, internalAndReadableText, null, isCaption, true, string.Empty);
-        }
+        public TextListItem Add(string internalAndReadableText, bool isCaption) => Add(internalAndReadableText, internalAndReadableText, null, isCaption, true, string.Empty);
 
-        public TextListItem Add(string internalAndReadableText, enDataFormat format) {
-            return Add(internalAndReadableText, internalAndReadableText, null, false, true, DataFormat.CompareKey(internalAndReadableText, format));
-        }
+        public TextListItem Add(string internalAndReadableText, enDataFormat format) => Add(internalAndReadableText, internalAndReadableText, null, false, true, DataFormat.CompareKey(internalAndReadableText, format));
 
-        public TextListItem Add(string internalAndReadableText, enImageCode symbol) {
-            return Add(internalAndReadableText, internalAndReadableText, symbol, false, true, string.Empty);
-        }
+        public TextListItem Add(string internalAndReadableText, enImageCode symbol) => Add(internalAndReadableText, internalAndReadableText, symbol, false, true, string.Empty);
 
-        public TextListItem Add(string readableText, string internalname, bool enabled) {
-            return Add(readableText, internalname, null, false, enabled, string.Empty);
-        }
+        public TextListItem Add(string readableText, string internalname, bool enabled) => Add(readableText, internalname, null, false, enabled, string.Empty);
 
-        public TextListItem Add(string readableText, string internalname, enImageCode symbol, bool enabled) {
-            return Add(readableText, internalname, symbol, false, enabled, string.Empty);
-        }
+        public TextListItem Add(string readableText, string internalname, enImageCode symbol, bool enabled) => Add(readableText, internalname, symbol, false, enabled, string.Empty);
 
-        public TextListItem Add(string readableText, string internalname, enImageCode symbol, bool enabled, string userDefCompareKey) {
-            return Add(readableText, internalname, symbol, false, enabled, userDefCompareKey);
-        }
+        public TextListItem Add(string readableText, string internalname, enImageCode symbol, bool enabled, string userDefCompareKey) => Add(readableText, internalname, symbol, false, enabled, userDefCompareKey);
 
-        public TextListItem Add(string readableText, string internalname, QuickImage symbol, bool enabled) {
-            return Add(readableText, internalname, symbol, false, enabled, string.Empty);
-        }
+        public TextListItem Add(string readableText, string internalname, QuickImage symbol, bool enabled) => Add(readableText, internalname, symbol, false, enabled, string.Empty);
 
-        public TextListItem Add(string readableText, string internalname, QuickImage symbol, bool enabled, string userDefCompareKey) {
-            return Add(readableText, internalname, symbol, false, enabled, userDefCompareKey);
-        }
+        public TextListItem Add(string readableText, string internalname, QuickImage symbol, bool enabled, string userDefCompareKey) => Add(readableText, internalname, symbol, false, enabled, userDefCompareKey);
 
-        public TextListItem Add(string readableText, string internalname) {
-            return Add(readableText, internalname, null, false, true, string.Empty);
+        public TextListItem Add(string readableText, string internalname) => Add(readableText, internalname, null, false, true, string.Empty);
 
-        }
+        public TextListItem Add(string readableText, string internalname, enImageCode symbol) => Add(readableText, internalname, symbol, false, true, string.Empty);
 
-        public TextListItem Add(string readableText, string internalname, enImageCode symbol) {
-            return Add(readableText, internalname, symbol, false, true, string.Empty);
-        }
+        public TextListItem Add(string readableText, string internalname, QuickImage symbol) => Add(readableText, internalname, symbol, false, true, string.Empty);
 
-        public TextListItem Add(string readableText, string internalname, QuickImage symbol) {
-            return Add(readableText, internalname, symbol, false, true, string.Empty);
-        }
-
-        public TextListItem Add(string readableText, string internalname, enImageCode symbol, bool isCaption, bool enabled, string userDefCompareKey) {
-            return Add(readableText, internalname, QuickImage.Get(symbol, 16), isCaption, enabled, userDefCompareKey);
-        }
+        public TextListItem Add(string readableText, string internalname, enImageCode symbol, bool isCaption, bool enabled, string userDefCompareKey) => Add(readableText, internalname, QuickImage.Get(symbol, 16), isCaption, enabled, userDefCompareKey);
 
         public TextListItem Add(string readableText, string internalname, QuickImage symbol, bool isCaption, bool enabled, string userDefCompareKey) {
 
@@ -665,21 +628,15 @@ namespace BlueControls.ItemCollection {
             return i;
         }
 
-        public LineListItem AddSeparator() {
-            return AddSeparator(string.Empty);
-        }
+        public LineListItem AddSeparator() => AddSeparator(string.Empty);
 
         #endregion
 
         #region RowFormulaItem
 
-        public RowFormulaListItem Add(RowItem row) {
-            return Add(row, string.Empty, string.Empty);
-        }
+        public RowFormulaListItem Add(RowItem row) => Add(row, string.Empty, string.Empty);
 
-        public RowFormulaListItem Add(RowItem row, string layoutID) {
-            return Add(row, layoutID, string.Empty);
-        }
+        public RowFormulaListItem Add(RowItem row, string layoutID) => Add(row, layoutID, string.Empty);
 
         public RowFormulaListItem Add(RowItem row, string layoutID, string userDefCompareKey) {
             var i = new RowFormulaListItem(row, layoutID, userDefCompareKey);
@@ -697,11 +654,9 @@ namespace BlueControls.ItemCollection {
         //    }
         //}
 
-        public TextListItem Add(ColumnItem column, bool doCaptionSort) {
-            return doCaptionSort
+        public TextListItem Add(ColumnItem column, bool doCaptionSort) => doCaptionSort
                 ? Add(column, column.Name, column.Ueberschriften + Constants.SecondSortChar + column.Name)
                 : Add(column, column.Name, string.Empty);
-        }
 
         public TextListItem Add(enContextMenuComands comand, bool enabled = true) {
 
@@ -962,9 +917,7 @@ namespace BlueControls.ItemCollection {
 
         #endregion
 
-        public void Remove(string Internal) {
-            Remove(this[Internal]);
-        }
+        public void Remove(string Internal) => Remove(this[Internal]);
 
         public void RemoveRange(List<string> Internal) {
             foreach (var item in Internal) {

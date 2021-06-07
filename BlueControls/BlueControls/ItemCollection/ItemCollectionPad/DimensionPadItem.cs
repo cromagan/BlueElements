@@ -192,9 +192,7 @@ namespace BlueControls.ItemCollection {
 
         public decimal Länge_in_MM => Math.Round(modConverter.PixelToMM(_Länge, ItemCollectionPad.DPI), Nachkommastellen);
 
-        protected override string ClassId() {
-            return "DIMENSION";
-        }
+        protected override string ClassId() => "DIMENSION";
 
         public override bool Contains(PointF value, decimal zoomfactor) {
             var ne = 5 / zoomfactor;

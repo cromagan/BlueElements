@@ -53,25 +53,15 @@ namespace BlueBasics {
             Code.Add("</html>");
         }
 
-        public void AddCaption(string _Caption) {
-            AddCaption(_Caption, 1);
-        }
+        public void AddCaption(string _Caption) => AddCaption(_Caption, 1);
 
-        public void Add(string what) {
-            Code.Add(what);
-        }
+        public void Add(string what) => Code.Add(what);
 
-        public void RowBeginn() {
-            Code.Add("      <tr>");
-        }
+        public void RowBeginn() => Code.Add("      <tr>");
 
-        public void RowEnd() {
-            Code.Add("      </tr>");
-        }
+        public void RowEnd() => Code.Add("      </tr>");
 
-        public void Save(string filename, bool executeafter) {
-            Code.Save(filename, executeafter, System.Text.Encoding.UTF8);
-        }
+        public void Save(string filename, bool executeafter) => Code.Save(filename, executeafter, System.Text.Encoding.UTF8);
 
         public void TableBeginn() {
             // da.Add("  <Font face=\"Arial\" Size=\"2\"><table border=\"1\" BORDERCOLOR=\"#aaaaaa\" cellspacing=\"0\" cellpadding=\"0\" align=\"left\">");
@@ -85,17 +75,11 @@ namespace BlueBasics {
             // Code.Add("      </tr>");
         }
 
-        public void TableEnd() {
-            Code.Add("    </table>");
-        }
+        public void TableEnd() => Code.Add("    </table>");
 
-        public void CellAdd(string content) {
-            Code.Add("              <th>" + content + "</th>");
-        }
+        public void CellAdd(string content) => Code.Add("              <th>" + content + "</th>");
 
-        public void CellAdd(string content, Color c) {
-            Code.Add("        <th  bgcolor=\"#" + c.ToHTMLCode() + "\">" + content + "</th>");
-        }
+        public void CellAdd(string content, Color c) => Code.Add("        <th  bgcolor=\"#" + c.ToHTMLCode() + "\">" + content + "</th>");
 
         public void AddCaption(string _caption, int size) {
             switch (size) {

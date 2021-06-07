@@ -33,7 +33,7 @@ namespace BlueDatabase {
     //Der Export wird nur Intern verwaltet und gibt keine Ereignisse aus.
     //Wenn mal ein LAyout geändert wird, sind es gleich 100 und mehr AddPenduings mit imensen Daten.
 
-    public class ExportDefinition : IParseable, IReadableTextWithChanging, ICompareKey, ICheckable, System.IDisposable {
+    public class ExportDefinition : IParseable, IReadableTextWithChanging, ICompareKey, ICheckable, IDisposable {
 
         public Database Database { get; private set; }
 
@@ -188,24 +188,17 @@ namespace BlueDatabase {
             Initialize();
         }
 
-        private void Database_Disposing(object sender, System.EventArgs e) {
-            Dispose();
-        }
+        private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
 
         #endregion
 
-        private void _Filter_Changed(object sender, System.EventArgs e) {
-            OnChanged();
-        }
+        private void _Filter_Changed(object sender, System.EventArgs e) => OnChanged();
 
-        private void _BereitsExportiert_ListOrItemChanged(object sender, System.EventArgs e) {
-            OnChanged();
-        }
+        private void _BereitsExportiert_ListOrItemChanged(object sender, System.EventArgs e) => OnChanged();
 
-        public void OnChanged() {
+        public void OnChanged() =>
             //if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
             Changed?.Invoke(this, System.EventArgs.Empty);
-        }
 
         public void Parse(string ToParse) {
 
@@ -291,9 +284,7 @@ namespace BlueDatabase {
             IsParsing = false;
         }
 
-        public string CompareKey() {
-            return ((int)_Typ).ToString(Constants.Format_Integer3) + "|" + _Verzeichnis + "|" + _ExportFormularID + "|" + _Intervall + "|" + _AutomatischLöschen;
-        }
+        public string CompareKey() => ((int)_Typ).ToString(Constants.Format_Integer3) + "|" + _Verzeichnis + "|" + _ExportFormularID + "|" + _Intervall + "|" + _AutomatischLöschen;
 
         public string ReadableText() {
             var t = ErrorReason();
@@ -418,7 +409,7 @@ namespace BlueDatabase {
 
                 Result = Result + "itv=" + _Intervall.ToString().ToNonCritical() + ", ";
 
-                if (_Typ == enExportTyp.DatenbankCSVFormat || _Typ == enExportTyp.DatenbankHTMLFormat || _Typ == enExportTyp.DatenbankOriginalFormat) {
+                if (_Typ is enExportTyp.DatenbankCSVFormat or enExportTyp.DatenbankHTMLFormat or enExportTyp.DatenbankOriginalFormat) {
                     Result = Result + "aud=" + _AutomatischLöschen.ToString().ToNonCritical() + ", ";
 
                     if (_Typ != enExportTyp.DatenbankOriginalFormat) {
@@ -542,7 +533,7 @@ namespace BlueDatabase {
 
             if (!IsOk()) { return false; }
 
-            if (_Typ == enExportTyp.DatenbankCSVFormat || _Typ == enExportTyp.DatenbankHTMLFormat || _Typ == enExportTyp.DatenbankOriginalFormat) {
+            if (_Typ is enExportTyp.DatenbankCSVFormat or enExportTyp.DatenbankHTMLFormat or enExportTyp.DatenbankOriginalFormat) {
                 for (var n = 0; n < _BereitsExportiert.Count; n++) {
                     if (worker != null && worker.CancellationPending) { break; }
 
@@ -607,9 +598,7 @@ namespace BlueDatabase {
             return Did;
         }
 
-        public bool IsOk() {
-            return string.IsNullOrEmpty(ErrorReason());
-        }
+        public bool IsOk() => string.IsNullOrEmpty(ErrorReason());
 
         public string ErrorReason() {
 
@@ -641,7 +630,7 @@ namespace BlueDatabase {
                 {
                     return "Intervall muss mindestens 0.001 sein.";
                 }
-                if (_AutomatischLöschen < 0.00099F || _AutomatischLöschen > 10000) {
+                if (_AutomatischLöschen is < 0.00099F or > 10000) {
                     return "Automatisch löschen muss zwischen 0.01 und 10000 sein.";
                 }
                 if (_Intervall * 1000 < _AutomatischLöschen) {
@@ -785,9 +774,7 @@ namespace BlueDatabase {
             return Did;
         }
 
-        public object Clone() {
-            return new ExportDefinition(Database, ToString());
-        }
+        public object Clone() => new ExportDefinition(Database, ToString());
 
         protected virtual void Dispose(bool disposing) {
             if (!disposedValue) {

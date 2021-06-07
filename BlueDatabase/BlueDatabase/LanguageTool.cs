@@ -64,16 +64,12 @@ namespace BlueDatabase {
             return style == enShortenStyle.Replaced || style == enShortenStyle.HTML || OT == txt ? txt : OT + " (" + txt + ")";
         }
 
-        private static string ColumnReplaceTranslated(string newTXT, ColumnItem column) {
-            return column.Format switch {
-                enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl or enDataFormat.Datum_und_Uhrzeit or enDataFormat.FarbeInteger or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem => newTXT,
-                _ => DoTranslate(newTXT, false),
-            };
-        }
+        private static string ColumnReplaceTranslated(string newTXT, ColumnItem column) => column.Format switch {
+            enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl or enDataFormat.Datum_und_Uhrzeit or enDataFormat.FarbeInteger or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem => newTXT,
+            _ => DoTranslate(newTXT, false),
+        };
 
-        public static string DoTranslate(string txt) {
-            return DoTranslate(txt, true, EmptyArgs);
-        }
+        public static string DoTranslate(string txt) => DoTranslate(txt, true, EmptyArgs);
 
         /// <summary>
         /// 

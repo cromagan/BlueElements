@@ -51,7 +51,7 @@ namespace Skript.Enums {
         //VariableString = 512,
         Variable_Numeral = Variable | Numeral,
         Variable_List = Variable | List,
-        Variable_String = Variable | String,
+        Variable_Stringx = Variable | String,
 
         Variable_List_Or_String = Variable | String | List,
         Variable_List_String_Numeral_or_Bool = Variable | String | List | Numeral | Bool,

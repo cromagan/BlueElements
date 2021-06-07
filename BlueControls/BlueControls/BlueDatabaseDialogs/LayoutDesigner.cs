@@ -30,7 +30,7 @@ using static BlueBasics.FileOperations;
 
 namespace BlueControls.BlueDatabaseDialogs {
 
-    internal partial class LayoutDesigner : BlueControls.Forms.PadEditor {
+    internal partial class LayoutDesigner : PadEditor {
         public Database Database { get; private set; }
 
         private string _LoadedLayout = string.Empty;
@@ -168,9 +168,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         }
 
-        private void cbxLayout_ItemClicked(object sender, BasicListItemEventArgs e) {
-            LoadLayout(e.Item.Internal);
-        }
+        private void cbxLayout_ItemClicked(object sender, BasicListItemEventArgs e) => LoadLayout(e.Item.Internal);
 
         internal void LoadLayout(string fileOrLayoutID) {
             SaveCurrentLayout();
@@ -230,13 +228,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             Pad.ZoomFit();
         }
 
-        private void btnTextEditor_Click(object sender, System.EventArgs e) {
-            ExecuteFile("notepad.exe", cbxLayout.Text, false);
-        }
+        private void btnTextEditor_Click(object sender, System.EventArgs e) => ExecuteFile("notepad.exe", cbxLayout.Text, false);
 
-        private void btnLayoutOeffnen_Click(object sender, System.EventArgs e) {
-            ExecuteFile(cbxLayout.Text, null, false);
-        }
+        private void btnLayoutOeffnen_Click(object sender, System.EventArgs e) => ExecuteFile(cbxLayout.Text, null, false);
 
         private void btnLayoutVerzeichnis_Click(object sender, System.EventArgs e) {
 

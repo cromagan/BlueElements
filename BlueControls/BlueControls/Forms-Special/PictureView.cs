@@ -184,9 +184,7 @@ namespace BlueControls.Forms {
             LoadPic(_NR);
         }
 
-        private void ZoomFitBut_Click(object sender, System.EventArgs e) {
-            Pad.ZoomFit();
-        }
+        private void ZoomFitBut_Click(object sender, System.EventArgs e) => Pad.ZoomFit();
 
         private void Pad_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
             if (ZoomIn.Checked) { Pad.ZoomIn(e); }

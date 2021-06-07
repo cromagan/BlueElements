@@ -29,7 +29,7 @@ using System.ComponentModel;
 using System.Drawing;
 
 namespace BlueControls.ItemCollection {
-    public abstract class BasicPadItem : IParseable, System.ICloneable, IChangedFeedback, IMoveable {
+    public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, IMoveable {
 
         private static string UniqueInternal_LastTime = "InitialDummy";
         private static int UniqueInternal_Count;
@@ -102,7 +102,7 @@ namespace BlueControls.ItemCollection {
                 case "blueelements.clsitemline":
                 case "blueelements.itemline":
                 case "line":
-                    i = new LinePadItem(parent, name, Enums.PadStyles.Style_Standard, Point.Empty, Point.Empty);
+                    i = new LinePadItem(parent, name, PadStyles.Style_Standard, Point.Empty, Point.Empty);
                     break;
 
                 case "blueelements.clsitempad":
@@ -393,13 +393,9 @@ namespace BlueControls.ItemCollection {
             return t.Trim(", ") + "}";
         }
 
-        public void InDenVordergrund() {
-            Parent?.InDenVordergrund(this);
-        }
+        public void InDenVordergrund() => Parent?.InDenVordergrund(this);
 
-        public void InDenHintergrund() {
-            Parent?.InDenHintergrund(this);
-        }
+        public void InDenHintergrund() => Parent?.InDenHintergrund(this);
 
         public void EineEbeneNachVorne() {
             if (Parent == null) { return; }
@@ -411,15 +407,8 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        internal void AddStyleOption(List<FlexiControl> l) {
-            l.Add(new FlexiControlForProperty(this, "Stil", Skin.GetFonts(Parent.SheetStyle)));
-            //l.Add(new FlexiControl("Stil", ((int)Stil).ToString()));
-        }
-        internal void AddLineStyleOption(List<FlexiControl> l) {
-            l.Add(new FlexiControlForProperty(this, "Stil", Skin.GetRahmenArt(Parent.SheetStyle, true)));
-            //l.Add(new FlexiControlForProperty("Umrandung", ((int)Stil).ToString(), Skin.GetRahmenArt(Parent.SheetStyle, true)));
-
-        }
+        internal void AddStyleOption(List<FlexiControl> l) => l.Add(new FlexiControlForProperty(this, "Stil", Skin.GetFonts(Parent.SheetStyle)));//l.Add(new FlexiControl("Stil", ((int)Stil).ToString()));
+        internal void AddLineStyleOption(List<FlexiControl> l) => l.Add(new FlexiControlForProperty(this, "Stil", Skin.GetRahmenArt(Parent.SheetStyle, true)));//l.Add(new FlexiControlForProperty("Umrandung", ((int)Stil).ToString(), Skin.GetRahmenArt(Parent.SheetStyle, true)));
 
         public void EineEbeneNachHinten() {
             if (Parent == null) { return; }
@@ -476,18 +465,12 @@ namespace BlueControls.ItemCollection {
 
         }
 
-        public void DrawOutline(Graphics GR, decimal cZoom, decimal shiftX, decimal shiftY, Color c) {
-            GR.DrawRectangle(new Pen(c), UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY, false));
-        }
+        public void DrawOutline(Graphics GR, decimal cZoom, decimal shiftX, decimal shiftY, Color c) => GR.DrawRectangle(new Pen(c), UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY, false));
 
-        protected bool IsInDrawingArea(RectangleF DrawingKoordinates, Size SizeOfParentControl) {
-            return SizeOfParentControl.IsEmpty || SizeOfParentControl.Width == 0 || SizeOfParentControl.Height == 0
+        protected bool IsInDrawingArea(RectangleF DrawingKoordinates, Size SizeOfParentControl) => SizeOfParentControl.IsEmpty || SizeOfParentControl.Width == 0 || SizeOfParentControl.Height == 0
 || DrawingKoordinates.IntersectsWith(new Rectangle(Point.Empty, SizeOfParentControl));
-        }
 
-        public void Parse(string ToParse) {
-            Parse(ToParse.GetAllTags());
-        }
+        public void Parse(string ToParse) => Parse(ToParse.GetAllTags());
 
         /// <summary>
         /// Gibt den Bereich zurück, den das Element benötigt, um komplett dargestellt zu werden. Unabhängig von der aktuellen Ansicht. Zusätzlich mit dem Wert aus Padding.

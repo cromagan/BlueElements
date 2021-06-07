@@ -1153,23 +1153,15 @@ namespace BlueControls {
 
         }
 
-        public static enImageCodeEffect AdditionalState(enStates vState) {
-            return vState.HasFlag(enStates.Standard_Disabled) ? ST[0] : enImageCodeEffect.Ohne;
-        }
+        public static enImageCodeEffect AdditionalState(enStates vState) => vState.HasFlag(enStates.Standard_Disabled) ? ST[0] : enImageCodeEffect.Ohne;
 
-        public static Color Color_Back(enDesign vDesign, enStates vState) {
-            return DesignOf(vDesign, vState).BackColor1;
-        }
+        public static Color Color_Back(enDesign vDesign, enStates vState) => DesignOf(vDesign, vState).BackColor1;
 
-        internal static Color Color_Border(enDesign vDesign, enStates vState) {
-            return DesignOf(vDesign, vState).BorderColor1;
-        }
+        internal static Color Color_Border(enDesign vDesign, enStates vState) => DesignOf(vDesign, vState).BorderColor1;
 
         #region  Back 
 
-        public static void Draw_Back(Graphics gr, enDesign design, enStates state, Rectangle r, System.Windows.Forms.Control control, bool needTransparenz) {
-            Draw_Back(gr, DesignOf(design, state), r, control, needTransparenz);
-        }
+        public static void Draw_Back(Graphics gr, enDesign design, enStates state, Rectangle r, System.Windows.Forms.Control control, bool needTransparenz) => Draw_Back(gr, DesignOf(design, state), r, control, needTransparenz);
 
         public static clsDesign DesignOf(enDesign design, enStates state) {
 
@@ -1462,27 +1454,22 @@ namespace BlueControls {
 
         #endregion
 
-        private static GraphicsPath Kontur(enKontur Kon, Rectangle r) {
-
-            return Kon switch {
-                enKontur.Rechteck => modAllgemein.Poly_Rechteck(r),// GR.SmoothingModex = Drawing2D.SmoothingMode.None
-                enKontur.Rechteck_R4 => modAllgemein.Poly_RoundRec(r, 4),// GR.SmoothingModex = Drawing2D.SmoothingMode.HighQuality
-                enKontur.Rechteck_R11 => modAllgemein.Poly_RoundRec(r, 11),//  GR.SmoothingModex = Drawing2D.SmoothingMode.HighQuality
-                enKontur.Rechteck_R20 => modAllgemein.Poly_RoundRec(r, 20),//    GR.SmoothingModex = Drawing2D.SmoothingMode.HighQuality
-                                                                           //break; case Is = enKontur.Rechteck_R4_NurOben
-                                                                           //    r.Y2 += 4
-                                                                           //    GR.SmoothingModex = Drawing2D.SmoothingMode.HighQuality
-                                                                           //    Return Poly_RoundRec(r, 4)
-                enKontur.Ohne => null,
-                _ => modAllgemein.Poly_Rechteck(r),//  GR.SmoothingModex = Drawing2D.SmoothingMode.None
-            };
-        }
+        private static GraphicsPath Kontur(enKontur Kon, Rectangle r) => Kon switch {
+            enKontur.Rechteck => modAllgemein.Poly_Rechteck(r),// GR.SmoothingModex = Drawing2D.SmoothingMode.None
+            enKontur.Rechteck_R4 => modAllgemein.Poly_RoundRec(r, 4),// GR.SmoothingModex = Drawing2D.SmoothingMode.HighQuality
+            enKontur.Rechteck_R11 => modAllgemein.Poly_RoundRec(r, 11),//  GR.SmoothingModex = Drawing2D.SmoothingMode.HighQuality
+            enKontur.Rechteck_R20 => modAllgemein.Poly_RoundRec(r, 20),//    GR.SmoothingModex = Drawing2D.SmoothingMode.HighQuality
+                                                                       //break; case Is = enKontur.Rechteck_R4_NurOben
+                                                                       //    r.Y2 += 4
+                                                                       //    GR.SmoothingModex = Drawing2D.SmoothingMode.HighQuality
+                                                                       //    Return Poly_RoundRec(r, 4)
+            enKontur.Ohne => null,
+            _ => modAllgemein.Poly_Rechteck(r),//  GR.SmoothingModex = Drawing2D.SmoothingMode.None
+        };
 
         #region  Border 
 
-        public static void Draw_Border(Graphics GR, enDesign vDesign, enStates vState, Rectangle r) {
-            Draw_Border(GR, DesignOf(vDesign, vState), r);
-        }
+        public static void Draw_Border(Graphics GR, enDesign vDesign, enStates vState, Rectangle r) => Draw_Border(GR, DesignOf(vDesign, vState), r);
 
         //[Obsolete]
         //public static void Draw_Border(Graphics GR, RowItem row, Rectangle r) {
@@ -1615,9 +1602,7 @@ namespace BlueControls {
         /// <param name="fitInRect"></param>
         /// <param name="child"></param>
         /// <param name="deleteBack"></param>
-        public static void Draw_FormatedText(Graphics gr, string txt, enDesign design, enStates state, QuickImage imageCode, enAlignment align, Rectangle fitInRect, System.Windows.Forms.Control child, bool deleteBack, bool translate) {
-            Draw_FormatedText(gr, txt, imageCode, DesignOf(design, state), align, fitInRect, child, deleteBack, translate);
-        }
+        public static void Draw_FormatedText(Graphics gr, string txt, enDesign design, enStates state, QuickImage imageCode, enAlignment align, Rectangle fitInRect, System.Windows.Forms.Control child, bool deleteBack, bool translate) => Draw_FormatedText(gr, txt, imageCode, DesignOf(design, state), align, fitInRect, child, deleteBack, translate);
 
         /// <summary>
         /// Status des Bildes (Disabled) wird geändert
@@ -1759,9 +1744,7 @@ namespace BlueControls {
             }
         }
 
-        internal static BlueFont GetBlueFont(int design, enStates state, RowItem rowOfStyle, int stufe) {
-            return design > 10000 ? Skin.GetBlueFont((PadStyles)design, rowOfStyle, stufe) : Skin.GetBlueFont((enDesign)design, state, stufe);
-        }
+        internal static BlueFont GetBlueFont(int design, enStates state, RowItem rowOfStyle, int stufe) => design > 10000 ? GetBlueFont((PadStyles)design, rowOfStyle, stufe) : GetBlueFont((enDesign)design, state, stufe);
 
         internal static BlueFont GetBlueFont(PadStyles padStyle, RowItem rowOfStyle, int stufe) {
             switch (stufe) {
@@ -1848,9 +1831,7 @@ namespace BlueControls {
             return StyleDB == null || rowOfStyle == null ? BlueFont.Get(ErrorFont) : GetBlueFont(StyleDB, ((int)format).ToString(), rowOfStyle);
         }
 
-        public static BlueFont GetBlueFont(Database styleDB, string column, RowItem row) {
-            return GetBlueFont(styleDB, styleDB.Column[column], row);
-        }
+        public static BlueFont GetBlueFont(Database styleDB, string column, RowItem row) => GetBlueFont(styleDB, styleDB.Column[column], row);
 
         public static BlueFont GetBlueFont(Database styleDB, ColumnItem column, RowItem row) {
             var _String = styleDB.Cell.GetString(column, row);
@@ -1861,9 +1842,7 @@ namespace BlueControls {
             return BlueFont.Get(_String);
         }
 
-        public static BlueFont GetBlueFont(enDesign design, enStates state) {
-            return DesignOf(design, state).bFont;
-        }
+        public static BlueFont GetBlueFont(enDesign design, enStates state) => DesignOf(design, state).bFont;
 
         #region  Styles 
 
@@ -1873,9 +1852,7 @@ namespace BlueControls {
             return StyleDB?.Column[0].Contents(null, null);
         }
 
-        public static void InitStyles() {
-            StyleDB = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Styles.MDB", "Styles", true, false);
-        }
+        public static void InitStyles() => StyleDB = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Styles.MDB", "Styles", true, false);
 
         #endregion
     }

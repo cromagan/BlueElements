@@ -353,7 +353,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             _Column.CaptionBitmap = txbSpaltenbild.Text;
 
-            _Column.DauerFilterPos = BlueBasics.Extensions.PointParse(txbDauerFilterPos.Text);
+            _Column.DauerFilterPos = Extensions.PointParse(txbDauerFilterPos.Text);
 
             var NewTags = tbxTags.Text.SplitByCRToList();
             if (NewTags.IsDifferentTo(_Column.Tags)) {
@@ -423,9 +423,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             T_Colorx.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", ColorDia.Color.ToHTMLCode()).ToString();
         }
 
-        private void QI_Vorschau_Click(object sender, System.EventArgs e) {
-            Notification.Show(tbxQuickinfo.Text.Replace("\r", "<BR>") + "<br><br><br>" + tbxAdminInfo.Text.Replace("\r", "<BR>"));
-        }
+        private void QI_Vorschau_Click(object sender, System.EventArgs e) => Notification.Show(tbxQuickinfo.Text.Replace("\r", "<BR>") + "<br><br><br>" + tbxAdminInfo.Text.Replace("\r", "<BR>"));
 
         private void btnZurueck_Click(object sender, System.EventArgs e) {
 
@@ -458,9 +456,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (!AllOk()) { e.Cancel = true; }
         }
 
-        private void cbxFormat_TextChanged(object sender, System.EventArgs e) {
-            ButtonCheck();
-        }
+        private void cbxFormat_TextChanged(object sender, System.EventArgs e) => ButtonCheck();
 
         private void btnStandard_Click(object sender, System.EventArgs e) {
             if (!AllOk()) { return; }
@@ -597,8 +593,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             Column_DatenAuslesen(_Table.CurrentArrangement[_Column].NextVisible(_Table.CurrentArrangement).Column);
         }
 
-        private void btnVerwendung_Click(object sender, System.EventArgs e) {
-            MessageBox.Show(_Column.Verwendung());
-        }
+        private void btnVerwendung_Click(object sender, System.EventArgs e) => MessageBox.Show(_Column.Verwendung());
     }
 }

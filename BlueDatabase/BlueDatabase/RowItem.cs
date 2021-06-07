@@ -55,9 +55,7 @@ namespace BlueDatabase {
             Database.Disposing += Database_Disposing;
         }
 
-        private void Database_Disposing(object sender, System.EventArgs e) {
-            Dispose();
-        }
+        private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
 
         public RowItem(Database database) : this(database, database.Row.NextRowKey()) { }
 
@@ -85,150 +83,80 @@ namespace BlueDatabase {
         #region Cell Get / Set
 
         #region bool
-        public bool CellGetBoolean(string columnName) {
-            return Database.Cell.GetBoolean(Database.Column[columnName], this);
-        }
-        public bool CellGetBoolean(ColumnItem column) {
-            return Database.Cell.GetBoolean(column, this);
-        }
+        public bool CellGetBoolean(string columnName) => Database.Cell.GetBoolean(Database.Column[columnName], this);
+        public bool CellGetBoolean(ColumnItem column) => Database.Cell.GetBoolean(column, this);
 
-        public void CellSet(string columnName, bool value) {
-            Database.Cell.Set(Database.Column[columnName], this, value);
-        }
+        public void CellSet(string columnName, bool value) => Database.Cell.Set(Database.Column[columnName], this, value);
 
-        public void CellSet(ColumnItem column, bool value) {
-            Database.Cell.Set(column, this, value);
-        }
+        public void CellSet(ColumnItem column, bool value) => Database.Cell.Set(column, this, value);
         #endregion
 
         #region string
-        public string CellFirstString() {
-            return Database.Cell.GetString(Database.Column[0], this);
-        }
-        public string CellGetString(string columnName) {
-            return Database.Cell.GetString(Database.Column[columnName], this);
-        }
-        public string CellGetString(ColumnItem column) {
-            return Database.Cell.GetString(column, this);
-        }
+        public string CellFirstString() => Database.Cell.GetString(Database.Column[0], this);
+        public string CellGetString(string columnName) => Database.Cell.GetString(Database.Column[columnName], this);
+        public string CellGetString(ColumnItem column) => Database.Cell.GetString(column, this);
 
-        public void CellSet(string columnName, string value) {
-            Database.Cell.Set(Database.Column[columnName], this, value);
-        }
+        public void CellSet(string columnName, string value) => Database.Cell.Set(Database.Column[columnName], this, value);
 
-        public void CellSet(ColumnItem column, string value) {
-            Database.Cell.Set(column, this, value);
-        }
+        public void CellSet(ColumnItem column, string value) => Database.Cell.Set(column, this, value);
         #endregion
 
         #region double
-        public double CellGetDouble(string columnName) {
-            return Database.Cell.GetDouble(Database.Column[columnName], this);
-        }
-        public double CellGetDouble(ColumnItem column) {
-            return Database.Cell.GetDouble(column, this);
-        }
+        public double CellGetDouble(string columnName) => Database.Cell.GetDouble(Database.Column[columnName], this);
+        public double CellGetDouble(ColumnItem column) => Database.Cell.GetDouble(column, this);
 
-        public void CellSet(string columnName, double value) {
-            Database.Cell.Set(Database.Column[columnName], this, value);
-        }
+        public void CellSet(string columnName, double value) => Database.Cell.Set(Database.Column[columnName], this, value);
 
-        public void CellSet(ColumnItem column, double value) {
-            Database.Cell.Set(column, this, value);
-        }
+        public void CellSet(ColumnItem column, double value) => Database.Cell.Set(column, this, value);
         #endregion
 
         #region decimal
-        public decimal CellGetDecimal(string columnName) {
-            return Database.Cell.GetDecimal(Database.Column[columnName], this);
-        }
-        public decimal CellGetDecimal(ColumnItem column) {
-            return Database.Cell.GetDecimal(column, this);
-        }
+        public decimal CellGetDecimal(string columnName) => Database.Cell.GetDecimal(Database.Column[columnName], this);
+        public decimal CellGetDecimal(ColumnItem column) => Database.Cell.GetDecimal(column, this);
 
-        public void CellSet(string columnName, decimal value) {
-            Database.Cell.Set(Database.Column[columnName], this, value);
-        }
-        public void CellSet(ColumnItem column, decimal value) {
-            Database.Cell.Set(column, this, value);
-        }
+        public void CellSet(string columnName, decimal value) => Database.Cell.Set(Database.Column[columnName], this, value);
+        public void CellSet(ColumnItem column, decimal value) => Database.Cell.Set(column, this, value);
         #endregion
 
         #region int
-        public int CellGetInteger(string columnName) {
-            return Database.Cell.GetInteger(Database.Column[columnName], this);
-        }
-        public int CellGetInteger(ColumnItem column) {
-            return Database.Cell.GetInteger(column, this);
-        }
+        public int CellGetInteger(string columnName) => Database.Cell.GetInteger(Database.Column[columnName], this);
+        public int CellGetInteger(ColumnItem column) => Database.Cell.GetInteger(column, this);
 
-        public void CellSet(string columnName, int value) {
-            Database.Cell.Set(Database.Column[columnName], this, value);
-        }
+        public void CellSet(string columnName, int value) => Database.Cell.Set(Database.Column[columnName], this, value);
 
-        public void CellSet(ColumnItem column, int value) {
-            Database.Cell.Set(column, this, value);
-        }
+        public void CellSet(ColumnItem column, int value) => Database.Cell.Set(column, this, value);
         #endregion
 
         #region Point
-        public Point CellGetPoint(string columnName) {
-            return Database.Cell.GetPoint(Database.Column[columnName], this);
-        }
-        public Point CellGetPoint(ColumnItem column) {
-            return Database.Cell.GetPoint(column, this);
-        }
+        public Point CellGetPoint(string columnName) => Database.Cell.GetPoint(Database.Column[columnName], this);
+        public Point CellGetPoint(ColumnItem column) => Database.Cell.GetPoint(column, this);
 
-        public void CellSet(string columnName, Point value) {
-            Database.Cell.Set(Database.Column[columnName], this, value);
-        }
+        public void CellSet(string columnName, Point value) => Database.Cell.Set(Database.Column[columnName], this, value);
 
-        public void CellSet(ColumnItem column, Point value) {
-            Database.Cell.Set(column, this, value);
-        }
+        public void CellSet(ColumnItem column, Point value) => Database.Cell.Set(column, this, value);
         #endregion
 
         #region List<string>
-        public List<string> CellGetList(string columnName) {
-            return Database.Cell.GetList(Database.Column[columnName], this);
-        }
-        public List<string> CellGetList(ColumnItem column) {
-            return Database.Cell.GetList(column, this);
-        }
+        public List<string> CellGetList(string columnName) => Database.Cell.GetList(Database.Column[columnName], this);
+        public List<string> CellGetList(ColumnItem column) => Database.Cell.GetList(column, this);
 
-        public void CellSet(string columnName, List<string> value) {
-            Database.Cell.Set(Database.Column[columnName], this, value);
-        }
+        public void CellSet(string columnName, List<string> value) => Database.Cell.Set(Database.Column[columnName], this, value);
 
-        public void CellSet(ColumnItem column, List<string> value) {
-            Database.Cell.Set(column, this, value);
-        }
+        public void CellSet(ColumnItem column, List<string> value) => Database.Cell.Set(column, this, value);
         #endregion
 
         #region DateTime
-        public DateTime CellGetDateTime(string columnName) {
-            return Database.Cell.GetDateTime(Database.Column[columnName], this);
-        }
-        public DateTime CellGetDateTime(ColumnItem column) {
-            return Database.Cell.GetDateTime(column, this);
-        }
+        public DateTime CellGetDateTime(string columnName) => Database.Cell.GetDateTime(Database.Column[columnName], this);
+        public DateTime CellGetDateTime(ColumnItem column) => Database.Cell.GetDateTime(column, this);
 
-        public void CellSet(string columnName, DateTime value) {
-            Database.Cell.Set(Database.Column[columnName], this, value);
-        }
+        public void CellSet(string columnName, DateTime value) => Database.Cell.Set(Database.Column[columnName], this, value);
 
-        public void CellSet(ColumnItem column, DateTime value) {
-            Database.Cell.Set(column, this, value);
-        }
+        public void CellSet(ColumnItem column, DateTime value) => Database.Cell.Set(column, this, value);
         #endregion
 
         #region color
-        public Color CellGetColor(string columnName) {
-            return Database.Cell.GetColor(Database.Column[columnName], this);
-        }
-        public Color CellGetColor(ColumnItem column) {
-            return Database.Cell.GetColor(column, this);
-        }
+        public Color CellGetColor(string columnName) => Database.Cell.GetColor(Database.Column[columnName], this);
+        public Color CellGetColor(ColumnItem column) => Database.Cell.GetColor(column, this);
 
         //public void CellSet(string columnName, Color value)
         //{
@@ -247,17 +175,13 @@ namespace BlueDatabase {
         //    Database.Cell.Set(column, this, value);
         //}
 
-        public int CellGetColorBGR(ColumnItem column) {
-            return Database.Cell.GetColorBGR(column, this);
-        }
+        public int CellGetColorBGR(ColumnItem column) => Database.Cell.GetColorBGR(column, this);
 
         #endregion
 
         #endregion
 
-        public List<string> CellGetValuesReadable(ColumnItem Column, enShortenStyle style) {
-            return Database.Cell.ValuesReadable(Column, this, style);
-        }
+        public List<string> CellGetValuesReadable(ColumnItem Column, enShortenStyle style) => Database.Cell.ValuesReadable(Column, this, style);
 
         private void Cell_CellValueChanged(object sender, CellEventArgs e) {
             if (e.Row != this) { return; }
@@ -321,14 +245,11 @@ namespace BlueDatabase {
             if (column == column.Database.Column.SysRowChanger) { ro = true; }
             if (column == column.Database.Column.SysRowChangeDate) { ro = true; }
 
-            return column.MultiLine
-                ? new Variable(column.Name, row.CellGetString(column), enVariableDataType.List, ro, false, "Spalte: " + column.ReadableText() + "\r\nMehrzeilige Spalten können nur als Liste bearbeitet werdern.")
+            return column.MultiLine ? new Variable(column.Name, row.CellGetString(column), enVariableDataType.List, ro, false, "Spalte: " + column.ReadableText() + "\r\nMehrzeilige Spalten können nur als Liste bearbeitet werdern.")
                 : column.Format switch {
-                    enDataFormat.Bit => row.CellGetString(column) == "+"
-                     ? new Variable(column.Name, "true", enVariableDataType.Bool, ro, false, "Spalte: " + column.ReadableText())
-                     : new Variable(column.Name, "false", enVariableDataType.Bool, ro, false, "Spalte: " + column.ReadableText()),
-                    enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl => new Variable(column.Name, row.CellGetString(column).Replace("\"", "''"), enVariableDataType.Numeral, ro, false, "Spalte: " + column.ReadableText()),
-                    _ => new Variable(column.Name, row.CellGetString(column).Replace("\"", "''"), enVariableDataType.String, ro, false, "Spalte: " + column.ReadableText()),
+                    enDataFormat.Bit => row.CellGetString(column) == "+" ? new Variable(column.Name, "true", enVariableDataType.Bool, ro, false, "Spalte: " + column.ReadableText()) : new Variable(column.Name, "false", enVariableDataType.Bool, ro, false, "Spalte: " + column.ReadableText()),
+                    enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl => new Variable(column.Name, row.CellGetString(column), enVariableDataType.Numeral, ro, false, "Spalte: " + column.ReadableText()),
+                    _ => new Variable(column.Name, row.CellGetString(column), enVariableDataType.String, ro, false, "Spalte: " + column.ReadableText()),
                 };
         }
 
@@ -336,7 +257,7 @@ namespace BlueDatabase {
         /// Führt alle Regeln aus und löst das Ereignis DoSpecialRules aus. Setzt ansonsten keine Änderungen, wie z.B. SysCorrect oder Runden-Befehle.
         /// </summary>
         /// <returns>Gibt Regeln, die einen Fehler verursachen zurück. z.B. SPALTE1|Die Splate darf nicht leer sein.</returns>
-        private BlueScript.Script DoRules(bool onlyTest, string startRoutine) {
+        private Script DoRules(bool onlyTest, string startRoutine) {
             try {
                 var vars = new List<Variable>
                 {
@@ -370,7 +291,7 @@ namespace BlueDatabase {
 
                 #endregion
 
-                var script = new BlueScript.Script(vars) {
+                var script = new Script(vars) {
                     ScriptText = Database.RulesScript
                 };
 
@@ -398,9 +319,7 @@ namespace BlueDatabase {
             }
         }
 
-        public (bool didSuccesfullyCheck, string error, BlueScript.Script script) DoAutomatic(bool onlyTest, string startroutine) {
-            return DoAutomatic(false, false, onlyTest, startroutine);
-        }
+        public (bool didSuccesfullyCheck, string error, Script script) DoAutomatic(bool onlyTest, string startroutine) => DoAutomatic(false, false, onlyTest, startroutine);
 
         /// <summary>
         /// Führt Regeln aus, löst Ereignisses, setzt SysCorrect und auch die initalwerte der Zellen.
@@ -410,7 +329,7 @@ namespace BlueDatabase {
         /// <param name="fullCheck">Runden, Großschreibung, etc. wird ebenfalls durchgefphrt</param>
         /// <param name="tryforsceonds"></param>
         /// <returns></returns>
-        public (bool didSuccesfullyCheck, string error, BlueScript.Script script) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, float tryforsceonds, string startroutine) {
+        public (bool didSuccesfullyCheck, string error, Script script) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, float tryforsceonds, string startroutine) {
             if (Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
 
             var t = DateTime.Now;
@@ -428,7 +347,7 @@ namespace BlueDatabase {
         /// </summary>
         /// <param name="doFemdZelleInvalidate">bei verlinkten Zellen wird der verlinkung geprüft und erneuert.</param>
         /// <param name="fullCheck">Runden, Großschreibung, etc. wird ebenfalls durchgeführt</param>
-        public (bool didSuccesfullyCheck, string error, BlueScript.Script skript) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, bool onlyTest, string startroutine) {
+        public (bool didSuccesfullyCheck, string error, Script skript) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, bool onlyTest, string startroutine) {
 
             if (Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
 
@@ -501,12 +420,12 @@ namespace BlueDatabase {
         public bool MatchesTo(FilterItem Filter) {
             if (Filter != null) {
 
-                if (Filter.FilterType == enFilterType.KeinFilter || Filter.FilterType == enFilterType.GroßKleinEgal) { return true; } // Filter ohne Funktion
+                if (Filter.FilterType is enFilterType.KeinFilter or enFilterType.GroßKleinEgal) { return true; } // Filter ohne Funktion
 
                 if (Filter.Column == null) {
-                    if (!Convert.ToBoolean(Filter.FilterType & enFilterType.GroßKleinEgal)) { Filter.FilterType |= enFilterType.GroßKleinEgal; }
+                    if (!Filter.FilterType.HasFlag(enFilterType.GroßKleinEgal)) { Filter.FilterType |= enFilterType.GroßKleinEgal; }
 
-                    if (Filter.FilterType != enFilterType.Instr_GroßKleinEgal && Filter.FilterType != enFilterType.Instr_UND_GroßKleinEgal) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeilenfilter nur mit Instr möglich!"); }
+                    if (Filter.FilterType is not enFilterType.Instr_GroßKleinEgal and not enFilterType.Instr_UND_GroßKleinEgal) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeilenfilter nur mit Instr möglich!"); }
                     if (Filter.SearchValue.Count < 1) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeilenfilter nur mit mindestens einem Wert möglich"); }
 
                     foreach (var t in Filter.SearchValue) {
@@ -560,28 +479,16 @@ namespace BlueDatabase {
             return true;
         }
 
-        public bool IsNullOrEmpty(ColumnItem column) {
-            return Database.Cell.IsNullOrEmpty(column, this);
-        }
+        public bool IsNullOrEmpty(ColumnItem column) => Database.Cell.IsNullOrEmpty(column, this);
 
-        public bool IsNullOrEmpty(string columnName) {
-            return Database.Cell.IsNullOrEmpty(Database.Column[columnName], this);
-        }
+        public bool IsNullOrEmpty(string columnName) => Database.Cell.IsNullOrEmpty(Database.Column[columnName], this);
 
-        public bool CellIsNullOrEmpty(string columnName) {
-            return Database.Cell.IsNullOrEmpty(Database.Column[columnName], this);
-        }
-        public bool CellIsNullOrEmpty(ColumnItem column) {
-            return Database.Cell.IsNullOrEmpty(column, this);
-        }
+        public bool CellIsNullOrEmpty(string columnName) => Database.Cell.IsNullOrEmpty(Database.Column[columnName], this);
+        public bool CellIsNullOrEmpty(ColumnItem column) => Database.Cell.IsNullOrEmpty(column, this);
 
-        internal void OnRowChecked(RowCheckedEventArgs e) {
-            RowChecked?.Invoke(this, e);
-        }
+        internal void OnRowChecked(RowCheckedEventArgs e) => RowChecked?.Invoke(this, e);
 
-        internal void OnDoSpecialRules(DoRowAutomaticEventArgs e) {
-            DoSpecialRules?.Invoke(this, e);
-        }
+        internal void OnDoSpecialRules(DoRowAutomaticEventArgs e) => DoSpecialRules?.Invoke(this, e);
 
         /// <summary>
         /// Ersetzt Spaltennamen mit dem dementsprechenden Wert der Zelle. Format: &Spaltenname; oder &Spaltenname(L,8);

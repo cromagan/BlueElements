@@ -977,13 +977,9 @@ namespace BlueControls {
             ResetPosition(true);
         }
 
-        public bool InsertImage(string Img, int Position) {
-            return InsertAnything(enASCIIKey.Undefined, Img, Position);
-        }
+        public bool InsertImage(string Img, int Position) => InsertAnything(enASCIIKey.Undefined, Img, Position);
 
-        public bool InsertChar(enASCIIKey KeyAscii, int Position) {
-            return InsertAnything(KeyAscii, string.Empty, Position);
-        }
+        public bool InsertChar(enASCIIKey KeyAscii, int Position) => InsertAnything(KeyAscii, string.Empty, Position);
 
         private bool InsertAnything(enASCIIKey KeyAscii, string img, int Position) {
 
@@ -1080,8 +1076,6 @@ namespace BlueControls {
             ResetPosition(true);
         }
 
-        public string Substring(int StartIndex, int lenght) {
-            return ConvertCharToPlainText(StartIndex, StartIndex + lenght - 1);
-        }
+        public string Substring(int StartIndex, int lenght) => ConvertCharToPlainText(StartIndex, StartIndex + lenght - 1);
     }
 }

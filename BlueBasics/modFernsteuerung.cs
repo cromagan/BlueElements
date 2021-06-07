@@ -73,7 +73,7 @@ namespace BlueBasics {
         public static string WinTitle(IntPtr handle) {
             var l = GetWindowTextLength(handle) + 1;
             var buffer = string.Empty.PadRight(l);
-            l = GetWindowText(handle, buffer, l);
+            _ = GetWindowText(handle, buffer, l);
 
             return buffer.Substring(0, buffer.Length);
         }
@@ -178,16 +178,10 @@ namespace BlueBasics {
             SetWindowPos(handle, 0, left, top, r.Width - r.Left, r.Height - r.Top, 0);
         }
 
-        public static void FensterMinimieren(IntPtr handle) {
-            ShowWindow(handle, (int)enSW.ShowMinimized);
-        }
+        public static void FensterMinimieren(IntPtr handle) => ShowWindow(handle, (int)enSW.ShowMinimized);
 
-        public static void FensterMaximieren(IntPtr handle) {
-            ShowWindow(handle, (int)enSW.ShowMaximized);
-        }
+        public static void FensterMaximieren(IntPtr handle) => ShowWindow(handle, (int)enSW.ShowMaximized);
 
-        public static void FensterRestore(IntPtr handle) {
-            ShowWindow(handle, (int)enSW.Restore);
-        }
+        public static void FensterRestore(IntPtr handle) => ShowWindow(handle, (int)enSW.Restore);
     }
 }

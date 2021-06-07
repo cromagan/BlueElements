@@ -22,14 +22,14 @@ using Skript.Enums;
 using System.Collections.Generic;
 
 namespace BlueScript {
-    public class Method_SetError : BlueScript.Method {
+    public class Method_SetError : Method {
 
         //public Method_SetError(Script parent) : base(parent) { }
 
         public override string Syntax => "SetError(Nachricht, Column1, Colum2, ...);";
 
         public override string Description => "Bei Zeilenprüfungen wird ein Fehler abgesetzt. Dessen Inhalt bestimmt die Nachricht. Die Spalten, die als fehlerhaft markiert werden sollen, müssen nachträglich als Variablennamen angegeben werden.";
-        public override List<string> Comand(Script s) { return new() { "seterror" }; }
+        public override List<string> Comand(Script s) => new() { "seterror" };
         public override string StartSequence => "(";
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;
@@ -47,7 +47,7 @@ namespace BlueScript {
                 var ve = s.Variablen.GetSystem(n);
 
                 if (ve == null) {
-                    ve = new Variable(n, string.Empty, Skript.Enums.enVariableDataType.List, false, true, string.Empty);
+                    ve = new Variable(n, string.Empty, enVariableDataType.List, false, true, string.Empty);
                     s.Variablen.Add(ve);
                 }
 

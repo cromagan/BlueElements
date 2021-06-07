@@ -26,7 +26,7 @@ namespace BlueScript {
 
         public override string Syntax => "var VariablenName = Wert;";
         public override string Description => "Erstellt eine neue Variable, der Typ wird automtisch bestimmt.";
-        public override List<string> Comand(Script s) { return new() { "var" }; }
+        public override List<string> Comand(Script s) => new() { "var" };
         public override string StartSequence => "";
         public override string EndSequence => ";";
         public override bool GetCodeBlockAfter => false;

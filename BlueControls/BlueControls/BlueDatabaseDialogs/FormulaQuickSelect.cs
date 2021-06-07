@@ -52,9 +52,9 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             foreach (var ThisColumn in Row.Database.Column) {
                 if (ThisColumn != null) {
-                    if (ThisColumn.EditType == enEditTypeFormula.SwapListBox || ThisColumn.EditType == enEditTypeFormula.Listbox || ThisColumn.EditType == enEditTypeFormula.Textfeld_mit_Auswahlknopf) {
+                    if (ThisColumn.EditType is enEditTypeFormula.SwapListBox or enEditTypeFormula.Listbox or enEditTypeFormula.Textfeld_mit_Auswahlknopf) {
                         if (ThisColumn.DropdownBearbeitungErlaubt) {
-                            if (CellCollection.UserEditPossible(ThisColumn, Row, BlueBasics.Enums.enErrorReason.OnlyRead)) {
+                            if (CellCollection.UserEditPossible(ThisColumn, Row, enErrorReason.OnlyRead)) {
                                 var ThisView = Formula.SearchColumnView(ThisColumn);
                                 if (ThisView != null) {
                                     if (Row.Database.PermissionCheck(ThisView.PermissionGroups_Show, null)) {

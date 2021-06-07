@@ -69,9 +69,7 @@ namespace BlueControls.Controls {
             Filter.Changed += Filter_Changed;
         }
 
-        private void Filter_Changed(object sender, System.EventArgs e) {
-            UpdateFilterData((Filterleiste)Parent);
-        }
+        private void Filter_Changed(object sender, System.EventArgs e) => UpdateFilterData((Filterleiste)Parent);
 
         private void UpdateFilterData(Filterleiste myParent) {
 
@@ -291,12 +289,8 @@ namespace BlueControls.Controls {
             return false;
         }
 
-        public void OnContextMenuInit(ContextMenuInitEventArgs e) {
-            ContextMenuInit?.Invoke(this, e);
-        }
+        public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
-        public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) {
-            ContextMenuItemClicked?.Invoke(this, e);
-        }
+        public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
     }
 }

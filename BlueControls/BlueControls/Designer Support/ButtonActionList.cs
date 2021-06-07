@@ -31,9 +31,7 @@ namespace BlueControls.Designer_Support {
 
         // Set a control property. This method makes Undo/Redo
         // work properly and marks the form as modified in the IDE.
-        private void SetControlProperty(string property_name, object Value) {
-            TypeDescriptor.GetProperties(ReverenceControl)[property_name].SetValue(ReverenceControl, Value);
-        }
+        private void SetControlProperty(string property_name, object Value) => TypeDescriptor.GetProperties(ReverenceControl)[property_name].SetValue(ReverenceControl, Value);
 
         public override DesignerActionItemCollection GetSortedActionItems() {
             var items = new DesignerActionItemCollection

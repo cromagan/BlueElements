@@ -179,13 +179,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
         }
 
-        private void _TableView_ViewChanged(object sender, System.EventArgs e) {
-            FillFilters();
-        }
+        private void _TableView_ViewChanged(object sender, System.EventArgs e) => FillFilters();
 
-        private void _TableView_PinnedOrFilterChanged(object sender, System.EventArgs e) {
-            FillFilters();
-        }
+        private void _TableView_PinnedOrFilterChanged(object sender, System.EventArgs e) => FillFilters();
 
         internal void FillFilters() {
 
@@ -531,9 +527,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             DoÄhnlich();
         }
 
-        private void txbZeilenFilter_Enter(object sender, System.EventArgs e) {
-            Filter_ZeilenFilterSetzen();
-        }
+        private void txbZeilenFilter_Enter(object sender, System.EventArgs e) => Filter_ZeilenFilterSetzen();
 
         private void Filter_ZeilenFilterSetzen() {
 
@@ -571,13 +565,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
         }
 
-        private void btnTextLöschen_Click(object sender, System.EventArgs e) {
-            txbZeilenFilter.Text = string.Empty;
-        }
+        private void btnTextLöschen_Click(object sender, System.EventArgs e) => txbZeilenFilter.Text = string.Empty;
 
-        public bool Textbox_hasFocus() {
-            return txbZeilenFilter.Focused();
-        }
+        public bool Textbox_hasFocus() => txbZeilenFilter.Focused();
 
         private void btnPinZurück_Click(object sender, System.EventArgs e) {
             _LastLooked = string.Empty;
@@ -591,11 +581,11 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void btnAdmin_Click(object sender, System.EventArgs e) {
-            Database.SaveAll(false);
-            var x = new BlueControls.Forms.frmTableView(_TableView.Database, false, true);
+            BlueBasics.MultiUserFile.clsMultiUserFile.SaveAll(false);
+            var x = new frmTableView(_TableView.Database, false, true);
             x.ShowDialog();
             x.Dispose();
-            Database.SaveAll(false);
+            BlueBasics.MultiUserFile.clsMultiUserFile.SaveAll(false);
         }
 
         private void Filterleiste_SizeChanged(object sender, System.EventArgs e) {

@@ -70,9 +70,7 @@ namespace BlueControls.ItemCollection {
 
         #endregion
 
-        protected override Size ComputeSizeUntouchedForListBox() {
-            return Table.FormatedText_NeededSize(_StyleLikeThis, Internal, Skin.GetBlueFont(Parent.ItemDesign, enStates.Standard), _style, 16, _bildTextverhalten);
-        }
+        protected override Size ComputeSizeUntouchedForListBox() => Table.FormatedText_NeededSize(_StyleLikeThis, Internal, Skin.GetBlueFont(Parent.ItemDesign, enStates.Standard), _style, 16, _bildTextverhalten);
 
         protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, bool Translate) {
 
@@ -87,19 +85,14 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        protected override string GetCompareKey() {
+        protected override string GetCompareKey() =>
             // Die hauptklasse frägt nach diesem Kompare-Key
             //    var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, enShortenStyle.HTML, true); // Muss Kompakt sein, um Suffixe zu vermeiden
-            return DataFormat.CompareKey(Internal, _StyleLikeThis.Format) + "|" + Internal;
-        }
+            DataFormat.CompareKey(Internal, _StyleLikeThis.Format) + "|" + Internal;
 
-        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) {
-            return SizeUntouchedForListBox().Height;
-        }
+        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) => SizeUntouchedForListBox().Height;
 
-        public override void CloneToNewCollection(ItemCollectionList newParent) {
-            CloneToNewCollection(newParent, new CellLikeListItem(Internal, _StyleLikeThis, _style, _Enabled, _bildTextverhalten));
-        }
+        public override void CloneToNewCollection(ItemCollectionList newParent) => CloneToNewCollection(newParent, new CellLikeListItem(Internal, _StyleLikeThis, _style, _Enabled, _bildTextverhalten));
 
         public override bool FilterMatch(string FilterText) {
             if (base.FilterMatch(FilterText)) { return true; }

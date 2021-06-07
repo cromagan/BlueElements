@@ -85,21 +85,13 @@ namespace BlueBasics {
             return del;
         }
 
-        public static bool DeleteFile(string file, bool toBeSure) {
-            return !FileExists(file) || ProcessFile(TryDeleteFile, file, file, toBeSure);
-        }
+        public static bool DeleteFile(string file, bool toBeSure) => !FileExists(file) || ProcessFile(TryDeleteFile, file, file, toBeSure);
 
-        public static bool RenameFile(string oldName, string newName, bool toBeSure) {
-            return ProcessFile(TryRenameFile, oldName, newName, toBeSure);
-        }
+        public static bool RenameFile(string oldName, string newName, bool toBeSure) => ProcessFile(TryRenameFile, oldName, newName, toBeSure);
 
-        public static bool CopyFile(string source, string target, bool toBeSure) {
-            return ProcessFile(TryCopyFile, source, target, toBeSure);
-        }
+        public static bool CopyFile(string source, string target, bool toBeSure) => ProcessFile(TryCopyFile, source, target, toBeSure);
 
-        public static bool DeleteDir(string directory, bool toBeSure) {
-            return ProcessFile(TryDeleteDir, directory, directory, toBeSure);
-        }
+        public static bool DeleteDir(string directory, bool toBeSure) => ProcessFile(TryDeleteDir, directory, directory, toBeSure);
 
         private static bool TryDeleteFile(string thisFile, string willbeIgnored) {
             // Komisch, manche Dateien können zwar gelöscht werden, die Attribute aber nicht geändert (Berechtigungen?)
@@ -152,9 +144,7 @@ namespace BlueBasics {
             return true; // FileExists(target);
         }
 
-        public static bool FileExists(string file) {
-            return file != null && !string.IsNullOrEmpty(file) && !file.ContainsChars(Constants.Char_PfadSonderZeichen) && File.Exists(file);
-        }
+        public static bool FileExists(string file) => file != null && !string.IsNullOrEmpty(file) && !file.ContainsChars(Constants.Char_PfadSonderZeichen) && File.Exists(file);
 
         // public static bool CanWriteInDirectory(string DirectoryPath)
         // {
@@ -256,9 +246,7 @@ namespace BlueBasics {
             return _canWrite_LastResult;
         }
 
-        public static bool PathExists(string pfad) {
-            return pfad.Length >= 3 && Directory.Exists(pfad.CheckPath());
-        }
+        public static bool PathExists(string pfad) => pfad.Length >= 3 && Directory.Exists(pfad.CheckPath());
 
         public static string TempFile(string newPath, string filename) {
             var dn = filename.FileNameWithoutSuffix();
@@ -273,9 +261,7 @@ namespace BlueBasics {
             return TempFile(dp, dn, ds);
         }
 
-        public static string TempFile() {
-            return TempFile(string.Empty, string.Empty, string.Empty);
-        }
+        public static string TempFile() => TempFile(string.Empty, string.Empty, string.Empty);
 
         public static string TempFile(string pfad, string wunschname, string suffix) {
             if (string.IsNullOrEmpty(pfad)) { pfad = Path.GetTempPath(); }

@@ -25,12 +25,12 @@ namespace BlueScript {
 
         public override string Description => "Gibt TRUE zurück, wenn die Variable nicht existiert, fehlerhaft ist, keinen Inhalt hat, oder dem Zahlenwert 0 entspricht. Falls die Variable existiert, muss diese dem Typ Numeral entsprechen.";
         public override string Syntax => "isNullOrZero(Variable)";
-        public override List<string> Comand(Script s) { return new() { "isnullorzero" }; }
+        public override List<string> Comand(Script s) => new() { "isnullorzero" };
         public override string StartSequence => "(";
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.Bool;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_Any };
+        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_Any};
         public override bool EndlessArgs => false;
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {

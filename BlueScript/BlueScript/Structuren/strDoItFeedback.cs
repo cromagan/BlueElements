@@ -17,7 +17,9 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using BlueBasics;
 using BlueScript;
+using Skript.Enums;
 
 public struct strDoItFeedback {
 
@@ -26,35 +28,32 @@ public struct strDoItFeedback {
         Value = string.Empty;
     }
 
-    public strDoItFeedback(string value, string errormessage) {
-        ErrorMessage = errormessage;
-        Value = value;
+
+    public strDoItFeedback(string value, enVariableDataType type) {
+
+        Value = Variable.ValueForReplace(value, type);
+
+        ErrorMessage = string.Empty;
+
     }
+
+    //public strDoItFeedback(string value, string errormessage) {
+    //    ErrorMessage = errormessage;
+    //    Value = value;
+    //}
 
     public string Value;
     public string ErrorMessage;
 
-    public static strDoItFeedback FalscherDatentyp() {
-        return new strDoItFeedback("Falscher Datentyp.");
-    }
+    public static strDoItFeedback FalscherDatentyp() => new("Falscher Datentyp.");
 
-    public static strDoItFeedback AttributFehler(Method method, strSplittedAttributesFeedback f) {
-        return new strDoItFeedback(f.ErrorMessage + " > " + method.Syntax);
-    }
+    public static strDoItFeedback AttributFehler(Method method, strSplittedAttributesFeedback f) => new(f.ErrorMessage + " > " + method.Syntax);
 
-    public static strDoItFeedback VariableNichtGefunden() {
-        return new strDoItFeedback("Variable nicht gefunden.");
-    }
+    public static strDoItFeedback VariableNichtGefunden() => new("Variable nicht gefunden.");
 
-    public static strDoItFeedback Klammerfehler() {
-        return new strDoItFeedback("Fehler bei der Klammersetzung.");
-    }
+    public static strDoItFeedback Klammerfehler() => new("Fehler bei der Klammersetzung.");
 
-    public static strDoItFeedback Wahr() {
-        return new strDoItFeedback("true", string.Empty);
-    }
+    public static strDoItFeedback Wahr() => new("true", enVariableDataType.Bool);
 
-    public static strDoItFeedback Falsch() {
-        return new strDoItFeedback("false", string.Empty);
-    }
+    public static strDoItFeedback Falsch() => new("false", enVariableDataType.Bool);
 }

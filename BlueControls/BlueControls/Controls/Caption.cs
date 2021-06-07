@@ -103,9 +103,7 @@ namespace BlueControls.Controls {
         }
 
         public new Size Size {
-            get {
-                return Convert.ToBoolean(_TextAnzeigeverhalten & enSteuerelementVerhalten.Steuerelement_Anpassen) ? TextRequiredSize() : base.Size;
-            }
+            get => Convert.ToBoolean(_TextAnzeigeverhalten & enSteuerelementVerhalten.Steuerelement_Anpassen) ? TextRequiredSize() : base.Size;
             set {
                 GetDesign();
                 if (value.Width == base.Size.Width && value.Height == base.Size.Height) { return; }
@@ -114,11 +112,9 @@ namespace BlueControls.Controls {
         }
 
         public new int Width {
-            get {
-                return Convert.ToBoolean(_TextAnzeigeverhalten & enSteuerelementVerhalten.Steuerelement_Anpassen)
+            get => Convert.ToBoolean(_TextAnzeigeverhalten & enSteuerelementVerhalten.Steuerelement_Anpassen)
                     ? TextRequiredSize().Width
                     : base.Width;
-            }
             set {
                 GetDesign();
                 if (Convert.ToBoolean(_TextAnzeigeverhalten & enSteuerelementVerhalten.Steuerelement_Anpassen)) { return; }
@@ -127,11 +123,9 @@ namespace BlueControls.Controls {
         }
 
         public new int Height {
-            get {
-                return Convert.ToBoolean(_TextAnzeigeverhalten & enSteuerelementVerhalten.Steuerelement_Anpassen)
+            get => Convert.ToBoolean(_TextAnzeigeverhalten & enSteuerelementVerhalten.Steuerelement_Anpassen)
                     ? TextRequiredSize().Height
                     : base.Height;
-            }
             set {
                 GetDesign();
                 if (Convert.ToBoolean(_TextAnzeigeverhalten & enSteuerelementVerhalten.Steuerelement_Anpassen)) { return; }
@@ -146,13 +140,9 @@ namespace BlueControls.Controls {
             if (e.Button == System.Windows.Forms.MouseButtons.Right) { FloatingInputBoxListBoxStyle.ContextMenuShow(this, e); }
         }
 
-        public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
-            return false;
-        }
+        public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) => false;
 
-        public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) {
-            ContextMenuItemClicked?.Invoke(this, e);
-        }
+        public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
         private void GetDesign() {
             _design = enDesign.Undefiniert;
@@ -247,7 +237,7 @@ namespace BlueControls.Controls {
                             eText.TextDimensions = Size.Empty;
                             break;
                     }
-                    eText.DrawingArea = base.ClientRectangle;
+                    eText.DrawingArea = ClientRectangle;
                 }
 
                 if (gr == null) { return; }// Wenn vorab die Größe abgefragt wird
@@ -265,13 +255,9 @@ namespace BlueControls.Controls {
             return !_Text.Contains("<");
         }
 
-        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
-            HotItem = null;
-        }
+        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) => HotItem = null;
 
-        public void OnContextMenuInit(ContextMenuInitEventArgs e) {
-            ContextMenuInit?.Invoke(this, e);
-        }
+        public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
         public Size TextRequiredSize() {
             if (QuickModePossible()) {

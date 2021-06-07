@@ -36,9 +36,7 @@ namespace BlueControls.ItemCollection {
             Randdicke = 1;
         }
 
-        protected override string ClassId() {
-            return "Symbol";
-        }
+        protected override string ClassId() => "Symbol";
 
         public enSymbol Symbol { get; set; } = enSymbol.Pfeil;
 

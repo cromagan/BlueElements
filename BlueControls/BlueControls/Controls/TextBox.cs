@@ -136,9 +136,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue("")]
         public new string Text {
-            get {
-                return _eTxt == null ? string.Empty : _Format == enDataFormat.Text_mit_Formatierung ? _eTxt.HtmlText : _eTxt.PlainText;
-            }
+            get => _eTxt == null ? string.Empty : _Format == enDataFormat.Text_mit_Formatierung ? _eTxt.HtmlText : _eTxt.PlainText;
 
             set {
 
@@ -225,7 +223,7 @@ namespace BlueControls.Controls {
             //if (_LastTextChange != null) { OnTextChanged(); }
 
             _LastUserActionForSpellChecking = DateTime.Now.AddSeconds(-30);
-            if (!FloatingInputBoxListBoxStyle.IsShowing(this)) { MarkClear(); }
+            if (!FloatingForm.IsShowing(this)) { MarkClear(); }
 
             Blinker.Enabled = false;
             CursorClear();
@@ -239,7 +237,7 @@ namespace BlueControls.Controls {
 
             if (_eTxt == null) { GenerateETXT(true); }
 
-            if (!FloatingInputBoxListBoxStyle.IsShowing(this)) {
+            if (!FloatingForm.IsShowing(this)) {
                 SetCursorToEnd();
                 if (!_eTxt.Multiline) { if (!ContainsMouse() || !MousePressing()) { MarkAll(); } }
 
@@ -504,17 +502,11 @@ namespace BlueControls.Controls {
             }
         }
 
-        private void OnTAB() {
-            TAB?.Invoke(this, System.EventArgs.Empty);
-        }
+        private void OnTAB() => TAB?.Invoke(this, System.EventArgs.Empty);
 
-        private void OnESC() {
-            ESC?.Invoke(this, System.EventArgs.Empty);
-        }
+        private void OnESC() => ESC?.Invoke(this, System.EventArgs.Empty);
 
-        private void OnEnter() {
-            Enter?.Invoke(this, System.EventArgs.Empty);
-        }
+        private void OnEnter() => Enter?.Invoke(this, System.EventArgs.Empty);
 
         // Mouse
         protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
@@ -593,9 +585,7 @@ namespace BlueControls.Controls {
             base.Focus();
         }
 
-        public new bool Focused() {
-            return base.Focused || (_SliderY != null && _SliderY.Focused());
-        }
+        public new bool Focused() => base.Focused || (_SliderY != null && _SliderY.Focused());
 
         private void CheckIfTextIsChanded(string NewPlainText) {
             if (NewPlainText == _LastCheckedText) { return; }
@@ -610,20 +600,17 @@ namespace BlueControls.Controls {
         /// <summary>
         /// Löst das Ereignis aus und setzt _LastUserChangingTime auf NULL.
         /// </summary>
-        protected virtual void OnTextChanged() {
-            TextChanged?.Invoke(this, System.EventArgs.Empty);
-        }
+        protected virtual void OnTextChanged() => TextChanged?.Invoke(this, System.EventArgs.Empty);
 
-        protected override bool IsInputKey(System.Windows.Forms.Keys keyData) {
+        protected override bool IsInputKey(System.Windows.Forms.Keys keyData) =>
             // Ganz wichtig diese Routine!
             // Wenn diese NICHT ist, geht der Fokus weg, sobald der cursor gedrückt wird.
             // http://technet.microsoft.com/de-de/subscriptions/control.isinputkey%28v=vs.100%29
 
-            return keyData switch {
+            keyData switch {
                 System.Windows.Forms.Keys.Up or System.Windows.Forms.Keys.Down or System.Windows.Forms.Keys.Left or System.Windows.Forms.Keys.Right => true,
                 _ => false,
             };
-        }
 
         /// <summary>
         /// Prüft - bei Multiline Zeile für Zeile - ob der Text in der Textbox zulässig ist.
@@ -770,15 +757,11 @@ namespace BlueControls.Controls {
             }
         }
 
-        private int HotPosition() {
-            return _Cursor_CharPos > -1
+        private int HotPosition() => _Cursor_CharPos > -1
                 ? _Cursor_CharPos
                 : _MarkStart > -1 && _MarkEnd < 0 ? _MarkEnd : _MarkStart > -1 && _MarkEnd > -1 ? _MarkEnd : -1;
-        }
 
-        protected virtual enDesign GetDesign() {
-            return enDesign.TextBox;
-        }
+        protected virtual enDesign GetDesign() => enDesign.TextBox;
 
         protected override void DrawControl(Graphics gr, enStates state) {
 
@@ -910,9 +893,7 @@ namespace BlueControls.Controls {
             GR.DrawLine(new Pen(Color.Black), r.Left + _eTxt.DrawingPos.X, r.Top + _eTxt.DrawingPos.Y, r.Left + _eTxt.DrawingPos.X, r.Bottom + _eTxt.DrawingPos.Y);
         }
 
-        private void SliderY_ValueChange(object sender, System.EventArgs e) {
-            Invalidate();
-        }
+        private void SliderY_ValueChange(object sender, System.EventArgs e) => Invalidate();
 
         protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseWheel(e);
@@ -1079,17 +1060,11 @@ namespace BlueControls.Controls {
             }
         }
 
-        public void Mark(enMarkState markstate, int first, int last) {
-            _eTxt?.Mark(markstate, first, last);
-        }
+        public void Mark(enMarkState markstate, int first, int last) => _eTxt?.Mark(markstate, first, last);
 
-        public void Unmark(enMarkState markstate) {
-            _eTxt?.Unmark(markstate);
-        }
+        public void Unmark(enMarkState markstate) => _eTxt?.Unmark(markstate);
 
-        private void SpellChecker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
-            Dictionary.IsSpellChecking = false;
-        }
+        private void SpellChecker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) => Dictionary.IsSpellChecking = false;
 
         private void AbortSpellChecking() {
             if (SpellChecker.IsBusy) { SpellChecker.CancelAsync(); }
@@ -1126,7 +1101,7 @@ namespace BlueControls.Controls {
                     return true;
 
                 case "#SpellChecking":
-                    FloatingInputBoxListBoxStyle.Close(this);
+                    FloatingForm.Close(this);
                     if (_SpellChecking) {
                         _MustCheck = false;
                         Dictionary.SpellCheckingAll(_eTxt, false);
@@ -1136,7 +1111,7 @@ namespace BlueControls.Controls {
                     return true;
 
                 case "#SpellChecking2":
-                    FloatingInputBoxListBoxStyle.Close(this);
+                    FloatingForm.Close(this);
                     if (_SpellChecking) {
                         _MustCheck = false;
                         Dictionary.SpellCheckingAll(_eTxt, true);
@@ -1197,9 +1172,7 @@ namespace BlueControls.Controls {
             return false;
         }
 
-        public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) {
-            ContextMenuItemClicked?.Invoke(this, e);
-        }
+        public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
         private void AddSpecialChar() {
 
@@ -1244,9 +1217,7 @@ namespace BlueControls.Controls {
             CheckIfTextIsChanded(_eTxt.HtmlText);
         }
 
-        private void OnNeedDatabaseOfAdditinalSpecialChars(MultiUserFileGiveBackEventArgs e) {
-            NeedDatabaseOfAdditinalSpecialChars?.Invoke(this, e);
-        }
+        private void OnNeedDatabaseOfAdditinalSpecialChars(MultiUserFileGiveBackEventArgs e) => NeedDatabaseOfAdditinalSpecialChars?.Invoke(this, e);
 
         public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
             AbortSpellChecking();
@@ -1308,9 +1279,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        public void OnContextMenuInit(ContextMenuInitEventArgs e) {
-            ContextMenuInit?.Invoke(this, e);
-        }
+        public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
         protected override void OnEnabledChanged(System.EventArgs e) {
             MarkClear();

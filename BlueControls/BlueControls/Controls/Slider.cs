@@ -160,9 +160,7 @@ namespace BlueControls.Controls {
         public event EventHandler ValueChanged;
         #endregion
 
-        private void OnValueChanged() {
-            ValueChanged?.Invoke(this, System.EventArgs.Empty);
-        }
+        private void OnValueChanged() => ValueChanged?.Invoke(this, System.EventArgs.Empty);
 
         private void But1_Click(object sender, System.EventArgs e) {
             lock (Lock_UserAction) {
@@ -221,9 +219,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        public new bool Focused() {
-            return base.Focused || But1.Focused || But2.Focused;
-        }
+        public new bool Focused() => base.Focused || But1.Focused || But2.Focused;
 
         private void GenerateButtons() {
 
@@ -390,8 +386,6 @@ namespace BlueControls.Controls {
             if (ol2 != But2.Enabled) { But2.Invalidate(); }
         }
 
-        internal void DoMouseWheel(System.Windows.Forms.MouseEventArgs e) {
-            OnMouseWheel(e);
-        }
+        internal void DoMouseWheel(System.Windows.Forms.MouseEventArgs e) => OnMouseWheel(e);
     }
 }

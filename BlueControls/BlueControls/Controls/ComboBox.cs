@@ -124,14 +124,14 @@ namespace BlueControls.Controls {
 
         private void DropDownMenu_Cancel(object sender, object MouseOver) {
             Item.UncheckAll();
-            FloatingInputBoxListBoxStyle.Close(this);
+            FloatingForm.Close(this);
             Focus();
         }
 
         private void DropDownMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
             Item.UncheckAll();
 
-            FloatingInputBoxListBoxStyle.Close(this);
+            FloatingForm.Close(this);
 
             if (!string.IsNullOrEmpty(e.ClickedComand)) {
                 _LastClickedText = e.ClickedComand;
@@ -143,16 +143,11 @@ namespace BlueControls.Controls {
             Focus();
         }
 
-        protected virtual void OnItemClicked(BasicListItemEventArgs e) {
+        protected virtual void OnItemClicked(BasicListItemEventArgs e) => ItemClicked?.Invoke(this, e);
 
-            ItemClicked?.Invoke(this, e);
-        }
-
-        protected override enDesign GetDesign() {
-            return ParentType() == enPartentType.RibbonGroupBox || ParentType() == enPartentType.RibbonPage
+        protected override enDesign GetDesign() => ParentType() == enPartentType.RibbonGroupBox || ParentType() == enPartentType.RibbonPage
                 ? enDesign.Ribbon_ComboBox_Textbox
                 : enDesign.ComboBox_Textbox;
-        }
 
         protected override void DrawControl(Graphics gr, enStates state) {
 
@@ -198,7 +193,7 @@ namespace BlueControls.Controls {
 
             Skin.Draw_Back(gr, vType, state, DisplayRectangle, this, true);
 
-            if (!FloatingInputBoxListBoxStyle.IsShowing(this)) {
+            if (!FloatingForm.IsShowing(this)) {
                 // Nur wenn die Selectbox gerade Nicht angezeigt wird, um hin und her Konvertierungen zu vermeiden
                 var r = i.Pos;
                 var ymod = -(int)((DisplayRectangle.Height - i.SizeUntouchedForListBox().Height) / 2.0);
@@ -218,14 +213,12 @@ namespace BlueControls.Controls {
             }
         }
 
-        internal bool WasThisValueClicked() {
-            return Text == _LastClickedText;
-        }
+        internal bool WasThisValueClicked() => Text == _LastClickedText;
 
         protected override void OnEnabledChanged(System.EventArgs e) {
             base.OnEnabledChanged(e);
 
-            FloatingInputBoxListBoxStyle.Close(this);
+            FloatingForm.Close(this);
 
             btnDropDown.Enabled = Enabled;
             btnDropDown.Invalidate();
@@ -264,9 +257,7 @@ namespace BlueControls.Controls {
             _btnDropDownIsIn = false;
         }
 
-        private void OnDropDownShowing() {
-            DropDownShowing?.Invoke(this, System.EventArgs.Empty);
-        }
+        private void OnDropDownShowing() => DropDownShowing?.Invoke(this, System.EventArgs.Empty);
 
         protected override void OnGotFocus(System.EventArgs e) {
 
@@ -276,7 +267,7 @@ namespace BlueControls.Controls {
                 base.OnGotFocus(e);
             }
 
-            FloatingInputBoxListBoxStyle.Close(this);
+            FloatingForm.Close(this);
         }
 
         protected override void OnLostFocus(System.EventArgs e) {
@@ -298,15 +289,13 @@ namespace BlueControls.Controls {
             }
         }
 
-        private void btnDropDown_LostFocus(object sender, System.EventArgs e) {
-            CheckLostFocus(e);
-        }
+        private void btnDropDown_LostFocus(object sender, System.EventArgs e) => CheckLostFocus(e);
 
         private void CheckLostFocus(System.EventArgs e) {
 
             try {
                 if (btnDropDown == null) { return; }
-                if (!btnDropDown.Focused && !Focused() && !FloatingInputBoxListBoxStyle.IsShowing(this)) { base.OnLostFocus(e); }
+                if (!btnDropDown.Focused && !Focused() && !FloatingForm.IsShowing(this)) { base.OnLostFocus(e); }
             } catch (Exception) {
 
             }
@@ -316,7 +305,7 @@ namespace BlueControls.Controls {
             if (IsDisposed) { return; }
             if (_btnDropDownIsIn) { return; }
 
-            FloatingInputBoxListBoxStyle.Close(this);
+            FloatingForm.Close(this);
             Invalidate();
         }
 
@@ -325,7 +314,7 @@ namespace BlueControls.Controls {
             if (IsDisposed) { return; }
             if (_btnDropDownIsIn) { return; }
 
-            FloatingInputBoxListBoxStyle.Close(this);
+            FloatingForm.Close(this);
             Invalidate();
         }
 
@@ -354,13 +343,13 @@ namespace BlueControls.Controls {
 
         protected override void OnTextChanged(System.EventArgs e) {
             base.OnTextChanged(e);
-            FloatingInputBoxListBoxStyle.Close(this);
+            FloatingForm.Close(this);
         }
 
         private void _Item_ItemRemoved(object sender, System.EventArgs e) {
             if (IsDisposed) { return; }
             if (_btnDropDownIsIn) { return; }
-            FloatingInputBoxListBoxStyle.Close(this);
+            FloatingForm.Close(this);
             Invalidate();
         }
 

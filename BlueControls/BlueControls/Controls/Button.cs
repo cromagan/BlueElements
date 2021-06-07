@@ -134,9 +134,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(false)]
         public bool Checked {
-            get {
-                return _ButtonStyle != enButtonStyle.Button && _ButtonStyle != enButtonStyle.SliderButton && _Checked;
-            }
+            get => _ButtonStyle != enButtonStyle.Button && _ButtonStyle != enButtonStyle.SliderButton && _Checked;
             set {
 
                 if (_Checked == value) { return; }
@@ -160,9 +158,7 @@ namespace BlueControls.Controls {
 
         #region  Form-Ereignisse 
 
-        private void OnCheckedChanged() {
-            CheckedChanged?.Invoke(this, System.EventArgs.Empty);
-        }
+        private void OnCheckedChanged() => CheckedChanged?.Invoke(this, System.EventArgs.Empty);
 
         protected override void OnMouseLeave(System.EventArgs e) {
             base.OnMouseLeave(e);

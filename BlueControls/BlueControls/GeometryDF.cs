@@ -77,17 +77,13 @@ namespace BlueControls {
         /// <param name="P1"></param>
         /// <param name="P2"></param>
         /// <returns></returns>
-        public static decimal DistanzZuStrecke(this PointF P, PointM P1, PointM P2) {
-            return P.DistanzZuStrecke(P1.X, P1.Y, P2.X, P2.Y);
-        }
+        public static decimal DistanzZuStrecke(this PointF P, PointM P1, PointM P2) => P.DistanzZuStrecke(P1.X, P1.Y, P2.X, P2.Y);
 
         //public static decimal DistanzZuStrecke(this PointF P, Point P1, Point P2)
         //{
         //    return P.DistanzZuStrecke(P1.X, P1.Y, P2.X, P2.Y);
         //}
-        public static PointM ToPointM(this PointF P) {
-            return new PointM(P.X, P.Y);
-        }
+        public static PointM ToPointM(this PointF P) => new(P.X, P.Y);
 
         /// <summary>
         /// Calculate the distance between the point and the segment
@@ -122,9 +118,7 @@ namespace BlueControls {
             };
         }
 
-        public static decimal Winkel(PointM Sp, PointM EP) {
-            return Geometry.Winkel(Sp.X, Sp.Y, EP.X, EP.Y);
-        }
+        public static decimal Winkel(PointM Sp, PointM EP) => Geometry.Winkel(Sp.X, Sp.Y, EP.X, EP.Y);
         public static PointM PointOnLine(PointM Maus, decimal P_X, decimal P_Y, decimal Q_X, decimal Q_Y) {
             //http://de.wikipedia.org/wiki/Geradengleichung
             // < 0.000001 ist 0 gleich, weil ansonsten zu große ergebnisse rauskommen

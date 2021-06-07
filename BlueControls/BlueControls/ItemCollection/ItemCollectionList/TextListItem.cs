@@ -86,9 +86,7 @@ namespace BlueControls.ItemCollection {
             return itemdesign;
         }
 
-        protected override Size ComputeSizeUntouchedForListBox() {
-            return Skin.FormatedText_NeededSize(_ReadableText, _Symbol, Skin.GetBlueFont(tempDesign(Parent.ItemDesign), enStates.Standard), 16);
-        }
+        protected override Size ComputeSizeUntouchedForListBox() => Skin.FormatedText_NeededSize(_ReadableText, _Symbol, Skin.GetBlueFont(tempDesign(Parent.ItemDesign), enStates.Standard), 16);
 
         protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign design, enStates vState, bool DrawBorderAndBack, bool Translate) {
 
@@ -105,20 +103,12 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        protected override string GetCompareKey() {
-            return DataFormat.CompareKey(Internal, enDataFormat.Text);
-        }
+        protected override string GetCompareKey() => DataFormat.CompareKey(Internal, enDataFormat.Text);
 
-        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) {
-            return SizeUntouchedForListBox().Height;
-        }
+        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) => SizeUntouchedForListBox().Height;
 
-        public override void CloneToNewCollection(ItemCollectionList newParent) {
-            CloneToNewCollection(newParent, new TextListItem(_ReadableText, Internal, _Symbol, IsCaption, _Enabled, UserDefCompareKey));
-        }
+        public override void CloneToNewCollection(ItemCollectionList newParent) => CloneToNewCollection(newParent, new TextListItem(_ReadableText, Internal, _Symbol, IsCaption, _Enabled, UserDefCompareKey));
 
-        public override bool FilterMatch(string FilterText) {
-            return base.FilterMatch(FilterText) || _ReadableText.ToUpper().Contains(FilterText.ToUpper());
-        }
+        public override bool FilterMatch(string FilterText) => base.FilterMatch(FilterText) || _ReadableText.ToUpper().Contains(FilterText.ToUpper());
     }
 }

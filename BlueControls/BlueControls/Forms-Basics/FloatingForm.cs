@@ -12,6 +12,8 @@ namespace BlueControls.Forms {
 
         private readonly System.Windows.Forms.Control _ConnectedControl = null;
 
+        public FloatingForm() : this(enDesign.Form_QuickInfo) { }
+
         protected FloatingForm(enDesign design) : base(design) {
 
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
@@ -39,13 +41,10 @@ namespace BlueControls.Forms {
 
         }
 
-        protected FloatingForm(System.Windows.Forms.Control connectedControl, enDesign design) : this(design) {
+        protected FloatingForm(System.Windows.Forms.Control connectedControl, enDesign design) : this(design) =>
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
             //InitializeComponent();
-            _ConnectedControl = connectedControl;
-            //SetStyles();
-            //AllBoxes.Add(this);
-        }
+            _ConnectedControl = connectedControl;//SetStyles();//AllBoxes.Add(this);
 
         /// <summary>
         /// Floating Forms sind immer Topmost, darf aber hier nicht gesetzt werden und wird über
@@ -73,7 +72,7 @@ namespace BlueControls.Forms {
             Height = Math.Min(Height, (int)(System.Windows.Forms.Screen.AllScreens[ScreenNr].WorkingArea.Height * 0.9));
         }
 
-        public void Position_CenterScreen(System.Drawing.Point BestPosition) {
+        public void Position_CenterScreen(Point BestPosition) {
             var ScreenNr = modAllgemein.PointOnScreenNr(BestPosition);
             CheckMaxSize(ScreenNr);
 
@@ -83,7 +82,7 @@ namespace BlueControls.Forms {
             Position_SetWindowIntoScreen(ScreenNr, (int)Xpos, (int)Ypos);
         }
 
-        public void Position_LocateToPosition(System.Drawing.Point BestPosition) {
+        public void Position_LocateToPosition(Point BestPosition) {
             var ScreenNr = modAllgemein.PointOnScreenNr(BestPosition);
 
             CheckMaxSize(ScreenNr);
@@ -122,9 +121,7 @@ namespace BlueControls.Forms {
             Location = new Point(Xpos, Ypos);
         }
 
-        public new void ShowDialog() {
-            Develop.DebugPrint(enFehlerArt.Fehler, "FloatingForms können nur mit Show aufgerufen werden.");
-        }
+        public new void ShowDialog() => Develop.DebugPrint(enFehlerArt.Fehler, "FloatingForms können nur mit Show aufgerufen werden.");
 
         public new void Show() {
             try {
@@ -161,13 +158,9 @@ namespace BlueControls.Forms {
             }
         }
 
-        internal static void Close(enDesign Design) {
-            Close(null, Design);
-        }
+        internal static void Close(enDesign Design) => Close(null, Design);
 
-        internal static void Close(object ConnectedControl) {
-            Close(ConnectedControl, enDesign.Undefiniert);
-        }
+        internal static void Close(object ConnectedControl) => Close(ConnectedControl, enDesign.Undefiniert);
 
         internal static bool IsShowing(object ConnectedControl) {
             foreach (var ThisForm in AllBoxes) {

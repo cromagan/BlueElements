@@ -37,14 +37,9 @@ namespace BlueDatabase {
             Database.Disposing += Database_Disposing;
         }
 
-        private void Database_Disposing(object sender, System.EventArgs e) {
-            Dispose();
-        }
+        private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
 
-        public FilterCollection(Database database, string toParse) : this(database) {
-
-            Parse(toParse);
-        }
+        public FilterCollection(Database database, string toParse) : this(database) => Parse(toParse);
 
         #endregion
 
@@ -84,43 +79,26 @@ namespace BlueDatabase {
             Remove(tmp);
         }
 
-        public void Remove_RowFilter() {
-            Remove((ColumnItem)null);
-        }
+        public void Remove_RowFilter() => Remove((ColumnItem)null);
 
-        public void Add(enFilterType filterType, string filterBy) {
-            AddIfNotExists(new FilterItem(Database, filterType, filterBy));
-        }
+        public void Add(enFilterType filterType, string filterBy) => AddIfNotExists(new FilterItem(Database, filterType, filterBy));
 
-        public void Add(enFilterType filterType, List<string> filterBy) {
-            AddIfNotExists(new FilterItem(Database, filterType, filterBy));
-        }
+        public void Add(enFilterType filterType, List<string> filterBy) => AddIfNotExists(new FilterItem(Database, filterType, filterBy));
 
-        public void Add(string columnName, enFilterType filterType, string filterBy) {
-            Add(Database.Column[columnName], filterType, filterBy);
-        }
+        public void Add(string columnName, enFilterType filterType, string filterBy) => Add(Database.Column[columnName], filterType, filterBy);
 
-        public void Add(string columnName, enFilterType filterType, List<string> filterBy) {
+        public void Add(string columnName, enFilterType filterType, List<string> filterBy) => Add(Database.Column[columnName], filterType, filterBy);
 
-            Add(Database.Column[columnName], filterType, filterBy);
-        }
+        public void Add(ColumnItem column, enFilterType filterType, List<string> filterBy) => AddIfNotExists(new FilterItem(column, filterType, filterBy));
 
-        public void Add(ColumnItem column, enFilterType filterType, List<string> filterBy) {
-            AddIfNotExists(new FilterItem(column, filterType, filterBy));
-        }
-
-        public void Add(ColumnItem column, enFilterType filterType, string filterBy) {
-            AddIfNotExists(new FilterItem(column, filterType, filterBy));
-        }
+        public void Add(ColumnItem column, enFilterType filterType, string filterBy) => AddIfNotExists(new FilterItem(column, filterType, filterBy));
 
         private void AddIfNotExists(FilterItem filterItem) {
             if (Exists(filterItem)) { return; }
             Add(filterItem);
         }
 
-        public bool IsRowFilterActiv() {
-            return this[null] != null;
-        }
+        public bool IsRowFilterActiv() => this[null] != null;
 
         public string RowFilterText {
             get {
@@ -141,10 +119,7 @@ namespace BlueDatabase {
             }
         }
 
-        public bool MayHasRowFilter(ColumnItem Column) {
-
-            return !Column.IgnoreAtRowFilter && IsRowFilterActiv();
-        }
+        public bool MayHasRowFilter(ColumnItem Column) => !Column.IgnoreAtRowFilter && IsRowFilterActiv();
 
         public void Parse(string ToParse) {
 
@@ -180,9 +155,7 @@ namespace BlueDatabase {
             return w.TrimEnd(", ") + "}";
         }
 
-        public void RemoveOtherAndAddIfNotExists(ColumnItem column, enFilterType filterType, string filterBy, string herkunft) {
-            RemoveOtherAndAddIfNotExists(new FilterItem(column, filterType, filterBy, herkunft));
-        }
+        public void RemoveOtherAndAddIfNotExists(ColumnItem column, enFilterType filterType, string filterBy, string herkunft) => RemoveOtherAndAddIfNotExists(new FilterItem(column, filterType, filterBy, herkunft));
 
         public void RemoveOtherAndAddIfNotExists(string columName, enFilterType filterType, string filterBy, string herkunft) {
 

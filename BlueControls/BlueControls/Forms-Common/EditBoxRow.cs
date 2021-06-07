@@ -1,12 +1,10 @@
 ﻿using BlueDatabase;
 
 namespace BlueControls.Forms {
-    public partial class EditBoxRow : Forms.DialogWithOkAndCancel {
+    public partial class EditBoxRow : DialogWithOkAndCancel {
 
         #region Konstruktor
-        private EditBoxRow() : base() {
-            InitializeComponent();
-        }
+        private EditBoxRow() : base() => InitializeComponent();
 
         private EditBoxRow(string TXT, RowItem row) : this() {
             formToEdit.Database = row.Database;

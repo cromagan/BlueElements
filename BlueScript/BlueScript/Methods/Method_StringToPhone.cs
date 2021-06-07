@@ -25,7 +25,7 @@ namespace BlueScript {
 
         public override string Syntax => "StringToPhone(String)";
         public override string Description => "Versucht, den String als internationale Telefonnummer zurückzugeben. Schlägt es fehl, wird nicht zurückgegeben.";
-        public override List<string> Comand(Script s) { return new() { "stringtophone" }; }
+        public override List<string> Comand(Script s) => new() { "stringtophone" };
         public override string StartSequence => "(";
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
@@ -48,7 +48,7 @@ namespace BlueScript {
 
             //return new strDoItFeedback(attvar.Attributes[0].ValueForReplace, string.Empty);
 
-            return new strDoItFeedback(attvar.Attributes[0].ValueForReplace, "Nicht fertig implementiert");
+            return new strDoItFeedback("Nicht fertig implementiert");
 
         }
     }

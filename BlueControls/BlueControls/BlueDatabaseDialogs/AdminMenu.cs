@@ -32,7 +32,7 @@ using static BlueBasics.FileOperations;
 
 namespace BlueControls.BlueDatabaseDialogs {
 
-    public sealed partial class AdminMenu : BlueControls.Forms.Form {
+    public sealed partial class AdminMenu : Form {
 
         private readonly Table _TableView;
 
@@ -69,9 +69,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         }
 
-        private void _TableView_CursorPosChanged(object sender, CellEventArgs e) {
-            Check_OrderButtons();
-        }
+        private void _TableView_CursorPosChanged(object sender, CellEventArgs e) => Check_OrderButtons();
 
         private void _TableView_ViewChanged(object sender, System.EventArgs e) {
             UpdateViewControls();
@@ -87,9 +85,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             Check_OrderButtons();
         }
 
-        private void UpdateViewControls() {
-            _TableView.WriteColumnArrangementsInto(cbxInternalColumnArrangementSelector);
-        }
+        private void UpdateViewControls() => _TableView.WriteColumnArrangementsInto(cbxInternalColumnArrangementSelector);
 
         private void btnNeueSpalteErstellen_Click(object sender, System.EventArgs e) {
 
@@ -148,7 +144,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             var MitVorlage = false;
 
             if (_TableView.Arrangement > 0 && _TableView.CurrentArrangement != null) {
-                MitVorlage = Convert.ToBoolean(Forms.MessageBox.Show("<b>Neue Spaltenanordnung erstellen:</b><br>Wollen sie die aktuelle Ansicht kopieren?", enImageCode.Frage, "Ja", "Nein") == 0);
+                MitVorlage = Convert.ToBoolean(MessageBox.Show("<b>Neue Spaltenanordnung erstellen:</b><br>Wollen sie die aktuelle Ansicht kopieren?", enImageCode.Frage, "Ja", "Nein") == 0);
             }
 
             if (_TableView.Database.ColumnArrangements.Count < 1) {
@@ -212,9 +208,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             _TableView.CurrentArrangement.ShowAllColumns();
         }
 
-        private void btnSystemspaltenAusblenden_Click(object sender, System.EventArgs e) {
-            _TableView.CurrentArrangement.HideSystemColumns();
-        }
+        private void btnSystemspaltenAusblenden_Click(object sender, System.EventArgs e) => _TableView.CurrentArrangement.HideSystemColumns();
 
         private void btnBerechtigungsgruppen_Click(object sender, System.EventArgs e) {
             var aa = new ItemCollectionList();
@@ -302,9 +296,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             _TableView.CurrentArrangement.Remove(ViewItem);
         }
 
-        private void btnSpalteBearbeiten_Click(object sender, System.EventArgs e) {
-            tabAdministration.OpenColumnEditor(_TableView.CursorPosColumn(), _TableView.CursorPosRow(), _TableView);
-        }
+        private void btnSpalteBearbeiten_Click(object sender, System.EventArgs e) => tabAdministration.OpenColumnEditor(_TableView.CursorPosColumn(), _TableView.CursorPosRow(), _TableView);
 
         private void btnSpalteNachRechts_Click_1(object sender, System.EventArgs e) {
             if (_TableView.Arrangement > 0) {

@@ -26,7 +26,7 @@ namespace BlueScript {
 
         public override string Syntax => "Remove(ListVariable, CaseSensitive, Value1, Value2, ...);";
         public override string Description => "Entfernt aus der Liste die angegebenen Werte.";
-        public override List<string> Comand(Script s) { return new() { "remove" }; }
+        public override List<string> Comand(Script s) => new() { "remove" };
         public override string StartSequence => "(";
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;
@@ -41,10 +41,10 @@ namespace BlueScript {
             var tmpList = attvar.Attributes[0].ValueListString;
 
             for (var z = 2; z < attvar.Attributes.Count; z++) {
-                if (attvar.Attributes[z].Type == Skript.Enums.enVariableDataType.String) {
+                if (attvar.Attributes[z].Type == enVariableDataType.String) {
                     tmpList.RemoveString(attvar.Attributes[z].ValueString, attvar.Attributes[1].ValueBool);
                 }
-                if (attvar.Attributes[z].Type == Skript.Enums.enVariableDataType.List) {
+                if (attvar.Attributes[z].Type == enVariableDataType.List) {
                     tmpList.RemoveString(attvar.Attributes[z].ValueListString, attvar.Attributes[1].ValueBool);
                 }
             }

@@ -25,7 +25,7 @@ namespace BlueScript {
 
         public override string Syntax => "Exception(\"Unbehandelter Programmcode!\");";
         public override string Description => "Unterbricht das Skript mit einer Fehlermeldung.";
-        public override List<string> Comand(Script s) { return new() { "Exception" }; }
+        public override List<string> Comand(Script s) => new() { "Exception" };
         public override string StartSequence => "(";
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;
@@ -39,9 +39,8 @@ namespace BlueScript {
 
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
 
-            return attvar.Attributes == null || attvar.Attributes.Count != 1
-                ? new strDoItFeedback("Die Ausführung wurde absichtlich abgebrochen.")
-                : new strDoItFeedback(string.Empty, attvar.Attributes[0].ValueString);
+            return attvar.Attributes == null || attvar.Attributes.Count != 1 ? new strDoItFeedback("Die Ausführung wurde absichtlich abgebrochen.")
+                                                                             : new strDoItFeedback(attvar.Attributes[0].ValueString);
         }
     }
 }

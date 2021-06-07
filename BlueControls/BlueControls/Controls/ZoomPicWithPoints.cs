@@ -18,9 +18,7 @@ namespace BlueControls.Controls {
     public partial class ZoomPicWithPoints : ZoomPic {
 
         #region Constructor
-        public ZoomPicWithPoints() : base() {
-            InitializeComponent();
-        }
+        public ZoomPicWithPoints() : base() => InitializeComponent();
         #endregion
 
         private readonly List<PointM> points = new();
@@ -165,13 +163,9 @@ namespace BlueControls.Controls {
             Invalidate();
         }
 
-        public void PointSet(string name, int x, int y) {
-            PointSet(name, x, (decimal)y);
-        }
+        public void PointSet(string name, int x, int y) => PointSet(name, x, (decimal)y);
 
-        public void PointSet(string name, double x, double y) {
-            PointSet(name, (decimal)x, (decimal)y);
-        }
+        public void PointSet(string name, double x, double y) => PointSet(name, (decimal)x, (decimal)y);
 
         public void PointSet(string name, decimal x, decimal y) {
 
@@ -212,12 +206,7 @@ namespace BlueControls.Controls {
             Invalidate();
         }
 
-        public static string FilenameTXT(string PathOfPicture) {
-
-            return PathOfPicture.FilePath() + PathOfPicture.FileNameWithoutSuffix() + ".txt";
-
-            //            return PathOfPicture.TrimEnd(".PNG").TrimEnd(".JPG").TrimEnd(".JPG") + ".txt";
-        }
+        public static string FilenameTXT(string PathOfPicture) => PathOfPicture.FilePath() + PathOfPicture.FileNameWithoutSuffix() + ".txt";//            return PathOfPicture.TrimEnd(".PNG").TrimEnd(".JPG").TrimEnd(".JPG") + ".txt";
 
         public static Tuple<Bitmap, List<string>> LoadFromDisk(string PathOfPicture) {
 
@@ -360,9 +349,7 @@ namespace BlueControls.Controls {
 
         }
 
-        protected virtual void OnPointSetByUser() {
-            PointSetByUser?.Invoke(this, System.EventArgs.Empty);
-        }
+        protected virtual void OnPointSetByUser() => PointSetByUser?.Invoke(this, System.EventArgs.Empty);
 
         public void SaveData() {
 

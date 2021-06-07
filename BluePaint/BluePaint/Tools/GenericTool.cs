@@ -78,9 +78,7 @@ namespace BluePaint {
         /// Wenn keine Benutzung möglich ist, wird string.empty zurückgegebenm
         /// </summary>
         /// <returns></returns>
-        public virtual string MacroKennung() {
-            return string.Empty;
-        }
+        public virtual string MacroKennung() => string.Empty;
 
         /// <summary>
         /// Z.B: bei Undo
@@ -90,21 +88,13 @@ namespace BluePaint {
 
         }
 
-        protected virtual void OnHideMainWindow() {
-            HideMainWindow?.Invoke(this, System.EventArgs.Empty);
-        }
+        protected virtual void OnHideMainWindow() => HideMainWindow?.Invoke(this, System.EventArgs.Empty);
 
-        protected virtual void OnZoomFit() {
-            ZoomFit?.Invoke(this, System.EventArgs.Empty);
-        }
+        protected virtual void OnZoomFit() => ZoomFit?.Invoke(this, System.EventArgs.Empty);
 
-        protected virtual void OnShowMainWindow() {
-            ShowMainWindow?.Invoke(this, System.EventArgs.Empty);
-        }
+        protected virtual void OnShowMainWindow() => ShowMainWindow?.Invoke(this, System.EventArgs.Empty);
 
-        public virtual void ExcuteCommand(string command) {
-            BlueBasics.Develop.DebugPrint_RoutineMussUeberschriebenWerden();
-        }
+        public virtual void ExcuteCommand(string command) => BlueBasics.Develop.DebugPrint_RoutineMussUeberschriebenWerden();
 
         protected virtual Bitmap OnNeedCurrentPic() {
             var e = new BitmapEventArgs(null);
@@ -117,20 +107,12 @@ namespace BluePaint {
         /// Wird benutzt, wenn ein neues Bild erstellt wurde und dieses in den Speicher soll.
         /// </summary>
         /// <param name="BMP"></param>
-        protected virtual void OnOverridePic(Bitmap BMP) {
-            OverridePic?.Invoke(this, new BitmapEventArgs(BMP));
-        }
+        protected virtual void OnOverridePic(Bitmap BMP) => OverridePic?.Invoke(this, new BitmapEventArgs(BMP));
 
-        protected virtual void OnForceUndoSaving() {
-            ForceUndoSaving?.Invoke(this, System.EventArgs.Empty);
-        }
+        protected virtual void OnForceUndoSaving() => ForceUndoSaving?.Invoke(this, System.EventArgs.Empty);
 
-        protected virtual void OnDoInvalidate() {
-            DoInvalidate?.Invoke(this, System.EventArgs.Empty);
-        }
+        protected virtual void OnDoInvalidate() => DoInvalidate?.Invoke(this, System.EventArgs.Empty);
 
-        protected virtual void OnCommandForMacro(string command) {
-            CommandForMacro?.Invoke(this, new CommandForMacroArgs(command));
-        }
+        protected virtual void OnCommandForMacro(string command) => CommandForMacro?.Invoke(this, new CommandForMacroArgs(command));
     }
 }

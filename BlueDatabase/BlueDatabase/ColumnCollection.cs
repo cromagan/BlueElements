@@ -52,9 +52,7 @@ namespace BlueDatabase {
             Initialize();
         }
 
-        private void Database_Disposing(object sender, System.EventArgs e) {
-            Dispose();
-        }
+        private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
 
         #endregion
 
@@ -179,7 +177,7 @@ namespace BlueDatabase {
             var nr1 = IndexOf(Column1);
             var nr2 = IndexOf(Column2);
 
-            base.Swap(nr1, nr2);
+            Swap(nr1, nr2);
 
             Column1.Invalidate_ColumAndContent();
             Column2.Invalidate_ColumAndContent();
@@ -308,19 +306,19 @@ namespace BlueDatabase {
                 if (ColN + 2 > Count) { break; }
 
                 if (this[ColN] == null) {
-                    base.Swap(ColN, ColN + 1);
+                    Swap(ColN, ColN + 1);
                     ColN = -1;
                 } else if (this[ColN + 1] == null) {
                     // Dummy, um nachfoldgnd nicht abfragen zu müssen
 
                 } else if (!string.IsNullOrEmpty(this[ColN].Identifier) && string.IsNullOrEmpty(this[ColN + 1].Identifier)) {
-                    base.Swap(ColN, ColN + 1);
+                    Swap(ColN, ColN + 1);
                     ColN = -1;
 
                 } else if (!string.IsNullOrEmpty(this[ColN].Identifier) && !string.IsNullOrEmpty(this[ColN + 1].Identifier)) {
 
                     if (w.IndexOf(this[ColN].Identifier) > w.IndexOf(this[ColN + 1].Identifier)) {
-                        base.Swap(ColN, ColN + 1);
+                        Swap(ColN, ColN + 1);
                         ColN = -1;
                     }
                 }
@@ -336,13 +334,9 @@ namespace BlueDatabase {
             } while (true);
         }
 
-        internal static string ParsableColumnKey(ColumnItem Column) {
-            return Column == null ? "ColumnKey=?" : ParsableColumnKey(Column.Key);
-        }
+        internal static string ParsableColumnKey(ColumnItem Column) => Column == null ? "ColumnKey=?" : ParsableColumnKey(Column.Key);
 
-        internal static string ParsableColumnKey(int Key) {
-            return "ColumnKey=" + Key;
-        }
+        internal static string ParsableColumnKey(int Key) => "ColumnKey=" + Key;
 
         public static string ChangeKeysInString(string OriginalString, int OldKey, int NewKey) {
 
@@ -569,7 +563,7 @@ namespace BlueDatabase {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Parent-Datenbanken unterschiedlich!");
             }
 
-            if (base.Contains(column)) {
+            if (Contains(column)) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Spalte bereits vorhanden!");
             }
             base.Add(column);
@@ -586,9 +580,7 @@ namespace BlueDatabase {
             return SearchByKey(colKey);
         }
 
-        public ColumnItem Add() {
-            return Add(Database.Column.NextColumnKey());
-        }
+        public ColumnItem Add() => Add(Database.Column.NextColumnKey());
 
         public ColumnItem Add(string internalName, string caption, enDataFormat format) {
             var c = Add();

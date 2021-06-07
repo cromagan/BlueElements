@@ -25,7 +25,7 @@ namespace BlueScript {
 
         public override string Description => "Gibt TRUE zurück, wenn die Variable existiert. Dieser Befehl sollte niemals mit einem Vergleichsoperator verwendet werden.";
         public override string Syntax => "Exists(Variable)";
-        public override List<string> Comand(Script s) { return new() { "exists" }; }
+        public override List<string> Comand(Script s) => new() { "exists" };
         public override string StartSequence => "(";
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;

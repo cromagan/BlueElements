@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace BlueControls.BlueDatabaseDialogs {
 
-    internal sealed partial class SearchAndReplace : BlueControls.Forms.Form {
+    internal sealed partial class SearchAndReplace : Form {
 
         private readonly Table _BlueTable;
         private bool IsWorking;
@@ -140,13 +140,9 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         }
 
-        private void Alt_TextChange(object sender, System.EventArgs e) {
-            Checkbuttons();
-        }
+        private void Alt_TextChange(object sender, System.EventArgs e) => Checkbuttons();
 
-        private void Something_CheckedChanged(object sender, System.EventArgs e) {
-            Checkbuttons();
-        }
+        private void Something_CheckedChanged(object sender, System.EventArgs e) => Checkbuttons();
 
         private void Checkbuttons() {
             var CanDo = true;

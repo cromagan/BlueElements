@@ -106,13 +106,9 @@ namespace BlueControls {
             return Erg == llo ? LO : Erg == lro ? rO : Erg == llu ? lu : Erg == lru ? ru : null;
         }
 
-        public bool Contains(PointM P) {
-            return Contains(P.X, P.Y);
-        }
+        public bool Contains(PointM P) => Contains(P.X, P.Y);
 
-        public bool Contains(decimal PX, decimal PY) {
-            return PX >= X && PY >= Y && PX <= X + Width && PY <= Y + Height;
-        }
+        public bool Contains(decimal PX, decimal PY) => PX >= X && PY >= Y && PX <= X + Width && PY <= Y + Height;
 
         /// <summary>
         /// 
@@ -166,16 +162,10 @@ namespace BlueControls {
             }
         }
 
-        public object Clone() {
-            return new RectangleM(X, Y, Width, Height);
-        }
+        public object Clone() => new RectangleM(X, Y, Width, Height);
 
-        public static explicit operator RectangleF(RectangleM r) {
-            return new((float)r.X, (float)r.Y, (float)r.Width, (float)r.Height);
-        }
+        public static explicit operator RectangleF(RectangleM r) => new((float)r.X, (float)r.Y, (float)r.Width, (float)r.Height);
 
-        public static explicit operator Rectangle(RectangleM r) {
-            return new((int)r.X, (int)r.Y, (int)r.Width, (int)r.Height);
-        }
+        public static explicit operator Rectangle(RectangleM r) => new((int)r.X, (int)r.Y, (int)r.Width, (int)r.Height);
     }
 }

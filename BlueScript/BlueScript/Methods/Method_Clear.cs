@@ -25,7 +25,7 @@ namespace BlueScript {
 
         public override string Syntax => "Clear(VariableListe);";
         public override string Description => "Entfernt alle Einträge einer Liste";
-        public override List<string> Comand(Script s) { return new() { "clear" }; }
+        public override List<string> Comand(Script s) => new() { "clear" };
         public override string StartSequence => "(";
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;

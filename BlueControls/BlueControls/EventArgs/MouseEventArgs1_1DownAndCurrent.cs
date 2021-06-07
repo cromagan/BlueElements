@@ -30,8 +30,6 @@ namespace BlueControls.EventArgs {
         public MouseEventArgs1_1 MouseDown { get; }
         public MouseEventArgs1_1 Current { get; }
 
-        public Rectangle TrimmedRectangle() {
-            return new Rectangle(Math.Min(MouseDown.TrimmedX, Current.TrimmedX), Math.Min(MouseDown.TrimmedY, Current.TrimmedY), Math.Abs(MouseDown.TrimmedX - Current.TrimmedX) + 1, Math.Abs(MouseDown.TrimmedY - Current.TrimmedY) + 1);
-        }
+        public Rectangle TrimmedRectangle() => new(Math.Min(MouseDown.TrimmedX, Current.TrimmedX), Math.Min(MouseDown.TrimmedY, Current.TrimmedY), Math.Abs(MouseDown.TrimmedX - Current.TrimmedX) + 1, Math.Abs(MouseDown.TrimmedY - Current.TrimmedY) + 1);
     }
 }

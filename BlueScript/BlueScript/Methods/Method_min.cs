@@ -27,7 +27,7 @@ namespace BlueScript {
         public override string Syntax => "Min(Value1, Value2, ...)";
         public override string Description => "Gibt den den angegeben Werten den, mit dem niedrigsten Wert zurück.";
 
-        public override List<string> Comand(Script s) { return new() { "min" }; }
+        public override List<string> Comand(Script s) => new() { "min" };
         public override string StartSequence => "(";
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
@@ -45,7 +45,7 @@ namespace BlueScript {
                 val = Math.Min(thisval.ValueDouble, val);
             }
 
-            return new strDoItFeedback(val.ToString(), string.Empty);
+            return new strDoItFeedback(val.ToString(), enVariableDataType.Numeral);
         }
     }
 }

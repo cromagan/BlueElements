@@ -107,9 +107,7 @@ namespace BlueControls.ItemCollection {
             PadInternal.Item.SheetStyleScale = Parent.SheetStyleScale;
         }
 
-        protected override string ClassId() {
-            return "CHILDPAD";
-        }
+        protected override string ClassId() => "CHILDPAD";
 
         protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
             try {

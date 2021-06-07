@@ -64,9 +64,7 @@ namespace BlueDatabase {
 
         #endregion
 
-        internal void InvalidateSize() {
-            Size = Size.Empty;
-        }
+        internal void InvalidateSize() => Size = Size.Empty;
 
         /// <summary>
         /// Jede Zeile für sich richtig formatiert.
@@ -102,9 +100,9 @@ namespace BlueDatabase {
         }
 
         public static Tuple<string, enAlignment, QuickImage> GetDrawingData(ColumnItem column, string originalText, enShortenStyle style, enBildTextVerhalten bildTextverhalten) {
-            var tmpText = CellItem.ValueReadable(column, originalText, style, bildTextverhalten, true);
-            var tmpAlign = CellItem.StandardAlignment(column, bildTextverhalten);
-            var tmpImageCode = CellItem.StandardImage(column, originalText, tmpText, style, bildTextverhalten);
+            var tmpText = ValueReadable(column, originalText, style, bildTextverhalten, true);
+            var tmpAlign = StandardAlignment(column, bildTextverhalten);
+            var tmpImageCode = StandardImage(column, originalText, tmpText, style, bildTextverhalten);
 
             if (bildTextverhalten == enBildTextVerhalten.Bild_oder_Text) {
                 if (tmpImageCode != null) { tmpText = string.Empty; }
@@ -216,19 +214,16 @@ namespace BlueDatabase {
             return txt;
         }
 
-        public static QuickImage StandardErrorImage(int gr, enBildTextVerhalten bildTextverhalten) {
-
-            return bildTextverhalten switch {
-                enBildTextVerhalten.Fehlendes_Bild_zeige_Fragezeichen => QuickImage.Get("Fragezeichen|" + gr + "|||||200|||80"),
-                enBildTextVerhalten.Fehlendes_Bild_zeige_Kreis => QuickImage.Get("Kreis2|" + gr),
-                enBildTextVerhalten.Fehlendes_Bild_zeige_Kreuz => QuickImage.Get("Kreuz|" + gr),
-                enBildTextVerhalten.Fehlendes_Bild_zeige_Häkchen => QuickImage.Get("Häkchen|" + gr),
-                enBildTextVerhalten.Fehlendes_Bild_zeige_Infozeichen => QuickImage.Get("Information|" + gr),
-                enBildTextVerhalten.Fehlendes_Bild_zeige_Warnung => QuickImage.Get("Warnung|" + gr),
-                enBildTextVerhalten.Fehlendes_Bild_zeige_Kritischzeichen => QuickImage.Get("Kritisch|" + gr),
-                _ => null,
-            };
-        }
+        public static QuickImage StandardErrorImage(int gr, enBildTextVerhalten bildTextverhalten) => bildTextverhalten switch {
+            enBildTextVerhalten.Fehlendes_Bild_zeige_Fragezeichen => QuickImage.Get("Fragezeichen|" + gr + "|||||200|||80"),
+            enBildTextVerhalten.Fehlendes_Bild_zeige_Kreis => QuickImage.Get("Kreis2|" + gr),
+            enBildTextVerhalten.Fehlendes_Bild_zeige_Kreuz => QuickImage.Get("Kreuz|" + gr),
+            enBildTextVerhalten.Fehlendes_Bild_zeige_Häkchen => QuickImage.Get("Häkchen|" + gr),
+            enBildTextVerhalten.Fehlendes_Bild_zeige_Infozeichen => QuickImage.Get("Information|" + gr),
+            enBildTextVerhalten.Fehlendes_Bild_zeige_Warnung => QuickImage.Get("Warnung|" + gr),
+            enBildTextVerhalten.Fehlendes_Bild_zeige_Kritischzeichen => QuickImage.Get("Kritisch|" + gr),
+            _ => null,
+        };
 
         private static QuickImage StandardImage(ColumnItem column, string originalText, string replacedText, enShortenStyle style, enBildTextVerhalten bildTextverhalten) {
 

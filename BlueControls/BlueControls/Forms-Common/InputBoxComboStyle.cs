@@ -21,14 +21,12 @@ using BlueControls.ItemCollection;
 using System.Collections.Generic;
 
 namespace BlueControls.Forms {
-    public partial class InputBoxComboStyle : Forms.DialogWithOkAndCancel {
+    public partial class InputBoxComboStyle : DialogWithOkAndCancel {
         private string GiveBack = string.Empty;
 
         #region Konstruktor
 
-        private InputBoxComboStyle() : base() {
-            InitializeComponent();
-        }
+        private InputBoxComboStyle() : base() => InitializeComponent();
 
         private InputBoxComboStyle(string TXT, string VorschlagsText, ItemCollectionList SuggestOriginal, bool TexteingabeErlaubt) : this() {
             cbxText.Text = VorschlagsText;
@@ -47,9 +45,7 @@ namespace BlueControls.Forms {
 
         #endregion
 
-        public static string Show(string TXT, ItemCollectionList Suggest, bool TexteingabeErlaubt) {
-            return Show(TXT, string.Empty, Suggest, TexteingabeErlaubt);
-        }
+        public static string Show(string TXT, ItemCollectionList Suggest, bool TexteingabeErlaubt) => Show(TXT, string.Empty, Suggest, TexteingabeErlaubt);
 
         /// <summary>
         /// 
@@ -73,20 +69,12 @@ namespace BlueControls.Forms {
             return Show(TXT, string.Empty, cSuggest, TexteingabeErlaubt);
         }
 
-        private void cbxText_ESC(object sender, System.EventArgs e) {
-            Cancel();
-        }
+        private void cbxText_ESC(object sender, System.EventArgs e) => Cancel();
 
-        private void cbxText_Enter(object sender, System.EventArgs e) {
-            Ok();
-        }
+        private void cbxText_Enter(object sender, System.EventArgs e) => Ok();
 
-        private void InputComboBox_Shown(object sender, System.EventArgs e) {
-            cbxText.Focus();
-        }
+        private void InputComboBox_Shown(object sender, System.EventArgs e) => cbxText.Focus();
 
-        protected override void SetValue(bool canceled) {
-            GiveBack = canceled ? string.Empty : cbxText.Text;
-        }
+        protected override void SetValue(bool canceled) => GiveBack = canceled ? string.Empty : cbxText.Text;
     }
 }

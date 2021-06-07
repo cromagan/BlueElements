@@ -86,13 +86,9 @@ namespace BlueControls.ItemCollection {
             _UserDefCompareKey = string.Empty;
         }
 
-        public virtual bool IsClickable() {
-            return !IsCaption;
-        }
+        public virtual bool IsClickable() => !IsCaption;
 
-        public bool Contains(int x, int y) {
-            return Pos.Contains(x, y);
-        }
+        public bool Contains(int x, int y) => Pos.Contains(x, y);
 
         public void SetCoordinates(Rectangle r) {
             Pos = r;
@@ -169,14 +165,9 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public virtual void CloneToNewCollection(ItemCollectionList newParent) {
-            Develop.DebugPrint_RoutineMussUeberschriebenWerden();
-            //return null;
-        }
+        public virtual void CloneToNewCollection(ItemCollectionList newParent) => Develop.DebugPrint_RoutineMussUeberschriebenWerden();//return null;
 
-        internal void SetParent(ItemCollectionList list) {
-            Parent = list;
-        }
+        internal void SetParent(ItemCollectionList list) => Parent = list;
 
         public void CloneToNewCollection(ItemCollectionList newParent, BasicListItem newItem) {
             if (newItem.Internal != Internal) {
@@ -193,8 +184,6 @@ namespace BlueControls.ItemCollection {
             //return newItem;
         }
 
-        public virtual bool FilterMatch(string FilterText) {
-            return Internal.ToUpper().Contains(FilterText.ToUpper());
-        }
+        public virtual bool FilterMatch(string FilterText) => Internal.ToUpper().Contains(FilterText.ToUpper());
     }
 }

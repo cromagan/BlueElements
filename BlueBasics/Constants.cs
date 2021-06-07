@@ -37,6 +37,8 @@ namespace BlueBasics {
         // public const char beLf = (char)10;
         public const char beChrW1 = (char)1;
 
+        public static readonly string GänsefüßchenReplace = ((char)9000).ToString();
+
         public static readonly string Char_NotFromClip = (char)3 + ((char)22).ToString() + (char)24 + "\n";
 
         /// <summary>

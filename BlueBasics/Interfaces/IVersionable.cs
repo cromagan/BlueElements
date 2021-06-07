@@ -25,13 +25,9 @@ namespace BlueBasics.Interfaces {
     }
 
     public static class IVersionableExtensions {
-        public static bool NeedUpdate(this IVersionable i) {
-            return i.Version != i.SollVersion;
-        }
+        public static bool NeedUpdate(this IVersionable i) => i.Version != i.SollVersion;
 
-        public static void VersionIsNowCorrect(this IVersionable i) {
-            i.Version = i.SollVersion;
-        }
+        public static void VersionIsNowCorrect(this IVersionable i) => i.Version = i.SollVersion;
     }
 }
 

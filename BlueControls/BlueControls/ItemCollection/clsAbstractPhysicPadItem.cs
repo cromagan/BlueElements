@@ -93,9 +93,7 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public void Move(PointM v) {
-            Move(v.X, v.Y);
-        }
+        public void Move(PointM v) => Move(v.X, v.Y);
 
         #region Polygon Union
 
@@ -159,8 +157,8 @@ namespace BlueControls.ItemCollection {
                     var point1 = polygons[other_pgon][index1];
                     var point2 = polygons[other_pgon][index2];
                     FindIntersection(cur_point, next_point, point1, point2,
-                        out var lines_intersect, out var segments_intersect,
-                        out var intersection, out var close_p1, out var close_p2, out var t1, out var t2);
+                        out _, out var segments_intersect,
+                        out var intersection, out _, out _, out var t1, out _);
 
                     if (segments_intersect && // The segments intersect
                         (t1 > 0.001) &&         // Not at the previous intersection
@@ -255,9 +253,7 @@ namespace BlueControls.ItemCollection {
             close_p2 = new PointF(p3.X + (dx34 * t2), p3.Y + (dy34 * t2));
         }
         // Return true if the polygon is oriented clockwise.
-        public bool PolygonIsOrientedClockwise(List<PointF> points) {
-            return SignedPolygonArea(points) < 0;
-        }
+        public bool PolygonIsOrientedClockwise(List<PointF> points) => SignedPolygonArea(points) < 0;
 
         private float SignedPolygonArea(List<PointF> points) {
             // Add the first point to the end.
@@ -282,9 +278,7 @@ namespace BlueControls.ItemCollection {
         #region Collission Calculation
         // https://www.codeproject.com/Articles/15573/2D-Polygon-Collision-Detection
 
-        public strPolygonCollisionResult ColidesWith(clsAbstractPhysicPadItem polygonB, PointM velocity) {
-            return clsPhysicPadItem.PolygonCollision(this, polygonB, velocity);
-        }
+        public strPolygonCollisionResult ColidesWith(clsAbstractPhysicPadItem polygonB, PointM velocity) => PolygonCollision(this, polygonB, velocity);
 
         // Check if polygon A is going to collide with polygon B for the given velocity
         public static strPolygonCollisionResult PolygonCollision(clsAbstractPhysicPadItem polygonA, clsAbstractPhysicPadItem polygonB, PointM velocity) {
@@ -390,9 +384,7 @@ namespace BlueControls.ItemCollection {
 
         // Calculate the distance between [minA, maxA] and [minB, maxB]
         // The distance will be negative if the intervals overlap
-        public static decimal IntervalDistance(decimal minA, decimal maxA, decimal minB, decimal maxB) {
-            return minA < minB ? minB - maxA : minA - maxB;
-        }
+        public static decimal IntervalDistance(decimal minA, decimal maxA, decimal minB, decimal maxB) => minA < minB ? minB - maxA : minA - maxB;
 
         // Calculate the projection of a polygon on an axis and returns it as a [min, max] interval
         public static void ProjectPolygon(PointM axis, clsAbstractPhysicPadItem polygon, ref decimal min, ref decimal max) {
@@ -478,12 +470,11 @@ namespace BlueControls.ItemCollection {
         }
 
         // Return the polygon's area in "square units."
-        public decimal PolygonArea() {
+        public decimal PolygonArea() =>
             // Return the absolute value of the signed area.
             // The signed area is negative if the polyogn is
             // oriented clockwise.
-            return Math.Abs(SignedPolygonArea());
-        }
+            Math.Abs(SignedPolygonArea());
 
         #endregion
 

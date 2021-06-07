@@ -168,11 +168,11 @@ namespace BlueScript {
                 var thisV = vars.Get(witch);
                 if (thisV == null) { return new strGetEndFeedback("Variablen-Fehler " + witch); }
 
-                if (thisV.Type == Skript.Enums.enVariableDataType.NotDefinedYet) {
+                if (thisV.Type == enVariableDataType.NotDefinedYet) {
                     return new strGetEndFeedback("Variable " + witch + " ist keinem Typ zugeordnet");
                 }
 
-                txt = txt.Substring(0, pos) + thisV.ValueForReplace + txt.Substring(pos + witch.Length);
+                txt = txt.Substring(0, pos) + Variable.ValueForReplace(thisV.ValueString, thisV.Type) + txt.Substring(pos + witch.Length);
                 posc = pos;
 
             } while (true);

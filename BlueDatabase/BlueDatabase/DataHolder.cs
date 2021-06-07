@@ -84,9 +84,7 @@ namespace BlueDatabase {
             ID = id;
         }
 
-        private void InternalDatabase_Disposing(object sender, System.EventArgs e) {
-            Dispose();
-        }
+        private void InternalDatabase_Disposing(object sender, System.EventArgs e) => Dispose();
 
         /// <summary>
         /// Erzeugt eine eigenständige Datei. Der Typ wird dabei immer auf MAIN gesetzt
@@ -102,7 +100,7 @@ namespace BlueDatabase {
             Typ = "MAIN";
 
             var filename = MyDefaultFileName();
-            InternalDatabase = (Database)Database.GetByFilename(filename, false);
+            InternalDatabase = (Database)BlueBasics.MultiUserFile.clsMultiUserFile.GetByFilename(filename, false);
 
             Parent = null;
 
@@ -149,9 +147,7 @@ namespace BlueDatabase {
             InternalDatabase.Disposing += InternalDatabase_Disposing;
         }
 
-        public void Save(bool mustsave) {
-            InternalDatabase.Save(mustsave);
-        }
+        public void Save(bool mustsave) => InternalDatabase.Save(mustsave);
 
         public static string ColumnName(string originalName) {
 
@@ -211,13 +207,9 @@ namespace BlueDatabase {
             return r;
         }
 
-        public void Set(string dataName, string value) {
-            Row().CellSet(Column(dataName, string.Empty), value);
-        }
+        public void Set(string dataName, string value) => Row().CellSet(Column(dataName, string.Empty), value);
 
-        public void Set(string dataName, List<string> value) {
-            Row().CellSet(Column(dataName, string.Empty), value);
-        }
+        public void Set(string dataName, List<string> value) => Row().CellSet(Column(dataName, string.Empty), value);
 
         public void SetSynchronizedFiles<t>(string dataName, string value, ref t synchronData) where t : DataHolder {
             Row().CellSet(Column(dataName, string.Empty), value);
@@ -337,37 +329,21 @@ namespace BlueDatabase {
         //    #endregion
         //}
 
-        public void Set(string dataName, decimal value) {
-            Row().CellSet(Column(dataName, string.Empty), value);
-        }
+        public void Set(string dataName, decimal value) => Row().CellSet(Column(dataName, string.Empty), value);
 
-        public void Set(string dataName, double value) {
-            Row().CellSet(Column(dataName, string.Empty), value);
-        }
+        public void Set(string dataName, double value) => Row().CellSet(Column(dataName, string.Empty), value);
 
-        public void Set(string dataName, int value) {
-            Row().CellSet(Column(dataName, string.Empty), value);
-        }
+        public void Set(string dataName, int value) => Row().CellSet(Column(dataName, string.Empty), value);
 
-        public string GetString(string dataName) {
-            return Row().CellGetString(Column(dataName, string.Empty));
-        }
+        public string GetString(string dataName) => Row().CellGetString(Column(dataName, string.Empty));
 
-        public List<string> GetList(string dataName) {
-            return Row().CellGetList(Column(dataName, string.Empty));
-        }
+        public List<string> GetList(string dataName) => Row().CellGetList(Column(dataName, string.Empty));
 
-        public decimal GetDecimal(string dataName) {
-            return Row().CellGetDecimal(Column(dataName, string.Empty));
-        }
+        public decimal GetDecimal(string dataName) => Row().CellGetDecimal(Column(dataName, string.Empty));
 
-        public double GetDouble(string dataName) {
-            return Row().CellGetDouble(Column(dataName, string.Empty));
-        }
+        public double GetDouble(string dataName) => Row().CellGetDouble(Column(dataName, string.Empty));
 
-        public int GetInt(string dataName) {
-            return Row().CellGetInteger(Column(dataName, string.Empty));
-        }
+        public int GetInt(string dataName) => Row().CellGetInteger(Column(dataName, string.Empty));
 
         public string Erstelldatum {
             get => InternalDatabase.CreateDate;

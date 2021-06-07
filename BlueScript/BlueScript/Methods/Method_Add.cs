@@ -26,7 +26,7 @@ namespace BlueScript {
         public override string Syntax => "Add(List-Variable, Value1, Value2, ...);";
 
         public override string Description => "Fügt einer Liste einen oder mehrere Werte hinzu.";
-        public override List<string> Comand(Script s) { return new() { "add" }; }
+        public override List<string> Comand(Script s) => new() { "add" };
         public override string StartSequence => "(";
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;
@@ -41,10 +41,10 @@ namespace BlueScript {
             var tmpList = attvar.Attributes[0].ValueListString;
 
             for (var z = 1; z < attvar.Attributes.Count; z++) {
-                if (attvar.Attributes[z].Type == Skript.Enums.enVariableDataType.String) {
+                if (attvar.Attributes[z].Type == enVariableDataType.String) {
                     tmpList.Add(attvar.Attributes[z].ValueString);
                 }
-                if (attvar.Attributes[z].Type == Skript.Enums.enVariableDataType.List) {
+                if (attvar.Attributes[z].Type == enVariableDataType.List) {
                     tmpList.AddRange(attvar.Attributes[z].ValueListString);
                 }
             }

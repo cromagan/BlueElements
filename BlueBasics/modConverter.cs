@@ -40,9 +40,7 @@ namespace BlueBasics {
             }
         }
 
-        public static byte Bin8ToByte(string bIN8) {
-            return Convert.ToByte(bIN8, 2);
-        }
+        public static byte Bin8ToByte(string bIN8) => Convert.ToByte(bIN8, 2);
 
         public static Bitmap StringWIN1252ToBitmap(string tXT) {
             if (string.IsNullOrEmpty(tXT)) {
@@ -141,9 +139,7 @@ namespace BlueBasics {
             return MemSt.ToArray();
         }
 
-        public static string BitmapToStringUnicode(Bitmap bMP, ImageFormat format) {
-            return bMP == null ? string.Empty : new string(Encoding.Unicode.GetChars(BitmapToByte(bMP, format)));
-        }
+        public static string BitmapToStringUnicode(Bitmap bMP, ImageFormat format) => bMP == null ? string.Empty : new string(Encoding.Unicode.GetChars(BitmapToByte(bMP, format)));
 
         public static Bitmap ByteToBitmap(byte[] value) {
             if (value == null || value.GetUpperBound(0) == 0) { return null; }
@@ -174,13 +170,9 @@ namespace BlueBasics {
 
         #endregion
 
-        public static decimal PixelToMM(decimal pixel, int dPI) {
-            return pixel / dPI * 25.4M;
-        }
+        public static decimal PixelToMM(decimal pixel, int dPI) => pixel / dPI * 25.4M;
 
-        public static decimal mmToPixel(decimal mM, int dPI) {
-            return mM * dPI / 25.4M;
-        }
+        public static decimal mmToPixel(decimal mM, int dPI) => mM * dPI / 25.4M;
 
         //private static string GetDriveSerialNumber(string drive)
         //{
@@ -341,9 +333,9 @@ namespace BlueBasics {
             return DateTime.Now;
         }
 
-        public static bool DateTimeTryParse(string s, out DateTime result) {
+        public static bool DateTimeTryParse(string s, out DateTime result) =>
             // https://docs.microsoft.com/de-de/dotnet/standard/base-types/standard-date-and-time-format-strings?view=netframework-4.8
-            return DateTime.TryParseExact(s, Constants.Format_Date5, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
+            DateTime.TryParseExact(s, Constants.Format_Date5, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
                     || DateTime.TryParseExact(s, Constants.Format_Date6, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
                     || DateTime.TryParseExact(s, "dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
                     || DateTime.TryParseExact(s, "dd.MM.yyyy H:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
@@ -354,6 +346,5 @@ namespace BlueBasics {
                     || DateTime.TryParseExact(s, "d.M.yy", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
                     || DateTime.TryParseExact(s, Constants.Format_Date7, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
                     || DateTime.TryParseExact(s, Constants.Format_Date, CultureInfo.InvariantCulture, DateTimeStyles.None, out result);
-        }
     }
 }

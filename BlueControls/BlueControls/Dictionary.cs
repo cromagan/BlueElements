@@ -35,9 +35,7 @@ namespace BlueControls {
 
         public static bool IsSpellChecking;
 
-        private static void Init() {
-            _DictWords = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Deutsch.MDB", "Dictionary", true, false);
-        }
+        private static void Init() => _DictWords = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Deutsch.MDB", "Dictionary", true, false);
 
         //Sub Release()
 
@@ -54,9 +52,7 @@ namespace BlueControls {
             return _DictWords != null;
         }
 
-        public static bool IsWriteable() {
-            return _DictWords != null && !string.IsNullOrEmpty(_DictWords.Filename);
-        }
+        public static bool IsWriteable() => _DictWords != null && !string.IsNullOrEmpty(_DictWords.Filename);
 
         public static bool IsWordOk(string Word) {
             if (!DictionaryRunning(true)) { return true; }

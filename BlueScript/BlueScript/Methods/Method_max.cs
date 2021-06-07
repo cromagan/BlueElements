@@ -26,7 +26,7 @@ namespace BlueScript {
 
         public override string Syntax => "Max(Value1, Value2, ...)";
         public override string Description => "Gibt den den angegeben Werten den, mit dem höchsten Wert zurück.";
-        public override List<string> Comand(Script s) { return new() { "max" }; }
+        public override List<string> Comand(Script s) => new() { "max" };
         public override string StartSequence => "(";
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
@@ -44,7 +44,7 @@ namespace BlueScript {
                 val = Math.Max(thisval.ValueDouble, val);
             }
 
-            return new strDoItFeedback(val.ToString(), string.Empty);
+            return new strDoItFeedback(val.ToString(), enVariableDataType.Numeral);
         }
     }
 }

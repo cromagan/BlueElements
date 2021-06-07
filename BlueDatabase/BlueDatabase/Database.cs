@@ -189,7 +189,7 @@ namespace BlueDatabase {
         public Database(string filename, bool readOnly, bool create) : this(null, filename, readOnly, create) { }
 
         private Database(Stream stream, string filename, bool readOnly, bool create) : base(readOnly, true) {
-            var culture = new System.Globalization.CultureInfo("de-DE");
+            var culture = new CultureInfo("de-DE");
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
 
@@ -557,9 +557,7 @@ namespace BlueDatabase {
             }
         }
 
-        private void Row_RowRemoving(object sender, RowEventArgs e) {
-            AddPending(enDatabaseDataType.dummyComand_RemoveRow, -1, e.Row.Key, "", e.Row.Key.ToString(), false);
-        }
+        private void Row_RowRemoving(object sender, RowEventArgs e) => AddPending(enDatabaseDataType.dummyComand_RemoveRow, -1, e.Row.Key, "", e.Row.Key.ToString(), false);
 
         private void Layouts_ItemSeted(object sender, ListEventArgs e) {
             if (e != null) {
@@ -574,6 +572,7 @@ namespace BlueDatabase {
         }
 
         private void CheckViewsAndArrangements() {
+            if(ReadOnly) { return; }
 
             foreach (var ThisCol in ColumnArrangements) {
                 ThisCol.Repair();
@@ -907,7 +906,7 @@ namespace BlueDatabase {
 
         private string ParseThis(enDatabaseDataType Art, string content, ColumnItem column, RowItem row, int width, int height) {
 
-            if (Art >= enDatabaseDataType.Info_ColumDataSart && Art <= enDatabaseDataType.Info_ColumnDataEnd) {
+            if (Art is >= enDatabaseDataType.Info_ColumDataSart and <= enDatabaseDataType.Info_ColumnDataEnd) {
                 return column.Load(Art, content);
             }
 
@@ -1258,13 +1257,9 @@ namespace BlueDatabase {
             List.AddRange(b);
         }
 
-        private static int NummerCode3(byte[] b, int pointer) {
-            return (b[pointer] * 65025) + (b[pointer + 1] * 255) + b[pointer + 2];
-        }
+        private static int NummerCode3(byte[] b, int pointer) => (b[pointer] * 65025) + (b[pointer + 1] * 255) + b[pointer + 2];
 
-        private static int NummerCode2(byte[] b, int pointer) {
-            return (b[pointer] * 255) + b[pointer + 1];
-        }
+        private static int NummerCode2(byte[] b, int pointer) => (b[pointer] * 255) + b[pointer + 1];
 
         private void SaveToByteList(List<byte> List, int NrToAdd, int ByteAnzahl) {
 
@@ -1323,10 +1318,9 @@ namespace BlueDatabase {
         /// <param name="column">Die Spalte, die zurückgegeben wird.</param>
         /// <param name="sortedRows">Die Zeilen, die zurückgegeben werden. NULL gibt alle Zeilen zurück.</param>
         /// <returns></returns>
-        public string Export_CSV(enFirstRow firstRow, ColumnItem column, List<RowItem> sortedRows) {
+        public string Export_CSV(enFirstRow firstRow, ColumnItem column, List<RowItem> sortedRows) =>
             //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
-            return Export_CSV(firstRow, new List<ColumnItem>() { column }, sortedRows);
-        }
+            Export_CSV(firstRow, new List<ColumnItem>() { column }, sortedRows);
 
         /// <summary>
         /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
@@ -1417,30 +1411,27 @@ namespace BlueDatabase {
         /// <param name="arrangement">Die Spalten, die zurückgegeben werden. NULL gibt alle Spalten zurück.</param>
         /// <param name="sortedRows">Die Zeilen, die zurückgegeben werden. NULL gibt alle ZEilen zurück.</param>
         /// <returns></returns>
-        public string Export_CSV(enFirstRow firstRow, ColumnViewCollection arrangement, List<RowItem> sortedRows) {
+        public string Export_CSV(enFirstRow firstRow, ColumnViewCollection arrangement, List<RowItem> sortedRows) =>
             //Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
 
-            return Export_CSV(firstRow, arrangement.ListOfUsedColumn(), sortedRows);
-        }
+            Export_CSV(firstRow, arrangement.ListOfUsedColumn(), sortedRows);
 
         /// <summary>
         /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
         /// </summary>
         /// <returns></returns>
-        public string Export_CSV(enFirstRow firstRow, int arrangementNo, FilterCollection filter, List<RowItem> pinned) {
+        public string Export_CSV(enFirstRow firstRow, int arrangementNo, FilterCollection filter, List<RowItem> pinned) =>
             //    Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
 
-            return Export_CSV(firstRow, ColumnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateSortedRows(filter, SortDefinition, pinned));
-        }
+            Export_CSV(firstRow, ColumnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateSortedRows(filter, SortDefinition, pinned));
 
         /// <summary>
         /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
         /// </summary>
         /// <returns></returns>
-        public void Export_HTML(string filename, int arrangementNo, FilterCollection filter, List<RowItem> pinned) {
+        public void Export_HTML(string filename, int arrangementNo, FilterCollection filter, List<RowItem> pinned) =>
             //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
             Export_HTML(filename, ColumnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateSortedRows(filter, SortDefinition, pinned), false);
-        }
 
         /// <summary>
         /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
@@ -1534,9 +1525,7 @@ namespace BlueDatabase {
         /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
         /// </summary>
         /// <returns></returns>
-        public void Export_HTML(string filename, ColumnViewCollection arrangement, List<RowItem> sortedRows, bool execute) {
-            Export_HTML(filename, arrangement.ListOfUsedColumn(), sortedRows, execute);
-        }
+        public void Export_HTML(string filename, ColumnViewCollection arrangement, List<RowItem> sortedRows, bool execute) => Export_HTML(filename, arrangement.ListOfUsedColumn(), sortedRows, execute);
 
         #endregion
 
@@ -1631,11 +1620,9 @@ namespace BlueDatabase {
             return e.SortedDistinctList();
         }
 
-        public bool IsAdministrator() {
-            return DatenbankAdmin.Contains("#User: " + UserName, false)
+        public bool IsAdministrator() => DatenbankAdmin.Contains("#User: " + UserName, false)
                     || (!string.IsNullOrEmpty(UserGroup) && (DatenbankAdmin.Contains(UserGroup, false)
                     || UserGroup.ToUpper() == "#ADMINISTRATOR"));
-        }
 
         protected override byte[] ToListOfByte() {
 
@@ -1801,25 +1788,18 @@ namespace BlueDatabase {
 
         #endregion
 
-        public string DefaultLayoutPath() {
+        public string DefaultLayoutPath() =>
             //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
-            return string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + "Layouts\\";
-        }
+            string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + "Layouts\\";
 
         /// <summary>
         /// Fügt Comandos manuell hinzu. Vorsicht: Kann Datenbank beschädigen
         /// </summary>
-        public void InjectCommand(enDatabaseDataType Comand, string ChangedTo) {
-            AddPending(Comand, -1, -1, string.Empty, ChangedTo, true);
-        }
+        public void InjectCommand(enDatabaseDataType Comand, string ChangedTo) => AddPending(Comand, -1, -1, string.Empty, ChangedTo, true);
 
-        internal void AddPending(enDatabaseDataType Comand, ColumnItem column, string PreviousValue, string ChangedTo, bool ExecuteNow) {
-            AddPending(Comand, column.Key, -1, PreviousValue, ChangedTo, ExecuteNow);
-        }
+        internal void AddPending(enDatabaseDataType Comand, ColumnItem column, string PreviousValue, string ChangedTo, bool ExecuteNow) => AddPending(Comand, column.Key, -1, PreviousValue, ChangedTo, ExecuteNow);
 
-        internal void AddPending(enDatabaseDataType Comand, int ColumnKey, string ListExt, bool ExecuteNow) {
-            AddPending(Comand, ColumnKey, -1, "", ListExt, ExecuteNow);
-        }
+        internal void AddPending(enDatabaseDataType Comand, int ColumnKey, string ListExt, bool ExecuteNow) => AddPending(Comand, ColumnKey, -1, "", ListExt, ExecuteNow);
 
         internal void AddPending(enDatabaseDataType Comand, int ColumnKey, int RowKey, string PreviousValue, string ChangedTo, bool ExecuteNow) {
 
@@ -2195,9 +2175,7 @@ namespace BlueDatabase {
             if (Writer_FilesToDeleteLCase.Count > 0) { DeleteFile(Writer_FilesToDeleteLCase); }
         }
 
-        protected override bool isSomethingDiscOperatingsBlocking() {
-            return false;
-        }
+        protected override bool isSomethingDiscOperatingsBlocking() => false;
 
         protected override bool IsThereBackgroundWorkToDo() {
             if (HasPendingChanges()) { return true; }
@@ -2273,7 +2251,7 @@ namespace BlueDatabase {
                         return "Abbruch,<br>leerer Spaltenname.";
                     }
 
-                    Zeil[0][SpaltNo] = Zeil[0][SpaltNo].Replace(" ", "_").ReduceToChars(BlueBasics.Constants.AllowedCharsVariableName);
+                    Zeil[0][SpaltNo] = Zeil[0][SpaltNo].Replace(" ", "_").ReduceToChars(Constants.AllowedCharsVariableName);
                     var Col = Column.Exists(Zeil[0][SpaltNo]);
                     if (Col == null) {
                         Col = Column.Add(Zeil[0][SpaltNo]);

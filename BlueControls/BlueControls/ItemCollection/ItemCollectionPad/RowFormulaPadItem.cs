@@ -101,30 +101,16 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public RowItem Row {
-            get {
-                return _Database?.Row.SearchByKey(_RowKey);
-            }
-            //set {
-            //    if (_Row == value) { return; }
-            //    _Row = value;
-            //    _tmpQuickInfo = string.Empty;
-            //    removePic();
-            //}
-        }
+        public RowItem Row => _Database?.Row.SearchByKey(_RowKey);
 
         private void RemovePic() {
             if (GeneratedBitmap != null) { GeneratedBitmap.Dispose(); }
             GeneratedBitmap = null;
         }
 
-        public override void DesignOrStyleChanged() {
-            RemovePic();
-        }
+        public override void DesignOrStyleChanged() => RemovePic();
 
-        protected override string ClassId() {
-            return "ROW";
-        }
+        protected override string ClassId() => "ROW";
 
         protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
 
@@ -159,7 +145,7 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "database":
-                    _Database = (Database)Database.GetByFilename(value, false);
+                    _Database = (Database)BlueBasics.MultiUserFile.clsMultiUserFile.GetByFilename(value, false);
                     if (_Database == null) {
                         _Database = new Database(value, false, false);
                     }
@@ -280,9 +266,7 @@ namespace BlueControls.ItemCollection {
         //    Return False
         //End Function
 
-        protected override void ParseFinished() {
-            GeneratePic(true);
-        }
+        protected override void ParseFinished() => GeneratePic(true);
 
         public override List<FlexiControl> GetStyleOptions() {
             var l = new List<FlexiControl>

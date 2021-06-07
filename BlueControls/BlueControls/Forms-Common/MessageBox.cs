@@ -24,7 +24,7 @@ using System.Collections.Generic;
 using System.Drawing;
 
 namespace BlueControls.Forms {
-    public partial class MessageBox : Forms.Form {
+    public partial class MessageBox : Form {
         private Button Pressed = null;
 
         //private MessageBox()
@@ -37,7 +37,7 @@ namespace BlueControls.Forms {
         //    }
         //}
 
-        private MessageBox(string TXT, enImageCode Pic, params string[] Buttons) : base(Enums.enDesign.Form_MsgBox) {
+        private MessageBox(string TXT, enImageCode Pic, params string[] Buttons) : base(enDesign.Form_MsgBox) {
             InitializeComponent();
 
             Text = Develop.AppName();
@@ -46,7 +46,7 @@ namespace BlueControls.Forms {
                 ? "<ImageCode=" + QuickImage.Get(Pic, 32) + "> <zbx_store><top>" + BlueDatabase.LanguageTool.DoTranslate(TXT, false)
                 : BlueDatabase.LanguageTool.DoTranslate(TXT, false);
 
-            Size = new System.Drawing.Size((capText.Left * 2) + capText.Width + BorderWidth, (capText.Top * 3) + capText.Height + 35 + BorderHeight);
+            Size = new Size((capText.Left * 2) + capText.Width + BorderWidth, (capText.Top * 3) + capText.Height + 35 + BorderHeight);
 
             if (Buttons.Length == 0) { Buttons = new[] { "OK" }; }
 
@@ -137,17 +137,11 @@ namespace BlueControls.Forms {
             Close();
         }
 
-        public static void Show(string TXT) {
-            Show(TXT, enImageCode.None, true, "OK");
-        }
+        public static void Show(string TXT) => Show(TXT, enImageCode.None, true, "OK");
 
-        public static void Show(string TXT, enImageCode Pic, string Buttons) {
-            Show(TXT, Pic, true, Buttons);
-        }
+        public static void Show(string TXT, enImageCode Pic, string Buttons) => Show(TXT, Pic, true, Buttons);
 
-        public static int Show(string TXT, enImageCode Pic, params string[] Buttons) {
-            return Show(TXT, Pic, true, Buttons);
-        }
+        public static int Show(string TXT, enImageCode Pic, params string[] Buttons) => Show(TXT, Pic, true, Buttons);
 
         public static int Show(string TXT, enImageCode Pic, bool Dialog, params string[] Buttons) {
 

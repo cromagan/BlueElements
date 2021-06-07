@@ -25,10 +25,10 @@ using static BlueBasics.Extensions;
 namespace BlueScript {
     internal class Method_Number : Method {
 
-        public override string Syntax => "Number(string, number)";
+        public override string Syntax => "Number(string, NaNValue)";
 
-        public override string Description => "Gibt den Text als Zahl zurück. Fall dies keine gültige Zahl ist, wird der nachfolgende Zahlenwert zurückgegeben.";
-        public override List<string> Comand(Script s) { return new() { "number" }; }
+        public override string Description => "Gibt den Text als Zahl zurück. Fall dies keine gültige Zahl ist, wird NaN-Value zurückgegeben.";
+        public override List<string> Comand(Script s) => new() { "number" };
         public override string StartSequence => "(";
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
@@ -38,11 +38,9 @@ namespace BlueScript {
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            return !string.IsNullOrEmpty(attvar.ErrorMessage)
-                ? strDoItFeedback.AttributFehler(this, attvar)
-                : attvar.Attributes[0].ValueString.IsNumeral()
-                ? new strDoItFeedback(attvar.Attributes[0].ValueString, string.Empty)
-                : new strDoItFeedback(attvar.Attributes[1].ValueString, string.Empty);
+            return !string.IsNullOrEmpty(attvar.ErrorMessage) ? strDoItFeedback.AttributFehler(this, attvar)
+                 : attvar.Attributes[0].ValueString.IsNumeral() ? new strDoItFeedback(attvar.Attributes[0].ValueString, enVariableDataType.Numeral)
+                 : new strDoItFeedback(attvar.Attributes[1].ValueString, enVariableDataType.Numeral);
         }
     }
 }

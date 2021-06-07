@@ -96,10 +96,9 @@ namespace BlueBasics {
             return Did;
         }
 
-        public static bool IsDifferentTo<T>(this List<T> list1, List<T> list2) {
+        public static bool IsDifferentTo<T>(this List<T> list1, List<T> list2) =>
             // https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.sequenceequal?redirectedfrom=MSDN&view=netcore-3.1#System_Linq_Enumerable_SequenceEqual__1_System_Collections_Generic_IEnumerable___0__System_Collections_Generic_IEnumerable___0__
-            return list1 != list2 && (list1 is null || list2 is null || !list1.SequenceEqual(list2));
-        }
+            list1 != list2 && (list1 is null || list2 is null || !list1.SequenceEqual(list2));
 
         // public static bool IsDifferentTo<T>(this List<T> List1, List<T> List2) where T : IParseable
         // {
@@ -189,8 +188,8 @@ namespace BlueBasics {
         public static void Save(this List<string> l, string dateiName, bool executeAfter, System.Text.Encoding code) {
             var t = l.JoinWith("\r\n").TrimEnd("\r\n");
 
-            if (!FileOperations.PathExists(dateiName.FilePath())) {
-                System.IO.Directory.CreateDirectory(dateiName.FilePath());
+            if (!PathExists(dateiName.FilePath())) {
+                Directory.CreateDirectory(dateiName.FilePath());
             }
 
             SaveToDisk(dateiName, t, executeAfter, code);
@@ -261,17 +260,11 @@ namespace BlueBasics {
             return l;
         }
 
-        public static int TagGetInt(this ICollection<string> _String, string tagName) {
-            return IntParse(TagGet(_String, tagName));
-        }
+        public static int TagGetInt(this ICollection<string> _String, string tagName) => IntParse(TagGet(_String, tagName));
 
-        public static decimal TagGetDecimal(this ICollection<string> _String, string tagName) {
-            return DecimalParse(TagGet(_String, tagName));
-        }
+        public static decimal TagGetDecimal(this ICollection<string> _String, string tagName) => DecimalParse(TagGet(_String, tagName));
 
-        public static double TagGetDouble(this ICollection<string> _String, string tagName) {
-            return DoubleParse(TagGet(_String, tagName));
-        }
+        public static double TagGetDouble(this ICollection<string> _String, string tagName) => DoubleParse(TagGet(_String, tagName));
 
         public static string TagGet(this ICollection<string> _String, string tagName) {
             if (_String == null) { return string.Empty; }

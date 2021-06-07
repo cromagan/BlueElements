@@ -22,8 +22,6 @@ using BlueControls.Enums;
 namespace BlueControls.Controls {
     public class TabControl : AbstractTabControl {
 
-        public TabControl() : base() {
-            BackColor = Skin.Color_Back(enDesign.TabStrip_Body, enStates.Standard);
-        }
+        public TabControl() : base() => BackColor = Skin.Color_Back(enDesign.TabStrip_Body, enStates.Standard);
     }
 }

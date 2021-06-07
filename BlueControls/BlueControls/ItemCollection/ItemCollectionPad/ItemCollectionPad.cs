@@ -466,9 +466,7 @@ namespace BlueControls.ItemCollection {
 
         #endregion
 
-        public void OnDoInvalidate() {
-            DoInvalidate?.Invoke(this, System.EventArgs.Empty);
-        }
+        public void OnDoInvalidate() => DoInvalidate?.Invoke(this, System.EventArgs.Empty);
 
         protected override void OnItemAdded(BasicPadItem item) {
             if (item == null) {
@@ -505,9 +503,7 @@ namespace BlueControls.ItemCollection {
             OnDoInvalidate();
         }
 
-        public void Remove(string internalname) {
-            Remove(this[internalname]);
-        }
+        public void Remove(string internalname) => Remove(this[internalname]);
 
         public new void Remove(BasicPadItem item) {
             if (item == null || !Contains(item)) { return; }
@@ -708,9 +704,7 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        protected RectangleM MaxBounds() {
-            return MaxBounds(null);
-        }
+        protected RectangleM MaxBounds() => MaxBounds(null);
 
         internal RectangleM MaxBounds(List<BasicPadItem> ZoomItems) {
 
@@ -720,8 +714,8 @@ namespace BlueControls.ItemCollection {
                 var X1 = Math.Min(r.Left, 0);
                 var y1 = Math.Min(r.Top, 0);
 
-                var x2 = Math.Max(r.Right, modConverter.mmToPixel((decimal)SheetSizeInMM.Width, ItemCollectionPad.DPI));
-                var y2 = Math.Max(r.Bottom, modConverter.mmToPixel((decimal)SheetSizeInMM.Height, ItemCollectionPad.DPI));
+                var x2 = Math.Max(r.Right, modConverter.mmToPixel((decimal)SheetSizeInMM.Width, DPI));
+                var y2 = Math.Max(r.Bottom, modConverter.mmToPixel((decimal)SheetSizeInMM.Height, DPI));
 
                 return new RectangleM(X1, y1, x2 - X1, y2 - y1);
             }
@@ -729,6 +723,10 @@ namespace BlueControls.ItemCollection {
             return r;
 
         }
+
+
+        public bool ParseVariable(string name, string wert) => ParseVariable(new BlueScript.Variable(name, wert, Skript.Enums.enVariableDataType.String));
+
 
         public bool ParseVariable(BlueScript.Variable variable) {
 
@@ -745,8 +743,7 @@ namespace BlueControls.ItemCollection {
         public void ParseVariable(RowItem row) {
 
             if (row != null) {
-
-                (var didSuccesfullyCheck, var error, var script) = row.DoAutomatic(false, "export");
+                (_, _, var script) = row.DoAutomatic(false, "export");
                 foreach (var thisV in script.Variablen) {
                     ParseVariable(thisV);
                 }
@@ -807,11 +804,9 @@ namespace BlueControls.ItemCollection {
 
         }
 
-        internal Rectangle DruckbereichRect() {
-            return P_rLO == null
+        internal Rectangle DruckbereichRect() => P_rLO == null
                 ? new Rectangle(0, 0, 0, 0)
                 : new Rectangle((int)P_rLO.X, (int)P_rLO.Y, (int)(P_rRU.X - P_rLO.X), (int)(P_rRU.Y - P_rLO.Y));
-        }
 
         public void SaveAsBitmap(string filename) {
 

@@ -54,9 +54,7 @@ namespace BlueDatabase {
 
         #region  Construktor + Initialize 
 
-        public void Initialize() {
-            _LastRowKey = 0;
-        }
+        public void Initialize() => _LastRowKey = 0;
 
         public RowCollection(Database database) {
             Database = database;
@@ -89,17 +87,11 @@ namespace BlueDatabase {
             }
         }
 
-        public RowItem this[FilterCollection filter] {
-            get {
-                return Database == null ? null : _Internal.Values.FirstOrDefault(ThisRow => ThisRow != null && ThisRow.MatchesTo(filter));
-            }
-        }
+        public RowItem this[FilterCollection filter] => Database == null ? null : _Internal.Values.FirstOrDefault(ThisRow => ThisRow != null && ThisRow.MatchesTo(filter));
 
         #endregion
 
-        private void Database_Disposing(object sender, System.EventArgs e) {
-            Dispose();
-        }
+        private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
 
         internal int NextRowKey() {
             do {
@@ -124,9 +116,7 @@ namespace BlueDatabase {
             OnRowRemoved();
         }
 
-        public bool Clear() {
-            return Remove(new FilterCollection(Database));
-        }
+        public bool Clear() => Remove(new FilterCollection(Database));
 
         public bool Remove(FilterItem Filter) {
             var NF = new FilterCollection(Database)
@@ -169,20 +159,15 @@ namespace BlueDatabase {
 
         }
 
-        public RowItem Add(RowItem Row) {
+        public void Add(RowItem Row) {
             if (!_Internal.TryAdd(Row.Key, Row)) { Develop.DebugPrint(enFehlerArt.Fehler, "Add Failed"); }
 
             OnRowAdded(new RowEventArgs(Row));
-            return Row;
         }
 
-        private void OnRowChecked(object sender, RowCheckedEventArgs e) {
-            RowChecked?.Invoke(this, e);
-        }
+        private void OnRowChecked(object sender, RowCheckedEventArgs e) => RowChecked?.Invoke(this, e);
 
-        private void OnDoSpecialRules(object sender, DoRowAutomaticEventArgs e) {
-            DoSpecialRules?.Invoke(this, e);
-        }
+        private void OnDoSpecialRules(object sender, DoRowAutomaticEventArgs e) => DoSpecialRules?.Invoke(this, e);
 
         public RowItem Add(string ValueOfCellInFirstColumn) {
             if (string.IsNullOrEmpty(ValueOfCellInFirstColumn)) {
@@ -265,9 +250,7 @@ namespace BlueDatabase {
             }
         }
 
-        internal void SaveToByteList(List<byte> l) {
-            Database.SaveToByteList(l, enDatabaseDataType.LastRowKey, _LastRowKey.ToString());
-        }
+        internal void SaveToByteList(List<byte> l) => Database.SaveToByteList(l, enDatabaseDataType.LastRowKey, _LastRowKey.ToString());
 
         public RowItem SearchByKey(int Key) {
             try {
@@ -278,33 +261,16 @@ namespace BlueDatabase {
             }
         }
 
-        public RowItem First() {
-            return _Internal.Values.FirstOrDefault(ThisRowItem => ThisRowItem != null);
+        public RowItem First() => _Internal.Values.FirstOrDefault(ThisRowItem => ThisRowItem != null);//foreach (var ThisRowItem in _Internal.Values)//{//    if (ThisRowItem != null) { return ThisRowItem; }//}//return null;
 
-            //foreach (var ThisRowItem in _Internal.Values)
-            //{
-            //    if (ThisRowItem != null) { return ThisRowItem; }
-            //}
+        public IEnumerator<RowItem> GetEnumerator() => _Internal.Values.GetEnumerator();
 
-            //return null;
-        }
-
-        public IEnumerator<RowItem> GetEnumerator() {
-            return _Internal.Values.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator() {
-            return IEnumerable_GetEnumerator();
-        }
-        private IEnumerator IEnumerable_GetEnumerator() {
-            return _Internal.Values.GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => IEnumerable_GetEnumerator();
+        private IEnumerator IEnumerable_GetEnumerator() => _Internal.Values.GetEnumerator();
 
         public int Count => _Internal.Count;
 
-        internal void RemoveNullOrEmpty() {
-            _Internal.RemoveNullOrEmpty();
-        }
+        internal void RemoveNullOrEmpty() => _Internal.RemoveNullOrEmpty();
 
         internal void OnRowAdded(RowEventArgs e) {
             e.Row.RowChecked += OnRowChecked;
@@ -318,9 +284,7 @@ namespace BlueDatabase {
             RowRemoving?.Invoke(this, e);
         }
 
-        internal void OnRowRemoved() {
-            RowRemoved?.Invoke(this, System.EventArgs.Empty);
-        }
+        internal void OnRowRemoved() => RowRemoved?.Invoke(this, System.EventArgs.Empty);
 
         public bool RemoveOlderThan(float InHours) {
 

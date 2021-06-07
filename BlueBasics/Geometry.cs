@@ -24,29 +24,17 @@ namespace BlueBasics {
     public static class Geometry {
         private const decimal Rad = (decimal)(Math.PI / 180);
 
-        public static double Sinus(double winkel) {
-            return Math.Sin(winkel * (double)Rad);
-        }
+        public static double Sinus(double winkel) => Math.Sin(winkel * (double)Rad);
 
-        public static double Cosinus(double winkel) {
-            return Math.Cos(winkel * (double)Rad);
-        }
+        public static double Cosinus(double winkel) => Math.Cos(winkel * (double)Rad);
 
-        public static double Tangens(double winkel) {
-            return Math.Tan(winkel * (double)Rad);
-        }
+        public static double Tangens(double winkel) => Math.Tan(winkel * (double)Rad);
 
-        public static decimal RadToDeg(decimal radAngle) {
-            return (decimal)((double)radAngle * (180 / Math.PI));
-        }
+        public static decimal RadToDeg(decimal radAngle) => (decimal)((double)radAngle * (180 / Math.PI));
 
-        public static decimal DegToRad(decimal degAngle) {
-            return (decimal)((double)degAngle * (Math.PI / 180));
-        }
+        public static decimal DegToRad(decimal degAngle) => (decimal)((double)degAngle * (Math.PI / 180));
 
-        public static decimal ArcTangens(decimal ta) {
-            return (decimal)(Math.Atan(Convert.ToDouble(ta)) / (double)Rad);
-        }
+        public static decimal ArcTangens(decimal ta) => (decimal)(Math.Atan(Convert.ToDouble(ta)) / (double)Rad);
 
         public static decimal Länge(Point sP, Point ep) {
             // Berechnet die Länge einer Strecke
@@ -68,9 +56,7 @@ namespace BlueBasics {
             return (decimal)Math.Sqrt(Convert.ToDouble((L1 * L1) + (L2 * L2)));
         }
 
-        public static decimal Winkel(PointF sp, PointF eP) {
-            return Winkel((decimal)sp.X, (decimal)sp.Y, (decimal)eP.X, (decimal)eP.Y);
-        }
+        public static decimal Winkel(PointF sp, PointF eP) => Winkel((decimal)sp.X, (decimal)sp.Y, (decimal)eP.X, (decimal)eP.Y);
 
         public static decimal Winkel(decimal x1, decimal y1, decimal x2, decimal y2) {
             // http://de.wikipedia.org/wiki/Polarkoordinaten

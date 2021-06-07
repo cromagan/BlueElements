@@ -80,9 +80,7 @@ namespace BlueControls {
             Key_LastKey = 0;
         }
 
-        public SystemInputHook() {
-            Initialize();
-        }
+        public SystemInputHook() => Initialize();
 
         #endregion
 
@@ -103,13 +101,9 @@ namespace BlueControls {
             Key_LastKey = 0;
         }
 
-        public void RemoveHook() {
-            Tim.Enabled = false;
-        }
+        public void RemoveHook() => Tim.Enabled = false;
 
-        public void CheckNow() {
-            Tim_Tick(null, null);
-        }
+        public void CheckNow() => Tim_Tick(null, null);
 
         private void Tim_Tick(object sender, System.EventArgs e) {
 
@@ -156,17 +150,11 @@ namespace BlueControls {
             Mouse_LastButton = B;
         }
 
-        private void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
-            MouseDown?.Invoke(null, e);
-        }
+        private void OnMouseDown(System.Windows.Forms.MouseEventArgs e) => MouseDown?.Invoke(null, e);
 
-        private void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
-            MouseUp?.Invoke(this, e);
-        }
+        private void OnMouseUp(System.Windows.Forms.MouseEventArgs e) => MouseUp?.Invoke(this, e);
 
-        private void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
-            MouseMove?.Invoke(this, e);
-        }
+        private void OnMouseMove(System.Windows.Forms.MouseEventArgs e) => MouseMove?.Invoke(this, e);
 
         public void DoKeyboard() {
 
@@ -373,12 +361,8 @@ namespace BlueControls {
             Key_LastKey = k;
         }
 
-        private void OnKeyDown(System.Windows.Forms.KeyEventArgs e) {
-            KeyDown?.Invoke(this, e);
-        }
+        private void OnKeyDown(System.Windows.Forms.KeyEventArgs e) => KeyDown?.Invoke(this, e);
 
-        private void OnKeyUp(System.Windows.Forms.KeyEventArgs e) {
-            KeyUp?.Invoke(null, e);
-        }
+        private void OnKeyUp(System.Windows.Forms.KeyEventArgs e) => KeyUp?.Invoke(null, e);
     }
 }

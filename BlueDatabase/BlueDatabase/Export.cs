@@ -39,9 +39,7 @@ namespace BlueDatabase {
             return l;
         }
 
-        public static void SaveAsBitmap(RowItem Row, string LayoutID, string Filename) {
-            Row.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventargs(Row, LayoutID, Filename));
-        }
+        public static void SaveAsBitmap(RowItem Row, string LayoutID, string Filename) => Row.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventargs(Row, LayoutID, Filename));
 
         //public static object ParseVariable(string platzhaltertxt, string variablename, object value) {
 
@@ -601,7 +599,7 @@ namespace BlueDatabase {
 
             if (stx > -1 && enx > stx) {
                 Head = FileLoaded.Substring(0, stx);
-                var Body = FileLoaded.Substring(stx + 11, enx - stx - 11);
+                _ = FileLoaded.Substring(stx + 11, enx - stx - 11);
                 Foot = FileLoaded.Substring(enx + 11);
             }
 

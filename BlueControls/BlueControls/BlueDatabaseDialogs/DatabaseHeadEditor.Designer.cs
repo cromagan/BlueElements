@@ -69,6 +69,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.cbxJoinTyp = new BlueControls.Controls.ComboBox();
             this.capAnsicht = new BlueControls.Controls.Caption();
             this.Tab_Regeln = new BlueControls.Controls.TabPage();
+            this.scriptEditor = new BlueControls.ScriptEditor();
             this.Tab_Backup = new BlueControls.Controls.TabPage();
             this.ExportEditor = new BlueControls.Classes_Editor.ExportDefinition_Editor();
             this.grpExport = new BlueControls.Controls.GroupBox();
@@ -87,7 +88,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capExperimentellWarnung = new BlueControls.Controls.Caption();
             this.capBinInfo = new BlueControls.Controls.Caption();
             this.btnSave = new BlueControls.Controls.Button();
-            this.scriptEditor = new BlueControls.ScriptEditor();
+            this.btnAlleUndos = new BlueControls.Controls.Button();
+            this.btnClipboard = new BlueControls.Controls.Button();
             this.grpBenutzergruppen.SuspendLayout();
             this.grpKennwort.SuspendLayout();
             this.GlobalTab.SuspendLayout();
@@ -347,7 +349,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.GlobalTab.HotTrack = true;
             this.GlobalTab.Location = new System.Drawing.Point(0, 0);
             this.GlobalTab.Name = "GlobalTab";
-            this.GlobalTab.SelectedIndex = 0;
+            this.GlobalTab.SelectedIndex = 5;
             this.GlobalTab.Size = new System.Drawing.Size(1047, 645);
             this.GlobalTab.TabIndex = 21;
             this.GlobalTab.Selecting += new System.Windows.Forms.TabControlCancelEventHandler(this.GlobalTab_Selecting);
@@ -562,6 +564,17 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Regeln.TabIndex = 3;
             this.Tab_Regeln.Text = "Skript";
             // 
+            // scriptEditor
+            // 
+            this.scriptEditor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.scriptEditor.Database = null;
+            this.scriptEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.scriptEditor.Location = new System.Drawing.Point(3, 3);
+            this.scriptEditor.Name = "scriptEditor";
+            this.scriptEditor.Size = new System.Drawing.Size(1033, 610);
+            this.scriptEditor.TabIndex = 0;
+            this.scriptEditor.TabStop = false;
+            // 
             // Tab_Backup
             // 
             this.Tab_Backup.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
@@ -683,6 +696,8 @@ namespace BlueControls.BlueDatabaseDialogs
             // Tab_Undo
             // 
             this.Tab_Undo.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.Tab_Undo.Controls.Add(this.btnClipboard);
+            this.Tab_Undo.Controls.Add(this.btnAlleUndos);
             this.Tab_Undo.Controls.Add(this.tbxUndoAnzahl);
             this.Tab_Undo.Controls.Add(this.capUndoAnzahl);
             this.Tab_Undo.Controls.Add(this.tblUndo);
@@ -770,14 +785,25 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnSave.Text = "Speichern";
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
-            // scriptEditor
+            // btnAlleUndos
             // 
-            this.scriptEditor.Database = null;
-            this.scriptEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.scriptEditor.Location = new System.Drawing.Point(3, 3);
-            this.scriptEditor.Name = "scriptEditor";
-            this.scriptEditor.Size = new System.Drawing.Size(1033, 610);
-            this.scriptEditor.TabIndex = 0;
+            this.btnAlleUndos.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnAlleUndos.Location = new System.Drawing.Point(688, 8);
+            this.btnAlleUndos.Name = "btnAlleUndos";
+            this.btnAlleUndos.Size = new System.Drawing.Size(168, 32);
+            this.btnAlleUndos.TabIndex = 2;
+            this.btnAlleUndos.Text = "Alle Undos generieren";
+            this.btnAlleUndos.Click += new System.EventHandler(this.btnAlleUndos_Click);
+            // 
+            // btnClipboard
+            // 
+            this.btnClipboard.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnClipboard.Location = new System.Drawing.Point(864, 8);
+            this.btnClipboard.Name = "btnClipboard";
+            this.btnClipboard.Size = new System.Drawing.Size(168, 32);
+            this.btnClipboard.TabIndex = 3;
+            this.btnClipboard.Text = "Clipboard";
+            this.btnClipboard.Click += new System.EventHandler(this.btnClipboard_Click);
             // 
             // DatabaseHeadEditor
             // 
@@ -867,5 +893,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private Caption capAdditional;
         private Button btnSave;
         private ScriptEditor scriptEditor;
+        private Button btnClipboard;
+        private Button btnAlleUndos;
     }
 }

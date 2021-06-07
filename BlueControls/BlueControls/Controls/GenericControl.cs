@@ -88,15 +88,9 @@ namespace BlueControls.Controls {
             }
         }
 
-        protected void SetDoubleBuffering() {
-            SetStyle(System.Windows.Forms.ControlStyles.DoubleBuffer, true);
+        protected void SetDoubleBuffering() => SetStyle(System.Windows.Forms.ControlStyles.DoubleBuffer, true);
 
-        }
-
-        protected virtual void DrawControl(Graphics gr, enStates state) {
-
-            Develop.DebugPrint_RoutineMussUeberschriebenWerden();
-        }
+        protected virtual void DrawControl(Graphics gr, enStates state) => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
 
         [DefaultValue(true)]
         public bool Translate { get; set; }
@@ -125,9 +119,7 @@ namespace BlueControls.Controls {
             set => base.AutoSize = false;
         }
 
-        protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified) {
-            return bounds; //MyBase.GetScaledBounds(bounds, factor, specified)
-        }
+        protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified) => bounds; //MyBase.GetScaledBounds(bounds, factor, specified)
         #endregion
 
         protected override void WndProc(ref System.Windows.Forms.Message m) {
@@ -140,10 +132,9 @@ namespace BlueControls.Controls {
             }
         }
 
-        protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) {
+        protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) =>
             // MyBase.OnPaint(e) - comment out - do not call  http://stackoverflow.com/questions/592538/how-to-create-a-transparent-control-which-works-when-on-top-of-other-controls
             DoDraw(e.Graphics);
-        }
 
         #region  QuickInfo 
         // Dieser Codeblock ist im Interface IQuickInfo herauskopiert und muss überall Identisch sein.
@@ -193,9 +184,7 @@ namespace BlueControls.Controls {
             EndEdit();
         }
 
-        public void BeginnEdit() {
-            BeginnEdit(1);
-        }
+        public void BeginnEdit() => BeginnEdit(1);
 
         public void BeginnEdit(int count) {
             if (DesignMode) { return; }
@@ -318,13 +307,9 @@ namespace BlueControls.Controls {
             return PointToClient(System.Windows.Forms.Cursor.Position);
         }
 
-        internal bool MousePressing() {
-            return _MousePressing;
-        }
+        internal bool MousePressing() => _MousePressing;
 
-        public bool ContainsMouse() {
-            return ClientRectangle.Contains(PointToClient(System.Windows.Forms.Cursor.Position));
-        }
+        public bool ContainsMouse() => ClientRectangle.Contains(PointToClient(System.Windows.Forms.Cursor.Position));
 
         private enStates IsStatus() {
             if (!Enabled) { return enStates.Standard_Disabled; }
@@ -528,7 +513,7 @@ namespace BlueControls.Controls {
                 case Slider _:
                     return enPartentType.Slider;
                 //Is = "FRMMSGBOX"
-                case Forms.FloatingForm _:
+                case FloatingForm _:
                     return enPartentType.MsgBox;
                 case DialogWithOkAndCancel _:
                     return enPartentType.MsgBox;
@@ -578,9 +563,7 @@ namespace BlueControls.Controls {
             //SetStyle(System.Windows.Forms.ControlStyles.StandardDoubleClick, false);
         }
 
-        protected System.Windows.Forms.Form ParentForm() {
-            return ParentForm(Parent);
-        }
+        protected System.Windows.Forms.Form ParentForm() => ParentForm(Parent);
 
         public static System.Windows.Forms.Form ParentForm(System.Windows.Forms.Control o) {
             Develop.DebugPrint_Disposed(o.IsDisposed);

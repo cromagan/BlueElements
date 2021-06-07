@@ -6,8 +6,6 @@ namespace BlueControls.Controls {
         public TabPageCollectionEditor(Type type) : base(type) {
         }
 
-        protected override Type CreateCollectionItemType() {
-            return typeof(TabPage);
-        }
+        protected override Type CreateCollectionItemType() => typeof(TabPage);
     }
 }

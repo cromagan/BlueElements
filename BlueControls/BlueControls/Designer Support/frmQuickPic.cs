@@ -27,13 +27,10 @@ namespace BlueControls.Designer_Support {
     internal sealed class frmQuickPic : Panel {
         #region  Vom Windows Form Designer generierter Code 
 
-        public frmQuickPic() {
+        public frmQuickPic() =>
 
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
-            InitializeComponent();
-
-            // Initialisierungen nach dem Aufruf InitializeComponent() hinzufügen
-        }
+            InitializeComponent();// Initialisierungen nach dem Aufruf InitializeComponent() hinzufügen
 
         // Die Form überschreibt den Deletevorgang der Basisklasse, um Komponenten zu bereinigen.
         protected override void Dispose(bool NowDisposing) {
@@ -79,36 +76,36 @@ namespace BlueControls.Designer_Support {
 
         [DebuggerStepThrough]
         private void InitializeComponent() {
-            LB = new System.Windows.Forms.ListBox();
-            ButOK = new System.Windows.Forms.Button();
-            PicName = new System.Windows.Forms.TextBox();
-            GroupBox1 = new System.Windows.Forms.GroupBox();
-            GroupBox2 = new System.Windows.Forms.GroupBox();
-            GrY = new System.Windows.Forms.TextBox();
-            GrX = new System.Windows.Forms.TextBox();
-            Label1 = new System.Windows.Forms.Label();
-            chkbDurchgestrichen = new System.Windows.Forms.CheckBox();
-            chkbGrauStufen = new System.Windows.Forms.CheckBox();
-            chkbMEDisabled = new System.Windows.Forms.CheckBox();
-            chkbXPDisabled = new System.Windows.Forms.CheckBox();
-            GroupBox4 = new System.Windows.Forms.GroupBox();
-            Preview = new System.Windows.Forms.PictureBox();
-            SAT = new System.Windows.Forms.TrackBar();
-            Label2 = new System.Windows.Forms.Label();
-            SATL = new System.Windows.Forms.Label();
-            Hell = new System.Windows.Forms.TrackBar();
-            Label4 = new System.Windows.Forms.Label();
-            Transp = new System.Windows.Forms.TrackBar();
-            Helll = new System.Windows.Forms.Label();
-            Label6 = new System.Windows.Forms.Label();
-            Transpl = new System.Windows.Forms.Label();
-            Label3 = new System.Windows.Forms.Label();
-            Label5 = new System.Windows.Forms.Label();
-            Färb = new System.Windows.Forms.TextBox();
-            grün = new System.Windows.Forms.TextBox();
-            GroupBox3 = new System.Windows.Forms.GroupBox();
-            ZweitSymbol = new System.Windows.Forms.GroupBox();
-            txbZweitsymbol = new System.Windows.Forms.TextBox();
+            LB = new ListBox();
+            ButOK = new Button();
+            PicName = new TextBox();
+            GroupBox1 = new GroupBox();
+            GroupBox2 = new GroupBox();
+            GrY = new TextBox();
+            GrX = new TextBox();
+            Label1 = new Label();
+            chkbDurchgestrichen = new CheckBox();
+            chkbGrauStufen = new CheckBox();
+            chkbMEDisabled = new CheckBox();
+            chkbXPDisabled = new CheckBox();
+            GroupBox4 = new GroupBox();
+            Preview = new PictureBox();
+            SAT = new TrackBar();
+            Label2 = new Label();
+            SATL = new Label();
+            Hell = new TrackBar();
+            Label4 = new Label();
+            Transp = new TrackBar();
+            Helll = new Label();
+            Label6 = new Label();
+            Transpl = new Label();
+            Label3 = new Label();
+            Label5 = new Label();
+            Färb = new TextBox();
+            grün = new TextBox();
+            GroupBox3 = new GroupBox();
+            ZweitSymbol = new GroupBox();
+            txbZweitsymbol = new TextBox();
             GroupBox1.SuspendLayout();
             GroupBox2.SuspendLayout();
             GroupBox4.SuspendLayout();
@@ -122,18 +119,18 @@ namespace BlueControls.Designer_Support {
             // 
             // LB
             // 
-            LB.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom
-            | System.Windows.Forms.AnchorStyles.Left
-            | System.Windows.Forms.AnchorStyles.Right;
+            LB.Anchor = AnchorStyles.Top | AnchorStyles.Bottom
+            | AnchorStyles.Left
+            | AnchorStyles.Right;
             LB.Location = new System.Drawing.Point(8, 16);
             LB.Name = "LB";
             LB.Size = new System.Drawing.Size(192, 303);
             LB.TabIndex = 0;
-            LB.DoubleClick += new System.EventHandler(LB_DoubleClick);
+            LB.DoubleClick += new EventHandler(LB_DoubleClick);
             // 
             // ButOK
             // 
-            ButOK.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
+            ButOK.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             ButOK.Location = new System.Drawing.Point(519, 331);
             ButOK.Name = "ButOK";
             ButOK.Size = new System.Drawing.Size(64, 24);
@@ -142,20 +139,20 @@ namespace BlueControls.Designer_Support {
             // 
             // PicName
             // 
-            PicName.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left
-            | System.Windows.Forms.AnchorStyles.Right;
-            PicName.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            PicName.Anchor = AnchorStyles.Bottom | AnchorStyles.Left
+            | AnchorStyles.Right;
+            PicName.BorderStyle = BorderStyle.FixedSingle;
             PicName.Location = new System.Drawing.Point(8, 334);
             PicName.Name = "PicName";
             PicName.Size = new System.Drawing.Size(192, 20);
             PicName.TabIndex = 2;
             PicName.Text = "PicNam";
-            PicName.TextChanged += new System.EventHandler(SomethingChanged);
+            PicName.TextChanged += new EventHandler(SomethingChanged);
             // 
             // GroupBox1
             // 
-            GroupBox1.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom
-            | System.Windows.Forms.AnchorStyles.Left;
+            GroupBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom
+            | AnchorStyles.Left;
             GroupBox1.Controls.Add(LB);
             GroupBox1.Controls.Add(PicName);
             GroupBox1.Location = new System.Drawing.Point(0, 0);
@@ -179,23 +176,23 @@ namespace BlueControls.Designer_Support {
             // 
             // GrY
             // 
-            GrY.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            GrY.BorderStyle = BorderStyle.FixedSingle;
             GrY.Location = new System.Drawing.Point(88, 16);
             GrY.Name = "GrY";
             GrY.Size = new System.Drawing.Size(24, 20);
             GrY.TabIndex = 2;
             GrY.Text = "16";
-            GrY.TextChanged += new System.EventHandler(SomethingChanged);
+            GrY.TextChanged += new EventHandler(SomethingChanged);
             // 
             // GrX
             // 
-            GrX.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            GrX.BorderStyle = BorderStyle.FixedSingle;
             GrX.Location = new System.Drawing.Point(48, 16);
             GrX.Name = "GrX";
             GrX.Size = new System.Drawing.Size(24, 20);
             GrX.TabIndex = 0;
             GrX.Text = "16";
-            GrX.TextChanged += new System.EventHandler(SomethingChanged);
+            GrX.TextChanged += new EventHandler(SomethingChanged);
             // 
             // Label1
             // 
@@ -207,43 +204,43 @@ namespace BlueControls.Designer_Support {
             // 
             // chkbDurchgestrichen
             // 
-            chkbDurchgestrichen.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            chkbDurchgestrichen.FlatStyle = FlatStyle.Flat;
             chkbDurchgestrichen.Location = new System.Drawing.Point(8, 16);
             chkbDurchgestrichen.Name = "chkbDurchgestrichen";
             chkbDurchgestrichen.Size = new System.Drawing.Size(120, 16);
             chkbDurchgestrichen.TabIndex = 0;
             chkbDurchgestrichen.Text = "Durchgestrichen";
-            chkbDurchgestrichen.CheckedChanged += new System.EventHandler(SomethingCheckedChanged);
+            chkbDurchgestrichen.CheckedChanged += new EventHandler(SomethingCheckedChanged);
             // 
             // chkbGrauStufen
             // 
-            chkbGrauStufen.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            chkbGrauStufen.FlatStyle = FlatStyle.Flat;
             chkbGrauStufen.Location = new System.Drawing.Point(8, 64);
             chkbGrauStufen.Name = "chkbGrauStufen";
             chkbGrauStufen.Size = new System.Drawing.Size(152, 16);
             chkbGrauStufen.TabIndex = 15;
             chkbGrauStufen.Text = "Bild in Graustufen anzeigen";
-            chkbGrauStufen.CheckedChanged += new System.EventHandler(SomethingCheckedChanged);
+            chkbGrauStufen.CheckedChanged += new EventHandler(SomethingCheckedChanged);
             // 
             // chkbMEDisabled
             // 
-            chkbMEDisabled.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            chkbMEDisabled.FlatStyle = FlatStyle.Flat;
             chkbMEDisabled.Location = new System.Drawing.Point(8, 32);
             chkbMEDisabled.Name = "chkbMEDisabled";
             chkbMEDisabled.Size = new System.Drawing.Size(136, 16);
             chkbMEDisabled.TabIndex = 1;
             chkbMEDisabled.Text = "Windows ME disabled";
-            chkbMEDisabled.CheckedChanged += new System.EventHandler(SomethingCheckedChanged);
+            chkbMEDisabled.CheckedChanged += new EventHandler(SomethingCheckedChanged);
             // 
             // chkbXPDisabled
             // 
-            chkbXPDisabled.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            chkbXPDisabled.FlatStyle = FlatStyle.Flat;
             chkbXPDisabled.Location = new System.Drawing.Point(8, 48);
             chkbXPDisabled.Name = "chkbXPDisabled";
             chkbXPDisabled.Size = new System.Drawing.Size(136, 16);
             chkbXPDisabled.TabIndex = 2;
             chkbXPDisabled.Text = "Windows XP disabled";
-            chkbXPDisabled.CheckedChanged += new System.EventHandler(SomethingCheckedChanged);
+            chkbXPDisabled.CheckedChanged += new EventHandler(SomethingCheckedChanged);
             // 
             // GroupBox4
             // 
@@ -277,7 +274,7 @@ namespace BlueControls.Designer_Support {
             SAT.TabIndex = 5;
             SAT.TickFrequency = 10;
             SAT.Value = 100;
-            SAT.ValueChanged += new System.EventHandler(SomethingChanged);
+            SAT.ValueChanged += new EventHandler(SomethingChanged);
             // 
             // Label2
             // 
@@ -307,7 +304,7 @@ namespace BlueControls.Designer_Support {
             Hell.TabIndex = 8;
             Hell.TickFrequency = 10;
             Hell.Value = 100;
-            Hell.ValueChanged += new System.EventHandler(SomethingChanged);
+            Hell.ValueChanged += new EventHandler(SomethingChanged);
             // 
             // Label4
             // 
@@ -327,7 +324,7 @@ namespace BlueControls.Designer_Support {
             Transp.Size = new System.Drawing.Size(240, 32);
             Transp.TabIndex = 8;
             Transp.TickFrequency = 10;
-            Transp.ValueChanged += new System.EventHandler(SomethingChanged);
+            Transp.ValueChanged += new EventHandler(SomethingChanged);
             // 
             // Helll
             // 
@@ -373,26 +370,26 @@ namespace BlueControls.Designer_Support {
             // 
             // Färb
             // 
-            Färb.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            Färb.BorderStyle = BorderStyle.FixedSingle;
             Färb.Location = new System.Drawing.Point(64, 112);
             Färb.Name = "Färb";
             Färb.Size = new System.Drawing.Size(48, 20);
             Färb.TabIndex = 16;
-            Färb.TextChanged += new System.EventHandler(SomethingChanged);
+            Färb.TextChanged += new EventHandler(SomethingChanged);
             // 
             // grün
             // 
-            grün.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            grün.BorderStyle = BorderStyle.FixedSingle;
             grün.Location = new System.Drawing.Point(200, 112);
             grün.Name = "grün";
             grün.Size = new System.Drawing.Size(48, 20);
             grün.TabIndex = 17;
-            grün.TextChanged += new System.EventHandler(SomethingChanged);
+            grün.TextChanged += new EventHandler(SomethingChanged);
             // 
             // GroupBox3
             // 
-            GroupBox3.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left
-            | System.Windows.Forms.AnchorStyles.Right;
+            GroupBox3.Anchor = AnchorStyles.Top | AnchorStyles.Left
+            | AnchorStyles.Right;
             GroupBox3.Controls.Add(grün);
             GroupBox3.Controls.Add(Färb);
             GroupBox3.Controls.Add(Label5);
@@ -415,8 +412,8 @@ namespace BlueControls.Designer_Support {
             // 
             // ZweitSymbol
             // 
-            ZweitSymbol.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left
-            | System.Windows.Forms.AnchorStyles.Right;
+            ZweitSymbol.Anchor = AnchorStyles.Top | AnchorStyles.Left
+            | AnchorStyles.Right;
             ZweitSymbol.Controls.Add(txbZweitsymbol);
             ZweitSymbol.Location = new System.Drawing.Point(384, 88);
             ZweitSymbol.Name = "ZweitSymbol";
@@ -427,12 +424,12 @@ namespace BlueControls.Designer_Support {
             // 
             // txbZweitsymbol
             // 
-            txbZweitsymbol.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            txbZweitsymbol.BorderStyle = BorderStyle.FixedSingle;
             txbZweitsymbol.Location = new System.Drawing.Point(8, 24);
             txbZweitsymbol.Name = "txbZweitsymbol";
             txbZweitsymbol.Size = new System.Drawing.Size(184, 20);
             txbZweitsymbol.TabIndex = 17;
-            txbZweitsymbol.TextChanged += new System.EventHandler(SomethingChanged);
+            txbZweitsymbol.TextChanged += new EventHandler(SomethingChanged);
             // 
             // frmQuickPic
             // 
@@ -498,9 +495,7 @@ namespace BlueControls.Designer_Support {
             txbZweitsymbol.Text = l.Zweitsymbol;
         }
 
-        private void LB_DoubleClick(object sender, System.EventArgs e) {
-            PicName.Text = Convert.ToString(LB.SelectedItem);
-        }
+        private void LB_DoubleClick(object sender, System.EventArgs e) => PicName.Text = Convert.ToString(LB.SelectedItem);
 
         public void GeneratePreview() {
             try {

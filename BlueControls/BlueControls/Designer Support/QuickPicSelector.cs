@@ -51,8 +51,6 @@ namespace BlueControls.Designer_Support {
             }
         }
 
-        public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context) {
-            return UITypeEditorEditStyle.Modal;
-        }
+        public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context) => UITypeEditorEditStyle.Modal;
     }
 }

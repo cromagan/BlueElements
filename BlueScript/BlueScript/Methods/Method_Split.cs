@@ -25,7 +25,7 @@ namespace BlueScript {
 
         public override string Syntax => "Split(String, Trennzeichen)";
         public override string Description => "Wandelt einen Text in eine Liste um. Es Trennt den Text dabei mitteles dem angegebenen Trennzeichen";
-        public override List<string> Comand(Script s) { return new() { "split" }; }
+        public override List<string> Comand(Script s) => new() { "split" };
         public override string StartSequence => "(";
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
@@ -41,7 +41,7 @@ namespace BlueScript {
             attvar.Attributes[0].ValueString = attvar.Attributes[0].ValueString.Replace(attvar.Attributes[1].ValueString, "\r");
             attvar.Attributes[0].Type = enVariableDataType.List;
 
-            return new strDoItFeedback(attvar.Attributes[0].ValueForReplace, string.Empty);
+            return new strDoItFeedback(attvar.Attributes[0].ValueString, enVariableDataType.String);
         }
     }
 }

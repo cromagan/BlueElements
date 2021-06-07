@@ -28,12 +28,12 @@ namespace BluePaint {
             InitializeComponent();
         }
 
-        public override void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap OriginalPic) {
+        public override void MouseDown(MouseEventArgs1_1 e, Bitmap OriginalPic) {
             OnForceUndoSaving();
             MouseMove(new MouseEventArgs1_1DownAndCurrent(e, e), OriginalPic);
         }
 
-        public override void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) {
+        public override void MouseMove(MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) {
             if (e.Current.Button == System.Windows.Forms.MouseButtons.Left) {
                 var _Pic = OnNeedCurrentPic();
                 _Pic.FillCircle(Color.Black, e.Current.TrimmedX, e.Current.TrimmedY, 2);

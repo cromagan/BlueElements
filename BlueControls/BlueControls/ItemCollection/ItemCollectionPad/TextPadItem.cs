@@ -100,9 +100,7 @@ namespace BlueControls.ItemCollection {
 
         #endregion
 
-        public override void DesignOrStyleChanged() {
-            MakeNewETxt();
-        }
+        public override void DesignOrStyleChanged() => MakeNewETxt();
 
         public override bool ParseThis(string tag, string value) {
             if (base.ParseThis(tag, value)) { return true; }
@@ -139,9 +137,7 @@ namespace BlueControls.ItemCollection {
             return t.Trim(", ") + "}";
         }
 
-        protected override string ClassId() {
-            return "TEXT";
-        }
+        protected override string ClassId() => "TEXT";
 
         protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
 
@@ -263,10 +259,11 @@ namespace BlueControls.ItemCollection {
 
             if ("&" + variable.Name.ToLower() + ";" != Text.ToLower().TrimCr()) { return false; }
 
-            if (variable.Type != Skript.Enums.enVariableDataType.String &&
-                variable.Type != Skript.Enums.enVariableDataType.List &&
-                variable.Type != Skript.Enums.enVariableDataType.String &&
-                variable.Type != Skript.Enums.enVariableDataType.Numeral) { return false; }
+            if (variable.Type is not Skript.Enums.enVariableDataType.String and
+                                 not Skript.Enums.enVariableDataType.List and
+                                 not Skript.Enums.enVariableDataType.Integer and
+                                 not Skript.Enums.enVariableDataType.Bool and
+                                 not Skript.Enums.enVariableDataType.Numeral) { return false; }
 
             var nt = variable.ValueString;
             if (nt is string txt) {
@@ -315,9 +312,7 @@ namespace BlueControls.ItemCollection {
             return l;
         }
 
-        protected override void ParseFinished() {
-            MakeNewETxt();
-        }
+        protected override void ParseFinished() => MakeNewETxt();
 
         //public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
         //{

@@ -237,9 +237,7 @@ namespace BlueBasics {
             return P;
         }
 
-        public static GraphicsPath Poly_RoundRec(Rectangle rect, int radius) {
-            return Poly_RoundRec(rect.X, rect.Y, rect.Width, rect.Height, radius);
-        }
+        public static GraphicsPath Poly_RoundRec(Rectangle rect, int radius) => Poly_RoundRec(rect.X, rect.Y, rect.Width, rect.Height, radius);
 
         public static GraphicsPath Poly_RoundRec(int x, int y, int width, int height, int radius) {
             if (width < 1 || height < 1) { return null; }
@@ -268,9 +266,7 @@ namespace BlueBasics {
 
             return tempPoly_RoundRec;
 
-            void AddRad90(int mxX, int mxY, int Radius, int gradStart) {
-                tempPoly_RoundRec.AddArc(mxX, mxY, Radius, Radius, gradStart, 90);
-            }
+            void AddRad90(int mxX, int mxY, int Radius, int gradStart) => tempPoly_RoundRec.AddArc(mxX, mxY, Radius, Radius, gradStart, 90);
         }
 
         public static GraphicsPath Poly_Rechteck(Rectangle rect) {
@@ -447,12 +443,10 @@ namespace BlueBasics {
             return _GotUserName;
         }
 
-        public static string LastMouseButton() {
-            return Convert.ToBoolean(GetAsyncKeyState(0x1)) ? "Links"
+        public static string LastMouseButton() => Convert.ToBoolean(GetAsyncKeyState(0x1)) ? "Links"
                  : Convert.ToBoolean(GetAsyncKeyState(0x2)) ? "Rechts"
                  : Convert.ToBoolean(GetAsyncKeyState(0x4)) ? "Mitte"
                  : string.Empty;
-        }
 
         public static string Download(string url) {
             // My.Computer.Network.DownloadFile("http://.png", "C:\TMP\a.png")
@@ -489,7 +483,7 @@ namespace BlueBasics {
         }
 
         public static string GetUrlFileDestination(string filename) {
-            var D = File.ReadAllText(filename, System.Text.Encoding.UTF8).SplitByCRToList();
+            var D = File.ReadAllText(filename, Encoding.UTF8).SplitByCRToList();
             return D.TagGet("URL");
         }
 
@@ -584,9 +578,7 @@ namespace BlueBasics {
         // return nn;
         // }
 
-        public static Stream GetEmmbedResource(Assembly assembly, string name) {
-            return (from ThisString in assembly.GetManifestResourceNames() where ThisString.EndsWith("." + name) select assembly.GetManifestResourceStream(ThisString)).FirstOrDefault();
-        }
+        public static Stream GetEmmbedResource(Assembly assembly, string name) => (from ThisString in assembly.GetManifestResourceNames() where ThisString.EndsWith("." + name) select assembly.GetManifestResourceStream(ThisString)).FirstOrDefault();
 
         public static BitmapExt GetEmmbedBitmap(Assembly assembly, string name) {
             if (name.Contains("|")) { return null; }
@@ -648,9 +640,7 @@ namespace BlueBasics {
         /// </summary>
         /// <param name="x"></param>
         /// <returns></returns>
-        public static double Sigmoid(double x) {
-            return 1 / (1 + Math.Exp(-x));
-        }
+        public static double Sigmoid(double x) => 1 / (1 + Math.Exp(-x));
 
         /// <summary>
         /// Gibt einen Wert zwischen -1 und 1 zurück
@@ -678,9 +668,7 @@ namespace BlueBasics {
             return b;
         }
 
-        public static byte[] SimpleCrypt(byte[] b, string pass, int direction) {
-            return SimpleCrypt(b, pass, direction, 0, b.GetUpperBound(0));
-        }
+        public static byte[] SimpleCrypt(byte[] b, string pass, int direction) => SimpleCrypt(b, pass, direction, 0, b.GetUpperBound(0));
 
         public static List<byte> SimpleCrypt(List<byte> b, string pass, int direction, int start, int end) {
             if (string.IsNullOrEmpty(pass)) { return b; }
@@ -696,8 +684,6 @@ namespace BlueBasics {
             return b;
         }
 
-        public static List<byte> SimpleCrypt(List<byte> b, string pass, int direction) {
-            return SimpleCrypt(b, pass, direction, 0, b.Count - 1);
-        }
+        public static List<byte> SimpleCrypt(List<byte> b, string pass, int direction) => SimpleCrypt(b, pass, direction, 0, b.Count - 1);
     }
 }

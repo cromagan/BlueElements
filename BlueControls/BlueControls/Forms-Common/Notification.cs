@@ -33,9 +33,7 @@ namespace BlueControls.Forms {
         //internal int UnloadAfterSek = -999;
         internal int FloatInAndOutMilliSek = -999;
 
-        private Notification() : base(Enums.enDesign.Form_DesktopBenachrichtigung) {
-            InitializeComponent();
-        }
+        private Notification() : base(Enums.enDesign.Form_DesktopBenachrichtigung) => InitializeComponent();
 
         private Notification(string Text) : this() {
             //InitializeComponent();
@@ -251,8 +249,6 @@ namespace BlueControls.Forms {
             }
         }
 
-        private void capTXT_Click(object sender, System.EventArgs e) {
-            FadeOut();
-        }
+        private void capTXT_Click(object sender, System.EventArgs e) => FadeOut();
     }
 }

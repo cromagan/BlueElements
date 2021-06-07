@@ -142,38 +142,11 @@ namespace BlueControls.Controls {
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public new bool Enabled {
-            get {
-                return !DesignMode && string.IsNullOrEmpty(_disabledReason);
-            }
-            // set
-            // {
-            //     if (Enabled == value) { return; }
-            ////     _enabled = value;
-
-            //     if (
-
-            //     //foreach (System.Windows.Forms.Control ThisControl in Controls)
-            //     //{
-            //     //    if (ThisControl.Name == "Info")
-            //     //    {
-            //     //        ThisControl.Enabled = true;
-            //     //    }
-            //     //    else
-            //     //    {
-            //     //        ThisControl.Enabled = value;
-            //     //    }
-            //     //}
-
-            //     //Invalidate();
-            // }
-        }
+        public new bool Enabled => !DesignMode && string.IsNullOrEmpty(_disabledReason);
 
         [DefaultValue("")]
         public string DisabledReason {
-            get {
-                return _disabledReason ?? string.Empty;
-            }
+            get => _disabledReason ?? string.Empty;
             set {
                 value ??= string.Empty;
                 //if (value == null) { value = string.Empty; }
@@ -182,7 +155,7 @@ namespace BlueControls.Controls {
 
                 _disabledReason = value;
 
-                foreach (System.Windows.Forms.Control ThisControl in Controls) {
+                foreach (Control ThisControl in Controls) {
                     ThisControl.Enabled = ThisControl == _InfoCaption || Enabled;
                 }
 
@@ -206,11 +179,7 @@ namespace BlueControls.Controls {
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public string Value {
-            get {
-                return _Value ?? string.Empty;
-            }
-        }
+        public string Value => _Value ?? string.Empty;
 
         /// <summary>
         /// Falls das Steuerelement eine Suffix unterstützt, wird dieser angezeigt
@@ -386,7 +355,7 @@ namespace BlueControls.Controls {
 
             _IsFilling = true;
 
-            foreach (System.Windows.Forms.Control Control in Controls) {
+            foreach (Control Control in Controls) {
                 switch (Control) {
 
                     case ComboBox ComboBox:
@@ -496,11 +465,9 @@ namespace BlueControls.Controls {
             UpdateControls();
         }
 
-        private void TextEditControl_LostFocus(object sender, System.EventArgs e) {
-            CheckIfChanged();
-        }
+        private void TextEditControl_LostFocus(object sender, System.EventArgs e) => CheckIfChanged();
 
-        protected override void OnControlRemoved(System.Windows.Forms.ControlEventArgs e) {
+        protected override void OnControlRemoved(ControlEventArgs e) {
             base.OnControlRemoved(e);
 
             switch (e.Control) {
@@ -597,9 +564,7 @@ namespace BlueControls.Controls {
         //    RemovingAll?.Invoke(this, System.EventArgs.Empty);
         //}
 
-        protected virtual void OnNeedRefresh() {
-            NeedRefresh?.Invoke(this, System.EventArgs.Empty);
-        }
+        protected virtual void OnNeedRefresh() => NeedRefresh?.Invoke(this, System.EventArgs.Empty);
 
         #region  Caption 
 
@@ -620,7 +585,7 @@ namespace BlueControls.Controls {
             _CaptionObject.Left = 0;
             _CaptionObject.Top = 0;
 
-            _CaptionObject.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left;
+            _CaptionObject.Anchor = AnchorStyles.Top | AnchorStyles.Left;
 
             _CaptionObject.Visible = _CaptionPosition != enÜberschriftAnordnung.Ohne_mit_Abstand;
 
@@ -681,10 +646,9 @@ namespace BlueControls.Controls {
         /// <summary>
         /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling  muss TRUE sein.
         /// </summary>
-        private void UpdateValueTo_EasyPic(EasyPic Control) {
+        private void UpdateValueTo_EasyPic(EasyPic Control) =>
             //if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
             Control.FromFile(_Value);
-        }
 
         #endregion
 
@@ -696,14 +660,14 @@ namespace BlueControls.Controls {
         private ComboBox Control_Create_ComboBox() {
             var Control = new ComboBox();
 
-            StyleComboBox(Control, null, System.Windows.Forms.ComboBoxStyle.DropDownList);
+            StyleComboBox(Control, null, ComboBoxStyle.DropDownList);
 
             UpdateValueToControl();
             StandardBehandlung(Control);
             return Control;
         }
 
-        protected void StyleComboBox(ComboBox Control, ItemCollectionList list, System.Windows.Forms.ComboBoxStyle Style) {
+        protected void StyleComboBox(ComboBox Control, ItemCollectionList list, ComboBoxStyle Style) {
             Control.Enabled = Enabled;
             Control.Format = _Format;
             Control.Suffix = _Suffix;
@@ -716,10 +680,9 @@ namespace BlueControls.Controls {
         /// <summary>
         /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.
         /// </summary>
-        private void UpdateValueTo_Combobox(ComboBox Control) {
+        private void UpdateValueTo_Combobox(ComboBox Control) =>
             //if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
             Control.Text = _Value;
-        }
 
         private void ValueChanged_ComboBox(object sender, System.EventArgs e) {
             if (_IsFilling) { return; }
@@ -851,9 +814,7 @@ namespace BlueControls.Controls {
         /// <summary>
         /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.
         /// </summary>
-        private void UpdateValueTo_ListBox(ItemCollectionList Main) {
-            Main.SetValuesTo(_Value.SplitByCRToList(), FileEncryptionKey);
-        }
+        private void UpdateValueTo_ListBox(ItemCollectionList Main) => Main.SetValuesTo(_Value.SplitByCRToList(), FileEncryptionKey);
 
         #endregion
 
@@ -865,23 +826,11 @@ namespace BlueControls.Controls {
             OnButtonClicked();
         }
 
-        private void ColorButton_Click(object sender, System.EventArgs e) {
+        private void ColorButton_Click(object sender, System.EventArgs e) => Develop.DebugPrint_NichtImplementiert(); // TODO: Erstellen!//if (_EditType != enEditTypeFormula.Button) { return; }//CheckIfChanged("+");//OnButtonClicked();
 
-            Develop.DebugPrint_NichtImplementiert(); // TODO: Erstellen!
-                                                     //if (_EditType != enEditTypeFormula.Button) { return; }
-                                                     //CheckIfChanged("+");
+        protected virtual void OnButtonClicked() => ButtonClicked?.Invoke(this, System.EventArgs.Empty);
 
-            //OnButtonClicked();
-
-        }
-
-        protected virtual void OnButtonClicked() {
-            ButtonClicked?.Invoke(this, System.EventArgs.Empty);
-        }
-
-        private void YesNoButton_CheckedChanged(object sender, System.EventArgs e) {
-            ValueSet(((Button)sender).Checked.ToPlusMinus(), false, true);
-        }
+        private void YesNoButton_CheckedChanged(object sender, System.EventArgs e) => ValueSet(((Button)sender).Checked.ToPlusMinus(), false, true);
 
         /// <summary>
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
@@ -991,11 +940,10 @@ namespace BlueControls.Controls {
         /// <summary>
         /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.
         /// </summary>
-        private void UpdateValueTo_TextBox(TextBox Control) {
+        private void UpdateValueTo_TextBox(TextBox Control) =>
             //if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
 
             Control.Text = _Value;
-        }
 
         private void ValueChanged_TextBox(object sender, System.EventArgs e) {
             if (_IsFilling) { return; }
@@ -1045,7 +993,7 @@ namespace BlueControls.Controls {
                     break;
             }
 
-            Control.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right | System.Windows.Forms.AnchorStyles.Bottom;
+            Control.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;
 
             Control.Visible = true;
 
@@ -1059,7 +1007,7 @@ namespace BlueControls.Controls {
 
         public override bool Focused {
             get {
-                foreach (System.Windows.Forms.Control ThisControl in Controls) {
+                foreach (Control ThisControl in Controls) {
                     if (ThisControl.Focused) { return true; }
                 }
 
@@ -1073,9 +1021,7 @@ namespace BlueControls.Controls {
             OnValueChanged();
         }
 
-        protected virtual void OnValueChanged() {
-            ValueChanged?.Invoke(this, System.EventArgs.Empty);
-        }
+        protected virtual void OnValueChanged() => ValueChanged?.Invoke(this, System.EventArgs.Empty);
 
         private void DoInfoTextCaption(string disabledReason) {
             var txt = string.Empty;
@@ -1124,7 +1070,7 @@ namespace BlueControls.Controls {
                     Height = 18,
                     Left = Width - 18,
                     Top = 0,
-                    Anchor = System.Windows.Forms.AnchorStyles.Right | System.Windows.Forms.AnchorStyles.Top,
+                    Anchor = AnchorStyles.Right | AnchorStyles.Top,
                     Visible = true
                 };
                 Controls.Add(_InfoCaption);
@@ -1260,7 +1206,7 @@ namespace BlueControls.Controls {
 
         private void UpdateControls() {
 
-            foreach (System.Windows.Forms.Control Control in Controls) {
+            foreach (Control Control in Controls) {
 
                 if (Control != _InfoCaption) {
                     if (Control is GenericControl QI) { QI.QuickInfo = QuickInfo; }

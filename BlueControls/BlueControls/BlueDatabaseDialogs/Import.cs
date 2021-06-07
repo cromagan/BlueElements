@@ -74,8 +74,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             Close();
         }
 
-        private void Cancel_Click(object sender, System.EventArgs e) {
-            Close();
-        }
+        private void Cancel_Click(object sender, System.EventArgs e) => Close();
     }
 }

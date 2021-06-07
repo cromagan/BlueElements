@@ -27,7 +27,7 @@ namespace BlueScript {
 
         public override string Description => "Prüft, ob der Inhalt der Variable eine gültige Zahl ist. ";
         public override string Syntax => "isNumeral(Value)";
-        public override List<string> Comand(Script s) { return new() { "isnumeral" }; }
+        public override List<string> Comand(Script s) => new() { "isnumeral" };
         public override string StartSequence => "(";
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
@@ -39,9 +39,9 @@ namespace BlueScript {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.Falsch(); }
 
-            if (attvar.Attributes[0].Type == Skript.Enums.enVariableDataType.Numeral) { return strDoItFeedback.Wahr(); }
+            if (attvar.Attributes[0].Type == enVariableDataType.Numeral) { return strDoItFeedback.Wahr(); }
 
-            if (attvar.Attributes[0].Type == Skript.Enums.enVariableDataType.String) {
+            if (attvar.Attributes[0].Type == enVariableDataType.String) {
 
                 if (attvar.Attributes[0].ValueString.IsNumeral()) {
                     return strDoItFeedback.Wahr();

@@ -38,9 +38,7 @@ namespace BlueControls.Controls {
     [Designer(typeof(BasicDesigner))]
     public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
         #region Constructor
-        public Formula() : base(false, false) {
-            InitializeComponent();
-        }
+        public Formula() : base(false, false) => InitializeComponent();
 
         #endregion
 
@@ -117,9 +115,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        private void _Database_Disposing(object sender, System.EventArgs e) {
-            Database = null;
-        }
+        private void _Database_Disposing(object sender, System.EventArgs e) => Database = null;
 
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -166,9 +162,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        private void OnShowingRowChanged(RowEventArgs e) {
-            ShowingRowChanged?.Invoke(this, e);
-        }
+        private void OnShowingRowChanged(RowEventArgs e) => ShowingRowChanged?.Invoke(this, e);
 
         // <Obsolete("Database darf nicht im Designer gesetzt werden.", True)>
         [Browsable(false)]
@@ -322,7 +316,7 @@ namespace BlueControls.Controls {
                         if (ObjPX.Y > 0) { ObjPX.Y += 8; }
                         ObjPX.Height = (Math.Max(ThisViewItem.Height, 0) * 16) + 8;
 
-                        if (ThisViewItem.ÜberschriftAnordnung == enÜberschriftAnordnung.Ohne_mit_Abstand || ThisViewItem.ÜberschriftAnordnung == enÜberschriftAnordnung.Über_dem_Feld) {
+                        if (ThisViewItem.ÜberschriftAnordnung is enÜberschriftAnordnung.Ohne_mit_Abstand or enÜberschriftAnordnung.Über_dem_Feld) {
                             ObjPX.Height += Skin.PaddingSmal + 16;
 
                         }
@@ -565,9 +559,7 @@ namespace BlueControls.Controls {
 
         }
 
-        protected override void DrawControl(Graphics gr, enStates state) {
-            Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
-        }
+        protected override void DrawControl(Graphics gr, enStates state) => Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
 
         protected override void OnSizeChanged(System.EventArgs e) {
             if (IsDisposed) { return; }
@@ -679,13 +671,9 @@ namespace BlueControls.Controls {
             ColumnsEinfärben();
         }
 
-        private string EditorSelectedColumn() {
-            return lbxColumns.Item.Checked().Count != 1 ? string.Empty : lbxColumns.Item.Checked()[0].Internal;
-        }
+        private string EditorSelectedColumn() => lbxColumns.Item.Checked().Count != 1 ? string.Empty : lbxColumns.Item.Checked()[0].Internal;
 
-        private void lbxColumns_ItemCheckedChanged(object sender, System.EventArgs e) {
-            Editor_CheckButtons(true);
-        }
+        private void lbxColumns_ItemCheckedChanged(object sender, System.EventArgs e) => Editor_CheckButtons(true);
 
         private void RedoView() {
             var i = Tabs.SelectedIndex;
@@ -710,7 +698,7 @@ namespace BlueControls.Controls {
 
             if (vn < 1) { return; }
             if (vn >= _Database.Views.Count) { return; }
-            if (Ri == 0 || Ri > 1 || Ri < -1) { return; }
+            if (Ri is 0 or > 1 or < -1) { return; }
 
             if (vn < 2 && Ri < 0) { return; }
             if (vn >= _Database.Views.Count - 1 && Ri > 0) { return; }
@@ -970,13 +958,9 @@ namespace BlueControls.Controls {
             EndEdit();
         }
 
-        private void Li_Click(object sender, System.EventArgs e) {
-            Arrangement_Swap(-1);
-        }
+        private void Li_Click(object sender, System.EventArgs e) => Arrangement_Swap(-1);
 
-        private void Re_Click(object sender, System.EventArgs e) {
-            Arrangement_Swap(1);
-        }
+        private void Re_Click(object sender, System.EventArgs e) => Arrangement_Swap(1);
 
         private void _Database_ColumnRemoved(object sender, System.EventArgs e) {
             if (IsDisposed) { return; }
@@ -1080,13 +1064,9 @@ namespace BlueControls.Controls {
 
         }
 
-        public void OnContextMenuInit(ContextMenuInitEventArgs e) {
-            ContextMenuInit?.Invoke(this, e);
-        }
+        public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
-        public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) {
-            ContextMenuItemClicked?.Invoke(this, e);
-        }
+        public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
         private void _Database_StoreView(object sender, LoadingEventArgs e) {
             if (e.OnlyReload) { return; }
             _savedRowKey = ShowingRowKey;

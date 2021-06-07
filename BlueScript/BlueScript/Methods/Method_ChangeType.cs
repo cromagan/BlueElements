@@ -27,7 +27,7 @@ namespace BlueScript {
 
         public override string Description => "Ändert den Variabelntyp einfach um. Ohne jegliche Prüfung. Alle Variablen werden Intern als Text gespeichert, weshalb diese Änderung möglich ist. Evtl. entstehen dadurch Variablen, die an sich kaputt sind, aber nicht als solches markiert sind.";
 
-        public override List<string> Comand(Script s) { return new() { "changetype" }; }
+        public override List<string> Comand(Script s) => new() { "changetype" };
         public override string StartSequence => "(";
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;

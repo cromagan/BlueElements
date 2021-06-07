@@ -34,9 +34,7 @@ namespace BlueControls {
     /// </summary>
     public sealed partial class ScreenShot {
 
-        private ScreenShot() {
-            InitializeComponent();
-        }
+        private ScreenShot() => InitializeComponent();
 
         #region  +++ Deklarationen +++ 
         //private enSelectModus Modus = enSelectModus.Unbekannt;
@@ -104,13 +102,9 @@ namespace BlueControls {
 
         }
 
-        public static Bitmap GrabArea(Rectangle R) {
-            return R.Width < 2 || R.Height < 2 ? null : GrabAllScreens().Area(R);
-        }
+        public static Bitmap GrabArea(Rectangle R) => R.Width < 2 || R.Height < 2 ? null : GrabAllScreens().Area(R);
 
-        public static strScreenData GrabArea() {
-            return GrabArea(null, -1, -1);
-        }
+        public static strScreenData GrabArea() => GrabArea(null, -1, -1);
 
         /// <summary>
         /// Erstellt einen Screenshot, dann kann der User einen Bereich wählen - und gibt diesen zurück.
