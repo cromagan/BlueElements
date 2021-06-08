@@ -297,7 +297,7 @@ namespace BlueControls.Controls {
         }
 
         [DefaultValue("")]
-        public string FileEncryptionKey { get; set; }
+        public string FileEncryptionKey { get; set; } = "";
 
         #endregion
 

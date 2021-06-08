@@ -241,18 +241,12 @@ namespace BlueDatabase {
 
         }
 
-        public void Swap(ColumnViewItem viewItem1, ColumnViewItem viewItem2) {
-            if (viewItem1 == null) { return; }
-            if (viewItem2 == null) { return; }
-            if (viewItem1 == viewItem2) { return; }
+        public new void Swap(ColumnViewItem viewItem1, ColumnViewItem viewItem2) {
+            if (viewItem1 == null ||   viewItem2 == null) { return; }
 
-            var Col1 = IndexOf(viewItem1);
-            var Col2 = IndexOf(viewItem2);
-            if (Col1 < 0 || Col2 < 0) { return; }
-
-            Swap(Col1, Col2);
-
-            if (this[Col1].ViewType != enViewType.PermanentColumn) { this[Col2].ViewType = enViewType.Column; }
+            base.Swap(viewItem1, viewItem2);
+ 
+            if (viewItem2.ViewType != enViewType.PermanentColumn) { viewItem1.ViewType = enViewType.Column; }
         }
 
         public List<ColumnItem> ListOfUsedColumn() {
