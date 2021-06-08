@@ -1162,7 +1162,7 @@ namespace BlueDatabase {
                     break;
                 case enDatabaseDataType.co_Identifier:
                     _Identifier = Wert;
-                    StandardWerteNachKennung(false);
+                    ResetSystemToDefault(false);
                     Database.Column.GetSystems();
                     break;
                 case enDatabaseDataType.co_EditType:
@@ -1334,7 +1334,7 @@ namespace BlueDatabase {
             return string.Empty;
         }
 
-        public void StandardWerteNachKennung(bool SetAll) {
+        public void ResetSystemToDefault(bool SetAll) {
             if (string.IsNullOrEmpty(_Identifier)) { return; }
 
             //if (SetAll && !IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Ausserhalb des parsens!"); }

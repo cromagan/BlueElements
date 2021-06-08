@@ -129,7 +129,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             btnEditableDropdown.Checked = _Column.DropdownBearbeitungErlaubt;
             btnCanBeEmpty.Checked = _Column.DropdownAllesAbwählenErlaubt;
             btnAutoEditAutoSort.Checked = _Column.AfterEdit_QuickSortRemoveDouble;
-            tbxRunden.Text = _Column.AfterEdit_Runden > -1 && _Column.AfterEdit_Runden < 7 ? _Column.AfterEdit_Runden.ToString() : string.Empty;
+            tbxRunden.Text = _Column.AfterEdit_Runden is > -1 and < 7 ? _Column.AfterEdit_Runden.ToString() : string.Empty;
             btnAutoEditToUpper.Checked = _Column.AfterEdit_DoUCase;
             btnAutoEditKleineFehler.Checked = _Column.AfterEdit_AutoCorrect;
             tbxInitValue.Text = _Column.CellInitValue;
@@ -293,9 +293,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             if (tbxRunden.Text.IsLong()) {
                 var zahl = int.Parse(tbxRunden.Text);
-                if (zahl > -1 && zahl < 7) {
-                    _Column.AfterEdit_Runden = zahl;
-                }
+                if (zahl is > -1 and < 7) { _Column.AfterEdit_Runden = zahl; }
             } else {
                 _Column.AfterEdit_Runden = -1;
             }
@@ -461,7 +459,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void btnStandard_Click(object sender, System.EventArgs e) {
             if (!AllOk()) { return; }
 
-            _Column.StandardWerteNachKennung(true);
+            _Column.ResetSystemToDefault(true);
             Column_DatenAuslesen(_Column);
         }
 

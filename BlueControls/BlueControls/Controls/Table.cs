@@ -3214,10 +3214,9 @@ namespace BlueControls.Controls {
 
         private bool UserEdit_NewRowAllowed() {
 
-            //if (Thread.CurrentThread.IsBackground) { return false; }
 
-            if (_Database == null) { return false; }
-            //if (!Enabled) { return false; }
+            if (_Database == null || _Database.Column.Count == 0) { return false; }
+
 
             return _Database.Column[0] != null
                     && _Design != enBlueTableAppearance.OnlyMainColumnWithoutHead

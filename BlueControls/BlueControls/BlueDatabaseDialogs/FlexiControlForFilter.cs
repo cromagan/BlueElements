@@ -104,7 +104,7 @@ namespace BlueControls.Controls {
                         ValueSet(Filter.SearchValue[0], true, true);
                     }
 
-                    if (Filter.Column.FilterOptions == enFilterOptions.Enabled_OnlyAndAllowed || Filter.Column.FilterOptions == enFilterOptions.Enabled_OnlyOrAllowed) {
+                    if (Filter.Column.FilterOptions is enFilterOptions.Enabled_OnlyAndAllowed or enFilterOptions.Enabled_OnlyOrAllowed) {
                         ShowDelFilterButton = false;
                         CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
                         Caption = Filter.Column.ReadableText() + ":";

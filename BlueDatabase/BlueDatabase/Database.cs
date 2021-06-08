@@ -227,7 +227,11 @@ namespace BlueDatabase {
                 Load(filename, create);
             } else if (stream != null) {
                 LoadFromStream(stream);
+            } else {
+                RepairAfterParse();
             }
+
+
 
             QuickImage.NeedImage += QuickImage_NeedImage;
         }
@@ -572,7 +576,7 @@ namespace BlueDatabase {
         }
 
         private void CheckViewsAndArrangements() {
-            if(ReadOnly) { return; }
+            if (ReadOnly) { return; }
 
             foreach (var ThisCol in ColumnArrangements) {
                 ThisCol.Repair();
@@ -795,7 +799,7 @@ namespace BlueDatabase {
 
                         if (_Column != null) {
                             // Prima, gefunden! Noch die Collections korrigieren
-                            Column.Add(enDatabaseDataType.AddColumn, _Column);
+                            Column.AddFromParser(_Column);
                             ColumnsOld.Remove(_Column);
                         } else {
                             // Nicht gefunden, als neu machen
@@ -1087,7 +1091,7 @@ namespace BlueDatabase {
 
                 case enDatabaseDataType.AddColumn:
                     var addColumnKey = int.Parse(content);
-                    if (Column.SearchByKey(addColumnKey) == null) { Column.Add(enDatabaseDataType.AddColumn, new ColumnItem(this, addColumnKey)); }
+                    if (Column.SearchByKey(addColumnKey) == null) { Column.AddFromParser(new ColumnItem(this, addColumnKey)); }
                     break;
 
                 case enDatabaseDataType.dummyComand_RemoveRow:
@@ -1867,7 +1871,7 @@ namespace BlueDatabase {
                             ChangeRowKeyInPending(ThisPending.RowKey, Row.NextRowKey());
                             break;
                         case enDatabaseDataType.AddColumn:
-                            ChangeColumnKeyInPending(ThisPending.ColKey, Column.NextColumnKey());
+                            ChangeColumnKeyInPending(ThisPending.ColKey, Column.NextColumnKey);
                             break;
                     }
                 }
@@ -2012,7 +2016,7 @@ namespace BlueDatabase {
             ColumnKeyChanged?.Invoke(this, e);
         }
 
-        internal void ChangeWorkItems(enItemState OldState, enItemState NewState) {
+        private void ChangeWorkItems(enItemState OldState, enItemState NewState) {
 
             foreach (var ThisWork in Works) {
                 if (ThisWork.State == OldState) { ThisWork.State = NewState; }
@@ -2267,7 +2271,7 @@ namespace BlueDatabase {
                 }
 
                 while (columns.Count < Zeil[0].GetUpperBound(0) + 1) {
-                    var newc = Column.Add(string.Empty);
+                    var newc = Column.Add();
                     newc.Caption = newc.Name;
                     newc.Format = enDataFormat.Text;
                     newc.MultiLine = true;
@@ -2307,6 +2311,10 @@ namespace BlueDatabase {
 
             OnDropMessage("<b>Import abgeschlossen.</b>\r\n" + neuZ.ToString() + " neue Zeilen erstellt.");
             return string.Empty;
+        }
+
+        public override void DiscardPendingChanges() {
+            ChangeWorkItems(enItemState.Pending, enItemState.Undo);
         }
     }
 }

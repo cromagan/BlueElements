@@ -205,8 +205,17 @@ namespace BlueBasics {
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
+
+        public void Swap(T item1, T item2) {
+            var nr1 = IndexOf(item1);
+            var nr2 = IndexOf(item2);
+            if (nr1 < 0 || nr2 < 0) { Develop.DebugPrint("Swap fehlgeschlagen!"); }
+            Swap(nr1, nr2);
+        }
+
         public void Swap(int index1, int index2) {
             Develop.DebugPrint_Disposed(Disposed);
+            if (index1 == index2) { return; }
             // Der Swap geht so, und nicht anders! Es müssen die Items im Original-Array geswapt werden!
             // Wichtig auch der Zugriff auf die base (nicht auf this). Dadurch werden keine Add/Remove Event ausgelöst.
             var tmp = base[index1];

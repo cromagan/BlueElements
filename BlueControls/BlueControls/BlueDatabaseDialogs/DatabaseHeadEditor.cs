@@ -397,6 +397,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             var x = new Database(true);
             x.Column.Add("hidden", "hidden", enDataFormat.Text);
             x.Column.Add("Index", "Index", enDataFormat.Ganzzahl);
+            x.Column.Add("db", "Herkunft", enDataFormat.Text);
             x.Column.Add("ColumnKey", "Spalten-<br>Schlüssel", enDataFormat.Ganzzahl);
             x.Column.Add("ColumnName", "Spalten-<br>Name", enDataFormat.Text);
             x.Column.Add("ColumnCaption", "Spalten-<br>Beschriftung", enDataFormat.Text);
@@ -425,17 +426,17 @@ namespace BlueControls.BlueDatabaseDialogs {
             x.ColumnArrangements[1].Hide("hidden");
             x.ColumnArrangements[1].HideSystemColumns();
 
-            x.SortDefinition = new RowSortDefinition(x, "Aenderzeit", true);
+            x.SortDefinition = new RowSortDefinition(x,  "Index" , true);
             tblUndo.Database = x;
             tblUndo.Arrangement = 1;
             for (var n = 0; n < _Database.Works.Count; n++) {
-                AddUndoToTable(_Database.Works[n], n.ToString());
+                AddUndoToTable(_Database.Works[n], n, string.Empty);
             }
 
 
         }
 
-        private void AddUndoToTable(WorkItem work, string sorttxt) {
+        private void AddUndoToTable(WorkItem work, int index,  string db) {
             if (work.HistorischRelevant) {
 
                 var l = tblUndo.Database.Row[work.ToString()];
@@ -450,7 +451,8 @@ namespace BlueControls.BlueDatabaseDialogs {
 
                 r.CellSet("ColumnKey", cd[0]);
                 r.CellSet("RowKey", cd[1]);
-                r.CellSet("index", sorttxt);
+                r.CellSet("index", index);
+                r.CellSet("db", db);
 
                 if (Col != null) {
                     r.CellSet("ColumnName", Col.Name);
@@ -586,7 +588,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
                 if (db.Caption == _Database.Caption) {
                     for (var n = 0; n < db.Works.Count; n++) {
-                        AddUndoToTable(db.Works[n], db.Filename.FileNameWithoutSuffix() + "-" + n.ToString());
+                        AddUndoToTable(db.Works[n], n, db.Filename.FileNameWithoutSuffix());
                     }
                 }
 

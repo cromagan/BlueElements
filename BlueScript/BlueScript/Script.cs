@@ -163,6 +163,8 @@ namespace BlueScript {
             var gänsef = false;
             var comment = false;
 
+            txt = txt.Replace("\\\"", Constants.GänsefüßchenReplace); // muss am anfaang gemacht werden, weil sonst die Zählweise nicht mehr stimmt
+
             for (var pos = 0; pos < txt.Length; pos++) {
 
                 var c = txt.Substring(pos, 1);
@@ -199,7 +201,7 @@ namespace BlueScript {
                 }
             }
 
-            return s.ToString().Replace("\\\"", Constants.GänsefüßchenReplace);
+            return s.ToString();
         }
 
         public static (string, string) Parse(string scriptText, bool reduce, Script s) {

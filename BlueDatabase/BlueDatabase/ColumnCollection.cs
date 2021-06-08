@@ -126,15 +126,6 @@ namespace BlueDatabase {
             return null;
         }
 
-        public void ResetSystems() {
-            SysLocked = null;
-            SysRowCreateDate = null;
-            SysRowCreator = null;
-            SysCorrect = null;
-            SysRowChanger = null;
-            SysRowChangeDate = null;
-            SysChapter = null;
-        }
 
         internal string Load_310(enDatabaseDataType Art, string Wert) {
 
@@ -170,32 +161,19 @@ namespace BlueDatabase {
 
         public ColumnItem SysRowCreator { get; private set; }
 
-        public void Swap(ColumnItem Column1, ColumnItem Column2) {
+        public new void Swap(ColumnItem column1, ColumnItem column2) {
 
-            if (Column1 == Column2 || Column1 == null || Column2 == null) { return; }
+            if (column1 == null || column2 == null) { return; }
 
-            var nr1 = IndexOf(Column1);
-            var nr2 = IndexOf(Column2);
+            base.Swap(column1, column2);
 
-            Swap(nr1, nr2);
-
-            Column1.Invalidate_ColumAndContent();
-            Column2.Invalidate_ColumAndContent();
+            column1.Invalidate_ColumAndContent();
+            column2.Invalidate_ColumAndContent();
 
             Database.ColumnArrangements[0].ShowAllColumns(); // Damit die Datenbank mitbekommt, das sich da was geändert hat
         }
 
-        private void AddSystems(string Kennung) {
 
-            foreach (var ThisColumn in this) {
-                if (ThisColumn != null && ThisColumn.Identifier.ToUpper() == Kennung.ToUpper()) { return; }
-            }
-
-            var c = Database.Column.Add();
-            c.Load(enDatabaseDataType.co_Identifier, Kennung);
-            c.StandardWerteNachKennung(true);
-
-        }
 
         internal void SaveToByteList(List<byte> List) {
 
@@ -210,7 +188,13 @@ namespace BlueDatabase {
 
         public void GetSystems() {
 
-            ResetSystems();
+            SysLocked = null;
+            SysRowCreateDate = null;
+            SysRowCreator = null;
+            SysCorrect = null;
+            SysRowChanger = null;
+            SysRowChangeDate = null;
+            SysChapter = null;
 
             foreach (var ThisColumnItem in this) {
                 if (ThisColumnItem != null) {
@@ -270,7 +254,7 @@ namespace BlueDatabase {
             }
 
             foreach (var thisstring in w) {
-                AddSystems(thisstring);
+                AddSystem(thisstring);
             }
 
             GetSystems();
@@ -325,13 +309,14 @@ namespace BlueDatabase {
             } while (true);
         }
 
-        internal int NextColumnKey() {
-
-            do {
-                if (_LastColumnKey == int.MaxValue) { _LastColumnKey = 0; }
-                _LastColumnKey++;
-                if (SearchByKey(_LastColumnKey) == null) { return _LastColumnKey; }
-            } while (true);
+        internal int NextColumnKey {
+            get {
+                do {
+                    if (_LastColumnKey == int.MaxValue) { _LastColumnKey = 0; }
+                    _LastColumnKey++;
+                    if (SearchByKey(_LastColumnKey) == null) { return _LastColumnKey; }
+                } while (true);
+            }
         }
 
         internal static string ParsableColumnKey(ColumnItem Column) => Column == null ? "ColumnKey=?" : ParsableColumnKey(Column.Key);
@@ -365,119 +350,7 @@ namespace BlueDatabase {
 
         }
 
-        public ColumnItem AddACloneFrom(ColumnItem Source) {
 
-            var c = Add(string.Empty);
-
-            c.Caption = Source.Caption;
-            c.CaptionBitmap = Source.CaptionBitmap;
-
-            c.Format = Source.Format;
-            c.LineLeft = Source.LineLeft;
-            c.LineRight = Source.LineRight;
-            c.MultiLine = Source.MultiLine;
-            c.Quickinfo = Source.Quickinfo;
-            c.ForeColor = Source.ForeColor;
-            c.BackColor = Source.BackColor;
-
-            c.EditTrotzSperreErlaubt = Source.EditTrotzSperreErlaubt;
-
-            c.EditType = Source.EditType;
-            c.Identifier = Source.Identifier;
-
-            c.PermissionGroups_ChangeCell.Clear();
-            c.PermissionGroups_ChangeCell.AddRange(Source.PermissionGroups_ChangeCell);
-
-            c.Tags.Clear();
-            c.Tags.AddRange(Source.Tags);
-
-            c.AllowedChars = Source.AllowedChars;
-            c.AdminInfo = Source.AdminInfo;
-            c.FilterOptions = Source.FilterOptions;
-            //c.AutoFilterErlaubt = Source.AutoFilterErlaubt;
-            //c.AutofilterTextFilterErlaubt = Source.AutofilterTextFilterErlaubt;
-            //c.AutoFilterErweitertErlaubt = Source.AutoFilterErweitertErlaubt;
-            c.IgnoreAtRowFilter = Source.IgnoreAtRowFilter;
-            c.DropdownBearbeitungErlaubt = Source.DropdownBearbeitungErlaubt;
-            c.DropdownAllesAbwählenErlaubt = Source.DropdownAllesAbwählenErlaubt;
-            c.TextBearbeitungErlaubt = Source.TextBearbeitungErlaubt;
-            c.SpellCheckingEnabled = Source.SpellCheckingEnabled;
-            c.DropdownWerteAndererZellenAnzeigen = Source.DropdownWerteAndererZellenAnzeigen;
-            c.AfterEdit_QuickSortRemoveDouble = Source.AfterEdit_QuickSortRemoveDouble;
-
-            c.AfterEdit_Runden = Source.AfterEdit_Runden;
-            c.AfterEdit_DoUCase = Source.AfterEdit_DoUCase;
-            c.AfterEdit_AutoCorrect = Source.AfterEdit_AutoCorrect;
-            c.AutoRemove = Source.AutoRemove;
-            c.SaveContent = Source.SaveContent;
-            c.CellInitValue = Source.CellInitValue;
-            c.AutoFilterJoker = Source.AutoFilterJoker;
-            c.KeyColumnKey = Source.KeyColumnKey;
-            c.LinkedCell_RowKey = Source.LinkedCell_RowKey;
-            c.LinkedCell_ColumnKey = Source.LinkedCell_ColumnKey;
-            c.LinkedCell_ColumnValueFoundIn = Source.LinkedCell_ColumnValueFoundIn;
-            c.LinkedCell_ColumnValueAdd = Source.LinkedCell_ColumnValueAdd;
-            //c.ZellenZusammenfassen = Source.ZellenZusammenfassen;
-            c.DropdownKey = Source.DropdownKey;
-            c.VorschlagsColumn = Source.VorschlagsColumn;
-            c.Align = Source.Align;
-            c.SortMask = Source.SortMask;
-
-            c.DropDownItems.Clear();
-            c.DropDownItems.AddRange(Source.DropDownItems);
-
-            c.OpticalReplace.Clear();
-            c.OpticalReplace.AddRange(Source.OpticalReplace);
-
-            c.AfterEdit_AutoReplace.Clear();
-            c.AfterEdit_AutoReplace.AddRange(Source.OpticalReplace);
-
-            c.Regex.Clear();
-            c.Regex.AddRange(Source.Regex);
-
-            //c.CompactView = Source.CompactView;
-            c.ShowUndo = Source.ShowUndo;
-            c.ShowMultiLineInOneLine = Source.ShowMultiLineInOneLine;
-
-            c.Ueberschrift1 = Source.Ueberschrift1;
-            c.Ueberschrift2 = Source.Ueberschrift2;
-            c.Ueberschrift3 = Source.Ueberschrift3;
-
-            c.Suffix = Source.Suffix;
-            //c.Intelligenter_Multifilter = Source.Intelligenter_Multifilter;
-
-            c.DauerFilterPos = new Point(Source.DauerFilterPos.X, Source.DauerFilterPos.Y);
-
-            c.LinkedKeyKennung = Source.LinkedKeyKennung;
-            c.LinkedDatabaseFile = Source.LinkedDatabaseFile;
-            c.BildTextVerhalten = Source.BildTextVerhalten;
-            c.BildCode_ConstantHeight = Source.BildCode_ConstantHeight;
-            c.BestFile_StandardSuffix = Source.BestFile_StandardSuffix;
-            c.BestFile_StandardFolder = Source.BestFile_StandardFolder;
-
-            c.Prefix = Source.Prefix;
-
-            return c;
-
-        }
-
-        //internal string ChangeKeysToNames(string OriginalString)
-        //{
-
-        //    foreach (var ThisColumn in this)
-        //    {
-        //        if (ThisColumn != null)
-        //        {
-
-        //            OriginalString = OriginalString.Replace(ParsableColumnKey(ThisColumn) + ",", "ColumnName=" + ThisColumn.Name.ToNonCritical() + ",");
-        //            OriginalString = OriginalString.Replace(ParsableColumnKey(ThisColumn) + "}", "ColumnName=" + ThisColumn.Name.ToNonCritical() + "}");
-        //            OriginalString = OriginalString.Replace(ParsableColumnKey(ThisColumn) + " ", "ColumnName=" + ThisColumn.Name.ToNonCritical() + " ");
-        //        }
-        //    }
-
-        //    return OriginalString;
-
-        //}
 
         public void GenerateOverView() {
             var da = new HTML(Database.Filename.FileNameWithoutSuffix());
@@ -540,6 +413,116 @@ namespace BlueDatabase {
             return TestName;
         }
 
+
+        #region Add
+
+        public ColumnItem AddACloneFrom(ColumnItem source) {
+
+            var c = Add();
+
+            c.Caption = source.Caption;
+            c.CaptionBitmap = source.CaptionBitmap;
+
+            c.Format = source.Format;
+            c.LineLeft = source.LineLeft;
+            c.LineRight = source.LineRight;
+            c.MultiLine = source.MultiLine;
+            c.Quickinfo = source.Quickinfo;
+            c.ForeColor = source.ForeColor;
+            c.BackColor = source.BackColor;
+
+            c.EditTrotzSperreErlaubt = source.EditTrotzSperreErlaubt;
+
+            c.EditType = source.EditType;
+            c.Identifier = source.Identifier;
+
+            c.PermissionGroups_ChangeCell.Clear();
+            c.PermissionGroups_ChangeCell.AddRange(source.PermissionGroups_ChangeCell);
+
+            c.Tags.Clear();
+            c.Tags.AddRange(source.Tags);
+
+            c.AllowedChars = source.AllowedChars;
+            c.AdminInfo = source.AdminInfo;
+            c.FilterOptions = source.FilterOptions;
+            //c.AutoFilterErlaubt = Source.AutoFilterErlaubt;
+            //c.AutofilterTextFilterErlaubt = Source.AutofilterTextFilterErlaubt;
+            //c.AutoFilterErweitertErlaubt = Source.AutoFilterErweitertErlaubt;
+            c.IgnoreAtRowFilter = source.IgnoreAtRowFilter;
+            c.DropdownBearbeitungErlaubt = source.DropdownBearbeitungErlaubt;
+            c.DropdownAllesAbwählenErlaubt = source.DropdownAllesAbwählenErlaubt;
+            c.TextBearbeitungErlaubt = source.TextBearbeitungErlaubt;
+            c.SpellCheckingEnabled = source.SpellCheckingEnabled;
+            c.DropdownWerteAndererZellenAnzeigen = source.DropdownWerteAndererZellenAnzeigen;
+            c.AfterEdit_QuickSortRemoveDouble = source.AfterEdit_QuickSortRemoveDouble;
+
+            c.AfterEdit_Runden = source.AfterEdit_Runden;
+            c.AfterEdit_DoUCase = source.AfterEdit_DoUCase;
+            c.AfterEdit_AutoCorrect = source.AfterEdit_AutoCorrect;
+            c.AutoRemove = source.AutoRemove;
+            c.SaveContent = source.SaveContent;
+            c.CellInitValue = source.CellInitValue;
+            c.AutoFilterJoker = source.AutoFilterJoker;
+            c.KeyColumnKey = source.KeyColumnKey;
+            c.LinkedCell_RowKey = source.LinkedCell_RowKey;
+            c.LinkedCell_ColumnKey = source.LinkedCell_ColumnKey;
+            c.LinkedCell_ColumnValueFoundIn = source.LinkedCell_ColumnValueFoundIn;
+            c.LinkedCell_ColumnValueAdd = source.LinkedCell_ColumnValueAdd;
+            //c.ZellenZusammenfassen = Source.ZellenZusammenfassen;
+            c.DropdownKey = source.DropdownKey;
+            c.VorschlagsColumn = source.VorschlagsColumn;
+            c.Align = source.Align;
+            c.SortMask = source.SortMask;
+
+            c.DropDownItems.Clear();
+            c.DropDownItems.AddRange(source.DropDownItems);
+
+            c.OpticalReplace.Clear();
+            c.OpticalReplace.AddRange(source.OpticalReplace);
+
+            c.AfterEdit_AutoReplace.Clear();
+            c.AfterEdit_AutoReplace.AddRange(source.OpticalReplace);
+
+            c.Regex.Clear();
+            c.Regex.AddRange(source.Regex);
+
+            //c.CompactView = Source.CompactView;
+            c.ShowUndo = source.ShowUndo;
+            c.ShowMultiLineInOneLine = source.ShowMultiLineInOneLine;
+
+            c.Ueberschrift1 = source.Ueberschrift1;
+            c.Ueberschrift2 = source.Ueberschrift2;
+            c.Ueberschrift3 = source.Ueberschrift3;
+
+            c.Suffix = source.Suffix;
+            //c.Intelligenter_Multifilter = Source.Intelligenter_Multifilter;
+
+            c.DauerFilterPos = new Point(source.DauerFilterPos.X, source.DauerFilterPos.Y);
+
+            c.LinkedKeyKennung = source.LinkedKeyKennung;
+            c.LinkedDatabaseFile = source.LinkedDatabaseFile;
+            c.BildTextVerhalten = source.BildTextVerhalten;
+            c.BildCode_ConstantHeight = source.BildCode_ConstantHeight;
+            c.BestFile_StandardSuffix = source.BestFile_StandardSuffix;
+            c.BestFile_StandardFolder = source.BestFile_StandardFolder;
+
+            c.Prefix = source.Prefix;
+
+            return c;
+        }
+
+        private void AddSystem(string identifier) {
+
+            foreach (var ThisColumn in this) {
+                if (ThisColumn != null && ThisColumn.Identifier.ToUpper() == identifier.ToUpper()) { return; }
+            }
+
+            var c = Add(identifier);
+            c.Load(enDatabaseDataType.co_Identifier, identifier);
+            c.ResetSystemToDefault(true);
+
+        }
+
         [Obsolete]
         public new ColumnItem Add(ColumnItem column) {
 
@@ -550,50 +533,33 @@ namespace BlueDatabase {
         /// <summary>
         /// Diese Routine sollte nur bei einem Reload benutzt werden. AddPending wir nicht mehr ausgelöst.
         /// </summary>
-        /// <param name="comand">AddColumn muss benutzt werden. Ein Sicherheitsfaktor, um zu zeigen, dass das AddPending bereits erledigt wurde.</param>
         /// <param name="column"></param>
         /// <returns></returns>
-        public ColumnItem Add(enDatabaseDataType comand, ColumnItem column) {
+        public void AddFromParser(ColumnItem column) {
 
-            if (comand != enDatabaseDataType.AddColumn) {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Parent-Datenbanken unterschiedlich!");
-            }
+            if (column.Database != Database) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent-Datenbanken unterschiedlich!"); }
+            if (Contains(column)) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte bereits vorhanden!"); }
 
-            if (column.Database != Database) {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Parent-Datenbanken unterschiedlich!");
-            }
-
-            if (Contains(column)) {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Spalte bereits vorhanden!");
-            }
             base.Add(column);
-            return column;
+
         }
 
-        /// <summary>
-        /// Diese Routine sollte nur bei einem Load oder Reload benutzt werden.
-        /// </summary>
-        /// <param name="colKey">Ein bereits bekannter einmaliger Schlüssel mit einer Wert >= 0</param>
-        /// <returns></returns>
-        internal ColumnItem Add(int colKey) {
-            Database.AddPending(enDatabaseDataType.AddColumn, colKey, -1, "", colKey.ToString(), true);
-            return SearchByKey(colKey);
-        }
 
-        public ColumnItem Add() => Add(Database.Column.NextColumnKey());
+        public ColumnItem Add(string internalName) => Add(NextColumnKey, internalName, internalName, string.Empty, enDataFormat.Text);
+        public ColumnItem Add(int colKey) => Add(colKey, string.Empty, string.Empty, string.Empty, enDataFormat.Text);
 
-        public ColumnItem Add(string internalName, string caption, enDataFormat format) {
-            var c = Add();
-            c.Name = internalName;
+        public ColumnItem Add() => Add(NextColumnKey, string.Empty, string.Empty, string.Empty, enDataFormat.Text);
 
-            c.Caption = caption;
-            c.Format = format;
+        public ColumnItem Add(string internalName, string caption, enDataFormat format) => Add(NextColumnKey, internalName, caption, string.Empty, format);
 
-            return c;
-        }
+        public ColumnItem Add(string internalName, string caption, string suffix, enDataFormat format) => Add(NextColumnKey, internalName, caption, suffix, format);
 
-        public ColumnItem Add(string internalName, string caption, string suffix, enDataFormat format) {
-            var c = Add();
+        public ColumnItem Add(int colKey, string internalName, string caption, string suffix, enDataFormat format) {
+            Database.AddPending(enDatabaseDataType.AddColumn, colKey, -1, string.Empty, colKey.ToString(), true);
+            // Ruft anschließen AddFromParserAuf, der die Spalte endgülrig dazumacht
+
+
+            var c = SearchByKey(colKey);
             c.Name = internalName;
             c.Caption = caption;
             c.Format = format;
@@ -601,11 +567,9 @@ namespace BlueDatabase {
             return c;
         }
 
-        public ColumnItem Add(string internalName) {
-            var c = Add();
-            c.Name = internalName;
-            return c;
-        }
+        #endregion
+
+
 
         protected override void Dispose(bool disposing) {
             Database.Disposing -= Database_Disposing;

@@ -149,7 +149,8 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void DoÄhnlich() {
 
-            if (_TableView == null || _TableView.Database == null) { return; }
+            //_TableView.Database.Column.Count == 0 Ist eine nigelnagelneue Datenbank
+            if (_TableView == null || _TableView.Database == null || _TableView.Database.Column.Count == 0 ) { return; }
 
             var fl = new List<FilterItem>() { new FilterItem(_TableView.Database.Column[0], enFilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text) };
             var r = _TableView.Database.Row.CalculateSortedRows(fl, null, null);
@@ -339,7 +340,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                         } else {
                             // Na gut, eben neuen Flex erstellen
                             flx = new FlexiControlForFilter(_TableView, FilterItem, this);
-                            flx.TextChanged += Flx_ValueChanged;
+                            flx.ValueChanged += Flx_ValueChanged;
                             flx.ButtonClicked += Flx_ButtonClicked;
                             Controls.Add(flx);
                         }
@@ -393,7 +394,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             #region  Unnötige Flexis löschen
 
             foreach (var thisFlexi in flexsToDelete) {
-                thisFlexi.TextChanged -= Flx_ValueChanged;
+                thisFlexi.ValueChanged -= Flx_ValueChanged;
                 thisFlexi.ButtonClicked -= Flx_ButtonClicked;
                 thisFlexi.Visible = false;
                 //thisFlexi.thisFilter = null;

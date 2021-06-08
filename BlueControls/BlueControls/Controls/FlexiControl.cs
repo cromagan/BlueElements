@@ -76,6 +76,10 @@ namespace BlueControls.Controls {
         public event EventHandler ButtonClicked;
         public event EventHandler ValueChanged;
 
+
+        [Obsolete]
+        public new event EventHandler TextChanged;
+
         #region  Constructor 
 
         public FlexiControl() : base(false, false) {

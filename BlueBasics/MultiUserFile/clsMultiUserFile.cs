@@ -194,7 +194,7 @@ namespace BlueBasics.MultiUserFile {
             Checker = new Timer(Checker_Tick);
 
             Filename = string.Empty;// KEIN Filename. Ansonsten wird davon ausgegnagen, dass die Datei gleich geladen wird.Dann können abgeleitete Klasse aber keine Initialisierung mehr vornehmen.
-            DoWatcher();
+            ReCreateWatcher();
             _CheckedAndReloadNeed = true;
             _LastSaveCode = string.Empty;
             _dataOnDisk = new byte[0];
@@ -232,7 +232,7 @@ namespace BlueBasics.MultiUserFile {
 
         public void RemoveFilename() {
             Filename = string.Empty;
-            DoWatcher();
+            ReCreateWatcher();
             SetReadOnly();
         }
 
@@ -626,13 +626,18 @@ namespace BlueBasics.MultiUserFile {
             }
 
             Filename = fileNameToLoad;
-            DoWatcher();
+            ReCreateWatcher();
 
             // Wenn ein Dateiname auf Nix gesezt wird, z.B: bei Bitmap import
             Load_Reload();
         }
 
-        private void DoWatcher() {
+        private void ReCreateWatcher() {
+            RemoveWatcher();
+            CreateWatcher();
+        }
+
+        private void RemoveWatcher() {
             if (Watcher != null) {
                 Watcher.EnableRaisingEvents = false;
                 Watcher.Changed -= Watcher_Changed;
@@ -643,7 +648,8 @@ namespace BlueBasics.MultiUserFile {
                 Watcher.Dispose();
                 Watcher = null;
             }
-
+        }
+        private void CreateWatcher() {
             if (!string.IsNullOrEmpty(Filename)) {
                 Watcher = new FileSystemWatcher(Filename.FilePath());
                 Watcher.Changed += Watcher_Changed;
@@ -683,9 +689,15 @@ namespace BlueBasics.MultiUserFile {
             if (string.Equals(newFileName, Filename, StringComparison.OrdinalIgnoreCase)) { Develop.DebugPrint(enFehlerArt.Fehler, "Dateiname unterscheiden sich nicht!"); }
 
             Save(true); // Original-Datei speichern, die ist ja dann weg.
+            // Jetzt kann es aber immern noch sein, das PendingChanges da sind.
+            // Wenn kein Dateiname angegeben ist oder die Datei Readonkly wir nicht gespeichert und die Pendings bleiben erhalten!
+
+            RemoveWatcher();
 
             Filename = newFileName;
-            DoWatcher();
+
+            DiscardPendingChanges(); // Oben beschrieben. Sonst passiert bei Reload, dass diese wiederholt werden.
+
             var l = ToListOfByte();
 
             using (var x = new FileStream(newFileName, FileMode.Create, FileAccess.Write, FileShare.None)) {
@@ -695,9 +707,10 @@ namespace BlueBasics.MultiUserFile {
             }
 
             _dataOnDisk = l;
-
             _LastSaveCode = GetFileInfo(Filename, true);
             _CheckedAndReloadNeed = false;
+
+            CreateWatcher();
         }
 
         private void OnLoading(LoadingEventArgs e) {
@@ -907,6 +920,8 @@ namespace BlueBasics.MultiUserFile {
         }
 
         public abstract bool HasPendingChanges();
+
+        public abstract void DiscardPendingChanges();
 
         public void UnlockHard() {
             try {
