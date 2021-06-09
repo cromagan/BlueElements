@@ -60,12 +60,15 @@ namespace BlueControls {
             const decimal tol = 0.0001m;
 
             if (sp.X < Math.Min(Line1Start.X, Line1End.X) - tol) { return null; }
-            if (sp.X > Math.Max(Line1Start.X, Line1End.X) + tol) { return null; }
-            if (sp.X < Math.Min(Line2Start.X, Line2End.X) - tol) { return null; }
-            if (sp.X > Math.Max(Line2Start.X, Line2End.X) + tol) { return null; }
-
-            if (sp.Y < Math.Min(Line1Start.Y, Line1End.Y) - tol) { return null; }
-            return sp.Y > Math.Max(Line1Start.Y, Line1End.Y) + tol
+            return sp.X > Math.Max(Line1Start.X, Line1End.X) + tol
+                ? null
+                : sp.X < Math.Min(Line2Start.X, Line2End.X) - tol
+                ? null
+                : sp.X > Math.Max(Line2Start.X, Line2End.X) + tol
+                ? null
+                : sp.Y < Math.Min(Line1Start.Y, Line1End.Y) - tol
+                ? null
+                : sp.Y > Math.Max(Line1Start.Y, Line1End.Y) + tol
                 ? null
                 : sp.Y < Math.Min(Line2Start.Y, Line2End.Y) - tol ? null : sp.Y > Math.Max(Line2Start.Y, Line2End.Y) + tol ? null : sp;
         }

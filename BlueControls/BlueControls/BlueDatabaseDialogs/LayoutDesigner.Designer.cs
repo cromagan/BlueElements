@@ -69,6 +69,10 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.Ribbon.Size = new System.Drawing.Size(1340, 110);
             // 
+            // tabPageControl
+            // 
+            this.tabPageControl.Size = new System.Drawing.Size(1332, 81);
+            // 
             // tabPageStart
             // 
             this.tabPageStart.Controls.Add(this.grpExterneLayouts);
@@ -79,29 +83,29 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabPageStart.Controls.SetChildIndex(this.grpLayoutSelection, 0);
             this.tabPageStart.Controls.SetChildIndex(this.grpExterneLayouts, 0);
             // 
-            // Button_PageSetup
+            // Area_Drucken
             // 
-            this.Button_PageSetup.ButtonStyle = BlueControls.Enums.enButtonStyle.Button;
+            this.Area_Drucken.Location = new System.Drawing.Point(208, 0);
+            this.Area_Drucken.Visible = false;
             // 
-            // ArbeitsbreichSetup
+            // grpDateiSystem
             // 
-            this.ArbeitsbreichSetup.ButtonStyle = BlueControls.Enums.enButtonStyle.Button;
+            this.grpDateiSystem.Size = new System.Drawing.Size(208, 81);
             // 
             // btnLastFiles
             // 
-            this.btnLastFiles.Verhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_ohne_Textumbruch;
-            // 
-            // btnNeu
-            // 
-            this.btnNeu.ButtonStyle = BlueControls.Enums.enButtonStyle.Button;
+            this.btnLastFiles.Location = new System.Drawing.Point(200, 2);
+            this.btnLastFiles.Visible = false;
             // 
             // btnOeffnen
             // 
-            this.btnOeffnen.ButtonStyle = BlueControls.Enums.enButtonStyle.Button;
+            this.btnOeffnen.ImageCode = "Textdatei||||||||||Pfeil_Links";
+            this.btnOeffnen.Text = "Import";
             // 
             // btnSpeichern
             // 
-            this.btnSpeichern.ButtonStyle = BlueControls.Enums.enButtonStyle.Button;
+            this.btnSpeichern.Location = new System.Drawing.Point(136, 2);
+            this.btnSpeichern.Text = "Speichern unter";
             // 
             // grpLayoutSelection
             // 
@@ -114,7 +118,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpLayoutSelection.Controls.Add(this.cbxLayout);
             this.grpLayoutSelection.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpLayoutSelection.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
-            this.grpLayoutSelection.Location = new System.Drawing.Point(608, 0);
+            this.grpLayoutSelection.Location = new System.Drawing.Point(504, 0);
             this.grpLayoutSelection.Name = "grpLayoutSelection";
             this.grpLayoutSelection.Size = new System.Drawing.Size(232, 81);
             this.grpLayoutSelection.TabIndex = 2;
@@ -185,7 +189,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpExterneLayouts.Controls.Add(this.btnLayoutOeffnen);
             this.grpExterneLayouts.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpExterneLayouts.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
-            this.grpExterneLayouts.Location = new System.Drawing.Point(840, 0);
+            this.grpExterneLayouts.Location = new System.Drawing.Point(736, 0);
             this.grpExterneLayouts.Name = "grpExterneLayouts";
             this.grpExterneLayouts.Size = new System.Drawing.Size(336, 81);
             this.grpExterneLayouts.TabIndex = 1;
@@ -206,7 +210,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // btnLayoutVerzeichnis
             // 
             this.btnLayoutVerzeichnis.ImageCode = "Ordner|16";
-            this.btnLayoutVerzeichnis.Location = new System.Drawing.Point(96, 46);
+            this.btnLayoutVerzeichnis.Location = new System.Drawing.Point(96, 24);
             this.btnLayoutVerzeichnis.Name = "btnLayoutVerzeichnis";
             this.btnLayoutVerzeichnis.Size = new System.Drawing.Size(232, 22);
             this.btnLayoutVerzeichnis.TabIndex = 84;

@@ -36,11 +36,9 @@ namespace BlueScript {
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
 
-            if (attvar.Attributes == null) {
-                return attvar.FehlerTyp != enSkriptFehlerTyp.VariableNichtGefunden ? strDoItFeedback.AttributFehler(this, attvar) : strDoItFeedback.Wahr();
-            }
-
-            return string.IsNullOrEmpty(attvar.Attributes[0].ValueString) ? strDoItFeedback.Wahr()
+            return attvar.Attributes == null
+                ? attvar.FehlerTyp != enSkriptFehlerTyp.VariableNichtGefunden ? strDoItFeedback.AttributFehler(this, attvar) : strDoItFeedback.Wahr()
+                : string.IsNullOrEmpty(attvar.Attributes[0].ValueString) ? strDoItFeedback.Wahr()
                 : attvar.Attributes[0].Type is enVariableDataType.Null or enVariableDataType.Error or enVariableDataType.NotDefinedYet ? strDoItFeedback.Wahr()
                 : attvar.Attributes[0].Type != enVariableDataType.Numeral ? new strDoItFeedback("Variable existiert, ist aber nicht vom Datentyp Numeral.")
                 : attvar.Attributes[0].ValueDouble == 0 ? strDoItFeedback.Wahr()

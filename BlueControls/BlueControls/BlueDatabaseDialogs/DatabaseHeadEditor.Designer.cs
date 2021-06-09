@@ -80,6 +80,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnDateiSchluessel = new BlueControls.Controls.Button();
             this.Tab_Sortierung = new BlueControls.Controls.TabPage();
             this.Tab_Undo = new BlueControls.Controls.TabPage();
+            this.btnClipboard = new BlueControls.Controls.Button();
+            this.btnAlleUndos = new BlueControls.Controls.Button();
             this.tbxUndoAnzahl = new BlueControls.Controls.TextBox();
             this.capUndoAnzahl = new BlueControls.Controls.Caption();
             this.tblUndo = new BlueControls.Controls.Table();
@@ -88,8 +90,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capExperimentellWarnung = new BlueControls.Controls.Caption();
             this.capBinInfo = new BlueControls.Controls.Caption();
             this.btnSave = new BlueControls.Controls.Button();
-            this.btnAlleUndos = new BlueControls.Controls.Button();
-            this.btnClipboard = new BlueControls.Controls.Button();
             this.grpBenutzergruppen.SuspendLayout();
             this.grpKennwort.SuspendLayout();
             this.GlobalTab.SuspendLayout();
@@ -340,16 +340,16 @@ namespace BlueControls.BlueDatabaseDialogs
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.GlobalTab.Controls.Add(this.Tab_Allgemein);
+            this.GlobalTab.Controls.Add(this.Tab_Undo);
             this.GlobalTab.Controls.Add(this.Tab_Regeln);
             this.GlobalTab.Controls.Add(this.Tab_Backup);
             this.GlobalTab.Controls.Add(this.Tab_Rechte);
             this.GlobalTab.Controls.Add(this.Tab_Sortierung);
-            this.GlobalTab.Controls.Add(this.Tab_Undo);
             this.GlobalTab.Controls.Add(this.Tab_Expermimentell);
             this.GlobalTab.HotTrack = true;
             this.GlobalTab.Location = new System.Drawing.Point(0, 0);
             this.GlobalTab.Name = "GlobalTab";
-            this.GlobalTab.SelectedIndex = 5;
+            this.GlobalTab.SelectedIndex = 0;
             this.GlobalTab.Size = new System.Drawing.Size(1047, 645);
             this.GlobalTab.TabIndex = 21;
             this.GlobalTab.Selecting += new System.Windows.Forms.TabControlCancelEventHandler(this.GlobalTab_Selecting);
@@ -707,6 +707,26 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Undo.TabIndex = 6;
             this.Tab_Undo.Text = "Undo";
             // 
+            // btnClipboard
+            // 
+            this.btnClipboard.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnClipboard.Location = new System.Drawing.Point(864, 8);
+            this.btnClipboard.Name = "btnClipboard";
+            this.btnClipboard.Size = new System.Drawing.Size(168, 32);
+            this.btnClipboard.TabIndex = 3;
+            this.btnClipboard.Text = "Clipboard";
+            this.btnClipboard.Click += new System.EventHandler(this.btnClipboard_Click);
+            // 
+            // btnAlleUndos
+            // 
+            this.btnAlleUndos.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnAlleUndos.Location = new System.Drawing.Point(688, 8);
+            this.btnAlleUndos.Name = "btnAlleUndos";
+            this.btnAlleUndos.Size = new System.Drawing.Size(168, 32);
+            this.btnAlleUndos.TabIndex = 2;
+            this.btnAlleUndos.Text = "Alle Undos generieren";
+            this.btnAlleUndos.Click += new System.EventHandler(this.btnAlleUndos_Click);
+            // 
             // tbxUndoAnzahl
             // 
             this.tbxUndoAnzahl.Cursor = System.Windows.Forms.Cursors.IBeam;
@@ -784,26 +804,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnSave.TabIndex = 22;
             this.btnSave.Text = "Speichern";
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
-            // 
-            // btnAlleUndos
-            // 
-            this.btnAlleUndos.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnAlleUndos.Location = new System.Drawing.Point(688, 8);
-            this.btnAlleUndos.Name = "btnAlleUndos";
-            this.btnAlleUndos.Size = new System.Drawing.Size(168, 32);
-            this.btnAlleUndos.TabIndex = 2;
-            this.btnAlleUndos.Text = "Alle Undos generieren";
-            this.btnAlleUndos.Click += new System.EventHandler(this.btnAlleUndos_Click);
-            // 
-            // btnClipboard
-            // 
-            this.btnClipboard.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClipboard.Location = new System.Drawing.Point(864, 8);
-            this.btnClipboard.Name = "btnClipboard";
-            this.btnClipboard.Size = new System.Drawing.Size(168, 32);
-            this.btnClipboard.TabIndex = 3;
-            this.btnClipboard.Text = "Clipboard";
-            this.btnClipboard.Click += new System.EventHandler(this.btnClipboard_Click);
             // 
             // DatabaseHeadEditor
             // 

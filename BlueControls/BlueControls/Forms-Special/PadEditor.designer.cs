@@ -36,6 +36,7 @@ namespace BlueControls.Forms
             this.Bild = new BlueControls.Controls.Button();
             this.Drucken = new BlueControls.Controls.Button();
             this.grpDateiSystem = new BlueControls.Controls.GroupBox();
+            this.btnImport = new BlueControls.Controls.Button();
             this.btnLastFiles = new BlueControls.Controls.LastFilesCombo();
             this.btnNeu = new BlueControls.Controls.Button();
             this.btnOeffnen = new BlueControls.Controls.Button();
@@ -156,9 +157,9 @@ namespace BlueControls.Forms
             this.Area_Drucken.Controls.Add(this.Drucken);
             this.Area_Drucken.Dock = System.Windows.Forms.DockStyle.Left;
             this.Area_Drucken.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
-            this.Area_Drucken.Location = new System.Drawing.Point(312, 0);
+            this.Area_Drucken.Location = new System.Drawing.Point(376, 0);
             this.Area_Drucken.Name = "Area_Drucken";
-            this.Area_Drucken.Size = new System.Drawing.Size(296, 81);
+            this.Area_Drucken.Size = new System.Drawing.Size(288, 81);
             this.Area_Drucken.TabIndex = 0;
             this.Area_Drucken.TabStop = false;
             this.Area_Drucken.Text = "Drucken";
@@ -166,7 +167,7 @@ namespace BlueControls.Forms
             // Vorschau
             // 
             this.Vorschau.ImageCode = "Datei||||||||||Lupe";
-            this.Vorschau.Location = new System.Drawing.Point(232, 2);
+            this.Vorschau.Location = new System.Drawing.Point(224, 2);
             this.Vorschau.Name = "Vorschau";
             this.Vorschau.Size = new System.Drawing.Size(56, 66);
             this.Vorschau.TabIndex = 13;
@@ -176,7 +177,7 @@ namespace BlueControls.Forms
             // Button_PageSetup
             // 
             this.Button_PageSetup.ImageCode = "SeiteEinrichten";
-            this.Button_PageSetup.Location = new System.Drawing.Point(144, 2);
+            this.Button_PageSetup.Location = new System.Drawing.Point(136, 2);
             this.Button_PageSetup.Name = "Button_PageSetup";
             this.Button_PageSetup.Size = new System.Drawing.Size(88, 66);
             this.Button_PageSetup.TabIndex = 12;
@@ -186,7 +187,7 @@ namespace BlueControls.Forms
             // Bild
             // 
             this.Bild.ImageCode = "Bild";
-            this.Bild.Location = new System.Drawing.Point(76, 2);
+            this.Bild.Location = new System.Drawing.Point(72, 2);
             this.Bild.Name = "Bild";
             this.Bild.Size = new System.Drawing.Size(64, 66);
             this.Bild.TabIndex = 11;
@@ -208,6 +209,7 @@ namespace BlueControls.Forms
             // 
             this.grpDateiSystem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpDateiSystem.CausesValidation = false;
+            this.grpDateiSystem.Controls.Add(this.btnImport);
             this.grpDateiSystem.Controls.Add(this.btnLastFiles);
             this.grpDateiSystem.Controls.Add(this.btnNeu);
             this.grpDateiSystem.Controls.Add(this.btnOeffnen);
@@ -216,10 +218,21 @@ namespace BlueControls.Forms
             this.grpDateiSystem.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
             this.grpDateiSystem.Location = new System.Drawing.Point(0, 0);
             this.grpDateiSystem.Name = "grpDateiSystem";
-            this.grpDateiSystem.Size = new System.Drawing.Size(312, 81);
+            this.grpDateiSystem.Size = new System.Drawing.Size(376, 81);
             this.grpDateiSystem.TabIndex = 4;
             this.grpDateiSystem.TabStop = false;
             this.grpDateiSystem.Text = "Dateisystem";
+            // 
+            // btnImport
+            // 
+            this.btnImport.ImageCode = "Textdatei||||||||||Pfeil_Links";
+            this.btnImport.Location = new System.Drawing.Point(240, 2);
+            this.btnImport.Name = "btnImport";
+            this.btnImport.QuickInfo = "Das aktuelle Layout durch eines\r\nvon ihrem Computer ersetzen.";
+            this.btnImport.Size = new System.Drawing.Size(64, 66);
+            this.btnImport.TabIndex = 12;
+            this.btnImport.Text = "Import";
+            this.btnImport.Click += new System.EventHandler(this.btnOeffnen_Click);
             // 
             // btnLastFiles
             // 
@@ -240,9 +253,10 @@ namespace BlueControls.Forms
             this.btnNeu.ImageCode = "Datei";
             this.btnNeu.Location = new System.Drawing.Point(8, 2);
             this.btnNeu.Name = "btnNeu";
+            this.btnNeu.QuickInfo = "Löscht alle Objekte";
             this.btnNeu.Size = new System.Drawing.Size(64, 66);
             this.btnNeu.TabIndex = 10;
-            this.btnNeu.Text = "Neu";
+            this.btnNeu.Text = "Alles leeren";
             this.btnNeu.Click += new System.EventHandler(this.btnNeu_Click);
             // 
             // btnOeffnen
@@ -250,7 +264,7 @@ namespace BlueControls.Forms
             this.btnOeffnen.ImageCode = "Ordner";
             this.btnOeffnen.Location = new System.Drawing.Point(72, 2);
             this.btnOeffnen.Name = "btnOeffnen";
-            this.btnOeffnen.QuickInfo = "Eine Datei von ihrem<br>Computer importieren";
+            this.btnOeffnen.QuickInfo = "Eine Datei von ihrem\r\nComputer öffnen";
             this.btnOeffnen.Size = new System.Drawing.Size(64, 66);
             this.btnOeffnen.TabIndex = 9;
             this.btnOeffnen.Text = "Öffnen";
@@ -259,11 +273,11 @@ namespace BlueControls.Forms
             // btnSpeichern
             // 
             this.btnSpeichern.ImageCode = "Diskette";
-            this.btnSpeichern.Location = new System.Drawing.Point(240, 2);
+            this.btnSpeichern.Location = new System.Drawing.Point(304, 2);
             this.btnSpeichern.Name = "btnSpeichern";
             this.btnSpeichern.Size = new System.Drawing.Size(64, 66);
             this.btnSpeichern.TabIndex = 8;
-            this.btnSpeichern.Text = "Speichern";
+            this.btnSpeichern.Text = "Speichern unter";
             this.btnSpeichern.Click += new System.EventHandler(this.btnSpeichern_Click);
             // 
             // tabPageControl
@@ -665,5 +679,6 @@ namespace BlueControls.Forms
         private Button btnHintergrundFarbe;
         private System.Windows.Forms.ColorDialog ColorDia;
         private Button btnKeinHintergrund;
+        protected Button btnImport;
     }
 	}

@@ -51,6 +51,9 @@ namespace BlueBasics {
             }
         }
 
+        /// <summary>
+        ///  Leert nur die Objekte. Sonstige Einstellungen und die ID bleiben erhalten
+        /// </summary>
         public new void Clear() {
             if (Count == 0) { return; }
 

@@ -118,14 +118,14 @@ namespace BlueControls.Forms {
                 T = "<br>Restzeit wird ermittelt<tab>";
             } else if (eProgressbar_LastCalulatedSeconds < -10) {
                 T = "<br>Restzeit wird ermittelt<tab>";
-            } else if (eProgressbar_LastCalulatedSeconds > 94) {
-                T = "<br>" + PRT + " % - Geschätzte Restzeit:   " + (eProgressbar_LastCalulatedSeconds / 60) + " Minuten<tab>";
             } else {
-                T = eProgressbar_LastCalulatedSeconds > 10
-                    ? "<br>" + PRT + " % - Geschätzte Restzeit: " + (eProgressbar_LastCalulatedSeconds / 5 * 5) + " Sekunden<tab>"
-                    : eProgressbar_LastCalulatedSeconds > 0
-                                    ? "<br>" + PRT + " % - Geschätzte Restzeit: <<> 10 Sekunden<tab>"
-                                    : "<br>100 % - ...abgeschlossen!<tab>";
+                T = eProgressbar_LastCalulatedSeconds > 94
+                    ? "<br>" + PRT + " % - Geschätzte Restzeit:   " + (eProgressbar_LastCalulatedSeconds / 60) + " Minuten<tab>"
+                    : eProgressbar_LastCalulatedSeconds > 10
+                                    ? "<br>" + PRT + " % - Geschätzte Restzeit: " + (eProgressbar_LastCalulatedSeconds / 5 * 5) + " Sekunden<tab>"
+                                    : eProgressbar_LastCalulatedSeconds > 0
+                                                    ? "<br>" + PRT + " % - Geschätzte Restzeit: <<> 10 Sekunden<tab>"
+                                                    : "<br>100 % - ...abgeschlossen!<tab>";
             }
             return BaseText + "</b></i></u>" + T;
         }

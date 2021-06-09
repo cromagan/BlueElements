@@ -191,12 +191,8 @@ namespace BlueScript {
             Coment = coment;
         }
 
-        public void PrepareForScript() {
-            _ValueString = _ValueString.Replace("\"", BlueBasics.Constants.GänsefüßchenReplace);
-        }
-        public void ScriptFinished() {
-            _ValueString = _ValueString.Replace(BlueBasics.Constants.GänsefüßchenReplace, "\"");
-        }
+        public void PrepareForScript() => _ValueString = _ValueString.Replace("\"", BlueBasics.Constants.GänsefüßchenReplace);
+        public void ScriptFinished() => _ValueString = _ValueString.Replace(BlueBasics.Constants.GänsefüßchenReplace, "\"");
 
         public Variable(string name, string value, enVariableDataType type, bool ronly, bool system, string coment) {
 

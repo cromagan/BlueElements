@@ -35,17 +35,17 @@ namespace BlueScript {
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (attvar.Attributes == null) {
-                if (attvar.FehlerTyp != enSkriptFehlerTyp.VariableNichtGefunden) { return strDoItFeedback.AttributFehler(this, attvar); }
-                return strDoItFeedback.Wahr();
-            }
-            if (string.IsNullOrEmpty(attvar.Attributes[0].ValueString)) { return strDoItFeedback.Wahr(); }
-            if (attvar.Attributes[0].Type is enVariableDataType.Null or
+            return attvar.Attributes == null
+                ? attvar.FehlerTyp != enSkriptFehlerTyp.VariableNichtGefunden
+                    ? strDoItFeedback.AttributFehler(this, attvar)
+                    : strDoItFeedback.Wahr()
+                : string.IsNullOrEmpty(attvar.Attributes[0].ValueString)
+                ? strDoItFeedback.Wahr()
+                : attvar.Attributes[0].Type is enVariableDataType.Null or
                                              enVariableDataType.Error or
-                                             enVariableDataType.NotDefinedYet) {
-                return strDoItFeedback.Wahr();
-            }
-            return strDoItFeedback.Falsch();
+                                             enVariableDataType.NotDefinedYet
+                ? strDoItFeedback.Wahr()
+                : strDoItFeedback.Falsch();
         }
     }
 }

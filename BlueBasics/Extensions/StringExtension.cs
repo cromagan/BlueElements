@@ -639,6 +639,7 @@ namespace BlueBasics {
                     "B4A" or "BAS" or "CS" => enFileFormat.ProgrammingCode,// case "DLL":
                     "DB" or "MDB" => enFileFormat.Database,
                     "LNK" or "URL" => enFileFormat.Link,
+                    "BCR" => enFileFormat.BlueCreativeFile,
                     _ => enFileFormat.Unknown,
                 };
 

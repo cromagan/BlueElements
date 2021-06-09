@@ -307,7 +307,7 @@ namespace BlueDatabase {
         }
 
         [Browsable(false)]
-        [Description("Ein Bild, da in der senkrechte Filterleiste angezeigt werden kann.")]
+        [Description("Ein Bild, das in der senkrechte Filterleiste angezeigt werden kann.")]
         public string FilterImagePfad {
             get => _FilterImagePfad;
             set {
@@ -317,32 +317,8 @@ namespace BlueDatabase {
             }
         }
 
-        private string _AdditionaFilesPfadtmp = string.Empty;
-        public string AdditionaFilesPfadWhole() {
-
-            if (_AdditionaFilesPfadtmp == "@") { return string.Empty; }
-            if (!string.IsNullOrEmpty(_AdditionaFilesPfadtmp)) { return _AdditionaFilesPfadtmp; }
-
-            var t = _AdditionaFilesPfad.CheckPath();
-            if (PathExists(t)) {
-                _AdditionaFilesPfadtmp = t;
-                return t;
-            }
-
-            t = (Filename.FilePath() + _AdditionaFilesPfad.Trim("\\") + "\\").CheckPath();
-
-            if (PathExists(t)) {
-                _AdditionaFilesPfadtmp = t;
-                return t;
-            }
-
-            _AdditionaFilesPfadtmp = "@";
-            return string.Empty;
-
-        }
-
         [Browsable(false)]
-        [Description("Ein Bild, da in der senkrechte Filterleiste angezeigt werden kann.")]
+        [Description("In diesem Pfad suchen verschiedene Routinen (Spalten Bilder, Layouts, etc.) nach zusätzlichen Dateien.")]
         public string AdditionaFilesPfad {
             get => _AdditionaFilesPfad;
             set {
@@ -449,14 +425,6 @@ namespace BlueDatabase {
             }
         }
 
-        //public string ImportScript {
-        //    get => _ImportScript;
-        //    set {
-        //        if (_ImportScript == value) { return; }
-        //        AddPending(enDatabaseDataType.ImportScript, -1, -1, _ImportScript, value, true);
-        //    }
-        //}
-
         public string RulesScript {
             get => _RulesScript;
             set {
@@ -474,6 +442,33 @@ namespace BlueDatabase {
         }
 
         #endregion
+
+        private string _AdditionaFilesPfadtmp = string.Empty;
+        public string AdditionaFilesPfadWhole() {
+
+
+            // @ ist ein erkennungszeichen, dass der Pfad schon geprüft wurde, aber nicht vorhanden ist
+            if (_AdditionaFilesPfadtmp == "@") { return string.Empty; }
+            if (!string.IsNullOrEmpty(_AdditionaFilesPfadtmp)) { return _AdditionaFilesPfadtmp; }
+
+            var t = _AdditionaFilesPfad.CheckPath();
+            if (PathExists(t)) {
+                _AdditionaFilesPfadtmp = t;
+                return t;
+            }
+
+            t = (Filename.FilePath() + _AdditionaFilesPfad.Trim("\\") + "\\").CheckPath();
+
+            if (PathExists(t)) {
+                _AdditionaFilesPfadtmp = t;
+                return t;
+            }
+
+            _AdditionaFilesPfadtmp = "@";
+            return string.Empty;
+        }
+
+
 
         protected override void Dispose(bool disposing) {
             if (!Disposed) { return; }
@@ -614,34 +609,10 @@ namespace BlueDatabase {
             AddPending(enDatabaseDataType.Layouts, -1, Layouts.JoinWithCr(), false);
         }
 
-        //private void Bins_ListOrItemChanged(object sender, System.EventArgs e) {
-
-        //    if (IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
-        //    AddPending(enDatabaseDataType.BinaryDataInOne, -1, Bins.ToString(true), false);
-        //}
-
         private void Export_ListOrItemChanged(object sender, System.EventArgs e) {
             if (IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
             AddPending(enDatabaseDataType.AutoExport, -1, Export.ToString(true), false);
         }
-
-        //private void Rules_ListOrItemChanged(object sender, System.EventArgs e) {
-
-        //    if (IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt wetrden. Kann zu Endlosschleifen führen.
-
-        //    if (sender == Rules) {
-        //        AddPending(enDatabaseDataType.Rules, -1, Rules.ToString(true), false);
-        //        return;
-        //    }
-
-        //    if (sender is RuleItem RL) {
-        //        if (!Rules.Contains(RL)) { return; }
-        //        AddPending(enDatabaseDataType.Rules, -1, Rules.ToString(true), false);
-        //    }
-        //    else {
-        //        Develop.DebugPrint(enFehlerArt.Fehler, "Typ ist kein RuleItem");
-        //    }
-        //}
 
         private void Views_ListOrItemChanged(object sender, System.EventArgs e) {
             if (IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt werden. Kann zu Endlosschleifen führen.
@@ -1118,41 +1089,9 @@ namespace BlueDatabase {
             return "";
         }
 
-        //[Obsolete]
-        //private string GenerateScriptFromRules(List<RuleItem_Old> rules) {
-        //    if (rules is null || rules.Count == 0) { return string.Empty; }
-
-        //    var txt = "// Automatische Umwandlung des alten Regel-Systems in die neue Skript-Sprache.\r\n";
-        //    txt += "// - Zur Bearbeitung wird NOTEPAD++ empfohlen.\r\n";
-        //    txt += "// - Zur Verschönerung der Optik wird https://codebeautify.org/javaviewer empfohlen.\r\n\r\n\r\n";
-
-        //    foreach (var thisRegel in rules) {
-        //        txt = txt + thisRegel.ToScript();
-        //    }
-
-        //    return txt;
-
-        //}
-
-        //public void LoadPicsIntoImageChache() {
-        //    foreach (var bmp in Bins) {
-        //        if (bmp.Picture != null) {
-        //            if (!string.IsNullOrEmpty(bmp.Name)) {
-        //                QuickImage.Add("DB_" + bmp.Name, new BitmapExt((Bitmap)bmp.Picture.Clone()));
-        //            }
-        //        }
-
-        //    }
-        //}
-
         internal string Column_UsedIn(ColumnItem column) {
 
             var t = string.Empty;
-            //var layout = false;
-            //foreach (var thisLayout in Layoutsx) {
-            //    if (thisLayout.ToUpper().Contains(column.Name.ToUpper())) { layout = true; }
-            //}
-            //if (layout) { t += " - Layouts (für Export)"; }
 
             if (SortDefinition.Columns.Contains(column)) { t += " - Sortierung<br>"; }
 
@@ -1170,19 +1109,17 @@ namespace BlueDatabase {
             }
             if (cola) { t += " - Benutzerdefinierte Spalten-Anordnungen<br>"; }
 
-            //if (ImportScript.ToUpper().Contains(column.Name.ToUpper())) { t += " - Import-Skript<br>"; }
-
             if (RulesScript.ToUpper().Contains(column.Name.ToUpper())) { t += " - Regeln-Skript<br>"; }
 
             if (ZeilenQuickInfo.ToUpper().Contains(column.Name.ToUpper())) { t += " - Zeilen-Quick-Info<br>"; }
 
             if (Tags.JoinWithCr().ToUpper().Contains(column.Name.ToUpper())) { t += " - Datenbank-Tags<br>"; }
 
-            //var rul = false;
-            //foreach (var ThisRule in Rules) {
-            //    if (ThisRule.Contains(column)) { rul = true; }
-            //}
-            //if (rul) { t += " - Regeln<br>"; }
+            var layout = false;
+            foreach (var thisLayout in Layouts) {
+                if (thisLayout.Contains(column.Name.ToUpper())) { layout = true; }
+            }
+            if (layout) { t += " - Layouts<br>"; }
 
             var l = column.Contents(null, null);
             if (l.Count > 0) {
@@ -1541,29 +1478,14 @@ namespace BlueDatabase {
             if (allowed.ToUpper() == "#EVERYBODY") {
                 return true;
             } else if (allowed.ToUpper() == "#ROWCREATOR") {
-                if (row != null && Cell.GetString(Column.SysRowCreator, row).ToUpper() == tmpName) {
-                    return true;
-                }
-            }
-              //else if (allowed.ToUpper() == "#ROWCHANGER")
-              //{
-              //    if (row != null && Cell.GetString(Column.SysRowChanger, row).ToUpper() == tmpName)
-              //    {
-              //        return true;
-              //    }
-              //}
-              else if (allowed.ToUpper() == "#USER: " + tmpName) {
+                if (row != null && Cell.GetString(Column.SysRowCreator, row).ToUpper() == tmpName) { return true; }
+            } else if (allowed.ToUpper() == "#USER: " + tmpName) {
                 return true;
             } else if (allowed.ToUpper() == "#USER:" + tmpName) {
                 return true;
             } else if (allowed.ToUpper() == tmpGroup) {
                 return true;
             }
-            //else if (allowed.ToUpper() == "#DATABASECREATOR")
-            //{
-            //    if (UserName.ToUpper() == _Creator.ToUpper()) { return true; }
-            //}
-
             return false;
         }
 
@@ -1584,7 +1506,7 @@ namespace BlueDatabase {
             return false;
         }
 
-        public List<string> Permission_AllUsed(bool DatabaseEbene) {
+        public List<string> Permission_AllUsed(bool cellLevel) {
             var e = new List<string>();
 
             foreach (var ThisColumnItem in Column) {
@@ -1604,23 +1526,18 @@ namespace BlueDatabase {
                 e.AddRange(ThisArrangement.PermissionGroups_Show);
             }
 
-            //e.Add("#DatabaseCreator");
             e.Add("#Everybody");
             e.Add("#User: " + UserName);
 
-            if (!DatabaseEbene) {
+            if (cellLevel) {
                 e.Add("#RowCreator");
-                //e.Add("#RowChanger");
             } else {
                 e.RemoveString("#RowCreator", false);
-                //e.RemoveString("#RowChanger", false);
-
             }
 
             e.RemoveString("#Administrator", false);
-            if (!IsAdministrator()) {
-                e.Add(UserGroup);
-            }
+            if (!IsAdministrator()) { e.Add(UserGroup); }
+
             return e.SortedDistinctList();
         }
 
@@ -1792,9 +1709,7 @@ namespace BlueDatabase {
 
         #endregion
 
-        public string DefaultLayoutPath() =>
-            //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
-            string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + "Layouts\\";
+        public string DefaultLayoutPath() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + "Layouts\\";
 
         /// <summary>
         /// Fügt Comandos manuell hinzu. Vorsicht: Kann Datenbank beschädigen
@@ -2092,30 +2007,6 @@ namespace BlueDatabase {
             }
         }
 
-        protected override void BackgroundWorkerMessage(ProgressChangedEventArgs e) {
-            //switch ((string)e.UserState) {
-            //    case "AddPending":
-            //        AddPending(enDatabaseDataType.AutoExport, -1, Export.ToString(true), false);
-            //        break;
-
-            //    default:
-            //        Develop.DebugPrint("Unbekannter Befehl:" + (string)e.UserState);
-            //        break;
-
-            //}
-        }
-
-        //public bool AllRulesOK() {
-        //    return AllRulesOK(Rules);
-        //}
-
-        //public static bool AllRulesOK(ListExt<RuleItem> RulesToCheck) {
-        //    foreach (var thisRule in RulesToCheck) {
-        //        if (thisRule != null && !thisRule.IsOk()) { return false; }
-        //    }
-        //    return true;
-        //}
-
         protected override void PrepeareDataForCheckingBeforeLoad() {
             // Letztes WorkItem speichern, als Kontrolle
             WVorher = string.Empty;
@@ -2313,9 +2204,7 @@ namespace BlueDatabase {
             return string.Empty;
         }
 
-        public override void DiscardPendingChanges() {
-            ChangeWorkItems(enItemState.Pending, enItemState.Undo);
-        }
+        public override void DiscardPendingChanges() => ChangeWorkItems(enItemState.Pending, enItemState.Undo);
     }
 }
 

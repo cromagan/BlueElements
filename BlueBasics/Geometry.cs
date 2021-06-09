@@ -64,19 +64,7 @@ namespace BlueBasics {
             var XA = x2 - x1;
             var YA = y2 - y1;
 
-            if (YA == 0M) {
-                if (XA <= 0M) {
-                    return 180M;
-                }
-
-                return 0M;
-            }
-
-            if (YA < 0M) {
-                return 90M + ArcTangens(XA / YA);
-            }
-
-            return 270M + ArcTangens(XA / YA);
+            return YA == 0M ? XA <= 0M ? 180M : 0M : YA < 0M ? 90M + ArcTangens(XA / YA) : 270M + ArcTangens(XA / YA);
         }
     }
 }

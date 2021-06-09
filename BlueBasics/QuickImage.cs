@@ -68,9 +68,7 @@ namespace BlueBasics {
 
         #region  Construktor + Initialize
 
-        public QuickImage(string imageCode) {
-            Parse(imageCode);
-        }
+        public QuickImage(string imageCode) => Parse(imageCode);
 
         private void Initialize() {
             _name = string.Empty;
@@ -322,6 +320,10 @@ namespace BlueBasics {
                     return enImageCode.Skript;
                 case enFileFormat.Link:
                     return enImageCode.Undo;
+                case enFileFormat.BlueCreativeFile:
+                    return enImageCode.Smiley;
+                case enFileFormat.Icon:
+                    return enImageCode.Bild;
                 default:
                     Develop.DebugPrint(file);
                     return enImageCode.Datei;

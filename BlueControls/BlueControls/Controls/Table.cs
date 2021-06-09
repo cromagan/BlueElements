@@ -3212,19 +3212,14 @@ namespace BlueControls.Controls {
             return Column.TMP_CaptionText_Size;
         }
 
-        private bool UserEdit_NewRowAllowed() {
-
-
-            if (_Database == null || _Database.Column.Count == 0) { return false; }
-
-
-            return _Database.Column[0] != null
+        private bool UserEdit_NewRowAllowed() => _Database == null || _Database.Column.Count == 0
+                ? false
+                : _Database.Column[0] != null
                     && _Design != enBlueTableAppearance.OnlyMainColumnWithoutHead
                     && _Database.ColumnArrangements.Count != 0
                     && (CurrentArrangement == null || CurrentArrangement[_Database.Column[0]] != null)
                     && _Database.PermissionCheck(_Database.PermissionGroups_NewRow, null)
                     && CellCollection.UserEditPossible(_Database.Column[0], null, enErrorReason.EditNormaly);
-        }
 
         private void _Database_RowRemoved(object sender, System.EventArgs e) {
             Invalidate_RowSort();

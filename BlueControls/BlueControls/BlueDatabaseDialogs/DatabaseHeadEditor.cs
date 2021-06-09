@@ -44,11 +44,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             InitializeComponent();
 
             _Database = cDatabase;
-            _Database.Disposing += _Database_Disposing;
+            _Database.Disposing += Database_Disposing;
 
         }
 
-        private void _Database_Disposing(object sender, System.EventArgs e) {
+        private void Database_Disposing(object sender, System.EventArgs e) {
             RemoveDatabase();
             Close();
 
@@ -56,7 +56,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void RemoveDatabase() {
             if (_Database == null) { return; }
-            _Database.Disposing -= _Database_Disposing;
+            _Database.Disposing -= Database_Disposing;
             _Database = null;
 
         }

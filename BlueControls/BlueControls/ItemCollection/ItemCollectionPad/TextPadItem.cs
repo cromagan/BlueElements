@@ -30,7 +30,7 @@ namespace BlueControls.ItemCollection {
     public class TextPadItem : FormPadItemRectangle, ICanHaveColumnVariables {
         #region  Variablen-Deklarationen 
 
-        [Description("Text der angezeigt werden soll.<br>Kann Variablen aus dem Code-Generator enthalten.")]
+        [Description("Text der angezeigt werden soll.<br>Alternativ kann ein Variablenname im Format &Name; angegeben werden.")]
         public string Interner_Text {
             get => _VariableText;
             set {

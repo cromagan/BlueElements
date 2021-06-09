@@ -35,27 +35,25 @@ using static BlueBasics.modConverter;
 namespace BlueControls.Forms {
     public sealed partial class ExportDialog {
 
-        private readonly string _AdditionalLayoutPath = "";
         private readonly List<RowItem> _RowsForExport;
-        private Database _Database;
+        public Database Database { get; private set; } = null;
         private readonly string _ZielPfad = "";
         private readonly string _SaveTo = "";
 
         private int _ItemNrForPrint;
 
-        public ExportDialog(Database db, string additionalLayoutPath, string autosaveFile) : this(db, null, additionalLayoutPath, autosaveFile) { }
-        public ExportDialog(Database db, List<RowItem> rows) : this(db, rows, string.Empty, string.Empty) { }
-        public ExportDialog(Database db, List<RowItem> rows, string additionalLayoutPath, string autosaveFile) {
+        public ExportDialog(Database db, string autosaveFile) : this(db, null, autosaveFile) { }
+        public ExportDialog(Database db, List<RowItem> rows) : this(db, rows, string.Empty) { }
+        public ExportDialog(Database db, List<RowItem> rows, string autosaveFile) {
 
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
 
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            _Database = db;
-            _Database.Disposing += _Database_Disposing;
+            Database = db;
+            Database.Disposing += _Database_Disposing;
             _RowsForExport = rows;
 
-            _AdditionalLayoutPath = additionalLayoutPath;
 
             if (!string.IsNullOrEmpty(autosaveFile)) {
                 _ZielPfad = autosaveFile.FilePath();
@@ -65,9 +63,6 @@ namespace BlueControls.Forms {
             }
 
             try {
-                if (!string.IsNullOrEmpty(_AdditionalLayoutPath) && !PathExists(_AdditionalLayoutPath)) {
-                    Directory.CreateDirectory(_AdditionalLayoutPath);
-                }
                 if (!PathExists(_ZielPfad)) {
                     Directory.CreateDirectory(_ZielPfad);
                 }
@@ -99,7 +94,7 @@ namespace BlueControls.Forms {
 
             if (string.IsNullOrEmpty(cbxLayoutWahl.Text)) { return "Es sind keine Layout für den Export gewählt."; }
 
-            if (_Database.Layouts.LayoutIDToIndex(cbxLayoutWahl.Text) > -1) {
+            if (Database.Layouts.LayoutIDToIndex(cbxLayoutWahl.Text) > -1) {
                 if (!optBildSchateln.Checked && !optDrucken.Checked && !optSpeichern.Checked) { return "Das gewählte Layout kann nur gedruckt, geschachtelt oder gespeichtert werden."; }
             } else {
                 if (!optSpezialFormat.Checked && !optSpeichern.Checked) { return "Das gewählte Layout kann nur gespeichtert oder im Spezialformat bearbeitet werden."; }
@@ -114,7 +109,7 @@ namespace BlueControls.Forms {
                     ? "Es ist genau ein Eintrag gewählt:<br> <b>-" + _RowsForExport[0].CellFirstString().Replace("\r\n", " ")
                     : "Es sind <b>" + _RowsForExport.Count + "</b> Einträge gewählt.";
 
-        public static void AddLayoutsOff(ItemCollectionList addHere, Database database, bool addDiskLayouts, string additionalLayoutPath) {
+        public static void AddLayoutsOff(ItemCollectionList addHere, Database database, bool addDiskLayouts) {
 
             if (database != null) {
                 for (var z = 0; z < database.Layouts.Count; z++) {
@@ -127,14 +122,17 @@ namespace BlueControls.Forms {
 
             var path = new List<string>();
             if (database != null) { path.Add(database.DefaultLayoutPath()); }
-            if (!string.IsNullOrEmpty(additionalLayoutPath)) { path.Add(additionalLayoutPath); }
+            if (!string.IsNullOrEmpty(database.AdditionaFilesPfadWhole())) { path.Add(database.AdditionaFilesPfadWhole()); }
 
             foreach (var thisP in path) {
                 if (PathExists(thisP)) {
                     var e = Directory.GetFiles(thisP);
                     foreach (var ThisFile in e) {
-                        //if (ThisFile.FilePath() == database.DefaultLayoutPath()) { ThisFile.TrimStart(database.DefaultLayoutPath()); }
-                        if (addHere[ThisFile] == null) { addHere.Add(ThisFile.FileNameWithSuffix(), ThisFile, QuickImage.Get(ThisFile.FileType(), 16)); }
+
+                        if (ThisFile.FileType() is enFileFormat.HTML or enFileFormat.Textdocument or enFileFormat.Visitenkarte or enFileFormat.BlueCreativeFile or enFileFormat.XMLFile) {
+
+                            if (addHere[ThisFile] == null) { addHere.Add(ThisFile.FileNameWithSuffix(), ThisFile, QuickImage.Get(ThisFile.FileType(), 16)); }
+                        }
                     }
                 }
             }
@@ -142,7 +140,7 @@ namespace BlueControls.Forms {
 
         private void BefülleLayoutDropdowns() {
             cbxLayoutWahl.Item.Clear();
-            AddLayoutsOff(cbxLayoutWahl.Item, _Database, true, _AdditionalLayoutPath);
+            AddLayoutsOff(cbxLayoutWahl.Item, Database, true);
         }
 
         private void LayoutEditor_Click(object sender, System.EventArgs e) {
@@ -152,7 +150,7 @@ namespace BlueControls.Forms {
             var n = cbxLayoutWahl.Text;
 
             cbxLayoutWahl.Text = string.Empty;
-            tabAdministration.OpenLayoutEditor(_Database, _AdditionalLayoutPath, n);
+            tabAdministration.OpenLayoutEditor(Database, n);
 
             BefülleLayoutDropdowns();
 
@@ -167,7 +165,7 @@ namespace BlueControls.Forms {
 
         private void cbxLayoutWahl_TextChanged(object sender, System.EventArgs e) {
 
-            if (_Database.Layouts.LayoutIDToIndex(cbxLayoutWahl.Text) > -1) {
+            if (Database.Layouts.LayoutIDToIndex(cbxLayoutWahl.Text) > -1) {
 
                 padVorschau.ShowInPrintMode = true;
                 padVorschau.Item = new ItemCollectionPad(cbxLayoutWahl.Text, _RowsForExport[0].Database, _RowsForExport[0].Key);
@@ -204,7 +202,7 @@ namespace BlueControls.Forms {
                 tabDateiExport.Enabled = true;
                 Tabs.SelectedTab = tabDateiExport;
 
-                var l = _Database.Layouts.LayoutIDToIndex(cbxLayoutWahl.Text) > -1
+                var l = Database.Layouts.LayoutIDToIndex(cbxLayoutWahl.Text) > -1
                     ? Export.SaveAsBitmap(_RowsForExport, cbxLayoutWahl.Text, _ZielPfad)
                     : Export.GenerateLayout_FileSystem(_RowsForExport, cbxLayoutWahl.Text, _SaveTo, optSpezialFormat.Checked, _ZielPfad);
                 Exported.Item.AddRange(l);
@@ -291,9 +289,9 @@ namespace BlueControls.Forms {
 
         protected override void OnFormClosing(FormClosingEventArgs e) {
 
-            if (_Database != null) {
-                _Database.Disposing -= _Database_Disposing;
-                _Database = null;
+            if (Database != null) {
+                Database.Disposing -= _Database_Disposing;
+                Database = null;
             }
             base.OnFormClosing(e);
         }

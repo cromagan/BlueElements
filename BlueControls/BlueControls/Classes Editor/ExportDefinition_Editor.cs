@@ -106,7 +106,7 @@ namespace BlueControls.Classes_Editor {
         protected override void PrepaireFormula() {
 
             cbxExportFormularID.Item.Clear();
-            Forms.ExportDialog.AddLayoutsOff(cbxExportFormularID.Item, Item.Database, true, string.Empty);
+            Forms.ExportDialog.AddLayoutsOff(cbxExportFormularID.Item, Item.Database, true);
 
             ExportSpaltenAnsicht.Item.Clear();
             for (var spa = 0; spa < Item.Database.ColumnArrangements.Count; spa++) {

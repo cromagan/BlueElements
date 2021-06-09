@@ -108,12 +108,6 @@ namespace BlueControls.Forms {
             Pad.Item.Add(b);
         }
 
-        //private void btnAddDistance_Click(object sender, System.EventArgs e) {
-        //    var b = new SpacerPadItem(Pad.Item);
-        //    Pad.Item.Add(b);
-        //    b.SetCoordinates(new RectangleM(10, 10, 20, 20), false);
-        //}
-
         private void btnAddImage_Click(object sender, System.EventArgs e) {
             var b = new BitmapPadItem(Pad.Item, QuickImage.Get(enImageCode.Fragezeichen).BMP, new Size(1000, 1000));
             Pad.Item.Add(b);
@@ -196,7 +190,16 @@ namespace BlueControls.Forms {
 
         #region Load / Save
         private void LoadTab_FileOk(object sender, System.ComponentModel.CancelEventArgs e) {
-            LoadFile(LoadTab.FileName);
+
+            if (sender == btnOeffnen) {
+                LoadFile(LoadTab.FileName, LoadTab.FileName);
+            } else {
+                // Kann nur der Import-Knopf sein
+                LoadFile(LoadTab.FileName, string.Empty);
+            }
+
+
+
             Ribbon.SelectedIndex = 1;
         }
 
@@ -206,7 +209,10 @@ namespace BlueControls.Forms {
             btnLastFiles.AddFileName(SaveTab.FileName, string.Empty);
         }
 
-        private void btnOeffnen_Click(object sender, System.EventArgs e) => LoadTab.ShowDialog();
+        private void btnOeffnen_Click(object sender, System.EventArgs e) {
+            LoadTab.Tag = sender;
+            LoadTab.ShowDialog();
+        }
 
         private void btnSpeichern_Click(object sender, System.EventArgs e) => SaveTab.ShowDialog();
 
@@ -216,16 +222,35 @@ namespace BlueControls.Forms {
             Ribbon.SelectedIndex = 1;
         }
 
-        private void btnLastFiles_ItemClicked(object sender, BasicListItemEventArgs e) => LoadFile(e.Item.Internal);
+        /// <summary>
+        /// löscht den kompletten Inhalt des Pads auch die ID und setzt es auf Disabled
+        /// </summary>
+        public void DisablePad() {
+            Pad.Item = new ItemCollectionPad();
+            Pad.Enabled = false;
+        }
 
-        private void LoadFile(string fileName) {
-            Pad.Item.Clear();
+        private void btnLastFiles_ItemClicked(object sender, BasicListItemEventArgs e) => LoadFile(e.Item.Internal, string.Empty);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="useThisID">Wenn das Blatt bereits eine Id hat, muss die Id verwendet werden. Wird das Feld leer gelassen, wird die beinhaltete Id benutzt.</param>
+        public void LoadFile(string fileName, string useThisID) {
             var t = File.ReadAllText(fileName, Constants.Win1252);
+            LoadFromString(t, useThisID);
+            btnLastFiles.AddFileName(fileName, fileName.FileNameWithSuffix());
+        }
 
-            Pad.Item = new ItemCollectionPad(t, fileName);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="useThisID">Wenn das Blatt bereits eine Id hat, muss die Id verwendet werden. Wird das Feld leer gelassen, wird die beinhaltete Id benutzt.</param>
+        public void LoadFromString(string data, string useThisID) {
+            Pad.Enabled = true;
+            //Pad.Item.Clear();
+            Pad.Item = new ItemCollectionPad(data, useThisID);
             ItemChanged();
-
-            btnLastFiles.AddFileName(fileName, string.Empty);
         }
 
         #endregion
@@ -243,5 +268,7 @@ namespace BlueControls.Forms {
             Pad.Item.BackColor = Color.Transparent;
             Pad.Invalidate();
         }
+
+
     }
 }

@@ -55,8 +55,8 @@ namespace BlueControls.BlueDatabaseDialogs {
                 if (_TableView == value) { return; }
 
                 if (_TableView != null) {
-                    _TableView.DatabaseChanged -= _TableView_DatabaseChanged;
-                    _TableView.EnabledChanged -= _TableView_EnabledChanged;
+                    _TableView.DatabaseChanged -= TableView_DatabaseChanged;
+                    _TableView.EnabledChanged -= TableView_EnabledChanged;
                     ChangeDatabase(null);
                 }
                 _TableView = value;
@@ -64,15 +64,15 @@ namespace BlueControls.BlueDatabaseDialogs {
 
                 if (_TableView != null) {
                     ChangeDatabase(_TableView.Database);
-                    _TableView.DatabaseChanged += _TableView_DatabaseChanged;
-                    _TableView.EnabledChanged += _TableView_EnabledChanged;
+                    _TableView.DatabaseChanged += TableView_DatabaseChanged;
+                    _TableView.EnabledChanged += TableView_EnabledChanged;
                 }
             }
         }
 
-        private void _TableView_EnabledChanged(object sender, System.EventArgs e) => Check_OrderButtons();
+        private void TableView_EnabledChanged(object sender, System.EventArgs e) => Check_OrderButtons();
 
-        private void _TableView_DatabaseChanged(object sender, System.EventArgs e) {
+        private void TableView_DatabaseChanged(object sender, System.EventArgs e) {
             ChangeDatabase(_TableView.Database);
             Check_OrderButtons();
         }
@@ -199,16 +199,22 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void btnLayouts_Click(object sender, System.EventArgs e) {
             Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
+            if (_TableView.Database == null) { return; }
 
-            OpenLayoutEditor(_TableView.Database, string.Empty, string.Empty);
+            OpenLayoutEditor(_TableView.Database, string.Empty);
         }
 
-        public static void OpenLayoutEditor(Database DB, string AdditionalLayoutPath, string LayoutToOpen) {
-            if (!string.IsNullOrEmpty(DB.ErrorReason(enErrorReason.EditNormaly))) { return; }
+        public static void OpenLayoutEditor(Database DB, string LayoutToOpen) {
+            var x = DB.ErrorReason(enErrorReason.EditNormaly);
+
+            if (!string.IsNullOrEmpty(x)) {
+                MessageBox.Show(x);
+                return;
+            }
 
             DB.CancelBackGroundWorker();
 
-            var w = new LayoutDesigner(DB, AdditionalLayoutPath);
+            var w = new LayoutDesigner(DB);
             if (!string.IsNullOrEmpty(LayoutToOpen)) { w.LoadLayout(LayoutToOpen); }
             w.ShowDialog();
         }

@@ -185,11 +185,10 @@ namespace BlueBasics.MultiUserFile {
             PureBinSaver.ProgressChanged += PureBinSaver_ProgressChanged;
 
             BackgroundWorker = new BackgroundWorker {
-                WorkerReportsProgress = true,
+                WorkerReportsProgress = false,
                 WorkerSupportsCancellation = true,
             };
             BackgroundWorker.DoWork += BackgroundWorker_DoWork;
-            BackgroundWorker.ProgressChanged += Backup_ProgressChanged;
 
             Checker = new Timer(Checker_Tick);
 
@@ -1049,12 +1048,11 @@ namespace BlueBasics.MultiUserFile {
             if (!BackgroundWorker.IsBusy) { BackgroundWorker.RunWorkerAsync(); }
         }
 
-        private void Backup_ProgressChanged(object sender, ProgressChangedEventArgs e) => BackgroundWorkerMessage(e);
 
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) => DoBackGroundWork((BackgroundWorker)sender);
 
         protected abstract void DoBackGroundWork(BackgroundWorker listenToMyCancel);
-        protected abstract void BackgroundWorkerMessage(ProgressChangedEventArgs e);
+
         protected abstract bool IsThereBackgroundWorkToDo();
 
         public virtual string ErrorReason(enErrorReason mode) {
