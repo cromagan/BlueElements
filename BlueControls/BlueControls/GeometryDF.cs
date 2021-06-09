@@ -38,7 +38,7 @@ namespace BlueControls {
             c2 = (Line2End.X * Line2Start.Y) - (Line2Start.X * Line2End.Y);
 
             denom = (a1 * b2) - (a2 * b1);
-            if (denom < 0.0000001M && denom > -0.0000001M) {
+            if (denom is < 0.0000001M and > (-0.0000001M)) {
                 // Ergibt ansonsten zu große ergebnisse
                 return null;
             }
@@ -59,8 +59,9 @@ namespace BlueControls {
 
             const decimal tol = 0.0001m;
 
-            if (sp.X < Math.Min(Line1Start.X, Line1End.X) - tol) { return null; }
-            return sp.X > Math.Max(Line1Start.X, Line1End.X) + tol
+            return sp.X < Math.Min(Line1Start.X, Line1End.X) - tol
+                ? null
+                : sp.X > Math.Max(Line1Start.X, Line1End.X) + tol
                 ? null
                 : sp.X < Math.Min(Line2Start.X, Line2End.X) - tol
                 ? null
