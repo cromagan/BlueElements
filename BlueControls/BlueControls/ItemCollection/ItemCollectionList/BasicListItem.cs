@@ -157,7 +157,6 @@ namespace BlueControls.ItemCollection {
 
         public int CompareTo(object obj) {
             if (obj is BasicListItem tobj) {
-                // hierist es egal, ob es ein DoAlways ist oder nicht. Es sollen nur Bedingugen VOR Aktionen kommen
                 return CompareKey().CompareTo(tobj.CompareKey());
             } else {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Objecttyp!");

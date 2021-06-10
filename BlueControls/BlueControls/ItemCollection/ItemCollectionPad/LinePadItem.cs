@@ -370,7 +370,7 @@ namespace BlueControls.ItemCollection {
                 if (ThisItemBasic != null) {
                     //    If ThisBasicItem IsNot Object1 AndAlso ThisBasicItem IsNot Object2 Then
 
-                    if (!(ThisItemBasic is LinePadItem)) {
+                    if (ThisItemBasic is not LinePadItem) {
 
                         var a = (RectangleM)ThisItemBasic.UsedArea().Clone(); // Umwandeln, um den Bezu zu brechen
 

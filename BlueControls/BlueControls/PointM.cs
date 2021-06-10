@@ -28,14 +28,12 @@ using System;
 using System.Drawing;
 
 namespace BlueControls {
-    public sealed class PointM : IComparable, IMoveable {
+    public sealed class PointM : IMoveable {
         #region  Variablen-Deklarationen 
 
-        private object _parent;
+
         private decimal _x;
         private decimal _y;
-
-        private string _tag;
 
         #endregion
 
@@ -53,7 +51,7 @@ namespace BlueControls {
             var tempVar = GeometryDF.PolarToCartesian(laenge, Convert.ToDouble(alpha));
             _x = startX + tempVar.X;
             _y = startY + tempVar.Y;
-            _tag = string.Empty;
+            Tag = string.Empty;
         }
         public PointM(PointM startPoint, decimal laenge, decimal alpha) : this(null, string.Empty, startPoint.X, startPoint.Y, laenge, alpha) { }
         public PointM(PointF startPoint, decimal laenge, decimal alpha) : this(null, string.Empty, (decimal)startPoint.X, (decimal)startPoint.Y, laenge, alpha) { }
@@ -61,11 +59,11 @@ namespace BlueControls {
         public PointM(object parent, string codeToParse) : this(parent) => Parse(codeToParse);
 
         public PointM(object parent, string name, decimal x, decimal y, string tag) {
-            _parent = parent;
+            Parent = parent;
             _x = x;
             _y = y;
             Name = name;
-            _tag = tag;
+            Tag = tag;
         }
         public PointM() : this(null, string.Empty, 0m, 0m, string.Empty) { }
         public PointM(object parent) : this(parent, string.Empty, 0m, 0m, string.Empty) { }
@@ -85,14 +83,7 @@ namespace BlueControls {
 
         public string Name { get; private set; }
 
-        public object Parent {
-            get => _parent;
-
-            set {
-                if (_parent == value) { return; }
-                _parent = value;
-            }
-        }
+        public object Parent { get; set; }
 
         public decimal X {
             get => _x;
@@ -114,14 +105,8 @@ namespace BlueControls {
             }
         }
 
-        public string Tag {
-            get => _tag;
+        public string Tag { get; set; }
 
-            set {
-                if (_tag == value) { return; }
-                _tag = value;
-            }
-        }
         #endregion
 
         public void Parse(string codeToParse) {
@@ -136,7 +121,7 @@ namespace BlueControls {
                         break;
 
                     case "tag":
-                        _tag = pair.Value.FromNonCritical();
+                        Tag = pair.Value.FromNonCritical();
                         break;
 
                     case "x":
@@ -175,10 +160,10 @@ namespace BlueControls {
         public override string ToString() {
             var t = "{";
 
-            if (_parent != null) {
-                switch (_parent) {
+            if (Parent != null) {
+                switch (Parent) {
                     case BasicPadItem _:
-                        t = t + "ParentName=" + ((BasicPadItem)_parent).Internal.ToNonCritical() + ", ";
+                        t = t + "ParentName=" + ((BasicPadItem)Parent).Internal.ToNonCritical() + ", ";
                         break;
                     case CreativePad _:
                         t += "ParentType=Main, ";
@@ -196,29 +181,18 @@ namespace BlueControls {
             t = t + "X=" + _x + ", ";
             t = t + "Y=" + _y + ", ";
 
-            if (!string.IsNullOrEmpty(_tag)) {
-                t = t + "Tag=" + _tag.ToNonCritical() + ", ";
-            }
-
-            //t = t + "Fix=" + Fix.ToPlusMinus() + ", ";
-
-            //if (!_canUsedForAutoRelation) {
-            //    t = t + "GetSnapped=" + _canUsedForAutoRelation + ", ";
-            //}
-            //if (_primaryGridSnapPoint) {
-            //    t = t + "PrimaryGridSnapPoint=" + _primaryGridSnapPoint + ", ";
-            //}
+            if (!string.IsNullOrEmpty(Tag)) { t = t + "Tag=" + Tag.ToNonCritical() + ", "; }
 
             return t.Trim(", ") + "}";
         }
 
-        public bool IsOnScreen(decimal zoom, decimal shiftX, decimal shiftY, Rectangle displayRectangle) {
+        //public bool IsOnScreen(decimal zoom, decimal shiftX, decimal shiftY, Rectangle displayRectangle) {
 
-            var tx = (_x * zoom) - shiftX;
-            var ty = (_y * zoom) - shiftY;
+        //    var tx = (_x * zoom) - shiftX;
+        //    var ty = (_y * zoom) - shiftY;
 
-            return tx >= displayRectangle.Left && ty >= displayRectangle.Top && tx <= displayRectangle.Right && ty <= displayRectangle.Bottom;
-        }
+        //    return tx >= displayRectangle.Left && ty >= displayRectangle.Top && tx <= displayRectangle.Right && ty <= displayRectangle.Bottom;
+        //}
 
         public void Draw(Graphics gr, decimal zoom, decimal shiftX, decimal shiftY, enDesign type, enStates state) {
             var tx = (_x * zoom) - shiftX + (zoom / 2);
@@ -270,26 +244,21 @@ namespace BlueControls {
 
         public void SetTo(int x, int y) => SetTo(x, (decimal)y);
 
-        public int CompareTo(object obj) {
-            if (obj is PointM tobj) {
-                // hierist es egal, ob es ein DoAlways ist oder nicht. Es sollen nur Bedingugen VOR Aktionen kommen
-                return CompareKey().CompareTo(tobj.CompareKey());
-            } else {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Objecttyp!");
-                return 0;
-            }
-        }
+        //public int CompareTo(object obj) {
+        //    if (obj is PointM tobj) {
+        //        // hierist es egal, ob es ein DoAlways ist oder nicht. Es sollen nur Bedingugen VOR Aktionen kommen
+        //        return CompareKey().CompareTo(tobj.CompareKey());
+        //    } else {
+        //        Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Objecttyp!");
+        //        return 0;
+        //    }
+        //}
 
-        internal string CompareKey() =>
-            //if (_x > int.MaxValue / 10.0m || _y > int.MaxValue / 10.0m || _x < int.MinValue / 10.0m || _y < int.MinValue / 10.0m) { return "ZZZ-ZZZ"; }
-            _y.ToString(Constants.Format_Float5_1) + "-" + _x.ToString(Constants.Format_Float5_1);
+        //internal string CompareKey() => _y.ToString(Constants.Format_Float5_1) + "-" + _x.ToString(Constants.Format_Float5_1);
 
         public decimal DistanzZuLinie(PointM P1, PointM P2) => DistanzZuLinie(P1.X, P1.Y, P2.X, P2.Y);
 
-        public decimal DistanzZuLinie(decimal X1, decimal Y1, decimal X2, decimal Y2) {
-            var pal = GeometryDF.PointOnLine(this, X1, Y1, X2, Y2);
-            return GeometryDF.Länge(this, pal);
-        }
+        public decimal DistanzZuLinie(decimal X1, decimal Y1, decimal X2, decimal Y2) => GeometryDF.Länge(this, GeometryDF.PointOnLine(this, X1, Y1, X2, Y2));
 
         public void OnMoved() => Moved?.Invoke(this, System.EventArgs.Empty);
 

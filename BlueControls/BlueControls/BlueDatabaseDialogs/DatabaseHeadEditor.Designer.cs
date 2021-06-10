@@ -68,6 +68,12 @@ namespace BlueControls.BlueDatabaseDialogs
             this.cbxAnsicht = new BlueControls.Controls.ComboBox();
             this.cbxJoinTyp = new BlueControls.Controls.ComboBox();
             this.capAnsicht = new BlueControls.Controls.Caption();
+            this.Tab_Undo = new BlueControls.Controls.TabPage();
+            this.btnClipboard = new BlueControls.Controls.Button();
+            this.btnAlleUndos = new BlueControls.Controls.Button();
+            this.tbxUndoAnzahl = new BlueControls.Controls.TextBox();
+            this.capUndoAnzahl = new BlueControls.Controls.Caption();
+            this.tblUndo = new BlueControls.Controls.Table();
             this.Tab_Regeln = new BlueControls.Controls.TabPage();
             this.scriptEditor = new BlueControls.ScriptEditor();
             this.Tab_Backup = new BlueControls.Controls.TabPage();
@@ -79,12 +85,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capDateiverschluesselungInfo = new BlueControls.Controls.Caption();
             this.btnDateiSchluessel = new BlueControls.Controls.Button();
             this.Tab_Sortierung = new BlueControls.Controls.TabPage();
-            this.Tab_Undo = new BlueControls.Controls.TabPage();
-            this.btnClipboard = new BlueControls.Controls.Button();
-            this.btnAlleUndos = new BlueControls.Controls.Button();
-            this.tbxUndoAnzahl = new BlueControls.Controls.TextBox();
-            this.capUndoAnzahl = new BlueControls.Controls.Caption();
-            this.tblUndo = new BlueControls.Controls.Table();
             this.Tab_Expermimentell = new BlueControls.Controls.TabPage();
             this.btnFremdImport = new BlueControls.Controls.Button();
             this.capExperimentellWarnung = new BlueControls.Controls.Caption();
@@ -94,13 +94,13 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpKennwort.SuspendLayout();
             this.GlobalTab.SuspendLayout();
             this.Tab_Allgemein.SuspendLayout();
+            this.Tab_Undo.SuspendLayout();
             this.Tab_Regeln.SuspendLayout();
             this.Tab_Backup.SuspendLayout();
             this.grpExport.SuspendLayout();
             this.Tab_Rechte.SuspendLayout();
             this.grpDateiVerschluesselung.SuspendLayout();
             this.Tab_Sortierung.SuspendLayout();
-            this.Tab_Undo.SuspendLayout();
             this.Tab_Expermimentell.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -553,6 +553,71 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capAnsicht.Size = new System.Drawing.Size(120, 18);
             this.capAnsicht.Text = "Bevorzugte Ansicht:";
             // 
+            // Tab_Undo
+            // 
+            this.Tab_Undo.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.Tab_Undo.Controls.Add(this.btnClipboard);
+            this.Tab_Undo.Controls.Add(this.btnAlleUndos);
+            this.Tab_Undo.Controls.Add(this.tbxUndoAnzahl);
+            this.Tab_Undo.Controls.Add(this.capUndoAnzahl);
+            this.Tab_Undo.Controls.Add(this.tblUndo);
+            this.Tab_Undo.Location = new System.Drawing.Point(4, 25);
+            this.Tab_Undo.Name = "Tab_Undo";
+            this.Tab_Undo.Size = new System.Drawing.Size(1039, 616);
+            this.Tab_Undo.TabIndex = 6;
+            this.Tab_Undo.Text = "Undo";
+            // 
+            // btnClipboard
+            // 
+            this.btnClipboard.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnClipboard.Location = new System.Drawing.Point(864, 8);
+            this.btnClipboard.Name = "btnClipboard";
+            this.btnClipboard.Size = new System.Drawing.Size(168, 32);
+            this.btnClipboard.TabIndex = 3;
+            this.btnClipboard.Text = "Clipboard";
+            this.btnClipboard.Click += new System.EventHandler(this.btnClipboard_Click);
+            // 
+            // btnAlleUndos
+            // 
+            this.btnAlleUndos.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnAlleUndos.Location = new System.Drawing.Point(688, 8);
+            this.btnAlleUndos.Name = "btnAlleUndos";
+            this.btnAlleUndos.Size = new System.Drawing.Size(168, 32);
+            this.btnAlleUndos.TabIndex = 2;
+            this.btnAlleUndos.Text = "Alle Undos generieren";
+            this.btnAlleUndos.Click += new System.EventHandler(this.btnAlleUndos_Click);
+            // 
+            // tbxUndoAnzahl
+            // 
+            this.tbxUndoAnzahl.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.tbxUndoAnzahl.Format = BlueBasics.Enums.enDataFormat.Ganzzahl;
+            this.tbxUndoAnzahl.Location = new System.Drawing.Point(176, 8);
+            this.tbxUndoAnzahl.Name = "tbxUndoAnzahl";
+            this.tbxUndoAnzahl.Size = new System.Drawing.Size(88, 24);
+            this.tbxUndoAnzahl.TabIndex = 1;
+            // 
+            // capUndoAnzahl
+            // 
+            this.capUndoAnzahl.CausesValidation = false;
+            this.capUndoAnzahl.Location = new System.Drawing.Point(0, 8);
+            this.capUndoAnzahl.Name = "capUndoAnzahl";
+            this.capUndoAnzahl.Size = new System.Drawing.Size(168, 40);
+            this.capUndoAnzahl.Text = "Anzahl gespeicherter Undos:<br>(Standard: 300)";
+            // 
+            // tblUndo
+            // 
+            this.tblUndo.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tblUndo.Location = new System.Drawing.Point(0, 56);
+            this.tblUndo.Name = "tblUndo";
+            this.tblUndo.ShowWaitScreen = true;
+            this.tblUndo.Size = new System.Drawing.Size(1039, 562);
+            this.tblUndo.TabIndex = 0;
+            this.tblUndo.Text = "UndoTab";
+            this.tblUndo.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.tblUndo_ContextMenuInit);
+            this.tblUndo.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.tblUndo_ContextMenuItemClicked);
+            // 
             // Tab_Regeln
             // 
             this.Tab_Regeln.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
@@ -693,69 +758,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Sortierung.TabIndex = 2;
             this.Tab_Sortierung.Text = "Sortierung";
             // 
-            // Tab_Undo
-            // 
-            this.Tab_Undo.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.Tab_Undo.Controls.Add(this.btnClipboard);
-            this.Tab_Undo.Controls.Add(this.btnAlleUndos);
-            this.Tab_Undo.Controls.Add(this.tbxUndoAnzahl);
-            this.Tab_Undo.Controls.Add(this.capUndoAnzahl);
-            this.Tab_Undo.Controls.Add(this.tblUndo);
-            this.Tab_Undo.Location = new System.Drawing.Point(4, 25);
-            this.Tab_Undo.Name = "Tab_Undo";
-            this.Tab_Undo.Size = new System.Drawing.Size(1039, 616);
-            this.Tab_Undo.TabIndex = 6;
-            this.Tab_Undo.Text = "Undo";
-            // 
-            // btnClipboard
-            // 
-            this.btnClipboard.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClipboard.Location = new System.Drawing.Point(864, 8);
-            this.btnClipboard.Name = "btnClipboard";
-            this.btnClipboard.Size = new System.Drawing.Size(168, 32);
-            this.btnClipboard.TabIndex = 3;
-            this.btnClipboard.Text = "Clipboard";
-            this.btnClipboard.Click += new System.EventHandler(this.btnClipboard_Click);
-            // 
-            // btnAlleUndos
-            // 
-            this.btnAlleUndos.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnAlleUndos.Location = new System.Drawing.Point(688, 8);
-            this.btnAlleUndos.Name = "btnAlleUndos";
-            this.btnAlleUndos.Size = new System.Drawing.Size(168, 32);
-            this.btnAlleUndos.TabIndex = 2;
-            this.btnAlleUndos.Text = "Alle Undos generieren";
-            this.btnAlleUndos.Click += new System.EventHandler(this.btnAlleUndos_Click);
-            // 
-            // tbxUndoAnzahl
-            // 
-            this.tbxUndoAnzahl.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.tbxUndoAnzahl.Format = BlueBasics.Enums.enDataFormat.Ganzzahl;
-            this.tbxUndoAnzahl.Location = new System.Drawing.Point(176, 8);
-            this.tbxUndoAnzahl.Name = "tbxUndoAnzahl";
-            this.tbxUndoAnzahl.Size = new System.Drawing.Size(88, 24);
-            this.tbxUndoAnzahl.TabIndex = 1;
-            // 
-            // capUndoAnzahl
-            // 
-            this.capUndoAnzahl.CausesValidation = false;
-            this.capUndoAnzahl.Location = new System.Drawing.Point(0, 8);
-            this.capUndoAnzahl.Name = "capUndoAnzahl";
-            this.capUndoAnzahl.Size = new System.Drawing.Size(168, 40);
-            this.capUndoAnzahl.Text = "Anzahl gespeicherter Undos:<br>(Standard: 300)";
-            // 
-            // tblUndo
-            // 
-            this.tblUndo.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.tblUndo.Location = new System.Drawing.Point(0, 56);
-            this.tblUndo.Name = "tblUndo";
-            this.tblUndo.ShowWaitScreen = true;
-            this.tblUndo.Size = new System.Drawing.Size(1039, 562);
-            this.tblUndo.TabIndex = 0;
-            this.tblUndo.Text = "UndoTab";
-            // 
             // Tab_Expermimentell
             // 
             this.Tab_Expermimentell.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
@@ -820,13 +822,13 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpKennwort.ResumeLayout(false);
             this.GlobalTab.ResumeLayout(false);
             this.Tab_Allgemein.ResumeLayout(false);
+            this.Tab_Undo.ResumeLayout(false);
             this.Tab_Regeln.ResumeLayout(false);
             this.Tab_Backup.ResumeLayout(false);
             this.grpExport.ResumeLayout(false);
             this.Tab_Rechte.ResumeLayout(false);
             this.grpDateiVerschluesselung.ResumeLayout(false);
             this.Tab_Sortierung.ResumeLayout(false);
-            this.Tab_Undo.ResumeLayout(false);
             this.Tab_Expermimentell.ResumeLayout(false);
             this.ResumeLayout(false);
 

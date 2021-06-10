@@ -44,7 +44,6 @@ namespace BlueControls {
         }
 
         public decimal Left => X;
-
         public decimal Top => Y;
         public decimal Right => X + Width;
         public decimal Bottom => Y + Height;
@@ -52,18 +51,17 @@ namespace BlueControls {
         /// <summary>
         /// Positive Werte verkleinern das Rechteck, negative vergrößern es.
         /// </summary>
-        /// <param name="XVal"></param>
-        /// <param name="YVal"></param>
-        public void Inflate(int XVal, int YVal) {
-            X += XVal;
-            Y += YVal;
-            Width -= XVal * 2;
-            Height -= YVal * 2;
-
+        /// <param name="xVal"></param>
+        /// <param name="yVal"></param>
+        public void Inflate(int xVal, int yVal) {
+            X += xVal;
+            Y += yVal;
+            Width -= xVal * 2;
+            Height -= yVal * 2;
         }
 
-        public PointM PointOf(enAlignment P) {
-            switch (P) {
+        public PointM PointOf(enAlignment corner) {
+            switch (corner) {
                 case enAlignment.Bottom_Left:
                     return new PointM(Left, Bottom);
                 case enAlignment.Bottom_Right:
@@ -83,9 +81,8 @@ namespace BlueControls {
                 case enAlignment.Horizontal_Vertical_Center:
                     return new PointM(Left + (Width / 2m), Top + (Height / 2m));
                 default:
-                    Develop.DebugPrint(P);
+                    Develop.DebugPrint(corner);
                     return new PointM();
-
             }
         }
 
@@ -106,24 +103,39 @@ namespace BlueControls {
             return Erg == llo ? LO : Erg == lro ? rO : Erg == llu ? lu : Erg == lru ? ru : null;
         }
 
-        public bool Contains(PointM P) => Contains(P.X, P.Y);
+        public bool Contains(PointM p) => Contains(p.X, p.Y);
 
-        public bool Contains(decimal PX, decimal PY) => PX >= X && PY >= Y && PX <= X + Width && PY <= Y + Height;
+        public bool Contains(decimal pX, decimal pY) => pX >= X && pY >= Y && pX <= X + Width && pY <= Y + Height;
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="cZoom"></param>
+        /// <param name="zoom"></param>
         /// <param name="shiftX"></param>
         /// <param name="shiftY"></param>
-        /// <param name="outline">true = die Punkte komplett umschlossen (für Fills), false = Mitte der Punkte</param>
+        /// <param name="outerLine">true = die Punkte komplett umschlossen (für Fills), false = Mitte der Punkte</param>
         /// <returns></returns>
-        public RectangleF ZoomAndMoveRect(decimal cZoom, decimal shiftX, decimal shiftY, bool outline) {
+        public RectangleF ZoomAndMoveRect(decimal zoom, decimal shiftX, decimal shiftY, bool outerLine) {
+            if (outerLine) {
+                // Beispiel: bei X=0 und Width=5 muss bei einen zoom von 5
+                //               0 und 25 rauskommen
 
-            var add = 0m;
-            if (!outline) { add = cZoom / 2; }
+                return new RectangleF((float)((X * zoom) - shiftX),
+                      (float)((Y * zoom) - shiftY),
+                      (float)(Width * zoom),
+                      (float)(Height * zoom));
 
-            return new RectangleF((float)((X * cZoom) - shiftX + add), (float)((Y * cZoom) - shiftY + add), (float)((Width * cZoom) - (add * 2)), (float)((Height * cZoom) - (add * 2)));
+            } else {
+                // Beispiel: bei X=0 und Width=5 muss bei einen zoom von 5
+                //               2,5 und 27,5 rauskommen
+
+                var add = zoom / 2;
+                return new RectangleF((float)((X * zoom) - shiftX + add),
+                                      (float)((Y * zoom) - shiftY + add),
+                                      (float)(Width * zoom),
+                                      (float)(Height * zoom));
+            }
+
         }
 
         /// <summary>

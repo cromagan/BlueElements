@@ -24,10 +24,10 @@ namespace BlueControls.Controls {
         private object _propertyObject;
         private string _propertyName;
         private string _propertynamecpl;
-        private bool _FehlerWennLeer = true;
-        private bool _alwaysDiabled = false;
-        private readonly bool _FehlerFormatCheck = true;
-        private bool _enabled = true;
+        //private bool _FehlerWennLeer = true;
+        //private bool _alwaysDiabled = false;
+        //private readonly bool _FehlerFormatCheck = true;
+        //private bool _enabled = true;
 
         ///// <summary>
         ///// Die Hauptklasse wird zwar beibehalten, aber Unterklassen müssen evtl. neu definiert werden.
@@ -95,16 +95,16 @@ namespace BlueControls.Controls {
             }
         }
 
-        [DefaultValue(true)]
-        public new bool Enabled {
-            get => _enabled;
-            set {
-                if (_enabled == value) { return; }
-                _enabled = value;
-                CheckEnabledState();
-                GenFehlerText();
-            }
-        }
+        //[DefaultValue(true)]
+        //public new bool Enabled {
+        //    get => _enabled;
+        //    set {
+        //        if (_enabled == value) { return; }
+        //        _enabled = value;
+        //        CheckEnabledState();
+        //        GenFehlerText();
+        //    }
+        //}
 
         [DefaultValue(null)]
         public object PropertyObject {
@@ -236,20 +236,16 @@ namespace BlueControls.Controls {
                 DisabledReason = "Feld existiert im zugehörigen Objekt nicht.";
                 return false;
             }
-            if (!_enabled) {
-                DisabledReason = "Das Feld ist deaktiviert.";
-                return false;
-            }
 
             if (_propInfo != null && !_propInfo.CanWrite) {
                 DisabledReason = "Feld kann generell nicht beschrieben werdern.";
                 return false;
             }
 
-            if (_alwaysDiabled) {
-                DisabledReason = "Feld ist schreibgeschützt.";
-                return false;
-            }
+            //if (_alwaysDiabled) {
+            //    DisabledReason = "Feld ist schreibgeschützt.";
+            //    return false;
+            //}
 
             DisabledReason = string.Empty;
             return true;
@@ -395,8 +391,8 @@ namespace BlueControls.Controls {
 
             // [PropertyAttributes("", false)] setzen
 
-            _FehlerWennLeer = true;
-            _alwaysDiabled = false;
+            //_FehlerWennLeer = true;
+            //_alwaysDiabled = false;
 
             if (_propInfo == null && _methInfo == null) {
                 QuickInfo = string.Empty;
@@ -460,20 +456,20 @@ namespace BlueControls.Controls {
                 return;
             }
 
-            if (_FehlerWennLeer && string.IsNullOrEmpty(Value)) {
-                InfoText = "Dieses Feld darf nicht leer sein.";
-                return;
-            }
+            //if (_FehlerWennLeer && string.IsNullOrEmpty(Value)) {
+            //    InfoText = "Dieses Feld darf nicht leer sein.";
+            //    return;
+            //}
 
             if (string.IsNullOrEmpty(Value)) {
                 InfoText = string.Empty;
                 return;
             }
 
-            if (_FehlerFormatCheck && !Value.IsFormat(Format)) {
-                InfoText = "Der Wert entspricht nicht dem erwarteten Format.";
-                return;
-            }
+            //if (_FehlerFormatCheck && !Value.IsFormat(Format)) {
+            //    InfoText = "Der Wert entspricht nicht dem erwarteten Format.";
+            //    return;
+            //}
 
             InfoText = string.Empty;
 

@@ -20,6 +20,7 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.MultiUserFile;
+using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
@@ -426,7 +427,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             x.ColumnArrangements[1].Hide("hidden");
             x.ColumnArrangements[1].HideSystemColumns();
 
-            x.SortDefinition = new RowSortDefinition(x,  "Index" , true);
+            x.SortDefinition = new RowSortDefinition(x, "Index", true);
             tblUndo.Database = x;
             tblUndo.Arrangement = 1;
             for (var n = 0; n < _Database.Works.Count; n++) {
@@ -436,7 +437,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         }
 
-        private void AddUndoToTable(WorkItem work, int index,  string db) {
+        private void AddUndoToTable(WorkItem work, int index, string db) {
             if (work.HistorischRelevant) {
 
                 var l = tblUndo.Database.Row[work.ToString()];
@@ -570,20 +571,28 @@ namespace BlueControls.BlueDatabaseDialogs {
                 MessageBox.Show("Keine Vorgänger gefunden.");
                 return;
             }
+            L.CheckBehavior = enCheckBehavior.MultiSelection;
+            var alle = InputBoxListBoxStyle.Show("Datenbaken, die geladen werden sollen, wählen:", L, enAddType.None, true);
 
 
+
+            if (alle.Count < 1) {
+                MessageBox.Show("Abbruch.");
+                btnAlleUndos.Enabled = true;
+                return;
+            }
             var nDB = 0;
-            var x = Progressbar.Show("Lade Vorgänger Datenbanken", L.Count);
+            var x = Progressbar.Show("Lade Vorgänger Datenbanken", alle.Count);
 
-            foreach (var thisf in L) {
+            foreach (var thisf in alle) {
                 nDB++;
                 x.Update(nDB);
 
-                var db = (Database)Database.GetByFilename(thisf.Internal, false);
+                var db = (Database)Database.GetByFilename(thisf, false);
 
                 var disp = db == null;
                 if (db == null) {
-                    db = new Database(thisf.Internal, true, false);
+                    db = new Database(thisf, true, false);
                 }
 
                 if (db.Caption == _Database.Caption) {
@@ -598,6 +607,38 @@ namespace BlueControls.BlueDatabaseDialogs {
             x.Close();
 
 
+        }
+
+        private void tblUndo_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
+            var bt = (Table)sender;
+            var CellKey = e.Tags.TagGet("Cellkey");
+            if (string.IsNullOrEmpty(CellKey)) { return; }
+            bt.Database.Cell.DataOfCellKey(CellKey, out var Column, out var Row);
+
+            e.UserMenu.Add("Sortierung", true);
+            e.UserMenu.Add(enContextMenuComands.SpaltenSortierungAZ, Column != null && Column.Format.CanBeChangedByRules());
+            e.UserMenu.Add(enContextMenuComands.SpaltenSortierungZA, Column != null && Column.Format.CanBeChangedByRules());
+
+        }
+
+        private void tblUndo_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
+            var bt = (Table)sender;
+
+            var CellKey = e.Tags.TagGet("CellKey");
+
+            if (string.IsNullOrEmpty(CellKey)) { return; }
+            bt.Database.Cell.DataOfCellKey(CellKey, out var Column, out var Row);
+
+            switch (e.ClickedComand) {
+
+                case "SpaltenSortierungAZ":
+                    bt.SortDefinitionTemporary = new RowSortDefinition(bt.Database, Column.Name, false);
+                    break;
+
+                case "SpaltenSortierungZA":
+                    bt.SortDefinitionTemporary = new RowSortDefinition(bt.Database, Column.Name, true);
+                    break;
+            }
         }
     }
 }

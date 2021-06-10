@@ -630,9 +630,10 @@ namespace BlueControls.Forms {
         }
 
         private void TableView_ContextMenu_Init(object sender, ContextMenuInitEventArgs e) {
+            var bt = (Table)sender;
             var CellKey = e.Tags.TagGet("Cellkey");
             if (string.IsNullOrEmpty(CellKey)) { return; }
-            TableView.Database.Cell.DataOfCellKey(CellKey, out var Column, out var Row);
+            bt.Database.Cell.DataOfCellKey(CellKey, out var Column, out var Row);
 
             if (_Ansicht != enAnsicht.Überschriften_und_Formular) {
 
@@ -677,7 +678,7 @@ namespace BlueControls.Forms {
             var CellKey = e.Tags.TagGet("CellKey");
 
             if (string.IsNullOrEmpty(CellKey)) { return; }
-            TableView.Database.Cell.DataOfCellKey(CellKey, out var Column, out var Row);
+            bt.Database.Cell.DataOfCellKey(CellKey, out var Column, out var Row);
 
             switch (e.ClickedComand) {
 
