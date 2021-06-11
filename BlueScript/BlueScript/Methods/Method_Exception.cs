@@ -16,13 +16,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using Skript.Enums;
 using System.Collections.Generic;
-
 namespace BlueScript {
     internal class Method_Exception : Method {
-
         public override string Syntax => "Exception(\"Unbehandelter Programmcode!\");";
         public override string Description => "Unterbricht das Skript mit einer Fehlermeldung.";
         public override List<string> Comand(Script s) => new() { "Exception" };
@@ -32,13 +29,9 @@ namespace BlueScript {
         public override enVariableDataType Returns => enVariableDataType.Null;
         public override List<enVariableDataType> Args => new() { enVariableDataType.String };
         public override bool EndlessArgs => false;
-
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-
             if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Die Ausführung wurde absichtlich abgebrochen."); }
-
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-
             return attvar.Attributes == null || attvar.Attributes.Count != 1 ? new strDoItFeedback("Die Ausführung wurde absichtlich abgebrochen.")
                                                                              : new strDoItFeedback(attvar.Attributes[0].ValueString);
         }

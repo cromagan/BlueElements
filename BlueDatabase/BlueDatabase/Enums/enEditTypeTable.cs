@@ -16,10 +16,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 namespace BlueDatabase.Enums {
     public enum enEditTypeTable {
-
         None = -1,
         Textfeld = 1,
         FileHandling_InDateiSystem = 2,

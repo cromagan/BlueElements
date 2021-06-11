@@ -16,33 +16,25 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
 using System;
 using System.Collections.Generic;
-
 namespace BlueControls.Interfaces {
     public interface IContextMenu {
-
         event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
         event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
-
         void OnContextMenuInit(ContextMenuInitEventArgs e);
         //public void OnContextMenuInit(ContextMenuInitEventArgs e)
         //{
         //    ContextMenuInit?.Invoke(this, e);
         //}
-
         void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e);
         //public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e)
         //{
         //    ContextMenuItemClicked?.Invoke(this, e);
         //}
-
         void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate);
-
         bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e);
-
     }
 }

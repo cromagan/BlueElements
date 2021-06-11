@@ -6,7 +6,6 @@
         /// Erforderliche Designervariable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
-
         /// <summary> 
         /// Verwendete Ressourcen bereinigen.
         /// </summary>
@@ -19,9 +18,7 @@
             }
             base.Dispose(disposing);
         }
-
         #region Vom Komponenten-Designer generierter Code
-
         /// <summary> 
         /// Erforderliche Methode für die Designerunterstützung. 
         /// Der Inhalt der Methode darf nicht mit dem Code-Editor geändert werden.
@@ -55,11 +52,8 @@
             this.Controls.Add(this.SliderY);
             this.Size = new System.Drawing.Size(383, 239);
             this.ResumeLayout(false);
-
         }
-
         #endregion
-
         protected Controls.Slider SliderX;
         protected Controls.Slider SliderY;
     }

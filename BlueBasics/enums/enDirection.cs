@@ -16,9 +16,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 #endregion
-
 using System;
-
 namespace BlueBasics.Enums {
     [Flags]
     public enum enDirection : byte {
@@ -27,7 +25,6 @@ namespace BlueBasics.Enums {
         Unten = 2,
         Links = 4,
         Rechts = 8,
-
         Oben_Links = Oben | Links,
         Oben_Rechts = Oben | Rechts,
         Unten_Links = Unten | Links,

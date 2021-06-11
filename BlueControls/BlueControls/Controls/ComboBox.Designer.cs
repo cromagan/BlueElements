@@ -2,8 +2,6 @@
 using System;
 using System.Diagnostics;
 using System.Drawing;
-
-
 namespace BlueControls.Controls
 {
     public partial class ComboBox 
@@ -21,18 +19,12 @@ namespace BlueControls.Controls
                 _DropDownStyle = 0;
                 _ImageCode = null;
                 _DrawStyle = 0;
-
-
-
             }
             finally
             {
                 base.Dispose(disposing);
             }
         }
-
-
-
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -60,9 +52,7 @@ namespace BlueControls.Controls
             this.Name = "ComboBox";
             this.Size = new Size(500, 150);
             this.ResumeLayout(false);
-
         }
-
         internal Button btnDropDown;
     }
 }

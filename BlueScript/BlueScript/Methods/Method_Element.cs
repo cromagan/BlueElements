@@ -16,13 +16,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using Skript.Enums;
 using System.Collections.Generic;
-
 namespace BlueScript {
     internal class Method_Element : Method {
-
         public override string Syntax => "Element(VariableListe, Indexnummer)";
         public override string Description => "Gibt ein das Element der Liste mit der Indexnummer als Text zurück. Die Liste beginnt mit dem Element 0.";
         public override List<string> Comand(Script s) => new() { "element" };

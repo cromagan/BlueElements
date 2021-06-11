@@ -16,14 +16,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 namespace BluePaint.EventArgs {
     public class CommandForMacroArgs : System.EventArgs {
-
-        public CommandForMacroArgs(string Command) {
-            this.Command = Command;
-        }
-
+        public CommandForMacroArgs(string Command) => this.Command = Command;
         public string Command { get; set; }
     }
 }

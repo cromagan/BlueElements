@@ -16,7 +16,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 namespace BlueControls.Enums {
     public enum enWndProc {
         WM_NULL = 0x0,
@@ -219,7 +218,6 @@ namespace BlueControls.Enums {
         WM_APP = 0x8000,
         WM_USER = 0x400,
         WM_REFLECT = WM_USER + 0x1C00,
-
         TCM_FIRST = 0x1300,
         TCM_HITTEST = TCM_FIRST + 13,
         TCM_SETPADDING = TCM_FIRST + 43

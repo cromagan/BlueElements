@@ -16,13 +16,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 namespace BlueDatabase.EventArgs {
-
     public class RowCancelEventArgs : RowEventArgs {
-
         public RowCancelEventArgs(RowItem row, string cancelReason) : base(row) => CancelReason = cancelReason;
-
         public string CancelReason { get; set; }
     }
 }

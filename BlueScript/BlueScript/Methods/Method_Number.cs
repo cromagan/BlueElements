@@ -16,17 +16,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
 using static BlueBasics.Extensions;
-
 namespace BlueScript {
     internal class Method_Number : Method {
-
         public override string Syntax => "Number(string, NaNValue)";
-
         public override string Description => "Gibt den Text als Zahl zurück. Fall dies keine gültige Zahl ist, wird NaN-Value zurückgegeben.";
         public override List<string> Comand(Script s) => new() { "number" };
         public override string StartSequence => "(";
@@ -35,7 +31,6 @@ namespace BlueScript {
         public override enVariableDataType Returns => enVariableDataType.Numeral;
         public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.Numeral };
         public override bool EndlessArgs => false;
-
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             return !string.IsNullOrEmpty(attvar.ErrorMessage) ? strDoItFeedback.AttributFehler(this, attvar)

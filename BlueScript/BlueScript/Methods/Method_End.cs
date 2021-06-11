@@ -16,32 +16,23 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using Skript.Enums;
 using System.Collections.Generic;
-
 namespace BlueScript {
     internal class Method_Break : Method {
-
         //public Method_var(Script parent) : base(parent) { }
-
         public override string Syntax => "End;";
-
         public override string Description => "Beendet das Skript ohne Fehler.";
         public override List<string> Comand(Script s) => new() { "end" };
         public override string StartSequence => "";
         public override string EndSequence => ";";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.Null;
-
         public override List<enVariableDataType> Args => new() { };
         public override bool EndlessArgs => false;
-
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-
             s.EndSkript = true;
             return new strDoItFeedback();
-
         }
     }
 }

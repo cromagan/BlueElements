@@ -1,10 +1,7 @@
 using BlueControls.Controls;
 using System.Diagnostics;
-
 namespace BlueControls.BlueDatabaseDialogs
 {
-
-
     internal sealed partial class SearchAndReplace
         {
 			//Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
@@ -13,13 +10,9 @@ namespace BlueControls.BlueDatabaseDialogs
 			{
 				if (disposing )
 				{
-
 				}
 				base.Dispose(disposing);
 			}
-
-
-
 			//Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
 			//Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
 			//Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -248,7 +241,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.BlueFrame2.ResumeLayout(false);
             this.grpSonderzeichen.ResumeLayout(false);
             this.ResumeLayout(false);
-
 			}
 			private TextBox Alt;
 			private TextBox Neu;

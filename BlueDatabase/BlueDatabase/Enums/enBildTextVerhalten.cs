@@ -16,14 +16,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 namespace BlueDatabase.Enums {
     public enum enBildTextVerhalten {
         Nur_Text = 0,
         Wenn_möglich_Bild_und_immer_Text = 1,
         Nur_Bild = 110,
         Bild_oder_Text = 120,
-
         Fehlendes_Bild_zeige_Fragezeichen = 2,
         Fehlendes_Bild_zeige_Häkchen = 3,
         Fehlendes_Bild_zeige_Kreis = 4,
@@ -31,6 +29,5 @@ namespace BlueDatabase.Enums {
         Fehlendes_Bild_zeige_Infozeichen = 6,
         Fehlendes_Bild_zeige_Warnung = 7,
         Fehlendes_Bild_zeige_Kritischzeichen = 8,
-
     }
 }

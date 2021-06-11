@@ -1,5 +1,4 @@
 ﻿using BlueControls.Enums;
-
 namespace BlueControls.Forms
 {
     partial class Notification
@@ -8,7 +7,6 @@ namespace BlueControls.Forms
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
-
         /// <summary>
         /// Clean up any resources being used.
         /// </summary>
@@ -21,9 +19,7 @@ namespace BlueControls.Forms
             }
             base.Dispose(disposing);
         }
-
         #region Windows Form Designer generated code
-
         /// <summary>
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
@@ -58,11 +54,8 @@ namespace BlueControls.Forms
             this.Controls.Add(this.capTXT);
             this.Name = "Notification";
             this.ResumeLayout(false);
-
         }
-
         #endregion
-
         private Controls.Caption capTXT;
         private System.Windows.Forms.Timer timNote;
     }

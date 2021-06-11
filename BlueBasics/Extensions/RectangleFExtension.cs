@@ -16,11 +16,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 #endregion
-
 using BlueBasics.Enums;
 using System;
 using System.Drawing;
-
 namespace BlueBasics {
     public static partial class Extensions {
         public static PointF PointOf(this RectangleF r, enAlignment p) {
@@ -48,23 +46,18 @@ namespace BlueBasics {
                     return Point.Empty;
             }
         }
-
         public static PointF NearestCornerOF(this RectangleF r, Point p) {
             var LO = r.PointOf(enAlignment.Top_Left);
             var rO = r.PointOf(enAlignment.Top_Right);
             var ru = r.PointOf(enAlignment.Bottom_Right);
             var lu = r.PointOf(enAlignment.Bottom_Left);
-
             var llo = Geometry.Länge(p, LO);
             var lro = Geometry.Länge(p, rO);
             var llu = Geometry.Länge(p, lu);
             var lru = Geometry.Länge(p, ru);
-
             var Erg = Math.Min(Math.Min(llo, lro), Math.Min(llu, lru));
-
             return Erg == llo ? LO : Erg == lro ? rO : Erg == llu ? lu : Erg == lru ? ru : Point.Empty;
         }
-
         public static Rectangle ToRect(this RectangleF r) => new((int)r.X, (int)r.Y, (int)r.Width, (int)r.Height);
     }
 }

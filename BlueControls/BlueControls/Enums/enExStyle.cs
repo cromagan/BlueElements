@@ -16,12 +16,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 namespace BlueControls.Enums {
     public enum enExStyle {
-
         // 3x  &H0? Kann nicht sein! Sicherheitshalber auskommentuert!
-
         EX_ACCEPTFILES = 0x10,
         EX_APPWINDOW = 0x40000,
         EX_CLIENTEDGE = 0x200,

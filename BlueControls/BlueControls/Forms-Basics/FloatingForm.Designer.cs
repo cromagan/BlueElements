@@ -7,7 +7,6 @@ namespace BlueControls.Forms
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
-
         /// <summary>
         /// Clean up any resources being used.
         /// </summary>
@@ -20,9 +19,7 @@ namespace BlueControls.Forms
             }
             base.Dispose(disposing);
         }
-
         #region Windows Form Designer generated code
-
         /// <summary>
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
@@ -47,9 +44,7 @@ namespace BlueControls.Forms
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "";
             this.ResumeLayout(false);
-
         }
-
         #endregion
     }
 }

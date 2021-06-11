@@ -16,13 +16,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using Skript.Enums;
 using System.Collections.Generic;
-
 namespace BlueScript {
     internal class Method_IsType : Method {
-
         public override string Syntax => "isType(Variable, num / str / lst / bol / err / ukn)";
         public override string Description => "Prüft, ob der Variablenntyp dem hier angegeben Wert entspricht. Es wird keine Inhaltsprüfung ausgeführt!";
         public override List<string> Comand(Script s) => new() { "istype" };
@@ -35,9 +32,7 @@ namespace BlueScript {
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
-
             switch (attvar.Attributes[1].ValueString.ToLower()) {
-
                 case "num":
                     if (attvar.Attributes[0].Type == enVariableDataType.Numeral) { return strDoItFeedback.Wahr(); }
                     return strDoItFeedback.Falsch();

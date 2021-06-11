@@ -16,15 +16,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 namespace BlueDatabase.EventArgs {
     public class KeyChangedEventArgs : System.EventArgs {
-
         public KeyChangedEventArgs(int KeyOld, int KeyNew) {
             this.KeyOld = KeyOld;
             this.KeyNew = KeyNew;
         }
-
         public int KeyOld { get; set; }
         public int KeyNew { get; set; }
     }

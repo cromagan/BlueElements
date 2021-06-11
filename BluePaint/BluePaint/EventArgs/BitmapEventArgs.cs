@@ -17,14 +17,9 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 using System.Drawing;
-
 namespace BluePaint.EventArgs {
     public class BitmapEventArgs : System.EventArgs {
-
-        public BitmapEventArgs(Bitmap BMP) {
-            this.BMP = BMP;
-        }
-
+        public BitmapEventArgs(Bitmap BMP) => this.BMP = BMP;
         public Bitmap BMP { get; set; }
     }
 }

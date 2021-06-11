@@ -16,12 +16,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 #endregion
-
 namespace BlueBasics.Enums {
     public enum enTaste : byte {
         VK_LBUTTON = 0x1, // Left mouse button.
         VK_RBUTTON = 0x2, // Right mouse button.
-
         VK_MBUTTON = 0x4, // Middle mouse button (3-button mouse).
         VK_BACK = 0x8,
         VK_TAB = 0x9,
@@ -51,7 +49,6 @@ namespace BlueBasics.Enums {
         VK_HELP = 0x2F,
         VK_OEM_COMMA = 0xBC, // , comma
         VK_NUMLOCK = 0x90, // Num Lock
-
         VK_0 = 0x30,
         VK_1 = 0x31,
         VK_2 = 0x32,

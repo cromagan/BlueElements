@@ -16,7 +16,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -30,7 +29,6 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.Reflection;
-
 //  = A3 & ".Design.Add(enStates."&B3&", enKontur."& C3 & ", " &D3&", "&E3&", "&F3&","&G3&", enHintergrundArt."&H3&","&I3&",'"&J3&"','"&K3&"','"&L3&"',enRahmenArt."&M3&",'"&N3&"','"&O3&"','"&P3&"','"&Q3&"','"&R3&"');"
 #region Win 10
 //	Control	Status	Kontur	X1	X2	Y1	Y2	Draw Back	Verlauf Mitte	Color Back 1	Color Back 2	Color Back 3	Border Style	Color Border 1	Color Border 2	Color Border 3	Schrift	StandardPic
@@ -297,7 +295,6 @@ using System.Reflection;
 //	Table_Column	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Bold=True}	
 //	Table_Cell_Chapter	Standard															{Name=Calibri, Size=15, Bold=True, Underline=True}	
 #endregion
-
 #region Win XP
 //	Control	Status	Kontur	X1	X2	Y1	Y2	Draw Back	Verlauf Mitte	Color Back 1	Color Back 2	Color Back 3	Border Style	Color Border 1	Color Border 2	Color Border 3	Schrift	StandardPic
 //	Button	Standard	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	DCD7CB	Solide_1px	003C74			{Name=Arial, Size=9, Color=000000}	
@@ -562,9 +559,7 @@ using System.Reflection;
 //	Table_Cell_New	Standard	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Italic=True, Color=a6a6a6}	
 //	Table_Column	Standard	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Bold=True, Color=ffffff}	
 //	Table_Cell_Chapter	Standard															{Name=Arial, Size=14, Bold=True, Underline=True, Color=000000}	
-
 #endregion
-
 #region GlossyCyan
 //	Control	Status	Kontur	X1	X2	Y1	Y2	Draw Back	Verlauf Mitte	Color Back 1	Color Back 2	Color Back 3	Border Style	Color Border 1	Color Border 2	Color Border 3	Schrift	StandardPic
 //	Button	Standard	Rechteck_R2Ohne	0	0	0	0	Glossy		0095DD			Solide_1px	FFFFFF			{Name=Comic Sans MS, Size=9, Color=ffffff}	
@@ -829,37 +824,25 @@ using System.Reflection;
 //	Table_Cell_New	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Italic=True, Color=0046d5}	
 //	Table_Column	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9,4, Bold=True, Color=0046d5}	
 //	Table_Cell_Chapter	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=13, Bold=True, Underline=True, Color=0046d5}	
-
 #endregion
-
 namespace BlueControls {
     public static class Skin {
         public static Database StyleDB;
-
         public static bool inited = false;
-
         private static readonly enImageCodeEffect[] ST = new enImageCodeEffect[1];
         internal static Pen Pen_LinieDünn;
         internal static Pen Pen_LinieKräftig;
         internal static Pen Pen_LinieDick;
-
         public static readonly float Scale = (float)Math.Round(System.Windows.Forms.SystemInformation.VirtualScreen.Width / System.Windows.SystemParameters.VirtualScreenWidth, 2);
-
         public static string ErrorFont = "<Name=Arial, Size=8, Color=FF0000>";
         public static string DummyStandardFont = "<Name=Arial, Size=10>";
-
         public static readonly int PaddingSmal = 3; // Der Abstand von z.B. in Textboxen: Text Linke Koordinate
         public static readonly int Padding = 9;
-
         public static readonly Dictionary<enDesign, Dictionary<enStates, clsDesign>> Design = new();
-
         public static void LoadSkin() {
             //_SkinString = "Windows10";
-
             //SkinDB = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), _SkinString + ".skn", "Skin", true, Convert.ToBoolean(Develop.AppName() == "SkinDesigner"));
-
             //="Design.Add(enDesign."& A3 & ",enStates."&B3&", enKontur."& C3 & ", " &D3&", "&E3&", "&F3&","&G3&", enHintergrundArt."&H3&","&I3&",'"&J3&"','"&K3&"','"&L3&"',enRahmenArt."&M3&",'"&N3&"','"&O3&"','"&P3&"','"&Q3&"','"&R3&"');"
-
             Design.Add(enDesign.Button, enStates.Standard, enKontur.Rechteck, 0, 0, 0, 0, enHintergrundArt.Solide, 0, "EAEAEA", "", "", enRahmenArt.Solide_1px, "B6B6B6", "", "", "{Name=Calibri, Size=10[K]15}", "");
             Design.Add(enDesign.Button, enStates.Standard_HasFocus_MousePressed, enKontur.Rechteck, 0, 0, 0, 0, enHintergrundArt.Solide, 0, "EAEAEA", "", "", enRahmenArt.Solide_1px, "3399FF", "", "", "{Name=Calibri, Size=10[K]15}", "");
             Design.Add(enDesign.Button, enStates.Standard_MouseOver_HasFocus_MousePressed, enKontur.Rechteck, 0, 0, 0, 0, enHintergrundArt.Solide, 0, "EAEAEA", "", "", enRahmenArt.Solide_3px, "3399FF", "", "", "{Name=Calibri, Size=10[K]15}", "");
@@ -1122,14 +1105,11 @@ namespace BlueControls {
             Design.Add(enDesign.Table_Cell_New, enStates.Standard, enKontur.Ohne, 0, 0, 0, 0, enHintergrundArt.Ohne, 0, "", "", "", enRahmenArt.Ohne, "", "", "", "{Name=Calibri, Size=10[K]15,Italic=True}", "");
             Design.Add(enDesign.Table_Column, enStates.Standard, enKontur.Ohne, 0, 0, 0, 0, enHintergrundArt.Ohne, 0, "", "", "", enRahmenArt.Ohne, "", "", "", "{Name=Calibri, Size=10[K]15,Bold=True}", "");
             Design.Add(enDesign.Table_Cell_Chapter, enStates.Standard, enKontur.Ohne, 0, 0, 0, 0, enHintergrundArt.Ohne, 0, "", "", "", enRahmenArt.Ohne, "", "", "", "{Name=Calibri, Size=15,Bold=True,Underline=True}", "");
-
             inited = true;
-
             //ColX1 = SkinDB.Column["X1"];
             //ColX2 = SkinDB.Column["X2"];
             //ColY1 = SkinDB.Column["Y1"];
             //ColY2 = SkinDB.Column["Y2"];
-
             //col_Color_Back_1 = SkinDB.Column["Color_Back_1"];
             //col_Color_Back_2 = SkinDB.Column["Color_Back_2"];
             ////col_Color_Back_3 = SkinDB.Column["Color_Back_3"];
@@ -1140,36 +1120,25 @@ namespace BlueControls {
             //col_Draw_Back = SkinDB.Column["Draw_Back"];
             //col_Verlauf_Mitte = SkinDB.Column["Verlauf_Mitte"];
             //col_Border_Style = SkinDB.Column["Border_Style"];
-
             ////col_Status = SkinDB.Column["Status"];
             //col_Font = SkinDB.Column["Font"];
             //col_StandardPic = SkinDB.Column["StandardPic"];
-
             ST[0] = enImageCodeEffect.WindowsXPDisabled;
             //ST[0] = (enImageCodeEffect)int.Parse(SkinDB?.Tags[0]);
             Pen_LinieDünn = new Pen(Color_Border(enDesign.Table_Lines_thin, enStates.Standard));
             Pen_LinieKräftig = new Pen(Color_Border(enDesign.Table_Lines_thick, enStates.Standard));
             Pen_LinieDick = new Pen(Color_Border(enDesign.Table_Lines_thick, enStates.Standard), 3);
-
         }
-
         public static enImageCodeEffect AdditionalState(enStates vState) => vState.HasFlag(enStates.Standard_Disabled) ? ST[0] : enImageCodeEffect.Ohne;
-
         public static Color Color_Back(enDesign vDesign, enStates vState) => DesignOf(vDesign, vState).BackColor1;
-
         internal static Color Color_Border(enDesign vDesign, enStates vState) => DesignOf(vDesign, vState).BorderColor1;
-
         #region  Back 
-
         public static void Draw_Back(Graphics gr, enDesign design, enStates state, Rectangle r, System.Windows.Forms.Control control, bool needTransparenz) => Draw_Back(gr, DesignOf(design, state), r, control, needTransparenz);
-
         public static clsDesign DesignOf(enDesign design, enStates state) {
-
             try {
                 return Design[design][state];
-
             } catch {
-                var d = new clsDesign {
+                clsDesign d = new() {
                     BackColor1 = Color.White,
                     BorderColor1 = Color.Red,
                     bFont = BlueFont.Get("Arial", 10f, false, false, false, false, false, Color.Red, Color.Black, false, false, false),
@@ -1178,16 +1147,12 @@ namespace BlueControls {
                     Kontur = enKontur.Rechteck
                 };
                 return d;
-
             }
         }
-
         public static void Draw_Back(Graphics gr, clsDesign design, Rectangle r, System.Windows.Forms.Control control, bool needTransparenz) {
             try {
-
                 if (design.Need) {
                     if (!needTransparenz) { design.Need = false; }
-
                     if (design.Kontur != enKontur.Ohne) {
                         if (design.HintergrundArt != enHintergrundArt.Ohne) {
                             if (design.Kontur == enKontur.Rechteck && design.X1 >= 0 && design.X2 >= 0 && design.Y1 >= 0 && design.Y2 >= 0) { design.Need = false; }
@@ -1195,45 +1160,34 @@ namespace BlueControls {
                         }
                     }
                 }
-
                 if (design.Need) { Draw_Back_Transparent(gr, r, control); }
-
                 if (design.HintergrundArt == enHintergrundArt.Ohne || design.Kontur == enKontur.Ohne) { return; }
-
                 r.X -= design.X1;
                 r.Y -= design.Y1;
                 r.Width += design.X1 + design.X2;
                 r.Height += design.Y1 + design.Y2;
-
                 if (r.Width < 1 || r.Height < 1) { return; }// Durchaus möglich, Creative-Pad, usereingabe
-
                 switch (design.HintergrundArt) {
                     case enHintergrundArt.Ohne:
                         break;
-
                     case enHintergrundArt.Solide:
                         gr.FillPath(new SolidBrush(design.BackColor1), Kontur(design.Kontur, r));
                         break;
-
                     case enHintergrundArt.Verlauf_Vertical_2:
                         //var c1 = Color.FromArgb(Value(row, col_Color_Back_1, 0));
                         //var c2 = Color.FromArgb(Value(row, col_Color_Back_2, 0));
-                        var lgb = new LinearGradientBrush(r, design.BackColor1, design.BackColor2, LinearGradientMode.Vertical);
+                        LinearGradientBrush lgb = new(r, design.BackColor1, design.BackColor2, LinearGradientMode.Vertical);
                         gr.FillPath(lgb, Kontur(design.Kontur, r));
                         break;
-
                     //case enHintergrundArt.Verlauf_Vertical_3:
                     //    Draw_Back_Verlauf_Vertical_3(gr, row, r);
                     //    break;
-
                     //case enHintergrundArt.Verlauf_Horizontal_2:
                     //    Draw_Back_Verlauf_Horizontal_2(gr, row, r);
                     //    break;
-
                     //case enHintergrundArt.Verlauf_Horizontal_3:
                     //    Draw_Back_Verlauf_Horizontal_3(gr, row, r);
                     //    break;
-
                     //case enHintergrundArt.Verlauf_Diagonal_3:
                     //    PathX = Kontur(Kon, r);
                     //    var cx1 = Color.FromArgb(Value(row, col_Color_Back_1, 0));
@@ -1245,204 +1199,153 @@ namespace BlueControls {
                     //        Colors = new[] { cx1, cx2, cx3 },
                     //        Positions = new[] { 0.0F, PR, 1.0F }
                     //    };
-
                     //    lgb2.InterpolationColors = cb;
                     //    lgb2.GammaCorrection = true;
                     //    gr.FillPath(lgb2, PathX);
                     //    break;
-
                     //case enHintergrundArt.Glossy:
                     //    Draw_Back_Glossy(gr, row, r);
                     //    break;
-
                     //case enHintergrundArt.GlossyPressed:
                     //    Draw_Back_GlossyPressed(gr, row, r);
                     //    break;
-
                     //case enHintergrundArt.Verlauf_Vertikal_Glanzpunkt:
                     //    Draw_Back_Verlauf_Vertical_Glanzpunkt(gr, row, r);
                     //    break;
-
                     case enHintergrundArt.Unbekannt:
                         break;
-
                     default:
                         Develop.DebugPrint(design.HintergrundArt);
                         break;
-
                 }
             } catch (Exception ex) {
                 Develop.DebugPrint(ex);
             }
         }
-
         public static void Draw_Back_Transparent(Graphics gr, Rectangle r, System.Windows.Forms.Control control) {
             if (control?.Parent == null) { return; }
-
             switch (control.Parent) {
                 case IUseMyBackColor _:
                     gr.FillRectangle(new SolidBrush(control.Parent.BackColor), r);
                     return;
-
                 case IBackgroundNone _:
                     Draw_Back_Transparent(gr, r, control.Parent);
                     break;
-
                 case GenericControl TRB:
                     if (TRB.BitmapOfControl() == null) { return; }
                     gr.DrawImage(TRB.BitmapOfControl(), r, new Rectangle(control.Left + r.Left, control.Top + r.Top, r.Width, r.Height), GraphicsUnit.Pixel);
                     break;
-
                 case System.Windows.Forms.Form frm:
                     gr.FillRectangle(new SolidBrush(frm.BackColor), r);
                     break;
-
                 case System.Windows.Forms.SplitContainer _:
                     Draw_Back_Transparent(gr, r, control.Parent);
                     break;
-
                 case System.Windows.Forms.SplitterPanel _:
                     Draw_Back_Transparent(gr, r, control.Parent);
                     break;
-
                 case System.Windows.Forms.TableLayoutPanel _:
                     Draw_Back_Transparent(gr, r, control.Parent);
                     break;
-
                 case System.Windows.Forms.Panel _:
                     Draw_Back_Transparent(gr, r, control.Parent);
                     break;
-
                 default:
                     System.Windows.Forms.ButtonRenderer.DrawParentBackground(gr, r, control); // Ein Versuch ist es allemal wert..
                     Develop.DebugPrint("Unbekannter Typ: " + control.Parent.Name);
                     break;
             }
         }
-
         //private static void Draw_Back_Verlauf_Vertical_Glanzpunkt(Graphics GR, RowItem Row, Rectangle r) {
-
         //    var cb = new ColorBlend();
-
         //    var c1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
         //    var c2 = Color.FromArgb(Value(Row, col_Color_Back_2, 0));
         //    var PR = Value(Row, col_Verlauf_Mitte, 0.05f);
-
         //    if (PR < 0.06F) { PR = 0.06F; }
         //    if (PR > 0.94F) { PR = 0.94F; }
-
         //    var lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Bottom), c1, c1);
-
         //    cb.Colors = new[] { c1, c2, c1, c1, c1.Darken(0.3), c1 };
         //    cb.Positions = new[]
         //    {
         //        0.0F, (float) (PR - 0.05), (float) (PR + 0.05), (float) (1 - PR - 0.05), (float) (1 - PR + 0.05), 1.0F
         //    };
-
         //    lgb.InterpolationColors = cb;
         //    lgb.GammaCorrection = true;
-
         //    GR.FillRectangle(lgb, r);
         //}
-
         //private static void Draw_Back_Verlauf_Horizontal_2(Graphics GR, RowItem Row, Rectangle r) {
         //    var c1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
         //    var c2 = Color.FromArgb(Value(Row, col_Color_Back_2, 0));
         //    var lgb = new LinearGradientBrush(r, c1, c2, LinearGradientMode.Horizontal);
         //    GR.FillRectangle(lgb, r);
-
         //}
-
         //private static void Draw_Back_Verlauf_Horizontal_3(Graphics GR, RowItem Row, Rectangle r) {
-
         //    var cb = new ColorBlend();
-
         //    var c1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
         //    var c2 = Color.FromArgb(Value(Row, col_Color_Back_2, 0));
         //    var c3 = Color.FromArgb(Value(Row, col_Color_Back_3, 0));
         //    var PR = Value(Row, col_Verlauf_Mitte, 0.5f);
-
         //    var lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Right, r.Top), c1, c3);
-
         //    cb.Colors = new[] { c1, c2, c3 };
         //    cb.Positions = new[] { 0.0F, PR, 1.0F };
-
         //    lgb.InterpolationColors = cb;
         //    lgb.GammaCorrection = true;
-
         //    GR.FillRectangle(lgb, r);
         //    GR.DrawLine(new Pen(c3), r.Left, r.Bottom - 1, r.Right, r.Bottom - 1);
         //}
-
         //private static void Draw_Back_Glossy(Graphics GR, RowItem Row, Rectangle r) {
         //    var col1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
-
         //    var cb = new ColorBlend();
-
         //    var c1 = Extensions.MixColor(Color.White, Extensions.SoftLightMix(col1, Color.Black, 1), 0.4);
         //    var c2 = Extensions.MixColor(Color.White, Extensions.SoftLightMix(col1, Color.FromArgb(64, 64, 64), 1), 0.2);
         //    var c3 = Extensions.SoftLightMix(col1, Color.FromArgb(128, 128, 128), 1);
         //    var c4 = Extensions.SoftLightMix(col1, Color.FromArgb(192, 192, 192), 1);
         //    var c5 = Extensions.OverlayMix(Extensions.SoftLightMix(col1, Color.White, 1), Color.White, 0.75);
-
         //    cb.Colors = new[] { c1, c2, c3, c4, c5 };
         //    cb.Positions = new[] { 0.0F, 0.25F, 0.5F, 0.75F, 1 };
         //    var lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Top + r.Height + 1), c1, c5) {
         //        InterpolationColors = cb
         //    };
         //    Draw_Back_Glossy_TMP(lgb, r, GR, 20);
-
         //    c2 = Color.White;
         //    cb.Colors = new[] { c2, c3, c4, c5 };
         //    cb.Positions = new[] { 0.0F, 0.5F, 0.75F, 1.0F };
         //    lgb = new LinearGradientBrush(new Point(r.Left + 1, r.Top), new Point(r.Left + 1, r.Top + r.Height - 1), c2, c5) {
         //        InterpolationColors = cb
         //    };
-
         //    r.Inflate(-4, -4);
         //    GR.SmoothingMode = SmoothingMode.HighQuality;
         //    Draw_Back_Glossy_TMP(lgb, r, GR, 16);
-
         //}
-
         //private static void Draw_Back_GlossyPressed(Graphics GR, RowItem Row, Rectangle r) {
-
         //    var col1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
-
         //    var cb = new ColorBlend();
-
         //    var c5 = Extensions.MixColor(Color.White, Extensions.SoftLightMix(col1, Color.Black, 1), 0.4);
         //    var c4 = Extensions.MixColor(Color.White, Extensions.SoftLightMix(col1, Color.FromArgb(64, 64, 64), 1), 0.2);
         //    var c3 = Extensions.SoftLightMix(col1, Color.FromArgb(128, 128, 128), 1);
         //    var c2 = Extensions.SoftLightMix(col1, Color.FromArgb(192, 192, 192), 1);
         //    var c1 = Extensions.OverlayMix(Extensions.SoftLightMix(col1, Color.White, 1), Color.White, 0.75);
-
         //    cb.Colors = new[] { c1, c2, c3, c4, c5 };
         //    cb.Positions = new[] { 0.0F, 0.25F, 0.5F, 0.75F, 1 };
         //    var lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Top + r.Height + 1), c1, c5) {
         //        InterpolationColors = cb
         //    };
         //    Draw_Back_Glossy_TMP(lgb, r, GR, 20);
-
         //    c2 = Color.White;
         //    cb.Colors = new[] { c2, c3, c4, c5 };
         //    cb.Positions = new[] { 0.0F, 0.5F, 0.75F, 1.0F };
         //    lgb = new LinearGradientBrush(new Point(r.Left + 1, r.Top), new Point(r.Left + 1, r.Top + r.Height - 1), c2, c5) {
         //        InterpolationColors = cb
         //    };
-
         //    r.Inflate(-4, -4);
         //    GR.SmoothingMode = SmoothingMode.HighQuality;
         //    Draw_Back_Glossy_TMP(lgb, r, GR, 16);
         //    //    GR.SmoothingModex = Drawing2D.SmoothingMode.None
         //}
-
         //private static void Draw_Back_Glossy_TMP(Brush b, Rectangle rect, Graphics GR, int RMinus) {
-
         //    var r = Math.Min(RMinus, Math.Min(rect.Width, rect.Height) - 1);
         //    var r2 = (int)Math.Truncate(r / 2.0);
         //    r = r2 * 2;
-
         //    GR.FillEllipse(b, new Rectangle(rect.Left, rect.Top - 1, r, r));
         //    GR.FillEllipse(b, new Rectangle(rect.Right - r - 1, rect.Top - 1, r, r));
         //    GR.FillEllipse(b, new Rectangle(rect.Left, rect.Bottom - r, r, r));
@@ -1451,9 +1354,7 @@ namespace BlueControls {
         //    GR.FillRectangle(b, new Rectangle(rect.Left + r2, rect.Top, rect.Width - r, rect.Height));
         //    GR.FillRectangle(b, new Rectangle(rect.Left, rect.Top + r2, rect.Width, rect.Height - r));
         //}
-
         #endregion
-
         private static GraphicsPath Kontur(enKontur Kon, Rectangle r) => Kon switch {
             enKontur.Rechteck => modAllgemein.Poly_Rechteck(r),// GR.SmoothingModex = Drawing2D.SmoothingMode.None
             enKontur.Rechteck_R4 => modAllgemein.Poly_RoundRec(r, 4),// GR.SmoothingModex = Drawing2D.SmoothingMode.HighQuality
@@ -1466,39 +1367,26 @@ namespace BlueControls {
             enKontur.Ohne => null,
             _ => modAllgemein.Poly_Rechteck(r),//  GR.SmoothingModex = Drawing2D.SmoothingMode.None
         };
-
         #region  Border 
-
         public static void Draw_Border(Graphics GR, enDesign vDesign, enStates vState, Rectangle r) => Draw_Border(GR, DesignOf(vDesign, vState), r);
-
         //[Obsolete]
         //public static void Draw_Border(Graphics GR, RowItem row, Rectangle r) {
-
         //    if (row == null) { return; }
-
         //    var d = new clsDesign();
-
         //    d.Kontur = (enKontur)Value(row, col_Kontur, -1);
         //    if (d.Kontur == enKontur.Ohne) { return; }
-
         //    d.RahmenArt = (enRahmenArt)Value(row, col_Border_Style, -1);
         //    if (d.RahmenArt == enRahmenArt.Ohne) { return; }
-
         //    d.X1 = Value(row, ColX1, 0);
         //    d.Y1 = Value(row, ColY1, 0);
         //    d.X2 = Value(row, ColX2, 0);
         //    d.Y2 = Value(row, ColY2, 0);
-
         //    d.BorderColor1 = Color.FromArgb(Value(row, col_Color_Border_1, 0));
-
         //    Draw_Border(GR, d, r);
         //}
-
         public static void Draw_Border(Graphics GR, clsDesign design, Rectangle r) {
-
             if (design.Kontur == enKontur.Ohne) { return; }
             if (design.RahmenArt == enRahmenArt.Ohne) { return; }
-
             if (design.Kontur == enKontur.Unbekannt) {
                 design.Kontur = enKontur.Rechteck;
                 r.Width--;
@@ -1509,34 +1397,28 @@ namespace BlueControls {
                 r.Width += design.X1 + design.X2 - 1;
                 r.Height += design.Y1 + design.Y2 - 1;
             }
-
             if (r.Width < 1 || r.Height < 1) { return; }
-
             // PathX kann durch die ganzen Expand mal zu klein werden, dann wird nothing zurückgegeben
             GraphicsPath PathX;
             Pen PenX;
             try {
-
                 switch (design.RahmenArt) {
                     case enRahmenArt.Solide_1px:
                         PathX = Kontur(design.Kontur, r);
                         PenX = new Pen(design.BorderColor1);
                         if (PathX != null) { GR.DrawPath(PenX, PathX); }
                         break;
-
                     case enRahmenArt.Solide_1px_FocusDotLine:
                         PathX = Kontur(design.Kontur, r);
                         PenX = new Pen(design.BorderColor1);
                         GR.DrawPath(PenX, PathX);
                         r.Inflate(-3, -3);
-
                         PathX = Kontur(design.Kontur, r);
                         PenX = new Pen(design.BorderColor3) {
                             DashStyle = DashStyle.Dot
                         };
                         if (PathX != null) { GR.DrawPath(PenX, PathX); }
                         break;
-
                     case enRahmenArt.FocusDotLine:
                         PenX = new Pen(design.BorderColor3) {
                             DashStyle = DashStyle.Dot
@@ -1544,15 +1426,12 @@ namespace BlueControls {
                         r.Inflate(-3, -3);
                         PathX = Kontur(design.Kontur, r);
                         if (PathX != null) { GR.DrawPath(PenX, PathX); }
-
                         break;
-
                     case enRahmenArt.Solide_3px:
                         PathX = Kontur(design.Kontur, r);
                         PenX = new Pen(design.BorderColor1, 3);
                         if (PathX != null) { GR.DrawPath(PenX, PathX); }
                         break;
-
                     default:
                         PathX = Kontur(design.Kontur, r);
                         PenX = new Pen(Color.Red);
@@ -1564,32 +1443,23 @@ namespace BlueControls {
                 Develop.DebugPrint(ex);
             }
         }
-
         //private static void Draw_Border_DuoColor(Graphics GR, RowItem Row, Rectangle r, bool NurOben) {
-
         //    var c1 = Color.FromArgb(Value(Row, col_Color_Border_2, 0));
         //    var c2 = Color.FromArgb(Value(Row, col_Color_Border_3, 0));
-
         //    var lgb = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Height), c1, c2) {
         //        GammaCorrection = true
         //    };
-
         //    var x = GR.SmoothingMode;
-
         //    GR.SmoothingMode = SmoothingMode.Default; //Returns the smoothing mode to default for a crisp structure
         //    GR.FillRectangle(lgb, r.Left, r.Top, r.Width + 1, 2); // Oben
-
         //    if (!NurOben) {
         //        GR.FillRectangle(lgb, r.Left, r.Bottom - 1, r.Width + 1, 2); // unten
         //        GR.FillRectangle(lgb, r.Left, r.Top, 2, r.Height + 1); // links
         //        GR.FillRectangle(lgb, r.Right - 1, r.Top, 2, r.Height + 1); // rechts
         //    }
-
         //    GR.SmoothingMode = x;
         //}
-
         #endregion
-
         /// <summary>
         /// Bild wird in dieser Routine nicht mehr gändert, aber in der nachfolgenden
         /// </summary>
@@ -1603,7 +1473,6 @@ namespace BlueControls {
         /// <param name="child"></param>
         /// <param name="deleteBack"></param>
         public static void Draw_FormatedText(Graphics gr, string txt, enDesign design, enStates state, QuickImage imageCode, enAlignment align, Rectangle fitInRect, System.Windows.Forms.Control child, bool deleteBack, bool translate) => Draw_FormatedText(gr, txt, imageCode, DesignOf(design, state), align, fitInRect, child, deleteBack, translate);
-
         /// <summary>
         /// Status des Bildes (Disabled) wird geändert
         /// </summary>
@@ -1618,17 +1487,13 @@ namespace BlueControls {
             if (string.IsNullOrEmpty(txt) && qi == null) { return; }
             QuickImage tmpImage = null;
             if (qi != null) { tmpImage = QuickImage.Get(qi, AdditionalState(design.Status)); }
-
             Draw_FormatedText(gr, txt, tmpImage, align, fitInRect, child, deleteBack, design.bFont, translate);
         }
-
         public static ItemCollectionList GetRahmenArt(RowItem SheetStyle, bool MitOhne) {
-
-            var Rahms = new ItemCollectionList();
+            ItemCollectionList Rahms = new();
             if (MitOhne) {
                 Rahms.Add("Ohne Rahmen", ((int)PadStyles.Undefiniert).ToString(), enImageCode.Kreuz);
             }
-
             Rahms.Add("Haupt-Überschrift", ((int)PadStyles.Style_Überschrift_Haupt).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Haupt, SheetStyle).SymbolOfLine());
             Rahms.Add("Untertitel für Haupt-Überschrift", ((int)PadStyles.Style_Überschrift_Untertitel).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Untertitel, SheetStyle).SymbolOfLine());
             Rahms.Add("Überschrift für Kapitel", ((int)PadStyles.Style_Überschrift_Kapitel).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Kapitel, SheetStyle).SymbolOfLine());
@@ -1637,14 +1502,10 @@ namespace BlueControls {
             Rahms.Add("Standard Alternativ-Design", ((int)PadStyles.Style_StandardAlternativ).ToString(), GetBlueFont(PadStyles.Style_StandardAlternativ, SheetStyle).SymbolOfLine());
             Rahms.Add("Kleiner Zusatz", ((int)PadStyles.Style_KleinerZusatz).ToString(), GetBlueFont(PadStyles.Style_KleinerZusatz, SheetStyle).SymbolOfLine());
             Rahms.Sort();
-
             return Rahms;
-
         }
-
         public static ItemCollectionList GetFonts(RowItem SheetStyle) {
-
-            var Rahms = new ItemCollectionList
+            ItemCollectionList Rahms = new()
             {
                 //   Rahms.Add(New ItemCollection.TextListItem(CInt(PadStyles.Undefiniert).ToString, "Ohne Rahmen", enImageCode.Kreuz))
                 { "Haupt-Überschrift", ((int)PadStyles.Style_Überschrift_Haupt).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Haupt, SheetStyle).SymbolForReadableText() },
@@ -1656,9 +1517,7 @@ namespace BlueControls {
                 { "Kleiner Zusatz", ((int)PadStyles.Style_KleinerZusatz).ToString(), GetBlueFont(PadStyles.Style_KleinerZusatz, SheetStyle).SymbolForReadableText() }
             };
             Rahms.Sort();
-
             return Rahms;
-
         }
         /// <summary>
         /// Zeichnet den Text und das Bild ohne weitere Modifikation
@@ -1672,32 +1531,23 @@ namespace BlueControls {
         /// <param name="DeleteBack"></param>
         /// <param name="F"></param>
         public static void Draw_FormatedText(Graphics gr, string txt, QuickImage qi, enAlignment vAlign, Rectangle FitInRect, System.Windows.Forms.Control Child, bool DeleteBack, BlueFont F, bool Translate) {
-
             if (gr.TextRenderingHint != TextRenderingHint.ClearTypeGridFit) {
                 gr.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
             }
-
             //  GR.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit
-
             var pSize = SizeF.Empty;
             var tSize = SizeF.Empty;
-
             float XP = 0;
             float YP1 = 0;
             float YP2 = 0;
-
             if (qi != null) { pSize = qi.BMP.Size; }
-
             if (LanguageTool.Translation != null) { txt = LanguageTool.DoTranslate(txt, Translate); }
-
             if (F != null) {
                 if (FitInRect.Width > 0) { txt = txt.TrimByWidth(FitInRect.Width - pSize.Width, F); }
                 tSize = gr.MeasureString(txt, F.Font());
             }
-
             if (vAlign.HasFlag(enAlignment.Right)) { XP = FitInRect.Width - pSize.Width - tSize.Width; }
             if (vAlign.HasFlag(enAlignment.HorizontalCenter)) { XP = (float)((FitInRect.Width - pSize.Width - tSize.Width) / 2.0); }
-
             if (vAlign.HasFlag(enAlignment.VerticalCenter)) {
                 YP1 = (float)((FitInRect.Height - pSize.Height) / 2.0);
                 YP2 = (float)((FitInRect.Height - tSize.Height) / 2.0);
@@ -1706,13 +1556,10 @@ namespace BlueControls {
                 YP1 = FitInRect.Height - pSize.Height;
                 YP2 = FitInRect.Height - tSize.Height;
             }
-
             if (DeleteBack) {
                 if (!string.IsNullOrEmpty(txt)) { Draw_Back_Transparent(gr, new Rectangle((int)(FitInRect.X + pSize.Width + XP - 1), (int)(FitInRect.Y + YP2 - 1), (int)(tSize.Width + 2), (int)(tSize.Height + 2)), Child); }
-
                 if (qi != null) { Draw_Back_Transparent(gr, new Rectangle((int)(FitInRect.X + XP), (int)(FitInRect.Y + YP1), (int)pSize.Width, (int)pSize.Height), Child); }
             }
-
             try {
                 if (qi != null) { gr.DrawImage(qi.BMP, (int)(FitInRect.X + XP), (int)(FitInRect.Y + YP1)); }
                 if (!string.IsNullOrEmpty(txt)) { gr.DrawString(txt, F.Font(), F.Brush_Color_Main, FitInRect.X + pSize.Width + XP, FitInRect.Y + YP2); }
@@ -1721,18 +1568,13 @@ namespace BlueControls {
                 //Develop.DebugPrint(ex);
             }
         }
-
         public static Size FormatedText_NeededSize(string text, QuickImage image, BlueFont font, int minSie) {
             try {
-
                 var pSize = SizeF.Empty;
                 var tSize = SizeF.Empty;
-
                 if (font == null) { return new Size(3, 3); }
-
                 if (image != null) { pSize = image.BMP.Size; }
                 if (!string.IsNullOrEmpty(text)) { tSize = BlueFont.MeasureString(text, font.Font()); }
-
                 return !string.IsNullOrEmpty(text)
                     ? image == null
                         ? new Size((int)(tSize.Width + 1), Math.Max((int)tSize.Height, minSie))
@@ -1743,14 +1585,11 @@ namespace BlueControls {
                 return FormatedText_NeededSize(text, image, font, minSie);
             }
         }
-
         internal static BlueFont GetBlueFont(int design, enStates state, RowItem rowOfStyle, int stufe) => design > 10000 ? GetBlueFont((PadStyles)design, rowOfStyle, stufe) : GetBlueFont((enDesign)design, state, stufe);
-
         internal static BlueFont GetBlueFont(PadStyles padStyle, RowItem rowOfStyle, int stufe) {
             switch (stufe) {
                 case 4:
                     return GetBlueFont(padStyle, rowOfStyle);
-
                 case 3:
                     switch (padStyle) {
                         case PadStyles.Style_Standard:
@@ -1760,7 +1599,6 @@ namespace BlueControls {
                             //    Case Else : Return BlueFont(vDesign, vState)
                     }
                     break;
-
                 case 2:
                     switch (padStyle) {
                         case PadStyles.Style_Standard:
@@ -1770,7 +1608,6 @@ namespace BlueControls {
                             //    Case Else : Return BlueFont(vDesign, vState)
                     }
                     break;
-
                 case 1:
                     switch (padStyle) {
                         case PadStyles.Style_Standard:
@@ -1780,7 +1617,6 @@ namespace BlueControls {
                             //  Case Else : Return BlueFont(vDesign, vState)
                     }
                     break;
-
                 case 7:
                     switch (padStyle) {
                         case PadStyles.Style_Standard:
@@ -1790,49 +1626,36 @@ namespace BlueControls {
                             //default: : Return BlueFont(vDesign, vState)
                     }
                     break;
-
             }
-
             Develop.DebugPrint(enFehlerArt.Fehler, "Stufe " + stufe + " nicht definiert.");
             return null;
         }
-
         internal static BlueFont GetBlueFont(enDesign design, enStates state, int stufe) {
-
             if (stufe != 4 && design != enDesign.TextBox) {
                 if (design == enDesign.Form_QuickInfo) { return GetBlueFont(design, state); } // QuickInfo kann jeden Text enthatlten
-
                 Develop.DebugPrint(enFehlerArt.Warnung, "Design unbekannt: " + (int)design);
                 return GetBlueFont(design, state);
             }
-
             switch (stufe) {
                 case 4:
                     return GetBlueFont(design, state);
-
                 case 3:
                     return GetBlueFont(enDesign.TextBox_Stufe3, state);
-
                 case 2:
                     return GetBlueFont(enDesign.TextBox_Stufe3, state);
-
                 case 1:
                     return GetBlueFont(enDesign.TextBox_Stufe3, state);
                 case 7:
                     return GetBlueFont(enDesign.TextBox_Bold, state);
             }
-
             Develop.DebugPrint(enFehlerArt.Fehler, "Stufe " + stufe + " nicht definiert.");
             return GetBlueFont(design, state);
         }
-
         public static BlueFont GetBlueFont(PadStyles format, RowItem rowOfStyle) {
             if (StyleDB == null) { InitStyles(); }
             return StyleDB == null || rowOfStyle == null ? BlueFont.Get(ErrorFont) : GetBlueFont(StyleDB, ((int)format).ToString(), rowOfStyle);
         }
-
         public static BlueFont GetBlueFont(Database styleDB, string column, RowItem row) => GetBlueFont(styleDB, styleDB.Column[column], row);
-
         public static BlueFont GetBlueFont(Database styleDB, ColumnItem column, RowItem row) {
             var _String = styleDB.Cell.GetString(column, row);
             if (string.IsNullOrEmpty(_String)) {
@@ -1841,19 +1664,13 @@ namespace BlueControls {
             }
             return BlueFont.Get(_String);
         }
-
         public static BlueFont GetBlueFont(enDesign design, enStates state) => DesignOf(design, state).bFont;
-
         #region  Styles 
-
         public static List<string> AllStyles() {
             if (StyleDB == null) { InitStyles(); }
-
             return StyleDB?.Column[0].Contents(null, null);
         }
-
         public static void InitStyles() => StyleDB = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Styles.MDB", "Styles", true, false);
-
         #endregion
     }
 }

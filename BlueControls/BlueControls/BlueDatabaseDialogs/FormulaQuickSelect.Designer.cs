@@ -5,11 +5,8 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
-
 namespace BlueControls.BlueDatabaseDialogs
 {
-
-
     public partial class FormulaQuickSelect : Form
     {
         //    Inherits Form
@@ -21,7 +18,6 @@ namespace BlueControls.BlueDatabaseDialogs
             {
                 if (disposing)
                 {
-
                 }
             }
             finally
@@ -29,8 +25,6 @@ namespace BlueControls.BlueDatabaseDialogs
                 base.Dispose(disposing);
             }
         }
-
-
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -115,7 +109,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.ShowInTaskbar = false;
             this.Text = "Schnelleingabe";
             this.ResumeLayout(false);
-
         }
         internal Caption Caption1;
         internal Caption Für;

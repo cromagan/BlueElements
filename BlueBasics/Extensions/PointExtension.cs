@@ -16,24 +16,18 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 #endregion
-
 using System.Drawing;
-
 namespace BlueBasics {
     public static partial class Extensions {
         public static Point PointParse(this string code) {
             code = code.RemoveChars("{}XYxy= ");
-
-            var P = new Point();
-
+            Point P = new();
             if (string.IsNullOrEmpty(code)) {
                 P.X = 0;
                 P.Y = 0;
                 return P;
             }
-
             var w = code.Split(',');
-
             P.X = int.Parse(w[0]);
             P.Y = int.Parse(w[1]);
             return P;

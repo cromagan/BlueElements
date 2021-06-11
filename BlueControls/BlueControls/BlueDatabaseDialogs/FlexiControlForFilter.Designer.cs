@@ -1,6 +1,5 @@
 ﻿
     using System.ComponentModel;
-
 namespace BlueControls.Controls
 {
     partial class FlexiControlForFilter
@@ -9,7 +8,6 @@ namespace BlueControls.Controls
         /// Erforderliche Designervariable.
         /// </summary>
         private IContainer components = null;
-
         /// <summary> 
         /// Verwendete Ressourcen bereinigen.
         /// </summary>
@@ -22,9 +20,7 @@ namespace BlueControls.Controls
             }
             base.Dispose(disposing);
         }
-
         #region Vom Komponenten-Designer generierter Code
-
         /// <summary> 
         /// Erforderliche Methode für die Designerunterstützung. 
         /// Der Inhalt der Methode darf nicht mit dem Code-Editor geändert werden.
@@ -37,9 +33,7 @@ namespace BlueControls.Controls
             // 
             this.Name = "FlexiControlForCell";
             this.ResumeLayout(false);
-
         }
-
         #endregion
     }
 }

@@ -16,29 +16,22 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using BlueScript;
 using Skript.Enums;
 using System.Collections.Generic;
-
 public struct strSplittedAttributesFeedback {
-
     public strSplittedAttributesFeedback(List<Variable> atts) {
         Attributes = atts;
         ErrorMessage = string.Empty;
         FehlerTyp = enSkriptFehlerTyp.ohne;
     }
-
     public strSplittedAttributesFeedback(enSkriptFehlerTyp type, string error) {
         Attributes = null;
         ErrorMessage = error;
         FehlerTyp = type;
     }
-
     public enSkriptFehlerTyp FehlerTyp;
-
     public List<Variable> Attributes;
-
     ///// <summary>
     ///// Die Position, wo der Fehler stattgefunfden hat ODER die Position wo weiter geparsesd werden muss
     ///// </summary>
@@ -61,5 +54,4 @@ public struct strSplittedAttributesFeedback {
     ///// </summary>
     //public string CodeBlockAfterText;
     //public int LineBreakInCodeBlock;
-
 }

@@ -2,20 +2,14 @@
 using BlueBasics.Enums;
 using System.Collections.Generic;
 using static BlueBasics.FileOperations;
-
 namespace BlueControls.Forms {
     public static class FileDialogs {
-
         //#region FileDialogs
-
         //public static void DeleteDir(string Pfad, bool Meldungen = true)
         //{
         //    int ButtonNumber = 0;
-
         //    Pfad = Pfad.CheckPath();
-
         //    if (!PathExists(Pfad)) { return; }
-
         //    if (Meldungen)
         //    {
         //        ButtonNumber = MessageBox.Show("Soll der Ordner \"" + Pfad + "\"<br>und dessen Inhalt wirklich <b>gelöscht</b> werden?\"", enImageCode.Warnung, "Ja - löschen", "Nein - abbrechen");
@@ -24,10 +18,8 @@ namespace BlueControls.Forms {
         //    {
         //        ButtonNumber = 0;
         //    }
-
         //    if (ButtonNumber == 0)
         //    {
-
         //        try
         //        {
         //            Directory.Delete(Pfad, true);
@@ -49,7 +41,6 @@ namespace BlueControls.Forms {
         //        }
         //    }
         //}
-
         /// <summary>
         /// 
         /// </summary>
@@ -58,27 +49,21 @@ namespace BlueControls.Forms {
         /// <returns>True, wenn mindestens eine DAtei gelöscht wurde.</returns>
         public static bool DeleteFile(List<string> Filelist, bool Meldungen) {
             var ButtonNumber = 0;
-
             for (var Z = 0; Z < Filelist.Count; Z++) {
                 if (!FileExists(Filelist[Z])) { Filelist[Z] = ""; }
             }
-
             Filelist = Filelist.SortedDistinctList();
-
             if (Filelist.Count == 0) { return false; }
-
             if (Meldungen) {
                 ButtonNumber = Filelist.Count == 1
                     ? MessageBox.Show("Soll die Datei<br>\"" + Filelist[0] + "\"<br>wirklich <b>gelöscht</b> werden?\"", enImageCode.Warnung, "Ja - löschen", "Nein - abbrechen")
                     : MessageBox.Show("Sollen wirklich " + Filelist.Count + " Dateien<br><b>gelöscht</b> werden?\"", enImageCode.Warnung, "Ja - löschen", "Nein - abbrechen");
             }
-
             if (ButtonNumber == 0) {
                 return FileOperations.DeleteFile(Filelist);
             }
             return false; //nein geklickt
         }
-
         /// <summary>
         /// 
         /// </summary>
@@ -86,7 +71,7 @@ namespace BlueControls.Forms {
         /// <param name="Meldungen"></param>
         /// <returns>True, wenn mindestens eine DAtei gelöscht wurde.</returns>
         public static bool DeleteFile(string File, bool Rückfrage) {
-            var f = new List<string>
+            List<string> f = new()
             {
                 File
             };
@@ -94,15 +79,12 @@ namespace BlueControls.Forms {
         }
         //public static string RenameFile(string OldN, string NewN)
         //{
-
         //    if (OldN == NewN) { return string.Empty; }
-
         //    DateTime StartTime = DateTime.Now;
         //    do
         //    {
         //        if (!FileExists(OldN)) { return "Quelldatei existiert nicht: " + OldN; }
         //        if (FileExists(NewN)) { return "Zieldatei existiert bereits: " + NewN; }
-
         //        try
         //        {
         //            File.Move(OldN, NewN);
@@ -116,19 +98,16 @@ namespace BlueControls.Forms {
         //                return "Datei konnte nicht umbenannt werden: " + OldN + "<br>" + ex.Message;
         //            }
         //        }
-
         //    } while (true);
         //}
         //public static string CopyFile(string OldN, string NewN)
         //{
         //    if (OldN == NewN) { return string.Empty; }
-
         //    DateTime StartTime = DateTime.Now;
         //    do
         //    {
         //        if (!FileExists(OldN)) { return "Quelldatei existiert nicht: " + OldN; }
         //        if (FileExists(NewN)) { return "Zieldatei existiert bereits: " + NewN; }
-
         //        try
         //        {
         //            File.Copy(OldN, NewN);
@@ -142,11 +121,8 @@ namespace BlueControls.Forms {
         //                return "Datei konnte nicht kopiert werden: " + OldN + "<br>" + ex.Message;
         //            }
         //        }
-
         //    } while (true);
         //}
-
         //#endregion
-
     }
 }

@@ -16,14 +16,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using Skript.Enums;
 using System;
 using System.Collections.Generic;
-
 namespace BlueScript {
     internal class Method_Round : Method {
-
         public override string Syntax => "Round(Value, Nachkommastellen)";
         public override string Description => "Rundet den Zahlenwert mathematisch korrekt.";
         public override List<string> Comand(Script s) => new() { "round" };
@@ -33,18 +30,13 @@ namespace BlueScript {
         public override enVariableDataType Returns => enVariableDataType.Numeral;
         public override List<enVariableDataType> Args => new() { enVariableDataType.Numeral, enVariableDataType.Integer };
         public override bool EndlessArgs => false;
-
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
-
             var n = (int)attvar.Attributes[1].ValueDouble;
-
             if (n < 0) { n = 0; }
             if (n > 10) { n = 10; }
-
             var val = Math.Round(attvar.Attributes[0].ValueDouble, n);
-
             return new strDoItFeedback(val.ToString(), enVariableDataType.Numeral);
         }
     }

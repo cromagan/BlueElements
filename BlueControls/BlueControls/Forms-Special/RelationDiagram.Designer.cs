@@ -4,10 +4,8 @@ using System.Drawing;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
-
 namespace BlueControls.Forms
     {
-
         public partial class RelationDiagram 
 		{
 			//Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
@@ -18,7 +16,6 @@ namespace BlueControls.Forms
 				{
 					if (disposing)
 					{
-
 					}
 				}
 				finally
@@ -26,9 +23,6 @@ namespace BlueControls.Forms
 					base.Dispose(disposing);
 				}
 			}
-
-
-
 			//Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
 			//Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
 			//Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -167,7 +161,6 @@ namespace BlueControls.Forms
             this.grpDateiSystem.ResumeLayout(false);
             this.grpExtras.ResumeLayout(false);
             this.ResumeLayout(false);
-
 			}
 			private Button Hinzu;
         private GroupBox grpExtras;

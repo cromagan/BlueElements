@@ -1,12 +1,8 @@
 ﻿using BlueControls;
 using BlueControls.Controls;
-
-
 namespace BluePaint
 {
-
     public partial class Tool_Bruchlinie : GenericTool
-
     {
         //UserControl überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
         [System.Diagnostics.DebuggerNonUserCode()]
@@ -16,7 +12,6 @@ namespace BluePaint
             {
                 if (disposing)
                 {
-
                 }
             }
             finally
@@ -24,9 +19,6 @@ namespace BluePaint
                 base.Dispose(disposing);
             }
         }
-
-
-
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -84,13 +76,10 @@ namespace BluePaint
             this.Name = "Tool_Bruchlinie";
             this.Size = new System.Drawing.Size(307, 350);
             this.ResumeLayout(false);
-
         }
-
         internal Button Bruch_Rechts;
         internal Button Bruch_Links;
         internal Button Bruch_unten;
         internal Button Bruch_Oben;
     }
-
 }

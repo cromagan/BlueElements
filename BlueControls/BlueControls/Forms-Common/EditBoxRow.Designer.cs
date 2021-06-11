@@ -1,5 +1,4 @@
 ﻿using System.Drawing;
-
 namespace BlueControls.Forms
 {
     partial class EditBoxRow
@@ -8,7 +7,6 @@ namespace BlueControls.Forms
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
-
         /// <summary>
         /// Clean up any resources being used.
         /// </summary>
@@ -21,9 +19,7 @@ namespace BlueControls.Forms
             }
             base.Dispose(disposing);
         }
-
         #region Windows Form Designer generated code
-
         /// <summary>
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
@@ -50,13 +46,8 @@ namespace BlueControls.Forms
             this.Name = "EditBoxRow";
             this.Controls.SetChildIndex(this.formToEdit, 0);
             this.ResumeLayout(false);
-
         }
-
-
         #endregion
-
-
         private Controls.Formula formToEdit;
     }
 }

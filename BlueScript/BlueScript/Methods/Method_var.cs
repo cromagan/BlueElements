@@ -16,14 +16,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using Skript.Enums;
 using System.Collections.Generic;
 using static BlueBasics.Extensions;
-
 namespace BlueScript {
     internal class Method_Var : Method {
-
         public override string Syntax => "var VariablenName = Wert;";
         public override string Description => "Erstellt eine neue Variable, der Typ wird automtisch bestimmt.";
         public override List<string> Comand(Script s) => new() { "var" };
@@ -33,37 +30,23 @@ namespace BlueScript {
         public override enVariableDataType Returns => enVariableDataType.Null;
         public override List<enVariableDataType> Args => new() { enVariableDataType.Bool_Numeral_or_String };
         public override bool EndlessArgs => false;
-
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-
             if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
-
             var bs = infos.AttributText.SplitBy("=");
-
             if (bs.GetUpperBound(0) != 1) { return new strDoItFeedback("Fehler mit = - Zeichen"); }
-
             if (!Variable.IsValidName(bs[0])) { return new strDoItFeedback(bs[0] + "ist kein gültiger Variablen-Name"); }
-
             var v = s.Variablen.Get(bs[0]);
-
             if (v != null) { return new strDoItFeedback("Variable " + bs[0] + " ist bereits vorhanden."); }
-
             s.Variablen.Add(new Variable(bs[0]));
-
-            var r = new Method_BerechneVariable();
+            Method_BerechneVariable r = new();
             var f = r.CanDo(infos.AttributText + ";", 0, false, s);
-
             if (!string.IsNullOrEmpty(f.ErrorMessage)) {
-
                 return new strDoItFeedback("Befehl nicht erkannt, " + f.ErrorMessage + ": " + infos.AttributText);
             }
-
             if (infos.AttributText.Length != f.ContinueOrErrorPosition - 1) {
                 return new strDoItFeedback("Falsch gesetztes Semikolon");
             }
-
             var f2 = r.DoIt(f, s);
-
             return !string.IsNullOrEmpty(f2.ErrorMessage)
                 ? new strDoItFeedback("Berechung fehlerhaft: " + f2.ErrorMessage)
                 : new strDoItFeedback();

@@ -1,10 +1,6 @@
 ﻿using BlueControls.Controls;
-
 namespace BluePaint
 {
-
-
-
     public partial class Tool_Kontrast 
     {
         //UserControl überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
@@ -15,7 +11,6 @@ namespace BluePaint
             {
                 if (disposing)
                 {
-
                 }
             }
             finally
@@ -23,9 +18,6 @@ namespace BluePaint
                 base.Dispose(disposing);
             }
         }
-
-
-
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -225,9 +217,7 @@ namespace BluePaint
             this.grpGamma.ResumeLayout(false);
             this.grpHelligkeit.ResumeLayout(false);
             this.ResumeLayout(false);
-
         }
-
         internal Button btnAlleFarbenSchwarz;
         internal Button btnKontrastErhoehen;
         internal Button btnGraustufen;
@@ -245,5 +235,4 @@ namespace BluePaint
         private Slider sldHelligkeit;
         internal Button btnHelligkeit;
     }
-
 }

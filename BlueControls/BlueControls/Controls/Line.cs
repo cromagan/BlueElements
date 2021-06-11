@@ -16,33 +16,25 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using BlueBasics.Enums;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using System.ComponentModel;
 using System.Drawing;
-
 namespace BlueControls.Controls {
-
     [Designer(typeof(BasicDesigner))]
     public class Line : GenericControl, IBackgroundNone {
-
         #region Constructor
         public Line() : base(false, false) {
-
             // Dieser Aufruf ist für den Designer erforderlich.
             //  InitializeComponent()
-
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             SetNotFocusable();
             _MouseHighlight = false;
         }
         #endregion
-
         private enOrientation _Orientation = enOrientation.Waagerecht;
-
         [DefaultValue(enOrientation.Waagerecht)]
         public enOrientation Orientation {
             get => _Orientation;
@@ -53,23 +45,18 @@ namespace BlueControls.Controls {
                 _Orientation = value;
                 CheckSize();
                 Invalidate();
-
             }
         }
-
         [DefaultValue(0)]
         public new int TabIndex {
             get => 0;
-
             set => base.TabIndex = 0;
         }
-
         [DefaultValue(false)]
         public new bool TabStop {
             get => false;
             set => base.TabStop = false;
         }
-
         public void CheckSize() {
             if (_Orientation == enOrientation.Waagerecht) {
                 if (Width < 10) { Width = 10; }
@@ -79,12 +66,10 @@ namespace BlueControls.Controls {
                 if (Height < 10) { Height = 10; }
             }
         }
-
         protected override void DrawControl(Graphics gr, enStates state) {
             CheckSize();
-            var DP = new Pen(SystemColors.ControlDark);
-            var LP = new Pen(SystemColors.ControlLight);
-
+            Pen DP = new(SystemColors.ControlDark);
+            Pen LP = new(SystemColors.ControlLight);
             if (_Orientation == enOrientation.Waagerecht) {
                 gr.DrawLine(DP, 0, 0, Width - 1, 0);
                 gr.DrawLine(LP, 1, 1, Width, 1);

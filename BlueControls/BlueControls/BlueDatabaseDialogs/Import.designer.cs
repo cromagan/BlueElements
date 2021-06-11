@@ -4,7 +4,6 @@ using System.Drawing;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Forms;
-
 namespace BlueControls.BlueDatabaseDialogs
 {
     public sealed partial class Import : Form
@@ -15,13 +14,9 @@ namespace BlueControls.BlueDatabaseDialogs
         {
             if (disposing)
             {
-
             }
             base.Dispose(disposing);
         }
-
-
-
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -251,9 +246,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.BlueFrame3.ResumeLayout(false);
             this.GroupBox1.ResumeLayout(false);
             this.ResumeLayout(false);
-
         }
-
         private Caption Eintr;
         private Button TabStopp;
         private Button Semikolon;

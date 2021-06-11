@@ -5,7 +5,6 @@ namespace BlueControls {
         /// Erforderliche Designervariable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
-
         /// <summary> 
         /// Verwendete Ressourcen bereinigen.
         /// </summary>
@@ -16,9 +15,7 @@ namespace BlueControls {
             }
             base.Dispose(disposing);
         }
-
         #region Vom Komponenten-Designer generierter Code
-
         /// <summary> 
         /// Erforderliche Methode für die Designerunterstützung. 
         /// Der Inhalt der Methode darf nicht mit dem Code-Editor geändert werden.
@@ -241,11 +238,8 @@ namespace BlueControls {
             this.tabVariablen.ResumeLayout(false);
             this.grpTextAllgemein.ResumeLayout(false);
             this.ResumeLayout(false);
-
         }
-
         #endregion
-
         private Controls.TabControl tabCSckript;
         private Controls.TabPage tabScriptAnzeige;
         private FastColoredTextBoxNS.FastColoredTextBox txtSkript;

@@ -1,11 +1,8 @@
 using System.Diagnostics;
 using BlueControls.Controls;
 using BlueControls.Forms;
-
 namespace BlueControls.BlueDatabaseDialogs
 	{
-
-	
 		internal sealed partial class ColumnEditor : Form
         {
 			//Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
@@ -18,8 +15,6 @@ namespace BlueControls.BlueDatabaseDialogs
 				//}
 				base.Dispose(disposing);
 			}
-
-
 			//Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
 			//Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
 			//Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -1559,7 +1554,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpColumnsForLinkedDatabase.ResumeLayout(false);
             this.grpVerlinkteZellen.ResumeLayout(false);
             this.ResumeLayout(false);
-
 			}
 			private Button btnOk;
 			private TextBox tbxName;

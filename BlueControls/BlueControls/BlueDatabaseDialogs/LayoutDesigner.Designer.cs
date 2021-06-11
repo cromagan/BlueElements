@@ -1,10 +1,7 @@
 ﻿using System.Diagnostics;
 using BlueControls.Controls;
-
 namespace BlueControls.BlueDatabaseDialogs
 {
-
-
     internal partial class LayoutDesigner
     { 
         //Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
@@ -15,7 +12,6 @@ namespace BlueControls.BlueDatabaseDialogs
             {
                 if (disposing)
                 {
-
                 }
             }
             finally
@@ -23,9 +19,6 @@ namespace BlueControls.BlueDatabaseDialogs
                 base.Dispose(disposing);
             }
         }
-
-
-
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -293,7 +286,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabRightSide.ResumeLayout(false);
             this.tabSkript.ResumeLayout(false);
             this.ResumeLayout(false);
-
         }
         internal GroupBox grpLayoutSelection;
         internal Button btnLayoutUmbenennen;

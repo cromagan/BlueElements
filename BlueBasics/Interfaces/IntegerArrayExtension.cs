@@ -16,16 +16,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 #endregion
-
 namespace BlueBasics.Interfaces {
     public static class IntegerArrayExtension {
         public static string[] ToStringArray(this int[] ar) {
             var sar = new string[ar.GetUpperBound(0) + 1];
-
             for (var z = 0; z <= ar.GetUpperBound(0); z++) {
                 sar[z] = ar[z].ToString().Trim();
             }
-
             return sar;
         }
     }

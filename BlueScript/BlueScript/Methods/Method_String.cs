@@ -16,13 +16,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using Skript.Enums;
 using System.Collections.Generic;
-
 namespace BlueScript {
     internal class Method_String : Method {
-
         public override string Syntax => "String(numeral)";
         public override string Description => "Wandelt die Zahl in einen Text um.";
         public override List<string> Comand(Script s) => new() { "string" };
@@ -32,11 +29,9 @@ namespace BlueScript {
         public override enVariableDataType Returns => enVariableDataType.String;
         public override List<enVariableDataType> Args => new() { enVariableDataType.Numeral };
         public override bool EndlessArgs => false;
-
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
-
             attvar.Attributes[0].Type = enVariableDataType.String;
             return new strDoItFeedback(attvar.Attributes[0].ValueString, enVariableDataType.String);
         }

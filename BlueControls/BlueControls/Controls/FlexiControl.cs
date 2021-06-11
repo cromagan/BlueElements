@@ -16,7 +16,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -31,90 +30,65 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-
 namespace BlueControls.Controls {
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("ValueChanged")]
     public partial class FlexiControl : GenericControl, IUseMyBackColor {
-
         ///// <summary>
         ///// Wenn True, wird ValueChanged NICHT ausgelöst
         ///// </summary>
         protected bool _IsFilling;
-
         public readonly string ValueId;
         private string _Value = string.Empty;
         protected enEditTypeFormula _EditType = enEditTypeFormula.None; // None ist -1 und muss gesetzt sein!
         protected enÜberschriftAnordnung _CaptionPosition = enÜberschriftAnordnung.ohne;
         protected string _Caption;
-
         private int _ControlX = -1;
         private Caption _CaptionObject;
         private Caption _InfoCaption;
         private string _InfoText = string.Empty;
         private bool _ShowInfoWhenDisabled = false;
-
         protected bool _MultiLine = false;
         private string _Suffix = string.Empty;
         private enDataFormat _Format = enDataFormat.Text;
-
         protected bool _allinitialized = false;
-
         protected string _disabledReason = string.Empty;
-
         private bool _InstantChangedEvent = false;
-
         /// <summary>
         /// Speichert, wann die letzte Text-Änderung vorgenommen wurden.
         /// Wenn NULL, dann wurde bereits ein Event ausgelöst.
         /// </summary>
         protected DateTime? _LastTextChange;
-
         //public event EventHandler RemovingAll;
-
         public event EventHandler NeedRefresh;
         public event EventHandler ButtonClicked;
         public event EventHandler ValueChanged;
-
-
         [Obsolete]
         public new event EventHandler TextChanged;
-
         #region  Constructor 
-
         public FlexiControl() : base(false, false) {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
-
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             _EditType = enEditTypeFormula.Line;
             Size = new Size(200, 8);
-
         }
-
         /// <summary>
         /// Einfacher Info Text. Wird nirgends mehr zurück gegeben.
         /// </summary>
         /// <param name="CaptionText"></param>
         public FlexiControl(string CaptionText) : base(false, false) {
-
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             _EditType = enEditTypeFormula.None;
             _Caption = CaptionText;
             _CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
             ValueId = string.Empty;
-
             var s = BlueFont.MeasureString(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
-
             Size = new Size((int)(s.Width + 2), (int)(s.Height + 2));
-
         }
-
         #endregion
-
         #region  Properties 
-
         [DefaultValue(false)]
         public bool ShowInfoWhenDisabled {
             get => _ShowInfoWhenDisabled;
@@ -124,21 +98,17 @@ namespace BlueControls.Controls {
                 Invalidate();
             }
         }
-
         //[DefaultValue(typeof(Color), "Transparent")]
         //public Color Color {
         //    get {
         //        return _Color;
         //    }
         //    set {
-
         //        if (_Color == value) { return; }
-
         //        _Color = value;
         //        Invalidate();
         //    }
         //}
-
         /// <summary>
         /// DisabledReason befüllen, um das Steuerelement zu disablen
         /// </summary>
@@ -147,7 +117,6 @@ namespace BlueControls.Controls {
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public new bool Enabled => !DesignMode && string.IsNullOrEmpty(_disabledReason);
-
         [DefaultValue("")]
         public string DisabledReason {
             get => _disabledReason ?? string.Empty;
@@ -156,19 +125,14 @@ namespace BlueControls.Controls {
                 //if (value == null) { value = string.Empty; }
                 if (_disabledReason == null && string.IsNullOrEmpty(value)) { return; }
                 if (_disabledReason == value) { return; }
-
                 _disabledReason = value;
-
                 foreach (Control ThisControl in Controls) {
                     ThisControl.Enabled = ThisControl == _InfoCaption || Enabled;
                 }
-
                 DoInfoTextCaption(_disabledReason);
                 Invalidate();
-
             }
         }
-
         /// <summary>
         /// Value benutzen!
         /// </summary>
@@ -178,13 +142,11 @@ namespace BlueControls.Controls {
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public new string Text { get; set; }
-
         [DefaultValue("")]
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string Value => _Value ?? string.Empty;
-
         /// <summary>
         /// Falls das Steuerelement eine Suffix unterstützt, wird dieser angezeigt
         /// </summary>
@@ -192,13 +154,11 @@ namespace BlueControls.Controls {
         public string Suffix {
             get => _Suffix;
             set {
-
                 if (_Suffix == value) { return; }
                 _Suffix = value;
                 UpdateControls();
             }
         }
-
         /// <summary>
         /// Falls das Steuerelement Multiline unterstützt, wird dieser angezeigt
         /// </summary>
@@ -206,13 +166,11 @@ namespace BlueControls.Controls {
         public bool MultiLine {
             get => _MultiLine;
             set {
-
                 if (_MultiLine == value) { return; }
                 _MultiLine = value;
                 UpdateControls();
             }
         }
-
         /// <summary>
         /// Falls das Steuerelement eine InstantChangeEvent unterstützt, wird dieses umgesetzt
         /// </summary>
@@ -220,15 +178,11 @@ namespace BlueControls.Controls {
         public bool InstantChangedEvent {
             get => _InstantChangedEvent;
             set {
-
                 if (_InstantChangedEvent == value) { return; }
                 _InstantChangedEvent = value;
-
                 CheckIfChanged();
-
             }
         }
-
         /// <summary>
         /// Falls das Steuerelement eine Suffix unterstützt, wird dieser angezeigt
         /// </summary>
@@ -241,7 +195,6 @@ namespace BlueControls.Controls {
                 UpdateControls();
             }
         }
-
         [DefaultValue(enEditTypeFormula.None)]
         public enEditTypeFormula EditType {
             get => _EditType;
@@ -251,7 +204,6 @@ namespace BlueControls.Controls {
                 _EditType = value;
             }
         }
-
         /// <summary>
         /// Ab welchen Wert in Pixel das Eingabesteuerelement beginnen darf.
         /// </summary>
@@ -264,7 +216,6 @@ namespace BlueControls.Controls {
                 _ControlX = value;
             }
         }
-
         [DefaultValue("")]
         [Description("Zeigt rechts oben im Eck ein kleines Symbol an, dessen hier eingegebener Text angezeigt wird.")]
         public string InfoText {
@@ -275,7 +226,6 @@ namespace BlueControls.Controls {
                 Invalidate();
             }
         }
-
         [DefaultValue(enÜberschriftAnordnung.ohne)]
         public enÜberschriftAnordnung CaptionPosition {
             get => _CaptionPosition;
@@ -285,7 +235,6 @@ namespace BlueControls.Controls {
                 _CaptionPosition = value;
             }
         }
-
         [DefaultValue("")]
         public string Caption {
             get => _Caption;
@@ -295,19 +244,13 @@ namespace BlueControls.Controls {
                 _Caption = value;
             }
         }
-
         [DefaultValue("")]
         public string FileEncryptionKey { get; set; } = "";
-
         #endregion
-
         protected override void DrawControl(Graphics gr, enStates state) {
-
             // Enabled wurde verdeckt!
             if (!Enabled) { state = enStates.Standard_Disabled; }
-
             Skin.Draw_Back_Transparent(gr, ClientRectangle, this);
-
             //if (_Color.A != 0) {
             //    if (state.HasFlag(enStates.Standard_Disabled)) {
             //        var br = (byte)(_Color.GetBrightness() * 254);
@@ -318,27 +261,21 @@ namespace BlueControls.Controls {
             //        gr.FillRectangle(lgb, ClientRectangle);
             //    }
             //}
-
             if (!_allinitialized) { CreateSubControls(); }
-
             //if (_EditType == enEditTypeFormula.Listbox || _EditType == enEditTypeFormula.Listbox_1_Zeile || _EditType == enEditTypeFormula.Listbox_3_Zeilen) {
             //    ListBoxen(out var Main, out var Suggest);
-
             //    if (Suggest != null) {
             //        var tmpstate = state;
             //        if (tmpstate != enStates.Checked_Disabled) { tmpstate = enStates.Standard; }
-
             //        var R = new Rectangle {
             //            X = Main.Left - 1,
             //            Y = Main.Top - 1,
             //            Width = Main.Width + 2,
             //            Height = Height - Main.Top - 1
             //        };
-
             //        Skin.Draw_Border(gr, enDesign.ListBox, tmpstate, R);
             //    }
             //}
-
             if (!string.IsNullOrEmpty(_disabledReason)) {
                 DoInfoTextCaption(_disabledReason);
             } else {
@@ -349,328 +286,249 @@ namespace BlueControls.Controls {
                 }
             }
         }
-
         /// <summary>
         /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Die Filling-Variable wird währenddessen umgesetzt.
         /// sollte vor StandardBehandlung kommen, da dort das Objekt gesetzt wird und dann die Handler generiert werden.
         /// </summary>
         private void UpdateValueToControl() {
             if (!_allinitialized) { CreateSubControls(); }
-
             _IsFilling = true;
-
             foreach (Control Control in Controls) {
                 switch (Control) {
-
                     case ComboBox ComboBox:
                         UpdateValueTo_Combobox(ComboBox);
                         break;
-
                     case TextBox TextBox:
                         UpdateValueTo_TextBox(TextBox);
                         break;
-
                     case EasyPic EasyPic:
                         UpdateValueTo_EasyPic(EasyPic);
                         break;
-
                     case ListBox ListBox:
                         UpdateValueTo_ListBox(ListBox.Item);
                         break;
-
                     case SwapListBox SwapListBox:
                         UpdateValueTo_ListBox(SwapListBox.Item);
                         break;
-
                     case Button Button:
                         UpdateValueTo_Button(Button);
                         break;
-
                     case Caption _:
                         UpdateValueTo_Caption();
                         break;
-
                     case Line _:
                         if (!string.IsNullOrEmpty(_Value)) {
                             Develop.DebugPrint(enFehlerArt.Fehler, "Line kann keine Value erhalten: '" + _Value + "'");
                         }
                         break;
-
                     default:
                         Develop.DebugPrint(Typ(Control));
                         break;
                 }
             }
-
             _IsFilling = false;
-
         }
-
         protected override void OnControlAdded(ControlEventArgs e) {
             base.OnControlAdded(e);
-
             switch (e.Control) {
                 case ComboBox ComboBox:
                     //ComboBox.ItemClicked += ComboBoxItemClicked;
                     ComboBox.TextChanged += ValueChanged_ComboBox;
                     ComboBox.LostFocus += TextEditControl_LostFocus;
                     break;
-
                 case TextBox TextBox:
                     TextBox.TextChanged += ValueChanged_TextBox;
                     TextBox.LostFocus += TextEditControl_LostFocus;
                     break;
-
                 case Caption _:
                 case Line _:
                     break;
-
                 case EasyPic _:
                     // Control.ImageChanged += EasyPicImageChanged;
                     // Einzig und alleine eigene Datenbank kann den dazugehörigen Wert generieren.
                     break;
-
                 case SwapListBox SwapListBox:
                     //ListBox.ItemClicked += ListBox_ItemClicked;
                     SwapListBox.ItemAdded += SwapListBox_ItemAdded;
                     SwapListBox.ItemRemoved += SwapListBox_ItemRemoved;
                     break;
-
                 case ListBox ListBox:
                     //ListBox.ItemClicked += ListBox_ItemClicked;
                     ListBox.ItemAdded += ListBox_ItemAdded;
                     ListBox.ItemRemoved += ListBox_ItemRemoved;
                     break;
-
                 case Button Button:
                     switch (_EditType) {
                         case enEditTypeFormula.Ja_Nein_Knopf:
                             Button.CheckedChanged += YesNoButton_CheckedChanged;
                             break;
-
                         case enEditTypeFormula.Button:
                             Button.Click += ComandButton_Click;
                             break;
-
                         case enEditTypeFormula.Farb_Auswahl_Dialog:
                             Button.Click += ColorButton_Click;
                             break;
-
                         default:
                             Develop.DebugPrint_NichtImplementiert();
                             break;
                     }
                     break;
-
                 default:
                     Develop.DebugPrint(Typ(e.Control));
                     break;
             }
             UpdateControls();
         }
-
         private void TextEditControl_LostFocus(object sender, System.EventArgs e) => CheckIfChanged();
-
         protected override void OnControlRemoved(ControlEventArgs e) {
             base.OnControlRemoved(e);
-
             switch (e.Control) {
                 case ComboBox ComboBox:
                     //ComboBox.ItemClicked -= ComboBoxItemClicked;
                     ComboBox.TextChanged -= ValueChanged_ComboBox;
                     ComboBox.LostFocus -= TextEditControl_LostFocus;
                     break;
-
                 case TextBox TextBox:
                     TextBox.TextChanged -= ValueChanged_TextBox;
                     TextBox.LostFocus -= TextEditControl_LostFocus;
                     break;
-
                 case Caption _:
                 case Line _:
                     break;
-
                 case EasyPic _:
                     break;
-
                 case ListBox ListBox:
                     //ListBox.ItemClicked -= ListBox_ItemClicked;
                     ListBox.ItemAdded -= ListBox_ItemAdded;
                     ListBox.ItemRemoved -= ListBox_ItemRemoved;
                     break;
-
                 case SwapListBox SwapListBox:
                     //ListBox.ItemClicked -= ListBox_ItemClicked;
                     SwapListBox.ItemAdded -= SwapListBox_ItemAdded;
                     SwapListBox.ItemRemoved -= SwapListBox_ItemRemoved;
                     break;
-
                 case Button Button:
                     switch (_EditType) {
                         case enEditTypeFormula.Ja_Nein_Knopf:
                             Button.CheckedChanged -= YesNoButton_CheckedChanged;
                             break;
-
                         case enEditTypeFormula.Button:
                             Button.Click -= ComandButton_Click;
                             break;
-
                         case enEditTypeFormula.Farb_Auswahl_Dialog:
                             Button.Click -= ColorButton_Click;
                             break;
-
                         default:
                             Develop.DebugPrint_NichtImplementiert();
                             break;
                     }
                     break;
-
                 default:
                     Develop.DebugPrint(Typ(e.Control));
                     break;
             }
-
             if (e.Control == _InfoCaption) { _InfoCaption = null; }
             if (e.Control == _CaptionObject) { _CaptionObject = null; }
         }
-
         /// <summary>
         /// Entfernt alle Controls und löst dessen die Events auf. Setzt _allinitialized auf false.
         /// </summary>
         protected virtual void RemoveAll() {
-
             //if (Controls.Count > 0) { OnRemovingAll(); }
-
-            var l = new List<Control>();
-
+            List<Control> l = new();
             for (var z = 0; z < Controls.Count; z++) { l.Add(Controls[z]); }
-
             foreach (var thisc in l) {
                 thisc.Visible = false;
-
                 if (thisc != _CaptionObject && thisc != _InfoCaption) {
                     thisc.Dispose(); // Dispose entfernt da Control aus der Collection // Controls.Remove(Controls[0]);
                 }
             }
-
             //while (Controls.Count > 0) {
             //    Controls[0].Visible = false;
             //    Controls[0].Dispose(); // Dispose entfernt da Control aus der Collection
             //                           // Controls.Remove(Controls[0]);
             //}
-
             //Controls.Clear();
             _allinitialized = false;
             //Invalidate();
         }
-
         //protected virtual void OnRemovingAll() {
         //    RemovingAll?.Invoke(this, System.EventArgs.Empty);
         //}
-
         protected virtual void OnNeedRefresh() => NeedRefresh?.Invoke(this, System.EventArgs.Empty);
-
         #region  Caption 
-
         private void Control_Create_Caption() {
             if (_CaptionPosition == enÜberschriftAnordnung.ohne) { return; }
-
             if (_CaptionObject == null) {
                 _CaptionObject = new Caption();
                 Controls.Add(_CaptionObject);
             }
-
             _CaptionObject.Enabled = Enabled;
-
             _CaptionObject.TextAnzeigeVerhalten = enSteuerelementVerhalten.Text_Abschneiden; // nicht enSteuerelementVerhalten.Steuerelement_Anpassen! weil sonst beim einem Resize die Koordinaten geändert werden und das kann zum Ping Pong führen
             _CaptionObject.Text = _Caption;
             _CaptionObject.Size = _CaptionObject.TextRequiredSize();
-
             _CaptionObject.Left = 0;
             _CaptionObject.Top = 0;
-
             _CaptionObject.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-
             _CaptionObject.Visible = _CaptionPosition != enÜberschriftAnordnung.Ohne_mit_Abstand;
-
             _CaptionObject.BringToFront();
-
         }
-
         /// <summary>
         /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.
         /// </summary>
         private void UpdateValueTo_Caption() {
             //if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
             //if (Column == null) { return; } // nur mögloch bei verbundenen Datenbanken
-
             if (_EditType != enEditTypeFormula.nur_als_Text_anzeigen) { return; } // und auch dann nur als reine Text anzeige
-
             if (_CaptionObject == null) { return; }
             _CaptionObject.Width = Width;
             _CaptionObject.Translate = false;
             _CaptionObject.Text = _Caption + " <i>" + _Value;
-
         }
-
         #endregion
-
         #region  Line 
         /// <summary>
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt. 
         /// </summary>
         private Line Control_Create_Line() {
-            var Control = new Line {
+            Line Control = new() {
                 Enabled = Enabled,
                 Orientation = enOrientation.Waagerecht
             };
             StandardBehandlung(Control);
-
             return Control;
         }
-
         #endregion
-
         #region  EasyPic 
-
         /// <summary>
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt. 
         /// </summary>
         private EasyPic Control_Create_EasyPic() {
-            var Control = new EasyPic {
+            EasyPic Control = new() {
                 Enabled = Enabled
             };
-
             StandardBehandlung(Control);
             UpdateValueToControl();
-
             return Control;
         }
-
         /// <summary>
         /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling  muss TRUE sein.
         /// </summary>
         private void UpdateValueTo_EasyPic(EasyPic Control) =>
             //if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
             Control.FromFile(_Value);
-
         #endregion
-
         #region  ComboBox 
-
         /// <summary>
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
         /// </summary>
         private ComboBox Control_Create_ComboBox() {
-            var Control = new ComboBox();
-
+            ComboBox Control = new();
             StyleComboBox(Control, null, ComboBoxStyle.DropDownList);
-
             UpdateValueToControl();
             StandardBehandlung(Control);
             return Control;
         }
-
         protected void StyleComboBox(ComboBox Control, ItemCollectionList list, ComboBoxStyle Style) {
             Control.Enabled = Enabled;
             Control.Format = _Format;
@@ -680,107 +538,76 @@ namespace BlueControls.Controls {
             Control.Item.AddRange(list);
             Control.Item.Sort();
         }
-
         /// <summary>
         /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.
         /// </summary>
         private void UpdateValueTo_Combobox(ComboBox Control) =>
             //if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
             Control.Text = _Value;
-
         private void ValueChanged_ComboBox(object sender, System.EventArgs e) {
             if (_IsFilling) { return; }
             ValueSet(((ComboBox)sender).Text, false, ((ComboBox)sender).DropDownStyle == ComboBoxStyle.DropDownList);
         }
-
         #endregion
-
         #region SwapListBox
-
         // Nimmt Teilweise die Routinen der Listbox her
-
         private SwapListBox Control_Create_SwapListBox() {
-            var Control = new SwapListBox {
+            SwapListBox Control = new() {
                 Enabled = Enabled,
             };
-
             StyleSwapListBox(Control, null);
             UpdateValueToControl();
             StandardBehandlung(Control);
-
             return Control;
         }
-
         protected void StyleSwapListBox(SwapListBox Control, ColumnItem Column) {
             Control.Enabled = Enabled;
-
             Control.Item.Clear();
             Control.Item.CheckBehavior = enCheckBehavior.NoSelection;
-
             if (Column == null) { return; }
-
-            var Item = new ItemCollectionList();
-
+            ItemCollectionList Item = new();
             ItemCollectionList.GetItemCollection(Item, Column, null, enShortenStyle.Both, 10000);
-
             Control.SuggestionsAdd(Item);
-
             Control.AddAllowed = enAddType.UserDef;
-
         }
-
         private void SwapListBox_ItemRemoved(object sender, System.EventArgs e) {
             if (_IsFilling) { return; }
             ValueSet(((SwapListBox)sender).Item.ToListOfString().JoinWithCr(), false, true);
         }
-
         private void SwapListBox_ItemAdded(object sender, ListEventArgs e) {
             if (_IsFilling) { return; }
             ValueSet(((SwapListBox)sender).Item.ToListOfString().JoinWithCr(), false, true);
         }
-
         #endregion
-
         #region  ListBox 
-
         private void ListBox_ItemRemoved(object sender, System.EventArgs e) {
             if (_IsFilling) { return; }
             ValueSet(((ListBox)sender).Item.ToListOfString().JoinWithCr(), false, true);
         }
-
         private void ListBox_ItemAdded(object sender, ListEventArgs e) {
             if (_IsFilling) { return; }
             ValueSet(((ListBox)sender).Item.ToListOfString().JoinWithCr(), false, true);
         }
-
         /// <summary>
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
         /// </summary>
         private ListBox Control_Create_ListBox() {
-            var Control = new ListBox {
+            ListBox Control = new() {
                 Enabled = Enabled,
             };
-
             StyleListBox(Control, null);
             UpdateValueToControl();
             StandardBehandlung(Control);
-
             return Control;
         }
-
         protected void StyleListBox(ListBox Control, ColumnItem Column) {
             Control.Enabled = Enabled;
-
             Control.Item.Clear();
             Control.Item.CheckBehavior = enCheckBehavior.MultiSelection;
-
             if (Column == null) { return; }
-
-            var Item = new ItemCollectionList();
-
+            ItemCollectionList Item = new();
             if (Column.DropdownBearbeitungErlaubt) {
                 ItemCollectionList.GetItemCollection(Item, Column, null, enShortenStyle.Both, 10000);
-
                 if (!Column.DropdownWerteAndererZellenAnzeigen) {
                     bool again;
                     do {
@@ -795,139 +622,108 @@ namespace BlueControls.Controls {
                     } while (again);
                 }
             }
-
             Control.AddAllowed = enAddType.UserDef;
             Control.FilterAllowed = false;
             Control.MoveAllowed = false;
-
             switch (_EditType) {
                 case enEditTypeFormula.Gallery:
                     Control.Appearance = enBlueListBoxAppearance.Gallery;
                     Control.RemoveAllowed = true;
                     break;
-
                 case enEditTypeFormula.Listbox:
                     Control.RemoveAllowed = true;
-
                     Control.Appearance = enBlueListBoxAppearance.Listbox;
                     break;
-
             }
         }
-
         /// <summary>
         /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.
         /// </summary>
         private void UpdateValueTo_ListBox(ItemCollectionList Main) => Main.SetValuesTo(_Value.SplitByCRToList(), FileEncryptionKey);
-
         #endregion
-
         #region  Button 
-
         private void ComandButton_Click(object sender, System.EventArgs e) {
             if (_EditType != enEditTypeFormula.Button) { return; }
             ValueSet(true.ToPlusMinus(), false, true); // Geklickt, wurde hiermit vermerkt
             OnButtonClicked();
         }
-
         private void ColorButton_Click(object sender, System.EventArgs e) => Develop.DebugPrint_NichtImplementiert(); // TODO: Erstellen!//if (_EditType != enEditTypeFormula.Button) { return; }//CheckIfChanged("+");//OnButtonClicked();
-
         protected virtual void OnButtonClicked() => ButtonClicked?.Invoke(this, System.EventArgs.Empty);
-
         private void YesNoButton_CheckedChanged(object sender, System.EventArgs e) => ValueSet(((Button)sender).Checked.ToPlusMinus(), false, true);
-
         /// <summary>
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
         /// </summary>
         private Button Control_Create_ButtonComand() {
-            var Control = new Button {
+            Button Control = new() {
                 Enabled = Enabled,
                 Name = "ComandButton",
                 Checked = false,
                 ButtonStyle = enButtonStyle.Button,
                 Text = _Caption,
             };
-
             StandardBehandlung(Control);
-
             return Control;
         }
-
         /// <summary>
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
         /// </summary>
         private Button Control_Create_ButtonColor() {
-            var Control = new Button {
+            Button Control = new() {
                 Enabled = Enabled,
                 Name = "ColorButton",
                 Checked = false,
                 ButtonStyle = enButtonStyle.Button,
                 Text = string.Empty
             };
-
             StandardBehandlung(Control);
-
             return Control;
         }
-
         /// <summary>
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt. 
         /// </summary>
         private Button Control_Create_ButtonYesNo() {
-            var Control = new Button {
+            Button Control = new() {
                 Enabled = Enabled,
                 Name = "YesNoButton",
                 ButtonStyle = enButtonStyle.Yes_or_No,
                 Text = "",
                 ImageCode = ""
             };
-
             UpdateValueToControl();
             StandardBehandlung(Control);
-
             return Control;
         }
-
         /// <summary>
         /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.
         /// </summary>
         private void UpdateValueTo_Button(Button Control) {
-
             //if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling und Creating False!"); }
-
             switch (_EditType) {
                 case enEditTypeFormula.Ja_Nein_Knopf:
                     Control.Checked = _Value.FromPlusMinus();
                     break;
-
                 case enEditTypeFormula.Button:
                     break;
-
                 case enEditTypeFormula.Farb_Auswahl_Dialog:
                     Control.ImageCode = string.IsNullOrEmpty(_Value) ? "Fragezeichen|24" : "Kreis|24|||" + Color.FromArgb(int.Parse(_Value)).ToHTMLCode();
                     break;
-
                 default:
                     Develop.DebugPrint_NichtImplementiert();
                     break;
             }
         }
-
         #endregion
-
         #region  Textbox 
-
         /// <summary>
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
         /// </summary>
         private TextBox Control_Create_TextBox() {
-            var Control = new TextBox();
+            TextBox Control = new();
             StyleTextBox(Control, string.Empty, false);
             UpdateValueToControl();
             StandardBehandlung(Control);
             return Control;
         }
-
         protected void StyleTextBox(TextBox Control, string AllowedChars, bool SpellChecking) {
             Control.Enabled = Enabled;
             Control.Format = _Format;
@@ -935,27 +731,21 @@ namespace BlueControls.Controls {
             Control.AllowedChars = AllowedChars;
             Control.MultiLine = _MultiLine;
             Control.SpellChecking = SpellChecking;
-
             Control.Verhalten = _MultiLine || Height > 20
                 ? enSteuerelementVerhalten.Scrollen_mit_Textumbruch
                 : enSteuerelementVerhalten.Scrollen_ohne_Textumbruch;
         }
-
         /// <summary>
         /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.
         /// </summary>
         private void UpdateValueTo_TextBox(TextBox Control) =>
             //if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
-
             Control.Text = _Value;
-
         private void ValueChanged_TextBox(object sender, System.EventArgs e) {
             if (_IsFilling) { return; }
             ValueSet(((TextBox)sender).Text, false, false);
         }
-
         #endregion
-
         /// <summary>
         /// Erstellt zuerst die Standard-Caption, dessen Events werden registriert.
         /// Kümmert sich dann um die Position des Controls im Bezug auf die Caption. Setzt die Sichtbarkeit, korrigiert Anachor und fügt das Control zu der Controll Collection hinzu.
@@ -963,9 +753,7 @@ namespace BlueControls.Controls {
         /// </summary>
         /// <param name="Control"></param>
         private void StandardBehandlung(GenericControl Control) {
-
             Control_Create_Caption();
-
             switch (_CaptionPosition) {
                 case enÜberschriftAnordnung.ohne:
                     Control.Left = 0;
@@ -973,7 +761,6 @@ namespace BlueControls.Controls {
                     Control.Width = Width;
                     Control.Height = Height;
                     break;
-
                 case enÜberschriftAnordnung.Links_neben_Dem_Feld:
                     Control.Left = Math.Max(_ControlX, _CaptionObject.Width);
                     Control.Top = 0;
@@ -981,7 +768,6 @@ namespace BlueControls.Controls {
                     Control.Height = Height;
                     if (_CaptionObject.Width < 4) { Develop.DebugPrint("Caption Width zu klein"); }
                     break;
-
                 case enÜberschriftAnordnung.Über_dem_Feld:
                 case enÜberschriftAnordnung.Ohne_mit_Abstand:
                     Control.Left = 0;
@@ -989,44 +775,31 @@ namespace BlueControls.Controls {
                     Control.Width = Width;
                     Control.Height = Height - _CaptionObject.Height;
                     if (_CaptionObject.Height < 4) { Develop.DebugPrint("Caption Height zu klein"); }
-
                     break;
-
                 default:
                     Develop.DebugPrint(_CaptionPosition);
                     break;
             }
-
             Control.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;
-
             Control.Visible = true;
-
             Controls.Add(Control);
-
             Invalidate();
-
             //DoInfoTextCaption();
-
         }
-
         public override bool Focused {
             get {
                 foreach (Control ThisControl in Controls) {
                     if (ThisControl.Focused) { return true; }
                 }
-
                 return base.Focused;
             }
         }
-
         private void CheckIfChanged() {
             if (_LastTextChange == null) { return; }
             _LastTextChange = null;
             OnValueChanged();
         }
-
         protected virtual void OnValueChanged() => ValueChanged?.Invoke(this, System.EventArgs.Empty);
-
         private void DoInfoTextCaption(string disabledReason) {
             var txt = string.Empty;
             var symbol = string.Empty;
@@ -1043,9 +816,7 @@ namespace BlueControls.Controls {
                 symbol = "<ImageCode=Information|16>";
                 txt = "<b>Der Wert kann nicht bearbeitet werden:</b><br>" + disabledReason + "<br><br><b>Enthält aber einen Fehler:</b><br>" + _InfoText;
             }
-
             if (!_ShowInfoWhenDisabled && !string.IsNullOrEmpty(disabledReason)) { txt = string.Empty; }
-
             if (!string.IsNullOrEmpty(txt) && _InfoCaption != null) {
                 _InfoCaption.Left = Width - 18;
                 _InfoCaption.Top = 0;
@@ -1053,11 +824,9 @@ namespace BlueControls.Controls {
                 _InfoCaption.Text = symbol;
                 _InfoCaption.Visible = true;
                 _InfoCaption.BringToFront();
-
                 return;
             }
             if (string.IsNullOrEmpty(txt) && _InfoCaption == null) { return; }
-
             if (string.IsNullOrEmpty(txt)) {
                 //Controls.Remove(_InfoCaption);
                 //_InfoCaption.Click -= _InfoCaption_Click;
@@ -1083,9 +852,7 @@ namespace BlueControls.Controls {
                 _InfoCaption.BringToFront();
             }
         }
-
         private void _InfoCaption_Click(object sender, System.EventArgs e) {
-
             foreach (var thisc in Controls) {
                 if (thisc is ComboBox cbx) {
                     cbx.Focus();
@@ -1094,99 +861,75 @@ namespace BlueControls.Controls {
                 }
             }
         }
-
         /// <summary>
         /// Erstellt die Steuerelemente zur Bearbeitung und auch die Caption und alles was gebrauch wird.
         /// Die Events werden Registriert und auch der Wert gesetzt.
         /// </summary>
         protected GenericControl CreateSubControls() {
-
             if (_allinitialized) {
                 Develop.DebugPrint(enFehlerArt.Warnung, "Bereits initialisiert");
                 return null;
             }
-
             if (Width < 5 || Height < 5) {
                 Develop.DebugPrint(enFehlerArt.Warnung, "Width / Height zu klein");
                 return null;
             }
-
             _allinitialized = true;
-
             GenericControl c = null;
-
             switch (_EditType) {
                 case enEditTypeFormula.Line:
                     c = Control_Create_Line();
                     break;
-
                 case enEditTypeFormula.Textfeld:
                     c = Control_Create_TextBox();
                     break;
-
                 case enEditTypeFormula.EasyPic:
                     c = Control_Create_EasyPic();
                     break;
-
                 case enEditTypeFormula.Gallery:
                 //case enEditTypeFormula.Listbox_1_Zeile:
                 //case enEditTypeFormula.Listbox_3_Zeilen:
                 case enEditTypeFormula.Listbox:
                     c = Control_Create_ListBox();
                     break;
-
                 case enEditTypeFormula.Textfeld_mit_Auswahlknopf:
                     c = Control_Create_ComboBox();
                     break;
-
                 case enEditTypeFormula.Ja_Nein_Knopf:
                     c = Control_Create_ButtonYesNo();
                     break;
-
                 case enEditTypeFormula.None:
                     break;
-
                 case enEditTypeFormula.nur_als_Text_anzeigen:
                     _CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
                     Control_Create_Caption();
                     break;
-
                 case enEditTypeFormula.Farb_Auswahl_Dialog:
                     c = Control_Create_ButtonColor();
                     break;
-
                 case enEditTypeFormula.Button:
                     c = Control_Create_ButtonComand();
                     break;
-
                 case enEditTypeFormula.SwapListBox:
                     c = Control_Create_SwapListBox();
                     break;
-
                 default:
                     Develop.DebugPrint(_EditType);
                     return null;
             }
-
             UpdateControls();
-
             return c;
         }
-
         private void _IdleTimer_Tick(object sender, System.EventArgs e) {
             if (_LastTextChange == null) { return; }
             if (DateTime.UtcNow.Subtract((DateTime)_LastTextChange).TotalSeconds < 20) { return; }
-
             Focus(); // weitere Tastatureingabn verhindern. Z.B: wenn was mariert wird und dann entfernen gedrück wird. Wenn die Box neu sortiert wird, ist dsa ergebnis nicht schön
-
             CheckIfChanged();
         }
-
         protected override void OnQuickInfoChanged() {
             base.OnQuickInfoChanged();
             UpdateControls();
         }
-
         /// <summary>
         /// 
         /// </summary>
@@ -1199,60 +942,45 @@ namespace BlueControls.Controls {
             if (_Value == newvalue) { return; }
             _LastTextChange = DateTime.UtcNow;
             _Value = newvalue;
-
             if (updateControls) {
                 UpdateValueToControl();
                 //return; // kein CheckedIfChanged. Der Wert kommt ja von der Zelle / Property / etc. und ist somit gesetzt und wir nicht geändert
-
             }
             if (alwaysValueChanged || InvokeRequired || !Focused || _InstantChangedEvent) { CheckIfChanged(); }
         }
-
         private void UpdateControls() {
-
             foreach (Control Control in Controls) {
-
                 if (Control != _InfoCaption) {
                     if (Control is GenericControl QI) { QI.QuickInfo = QuickInfo; }
                     Control.Enabled = Enabled;
                 } else {
                     Control.Enabled = true;
                 }
-
                 switch (Control) {
-
                     case ComboBox ComboBox:
                         ComboBox.Suffix = _Suffix;
                         ComboBox.Format = _Format;
                         break;
-
                     case TextBox TextBox:
                         TextBox.Suffix = _Suffix;
                         TextBox.Format = _Format;
                         break;
-
                     case EasyPic _:
                         break;
-
                     case ListBox _:
                         //if (ListBox.Name == "Main") { UpdateValueTo_ListBox(); }
                         break;
-
                     case SwapListBox _:
                         //if (ListBox.Name == "Main") { UpdateValueTo_ListBox(); }
                         break;
-
                     case Button _:
                         //UpdateValueTo_Button(Button);
                         break;
-
                     case Caption _:
                         //UpdateValueTo_Caption();
                         break;
-
                     case Line _:
                         break;
-
                     default:
                         Develop.DebugPrint(Typ(Control));
                         break;

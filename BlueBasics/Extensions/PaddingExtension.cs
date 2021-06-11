@@ -16,21 +16,17 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 #endregion
-
 namespace BlueBasics {
     public static partial class Extensions {
         public static System.Windows.Forms.Padding PaddingParse(this string code) {
             code = code.RemoveChars("{}LeftTopRightBm= ");
-
             var w = code.Split(',');
-
-            var P = new System.Windows.Forms.Padding {
+            System.Windows.Forms.Padding P = new() {
                 Left = int.Parse(w[0]),
                 Top = int.Parse(w[1]),
                 Right = int.Parse(w[2]),
                 Bottom = int.Parse(w[3])
             };
-
             return P;
         }
     }

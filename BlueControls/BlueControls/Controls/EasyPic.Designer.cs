@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Drawing;
 using BlueBasics.Enums;
 using BlueControls.Enums;
-
 namespace BlueControls.Controls
 {
     public partial class EasyPic 
@@ -26,10 +25,8 @@ namespace BlueControls.Controls
                 base.Dispose(disposing);
             }
         }
-
         //Wird vom Windows Form-Designer benötigt.
         private IContainer components;
-
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -131,7 +128,6 @@ namespace BlueControls.Controls
             this.Size = new Size(472, 408);
             this.EditPanelFrame.ResumeLayout(false);
             this.ResumeLayout(false);
-
         }
         private Button DelP;
         private Button MakePic;

@@ -16,15 +16,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 namespace BlueControls.EventArgs {
     public class PositionEventArgs : System.EventArgs {
-
         public PositionEventArgs(int x, int y) {
             X = x;
             Y = y;
         }
-
         public int X { get; set; }
         public int Y { get; set; }
     }

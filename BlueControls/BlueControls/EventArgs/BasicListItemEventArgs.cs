@@ -16,13 +16,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using BlueControls.ItemCollection;
-
 namespace BlueControls.EventArgs {
     public class BasicListItemEventArgs : System.EventArgs {
         public BasicListItemEventArgs(BasicListItem item) => Item = item;
-
         public BasicListItem Item { get; }
     }
 }

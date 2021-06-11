@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Drawing;
 using BlueControls.Enums;
-
 namespace BlueControls.Controls
 {
     public partial class Slider : GenericControl
@@ -15,7 +14,6 @@ namespace BlueControls.Controls
             {
                 if (disposing)
                 {
-
                 }
             }
             finally
@@ -23,9 +21,6 @@ namespace BlueControls.Controls
                 base.Dispose(disposing);
             }
         }
-
-
-
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -69,7 +64,6 @@ namespace BlueControls.Controls
             this.Name = "Slider";
             this.ResumeLayout(false);
         }
-
         internal Button But1;
         internal Button But2;
     }

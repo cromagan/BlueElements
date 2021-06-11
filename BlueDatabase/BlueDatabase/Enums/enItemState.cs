@@ -16,7 +16,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 namespace BlueDatabase.Enums {
     internal enum enItemState {
         Pending = 2,

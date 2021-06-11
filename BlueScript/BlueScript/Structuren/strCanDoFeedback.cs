@@ -16,11 +16,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using System.Linq;
-
 public struct strCanDoFeedback {
-
     public strCanDoFeedback(int errorposition, string errormessage, bool mustabort) {
         ContinueOrErrorPosition = errorposition;
         ErrorMessage = errormessage;
@@ -30,7 +27,6 @@ public struct strCanDoFeedback {
         CodeBlockAfterText = string.Empty;
         LineBreakInCodeBlock = 0;
     }
-
     public strCanDoFeedback(int continuePosition, string comandText, string attributtext, string codeblockaftertext) {
         ContinueOrErrorPosition = continuePosition;
         ErrorMessage = string.Empty;
@@ -40,7 +36,6 @@ public struct strCanDoFeedback {
         CodeBlockAfterText = codeblockaftertext;
         LineBreakInCodeBlock = codeblockaftertext.Count(c => c == '¶');
     }
-
     /// <summary>
     /// Die Position, wo der Fehler stattgefunfden hat ODER die Position wo weiter geparsesd werden muss
     /// </summary>
@@ -63,5 +58,4 @@ public struct strCanDoFeedback {
     /// </summary>
     public string CodeBlockAfterText;
     public int LineBreakInCodeBlock;
-
 }

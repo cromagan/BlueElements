@@ -16,15 +16,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using Skript.Enums;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using static BlueBasics.Extensions;
-
 namespace BlueScript {
     internal class Method_StringShortenWord : Method {
-
         public override string Syntax => "StringShortenWord(String)";
         public override string Description => "Versucht den String zu kürzen, indem Abkürzungen verwendet werden.";
         public override List<string> Comand(Script s) => new() { "stringshortenword" };
@@ -34,13 +31,10 @@ namespace BlueScript {
         public override enVariableDataType Returns => enVariableDataType.String;
         public override List<enVariableDataType> Args => new() { enVariableDataType.String_or_List };
         public override bool EndlessArgs => false;
-
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
-
             var TXT = attvar.Attributes[0].ValueString;
-
             if (!string.IsNullOrEmpty(TXT)) {
                 //TXT = TXT.HTMLSpecialToNormalChar();
                 TXT = TXT.Replace("Sekunden", "Sek.");
@@ -86,13 +80,10 @@ namespace BlueScript {
                 TXT = TXT.Replace("eine achtel ", "1/8 ", RegexOptions.IgnoreCase);
                 TXT = TXT.Replace("Stufe ", "St. ");
                 TXT = TXT.Replace("Liter", "l ", RegexOptions.IgnoreCase);
-
                 TXT = TXT.Replace("ein EL", "1 EL", RegexOptions.IgnoreCase);
                 TXT = TXT.Replace("ein TL", "1 TL", RegexOptions.IgnoreCase);
-
                 TXT = TXT.Replace("zwei EL", "2 EL", RegexOptions.IgnoreCase);
                 TXT = TXT.Replace("zwei TL", "2 TL", RegexOptions.IgnoreCase);
-
                 string[] A = { "es", "er", "em", "en", "e", "" };
                 for (var t = 0; t <= A.GetUpperBound(0); t++) {
                     TXT = TXT.Replace("gerieben" + A[t], "ger.");
@@ -101,11 +92,9 @@ namespace BlueScript {
                     TXT = TXT.Replace("gekocht" + A[t], "gek.");
                     TXT = TXT.Replace("tiefgekühlt" + A[t], "TK");
                 }
-
                 TXT = TXT.Replace("Tiefkühl", "TK-");
                 //TXT = TXT.CreateHtmlCodes(true);
             }
-
             return new strDoItFeedback(TXT, enVariableDataType.String);
         }
     }

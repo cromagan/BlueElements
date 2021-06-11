@@ -16,9 +16,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using System;
-
 namespace BlueControls.Enums {
     [Flags]
     public enum enHelpers {
@@ -32,7 +30,6 @@ namespace BlueControls.Enums {
         DrawToPoint = 64,
         FilledRectancle = 128,
         PointNames = 256,
-
         HorizontalVerticalLine = HorizontalLine | VerticalLine
     }
 }

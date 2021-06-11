@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Drawing;
 using BlueBasics.Enums;
-
 namespace BlueControls.Controls
 {
     public partial class ListBox 
@@ -22,8 +21,6 @@ namespace BlueControls.Controls
                 base.Dispose(disposing);
             }
         }
-
-
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -124,9 +121,7 @@ namespace BlueControls.Controls
             this.Name = "ListBox";
             this.Size = new Size(177, 168);
             this.ResumeLayout(false);
-
         }
-
         private Button Down;
         private Button Up;
         private Button Plus;

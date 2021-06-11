@@ -16,13 +16,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using Skript.Enums;
 using System.Collections.Generic;
-
 namespace BlueScript {
     internal class Method_Replace : Method {
-
         public override string Syntax => "Replace(OriginalString, SearchString, ReplaceString)";
         public override string Description => "Ersetzt in einem Text einen Text durch einen anderen Text";
         public override List<string> Comand(Script s) => new() { "replace" };
@@ -32,7 +29,6 @@ namespace BlueScript {
         public override enVariableDataType Returns => enVariableDataType.String;
         public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.String, enVariableDataType.String };
         public override bool EndlessArgs => false;
-
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             return !string.IsNullOrEmpty(attvar.ErrorMessage) ? strDoItFeedback.AttributFehler(this, attvar)

@@ -1,9 +1,7 @@
 using System.Diagnostics;
 using BlueControls.Controls;
-
 namespace BlueControls.Forms
 {
-
     public partial class PadEditor
         {
 			//Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
@@ -12,12 +10,9 @@ namespace BlueControls.Forms
 			{
 				if (disposing )
 				{
-				
 				}
 				base.Dispose(disposing);
 			}
-
-
 			//Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
 			//Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
 			//Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -629,7 +624,6 @@ namespace BlueControls.Forms
             this.Area_Assistent.ResumeLayout(false);
             this.Area_Design.ResumeLayout(false);
             this.ResumeLayout(false);
-
 			}
 			private Button btnZoomOut;
 			private Button btnAuswahl;
@@ -662,8 +656,6 @@ namespace BlueControls.Forms
 			internal Caption sscchrifthgöße;
 			protected internal Button Button_PageSetup;
 			protected internal Button ArbeitsbreichSetup;
-
-
             private TabPage Page_Settings;
         private Button btnAddUnterStufe;
         private Button btnAddSymbol;

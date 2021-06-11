@@ -16,7 +16,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 namespace BlueDatabase.EventArgs {
     public class ProgressbarEventArgs : System.EventArgs {
         public ProgressbarEventArgs(string name, int current, int count, bool beginns, bool ends) {
@@ -26,12 +25,9 @@ namespace BlueDatabase.EventArgs {
             Beginns = beginns;
             Ends = ends;
         }
-
         public int Count { get; }
         public int Current { get; }
-
         public string Name { get; }
-
         public bool Beginns { get; }
         public bool Ends { get; }
     }

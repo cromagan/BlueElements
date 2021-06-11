@@ -16,13 +16,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 namespace BlueControls.Enums {
-
     public enum enTableDrawColumn {
         NonPermament = 0,
         Permament = 1,
         All = 2
-
     }
 }

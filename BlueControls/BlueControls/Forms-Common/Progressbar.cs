@@ -16,25 +16,18 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-
 namespace BlueControls.Forms {
     public partial class Progressbar : FloatingForm {
-
         private int eProgressbar_LastCurrent = int.MaxValue;
-
         private readonly Dictionary<int, DateTime> eProgressbar_TimeDic = new();
         private int eProgressbar_LastCalulatedSeconds = int.MinValue;
         private DateTime eProgressbar_LastTimeUpdate = DateTime.Now;
-
         private int _count = 0;
         private string _baseText = string.Empty;
-
         private Progressbar() : base(Enums.enDesign.Form_BitteWarten) => InitializeComponent();
-
         private Progressbar(string Text) : this() {
             // InitializeComponent();
             capTXT.Text = Text;
@@ -42,17 +35,15 @@ namespace BlueControls.Forms {
             var Wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
             Size = new Size(Wi + (capTXT.Left * 2), He + (capTXT.Top * 2));
         }
-
         public static Progressbar Show(string Text) {
-            var P = new Progressbar(Text) {
+            Progressbar P = new(Text) {
                 _baseText = Text
             };
             P.Show();
             return P;
         }
-
         public static Progressbar Show(string Text, int Count) {
-            var P = new Progressbar(Text) {
+            Progressbar P = new(Text) {
                 _baseText = Text,
                 _count = Count
             };
@@ -61,20 +52,16 @@ namespace BlueControls.Forms {
             P.BringToFront();
             return P;
         }
-
         private string CalculateText(string BaseText, int Current, int Count) {
             if (Current < eProgressbar_LastCurrent) {
                 eProgressbar_TimeDic.Clear();
                 eProgressbar_LastTimeUpdate = DateTime.Now;
                 eProgressbar_LastCalulatedSeconds = int.MinValue;
             }
-
             var PR = Current / (double)Count;
             if (PR > 1) { PR = 1; }
             if (PR < 0) { PR = 0; }
-
             if (double.IsNaN(PR)) { PR = 0; }
-
             int tmpCalculatedSeconds;
             if (Current > 0) {
                 if (eProgressbar_TimeDic.ContainsKey(Math.Max(0, Current - 100))) {
@@ -87,13 +74,10 @@ namespace BlueControls.Forms {
             } else {
                 tmpCalculatedSeconds = 0;
             }
-
             eProgressbar_LastCurrent = Current;
-
             if (!eProgressbar_TimeDic.ContainsKey(Current)) {
                 eProgressbar_TimeDic.Add(Current, DateTime.Now);
             }
-
             if (eProgressbar_LastCalulatedSeconds != tmpCalculatedSeconds && DateTime.Now.Subtract(eProgressbar_LastTimeUpdate).TotalSeconds > 5) {
                 eProgressbar_LastTimeUpdate = DateTime.Now;
                 if (Current < 2) {
@@ -106,52 +90,36 @@ namespace BlueControls.Forms {
                     eProgressbar_LastCalulatedSeconds = tmpCalculatedSeconds;
                 }
             }
-
             var PRT = (int)(PR * 100);
             if (PRT > 100) { PRT = 100; }
             if (PRT < 0) { PRT = 0; }
+            return BaseText + "</b></i></u>" +
+                      (Count < 1 ? string.Empty
+                      : Current <= 3 ? "<br>Restzeit wird ermittelt<tab>"
+                      : eProgressbar_LastCalulatedSeconds < -10 ? "<br>Restzeit wird ermittelt<tab>"
+                      : eProgressbar_LastCalulatedSeconds > 94 ? "<br>" + PRT + " % - Geschätzte Restzeit:   " + (eProgressbar_LastCalulatedSeconds / 60) + " Minuten<tab>"
+                      : eProgressbar_LastCalulatedSeconds > 10 ? "<br>" + PRT + " % - Geschätzte Restzeit: " + (eProgressbar_LastCalulatedSeconds / 5 * 5) + " Sekunden<tab>"
+                      : eProgressbar_LastCalulatedSeconds > 0 ? "<br>" + PRT + " % - Geschätzte Restzeit: <<> 10 Sekunden<tab>"
+                      : "<br>100 % - ...abgeschlossen!<tab>");
 
-            string T;
-            if (Count < 1) {
-                T = string.Empty;
-            } else if (Current <= 3) {
-                T = "<br>Restzeit wird ermittelt<tab>";
-            } else if (eProgressbar_LastCalulatedSeconds < -10) {
-                T = "<br>Restzeit wird ermittelt<tab>";
-            } else {
-                T = eProgressbar_LastCalulatedSeconds > 94
-                    ? "<br>" + PRT + " % - Geschätzte Restzeit:   " + (eProgressbar_LastCalulatedSeconds / 60) + " Minuten<tab>"
-                    : eProgressbar_LastCalulatedSeconds > 10
-                                    ? "<br>" + PRT + " % - Geschätzte Restzeit: " + (eProgressbar_LastCalulatedSeconds / 5 * 5) + " Sekunden<tab>"
-                                    : eProgressbar_LastCalulatedSeconds > 0
-                                                    ? "<br>" + PRT + " % - Geschätzte Restzeit: <<> 10 Sekunden<tab>"
-                                                    : "<br>100 % - ...abgeschlossen!<tab>";
-            }
-            return BaseText + "</b></i></u>" + T;
         }
-
         public void Update(string Text) {
             _baseText = Text;
             UpdateInternal(Text);
         }
-
         public void Update(int current) {
-
             if (InvokeRequired) {
                 // Es kommt zwar die ganze Berechnung durcheinander, aber besser als ein Fehler
                 Invoke(new Action(() => Update(current)));
                 return;
             }
-
             UpdateInternal(CalculateText(_baseText, current, _count));
         }
-
         private void UpdateInternal(string Text) {
             if (Text != capTXT.Text) {
                 capTXT.Text = Text;
                 var Wi = Math.Max(Size.Width, capTXT.Width + (Skin.Padding * 2));
                 var He = Math.Max(Size.Height, capTXT.Height + (Skin.Padding * 2));
-
                 Size = new Size(Wi, He);
                 Refresh();
             }

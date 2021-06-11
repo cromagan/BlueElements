@@ -2,8 +2,6 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
-
-
 namespace BlueControls
 {
     public partial class Overlay 
@@ -18,10 +16,8 @@ namespace BlueControls
             }
             base.Dispose(disposing);
         }
-
         //Wird vom Windows Form-Designer benötigt.
         private IContainer components;
-
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -49,7 +45,6 @@ namespace BlueControls
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.TransparencyKey = System.Drawing.Color.Magenta;
             this.ResumeLayout(false);
-
         }
         internal System.Windows.Forms.Timer Blinker;
     }

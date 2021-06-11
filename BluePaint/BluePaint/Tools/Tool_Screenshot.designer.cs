@@ -1,10 +1,6 @@
 ﻿using BlueControls.Controls;
-
-
 namespace BluePaint
 {
-
-
     public partial class Tool_Screenshot : GenericTool
     {
         //UserControl überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
@@ -15,7 +11,6 @@ namespace BluePaint
             {
                 if (disposing)
                 {
-
                 }
             }
             finally
@@ -23,9 +18,6 @@ namespace BluePaint
                 base.Dispose(disposing);
             }
         }
-
-
-
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -50,10 +42,7 @@ namespace BluePaint
             this.Name = "Tool_Screenshot";
             this.Size = new System.Drawing.Size(173, 150);
             this.ResumeLayout(false);
-
         }
-
         internal Button NeuerScreenshot;
     }
-
 }

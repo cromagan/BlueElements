@@ -16,11 +16,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 namespace Skript.Enums {
-
     public enum enVariableDataType {
-
         NotDefinedYet = 0,
         Bool = 1,
         Numeral = 2,
@@ -28,31 +25,23 @@ namespace Skript.Enums {
         //Date = 8, // Werden einfach die Strings manipuliert
         List = 16,
         Bitmap = 32,
-
         /// <summary>
         /// Nur für Attribute
         /// </summary>
         Integer = 256,
-
         Nummeral_or_String = Numeral | String,
-
         String_or_List = String | List,
-
         Bool_Numeral_or_String = Bool | Numeral | String,
         Bool_Numeral_String_or_List = Bool | Numeral | String | List,
-
         Variable = 1024,
-
         Error = 2048,
         Null = 4096,
-
         //VariableBool = 128,
         //VariableNum = 256,
         //VariableString = 512,
         Variable_Numeral = Variable | Numeral,
         Variable_List = Variable | List,
         Variable_Stringx = Variable | String,
-
         Variable_List_Or_String = Variable | String | List,
         Variable_List_String_Numeral_or_Bool = Variable | String | List | Numeral | Bool,
         Variable_String_or_Numeral = Variable | String | List | Numeral,

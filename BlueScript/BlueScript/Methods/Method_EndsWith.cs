@@ -16,17 +16,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using Skript.Enums;
 using System.Collections.Generic;
-
 namespace BlueScript {
     internal class Method_EndsWith : Method {
-
         public override string Syntax => "EndsWith(String, CaseSensitive, Value1, Value2, ...)";
-
         public override string Description => "Prüft, ob der String mit einem der angegeben Strings endet.";
-
         public override List<string> Comand(Script s) => new() { "endswith" };
         public override string StartSequence => "(";
         public override string EndSequence => ")";
@@ -34,11 +29,9 @@ namespace BlueScript {
         public override enVariableDataType Returns => enVariableDataType.Bool;
         public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.Bool, enVariableDataType.String };
         public override bool EndlessArgs => true;
-
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
-
             for (var z = 2; z < attvar.Attributes.Count; z++) {
                 if (attvar.Attributes[1].ValueBool) {
                     if (attvar.Attributes[0].ValueString.EndsWith(attvar.Attributes[z].ValueString)) {

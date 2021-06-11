@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
-
 namespace BlueControls.Controls
 {
     public partial class FlexiControl 
@@ -18,7 +17,6 @@ namespace BlueControls.Controls
                     //if (_BitmapOfControl != null) { _BitmapOfControl.Dispose(); }
                     //DoInfoTextButton(); // Events entfernen!
                     RemoveAll(); // Events entfernen!
-
                    components.Dispose();
                 }
             }
@@ -27,10 +25,8 @@ namespace BlueControls.Controls
                 base.Dispose(disposing);
             }
         }
-
         //Wird vom Windows Form-Designer benötigt.
         private IContainer components;
-
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -52,9 +48,7 @@ namespace BlueControls.Controls
             this.Name = "FlexiControl";
             this.Size = new System.Drawing.Size(100, 100);
             this.ResumeLayout(false);
-
         }
-
         protected System.Windows.Forms.Timer _IdleTimer;
     }
 }

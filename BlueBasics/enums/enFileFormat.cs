@@ -16,13 +16,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 #endregion
-
 namespace BlueBasics.Enums {
     public enum enFileFormat {
         Unknown,
-
         WordKind,
-
         Textdocument,
         ExcelKind,
         PowerPointKind,
@@ -37,10 +34,8 @@ namespace BlueBasics.Enums {
         Database,
         XMLFile,
         Visitenkarte,
-
         Sound,
         Icon,
-
         ProgrammingCode,
         Link,
         BlueCreativeFile

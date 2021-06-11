@@ -16,11 +16,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 namespace BlueControls.Enums {
     public enum enASCIIKey {
         Undefined = -1,
-
         LineFeed = 10,
         // VerticalTab = 11
         //FormFeed = 12
@@ -40,12 +38,9 @@ namespace BlueControls.Enums {
         StrgV = 22,
         StrgX = 24,
         StrgA = 1,
-
         Space = 32,
         //Chr255 = 255,
-
         Euro = 8364,
-
         ImageStart = 20000
     }
 }

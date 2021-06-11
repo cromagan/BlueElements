@@ -16,21 +16,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using BlueControls.Controls;
-
 namespace BlueControls.BlueDatabaseDialogs {
-
     public sealed partial class Filter : Forms.Form {
-
         public Filter(Table table) {
-
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
-
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             filterleiste.Table = table;
-
         }
     }
 }

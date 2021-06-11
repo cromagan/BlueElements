@@ -2,11 +2,8 @@
 using BlueControls.Enums;
 using System.ComponentModel;
 using System.Diagnostics;
-
 namespace BlueControls.BlueDatabaseDialogs
 {
-
-
     public partial class AutoFilter
     {
         //Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
@@ -25,10 +22,8 @@ namespace BlueControls.BlueDatabaseDialogs
                 base.Dispose(disposing);
             }
         }
-
         //Wird vom Windows Form-Designer benötigt.
         private IContainer components;
-
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -151,9 +146,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Size = new System.Drawing.Size(165, 159);
             this.TopMost = true;
             this.ResumeLayout(false);
-
         }
-
         internal TextBox txbEingabe;
         internal System.Windows.Forms.Timer Timer1x;
         internal Line Line;

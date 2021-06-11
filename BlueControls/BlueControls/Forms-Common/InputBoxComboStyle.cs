@@ -16,37 +16,24 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using BlueControls.ItemCollection;
 using System.Collections.Generic;
-
 namespace BlueControls.Forms {
     public partial class InputBoxComboStyle : DialogWithOkAndCancel {
         private string GiveBack = string.Empty;
-
         #region Konstruktor
-
         private InputBoxComboStyle() : base() => InitializeComponent();
-
         private InputBoxComboStyle(string TXT, string VorschlagsText, ItemCollectionList SuggestOriginal, bool TexteingabeErlaubt) : this() {
             cbxText.Text = VorschlagsText;
-
             var SuggestClone = (ItemCollectionList)SuggestOriginal.Clone();
-
             cbxText.Item.CheckBehavior = SuggestClone.CheckBehavior;
             cbxText.Item.AddRange(SuggestClone);
-
             cbxText.DropDownStyle = TexteingabeErlaubt ? System.Windows.Forms.ComboBoxStyle.DropDown : System.Windows.Forms.ComboBoxStyle.DropDownList;
-
             Setup(TXT, cbxText, 250, true, true);
-
             GiveBack = VorschlagsText;
         }
-
         #endregion
-
         public static string Show(string TXT, ItemCollectionList Suggest, bool TexteingabeErlaubt) => Show(TXT, string.Empty, Suggest, TexteingabeErlaubt);
-
         /// <summary>
         /// 
         /// </summary>
@@ -55,26 +42,19 @@ namespace BlueControls.Forms {
         /// <param name="SuggestOriginal">Wird geklont, es kann auch aus einer Listbox kommen, und dann stimmen die Events nicht mehr. Es muss auch einbe ItemCollection bleiben, damit aus der Datenbank auch Bilder etc. angezeigt werden können.</param>
         /// <returns></returns>
         private static string Show(string TXT, string VorschlagsText, ItemCollectionList SuggestOriginal, bool TexteingabeErlaubt) {
-
-            var MB = new InputBoxComboStyle(TXT, VorschlagsText, SuggestOriginal, TexteingabeErlaubt);
+            InputBoxComboStyle MB = new(TXT, VorschlagsText, SuggestOriginal, TexteingabeErlaubt);
             MB.ShowDialog();
-
             return MB.GiveBack;
         }
-
         public static string Show(string TXT, List<string> Suggest, bool TexteingabeErlaubt) {
-            var cSuggest = new ItemCollectionList();
+            ItemCollectionList cSuggest = new();
             cSuggest.AddRange(Suggest);
             cSuggest.Sort();
             return Show(TXT, string.Empty, cSuggest, TexteingabeErlaubt);
         }
-
         private void cbxText_ESC(object sender, System.EventArgs e) => Cancel();
-
         private void cbxText_Enter(object sender, System.EventArgs e) => Ok();
-
         private void InputComboBox_Shown(object sender, System.EventArgs e) => cbxText.Focus();
-
         protected override void SetValue(bool canceled) => GiveBack = canceled ? string.Empty : cbxText.Text;
     }
 }

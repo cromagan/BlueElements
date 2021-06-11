@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using BlueControls.Controls;
-
 namespace BlueControls.Classes_Editor
 {
     internal partial class FilterItem_Editor
@@ -20,8 +19,6 @@ namespace BlueControls.Classes_Editor
                 base.Dispose(disposing);
             }
         }
-
-
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -71,12 +68,9 @@ namespace BlueControls.Classes_Editor
             this.Name = "FilterItem_Editor";
             this.Size = new System.Drawing.Size(354, 72);
             this.ResumeLayout(false);
-
         }
-
         internal ComboBox Col;
         internal Caption Caption1;
         internal Button FiltWahl;
     }
 }
-

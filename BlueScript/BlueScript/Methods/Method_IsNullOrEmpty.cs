@@ -16,13 +16,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using Skript.Enums;
 using System.Collections.Generic;
-
 namespace BlueScript {
     internal class Method_IsNullOrEmpty : Method {
-
         public override string Description => "Gibt TRUE zurück, wenn die Variable nicht existiert, fehlerhaft ist oder keinen Inhalt hat.";
         public override string Syntax => "isNullOrEmpty(Variable)";
         public override List<string> Comand(Script s) => new() { "isnullorempty" };
@@ -32,7 +29,6 @@ namespace BlueScript {
         public override enVariableDataType Returns => enVariableDataType.Bool;
         public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_Any };
         public override bool EndlessArgs => false;
-
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             return attvar.Attributes == null

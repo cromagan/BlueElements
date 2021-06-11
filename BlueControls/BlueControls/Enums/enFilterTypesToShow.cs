@@ -16,19 +16,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using System;
-
 namespace BlueControls.Enums {
     [Flags]
     public enum enFilterTypesToShow {
-
         None = 0,
         NachDefinierterAnsicht = 1,
         AktuelleAnsicht_AktiveFilter = 2,
         NachDefinierterAnsichtStepByStep = 4,
-
         DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter = NachDefinierterAnsicht | AktuelleAnsicht_AktiveFilter
-
     }
 }

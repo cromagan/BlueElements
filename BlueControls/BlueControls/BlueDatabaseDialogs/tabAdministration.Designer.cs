@@ -1,7 +1,5 @@
 ﻿using BlueControls.Controls;
 using System.ComponentModel;
-
-
 namespace BlueControls.BlueDatabaseDialogs
 {
     partial class tabAdministration
@@ -10,7 +8,6 @@ namespace BlueControls.BlueDatabaseDialogs
         /// Erforderliche Designervariable.
         /// </summary>
         private IContainer components = null;
-
         /// <summary> 
         /// Verwendete Ressourcen bereinigen.
         /// </summary>
@@ -23,9 +20,7 @@ namespace BlueControls.BlueDatabaseDialogs
             }
             base.Dispose(disposing);
         }
-
         #region Vom Komponenten-Designer generierter Code
-
         /// <summary> 
         /// Erforderliche Methode für die Designerunterstützung. 
         /// Der Inhalt der Methode darf nicht mit dem Code-Editor geändert werden.
@@ -191,12 +186,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpTabellenAnsicht.ResumeLayout(false);
             this.grpBearbeitung.ResumeLayout(false);
             this.ResumeLayout(false);
-
         }
-
-
         #endregion
-
         internal GroupBox grpAllgemein;
         internal Button btnSpaltenUebersicht;
         private Button btnDatenbankKopf;

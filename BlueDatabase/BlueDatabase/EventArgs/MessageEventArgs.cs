@@ -16,11 +16,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 namespace BlueDatabase.EventArgs {
     public class MessageEventArgs : System.EventArgs {
         public MessageEventArgs(string message) => Message = message;
-
         public string Message { get; }
     }
 }

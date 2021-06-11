@@ -16,104 +16,70 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using BlueBasics;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-
 namespace BlueControls.Forms {
     public partial class PictureView {
         protected List<string> _FileList;
         private int _NR = -1;
         private readonly string _Title = string.Empty;
-
         public PictureView() {
-
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
-
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-
             InitWindow(false, "", -1);
         }
-
         public PictureView(List<string> FileList, bool MitScreenResize, string WindowCaption) {
-
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
             InitializeComponent();
-
             _FileList = FileList;
             LoadPic(0);
-
             InitWindow(MitScreenResize, WindowCaption, -1);
-
             ZoomIn.Checked = true;
             Auswahl.Enabled = false;
         }
-
         public PictureView(Bitmap BMP) {
-
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
             InitializeComponent();
-
             _FileList = new List<string>();
-
             InitWindow(false, "", -1);
-
             Pad.BMP = BMP;
-
             Pad.ZoomFit();
-
             ZoomIn.Checked = true;
             Auswahl.Enabled = false;
         }
-
         public PictureView(List<string> FileList, bool MitScreenResize, string WindowCaption, int OpenOnScreen) {
-
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
             InitializeComponent();
-
             _FileList = FileList;
             LoadPic(0);
-
             InitWindow(MitScreenResize, WindowCaption, OpenOnScreen);
-
             grpSeiten.Visible = FileList != null && FileList.Count > 1;
-
             ZoomIn.Checked = true;
             Auswahl.Enabled = false;
         }
-
         //public PictureView(string CodeToParse, string Title)
         //{
-
         //    // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         //    InitializeComponent();
-
         //    _FileList = null;
         //    _Title = Title;
         //    Pad.Item.Clear();
-
         //    Pad.ParseData(CodeToParse, true, true);
-
         //    var Count = 0;
-
         //    do
         //    {
         //        Count++;
         //        if (Pad.RepairAll(0, true)) { break; }
         //        if (Count > 10) { break; }
         //    } while (true);
-
         //    Pad.RepairAll(1, true);
-
         //    InitWindow(false, Title, Title, -1, Pad.SheetStyle);
         //}
-
         protected void LoadPic(int Nr) {
             _NR = Nr;
-
             if (_FileList != null && Nr < _FileList.Count) {
                 try {
                     Pad.BMP = (Bitmap)BitmapExt.Image_FromFile(_FileList[Nr]);
@@ -123,9 +89,7 @@ namespace BlueControls.Forms {
                 }
             }
             Ribbon.SelectedIndex = 1;
-
             grpSeiten.Visible = _FileList != null && _FileList.Count > 1;
-
             if (_FileList == null || _FileList.Count == 0) {
                 Links.Enabled = false;
                 Rechts.Enabled = false;
@@ -133,27 +97,19 @@ namespace BlueControls.Forms {
                 grpSeiten.Enabled = true;
                 Links.Enabled = Convert.ToBoolean(_NR > 0);
                 Rechts.Enabled = Convert.ToBoolean(_NR < _FileList.Count - 1);
-
             }
-
             Pad.ZoomFit();
-
         }
-
         private void InitWindow(bool fitWindowToBest, string windowCaption, int openOnScreen) {
             //    Me.ShowInTaskbar = False
-
             if (_FileList == null || _FileList.Count < 2) { grpSeiten.Enabled = false; }
-
             if (fitWindowToBest) {
                 if (System.Windows.Forms.Screen.AllScreens.Length == 1 || openOnScreen < 0) {
                     var OpScNr = modAllgemein.PointOnScreenNr(System.Windows.Forms.Cursor.Position);
-
                     Width = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Width / 1.5);
                     Height = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Height / 1.5);
                     Left = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Left + ((System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Width - Width) / 2.0));
                     Top = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Top + ((System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Height - Height) / 2.0));
-
                 } else {
                     Width = System.Windows.Forms.Screen.AllScreens[openOnScreen].WorkingArea.Width;
                     Height = System.Windows.Forms.Screen.AllScreens[openOnScreen].WorkingArea.Height;
@@ -161,31 +117,22 @@ namespace BlueControls.Forms {
                     Top = System.Windows.Forms.Screen.AllScreens[openOnScreen].WorkingArea.Top;
                 }
             }
-
             if (!string.IsNullOrEmpty(windowCaption)) {
                 Text = windowCaption;
             }
-
             if (Develop.IsHostRunning()) { TopMost = false; }
         }
-
         private void Links_Click(object sender, System.EventArgs e) {
-
             _NR--;
             if (_NR <= 0) { _NR = 0; }
-
             LoadPic(_NR);
         }
-
         private void Rechts_Click(object sender, System.EventArgs e) {
             _NR++;
             if (_NR >= _FileList.Count - 1) { _NR = _FileList.Count - 1; }
-
             LoadPic(_NR);
         }
-
         private void ZoomFitBut_Click(object sender, System.EventArgs e) => Pad.ZoomFit();
-
         private void Pad_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
             if (ZoomIn.Checked) { Pad.ZoomIn(e); }
             if (ZoomOut.Checked) { Pad.ZoomOut(e); }

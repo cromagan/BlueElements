@@ -16,7 +16,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 #endregion
-
 namespace BlueBasics.Enums {
     public enum enImageCode {
         None,
@@ -162,7 +161,6 @@ namespace BlueBasics.Enums {
         Zentrieren,
         ZoomFit,
         Zuschneiden
-
         ////http://www.fileformat.info/info/emoji/list.htm
         ////Emoji
         // angry,
@@ -217,7 +215,6 @@ namespace BlueBasics.Enums {
         // wink,
         // worried,
         // yum,
-
         // Globals
         // sphere
     }

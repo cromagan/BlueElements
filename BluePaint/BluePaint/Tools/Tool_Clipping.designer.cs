@@ -1,10 +1,7 @@
 ﻿using BlueControls.Controls;
 using BlueBasics.Enums;
-
 namespace BluePaint
 {
-
-
     public partial class Tool_Clipping : GenericTool
     {
         //UserControl überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
@@ -15,7 +12,6 @@ namespace BluePaint
             {
                 if (disposing)
                 {
-
                 }
             }
             finally
@@ -23,9 +19,6 @@ namespace BluePaint
                 base.Dispose(disposing);
             }
         }
-
-
-
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -130,9 +123,7 @@ namespace BluePaint
             this.Size = new System.Drawing.Size(297, 424);
             ((System.ComponentModel.ISupportInitialize)(this.PictureBox2)).EndInit();
             this.ResumeLayout(false);
-
         }
-
         internal Button ZuschnittOK;
         internal Slider Unten;
         internal Slider Oben;
@@ -141,5 +132,4 @@ namespace BluePaint
         internal Slider Links;
         internal Button AutoZ;
     }
-
 }

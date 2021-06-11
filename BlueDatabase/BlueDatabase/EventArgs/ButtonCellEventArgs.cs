@@ -16,17 +16,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using BlueBasics;
-
 namespace BlueDatabase.EventArgs {
     public class ButtonCellEventArgs : CellEventArgs {
-
         public ButtonCellEventArgs(ColumnItem Column, RowItem Row) : base(Column, Row) => Text = "Click";
-
         public string Text { get; set; }
         public bool Cecked { get; set; }
-
         public QuickImage Image { get; set; }
     }
 }

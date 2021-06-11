@@ -1,5 +1,4 @@
 ﻿using BlueControls.Controls;
-
 namespace BluePaint
 {
     partial class MainWindow : BlueControls.Forms.Form
@@ -8,7 +7,6 @@ namespace BluePaint
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
-
         /// <summary>
         /// Clean up any resources being used.
         /// </summary>
@@ -21,9 +19,7 @@ namespace BluePaint
             }
             base.Dispose(disposing);
         }
-
         #region Windows Form Designer generated code
-
         /// <summary>
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
@@ -559,9 +555,7 @@ namespace BluePaint
             this.Split.ResumeLayout(false);
             this.BLupe.ResumeLayout(false);
             this.ResumeLayout(false);
-
         }
-
         internal RibbonBar tabRibbonbar;
         internal TabPage Tab_Start;
         internal TabPage Tab_Werkzeug;

@@ -16,14 +16,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using Skript.Enums;
 using System;
 using System.Collections.Generic;
-
 namespace BlueScript {
     internal class Method_Max : Method {
-
         public override string Syntax => "Max(Value1, Value2, ...)";
         public override string Description => "Gibt den den angegeben Werten den, mit dem höchsten Wert zurück.";
         public override List<string> Comand(Script s) => new() { "max" };
@@ -33,17 +30,13 @@ namespace BlueScript {
         public override enVariableDataType Returns => enVariableDataType.Numeral;
         public override List<enVariableDataType> Args => new() { enVariableDataType.Numeral };
         public override bool EndlessArgs => true;
-
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
-
             var val = double.MinValue;
-
             foreach (var thisval in attvar.Attributes) {
                 val = Math.Max(thisval.ValueDouble, val);
             }
-
             return new strDoItFeedback(val.ToString(), enVariableDataType.Numeral);
         }
     }

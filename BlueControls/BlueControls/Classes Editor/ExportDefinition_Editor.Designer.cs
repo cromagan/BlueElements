@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using BlueControls.Controls;
-
 namespace BlueControls.Classes_Editor
 {
     internal partial class ExportDefinition_Editor 
@@ -13,7 +12,6 @@ namespace BlueControls.Classes_Editor
             {
                 if (disposing)
                 {
-
                 }
             }
             finally
@@ -21,8 +19,6 @@ namespace BlueControls.Classes_Editor
                 base.Dispose(disposing);
             }
         }
-
-
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -302,10 +298,7 @@ namespace BlueControls.Classes_Editor
             this.BlueFrame2.ResumeLayout(false);
             this.BlueFrame9.ResumeLayout(false);
             this.ResumeLayout(false);
-
         }
-
-
         private GroupBox BlueFrame3;
         private Caption Caption1;
         private ListBox lbxFilter;

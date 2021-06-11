@@ -2,10 +2,8 @@ using BlueControls.Classes_Editor;
 using BlueControls.Controls;
 using BlueControls.Forms;
 using System.Diagnostics;
-
 namespace BlueControls.BlueDatabaseDialogs
 {
-
     internal sealed partial class DatabaseHeadEditor : Form
     {
         //Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
@@ -17,9 +15,6 @@ namespace BlueControls.BlueDatabaseDialogs
             }
             base.Dispose(disposing);
         }
-
-
-
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -340,11 +335,11 @@ namespace BlueControls.BlueDatabaseDialogs
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.GlobalTab.Controls.Add(this.Tab_Allgemein);
-            this.GlobalTab.Controls.Add(this.Tab_Undo);
             this.GlobalTab.Controls.Add(this.Tab_Regeln);
-            this.GlobalTab.Controls.Add(this.Tab_Backup);
             this.GlobalTab.Controls.Add(this.Tab_Rechte);
             this.GlobalTab.Controls.Add(this.Tab_Sortierung);
+            this.GlobalTab.Controls.Add(this.Tab_Backup);
+            this.GlobalTab.Controls.Add(this.Tab_Undo);
             this.GlobalTab.Controls.Add(this.Tab_Expermimentell);
             this.GlobalTab.HotTrack = true;
             this.GlobalTab.Location = new System.Drawing.Point(0, 0);

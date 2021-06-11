@@ -1,5 +1,4 @@
 ﻿using System.Drawing;
-
 namespace BlueControls.Forms
 {
     partial class EditBoxFlexiControl
@@ -8,7 +7,6 @@ namespace BlueControls.Forms
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
-
         /// <summary>
         /// Clean up any resources being used.
         /// </summary>
@@ -21,9 +19,7 @@ namespace BlueControls.Forms
             }
             base.Dispose(disposing);
         }
-
         #region Windows Form Designer generated code
-
         /// <summary>
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
@@ -37,11 +33,7 @@ namespace BlueControls.Forms
             this.ClientSize = new System.Drawing.Size(264, 153);
             this.Name = "EditBoxFlexiControl";
             this.ResumeLayout(false);
-
         }
-
-
         #endregion
-
     }
 }

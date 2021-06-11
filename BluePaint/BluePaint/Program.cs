@@ -16,10 +16,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using System;
 using System.Globalization;
-
 namespace BluePaint {
     internal static class Program {
         /// <summary>
@@ -27,7 +25,7 @@ namespace BluePaint {
         /// </summary>
         [STAThread]
         private static void Main() {
-            var culture = new CultureInfo("de-DE");
+            CultureInfo culture = new("de-DE");
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
             System.Windows.Forms.Application.EnableVisualStyles();

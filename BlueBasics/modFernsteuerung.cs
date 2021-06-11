@@ -16,13 +16,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 #endregion
-
 using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
-
 namespace BlueBasics {
     public static partial class modFernsteuerung {
         [DllImport("user32", EntryPoint = "GetClassNameA", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
@@ -39,13 +37,10 @@ namespace BlueBasics {
         private static extern IntPtr GetTopWindow(IntPtr hWnd);
         [DllImport("user32", EntryPoint = "GetWindowModuleFileNameA", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         private static extern int GetWindowModuleFileName(IntPtr hWnd, string pszFileName, int cchFileNameMax);
-
         [DllImport("user32", EntryPoint = "ShowWindow", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         public static extern int ShowWindow(IntPtr hWnd, int nCmdShow);
-
         [DllImport("user32", EntryPoint = "GetWindow", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         private static extern IntPtr GetWindow(IntPtr hwnd, int wCmd);
-
         /// <summary>
         /// Setzt ein Fenster an eine andere Position
         /// </summary>
@@ -60,10 +55,8 @@ namespace BlueBasics {
         /// <remarks></remarks>
         [DllImport("user32", EntryPoint = "SetWindowPos", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         private static extern int SetWindowPos(IntPtr hWnd, int hWndInsertAfter, int x, int y, int cx, int cy, int wFlags);
-
         [DllImport("user32", EntryPoint = "GetWindowRect", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         private static extern int GetWindowRect(IntPtr hWnd, ref Rectangle lpRect);
-
         /// <summary>
         ///  Liest den Titel der Anwendung aus.
         /// </summary>
@@ -74,10 +67,8 @@ namespace BlueBasics {
             var l = GetWindowTextLength(handle) + 1;
             var buffer = string.Empty.PadRight(l);
             _ = GetWindowText(handle, buffer, l);
-
             return buffer.Substring(0, buffer.Length);
         }
-
         /// <summary>
         /// Liest den KlassenNames aus.
         /// </summary>
@@ -87,12 +78,9 @@ namespace BlueBasics {
         public static string WinClass(IntPtr handle) {
             var buffer = string.Empty.PadRight(250); // = Space(250)
             var l = GetClassName(handle, buffer, 250);
-
             // If String.IsNullOrEmpty(buffer) Then Return String.Empty
-
             return buffer.Substring(0, l);
         }
-
         /// <summary>
         /// Liest den vollständigen Pfad und den Exe-Dateinamen aus.
         /// </summary>
@@ -102,15 +90,12 @@ namespace BlueBasics {
         public static string WinExeName(IntPtr handle) {
             var buffer = string.Empty.PadRight(250);
             var l = GetWindowModuleFileName(handle, buffer, 250);
-
             if (l > 0) {
                 buffer = buffer.Substring(0, l);
                 return buffer.Substring(buffer.Length - 1) == "\0" ? buffer.Substring(0, buffer.Length - 1) : buffer;
             }
-
             return string.Empty;
         }
-
         /// <summary>
         /// Liest Informationen des Zielfensters aus
         /// </summary>
@@ -121,33 +106,27 @@ namespace BlueBasics {
             //    wDescr = Nothing
             //    Exit Sub
             // End If
-
             // Dim PridA As Integer
-
             var prid = 0;
             var hParent = GetAncestor(wDescr.MainWindowHandle);
-
             GetWindowThreadProcessId(hParent, ref prid);
-
             wDescr.MainWindowTitle = WinTitle(wDescr.MainWindowHandle);
             wDescr.Klasse = WinClass(wDescr.MainWindowHandle);
             wDescr.ExeName = WinExeName(wDescr.MainWindowHandle);
             wDescr.prid = prid;
         }
-
         /// <summary>
         /// Diese Funktion Sucht alle offenen Fenster.
         /// </summary>
         /// <returns></returns>
         /// <remarks></remarks>
         public static List<strProcess> exProzesse() {
-            var wDescr = new List<strProcess>();
+            List<strProcess> wDescr = new();
             var hh = GetTopWindow((IntPtr)0);
-
             while (true) {
                 hh = GetWindow(hh, 2);
                 if (hh.ToInt32() != 0) {
-                    var l = new strProcess {
+                    strProcess l = new() {
                         MainWindowHandle = hh
                     };
                     GetWindowInfo(ref l);
@@ -157,7 +136,6 @@ namespace BlueBasics {
                 }
             }
         }
-
         public static IntPtr GetAncestor(IntPtr hWnd) {
             var hw = hWnd;
             IntPtr hParent;
@@ -167,21 +145,15 @@ namespace BlueBasics {
             } while (hParent.ToInt32() != 0);
             return hw;
         }
-
         public static void FensterPosSetzen(IntPtr handle, int left, int top) {
-            var r = new Rectangle();
+            Rectangle r = new();
             GetWindowRect(handle, ref r);
-
             if (r.Width == 0) { return; }
             if (r.Height == 0) { return; }
-
             SetWindowPos(handle, 0, left, top, r.Width - r.Left, r.Height - r.Top, 0);
         }
-
         public static void FensterMinimieren(IntPtr handle) => ShowWindow(handle, (int)enSW.ShowMinimized);
-
         public static void FensterMaximieren(IntPtr handle) => ShowWindow(handle, (int)enSW.ShowMaximized);
-
         public static void FensterRestore(IntPtr handle) => ShowWindow(handle, (int)enSW.Restore);
     }
 }

@@ -16,23 +16,16 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using BlueBasics;
 using BlueControls.EventArgs;
 using System.Drawing;
-
 namespace BluePaint {
     public partial class Tool_Paint {
-
-        public Tool_Paint() : base() {
-            InitializeComponent();
-        }
-
+        public Tool_Paint() : base() => InitializeComponent();
         public override void MouseDown(MouseEventArgs1_1 e, Bitmap OriginalPic) {
             OnForceUndoSaving();
             MouseMove(new MouseEventArgs1_1DownAndCurrent(e, e), OriginalPic);
         }
-
         public override void MouseMove(MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) {
             if (e.Current.Button == System.Windows.Forms.MouseButtons.Left) {
                 var _Pic = OnNeedCurrentPic();
@@ -42,7 +35,6 @@ namespace BluePaint {
                 OnDoInvalidate();
             }
         }
-
         public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic) {
             var c = Color.FromArgb(50, 255, 0, 0);
             e.FillCircle(c, e.Current.TrimmedX, e.Current.TrimmedY, 2);

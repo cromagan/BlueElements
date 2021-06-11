@@ -4,11 +4,8 @@ using System.Drawing;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Forms;
-
 namespace BlueControls.BlueDatabaseDialogs
 {
-
-
     public sealed partial class Filter
     {
         //Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
@@ -17,13 +14,9 @@ namespace BlueControls.BlueDatabaseDialogs
         {
             if (disposing)
             {
-
             }
             base.Dispose(disposing);
         }
-
-
-
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -56,9 +49,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Text = "Filter";
             this.TopMost = true;
             this.ResumeLayout(false);
-
         }
-
         private Filterleiste filterleiste;
     }
 }

@@ -1,9 +1,7 @@
 using System.Diagnostics;
 using BlueControls.Controls;
-
 namespace BlueControls.Forms
 {
-
     public partial class PictureView : Form
         {
 			//Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
@@ -12,12 +10,9 @@ namespace BlueControls.Forms
 			{
 				if (disposing )
 				{
-				
 				}
 				base.Dispose(disposing);
 			}
-
-
 			//Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
 			//Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
 			//Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -172,7 +167,6 @@ namespace BlueControls.Forms
             this.tabPageControl.ResumeLayout(false);
             this.grpWerkzeuge.ResumeLayout(false);
             this.ResumeLayout(false);
-
 			}
 			private Button Links;
 			private Button Rechts;

@@ -16,10 +16,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 namespace BlueDatabase.EventArgs {
     public class FilterEventArgs : System.EventArgs {
-
         public FilterEventArgs(FilterItem Filter) => this.Filter = Filter;
         public FilterItem Filter { get; set; }
     }

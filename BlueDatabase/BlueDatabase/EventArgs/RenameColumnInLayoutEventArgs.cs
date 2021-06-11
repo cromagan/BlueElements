@@ -16,7 +16,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 namespace BlueDatabase.EventArgs {
     public class GenerateLayoutInternalEventargs : System.EventArgs {
         public GenerateLayoutInternalEventargs(RowItem row, string layoutID, string SaveTo) {
@@ -25,7 +24,6 @@ namespace BlueDatabase.EventArgs {
             Filename = SaveTo;
             Handled = false;
         }
-
         public bool Handled { get; set; }
         public RowItem Row { get; set; }
         public string LayoutID { get; set; }

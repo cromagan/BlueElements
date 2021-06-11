@@ -16,12 +16,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 #endregion
-
 namespace BlueBasics.Interfaces {
     public interface IParseable : IChangedFeedback {
         void Parse(string toParse);
         string ToString();
-
         bool IsParsing { get; }
     }
 }

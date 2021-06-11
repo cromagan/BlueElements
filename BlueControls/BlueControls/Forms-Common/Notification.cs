@@ -16,62 +16,43 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using BlueBasics;
 using BlueBasics.Enums;
 using System;
 using System.Drawing;
-
 namespace BlueControls.Forms {
     public partial class Notification : FloatingForm {
-
         private int _Timer_Tick_count;
         private bool _Timer_Tick_WasVisible;
         private DateTime _FirstTimer; // Startzeit für UnloadAfterSek
         private const int UpDownSpeed = 250;
-
         //internal int UnloadAfterSek = -999;
         internal int FloatInAndOutMilliSek = -999;
-
         private Notification() : base(Enums.enDesign.Form_DesktopBenachrichtigung) => InitializeComponent();
-
         private Notification(string Text) : this() {
             //InitializeComponent();
-
             capTXT.Text = Text;
-
             var He = Math.Min(capTXT.TextRequiredSize().Height, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height * 0.7));
             var Wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
-
             Size = new Size(Wi + (capTXT.Left * 2), He + (capTXT.Top * 2));
-
             Location = new Point(-Width - 10, Height - 10);
             FloatInAndOutMilliSek = Math.Max(3200, Text.Length * 110);
-
             timNote.Enabled = true;
             _FirstTimer = DateTime.Now;
-
         }
-
         public static void Show(string Text) {
             CloseAll();
             if (string.IsNullOrEmpty(Text)) { return; }
-            var x = new Notification(Text);
+            Notification x = new(Text);
             x.Show();
         }
-
         public static void Show(string TXT, enImageCode Pic) {
-
             if (Pic != enImageCode.None) {
                 TXT = "<ImageCode=" + Enum.GetName(Pic.GetType(), Pic) + "|32> <zbx_store><top>" + TXT;
             }
-
             Show(TXT);
-
         }
-
         public static void CloseAll() {
-
             foreach (var ThisForm in AllBoxes) {
                 if (!ThisForm.IsDisposed && ThisForm is Notification) {
                     try {
@@ -84,9 +65,7 @@ namespace BlueControls.Forms {
                 }
             }
         }
-
         public new void Close() {
-
             foreach (var ThisForm in AllBoxes) {
                 if (!ThisForm.IsDisposed && ThisForm is Notification) {
                     try {
@@ -98,11 +77,9 @@ namespace BlueControls.Forms {
                 }
             }
         }
-
         private void timNote_Tick(object sender, System.EventArgs e) {
             var MS = DateTime.Now.Subtract(_FirstTimer).TotalMilliseconds;
             _Timer_Tick_count++;
-
             if (Tag is System.Windows.Forms.Control tempVar) {
                 if (!tempVar.Visible) {
                     _Timer_Tick_count = 0;
@@ -110,7 +87,6 @@ namespace BlueControls.Forms {
                     return;
                 }
             }
-
             if (FloatInAndOutMilliSek > 0) {
                 // Da das System oft ausgelastet ist, erst ein paar Dummy-Leerläufe, daß das Fenster dann angezeigt wird, wenn das System Luft hat
                 if (_Timer_Tick_count == 6) {
@@ -119,20 +95,17 @@ namespace BlueControls.Forms {
                 }
                 if (_Timer_Tick_count < 7) { return; }
             }
-
             if (FloatInAndOutMilliSek > 0) {
                 if (MS > UpDownSpeed + (FloatInAndOutMilliSek * 0.3) && !_Timer_Tick_WasVisible) {
                     _FirstTimer = DateTime.Now.Subtract(new TimeSpan(0, 0, 0, 0, UpDownSpeed));
                     MS = UpDownSpeed;
                 }
-
                 double _Proz;
                 if (MS < UpDownSpeed) {
                     _Proz = MS / UpDownSpeed;
                 } else if (MS >= UpDownSpeed && MS <= UpDownSpeed + FloatInAndOutMilliSek) {
                     _Proz = 1;
                     _Timer_Tick_WasVisible = true;
-
                 } else if (MS > UpDownSpeed + FloatInAndOutMilliSek && MS < FloatInAndOutMilliSek + (UpDownSpeed * 2)) {
                     _Proz = (FloatInAndOutMilliSek + (UpDownSpeed * 2) - MS) / UpDownSpeed;
                     //Going = true;
@@ -142,21 +115,17 @@ namespace BlueControls.Forms {
                     Close();
                     return;
                 }
-
                 Left = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width - Width - (Skin.Padding * 2);
                 Region = new Region(new Rectangle(0, 0, Width, (int)Math.Truncate(Height * _Proz)));
                 Top = (int)Math.Truncate(System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - (Height * _Proz));
                 Opacity = _Proz;
-
             }
         }
-
         //private void _Timer_Tick(object sender, System.EventArgs e)
         //{
         //    var MS = DateTime.Now.Subtract(_FirstTimer).TotalMilliseconds;
         //    var Going = false;
         //    _Timer_Tick_count++;
-
         //    if (Tag is System.Windows.Forms.Control tempVar)
         //    {
         //        if (!tempVar.Visible)
@@ -166,7 +135,6 @@ namespace BlueControls.Forms {
         //            return;
         //        }
         //    }
-
         //    if (FloatInAndOutMilliSek > 0)
         //    {
         //        // Da das System oft ausgelastet ist, erst ein paar Dummy-Leerläufe, daß das Fenster dann angezeigt wird, wenn das System Luft hat
@@ -177,7 +145,6 @@ namespace BlueControls.Forms {
         //        }
         //        if (_Timer_Tick_count < 7) { return; }
         //    }
-
         //    if (UnloadAfterSek > 0)
         //    {
         //        if (DateTime.Now.Subtract(_FirstTimer).TotalSeconds > UnloadAfterSek)
@@ -187,17 +154,14 @@ namespace BlueControls.Forms {
         //            return;
         //        }
         //    }
-
         //    if (FloatInAndOutMilliSek > 0)
         //    {
         //        double _Proz = 0;
-
         //        if (MS > UpDownSpeed + FloatInAndOutMilliSek * 0.3 && !_Timer_Tick_WasVisible)
         //        {
         //            _FirstTimer = DateTime.Now.Subtract(new TimeSpan(0, 0, 0, 0, UpDownSpeed));
         //            MS = UpDownSpeed;
         //        }
-
         //        if (MS < UpDownSpeed)
         //        {
         //            _Proz = MS / UpDownSpeed;
@@ -206,7 +170,6 @@ namespace BlueControls.Forms {
         //        {
         //            _Proz = 1;
         //            _Timer_Tick_WasVisible = true;
-
         //        }
         //        else if (MS > UpDownSpeed + FloatInAndOutMilliSek && MS < FloatInAndOutMilliSek + UpDownSpeed * 2)
         //        {
@@ -219,7 +182,6 @@ namespace BlueControls.Forms {
         //            Close();
         //            return;
         //        }
-
         //        if (this.Design == enDesign.Form_DesktopBenachrichtigung)
         //        {
         //            Left = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width - Width - Skin.Padding * 2;
@@ -235,20 +197,16 @@ namespace BlueControls.Forms {
         //                Top -= (int)((1 - _Proz) * 5);
         //            }
         //        }
-
         //    }
         //}
-
         public void FadeOut() {
             if (FloatInAndOutMilliSek > 300) {
                 if (DateTime.Now.Subtract(_FirstTimer).TotalMilliseconds > UpDownSpeed && DateTime.Now.Subtract(_FirstTimer).TotalMilliseconds < FloatInAndOutMilliSek + UpDownSpeed) {
                     _FirstTimer = DateTime.Now.Subtract(new TimeSpan(0, 0, 0, 0, UpDownSpeed + 10));
                 }
-
                 FloatInAndOutMilliSek = 300;
             }
         }
-
         private void capTXT_Click(object sender, System.EventArgs e) => FadeOut();
     }
 }

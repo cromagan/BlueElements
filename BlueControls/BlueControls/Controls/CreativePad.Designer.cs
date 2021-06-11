@@ -1,14 +1,9 @@
 ﻿using System.Diagnostics;
 using System.Drawing.Printing;
-
-
 namespace BlueControls.Controls
 {
     public partial class CreativePad 
-
     {
-
-
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -54,7 +49,6 @@ namespace BlueControls.Controls
             // 
             this.Size = new System.Drawing.Size(498, 362);
             this.ResumeLayout(false);
-
         }
         private System.Windows.Forms.PrintPreviewDialog PrintPreviewDialog1;
         private PrintDocument DruckerDokument;

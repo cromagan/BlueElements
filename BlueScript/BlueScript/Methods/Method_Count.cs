@@ -16,15 +16,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using Skript.Enums;
 using System.Collections.Generic;
-
 namespace BlueScript {
     internal class Method_Count : Method {
-
         public override string Syntax => "Count(List-Variable)";
-
         public override string Description => "Gibt die Anzahl der Elemente der Liste zurück.";
         public override List<string> Comand(Script s) => new() { "count" };
         public override string StartSequence => "(";
@@ -33,7 +29,6 @@ namespace BlueScript {
         public override enVariableDataType Returns => enVariableDataType.Numeral;
         public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List };
         public override bool EndlessArgs => false;
-
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             return !string.IsNullOrEmpty(attvar.ErrorMessage)

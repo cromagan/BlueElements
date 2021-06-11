@@ -16,29 +16,21 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using BlueControls.ItemCollection;
 using System.Collections.Generic;
-
 namespace BlueControls.EventArgs {
     public class ContextMenuInitEventArgs : System.EventArgs {
-
         public ContextMenuInitEventArgs(object hotItem, List<string> tags, ItemCollectionList userMenu) {
             UserMenu = userMenu;
             HotItem = hotItem;
             Tags = tags;
             Translate = true;
             Cancel = false;
-
         }
         public bool Cancel { get; }
-
         public bool Translate { get; }
-
         public ItemCollectionList UserMenu { get; }
-
         public object HotItem { get; }
-
         public List<string> Tags { get; }
     }
 }

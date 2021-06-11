@@ -16,12 +16,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 namespace BlueDatabase.EventArgs {
     public class BeforeNewValueEventArgs : CellCancelEventArgs {
         //   ColumnItem Column, RowItem Row, Point MousePos, string NewVal, ref string CancelReason
         public BeforeNewValueEventArgs(ColumnItem column, RowItem row, string newVal, string cancelReason) : base(column, row, cancelReason) => NewVal = newVal;
-
         public string NewVal { get; }
     }
 }

@@ -16,28 +16,20 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
 using System.Drawing;
-
 namespace BlueControls.ItemCollection {
     public class TextListItem : BasicListItem {
-
         #region  Variablen-Deklarationen 
         private string _ReadableText;
         private QuickImage _Symbol;
         //private readonly enDataFormat _Format = enDataFormat.Text;
-
         #endregion
-
         #region  Event-Deklarationen + Delegaten 
-
         #endregion
-
         #region  Construktor + Initialize 
-
         public TextListItem(string readableText, string internalname, QuickImage symbol, bool isCaption, bool enabled, string userDefCompareKey) : base(internalname) {
             IsCaption = isCaption;
             _ReadableText = readableText;
@@ -46,13 +38,9 @@ namespace BlueControls.ItemCollection {
             //_Format = format;
             UserDefCompareKey = userDefCompareKey;
         }
-
         #endregion
-
         #region  Properties 
-
         public override string QuickInfo => _ReadableText.CreateHtmlCodes(true);
-
         public string Text {
             get => _ReadableText;
             set {
@@ -61,7 +49,6 @@ namespace BlueControls.ItemCollection {
                 //OnChanged();
             }
         }
-
         public QuickImage Symbol {
             get => _Symbol;
             set {
@@ -70,9 +57,7 @@ namespace BlueControls.ItemCollection {
                 //OnChanged();
             }
         }
-
         #endregion
-
         private enDesign tempDesign(enDesign itemdesign) {
             if (IsCaption) {
                 switch (itemdesign) {
@@ -82,33 +67,22 @@ namespace BlueControls.ItemCollection {
                         return enDesign.Item_Listbox_Caption;
                 }
             }
-
             return itemdesign;
         }
-
         protected override Size ComputeSizeUntouchedForListBox() => Skin.FormatedText_NeededSize(_ReadableText, _Symbol, Skin.GetBlueFont(tempDesign(Parent.ItemDesign), enStates.Standard), 16);
-
         protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign design, enStates vState, bool DrawBorderAndBack, bool Translate) {
-
             var tmpd = tempDesign(design);
-
             if (DrawBorderAndBack) {
                 Skin.Draw_Back(GR, tmpd, vState, PositionModified, null, false);
             }
-
             Skin.Draw_FormatedText(GR, _ReadableText, tmpd, vState, _Symbol, enAlignment.VerticalCenter_Left, PositionModified, null, false, Translate);
-
             if (DrawBorderAndBack) {
                 Skin.Draw_Border(GR, tmpd, vState, PositionModified);
             }
         }
-
         protected override string GetCompareKey() => DataFormat.CompareKey(Internal, enDataFormat.Text);
-
         public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) => SizeUntouchedForListBox().Height;
-
         public override void CloneToNewCollection(ItemCollectionList newParent) => CloneToNewCollection(newParent, new TextListItem(_ReadableText, Internal, _Symbol, IsCaption, _Enabled, UserDefCompareKey));
-
         public override bool FilterMatch(string FilterText) => base.FilterMatch(FilterText) || _ReadableText.ToUpper().Contains(FilterText.ToUpper());
     }
 }

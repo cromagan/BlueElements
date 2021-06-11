@@ -16,25 +16,19 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using System;
-
 namespace BlueControls.Enums {
     public enum enRahmenArt {
         Unbekannt = -1,
         Ohne = 0,
-
         Solide_1px = 100,
         Solide_1px_FocusDotLine = 105,
         Solide_3px = 110,
-
         [Obsolete]
         Solide_1px_DuoColor = 120,
         [Obsolete]
         Solide_1px_DuoColor_NurOben = 121,
-
         FocusDotLine = 150,
-
         [Obsolete]
         ShadowBox = 160
     }

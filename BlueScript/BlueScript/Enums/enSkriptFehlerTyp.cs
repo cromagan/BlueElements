@@ -16,22 +16,16 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 namespace Skript.Enums {
-
     public enum enSkriptFehlerTyp {
-
         ohne = 0,
         FalscherDatentyp = 1,
         AttributAnzahl = 2,
-
         /// <summary>
         /// Es ist eine Rechenformel / BoolscheOperation vorhanden und diese ist Fehgeschlagen
         /// </summary>
         BerechnungFehlgeschlagen = 3,
-
         VariableNichtGefunden = 4,
         VariableErwartet = 5
-
     }
 }

@@ -1,7 +1,6 @@
 using BlueControls.Forms;
 using System.Diagnostics;
 using System.Drawing;
-
 namespace BlueControls
 {
     public sealed partial class ScreenShot : Form
@@ -12,13 +11,9 @@ namespace BlueControls
         {
             if (disposing )
             {
-
             }
             base.Dispose(disposing);
         }
-
-
-
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.

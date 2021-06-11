@@ -1,15 +1,11 @@
 ﻿using System.Diagnostics;
-
 namespace BlueControls.Controls
 {
     public partial class Formula
     {
         // Inherits Windows.Forms.UserControl
-
-
         //Wird vom Windows Form-Designer benötigt.
         //private IContainer components;
-
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -334,7 +330,6 @@ namespace BlueControls.Controls
             this.x2.ResumeLayout(false);
             this.x1.ResumeLayout(false);
             this.ResumeLayout(false);
-
         }
         private GroupBox Editor;
         private Button SUnten;
@@ -363,7 +358,5 @@ namespace BlueControls.Controls
         private ComboBox cbxControlType;
         private TabControl Tabs;
         private System.Windows.Forms.ColorDialog ColDiax;
-
-
     }
 }

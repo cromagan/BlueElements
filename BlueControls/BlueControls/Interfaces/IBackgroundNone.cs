@@ -16,12 +16,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 namespace BlueControls.Interfaces {
     /// <summary>
     /// Wird verwendet, wenn das Steuerelement sich selbst zeichnet und nicht als Container vorgesehen ist.
     /// </summary>
     public interface IBackgroundNone {
-
     }
 }

@@ -6,7 +6,6 @@
         /// Erforderliche Designervariable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
-
         /// <summary>
         /// Verwendete Ressourcen bereinigen.
         /// </summary>
@@ -19,9 +18,7 @@
             }
             base.Dispose(disposing);
         }
-
         #region Vom Komponenten-Designer generierter Code
-
         /// <summary>
         /// Erforderliche Methode für die Designerunterstützung. 
         /// Der Inhalt der Methode darf nicht mit dem Code-Editor geändert werden.
@@ -30,7 +27,6 @@
         {
             components = new System.ComponentModel.Container();
         }
-
         #endregion
     }
 }

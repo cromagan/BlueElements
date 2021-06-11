@@ -16,12 +16,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 #endregion
-
 namespace BlueBasics.EventArgs {
     public class NeedImageEventArgs : System.EventArgs {
         public string Name { get; }
         public BitmapExt BMP { get; set; }
-
         public NeedImageEventArgs(string name) {
             Name = name;
             BMP = null;

@@ -6,7 +6,6 @@
         /// Erforderliche Designervariable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
-
         /// <summary> 
         /// Verwendete Ressourcen bereinigen.
         /// </summary>
@@ -19,9 +18,7 @@
             }
             base.Dispose(disposing);
         }
-
         #region Vom Komponenten-Designer generierter Code
-
         /// <summary> 
         /// Erforderliche Methode für die Designerunterstützung. 
         /// Der Inhalt der Methode darf nicht mit dem Code-Editor geändert werden.
@@ -142,11 +139,8 @@
             this.SizeChanged += new System.EventHandler(this.Filterleiste_SizeChanged);
             ((System.ComponentModel.ISupportInitialize)(this.pic)).EndInit();
             this.ResumeLayout(false);
-
         }
-
         #endregion
-
         private Controls.Button btnTextLöschen;
         private Controls.TextBox txbZeilenFilter;
         private Controls.Button btnAlleFilterAus;

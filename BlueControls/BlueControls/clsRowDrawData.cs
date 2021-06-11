@@ -16,14 +16,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using BlueDatabase;
 using System.Collections.Generic;
 using System.Drawing;
-
 namespace BlueControls.Controls {
     public class clsRowDrawData {
-
         public RowItem Row;
         public bool Pinned;
         public int Y;
@@ -31,7 +28,6 @@ namespace BlueControls.Controls {
         public bool Expanded;
         public Rectangle CaptionPos;
         public int DrawHeight;
-
         public clsRowDrawData(RowItem row) {
             Row = row;
             Pinned = false;
@@ -42,17 +38,13 @@ namespace BlueControls.Controls {
             CaptionPos = Rectangle.Empty;
         }
     }
-
     public static class clsRowDrawDataExtensions {
-
         public static clsRowDrawData Get(this List<clsRowDrawData> l, RowItem row) {
-
             foreach (var thisr in l) {
                 if (thisr.Row == row) { return thisr; }
             }
             return null;
         }
-
         //public static int IndexOf(this List<clsRowDrawData> l, RowItem row) {
         //    for (var z = 0; z < l.Count; z++) {
         //        if (l[z].Row == row) { return z; }

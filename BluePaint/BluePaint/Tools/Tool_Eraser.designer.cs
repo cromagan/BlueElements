@@ -2,11 +2,8 @@
 using BlueControls;
 using BlueBasics.Enums;
 using BlueControls.Enums;
-
 namespace BluePaint
 {
-
-
     public partial class Tool_Eraser 
     {
         //UserControl überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
@@ -17,7 +14,6 @@ namespace BluePaint
             {
                 if (disposing)
                 {
-
                 }
             }
             finally
@@ -25,9 +21,6 @@ namespace BluePaint
                 base.Dispose(disposing);
             }
         }
-
-
-
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -84,12 +77,9 @@ namespace BluePaint
             this.Name = "Tool_Eraser";
             this.Size = new System.Drawing.Size(419, 274);
             this.ResumeLayout(false);
-
         }
-
         internal Button Razi;
         internal Button DrawBox;
         internal Button Eleminate;
     }
-
 }

@@ -17,18 +17,15 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 using System;
-
 namespace BlueDatabase.Enums {
     public enum enDatabaseDataType : byte {
         // Fehler = 0
-
         Version = 1,
         CryptionState = 2,
         CryptionTest = 3,
         //InBearbeitung = 3,
         //CheckOutTime = 4,
         //CheckOutUser = 5,
-
         // Zugriffanzahl = 6
         // TotalSperrbit = 7
         // TotalSperrer = 8
@@ -87,7 +84,6 @@ namespace BlueDatabase.Enums {
         ZeilenQuickInfo = 66,
         RulesScript = 67,
         AdditionaFilesPfad = 68,
-
         Info_ColumDataSart = 100,
         Info_ColumnDataEnd = 199,
         co_Name = 100,
@@ -124,10 +120,8 @@ namespace BlueDatabase.Enums {
         // co_FehlerWennSpalteBefüllt_Spalte = 132
         // co_FehlerWennFalschesFormat = 133
         // co_FehlerBeiUnerlaubtenZeichen = 136
-
         co_CellInitValue = 134,
         co_AllowedChars = 135,
-
         co_AdminInfo = 137,
         co_AutoFilterErlaubt_alt = 138,
         co_AutoFilterTextFilterErlaubt_alt = 139,
@@ -144,7 +138,6 @@ namespace BlueDatabase.Enums {
         // co_ÜberschriftErsatz = 150
         co_Identifier = 151,
         co_CompactView_alt = 152,
-
         co_ShowMultiLineInOneLine = 153,
         co_EditTrotzSperreErlaubt = 154,
         co_ShowUndo = 155,
@@ -154,7 +147,6 @@ namespace BlueDatabase.Enums {
         [Obsolete]
         co_CaptionBitmap = 159,
         co_Suffix = 160,
-
         co_AfterEdit_DoUcase = 161,
         co_AfterEdit_AutoCorrect = 162,
         co_AutoFilterJoker = 163,
@@ -193,27 +185,22 @@ namespace BlueDatabase.Enums {
         co_AfterEdit_AutoReplace = 195,
         co_FilterOptions = 196,
         co_CaptionBitmapTXT = 197,
-
         ce_Value_withoutSizeData = 200,
         ce_Value_withSizeData = 201,
-
         [Obsolete]
         ce_UTF8Value_withoutSizeData = 202,
         [Obsolete]
         ce_UTF8Value_withSizeData = 203,
         //Dummy_ce_ValueWithoutSizeUncrypted = 204,
-
         dummyComand_RemoveRow = 220,
         dummyComand_AddRow = 221,
         //	dummyComand_AddUndo = 222,
         dummyComand_RemoveColumn = 223,
         AddColumn = 224,
-
         UndoCount = 249,
         //PendingsInOne = 250,
         UndoInOne = 251,
         //   StatisticInOneOld = 252
-
         //StatisticOld = 253
         //UndoOld = 254
         EOF = 255

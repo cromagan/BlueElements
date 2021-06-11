@@ -16,41 +16,32 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using BlueBasics;
 using System;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Windows.Forms.Design;
-
 namespace BlueControls.Designer_Support {
     public sealed class QuickPicSelector : UITypeEditor {
         private IWindowsFormsEditorService edSvc;
         private readonly frmQuickPic fqp = new();
         private string C;
-
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value) {
-
             edSvc = (IWindowsFormsEditorService)provider.GetService(typeof(IWindowsFormsEditorService));
-
             C = Convert.ToString(value);
             fqp.StartAll(C);
-
             //we add handler to the about form button1 in order to close the form when the button is clicked
             fqp.ButOK.Click += Click;
             Develop.Debugprint_BackgroundThread();
             edSvc.DropDownControl(fqp);
-
             return C;
         }
-
         private void Click(object sender, System.EventArgs e) {
             if (edSvc != null) {
                 C = fqp.ICode();
                 edSvc.CloseDropDown();
             }
         }
-
         public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context) => UITypeEditorEditStyle.Modal;
     }
 }

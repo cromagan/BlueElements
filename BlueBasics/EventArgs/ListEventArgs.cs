@@ -16,13 +16,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 #endregion
-
 namespace BlueBasics.EventArgs {
     public class ListEventArgs : System.EventArgs {
         public object Item { get; }
-
-        public ListEventArgs(object item) {
-            Item = item;
-        }
+        public ListEventArgs(object item) => Item = item;
     }
 }

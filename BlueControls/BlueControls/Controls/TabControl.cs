@@ -16,12 +16,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using BlueControls.Enums;
-
 namespace BlueControls.Controls {
     public class TabControl : AbstractTabControl {
-
         public TabControl() : base() => BackColor = Skin.Color_Back(enDesign.TabStrip_Body, enStates.Standard);
     }
 }

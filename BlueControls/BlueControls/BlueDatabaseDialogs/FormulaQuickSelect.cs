@@ -16,7 +16,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -24,32 +23,20 @@ using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
-
 namespace BlueControls.BlueDatabaseDialogs {
-
     public partial class FormulaQuickSelect {
-
         private readonly RowItem Row;
-
         public FormulaQuickSelect(RowItem RowItem) {
-
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
-
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             Row = RowItem;
         }
-
         private void Such_TextChanged(object sender, System.EventArgs e) {
-
             Auswahl.Item.Clear();
-
             var t = Such.Text;
-
             if (string.IsNullOrEmpty(t)) { return; }
-
             t = t.ToLower();
-
             foreach (var ThisColumn in Row.Database.Column) {
                 if (ThisColumn != null) {
                     if (ThisColumn.EditType is enEditTypeFormula.SwapListBox or enEditTypeFormula.Listbox or enEditTypeFormula.Textfeld_mit_Auswahlknopf) {
@@ -58,18 +45,13 @@ namespace BlueControls.BlueDatabaseDialogs {
                                 var ThisView = Formula.SearchColumnView(ThisColumn);
                                 if (ThisView != null) {
                                     if (Row.Database.PermissionCheck(ThisView.PermissionGroups_Show, null)) {
-                                        var dummy = new ItemCollectionList();
-
+                                        ItemCollectionList dummy = new();
                                         ItemCollectionList.GetItemCollection(dummy, ThisColumn, Row, enShortenStyle.Replaced, 1000);
                                         if (dummy.Count > 0) {
-
                                             foreach (var thisItem in dummy) {
-
                                                 if (thisItem.Internal.ToLower().Contains(t)) {
-
                                                     var ni = Auswahl.Item.Add(ThisColumn.ReadableText() + ": " + thisItem.Internal, ThisColumn.Name.ToUpper() + "|" + thisItem.Internal);
                                                     ni.Checked = thisItem.Checked;
-
                                                 }
                                             }
                                         }
@@ -81,51 +63,36 @@ namespace BlueControls.BlueDatabaseDialogs {
                 }
             }
         }
-
         //Private Sub Auswahl_Item_CheckedChanged(sender As Object) Handles Auswahl.Item_CheckedChanged
-
         //End Sub
-
         protected override void OnLoad(System.EventArgs e) {
             base.OnLoad(e);
             Init();
         }
-
         private void Init() {
-
             if (Row == null) {
                 Close();
                 return;
             }
-
             Für.Text = "<b>" + Row.CellFirstString();
         }
-
         private void Auswahl_ItemClicked(object sender, BasicListItemEventArgs e) {
-
             var x = e.Item.Internal.SplitBy("|");
-
             if (Row.Database.Column[x[0]].MultiLine) {
-
                 var val = Row.CellGetList(Row.Database.Column[x[0]]);
                 if (e.Item.Checked) {
                     val.AddIfNotExists(x[1]);
                 } else {
                     val.Remove(x[1]);
                 }
-
                 Row.CellSet(Row.Database.Column[x[0]], val);
             } else {
-
                 if (e.Item.Checked) {
                     Row.CellSet(Row.Database.Column[x[0]], x[1]);
                 }
             }
-
             //       End If
-
             Such_TextChanged(null, System.EventArgs.Empty);
-
         }
     }
 }

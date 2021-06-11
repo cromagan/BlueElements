@@ -16,12 +16,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 namespace BlueDatabase.EventArgs {
     public class CellDoubleClickEventArgs : CellEventArgs {
-
         public CellDoubleClickEventArgs(ColumnItem column, RowItem row, bool startEdit) : base(column, row) => StartEdit = startEdit;
-
         public bool StartEdit { get; set; }
     }
 }

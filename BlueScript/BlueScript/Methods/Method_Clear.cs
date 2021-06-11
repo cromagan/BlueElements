@@ -16,13 +16,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using Skript.Enums;
 using System.Collections.Generic;
-
 namespace BlueScript {
     internal class Method_Clear : Method {
-
         public override string Syntax => "Clear(VariableListe);";
         public override string Description => "Entfernt alle Einträge einer Liste";
         public override List<string> Comand(Script s) => new() { "clear" };

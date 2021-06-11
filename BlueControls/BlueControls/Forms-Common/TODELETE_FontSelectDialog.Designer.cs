@@ -4,11 +4,8 @@ using System.Diagnostics;
 using System.Drawing;
 using BlueControls.Controls;
 using BlueControls.Enums;
-
 namespace BlueControls.Forms
     {
-
-
         public partial class FontSelectDialog : Form
         {
 			//Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
@@ -19,7 +16,6 @@ namespace BlueControls.Forms
 				{
 					if (disposing )
 					{
-
 					}
 				}
 				finally
@@ -27,9 +23,6 @@ namespace BlueControls.Forms
 					base.Dispose(disposing);
 				}
 			}
-
-
-
 			//Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
 			//Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
 			//Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -263,7 +256,6 @@ namespace BlueControls.Forms
             this.BlueFrame2.ResumeLayout(false);
             ((ISupportInitialize)(this.Sample)).EndInit();
             this.ResumeLayout(false);
-
 			}
 			internal ListBox FName;
 			internal Caption Caption1;

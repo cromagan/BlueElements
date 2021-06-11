@@ -16,7 +16,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -30,36 +29,26 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using static BlueBasics.Extensions;
-
 namespace BlueControls.ItemCollection {
     public class ItemCollectionList : ListExt<BasicListItem>, ICloneable {
-
         #region  Variablen-Deklarationen 
-
         private enCheckBehavior _CheckBehavior;
         private Size _CellposCorrect = Size.Empty;
         private bool _Validating;
-
         private enBlueListBoxAppearance _Appearance;
         private enDesign _ControlDesign;
         private enDesign _ItemDesign;
-
         private SizeF LastCheckedMaxSize = Size.Empty;
-
         #endregion
-
         #region  Properties 
-
         public enCheckBehavior CheckBehavior {
             get => _CheckBehavior;
             set {
-
                 if (value == _CheckBehavior) { return; }
                 _CheckBehavior = value;
                 ValidateCheckStates(null);
             }
         }
-
         /// <summary>
         /// Itemdesign wird durch Appearance gesetzt
         /// </summary>
@@ -71,7 +60,6 @@ namespace BlueControls.ItemCollection {
                 return _ItemDesign;
             }
         }
-
         /// <summary>
         /// ControlDesign wird durch Appearance gesetzt
         /// </summary>
@@ -83,30 +71,21 @@ namespace BlueControls.ItemCollection {
                 return _ControlDesign;
             }
         }
-
         public enOrientation Orientation { get; private set; }
-
         public int BreakAfterItems { get; private set; }
-
         public enBlueListBoxAppearance Appearance {
             get => _Appearance;
             set {
                 if (value == _Appearance && _ItemDesign != enDesign.Undefiniert) { return; }
                 _Appearance = value;
-
                 GetDesigns();
-
                 //DesignOrStyleChanged();
                 OnDoInvalidate();
             }
         }
-
         #endregion
-
         #region  Construktor 
-
         public ItemCollectionList() : this(enBlueListBoxAppearance.Listbox) { }
-
         public ItemCollectionList(enBlueListBoxAppearance design) : base() {
             _CellposCorrect = Size.Empty;
             _Appearance = enBlueListBoxAppearance.Listbox;
@@ -116,59 +95,45 @@ namespace BlueControls.ItemCollection {
             _Appearance = design;
             GetDesigns();
         }
-
         #endregion
-
         #region  Event-Deklarationen + Delegaten 
         public event EventHandler ItemCheckedChanged;
         public event EventHandler DoInvalidate;
         #endregion
-
         private void GetDesigns() {
             _ControlDesign = (enDesign)_Appearance;
-
             switch (_Appearance) {
                 case enBlueListBoxAppearance.Autofilter:
                     _ItemDesign = enDesign.Item_Autofilter;
                     break;
-
                 case enBlueListBoxAppearance.DropdownSelectbox:
                     _ItemDesign = enDesign.Item_DropdownMenu;
                     break;
-
                 case enBlueListBoxAppearance.Gallery:
                     _ItemDesign = enDesign.Item_Listbox;
                     _ControlDesign = enDesign.ListBox;
                     break;
-
                 case enBlueListBoxAppearance.FileSystem:
                     _ItemDesign = enDesign.Item_Listbox;
                     _ControlDesign = enDesign.ListBox;
                     break;
-
                 case enBlueListBoxAppearance.Listbox:
                     _ItemDesign = enDesign.Item_Listbox;
                     _ControlDesign = enDesign.ListBox;
                     break;
-
                 case enBlueListBoxAppearance.KontextMenu:
                     _ItemDesign = enDesign.Item_KontextMenu;
                     break;
-
                 case enBlueListBoxAppearance.ComboBox_Textbox:
                     _ItemDesign = enDesign.ComboBox_Textbox;
                     break;
-
                 default:
                     Develop.DebugPrint(enFehlerArt.Fehler, "Unbekanntes Design: " + _Appearance);
                     break;
             }
         }
-
         public void Check(ListExt<string> vItems, bool Checked) => Check(vItems.ToArray(), Checked);
-
         public void Check(List<string> vItems, bool Checked) => Check(vItems.ToArray(), Checked);
-
         public void Check(string[] vItems, bool Checked) {
             for (var z = 0; z <= vItems.GetUpperBound(0); z++) {
                 if (this[vItems[z]] != null) {
@@ -176,7 +141,6 @@ namespace BlueControls.ItemCollection {
                 }
             }
         }
-
         public void UncheckAll() {
             foreach (var ThisItem in this) {
                 if (ThisItem != null) {
@@ -184,7 +148,6 @@ namespace BlueControls.ItemCollection {
                 }
             }
         }
-
         public void CheckAll() {
             foreach (var ThisItem in this) {
                 if (ThisItem != null) {
@@ -192,59 +155,42 @@ namespace BlueControls.ItemCollection {
                 }
             }
         }
-
         internal void SetNewCheckState(BasicListItem This, bool value, ref bool CheckVariable) {
-
             if (!This.IsClickable()) { value = false; }
-
             if (_CheckBehavior == enCheckBehavior.NoSelection) {
                 value = false;
             } else if (CheckVariable && value == false && _CheckBehavior == enCheckBehavior.AlwaysSingleSelection) {
                 if (Checked().Count == 1) { value = true; }
             }
-
             if (value == CheckVariable) { return; }
-
             CheckVariable = value;
-
             if (_Validating) { return; }
-
             ValidateCheckStates(This);
-
             OnItemCheckedChanged();
             OnDoInvalidate();
         }
-
         private void OnItemCheckedChanged() => ItemCheckedChanged?.Invoke(this, System.EventArgs.Empty);
-
         public void OnDoInvalidate() => DoInvalidate?.Invoke(this, System.EventArgs.Empty);
-
         public override void OnChanged() {
             _CellposCorrect = Size.Empty;
             base.OnChanged();
             OnDoInvalidate();
         }
-
         protected override void OnItemAdded(BasicListItem item) {
             if (string.IsNullOrEmpty(item.Internal)) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Der Auflistung soll ein Item hinzugefügt werden, welches keinen Namen hat " + item.Internal);
             }
-
             item.SetParent(this);
             base.OnItemAdded(item);
             OnDoInvalidate();
         }
-
         public List<BasicListItem> Checked() {
-            var p = new List<BasicListItem>();
-
+            List<BasicListItem> p = new();
             foreach (var ThisItem in this) {
                 if (ThisItem != null && ThisItem.Checked) { p.Add(ThisItem); }
             }
-
             return p;
         }
-
         /// <summary>
         ///  BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
         /// </summary>
@@ -254,57 +200,42 @@ namespace BlueControls.ItemCollection {
             var w = 16;
             var h = 0;
             var hall = 0;
-
             var sameh = -1;
             var or = enOrientation.Senkrecht;
-
             PreComputeSize();
-
             foreach (var ThisItem in this) {
                 if (ThisItem != null) {
                     var s = ThisItem.SizeUntouchedForListBox();
-
                     w = Math.Max(w, s.Width);
                     h = Math.Max(h, s.Height);
                     hall += s.Height;
-
                     if (sameh < 0) {
                         sameh = ThisItem.SizeUntouchedForListBox().Height;
                     } else {
                         if (sameh != ThisItem.SizeUntouchedForListBox().Height) { or = enOrientation.Waagerecht; }
                         sameh = ThisItem.SizeUntouchedForListBox().Height;
                     }
-
                     if (ThisItem is not TextListItem and not CellLikeListItem) { or = enOrientation.Waagerecht; }
                 }
             }
-
             return (w, h, hall, or);
         }
-
         private void PreComputeSize() {
             try {
                 System.Threading.Tasks.Parallel.ForEach(this, ThisItem => {
-
                     ThisItem.SizeUntouchedForListBox();
                 });
             } catch {
                 PreComputeSize();
             }
         }
-
         public Size CalculateColumnAndSize() {
-            var (BiggestItemX, _, HeightAdded, SenkrechtAllowed) = ItemData();
-
+            (var BiggestItemX, var _, var HeightAdded, var SenkrechtAllowed) = ItemData();
             if (SenkrechtAllowed == enOrientation.Waagerecht) { return ComputeAllItemPositions(new Size(300, 300), null, BiggestItemX, HeightAdded, SenkrechtAllowed); }
-
             BreakAfterItems = CalculateColumnCount(BiggestItemX, HeightAdded, SenkrechtAllowed);
-
             return ComputeAllItemPositions(new Size(1, 30), null, BiggestItemX, HeightAdded, SenkrechtAllowed);
         }
-
         internal Size ComputeAllItemPositions(Size controlDrawingArea, Slider sliderY, int biggestItemX, int heightAdded, enOrientation senkrechtAllowed) {
-
             if (Math.Abs(LastCheckedMaxSize.Width - controlDrawingArea.Width) > 0.1 || Math.Abs(LastCheckedMaxSize.Height - controlDrawingArea.Height) > 0.1) {
                 LastCheckedMaxSize = controlDrawingArea;
                 _CellposCorrect = Size.Empty;
@@ -314,31 +245,23 @@ namespace BlueControls.ItemCollection {
                 _CellposCorrect = Size.Empty;
                 return Size.Empty;
             }
-
             PreComputeSize();
-
             if (_ItemDesign == enDesign.Undefiniert) { GetDesigns(); }
-
             if (BreakAfterItems < 1) { senkrechtAllowed = enOrientation.Waagerecht; }
-
             var SliderWidth = 0;
             if (sliderY != null) {
                 if (BreakAfterItems < 1 && heightAdded > controlDrawingArea.Height) {
                     SliderWidth = sliderY.Width;
                 }
             }
-
             int colWidth;
-
             switch (_Appearance) {
                 case enBlueListBoxAppearance.Gallery:
                     colWidth = 200;
                     break;
-
                 case enBlueListBoxAppearance.FileSystem:
                     colWidth = 110;
                     break;
-
                 default:
                     // u.a. Autofilter
                     if (BreakAfterItems < 1) {
@@ -347,35 +270,28 @@ namespace BlueControls.ItemCollection {
                         var colCount = Count / BreakAfterItems;
                         var r = Count % colCount;
                         if (r != 0) { colCount++; }
-
                         colWidth = controlDrawingArea.Width < 5 ? biggestItemX : (controlDrawingArea.Width - SliderWidth) / colCount;
                     }
                     break;
             }
-
             var MaxX = int.MinValue;
             var Maxy = int.MinValue;
-
             var itenc = -1;
-
             BasicListItem previtem = null;
             foreach (var ThisItem in this) {
                 // PaintmodX kann immer abgezogen werden, da es eh nur bei einspaltigen Listboxen verändert wird!
                 if (ThisItem != null) {
                     var cx = 0;
                     var cy = 0;
-
                     var wi = colWidth;
                     var he = 0;
                     itenc++;
-
                     if (senkrechtAllowed == enOrientation.Waagerecht) {
                         if (ThisItem.IsCaption) { wi = controlDrawingArea.Width - SliderWidth; }
                         he = ThisItem.HeightForListBox(_Appearance, wi);
                     } else {
                         he = ThisItem.HeightForListBox(_Appearance, wi);
                     }
-
                     if (previtem != null) {
                         if (senkrechtAllowed == enOrientation.Waagerecht) {
                             if (previtem.Pos.Right + colWidth > controlDrawingArea.Width || ThisItem.IsCaption) {
@@ -395,19 +311,14 @@ namespace BlueControls.ItemCollection {
                             }
                         }
                     }
-
                     ThisItem.SetCoordinates(new Rectangle(cx, cy, wi, he));
-
                     MaxX = Math.Max(ThisItem.Pos.Right, MaxX);
                     Maxy = Math.Max(ThisItem.Pos.Bottom, Maxy);
                     previtem = ThisItem;
                 }
             }
-
             if (sliderY != null) {
-
                 bool SetTo0;
-
                 if (SliderWidth > 0) {
                     if (Maxy - controlDrawingArea.Height <= 0) {
                         sliderY.Enabled = false;
@@ -418,62 +329,46 @@ namespace BlueControls.ItemCollection {
                         sliderY.SmallChange = 16;
                         sliderY.LargeChange = controlDrawingArea.Height;
                         sliderY.Maximum = Maxy - controlDrawingArea.Height;
-
                         SetTo0 = false;
                     }
-
                     sliderY.Height = controlDrawingArea.Height;
                     sliderY.Visible = true;
                 } else {
                     SetTo0 = true;
                     sliderY.Visible = false;
                 }
-
                 if (SetTo0) {
                     sliderY.Minimum = 0;
                     sliderY.Maximum = 0;
                     sliderY.Value = 0;
                 }
             }
-
             _CellposCorrect = new Size(MaxX, Maxy);
             return _CellposCorrect;
         }
-
         private int CalculateColumnCount(int BiggestItemWidth, int AllItemsHeight, enOrientation orientation) {
-
             if (orientation != enOrientation.Senkrecht) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Nur 'senkrecht' erlaubt mehrere Spalten");
             }
-
             if (Count < 12) { return -1; }  // <10 ergibt dividieb by zere, weil es da 0 einträge währen bei 10 Spalten
-
             var dithemh = AllItemsHeight / Count;
-
             for (var TestSP = 10; TestSP >= 1; TestSP--) {
-
                 var colc = Count / TestSP;
                 var rest = Count % colc;
-
                 var ok = true;
-
                 if (rest > 0 && rest < colc / 2) { ok = false; }
-
                 if (colc < 5) { ok = false; }
                 if (colc > 20) { ok = false; }
                 if (colc * dithemh > 600) { ok = false; }
                 if (colc * dithemh < 150) { ok = false; }
                 if (TestSP * BiggestItemWidth > 600) { ok = false; }
-
                 if (colc * (float)dithemh / (TestSP * (float)BiggestItemWidth) < 0.5) { ok = false; }
-
                 if (ok) {
                     return colc;
                 }
             }
             return -1;
         }
-
         /// <summary>
         /// Füllt die Ersetzungen mittels eines Übergebenen Enums aus.
         /// </summary>
@@ -481,16 +376,11 @@ namespace BlueControls.ItemCollection {
         /// <param name="ZumDropdownHinzuAb">Erster Wert der Enumeration, der Hinzugefügt werden soll. Inklusive deses Wertes</param>
         /// <param name="ZumDropdownHinzuBis">Letzter Wert der Enumeration, der nicht mehr hinzugefügt wird, also exklusives diese Wertes</param>
         public void GetValuesFromEnum(Type t, int ZumDropdownHinzuAb, int ZumDropdownHinzuBis) {
-
             var items = Enum.GetValues(t);
-
             Clear();
-
             foreach (var thisItem in items) {
-
                 var te = Enum.GetName(t, thisItem);
                 var th = (int)thisItem;
-
                 if (!string.IsNullOrEmpty(te)) {
                     //NewReplacer.Add(th.ToString() + "|" + te);
                     if (th >= ZumDropdownHinzuAb && th < ZumDropdownHinzuBis) {
@@ -499,13 +389,9 @@ namespace BlueControls.ItemCollection {
                 }
             }
         }
-
         #region  Add / AddRange 
-
         #region TextListItem
-
         public TextListItem Add(string internalAndReadableText) => Add(internalAndReadableText, internalAndReadableText, null, false, true, string.Empty);
-
         /// <summary>
         /// Fügt das übergebende Object den Tags hinzu.
         /// </summary>
@@ -515,7 +401,6 @@ namespace BlueControls.ItemCollection {
             i.Tag = readableObject;
             return i;
         }
-
         /// <summary>
         /// Fügt das übergebende Object den Tags hinzu.
         /// </summary>
@@ -526,7 +411,6 @@ namespace BlueControls.ItemCollection {
             i.Tag = readableObject;
             return i;
         }
-
         /// <summary>
         /// Fügt das übergebende Object den Tags hinzu.
         /// </summary>
@@ -537,115 +421,73 @@ namespace BlueControls.ItemCollection {
             i.Tag = readableObject;
             return i;
         }
-
         public TextListItem Add(string readableText, string internalname, bool isCaption, string userDefCompareKey) => Add(readableText, internalname, null, isCaption, true, userDefCompareKey);
-
         public TextListItem Add(string internalAndReadableText, bool isCaption) => Add(internalAndReadableText, internalAndReadableText, null, isCaption, true, string.Empty);
-
         public TextListItem Add(string internalAndReadableText, enDataFormat format) => Add(internalAndReadableText, internalAndReadableText, null, false, true, DataFormat.CompareKey(internalAndReadableText, format));
-
         public TextListItem Add(string internalAndReadableText, enImageCode symbol) => Add(internalAndReadableText, internalAndReadableText, symbol, false, true, string.Empty);
-
         public TextListItem Add(string readableText, string internalname, bool enabled) => Add(readableText, internalname, null, false, enabled, string.Empty);
-
         public TextListItem Add(string readableText, string internalname, enImageCode symbol, bool enabled) => Add(readableText, internalname, symbol, false, enabled, string.Empty);
-
         public TextListItem Add(string readableText, string internalname, enImageCode symbol, bool enabled, string userDefCompareKey) => Add(readableText, internalname, symbol, false, enabled, userDefCompareKey);
-
         public TextListItem Add(string readableText, string internalname, QuickImage symbol, bool enabled) => Add(readableText, internalname, symbol, false, enabled, string.Empty);
-
         public TextListItem Add(string readableText, string internalname, QuickImage symbol, bool enabled, string userDefCompareKey) => Add(readableText, internalname, symbol, false, enabled, userDefCompareKey);
-
         public TextListItem Add(string readableText, string internalname) => Add(readableText, internalname, null, false, true, string.Empty);
-
         public TextListItem Add(string readableText, string internalname, enImageCode symbol) => Add(readableText, internalname, symbol, false, true, string.Empty);
-
         public TextListItem Add(string readableText, string internalname, QuickImage symbol) => Add(readableText, internalname, symbol, false, true, string.Empty);
-
         public TextListItem Add(string readableText, string internalname, enImageCode symbol, bool isCaption, bool enabled, string userDefCompareKey) => Add(readableText, internalname, QuickImage.Get(symbol, 16), isCaption, enabled, userDefCompareKey);
-
         public TextListItem Add(string readableText, string internalname, QuickImage symbol, bool isCaption, bool enabled, string userDefCompareKey) {
-
-            var x = new TextListItem(readableText, internalname, symbol, isCaption, enabled, userDefCompareKey);
+            TextListItem x = new(readableText, internalname, symbol, isCaption, enabled, userDefCompareKey);
             Add(x);
             return x;
         }
-
         #endregion
-
         #region  BitmapListItem
         public DataListItem Add(byte[] b, string caption) {
-            var i = new DataListItem(b, string.Empty, caption);
+            DataListItem i = new(b, string.Empty, caption);
             Add(i);
             return i;
-
         }
         #endregion
-
         #region  BitmapListItem
-
         public BitmapListItem Add(Bitmap bmp, string caption) {
-            var i = new BitmapListItem(bmp, string.Empty, caption);
+            BitmapListItem i = new(bmp, string.Empty, caption);
             Add(i);
             return i;
-
         }
-
         public new void Add(BasicListItem item) {
-
             if (Contains(item)) { Develop.DebugPrint(enFehlerArt.Fehler, "Bereits vorhanden!"); return; }
-
             if (this[item.Internal] != null) { Develop.DebugPrint(enFehlerArt.Warnung, "Name bereits vorhanden: " + item.Internal); return; }
-
             base.Add(item);
         }
-
         public BitmapListItem Add(string filename, string internalname, string caption, string EncryptionKey) {
-            var i = new BitmapListItem(filename, internalname, caption, EncryptionKey);
+            BitmapListItem i = new(filename, internalname, caption, EncryptionKey);
             Add(i);
             return i;
         }
-
         #endregion
-
         #region CellLikeListItem
-
         public CellLikeListItem Add(string internalAndReadableText, ColumnItem columnStyle, enShortenStyle style, enBildTextVerhalten bildTextverhaltent, bool enabled) {
-
-            var i = new CellLikeListItem(internalAndReadableText, columnStyle, style, enabled, bildTextverhaltent);
+            CellLikeListItem i = new(internalAndReadableText, columnStyle, style, enabled, bildTextverhaltent);
             Add(i);
             return i;
-
         }
-
         #endregion
-
         #region LineListItem
-
         public LineListItem AddSeparator(string userDefCompareKey) {
-            var i = new LineListItem(string.Empty, userDefCompareKey);
+            LineListItem i = new(string.Empty, userDefCompareKey);
             Add(i);
             return i;
         }
-
         public LineListItem AddSeparator() => AddSeparator(string.Empty);
-
         #endregion
-
         #region RowFormulaItem
-
         public RowFormulaListItem Add(RowItem row) => Add(row, string.Empty, string.Empty);
-
         public RowFormulaListItem Add(RowItem row, string layoutID) => Add(row, layoutID, string.Empty);
-
         public RowFormulaListItem Add(RowItem row, string layoutID, string userDefCompareKey) {
-            var i = new RowFormulaListItem(row, layoutID, userDefCompareKey);
+            RowFormulaListItem i = new(row, layoutID, userDefCompareKey);
             Add(i);
             return i;
         }
-
         #endregion
-
         //public BasicListItem Add(clsNamedBinary binary) {
         //    if (binary.Picture != null) {
         //        return Add(binary.Picture, binary.Name);
@@ -653,17 +495,13 @@ namespace BlueControls.ItemCollection {
         //        return Add(binary.Name, binary.Binary);
         //    }
         //}
-
         public TextListItem Add(ColumnItem column, bool doCaptionSort) => doCaptionSort
-                ? Add(column, column.Name, column.Ueberschriften + Constants.SecondSortChar + column.Name)
-                : Add(column, column.Name, string.Empty);
-
+? Add(column, column.Name, column.Ueberschriften + Constants.SecondSortChar + column.Name)
+: Add(column, column.Name, string.Empty);
         public TextListItem Add(enContextMenuComands comand, bool enabled = true) {
-
             var _Internal = comand.ToString();
             QuickImage _Symbol;
             string _ReadableText;
-
             switch (comand) {
                 case enContextMenuComands.Abbruch:
                     _ReadableText = "Abbrechen";
@@ -751,28 +589,20 @@ namespace BlueControls.ItemCollection {
                     _Symbol = QuickImage.Get(enImageCode.Fragezeichen);
                     break;
             }
-
             if (string.IsNullOrEmpty(_Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben:" + comand); }
-
             return Add(_ReadableText, _Internal, _Symbol, enabled);
-
         }
-
         public void AddRange(ColumnCollection Columns, bool OnlyExportableTextformatForLayout, bool NoCritical, bool DoCaptionSort) {
-
             foreach (var ThisColumnItem in Columns) {
                 if (ThisColumnItem != null) {
                     var addx = true;
                     if (addx && OnlyExportableTextformatForLayout && !ThisColumnItem.ExportableTextformatForLayout()) { addx = false; }
                     if (addx && NoCritical && !ThisColumnItem.Format.CanBeCheckedByRules()) { addx = false; }
                     if (addx && this[ThisColumnItem.Name] != null) { addx = false; }
-
                     if (addx) {
                         Add(ThisColumnItem, DoCaptionSort);
-
                         if (DoCaptionSort) {
                             var capt = ThisColumnItem.Ueberschriften;
-
                             if (this[capt] == null) {
                                 Add(new TextListItem(capt, capt, null, true, true, capt + Constants.FirstSortChar));
                             }
@@ -781,18 +611,14 @@ namespace BlueControls.ItemCollection {
                 }
             }
         }
-
         internal void SetValuesTo(List<string> values, string fileEncryptionKey) {
-
             var _Ist = this.ToListOfString();
             var _zuviel = _Ist.Except(values).ToList();
             var _zuwenig = values.Except(_Ist).ToList();
-
             // Zu viele im Mains aus der Liste löschen
             foreach (var ThisString in _zuviel) {
                 if (!values.Contains(ThisString)) { Remove(ThisString); }
             }
-
             // und die Mains auffüllen
             foreach (var ThisString in _zuwenig) {
                 if (FileOperations.FileExists(ThisString)) {
@@ -806,87 +632,65 @@ namespace BlueControls.ItemCollection {
                 }
             }
         }
-
         public void AddRange(Type type) {
             foreach (int z1 in Enum.GetValues(type)) {
                 if (this[z1.ToString()] == null) { Add(Enum.GetName(type, z1).Replace("_", " "), z1.ToString()); }
             }
-
             Sort();
         }
-
         public void AddRange(string[] Values) {
             if (Values == null) { return; }
-
             foreach (var thisstring in Values) {
                 if (this[thisstring] == null) { Add(thisstring); }
             }
         }
-
         public void AddRange(ListExt<string> Values) {
-
             if (Values == null) { return; }
-
             foreach (var thisstring in Values) {
                 if (this[thisstring] == null) { Add(thisstring, thisstring); }
             }
         }
-
         public void AddRange(List<string> Values, ColumnItem ColumnStyle, enShortenStyle Style, enBildTextVerhalten bildTextverhalten) {
-
             if (Values == null) { return; }
-
             if (Values.Count > 10000) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Values > 100000");
                 return;
             }
-
             foreach (var thisstring in Values) {
                 Add(thisstring, ColumnStyle, Style, bildTextverhalten); // If Item(thisstring) Is Nothing Then Add(New CellLikeItem(thisstring, ColumnStyle))
             }
         }
-
         public BasicListItem Add(string Value, ColumnItem ColumnStyle, enShortenStyle Style, enBildTextVerhalten bildTextverhalten) {
-
             if (this[Value] == null) {
                 if (ColumnStyle.Format == enDataFormat.Link_To_Filesystem && Value.FileType() == enFileFormat.Image) {
                     return Add(ColumnStyle.BestFile(Value, false), Value, Value, ColumnStyle.Database.FileEncryptionKey);
                 } else {
-                    var i = new CellLikeListItem(Value, ColumnStyle, Style, true, bildTextverhalten);
+                    CellLikeListItem i = new(Value, ColumnStyle, Style, true, bildTextverhalten);
                     Add(i);
                     return i;
-
                 }
             }
-
             return null;
         }
-
         ///// <summary>
         ///// Kann mit GetNamedBinaries zurückgeholt werden
         ///// </summary>
         ///// <param name="list"></param>
         //public void AddRange(ListExt<clsNamedBinary> list) {
-
         //    if (list == null) { return; }
-
         //    foreach (var ThisBin in list) {
         //        Add(ThisBin);
         //    }
         //}
-
         public void AddRange(List<string> list) {
             if (list == null) { return; }
-
             foreach (var thisstring in list) {
                 if (!string.IsNullOrEmpty(thisstring)) {
                     if (this[thisstring] == null) { Add(thisstring, thisstring); }
                 }
             }
         }
-
         #endregion
-
         //public ListExt<clsNamedBinary> GetNamedBinaries() {
         //    var l = new ListExt<clsNamedBinary>();
         //    foreach (var thisItem in this) {
@@ -901,37 +705,26 @@ namespace BlueControls.ItemCollection {
         //    }
         //    return l;
         //}
-
         #region  Standard-Such-Properties 
-
         public BasicListItem this[int X, int Y] {
             get {
-
                 foreach (var ThisItem in this) {
                     if (ThisItem != null && ThisItem.Contains(X, Y)) { return ThisItem; }
                 }
-
                 return null;
             }
         }
-
         #endregion
-
         public void Remove(string Internal) => Remove(this[Internal]);
-
         public void RemoveRange(List<string> Internal) {
             foreach (var item in Internal) {
                 Remove(item);
             }
         }
-
         public BasicListItem this[string Internal] {
             get {
-
                 try {
-
                     if (string.IsNullOrEmpty(Internal)) { return null; }
-
                     foreach (var ThisItem in this) {
                         if (ThisItem != null && Internal.ToUpper() == ThisItem.Internal.ToUpper()) { return ThisItem; }
                     }
@@ -941,31 +734,23 @@ namespace BlueControls.ItemCollection {
                 }
             }
         }
-
         private void ValidateCheckStates(BasicListItem ThisMustBeChecked) {
-
             _Validating = true;
             var SomethingDonex = false;
-
             var Done = false;
             BasicListItem F = null;
-
             switch (_CheckBehavior) {
                 case enCheckBehavior.NoSelection:
                     UncheckAll();
                     break;
-
                 case enCheckBehavior.MultiSelection:
                     break;
-
                 case enCheckBehavior.SingleSelection:
                 case enCheckBehavior.AlwaysSingleSelection:
                     foreach (var ThisItem in this) {
                         if (ThisItem != null) {
-
                             if (ThisMustBeChecked == null) {
                                 if (F == null) { F = ThisItem; }
-
                                 if (ThisItem.Checked) {
                                     if (!Done) {
                                         Done = true;
@@ -985,49 +770,37 @@ namespace BlueControls.ItemCollection {
                             }
                         }
                     }
-
                     if (_CheckBehavior == enCheckBehavior.AlwaysSingleSelection && !Done && F != null && !F.Checked) {
                         F.Checked = true;
                         SomethingDonex = true;
                     }
                     break;
-
                 default:
                     Develop.DebugPrint(_CheckBehavior);
                     break;
             }
-
             _Validating = false;
-
             if (SomethingDonex) { OnDoInvalidate(); }
         }
-
         public object Clone() {
-
-            var x = new ItemCollectionList(_Appearance) {
+            ItemCollectionList x = new(_Appearance) {
                 CheckBehavior = _CheckBehavior
             };
-
             foreach (var ThisItem in this) {
                 ThisItem.CloneToNewCollection(x);
             }
             return x;
         }
-
         public static void GetItemCollection(ItemCollectionList e, ColumnItem column, RowItem checkedItemsAtRow, enShortenStyle style, int maxItems) {
-
-            var Marked = new List<string>();
-            var l = new List<string>();
-
+            List<string> Marked = new();
+            List<string> l = new();
             e.Clear();
-
             e.CheckBehavior = enCheckBehavior.MultiSelection; // Es kann ja mehr als nur eines angewählt sein, auch wenn nicht erlaubt!
-
             l.AddRange(column.DropDownItems);
             if (column.DropdownWerteAndererZellenAnzeigen) {
                 if (column.DropdownKey >= 0 && checkedItemsAtRow != null) {
                     var cc = column.Database.Column.SearchByKey(column.DropdownKey);
-                    var F = new FilterCollection(column.Database)
+                    FilterCollection F = new(column.Database)
                     {
                         new FilterItem(cc, enFilterType.Istgleich_GroßKleinEgal, checkedItemsAtRow.CellGetString(cc))
                     };
@@ -1036,13 +809,11 @@ namespace BlueControls.ItemCollection {
                     l.AddRange(column.Contents());
                 }
             }
-
             switch (column.Format) {
                 case enDataFormat.Bit:
                     l.Add(true.ToPlusMinus());
                     l.Add(false.ToPlusMinus());
                     break;
-
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                     var DB = column.LinkedDatabase();
                     if (DB != null && !string.IsNullOrEmpty(column.LinkedKeyKennung)) {
@@ -1056,7 +827,6 @@ namespace BlueControls.ItemCollection {
                         Notification.Show("Keine Spalten gefunden, die<br>mit '" + column.LinkedKeyKennung + "' beginnen.", enImageCode.Information);
                     }
                     break;
-
                 case enDataFormat.Values_für_LinkedCellDropdown:
                     var DB2 = column.LinkedDatabase();
                     l.AddRange(DB2.Column[0].Contents());
@@ -1065,7 +835,6 @@ namespace BlueControls.ItemCollection {
                     }
                     break;
             }
-
             if (column.Database.Row.Count > 0) {
                 if (checkedItemsAtRow != null) {
                     if (!checkedItemsAtRow.CellIsNullOrEmpty(column)) {
@@ -1075,19 +844,12 @@ namespace BlueControls.ItemCollection {
                             Marked.Add(checkedItemsAtRow.CellGetString(column));
                         }
                     }
-
                     l.AddRange(Marked);
-
                 }
-
                 l = l.SortedDistinctList();
-
             }
-
             if (maxItems > 0 && l.Count > maxItems) { return; }
-
             e.AddRange(l, column, style, column.BildTextVerhalten);
-
             if (checkedItemsAtRow != null) {
                 foreach (var t in Marked) {
                     if (e[t] is BasicListItem bli) { bli.Checked = true; }

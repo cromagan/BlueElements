@@ -16,24 +16,18 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using BlueBasics;
 using BlueBasics.Interfaces;
 using System;
 using System.ComponentModel;
-
 namespace BlueControls.Classes_Editor {
     [DefaultEvent("Changed")]
     internal partial class AbstractClassEditor<T> : Controls.GroupBox where T : IParseable {
-
         public AbstractClassEditor() : base() => InitializeComponent();
-
         private T _Item;
         private string _LastState = string.Empty;
         private bool _VisibleChanged_Done;
-
         public event EventHandler Changed;
-
         /// <summary>
         /// Das Objekt, das im Original bearbeitet wird.
         /// </summary>
@@ -43,7 +37,6 @@ namespace BlueControls.Classes_Editor {
             get => _Item;
             set {
                 _Item = value;
-
                 if (_Item != null) {
                     _LastState = _Item.ToString();
                     if (!Inited) {
@@ -61,47 +54,34 @@ namespace BlueControls.Classes_Editor {
                 }
             }
         }
-
         public bool IsFilling { get; private set; }
         public bool Inited { get; private set; }
-
         /// <summary>
         /// Sperrt die komplette Bearbeitung des Formulars und löscht alle Einträge.
         /// Typischerweiße, wenn das zu bearbeitende Objekt 'null' ist oder beim erstmaligen Initialiseren des Steuerelementes.
         /// </summary>
         protected virtual void DisableAndClearFormula() => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
-
         /// <summary>
         /// Erlaubt die Bearbeitung des Objektes und füllt den aktuellen Zustand in das Formular.
         /// </summary>
         protected virtual void EnabledAndFillFormula() => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
-
         /// <summary>
         /// Bereitet das Formular vor. Z.B. werden in den Auswahldialog-Boxen die voreingestellten Werte hineingeschrieben.
         /// Diese Routine wird aufgerufen, wenn das Item zum ersten Mal empfangen wurde.
         /// </summary>
         protected virtual void PrepaireFormula() => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
-
         protected void OnChanged(T Obj) {
             if (IsFilling) { return; }
-
             var newstatse = Obj.ToString();
-
             if (newstatse == _LastState) { return; }
-
             _LastState = newstatse;
-
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
-
         protected override void OnVisibleChanged(System.EventArgs e) {
             base.OnVisibleChanged(e);
-
             // Damit das Formular nach der Anzeige erstmal deaktiviert ist.
-
             if (_VisibleChanged_Done) { return; }
             _VisibleChanged_Done = true;
-
             if (_Item == null) {
                 IsFilling = true;
                 DisableAndClearFormula();

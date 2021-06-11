@@ -1,8 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Drawing;
 using BlueBasics.Interfaces;
-
-
 namespace BlueControls.Classes_Editor
 {
     internal partial class AbstractClassEditor<T> : BlueControls.Controls.GroupBox where T : IParseable
@@ -23,9 +21,6 @@ namespace BlueControls.Classes_Editor
                 base.Dispose(disposing);
             }
         }
-
-
-
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -40,7 +35,5 @@ namespace BlueControls.Classes_Editor
             this.Text = "";
             this.ResumeLayout(false);
         }
-
     }
 }
-

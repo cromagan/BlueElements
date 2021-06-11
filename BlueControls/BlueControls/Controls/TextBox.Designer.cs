@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
-
 namespace BlueControls.Controls
 {
     public partial class TextBox 
@@ -21,10 +20,7 @@ namespace BlueControls.Controls
             finally
             {
                 base.Dispose(disposing);
-
                 //   Dictionary.Release()
-
-
                 _Cursor_CharPos = 0;
                 _MarkStart = 0;
                 _MarkEnd = 0;
@@ -34,10 +30,8 @@ namespace BlueControls.Controls
                 _eTxt = null;
             }
         }
-
         //Wird vom Windows Form-Designer benötigt.
         private IContainer components;
-
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -68,7 +62,6 @@ namespace BlueControls.Controls
             Name = "TextBox";
             this.ResumeLayout(false);
         }
-
         internal System.Windows.Forms.Timer Blinker;
         internal BackgroundWorker SpellChecker;
     }

@@ -16,30 +16,23 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using BlueBasics;
 using BlueBasics.Enums;
 using System;
 using System.Diagnostics;
 using System.Windows.Forms;
-
 namespace BlueControls.Designer_Support {
     internal sealed class frmQuickPic : Panel {
         #region  Vom Windows Form Designer generierter Code 
-
         public frmQuickPic() =>
-
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
             InitializeComponent();// Initialisierungen nach dem Aufruf InitializeComponent() hinzufügen
-
         // Die Form überschreibt den Deletevorgang der Basisklasse, um Komponenten zu bereinigen.
         protected override void Dispose(bool NowDisposing) {
             if (NowDisposing) {
-
             }
             base.Dispose(NowDisposing);
         }
-
         //HINWEIS: Die folgende Prozedur ist für den Windows Form-Designer erforderlich
         //Sie kann mit dem Windows Form-Designer modifiziert werden.
         //Verwenden Sie nicht den Code-Editor zur Bearbeitung.
@@ -73,7 +66,6 @@ namespace BlueControls.Designer_Support {
         private GroupBox ZweitSymbol;
         private TextBox txbZweitsymbol;
         private TextBox PicName;
-
         [DebuggerStepThrough]
         private void InitializeComponent() {
             LB = new ListBox();
@@ -456,47 +448,32 @@ namespace BlueControls.Designer_Support {
             ZweitSymbol.ResumeLayout(false);
             ZweitSymbol.PerformLayout();
             ResumeLayout(false);
-
         }
-
         #endregion
-
         public void StartAll(string C) {
-
             LB.Items.Clear();
-
             const enImageCode tempVar = (enImageCode)9999;
             for (enImageCode z = 0; z <= tempVar; z++) {
                 var w = Enum.GetName(z.GetType(), z);
                 if (!string.IsNullOrEmpty(w)) { LB.Items.Add(w); }
             }
-
-            var l = new QuickImage(C);
-
+            QuickImage l = new(C);
             PicName.Text = l.Name;
             Färb.Text = l.Färbung;
             grün.Text = l.ChangeGreenTo;
-
             chkbGrauStufen.Checked = Convert.ToBoolean(l.Effekt & enImageCodeEffect.Graustufen);
-
             SAT.Value = l.Sättigung;
             Hell.Value = l.Helligkeit;
             Transp.Value = l.Transparenz;
-
             if (l.Effekt < 0) { l.Effekt = 0; }
-
             chkbDurchgestrichen.Checked = Convert.ToBoolean(l.Effekt & enImageCodeEffect.Durchgestrichen);
             chkbMEDisabled.Checked = Convert.ToBoolean(l.Effekt & enImageCodeEffect.WindowsMEDisabled);
             chkbXPDisabled.Checked = Convert.ToBoolean(l.Effekt & enImageCodeEffect.WindowsXPDisabled);
-
             GrX.Text = l.Width.ToString();
             GrY.Text = l.Height.ToString();
-
             txbZweitsymbol.Text = l.Zweitsymbol;
         }
-
         private void LB_DoubleClick(object sender, System.EventArgs e) => PicName.Text = Convert.ToString(LB.SelectedItem);
-
         public void GeneratePreview() {
             try {
                 Preview.Image = QuickImage.Get(ICode()).BMP;
@@ -504,16 +481,12 @@ namespace BlueControls.Designer_Support {
                 Preview.Image = null;
             }
         }
-
         public string ICode() {
             var e = (enImageCodeEffect)(((chkbGrauStufen.Checked ? -1 : 0) * -(int)enImageCodeEffect.Graustufen) | ((chkbDurchgestrichen.Checked ? -1 : 0) * -(int)enImageCodeEffect.Durchgestrichen) | ((chkbMEDisabled.Checked ? -1 : 0) * -(int)enImageCodeEffect.WindowsMEDisabled) | ((chkbXPDisabled.Checked ? -1 : 0) * -(int)enImageCodeEffect.WindowsXPDisabled));
             return QuickImage.GenerateCode(PicName.Text, int.Parse(GrX.Text), int.Parse(GrY.Text), e, Färb.Text, grün.Text, SAT.Value, Hell.Value, 0, Transp.Value, txbZweitsymbol.Text);
         }
-
         private void SomethingCheckedChanged(object sender, System.EventArgs e) {
-
         }
-
         private void SomethingChanged(object sender, System.EventArgs e) {
             Helll.Text = Hell.Value + "%";
             SATL.Text = SAT.Value + "%";

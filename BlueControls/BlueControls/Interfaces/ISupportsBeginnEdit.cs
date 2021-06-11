@@ -16,16 +16,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 namespace BlueControls.Interfaces {
-
     public interface ISupportsBeginnEdit {
         void BeginnEdit();
-
         void BeginnEdit(int count);
-
         void EndEdit();
-
         int BeginnEditCounter { get; set; }
     }
 }

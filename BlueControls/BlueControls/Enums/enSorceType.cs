@@ -16,20 +16,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 namespace BlueControls.Enums {
-
     public enum enSorceType {
-
         Nichts = 0,
         //Downloaded = 2,
         SetedByProperty = 3,
         ScreenShot = 4,
-
         LoadedFromDiskAndResized = 5,
         LoadedFromDisk = 6,
-
         EntryWithoutPic = 7
-
     }
 }

@@ -16,9 +16,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 #endregion
-
 using System;
-
 namespace BlueBasics.Enums {
     [Flags]
     public enum enErrorReason {
@@ -26,33 +24,26 @@ namespace BlueBasics.Enums {
         /// Ob der Wert gelesen werden kann. Ein Speichern/Bearbeiten ist nicht geplant.
         /// </summary>
         OnlyRead = 1,
-
         ///// <summary>
         ///// Ob das Feld im allgemeinen bearbeitet werden kann, wenn keine Prozesse dazwischenpfuschen
         ///// </summary>
         EditNormaly = 2,
-
         /// <summary>
         /// Wenn die Daten eigentlich geschrieben werden müssen
         /// </summary>
         EditAcut = 4,
-
         /// <summary>
         /// Es ist noch Zeit, der Benutzer kann ausgesperrt werden
         /// </summary>
         EditGeneral = 8,
-
         Save = 16,
-
         /// <summary>
         ///  Wenn die Daten von der Festplatte geladen und auch weiterverarbeitet werdern sollen
         /// </summary>
         Load = 32,
-
         /// <summary>
         /// Wenn die Daten von der Festplatte geladen - aber wieder verworfen werdern. Nur für Kontrollzwecke benutzen!
         /// </summary>
         LoadForCheckingOnly = 64
-
     }
 }

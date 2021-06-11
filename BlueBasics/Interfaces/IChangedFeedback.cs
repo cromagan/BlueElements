@@ -16,9 +16,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 #endregion
-
 using System;
-
 namespace BlueBasics.Interfaces {
     public interface IChangedFeedback {
         /// <summary>
@@ -26,7 +24,6 @@ namespace BlueBasics.Interfaces {
         /// Wird nicht bei der Neuerstellung des Objektes oder beim Parsen ausgelöst.
         /// </summary>
         event EventHandler Changed;
-
         void OnChanged();
     }
 }

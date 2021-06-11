@@ -16,13 +16,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using Skript.Enums;
 using System.Collections.Generic;
-
 namespace BlueScript {
     internal class Method_Join : Method {
-
         public override string Syntax => "Join(VariableListe, Verbindungszeichen)";
         public override string Description => "Wandelt eine Liste in einen Text um. Es verbindet den Text dabei mitteles dem angegebenen Verbindungszeichen";
         public override List<string> Comand(Script s) => new() { "join" };

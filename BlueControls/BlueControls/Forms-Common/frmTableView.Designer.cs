@@ -16,7 +16,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using System.Diagnostics;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Controls;
@@ -27,14 +26,11 @@ using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
 using SaveFileDialog = System.Windows.Forms.SaveFileDialog;
 using TabPage = BlueControls.Controls.TabPage;
 using TextBox = BlueControls.Controls.TextBox;
-
-
 namespace BlueControls.Forms
 {
     public partial class frmTableView : Form
     {
         //Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
-
         protected override void Dispose(bool disposing)
         {
             try
@@ -49,10 +45,8 @@ namespace BlueControls.Forms
                 base.Dispose(disposing);
             }
         }
-
         //Wird vom Windows Form-Designer benötigt.
        // private IContainer components;
-
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -692,11 +686,7 @@ namespace BlueControls.Forms
             this.tabExtras.ResumeLayout(false);
             this.grpEditor.ResumeLayout(false);
             this.ResumeLayout(false);
-
         }
-
-
-
         private Table TableView;
         private GroupBox grpFormularSteuerung;
         private Button SuchB;
@@ -745,5 +735,4 @@ namespace BlueControls.Forms
         protected Button btnAlleSchließen;
         protected Button btnAlleErweitern;
     }
-
 }

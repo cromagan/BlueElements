@@ -16,33 +16,21 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using BlueControls;
-
 namespace BluePaint {
     public partial class Tool_Screenshot {
-
-        public Tool_Screenshot() : base() {
-            InitializeComponent();
-        }
-
+        public Tool_Screenshot() : base() => InitializeComponent();
         private void NeuerScreenshot_Click(object sender, System.EventArgs e) {
-
             DoScreenShot();
             OnZoomFit();
         }
-
         private void DoScreenShot() {
             OnHideMainWindow();
-
             BlueBasics.modAllgemein.Pause(1, true);
-
             var _Pic = ScreenShot.GrabArea(null, 0, 0).Pic;
-
             if (_Pic != null) { OnOverridePic(_Pic); }
             OnShowMainWindow();
         }
-
         public override void ToolFirstShown() {
             DoScreenShot();
             OnZoomFit();

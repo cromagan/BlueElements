@@ -16,15 +16,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
 using static BlueBasics.Extensions;
-
 namespace BlueScript {
     internal class Method_IsNumeral : Method {
-
         public override string Description => "Prüft, ob der Inhalt der Variable eine gültige Zahl ist. ";
         public override string Syntax => "isNumeral(Value)";
         public override List<string> Comand(Script s) => new() { "isnumeral" };
@@ -34,15 +31,11 @@ namespace BlueScript {
         public override enVariableDataType Returns => enVariableDataType.Bool;
         public override List<enVariableDataType> Args => new() { enVariableDataType.Nummeral_or_String };
         public override bool EndlessArgs => false;
-
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.Falsch(); }
-
             if (attvar.Attributes[0].Type == enVariableDataType.Numeral) { return strDoItFeedback.Wahr(); }
-
             if (attvar.Attributes[0].Type == enVariableDataType.String) {
-
                 if (attvar.Attributes[0].ValueString.IsNumeral()) {
                     return strDoItFeedback.Wahr();
                 }

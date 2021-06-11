@@ -16,20 +16,15 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
-
 namespace BlueDatabase {
     public static class LanguageTool {
-
         public static Database Translation = null;
         private static string German = string.Empty;
         private static string English = string.Empty;
-
         private static readonly object[] EmptyArgs = new object[0];
-
         /// <summary>
         /// Fügt Präfix und Suffix hinzu und ersetzt den Text nach dem gewünschten Stil.
         /// </summary>
@@ -42,13 +37,9 @@ namespace BlueDatabase {
                 if (!string.IsNullOrEmpty(column.Prefix)) { txt = DoTranslate(column.Prefix, true) + " " + txt; }
                 if (!string.IsNullOrEmpty(column.Suffix)) { txt = txt + " " + DoTranslate(column.Suffix, true); }
             }
-
             if (Translation != null) { return ColumnReplaceTranslated(txt, column); }
-
             if (style == enShortenStyle.Unreplaced || column.OpticalReplace.Count == 0) { return txt; }
-
             var OT = txt;
-
             foreach (var ThisString in column.OpticalReplace) {
                 var x = ThisString.SplitBy("|");
                 if (x.Length == 2) {
@@ -60,17 +51,13 @@ namespace BlueDatabase {
                 }
                 if (x.Length == 1 && !ThisString.StartsWith("|")) { txt = txt.Replace(x[0], string.Empty); }
             }
-
             return style == enShortenStyle.Replaced || style == enShortenStyle.HTML || OT == txt ? txt : OT + " (" + txt + ")";
         }
-
         private static string ColumnReplaceTranslated(string newTXT, ColumnItem column) => column.Format switch {
             enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl or enDataFormat.Datum_und_Uhrzeit or enDataFormat.FarbeInteger or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem => newTXT,
             _ => DoTranslate(newTXT, false),
         };
-
         public static string DoTranslate(string txt) => DoTranslate(txt, true, EmptyArgs);
-
         /// <summary>
         /// 
         /// </summary>
@@ -78,41 +65,30 @@ namespace BlueDatabase {
         /// <param name="mustTranslate">TRUE erstellt einen Eintrag in der Englisch-Datenbank, falls nicht vorhanden.</param>
         /// <returns></returns>
         public static string DoTranslate(string txt, bool mustTranslate, params object[] args) {
-
             try {
-
                 if (Translation == null) {
                     return !txt.Contains("{0}") ? txt : string.Format(txt, args);
                 }
                 if (string.IsNullOrEmpty(txt)) { return string.Empty; }
-
                 if (German == txt) { return string.Format(English, args); }
-
                 German = txt;
-
                 //if (txt.ContainsChars(Constants.Char_Numerals)) { English = German; return string.Format(English, args); }
                 //if (txt.ToLower().Contains("imagecode")) { English = German; return string.Format(English, args); }
-
                 var addend = string.Empty;
-
                 if (txt.EndsWith(":")) {
                     txt = txt.TrimEnd(":");
                     addend = ":";
                 }
-
                 txt = txt.Replace("\r\n", "\r");
-
                 var r = Translation.Row[txt];
                 if (r == null) {
                     if (Translation.ReadOnly) { English = German; return string.Format(English, args); }
                     if (!mustTranslate) { English = German; return string.Format(English, args); }
                     r = Translation.Row.Add(txt);
                 }
-
                 var t = r.CellGetString("Translation");
                 if (string.IsNullOrEmpty(t)) { English = German; return string.Format(English, args); }
                 English = t + addend;
-
                 return string.Format(English, args);
             } catch {
                 return txt;

@@ -1,10 +1,7 @@
 ﻿using System.Diagnostics;
 using BlueControls.Controls;
-
 namespace BlueControls.Forms
     {
-
-
         public sealed partial class ExportDialog : Form
 		{
 			//Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
@@ -15,7 +12,6 @@ namespace BlueControls.Forms
 				{
 					if (disposing )
 					{
-
 					}
 				}
 				finally
@@ -23,9 +19,6 @@ namespace BlueControls.Forms
 					base.Dispose(disposing);
 				}
 			}
-
-
-
 			//Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
 			//Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
 			//Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -486,7 +479,6 @@ namespace BlueControls.Forms
             this.tabBildSchachteln.ResumeLayout(false);
             this.tabDateiExport.ResumeLayout(false);
             this.ResumeLayout(false);
-
 			}
 			private ComboBox cbxLayoutWahl;
 			private Caption c_Layoutx;

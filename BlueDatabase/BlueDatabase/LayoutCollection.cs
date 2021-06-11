@@ -16,30 +16,22 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
-
 using BlueBasics;
-
 namespace BlueDatabase {
-
     /// <summary>
     /// Print Views werden nicht immer benötigt. Deswegen werden sie als String gespeichert. Der richtige Typ wäre ItemCollectionPad.
     /// Noch dazu ist ItemCollectionPad in BlueConrolls verankert, das nur die Sichtbarmachung einen Sinn macht.
     /// Und diese Sichtbarmachung braucht braucht Controls für die Bearbeitung.
     /// </summary>
     public class LayoutCollection : ListExt<string> {
-
         // Info:
         // ExportDialog.AddLayoutsOff wandelt Layouts In Items um
-
         public int LayoutIDToIndex(string exportFormularID) {
-
             for (var z = 0; z < Count; z++) {
                 if (this[z].Contains("ID=" + exportFormularID + ",")) { return z; }
             }
-
             return -1;
         }
-
         public void Check() {
             for (var z = 0; z < Count; z++) {
                 if (!this[z].StartsWith("{ID=#")) {

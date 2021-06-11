@@ -11,7 +11,6 @@ namespace BluePaint
 			{
 				if (disposing)
 				{
-
 				}
 			}
 			finally
@@ -19,8 +18,6 @@ namespace BluePaint
 				base.Dispose(disposing);
 			}
 		}
-
-
 		//Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
 		//Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
 		//Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -34,9 +31,6 @@ namespace BluePaint
 			this.Name = "AbstractTool";
 			this.Size = new System.Drawing.Size(300, 400);
 			this.ResumeLayout(false);
-
 		}
-
 	}
-
 }
