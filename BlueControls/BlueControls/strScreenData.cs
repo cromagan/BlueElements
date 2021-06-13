@@ -18,6 +18,7 @@
 #endregion
 using System;
 using System.Drawing;
+
 namespace BlueControls {
     public struct strScreenData {
         public Bitmap Pic;

@@ -825,6 +825,7 @@ using System.Reflection;
 //	Table_Column	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9,4, Bold=True, Color=0046d5}	
 //	Table_Cell_Chapter	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=13, Bold=True, Underline=True, Color=0046d5}	
 #endregion
+
 namespace BlueControls {
     public static class Skin {
         public static Database StyleDB;
@@ -1132,6 +1133,7 @@ namespace BlueControls {
         public static enImageCodeEffect AdditionalState(enStates vState) => vState.HasFlag(enStates.Standard_Disabled) ? ST[0] : enImageCodeEffect.Ohne;
         public static Color Color_Back(enDesign vDesign, enStates vState) => DesignOf(vDesign, vState).BackColor1;
         internal static Color Color_Border(enDesign vDesign, enStates vState) => DesignOf(vDesign, vState).BorderColor1;
+
         #region  Back 
         public static void Draw_Back(Graphics gr, enDesign design, enStates state, Rectangle r, System.Windows.Forms.Control control, bool needTransparenz) => Draw_Back(gr, DesignOf(design, state), r, control, needTransparenz);
         public static clsDesign DesignOf(enDesign design, enStates state) {
@@ -1355,6 +1357,7 @@ namespace BlueControls {
         //    GR.FillRectangle(b, new Rectangle(rect.Left, rect.Top + r2, rect.Width, rect.Height - r));
         //}
         #endregion
+
         private static GraphicsPath Kontur(enKontur Kon, Rectangle r) => Kon switch {
             enKontur.Rechteck => modAllgemein.Poly_Rechteck(r),// GR.SmoothingModex = Drawing2D.SmoothingMode.None
             enKontur.Rechteck_R4 => modAllgemein.Poly_RoundRec(r, 4),// GR.SmoothingModex = Drawing2D.SmoothingMode.HighQuality
@@ -1367,6 +1370,7 @@ namespace BlueControls {
             enKontur.Ohne => null,
             _ => modAllgemein.Poly_Rechteck(r),//  GR.SmoothingModex = Drawing2D.SmoothingMode.None
         };
+
         #region  Border 
         public static void Draw_Border(Graphics GR, enDesign vDesign, enStates vState, Rectangle r) => Draw_Border(GR, DesignOf(vDesign, vState), r);
         //[Obsolete]
@@ -1460,6 +1464,7 @@ namespace BlueControls {
         //    GR.SmoothingMode = x;
         //}
         #endregion
+
         /// <summary>
         /// Bild wird in dieser Routine nicht mehr gändert, aber in der nachfolgenden
         /// </summary>
@@ -1665,6 +1670,7 @@ namespace BlueControls {
             return BlueFont.Get(_String);
         }
         public static BlueFont GetBlueFont(enDesign design, enStates state) => DesignOf(design, state).bFont;
+
         #region  Styles 
         public static List<string> AllStyles() {
             if (StyleDB == null) { InitStyles(); }
@@ -1672,5 +1678,6 @@ namespace BlueControls {
         }
         public static void InitStyles() => StyleDB = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Styles.MDB", "Styles", true, false);
         #endregion
+
     }
 }

@@ -23,8 +23,10 @@ using BlueControls.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+
 namespace BlueControls.ItemCollection {
     public class LinePadItem : BasicPadItem {
+
         #region  Variablen-Deklarationen 
         internal PointM Point1;
         internal PointM Point2;
@@ -33,8 +35,12 @@ namespace BlueControls.ItemCollection {
         private DateTime _LastRecalc = DateTime.Now.AddHours(-1);
         public enConectorStyle Linien_Verhalten { get; set; }
         #endregion
+
+
         #region  Event-Deklarationen + Delegaten 
         #endregion
+
+
         #region  Construktor + Initialize 
         public LinePadItem(ItemCollectionPad parent) : this(parent, PadStyles.Style_Standard, Point.Empty, Point.Empty) { }
         public LinePadItem(ItemCollectionPad parent, PadStyles format, Point point1, Point point2) : this(parent, string.Empty, PadStyles.Style_Standard, point1, point2) { }
@@ -63,8 +69,11 @@ namespace BlueControls.ItemCollection {
         //    }
         //}
         #endregion
+
+
         #region  Properties 
         #endregion
+
         protected override string ClassId() => "LINE";
         public override bool Contains(PointF value, decimal zoomfactor) {
             var ne = 5 / zoomfactor;
@@ -116,6 +125,7 @@ namespace BlueControls.ItemCollection {
         public override bool ParseThis(string tag, string value) {
             if (base.ParseThis(tag, value)) { return true; }
             switch (tag) {
+
                 case "connection":
                     Linien_Verhalten = (enConectorStyle)int.Parse(value);
                     return true;

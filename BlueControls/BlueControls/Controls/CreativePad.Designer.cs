@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Drawing.Printing;
+
 namespace BlueControls.Controls
 {
     public partial class CreativePad 

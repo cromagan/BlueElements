@@ -22,8 +22,10 @@ using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
+
 namespace BlueDatabase {
     public sealed class FilterItem : IParseable, ICompareKey, IReadableTextWithChanging, ICanBeEmpty, IDisposable {
+
         #region  Variablen-Deklarationen 
         /// <summary>
         /// Der Edit-Dialog braucht die Datenbank, um mit Texten die Spalte zu suchen.
@@ -34,9 +36,13 @@ namespace BlueDatabase {
         public string Herkunft = string.Empty;
         private bool disposedValue;
         #endregion
+
+
         #region  Event-Deklarationen + Delegaten 
         public event EventHandler Changed;
         #endregion
+
+
         #region  Construktor + Initialize 
         public FilterItem(Database database, enFilterType filterType, string searchValue) : this(database, filterType, new List<string>() { searchValue }) { }
         public FilterItem(Database database, enFilterType filterType, List<string> searchValue) {
@@ -66,6 +72,8 @@ namespace BlueDatabase {
         }
         public FilterItem(ColumnItem column, RowItem rowWithValue) : this(column, enFilterType.Istgleich_GroﬂKleinEgal_MultiRowIgnorieren, rowWithValue.CellGetString(column)) { }
         #endregion
+
+
         #region  Properties 
         public bool IsParsing { get; private set; }
         public ColumnItem Column {
@@ -88,6 +96,7 @@ namespace BlueDatabase {
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
         #endregion
+
         public override string ToString() {
             if (!IsOk()) { return string.Empty; }
             var Result = "{Type=" + (int)_FilterType;
@@ -102,23 +111,29 @@ namespace BlueDatabase {
             IsParsing = true;
             foreach (var pair in ToParse.GetAllTags()) {
                 switch (pair.Key) {
+
                     case "identifier":
                         if (pair.Value != "Filter") {
                             Develop.DebugPrint(enFehlerArt.Fehler, "Identifier fehlerhaft: " + pair.Value);
                         }
                         break;
+
                     case "type":
                         _FilterType = (enFilterType)int.Parse(pair.Value);
                         break;
+
                     case "column":
                         _Column = Database.Column[pair.Value];
                         break;
+
                     case "columnkey":
                         _Column = Database.Column.SearchByKey(int.Parse(pair.Value));
                         break;
+
                     case "value":
                         SearchValue.Add(pair.Value.FromNonCritical());
                         break;
+
                     case "herkunft":
                         Herkunft = pair.Value.FromNonCritical();
                         break;
@@ -148,26 +163,39 @@ namespace BlueDatabase {
                 if (!SearchValue[0].FromPlusMinus()) { return "Fehlerhafte Zeilen"; }
             }
             switch (_FilterType) {
+
                 case enFilterType.Istgleich:
+
                 case enFilterType.Istgleich_GroﬂKleinEgal:
+
                 case enFilterType.Istgleich_ODER_GroﬂKleinEgal:
+
                 case enFilterType.Istgleich_UND_GroﬂKleinEgal:
                     if (string.IsNullOrEmpty(SearchValue[0])) { return nam + " muss leer sein"; }
                     return nam + " = " + LanguageTool.ColumnReplace(SearchValue[0], Column, enShortenStyle.Replaced);
+
                 case enFilterType.Ungleich_MultiRowIgnorieren:
+
                 case enFilterType.Ungleich_MultiRowIgnorieren_UND_GroﬂKleinEgal:
+
                 case enFilterType.Ungleich_MultiRowIgnorieren_GroﬂKleinEgal:
                     if (string.IsNullOrEmpty(SearchValue[0])) { return nam + " muss bef¸llt sein"; }
                     return nam + " <> " + LanguageTool.ColumnReplace(SearchValue[0], Column, enShortenStyle.Replaced);
+
                 case enFilterType.Istgleich_GroﬂKleinEgal_MultiRowIgnorieren:
+
                 case enFilterType.Istgleich_MultiRowIgnorieren:
                     if (SearchValue.Count == 1 && string.IsNullOrEmpty(SearchValue[0])) { return nam + " muss leer sein"; }
                     return "Spezial-Filter";
+
                 case enFilterType.Instr:
+
                 case enFilterType.Instr_GroﬂKleinEgal:
                     if (SearchValue.Count == 0 || string.IsNullOrEmpty(SearchValue[0])) { return "Filter aktuell ohne Funktion"; }
                     return nam + " beinhaltet den Text '" + SearchValue[0] + "'";
+
                 case enFilterType.Between:
+
                 case enFilterType.Between | enFilterType.UND:
                     return nam + ": von " + SearchValue[0].Replace("|", " bis ");
                 default:

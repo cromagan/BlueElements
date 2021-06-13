@@ -23,10 +23,12 @@ using BlueControls.Interfaces;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms.Design;
+
 namespace BlueControls.Controls {
     [ToolboxBitmap(typeof(System.Windows.Forms.TabPage))]
     [Designer(typeof(ScrollableControlDesigner))]
     public class TabPage : System.Windows.Forms.TabPage, IUseMyBackColor, ISupportsBeginnEdit {
+
         #region Constructor
         //public TabPage() : base()
         //{
@@ -44,6 +46,7 @@ namespace BlueControls.Controls {
         //    //SetBackColor();
         //}
         #endregion
+
         //#region  AutoScale deaktivieren 
         //// https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
         //public void PerformAutoScale()
@@ -87,6 +90,7 @@ namespace BlueControls.Controls {
             base.OnParentChanged(e);
             SetBackColor();
         }
+
         public void SetBackColor() {
             BackColor = Parent is RibbonBar
                 ? Skin.Color_Back(enDesign.RibbonBar_Body, enStates.Standard)
@@ -155,6 +159,7 @@ namespace BlueControls.Controls {
         //{
         //    //MyBase.OnLeave(e)
         //}
+
         #region ISupportsEdit
         [DefaultValue(0)]
         [Browsable(false)]
@@ -165,14 +170,17 @@ namespace BlueControls.Controls {
             BeginnEdit();
             base.SuspendLayout();
         }
+
         public new void ResumeLayout(bool performLayout) {
             base.ResumeLayout(performLayout);
             EndEdit();
         }
+
         public new void ResumeLayout() {
             base.ResumeLayout();
             EndEdit();
         }
+
         public void BeginnEdit() => BeginnEdit(1);
         public void BeginnEdit(int count) {
             if (DesignMode) { return; }
@@ -181,6 +189,7 @@ namespace BlueControls.Controls {
             }
             BeginnEditCounter += count;
         }
+
         public void EndEdit() {
             if (DesignMode) { return; }
             if (BeginnEditCounter < 1) { Develop.DebugPrint(enFehlerArt.Warnung, "Bearbeitungsstapel instabil: " + BeginnEditCounter); }
@@ -196,5 +205,6 @@ namespace BlueControls.Controls {
             base.OnControlAdded(e);
         }
         #endregion
+
     }
 }

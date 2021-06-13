@@ -5,6 +5,7 @@ using BlueControls.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+
 namespace BlueControls.Controls {
     public partial class EasyPicMulti : GenericControl, IBackgroundNone // System.Windows.Forms.UserControl //
     {

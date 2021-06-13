@@ -21,8 +21,10 @@ using BlueBasics.Enums;
 using BlueDatabase.Enums;
 using System;
 using System.Drawing;
+
 namespace BlueDatabase {
     public sealed class ColumnViewItem {
+
         #region  Variablen-Deklarationen 
         private enViewType _ViewType;
         /// <summary>
@@ -44,9 +46,13 @@ namespace BlueDatabase {
         public int? _TMP_DrawWidth;
         public bool _TMP_Reduced;
         #endregion
+
+
         #region  Event-Deklarationen + Delegaten 
         public event EventHandler Changed;
         #endregion
+
+
         #region  Construktor + Initialize 
         /// <summary>
         /// Info: Es wird keine Änderung ausgelöst
@@ -90,28 +96,37 @@ namespace BlueDatabase {
             Initialize();
             foreach (var pair in codeToParse.GetAllTags()) {
                 switch (pair.Key) {
+
                     case "column":
+
                     case "columnname":// Columname wichtg, wegen CopyLayout
                         Column = database.Column[pair.Value];
                         break;
+
                     case "columnkey":
                         Column = database.Column.SearchByKey(int.Parse(pair.Value));
                         break;
+
                     case "x":
                         _Spalte_X1 = int.Parse(pair.Value);
                         break;
+
                     case "width":
                         _Spalte_Width = int.Parse(pair.Value);
                         break;
+
                     case "height":
                         _Spalte_Height = int.Parse(pair.Value);
                         break;
+
                     case "caption": // Todo: Alt 06.09.2019
                         _ÜberschriftAnordnung = (enÜberschriftAnordnung)int.Parse(pair.Value);
                         break;
+
                     case "permanent": // Todo: Alten Code Entfernen, Permanent wird nicht mehr verstringt 06.09.2019
                         _ViewType = enViewType.PermanentColumn;
                         break;
+
                     case "type":
                         _ViewType = (enViewType)int.Parse(pair.Value);
                         break;
@@ -124,6 +139,8 @@ namespace BlueDatabase {
             if (Column != null && _ViewType != enViewType.None) { Column.CheckFormulaEditType(); }
         }
         #endregion
+
+
         #region  Properties 
         public enViewType ViewType {
             get => _ViewType;
@@ -133,6 +150,7 @@ namespace BlueDatabase {
                 OnChanged();
             }
         }
+
         public enÜberschriftAnordnung ÜberschriftAnordnung {
             get => _ÜberschriftAnordnung;
             set {
@@ -163,6 +181,7 @@ namespace BlueDatabase {
                 OnChanged();
             }
         }
+
         public int Height {
             get => _Spalte_Height;
             set {
@@ -171,8 +190,10 @@ namespace BlueDatabase {
                 OnChanged();
             }
         }
+
         public ColumnItem Column { get; private set; }
         #endregion
+
         /// <summary>
         /// Info: Es wird keine Änderung ausgelöst
         /// </summary>
@@ -197,6 +218,7 @@ namespace BlueDatabase {
             }
             OnChanged();
         }
+
         public override string ToString() {
             var Result = "{Type=" + (int)_ViewType;
             if (Column != null) { Result = Result + ", " + Column.ParsableColumnKey(); }
@@ -206,6 +228,7 @@ namespace BlueDatabase {
             if (_ÜberschriftAnordnung != enÜberschriftAnordnung.Über_dem_Feld) { Result = Result + ", Caption=" + (int)_ÜberschriftAnordnung; }
             return Result + "}";
         }
+
         public ColumnViewItem PreviewsVisible(ColumnViewCollection _Parent) => _Parent?.PreviousVisible(this);
         public ColumnViewItem NextVisible(ColumnViewCollection _Parent) => _Parent?.NextVisible(this);
         public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);

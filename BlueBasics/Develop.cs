@@ -27,6 +27,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
 using static BlueBasics.FileOperations;
+
 namespace BlueBasics {
     public static class Develop {
         private static readonly object _SyncLockObject = new();

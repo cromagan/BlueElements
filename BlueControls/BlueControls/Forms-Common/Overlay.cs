@@ -2,6 +2,7 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using System;
 using System.Drawing;
+
 namespace BlueControls {
     public partial class Overlay : System.Windows.Forms.Form {
         private int Count;
@@ -44,9 +45,11 @@ namespace BlueControls {
             if (IsDisposed) { return; }
             base.OnPaint(e);
             switch (Modus) {
+
                 case 1:
                     Paint_RoterRahmenUmControlUndBlinken();
                     break;
+
                 case 2:
                     Paint_Radius();
                     break;

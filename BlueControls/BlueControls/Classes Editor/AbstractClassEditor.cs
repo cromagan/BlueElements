@@ -20,6 +20,7 @@ using BlueBasics;
 using BlueBasics.Interfaces;
 using System;
 using System.ComponentModel;
+
 namespace BlueControls.Classes_Editor {
     [DefaultEvent("Changed")]
     internal partial class AbstractClassEditor<T> : Controls.GroupBox where T : IParseable {

@@ -4,6 +4,7 @@ using BlueControls.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+
 namespace BlueControls.Forms {
     public partial class FloatingForm : Form {
         internal static List<FloatingForm> AllBoxes = new();

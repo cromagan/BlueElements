@@ -19,6 +19,7 @@
 using BlueDatabase;
 using System.Collections.Generic;
 using System.Drawing;
+
 namespace BlueControls.Controls {
     public class clsRowDrawData {
         public RowItem Row;

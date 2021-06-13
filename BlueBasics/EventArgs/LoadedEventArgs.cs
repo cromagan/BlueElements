@@ -16,6 +16,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 #endregion
+
 namespace BlueBasics.EventArgs {
     public class LoadedEventArgs : System.EventArgs {
         public LoadedEventArgs(bool onlyReload) => OnlyReload = onlyReload;

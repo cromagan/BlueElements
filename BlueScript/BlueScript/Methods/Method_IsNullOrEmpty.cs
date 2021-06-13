@@ -18,6 +18,7 @@
 #endregion
 using Skript.Enums;
 using System.Collections.Generic;
+
 namespace BlueScript {
     internal class Method_IsNullOrEmpty : Method {
         public override string Description => "Gibt TRUE zurück, wenn die Variable nicht existiert, fehlerhaft ist oder keinen Inhalt hat.";

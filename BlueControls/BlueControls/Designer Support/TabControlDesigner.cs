@@ -6,19 +6,23 @@ using System.ComponentModel.Design;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms.Design;
+
 namespace BlueControls.Designer_Support {
     internal sealed class TabControlDesigner : ParentControlDesigner {
+
         #region  Private Instance Variables 
         private readonly DesignerVerbCollection m_verbs = new();
         private IDesignerHost m_DesignerHost;
         private ISelectionService m_SelectionService;
         #endregion
+
         public TabControlDesigner() {
             DesignerVerb verb1 = new("Add Tab", OnAddPage);
             DesignerVerb verb2 = new("Insert Tab", OnInsertPage);
             DesignerVerb verb3 = new("Remove Tab", OnRemovePage);
             m_verbs.AddRange(new[] { verb1, verb2, verb3 });
         }
+
         #region  Properties 
         public override DesignerVerbCollection Verbs {
             get {
@@ -52,6 +56,7 @@ namespace BlueControls.Designer_Support {
             }
         }
         #endregion
+
         public void OnAddPage(object sender, System.EventArgs e) {
             var ParentControl = (AbstractTabControl)Control;
             var oldTabs = ParentControl.Controls;
@@ -102,10 +107,12 @@ namespace BlueControls.Designer_Support {
         private void SetVerbs() {
             var ParentControl = (AbstractTabControl)Control;
             switch (ParentControl.TabPages.Count) {
+
                 case 0:
                     Verbs[1].Enabled = false;
                     Verbs[2].Enabled = false;
                     break;
+
                 case 1:
                     Verbs[1].Enabled = false;
                     Verbs[2].Enabled = true;

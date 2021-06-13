@@ -19,6 +19,7 @@
 using BlueBasics.Enums;
 using System.Collections.Generic;
 using System.Linq;
+
 namespace BlueBasics {
     public static partial class Extensions {
         public static bool Contains(this ICollection<string> iC, string searchKeyword, bool caseSensitive) {

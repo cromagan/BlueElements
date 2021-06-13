@@ -23,10 +23,12 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+
 namespace BlueControls.Controls {
     //[Designer("System.Windows.Forms.Design.ParentControlDesigner,System.Design", typeof(IDesigner))]
     [ToolboxBitmap(typeof(System.Windows.Forms.GroupBox))]
     public partial class GroupBox : System.Windows.Forms.GroupBox, IUseMyBackColor {
+
         #region Constructor
         public GroupBox() : base() =>
             //// Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
@@ -34,13 +36,19 @@ namespace BlueControls.Controls {
             //_MouseHighlight = false;
             SetStandardValues();
         #endregion
+
+
         #region  Variablen 
         //private string _Text = string.Empty;
         private enGroupBoxStyle _GroupBoxStyle = enGroupBoxStyle.Normal;
         #endregion
+
+
         #region  Events 
         //public new event EventHandler TextChanged;
         #endregion
+
+
         #region  Properties 
         [DefaultValue(enGroupBoxStyle.Normal)]
         public enGroupBoxStyle GroupBoxStyle {
@@ -92,6 +100,7 @@ namespace BlueControls.Controls {
         //    }
         //}
         #endregion
+
         protected override void OnParentChanged(System.EventArgs e) {
             base.OnParentChanged(e);
             SetStandardValues();
@@ -112,17 +121,21 @@ namespace BlueControls.Controls {
             SetStandardValues();
             ChildControls_RibbonBar();
         }
+
         private void SetStandardValues() {
             var l = GenericControl.Typ(Parent);
             if (_GroupBoxStyle == enGroupBoxStyle.RibbonBar) { l = enPartentType.RibbonPage; }
             switch (l) {
+
                 case enPartentType.RibbonPage:
                     GroupBoxStyle = enGroupBoxStyle.RibbonBar;
                     BackColor = Skin.Color_Back(enDesign.RibbonBar_Body, enStates.Standard);
                     break;
+
                 case enPartentType.TabPage:
                     BackColor = Skin.Color_Back(enDesign.TabStrip_Body, enStates.Standard);
                     break;
+
                 case enPartentType.Form:
                     BackColor = Skin.Color_Back(enDesign.Form_Standard, enStates.Standard);
                     break;
@@ -138,6 +151,7 @@ namespace BlueControls.Controls {
             Rectangle r = new(0, 0, Width, Height);
             e.Graphics.Clear(BackColor);
             switch (_GroupBoxStyle) {
+
                 case enGroupBoxStyle.RibbonBar:
                     Skin.Draw_Border(e.Graphics, enDesign.RibbonBar_Frame, state, r);
                     if (!string.IsNullOrEmpty(Text)) {
@@ -145,6 +159,7 @@ namespace BlueControls.Controls {
                         Skin.Draw_FormatedText(e.Graphics, Text, enDesign.RibbonBar_Frame, state, null, enAlignment.Bottom_HorizontalCenter, bottomTXT, this, false, true);
                     }
                     break;
+
                 case enGroupBoxStyle.Normal:
                     if (Height > 33) {
                         Skin.Draw_Border(e.Graphics, enDesign.Frame, state, r);
@@ -160,6 +175,7 @@ namespace BlueControls.Controls {
             }
             if (DesignMode) { ChildControls_RibbonBar(); }
         }
+
         private void ChildControls_RibbonBar() {
             if (_GroupBoxStyle != enGroupBoxStyle.RibbonBar) { return; }
             //if (Parent == null) { return; }
@@ -167,18 +183,24 @@ namespace BlueControls.Controls {
             if (Controls.Count == 0) { return; }
             foreach (Control thisControl in Controls) {
                 switch (thisControl) {
+
                     case Caption Caption:
                         if (Caption.TextAnzeigeVerhalten == enSteuerelementVerhalten.Steuerelement_Anpassen) { Caption.TextAnzeigeVerhalten = enSteuerelementVerhalten.Text_Abschneiden; }
                         thisControl.Top = ((int)(thisControl.Top / 22.0) * 22) + 2;
                         thisControl.Height = Math.Max((int)(thisControl.Height / 22.0) * 22, 22);
                         break;
+
                     case Line _:
                         thisControl.Top = ((int)(thisControl.Top / 22.0) * 22) + 2;
                         thisControl.Height = Math.Max((int)(thisControl.Height / 22.0) * 22, 22);
                         break;
+
                     case Button _:
+
                     case ComboBox _:
+
                     case ListBox _:
+
                     case TextBox _:
                         thisControl.Top = ((int)(thisControl.Top / 22.0) * 22) + 2;
                         thisControl.Height = Math.Max((int)(thisControl.Height / 22.0) * 22, 22);

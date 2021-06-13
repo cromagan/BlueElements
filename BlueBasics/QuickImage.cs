@@ -25,11 +25,13 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Reflection;
 using static BlueBasics.modConverter;
+
 namespace BlueBasics {
     public sealed class QuickImage : IParseable, IReadableTextWithChanging, ICompareKey {
         private static string _SearchedCode = string.Empty;
         private static int _FoundInde = -1;
         private static readonly object _locker = new();
+
         #region  Variablen-Deklarationen
         private string _name;
         private enImageCodeEffect _effekt;
@@ -46,10 +48,14 @@ namespace BlueBasics {
         private string TMPCode = string.Empty;
         private bool _IsError;
         #endregion
+
+
         #region  Event-Deklarationen + Delegaten
         public event EventHandler Changed;
         public static event EventHandler<NeedImageEventArgs> NeedImage;
         #endregion
+
+
         #region  Construktor + Initialize
         public QuickImage(string imageCode) => Parse(imageCode);
         private void Initialize() {
@@ -66,6 +72,8 @@ namespace BlueBasics {
             _Zweitsymbol = string.Empty;
         }
         #endregion
+
+
         #region  Properties
         public Bitmap BMP {
             get {
@@ -164,6 +172,8 @@ namespace BlueBasics {
             }
         }
         #endregion
+
+
         #region  Shares
         private static readonly List<QuickImage> _pics = new();
         public static QuickImage Get(Bitmap image) {
@@ -215,46 +225,67 @@ namespace BlueBasics {
         }
         public static enImageCode FileTypeImage(enFileFormat file) {
             switch (file) {
+
                 case enFileFormat.WordKind:
                     return enImageCode.Word;
+
                 case enFileFormat.ExcelKind:
                     return enImageCode.Excel;
+
                 case enFileFormat.PowerPointKind:
                     return enImageCode.PowerPoint;
+
                 case enFileFormat.Textdocument:
                     return enImageCode.Textdatei;
+
                 case enFileFormat.EMail:
                     return enImageCode.Brief;
+
                 case enFileFormat.Pdf:
                     return enImageCode.PDF;
+
                 case enFileFormat.HTML:
                     return enImageCode.Globus;
+
                 case enFileFormat.Image:
                     return enImageCode.Bild;
+
                 case enFileFormat.CompressedArchive:
                     return enImageCode.Karton;
+
                 case enFileFormat.Movie:
                     return enImageCode.Filmrolle;
+
                 case enFileFormat.Executable:
                     return enImageCode.Anwendung;
+
                 case enFileFormat.HelpFile:
                     return enImageCode.Frage;
+
                 case enFileFormat.Database:
                     return enImageCode.Datenbank;
+
                 case enFileFormat.XMLFile:
                     return enImageCode.XML;
+
                 case enFileFormat.Visitenkarte:
                     return enImageCode.Visitenkarte;
+
                 case enFileFormat.Sound:
                     return enImageCode.Note;
+
                 case enFileFormat.Unknown:
                     return enImageCode.Datei;
+
                 case enFileFormat.ProgrammingCode:
                     return enImageCode.Skript;
+
                 case enFileFormat.Link:
                     return enImageCode.Undo;
+
                 case enFileFormat.BlueCreativeFile:
                     return enImageCode.Smiley;
+
                 case enFileFormat.Icon:
                     return enImageCode.Bild;
                 default:
@@ -319,6 +350,7 @@ namespace BlueBasics {
             }
         }
         #endregion
+
         public override string ToString() {
             if (string.IsNullOrEmpty(TMPCode)) {
                 TMPCode = GenerateCode(_name, _width, _height, _effekt, _färbung, _changeGreenTo, _sättigung, _helligkeit, _drehWinkel, _transparenz, _Zweitsymbol);

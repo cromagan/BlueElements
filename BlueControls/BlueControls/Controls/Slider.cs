@@ -23,10 +23,12 @@ using BlueControls.Interfaces;
 using System;
 using System.ComponentModel;
 using System.Drawing;
+
 namespace BlueControls.Controls {
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("ValueChanged")]
     public partial class Slider : IBackgroundNone {
+
         #region Constructor
         public Slider() : base(false, false) {
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -36,6 +38,8 @@ namespace BlueControls.Controls {
             SetStyle(System.Windows.Forms.ControlStyles.ContainerControl, true);
         }
         #endregion
+
+
         #region  Variablen 
         private double? LastFiredValue;
         private readonly object Lock_UserAction = new();
@@ -52,6 +56,8 @@ namespace BlueControls.Controls {
         private bool _SliderContainsMouse;
         private const int _ButtonSize = 18;
         #endregion
+
+
         #region  Properties 
         [DefaultValue(0)]
         public new int TabIndex {
@@ -122,9 +128,12 @@ namespace BlueControls.Controls {
             }
         }
         #endregion
+
+
         #region  Event-Deklarationen 
         public event EventHandler ValueChanged;
         #endregion
+
         private void OnValueChanged() => ValueChanged?.Invoke(this, System.EventArgs.Empty);
         private void But1_Click(object sender, System.EventArgs e) {
             lock (Lock_UserAction) {
@@ -134,6 +143,7 @@ namespace BlueControls.Controls {
                 Value -= SmallChange;
             }
         }
+
         private void But2_Click(object sender, System.EventArgs e) {
             lock (Lock_UserAction) {
                 _SliderContainsMouse = false;
@@ -170,6 +180,7 @@ namespace BlueControls.Controls {
                 Invalidate();
             }
         }
+
         public new bool Focused() => base.Focused || But1.Focused || But2.Focused;
         private void GenerateButtons() {
             _SliderContainsMouse = false;
@@ -193,11 +204,13 @@ namespace BlueControls.Controls {
             }
             Invalidate();
         }
+
         private double CheckMinMax(double ValueToCheck) {
             var _Min = Math.Min(_Minimum, _Maximum);
             var _Max = Math.Max(_Minimum, _Maximum);
             return ValueToCheck < _Min ? _Min : ValueToCheck > _Max ? _Max : ValueToCheck;
         }
+
         private void DoMouseAction(System.Windows.Forms.MouseEventArgs e, bool MouseisMoving) {
             _ClickAreaContainsMouse = _ClickArea.Contains(e.X, e.Y);
             if (!_ClickAreaContainsMouse && !MouseisMoving) { return; }
@@ -277,6 +290,7 @@ namespace BlueControls.Controls {
             base.OnEnabledChanged(e);
             CheckButtonEnabledState();
         }
+
         private void CheckButtonEnabledState() {
             var ol1 = But1.Enabled;
             var ol2 = But1.Enabled;

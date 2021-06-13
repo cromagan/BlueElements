@@ -30,6 +30,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+
 namespace BlueControls.Controls {
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("ValueChanged")]
@@ -65,6 +66,7 @@ namespace BlueControls.Controls {
         public event EventHandler ValueChanged;
         [Obsolete]
         public new event EventHandler TextChanged;
+
         #region  Constructor 
         public FlexiControl() : base(false, false) {
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -88,6 +90,8 @@ namespace BlueControls.Controls {
             Size = new Size((int)(s.Width + 2), (int)(s.Height + 2));
         }
         #endregion
+
+
         #region  Properties 
         [DefaultValue(false)]
         public bool ShowInfoWhenDisabled {
@@ -247,6 +251,7 @@ namespace BlueControls.Controls {
         [DefaultValue("")]
         public string FileEncryptionKey { get; set; } = "";
         #endregion
+
         protected override void DrawControl(Graphics gr, enStates state) {
             // Enabled wurde verdeckt!
             if (!Enabled) { state = enStates.Standard_Disabled; }
@@ -456,6 +461,7 @@ namespace BlueControls.Controls {
         //    RemovingAll?.Invoke(this, System.EventArgs.Empty);
         //}
         protected virtual void OnNeedRefresh() => NeedRefresh?.Invoke(this, System.EventArgs.Empty);
+
         #region  Caption 
         private void Control_Create_Caption() {
             if (_CaptionPosition == enÜberschriftAnordnung.ohne) { return; }
@@ -486,6 +492,8 @@ namespace BlueControls.Controls {
             _CaptionObject.Text = _Caption + " <i>" + _Value;
         }
         #endregion
+
+
         #region  Line 
         /// <summary>
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt. 
@@ -499,6 +507,8 @@ namespace BlueControls.Controls {
             return Control;
         }
         #endregion
+
+
         #region  EasyPic 
         /// <summary>
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt. 
@@ -518,6 +528,8 @@ namespace BlueControls.Controls {
             //if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
             Control.FromFile(_Value);
         #endregion
+
+
         #region  ComboBox 
         /// <summary>
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
@@ -549,6 +561,8 @@ namespace BlueControls.Controls {
             ValueSet(((ComboBox)sender).Text, false, ((ComboBox)sender).DropDownStyle == ComboBoxStyle.DropDownList);
         }
         #endregion
+
+
         #region SwapListBox
         // Nimmt Teilweise die Routinen der Listbox her
         private SwapListBox Control_Create_SwapListBox() {
@@ -579,6 +593,8 @@ namespace BlueControls.Controls {
             ValueSet(((SwapListBox)sender).Item.ToListOfString().JoinWithCr(), false, true);
         }
         #endregion
+
+
         #region  ListBox 
         private void ListBox_ItemRemoved(object sender, System.EventArgs e) {
             if (_IsFilling) { return; }
@@ -641,6 +657,8 @@ namespace BlueControls.Controls {
         /// </summary>
         private void UpdateValueTo_ListBox(ItemCollectionList Main) => Main.SetValuesTo(_Value.SplitByCRToList(), FileEncryptionKey);
         #endregion
+
+
         #region  Button 
         private void ComandButton_Click(object sender, System.EventArgs e) {
             if (_EditType != enEditTypeFormula.Button) { return; }
@@ -713,6 +731,8 @@ namespace BlueControls.Controls {
             }
         }
         #endregion
+
+
         #region  Textbox 
         /// <summary>
         /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
@@ -746,6 +766,7 @@ namespace BlueControls.Controls {
             ValueSet(((TextBox)sender).Text, false, false);
         }
         #endregion
+
         /// <summary>
         /// Erstellt zuerst die Standard-Caption, dessen Events werden registriert.
         /// Kümmert sich dann um die Position des Controls im Bezug auf die Caption. Setzt die Sichtbarkeit, korrigiert Anachor und fügt das Control zu der Controll Collection hinzu.

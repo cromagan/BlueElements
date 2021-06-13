@@ -20,6 +20,7 @@ using BlueBasics;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+
 namespace BlueControls.Forms {
     public partial class PictureView {
         protected List<string> _FileList;
@@ -31,6 +32,7 @@ namespace BlueControls.Forms {
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             InitWindow(false, "", -1);
         }
+
         public PictureView(List<string> FileList, bool MitScreenResize, string WindowCaption) {
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
             InitializeComponent();
@@ -40,6 +42,7 @@ namespace BlueControls.Forms {
             ZoomIn.Checked = true;
             Auswahl.Enabled = false;
         }
+
         public PictureView(Bitmap BMP) {
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
             InitializeComponent();
@@ -50,6 +53,7 @@ namespace BlueControls.Forms {
             ZoomIn.Checked = true;
             Auswahl.Enabled = false;
         }
+
         public PictureView(List<string> FileList, bool MitScreenResize, string WindowCaption, int OpenOnScreen) {
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
             InitializeComponent();
@@ -100,6 +104,7 @@ namespace BlueControls.Forms {
             }
             Pad.ZoomFit();
         }
+
         private void InitWindow(bool fitWindowToBest, string windowCaption, int openOnScreen) {
             //    Me.ShowInTaskbar = False
             if (_FileList == null || _FileList.Count < 2) { grpSeiten.Enabled = false; }
@@ -122,16 +127,19 @@ namespace BlueControls.Forms {
             }
             if (Develop.IsHostRunning()) { TopMost = false; }
         }
+
         private void Links_Click(object sender, System.EventArgs e) {
             _NR--;
             if (_NR <= 0) { _NR = 0; }
             LoadPic(_NR);
         }
+
         private void Rechts_Click(object sender, System.EventArgs e) {
             _NR++;
             if (_NR >= _FileList.Count - 1) { _NR = _FileList.Count - 1; }
             LoadPic(_NR);
         }
+
         private void ZoomFitBut_Click(object sender, System.EventArgs e) => Pad.ZoomFit();
         private void Pad_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
             if (ZoomIn.Checked) { Pad.ZoomIn(e); }

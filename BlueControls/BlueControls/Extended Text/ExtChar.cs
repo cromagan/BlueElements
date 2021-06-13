@@ -21,8 +21,10 @@ using BlueControls.Enums;
 using System;
 using System.Drawing;
 using System.Drawing.Text;
+
 namespace BlueControls {
     public class ExtChar {
+
         #region  Variablen-Deklarationen 
         public PointF Pos = PointF.Empty;
         private readonly char _Char;
@@ -34,8 +36,12 @@ namespace BlueControls {
         public const char Top = (char)4;
         public const char StoreX = (char)5;
         #endregion
+
+
         #region  Event-Deklarationen + Delegaten 
         #endregion
+
+
         #region  Construktor + Initialize 
         internal ExtChar(char charcode, enDesign cDesign, enStates cState, BlueFont cFont, int Stufe, enMarkState cMarkState) {
             _Design = cDesign;
@@ -46,6 +52,8 @@ namespace BlueControls {
             Marking = cMarkState;
         }
         #endregion
+
+
         #region  Properties 
         internal BlueFont Font { get; private set; } = null;
         public int Char => _Char;
@@ -90,6 +98,7 @@ namespace BlueControls {
             }
         }
         #endregion
+
         private void ChangeState(enDesign vDesign, enStates vState, int vStufe) {
             if (vState == _State && vStufe == _Stufe && vDesign == _Design) { return; }
             _Size = SizeF.Empty;

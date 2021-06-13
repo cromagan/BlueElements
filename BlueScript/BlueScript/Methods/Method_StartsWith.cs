@@ -18,6 +18,7 @@
 #endregion
 using Skript.Enums;
 using System.Collections.Generic;
+
 namespace BlueScript {
     internal class Method_StartsWith : Method {
         public override string Syntax => "StartsWith(String, CaseSensitive, Value1, Value2, ...)";

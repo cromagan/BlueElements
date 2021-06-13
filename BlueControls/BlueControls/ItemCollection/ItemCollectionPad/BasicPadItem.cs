@@ -26,6 +26,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+
 namespace BlueControls.ItemCollection {
     public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, IMoveable {
         private static string UniqueInternal_LastTime = "InitialDummy";
@@ -33,9 +34,11 @@ namespace BlueControls.ItemCollection {
         public readonly ItemCollectionPad Parent = null;
         public RectangleM tmpUsedArea = null;
         public virtual string QuickInfo { get; set; } = string.Empty;
+
         #region  Event-Deklarationen + Delegaten 
         public event EventHandler Changed;
         #endregion
+
         public string Internal { get; private set; }
         public static BasicPadItem NewByParsing(ItemCollectionPad parent, string code) {
             BasicPadItem i = null;
@@ -44,10 +47,13 @@ namespace BlueControls.ItemCollection {
             var name = string.Empty;
             foreach (var thisIt in x) {
                 switch (thisIt.Key) {
+
                     case "type":
+
                     case "classid":
                         ding = thisIt.Value;
                         break;
+
                     case "internalname":
                         name = thisIt.Value;
                         break;
@@ -62,45 +68,69 @@ namespace BlueControls.ItemCollection {
                 return null;
             }
             switch (ding.ToLower()) {
+
                 case "blueelements.clsitemtext":
+
                 case "blueelements.textitem":
+
                 case "text":
                     i = new TextPadItem(parent, name, string.Empty);
                     break;
+
                 case "blueelements.clsitemdistanz": // Todo: Entfernt am 24.05.2021
+
                 case "blueelements.distanzitem": // Todo: Entfernt am 24.05.2021
+
                 case "spacer": // Todo: Entfernt am 24.05.2021
                     i = null;
                     break;
+
                 case "blueelements.clsitemimage":
+
                 case "blueelements.imageitem":
+
                 case "image":
                     i = new BitmapPadItem(parent, name, string.Empty);
                     break;
+
                 case "blueelements.clsdimensionitem":
+
                 case "blueelements.dimensionitem":
+
                 case "dimension":
                     i = new DimensionPadItem(parent, name, null, null, 0);
                     break;
+
                 case "blueelements.clsitemline":
+
                 case "blueelements.itemline":
+
                 case "line":
                     i = new LinePadItem(parent, name, PadStyles.Style_Standard, Point.Empty, Point.Empty);
                     break;
+
                 case "blueelements.clsitempad":
+
                 case "blueelements.itempad":
+
                 case "childpad":
                     i = new ChildPadItem(parent, name);
                     break;
+
                 case "blueelements.clsitemgrid": // Todo: Entfernt am 24.05.2021
+
                 case "blueelements.itemgrid": // Todo: Entfernt am 24.05.2021
+
                 case "grid": // Todo: Entfernt am 24.05.2021
                     i = null;// new GridPadItem(parent, name);
                     break;
+
                 case "blueelements.rowformulaitem":
+
                 case "row":
                     i = new RowFormulaPadItem(parent, name);
                     break;
+
                 case "symbol":
                     i = new SymbolPadItem(parent, name);
                     break;
@@ -214,17 +244,24 @@ namespace BlueControls.ItemCollection {
         public List<string> Tags => _Tags;
         public virtual bool ParseThis(string tag, string value) {
             switch (tag.ToLower()) {
+
                 case "classid":
+
                 case "type":
+
                 case "enabled":
+
                 case "checked":
                     return true;
+
                 case "tag":
                     _Tags.Add(value.FromNonCritical());
                     return true;
+
                 case "print":
                     _Bei_Export_sichtbar = value.FromPlusMinus();
                     return true;
+
                 case "point":
                     foreach (var ThisPoint in MovablePoint) {
                         if (value.Contains("Name=" + ThisPoint.Name + ",")) {
@@ -232,25 +269,33 @@ namespace BlueControls.ItemCollection {
                         }
                     }
                     return true;
+
                 case "format": // = Textformat!!!
+
                 case "design":
+
                 case "style":
                     _Style = (PadStyles)int.Parse(value);
                     return true;
+
                 case "removetoo": // TODO: Alt, löschen, 02.03.2020
                     //RemoveToo.AddRange(value.FromNonCritical().SplitByCR());
                     return true;
+
                 case "removetoogroup":
                     Gruppenzugehörigkeit = value.FromNonCritical();
                     return true;
+
                 case "internalname":
                     if (value != Internal) {
                         Develop.DebugPrint(enFehlerArt.Fehler, "Namen unterschiedlich: " + value + " / " + Internal);
                     }
                     return true;
+
                 case "zoompadding":
                     _ZoomPadding = int.Parse(value);
                     return true;
+
                 case "quickinfo":
                     QuickInfo = value.FromNonCritical();
                     return true;

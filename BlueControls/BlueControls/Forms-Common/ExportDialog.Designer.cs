@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using BlueControls.Controls;
+
 namespace BlueControls.Forms
     {
         public sealed partial class ExportDialog : Form
@@ -452,7 +453,6 @@ namespace BlueControls.Forms
             | System.Windows.Forms.AnchorStyles.Right)));
             this.Exported.CheckBehavior = BlueControls.Enums.enCheckBehavior.NoSelection;
             this.Exported.FilterAllowed = true;
-            this.Exported.LastFilePath = null;
             this.Exported.Location = new System.Drawing.Point(8, 40);
             this.Exported.Name = "Exported";
             this.Exported.Size = new System.Drawing.Size(847, 593);

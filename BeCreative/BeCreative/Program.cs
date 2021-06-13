@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Windows.Forms;
 
+
 namespace WindowsFormsApp1 {
     internal static class Program {
         /// <summary>

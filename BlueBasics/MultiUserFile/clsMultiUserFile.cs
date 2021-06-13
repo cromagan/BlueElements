@@ -26,8 +26,10 @@ using System.Linq;
 using System.Threading;
 using static BlueBasics.FileOperations;
 using static BlueBasics.modAllgemein;
+
 namespace BlueBasics.MultiUserFile {
     public abstract class clsMultiUserFile : IDisposable {
+
         #region Shareds
         public static readonly ListExt<clsMultiUserFile> AllFiles = new();
         /// <summary>
@@ -74,6 +76,8 @@ namespace BlueBasics.MultiUserFile {
             return null;
         }
         #endregion
+
+
         #region Variablen und Properties
         private readonly BackgroundWorker BackgroundWorker;
         private readonly BackgroundWorker PureBinSaver;
@@ -111,12 +115,14 @@ namespace BlueBasics.MultiUserFile {
         private int Checker_Tick_count = -5;
         private bool _InitialLoadDone = false;
         #endregion
+
         public void BlockReload(bool crashisiscurrentlyloading) {
             WaitLoaded(crashisiscurrentlyloading);
             if (IsInSaveingLoop) { return; } // Ausnahme, bearbeitung sollte eh blockiert sein...
             if (IsSaving) { return; }
             _BlockReload = DateTime.UtcNow;
         }
+
         #region  Event-Deklarationen
         public event EventHandler Disposing; // Disposing leider als Variable vorhanden
         public event EventHandler<LoadedEventArgs> Loaded;
@@ -130,6 +136,7 @@ namespace BlueBasics.MultiUserFile {
         /// </summary>
         public event EventHandler Parsed;
         #endregion
+
         protected clsMultiUserFile(bool readOnly, bool zipped) {
             _zipped = zipped;
             AllFiles.Add(this);
@@ -900,6 +907,7 @@ namespace BlueBasics.MultiUserFile {
                 Pause(0.2, true);
             }
         }
+
         #region IDisposable Support
         public bool Disposed { get; private set; } = false; // Dient zur Erkennung redundanter Aufrufe.
         protected virtual void Dispose(bool disposing) {
@@ -934,6 +942,7 @@ namespace BlueBasics.MultiUserFile {
             GC.SuppressFinalize(this);
         }
         #endregion
+
         protected bool IsFileAllowedToLoad(string fileName) {
             foreach (var ThisFile in AllFiles) {
                 if (ThisFile != null && string.Equals(ThisFile.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {

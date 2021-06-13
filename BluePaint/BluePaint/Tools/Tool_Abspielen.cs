@@ -22,6 +22,7 @@ using BluePaint.EventArgs;
 using System.Collections.Generic;
 using System.Drawing;
 using static BlueBasics.FileOperations;
+
 namespace BluePaint {
     public partial class Tool_Abspielen : GenericTool   // BlueControls.Forms.Form// 
     {
@@ -33,17 +34,23 @@ namespace BluePaint {
             _macro = macro;
             _merker = merker;
         }
+
         public override void ToolFirstShown() => OnZoomFit();
         private void optNeuerName_Click(object sender, System.EventArgs e) {
         }
+
         private void optUeberschreiben_Click(object sender, System.EventArgs e) {
         }
+
         private void optZielordner_Click(object sender, System.EventArgs e) {
         }
+
         private void txbZielordner_TextChanged(object sender, System.EventArgs e) {
         }
+
         private void txbQuelle_TextChanged(object sender, System.EventArgs e) {
         }
+
         private void btnAbspielen_Click(object sender, System.EventArgs e) {
             if (_macro == null || _macro.Count == 0) {
                 MessageBox.Show("Keine Aufzeichnung vorhanden.");
@@ -81,6 +88,7 @@ namespace BluePaint {
                 modAllgemein.CollectGarbage();
             }
         }
+
         private void DoMakro(string thisS) {
             var t = thisS.SplitBy(";");
             foreach (var ThisTool in _merker) {
@@ -94,6 +102,7 @@ namespace BluePaint {
                 }
             }
         }
+
         private void ThisTool_NeedCurrentPic(object sender, BitmapEventArgs e) => e.BMP = OnNeedCurrentPic();
         private void ThisTool_OverridePic(object sender, BitmapEventArgs e) => OnOverridePic(e.BMP);
     }

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Windows.Forms.Design;
+
 namespace BlueControls.Designer_Support {
     public class BasicDesigner : ControlDesigner {
         protected override void PreFilterProperties(IDictionary properties) {

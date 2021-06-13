@@ -4,6 +4,7 @@ using System.Drawing;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+
 namespace BlueControls.Forms
     {
         public partial class RelationDiagram 

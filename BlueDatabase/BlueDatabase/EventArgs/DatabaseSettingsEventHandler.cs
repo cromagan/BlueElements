@@ -16,6 +16,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
+
 namespace BlueDatabase.EventArgs {
     public class DatabaseSettingsEventHandler : System.EventArgs {
         public DatabaseSettingsEventHandler(ColumnItem executingColumn, string filenname, bool readOnly) {

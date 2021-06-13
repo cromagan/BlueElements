@@ -20,6 +20,7 @@ using BlueBasics.Enums;
 using System.Linq;
 using System.Text.RegularExpressions;
 using static BlueBasics.modConverter;
+
 namespace BlueBasics {
     public static class DataFormat {
         public static bool MultilinePossible(this enDataFormat format) => format switch {

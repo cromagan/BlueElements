@@ -26,6 +26,7 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
+
 namespace BlueControls.BlueDatabaseDialogs {
     public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserControl //
     {
@@ -127,15 +128,19 @@ namespace BlueControls.BlueDatabaseDialogs {
                 if (Column.FilterOptions == enFilterOptions.Enabled_OnlyOrAllowed) { ChangeToMultiOder(); }
             }
         }
+
         #region  Variablen 
         private readonly ColumnItem Column;
         private bool MultiAuswahlUND;
         private bool MultiAuswahlODER;
         private bool NegativAuswahl;
         #endregion
+
+
         #region  Events 
         public event EventHandler<FilterComandEventArgs> FilterComand;
         #endregion
+
         private void CloseAndDispose(string Comand, FilterItem NewFilter) {
             if (IsClosed) { return; }
             Close();
@@ -224,34 +229,42 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
         private void sFilter_ItemClicked(object sender, BasicListItemEventArgs e) {
             switch (e.Item.Internal.ToLower()) {
+
                 case "filterleere": {
                         CloseAndDispose("Filter", new FilterItem(Column, enFilterType.Istgleich | enFilterType.MultiRowIgnorieren, ""));
                         break;
                     }
+
                 case "filternichtleere": {
                         CloseAndDispose("Filter", new FilterItem(Column, enFilterType.Ungleich_MultiRowIgnorieren, ""));
                         break;
                     }
+
                 case "clipboard": {
                         CloseAndDispose("DoClipboard", null);
                         break;
                     }
+
                 case "nichtclipboard": {
                         CloseAndDispose("DoNotClipboard", null);
                         break;
                     }
+
                 case "filterlöschen": {
                         CloseAndDispose("FilterDelete", null);
                         break;
                     }
+
                 case "modusmultiund": {
                         ChangeToMultiUnd();
                         break;
                     }
+
                 case "modusmultioder": {
                         ChangeToMultiOder();
                         break;
                     }
+
                 case "modusnegativ": {
                         NegativAuswahl = true;
                         MultiAuswahlUND = false;
@@ -263,14 +276,17 @@ namespace BlueControls.BlueDatabaseDialogs {
                         lsbStandardFilter.Item["ModusMultiOder"].Enabled = false;
                         break;
                     }
+
                 case "einzigartig": {
                         CloseAndDispose("DoEinzigartig", null);
                         break;
                     }
+
                 case "nichteinzigartig": {
                         CloseAndDispose("DoNichtEinzigartig", null);
                         break;
                     }
+
                 case "spaltenvergleich": {
                         CloseAndDispose("DoSpaltenvergleich", null);
                         break;

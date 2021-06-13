@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using BlueControls.Controls;
 using BlueControls.Forms;
+
 namespace BlueControls.BlueDatabaseDialogs
 	{
 		internal sealed partial class ColumnEditor : Form
@@ -605,7 +606,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.lbxCellEditor.AddAllowed = BlueControls.Enums.enAddType.Text;
             this.lbxCellEditor.CheckBehavior = BlueControls.Enums.enCheckBehavior.MultiSelection;
             this.lbxCellEditor.FilterAllowed = true;
-            this.lbxCellEditor.LastFilePath = null;
             this.lbxCellEditor.Location = new System.Drawing.Point(576, 48);
             this.lbxCellEditor.Name = "lbxCellEditor";
             this.lbxCellEditor.RemoveAllowed = true;

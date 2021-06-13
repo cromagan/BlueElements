@@ -28,6 +28,7 @@ using FastColoredTextBoxNS;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 namespace BlueControls {
     public partial class ScriptEditor : GroupBox // System.Windows.Forms.UserControl
     {
@@ -38,6 +39,7 @@ namespace BlueControls {
             InitializeComponent();
             GenerateVariableTable();
         }
+
         public Database Database {
             get => _Database;
             set {
@@ -52,6 +54,7 @@ namespace BlueControls {
                 }
             }
         }
+
         private void _Database_Disposing(object sender, System.EventArgs e) => Database = null;
         private void GenerateVariableTable() {
             Database x = new(true);
@@ -81,6 +84,7 @@ namespace BlueControls {
             if (_Database == null) { return; }
             _Database.RulesScript = txtSkript.Text;
         }
+
         private void btnTest_Click(object sender, System.EventArgs e) {
             if (_Database == null) {
                 MessageBox.Show("Keine Datenbank geladen.", enImageCode.Information, "OK");
@@ -149,6 +153,7 @@ namespace BlueControls {
                 ? "[" + DateTime.Now.ToLongTimeString() + "] Erfolgreich, wenn auch IF-Routinen nicht geprüft wurden."
                 : "[" + DateTime.Now.ToLongTimeString() + "] Fehler in Zeile: " + s.Line.ToString() + "\r\n" + s.Error + "\r\n >>> " + s.ErrorCode;
         }
+
         private void txtSkript_ToolTipNeeded(object sender, ToolTipNeededEventArgs e) {
             try {
                 foreach (var thisc in lstComands.Item) {
@@ -183,6 +188,7 @@ namespace BlueControls {
                 Develop.DebugPrint(ex);
             }
         }
+
         private void lstComands_ItemClicked(object sender, BasicListItemEventArgs e) {
             var co = string.Empty;
             if (e.Item.Tag is Method thisc) {

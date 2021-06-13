@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+
 namespace BlueBasics {
     public static partial class Extensions {
         public static Bitmap Area(this Bitmap sourceBitmap, Rectangle r) {
@@ -89,7 +90,9 @@ namespace BlueBasics {
                     }
                 }
             }
-            bool IsWhite(int x, int y) => x < 0 || y < 0 || x >= pic.Width || y >= pic.Height || pic.GetPixel(x, y).IsNearWhite(0.9);
+            bool IsWhite(int x, int y) {
+                return x < 0 || y < 0 || x >= pic.Width || y >= pic.Height || pic.GetPixel(x, y).IsNearWhite(0.9);
+            }
         }
         public static Bitmap Image_Clone(this Bitmap sourceBMP) {
             if (sourceBMP == null) { return null; }
@@ -420,82 +423,102 @@ namespace BlueBasics {
         public static Bitmap ImageBlurFilter(this Bitmap sourceBitmap, BlurType blurType) {
             Bitmap resultBitmap = null;
             switch (blurType) {
+
                 case BlurType.Mean3x3: {
                         resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.Mean3x3, 1.0 / 9.0, 0);
                     }
                     break;
+
                 case BlurType.Mean5x5: {
                         resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.Mean5x5, 1.0 / 25.0, 0);
                     }
                     break;
+
                 case BlurType.Mean7x7: {
                         resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.Mean7x7, 1.0 / 49.0, 0);
                     }
                     break;
+
                 case BlurType.Mean9x9: {
                         resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.Mean9x9, 1.0 / 81.0, 0);
                     }
                     break;
+
                 case BlurType.GaussianBlur3x3: {
                         resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.GaussianBlur3x3, 1.0 / 16.0, 0);
                     }
                     break;
+
                 case BlurType.GaussianBlur5x5: {
                         resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.GaussianBlur5x5, 1.0 / 159.0, 0);
                     }
                     break;
+
                 case BlurType.MotionBlur5x5: {
                         resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.MotionBlur5x5, 1.0 / 10.0, 0);
                     }
                     break;
+
                 case BlurType.MotionBlur5x5At45Degrees: {
                         resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.MotionBlur5x5At45Degrees, 1.0 / 5.0, 0);
                     }
                     break;
+
                 case BlurType.MotionBlur5x5At135Degrees: {
                         resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.MotionBlur5x5At135Degrees, 1.0 / 5.0, 0);
                     }
                     break;
+
                 case BlurType.MotionBlur7x7: {
                         resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.MotionBlur7x7, 1.0 / 14.0, 0);
                     }
                     break;
+
                 case BlurType.MotionBlur7x7At45Degrees: {
                         resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.MotionBlur7x7At45Degrees, 1.0 / 7.0, 0);
                     }
                     break;
+
                 case BlurType.MotionBlur7x7At135Degrees: {
                         resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.MotionBlur7x7At135Degrees, 1.0 / 7.0, 0);
                     }
                     break;
+
                 case BlurType.MotionBlur9x9: {
                         resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.MotionBlur9x9, 1.0 / 18.0, 0);
                     }
                     break;
+
                 case BlurType.MotionBlur9x9At45Degrees: {
                         resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.MotionBlur9x9At45Degrees, 1.0 / 9.0, 0);
                     }
                     break;
+
                 case BlurType.MotionBlur9x9At135Degrees: {
                         resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.MotionBlur9x9At135Degrees, 1.0 / 9.0, 0);
                     }
                     break;
+
                 case BlurType.Median3x3: {
                         resultBitmap = sourceBitmap.MedianFilter(3);
                     }
                     break;
+
                 case BlurType.Median5x5: {
                         resultBitmap = sourceBitmap.MedianFilter(5);
                     }
                     break;
+
                 case BlurType.Median7x7: {
                         resultBitmap = sourceBitmap.MedianFilter(7);
                     }
                     break;
+
                 case BlurType.Median9x9: {
                         resultBitmap = sourceBitmap.MedianFilter(9);
                     }
                     break;
+
                 case BlurType.Median11x11: {
                         resultBitmap = sourceBitmap.MedianFilter(11);
                     }

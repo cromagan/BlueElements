@@ -1,5 +1,6 @@
 ﻿using BlueControls.Controls;
 using BlueBasics.Enums;
+
 namespace BluePaint
 {
     public partial class Tool_Resize 

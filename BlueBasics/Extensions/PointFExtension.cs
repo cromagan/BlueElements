@@ -18,6 +18,7 @@
 #endregion
 using System;
 using System.Drawing;
+
 namespace BlueBasics {
     public static partial class Extensions {
         public static bool PointInRect(this PointF p, decimal x1, decimal y1, decimal x2, decimal y2, float toleranz) {

@@ -17,6 +17,7 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 using System;
+
 namespace BlueControls.Enums {
     public enum enHintergrundArt {
         Unbekannt = -1,

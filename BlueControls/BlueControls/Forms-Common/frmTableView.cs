@@ -31,6 +31,7 @@ using System.ComponentModel;
 using System.IO;
 using static BlueBasics.Develop;
 using static BlueBasics.FileOperations;
+
 namespace BlueControls.Forms {
     public partial class frmTableView {
         public frmTableView() : this(null, true, true) { }
@@ -305,6 +306,7 @@ namespace BlueControls.Forms {
         private void Drucken_ItemClicked(object sender, BasicListItemEventArgs e) {
             BlueBasics.MultiUserFile.clsMultiUserFile.SaveAll(false);
             switch (e.Item.Internal) {
+
                 case "erweitert":
                     Visible = false;
                     TableView.Visible = false;
@@ -320,10 +322,12 @@ namespace BlueControls.Forms {
                     TableView.Visible = true;
                     Visible = true;
                     break;
+
                 case "csv":
                     System.Windows.Forms.Clipboard.SetDataObject(TableView.Export_CSV(enFirstRow.ColumnCaption), true);
                     MessageBox.Show("Die gewünschten Daten<br>sind nun im Zwischenspeicher.", enImageCode.Clipboard, "Ok");
                     break;
+
                 case "html":
                     TableView.Export_HTML();
                     break;
@@ -345,6 +349,7 @@ namespace BlueControls.Forms {
             Ansicht3.Checked = _Ansicht == enAnsicht.Tabelle_und_Formular_übereinander;
             TableView?.Filter?.Clear();
             switch (_Ansicht) {
+
                 case enAnsicht.Nur_Tabelle:
                     grpFormularSteuerung.Visible = false;
                     Formula.Visible = false;
@@ -354,6 +359,7 @@ namespace BlueControls.Forms {
                     Formula.Dock = System.Windows.Forms.DockStyle.None;
                     TableView.Dock = System.Windows.Forms.DockStyle.Fill;
                     break;
+
                 case enAnsicht.Überschriften_und_Formular:
                     grpFormularSteuerung.Visible = true;
                     TableView.Design = enBlueTableAppearance.OnlyMainColumnWithoutHead;
@@ -363,6 +369,7 @@ namespace BlueControls.Forms {
                     Formula.BringToFront();
                     Formula.Dock = System.Windows.Forms.DockStyle.Fill;
                     break;
+
                 case enAnsicht.Tabelle_und_Formular_nebeneinander:
                     grpFormularSteuerung.Visible = false;
                     TableView.Design = enBlueTableAppearance.Standard;
@@ -373,6 +380,7 @@ namespace BlueControls.Forms {
                     TableView.BringToFront();
                     TableView.Dock = System.Windows.Forms.DockStyle.Fill;
                     break;
+
                 case enAnsicht.Tabelle_und_Formular_übereinander:
                     grpFormularSteuerung.Visible = false;
                     TableView.Design = enBlueTableAppearance.Standard;
@@ -403,9 +411,11 @@ namespace BlueControls.Forms {
             BlueBasics.MultiUserFile.clsMultiUserFile.SaveAll(false);
             var bu = (Button)sender;
             switch (bu.Name) {
+
                 case "btnSaveAs":
                     if (TableView.Database == null) { return; }
                     break;
+
                 case "btnNeuDB":
                     if (TableView.Database != null) { SetDatabasetoNothing(); }
                     break;
@@ -507,15 +517,19 @@ namespace BlueControls.Forms {
             if (string.IsNullOrEmpty(CellKey)) { return; }
             bt.Database.Cell.DataOfCellKey(CellKey, out var Column, out var Row);
             switch (e.ClickedComand) {
+
                 case "SpaltenSortierungAZ":
                     bt.SortDefinitionTemporary = new RowSortDefinition(bt.Database, Column.Name, false);
                     break;
+
                 case "SpaltenSortierungZA":
                     bt.SortDefinitionTemporary = new RowSortDefinition(bt.Database, Column.Name, true);
                     break;
+
                 case "Fehlersuche":
                     MessageBox.Show(Row.DoAutomatic(true, true, 10, "manual check").error);
                     break;
+
                 case "ZeileLöschen":
                     if (Row != null) {
                         if (MessageBox.Show("Zeile löschen?", enImageCode.Frage, "Ja", "Nein") == 0) {
@@ -523,22 +537,28 @@ namespace BlueControls.Forms {
                         }
                     }
                     break;
+
                 case "ContentDelete":
                     TableView.Database.Cell.Delete(Column, Row.Key);
                     break;
+
                 case "SpaltenEigenschaftenBearbeiten":
                     tabAdministration.OpenColumnEditor(Column, TableView);
                     CheckButtons();
                     break;
+
                 case "ContentCopy":
                     Table.CopyToClipboard(Column, Row, true);
                     break;
+
                 case "SuchenUndErsetzen":
                     TableView.OpenSearchAndReplace();
                     break;
+
                 case "ÜberallDel":
                     TableView.OpenSearchAndReplace();
                     break;
+
                 case "Summe":
                     var summe = Column.Summe(TableView.Filter);
                     if (!summe.HasValue) {
@@ -547,12 +567,15 @@ namespace BlueControls.Forms {
                         MessageBox.Show("Summe dieser Spalte, nur angezeigte Zeilen: <br><b>" + summe, enImageCode.Summe, "OK");
                     }
                     break;
+
                 case "VorherigenInhaltWiederherstellen":
                     Table.DoUndo(Column, Row);
                     break;
+
                 case "ContentPaste":
                     Row.CellSet(Column, Convert.ToString(System.Windows.Forms.Clipboard.GetDataObject().GetData(System.Windows.Forms.DataFormats.Text)));
                     break;
+
                 case "ColumnContentDelete":
                     if (Column != null) {
                         if (MessageBox.Show("Angezeite Inhalte dieser Spalte löschen?", enImageCode.Frage, "Ja", "Nein") == 0) {

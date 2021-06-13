@@ -29,8 +29,10 @@ using System.Drawing;
 using System.Text.RegularExpressions;
 using static BlueBasics.Extensions;
 using static BlueBasics.FileOperations;
+
 namespace BlueDatabase {
     public sealed class ColumnItem : IReadableTextWithChanging, ICompareKey, ICheckable, IDisposable {
+
         #region  Variablen-Deklarationen 
         public Database Database { get; private set; }
         private string _Name;
@@ -115,9 +117,13 @@ namespace BlueDatabase {
         internal List<string> _UcaseNamesSortedByLenght = null;
         private bool disposedValue;
         #endregion
+
+
         #region  Event-Deklarationen + Delegaten 
         public event EventHandler Changed;
         #endregion
+
+
         #region  Construktor + Initialize 
         public ColumnItem(Database database, int columnkey) {
             Database = database;
@@ -126,6 +132,7 @@ namespace BlueDatabase {
             var ex = Database.Column.SearchByKey(columnkey);
             if (ex != null) { Develop.DebugPrint(enFehlerArt.Fehler, "Key existiert bereits"); }
             Key = columnkey;
+
             #region Standard-Werte
             _Name = Database.Column.Freename(string.Empty);
             _Caption = string.Empty;
@@ -191,6 +198,7 @@ namespace BlueDatabase {
             //_Intelligenter_Multifilter = string.Empty;
             _DauerFilterPos = Point.Empty;
             #endregion
+
             DropDownItems.Changed += DropDownItems_ListOrItemChanged;
             OpticalReplace.Changed += OpticalReplacer_ListOrItemChanged;
             AfterEdit_AutoReplace.Changed += AfterEdit_AutoReplace_ListOrItemChanged;
@@ -201,6 +209,8 @@ namespace BlueDatabase {
         }
         private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
         #endregion
+
+
         #region  Properties 
         public int Key { get; }
         public string I_Am_A_Key_For_Other_Column { get; private set; }
@@ -810,6 +820,7 @@ namespace BlueDatabase {
         //    }
         //}
         #endregion
+
         private Database TMP_LinkedDatabase {
             set {
                 if (value == _TMP_LinkedDatabase) { return; }

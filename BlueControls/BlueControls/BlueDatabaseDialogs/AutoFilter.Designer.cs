@@ -2,6 +2,7 @@
 using BlueControls.Enums;
 using System.ComponentModel;
 using System.Diagnostics;
+
 namespace BlueControls.BlueDatabaseDialogs
 {
     public partial class AutoFilter
@@ -44,7 +45,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // txbEingabe
             // 
-            this.txbEingabe.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.txbEingabe.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txbEingabe.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbEingabe.Location = new System.Drawing.Point(8, 100);
@@ -61,7 +62,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Line
             // 
-            this.Line.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.Line.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.Line.CausesValidation = false;
             this.Line.Location = new System.Drawing.Point(8, 132);
@@ -72,11 +73,10 @@ namespace BlueControls.BlueDatabaseDialogs
             // lsbFilterItems
             // 
             this.lsbFilterItems.AddAllowed = BlueControls.Enums.enAddType.None;
-            this.lsbFilterItems.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.lsbFilterItems.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lsbFilterItems.Appearance = BlueControls.Enums.enBlueListBoxAppearance.Autofilter;
-            this.lsbFilterItems.LastFilePath = null;
             this.lsbFilterItems.Location = new System.Drawing.Point(8, 140);
             this.lsbFilterItems.Name = "lsbFilterItems";
             this.lsbFilterItems.Size = new System.Drawing.Size(150, 12);
@@ -87,10 +87,9 @@ namespace BlueControls.BlueDatabaseDialogs
             // lsbStandardFilter
             // 
             this.lsbStandardFilter.AddAllowed = BlueControls.Enums.enAddType.None;
-            this.lsbStandardFilter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.lsbStandardFilter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lsbStandardFilter.Appearance = BlueControls.Enums.enBlueListBoxAppearance.Autofilter;
-            this.lsbStandardFilter.LastFilePath = null;
             this.lsbStandardFilter.Location = new System.Drawing.Point(8, 8);
             this.lsbStandardFilter.Name = "lsbStandardFilter";
             this.lsbStandardFilter.Size = new System.Drawing.Size(150, 72);
@@ -121,13 +120,13 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capInfo
             // 
-            this.capInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.capInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.capInfo.CausesValidation = false;
             this.capInfo.Location = new System.Drawing.Point(8, 8);
             this.capInfo.Name = "capInfo";
             this.capInfo.Size = new System.Drawing.Size(152, 72);
-            this.capInfo.TextAnzeigeVerhalten = enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            this.capInfo.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
             this.capInfo.Visible = false;
             // 
             // AutoFilter
@@ -135,6 +134,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
+            this.ClientSize = new System.Drawing.Size(165, 159);
             this.Controls.Add(this.capInfo);
             this.Controls.Add(this.butFertig);
             this.Controls.Add(this.capWas);
@@ -143,9 +143,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Controls.Add(this.Line);
             this.Controls.Add(this.txbEingabe);
             this.Name = "AutoFilter";
-            this.Size = new System.Drawing.Size(165, 159);
-            this.TopMost = true;
             this.ResumeLayout(false);
+
         }
         internal TextBox txbEingabe;
         internal System.Windows.Forms.Timer Timer1x;

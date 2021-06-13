@@ -21,13 +21,17 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using System.Collections.Generic;
+
 namespace BlueDatabase {
     public sealed class ColumnViewCollection : ListExt<ColumnViewItem>, IParseable {
         //NICHT IReadableText, das gibt zu viele Probleme (Dropdownboxen)
+
         #region  Variablen-Deklarationen 
         public Database Database { get; private set; }
         private string _Name;
         #endregion
+
+
         #region  Construktor + Initialize 
         private void Initialize() {
             _Name = string.Empty;
@@ -47,6 +51,8 @@ namespace BlueDatabase {
             _Name = newname;
         }
         #endregion
+
+
         #region  Properties 
         public bool IsParsing { get; private set; }
         public string Name {
@@ -68,6 +74,7 @@ namespace BlueDatabase {
             }
         }
         #endregion
+
         private void _PermissionGroups_Show_ListOrItemChanged(object sender, System.EventArgs e) => OnChanged();
         public void Add(ColumnItem Column, bool Permanent) {
             if (Permanent) {
@@ -84,12 +91,15 @@ namespace BlueDatabase {
             Initialize();
             foreach (var pair in ToParse.GetAllTags()) {
                 switch (pair.Key) {
+
                     case "name":
                         _Name = pair.Value;
                         break;
+
                     case "columndata":
                         Add(new ColumnViewItem(Database, pair.Value));
                         break;
+
                     case "permissiongroup":
                         PermissionGroups_Show.Add(pair.Value);
                         break;

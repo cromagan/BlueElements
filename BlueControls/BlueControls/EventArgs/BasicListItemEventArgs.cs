@@ -17,6 +17,7 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 using BlueControls.ItemCollection;
+
 namespace BlueControls.EventArgs {
     public class BasicListItemEventArgs : System.EventArgs {
         public BasicListItemEventArgs(BasicListItem item) => Item = item;

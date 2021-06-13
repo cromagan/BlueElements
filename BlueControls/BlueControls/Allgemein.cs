@@ -24,6 +24,7 @@ using BlueControls.ItemCollection;
 using System;
 using System.Collections.Generic;
 using static BlueBasics.Extensions;
+
 namespace BlueControls {
     public static class Allgemein {
         public static IContextMenu ParentControlWithCommands(this object o) {
@@ -43,13 +44,16 @@ namespace BlueControls {
                 : UserMenu.Count > 0 ? par
                 : null;
         }
+
         public static t ParentControl<t>(this object o) {
             if (o is System.Windows.Forms.Control co) {
                 do {
                     co = co.Parent;
                     switch (co) {
+
                         case null:
                             return default;
+
                         case t ctr:
                             return ctr;
                         default:
@@ -59,6 +63,7 @@ namespace BlueControls {
             }
             return default;
         }
+
         public static List<string> SplitByWidth(this string Text, float MaxWidth, int MaxLines, enDesign design, enStates state) {
             List<string> _broken = new();
             var pos = 0;
@@ -101,6 +106,7 @@ namespace BlueControls {
             //    GenericControl.Skin.Draw_FormatedText(GR, ThisCap, enDesign.Item_Listbox, vState, null, enAlignment.Horizontal_Vertical_Center, r, null, false);
             //}
         }
+
         public static string TrimByWidth(this string TXT, float MaxWidth, BlueFont F) {
             if (F == null) { return TXT; }
             var tSize = BlueFont.MeasureString(TXT, F.Font());
@@ -124,6 +130,7 @@ namespace BlueControls {
             }
             return TXT;
         }
+
         public static List<string> ToListOfString(this List<BasicListItem> Items) {
             List<string> w = new();
             if (Items == null) { return w; }

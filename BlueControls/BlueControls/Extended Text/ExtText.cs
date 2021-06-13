@@ -45,8 +45,10 @@ using System.Drawing;
 // ZBX_Store = Zeilenbeginn speichern
 // TOP = Y auf 0 zurücksetzen
 // vState = vState Setzen (mit HTML_Code)
+
 namespace BlueControls {
     public sealed class ExtText {
+
         #region  Variablen-Deklarationen 
         public enAlignment Ausrichtung;
         public bool Multiline;
@@ -69,8 +71,12 @@ namespace BlueControls {
         private string _TMPHtmlText = string.Empty;
         private string _TMPPlainText = string.Empty;
         #endregion
+
+
         #region  Event-Deklarationen + Delegaten 
         #endregion
+
+
         #region  Construktor + Initialize 
         private void Initialize() {
             _Design = enDesign.Undefiniert;
@@ -89,12 +95,14 @@ namespace BlueControls {
             _TMPHtmlText = string.Empty;
             _TMPPlainText = string.Empty;
         }
+
         public ExtText(enDesign vDesign, enStates state) {
             Initialize();
             _Design = vDesign;
             _State = state;
             _Row = null;
         }
+
         public ExtText(PadStyles vDesign, RowItem SkinRow) {
             Initialize();
             _Design = (enDesign)vDesign;
@@ -105,6 +113,8 @@ namespace BlueControls {
             }
         }
         #endregion
+
+
         #region  Properties 
         public List<ExtChar> Chars { get; private set; }
         public float Zeilenabstand {
@@ -126,6 +136,7 @@ namespace BlueControls {
                 ResetPosition(false);
             }
         }
+
         public string HtmlText {
             get {
                 if (string.IsNullOrEmpty(_TMPHtmlText)) {
@@ -138,6 +149,7 @@ namespace BlueControls {
                 ConvertTextToChar(value, true);
             }
         }
+
         public string PlainText {
             get {
                 if (string.IsNullOrEmpty(_TMPPlainText)) {
@@ -150,6 +162,7 @@ namespace BlueControls {
                 ConvertTextToChar(value, false);
             }
         }
+
         public enDesign Design {
             get => _Design;
             set {
@@ -160,6 +173,7 @@ namespace BlueControls {
                 }
             }
         }
+
         public enStates State {
             get => _State;
             set {
@@ -171,6 +185,7 @@ namespace BlueControls {
             }
         }
         #endregion
+
         internal int WordStart(int Pos) {
             if (Chars.Count == 0) { return -1; }
             if (Pos < 0 || Pos >= Chars.Count) { return -1; }
@@ -191,11 +206,13 @@ namespace BlueControls {
                 if (Chars[Pos].isWordSeperator()) { return Pos; }
             } while (true);
         }
+
         public string Word(int Pos) {
             var S = WordStart(Pos);
             var E = WordEnd(Pos);
             return Substring(S, E - S);
         }
+
         private void ResetPosition(bool AndTmpText) {
             _Width = null;
             _Height = null;
@@ -204,6 +221,7 @@ namespace BlueControls {
                 _TMPPlainText = string.Empty;
             }
         }
+
         #region  Für Formatierung 
         /// <summary>
         /// Berechnet die Zeichen-Positionen mit korrekten Umbrüchen. Die enAlignment wird ebefalls mit eingerechnet.
@@ -227,12 +245,15 @@ namespace BlueControls {
                     break;
                 }
                 switch (Chars[Akt].Char) {
-                    //case 9:
+                    //
+                    case 9:
                     //    Chars[Akt].Width = (float)((Math.Truncate(IsX / 100) + 1) * 100 - IsX);
                     //    break;
+
                     case ExtChar.StoreX:
                         vZBX_Pixel = IsX;
                         break;
+
                     case ExtChar.Top:
                         IsY = 0;
                         break;
@@ -286,6 +307,7 @@ namespace BlueControls {
                 }
             }
         }
+
         private float Row_SetOnLine(int Von, int Nach) {
             float Abstand = 0;
             for (var z = Von; z <= Nach; z++) {
@@ -298,6 +320,7 @@ namespace BlueControls {
             }
             return Abstand;
         }
+
         private int WordBreaker(int AugZeichen, int MinZeichen) {
             if (Chars.Count == 1) { return 0; }
             if (MinZeichen < 0) { MinZeichen = 0; }
@@ -323,6 +346,7 @@ namespace BlueControls {
             } while (true);
         }
         #endregion
+
         public void Draw(Graphics gr, float zoom) {
             while (_Width == null) { ReBreak(); }
             DrawStates(gr, zoom);
@@ -330,12 +354,14 @@ namespace BlueControls {
                 if (t.Char > 0 && t.IsVisible(zoom, DrawingPos, DrawingArea)) { t.Draw(gr, DrawingPos, zoom); }
             }
         }
+
         private void DrawStates(Graphics GR, float czoom) {
             DrawState(GR, czoom, enMarkState.Field);
             DrawState(GR, czoom, enMarkState.MyOwn);
             DrawState(GR, czoom, enMarkState.Other);
             DrawState(GR, czoom, enMarkState.Ringelchen);
         }
+
         private void DrawState(Graphics GR, float czoom, enMarkState state) {
             var tmas = -1;
             for (var Pos = 0; Pos < Chars.Count; Pos++) {
@@ -356,23 +382,29 @@ namespace BlueControls {
                 }
             }
         }
+
         private void DrawZone(Graphics GR, float czoom, enMarkState ThisState, int MarkStart, int MarkEnd) {
             var StartX = (Chars[MarkStart].Pos.X * czoom) + DrawingPos.X;
             var StartY = (Chars[MarkStart].Pos.Y * czoom) + DrawingPos.Y;
             var EndX = (Chars[MarkEnd].Pos.X * czoom) + DrawingPos.X + (Chars[MarkEnd].Size.Width * czoom);
             var Endy = (Chars[MarkEnd].Pos.Y * czoom) + DrawingPos.Y + (Chars[MarkEnd].Size.Height * czoom);
             switch (ThisState) {
+
                 case enMarkState.None:
                     break;
+
                 case enMarkState.Ringelchen:
                     GR.DrawLine(new Pen(Color.Red, 3 * czoom), StartX, (int)(StartY + (Chars[MarkStart].Size.Height * czoom * 0.9)), EndX, (int)(StartY + (Chars[MarkStart].Size.Height * czoom * 0.9)));
                     break;
+
                 case enMarkState.Field:
                     GR.FillRectangle(new SolidBrush(Color.FromArgb(80, 128, 128, 128)), StartX, StartY, EndX - StartX, Endy - StartY);
                     break;
+
                 case enMarkState.MyOwn:
                     GR.FillRectangle(new SolidBrush(Color.FromArgb(40, 50, 255, 50)), StartX, StartY, EndX - StartX, Endy - StartY);
                     break;
+
                 case enMarkState.Other:
                     GR.FillRectangle(new SolidBrush(Color.FromArgb(80, 255, 255, 50)), StartX, StartY, EndX - StartX, Endy - StartY);
                     break;
@@ -381,6 +413,7 @@ namespace BlueControls {
                     break;
             }
         }
+
         public Rectangle CursorPixelPosx(int CharPos) {
             while (_Width == null) { ReBreak(); }
             if (CharPos > Chars.Count + 1) { CharPos = Chars.Count + 1; }
@@ -407,6 +440,7 @@ namespace BlueControls {
             }
             return new Rectangle((int)X, (int)(Y - 1), 0, (int)(He + 2));
         }
+
         private void ConvertTextToChar(string cactext, bool IsRich) {
             var Pos = 0;
             var Zeichen = -1;
@@ -426,6 +460,7 @@ namespace BlueControls {
                     var CH = cactext[Pos];
                     if (IsRich) {
                         switch (CH) {
+
                             case '<': {
                                     DoHTMLCode(cactext, Pos, ref Zeichen, ref BF, ref Stufe, ref Markstate);
                                     var OP = 1;
@@ -438,6 +473,7 @@ namespace BlueControls {
                                     } while (true);
                                     break;
                                 }
+
                             case '&':
                                 DoSpecialEntities(cactext, ref Pos, ref Zeichen, ref BF, ref Stufe, ref Markstate);
                                 break;
@@ -457,6 +493,7 @@ namespace BlueControls {
             }
             ResetPosition(false);
         }
+
         private string ConvertCharToHTMLText(int Von, int Bis) {
             var T = "";
             var cZ = Von;
@@ -496,6 +533,7 @@ namespace BlueControls {
                 return ConvertCharToPlainText(Von, Bis);
             }
         }
+
         private void DoSpecialEntities(string xHTMLTextx, ref int xStartPosx, ref int xPosition, ref BlueFont f, ref int Stufe, ref enMarkState MarkState) {
             var Endpos = xHTMLTextx.IndexOf(';', xStartPosx + 1);
             xPosition++;
@@ -505,54 +543,71 @@ namespace BlueControls {
                 return;
             }
             switch (xHTMLTextx.Substring(xStartPosx, Endpos - xStartPosx + 1)) {
+
                 case "&uuml;":
                     Chars.Add(new ExtChar('ü', _Design, _State, f, Stufe, MarkState));
                     break;
+
                 case "&auml;":
                     Chars.Add(new ExtChar('ä', _Design, _State, f, Stufe, MarkState));
                     break;
+
                 case "&ouml;":
                     Chars.Add(new ExtChar('ö', _Design, _State, f, Stufe, MarkState));
                     break;
+
                 case "&Uuml;":
                     Chars.Add(new ExtChar('Ü', _Design, _State, f, Stufe, MarkState));
                     break;
+
                 case "&Auml;":
                     Chars.Add(new ExtChar('Ä', _Design, _State, f, Stufe, MarkState));
                     break;
+
                 case "&Ouml;":
                     Chars.Add(new ExtChar('Ö', _Design, _State, f, Stufe, MarkState));
                     break;
+
                 case "&szlig;":
                     Chars.Add(new ExtChar('ß', _Design, _State, f, Stufe, MarkState));
                     break;
+
                 case "&quot;":
                     Chars.Add(new ExtChar('\"', _Design, _State, f, Stufe, MarkState));
                     break;
+
                 case "&amp;":
                     Chars.Add(new ExtChar('&', _Design, _State, f, Stufe, MarkState));
                     break;
+
                 case "&lt;":
                     Chars.Add(new ExtChar('<', _Design, _State, f, Stufe, MarkState));
                     break;
+
                 case "&gt;":
                     Chars.Add(new ExtChar('>', _Design, _State, f, Stufe, MarkState));
                     break;
+
                 case "&Oslash;":
                     Chars.Add(new ExtChar('Ø', _Design, _State, f, Stufe, MarkState));
                     break;
+
                 case "&oslash;":
                     Chars.Add(new ExtChar('ø', _Design, _State, f, Stufe, MarkState));
                     break;
+
                 case "&bull;":
                     Chars.Add(new ExtChar('•', _Design, _State, f, Stufe, MarkState));
                     break;
+
                 case "&eacute;":
                     Chars.Add(new ExtChar('é', _Design, _State, f, Stufe, MarkState));
                     break;
+
                 case "&Eacute;":
                     Chars.Add(new ExtChar('É', _Design, _State, f, Stufe, MarkState));
                     break;
+
                 case "&euro;":
                     Chars.Add(new ExtChar('€', _Design, _State, f, Stufe, MarkState));
                     break;
@@ -563,6 +618,7 @@ namespace BlueControls {
             }
             xStartPosx = Endpos;
         }
+
         private void DoHTMLCode(string HTMLText, int StartPos, ref int Position, ref BlueFont PF, ref int Stufe, ref enMarkState MarkState) {
             if (PF == null) { return; }  // wenn die Datenbanken entladen wurden bei Programmende
             var Endpos = HTMLText.IndexOf('>', StartPos + 1);
@@ -582,127 +638,161 @@ namespace BlueControls {
                 Attribut = Oricode.Substring(Istgleich + 1).Trim('\"');
             }
             switch (Cod) {
+
                 case "B":
                     PF = BlueFont.Get(PF.FontName, PF.FontSize, true, PF.Italic, PF.Underline, PF.StrikeOut, PF.Outline, PF.Color_Main, PF.Color_Outline, PF.Kapitälchen, PF.OnlyUpper, PF.OnlyLower);
                     break;
+
                 case "/B":
                     PF = BlueFont.Get(PF.FontName, PF.FontSize, false, PF.Italic, PF.Underline, PF.StrikeOut, PF.Outline, PF.Color_Main, PF.Color_Outline, PF.Kapitälchen, PF.OnlyUpper, PF.OnlyLower);
                     break;
+
                 case "I":
                     PF = BlueFont.Get(PF.FontName, PF.FontSize, PF.Bold, true, PF.Underline, PF.StrikeOut, PF.Outline, PF.Color_Main, PF.Color_Outline, PF.Kapitälchen, PF.OnlyUpper, PF.OnlyLower);
                     break;
+
                 case "/I":
                     PF = BlueFont.Get(PF.FontName, PF.FontSize, PF.Bold, false, PF.Underline, PF.StrikeOut, PF.Outline, PF.Color_Main, PF.Color_Outline, PF.Kapitälchen, PF.OnlyUpper, PF.OnlyLower);
                     break;
+
                 case "U":
                     PF = BlueFont.Get(PF.FontName, PF.FontSize, PF.Bold, PF.Italic, true, PF.StrikeOut, PF.Outline, PF.Color_Main, PF.Color_Outline, PF.Kapitälchen, PF.OnlyUpper, PF.OnlyLower);
                     break;
+
                 case "/U":
                     PF = BlueFont.Get(PF.FontName, PF.FontSize, PF.Bold, PF.Italic, false, PF.StrikeOut, PF.Outline, PF.Color_Main, PF.Color_Outline, PF.Kapitälchen, PF.OnlyUpper, PF.OnlyLower);
                     break;
+
                 case "STRIKE":
                     PF = BlueFont.Get(PF.FontName, PF.FontSize, PF.Bold, PF.Italic, PF.Underline, true, PF.Outline, PF.Color_Main, PF.Color_Outline, PF.Kapitälchen, PF.OnlyUpper, PF.OnlyLower);
                     break;
+
                 case "/STRIKE":
                     PF = BlueFont.Get(PF.FontName, PF.FontSize, PF.Bold, PF.Italic, PF.Underline, false, PF.Outline, PF.Color_Main, PF.Color_Outline, PF.Kapitälchen, PF.OnlyUpper, PF.OnlyLower);
                     break;
+
                 case "3":
                     PF = BlueFont.Get(PF.FontName, PF.FontSize, PF.Bold, PF.Italic, PF.Underline, PF.StrikeOut, true, PF.Color_Main, PF.Color_Outline, PF.Kapitälchen, PF.OnlyUpper, PF.OnlyLower);
                     break;
+
                 case "/3":
                     PF = BlueFont.Get(PF.FontName, PF.FontSize, PF.Bold, PF.Italic, PF.Underline, PF.StrikeOut, false, PF.Color_Main, PF.Color_Outline, PF.Kapitälchen, PF.OnlyUpper, PF.OnlyLower);
                     break;
+
                 case "FONTSIZE":
                     PF = BlueFont.Get(PF.FontName, modConverter.FloatParse(Attribut), PF.Bold, PF.Italic, PF.Underline, PF.StrikeOut, PF.Outline, PF.Color_Main, PF.Color_Outline, PF.Kapitälchen, PF.OnlyUpper, PF.OnlyLower);
                     break;
+
                 case "FONTNAME":
                     PF = BlueFont.Get(Attribut, PF.FontSize, PF.Bold, PF.Italic, PF.Underline, PF.StrikeOut, PF.Outline, PF.Color_Main, PF.Color_Outline, PF.Kapitälchen, PF.OnlyUpper, PF.OnlyLower);
                     break;
+
                 case "FONTCOLOR":
                     PF = BlueFont.Get(PF.FontName, PF.FontSize, PF.Bold, PF.Italic, PF.Underline, PF.StrikeOut, PF.Outline, Attribut, PF.Color_Outline.ToHTMLCode(), PF.Kapitälchen, PF.OnlyUpper, PF.OnlyLower);
                     break;
+
                 case "FONTOUTLINE":
                     PF = BlueFont.Get(PF.FontName, PF.FontSize, PF.Bold, PF.Italic, PF.Underline, PF.StrikeOut, PF.Outline, PF.Color_Main.ToHTMLCode(), Attribut, PF.Kapitälchen, PF.OnlyUpper, PF.OnlyLower);
                     break;
+
                 case "BR":
                     Position++;
                     Chars.Add(new ExtChar((char)13, _Design, _State, PF, Stufe, enMarkState.None));
                     break;
-                //case "HR":
+                //
+                case "HR":
                 //    Position++;
                 //    Chars.Add(new ExtChar(13, _Design, _State, PF, Stufe, MarkState));
                 //    Position++;
                 //    Chars.Add(new ExtChar((int)enEtxtCodes.HorizontalLine, _Design, _State, PF, Stufe, MarkState));
                 //    break;
+
                 case "TAB":
                     Position++;
                     Chars.Add(new ExtChar((char)9, _Design, _State, PF, Stufe, enMarkState.None));
                     break;
+
                 case "ZBX_STORE":
                     Position++;
                     Chars.Add(new ExtChar(ExtChar.StoreX, _Design, _State, PF, Stufe, enMarkState.None));
                     break;
-                //case "ZBX_RESET":
+                //
+                case "ZBX_RESET":
                 //    Position++;
                 //    Chars.Add(new ExtChar((int)enEtxtCodes.ZBX_RESET, _Design, _State, PF, Stufe, MarkState));
                 //    break;
+
                 case "TOP":
                     Position++;
                     Chars.Add(new ExtChar(ExtChar.Top, _Design, _State, PF, Stufe, enMarkState.None));
                     break;
-                //case "ZBY_STORE":
+                //
+                case "ZBY_STORE":
                 //    Position++;
                 //    Chars.Add(new ExtChar((int)enEtxtCodes.ZBY_STORE, _Design, _State, PF, Stufe, MarkState));
                 //    break;
-                //case "ZBY_RESET":
+                //
+                case "ZBY_RESET":
                 //    Position++;
                 //    Chars.Add(new ExtChar((int)enEtxtCodes.ZBY_RESET, _Design, _State, PF, Stufe, MarkState));
                 //    break;
-                //case "LEFT":
+                //
+                case "LEFT":
                 //    Position++;
                 //    Chars.Add(new ExtChar((int)enEtxtCodes.Left, _Design, _State, PF, Stufe, MarkState));
                 //    break;
+
                 case "IMAGECODE":
                     QuickImage x;
                     x = !Attribut.Contains("|") && PF != null ? QuickImage.Get(Attribut, (int)PF.Oberlänge(1)) : QuickImage.Get(Attribut);
                     Position++;
                     Chars.Add(new ExtChar((char)(QuickImage.GetIndex(x) + (int)enASCIIKey.ImageStart), _Design, _State, PF, Stufe, enMarkState.None));
                     break;
-                //case "PROGRESSBAR":
+                //
+                case "PROGRESSBAR":
                 //    Position++;
                 //    Chars.Add(new ExtChar((int)((int)enEtxtCodes.ProgressBar0 + int.Parse(Attribut)), _Design, _State, PF, Stufe, MarkState));
                 //    break;
+
                 case "H7":
                     Stufe = 7;
                     PF = Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
+
                 case "H6":
                     Stufe = 6;
                     PF = Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
+
                 case "H5":
                     Stufe = 5;
                     PF = Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
+
                 case "H4":
                     Stufe = 4;
                     PF = Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
+
                 case "H3":
                     Stufe = 3;
                     PF = Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
+
                 case "H2":
                     Stufe = 2;
                     PF = Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
+
                 case "H1":
                     Stufe = 1;
                     PF = Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
+
                 case "MARKSTATE":
                     MarkState = (enMarkState)int.Parse(Attribut);
                     break;
+
                 case "":
                     // ist evtl. ein <> ausruck eines Textes
                     break;
@@ -711,14 +801,17 @@ namespace BlueControls {
                     break;
             }
         }
+
         public int Width() {
             while (_Width == null) { ReBreak(); }
             return (int)_Width;
         }
+
         public int Height() {
             while (_Width == null) { ReBreak(); }
             return (int)_Height;
         }
+
         public Size LastSize() {
             while (_Width == null) { ReBreak(); }
             return _Width < 5 || _Height < 5 ? new Size(32, 16) : new Size((int)_Width, (int)_Height);
@@ -776,6 +869,7 @@ namespace BlueControls {
             //    RN -= 1
             //Loop
         }
+
         public void Delete(int Von, int Bis) {
             var tempVar = Bis - Von;
             for (var z = 1; z <= tempVar; z++) {
@@ -785,6 +879,7 @@ namespace BlueControls {
             }
             ResetPosition(true);
         }
+
         public bool InsertImage(string Img, int Position) => InsertAnything(enASCIIKey.Undefined, Img, Position);
         public bool InsertChar(enASCIIKey KeyAscii, int Position) => InsertAnything(KeyAscii, string.Empty, Position);
         private bool InsertAnything(enASCIIKey KeyAscii, string img, int Position) {
@@ -843,6 +938,7 @@ namespace BlueControls {
                 }
             }
         }
+
         public void Check(int Von, int Bis, bool Checkstat) {
             for (var cc = Von; cc <= Bis; cc++) {
                 if (Chars[cc].State != enStates.Undefiniert) {
@@ -858,12 +954,14 @@ namespace BlueControls {
                 }
             }
         }
+
         public void StufeÄndern(int Von, int Bis, int stufe) {
             for (var cc = Von; cc <= Bis; cc++) {
                 Chars[cc].Stufe = stufe;
             }
             ResetPosition(true);
         }
+
         public string Substring(int StartIndex, int lenght) => ConvertCharToPlainText(StartIndex, StartIndex + lenght - 1);
     }
 }

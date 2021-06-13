@@ -4,6 +4,7 @@ using System.Drawing;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Forms;
+
 namespace BlueControls.BlueDatabaseDialogs
 {
     public sealed partial class AdminMenu

@@ -20,6 +20,7 @@ using Skript.Enums;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using static BlueBasics.Extensions;
+
 namespace BlueScript {
     internal class Method_StringShortenWord : Method {
         public override string Syntax => "StringShortenWord(String)";

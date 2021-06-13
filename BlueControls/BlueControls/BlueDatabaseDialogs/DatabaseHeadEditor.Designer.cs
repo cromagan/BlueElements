@@ -2,6 +2,7 @@ using BlueControls.Classes_Editor;
 using BlueControls.Controls;
 using BlueControls.Forms;
 using System.Diagnostics;
+
 namespace BlueControls.BlueDatabaseDialogs
 {
     internal sealed partial class DatabaseHeadEditor : Form
@@ -122,7 +123,6 @@ namespace BlueControls.BlueDatabaseDialogs
             | System.Windows.Forms.AnchorStyles.Left)));
             this.PermissionGroups_NewRow.CheckBehavior = BlueControls.Enums.enCheckBehavior.MultiSelection;
             this.PermissionGroups_NewRow.FilterAllowed = true;
-            this.PermissionGroups_NewRow.LastFilePath = null;
             this.PermissionGroups_NewRow.Location = new System.Drawing.Point(192, 48);
             this.PermissionGroups_NewRow.Name = "PermissionGroups_NewRow";
             this.PermissionGroups_NewRow.RemoveAllowed = true;
@@ -155,7 +155,6 @@ namespace BlueControls.BlueDatabaseDialogs
             | System.Windows.Forms.AnchorStyles.Left)));
             this.DatenbankAdmin.CheckBehavior = BlueControls.Enums.enCheckBehavior.MultiSelection;
             this.DatenbankAdmin.FilterAllowed = true;
-            this.DatenbankAdmin.LastFilePath = null;
             this.DatenbankAdmin.Location = new System.Drawing.Point(8, 46);
             this.DatenbankAdmin.Name = "DatenbankAdmin";
             this.DatenbankAdmin.RemoveAllowed = true;
@@ -205,7 +204,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.lbxSortierSpalten.AddAllowed = BlueControls.Enums.enAddType.OnlySuggests;
             this.lbxSortierSpalten.CheckBehavior = BlueControls.Enums.enCheckBehavior.MultiSelection;
-            this.lbxSortierSpalten.LastFilePath = null;
             this.lbxSortierSpalten.Location = new System.Drawing.Point(16, 32);
             this.lbxSortierSpalten.MoveAllowed = true;
             this.lbxSortierSpalten.Name = "lbxSortierSpalten";
@@ -684,7 +682,6 @@ namespace BlueControls.BlueDatabaseDialogs
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lbxExportSets.FilterAllowed = true;
-            this.lbxExportSets.LastFilePath = null;
             this.lbxExportSets.Location = new System.Drawing.Point(8, 24);
             this.lbxExportSets.Name = "lbxExportSets";
             this.lbxExportSets.RemoveAllowed = true;

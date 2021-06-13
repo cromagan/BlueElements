@@ -25,8 +25,10 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+
 namespace BlueControls.ItemCollection {
     public class ChildPadItem : FormPadItemRectangle, IMouseAndKeyHandle, ICanHaveColumnVariables {
+
         #region  Variablen-Deklarationen 
         private Bitmap _tmpBMP;
         private CreativePad _PadInternal;
@@ -50,8 +52,11 @@ namespace BlueControls.ItemCollection {
         [Description("Soll eine Umrandung einer anderen Ansicht hier angezeigt werden,<br>muss dessen Name hier eingegeben werden.")]
         public List<string> Eingebettete_Ansichten { get; set; } = new List<string>();
         #endregion
+
+
         #region  Event-Deklarationen + Delegaten 
         #endregion
+
         [Description("Name und gleichzeitig eventuelle Beschriftung dieser Ansicht.")]
         public string Name {
             get => _Name;
@@ -61,6 +66,7 @@ namespace BlueControls.ItemCollection {
                 OnChanged();
             }
         }
+
         #region  Construktor  
         public ChildPadItem(ItemCollectionPad parent) : this(parent, string.Empty) { }
         public ChildPadItem(ItemCollectionPad parent, string internalname) : base(parent, internalname) {
@@ -76,6 +82,7 @@ namespace BlueControls.ItemCollection {
             Eingebettete_Ansichten = new List<string>();
         }
         #endregion
+
         public override void DesignOrStyleChanged() {
             if (_tmpBMP != null) {
                 _tmpBMP.Dispose();
@@ -163,27 +170,35 @@ namespace BlueControls.ItemCollection {
         public override bool ParseThis(string tag, string value) {
             if (base.ParseThis(tag, value)) { return true; }
             switch (tag) {
-                //case "readabletext":
+                //
+                case "readabletext":
                 //    _ReadableText = value.FromNonCritical();
                 //    _VariableText = _ReadableText;
                 //    return true;
+
                 case "fixsize": // TODO: Entfernt am 24.05.2021
                     //Größe_fixiert = value.FromPlusMinus();
                     return true;
+
                 case "name":
                     _Name = value.FromNonCritical();
                     return true;
+
                 case "data":
                     PadInternal = new CreativePad(new ItemCollectionPad(value, string.Empty));
                     return true;
+
                 case "checked":
                     return true;
+
                 case "embedded":
                     Eingebettete_Ansichten = value.FromNonCritical().SplitByCRToList();
                     return true;
+
                 case "color":
                     Randfarbe = value.FromHTMLCode();
                     return true;
+
                 case "pos":
                     Textlage = (enAlignment)int.Parse(value);
                     return true;

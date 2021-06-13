@@ -1,6 +1,7 @@
 using BlueControls.Forms;
 using System.Diagnostics;
 using System.Drawing;
+
 namespace BlueControls
 {
     public sealed partial class ScreenShot : Form

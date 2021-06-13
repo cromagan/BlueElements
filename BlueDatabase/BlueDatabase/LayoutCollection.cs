@@ -17,6 +17,7 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 using BlueBasics;
+
 namespace BlueDatabase {
     /// <summary>
     /// Print Views werden nicht immer benötigt. Deswegen werden sie als String gespeichert. Der richtige Typ wäre ItemCollectionPad.

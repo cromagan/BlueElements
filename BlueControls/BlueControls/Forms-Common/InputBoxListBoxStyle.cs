@@ -21,9 +21,11 @@ using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.ItemCollection;
 using System.Collections.Generic;
+
 namespace BlueControls.Forms {
     public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
         private List<string> GiveBack = null;
+
         #region Konstruktor
         private InputBoxListBoxStyle() : base() => InitializeComponent();
         private InputBoxListBoxStyle(string TXT, ItemCollectionList ItemsOriginal, enAddType AddNewAllowed, bool CancelErl) : this() {
@@ -40,6 +42,7 @@ namespace BlueControls.Forms {
             Setup(TXT, txbText, 250, CancelErl, true);
         }
         #endregion
+
         public static string Show(string TXT, List<string> Items) {
             if (Items == null || Items.Count == 0) {
                 return InputBox.Show(TXT, "", enDataFormat.Text);
@@ -52,11 +55,13 @@ namespace BlueControls.Forms {
             var erg = Show(TXT, x, enAddType.None, true);
             return erg is null || erg.Count != 1 ? string.Empty : erg[0];
         }
+
         public static List<string> Show(string TXT, ItemCollectionList ItemsOriginal, enAddType AddNewAllowed, bool CancelErl) {
             InputBoxListBoxStyle MB = new(TXT, ItemsOriginal, AddNewAllowed, CancelErl);
             MB.ShowDialog();
             return MB.GiveBack;
         }
+
         private void InputBox_Shown(object sender, System.EventArgs e) => txbText.Focus();
         protected override void SetValue(bool canceled) => GiveBack = canceled ? null : txbText.Item.Checked().ToListOfString();
     }

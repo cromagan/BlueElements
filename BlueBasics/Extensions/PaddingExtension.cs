@@ -16,6 +16,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 #endregion
+
 namespace BlueBasics {
     public static partial class Extensions {
         public static System.Windows.Forms.Padding PaddingParse(this string code) {

@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using BlueControls.Controls;
+
 namespace BlueControls.Classes_Editor
 {
     internal partial class ExportDefinition_Editor 
@@ -94,7 +95,6 @@ namespace BlueControls.Classes_Editor
             this.lbxFilter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lbxFilter.FilterAllowed = true;
-            this.lbxFilter.LastFilePath = null;
             this.lbxFilter.Location = new System.Drawing.Point(248, 32);
             this.lbxFilter.Name = "lbxFilter";
             this.lbxFilter.QuickInfo = "";
@@ -257,7 +257,6 @@ namespace BlueControls.Classes_Editor
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lsbExportDateien.CheckBehavior = BlueControls.Enums.enCheckBehavior.MultiSelection;
             this.lsbExportDateien.FilterAllowed = true;
-            this.lsbExportDateien.LastFilePath = null;
             this.lsbExportDateien.Location = new System.Drawing.Point(8, 24);
             this.lsbExportDateien.Name = "lsbExportDateien";
             this.lsbExportDateien.QuickInfo = "";

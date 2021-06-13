@@ -29,10 +29,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+
 namespace BlueControls.Controls {
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("ItemClicked")]
     public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone {
+
         #region Constructor
         public ListBox() : base(true, false) {
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -47,12 +49,14 @@ namespace BlueControls.Controls {
             _Appearance = enBlueListBoxAppearance.Listbox;
         }
         #endregion
+
         private enBlueListBoxAppearance _Appearance; //Muss was gesetzt werden, sonst hat der Designer nachher einen Fehler
         private BasicListItem _MouseOverItem;
         private bool _MoveAllowed;
         private bool _RemoveAllowed;
         private bool _FilterAllowed;
         private enAddType _AddAlloweds = enAddType.Text;
+
         #region  Events 
         public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
         public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
@@ -77,21 +81,27 @@ namespace BlueControls.Controls {
         public event EventHandler<ListOfBasicListItemEventArgs> RemoveClicked;
         public event EventHandler ListOrItemChanged;
         #endregion
+
+
         #region  Properties 
         [DefaultValue(enCheckBehavior.SingleSelection)]
         public enCheckBehavior CheckBehavior {
             get => Item.CheckBehavior;
             set => Item.CheckBehavior = value;
         }
-        public string LastFilePath { get; set; }
+
+        //public string LastFilePath { get; set; }
+
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public ItemCollectionList Item { get; }
+
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public ItemCollectionList Suggestions { get; } = new ItemCollectionList();
+
         [DefaultValue(enBlueListBoxAppearance.Listbox)]
         public enBlueListBoxAppearance Appearance {
             get => _Appearance;
@@ -101,6 +111,7 @@ namespace BlueControls.Controls {
                 Item.Appearance = value;
             }
         }
+
         [DefaultValue(false)]
         public bool RemoveAllowed {
             get => _RemoveAllowed;
@@ -110,6 +121,7 @@ namespace BlueControls.Controls {
                 CheckButtons();
             }
         }
+
         [DefaultValue(true)]
         public enAddType AddAllowed {
             get => _AddAlloweds;
@@ -119,6 +131,7 @@ namespace BlueControls.Controls {
                 CheckButtons();
             }
         }
+
         [DefaultValue(false)]
         public bool MoveAllowed {
             get => _MoveAllowed;
@@ -129,6 +142,7 @@ namespace BlueControls.Controls {
                 CheckButtons();
             }
         }
+
         [DefaultValue(false)]
         public bool FilterAllowed {
             get => _FilterAllowed;
@@ -140,10 +154,12 @@ namespace BlueControls.Controls {
             }
         }
         #endregion
+
         protected override void OnVisibleChanged(System.EventArgs e) {
             CheckButtons();
             base.OnVisibleChanged(e);
         }
+
         private void CheckButtons() {
             if (!Visible) { return; }
             if (Parent == null) { return; }
@@ -187,6 +203,7 @@ namespace BlueControls.Controls {
             // Um den allerersten Check nicht zu verpassen
             CheckButtons();
         }
+
         public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) => false;
         public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
         private BasicListItem MouseOverNode(int X, int Y) => ButtonsVisible() && Y >= Height - Plus.Height ? null : Item[X, (int)(Y + SliderY.Value)];
@@ -196,6 +213,7 @@ namespace BlueControls.Controls {
             var ND = MouseOverNode(e.X, e.Y);
             if (ND != null && !ND.Enabled) { return; }
             switch (e.Button) {
+
                 case System.Windows.Forms.MouseButtons.Left:
                     if (ND != null) {
                         if (Appearance is enBlueListBoxAppearance.Listbox or enBlueListBoxAppearance.Autofilter or enBlueListBoxAppearance.Gallery or enBlueListBoxAppearance.FileSystem) {
@@ -204,11 +222,13 @@ namespace BlueControls.Controls {
                         OnItemClicked(new BasicListItemEventArgs(ND));
                     }
                     break;
+
                 case System.Windows.Forms.MouseButtons.Right:
                     FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
                     break;
             }
         }
+
         private void OnItemClicked(BasicListItemEventArgs e) => ItemClicked?.Invoke(this, e);
         protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseWheel(e);
@@ -221,6 +241,7 @@ namespace BlueControls.Controls {
             if (ND == null) { return; }
             OnItemDoubleClick(new BasicListItemEventArgs(ND));
         }
+
         private void OnItemDoubleClick(BasicListItemEventArgs e) => ItemDoubleClick?.Invoke(this, e);
         private bool ButtonsVisible() => Plus.Visible || Minus.Visible || Up.Visible || Down.Visible || FilterTxt.Visible;
         protected override void DrawControl(Graphics gr, enStates state) {
@@ -273,6 +294,7 @@ namespace BlueControls.Controls {
             }
             if (PaintModYx > 0) { Skin.Draw_Back_Transparent(gr, new Rectangle(0, BorderCoords.Bottom, Width, PaintModYx), this); }
         }
+
         private void SliderY_ValueChange(object sender, System.EventArgs e) {
             if (IsDisposed) { return; }
             Invalidate();
@@ -360,23 +382,15 @@ namespace BlueControls.Controls {
             CheckButtons();
         }
         private void OnRemoveClicked(ListOfBasicListItemEventArgs e) => RemoveClicked?.Invoke(this, e);
+
         public BasicListItem Add_FromFileSystem() {
-            using System.Windows.Forms.OpenFileDialog f = new();
-            f.CheckFileExists = true;
-            f.CheckPathExists = true;
-            f.Multiselect = false;
-            f.InitialDirectory = LastFilePath;
-            f.Title = "Datei hinzufügen:";
-            f.ShowDialog();
-            if (f.FileNames == null || f.FileNames.Length != 1) { return null; }
-            //var x = new clsNamedBinary();
-            //x.LoadFromFile(f.FileNames[0]);
-            //Item.Add(x);
-            var Picture = BitmapExt.Image_FromFile(f.FileNames[0]);
-            return Picture != null
-                ? Item.Add((Bitmap)Picture, f.FileNames[0])
-                : Item.Add(modConverter.FileToByte(f.FileNames[0]), f.FileNames[0]);
+            var f = FileOperations.GetFilesWithFileSelector(string.Empty, false);
+            if (f is null) { return null; }
+
+            var Picture = BitmapExt.Image_FromFile(f[0]);
+            return Picture != null ? Item.Add((Bitmap)Picture, f[0]) : Item.Add(modConverter.FileToByte(f[0]), f[0]);
         }
+
         public BasicListItem Add_TextBySuggestion() {
             if (Suggestions == null || Suggestions.Count == 0) {
                 MessageBox.Show("Keine (weiteren) Werte vorhanden.", enImageCode.Information, "OK");
@@ -402,16 +416,21 @@ namespace BlueControls.Controls {
         private void Plus_Click(object sender, System.EventArgs e) {
             OnAddClicked();
             switch (_AddAlloweds) {
+
                 case enAddType.UserDef:
                     break;
+
                 case enAddType.Text:
                     Add_Text();
                     break;
+
                 case enAddType.OnlySuggests:
                     Add_TextBySuggestion();
                     break;
+
                 case enAddType.None:
                     break;
+
                 case enAddType.BinarysFromFileSystem:
                     Add_FromFileSystem();
                     break;

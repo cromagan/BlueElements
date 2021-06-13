@@ -23,15 +23,21 @@ using BlueControls.Enums;
 using BlueDatabase;
 using System;
 using System.Drawing;
+
 namespace BlueControls.ItemCollection {
     public class RowFormulaListItem : BasicListItem {
+
         #region  Variablen-Deklarationen 
         private RowItem _Row;
         private Bitmap _tmpBMP;
         private string _LayoutID;
         #endregion
+
+
         #region  Event-Deklarationen + Delegaten 
         #endregion
+
+
         #region  Construktor + Initialize 
         public RowFormulaListItem(RowItem row, string layoutID, string userDefCompareKey) : base(string.Empty) {
             _Row = row;
@@ -39,6 +45,7 @@ namespace BlueControls.ItemCollection {
             UserDefCompareKey = userDefCompareKey;
         }
         #endregion
+
         public override string QuickInfo => _Row == null ? string.Empty : _Row.CellFirstString().CreateHtmlCodes(true);
         public string LayoutID {
             get => _LayoutID;
@@ -52,6 +59,7 @@ namespace BlueControls.ItemCollection {
                 //OnChanged();
             }
         }
+
         public RowItem Row {
             get => _Row;
             set {
@@ -61,6 +69,7 @@ namespace BlueControls.ItemCollection {
                 //OnChanged();
             }
         }
+
         private void removePic() {
             if (_tmpBMP != null) {
                 _tmpBMP.Dispose();
@@ -81,6 +90,7 @@ namespace BlueControls.ItemCollection {
                 Skin.Draw_Border(GR, itemdesign, vState, PositionModified);
             }
         }
+
         private void GeneratePic() {
             if (string.IsNullOrEmpty(_LayoutID) || !_LayoutID.StartsWith("#")) {
                 _tmpBMP = (Bitmap)QuickImage.Get(enImageCode.Warnung, 128).BMP.Clone();

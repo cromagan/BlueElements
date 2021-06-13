@@ -20,6 +20,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using System;
 using System.Drawing;
+
 namespace BlueControls.Forms {
     public partial class Notification : FloatingForm {
         private int _Timer_Tick_count;

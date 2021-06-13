@@ -20,6 +20,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Forms;
 using System.Drawing;
+
 namespace BluePaint {
     public partial class Tool_DummyGenerator {
         public Tool_DummyGenerator() : base() => InitializeComponent();
@@ -27,6 +28,7 @@ namespace BluePaint {
             CreateDummy();
             OnZoomFit();
         }
+
         private void CreateDummy() {
             var W = modErgebnis.Ergebnis(X.Text);
             var H = modErgebnis.Ergebnis(Y.Text);

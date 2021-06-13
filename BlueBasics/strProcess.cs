@@ -17,6 +17,7 @@
 // DEALINGS IN THE SOFTWARE.
 #endregion
 using System;
+
 namespace BlueBasics {
     public struct strProcess {
         public IntPtr MainWindowHandle;

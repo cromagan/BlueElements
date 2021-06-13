@@ -18,6 +18,7 @@
 #endregion
 using System;
 using System.Globalization;
+
 namespace BluePaint {
     internal static class Program {
         /// <summary>

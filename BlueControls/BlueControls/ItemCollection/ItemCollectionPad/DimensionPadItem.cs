@@ -23,8 +23,10 @@ using BlueControls.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+
 namespace BlueControls.ItemCollection {
     public class DimensionPadItem : BasicPadItem {
+
         #region  Variablen-Deklarationen 
         private readonly PointM Point1 = new(null, "Punkt 1", 0, 0);
         private readonly PointM Point2 = new(null, "Punkt 2", 0, 0);
@@ -45,6 +47,7 @@ namespace BlueControls.ItemCollection {
                 OnChanged();
             }
         }
+
         public string Text_unten { get; set; } = string.Empty;
         //http://www.kurztutorial.info/programme/punkt-mm/rechner.html
         // Dim Ausgleich As Double = mmToPixel(1 / 72 * 25.4, 300)
@@ -52,8 +55,12 @@ namespace BlueControls.ItemCollection {
         public string Präfix { get; set; } = string.Empty;
         public string Suffix { get; set; } = string.Empty;
         #endregion
+
+
         #region  Event-Deklarationen + Delegaten 
         #endregion
+
+
         #region  Construktor + Initialize 
         public DimensionPadItem(ItemCollectionPad parent) : this(parent, string.Empty, null, null, 0) { }
         public DimensionPadItem(ItemCollectionPad parent, PointM cPoint1, PointM cPoint2, int AbstandinMM) : this(parent, string.Empty, cPoint1, cPoint2, AbstandinMM) { }
@@ -82,37 +89,52 @@ namespace BlueControls.ItemCollection {
             MovablePoint.Add(TextPointx);
             PointsForSuccesfullyMove.AddRange(MovablePoint);
         }
+
         public DimensionPadItem(ItemCollectionPad parent, PointF cPoint1, PointF cPoint2, int AbstandInMM) : this(parent, new PointM(cPoint1), new PointM(cPoint2), AbstandInMM) { }
         #endregion
+
+
         #region  Properties 
         #endregion
+
         public override bool ParseThis(string tag, string value) {
             if (base.ParseThis(tag, value)) { return true; }
             switch (tag) {
+
                 case "text": // TODO: Alt 06.09.2019
+
                 case "text1":
                     Text_oben = value.FromNonCritical();
                     return true;
+
                 case "text2":
                     Text_unten = value.FromNonCritical();
                     return true;
+
                 case "color": // TODO: Alt 06.09.2019
                     return true;
+
                 case "fontsize": // TODO: Alt 06.09.2019
                     return true;
+
                 case "accuracy": // TODO: Alt 06.09.2019
                     return true;
+
                 case "decimal":
                     Nachkommastellen = int.Parse(value);
                     return true;
+
                 case "checked": // TODO: Alt 06.09.2019
                     return true;
+
                 case "prefix": // TODO: Alt 06.09.2019
                     Präfix = value.FromNonCritical();
                     return true;
+
                 case "suffix":
                     Suffix = value.FromNonCritical();
                     return true;
+
                 case "additionalscale":
                     Skalierung = decimal.Parse(value.FromNonCritical());
                     return true;
@@ -131,6 +153,7 @@ namespace BlueControls.ItemCollection {
                    ", Suffix=" + Suffix.ToNonCritical() +
                    ", AdditionalScale=" + Skalierung.ToString().ToNonCritical() + "}";
         }
+
         public string AngezeigterText1() {
             if (!string.IsNullOrEmpty(Text_oben)) { return Text_oben; }
             var s = Länge_in_MM.ToString(Constants.Format_Float10);
@@ -141,6 +164,7 @@ namespace BlueControls.ItemCollection {
             }
             return Präfix + s + Suffix;
         }
+
         public decimal Länge_in_MM => Math.Round(modConverter.PixelToMM(_Länge, ItemCollectionPad.DPI), Nachkommastellen);
         protected override string ClassId() => "DIMENSION";
         public override bool Contains(PointF value, decimal zoomfactor) {
@@ -206,10 +230,12 @@ namespace BlueControls.ItemCollection {
             X.Inflate(-2, -2); // die Sicherheits koordinaten damit nicht linien abgeschnitten werden
             return X;
         }
+
         private void ComputeData() {
             _Länge = GeometryDF.Länge(Point1, Point2);
             _Winkel = GeometryDF.Winkel(Point1, Point2);
         }
+
         public override void PointMoved(PointM point) {
             var tmppW = -90;
             var MHLAb = modConverter.mmToPixel(1.5M * Skalierung / 3.07m, ItemCollectionPad.DPI); // Den Abstand der Maßhilsfline, in echten MM
@@ -227,6 +253,7 @@ namespace BlueControls.ItemCollection {
             _Bezugslinie1.SetTo(_SchnittPunkt1, MHLAb, _Winkel + tmppW);
             _Bezugslinie2.SetTo(_SchnittPunkt2, MHLAb, _Winkel + tmppW);
         }
+
         public override List<FlexiControl> GetStyleOptions() {
             List<FlexiControl> l = new()
             {

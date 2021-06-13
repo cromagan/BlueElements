@@ -20,6 +20,7 @@ using BlueBasics;
 using BlueControls.EventArgs;
 using System.Drawing;
 using static BlueBasics.Extensions;
+
 namespace BluePaint {
     public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserControl //
     {
@@ -42,6 +43,7 @@ namespace BluePaint {
                 return;
             }
         }
+
         private void btnKontrastErhoehen_Click(object sender, System.EventArgs e) {
             var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
@@ -51,6 +53,7 @@ namespace BluePaint {
             sldKontrast.Value = 0f;
             sldHelligkeit.Value = 1f;
         }
+
         private void btnGraustufen_Click(object sender, System.EventArgs e) {
             var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
@@ -60,6 +63,7 @@ namespace BluePaint {
             sldHelligkeit.Value = 1f;
             OnCommandForMacro("Graustufen");
         }
+
         private void btnAlleFarbenSchwarz_Click(object sender, System.EventArgs e) {
             var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
@@ -71,6 +75,7 @@ namespace BluePaint {
             OnCommandForMacro("AlleFarbenSchwarz");
             OnDoInvalidate();
         }
+
         private void btnPixelHinzu_Click(object sender, System.EventArgs e) {
             var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
@@ -88,6 +93,7 @@ namespace BluePaint {
             OnCommandForMacro("PixelHinzu");
             OnDoInvalidate();
         }
+
         private void btnAusdünnen_Click(object sender, System.EventArgs e) {
             var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
@@ -100,6 +106,7 @@ namespace BluePaint {
             OnDoInvalidate();
             return;
         }
+
         private void btnHelligkeit_Click(object sender, System.EventArgs e) {
             var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
@@ -109,6 +116,7 @@ namespace BluePaint {
             sldKontrast.Value = 0f;
             sldHelligkeit.Value = 1f;
         }
+
         private void btnGamma_Click(object sender, System.EventArgs e) {
             var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
@@ -118,6 +126,7 @@ namespace BluePaint {
             sldKontrast.Value = 0f;
             sldHelligkeit.Value = 1f;
         }
+
         private void sldHelligkeit_ValueChanged(object sender, System.EventArgs e) {
             sldGamma.Value = 1f;
             sldKontrast.Value = 0f;
@@ -125,6 +134,7 @@ namespace BluePaint {
             capHelligkeit.Text = sldHelligkeit.Value.ToString();
             OnDoInvalidate();
         }
+
         private void sldKontrast_ValueChanged(object sender, System.EventArgs e) {
             sldGamma.Value = 1f;
             //sldKontrast.Value = 0f;
@@ -132,6 +142,7 @@ namespace BluePaint {
             capKontrast.Text = sldKontrast.Value.ToString();
             OnDoInvalidate();
         }
+
         private void sldGamma_ValueChanged(object sender, System.EventArgs e) {
             //sldGamma.Value = 1f;
             sldKontrast.Value = 0f;
@@ -139,30 +150,38 @@ namespace BluePaint {
             capGamma.Text = sldGamma.Value.ToString();
             OnDoInvalidate();
         }
+
         public override string MacroKennung() => "Kontrast";
         public override void ExcuteCommand(string command) {
             var c = command.SplitBy(";");
             switch (c[0]) {
+
                 case "Kontrast":
                     sldKontrast.Value = double.Parse(c[1]);
                     btnKontrastErhoehen_Click(null, System.EventArgs.Empty);
                     break;
+
                 case "Graustufen":
                     btnGraustufen_Click(null, System.EventArgs.Empty);
                     break;
+
                 case "AlleFarbenSchwarz":
                     btnAlleFarbenSchwarz_Click(null, System.EventArgs.Empty);
                     break;
+
                 case "PixelHinzu":
                     btnPixelHinzu_Click(null, System.EventArgs.Empty);
                     break;
+
                 case "Ausdünnen":
                     btnAusdünnen_Click(null, System.EventArgs.Empty);
                     break;
+
                 case "Gamma":
                     sldGamma.Value = double.Parse(c[1]);
                     btnGamma_Click(null, System.EventArgs.Empty);
                     break;
+
                 case "Helligkeit":
                     sldHelligkeit.Value = double.Parse(c[1]);
                     btnHelligkeit_Click(null, System.EventArgs.Empty);

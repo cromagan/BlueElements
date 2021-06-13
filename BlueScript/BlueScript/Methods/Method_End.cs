@@ -18,6 +18,7 @@
 #endregion
 using Skript.Enums;
 using System.Collections.Generic;
+
 namespace BlueScript {
     internal class Method_Break : Method {
         //public Method_var(Script parent) : base(parent) { }

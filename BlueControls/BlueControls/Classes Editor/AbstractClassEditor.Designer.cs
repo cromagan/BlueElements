@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Drawing;
 using BlueBasics.Interfaces;
+
 namespace BlueControls.Classes_Editor
 {
     internal partial class AbstractClassEditor<T> : BlueControls.Controls.GroupBox where T : IParseable

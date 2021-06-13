@@ -26,6 +26,7 @@ using System;
 using System.Drawing;
 using static BlueBasics.FileOperations;
 using static BlueBasics.modConverter;
+
 namespace BlueControls.Classes_Editor {
     internal sealed partial class ExportDefinition_Editor : AbstractClassEditor<ExportDefinition> //  System.Windows.Forms.UserControl// 
     {
@@ -46,15 +47,19 @@ namespace BlueControls.Classes_Editor {
         protected override void EnabledAndFillFormula() {
             Enabled = true;
             switch (Item.Typ) {
+
                 case enExportTyp.DatenbankCSVFormat:
                     ExportCSVFormat.Checked = true;
                     break;
+
                 case enExportTyp.DatenbankHTMLFormat:
                     ExportHTMLFormat.Checked = true;
                     break;
+
                 case enExportTyp.DatenbankOriginalFormat:
                     ExportOriginalFormat.Checked = true;
                     break;
+
                 case enExportTyp.EinzelnMitFormular:
                     ExportalsBild.Checked = true;
                     Item.Intervall = 0;
@@ -185,6 +190,7 @@ namespace BlueControls.Classes_Editor {
         //    UpdateExport(false);
         //}
         private void ExportDateien_ListOrItemChanged(object sender, System.EventArgs e) => UpdateExport(false);
+
         #region  Filter 
         private void lbxFilter_AddClicked(object sender, System.EventArgs e) {
             var NewFilterItem = lbxFilter.Item.Add(new FilterItem(Item.Database, string.Empty));
@@ -203,6 +209,7 @@ namespace BlueControls.Classes_Editor {
         }
         private void lbxFilter_ListOrItemChanged(object sender, System.EventArgs e) => UpdateExport(false);
         #endregion
+
         private void filterItemEditor_Changed(object sender, System.EventArgs e) {
             if (IsFilling) { return; }
             foreach (var thisitem in lbxFilter.Item) {

@@ -1,4 +1,5 @@
 ﻿using System;
+
 namespace BlueControls.Controls {
     partial class EasyPicMulti {
         /// <summary> 
@@ -15,6 +16,7 @@ namespace BlueControls.Controls {
             }
             base.Dispose(disposing);
         }
+
         #region Vom Komponenten-Designer generierter Code
         /// <summary> 
         /// Erforderliche Methode für die Designerunterstützung. 
@@ -86,6 +88,7 @@ namespace BlueControls.Controls {
             this.ResumeLayout(false);
         }
         #endregion
+
         private GroupBox pnlControls;
         private Button btnRight;
         private Button btnLeft;

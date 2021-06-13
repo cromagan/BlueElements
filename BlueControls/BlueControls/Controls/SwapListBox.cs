@@ -5,6 +5,7 @@ using BlueControls.ItemCollection;
 using System;
 using System.ComponentModel;
 using System.Drawing;
+
 namespace BlueControls.Controls {
     public partial class SwapListBox : GenericControl, IBackgroundNone {
         public SwapListBox() => InitializeComponent();

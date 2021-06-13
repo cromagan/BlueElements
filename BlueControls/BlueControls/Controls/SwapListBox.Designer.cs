@@ -1,4 +1,5 @@
-﻿namespace BlueControls.Controls {
+﻿
+namespace BlueControls.Controls {
     partial class SwapListBox {
         /// <summary> 
         /// Erforderliche Designervariable.
@@ -14,6 +15,7 @@
             }
             base.Dispose(disposing);
         }
+
         #region Vom Komponenten-Designer generierter Code
         /// <summary> 
         /// Erforderliche Methode für die Designerunterstützung. 
@@ -52,7 +54,6 @@
             this.Main.AddAllowed = BlueControls.Enums.enAddType.Text;
             this.Main.CheckBehavior = BlueControls.Enums.enCheckBehavior.NoSelection;
             this.Main.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.Main.LastFilePath = null;
             this.Main.Location = new System.Drawing.Point(0, 0);
             this.Main.Name = "Main";
             this.Main.Size = new System.Drawing.Size(345, 115);
@@ -69,7 +70,6 @@
             this.Suggest.CheckBehavior = BlueControls.Enums.enCheckBehavior.NoSelection;
             this.Suggest.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Suggest.FilterAllowed = true;
-            this.Suggest.LastFilePath = null;
             this.Suggest.Location = new System.Drawing.Point(0, 0);
             this.Suggest.Name = "Suggest";
             this.Suggest.Size = new System.Drawing.Size(345, 252);
@@ -87,6 +87,7 @@
             this.ResumeLayout(false);
         }
         #endregion
+
         private System.Windows.Forms.SplitContainer splitContainer1;
         private ListBox Main;
         private ListBox Suggest;

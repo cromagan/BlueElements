@@ -21,13 +21,16 @@ using BlueControls.Enums;
 using System;
 using System.ComponentModel;
 using System.Drawing;
+
 namespace BlueControls.Controls {
     [Designer(typeof(BasicDesigner))]
     public class ProgressBar : GenericControl {
         private int wProzent = 100;
+
         #region Constructor
         public ProgressBar() : base(false, false) { }
         #endregion
+
         [DefaultValue(100)]
         public int Prozent {
             get => wProzent;

@@ -34,10 +34,12 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using static BlueBasics.Extensions;
 using static BlueBasics.FileOperations;
+
 namespace BlueControls.Controls {
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("ImageChanged")]
     public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundNone {
+
         #region Constructor
         public EasyPic() : base(false, false) {
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -46,6 +48,7 @@ namespace BlueControls.Controls {
             SetNotFocusable();
         }
         #endregion
+
         private Bitmap _Bitmap = null;
         private int _MaxSize = -1;
         private int _Richt;
@@ -124,6 +127,7 @@ namespace BlueControls.Controls {
             DelP.Enabled = true;
             Invalidate();
         }
+
         #region " 3er Modifikatoren mit Eventauslösung "
         public void FromFile(string Filename) {
             if (!FileExists(Filename)) {
@@ -162,6 +166,7 @@ namespace BlueControls.Controls {
             }
         }
         #endregion
+
         protected override void DrawControl(Graphics GR, enStates vState) {
             if (Convert.ToBoolean(vState & enStates.Standard_MouseOver)) { vState ^= enStates.Standard_MouseOver; }
             if (Convert.ToBoolean(vState & enStates.Standard_MousePressed)) { vState ^= enStates.Standard_MousePressed; }

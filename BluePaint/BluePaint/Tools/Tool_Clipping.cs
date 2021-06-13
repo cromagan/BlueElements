@@ -24,6 +24,7 @@ using System;
 using System.Drawing;
 using static BlueBasics.Develop;
 using static BlueBasics.modAllgemein;
+
 namespace BluePaint {
     public partial class Tool_Clipping {
         public Tool_Clipping(bool aufnahme) : base() {
@@ -37,10 +38,12 @@ namespace BluePaint {
                 OnCommandForMacro("AutoZuschnitt");
             }
         }
+
         public override void ToolFirstShown() {
             CheckMinMax();
             AutoZ_Click(null, null);
         }
+
         public override void OnToolChanging() => WollenSieDenZuschnittÜbernehmen();
         public override void MouseDown(MouseEventArgs1_1 e, Bitmap OriginalPic) => OnDoInvalidate();
         public override void MouseMove(MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) => OnDoInvalidate();
@@ -52,6 +55,7 @@ namespace BluePaint {
             Unten.Value = -(OriginalPic.Height - Math.Max(e.Current.TrimmedY, e.MouseDown.TrimmedY));
             ValueChangedByClicking(this, System.EventArgs.Empty);
         }
+
         public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic) {
             if (OriginalPic == null) { return; }
             Pen Pen_Blau = new(Color.FromArgb(150, 0, 0, 255));
@@ -64,6 +68,7 @@ namespace BluePaint {
                 e.DrawLine(Pen_Blau, -1, e.MouseDown.Y, OriginalPic.Width, e.MouseDown.Y);
             }
         }
+
         private void ValueChangedByClicking(object sender, System.EventArgs e) => OnDoInvalidate();
         public void DrawZusatz(AdditionalDrawing e, Bitmap OriginalPic) {
             SolidBrush Brush_Blau = new(Color.FromArgb(120, 0, 0, 255));
@@ -80,6 +85,7 @@ namespace BluePaint {
                 e.FillRectangle(Brush_Blau, new Rectangle(0, OriginalPic.Height + Convert.ToInt32(Unten.Value), OriginalPic.Width, (int)-Unten.Value));
             }
         }
+
         private void ZuschnittOK_Click(object sender, System.EventArgs e) {
             var _Pic = OnNeedCurrentPic();
             var _BMP2 = _Pic.Crop((int)Links.Value, (int)Recht.Value, (int)Oben.Value, (int)Unten.Value);
@@ -92,6 +98,7 @@ namespace BluePaint {
             CheckMinMax();
             OnZoomFit();
         }
+
         private void AutoZ_Click(object sender, System.EventArgs e) {
             WollenSieDenZuschnittÜbernehmen();
             var _Pic = base.OnNeedCurrentPic();
@@ -118,6 +125,7 @@ namespace BluePaint {
             Recht.Value = Right;
             Unten.Value = Bottom;
         }
+
         public void CheckMinMax() {
             var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
@@ -126,6 +134,7 @@ namespace BluePaint {
             Oben.Maximum = _Pic.Height - 1;
             Unten.Minimum = -_Pic.Height - 1;
         }
+
         public override string MacroKennung() => "Clipping";
         public override void ExcuteCommand(string command) {
             var c = command.SplitBy(";");

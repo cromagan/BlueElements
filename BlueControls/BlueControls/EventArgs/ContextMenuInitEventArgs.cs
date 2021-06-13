@@ -18,6 +18,7 @@
 #endregion
 using BlueControls.ItemCollection;
 using System.Collections.Generic;
+
 namespace BlueControls.EventArgs {
     public class ContextMenuInitEventArgs : System.EventArgs {
         public ContextMenuInitEventArgs(object hotItem, List<string> tags, ItemCollectionList userMenu) {

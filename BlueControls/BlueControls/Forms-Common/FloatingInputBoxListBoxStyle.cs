@@ -24,6 +24,7 @@ using BlueControls.ItemCollection;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+
 namespace BlueControls.Forms {
     /// <summary>
     /// Typischerweise für Dropdownmenüs oder dem KontextMenu
@@ -50,6 +51,7 @@ namespace BlueControls.Forms {
         private bool _MouseWasDown = false;
         public static FloatingInputBoxListBoxStyle Show(ItemCollectionList Items, object Tag, System.Windows.Forms.Control ConnectedControl, bool Translate) => new(Items, System.Windows.Forms.Cursor.Position.X - 8, System.Windows.Forms.Cursor.Position.Y - 8, -1, Tag, ConnectedControl, Translate);
         public static FloatingInputBoxListBoxStyle Show(ItemCollectionList Items, int Xpos, int Ypos, int SteuerWi, object Tag, System.Windows.Forms.Control ConnectedControl, bool Translate) => new(Items, Xpos, Ypos, SteuerWi, Tag, ConnectedControl, Translate);
+
         #region  ListBox1 
         public void Generate_ListBox1(ItemCollectionList ItemsOri, int MinWidth, enAddType AddNewAllowed, bool Translate) {
             var itemsClone = (ItemCollectionList)ItemsOri.Clone();
@@ -98,6 +100,7 @@ namespace BlueControls.Forms {
         }
         private void OnItemClicked(ContextMenuItemClickedEventArgs e) => ItemClicked?.Invoke(this, e);
         #endregion
+
         private void OnCancel() => Cancel?.Invoke(this, System.EventArgs.Empty);
         private void timer1_Tick(object sender, System.EventArgs e) {
             var MouseIsDown = !string.IsNullOrEmpty(modAllgemein.LastMouseButton());

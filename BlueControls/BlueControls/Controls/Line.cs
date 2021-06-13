@@ -22,9 +22,11 @@ using BlueControls.Enums;
 using BlueControls.Interfaces;
 using System.ComponentModel;
 using System.Drawing;
+
 namespace BlueControls.Controls {
     [Designer(typeof(BasicDesigner))]
     public class Line : GenericControl, IBackgroundNone {
+
         #region Constructor
         public Line() : base(false, false) {
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -34,6 +36,7 @@ namespace BlueControls.Controls {
             _MouseHighlight = false;
         }
         #endregion
+
         private enOrientation _Orientation = enOrientation.Waagerecht;
         [DefaultValue(enOrientation.Waagerecht)]
         public enOrientation Orientation {

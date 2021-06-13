@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using BlueControls.Controls;
 using BlueControls.Enums;
+
 namespace BlueControls.Forms
     {
         public partial class FontSelectDialog : Form

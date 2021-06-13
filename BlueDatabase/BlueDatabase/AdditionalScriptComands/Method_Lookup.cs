@@ -21,6 +21,7 @@ using BlueDatabase;
 using Skript.Enums;
 using System.Collections.Generic;
 using static BlueBasics.Extensions;
+
 namespace BlueScript {
     public class Method_Lookup : Method {
         //public Method_Lookup(Script parent) : base(parent) { }

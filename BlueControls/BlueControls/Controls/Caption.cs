@@ -28,10 +28,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+
 namespace BlueControls.Controls {
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("Click")]
     public partial class Caption : GenericControl, IContextMenu, IBackgroundNone {
+
         #region Constructor
         public Caption() : base(false, false) {
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -41,14 +43,18 @@ namespace BlueControls.Controls {
             _MouseHighlight = false;
         }
         #endregion
+
+
         #region  Variablen 
         private string _Text = string.Empty;
         private ExtText eText;
         private enSteuerelementVerhalten _TextAnzeigeverhalten = enSteuerelementVerhalten.Text_Abschneiden;
         private enDesign _design = enDesign.Undefiniert;
         #endregion
+
         public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
         public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
+
         #region  Properties 
         /// <summary>
         /// Benötigt, dass der Designer das nicht erstellt
@@ -114,6 +120,7 @@ namespace BlueControls.Controls {
             }
         }
         #endregion
+
         protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseUp(e);
             if (e.Button == System.Windows.Forms.MouseButtons.Right) { FloatingInputBoxListBoxStyle.ContextMenuShow(this, e); }
@@ -125,25 +132,40 @@ namespace BlueControls.Controls {
             if (Parent == null) { return; }
             if (Parent is Form fm) { _design = fm.Design; }
             switch (_design) {
+
                 case enDesign.Form_QuickInfo:
+
                 case enDesign.Form_DesktopBenachrichtigung:
+
                 case enDesign.Form_BitteWarten:
+
                 case enDesign.Form_KontextMenu:
+
                 case enDesign.Form_SelectBox_Dropdown:
+
                 case enDesign.Form_AutoFilter:
                     return;
             }
             switch (ParentType()) {
+
                 case enPartentType.RibbonGroupBox:
+
                 case enPartentType.RibbonPage:
                     _design = enDesign.Ribbonbar_Caption;
                     break;
+
                 case enPartentType.GroupBox:
+
                 case enPartentType.TabPage:
+
                 case enPartentType.Form:
+
                 case enPartentType.FlexiControlForCell:
+
                 case enPartentType.Unbekannt: // UserForms und anderes
+
                 case enPartentType.Nothing: // UserForms und anderes
+
                 case enPartentType.ListBox:
                     _design = enDesign.Caption;
                     return;
@@ -183,16 +205,20 @@ namespace BlueControls.Controls {
                     eText.State = state;
                     eText.Multiline = true;
                     switch (_TextAnzeigeverhalten) {
+
                         case enSteuerelementVerhalten.Steuerelement_Anpassen:
                             eText.TextDimensions = Size.Empty;
                             Size = eText.LastSize();
                             break;
+
                         case enSteuerelementVerhalten.Text_Abschneiden:
                             eText.TextDimensions = Size.Empty;
                             break;
+
                         case enSteuerelementVerhalten.Scrollen_mit_Textumbruch:
                             eText.TextDimensions = new Size(base.Size.Width, -1);
                             break;
+
                         case enSteuerelementVerhalten.Scrollen_ohne_Textumbruch:
                             eText.TextDimensions = Size.Empty;
                             break;

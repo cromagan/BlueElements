@@ -1,5 +1,6 @@
 using BlueControls.Controls;
 using System.Diagnostics;
+
 namespace BlueControls.BlueDatabaseDialogs
 {
     internal sealed partial class SearchAndReplace

@@ -26,6 +26,7 @@ using System.ComponentModel;
 using System.IO;
 using static BlueBasics.FileOperations;
 using static BlueBasics.modConverter;
+
 namespace BlueDatabase {
     //Der Export wird nur Intern verwaltet und gibt keine Ereignisse aus.
     //Wenn mal ein LAyout geändert wird, sind es gleich 100 und mehr AddPenduings mit imensen Daten.
@@ -41,9 +42,12 @@ namespace BlueDatabase {
         private DateTime _LastExportTimeUTC;
         private FilterCollection _Filter;
         private bool disposedValue;
+
         #region  Event-Deklarationen + Delegaten 
         public event EventHandler Changed;
         #endregion
+
+
         #region  Properties 
         public bool IsParsing { get; private set; }
         public string Verzeichnis {
@@ -118,6 +122,8 @@ namespace BlueDatabase {
             }
         }
         #endregion
+
+
         #region  Construktor + Initialize 
         private void Initialize() {
             _Verzeichnis = string.Empty;
@@ -152,6 +158,7 @@ namespace BlueDatabase {
         }
         private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
         #endregion
+
         private void _Filter_Changed(object sender, System.EventArgs e) => OnChanged();
         private void _BereitsExportiert_ListOrItemChanged(object sender, System.EventArgs e) => OnChanged();
         public void OnChanged() =>

@@ -2,9 +2,11 @@
 using BlueControls.Enums;
 using System;
 using static BlueBasics.Develop;
+
 namespace BlueControls.Forms {
     public partial class DialogWithOkAndCancel : Form {
         private bool _cancelPossible = false;
+
         #region Konstruktor
         public DialogWithOkAndCancel() : this(enDesign.Form_MsgBox) {
         }
@@ -16,6 +18,7 @@ namespace BlueControls.Forms {
             }
         }
         #endregion
+
         public void Setup(int MinWidth, int BottomOfLowestControl, bool CancelPossible, bool Sizeable) {
             Text = AppName();
             _cancelPossible = CancelPossible;

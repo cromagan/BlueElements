@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using BlueControls.Controls;
+
 namespace BlueControls.BlueDatabaseDialogs
 {
     internal partial class LayoutDesigner

@@ -10,9 +10,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+
 namespace BlueControls.BlueDatabaseDialogs {
     public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserControl //
     {
+
         #region Variablen
         private Table _TableView;
         private enOrientation _orientation = enOrientation.Waagerecht;
@@ -24,12 +26,16 @@ namespace BlueControls.BlueDatabaseDialogs {
         private bool _AutoPin = false;
         private string _LastLooked = string.Empty;
         #endregion
+
+
         #region Konstruktor
         public Filterleiste() {
             InitializeComponent();
             FillFilters();
         }
         #endregion
+
+
         #region Properties
         [DefaultValue(enOrientation.Waagerecht)]
         public enOrientation Orientation {
@@ -107,6 +113,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
         }
         #endregion
+
         private void GetÄhnlich() {
             _ähnliche = null;
             if (_TableView != null && _TableView.Database != null && !string.IsNullOrEmpty(_ÄhnlicheAnsichtName)) {
@@ -154,11 +161,13 @@ namespace BlueControls.BlueDatabaseDialogs {
             //btnPin.Enabled = !_AutoPin;
             //btnPin.Visible = !_AutoPin;
             btnPinZurück.Enabled = _TableView != null && _TableView.Database != null && _TableView.PinnedRows != null && _TableView.PinnedRows.Count > 0;
+
             #region ZeilenFilter befüllen
             txbZeilenFilter.Text = _TableView != null && _TableView.Database != null && _TableView.Filter.IsRowFilterActiv()
                 ? _TableView.Filter.RowFilterText
                 : string.Empty;
             #endregion
+
             var toppos = 0;
             var leftpos = 0;
             var constwi = 0;
@@ -170,6 +179,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             var breakafter = -1;
             var beginnx = -1;
             var afterBreakAddY = -1;
+
             #region Variablen für Waagerecht / Senkrecht bestimmen
             if (_orientation == enOrientation.Waagerecht) {
                 toppos = btnAlleFilterAus.Top;
@@ -191,6 +201,8 @@ namespace BlueControls.BlueDatabaseDialogs {
                 showPic = _TableView != null && _TableView.Database != null && !string.IsNullOrEmpty(_TableView.Database.FilterImagePfad);
             }
             #endregion
+
+
             #region  Bild bei Bedarf laden und Visble richtig setze
             if (showPic) {
                 pic.Height = (int)Math.Min(pic.Width * 0.7, Height * 0.6);
@@ -211,12 +223,16 @@ namespace BlueControls.BlueDatabaseDialogs {
                 pic.Visible = false;
             }
             #endregion
+
             List<FlexiControlForFilter> flexsToDelete = new();
+
             #region Vorhandene Flexis ermitteln
             foreach (var ThisControl in Controls) {
                 if (ThisControl is FlexiControlForFilter flx) { flexsToDelete.Add(flx); }
             }
             #endregion
+
+
             #region Neue Flexis erstellen / updaten
             if (_TableView != null && _TableView.Database != null && _TableView.Filter != null) {
                 List<ColumnItem> columSort = new();
@@ -227,6 +243,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                     }
                 }
                 if (orderArrangement is null) { orderArrangement = _TableView?.CurrentArrangement; }
+
                 #region Reihenfolge der Spalten bestimmen
                 if (orderArrangement != null) {
                     foreach (var thisclsVitem in orderArrangement) {
@@ -242,17 +259,20 @@ namespace BlueControls.BlueDatabaseDialogs {
                     columSort.AddIfNotExists(thisColumn);
                 }
                 #endregion
+
                 foreach (var thisColumn in columSort) {
                     var ShowMe = false;
                     var ViewItemOrder = orderArrangement[thisColumn];
                     var ViewItemCurrent = _TableView.CurrentArrangement[thisColumn];
                     var FilterItem = _TableView.Filter[thisColumn];
+
                     #region Sichtbarkeit des Filterelemts bestimmen
                     if (thisColumn.AutoFilterSymbolPossible()) {
                         if (ViewItemOrder != null && _Filtertypes.HasFlag(enFilterTypesToShow.NachDefinierterAnsicht)) { ShowMe = true; }
                         if (ViewItemCurrent != null && FilterItem != null && _Filtertypes.HasFlag(enFilterTypesToShow.AktuelleAnsicht_AktiveFilter)) { ShowMe = true; }
                     }
                     #endregion
+
                     if (FilterItem == null && ShowMe) {
                         // Dummy-Filter, nicht in der Collection
                         FilterItem = thisColumn.FilterOptions == enFilterOptions.Enabled_OnlyAndAllowed ? new FilterItem(thisColumn, enFilterType.Istgleich_UND_GroßKleinEgal, string.Empty)
@@ -308,6 +328,8 @@ namespace BlueControls.BlueDatabaseDialogs {
                 }
             }
             #endregion
+
+
             #region  Unnötige Flexis löschen
             foreach (var thisFlexi in flexsToDelete) {
                 thisFlexi.ValueChanged -= Flx_ValueChanged;
@@ -318,6 +340,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 thisFlexi.Dispose();
             }
             #endregion
+
             _isFilling = false;
         }
         private void Flx_ButtonClicked(object sender, System.EventArgs e) {

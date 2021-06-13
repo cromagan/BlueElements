@@ -21,15 +21,21 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
+
 namespace BlueDatabase {
     public sealed class RowSortDefinition : IParseable {
+
         #region  Variablen-Deklarationen 
         public Database Database;
         private readonly ListExt<ColumnItem> _Columns = new();
         #endregion
+
+
         #region  Event-Deklarationen + Delegaten 
         public event EventHandler Changed;
         #endregion
+
+
         #region  Construktor + Initialize 
         private void Initialize() {
             Reverse = false;
@@ -52,11 +58,14 @@ namespace BlueDatabase {
             SetColumn(columnNames);
         }
         #endregion
+
+
         #region  Properties 
         public bool IsParsing { get; private set; }
         public bool Reverse { get; private set; }
         public List<ColumnItem> Columns => _Columns;
         #endregion
+
         public override string ToString() {
             var Result = "{";
             if (Reverse) {
@@ -78,16 +87,21 @@ namespace BlueDatabase {
             Initialize();
             foreach (var pair in ToParse.GetAllTags()) {
                 switch (pair.Key) {
+
                     case "identifier":
                         if (pair.Value != "SortDefinition") { Develop.DebugPrint(enFehlerArt.Fehler, "Identifier fehlerhaft: " + pair.Value); }
                         break;
+
                     case "direction":
                         Reverse = Convert.ToBoolean(pair.Value == "Z-A");
                         break;
+
                     case "column":
+
                     case "columnname": // Columname wichtig wegen CopyLayout
                         _Columns.Add(Database.Column[pair.Value]);
                         break;
+
                     case "columnkey":
                         _Columns.Add(Database.Column.SearchByKey(int.Parse(pair.Value)));
                         break;

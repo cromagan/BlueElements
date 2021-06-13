@@ -21,8 +21,10 @@ using BlueBasics.Enums;
 using System;
 using System.Diagnostics;
 using System.Windows.Forms;
+
 namespace BlueControls.Designer_Support {
     internal sealed class frmQuickPic : Panel {
+
         #region  Vom Windows Form Designer generierter Code 
         public frmQuickPic() =>
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
@@ -450,6 +452,7 @@ namespace BlueControls.Designer_Support {
             ResumeLayout(false);
         }
         #endregion
+
         public void StartAll(string C) {
             LB.Items.Clear();
             const enImageCode tempVar = (enImageCode)9999;
@@ -473,6 +476,7 @@ namespace BlueControls.Designer_Support {
             GrY.Text = l.Height.ToString();
             txbZweitsymbol.Text = l.Zweitsymbol;
         }
+
         private void LB_DoubleClick(object sender, System.EventArgs e) => PicName.Text = Convert.ToString(LB.SelectedItem);
         public void GeneratePreview() {
             try {
@@ -481,12 +485,15 @@ namespace BlueControls.Designer_Support {
                 Preview.Image = null;
             }
         }
+
         public string ICode() {
             var e = (enImageCodeEffect)(((chkbGrauStufen.Checked ? -1 : 0) * -(int)enImageCodeEffect.Graustufen) | ((chkbDurchgestrichen.Checked ? -1 : 0) * -(int)enImageCodeEffect.Durchgestrichen) | ((chkbMEDisabled.Checked ? -1 : 0) * -(int)enImageCodeEffect.WindowsMEDisabled) | ((chkbXPDisabled.Checked ? -1 : 0) * -(int)enImageCodeEffect.WindowsXPDisabled));
             return QuickImage.GenerateCode(PicName.Text, int.Parse(GrX.Text), int.Parse(GrY.Text), e, Färb.Text, grün.Text, SAT.Value, Hell.Value, 0, Transp.Value, txbZweitsymbol.Text);
         }
+
         private void SomethingCheckedChanged(object sender, System.EventArgs e) {
         }
+
         private void SomethingChanged(object sender, System.EventArgs e) {
             Helll.Text = Hell.Value + "%";
             SATL.Text = SAT.Value + "%";

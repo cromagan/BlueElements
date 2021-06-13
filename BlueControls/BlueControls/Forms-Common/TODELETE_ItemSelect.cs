@@ -22,6 +22,7 @@ using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using System.Collections.Generic;
+
 namespace BlueControls.Forms {
     public sealed partial class ItemSelect {
         public ItemSelect() => InitializeComponent();
@@ -30,6 +31,7 @@ namespace BlueControls.Forms {
             ClickedItem = e.Item;
             Close();
         }
+
         public string SelectOne_OfDataSystem(List<string> Files, string FileEncryptionKey) {
             //    Dim l As List(Of String) = DataSystem.GetFiles()
             foreach (var ThisString in Files) {
@@ -40,6 +42,7 @@ namespace BlueControls.Forms {
             ShowDialog();
             return ClickedItem != null ? ClickedItem.Internal : string.Empty;
         }
+
         public RowItem SelectOne_OfRow(List<RowItem> rows, string textOfNewRow, string layoutID, bool allowClose) {
             List.Item.Clear();
             foreach (var ThisRow in rows) {

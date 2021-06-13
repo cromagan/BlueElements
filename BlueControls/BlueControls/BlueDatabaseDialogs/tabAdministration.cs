@@ -32,6 +32,7 @@ using System.Drawing;
 using System.IO;
 using static BlueBasics.FileOperations;
 using static BlueBasics.modConverter;
+
 namespace BlueControls.BlueDatabaseDialogs {
     public partial class tabAdministration : TabPage // System.Windows.Forms.UserControl // 
     {
@@ -101,13 +102,16 @@ namespace BlueControls.BlueDatabaseDialogs {
             ColumnItem column2 = null;
             var PosError = false;
             switch (column.Format) {
+
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                     var Txt = Row.CellGetString(column);
                     if (int.TryParse(Txt, out var ColKey)) {
                         column2 = column.LinkedDatabase().Column.SearchByKey(ColKey);
                     }
                     break;
+
                 case enDataFormat.LinkedCell:
+
                 case enDataFormat.Values_für_LinkedCellDropdown:
                     (column2, _) = CellCollection.LinkedCellData(column, Row, true, false);
                     PosError = true;

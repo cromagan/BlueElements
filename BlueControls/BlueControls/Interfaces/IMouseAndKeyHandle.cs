@@ -16,6 +16,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
+
 namespace BlueControls.Interfaces {
     public interface IMouseAndKeyHandle {
         bool MouseDown(object sender, System.Windows.Forms.MouseEventArgs e, decimal zoom, decimal shiftX, decimal shiftY);

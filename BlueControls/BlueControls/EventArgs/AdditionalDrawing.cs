@@ -18,6 +18,7 @@
 #endregion
 using System;
 using System.Drawing;
+
 namespace BlueControls.EventArgs {
     public class AdditionalDrawing : MouseEventArgs1_1DownAndCurrent {
         public AdditionalDrawing(Graphics gr, decimal zoom, decimal shiftX, decimal shiftY, MouseEventArgs1_1 mouseDown, MouseEventArgs1_1 current) : base(mouseDown, current) {

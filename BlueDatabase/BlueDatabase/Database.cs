@@ -31,10 +31,12 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using static BlueBasics.FileOperations;
+
 namespace BlueDatabase {
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public sealed class Database : BlueBasics.MultiUserFile.clsMultiUserFile {
+
         #region  Shareds 
         public static readonly string DatabaseVersion = "3.51";
         public static Database LoadResource(Assembly assembly, string Name, string BlueBasicsSubDir, bool FehlerAusgeben, bool MustBeStream) {
@@ -93,6 +95,8 @@ namespace BlueDatabase {
             return null;
         }
         #endregion
+
+
         #region  Variablen-Deklarationen 
         public readonly ColumnCollection Column;
         public readonly CellCollection Cell;
@@ -135,6 +139,8 @@ namespace BlueDatabase {
         private string _LastWorkItem = string.Empty;
         private string WVorher = string.Empty;
         #endregion
+
+
         #region  Event-Deklarationen 
         public event EventHandler SortParameterChanged;
         public event EventHandler ViewChanged;
@@ -147,6 +153,8 @@ namespace BlueDatabase {
         public event EventHandler<PasswordEventArgs> NeedPassword;
         public event EventHandler<GenerateLayoutInternalEventargs> GenerateLayoutInternal;
         #endregion
+
+
         #region  Construktor + Initialize 
         public Database(Stream Stream) : this(Stream, string.Empty, true, false) { }
         public Database(bool readOnly) : this(null, string.Empty, readOnly, true) { }
@@ -217,6 +225,8 @@ namespace BlueDatabase {
             _sortDefinition = null;
         }
         #endregion
+
+
         #region  Properties 
         [Browsable(false)]
         public string Caption {
@@ -354,6 +364,7 @@ namespace BlueDatabase {
             }
         }
         #endregion
+
         private string _AdditionaFilesPfadtmp = string.Empty;
         public string AdditionaFilesPfadWhole() {
             // @ ist ein erkennungszeichen, dass der Pfad schon geprüft wurde, aber nicht vorhanden ist
@@ -1001,6 +1012,7 @@ namespace BlueDatabase {
                 return HasPendingChanges();
             }
         }
+
         #region  Export CSV / HTML 
         /// <summary>
         /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
@@ -1189,6 +1201,7 @@ namespace BlueDatabase {
         /// <returns></returns>
         public void Export_HTML(string filename, ColumnViewCollection arrangement, List<RowItem> sortedRows, bool execute) => Export_HTML(filename, arrangement.ListOfUsedColumn(), sortedRows, execute);
         #endregion
+
         private bool PermissionCheckWithoutAdmin(string allowed, RowItem row) {
             var tmpName = UserName.ToUpper();
             var tmpGroup = UserGroup.ToUpper();
@@ -1351,6 +1364,7 @@ namespace BlueDatabase {
             }
             return Column_All.SortedDistinctList();
         }
+
         #region  Undo 
         public string UndoText(ColumnItem column, RowItem row) {
             if (Works == null || Works.Count == 0) { return string.Empty; }
@@ -1370,6 +1384,7 @@ namespace BlueDatabase {
             return t;
         }
         #endregion
+
         public string DefaultLayoutPath() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + "Layouts\\";
         /// <summary>
         /// Fügt Comandos manuell hinzu. Vorsicht: Kann Datenbank beschädigen

@@ -18,6 +18,7 @@
 #endregion
 using Skript.Enums;
 using System.Collections.Generic;
+
 namespace BlueScript {
     internal class Method_Split : Method {
         public override string Syntax => "Split(String, Trennzeichen)";

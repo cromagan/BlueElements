@@ -5,6 +5,7 @@ using BlueControls.Forms;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System.Drawing;
+
 namespace BlueControls.Classes_Editor {
     internal sealed partial class FilterItem_Editor : AbstractClassEditor<FilterItem> //System.Windows.Forms.UserControl // :
     {
@@ -23,6 +24,7 @@ namespace BlueControls.Classes_Editor {
             Enabled = false;
             Col.Text = string.Empty;
         }
+
         private void FiltWahl_Click(object sender, System.EventArgs e) {
             var c = Item.Database.Column[Col.Text];
             if (c == null || !c.AutoFilterSymbolPossible()) { return; }
@@ -35,6 +37,7 @@ namespace BlueControls.Classes_Editor {
             autofilter.FilterComand += AutoFilter_FilterComand;
             Develop.Debugprint_BackgroundThread();
         }
+
         private void AutoFilter_FilterComand(object sender, FilterComandEventArgs e) {
             if (IsFilling) { return; }
             if (e.Comand != "Filter") {
@@ -46,6 +49,7 @@ namespace BlueControls.Classes_Editor {
             Item.SearchValue.AddRange(e.Filter.SearchValue);
             OnChanged(Item);
         }
+
         private void Col_TextChanged(object sender, System.EventArgs e) {
             if (IsFilling) { return; }
             var c = Item.Database.Column[Col.Text];

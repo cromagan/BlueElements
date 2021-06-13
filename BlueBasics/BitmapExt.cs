@@ -24,6 +24,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
 using static BlueBasics.FileOperations;
+
 namespace BlueBasics {
     // https://stackoverflow.com/questions/24701703/c-sharp-faster-alternatives-to-setpixel-and-getpixel-for-bitmaps-for-windows-f
     // Todo: Obselete Routinen:
@@ -116,21 +117,26 @@ namespace BlueBasics {
             if (height < 1) { height = 1; }
             var Scale = Math.Min(width / (double)bmp.Width, height / (double)bmp.Height);
             switch (sizeMode) {
+
                 case enSizeModes.EmptySpace:
                     break;
+
                 case enSizeModes.BildAbschneiden:
                     break;
+
                 case enSizeModes.Breite_oder_Höhe_Anpassen_MitVergrößern:
                     // Bei diesem Modus werden die Rückgabehöhe oder breite verändert!!!
                     width = (int)(Scale * bmp.Width);
                     height = (int)(Scale * bmp.Height);
                     break;
+
                 case enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern:
                     // Bei diesem Modus werden die Rückgabehöhe oder breite verändert!!!
                     if (Scale >= 1) { return bmp; }
                     width = (int)(Scale * bmp.Width);
                     height = (int)(Scale * bmp.Height);
                     break;
+
                 case enSizeModes.Verzerren:
                     Scale = 1; // Dummy setzen
                     break;
@@ -190,21 +196,26 @@ namespace BlueBasics {
             if (height < 1) { height = 1; }
             var Scale = Math.Min(width / (double)Width, height / (double)Height);
             switch (sizeMode) {
+
                 case enSizeModes.EmptySpace:
                     break;
+
                 case enSizeModes.BildAbschneiden:
                     break;
+
                 case enSizeModes.Breite_oder_Höhe_Anpassen_MitVergrößern:
                     // Bei diesem Modus werden die Rückgabehöhe oder breite verändert!!!
                     width = (int)(Scale * Width);
                     height = (int)(Scale * Height);
                     break;
+
                 case enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern:
                     // Bei diesem Modus werden die Rückgabehöhe oder breite verändert!!!
                     if (Scale >= 1) { return; }
                     width = (int)(Scale * Width);
                     height = (int)(Scale * Height);
                     break;
+
                 case enSizeModes.Verzerren:
                     Scale = 1; // Dummy setzen
                     break;

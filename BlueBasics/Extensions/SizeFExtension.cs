@@ -17,6 +17,7 @@
 // DEALINGS IN THE SOFTWARE.
 #endregion
 using System.Drawing;
+
 namespace BlueBasics {
     public static partial class Extensions {
         public static SizeF SizeFParse(this string code) {

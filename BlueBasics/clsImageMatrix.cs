@@ -1,4 +1,5 @@
-﻿namespace BlueBasics {
+﻿
+namespace BlueBasics {
     public static class clsImageMatrix {
         public static double[,] Mean3x3 => new double[,]
                { { 1, 1, 1, },

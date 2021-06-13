@@ -18,6 +18,7 @@
 #endregion
 using System;
 using System.Drawing;
+
 namespace BlueBasics {
     public static class Geometry {
         private const decimal Rad = (decimal)(Math.PI / 180);
@@ -34,6 +35,7 @@ namespace BlueBasics {
             // ^2 ist langsamer, laut Project Analyzer
             return (decimal)Math.Sqrt(Convert.ToDouble((L1 * L1) + (L2 * L2)));
         }
+
         public static decimal Länge(PointF sP, PointF ep) {
             // Berechnet die Länge einer Strecke
             var L1 = (decimal)(sP.X - ep.X);

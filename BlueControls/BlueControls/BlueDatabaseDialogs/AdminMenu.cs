@@ -28,6 +28,7 @@ using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using System;
 using static BlueBasics.FileOperations;
+
 namespace BlueControls.BlueDatabaseDialogs {
     public sealed partial class AdminMenu : Form {
         private readonly Table _TableView;
@@ -75,11 +76,14 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (Vorlage != null && !string.IsNullOrEmpty(Vorlage.Identifier)) { Vorlage = null; }
             if (Vorlage != null) {
                 switch (MessageBox.Show("Spalte '" + Vorlage.ReadableText() + "' als<br>Vorlage verwenden?", enImageCode.Frage, "Ja", "Ja, mit allen Daten", "Nein", "Abbrechen")) {
+
                     case 0:
                         break;
+
                     case 1:
                         mitDaten = true;
                         break;
+
                     case 2:
                         Vorlage = null;
                         break;

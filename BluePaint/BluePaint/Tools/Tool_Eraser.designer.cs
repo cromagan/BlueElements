@@ -2,6 +2,7 @@
 using BlueControls;
 using BlueBasics.Enums;
 using BlueControls.Enums;
+
 namespace BluePaint
 {
     public partial class Tool_Eraser 

@@ -30,6 +30,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+
 namespace BlueControls.BlueDatabaseDialogs {
     internal sealed partial class DatabaseHeadEditor {
         private Database _Database;
@@ -164,6 +165,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             t = t + "<b>Zeilen:</b><tab>" + (_Database.Row.Count() - 1);
             capInfo.Text = t.TrimEnd("<br>");
         }
+
         #region  Export 
         private void ExportSets_AddClicked(object sender, System.EventArgs e) {
             var NewExportItem = lbxExportSets.Item.Add(new ExportDefinition(_Database));
@@ -182,6 +184,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             ExportEditor.Item = SelectedExport;
         }
         #endregion
+
         private void lbxExportSets_RemoveClicked(object sender, ListOfBasicListItemEventArgs e) {
             foreach (var thisitem in e.Items) {
                 if (thisitem is BasicListItem ThisItemBasic) {

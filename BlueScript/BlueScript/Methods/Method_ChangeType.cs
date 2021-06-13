@@ -18,6 +18,7 @@
 #endregion
 using Skript.Enums;
 using System.Collections.Generic;
+
 namespace BlueScript {
     internal class Method_ChangeType : Method {
         public override string Syntax => "ChangeType(Variable, num / str / lst / dat / bol);";
@@ -33,18 +34,23 @@ namespace BlueScript {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
             switch (attvar.Attributes[1].ValueString.ToLower()) {
+
                 case "num":
                     attvar.Attributes[0].Type = enVariableDataType.Numeral;
                     break;
+
                 case "str":
                     attvar.Attributes[0].Type = enVariableDataType.String;
                     break;
+
                 case "lst":
                     attvar.Attributes[0].Type = enVariableDataType.List;
                     break;
-                //case "dat":
+                //
+                case "dat":
                 //    attvar.Attributes[0].Type = enVariableDataType.Date;
                 //    break;
+
                 case "bol":
                     attvar.Attributes[0].Type = enVariableDataType.Bool;
                     break;

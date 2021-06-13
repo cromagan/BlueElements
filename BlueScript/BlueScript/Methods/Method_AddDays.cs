@@ -20,6 +20,7 @@ using Skript.Enums;
 using System.Collections.Generic;
 using static BlueBasics.Constants;
 using static BlueBasics.modConverter;
+
 namespace BlueScript {
     internal class Method_AddDays : Method {
         public override string Syntax => "AddDays(DateTimeString, Days)";

@@ -1,4 +1,5 @@
 ﻿using BlueControls.Enums;
+
 namespace BlueControls.Forms
 {
     partial class Progressbar
@@ -19,6 +20,7 @@ namespace BlueControls.Forms
             }
             base.Dispose(disposing);
         }
+
         #region Windows Form Designer generated code
         /// <summary>
         /// Required method for Designer support - do not modify
@@ -49,6 +51,7 @@ namespace BlueControls.Forms
             this.ResumeLayout(false);
         }
         #endregion
+
         private Controls.Caption capTXT;
     }
 }

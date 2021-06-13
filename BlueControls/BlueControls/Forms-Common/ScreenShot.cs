@@ -26,12 +26,14 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Runtime.CompilerServices;
+
 namespace BlueControls {
     /// <summary>
     /// Eine Klasse, die alle möglichen Arten von Screenshots zurückgibt.
     /// </summary>
     public sealed partial class ScreenShot {
         private ScreenShot() => InitializeComponent();
+
         #region  +++ Deklarationen +++ 
         //private enSelectModus Modus = enSelectModus.Unbekannt;
         private bool MousesWasUp;
@@ -61,12 +63,14 @@ namespace BlueControls {
                 }
             }
         }
+
         private Point LastMouse;
         private Point HookStartPoint;
         private Point HookEndPoint;
         private bool HookFinish;
         private Overlay Rahm;
         #endregion
+
         public static Bitmap GrabAllScreens() {
             do {
                 try {
@@ -81,6 +85,7 @@ namespace BlueControls {
                 }
             } while (true);
         }
+
         public static Bitmap GrabArea(Rectangle R) => R.Width < 2 || R.Height < 2 ? null : GrabAllScreens().Area(R);
         public static strScreenData GrabArea() => GrabArea(null, -1, -1);
         /// <summary>
@@ -95,6 +100,7 @@ namespace BlueControls {
             using ScreenShot x = new(); x.DrawText = "Bitte ziehen sie einen Rahmen\r\num den gewünschten Bereich.";
             return x.GrabAreaInternal(frm, MaxW, MaxH);
         }
+
         public static Bitmap GrabContinuus() {
             ScreenShot x = new();
             var im = x.GrabContinuusIntern();
@@ -102,6 +108,7 @@ namespace BlueControls {
             modAllgemein.CollectGarbage();
             return im;
         }
+
         private Bitmap GrabContinuusIntern() {
             AllS = new List<strScreenData>();
             DrawText = "Bitte ziehen sie einen Rahmen um den gewünschten Bereich.\r\nDieser wird anschließend nach jedem Mauszug abfotografiert.\r\nBeendet wird der Modus mit der rechten Maustaste.";
@@ -166,6 +173,7 @@ namespace BlueControls {
             }
             return bmp;
         }
+
         private strScreenData GrabAreaInternal(System.Windows.Forms.Form frm, int MaxW, int MaxH) {
             try {
                 System.Windows.Forms.FormWindowState WS = 0;
@@ -201,6 +209,7 @@ namespace BlueControls {
                 return new strScreenData();
             }
         }
+
         #region  Form-Ereignisse 
         protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseDown(e);
@@ -252,6 +261,7 @@ namespace BlueControls {
             Refresh();
         }
         #endregion
+
         private void PrintText(Graphics GR, System.Windows.Forms.MouseEventArgs e) {
             Brush bs = new SolidBrush(Color.FromArgb(150, 0, 0, 0));
             Brush bf = new SolidBrush(Color.FromArgb(255, 255, 0, 0));
@@ -270,6 +280,7 @@ namespace BlueControls {
             BackgroundImage = new Bitmap(ScreenShotBMP.Width, ScreenShotBMP.Height, PixelFormat.Format32bppPArgb);
             using var GR = Graphics.FromImage(BackgroundImage); GR.DrawImage(ScreenShotBMP, 0, 0);
         }
+
         private void Hook_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
             if (e.Button == System.Windows.Forms.MouseButtons.Right) {
                 HookFinish = true;
@@ -278,6 +289,7 @@ namespace BlueControls {
             if (HookEndPoint.X > int.MinValue) { return; }
             if (e.Button == System.Windows.Forms.MouseButtons.Left) { HookEndPoint = new Point(LastMouse.X, LastMouse.Y); }
         }
+
         private void Hook_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e) {
             if (e.Button == System.Windows.Forms.MouseButtons.Right) {
                 HookFinish = true;
@@ -286,6 +298,7 @@ namespace BlueControls {
             if (HookStartPoint.X > int.MinValue) { return; }
             if (e.Button == System.Windows.Forms.MouseButtons.Left) { HookStartPoint = new Point(LastMouse.X, LastMouse.Y); }
         }
+
         private void Hook_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e) {
             LastMouse = new Point(e.X, e.Y);
             if (Rahm != null) {

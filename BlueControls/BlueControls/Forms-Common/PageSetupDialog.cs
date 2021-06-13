@@ -23,6 +23,7 @@ using BlueControls.EventArgs;
 using System;
 using System.Drawing;
 using System.Drawing.Printing;
+
 namespace BlueControls.Forms {
     public partial class PageSetupDialog : DialogWithOkAndCancel {
         private bool Doing;
@@ -33,6 +34,7 @@ namespace BlueControls.Forms {
             MB.ShowDialog();
             return MB.GiveBack;
         }
+
         private PageSetupDialog(PrintDocument _PrintDocument1, bool NurHochformat) : base() {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
@@ -70,6 +72,7 @@ namespace BlueControls.Forms {
             // PrepareForShowing(Controls)
             Doing = false;
         }
+
         private void Something_TextChanged(object sender, System.EventArgs e) {
             if (Doing) { return; }
             Doing = true;
@@ -77,6 +80,7 @@ namespace BlueControls.Forms {
             Doing = false;
             //generatePic()
         }
+
         private void Format_ItemClicked(object sender, BasicListItemEventArgs e) {
             if (Doing) { return; }
             Doing = true;
@@ -90,6 +94,7 @@ namespace BlueControls.Forms {
             DrawSampleAndCheckButton();
             Doing = false;
         }
+
         private double Inch1000ToMM(double inch) => inch switch {
             8 => 2.0F,
             16 => 4.0F,
@@ -128,21 +133,25 @@ namespace BlueControls.Forms {
                 Breite.Enabled = false;
                 Höhe.Enabled = false;
                 switch (Format.Text) {
+
                     case "827;1169":
                         //A4
                         h = 297;
                         B = 210;
                         break;
+
                     case "1169;1654":
                         //A3
                         h = 420;
                         B = 297;
                         break;
+
                     case "583;827":
                         //A5
                         h = 210;
                         B = 148;
                         break;
+
                     case "413;583":
                         //A6
                         h = 148;
@@ -153,12 +162,14 @@ namespace BlueControls.Forms {
             Breite.Text = Math.Round(B, 1).ToString();
             Höhe.Text = Math.Round(h, 1).ToString();
         }
+
         private void Abmasse_TextChanged(object sender, System.EventArgs e) {
             if (Doing) { return; }
             Doing = true;
             DrawSampleAndCheckButton();
             Doing = false;
         }
+
         private void HochQuer_CheckedChanged(object sender, System.EventArgs e) {
             if (Doing) { return; }
             if (!((Button)sender).Checked) { return; }
@@ -166,6 +177,7 @@ namespace BlueControls.Forms {
             DrawSampleAndCheckButton();
             Doing = false;
         }
+
         private void DrawSampleAndCheckButton() {
             var makeP = true;
             if (!Breite.Text.IsFormat(enDataFormat.Gleitkommazahl)) { makeP = false; }

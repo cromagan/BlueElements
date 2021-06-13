@@ -32,12 +32,15 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+
 namespace BlueControls.Controls {
     [Designer(typeof(BasicDesigner))]
     public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
+
         #region Constructor
         public Formula() : base(false, false) => InitializeComponent();
         #endregion
+
         private Database _Database;
         private RowItem _tmpShowingRow = null;
         private int _ShowingRowKey = -1;
@@ -371,9 +374,11 @@ namespace BlueControls.Controls {
             for (ItC = -1; ItC <= Tabs.TabCount + 100; ItC++) {
                 string Nam;
                 switch (ItC) {
+
                     case -1:
                         Nam = "Unbenutzt";
                         break;
+
                     case 0:
                         Nam = "Kopfbereich";
                         break;
@@ -500,18 +505,21 @@ namespace BlueControls.Controls {
             var ViewItem = SearchViewItem(Column);
             var CurrView = CurrentView();
             switch (e.ClickedComand) {
+
                 case "#RemoveColumnFromView":
                     if (ViewItem != null) {
                         _Database.Views[0]?.Remove(ViewItem);
                         CurrView?.Remove(ViewItem);
                     }
                     break;
+
                 case "#AddColumnToHead":
                     if (_Database.Views.Count == 0) {
                         _Database.Views.Add(new ColumnViewCollection(_Database, string.Empty, "##Head###"));
                     }
                     _Database.Views[0].Add(Column, false);
                     break;
+
                 case "#AddColumnToBody":
                     CurrView?.Add(Column, false);
                     break;
@@ -680,8 +688,10 @@ namespace BlueControls.Controls {
                 R = false;
                 foreach (System.Windows.Forms.Control o in Controls) {
                     switch (o.Name) {
+
                         case "Editor":
                             break;
+
                         case "Tabs":
                             if (((AbstractTabControl)o).TabCount > 0) {
                                 RemoveControl(o);
@@ -702,12 +712,14 @@ namespace BlueControls.Controls {
             if (vObject == null || vObject.IsDisposed) { return; }
             BeginnEdit();
             switch (vObject) {
+
                 case AbstractTabControl _:
                     foreach (System.Windows.Forms.Control o in vObject.Controls) {
                         RemoveControl(o);
                     }
                     EndEdit();
                     return; // Raus hier
+
                 case TabPage _:
                     foreach (System.Windows.Forms.Control o in vObject.Controls) {
                         RemoveControl(o);
@@ -771,6 +783,7 @@ namespace BlueControls.Controls {
             }
             return null;
         }
+
         #region  ContextMenu 
         public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
             HotItem = null;
@@ -787,11 +800,13 @@ namespace BlueControls.Controls {
         public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
             if (_Database == null) { return true; }
             switch (e.ClickedComand.ToLower()) {
+
                 case "#schnelleingabe":
                     if (ShowingRow == null) { return true; }
                     FormulaQuickSelect sh = new(ShowingRow);
                     sh.ShowDialog();
                     return true;
+
                 case "#ansicht":
                     ShowViewEditor();
                     return true;
@@ -810,5 +825,6 @@ namespace BlueControls.Controls {
             if (e.KeyOld == _savedRowKey) { _savedRowKey = e.KeyNew; }
         }
         #endregion
+
     }
 }

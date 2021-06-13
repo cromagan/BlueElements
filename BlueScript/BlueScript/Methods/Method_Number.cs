@@ -20,6 +20,7 @@ using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
 using static BlueBasics.Extensions;
+
 namespace BlueScript {
     internal class Method_Number : Method {
         public override string Syntax => "Number(string, NaNValue)";

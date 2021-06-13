@@ -18,6 +18,7 @@
 #endregion
 using Skript.Enums;
 using System.Collections.Generic;
+
 namespace BlueScript {
     internal class Method_Join : Method {
         public override string Syntax => "Join(VariableListe, Verbindungszeichen)";

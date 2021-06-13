@@ -40,6 +40,7 @@ namespace BlueControls.ItemCollection {
         private enDesign _ItemDesign;
         private SizeF LastCheckedMaxSize = Size.Empty;
         #endregion
+
         #region  Properties 
         public enCheckBehavior CheckBehavior {
             get => _CheckBehavior;
@@ -84,6 +85,7 @@ namespace BlueControls.ItemCollection {
             }
         }
         #endregion
+
         #region  Construktor 
         public ItemCollectionList() : this(enBlueListBoxAppearance.Listbox) { }
         public ItemCollectionList(enBlueListBoxAppearance design) : base() {
@@ -96,10 +98,12 @@ namespace BlueControls.ItemCollection {
             GetDesigns();
         }
         #endregion
+
         #region  Event-Deklarationen + Delegaten 
         public event EventHandler ItemCheckedChanged;
         public event EventHandler DoInvalidate;
         #endregion
+
         private void GetDesigns() {
             _ControlDesign = (enDesign)_Appearance;
             switch (_Appearance) {
@@ -440,6 +444,7 @@ namespace BlueControls.ItemCollection {
             return x;
         }
         #endregion
+
         #region  BitmapListItem
         public DataListItem Add(byte[] b, string caption) {
             DataListItem i = new(b, string.Empty, caption);
@@ -447,6 +452,7 @@ namespace BlueControls.ItemCollection {
             return i;
         }
         #endregion
+
         #region  BitmapListItem
         public BitmapListItem Add(Bitmap bmp, string caption) {
             BitmapListItem i = new(bmp, string.Empty, caption);
@@ -464,6 +470,7 @@ namespace BlueControls.ItemCollection {
             return i;
         }
         #endregion
+
         #region CellLikeListItem
         public CellLikeListItem Add(string internalAndReadableText, ColumnItem columnStyle, enShortenStyle style, enBildTextVerhalten bildTextverhaltent, bool enabled) {
             CellLikeListItem i = new(internalAndReadableText, columnStyle, style, enabled, bildTextverhaltent);
@@ -471,6 +478,7 @@ namespace BlueControls.ItemCollection {
             return i;
         }
         #endregion
+
         #region LineListItem
         public LineListItem AddSeparator(string userDefCompareKey) {
             LineListItem i = new(string.Empty, userDefCompareKey);
@@ -479,6 +487,7 @@ namespace BlueControls.ItemCollection {
         }
         public LineListItem AddSeparator() => AddSeparator(string.Empty);
         #endregion
+
         #region RowFormulaItem
         public RowFormulaListItem Add(RowItem row) => Add(row, string.Empty, string.Empty);
         public RowFormulaListItem Add(RowItem row, string layoutID) => Add(row, layoutID, string.Empty);
@@ -488,6 +497,7 @@ namespace BlueControls.ItemCollection {
             return i;
         }
         #endregion
+
         //public BasicListItem Add(clsNamedBinary binary) {
         //    if (binary.Picture != null) {
         //        return Add(binary.Picture, binary.Name);
@@ -691,6 +701,7 @@ namespace BlueControls.ItemCollection {
             }
         }
         #endregion
+
         //public ListExt<clsNamedBinary> GetNamedBinaries() {
         //    var l = new ListExt<clsNamedBinary>();
         //    foreach (var thisItem in this) {
@@ -715,6 +726,7 @@ namespace BlueControls.ItemCollection {
             }
         }
         #endregion
+
         public void Remove(string Internal) => Remove(this[Internal]);
         public void RemoveRange(List<string> Internal) {
             foreach (var item in Internal) {

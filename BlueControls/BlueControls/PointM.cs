@@ -25,15 +25,21 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
 using System;
 using System.Drawing;
+
 namespace BlueControls {
     public sealed class PointM : IMoveable {
+
         #region  Variablen-Deklarationen 
         private decimal _x;
         private decimal _y;
         #endregion
+
+
         #region  Event-Deklarationen + Delegaten 
         public event EventHandler Moved;
         #endregion
+
+
         #region  Construktor + Initialize 
         public PointM(object parent, string name, decimal startX, decimal startY, decimal laenge, decimal alpha) : this(parent) {
             Name = name;
@@ -64,6 +70,8 @@ namespace BlueControls {
         public PointM(PointM point) : this(null, string.Empty, point.X, point.Y, string.Empty) { }
         public PointM(object parent, PointM template) : this(parent, template.Name, template.X, template.Y, template.Tag) { }
         #endregion
+
+
         #region  Properties 
         public string Name { get; private set; }
         public object Parent { get; set; }
@@ -85,29 +93,39 @@ namespace BlueControls {
         }
         public string Tag { get; set; }
         #endregion
+
         public void Parse(string codeToParse) {
             foreach (var pair in codeToParse.GetAllTags()) {
                 switch (pair.Key) {
+
                     case "parentname":
                         break;
+
                     case "name":
                         Name = pair.Value.FromNonCritical();
                         break;
+
                     case "tag":
                         Tag = pair.Value.FromNonCritical();
                         break;
+
                     case "x":
                         _x = decimal.Parse(pair.Value);
                         break;
+
                     case "y":
                         _y = decimal.Parse(pair.Value);
                         break;
+
                     case "fix": // TODO: Entfernt, 24.05.2021
                         break;
+
                     case "moveable": // TODO: Entfernt, 24.05.2021
                         break;
+
                     case "getsnapped": // TODO: Entfernt, 24.05.2021
                         break;
+
                     case "primarygridsnappoint": // TODO: Entfernt, 24.05.2021
                         break;
                     default:
@@ -116,19 +134,28 @@ namespace BlueControls {
                 }
             }
         }
-        public static explicit operator PointF(PointM p) => new((float)p.X, (float)p.Y);
-        public static explicit operator Point(PointM p) => new((int)p.X, (int)p.Y);
+        public static explicit operator PointF(PointM p) {
+            return new((float)p.X, (float)p.Y);
+        }
+
+        public static explicit operator Point(PointM p) {
+            return new((int)p.X, (int)p.Y);
+        }
+
         public static PointM Empty() => new(0m, 0m);
         public override string ToString() {
             var t = "{";
             if (Parent != null) {
                 switch (Parent) {
+
                     case BasicPadItem _:
                         t = t + "ParentName=" + ((BasicPadItem)Parent).Internal.ToNonCritical() + ", ";
                         break;
+
                     case CreativePad _:
                         t += "ParentType=Main, ";
                         break;
+
                     case ItemCollectionPad _:
                         t += "ParentType=Main, ";
                         break;
@@ -209,9 +236,20 @@ namespace BlueControls {
             _y += y;
             OnMoved();
         }
-        public static PointM operator +(PointM a, PointM b) => new(a._x + b._x, a._y + b._y);
-        public static PointM operator -(PointM a) => new(-a._x, -a._y);
-        public static PointM operator -(PointM a, PointM b) => new(a._x - b._x, a._y - b._y);
-        public static PointM operator *(PointM a, decimal b) => new(a._x * b, a._y * b);
+        public static PointM operator +(PointM a, PointM b) {
+            return new(a._x + b._x, a._y + b._y);
+        }
+
+        public static PointM operator -(PointM a) {
+            return new(-a._x, -a._y);
+        }
+
+        public static PointM operator -(PointM a, PointM b) {
+            return new(a._x - b._x, a._y - b._y);
+        }
+
+        public static PointM operator *(PointM a, decimal b) {
+            return new(a._x * b, a._y * b);
+        }
     }
 }

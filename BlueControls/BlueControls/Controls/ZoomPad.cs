@@ -22,12 +22,15 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+
 namespace BlueControls.Controls {
     [Designer(typeof(BasicDesigner))]
     public partial class ZoomPad : GenericControl {
+
         #region Constructor
         public ZoomPad() : base(true, true) => InitializeComponent();
         #endregion
+
         public static readonly Pen PenGray = new(Color.FromArgb(40, 0, 0, 0));
         public static readonly Pen PenGrayLarge = new(Color.FromArgb(40, 0, 0, 0), 5);
         protected decimal _Zoom = 1;

@@ -20,6 +20,7 @@ using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
 using static BlueBasics.Extensions;
+
 namespace BlueScript {
     internal class Method_if : Method {
         public override string Syntax => "if (true) { Code zum Ausführen }";
@@ -50,31 +51,44 @@ namespace BlueScript {
         public static string? GetBool(string txt) {
             txt = txt.DeKlammere(true, false, false, true);
             switch (txt.ToLower()) {
+
                 case "true":
                     return "true";
+
                 case "false":
                     return "false";
-                //case "true&&true":
+                //
+                case "true&&true":
                 //    return "true";
-                //case "true&&false":
+                //
+                case "true&&false":
                 //    return "false";
-                //case "false&&true":
+                //
+                case "false&&true":
                 //    return "false";
-                //case "false&&false":
+                //
+                case "false&&false":
                 //    return "false";
-                //case "true||true":
+                //
+                case "true||true":
                 //    return "true";
-                //case "true||false":
+                //
+                case "true||false":
                 //    return "true";
-                //case "false||true":
+                //
+                case "false||true":
                 //    return "true";
-                //case "false||false":
+                //
+                case "false||false":
                 //    return "false";
+
                 case "!true":
                     return "false";
+
                 case "!false":
                     return "true";
             }
+
             #region Klammern zuerst berechnen
             (var posa, var _) = NextText(txt, 0, KlammerAuf, false, false);
             if (posa > -1) {
@@ -84,6 +98,7 @@ namespace BlueScript {
                 return tmp == null ? null : GetBool(txt.Substring(0, posa) + tmp + txt.Substring(pose + 1));
             }
             #endregion
+
             string ntxt;
             ntxt = GetBoolTMP(txt, "==");
             if (!string.IsNullOrEmpty(ntxt)) { return GetBool(ntxt); }
@@ -149,6 +164,7 @@ namespace BlueScript {
             }
             var replacer = string.Empty;
             switch (check) {
+
                 case "==":
                     replacer = "false";
                     if (v1.ValueString == v2.ValueString) { replacer = "true"; }
@@ -161,6 +177,7 @@ namespace BlueScript {
                     //    }
                     //}
                     break;
+
                 case "!=":
                     replacer = "false";
                     if (v1.ValueString != v2.ValueString) { replacer = "true"; }
@@ -173,36 +190,43 @@ namespace BlueScript {
                     //    }
                     //}
                     break;
+
                 case ">=":
                     if (v1.Type != enVariableDataType.Numeral) { return string.Empty; }
                     replacer = "false";
                     if (v1.ValueDouble >= v2.ValueDouble) { replacer = "true"; }
                     break;
+
                 case "<=":
                     if (v1.Type != enVariableDataType.Numeral) { return string.Empty; }
                     replacer = "false";
                     if (v1.ValueDouble <= v2.ValueDouble) { replacer = "true"; }
                     break;
+
                 case "<":
                     if (v1.Type != enVariableDataType.Numeral) { return string.Empty; }
                     replacer = "false";
                     if (v1.ValueDouble < v2.ValueDouble) { replacer = "true"; }
                     break;
+
                 case ">":
                     if (v1.Type != enVariableDataType.Numeral) { return string.Empty; }
                     replacer = "false";
                     if (v1.ValueDouble > v2.ValueDouble) { replacer = "true"; }
                     break;
+
                 case "||":
                     if (v1.Type != enVariableDataType.Bool) { return string.Empty; }
                     replacer = "false";
                     if (v1.ValueBool || v2.ValueBool) { replacer = "true"; }
                     break;
+
                 case "&&":
                     if (v1.Type != enVariableDataType.Bool) { return string.Empty; }
                     replacer = "false";
                     if (v1.ValueBool && v2.ValueBool) { replacer = "true"; }
                     break;
+
                 case "!":
                     // S1 dürfte eigentlich nie was sein: !False||!false
                     // entwederist es ganz am anfang, oder direkt nach einem Trenneichen

@@ -23,8 +23,10 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using static BlueBasics.FileOperations;
+
 namespace BlueControls.ItemCollection {
     public class BitmapListItem : BasicListItem {
+
         #region  Variablen-Deklarationen 
         private Bitmap _Bitmap;
         private string _caption;
@@ -36,8 +38,12 @@ namespace BlueControls.ItemCollection {
         private int _captionlines = 2;
         private const int ConstMY = 15;
         #endregion
+
+
         #region  Event-Deklarationen + Delegaten 
         #endregion
+
+
         #region  Construktor + Initialize 
         public BitmapListItem(Bitmap bmp, string internalname, string caption) : base(internalname) {
             _caption = caption;
@@ -60,6 +66,8 @@ namespace BlueControls.ItemCollection {
             //_overlays.ListOrItemChanged += _overlays_ListOrItemChanged;
         }
         #endregion
+
+
         #region  Properties 
         public Bitmap Bitmap {
             get {
@@ -72,6 +80,7 @@ namespace BlueControls.ItemCollection {
                 //OnChanged();
             }
         }
+
         public string Caption {
             get => _caption;
             set {
@@ -81,6 +90,7 @@ namespace BlueControls.ItemCollection {
                 //OnChanged();
             }
         }
+
         public int CaptionLines {
             get => _captionlines;
             set {
@@ -91,6 +101,7 @@ namespace BlueControls.ItemCollection {
                 //OnChanged();
             }
         }
+
         public int Padding {
             get => _padding;
             set {
@@ -99,9 +110,11 @@ namespace BlueControls.ItemCollection {
                 //OnChanged();
             }
         }
+
         public List<QuickImage> Overlays => _overlays;
         public override string QuickInfo => string.Empty;
         #endregion
+
         protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, bool Translate) {
             if (DrawBorderAndBack) {
                 Skin.Draw_Back(GR, itemdesign, vState, PositionModified, null, false);
@@ -170,6 +183,7 @@ namespace BlueControls.ItemCollection {
                 Develop.DebugPrint(ex);
             }
         }
+
         public bool ImageLoaded() => _Bitmap != null;
         public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) => style switch {
             enBlueListBoxAppearance.FileSystem => 110 + (_captionlines * ConstMY),

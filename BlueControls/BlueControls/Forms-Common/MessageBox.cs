@@ -22,6 +22,7 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using System.Collections.Generic;
 using System.Drawing;
+
 namespace BlueControls.Forms {
     public partial class MessageBox : Form {
         private Button Pressed = null;
@@ -67,27 +68,37 @@ namespace BlueControls.Forms {
                     };
                     var W = 2;
                     switch (B.Text.ToLower()) {
+
                         case "ja":
+
                         case "ok":
                             B.ImageCode = "Häkchen|16";
                             W = 4;
                             break;
+
                         case "nein":
+
                         case "abbrechen":
+
                         case "abbruch":
                             B.ImageCode = "Kreuz|16";
                             W = 4;
                             break;
+
                         case "verwerfen":
+
                         case "löschen":
                             B.ImageCode = "Papierkorb|16";
                             W = 4;
                             break;
+
                         case "speichern":
+
                         case "sichern":
                             B.ImageCode = "Diskette|16";
                             W = 4;
                             break;
+
                         case "laden":
                             B.ImageCode = "Ordner|16";
                             W = 4;

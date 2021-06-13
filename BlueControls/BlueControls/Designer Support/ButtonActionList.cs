@@ -2,6 +2,7 @@
 using BlueControls.Enums;
 using System.ComponentModel;
 using System.ComponentModel.Design;
+
 namespace BlueControls.Designer_Support {
     public sealed class ButtonActionList : DesignerActionList {
         private readonly Button ReverenceControl;
@@ -13,10 +14,12 @@ namespace BlueControls.Designer_Support {
             //Makes the Smart Tags open automatically 
             AutoShow = true;
         }
+
         public bool Checked {
             get => ReverenceControl.Checked;
             set => SetControlProperty("Checked", value);
         }
+
         public enButtonStyle ButtonStyle {
             get => ReverenceControl.ButtonStyle;
             set => SetControlProperty("ButtonStyle", value);

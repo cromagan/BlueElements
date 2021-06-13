@@ -23,6 +23,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+
 namespace BlueBasics {
     public static partial class Extensions {
         /// <summary>
@@ -177,6 +178,7 @@ namespace BlueBasics {
             const string TR = "&.,;\\?!\" ~|=<>+-(){}[]/*`´\r\n\t";
             do {
                 if (pos >= maxl) { return (-1, string.Empty); ; }
+
                 #region Klammer und " erledigen
                 switch (txt.Substring(pos, 1)) {
                     // Gänsefüsschen, immer erlaubt
@@ -231,6 +233,8 @@ namespace BlueBasics {
                         break;
                 }
                 #endregion
+
+
                 #region Den Text suchen
                 if (klammern == 0 && !Gans && GeschwKlammern == 0) {
                     if (!checkforSeparatorbefore || pos == 0 || TR.Contains(txt.Substring(pos - 1, 1))) {
@@ -246,6 +250,7 @@ namespace BlueBasics {
                     }
                 }
                 #endregion
+
                 pos++;
             } while (true);
         }

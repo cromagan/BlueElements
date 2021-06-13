@@ -1,5 +1,6 @@
 ﻿using BlueControls.Controls;
 using BlueControls.Enums;
+
 namespace BluePaint
 {
     public partial class Tool_Paint : GenericTool

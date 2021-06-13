@@ -35,9 +35,11 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
 using static BlueBasics.FileOperations;
+
 namespace BlueControls.Controls {
     [Designer(typeof(BasicDesigner))]
     public partial class FlexiControlForCell : FlexiControl, IContextMenu {
+
         #region Constructor
         public FlexiControlForCell() : this(null, -1, enÜberschriftAnordnung.Über_dem_Feld) { }
         public FlexiControlForCell(Database database, int columnKey, enÜberschriftAnordnung captionPosition) : base() {
@@ -51,6 +53,7 @@ namespace BlueControls.Controls {
             ColumnKey = columnKey;
         }
         #endregion
+
         // Für automatisches Datenbank-Management
         private int _ColKey = -1;
         private int _RowKey = -1;
@@ -482,48 +485,45 @@ namespace BlueControls.Controls {
                 //}
             }
         }
+
         private void ListBox_AddClicked(object sender, System.EventArgs e) {
             var Dia = ColumnItem.UserEditDialogTypeInTable(_tmpColumn, false);
             var lbx = (ListBox)sender;
+
             switch (Dia) {
                 case enEditTypeTable.None:
                     return;
+
                 case enEditTypeTable.FileHandling_InDateiSystem:
                     // korrektheit der Zelle bereits geprüft
-                    if (_tmpColumn != null && string.IsNullOrEmpty(lbx.LastFilePath)) { lbx.LastFilePath = _Database.Filename.FilePath(); }
-                    List<string> DelList = new();
-                    using (OpenFileDialog f = new()) {
-                        f.CheckFileExists = true;
-                        f.CheckPathExists = true;
-                        f.Multiselect = true;
-                        f.InitialDirectory = lbx.LastFilePath;
-                        f.Title = "Datei(en) hinzufügen:";
-                        f.ShowDialog();
-                        if (f.FileNames == null || f.FileNames.Length == 0) { return; }
-                        for (var z = 0; z <= f.FileNames.GetUpperBound(0); z++) {
-                            var b = modConverter.FileToByte(f.FileNames[z]);
-                            if (!string.IsNullOrEmpty(_Database.FileEncryptionKey)) { b = modAllgemein.SimpleCrypt(b, _Database.FileEncryptionKey, 1); }
-                            var neu = f.FileNames[z].FileNameWithSuffix();
-                            neu = _tmpColumn.BestFile(neu.FileNameWithSuffix(), true);
-                            lbx.LastFilePath = f.FileNames[z].FilePath();
-                            modConverter.ByteToFile(neu, b);
-                            lbx.Item.Add(neu.FileNameWithSuffix(), _tmpColumn, enShortenStyle.Replaced, _tmpColumn.BildTextVerhalten);
-                            DelList.Add(f.FileNames[z]);
-                        }
+                    var l = Table.FileSystem(_tmpColumn);
+
+
+                    if (l == null) { return; }
+
+                    foreach (var thisF in l) {
+                        lbx.Item.Add(thisF.FileNameWithSuffix(), _tmpColumn, enShortenStyle.Replaced, _tmpColumn.BildTextVerhalten);
                     }
-                    Forms.FileDialogs.DeleteFile(DelList, true);
+
                     return;
+
                 case enEditTypeTable.Textfeld:
                     lbx.Add_Text();
                     return;
+
                 case enEditTypeTable.Listbox:
                     lbx.Add_TextBySuggestion();
                     return;
+
                 default:
                     Develop.DebugPrint(Dia);
                     return;
             }
         }
+
+
+
+
         private void Marker_DoWork(object sender, DoWorkEventArgs e) {
             TextBox TXB = null;
             foreach (var Control in Controls) {

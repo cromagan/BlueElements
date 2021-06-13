@@ -17,6 +17,7 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 using BlueControls.Enums;
+
 namespace BlueControls.Controls {
     public class RibbonBar : AbstractTabControl {
         public RibbonBar() : base() {

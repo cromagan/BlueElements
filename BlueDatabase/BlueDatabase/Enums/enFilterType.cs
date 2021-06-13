@@ -17,6 +17,7 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 using System;
+
 namespace BlueDatabase.Enums {
     [Flags]
     public enum enFilterType {

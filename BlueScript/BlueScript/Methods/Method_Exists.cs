@@ -18,6 +18,7 @@
 #endregion
 using Skript.Enums;
 using System.Collections.Generic;
+
 namespace BlueScript {
     internal class Method_Exists : Method {
         public override string Description => "Gibt TRUE zurück, wenn die Variable existiert. Dieser Befehl sollte niemals mit einem Vergleichsoperator verwendet werden.";

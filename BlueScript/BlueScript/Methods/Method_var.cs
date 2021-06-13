@@ -19,6 +19,7 @@
 using Skript.Enums;
 using System.Collections.Generic;
 using static BlueBasics.Extensions;
+
 namespace BlueScript {
     internal class Method_Var : Method {
         public override string Syntax => "var VariablenName = Wert;";

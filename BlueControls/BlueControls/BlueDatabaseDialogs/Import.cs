@@ -20,6 +20,7 @@ using BlueBasics.Enums;
 using BlueControls.Forms;
 using BlueDatabase;
 using static BlueBasics.Extensions;
+
 namespace BlueControls.BlueDatabaseDialogs {
     public sealed partial class Import {
         public Database Database { get; private set; }
@@ -59,6 +60,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             MessageBox.Show(m, enImageCode.Information, "OK");
             Close();
         }
+
         private void Cancel_Click(object sender, System.EventArgs e) => Close();
     }
 }

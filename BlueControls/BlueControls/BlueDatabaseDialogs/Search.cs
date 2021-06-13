@@ -23,6 +23,7 @@ using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueDatabase;
 using BlueDatabase.EventArgs;
+
 namespace BlueControls.BlueDatabaseDialogs {
     public sealed partial class Search : Form {
         private readonly Table _BlueTable;
@@ -36,6 +37,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             _BlueTable.CursorPosChanged += CursorPosChanged;
             CursorPosChanged(_BlueTable, new CellEventArgs(_BlueTable.CursorPosColumn(), _BlueTable.CursorPosRow()));
         }
+
         private void CursorPosChanged(object sender, CellEventArgs e) {
             _row = e.Row;
             _col = e.Column;
@@ -44,6 +46,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             base.OnFormClosing(e);
             _BlueTable.CursorPosChanged -= CursorPosChanged;
         }
+
         private void btnSuchSpalte_Click(object sender, System.EventArgs e) {
             if (_BlueTable.Design == enBlueTableAppearance.OnlyMainColumnWithoutHead) {
                 MessageBox.Show("In dieser Ansicht nicht möglich", enImageCode.Information, "OK");
@@ -82,6 +85,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             _BlueTable.CursorPos_Set(found, _row, true);
             txbSuchText.Focus();
         }
+
         private string SuchText() {
             var SuchtT = txbSuchText.Text.Trim();
             if (string.IsNullOrEmpty(SuchtT)) {
@@ -90,6 +94,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
             return SuchtT.Replace(";cr;", "\r").Replace(";tab;", "\t").ToLower();
         }
+
         private void btnSuchInCell_Click(object sender, System.EventArgs e) {
             var SuchtT = SuchText();
             if (string.IsNullOrEmpty(SuchtT)) { return; }
@@ -101,9 +106,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             _BlueTable.CursorPos_Set(found, GefRow, true);
             txbSuchText.Focus();
         }
+
         private void Search_Load(object sender, System.EventArgs e) => txbSuchText.Focus();
         private void txbSuchText_TextChanged(object sender, System.EventArgs e) {
         }
+
         private void txbSuchText_Enter(object sender, System.EventArgs e) => btnSuchInCell_Click(null, System.EventArgs.Empty);
     }
 }

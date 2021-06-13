@@ -20,6 +20,7 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+
 namespace BlueBasics {
     public static partial class Extensions {
         public static bool RemoveNullOrEmpty<T>(this ConcurrentDictionary<int, T> l) where T : ICanBeEmpty {

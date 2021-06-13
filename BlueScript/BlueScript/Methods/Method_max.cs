@@ -19,6 +19,7 @@
 using Skript.Enums;
 using System;
 using System.Collections.Generic;
+
 namespace BlueScript {
     internal class Method_Max : Method {
         public override string Syntax => "Max(Value1, Value2, ...)";

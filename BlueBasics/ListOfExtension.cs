@@ -25,6 +25,7 @@ using System.IO;
 using System.Linq;
 using static BlueBasics.FileOperations;
 using static BlueBasics.modConverter;
+
 namespace BlueBasics {
     public static class ListOfExtension {
         /// <summary>

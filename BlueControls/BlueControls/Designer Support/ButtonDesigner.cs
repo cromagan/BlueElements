@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.Design;
+
 namespace BlueControls.Designer_Support {
     internal sealed class ButtonDesigner : BasicDesigner {
         private DesignerActionListCollection aList;

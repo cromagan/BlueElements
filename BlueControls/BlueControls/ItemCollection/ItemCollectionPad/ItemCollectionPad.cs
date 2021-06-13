@@ -49,6 +49,7 @@ namespace BlueControls.ItemCollection {
         /// </summary>
         private readonly int IDCount = 0;
         #endregion
+
         public bool IsParsing { get; private set; }
         [DefaultValue(true)]
         public bool IsSaved { get; set; }
@@ -268,9 +269,11 @@ namespace BlueControls.ItemCollection {
             }
         }
         #endregion
+
         #region  Event-Deklarationen + Delegaten 
         public event EventHandler DoInvalidate;
         #endregion
+
         internal void InDenVordergrund(BasicPadItem ThisItem) {
             if (IndexOf(ThisItem) == Count - 1) { return; }
             var g1 = ThisItem.Gruppenzugehörigkeit;
@@ -335,6 +338,7 @@ namespace BlueControls.ItemCollection {
             }
         }
         #endregion
+
         #region  Properties 
         [DefaultValue(1.0)]
         public decimal SheetStyleScale {
@@ -348,6 +352,7 @@ namespace BlueControls.ItemCollection {
             }
         }
         #endregion
+
         public void OnDoInvalidate() => DoInvalidate?.Invoke(this, System.EventArgs.Empty);
         protected override void OnItemAdded(BasicPadItem item) {
             if (item == null) {

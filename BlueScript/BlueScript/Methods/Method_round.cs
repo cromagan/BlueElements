@@ -19,6 +19,7 @@
 using Skript.Enums;
 using System;
 using System.Collections.Generic;
+
 namespace BlueScript {
     internal class Method_Round : Method {
         public override string Syntax => "Round(Value, Nachkommastellen)";

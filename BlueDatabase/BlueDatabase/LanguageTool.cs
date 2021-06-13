@@ -19,6 +19,7 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
+
 namespace BlueDatabase {
     public static class LanguageTool {
         public static Database Translation = null;

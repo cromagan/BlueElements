@@ -12,12 +12,15 @@ using System.IO;
 using System.Windows.Forms;
 using static BlueBasics.Extensions;
 using static BlueBasics.FileOperations;
+
 namespace BlueControls.Controls {
     [Designer(typeof(BasicDesigner))]
     public partial class ZoomPicWithPoints : ZoomPic {
+
         #region Constructor
         public ZoomPicWithPoints() : base() => InitializeComponent();
         #endregion
+
         private readonly List<PointM> points = new();
         public event EventHandler PointSetByUser;
         public List<string> Tags = new();

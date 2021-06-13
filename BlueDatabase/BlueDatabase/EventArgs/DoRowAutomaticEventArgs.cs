@@ -16,6 +16,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
 // DEALINGS IN THE SOFTWARE. 
 #endregion
+
 namespace BlueDatabase.EventArgs {
     public class DoRowAutomaticEventArgs : RowEventArgs {
         public DoRowAutomaticEventArgs(RowItem Row) : base(Row) {

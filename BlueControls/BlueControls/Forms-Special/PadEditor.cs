@@ -24,6 +24,7 @@ using BlueControls.ItemCollection;
 using System.Drawing;
 using System.IO;
 using static BlueBasics.FileOperations;
+
 namespace BlueControls.Forms {
     public partial class PadEditor : Form {
         private readonly string _Title = string.Empty;
@@ -138,6 +139,7 @@ namespace BlueControls.Forms {
         }
         private void btnVorschauModus_CheckedChanged(object sender, System.EventArgs e) => Pad.ShowInPrintMode = btnVorschauModus.Checked;
         private void Pad_PreviewModChanged(object sender, System.EventArgs e) => btnVorschauModus.Checked = Pad.ShowInPrintMode;
+
         #region Load / Save
         private void LoadTab_FileOk(object sender, System.ComponentModel.CancelEventArgs e) {
             if (sender == btnOeffnen) {
@@ -191,6 +193,7 @@ namespace BlueControls.Forms {
             ItemChanged();
         }
         #endregion
+
         private void btnHintergrundFarbe_Click(object sender, System.EventArgs e) {
             ColorDia.Color = Pad.Item.BackColor;
             ColorDia.ShowDialog();

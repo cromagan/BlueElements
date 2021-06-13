@@ -24,6 +24,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
+
 namespace BlueControls.Controls {
     [Designer(typeof(BasicDesigner))]
     public partial class ZoomPic : ZoomPad {
@@ -49,12 +50,14 @@ namespace BlueControls.Controls {
                 }
             }
         }
+
         #region Constructor
         public ZoomPic() : base() {
             InitializeComponent();
             _MouseHighlight = false;
         }
         #endregion
+
         public event EventHandler<MouseEventArgs1_1> ImageMouseDown;
         public event EventHandler<MouseEventArgs1_1DownAndCurrent> ImageMouseMove;
         public event EventHandler<MouseEventArgs1_1DownAndCurrent> ImageMouseUp;
@@ -96,6 +99,7 @@ namespace BlueControls.Controls {
             _MouseDown = _MouseCurrent;
             OnImageMouseDown(_MouseDown);
         }
+
         private MouseEventArgs1_1 GenerateNewMouseEventArgs(MouseEventArgs e) {
             PositionEventArgs en = new(MousePos_1_1.X, MousePos_1_1.Y);
             OnOverwriteMouseImageData(en);
@@ -130,6 +134,7 @@ namespace BlueControls.Controls {
             _MouseCurrent = GenerateNewMouseEventArgs(e);
             OnImageMouseMove(_MouseCurrent);
         }
+
         private void OnImageMouseMove(MouseEventArgs1_1 e) => ImageMouseMove?.Invoke(this, new MouseEventArgs1_1DownAndCurrent(_MouseDown, e));
         public Point PointInsidePic(int x, int y) {
             if (_bmp == null) { return Point.Empty; }

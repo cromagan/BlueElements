@@ -19,26 +19,36 @@
 using BlueBasics.Enums;
 using System;
 using System.Drawing;
+
 namespace BlueBasics {
     public static partial class Extensions {
         public static Point PointOf(this Rectangle r, enAlignment p) {
             switch (p) {
+
                 case enAlignment.Bottom_Left:
                     return new Point(r.Left, r.Bottom);
+
                 case enAlignment.Bottom_Right:
                     return new Point(r.Right, r.Bottom);
+
                 case enAlignment.Top_Left:
                     return new Point(r.Left, r.Top);
+
                 case enAlignment.Top_Right:
                     return new Point(r.Right, r.Top);
+
                 case enAlignment.Bottom_HorizontalCenter:
                     return new Point((int)(r.Left + (r.Width / 2.0)), r.Bottom);
+
                 case enAlignment.Top_HorizontalCenter:
                     return new Point((int)(r.Left + (r.Width / 2.0)), r.Top);
+
                 case enAlignment.VerticalCenter_Left:
                     return new Point(r.Left, (int)(r.Top + (r.Height / 2.0)));
+
                 case enAlignment.VerticalCenter_Right:
                     return new Point(r.Right, (int)(r.Top + (r.Height / 2.0)));
+
                 case enAlignment.Horizontal_Vertical_Center:
                     return new Point((int)(r.Left + (r.Width / 2.0)), (int)(r.Top + (r.Height / 2.0)));
                 default:

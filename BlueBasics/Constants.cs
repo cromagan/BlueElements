@@ -19,6 +19,7 @@
 using System;
 // http://www.carlosag.net/tools/codetranslator/
 // http://converter.telerik.com/
+
 namespace BlueBasics {
     public static class Constants {
         // public const char beTab = (char)9;

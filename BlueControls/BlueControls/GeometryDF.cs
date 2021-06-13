@@ -19,6 +19,7 @@
 using BlueBasics;
 using System;
 using System.Drawing;
+
 namespace BlueControls {
     public static class GeometryDF {
         /// Berechnet, ob sich zwei geraden IRGENDWO treffen.

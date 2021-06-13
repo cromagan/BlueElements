@@ -23,6 +23,7 @@ using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
+
 namespace BlueControls.BlueDatabaseDialogs {
     public partial class FormulaQuickSelect {
         private readonly RowItem Row;
@@ -32,6 +33,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             Row = RowItem;
         }
+
         private void Such_TextChanged(object sender, System.EventArgs e) {
             Auswahl.Item.Clear();
             var t = Such.Text;
@@ -69,6 +71,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             base.OnLoad(e);
             Init();
         }
+
         private void Init() {
             if (Row == null) {
                 Close();
@@ -76,6 +79,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
             Für.Text = "<b>" + Row.CellFirstString();
         }
+
         private void Auswahl_ItemClicked(object sender, BasicListItemEventArgs e) {
             var x = e.Item.Internal.SplitBy("|");
             if (Row.Database.Column[x[0]].MultiLine) {

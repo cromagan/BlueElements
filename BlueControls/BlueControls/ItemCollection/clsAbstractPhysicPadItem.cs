@@ -20,6 +20,7 @@ using BlueControls.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+
 namespace BlueControls.ItemCollection {
     public abstract class clsAbstractPhysicPadItem : BasicPadItem {
         public readonly List<PointM> Edges = new();
@@ -74,6 +75,7 @@ namespace BlueControls.ItemCollection {
             }
         }
         public void Move(PointM v) => Move(v.X, v.Y);
+
         #region Polygon Union
         //   http://csharphelper.com/blog/2016/01/find-a-polygon-union-in-c/
         // Return the union of the two polygons.
@@ -226,6 +228,8 @@ namespace BlueControls.ItemCollection {
             return area;
         }
         #endregion
+
+
         #region Collission Calculation
         // https://www.codeproject.com/Articles/15573/2D-Polygon-Collision-Detection
         public strPolygonCollisionResult ColidesWith(clsAbstractPhysicPadItem polygonB, PointM velocity) => PolygonCollision(this, polygonB, velocity);
@@ -293,6 +297,7 @@ namespace BlueControls.ItemCollection {
             if (result.WillIntersect) {
                 result.MinimumTranslationVector = translationAxis * minIntervalDistance;
             }
+
             #region Example
             //var playerTranslation = velocity;
             //foreach (var polygon in polygons)
@@ -307,6 +312,7 @@ namespace BlueControls.ItemCollection {
             //}
             //player.Move(playerTranslation);
             #endregion
+
             return result;
         }
         // Calculate the distance between [minA, maxA] and [minB, maxB]
@@ -330,6 +336,8 @@ namespace BlueControls.ItemCollection {
             }
         }
         #endregion
+
+
         #region Schwerpunkt
         //   http://csharphelper.com/blog/2014/07/find-the-centroid-of-a-polygon-in-c/
         // Find the polygon's centroid.
@@ -363,6 +371,8 @@ namespace BlueControls.ItemCollection {
             return new PointM(X, Y);
         }
         #endregion
+
+
         #region Flächenberechnung
         //http://csharphelper.com/blog/2014/07/calculate-the-area-of-a-polygon-in-c/
         // Return the polygon's area in "square units."
@@ -389,6 +399,8 @@ namespace BlueControls.ItemCollection {
             // oriented clockwise.
             Math.Abs(SignedPolygonArea());
         #endregion
+
+
         #region Point in Polygon
         //http://csharphelper.com/blog/2014/07/determine-whether-a-point-is-inside-a-polygon-in-c/
         // Alternative:  https://stackoverflow.com/questions/4243042/c-sharp-point-in-polygon
@@ -437,6 +449,8 @@ namespace BlueControls.ItemCollection {
             return (BAx * BCx) + (BAy * BCy);
         }
         #endregion
+
+
         #region IsConvex
         //http://csharphelper.com/blog/2014/07/determine-whether-a-polygon-is-convex-in-c/
         // Return True if the polygon is convex.
@@ -488,5 +502,6 @@ namespace BlueControls.ItemCollection {
             return (BAx * BCy) - (BAy * BCx);
         }
         #endregion
+
     }
 }

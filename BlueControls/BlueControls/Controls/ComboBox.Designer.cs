@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.Drawing;
+
 namespace BlueControls.Controls
 {
     public partial class ComboBox 

@@ -25,14 +25,18 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+
 namespace BlueDatabase {
     public sealed class RowCollection : IEnumerable<RowItem>, IDisposable {
+
         #region  Variablen-Deklarationen 
         private readonly ConcurrentDictionary<int, RowItem> _Internal = new();
         public Database Database { get; private set; }
         private int _LastRowKey;
         private bool disposedValue;
         #endregion
+
+
         #region  Event-Deklarationen + Delegaten 
         public event EventHandler<RowCheckedEventArgs> RowChecked;
         public event EventHandler<DoRowAutomaticEventArgs> DoSpecialRules;
@@ -40,6 +44,8 @@ namespace BlueDatabase {
         public event EventHandler RowRemoved;
         public event EventHandler<RowEventArgs> RowAdded;
         #endregion
+
+
         #region  Construktor + Initialize 
         public void Initialize() => _LastRowKey = 0;
         public RowCollection(Database database) {
@@ -48,6 +54,8 @@ namespace BlueDatabase {
             Initialize();
         }
         #endregion
+
+
         #region  Properties 
         /// <summary>
         /// Durchsucht die erste (interne) Spalte der Datenbank nach dem hier angegebenen Prmärschlüssel.
@@ -66,8 +74,10 @@ namespace BlueDatabase {
                 return this[d];
             }
         }
+
         public RowItem this[FilterCollection filter] => Database == null ? null : _Internal.Values.FirstOrDefault(ThisRow => ThisRow != null && ThisRow.MatchesTo(filter));
         #endregion
+
         private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
         internal int NextRowKey() {
             do {
@@ -76,6 +86,7 @@ namespace BlueDatabase {
             } while (SearchByKey(_LastRowKey) != null);
             return _LastRowKey;
         }
+
         public void Remove(int Key) {
             var e = SearchByKey(Key);
             if (e == null) { return; }
@@ -88,6 +99,7 @@ namespace BlueDatabase {
             if (!_Internal.TryRemove(Key, out _)) { Develop.DebugPrint(enFehlerArt.Fehler, "Remove Failed"); }
             OnRowRemoved();
         }
+
         public bool Clear() => Remove(new FilterCollection(Database));
         public bool Remove(FilterItem Filter) {
             FilterCollection NF = new(Database)
@@ -96,6 +108,7 @@ namespace BlueDatabase {
             };
             return Remove(NF);
         }
+
         public bool Remove(FilterCollection Filter) {
             var x = (from thisrowitem in _Internal.Values where thisrowitem != null && thisrowitem.MatchesTo(Filter) select thisrowitem.Key).Select(dummy => (long)dummy).ToList();
             foreach (int ThisKey in x) {
@@ -105,6 +118,7 @@ namespace BlueDatabase {
         }
         internal string Load_310(enDatabaseDataType Art, string Wert) {
             switch (Art) {
+
                 case enDatabaseDataType.LastRowKey:
                     _LastRowKey = int.Parse(Wert);
                     break;
@@ -118,10 +132,12 @@ namespace BlueDatabase {
             }
             return "";
         }
+
         public void Add(RowItem Row) {
             if (!_Internal.TryAdd(Row.Key, Row)) { Develop.DebugPrint(enFehlerArt.Fehler, "Add Failed"); }
             OnRowAdded(new RowEventArgs(Row));
         }
+
         private void OnRowChecked(object sender, RowCheckedEventArgs e) => RowChecked?.Invoke(this, e);
         private void OnDoSpecialRules(object sender, DoRowAutomaticEventArgs e) => DoSpecialRules?.Invoke(this, e);
         public RowItem Add(string ValueOfCellInFirstColumn) {
@@ -141,6 +157,7 @@ namespace BlueDatabase {
             Row.DoAutomatic(false, false, 1, "new row");
             return Row;
         }
+
         public void DoAutomatic(FilterCollection filter, bool fullCheck, List<RowItem> pinned, string startroutine) {
             if (Database.ReadOnly) { return; }
             DoAutomatic(CalculateSortedRows(filter, null, pinned), fullCheck, startroutine);
@@ -164,6 +181,7 @@ namespace BlueDatabase {
             }
             Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", x.Count(), x.Count(), false, true));
         }
+
         public void Remove(RowItem Row) {
             //if (Database.InvokeRequired)
             //{
@@ -190,6 +208,7 @@ namespace BlueDatabase {
                 return SearchByKey(Key);
             }
         }
+
         public RowItem First() => _Internal.Values.FirstOrDefault(ThisRowItem => ThisRowItem != null);//foreach (var ThisRowItem in _Internal.Values)//{//    if (ThisRowItem != null) { return ThisRowItem; }//}//return null;
         public IEnumerator<RowItem> GetEnumerator() => _Internal.Values.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => IEnumerable_GetEnumerator();
@@ -223,6 +242,7 @@ namespace BlueDatabase {
             }
             return true;
         }
+
         public List<RowItem> CalculateSortedRows(List<FilterItem> Filter, RowSortDefinition rowSortDefinition, List<RowItem> pinnedRows) {
             List<string> TMP = new();
             List<RowItem> _tmpSortedRows = new();

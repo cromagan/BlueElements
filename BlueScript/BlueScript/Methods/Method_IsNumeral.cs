@@ -20,6 +20,7 @@ using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
 using static BlueBasics.Extensions;
+
 namespace BlueScript {
     internal class Method_IsNumeral : Method {
         public override string Description => "Prüft, ob der Inhalt der Variable eine gültige Zahl ist. ";

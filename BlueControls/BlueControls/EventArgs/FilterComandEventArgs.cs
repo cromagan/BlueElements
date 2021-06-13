@@ -18,6 +18,7 @@
 #endregion
 using BlueDatabase;
 using BlueDatabase.EventArgs;
+
 namespace BlueControls.EventArgs {
     public class FilterComandEventArgs : FilterEventArgs {
         // string Comand, ColumnItem ThisColumn, FilterItem NewFilter

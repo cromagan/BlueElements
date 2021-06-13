@@ -25,13 +25,17 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Design;
+
 namespace BlueControls.Controls {
     [Designer(typeof(ButtonDesigner))]
     [DefaultEvent("Click")]
     public sealed class Button : GenericControl, IBackgroundNone {
+
         #region Constructor
         public Button() : base(true, false) { }
         #endregion
+
+
         #region  Variablen 
         private string _Text = "";
         private enButtonStyle _ButtonStyle = enButtonStyle.Button;
@@ -50,6 +54,8 @@ namespace BlueControls.Controls {
         private const int _FirstIntervall = 500;
         private bool _IsFireing;
         #endregion
+
+
         #region  Properties 
         [Category("Darstellung")]
         [Editor(typeof(QuickPicSelector), typeof(UITypeEditor))]
@@ -126,9 +132,13 @@ namespace BlueControls.Controls {
             }
         }
         #endregion
+
+
         #region  Event-Deklarationen 
         public event EventHandler CheckedChanged;
         #endregion
+
+
         #region  Form-Ereignisse 
         private void OnCheckedChanged() => CheckedChanged?.Invoke(this, System.EventArgs.Empty);
         protected override void OnMouseLeave(System.EventArgs e) {
@@ -157,14 +167,20 @@ namespace BlueControls.Controls {
             if (!Enabled) { return; }
             if (IsDisposed) { return; }
             switch ((enButtonStyle)((int)_ButtonStyle % 1000)) {
+
                 case enButtonStyle.Button:
+
                 case enButtonStyle.Checkbox:
+
                 case enButtonStyle.Optionbox:
                     break;
+
                 case enButtonStyle.Yes_or_No:
+
                 case enButtonStyle.Pic1_or_Pic2:
                     GetPic();
                     break;
+
                 case enButtonStyle.SliderButton:
                     _ClickFirerer.Interval = _FirstIntervall;
                     _ClickFirerer_Tick(null, e);
@@ -176,6 +192,7 @@ namespace BlueControls.Controls {
             Invalidate();
         }
         #endregion
+
         private void DisableOtherOptionButtons() {
             if (_ButtonStyle is not enButtonStyle.Optionbox and not enButtonStyle.Optionbox_Text and not enButtonStyle.Optionbox_RibbonBar) { return; }
             if (!_Checked) { return; }
@@ -187,6 +204,7 @@ namespace BlueControls.Controls {
                 }
             }
         }
+
         private void _ClickFirerer_Tick(object sender, System.EventArgs e) {
             var ok = _ButtonStyle == enButtonStyle.SliderButton;
             if (!MousePressing()) { ok = false; }
@@ -210,19 +228,25 @@ namespace BlueControls.Controls {
             _ClickFired = true;
             _IsFireing = true;
             switch ((enButtonStyle)((int)_ButtonStyle % 1000)) {
+
                 case enButtonStyle.Button:
                     break;
+
                 case enButtonStyle.Checkbox:
+
                 case enButtonStyle.Yes_or_No:
+
                 case enButtonStyle.Pic1_or_Pic2:
                     Checked = !Checked;
                     break;
+
                 case enButtonStyle.Optionbox:
                     if (!_Checked) {
                         Checked = true;
                         DisableOtherOptionButtons();
                     }
                     break;
+
                 case enButtonStyle.SliderButton:
                     // Bei Dauerfeuerbutten bei Mouseup kein Klick ereigniss
                     // Grund: Weil sonst immer mindesten 2 Klicks ausgeführt werden: MouseDown und MouseUp
@@ -266,11 +290,14 @@ namespace BlueControls.Controls {
                 etxt.Draw(GR, 1);
             }
         }
+
         private void GetPic() {
             switch ((enButtonStyle)((int)_ButtonStyle % 1000)) {
+
                 case enButtonStyle.Yes_or_No:
                     _Pic = _Checked || MousePressing() ? QuickImage.Get(enImageCode.Häkchen) : QuickImage.Get(enImageCode.Kreuz);
                     break;
+
                 case enButtonStyle.Pic1_or_Pic2:
                     _Pic = _Checked || MousePressing() ? QuickImage.Get(_ImageCode_Checked) : QuickImage.Get(_ImageCode);
                     break;
@@ -300,19 +327,26 @@ namespace BlueControls.Controls {
                     PicHeight44 = false;
                 }
                 switch ((enButtonStyle)((int)_ButtonStyle % 1000)) {
+
                     case enButtonStyle.Button:
+
                     case enButtonStyle.SliderButton:
                         switch (Par) {
+
                             case enPartentType.RibbonPage:
+
                             case enPartentType.RibbonGroupBox:
                                 DrawButton(this, gr, enDesign.Ribbonbar_Button, state, _Pic, enAlignment.VerticalCenter_Left, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
                                 break;
+
                             case enPartentType.Slider:
                                 DrawButton(this, gr, enDesign.Button_SliderDesign, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
                                 break;
+
                             case enPartentType.ComboBox:
                                 DrawButton(this, gr, enDesign.Button_ComboBox, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
                                 break;
+
                             case enPartentType.RibbonBarCombobox:
                                 DrawButton(this, gr, enDesign.Ribbonbar_Button_Combobox, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
                                 break;
@@ -321,6 +355,7 @@ namespace BlueControls.Controls {
                                 break;
                         }
                         break;
+
                     case enButtonStyle.Optionbox:
                         if (DesignToolbar) {
                             DrawButton(this, gr, enDesign.Ribbonbar_Button_OptionButton, state, _Pic, enAlignment.VerticalCenter_Left, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
@@ -330,6 +365,7 @@ namespace BlueControls.Controls {
                             DrawButton(this, gr, enDesign.Button_OptionButton, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
                         }
                         break;
+
                     case enButtonStyle.Checkbox:
                         if (DesignToolbar) {
                             DrawButton(this, gr, enDesign.Ribbonbar_Button_CheckBox, state, _Pic, enAlignment.VerticalCenter_Left, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
@@ -339,6 +375,7 @@ namespace BlueControls.Controls {
                             DrawButton(this, gr, enDesign.Button_CheckBox, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
                         }
                         break;
+
                     case enButtonStyle.Yes_or_No:
                         if (DesignToolbar) {
                             DrawButton(this, gr, enDesign.Ribbonbar_Button_CheckBox, state, _Pic, enAlignment.VerticalCenter_Left, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
@@ -346,6 +383,7 @@ namespace BlueControls.Controls {
                             DrawButton(this, gr, enDesign.Button_CheckBox, state, _Pic, enAlignment.Horizontal_Vertical_Center, PicHeight44, etxt, _Text, DisplayRectangle, Translate);
                         }
                         break;
+
                     case enButtonStyle.Pic1_or_Pic2:
                         if (DesignToolbar) {
                             DrawButton(this, gr, enDesign.Ribbonbar_Button_CheckBox, state, _Pic, enAlignment.VerticalCenter_Left, PicHeight44, etxt, _Text, DisplayRectangle, Translate);

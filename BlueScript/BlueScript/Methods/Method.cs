@@ -22,6 +22,7 @@ using Skript.Enums;
 using System.Collections.Generic;
 using System.Linq;
 using static BlueBasics.Extensions;
+
 namespace BlueScript {
     public abstract class Method : IReadableText {
         public abstract List<string> Comand(Script s);
@@ -130,6 +131,7 @@ namespace BlueScript {
         public static List<string> SplitAttributeToString(string attributtext) {
             if (string.IsNullOrEmpty(attributtext)) { return null; }
             List<string> attributes = new();
+
             #region Liste der Attribute splitten
             var posc = 0;
             do {
@@ -142,6 +144,7 @@ namespace BlueScript {
                 posc = pos + 1;
             } while (true);
             #endregion
+
             return attributes;
         }
         public static strSplittedAttributesFeedback SplitAttributeToVars(string attributtext, Script s, List<enVariableDataType> types, bool EndlessArgs) {

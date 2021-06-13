@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
+
 namespace BlueControls.Controls
 {
     public partial class FlexiControl 

@@ -23,8 +23,10 @@ using BlueControls.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+
 namespace BlueControls.ItemCollection {
     public abstract class FormPadItemRectangle : BasicPadItem {
+
         #region  Variablen-Deklarationen 
         internal PointM p_LO;
         internal PointM p_RO;
@@ -45,8 +47,12 @@ namespace BlueControls.ItemCollection {
             }
         }
         #endregion
+
+
         #region  Event-Deklarationen + Delegaten 
         #endregion
+
+
         #region  Construktor 
         public FormPadItemRectangle(ItemCollectionPad parent, string internalname) : base(parent, internalname) {
             p_LO = new PointM(this, "LO", 0, 0);
@@ -70,6 +76,7 @@ namespace BlueControls.ItemCollection {
             Drehwinkel = 0;
         }
         #endregion
+
         public override List<FlexiControl> GetStyleOptions() {
             List<FlexiControl> l = new()
             {

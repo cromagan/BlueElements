@@ -34,12 +34,14 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Media.Imaging;
 using static BlueBasics.FileOperations;
+
 namespace BlueBasics {
     public static class modAllgemein {
         // private static readonly object Pause_Sleeper = new object();
         private static string _GotUserName = string.Empty;
         [DllImport("user32", EntryPoint = "GetAsyncKeyState", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         private static extern short GetAsyncKeyState(int vKey);
+
         #region  Grafics/BMP - Bearbeitung
         // BMP_Clear
         // BMP_Generate3DBorder
@@ -184,6 +186,8 @@ namespace BlueBasics {
             return new Rectangle(GP, sz);
         }
         #endregion
+
+
         #region  Polygone
         public static GraphicsPath Poly_Triangle(PointF p1, PointF p2, PointF p3) {
             GraphicsPath P = new();
@@ -208,7 +212,9 @@ namespace BlueBasics {
             AddRad90(x, y, radius, 180); // OK
             tempPoly_RoundRec.CloseFigure();
             return tempPoly_RoundRec;
-            void AddRad90(int mxX, int mxY, int Radius, int gradStart) => tempPoly_RoundRec.AddArc(mxX, mxY, Radius, Radius, gradStart, 90);
+            void AddRad90(int mxX, int mxY, int Radius, int gradStart) {
+                tempPoly_RoundRec.AddArc(mxX, mxY, Radius, Radius, gradStart, 90);
+            }
         }
         public static GraphicsPath Poly_Rechteck(Rectangle rect) {
             GraphicsPath tempPoly_Rechteck = new();
@@ -256,12 +262,15 @@ namespace BlueBasics {
             gP.AddArc(middle.X - radius, middle.Y - radius, radius * 2, radius * 2, -startw, -wink);
         }
         #endregion
+
+
         #region  Variablen und String
         public static void Swap<T>(ref T w1, ref T w2) {
             var W3 = w1;
             w1 = w2;
             w2 = W3;
         }
+
         #region  Nummer
         public static string Nummer(this string nr, int stellen) {
             var M = string.Empty;
@@ -314,7 +323,10 @@ namespace BlueBasics {
         // return T[0];
         // }
         #endregion
+
         #endregion
+
+
         #region  Datum und Zeit
         public static void Pause(double sekunden, bool doEvents) {
             if (sekunden <= 0) { return; }
@@ -330,6 +342,7 @@ namespace BlueBasics {
             } while (AkTimer.TotalSeconds < sekunden);
         }
         #endregion
+
         public static void CollectGarbage() {
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
             //GC.WaitForPendingFinalizers();

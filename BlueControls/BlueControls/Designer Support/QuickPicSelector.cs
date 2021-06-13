@@ -21,6 +21,7 @@ using System;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Windows.Forms.Design;
+
 namespace BlueControls.Designer_Support {
     public sealed class QuickPicSelector : UITypeEditor {
         private IWindowsFormsEditorService edSvc;
@@ -36,12 +37,14 @@ namespace BlueControls.Designer_Support {
             edSvc.DropDownControl(fqp);
             return C;
         }
+
         private void Click(object sender, System.EventArgs e) {
             if (edSvc != null) {
                 C = fqp.ICode();
                 edSvc.CloseDropDown();
             }
         }
+
         public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context) => UITypeEditorEditStyle.Modal;
     }
 }

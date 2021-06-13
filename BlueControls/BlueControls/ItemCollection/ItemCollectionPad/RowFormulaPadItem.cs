@@ -25,8 +25,10 @@ using BlueDatabase;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+
 namespace BlueControls.ItemCollection {
     public class RowFormulaPadItem : FormPadItemRectangle {
+
         #region  Variablen-Deklarationen 
         private Database _Database;
         private int _RowKey;
@@ -35,8 +37,11 @@ namespace BlueControls.ItemCollection {
         private string _tmpQuickInfo;
         private string _lastQuickInfo;
         #endregion
+
+
         #region  Event-Deklarationen + Delegaten 
         #endregion
+
         public override string QuickInfo {
             get {
                 var r = Row;
@@ -52,6 +57,7 @@ namespace BlueControls.ItemCollection {
                 _tmpQuickInfo = string.Empty;
             }
         }
+
         #region  Construktor 
         public RowFormulaPadItem(ItemCollectionPad parent, string internalname) : this(parent, internalname, null, 0, string.Empty) { }
         public RowFormulaPadItem(ItemCollectionPad parent, Database database, int rowkey) : this(parent, string.Empty, database, rowkey, string.Empty) { }
@@ -69,6 +75,7 @@ namespace BlueControls.ItemCollection {
             GeneratePic(true);
         }
         #endregion
+
         // Namen so lassen, wegen Kontextmenu
         public string Layout_ID {
             get => _LayoutID;

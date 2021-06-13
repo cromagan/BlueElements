@@ -135,7 +135,6 @@ namespace BlueControls {
             this.lstComands.AddAllowed = BlueControls.Enums.enAddType.None;
             this.lstComands.Dock = System.Windows.Forms.DockStyle.Left;
             this.lstComands.FilterAllowed = true;
-            this.lstComands.LastFilePath = null;
             this.lstComands.Location = new System.Drawing.Point(0, 0);
             this.lstComands.Name = "lstComands";
             this.lstComands.Size = new System.Drawing.Size(488, 354);

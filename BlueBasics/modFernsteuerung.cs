@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
+
 namespace BlueBasics {
     public static partial class modFernsteuerung {
         [DllImport("user32", EntryPoint = "GetClassNameA", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
@@ -136,6 +137,7 @@ namespace BlueBasics {
                 }
             }
         }
+
         public static IntPtr GetAncestor(IntPtr hWnd) {
             var hw = hWnd;
             IntPtr hParent;
@@ -145,6 +147,7 @@ namespace BlueBasics {
             } while (hParent.ToInt32() != 0);
             return hw;
         }
+
         public static void FensterPosSetzen(IntPtr handle, int left, int top) {
             Rectangle r = new();
             GetWindowRect(handle, ref r);
@@ -152,6 +155,7 @@ namespace BlueBasics {
             if (r.Height == 0) { return; }
             SetWindowPos(handle, 0, left, top, r.Width - r.Left, r.Height - r.Top, 0);
         }
+
         public static void FensterMinimieren(IntPtr handle) => ShowWindow(handle, (int)enSW.ShowMinimized);
         public static void FensterMaximieren(IntPtr handle) => ShowWindow(handle, (int)enSW.ShowMaximized);
         public static void FensterRestore(IntPtr handle) => ShowWindow(handle, (int)enSW.Restore);

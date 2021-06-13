@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using BlueControls.Controls;
+
 namespace BlueControls.Classes_Editor
 {
     internal partial class FilterItem_Editor

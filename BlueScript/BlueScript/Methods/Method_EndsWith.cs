@@ -18,6 +18,7 @@
 #endregion
 using Skript.Enums;
 using System.Collections.Generic;
+
 namespace BlueScript {
     internal class Method_EndsWith : Method {
         public override string Syntax => "EndsWith(String, CaseSensitive, Value1, Value2, ...)";

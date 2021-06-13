@@ -19,6 +19,7 @@
 using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
+
 namespace BlueScript {
     public class Method_SetError : Method {
         //public Method_SetError(Script parent) : base(parent) { }

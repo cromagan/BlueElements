@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
+
 namespace BlueBasics {
     public static partial class Extensions {
         public static Color FromHSB(this float hue, float satuation, float brightness, byte alpha) {
@@ -62,6 +63,7 @@ namespace BlueBasics {
         public static Color OverlayMix(this Color baseColor, Color blendColor, double opacity) => MixColor(Color.FromArgb((int)OverlayMath(baseColor.R, blendColor.R),
 (int)OverlayMath(baseColor.G, blendColor.G),
 (int)OverlayMath(baseColor.B, blendColor.B)), baseColor, opacity);
+
         #region  Blend Mode Mathematics
         private static double SoftLightMath(int @base, int blend) {
             var dbase = @base / 255.0;
@@ -76,6 +78,7 @@ namespace BlueBasics {
             return dbase < 0.5 ? 2 * dbase * dblend * 255 : (1 - (2 * (1 - dbase) * (1 - dblend))) * 255;
         }
         #endregion
+
         public static Color MixColor(this Color color1, Color color2, double color1Prozent) {
             if (color1Prozent > 1) { color1Prozent = 1; }
             if (color1Prozent < 0) { color1Prozent = 0; }

@@ -5,6 +5,7 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
+
 namespace BlueControls.BlueDatabaseDialogs
 {
     public partial class FormulaQuickSelect : Form
@@ -75,7 +76,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.Auswahl.AddAllowed = BlueControls.Enums.enAddType.OnlySuggests;
             this.Auswahl.CheckBehavior = BlueControls.Enums.enCheckBehavior.MultiSelection;
-            this.Auswahl.LastFilePath = null;
             this.Auswahl.Location = new System.Drawing.Point(8, 136);
             this.Auswahl.Name = "Auswahl";
             this.Auswahl.Size = new System.Drawing.Size(312, 288);

@@ -16,6 +16,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 #endregion
+
 namespace BlueBasics.Enums {
     public enum enTaste : byte {
         VK_LBUTTON = 0x1, // Left mouse button.

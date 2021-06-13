@@ -22,6 +22,7 @@ using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using System;
 using System.Drawing;
+
 namespace BlueControls.ItemCollection {
     public abstract class BasicListItem : ICompareKey, IComparable {
         public Size SizeUntouchedForListBox() {

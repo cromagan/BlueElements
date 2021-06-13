@@ -11,6 +11,7 @@ using System.Reflection;
 using System.Windows.Forms;
 using static BlueBasics.Extensions;
 using static BlueBasics.modConverter;
+
 namespace BlueControls.Controls {
     // https://stackoverflow.com/questions/724143/how-do-i-create-a-delegate-for-a-net-property
     // http://peisker.net/dotnet/propertydelegates.htm
@@ -29,6 +30,7 @@ namespace BlueControls.Controls {
         ///// Die Hauptklasse wird zwar beibehalten, aber Unterklassen müssen evtl. neu definiert werden.
         ///// </summary>
         //public event System.EventHandler LoadedFromDisk;
+
         #region Constructor
         public FlexiControlForProperty(object propertyObject, string propertyName, int rowCount, ItemCollectionList list, enImageCode image) : this() {
             _propertyObject = propertyObject;
@@ -41,6 +43,7 @@ namespace BlueControls.Controls {
         public FlexiControlForProperty(object propertyObject, string propertyName, enImageCode image) : this(propertyObject, propertyName, 1, null, image) { }
         public FlexiControlForProperty(object propertyObject, string propertyName) : this(propertyObject, propertyName, 1, null, enImageCode.None) { }
         #endregion
+
         public FlexiControlForProperty() : base() {
             GenFehlerText();
             //if (propChecker == null)
@@ -211,6 +214,7 @@ namespace BlueControls.Controls {
             base.OnValueChanged();
         }
         private void UpdateControlData(bool withCreate, int TextLines, ItemCollectionList list, enImageCode image) {
+
             #region propInfo & _propertynamecpl befüllen
             if (string.IsNullOrEmpty(_propertyName) || _propertyObject == null) {
                 _methInfo = null;
@@ -228,6 +232,8 @@ namespace BlueControls.Controls {
                 _methInfo = _propertyObject.GetType().GetMethod(_propertynamecpl);
             }
             #endregion
+
+
             #region Caption setzen
             if (!string.IsNullOrEmpty(_propertyName)) {
                 var x = _propertyName.SplitBy("__");
@@ -237,6 +243,8 @@ namespace BlueControls.Controls {
                 Caption = "[unbekannt]";
             }
             #endregion
+
+
             #region Art des Steuerelements bestimmen
             if (withCreate && _methInfo != null) {
                 EditType = enEditTypeFormula.Button;
@@ -251,9 +259,13 @@ namespace BlueControls.Controls {
             }
             if (withCreate && _propInfo != null) {
                 switch (_propInfo.PropertyType.FullName.ToLower()) {
-                    //case "system.string":
-                    //case "system.int32":
-                    //case "system.decimal":
+                    //
+                    case "system.string":
+                    //
+                    case "system.int32":
+                    //
+                    case "system.decimal":
+
                     case "system.boolean": {
                             EditType = enEditTypeFormula.Ja_Nein_Knopf;
                             var s = BlueFont.MeasureStringOfCaption(_Caption);
@@ -313,6 +325,8 @@ namespace BlueControls.Controls {
             //    Develop.DebugPrint(_propertyName + " hat keine Zuordnung");
             //}
             #endregion
+
+
             #region QuickInfo setzen
             // https://stackoverflow.com/questions/32901771/multiple-enum-descriptions
             // [PropertyAttributes("", false)] setzen
@@ -338,6 +352,7 @@ namespace BlueControls.Controls {
                 }
             }
             #endregion
+
             SetValueFromProperty();
             GenFehlerText();
         }

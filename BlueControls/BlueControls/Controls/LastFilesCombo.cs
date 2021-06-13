@@ -26,6 +26,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using static BlueBasics.FileOperations;
+
 namespace BlueControls.Controls {
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("ItemClicked")]
@@ -35,12 +36,16 @@ namespace BlueControls.Controls {
         public bool _mustExists = true;
         public int _maxCount = 20;
         //public string _specialcommand = string.Empty;
+
         #region Constructor
         public LastFilesCombo() : base() => SetLastFilesStyle();
         #endregion
+
+
         #region  Events 
         //public event System.EventHandler SpecialCommandClicked;
         #endregion
+
         /// <summary>
         /// Wohin die Datei gespeichtert werden soll, welche Dateien zuletzt benutzt wurden.
         /// </summary>

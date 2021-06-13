@@ -1,4 +1,5 @@
-﻿namespace BlueControls.BlueDatabaseDialogs
+﻿
+namespace BlueControls.BlueDatabaseDialogs
 {
     partial class Filterleiste
     {
@@ -18,6 +19,7 @@
             }
             base.Dispose(disposing);
         }
+
         #region Vom Komponenten-Designer generierter Code
         /// <summary> 
         /// Erforderliche Methode für die Designerunterstützung. 
@@ -141,6 +143,7 @@
             this.ResumeLayout(false);
         }
         #endregion
+
         private Controls.Button btnTextLöschen;
         private Controls.TextBox txbZeilenFilter;
         private Controls.Button btnAlleFilterAus;

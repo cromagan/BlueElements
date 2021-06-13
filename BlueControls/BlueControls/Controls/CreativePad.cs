@@ -30,10 +30,12 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Printing;
+
 namespace BlueControls.Controls {
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("Click")]
     public sealed partial class CreativePad : ZoomPad, IContextMenu {
+
         #region Constructor
         public CreativePad(ItemCollectionPad itemCollectionPad) : base() {
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
@@ -45,6 +47,7 @@ namespace BlueControls.Controls {
         }
         public CreativePad() : this(new ItemCollectionPad()) { }
         #endregion
+
         private IMouseAndKeyHandle _GivesMouseComandsTo;
         private bool _ShowInPrintMode;
         private ItemCollectionPad _Item;
@@ -55,6 +58,7 @@ namespace BlueControls.Controls {
         public BasicPadItem LastClickedItem { get; private set; } = null;
         private bool RepairPrinterData_Prepaired;
         public bool _editAllowed = true;
+
         #region  Events 
         public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
         public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
@@ -64,6 +68,8 @@ namespace BlueControls.Controls {
         public event EventHandler PreviewModeChanged;
         public event EventHandler ClickedItemChanged;
         #endregion
+
+
         #region  Properties 
         [DefaultValue(false)]
         public bool ShowInPrintMode {
@@ -100,6 +106,7 @@ namespace BlueControls.Controls {
             }
         }
         #endregion
+
         private void OnPreviewModeChanged() => PreviewModeChanged?.Invoke(this, System.EventArgs.Empty);
         internal Point MiddleOfVisiblesScreen() => new((int)(((Width / 2) + _shiftX) / _Zoom), (int)(((Height / 2) + _shiftY) / _Zoom));
         private void Item_DoInvalidate(object sender, System.EventArgs e) => Invalidate();
@@ -127,7 +134,9 @@ namespace BlueControls.Controls {
             }
             if (Multi < 1) { Multi = 1m; }
             switch (e.KeyCode) {
+
                 case System.Windows.Forms.Keys.Delete:
+
                 case System.Windows.Forms.Keys.Back:
                     List<BasicPadItem> ItemsDoDelete = new();
                     foreach (var thisit in _ItemsToMove) {
@@ -136,15 +145,19 @@ namespace BlueControls.Controls {
                     Unselect();
                     _Item.RemoveRange(ItemsDoDelete);
                     break;
+
                 case System.Windows.Forms.Keys.Up:
                     MoveItems(0M, -1 * Multi, false, false);
                     break;
+
                 case System.Windows.Forms.Keys.Down:
                     MoveItems(0M, 1 * Multi, false, false);
                     break;
+
                 case System.Windows.Forms.Keys.Left:
                     MoveItems(-1 * Multi, 0M, false, false);
                     break;
+
                 case System.Windows.Forms.Keys.Right:
                     MoveItems(1 * Multi, 0M, false, false);
                     break;
@@ -232,6 +245,7 @@ namespace BlueControls.Controls {
                 }
             }
             switch (e.Button) {
+
                 case System.Windows.Forms.MouseButtons.Left:
                     if (!_editAllowed) { return; }
                     // Da ja evtl. nur ein Punkt verschoben wird, das Ursprüngliche Element wieder komplett auswählen.
@@ -245,6 +259,7 @@ namespace BlueControls.Controls {
                     }
                     SelectItem(select, false);
                     break;
+
                 case System.Windows.Forms.MouseButtons.Right:
                     FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
                     break;
@@ -435,26 +450,32 @@ namespace BlueControls.Controls {
             var Done = false;
             if (thisItem != null) {
                 switch (e.ClickedComand.ToLower()) {
+
                     case "#erweitert":
                         Done = true;
                         ShowErweitertMenü(thisItem);
                         break;
+
                     case "#vordergrund":
                         Done = true;
                         thisItem.InDenVordergrund();
                         break;
+
                     case "#hintergrund":
                         Done = true;
                         thisItem.InDenHintergrund();
                         break;
+
                     case "#vorne":
                         Done = true;
                         thisItem.EineEbeneNachVorne();
                         break;
+
                     case "#hinten":
                         Done = true;
                         thisItem.EineEbeneNachHinten();
                         break;
+
                     case "#duplicate":
                         Done = true;
                         _Item.Add((BasicPadItem)((ICloneable)thisItem).Clone());

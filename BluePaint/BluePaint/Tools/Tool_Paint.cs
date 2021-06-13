@@ -19,6 +19,7 @@
 using BlueBasics;
 using BlueControls.EventArgs;
 using System.Drawing;
+
 namespace BluePaint {
     public partial class Tool_Paint {
         public Tool_Paint() : base() => InitializeComponent();

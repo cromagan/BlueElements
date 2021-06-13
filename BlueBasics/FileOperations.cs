@@ -23,6 +23,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Security.Cryptography;
 using static BlueBasics.modAllgemein;
+
 namespace BlueBasics {
     public static class FileOperations {
         private delegate bool DoThis(string file1, string file2);
@@ -42,6 +43,47 @@ namespace BlueBasics {
             }
             return true;
         }
+
+
+        private static string _LastFilePath = string.Empty;
+
+        public static List<string> GetFilesWithFileSelector(string defaultpath, bool multi) {
+
+
+            if (string.IsNullOrEmpty(_LastFilePath)) {
+
+                if (!string.IsNullOrEmpty(defaultpath)) {
+                    _LastFilePath = defaultpath;
+                }
+            }
+
+
+
+            using System.Windows.Forms.OpenFileDialog f = new();
+            f.CheckFileExists = true;
+            f.CheckPathExists = true;
+            f.Multiselect = multi;
+            f.InitialDirectory = _LastFilePath;
+            f.Title = "Datei hinzufügen:";
+            f.ShowDialog();
+            if (f.FileNames == null) { return null; }
+
+
+            if (!multi && f.FileNames.Length != 1) { return null; }
+            var x = new List<string>();
+            x.AddRange(f.FileNames);
+            _LastFilePath = f.FileNames[0].FilePath();
+            return x;
+
+        }
+
+
+
+
+
+
+
+
         private static bool TryDeleteDir(string pfad, string willBeIgnored) {
             pfad = pfad.CheckPath();
             if (!PathExists(pfad)) { return true; }

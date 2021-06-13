@@ -21,6 +21,7 @@ using Skript.Enums;
 using System.Collections.Generic;
 using System.Linq;
 using static BlueBasics.Extensions;
+
 namespace BlueScript {
     internal class Method_Contains : Method {
         //public Method_Contains(Script parent) : base(parent) { }

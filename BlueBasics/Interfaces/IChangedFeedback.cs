@@ -17,6 +17,7 @@
 // DEALINGS IN THE SOFTWARE.
 #endregion
 using System;
+
 namespace BlueBasics.Interfaces {
     public interface IChangedFeedback {
         /// <summary>

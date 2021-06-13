@@ -19,6 +19,7 @@
 using BlueControls.Controls;
 using BluePaint.EventArgs;
 using System.Drawing;
+
 namespace BluePaint {
     public abstract partial class GenericTool : GroupBox // System.Windows.Forms.UserControl //
     {

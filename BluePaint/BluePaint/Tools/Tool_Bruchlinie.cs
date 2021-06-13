@@ -19,6 +19,7 @@
 using BlueControls.Controls;
 using System;
 using System.Drawing;
+
 namespace BluePaint {
     public partial class Tool_Bruchlinie {
         public Tool_Bruchlinie() : base() => InitializeComponent();
@@ -34,24 +35,28 @@ namespace BluePaint {
             OnForceUndoSaving();
             Point Nach;
             switch (((Button)sender).Name.ToLower()) {
+
                 case "bruch_oben":
                     Nach = new Point(0, 5);
                     YRI = -5;
                     ModY = -5;
                     ChangeY = true;
                     break;
+
                 case "bruch_unten":
                     Nach = new Point(0, _Pic.Height - 6);
                     YRI = 5;
                     ModY = 5;
                     ChangeY = true;
                     break;
+
                 case "bruch_links":
                     Nach = new Point(5, 0);
                     XRi = -5;
                     ModX = -5;
                     ChangeX = true;
                     break;
+
                 case "bruch_rechts":
                     Nach = new Point(_Pic.Width - 6, 0);
                     XRi = 5;

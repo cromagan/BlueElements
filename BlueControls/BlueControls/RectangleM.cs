@@ -20,6 +20,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using System;
 using System.Drawing;
+
 namespace BlueControls {
     public class RectangleM : ICloneable {
         public decimal X;
@@ -52,22 +53,31 @@ namespace BlueControls {
         }
         public PointM PointOf(enAlignment corner) {
             switch (corner) {
+
                 case enAlignment.Bottom_Left:
                     return new PointM(Left, Bottom);
+
                 case enAlignment.Bottom_Right:
                     return new PointM(Right, Bottom);
+
                 case enAlignment.Top_Left:
                     return new PointM(Left, Top);
+
                 case enAlignment.Top_Right:
                     return new PointM(Right, Top);
+
                 case enAlignment.Bottom_HorizontalCenter:
                     return new PointM(Left + (Width / 2m), Bottom);
+
                 case enAlignment.Top_HorizontalCenter:
                     return new PointM(Left + (Width / 2m), Top);
+
                 case enAlignment.VerticalCenter_Left:
                     return new PointM(Left, Top + (Height / 2m));
+
                 case enAlignment.VerticalCenter_Right:
                     return new PointM(Right, Top + (Height / 2m));
+
                 case enAlignment.Horizontal_Vertical_Center:
                     return new PointM(Left + (Width / 2m), Top + (Height / 2m));
                 default:
@@ -147,7 +157,12 @@ namespace BlueControls {
             }
         }
         public object Clone() => new RectangleM(X, Y, Width, Height);
-        public static explicit operator RectangleF(RectangleM r) => new((float)r.X, (float)r.Y, (float)r.Width, (float)r.Height);
-        public static explicit operator Rectangle(RectangleM r) => new((int)r.X, (int)r.Y, (int)r.Width, (int)r.Height);
+        public static explicit operator RectangleF(RectangleM r) {
+            return new((float)r.X, (float)r.Y, (float)r.Width, (float)r.Height);
+        }
+
+        public static explicit operator Rectangle(RectangleM r) {
+            return new((int)r.X, (int)r.Y, (int)r.Width, (int)r.Height);
+        }
     }
 }

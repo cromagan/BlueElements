@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+
 namespace BlueControls.Forms {
     public partial class Progressbar : FloatingForm {
         private int eProgressbar_LastCurrent = int.MaxValue;

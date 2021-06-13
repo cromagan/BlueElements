@@ -22,15 +22,19 @@ using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using System;
 using static BlueBasics.modConverter;
+
 namespace BlueDatabase {
     public class WorkItem : IParseable, ICompareKey {
         public event EventHandler Changed;
+
         #region  Variablen-Deklarationen 
         private enItemState _state;
         private int _colKey;
         private int _rowKey;
         private string _changedTo;
         #endregion
+
+
         #region Properties
         public bool IsParsing { get; private set; }
         internal enItemState State {
@@ -41,6 +45,7 @@ namespace BlueDatabase {
                 OnChanged();
             }
         }
+
         public string CellKey => CellCollection.KeyOfCell(ColKey, RowKey);
         public enDatabaseDataType Comand { get; private set; }
         public int ColKey {
@@ -51,6 +56,7 @@ namespace BlueDatabase {
                 OnChanged();
             }
         }
+
         public int RowKey {
             get => _rowKey;
             set {
@@ -59,6 +65,7 @@ namespace BlueDatabase {
                 OnChanged();
             }
         }
+
         public DateTime Date { get; private set; }
         public string User { get; private set; }
         public string PreviousValue { get; private set; }
@@ -70,8 +77,10 @@ namespace BlueDatabase {
                 OnChanged();
             }
         }
+
         public bool HistorischRelevant => State is enItemState.Pending or enItemState.Undo;
         #endregion
+
         public WorkItem(enDatabaseDataType Comand, int ColKey, int RowKey, string PreviousValue, string ChangedTo, string User) {
             _state = enItemState.Pending;
             this.Comand = Comand;
@@ -82,26 +91,33 @@ namespace BlueDatabase {
             this.User = User;
             Date = DateTime.UtcNow;
         }
+
         public WorkItem(string s) => Parse(s);
         public void Parse(string ToParse) {
             IsParsing = true;
             foreach (var pair in ToParse.GetAllTags()) {
                 switch (pair.Key) {
+
                     case "st":
                         _state = (enItemState)int.Parse(pair.Value);
                         break;
+
                     case "co":
                         Comand = (enDatabaseDataType)int.Parse(pair.Value);
                         break;
+
                     case "ck":
                         _colKey = int.Parse(pair.Value);
                         break;
+
                     case "rk":
                         _rowKey = int.Parse(pair.Value);
                         break;
+
                     case "undotype":
                         //_UndoType = pair.Value;
                         break;
+
                     case "cell":
                         var _CellKey = pair.Value.TrimStart("{ColumnKey=");
                         if (_CellKey == "{Disposed}") { _CellKey = "-1|-1"; }
@@ -113,29 +129,40 @@ namespace BlueDatabase {
                             int.TryParse(x[1], out _rowKey);
                         }
                         break;
+
                     case "cellkey":
                         _CellKey = pair.Value;
                         var x2 = _CellKey.SplitBy("|");
                         int.TryParse(x2[0], out _colKey);
                         int.TryParse(x2[1], out _rowKey);
                         break;
+
                     case "date":
+
                     case "d":
                         Date = DateTimeParse(pair.Value);
                         break;
+
                     case "user":
+
                     case "u":
                         User = pair.Value.FromNonCritical();
                         break;
+
                     case "group":
+
                     case "g":
                         //  Group = pair.Value.FromNonCritical();
                         break;
+
                     case "previousvalue":
+
                     case "pv":
                         PreviousValue = pair.Value.FromNonCritical();
                         break;
+
                     case "changedto":
+
                     case "ct":
                         _changedTo = pair.Value.FromNonCritical();
                         break;
@@ -146,6 +173,7 @@ namespace BlueDatabase {
             }
             IsParsing = false;
         }
+
         public new string ToString() => "{ST=" + (int)_state +
 ", CO=" + (int)Comand +
 ", CK=" + _colKey +
@@ -162,6 +190,7 @@ namespace BlueDatabase {
             if (n == "''") { n = "<IMAGECODE=Papierkorb|16>"; }
             return "<b>alt: </b>" + a + "<b> <IMAGECODE=Pfeil_Rechts_Scrollbar|8|16> neu: </b>" + n + "     <i>(" + Date + ", " + User + ")</i>";
         }
+
         public string CompareKey() => Date.ToString(Constants.Format_Date) + ColKey;
         public void OnChanged() {
             if (IsParsing) {

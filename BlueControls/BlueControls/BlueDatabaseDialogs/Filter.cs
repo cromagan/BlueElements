@@ -17,6 +17,7 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 using BlueControls.Controls;
+
 namespace BlueControls.BlueDatabaseDialogs {
     public sealed partial class Filter : Forms.Form {
         public Filter(Table table) {

@@ -1,4 +1,5 @@
 ﻿using BlueControls.Controls;
+
 namespace BluePaint
 {
     partial class MainWindow : BlueControls.Forms.Form
@@ -19,6 +20,7 @@ namespace BluePaint
             }
             base.Dispose(disposing);
         }
+
         #region Windows Form Designer generated code
         /// <summary>
         /// Required method for Designer support - do not modify
@@ -578,6 +580,7 @@ namespace BluePaint
         internal Caption InfoText;
         internal Button btnDummy;
         #endregion
+
         private Button btnZoomFit;
         private GroupBox grpDatei;
         internal LastFilesCombo btnLetzteDateien;

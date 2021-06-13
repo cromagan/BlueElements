@@ -28,10 +28,12 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Design;
+
 namespace BlueControls.Controls {
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("TextChanged")]
     public partial class ComboBox : TextBox {
+
         #region Constructor
         public ComboBox() : base() {
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -48,6 +50,8 @@ namespace BlueControls.Controls {
             btnDropDown.Height = Height;
         }
         #endregion
+
+
         #region  Variablen 
         private string _Initialtext;
         private bool _btnDropDownIsIn = false;
@@ -56,6 +60,8 @@ namespace BlueControls.Controls {
         private string _ImageCode = string.Empty;
         private string _LastClickedText = "####~~~~|||||";
         #endregion
+
+
         #region  Properties 
         [DefaultValue("")]
         [Category("Darstellung")]
@@ -70,6 +76,7 @@ namespace BlueControls.Controls {
                 SetStyle();
             }
         }
+
         public ItemCollectionList Item { get; }
         [DefaultValue(System.Windows.Forms.ComboBoxStyle.DropDown)]
         public System.Windows.Forms.ComboBoxStyle DropDownStyle {
@@ -94,15 +101,19 @@ namespace BlueControls.Controls {
             }
         }
         #endregion
+
+
         #region  Events 
         public event EventHandler<BasicListItemEventArgs> ItemClicked;
         public event EventHandler DropDownShowing;
         #endregion
+
         private void DropDownMenu_Cancel(object sender, object MouseOver) {
             Item.UncheckAll();
             FloatingForm.Close(this);
             Focus();
         }
+
         private void DropDownMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
             Item.UncheckAll();
             FloatingForm.Close(this);
@@ -163,10 +174,11 @@ namespace BlueControls.Controls {
             }
             Skin.Draw_Border(gr, vType, state, DisplayRectangle);
             DoReturn();
-            void DoReturn() =>
+            void DoReturn() {
                 //gr.DrawImage(_BitmapOfControl, 0, 0);
                 //TMPGR.Dispose();
                 btnDropDown.Invalidate();
+            }
         }
         internal bool WasThisValueClicked() => Text == _LastClickedText;
         protected override void OnEnabledChanged(System.EventArgs e) {
@@ -175,6 +187,7 @@ namespace BlueControls.Controls {
             btnDropDown.Enabled = Enabled;
             btnDropDown.Invalidate();
         }
+
         public void ShowMenu(object sender, System.Windows.Forms.MouseEventArgs ex) {
             if (_btnDropDownIsIn) { return; }
             if (IsDisposed) { return; }
@@ -197,6 +210,7 @@ namespace BlueControls.Controls {
             DropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
             _btnDropDownIsIn = false;
         }
+
         private void OnDropDownShowing() => DropDownShowing?.Invoke(this, System.EventArgs.Empty);
         protected override void OnGotFocus(System.EventArgs e) {
             if (_DropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDownList) {
@@ -222,6 +236,7 @@ namespace BlueControls.Controls {
                 base.OnMouseUp(e);
             }
         }
+
         private void btnDropDown_LostFocus(object sender, System.EventArgs e) => CheckLostFocus(e);
         private void CheckLostFocus(System.EventArgs e) {
             try {
@@ -230,18 +245,21 @@ namespace BlueControls.Controls {
             } catch (Exception) {
             }
         }
+
         private void _Item_ItemAdded(object sender, ListEventArgs e) {
             if (IsDisposed) { return; }
             if (_btnDropDownIsIn) { return; }
             FloatingForm.Close(this);
             Invalidate();
         }
+
         private void _Item_ItemCheckedChanged(object sender, System.EventArgs e) {
             if (IsDisposed) { return; }
             if (_btnDropDownIsIn) { return; }
             FloatingForm.Close(this);
             Invalidate();
         }
+
         private void SetStyle() {
             if (DrawStyle != enComboboxStyle.TextBox) {
                 Cursor = System.Windows.Forms.Cursors.Arrow;
@@ -266,12 +284,14 @@ namespace BlueControls.Controls {
             base.OnTextChanged(e);
             FloatingForm.Close(this);
         }
+
         private void _Item_ItemRemoved(object sender, System.EventArgs e) {
             if (IsDisposed) { return; }
             if (_btnDropDownIsIn) { return; }
             FloatingForm.Close(this);
             Invalidate();
         }
+
         public void SetTextIfItemExists(string text) {
             foreach (var thisItem in Item) {
                 if (thisItem.Internal == text) {

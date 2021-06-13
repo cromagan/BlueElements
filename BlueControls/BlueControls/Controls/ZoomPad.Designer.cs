@@ -1,4 +1,5 @@
-﻿namespace BlueControls.Controls
+﻿
+namespace BlueControls.Controls
 {
     partial class ZoomPad
     {
@@ -18,6 +19,7 @@
             }
             base.Dispose(disposing);
         }
+
         #region Vom Komponenten-Designer generierter Code
         /// <summary> 
         /// Erforderliche Methode für die Designerunterstützung. 
@@ -54,6 +56,7 @@
             this.ResumeLayout(false);
         }
         #endregion
+
         protected Controls.Slider SliderX;
         protected Controls.Slider SliderY;
     }

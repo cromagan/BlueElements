@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
+
 namespace BlueControls {
     internal static class Dictionary {
         internal static object Lock_SpellChecking = new();
@@ -42,6 +43,7 @@ namespace BlueControls {
             }
             return _DictWords != null;
         }
+
         public static bool IsWriteable() => _DictWords != null && !string.IsNullOrEmpty(_DictWords.Filename);
         public static bool IsWordOk(string Word) {
             if (!DictionaryRunning(true)) { return true; }
@@ -56,6 +58,7 @@ namespace BlueControls {
             }
             return _DictWords.Row[Word] != null;
         }
+
         public static List<string> SimilarTo(string Word) {
             if (IsWordOk(Word)) { return null; }
             List<string> l = new();
@@ -77,6 +80,7 @@ namespace BlueControls {
             }
             return L2;
         }
+
         public static void SpellCheckingAll(ExtText _ETXT, bool AllOK) {
             var Can = Monitor.TryEnter(Lock_SpellChecking);
             if (Can) { Monitor.Exit(Lock_SpellChecking); }
@@ -100,15 +104,19 @@ namespace BlueControls {
                                 ? MessageBox.Show("<b>" + wort + "</b>", enImageCode.Stift, "'" + wort + "' aufnehmen", "'" + wort.ToLower() + "' aufnehmen", "Ignorieren", "Beenden")
                                 : AllOK ? 1 : MessageBox.Show("<b>" + wort + "</b>", enImageCode.Stift, "'" + wort + "' aufnehmen", "Ignorieren", "Beenden") + 1;
                             switch (butt) {
+
                                 case 0:
                                     WordAdd(wort);
                                     break;
+
                                 case 1:
                                     WordAdd(wort.ToLower());
                                     break;
+
                                 case 2:
                                     //  woEnd = woStart - 1
                                     break;
+
                                 case 3:
                                     IsSpellChecking = false;
                                     return;
@@ -119,6 +127,7 @@ namespace BlueControls {
                 IsSpellChecking = false;
             }
         }
+
         public static void WordAdd(string Wort) {
             if (_DictWords.Row[Wort] != null) { _DictWords.Row.Remove(_DictWords.Row[Wort]); }
             _DictWords.Row.Add(Wort);

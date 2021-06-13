@@ -1,4 +1,5 @@
-﻿namespace BlueControls.Controls
+﻿
+namespace BlueControls.Controls
 {
     partial class ZoomPic
     {
@@ -18,6 +19,7 @@
             }
             base.Dispose(disposing);
         }
+
         #region Vom Komponenten-Designer generierter Code
         /// <summary> 
         /// Erforderliche Methode für die Designerunterstützung. 
@@ -28,5 +30,6 @@
             components = new System.ComponentModel.Container();
         }
         #endregion
+
     }
 }

@@ -30,6 +30,7 @@ using System.IO;
 using System.Windows.Forms;
 using static BlueBasics.FileOperations;
 using static BlueBasics.modConverter;
+
 namespace BlueControls.Forms {
     public sealed partial class ExportDialog {
         private readonly List<RowItem> _RowsForExport;
@@ -79,6 +80,7 @@ namespace BlueControls.Forms {
             }
             return string.Empty;
         }
+
         private void EintragsText() => capAnzahlInfo.Text = _RowsForExport == null || _RowsForExport.Count == 0
 ? "Bitte wählen sie die Einträge für den Export."
 : _RowsForExport.Count == 1
@@ -106,6 +108,7 @@ namespace BlueControls.Forms {
                 }
             }
         }
+
         private void BefülleLayoutDropdowns() {
             cbxLayoutWahl.Item.Clear();
             AddLayoutsOff(cbxLayoutWahl.Item, Database, true);

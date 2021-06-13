@@ -19,6 +19,7 @@
 using BlueBasics;
 using System;
 using System.Drawing;
+
 namespace BlueControls.Forms {
     public partial class QuickInfo : FloatingForm {
         public static string _shownTXT = string.Empty;

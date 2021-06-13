@@ -19,10 +19,12 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+
 namespace BlueControls {
     public sealed class SystemInputHook {
         [DllImport("user32.dll", EntryPoint = "GetAsyncKeyState", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         private static extern short GetAsyncKeyState(System.Windows.Forms.Keys nVirtKey);
+
         #region  Variablen-Deklarationen 
         [AccessedThroughProperty(nameof(Tim))]
         private System.Windows.Forms.Timer _Tim;
@@ -41,6 +43,7 @@ namespace BlueControls {
                 }
             }
         }
+
         private bool Mouse_IsPressing;
         private int Mouse_LastX;
         private int Mouse_LastY;
@@ -48,6 +51,8 @@ namespace BlueControls {
         private bool Key_IsPressing;
         private System.Windows.Forms.Keys Key_LastKey;
         #endregion
+
+
         #region  Event-Deklarationen + Delegaten 
         public event System.EventHandler<System.Windows.Forms.MouseEventArgs> MouseDown;
         public event System.EventHandler<System.Windows.Forms.MouseEventArgs> MouseUp;
@@ -55,6 +60,8 @@ namespace BlueControls {
         public event System.EventHandler<System.Windows.Forms.KeyEventArgs> KeyDown;
         public event System.EventHandler<System.Windows.Forms.KeyEventArgs> KeyUp;
         #endregion
+
+
         #region  Construktor + Initialize 
         private void Initialize() {
             Tim = new System.Windows.Forms.Timer {
@@ -67,10 +74,14 @@ namespace BlueControls {
             Key_IsPressing = false;
             Key_LastKey = 0;
         }
+
         public SystemInputHook() => Initialize();
         #endregion
+
+
         #region  Properties 
         #endregion
+
         public void InstallHook() {
             Tim.Enabled = true;
             Mouse_IsPressing = false;
@@ -80,6 +91,7 @@ namespace BlueControls {
             Key_IsPressing = false;
             Key_LastKey = 0;
         }
+
         public void RemoveHook() => Tim.Enabled = false;
         public void CheckNow() => Tim_Tick(null, null);
         private void Tim_Tick(object sender, System.EventArgs e) {
@@ -88,6 +100,7 @@ namespace BlueControls {
             DoKeyboard();
             Tim.Enabled = true;
         }
+
         public void DoMouse() {
             var B = System.Windows.Forms.MouseButtons.None;
             if (GetAsyncKeyState(System.Windows.Forms.Keys.LButton) != 0) {
@@ -116,6 +129,7 @@ namespace BlueControls {
             Mouse_LastY = mev.Y;
             Mouse_LastButton = B;
         }
+
         private void OnMouseDown(System.Windows.Forms.MouseEventArgs e) => MouseDown?.Invoke(null, e);
         private void OnMouseUp(System.Windows.Forms.MouseEventArgs e) => MouseUp?.Invoke(this, e);
         private void OnMouseMove(System.Windows.Forms.MouseEventArgs e) => MouseMove?.Invoke(this, e);
@@ -309,6 +323,7 @@ namespace BlueControls {
             }
             Key_LastKey = k;
         }
+
         private void OnKeyDown(System.Windows.Forms.KeyEventArgs e) => KeyDown?.Invoke(this, e);
         private void OnKeyUp(System.Windows.Forms.KeyEventArgs e) => KeyUp?.Invoke(null, e);
     }

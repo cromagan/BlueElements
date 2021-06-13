@@ -26,6 +26,7 @@ using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
 using SaveFileDialog = System.Windows.Forms.SaveFileDialog;
 using TabPage = BlueControls.Controls.TabPage;
 using TextBox = BlueControls.Controls.TextBox;
+
 namespace BlueControls.Forms
 {
     public partial class frmTableView : Form
@@ -687,6 +688,7 @@ namespace BlueControls.Forms
             this.grpEditor.ResumeLayout(false);
             this.ResumeLayout(false);
         }
+
         private Table TableView;
         private GroupBox grpFormularSteuerung;
         private Button SuchB;

@@ -17,6 +17,7 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 using BlueBasics;
+
 namespace BlueDatabase.EventArgs {
     public class ButtonCellEventArgs : CellEventArgs {
         public ButtonCellEventArgs(ColumnItem Column, RowItem Row) : base(Column, Row) => Text = "Click";

@@ -32,6 +32,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using static BlueBasics.FileOperations;
+
 namespace BlueControls.Controls {
     [Designer(typeof(BasicDesigner))]
     public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
@@ -185,11 +186,13 @@ namespace BlueControls.Controls {
         }
         public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
             switch (e.ClickedComand.ToLower()) {
+
                 case "#columnedit":
                     if (e.HotItem is ColumnItem col) {
                         tabAdministration.OpenColumnEditor(col, null);
                     }
                     return true;
+
                 case "#filterverschieben":
                     if (e.HotItem is ColumnItem col2) {
                         var pc = (Filterleiste)Parent; // Parent geht verlren, wenn der Filter selbst disposed und neu erzeugt wird
@@ -209,6 +212,7 @@ namespace BlueControls.Controls {
                         }
                     }
                     return true;
+
                 case "#bildpfad":
                     var p = (string)((Filterleiste)Parent).pic.Tag;
                     ExecuteFile(p.FilePath());

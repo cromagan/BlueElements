@@ -19,6 +19,7 @@
 using BlueBasics;
 using System;
 using System.Collections.Generic;
+
 namespace BlueScript {
     public class Script {
         private string _error;
@@ -132,22 +133,28 @@ namespace BlueScript {
                 var c = txt.Substring(pos, 1);
                 var addt = true;
                 switch (c) {
+
                     case "\"":
                         if (!comment) { gänsef = !gänsef; }
                         break;
+
                     case "/":
                         if (!gänsef) {
                             if (pos < txt.Length - 1 && txt.Substring(pos, 2) == "//") { comment = true; }
                         }
                         break;
+
                     case "\r":
                         if (gänsef) { s.Append("\";Exception(\"Fehler mit Anführungsstrichen\");"); }
                         s.Append("¶");
                         comment = false;
                         addt = false;
                         break;
+
                     case " ":
+
                     case "\n":
+
                     case "\t":
                         if (!gänsef) { addt = false; }
                         break;
@@ -200,6 +207,7 @@ namespace BlueScript {
                     return new strDoItWithEndedPosFeedback(fn.ErrorMessage, fn.Value, f.ContinueOrErrorPosition);
                 }
             }
+
             #region Prüfen für bessere Fehlermeldung, ob der Rückgabetyp falsch gesetzt wurde
             foreach (var thisC in Comands) {
                 var f = thisC.CanDo(txt, pos, !expectedvariablefeedback, s);
@@ -211,6 +219,7 @@ namespace BlueScript {
                 }
             }
             #endregion
+
             return new strDoItWithEndedPosFeedback("Kann nicht geparsed werden: " + txt.Substring(pos));
         }
         //public static void AddScriptComands() {

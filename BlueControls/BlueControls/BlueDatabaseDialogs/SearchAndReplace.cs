@@ -25,6 +25,7 @@ using BlueDatabase;
 using BlueDatabase.EventArgs;
 using System;
 using System.Collections.Generic;
+
 namespace BlueControls.BlueDatabaseDialogs {
     internal sealed partial class SearchAndReplace : Form {
         private readonly Table _BlueTable;
@@ -37,11 +38,13 @@ namespace BlueControls.BlueDatabaseDialogs {
             _BlueTable.CursorPosChanged += CursorPosChanged;
             CursorPosChanged(_BlueTable, new CellEventArgs(_BlueTable.CursorPosColumn(), _BlueTable.CursorPosRow()));
         }
+
         private void CursorPosChanged(object sender, CellEventArgs e) {
             NurinAktuellerSpalte.Text = e.Column == null ? "Nur in der <b>aktuell gewählten Spalte</b> ersetzen."
                                                          : "Nur in Spalte <b>'" + e.Column.ReadableText() + "'</b> ersetzen.";
             Checkbuttons();
         }
+
         private void ers_Click(object sender, System.EventArgs e) {
             if (IsWorking) { return; }
             var SuchText = Alt.Text.Replace(";cr;", "\r").Replace(";tab;", "\t");
@@ -106,6 +109,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             MessageBox.Show(count + " Ersetzung(en) vorgenommen.", enImageCode.Information, "OK");
             IsWorking = false;
         }
+
         private void Alt_TextChange(object sender, System.EventArgs e) => Checkbuttons();
         private void Something_CheckedChanged(object sender, System.EventArgs e) => Checkbuttons();
         private void Checkbuttons() {

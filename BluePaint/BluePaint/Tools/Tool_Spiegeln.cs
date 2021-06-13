@@ -22,6 +22,7 @@ using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using static BlueBasics.modAllgemein;
+
 namespace BluePaint {
     public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserControl // 
     {

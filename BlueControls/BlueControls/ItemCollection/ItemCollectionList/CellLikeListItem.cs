@@ -22,12 +22,14 @@ using BlueControls.Enums;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System.Drawing;
+
 namespace BlueControls.ItemCollection {
     public class CellLikeListItem : BasicListItem {
         // Implements IReadableText
         //http://www.kurztutorial.info/programme/punkt-mm/rechner.html
         // Dim Ausgleich As Double = mmToPixel(1 / 72 * 25.4, 300)
         //   Dim FixZoom As Single = 3.07F
+
         #region  Variablen-Deklarationen 
         /// <summary>
         /// Nach welche Spalte sich der Stil richten muss.
@@ -38,8 +40,12 @@ namespace BlueControls.ItemCollection {
         private readonly enBildTextVerhalten _bildTextverhalten;
         public override string QuickInfo => Internal.CreateHtmlCodes(true); // unveränderter Text
         #endregion
+
+
         #region  Event-Deklarationen + Delegaten 
         #endregion
+
+
         #region  Construktor + Initialize 
         public CellLikeListItem(string internalAndReadableText, ColumnItem columnStyle, enShortenStyle style, bool enabled, enBildTextVerhalten bildTextverhalten) : base(internalAndReadableText) {
             _StyleLikeThis = columnStyle;
@@ -48,8 +54,11 @@ namespace BlueControls.ItemCollection {
             _bildTextverhalten = bildTextverhalten;
         }
         #endregion
+
+
         #region  Properties 
         #endregion
+
         protected override Size ComputeSizeUntouchedForListBox() => Table.FormatedText_NeededSize(_StyleLikeThis, Internal, Skin.GetBlueFont(Parent.ItemDesign, enStates.Standard), _style, 16, _bildTextverhalten);
         protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, bool Translate) {
             if (DrawBorderAndBack) {

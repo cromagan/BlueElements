@@ -17,6 +17,7 @@
 // DEALINGS IN THE SOFTWARE.
 #endregion
 using System;
+
 namespace BlueBasics {
     public static class modErgebnis {
         public static double? Ergebnis(string formel) {

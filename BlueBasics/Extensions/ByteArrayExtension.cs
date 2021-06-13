@@ -18,6 +18,7 @@
 #endregion
 using System.Collections.Generic;
 using System.Text;
+
 namespace BlueBasics {
     public static partial class Extensions {
         // static Encoding enc1252 = CodePagesEncodingProvider.Instance.GetEncoding(1252);

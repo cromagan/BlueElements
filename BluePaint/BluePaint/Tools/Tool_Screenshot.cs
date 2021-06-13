@@ -17,6 +17,7 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 using BlueControls;
+
 namespace BluePaint {
     public partial class Tool_Screenshot {
         public Tool_Screenshot() : base() => InitializeComponent();

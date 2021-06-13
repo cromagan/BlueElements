@@ -24,8 +24,10 @@ using BlueControls.Interfaces;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+
 namespace BlueControls.ItemCollection {
     public class TextPadItem : FormPadItemRectangle, ICanHaveColumnVariables {
+
         #region  Variablen-Deklarationen 
         [Description("Text der angezeigt werden soll.<br>Alternativ kann ein Variablenname im Format &Name; angegeben werden.")]
         public string Interner_Text {
@@ -47,8 +49,12 @@ namespace BlueControls.ItemCollection {
         // Dim Ausgleich As Double = mmToPixel(1 / 72 * 25.4, 300)
         public decimal Skalierung { get; set; } = 3.07m;
         #endregion
+
+
         #region  Event-Deklarationen + Delegaten 
         #endregion
+
+
         #region  Construktor + Initialize 
         public TextPadItem(ItemCollectionPad parent) : this(parent, string.Empty, string.Empty) { }
         public TextPadItem(ItemCollectionPad parent, string internalname, string readableText) : base(parent, internalname) {
@@ -59,6 +65,8 @@ namespace BlueControls.ItemCollection {
             MakeNewETxt();
         }
         #endregion
+
+
         #region  Properties 
         public string Text {
             get; private set;
@@ -80,6 +88,7 @@ namespace BlueControls.ItemCollection {
             }
         }
         #endregion
+
         public override void DesignOrStyleChanged() => MakeNewETxt();
         public override bool ParseThis(string tag, string value) {
             if (base.ParseThis(tag, value)) { return true; }

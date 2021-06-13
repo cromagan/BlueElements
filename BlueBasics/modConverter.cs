@@ -24,8 +24,10 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using static BlueBasics.FileOperations;
+
 namespace BlueBasics {
     public static class modConverter {
+
         #region  Konvertier-Routinen
         //private static readonly string SerialNr2Path_LastSearch = string.Empty;
         //private static readonly string SerialNr2Path_LastErgebnis = string.Empty;
@@ -136,6 +138,7 @@ namespace BlueBasics {
             win = Convert.ToDouble(Geometry.Winkel(0M, 0M, (decimal)ko.X, (decimal)ko.Y));
         }
         #endregion
+
         public static decimal PixelToMM(decimal pixel, int dPI) => pixel / dPI * 25.4M;
         public static decimal mmToPixel(decimal mM, int dPI) => mM * dPI / 25.4M;
         //private static string GetDriveSerialNumber(string drive)

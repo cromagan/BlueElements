@@ -23,6 +23,7 @@ using BlueControls.Enums;
 using BlueControls.Interfaces;
 using System.ComponentModel;
 using System.Drawing;
+
 namespace BlueControls.Forms {
     public partial class Form : System.Windows.Forms.Form, ISupportsBeginnEdit, IUseMyBackColor {
         public Form() : this(enDesign.Form_Standard) { }
@@ -53,6 +54,7 @@ namespace BlueControls.Forms {
         protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) {
             if (!IsClosed && !IsDisposed) { base.OnPaint(e); }
         }
+
         #region  AutoScale deaktivieren 
         // https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
         public new void PerformAutoScale() {
@@ -73,12 +75,14 @@ namespace BlueControls.Forms {
         }
         protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified) => bounds; //MyBase.GetScaledBounds(bounds, factor, specified)
         #endregion
+
         [DefaultValue(enDesign.Form_Standard)]
         public enDesign Design {
             get;
         } = enDesign.Form_Standard;
         [DefaultValue(true)]
         public bool CloseButtonEnabled { get; set; } = true;
+
         #region ISupportsEdit
         [DefaultValue(0)]
         [Browsable(false)]
@@ -120,6 +124,7 @@ namespace BlueControls.Forms {
             base.OnControlAdded(e);
         }
         #endregion
+
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
             //https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.form.closed?view=netframework-4.8
             if (IsClosed) { return; }

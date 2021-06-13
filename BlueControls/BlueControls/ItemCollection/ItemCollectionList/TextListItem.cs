@@ -20,15 +20,21 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
 using System.Drawing;
+
 namespace BlueControls.ItemCollection {
     public class TextListItem : BasicListItem {
+
         #region  Variablen-Deklarationen 
         private string _ReadableText;
         private QuickImage _Symbol;
         //private readonly enDataFormat _Format = enDataFormat.Text;
         #endregion
+
+
         #region  Event-Deklarationen + Delegaten 
         #endregion
+
+
         #region  Construktor + Initialize 
         public TextListItem(string readableText, string internalname, QuickImage symbol, bool isCaption, bool enabled, string userDefCompareKey) : base(internalname) {
             IsCaption = isCaption;
@@ -39,6 +45,8 @@ namespace BlueControls.ItemCollection {
             UserDefCompareKey = userDefCompareKey;
         }
         #endregion
+
+
         #region  Properties 
         public override string QuickInfo => _ReadableText.CreateHtmlCodes(true);
         public string Text {
@@ -58,11 +66,14 @@ namespace BlueControls.ItemCollection {
             }
         }
         #endregion
+
         private enDesign tempDesign(enDesign itemdesign) {
             if (IsCaption) {
                 switch (itemdesign) {
+
                     case enDesign.Item_KontextMenu:
                         return enDesign.Item_KontextMenu_Caption;
+
                     case enDesign.Item_Listbox:
                         return enDesign.Item_Listbox_Caption;
                 }

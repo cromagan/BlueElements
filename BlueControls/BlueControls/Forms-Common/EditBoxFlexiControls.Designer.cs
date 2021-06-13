@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+
 namespace BlueControls.Forms
 {
     partial class EditBoxFlexiControl
@@ -19,6 +20,7 @@ namespace BlueControls.Forms
             }
             base.Dispose(disposing);
         }
+
         #region Windows Form Designer generated code
         /// <summary>
         /// Required method for Designer support - do not modify
@@ -35,5 +37,6 @@ namespace BlueControls.Forms
             this.ResumeLayout(false);
         }
         #endregion
+
     }
 }

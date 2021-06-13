@@ -29,8 +29,10 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using static BlueBasics.FileOperations;
+
 namespace BlueControls.ItemCollection {
     public class BitmapPadItem : FormPadItemRectangle, ICanHaveColumnVariables {
+
         #region  Variablen-Deklarationen 
         public bool Hintergrund_weiß_füllen { get; set; }
         public int Padding;
@@ -39,8 +41,12 @@ namespace BlueControls.ItemCollection {
         [Description("Hier kann ein Platzhalter, der mit dem Code-Generator erzeugt wurde, eingefügt werden.")]
         public string Platzhalter_für_Layout { get; set; }
         #endregion
+
+
         #region  Event-Deklarationen + Delegaten 
         #endregion
+
+
         #region  Construktor + Initialize 
         public BitmapPadItem(ItemCollectionPad parent) : this(parent, string.Empty, null, Size.Empty) { }
         public BitmapPadItem(ItemCollectionPad parent, string internalname, string FileToLoad) : this(parent, internalname, (Bitmap)BitmapExt.Image_FromFile(FileToLoad), Size.Empty) { }
@@ -57,6 +63,8 @@ namespace BlueControls.ItemCollection {
             Stil = PadStyles.Undefiniert; // Kein Rahmen
         }
         #endregion
+
+
         #region  Properties 
         public Bitmap Bitmap { get; set; }
         public void Bildschirmbereich_wählen() {
@@ -80,6 +88,7 @@ namespace BlueControls.ItemCollection {
             Bitmap = (Bitmap)BitmapExt.Image_FromFile(e.FileName);
         }
         #endregion
+
         protected override string ClassId() => "IMAGE";
         protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
             DCoordinates.Inflate(-Padding, -Padding);
@@ -89,10 +98,12 @@ namespace BlueControls.ItemCollection {
             if (Bitmap != null) {
                 r3 = new RectangleF(0, 0, Bitmap.Width, Bitmap.Height);
                 switch (Bild_Modus) {
+
                     case enSizeModes.Verzerren: {
                             r2 = r1;
                             break;
                         }
+
                     case enSizeModes.BildAbschneiden: {
                             var scale = (float)Math.Max((DCoordinates.Width - (Padding * 2)) / (double)Bitmap.Width, (DCoordinates.Height - (Padding * 2)) / (double)Bitmap.Height);
                             var tmpw = (DCoordinates.Width - (Padding * 2)) / scale;
@@ -152,20 +163,26 @@ namespace BlueControls.ItemCollection {
         public override bool ParseThis(string tag, string value) {
             if (base.ParseThis(tag, value)) { return true; }
             switch (tag) {
+
                 case "stretchallowed": // ALT
                     return true;
+
                 case "modus":
                     Bild_Modus = (enSizeModes)int.Parse(value);
                     return true;
+
                 case "whiteback":
                     Hintergrund_weiß_füllen = value.FromPlusMinus();
                     return true;
+
                 case "padding":
                     Padding = int.Parse(value);
                     return true;
+
                 case "image":
                     Bitmap = modConverter.Base64ToBitmap(value);
                     return true;
+
                 case "placeholder":
                     Platzhalter_für_Layout = value.FromNonCritical();
                     return true;

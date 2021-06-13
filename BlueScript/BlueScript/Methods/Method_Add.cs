@@ -18,6 +18,7 @@
 #endregion
 using Skript.Enums;
 using System.Collections.Generic;
+
 namespace BlueScript {
     internal class Method_Add : Method {
         public override string Syntax => "Add(List-Variable, Value1, Value2, ...);";

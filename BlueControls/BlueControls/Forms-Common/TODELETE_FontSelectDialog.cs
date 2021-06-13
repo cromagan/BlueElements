@@ -21,6 +21,7 @@ using BlueBasics.Enums;
 using BlueControls.ItemCollection;
 using System;
 using System.Drawing;
+
 namespace BlueControls.Forms {
     public partial class FontSelectDialog {
         private bool Adding;
@@ -73,6 +74,7 @@ namespace BlueControls.Forms {
             Font = BlueFont.Get(Skin.DummyStandardFont); //, False, False, False, False, False, "000000", "", False)
             UpdateSampleText();
         }
+
         public new BlueFont Font {
             get => BlueFont.Get(FName.Item.Checked()[0].Internal, float.Parse(FSize.Item.Checked()[0].Internal), fFett.Checked, fKursiv.Checked, fUnterstrichen.Checked, fDurchge.Checked, fOutline.Checked, QuickImage.Get(cFarbe.ImageCode).ChangeGreenTo, QuickImage.Get(cRandF.ImageCode).ChangeGreenTo, fKap.Checked, OnlyUpper.Checked, OnlyLow.Checked);
             set {
@@ -98,10 +100,12 @@ namespace BlueControls.Forms {
                 UpdateSampleText();
             }
         }
+
         private void UpdateSampleText() {
             if (Adding) { return; }
             Sample.Image = Font.SampleText().Bitmap;
         }
+
         private void FName_Item_CheckedChanged(object sender, System.EventArgs e) => UpdateSampleText();
         private void fFett_CheckedChanged(object sender, System.EventArgs e) => UpdateSampleText();
         private void cFarbe_Click(object sender, System.EventArgs e) {
@@ -110,12 +114,14 @@ namespace BlueControls.Forms {
             cFarbe.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", ColorDia.Color.ToHTMLCode()).ToString();
             UpdateSampleText();
         }
+
         private void cRandF_Click(object sender, System.EventArgs e) {
             ColorDia.Color = QuickImage.Get(cRandF.ImageCode).ChangeGreenTo.FromHTMLCode();
             ColorDia.ShowDialog();
             cRandF.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", ColorDia.Color.ToHTMLCode()).ToString();
             UpdateSampleText();
         }
+
         private void Ok_Click(object sender, System.EventArgs e) => Close();
     }
 }

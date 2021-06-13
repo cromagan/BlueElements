@@ -19,6 +19,7 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using static BlueBasics.Extensions;
+
 namespace BluePaint {
     public partial class Tool_Resize : GenericTool //BlueControls.Forms.Form //
     {
@@ -27,6 +28,7 @@ namespace BluePaint {
             capInfo.Text = "Bitte Skalierung in Prozent eingeben";
             flxProzent.ValueSet("100", true, false);
         }
+
         private void DoCapInfo() {
             var p = OnNeedCurrentPic();
             if (p == null) {
@@ -46,6 +48,7 @@ namespace BluePaint {
             }
             capInfo.Text = "Zielgröße: " + (int)(p.Width * pr) + " x " + (int)(p.Height * pr) + " Pixel";
         }
+
         private void btnDoResize_Click(object sender, System.EventArgs e) {
             var p = OnNeedCurrentPic();
             if (p == null) { return; }
@@ -60,6 +63,7 @@ namespace BluePaint {
             OnCommandForMacro("ResizeProzent;" + flxProzent.Value);
             DoCapInfo();
         }
+
         public override string MacroKennung() => "Resize";
         public override void ExcuteCommand(string command) {
             var c = command.SplitBy(";");
@@ -70,6 +74,7 @@ namespace BluePaint {
                 Develop.DebugPrint_NichtImplementiert();
             }
         }
+
         private void flxProzent_ValueChanged(object sender, System.EventArgs e) => DoCapInfo();
         public override void PictureChangedByMainWindow() {
             base.PictureChangedByMainWindow();

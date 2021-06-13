@@ -1,5 +1,6 @@
 ﻿using BlueControls.Controls;
 using System.ComponentModel;
+
 namespace BlueControls.BlueDatabaseDialogs
 {
     partial class tabAdministration
@@ -20,6 +21,7 @@ namespace BlueControls.BlueDatabaseDialogs
             }
             base.Dispose(disposing);
         }
+
         #region Vom Komponenten-Designer generierter Code
         /// <summary> 
         /// Erforderliche Methode für die Designerunterstützung. 
@@ -188,6 +190,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.ResumeLayout(false);
         }
         #endregion
+
         internal GroupBox grpAllgemein;
         internal Button btnSpaltenUebersicht;
         private Button btnDatenbankKopf;

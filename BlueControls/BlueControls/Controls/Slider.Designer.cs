@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Drawing;
 using BlueControls.Enums;
+
 namespace BlueControls.Controls
 {
     public partial class Slider : GenericControl

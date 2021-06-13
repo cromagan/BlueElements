@@ -23,6 +23,7 @@ using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using System.Collections.Generic;
+
 namespace BlueControls.Forms {
     public partial class RelationDiagram : PadEditor {
         private Database Database;

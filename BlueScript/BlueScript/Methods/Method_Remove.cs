@@ -19,6 +19,7 @@
 using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
+
 namespace BlueScript {
     internal class Method_Remove : Method {
         public override string Syntax => "Remove(ListVariable, CaseSensitive, Value1, Value2, ...);";

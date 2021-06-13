@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+
 namespace BlueControls.Controls
 {
     public partial class Formula

@@ -27,15 +27,21 @@ using System.Text.RegularExpressions;
 using static BlueBasics.Extensions;
 using static BlueBasics.modAllgemein;
 using static BlueBasics.modConverter;
+
 namespace BlueDatabase {
     public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
+
         #region  Variablen-Deklarationen 
         private Database _database;
         private bool disposedValue;
         #endregion
+
+
         #region  Event-Deklarationen + Delegaten 
         public event EventHandler<CellEventArgs> CellValueChanged;
         #endregion
+
+
         #region  Construktor + Initialize 
         public void Initialize() => Clear();
         public CellCollection(Database database) : base() {
@@ -45,6 +51,7 @@ namespace BlueDatabase {
             Initialize();
         }
         #endregion
+
         public void Delete(ColumnItem Column, int RowKey) {
             var CellKey = KeyOfCell(Column.Key, RowKey);
             if (!ContainsKey(CellKey)) { return; }
@@ -674,7 +681,9 @@ namespace BlueDatabase {
                 ? LanguageTool.DoTranslate("Sie haben nicht die nötigen Rechte, um diesen Wert zu ändern.")
                 : string.Empty;
         }
+
         #region Get / Set
+
         #region String
         public string GetString(string columnName, RowItem row) => GetString(_database.Column[columnName], row);
         public string GetString(ColumnItem column, RowItem row) // Main Method
@@ -707,6 +716,8 @@ namespace BlueDatabase {
             SetValueBehindLinkedValue(column, row, value);
         }
         #endregion
+
+
         #region Boolean
         public bool GetBoolean(string columnName, RowItem row) => GetBoolean(_database.Column[columnName], row);
         public bool GetBoolean(ColumnItem column, RowItem row) // Main Method
@@ -714,6 +725,8 @@ namespace BlueDatabase {
         public void Set(string columnName, RowItem row, bool value) => Set(_database.Column[columnName], row, value.ToPlusMinus());
         public void Set(ColumnItem column, RowItem row, bool value) => Set(column, row, value.ToPlusMinus());
         #endregion
+
+
         #region DateTime
         public DateTime GetDateTime(string columnName, RowItem row) => GetDateTime(_database.Column[columnName], row);
         public DateTime GetDateTime(ColumnItem column, RowItem row) // Main Method
@@ -724,6 +737,8 @@ namespace BlueDatabase {
         public void Set(string columnName, RowItem row, DateTime value) => Set(_database.Column[columnName], row, value.ToString(Constants.Format_Date5));
         public void Set(ColumnItem column, RowItem row, DateTime value) => Set(column, row, value.ToString(Constants.Format_Date5));
         #endregion
+
+
         #region List<String>
         public List<string> GetList(string columnName, RowItem row) => GetList(_database.Column[columnName], row);
         public List<string> GetList(ColumnItem column, RowItem row) // Main Method
@@ -731,6 +746,8 @@ namespace BlueDatabase {
         public void Set(string columnName, RowItem row, List<string> value) => Set(_database.Column[columnName], row, value);
         public void Set(ColumnItem column, RowItem row, List<string> value) => Set(column, row, value.JoinWithCr());
         #endregion
+
+
         #region Point
         public Point GetPoint(string columnName, RowItem row) => GetPoint(_database.Column[columnName], row);
         public Point GetPoint(ColumnItem column, RowItem row) // Main Method
@@ -744,6 +761,8 @@ namespace BlueDatabase {
             // {X=253,Y=194} MUSS ES SEIN, prüfen
             Set(column, row, value.ToString());
         #endregion
+
+
         #region int
         public int GetInteger(string columnName, RowItem row) => GetInteger(_database.Column[columnName], row);
         public int GetInteger(ColumnItem column, RowItem row) // Main Method
@@ -754,6 +773,8 @@ namespace BlueDatabase {
         public void Set(string columnName, RowItem row, int value) => Set(_database.Column[columnName], row, value.ToString());
         public void Set(ColumnItem column, RowItem row, int value) => Set(column, row, value.ToString());
         #endregion
+
+
         #region double
         public double GetDouble(string columnName, RowItem row) => GetDouble(_database.Column[columnName], row);
         public double GetDouble(ColumnItem column, RowItem row) // Main Method
@@ -764,6 +785,8 @@ namespace BlueDatabase {
         public void Set(string columnName, RowItem row, double value) => Set(_database.Column[columnName], row, value.ToString());
         public void Set(ColumnItem column, RowItem row, double value) => Set(column, row, value.ToString());
         #endregion
+
+
         #region decimal
         public decimal GetDecimal(string columnName, RowItem row) => GetDecimal(_database.Column[columnName], row);
         public decimal GetDecimal(ColumnItem column, RowItem row) // Main Method
@@ -774,6 +797,8 @@ namespace BlueDatabase {
         public void Set(string columnName, RowItem row, decimal value) => Set(_database.Column[columnName], row, value.ToString());
         public void Set(ColumnItem column, RowItem row, decimal value) => Set(column, row, value.ToString());
         #endregion
+
+
         #region Color
         public Color GetColor(string columnName, RowItem row) => GetColor(_database.Column[columnName], row);
         public Color GetColor(ColumnItem column, RowItem row) // Main Method
@@ -794,6 +819,7 @@ namespace BlueDatabase {
         //{
         //}
         #endregion
+
         /// <summary>
         /// Gibt einen Datainamen/Pfad zurück, der sich aus dem Standard Angaben der Spalte und den Zelleninhalt zusammensetzt.
         /// Keine Garantie, dass die Datei auch existiert.
@@ -821,6 +847,7 @@ namespace BlueDatabase {
             return (colorBlue << 16) | (colorGreen << 8) | colorRed;
         }
         #endregion
+
         public bool IsNullOrEmpty(string ColumnName, RowItem Row) => IsNullOrEmpty(_database.Column[ColumnName], Row);
         public bool IsNullOrEmpty(string CellKey) {
             DataOfCellKey(CellKey, out var Column, out var Row);

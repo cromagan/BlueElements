@@ -32,8 +32,10 @@ using System.Drawing.Imaging;
 //Inherits ContainerControl -> ?
 //Inherits Panel '-> Alles ist ein Container!
 //Inherits ScrollableControl - > keine Tastatur/Mouseabfragen
+
 namespace BlueControls.Controls {
     public class GenericControl : System.Windows.Forms.Control, ISupportsBeginnEdit {
+
         #region Constructor
         protected GenericControl() : this(false, false) { }
         protected GenericControl(bool DoubleBuffer, bool UseBackgroundBitmap) : base() {
@@ -54,6 +56,8 @@ namespace BlueControls.Controls {
             Translate = true;
         }
         #endregion
+
+
         #region  Standard-Variablen 
         private bool _MousePressing;
         protected bool _MouseHighlight = true;
@@ -62,6 +66,7 @@ namespace BlueControls.Controls {
         private Bitmap _BitmapOfControl;
         private bool _GeneratingBitmapOfControl;
         #endregion
+
         protected override void Dispose(bool disposing) {
             base.Dispose(disposing);
             if (disposing) {
@@ -73,6 +78,7 @@ namespace BlueControls.Controls {
         protected virtual void DrawControl(Graphics gr, enStates state) => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
         [DefaultValue(true)]
         public bool Translate { get; set; }
+
         #region  AutoScale deaktivieren 
         // https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
         public void PerformAutoScale() {
@@ -93,6 +99,7 @@ namespace BlueControls.Controls {
         }
         protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified) => bounds; //MyBase.GetScaledBounds(bounds, factor, specified)
         #endregion
+
         protected override void WndProc(ref System.Windows.Forms.Message m) {
             try {
                 //https://www.vb-paradise.de/allgemeines/tipps-tricks-und-tutorials/windows-forms/50038-wndproc-kleine-liste-aller-messages/
@@ -105,6 +112,7 @@ namespace BlueControls.Controls {
         protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) =>
             // MyBase.OnPaint(e) - comment out - do not call  http://stackoverflow.com/questions/592538/how-to-create-a-transparent-control-which-works-when-on-top-of-other-controls
             DoDraw(e.Graphics);
+
         #region  QuickInfo 
         // Dieser Codeblock ist im Interface IQuickInfo herauskopiert und muss überall Identisch sein.
         private string _QuickInfo = "";
@@ -127,6 +135,8 @@ namespace BlueControls.Controls {
         }
         public virtual string QuickInfoText => _QuickInfo;
         #endregion
+
+
         #region ISupportsEdit
         [DefaultValue(0)]
         [Browsable(false)]
@@ -168,6 +178,7 @@ namespace BlueControls.Controls {
             base.OnControlAdded(e);
         }
         #endregion
+
         /// <summary>
         /// Veranlaßt, das das Control neu gezeichnet wird.
         /// </summary>
@@ -255,6 +266,7 @@ namespace BlueControls.Controls {
             }
             return S;
         }
+
         #region  Focus-Verwaltung 
         protected override void OnGotFocus(System.EventArgs e) {
             if (IsDisposed) { return; }
@@ -275,6 +287,8 @@ namespace BlueControls.Controls {
             }
         }
         #endregion
+
+
         #region  Key-Verwaltung 
         protected override void OnKeyDown(System.Windows.Forms.KeyEventArgs e) {
             if (IsDisposed) { return; }
@@ -289,6 +303,8 @@ namespace BlueControls.Controls {
             base.OnKeyUp(e);
         }
         #endregion
+
+
         #region  MousePos-Verwaltung 
         protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
             lock (this) {
@@ -353,6 +369,7 @@ namespace BlueControls.Controls {
             base.OnSizeChanged(e);
         }
         #endregion
+
         public Bitmap BitmapOfControl() {
             if (!_UseBackBitmap || _GeneratingBitmapOfControl) { return null; }
             _GeneratingBitmapOfControl = true;
@@ -371,8 +388,10 @@ namespace BlueControls.Controls {
         }
         public static enPartentType Typ(System.Windows.Forms.Control control) {
             switch (control) {
+
                 case null:
                     return enPartentType.Nothing;
+
                 case GroupBox _: {
                         if (control.Parent is TabPage TP) {
                             if (TP.Parent == null) { return enPartentType.Unbekannt; }
@@ -380,54 +399,77 @@ namespace BlueControls.Controls {
                         }
                         return enPartentType.GroupBox;
                     }
+
                 case LastFilesCombo _:
                     return enPartentType.LastFilesCombo;
                 //Is = "BlueBasics.ComboBox"
+
                 case ComboBox _ when ((ComboBox)control).ParentType() == enPartentType.RibbonPage:
                     return enPartentType.RibbonBarCombobox;
+
                 case ComboBox _:
                     return enPartentType.ComboBox;
                 // Is = "BlueBasics.TabControl"
+
                 case RibbonBar _:
                     return enPartentType.RibbonControl;
+
                 case TabControl _:
                     return enPartentType.TabControl;
                 // Is = "BlueBasics.TabPage"
+
                 case tabAdministration _:
+
                 case TabPage _ when control.Parent is RibbonBar:
                     return enPartentType.RibbonPage;
+
                 case TabPage _:
                     return enPartentType.TabPage;
                 //Is = "BlueBasics.Slider"
+
                 case Slider _:
                     return enPartentType.Slider;
                 //Is = "FRMMSGBOX"
+
                 case FloatingForm _:
                     return enPartentType.MsgBox;
+
                 case DialogWithOkAndCancel _:
                     return enPartentType.MsgBox;
+
                 case TextBox _:
                     return enPartentType.TextBox;
+
                 case ListBox _:
                     return enPartentType.ListBox;
+
                 case EasyPic _:
                     return enPartentType.EasyPic;
+
                 case Button _:
                     return enPartentType.Button;
+
                 case Line _:
                     return enPartentType.Line;
+
                 case Caption _:
                     return enPartentType.Caption;
+
                 case Formula _:
                     return enPartentType.Formula;
+
                 case Form _:
                     return enPartentType.Form;
+
                 case Table _:
                     return enPartentType.Table;
+
                 case System.Windows.Forms.Panel _:
                     return enPartentType.Panel;
+
                 case FlexiControlForCell _:
                     return enPartentType.FlexiControlForCell;
+
                 case FlexiControl _:
                     return enPartentType.FlexiControl;
                 default:
@@ -454,8 +496,10 @@ namespace BlueControls.Controls {
             Develop.DebugPrint_Disposed(o.IsDisposed);
             do {
                 switch (o) {
+
                     case null:
                         return null;
+
                     case Form frm:
                         return frm;
                     default:

@@ -24,6 +24,7 @@ using BlueControls.Forms;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using static BlueBasics.FileOperations;
+
 namespace BlueControls.BlueDatabaseDialogs {
     internal partial class LayoutDesigner : PadEditor {
         public Database Database { get; private set; }

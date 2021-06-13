@@ -17,6 +17,7 @@
 // DEALINGS IN THE SOFTWARE. 
 #endregion
 using System.Collections.Generic;
+
 namespace BlueControls.ItemCollection {
     internal class clsPhysicPadItem : clsAbstractPhysicPadItem {
         public readonly List<clsKraft> Kraft = new();

@@ -19,26 +19,36 @@
 using BlueBasics.Enums;
 using System;
 using System.Drawing;
+
 namespace BlueBasics {
     public static partial class Extensions {
         public static PointF PointOf(this RectangleF r, enAlignment p) {
             switch (p) {
+
                 case enAlignment.Bottom_Left:
                     return new PointF(r.Left, r.Bottom);
+
                 case enAlignment.Bottom_Right:
                     return new PointF(r.Right, r.Bottom);
+
                 case enAlignment.Top_Left:
                     return new PointF(r.Left, r.Top);
+
                 case enAlignment.Top_Right:
                     return new PointF(r.Right, r.Top);
+
                 case enAlignment.Bottom_HorizontalCenter:
                     return new PointF((int)(r.Left + (r.Width / 2.0)), r.Bottom);
+
                 case enAlignment.Top_HorizontalCenter:
                     return new PointF((int)(r.Left + (r.Width / 2.0)), r.Top);
+
                 case enAlignment.VerticalCenter_Left:
                     return new PointF(r.Left, (int)(r.Top + (r.Height / 2.0)));
+
                 case enAlignment.VerticalCenter_Right:
                     return new PointF(r.Right, (int)(r.Top + (r.Height / 2.0)));
+
                 case enAlignment.Horizontal_Vertical_Center:
                     return new Point((int)(r.Left + (r.Width / 2.0)), (int)(r.Top + (r.Height / 2.0)));
                 default:
@@ -46,6 +56,7 @@ namespace BlueBasics {
                     return Point.Empty;
             }
         }
+
         public static PointF NearestCornerOF(this RectangleF r, Point p) {
             var LO = r.PointOf(enAlignment.Top_Left);
             var rO = r.PointOf(enAlignment.Top_Right);
@@ -58,6 +69,7 @@ namespace BlueBasics {
             var Erg = Math.Min(Math.Min(llo, lro), Math.Min(llu, lru));
             return Erg == llo ? LO : Erg == lro ? rO : Erg == llu ? lu : Erg == lru ? ru : Point.Empty;
         }
+
         public static Rectangle ToRect(this RectangleF r) => new((int)r.X, (int)r.Y, (int)r.Width, (int)r.Height);
     }
 }
