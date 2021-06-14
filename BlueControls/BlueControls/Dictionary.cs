@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Forms;
@@ -32,25 +28,22 @@ using System.Threading;
 namespace BlueControls {
 
     internal static class Dictionary {
+
+        #region Fields
+
+        public static bool IsSpellChecking;
         internal static object Lock_SpellChecking = new();
         private static Database _DictWords;
-        public static bool IsSpellChecking;
 
-        private static void Init() => _DictWords = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Deutsch.MDB", "Dictionary", true, false);
+        #endregion
 
-        //Sub Release()
-        //    If _DictWords IsNot Nothing AndAlso Not _DictWords.IsDisposed Then
-        //        _DictWords.Releasex()
-        //    End If
-        //End Sub
+        #region Methods
         public static bool DictionaryRunning(bool TryToInit) {
             if (TryToInit && _DictWords == null) {
                 Init();
             }
             return _DictWords != null;
         }
-
-        public static bool IsWriteable() => _DictWords != null && !string.IsNullOrEmpty(_DictWords.Filename);
 
         public static bool IsWordOk(string Word) {
             if (!DictionaryRunning(true)) { return true; }
@@ -65,6 +58,8 @@ namespace BlueControls {
             }
             return _DictWords.Row[Word] != null;
         }
+
+        public static bool IsWriteable() => _DictWords != null && !string.IsNullOrEmpty(_DictWords.Filename);
 
         public static List<string> SimilarTo(string Word) {
             if (IsWordOk(Word)) { return null; }
@@ -138,5 +133,9 @@ namespace BlueControls {
             if (_DictWords.Row[Wort] != null) { _DictWords.Row.Remove(_DictWords.Row[Wort]); }
             _DictWords.Row.Add(Wort);
         }
+
+        private static void Init() => _DictWords = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Deutsch.MDB", "Dictionary", true, false);
+
+        #endregion
     }
 }

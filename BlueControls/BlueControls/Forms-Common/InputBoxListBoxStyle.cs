@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
@@ -28,9 +24,14 @@ using System.Collections.Generic;
 namespace BlueControls.Forms {
 
     public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
+
+        #region Fields
+
         private List<string> GiveBack = null;
 
-        #region Konstruktor
+        #endregion
+
+        #region Constructors
 
         private InputBoxListBoxStyle() : base() => InitializeComponent();
 
@@ -48,7 +49,9 @@ namespace BlueControls.Forms {
             Setup(TXT, txbText, 250, CancelErl, true);
         }
 
-        #endregion Konstruktor
+        #endregion
+
+        #region Methods
 
         public static string Show(string TXT, List<string> Items) {
             if (Items == null || Items.Count == 0) {
@@ -69,8 +72,10 @@ namespace BlueControls.Forms {
             return MB.GiveBack;
         }
 
+        protected override void SetValue(bool canceled) => GiveBack = canceled ? null : txbText.Item.Checked().ToListOfString();
+
         private void InputBox_Shown(object sender, System.EventArgs e) => txbText.Focus();
 
-        protected override void SetValue(bool canceled) => GiveBack = canceled ? null : txbText.Item.Checked().ToListOfString();
+        #endregion
     }
 }

@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
@@ -26,17 +22,23 @@ using System.Collections.Generic;
 namespace BlueScript {
 
     internal class Method_Remove : Method {
-        public override string Syntax => "Remove(ListVariable, CaseSensitive, Value1, Value2, ...);";
+
+        #region Properties
+
+        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List, enVariableDataType.Bool, enVariableDataType.String_or_List };
         public override string Description => "Entfernt aus der Liste die angegebenen Werte.";
-
-        public override List<string> Comand(Script s) => new() { "remove" };
-
-        public override string StartSequence => "(";
+        public override bool EndlessArgs => true;
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.Null;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List, enVariableDataType.Bool, enVariableDataType.String_or_List };
-        public override bool EndlessArgs => true;
+        public override string StartSequence => "(";
+        public override string Syntax => "Remove(ListVariable, CaseSensitive, Value1, Value2, ...);";
+
+        #endregion
+
+        #region Methods
+
+        public override List<string> Comand(Script s) => new() { "remove" };
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
@@ -53,5 +55,7 @@ namespace BlueScript {
             attvar.Attributes[0].ValueListString = tmpList;
             return new strDoItFeedback();
         }
+
+        #endregion
     }
 }

@@ -6,9 +6,14 @@ using static BlueBasics.Develop;
 namespace BlueControls.Forms {
 
     public partial class DialogWithOkAndCancel : Form {
+
+        #region Fields
+
         private bool _cancelPossible = false;
 
-        #region Konstruktor
+        #endregion
+
+        #region Constructors
 
         public DialogWithOkAndCancel() : this(enDesign.Form_MsgBox) {
         }
@@ -21,7 +26,18 @@ namespace BlueControls.Forms {
             }
         }
 
-        #endregion Konstruktor
+        #endregion
+
+        #region Properties
+
+        protected bool OK_Enabled {
+            get => butOK.Enabled;
+            set => butOK.Enabled = value;
+        }
+
+        #endregion
+
+        #region Methods
 
         public void Setup(int MinWidth, int BottomOfLowestControl, bool CancelPossible, bool Sizeable) {
             Text = AppName();
@@ -66,29 +82,15 @@ namespace BlueControls.Forms {
             }
         }
 
-        /// <summary>
-        /// Diese Routine wird aufgerufen, nachdem OK oder Cancel gedrückt wurde.
-        /// </summary>
-        protected virtual void SetValue(bool canceled) => DebugPrint_RoutineMussUeberschriebenWerden();
-
-        protected void Ok() {
-            SetValue(false);
-            Close();
-        }
-
         protected void Cancel() {
             SetValue(true);
             Close();
         }
 
-        private void butAbbrechen_Click(object sender, System.EventArgs e) => Cancel();
-
-        protected bool OK_Enabled {
-            get => butOK.Enabled;
-            set => butOK.Enabled = value;
+        protected void Ok() {
+            SetValue(false);
+            Close();
         }
-
-        private void butOK_Click(object sender, System.EventArgs e) => Ok();
 
         /// <summary>
         /// Must handle some layout operations manually because Visual Studio
@@ -111,5 +113,16 @@ namespace BlueControls.Forms {
                 }
             }
         }
+
+        /// <summary>
+        /// Diese Routine wird aufgerufen, nachdem OK oder Cancel gedrückt wurde.
+        /// </summary>
+        protected virtual void SetValue(bool canceled) => DebugPrint_RoutineMussUeberschriebenWerden();
+
+        private void butAbbrechen_Click(object sender, System.EventArgs e) => Cancel();
+
+        private void butOK_Click(object sender, System.EventArgs e) => Ok();
+
+        #endregion
     }
 }

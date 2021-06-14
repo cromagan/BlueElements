@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueControls.ItemCollection;
 using System.Collections.Generic;
 
@@ -26,8 +22,16 @@ namespace BlueControls.EventArgs {
 
     public class ListOfBasicListItemEventArgs : System.EventArgs {
 
+        #region Constructors
+
         public ListOfBasicListItemEventArgs(List<BasicListItem> items) => Items = items;
 
+        #endregion
+
+        #region Properties
+
         public List<BasicListItem> Items { get; }
+
+        #endregion
     }
 }

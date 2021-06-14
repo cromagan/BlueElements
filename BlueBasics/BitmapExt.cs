@@ -36,7 +36,7 @@ namespace BlueBasics {
 
         public PixelFormat _pixelformat = PixelFormat.Format32bppArgb;
 
-        #endregion Fields
+        #endregion
 
         #region Constructors
 
@@ -56,7 +56,7 @@ namespace BlueBasics {
         /// <param name="bmp"></param>
         public BitmapExt(Bitmap bmp) => SetBitmap(bmp);
 
-        #endregion Constructors
+        #endregion
 
         #region Properties
 
@@ -67,7 +67,7 @@ namespace BlueBasics {
         public int Width { get; private set; }
         protected GCHandle BitsHandle { get; private set; }
 
-        #endregion Properties
+        #endregion
 
         #region Methods
 
@@ -305,6 +305,6 @@ namespace BlueBasics {
             }
         }
 
-        #endregion Methods
+        #endregion
     }
 }

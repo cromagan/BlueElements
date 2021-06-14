@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -33,19 +29,97 @@ using System.Drawing;
 namespace BlueControls.ItemCollection {
 
     public abstract class BasicPadItem : IParseable, ICloneable, IChangedFeedback, IMoveable {
-        private static string UniqueInternal_LastTime = "InitialDummy";
-        private static int UniqueInternal_Count;
-        public readonly ItemCollectionPad Parent = null;
-        public RectangleM tmpUsedArea = null;
-        public virtual string QuickInfo { get; set; } = string.Empty;
 
-        #region Event-Deklarationen + Delegaten
+        #region Fields
+
+        public readonly ListExt<PointM> MovablePoint = new();
+        public readonly ItemCollectionPad Parent = null;
+        public readonly List<PointM> PointsForSuccesfullyMove = new();
+        public RectangleM tmpUsedArea = null;
+        protected int _ZoomPadding = 0;
+        private static int UniqueInternal_Count;
+        private static string UniqueInternal_LastTime = "InitialDummy";
+
+        /// <summary>
+        /// Falls eine Spezielle Information gespeichert und zurückgegeben werden soll
+        /// </summary>
+        /// <remarks></remarks>
+        private readonly List<string> _Tags = new();
+
+        /// <summary>
+        /// Soll es gedruckt werden?
+        /// </summary>
+        /// <remarks></remarks>
+        private bool _Bei_Export_sichtbar = true;
+
+        private PadStyles _Style = PadStyles.Undefiniert;
+
+        #endregion
+
+        #region Constructors
+
+        protected BasicPadItem(ItemCollectionPad parent, string internalname) {
+            Parent = parent;
+            Internal = string.IsNullOrEmpty(internalname) ? UniqueInternal() : internalname;
+            if (string.IsNullOrEmpty(Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
+            MovablePoint.ItemAdded += Points_ItemAdded;
+            MovablePoint.ItemRemoving += Points_ItemRemoving;
+        }
+
+        #endregion
+
+        #region Events
 
         public event EventHandler Changed;
 
-        #endregion Event-Deklarationen + Delegaten
+        #endregion
+
+        #region Properties
+
+        [Description("Wird bei einem Export (wie z. B. Drucken) nur angezeigt, wenn das Häkchen gesetzt ist.")]
+        public bool Bei_Export_sichtbar {
+            get => _Bei_Export_sichtbar;
+            set {
+                if (_Bei_Export_sichtbar == value) { return; }
+                _Bei_Export_sichtbar = value;
+                OnChanged();
+            }
+        }
+
+        /// <summary>
+        /// Wird ein Element gelöscht, das diese Feld befüllt hat, werden automatisch alle andern Elemente mit der selben Gruppe gelöscht.
+        /// </summary>
+        [Description("Alle Elemente, die der selben Gruppe angehören, werden beim Löschen eines Elements ebenfalls gelöscht.")]
+        public string Gruppenzugehörigkeit { get; set; } = string.Empty;
 
         public string Internal { get; private set; }
+        public bool IsParsing { get; private set; }
+        public virtual string QuickInfo { get; set; } = string.Empty;
+
+        public PadStyles Stil {
+            get => _Style;
+            set {
+                if (_Style == value) { return; }
+                _Style = value;
+                DesignOrStyleChanged();
+                PointMoved(null);
+            }
+        }
+
+        public List<string> Tags => _Tags;
+
+        public int ZoomPadding {
+            get => _ZoomPadding;
+            set {
+                if (_ZoomPadding == value) { return; }
+                _ZoomPadding = value;
+                OnChanged();
+            }
+        }
+
+        #endregion
+
+        #region Methods
 
         public static BasicPadItem NewByParsing(ItemCollectionPad parent, string code) {
             BasicPadItem i = null;
@@ -148,34 +222,6 @@ namespace BlueControls.ItemCollection {
             return i;
         }
 
-        public virtual void DesignOrStyleChanged() {
-        }
-
-        protected BasicPadItem(ItemCollectionPad parent, string internalname) {
-            Parent = parent;
-            Internal = string.IsNullOrEmpty(internalname) ? UniqueInternal() : internalname;
-            if (string.IsNullOrEmpty(Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
-            MovablePoint.ItemAdded += Points_ItemAdded;
-            MovablePoint.ItemRemoving += Points_ItemRemoving;
-        }
-
-        private void Points_ItemRemoving(object sender, BlueBasics.EventArgs.ListEventArgs e) {
-            if (e.Item is PointM P) {
-                P.Moved -= Point_Moved;
-            }
-        }
-
-        private void Point_Moved(object sender, System.EventArgs e) {
-            PointMoved((PointM)sender);
-            OnChanged();
-        }
-
-        private void Points_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
-            if (e.Item is PointM P) {
-                P.Moved += Point_Moved;
-            }
-        }
-
         public static string UniqueInternal() {
             var NeueZeit = DateTime.Now + " " + DateTime.Now.Millisecond;
             if (NeueZeit == UniqueInternal_LastTime) {
@@ -187,7 +233,9 @@ namespace BlueControls.ItemCollection {
             return "Auto " + NeueZeit + " IDX" + UniqueInternal_Count;
         }
 
-        public virtual void PointMoved(PointM point) {
+        public object Clone() {
+            var t = ToString();
+            return NewByParsing(Parent, t);
         }
 
         /// <summary>
@@ -195,81 +243,102 @@ namespace BlueControls.ItemCollection {
         /// Der Zoomfaktor wird nur benötigt, um Maßstabsunabhängige Punkt oder Linienberührungen zu berechnen.
         /// </summary>
         /// <remarks></remarks>
-        public virtual bool Contains(PointF value, decimal zoomfactor) {
+        public virtual bool Contains(PointF value, double zoomfactor) {
             var tmp = (RectangleF)UsedArea(); // Umwandlung, um den Bezug zur Klasse zu zerstören
             var ne = (float)(-5 / zoomfactor) + 1;
             tmp.Inflate(ne, ne);
             return tmp.Contains(value);
         }
 
-        protected abstract void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting);
-
-        protected abstract string ClassId();
-
-        /// <summary>
-        /// Gibt den Bereich zurück, den das Element benötigt, um komplett dargestellt zu werden. Unabhängig von der aktuellen Ansicht.
-        /// </summary>
-        /// <remarks></remarks>
-        public RectangleM UsedArea() {
-            if (tmpUsedArea == null) { tmpUsedArea = CalculateUsedArea(); }
-            return tmpUsedArea;
+        public virtual void DesignOrStyleChanged() {
         }
 
-        protected abstract RectangleM CalculateUsedArea();
-
-        /// <summary>
-        /// Falls eine Spezielle Information gespeichert und zurückgegeben werden soll
-        /// </summary>
-        /// <remarks></remarks>
-        private readonly List<string> _Tags = new();
-
-        /// <summary>
-        /// Soll es gedruckt werden?
-        /// </summary>
-        /// <remarks></remarks>
-        private bool _Bei_Export_sichtbar = true;
-
-        protected int _ZoomPadding = 0;
-        public readonly ListExt<PointM> MovablePoint = new();
-        public readonly List<PointM> PointsForSuccesfullyMove = new();
-        private PadStyles _Style = PadStyles.Undefiniert;
-
-        /// <summary>
-        /// Wird ein Element gelöscht, das diese Feld befüllt hat, werden automatisch alle andern Elemente mit der selben Gruppe gelöscht.
-        /// </summary>
-        [Description("Alle Elemente, die der selben Gruppe angehören, werden beim Löschen eines Elements ebenfalls gelöscht.")]
-        public string Gruppenzugehörigkeit { get; set; } = string.Empty;
-
-        [Description("Wird bei einem Export (wie z. B. Drucken) nur angezeigt, wenn das Häkchen gesetzt ist.")]
-        public bool Bei_Export_sichtbar {
-            get => _Bei_Export_sichtbar;
-            set {
-                if (_Bei_Export_sichtbar == value) { return; }
-                _Bei_Export_sichtbar = value;
-                OnChanged();
+        public void Draw(Graphics gr, double zoom, double shiftX, double shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
+            if (Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent nicht definiert"); }
+            if (forPrinting && !_Bei_Export_sichtbar) { return; }
+            var DCoordinates = UsedArea().ZoomAndMoveRect(zoom, shiftX, shiftY, false);
+            if (Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent = null"); }
+            if (!IsInDrawingArea(DCoordinates, sizeOfParentControl)) { return; }
+            DrawExplicit(gr, DCoordinates, zoom, shiftX, shiftY, state, sizeOfParentControl, forPrinting);
+            if (!_Bei_Export_sichtbar) {
+                if (IsInDrawingArea(DCoordinates, sizeOfParentControl)) {
+                    gr.DrawImage(QuickImage.Get("Drucker|16||1").BMP, DCoordinates.X, DCoordinates.Y);
+                }
             }
         }
 
-        public int ZoomPadding {
-            get => _ZoomPadding;
-            set {
-                if (_ZoomPadding == value) { return; }
-                _ZoomPadding = value;
-                OnChanged();
+        public void DrawOutline(Graphics GR, double cZoom, double shiftX, double shiftY, Color c) => GR.DrawRectangle(new Pen(c), UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY, false));
+
+        public void EineEbeneNachHinten() {
+            if (Parent == null) { return; }
+            var i2 = Previous();
+            if (i2 != null) {
+                var tempVar = this;
+                Parent.Swap(tempVar, i2);
             }
         }
 
-        public PadStyles Stil {
-            get => _Style;
-            set {
-                if (_Style == value) { return; }
-                _Style = value;
-                DesignOrStyleChanged();
-                PointMoved(null);
+        public void EineEbeneNachVorne() {
+            if (Parent == null) { return; }
+            var i2 = Next();
+            if (i2 != null) {
+                var tempVar = this;
+                Parent.Swap(tempVar, i2);
             }
         }
 
-        public List<string> Tags => _Tags;
+        /// <summary>
+        /// Gibt für das aktuelle Item das "Kontext-Menü" zurück.
+        /// </summary>
+        /// <returns></returns>
+        public virtual List<FlexiControl> GetStyleOptions() {
+            List<FlexiControl> l = new()
+            {
+                new FlexiControlForProperty(this, "Gruppenzugehörigkeit"),
+                new FlexiControlForProperty(this, "Bei_Export_sichtbar")
+            };
+            return l;
+        }
+
+        public void InDenHintergrund() => Parent?.InDenHintergrund(this);
+
+        public void InDenVordergrund() => Parent?.InDenVordergrund(this);
+
+        public void Move(double x, double y) {
+            if (x == 0 && y == 0) { return; }
+            for (var i = 0; i < PointsForSuccesfullyMove.Count; i++) {
+                PointsForSuccesfullyMove[i].Move(x, y);
+            }
+            OnChanged();
+        }
+
+        ///// <summary>
+        ///// OnChanged wird nicht im Parsing gemacht
+        ///// </summary>
+        //[Obsolete]
+        //public void RecalculateAndOnChanged() {
+        //    CaluclatePointsWORelations();
+        //    if (!IsParsing) { OnChanged(); }
+        //}
+        public void OnChanged() {
+            //if (this is IParseable O && O.IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
+            tmpUsedArea = null;
+            Changed?.Invoke(this, System.EventArgs.Empty);
+        }
+
+        public void Parse(List<KeyValuePair<string, string>> ToParse) {
+            IsParsing = true;
+            foreach (var pair in ToParse) {
+                if (!ParseThis(pair.Key, pair.Value)) {
+                    Develop.DebugPrint(enFehlerArt.Warnung, "Kann nicht geparsed werden: " + pair.Key + "/" + pair.Value + "/" + ToParse);
+                }
+            }
+            PointMoved(null);
+            ParseFinished();
+            IsParsing = false;
+        }
+
+        public void Parse(string ToParse) => Parse(ToParse.GetAllTags());
 
         public virtual bool ParseThis(string tag, string value) {
             switch (tag.ToLower()) {
@@ -333,33 +402,7 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public bool IsParsing { get; private set; }
-
-        public void Parse(List<KeyValuePair<string, string>> ToParse) {
-            IsParsing = true;
-            foreach (var pair in ToParse) {
-                if (!ParseThis(pair.Key, pair.Value)) {
-                    Develop.DebugPrint(enFehlerArt.Warnung, "Kann nicht geparsed werden: " + pair.Key + "/" + pair.Value + "/" + ToParse);
-                }
-            }
-            PointMoved(null);
-            ParseFinished();
-            IsParsing = false;
-        }
-
-        protected abstract void ParseFinished();
-
-        /// <summary>
-        /// Gibt für das aktuelle Item das "Kontext-Menü" zurück.
-        /// </summary>
-        /// <returns></returns>
-        public virtual List<FlexiControl> GetStyleOptions() {
-            List<FlexiControl> l = new()
-            {
-                new FlexiControlForProperty(this, "Gruppenzugehörigkeit"),
-                new FlexiControlForProperty(this, "Bei_Export_sichtbar")
-            };
-            return l;
+        public virtual void PointMoved(PointM point) {
         }
 
         public override string ToString() {
@@ -386,72 +429,14 @@ namespace BlueControls.ItemCollection {
             return t.Trim(", ") + "}";
         }
 
-        public void InDenVordergrund() => Parent?.InDenVordergrund(this);
-
-        public void InDenHintergrund() => Parent?.InDenHintergrund(this);
-
-        public void EineEbeneNachVorne() {
-            if (Parent == null) { return; }
-            var i2 = Next();
-            if (i2 != null) {
-                var tempVar = this;
-                Parent.Swap(tempVar, i2);
-            }
+        /// <summary>
+        /// Gibt den Bereich zurück, den das Element benötigt, um komplett dargestellt zu werden. Unabhängig von der aktuellen Ansicht.
+        /// </summary>
+        /// <remarks></remarks>
+        public RectangleM UsedArea() {
+            if (tmpUsedArea == null) { tmpUsedArea = CalculateUsedArea(); }
+            return tmpUsedArea;
         }
-
-        internal void AddStyleOption(List<FlexiControl> l) => l.Add(new FlexiControlForProperty(this, "Stil", Skin.GetFonts(Parent.SheetStyle)));//l.Add(new FlexiControl("Stil", ((int)Stil).ToString()));
-
-        internal void AddLineStyleOption(List<FlexiControl> l) => l.Add(new FlexiControlForProperty(this, "Stil", Skin.GetRahmenArt(Parent.SheetStyle, true)));//l.Add(new FlexiControlForProperty("Umrandung", ((int)Stil).ToString(), Skin.GetRahmenArt(Parent.SheetStyle, true)));
-
-        public void EineEbeneNachHinten() {
-            if (Parent == null) { return; }
-            var i2 = Previous();
-            if (i2 != null) {
-                var tempVar = this;
-                Parent.Swap(tempVar, i2);
-            }
-        }
-
-        public void Draw(Graphics gr, decimal zoom, decimal shiftX, decimal shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
-            if (Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent nicht definiert"); }
-            if (forPrinting && !_Bei_Export_sichtbar) { return; }
-            var DCoordinates = UsedArea().ZoomAndMoveRect(zoom, shiftX, shiftY, false);
-            if (Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent = null"); }
-            if (!IsInDrawingArea(DCoordinates, sizeOfParentControl)) { return; }
-            DrawExplicit(gr, DCoordinates, zoom, shiftX, shiftY, state, sizeOfParentControl, forPrinting);
-            if (!_Bei_Export_sichtbar) {
-                if (IsInDrawingArea(DCoordinates, sizeOfParentControl)) {
-                    gr.DrawImage(QuickImage.Get("Drucker|16||1").BMP, DCoordinates.X, DCoordinates.Y);
-                }
-            }
-        }
-
-        internal BasicPadItem Previous() {
-            var ItemCount = Parent.IndexOf(this);
-            if (ItemCount < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Item im SortDefinition nicht enthalten"); }
-            do {
-                ItemCount--;
-                if (ItemCount < 0) { return null; }
-                if (Parent[ItemCount] != null) { return Parent[ItemCount]; }
-            } while (true);
-        }
-
-        internal BasicPadItem Next() {
-            var ItemCount = Parent.IndexOf(this);
-            if (ItemCount < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Item im SortDefinition nicht enthalten"); }
-            do {
-                ItemCount++;
-                if (ItemCount >= Parent.Count) { return null; }
-                if (Parent[ItemCount] != null) { return Parent[ItemCount]; }
-            } while (true);
-        }
-
-        public void DrawOutline(Graphics GR, decimal cZoom, decimal shiftX, decimal shiftY, Color c) => GR.DrawRectangle(new Pen(c), UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY, false));
-
-        protected bool IsInDrawingArea(RectangleF DrawingKoordinates, Size SizeOfParentControl) => SizeOfParentControl.IsEmpty || SizeOfParentControl.Width == 0 || SizeOfParentControl.Height == 0
-|| DrawingKoordinates.IntersectsWith(new Rectangle(Point.Empty, SizeOfParentControl));
-
-        public void Parse(string ToParse) => Parse(ToParse.GetAllTags());
 
         /// <summary>
         /// Gibt den Bereich zurück, den das Element benötigt, um komplett dargestellt zu werden. Unabhängig von der aktuellen Ansicht. Zusätzlich mit dem Wert aus Padding.
@@ -464,31 +449,60 @@ namespace BlueControls.ItemCollection {
             return x;
         }
 
-        public object Clone() {
-            var t = ToString();
-            return NewByParsing(Parent, t);
+        internal void AddLineStyleOption(List<FlexiControl> l) => l.Add(new FlexiControlForProperty(this, "Stil", Skin.GetRahmenArt(Parent.SheetStyle, true)));
+
+        internal void AddStyleOption(List<FlexiControl> l) => l.Add(new FlexiControlForProperty(this, "Stil", Skin.GetFonts(Parent.SheetStyle)));
+
+        internal BasicPadItem Next() {
+            var ItemCount = Parent.IndexOf(this);
+            if (ItemCount < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Item im SortDefinition nicht enthalten"); }
+            do {
+                ItemCount++;
+                if (ItemCount >= Parent.Count) { return null; }
+                if (Parent[ItemCount] != null) { return Parent[ItemCount]; }
+            } while (true);
         }
 
-        ///// <summary>
-        ///// OnChanged wird nicht im Parsing gemacht
-        ///// </summary>
-        //[Obsolete]
-        //public void RecalculateAndOnChanged() {
-        //    CaluclatePointsWORelations();
-        //    if (!IsParsing) { OnChanged(); }
-        //}
-        public void OnChanged() {
-            //if (this is IParseable O && O.IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
-            tmpUsedArea = null;
-            Changed?.Invoke(this, System.EventArgs.Empty);
+        //l.Add(new FlexiControlForProperty("Umrandung", ((int)Stil).ToString(), Skin.GetRahmenArt(Parent.SheetStyle, true)));
+        internal BasicPadItem Previous() {
+            var ItemCount = Parent.IndexOf(this);
+            if (ItemCount < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Item im SortDefinition nicht enthalten"); }
+            do {
+                ItemCount--;
+                if (ItemCount < 0) { return null; }
+                if (Parent[ItemCount] != null) { return Parent[ItemCount]; }
+            } while (true);
         }
 
-        public void Move(decimal x, decimal y) {
-            if (x == 0 && y == 0) { return; }
-            for (var i = 0; i < PointsForSuccesfullyMove.Count; i++) {
-                PointsForSuccesfullyMove[i].Move(x, y);
-            }
+        protected abstract RectangleM CalculateUsedArea();
+
+        protected abstract string ClassId();
+
+        protected abstract void DrawExplicit(Graphics GR, RectangleF DCoordinates, double cZoom, double shiftX, double shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting);
+
+        //l.Add(new FlexiControl("Stil", ((int)Stil).ToString()));
+        protected bool IsInDrawingArea(RectangleF DrawingKoordinates, Size SizeOfParentControl) => SizeOfParentControl.IsEmpty || SizeOfParentControl.Width == 0 || SizeOfParentControl.Height == 0
+|| DrawingKoordinates.IntersectsWith(new Rectangle(Point.Empty, SizeOfParentControl));
+
+        protected abstract void ParseFinished();
+
+        private void Point_Moved(object sender, System.EventArgs e) {
+            PointMoved((PointM)sender);
             OnChanged();
         }
+
+        private void Points_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
+            if (e.Item is PointM P) {
+                P.Moved += Point_Moved;
+            }
+        }
+
+        private void Points_ItemRemoving(object sender, BlueBasics.EventArgs.ListEventArgs e) {
+            if (e.Item is PointM P) {
+                P.Moved -= Point_Moved;
+            }
+        }
+
+        #endregion
     }
 }

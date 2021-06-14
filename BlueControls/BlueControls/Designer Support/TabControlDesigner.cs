@@ -11,13 +11,19 @@ namespace BlueControls.Designer_Support {
 
     internal sealed class TabControlDesigner : ParentControlDesigner {
 
-        #region Private Instance Variables
+        #region Fields
 
+        private const int HTCLIENT = 1;
+        private const int HTTRANSPARENT = -1;
+        private const int TCM_HITTEST = 0x130D;
+        private const int WM_NCHITTEST = 0x84;
         private readonly DesignerVerbCollection m_verbs = new();
         private IDesignerHost m_DesignerHost;
         private ISelectionService m_SelectionService;
 
-        #endregion Private Instance Variables
+        #endregion
+
+        #region Constructors
 
         public TabControlDesigner() {
             DesignerVerb verb1 = new("Add Tab", OnAddPage);
@@ -26,7 +32,30 @@ namespace BlueControls.Designer_Support {
             m_verbs.AddRange(new[] { verb1, verb2, verb3 });
         }
 
+        #endregion
+
         #region Properties
+
+        public IDesignerHost DesignerHost {
+            get {
+                if (m_DesignerHost == null) {
+                    m_DesignerHost = (IDesignerHost)GetService(typeof(IDesignerHost));
+                }
+                return m_DesignerHost;
+            }
+        }
+
+        //Fix the AllSizable selectiorule on System.Windows.Forms.DockStyle.Fill
+        public override SelectionRules SelectionRules => Control.Dock == System.Windows.Forms.DockStyle.Fill ? SelectionRules.Visible : base.SelectionRules;
+
+        public ISelectionService SelectionService {
+            get {
+                if (m_SelectionService == null) {
+                    m_SelectionService = (ISelectionService)GetService(typeof(ISelectionService));
+                }
+                return m_SelectionService;
+            }
+        }
 
         public override DesignerVerbCollection Verbs {
             get {
@@ -44,25 +73,9 @@ namespace BlueControls.Designer_Support {
             }
         }
 
-        public IDesignerHost DesignerHost {
-            get {
-                if (m_DesignerHost == null) {
-                    m_DesignerHost = (IDesignerHost)GetService(typeof(IDesignerHost));
-                }
-                return m_DesignerHost;
-            }
-        }
+        #endregion
 
-        public ISelectionService SelectionService {
-            get {
-                if (m_SelectionService == null) {
-                    m_SelectionService = (ISelectionService)GetService(typeof(ISelectionService));
-                }
-                return m_SelectionService;
-            }
-        }
-
-        #endregion Properties
+        #region Methods
 
         public void OnAddPage(object sender, System.EventArgs e) {
             var ParentControl = (AbstractTabControl)Control;
@@ -74,10 +87,6 @@ namespace BlueControls.Designer_Support {
             RaiseComponentChanged(TypeDescriptor.GetProperties(ParentControl)["TabPages"], oldTabs, ParentControl.TabPages);
             ParentControl.SelectedTab = P;
             SetVerbs();
-        }
-
-        protected override void OnPaintAdornments(System.Windows.Forms.PaintEventArgs pe) {
-            //Don't want DrawGrid dots.
         }
 
         public void OnInsertPage(object sender, System.EventArgs e) {
@@ -115,6 +124,39 @@ namespace BlueControls.Designer_Support {
             SetVerbs();
         }
 
+        protected override bool GetHitTest(Point point) {
+            if ((System.Windows.Forms.Control)SelectionService.PrimarySelection == Control) {
+                TCHITTESTINFO hti = new() {
+                    pt = Control.PointToClient(point)
+                };
+                System.Windows.Forms.Message m = new() {
+                    HWnd = Control.Handle,
+                    Msg = TCM_HITTEST
+                };
+                var lparam = Marshal.AllocHGlobal(Marshal.SizeOf(hti));
+                Marshal.StructureToPtr(hti, lparam, false);
+                m.LParam = lparam;
+                base.WndProc(ref m);
+                Marshal.FreeHGlobal(lparam);
+                if (m.Result.ToInt32() != -1) { return hti.flags != TabControlHitTest.TCHT_NOWHERE; }
+            }
+            return false;
+        }
+
+        protected override void OnPaintAdornments(System.Windows.Forms.PaintEventArgs pe) {
+            //Don't want DrawGrid dots.
+        }
+
+        protected override void WndProc(ref System.Windows.Forms.Message m) {
+            base.WndProc(ref m);
+            if (m.Msg == WM_NCHITTEST) {
+                //select tabcontrol when Tabcontrol clicked outside of TabItem.
+                if (m.Result.ToInt32() == HTTRANSPARENT) {
+                    m.Result = new IntPtr(HTCLIENT);
+                }
+            }
+        }
+
         private void SetVerbs() {
             var ParentControl = (AbstractTabControl)Control;
             switch (ParentControl.TabPages.Count) {
@@ -135,47 +177,20 @@ namespace BlueControls.Designer_Support {
             }
         }
 
-        private const int WM_NCHITTEST = 0x84;
-        private const int HTTRANSPARENT = -1;
-        private const int HTCLIENT = 1;
+        #endregion
 
-        protected override void WndProc(ref System.Windows.Forms.Message m) {
-            base.WndProc(ref m);
-            if (m.Msg == WM_NCHITTEST) {
-                //select tabcontrol when Tabcontrol clicked outside of TabItem.
-                if (m.Result.ToInt32() == HTTRANSPARENT) {
-                    m.Result = new IntPtr(HTCLIENT);
-                }
-            }
-        }
-
-        private const int TCM_HITTEST = 0x130D;
+        #region Structs
 
         private struct TCHITTESTINFO {
-            public Point pt;
+
+            #region Fields
+
             public TabControlHitTest flags;
+            public Point pt;
+
+            #endregion
         }
 
-        protected override bool GetHitTest(Point point) {
-            if ((System.Windows.Forms.Control)SelectionService.PrimarySelection == Control) {
-                TCHITTESTINFO hti = new() {
-                    pt = Control.PointToClient(point)
-                };
-                System.Windows.Forms.Message m = new() {
-                    HWnd = Control.Handle,
-                    Msg = TCM_HITTEST
-                };
-                var lparam = Marshal.AllocHGlobal(Marshal.SizeOf(hti));
-                Marshal.StructureToPtr(hti, lparam, false);
-                m.LParam = lparam;
-                base.WndProc(ref m);
-                Marshal.FreeHGlobal(lparam);
-                if (m.Result.ToInt32() != -1) { return hti.flags != TabControlHitTest.TCHT_NOWHERE; }
-            }
-            return false;
-        }
-
-        //Fix the AllSizable selectiorule on System.Windows.Forms.DockStyle.Fill
-        public override SelectionRules SelectionRules => Control.Dock == System.Windows.Forms.DockStyle.Fill ? SelectionRules.Visible : base.SelectionRules;
+        #endregion
     }
 }

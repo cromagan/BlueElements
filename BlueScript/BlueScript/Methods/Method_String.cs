@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,25 +15,29 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using Skript.Enums;
 using System.Collections.Generic;
 
 namespace BlueScript {
 
     internal class Method_String : Method {
-        public override string Syntax => "String(numeral)";
+
+        #region Properties
+
+        public override List<enVariableDataType> Args => new() { enVariableDataType.Numeral };
         public override string Description => "Wandelt die Zahl in einen Text um.";
-
-        public override List<string> Comand(Script s) => new() { "string" };
-
-        public override string StartSequence => "(";
+        public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.String;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Numeral };
-        public override bool EndlessArgs => false;
+        public override string StartSequence => "(";
+        public override string Syntax => "String(numeral)";
+
+        #endregion
+
+        #region Methods
+
+        public override List<string> Comand(Script s) => new() { "string" };
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
@@ -43,5 +45,7 @@ namespace BlueScript {
             attvar.Attributes[0].Type = enVariableDataType.String;
             return new strDoItFeedback(attvar.Attributes[0].ValueString, enVariableDataType.String);
         }
+
+        #endregion
     }
 }

@@ -1,5 +1,3 @@
-#region BlueElements - a collection of useful tools, database and controls
-
 // Authors:
 // Christian Peter
 //
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics.Enums;
 using System.Runtime.InteropServices;
 
@@ -26,9 +22,27 @@ namespace BlueBasics
 // TODO: Enums erzeugen
 {
     internal static class modTastaturSimulation {
-        private const int KEYEVENTF_KEYUP = 0x2; // Release key
+
+        #region Fields
+
         private const int KEYEVENTF_EXTENDEDKEY = 0x1;
         private const int KEYEVENTF_KEYDOWN = 0x0;
+        private const int KEYEVENTF_KEYUP = 0x2;
+
+        #endregion
+
+        #region Methods
+
+        // Release key
+        public static void altrelease() => keybd_event((byte)enTaste.VK_MENU, 0, KEYEVENTF_EXTENDEDKEY | 2, 0);
+
+        public static void KeyDown(enTaste k) => keybd_event((byte)k, 0, KEYEVENTF_KEYDOWN, 0);
+
+        public static void KeyUp(enTaste k) => keybd_event((byte)k, 0, KEYEVENTF_KEYUP, 0);
+
+        public static void leftaltrelease() => keybd_event((byte)enTaste.VK_MENU, 0, KEYEVENTF_KEYUP, 0);
+
+        public static void shiftrelease() => keybd_event((byte)enTaste.VK_SHIFT, 0, 2, 0);
 
         // VK_CANCEL = &H3 'Used for control-break processing.
         // '****************
@@ -44,18 +58,6 @@ namespace BlueBasics
         [DllImport("user32.dll", EntryPoint = "keybd_event", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         private static extern int keybd_event(byte bVk, byte bScan, int dwFlags, int dwExtraInfo);
 
-        public static void KeyDown(enTaste k) => keybd_event((byte)k, 0, KEYEVENTF_KEYDOWN, 0);
-
-        public static void KeyUp(enTaste k) => keybd_event((byte)k, 0, KEYEVENTF_KEYUP, 0);
-
-        #region shift ,altgr and alt release sub
-
-        public static void shiftrelease() => keybd_event((byte)enTaste.VK_SHIFT, 0, 2, 0);
-
-        public static void altrelease() => keybd_event((byte)enTaste.VK_MENU, 0, KEYEVENTF_EXTENDEDKEY | 2, 0);
-
-        public static void leftaltrelease() => keybd_event((byte)enTaste.VK_MENU, 0, KEYEVENTF_KEYUP, 0);
-
-        #endregion shift ,altgr and alt release sub
+        #endregion
     }
 }

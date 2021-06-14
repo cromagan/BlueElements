@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,25 +15,29 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using Skript.Enums;
 using System.Collections.Generic;
 
 namespace BlueScript {
 
     internal class Method_Count : Method {
-        public override string Syntax => "Count(List-Variable)";
+
+        #region Properties
+
+        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List };
         public override string Description => "Gibt die Anzahl der Elemente der Liste zurück.";
-
-        public override List<string> Comand(Script s) => new() { "count" };
-
-        public override string StartSequence => "(";
+        public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.Numeral;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List };
-        public override bool EndlessArgs => false;
+        public override string StartSequence => "(";
+        public override string Syntax => "Count(List-Variable)";
+
+        #endregion
+
+        #region Methods
+
+        public override List<string> Comand(Script s) => new() { "count" };
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
@@ -43,5 +45,7 @@ namespace BlueScript {
                 ? strDoItFeedback.AttributFehler(this, attvar)
                 : new strDoItFeedback(attvar.Attributes[0].ValueListString.Count.ToString(), enVariableDataType.Numeral);
         }
+
+        #endregion
     }
 }

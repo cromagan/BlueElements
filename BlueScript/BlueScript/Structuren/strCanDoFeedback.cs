@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,11 +15,44 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using System.Linq;
 
 public struct strCanDoFeedback {
+
+    #region Fields
+
+    /// <summary>
+    /// Der Text zwischen dem StartString und dem EndString
+    /// </summary>
+    public string AttributText;
+
+    /// <summary>
+    /// Falls ein Codeblock { } direkt nach dem Befehl beginnt, dessen Inhalt
+    /// </summary>
+    public string CodeBlockAfterText;
+
+    /// <summary>
+    /// Der Text, mit dem eingetiegen wird. Also der Behel mit dem StartString.
+    /// </summary>
+    public string ComandText;
+
+    /// <summary>
+    /// Die Position, wo der Fehler stattgefunfden hat ODER die Position wo weiter geparsesd werden muss
+    /// </summary>
+    public int ContinueOrErrorPosition;
+
+    public string ErrorMessage;
+
+    public int LineBreakInCodeBlock;
+
+    /// <summary>
+    /// TRUE, wenn der Befehl erkannt wurde, aber nicht ausgeführt werden kann.
+    /// </summary>
+    public bool MustAbort;
+
+    #endregion
+
+    #region Constructors
 
     public strCanDoFeedback(int errorposition, string errormessage, bool mustabort) {
         ContinueOrErrorPosition = errorposition;
@@ -43,32 +74,5 @@ public struct strCanDoFeedback {
         LineBreakInCodeBlock = codeblockaftertext.Count(c => c == '¶');
     }
 
-    /// <summary>
-    /// Die Position, wo der Fehler stattgefunfden hat ODER die Position wo weiter geparsesd werden muss
-    /// </summary>
-    public int ContinueOrErrorPosition;
-
-    public string ErrorMessage;
-
-    /// <summary>
-    /// TRUE, wenn der Befehl erkannt wurde, aber nicht ausgeführt werden kann.
-    /// </summary>
-    public bool MustAbort;
-
-    /// <summary>
-    /// Der Text, mit dem eingetiegen wird. Also der Behel mit dem StartString.
-    /// </summary>
-    public string ComandText;
-
-    /// <summary>
-    /// Der Text zwischen dem StartString und dem EndString
-    /// </summary>
-    public string AttributText;
-
-    /// <summary>
-    /// Falls ein Codeblock { } direkt nach dem Befehl beginnt, dessen Inhalt
-    /// </summary>
-    public string CodeBlockAfterText;
-
-    public int LineBreakInCodeBlock;
+    #endregion
 }

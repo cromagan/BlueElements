@@ -8,8 +8,15 @@ using System.Drawing;
 namespace BlueControls.Forms {
 
     public partial class FloatingForm : Form {
+
+        #region Fields
+
         internal static List<FloatingForm> AllBoxes = new();
         private readonly System.Windows.Forms.Control _ConnectedControl = null;
+
+        #endregion
+
+        #region Constructors
 
         public FloatingForm() : this(enDesign.Form_QuickInfo) {
         }
@@ -37,16 +44,13 @@ namespace BlueControls.Forms {
         protected FloatingForm(System.Windows.Forms.Control connectedControl, enDesign design) : this(design) =>
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
             //InitializeComponent();
-            _ConnectedControl = connectedControl;//SetStyles();//AllBoxes.Add(this);
+            _ConnectedControl = connectedControl;
 
-        /// <summary>
-        /// Floating Forms sind immer Topmost, darf aber hier nicht gesetzt werden und wird über
-        /// CreateParams gesteuert. Wenn TopMost true wäre, würde das Form den Focus bekommen.
-        /// </summary>
-        public new bool TopMost {
-            get => false;
-            set => base.TopMost = false;
-        }
+        #endregion
+
+        //SetStyles();//AllBoxes.Add(this);
+
+        #region Properties
 
         protected override System.Windows.Forms.CreateParams CreateParams {
             get {
@@ -57,9 +61,22 @@ namespace BlueControls.Forms {
             }
         }
 
-        private void CheckMaxSize(int ScreenNr) {
-            Width = Math.Min(Width, (int)(System.Windows.Forms.Screen.AllScreens[ScreenNr].WorkingArea.Width * 0.9));
-            Height = Math.Min(Height, (int)(System.Windows.Forms.Screen.AllScreens[ScreenNr].WorkingArea.Height * 0.9));
+        /// <summary>
+        /// Floating Forms sind immer Topmost, darf aber hier nicht gesetzt werden und wird über
+        /// CreateParams gesteuert. Wenn TopMost true wäre, würde das Form den Focus bekommen.
+        /// </summary>
+        public new bool TopMost {
+            get => false;
+            set => base.TopMost = false;
+        }
+
+        #endregion
+
+        #region Methods
+
+        public new void Close() {
+            AllBoxes.Remove(this);
+            base.Close();
         }
 
         public void Position_CenterScreen(Point BestPosition) {
@@ -69,12 +86,6 @@ namespace BlueControls.Forms {
             var Xpos = System.Windows.Forms.Screen.AllScreens[ScreenNr].WorkingArea.Left + ((System.Windows.Forms.Screen.AllScreens[ScreenNr].WorkingArea.Width - Width) / 2.0);
             var Ypos = System.Windows.Forms.Screen.AllScreens[ScreenNr].WorkingArea.Top + ((System.Windows.Forms.Screen.AllScreens[ScreenNr].WorkingArea.Height - Height) / 2.0);
             Position_SetWindowIntoScreen(ScreenNr, (int)Xpos, (int)Ypos);
-        }
-
-        public void Position_LocateToPosition(Point BestPosition) {
-            var ScreenNr = modAllgemein.PointOnScreenNr(BestPosition);
-            CheckMaxSize(ScreenNr);
-            Position_SetWindowIntoScreen(ScreenNr, BestPosition.X, BestPosition.Y);
         }
 
         public void Position_LocateToMouse() {
@@ -91,6 +102,12 @@ namespace BlueControls.Forms {
             Position_SetWindowIntoScreen(ScreenNr, Xpos, Ypos);
         }
 
+        public void Position_LocateToPosition(Point BestPosition) {
+            var ScreenNr = modAllgemein.PointOnScreenNr(BestPosition);
+            CheckMaxSize(ScreenNr);
+            Position_SetWindowIntoScreen(ScreenNr, BestPosition.X, BestPosition.Y);
+        }
+
         public void Position_SetWindowIntoScreen(int ScreenNr, int Xpos, int Ypos) {
             //  Dim ScreenNr As Integer = PointOnScreenNr(BestPosition)
             CheckMaxSize(ScreenNr);
@@ -100,8 +117,6 @@ namespace BlueControls.Forms {
             if (Ypos + Height > System.Windows.Forms.Screen.AllScreens[ScreenNr].WorkingArea.Bottom) { Ypos = System.Windows.Forms.Screen.AllScreens[ScreenNr].WorkingArea.Bottom - Height; }
             Location = new Point(Xpos, Ypos);
         }
-
-        public new void ShowDialog() => Develop.DebugPrint(enFehlerArt.Fehler, "FloatingForms können nur mit Show aufgerufen werden.");
 
         public new void Show() {
             try {
@@ -113,10 +128,7 @@ namespace BlueControls.Forms {
             }
         }
 
-        public new void Close() {
-            AllBoxes.Remove(this);
-            base.Close();
-        }
+        public new void ShowDialog() => Develop.DebugPrint(enFehlerArt.Fehler, "FloatingForms können nur mit Show aufgerufen werden.");
 
         internal static void Close(object ConnectedControl, enDesign Design) {
             foreach (var ThisForm in AllBoxes) {
@@ -157,5 +169,12 @@ namespace BlueControls.Forms {
             Skin.Draw_Back(TMPGR, Design, enStates.Standard, DisplayRectangle, null, false);
             Skin.Draw_Border(TMPGR, Design, enStates.Standard, DisplayRectangle);
         }
+
+        private void CheckMaxSize(int ScreenNr) {
+            Width = Math.Min(Width, (int)(System.Windows.Forms.Screen.AllScreens[ScreenNr].WorkingArea.Width * 0.9));
+            Height = Math.Min(Height, (int)(System.Windows.Forms.Screen.AllScreens[ScreenNr].WorkingArea.Height * 0.9));
+        }
+
+        #endregion
     }
 }

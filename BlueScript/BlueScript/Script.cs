@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using System;
 using System.Collections.Generic;
@@ -26,10 +22,60 @@ using System.Collections.Generic;
 namespace BlueScript {
 
     public class Script {
+
+        #region Fields
+
+        public static List<Method> Comands = null;
+        public readonly List<Variable> Variablen;
+        public bool EndSkript = false;
         private string _error;
         private string _errorCode;
-        public bool EndSkript = false;
-        public int Line { get; internal set; }
+        private string _ScriptText = string.Empty;
+
+        #endregion
+
+        #region Constructors
+
+        //public static IEnumerable<T> GetEnumerableOfType<T>(params object[] constructorArgs) where T : class {
+        //    var objects = new List<T>();
+        //    IEnumerable<Type> types = null;
+        //    try {
+        //        types =
+        //           from a in AppDomain.CurrentDomain.GetAssemblies()
+        //           from t in a.GetTypes()
+        //           select t;
+        //    }
+        //    catch (Exception ex) {
+        //        Develop.DebugPrint(ex);
+        //        if (ex is System.Reflection.ReflectionTypeLoadException typeLoadException) {
+        //            Develop.DebugPrint(typeLoadException.LoaderExceptions.ToString());
+        //            //var loaderExceptions = typeLoadException.LoaderExceptions;
+        //        }
+        //        return objects;
+        //    }
+        //    foreach (var type in types.Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(T)))) {
+        //        objects.Add((T)Activator.CreateInstance(type, constructorArgs));
+        //    }
+        //    //foreach( var thisa in  AppDomain.CurrentDomain.GetAssemblies())
+        //    //       {
+        //    //   foreach (var type in
+        //    //       Assembly.GetAssembly(typeof(T)).GetTypes()
+        //    //       .Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(T)))) {
+        //    //       objects.Add((T)Activator.CreateInstance(type, constructorArgs));
+        //    //   }
+        //    //   //objects.Sort();
+        //    return objects;
+        //}
+        public Script(List<Variable> variablen) {
+            if (Comands == null) {
+                Comands = GetEnumerableOfType<Method>();
+            }
+            Variablen = variablen;
+        }
+
+        #endregion
+
+        #region Properties
 
         public string Error {
             get => _error;
@@ -41,9 +87,47 @@ namespace BlueScript {
             private set => _errorCode = value.Replace("{", "").Replace("}", "");
         }
 
-        private string _ScriptText = string.Empty;
-        public static List<Method> Comands = null;
-        public readonly List<Variable> Variablen;
+        public int Line { get; internal set; }
+
+        public string ScriptText {
+            get => _ScriptText;
+            set {
+                if (_ScriptText == value) { return; }
+                //_parsed = false;
+                _ScriptText = value;
+            }
+        }
+
+        #endregion
+
+        #region Methods
+
+        public static strDoItWithEndedPosFeedback ComandOnPosition(string txt, int pos, Script s, bool expectedvariablefeedback) {
+            foreach (var thisC in Comands) {
+                var f = thisC.CanDo(txt, pos, expectedvariablefeedback, s);
+                if (f.MustAbort) { return new strDoItWithEndedPosFeedback(f.ErrorMessage); }
+                if (string.IsNullOrEmpty(f.ErrorMessage)) {
+                    var fn = thisC.DoIt(f, s);
+                    return new strDoItWithEndedPosFeedback(fn.ErrorMessage, fn.Value, f.ContinueOrErrorPosition);
+                }
+            }
+
+            #region Prüfen für bessere Fehlermeldung, ob der Rückgabetyp falsch gesetzt wurde
+
+            foreach (var thisC in Comands) {
+                var f = thisC.CanDo(txt, pos, !expectedvariablefeedback, s);
+                if (f.MustAbort) { return new strDoItWithEndedPosFeedback(f.ErrorMessage); }
+                if (string.IsNullOrEmpty(f.ErrorMessage)) {
+                    return expectedvariablefeedback
+                        ? new strDoItWithEndedPosFeedback("Dieser Befehl hat keinen Rückgabewert: " + txt.Substring(pos))
+                        : new strDoItWithEndedPosFeedback("Dieser Befehl hat einen Rückgabewert, der nicht verwendet wird: " + txt.Substring(pos));
+                }
+            }
+
+            #endregion Prüfen für bessere Fehlermeldung, ob der Rückgabetyp falsch gesetzt wurde
+
+            return new strDoItWithEndedPosFeedback("Kann nicht geparsed werden: " + txt.Substring(pos));
+        }
 
         public static List<T> GetEnumerableOfType<T>(params object[] constructorArgs) where T : class {
             List<T> l = new();
@@ -89,50 +173,39 @@ namespace BlueScript {
             //    return objects;
         }
 
-        //public static IEnumerable<T> GetEnumerableOfType<T>(params object[] constructorArgs) where T : class {
-        //    var objects = new List<T>();
-        //    IEnumerable<Type> types = null;
-        //    try {
-        //        types =
-        //           from a in AppDomain.CurrentDomain.GetAssemblies()
-        //           from t in a.GetTypes()
-        //           select t;
-        //    }
-        //    catch (Exception ex) {
-        //        Develop.DebugPrint(ex);
-        //        if (ex is System.Reflection.ReflectionTypeLoadException typeLoadException) {
-        //            Develop.DebugPrint(typeLoadException.LoaderExceptions.ToString());
-        //            //var loaderExceptions = typeLoadException.LoaderExceptions;
-        //        }
-        //        return objects;
-        //    }
-        //    foreach (var type in types.Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(T)))) {
-        //        objects.Add((T)Activator.CreateInstance(type, constructorArgs));
-        //    }
-        //    //foreach( var thisa in  AppDomain.CurrentDomain.GetAssemblies())
-        //    //       {
-        //    //   foreach (var type in
-        //    //       Assembly.GetAssembly(typeof(T)).GetTypes()
-        //    //       .Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(T)))) {
-        //    //       objects.Add((T)Activator.CreateInstance(type, constructorArgs));
-        //    //   }
-        //    //   //objects.Sort();
-        //    return objects;
-        //}
-        public Script(List<Variable> variablen) {
-            if (Comands == null) {
-                Comands = GetEnumerableOfType<Method>();
+        public static (string, string) Parse(string scriptText, bool reduce, Script s) {
+            var pos = 0;
+            s.EndSkript = false;
+            string tmptxt;
+            if (reduce) {
+                tmptxt = ReduceText(scriptText);
+                s.Line = 1;
+                s.Variablen.PrepareForScript();
+            } else {
+                tmptxt = scriptText;
             }
-            Variablen = variablen;
+            do {
+                if (pos >= tmptxt.Length || s.EndSkript) {
+                    if (reduce) { s.Variablen.ScriptFinished(); }
+                    return (string.Empty, string.Empty);
+                }
+                if (tmptxt.Substring(pos, 1) == "¶") {
+                    s.Line++;
+                    pos++;
+                } else {
+                    var f = ComandOnPosition(tmptxt, pos, s, false);
+                    if (!string.IsNullOrEmpty(f.ErrorMessage)) {
+                        if (reduce) { s.Variablen.ScriptFinished(); }
+                        return (f.ErrorMessage, tmptxt.Substring(pos, Math.Min(30, tmptxt.Length - pos)));
+                    }
+                    pos = f.Position;
+                }
+            } while (true);
         }
 
-        public string ScriptText {
-            get => _ScriptText;
-            set {
-                if (_ScriptText == value) { return; }
-                //_parsed = false;
-                _ScriptText = value;
-            }
+        public bool Parse() {
+            (Error, ErrorCode) = Parse(_ScriptText, true, this);
+            return !string.IsNullOrEmpty(Error);
         }
 
         private static string ReduceText(string txt) {
@@ -176,67 +249,7 @@ namespace BlueScript {
             return s.ToString();
         }
 
-        public static (string, string) Parse(string scriptText, bool reduce, Script s) {
-            var pos = 0;
-            s.EndSkript = false;
-            string tmptxt;
-            if (reduce) {
-                tmptxt = ReduceText(scriptText);
-                s.Line = 1;
-                s.Variablen.PrepareForScript();
-            } else {
-                tmptxt = scriptText;
-            }
-            do {
-                if (pos >= tmptxt.Length || s.EndSkript) {
-                    if (reduce) { s.Variablen.ScriptFinished(); }
-                    return (string.Empty, string.Empty);
-                }
-                if (tmptxt.Substring(pos, 1) == "¶") {
-                    s.Line++;
-                    pos++;
-                } else {
-                    var f = ComandOnPosition(tmptxt, pos, s, false);
-                    if (!string.IsNullOrEmpty(f.ErrorMessage)) {
-                        if (reduce) { s.Variablen.ScriptFinished(); }
-                        return (f.ErrorMessage, tmptxt.Substring(pos, Math.Min(30, tmptxt.Length - pos)));
-                    }
-                    pos = f.Position;
-                }
-            } while (true);
-        }
-
-        public bool Parse() {
-            (Error, ErrorCode) = Parse(_ScriptText, true, this);
-            return !string.IsNullOrEmpty(Error);
-        }
-
-        public static strDoItWithEndedPosFeedback ComandOnPosition(string txt, int pos, Script s, bool expectedvariablefeedback) {
-            foreach (var thisC in Comands) {
-                var f = thisC.CanDo(txt, pos, expectedvariablefeedback, s);
-                if (f.MustAbort) { return new strDoItWithEndedPosFeedback(f.ErrorMessage); }
-                if (string.IsNullOrEmpty(f.ErrorMessage)) {
-                    var fn = thisC.DoIt(f, s);
-                    return new strDoItWithEndedPosFeedback(fn.ErrorMessage, fn.Value, f.ContinueOrErrorPosition);
-                }
-            }
-
-            #region Prüfen für bessere Fehlermeldung, ob der Rückgabetyp falsch gesetzt wurde
-
-            foreach (var thisC in Comands) {
-                var f = thisC.CanDo(txt, pos, !expectedvariablefeedback, s);
-                if (f.MustAbort) { return new strDoItWithEndedPosFeedback(f.ErrorMessage); }
-                if (string.IsNullOrEmpty(f.ErrorMessage)) {
-                    return expectedvariablefeedback
-                        ? new strDoItWithEndedPosFeedback("Dieser Befehl hat keinen Rückgabewert: " + txt.Substring(pos))
-                        : new strDoItWithEndedPosFeedback("Dieser Befehl hat einen Rückgabewert, der nicht verwendet wird: " + txt.Substring(pos));
-                }
-            }
-
-            #endregion Prüfen für bessere Fehlermeldung, ob der Rückgabetyp falsch gesetzt wurde
-
-            return new strDoItWithEndedPosFeedback("Kann nicht geparsed werden: " + txt.Substring(pos));
-        }
+        #endregion
 
         //public static void AddScriptComands() {
         //    Comands.Add(new Method_Add());

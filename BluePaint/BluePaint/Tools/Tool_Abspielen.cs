@@ -1,9 +1,7 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2019 Christian Peter
+// Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueControls.Forms;
 using BluePaint.EventArgs;
@@ -30,8 +26,14 @@ namespace BluePaint {
 
     public partial class Tool_Abspielen : GenericTool   // BlueControls.Forms.Form//
     {
+        #region Fields
+
         private readonly List<string> _macro;
         private readonly List<GenericTool> _merker;
+
+        #endregion
+
+        #region Constructors
 
         public Tool_Abspielen(List<string> macro, List<GenericTool> merker) : base() {
             InitializeComponent();
@@ -40,22 +42,11 @@ namespace BluePaint {
             _merker = merker;
         }
 
+        #endregion
+
+        #region Methods
+
         public override void ToolFirstShown() => OnZoomFit();
-
-        private void optNeuerName_Click(object sender, System.EventArgs e) {
-        }
-
-        private void optUeberschreiben_Click(object sender, System.EventArgs e) {
-        }
-
-        private void optZielordner_Click(object sender, System.EventArgs e) {
-        }
-
-        private void txbZielordner_TextChanged(object sender, System.EventArgs e) {
-        }
-
-        private void txbQuelle_TextChanged(object sender, System.EventArgs e) {
-        }
 
         private void btnAbspielen_Click(object sender, System.EventArgs e) {
             if (_macro == null || _macro.Count == 0) {
@@ -109,8 +100,20 @@ namespace BluePaint {
             }
         }
 
+        private void optNeuerName_Click(object sender, System.EventArgs e) { }
+
+        private void optUeberschreiben_Click(object sender, System.EventArgs e) { }
+
+        private void optZielordner_Click(object sender, System.EventArgs e) { }
+
         private void ThisTool_NeedCurrentPic(object sender, BitmapEventArgs e) => e.BMP = OnNeedCurrentPic();
 
         private void ThisTool_OverridePic(object sender, BitmapEventArgs e) => OnOverridePic(e.BMP);
+
+        private void txbQuelle_TextChanged(object sender, System.EventArgs e) { }
+
+        private void txbZielordner_TextChanged(object sender, System.EventArgs e) { }
+
+        #endregion
     }
 }

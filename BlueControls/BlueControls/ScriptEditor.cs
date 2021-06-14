@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -16,8 +14,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-
-#endregion BlueElements - a collection of useful tools, database and controls
 
 using BlueBasics;
 using BlueBasics.Enums;
@@ -36,14 +32,24 @@ namespace BlueControls {
 
     public partial class ScriptEditor : GroupBox // System.Windows.Forms.UserControl
     {
+        #region Fields
+
         private Database _Database = null;
-        private AutocompleteMenu popupMenu;
         private bool menuDone = false;
+        private AutocompleteMenu popupMenu;
+
+        #endregion
+
+        #region Constructors
 
         public ScriptEditor() {
             InitializeComponent();
             GenerateVariableTable();
         }
+
+        #endregion
+
+        #region Properties
 
         public Database Database {
             get => _Database;
@@ -60,37 +66,16 @@ namespace BlueControls {
             }
         }
 
-        private void _Database_Disposing(object sender, System.EventArgs e) => Database = null;
+        #endregion
 
-        private void GenerateVariableTable() {
-            Database x = new(true);
-            x.Column.Add("Name", "Name", enDataFormat.Text);
-            x.Column.Add("Typ", "Typ", enDataFormat.Text);
-            x.Column.Add("RO", "Schreibgeschützt", enDataFormat.Bit);
-            x.Column.Add("System", "Systemspalte", enDataFormat.Bit);
-            x.Column.Add("Inhalt", "Inhalt", enDataFormat.Text);
-            x.Column.Add("Kommentar", "Kommentar", enDataFormat.Text);
-            foreach (var ThisColumn in x.Column) {
-                if (string.IsNullOrEmpty(ThisColumn.Identifier)) {
-                    ThisColumn.MultiLine = true;
-                    ThisColumn.TextBearbeitungErlaubt = false;
-                    ThisColumn.DropdownBearbeitungErlaubt = false;
-                    ThisColumn.BildTextVerhalten = enBildTextVerhalten.Bild_oder_Text;
-                }
-            }
-            x.RepairAfterParse();
-            x.ColumnArrangements[1].ShowAllColumns();
-            x.ColumnArrangements[1].HideSystemColumns();
-            x.SortDefinition = new RowSortDefinition(x, "Name", true);
-            tableVariablen.Database = x;
-            tableVariablen.Arrangement = 1;
-            filterVariablen.Table = tableVariablen;
-        }
+        #region Methods
 
         internal void WriteScriptBack() {
             if (_Database == null) { return; }
             _Database.RulesScript = txtSkript.Text;
         }
+
+        private void _Database_Disposing(object sender, System.EventArgs e) => Database = null;
 
         private void btnTest_Click(object sender, System.EventArgs e) {
             if (_Database == null) {
@@ -161,6 +146,39 @@ namespace BlueControls {
                 : "[" + DateTime.Now.ToLongTimeString() + "] Fehler in Zeile: " + s.Line.ToString() + "\r\n" + s.Error + "\r\n >>> " + s.ErrorCode;
         }
 
+        private void GenerateVariableTable() {
+            Database x = new(true);
+            x.Column.Add("Name", "Name", enDataFormat.Text);
+            x.Column.Add("Typ", "Typ", enDataFormat.Text);
+            x.Column.Add("RO", "Schreibgeschützt", enDataFormat.Bit);
+            x.Column.Add("System", "Systemspalte", enDataFormat.Bit);
+            x.Column.Add("Inhalt", "Inhalt", enDataFormat.Text);
+            x.Column.Add("Kommentar", "Kommentar", enDataFormat.Text);
+            foreach (var ThisColumn in x.Column) {
+                if (string.IsNullOrEmpty(ThisColumn.Identifier)) {
+                    ThisColumn.MultiLine = true;
+                    ThisColumn.TextBearbeitungErlaubt = false;
+                    ThisColumn.DropdownBearbeitungErlaubt = false;
+                    ThisColumn.BildTextVerhalten = enBildTextVerhalten.Bild_oder_Text;
+                }
+            }
+            x.RepairAfterParse();
+            x.ColumnArrangements[1].ShowAllColumns();
+            x.ColumnArrangements[1].HideSystemColumns();
+            x.SortDefinition = new RowSortDefinition(x, "Name", true);
+            tableVariablen.Database = x;
+            tableVariablen.Arrangement = 1;
+            filterVariablen.Table = tableVariablen;
+        }
+
+        private void lstComands_ItemClicked(object sender, BasicListItemEventArgs e) {
+            var co = string.Empty;
+            if (e.Item.Tag is Method thisc) {
+                co += thisc.HintText();
+            }
+            txbComms.Text = co;
+        }
+
         private void txtSkript_ToolTipNeeded(object sender, ToolTipNeededEventArgs e) {
             try {
                 foreach (var thisc in lstComands.Item) {
@@ -196,12 +214,6 @@ namespace BlueControls {
             }
         }
 
-        private void lstComands_ItemClicked(object sender, BasicListItemEventArgs e) {
-            var co = string.Empty;
-            if (e.Item.Tag is Method thisc) {
-                co += thisc.HintText();
-            }
-            txbComms.Text = co;
-        }
+        #endregion
     }
 }

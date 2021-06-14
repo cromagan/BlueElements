@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueDatabase;
 using Skript.Enums;
@@ -29,19 +25,30 @@ namespace BlueScript {
 
     public class Method_Lookup : Method {
 
-        //public Method_Lookup(Script parent) : base(parent) { }
-        public override string Syntax => "Lookup(Database, KeyValue, Column, NothingFoundValue, FoundToMuchValue)";
+        #region Properties
+
+        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.String, enVariableDataType.String, enVariableDataType.String, enVariableDataType.String };
 
         public override string Description => "Lädt eine andere Datenbank (Database), sucht eine Zeile (KeyValue) und gibt den Inhalt einer Spalte (Column) als Liste zurück. Wird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben. Ist der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.";
 
-        public override List<string> Comand(Script s) => new() { "lookup" };
+        public override bool EndlessArgs => false;
+
+        public override string EndSequence => ")";
+
+        public override bool GetCodeBlockAfter => false;
+
+        public override enVariableDataType Returns => enVariableDataType.List;
 
         public override string StartSequence => "(";
-        public override string EndSequence => ")";
-        public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.List;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.String, enVariableDataType.String, enVariableDataType.String, enVariableDataType.String };
-        public override bool EndlessArgs => false;
+
+        //public Method_Lookup(Script parent) : base(parent) { }
+        public override string Syntax => "Lookup(Database, KeyValue, Column, NothingFoundValue, FoundToMuchValue)";
+
+        #endregion
+
+        #region Methods
+
+        public override List<string> Comand(Script s) => new() { "lookup" };
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
@@ -80,10 +87,12 @@ namespace BlueScript {
                 return new strDoItFeedback(string.Empty);
             }
             var v = RowItem.CellToVariable(c, r[0]);
-            if (v == null) { return new strDoItFeedback("Wert konnte nicht erzeugt werden: " + attvar.Attributes[2].ValueString); }
-            v.Readonly = false;
-            v.Type = enVariableDataType.List;
-            return new strDoItFeedback(v.ValueString, enVariableDataType.List);
+            if (v == null || v.Count != 1) { return new strDoItFeedback("Wert konnte nicht erzeugt werden: " + attvar.Attributes[2].ValueString); }
+            v[0].Readonly = false;
+            v[0].Type = enVariableDataType.List;
+            return new strDoItFeedback(v[0].ValueString, enVariableDataType.List);
         }
+
+        #endregion
     }
 }

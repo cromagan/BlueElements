@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -30,13 +26,58 @@ using BlueDatabase.Enums;
 namespace BlueControls.BlueDatabaseDialogs {
 
     public partial class FormulaQuickSelect {
+
+        #region Fields
+
         private readonly RowItem Row;
+
+        #endregion
+
+        #region Constructors
 
         public FormulaQuickSelect(RowItem RowItem) {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             Row = RowItem;
+        }
+
+        #endregion
+
+        #region Methods
+
+        //Private Sub Auswahl_Item_CheckedChanged(sender As Object) Handles Auswahl.Item_CheckedChanged
+        //End Sub
+        protected override void OnLoad(System.EventArgs e) {
+            base.OnLoad(e);
+            Init();
+        }
+
+        private void Auswahl_ItemClicked(object sender, BasicListItemEventArgs e) {
+            var x = e.Item.Internal.SplitBy("|");
+            if (Row.Database.Column[x[0]].MultiLine) {
+                var val = Row.CellGetList(Row.Database.Column[x[0]]);
+                if (e.Item.Checked) {
+                    val.AddIfNotExists(x[1]);
+                } else {
+                    val.Remove(x[1]);
+                }
+                Row.CellSet(Row.Database.Column[x[0]], val);
+            } else {
+                if (e.Item.Checked) {
+                    Row.CellSet(Row.Database.Column[x[0]], x[1]);
+                }
+            }
+            //       End If
+            Such_TextChanged(null, System.EventArgs.Empty);
+        }
+
+        private void Init() {
+            if (Row == null) {
+                Close();
+                return;
+            }
+            Für.Text = "<b>" + Row.CellFirstString();
         }
 
         private void Such_TextChanged(object sender, System.EventArgs e) {
@@ -71,38 +112,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
         }
 
-        //Private Sub Auswahl_Item_CheckedChanged(sender As Object) Handles Auswahl.Item_CheckedChanged
-        //End Sub
-        protected override void OnLoad(System.EventArgs e) {
-            base.OnLoad(e);
-            Init();
-        }
-
-        private void Init() {
-            if (Row == null) {
-                Close();
-                return;
-            }
-            Für.Text = "<b>" + Row.CellFirstString();
-        }
-
-        private void Auswahl_ItemClicked(object sender, BasicListItemEventArgs e) {
-            var x = e.Item.Internal.SplitBy("|");
-            if (Row.Database.Column[x[0]].MultiLine) {
-                var val = Row.CellGetList(Row.Database.Column[x[0]]);
-                if (e.Item.Checked) {
-                    val.AddIfNotExists(x[1]);
-                } else {
-                    val.Remove(x[1]);
-                }
-                Row.CellSet(Row.Database.Column[x[0]], val);
-            } else {
-                if (e.Item.Checked) {
-                    Row.CellSet(Row.Database.Column[x[0]], x[1]);
-                }
-            }
-            //       End If
-            Such_TextChanged(null, System.EventArgs.Empty);
-        }
+        #endregion
     }
 }

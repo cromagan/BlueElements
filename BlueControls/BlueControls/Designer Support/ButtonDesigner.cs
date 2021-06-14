@@ -3,7 +3,14 @@
 namespace BlueControls.Designer_Support {
 
     internal sealed class ButtonDesigner : BasicDesigner {
+
+        #region Fields
+
         private DesignerActionListCollection aList;
+
+        #endregion
+
+        #region Properties
 
         public override DesignerActionListCollection ActionLists {
             get {
@@ -16,5 +23,7 @@ namespace BlueControls.Designer_Support {
                 return aList;
             }
         }
+
+        #endregion
     }
 }

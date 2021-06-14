@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,22 +15,48 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueDatabase;
 using System.Collections.Generic;
 using System.Drawing;
 
 namespace BlueControls.Controls {
 
+    public static class clsRowDrawDataExtensions {
+
+        #region Methods
+
+        public static clsRowDrawData Get(this List<clsRowDrawData> l, RowItem row) {
+            foreach (var thisr in l) {
+                if (thisr.Row == row) { return thisr; }
+            }
+            return null;
+        }
+
+        #endregion
+
+        //public static int IndexOf(this List<clsRowDrawData> l, RowItem row) {
+        //    for (var z = 0; z < l.Count; z++) {
+        //        if (l[z].Row == row) { return z; }
+        //    }
+        //    return -1;
+        //}
+    }
+
     public class clsRowDrawData {
-        public RowItem Row;
-        public bool Pinned;
-        public int Y;
-        public string Chapter;
-        public bool Expanded;
+
+        #region Fields
+
         public Rectangle CaptionPos;
+        public string Chapter;
         public int DrawHeight;
+        public bool Expanded;
+        public bool Pinned;
+        public RowItem Row;
+        public int Y;
+
+        #endregion
+
+        #region Constructors
 
         public clsRowDrawData(RowItem row) {
             Row = row;
@@ -43,22 +67,7 @@ namespace BlueControls.Controls {
             DrawHeight = 0;
             CaptionPos = Rectangle.Empty;
         }
-    }
 
-    public static class clsRowDrawDataExtensions {
-
-        public static clsRowDrawData Get(this List<clsRowDrawData> l, RowItem row) {
-            foreach (var thisr in l) {
-                if (thisr.Row == row) { return thisr; }
-            }
-            return null;
-        }
-
-        //public static int IndexOf(this List<clsRowDrawData> l, RowItem row) {
-        //    for (var z = 0; z < l.Count; z++) {
-        //        if (l[z].Row == row) { return z; }
-        //    }
-        //    return -1;
-        //}
+        #endregion
     }
 }

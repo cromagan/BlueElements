@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,11 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 namespace BlueDatabase.EventArgs {
 
     public class GenerateLayoutInternalEventargs : System.EventArgs {
+
+        #region Constructors
 
         public GenerateLayoutInternalEventargs(RowItem row, string layoutID, string SaveTo) {
             Row = row;
@@ -30,12 +28,18 @@ namespace BlueDatabase.EventArgs {
             Handled = false;
         }
 
-        public bool Handled { get; set; }
-        public RowItem Row { get; set; }
-        public string LayoutID { get; set; }
+        #endregion
+
+        #region Properties
 
         //public bool DirectPrint { get; set; }
         //public bool DirectSave { get; set; }
         public string Filename { get; set; }
+
+        public bool Handled { get; set; }
+        public string LayoutID { get; set; }
+        public RowItem Row { get; set; }
+
+        #endregion
     }
 }

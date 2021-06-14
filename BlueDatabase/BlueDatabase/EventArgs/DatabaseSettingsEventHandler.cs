@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,11 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 namespace BlueDatabase.EventArgs {
 
     public class DatabaseSettingsEventHandler : System.EventArgs {
+
+        #region Constructors
 
         public DatabaseSettingsEventHandler(ColumnItem executingColumn, string filenname, bool readOnly) {
             ExecutingColumn = executingColumn;
@@ -29,8 +27,14 @@ namespace BlueDatabase.EventArgs {
             ReadOnly = readOnly;
         }
 
+        #endregion
+
+        #region Properties
+
         public ColumnItem ExecutingColumn { get; }
         public string Filenname { get; }
         public bool ReadOnly { get; set; }
+
+        #endregion
     }
 }

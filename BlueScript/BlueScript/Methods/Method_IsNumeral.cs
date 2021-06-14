@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
@@ -27,17 +23,23 @@ using static BlueBasics.Extensions;
 namespace BlueScript {
 
     internal class Method_IsNumeral : Method {
+
+        #region Properties
+
+        public override List<enVariableDataType> Args => new() { enVariableDataType.Nummeral_or_String };
         public override string Description => "Prüft, ob der Inhalt der Variable eine gültige Zahl ist. ";
-        public override string Syntax => "isNumeral(Value)";
-
-        public override List<string> Comand(Script s) => new() { "isnumeral" };
-
-        public override string StartSequence => "(";
+        public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.Bool;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Nummeral_or_String };
-        public override bool EndlessArgs => false;
+        public override string StartSequence => "(";
+        public override string Syntax => "isNumeral(Value)";
+
+        #endregion
+
+        #region Methods
+
+        public override List<string> Comand(Script s) => new() { "isnumeral" };
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
@@ -50,5 +52,7 @@ namespace BlueScript {
             }
             return strDoItFeedback.Falsch();
         }
+
+        #endregion
     }
 }

@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -31,17 +27,15 @@ namespace BlueControls.ItemCollection {
 
     public class RowFormulaListItem : BasicListItem {
 
-        #region Variablen-Deklarationen
+        #region Fields
 
+        private string _LayoutID;
         private RowItem _Row;
         private Bitmap _tmpBMP;
-        private string _LayoutID;
 
-        #endregion Variablen-Deklarationen
+        #endregion
 
-
-
-        #region Construktor + Initialize
+        #region Constructors
 
         public RowFormulaListItem(RowItem row, string layoutID, string userDefCompareKey) : base(string.Empty) {
             _Row = row;
@@ -49,9 +43,9 @@ namespace BlueControls.ItemCollection {
             UserDefCompareKey = userDefCompareKey;
         }
 
-        #endregion Construktor + Initialize
+        #endregion
 
-        public override string QuickInfo => _Row == null ? string.Empty : _Row.CellFirstString().CreateHtmlCodes(true);
+        #region Properties
 
         public string LayoutID {
             get => _LayoutID;
@@ -66,6 +60,8 @@ namespace BlueControls.ItemCollection {
             }
         }
 
+        public override string QuickInfo => _Row == null ? string.Empty : _Row.CellFirstString().CreateHtmlCodes(true);
+
         public RowItem Row {
             get => _Row;
             set {
@@ -76,12 +72,13 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        private void removePic() {
-            if (_tmpBMP != null) {
-                _tmpBMP.Dispose();
-                _tmpBMP = null;
-            }
-        }
+        #endregion
+
+        #region Methods
+
+        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) => (int)(columnWidth * 0.8);
+
+        protected override Size ComputeSizeUntouchedForListBox() => new(300, 300);
 
         protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, bool Translate) {
             if (_tmpBMP == null) { GeneratePic(); }
@@ -97,6 +94,8 @@ namespace BlueControls.ItemCollection {
                 Skin.Draw_Border(GR, itemdesign, vState, PositionModified);
             }
         }
+
+        protected override string GetCompareKey() => _Row.CellFirstString();
 
         private void GeneratePic() {
             if (string.IsNullOrEmpty(_LayoutID) || !_LayoutID.StartsWith("#")) {
@@ -117,13 +116,16 @@ namespace BlueControls.ItemCollection {
             var slidervalues = _pad.SliderValues(mb, zoomv, centerpos);
             _pad.ShowInPrintMode = true;
             _pad.Unselect();
-            _pad.DrawCreativePadToBitmap(_tmpBMP, enStates.Standard, zoomv, (decimal)slidervalues.X, (decimal)slidervalues.Y, null);
+            _pad.DrawCreativePadToBitmap(_tmpBMP, enStates.Standard, zoomv, (double)slidervalues.X, (double)slidervalues.Y, null);
         }
 
-        protected override Size ComputeSizeUntouchedForListBox() => new(300, 300);
+        private void removePic() {
+            if (_tmpBMP != null) {
+                _tmpBMP.Dispose();
+                _tmpBMP = null;
+            }
+        }
 
-        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) => (int)(columnWidth * 0.8);
-
-        protected override string GetCompareKey() => _Row.CellFirstString();
+        #endregion
     }
 }

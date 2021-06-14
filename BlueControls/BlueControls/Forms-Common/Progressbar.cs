@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -26,12 +22,19 @@ using System.Drawing;
 namespace BlueControls.Forms {
 
     public partial class Progressbar : FloatingForm {
-        private int eProgressbar_LastCurrent = int.MaxValue;
+
+        #region Fields
+
         private readonly Dictionary<int, DateTime> eProgressbar_TimeDic = new();
-        private int eProgressbar_LastCalulatedSeconds = int.MinValue;
-        private DateTime eProgressbar_LastTimeUpdate = DateTime.Now;
-        private int _count = 0;
         private string _baseText = string.Empty;
+        private int _count = 0;
+        private int eProgressbar_LastCalulatedSeconds = int.MinValue;
+        private int eProgressbar_LastCurrent = int.MaxValue;
+        private DateTime eProgressbar_LastTimeUpdate = DateTime.Now;
+
+        #endregion
+
+        #region Constructors
 
         private Progressbar() : base(Enums.enDesign.Form_BitteWarten) => InitializeComponent();
 
@@ -42,6 +45,10 @@ namespace BlueControls.Forms {
             var Wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
             Size = new Size(Wi + (capTXT.Left * 2), He + (capTXT.Top * 2));
         }
+
+        #endregion
+
+        #region Methods
 
         public static Progressbar Show(string Text) {
             Progressbar P = new(Text) {
@@ -60,6 +67,20 @@ namespace BlueControls.Forms {
             P.Show();
             P.BringToFront();
             return P;
+        }
+
+        public void Update(string Text) {
+            _baseText = Text;
+            UpdateInternal(Text);
+        }
+
+        public void Update(int current) {
+            if (InvokeRequired) {
+                // Es kommt zwar die ganze Berechnung durcheinander, aber besser als ein Fehler
+                Invoke(new Action(() => Update(current)));
+                return;
+            }
+            UpdateInternal(CalculateText(_baseText, current, _count));
         }
 
         private string CalculateText(string BaseText, int Current, int Count) {
@@ -113,20 +134,6 @@ namespace BlueControls.Forms {
                       : "<br>100 % - ...abgeschlossen!<tab>");
         }
 
-        public void Update(string Text) {
-            _baseText = Text;
-            UpdateInternal(Text);
-        }
-
-        public void Update(int current) {
-            if (InvokeRequired) {
-                // Es kommt zwar die ganze Berechnung durcheinander, aber besser als ein Fehler
-                Invoke(new Action(() => Update(current)));
-                return;
-            }
-            UpdateInternal(CalculateText(_baseText, current, _count));
-        }
-
         private void UpdateInternal(string Text) {
             if (Text != capTXT.Text) {
                 capTXT.Text = Text;
@@ -136,5 +143,7 @@ namespace BlueControls.Forms {
                 Refresh();
             }
         }
+
+        #endregion
     }
 }

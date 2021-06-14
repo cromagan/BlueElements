@@ -1,5 +1,3 @@
-#region BlueElements - a collection of useful tools, database and controls
-
 // Authors:
 // Christian Peter
 //
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using System;
 using System.Collections.Generic;
@@ -27,9 +23,16 @@ using System.Drawing;
 namespace BlueControls.Forms {
 
     public partial class PictureView {
+
+        #region Fields
+
         protected List<string> _FileList;
-        private int _NR = -1;
         private readonly string _Title = string.Empty;
+        private int _NR = -1;
+
+        #endregion
+
+        #region Constructors
 
         public PictureView() {
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -69,6 +72,10 @@ namespace BlueControls.Forms {
             ZoomIn.Checked = true;
             Auswahl.Enabled = false;
         }
+
+        #endregion
+
+        #region Methods
 
         //public PictureView(string CodeToParse, string Title)
         //{
@@ -140,6 +147,11 @@ namespace BlueControls.Forms {
             LoadPic(_NR);
         }
 
+        private void Pad_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
+            if (ZoomIn.Checked) { Pad.ZoomIn(e); }
+            if (ZoomOut.Checked) { Pad.ZoomOut(e); }
+        }
+
         private void Rechts_Click(object sender, System.EventArgs e) {
             _NR++;
             if (_NR >= _FileList.Count - 1) { _NR = _FileList.Count - 1; }
@@ -148,9 +160,6 @@ namespace BlueControls.Forms {
 
         private void ZoomFitBut_Click(object sender, System.EventArgs e) => Pad.ZoomFit();
 
-        private void Pad_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
-            if (ZoomIn.Checked) { Pad.ZoomIn(e); }
-            if (ZoomOut.Checked) { Pad.ZoomOut(e); }
-        }
+        #endregion
     }
 }

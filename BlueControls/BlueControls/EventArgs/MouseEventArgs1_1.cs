@@ -1,5 +1,3 @@
-#region BlueElements - a collection of useful tools, database and controls
-
 // Authors:
 // Christian Peter
 //
@@ -17,13 +15,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using System.Windows.Forms;
 
 namespace BlueControls.EventArgs {
 
     public sealed class MouseEventArgs1_1 : MouseEventArgs {
+
+        #region Constructors
 
         public MouseEventArgs1_1(MouseButtons button, int clicks, int x, int y, int delta, int trimmedX, int trimmedy, bool isinPic) : base(button, clicks, x, y, delta) {
             IsInPic = isinPic;
@@ -31,8 +29,14 @@ namespace BlueControls.EventArgs {
             TrimmedY = trimmedy;
         }
 
+        #endregion
+
+        #region Properties
+
+        public bool IsInPic { get; }
         public int TrimmedX { get; }
         public int TrimmedY { get; }
-        public bool IsInPic { get; }
+
+        #endregion
     }
 }

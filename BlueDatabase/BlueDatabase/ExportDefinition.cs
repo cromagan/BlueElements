@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -16,8 +14,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-
-#endregion BlueElements - a collection of useful tools, database and controls
 
 using BlueBasics;
 using BlueBasics.Enums;
@@ -35,54 +31,67 @@ namespace BlueDatabase {
     //Der Export wird nur Intern verwaltet und gibt keine Ereignisse aus.
     //Wenn mal ein LAyout geändert wird, sind es gleich 100 und mehr AddPenduings mit imensen Daten.
     public class ExportDefinition : IParseable, IReadableTextWithChanging, ICompareKey, ICheckable, IDisposable {
-        public Database Database { get; private set; }
-        private string _Verzeichnis;
-        private enExportTyp _Typ;
-        private float _Intervall;
+
+        #region Fields
+
+        public ListExt<string> _BereitsExportiert;
         private float _AutomatischLöschen;
         private string _ExportFormularID;
         private int _ExportSpaltenAnsicht;
-        public ListExt<string> _BereitsExportiert;
-        private DateTime _LastExportTimeUTC;
         private FilterCollection _Filter;
+        private float _Intervall;
+        private DateTime _LastExportTimeUTC;
+        private enExportTyp _Typ;
+        private string _Verzeichnis;
         private bool disposedValue;
 
-        #region Event-Deklarationen + Delegaten
+        #endregion
+
+        #region Constructors
+
+        public ExportDefinition(Database database, string verzeichnis, enExportTyp typ, float intervall, float automatischlöschen) : this(database) {
+            _Verzeichnis = verzeichnis;
+            _Typ = typ;
+            _Intervall = intervall;
+            _AutomatischLöschen = automatischlöschen;
+        }
+
+        public ExportDefinition(Database database, string toParse) : this(database, toParse, false) {
+        }
+
+        public ExportDefinition(Database database, string toParse, bool DeleteLastExportInfos) : this(database) {
+            Parse(toParse);
+            if (DeleteLastExportInfos) {
+                _BereitsExportiert.Clear();
+                _LastExportTimeUTC = new DateTime(1900, 1, 1);
+            }
+        }
+
+        public ExportDefinition(Database database) {
+            Database = database;
+            Database.Disposing += Database_Disposing;
+            Initialize();
+        }
+
+        #endregion
+
+        #region Destructors
+
+        // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
+        ~ExportDefinition() {
+            // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+            Dispose(disposing: false);
+        }
+
+        #endregion
+
+        #region Events
 
         public event EventHandler Changed;
 
-        #endregion Event-Deklarationen + Delegaten
+        #endregion
 
         #region Properties
-
-        public bool IsParsing { get; private set; }
-
-        public string Verzeichnis {
-            get => _Verzeichnis;
-            set {
-                if (_Verzeichnis == value) { return; }
-                _Verzeichnis = value;
-                OnChanged();
-            }
-        }
-
-        public enExportTyp Typ {
-            get => _Typ;
-            set {
-                if (_Typ == value) { return; }
-                _Typ = value;
-                OnChanged();
-            }
-        }
-
-        public float Intervall {
-            get => _Intervall;
-            set {
-                if (_Intervall == value) { return; }
-                _Intervall = value;
-                OnChanged();
-            }
-        }
 
         public float AutomatischLöschen {
             get => _AutomatischLöschen;
@@ -92,6 +101,9 @@ namespace BlueDatabase {
                 OnChanged();
             }
         }
+
+        public List<string> BereitsExportiert => _BereitsExportiert;
+        public Database Database { get; private set; }
 
         public string ExportFormularID {
             get => _ExportFormularID;
@@ -126,7 +138,16 @@ namespace BlueDatabase {
             }
         }
 
-        public List<string> BereitsExportiert => _BereitsExportiert;
+        public float Intervall {
+            get => _Intervall;
+            set {
+                if (_Intervall == value) { return; }
+                _Intervall = value;
+                OnChanged();
+            }
+        }
+
+        public bool IsParsing { get; private set; }
 
         public DateTime LastExportTimeUTC {
             get => _LastExportTimeUTC;
@@ -137,54 +158,129 @@ namespace BlueDatabase {
             }
         }
 
-        #endregion Properties
-
-        #region Construktor + Initialize
-
-        private void Initialize() {
-            _Verzeichnis = string.Empty;
-            _Typ = enExportTyp.DatenbankOriginalFormat;
-            _Intervall = 1;
-            _AutomatischLöschen = 30;
-            _ExportFormularID = string.Empty;
-            _ExportSpaltenAnsicht = 0;
-            Filter = new FilterCollection(Database);
-            _BereitsExportiert = new ListExt<string>();
-            _BereitsExportiert.Changed += _BereitsExportiert_ListOrItemChanged;
-            _LastExportTimeUTC = new DateTime(1900, 1, 1);
-        }
-
-        public ExportDefinition(Database database, string verzeichnis, enExportTyp typ, float intervall, float automatischlöschen) : this(database) {
-            _Verzeichnis = verzeichnis;
-            _Typ = typ;
-            _Intervall = intervall;
-            _AutomatischLöschen = automatischlöschen;
-        }
-
-        public ExportDefinition(Database database, string toParse) : this(database, toParse, false) {
-        }
-
-        public ExportDefinition(Database database, string toParse, bool DeleteLastExportInfos) : this(database) {
-            Parse(toParse);
-            if (DeleteLastExportInfos) {
-                _BereitsExportiert.Clear();
-                _LastExportTimeUTC = new DateTime(1900, 1, 1);
+        public enExportTyp Typ {
+            get => _Typ;
+            set {
+                if (_Typ == value) { return; }
+                _Typ = value;
+                OnChanged();
             }
         }
 
-        public ExportDefinition(Database database) {
-            Database = database;
-            Database.Disposing += Database_Disposing;
-            Initialize();
+        public string Verzeichnis {
+            get => _Verzeichnis;
+            set {
+                if (_Verzeichnis == value) { return; }
+                _Verzeichnis = value;
+                OnChanged();
+            }
         }
 
-        private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
+        #endregion
 
-        #endregion Construktor + Initialize
+        #region Methods
 
-        private void _Filter_Changed(object sender, System.EventArgs e) => OnChanged();
+        public object Clone() => new ExportDefinition(Database, ToString());
 
-        private void _BereitsExportiert_ListOrItemChanged(object sender, System.EventArgs e) => OnChanged();
+        public string CompareKey() => ((int)_Typ).ToString(Constants.Format_Integer3) + "|" + _Verzeichnis + "|" + _ExportFormularID + "|" + _Intervall + "|" + _AutomatischLöschen;
+
+        //#region IDisposable Support
+        //// IDisposable
+        //protected virtual void Dispose(bool disposing)
+        //{
+        //    if (!disposedValue)
+        //    {
+        //        if (disposing)
+        //        {
+        //            //disposedValue = False
+        //            _Verzeichnis = null;
+        //            _Typ = 0;
+        //            _Intervall = 0;
+        //            _AutomatischLöschen = 0;
+        //            _ExportFormular = null;
+        //            _ExportSpaltenAnsicht = 0;
+        //            _Filter.Dispose();
+        //            _BereitsExportiert = null;
+        //            _LastExportTime = default(DateTime);
+        //            // TODO: verwalteten Zustand (verwaltete Objekte) entsorgen.
+        //        }
+        //        // TODO: nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalize() weiter unten überschreiben.
+        //        // TODO: große Felder auf Null setzen.
+        //    }
+        //    disposedValue = true;
+        //}
+        //// TODO: Finalize() nur überschreiben, wenn Dispose(disposing As Boolean) weiter oben Code zur Bereinigung nicht verwalteter Ressourcen enthält.
+        ////Protected Overrides Sub Finalize()
+        ////    ' Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in Dispose(disposing As Boolean) weiter oben ein.
+        ////    Dispose(False)
+        ////    MyBase.Finalize()
+        ////End Sub
+        //// Dieser Code wird von Visual Basic hinzugefügt, um das Dispose-Muster richtig zu implementieren.
+        //public void Dispose()
+        //{
+        //    // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in Dispose(disposing As Boolean) weiter oben ein.
+        //    Dispose(true);
+        //    // TODO: Auskommentierung der folgenden Zeile aufheben, wenn Finalize() oben überschrieben wird.
+        //    // GC.SuppressFinalize(Me)
+        //}
+        public void DeleteAllBackups() {
+            for (var n = 0; n < _BereitsExportiert.Count; n++) {
+                if (!string.IsNullOrEmpty(_BereitsExportiert[n])) {
+                    var x = _BereitsExportiert[n].SplitBy("|");
+                    if (FileExists(x[0])) {
+                        DeleteFile(x[0], false);
+                        _BereitsExportiert[n] = string.Empty;
+                    }
+                }
+            }
+            _BereitsExportiert.RemoveNullOrEmpty();
+        }
+
+        public void Dispose() {
+            // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
+        public string ErrorReason() {
+            if (string.IsNullOrEmpty(Database.Filename)) {
+                return "Nur von Datenbanken, die auch auf der Festplatte gespeichert sind, kann ein Export stattfinden.";
+            }
+            if (!string.IsNullOrEmpty(Database.GlobalShowPass) && _Typ != enExportTyp.DatenbankOriginalFormat) {
+                return "Von passwortgeschützten Datenbanken können nur Exporte im Originalformat stattfinden.";
+            }
+            if (_Typ == enExportTyp.EinzelnMitFormular) {
+                if (string.IsNullOrEmpty(_ExportFormularID)) {
+                    return "Layout-Vorlage nicht definiert.";
+                }
+                if (_ExportFormularID.StartsWith("#")) {
+                    var LNo = Database.Layouts.LayoutIDToIndex(_ExportFormularID);
+                    if (LNo < 0) {
+                        return "Layout-Vorlage nicht vorhanden.";
+                    }
+                } else {
+                    if (!FileExists(_ExportFormularID)) {
+                        return "Layout-Vorlage existiert nicht.";
+                    }
+                }
+            } else {
+                if (_Intervall < 0.00099F) // ALT: Auch bei Bild Export. Sonst wird bei jeder änderung der Durchlauf angestoßen und das hindert die Arbeit ungemein
+                {
+                    return "Intervall muss mindestens 0.001 sein.";
+                }
+                if (_AutomatischLöschen is < 0.00099F or > 10000) {
+                    return "Automatisch löschen muss zwischen 0.01 und 10000 sein.";
+                }
+                if (_Intervall * 1000 < _AutomatischLöschen) {
+                    return "Automatisch löschen darf bei diesem Intervall maximal " + (_Intervall * 1000) + " sein.";
+                }
+            }
+            return !string.IsNullOrEmpty(_Verzeichnis) && !PathExists(_Verzeichnis)
+                ? "Das Zielverzeichnis existiert nicht."
+                : !CanWriteInDirectory(_Verzeichnis) ? "Sie besitzen im Zielverzeichnis keine Schreibrechte." : string.Empty;
+        }
+
+        public bool IsOk() => string.IsNullOrEmpty(ErrorReason());
 
         public void OnChanged() =>
             //if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
@@ -268,8 +364,6 @@ namespace BlueDatabase {
             _BereitsExportiert.ThrowEvents = true;
             IsParsing = false;
         }
-
-        public string CompareKey() => ((int)_Typ).ToString(Constants.Format_Integer3) + "|" + _Verzeichnis + "|" + _ExportFormularID + "|" + _Intervall + "|" + _AutomatischLöschen;
 
         public string ReadableText() {
             var t = ErrorReason();
@@ -406,77 +500,6 @@ namespace BlueDatabase {
             }
         }
 
-        private string GetShortener() {
-            if (_BereitsExportiert.Count < 2) { return string.Empty; }
-            var ze = 1;
-            var last = string.Empty;
-            do {
-                foreach (var thiss in _BereitsExportiert) {
-                    if (ze > thiss.Length - 2) { return thiss.Substring(0, ze - 1); }
-                    if (!string.IsNullOrEmpty(last)) {
-                        if (thiss.Substring(0, ze) != last) { return thiss.Substring(0, ze - 1); }
-                    } else {
-                        last = thiss.Substring(0, ze);
-                    }
-                }
-                ze++;
-                last = string.Empty;
-            }
-            while (true);
-        }
-
-        //#region IDisposable Support
-        //// IDisposable
-        //protected virtual void Dispose(bool disposing)
-        //{
-        //    if (!disposedValue)
-        //    {
-        //        if (disposing)
-        //        {
-        //            //disposedValue = False
-        //            _Verzeichnis = null;
-        //            _Typ = 0;
-        //            _Intervall = 0;
-        //            _AutomatischLöschen = 0;
-        //            _ExportFormular = null;
-        //            _ExportSpaltenAnsicht = 0;
-        //            _Filter.Dispose();
-        //            _BereitsExportiert = null;
-        //            _LastExportTime = default(DateTime);
-        //            // TODO: verwalteten Zustand (verwaltete Objekte) entsorgen.
-        //        }
-        //        // TODO: nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalize() weiter unten überschreiben.
-        //        // TODO: große Felder auf Null setzen.
-        //    }
-        //    disposedValue = true;
-        //}
-        //// TODO: Finalize() nur überschreiben, wenn Dispose(disposing As Boolean) weiter oben Code zur Bereinigung nicht verwalteter Ressourcen enthält.
-        ////Protected Overrides Sub Finalize()
-        ////    ' Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in Dispose(disposing As Boolean) weiter oben ein.
-        ////    Dispose(False)
-        ////    MyBase.Finalize()
-        ////End Sub
-        //// Dieser Code wird von Visual Basic hinzugefügt, um das Dispose-Muster richtig zu implementieren.
-        //public void Dispose()
-        //{
-        //    // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in Dispose(disposing As Boolean) weiter oben ein.
-        //    Dispose(true);
-        //    // TODO: Auskommentierung der folgenden Zeile aufheben, wenn Finalize() oben überschrieben wird.
-        //    // GC.SuppressFinalize(Me)
-        //}
-        public void DeleteAllBackups() {
-            for (var n = 0; n < _BereitsExportiert.Count; n++) {
-                if (!string.IsNullOrEmpty(_BereitsExportiert[n])) {
-                    var x = _BereitsExportiert[n].SplitBy("|");
-                    if (FileExists(x[0])) {
-                        DeleteFile(x[0], false);
-                        _BereitsExportiert[n] = string.Empty;
-                    }
-                }
-            }
-            _BereitsExportiert.RemoveNullOrEmpty();
-        }
-
         internal bool DeleteOutdatedBackUps(BackgroundWorker worker) {
             var Did = false;
             if (!IsOk()) { return false; }
@@ -536,46 +559,6 @@ namespace BlueDatabase {
                 _BereitsExportiert.RemoveNullOrEmpty();
             }
             return Did;
-        }
-
-        public bool IsOk() => string.IsNullOrEmpty(ErrorReason());
-
-        public string ErrorReason() {
-            if (string.IsNullOrEmpty(Database.Filename)) {
-                return "Nur von Datenbanken, die auch auf der Festplatte gespeichert sind, kann ein Export stattfinden.";
-            }
-            if (!string.IsNullOrEmpty(Database.GlobalShowPass) && _Typ != enExportTyp.DatenbankOriginalFormat) {
-                return "Von passwortgeschützten Datenbanken können nur Exporte im Originalformat stattfinden.";
-            }
-            if (_Typ == enExportTyp.EinzelnMitFormular) {
-                if (string.IsNullOrEmpty(_ExportFormularID)) {
-                    return "Layout-Vorlage nicht definiert.";
-                }
-                if (_ExportFormularID.StartsWith("#")) {
-                    var LNo = Database.Layouts.LayoutIDToIndex(_ExportFormularID);
-                    if (LNo < 0) {
-                        return "Layout-Vorlage nicht vorhanden.";
-                    }
-                } else {
-                    if (!FileExists(_ExportFormularID)) {
-                        return "Layout-Vorlage existiert nicht.";
-                    }
-                }
-            } else {
-                if (_Intervall < 0.00099F) // ALT: Auch bei Bild Export. Sonst wird bei jeder änderung der Durchlauf angestoßen und das hindert die Arbeit ungemein
-                {
-                    return "Intervall muss mindestens 0.001 sein.";
-                }
-                if (_AutomatischLöschen is < 0.00099F or > 10000) {
-                    return "Automatisch löschen muss zwischen 0.01 und 10000 sein.";
-                }
-                if (_Intervall * 1000 < _AutomatischLöschen) {
-                    return "Automatisch löschen darf bei diesem Intervall maximal " + (_Intervall * 1000) + " sein.";
-                }
-            }
-            return !string.IsNullOrEmpty(_Verzeichnis) && !PathExists(_Verzeichnis)
-                ? "Das Zielverzeichnis existiert nicht."
-                : !CanWriteInDirectory(_Verzeichnis) ? "Sie besitzen im Zielverzeichnis keine Schreibrechte." : string.Empty;
         }
 
         //#endregion
@@ -667,6 +650,27 @@ namespace BlueDatabase {
             return DidAndOk;
         }
 
+        protected virtual void Dispose(bool disposing) {
+            if (!disposedValue) {
+                if (disposing) {
+                    // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
+                }
+                Database.Disposing -= Database_Disposing;
+                Database = null;
+                Filter.Dispose();
+                _BereitsExportiert = new ListExt<string>();
+                _BereitsExportiert.Changed -= _BereitsExportiert_ListOrItemChanged;
+                _BereitsExportiert.Dispose();
+                disposedValue = true;
+            }
+        }
+
+        private void _BereitsExportiert_ListOrItemChanged(object sender, System.EventArgs e) => OnChanged();
+
+        private void _Filter_Changed(object sender, System.EventArgs e) => OnChanged();
+
+        private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
+
         private bool DeleteId(long Id, BackgroundWorker Worker) {
             var Did = false;
             for (var f = 0; f < _BereitsExportiert.Count; f++) {
@@ -688,33 +692,38 @@ namespace BlueDatabase {
             return Did;
         }
 
-        public object Clone() => new ExportDefinition(Database, ToString());
-
-        protected virtual void Dispose(bool disposing) {
-            if (!disposedValue) {
-                if (disposing) {
-                    // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
+        private string GetShortener() {
+            if (_BereitsExportiert.Count < 2) { return string.Empty; }
+            var ze = 1;
+            var last = string.Empty;
+            do {
+                foreach (var thiss in _BereitsExportiert) {
+                    if (ze > thiss.Length - 2) { return thiss.Substring(0, ze - 1); }
+                    if (!string.IsNullOrEmpty(last)) {
+                        if (thiss.Substring(0, ze) != last) { return thiss.Substring(0, ze - 1); }
+                    } else {
+                        last = thiss.Substring(0, ze);
+                    }
                 }
-                Database.Disposing -= Database_Disposing;
-                Database = null;
-                Filter.Dispose();
-                _BereitsExportiert = new ListExt<string>();
-                _BereitsExportiert.Changed -= _BereitsExportiert_ListOrItemChanged;
-                _BereitsExportiert.Dispose();
-                disposedValue = true;
+                ze++;
+                last = string.Empty;
             }
+            while (true);
         }
 
-        // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
-        ~ExportDefinition() {
-            // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-            Dispose(disposing: false);
+        private void Initialize() {
+            _Verzeichnis = string.Empty;
+            _Typ = enExportTyp.DatenbankOriginalFormat;
+            _Intervall = 1;
+            _AutomatischLöschen = 30;
+            _ExportFormularID = string.Empty;
+            _ExportSpaltenAnsicht = 0;
+            Filter = new FilterCollection(Database);
+            _BereitsExportiert = new ListExt<string>();
+            _BereitsExportiert.Changed += _BereitsExportiert_ListOrItemChanged;
+            _LastExportTimeUTC = new DateTime(1900, 1, 1);
         }
 
-        public void Dispose() {
-            // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
+        #endregion
     }
 }

@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,39 +15,29 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using System.Collections.Generic;
 
 namespace BlueControls.ItemCollection {
 
     internal class clsPhysicPadItem : clsAbstractPhysicPadItem {
+
+        #region Fields
+
         public readonly List<clsKraft> Kraft = new();
+
+        #endregion
+
+        #region Constructors
 
         public clsPhysicPadItem(ItemCollectionPad parent) : base(parent, string.Empty) {
         }
 
+        #endregion
+
+        #region Methods
+
         protected override string ClassId() => "Physics-Object";
 
-        //public override bool Contains(PointF value, decimal zoomfactor)
-        //{
-        //    throw new NotImplementedException();
-        //}
-        //public override RectangleM UsedArea()
-        //{
-        //    throw new NotImplementedException();
-        //}
-        //protected override string ClassId()
-        //{
-        //    throw new NotImplementedException();
-        //}
-        //protected override void GenerateInternalRelationExplicit()
-        //{
-        //    throw new NotImplementedException();
-        //}
-        //protected override void ParseFinished()
-        //{
-        //    throw new NotImplementedException();
-        //}
+        #endregion
     }
 }

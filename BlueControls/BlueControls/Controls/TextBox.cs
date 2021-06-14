@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -16,8 +14,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-
-#endregion BlueElements - a collection of useful tools, database and controls
 
 using BlueBasics;
 using BlueBasics.Enums;
@@ -39,7 +35,43 @@ namespace BlueControls.Controls {
     [DefaultEvent("TextChanged")]
     public partial class TextBox : GenericControl, IContextMenu {
 
-        #region Constructor
+        #region Fields
+
+        private string _AllowedChars = string.Empty;
+
+        private int _Cursor_CharPos = -1;
+
+        private bool _Cursor_Visible;
+
+        private ExtText _eTxt;
+
+        private enDataFormat _Format = enDataFormat.Text;
+
+        private string _LastCheckedText = string.Empty;
+
+        private DateTime _LastUserActionForSpellChecking = DateTime.Now;
+
+        private int _MarkEnd = -1;
+
+        private int _MarkStart = -1;
+
+        private int _MouseValue;
+
+        private bool _Multiline;
+
+        private bool _MustCheck = true;
+
+        private Slider _SliderY = null;
+
+        private bool _SpellChecking;
+
+        private string _Suffix = string.Empty;
+
+        private enSteuerelementVerhalten _Verhalten = enSteuerelementVerhalten.Scrollen_ohne_Textumbruch;
+
+        #endregion
+
+        #region Constructors
 
         public TextBox() : base(true, true) {
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -48,55 +80,27 @@ namespace BlueControls.Controls {
             _MouseHighlight = false;
         }
 
-        #endregion Constructor
+        #endregion
 
-        #region Variablen
+        #region Events
 
-        private enDataFormat _Format = enDataFormat.Text;
-        private enSteuerelementVerhalten _Verhalten = enSteuerelementVerhalten.Scrollen_ohne_Textumbruch;
-        private ExtText _eTxt;
-        private string _AllowedChars = string.Empty;
-        private bool _SpellChecking;
-        private bool _Multiline;
-        private bool _MustCheck = true;
-        private string _Suffix = string.Empty;
-        private Slider _SliderY = null;
-        private DateTime _LastUserActionForSpellChecking = DateTime.Now;
-        private string _LastCheckedText = string.Empty;
-        private int _MarkStart = -1;
-        private int _MarkEnd = -1;
-        private int _Cursor_CharPos = -1;
-        private int _MouseValue; //Zum Berechnen, was die Maus gerade macht
-        private bool _Cursor_Visible;
+        public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
 
-        #endregion Variablen
+        public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
+
+        public new event EventHandler Enter;
+
+        public event EventHandler ESC;
+
+        public event EventHandler<MultiUserFileGiveBackEventArgs> NeedDatabaseOfAdditinalSpecialChars;
+
+        public event EventHandler TAB;
+
+        public new event EventHandler TextChanged;
+
+        #endregion
 
         #region Properties
-
-        [DefaultValue(false)]
-        public bool SpellChecking {
-            get => _SpellChecking;
-            set {
-                if (_SpellChecking == value) { return; }
-                _SpellChecking = value;
-                AbortSpellChecking();
-                Invalidate();
-            }
-        }
-
-        [DefaultValue(enSteuerelementVerhalten.Scrollen_ohne_Textumbruch)]
-        public enSteuerelementVerhalten Verhalten {
-            get => _Verhalten;
-            set {
-                if (_Verhalten == value) { return; }
-                _Verhalten = value;
-                if (_SliderY != null) {
-                    _SliderY.Visible = false;
-                    _SliderY.Value = 0;
-                }
-                Invalidate();
-            }
-        }
 
         [DefaultValue("")]
         public string AllowedChars {
@@ -108,16 +112,6 @@ namespace BlueControls.Controls {
             }
         }
 
-        [DefaultValue("")]
-        public string Suffix {
-            get => _Suffix;
-            set {
-                if (value == _Suffix) { return; }
-                _Suffix = value;
-                Invalidate();
-            }
-        }
-
         [DefaultValue(enDataFormat.Text)]
         public enDataFormat Format {
             get => _Format;
@@ -125,6 +119,43 @@ namespace BlueControls.Controls {
                 if (_Format == value) { return; }
                 _Format = value;
                 GenerateETXT(false);
+            }
+        }
+
+        [DefaultValue(false)]
+        public bool MultiLine {
+            get => _Multiline;
+            set {
+                if (value == _Multiline) { return; }
+                _Multiline = value;
+                GenerateETXT(false);
+                if (_SliderY != null) {
+                    _SliderY.Visible = false;
+                    _SliderY.Value = 0;
+                }
+                Invalidate();
+            }
+        }
+
+        //Zum Berechnen, was die Maus gerade macht
+        [DefaultValue(false)]
+        public bool SpellChecking {
+            get => _SpellChecking;
+            set {
+                if (_SpellChecking == value) { return; }
+                _SpellChecking = value;
+                AbortSpellChecking();
+                Invalidate();
+            }
+        }
+
+        [DefaultValue("")]
+        public string Suffix {
+            get => _Suffix;
+            set {
+                if (value == _Suffix) { return; }
+                _Suffix = value;
+                Invalidate();
             }
         }
 
@@ -156,13 +187,12 @@ namespace BlueControls.Controls {
             }
         }
 
-        [DefaultValue(false)]
-        public bool MultiLine {
-            get => _Multiline;
+        [DefaultValue(enSteuerelementVerhalten.Scrollen_ohne_Textumbruch)]
+        public enSteuerelementVerhalten Verhalten {
+            get => _Verhalten;
             set {
-                if (value == _Multiline) { return; }
-                _Multiline = value;
-                GenerateETXT(false);
+                if (_Verhalten == value) { return; }
+                _Verhalten = value;
                 if (_SliderY != null) {
                     _SliderY.Visible = false;
                     _SliderY.Value = 0;
@@ -171,133 +201,205 @@ namespace BlueControls.Controls {
             }
         }
 
-        #endregion Properties
+        #endregion
 
-        #region Events
+        #region Methods
 
-        public new event EventHandler TextChanged;
-
-        public new event EventHandler Enter;
-
-        public event EventHandler ESC;
-
-        public event EventHandler TAB;
-
-        public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
-
-        public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
-
-        public event EventHandler<MultiUserFileGiveBackEventArgs> NeedDatabaseOfAdditinalSpecialChars;
-
-        #endregion Events
-
-        #region Form Ereignisse
-
-        private void Blinker_Tick(object sender, System.EventArgs e) {
-            if (!Focused()) { return; }
-            if (!Enabled) { return; }
-            if (_MarkStart > -1 && _MarkEnd > -1) { _Cursor_CharPos = -1; }
-            if (_Cursor_CharPos > -1) {
-                _Cursor_Visible = !_Cursor_Visible;
-                Invalidate();
-            } else {
-                if (_Cursor_Visible) {
-                    _Cursor_Visible = false;
-                    Invalidate();
-                }
-            }
-        }
-
-        // Fokus
-        protected override void OnLostFocus(System.EventArgs e) {
-            base.OnLostFocus(e);
-            //if (_LastTextChange != null) { OnTextChanged(); }
-            _LastUserActionForSpellChecking = DateTime.Now.AddSeconds(-30);
-            if (!FloatingForm.IsShowing(this)) { MarkClear(); }
-            Blinker.Enabled = false;
-            CursorClear();
-            Invalidate(); // Muss sein, weil evtl. der Cursor stehen bleibt
-        }
-
-        protected override void OnGotFocus(System.EventArgs e) {
-            base.OnGotFocus(e);
-            if (!Enabled) { return; }
-            if (_eTxt == null) { GenerateETXT(true); }
-            if (!FloatingForm.IsShowing(this)) {
-                SetCursorToEnd();
-                if (!_eTxt.Multiline) { if (!ContainsMouse() || !MousePressing()) { MarkAll(); } }
-                _LastUserActionForSpellChecking = DateTime.Now.AddSeconds(-30);
-            }
-            Blinker.Enabled = true;
-        }
-
-        // Tastatur
-        protected override void OnKeyDown(System.Windows.Forms.KeyEventArgs e) {
-            base.OnKeyDown(e);
-            if (!Enabled) { return; }
-            _LastUserActionForSpellChecking = DateTime.Now;
-            if (_MouseValue != 0) { return; }
-            switch (e.KeyCode) {
-                case System.Windows.Forms.Keys.Left:
-                    Cursor_Richtung(-1, 0);
-                    break;
-
-                case System.Windows.Forms.Keys.Right:
-                    Cursor_Richtung(1, 0);
-                    break;
-
-                case System.Windows.Forms.Keys.Down:
-                    Cursor_Richtung(0, 1);
-                    break;
-
-                case System.Windows.Forms.Keys.Up:
-                    Cursor_Richtung(0, -1);
-                    break;
-
-                case System.Windows.Forms.Keys.Delete:
-                    KeyPress(enASCIIKey.DEL);
-                    CheckIfTextIsChanded(_eTxt.HtmlText);
-                    break;
-            }
-            _Cursor_Visible = true;
-            Invalidate();
-        }
-
-        #region Cursor Berechnung
-
-        private void Cursor_Richtung(short X, short Y) {
-            if (X != 0) {
-                if (_Cursor_CharPos > -1) {
-                    if (X == -1 && _Cursor_CharPos > 0) { _Cursor_CharPos--; }
-                    if (X == 1 && _Cursor_CharPos < _eTxt.Chars.Count) { _Cursor_CharPos++; }
-                } else if (_MarkStart > -1 && _MarkEnd > -1) {
-                    if (X == -1) { _Cursor_CharPos = Math.Min(_MarkEnd, _MarkStart); }
-                    if (X == 1) { _Cursor_CharPos = Math.Max(_MarkEnd, _MarkStart) + 1; }
-                } else {
-                    _Cursor_CharPos = 0;
-                }
+        public void Char_DelBereich(int Von, int Bis) {
+            if (_MarkStart > -1 && _MarkEnd > -1) {
+                Von = _MarkStart;
+                Bis = _MarkEnd;
             }
             MarkClear();
-            var ri = _eTxt.CursorPixelPosx(_Cursor_CharPos);
-            if (_Cursor_CharPos < 0) { _Cursor_CharPos = 0; }
-            if (Y > 0) {
-                _Cursor_CharPos = _Cursor_CharPos >= _eTxt.Chars.Count
-                    ? _eTxt.Chars.Count
-                    : Cursor_PosAt(ri.Left + _eTxt.DrawingPos.X, ri.Top + (ri.Height / 2.0) + _eTxt.Chars[_Cursor_CharPos].Size.Height + _eTxt.DrawingPos.Y);
-            } else if (Y < 0) {
-                _Cursor_CharPos = _Cursor_CharPos >= _eTxt.Chars.Count
-                    ? _eTxt.Chars.Count > 0
-                        ? Cursor_PosAt(ri.Left + _eTxt.DrawingPos.X, ri.Top + (ri.Height / 2.0) - _eTxt.Chars[_Cursor_CharPos - 1].Size.Height + _eTxt.DrawingPos.Y)
-                        : 0
-                    : Cursor_PosAt(ri.Left + _eTxt.DrawingPos.X, ri.Top + (ri.Height / 2.0) - _eTxt.Chars[_Cursor_CharPos].Size.Height + _eTxt.DrawingPos.Y);
-            }
-            if (_Cursor_CharPos < 0) { _Cursor_CharPos = 0; }
             _Cursor_Visible = true;
+            if (Von < 0 || Bis < 0) { return; }
+            _Cursor_CharPos = Von;
+            _eTxt.Delete(Von, Bis);
         }
 
-        #endregion Cursor Berechnung
+        public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
+            Focus();
+            var NewWord = "";
+            _MarkStart = int.Parse(e.Tags.TagGet("MarkStart"));
+            _MarkEnd = int.Parse(e.Tags.TagGet("MarkEnd"));
+            _Cursor_CharPos = int.Parse(e.Tags.TagGet("Cursorpos"));
+            var tmp = e.ClickedComand;
+            if (e.ClickedComand.StartsWith("#ChangeTo:")) {
+                NewWord = e.ClickedComand.Substring(10);
+                tmp = "#ChangeTo";
+            }
+            switch (tmp) {
+                case "#SpellAdd":
+                    Dictionary.WordAdd(e.Tags.TagGet("Word"));
+                    _MustCheck = true;
+                    Invalidate();
+                    return true;
 
-        #region Übergebene Form Ereignisse
+                case "#SpellAddLower":
+                    Dictionary.WordAdd(e.Tags.TagGet("Word".ToLower()));
+                    _MustCheck = true;
+                    Invalidate();
+                    return true;
+
+                case "#SpellChecking":
+                    FloatingForm.Close(this);
+                    if (_SpellChecking) {
+                        _MustCheck = false;
+                        Dictionary.SpellCheckingAll(_eTxt, false);
+                        _MustCheck = true;
+                        Invalidate();
+                    }
+                    return true;
+
+                case "#SpellChecking2":
+                    FloatingForm.Close(this);
+                    if (_SpellChecking) {
+                        _MustCheck = false;
+                        Dictionary.SpellCheckingAll(_eTxt, true);
+                        _MustCheck = true;
+                        Invalidate();
+                    }
+                    break;
+
+                case "Ausschneiden":
+                    Clipboard_Copy();
+                    Char_DelBereich(-1, -1);
+                    return true;
+
+                case "Kopieren":
+                    Clipboard_Copy();
+                    return true;
+
+                case "Einfügen":
+                    Clipboard_Paste();
+                    return true;
+
+                case "#Caption":
+                    if (_MarkStart < 0 || _MarkEnd < 0) { return true; }
+                    Selection_Repair(true);
+                    _eTxt.StufeÄndern(_MarkStart, _MarkEnd - 1, 3);
+                    return true;
+
+                case "#NoCaption":
+                    if (_MarkStart < 0 || _MarkEnd < 0) { return true; }
+                    Selection_Repair(true);
+                    _eTxt.StufeÄndern(_MarkStart, _MarkEnd - 1, 4);
+                    return true;
+
+                case "#Bold":
+                    if (_MarkStart < 0 || _MarkEnd < 0) { return true; }
+                    Selection_Repair(true);
+                    _eTxt.StufeÄndern(_MarkStart, _MarkEnd - 1, 7);
+                    return true;
+
+                case "#Sonderzeichen":
+                    AddSpecialChar();
+                    return true;
+
+                case "#ChangeTo":
+                    var ws = _eTxt.WordStart(_Cursor_CharPos);
+                    var we = _eTxt.WordEnd(_Cursor_CharPos);
+                    Char_DelBereich(ws, we);
+                    _Cursor_CharPos = ws;
+                    InsertText(NewWord);
+                    _Cursor_CharPos = _eTxt.WordEnd(_Cursor_CharPos);
+                    return true;
+            }
+            return false;
+        }
+
+        public new void Focus() {
+            if (Focused()) { return; }
+            base.Focus();
+        }
+
+        public new bool Focused() => base.Focused || (_SliderY != null && _SliderY.Focused());
+
+        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
+            AbortSpellChecking();
+            HotItem = null;
+            Tags.TagSet("CursorPosBeforeClick", _Cursor_CharPos.ToString());
+            var tmp = Cursor_PosAt(e.X, e.Y);
+            Tags.TagSet("Char", tmp.ToString());
+            Tags.TagSet("MarkStart", _MarkStart.ToString());
+            Tags.TagSet("MarkEnd", _MarkEnd.ToString());
+            Tags.TagSet("Cursorpos", _Cursor_CharPos.ToString());
+            var tmpWord = _eTxt.Word(tmp);
+            Tags.TagSet("Word", tmpWord);
+            if (_SpellChecking && !Dictionary.IsWordOk(tmpWord)) {
+                Items.Add("Rechtschreibprüfung", true);
+                if (Dictionary.IsSpellChecking) {
+                    Items.Add("Gerade ausgelastet...", "Gerade ausgelastet...", false);
+                    Items.AddSeparator();
+                } else {
+                    var sim = Dictionary.SimilarTo(tmpWord);
+                    if (sim != null) {
+                        foreach (var ThisS in sim) {
+                            Items.Add(" - " + ThisS, "#ChangeTo:" + ThisS);
+                        }
+                        Items.AddSeparator();
+                    }
+                    Items.Add("'" + tmpWord + "' ins Wörterbuch aufnehmen", "#SpellAdd", Dictionary.IsWriteable());
+                    if (tmpWord.ToLower() != tmpWord) {
+                        Items.Add("'" + tmpWord.ToLower() + "' ins Wörterbuch aufnehmen", "#SpellAddLower", Dictionary.IsWriteable());
+                    }
+                    Items.Add("Schnelle Rechtschreibprüfung", "#SpellChecking", Dictionary.IsWriteable());
+                    Items.Add("Alle Wörter sind ok", "#SpellChecking2", Dictionary.IsWriteable());
+                    Items.AddSeparator();
+                }
+            }
+            if (this is not ComboBox cbx || cbx.DropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDown) {
+                Items.Add(enContextMenuComands.Ausschneiden, Convert.ToBoolean(_MarkStart >= 0) && Enabled);
+                Items.Add(enContextMenuComands.Kopieren, Convert.ToBoolean(_MarkStart >= 0));
+                Items.Add(enContextMenuComands.Einfügen, System.Windows.Forms.Clipboard.ContainsText() && Enabled);
+                if (_Format == enDataFormat.Text_mit_Formatierung) {
+                    Items.AddSeparator();
+                    Items.Add("Sonderzeichen einfügen", "#Sonderzeichen", QuickImage.Get(enImageCode.Sonne, 16), _Cursor_CharPos > -1);
+                    if (Convert.ToBoolean(_MarkEnd > -1)) {
+                        Items.AddSeparator();
+                        Items.Add("Als Überschrift markieren", "#Caption", Skin.GetBlueFont(enDesign.TextBox_Stufe3, enStates.Standard).SymbolForReadableText(), _MarkEnd > -1);
+                        Items.Add("Fettschrift", "#Bold", Skin.GetBlueFont(enDesign.TextBox_Bold, enStates.Standard).SymbolForReadableText(), Convert.ToBoolean(_MarkEnd > -1));
+                        Items.Add("Als normalen Text markieren", "#NoCaption", Skin.GetBlueFont(enDesign.TextBox, enStates.Standard).SymbolForReadableText(), Convert.ToBoolean(_MarkEnd > -1));
+                    }
+                }
+            }
+        }
+
+        public void InsertText(string nt) {
+            if (nt == null) { nt = string.Empty; }
+            nt = nt.Replace(Constants.beChrW1.ToString(), "\r");
+            nt = nt.RemoveChars(Constants.Char_NotFromClip);
+            if (!MultiLine) { nt = nt.RemoveChars("\r"); }
+            foreach (var t in nt) {
+                var a = (enASCIIKey)t;
+                if (_eTxt.InsertChar(a, _Cursor_CharPos)) {
+                    _Cursor_CharPos++;
+                }
+            }
+            CheckIfTextIsChanded(_eTxt.HtmlText);
+        }
+
+        public void Mark(enMarkState markstate, int first, int last) => _eTxt?.Mark(markstate, first, last);
+
+        public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
+
+        public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
+
+        /// <summary>
+        /// Prüft - bei Multiline Zeile für Zeile - ob der Text in der Textbox zulässig ist.
+        /// </summary>
+        /// <param name="MitMeldung"></param>
+        /// <returns>Ergibt Wahr, wenn der komplette Text dem Format entspricht. Andernfalls Falsch.</returns>
+        /// <remarks></remarks>
+        public bool Text_IsOkay(bool MitMeldung) {
+            if (!_eTxt.PlainText.IsFormat(_Format, _Multiline)) {
+                if (MitMeldung) { MessageBox.Show("Ihre Eingabe entspricht nicht<br>dem erwarteten Format.", enImageCode.Warnung, "OK"); }
+                return false;
+            }
+            return true;
+        }
+
+        public void Unmark(enMarkState markstate) => _eTxt?.Unmark(markstate);
 
         // Tastatur
         internal new void KeyPress(enASCIIKey KeyAscii) {
@@ -365,79 +467,6 @@ namespace BlueControls.Controls {
             CheckIfTextIsChanded(_eTxt.HtmlText);
         }
 
-        #endregion Übergebene Form Ereignisse
-
-        #region Clipboard
-
-        private void Clipboard_Paste() {
-            // VORSICHT!
-            // Seltsames Verhalten von VB.NET
-            // Anscheinend wird bei den Clipboard operationen ein DoEventXsx ausgelöst.
-            // Dadurch kommt es zum Refresh des übergeordneten Steuerelementes, warscheinlich der Textbox.
-            // Deshalb  muss 'Char_DelBereich' NACH den Clipboard-Operationen stattfinden.
-            if (!System.Windows.Forms.Clipboard.GetDataObject().GetDataPresent(System.Windows.Forms.DataFormats.Text)) { return; }
-            Char_DelBereich(-1, -1);
-            InsertText(Convert.ToString(System.Windows.Clipboard.GetDataObject().GetData(System.Windows.Forms.DataFormats.UnicodeText)));
-        }
-
-        public void InsertText(string nt) {
-            if (nt == null) { nt = string.Empty; }
-            nt = nt.Replace(Constants.beChrW1.ToString(), "\r");
-            nt = nt.RemoveChars(Constants.Char_NotFromClip);
-            if (!MultiLine) { nt = nt.RemoveChars("\r"); }
-            foreach (var t in nt) {
-                var a = (enASCIIKey)t;
-                if (_eTxt.InsertChar(a, _Cursor_CharPos)) {
-                    _Cursor_CharPos++;
-                }
-            }
-            CheckIfTextIsChanded(_eTxt.HtmlText);
-        }
-
-        private void Clipboard_Copy() {
-            if (_MarkStart < 0 || _MarkEnd < 0) { return; }
-            Selection_Repair(true);
-            var tt = _eTxt.ConvertCharToPlainText(_MarkStart, _MarkEnd - 1);
-            if (string.IsNullOrEmpty(tt)) { return; }
-            tt = tt.Replace("\n", string.Empty);
-            tt = tt.Replace("\r", "\r\n");
-            System.Windows.Forms.DataObject datobj = new();
-            datobj.SetData(System.Windows.Forms.DataFormats.Text, tt);
-            System.Windows.Clipboard.SetDataObject(datobj);
-        }
-
-        #endregion Clipboard
-
-        protected override void OnKeyPress(System.Windows.Forms.KeyPressEventArgs e) {
-            base.OnKeyPress(e);
-            _LastUserActionForSpellChecking = DateTime.Now;
-            if (!Enabled) {
-                if (e.KeyChar != (int)enASCIIKey.StrgX) { e.KeyChar = (char)enASCIIKey.StrgC; }
-                if (e.KeyChar != (int)enASCIIKey.StrgC) { return; }
-            }
-            switch ((int)e.KeyChar) {
-                case (int)enASCIIKey.ENTER:
-                    KeyPress((enASCIIKey)e.KeyChar);
-                    OnEnter();
-                    return;
-
-                case (int)enASCIIKey.ESC:
-                    OnESC();
-                    return;
-
-                case (int)enASCIIKey.TAB:
-                    OnTAB();
-                    return;
-
-                default:
-                    KeyPress((enASCIIKey)e.KeyChar);
-                    break;
-            }
-            Invalidate();
-            if (IsDisposed) { return; }
-            CheckIfTextIsChanded(_eTxt.HtmlText);
-        }
-
         internal bool WordStarts(string word, int position) {
             if (InvokeRequired) {
                 return (bool)Invoke(new Func<bool>(() => WordStarts(word, position)));
@@ -455,217 +484,6 @@ namespace BlueControls.Controls {
                 return WordStarts(word, position);
             }
         }
-
-        private void OnTAB() => TAB?.Invoke(this, System.EventArgs.Empty);
-
-        private void OnESC() => ESC?.Invoke(this, System.EventArgs.Empty);
-
-        private void OnEnter() => Enter?.Invoke(this, System.EventArgs.Empty);
-
-        // Mouse
-        protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
-            base.OnMouseDown(e);
-            _LastUserActionForSpellChecking = DateTime.Now;
-            if (!Enabled) { return; }
-            if (e.Button == System.Windows.Forms.MouseButtons.Right) { return; }
-            _MouseValue = 1;
-            _MarkStart = Cursor_PosAt(e.X, e.Y);
-            _MarkEnd = _MarkStart;
-            CursorClear();
-            Selection_Repair(false);
-            Invalidate();
-        }
-
-        protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
-            base.OnMouseUp(e);
-            _LastUserActionForSpellChecking = DateTime.Now;
-            if (Enabled) {
-                if (_MouseValue == 9999) {
-                    //es Wurde Doppelgeklickt
-                } else {
-                    if (_MarkStart == _MarkEnd || _MarkEnd < 0) {
-                        _Cursor_CharPos = Cursor_PosAt(e.X, e.Y);
-                        MarkClear();
-                        if (e.Button == System.Windows.Forms.MouseButtons.Right) {
-                            FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
-                        }
-                    } else {
-                        CursorClear();
-                        Selection_Repair(true);
-                        if (e.Button == System.Windows.Forms.MouseButtons.Right) {
-                            FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
-                        }
-                    }
-                }
-                _MouseValue = 0;
-            } else {
-                CursorClear();
-            }
-            Invalidate();
-        }
-
-        protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
-            base.OnMouseMove(e);
-            if (_eTxt == null) { return; }
-            if (e.Button != System.Windows.Forms.MouseButtons.Left) { return; }
-            if (!Enabled) { return; }
-            _LastUserActionForSpellChecking = DateTime.Now;
-            CursorClear();
-            _MarkEnd = Cursor_PosAt(e.X, e.Y);
-            Selection_Repair(false);
-            Invalidate();
-        }
-
-        #endregion Form Ereignisse
-
-        public new void Focus() {
-            if (Focused()) { return; }
-            base.Focus();
-        }
-
-        public new bool Focused() => base.Focused || (_SliderY != null && _SliderY.Focused());
-
-        private void CheckIfTextIsChanded(string NewPlainText) {
-            if (NewPlainText == _LastCheckedText) { return; }
-            _LastCheckedText = NewPlainText;
-            if (Dictionary.DictionaryRunning(true)) { _MustCheck = true; }
-            OnTextChanged();
-            return;
-        }
-
-        /// <summary>
-        /// Löst das Ereignis aus und setzt _LastUserChangingTime auf NULL.
-        /// </summary>
-        protected virtual void OnTextChanged() => TextChanged?.Invoke(this, System.EventArgs.Empty);
-
-        protected override bool IsInputKey(System.Windows.Forms.Keys keyData) =>
-            // Ganz wichtig diese Routine!
-            // Wenn diese NICHT ist, geht der Fokus weg, sobald der cursor gedrückt wird.
-            // http://technet.microsoft.com/de-de/subscriptions/control.isinputkey%28v=vs.100%29
-            keyData switch {
-                System.Windows.Forms.Keys.Up or System.Windows.Forms.Keys.Down or System.Windows.Forms.Keys.Left or System.Windows.Forms.Keys.Right => true,
-                _ => false,
-            };
-
-        /// <summary>
-        /// Prüft - bei Multiline Zeile für Zeile - ob der Text in der Textbox zulässig ist.
-        /// </summary>
-        /// <param name="MitMeldung"></param>
-        /// <returns>Ergibt Wahr, wenn der komplette Text dem Format entspricht. Andernfalls Falsch.</returns>
-        /// <remarks></remarks>
-        public bool Text_IsOkay(bool MitMeldung) {
-            if (!_eTxt.PlainText.IsFormat(_Format, _Multiline)) {
-                if (MitMeldung) { MessageBox.Show("Ihre Eingabe entspricht nicht<br>dem erwarteten Format.", enImageCode.Warnung, "OK"); }
-                return false;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Wenn das Format, die Maxlänge oder Multiline sich geändert haben,
-        /// wird für das dementsprechende Format die Verbote/Erlaubnisse gesetzt.
-        /// z.B. wird beim Format Datum die Maxlänge auf 10 gesetzt und nur noch Ziffern und Punkt erlaubt.
-        /// </summary>
-        /// <remarks></remarks>
-        private void GenerateETXT(bool ResetCoords) {
-            if (InvokeRequired) {
-                Invoke(new Action(() => GenerateETXT(ResetCoords)));
-                return;
-            }
-            if (_eTxt == null) {
-                var state = enStates.Standard;
-                if (!Enabled) { state = enStates.Standard_Disabled; }
-                _eTxt = new ExtText(GetDesign(), state);
-                ResetCoords = true;
-            }
-            _eTxt.Multiline = _Multiline;
-            _eTxt.AllowedChars = !string.IsNullOrEmpty(_AllowedChars) ? _AllowedChars : _Format.AllowedChars();
-            if (ResetCoords) {
-                // Hier Standard-Werte Setzen, die Draw-Routine setzt bei Bedarf um
-                if (_SliderY != null) {
-                    _SliderY.Visible = false;
-                    _SliderY.Value = 0;
-                }
-                _eTxt.DrawingPos.X = Skin.PaddingSmal;
-                _eTxt.DrawingPos.Y = Skin.PaddingSmal;
-                _eTxt.DrawingArea = new Rectangle(0, 0, -1, -1);
-                _eTxt.TextDimensions = Size.Empty;
-            }
-        }
-
-        #region Markierung (Selection)
-
-        private void Selection_WortMarkieren(int Pos) {
-            if (_eTxt == null || _eTxt.Chars.Count == 0) {
-                MarkClear();
-                return;
-            }
-            _MarkStart = _eTxt.WordStart(Pos);
-            _MarkEnd = _eTxt.WordEnd(Pos);
-            CursorClear();
-            Selection_Repair(true);
-        }
-
-        /// <summary>
-        /// Prüft die den Selektions-Bereich auf nicht erlaubte Werte und Repariert diese.
-        /// </summary>
-        /// <param name="SwapThem">Bei True werden MarkStart und MarkEnd richtig angeordnet. (Start kleiner/gleich End) </param>
-        /// <remarks></remarks>
-        private void Selection_Repair(bool SwapThem) {
-            if (_eTxt == null || _eTxt.Chars.Count == 0) { MarkClear(); }
-            if (_MarkStart < 0 && _MarkEnd < 0) { return; }
-            _MarkStart = Math.Max(_MarkStart, 0);
-            _MarkStart = Math.Min(_MarkStart, _eTxt.Chars.Count);
-            _MarkEnd = Math.Max(_MarkEnd, 0);
-            _MarkEnd = Math.Min(_MarkEnd, _eTxt.Chars.Count);
-            if (SwapThem && _MarkStart > _MarkEnd) {
-                modAllgemein.Swap(ref _MarkStart, ref _MarkEnd);
-            }
-        }
-
-        #endregion Markierung (Selection)
-
-        protected override void OnDoubleClick(System.EventArgs e) {
-            base.OnDoubleClick(e);
-            Selection_WortMarkieren(_MarkStart);
-            _LastUserActionForSpellChecking = DateTime.Now;
-            _MouseValue = 9999;
-            Invalidate();
-        }
-
-        private void MarkClear() {
-            _MarkStart = -1;
-            _MarkEnd = -1;
-        }
-
-        private void MarkAndGenerateZone(Graphics GR) {
-            _eTxt.Check(0, _eTxt.Chars.Count - 1, false);
-            if (_MarkStart < 0 || _MarkEnd < 0) { return; }
-            Selection_Repair(false);
-            var MaS = Math.Min(_MarkStart, _MarkEnd);
-            var MaE = Math.Max(_MarkStart, _MarkEnd);
-            if (MaS == MaE) { return; }
-            _eTxt.Check(MaS, MaE - 1, true);
-            var TmpcharS = MaS;
-            for (var cc = MaS; cc <= MaE; cc++) {
-                if (cc == MaE || _eTxt.Chars[cc].Pos.X < _eTxt.Chars[TmpcharS].Pos.X || Math.Abs(_eTxt.Chars[cc].Pos.Y - _eTxt.Chars[TmpcharS].Pos.Y) > 0.001) //Jetzt ist der Zeitpunkt zum Zeichen/start setzen
-                {
-                    Rectangle r = new((int)(_eTxt.Chars[TmpcharS].Pos.X + _eTxt.DrawingPos.X), (int)(_eTxt.Chars[TmpcharS].Pos.Y + 2 + _eTxt.DrawingPos.Y), (int)(_eTxt.Chars[cc - 1].Pos.X + _eTxt.Chars[cc - 1].Size.Width - _eTxt.Chars[TmpcharS].Pos.X), (int)(_eTxt.Chars[cc - 1].Pos.Y + _eTxt.Chars[cc - 1].Size.Height - _eTxt.Chars[TmpcharS].Pos.Y));
-                    if (r.Width < 2) { r = new Rectangle(r.Left, r.Top, 2, r.Height); }
-                    if (_eTxt.Chars[TmpcharS].State != enStates.Undefiniert) {
-                        Skin.Draw_Back(GR, _eTxt.Design, _eTxt.Chars[TmpcharS].State, r, null, false);
-                        Skin.Draw_Border(GR, _eTxt.Design, _eTxt.Chars[TmpcharS].State, r);
-                    }
-                    TmpcharS = cc;
-                }
-            }
-        }
-
-        private int HotPosition() => _Cursor_CharPos > -1
-? _Cursor_CharPos
-: _MarkStart > -1 && _MarkEnd < 0 ? _MarkEnd : _MarkStart > -1 && _MarkEnd > -1 ? _MarkEnd : -1;
-
-        protected virtual enDesign GetDesign() => enDesign.TextBox;
 
         protected override void DrawControl(Graphics gr, enStates state) {
             if (_eTxt == null) { GenerateETXT(true); }
@@ -765,14 +583,168 @@ namespace BlueControls.Controls {
             if (_MustCheck && !Dictionary.IsSpellChecking && Dictionary.DictionaryRunning(true) && !SpellChecker.CancellationPending && !SpellChecker.IsBusy) { SpellChecker.RunWorkerAsync(); }
         }
 
-        private void Cursor_Show(Graphics GR) {
-            if (!_Cursor_Visible) { return; }
-            if (_Cursor_CharPos < 0) { return; }
-            var r = _eTxt.CursorPixelPosx(_Cursor_CharPos);
-            GR.DrawLine(new Pen(Color.Black), r.Left + _eTxt.DrawingPos.X, r.Top + _eTxt.DrawingPos.Y, r.Left + _eTxt.DrawingPos.X, r.Bottom + _eTxt.DrawingPos.Y);
+        protected virtual enDesign GetDesign() => enDesign.TextBox;
+
+        protected override bool IsInputKey(System.Windows.Forms.Keys keyData) =>
+            // Ganz wichtig diese Routine!
+            // Wenn diese NICHT ist, geht der Fokus weg, sobald der cursor gedrückt wird.
+            // http://technet.microsoft.com/de-de/subscriptions/control.isinputkey%28v=vs.100%29
+            keyData switch {
+                System.Windows.Forms.Keys.Up or System.Windows.Forms.Keys.Down or System.Windows.Forms.Keys.Left or System.Windows.Forms.Keys.Right => true,
+                _ => false,
+            };
+
+        protected override void OnDoubleClick(System.EventArgs e) {
+            base.OnDoubleClick(e);
+            Selection_WortMarkieren(_MarkStart);
+            _LastUserActionForSpellChecking = DateTime.Now;
+            _MouseValue = 9999;
+            Invalidate();
         }
 
-        private void SliderY_ValueChange(object sender, System.EventArgs e) => Invalidate();
+        protected override void OnEnabledChanged(System.EventArgs e) {
+            MarkClear();
+            base.OnEnabledChanged(e);
+        }
+
+        protected override void OnGotFocus(System.EventArgs e) {
+            base.OnGotFocus(e);
+            if (!Enabled) { return; }
+            if (_eTxt == null) { GenerateETXT(true); }
+            if (!FloatingForm.IsShowing(this)) {
+                SetCursorToEnd();
+                if (!_eTxt.Multiline) { if (!ContainsMouse() || !MousePressing()) { MarkAll(); } }
+                _LastUserActionForSpellChecking = DateTime.Now.AddSeconds(-30);
+            }
+            Blinker.Enabled = true;
+        }
+
+        // Tastatur
+        protected override void OnKeyDown(System.Windows.Forms.KeyEventArgs e) {
+            base.OnKeyDown(e);
+            if (!Enabled) { return; }
+            _LastUserActionForSpellChecking = DateTime.Now;
+            if (_MouseValue != 0) { return; }
+            switch (e.KeyCode) {
+                case System.Windows.Forms.Keys.Left:
+                    Cursor_Richtung(-1, 0);
+                    break;
+
+                case System.Windows.Forms.Keys.Right:
+                    Cursor_Richtung(1, 0);
+                    break;
+
+                case System.Windows.Forms.Keys.Down:
+                    Cursor_Richtung(0, 1);
+                    break;
+
+                case System.Windows.Forms.Keys.Up:
+                    Cursor_Richtung(0, -1);
+                    break;
+
+                case System.Windows.Forms.Keys.Delete:
+                    KeyPress(enASCIIKey.DEL);
+                    CheckIfTextIsChanded(_eTxt.HtmlText);
+                    break;
+            }
+            _Cursor_Visible = true;
+            Invalidate();
+        }
+
+        protected override void OnKeyPress(System.Windows.Forms.KeyPressEventArgs e) {
+            base.OnKeyPress(e);
+            _LastUserActionForSpellChecking = DateTime.Now;
+            if (!Enabled) {
+                if (e.KeyChar != (int)enASCIIKey.StrgX) { e.KeyChar = (char)enASCIIKey.StrgC; }
+                if (e.KeyChar != (int)enASCIIKey.StrgC) { return; }
+            }
+            switch ((int)e.KeyChar) {
+                case (int)enASCIIKey.ENTER:
+                    KeyPress((enASCIIKey)e.KeyChar);
+                    OnEnter();
+                    return;
+
+                case (int)enASCIIKey.ESC:
+                    OnESC();
+                    return;
+
+                case (int)enASCIIKey.TAB:
+                    OnTAB();
+                    return;
+
+                default:
+                    KeyPress((enASCIIKey)e.KeyChar);
+                    break;
+            }
+            Invalidate();
+            if (IsDisposed) { return; }
+            CheckIfTextIsChanded(_eTxt.HtmlText);
+        }
+
+        // Fokus
+        protected override void OnLostFocus(System.EventArgs e) {
+            base.OnLostFocus(e);
+            //if (_LastTextChange != null) { OnTextChanged(); }
+            _LastUserActionForSpellChecking = DateTime.Now.AddSeconds(-30);
+            if (!FloatingForm.IsShowing(this)) { MarkClear(); }
+            Blinker.Enabled = false;
+            CursorClear();
+            Invalidate(); // Muss sein, weil evtl. der Cursor stehen bleibt
+        }
+
+        // Mouse
+        protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
+            base.OnMouseDown(e);
+            _LastUserActionForSpellChecking = DateTime.Now;
+            if (!Enabled) { return; }
+            if (e.Button == System.Windows.Forms.MouseButtons.Right) { return; }
+            _MouseValue = 1;
+            _MarkStart = Cursor_PosAt(e.X, e.Y);
+            _MarkEnd = _MarkStart;
+            CursorClear();
+            Selection_Repair(false);
+            Invalidate();
+        }
+
+        protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
+            base.OnMouseMove(e);
+            if (_eTxt == null) { return; }
+            if (e.Button != System.Windows.Forms.MouseButtons.Left) { return; }
+            if (!Enabled) { return; }
+            _LastUserActionForSpellChecking = DateTime.Now;
+            CursorClear();
+            _MarkEnd = Cursor_PosAt(e.X, e.Y);
+            Selection_Repair(false);
+            Invalidate();
+        }
+
+        protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
+            base.OnMouseUp(e);
+            _LastUserActionForSpellChecking = DateTime.Now;
+            if (Enabled) {
+                if (_MouseValue == 9999) {
+                    //es Wurde Doppelgeklickt
+                } else {
+                    if (_MarkStart == _MarkEnd || _MarkEnd < 0) {
+                        _Cursor_CharPos = Cursor_PosAt(e.X, e.Y);
+                        MarkClear();
+                        if (e.Button == System.Windows.Forms.MouseButtons.Right) {
+                            FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
+                        }
+                    } else {
+                        CursorClear();
+                        Selection_Repair(true);
+                        if (e.Button == System.Windows.Forms.MouseButtons.Right) {
+                            FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
+                        }
+                    }
+                }
+                _MouseValue = 0;
+            } else {
+                CursorClear();
+            }
+            Invalidate();
+        }
 
         protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseWheel(e);
@@ -781,7 +753,91 @@ namespace BlueControls.Controls {
             _SliderY.DoMouseWheel(e);
         }
 
-        #region Einzel-Charakter - Manipulation
+        /// <summary>
+        /// Löst das Ereignis aus und setzt _LastUserChangingTime auf NULL.
+        /// </summary>
+        protected virtual void OnTextChanged() => TextChanged?.Invoke(this, System.EventArgs.Empty);
+
+        private void AbortSpellChecking() {
+            if (SpellChecker.IsBusy) { SpellChecker.CancelAsync(); }
+        }
+
+        private void AddSpecialChar() {
+            var x = _Cursor_CharPos;
+            MultiUserFileGiveBackEventArgs e = new();
+            OnNeedDatabaseOfAdditinalSpecialChars(e);
+            ItemCollectionList i = new(enBlueListBoxAppearance.Listbox)
+            {
+                //if (e.File is Database DB && DB.Bins.Count > 0) {
+                //    foreach (var bmp in DB.Bins) {
+                //        if (bmp.Picture != null) {
+                //            if (!string.IsNullOrEmpty(bmp.Name)) {
+                //                var crc = "DB_" + bmp.Name;
+                //                i.Add(bmp.Name, crc, QuickImage.Get(crc, 20));
+                //            }
+                //        }
+                //    }
+                //    i.AddSeparator();
+                //}
+                { "Kugel", "sphere", QuickImage.Get(enImageCode.Kugel, 20) },
+                { "Warnung", "Warnung", QuickImage.Get(enImageCode.Warnung, 20) },
+                { "Information", "Information", QuickImage.Get(enImageCode.Information, 20) },
+                { "Kritisch", "Kritisch", QuickImage.Get(enImageCode.Kritisch, 20) },
+                { "Frage", "Frage", QuickImage.Get(enImageCode.Frage, 20) }
+            };
+            var r = InputBoxListBoxStyle.Show("Wählen sie:", i, enAddType.None, true);
+            _Cursor_CharPos = x;
+            if (r == null || r.Count != 1) { return; }
+            Char_DelBereich(-1, -1);
+            if (_eTxt.InsertImage(r[0], _Cursor_CharPos)) { _Cursor_CharPos++; }
+            CheckIfTextIsChanded(_eTxt.HtmlText);
+        }
+
+        private void Blinker_Tick(object sender, System.EventArgs e) {
+            if (!Focused()) { return; }
+            if (!Enabled) { return; }
+            if (_MarkStart > -1 && _MarkEnd > -1) { _Cursor_CharPos = -1; }
+            if (_Cursor_CharPos > -1) {
+                _Cursor_Visible = !_Cursor_Visible;
+                Invalidate();
+            } else {
+                if (_Cursor_Visible) {
+                    _Cursor_Visible = false;
+                    Invalidate();
+                }
+            }
+        }
+
+        private void CheckIfTextIsChanded(string NewPlainText) {
+            if (NewPlainText == _LastCheckedText) { return; }
+            _LastCheckedText = NewPlainText;
+            if (Dictionary.DictionaryRunning(true)) { _MustCheck = true; }
+            OnTextChanged();
+            return;
+        }
+
+        private void Clipboard_Copy() {
+            if (_MarkStart < 0 || _MarkEnd < 0) { return; }
+            Selection_Repair(true);
+            var tt = _eTxt.ConvertCharToPlainText(_MarkStart, _MarkEnd - 1);
+            if (string.IsNullOrEmpty(tt)) { return; }
+            tt = tt.Replace("\n", string.Empty);
+            tt = tt.Replace("\r", "\r\n");
+            System.Windows.Forms.DataObject datobj = new();
+            datobj.SetData(System.Windows.Forms.DataFormats.Text, tt);
+            System.Windows.Clipboard.SetDataObject(datobj);
+        }
+
+        private void Clipboard_Paste() {
+            // VORSICHT!
+            // Seltsames Verhalten von VB.NET
+            // Anscheinend wird bei den Clipboard operationen ein DoEventXsx ausgelöst.
+            // Dadurch kommt es zum Refresh des übergeordneten Steuerelementes, warscheinlich der Textbox.
+            // Deshalb  muss 'Char_DelBereich' NACH den Clipboard-Operationen stattfinden.
+            if (!System.Windows.Forms.Clipboard.GetDataObject().GetDataPresent(System.Windows.Forms.DataFormats.Text)) { return; }
+            Char_DelBereich(-1, -1);
+            InsertText(Convert.ToString(System.Windows.Clipboard.GetDataObject().GetData(System.Windows.Forms.DataFormats.UnicodeText)));
+        }
 
         /// <summary>
         /// Sucht den aktuellen Buchstaben, der unter den angegeben Koordinaten liegt.
@@ -801,23 +857,179 @@ namespace BlueControls.Controls {
             return c < _eTxt.Chars.Count && PixX > _eTxt.DrawingPos.X + _eTxt.Chars[c].Pos.X + (_eTxt.Chars[c].Size.Width / 2.0) ? c + 1 : c;
         }
 
-        public void Char_DelBereich(int Von, int Bis) {
-            if (_MarkStart > -1 && _MarkEnd > -1) {
-                Von = _MarkStart;
-                Bis = _MarkEnd;
+        private void Cursor_Richtung(short X, short Y) {
+            if (X != 0) {
+                if (_Cursor_CharPos > -1) {
+                    if (X == -1 && _Cursor_CharPos > 0) { _Cursor_CharPos--; }
+                    if (X == 1 && _Cursor_CharPos < _eTxt.Chars.Count) { _Cursor_CharPos++; }
+                } else if (_MarkStart > -1 && _MarkEnd > -1) {
+                    if (X == -1) { _Cursor_CharPos = Math.Min(_MarkEnd, _MarkStart); }
+                    if (X == 1) { _Cursor_CharPos = Math.Max(_MarkEnd, _MarkStart) + 1; }
+                } else {
+                    _Cursor_CharPos = 0;
+                }
             }
             MarkClear();
+            var ri = _eTxt.CursorPixelPosx(_Cursor_CharPos);
+            if (_Cursor_CharPos < 0) { _Cursor_CharPos = 0; }
+            if (Y > 0) {
+                _Cursor_CharPos = _Cursor_CharPos >= _eTxt.Chars.Count
+                    ? _eTxt.Chars.Count
+                    : Cursor_PosAt(ri.Left + _eTxt.DrawingPos.X, ri.Top + (ri.Height / 2.0) + _eTxt.Chars[_Cursor_CharPos].Size.Height + _eTxt.DrawingPos.Y);
+            } else if (Y < 0) {
+                _Cursor_CharPos = _Cursor_CharPos >= _eTxt.Chars.Count
+                    ? _eTxt.Chars.Count > 0
+                        ? Cursor_PosAt(ri.Left + _eTxt.DrawingPos.X, ri.Top + (ri.Height / 2.0) - _eTxt.Chars[_Cursor_CharPos - 1].Size.Height + _eTxt.DrawingPos.Y)
+                        : 0
+                    : Cursor_PosAt(ri.Left + _eTxt.DrawingPos.X, ri.Top + (ri.Height / 2.0) - _eTxt.Chars[_Cursor_CharPos].Size.Height + _eTxt.DrawingPos.Y);
+            }
+            if (_Cursor_CharPos < 0) { _Cursor_CharPos = 0; }
             _Cursor_Visible = true;
-            if (Von < 0 || Bis < 0) { return; }
-            _Cursor_CharPos = Von;
-            _eTxt.Delete(Von, Bis);
         }
 
-        #endregion Einzel-Charakter - Manipulation
+        private void Cursor_Show(Graphics GR) {
+            if (!_Cursor_Visible) { return; }
+            if (_Cursor_CharPos < 0) { return; }
+            var r = _eTxt.CursorPixelPosx(_Cursor_CharPos);
+            GR.DrawLine(new Pen(Color.Black), r.Left + _eTxt.DrawingPos.X, r.Top + _eTxt.DrawingPos.Y, r.Left + _eTxt.DrawingPos.X, r.Bottom + _eTxt.DrawingPos.Y);
+        }
 
         private void CursorClear() {
             _Cursor_CharPos = -1;
             _Cursor_Visible = false;
+        }
+
+        /// <summary>
+        /// Wenn das Format, die Maxlänge oder Multiline sich geändert haben,
+        /// wird für das dementsprechende Format die Verbote/Erlaubnisse gesetzt.
+        /// z.B. wird beim Format Datum die Maxlänge auf 10 gesetzt und nur noch Ziffern und Punkt erlaubt.
+        /// </summary>
+        /// <remarks></remarks>
+        private void GenerateETXT(bool ResetCoords) {
+            if (InvokeRequired) {
+                Invoke(new Action(() => GenerateETXT(ResetCoords)));
+                return;
+            }
+            if (_eTxt == null) {
+                var state = enStates.Standard;
+                if (!Enabled) { state = enStates.Standard_Disabled; }
+                _eTxt = new ExtText(GetDesign(), state);
+                ResetCoords = true;
+            }
+            _eTxt.Multiline = _Multiline;
+            _eTxt.AllowedChars = !string.IsNullOrEmpty(_AllowedChars) ? _AllowedChars : _Format.AllowedChars();
+            if (ResetCoords) {
+                // Hier Standard-Werte Setzen, die Draw-Routine setzt bei Bedarf um
+                if (_SliderY != null) {
+                    _SliderY.Visible = false;
+                    _SliderY.Value = 0;
+                }
+                _eTxt.DrawingPos.X = Skin.PaddingSmal;
+                _eTxt.DrawingPos.Y = Skin.PaddingSmal;
+                _eTxt.DrawingArea = new Rectangle(0, 0, -1, -1);
+                _eTxt.TextDimensions = Size.Empty;
+            }
+        }
+
+        private Slider GetSlider() {
+            if (_SliderY != null) { return _SliderY; }
+            _SliderY = new Slider {
+                Dock = System.Windows.Forms.DockStyle.Right,
+                LargeChange = 10.0D,
+                Location = new Point(Width - 18, 0),
+                Maximum = 100.0D,
+                Minimum = 0.0D,
+                MouseChange = 1.0D,
+                Name = "SliderY",
+                Orientation = enOrientation.Senkrecht,
+                Size = new Size(18, Height),
+                SmallChange = 48.0D,
+                TabIndex = 0,
+                TabStop = false,
+                Value = 0.0D,
+                Visible = true
+            };
+            _SliderY.ValueChanged += new EventHandler(SliderY_ValueChange);
+            Controls.Add(_SliderY);
+            return _SliderY;
+        }
+
+        private int HotPosition() => _Cursor_CharPos > -1
+? _Cursor_CharPos
+: _MarkStart > -1 && _MarkEnd < 0 ? _MarkEnd : _MarkStart > -1 && _MarkEnd > -1 ? _MarkEnd : -1;
+
+        private void MarkAll() {
+            if (_eTxt != null && _eTxt.Chars.Count > 0) {
+                _MarkStart = 0;
+                _MarkEnd = _eTxt.Chars.Count;
+                _Cursor_Visible = false;
+            } else {
+                MarkClear();
+            }
+        }
+
+        private void MarkAndGenerateZone(Graphics GR) {
+            _eTxt.Check(0, _eTxt.Chars.Count - 1, false);
+            if (_MarkStart < 0 || _MarkEnd < 0) { return; }
+            Selection_Repair(false);
+            var MaS = Math.Min(_MarkStart, _MarkEnd);
+            var MaE = Math.Max(_MarkStart, _MarkEnd);
+            if (MaS == MaE) { return; }
+            _eTxt.Check(MaS, MaE - 1, true);
+            var TmpcharS = MaS;
+            for (var cc = MaS; cc <= MaE; cc++) {
+                if (cc == MaE || _eTxt.Chars[cc].Pos.X < _eTxt.Chars[TmpcharS].Pos.X || Math.Abs(_eTxt.Chars[cc].Pos.Y - _eTxt.Chars[TmpcharS].Pos.Y) > 0.001) //Jetzt ist der Zeitpunkt zum Zeichen/start setzen
+                {
+                    Rectangle r = new((int)(_eTxt.Chars[TmpcharS].Pos.X + _eTxt.DrawingPos.X), (int)(_eTxt.Chars[TmpcharS].Pos.Y + 2 + _eTxt.DrawingPos.Y), (int)(_eTxt.Chars[cc - 1].Pos.X + _eTxt.Chars[cc - 1].Size.Width - _eTxt.Chars[TmpcharS].Pos.X), (int)(_eTxt.Chars[cc - 1].Pos.Y + _eTxt.Chars[cc - 1].Size.Height - _eTxt.Chars[TmpcharS].Pos.Y));
+                    if (r.Width < 2) { r = new Rectangle(r.Left, r.Top, 2, r.Height); }
+                    if (_eTxt.Chars[TmpcharS].State != enStates.Undefiniert) {
+                        Skin.Draw_Back(GR, _eTxt.Design, _eTxt.Chars[TmpcharS].State, r, null, false);
+                        Skin.Draw_Border(GR, _eTxt.Design, _eTxt.Chars[TmpcharS].State, r);
+                    }
+                    TmpcharS = cc;
+                }
+            }
+        }
+
+        private void MarkClear() {
+            _MarkStart = -1;
+            _MarkEnd = -1;
+        }
+
+        private void OnEnter() => Enter?.Invoke(this, System.EventArgs.Empty);
+
+        private void OnESC() => ESC?.Invoke(this, System.EventArgs.Empty);
+
+        private void OnNeedDatabaseOfAdditinalSpecialChars(MultiUserFileGiveBackEventArgs e) => NeedDatabaseOfAdditinalSpecialChars?.Invoke(this, e);
+
+        private void OnTAB() => TAB?.Invoke(this, System.EventArgs.Empty);
+
+        /// <summary>
+        /// Prüft die den Selektions-Bereich auf nicht erlaubte Werte und Repariert diese.
+        /// </summary>
+        /// <param name="SwapThem">Bei True werden MarkStart und MarkEnd richtig angeordnet. (Start kleiner/gleich End) </param>
+        /// <remarks></remarks>
+        private void Selection_Repair(bool SwapThem) {
+            if (_eTxt == null || _eTxt.Chars.Count == 0) { MarkClear(); }
+            if (_MarkStart < 0 && _MarkEnd < 0) { return; }
+            _MarkStart = Math.Max(_MarkStart, 0);
+            _MarkStart = Math.Min(_MarkStart, _eTxt.Chars.Count);
+            _MarkEnd = Math.Max(_MarkEnd, 0);
+            _MarkEnd = Math.Min(_MarkEnd, _eTxt.Chars.Count);
+            if (SwapThem && _MarkStart > _MarkEnd) {
+                modAllgemein.Swap(ref _MarkStart, ref _MarkEnd);
+            }
+        }
+
+        private void Selection_WortMarkieren(int Pos) {
+            if (_eTxt == null || _eTxt.Chars.Count == 0) {
+                MarkClear();
+                return;
+            }
+            _MarkStart = _eTxt.WordStart(Pos);
+            _MarkEnd = _eTxt.WordEnd(Pos);
+            CursorClear();
+            Selection_Repair(true);
         }
 
         private void SetCursorToEnd() {
@@ -830,15 +1042,7 @@ namespace BlueControls.Controls {
             _Cursor_Visible = true;
         }
 
-        private void MarkAll() {
-            if (_eTxt != null && _eTxt.Chars.Count > 0) {
-                _MarkStart = 0;
-                _MarkEnd = _eTxt.Chars.Count;
-                _Cursor_Visible = false;
-            } else {
-                MarkClear();
-            }
-        }
+        private void SliderY_ValueChange(object sender, System.EventArgs e) => Invalidate();
 
         private void SpellChecker_DoWork(object sender, DoWorkEventArgs e) {
             try {
@@ -905,220 +1109,8 @@ namespace BlueControls.Controls {
             }
         }
 
-        public void Mark(enMarkState markstate, int first, int last) => _eTxt?.Mark(markstate, first, last);
-
-        public void Unmark(enMarkState markstate) => _eTxt?.Unmark(markstate);
-
         private void SpellChecker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) => Dictionary.IsSpellChecking = false;
 
-        private void AbortSpellChecking() {
-            if (SpellChecker.IsBusy) { SpellChecker.CancelAsync(); }
-        }
-
-        public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
-            Focus();
-            var NewWord = "";
-            _MarkStart = int.Parse(e.Tags.TagGet("MarkStart"));
-            _MarkEnd = int.Parse(e.Tags.TagGet("MarkEnd"));
-            _Cursor_CharPos = int.Parse(e.Tags.TagGet("Cursorpos"));
-            var tmp = e.ClickedComand;
-            if (e.ClickedComand.StartsWith("#ChangeTo:")) {
-                NewWord = e.ClickedComand.Substring(10);
-                tmp = "#ChangeTo";
-            }
-            switch (tmp) {
-                case "#SpellAdd":
-                    Dictionary.WordAdd(e.Tags.TagGet("Word"));
-                    _MustCheck = true;
-                    Invalidate();
-                    return true;
-
-                case "#SpellAddLower":
-                    Dictionary.WordAdd(e.Tags.TagGet("Word".ToLower()));
-                    _MustCheck = true;
-                    Invalidate();
-                    return true;
-
-                case "#SpellChecking":
-                    FloatingForm.Close(this);
-                    if (_SpellChecking) {
-                        _MustCheck = false;
-                        Dictionary.SpellCheckingAll(_eTxt, false);
-                        _MustCheck = true;
-                        Invalidate();
-                    }
-                    return true;
-
-                case "#SpellChecking2":
-                    FloatingForm.Close(this);
-                    if (_SpellChecking) {
-                        _MustCheck = false;
-                        Dictionary.SpellCheckingAll(_eTxt, true);
-                        _MustCheck = true;
-                        Invalidate();
-                    }
-                    break;
-
-                case "Ausschneiden":
-                    Clipboard_Copy();
-                    Char_DelBereich(-1, -1);
-                    return true;
-
-                case "Kopieren":
-                    Clipboard_Copy();
-                    return true;
-
-                case "Einfügen":
-                    Clipboard_Paste();
-                    return true;
-
-                case "#Caption":
-                    if (_MarkStart < 0 || _MarkEnd < 0) { return true; }
-                    Selection_Repair(true);
-                    _eTxt.StufeÄndern(_MarkStart, _MarkEnd - 1, 3);
-                    return true;
-
-                case "#NoCaption":
-                    if (_MarkStart < 0 || _MarkEnd < 0) { return true; }
-                    Selection_Repair(true);
-                    _eTxt.StufeÄndern(_MarkStart, _MarkEnd - 1, 4);
-                    return true;
-
-                case "#Bold":
-                    if (_MarkStart < 0 || _MarkEnd < 0) { return true; }
-                    Selection_Repair(true);
-                    _eTxt.StufeÄndern(_MarkStart, _MarkEnd - 1, 7);
-                    return true;
-
-                case "#Sonderzeichen":
-                    AddSpecialChar();
-                    return true;
-
-                case "#ChangeTo":
-                    var ws = _eTxt.WordStart(_Cursor_CharPos);
-                    var we = _eTxt.WordEnd(_Cursor_CharPos);
-                    Char_DelBereich(ws, we);
-                    _Cursor_CharPos = ws;
-                    InsertText(NewWord);
-                    _Cursor_CharPos = _eTxt.WordEnd(_Cursor_CharPos);
-                    return true;
-            }
-            return false;
-        }
-
-        public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
-
-        private void AddSpecialChar() {
-            var x = _Cursor_CharPos;
-            MultiUserFileGiveBackEventArgs e = new();
-            OnNeedDatabaseOfAdditinalSpecialChars(e);
-            ItemCollectionList i = new(enBlueListBoxAppearance.Listbox)
-            {
-                //if (e.File is Database DB && DB.Bins.Count > 0) {
-                //    foreach (var bmp in DB.Bins) {
-                //        if (bmp.Picture != null) {
-                //            if (!string.IsNullOrEmpty(bmp.Name)) {
-                //                var crc = "DB_" + bmp.Name;
-                //                i.Add(bmp.Name, crc, QuickImage.Get(crc, 20));
-                //            }
-                //        }
-                //    }
-                //    i.AddSeparator();
-                //}
-                { "Kugel", "sphere", QuickImage.Get(enImageCode.Kugel, 20) },
-                { "Warnung", "Warnung", QuickImage.Get(enImageCode.Warnung, 20) },
-                { "Information", "Information", QuickImage.Get(enImageCode.Information, 20) },
-                { "Kritisch", "Kritisch", QuickImage.Get(enImageCode.Kritisch, 20) },
-                { "Frage", "Frage", QuickImage.Get(enImageCode.Frage, 20) }
-            };
-            var r = InputBoxListBoxStyle.Show("Wählen sie:", i, enAddType.None, true);
-            _Cursor_CharPos = x;
-            if (r == null || r.Count != 1) { return; }
-            Char_DelBereich(-1, -1);
-            if (_eTxt.InsertImage(r[0], _Cursor_CharPos)) { _Cursor_CharPos++; }
-            CheckIfTextIsChanded(_eTxt.HtmlText);
-        }
-
-        private void OnNeedDatabaseOfAdditinalSpecialChars(MultiUserFileGiveBackEventArgs e) => NeedDatabaseOfAdditinalSpecialChars?.Invoke(this, e);
-
-        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
-            AbortSpellChecking();
-            HotItem = null;
-            Tags.TagSet("CursorPosBeforeClick", _Cursor_CharPos.ToString());
-            var tmp = Cursor_PosAt(e.X, e.Y);
-            Tags.TagSet("Char", tmp.ToString());
-            Tags.TagSet("MarkStart", _MarkStart.ToString());
-            Tags.TagSet("MarkEnd", _MarkEnd.ToString());
-            Tags.TagSet("Cursorpos", _Cursor_CharPos.ToString());
-            var tmpWord = _eTxt.Word(tmp);
-            Tags.TagSet("Word", tmpWord);
-            if (_SpellChecking && !Dictionary.IsWordOk(tmpWord)) {
-                Items.Add("Rechtschreibprüfung", true);
-                if (Dictionary.IsSpellChecking) {
-                    Items.Add("Gerade ausgelastet...", "Gerade ausgelastet...", false);
-                    Items.AddSeparator();
-                } else {
-                    var sim = Dictionary.SimilarTo(tmpWord);
-                    if (sim != null) {
-                        foreach (var ThisS in sim) {
-                            Items.Add(" - " + ThisS, "#ChangeTo:" + ThisS);
-                        }
-                        Items.AddSeparator();
-                    }
-                    Items.Add("'" + tmpWord + "' ins Wörterbuch aufnehmen", "#SpellAdd", Dictionary.IsWriteable());
-                    if (tmpWord.ToLower() != tmpWord) {
-                        Items.Add("'" + tmpWord.ToLower() + "' ins Wörterbuch aufnehmen", "#SpellAddLower", Dictionary.IsWriteable());
-                    }
-                    Items.Add("Schnelle Rechtschreibprüfung", "#SpellChecking", Dictionary.IsWriteable());
-                    Items.Add("Alle Wörter sind ok", "#SpellChecking2", Dictionary.IsWriteable());
-                    Items.AddSeparator();
-                }
-            }
-            if (this is not ComboBox cbx || cbx.DropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDown) {
-                Items.Add(enContextMenuComands.Ausschneiden, Convert.ToBoolean(_MarkStart >= 0) && Enabled);
-                Items.Add(enContextMenuComands.Kopieren, Convert.ToBoolean(_MarkStart >= 0));
-                Items.Add(enContextMenuComands.Einfügen, System.Windows.Forms.Clipboard.ContainsText() && Enabled);
-                if (_Format == enDataFormat.Text_mit_Formatierung) {
-                    Items.AddSeparator();
-                    Items.Add("Sonderzeichen einfügen", "#Sonderzeichen", QuickImage.Get(enImageCode.Sonne, 16), _Cursor_CharPos > -1);
-                    if (Convert.ToBoolean(_MarkEnd > -1)) {
-                        Items.AddSeparator();
-                        Items.Add("Als Überschrift markieren", "#Caption", Skin.GetBlueFont(enDesign.TextBox_Stufe3, enStates.Standard).SymbolForReadableText(), _MarkEnd > -1);
-                        Items.Add("Fettschrift", "#Bold", Skin.GetBlueFont(enDesign.TextBox_Bold, enStates.Standard).SymbolForReadableText(), Convert.ToBoolean(_MarkEnd > -1));
-                        Items.Add("Als normalen Text markieren", "#NoCaption", Skin.GetBlueFont(enDesign.TextBox, enStates.Standard).SymbolForReadableText(), Convert.ToBoolean(_MarkEnd > -1));
-                    }
-                }
-            }
-        }
-
-        public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
-
-        protected override void OnEnabledChanged(System.EventArgs e) {
-            MarkClear();
-            base.OnEnabledChanged(e);
-        }
-
-        private Slider GetSlider() {
-            if (_SliderY != null) { return _SliderY; }
-            _SliderY = new Slider {
-                Dock = System.Windows.Forms.DockStyle.Right,
-                LargeChange = 10.0D,
-                Location = new Point(Width - 18, 0),
-                Maximum = 100.0D,
-                Minimum = 0.0D,
-                MouseChange = 1.0D,
-                Name = "SliderY",
-                Orientation = enOrientation.Senkrecht,
-                Size = new Size(18, Height),
-                SmallChange = 48.0D,
-                TabIndex = 0,
-                TabStop = false,
-                Value = 0.0D,
-                Visible = true
-            };
-            _SliderY.ValueChanged += new EventHandler(SliderY_ValueChange);
-            Controls.Add(_SliderY);
-            return _SliderY;
-        }
+        #endregion
     }
 }

@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,25 +15,29 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using Skript.Enums;
 using System.Collections.Generic;
 
 namespace BlueScript {
 
     internal class Method_Element : Method {
-        public override string Syntax => "Element(VariableListe, Indexnummer)";
+
+        #region Properties
+
+        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List, enVariableDataType.Integer };
         public override string Description => "Gibt ein das Element der Liste mit der Indexnummer als Text zurück. Die Liste beginnt mit dem Element 0.";
-
-        public override List<string> Comand(Script s) => new() { "element" };
-
-        public override string StartSequence => "(";
+        public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.String;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List, enVariableDataType.Integer };
-        public override bool EndlessArgs => false;
+        public override string StartSequence => "(";
+        public override string Syntax => "Element(VariableListe, Indexnummer)";
+
+        #endregion
+
+        #region Methods
+
+        public override List<string> Comand(Script s) => new() { "element" };
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
@@ -45,5 +47,7 @@ namespace BlueScript {
             return i < 0 || i >= list.Count ? new strDoItFeedback("Element nicht in Liste")
                                             : new strDoItFeedback(list[i], enVariableDataType.String);
         }
+
+        #endregion
     }
 }

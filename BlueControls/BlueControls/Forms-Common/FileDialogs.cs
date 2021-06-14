@@ -7,6 +7,8 @@ namespace BlueControls.Forms {
 
     public static class FileDialogs {
 
+        #region Methods
+
         //#region FileDialogs
         //public static void DeleteDir(string Pfad, bool Meldungen = true)
         //{
@@ -81,6 +83,8 @@ namespace BlueControls.Forms {
             };
             return DeleteFile(f, Rückfrage);
         }
+
+        #endregion
 
         //public static string RenameFile(string OldN, string NewN)
         //{

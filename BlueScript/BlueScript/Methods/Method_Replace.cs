@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,30 +15,36 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using Skript.Enums;
 using System.Collections.Generic;
 
 namespace BlueScript {
 
     internal class Method_Replace : Method {
-        public override string Syntax => "Replace(OriginalString, SearchString, ReplaceString)";
+
+        #region Properties
+
+        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.String, enVariableDataType.String };
         public override string Description => "Ersetzt in einem Text einen Text durch einen anderen Text";
-
-        public override List<string> Comand(Script s) => new() { "replace" };
-
-        public override string StartSequence => "(";
+        public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.String;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.String, enVariableDataType.String };
-        public override bool EndlessArgs => false;
+        public override string StartSequence => "(";
+        public override string Syntax => "Replace(OriginalString, SearchString, ReplaceString)";
+
+        #endregion
+
+        #region Methods
+
+        public override List<string> Comand(Script s) => new() { "replace" };
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             return !string.IsNullOrEmpty(attvar.ErrorMessage) ? strDoItFeedback.AttributFehler(this, attvar)
                                                               : new strDoItFeedback(attvar.Attributes[0].ValueString.Replace(attvar.Attributes[1].ValueString, attvar.Attributes[2].ValueString), enVariableDataType.String);
         }
+
+        #endregion
     }
 }

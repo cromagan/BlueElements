@@ -18,11 +18,17 @@ namespace BlueControls.Controls {
     // http://peisker.net/dotnet/propertydelegates.htm
     // http://geekswithblogs.net/akraus1/archive/2006/02/10/69047.aspx
     public class FlexiControlForProperty : FlexiControl {
+
+        #region Fields
+
         private MethodInfo _methInfo;
-        private PropertyInfo _propInfo;
-        private object _propertyObject;
         private string _propertyName;
         private string _propertynamecpl;
+        private object _propertyObject;
+        private PropertyInfo _propInfo;
+
+        #endregion
+
         //private bool _FehlerWennLeer = true;
         //private bool _alwaysDiabled = false;
         //private readonly bool _FehlerFormatCheck = true;
@@ -32,7 +38,7 @@ namespace BlueControls.Controls {
         ///// </summary>
         //public event System.EventHandler LoadedFromDisk;
 
-        #region Constructor
+        #region Constructors
 
         public FlexiControlForProperty(object propertyObject, string propertyName, int rowCount, ItemCollectionList list, enImageCode image) : this() {
             _propertyObject = propertyObject;
@@ -53,8 +59,6 @@ namespace BlueControls.Controls {
         public FlexiControlForProperty(object propertyObject, string propertyName) : this(propertyObject, propertyName, 1, null, enImageCode.None) {
         }
 
-        #endregion Constructor
-
         public FlexiControlForProperty() : base() {
             GenFehlerText();
             //if (propChecker == null)
@@ -69,12 +73,9 @@ namespace BlueControls.Controls {
             Size = new Size(200, 24);
         }
 
-        private void Checker_Tick(object sender, System.EventArgs e) {
-            //if (_IsFilling) { return; }
-            if (!_allinitialized) { return; }
-            if (_LastTextChange != null) { return; } // Noch am bearbeiten
-            SetValueFromProperty();
-        }
+        #endregion
+
+        #region Properties
 
         /// <summary>
         /// Der Getter/Setter des UserControls. Dabei werden Sonderzeichen in _ umgewandelt. Punkte gelöscht. Zwei __ werden zu einem geändert, und die Anzegige nach den beiden _ wird optisch abgeschnitten.
@@ -118,83 +119,30 @@ namespace BlueControls.Controls {
             }
         }
 
-        //private void OnLoadedFromDisk(object sender, System.EventArgs e) {
-        //    FillPropertyNow();
-        //    _propertyObject = null;  //Das Objekt ist tot und irgendwo im Nirvana verschwunden
-        //    UpdateControlData(false, 1, null, enImageCode.None);
-        //    CheckEnabledState();
-        //    LoadedFromDisk?.Invoke(this, System.EventArgs.Empty);
-        //}
-        private void SetValueFromProperty() {
-            if (_propertyObject == null || string.IsNullOrEmpty(_propertyName) || _propInfo == null || !_propInfo.CanRead) {
-                ValueSet(string.Empty, true, false);
-                InfoText = string.Empty;
-                return;
-            }
-            var x = _propInfo.GetValue(_propertyObject, null);
-            if (x is null) {
-                ValueSet(string.Empty, true, false);
-            } else if (x is string s) {
-                ValueSet(s, true, false);
-            } else if (x is List<string> ls) {
-                ValueSet(ls.JoinWithCr(), true, false);
-            } else if (x is bool bo) {
-                ValueSet(bo.ToPlusMinus(), true, false);
-            } else if (x is int iv) {
-                ValueSet(iv.ToString(), true, false);
-            } else if (x is Enum) {
-                ValueSet(((int)x).ToString(), true, false);
-            } else if (x is decimal dc) {
-                ValueSet(dc.ToString(Constants.Format_Float2), true, false);
-            } else if (x is double db) {
-                ValueSet(db.ToString(Constants.Format_Float2), true, false);
-            } else if (x is Color co) {
-                ValueSet(co.ToHTMLCode(), true, false);
-            } else {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Art unbekannt!");
+        #endregion
+
+        #region Methods
+
+        public static void SetAllFlexControls(Control _in, object _to) {
+            if (_in == null || _in.IsDisposed) { return; }
+            foreach (var thisc in _in.Controls) {
+                if (thisc is FlexiControlForProperty flx) {
+                    flx.PropertyObject = _to;
+                }
+                if (thisc is FlexiControlForCell flxc && _to is DataHolder dh) {
+                    dh.Column(flxc.ColumnName, "Inkorrecte Zuordnung: " + flxc.ColumnName);
+                    flxc.Database = dh.InternalDatabase;
+                    flxc.RowKey = dh.Row().Key;
+                }
             }
         }
 
-        private void FillPropertyNow() {
-            //if (_IsFilling) { return; }
-            if (!_allinitialized) { return; }
-            if (!CheckEnabledState()) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.
-            if (_propertyObject == null || string.IsNullOrEmpty(_propertyName) || _propInfo == null || !_propInfo.CanRead) { return; }
-            var OldVal = string.Empty;
-            var x = _propInfo.GetValue(_propertyObject, null);
-            object toSet = null;
-            if (x is null) {
-                OldVal = string.Empty;
-                toSet = Value; // Wissen wir leider nicht, welcher Typ....
-            } else if (x is string s) {
-                OldVal = s;
-                toSet = Value;
-            } else if (x is List<string> ls) {
-                OldVal = ls.JoinWithCr();
-                toSet = Value.SplitByCRToList();
-            } else if (x is bool bo) {
-                OldVal = bo.ToPlusMinus();
-                toSet = Value.FromPlusMinus();
-            } else if (x is Color co) {
-                OldVal = co.ToHTMLCode();
-                toSet = Value.FromHTMLCode();
-            } else if (x is int iv) {
-                OldVal = iv.ToString();
-                toSet = IntParse(Value);
-            } else if (x is Enum) {
-                OldVal = ((int)x).ToString();
-                toSet = IntParse(Value);
-            } else if (x is decimal dc) {
-                OldVal = dc.ToString(Constants.Format_Float2);
-                toSet = DecimalParse(Value);
-            } else if (x is double db) {
-                OldVal = db.ToString(Constants.Format_Float2);
-                toSet = DoubleParse(Value);
-            } else {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Art unbekannt!");
+        public ComboBox GetComboBox() {
+            if (!_allinitialized) { return null; }
+            foreach (var thiscon in Controls) {
+                if (thiscon is ComboBox cbx) { return cbx; }
             }
-            if (OldVal == Value) { return; }
-            _propInfo.SetValue(_propertyObject, toSet, null);
+            return null;
         }
 
         internal bool CheckEnabledState() {
@@ -226,10 +174,139 @@ namespace BlueControls.Controls {
             return true;
         }
 
+        protected override void Dispose(bool disposing) {
+            _IdleTimer.Tick -= Checker_Tick;
+            //if (_propertyObject is IReloadable LS) { LS.LoadedFromDisk -= OnLoadedFromDisk; }
+            base.Dispose(disposing);
+        }
+
+        protected override void OnButtonClicked() {
+            base.OnButtonClicked();
+            if (_methInfo != null) {
+                _methInfo.Invoke(_propertyObject, null);
+            }
+        }
+
+        protected override void OnControlAdded(ControlEventArgs e) {
+            CheckEnabledState();
+            base.OnControlAdded(e);
+        }
+
+        protected override void OnHandleDestroyed(System.EventArgs e) {
+            FillPropertyNow();
+            base.OnHandleDestroyed(e);
+        }
+
         protected override void OnValueChanged() {
             FillPropertyNow(); // erst befüllen, bevor das Event ausgelöst wird
             GenFehlerText(); // erst Standard fehler Text, bevor das Event ausgelöst wird
             base.OnValueChanged();
+        }
+
+        private void Checker_Tick(object sender, System.EventArgs e) {
+            //if (_IsFilling) { return; }
+            if (!_allinitialized) { return; }
+            if (_LastTextChange != null) { return; } // Noch am bearbeiten
+            SetValueFromProperty();
+        }
+
+        private void FillPropertyNow() {
+            //if (_IsFilling) { return; }
+            if (!_allinitialized) { return; }
+            if (!CheckEnabledState()) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.
+            if (_propertyObject == null || string.IsNullOrEmpty(_propertyName) || _propInfo == null || !_propInfo.CanRead) { return; }
+            var OldVal = string.Empty;
+            var x = _propInfo.GetValue(_propertyObject, null);
+            object toSet = null;
+            if (x is null) {
+                OldVal = string.Empty;
+                toSet = Value; // Wissen wir leider nicht, welcher Typ....
+            } else if (x is string s) {
+                OldVal = s;
+                toSet = Value;
+            } else if (x is List<string> ls) {
+                OldVal = ls.JoinWithCr();
+                toSet = Value.SplitByCRToList();
+            } else if (x is bool bo) {
+                OldVal = bo.ToPlusMinus();
+                toSet = Value.FromPlusMinus();
+            } else if (x is Color co) {
+                OldVal = co.ToHTMLCode();
+                toSet = Value.FromHTMLCode();
+            } else if (x is int iv) {
+                OldVal = iv.ToString();
+                toSet = IntParse(Value);
+            } else if (x is Enum) {
+                OldVal = ((int)x).ToString();
+                toSet = IntParse(Value);
+            } else if (x is double dc) {
+                OldVal = dc.ToString(Constants.Format_Float2);
+                toSet = DecimalParse(Value);
+            } else if (x is double db) {
+                OldVal = db.ToString(Constants.Format_Float2);
+                toSet = DoubleParse(Value);
+            } else {
+                Develop.DebugPrint(enFehlerArt.Fehler, "Art unbekannt!");
+            }
+            if (OldVal == Value) { return; }
+            _propInfo.SetValue(_propertyObject, toSet, null);
+        }
+
+        private void GenFehlerText() {
+            if (_propInfo == null) {
+                InfoText = string.Empty;
+                return;
+            }
+            //if (_FehlerWennLeer && string.IsNullOrEmpty(Value)) {
+            //    InfoText = "Dieses Feld darf nicht leer sein.";
+            //    return;
+            //}
+            if (string.IsNullOrEmpty(Value)) {
+                InfoText = string.Empty;
+                return;
+            }
+            //if (_FehlerFormatCheck && !Value.IsFormat(Format)) {
+            //    InfoText = "Der Wert entspricht nicht dem erwarteten Format.";
+            //    return;
+            //}
+            InfoText = string.Empty;
+        }
+
+        //private void OnLoadedFromDisk(object sender, System.EventArgs e) {
+        //    FillPropertyNow();
+        //    _propertyObject = null;  //Das Objekt ist tot und irgendwo im Nirvana verschwunden
+        //    UpdateControlData(false, 1, null, enImageCode.None);
+        //    CheckEnabledState();
+        //    LoadedFromDisk?.Invoke(this, System.EventArgs.Empty);
+        //}
+        private void SetValueFromProperty() {
+            if (_propertyObject == null || string.IsNullOrEmpty(_propertyName) || _propInfo == null || !_propInfo.CanRead) {
+                ValueSet(string.Empty, true, false);
+                InfoText = string.Empty;
+                return;
+            }
+            var x = _propInfo.GetValue(_propertyObject, null);
+            if (x is null) {
+                ValueSet(string.Empty, true, false);
+            } else if (x is string s) {
+                ValueSet(s, true, false);
+            } else if (x is List<string> ls) {
+                ValueSet(ls.JoinWithCr(), true, false);
+            } else if (x is bool bo) {
+                ValueSet(bo.ToPlusMinus(), true, false);
+            } else if (x is int iv) {
+                ValueSet(iv.ToString(), true, false);
+            } else if (x is Enum) {
+                ValueSet(((int)x).ToString(), true, false);
+            } else if (x is double dc) {
+                ValueSet(dc.ToString(Constants.Format_Float2), true, false);
+            } else if (x is double db) {
+                ValueSet(db.ToString(Constants.Format_Float2), true, false);
+            } else if (x is Color co) {
+                ValueSet(co.ToHTMLCode(), true, false);
+            } else {
+                Develop.DebugPrint(enFehlerArt.Fehler, "Art unbekannt!");
+            }
         }
 
         private void UpdateControlData(bool withCreate, int TextLines, ItemCollectionList list, enImageCode image) {
@@ -281,13 +358,6 @@ namespace BlueControls.Controls {
             }
             if (withCreate && _propInfo != null) {
                 switch (_propInfo.PropertyType.FullName.ToLower()) {
-                    //
-                    case "system.string":
-                    //
-                    case "system.int32":
-                    //
-                    case "system.decimal":
-
                     case "system.boolean": {
                             EditType = enEditTypeFormula.Ja_Nein_Knopf;
                             var s = BlueFont.MeasureStringOfCaption(_Caption);
@@ -381,69 +451,6 @@ namespace BlueControls.Controls {
             GenFehlerText();
         }
 
-        public static void SetAllFlexControls(Control _in, object _to) {
-            if (_in == null || _in.IsDisposed) { return; }
-            foreach (var thisc in _in.Controls) {
-                if (thisc is FlexiControlForProperty flx) {
-                    flx.PropertyObject = _to;
-                }
-                if (thisc is FlexiControlForCell flxc && _to is DataHolder dh) {
-                    dh.Column(flxc.ColumnName, "Inkorrecte Zuordnung: " + flxc.ColumnName);
-                    flxc.Database = dh.InternalDatabase;
-                    flxc.RowKey = dh.Row().Key;
-                }
-            }
-        }
-
-        protected override void OnControlAdded(ControlEventArgs e) {
-            CheckEnabledState();
-            base.OnControlAdded(e);
-        }
-
-        private void GenFehlerText() {
-            if (_propInfo == null) {
-                InfoText = string.Empty;
-                return;
-            }
-            //if (_FehlerWennLeer && string.IsNullOrEmpty(Value)) {
-            //    InfoText = "Dieses Feld darf nicht leer sein.";
-            //    return;
-            //}
-            if (string.IsNullOrEmpty(Value)) {
-                InfoText = string.Empty;
-                return;
-            }
-            //if (_FehlerFormatCheck && !Value.IsFormat(Format)) {
-            //    InfoText = "Der Wert entspricht nicht dem erwarteten Format.";
-            //    return;
-            //}
-            InfoText = string.Empty;
-        }
-
-        public ComboBox GetComboBox() {
-            if (!_allinitialized) { return null; }
-            foreach (var thiscon in Controls) {
-                if (thiscon is ComboBox cbx) { return cbx; }
-            }
-            return null;
-        }
-
-        protected override void OnHandleDestroyed(System.EventArgs e) {
-            FillPropertyNow();
-            base.OnHandleDestroyed(e);
-        }
-
-        protected override void OnButtonClicked() {
-            base.OnButtonClicked();
-            if (_methInfo != null) {
-                _methInfo.Invoke(_propertyObject, null);
-            }
-        }
-
-        protected override void Dispose(bool disposing) {
-            _IdleTimer.Tick -= Checker_Tick;
-            //if (_propertyObject is IReloadable LS) { LS.LoadedFromDisk -= OnLoadedFromDisk; }
-            base.Dispose(disposing);
-        }
+        #endregion
     }
 }

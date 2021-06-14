@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,13 +15,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using System;
 
 namespace BlueBasics {
 
     public static class modErgebnis {
+
+        #region Methods
 
         public static double? Ergebnis(string formel) {
             formel = formel.ToUpper();
@@ -32,6 +30,20 @@ namespace BlueBasics {
             // Formel = Formel.Replace("INT(", "XNT(0,");
             // Formel = Formel.Replace("RND()", "XND(0,1)");
             return ErgebnisCore(formel);
+        }
+
+        public static int LastMinusIndex(string formel) {
+            if (!formel.Contains("-")) { return -1; }
+            var LastMin = 1;
+            var OkMin = -1;
+            while (true) {
+                LastMin = formel.IndexOf("-", LastMin);
+                if (LastMin < 1) { break; }
+                var VorZ = formel.Substring(LastMin - 1, 1);
+                if (VorZ.IsNumeral()) { OkMin = LastMin; }
+                LastMin++;
+            }
+            return OkMin;
         }
 
         private static double? ErgebnisCore(string formel) {
@@ -180,18 +192,6 @@ namespace BlueBasics {
             return null;
         }
 
-        public static int LastMinusIndex(string formel) {
-            if (!formel.Contains("-")) { return -1; }
-            var LastMin = 1;
-            var OkMin = -1;
-            while (true) {
-                LastMin = formel.IndexOf("-", LastMin);
-                if (LastMin < 1) { break; }
-                var VorZ = formel.Substring(LastMin - 1, 1);
-                if (VorZ.IsNumeral()) { OkMin = LastMin; }
-                LastMin++;
-            }
-            return OkMin;
-        }
+        #endregion
     }
 }

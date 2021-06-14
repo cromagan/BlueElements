@@ -1,5 +1,3 @@
-#region BlueElements - a collection of useful tools, database and controls
-
 // Authors:
 // Christian Peter
 //
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using System;
 using System.ComponentModel;
@@ -28,9 +24,16 @@ using System.Windows.Forms.Design;
 namespace BlueControls.Designer_Support {
 
     public sealed class QuickPicSelector : UITypeEditor {
-        private IWindowsFormsEditorService edSvc;
+
+        #region Fields
+
         private readonly frmQuickPic fqp = new();
         private string C;
+        private IWindowsFormsEditorService edSvc;
+
+        #endregion
+
+        #region Methods
 
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value) {
             edSvc = (IWindowsFormsEditorService)provider.GetService(typeof(IWindowsFormsEditorService));
@@ -43,6 +46,8 @@ namespace BlueControls.Designer_Support {
             return C;
         }
 
+        public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context) => UITypeEditorEditStyle.Modal;
+
         private void Click(object sender, System.EventArgs e) {
             if (edSvc != null) {
                 C = fqp.ICode();
@@ -50,6 +55,6 @@ namespace BlueControls.Designer_Support {
             }
         }
 
-        public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context) => UITypeEditorEditStyle.Modal;
+        #endregion
     }
 }

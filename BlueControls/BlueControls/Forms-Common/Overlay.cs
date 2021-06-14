@@ -6,9 +6,16 @@ using System.Drawing;
 namespace BlueControls {
 
     public partial class Overlay : System.Windows.Forms.Form {
-        private int Count;
-        private readonly int Modus;
+
+        #region Fields
+
         private readonly GenericControl Control;
+        private readonly int Modus;
+        private int Count;
+
+        #endregion
+
+        #region Constructors
 
         public Overlay() {
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -38,6 +45,31 @@ namespace BlueControls {
             SetControl();
         }
 
+        #endregion
+
+        #region Properties
+
+        protected override System.Windows.Forms.CreateParams CreateParams {
+            get {
+                var oParam = base.CreateParams;
+                oParam.ExStyle |= (int)enExStyle.EX_NOACTIVATE | (int)enExStyle.EX_TOOLWINDOW | (int)enExStyle.EX_TOPMOST;
+                oParam.Parent = IntPtr.Zero;
+                return oParam;
+            }
+        }
+
+        #endregion
+
+        #region Methods
+
+        public void Paint_Radius() {
+            var g = CreateGraphics();
+            g.Clear(Color.Magenta);
+            g.DrawEllipse(new Pen(Color.Black, 3), 1, 1, Width - 3, Height - 3);
+            g.DrawEllipse(Pens.Red, 1, 1, Width - 3, Height - 3);
+            g.Dispose();
+        }
+
         public void SetControl() {
             Width = Control.Width;
             Height = Control.Height;
@@ -64,12 +96,13 @@ namespace BlueControls {
             }
         }
 
-        public void Paint_Radius() {
-            var g = CreateGraphics();
-            g.Clear(Color.Magenta);
-            g.DrawEllipse(new Pen(Color.Black, 3), 1, 1, Width - 3, Height - 3);
-            g.DrawEllipse(Pens.Red, 1, 1, Width - 3, Height - 3);
-            g.Dispose();
+        private void Blinker_Tick(object sender, System.EventArgs e) {
+            Opacity = Opacity > 0.5 ? 0.01 : 1;
+            Count++;
+            if (Count > 4) {
+                Blinker.Enabled = false;
+                Dispose();
+            }
         }
 
         private void Paint_RoterRahmenUmControlUndBlinken() {
@@ -83,22 +116,6 @@ namespace BlueControls {
             Blinker.Enabled = true;
         }
 
-        private void Blinker_Tick(object sender, System.EventArgs e) {
-            Opacity = Opacity > 0.5 ? 0.01 : 1;
-            Count++;
-            if (Count > 4) {
-                Blinker.Enabled = false;
-                Dispose();
-            }
-        }
-
-        protected override System.Windows.Forms.CreateParams CreateParams {
-            get {
-                var oParam = base.CreateParams;
-                oParam.ExStyle |= (int)enExStyle.EX_NOACTIVATE | (int)enExStyle.EX_TOOLWINDOW | (int)enExStyle.EX_TOPMOST;
-                oParam.Parent = IntPtr.Zero;
-                return oParam;
-            }
-        }
+        #endregion
     }
 }

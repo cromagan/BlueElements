@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.EventArgs;
@@ -34,7 +30,13 @@ namespace BlueControls.Classes_Editor {
 
     internal sealed partial class ExportDefinition_Editor : AbstractClassEditor<ExportDefinition> //  System.Windows.Forms.UserControl//
     {
+        #region Constructors
+
         public ExportDefinition_Editor() : base() => InitializeComponent();
+
+        #endregion
+
+        #region Methods
 
         protected override void DisableAndClearFormula() {
             Enabled = false;
@@ -117,9 +119,20 @@ namespace BlueControls.Classes_Editor {
             }
         }
 
-        private void ExportVerzeichnis_TextChanged(object sender, System.EventArgs e) => UpdateExport(true);
-
         private void cbxExportFormularID_ItemClicked(object sender, BasicListItemEventArgs e) => UpdateExport(true);
+
+        //private void ExportFilter_AddClicked(object sender, System.EventArgs e)
+        //{
+        //    Develop.DebugPrint_NichtImplementiert();
+        //    var DummyFilter = new FilterItem(tmp.Database.Column[0], enFilterType.KeinFilter, "");
+        //    var NewFilter = FilterItem_Editor();// DialogBox.eEditClass(DummyFilter, false);
+        //    if (NewFilter == DummyFilter) { return; }
+        //    var NewFilter2 = (FilterItem)NewFilter;
+        //    if (NewFilter2.FilterType == enFilterType.KeinFilter) { return; }
+        //    ExportFilter.Item.Add(new ObjectListItem(NewFilter2));
+        //    UpdateExport(false);
+        //}
+        private void ExportDateien_ListOrItemChanged(object sender, System.EventArgs e) => UpdateExport(false);
 
         private void ExportDateien_RemoveClicked(object sender, ListOfBasicListItemEventArgs e) {
             foreach (var thisItem in e.Items) {
@@ -137,6 +150,40 @@ namespace BlueControls.Classes_Editor {
         }
 
         private void ExportOriginalFormat_CheckedChanged(object sender, System.EventArgs e) => UpdateExport(true);
+
+        private void ExportVerzeichnis_TextChanged(object sender, System.EventArgs e) => UpdateExport(true);
+
+        private void filterItemEditor_Changed(object sender, System.EventArgs e) {
+            if (IsFilling) { return; }
+            foreach (var thisitem in lbxFilter.Item) {
+                if (thisitem is TextListItem tli) {
+                    if (tli.Tag == filterItemEditor.Item) {
+                        tli.Text = filterItemEditor.Item.ReadableText();
+                        tli.Symbol = filterItemEditor.Item.SymbolForReadableText();
+                    }
+                }
+            }
+            OnChanged(Item);
+        }
+
+        private void lbxFilter_AddClicked(object sender, System.EventArgs e) {
+            var NewFilterItem = lbxFilter.Item.Add(new FilterItem(Item.Database, string.Empty));
+            NewFilterItem.Checked = true;
+        }
+
+        private void lbxFilter_ItemCheckedChanged(object sender, System.EventArgs e) {
+            if (lbxFilter.Item.Checked().Count != 1) {
+                filterItemEditor.Item = null;
+                return;
+            }
+            if (Item.Database.ReadOnly) {
+                filterItemEditor.Item = null;
+                return;
+            }
+            filterItemEditor.Item = (FilterItem)((TextListItem)lbxFilter.Item.Checked()[0]).Tag;
+        }
+
+        private void lbxFilter_ListOrItemChanged(object sender, System.EventArgs e) => UpdateExport(false);
 
         private void UpdateExport(bool MustDeleteAllExportFiles) {
             if (ExportOriginalFormat.Checked) {
@@ -191,53 +238,6 @@ namespace BlueControls.Classes_Editor {
             OnChanged(Item);
         }
 
-        //private void ExportFilter_AddClicked(object sender, System.EventArgs e)
-        //{
-        //    Develop.DebugPrint_NichtImplementiert();
-        //    var DummyFilter = new FilterItem(tmp.Database.Column[0], enFilterType.KeinFilter, "");
-        //    var NewFilter = FilterItem_Editor();// DialogBox.eEditClass(DummyFilter, false);
-        //    if (NewFilter == DummyFilter) { return; }
-        //    var NewFilter2 = (FilterItem)NewFilter;
-        //    if (NewFilter2.FilterType == enFilterType.KeinFilter) { return; }
-        //    ExportFilter.Item.Add(new ObjectListItem(NewFilter2));
-        //    UpdateExport(false);
-        //}
-        private void ExportDateien_ListOrItemChanged(object sender, System.EventArgs e) => UpdateExport(false);
-
-        #region Filter
-
-        private void lbxFilter_AddClicked(object sender, System.EventArgs e) {
-            var NewFilterItem = lbxFilter.Item.Add(new FilterItem(Item.Database, string.Empty));
-            NewFilterItem.Checked = true;
-        }
-
-        private void lbxFilter_ItemCheckedChanged(object sender, System.EventArgs e) {
-            if (lbxFilter.Item.Checked().Count != 1) {
-                filterItemEditor.Item = null;
-                return;
-            }
-            if (Item.Database.ReadOnly) {
-                filterItemEditor.Item = null;
-                return;
-            }
-            filterItemEditor.Item = (FilterItem)((TextListItem)lbxFilter.Item.Checked()[0]).Tag;
-        }
-
-        private void lbxFilter_ListOrItemChanged(object sender, System.EventArgs e) => UpdateExport(false);
-
-        #endregion Filter
-
-        private void filterItemEditor_Changed(object sender, System.EventArgs e) {
-            if (IsFilling) { return; }
-            foreach (var thisitem in lbxFilter.Item) {
-                if (thisitem is TextListItem tli) {
-                    if (tli.Tag == filterItemEditor.Item) {
-                        tli.Text = filterItemEditor.Item.ReadableText();
-                        tli.Symbol = filterItemEditor.Item.SymbolForReadableText();
-                    }
-                }
-            }
-            OnChanged(Item);
-        }
+        #endregion
     }
 }

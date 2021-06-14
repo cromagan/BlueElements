@@ -1,5 +1,3 @@
-#region BlueElements - a collection of useful tools, database and controls
-
 // Authors:
 // Christian Peter
 //
@@ -17,13 +15,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueControls.Controls;
 
 namespace BlueControls.BlueDatabaseDialogs {
 
     public sealed partial class Filter : Forms.Form {
+
+        #region Constructors
 
         public Filter(Table table) {
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -31,5 +29,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             filterleiste.Table = table;
         }
+
+        #endregion
     }
 }

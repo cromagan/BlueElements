@@ -1,5 +1,3 @@
-#region BlueElements - a collection of useful tools, database and controls
-
 // Authors:
 // Christian Peter
 //
@@ -17,18 +15,30 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 namespace BlueControls.EventArgs {
 
     public sealed class TabControlEventArgs : System.EventArgs {
+
+        #region Fields
+
         public bool Cancel = false;
-        public System.Windows.Forms.TabPage TabPage { get; }
-        public int TabPageIndex { get; } = -1;
+
+        #endregion
+
+        #region Constructors
 
         public TabControlEventArgs(System.Windows.Forms.TabPage TabPage, int TabPageIndex) {
             this.TabPage = TabPage;
             this.TabPageIndex = TabPageIndex;
         }
+
+        #endregion
+
+        #region Properties
+
+        public System.Windows.Forms.TabPage TabPage { get; }
+        public int TabPageIndex { get; } = -1;
+
+        #endregion
     }
 }

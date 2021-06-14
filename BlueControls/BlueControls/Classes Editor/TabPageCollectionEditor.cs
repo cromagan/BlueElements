@@ -5,9 +5,16 @@ namespace BlueControls.Controls {
 
     internal sealed class TabPageCollectionEditor : CollectionEditor {
 
-        public TabPageCollectionEditor(Type type) : base(type) {
-        }
+        #region Constructors
+
+        public TabPageCollectionEditor(Type type) : base(type) { }
+
+        #endregion
+
+        #region Methods
 
         protected override Type CreateCollectionItemType() => typeof(TabPage);
+
+        #endregion
     }
 }

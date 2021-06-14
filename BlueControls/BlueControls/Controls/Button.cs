@@ -57,19 +57,19 @@ namespace BlueControls.Controls {
 
         private string _Text = string.Empty;
 
-        #endregion Fields
+        #endregion
 
         #region Constructors
 
         public Button() : base(true, false) { }
 
-        #endregion Constructors
+        #endregion
 
         #region Events
 
         public event EventHandler CheckedChanged;
 
-        #endregion Events
+        #endregion
 
         #region Properties
 
@@ -154,7 +154,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        #endregion Properties
+        #endregion
 
         #region Methods
 
@@ -214,7 +214,6 @@ namespace BlueControls.Controls {
             s.Height += 4;
             return s;
         }
-
 
         protected override void DrawControl(Graphics gr, enStates state) {
             try {
@@ -289,8 +288,7 @@ namespace BlueControls.Controls {
                         Develop.DebugPrint_MissingCommand(_ButtonStyle.ToString());
                         break;
                 }
-            } catch {
-            }
+            } catch { }
         }
 
         protected override void OnClick(System.EventArgs e) {
@@ -378,7 +376,7 @@ namespace BlueControls.Controls {
         }
 
         private void DisableOtherOptionButtons() {
-            if (!_Checked || _ButtonStyle.HasFlag(enButtonStyle.Optionbox) || Parent == null) { return; }
+            if (!_Checked || !_ButtonStyle.HasFlag(enButtonStyle.Optionbox) || Parent == null) { return; }
 
             if (string.IsNullOrEmpty(Name)) { return; }
 
@@ -391,6 +389,6 @@ namespace BlueControls.Controls {
 
         private void OnCheckedChanged() => CheckedChanged?.Invoke(this, System.EventArgs.Empty);
 
-        #endregion Methods
+        #endregion
     }
 }

@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
@@ -31,23 +27,21 @@ namespace BlueControls.ItemCollection {
 
     public class DataListItem : BasicListItem {
 
-        #region Variablen-Deklarationen
+        #region Fields
 
+        private const int ConstMY = 15;
+        private readonly string _EncryptionKey;
+        private readonly ListExt<QuickImage> _overlays = new();
         private byte[] _bin;
         private string _caption;
-        private List<string> _captiontmp = new();
-        private int _padding;
-        private readonly ListExt<QuickImage> _overlays = new();
-        private string _filename;
-        private readonly string _EncryptionKey;
         private int _captionlines = 2;
-        private const int ConstMY = 15;
+        private List<string> _captiontmp = new();
+        private string _filename;
+        private int _padding;
 
-        #endregion Variablen-Deklarationen
+        #endregion
 
-
-
-        #region Construktor + Initialize
+        #region Constructors
 
         public DataListItem(byte[] b, string internalname, string caption) : base(internalname) {
             _caption = caption;
@@ -66,7 +60,7 @@ namespace BlueControls.ItemCollection {
             _overlays.Clear();
         }
 
-        #endregion Construktor + Initialize
+        #endregion
 
         #region Properties
 
@@ -103,6 +97,8 @@ namespace BlueControls.ItemCollection {
             }
         }
 
+        public List<QuickImage> Overlays => _overlays;
+
         public int Padding {
             get => _padding;
             set {
@@ -112,10 +108,20 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public List<QuickImage> Overlays => _overlays;
         public override string QuickInfo => string.Empty;
 
-        #endregion Properties
+        #endregion
+
+        #region Methods
+
+        public override bool FilterMatch(string FilterText) => base.FilterMatch(FilterText) || Caption.ToUpper().Contains(FilterText.ToUpper()) || _filename.ToUpper().Contains(FilterText.ToUpper());
+
+        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) => style switch {
+            enBlueListBoxAppearance.FileSystem => 110 + (_captionlines * ConstMY),
+            _ => (int)(columnWidth * 0.8),
+        };
+
+        protected override Size ComputeSizeUntouchedForListBox() => new(300, 300);
 
         protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, bool Translate) {
             if (DrawBorderAndBack) {
@@ -167,7 +173,7 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        protected override Size ComputeSizeUntouchedForListBox() => new(300, 300);
+        protected override string GetCompareKey() => Internal;
 
         private void GetBin() {
             if (string.IsNullOrEmpty(_filename)) { return; }
@@ -184,13 +190,6 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) => style switch {
-            enBlueListBoxAppearance.FileSystem => 110 + (_captionlines * ConstMY),
-            _ => (int)(columnWidth * 0.8),
-        };
-
-        protected override string GetCompareKey() => Internal;
-
-        public override bool FilterMatch(string FilterText) => base.FilterMatch(FilterText) || Caption.ToUpper().Contains(FilterText.ToUpper()) || _filename.ToUpper().Contains(FilterText.ToUpper());
+        #endregion
     }
 }

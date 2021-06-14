@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -31,20 +27,17 @@ namespace BlueControls.ItemCollection {
 
     public class LinePadItem : BasicPadItem {
 
-        #region Variablen-Deklarationen
+        #region Fields
 
         internal PointM Point1;
         internal PointM Point2;
-        private string CalcTempPoints_Code = string.Empty;
-        private List<PointM> _TempPoints;
         private DateTime _LastRecalc = DateTime.Now.AddHours(-1);
-        public enConectorStyle Linien_Verhalten { get; set; }
+        private List<PointM> _TempPoints;
+        private string CalcTempPoints_Code = string.Empty;
 
-        #endregion Variablen-Deklarationen
+        #endregion
 
-
-
-        #region Construktor + Initialize
+        #region Constructors
 
         public LinePadItem(ItemCollectionPad parent) : this(parent, PadStyles.Style_Standard, Point.Empty, Point.Empty) {
         }
@@ -65,6 +58,14 @@ namespace BlueControls.ItemCollection {
             Linien_Verhalten = enConectorStyle.Direct;
         }
 
+        #endregion
+
+        #region Properties
+
+        public enConectorStyle Linien_Verhalten { get; set; }
+
+        #endregion
+
         //public LinePadItem(string vInternal, PadStyles vFormat, enConectorStyle vArt, PointM cPoint1, PointM cPoint2)
         //{
         //    _Internal = vInternal;
@@ -78,13 +79,11 @@ namespace BlueControls.ItemCollection {
         //    }
         //}
 
-        #endregion Construktor + Initialize
+        #region Methods
 
-        protected override string ClassId() => "LINE";
-
-        public override bool Contains(PointF value, decimal zoomfactor) {
+        public override bool Contains(PointF value, double zoomfactor) {
             var ne = 5 / zoomfactor;
-            if (Point1.X == 0M && Point2.X == 0M && Point1.Y == 0M && Point2.Y == 0M) { return false; }
+            if (Point1.X == 0d && Point2.X == 0d && Point1.Y == 0d && Point2.Y == 0d) { return false; }
             if (_TempPoints.Count == 0) { CalcTempPoints(); }
             if (_TempPoints.Count == 0) { return false; }
             for (var z = 0; z <= _TempPoints.Count - 2; z++) {
@@ -93,34 +92,21 @@ namespace BlueControls.ItemCollection {
             return false;
         }
 
-        protected override RectangleM CalculateUsedArea() {
-            if (Point1.X == 0M && Point2.X == 0M && Point1.Y == 0M && Point2.Y == 0M) { return new RectangleM(); }
-            if (_TempPoints.Count == 0) { CalcTempPoints(); }
-            if (_TempPoints.Count == 0) { return new RectangleM(); }
-            var x1 = decimal.MaxValue;
-            var y1 = decimal.MaxValue;
-            var x2 = decimal.MinValue;
-            var y2 = decimal.MinValue;
-            foreach (var ThisPoint in _TempPoints) {
-                x1 = Math.Min(ThisPoint.X, x1);
-                y1 = Math.Min(ThisPoint.Y, y1);
-                x2 = Math.Max(ThisPoint.X, x2);
-                y2 = Math.Max(ThisPoint.Y, y2);
-            }
-            return new RectangleM(x1, y1, x2 - x1, y2 - y1);
-            //Return New Rectangle(CInt(Math.Min(Point1.X, Point2.X)), CInt(Math.Min(Point1.Y, Point2.Y)), CInt(Math.Abs(Point2.X - Point1.X)), CInt(Math.Abs(Point2.Y - Point1.Y)))
+        public override List<FlexiControl> GetStyleOptions() {
+            List<FlexiControl> l = new();
+            ItemCollectionList Verhalt = new()
+            {
+                { "Linie direkt zwischen zwei Punkten", ((int)enConectorStyle.Direct).ToString(), QuickImage.Get(enImageCode.Linie) },
+                { "Linie soll Objekten ausweichen", ((int)enConectorStyle.Ausweichenx).ToString(), QuickImage.Get(enImageCode.Linie) },
+                { "Linie soll Objekten ausweichen und rechtwinklig sein", ((int)enConectorStyle.AusweichenUndGerade).ToString(), QuickImage.Get(enImageCode.Linie) }
+            };
+            l.Add(new FlexiControlForProperty(this, "Linien-Verhalten", Verhalt));
+            AddLineStyleOption(l);
+            l.AddRange(base.GetStyleOptions());
+            return l;
         }
 
-        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
-            if (Stil == PadStyles.Undefiniert) { return; }
-            CalcTempPoints();
-            if (_TempPoints.Count == 0) { return; }
-            for (var z = 0; z <= _TempPoints.Count - 2; z++) {
-                GR.DrawLine(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(cZoom * Parent.SheetStyleScale), _TempPoints[z].ZoomAndMove(cZoom, shiftX, shiftY), _TempPoints[z + 1].ZoomAndMove(cZoom, shiftX, shiftY));
-            }
-        }
-
-        //public void Move(decimal x, decimal y) {
+        //public void Move(double x, double y) {
         //    _LastRecalc = DateTime.Now.AddHours(-1);
         //    Point1.SetTo(Point1.X + x, Point1.Y + y);
         //    Point2.SetTo(Point2.X + x, Point2.Y + y);
@@ -142,7 +128,20 @@ namespace BlueControls.ItemCollection {
             return false;
         }
 
-        protected override void ParseFinished() {
+        public override void PointMoved(PointM point) => CalcTempPoints();
+
+        //public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
+        //{
+        //    Stil = (PadStyles)int.Parse(Tags.TagGet("Stil"));
+        //    _TempPoints = null;
+        //    Linien_Verhalten = (enConectorStyle)int.Parse(Tags.TagGet("Linien-Verhalten"));
+        //}
+        public void SetCoordinates(double px1, double py1, double px2, double py2) {
+            Point1.SetTo(px1, py1);
+            Point2.SetTo(px2, py2);
+            //p_ML.SetTo(r.PointOf(enAlignment.VerticalCenter_Left));
+            //p_MR.SetTo(r.PointOf(enAlignment.VerticalCenter_Right));
+            //base.SetCoordinates(r);
         }
 
         public override string ToString() {
@@ -150,6 +149,57 @@ namespace BlueControls.ItemCollection {
             t = t.Substring(0, t.Length - 1) + ", ";
             if (Linien_Verhalten != enConectorStyle.Direct) { t = t + "Connection=" + (int)Linien_Verhalten + ", "; }
             return t.TrimEnd(", ") + "}";
+        }
+
+        protected override RectangleM CalculateUsedArea() {
+            if (Point1.X == 0d && Point2.X == 0d && Point1.Y == 0d && Point2.Y == 0d) { return new RectangleM(); }
+            if (_TempPoints.Count == 0) { CalcTempPoints(); }
+            if (_TempPoints.Count == 0) { return new RectangleM(); }
+            var x1 = double.MaxValue;
+            var y1 = double.MaxValue;
+            var x2 = double.MinValue;
+            var y2 = double.MinValue;
+            foreach (var ThisPoint in _TempPoints) {
+                x1 = Math.Min(ThisPoint.X, x1);
+                y1 = Math.Min(ThisPoint.Y, y1);
+                x2 = Math.Max(ThisPoint.X, x2);
+                y2 = Math.Max(ThisPoint.Y, y2);
+            }
+            return new RectangleM(x1, y1, x2 - x1, y2 - y1);
+            //Return New Rectangle(CInt(Math.Min(Point1.X, Point2.X)), CInt(Math.Min(Point1.Y, Point2.Y)), CInt(Math.Abs(Point2.X - Point1.X)), CInt(Math.Abs(Point2.Y - Point1.Y)))
+        }
+
+        protected override string ClassId() => "LINE";
+
+        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, double cZoom, double shiftX, double shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
+            if (Stil == PadStyles.Undefiniert) { return; }
+            CalcTempPoints();
+            if (_TempPoints.Count == 0) { return; }
+            for (var z = 0; z <= _TempPoints.Count - 2; z++) {
+                GR.DrawLine(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(cZoom * Parent.SheetStyleScale), _TempPoints[z].ZoomAndMove(cZoom, shiftX, shiftY), _TempPoints[z + 1].ZoomAndMove(cZoom, shiftX, shiftY));
+            }
+        }
+
+        protected override void ParseFinished() {
+        }
+
+        private bool Begradige(int P1) {
+            if (P1 >= _TempPoints.Count - 1) { return false; }
+            if ((int)_TempPoints[P1].X == (int)_TempPoints[P1 + 1].X || (int)_TempPoints[P1].Y == (int)_TempPoints[P1 + 1].Y) { return false; }
+            PointM NP1;
+            PointM NP2;
+            if ((int)(_TempPoints[P1].X - _TempPoints[P1 + 1].X) > (int)(_TempPoints[P1].Y - _TempPoints[P1 + 1].Y)) {
+                NP1 = new PointM(_TempPoints[P1].X, (_TempPoints[P1].Y + _TempPoints[P1 + 1].Y) / 2);
+                NP2 = new PointM(_TempPoints[P1 + 1].X, (_TempPoints[P1].Y + _TempPoints[P1 + 1].Y) / 2);
+                _TempPoints.Insert(P1 + 1, NP1);
+                _TempPoints.Insert(P1 + 2, NP2);
+            } else {
+                NP1 = new PointM((_TempPoints[P1].X + _TempPoints[P1 + 1].X) / 2, _TempPoints[P1].Y);
+                NP2 = new PointM((_TempPoints[P1].X + _TempPoints[P1 + 1].X) / 2, _TempPoints[P1 + 1].Y);
+                _TempPoints.Insert(P1 + 1, NP1);
+                _TempPoints.Insert(P1 + 2, NP2);
+            }
+            return true;
         }
 
         private void CalcTempPoints() {
@@ -207,7 +257,7 @@ namespace BlueControls.ItemCollection {
             } while (true);
         }
 
-        private bool IsVerdeckt(decimal X, decimal Y) {
+        private bool IsVerdeckt(double X, double Y) {
             foreach (var ThisBasicItem in Parent) {
                 if (ThisBasicItem != null) {
                     if (ThisBasicItem is not LinePadItem) {
@@ -222,11 +272,16 @@ namespace BlueControls.ItemCollection {
             return false;
         }
 
-        private bool SchneidetWas(decimal X1, decimal Y1, decimal X2, decimal Y2) {
-            PointM p1 = new(X1, Y1);
-            PointM p2 = new(X2, Y2);
-            foreach (var ThisItemBasic in Parent) {
-                if (SchneidetDas(ThisItemBasic, p1, p2)) { return true; }
+        private bool LöscheVerdeckte(int P1) {
+            if (_TempPoints[P1] == Point1) {
+                return false;
+            }
+            if (_TempPoints[P1] == Point2) {
+                return false;
+            }
+            if (IsVerdeckt(_TempPoints[P1].X, _TempPoints[P1].Y)) {
+                _TempPoints.RemoveAt(P1);
+                return true;
             }
             return false;
         }
@@ -245,6 +300,15 @@ namespace BlueControls.ItemCollection {
                         return true;
                     }
                 }
+            }
+            return false;
+        }
+
+        private bool SchneidetWas(double X1, double Y1, double X2, double Y2) {
+            PointM p1 = new(X1, Y1);
+            PointM p2 = new(X2, Y2);
+            foreach (var ThisItemBasic in Parent) {
+                if (SchneidetDas(ThisItemBasic, p1, p2)) { return true; }
             }
             return false;
         }
@@ -448,67 +512,6 @@ namespace BlueControls.ItemCollection {
             return false;
         }
 
-        private bool Begradige(int P1) {
-            if (P1 >= _TempPoints.Count - 1) { return false; }
-            if ((int)_TempPoints[P1].X == (int)_TempPoints[P1 + 1].X || (int)_TempPoints[P1].Y == (int)_TempPoints[P1 + 1].Y) { return false; }
-            PointM NP1;
-            PointM NP2;
-            if ((int)(_TempPoints[P1].X - _TempPoints[P1 + 1].X) > (int)(_TempPoints[P1].Y - _TempPoints[P1 + 1].Y)) {
-                NP1 = new PointM(_TempPoints[P1].X, (_TempPoints[P1].Y + _TempPoints[P1 + 1].Y) / 2);
-                NP2 = new PointM(_TempPoints[P1 + 1].X, (_TempPoints[P1].Y + _TempPoints[P1 + 1].Y) / 2);
-                _TempPoints.Insert(P1 + 1, NP1);
-                _TempPoints.Insert(P1 + 2, NP2);
-            } else {
-                NP1 = new PointM((_TempPoints[P1].X + _TempPoints[P1 + 1].X) / 2, _TempPoints[P1].Y);
-                NP2 = new PointM((_TempPoints[P1].X + _TempPoints[P1 + 1].X) / 2, _TempPoints[P1 + 1].Y);
-                _TempPoints.Insert(P1 + 1, NP1);
-                _TempPoints.Insert(P1 + 2, NP2);
-            }
-            return true;
-        }
-
-        private bool LöscheVerdeckte(int P1) {
-            if (_TempPoints[P1] == Point1) {
-                return false;
-            }
-            if (_TempPoints[P1] == Point2) {
-                return false;
-            }
-            if (IsVerdeckt(_TempPoints[P1].X, _TempPoints[P1].Y)) {
-                _TempPoints.RemoveAt(P1);
-                return true;
-            }
-            return false;
-        }
-
-        public override void PointMoved(PointM point) => CalcTempPoints();
-
-        public override List<FlexiControl> GetStyleOptions() {
-            List<FlexiControl> l = new();
-            ItemCollectionList Verhalt = new()
-            {
-                { "Linie direkt zwischen zwei Punkten", ((int)enConectorStyle.Direct).ToString(), QuickImage.Get(enImageCode.Linie) },
-                { "Linie soll Objekten ausweichen", ((int)enConectorStyle.Ausweichenx).ToString(), QuickImage.Get(enImageCode.Linie) },
-                { "Linie soll Objekten ausweichen und rechtwinklig sein", ((int)enConectorStyle.AusweichenUndGerade).ToString(), QuickImage.Get(enImageCode.Linie) }
-            };
-            l.Add(new FlexiControlForProperty(this, "Linien-Verhalten", Verhalt));
-            AddLineStyleOption(l);
-            l.AddRange(base.GetStyleOptions());
-            return l;
-        }
-
-        //public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
-        //{
-        //    Stil = (PadStyles)int.Parse(Tags.TagGet("Stil"));
-        //    _TempPoints = null;
-        //    Linien_Verhalten = (enConectorStyle)int.Parse(Tags.TagGet("Linien-Verhalten"));
-        //}
-        public void SetCoordinates(decimal px1, decimal py1, decimal px2, decimal py2) {
-            Point1.SetTo(px1, py1);
-            Point2.SetTo(px2, py2);
-            //p_ML.SetTo(r.PointOf(enAlignment.VerticalCenter_Left));
-            //p_MR.SetTo(r.PointOf(enAlignment.VerticalCenter_Right));
-            //base.SetCoordinates(r);
-        }
+        #endregion
     }
 }

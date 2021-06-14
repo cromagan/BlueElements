@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,13 +15,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using System;
 
 namespace BlueBasics.Interfaces {
 
     public interface IChangedFeedback {
+
+        #region Events
 
         /// <summary>
         /// Wird ausgelöst, wenn sich ein Objekt verändert.
@@ -31,6 +29,12 @@ namespace BlueBasics.Interfaces {
         /// </summary>
         event EventHandler Changed;
 
+        #endregion
+
+        #region Methods
+
         void OnChanged();
+
+        #endregion
     }
 }

@@ -1,5 +1,3 @@
-#region BlueElements - a collection of useful tools, database and controls
-
 // Authors:
 // Christian Peter
 //
@@ -16,8 +14,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-
-#endregion BlueElements - a collection of useful tools, database and controls
 
 using BlueBasics;
 using BlueBasics.Enums;
@@ -54,18 +50,10 @@ namespace BlueControls {
 
     public sealed class ExtText {
 
-        #region Variablen-Deklarationen
+        #region Fields
 
-        public enAlignment Ausrichtung;
-        public bool Multiline;
         public string AllowedChars;
-        private enDesign _Design;
-        private RowItem _Row;
-        private enStates _State;
-        private float _Zeilenabstand = 1;
-        private Size _TextDimensions;
-        private int? _Width = null;
-        private int? _Height = null;
+        public enAlignment Ausrichtung;
 
         /// <summary>
         /// Falls mit einer Skalierung gezeichnet wird, müssen die Angaben bereits skaleiert sein.
@@ -77,32 +65,20 @@ namespace BlueControls {
         /// </summary>
         public Point DrawingPos;
 
+        public bool Multiline;
+        private enDesign _Design;
+        private int? _Height = null;
+        private RowItem _Row;
+        private enStates _State;
+        private Size _TextDimensions;
         private string _TMPHtmlText = string.Empty;
         private string _TMPPlainText = string.Empty;
+        private int? _Width = null;
+        private float _Zeilenabstand = 1;
 
-        #endregion Variablen-Deklarationen
+        #endregion
 
-
-
-        #region Construktor + Initialize
-
-        private void Initialize() {
-            _Design = enDesign.Undefiniert;
-            _State = enStates.Standard;
-            _Row = null;
-            DrawingPos = new Point(0, 0);
-            Ausrichtung = enAlignment.Top_Left;
-            Multiline = true;
-            AllowedChars = string.Empty;
-            Chars = new List<ExtChar>();
-            DrawingArea = new Rectangle(0, 0, -1, -1);
-            _TextDimensions = Size.Empty;
-            _Width = null;
-            _Height = null;
-            _Zeilenabstand = 1;
-            _TMPHtmlText = string.Empty;
-            _TMPPlainText = string.Empty;
-        }
+        #region Constructors
 
         public ExtText(enDesign vDesign, enStates state) {
             Initialize();
@@ -121,30 +97,20 @@ namespace BlueControls {
             }
         }
 
-        #endregion Construktor + Initialize
+        #endregion
 
         #region Properties
 
         public List<ExtChar> Chars { get; private set; }
 
-        public float Zeilenabstand {
-            get => _Zeilenabstand;
+        public enDesign Design {
+            get => _Design;
             set {
-                if (value == _Zeilenabstand) { return; }
-                _Zeilenabstand = value;
-                ResetPosition(false);
-            }
-        }
-
-        /// <summary>
-        /// Nach wieviel Pixeln der Zeilenumbruch stattfinden soll. -1 wenn kein Umbruch sein soll. Auch das Alingement richtet sich nach diesen Größen.
-        /// </summary>
-        public Size TextDimensions {
-            get => _TextDimensions;
-            set {
-                if (_TextDimensions.Width == value.Width && _TextDimensions.Height == value.Height) { return; }
-                _TextDimensions = value;
-                ResetPosition(false);
+                if (value == _Design) { return; }
+                _Design = value;
+                foreach (var ch in Chars) {
+                    ch.Design = _Design;
+                }
             }
         }
 
@@ -174,17 +140,6 @@ namespace BlueControls {
             }
         }
 
-        public enDesign Design {
-            get => _Design;
-            set {
-                if (value == _Design) { return; }
-                _Design = value;
-                foreach (var ch in Chars) {
-                    ch.Design = _Design;
-                }
-            }
-        }
-
         public enStates State {
             get => _State;
             set {
@@ -196,236 +151,98 @@ namespace BlueControls {
             }
         }
 
-        #endregion Properties
-
-        internal int WordStart(int Pos) {
-            if (Chars.Count == 0) { return -1; }
-            if (Pos < 0 || Pos >= Chars.Count) { return -1; }
-            if (Chars[Pos].isWordSeperator()) { return -1; }
-            do {
-                Pos--;
-                if (Pos < 0) { return 0; }
-                if (Chars[Pos].isWordSeperator()) { return Pos + 1; }
-            } while (true);
-        }
-
-        internal int WordEnd(int Pos) {
-            if (Chars.Count == 0) { return -1; }
-            if (Pos < 0 || Pos >= Chars.Count) { return -1; }
-            if (Chars[Pos].isWordSeperator()) { return -1; }
-            do {
-                Pos++;
-                if (Pos >= Chars.Count) { return Chars.Count; }
-                if (Chars[Pos].isWordSeperator()) { return Pos; }
-            } while (true);
-        }
-
-        public string Word(int Pos) {
-            var S = WordStart(Pos);
-            var E = WordEnd(Pos);
-            return Substring(S, E - S);
-        }
-
-        private void ResetPosition(bool AndTmpText) {
-            _Width = null;
-            _Height = null;
-            if (AndTmpText) {
-                _TMPHtmlText = string.Empty;
-                _TMPPlainText = string.Empty;
+        /// <summary>
+        /// Nach wieviel Pixeln der Zeilenumbruch stattfinden soll. -1 wenn kein Umbruch sein soll. Auch das Alingement richtet sich nach diesen Größen.
+        /// </summary>
+        public Size TextDimensions {
+            get => _TextDimensions;
+            set {
+                if (_TextDimensions.Width == value.Width && _TextDimensions.Height == value.Height) { return; }
+                _TextDimensions = value;
+                ResetPosition(false);
             }
         }
 
-        #region Für Formatierung
+        public float Zeilenabstand {
+            get => _Zeilenabstand;
+            set {
+                if (value == _Zeilenabstand) { return; }
+                _Zeilenabstand = value;
+                ResetPosition(false);
+            }
+        }
+
+        #endregion
+
+        #region Methods
 
         /// <summary>
-        /// Berechnet die Zeichen-Positionen mit korrekten Umbrüchen. Die enAlignment wird ebefalls mit eingerechnet.
-        /// Cursor_ComputePixelXPos wird am Ende aufgerufen, einschließlich Cursor_Repair und SetNewAkt.
+        ///     Sucht den aktuellen Buchstaben, der unter den angegeben Koordinaten liegt.
+        ///     Wird kein Char gefunden, wird der logischste Char gewählt. (z.B. Nach ZeilenEnde = Letzzter Buchstabe der Zeile)
         /// </summary>
         /// <remarks></remarks>
-        private void ReBreak() {
-            _Width = 0;
-            _Height = 0;
-            if (Chars.Count == 0) { return; }
-            List<string> RI = new();
-            var vZBX_Pixel = 0f;
-            var IsX = 0f;
-            var IsY = 0f;
-            var ZB_Char = 0;
-            var Akt = -1;
+        public int Char_Search(double PixX, double PixY) {
+            var cZ = -1;
+            var XDi = double.MaxValue;
+            var YDi = double.MaxValue;
+            var XNr = -1;
+            var YNr = -1;
+            // Passiert dann, wenn wäherend des Klickens der Text geändert wird, z.B. PLZ ->Ort
+            //  If Not CBool(_TextTyp And enTextTyp.Converted) Then HTML2Char()
+            //  Dim RLC As Integer = ReallyLastChar()
             do {
-                Akt++;
-                if (Akt > Chars.Count - 1) {
-                    RI.Add(ZB_Char + ";" + (Akt - 1));
+                cZ++;
+                if (cZ > Chars.Count - 1) // Das Ende des Textes
+                {
                     break;
                 }
-                switch (Chars[Akt].Char) {
-                    //
-                    case 9:
-                    //    Chars[Akt].Width = (float)((Math.Truncate(IsX / 100) + 1) * 100 - IsX);
-                    //    break;
-
-                    case ExtChar.StoreX:
-                        vZBX_Pixel = IsX;
-                        break;
-
-                    case ExtChar.Top:
-                        IsY = 0;
-                        break;
-                }
-                if (!Chars[Akt].isSpace()) {
-                    if (Akt > ZB_Char && _TextDimensions.Width > 0) {
-                        if (IsX + Chars[Akt].Size.Width + 0.5 > _TextDimensions.Width) {
-                            Akt = WordBreaker(Akt, ZB_Char);
-                            IsX = vZBX_Pixel;
-                            IsY += Row_SetOnLine(ZB_Char, Akt - 1) * _Zeilenabstand;
-                            RI.Add(ZB_Char + ";" + (Akt - 1));
-                            ZB_Char = Akt;
+                if (Chars[cZ].Char > 0 && Chars[cZ].Size.Width > 0) {
+                    var X = Convert.ToBoolean(PixX >= DrawingPos.X + Chars[cZ].Pos.X && PixX <= DrawingPos.X + Chars[cZ].Pos.X + Chars[cZ].Size.Width);
+                    var Y = Convert.ToBoolean(PixY >= DrawingPos.Y + Chars[cZ].Pos.Y && PixY <= DrawingPos.Y + Chars[cZ].Pos.Y + Chars[cZ].Size.Height);
+                    //If PixX >= Left + vChars(cZ).Pos.X AndAlso PixX <= Left + vChars(cZ).Pos.X + vChars(cZ).Size.Width Then X = True
+                    //If PixY >= Top + vChars(cZ).Pos.Y AndAlso PixY <= Top + vChars(cZ).Pos.Y + vChars(cZ).Size.Height Then Y = True
+                    if (X && Y) {
+                        return cZ;
+                    }
+                    double TmpDi;
+                    if (X == false && Y) {
+                        TmpDi = Math.Abs(PixX - (DrawingPos.X + Chars[cZ].Pos.X + (Chars[cZ].Size.Width / 2.0)));
+                        if (TmpDi < XDi) {
+                            XNr = cZ;
+                            XDi = TmpDi;
+                        }
+                    } else if (X && Y == false) {
+                        TmpDi = Math.Abs(PixY - (DrawingPos.Y + Chars[cZ].Pos.Y + (Chars[cZ].Size.Height / 2.0)));
+                        if (TmpDi < YDi) {
+                            YNr = cZ;
+                            YDi = TmpDi;
                         }
                     }
-                    _Width = Math.Max((int)_Width, (int)(IsX + Chars[Akt].Size.Width + 0.5));
-                    _Height = Math.Max((int)_Height, (int)(IsY + Chars[Akt].Size.Height + 0.5));
                 }
-                Chars[Akt].Pos.X = (float)IsX;
-                Chars[Akt].Pos.Y = (float)IsY;
-                // Diese Zeile garantiert, dass immer genau EIN Pixel frei ist zwischen zwei Buchstaben.
-                IsX = (float)(IsX + Math.Truncate(Chars[Akt].Size.Width + 0.5));
-                if (Chars[Akt].isLineBreak()) {
-                    IsX = vZBX_Pixel;
-                    if (Chars[Akt].Char == ExtChar.Top) {
-                        Row_SetOnLine(ZB_Char, Akt);
-                        RI.Add(ZB_Char + ";" + Akt);
+            } while (true);
+            //   Dim RN As Integer = cZ
+            cZ--;
+            return XNr >= 0 ? XNr : YNr >= 0 ? YNr : cZ >= 0 ? cZ : 0;
+            //Do
+            //    If RN < 1 Then Return 0
+            //    If vChars(RN - 1).Char <> 0 Then Return RN
+            //    RN -= 1
+            //Loop
+        }
+
+        public void Check(int Von, int Bis, bool Checkstat) {
+            for (var cc = Von; cc <= Bis; cc++) {
+                if (Chars[cc].State != enStates.Undefiniert) {
+                    if (Checkstat) {
+                        if (!Convert.ToBoolean(Chars[cc].State & enStates.Checked)) {
+                            Chars[cc].State |= enStates.Checked;
+                        }
                     } else {
-                        IsY += (int)(Row_SetOnLine(ZB_Char, Akt) * _Zeilenabstand);
-                        RI.Add(ZB_Char + ";" + Akt);
-                    }
-                    ZB_Char = Akt + 1;
-                }
-            } while (true);
-            //    vHeight = CInt(Math.Max(vHeight, _Chars(ZB_Char).Pos.Y + _Chars(ZB_Char).Size.Height))
-            // enAlignment berechnen -------------------------------------
-            if (Ausrichtung != enAlignment.Top_Left) {
-                float KY = 0;
-                if (Convert.ToBoolean(Ausrichtung & enAlignment.VerticalCenter)) { KY = (float)((_TextDimensions.Height - (int)_Height) / 2.0); }
-                if (Convert.ToBoolean(Ausrichtung & enAlignment.Bottom)) { KY = _TextDimensions.Height - (int)_Height; }
-                foreach (var t in RI) {
-                    var o = t.SplitBy(";");
-                    var Z1 = int.Parse(o[0]);
-                    var Z2 = int.Parse(o[1]);
-                    float KX = 0;
-                    if (Convert.ToBoolean(Ausrichtung & enAlignment.Right)) { KX = _TextDimensions.Width - Chars[Z2].Pos.X - Chars[Z2].Size.Width; }
-                    if (Convert.ToBoolean(Ausrichtung & enAlignment.HorizontalCenter)) { KX = (_TextDimensions.Width - Chars[Z2].Pos.X - Chars[Z2].Size.Width) / 2; }
-                    for (var Z3 = Z1; Z3 <= Z2; Z3++) {
-                        Chars[Z3].Pos.X += KX;
-                        Chars[Z3].Pos.Y += KY;
-                    }
-                }
-            }
-        }
-
-        private float Row_SetOnLine(int Von, int Nach) {
-            float Abstand = 0;
-            for (var z = Von; z <= Nach; z++) {
-                Abstand = Math.Max(Abstand, Chars[z].Size.Height);
-            }
-            for (var z = Von; z <= Nach; z++) {
-                if (Chars[z].Char != ExtChar.Top) {
-                    Chars[z].Pos.Y = Chars[z].Pos.Y + Abstand - Chars[z].Size.Height;
-                }
-            }
-            return Abstand;
-        }
-
-        private int WordBreaker(int AugZeichen, int MinZeichen) {
-            if (Chars.Count == 1) { return 0; }
-            if (MinZeichen < 0) { MinZeichen = 0; }
-            if (AugZeichen > Chars.Count - 1) { AugZeichen = Chars.Count - 1; }
-            if (AugZeichen < MinZeichen + 1) { AugZeichen = MinZeichen + 1; }
-            // AusnahmeFall auschließen:
-            // Space-Zeichen - Dann Buchstabe
-            if (Chars[AugZeichen - 1].isSpace() && !Chars[AugZeichen].isPossibleLineBreak()) { return AugZeichen; }
-            var Started = AugZeichen;
-            // Das Letzte Zeichen Search, das kein Trennzeichen ist
-            do {
-                if (Chars[AugZeichen].isPossibleLineBreak()) {
-                    AugZeichen--;
-                } else {
-                    break;
-                }
-                if (AugZeichen <= MinZeichen) { return Started; }
-            } while (true);
-            do {
-                if (Chars[AugZeichen].isPossibleLineBreak()) { return AugZeichen + 1; }
-                AugZeichen--;
-                if (AugZeichen <= MinZeichen) { return Started; }
-            } while (true);
-        }
-
-        #endregion Für Formatierung
-
-        public void Draw(Graphics gr, float zoom) {
-            while (_Width == null) { ReBreak(); }
-            DrawStates(gr, zoom);
-            foreach (var t in Chars) {
-                if (t.Char > 0 && t.IsVisible(zoom, DrawingPos, DrawingArea)) { t.Draw(gr, DrawingPos, zoom); }
-            }
-        }
-
-        private void DrawStates(Graphics GR, float czoom) {
-            DrawState(GR, czoom, enMarkState.Field);
-            DrawState(GR, czoom, enMarkState.MyOwn);
-            DrawState(GR, czoom, enMarkState.Other);
-            DrawState(GR, czoom, enMarkState.Ringelchen);
-        }
-
-        private void DrawState(Graphics GR, float czoom, enMarkState state) {
-            var tmas = -1;
-            for (var Pos = 0; Pos < Chars.Count; Pos++) {
-                var tempVar = Chars[Pos];
-                var marked = tempVar.Marking.HasFlag(state);
-                if (marked && tmas < 0) {
-                    tmas = Pos;
-                }
-                if (!marked || tempVar.Char == 0 || Pos == Chars.Count - 1) {
-                    if (tmas > -1) {
-                        if (Pos == Chars.Count - 1) {
-                            DrawZone(GR, czoom, state, tmas, Pos);
-                        } else {
-                            DrawZone(GR, czoom, state, tmas, Pos - 1);
+                        if (Convert.ToBoolean(Chars[cc].State & enStates.Checked)) {
+                            Chars[cc].State = Chars[cc].State ^ enStates.Checked;
                         }
-                        tmas = -1;
                     }
                 }
-            }
-        }
-
-        private void DrawZone(Graphics GR, float czoom, enMarkState ThisState, int MarkStart, int MarkEnd) {
-            var StartX = (Chars[MarkStart].Pos.X * czoom) + DrawingPos.X;
-            var StartY = (Chars[MarkStart].Pos.Y * czoom) + DrawingPos.Y;
-            var EndX = (Chars[MarkEnd].Pos.X * czoom) + DrawingPos.X + (Chars[MarkEnd].Size.Width * czoom);
-            var Endy = (Chars[MarkEnd].Pos.Y * czoom) + DrawingPos.Y + (Chars[MarkEnd].Size.Height * czoom);
-            switch (ThisState) {
-                case enMarkState.None:
-                    break;
-
-                case enMarkState.Ringelchen:
-                    GR.DrawLine(new Pen(Color.Red, 3 * czoom), StartX, (int)(StartY + (Chars[MarkStart].Size.Height * czoom * 0.9)), EndX, (int)(StartY + (Chars[MarkStart].Size.Height * czoom * 0.9)));
-                    break;
-
-                case enMarkState.Field:
-                    GR.FillRectangle(new SolidBrush(Color.FromArgb(80, 128, 128, 128)), StartX, StartY, EndX - StartX, Endy - StartY);
-                    break;
-
-                case enMarkState.MyOwn:
-                    GR.FillRectangle(new SolidBrush(Color.FromArgb(40, 50, 255, 50)), StartX, StartY, EndX - StartX, Endy - StartY);
-                    break;
-
-                case enMarkState.Other:
-                    GR.FillRectangle(new SolidBrush(Color.FromArgb(80, 255, 255, 50)), StartX, StartY, EndX - StartX, Endy - StartY);
-                    break;
-
-                default:
-                    Develop.DebugPrint(ThisState);
-                    break;
             }
         }
 
@@ -454,6 +271,142 @@ namespace BlueControls {
                 He = Chars[CharPos - 1].Size.Height;
             }
             return new Rectangle((int)X, (int)(Y - 1), 0, (int)(He + 2));
+        }
+
+        public void Delete(int Von, int Bis) {
+            var tempVar = Bis - Von;
+            for (var z = 1; z <= tempVar; z++) {
+                if (Von < Chars.Count) {
+                    Chars.RemoveAt(Von);
+                }
+            }
+            ResetPosition(true);
+        }
+
+        public void Draw(Graphics gr, float zoom) {
+            while (_Width == null) { ReBreak(); }
+            DrawStates(gr, zoom);
+            foreach (var t in Chars) {
+                if (t.Char > 0 && t.IsVisible(zoom, DrawingPos, DrawingArea)) { t.Draw(gr, DrawingPos, zoom); }
+            }
+        }
+
+        public int Height() {
+            while (_Width == null) { ReBreak(); }
+            return (int)_Height;
+        }
+
+        public bool InsertChar(enASCIIKey KeyAscii, int Position) => InsertAnything(KeyAscii, string.Empty, Position);
+
+        public bool InsertImage(string Img, int Position) => InsertAnything(enASCIIKey.Undefined, Img, Position);
+
+        public Size LastSize() {
+            while (_Width == null) { ReBreak(); }
+            return _Width < 5 || _Height < 5 ? new Size(32, 16) : new Size((int)_Width, (int)_Height);
+        }
+
+        public void StufeÄndern(int Von, int Bis, int stufe) {
+            for (var cc = Von; cc <= Bis; cc++) {
+                Chars[cc].Stufe = stufe;
+            }
+            ResetPosition(true);
+        }
+
+        public string Substring(int StartIndex, int lenght) => ConvertCharToPlainText(StartIndex, StartIndex + lenght - 1);
+
+        public int Width() {
+            while (_Width == null) { ReBreak(); }
+            return (int)_Width;
+        }
+
+        public string Word(int Pos) {
+            var S = WordStart(Pos);
+            var E = WordEnd(Pos);
+            return Substring(S, E - S);
+        }
+
+        internal string ConvertCharToPlainText(int Von, int Bis) {
+            try {
+                var T = string.Empty;
+                var cZ = Von;
+                Bis = Math.Min(Bis, Chars.Count - 1);
+                while (cZ <= Bis && Chars[cZ].Char > 0) {
+                    if (Chars[cZ].Char < (int)enASCIIKey.ImageStart) {
+                        T += Convert.ToChar(Chars[cZ].Char).ToString();
+                    }
+                    cZ++;
+                }
+                T = T.Replace("\n", "");
+                return T;
+            } catch {
+                // Wenn Chars geändter wird (und dann der Count nimmer stimmt)
+                return ConvertCharToPlainText(Von, Bis);
+            }
+        }
+
+        internal void Mark(enMarkState markstate, int first, int last) {
+            try {
+                for (var z = first; z <= last; z++) {
+                    if (z >= Chars.Count) { return; }
+                    if (!Chars[z].Marking.HasFlag(markstate)) {
+                        Chars[z].Marking = Chars[z].Marking | markstate;
+                    }
+                }
+            } catch (Exception) {
+                Mark(markstate, first, last);
+            }
+        }
+
+        internal void Unmark(enMarkState markstate) {
+            foreach (var t in Chars) {
+                if (t.Marking.HasFlag(markstate)) {
+                    t.Marking ^= markstate;
+                }
+            }
+        }
+
+        internal int WordEnd(int Pos) {
+            if (Chars.Count == 0) { return -1; }
+            if (Pos < 0 || Pos >= Chars.Count) { return -1; }
+            if (Chars[Pos].isWordSeperator()) { return -1; }
+            do {
+                Pos++;
+                if (Pos >= Chars.Count) { return Chars.Count; }
+                if (Chars[Pos].isWordSeperator()) { return Pos; }
+            } while (true);
+        }
+
+        internal int WordStart(int Pos) {
+            if (Chars.Count == 0) { return -1; }
+            if (Pos < 0 || Pos >= Chars.Count) { return -1; }
+            if (Chars[Pos].isWordSeperator()) { return -1; }
+            do {
+                Pos--;
+                if (Pos < 0) { return 0; }
+                if (Chars[Pos].isWordSeperator()) { return Pos + 1; }
+            } while (true);
+        }
+
+        private string ConvertCharToHTMLText(int Von, int Bis) {
+            var T = "";
+            var cZ = Von;
+            Bis = Math.Min(Bis, Chars.Count - 1);
+            var LastStufe = 4;
+            while (cZ <= Bis && Chars[cZ].Char > 0) {
+                if (Chars[cZ].Char < (int)enASCIIKey.ImageStart) {
+                    if (LastStufe != Chars[cZ].Stufe) {
+                        T = T + "<H" + Chars[cZ].Stufe + ">";
+                        LastStufe = Chars[cZ].Stufe;
+                    }
+                    T += Chars[cZ].ToHTML();
+                } else {
+                    var index = Chars[cZ].Char - (int)enASCIIKey.ImageStart;
+                    var x = QuickImage.Get(index);
+                    if (x != null) { T += "<ImageCode=" + x.Name + ">"; }
+                }
+                cZ++;
+            }
+            return T;
         }
 
         private void ConvertTextToChar(string cactext, bool IsRich) {
@@ -507,132 +460,6 @@ namespace BlueControls {
                 } while (true);
             }
             ResetPosition(false);
-        }
-
-        private string ConvertCharToHTMLText(int Von, int Bis) {
-            var T = "";
-            var cZ = Von;
-            Bis = Math.Min(Bis, Chars.Count - 1);
-            var LastStufe = 4;
-            while (cZ <= Bis && Chars[cZ].Char > 0) {
-                if (Chars[cZ].Char < (int)enASCIIKey.ImageStart) {
-                    if (LastStufe != Chars[cZ].Stufe) {
-                        T = T + "<H" + Chars[cZ].Stufe + ">";
-                        LastStufe = Chars[cZ].Stufe;
-                    }
-                    T += Chars[cZ].ToHTML();
-                } else {
-                    var index = Chars[cZ].Char - (int)enASCIIKey.ImageStart;
-                    var x = QuickImage.Get(index);
-                    if (x != null) { T += "<ImageCode=" + x.Name + ">"; }
-                }
-                cZ++;
-            }
-            return T;
-        }
-
-        internal string ConvertCharToPlainText(int Von, int Bis) {
-            try {
-                var T = string.Empty;
-                var cZ = Von;
-                Bis = Math.Min(Bis, Chars.Count - 1);
-                while (cZ <= Bis && Chars[cZ].Char > 0) {
-                    if (Chars[cZ].Char < (int)enASCIIKey.ImageStart) {
-                        T += Convert.ToChar(Chars[cZ].Char).ToString();
-                    }
-                    cZ++;
-                }
-                T = T.Replace("\n", "");
-                return T;
-            } catch {
-                // Wenn Chars geändter wird (und dann der Count nimmer stimmt)
-                return ConvertCharToPlainText(Von, Bis);
-            }
-        }
-
-        private void DoSpecialEntities(string xHTMLTextx, ref int xStartPosx, ref int xPosition, ref BlueFont f, ref int Stufe, ref enMarkState MarkState) {
-            var Endpos = xHTMLTextx.IndexOf(';', xStartPosx + 1);
-            xPosition++;
-            if (Endpos <= xStartPosx || Endpos > xStartPosx + 10) {
-                // Ein nicht konvertiertes &, einfach so übernehmen.
-                Chars.Add(new ExtChar('&', _Design, _State, f, Stufe, MarkState));
-                return;
-            }
-            switch (xHTMLTextx.Substring(xStartPosx, Endpos - xStartPosx + 1)) {
-                case "&uuml;":
-                    Chars.Add(new ExtChar('ü', _Design, _State, f, Stufe, MarkState));
-                    break;
-
-                case "&auml;":
-                    Chars.Add(new ExtChar('ä', _Design, _State, f, Stufe, MarkState));
-                    break;
-
-                case "&ouml;":
-                    Chars.Add(new ExtChar('ö', _Design, _State, f, Stufe, MarkState));
-                    break;
-
-                case "&Uuml;":
-                    Chars.Add(new ExtChar('Ü', _Design, _State, f, Stufe, MarkState));
-                    break;
-
-                case "&Auml;":
-                    Chars.Add(new ExtChar('Ä', _Design, _State, f, Stufe, MarkState));
-                    break;
-
-                case "&Ouml;":
-                    Chars.Add(new ExtChar('Ö', _Design, _State, f, Stufe, MarkState));
-                    break;
-
-                case "&szlig;":
-                    Chars.Add(new ExtChar('ß', _Design, _State, f, Stufe, MarkState));
-                    break;
-
-                case "&quot;":
-                    Chars.Add(new ExtChar('\"', _Design, _State, f, Stufe, MarkState));
-                    break;
-
-                case "&amp;":
-                    Chars.Add(new ExtChar('&', _Design, _State, f, Stufe, MarkState));
-                    break;
-
-                case "&lt;":
-                    Chars.Add(new ExtChar('<', _Design, _State, f, Stufe, MarkState));
-                    break;
-
-                case "&gt;":
-                    Chars.Add(new ExtChar('>', _Design, _State, f, Stufe, MarkState));
-                    break;
-
-                case "&Oslash;":
-                    Chars.Add(new ExtChar('Ø', _Design, _State, f, Stufe, MarkState));
-                    break;
-
-                case "&oslash;":
-                    Chars.Add(new ExtChar('ø', _Design, _State, f, Stufe, MarkState));
-                    break;
-
-                case "&bull;":
-                    Chars.Add(new ExtChar('•', _Design, _State, f, Stufe, MarkState));
-                    break;
-
-                case "&eacute;":
-                    Chars.Add(new ExtChar('é', _Design, _State, f, Stufe, MarkState));
-                    break;
-
-                case "&Eacute;":
-                    Chars.Add(new ExtChar('É', _Design, _State, f, Stufe, MarkState));
-                    break;
-
-                case "&euro;":
-                    Chars.Add(new ExtChar('€', _Design, _State, f, Stufe, MarkState));
-                    break;
-
-                default:
-                    Develop.DebugPrint(enFehlerArt.Info, "Unbekannter Code: " + xHTMLTextx.Substring(xStartPosx, Endpos - xStartPosx + 1));
-                    Chars.Add(new ExtChar('&', _Design, _State, f, Stufe, MarkState));
-                    return;
-            }
-            xStartPosx = Endpos;
         }
 
         private void DoHTMLCode(string HTMLText, int StartPos, ref int Position, ref BlueFont PF, ref int Stufe, ref enMarkState MarkState) {
@@ -818,88 +645,167 @@ namespace BlueControls {
             }
         }
 
-        public int Width() {
-            while (_Width == null) { ReBreak(); }
-            return (int)_Width;
-        }
-
-        public int Height() {
-            while (_Width == null) { ReBreak(); }
-            return (int)_Height;
-        }
-
-        public Size LastSize() {
-            while (_Width == null) { ReBreak(); }
-            return _Width < 5 || _Height < 5 ? new Size(32, 16) : new Size((int)_Width, (int)_Height);
-        }
-
-        /// <summary>
-        ///     Sucht den aktuellen Buchstaben, der unter den angegeben Koordinaten liegt.
-        ///     Wird kein Char gefunden, wird der logischste Char gewählt. (z.B. Nach ZeilenEnde = Letzzter Buchstabe der Zeile)
-        /// </summary>
-        /// <remarks></remarks>
-        public int Char_Search(double PixX, double PixY) {
-            var cZ = -1;
-            var XDi = double.MaxValue;
-            var YDi = double.MaxValue;
-            var XNr = -1;
-            var YNr = -1;
-            // Passiert dann, wenn wäherend des Klickens der Text geändert wird, z.B. PLZ ->Ort
-            //  If Not CBool(_TextTyp And enTextTyp.Converted) Then HTML2Char()
-            //  Dim RLC As Integer = ReallyLastChar()
-            do {
-                cZ++;
-                if (cZ > Chars.Count - 1) // Das Ende des Textes
-                {
+        private void DoSpecialEntities(string xHTMLTextx, ref int xStartPosx, ref int xPosition, ref BlueFont f, ref int Stufe, ref enMarkState MarkState) {
+            var Endpos = xHTMLTextx.IndexOf(';', xStartPosx + 1);
+            xPosition++;
+            if (Endpos <= xStartPosx || Endpos > xStartPosx + 10) {
+                // Ein nicht konvertiertes &, einfach so übernehmen.
+                Chars.Add(new ExtChar('&', _Design, _State, f, Stufe, MarkState));
+                return;
+            }
+            switch (xHTMLTextx.Substring(xStartPosx, Endpos - xStartPosx + 1)) {
+                case "&uuml;":
+                    Chars.Add(new ExtChar('ü', _Design, _State, f, Stufe, MarkState));
                     break;
-                }
-                if (Chars[cZ].Char > 0 && Chars[cZ].Size.Width > 0) {
-                    var X = Convert.ToBoolean(PixX >= DrawingPos.X + Chars[cZ].Pos.X && PixX <= DrawingPos.X + Chars[cZ].Pos.X + Chars[cZ].Size.Width);
-                    var Y = Convert.ToBoolean(PixY >= DrawingPos.Y + Chars[cZ].Pos.Y && PixY <= DrawingPos.Y + Chars[cZ].Pos.Y + Chars[cZ].Size.Height);
-                    //If PixX >= Left + vChars(cZ).Pos.X AndAlso PixX <= Left + vChars(cZ).Pos.X + vChars(cZ).Size.Width Then X = True
-                    //If PixY >= Top + vChars(cZ).Pos.Y AndAlso PixY <= Top + vChars(cZ).Pos.Y + vChars(cZ).Size.Height Then Y = True
-                    if (X && Y) {
-                        return cZ;
-                    }
-                    double TmpDi;
-                    if (X == false && Y) {
-                        TmpDi = Math.Abs(PixX - (DrawingPos.X + Chars[cZ].Pos.X + (Chars[cZ].Size.Width / 2.0)));
-                        if (TmpDi < XDi) {
-                            XNr = cZ;
-                            XDi = TmpDi;
-                        }
-                    } else if (X && Y == false) {
-                        TmpDi = Math.Abs(PixY - (DrawingPos.Y + Chars[cZ].Pos.Y + (Chars[cZ].Size.Height / 2.0)));
-                        if (TmpDi < YDi) {
-                            YNr = cZ;
-                            YDi = TmpDi;
-                        }
-                    }
-                }
-            } while (true);
-            //   Dim RN As Integer = cZ
-            cZ--;
-            return XNr >= 0 ? XNr : YNr >= 0 ? YNr : cZ >= 0 ? cZ : 0;
-            //Do
-            //    If RN < 1 Then Return 0
-            //    If vChars(RN - 1).Char <> 0 Then Return RN
-            //    RN -= 1
-            //Loop
+
+                case "&auml;":
+                    Chars.Add(new ExtChar('ä', _Design, _State, f, Stufe, MarkState));
+                    break;
+
+                case "&ouml;":
+                    Chars.Add(new ExtChar('ö', _Design, _State, f, Stufe, MarkState));
+                    break;
+
+                case "&Uuml;":
+                    Chars.Add(new ExtChar('Ü', _Design, _State, f, Stufe, MarkState));
+                    break;
+
+                case "&Auml;":
+                    Chars.Add(new ExtChar('Ä', _Design, _State, f, Stufe, MarkState));
+                    break;
+
+                case "&Ouml;":
+                    Chars.Add(new ExtChar('Ö', _Design, _State, f, Stufe, MarkState));
+                    break;
+
+                case "&szlig;":
+                    Chars.Add(new ExtChar('ß', _Design, _State, f, Stufe, MarkState));
+                    break;
+
+                case "&quot;":
+                    Chars.Add(new ExtChar('\"', _Design, _State, f, Stufe, MarkState));
+                    break;
+
+                case "&amp;":
+                    Chars.Add(new ExtChar('&', _Design, _State, f, Stufe, MarkState));
+                    break;
+
+                case "&lt;":
+                    Chars.Add(new ExtChar('<', _Design, _State, f, Stufe, MarkState));
+                    break;
+
+                case "&gt;":
+                    Chars.Add(new ExtChar('>', _Design, _State, f, Stufe, MarkState));
+                    break;
+
+                case "&Oslash;":
+                    Chars.Add(new ExtChar('Ø', _Design, _State, f, Stufe, MarkState));
+                    break;
+
+                case "&oslash;":
+                    Chars.Add(new ExtChar('ø', _Design, _State, f, Stufe, MarkState));
+                    break;
+
+                case "&bull;":
+                    Chars.Add(new ExtChar('•', _Design, _State, f, Stufe, MarkState));
+                    break;
+
+                case "&eacute;":
+                    Chars.Add(new ExtChar('é', _Design, _State, f, Stufe, MarkState));
+                    break;
+
+                case "&Eacute;":
+                    Chars.Add(new ExtChar('É', _Design, _State, f, Stufe, MarkState));
+                    break;
+
+                case "&euro;":
+                    Chars.Add(new ExtChar('€', _Design, _State, f, Stufe, MarkState));
+                    break;
+
+                default:
+                    Develop.DebugPrint(enFehlerArt.Info, "Unbekannter Code: " + xHTMLTextx.Substring(xStartPosx, Endpos - xStartPosx + 1));
+                    Chars.Add(new ExtChar('&', _Design, _State, f, Stufe, MarkState));
+                    return;
+            }
+            xStartPosx = Endpos;
         }
 
-        public void Delete(int Von, int Bis) {
-            var tempVar = Bis - Von;
-            for (var z = 1; z <= tempVar; z++) {
-                if (Von < Chars.Count) {
-                    Chars.RemoveAt(Von);
+        private void DrawState(Graphics GR, float czoom, enMarkState state) {
+            var tmas = -1;
+            for (var Pos = 0; Pos < Chars.Count; Pos++) {
+                var tempVar = Chars[Pos];
+                var marked = tempVar.Marking.HasFlag(state);
+                if (marked && tmas < 0) {
+                    tmas = Pos;
+                }
+                if (!marked || tempVar.Char == 0 || Pos == Chars.Count - 1) {
+                    if (tmas > -1) {
+                        if (Pos == Chars.Count - 1) {
+                            DrawZone(GR, czoom, state, tmas, Pos);
+                        } else {
+                            DrawZone(GR, czoom, state, tmas, Pos - 1);
+                        }
+                        tmas = -1;
+                    }
                 }
             }
-            ResetPosition(true);
         }
 
-        public bool InsertImage(string Img, int Position) => InsertAnything(enASCIIKey.Undefined, Img, Position);
+        private void DrawStates(Graphics GR, float czoom) {
+            DrawState(GR, czoom, enMarkState.Field);
+            DrawState(GR, czoom, enMarkState.MyOwn);
+            DrawState(GR, czoom, enMarkState.Other);
+            DrawState(GR, czoom, enMarkState.Ringelchen);
+        }
 
-        public bool InsertChar(enASCIIKey KeyAscii, int Position) => InsertAnything(KeyAscii, string.Empty, Position);
+        private void DrawZone(Graphics GR, float czoom, enMarkState ThisState, int MarkStart, int MarkEnd) {
+            var StartX = (Chars[MarkStart].Pos.X * czoom) + DrawingPos.X;
+            var StartY = (Chars[MarkStart].Pos.Y * czoom) + DrawingPos.Y;
+            var EndX = (Chars[MarkEnd].Pos.X * czoom) + DrawingPos.X + (Chars[MarkEnd].Size.Width * czoom);
+            var Endy = (Chars[MarkEnd].Pos.Y * czoom) + DrawingPos.Y + (Chars[MarkEnd].Size.Height * czoom);
+            switch (ThisState) {
+                case enMarkState.None:
+                    break;
+
+                case enMarkState.Ringelchen:
+                    GR.DrawLine(new Pen(Color.Red, 3 * czoom), StartX, (int)(StartY + (Chars[MarkStart].Size.Height * czoom * 0.9)), EndX, (int)(StartY + (Chars[MarkStart].Size.Height * czoom * 0.9)));
+                    break;
+
+                case enMarkState.Field:
+                    GR.FillRectangle(new SolidBrush(Color.FromArgb(80, 128, 128, 128)), StartX, StartY, EndX - StartX, Endy - StartY);
+                    break;
+
+                case enMarkState.MyOwn:
+                    GR.FillRectangle(new SolidBrush(Color.FromArgb(40, 50, 255, 50)), StartX, StartY, EndX - StartX, Endy - StartY);
+                    break;
+
+                case enMarkState.Other:
+                    GR.FillRectangle(new SolidBrush(Color.FromArgb(80, 255, 255, 50)), StartX, StartY, EndX - StartX, Endy - StartY);
+                    break;
+
+                default:
+                    Develop.DebugPrint(ThisState);
+                    break;
+            }
+        }
+
+        private void Initialize() {
+            _Design = enDesign.Undefiniert;
+            _State = enStates.Standard;
+            _Row = null;
+            DrawingPos = new Point(0, 0);
+            Ausrichtung = enAlignment.Top_Left;
+            Multiline = true;
+            AllowedChars = string.Empty;
+            Chars = new List<ExtChar>();
+            DrawingArea = new Rectangle(0, 0, -1, -1);
+            _TextDimensions = Size.Empty;
+            _Width = null;
+            _Height = null;
+            _Zeilenabstand = 1;
+            _TMPHtmlText = string.Empty;
+            _TMPPlainText = string.Empty;
+        }
 
         private bool InsertAnything(enASCIIKey KeyAscii, string img, int Position) {
             if (Position < 0 && !string.IsNullOrEmpty(PlainText)) { return false; }            // Text zwar da, aber kein Cursor angezeigt
@@ -939,50 +845,138 @@ namespace BlueControls {
             return true;
         }
 
-        internal void Mark(enMarkState markstate, int first, int last) {
-            try {
-                for (var z = first; z <= last; z++) {
-                    if (z >= Chars.Count) { return; }
-                    if (!Chars[z].Marking.HasFlag(markstate)) {
-                        Chars[z].Marking = Chars[z].Marking | markstate;
-                    }
+        /// <summary>
+        /// Berechnet die Zeichen-Positionen mit korrekten Umbrüchen. Die enAlignment wird ebefalls mit eingerechnet.
+        /// Cursor_ComputePixelXPos wird am Ende aufgerufen, einschließlich Cursor_Repair und SetNewAkt.
+        /// </summary>
+        /// <remarks></remarks>
+        private void ReBreak() {
+            _Width = 0;
+            _Height = 0;
+            if (Chars.Count == 0) { return; }
+            List<string> RI = new();
+            var vZBX_Pixel = 0f;
+            var IsX = 0f;
+            var IsY = 0f;
+            var ZB_Char = 0;
+            var Akt = -1;
+            do {
+                Akt++;
+                if (Akt > Chars.Count - 1) {
+                    RI.Add(ZB_Char + ";" + (Akt - 1));
+                    break;
                 }
-            } catch (Exception) {
-                Mark(markstate, first, last);
-            }
-        }
+                switch (Chars[Akt].Char) {
+                    //
+                    case 9:
+                    //    Chars[Akt].Width = (float)((Math.Truncate(IsX / 100) + 1) * 100 - IsX);
+                    //    break;
 
-        internal void Unmark(enMarkState markstate) {
-            foreach (var t in Chars) {
-                if (t.Marking.HasFlag(markstate)) {
-                    t.Marking ^= markstate;
+                    case ExtChar.StoreX:
+                        vZBX_Pixel = IsX;
+                        break;
+
+                    case ExtChar.Top:
+                        IsY = 0;
+                        break;
                 }
-            }
-        }
-
-        public void Check(int Von, int Bis, bool Checkstat) {
-            for (var cc = Von; cc <= Bis; cc++) {
-                if (Chars[cc].State != enStates.Undefiniert) {
-                    if (Checkstat) {
-                        if (!Convert.ToBoolean(Chars[cc].State & enStates.Checked)) {
-                            Chars[cc].State |= enStates.Checked;
+                if (!Chars[Akt].isSpace()) {
+                    if (Akt > ZB_Char && _TextDimensions.Width > 0) {
+                        if (IsX + Chars[Akt].Size.Width + 0.5 > _TextDimensions.Width) {
+                            Akt = WordBreaker(Akt, ZB_Char);
+                            IsX = vZBX_Pixel;
+                            IsY += Row_SetOnLine(ZB_Char, Akt - 1) * _Zeilenabstand;
+                            RI.Add(ZB_Char + ";" + (Akt - 1));
+                            ZB_Char = Akt;
                         }
+                    }
+                    _Width = Math.Max((int)_Width, (int)(IsX + Chars[Akt].Size.Width + 0.5));
+                    _Height = Math.Max((int)_Height, (int)(IsY + Chars[Akt].Size.Height + 0.5));
+                }
+                Chars[Akt].Pos.X = (float)IsX;
+                Chars[Akt].Pos.Y = (float)IsY;
+                // Diese Zeile garantiert, dass immer genau EIN Pixel frei ist zwischen zwei Buchstaben.
+                IsX = (float)(IsX + Math.Truncate(Chars[Akt].Size.Width + 0.5));
+                if (Chars[Akt].isLineBreak()) {
+                    IsX = vZBX_Pixel;
+                    if (Chars[Akt].Char == ExtChar.Top) {
+                        Row_SetOnLine(ZB_Char, Akt);
+                        RI.Add(ZB_Char + ";" + Akt);
                     } else {
-                        if (Convert.ToBoolean(Chars[cc].State & enStates.Checked)) {
-                            Chars[cc].State = Chars[cc].State ^ enStates.Checked;
-                        }
+                        IsY += (int)(Row_SetOnLine(ZB_Char, Akt) * _Zeilenabstand);
+                        RI.Add(ZB_Char + ";" + Akt);
+                    }
+                    ZB_Char = Akt + 1;
+                }
+            } while (true);
+            //    vHeight = CInt(Math.Max(vHeight, _Chars(ZB_Char).Pos.Y + _Chars(ZB_Char).Size.Height))
+            // enAlignment berechnen -------------------------------------
+            if (Ausrichtung != enAlignment.Top_Left) {
+                float KY = 0;
+                if (Convert.ToBoolean(Ausrichtung & enAlignment.VerticalCenter)) { KY = (float)((_TextDimensions.Height - (int)_Height) / 2.0); }
+                if (Convert.ToBoolean(Ausrichtung & enAlignment.Bottom)) { KY = _TextDimensions.Height - (int)_Height; }
+                foreach (var t in RI) {
+                    var o = t.SplitBy(";");
+                    var Z1 = int.Parse(o[0]);
+                    var Z2 = int.Parse(o[1]);
+                    float KX = 0;
+                    if (Convert.ToBoolean(Ausrichtung & enAlignment.Right)) { KX = _TextDimensions.Width - Chars[Z2].Pos.X - Chars[Z2].Size.Width; }
+                    if (Convert.ToBoolean(Ausrichtung & enAlignment.HorizontalCenter)) { KX = (_TextDimensions.Width - Chars[Z2].Pos.X - Chars[Z2].Size.Width) / 2; }
+                    for (var Z3 = Z1; Z3 <= Z2; Z3++) {
+                        Chars[Z3].Pos.X += KX;
+                        Chars[Z3].Pos.Y += KY;
                     }
                 }
             }
         }
 
-        public void StufeÄndern(int Von, int Bis, int stufe) {
-            for (var cc = Von; cc <= Bis; cc++) {
-                Chars[cc].Stufe = stufe;
+        private void ResetPosition(bool AndTmpText) {
+            _Width = null;
+            _Height = null;
+            if (AndTmpText) {
+                _TMPHtmlText = string.Empty;
+                _TMPPlainText = string.Empty;
             }
-            ResetPosition(true);
         }
 
-        public string Substring(int StartIndex, int lenght) => ConvertCharToPlainText(StartIndex, StartIndex + lenght - 1);
+        private float Row_SetOnLine(int Von, int Nach) {
+            float Abstand = 0;
+            for (var z = Von; z <= Nach; z++) {
+                Abstand = Math.Max(Abstand, Chars[z].Size.Height);
+            }
+            for (var z = Von; z <= Nach; z++) {
+                if (Chars[z].Char != ExtChar.Top) {
+                    Chars[z].Pos.Y = Chars[z].Pos.Y + Abstand - Chars[z].Size.Height;
+                }
+            }
+            return Abstand;
+        }
+
+        private int WordBreaker(int AugZeichen, int MinZeichen) {
+            if (Chars.Count == 1) { return 0; }
+            if (MinZeichen < 0) { MinZeichen = 0; }
+            if (AugZeichen > Chars.Count - 1) { AugZeichen = Chars.Count - 1; }
+            if (AugZeichen < MinZeichen + 1) { AugZeichen = MinZeichen + 1; }
+            // AusnahmeFall auschließen:
+            // Space-Zeichen - Dann Buchstabe
+            if (Chars[AugZeichen - 1].isSpace() && !Chars[AugZeichen].isPossibleLineBreak()) { return AugZeichen; }
+            var Started = AugZeichen;
+            // Das Letzte Zeichen Search, das kein Trennzeichen ist
+            do {
+                if (Chars[AugZeichen].isPossibleLineBreak()) {
+                    AugZeichen--;
+                } else {
+                    break;
+                }
+                if (AugZeichen <= MinZeichen) { return Started; }
+            } while (true);
+            do {
+                if (Chars[AugZeichen].isPossibleLineBreak()) { return AugZeichen + 1; }
+                AugZeichen--;
+                if (AugZeichen <= MinZeichen) { return Started; }
+            } while (true);
+        }
+
+        #endregion
     }
 }

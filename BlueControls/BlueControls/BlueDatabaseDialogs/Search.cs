@@ -1,5 +1,3 @@
-#region BlueElements - a collection of useful tools, database and controls
-
 // Authors:
 // Christian Peter
 //
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -30,9 +26,16 @@ using BlueDatabase.EventArgs;
 namespace BlueControls.BlueDatabaseDialogs {
 
     public sealed partial class Search : Form {
+
+        #region Fields
+
         private readonly Table _BlueTable;
-        private RowItem _row = null;
         private ColumnItem _col = null;
+        private RowItem _row = null;
+
+        #endregion
+
+        #region Constructors
 
         public Search(Table table) {
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -43,14 +46,25 @@ namespace BlueControls.BlueDatabaseDialogs {
             CursorPosChanged(_BlueTable, new CellEventArgs(_BlueTable.CursorPosColumn(), _BlueTable.CursorPosRow()));
         }
 
-        private void CursorPosChanged(object sender, CellEventArgs e) {
-            _row = e.Row;
-            _col = e.Column;
-        }
+        #endregion
+
+        #region Methods
 
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
             base.OnFormClosing(e);
             _BlueTable.CursorPosChanged -= CursorPosChanged;
+        }
+
+        private void btnSuchInCell_Click(object sender, System.EventArgs e) {
+            var SuchtT = SuchText();
+            if (string.IsNullOrEmpty(SuchtT)) { return; }
+            Table.SearchNextText(SuchtT, _BlueTable, _col, _row, out var found, out var GefRow, btnAehnliches.Checked);
+            if (found == null) {
+                MessageBox.Show("Text nicht gefunden", enImageCode.Information, "OK");
+                return;
+            }
+            _BlueTable.CursorPos_Set(found, GefRow, true);
+            txbSuchText.Focus();
         }
 
         private void btnSuchSpalte_Click(object sender, System.EventArgs e) {
@@ -92,6 +106,13 @@ namespace BlueControls.BlueDatabaseDialogs {
             txbSuchText.Focus();
         }
 
+        private void CursorPosChanged(object sender, CellEventArgs e) {
+            _row = e.Row;
+            _col = e.Column;
+        }
+
+        private void Search_Load(object sender, System.EventArgs e) => txbSuchText.Focus();
+
         private string SuchText() {
             var SuchtT = txbSuchText.Text.Trim();
             if (string.IsNullOrEmpty(SuchtT)) {
@@ -101,23 +122,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             return SuchtT.Replace(";cr;", "\r").Replace(";tab;", "\t").ToLower();
         }
 
-        private void btnSuchInCell_Click(object sender, System.EventArgs e) {
-            var SuchtT = SuchText();
-            if (string.IsNullOrEmpty(SuchtT)) { return; }
-            Table.SearchNextText(SuchtT, _BlueTable, _col, _row, out var found, out var GefRow, btnAehnliches.Checked);
-            if (found == null) {
-                MessageBox.Show("Text nicht gefunden", enImageCode.Information, "OK");
-                return;
-            }
-            _BlueTable.CursorPos_Set(found, GefRow, true);
-            txbSuchText.Focus();
-        }
-
-        private void Search_Load(object sender, System.EventArgs e) => txbSuchText.Focus();
-
-        private void txbSuchText_TextChanged(object sender, System.EventArgs e) {
-        }
-
         private void txbSuchText_Enter(object sender, System.EventArgs e) => btnSuchInCell_Click(null, System.EventArgs.Empty);
+
+        private void txbSuchText_TextChanged(object sender, System.EventArgs e) { }
+
+        #endregion
     }
 }

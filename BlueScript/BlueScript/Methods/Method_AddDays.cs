@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using Skript.Enums;
 using System.Collections.Generic;
 using static BlueBasics.Constants;
@@ -27,17 +23,23 @@ using static BlueBasics.modConverter;
 namespace BlueScript {
 
     internal class Method_AddDays : Method {
-        public override string Syntax => "AddDays(DateTimeString, Days)";
+
+        #region Properties
+
+        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.Numeral };
         public override string Description => "Fügt dem Datum die angegeben Anzahl Tage hinzu. Dabei können auch Gleitkommazahlen benutzt werden, so werden z.B. bei 0.25 nur 6 Stunden hinzugefügt. Der Rückgabwert erfolgt immer im Format " + Format_Date7;
-
-        public override List<string> Comand(Script s) => new() { "adddays" };
-
-        public override string StartSequence => "(";
+        public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.String;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.Numeral };
-        public override bool EndlessArgs => false;
+        public override string StartSequence => "(";
+        public override string Syntax => "AddDays(DateTimeString, Days)";
+
+        #endregion
+
+        #region Methods
+
+        public override List<string> Comand(Script s) => new() { "adddays" };
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
@@ -49,5 +51,7 @@ namespace BlueScript {
             d = d.AddDays(attvar.Attributes[1].ValueDouble);
             return new strDoItFeedback(d.ToString(Format_Date7), enVariableDataType.String);
         }
+
+        #endregion
     }
 }

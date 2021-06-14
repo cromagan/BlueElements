@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -27,13 +23,46 @@ namespace BlueControls {
 
     public sealed class SystemInputHook {
 
-        [DllImport("user32.dll", EntryPoint = "GetAsyncKeyState", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
-        private static extern short GetAsyncKeyState(System.Windows.Forms.Keys nVirtKey);
-
-        #region Variablen-Deklarationen
+        #region Fields
 
         [AccessedThroughProperty(nameof(Tim))]
         private System.Windows.Forms.Timer _Tim;
+
+        private bool Key_IsPressing;
+
+        private System.Windows.Forms.Keys Key_LastKey;
+
+        private bool Mouse_IsPressing;
+
+        private System.Windows.Forms.MouseButtons Mouse_LastButton;
+
+        private int Mouse_LastX;
+
+        private int Mouse_LastY;
+
+        #endregion
+
+        #region Constructors
+
+        public SystemInputHook() => Initialize();
+
+        #endregion
+
+        #region Events
+
+        public event System.EventHandler<System.Windows.Forms.KeyEventArgs> KeyDown;
+
+        public event System.EventHandler<System.Windows.Forms.KeyEventArgs> KeyUp;
+
+        public event System.EventHandler<System.Windows.Forms.MouseEventArgs> MouseDown;
+
+        public event System.EventHandler<System.Windows.Forms.MouseEventArgs> MouseMove;
+
+        public event System.EventHandler<System.Windows.Forms.MouseEventArgs> MouseUp;
+
+        #endregion
+
+        #region Properties
 
         private System.Windows.Forms.Timer Tim {
             [DebuggerNonUserCode]
@@ -51,102 +80,11 @@ namespace BlueControls {
             }
         }
 
-        private bool Mouse_IsPressing;
-        private int Mouse_LastX;
-        private int Mouse_LastY;
-        private System.Windows.Forms.MouseButtons Mouse_LastButton;
-        private bool Key_IsPressing;
-        private System.Windows.Forms.Keys Key_LastKey;
+        #endregion
 
-        #endregion Variablen-Deklarationen
-
-        #region Event-Deklarationen + Delegaten
-
-        public event System.EventHandler<System.Windows.Forms.MouseEventArgs> MouseDown;
-
-        public event System.EventHandler<System.Windows.Forms.MouseEventArgs> MouseUp;
-
-        public event System.EventHandler<System.Windows.Forms.MouseEventArgs> MouseMove;
-
-        public event System.EventHandler<System.Windows.Forms.KeyEventArgs> KeyDown;
-
-        public event System.EventHandler<System.Windows.Forms.KeyEventArgs> KeyUp;
-
-        #endregion Event-Deklarationen + Delegaten
-
-        #region Construktor + Initialize
-
-        private void Initialize() {
-            Tim = new System.Windows.Forms.Timer {
-                Interval = 1,
-                Enabled = false
-            };
-            Mouse_IsPressing = false;
-            Mouse_LastX = 0;
-            Mouse_LastY = 0;
-            Key_IsPressing = false;
-            Key_LastKey = 0;
-        }
-
-        public SystemInputHook() => Initialize();
-
-        #endregion Construktor + Initialize
-
-        public void InstallHook() {
-            Tim.Enabled = true;
-            Mouse_IsPressing = false;
-            Mouse_LastX = -1;
-            Mouse_LastY = -1;
-            Mouse_LastButton = 0;
-            Key_IsPressing = false;
-            Key_LastKey = 0;
-        }
-
-        public void RemoveHook() => Tim.Enabled = false;
+        #region Methods
 
         public void CheckNow() => Tim_Tick(null, null);
-
-        private void Tim_Tick(object sender, System.EventArgs e) {
-            Tim.Enabled = false;
-            DoMouse();
-            DoKeyboard();
-            Tim.Enabled = true;
-        }
-
-        public void DoMouse() {
-            var B = System.Windows.Forms.MouseButtons.None;
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.LButton) != 0) {
-                B |= System.Windows.Forms.MouseButtons.Left;
-            }
-            if (GetAsyncKeyState(System.Windows.Forms.Keys.RButton) != 0) {
-                B |= System.Windows.Forms.MouseButtons.Right;
-            }
-            System.Windows.Forms.MouseEventArgs mev = new(B, 0, System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y, 0);
-            System.Windows.Forms.MouseEventArgs mevold = new(Mouse_LastButton, 0, System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y, 0);
-            if (Mouse_LastX != mev.X || Mouse_LastY != mev.Y) {
-                OnMouseMove(mev);
-            }
-            if (Mouse_IsPressing) {
-                if (B == System.Windows.Forms.MouseButtons.None) {
-                    OnMouseUp(mevold);
-                    Mouse_IsPressing = false;
-                }
-            } else {
-                if (B != System.Windows.Forms.MouseButtons.None) {
-                    OnMouseDown(mev);
-                    Mouse_IsPressing = true;
-                }
-            }
-            Mouse_LastX = mev.X;
-            Mouse_LastY = mev.Y;
-            Mouse_LastButton = B;
-        }
-
-        private void OnMouseDown(System.Windows.Forms.MouseEventArgs e) => MouseDown?.Invoke(null, e);
-
-        private void OnMouseUp(System.Windows.Forms.MouseEventArgs e) => MouseUp?.Invoke(this, e);
-
-        private void OnMouseMove(System.Windows.Forms.MouseEventArgs e) => MouseMove?.Invoke(this, e);
 
         public void DoKeyboard() {
             var k = System.Windows.Forms.Keys.None;
@@ -339,8 +277,79 @@ namespace BlueControls {
             Key_LastKey = k;
         }
 
+        public void DoMouse() {
+            var B = System.Windows.Forms.MouseButtons.None;
+            if (GetAsyncKeyState(System.Windows.Forms.Keys.LButton) != 0) {
+                B |= System.Windows.Forms.MouseButtons.Left;
+            }
+            if (GetAsyncKeyState(System.Windows.Forms.Keys.RButton) != 0) {
+                B |= System.Windows.Forms.MouseButtons.Right;
+            }
+            System.Windows.Forms.MouseEventArgs mev = new(B, 0, System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y, 0);
+            System.Windows.Forms.MouseEventArgs mevold = new(Mouse_LastButton, 0, System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y, 0);
+            if (Mouse_LastX != mev.X || Mouse_LastY != mev.Y) {
+                OnMouseMove(mev);
+            }
+            if (Mouse_IsPressing) {
+                if (B == System.Windows.Forms.MouseButtons.None) {
+                    OnMouseUp(mevold);
+                    Mouse_IsPressing = false;
+                }
+            } else {
+                if (B != System.Windows.Forms.MouseButtons.None) {
+                    OnMouseDown(mev);
+                    Mouse_IsPressing = true;
+                }
+            }
+            Mouse_LastX = mev.X;
+            Mouse_LastY = mev.Y;
+            Mouse_LastButton = B;
+        }
+
+        public void InstallHook() {
+            Tim.Enabled = true;
+            Mouse_IsPressing = false;
+            Mouse_LastX = -1;
+            Mouse_LastY = -1;
+            Mouse_LastButton = 0;
+            Key_IsPressing = false;
+            Key_LastKey = 0;
+        }
+
+        public void RemoveHook() => Tim.Enabled = false;
+
+        [DllImport("user32.dll", EntryPoint = "GetAsyncKeyState", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
+        private static extern short GetAsyncKeyState(System.Windows.Forms.Keys nVirtKey);
+
+        private void Initialize() {
+            Tim = new System.Windows.Forms.Timer {
+                Interval = 1,
+                Enabled = false
+            };
+            Mouse_IsPressing = false;
+            Mouse_LastX = 0;
+            Mouse_LastY = 0;
+            Key_IsPressing = false;
+            Key_LastKey = 0;
+        }
+
         private void OnKeyDown(System.Windows.Forms.KeyEventArgs e) => KeyDown?.Invoke(this, e);
 
         private void OnKeyUp(System.Windows.Forms.KeyEventArgs e) => KeyUp?.Invoke(null, e);
+
+        private void OnMouseDown(System.Windows.Forms.MouseEventArgs e) => MouseDown?.Invoke(null, e);
+
+        private void OnMouseMove(System.Windows.Forms.MouseEventArgs e) => MouseMove?.Invoke(this, e);
+
+        private void OnMouseUp(System.Windows.Forms.MouseEventArgs e) => MouseUp?.Invoke(this, e);
+
+        private void Tim_Tick(object sender, System.EventArgs e) {
+            Tim.Enabled = false;
+            DoMouse();
+            DoKeyboard();
+            Tim.Enabled = true;
+        }
+
+        #endregion
     }
 }

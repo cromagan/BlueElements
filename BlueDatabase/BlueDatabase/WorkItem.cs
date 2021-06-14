@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -30,67 +26,19 @@ namespace BlueDatabase {
 
     public class WorkItem : IParseable, ICompareKey {
 
-        public event EventHandler Changed;
+        #region Fields
 
-        #region Variablen-Deklarationen
-
-        private enItemState _state;
-        private int _colKey;
-        private int _rowKey;
         private string _changedTo;
 
-        #endregion Variablen-Deklarationen
+        private int _colKey;
 
-        #region Properties
+        private int _rowKey;
 
-        public bool IsParsing { get; private set; }
+        private enItemState _state;
 
-        internal enItemState State {
-            get => _state;
-            set {
-                if (value == _state) { return; }
-                _state = value;
-                OnChanged();
-            }
-        }
+        #endregion
 
-        public string CellKey => CellCollection.KeyOfCell(ColKey, RowKey);
-        public enDatabaseDataType Comand { get; private set; }
-
-        public int ColKey {
-            get => _colKey;
-            set {
-                if (value == _colKey) { return; }
-                _colKey = value;
-                OnChanged();
-            }
-        }
-
-        public int RowKey {
-            get => _rowKey;
-            set {
-                if (value == _rowKey) { return; }
-                _rowKey = value;
-                OnChanged();
-            }
-        }
-
-        public DateTime Date { get; private set; }
-        public string User { get; private set; }
-        public string PreviousValue { get; private set; }
-
-        public string ChangedTo {
-            get => _changedTo;
-            set {
-                if (value == _changedTo) { return; }
-                _changedTo = value;
-                OnChanged();
-            }
-        }
-
-        public bool HistorischRelevant => State is enItemState.Pending or enItemState.Undo;
-
-        #endregion Properties
+        #region Constructors
 
         public WorkItem(enDatabaseDataType Comand, int ColKey, int RowKey, string PreviousValue, string ChangedTo, string User) {
             _state = enItemState.Pending;
@@ -104,6 +52,77 @@ namespace BlueDatabase {
         }
 
         public WorkItem(string s) => Parse(s);
+
+        #endregion
+
+        #region Events
+
+        public event EventHandler Changed;
+
+        #endregion
+
+        #region Properties
+
+        public string CellKey => CellCollection.KeyOfCell(ColKey, RowKey);
+
+        public string ChangedTo {
+            get => _changedTo;
+            set {
+                if (value == _changedTo) { return; }
+                _changedTo = value;
+                OnChanged();
+            }
+        }
+
+        public int ColKey {
+            get => _colKey;
+            set {
+                if (value == _colKey) { return; }
+                _colKey = value;
+                OnChanged();
+            }
+        }
+
+        public enDatabaseDataType Comand { get; private set; }
+        public DateTime Date { get; private set; }
+        public bool HistorischRelevant => State is enItemState.Pending or enItemState.Undo;
+        public bool IsParsing { get; private set; }
+
+        public string PreviousValue { get; private set; }
+
+        public int RowKey {
+            get => _rowKey;
+            set {
+                if (value == _rowKey) { return; }
+                _rowKey = value;
+                OnChanged();
+            }
+        }
+
+        public string User { get; private set; }
+
+        internal enItemState State {
+            get => _state;
+            set {
+                if (value == _state) { return; }
+                _state = value;
+                OnChanged();
+            }
+        }
+
+        #endregion
+
+        #region Methods
+
+        public string CompareKey() => Date.ToString(Constants.Format_Date) + ColKey;
+
+        public void OnChanged() {
+            if (IsParsing) {
+                Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!");
+                return;
+            }
+            Changed?.Invoke(this, System.EventArgs.Empty);
+        }
 
         public void Parse(string ToParse) {
             IsParsing = true;
@@ -204,16 +223,8 @@ namespace BlueDatabase {
             return "<b>alt: </b>" + a + "<b> <IMAGECODE=Pfeil_Rechts_Scrollbar|8|16> neu: </b>" + n + "     <i>(" + Date + ", " + User + ")</i>";
         }
 
-        public string CompareKey() => Date.ToString(Constants.Format_Date) + ColKey;
-
-        public void OnChanged() {
-            if (IsParsing) {
-                Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!");
-                return;
-            }
-            Changed?.Invoke(this, System.EventArgs.Empty);
-        }
-
         internal bool LogsUndo(Database database) => database.Column.SearchByKey(ColKey) is ColumnItem C && C.ShowUndo;
+
+        #endregion
     }
 }

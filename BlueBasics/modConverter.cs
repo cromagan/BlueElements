@@ -1,5 +1,3 @@
-#region BlueElements - a collection of useful tools, database and controls
-
 // Authors:
 // Christian Peter
 //
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics.Enums;
 using System;
 using System.Drawing;
@@ -32,7 +28,7 @@ namespace BlueBasics {
 
     public static class modConverter {
 
-        #region Konvertier-Routinen
+        #region Methods
 
         public static Bitmap Base64ToBitmap(string base64) {
             try {
@@ -117,47 +113,8 @@ namespace BlueBasics {
         // }
         public static void CartesianToPolar(PointF ko, ref double r, ref double win) {
             r = Math.Sqrt((ko.X * ko.X) + (ko.Y * ko.Y));
-            win = Convert.ToDouble(Geometry.Winkel(0M, 0M, (decimal)ko.X, (decimal)ko.Y));
+            win = Convert.ToDouble(Geometry.Winkel(0d, 0d, (double)ko.X, (double)ko.Y));
         }
-
-        public static byte[] FileToByte(string dateiname) {
-            FileStream obFi = new(dateiname, FileMode.Open, FileAccess.Read);
-            BinaryReader r = new(obFi);
-            var b = r.ReadBytes((int)new FileInfo(dateiname).Length);
-            r.Close();
-            r.Dispose();
-            obFi.Close();
-            obFi.Dispose();
-            return b;
-        }
-
-        public static Bitmap StringUnicodeToBitmap(string unicodeTXT) {
-            if (string.IsNullOrEmpty(unicodeTXT)) {
-                return null;
-            }
-            var b = unicodeTXT.Unicode_ToByte();
-            var BMP = ByteToBitmap(b);
-            return BMP;
-        }
-
-        public static Bitmap StringWIN1252ToBitmap(string tXT) {
-            if (string.IsNullOrEmpty(tXT)) {
-                return null;
-            }
-            var b = tXT.ToByteWIN1252();
-            var BMP = ByteToBitmap(b);
-            return BMP;
-        }
-
-        private static Bitmap Bitmap_ChangePixelFormat(Bitmap oldBmp) {
-            modAllgemein.CollectGarbage();
-            return new Bitmap(oldBmp);
-            // Return oldBmp.Clone(New Rectangle(0, 0, oldBmp.Width, oldBmp.Height), NewFormat)
-        }
-
-        #endregion Konvertier-Routinen
-
-        #region Methods
 
         /// <summary>
         /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird DateTime.Now zurückgegeben.
@@ -189,10 +146,10 @@ namespace BlueBasics {
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        public static decimal DecimalParse(string s) {
+        public static double DecimalParse(string s) {
             if (string.IsNullOrEmpty(s)) { return 0; }
-            if (decimal.TryParse(s, out var result)) { return result; }
-            // Develop.DebugPrint(enFehlerArt.Warnung, "Decimal kann nicht geparsed werden: " + s);
+            if (double.TryParse(s, out var result)) { return result; }
+            // Develop.DebugPrint(enFehlerArt.Warnung, "double kann nicht geparsed werden: " + s);
             return 0;
         }
 
@@ -208,6 +165,17 @@ namespace BlueBasics {
             if (double.TryParse(s.Replace(".", ","), out var result3)) { return result3; }
             Develop.DebugPrint(enFehlerArt.Warnung, "Double kann nicht geparsed werden: " + s);
             return 0;
+        }
+
+        public static byte[] FileToByte(string dateiname) {
+            FileStream obFi = new(dateiname, FileMode.Open, FileAccess.Read);
+            BinaryReader r = new(obFi);
+            var b = r.ReadBytes((int)new FileInfo(dateiname).Length);
+            r.Close();
+            r.Dispose();
+            obFi.Close();
+            obFi.Dispose();
+            return b;
         }
 
         /// <summary>
@@ -312,9 +280,33 @@ namespace BlueBasics {
             return 0;
         }
 
-        public static decimal mmToPixel(decimal mM, int dPI) => mM * dPI / 25.4M;
+        public static double mmToPixel(double mM, int dPI) => mM * dPI / 25.4D;
 
-        public static decimal PixelToMM(decimal pixel, int dPI) => pixel / dPI * 25.4M;
+        public static double PixelToMM(double pixel, int dPI) => pixel / dPI * 25.4D;
+
+        public static Bitmap StringUnicodeToBitmap(string unicodeTXT) {
+            if (string.IsNullOrEmpty(unicodeTXT)) {
+                return null;
+            }
+            var b = unicodeTXT.Unicode_ToByte();
+            var BMP = ByteToBitmap(b);
+            return BMP;
+        }
+
+        public static Bitmap StringWIN1252ToBitmap(string tXT) {
+            if (string.IsNullOrEmpty(tXT)) {
+                return null;
+            }
+            var b = tXT.ToByteWIN1252();
+            var BMP = ByteToBitmap(b);
+            return BMP;
+        }
+
+        private static Bitmap Bitmap_ChangePixelFormat(Bitmap oldBmp) {
+            modAllgemein.CollectGarbage();
+            return new Bitmap(oldBmp);
+            // Return oldBmp.Clone(New Rectangle(0, 0, oldBmp.Width, oldBmp.Height), NewFormat)
+        }
 
         #endregion
     }

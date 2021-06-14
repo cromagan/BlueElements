@@ -1,9 +1,7 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2019 Christian Peter
+// Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -17,17 +15,21 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueControls;
 
 namespace BluePaint {
 
     public partial class Tool_Screenshot {
 
+        #region Constructors
+
         public Tool_Screenshot() : base() => InitializeComponent();
 
-        private void NeuerScreenshot_Click(object sender, System.EventArgs e) {
+        #endregion
+
+        #region Methods
+
+        public override void ToolFirstShown() {
             DoScreenShot();
             OnZoomFit();
         }
@@ -40,9 +42,11 @@ namespace BluePaint {
             OnShowMainWindow();
         }
 
-        public override void ToolFirstShown() {
+        private void NeuerScreenshot_Click(object sender, System.EventArgs e) {
             DoScreenShot();
             OnZoomFit();
         }
+
+        #endregion
     }
 }

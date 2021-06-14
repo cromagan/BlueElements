@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -33,22 +29,16 @@ namespace BlueControls {
 
     public sealed class PointM : IMoveable {
 
-        #region Variablen-Deklarationen
+        #region Fields
 
-        private decimal _x;
-        private decimal _y;
+        private double _x;
+        private double _y;
 
-        #endregion Variablen-Deklarationen
+        #endregion
 
-        #region Event-Deklarationen + Delegaten
+        #region Constructors
 
-        public event EventHandler Moved;
-
-        #endregion Event-Deklarationen + Delegaten
-
-        #region Construktor + Initialize
-
-        public PointM(object parent, string name, decimal startX, decimal startY, decimal laenge, decimal alpha) : this(parent) {
+        public PointM(object parent, string name, double startX, double startY, double laenge, double alpha) : this(parent) {
             Name = name;
             var tempVar = GeometryDF.PolarToCartesian(laenge, Convert.ToDouble(alpha));
             _x = startX + tempVar.X;
@@ -56,15 +46,13 @@ namespace BlueControls {
             Tag = string.Empty;
         }
 
-        public PointM(PointM startPoint, decimal laenge, decimal alpha) : this(null, string.Empty, startPoint.X, startPoint.Y, laenge, alpha) {
-        }
+        public PointM(PointM startPoint, double laenge, double alpha) : this(null, string.Empty, startPoint.X, startPoint.Y, laenge, alpha) { }
 
-        public PointM(PointF startPoint, decimal laenge, decimal alpha) : this(null, string.Empty, (decimal)startPoint.X, (decimal)startPoint.Y, laenge, alpha) {
-        }
+        public PointM(PointF startPoint, double laenge, double alpha) : this(null, string.Empty, (double)startPoint.X, (double)startPoint.Y, laenge, alpha) { }
 
         public PointM(object parent, string codeToParse) : this(parent) => Parse(codeToParse);
 
-        public PointM(object parent, string name, decimal x, decimal y, string tag) {
+        public PointM(object parent, string name, double x, double y, string tag) {
             Parent = parent;
             _x = x;
             _y = y;
@@ -72,47 +60,43 @@ namespace BlueControls {
             Tag = tag;
         }
 
-        public PointM() : this(null, string.Empty, 0m, 0m, string.Empty) {
-        }
+        public PointM() : this(null, string.Empty, 0D, 0D, string.Empty) { }
 
-        public PointM(object parent) : this(parent, string.Empty, 0m, 0m, string.Empty) {
-        }
+        public PointM(object parent) : this(parent, string.Empty, 0D, 0D, string.Empty) { }
 
-        public PointM(string name, decimal x, decimal y) : this(null, name, x, y, string.Empty) {
-        }
+        public PointM(string name, double x, double y) : this(null, name, x, y, string.Empty) { }
 
-        public PointM(object parent, string name, int x, int y) : this(parent, name, x, y, string.Empty) {
-        }
+        public PointM(object parent, string name, int x, int y) : this(parent, name, x, y, string.Empty) { }
 
-        public PointM(object parent, string name, decimal x, decimal y) : this(parent, name, x, y, string.Empty) {
-        }
+        public PointM(object parent, string name, double x, double y) : this(parent, name, x, y, string.Empty) { }
 
-        public PointM(PointF point) : this(null, string.Empty, (decimal)point.X, (decimal)point.Y, string.Empty) {
-        }
+        public PointM(PointF point) : this(null, string.Empty, (double)point.X, (double)point.Y, string.Empty) { }
 
-        public PointM(int x, int y) : this(null, string.Empty, x, y, string.Empty) {
-        }
+        public PointM(int x, int y) : this(null, string.Empty, x, y, string.Empty) { }
 
-        public PointM(double x, double y) : this(null, string.Empty, (decimal)x, (decimal)y, string.Empty) {
-        }
+        public PointM(double x, double y) : this(null, string.Empty, (double)x, (double)y, string.Empty) { }
 
-        public PointM(decimal x, decimal y) : this(null, string.Empty, x, y, string.Empty) {
-        }
+        public PointM(PointM point) : this(null, string.Empty, point.X, point.Y, string.Empty) { }
 
-        public PointM(PointM point) : this(null, string.Empty, point.X, point.Y, string.Empty) {
-        }
+        public PointM(object parent, PointM template) : this(parent, template.Name, template.X, template.Y, template.Tag) { }
 
-        public PointM(object parent, PointM template) : this(parent, template.Name, template.X, template.Y, template.Tag) {
-        }
+        #endregion
 
-        #endregion Construktor + Initialize
+        #region Events
+
+        public event EventHandler Moved;
+
+        #endregion
 
         #region Properties
 
+        public double Magnitude => (double)Math.Sqrt((double)((_x * _x) + (_y * _y)));
         public string Name { get; private set; }
         public object Parent { get; set; }
 
-        public decimal X {
+        public string Tag { get; set; }
+
+        public double X {
             get => _x;
             set {
                 if (_x == value) { return; }
@@ -121,7 +105,7 @@ namespace BlueControls {
             }
         }
 
-        public decimal Y {
+        public double Y {
             get => _y;
             set {
                 if (_y == value) { return; }
@@ -130,9 +114,91 @@ namespace BlueControls {
             }
         }
 
-        public string Tag { get; set; }
+        #endregion
 
-        #endregion Properties
+        #region Methods
+
+        public static PointM Empty() => new(0d, 0d);
+
+        public static explicit operator Point(PointM p) {
+            return new((int)p.X, (int)p.Y);
+        }
+
+        public static explicit operator PointF(PointM p) {
+            return new((float)p.X, (float)p.Y);
+        }
+
+        public static PointM operator -(PointM a) {
+            return new(-a._x, -a._y);
+        }
+
+        public static PointM operator -(PointM a, PointM b) {
+            return new(a._x - b._x, a._y - b._y);
+        }
+
+        public static PointM operator *(PointM a, double b) {
+            return new(a._x * b, a._y * b);
+        }
+
+        public static PointM operator +(PointM a, PointM b) {
+            return new(a._x + b._x, a._y + b._y);
+        }
+
+        //public int CompareTo(object obj) {
+        //    if (obj is PointM tobj) {
+        //        // hierist es egal, ob es ein DoAlways ist oder nicht. Es sollen nur Bedingugen VOR Aktionen kommen
+        //        return CompareKey().CompareTo(tobj.CompareKey());
+        //    } else {
+        //        Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Objecttyp!");
+        //        return 0;
+        //    }
+        //}
+        //internal string CompareKey() => _y.ToString(Constants.Format_Float5_1) + "-" + _x.ToString(Constants.Format_Float5_1);
+        public double DistanzZuLinie(PointM P1, PointM P2) => DistanzZuLinie(P1.X, P1.Y, P2.X, P2.Y);
+
+        public double DistanzZuLinie(double X1, double Y1, double X2, double Y2) => GeometryDF.Länge(this, GeometryDF.PointOnLine(this, X1, Y1, X2, Y2));
+
+        public double DotProduct(PointM vector) => (_x * vector._x) + (_y * vector._y);
+
+        //public bool IsOnScreen(double zoom, double shiftX, double shiftY, Rectangle displayRectangle) {
+        //    var tx = (_x * zoom) - shiftX;
+        //    var ty = (_y * zoom) - shiftY;
+        //    return tx >= displayRectangle.Left && ty >= displayRectangle.Top && tx <= displayRectangle.Right && ty <= displayRectangle.Bottom;
+        //}
+        public void Draw(Graphics gr, double zoom, double shiftX, double shiftY, enDesign type, enStates state) {
+            var tx = (_x * zoom) - shiftX + (zoom / 2);
+            var ty = (_y * zoom) - shiftY + (zoom / 2);
+            Rectangle r = new((int)(tx - 4), (int)(ty - 4), 9, 9);
+            //if (!_UserSelectable) {
+            //    type = enDesign.Button_EckpunktSchieber_Phantom;
+            //    state = enStates.Standard;
+            //}
+            Skin.Draw_Back(gr, type, state, r, null, false);
+            Skin.Draw_Border(gr, type, state, r);
+            //if (!string.IsNullOrEmpty(textToDraw)) {
+            //    for (var x = -1; x < 2; x++) {
+            //        for (var y = -1; y < 2; y++) {
+            //            gr.DrawString(textToDraw, SimpleArial, Brushes.White, (float)tx + x, (float)ty + y - 16);
+            //        }
+            //    }
+            //    gr.DrawString(textToDraw, SimpleArial, Brushes.Black, (float)tx, (float)ty - 16);
+            //}
+        }
+
+        public void Move(double x, double y) {
+            if (x == 0 && y == 0) { return; }
+            _x += x;
+            _y += y;
+            OnMoved();
+        }
+
+        public void Normalize() {
+            var magnitude = Magnitude;
+            _x /= magnitude;
+            _y /= magnitude;
+        }
+
+        public void OnMoved() => Moved?.Invoke(this, System.EventArgs.Empty);
 
         public void Parse(string codeToParse) {
             foreach (var pair in codeToParse.GetAllTags()) {
@@ -149,11 +215,11 @@ namespace BlueControls {
                         break;
 
                     case "x":
-                        _x = decimal.Parse(pair.Value);
+                        _x = double.Parse(pair.Value);
                         break;
 
                     case "y":
-                        _y = decimal.Parse(pair.Value);
+                        _y = double.Parse(pair.Value);
                         break;
 
                     case "fix": // TODO: Entfernt, 24.05.2021
@@ -175,15 +241,23 @@ namespace BlueControls {
             }
         }
 
-        public static explicit operator PointF(PointM p) {
-            return new((float)p.X, (float)p.Y);
+        public void SetTo(double x, double y) {
+            if (x == _x && y == _y) { return; }
+            _x = x;
+            _y = y;
+            OnMoved();
         }
 
-        public static explicit operator Point(PointM p) {
-            return new((int)p.X, (int)p.Y);
+        public void SetTo(PointM StartPoint, double Länge, double Alpha) {
+            var tempVar = GeometryDF.PolarToCartesian(Länge, Convert.ToDouble(Alpha));
+            SetTo(StartPoint.X + tempVar.X, Y = StartPoint.Y + tempVar.Y);
         }
 
-        public static PointM Empty() => new(0m, 0m);
+        public void SetTo(PointM Point) => SetTo(Point.X, Point.Y);
+
+        public void SetTo(Point point) => SetTo(point.X, (double)point.Y);
+
+        public void SetTo(int x, int y) => SetTo(x, (double)y);
 
         public override string ToString() {
             var t = "{";
@@ -213,102 +287,10 @@ namespace BlueControls {
             return t.Trim(", ") + "}";
         }
 
-        //public bool IsOnScreen(decimal zoom, decimal shiftX, decimal shiftY, Rectangle displayRectangle) {
-        //    var tx = (_x * zoom) - shiftX;
-        //    var ty = (_y * zoom) - shiftY;
-        //    return tx >= displayRectangle.Left && ty >= displayRectangle.Top && tx <= displayRectangle.Right && ty <= displayRectangle.Bottom;
-        //}
-        public void Draw(Graphics gr, decimal zoom, decimal shiftX, decimal shiftY, enDesign type, enStates state) {
-            var tx = (_x * zoom) - shiftX + (zoom / 2);
-            var ty = (_y * zoom) - shiftY + (zoom / 2);
-            Rectangle r = new((int)(tx - 4), (int)(ty - 4), 9, 9);
-            //if (!_UserSelectable) {
-            //    type = enDesign.Button_EckpunktSchieber_Phantom;
-            //    state = enStates.Standard;
-            //}
-            Skin.Draw_Back(gr, type, state, r, null, false);
-            Skin.Draw_Border(gr, type, state, r);
-            //if (!string.IsNullOrEmpty(textToDraw)) {
-            //    for (var x = -1; x < 2; x++) {
-            //        for (var y = -1; y < 2; y++) {
-            //            gr.DrawString(textToDraw, SimpleArial, Brushes.White, (float)tx + x, (float)ty + y - 16);
-            //        }
-            //    }
-            //    gr.DrawString(textToDraw, SimpleArial, Brushes.Black, (float)tx, (float)ty - 16);
-            //}
-        }
-
         public PointF ZoomAndMove(AdditionalDrawing e) => ZoomAndMove(e.Zoom, e.ShiftX, e.ShiftY);
 
-        public PointF ZoomAndMove(decimal zoom, decimal shiftX, decimal shiftY) => new((float)((_x * zoom) - shiftX + (zoom / 2)), (float)((_y * zoom) - shiftY + (zoom / 2)));
+        public PointF ZoomAndMove(double zoom, double shiftX, double shiftY) => new((float)((_x * zoom) - shiftX + (zoom / 2)), (float)((_y * zoom) - shiftY + (zoom / 2)));
 
-        public void SetTo(decimal x, decimal y) {
-            if (x == _x && y == _y) { return; }
-            _x = x;
-            _y = y;
-            OnMoved();
-        }
-
-        public void SetTo(double x, double y) => SetTo((decimal)x, (decimal)y);
-
-        public void SetTo(PointM StartPoint, decimal Länge, decimal Alpha) {
-            var tempVar = GeometryDF.PolarToCartesian(Länge, Convert.ToDouble(Alpha));
-            SetTo(StartPoint.X + tempVar.X, Y = StartPoint.Y + tempVar.Y);
-        }
-
-        public void SetTo(PointM Point) => SetTo(Point.X, Point.Y);
-
-        public void SetTo(Point point) => SetTo(point.X, (decimal)point.Y);
-
-        public void SetTo(int x, int y) => SetTo(x, (decimal)y);
-
-        //public int CompareTo(object obj) {
-        //    if (obj is PointM tobj) {
-        //        // hierist es egal, ob es ein DoAlways ist oder nicht. Es sollen nur Bedingugen VOR Aktionen kommen
-        //        return CompareKey().CompareTo(tobj.CompareKey());
-        //    } else {
-        //        Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Objecttyp!");
-        //        return 0;
-        //    }
-        //}
-        //internal string CompareKey() => _y.ToString(Constants.Format_Float5_1) + "-" + _x.ToString(Constants.Format_Float5_1);
-        public decimal DistanzZuLinie(PointM P1, PointM P2) => DistanzZuLinie(P1.X, P1.Y, P2.X, P2.Y);
-
-        public decimal DistanzZuLinie(decimal X1, decimal Y1, decimal X2, decimal Y2) => GeometryDF.Länge(this, GeometryDF.PointOnLine(this, X1, Y1, X2, Y2));
-
-        public void OnMoved() => Moved?.Invoke(this, System.EventArgs.Empty);
-
-        public decimal Magnitude => (decimal)Math.Sqrt((double)((_x * _x) + (_y * _y)));
-
-        public void Normalize() {
-            var magnitude = Magnitude;
-            _x /= magnitude;
-            _y /= magnitude;
-        }
-
-        public decimal DotProduct(PointM vector) => (_x * vector._x) + (_y * vector._y);
-
-        public void Move(decimal x, decimal y) {
-            if (x == 0 && y == 0) { return; }
-            _x += x;
-            _y += y;
-            OnMoved();
-        }
-
-        public static PointM operator +(PointM a, PointM b) {
-            return new(a._x + b._x, a._y + b._y);
-        }
-
-        public static PointM operator -(PointM a) {
-            return new(-a._x, -a._y);
-        }
-
-        public static PointM operator -(PointM a, PointM b) {
-            return new(a._x - b._x, a._y - b._y);
-        }
-
-        public static PointM operator *(PointM a, decimal b) {
-            return new(a._x * b, a._y * b);
-        }
+        #endregion
     }
 }

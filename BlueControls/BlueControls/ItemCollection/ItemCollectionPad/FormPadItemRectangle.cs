@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -31,33 +27,21 @@ namespace BlueControls.ItemCollection {
 
     public abstract class FormPadItemRectangle : BasicPadItem {
 
-        #region Variablen-Deklarationen
+        #region Fields
 
+        internal PointM p_L;
         internal PointM p_LO;
-        internal PointM p_RO;
-        internal PointM p_RU;
         internal PointM p_LU;
         internal PointM p_O;
-        internal PointM p_U;
-        internal PointM p_L;
         internal PointM p_R;
+        internal PointM p_RO;
+        internal PointM p_RU;
+        internal PointM p_U;
         private int _drehwinkel = 0;
 
-        //private bool _größe_fixiert = false;
-        public int Drehwinkel {
-            get => _drehwinkel;
-            set {
-                if (_drehwinkel == value) { return; }
-                _drehwinkel = value;
-                OnChanged();
-            }
-        }
+        #endregion
 
-        #endregion Variablen-Deklarationen
-
-
-
-        #region Construktor
+        #region Constructors
 
         public FormPadItemRectangle(ItemCollectionPad parent, string internalname) : base(parent, internalname) {
             p_LO = new PointM(this, "LO", 0, 0);
@@ -81,38 +65,53 @@ namespace BlueControls.ItemCollection {
             Drehwinkel = 0;
         }
 
-        #endregion Construktor
+        #endregion
+
+        #region Properties
+
+        //private bool _größe_fixiert = false;
+        public int Drehwinkel {
+            get => _drehwinkel;
+            set {
+                if (_drehwinkel == value) { return; }
+                _drehwinkel = value;
+                OnChanged();
+            }
+        }
+
+        #endregion
+
+        #region Methods
 
         public override List<FlexiControl> GetStyleOptions() {
             List<FlexiControl> l = new()
             {
                 new FlexiControl(),
-                new FlexiControlForProperty(this, "Drehwinkel")
+                new FlexiControlForProperty(this, "Drehwinkel"),
+                new FlexiControlForProperty(this, "Größe_fixiert")
             };
-            l.Add(new FlexiControlForProperty(this, "Größe_fixiert"));
             l.AddRange(base.GetStyleOptions());
             return l;
         }
 
-        public void SetCoordinates(RectangleM r, bool overrideFixedSize) {
-            if (!overrideFixedSize) {
-                var vr = r.PointOf(enAlignment.Horizontal_Vertical_Center);
-                var ur = UsedArea();
-                p_LO.SetTo(vr.X - (ur.Width / 2), vr.Y - (ur.Height / 2));
-                p_RU.SetTo(p_LO.X + ur.Width, p_LO.Y + ur.Height);
-            } else {
-                p_LO.SetTo(r.PointOf(enAlignment.Top_Left));
-                p_RU.SetTo(r.PointOf(enAlignment.Bottom_Right));
-            }
-        }
+        public override bool ParseThis(string tag, string value) {
+            if (base.ParseThis(tag, value)) { return true; }
+            switch (tag) {
+                case "fixsize": // TODO: Entfernt am 24.05.2021
+                                //_größe_fixiert = value.FromPlusMinus();
+                    return true;
 
-        protected override RectangleM CalculateUsedArea() => p_LO == null || p_RU == null ? new RectangleM()
-: new RectangleM(Math.Min(p_LO.X, p_RU.X), Math.Min(p_LO.Y, p_RU.Y), Math.Abs(p_RU.X - p_LO.X), Math.Abs(p_RU.Y - p_LO.Y));
+                case "rotation":
+                    _drehwinkel = int.Parse(value);
+                    return true;
+            }
+            return false;
+        }
 
         public override void PointMoved(PointM point) {
             //PointM Second = null;
-            var x = 0m;
-            var y = 0m;
+            var x = 0D;
+            var y = 0D;
             if (point != null) {
                 x = point.X;
                 y = point.Y;
@@ -165,18 +164,16 @@ namespace BlueControls.ItemCollection {
             p_U.X = p_O.X;
         }
 
-        public override bool ParseThis(string tag, string value) {
-            if (base.ParseThis(tag, value)) { return true; }
-            switch (tag) {
-                case "fixsize": // TODO: Entfernt am 24.05.2021
-                    //_größe_fixiert = value.FromPlusMinus();
-                    return true;
-
-                case "rotation":
-                    _drehwinkel = int.Parse(value);
-                    return true;
+        public void SetCoordinates(RectangleM r, bool overrideFixedSize) {
+            if (!overrideFixedSize) {
+                var vr = r.PointOf(enAlignment.Horizontal_Vertical_Center);
+                var ur = UsedArea();
+                p_LO.SetTo(vr.X - (ur.Width / 2), vr.Y - (ur.Height / 2));
+                p_RU.SetTo(p_LO.X + ur.Width, p_LO.Y + ur.Height);
+            } else {
+                p_LO.SetTo(r.PointOf(enAlignment.Top_Left));
+                p_RU.SetTo(r.PointOf(enAlignment.Bottom_Right));
             }
-            return false;
         }
 
         public override string ToString() {
@@ -186,7 +183,10 @@ namespace BlueControls.ItemCollection {
             return t.Trim(", ") + "}";
         }
 
-        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
+        protected override RectangleM CalculateUsedArea() => p_LO == null || p_RU == null ? new RectangleM()
+        : new RectangleM(Math.Min(p_LO.X, p_RU.X), Math.Min(p_LO.Y, p_RU.Y), Math.Abs(p_RU.X - p_LO.X), Math.Abs(p_RU.Y - p_LO.Y));
+
+        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, double cZoom, double shiftX, double shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
             try {
                 if (!ForPrinting) {
                     if (cZoom > 1) {
@@ -200,6 +200,8 @@ namespace BlueControls.ItemCollection {
                 }
             } catch { }
         }
+
+        #endregion
 
         //internal PointM PointOf(enAlignment P)
         //{

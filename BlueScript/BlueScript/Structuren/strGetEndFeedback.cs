@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,9 +15,24 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 public struct strGetEndFeedback {
+
+    #region Fields
+
+    public string AttributeText;
+
+    //public strGetEndFeedback(string errormessage, int continuePosition, string attributetext) {
+    //    ContinuePosition = continuePosition;
+    //    ErrorMessage = errormessage;
+    //    AttributeText = attributetext;
+    //}
+    public int ContinuePosition;
+
+    public string ErrorMessage;
+
+    #endregion
+
+    #region Constructors
 
     public strGetEndFeedback(string errormessage) {
         ContinuePosition = 0;
@@ -34,13 +47,5 @@ public struct strGetEndFeedback {
         AttributeText = attributetext;
     }
 
-    //public strGetEndFeedback(string errormessage, int continuePosition, string attributetext) {
-    //    ContinuePosition = continuePosition;
-    //    ErrorMessage = errormessage;
-    //    AttributeText = attributetext;
-    //}
-    public int ContinuePosition;
-
-    public string ErrorMessage;
-    public string AttributeText;
+    #endregion
 }

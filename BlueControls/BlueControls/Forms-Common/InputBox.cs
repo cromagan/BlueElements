@@ -3,9 +3,14 @@
 namespace BlueControls.Forms {
 
     public partial class InputBox : DialogWithOkAndCancel {
+
+        #region Fields
+
         private string GiveBack = string.Empty;
 
-        #region Konstruktor
+        #endregion
+
+        #region Constructors
 
         private InputBox() : base() => InitializeComponent();
 
@@ -18,7 +23,9 @@ namespace BlueControls.Forms {
             GiveBack = VorschlagsText;
         }
 
-        #endregion Konstruktor
+        #endregion
+
+        #region Methods
 
         public static string Show(string TXT) => Show(TXT, "", enDataFormat.Text, false);
 
@@ -30,12 +37,14 @@ namespace BlueControls.Forms {
             return MB.GiveBack;
         }
 
-        private void txbText_ESC(object sender, System.EventArgs e) => Cancel();
-
-        private void txbText_Enter(object sender, System.EventArgs e) => Ok();
+        protected override void SetValue(bool canceled) => GiveBack = canceled ? string.Empty : txbText.Text;
 
         private void InputBox_Shown(object sender, System.EventArgs e) => txbText.Focus();
 
-        protected override void SetValue(bool canceled) => GiveBack = canceled ? string.Empty : txbText.Text;
+        private void txbText_Enter(object sender, System.EventArgs e) => Ok();
+
+        private void txbText_ESC(object sender, System.EventArgs e) => Cancel();
+
+        #endregion
     }
 }

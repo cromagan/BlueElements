@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,14 +15,18 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using System.Collections.Generic;
 using System.Text;
 
 namespace BlueBasics {
 
     public static partial class Extensions {
+
+        #region Methods
+
+        public static string ToStringUTF8(this byte[] b) => Encoding.UTF8.GetString(b);
+
+        public static string ToStringUTF8(this List<byte> b) => Encoding.UTF8.GetString(b.ToArray());
 
         // static Encoding enc1252 = CodePagesEncodingProvider.Instance.GetEncoding(1252);
         public static string ToStringWIN1252(this byte[] b) =>
@@ -33,8 +35,6 @@ namespace BlueBasics {
             // var enc1252 = Encoding.GetEncoding(1252);
             Encoding.GetEncoding(1252).GetString(b);
 
-        public static string ToStringUTF8(this byte[] b) => Encoding.UTF8.GetString(b);
-
-        public static string ToStringUTF8(this List<byte> b) => Encoding.UTF8.GetString(b.ToArray());
+        #endregion
     }
 }

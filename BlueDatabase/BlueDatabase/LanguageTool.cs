@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
@@ -26,10 +22,17 @@ using BlueDatabase.Enums;
 namespace BlueDatabase {
 
     public static class LanguageTool {
+
+        #region Fields
+
         public static Database Translation = null;
-        private static string German = string.Empty;
-        private static string English = string.Empty;
         private static readonly object[] EmptyArgs = new object[0];
+        private static string English = string.Empty;
+        private static string German = string.Empty;
+
+        #endregion
+
+        #region Methods
 
         /// <summary>
         /// Fügt Präfix und Suffix hinzu und ersetzt den Text nach dem gewünschten Stil.
@@ -59,11 +62,6 @@ namespace BlueDatabase {
             }
             return style == enShortenStyle.Replaced || style == enShortenStyle.HTML || OT == txt ? txt : OT + " (" + txt + ")";
         }
-
-        private static string ColumnReplaceTranslated(string newTXT, ColumnItem column) => column.Format switch {
-            enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl or enDataFormat.Datum_und_Uhrzeit or enDataFormat.FarbeInteger or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem => newTXT,
-            _ => DoTranslate(newTXT, false),
-        };
 
         public static string DoTranslate(string txt) => DoTranslate(txt, true, EmptyArgs);
 
@@ -103,5 +101,12 @@ namespace BlueDatabase {
                 return txt;
             }
         }
+
+        private static string ColumnReplaceTranslated(string newTXT, ColumnItem column) => column.Format switch {
+            enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl or enDataFormat.Datum_und_Uhrzeit or enDataFormat.FarbeInteger or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem => newTXT,
+            _ => DoTranslate(newTXT, false),
+        };
+
+        #endregion
     }
 }

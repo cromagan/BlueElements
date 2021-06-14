@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
@@ -34,15 +30,22 @@ using static BlueBasics.FileOperations;
 namespace BlueBasics {
 
     public static class Develop {
+
+        #region Fields
+
+        private static readonly DateTime _ProgrammStarted = DateTime.Now;
         private static readonly object _SyncLockObject = new();
-        private static string _LastDebugMessage = string.Empty;
-        private static DateTime _LastDebugTime = DateTime.Now;
         private static string _CurrentTraceLogFile = string.Empty;
-        private static TextWriterTraceListener _TraceListener;
         private static bool _DeleteTraceLog = true;
         private static bool _IsTraceLogging;
-        private static readonly DateTime _ProgrammStarted = DateTime.Now;
+        private static string _LastDebugMessage = string.Empty;
+        private static DateTime _LastDebugTime = DateTime.Now;
         private static DateTime _StopUhr = DateTime.Now;
+        private static TextWriterTraceListener _TraceListener;
+
+        #endregion
+
+        #region Properties
 
         [DefaultValue(false)]
         public static bool Exited { get; private set; } = false;
@@ -50,48 +53,9 @@ namespace BlueBasics {
         [DefaultValue(false)]
         public static bool ServiceStarted { get; private set; } = false;
 
-        public static bool IsHostRunning() => Debugger.IsAttached;
+        #endregion
 
-        public static void TraceLogging_End() {
-            try {
-                if (!string.IsNullOrEmpty(_CurrentTraceLogFile)) {
-                    // Trace-Log soll umgeleitet werden
-                    Trace.WriteLine("    </table>");
-                    Trace.WriteLine("  </body>");
-                    Trace.WriteLine(" </html>");
-                    Trace.Listeners.Remove(_TraceListener);
-                    _TraceListener.Flush();
-                    _TraceListener.Close();
-                    _TraceListener.Dispose();
-                    _TraceListener = null;
-                    if (_DeleteTraceLog && FileExists(_CurrentTraceLogFile)) { DeleteFile(_CurrentTraceLogFile, false); }
-                }
-            } catch {
-            }
-            _CurrentTraceLogFile = string.Empty;
-            _DeleteTraceLog = true;
-        }
-
-        public static void TraceLogging_Start(string traceFileName) {
-            TraceLogging_End();
-            _DeleteTraceLog = true;
-            if (FileExists(_CurrentTraceLogFile)) { File.Delete(_CurrentTraceLogFile); }
-            _CurrentTraceLogFile = TempFile(traceFileName);
-            _TraceListener = new TextWriterTraceListener(_CurrentTraceLogFile);
-            Trace.Listeners.Add(_TraceListener);
-            try {
-                Trace.AutoFlush = true;
-                Trace.WriteLine("<!DOctypex HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"");
-                Trace.WriteLine("\"http://www.w3.org/TR/html4/strict.dtd\">");
-                Trace.WriteLine("<html>");
-                Trace.WriteLine("  <head>");
-                Trace.WriteLine("    <title>Tracelog</title>");
-                Trace.WriteLine("  </head>");
-                Trace.WriteLine("<body>");
-                Trace.WriteLine("  <Font face=\"Arial\" Size=\"2\">");
-                Trace.WriteLine("  <table border=\"1\" cellspacing=\"1\" cellpadding=\"1\" align=\"left\">");
-            } catch { }
-        }
+        #region Methods
 
         public static void AbortExe() {
             Exited = true;
@@ -99,6 +63,8 @@ namespace BlueBasics {
             Environment.Exit(-1);
             System.Windows.Forms.Application.Exit();
         }
+
+        public static string AppExe() => System.Windows.Forms.Application.StartupPath + "\\" + AppName() + ".exe";
 
         public static string AppName() {
             try {
@@ -109,21 +75,11 @@ namespace BlueBasics {
             }
         }
 
-        public static string AppExe() => System.Windows.Forms.Application.StartupPath + "\\" + AppName() + ".exe";
-
-        public static void HTML_AddFoot(List<string> l) {
-            l.Add("  </body>");
-            l.Add("</html>");
-        }
-
-        public static void HTML_AddHead(List<string> l, string title) {
-            l.Add("<!DOctypex HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"");
-            l.Add("\"http://www.w3.org/TR/html4/strict.dtd\">");
-            l.Add("<html>");
-            l.Add("  <head>");
-            l.Add("    <title>" + title + "</title>");
-            l.Add("  </head>");
-            l.Add("<body>");
+        public static void CheckStackForOverflow() {
+            StackTrace stackTrace = new();
+            if (stackTrace.GetFrames().GetUpperBound(0) > 300) {
+                DebugPrint(enFehlerArt.Fehler, "Stack-Overflow abgefangen!");
+            }
         }
 
         public static void DebugPrint(string warnung) => DebugPrint(enFehlerArt.Warnung, warnung);
@@ -135,19 +91,7 @@ namespace BlueBasics {
 
         public static void DebugPrint(Exception warnung) => DebugPrint(enFehlerArt.Warnung, warnung);
 
-        public static void DebugPrint_RoutineMussUeberschriebenWerden() {
-            if (IsHostRunning()) { Debugger.Break(); }
-            DebugPrint(enFehlerArt.Warnung, "Diese Funktion muss noch überschrieben werden.");
-        }
-
-        public static void DebugPrint_NichtImplementiert() {
-            if (IsHostRunning()) { Debugger.Break(); }
-            DebugPrint(enFehlerArt.Fehler, "Diese Funktion ist vom Entwickler noch nicht implementiert.");
-        }
-
         public static void DebugPrint(object _Enum) => DebugPrint(enFehlerArt.Warnung, "Ein Wert einer Enumeration konnte nicht verarbeitet werden.\r\nEnumeration: " + _Enum.GetType().FullName + "\r\nParameter: " + _Enum);
-
-        public static void DebugPrint_MissingCommand(string comand) => DebugPrint(enFehlerArt.Warnung, "Ein Wert einer Kontextmenü-Befehls konnte nicht verarbeitet werden.\r\nBefehl: " + comand);
 
         public static void DebugPrint(enFehlerArt art, string meldung) {
             lock (_SyncLockObject) {
@@ -249,10 +193,6 @@ namespace BlueBasics {
             }
         }
 
-        public static bool IsRunning() => Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).GetUpperBound(0) > 0;
-
-        public static void DoEvents() => System.Windows.Forms.Application.DoEvents();
-
         public static void Debugprint_BackgroundThread() {
             if (!Thread.CurrentThread.IsBackground) { return; }
             DebugPrint(enFehlerArt.Warnung, "Totes Fenster!");
@@ -274,12 +214,38 @@ namespace BlueBasics {
             }
         }
 
-        public static void CheckStackForOverflow() {
-            StackTrace stackTrace = new();
-            if (stackTrace.GetFrames().GetUpperBound(0) > 300) {
-                DebugPrint(enFehlerArt.Fehler, "Stack-Overflow abgefangen!");
-            }
+        public static void DebugPrint_MissingCommand(string comand) => DebugPrint(enFehlerArt.Warnung, "Ein Wert einer Kontextmenü-Befehls konnte nicht verarbeitet werden.\r\nBefehl: " + comand);
+
+        public static void DebugPrint_NichtImplementiert() {
+            if (IsHostRunning()) { Debugger.Break(); }
+            DebugPrint(enFehlerArt.Fehler, "Diese Funktion ist vom Entwickler noch nicht implementiert.");
         }
+
+        public static void DebugPrint_RoutineMussUeberschriebenWerden() {
+            if (IsHostRunning()) { Debugger.Break(); }
+            DebugPrint(enFehlerArt.Warnung, "Diese Funktion muss noch überschrieben werden.");
+        }
+
+        public static void DoEvents() => System.Windows.Forms.Application.DoEvents();
+
+        public static void HTML_AddFoot(List<string> l) {
+            l.Add("  </body>");
+            l.Add("</html>");
+        }
+
+        public static void HTML_AddHead(List<string> l, string title) {
+            l.Add("<!DOctypex HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"");
+            l.Add("\"http://www.w3.org/TR/html4/strict.dtd\">");
+            l.Add("<html>");
+            l.Add("  <head>");
+            l.Add("    <title>" + title + "</title>");
+            l.Add("  </head>");
+            l.Add("<body>");
+        }
+
+        public static bool IsHostRunning() => Debugger.IsAttached;
+
+        public static bool IsRunning() => Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).GetUpperBound(0) > 0;
 
         public static void StartService() {
             if (ServiceStarted) { return; }
@@ -299,15 +265,6 @@ namespace BlueBasics {
             Check.Enabled = true;
         }
 
-        private static void CloseAfter12Hours(object sender, System.EventArgs e) {
-            if (DateTime.Now.Subtract(_ProgrammStarted).TotalHours > 12) {
-                if (IsHostRunning()) { return; }
-                DebugPrint(enFehlerArt.Info, "Das Programm wird nach 12 Stunden automatisch geschlossen.");
-                TraceLogging_End();
-                AbortExe();
-            }
-        }
-
         /// <summary>
         /// Schreibt die vergangene Zeit in MS in die Konsole.
         /// Wir kein Text angegeben, wird nur die Zeit zurückgesetzt, ohne einer Ausgabe.
@@ -320,5 +277,57 @@ namespace BlueBasics {
             }
             _StopUhr = DateTime.Now;
         }
+
+        public static void TraceLogging_End() {
+            try {
+                if (!string.IsNullOrEmpty(_CurrentTraceLogFile)) {
+                    // Trace-Log soll umgeleitet werden
+                    Trace.WriteLine("    </table>");
+                    Trace.WriteLine("  </body>");
+                    Trace.WriteLine(" </html>");
+                    Trace.Listeners.Remove(_TraceListener);
+                    _TraceListener.Flush();
+                    _TraceListener.Close();
+                    _TraceListener.Dispose();
+                    _TraceListener = null;
+                    if (_DeleteTraceLog && FileExists(_CurrentTraceLogFile)) { DeleteFile(_CurrentTraceLogFile, false); }
+                }
+            } catch {
+            }
+            _CurrentTraceLogFile = string.Empty;
+            _DeleteTraceLog = true;
+        }
+
+        public static void TraceLogging_Start(string traceFileName) {
+            TraceLogging_End();
+            _DeleteTraceLog = true;
+            if (FileExists(_CurrentTraceLogFile)) { File.Delete(_CurrentTraceLogFile); }
+            _CurrentTraceLogFile = TempFile(traceFileName);
+            _TraceListener = new TextWriterTraceListener(_CurrentTraceLogFile);
+            Trace.Listeners.Add(_TraceListener);
+            try {
+                Trace.AutoFlush = true;
+                Trace.WriteLine("<!DOctypex HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"");
+                Trace.WriteLine("\"http://www.w3.org/TR/html4/strict.dtd\">");
+                Trace.WriteLine("<html>");
+                Trace.WriteLine("  <head>");
+                Trace.WriteLine("    <title>Tracelog</title>");
+                Trace.WriteLine("  </head>");
+                Trace.WriteLine("<body>");
+                Trace.WriteLine("  <Font face=\"Arial\" Size=\"2\">");
+                Trace.WriteLine("  <table border=\"1\" cellspacing=\"1\" cellpadding=\"1\" align=\"left\">");
+            } catch { }
+        }
+
+        private static void CloseAfter12Hours(object sender, System.EventArgs e) {
+            if (DateTime.Now.Subtract(_ProgrammStarted).TotalHours > 12) {
+                if (IsHostRunning()) { return; }
+                DebugPrint(enFehlerArt.Info, "Das Programm wird nach 12 Stunden automatisch geschlossen.");
+                TraceLogging_End();
+                AbortExe();
+            }
+        }
+
+        #endregion
     }
 }

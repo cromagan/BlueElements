@@ -1,9 +1,7 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2019 Christian Peter
+// Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueControls.Controls;
 using BluePaint.EventArgs;
 using System.Drawing;
@@ -27,31 +23,57 @@ namespace BluePaint {
 
     public abstract partial class GenericTool : GroupBox // System.Windows.Forms.UserControl //
     {
-        protected static Color ColorRedTransp = Color.FromArgb(50, 255, 0, 0);
+        #region Fields
+
         protected static SolidBrush Brush_RedTransp = new(Color.FromArgb(128, 255, 0, 0));
-        protected static Pen Pen_RedTransp = new(ColorRedTransp);
+        protected static Color ColorRedTransp = Color.FromArgb(50, 255, 0, 0);
         protected static Pen Pen_LightWhite = new(Color.FromArgb(150, 255, 255, 255), 3);
+        protected static Pen Pen_RedTransp = new(ColorRedTransp);
+
+        #endregion
+
+        #region Constructors
 
         public GenericTool() : base() => InitializeComponent();
 
-        public event System.EventHandler DoInvalidate;
+        #endregion
 
-        public event System.EventHandler ZoomFit;
-
-        public event System.EventHandler HideMainWindow;
-
-        public event System.EventHandler ShowMainWindow;
-
-        public event System.EventHandler ForceUndoSaving;
-
-        public event System.EventHandler<BitmapEventArgs> OverridePic;
-
-        public event System.EventHandler<BitmapEventArgs> NeedCurrentPic;
+        #region Events
 
         public event System.EventHandler<CommandForMacroArgs> CommandForMacro;
 
-        public virtual void ToolFirstShown() {
-        }
+        public event System.EventHandler DoInvalidate;
+
+        public event System.EventHandler ForceUndoSaving;
+
+        public event System.EventHandler HideMainWindow;
+
+        public event System.EventHandler<BitmapEventArgs> NeedCurrentPic;
+
+        public event System.EventHandler<BitmapEventArgs> OverridePic;
+
+        public event System.EventHandler ShowMainWindow;
+
+        public event System.EventHandler ZoomFit;
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
+        public virtual void DoAdditionalDrawing(BlueControls.EventArgs.AdditionalDrawing e, Bitmap OriginalPic) { }
+
+        public virtual void ExcuteCommand(string command) => BlueBasics.Develop.DebugPrint_RoutineMussUeberschriebenWerden();
+
+        /// <summary>
+        /// Falls es während einer Makro aufzeichnung benutzt werden kann, gibt es eine eindeutige Kennung zurück.
+        /// Wenn keine Benutzung möglich ist, wird string.empty zurückgegebenm
+        /// </summary>
+        /// <returns></returns>
+        public virtual string MacroKennung() => string.Empty;
 
         /// <summary>
         ///
@@ -77,32 +99,22 @@ namespace BluePaint {
         public virtual void OnToolChanging() { }
 
         /// <summary>
-        ///
-        /// </summary>
-        /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
-        public virtual void DoAdditionalDrawing(BlueControls.EventArgs.AdditionalDrawing e, Bitmap OriginalPic) { }
-
-        /// <summary>
-        /// Falls es während einer Makro aufzeichnung benutzt werden kann, gibt es eine eindeutige Kennung zurück.
-        /// Wenn keine Benutzung möglich ist, wird string.empty zurückgegebenm
-        /// </summary>
-        /// <returns></returns>
-        public virtual string MacroKennung() => string.Empty;
-
-        /// <summary>
         /// Z.B: bei Undo
         /// </summary>
         /// <returns></returns>
         public virtual void PictureChangedByMainWindow() {
         }
 
+        public virtual void ToolFirstShown() {
+        }
+
+        protected virtual void OnCommandForMacro(string command) => CommandForMacro?.Invoke(this, new CommandForMacroArgs(command));
+
+        protected virtual void OnDoInvalidate() => DoInvalidate?.Invoke(this, System.EventArgs.Empty);
+
+        protected virtual void OnForceUndoSaving() => ForceUndoSaving?.Invoke(this, System.EventArgs.Empty);
+
         protected virtual void OnHideMainWindow() => HideMainWindow?.Invoke(this, System.EventArgs.Empty);
-
-        protected virtual void OnZoomFit() => ZoomFit?.Invoke(this, System.EventArgs.Empty);
-
-        protected virtual void OnShowMainWindow() => ShowMainWindow?.Invoke(this, System.EventArgs.Empty);
-
-        public virtual void ExcuteCommand(string command) => BlueBasics.Develop.DebugPrint_RoutineMussUeberschriebenWerden();
 
         protected virtual Bitmap OnNeedCurrentPic() {
             BitmapEventArgs e = new(null);
@@ -117,10 +129,10 @@ namespace BluePaint {
         /// <param name="BMP"></param>
         protected virtual void OnOverridePic(Bitmap BMP) => OverridePic?.Invoke(this, new BitmapEventArgs(BMP));
 
-        protected virtual void OnForceUndoSaving() => ForceUndoSaving?.Invoke(this, System.EventArgs.Empty);
+        protected virtual void OnShowMainWindow() => ShowMainWindow?.Invoke(this, System.EventArgs.Empty);
 
-        protected virtual void OnDoInvalidate() => DoInvalidate?.Invoke(this, System.EventArgs.Empty);
+        protected virtual void OnZoomFit() => ZoomFit?.Invoke(this, System.EventArgs.Empty);
 
-        protected virtual void OnCommandForMacro(string command) => CommandForMacro?.Invoke(this, new CommandForMacroArgs(command));
+        #endregion
     }
 }

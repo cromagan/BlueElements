@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
@@ -27,17 +23,23 @@ using static BlueBasics.Extensions;
 namespace BlueScript {
 
     internal class Method_Number : Method {
-        public override string Syntax => "Number(string, NaNValue)";
+
+        #region Properties
+
+        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.Numeral };
         public override string Description => "Gibt den Text als Zahl zurück. Fall dies keine gültige Zahl ist, wird NaN-Value zurückgegeben.";
-
-        public override List<string> Comand(Script s) => new() { "number" };
-
-        public override string StartSequence => "(";
+        public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.Numeral;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.Numeral };
-        public override bool EndlessArgs => false;
+        public override string StartSequence => "(";
+        public override string Syntax => "Number(string, NaNValue)";
+
+        #endregion
+
+        #region Methods
+
+        public override List<string> Comand(Script s) => new() { "number" };
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
@@ -45,5 +47,7 @@ namespace BlueScript {
                  : attvar.Attributes[0].ValueString.IsNumeral() ? new strDoItFeedback(attvar.Attributes[0].ValueString, enVariableDataType.Numeral)
                  : new strDoItFeedback(attvar.Attributes[1].ValueString, enVariableDataType.Numeral);
         }
+
+        #endregion
     }
 }

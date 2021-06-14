@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,36 +15,15 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueControls.Enums;
 using System.Collections.Generic;
 using System.Drawing;
 using static BlueBasics.Extensions;
 
-public class clsDesign {
-    public enKontur Kontur;
-    public enHintergrundArt HintergrundArt;
-    public int X1;
-    public int Y1;
-    public int X2;
-    public int Y2;
-    public bool Need;
-    public Color BackColor1;
-    public Color BackColor2;
-    public Color BackColor3;
-    public enRahmenArt RahmenArt;
-    public Color BorderColor1;
-    public Color BorderColor2;
-    public Color BorderColor3;
-    public float Verlauf;
-    public BlueControls.BlueFont bFont;
-    public string Image;
-    public enStates Status;
-}
-
 public static class clsDesignExtensions {
+
+    #region Methods
 
     // Button.Design.Add(enStates.Standard, enKontur.Rechteck, 0, 0, 0, 0, enHintergrundArt.Solide, 0, "EAEAEA", "", "", enRahmenArt.Solide_1px, "B6B6B6", "", "", "{Name=Calibri, Size=10[K]15}", "");
     public static void Add(this Dictionary<enDesign, Dictionary<enStates, clsDesign>> l, enDesign ds, enStates status, enKontur enKontur, int x1, int y1, int x2, int y2, enHintergrundArt hint, float verlauf, string bc1, string bc2, string bc3, enRahmenArt rahm, string boc1, string boc2, string boc3, string f, string pic) {
@@ -85,4 +62,32 @@ public static class clsDesignExtensions {
         des.Status = status;
         l.Add(status, des);
     }
+
+    #endregion
+}
+
+public class clsDesign {
+
+    #region Fields
+
+    public Color BackColor1;
+    public Color BackColor2;
+    public Color BackColor3;
+    public BlueControls.BlueFont bFont;
+    public Color BorderColor1;
+    public Color BorderColor2;
+    public Color BorderColor3;
+    public enHintergrundArt HintergrundArt;
+    public string Image;
+    public enKontur Kontur;
+    public bool Need;
+    public enRahmenArt RahmenArt;
+    public enStates Status;
+    public float Verlauf;
+    public int X1;
+    public int X2;
+    public int Y1;
+    public int Y2;
+
+    #endregion
 }

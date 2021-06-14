@@ -1,5 +1,3 @@
-#region BlueElements - a collection of useful tools, database and controls
-
 // Authors:
 // Christian Peter
 //
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics.Enums;
 using BlueControls.Forms;
 using BlueDatabase;
@@ -27,8 +23,14 @@ using static BlueBasics.Extensions;
 namespace BlueControls.BlueDatabaseDialogs {
 
     public sealed partial class Import {
-        public Database Database { get; private set; }
+
+        #region Fields
+
         private readonly string _originalImportText = string.Empty;
+
+        #endregion
+
+        #region Constructors
 
         public Import(Database database, string importtext) : base() {
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -40,6 +42,18 @@ namespace BlueControls.BlueDatabaseDialogs {
             Database = database;
             Database.Disposing += Database_Disposing;
         }
+
+        #endregion
+
+        #region Properties
+
+        public Database Database { get; private set; }
+
+        #endregion
+
+        #region Methods
+
+        private void Cancel_Click(object sender, System.EventArgs e) => Close();
 
         private void Database_Disposing(object sender, System.EventArgs e) {
             Database.Disposing -= Database_Disposing;
@@ -68,6 +82,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             Close();
         }
 
-        private void Cancel_Click(object sender, System.EventArgs e) => Close();
+        #endregion
     }
 }

@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
@@ -32,16 +28,21 @@ namespace BlueDatabase {
     /// Diese Klasse enthält nur das Aussehen und gibt keinerlei Events ab. Deswegen INTERNAL!
     /// </summary>
     public class CellItem {
+
+        #region Fields
+
         private string _value = string.Empty;
 
-        #region Konstruktor
+        #endregion
+
+        #region Constructors
 
         public CellItem(string value, int width, int height) {
             _value = value;
             if (width > 0) { Size = new Size(width, height); }
         }
 
-        #endregion Konstruktor
+        #endregion
 
         #region Properties
 
@@ -60,36 +61,9 @@ namespace BlueDatabase {
             }
         }
 
-        #endregion Properties
+        #endregion
 
-        internal void InvalidateSize() => Size = Size.Empty;
-
-        /// <summary>
-        /// Jede Zeile für sich richtig formatiert.
-        /// </summary>
-        /// <returns></returns>
-        public static List<string> ValuesReadable(ColumnItem column, RowItem Row, enShortenStyle Style) {
-            if (column.Format == enDataFormat.LinkedCell) {
-                //var LinkedData = CellCollection.LinkedCellData(column, Row, false, false);
-                //if (LinkedData.Item1 != null && LinkedData.Item2 != null) { return ValuesReadable(LinkedData.Item1, LinkedData.Item2, Style); }
-                //return new List<string>();
-                Develop.DebugPrint(enFehlerArt.Warnung, "LinkedCell sollte hier nicht ankommen.");
-            }
-            List<string> ret = new();
-            if (!column.MultiLine) {
-                ret.Add(ValueReadable(column, Row.CellGetString(column), Style, column.BildTextVerhalten, true));
-                return ret;
-            }
-            var x = Row.CellGetList(column);
-            foreach (var thisstring in x) {
-                ret.Add(ValueReadable(column, thisstring, Style, column.BildTextVerhalten, true));
-            }
-            if (x.Count == 0) {
-                var tmp = ValueReadable(column, string.Empty, Style, column.BildTextVerhalten, true);
-                if (!string.IsNullOrEmpty(tmp)) { ret.Add(tmp); }
-            }
-            return ret;
-        }
+        #region Methods
 
         public static Tuple<string, enAlignment, QuickImage> GetDrawingData(ColumnItem column, string originalText, enShortenStyle style, enBildTextVerhalten bildTextverhalten) {
             var tmpText = ValueReadable(column, originalText, style, bildTextverhalten, true);
@@ -103,6 +77,42 @@ namespace BlueDatabase {
             }
             return new Tuple<string, enAlignment, QuickImage>(tmpText, tmpAlign, tmpImageCode);
         }
+
+        public static enAlignment StandardAlignment(ColumnItem column, enBildTextVerhalten bildTextverhalten) {
+            switch (column.Align) {
+                case enAlignmentHorizontal.Links:
+                    return enAlignment.Top_Left;
+
+                case enAlignmentHorizontal.Rechts:
+                    return enAlignment.Top_Right;
+
+                case enAlignmentHorizontal.Zentriert:
+                    return enAlignment.HorizontalCenter;
+            }
+            switch (column.Format) {
+                case enDataFormat.Ganzzahl:
+                case enDataFormat.Gleitkommazahl:
+                    return enAlignment.Top_Right;
+
+                case enDataFormat.Bit:
+                    if (bildTextverhalten is enBildTextVerhalten.Nur_Bild or enBildTextVerhalten.Bild_oder_Text) { return enAlignment.Top_HorizontalCenter; }
+                    return enAlignment.Top_Left;
+
+                default:
+                    return enAlignment.Top_Left;
+            }
+        }
+
+        public static QuickImage StandardErrorImage(int gr, enBildTextVerhalten bildTextverhalten) => bildTextverhalten switch {
+            enBildTextVerhalten.Fehlendes_Bild_zeige_Fragezeichen => QuickImage.Get("Fragezeichen|" + gr + "|||||200|||80"),
+            enBildTextVerhalten.Fehlendes_Bild_zeige_Kreis => QuickImage.Get("Kreis2|" + gr),
+            enBildTextVerhalten.Fehlendes_Bild_zeige_Kreuz => QuickImage.Get("Kreuz|" + gr),
+            enBildTextVerhalten.Fehlendes_Bild_zeige_Häkchen => QuickImage.Get("Häkchen|" + gr),
+            enBildTextVerhalten.Fehlendes_Bild_zeige_Infozeichen => QuickImage.Get("Information|" + gr),
+            enBildTextVerhalten.Fehlendes_Bild_zeige_Warnung => QuickImage.Get("Warnung|" + gr),
+            enBildTextVerhalten.Fehlendes_Bild_zeige_Kritischzeichen => QuickImage.Get("Kritisch|" + gr),
+            _ => null,
+        };
 
         /// <summary>
         /// Gibt eine einzelne Zeile richtig ersetzt mit Prä- und Suffix zurück.
@@ -195,16 +205,34 @@ namespace BlueDatabase {
             return txt;
         }
 
-        public static QuickImage StandardErrorImage(int gr, enBildTextVerhalten bildTextverhalten) => bildTextverhalten switch {
-            enBildTextVerhalten.Fehlendes_Bild_zeige_Fragezeichen => QuickImage.Get("Fragezeichen|" + gr + "|||||200|||80"),
-            enBildTextVerhalten.Fehlendes_Bild_zeige_Kreis => QuickImage.Get("Kreis2|" + gr),
-            enBildTextVerhalten.Fehlendes_Bild_zeige_Kreuz => QuickImage.Get("Kreuz|" + gr),
-            enBildTextVerhalten.Fehlendes_Bild_zeige_Häkchen => QuickImage.Get("Häkchen|" + gr),
-            enBildTextVerhalten.Fehlendes_Bild_zeige_Infozeichen => QuickImage.Get("Information|" + gr),
-            enBildTextVerhalten.Fehlendes_Bild_zeige_Warnung => QuickImage.Get("Warnung|" + gr),
-            enBildTextVerhalten.Fehlendes_Bild_zeige_Kritischzeichen => QuickImage.Get("Kritisch|" + gr),
-            _ => null,
-        };
+        /// <summary>
+        /// Jede Zeile für sich richtig formatiert.
+        /// </summary>
+        /// <returns></returns>
+        public static List<string> ValuesReadable(ColumnItem column, RowItem Row, enShortenStyle Style) {
+            if (column.Format == enDataFormat.LinkedCell) {
+                //var LinkedData = CellCollection.LinkedCellData(column, Row, false, false);
+                //if (LinkedData.Item1 != null && LinkedData.Item2 != null) { return ValuesReadable(LinkedData.Item1, LinkedData.Item2, Style); }
+                //return new List<string>();
+                Develop.DebugPrint(enFehlerArt.Warnung, "LinkedCell sollte hier nicht ankommen.");
+            }
+            List<string> ret = new();
+            if (!column.MultiLine) {
+                ret.Add(ValueReadable(column, Row.CellGetString(column), Style, column.BildTextVerhalten, true));
+                return ret;
+            }
+            var x = Row.CellGetList(column);
+            foreach (var thisstring in x) {
+                ret.Add(ValueReadable(column, thisstring, Style, column.BildTextVerhalten, true));
+            }
+            if (x.Count == 0) {
+                var tmp = ValueReadable(column, string.Empty, Style, column.BildTextVerhalten, true);
+                if (!string.IsNullOrEmpty(tmp)) { ret.Add(tmp); }
+            }
+            return ret;
+        }
+
+        internal void InvalidateSize() => Size = Size.Empty;
 
         private static QuickImage StandardImage(ColumnItem column, string originalText, string replacedText, enShortenStyle style, enBildTextVerhalten bildTextverhalten) {
             // replacedText kann auch empty sein. z.B. wenn er nicht angezeigt wird
@@ -273,30 +301,7 @@ namespace BlueDatabase {
             }
         }
 
-        public static enAlignment StandardAlignment(ColumnItem column, enBildTextVerhalten bildTextverhalten) {
-            switch (column.Align) {
-                case enAlignmentHorizontal.Links:
-                    return enAlignment.Top_Left;
-
-                case enAlignmentHorizontal.Rechts:
-                    return enAlignment.Top_Right;
-
-                case enAlignmentHorizontal.Zentriert:
-                    return enAlignment.HorizontalCenter;
-            }
-            switch (column.Format) {
-                case enDataFormat.Ganzzahl:
-                case enDataFormat.Gleitkommazahl:
-                    return enAlignment.Top_Right;
-
-                case enDataFormat.Bit:
-                    if (bildTextverhalten is enBildTextVerhalten.Nur_Bild or enBildTextVerhalten.Bild_oder_Text) { return enAlignment.Top_HorizontalCenter; }
-                    return enAlignment.Top_Left;
-
-                default:
-                    return enAlignment.Top_Left;
-            }
-        }
+        #endregion
 
         //public static string ValueForHTMLExport(ColumnItem Column, string Einstiegstext)
         //{

@@ -1,5 +1,3 @@
-#region BlueElements - a collection of useful tools, database and controls
-
 // Authors:
 // Christian Peter
 //
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -29,77 +25,22 @@ namespace BlueDatabase {
 
     public sealed class FilterCollection : ListExt<FilterItem>, IParseable {
 
-        #region Variablen-Deklarationen
-
-        public Database Database { get; private set; }
-
-        #endregion Variablen-Deklarationen
-
-        public bool IsParsing { get; private set; }
-
-        #region Construktor + Initialize
+        #region Constructors
 
         public FilterCollection(Database database) {
             Database = database;
             Database.Disposing += Database_Disposing;
         }
 
-        private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
-
         public FilterCollection(Database database, string toParse) : this(database) => Parse(toParse);
 
-        #endregion Construktor + Initialize
+        #endregion
 
         #region Properties
 
-        public FilterItem this[ColumnItem column] {
-            get {
-                foreach (var ThisFilterItem in this) {
-                    if (ThisFilterItem != null && ThisFilterItem.FilterType != enFilterType.KeinFilter) {
-                        if (ThisFilterItem.Column == column) { return ThisFilterItem; }
-                    }
-                }
-                return null;
-            }
-        }
+        public Database Database { get; private set; }
 
-        #endregion Properties
-
-        public void Remove(ColumnItem column) {
-            List<FilterItem> toDel = new();
-            foreach (var thisFilter in this) {
-                if (thisFilter.Column == column) { toDel.Add(thisFilter); }
-            }
-            if (toDel.Count == 0) { return; }
-            RemoveRange(toDel);
-        }
-
-        public void Remove(string columnName) {
-            var tmp = Database.Column[columnName];
-            if (tmp == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte '" + columnName + "' nicht vorhanden."); }
-            Remove(tmp);
-        }
-
-        public void Remove_RowFilter() => Remove((ColumnItem)null);
-
-        public void Add(enFilterType filterType, string filterBy) => AddIfNotExists(new FilterItem(Database, filterType, filterBy));
-
-        public void Add(enFilterType filterType, List<string> filterBy) => AddIfNotExists(new FilterItem(Database, filterType, filterBy));
-
-        public void Add(string columnName, enFilterType filterType, string filterBy) => Add(Database.Column[columnName], filterType, filterBy);
-
-        public void Add(string columnName, enFilterType filterType, List<string> filterBy) => Add(Database.Column[columnName], filterType, filterBy);
-
-        public void Add(ColumnItem column, enFilterType filterType, List<string> filterBy) => AddIfNotExists(new FilterItem(column, filterType, filterBy));
-
-        public void Add(ColumnItem column, enFilterType filterType, string filterBy) => AddIfNotExists(new FilterItem(column, filterType, filterBy));
-
-        private void AddIfNotExists(FilterItem filterItem) {
-            if (Exists(filterItem)) { return; }
-            Add(filterItem);
-        }
-
-        public bool IsRowFilterActiv() => this[null] != null;
+        public bool IsParsing { get; private set; }
 
         public string RowFilterText {
             get {
@@ -117,6 +58,54 @@ namespace BlueDatabase {
                 Add(fi);
             }
         }
+
+        #endregion
+
+        #region Indexers
+
+        public FilterItem this[ColumnItem column] {
+            get {
+                foreach (var ThisFilterItem in this) {
+                    if (ThisFilterItem != null && ThisFilterItem.FilterType != enFilterType.KeinFilter) {
+                        if (ThisFilterItem.Column == column) { return ThisFilterItem; }
+                    }
+                }
+                return null;
+            }
+        }
+
+        #endregion
+
+        #region Methods
+
+        public void Add(enFilterType filterType, string filterBy) => AddIfNotExists(new FilterItem(Database, filterType, filterBy));
+
+        public void Add(enFilterType filterType, List<string> filterBy) => AddIfNotExists(new FilterItem(Database, filterType, filterBy));
+
+        public void Add(string columnName, enFilterType filterType, string filterBy) => Add(Database.Column[columnName], filterType, filterBy);
+
+        public void Add(string columnName, enFilterType filterType, List<string> filterBy) => Add(Database.Column[columnName], filterType, filterBy);
+
+        public void Add(ColumnItem column, enFilterType filterType, List<string> filterBy) => AddIfNotExists(new FilterItem(column, filterType, filterBy));
+
+        public void Add(ColumnItem column, enFilterType filterType, string filterBy) => AddIfNotExists(new FilterItem(column, filterType, filterBy));
+
+        public bool Exists(FilterItem filterItem) {
+            foreach (var thisFilter in this) {
+                if (thisFilter.FilterType == filterItem.FilterType) {
+                    if (thisFilter.Column == filterItem.Column) {
+                        if (thisFilter.Herkunft == filterItem.Herkunft) {
+                            if (thisFilter.SearchValue.JoinWithCr() == filterItem.SearchValue.JoinWithCr()) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        public bool IsRowFilterActiv() => this[null] != null;
 
         public bool MayHasRowFilter(ColumnItem Column) => !Column.IgnoreAtRowFilter && IsRowFilterActiv();
 
@@ -139,15 +128,22 @@ namespace BlueDatabase {
             IsParsing = false;
         }
 
-        public override string ToString() {
-            var w = "{";
-            foreach (var ThisFilterItem in this) {
-                if (ThisFilterItem != null) {
-                    w = w + "Filter=" + ThisFilterItem + ", ";
-                }
+        public void Remove(ColumnItem column) {
+            List<FilterItem> toDel = new();
+            foreach (var thisFilter in this) {
+                if (thisFilter.Column == column) { toDel.Add(thisFilter); }
             }
-            return w.TrimEnd(", ") + "}";
+            if (toDel.Count == 0) { return; }
+            RemoveRange(toDel);
         }
+
+        public void Remove(string columnName) {
+            var tmp = Database.Column[columnName];
+            if (tmp == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte '" + columnName + "' nicht vorhanden."); }
+            Remove(tmp);
+        }
+
+        public void Remove_RowFilter() => Remove((ColumnItem)null);
 
         public void RemoveOtherAndAddIfNotExists(ColumnItem column, enFilterType filterType, string filterBy, string herkunft) => RemoveOtherAndAddIfNotExists(new FilterItem(column, filterType, filterBy, herkunft));
 
@@ -164,25 +160,20 @@ namespace BlueDatabase {
             Add(filterItem);
         }
 
-        public bool Exists(FilterItem filterItem) {
-            foreach (var thisFilter in this) {
-                if (thisFilter.FilterType == filterItem.FilterType) {
-                    if (thisFilter.Column == filterItem.Column) {
-                        if (thisFilter.Herkunft == filterItem.Herkunft) {
-                            if (thisFilter.SearchValue.JoinWithCr() == filterItem.SearchValue.JoinWithCr()) {
-                                return true;
-                            }
-                        }
-                    }
-                }
-            }
-            return false;
-        }
-
         public void RemoveOtherAndAddIfNotExists(string columName, enFilterType filterType, List<string> filterBy, string herkunft) {
             var tmp = Database.Column[columName];
             if (tmp == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte '" + columName + "' nicht vorhanden."); }
             RemoveOtherAndAddIfNotExists(new FilterItem(tmp, filterType, filterBy, herkunft));
+        }
+
+        public override string ToString() {
+            var w = "{";
+            foreach (var ThisFilterItem in this) {
+                if (ThisFilterItem != null) {
+                    w = w + "Filter=" + ThisFilterItem + ", ";
+                }
+            }
+            return w.TrimEnd(", ") + "}";
         }
 
         protected override void Dispose(bool disposing) {
@@ -192,5 +183,14 @@ namespace BlueDatabase {
                 Database = null;
             }
         }
+
+        private void AddIfNotExists(FilterItem filterItem) {
+            if (Exists(filterItem)) { return; }
+            Add(filterItem);
+        }
+
+        private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
+
+        #endregion
     }
 }

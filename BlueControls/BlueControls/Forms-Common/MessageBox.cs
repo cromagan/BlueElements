@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -29,7 +25,14 @@ using System.Drawing;
 namespace BlueControls.Forms {
 
     public partial class MessageBox : Form {
+
+        #region Fields
+
         private Button Pressed = null;
+
+        #endregion
+
+        #region Constructors
 
         //private MessageBox()
         //{
@@ -58,6 +61,29 @@ namespace BlueControls.Forms {
             if (Owner == null) {
                 StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             }
+        }
+
+        #endregion
+
+        #region Methods
+
+        public static void Show(string TXT) => Show(TXT, enImageCode.None, true, "OK");
+
+        public static void Show(string TXT, enImageCode Pic, string Buttons) => Show(TXT, Pic, true, Buttons);
+
+        public static int Show(string TXT, enImageCode Pic, params string[] Buttons) => Show(TXT, Pic, true, Buttons);
+
+        public static int Show(string TXT, enImageCode Pic, bool Dialog, params string[] Buttons) {
+            MessageBox MB = new(TXT, Pic, Buttons);
+            if (Dialog) {
+                MB.ShowDialog();
+            } else {
+                MB.Show();
+                while (MB.Pressed == null) {
+                    modAllgemein.Pause(0.1, true);
+                }
+            }
+            return int.Parse(MB.Pressed.Name);
         }
 
         public List<Button> Generate_Buttons(string[] Names) {
@@ -131,23 +157,6 @@ namespace BlueControls.Forms {
             Close();
         }
 
-        public static void Show(string TXT) => Show(TXT, enImageCode.None, true, "OK");
-
-        public static void Show(string TXT, enImageCode Pic, string Buttons) => Show(TXT, Pic, true, Buttons);
-
-        public static int Show(string TXT, enImageCode Pic, params string[] Buttons) => Show(TXT, Pic, true, Buttons);
-
-        public static int Show(string TXT, enImageCode Pic, bool Dialog, params string[] Buttons) {
-            MessageBox MB = new(TXT, Pic, Buttons);
-            if (Dialog) {
-                MB.ShowDialog();
-            } else {
-                MB.Show();
-                while (MB.Pressed == null) {
-                    modAllgemein.Pause(0.1, true);
-                }
-            }
-            return int.Parse(MB.Pressed.Name);
-        }
+        #endregion
     }
 }

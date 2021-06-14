@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,25 +15,29 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using Skript.Enums;
 using System.Collections.Generic;
 
 namespace BlueScript {
 
     internal class Method_StringToPhone : Method {
-        public override string Syntax => "StringToPhone(String)";
+
+        #region Properties
+
+        public override List<enVariableDataType> Args => new() { enVariableDataType.String_or_List };
         public override string Description => "Versucht, den String als internationale Telefonnummer zurückzugeben. Schlägt es fehl, wird nicht zurückgegeben.";
-
-        public override List<string> Comand(Script s) => new() { "stringtophone" };
-
-        public override string StartSequence => "(";
+        public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.List;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String_or_List };
-        public override bool EndlessArgs => false;
+        public override string StartSequence => "(";
+        public override string Syntax => "StringToPhone(String)";
+
+        #endregion
+
+        #region Methods
+
+        public override List<string> Comand(Script s) => new() { "stringtophone" };
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
@@ -50,5 +52,7 @@ namespace BlueScript {
             //return new strDoItFeedback(attvar.Attributes[0].ValueForReplace, string.Empty);
             return new strDoItFeedback("Nicht fertig implementiert");
         }
+
+        #endregion
     }
 }

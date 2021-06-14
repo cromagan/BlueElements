@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -16,8 +14,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-
-#endregion BlueElements - a collection of useful tools, database and controls
 
 using BlueBasics;
 using BlueBasics.Enums;
@@ -38,7 +34,19 @@ namespace BlueControls.Controls {
     [DefaultEvent("Click")]
     public partial class Caption : GenericControl, IContextMenu, IBackgroundNone {
 
-        #region Constructor
+        #region Fields
+
+        private enDesign _design = enDesign.Undefiniert;
+
+        private string _Text = string.Empty;
+
+        private enSteuerelementVerhalten _TextAnzeigeverhalten = enSteuerelementVerhalten.Text_Abschneiden;
+
+        private ExtText eText;
+
+        #endregion
+
+        #region Constructors
 
         public Caption() : base(false, false) {
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -48,22 +56,37 @@ namespace BlueControls.Controls {
             _MouseHighlight = false;
         }
 
-        #endregion Constructor
+        #endregion
 
-        #region Variablen
-
-        private string _Text = string.Empty;
-        private ExtText eText;
-        private enSteuerelementVerhalten _TextAnzeigeverhalten = enSteuerelementVerhalten.Text_Abschneiden;
-        private enDesign _design = enDesign.Undefiniert;
-
-        #endregion Variablen
+        #region Events
 
         public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
 
         public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
 
+        #endregion
+
         #region Properties
+
+        public new int Height {
+            get => Convert.ToBoolean(_TextAnzeigeverhalten & enSteuerelementVerhalten.Steuerelement_Anpassen)
+                    ? TextRequiredSize().Height
+                    : base.Height;
+            set {
+                GetDesign();
+                if (Convert.ToBoolean(_TextAnzeigeverhalten & enSteuerelementVerhalten.Steuerelement_Anpassen)) { return; }
+                base.Height = value;
+            }
+        }
+
+        public new Size Size {
+            get => Convert.ToBoolean(_TextAnzeigeverhalten & enSteuerelementVerhalten.Steuerelement_Anpassen) ? TextRequiredSize() : base.Size;
+            set {
+                GetDesign();
+                if (value.Width == base.Size.Width && value.Height == base.Size.Height) { return; }
+                base.Size = value;
+            }
+        }
 
         /// <summary>
         /// Benötigt, dass der Designer das nicht erstellt
@@ -104,15 +127,6 @@ namespace BlueControls.Controls {
             }
         }
 
-        public new Size Size {
-            get => Convert.ToBoolean(_TextAnzeigeverhalten & enSteuerelementVerhalten.Steuerelement_Anpassen) ? TextRequiredSize() : base.Size;
-            set {
-                GetDesign();
-                if (value.Width == base.Size.Width && value.Height == base.Size.Height) { return; }
-                base.Size = value;
-            }
-        }
-
         public new int Width {
             get => Convert.ToBoolean(_TextAnzeigeverhalten & enSteuerelementVerhalten.Steuerelement_Anpassen)
                     ? TextRequiredSize().Width
@@ -124,79 +138,35 @@ namespace BlueControls.Controls {
             }
         }
 
-        public new int Height {
-            get => Convert.ToBoolean(_TextAnzeigeverhalten & enSteuerelementVerhalten.Steuerelement_Anpassen)
-                    ? TextRequiredSize().Height
-                    : base.Height;
-            set {
-                GetDesign();
-                if (Convert.ToBoolean(_TextAnzeigeverhalten & enSteuerelementVerhalten.Steuerelement_Anpassen)) { return; }
-                base.Height = value;
-            }
-        }
+        #endregion
 
-        #endregion Properties
-
-        protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
-            base.OnMouseUp(e);
-            if (e.Button == System.Windows.Forms.MouseButtons.Right) { FloatingInputBoxListBoxStyle.ContextMenuShow(this, e); }
-        }
+        #region Methods
 
         public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) => false;
 
+        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) => HotItem = null;
+
+        public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
+
         public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
-
-        private void GetDesign() {
-            _design = enDesign.Undefiniert;
-            if (Parent == null) { return; }
-            if (Parent is Form fm) { _design = fm.Design; }
-            switch (_design) {
-                case enDesign.Form_QuickInfo:
-
-                case enDesign.Form_DesktopBenachrichtigung:
-
-                case enDesign.Form_BitteWarten:
-
-                case enDesign.Form_KontextMenu:
-
-                case enDesign.Form_SelectBox_Dropdown:
-
-                case enDesign.Form_AutoFilter:
-                    return;
-            }
-            switch (ParentType()) {
-                case enPartentType.RibbonGroupBox:
-
-                case enPartentType.RibbonPage:
-                    _design = enDesign.Ribbonbar_Caption;
-                    break;
-
-                case enPartentType.GroupBox:
-
-                case enPartentType.TabPage:
-
-                case enPartentType.Form:
-
-                case enPartentType.FlexiControlForCell:
-
-                case enPartentType.Unbekannt: // UserForms und anderes
-
-                case enPartentType.Nothing: // UserForms und anderes
-
-                case enPartentType.ListBox:
-                    _design = enDesign.Caption;
-                    return;
-
-                default:
-                    _design = enDesign.Caption;
-                    break;
-            }
-        }
 
         public void ResetETextAndInvalidate() {
             eText = null;
             if (!QuickModePossible()) { SetDoubleBuffering(); }
             Invalidate();
+        }
+
+        public Size TextRequiredSize() {
+            if (QuickModePossible()) {
+                if (_design == enDesign.Undefiniert) { GetDesign(); }
+                var s = BlueFont.MeasureString(_Text, Skin.GetBlueFont(_design, enStates.Standard).Font());
+                return new Size((int)(s.Width + 1), (int)(s.Height + 1));
+            }
+            if (eText == null) {
+                if (DesignMode) { Refresh(); }// Damit das skin Geinittet wird
+                DrawControl(null, enStates.Standard);
+            }
+            return eText != null ? eText.LastSize() : new Size(1, 1);
         }
 
         protected override void DrawControl(Graphics gr, enStates state) {
@@ -251,27 +221,64 @@ namespace BlueControls.Controls {
             }
         }
 
+        protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
+            base.OnMouseUp(e);
+            if (e.Button == System.Windows.Forms.MouseButtons.Right) { FloatingInputBoxListBoxStyle.ContextMenuShow(this, e); }
+        }
+
+        private void GetDesign() {
+            _design = enDesign.Undefiniert;
+            if (Parent == null) { return; }
+            if (Parent is Form fm) { _design = fm.Design; }
+            switch (_design) {
+                case enDesign.Form_QuickInfo:
+
+                case enDesign.Form_DesktopBenachrichtigung:
+
+                case enDesign.Form_BitteWarten:
+
+                case enDesign.Form_KontextMenu:
+
+                case enDesign.Form_SelectBox_Dropdown:
+
+                case enDesign.Form_AutoFilter:
+                    return;
+            }
+            switch (ParentType()) {
+                case enPartentType.RibbonGroupBox:
+
+                case enPartentType.RibbonPage:
+                    _design = enDesign.Ribbonbar_Caption;
+                    break;
+
+                case enPartentType.GroupBox:
+
+                case enPartentType.TabPage:
+
+                case enPartentType.Form:
+
+                case enPartentType.FlexiControlForCell:
+
+                case enPartentType.Unbekannt: // UserForms und anderes
+
+                case enPartentType.Nothing: // UserForms und anderes
+
+                case enPartentType.ListBox:
+                    _design = enDesign.Caption;
+                    return;
+
+                default:
+                    _design = enDesign.Caption;
+                    break;
+            }
+        }
+
         private bool QuickModePossible() {
             if (_TextAnzeigeverhalten != enSteuerelementVerhalten.Text_Abschneiden) { return false; }
             //if (Math.Abs(_Zeilenabstand - 1) > 0.01) { return false; }
             return !_Text.Contains("<");
         }
 
-        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) => HotItem = null;
-
-        public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
-
-        public Size TextRequiredSize() {
-            if (QuickModePossible()) {
-                if (_design == enDesign.Undefiniert) { GetDesign(); }
-                var s = BlueFont.MeasureString(_Text, Skin.GetBlueFont(_design, enStates.Standard).Font());
-                return new Size((int)(s.Width + 1), (int)(s.Height + 1));
-            }
-            if (eText == null) {
-                if (DesignMode) { Refresh(); }// Damit das skin Geinittet wird
-                DrawControl(null, enStates.Standard);
-            }
-            return eText != null ? eText.LastSize() : new Size(1, 1);
-        }
+        #endregion
     }
 }

@@ -1,9 +1,7 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2019 Christian Peter
+// Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueControls;
 using BlueControls.EventArgs;
 using System;
@@ -30,54 +26,19 @@ namespace BluePaint {
 
     public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserControl //
     {
+        #region Fields
+
         private bool _ausricht = false;
+
+        #endregion
+
+        #region Constructors
 
         public Tool_Spiegeln() : base() => InitializeComponent();
 
-        private void SpiegelnH_Click(object sender, System.EventArgs e) {
-            _ausricht = false;
-            var _Pic = OnNeedCurrentPic();
-            if (_Pic == null) { return; }
-            CollectGarbage();
-            _Pic.RotateFlip(RotateFlipType.RotateNoneFlipY);
-            OnOverridePic(_Pic);
-            OnZoomFit();
-        }
+        #endregion
 
-        private void SpiegelnV_Click(object sender, System.EventArgs e) {
-            _ausricht = false;
-            var _Pic = OnNeedCurrentPic();
-            if (_Pic == null) { return; }
-            CollectGarbage();
-            _Pic.RotateFlip(RotateFlipType.RotateNoneFlipX);
-            OnOverridePic(_Pic);
-            OnZoomFit();
-        }
-
-        private void btnDrehenR_Click(object sender, System.EventArgs e) {
-            _ausricht = false;
-            var _Pic = OnNeedCurrentPic();
-            if (_Pic == null) { return; }
-            CollectGarbage();
-            _Pic.RotateFlip(RotateFlipType.Rotate90FlipNone);
-            OnOverridePic(_Pic);
-            OnZoomFit();
-        }
-
-        private void btnDrehenL_Click(object sender, System.EventArgs e) {
-            _ausricht = false;
-            var _Pic = OnNeedCurrentPic();
-            if (_Pic == null) { return; }
-            CollectGarbage();
-            _Pic.RotateFlip(RotateFlipType.Rotate270FlipNone);
-            OnOverridePic(_Pic);
-            OnZoomFit();
-        }
-
-        private void btnAusrichten_Click(object sender, System.EventArgs e) {
-            _ausricht = true;
-            OnDoInvalidate();
-        }
+        #region Methods
 
         public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic) {
             if (!_ausricht) { return; }
@@ -136,5 +97,52 @@ namespace BluePaint {
             }
             OnOverridePic(nBMP);
         }
+
+        private void btnAusrichten_Click(object sender, System.EventArgs e) {
+            _ausricht = true;
+            OnDoInvalidate();
+        }
+
+        private void btnDrehenL_Click(object sender, System.EventArgs e) {
+            _ausricht = false;
+            var _Pic = OnNeedCurrentPic();
+            if (_Pic == null) { return; }
+            CollectGarbage();
+            _Pic.RotateFlip(RotateFlipType.Rotate270FlipNone);
+            OnOverridePic(_Pic);
+            OnZoomFit();
+        }
+
+        private void btnDrehenR_Click(object sender, System.EventArgs e) {
+            _ausricht = false;
+            var _Pic = OnNeedCurrentPic();
+            if (_Pic == null) { return; }
+            CollectGarbage();
+            _Pic.RotateFlip(RotateFlipType.Rotate90FlipNone);
+            OnOverridePic(_Pic);
+            OnZoomFit();
+        }
+
+        private void SpiegelnH_Click(object sender, System.EventArgs e) {
+            _ausricht = false;
+            var _Pic = OnNeedCurrentPic();
+            if (_Pic == null) { return; }
+            CollectGarbage();
+            _Pic.RotateFlip(RotateFlipType.RotateNoneFlipY);
+            OnOverridePic(_Pic);
+            OnZoomFit();
+        }
+
+        private void SpiegelnV_Click(object sender, System.EventArgs e) {
+            _ausricht = false;
+            var _Pic = OnNeedCurrentPic();
+            if (_Pic == null) { return; }
+            CollectGarbage();
+            _Pic.RotateFlip(RotateFlipType.RotateNoneFlipX);
+            OnOverridePic(_Pic);
+            OnZoomFit();
+        }
+
+        #endregion
     }
 }

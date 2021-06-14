@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
@@ -27,17 +23,23 @@ using static BlueBasics.Extensions;
 namespace BlueScript {
 
     internal class Method_BerechneVariable : Method {
-        public override string Syntax => "VariablenName = Berechung;";
+
+        #region Properties
+
+        public override List<enVariableDataType> Args => new() { enVariableDataType.Bool_Numeral_String_or_List };
         public override string Description => "Berechnet eine Variable. Der Typ der Variable und des Ergebnisses müssen übereinstimmen.";
-
-        public override List<string> Comand(Script s) => s == null ? (new()) : s.Variablen.AllNames();
-
-        public override string StartSequence => "=";
+        public override bool EndlessArgs => false;
         public override string EndSequence => ";";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.Null;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Bool_Numeral_String_or_List };
-        public override bool EndlessArgs => false;
+        public override string StartSequence => "=";
+        public override string Syntax => "VariablenName = Berechung;";
+
+        #endregion
+
+        #region Methods
+
+        public override List<string> Comand(Script s) => s == null ? (new()) : s.Variablen.AllNames();
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var variableName = infos.ComandText.ToLower().ReduceToChars(Constants.AllowedCharsVariableName);
@@ -50,5 +52,7 @@ namespace BlueScript {
             variable.Type = attvar.Attributes[0].Type;
             return new strDoItFeedback();
         }
+
+        #endregion
     }
 }

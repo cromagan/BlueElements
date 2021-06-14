@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Interfaces;
 using Skript.Enums;
@@ -30,77 +26,27 @@ namespace BlueScript {
 
     public abstract class Method : IReadableText {
 
-        public abstract List<string> Comand(Script s);
+        #region Properties
+
+        public abstract List<enVariableDataType> Args { get; }
 
         public abstract string Description { get; }
-        public abstract string Syntax { get; }
-        public abstract string StartSequence { get; }
-        public abstract string EndSequence { get; }
-        public abstract bool GetCodeBlockAfter { get; }
-        public abstract enVariableDataType Returns { get; }
-        public abstract List<enVariableDataType> Args { get; }
+
         public abstract bool EndlessArgs { get; }
 
-        public abstract strDoItFeedback DoIt(strCanDoFeedback infos, Script s);
+        public abstract string EndSequence { get; }
 
-        public strCanDoFeedback CanDo(string scriptText, int pos, bool expectedvariablefeedback, Script s) {
-            if (!expectedvariablefeedback && Returns != enVariableDataType.Null) {
-                return new strCanDoFeedback(pos, "Befehl an dieser Stelle nicht möglich", false);
-            }
-            if (expectedvariablefeedback && Returns == enVariableDataType.Null) {
-                return new strCanDoFeedback(pos, "Befehl an dieser Stelle nicht möglich", false);
-            }
-            var maxl = scriptText.Length;
-            //if (parent != null) {
-            //    var al = AllowedInIDs;
-            //    if (al != null && !al.Contains(parent.ID)) {
-            //        return new strCanDoFeedback(pos, "Befehl an dieser Stelle nicht möglich", false);
-            //    }
-            //}
-            foreach (var thiscomand in Comand(s)) {
-                var comandtext = thiscomand + StartSequence;
-                var l = comandtext.Length;
-                if (pos + l < maxl) {
-                    if (scriptText.Substring(pos, l).ToLower() == comandtext.ToLower()) {
-                        var f = GetEnd(scriptText, pos + thiscomand.Length, StartSequence.Length);
-                        if (!string.IsNullOrEmpty(f.ErrorMessage)) {
-                            return new strCanDoFeedback(f.ContinuePosition, "Fehler bei " + comandtext + ": " + f.ErrorMessage, true);
-                        }
-                        var cont = f.ContinuePosition;
-                        var codebltxt = string.Empty;
-                        if (GetCodeBlockAfter) {
-                            do {
-                                if (cont >= maxl) { return new strCanDoFeedback(f.ContinuePosition, "Kein nachfolgender Codeblock bei " + comandtext, true); }
-                                if (scriptText.Substring(cont, 1) == "{") { break; }
-                                if (scriptText.Substring(cont, 1) != "¶") { return new strCanDoFeedback(f.ContinuePosition, "Kein nachfolgender Codeblock bei " + comandtext, true); }
-                                cont++;
-                                s.Line++;
-                            } while (true);
-                            (var posek, var _) = NextText(scriptText, cont, GeschKlammerZu, false, false);
-                            if (posek < cont) {
-                                return new strCanDoFeedback(cont, "Kein Codeblock Ende bei " + comandtext, true);
-                            }
-                            codebltxt = scriptText.Substring(cont + 1, posek - cont - 1);
-                            //if (string.IsNullOrEmpty(codebltxt)) {
-                            //    return new strCanDoFeedback(cont, "Leerer Codeblock bei " + comandtext, true);
-                            //}
-                            cont = posek + 1;
-                        }
-                        return new strCanDoFeedback(cont, comandtext, f.AttributeText, codebltxt);
-                    }
-                }
-            }
-            return new strCanDoFeedback(pos, "Kann nicht geparst werden", false);
-        }
+        public abstract bool GetCodeBlockAfter { get; }
 
-        private strGetEndFeedback GetEnd(string scriptText, int startpos, int lenghtStartSequence) {
-            (var pos, var witch) = NextText(scriptText, startpos, new List<string>() { EndSequence }, false, false);
-            if (pos < startpos) {
-                return new strGetEndFeedback("Keinen Endpunkt gefunden.");
-            }
-            var txtBTW = scriptText.Substring(startpos + lenghtStartSequence, pos - startpos - lenghtStartSequence);
-            return new strGetEndFeedback(pos + witch.Length, txtBTW);
-        }
+        public abstract enVariableDataType Returns { get; }
+
+        public abstract string StartSequence { get; }
+
+        public abstract string Syntax { get; }
+
+        #endregion
+
+        #region Methods
 
         public static strGetEndFeedback ReplaceComands(string txt, IEnumerable<Method> comands, Script s) {
             List<string> c = new();
@@ -199,9 +145,59 @@ namespace BlueScript {
             return new strSplittedAttributesFeedback(vars);
         }
 
-        public string ReadableText() => Syntax;
+        public strCanDoFeedback CanDo(string scriptText, int pos, bool expectedvariablefeedback, Script s) {
+            if (!expectedvariablefeedback && Returns != enVariableDataType.Null) {
+                return new strCanDoFeedback(pos, "Befehl an dieser Stelle nicht möglich", false);
+            }
+            if (expectedvariablefeedback && Returns == enVariableDataType.Null) {
+                return new strCanDoFeedback(pos, "Befehl an dieser Stelle nicht möglich", false);
+            }
+            var maxl = scriptText.Length;
+            //if (parent != null) {
+            //    var al = AllowedInIDs;
+            //    if (al != null && !al.Contains(parent.ID)) {
+            //        return new strCanDoFeedback(pos, "Befehl an dieser Stelle nicht möglich", false);
+            //    }
+            //}
+            foreach (var thiscomand in Comand(s)) {
+                var comandtext = thiscomand + StartSequence;
+                var l = comandtext.Length;
+                if (pos + l < maxl) {
+                    if (scriptText.Substring(pos, l).ToLower() == comandtext.ToLower()) {
+                        var f = GetEnd(scriptText, pos + thiscomand.Length, StartSequence.Length);
+                        if (!string.IsNullOrEmpty(f.ErrorMessage)) {
+                            return new strCanDoFeedback(f.ContinuePosition, "Fehler bei " + comandtext + ": " + f.ErrorMessage, true);
+                        }
+                        var cont = f.ContinuePosition;
+                        var codebltxt = string.Empty;
+                        if (GetCodeBlockAfter) {
+                            do {
+                                if (cont >= maxl) { return new strCanDoFeedback(f.ContinuePosition, "Kein nachfolgender Codeblock bei " + comandtext, true); }
+                                if (scriptText.Substring(cont, 1) == "{") { break; }
+                                if (scriptText.Substring(cont, 1) != "¶") { return new strCanDoFeedback(f.ContinuePosition, "Kein nachfolgender Codeblock bei " + comandtext, true); }
+                                cont++;
+                                s.Line++;
+                            } while (true);
+                            (var posek, var _) = NextText(scriptText, cont, GeschKlammerZu, false, false);
+                            if (posek < cont) {
+                                return new strCanDoFeedback(cont, "Kein Codeblock Ende bei " + comandtext, true);
+                            }
+                            codebltxt = scriptText.Substring(cont + 1, posek - cont - 1);
+                            //if (string.IsNullOrEmpty(codebltxt)) {
+                            //    return new strCanDoFeedback(cont, "Leerer Codeblock bei " + comandtext, true);
+                            //}
+                            cont = posek + 1;
+                        }
+                        return new strCanDoFeedback(cont, comandtext, f.AttributeText, codebltxt);
+                    }
+                }
+            }
+            return new strCanDoFeedback(pos, "Kann nicht geparst werden", false);
+        }
 
-        public QuickImage SymbolForReadableText() => null;
+        public abstract List<string> Comand(Script s);
+
+        public abstract strDoItFeedback DoIt(strCanDoFeedback infos, Script s);
 
         public string HintText() {
             var co = "Syntax:\r\n";
@@ -227,5 +223,20 @@ namespace BlueScript {
             co = co + Description + "\r\n";
             return co;
         }
+
+        public string ReadableText() => Syntax;
+
+        public QuickImage SymbolForReadableText() => null;
+
+        private strGetEndFeedback GetEnd(string scriptText, int startpos, int lenghtStartSequence) {
+            (var pos, var witch) = NextText(scriptText, startpos, new List<string>() { EndSequence }, false, false);
+            if (pos < startpos) {
+                return new strGetEndFeedback("Keinen Endpunkt gefunden.");
+            }
+            var txtBTW = scriptText.Substring(startpos + lenghtStartSequence, pos - startpos - lenghtStartSequence);
+            return new strGetEndFeedback(pos + witch.Length, txtBTW);
+        }
+
+        #endregion
     }
 }

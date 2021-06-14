@@ -5,6 +5,8 @@ namespace BlueControls.Designer_Support {
 
     public class BasicDesigner : ControlDesigner {
 
+        #region Methods
+
         protected override void PreFilterProperties(IDictionary properties) {
             properties.Remove("BackColor");
             properties.Remove("BackgroundImage");
@@ -26,5 +28,7 @@ namespace BlueControls.Designer_Support {
             properties.Remove("(AppicationSettings)");
             base.PreFilterProperties(properties);
         }
+
+        #endregion
     }
 }

@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,14 +15,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using System;
 using System.Drawing;
 
 namespace BlueBasics {
 
     public static partial class Extensions {
+
+        #region Methods
 
         public static void DrawImageInRectAspectRatio(this Graphics gR, Bitmap bmp, int x, int y, int width, int height) {
             var Sc = Math.Min((float)width / bmp.Width, (float)height / bmp.Height);
@@ -35,12 +33,14 @@ namespace BlueBasics {
 
         public static void DrawImageInRectAspectRatio(this Graphics gR, Bitmap bmp, Rectangle r) => DrawImageInRectAspectRatio(gR, bmp, r.Left, r.Top, r.Width, r.Height);
 
-        public static void DrawRectangle(this Graphics gR, Pen pen, RectangleF r) => gR.DrawRectangle(pen, r.X, r.Y, r.Width, r.Height);
-
         public static void DrawRad(this Graphics gR, Pen pen, PointF middle, PointF startP, float wink) {
             var radius = (float)Math.Abs(Geometry.Länge(middle, startP));
             var startw = (float)Geometry.Winkel(middle, startP);
             gR.DrawArc(pen, middle.X - radius, middle.Y - radius, radius * 2, radius * 2, -startw, -wink);
         }
+
+        public static void DrawRectangle(this Graphics gR, Pen pen, RectangleF r) => gR.DrawRectangle(pen, r.X, r.Y, r.Width, r.Height);
+
+        #endregion
     }
 }

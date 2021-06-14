@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -30,15 +26,16 @@ using System.Drawing.Printing;
 namespace BlueControls.Forms {
 
     public partial class PageSetupDialog : DialogWithOkAndCancel {
-        private bool Doing;
+
+        #region Fields
+
         private readonly PrintDocument OriD;
+        private bool Doing;
         private PrintDocument GiveBack = null;
 
-        public static PrintDocument Show(PrintDocument _PrintDocument1, bool NurHochformat) {
-            PageSetupDialog MB = new(_PrintDocument1, NurHochformat);
-            MB.ShowDialog();
-            return MB.GiveBack;
-        }
+        #endregion
+
+        #region Constructors
 
         private PageSetupDialog(PrintDocument _PrintDocument1, bool NurHochformat) : base() {
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -78,46 +75,69 @@ namespace BlueControls.Forms {
             Doing = false;
         }
 
-        private void Something_TextChanged(object sender, System.EventArgs e) {
+        #endregion
+
+        #region Methods
+
+        public static PrintDocument Show(PrintDocument _PrintDocument1, bool NurHochformat) {
+            PageSetupDialog MB = new(_PrintDocument1, NurHochformat);
+            MB.ShowDialog();
+            return MB.GiveBack;
+        }
+
+        protected override void SetValue(bool canceled) {
+            if (canceled) { GiveBack = null; return; }
+            GiveBack = new PrintDocument();
+            GiveBack.DefaultPageSettings.Landscape = Querformat.Checked;
+            GiveBack.DefaultPageSettings.PaperSize = new PaperSize("Benutzerdefiniert", (int)(float.Parse(Breite.Text) / 0.254), (int)(float.Parse(Höhe.Text) / 0.254));
+            GiveBack.DefaultPageSettings.Margins.Top = (int)(float.Parse(Oben.Text) / 0.254);
+            GiveBack.DefaultPageSettings.Margins.Bottom = (int)(float.Parse(Unten.Text) / 0.254);
+            GiveBack.DefaultPageSettings.Margins.Left = (int)(float.Parse(Links.Text) / 0.254);
+            GiveBack.DefaultPageSettings.Margins.Right = (int)(float.Parse(Rechts.Text) / 0.254);
+        }
+
+        private void Abmasse_TextChanged(object sender, System.EventArgs e) {
             if (Doing) { return; }
             Doing = true;
             DrawSampleAndCheckButton();
             Doing = false;
-            //generatePic()
         }
 
-        private void Format_ItemClicked(object sender, BasicListItemEventArgs e) {
-            if (Doing) { return; }
-            Doing = true;
-            if (Format.Text.Contains(";")) {
-                var l = Format.Text.SplitBy(";");
-                FillHöheBreite(int.Parse(l[0]), int.Parse(l[1]));
-            } else {
-                Format.Text = "neu";
-                FillHöheBreite(-1, -1);
+        private void DrawSampleAndCheckButton() {
+            var makeP = true;
+            if (!Breite.Text.IsFormat(enDataFormat.Gleitkommazahl)) { makeP = false; }
+            if (!Höhe.Text.IsFormat(enDataFormat.Gleitkommazahl)) { makeP = false; }
+            if (!Oben.Text.IsFormat(enDataFormat.Gleitkommazahl)) { makeP = false; }
+            if (!Unten.Text.IsFormat(enDataFormat.Gleitkommazahl)) { makeP = false; }
+            if (!Links.Text.IsFormat(enDataFormat.Gleitkommazahl)) { makeP = false; }
+            if (!Rechts.Text.IsFormat(enDataFormat.Gleitkommazahl)) { makeP = false; }
+            double br = 0;
+            double ho = 0;
+            if (makeP) {
+                br = double.Parse(Breite.Text);
+                if (br < 5) { makeP = false; }
+                ho = double.Parse(Höhe.Text);
+                if (ho < 5) { makeP = false; }
             }
-            DrawSampleAndCheckButton();
-            Doing = false;
+            if (Querformat.Checked) { modAllgemein.Swap(ref br, ref ho); }
+            if (makeP) {
+                OK_Enabled = true;
+                var Z = Math.Min(Sample.Width / br, Sample.Height / ho);
+                var l = (float)(float.Parse(Links.Text) * Z);
+                var o = (float)(float.Parse(Oben.Text) * Z);
+                var r = (float)(float.Parse(Rechts.Text) * Z);
+                var u = (float)(float.Parse(Unten.Text) * Z);
+                Bitmap i = new((int)((br * Z) - 1), (int)((ho * Z) - 1));
+                var gr = Graphics.FromImage(i);
+                gr.Clear(Color.White);
+                gr.DrawRectangle(Pens.Black, 0, 0, i.Width - 1, i.Height - 1);
+                gr.DrawRectangle(Pens.Gray, l, o, i.Width - r - l, i.Height - u - o);
+                Sample.Image = i;
+            } else {
+                OK_Enabled = false;
+                Sample.Image = null;
+            }
         }
-
-        private double Inch1000ToMM(double inch) => inch switch {
-            8 => 2.0F,
-            16 => 4.0F,
-            20 => 5.0F,
-            39 => 10.0F,
-            79 => 20.0F,
-            98 => 25.0F,
-            394 => 100.0F,
-            413 => 105.0F,
-            432 => 110.0F,
-            583 => 148.0F,
-            591 => 150.0F,
-            787 => 200.0F,
-            827 => 210.0F,
-            1169 => 297.0F,
-            1654 => 420.0F,
-            _ => Math.Round(inch * 0.254, 1),
-        };
 
         private void FillHöheBreite(double B, double h) {
             var nn1 = B + ";" + h;
@@ -168,9 +188,16 @@ namespace BlueControls.Forms {
             Höhe.Text = Math.Round(h, 1).ToString();
         }
 
-        private void Abmasse_TextChanged(object sender, System.EventArgs e) {
+        private void Format_ItemClicked(object sender, BasicListItemEventArgs e) {
             if (Doing) { return; }
             Doing = true;
+            if (Format.Text.Contains(";")) {
+                var l = Format.Text.SplitBy(";");
+                FillHöheBreite(int.Parse(l[0]), int.Parse(l[1]));
+            } else {
+                Format.Text = "neu";
+                FillHöheBreite(-1, -1);
+            }
             DrawSampleAndCheckButton();
             Doing = false;
         }
@@ -183,51 +210,33 @@ namespace BlueControls.Forms {
             Doing = false;
         }
 
-        private void DrawSampleAndCheckButton() {
-            var makeP = true;
-            if (!Breite.Text.IsFormat(enDataFormat.Gleitkommazahl)) { makeP = false; }
-            if (!Höhe.Text.IsFormat(enDataFormat.Gleitkommazahl)) { makeP = false; }
-            if (!Oben.Text.IsFormat(enDataFormat.Gleitkommazahl)) { makeP = false; }
-            if (!Unten.Text.IsFormat(enDataFormat.Gleitkommazahl)) { makeP = false; }
-            if (!Links.Text.IsFormat(enDataFormat.Gleitkommazahl)) { makeP = false; }
-            if (!Rechts.Text.IsFormat(enDataFormat.Gleitkommazahl)) { makeP = false; }
-            double br = 0;
-            double ho = 0;
-            if (makeP) {
-                br = double.Parse(Breite.Text);
-                if (br < 5) { makeP = false; }
-                ho = double.Parse(Höhe.Text);
-                if (ho < 5) { makeP = false; }
-            }
-            if (Querformat.Checked) { modAllgemein.Swap(ref br, ref ho); }
-            if (makeP) {
-                OK_Enabled = true;
-                var Z = Math.Min(Sample.Width / br, Sample.Height / ho);
-                var l = (float)(float.Parse(Links.Text) * Z);
-                var o = (float)(float.Parse(Oben.Text) * Z);
-                var r = (float)(float.Parse(Rechts.Text) * Z);
-                var u = (float)(float.Parse(Unten.Text) * Z);
-                Bitmap i = new((int)((br * Z) - 1), (int)((ho * Z) - 1));
-                var gr = Graphics.FromImage(i);
-                gr.Clear(Color.White);
-                gr.DrawRectangle(Pens.Black, 0, 0, i.Width - 1, i.Height - 1);
-                gr.DrawRectangle(Pens.Gray, l, o, i.Width - r - l, i.Height - u - o);
-                Sample.Image = i;
-            } else {
-                OK_Enabled = false;
-                Sample.Image = null;
-            }
+        private double Inch1000ToMM(double inch) => inch switch {
+            8 => 2.0F,
+            16 => 4.0F,
+            20 => 5.0F,
+            39 => 10.0F,
+            79 => 20.0F,
+            98 => 25.0F,
+            394 => 100.0F,
+            413 => 105.0F,
+            432 => 110.0F,
+            583 => 148.0F,
+            591 => 150.0F,
+            787 => 200.0F,
+            827 => 210.0F,
+            1169 => 297.0F,
+            1654 => 420.0F,
+            _ => Math.Round(inch * 0.254, 1),
+        };
+
+        private void Something_TextChanged(object sender, System.EventArgs e) {
+            if (Doing) { return; }
+            Doing = true;
+            DrawSampleAndCheckButton();
+            Doing = false;
+            //generatePic()
         }
 
-        protected override void SetValue(bool canceled) {
-            if (canceled) { GiveBack = null; return; }
-            GiveBack = new PrintDocument();
-            GiveBack.DefaultPageSettings.Landscape = Querformat.Checked;
-            GiveBack.DefaultPageSettings.PaperSize = new PaperSize("Benutzerdefiniert", (int)(float.Parse(Breite.Text) / 0.254), (int)(float.Parse(Höhe.Text) / 0.254));
-            GiveBack.DefaultPageSettings.Margins.Top = (int)(float.Parse(Oben.Text) / 0.254);
-            GiveBack.DefaultPageSettings.Margins.Bottom = (int)(float.Parse(Unten.Text) / 0.254);
-            GiveBack.DefaultPageSettings.Margins.Left = (int)(float.Parse(Links.Text) / 0.254);
-            GiveBack.DefaultPageSettings.Margins.Right = (int)(float.Parse(Rechts.Text) / 0.254);
-        }
+        #endregion
     }
 }

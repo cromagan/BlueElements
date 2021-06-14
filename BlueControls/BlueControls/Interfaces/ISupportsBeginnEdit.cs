@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,11 +15,17 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 namespace BlueControls.Interfaces {
 
     public interface ISupportsBeginnEdit {
+
+        #region Properties
+
+        int BeginnEditCounter { get; set; }
+
+        #endregion
+
+        #region Methods
 
         void BeginnEdit();
 
@@ -29,6 +33,6 @@ namespace BlueControls.Interfaces {
 
         void EndEdit();
 
-        int BeginnEditCounter { get; set; }
+        #endregion
     }
 }

@@ -1,5 +1,3 @@
-#region BlueElements - a collection of useful tools, database and controls
-
 // Authors:
 // Christian Peter
 //
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -30,27 +26,19 @@ namespace BlueDatabase {
 
     public sealed class FilterItem : IParseable, ICompareKey, IReadableTextWithChanging, ICanBeEmpty, IDisposable {
 
-        #region Variablen-Deklarationen
+        #region Fields
 
-        /// <summary>
-        /// Der Edit-Dialog braucht die Datenbank, um mit Texten die Spalte zu suchen.
-        /// </summary>
-        public Database Database { get; private set; }
+        public string Herkunft = string.Empty;
 
         private ColumnItem _Column;
+
         private enFilterType _FilterType = enFilterType.KeinFilter;
-        public string Herkunft = string.Empty;
+
         private bool disposedValue;
 
-        #endregion Variablen-Deklarationen
+        #endregion
 
-        #region Event-Deklarationen + Delegaten
-
-        public event EventHandler Changed;
-
-        #endregion Event-Deklarationen + Delegaten
-
-        #region Construktor + Initialize
+        #region Constructors
 
         public FilterItem(Database database, enFilterType filterType, string searchValue) : this(database, filterType, new List<string>() { searchValue }) {
         }
@@ -92,11 +80,15 @@ namespace BlueDatabase {
         public FilterItem(ColumnItem column, RowItem rowWithValue) : this(column, enFilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, rowWithValue.CellGetString(column)) {
         }
 
-        #endregion Construktor + Initialize
+        #endregion
+
+        #region Events
+
+        public event EventHandler Changed;
+
+        #endregion
 
         #region Properties
-
-        public bool IsParsing { get; private set; }
 
         public ColumnItem Column {
             get => _Column;
@@ -106,7 +98,10 @@ namespace BlueDatabase {
             }
         }
 
-        public ListExt<string> SearchValue { get; private set; } = new ListExt<string>();
+        /// <summary>
+        /// Der Edit-Dialog braucht die Datenbank, um mit Texten die Spalte zu suchen.
+        /// </summary>
+        public Database Database { get; private set; }
 
         public enFilterType FilterType {
             get => _FilterType;
@@ -116,22 +111,47 @@ namespace BlueDatabase {
             }
         }
 
+        public bool IsParsing { get; private set; }
+        public ListExt<string> SearchValue { get; private set; } = new ListExt<string>();
+
+        #endregion
+
+        #region Methods
+
+        public void Changeto(enFilterType type, string searchvalue) {
+            SearchValue.ThrowEvents = false;
+            SearchValue.Clear();
+            SearchValue.Add(searchvalue);
+            _FilterType = type;
+            SearchValue.ThrowEvents = true;
+            OnChanged();
+        }
+
+        public object Clone() => new FilterItem(Database, ToString());
+
+        public string CompareKey() => ((int)_FilterType).ToString(Constants.Format_Integer10);
+
+        // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
+        // ~FilterItem()
+        // {
+        //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+        //     Dispose(disposing: false);
+        // }
+        public void Dispose() {
+            // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
+        public string ErrorReason() => _FilterType == enFilterType.KeinFilter ? "'Kein Filter' angegeben" : string.Empty;
+
+        public bool IsNullOrEmpty() => _FilterType == enFilterType.KeinFilter;
+
+        public bool IsOk() => string.IsNullOrEmpty(ErrorReason());
+
         public void OnChanged() {
             if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
             Changed?.Invoke(this, System.EventArgs.Empty);
-        }
-
-        #endregion Properties
-
-        public override string ToString() {
-            if (!IsOk()) { return string.Empty; }
-            var Result = "{Type=" + (int)_FilterType;
-            if (_Column != null) { Result = Result + ", " + _Column.ParsableColumnKey(); }
-            foreach (var t in SearchValue) {
-                Result = Result + ", Value=" + t.ToNonCritical();
-            }
-            if (!string.IsNullOrEmpty(Herkunft)) { Result = Result + ", Herkunft=" + Herkunft.ToNonCritical(); }
-            return Result + "}";
         }
 
         public void Parse(string ToParse) {
@@ -172,8 +192,6 @@ namespace BlueDatabase {
             if (ToParse.Contains(", Value=}") || ToParse.Contains(", Value=,")) { SearchValue.Add(""); }
             IsParsing = false;
         }
-
-        public string CompareKey() => ((int)_FilterType).ToString(Constants.Format_Integer10);
 
         public string ReadableText() {
             if (_FilterType == enFilterType.KeinFilter) { return "Filter ohne Funktion"; }
@@ -234,23 +252,15 @@ namespace BlueDatabase {
 
         public QuickImage SymbolForReadableText() => null;
 
-        public bool IsNullOrEmpty() => _FilterType == enFilterType.KeinFilter;
-
-        public object Clone() => new FilterItem(Database, ToString());
-
-        public bool IsOk() => string.IsNullOrEmpty(ErrorReason());
-
-        public string ErrorReason() => _FilterType == enFilterType.KeinFilter ? "'Kein Filter' angegeben" : string.Empty;
-
-        private void SearchValue_ListOrItemChanged(object sender, System.EventArgs e) => OnChanged();
-
-        public void Changeto(enFilterType type, string searchvalue) {
-            SearchValue.ThrowEvents = false;
-            SearchValue.Clear();
-            SearchValue.Add(searchvalue);
-            _FilterType = type;
-            SearchValue.ThrowEvents = true;
-            OnChanged();
+        public override string ToString() {
+            if (!IsOk()) { return string.Empty; }
+            var Result = "{Type=" + (int)_FilterType;
+            if (_Column != null) { Result = Result + ", " + _Column.ParsableColumnKey(); }
+            foreach (var t in SearchValue) {
+                Result = Result + ", Value=" + t.ToNonCritical();
+            }
+            if (!string.IsNullOrEmpty(Herkunft)) { Result = Result + ", Herkunft=" + Herkunft.ToNonCritical(); }
+            return Result + "}";
         }
 
         private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
@@ -271,16 +281,8 @@ namespace BlueDatabase {
             }
         }
 
-        // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
-        // ~FilterItem()
-        // {
-        //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-        //     Dispose(disposing: false);
-        // }
-        public void Dispose() {
-            // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
+        private void SearchValue_ListOrItemChanged(object sender, System.EventArgs e) => OnChanged();
+
+        #endregion
     }
 }

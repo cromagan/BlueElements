@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,19 +15,21 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 namespace BlueControls.Interfaces {
 
     public interface IMouseAndKeyHandle {
 
-        bool MouseDown(object sender, System.Windows.Forms.MouseEventArgs e, decimal zoom, decimal shiftX, decimal shiftY);
+        #region Methods
 
-        bool MouseMove(object sender, System.Windows.Forms.MouseEventArgs e, decimal zoom, decimal shiftX, decimal shiftY);
+        bool KeyUp(object sender, System.Windows.Forms.KeyEventArgs e, double zoom, double shiftX, double shiftY);
 
-        bool MouseUp(object sender, System.Windows.Forms.MouseEventArgs e, decimal zoom, decimal shiftX, decimal shiftY);
+        bool MouseDown(object sender, System.Windows.Forms.MouseEventArgs e, double zoom, double shiftX, double shiftY);
 
-        bool KeyUp(object sender, System.Windows.Forms.KeyEventArgs e, decimal zoom, decimal shiftX, decimal shiftY);
+        bool MouseMove(object sender, System.Windows.Forms.MouseEventArgs e, double zoom, double shiftX, double shiftY);
+
+        bool MouseUp(object sender, System.Windows.Forms.MouseEventArgs e, double zoom, double shiftX, double shiftY);
+
+        #endregion
 
         //Function BlueCreativePad_MouseWheel(sender As Object, e As System.Windows.Forms.MouseEventArgs) As Boolean
         //Function MouseClick(sender As Object, e As System.Windows.Forms.MouseEventArgs) As Boolean

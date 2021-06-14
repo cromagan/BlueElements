@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using System;
@@ -29,14 +25,21 @@ namespace BlueControls.Controls {
 
     [Designer(typeof(BasicDesigner))]
     public class ProgressBar : GenericControl {
+
+        #region Fields
+
         private int wProzent = 100;
 
-        #region Constructor
+        #endregion
+
+        #region Constructors
 
         public ProgressBar() : base(false, false) {
         }
 
-        #endregion Constructor
+        #endregion
+
+        #region Properties
 
         [DefaultValue(100)]
         public int Prozent {
@@ -56,6 +59,10 @@ namespace BlueControls.Controls {
             }
         }
 
+        #endregion
+
+        #region Methods
+
         //Friend Overrides Sub PrepareForShowing()
         //    'Stop
         //End Sub
@@ -71,5 +78,7 @@ namespace BlueControls.Controls {
             }
             Skin.Draw_Border(gr, enDesign.Progressbar, state, DisplayRectangle);
         }
+
+        #endregion
     }
 }

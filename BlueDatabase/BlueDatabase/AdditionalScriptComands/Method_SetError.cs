@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
@@ -27,19 +23,30 @@ namespace BlueScript {
 
     public class Method_SetError : Method {
 
-        //public Method_SetError(Script parent) : base(parent) { }
-        public override string Syntax => "SetError(Nachricht, Column1, Colum2, ...);";
+        #region Properties
+
+        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.Variable_List_String_Numeral_or_Bool };
 
         public override string Description => "Bei Zeilenprüfungen wird ein Fehler abgesetzt. Dessen Inhalt bestimmt die Nachricht. Die Spalten, die als fehlerhaft markiert werden sollen, müssen nachträglich als Variablennamen angegeben werden.";
 
-        public override List<string> Comand(Script s) => new() { "seterror" };
+        public override bool EndlessArgs => true;
+
+        public override string EndSequence => ");";
+
+        public override bool GetCodeBlockAfter => false;
+
+        public override enVariableDataType Returns => enVariableDataType.Null;
 
         public override string StartSequence => "(";
-        public override string EndSequence => ");";
-        public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.Null;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.Variable_List_String_Numeral_or_Bool };
-        public override bool EndlessArgs => true;
+
+        //public Method_SetError(Script parent) : base(parent) { }
+        public override string Syntax => "SetError(Nachricht, Column1, Colum2, ...);";
+
+        #endregion
+
+        #region Methods
+
+        public override List<string> Comand(Script s) => new() { "seterror" };
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
@@ -57,5 +64,7 @@ namespace BlueScript {
             }
             return new strDoItFeedback();
         }
+
+        #endregion
     }
 }

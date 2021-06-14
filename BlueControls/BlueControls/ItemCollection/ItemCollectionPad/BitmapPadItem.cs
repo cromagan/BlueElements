@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -16,8 +14,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-
-#endregion BlueElements - a collection of useful tools, database and controls
 
 using BlueBasics;
 using BlueBasics.Enums;
@@ -37,21 +33,14 @@ namespace BlueControls.ItemCollection {
 
     public class BitmapPadItem : FormPadItemRectangle, ICanHaveColumnVariables {
 
-        #region Variablen-Deklarationen
+        #region Fields
 
-        public bool Hintergrund_weiß_füllen { get; set; }
-        public int Padding;
         public List<QuickImage> Overlays;
-        public enSizeModes Bild_Modus { get; set; }
+        public int Padding;
 
-        [Description("Hier kann ein Platzhalter, der mit dem Code-Generator erzeugt wurde, eingefügt werden.")]
-        public string Platzhalter_für_Layout { get; set; }
+        #endregion
 
-        #endregion Variablen-Deklarationen
-
-
-
-        #region Construktor + Initialize
+        #region Constructors
 
         public BitmapPadItem(ItemCollectionPad parent) : this(parent, string.Empty, null, Size.Empty) {
         }
@@ -78,11 +67,20 @@ namespace BlueControls.ItemCollection {
             Stil = PadStyles.Undefiniert; // Kein Rahmen
         }
 
-        #endregion Construktor + Initialize
+        #endregion
 
         #region Properties
 
+        public enSizeModes Bild_Modus { get; set; }
         public Bitmap Bitmap { get; set; }
+        public bool Hintergrund_weiß_füllen { get; set; }
+
+        [Description("Hier kann ein Platzhalter, der mit dem Code-Generator erzeugt wurde, eingefügt werden.")]
+        public string Platzhalter_für_Layout { get; set; }
+
+        #endregion
+
+        #region Methods
 
         public void Bildschirmbereich_wählen() {
             if (Bitmap != null) {
@@ -106,11 +104,103 @@ namespace BlueControls.ItemCollection {
             Bitmap = (Bitmap)BitmapExt.Image_FromFile(e.FileName);
         }
 
-        #endregion Properties
+        public override List<FlexiControl> GetStyleOptions() {
+            List<FlexiControl> l = new()
+            {
+                new FlexiControlForProperty(this, "Bildschirmbereich_wählen", enImageCode.Bild),
+                new FlexiControlForProperty(this, "Datei_laden", enImageCode.Ordner),
+                new FlexiControl(),
+                new FlexiControlForProperty(this, "Platzhalter_für_Layout", 2),
+                new FlexiControl()
+            };
+            ItemCollectionList Comms = new()
+            {
+                { "Abschneiden", ((int)enSizeModes.BildAbschneiden).ToString(), QuickImage.Get("BildmodusAbschneiden|32") },
+                { "Verzerren", ((int)enSizeModes.Verzerren).ToString(), QuickImage.Get("BildmodusVerzerren|32") },
+                { "Einpassen", ((int)enSizeModes.EmptySpace).ToString(), QuickImage.Get("BildmodusEinpassen|32") }
+            };
+            l.Add(new FlexiControlForProperty(this, "Bild-Modus", Comms));
+            l.Add(new FlexiControl());
+            AddLineStyleOption(l);
+            l.Add(new FlexiControlForProperty(this, "Hintergrund_weiß_füllen"));
+            l.AddRange(base.GetStyleOptions());
+            return l;
+        }
+
+        public override bool ParseThis(string tag, string value) {
+            if (base.ParseThis(tag, value)) { return true; }
+            switch (tag) {
+                case "stretchallowed": // ALT
+                    return true;
+
+                case "modus":
+                    Bild_Modus = (enSizeModes)int.Parse(value);
+                    return true;
+
+                case "whiteback":
+                    Hintergrund_weiß_füllen = value.FromPlusMinus();
+                    return true;
+
+                case "padding":
+                    Padding = int.Parse(value);
+                    return true;
+
+                case "image":
+                    Bitmap = modConverter.Base64ToBitmap(value);
+                    return true;
+
+                case "placeholder":
+                    Platzhalter_für_Layout = value.FromNonCritical();
+                    return true;
+            }
+            return false;
+        }
+
+        public bool ReplaceVariable(BlueScript.Variable variable) {
+            if (string.IsNullOrEmpty(Platzhalter_für_Layout)) { return false; }
+            if ("&" + variable.Name.ToLower() + ";" != Platzhalter_für_Layout.ToLower()) { return false; }
+            if (variable.Type != Skript.Enums.enVariableDataType.Bitmap) { return false; }
+            var ot = variable.ValueBitmap;
+            if (ot is Bitmap bmp) {
+                Bitmap = bmp;
+                OnChanged();
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        public bool ResetVariables() {
+            if (!string.IsNullOrEmpty(Platzhalter_für_Layout) && Bitmap != null) {
+                Bitmap.Dispose();
+                Bitmap = null;
+                OnChanged();
+                return true;
+            }
+            return false;
+        }
+
+        public override string ToString() {
+            var t = base.ToString();
+            t = t.Substring(0, t.Length - 1) + ", ";
+            t = t + "Modus=" + (int)Bild_Modus + ", ";
+            if (!string.IsNullOrEmpty(Platzhalter_für_Layout)) {
+                t = t + "Placeholder=" + Platzhalter_für_Layout.ToNonCritical() + ", ";
+            }
+            t = t + "WhiteBack=" + Hintergrund_weiß_füllen.ToPlusMinus() + ", ";
+            foreach (var thisQI in Overlays) {
+                t = t + "Overlay=" + thisQI + ", ";
+            }
+            t = t + "Padding=" + Padding + ", ";
+            if (Bitmap != null) {
+                t = t + "Image=" + modConverter.BitmapToBase64(Bitmap, ImageFormat.Png) + ", ";
+            }
+            return t.Trim(", ") + "}";
+        }
 
         protected override string ClassId() => "IMAGE";
 
-        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
+        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, double cZoom, double shiftX, double shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
             DCoordinates.Inflate(-Padding, -Padding);
             RectangleF r1 = new(DCoordinates.Left + Padding, DCoordinates.Top + Padding, DCoordinates.Width - (Padding * 2), DCoordinates.Height - (Padding * 2));
             RectangleF r2 = new();
@@ -180,102 +270,10 @@ namespace BlueControls.ItemCollection {
             base.DrawExplicit(GR, DCoordinates, cZoom, shiftX, shiftY, vState, SizeOfParentControl, ForPrinting);
         }
 
-        public override bool ParseThis(string tag, string value) {
-            if (base.ParseThis(tag, value)) { return true; }
-            switch (tag) {
-                case "stretchallowed": // ALT
-                    return true;
-
-                case "modus":
-                    Bild_Modus = (enSizeModes)int.Parse(value);
-                    return true;
-
-                case "whiteback":
-                    Hintergrund_weiß_füllen = value.FromPlusMinus();
-                    return true;
-
-                case "padding":
-                    Padding = int.Parse(value);
-                    return true;
-
-                case "image":
-                    Bitmap = modConverter.Base64ToBitmap(value);
-                    return true;
-
-                case "placeholder":
-                    Platzhalter_für_Layout = value.FromNonCritical();
-                    return true;
-            }
-            return false;
-        }
-
         protected override void ParseFinished() {
         }
 
-        public override string ToString() {
-            var t = base.ToString();
-            t = t.Substring(0, t.Length - 1) + ", ";
-            t = t + "Modus=" + (int)Bild_Modus + ", ";
-            if (!string.IsNullOrEmpty(Platzhalter_für_Layout)) {
-                t = t + "Placeholder=" + Platzhalter_für_Layout.ToNonCritical() + ", ";
-            }
-            t = t + "WhiteBack=" + Hintergrund_weiß_füllen.ToPlusMinus() + ", ";
-            foreach (var thisQI in Overlays) {
-                t = t + "Overlay=" + thisQI + ", ";
-            }
-            t = t + "Padding=" + Padding + ", ";
-            if (Bitmap != null) {
-                t = t + "Image=" + modConverter.BitmapToBase64(Bitmap, ImageFormat.Png) + ", ";
-            }
-            return t.Trim(", ") + "}";
-        }
-
-        public bool ReplaceVariable(BlueScript.Variable variable) {
-            if (string.IsNullOrEmpty(Platzhalter_für_Layout)) { return false; }
-            if ("&" + variable.Name.ToLower() + ";" != Platzhalter_für_Layout.ToLower()) { return false; }
-            if (variable.Type != Skript.Enums.enVariableDataType.Bitmap) { return false; }
-            var ot = variable.ValueBitmap;
-            if (ot is Bitmap bmp) {
-                Bitmap = bmp;
-                OnChanged();
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        public bool ResetVariables() {
-            if (!string.IsNullOrEmpty(Platzhalter_für_Layout) && Bitmap != null) {
-                Bitmap.Dispose();
-                Bitmap = null;
-                OnChanged();
-                return true;
-            }
-            return false;
-        }
-
-        public override List<FlexiControl> GetStyleOptions() {
-            List<FlexiControl> l = new()
-            {
-                new FlexiControlForProperty(this, "Bildschirmbereich_wählen", enImageCode.Bild),
-                new FlexiControlForProperty(this, "Datei_laden", enImageCode.Ordner),
-                new FlexiControl(),
-                new FlexiControlForProperty(this, "Platzhalter_für_Layout", 2),
-                new FlexiControl()
-            };
-            ItemCollectionList Comms = new()
-            {
-                { "Abschneiden", ((int)enSizeModes.BildAbschneiden).ToString(), QuickImage.Get("BildmodusAbschneiden|32") },
-                { "Verzerren", ((int)enSizeModes.Verzerren).ToString(), QuickImage.Get("BildmodusVerzerren|32") },
-                { "Einpassen", ((int)enSizeModes.EmptySpace).ToString(), QuickImage.Get("BildmodusEinpassen|32") }
-            };
-            l.Add(new FlexiControlForProperty(this, "Bild-Modus", Comms));
-            l.Add(new FlexiControl());
-            AddLineStyleOption(l);
-            l.Add(new FlexiControlForProperty(this, "Hintergrund_weiß_füllen"));
-            l.AddRange(base.GetStyleOptions());
-            return l;
-        }
+        #endregion
 
         //public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
         //{
@@ -322,8 +320,8 @@ namespace BlueControls.ItemCollection {
         //        }
         //        var x = p_RU.X - p_LO.X;
         //        var y = p_RU.Y - p_LO.Y;
-        //        p_RU.X = (decimal)((double)p_LO.X + (double)x * sc);
-        //        p_RU.Y = (decimal)((double)p_LO.Y + (double)y * sc);
+        //        p_RU.X = (double)((double)p_LO.X + (double)x * sc);
+        //        p_RU.Y = (double)((double)p_LO.Y + (double)y * sc);
         //        KeepInternalLogic();
         //        return;
         //    }

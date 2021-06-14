@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using Skript.Enums;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -27,17 +23,23 @@ using static BlueBasics.Extensions;
 namespace BlueScript {
 
     internal class Method_StringShortenWord : Method {
-        public override string Syntax => "StringShortenWord(String)";
+
+        #region Properties
+
+        public override List<enVariableDataType> Args => new() { enVariableDataType.String_or_List };
         public override string Description => "Versucht den String zu kürzen, indem Abkürzungen verwendet werden.";
-
-        public override List<string> Comand(Script s) => new() { "stringshortenword" };
-
-        public override string StartSequence => "(";
+        public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.String;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String_or_List };
-        public override bool EndlessArgs => false;
+        public override string StartSequence => "(";
+        public override string Syntax => "StringShortenWord(String)";
+
+        #endregion
+
+        #region Methods
+
+        public override List<string> Comand(Script s) => new() { "stringshortenword" };
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
@@ -105,5 +107,7 @@ namespace BlueScript {
             }
             return new strDoItFeedback(TXT, enVariableDataType.String);
         }
+
+        #endregion
     }
 }

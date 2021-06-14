@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,16 +15,22 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using System.Collections.Generic;
 
 namespace BlueBasics.EventArgs {
 
     public class MultiUserFileStopWorkingEventArgs : System.EventArgs {
 
+        #region Constructors
+
         public MultiUserFileStopWorkingEventArgs() => AllreadyStopped = new List<string>();
 
+        #endregion
+
+        #region Properties
+
         public List<string> AllreadyStopped { get; }
+
+        #endregion
     }
 }

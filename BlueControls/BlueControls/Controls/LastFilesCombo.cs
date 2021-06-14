@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -16,8 +14,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-
-#endregion BlueElements - a collection of useful tools, database and controls
 
 using BlueBasics;
 using BlueControls.Designer_Support;
@@ -35,23 +31,27 @@ namespace BlueControls.Controls {
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("ItemClicked")]
     public sealed class LastFilesCombo : ComboBox {
-        private List<string> LastD = new();
+
+        #region Fields
+
         public string _filename = string.Empty;
-        public bool _mustExists = true;
         public int _maxCount = 20;
+        public bool _mustExists = true;
+        private List<string> LastD = new();
+
+        #endregion
+
         //public string _specialcommand = string.Empty;
 
-        #region Constructor
+        #region Constructors
 
         public LastFilesCombo() : base() => SetLastFilesStyle();
 
-        #endregion Constructor
-
-        #region Events
+        #endregion
 
         //public event System.EventHandler SpecialCommandClicked;
 
-        #endregion Events
+        #region Properties
 
         /// <summary>
         /// Wohin die Datei gespeichtert werden soll, welche Dateien zuletzt benutzt wurden.
@@ -64,6 +64,16 @@ namespace BlueControls.Controls {
                 if (_filename == value) { return; }
                 _filename = value;
                 LoadFromDisk();
+                GenerateMenu();
+            }
+        }
+
+        [DefaultValue(20)]
+        public int MaxCount {
+            get => _maxCount;
+            set {
+                if (_maxCount == value) { return; }
+                _maxCount = value;
                 GenerateMenu();
             }
         }
@@ -96,14 +106,44 @@ namespace BlueControls.Controls {
             }
         }
 
-        [DefaultValue(20)]
-        public int MaxCount {
-            get => _maxCount;
-            set {
-                if (_maxCount == value) { return; }
-                _maxCount = value;
-                GenerateMenu();
+        #endregion
+
+        #region Methods
+
+        public void AddFileName(string FileName, string AdditionalText) {
+            var s = FileName + "|" + AdditionalText;
+            s = s.Replace("\r\n", ";");
+            s = s.Replace("\r", ";");
+            s = s.Replace("\n", ";");
+            if (!_mustExists || FileExists(FileName)) {
+                if (LastD.Count > 0) { LastD.RemoveString(FileName, false); }
+                if (LastD.Count > 0) { LastD.RemoveString(s, false); }
+                LastD.Add(s);
+                LastD.Save(SaveFile(), false, System.Text.Encoding.GetEncoding(1252));
             }
+            GenerateMenu();
+        }
+
+        protected override void DrawControl(Graphics gr, enStates state) {
+            SetLastFilesStyle();
+            base.DrawControl(gr, state);
+        }
+
+        protected override void OnHandleCreated(System.EventArgs e) {
+            base.OnHandleCreated(e);
+            LoadFromDisk();
+            GenerateMenu();
+        }
+
+        protected override void OnItemClicked(BasicListItemEventArgs e) {
+            //if (!string.IsNullOrEmpty(_specialcommand) && e.Item.Internal == "#SPECIAL#")
+            //{
+            //    OnSpecialCommandClicked();
+            //    return;
+            //}
+            base.OnItemClicked(e);
+            var t = (List<string>)e.Item.Tag;
+            AddFileName(e.Item.Internal, t[0]);
         }
 
         private void GenerateMenu() {
@@ -142,33 +182,6 @@ namespace BlueControls.Controls {
             Enabled = Vis;
         }
 
-        public void AddFileName(string FileName, string AdditionalText) {
-            var s = FileName + "|" + AdditionalText;
-            s = s.Replace("\r\n", ";");
-            s = s.Replace("\r", ";");
-            s = s.Replace("\n", ";");
-            if (!_mustExists || FileExists(FileName)) {
-                if (LastD.Count > 0) { LastD.RemoveString(FileName, false); }
-                if (LastD.Count > 0) { LastD.RemoveString(s, false); }
-                LastD.Add(s);
-                LastD.Save(SaveFile(), false, System.Text.Encoding.GetEncoding(1252));
-            }
-            GenerateMenu();
-        }
-
-        protected override void DrawControl(Graphics gr, enStates state) {
-            SetLastFilesStyle();
-            base.DrawControl(gr, state);
-        }
-
-        protected override void OnHandleCreated(System.EventArgs e) {
-            base.OnHandleCreated(e);
-            LoadFromDisk();
-            GenerateMenu();
-        }
-
-        private string SaveFile() => !string.IsNullOrEmpty(_filename) ? _filename : System.Windows.Forms.Application.StartupPath + Name + "-Files.laf";
-
         private void LoadFromDisk() {
             LastD = new List<string>();
             if (FileExists(SaveFile())) {
@@ -178,6 +191,8 @@ namespace BlueControls.Controls {
             }
         }
 
+        private string SaveFile() => !string.IsNullOrEmpty(_filename) ? _filename : System.Windows.Forms.Application.StartupPath + Name + "-Files.laf";
+
         private void SetLastFilesStyle() {
             if (DrawStyle == enComboboxStyle.TextBox) {
                 DrawStyle = enComboboxStyle.Button;
@@ -186,16 +201,7 @@ namespace BlueControls.Controls {
             if (string.IsNullOrEmpty(Text)) { Text = "zuletzt geöffnete Dateien"; }
         }
 
-        protected override void OnItemClicked(BasicListItemEventArgs e) {
-            //if (!string.IsNullOrEmpty(_specialcommand) && e.Item.Internal == "#SPECIAL#")
-            //{
-            //    OnSpecialCommandClicked();
-            //    return;
-            //}
-            base.OnItemClicked(e);
-            var t = (List<string>)e.Item.Tag;
-            AddFileName(e.Item.Internal, t[0]);
-        }
+        #endregion
 
         //private void OnSpecialCommandClicked()
         //{

@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using Skript.Enums;
 using System.Collections.Generic;
 using static BlueBasics.Extensions;
@@ -26,22 +22,30 @@ using static BlueBasics.Extensions;
 namespace BlueScript {
 
     internal class Method_StringHTMLToAscii : Method {
-        public override string Syntax => "StringHTMLToAscii(String, IgnoreBRbool)";
+
+        #region Properties
+
+        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.Bool };
         public override string Description => "Ersetzt einen HTML-String zu normalen ASCII-String. Beispiel: Aus &auml; wird ä. Dabei kann der Zeilenumbuch explicit ausgenommen werden.";
-
-        public override List<string> Comand(Script s) => new() { "stringhtmltoascii" };
-
-        public override string StartSequence => "(";
+        public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.String;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.Bool };
-        public override bool EndlessArgs => false;
+        public override string StartSequence => "(";
+        public override string Syntax => "StringHTMLToAscii(String, IgnoreBRbool)";
+
+        #endregion
+
+        #region Methods
+
+        public override List<string> Comand(Script s) => new() { "stringhtmltoascii" };
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             return string.IsNullOrEmpty(attvar.ErrorMessage) ? new strDoItFeedback(attvar.Attributes[0].ValueString.HTMLSpecialToNormalChar(attvar.Attributes[1].ValueBool), enVariableDataType.String)
                                                              : strDoItFeedback.AttributFehler(this, attvar);
         }
+
+        #endregion
     }
 }

@@ -6,9 +6,14 @@ using System.Collections.Generic;
 namespace BlueControls.Forms {
 
     public partial class EditBoxFlexiControl : DialogWithOkAndCancel {
+
+        #region Fields
+
         private List<string> GiveBack = null;
 
-        #region Konstruktor
+        #endregion
+
+        #region Constructors
 
         private EditBoxFlexiControl() : base() => InitializeComponent();
 
@@ -32,7 +37,9 @@ namespace BlueControls.Forms {
             Setup(we, top, true, false);
         }
 
-        #endregion Konstruktor
+        #endregion
+
+        #region Methods
 
         public static List<string> Show(List<FlexiControl> Flexis) {
             EditBoxFlexiControl MB = new(Flexis);
@@ -54,5 +61,7 @@ namespace BlueControls.Forms {
         }
 
         private void FlexiButtonClick(object sender, System.EventArgs e) => Ok();
+
+        #endregion
     }
 }

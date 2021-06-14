@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
@@ -32,9 +28,6 @@ namespace BlueControls.Controls {
     [ToolboxBitmap(typeof(System.Windows.Forms.TabPage))]
     [Designer(typeof(ScrollableControlDesigner))]
     public class TabPage : System.Windows.Forms.TabPage, IUseMyBackColor, ISupportsBeginnEdit {
-
-        #region Constructor
-
         //public TabPage() : base()
         //{
         //    //This call is required by the Windows Form Designer.
@@ -51,50 +44,46 @@ namespace BlueControls.Controls {
         //    //SetBackColor();
         //}
 
-        #endregion Constructor
+        #region Properties
 
-        //#region  AutoScale deaktivieren
-        //// https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
-        //public void PerformAutoScale()
-        //{
-        //    // NIX TUN!!!!
-        //}
-        //public void Scale()
-        //{
-        //    // NIX TUN!!!!
-        //}
-        //protected override void ScaleControl(SizeF factor, System.Windows.Forms.BoundsSpecified specified)
-        //{
-        //    factor = new SizeF(1, 1);
-        //    base.ScaleControl(factor, specified);
-        //}
-        //protected override bool ScaleChildren
-        //{
-        //    get
-        //    {
-        //        return false; //MyBase.ScaleChildren
-        //    }
-        //}
-        //[DefaultValue(false)]
-        //public override bool AutoSize
-        //{
-        //    get
-        //    {
-        //        return false; //MyBase.AutoSize
-        //    }
-        //    set
-        //    {
-        //        base.AutoSize = false;
-        //    }
-        //}
-        //protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified)
-        //{
-        //    return bounds; //MyBase.GetScaledBounds(bounds, factor, specified)
-        //}
-        //#endregion
-        protected override void OnParentChanged(System.EventArgs e) {
-            base.OnParentChanged(e);
-            SetBackColor();
+        [DefaultValue(0)]
+        [Browsable(false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public int BeginnEditCounter { get; set; } = 0;
+
+        #endregion
+
+        #region Methods
+
+        public void BeginnEdit() => BeginnEdit(1);
+
+        public void BeginnEdit(int count) {
+            if (DesignMode) { return; }
+            foreach (var ThisControl in Controls) {
+                if (ThisControl is ISupportsBeginnEdit e) { e.BeginnEdit(count); }
+            }
+            BeginnEditCounter += count;
+        }
+
+        public void EndEdit() {
+            if (DesignMode) { return; }
+            if (BeginnEditCounter < 1) { Develop.DebugPrint(enFehlerArt.Warnung, "Bearbeitungsstapel instabil: " + BeginnEditCounter); }
+            BeginnEditCounter--;
+            if (BeginnEditCounter == 0) { Invalidate(); }
+            foreach (var ThisControl in Controls) {
+                if (ThisControl is ISupportsBeginnEdit e) { e.EndEdit(); }
+            }
+        }
+
+        public new void ResumeLayout(bool performLayout) {
+            base.ResumeLayout(performLayout);
+            EndEdit();
+        }
+
+        public new void ResumeLayout() {
+            base.ResumeLayout();
+            EndEdit();
         }
 
         public void SetBackColor() {
@@ -166,48 +155,9 @@ namespace BlueControls.Controls {
         //{
         //    //MyBase.OnLeave(e)
         //}
-
-        #region ISupportsEdit
-
-        [DefaultValue(0)]
-        [Browsable(false)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public int BeginnEditCounter { get; set; } = 0;
-
         public new void SuspendLayout() {
             BeginnEdit();
             base.SuspendLayout();
-        }
-
-        public new void ResumeLayout(bool performLayout) {
-            base.ResumeLayout(performLayout);
-            EndEdit();
-        }
-
-        public new void ResumeLayout() {
-            base.ResumeLayout();
-            EndEdit();
-        }
-
-        public void BeginnEdit() => BeginnEdit(1);
-
-        public void BeginnEdit(int count) {
-            if (DesignMode) { return; }
-            foreach (var ThisControl in Controls) {
-                if (ThisControl is ISupportsBeginnEdit e) { e.BeginnEdit(count); }
-            }
-            BeginnEditCounter += count;
-        }
-
-        public void EndEdit() {
-            if (DesignMode) { return; }
-            if (BeginnEditCounter < 1) { Develop.DebugPrint(enFehlerArt.Warnung, "Bearbeitungsstapel instabil: " + BeginnEditCounter); }
-            BeginnEditCounter--;
-            if (BeginnEditCounter == 0) { Invalidate(); }
-            foreach (var ThisControl in Controls) {
-                if (ThisControl is ISupportsBeginnEdit e) { e.EndEdit(); }
-            }
         }
 
         protected override void OnControlAdded(System.Windows.Forms.ControlEventArgs e) {
@@ -216,6 +166,50 @@ namespace BlueControls.Controls {
             base.OnControlAdded(e);
         }
 
-        #endregion ISupportsEdit
+        //#region  AutoScale deaktivieren
+        //// https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
+        //public void PerformAutoScale()
+        //{
+        //    // NIX TUN!!!!
+        //}
+        //public void Scale()
+        //{
+        //    // NIX TUN!!!!
+        //}
+        //protected override void ScaleControl(SizeF factor, System.Windows.Forms.BoundsSpecified specified)
+        //{
+        //    factor = new SizeF(1, 1);
+        //    base.ScaleControl(factor, specified);
+        //}
+        //protected override bool ScaleChildren
+        //{
+        //    get
+        //    {
+        //        return false; //MyBase.ScaleChildren
+        //    }
+        //}
+        //[DefaultValue(false)]
+        //public override bool AutoSize
+        //{
+        //    get
+        //    {
+        //        return false; //MyBase.AutoSize
+        //    }
+        //    set
+        //    {
+        //        base.AutoSize = false;
+        //    }
+        //}
+        //protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified)
+        //{
+        //    return bounds; //MyBase.GetScaledBounds(bounds, factor, specified)
+        //}
+        //#endregion
+        protected override void OnParentChanged(System.EventArgs e) {
+            base.OnParentChanged(e);
+            SetBackColor();
+        }
+
+        #endregion
     }
 }

@@ -10,12 +10,15 @@ namespace BlueControls.Controls {
 
     public partial class SwapListBox : GenericControl, IBackgroundNone {
 
+        #region Constructors
+
         public SwapListBox() => InitializeComponent();
 
-        [Browsable(false)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public ItemCollectionList Item => Main.Item;
+        #endregion
+
+        #region Events
+
+        public event EventHandler AddClicked;
 
         public event EventHandler<ListEventArgs> ItemAdded;
 
@@ -25,35 +28,37 @@ namespace BlueControls.Controls {
         /// </summary>
         public event EventHandler ItemRemoved;
 
-        public event EventHandler AddClicked;
+        #endregion
+
+        #region Properties
 
         public enAddType AddAllowed {
             get => Main.AddAllowed;
             set => Main.AddAllowed = value;
         }
 
-        protected void OnItemAdded(ListEventArgs e) {
-            if (IsDisposed) { return; }
-            ItemAdded?.Invoke(this, e);
+        [Browsable(false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public ItemCollectionList Item => Main.Item;
+
+        #endregion
+
+        #region Methods
+
+        public void OnAddClicked() => AddClicked?.Invoke(this, System.EventArgs.Empty);
+
+        internal void SuggestionsAdd(ItemCollectionList item) {
+            foreach (var thisi in item) {
+                if (Main.Item[thisi.Internal] == null && Suggest.Item[thisi.Internal] == null) {
+                    thisi.Checked = false;
+                    thisi.CloneToNewCollection(Suggest.Item);
+                }
+            }
         }
 
-        protected void OnItemRemoved(System.EventArgs e) {
-            if (IsDisposed) { return; }
-            ItemRemoved?.Invoke(this, e);
+        protected override void DrawControl(Graphics gr, enStates state) {
         }
-
-        private void Main_ItemAdded(object sender, ListEventArgs e) {
-            MoveItemBetweenList(Suggest, Main, ((BasicListItem)e.Item).Internal, true);
-            OnItemAdded(e);
-        }
-
-        private void Main_ItemRemoving(object sender, ListEventArgs e) => MoveItemBetweenList(Main, Suggest, ((BasicListItem)e.Item).Internal, false);
-
-        private void Main_ItemRemoved(object sender, System.EventArgs e) => OnItemRemoved(e);
-
-        private void Main_ItemClicked(object sender, EventArgs.BasicListItemEventArgs e) => MoveItemBetweenList(Main, Suggest, e.Item.Internal, true);
-
-        private void Suggest_ItemClicked(object sender, EventArgs.BasicListItemEventArgs e) => MoveItemBetweenList(Suggest, Main, e.Item.Internal, true);
 
         protected void MoveItemBetweenList(ListBox Source, ListBox Target, string Internal, bool doRemove) {
             var SourceItem = Source.Item[Internal];
@@ -87,21 +92,32 @@ namespace BlueControls.Controls {
             Suggest.Enabled = Enabled;
         }
 
+        protected void OnItemAdded(ListEventArgs e) {
+            if (IsDisposed) { return; }
+            ItemAdded?.Invoke(this, e);
+        }
+
+        protected void OnItemRemoved(System.EventArgs e) {
+            if (IsDisposed) { return; }
+            ItemRemoved?.Invoke(this, e);
+        }
+
         private void Main_AddClicked(object sender, System.EventArgs e) => OnAddClicked();
 
-        public void OnAddClicked() => AddClicked?.Invoke(this, System.EventArgs.Empty);
-
-        internal void SuggestionsAdd(ItemCollectionList item) {
-            foreach (var thisi in item) {
-                if (Main.Item[thisi.Internal] == null && Suggest.Item[thisi.Internal] == null) {
-                    thisi.Checked = false;
-                    thisi.CloneToNewCollection(Suggest.Item);
-                }
-            }
+        private void Main_ItemAdded(object sender, ListEventArgs e) {
+            MoveItemBetweenList(Suggest, Main, ((BasicListItem)e.Item).Internal, true);
+            OnItemAdded(e);
         }
 
-        protected override void DrawControl(Graphics gr, enStates state) {
-        }
+        private void Main_ItemClicked(object sender, EventArgs.BasicListItemEventArgs e) => MoveItemBetweenList(Main, Suggest, e.Item.Internal, true);
+
+        private void Main_ItemRemoved(object sender, System.EventArgs e) => OnItemRemoved(e);
+
+        private void Main_ItemRemoving(object sender, ListEventArgs e) => MoveItemBetweenList(Main, Suggest, ((BasicListItem)e.Item).Internal, false);
+
+        private void Suggest_ItemClicked(object sender, EventArgs.BasicListItemEventArgs e) => MoveItemBetweenList(Suggest, Main, e.Item.Internal, true);
+
+        #endregion
 
         //public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) {
         //    ContextMenuItemClicked?.Invoke(this, e);

@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics.Enums;
 using System;
 using System.Drawing;
@@ -26,6 +22,21 @@ using System.Drawing;
 namespace BlueBasics {
 
     public static partial class Extensions {
+
+        #region Methods
+
+        public static Point NearestCornerOF(this Rectangle r, Point p) {
+            var LO = r.PointOf(enAlignment.Top_Left);
+            var rO = r.PointOf(enAlignment.Top_Right);
+            var ru = r.PointOf(enAlignment.Bottom_Right);
+            var lu = r.PointOf(enAlignment.Bottom_Left);
+            var llo = Geometry.Länge(p, LO);
+            var lro = Geometry.Länge(p, rO);
+            var llu = Geometry.Länge(p, lu);
+            var lru = Geometry.Länge(p, ru);
+            var Erg = Math.Min(Math.Min(llo, lro), Math.Min(llu, lru));
+            return Erg == llo ? LO : Erg == lro ? rO : Erg == llu ? lu : Erg == lru ? ru : Point.Empty;
+        }
 
         public static Point PointOf(this Rectangle r, enAlignment p) {
             switch (p) {
@@ -62,17 +73,6 @@ namespace BlueBasics {
             }
         }
 
-        public static Point NearestCornerOF(this Rectangle r, Point p) {
-            var LO = r.PointOf(enAlignment.Top_Left);
-            var rO = r.PointOf(enAlignment.Top_Right);
-            var ru = r.PointOf(enAlignment.Bottom_Right);
-            var lu = r.PointOf(enAlignment.Bottom_Left);
-            var llo = Geometry.Länge(p, LO);
-            var lro = Geometry.Länge(p, rO);
-            var llu = Geometry.Länge(p, lu);
-            var lru = Geometry.Länge(p, ru);
-            var Erg = Math.Min(Math.Min(llo, lro), Math.Min(llu, lru));
-            return Erg == llo ? LO : Erg == lro ? rO : Erg == llu ? lu : Erg == lru ? ru : Point.Empty;
-        }
+        #endregion
     }
 }

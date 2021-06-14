@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,12 +15,24 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueScript;
 using Skript.Enums;
 
 public struct strDoItFeedback {
+
+    #region Fields
+
+    public string ErrorMessage;
+
+    //public strDoItFeedback(string value, string errormessage) {
+    //    ErrorMessage = errormessage;
+    //    Value = value;
+    //}
+    public string Value;
+
+    #endregion
+
+    #region Constructors
 
     public strDoItFeedback(string errormessage) {
         ErrorMessage = errormessage;
@@ -34,23 +44,21 @@ public struct strDoItFeedback {
         ErrorMessage = string.Empty;
     }
 
-    //public strDoItFeedback(string value, string errormessage) {
-    //    ErrorMessage = errormessage;
-    //    Value = value;
-    //}
-    public string Value;
+    #endregion
 
-    public string ErrorMessage;
-
-    public static strDoItFeedback FalscherDatentyp() => new("Falscher Datentyp.");
+    #region Methods
 
     public static strDoItFeedback AttributFehler(Method method, strSplittedAttributesFeedback f) => new(f.ErrorMessage + " > " + method.Syntax);
 
-    public static strDoItFeedback VariableNichtGefunden() => new("Variable nicht gefunden.");
+    public static strDoItFeedback Falsch() => new("false", enVariableDataType.Bool);
+
+    public static strDoItFeedback FalscherDatentyp() => new("Falscher Datentyp.");
 
     public static strDoItFeedback Klammerfehler() => new("Fehler bei der Klammersetzung.");
 
+    public static strDoItFeedback VariableNichtGefunden() => new("Variable nicht gefunden.");
+
     public static strDoItFeedback Wahr() => new("true", enVariableDataType.Bool);
 
-    public static strDoItFeedback Falsch() => new("false", enVariableDataType.Bool);
+    #endregion
 }

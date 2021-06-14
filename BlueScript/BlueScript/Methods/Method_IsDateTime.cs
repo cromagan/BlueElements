@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using Skript.Enums;
 using System.Collections.Generic;
 using static BlueBasics.modConverter;
@@ -26,17 +22,23 @@ using static BlueBasics.modConverter;
 namespace BlueScript {
 
     internal class Method_IsDateTime : Method {
+
+        #region Properties
+
+        public override List<enVariableDataType> Args => new() { enVariableDataType.String };
         public override string Description => "Prüft, ob der Inhalt der Variable ein gültiges Datum/Zeit-Format ist. ";
-        public override string Syntax => "IsDateTime(Value)";
-
-        public override List<string> Comand(Script s) => new() { "isdatetime" };
-
-        public override string StartSequence => "(";
+        public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.Bool;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String };
-        public override bool EndlessArgs => false;
+        public override string StartSequence => "(";
+        public override string Syntax => "IsDateTime(Value)";
+
+        #endregion
+
+        #region Methods
+
+        public override List<string> Comand(Script s) => new() { "isdatetime" };
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
@@ -44,5 +46,7 @@ namespace BlueScript {
             var ok = DateTimeTryParse(attvar.Attributes[0].ValueString, out var _);
             return ok ? strDoItFeedback.Wahr() : strDoItFeedback.Falsch();
         }
+
+        #endregion
     }
 }

@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
@@ -29,19 +25,30 @@ namespace BlueScript {
 
     internal class Method_Contains : Method {
 
-        //public Method_Contains(Script parent) : base(parent) { }
-        public override string Syntax => "Contains(ListVariable/StringVariable, CaseSensitive, Value1, Value2, ...)";
+        #region Properties
+
+        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List_Or_String, enVariableDataType.Bool, enVariableDataType.String };
 
         public override string Description => "Bei Listen: Prüft, ob einer der Werte in der Liste steht. Bei String: Prüft ob eine der Zeichenketten vorkommt.";
 
-        public override List<string> Comand(Script s) => new() { "contains" };
+        public override bool EndlessArgs => true;
+
+        public override string EndSequence => ")";
+
+        public override bool GetCodeBlockAfter => false;
+
+        public override enVariableDataType Returns => enVariableDataType.Bool;
 
         public override string StartSequence => "(";
-        public override string EndSequence => ")";
-        public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.Bool;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List_Or_String, enVariableDataType.Bool, enVariableDataType.String };
-        public override bool EndlessArgs => true;
+
+        //public Method_Contains(Script parent) : base(parent) { }
+        public override string Syntax => "Contains(ListVariable/StringVariable, CaseSensitive, Value1, Value2, ...)";
+
+        #endregion
+
+        #region Methods
+
+        public override List<string> Comand(Script s) => new() { "contains" };
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
@@ -73,5 +80,7 @@ namespace BlueScript {
             }
             return strDoItFeedback.FalscherDatentyp();
         }
+
+        #endregion
     }
 }

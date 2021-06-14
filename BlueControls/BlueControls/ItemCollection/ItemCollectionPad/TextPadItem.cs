@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -32,7 +28,42 @@ namespace BlueControls.ItemCollection {
 
     public class TextPadItem : FormPadItemRectangle, ICanHaveColumnVariables {
 
-        #region Variablen-Deklarationen
+        #region Fields
+
+        private enAlignment _ausrichtung;
+
+        private string _VariableText;
+
+        private ExtText etxt;
+
+        #endregion
+
+        #region Constructors
+
+        public TextPadItem(ItemCollectionPad parent) : this(parent, string.Empty, string.Empty) {
+        }
+
+        public TextPadItem(ItemCollectionPad parent, string internalname, string readableText) : base(parent, internalname) {
+            Text = readableText;
+            _VariableText = readableText;
+            Stil = PadStyles.Undefiniert;
+            _ausrichtung = enAlignment.Top_Left;
+            MakeNewETxt();
+        }
+
+        #endregion
+
+        #region Properties
+
+        public enAlignment Ausrichtung {
+            get => _ausrichtung;
+            set {
+                if (value == _ausrichtung) { return; }
+                _ausrichtung = value;
+                MakeNewETxt();
+                OnChanged();
+            }
+        }
 
         [Description("Text der angezeigt werden soll.<br>Alternativ kann ein Variablenname im Format &Name; angegeben werden.")]
         public string Interner_Text {
@@ -47,35 +78,9 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        private enDataFormat Format { get; set; } = enDataFormat.Text;
-        private ExtText etxt;
-        private string _VariableText;
-        private enAlignment _ausrichtung;
-
         //http://www.kurztutorial.info/programme/punkt-mm/rechner.html
         // Dim Ausgleich As Double = mmToPixel(1 / 72 * 25.4, 300)
-        public decimal Skalierung { get; set; } = 3.07m;
-
-        #endregion Variablen-Deklarationen
-
-
-
-        #region Construktor + Initialize
-
-        public TextPadItem(ItemCollectionPad parent) : this(parent, string.Empty, string.Empty) {
-        }
-
-        public TextPadItem(ItemCollectionPad parent, string internalname, string readableText) : base(parent, internalname) {
-            Text = readableText;
-            _VariableText = readableText;
-            Stil = PadStyles.Undefiniert;
-            _ausrichtung = enAlignment.Top_Left;
-            MakeNewETxt();
-        }
-
-        #endregion Construktor + Initialize
-
-        #region Properties
+        public double Skalierung { get; set; } = 3.07d;
 
         public string Text {
             get; private set;
@@ -88,19 +93,32 @@ namespace BlueControls.ItemCollection {
             //}
         }
 
-        public enAlignment Ausrichtung {
-            get => _ausrichtung;
-            set {
-                if (value == _ausrichtung) { return; }
-                _ausrichtung = value;
-                MakeNewETxt();
-                OnChanged();
-            }
-        }
+        private enDataFormat Format { get; set; } = enDataFormat.Text;
 
-        #endregion Properties
+        #endregion
+
+        #region Methods
 
         public override void DesignOrStyleChanged() => MakeNewETxt();
+
+        public override List<FlexiControl> GetStyleOptions() {
+            List<FlexiControl> l = new()
+            {
+                new FlexiControlForProperty(this, "Interner-Text", 5)
+            };
+            ItemCollectionList Aursicht = new()
+            {
+                { "Linksbündig ausrichten", ((int)enAlignment.Top_Left).ToString(), enImageCode.Linksbündig },
+                { "Zentrieren", ((int)enAlignment.Top_HorizontalCenter).ToString(), enImageCode.Zentrieren },
+                { "Rechtsbündig ausrichten", ((int)enAlignment.Top_Right).ToString(), enImageCode.Rechtsbündig }
+            };
+            Aursicht.Sort();
+            l.Add(new FlexiControlForProperty(this, "Ausrichtung", Aursicht));
+            l.Add(new FlexiControlForProperty(this, "Skalierung"));
+            AddStyleOption(l);
+            l.AddRange(base.GetStyleOptions());
+            return l;
+        }
 
         public override bool ParseThis(string tag, string value) {
             if (base.ParseThis(tag, value)) { return true; }
@@ -119,10 +137,47 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "additionalscale":
-                    Skalierung = decimal.Parse(value.FromNonCritical());
+                    Skalierung = double.Parse(value.FromNonCritical());
                     return true;
             }
             return false;
+        }
+
+        //public override void PointMoved(PointM point) {
+        //    if (etxt == null || etxt.Height() < 8) {
+        //        p_RU.Y = Math.Max(p_LO.Y + 8 * Skalierung * Parent.SheetStyleScale, p_LO.Y + 10);
+        //    } else {
+        //        p_RU.Y = Math.Max(p_LO.Y + etxt.Height() * Skalierung * Parent.SheetStyleScale, p_LO.Y + 10);
+        //    }
+        //    p_RU.X = Math.Max(p_RU.X, p_LO.X + 10m * Skalierung * Parent.SheetStyleScale);
+        //}
+        public bool ReplaceVariable(BlueScript.Variable variable) {
+            if ("&" + variable.Name.ToLower() + ";" != Text.ToLower().TrimCr()) { return false; }
+            if (variable.Type is not Skript.Enums.enVariableDataType.String and
+                                 not Skript.Enums.enVariableDataType.List and
+                                 not Skript.Enums.enVariableDataType.Integer and
+                                 not Skript.Enums.enVariableDataType.Bool and
+                                 not Skript.Enums.enVariableDataType.Numeral) { return false; }
+            var nt = variable.ValueString;
+            if (nt is string txt) {
+                if (txt == Text) { return false; }
+                Text = txt;
+                MakeNewETxt();
+                PointMoved(null);
+                OnChanged();
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        public bool ResetVariables() {
+            if (_VariableText == Text) { return false; }
+            Text = _VariableText;
+            MakeNewETxt();
+            PointMoved(null);
+            OnChanged();
+            return true;
         }
 
         public override string ToString() {
@@ -137,7 +192,7 @@ namespace BlueControls.ItemCollection {
 
         protected override string ClassId() => "TEXT";
 
-        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
+        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, double cZoom, double shiftX, double shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
             if (Stil == PadStyles.Undefiniert) { return; }
             GR.SetClip(DCoordinates);
             var trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
@@ -155,6 +210,8 @@ namespace BlueControls.ItemCollection {
             GR.ResetClip();
             base.DrawExplicit(GR, DCoordinates, cZoom, shiftX, shiftY, vState, SizeOfParentControl, ForPrinting);
         }
+
+        protected override void ParseFinished() => MakeNewETxt();
 
         //private string ChangeText(string tmpBody) {
         //    var nt = tmpBody;
@@ -213,63 +270,7 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        //public override void PointMoved(PointM point) {
-        //    if (etxt == null || etxt.Height() < 8) {
-        //        p_RU.Y = Math.Max(p_LO.Y + 8 * Skalierung * Parent.SheetStyleScale, p_LO.Y + 10);
-        //    } else {
-        //        p_RU.Y = Math.Max(p_LO.Y + etxt.Height() * Skalierung * Parent.SheetStyleScale, p_LO.Y + 10);
-        //    }
-        //    p_RU.X = Math.Max(p_RU.X, p_LO.X + 10m * Skalierung * Parent.SheetStyleScale);
-        //}
-        public bool ReplaceVariable(BlueScript.Variable variable) {
-            if ("&" + variable.Name.ToLower() + ";" != Text.ToLower().TrimCr()) { return false; }
-            if (variable.Type is not Skript.Enums.enVariableDataType.String and
-                                 not Skript.Enums.enVariableDataType.List and
-                                 not Skript.Enums.enVariableDataType.Integer and
-                                 not Skript.Enums.enVariableDataType.Bool and
-                                 not Skript.Enums.enVariableDataType.Numeral) { return false; }
-            var nt = variable.ValueString;
-            if (nt is string txt) {
-                if (txt == Text) { return false; }
-                Text = txt;
-                MakeNewETxt();
-                PointMoved(null);
-                OnChanged();
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        public bool ResetVariables() {
-            if (_VariableText == Text) { return false; }
-            Text = _VariableText;
-            MakeNewETxt();
-            PointMoved(null);
-            OnChanged();
-            return true;
-        }
-
-        public override List<FlexiControl> GetStyleOptions() {
-            List<FlexiControl> l = new()
-            {
-                new FlexiControlForProperty(this, "Interner-Text", 5)
-            };
-            ItemCollectionList Aursicht = new()
-            {
-                { "Linksbündig ausrichten", ((int)enAlignment.Top_Left).ToString(), enImageCode.Linksbündig },
-                { "Zentrieren", ((int)enAlignment.Top_HorizontalCenter).ToString(), enImageCode.Zentrieren },
-                { "Rechtsbündig ausrichten", ((int)enAlignment.Top_Right).ToString(), enImageCode.Rechtsbündig }
-            };
-            Aursicht.Sort();
-            l.Add(new FlexiControlForProperty(this, "Ausrichtung", Aursicht));
-            l.Add(new FlexiControlForProperty(this, "Skalierung"));
-            AddStyleOption(l);
-            l.AddRange(base.GetStyleOptions());
-            return l;
-        }
-
-        protected override void ParseFinished() => MakeNewETxt();
+        #endregion
 
         //public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
         //{
@@ -294,7 +295,7 @@ namespace BlueControls.ItemCollection {
         //        _Align = tmpa;
         //        etxt = null;
         //    }
-        //    AdditionalScale = decimal.Parse(Tags.TagGet("Skalierung").FromNonCritical());
+        //    AdditionalScale = double.Parse(Tags.TagGet("Skalierung").FromNonCritical());
         //}
     }
 }

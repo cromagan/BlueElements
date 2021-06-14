@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -34,6 +30,14 @@ namespace BlueControls.Forms {
     /// Typischerweise für Dropdownmenüs oder dem KontextMenu
     /// </summary>
     public partial class FloatingInputBoxListBoxStyle : FloatingForm {
+
+        #region Fields
+
+        private bool _MouseWasDown = false;
+
+        #endregion
+
+        #region Constructors
 
         private FloatingInputBoxListBoxStyle() : base(enDesign.Form_QuickInfo) => InitializeComponent();
 
@@ -53,92 +57,17 @@ namespace BlueControls.Forms {
             timer1.Enabled = true;
         }
 
-        public event EventHandler<ContextMenuItemClickedEventArgs> ItemClicked;
+        #endregion
+
+        #region Events
 
         public event EventHandler Cancel;
 
-        private bool _MouseWasDown = false;
+        public event EventHandler<ContextMenuItemClickedEventArgs> ItemClicked;
 
-        public static FloatingInputBoxListBoxStyle Show(ItemCollectionList Items, object Tag, System.Windows.Forms.Control ConnectedControl, bool Translate) => new(Items, System.Windows.Forms.Cursor.Position.X - 8, System.Windows.Forms.Cursor.Position.Y - 8, -1, Tag, ConnectedControl, Translate);
+        #endregion
 
-        public static FloatingInputBoxListBoxStyle Show(ItemCollectionList Items, int Xpos, int Ypos, int SteuerWi, object Tag, System.Windows.Forms.Control ConnectedControl, bool Translate) => new(Items, Xpos, Ypos, SteuerWi, Tag, ConnectedControl, Translate);
-
-        #region ListBox1
-
-        public void Generate_ListBox1(ItemCollectionList ItemsOri, int MinWidth, enAddType AddNewAllowed, bool Translate) {
-            var itemsClone = (ItemCollectionList)ItemsOri.Clone();
-            (var BiggestItemX, var _, var HeightAdded, var _) = itemsClone.ItemData();
-            if (AddNewAllowed != enAddType.None) { HeightAdded += 24; }
-            lstbx.Appearance = (enBlueListBoxAppearance)itemsClone.ControlDesign;
-            lstbx.Translate = Translate;
-            //if (data.Item4 == BlueBasics.Enums.enOrientation.Senkrecht)
-            //{
-            //    He += Skin.PaddingSmal * 2;
-            //    He = Math.Max(He, 5 * 16 + Skin.PaddingSmal * 2 + 24);
-            //    Wi = Math.Max(Wi, 250);
-            //}
-            //else
-            //{
-            //Wi = CInt(Wi * 1.05) 'Weil die Breite nur circa berechnet wird
-            HeightAdded++; // Um ja den Slider zu vermeiden!
-            HeightAdded = Math.Max(HeightAdded, 16);
-            BiggestItemX = Math.Max(BiggestItemX, 16);
-            //}
-            BiggestItemX = Math.Max(BiggestItemX, MinWidth);
-            var MaxWi = (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7);
-            var MaxHe = (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height * 0.7);
-            if (BiggestItemX > MaxWi) { BiggestItemX = MaxWi; }
-            if (HeightAdded > MaxHe) {
-                HeightAdded = MaxHe;
-                BiggestItemX += 20;
-            }
-            Size = new Size(BiggestItemX + (lstbx.Left * 2), HeightAdded + (lstbx.Top * 2));
-            lstbx.Item.CheckBehavior = itemsClone.CheckBehavior;
-            lstbx.Item.AddRange(itemsClone);
-        }
-
-        private void ListBox1_ItemClicked(object sender, BasicListItemEventArgs e) {
-            // Selectet Chanched bringt nix, da es ja drum geht, ob eine Node angeklickt wurde.
-            // Nur Listboxen können überhaupt erst Checked werden!
-            // Ob sie Checked wird, ist egal!
-            if (e.Item != null) {
-                // Einen Klick auf Überschriften einfach ignorieren, zB. kontextmenü
-                if (!e.Item.IsClickable()) { return; }
-                if (lstbx.Appearance is not enBlueListBoxAppearance.Listbox and not enBlueListBoxAppearance.Gallery and not enBlueListBoxAppearance.FileSystem) {
-                    OnItemClicked(new ContextMenuItemClickedEventArgs(e.Item.Internal, Tag, null)); // Das Tag hier ist eigentlich das HotItem
-                    if (!IsDisposed) { Close(); }
-                    return;
-                }
-            }
-        }
-
-        private void OnItemClicked(ContextMenuItemClickedEventArgs e) => ItemClicked?.Invoke(this, e);
-
-        #endregion ListBox1
-
-        private void OnCancel() => Cancel?.Invoke(this, System.EventArgs.Empty);
-
-        private void timer1_Tick(object sender, System.EventArgs e) {
-            var MouseIsDown = !string.IsNullOrEmpty(modAllgemein.LastMouseButton());
-            if (MouseIsDown && !_MouseWasDown && !IsMouseInForm()) {
-                // erster Klick ausserhalb des Forms
-                Close();
-                OnCancel();
-                return;
-            }
-            if (_MouseWasDown && !MouseIsDown && IsMouseInForm()) {
-                // Maus ausserhalb der Form ausgelassen
-                _MouseWasDown = false;
-                return;
-            }
-            if (MouseIsDown) { _MouseWasDown = true; }
-        }
-
-        public override void Refresh() {
-            Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
-            base.Refresh();
-            OnPaint(null);
-        }
+        #region Methods
 
         public static void ContextMenuShow(IContextMenu Control, System.Windows.Forms.MouseEventArgs e) {
             Close(enBlueListBoxAppearance.KontextMenu);
@@ -180,6 +109,48 @@ namespace BlueControls.Forms {
             }
         }
 
+        public static FloatingInputBoxListBoxStyle Show(ItemCollectionList Items, object Tag, System.Windows.Forms.Control ConnectedControl, bool Translate) => new(Items, System.Windows.Forms.Cursor.Position.X - 8, System.Windows.Forms.Cursor.Position.Y - 8, -1, Tag, ConnectedControl, Translate);
+
+        public static FloatingInputBoxListBoxStyle Show(ItemCollectionList Items, int Xpos, int Ypos, int SteuerWi, object Tag, System.Windows.Forms.Control ConnectedControl, bool Translate) => new(Items, Xpos, Ypos, SteuerWi, Tag, ConnectedControl, Translate);
+
+        public void Generate_ListBox1(ItemCollectionList ItemsOri, int MinWidth, enAddType AddNewAllowed, bool Translate) {
+            var itemsClone = (ItemCollectionList)ItemsOri.Clone();
+            (var BiggestItemX, var _, var HeightAdded, var _) = itemsClone.ItemData();
+            if (AddNewAllowed != enAddType.None) { HeightAdded += 24; }
+            lstbx.Appearance = (enBlueListBoxAppearance)itemsClone.ControlDesign;
+            lstbx.Translate = Translate;
+            //if (data.Item4 == BlueBasics.Enums.enOrientation.Senkrecht)
+            //{
+            //    He += Skin.PaddingSmal * 2;
+            //    He = Math.Max(He, 5 * 16 + Skin.PaddingSmal * 2 + 24);
+            //    Wi = Math.Max(Wi, 250);
+            //}
+            //else
+            //{
+            //Wi = CInt(Wi * 1.05) 'Weil die Breite nur circa berechnet wird
+            HeightAdded++; // Um ja den Slider zu vermeiden!
+            HeightAdded = Math.Max(HeightAdded, 16);
+            BiggestItemX = Math.Max(BiggestItemX, 16);
+            //}
+            BiggestItemX = Math.Max(BiggestItemX, MinWidth);
+            var MaxWi = (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7);
+            var MaxHe = (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height * 0.7);
+            if (BiggestItemX > MaxWi) { BiggestItemX = MaxWi; }
+            if (HeightAdded > MaxHe) {
+                HeightAdded = MaxHe;
+                BiggestItemX += 20;
+            }
+            Size = new Size(BiggestItemX + (lstbx.Left * 2), HeightAdded + (lstbx.Top * 2));
+            lstbx.Item.CheckBehavior = itemsClone.CheckBehavior;
+            lstbx.Item.AddRange(itemsClone);
+        }
+
+        public override void Refresh() {
+            Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
+            base.Refresh();
+            OnPaint(null);
+        }
+
         private static void _ContextMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
             var Infos = (List<object>)e.HotItem;
             var UserMmenu = (ItemCollectionList)Infos[0];
@@ -208,5 +179,42 @@ namespace BlueControls.Forms {
                 Develop.DebugPrint("Kontextmenu-Befehl nicht ausgeführt: " + e.ClickedComand);
             }
         }
+
+        private void ListBox1_ItemClicked(object sender, BasicListItemEventArgs e) {
+            // Selectet Chanched bringt nix, da es ja drum geht, ob eine Node angeklickt wurde.
+            // Nur Listboxen können überhaupt erst Checked werden!
+            // Ob sie Checked wird, ist egal!
+            if (e.Item != null) {
+                // Einen Klick auf Überschriften einfach ignorieren, zB. kontextmenü
+                if (!e.Item.IsClickable()) { return; }
+                if (lstbx.Appearance is not enBlueListBoxAppearance.Listbox and not enBlueListBoxAppearance.Gallery and not enBlueListBoxAppearance.FileSystem) {
+                    OnItemClicked(new ContextMenuItemClickedEventArgs(e.Item.Internal, Tag, null)); // Das Tag hier ist eigentlich das HotItem
+                    if (!IsDisposed) { Close(); }
+                    return;
+                }
+            }
+        }
+
+        private void OnCancel() => Cancel?.Invoke(this, System.EventArgs.Empty);
+
+        private void OnItemClicked(ContextMenuItemClickedEventArgs e) => ItemClicked?.Invoke(this, e);
+
+        private void timer1_Tick(object sender, System.EventArgs e) {
+            var MouseIsDown = !string.IsNullOrEmpty(modAllgemein.LastMouseButton());
+            if (MouseIsDown && !_MouseWasDown && !IsMouseInForm()) {
+                // erster Klick ausserhalb des Forms
+                Close();
+                OnCancel();
+                return;
+            }
+            if (_MouseWasDown && !MouseIsDown && IsMouseInForm()) {
+                // Maus ausserhalb der Form ausgelassen
+                _MouseWasDown = false;
+                return;
+            }
+            if (MouseIsDown) { _MouseWasDown = true; }
+        }
+
+        #endregion
     }
 }

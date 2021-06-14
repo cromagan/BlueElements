@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,14 +15,20 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 namespace BlueDatabase.EventArgs {
 
     public class RowEventArgs : System.EventArgs {
 
+        #region Constructors
+
         public RowEventArgs(RowItem Row) => this.Row = Row;
 
+        #endregion
+
+        #region Properties
+
         public RowItem Row { get; set; }
+
+        #endregion
     }
 }

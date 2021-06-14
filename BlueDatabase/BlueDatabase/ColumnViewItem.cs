@@ -1,5 +1,3 @@
-#region BlueElements - a collection of useful tools, database and controls
-
 // Authors:
 // Christian Peter
 //
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
@@ -29,14 +25,18 @@ namespace BlueDatabase {
 
     public sealed class ColumnViewItem {
 
-        #region Variablen-Deklarationen
+        #region Fields
 
-        private enViewType _ViewType;
+        public Rectangle _TMP_AutoFilterLocation;
+        public int? _TMP_DrawWidth;
+        public bool _TMP_Reduced;
+        public Rectangle _TMP_ReduceLocation;
+        public int? OrderTMP_Spalte_X1;
 
         /// <summary>
-        /// Koordinaten Angabe in "Spalten"
+        /// // Koordinaten Angabe in "Spalten"
         /// </summary>
-        private int _Spalte_X1;
+        private int _Spalte_Height;
 
         /// <summary>
         /// Koordinaten Angabe in "Spalten"
@@ -44,43 +44,16 @@ namespace BlueDatabase {
         private int _Spalte_Width;
 
         /// <summary>
-        /// // Koordinaten Angabe in "Spalten"
+        /// Koordinaten Angabe in "Spalten"
         /// </summary>
-        private int _Spalte_Height;
+        private int _Spalte_X1;
 
         private enÜberschriftAnordnung _ÜberschriftAnordnung;
-        public int? OrderTMP_Spalte_X1;
-        public Rectangle _TMP_AutoFilterLocation;
-        public Rectangle _TMP_ReduceLocation;
-        public int? _TMP_DrawWidth;
-        public bool _TMP_Reduced;
+        private enViewType _ViewType;
 
-        #endregion Variablen-Deklarationen
+        #endregion
 
-        #region Event-Deklarationen + Delegaten
-
-        public event EventHandler Changed;
-
-        #endregion Event-Deklarationen + Delegaten
-
-        #region Construktor + Initialize
-
-        /// <summary>
-        /// Info: Es wird keine Änderung ausgelöst
-        /// </summary>
-        private void Initialize() {
-            _ViewType = enViewType.None;
-            Column = null;
-            _Spalte_X1 = 0;
-            _Spalte_Width = 1;
-            _Spalte_Height = 1;
-            _ÜberschriftAnordnung = enÜberschriftAnordnung.Über_dem_Feld;
-            OrderTMP_Spalte_X1 = null;
-            _TMP_AutoFilterLocation = Rectangle.Empty;
-            _TMP_ReduceLocation = Rectangle.Empty;
-            _TMP_DrawWidth = null;
-            _TMP_Reduced = false;
-        }
+        #region Constructors
 
         /// <summary>
         /// Info: Es wird keine Änderung ausgelöst
@@ -153,24 +126,23 @@ namespace BlueDatabase {
             if (Column != null && _ViewType != enViewType.None) { Column.CheckFormulaEditType(); }
         }
 
-        #endregion Construktor + Initialize
+        #endregion
+
+        #region Events
+
+        public event EventHandler Changed;
+
+        #endregion
 
         #region Properties
 
-        public enViewType ViewType {
-            get => _ViewType;
-            set {
-                if (value == _ViewType) { return; }
-                _ViewType = value;
-                OnChanged();
-            }
-        }
+        public ColumnItem Column { get; private set; }
 
-        public enÜberschriftAnordnung ÜberschriftAnordnung {
-            get => _ÜberschriftAnordnung;
+        public int Height {
+            get => _Spalte_Height;
             set {
-                if (value == _ÜberschriftAnordnung) { return; }
-                _ÜberschriftAnordnung = value;
+                if (value == _Spalte_Height) { return; }
+                _Spalte_Height = value;
                 OnChanged();
             }
         }
@@ -187,6 +159,24 @@ namespace BlueDatabase {
             }
         }
 
+        public enÜberschriftAnordnung ÜberschriftAnordnung {
+            get => _ÜberschriftAnordnung;
+            set {
+                if (value == _ÜberschriftAnordnung) { return; }
+                _ÜberschriftAnordnung = value;
+                OnChanged();
+            }
+        }
+
+        public enViewType ViewType {
+            get => _ViewType;
+            set {
+                if (value == _ViewType) { return; }
+                _ViewType = value;
+                OnChanged();
+            }
+        }
+
         /// <summary>
         /// Nur wichtig für Formular
         /// </summary>
@@ -199,18 +189,9 @@ namespace BlueDatabase {
             }
         }
 
-        public int Height {
-            get => _Spalte_Height;
-            set {
-                if (value == _Spalte_Height) { return; }
-                _Spalte_Height = value;
-                OnChanged();
-            }
-        }
+        #endregion
 
-        public ColumnItem Column { get; private set; }
-
-        #endregion Properties
+        #region Methods
 
         /// <summary>
         /// Info: Es wird keine Änderung ausgelöst
@@ -237,6 +218,12 @@ namespace BlueDatabase {
             OnChanged();
         }
 
+        public ColumnViewItem NextVisible(ColumnViewCollection _Parent) => _Parent?.NextVisible(this);
+
+        public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
+
+        public ColumnViewItem PreviewsVisible(ColumnViewCollection _Parent) => _Parent?.PreviousVisible(this);
+
         public override string ToString() {
             var Result = "{Type=" + (int)_ViewType;
             if (Column != null) { Result = Result + ", " + Column.ParsableColumnKey(); }
@@ -247,10 +234,23 @@ namespace BlueDatabase {
             return Result + "}";
         }
 
-        public ColumnViewItem PreviewsVisible(ColumnViewCollection _Parent) => _Parent?.PreviousVisible(this);
+        /// <summary>
+        /// Info: Es wird keine Änderung ausgelöst
+        /// </summary>
+        private void Initialize() {
+            _ViewType = enViewType.None;
+            Column = null;
+            _Spalte_X1 = 0;
+            _Spalte_Width = 1;
+            _Spalte_Height = 1;
+            _ÜberschriftAnordnung = enÜberschriftAnordnung.Über_dem_Feld;
+            OrderTMP_Spalte_X1 = null;
+            _TMP_AutoFilterLocation = Rectangle.Empty;
+            _TMP_ReduceLocation = Rectangle.Empty;
+            _TMP_DrawWidth = null;
+            _TMP_Reduced = false;
+        }
 
-        public ColumnViewItem NextVisible(ColumnViewCollection _Parent) => _Parent?.NextVisible(this);
-
-        public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
+        #endregion
     }
 }

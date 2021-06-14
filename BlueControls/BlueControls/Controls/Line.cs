@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics.Enums;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
@@ -31,7 +27,13 @@ namespace BlueControls.Controls {
     [Designer(typeof(BasicDesigner))]
     public class Line : GenericControl, IBackgroundNone {
 
-        #region Constructor
+        #region Fields
+
+        private enOrientation _Orientation = enOrientation.Waagerecht;
+
+        #endregion
+
+        #region Constructors
 
         public Line() : base(false, false) {
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -41,9 +43,9 @@ namespace BlueControls.Controls {
             _MouseHighlight = false;
         }
 
-        #endregion Constructor
+        #endregion
 
-        private enOrientation _Orientation = enOrientation.Waagerecht;
+        #region Properties
 
         [DefaultValue(enOrientation.Waagerecht)]
         public enOrientation Orientation {
@@ -70,6 +72,10 @@ namespace BlueControls.Controls {
             set => base.TabStop = false;
         }
 
+        #endregion
+
+        #region Methods
+
         public void CheckSize() {
             if (_Orientation == enOrientation.Waagerecht) {
                 if (Width < 10) { Width = 10; }
@@ -92,5 +98,7 @@ namespace BlueControls.Controls {
                 gr.DrawLine(LP, 1, 1, 1, Height);
             }
         }
+
+        #endregion
     }
 }

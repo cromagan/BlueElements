@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.ItemCollection;
@@ -28,9 +24,16 @@ using System.Drawing;
 namespace BlueControls.Forms {
 
     public partial class FontSelectDialog {
-        private bool Adding;
+
+        #region Fields
+
         private static ItemCollectionList FNList;
         private static ItemCollectionList FSList;
+        private bool Adding;
+
+        #endregion
+
+        #region Constructors
 
         public FontSelectDialog() {
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -45,8 +48,7 @@ namespace BlueControls.Forms {
                             try {
                                 BlueFont.MeasureString("T", fo);
                                 FNList.Add(string.Empty, f.Name, BlueFont.Get(f, 12).NameInStyle(), true);
-                            } catch (Exception) {
-                            }
+                            } catch (Exception) { }
                         }
                     }
                 }
@@ -80,6 +82,10 @@ namespace BlueControls.Forms {
             UpdateSampleText();
         }
 
+        #endregion
+
+        #region Properties
+
         public new BlueFont Font {
             get => BlueFont.Get(FName.Item.Checked()[0].Internal, float.Parse(FSize.Item.Checked()[0].Internal), fFett.Checked, fKursiv.Checked, fUnterstrichen.Checked, fDurchge.Checked, fOutline.Checked, QuickImage.Get(cFarbe.ImageCode).ChangeGreenTo, QuickImage.Get(cRandF.ImageCode).ChangeGreenTo, fKap.Checked, OnlyUpper.Checked, OnlyLow.Checked);
             set {
@@ -106,14 +112,9 @@ namespace BlueControls.Forms {
             }
         }
 
-        private void UpdateSampleText() {
-            if (Adding) { return; }
-            Sample.Image = Font.SampleText().Bitmap;
-        }
+        #endregion
 
-        private void FName_Item_CheckedChanged(object sender, System.EventArgs e) => UpdateSampleText();
-
-        private void fFett_CheckedChanged(object sender, System.EventArgs e) => UpdateSampleText();
+        #region Methods
 
         private void cFarbe_Click(object sender, System.EventArgs e) {
             ColorDia.Color = QuickImage.Get(cFarbe.ImageCode).ChangeGreenTo.FromHTMLCode();
@@ -129,6 +130,17 @@ namespace BlueControls.Forms {
             UpdateSampleText();
         }
 
+        private void fFett_CheckedChanged(object sender, System.EventArgs e) => UpdateSampleText();
+
+        private void FName_Item_CheckedChanged(object sender, System.EventArgs e) => UpdateSampleText();
+
         private void Ok_Click(object sender, System.EventArgs e) => Close();
+
+        private void UpdateSampleText() {
+            if (Adding) { return; }
+            Sample.Image = Font.SampleText().Bitmap;
+        }
+
+        #endregion
     }
 }

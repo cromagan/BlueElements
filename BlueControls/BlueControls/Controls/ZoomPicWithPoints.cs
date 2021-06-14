@@ -18,23 +18,49 @@ namespace BlueControls.Controls {
     [Designer(typeof(BasicDesigner))]
     public partial class ZoomPicWithPoints : ZoomPic {
 
-        #region Constructor
+        #region Fields
 
-        public ZoomPicWithPoints() : base() => InitializeComponent();
+        public string Feedback = string.Empty;
 
-        #endregion Constructor
+        public List<string> Tags = new();
+
+        private static readonly Brush Brush_RotTransp = new SolidBrush(Color.FromArgb(200, 255, 0, 0));
+
+        private static readonly Pen Pen_RotTransp = new(Color.FromArgb(200, 255, 0, 0));
 
         private readonly List<PointM> points = new();
 
+        private enHelpers _Helper = enHelpers.Ohne;
+
+        private enOrientation _MittelLinie = enOrientation.Ohne;
+
+        private bool _PointAdding = false;
+
+        #endregion
+
+        #region Constructors
+
+        public ZoomPicWithPoints() : base() => InitializeComponent();
+
+        #endregion
+
+        #region Events
+
         public event EventHandler PointSetByUser;
 
-        public List<string> Tags = new();
-        public string Feedback = string.Empty;
-        private bool _PointAdding = false;
-        private static readonly Pen Pen_RotTransp = new(Color.FromArgb(200, 255, 0, 0));
-        private static readonly Brush Brush_RotTransp = new SolidBrush(Color.FromArgb(200, 255, 0, 0));
-        private enOrientation _MittelLinie = enOrientation.Ohne;
-        private enHelpers _Helper = enHelpers.Ohne;
+        #endregion
+
+        #region Properties
+
+        [DefaultValue(enHelpers.Ohne)]
+        public enHelpers Helper {
+            get => _Helper;
+            set {
+                if (_Helper == value) { return; }
+                _Helper = value;
+                Invalidate();
+            }
+        }
 
         [DefaultValue((enOrientation)(-1))]
         public enOrientation Mittellinie {
@@ -46,13 +72,133 @@ namespace BlueControls.Controls {
             }
         }
 
-        [DefaultValue(enHelpers.Ohne)]
-        public enHelpers Helper {
-            get => _Helper;
-            set {
-                if (_Helper == value) { return; }
-                _Helper = value;
+        #endregion
+
+        #region Methods
+
+        public static string FilenameTXT(string PathOfPicture) => PathOfPicture.FilePath() + PathOfPicture.FileNameWithoutSuffix() + ".txt";
+
+        public static BitmapListItem GenerateBitmapListItem(string pathOfPicture) {
+            var x = LoadFromDisk(pathOfPicture);
+            return GenerateBitmapListItem(x.Item1, x.Item2);
+        }
+
+        public static BitmapListItem GenerateBitmapListItem(Bitmap bmp, List<string> tags) {
+            var FilenamePNG = tags.TagGet("ImageFile");
+            BitmapListItem i = new(bmp, FilenamePNG, FilenamePNG.FileNameWithoutSuffix()) {
+                Padding = 10,
+                Tag = tags,
+            };
+            return i;
+        }
+
+        public static Tuple<Bitmap, List<string>> LoadFromDisk(string PathOfPicture) {
+            Bitmap bmp = null;
+            List<string> tags = new();
+            if (FileExists(PathOfPicture)) {
+                bmp = (Bitmap)BitmapExt.Image_FromFile(PathOfPicture);
+            }
+            var ftxt = FilenameTXT(PathOfPicture);
+            if (FileExists(ftxt)) {
+                tags = File.ReadAllText(ftxt, System.Text.Encoding.UTF8).SplitByCRToList();
+            }
+            tags.TagSet("ImageFile", PathOfPicture);
+            return new Tuple<Bitmap, List<string>>(bmp, tags);
+        }
+
+        public static Tuple<Bitmap, List<string>> ResizeData(Bitmap pic, List<string> tags, int width, int height) {
+            var zoomx = (double)width / pic.Width;
+            var zoomy = (double)height / pic.Height;
+            var pic2 = BitmapExt.Resize(pic, width, height, enSizeModes.Verzerren, System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic, true);
+            List<string> tags2 = new(tags);
+            var Names = tags2.TagGet("AllPointNames").FromNonCritical().SplitBy("|");
+            foreach (var thisO in Names) {
+                var s = tags2.TagGet(thisO);
+                PointM ThisP = new(null, s);
+                ThisP.X *= zoomx;
+                ThisP.Y *= zoomy;
+                tags2.TagSet(ThisP.Name, ThisP.ToString());
+            }
+            return new Tuple<Bitmap, List<string>>(pic2, tags2);
+        }
+
+        public BitmapListItem GenerateBitmapListItem() {
+            WritePointsInTags();
+            return GenerateBitmapListItem(BMP, Tags);
+        }
+
+        public PointM GetPoint(string name) {
+            foreach (var thisp in points) {
+                if (thisp != null && thisp.Name.ToUpper() == name.ToUpper()) { return thisp; }
+            }
+            return null;
+        }
+
+        public void LetUserAddAPoint(string pointName, enHelpers helper, enOrientation mittelline) {
+            _MittelLinie = mittelline;
+            _Helper = helper;
+            Feedback = pointName;
+            _PointAdding = true;
+            Invalidate();
+        }
+
+        public void LoadData(string PathOfPicture) {
+            var x = LoadFromDisk(PathOfPicture);
+            BMP = x.Item1;
+            Tags = x.Item2;
+            GeneratePointsFromTags();
+            Invalidate();
+        }
+
+        public void PointClear() {
+            points.Clear();
+            WritePointsInTags();
+            Invalidate();
+        }
+
+        public void PointRemove(string name) {
+            var p = GetPoint(name);
+            if (p == null) { return; }
+            points.Remove(p);
+            WritePointsInTags();
+            Invalidate();
+        }
+
+        public void PointSet(string name, int x, int y) => PointSet(name, x, (double)y);
+
+        public void PointSet(string name, double x, double y) {
+            var p = GetPoint(name);
+            if (p == null) {
+                p = new PointM(name, x, y);
+                points.Add(p);
+                WritePointsInTags();
                 Invalidate();
+                return;
+            }
+            if (p.X != x || p.Y != y) {
+                p.X = x;
+                p.Y = y;
+                Invalidate();
+            }
+            WritePointsInTags();
+        }
+
+        public void SaveData() {
+            WritePointsInTags();
+            var Path = Tags.TagGet("ImageFile");
+            var pathtxt = FilenameTXT(Path);
+            try {
+                if (BMP != null) {
+                    BMP.Save(Path, System.Drawing.Imaging.ImageFormat.Png);
+                }
+                if (Tags != null) {
+                    Tags.TagSet("Erstellt", modAllgemein.UserName());
+                    Tags.TagSet("Datum", DateTime.Now.ToString(Constants.Format_Date5));
+                    Tags.Save(pathtxt, false, System.Text.Encoding.GetEncoding(1252));
+                }
+            } catch {
+                Develop.DebugPrint("Fehler beim Speichern: " + pathtxt);
+                MessageBox.Show("Fehler beim Speichern");
             }
         }
 
@@ -85,92 +231,14 @@ namespace BlueControls.Controls {
             }
         }
 
-        public void LoadData(string PathOfPicture) {
-            var x = LoadFromDisk(PathOfPicture);
-            BMP = x.Item1;
-            Tags = x.Item2;
-            GeneratePointsFromTags();
-            Invalidate();
-        }
-
-        private void GeneratePointsFromTags() {
-            var Names = Tags.TagGet("AllPointNames").FromNonCritical().SplitBy("|");
-            points.Clear();
-            foreach (var thisO in Names) {
-                var s = Tags.TagGet(thisO);
-                points.Add(new PointM(null, s));
+        protected override void OnImageMouseUp(MouseEventArgs1_1 e) {
+            if (_PointAdding && !string.IsNullOrEmpty(Feedback)) {
+                PointSet(Feedback, e.X, e.Y);
+                _PointAdding = false;
+                OnPointSetByUser();
             }
-        }
-
-        public static BitmapListItem GenerateBitmapListItem(string pathOfPicture) {
-            var x = LoadFromDisk(pathOfPicture);
-            return GenerateBitmapListItem(x.Item1, x.Item2);
-        }
-
-        public static BitmapListItem GenerateBitmapListItem(Bitmap bmp, List<string> tags) {
-            var FilenamePNG = tags.TagGet("ImageFile");
-            BitmapListItem i = new(bmp, FilenamePNG, FilenamePNG.FileNameWithoutSuffix()) {
-                Padding = 10,
-                Tag = tags,
-            };
-            return i;
-        }
-
-        public BitmapListItem GenerateBitmapListItem() {
-            WritePointsInTags();
-            return GenerateBitmapListItem(BMP, Tags);
-        }
-
-        private void WritePointsInTags() {
-            var Old = Tags.TagGet("AllPointNames").FromNonCritical().SplitBy("|");
-            foreach (var thisO in Old) {
-                Tags.TagSet(thisO, string.Empty);
-            }
-            var s = string.Empty;
-            foreach (var ThisP in points) {
-                s = s + ThisP.Name + "|";
-                Tags.TagSet(ThisP.Name, ThisP.ToString());
-            }
-            Tags.TagSet("AllPointNames", s.TrimEnd("|").ToNonCritical());
-        }
-
-        public PointM GetPoint(string name) {
-            foreach (var thisp in points) {
-                if (thisp != null && thisp.Name.ToUpper() == name.ToUpper()) { return thisp; }
-            }
-            return null;
-        }
-
-        public void PointClear() {
-            points.Clear();
-            WritePointsInTags();
-            Invalidate();
-        }
-
-        public void PointSet(string name, int x, int y) => PointSet(name, x, (decimal)y);
-
-        public void PointSet(string name, double x, double y) => PointSet(name, (decimal)x, (decimal)y);
-
-        public void PointSet(string name, decimal x, decimal y) {
-            var p = GetPoint(name);
-            if (p == null) {
-                p = new PointM(name, x, y);
-                points.Add(p);
-                WritePointsInTags();
-                Invalidate();
-                return;
-            }
-            if (p.X != x || p.Y != y) {
-                p.X = x;
-                p.Y = y;
-                Invalidate();
-            }
-            WritePointsInTags();
-        }
-
-        protected override void OnMouseMove(MouseEventArgs e) {
-            base.OnMouseMove(e);
-            Invalidate();
+            base.OnImageMouseUp(e); // erst nachher, dass die MouseUpRoutine das Feedback nicht änddern kann
+            //Feedback = string.Empty;
         }
 
         protected override void OnMouseDown(MouseEventArgs e) {
@@ -183,22 +251,14 @@ namespace BlueControls.Controls {
             Invalidate();
         }
 
-        public static string FilenameTXT(string PathOfPicture) => PathOfPicture.FilePath() + PathOfPicture.FileNameWithoutSuffix() + ".txt";//            return PathOfPicture.TrimEnd(".PNG").TrimEnd(".JPG").TrimEnd(".JPG") + ".txt";
-
-        public static Tuple<Bitmap, List<string>> LoadFromDisk(string PathOfPicture) {
-            Bitmap bmp = null;
-            List<string> tags = new();
-            if (FileExists(PathOfPicture)) {
-                bmp = (Bitmap)BitmapExt.Image_FromFile(PathOfPicture);
-            }
-            var ftxt = FilenameTXT(PathOfPicture);
-            if (FileExists(ftxt)) {
-                tags = File.ReadAllText(ftxt, System.Text.Encoding.UTF8).SplitByCRToList();
-            }
-            tags.TagSet("ImageFile", PathOfPicture);
-            return new Tuple<Bitmap, List<string>>(bmp, tags);
+        protected override void OnMouseMove(MouseEventArgs e) {
+            base.OnMouseMove(e);
+            Invalidate();
         }
 
+        protected virtual void OnPointSetByUser() => PointSetByUser?.Invoke(this, System.EventArgs.Empty);
+
+        //            return PathOfPicture.TrimEnd(".PNG").TrimEnd(".JPG").TrimEnd(".JPG") + ".txt";
         private void DrawMittelLinien(AdditionalDrawing eg) {
             if (BMP == null) { return; }
             PositionEventArgs e = new(MousePos_1_1.X, MousePos_1_1.Y);
@@ -266,67 +326,28 @@ namespace BlueControls.Controls {
             }
         }
 
-        public void PointRemove(string name) {
-            var p = GetPoint(name);
-            if (p == null) { return; }
-            points.Remove(p);
-            WritePointsInTags();
-            Invalidate();
-        }
-
-        public void LetUserAddAPoint(string pointName, enHelpers helper, enOrientation mittelline) {
-            _MittelLinie = mittelline;
-            _Helper = helper;
-            Feedback = pointName;
-            _PointAdding = true;
-            Invalidate();
-        }
-
-        protected override void OnImageMouseUp(MouseEventArgs1_1 e) {
-            if (_PointAdding && !string.IsNullOrEmpty(Feedback)) {
-                PointSet(Feedback, e.X, e.Y);
-                _PointAdding = false;
-                OnPointSetByUser();
-            }
-            base.OnImageMouseUp(e); // erst nachher, dass die MouseUpRoutine das Feedback nicht änddern kann
-            //Feedback = string.Empty;
-        }
-
-        protected virtual void OnPointSetByUser() => PointSetByUser?.Invoke(this, System.EventArgs.Empty);
-
-        public void SaveData() {
-            WritePointsInTags();
-            var Path = Tags.TagGet("ImageFile");
-            var pathtxt = FilenameTXT(Path);
-            try {
-                if (BMP != null) {
-                    BMP.Save(Path, System.Drawing.Imaging.ImageFormat.Png);
-                }
-                if (Tags != null) {
-                    Tags.TagSet("Erstellt", modAllgemein.UserName());
-                    Tags.TagSet("Datum", DateTime.Now.ToString(Constants.Format_Date5));
-                    Tags.Save(pathtxt, false, System.Text.Encoding.GetEncoding(1252));
-                }
-            } catch {
-                Develop.DebugPrint("Fehler beim Speichern: " + pathtxt);
-                MessageBox.Show("Fehler beim Speichern");
-            }
-        }
-
-        public static Tuple<Bitmap, List<string>> ResizeData(Bitmap pic, List<string> tags, int width, int height) {
-            var zoomx = (decimal)width / pic.Width;
-            var zoomy = (decimal)height / pic.Height;
-            var pic2 = BitmapExt.Resize(pic, width, height, enSizeModes.Verzerren, System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic, true);
-            List<string> tags2 = new(tags);
-            var Names = tags2.TagGet("AllPointNames").FromNonCritical().SplitBy("|");
+        private void GeneratePointsFromTags() {
+            var Names = Tags.TagGet("AllPointNames").FromNonCritical().SplitBy("|");
+            points.Clear();
             foreach (var thisO in Names) {
-                var s = tags2.TagGet(thisO);
-                PointM ThisP = new(null, s);
-                ThisP.X *= zoomx;
-                ThisP.Y *= zoomy;
-                tags2.TagSet(ThisP.Name, ThisP.ToString());
+                var s = Tags.TagGet(thisO);
+                points.Add(new PointM(null, s));
             }
-            return new Tuple<Bitmap, List<string>>(pic2, tags2);
         }
+
+        private void WritePointsInTags() {
+            var Old = Tags.TagGet("AllPointNames").FromNonCritical().SplitBy("|");
+            foreach (var thisO in Old) {
+                Tags.TagSet(thisO, string.Empty);
+            }
+            var s = string.Empty;
+            foreach (var ThisP in points) {
+                s = s + ThisP.Name + "|";
+                Tags.TagSet(ThisP.Name, ThisP.ToString());
+            }
+            Tags.TagSet("AllPointNames", s.TrimEnd("|").ToNonCritical());
+        }
+
+        #endregion
     }
 }

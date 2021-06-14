@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
@@ -28,17 +24,16 @@ namespace BlueControls.ItemCollection {
 
     public class TextListItem : BasicListItem {
 
-        #region Variablen-Deklarationen
+        #region Fields
 
         private string _ReadableText;
         private QuickImage _Symbol;
+
+        #endregion
+
         //private readonly enDataFormat _Format = enDataFormat.Text;
 
-        #endregion Variablen-Deklarationen
-
-
-
-        #region Construktor + Initialize
+        #region Constructors
 
         public TextListItem(string readableText, string internalname, QuickImage symbol, bool isCaption, bool enabled, string userDefCompareKey) : base(internalname) {
             IsCaption = isCaption;
@@ -49,20 +44,11 @@ namespace BlueControls.ItemCollection {
             UserDefCompareKey = userDefCompareKey;
         }
 
-        #endregion Construktor + Initialize
+        #endregion
 
         #region Properties
 
         public override string QuickInfo => _ReadableText.CreateHtmlCodes(true);
-
-        public string Text {
-            get => _ReadableText;
-            set {
-                if (value == _ReadableText) { return; }
-                _ReadableText = value;
-                //OnChanged();
-            }
-        }
 
         public QuickImage Symbol {
             get => _Symbol;
@@ -73,20 +59,24 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        #endregion Properties
-
-        private enDesign tempDesign(enDesign itemdesign) {
-            if (IsCaption) {
-                switch (itemdesign) {
-                    case enDesign.Item_KontextMenu:
-                        return enDesign.Item_KontextMenu_Caption;
-
-                    case enDesign.Item_Listbox:
-                        return enDesign.Item_Listbox_Caption;
-                }
+        public string Text {
+            get => _ReadableText;
+            set {
+                if (value == _ReadableText) { return; }
+                _ReadableText = value;
+                //OnChanged();
             }
-            return itemdesign;
         }
+
+        #endregion
+
+        #region Methods
+
+        public override void CloneToNewCollection(ItemCollectionList newParent) => CloneToNewCollection(newParent, new TextListItem(_ReadableText, Internal, _Symbol, IsCaption, _Enabled, UserDefCompareKey));
+
+        public override bool FilterMatch(string FilterText) => base.FilterMatch(FilterText) || _ReadableText.ToUpper().Contains(FilterText.ToUpper());
+
+        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) => SizeUntouchedForListBox().Height;
 
         protected override Size ComputeSizeUntouchedForListBox() => Skin.FormatedText_NeededSize(_ReadableText, _Symbol, Skin.GetBlueFont(tempDesign(Parent.ItemDesign), enStates.Standard), 16);
 
@@ -103,10 +93,19 @@ namespace BlueControls.ItemCollection {
 
         protected override string GetCompareKey() => DataFormat.CompareKey(Internal, enDataFormat.Text);
 
-        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) => SizeUntouchedForListBox().Height;
+        private enDesign tempDesign(enDesign itemdesign) {
+            if (IsCaption) {
+                switch (itemdesign) {
+                    case enDesign.Item_KontextMenu:
+                        return enDesign.Item_KontextMenu_Caption;
 
-        public override void CloneToNewCollection(ItemCollectionList newParent) => CloneToNewCollection(newParent, new TextListItem(_ReadableText, Internal, _Symbol, IsCaption, _Enabled, UserDefCompareKey));
+                    case enDesign.Item_Listbox:
+                        return enDesign.Item_Listbox_Caption;
+                }
+            }
+            return itemdesign;
+        }
 
-        public override bool FilterMatch(string FilterText) => base.FilterMatch(FilterText) || _ReadableText.ToUpper().Contains(FilterText.ToUpper());
+        #endregion
     }
 }

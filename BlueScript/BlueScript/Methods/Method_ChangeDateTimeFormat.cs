@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using Skript.Enums;
 using System.Collections.Generic;
 using static BlueBasics.Constants;
@@ -27,17 +23,23 @@ using static BlueBasics.modConverter;
 namespace BlueScript {
 
     internal class Method_ChangeDateTimeFormat : Method {
-        public override string Syntax => "ChangeDateTimeFormat(DateTimeString, string)";
+
+        #region Properties
+
+        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.String };
         public override string Description => "Gibt einen neuen DateTime-String zurück, der mittels des zweiten String definiert ist. Beispiel eine solchen Strings:  " + Format_Date7 + " Achtung: Groß-Kleinschreibung ist wichtig!";
-
-        public override List<string> Comand(Script s) => new() { "changedatetimeformat" };
-
-        public override string StartSequence => "(";
+        public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.String;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.String };
-        public override bool EndlessArgs => false;
+        public override string StartSequence => "(";
+        public override string Syntax => "ChangeDateTimeFormat(DateTimeString, string)";
+
+        #endregion
+
+        #region Methods
+
+        public override List<string> Comand(Script s) => new() { "changedatetimeformat" };
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
@@ -55,5 +57,7 @@ namespace BlueScript {
                 return new strDoItFeedback("Der Umwandlungs-String '" + attvar.Attributes[1].ValueString + "' ist fehlerhaft.");
             }
         }
+
+        #endregion
     }
 }

@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,13 +15,27 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueScript;
 using Skript.Enums;
 using System.Collections.Generic;
 
 public struct strSplittedAttributesFeedback {
+
+    #region Fields
+
+    public List<Variable> Attributes;
+
+    ///// <summary>
+    ///// Die Position, wo der Fehler stattgefunfden hat ODER die Position wo weiter geparsesd werden muss
+    ///// </summary>
+    //public int ContinueOrErrorPosition;
+    public string ErrorMessage;
+
+    public enSkriptFehlerTyp FehlerTyp;
+
+    #endregion
+
+    #region Constructors
 
     public strSplittedAttributesFeedback(List<Variable> atts) {
         Attributes = atts;
@@ -37,14 +49,7 @@ public struct strSplittedAttributesFeedback {
         FehlerTyp = type;
     }
 
-    public enSkriptFehlerTyp FehlerTyp;
-    public List<Variable> Attributes;
-
-    ///// <summary>
-    ///// Die Position, wo der Fehler stattgefunfden hat ODER die Position wo weiter geparsesd werden muss
-    ///// </summary>
-    //public int ContinueOrErrorPosition;
-    public string ErrorMessage;
+    #endregion
 
     ///// <summary>
     ///// TRUE, wenn der Befehl erkannt wurde, aber nicht ausgeführt werden kann.

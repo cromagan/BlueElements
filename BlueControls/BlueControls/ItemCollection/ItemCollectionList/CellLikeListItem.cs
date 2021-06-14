@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueControls.Controls;
 using BlueControls.Enums;
@@ -34,7 +30,11 @@ namespace BlueControls.ItemCollection {
         // Dim Ausgleich As Double = mmToPixel(1 / 72 * 25.4, 300)
         //   Dim FixZoom As Single = 3.07F
 
-        #region Variablen-Deklarationen
+        #region Fields
+
+        private readonly enBildTextVerhalten _bildTextverhalten;
+
+        private readonly enShortenStyle _style;
 
         /// <summary>
         /// Nach welche Spalte sich der Stil richten muss.
@@ -42,15 +42,9 @@ namespace BlueControls.ItemCollection {
         /// </summary>
         private readonly ColumnItem _StyleLikeThis;
 
-        private readonly enShortenStyle _style;
-        private readonly enBildTextVerhalten _bildTextverhalten;
-        public override string QuickInfo => Internal.CreateHtmlCodes(true); // unveränderter Text
+        #endregion
 
-        #endregion Variablen-Deklarationen
-
-
-
-        #region Construktor + Initialize
+        #region Constructors
 
         public CellLikeListItem(string internalAndReadableText, ColumnItem columnStyle, enShortenStyle style, bool enabled, enBildTextVerhalten bildTextverhalten) : base(internalAndReadableText) {
             _StyleLikeThis = columnStyle;
@@ -59,7 +53,26 @@ namespace BlueControls.ItemCollection {
             _bildTextverhalten = bildTextverhalten;
         }
 
-        #endregion Construktor + Initialize
+        #endregion
+
+        #region Properties
+
+        public override string QuickInfo => Internal.CreateHtmlCodes(true);
+
+        #endregion
+
+        #region Methods
+
+        // unveränderter Text
+        public override void CloneToNewCollection(ItemCollectionList newParent) => CloneToNewCollection(newParent, new CellLikeListItem(Internal, _StyleLikeThis, _style, _Enabled, _bildTextverhalten));
+
+        public override bool FilterMatch(string FilterText) {
+            if (base.FilterMatch(FilterText)) { return true; }
+            var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, enShortenStyle.Both, _StyleLikeThis.BildTextVerhalten, true);
+            return txt.ToUpper().Contains(FilterText.ToUpper());
+        }
+
+        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) => SizeUntouchedForListBox().Height;
 
         protected override Size ComputeSizeUntouchedForListBox() => Table.FormatedText_NeededSize(_StyleLikeThis, Internal, Skin.GetBlueFont(Parent.ItemDesign, enStates.Standard), _style, 16, _bildTextverhalten);
 
@@ -78,14 +91,6 @@ namespace BlueControls.ItemCollection {
             //    var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, enShortenStyle.HTML, true); // Muss Kompakt sein, um Suffixe zu vermeiden
             DataFormat.CompareKey(Internal, _StyleLikeThis.Format) + "|" + Internal;
 
-        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) => SizeUntouchedForListBox().Height;
-
-        public override void CloneToNewCollection(ItemCollectionList newParent) => CloneToNewCollection(newParent, new CellLikeListItem(Internal, _StyleLikeThis, _style, _Enabled, _bildTextverhalten));
-
-        public override bool FilterMatch(string FilterText) {
-            if (base.FilterMatch(FilterText)) { return true; }
-            var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, enShortenStyle.Both, _StyleLikeThis.BildTextVerhalten, true);
-            return txt.ToUpper().Contains(FilterText.ToUpper());
-        }
+        #endregion
     }
 }

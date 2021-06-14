@@ -10,9 +10,21 @@ namespace BlueControls.Controls {
 
     public partial class EasyPicMulti : GenericControl, IBackgroundNone // System.Windows.Forms.UserControl //
     {
-        private int _nr = 0;
+        #region Fields
+
         private readonly List<BitmapExt> pic = new();
+        private int _nr = 0;
         private List<string> files = new();
+
+        #endregion
+
+        #region Constructors
+
+        public EasyPicMulti() => InitializeComponent();
+
+        #endregion
+
+        #region Properties
 
         public List<string> Files {
             get => files;
@@ -26,7 +38,34 @@ namespace BlueControls.Controls {
             }
         }
 
-        public EasyPicMulti() => InitializeComponent();// pic.ItemInternalChanged += Pic_ItemInternalChanged;
+        #endregion
+
+        // pic.ItemInternalChanged += Pic_ItemInternalChanged;
+
+        #region Methods
+
+        protected override void DrawControl(Graphics GR, enStates vState) {
+            if (Convert.ToBoolean(vState & enStates.Standard_MouseOver)) { vState ^= enStates.Standard_MouseOver; }
+            if (Convert.ToBoolean(vState & enStates.Standard_MousePressed)) { vState ^= enStates.Standard_MousePressed; }
+            Skin.Draw_Back(GR, enDesign.EasyPic, vState, DisplayRectangle, this, true);
+            //Bitmap _Bitmap = null;
+            //if (pic.Count > 0) {
+            //    if (pic[_nr] == null) {
+            //        pic[_nr] = new BitmapExt(files[_nr], true);
+            //    }
+            //    _Bitmap = pic[_nr].Bitmap;
+            //}
+            //if (_Bitmap != null) {
+            //    GR.DrawImageInRectAspectRatio(_Bitmap, 1, pnlControls.Height, Width - 2, Height - 2 - pnlControls.Height);
+            //}
+            Skin.Draw_Border(GR, enDesign.EasyPic, vState, DisplayRectangle);
+        }
+
+        private void btnLeft_Click(object sender, System.EventArgs e) {
+            _nr--;
+            if (_nr < 0) { _nr = 0; }
+            SetPic();
+        }
 
         //private void Pic_ItemInternalChanged(object sender, BlueBasics.EventArgs.ListEventArgs e) {
         //    _nr = 0;
@@ -35,12 +74,6 @@ namespace BlueControls.Controls {
         private void btnRight_Click(object sender, System.EventArgs e) {
             _nr++;
             if (_nr > pic.Count - 1) { _nr = pic.Count - 1; }
-            SetPic();
-        }
-
-        private void btnLeft_Click(object sender, System.EventArgs e) {
-            _nr--;
-            if (_nr < 0) { _nr = 0; }
             SetPic();
         }
 
@@ -60,21 +93,6 @@ namespace BlueControls.Controls {
             zoompic.BMP = _Bitmap;
         }
 
-        protected override void DrawControl(Graphics GR, enStates vState) {
-            if (Convert.ToBoolean(vState & enStates.Standard_MouseOver)) { vState ^= enStates.Standard_MouseOver; }
-            if (Convert.ToBoolean(vState & enStates.Standard_MousePressed)) { vState ^= enStates.Standard_MousePressed; }
-            Skin.Draw_Back(GR, enDesign.EasyPic, vState, DisplayRectangle, this, true);
-            //Bitmap _Bitmap = null;
-            //if (pic.Count > 0) {
-            //    if (pic[_nr] == null) {
-            //        pic[_nr] = new BitmapExt(files[_nr], true);
-            //    }
-            //    _Bitmap = pic[_nr].Bitmap;
-            //}
-            //if (_Bitmap != null) {
-            //    GR.DrawImageInRectAspectRatio(_Bitmap, 1, pnlControls.Height, Width - 2, Height - 2 - pnlControls.Height);
-            //}
-            Skin.Draw_Border(GR, enDesign.EasyPic, vState, DisplayRectangle);
-        }
+        #endregion
     }
 }

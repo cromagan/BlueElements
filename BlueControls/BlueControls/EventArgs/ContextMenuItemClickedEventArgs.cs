@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,13 +15,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using System.Collections.Generic;
 
 namespace BlueControls.EventArgs {
 
     public class ContextMenuItemClickedEventArgs : System.EventArgs {
+
+        #region Constructors
 
         public ContextMenuItemClickedEventArgs(string clickedComand, object hotItem, List<string> tags) {
             HotItem = hotItem;
@@ -31,8 +29,14 @@ namespace BlueControls.EventArgs {
             ClickedComand = clickedComand;
         }
 
+        #endregion
+
+        #region Properties
+
         public string ClickedComand { get; }
         public object HotItem { get; }
         public List<string> Tags { get; }
+
+        #endregion
     }
 }

@@ -4,7 +4,8 @@ using System.Drawing;
 namespace BlueBasics {
 
     public class HTML {
-        private List<string> Code { get; set; }
+
+        #region Constructors
 
         // https://www.w3schools.com/html/html_tables.asp
         public HTML(string title) => Code = new List<string>
@@ -43,34 +44,19 @@ namespace BlueBasics {
                 "<body>"
             };
 
-        public void AddFoot() {
-            Code.Add("  </body>");
-            Code.Add("</html>");
-        }
+        #endregion
 
-        public void AddCaption(string _Caption) => AddCaption(_Caption, 1);
+        #region Properties
+
+        private List<string> Code { get; set; }
+
+        #endregion
+
+        #region Methods
 
         public void Add(string what) => Code.Add(what);
 
-        public void RowBeginn() => Code.Add("      <tr>");
-
-        public void RowEnd() => Code.Add("      </tr>");
-
-        public void Save(string filename, bool executeafter) => Code.Save(filename, executeafter, System.Text.Encoding.UTF8);
-
-        public void TableBeginn() {
-            // da.Add("  <Font face=\"Arial\" Size=\"2\"><table border=\"1\" BORDERCOLOR=\"#aaaaaa\" cellspacing=\"0\" cellpadding=\"0\" align=\"left\">");
-            Code.Add("<Font face=\"Arial\" Size=\"2\">");
-            Code.Add("  <table>");
-            // da.Add("  <Font face=\"Arial\" Size=\"2\"><table border=\"1\" BORDERCOLOR=\"#aaaaaa\" cellspacing=\"0\" cellpadding=\"0\" align=\"left\">");
-            // Code.Add("      </tr>");
-        }
-
-        public void TableEnd() => Code.Add("    </table>");
-
-        public void CellAdd(string content) => Code.Add("              <th>" + content + "</th>");
-
-        public void CellAdd(string content, Color c) => Code.Add("        <th  bgcolor=\"#" + c.ToHTMLCode() + "\">" + content + "</th>");
+        public void AddCaption(string _Caption) => AddCaption(_Caption, 1);
 
         public void AddCaption(string _caption, int size) {
             switch (size) {
@@ -92,6 +78,15 @@ namespace BlueBasics {
             }
         }
 
+        public void AddFoot() {
+            Code.Add("  </body>");
+            Code.Add("</html>");
+        }
+
+        public void CellAdd(string content) => Code.Add("              <th>" + content + "</th>");
+
+        public void CellAdd(string content, Color c) => Code.Add("        <th  bgcolor=\"#" + c.ToHTMLCode() + "\">" + content + "</th>");
+
         public void ListAdd(List<string> items) {
             Code.Add("<ul>");
             foreach (var thisitem in items) {
@@ -99,5 +94,23 @@ namespace BlueBasics {
             }
             Code.Add("</ul>");
         }
+
+        public void RowBeginn() => Code.Add("      <tr>");
+
+        public void RowEnd() => Code.Add("      </tr>");
+
+        public void Save(string filename, bool executeafter) => Code.Save(filename, executeafter, System.Text.Encoding.UTF8);
+
+        public void TableBeginn() {
+            // da.Add("  <Font face=\"Arial\" Size=\"2\"><table border=\"1\" BORDERCOLOR=\"#aaaaaa\" cellspacing=\"0\" cellpadding=\"0\" align=\"left\">");
+            Code.Add("<Font face=\"Arial\" Size=\"2\">");
+            Code.Add("  <table>");
+            // da.Add("  <Font face=\"Arial\" Size=\"2\"><table border=\"1\" BORDERCOLOR=\"#aaaaaa\" cellspacing=\"0\" cellpadding=\"0\" align=\"left\">");
+            // Code.Add("      </tr>");
+        }
+
+        public void TableEnd() => Code.Add("    </table>");
+
+        #endregion
     }
 }

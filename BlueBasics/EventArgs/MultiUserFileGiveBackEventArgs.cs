@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,13 +15,16 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics.MultiUserFile;
 
 namespace BlueBasics.EventArgs {
 
     public class MultiUserFileGiveBackEventArgs : System.EventArgs {
+
+        #region Properties
+
         public clsMultiUserFile File { get; set; }
+
+        #endregion
     }
 }

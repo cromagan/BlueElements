@@ -43,7 +43,7 @@ namespace BlueBasics {
         // private static readonly object Pause_Sleeper = new object();
         private static string _GotUserName = string.Empty;
 
-        #endregion Fields
+        #endregion
 
         #region Methods
 
@@ -537,9 +537,9 @@ namespace BlueBasics {
         [DllImport("user32", EntryPoint = "GetAsyncKeyState", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         private static extern short GetAsyncKeyState(int vKey);
 
-        #endregion Methods
+        #endregion
 
-        // public static string Nummer(this decimal Nr, int Stellen, int NachKomma)
+        // public static string Nummer(this double Nr, int Stellen, int NachKomma)
         // {
         //    return Nummer(Nr.ToString(), Stellen, NachKomma);
         // }

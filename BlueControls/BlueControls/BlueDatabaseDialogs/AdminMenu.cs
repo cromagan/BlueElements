@@ -1,5 +1,3 @@
-#region BlueElements - a collection of useful tools, database and controls
-
 // Authors:
 // Christian Peter
 //
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -35,7 +31,14 @@ using static BlueBasics.FileOperations;
 namespace BlueControls.BlueDatabaseDialogs {
 
     public sealed partial class AdminMenu : Form {
+
+        #region Fields
+
         private readonly Table _TableView;
+
+        #endregion
+
+        #region Constructors
 
         public AdminMenu(Table table) {
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -52,6 +55,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             Check_OrderButtons();
         }
 
+        #endregion
+
+        #region Methods
+
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
             if (_TableView != null) {
                 _TableView.DatabaseChanged -= _TableView_DatabaseChanged;
@@ -64,7 +71,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void _TableView_CursorPosChanged(object sender, CellEventArgs e) => Check_OrderButtons();
 
-        private void _TableView_ViewChanged(object sender, System.EventArgs e) {
+        private void _TableView_DatabaseChanged(object sender, System.EventArgs e) {
             UpdateViewControls();
             Check_OrderButtons();
         }
@@ -74,12 +81,45 @@ namespace BlueControls.BlueDatabaseDialogs {
             Check_OrderButtons();
         }
 
-        private void _TableView_DatabaseChanged(object sender, System.EventArgs e) {
+        private void _TableView_ViewChanged(object sender, System.EventArgs e) {
             UpdateViewControls();
             Check_OrderButtons();
         }
 
-        private void UpdateViewControls() => _TableView.WriteColumnArrangementsInto(cbxInternalColumnArrangementSelector);
+        private void btnAktuelleAnsichtLoeschen_Click(object sender, System.EventArgs e) {
+            if (_TableView.Arrangement < 2 || _TableView.Arrangement >= _TableView.Database.ColumnArrangements.Count) { return; }
+            if (MessageBox.Show("Anordung <b>'" + _TableView.CurrentArrangement.Name + "'</b><br>wirklich löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+            _TableView.Database.ColumnArrangements.RemoveAt(_TableView.Arrangement);
+            _TableView.Arrangement = 1;
+        }
+
+        private void btnAlleSpaltenEinblenden_Click(object sender, System.EventArgs e) {
+            if (MessageBox.Show("Alle Spalten anzeigen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+            _TableView.CurrentArrangement.ShowAllColumns();
+        }
+
+        private void btnAnsichtUmbenennen_Click(object sender, System.EventArgs e) {
+            var n = InputBox.Show("Umbenennen:", _TableView.CurrentArrangement.Name, enDataFormat.Text);
+            if (!string.IsNullOrEmpty(n)) { _TableView.CurrentArrangement.Name = n; }
+        }
+
+        private void btnBerechtigungsgruppen_Click(object sender, System.EventArgs e) {
+            ItemCollectionList aa = new();
+            aa.AddRange(_TableView.Database.Permission_AllUsed(true));
+            aa.Sort();
+            aa.CheckBehavior = enCheckBehavior.MultiSelection;
+            aa.Check(_TableView.CurrentArrangement.PermissionGroups_Show, true);
+            var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, enAddType.Text, true);
+            if (b == null) { return; }
+            _TableView.CurrentArrangement.PermissionGroups_Show.Clear();
+            _TableView.CurrentArrangement.PermissionGroups_Show.AddRange(b.ToArray());
+            if (_TableView.Arrangement == 1) { _TableView.CurrentArrangement.PermissionGroups_Show.Add("#Everybody"); }
+        }
+
+        private void btnDatenbankPfad_Click(object sender, System.EventArgs e) {
+            var P = _TableView.Database.Filename.FilePath();
+            if (PathExists(P)) { ExecuteFile(P); }
+        }
 
         private void btnNeueSpalteErstellen_Click(object sender, System.EventArgs e) {
             if (_TableView.Database.ReadOnly) { return; }
@@ -123,104 +163,15 @@ namespace BlueControls.BlueDatabaseDialogs {
             _TableView.Invalidate_HeadSize();
         }
 
-        private void OrderAdd_Click(object sender, System.EventArgs e) {
-            var MitVorlage = false;
-            if (_TableView.Arrangement > 0 && _TableView.CurrentArrangement != null) {
-                MitVorlage = Convert.ToBoolean(MessageBox.Show("<b>Neue Spaltenanordnung erstellen:</b><br>Wollen sie die aktuelle Ansicht kopieren?", enImageCode.Frage, "Ja", "Nein") == 0);
-            }
-            if (_TableView.Database.ColumnArrangements.Count < 1) {
-                _TableView.Database.ColumnArrangements.Add(new ColumnViewCollection(_TableView.Database, "", ""));
-            }
-            string newname;
-            if (MitVorlage) {
-                newname = InputBox.Show("Die aktuelle Ansicht wird <b>kopiert</b>.<br><br>Geben sie den Namen<br>der neuen Anordnung ein:", "", enDataFormat.Text);
-                if (string.IsNullOrEmpty(newname)) { return; }
-                _TableView.Database.ColumnArrangements.Add(new ColumnViewCollection(_TableView.Database, _TableView.CurrentArrangement.ToString(), newname));
-            } else {
-                newname = InputBox.Show("Geben sie den Namen<br>der neuen Anordnung ein:", "", enDataFormat.Text);
-                if (string.IsNullOrEmpty(newname)) { return; }
-                _TableView.Database.ColumnArrangements.Add(new ColumnViewCollection(_TableView.Database, "", newname));
-            }
-        }
-
-        private void btnAktuelleAnsichtLoeschen_Click(object sender, System.EventArgs e) {
-            if (_TableView.Arrangement < 2 || _TableView.Arrangement >= _TableView.Database.ColumnArrangements.Count) { return; }
-            if (MessageBox.Show("Anordung <b>'" + _TableView.CurrentArrangement.Name + "'</b><br>wirklich löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-            _TableView.Database.ColumnArrangements.RemoveAt(_TableView.Arrangement);
-            _TableView.Arrangement = 1;
-        }
-
-        private void btnAnsichtUmbenennen_Click(object sender, System.EventArgs e) {
-            var n = InputBox.Show("Umbenennen:", _TableView.CurrentArrangement.Name, enDataFormat.Text);
-            if (!string.IsNullOrEmpty(n)) { _TableView.CurrentArrangement.Name = n; }
-        }
-
-        private void cbxInternalColumnArrangementSelector_ItemClicked(object sender, BasicListItemEventArgs e) {
-            if (string.IsNullOrEmpty(cbxInternalColumnArrangementSelector.Text)) { return; }
-            _TableView.Arrangement = int.Parse(e.Item.Internal);
-            Check_OrderButtons();
-        }
-
-        private void btnSpalteEinblenden_Click(object sender, System.EventArgs e) {
-            ItemCollectionList ic = new();
-            foreach (var ThisColumnItem in _TableView.Database.Column) {
-                if (ThisColumnItem != null && _TableView.CurrentArrangement[ThisColumnItem] == null) { ic.Add(ThisColumnItem, false); }
-            }
-            if (ic.Count == 0) {
-                if (MessageBox.Show("Es werden bereits alle<br>Spalten angezeigt.<br><br>Wollen sie eine neue Spalte erstellen?", enImageCode.Frage, "Ja", "Nein") == 0) { btnNeueSpalteErstellen_Click(sender, e); }
-                return;
-            }
-            ic.Sort();
-            var r = InputBoxListBoxStyle.Show("Wählen sie:", ic, enAddType.None, true);
-            if (r == null || r.Count == 0) { return; }
-            _TableView.CurrentArrangement.Add(_TableView.Database.Column[r[0]], false);
-            _TableView.Invalidate_HeadSize();
-        }
-
-        private void btnAlleSpaltenEinblenden_Click(object sender, System.EventArgs e) {
-            if (MessageBox.Show("Alle Spalten anzeigen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-            _TableView.CurrentArrangement.ShowAllColumns();
-        }
-
-        private void btnSystemspaltenAusblenden_Click(object sender, System.EventArgs e) => _TableView.CurrentArrangement.HideSystemColumns();
-
-        private void btnBerechtigungsgruppen_Click(object sender, System.EventArgs e) {
-            ItemCollectionList aa = new();
-            aa.AddRange(_TableView.Database.Permission_AllUsed(true));
-            aa.Sort();
-            aa.CheckBehavior = enCheckBehavior.MultiSelection;
-            aa.Check(_TableView.CurrentArrangement.PermissionGroups_Show, true);
-            var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, enAddType.Text, true);
-            if (b == null) { return; }
-            _TableView.CurrentArrangement.PermissionGroups_Show.Clear();
-            _TableView.CurrentArrangement.PermissionGroups_Show.AddRange(b.ToArray());
-            if (_TableView.Arrangement == 1) { _TableView.CurrentArrangement.PermissionGroups_Show.Add("#Everybody"); }
-        }
-
-        private void btnSpalteNachLinks_Click(object sender, System.EventArgs e) {
-            if (_TableView.Arrangement > 0) {
-                ColumnViewItem ViewItem = null;
-                if (_TableView.CursorPosColumn() != null) { ViewItem = _TableView.CurrentArrangement[_TableView.CursorPosColumn()]; }
-                _TableView.CurrentArrangement.Swap(ViewItem, ViewItem.PreviewsVisible(_TableView.CurrentArrangement));
-            } else {
-                _TableView.Database.Column.Swap(_TableView.CursorPosColumn(), _TableView.CursorPosColumn().Previous());
-            }
-            _TableView.EnsureVisible(_TableView.CursorPosColumn(), _TableView.CursorPosRow());
-            Check_OrderButtons();
-        }
-
-        private void btnSpalteNachRechts_Click(object sender, System.EventArgs e) {
-        }
-
-        private void btnPermanent_Click(object sender, System.EventArgs e) {
-        }
-
         private void btnPermanent_CheckedChanged(object sender, System.EventArgs e) {
             ColumnViewItem ViewItem = null;
             if (_TableView.CursorPosColumn() != null) { ViewItem = _TableView.CurrentArrangement[_TableView.CursorPosColumn()]; }
             if (ViewItem == null) { return; }
             ViewItem.ViewType = btnPermanent.Checked ? enViewType.PermanentColumn : enViewType.Column;
             Check_OrderButtons();
+        }
+
+        private void btnPermanent_Click(object sender, System.EventArgs e) {
         }
 
         private void btnPosEingeben_Click(object sender, System.EventArgs e) {
@@ -242,11 +193,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
         }
 
-        private void btnSpalteDauerhaftloeschen_Click(object sender, System.EventArgs e) {
-            if (MessageBox.Show("Spalte <b>" + _TableView.CursorPosColumn().ReadableText() + "</b> endgültig löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-            _TableView.Database.Column.Remove(_TableView.CursorPosColumn());
-        }
-
         private void btnSpalteAusblenden_Click(object sender, System.EventArgs e) {
             ColumnViewItem ViewItem = null;
             if (_TableView.CursorPosColumn() != null) { ViewItem = _TableView.CurrentArrangement[_TableView.CursorPosColumn()]; }
@@ -254,6 +200,42 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void btnSpalteBearbeiten_Click(object sender, System.EventArgs e) => tabAdministration.OpenColumnEditor(_TableView.CursorPosColumn(), _TableView.CursorPosRow(), _TableView);
+
+        private void btnSpalteDauerhaftloeschen_Click(object sender, System.EventArgs e) {
+            if (MessageBox.Show("Spalte <b>" + _TableView.CursorPosColumn().ReadableText() + "</b> endgültig löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+            _TableView.Database.Column.Remove(_TableView.CursorPosColumn());
+        }
+
+        private void btnSpalteEinblenden_Click(object sender, System.EventArgs e) {
+            ItemCollectionList ic = new();
+            foreach (var ThisColumnItem in _TableView.Database.Column) {
+                if (ThisColumnItem != null && _TableView.CurrentArrangement[ThisColumnItem] == null) { ic.Add(ThisColumnItem, false); }
+            }
+            if (ic.Count == 0) {
+                if (MessageBox.Show("Es werden bereits alle<br>Spalten angezeigt.<br><br>Wollen sie eine neue Spalte erstellen?", enImageCode.Frage, "Ja", "Nein") == 0) { btnNeueSpalteErstellen_Click(sender, e); }
+                return;
+            }
+            ic.Sort();
+            var r = InputBoxListBoxStyle.Show("Wählen sie:", ic, enAddType.None, true);
+            if (r == null || r.Count == 0) { return; }
+            _TableView.CurrentArrangement.Add(_TableView.Database.Column[r[0]], false);
+            _TableView.Invalidate_HeadSize();
+        }
+
+        private void btnSpalteNachLinks_Click(object sender, System.EventArgs e) {
+            if (_TableView.Arrangement > 0) {
+                ColumnViewItem ViewItem = null;
+                if (_TableView.CursorPosColumn() != null) { ViewItem = _TableView.CurrentArrangement[_TableView.CursorPosColumn()]; }
+                _TableView.CurrentArrangement.Swap(ViewItem, ViewItem.PreviewsVisible(_TableView.CurrentArrangement));
+            } else {
+                _TableView.Database.Column.Swap(_TableView.CursorPosColumn(), _TableView.CursorPosColumn().Previous());
+            }
+            _TableView.EnsureVisible(_TableView.CursorPosColumn(), _TableView.CursorPosRow());
+            Check_OrderButtons();
+        }
+
+        private void btnSpalteNachRechts_Click(object sender, System.EventArgs e) {
+        }
 
         private void btnSpalteNachRechts_Click_1(object sender, System.EventArgs e) {
             if (_TableView.Arrangement > 0) {
@@ -267,9 +249,12 @@ namespace BlueControls.BlueDatabaseDialogs {
             Check_OrderButtons();
         }
 
-        private void btnDatenbankPfad_Click(object sender, System.EventArgs e) {
-            var P = _TableView.Database.Filename.FilePath();
-            if (PathExists(P)) { ExecuteFile(P); }
+        private void btnSystemspaltenAusblenden_Click(object sender, System.EventArgs e) => _TableView.CurrentArrangement.HideSystemColumns();
+
+        private void cbxInternalColumnArrangementSelector_ItemClicked(object sender, BasicListItemEventArgs e) {
+            if (string.IsNullOrEmpty(cbxInternalColumnArrangementSelector.Text)) { return; }
+            _TableView.Arrangement = int.Parse(e.Item.Internal);
+            Check_OrderButtons();
         }
 
         private void Check_OrderButtons() {
@@ -326,5 +311,29 @@ namespace BlueControls.BlueDatabaseDialogs {
             grpAktuelleSpalte.Enabled = enAktuelleSpalte;
             Enabled = true;
         }
+
+        private void OrderAdd_Click(object sender, System.EventArgs e) {
+            var MitVorlage = false;
+            if (_TableView.Arrangement > 0 && _TableView.CurrentArrangement != null) {
+                MitVorlage = Convert.ToBoolean(MessageBox.Show("<b>Neue Spaltenanordnung erstellen:</b><br>Wollen sie die aktuelle Ansicht kopieren?", enImageCode.Frage, "Ja", "Nein") == 0);
+            }
+            if (_TableView.Database.ColumnArrangements.Count < 1) {
+                _TableView.Database.ColumnArrangements.Add(new ColumnViewCollection(_TableView.Database, "", ""));
+            }
+            string newname;
+            if (MitVorlage) {
+                newname = InputBox.Show("Die aktuelle Ansicht wird <b>kopiert</b>.<br><br>Geben sie den Namen<br>der neuen Anordnung ein:", "", enDataFormat.Text);
+                if (string.IsNullOrEmpty(newname)) { return; }
+                _TableView.Database.ColumnArrangements.Add(new ColumnViewCollection(_TableView.Database, _TableView.CurrentArrangement.ToString(), newname));
+            } else {
+                newname = InputBox.Show("Geben sie den Namen<br>der neuen Anordnung ein:", "", enDataFormat.Text);
+                if (string.IsNullOrEmpty(newname)) { return; }
+                _TableView.Database.ColumnArrangements.Add(new ColumnViewCollection(_TableView.Database, "", newname));
+            }
+        }
+
+        private void UpdateViewControls() => _TableView.WriteColumnArrangementsInto(cbxInternalColumnArrangementSelector);
+
+        #endregion
     }
 }

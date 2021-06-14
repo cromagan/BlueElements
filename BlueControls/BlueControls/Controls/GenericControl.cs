@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -16,8 +14,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-
-#endregion BlueElements - a collection of useful tools, database and controls
 
 using BlueBasics;
 using BlueBasics.Enums;
@@ -41,7 +37,26 @@ namespace BlueControls.Controls {
 
     public class GenericControl : System.Windows.Forms.Control, ISupportsBeginnEdit {
 
-        #region Constructor
+        #region Fields
+
+        protected bool _MouseHighlight = true;
+
+        private readonly bool _UseBackBitmap = false;
+
+        private Bitmap _BitmapOfControl;
+
+        private bool _GeneratingBitmapOfControl;
+
+        private bool _MousePressing;
+
+        private enPartentType _MyParentType = enPartentType.Unbekannt;
+
+        // Dieser Codeblock ist im Interface IQuickInfo herauskopiert und muss überall Identisch sein.
+        private string _QuickInfo = "";
+
+        #endregion
+
+        #region Constructors
 
         protected GenericControl() : this(false, false) {
         }
@@ -64,51 +79,9 @@ namespace BlueControls.Controls {
             Translate = true;
         }
 
-        #endregion Constructor
+        #endregion
 
-        #region Standard-Variablen
-
-        private bool _MousePressing;
-        protected bool _MouseHighlight = true;
-        private enPartentType _MyParentType = enPartentType.Unbekannt;
-        private readonly bool _UseBackBitmap = false;
-        private Bitmap _BitmapOfControl;
-        private bool _GeneratingBitmapOfControl;
-
-        #endregion Standard-Variablen
-
-        protected override void Dispose(bool disposing) {
-            base.Dispose(disposing);
-            if (disposing) {
-                _BitmapOfControl?.Dispose();
-                _BitmapOfControl = null;
-            }
-        }
-
-        protected void SetDoubleBuffering() => SetStyle(System.Windows.Forms.ControlStyles.DoubleBuffer, true);
-
-        protected virtual void DrawControl(Graphics gr, enStates state) => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
-
-        [DefaultValue(true)]
-        public bool Translate { get; set; }
-
-        #region AutoScale deaktivieren
-
-        // https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
-        public void PerformAutoScale() {
-            // NIX TUN!!!!
-        }
-
-        public void Scale() {
-            // NIX TUN!!!!
-        }
-
-        protected override void ScaleControl(SizeF factor, System.Windows.Forms.BoundsSpecified specified) {
-            factor = new SizeF(1, 1);
-            base.ScaleControl(factor, specified);
-        }
-
-        protected override bool ScaleChildren => false; //MyBase.ScaleChildren
+        #region Properties
 
         [DefaultValue(false)]
         public override bool AutoSize {
@@ -116,28 +89,11 @@ namespace BlueControls.Controls {
             set => base.AutoSize = false;
         }
 
-        protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified) => bounds; //MyBase.GetScaledBounds(bounds, factor, specified)
-
-        #endregion AutoScale deaktivieren
-
-        protected override void WndProc(ref System.Windows.Forms.Message m) {
-            try {
-                //https://www.vb-paradise.de/allgemeines/tipps-tricks-und-tutorials/windows-forms/50038-wndproc-kleine-liste-aller-messages/
-                if (m.Msg == (int)enWndProc.WM_ERASEBKGND) { return; }
-                base.WndProc(ref m);
-            } catch (Exception ex) {
-                Develop.DebugPrint(ex);
-            }
-        }
-
-        protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) =>
-            // MyBase.OnPaint(e) - comment out - do not call  http://stackoverflow.com/questions/592538/how-to-create-a-transparent-control-which-works-when-on-top-of-other-controls
-            DoDraw(e.Graphics);
-
-        #region QuickInfo
-
-        // Dieser Codeblock ist im Interface IQuickInfo herauskopiert und muss überall Identisch sein.
-        private string _QuickInfo = "";
+        [DefaultValue(0)]
+        [Browsable(false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public int BeginnEditCounter { get; set; } = 0;
 
         [Category("Darstellung")]
         [DefaultValue("")]
@@ -154,288 +110,31 @@ namespace BlueControls.Controls {
             }
         }
 
-        protected virtual void OnQuickInfoChanged() {
-            // Dummy, dass die angeleeiteten Controls reagieren können.
-        }
-
         public virtual string QuickInfoText => _QuickInfo;
 
-        #endregion QuickInfo
+        protected override bool ScaleChildren => false;
 
-        #region ISupportsEdit
+        [DefaultValue(true)]
+        public bool Translate { get; set; }
 
-        [DefaultValue(0)]
-        [Browsable(false)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public int BeginnEditCounter { get; set; } = 0;
+        #endregion
 
-        public new void SuspendLayout() {
-            BeginnEdit();
-            base.SuspendLayout();
-        }
+        #region Methods
 
-        public new void ResumeLayout(bool performLayout) {
-            base.ResumeLayout(performLayout);
-            EndEdit();
-        }
-
-        public new void ResumeLayout() {
-            base.ResumeLayout();
-            EndEdit();
-        }
-
-        public void BeginnEdit() => BeginnEdit(1);
-
-        public void BeginnEdit(int count) {
-            if (DesignMode) { return; }
-            foreach (var ThisControl in Controls) {
-                if (ThisControl is ISupportsBeginnEdit e) { e.BeginnEdit(count); }
-            }
-            BeginnEditCounter += count;
-        }
-
-        public void EndEdit() {
-            if (DesignMode) { return; }
-            if (BeginnEditCounter < 1) { Develop.DebugPrint(enFehlerArt.Warnung, "Bearbeitungsstapel instabil: " + BeginnEditCounter); }
-            BeginnEditCounter--;
-            if (BeginnEditCounter == 0) { Invalidate(); }
-            foreach (var ThisControl in Controls) {
-                if (ThisControl is ISupportsBeginnEdit e) { e.EndEdit(); }
-            }
-        }
-
-        protected override void OnControlAdded(System.Windows.Forms.ControlEventArgs e) {
-            if (DesignMode) { return; }
-            if (e.Control is ISupportsBeginnEdit nc) { nc.BeginnEdit(BeginnEditCounter); }
-            base.OnControlAdded(e);
-        }
-
-        #endregion ISupportsEdit
-
-        /// <summary>
-        /// Veranlaßt, das das Control neu gezeichnet wird.
-        /// </summary>
-        /// <remarks></remarks>
-        public override void Refresh() {
-            if (IsDisposed) { return; }
-            DoDraw(CreateGraphics());
-        }
-
-        protected override void OnEnabledChanged(System.EventArgs e) {
-            if (InvokeRequired) {
-                Invoke(new Action(() => OnEnabledChanged(e)));
-                return;
-            }
-            if (IsDisposed) { return; }
-            base.OnEnabledChanged(e);
-            Invalidate();
-        }
-
-        protected override void OnPaintBackground(System.Windows.Forms.PaintEventArgs pevent) {
-            // do not allow the background to be painted
-            // Um flimmern zu vermeiden!
-        }
-
-        private void DoDraw(Graphics gr) {
-            if (IsDisposed) {
-                gr.Clear(Color.Red);
-                return;
-            }
-            if (BeginnEditCounter > 0) {
-                gr.Clear(Color.LightGray);
-                return;
-            }
-            if (Develop.Exited || IsDisposed || !Visible || BeginnEditCounter > 0) { return; }
-            lock (this) {
-                if (!Skin.inited) {
-                    if (DesignMode) {
-                        Skin.LoadSkin();
-                    } else {
-                        return;
-                    }
-                }
-                if (Width < 1 || Height < 1) { return; }
-                try {
-                    if (_UseBackBitmap) {
-                        if (_BitmapOfControl == null) { _BitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb); }
-                        var TMPGR = Graphics.FromImage(_BitmapOfControl);
-                        DrawControl(TMPGR, IsStatus());
-                        if (_BitmapOfControl != null) {
-                            gr.DrawImage(_BitmapOfControl, 0, 0);
-                        }
-                        TMPGR.Dispose();
-                    } else {
-                        DrawControl(gr, IsStatus());
-                    }
-                } catch {
-                    return;
-                }
-                // UmRandung für DesignMode ------------
-                if (DesignMode) {
-                    using Pen P = new(Color.FromArgb(128, 255, 0, 0));
-                    gr.DrawRectangle(P, 0, 0, Width - 1, Height - 1);
-                }
-            }
-        }
-
-        public Point MousePos() {
-            if (InvokeRequired) {
-                return (Point)Invoke(new Func<Point>(() => MousePos()));
-            }
-            Develop.DebugPrint_Disposed(IsDisposed);
-            return PointToClient(System.Windows.Forms.Cursor.Position);
-        }
-
-        protected bool MousePressing() => _MousePressing;
-
-        public bool ContainsMouse() => ClientRectangle.Contains(PointToClient(System.Windows.Forms.Cursor.Position));
-
-        private enStates IsStatus() {
-            if (!Enabled) { return enStates.Standard_Disabled; }
-            var S = enStates.Standard;
-            if (_MouseHighlight && ContainsMouse()) { S |= enStates.Standard_MouseOver; }
-            if (_MousePressing) {
-                if (_MouseHighlight) { S |= enStates.Standard_MousePressed; }
-                if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && CanFocus) { S |= enStates.Standard_HasFocus; }
-            } else {
-                if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && CanFocus && Focused) { S |= enStates.Standard_HasFocus; }
-            }
-            return S;
-        }
-
-        #region Focus-Verwaltung
-
-        protected override void OnGotFocus(System.EventArgs e) {
-            if (IsDisposed) { return; }
-            if (!GetStyle(System.Windows.Forms.ControlStyles.Selectable)) {
-                Parent.SelectNextControl(this, true, true, true, true);
-            } else {
-                base.OnGotFocus(e);
-                Invalidate();
-            }
-        }
-
-        protected override void OnLostFocus(System.EventArgs e) {
-            if (IsDisposed) { return; }
-            if (GetStyle(System.Windows.Forms.ControlStyles.Selectable)) {
-                //if (_MousePressing) { OnMouseUp(new System.Windows.Forms.MouseEventArgs(System.Windows.Forms.MouseButtons.None, 0, 0, 0, 0)); }
-                _MouseHighlight = false;
-                base.OnLostFocus(e);
-                Invalidate();
-            }
-        }
-
-        #endregion Focus-Verwaltung
-
-        #region Key-Verwaltung
-
-        protected override void OnKeyDown(System.Windows.Forms.KeyEventArgs e) {
-            if (IsDisposed) { return; }
-            base.OnKeyDown(e);
-        }
-
-        protected override void OnKeyPress(System.Windows.Forms.KeyPressEventArgs e) {
-            if (IsDisposed) { return; }
-            base.OnKeyPress(e);
-        }
-
-        protected override void OnKeyUp(System.Windows.Forms.KeyEventArgs e) {
-            if (IsDisposed) { return; }
-            base.OnKeyUp(e);
-        }
-
-        #endregion Key-Verwaltung
-
-        #region MousePos-Verwaltung
-
-        protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
-            lock (this) {
-                if (IsDisposed) { return; }
-                if (_MousePressing) { return; }
-                _MousePressing = true;
-                Forms.QuickInfo.Close();
-                if (Enabled) {
-                    if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && Focus()) { Focus(); }
-                }
-                base.OnMouseDown(e);
-            }
-        }
-
-        protected override void OnMouseLeave(System.EventArgs e) {
-            if (IsDisposed) { return; }
-            base.OnMouseLeave(e);
-            DoQuickInfo();
-        }
-
-        public void DoQuickInfo() {
-            if (string.IsNullOrEmpty(_QuickInfo) && string.IsNullOrEmpty(QuickInfoText)) {
-                Forms.QuickInfo.Close();
-            } else {
-                if (ContainsMouse()) {
-                    Forms.QuickInfo.Show(QuickInfoText);
-                } else {
-                    Forms.QuickInfo.Close();
-                }
-            }
-        }
-
-        protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
-            lock (this) {
-                if (IsDisposed) { return; }
-                base.OnMouseMove(e);
-                DoQuickInfo();
-            }
-        }
-
-        protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
-            if (IsDisposed) { return; }
-            if (!_MousePressing) { return; }
-            _MousePressing = false;
-            base.OnMouseUp(e);
-        }
-
-        protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e) {
-            if (IsDisposed) { return; }
-            _MousePressing = false;
-            base.OnMouseWheel(e);
-        }
-
-        protected override void OnMouseEnter(System.EventArgs e) {
-            if (IsDisposed) { return; }
-            base.OnMouseEnter(e);
-            if (!string.IsNullOrEmpty(_QuickInfo) || !string.IsNullOrEmpty(QuickInfoText)) { Forms.QuickInfo.Show(QuickInfoText); }
-        }
-
-        protected override void OnSizeChanged(System.EventArgs e) {
-            if (IsDisposed) { return; }
-            Invalidate();
-            if (_BitmapOfControl != null) {
-                if (_BitmapOfControl.Width < Width || _BitmapOfControl.Height < Height) {
-                    _BitmapOfControl.Dispose();
-                    _BitmapOfControl = null;
-                }
-            }
-            base.OnSizeChanged(e);
-        }
-
-        #endregion MousePos-Verwaltung
-
-        public Bitmap BitmapOfControl() {
-            if (!_UseBackBitmap || _GeneratingBitmapOfControl) { return null; }
-            _GeneratingBitmapOfControl = true;
-            if (_BitmapOfControl == null) { Refresh(); }
-            _GeneratingBitmapOfControl = false;
-            return _BitmapOfControl;
-        }
-
-        internal static bool AllEnabled(System.Windows.Forms.Control control) {
-            Develop.DebugPrint_Disposed(control.IsDisposed);
+        public static System.Windows.Forms.Form ParentForm(System.Windows.Forms.Control o) {
+            Develop.DebugPrint_Disposed(o.IsDisposed);
             do {
-                if (control == null) { return true; }
-                if (control.IsDisposed) { return false; }
-                if (!control.Enabled) { return false; }
-                control = control.Parent;
+                switch (o) {
+                    case null:
+                        return null;
+
+                    case Form frm:
+                        return frm;
+
+                    default:
+                        o = o.Parent;
+                        break;
+                }
             } while (true);
         }
 
@@ -530,12 +229,253 @@ namespace BlueControls.Controls {
             }
         }
 
+        public void BeginnEdit() => BeginnEdit(1);
+
+        public void BeginnEdit(int count) {
+            if (DesignMode) { return; }
+            foreach (var ThisControl in Controls) {
+                if (ThisControl is ISupportsBeginnEdit e) { e.BeginnEdit(count); }
+            }
+            BeginnEditCounter += count;
+        }
+
+        public Bitmap BitmapOfControl() {
+            if (!_UseBackBitmap || _GeneratingBitmapOfControl) { return null; }
+            _GeneratingBitmapOfControl = true;
+            if (_BitmapOfControl == null) { Refresh(); }
+            _GeneratingBitmapOfControl = false;
+            return _BitmapOfControl;
+        }
+
+        public bool ContainsMouse() => ClientRectangle.Contains(PointToClient(System.Windows.Forms.Cursor.Position));
+
+        public void DoQuickInfo() {
+            if (string.IsNullOrEmpty(_QuickInfo) && string.IsNullOrEmpty(QuickInfoText)) {
+                Forms.QuickInfo.Close();
+            } else {
+                if (ContainsMouse()) {
+                    Forms.QuickInfo.Show(QuickInfoText);
+                } else {
+                    Forms.QuickInfo.Close();
+                }
+            }
+        }
+
+        public void EndEdit() {
+            if (DesignMode) { return; }
+            if (BeginnEditCounter < 1) { Develop.DebugPrint(enFehlerArt.Warnung, "Bearbeitungsstapel instabil: " + BeginnEditCounter); }
+            BeginnEditCounter--;
+            if (BeginnEditCounter == 0) { Invalidate(); }
+            foreach (var ThisControl in Controls) {
+                if (ThisControl is ISupportsBeginnEdit e) { e.EndEdit(); }
+            }
+        }
+
+        public Point MousePos() {
+            if (InvokeRequired) {
+                return (Point)Invoke(new Func<Point>(() => MousePos()));
+            }
+            Develop.DebugPrint_Disposed(IsDisposed);
+            return PointToClient(System.Windows.Forms.Cursor.Position);
+        }
+
+        // https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
+        public void PerformAutoScale() {
+            // NIX TUN!!!!
+        }
+
+        /// <summary>
+        /// Veranlaßt, das das Control neu gezeichnet wird.
+        /// </summary>
+        /// <remarks></remarks>
+        public override void Refresh() {
+            if (IsDisposed) { return; }
+            DoDraw(CreateGraphics());
+        }
+
+        public new void ResumeLayout(bool performLayout) {
+            base.ResumeLayout(performLayout);
+            EndEdit();
+        }
+
+        public new void ResumeLayout() {
+            base.ResumeLayout();
+            EndEdit();
+        }
+
+        public void Scale() {
+            // NIX TUN!!!!
+        }
+
+        public new void SuspendLayout() {
+            BeginnEdit();
+            base.SuspendLayout();
+        }
+
+        internal static bool AllEnabled(System.Windows.Forms.Control control) {
+            Develop.DebugPrint_Disposed(control.IsDisposed);
+            do {
+                if (control == null) { return true; }
+                if (control.IsDisposed) { return false; }
+                if (!control.Enabled) { return false; }
+                control = control.Parent;
+            } while (true);
+        }
+
+        protected override void Dispose(bool disposing) {
+            base.Dispose(disposing);
+            if (disposing) {
+                _BitmapOfControl?.Dispose();
+                _BitmapOfControl = null;
+            }
+        }
+
+        protected virtual void DrawControl(Graphics gr, enStates state) => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
+
+        //MyBase.ScaleChildren
+        protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified) => bounds;
+
+        protected bool MousePressing() => _MousePressing;
+
+        protected override void OnControlAdded(System.Windows.Forms.ControlEventArgs e) {
+            if (DesignMode) { return; }
+            if (e.Control is ISupportsBeginnEdit nc) { nc.BeginnEdit(BeginnEditCounter); }
+            base.OnControlAdded(e);
+        }
+
+        protected override void OnEnabledChanged(System.EventArgs e) {
+            if (InvokeRequired) {
+                Invoke(new Action(() => OnEnabledChanged(e)));
+                return;
+            }
+            if (IsDisposed) { return; }
+            base.OnEnabledChanged(e);
+            Invalidate();
+        }
+
+        protected override void OnGotFocus(System.EventArgs e) {
+            if (IsDisposed) { return; }
+            if (!GetStyle(System.Windows.Forms.ControlStyles.Selectable)) {
+                Parent.SelectNextControl(this, true, true, true, true);
+            } else {
+                base.OnGotFocus(e);
+                Invalidate();
+            }
+        }
+
+        protected override void OnKeyDown(System.Windows.Forms.KeyEventArgs e) {
+            if (IsDisposed) { return; }
+            base.OnKeyDown(e);
+        }
+
+        protected override void OnKeyPress(System.Windows.Forms.KeyPressEventArgs e) {
+            if (IsDisposed) { return; }
+            base.OnKeyPress(e);
+        }
+
+        protected override void OnKeyUp(System.Windows.Forms.KeyEventArgs e) {
+            if (IsDisposed) { return; }
+            base.OnKeyUp(e);
+        }
+
+        protected override void OnLostFocus(System.EventArgs e) {
+            if (IsDisposed) { return; }
+            if (GetStyle(System.Windows.Forms.ControlStyles.Selectable)) {
+                //if (_MousePressing) { OnMouseUp(new System.Windows.Forms.MouseEventArgs(System.Windows.Forms.MouseButtons.None, 0, 0, 0, 0)); }
+                _MouseHighlight = false;
+                base.OnLostFocus(e);
+                Invalidate();
+            }
+        }
+
+        protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
+            lock (this) {
+                if (IsDisposed) { return; }
+                if (_MousePressing) { return; }
+                _MousePressing = true;
+                Forms.QuickInfo.Close();
+                if (Enabled) {
+                    if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && Focus()) { Focus(); }
+                }
+                base.OnMouseDown(e);
+            }
+        }
+
+        protected override void OnMouseEnter(System.EventArgs e) {
+            if (IsDisposed) { return; }
+            base.OnMouseEnter(e);
+            if (!string.IsNullOrEmpty(_QuickInfo) || !string.IsNullOrEmpty(QuickInfoText)) { Forms.QuickInfo.Show(QuickInfoText); }
+        }
+
+        protected override void OnMouseLeave(System.EventArgs e) {
+            if (IsDisposed) { return; }
+            base.OnMouseLeave(e);
+            DoQuickInfo();
+        }
+
+        protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
+            lock (this) {
+                if (IsDisposed) { return; }
+                base.OnMouseMove(e);
+                DoQuickInfo();
+            }
+        }
+
+        protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
+            if (IsDisposed) { return; }
+            if (!_MousePressing) { return; }
+            _MousePressing = false;
+            base.OnMouseUp(e);
+        }
+
+        protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e) {
+            if (IsDisposed) { return; }
+            _MousePressing = false;
+            base.OnMouseWheel(e);
+        }
+
+        protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) =>
+            // MyBase.OnPaint(e) - comment out - do not call  http://stackoverflow.com/questions/592538/how-to-create-a-transparent-control-which-works-when-on-top-of-other-controls
+            DoDraw(e.Graphics);
+
+        protected override void OnPaintBackground(System.Windows.Forms.PaintEventArgs pevent) {
+            // do not allow the background to be painted
+            // Um flimmern zu vermeiden!
+        }
+
+        protected virtual void OnQuickInfoChanged() {
+            // Dummy, dass die angeleeiteten Controls reagieren können.
+        }
+
+        protected override void OnSizeChanged(System.EventArgs e) {
+            if (IsDisposed) { return; }
+            Invalidate();
+            if (_BitmapOfControl != null) {
+                if (_BitmapOfControl.Width < Width || _BitmapOfControl.Height < Height) {
+                    _BitmapOfControl.Dispose();
+                    _BitmapOfControl = null;
+                }
+            }
+            base.OnSizeChanged(e);
+        }
+
+        protected System.Windows.Forms.Form ParentForm() => ParentForm(Parent);
+
         protected enPartentType ParentType() {
             if (Parent == null) { return enPartentType.Unbekannt; }
             if (_MyParentType != enPartentType.Unbekannt) { return _MyParentType; }
             _MyParentType = Typ(Parent);
             return _MyParentType;
         }
+
+        protected override void ScaleControl(SizeF factor, System.Windows.Forms.BoundsSpecified specified) {
+            factor = new SizeF(1, 1);
+            base.ScaleControl(factor, specified);
+        }
+
+        protected void SetDoubleBuffering() => SetStyle(System.Windows.Forms.ControlStyles.DoubleBuffer, true);
+
+        //MyBase.GetScaledBounds(bounds, factor, specified)
 
         protected void SetNotFocusable() {
             Develop.DebugPrint_Disposed(IsDisposed);
@@ -547,23 +487,71 @@ namespace BlueControls.Controls {
             //SetStyle(System.Windows.Forms.ControlStyles.StandardDoubleClick, false);
         }
 
-        protected System.Windows.Forms.Form ParentForm() => ParentForm(Parent);
-
-        public static System.Windows.Forms.Form ParentForm(System.Windows.Forms.Control o) {
-            Develop.DebugPrint_Disposed(o.IsDisposed);
-            do {
-                switch (o) {
-                    case null:
-                        return null;
-
-                    case Form frm:
-                        return frm;
-
-                    default:
-                        o = o.Parent;
-                        break;
-                }
-            } while (true);
+        protected override void WndProc(ref System.Windows.Forms.Message m) {
+            try {
+                //https://www.vb-paradise.de/allgemeines/tipps-tricks-und-tutorials/windows-forms/50038-wndproc-kleine-liste-aller-messages/
+                if (m.Msg == (int)enWndProc.WM_ERASEBKGND) { return; }
+                base.WndProc(ref m);
+            } catch (Exception ex) {
+                Develop.DebugPrint(ex);
+            }
         }
+
+        private void DoDraw(Graphics gr) {
+            if (IsDisposed) {
+                gr.Clear(Color.Red);
+                return;
+            }
+            if (BeginnEditCounter > 0) {
+                gr.Clear(Color.LightGray);
+                return;
+            }
+            if (Develop.Exited || IsDisposed || !Visible || BeginnEditCounter > 0) { return; }
+            lock (this) {
+                if (!Skin.inited) {
+                    if (DesignMode) {
+                        Skin.LoadSkin();
+                    } else {
+                        return;
+                    }
+                }
+                if (Width < 1 || Height < 1) { return; }
+                try {
+                    if (_UseBackBitmap) {
+                        if (_BitmapOfControl == null) { _BitmapOfControl = new Bitmap(ClientSize.Width, ClientSize.Height, PixelFormat.Format32bppPArgb); }
+                        var TMPGR = Graphics.FromImage(_BitmapOfControl);
+                        DrawControl(TMPGR, IsStatus());
+                        if (_BitmapOfControl != null) {
+                            gr.DrawImage(_BitmapOfControl, 0, 0);
+                        }
+                        TMPGR.Dispose();
+                    } else {
+                        DrawControl(gr, IsStatus());
+                    }
+                } catch {
+                    return;
+                }
+                // UmRandung für DesignMode ------------
+                if (DesignMode) {
+                    using Pen P = new(Color.FromArgb(128, 255, 0, 0));
+                    gr.DrawRectangle(P, 0, 0, Width - 1, Height - 1);
+                }
+            }
+        }
+
+        private enStates IsStatus() {
+            if (!Enabled) { return enStates.Standard_Disabled; }
+            var S = enStates.Standard;
+            if (_MouseHighlight && ContainsMouse()) { S |= enStates.Standard_MouseOver; }
+            if (_MousePressing) {
+                if (_MouseHighlight) { S |= enStates.Standard_MousePressed; }
+                if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && CanFocus) { S |= enStates.Standard_HasFocus; }
+            } else {
+                if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && CanFocus && Focused) { S |= enStates.Standard_HasFocus; }
+            }
+            return S;
+        }
+
+        #endregion
     }
 }

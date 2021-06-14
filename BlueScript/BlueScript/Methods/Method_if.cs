@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
@@ -27,36 +23,32 @@ using static BlueBasics.Extensions;
 namespace BlueScript {
 
     internal class Method_if : Method {
-        public override string Syntax => "if (true) { Code zum Ausführen }";
-        public override string Description => "Nur wenn der Wert in der Klammer TRUE ist, wird der nachfolgende Codeblock ausgeführt. Es werden IMMER alle Vergleichsoperatoren aufgelöst. Deswegen sind Verschachtelungen mit Voricht zu verwenden - z.B. mir einem Exists-Befehl.";
 
-        public override List<string> Comand(Script s) => new() { "if" };
+        #region Fields
 
-        public override string StartSequence => "(";
-        public override string EndSequence => ")";
-        public override bool GetCodeBlockAfter => true;
-        public override enVariableDataType Returns => enVariableDataType.Null;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Bool };
-        public override bool EndlessArgs => false;
-        public static readonly List<string> VergleichsOperatoren = new() { "!", "||", "&&", "==", "!=", "<", ">", ">=", "<=" };
+        public static readonly List<string> OderOder = new() { "||" };
 
         //public static readonly List<string> VergleichsOperatoren2 = new() { "||", "&&", "==", "!=", "<", ">", ">=", "<=" };
         public static readonly List<string> UndUnd = new() { "&&" };
 
-        public static readonly List<string> OderOder = new() { "||" };
+        public static readonly List<string> VergleichsOperatoren = new() { "!", "||", "&&", "==", "!=", "<", ">", ">=", "<=" };
 
-        //public static readonly List<string> Vorbidden = new() { "exists", "istype", "isnullorempty", "isnullorzero" };
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
-            if (attvar.Attributes[0].ValueBool) {
-                (var err, var _) = Script.Parse(infos.CodeBlockAfterText, false, s);
-                if (!string.IsNullOrEmpty(err)) { return new strDoItFeedback(err); }
-            } else {
-                s.Line += infos.LineBreakInCodeBlock;
-            }
-            return new strDoItFeedback(string.Empty);
-        }
+        #endregion
+
+        #region Properties
+
+        public override List<enVariableDataType> Args => new() { enVariableDataType.Bool };
+        public override string Description => "Nur wenn der Wert in der Klammer TRUE ist, wird der nachfolgende Codeblock ausgeführt. Es werden IMMER alle Vergleichsoperatoren aufgelöst. Deswegen sind Verschachtelungen mit Voricht zu verwenden - z.B. mir einem Exists-Befehl.";
+        public override bool EndlessArgs => false;
+        public override string EndSequence => ")";
+        public override bool GetCodeBlockAfter => true;
+        public override enVariableDataType Returns => enVariableDataType.Null;
+        public override string StartSequence => "(";
+        public override string Syntax => "if (true) { Code zum Ausführen }";
+
+        #endregion
+
+        #region Methods
 
         public static string? GetBool(string txt) {
             txt = txt.DeKlammere(true, false, false, true);
@@ -133,6 +125,21 @@ namespace BlueScript {
             //Disjunktion
             ntxt = GetBoolTMP(txt, "||");
             return !string.IsNullOrEmpty(ntxt) ? GetBool(ntxt) : null;
+        }
+
+        public override List<string> Comand(Script s) => new() { "if" };
+
+        //public static readonly List<string> Vorbidden = new() { "exists", "istype", "isnullorempty", "isnullorzero" };
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+            if (attvar.Attributes[0].ValueBool) {
+                (var err, var _) = Script.Parse(infos.CodeBlockAfterText, false, s);
+                if (!string.IsNullOrEmpty(err)) { return new strDoItFeedback(err); }
+            } else {
+                s.Line += infos.LineBreakInCodeBlock;
+            }
+            return new strDoItFeedback(string.Empty);
         }
 
         private static string GetBoolTMP(string txt, string check) {
@@ -252,5 +259,7 @@ namespace BlueScript {
             }
             return string.IsNullOrEmpty(replacer) ? string.Empty : txt.Substring(0, start + 1) + replacer + txt.Substring(ende);
         }
+
+        #endregion
     }
 }

@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using System;
 using System.Drawing;
 
@@ -26,28 +22,39 @@ namespace BlueControls.EventArgs {
 
     public class AdditionalDrawing : MouseEventArgs1_1DownAndCurrent {
 
-        public AdditionalDrawing(Graphics gr, decimal zoom, decimal shiftX, decimal shiftY, MouseEventArgs1_1 mouseDown, MouseEventArgs1_1 current) : base(mouseDown, current) {
+        #region Constructors
+
+        public AdditionalDrawing(Graphics gr, double zoom, double shiftX, double shiftY, MouseEventArgs1_1 mouseDown, MouseEventArgs1_1 current) : base(mouseDown, current) {
             G = gr;
             Zoom = zoom;
             ShiftX = shiftX;
             ShiftY = shiftY;
         }
 
-        public Graphics G { get; }
-        public decimal Zoom { get; }
-        public decimal ShiftX { get; }
-        public decimal ShiftY { get; }
+        #endregion
 
-        public void FillRectangle(Brush brush, Rectangle rectangle) {
-            var x = new RectangleM(rectangle).ZoomAndMoveRect(Zoom, ShiftX, ShiftY, true);
-            G.FillRectangle(brush, x);
-        }
+        #region Properties
+
+        public Graphics G { get; }
+        public double ShiftX { get; }
+        public double ShiftY { get; }
+        public double Zoom { get; }
+
+        #endregion
+
+        #region Methods
 
         public void DrawImage(Bitmap BMP) {
             var r = new RectangleM(0, 0, BMP.Width, BMP.Height).ZoomAndMoveRect(Zoom, ShiftX, ShiftY, true);
             G.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
             G.DrawImage(BMP, r);
             //            G.DrawImage(BMP, p1.X, p1.Y, p2.X - p1.X, p2.Y - p1.Y);
+        }
+
+        public void DrawLine(Pen pen, double x1, double y1, double x2, double y2) {
+            var p1 = new PointM(x1, y1).ZoomAndMove(this);
+            var p2 = new PointM(x2, y2).ZoomAndMove(this);
+            G.DrawLine(pen, p1, p2);
         }
 
         public void FillCircle(Color C, int X, int Y, int R) {
@@ -60,10 +67,11 @@ namespace BlueControls.EventArgs {
             }
         }
 
-        public void DrawLine(Pen pen, decimal x1, decimal y1, decimal x2, decimal y2) {
-            var p1 = new PointM(x1, y1).ZoomAndMove(this);
-            var p2 = new PointM(x2, y2).ZoomAndMove(this);
-            G.DrawLine(pen, p1, p2);
+        public void FillRectangle(Brush brush, Rectangle rectangle) {
+            var x = new RectangleM(rectangle).ZoomAndMoveRect(Zoom, ShiftX, ShiftY, true);
+            G.FillRectangle(brush, x);
         }
+
+        #endregion
     }
 }

@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.EventArgs;
@@ -30,14 +26,19 @@ namespace BlueControls.Forms {
 
     public sealed partial class ItemSelect {
 
-        public ItemSelect() => InitializeComponent();
+        #region Fields
 
         private BasicListItem ClickedItem;
 
-        private void List_ItemClicked(object sender, BasicListItemEventArgs e) {
-            ClickedItem = e.Item;
-            Close();
-        }
+        #endregion
+
+        #region Constructors
+
+        public ItemSelect() => InitializeComponent();
+
+        #endregion
+
+        #region Methods
 
         public string SelectOne_OfDataSystem(List<string> Files, string FileEncryptionKey) {
             //    Dim l As List(Of String) = DataSystem.GetFiles()
@@ -65,5 +66,12 @@ namespace BlueControls.Forms {
             } while (true);
             return (ClickedItem as RowFormulaListItem)?.Row;
         }
+
+        private void List_ItemClicked(object sender, BasicListItemEventArgs e) {
+            ClickedItem = e.Item;
+            Close();
+        }
+
+        #endregion
     }
 }

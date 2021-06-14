@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,17 +15,24 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 namespace BlueBasics.EventArgs {
 
     public class NeedImageEventArgs : System.EventArgs {
-        public string Name { get; }
-        public BitmapExt BMP { get; set; }
+
+        #region Constructors
 
         public NeedImageEventArgs(string name) {
             Name = name;
             BMP = null;
         }
+
+        #endregion
+
+        #region Properties
+
+        public BitmapExt BMP { get; set; }
+        public string Name { get; }
+
+        #endregion
     }
 }

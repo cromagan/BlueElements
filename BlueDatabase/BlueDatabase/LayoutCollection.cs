@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 
 namespace BlueDatabase {
@@ -30,6 +26,16 @@ namespace BlueDatabase {
     /// </summary>
     public class LayoutCollection : ListExt<string> {
 
+        #region Methods
+
+        public void Check() {
+            for (var z = 0; z < Count; z++) {
+                if (!this[z].StartsWith("{ID=#")) {
+                    this[z] = "{ID=#Converted" + z.ToString() + ", " + this[z].Substring(1);
+                }
+            }
+        }
+
         // Info:
         // ExportDialog.AddLayoutsOff wandelt Layouts In Items um
         public int LayoutIDToIndex(string exportFormularID) {
@@ -39,12 +45,6 @@ namespace BlueDatabase {
             return -1;
         }
 
-        public void Check() {
-            for (var z = 0; z < Count; z++) {
-                if (!this[z].StartsWith("{ID=#")) {
-                    this[z] = "{ID=#Converted" + z.ToString() + ", " + this[z].Substring(1);
-                }
-            }
-        }
+        #endregion
     }
 }

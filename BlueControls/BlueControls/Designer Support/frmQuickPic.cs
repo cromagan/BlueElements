@@ -1,5 +1,3 @@
-#region BlueElements - a collection of useful tools, database and controls
-
 // Authors:
 // Christian Peter
 //
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using System;
@@ -29,53 +25,124 @@ namespace BlueControls.Designer_Support {
 
     internal sealed class frmQuickPic : Panel {
 
-        #region Vom Windows Form Designer generierter Code
+        #region Fields
+
+        internal Button ButOK;
+
+        private CheckBox chkbDurchgestrichen;
+
+        private CheckBox chkbGrauStufen;
+
+        private CheckBox chkbMEDisabled;
+
+        private CheckBox chkbXPDisabled;
+
+        private TextBox Färb;
+
+        private GroupBox GroupBox1;
+
+        private GroupBox GroupBox2;
+
+        private GroupBox GroupBox3;
+
+        private GroupBox GroupBox4;
+
+        private TextBox grün;
+
+        private TextBox GrX;
+
+        private TextBox GrY;
+
+        private TrackBar Hell;
+
+        private Label Helll;
+
+        private Label Label1;
+
+        private Label Label2;
+
+        private Label Label3;
+
+        private Label Label4;
+
+        private Label Label5;
+
+        private Label Label6;
+
+        private ListBox LB;
+
+        private TextBox PicName;
+
+        private PictureBox Preview;
+
+        private TrackBar SAT;
+
+        private Label SATL;
+
+        private TrackBar Transp;
+
+        private Label Transpl;
+
+        private TextBox txbZweitsymbol;
+
+        private GroupBox ZweitSymbol;
+
+        #endregion
+
+        #region Constructors
 
         public frmQuickPic() =>
-            // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
-            InitializeComponent();// Initialisierungen nach dem Aufruf InitializeComponent() hinzufügen
+                                                                                                                                                                                                                                                            // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
+                                                                                                                                                                                                                                                            InitializeComponent();
+
+        #endregion
+
+        // Initialisierungen nach dem Aufruf InitializeComponent() hinzufügen
+
+        #region Methods
+
+        public void GeneratePreview() {
+            try {
+                Preview.Image = QuickImage.Get(ICode()).BMP;
+            } catch {
+                Preview.Image = null;
+            }
+        }
+
+        public string ICode() {
+            var e = (enImageCodeEffect)(((chkbGrauStufen.Checked ? -1 : 0) * -(int)enImageCodeEffect.Graustufen) | ((chkbDurchgestrichen.Checked ? -1 : 0) * -(int)enImageCodeEffect.Durchgestrichen) | ((chkbMEDisabled.Checked ? -1 : 0) * -(int)enImageCodeEffect.WindowsMEDisabled) | ((chkbXPDisabled.Checked ? -1 : 0) * -(int)enImageCodeEffect.WindowsXPDisabled));
+            return QuickImage.GenerateCode(PicName.Text, int.Parse(GrX.Text), int.Parse(GrY.Text), e, Färb.Text, grün.Text, SAT.Value, Hell.Value, 0, Transp.Value, txbZweitsymbol.Text);
+        }
+
+        public void StartAll(string C) {
+            LB.Items.Clear();
+            const enImageCode tempVar = (enImageCode)9999;
+            for (enImageCode z = 0; z <= tempVar; z++) {
+                var w = Enum.GetName(z.GetType(), z);
+                if (!string.IsNullOrEmpty(w)) { LB.Items.Add(w); }
+            }
+            QuickImage l = new(C);
+            PicName.Text = l.Name;
+            Färb.Text = l.Färbung;
+            grün.Text = l.ChangeGreenTo;
+            chkbGrauStufen.Checked = Convert.ToBoolean(l.Effekt & enImageCodeEffect.Graustufen);
+            SAT.Value = l.Sättigung;
+            Hell.Value = l.Helligkeit;
+            Transp.Value = l.Transparenz;
+            if (l.Effekt < 0) { l.Effekt = 0; }
+            chkbDurchgestrichen.Checked = Convert.ToBoolean(l.Effekt & enImageCodeEffect.Durchgestrichen);
+            chkbMEDisabled.Checked = Convert.ToBoolean(l.Effekt & enImageCodeEffect.WindowsMEDisabled);
+            chkbXPDisabled.Checked = Convert.ToBoolean(l.Effekt & enImageCodeEffect.WindowsXPDisabled);
+            GrX.Text = l.Width.ToString();
+            GrY.Text = l.Height.ToString();
+            txbZweitsymbol.Text = l.Zweitsymbol;
+        }
 
         // Die Form überschreibt den Deletevorgang der Basisklasse, um Komponenten zu bereinigen.
         protected override void Dispose(bool NowDisposing) {
-            if (NowDisposing) {
-            }
+            if (NowDisposing) { }
             base.Dispose(NowDisposing);
         }
-
-        //HINWEIS: Die folgende Prozedur ist für den Windows Form-Designer erforderlich
-        //Sie kann mit dem Windows Form-Designer modifiziert werden.
-        //Verwenden Sie nicht den Code-Editor zur Bearbeitung.
-        private ListBox LB;
-
-        private GroupBox GroupBox1;
-        private GroupBox GroupBox2;
-        private Label Label1;
-        private TextBox GrY;
-        private TextBox GrX;
-        internal Button ButOK;
-        private CheckBox chkbDurchgestrichen;
-        private CheckBox chkbGrauStufen;
-        private CheckBox chkbMEDisabled;
-        private CheckBox chkbXPDisabled;
-        private GroupBox GroupBox4;
-        private PictureBox Preview;
-        private TrackBar SAT;
-        private Label Label2;
-        private Label SATL;
-        private TrackBar Hell;
-        private Label Label4;
-        private TrackBar Transp;
-        private Label Helll;
-        private Label Label6;
-        private Label Transpl;
-        private Label Label3;
-        private Label Label5;
-        private TextBox Färb;
-        private TextBox grün;
-        private GroupBox GroupBox3;
-        private GroupBox ZweitSymbol;
-        private TextBox txbZweitsymbol;
-        private TextBox PicName;
 
         [DebuggerStepThrough]
         private void InitializeComponent() {
@@ -461,49 +528,7 @@ namespace BlueControls.Designer_Support {
             ResumeLayout(false);
         }
 
-        #endregion Vom Windows Form Designer generierter Code
-
-        public void StartAll(string C) {
-            LB.Items.Clear();
-            const enImageCode tempVar = (enImageCode)9999;
-            for (enImageCode z = 0; z <= tempVar; z++) {
-                var w = Enum.GetName(z.GetType(), z);
-                if (!string.IsNullOrEmpty(w)) { LB.Items.Add(w); }
-            }
-            QuickImage l = new(C);
-            PicName.Text = l.Name;
-            Färb.Text = l.Färbung;
-            grün.Text = l.ChangeGreenTo;
-            chkbGrauStufen.Checked = Convert.ToBoolean(l.Effekt & enImageCodeEffect.Graustufen);
-            SAT.Value = l.Sättigung;
-            Hell.Value = l.Helligkeit;
-            Transp.Value = l.Transparenz;
-            if (l.Effekt < 0) { l.Effekt = 0; }
-            chkbDurchgestrichen.Checked = Convert.ToBoolean(l.Effekt & enImageCodeEffect.Durchgestrichen);
-            chkbMEDisabled.Checked = Convert.ToBoolean(l.Effekt & enImageCodeEffect.WindowsMEDisabled);
-            chkbXPDisabled.Checked = Convert.ToBoolean(l.Effekt & enImageCodeEffect.WindowsXPDisabled);
-            GrX.Text = l.Width.ToString();
-            GrY.Text = l.Height.ToString();
-            txbZweitsymbol.Text = l.Zweitsymbol;
-        }
-
         private void LB_DoubleClick(object sender, System.EventArgs e) => PicName.Text = Convert.ToString(LB.SelectedItem);
-
-        public void GeneratePreview() {
-            try {
-                Preview.Image = QuickImage.Get(ICode()).BMP;
-            } catch {
-                Preview.Image = null;
-            }
-        }
-
-        public string ICode() {
-            var e = (enImageCodeEffect)(((chkbGrauStufen.Checked ? -1 : 0) * -(int)enImageCodeEffect.Graustufen) | ((chkbDurchgestrichen.Checked ? -1 : 0) * -(int)enImageCodeEffect.Durchgestrichen) | ((chkbMEDisabled.Checked ? -1 : 0) * -(int)enImageCodeEffect.WindowsMEDisabled) | ((chkbXPDisabled.Checked ? -1 : 0) * -(int)enImageCodeEffect.WindowsXPDisabled));
-            return QuickImage.GenerateCode(PicName.Text, int.Parse(GrX.Text), int.Parse(GrY.Text), e, Färb.Text, grün.Text, SAT.Value, Hell.Value, 0, Transp.Value, txbZweitsymbol.Text);
-        }
-
-        private void SomethingCheckedChanged(object sender, System.EventArgs e) {
-        }
 
         private void SomethingChanged(object sender, System.EventArgs e) {
             Helll.Text = Hell.Value + "%";
@@ -511,5 +536,9 @@ namespace BlueControls.Designer_Support {
             Transpl.Text = Transp.Value + "%";
             GeneratePreview();
         }
+
+        private void SomethingCheckedChanged(object sender, System.EventArgs e) { }
+
+        #endregion
     }
 }

@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -31,6 +27,32 @@ namespace BlueControls.Forms {
 
     public partial class Form : System.Windows.Forms.Form, ISupportsBeginnEdit, IUseMyBackColor {
 
+        #region Fields
+
+        /// <summary>
+        /// Die Dicke des unteren Rahmens einer Form in Pixel
+        /// </summary>
+        public static readonly int BorderBottom = 8;
+
+        /// <summary>
+        /// Die Dicke des oberen Balkens und unteren Randes einer Form in Pixel
+        /// </summary>
+        public static readonly int BorderHeight = 39;
+
+        /// <summary>
+        /// Die Dicke des oberen Balken einer Form in Pixel
+        /// </summary>
+        public static readonly int BorderTop = 31;
+
+        /// <summary>
+        /// Die Dicke des linken und rechen Randes einer Form in Pixel
+        /// </summary>
+        public static readonly int BorderWidth = 16;
+
+        #endregion
+
+        #region Constructors
+
         public Form() : this(enDesign.Form_Standard) {
         }
 
@@ -42,49 +64,9 @@ namespace BlueControls.Forms {
             BackColor = Skin.Color_Back(Design, enStates.Standard);
         }
 
-        public bool IsClosed { get; private set; }
+        #endregion
 
-        /// <summary>
-        /// Die Dicke des linken und rechen Randes einer Form in Pixel
-        /// </summary>
-        public static readonly int BorderWidth = 16;
-
-        /// <summary>
-        /// Die Dicke des oberen Balkens und unteren Randes einer Form in Pixel
-        /// </summary>
-        public static readonly int BorderHeight = 39;
-
-        /// <summary>
-        /// Die Dicke des unteren Rahmens einer Form in Pixel
-        /// </summary>
-        public static readonly int BorderBottom = 8;
-
-        /// <summary>
-        /// Die Dicke des oberen Balken einer Form in Pixel
-        /// </summary>
-        public static readonly int BorderTop = 31;
-
-        protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) {
-            if (!IsClosed && !IsDisposed) { base.OnPaint(e); }
-        }
-
-        #region AutoScale deaktivieren
-
-        // https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
-        public new void PerformAutoScale() {
-            // NIX TUN!!!!
-        }
-
-        public void Scale() {
-            // NIX TUN!!!!
-        }
-
-        protected override void ScaleControl(SizeF factor, System.Windows.Forms.BoundsSpecified specified) {
-            factor = new SizeF(1, 1);
-            base.ScaleControl(factor, specified);
-        }
-
-        protected override bool ScaleChildren => false; //MyBase.ScaleChildren
+        #region Properties
 
         [DefaultValue(false)]
         public override bool AutoSize {
@@ -92,40 +74,36 @@ namespace BlueControls.Forms {
             set => base.AutoSize = false;
         }
 
-        protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified) => bounds; //MyBase.GetScaledBounds(bounds, factor, specified)
-
-        #endregion AutoScale deaktivieren
-
-        [DefaultValue(enDesign.Form_Standard)]
-        public enDesign Design {
-            get;
-        } = enDesign.Form_Standard;
-
-        [DefaultValue(true)]
-        public bool CloseButtonEnabled { get; set; } = true;
-
-        #region ISupportsEdit
-
         [DefaultValue(0)]
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public int BeginnEditCounter { get; set; } = 0;
 
-        public new void SuspendLayout() {
-            BeginnEdit();
-            base.SuspendLayout();
+        [DefaultValue(true)]
+        public bool CloseButtonEnabled { get; set; } = true;
+
+        protected override System.Windows.Forms.CreateParams CreateParams {
+            get {
+                var oParam = base.CreateParams;
+                if (!CloseButtonEnabled) {
+                    oParam.ClassStyle |= (int)enCS.NOCLOSE;
+                }
+                return oParam;
+            }
         }
 
-        public new void ResumeLayout(bool performLayout) {
-            base.ResumeLayout(performLayout);
-            EndEdit();
-        }
+        [DefaultValue(enDesign.Form_Standard)]
+        public enDesign Design {
+            get;
+        } = enDesign.Form_Standard;
 
-        public new void ResumeLayout() {
-            base.ResumeLayout();
-            EndEdit();
-        }
+        public bool IsClosed { get; private set; }
+        protected override bool ScaleChildren => false;
+
+        #endregion
+
+        #region Methods
 
         public void BeginnEdit() => BeginnEdit(1);
 
@@ -147,13 +125,47 @@ namespace BlueControls.Forms {
             }
         }
 
+        public bool IsMouseInForm() => new Rectangle(Location, Size).Contains(System.Windows.Forms.Cursor.Position);
+
+        // https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
+        public new void PerformAutoScale() {
+            // NIX TUN!!!!
+        }
+
+        public new void ResumeLayout(bool performLayout) {
+            base.ResumeLayout(performLayout);
+            EndEdit();
+        }
+
+        public new void ResumeLayout() {
+            base.ResumeLayout();
+            EndEdit();
+        }
+
+        public void Scale() {
+            // NIX TUN!!!!
+        }
+
+        public new void SuspendLayout() {
+            BeginnEdit();
+            base.SuspendLayout();
+        }
+
+        //MyBase.ScaleChildren
+        protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified) => bounds;
+
+        //MyBase.GetScaledBounds(bounds, factor, specified)
         protected override void OnControlAdded(System.Windows.Forms.ControlEventArgs e) {
             if (DesignMode) { return; }
             if (e.Control is ISupportsBeginnEdit nc) { nc.BeginnEdit(BeginnEditCounter); }
             base.OnControlAdded(e);
         }
 
-        #endregion ISupportsEdit
+        protected override void OnCreateControl() {
+            Develop.StartService();
+            Table.StartDatabaseService();
+            base.OnCreateControl();
+        }
 
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
             //https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.form.closed?view=netframework-4.8
@@ -164,23 +176,21 @@ namespace BlueControls.Forms {
             }
         }
 
-        protected override void OnCreateControl() {
-            Develop.StartService();
-            Table.StartDatabaseService();
-            base.OnCreateControl();
-        }
-
-        protected override void OnResize(System.EventArgs e) {
-            if (!IsClosed) { base.OnResize(e); }
-        }
-
-        protected override void OnSizeChanged(System.EventArgs e) {
-            if (!IsClosed) { base.OnSizeChanged(e); }
+        protected override void OnInvalidated(System.Windows.Forms.InvalidateEventArgs e) {
+            if (!IsClosed) { base.OnInvalidated(e); }
         }
 
         protected override void OnLoad(System.EventArgs e) {
             BackColor = Skin.Color_Back(Design, enStates.Standard);
             base.OnLoad(e);
+        }
+
+        protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) {
+            if (!IsClosed && !IsDisposed) { base.OnPaint(e); }
+        }
+
+        protected override void OnResize(System.EventArgs e) {
+            if (!IsClosed) { base.OnResize(e); }
         }
 
         protected override void OnResizeBegin(System.EventArgs e) {
@@ -191,8 +201,13 @@ namespace BlueControls.Forms {
             if (!IsClosed) { base.OnResizeEnd(e); }
         }
 
-        protected override void OnInvalidated(System.Windows.Forms.InvalidateEventArgs e) {
-            if (!IsClosed) { base.OnInvalidated(e); }
+        protected override void OnSizeChanged(System.EventArgs e) {
+            if (!IsClosed) { base.OnSizeChanged(e); }
+        }
+
+        protected override void ScaleControl(SizeF factor, System.Windows.Forms.BoundsSpecified specified) {
+            factor = new SizeF(1, 1);
+            base.ScaleControl(factor, specified);
         }
 
         private void SkinChanged() {
@@ -200,16 +215,6 @@ namespace BlueControls.Forms {
             Invalidate();
         }
 
-        public bool IsMouseInForm() => new Rectangle(Location, Size).Contains(System.Windows.Forms.Cursor.Position);
-
-        protected override System.Windows.Forms.CreateParams CreateParams {
-            get {
-                var oParam = base.CreateParams;
-                if (!CloseButtonEnabled) {
-                    oParam.ClassStyle |= (int)enCS.NOCLOSE;
-                }
-                return oParam;
-            }
-        }
+        #endregion
     }
 }

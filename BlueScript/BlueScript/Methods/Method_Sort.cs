@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
@@ -28,19 +24,30 @@ namespace BlueScript {
 
     internal class Method_Sort : Method {
 
-        //public Method_Sort(Script parent) : base(parent) { }
-        public override string Syntax => "Sort(ListVariable, EliminateDupes);";
+        #region Properties
+
+        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List, enVariableDataType.Bool };
 
         public override string Description => "Sortiert die Liste und falls das zweite Attribut TRUE ist, entfernt Doubletten.";
 
-        public override List<string> Comand(Script s) => new() { "sort" };
+        public override bool EndlessArgs => false;
+
+        public override string EndSequence => ");";
+
+        public override bool GetCodeBlockAfter => false;
+
+        public override enVariableDataType Returns => enVariableDataType.Null;
 
         public override string StartSequence => "(";
-        public override string EndSequence => ");";
-        public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.Null;
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List, enVariableDataType.Bool };
-        public override bool EndlessArgs => false;
+
+        //public Method_Sort(Script parent) : base(parent) { }
+        public override string Syntax => "Sort(ListVariable, EliminateDupes);";
+
+        #endregion
+
+        #region Methods
+
+        public override List<string> Comand(Script s) => new() { "sort" };
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
@@ -54,5 +61,7 @@ namespace BlueScript {
             attvar.Attributes[0].ValueListString = x;
             return new strDoItFeedback();
         }
+
+        #endregion
     }
 }

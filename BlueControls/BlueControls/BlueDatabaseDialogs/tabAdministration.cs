@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -16,8 +14,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-
-#endregion BlueElements - a collection of useful tools, database and controls
 
 using BlueBasics;
 using BlueBasics.Enums;
@@ -40,13 +36,23 @@ namespace BlueControls.BlueDatabaseDialogs {
 
     public partial class tabAdministration : TabPage // System.Windows.Forms.UserControl //
     {
-        private Table _TableView;
+        #region Fields
+
         private Database _originalDB;
+        private Table _TableView;
+
+        #endregion
+
+        #region Constructors
 
         public tabAdministration() : base() {
             InitializeComponent();
             Check_OrderButtons();
         }
+
+        #endregion
+
+        #region Properties
 
         [DefaultValue((Table)null)]
         public Table Table {
@@ -68,12 +74,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
         }
 
-        private void TableView_EnabledChanged(object sender, System.EventArgs e) => Check_OrderButtons();
+        #endregion
 
-        private void TableView_DatabaseChanged(object sender, System.EventArgs e) {
-            ChangeDatabase(_TableView.Database);
-            Check_OrderButtons();
-        }
+        #region Methods
 
         public static void CheckDatabase(object sender, LoadedEventArgs e) {
             var _database = (Database)sender;
@@ -92,18 +95,6 @@ namespace BlueControls.BlueDatabaseDialogs {
                 }
             }
         }
-
-        private void ChangeDatabase(Database database) {
-            if (_originalDB != null) {
-                _originalDB.Disposing -= _originalDB_Disposing;
-            }
-            _originalDB = null;
-            btnVorherigeVersion.Text = "Vorherige Version";
-            CheckDatabase(database, null);
-            Check_OrderButtons();
-        }
-
-        private void _originalDB_Disposing(object sender, System.EventArgs e) => ChangeDatabase(null);
 
         public static void OpenColumnEditor(ColumnItem column, RowItem Row, Table tableview) {
             if (column == null) { return; }
@@ -144,27 +135,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             column.Invalidate_ColumAndContent();
         }
 
-        private void btnSpaltenUebersicht_Click(object sender, System.EventArgs e) => _TableView.Database.Column.GenerateOverView();
-
-        private void Check_OrderButtons() {
-            if (InvokeRequired) {
-                Invoke(new Action(() => Check_OrderButtons()));
-                return;
-            }
-            var enTabAllgemein = true;
-            var enTabellenAnsicht = true;
-            if (_TableView?.Database == null || !_TableView.Database.IsAdministrator()) {
-                Enabled = false;
-                return; // Weitere funktionen benötigen sicher eine Datenbank um keine Null Exception auszulösen
-            }
-            if (_TableView.Design != enBlueTableAppearance.Standard || !_TableView.Enabled || _TableView.Database.ReadOnly) {
-                enTabellenAnsicht = false;
-            }
-            grpAllgemein.Enabled = enTabAllgemein;
-            grpTabellenAnsicht.Enabled = enTabellenAnsicht;
-            Enabled = true;
-        }
-
         /// <summary>
         /// Löst das DatabaseLoadedEvengt aus, weil es fast einem Neuladen gleichkommt.
         /// </summary>
@@ -175,12 +145,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             using DatabaseHeadEditor w = new(DB);
             w.ShowDialog();
             // DB.OnLoaded(new LoadedEventArgs(true));
-        }
-
-        private void btnLayouts_Click(object sender, System.EventArgs e) {
-            Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
-            if (_TableView.Database == null) { return; }
-            OpenLayoutEditor(_TableView.Database, string.Empty);
         }
 
         public static void OpenLayoutEditor(Database DB, string LayoutToOpen) {
@@ -195,9 +159,55 @@ namespace BlueControls.BlueDatabaseDialogs {
             w.ShowDialog();
         }
 
-        private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => OpenDatabaseHeadEditor(_TableView.Database);
+        public static ItemCollectionList Vorgängervsersionen(Database db) {
+            List<string> Zusatz = new();
+            ItemCollectionList L = new();
+            foreach (var ThisExport in db.Export) {
+                if (ThisExport.Typ == enExportTyp.DatenbankOriginalFormat) {
+                    foreach (var ThisString in ThisExport._BereitsExportiert) {
+                        var t = ThisString.SplitBy("|");
+                        if (FileExists(t[0])) {
+                            var q1 = QuickImage.Get(enImageCode.Kugel, 16, Extensions.MixColor(Color.Red, Color.Green, DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / ThisExport.AutomatischLöschen).ToHTMLCode(), "");
+                            L.Add(t[1], t[0], q1, true, DataFormat.CompareKey(t[1], enDataFormat.Datum_und_Uhrzeit));
+                        }
+                    }
+                    Zusatz.AddRange(Directory.GetFiles(ThisExport.Verzeichnis, db.Filename.FileNameWithoutSuffix() + "_*.MDB"));
+                }
+            }
+            foreach (var ThisString in Zusatz) {
+                if (L[ThisString] == null) {
+                    L.Add(ThisString.FileNameWithSuffix(), ThisString, QuickImage.Get(enImageCode.Warnung), true, DataFormat.CompareKey(new FileInfo(ThisString).CreationTime.ToString(), enDataFormat.Datum_und_Uhrzeit));
+                }
+            }
+            L.Sort();
+            return L;
+        }
+
+        private void _originalDB_Disposing(object sender, System.EventArgs e) => ChangeDatabase(null);
+
+        private void btnAdminMenu_Click(object sender, System.EventArgs e) {
+            if (_TableView == null) { return; }
+            AdminMenu adm = new(_TableView);
+            adm.Show();
+            adm.BringToFront();
+        }
 
         private void btnClipboardImport_Click(object sender, System.EventArgs e) => _TableView.ImportClipboard();
+
+        private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => OpenDatabaseHeadEditor(_TableView.Database);
+
+        private void btnDatenüberprüfung_Click(object sender, System.EventArgs e) {
+            if (_TableView.Database == null || !_TableView.Database.IsAdministrator()) { return; }
+            _TableView.Database.Row.DoAutomatic(_TableView.Filter, true, _TableView.PinnedRows, "manual check");
+        }
+
+        private void btnLayouts_Click(object sender, System.EventArgs e) {
+            Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
+            if (_TableView.Database == null) { return; }
+            OpenLayoutEditor(_TableView.Database, string.Empty);
+        }
+
+        private void btnSpaltenUebersicht_Click(object sender, System.EventArgs e) => _TableView.Database.Column.GenerateOverView();
 
         private void btnVorherigeVersion_Click(object sender, System.EventArgs e) {
             btnVorherigeVersion.Enabled = false;
@@ -232,47 +242,49 @@ namespace BlueControls.BlueDatabaseDialogs {
             btnVorherigeVersion.Enabled = true;
         }
 
-        public static ItemCollectionList Vorgängervsersionen(Database db) {
-            List<string> Zusatz = new();
-            ItemCollectionList L = new();
-            foreach (var ThisExport in db.Export) {
-                if (ThisExport.Typ == enExportTyp.DatenbankOriginalFormat) {
-                    foreach (var ThisString in ThisExport._BereitsExportiert) {
-                        var t = ThisString.SplitBy("|");
-                        if (FileExists(t[0])) {
-                            var q1 = QuickImage.Get(enImageCode.Kugel, 16, Extensions.MixColor(Color.Red, Color.Green, DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / ThisExport.AutomatischLöschen).ToHTMLCode(), "");
-                            L.Add(t[1], t[0], q1, true, DataFormat.CompareKey(t[1], enDataFormat.Datum_und_Uhrzeit));
-                        }
-                    }
-                    Zusatz.AddRange(Directory.GetFiles(ThisExport.Verzeichnis, db.Filename.FileNameWithoutSuffix() + "_*.MDB"));
-                }
-            }
-            foreach (var ThisString in Zusatz) {
-                if (L[ThisString] == null) {
-                    L.Add(ThisString.FileNameWithSuffix(), ThisString, QuickImage.Get(enImageCode.Warnung), true, DataFormat.CompareKey(new FileInfo(ThisString).CreationTime.ToString(), enDataFormat.Datum_und_Uhrzeit));
-                }
-            }
-            L.Sort();
-            return L;
-        }
-
-        private void btnAdminMenu_Click(object sender, System.EventArgs e) {
-            if (_TableView == null) { return; }
-            AdminMenu adm = new(_TableView);
-            adm.Show();
-            adm.BringToFront();
-        }
-
-        private void btnDatenüberprüfung_Click(object sender, System.EventArgs e) {
-            if (_TableView.Database == null || !_TableView.Database.IsAdministrator()) { return; }
-            _TableView.Database.Row.DoAutomatic(_TableView.Filter, true, _TableView.PinnedRows, "manual check");
-        }
-
         private void btnZeileLöschen_Click(object sender, System.EventArgs e) {
             if (!_TableView.Database.IsAdministrator()) { return; }
             var m = MessageBox.Show("Angezeigte Zeilen löschen?", enImageCode.Warnung, "Ja", "Nein");
             if (m != 0) { return; }
             _TableView.Database.Row.Remove(_TableView.Filter);
         }
+
+        private void ChangeDatabase(Database database) {
+            if (_originalDB != null) {
+                _originalDB.Disposing -= _originalDB_Disposing;
+            }
+            _originalDB = null;
+            btnVorherigeVersion.Text = "Vorherige Version";
+            CheckDatabase(database, null);
+            Check_OrderButtons();
+        }
+
+        private void Check_OrderButtons() {
+            if (InvokeRequired) {
+                Invoke(new Action(() => Check_OrderButtons()));
+                return;
+            }
+            var enTabAllgemein = true;
+            var enTabellenAnsicht = true;
+            if (_TableView?.Database == null || !_TableView.Database.IsAdministrator()) {
+                Enabled = false;
+                return; // Weitere funktionen benötigen sicher eine Datenbank um keine Null Exception auszulösen
+            }
+            if (_TableView.Design != enBlueTableAppearance.Standard || !_TableView.Enabled || _TableView.Database.ReadOnly) {
+                enTabellenAnsicht = false;
+            }
+            grpAllgemein.Enabled = enTabAllgemein;
+            grpTabellenAnsicht.Enabled = enTabellenAnsicht;
+            Enabled = true;
+        }
+
+        private void TableView_DatabaseChanged(object sender, System.EventArgs e) {
+            ChangeDatabase(_TableView.Database);
+            Check_OrderButtons();
+        }
+
+        private void TableView_EnabledChanged(object sender, System.EventArgs e) => Check_OrderButtons();
+
+        #endregion
     }
 }

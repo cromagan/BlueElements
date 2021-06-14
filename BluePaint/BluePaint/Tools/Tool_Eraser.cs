@@ -1,9 +1,7 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2019 Christian Peter
+// Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueControls.EventArgs;
 using System;
@@ -29,6 +25,8 @@ namespace BluePaint {
 
     public partial class Tool_Eraser : GenericTool {
 
+        #region Constructors
+
         public Tool_Eraser(bool Aufnahme) : base() {
             InitializeComponent();
             DrawBox.Enabled = !Aufnahme;
@@ -37,6 +35,10 @@ namespace BluePaint {
                 Eleminate.Checked = true;
             }
         }
+
+        #endregion
+
+        #region Methods
 
         public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic) {
             if (Razi.Checked) {
@@ -54,10 +56,10 @@ namespace BluePaint {
                     p1 = new Point(e.Current.TrimmedX, e.Current.TrimmedY);
                     p2 = new Point(e.Current.TrimmedX, e.Current.TrimmedY);
                 }
-                e.DrawLine(Pen_RedTransp, -0.5m, p1.Y - 0.5m, _Pic.Width + 0.5m, p1.Y - 0.5m);
-                e.DrawLine(Pen_RedTransp, p1.X - 0.5m, -0.5m, p1.X - 0.5m, _Pic.Height + 0.5m);
-                e.DrawLine(Pen_RedTransp, -0.5m, p2.Y + 0.5m, _Pic.Width + 0.5m, p2.Y + 0.5m);
-                e.DrawLine(Pen_RedTransp, p2.X + 0.5m, 0, p2.X + 0.5m, _Pic.Height + 0.5m);
+                e.DrawLine(Pen_RedTransp, -0.5d, p1.Y - 0.5d, _Pic.Width + 0.5d, p1.Y - 0.5d);
+                e.DrawLine(Pen_RedTransp, p1.X - 0.5d, -0.5d, p1.X - 0.5d, _Pic.Height + 0.5d);
+                e.DrawLine(Pen_RedTransp, -0.5d, p2.Y + 0.5d, _Pic.Width + 0.5d, p2.Y + 0.5d);
+                e.DrawLine(Pen_RedTransp, p2.X + 0.5d, 0, p2.X + 0.5d, _Pic.Height + 0.5d);
                 //if (e.Current.Button == System.Windows.Forms.MouseButtons.Left && e.MouseDown != null) {
                 //    e.DrawLine(Pen_RedTransp, -1, e.MouseDown.TrimmedY, _Pic.Width, e.MouseDown.TrimmedY);
                 //    e.DrawLine(Pen_RedTransp, e.MouseDown.TrimmedX, -1, e.MouseDown.TrimmedX, _Pic.Height);
@@ -65,6 +67,19 @@ namespace BluePaint {
                 //}
             }
         }
+
+        public override void ExcuteCommand(string command) {
+            var c = command.SplitBy(";");
+            if (c[0] == "Replace") {
+                var OriginalPic = OnNeedCurrentPic();
+                var cc = Color.FromArgb(int.Parse(c[1]));
+                OnOverridePic(OriginalPic.ReplaceColor(cc, Color.Transparent));
+            } else {
+                Develop.DebugPrint_NichtImplementiert();
+            }
+        }
+
+        public override string MacroKennung() => "Eraser";
 
         public override void MouseDown(MouseEventArgs1_1 e, Bitmap OriginalPic) {
             OnForceUndoSaving();
@@ -106,17 +121,6 @@ namespace BluePaint {
 
         private void DrawBox_CheckedChanged(object sender, System.EventArgs e) => OnDoInvalidate();
 
-        public override string MacroKennung() => "Eraser";
-
-        public override void ExcuteCommand(string command) {
-            var c = command.SplitBy(";");
-            if (c[0] == "Replace") {
-                var OriginalPic = OnNeedCurrentPic();
-                var cc = Color.FromArgb(int.Parse(c[1]));
-                OnOverridePic(OriginalPic.ReplaceColor(cc, Color.Transparent));
-            } else {
-                Develop.DebugPrint_NichtImplementiert();
-            }
-        }
+        #endregion
     }
 }

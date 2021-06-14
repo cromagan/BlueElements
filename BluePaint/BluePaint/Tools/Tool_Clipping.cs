@@ -1,9 +1,7 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2019 Christian Peter
+// Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -16,8 +14,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-
-#endregion BlueElements - a collection of useful tools, database and controls
 
 using BlueBasics;
 using BlueBasics.Enums;
@@ -32,6 +28,8 @@ namespace BluePaint {
 
     public partial class Tool_Clipping {
 
+        #region Constructors
+
         public Tool_Clipping(bool aufnahme) : base() {
             InitializeComponent();
             if (aufnahme) {
@@ -44,24 +42,17 @@ namespace BluePaint {
             }
         }
 
-        public override void ToolFirstShown() {
-            CheckMinMax();
-            AutoZ_Click(null, null);
-        }
+        #endregion
 
-        public override void OnToolChanging() => WollenSieDenZuschnittÜbernehmen();
+        #region Methods
 
-        public override void MouseDown(MouseEventArgs1_1 e, Bitmap OriginalPic) => OnDoInvalidate();
-
-        public override void MouseMove(MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) => OnDoInvalidate();
-
-        public override void MouseUp(MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) {
-            if (OriginalPic == null) { return; }
-            Links.Value = Math.Min(e.Current.TrimmedX, e.MouseDown.TrimmedX) + 1;
-            Recht.Value = -(OriginalPic.Width - Math.Max(e.Current.TrimmedX, e.MouseDown.TrimmedX));
-            Oben.Value = Math.Min(e.Current.TrimmedY, e.MouseDown.TrimmedY) + 1;
-            Unten.Value = -(OriginalPic.Height - Math.Max(e.Current.TrimmedY, e.MouseDown.TrimmedY));
-            ValueChangedByClicking(this, System.EventArgs.Empty);
+        public void CheckMinMax() {
+            var _Pic = OnNeedCurrentPic();
+            if (_Pic == null) { return; }
+            Links.Maximum = _Pic.Width - 1;
+            Recht.Minimum = -_Pic.Width + 1;
+            Oben.Maximum = _Pic.Height - 1;
+            Unten.Minimum = -_Pic.Height - 1;
         }
 
         public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic) {
@@ -76,8 +67,6 @@ namespace BluePaint {
                 e.DrawLine(Pen_Blau, -1, e.MouseDown.Y, OriginalPic.Width, e.MouseDown.Y);
             }
         }
-
-        private void ValueChangedByClicking(object sender, System.EventArgs e) => OnDoInvalidate();
 
         public void DrawZusatz(AdditionalDrawing e, Bitmap OriginalPic) {
             SolidBrush Brush_Blau = new(Color.FromArgb(120, 0, 0, 255));
@@ -95,17 +84,48 @@ namespace BluePaint {
             }
         }
 
-        private void ZuschnittOK_Click(object sender, System.EventArgs e) {
-            var _Pic = OnNeedCurrentPic();
-            var _BMP2 = _Pic.Crop((int)Links.Value, (int)Recht.Value, (int)Oben.Value, (int)Unten.Value);
-            OnOverridePic(_BMP2);
-            Links.Value = 0;
-            Recht.Value = 0;
-            Oben.Value = 0;
-            Unten.Value = 0;
-            CollectGarbage();
+        public override void ExcuteCommand(string command) {
+            var c = command.SplitBy(";");
+            if (c[0] == "AutoZuschnitt") {
+                CheckMinMax();
+                AutoZ_Click(null, null);
+                ZuschnittOK_Click(null, null);
+            } else {
+                DebugPrint_NichtImplementiert();
+            }
+        }
+
+        public override string MacroKennung() => "Clipping";
+
+        public override void MouseDown(MouseEventArgs1_1 e, Bitmap OriginalPic) => OnDoInvalidate();
+
+        public override void MouseMove(MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) => OnDoInvalidate();
+
+        public override void MouseUp(MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) {
+            if (OriginalPic == null) { return; }
+            Links.Value = Math.Min(e.Current.TrimmedX, e.MouseDown.TrimmedX) + 1;
+            Recht.Value = -(OriginalPic.Width - Math.Max(e.Current.TrimmedX, e.MouseDown.TrimmedX));
+            Oben.Value = Math.Min(e.Current.TrimmedY, e.MouseDown.TrimmedY) + 1;
+            Unten.Value = -(OriginalPic.Height - Math.Max(e.Current.TrimmedY, e.MouseDown.TrimmedY));
+            ValueChangedByClicking(this, System.EventArgs.Empty);
+        }
+
+        public override void OnToolChanging() => WollenSieDenZuschnittÜbernehmen();
+
+        public void Set(int Left, int Top, int Right, int Bottom) {
+            if (Left < 0 || Top < 0 || Right > 0 || Bottom > 0) {
+                DebugPrint(enFehlerArt.Warnung, "Fehler in den Angaben");
+            }
             CheckMinMax();
-            OnZoomFit();
+            Links.Value = Left;
+            Oben.Value = Top;
+            Recht.Value = Right;
+            Unten.Value = Bottom;
+        }
+
+        public override void ToolFirstShown() {
+            CheckMinMax();
+            AutoZ_Click(null, null);
         }
 
         private void AutoZ_Click(object sender, System.EventArgs e) {
@@ -120,43 +140,27 @@ namespace BluePaint {
             OnDoInvalidate();
         }
 
+        private void ValueChangedByClicking(object sender, System.EventArgs e) => OnDoInvalidate();
+
         private void WollenSieDenZuschnittÜbernehmen() {
             if (Links.Value <= 0 && Recht.Value >= 0 && Oben.Value <= 0 && Unten.Value >= 0) { return; }
             if (MessageBox.Show("Soll der <b>aktuelle</b> Zuschnitt<br>übernommen werden?", enImageCode.Zuschneiden, "Ja", "Nein") == 1) { return; }
             ZuschnittOK_Click(null, System.EventArgs.Empty);
         }
 
-        public void Set(int Left, int Top, int Right, int Bottom) {
-            if (Left < 0 || Top < 0 || Right > 0 || Bottom > 0) {
-                DebugPrint(enFehlerArt.Warnung, "Fehler in den Angaben");
-            }
-            CheckMinMax();
-            Links.Value = Left;
-            Oben.Value = Top;
-            Recht.Value = Right;
-            Unten.Value = Bottom;
-        }
-
-        public void CheckMinMax() {
+        private void ZuschnittOK_Click(object sender, System.EventArgs e) {
             var _Pic = OnNeedCurrentPic();
-            if (_Pic == null) { return; }
-            Links.Maximum = _Pic.Width - 1;
-            Recht.Minimum = -_Pic.Width + 1;
-            Oben.Maximum = _Pic.Height - 1;
-            Unten.Minimum = -_Pic.Height - 1;
+            var _BMP2 = _Pic.Crop((int)Links.Value, (int)Recht.Value, (int)Oben.Value, (int)Unten.Value);
+            OnOverridePic(_BMP2);
+            Links.Value = 0;
+            Recht.Value = 0;
+            Oben.Value = 0;
+            Unten.Value = 0;
+            CollectGarbage();
+            CheckMinMax();
+            OnZoomFit();
         }
 
-        public override string MacroKennung() => "Clipping";
-
-        public override void ExcuteCommand(string command) {
-            var c = command.SplitBy(";");
-            if (c[0] == "AutoZuschnitt") {
-                CheckMinMax();
-                AutoZ_Click(null, null);
-                ZuschnittOK_Click(null, null);
-            } else {
-                DebugPrint_NichtImplementiert();
-            }
-        }
+        #endregion
     }
 }

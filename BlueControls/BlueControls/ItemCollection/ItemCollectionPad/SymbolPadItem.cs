@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -31,6 +27,8 @@ namespace BlueControls.ItemCollection {
 
     public class SymbolPadItem : FormPadItemRectangle {
 
+        #region Constructors
+
         public SymbolPadItem(ItemCollectionPad parent) : this(parent, string.Empty) {
         }
 
@@ -41,14 +39,84 @@ namespace BlueControls.ItemCollection {
             Randdicke = 1;
         }
 
-        protected override string ClassId() => "Symbol";
+        #endregion
+
+        #region Properties
+
+        public Color Hintergrundfarbe { get; set; }
+
+        public double Randdicke { get; set; }
+
+        public Color Randfarbe { get; set; }
 
         public enSymbol Symbol { get; set; } = enSymbol.Pfeil;
-        public Color Hintergrundfarbe { get; set; }
-        public Color Randfarbe { get; set; }
-        public decimal Randdicke { get; set; }
 
-        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
+        #endregion
+
+        #region Methods
+
+        public override List<FlexiControl> GetStyleOptions() {
+            List<FlexiControl> l = new()
+            {
+                new FlexiControl()
+            };
+            ItemCollectionList Comms = new()
+            {
+                { "Ohne", ((int)enSymbol.Ohne).ToString(), QuickImage.Get("Datei|32") },
+                { "Rechteck", ((int)enSymbol.Rechteck).ToString(), QuickImage.Get("Stop|32") },
+                { "Rechteck gerundet", ((int)enSymbol.Rechteck_gerundet).ToString() },
+                { "Pfeil", ((int)enSymbol.Pfeil).ToString(), QuickImage.Get("Pfeil_Rechts|32") },
+                { "Bruchlinie", ((int)enSymbol.Bruchlinie).ToString() }
+            };
+            l.Add(new FlexiControl());
+            l.Add(new FlexiControlForProperty(this, "Symbol", Comms));
+            l.Add(new FlexiControlForProperty(this, "Randdicke"));
+            l.Add(new FlexiControlForProperty(this, "Randfarbe"));
+            l.Add(new FlexiControlForProperty(this, "Hintergrundfarbe"));
+            l.AddRange(base.GetStyleOptions());
+            return l;
+        }
+
+        public override bool ParseThis(string tag, string value) {
+            if (base.ParseThis(tag, value)) { return true; }
+            switch (tag) {
+                case "symbol":
+                    Symbol = (enSymbol)int.Parse(value);
+                    return true;
+
+                case "backcolor":
+                    Hintergrundfarbe = value.FromHTMLCode();
+                    return true;
+
+                case "bordercolor":
+                    Randfarbe = value.FromHTMLCode();
+                    return true;
+
+                case "borderwidth":
+                    double.TryParse(value.FromNonCritical(), out var tRanddicke);
+                    Randdicke = tRanddicke;
+                    return true;
+
+                case "fill": // alt: 28.11.2019
+                case "whiteback": // alt: 28.11.2019
+                    return true;
+            }
+            return false;
+        }
+
+        public override string ToString() {
+            var t = base.ToString();
+            t = t.Substring(0, t.Length - 1) + ", ";
+            t = t + "Symbol=" + (int)Symbol + ", ";
+            t = t + "Backcolor=" + Hintergrundfarbe.ToHTMLCode() + ", ";
+            t = t + "BorderColor=" + Randfarbe.ToHTMLCode() + ", ";
+            t = t + "BorderWidth=" + Randdicke.ToString().ToNonCritical() + ", ";
+            return t.Trim(", ") + "}";
+        }
+
+        protected override string ClassId() => "Symbol";
+
+        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, double cZoom, double shiftX, double shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
             var trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
             GR.TranslateTransform(trp.X, trp.Y);
             GR.RotateTransform(-Drehwinkel);
@@ -89,66 +157,9 @@ namespace BlueControls.ItemCollection {
             base.DrawExplicit(GR, DCoordinates, cZoom, shiftX, shiftY, vState, SizeOfParentControl, ForPrinting);
         }
 
-        public override List<FlexiControl> GetStyleOptions() {
-            List<FlexiControl> l = new()
-            {
-                new FlexiControl()
-            };
-            ItemCollectionList Comms = new()
-            {
-                { "Ohne", ((int)enSymbol.Ohne).ToString(), QuickImage.Get("Datei|32") },
-                { "Rechteck", ((int)enSymbol.Rechteck).ToString(), QuickImage.Get("Stop|32") },
-                { "Rechteck gerundet", ((int)enSymbol.Rechteck_gerundet).ToString() },
-                { "Pfeil", ((int)enSymbol.Pfeil).ToString(), QuickImage.Get("Pfeil_Rechts|32") },
-                { "Bruchlinie", ((int)enSymbol.Bruchlinie).ToString() }
-            };
-            l.Add(new FlexiControl());
-            l.Add(new FlexiControlForProperty(this, "Symbol", Comms));
-            l.Add(new FlexiControlForProperty(this, "Randdicke"));
-            l.Add(new FlexiControlForProperty(this, "Randfarbe"));
-            l.Add(new FlexiControlForProperty(this, "Hintergrundfarbe"));
-            l.AddRange(base.GetStyleOptions());
-            return l;
-        }
-
-        public override string ToString() {
-            var t = base.ToString();
-            t = t.Substring(0, t.Length - 1) + ", ";
-            t = t + "Symbol=" + (int)Symbol + ", ";
-            t = t + "Backcolor=" + Hintergrundfarbe.ToHTMLCode() + ", ";
-            t = t + "BorderColor=" + Randfarbe.ToHTMLCode() + ", ";
-            t = t + "BorderWidth=" + Randdicke.ToString().ToNonCritical() + ", ";
-            return t.Trim(", ") + "}";
-        }
-
-        public override bool ParseThis(string tag, string value) {
-            if (base.ParseThis(tag, value)) { return true; }
-            switch (tag) {
-                case "symbol":
-                    Symbol = (enSymbol)int.Parse(value);
-                    return true;
-
-                case "backcolor":
-                    Hintergrundfarbe = value.FromHTMLCode();
-                    return true;
-
-                case "bordercolor":
-                    Randfarbe = value.FromHTMLCode();
-                    return true;
-
-                case "borderwidth":
-                    decimal.TryParse(value.FromNonCritical(), out var tRanddicke);
-                    Randdicke = tRanddicke;
-                    return true;
-
-                case "fill": // alt: 28.11.2019
-                case "whiteback": // alt: 28.11.2019
-                    return true;
-            }
-            return false;
-        }
-
         protected override void ParseFinished() {
         }
+
+        #endregion
     }
 }

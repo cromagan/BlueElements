@@ -1,5 +1,3 @@
-#region BlueElements - a collection of useful tools, database and controls
-
 // Authors:
 // Christian Peter
 //
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -32,14 +28,198 @@ using static BlueBasics.Extensions;
 namespace BlueControls.BlueDatabaseDialogs {
 
     internal sealed partial class ColumnEditor {
-        private ColumnItem _Column;
+
+        #region Fields
+
         private readonly Table _Table;
+        private ColumnItem _Column;
+
+        #endregion
+
+        #region Constructors
 
         public ColumnEditor(ColumnItem column, Table table) : base() {
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
             InitializeComponent();
             _Table = table;
             Column_DatenAuslesen(column);
+        }
+
+        #endregion
+
+        #region Methods
+
+        protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
+            base.OnFormClosing(e);
+            if (!AllOk()) { e.Cancel = true; }
+        }
+
+        private bool AllOk() {
+            var Feh = "";
+            // Diese Fehler sind so schwer und darf auf keinen Fall in die Umwelt gelassen werden
+            if (string.IsNullOrEmpty(Feh)) {
+                if (string.IsNullOrEmpty(tbxName.Text)) { Feh = "Spaltenname nicht definiert."; }
+            }
+            // Diese Fehler sind so schwer und darf auf keinen Fall in die Umwelt gelassen werden
+            if (string.IsNullOrEmpty(Feh)) {
+                foreach (var ThisColumn in _Column.Database.Column) {
+                    if (ThisColumn != _Column && ThisColumn != null) {
+                        if (tbxName.Text.ToUpper() == ThisColumn.Name.ToUpper()) { Feh = "Spalten-Name bereits vorhanden."; }
+                    }
+                }
+            }
+            if (string.IsNullOrEmpty(Feh)) {
+                Column_DatenZurückschreibenx();
+                if (string.IsNullOrEmpty(Feh)) { Feh = _Column.ErrorReason(); }
+            }
+            if (!string.IsNullOrEmpty(Feh)) {
+                MessageBox.Show("<b><u>Bitte korrigieren sie zuerst folgenden Fehler:</u></b><br>" + Feh, enImageCode.Warnung, "Ok");
+                return false;
+            }
+            return true;
+        }
+
+        private void btnOk_Click(object sender, System.EventArgs e) {
+            if (!AllOk()) { return; }
+            Close();
+        }
+
+        private void btnStandard_Click(object sender, System.EventArgs e) {
+            if (!AllOk()) { return; }
+            _Column.ResetSystemToDefault(true);
+            Column_DatenAuslesen(_Column);
+        }
+
+        private void btnVerwendung_Click(object sender, System.EventArgs e) => MessageBox.Show(_Column.Verwendung());
+
+        private void btnVor_Click(object sender, System.EventArgs e) {
+            if (!AllOk()) { return; }
+            //if (_Column.Next() == null)
+            //{
+            //    MessageBox.Show("Spalte nicht gültig!", enImageCode.Warnung, "OK");
+            //    return;
+            //}
+            Column_DatenAuslesen(_Column.Next());
+        }
+
+        private void btnZurueck_Click(object sender, System.EventArgs e) {
+            if (!AllOk()) { return; }
+            //if (_Column.Previous() == null)
+            //{
+            //    MessageBox.Show("Spalte nicht gültig!", enImageCode.Warnung, "OK");
+            //    return;
+            //}
+            Column_DatenAuslesen(_Column.Previous());
+        }
+
+        private void butAktuellVor_Click(object sender, System.EventArgs e) {
+            if (!AllOk()) { return; }
+            //if (_Column.Previous() == null)
+            //{
+            //    MessageBox.Show("Spalte nicht gültig!", enImageCode.Warnung, "OK");
+            //    return;
+            //}
+            Column_DatenAuslesen(_Table.CurrentArrangement[_Column].NextVisible(_Table.CurrentArrangement).Column);
+        }
+
+        private void butAktuellZurueck_Click(object sender, System.EventArgs e) {
+            if (!AllOk()) { return; }
+            //if (_Column.Previous() == null)
+            //{
+            //    MessageBox.Show("Spalte nicht gültig!", enImageCode.Warnung, "OK");
+            //    return;
+            //}
+            Column_DatenAuslesen(_Table.CurrentArrangement[_Column].PreviewsVisible(_Table.CurrentArrangement).Column);
+        }
+
+        private void ButtonCheck() {
+            var tmpFormat = (enDataFormat)int.Parse(cbxFormat.Text);
+            // Mehrzeilig
+            btnMultiline.Enabled = tmpFormat.MultilinePossible();
+            if (!tmpFormat.MultilinePossible()) { btnMultiline.Checked = false; }
+            // Rechtschreibprüfung
+            btnSpellChecking.Enabled = tmpFormat.SpellCheckingPossible();
+            if (!tmpFormat.SpellCheckingPossible()) { btnSpellChecking.Checked = false; }
+            // Format: Bildcode
+            grpBildCode.Enabled = tmpFormat == enDataFormat.BildCode;
+            if (tmpFormat != enDataFormat.BildCode) {
+                txbBildCodeConstHeight.Text = string.Empty;
+                cbxBildTextVerhalten.Text = string.Empty;
+            }
+            // Format: LinkToFileSystem
+            grpLinkToFileSystem.Enabled = tmpFormat == enDataFormat.Link_To_Filesystem;
+            if (tmpFormat != enDataFormat.BildCode) {
+                txbBestFileStandardFolder.Text = string.Empty;
+                txbBestFileStandardSuffix.Text = string.Empty;
+            }
+            // LinkedDatabase - Verknüpfte Datenbank
+            grpLinkedDatabase.Enabled = tmpFormat.NeedTargetDatabase();
+            if (!tmpFormat.NeedTargetDatabase()) {
+                cbxLinkedDatabase.Text = string.Empty;
+            }
+            // Format: Columns für Linked Database / LinkedKey-Kennung
+            grpColumnsForLinkedDatabase.Enabled = tmpFormat.NeedLinkedKeyKennung();
+            if (!tmpFormat.NeedLinkedKeyKennung()) { txbLinkedKeyKennung.Text = string.Empty; }
+            // Format: LinkedCell
+            grpVerlinkteZellen.Enabled = tmpFormat == enDataFormat.LinkedCell;
+        }
+
+        private void cbxFormat_TextChanged(object sender, System.EventArgs e) => ButtonCheck();
+
+        /// <summary>
+        /// Kümmert sich um erlaubte Spalten für LinkedCell
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void cbxLinkedDatabase_TextChanged(object sender, System.EventArgs e) {
+            _Column.LinkedDatabaseFile = cbxLinkedDatabase.Text;
+            cbxColumnKeyInColumn.Item.Clear();
+            cbxColumnKeyInColumn.Item.Add("#Ohne");
+            cbxRowKeyInColumn.Item.Clear();
+            cbxRowKeyInColumn.Item.Add("#Ohne");
+            cbxTargetColumn.Item.Clear();
+            if (_Column.LinkedDatabase() != null) {
+                foreach (var ThisColumn in _Column.Database.Column) {
+                    if (ThisColumn.Format.CanBeCheckedByRules() && !ThisColumn.MultiLine && !ThisColumn.Format.NeedTargetDatabase()) {
+                        cbxRowKeyInColumn.Item.Add(ThisColumn, false);
+                    }
+                    if (ThisColumn.Format == enDataFormat.Values_für_LinkedCellDropdown && ThisColumn.LinkedDatabase() == _Column.LinkedDatabase()) {
+                        cbxRowKeyInColumn.Item.Add(ThisColumn, false);
+                    }
+                    if (ThisColumn.Format == enDataFormat.Columns_für_LinkedCellDropdown && ThisColumn.LinkedDatabase() == _Column.LinkedDatabase()) {
+                        cbxColumnKeyInColumn.Item.Add(ThisColumn, false);
+                    }
+                }
+                foreach (var ThisLinkedColumn in _Column.LinkedDatabase().Column) {
+                    if (!ThisLinkedColumn.IsFirst() && ThisLinkedColumn.Format.CanBeChangedByRules() && !ThisLinkedColumn.Format.NeedTargetDatabase()) {
+                        cbxTargetColumn.Item.Add(ThisLinkedColumn, false);
+                    }
+                }
+            }
+            cbxTargetColumn.Item.Sort();
+            cbxColumnKeyInColumn.Item.Sort();
+            cbxRowKeyInColumn.Item.Sort();
+            cbxColumnKeyInColumn.Enabled = cbxColumnKeyInColumn.Item.Count > 0;
+            btnColumnKeyInColumn.Enabled = cbxColumnKeyInColumn.Enabled;
+            txbZeichenkette.Enabled = cbxColumnKeyInColumn.Enabled;
+            cbxRowKeyInColumn.Enabled = cbxRowKeyInColumn.Item.Count > 0;
+            SetKeyTo(_Column.Database, cbxRowKeyInColumn, _Column.LinkedCell_RowKey);
+            SetKeyTo(_Column.Database, cbxColumnKeyInColumn, _Column.LinkedCell_ColumnValueFoundIn);
+            SetKeyTo(_Column.LinkedDatabase(), cbxTargetColumn, _Column.LinkedCell_ColumnKey);
+            cbxTargetColumn.Enabled = cbxTargetColumn.Item.Count > 0;
+            btnTargetColumn.Enabled = cbxTargetColumn.Enabled;
+            if (!cbxTargetColumn.Enabled) {
+                cbxTargetColumn.Text = string.Empty;
+                btnTargetColumn.Checked = false;
+            }
+            if (btnColumnKeyInColumn.Enabled && _Column.LinkedCell_ColumnValueFoundIn > -1) { btnColumnKeyInColumn.Checked = true; } // Nicht perfekt die Lösung :-(
+            if (btnTargetColumn.Enabled && _Column.LinkedCell_ColumnKey > -1) { btnTargetColumn.Checked = true; } // Nicht perfekt die Lösung :-(
+        }
+
+        private int ColumKeyFrom(Database database, string columnName) {
+            if (database == null) { return -1; }
+            var c = database.Column.Exists(columnName);
+            return c is null ? -1 : c.Key;
         }
 
         private void Column_DatenAuslesen(ColumnItem FromColumn) {
@@ -171,51 +351,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             cbxLinkedDatabase_TextChanged(null, System.EventArgs.Empty);
         }
 
-        private void SetKeyTo(Database database, ComboBox combobox, int columnKey) {
-            if (database is null || columnKey < 0) {
-                combobox.Text = "#Ohne";
-            } else {
-                var c = database.Column.SearchByKey(columnKey);
-                combobox.Text = c == null ? "#Ohne" : c.Name;
-            }
-        }
-
-        private int ColumKeyFrom(Database database, string columnName) {
-            if (database == null) { return -1; }
-            var c = database.Column.Exists(columnName);
-            return c is null ? -1 : c.Key;
-        }
-
-        private bool AllOk() {
-            var Feh = "";
-            // Diese Fehler sind so schwer und darf auf keinen Fall in die Umwelt gelassen werden
-            if (string.IsNullOrEmpty(Feh)) {
-                if (string.IsNullOrEmpty(tbxName.Text)) { Feh = "Spaltenname nicht definiert."; }
-            }
-            // Diese Fehler sind so schwer und darf auf keinen Fall in die Umwelt gelassen werden
-            if (string.IsNullOrEmpty(Feh)) {
-                foreach (var ThisColumn in _Column.Database.Column) {
-                    if (ThisColumn != _Column && ThisColumn != null) {
-                        if (tbxName.Text.ToUpper() == ThisColumn.Name.ToUpper()) { Feh = "Spalten-Name bereits vorhanden."; }
-                    }
-                }
-            }
-            if (string.IsNullOrEmpty(Feh)) {
-                Column_DatenZurückschreibenx();
-                if (string.IsNullOrEmpty(Feh)) { Feh = _Column.ErrorReason(); }
-            }
-            if (!string.IsNullOrEmpty(Feh)) {
-                MessageBox.Show("<b><u>Bitte korrigieren sie zuerst folgenden Fehler:</u></b><br>" + Feh, enImageCode.Warnung, "Ok");
-                return false;
-            }
-            return true;
-        }
-
-        private void btnOk_Click(object sender, System.EventArgs e) {
-            if (!AllOk()) { return; }
-            Close();
-        }
-
         private void Column_DatenZurückschreibenx() {
             if (_Column.Database.ReadOnly) { return; }
             _Column.Name = tbxName.Text;
@@ -328,149 +463,23 @@ namespace BlueControls.BlueDatabaseDialogs {
             H_Colorx.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", ColorDia.Color.ToHTMLCode()).ToString();
         }
 
+        private void QI_Vorschau_Click(object sender, System.EventArgs e) => Notification.Show(tbxQuickinfo.Text.Replace("\r", "<BR>") + "<br><br><br>" + tbxAdminInfo.Text.Replace("\r", "<BR>"));
+
+        private void SetKeyTo(Database database, ComboBox combobox, int columnKey) {
+            if (database is null || columnKey < 0) {
+                combobox.Text = "#Ohne";
+            } else {
+                var c = database.Column.SearchByKey(columnKey);
+                combobox.Text = c == null ? "#Ohne" : c.Name;
+            }
+        }
+
         private void T_Color_Click(object sender, System.EventArgs e) {
             ColorDia.Color = QuickImage.Get(T_Colorx.ImageCode).ChangeGreenTo.FromHTMLCode();
             ColorDia.ShowDialog();
             T_Colorx.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", ColorDia.Color.ToHTMLCode()).ToString();
         }
 
-        private void QI_Vorschau_Click(object sender, System.EventArgs e) => Notification.Show(tbxQuickinfo.Text.Replace("\r", "<BR>") + "<br><br><br>" + tbxAdminInfo.Text.Replace("\r", "<BR>"));
-
-        private void btnZurueck_Click(object sender, System.EventArgs e) {
-            if (!AllOk()) { return; }
-            //if (_Column.Previous() == null)
-            //{
-            //    MessageBox.Show("Spalte nicht gültig!", enImageCode.Warnung, "OK");
-            //    return;
-            //}
-            Column_DatenAuslesen(_Column.Previous());
-        }
-
-        private void btnVor_Click(object sender, System.EventArgs e) {
-            if (!AllOk()) { return; }
-            //if (_Column.Next() == null)
-            //{
-            //    MessageBox.Show("Spalte nicht gültig!", enImageCode.Warnung, "OK");
-            //    return;
-            //}
-            Column_DatenAuslesen(_Column.Next());
-        }
-
-        protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
-            base.OnFormClosing(e);
-            if (!AllOk()) { e.Cancel = true; }
-        }
-
-        private void cbxFormat_TextChanged(object sender, System.EventArgs e) => ButtonCheck();
-
-        private void btnStandard_Click(object sender, System.EventArgs e) {
-            if (!AllOk()) { return; }
-            _Column.ResetSystemToDefault(true);
-            Column_DatenAuslesen(_Column);
-        }
-
-        private void ButtonCheck() {
-            var tmpFormat = (enDataFormat)int.Parse(cbxFormat.Text);
-            // Mehrzeilig
-            btnMultiline.Enabled = tmpFormat.MultilinePossible();
-            if (!tmpFormat.MultilinePossible()) { btnMultiline.Checked = false; }
-            // Rechtschreibprüfung
-            btnSpellChecking.Enabled = tmpFormat.SpellCheckingPossible();
-            if (!tmpFormat.SpellCheckingPossible()) { btnSpellChecking.Checked = false; }
-            // Format: Bildcode
-            grpBildCode.Enabled = tmpFormat == enDataFormat.BildCode;
-            if (tmpFormat != enDataFormat.BildCode) {
-                txbBildCodeConstHeight.Text = string.Empty;
-                cbxBildTextVerhalten.Text = string.Empty;
-            }
-            // Format: LinkToFileSystem
-            grpLinkToFileSystem.Enabled = tmpFormat == enDataFormat.Link_To_Filesystem;
-            if (tmpFormat != enDataFormat.BildCode) {
-                txbBestFileStandardFolder.Text = string.Empty;
-                txbBestFileStandardSuffix.Text = string.Empty;
-            }
-            // LinkedDatabase - Verknüpfte Datenbank
-            grpLinkedDatabase.Enabled = tmpFormat.NeedTargetDatabase();
-            if (!tmpFormat.NeedTargetDatabase()) {
-                cbxLinkedDatabase.Text = string.Empty;
-            }
-            // Format: Columns für Linked Database / LinkedKey-Kennung
-            grpColumnsForLinkedDatabase.Enabled = tmpFormat.NeedLinkedKeyKennung();
-            if (!tmpFormat.NeedLinkedKeyKennung()) { txbLinkedKeyKennung.Text = string.Empty; }
-            // Format: LinkedCell
-            grpVerlinkteZellen.Enabled = tmpFormat == enDataFormat.LinkedCell;
-        }
-
-        /// <summary>
-        /// Kümmert sich um erlaubte Spalten für LinkedCell
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void cbxLinkedDatabase_TextChanged(object sender, System.EventArgs e) {
-            _Column.LinkedDatabaseFile = cbxLinkedDatabase.Text;
-            cbxColumnKeyInColumn.Item.Clear();
-            cbxColumnKeyInColumn.Item.Add("#Ohne");
-            cbxRowKeyInColumn.Item.Clear();
-            cbxRowKeyInColumn.Item.Add("#Ohne");
-            cbxTargetColumn.Item.Clear();
-            if (_Column.LinkedDatabase() != null) {
-                foreach (var ThisColumn in _Column.Database.Column) {
-                    if (ThisColumn.Format.CanBeCheckedByRules() && !ThisColumn.MultiLine && !ThisColumn.Format.NeedTargetDatabase()) {
-                        cbxRowKeyInColumn.Item.Add(ThisColumn, false);
-                    }
-                    if (ThisColumn.Format == enDataFormat.Values_für_LinkedCellDropdown && ThisColumn.LinkedDatabase() == _Column.LinkedDatabase()) {
-                        cbxRowKeyInColumn.Item.Add(ThisColumn, false);
-                    }
-                    if (ThisColumn.Format == enDataFormat.Columns_für_LinkedCellDropdown && ThisColumn.LinkedDatabase() == _Column.LinkedDatabase()) {
-                        cbxColumnKeyInColumn.Item.Add(ThisColumn, false);
-                    }
-                }
-                foreach (var ThisLinkedColumn in _Column.LinkedDatabase().Column) {
-                    if (!ThisLinkedColumn.IsFirst() && ThisLinkedColumn.Format.CanBeChangedByRules() && !ThisLinkedColumn.Format.NeedTargetDatabase()) {
-                        cbxTargetColumn.Item.Add(ThisLinkedColumn, false);
-                    }
-                }
-            }
-            cbxTargetColumn.Item.Sort();
-            cbxColumnKeyInColumn.Item.Sort();
-            cbxRowKeyInColumn.Item.Sort();
-            cbxColumnKeyInColumn.Enabled = cbxColumnKeyInColumn.Item.Count > 0;
-            btnColumnKeyInColumn.Enabled = cbxColumnKeyInColumn.Enabled;
-            txbZeichenkette.Enabled = cbxColumnKeyInColumn.Enabled;
-            cbxRowKeyInColumn.Enabled = cbxRowKeyInColumn.Item.Count > 0;
-            SetKeyTo(_Column.Database, cbxRowKeyInColumn, _Column.LinkedCell_RowKey);
-            SetKeyTo(_Column.Database, cbxColumnKeyInColumn, _Column.LinkedCell_ColumnValueFoundIn);
-            SetKeyTo(_Column.LinkedDatabase(), cbxTargetColumn, _Column.LinkedCell_ColumnKey);
-            cbxTargetColumn.Enabled = cbxTargetColumn.Item.Count > 0;
-            btnTargetColumn.Enabled = cbxTargetColumn.Enabled;
-            if (!cbxTargetColumn.Enabled) {
-                cbxTargetColumn.Text = string.Empty;
-                btnTargetColumn.Checked = false;
-            }
-            if (btnColumnKeyInColumn.Enabled && _Column.LinkedCell_ColumnValueFoundIn > -1) { btnColumnKeyInColumn.Checked = true; } // Nicht perfekt die Lösung :-(
-            if (btnTargetColumn.Enabled && _Column.LinkedCell_ColumnKey > -1) { btnTargetColumn.Checked = true; } // Nicht perfekt die Lösung :-(
-        }
-
-        private void butAktuellZurueck_Click(object sender, System.EventArgs e) {
-            if (!AllOk()) { return; }
-            //if (_Column.Previous() == null)
-            //{
-            //    MessageBox.Show("Spalte nicht gültig!", enImageCode.Warnung, "OK");
-            //    return;
-            //}
-            Column_DatenAuslesen(_Table.CurrentArrangement[_Column].PreviewsVisible(_Table.CurrentArrangement).Column);
-        }
-
-        private void butAktuellVor_Click(object sender, System.EventArgs e) {
-            if (!AllOk()) { return; }
-            //if (_Column.Previous() == null)
-            //{
-            //    MessageBox.Show("Spalte nicht gültig!", enImageCode.Warnung, "OK");
-            //    return;
-            //}
-            Column_DatenAuslesen(_Table.CurrentArrangement[_Column].NextVisible(_Table.CurrentArrangement).Column);
-        }
-
-        private void btnVerwendung_Click(object sender, System.EventArgs e) => MessageBox.Show(_Column.Verwendung());
+        #endregion
     }
 }

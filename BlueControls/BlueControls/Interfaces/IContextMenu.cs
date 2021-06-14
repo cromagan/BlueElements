@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
 using System;
@@ -28,9 +24,23 @@ namespace BlueControls.Interfaces {
 
     public interface IContextMenu {
 
+        #region Events
+
         event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
 
         event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
+
+        #endregion
+
+        #region Methods
+
+        bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e);
+
+        //public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e)
+        //{
+        //    ContextMenuItemClicked?.Invoke(this, e);
+        //}
+        void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate);
 
         void OnContextMenuInit(ContextMenuInitEventArgs e);
 
@@ -40,12 +50,6 @@ namespace BlueControls.Interfaces {
         //}
         void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e);
 
-        //public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e)
-        //{
-        //    ContextMenuItemClicked?.Invoke(this, e);
-        //}
-        void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate);
-
-        bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e);
+        #endregion
     }
 }

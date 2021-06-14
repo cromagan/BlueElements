@@ -1,5 +1,3 @@
-#region BlueElements - a collection of useful tools, database and controls
-
 // Authors:
 // Christian Peter
 //
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -32,8 +28,15 @@ using System.Collections.Generic;
 namespace BlueControls.BlueDatabaseDialogs {
 
     internal sealed partial class SearchAndReplace : Form {
+
+        #region Fields
+
         private readonly Table _BlueTable;
         private bool IsWorking;
+
+        #endregion
+
+        #region Constructors
 
         public SearchAndReplace(Table table) {
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -42,6 +45,62 @@ namespace BlueControls.BlueDatabaseDialogs {
             _BlueTable = table;
             _BlueTable.CursorPosChanged += CursorPosChanged;
             CursorPosChanged(_BlueTable, new CellEventArgs(_BlueTable.CursorPosColumn(), _BlueTable.CursorPosRow()));
+        }
+
+        #endregion
+
+        #region Methods
+
+        protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
+            base.OnFormClosing(e);
+            _BlueTable.CursorPosChanged -= CursorPosChanged;
+        }
+
+        private void Alt_TextChange(object sender, System.EventArgs e) => Checkbuttons();
+
+        private void Checkbuttons() {
+            var CanDo = true;
+            if (_BlueTable == null) { return; }
+            if (!_BlueTable.Database.IsAdministrator()) { CanDo = false; }
+            if (SucheNach.Checked) {
+                if (string.IsNullOrEmpty(Alt.Text)) { CanDo = false; }
+                Alt.Enabled = true;
+                ErsetzeMit.Enabled = true;
+                NurinAktuellerSpalte.Enabled = true;
+            } else if (SucheExact.Checked) {
+                Alt.Enabled = true;
+                ErsetzeMit.Enabled = false;
+                if (ErsetzeMit.Checked) { CanDo = false; }
+                NurinAktuellerSpalte.Enabled = true;
+            } else if (InhaltEgal.Checked) {
+                Alt.Enabled = false;
+                ErsetzeMit.Enabled = false;
+                NurinAktuellerSpalte.Enabled = false; // Zu Riskant
+                if (!NurinAktuellerSpalte.Checked) { CanDo = false; }// Zu Riskant
+                if (ErsetzeMit.Checked) { CanDo = false; }
+            } else {
+                CanDo = false;
+            }
+            if (ErsetzeMit.Checked) { } else if (ErsetzeKomplett.Checked) {
+                NurinAktuellerSpalte.Enabled = false; // Zu Riskant
+                if (!NurinAktuellerSpalte.Checked) { CanDo = false; }// Zu Riskant
+            } else if (FügeHinzu.Checked) {
+                if (string.IsNullOrEmpty(Neu.Text)) { CanDo = false; }
+            } else {
+                CanDo = true;
+            }
+            if (NurinAktuellerSpalte.Checked) {
+                if (_BlueTable.CursorPosColumn() == null) {
+                    CanDo = false;
+                } else {
+                    if (!_BlueTable.CursorPosColumn().Format.CanBeChangedByRules()) { CanDo = false; }
+                }
+            }
+            if (Alt.Text == Neu.Text) {
+                if (!InhaltEgal.Checked) { CanDo = false; }
+                if (!ErsetzeKomplett.Checked) { CanDo = false; }
+            }
+            ers.Enabled = CanDo;
         }
 
         private void CursorPosChanged(object sender, CellEventArgs e) {
@@ -115,59 +174,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             IsWorking = false;
         }
 
-        private void Alt_TextChange(object sender, System.EventArgs e) => Checkbuttons();
-
         private void Something_CheckedChanged(object sender, System.EventArgs e) => Checkbuttons();
 
-        private void Checkbuttons() {
-            var CanDo = true;
-            if (_BlueTable == null) { return; }
-            if (!_BlueTable.Database.IsAdministrator()) { CanDo = false; }
-            if (SucheNach.Checked) {
-                if (string.IsNullOrEmpty(Alt.Text)) { CanDo = false; }
-                Alt.Enabled = true;
-                ErsetzeMit.Enabled = true;
-                NurinAktuellerSpalte.Enabled = true;
-            } else if (SucheExact.Checked) {
-                Alt.Enabled = true;
-                ErsetzeMit.Enabled = false;
-                if (ErsetzeMit.Checked) { CanDo = false; }
-                NurinAktuellerSpalte.Enabled = true;
-            } else if (InhaltEgal.Checked) {
-                Alt.Enabled = false;
-                ErsetzeMit.Enabled = false;
-                NurinAktuellerSpalte.Enabled = false; // Zu Riskant
-                if (!NurinAktuellerSpalte.Checked) { CanDo = false; }// Zu Riskant
-                if (ErsetzeMit.Checked) { CanDo = false; }
-            } else {
-                CanDo = false;
-            }
-            if (ErsetzeMit.Checked) {
-            } else if (ErsetzeKomplett.Checked) {
-                NurinAktuellerSpalte.Enabled = false; // Zu Riskant
-                if (!NurinAktuellerSpalte.Checked) { CanDo = false; }// Zu Riskant
-            } else if (FügeHinzu.Checked) {
-                if (string.IsNullOrEmpty(Neu.Text)) { CanDo = false; }
-            } else {
-                CanDo = true;
-            }
-            if (NurinAktuellerSpalte.Checked) {
-                if (_BlueTable.CursorPosColumn() == null) {
-                    CanDo = false;
-                } else {
-                    if (!_BlueTable.CursorPosColumn().Format.CanBeChangedByRules()) { CanDo = false; }
-                }
-            }
-            if (Alt.Text == Neu.Text) {
-                if (!InhaltEgal.Checked) { CanDo = false; }
-                if (!ErsetzeKomplett.Checked) { CanDo = false; }
-            }
-            ers.Enabled = CanDo;
-        }
-
-        protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
-            base.OnFormClosing(e);
-            _BlueTable.CursorPosChanged -= CursorPosChanged;
-        }
+        #endregion
     }
 }

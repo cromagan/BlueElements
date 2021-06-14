@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Interfaces;
 using System;
@@ -29,13 +25,33 @@ namespace BlueControls.Classes_Editor {
     [DefaultEvent("Changed")]
     internal partial class AbstractClassEditor<T> : Controls.GroupBox where T : IParseable {
 
-        public AbstractClassEditor() : base() => InitializeComponent();
+        #region Fields
 
         private T _Item;
+
         private string _LastState = string.Empty;
+
         private bool _VisibleChanged_Done;
 
+        #endregion
+
+        #region Constructors
+
+        public AbstractClassEditor() : base() => InitializeComponent();
+
+        #endregion
+
+        #region Events
+
         public event EventHandler Changed;
+
+        #endregion
+
+        #region Properties
+
+        public bool Inited { get; private set; }
+
+        public bool IsFilling { get; private set; }
 
         /// <summary>
         /// Das Objekt, das im Original bearbeitet wird.
@@ -64,8 +80,9 @@ namespace BlueControls.Classes_Editor {
             }
         }
 
-        public bool IsFilling { get; private set; }
-        public bool Inited { get; private set; }
+        #endregion
+
+        #region Methods
 
         /// <summary>
         /// Sperrt die komplette Bearbeitung des Formulars und löscht alle Einträge.
@@ -77,12 +94,6 @@ namespace BlueControls.Classes_Editor {
         /// Erlaubt die Bearbeitung des Objektes und füllt den aktuellen Zustand in das Formular.
         /// </summary>
         protected virtual void EnabledAndFillFormula() => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
-
-        /// <summary>
-        /// Bereitet das Formular vor. Z.B. werden in den Auswahldialog-Boxen die voreingestellten Werte hineingeschrieben.
-        /// Diese Routine wird aufgerufen, wenn das Item zum ersten Mal empfangen wurde.
-        /// </summary>
-        protected virtual void PrepaireFormula() => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
 
         protected void OnChanged(T Obj) {
             if (IsFilling) { return; }
@@ -103,5 +114,13 @@ namespace BlueControls.Classes_Editor {
                 IsFilling = false;
             }
         }
+
+        /// <summary>
+        /// Bereitet das Formular vor. Z.B. werden in den Auswahldialog-Boxen die voreingestellten Werte hineingeschrieben.
+        /// Diese Routine wird aufgerufen, wenn das Item zum ersten Mal empfangen wurde.
+        /// </summary>
+        protected virtual void PrepaireFormula() => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
+
+        #endregion
     }
 }

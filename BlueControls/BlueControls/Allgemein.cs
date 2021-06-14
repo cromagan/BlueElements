@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -32,23 +28,7 @@ namespace BlueControls {
 
     public static class Allgemein {
 
-        public static IContextMenu ParentControlWithCommands(this object o) {
-            var par = o.ParentControl<IContextMenu>();
-            if (par == null) { return null; }
-            ItemCollectionList ThisContextMenu = new(enBlueListBoxAppearance.KontextMenu);
-            ItemCollectionList UserMenu = new(enBlueListBoxAppearance.KontextMenu);
-            List<string> tags = new();
-            var Cancel = false;
-            var Translate = true;
-            par.GetContextMenuItems(null, ThisContextMenu, out var HotItem, tags, ref Cancel, ref Translate);
-            if (Cancel) { return null; }
-            ContextMenuInitEventArgs ec = new(HotItem, tags, UserMenu);
-            par.OnContextMenuInit(ec);
-            return ec.Cancel ? null
-                : ThisContextMenu != null && ThisContextMenu.Count > 0 ? par
-                : UserMenu.Count > 0 ? par
-                : null;
-        }
+        #region Methods
 
         public static t ParentControl<t>(this object o) {
             if (o is System.Windows.Forms.Control co) {
@@ -67,6 +47,24 @@ namespace BlueControls {
                 } while (true);
             }
             return default;
+        }
+
+        public static IContextMenu ParentControlWithCommands(this object o) {
+            var par = o.ParentControl<IContextMenu>();
+            if (par == null) { return null; }
+            ItemCollectionList ThisContextMenu = new(enBlueListBoxAppearance.KontextMenu);
+            ItemCollectionList UserMenu = new(enBlueListBoxAppearance.KontextMenu);
+            List<string> tags = new();
+            var Cancel = false;
+            var Translate = true;
+            par.GetContextMenuItems(null, ThisContextMenu, out var HotItem, tags, ref Cancel, ref Translate);
+            if (Cancel) { return null; }
+            ContextMenuInitEventArgs ec = new(HotItem, tags, UserMenu);
+            par.OnContextMenuInit(ec);
+            return ec.Cancel ? null
+                : ThisContextMenu != null && ThisContextMenu.Count > 0 ? par
+                : UserMenu.Count > 0 ? par
+                : null;
         }
 
         public static List<string> SplitByWidth(this string Text, float MaxWidth, int MaxLines, enDesign design, enStates state) {
@@ -112,6 +110,19 @@ namespace BlueControls {
             //}
         }
 
+        public static List<string> ToListOfString(this List<BasicListItem> Items) {
+            List<string> w = new();
+            if (Items == null) { return w; }
+            foreach (var ThisItem in Items) {
+                if (ThisItem != null) {
+                    if (!string.IsNullOrEmpty(ThisItem.Internal)) {
+                        w.Add(ThisItem.Internal);
+                    }
+                }
+            }
+            return w;
+        }
+
         public static string TrimByWidth(this string TXT, float MaxWidth, BlueFont F) {
             if (F == null) { return TXT; }
             var tSize = BlueFont.MeasureString(TXT, F.Font());
@@ -136,17 +147,6 @@ namespace BlueControls {
             return TXT;
         }
 
-        public static List<string> ToListOfString(this List<BasicListItem> Items) {
-            List<string> w = new();
-            if (Items == null) { return w; }
-            foreach (var ThisItem in Items) {
-                if (ThisItem != null) {
-                    if (!string.IsNullOrEmpty(ThisItem.Internal)) {
-                        w.Add(ThisItem.Internal);
-                    }
-                }
-            }
-            return w;
-        }
+        #endregion
     }
 }

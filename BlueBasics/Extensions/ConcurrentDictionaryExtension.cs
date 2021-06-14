@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System.Collections.Concurrent;
@@ -27,6 +23,8 @@ using System.Collections.Generic;
 namespace BlueBasics {
 
     public static partial class Extensions {
+
+        #region Methods
 
         public static bool RemoveNullOrEmpty<T>(this ConcurrentDictionary<int, T> l) where T : ICanBeEmpty {
             if (l == null || l.Count == 0) { return false; }
@@ -42,5 +40,7 @@ namespace BlueBasics {
             }
             return true;
         }
+
+        #endregion
     }
 }

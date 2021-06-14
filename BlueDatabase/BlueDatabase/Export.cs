@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueDatabase.EventArgs;
 using System.Collections.Generic;
@@ -29,17 +25,81 @@ namespace BlueDatabase {
 
     public static class Export {
 
-        public static List<string> SaveAsBitmap(List<RowItem> Row, string LayoutID, string Path) {
-            List<string> l = new();
-            foreach (var ThisRow in Row) {
-                var FN = TempFile(Path, ThisRow.CellFirstString(), "PNG");
-                ThisRow.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventargs(ThisRow, LayoutID, FN));
-                l.Add(FN);
-            }
-            return l;
+        #region Methods
+
+        //public static string CreateLayout(RowItem Row, string LoadedFile, bool ToNonCriticalText) {
+        //    if (string.IsNullOrEmpty(LoadedFile)) {
+        //        return string.Empty;
+        //    }
+        //    if (LoadedFile.Contains("BlueBasics")) {
+        //        Develop.DebugPrint(enFehlerArt.Fehler, "Nur für externe Elemente erlaubt!");
+        //        return string.Empty;
+        //    }
+        //    var TMPList = new List<RowItem>
+        //    {
+        //        Row
+        //    };
+        //    return InternalCreateLayout(TMPList, LoadedFile, string.Empty, ToNonCriticalText);
+        //}
+        public static void CreateLayout(RowItem Row, string LoadFile, string SaveFile) {
+            if (!FileExists(LoadFile)) { return; }
+            List<RowItem> TMPList = new()
+            {
+                Row
+            };
+            InternalCreateLayout(TMPList, File.ReadAllText(LoadFile, Constants.Win1252), SaveFile, false);
         }
 
-        public static void SaveAsBitmap(RowItem Row, string LayoutID, string Filename) => Row.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventargs(Row, LayoutID, Filename));
+        public static void CreateLayout(List<RowItem> Rows, string LoadFile, string SaveFile) {
+            if (!FileExists(LoadFile)) { return; }
+            InternalCreateLayout(Rows, File.ReadAllText(LoadFile, Constants.Win1252), SaveFile, false);
+        }
+
+        //Shared Sub SaveAsBitmap(Row As RowItem)
+        //    If Row Is Nothing Then
+        //        MessageBox.Show("Kein Eintrag gewählt.", enImageCode.Information, "OK")
+        //        Exit Sub
+        //    End If
+        //    If Row.Database.Layouts.Count = 0 Then
+        //        MessageBox.Show("Kein Layouts vorhanden.", enImageCode.Information, "OK")
+        //        Exit Sub
+        //    End If
+        //    'Dim x As String = Row.Cell(Row.Database.Column.SysLastUsedLayout).String
+        //    'If x.IsLong Then
+        //    '    GenerateLayout_Internal(Row, Integer.Parse(x), False, True, String.Empty)
+        //    'Else
+        //    GenerateLayout_Internal(Row, 0, False, True, String.Empty)
+        //    '   End If
+        //End Sub
+        public static List<string> GenerateLayout_FileSystem(List<RowItem> Liste, string Lad, string OptionalFileName, bool EineGrosseDatei, string ZielPfad) {
+            List<string> l = new();
+            if (Liste == null) { return l; }
+            string sav;
+            if (Liste.Count == 1 || EineGrosseDatei) {
+                sav = !string.IsNullOrEmpty(OptionalFileName)
+                    ? TempFile(OptionalFileName.FilePath(), OptionalFileName.FileNameWithoutSuffix(), Lad.FileSuffix())
+                    : TempFile(ZielPfad, Liste[0].CellFirstString(), Lad.FileSuffix());
+                CreateLayout(Liste, Lad, sav);
+                l.Add(sav);
+            } else {
+                foreach (var ThisRow in Liste) {
+                    sav = !string.IsNullOrEmpty(OptionalFileName)
+                        ? TempFile(OptionalFileName.FilePath(), OptionalFileName.FileNameWithoutSuffix(), Lad.FileSuffix())
+                        : TempFile(ZielPfad, ThisRow.CellFirstString(), Lad.FileSuffix());
+                    CreateLayout(ThisRow, Lad, sav);
+                    l.Add(sav);
+                }
+                //    If OpenIt Then ExecuteFile(ZielPfad)
+            }
+            //If Not String.IsNullOrEmpty(sav) Then
+            //    If FileExists(sav) Then
+            //        If OpenIt Then ExecuteFile(sav)
+            //    Else
+            //        MessageBox.Show("Datei konnte nicht erzeugt werden.", enImageCode.Information, "OK")
+            //    End If
+            //End If
+            return l;
+        }
 
         //public static object ParseVariable(string platzhaltertxt, string variablename, object value) {
         //    var kennungstart = 0;
@@ -416,79 +476,17 @@ namespace BlueDatabase {
             return GenerateLayout_FileSystem(l, Layout, DestinationFile, false, string.Empty);
         }
 
-        //Shared Sub SaveAsBitmap(Row As RowItem)
-        //    If Row Is Nothing Then
-        //        MessageBox.Show("Kein Eintrag gewählt.", enImageCode.Information, "OK")
-        //        Exit Sub
-        //    End If
-        //    If Row.Database.Layouts.Count = 0 Then
-        //        MessageBox.Show("Kein Layouts vorhanden.", enImageCode.Information, "OK")
-        //        Exit Sub
-        //    End If
-        //    'Dim x As String = Row.Cell(Row.Database.Column.SysLastUsedLayout).String
-        //    'If x.IsLong Then
-        //    '    GenerateLayout_Internal(Row, Integer.Parse(x), False, True, String.Empty)
-        //    'Else
-        //    GenerateLayout_Internal(Row, 0, False, True, String.Empty)
-        //    '   End If
-        //End Sub
-        public static List<string> GenerateLayout_FileSystem(List<RowItem> Liste, string Lad, string OptionalFileName, bool EineGrosseDatei, string ZielPfad) {
+        public static List<string> SaveAsBitmap(List<RowItem> Row, string LayoutID, string Path) {
             List<string> l = new();
-            if (Liste == null) { return l; }
-            string sav;
-            if (Liste.Count == 1 || EineGrosseDatei) {
-                sav = !string.IsNullOrEmpty(OptionalFileName)
-                    ? TempFile(OptionalFileName.FilePath(), OptionalFileName.FileNameWithoutSuffix(), Lad.FileSuffix())
-                    : TempFile(ZielPfad, Liste[0].CellFirstString(), Lad.FileSuffix());
-                CreateLayout(Liste, Lad, sav);
-                l.Add(sav);
-            } else {
-                foreach (var ThisRow in Liste) {
-                    sav = !string.IsNullOrEmpty(OptionalFileName)
-                        ? TempFile(OptionalFileName.FilePath(), OptionalFileName.FileNameWithoutSuffix(), Lad.FileSuffix())
-                        : TempFile(ZielPfad, ThisRow.CellFirstString(), Lad.FileSuffix());
-                    CreateLayout(ThisRow, Lad, sav);
-                    l.Add(sav);
-                }
-                //    If OpenIt Then ExecuteFile(ZielPfad)
+            foreach (var ThisRow in Row) {
+                var FN = TempFile(Path, ThisRow.CellFirstString(), "PNG");
+                ThisRow.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventargs(ThisRow, LayoutID, FN));
+                l.Add(FN);
             }
-            //If Not String.IsNullOrEmpty(sav) Then
-            //    If FileExists(sav) Then
-            //        If OpenIt Then ExecuteFile(sav)
-            //    Else
-            //        MessageBox.Show("Datei konnte nicht erzeugt werden.", enImageCode.Information, "OK")
-            //    End If
-            //End If
             return l;
         }
 
-        //public static string CreateLayout(RowItem Row, string LoadedFile, bool ToNonCriticalText) {
-        //    if (string.IsNullOrEmpty(LoadedFile)) {
-        //        return string.Empty;
-        //    }
-        //    if (LoadedFile.Contains("BlueBasics")) {
-        //        Develop.DebugPrint(enFehlerArt.Fehler, "Nur für externe Elemente erlaubt!");
-        //        return string.Empty;
-        //    }
-        //    var TMPList = new List<RowItem>
-        //    {
-        //        Row
-        //    };
-        //    return InternalCreateLayout(TMPList, LoadedFile, string.Empty, ToNonCriticalText);
-        //}
-        public static void CreateLayout(RowItem Row, string LoadFile, string SaveFile) {
-            if (!FileExists(LoadFile)) { return; }
-            List<RowItem> TMPList = new()
-            {
-                Row
-            };
-            InternalCreateLayout(TMPList, File.ReadAllText(LoadFile, Constants.Win1252), SaveFile, false);
-        }
-
-        public static void CreateLayout(List<RowItem> Rows, string LoadFile, string SaveFile) {
-            if (!FileExists(LoadFile)) { return; }
-            InternalCreateLayout(Rows, File.ReadAllText(LoadFile, Constants.Win1252), SaveFile, false);
-        }
+        public static void SaveAsBitmap(RowItem Row, string LayoutID, string Filename) => Row.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventargs(Row, LayoutID, Filename));
 
         private static string InternalCreateLayout(List<RowItem> Rows, string FileLoaded, string SaveFile, bool ToNonCriticalText) {
             var Head = "";
@@ -521,5 +519,7 @@ namespace BlueDatabase {
             }
             return tmpSave;
         }
+
+        #endregion
     }
 }

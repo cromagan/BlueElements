@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
@@ -33,28 +29,24 @@ namespace BlueControls.Controls {
     [ToolboxBitmap(typeof(System.Windows.Forms.GroupBox))]
     public partial class GroupBox : System.Windows.Forms.GroupBox, IUseMyBackColor {
 
-        #region Constructor
-
-        public GroupBox() : base() =>
-            //// Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            //SetNotFocusable();
-            //_MouseHighlight = false;
-            SetStandardValues();
-
-        #endregion Constructor
-
-        #region Variablen
+        #region Fields
 
         //private string _Text = string.Empty;
         private enGroupBoxStyle _GroupBoxStyle = enGroupBoxStyle.Normal;
 
-        #endregion Variablen
+        #endregion
 
-        #region Events
+        #region Constructors
+
+        public GroupBox() : base() =>
+                    //// Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+                    //SetNotFocusable();
+                    //_MouseHighlight = false;
+                    SetStandardValues();
+
+        #endregion
 
         //public new event EventHandler TextChanged;
-
-        #endregion Events
 
         #region Properties
 
@@ -68,6 +60,8 @@ namespace BlueControls.Controls {
                 Invalidate();
             }
         }
+
+        #endregion
 
         //[DefaultValue(0)]
         //public new int TabIndex
@@ -109,13 +103,7 @@ namespace BlueControls.Controls {
         //    }
         //}
 
-        #endregion Properties
-
-        protected override void OnParentChanged(System.EventArgs e) {
-            base.OnParentChanged(e);
-            SetStandardValues();
-            ChildControls_RibbonBar();
-        }
+        #region Methods
 
         protected override void OnControlAdded(ControlEventArgs e) {
             base.OnControlAdded(e);
@@ -133,29 +121,6 @@ namespace BlueControls.Controls {
             base.OnDockChanged(e);
             SetStandardValues();
             ChildControls_RibbonBar();
-        }
-
-        private void SetStandardValues() {
-            var l = GenericControl.Typ(Parent);
-            if (_GroupBoxStyle == enGroupBoxStyle.RibbonBar) { l = enPartentType.RibbonPage; }
-            switch (l) {
-                case enPartentType.RibbonPage:
-                    GroupBoxStyle = enGroupBoxStyle.RibbonBar;
-                    BackColor = Skin.Color_Back(enDesign.RibbonBar_Body, enStates.Standard);
-                    break;
-
-                case enPartentType.TabPage:
-                    BackColor = Skin.Color_Back(enDesign.TabStrip_Body, enStates.Standard);
-                    break;
-
-                case enPartentType.Form:
-                    BackColor = Skin.Color_Back(enDesign.Form_Standard, enStates.Standard);
-                    break;
-            }
-        }
-
-        protected override void OnPaintBackground(PaintEventArgs pevent) {
-            // base.OnPaintBackground(pevent);
         }
 
         protected override void OnPaint(PaintEventArgs e) {
@@ -190,6 +155,16 @@ namespace BlueControls.Controls {
             if (DesignMode) { ChildControls_RibbonBar(); }
         }
 
+        protected override void OnPaintBackground(PaintEventArgs pevent) {
+            // base.OnPaintBackground(pevent);
+        }
+
+        protected override void OnParentChanged(System.EventArgs e) {
+            base.OnParentChanged(e);
+            SetStandardValues();
+            ChildControls_RibbonBar();
+        }
+
         private void ChildControls_RibbonBar() {
             if (_GroupBoxStyle != enGroupBoxStyle.RibbonBar) { return; }
             //if (Parent == null) { return; }
@@ -221,5 +196,26 @@ namespace BlueControls.Controls {
                 }
             }
         }
+
+        private void SetStandardValues() {
+            var l = GenericControl.Typ(Parent);
+            if (_GroupBoxStyle == enGroupBoxStyle.RibbonBar) { l = enPartentType.RibbonPage; }
+            switch (l) {
+                case enPartentType.RibbonPage:
+                    GroupBoxStyle = enGroupBoxStyle.RibbonBar;
+                    BackColor = Skin.Color_Back(enDesign.RibbonBar_Body, enStates.Standard);
+                    break;
+
+                case enPartentType.TabPage:
+                    BackColor = Skin.Color_Back(enDesign.TabStrip_Body, enStates.Standard);
+                    break;
+
+                case enPartentType.Form:
+                    BackColor = Skin.Color_Back(enDesign.Form_Standard, enStates.Standard);
+                    break;
+            }
+        }
+
+        #endregion
     }
 }

@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using System;
 using System.Drawing;
 
@@ -26,10 +22,14 @@ namespace BlueBasics {
 
     public static partial class Extensions {
 
-        public static bool PointInRect(this PointF p, decimal x1, decimal y1, decimal x2, decimal y2, float toleranz) {
+        #region Methods
+
+        public static bool PointInRect(this PointF p, double x1, double y1, double x2, double y2, float toleranz) {
             RectangleF r = new((float)Math.Min(x1, x2), (float)Math.Min(y1, y2), (float)Math.Abs(x1 - x2), (float)Math.Abs(y1 - y2));
             r.Inflate(toleranz, toleranz);
             return r.Contains(p);
         }
+
+        #endregion
     }
 }

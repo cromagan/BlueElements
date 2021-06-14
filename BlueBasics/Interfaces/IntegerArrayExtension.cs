@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,11 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 namespace BlueBasics.Interfaces {
 
     public static class IntegerArrayExtension {
+
+        #region Methods
 
         public static string[] ToStringArray(this int[] ar) {
             var sar = new string[ar.GetUpperBound(0) + 1];
@@ -30,5 +28,7 @@ namespace BlueBasics.Interfaces {
             }
             return sar;
         }
+
+        #endregion
     }
 }

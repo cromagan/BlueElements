@@ -1,5 +1,3 @@
-#region BlueElements - a collection of useful tools, database and controls
-
 // Authors:
 // Christian Peter
 //
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -29,25 +25,14 @@ namespace BlueDatabase {
 
     public sealed class RowSortDefinition : IParseable {
 
-        #region Variablen-Deklarationen
+        #region Fields
 
         public Database Database;
         private readonly ListExt<ColumnItem> _Columns = new();
 
-        #endregion Variablen-Deklarationen
+        #endregion
 
-        #region Event-Deklarationen + Delegaten
-
-        public event EventHandler Changed;
-
-        #endregion Event-Deklarationen + Delegaten
-
-        #region Construktor + Initialize
-
-        private void Initialize() {
-            Reverse = false;
-            _Columns.Clear();
-        }
+        #region Constructors
 
         public RowSortDefinition(Database database, string code) {
             Database = database;
@@ -68,31 +53,29 @@ namespace BlueDatabase {
             SetColumn(columnNames);
         }
 
-        #endregion Construktor + Initialize
+        #endregion
+
+        #region Events
+
+        public event EventHandler Changed;
+
+        #endregion
 
         #region Properties
 
-        public bool IsParsing { get; private set; }
-        public bool Reverse { get; private set; }
         public List<ColumnItem> Columns => _Columns;
 
-        #endregion Properties
+        public bool IsParsing { get; private set; }
 
-        public override string ToString() {
-            var Result = "{";
-            if (Reverse) {
-                Result += "Direction=Z-A";
-            } else {
-                Result += "Direction=A-Z";
-            }
-            if (_Columns != null) {
-                foreach (var ThisColumn in _Columns) {
-                    if (ThisColumn != null) {
-                        Result = Result + ", " + ThisColumn.ParsableColumnKey();
-                    }
-                }
-            }
-            return Result + "}";
+        public bool Reverse { get; private set; }
+
+        #endregion
+
+        #region Methods
+
+        public void OnChanged() {
+            if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
+            Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
         public void Parse(string ToParse) {
@@ -126,12 +109,21 @@ namespace BlueDatabase {
             IsParsing = false;
         }
 
-        private void SetColumn(List<string> names) {
-            _Columns.Clear();
-            for (var z = 0; z < names.Count; z++) {
-                var c = Database.Column.Exists(names[z]);
-                if (c != null) { _Columns.Add(c); }
+        public override string ToString() {
+            var Result = "{";
+            if (Reverse) {
+                Result += "Direction=Z-A";
+            } else {
+                Result += "Direction=A-Z";
             }
+            if (_Columns != null) {
+                foreach (var ThisColumn in _Columns) {
+                    if (ThisColumn != null) {
+                        Result = Result + ", " + ThisColumn.ParsableColumnKey();
+                    }
+                }
+            }
+            return Result + "}";
         }
 
         public bool UsedForRowSort(ColumnItem vcolumn) {
@@ -142,9 +134,19 @@ namespace BlueDatabase {
             return false;
         }
 
-        public void OnChanged() {
-            if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
-            Changed?.Invoke(this, System.EventArgs.Empty);
+        private void Initialize() {
+            Reverse = false;
+            _Columns.Clear();
         }
+
+        private void SetColumn(List<string> names) {
+            _Columns.Clear();
+            for (var z = 0; z < names.Count; z++) {
+                var c = Database.Column.Exists(names[z]);
+                if (c != null) { _Columns.Add(c); }
+            }
+        }
+
+        #endregion
     }
 }

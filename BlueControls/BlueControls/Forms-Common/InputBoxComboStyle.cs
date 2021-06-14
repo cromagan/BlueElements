@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,17 +15,20 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueControls.ItemCollection;
 using System.Collections.Generic;
 
 namespace BlueControls.Forms {
 
     public partial class InputBoxComboStyle : DialogWithOkAndCancel {
+
+        #region Fields
+
         private string GiveBack = string.Empty;
 
-        #region Konstruktor
+        #endregion
+
+        #region Constructors
 
         private InputBoxComboStyle() : base() => InitializeComponent();
 
@@ -41,9 +42,20 @@ namespace BlueControls.Forms {
             GiveBack = VorschlagsText;
         }
 
-        #endregion Konstruktor
+        #endregion
+
+        #region Methods
 
         public static string Show(string TXT, ItemCollectionList Suggest, bool TexteingabeErlaubt) => Show(TXT, string.Empty, Suggest, TexteingabeErlaubt);
+
+        public static string Show(string TXT, List<string> Suggest, bool TexteingabeErlaubt) {
+            ItemCollectionList cSuggest = new();
+            cSuggest.AddRange(Suggest);
+            cSuggest.Sort();
+            return Show(TXT, string.Empty, cSuggest, TexteingabeErlaubt);
+        }
+
+        protected override void SetValue(bool canceled) => GiveBack = canceled ? string.Empty : cbxText.Text;
 
         /// <summary>
         ///
@@ -58,19 +70,12 @@ namespace BlueControls.Forms {
             return MB.GiveBack;
         }
 
-        public static string Show(string TXT, List<string> Suggest, bool TexteingabeErlaubt) {
-            ItemCollectionList cSuggest = new();
-            cSuggest.AddRange(Suggest);
-            cSuggest.Sort();
-            return Show(TXT, string.Empty, cSuggest, TexteingabeErlaubt);
-        }
+        private void cbxText_Enter(object sender, System.EventArgs e) => Ok();
 
         private void cbxText_ESC(object sender, System.EventArgs e) => Cancel();
 
-        private void cbxText_Enter(object sender, System.EventArgs e) => Ok();
-
         private void InputComboBox_Shown(object sender, System.EventArgs e) => cbxText.Focus();
 
-        protected override void SetValue(bool canceled) => GiveBack = canceled ? string.Empty : cbxText.Text;
+        #endregion
     }
 }

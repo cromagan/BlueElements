@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using System;
 using System.Drawing;
@@ -26,10 +22,17 @@ using System.Drawing;
 namespace BlueControls.Forms {
 
     public partial class QuickInfo : FloatingForm {
-        public static string _shownTXT = string.Empty;
+
+        #region Fields
+
         public static string _AutoClosedTXT = string.Empty;
+        public static string _shownTXT = string.Empty;
         private bool _Shown = false;
         private int Counter = 0;
+
+        #endregion
+
+        #region Constructors
 
         private QuickInfo() : base(Enums.enDesign.Form_QuickInfo) => InitializeComponent();
 
@@ -43,6 +46,12 @@ namespace BlueControls.Forms {
             timQI.Enabled = true;
         }
 
+        #endregion
+
+        #region Methods
+
+        public static new void Close() => Close(false);
+
         public static void Show(string Text) {
             if (Text == _shownTXT) { return; }
             Close(false);
@@ -51,8 +60,6 @@ namespace BlueControls.Forms {
             if (string.IsNullOrEmpty(Text)) { return; }
             new QuickInfo(Text);
         }
-
-        public static new void Close() => Close(false);
 
         private static void Close(bool AutoClose) {
             if (AutoClose) {
@@ -88,5 +95,7 @@ namespace BlueControls.Forms {
                 Close(true);
             }
         }
+
+        #endregion
     }
 }

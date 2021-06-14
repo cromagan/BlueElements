@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -31,7 +27,8 @@ using static BlueBasics.FileOperations;
 namespace BlueControls.BlueDatabaseDialogs {
 
     internal partial class LayoutDesigner : PadEditor {
-        public Database Database { get; private set; }
+
+        #region Constructors
 
         //private string _LoadedLayout = string.Empty;
         public LayoutDesigner(Database database) : base() {
@@ -45,17 +42,112 @@ namespace BlueControls.BlueDatabaseDialogs {
             CheckButtons();
         }
 
-        private void Database_Disposing(object sender, System.EventArgs e) {
-            Database.Disposing -= Database_Disposing;
-            scriptEditor.Database = null;
-            Database = null;
-            Close();
+        #endregion
+
+        #region Properties
+
+        public Database Database { get; private set; }
+
+        #endregion
+
+        #region Methods
+
+        public override void ItemChanged() {
+            base.ItemChanged();
+            CheckButtons();
+        }
+
+        internal void LoadLayout(string fileOrLayoutID) {
+            SaveCurrentLayout();
+            cbxLayout.Text = fileOrLayoutID;
+            if (string.IsNullOrEmpty(fileOrLayoutID)) {
+                DisablePad();
+                return;
+            }
+            var ind = Database.Layouts.LayoutIDToIndex(fileOrLayoutID);
+            if (ind < 0) {
+                if (fileOrLayoutID.FileSuffix().ToUpper() == "BCR") {
+                    LoadFile(fileOrLayoutID, fileOrLayoutID);
+                } else {
+                    DisablePad();
+                    TextPadItem x = new(Pad.Item, "x", "Nicht editierbares Layout aus dem Dateisystem");
+                    Pad.Item.Add(x);
+                    x.Stil = Enums.PadStyles.Style_Überschrift_Haupt;
+                    x.SetCoordinates(new RectangleM(0, 0, 1000, 400), true);
+                    ItemChanged();
+                }
+            } else {
+                LoadFromString(Database.Layouts[ind], fileOrLayoutID);
+            }
         }
 
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
             base.OnFormClosing(e);
             SaveCurrentLayout();
         }
+
+        private void befülleLayoutDropdown() {
+            if (Database != null) {
+                cbxLayout.Item.Clear();
+                ExportDialog.AddLayoutsOff(cbxLayout.Item, Database, true);
+            }
+        }
+
+        private void btnLayoutHinzu_Click(object sender, System.EventArgs e) {
+            SaveCurrentLayout();
+            var ex = InputBox.Show("Geben sie den Namen<br>des neuen Layouts ein:", "", enDataFormat.Text);
+            if (string.IsNullOrEmpty(ex)) { return; }
+            LoadLayout(string.Empty);
+            CreativePad c = new();
+            c.Item.Caption = ex;
+            Database.Layouts.Add(c.Item.ToString());
+            befülleLayoutDropdown();
+            LoadLayout(c.Item.ID);
+            CheckButtons();
+        }
+
+        private void btnLayoutLöschen_Click(object sender, System.EventArgs e) {
+            SaveCurrentLayout();
+            var ind = Database.Layouts.LayoutIDToIndex(Pad.Item.ID);
+            if (ind < 0) {
+                MessageBox.Show("Layout kann nur manuell gelöscht werden.");
+                return;
+            }
+            if (MessageBox.Show("Layout <b>'" + Pad.Item.Caption + "'</b><br>wirklich löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+            Database.Layouts.RemoveAt(ind);
+            LoadLayout(string.Empty);
+            befülleLayoutDropdown();
+            CheckButtons();
+        }
+
+        private void btnLayoutOeffnen_Click(object sender, System.EventArgs e) => ExecuteFile(cbxLayout.Text, null, false);
+
+        private void btnLayoutUmbenennen_Click(object sender, System.EventArgs e) {
+            SaveCurrentLayout();
+            var ind = Database.Layouts.LayoutIDToIndex(Pad.Item.ID);
+            if (ind < 0) {
+                MessageBox.Show("Layout kann nur manuell umbenannt werden.");
+                return;
+            }
+            var ex = InputBox.Show("Namen des Layouts ändern:", Pad.Item.Caption, enDataFormat.Text);
+            if (string.IsNullOrEmpty(ex)) { return; }
+            Pad.Item.Caption = ex;
+            SaveCurrentLayout();
+            befülleLayoutDropdown();
+            CheckButtons();
+        }
+
+        private void btnLayoutVerzeichnis_Click(object sender, System.EventArgs e) {
+            if (Database == null) { return; }
+            if (!string.IsNullOrEmpty(Database.AdditionaFilesPfadWhole())) {
+                ExecuteFile(Database.AdditionaFilesPfadWhole());
+            }
+            ExecuteFile(Database.Filename.FilePath() + "Layouts\\");
+        }
+
+        private void btnTextEditor_Click(object sender, System.EventArgs e) => ExecuteFile("notepad.exe", cbxLayout.Text, false);
+
+        private void cbxLayout_ItemClicked(object sender, BasicListItemEventArgs e) => LoadLayout(e.Item.Internal);
 
         private void CheckButtons() {
             if (Database == null) {
@@ -97,109 +189,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             //}
         }
 
-        private void btnLayoutHinzu_Click(object sender, System.EventArgs e) {
-            SaveCurrentLayout();
-            var ex = InputBox.Show("Geben sie den Namen<br>des neuen Layouts ein:", "", enDataFormat.Text);
-            if (string.IsNullOrEmpty(ex)) { return; }
-            LoadLayout(string.Empty);
-            CreativePad c = new();
-            c.Item.Caption = ex;
-            Database.Layouts.Add(c.Item.ToString());
-            befülleLayoutDropdown();
-            LoadLayout(c.Item.ID);
-            CheckButtons();
-        }
-
-        private void btnLayoutLöschen_Click(object sender, System.EventArgs e) {
-            SaveCurrentLayout();
-            var ind = Database.Layouts.LayoutIDToIndex(Pad.Item.ID);
-            if (ind < 0) {
-                MessageBox.Show("Layout kann nur manuell gelöscht werden.");
-                return;
-            }
-            if (MessageBox.Show("Layout <b>'" + Pad.Item.Caption + "'</b><br>wirklich löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-            Database.Layouts.RemoveAt(ind);
-            LoadLayout(string.Empty);
-            befülleLayoutDropdown();
-            CheckButtons();
-        }
-
-        private void btnLayoutUmbenennen_Click(object sender, System.EventArgs e) {
-            SaveCurrentLayout();
-            var ind = Database.Layouts.LayoutIDToIndex(Pad.Item.ID);
-            if (ind < 0) {
-                MessageBox.Show("Layout kann nur manuell umbenannt werden.");
-                return;
-            }
-            var ex = InputBox.Show("Namen des Layouts ändern:", Pad.Item.Caption, enDataFormat.Text);
-            if (string.IsNullOrEmpty(ex)) { return; }
-            Pad.Item.Caption = ex;
-            SaveCurrentLayout();
-            befülleLayoutDropdown();
-            CheckButtons();
-        }
-
-        private void cbxLayout_ItemClicked(object sender, BasicListItemEventArgs e) => LoadLayout(e.Item.Internal);
-
-        internal void LoadLayout(string fileOrLayoutID) {
-            SaveCurrentLayout();
-            cbxLayout.Text = fileOrLayoutID;
-            if (string.IsNullOrEmpty(fileOrLayoutID)) {
-                DisablePad();
-                return;
-            }
-            var ind = Database.Layouts.LayoutIDToIndex(fileOrLayoutID);
-            if (ind < 0) {
-                if (fileOrLayoutID.FileSuffix().ToUpper() == "BCR") {
-                    LoadFile(fileOrLayoutID, fileOrLayoutID);
-                } else {
-                    DisablePad();
-                    TextPadItem x = new(Pad.Item, "x", "Nicht editierbares Layout aus dem Dateisystem");
-                    Pad.Item.Add(x);
-                    x.Stil = Enums.PadStyles.Style_Überschrift_Haupt;
-                    x.SetCoordinates(new RectangleM(0, 0, 1000, 400), true);
-                    ItemChanged();
-                }
-            } else {
-                LoadFromString(Database.Layouts[ind], fileOrLayoutID);
-            }
-        }
-
-        public override void ItemChanged() {
-            base.ItemChanged();
-            CheckButtons();
-        }
-
-        private void SaveCurrentLayout() {
-            scriptEditor.WriteScriptBack();
-            if (Database == null) { return; }
-            var newl = Pad.Item.ToString();
-            var ind = Database.Layouts.LayoutIDToIndex(Pad.Item.ID);
-            if (ind > -1) {
-                if (Database.Layouts[ind] == newl) { return; }
-                Database.Layouts[ind] = newl;
-            } else if (Pad.Item.ID.FileSuffix().ToUpper() == "BCR") {
-                SaveToDisk(Pad.Item.ID, newl, false, System.Text.Encoding.UTF8);
-            }
-        }
-
-        private void btnTextEditor_Click(object sender, System.EventArgs e) => ExecuteFile("notepad.exe", cbxLayout.Text, false);
-
-        private void btnLayoutOeffnen_Click(object sender, System.EventArgs e) => ExecuteFile(cbxLayout.Text, null, false);
-
-        private void btnLayoutVerzeichnis_Click(object sender, System.EventArgs e) {
-            if (Database == null) { return; }
-            if (!string.IsNullOrEmpty(Database.AdditionaFilesPfadWhole())) {
-                ExecuteFile(Database.AdditionaFilesPfadWhole());
-            }
-            ExecuteFile(Database.Filename.FilePath() + "Layouts\\");
-        }
-
-        private void befülleLayoutDropdown() {
-            if (Database != null) {
-                cbxLayout.Item.Clear();
-                ExportDialog.AddLayoutsOff(cbxLayout.Item, Database, true);
-            }
+        private void Database_Disposing(object sender, System.EventArgs e) {
+            Database.Disposing -= Database_Disposing;
+            scriptEditor.Database = null;
+            Database = null;
+            Close();
         }
 
         private void Pad_ClickedItemChanged(object sender, System.EventArgs e) {
@@ -219,5 +213,20 @@ namespace BlueControls.BlueDatabaseDialogs {
                 //ThisFlexi.ButtonClicked += FlexiButtonClick;
             }
         }
+
+        private void SaveCurrentLayout() {
+            scriptEditor.WriteScriptBack();
+            if (Database == null) { return; }
+            var newl = Pad.Item.ToString();
+            var ind = Database.Layouts.LayoutIDToIndex(Pad.Item.ID);
+            if (ind > -1) {
+                if (Database.Layouts[ind] == newl) { return; }
+                Database.Layouts[ind] = newl;
+            } else if (Pad.Item.ID.FileSuffix().ToUpper() == "BCR") {
+                SaveToDisk(Pad.Item.ID, newl, false, System.Text.Encoding.UTF8);
+            }
+        }
+
+        #endregion
     }
 }

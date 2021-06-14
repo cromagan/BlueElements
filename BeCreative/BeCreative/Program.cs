@@ -2,9 +2,12 @@
 using System.Globalization;
 using System.Windows.Forms;
 
-
 namespace WindowsFormsApp1 {
+
     internal static class Program {
+
+        #region Methods
+
         /// <summary>
         /// Der Haupteinstiegspunkt für die Anwendung.
         /// </summary>
@@ -18,5 +21,7 @@ namespace WindowsFormsApp1 {
             Application.Run(new BlueControls.Forms.frmTableView(null, true, true));
             BlueBasics.Develop.TraceLogging_End();
         }
+
+        #endregion
     }
 }

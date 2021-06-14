@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using System.Collections;
@@ -27,40 +23,34 @@ using System.ComponentModel;
 
 namespace BlueDatabase {
 
+    public static class DataHolderExtensions {
+
+        #region Methods
+
+        public static t GetByID<t>(this List<t> items, string id) where t : DataHolder {
+            foreach (var thisit in items) {
+                if (thisit.ID.ToUpper() == id.ToUpper()) { return thisit; }
+            }
+            return null;
+        }
+
+        #endregion
+    }
+
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public abstract class DataHolder : System.IDisposable {
-        public Database InternalDatabase { get; set; }
+
+        #region Fields
+
+        public readonly string ID = string.Empty;
         public readonly DataHolder Parent = null;
         public readonly string Typ = string.Empty;
-        public readonly string ID = string.Empty;
         private bool disposedValue;
 
-        public abstract string MyDefaultFileName();
+        #endregion
 
-        public abstract string MyDefaultSubTyp();
-
-        public abstract bool UseExtraFile();
-
-        //private List<(ColumnItem, ListExt<object>)> syncs = new List<(ColumnItem, ListExt<object>)>();
-        //public void Sync<t>(string columnname, ListExt<object> data) {
-        //    var c = Column(columnname, string.Empty);
-        //    syncs.Add((c, data));
-        //    data.Changed += Data_Changed;
-        //}
-        public void SetData(string feldname, bool editable, string quickinfo) {
-            var c = Column(feldname, string.Empty);
-            //c.Caption = dataName;
-            //c.Format = enDataFormat.Text;
-            //c.MultiLine = true;
-            c.TextBearbeitungErlaubt = editable;
-            if (editable) {
-                c.PermissionGroups_ChangeCell.AddIfNotExists("#Everybody");
-            } else {
-                c.PermissionGroups_ChangeCell.Remove("#Everybody");
-            }
-            c.Quickinfo = quickinfo;
-        }
+        #region Constructors
 
         /// <summary>
         /// Speichert die Daten in dem Parent ab
@@ -76,8 +66,6 @@ namespace BlueDatabase {
             Typ = parent.Row().CellFirstString() + "/" + MyDefaultSubTyp();
             ID = id;
         }
-
-        private void InternalDatabase_Disposing(object sender, System.EventArgs e) => Dispose();
 
         /// <summary>
         /// Erzeugt eine eigenständige Datei. Der Typ wird dabei immer auf MAIN gesetzt
@@ -128,7 +116,35 @@ namespace BlueDatabase {
             InternalDatabase.Disposing += InternalDatabase_Disposing;
         }
 
-        public void Save(bool mustsave) => InternalDatabase.Save(mustsave);
+        #endregion
+
+        #region Destructors
+
+        // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
+        ~DataHolder() {
+            // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+            Dispose(disposing: false);
+        }
+
+        #endregion
+
+        #region Properties
+
+        public string Erstelldatum {
+            get => InternalDatabase.CreateDate;
+            set => InternalDatabase.CreateDate = value;
+        }
+
+        public string Ersteller {
+            get => InternalDatabase.Creator;
+            set => InternalDatabase.Creator = value;
+        }
+
+        public Database InternalDatabase { get; set; }
+
+        #endregion
+
+        #region Methods
 
         public static string ColumnName(string originalName) {
             originalName = originalName.ToUpper().StarkeVereinfachung(" -_\\*/()");
@@ -165,26 +181,25 @@ namespace BlueDatabase {
             return c;
         }
 
-        public RowItem Row() {
-            var rn = Typ + "/" + ID;
-            var r = InternalDatabase.Row[rn];
-            if (r == null) {
-                r = InternalDatabase.Row.Add(rn);
-                r.CellSet(InternalDatabase.Column.SysChapter, Typ);
-            }
-            return r;
+        public void Dispose() {
+            // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+            Dispose(disposing: true);
+            System.GC.SuppressFinalize(this);
         }
 
-        public void Set(string dataName, string value) => Row().CellSet(Column(dataName, string.Empty), value);
+        public double GetDecimal(string dataName) => Row().CellGetDecimal(Column(dataName, string.Empty));
 
-        public void Set(string dataName, List<string> value) => Row().CellSet(Column(dataName, string.Empty), value);
+        public double GetDouble(string dataName) => Row().CellGetDouble(Column(dataName, string.Empty));
 
-        public void SetSynchronizedFiles<t>(string dataName, string value, ref t synchronData) where t : DataHolder {
-            Row().CellSet(Column(dataName, string.Empty), value);
-            if (synchronData == null || synchronData.ID.ToUpper() != value.ToUpper()) {
-                synchronData = (t)System.Activator.CreateInstance(typeof(t), value);
-            }
-        }
+        public int GetInt(string dataName) => Row().CellGetInteger(Column(dataName, string.Empty));
+
+        public List<string> GetList(string dataName) => Row().CellGetList(Column(dataName, string.Empty));
+
+        public string GetString(string dataName) => Row().CellGetString(Column(dataName, string.Empty));
+
+        public abstract string MyDefaultFileName();
+
+        public abstract string MyDefaultSubTyp();
 
         //public void SetSynchronizedFiles<t>(string dataName, List<string> value, List<t> synchronData) where t : DataHolder {
         //    Row().CellSet(Column(dataName, string.Empty), value);
@@ -219,20 +234,21 @@ namespace BlueDatabase {
             data.Changed += Data_Changed;
         }
 
-        private void Data_Changed(object sender, System.EventArgs e) {
-            List<string> IDS = new();
-            if (sender is IEnumerable enumerable) {
-                foreach (var thisd in enumerable) {
-                    if (thisd is DataHolder dh) {
-                        IDS.Add(dh.ID);
-                    }
-                }
-            } else {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Typ");
+        public RowItem Row() {
+            var rn = Typ + "/" + ID;
+            var r = InternalDatabase.Row[rn];
+            if (r == null) {
+                r = InternalDatabase.Row.Add(rn);
+                r.CellSet(InternalDatabase.Column.SysChapter, Typ);
             }
-            var name = sender.GetType().ToString();
-            Set(name, IDS);
+            return r;
         }
+
+        public void Save(bool mustsave) => InternalDatabase.Save(mustsave);
+
+        public void Set(string dataName, string value) => Row().CellSet(Column(dataName, string.Empty), value);
+
+        public void Set(string dataName, List<string> value) => Row().CellSet(Column(dataName, string.Empty), value);
 
         ///// <summary>
         ///// Setz die Synchronen Daten in dieser Datei mit ab
@@ -269,31 +285,38 @@ namespace BlueDatabase {
         //    }
         //    #endregion
         //}
-        public void Set(string dataName, decimal value) => Row().CellSet(Column(dataName, string.Empty), value);
-
         public void Set(string dataName, double value) => Row().CellSet(Column(dataName, string.Empty), value);
 
         public void Set(string dataName, int value) => Row().CellSet(Column(dataName, string.Empty), value);
 
-        public string GetString(string dataName) => Row().CellGetString(Column(dataName, string.Empty));
-
-        public List<string> GetList(string dataName) => Row().CellGetList(Column(dataName, string.Empty));
-
-        public decimal GetDecimal(string dataName) => Row().CellGetDecimal(Column(dataName, string.Empty));
-
-        public double GetDouble(string dataName) => Row().CellGetDouble(Column(dataName, string.Empty));
-
-        public int GetInt(string dataName) => Row().CellGetInteger(Column(dataName, string.Empty));
-
-        public string Erstelldatum {
-            get => InternalDatabase.CreateDate;
-            set => InternalDatabase.CreateDate = value;
+        //private List<(ColumnItem, ListExt<object>)> syncs = new List<(ColumnItem, ListExt<object>)>();
+        //public void Sync<t>(string columnname, ListExt<object> data) {
+        //    var c = Column(columnname, string.Empty);
+        //    syncs.Add((c, data));
+        //    data.Changed += Data_Changed;
+        //}
+        public void SetData(string feldname, bool editable, string quickinfo) {
+            var c = Column(feldname, string.Empty);
+            //c.Caption = dataName;
+            //c.Format = enDataFormat.Text;
+            //c.MultiLine = true;
+            c.TextBearbeitungErlaubt = editable;
+            if (editable) {
+                c.PermissionGroups_ChangeCell.AddIfNotExists("#Everybody");
+            } else {
+                c.PermissionGroups_ChangeCell.Remove("#Everybody");
+            }
+            c.Quickinfo = quickinfo;
         }
 
-        public string Ersteller {
-            get => InternalDatabase.Creator;
-            set => InternalDatabase.Creator = value;
+        public void SetSynchronizedFiles<t>(string dataName, string value, ref t synchronData) where t : DataHolder {
+            Row().CellSet(Column(dataName, string.Empty), value);
+            if (synchronData == null || synchronData.ID.ToUpper() != value.ToUpper()) {
+                synchronData = (t)System.Activator.CreateInstance(typeof(t), value);
+            }
         }
+
+        public abstract bool UseExtraFile();
 
         protected virtual void Dispose(bool disposing) {
             if (!disposedValue) {
@@ -309,26 +332,23 @@ namespace BlueDatabase {
             }
         }
 
-        // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
-        ~DataHolder() {
-            // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-            Dispose(disposing: false);
-        }
-
-        public void Dispose() {
-            // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-            Dispose(disposing: true);
-            System.GC.SuppressFinalize(this);
-        }
-    }
-
-    public static class DataHolderExtensions {
-
-        public static t GetByID<t>(this List<t> items, string id) where t : DataHolder {
-            foreach (var thisit in items) {
-                if (thisit.ID.ToUpper() == id.ToUpper()) { return thisit; }
+        private void Data_Changed(object sender, System.EventArgs e) {
+            List<string> IDS = new();
+            if (sender is IEnumerable enumerable) {
+                foreach (var thisd in enumerable) {
+                    if (thisd is DataHolder dh) {
+                        IDS.Add(dh.ID);
+                    }
+                }
+            } else {
+                Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Typ");
             }
-            return null;
+            var name = sender.GetType().ToString();
+            Set(name, IDS);
         }
+
+        private void InternalDatabase_Disposing(object sender, System.EventArgs e) => Dispose();
+
+        #endregion
     }
 }

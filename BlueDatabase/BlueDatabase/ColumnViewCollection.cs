@@ -1,5 +1,3 @@
-#region BlueElements - a collection of useful tools, database and controls
-
 // Authors:
 // Christian Peter
 //
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -30,28 +26,19 @@ namespace BlueDatabase {
     public sealed class ColumnViewCollection : ListExt<ColumnViewItem>, IParseable {
         //NICHT IReadableText, das gibt zu viele Probleme (Dropdownboxen)
 
-        #region Variablen-Deklarationen
+        #region Fields
 
-        public Database Database { get; private set; }
         private string _Name;
 
-        #endregion Variablen-Deklarationen
+        #endregion
 
-        #region Construktor + Initialize
-
-        private void Initialize() {
-            _Name = string.Empty;
-            PermissionGroups_Show.Clear();
-            PermissionGroups_Show.Changed += _PermissionGroups_Show_ListOrItemChanged;
-        }
+        #region Constructors
 
         public ColumnViewCollection(Database database, string code) {
             Database = database;
             Database.Disposing += Database_Disposing;
             Parse(code);
         }
-
-        private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
 
         public ColumnViewCollection(Database database, string code, string newname) {
             Database = database;
@@ -60,10 +47,11 @@ namespace BlueDatabase {
             _Name = newname;
         }
 
-        #endregion Construktor + Initialize
+        #endregion
 
         #region Properties
 
+        public Database Database { get; private set; }
         public bool IsParsing { get; private set; }
 
         public string Name {
@@ -77,6 +65,10 @@ namespace BlueDatabase {
 
         public ListExt<string> PermissionGroups_Show { get; } = new ListExt<string>();
 
+        #endregion
+
+        #region Indexers
+
         public ColumnViewItem this[ColumnItem vColumn] {
             get {
                 if (vColumn == null) { return null; }
@@ -87,9 +79,9 @@ namespace BlueDatabase {
             }
         }
 
-        #endregion Properties
+        #endregion
 
-        private void _PermissionGroups_Show_ListOrItemChanged(object sender, System.EventArgs e) => OnChanged();
+        #region Methods
 
         public void Add(ColumnItem Column, bool Permanent) {
             if (Permanent) {
@@ -99,7 +91,68 @@ namespace BlueDatabase {
             }
         }
 
+        public void Hide(string ColumnName) {
+            foreach (var ThisViewItem in this) {
+                if (ThisViewItem != null) {
+                    if (ThisViewItem.Column == null || ThisViewItem.Column.Name.ToUpper() == ColumnName.ToUpper()) {
+                        Remove(ThisViewItem);
+                        Hide(ColumnName);
+                        return;
+                    }
+                }
+            }
+        }
+
+        public void HideSystemColumns() {
+            foreach (var ThisViewItem in this) {
+                if (ThisViewItem != null) {
+                    if (ThisViewItem.Column == null || !string.IsNullOrEmpty(ThisViewItem.Column.Identifier)) {
+                        Remove(ThisViewItem);
+                        HideSystemColumns();
+                        return;
+                    }
+                }
+            }
+        }
+
         public void Insert(int index, ColumnItem Column) => Insert(index, new ColumnViewItem(Column, enViewType.Column));
+
+        public List<ColumnItem> ListOfUsedColumn() {
+            List<ColumnItem> ColList = new();
+            foreach (var t in this) {
+                if (t != null) { ColList.Add(t.Column); }
+            }
+            return ColList;
+        }
+
+        public ColumnItem NextVisible(ColumnItem column) {
+            var ViewItemNo = 0;
+            var Found = false;
+            do {
+                if (ViewItemNo >= Count) { return null; }
+                if (this[ViewItemNo] != null && this[ViewItemNo].Column != null) {
+                    if (Found) { return this[ViewItemNo].Column; }
+                    if (this[ViewItemNo].Column == column) { Found = true; }
+                }
+                ViewItemNo++;
+            } while (true);
+        }
+
+        public ColumnViewItem NextVisible(ColumnViewItem viewItem) {
+            var ViewItemNo = IndexOf(viewItem);
+            if (ViewItemNo < 0) { return null; }
+            do {
+                ViewItemNo++;
+                if (ViewItemNo >= Count) { return null; }
+                if (this[ViewItemNo] != null && this[ViewItemNo].Column != null) { return this[ViewItemNo]; }
+            } while (true);
+        }
+
+        public override void OnChanged() {
+            if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
+            base.OnChanged();
+            //Changed?.Invoke(this, System.EventArgs.Empty);
+        }
 
         public void Parse(string ToParse) {
             IsParsing = true;
@@ -130,22 +183,26 @@ namespace BlueDatabase {
             IsParsing = false;
         }
 
-        public override string ToString() {
-            Develop.DebugPrint_Disposed(Disposed);
-            var Result = "{Name=" + _Name.ToNonCritical();
-            foreach (var ThisViewItem in this) {
-                if (ThisViewItem != null) {
-                    Result = Result + ", Columndata=" + ThisViewItem;
+        public ColumnItem PreviousVisible(ColumnItem column) {
+            var ViewItemNo = Count - 1;
+            var Found = false;
+            do {
+                if (ViewItemNo < 0) { return null; }
+                if (this[ViewItemNo] != null && this[ViewItemNo].Column != null) {
+                    if (Found) { return this[ViewItemNo].Column; }
+                    if (this[ViewItemNo].Column == column) { Found = true; }
                 }
-            }
-            var tmp = PermissionGroups_Show.SortedDistinctList();
-            tmp.RemoveString("#Administrator", false);
-            foreach (var t in tmp) {
-                if (!string.IsNullOrEmpty(t)) {
-                    Result = Result + ", Permissiongroup=" + t;
-                }
-            }
-            return Result + "}";
+                ViewItemNo--;
+            } while (true);
+        }
+
+        public ColumnViewItem PreviousVisible(ColumnViewItem viewItem) {
+            var ViewItemNo = IndexOf(viewItem);
+            do {
+                ViewItemNo--;
+                if (ViewItemNo < 0) { return null; }
+                if (this[ViewItemNo] != null && this[ViewItemNo].Column != null) { return this[ViewItemNo]; }
+            } while (true);
         }
 
         public void ShowAllColumns() {
@@ -172,93 +229,28 @@ namespace BlueDatabase {
             if (Count > 0) { this[0].ViewType = enViewType.PermanentColumn; }
         }
 
-        public ColumnItem PreviousVisible(ColumnItem column) {
-            var ViewItemNo = Count - 1;
-            var Found = false;
-            do {
-                if (ViewItemNo < 0) { return null; }
-                if (this[ViewItemNo] != null && this[ViewItemNo].Column != null) {
-                    if (Found) { return this[ViewItemNo].Column; }
-                    if (this[ViewItemNo].Column == column) { Found = true; }
-                }
-                ViewItemNo--;
-            } while (true);
-        }
-
-        public ColumnItem NextVisible(ColumnItem column) {
-            var ViewItemNo = 0;
-            var Found = false;
-            do {
-                if (ViewItemNo >= Count) { return null; }
-                if (this[ViewItemNo] != null && this[ViewItemNo].Column != null) {
-                    if (Found) { return this[ViewItemNo].Column; }
-                    if (this[ViewItemNo].Column == column) { Found = true; }
-                }
-                ViewItemNo++;
-            } while (true);
-        }
-
-        public ColumnViewItem PreviousVisible(ColumnViewItem viewItem) {
-            var ViewItemNo = IndexOf(viewItem);
-            do {
-                ViewItemNo--;
-                if (ViewItemNo < 0) { return null; }
-                if (this[ViewItemNo] != null && this[ViewItemNo].Column != null) { return this[ViewItemNo]; }
-            } while (true);
-        }
-
-        public ColumnViewItem NextVisible(ColumnViewItem viewItem) {
-            var ViewItemNo = IndexOf(viewItem);
-            if (ViewItemNo < 0) { return null; }
-            do {
-                ViewItemNo++;
-                if (ViewItemNo >= Count) { return null; }
-                if (this[ViewItemNo] != null && this[ViewItemNo].Column != null) { return this[ViewItemNo]; }
-            } while (true);
-        }
-
         public new void Swap(ColumnViewItem viewItem1, ColumnViewItem viewItem2) {
             if (viewItem1 == null || viewItem2 == null) { return; }
             base.Swap(viewItem1, viewItem2);
             if (viewItem2.ViewType != enViewType.PermanentColumn) { viewItem1.ViewType = enViewType.Column; }
         }
 
-        public List<ColumnItem> ListOfUsedColumn() {
-            List<ColumnItem> ColList = new();
-            foreach (var t in this) {
-                if (t != null) { ColList.Add(t.Column); }
-            }
-            return ColList;
-        }
-
-        public override void OnChanged() {
-            if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
-            base.OnChanged();
-            //Changed?.Invoke(this, System.EventArgs.Empty);
-        }
-
-        public void HideSystemColumns() {
+        public override string ToString() {
+            Develop.DebugPrint_Disposed(Disposed);
+            var Result = "{Name=" + _Name.ToNonCritical();
             foreach (var ThisViewItem in this) {
                 if (ThisViewItem != null) {
-                    if (ThisViewItem.Column == null || !string.IsNullOrEmpty(ThisViewItem.Column.Identifier)) {
-                        Remove(ThisViewItem);
-                        HideSystemColumns();
-                        return;
-                    }
+                    Result = Result + ", Columndata=" + ThisViewItem;
                 }
             }
-        }
-
-        public void Hide(string ColumnName) {
-            foreach (var ThisViewItem in this) {
-                if (ThisViewItem != null) {
-                    if (ThisViewItem.Column == null || ThisViewItem.Column.Name.ToUpper() == ColumnName.ToUpper()) {
-                        Remove(ThisViewItem);
-                        Hide(ColumnName);
-                        return;
-                    }
+            var tmp = PermissionGroups_Show.SortedDistinctList();
+            tmp.RemoveString("#Administrator", false);
+            foreach (var t in tmp) {
+                if (!string.IsNullOrEmpty(t)) {
+                    Result = Result + ", Permissiongroup=" + t;
                 }
             }
+            return Result + "}";
         }
 
         internal void Repair() {
@@ -285,5 +277,17 @@ namespace BlueDatabase {
             Database = null;
             base.Dispose(disposing);
         }
+
+        private void _PermissionGroups_Show_ListOrItemChanged(object sender, System.EventArgs e) => OnChanged();
+
+        private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
+
+        private void Initialize() {
+            _Name = string.Empty;
+            PermissionGroups_Show.Clear();
+            PermissionGroups_Show.Changed += _PermissionGroups_Show_ListOrItemChanged;
+        }
+
+        #endregion
     }
 }

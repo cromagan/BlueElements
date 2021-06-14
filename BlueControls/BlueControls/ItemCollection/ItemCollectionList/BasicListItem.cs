@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -30,23 +26,9 @@ namespace BlueControls.ItemCollection {
 
     public abstract class BasicListItem : ICompareKey, IComparable {
 
-        public Size SizeUntouchedForListBox() {
-            if (_SizeUntouchedForListBox.IsEmpty) {
-                _SizeUntouchedForListBox = ComputeSizeUntouchedForListBox();
-            }
-            return _SizeUntouchedForListBox;
-        }
+        #region Fields
 
-        protected abstract Size ComputeSizeUntouchedForListBox();
-
-        public ItemCollectionList Parent { get; private set; }
-        public string Internal { get; set; }
-
-        public abstract int HeightForListBox(enBlueListBoxAppearance style, int columnWidth);
-
-        protected abstract string GetCompareKey();
-
-        protected abstract void DrawExplicit(Graphics gr, Rectangle positionModified, enDesign itemdesign, enStates state, bool drawBorderAndBack, bool translate);
+        public Rectangle Pos;
 
         /// <summary>
         /// Falls eine Spezielle Information gespeichert und zurückgegeben werden soll
@@ -54,7 +36,11 @@ namespace BlueControls.ItemCollection {
         /// <remarks></remarks>
         public object Tag;
 
-        private Size _SizeUntouchedForListBox = Size.Empty;
+        /// <summary>
+        /// Ist das Item enabled?
+        /// </summary>
+        /// <remarks></remarks>
+        protected bool _Enabled = true;
 
         /// <summary>
         /// Ist das Item markiert/selektiert?
@@ -62,15 +48,13 @@ namespace BlueControls.ItemCollection {
         /// <remarks></remarks>
         private bool _Checked;
 
-        public Rectangle Pos;
-        private string _UserDefCompareKey = "";
-        public bool IsCaption { get; protected set; }
+        private Size _SizeUntouchedForListBox = Size.Empty;
 
-        /// <summary>
-        /// Ist das Item enabled?
-        /// </summary>
-        /// <remarks></remarks>
-        protected bool _Enabled = true;
+        private string _UserDefCompareKey = "";
+
+        #endregion
+
+        #region Constructors
 
         protected BasicListItem(string internalname) {
             if (string.IsNullOrEmpty(internalname)) {
@@ -84,13 +68,17 @@ namespace BlueControls.ItemCollection {
             _UserDefCompareKey = string.Empty;
         }
 
-        public virtual bool IsClickable() => !IsCaption;
+        #endregion
 
-        public bool Contains(int x, int y) => Pos.Contains(x, y);
+        #region Properties
 
-        public void SetCoordinates(Rectangle r) {
-            Pos = r;
-            Parent?.OnDoInvalidate();
+        public bool Checked {
+            get => _Checked;
+            set {
+                if (Parent == null) { Develop.DebugPrint(enFehlerArt.Warnung, "Parent == null!"); }
+                Parent?.SetNewCheckState(this, value, ref _Checked);
+                //OnChanged();
+            }
         }
 
         public bool Enabled {
@@ -102,13 +90,13 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public string CompareKey() {
-            if (!string.IsNullOrEmpty(_UserDefCompareKey)) {
-                if (Convert.ToChar(_UserDefCompareKey.Substring(0, 1)) < 32) { Develop.DebugPrint("Sortierung inkorrekt: " + _UserDefCompareKey); }
-                return _UserDefCompareKey + Constants.FirstSortChar + Parent.IndexOf(this).ToString(Constants.Format_Integer6);
-            }
-            return GetCompareKey();
-        }
+        public string Internal { get; set; }
+
+        public bool IsCaption { get; protected set; }
+
+        public ItemCollectionList Parent { get; private set; }
+
+        public abstract string QuickInfo { get; }
 
         public string UserDefCompareKey {
             get => _UserDefCompareKey;
@@ -119,16 +107,42 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public bool Checked {
-            get => _Checked;
-            set {
-                if (Parent == null) { Develop.DebugPrint(enFehlerArt.Warnung, "Parent == null!"); }
-                Parent?.SetNewCheckState(this, value, ref _Checked);
-                //OnChanged();
+        #endregion
+
+        #region Methods
+
+        public virtual void CloneToNewCollection(ItemCollectionList newParent) => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
+
+        public void CloneToNewCollection(ItemCollectionList newParent, BasicListItem newItem) {
+            if (newItem.Internal != Internal) {
+                Develop.DebugPrint(enFehlerArt.Fehler, "Clone fehlgeschlagen, Internal unterschiedlich");
+            }
+            newParent.Add(newItem);
+            newItem.Checked = Checked; // Parent muss gesetz sein!
+            newItem.Enabled = Enabled;
+            newItem.Tag = Tag;
+            newItem.UserDefCompareKey = UserDefCompareKey;
+            //return newItem;
+        }
+
+        public string CompareKey() {
+            if (!string.IsNullOrEmpty(_UserDefCompareKey)) {
+                if (Convert.ToChar(_UserDefCompareKey.Substring(0, 1)) < 32) { Develop.DebugPrint("Sortierung inkorrekt: " + _UserDefCompareKey); }
+                return _UserDefCompareKey + Constants.FirstSortChar + Parent.IndexOf(this).ToString(Constants.Format_Integer6);
+            }
+            return GetCompareKey();
+        }
+
+        public int CompareTo(object obj) {
+            if (obj is BasicListItem tobj) {
+                return CompareKey().CompareTo(tobj.CompareKey());
+            } else {
+                Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Objecttyp!");
+                return 0;
             }
         }
 
-        public abstract string QuickInfo { get; }
+        public bool Contains(int x, int y) => Pos.Contains(x, y);
 
         public void Draw(Graphics GR, int xModifier, int YModifier, enDesign controldesign, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, string FilterText, bool Translate) {
             if (Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent nicht definiert"); }
@@ -144,31 +158,34 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public int CompareTo(object obj) {
-            if (obj is BasicListItem tobj) {
-                return CompareKey().CompareTo(tobj.CompareKey());
-            } else {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Objecttyp!");
-                return 0;
-            }
+        public virtual bool FilterMatch(string FilterText) => Internal.ToUpper().Contains(FilterText.ToUpper());
+
+        public abstract int HeightForListBox(enBlueListBoxAppearance style, int columnWidth);
+
+        public virtual bool IsClickable() => !IsCaption;
+
+        public void SetCoordinates(Rectangle r) {
+            Pos = r;
+            Parent?.OnDoInvalidate();
         }
 
-        public virtual void CloneToNewCollection(ItemCollectionList newParent) => Develop.DebugPrint_RoutineMussUeberschriebenWerden();//return null;
+        public Size SizeUntouchedForListBox() {
+            if (_SizeUntouchedForListBox.IsEmpty) {
+                _SizeUntouchedForListBox = ComputeSizeUntouchedForListBox();
+            }
+            return _SizeUntouchedForListBox;
+        }
 
         internal void SetParent(ItemCollectionList list) => Parent = list;
 
-        public void CloneToNewCollection(ItemCollectionList newParent, BasicListItem newItem) {
-            if (newItem.Internal != Internal) {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Clone fehlgeschlagen, Internal unterschiedlich");
-            }
-            newParent.Add(newItem);
-            newItem.Checked = Checked; // Parent muss gesetz sein!
-            newItem.Enabled = Enabled;
-            newItem.Tag = Tag;
-            newItem.UserDefCompareKey = UserDefCompareKey;
-            //return newItem;
-        }
+        protected abstract Size ComputeSizeUntouchedForListBox();
 
-        public virtual bool FilterMatch(string FilterText) => Internal.ToUpper().Contains(FilterText.ToUpper());
+        protected abstract void DrawExplicit(Graphics gr, Rectangle positionModified, enDesign itemdesign, enStates state, bool drawBorderAndBack, bool translate);
+
+        protected abstract string GetCompareKey();
+
+        #endregion
+
+        //return null;
     }
 }

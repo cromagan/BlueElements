@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -34,6 +30,20 @@ namespace BlueControls.BlueDatabaseDialogs {
 
     public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserControl //
     {
+        #region Fields
+
+        private readonly ColumnItem Column;
+
+        private bool MultiAuswahlODER;
+
+        private bool MultiAuswahlUND;
+
+        private bool NegativAuswahl;
+
+        #endregion
+
+        #region Constructors
+
         public AutoFilter(ColumnItem column, FilterCollection filter, List<RowItem> pinned) : base(enDesign.Form_AutoFilter) {
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
             InitializeComponent();
@@ -52,6 +62,16 @@ namespace BlueControls.BlueDatabaseDialogs {
             Column = column;
             GenerateAll(filter, pinned);
         }
+
+        #endregion
+
+        #region Events
+
+        public event EventHandler<FilterComandEventArgs> FilterComand;
+
+        #endregion
+
+        #region Methods
 
         public void GenerateAll(FilterCollection filter, List<RowItem> pinned) {
             var nochOk = true;
@@ -134,37 +154,57 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
         }
 
-        #region Variablen
+        protected override void OnLostFocus(System.EventArgs e) {
+            base.OnLostFocus(e);
+            Something_LostFocus(this, e);
+        }
 
-        private readonly ColumnItem Column;
-        private bool MultiAuswahlUND;
-        private bool MultiAuswahlODER;
-        private bool NegativAuswahl;
+        private void butFertig_Click(object sender, System.EventArgs e) {
+            var _SearchValue = lsbFilterItems.Item.Checked().ToListOfString();
+            if (_SearchValue.Count == 0) {
+                CloseAndDispose("FilterDelete", null);
+                return;
+            }
+            if (MultiAuswahlODER) {
+                CloseAndDispose("Filter", new FilterItem(Column, enFilterType.Istgleich_ODER_GroßKleinEgal, _SearchValue));
+                return;
+            }
+            if (MultiAuswahlUND) {
+                CloseAndDispose("Filter", new FilterItem(Column, enFilterType.Istgleich_UND_GroßKleinEgal, _SearchValue));
+                return;
+            }
+            Develop.DebugPrint("Filter Fehler!");
+            CloseAndDispose("FilterDelete", null);
+        }
 
-        #endregion Variablen
+        private void ChangeDesign() {
+            lsbStandardFilter.Visible = false;
+            capWas.Visible = false;
+            txbEingabe.Visible = false;
+            txbEingabe.Text = string.Empty;
+            //Line.Visible = false;
+            capInfo.Visible = true;
+            butFertig.Visible = true;
+        }
 
-        #region Events
+        private void ChangeToMultiOder() {
+            var F = Skin.GetBlueFont(enDesign.Caption, enStates.Standard);
+            MultiAuswahlODER = true;
+            capInfo.Text = LanguageTool.DoTranslate("<fontsize=15><b><u>ODER-Filterung:</u></b><fontsize=" + F.FontSize.ToString() + "><br><br>Wählen sie Einträge, von denen <b>einer</b> zutreffen muss:");
+            ChangeDesign();
+        }
 
-        public event EventHandler<FilterComandEventArgs> FilterComand;
-
-        #endregion Events
+        private void ChangeToMultiUnd() {
+            MultiAuswahlUND = true;
+            var F = Skin.GetBlueFont(enDesign.Caption, enStates.Standard);
+            capInfo.Text = LanguageTool.DoTranslate("<fontsize=15><b><u>UND-Filterung:</u></b><fontsize=" + F.FontSize.ToString() + "><br><br>Wählen sie welche Einträge <b>alle</b> zutreffen müssen:");
+            ChangeDesign();
+        }
 
         private void CloseAndDispose(string Comand, FilterItem NewFilter) {
             if (IsClosed) { return; }
             Close();
             OnFilterComand(new FilterComandEventArgs(Comand, Column, NewFilter));
-        }
-
-        private void OnFilterComand(FilterComandEventArgs e) => FilterComand?.Invoke(this, e);
-
-        private void Timer1_Tick(object sender, System.EventArgs e) {
-            BringToFront();
-            if (Timer1x.Interval < 5000) {
-                Timer1x.Interval = 5000;
-                if (txbEingabe.Enabled && txbEingabe.Visible) {
-                    if (!txbEingabe.Focused()) { txbEingabe.Focus(); }
-                }
-            }
         }
 
         private void FiltItems_ItemClicked(object sender, BasicListItemEventArgs e) {
@@ -185,62 +225,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
         }
 
-        protected override void OnLostFocus(System.EventArgs e) {
-            base.OnLostFocus(e);
-            Something_LostFocus(this, e);
-        }
-
-        private void Something_LostFocus(object sender, System.EventArgs e) {
-            if (IsClosed) { return; }
-            if (txbEingabe.Focused()) { return; }
-            if (Focused) { return; }
-            if (lsbFilterItems.Focused()) { return; }
-            if (lsbStandardFilter.Focused()) { return; }
-            if (butFertig.Focused) { return; }
-            CloseAndDispose(string.Empty, null);
-        }
-
-        //private void OnMouseEnter(object sender, System.EventArgs e)
-        //{
-        //    IsMouseInControl();
-        //    MouseMoved?.Invoke(this, System.EventArgs.Empty);
-        //}
-        //private void OnMouseLeave(object sender, System.EventArgs e)
-        //{
-        //    IsMouseInControl();
-        //    MouseMoved?.Invoke(this, System.EventArgs.Empty);
-        //}
-        //private void OnMouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
-        //{
-        //    IsMouseInControl();
-        //    MouseMoved?.Invoke(this, System.EventArgs.Empty);
-        //}
-        private void TXTBox_Enter(object sender, System.EventArgs e) {
-            if (string.IsNullOrEmpty(txbEingabe.Text)) {
-                CloseAndDispose("FilterDelete", null);
-                return;
-            }
-            if (Column.Format.IsZahl()) {
-                if (txbEingabe.Text.Contains("-")) {
-                    var tmp = txbEingabe.Text.Replace(" ", "");
-                    var l = modErgebnis.LastMinusIndex(tmp);
-                    if (l > 0 && l < tmp.Length - 1) {
-                        var Z1 = tmp.Substring(0, l);
-                        var Z2 = tmp.Substring(l + 1);
-                        if (Z1.IsDouble() && Z2.IsDouble()) {
-                            var Zd1 = double.Parse(Z1);
-                            var Zd2 = double.Parse(Z2);
-                            if (Zd2 < Zd1) {
-                                modAllgemein.Swap(ref Zd1, ref Zd2);
-                            }
-                            CloseAndDispose("Filter", new FilterItem(Column, enFilterType.Between | enFilterType.UND, Zd1.ToString(Constants.Format_Float9) + "|" + Zd2.ToString(Constants.Format_Float9)));
-                            return;
-                        }
-                    }
-                }
-            }
-            CloseAndDispose("Filter", new FilterItem(Column, enFilterType.Instr | enFilterType.GroßKleinEgal, txbEingabe.Text));
-        }
+        private void OnFilterComand(FilterComandEventArgs e) => FilterComand?.Invoke(this, e);
 
         private void sFilter_ItemClicked(object sender, BasicListItemEventArgs e) {
             switch (e.Item.Internal.ToLower()) {
@@ -312,46 +297,68 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
         }
 
-        private void ChangeToMultiOder() {
-            var F = Skin.GetBlueFont(enDesign.Caption, enStates.Standard);
-            MultiAuswahlODER = true;
-            capInfo.Text = LanguageTool.DoTranslate("<fontsize=15><b><u>ODER-Filterung:</u></b><fontsize=" + F.FontSize.ToString() + "><br><br>Wählen sie Einträge, von denen <b>einer</b> zutreffen muss:");
-            ChangeDesign();
+        private void Something_LostFocus(object sender, System.EventArgs e) {
+            if (IsClosed) { return; }
+            if (txbEingabe.Focused()) { return; }
+            if (Focused) { return; }
+            if (lsbFilterItems.Focused()) { return; }
+            if (lsbStandardFilter.Focused()) { return; }
+            if (butFertig.Focused) { return; }
+            CloseAndDispose(string.Empty, null);
         }
 
-        private void ChangeDesign() {
-            lsbStandardFilter.Visible = false;
-            capWas.Visible = false;
-            txbEingabe.Visible = false;
-            txbEingabe.Text = string.Empty;
-            //Line.Visible = false;
-            capInfo.Visible = true;
-            butFertig.Visible = true;
+        private void Timer1_Tick(object sender, System.EventArgs e) {
+            BringToFront();
+            if (Timer1x.Interval < 5000) {
+                Timer1x.Interval = 5000;
+                if (txbEingabe.Enabled && txbEingabe.Visible) {
+                    if (!txbEingabe.Focused()) { txbEingabe.Focus(); }
+                }
+            }
         }
 
-        private void ChangeToMultiUnd() {
-            MultiAuswahlUND = true;
-            var F = Skin.GetBlueFont(enDesign.Caption, enStates.Standard);
-            capInfo.Text = LanguageTool.DoTranslate("<fontsize=15><b><u>UND-Filterung:</u></b><fontsize=" + F.FontSize.ToString() + "><br><br>Wählen sie welche Einträge <b>alle</b> zutreffen müssen:");
-            ChangeDesign();
-        }
-
-        private void butFertig_Click(object sender, System.EventArgs e) {
-            var _SearchValue = lsbFilterItems.Item.Checked().ToListOfString();
-            if (_SearchValue.Count == 0) {
+        //private void OnMouseEnter(object sender, System.EventArgs e)
+        //{
+        //    IsMouseInControl();
+        //    MouseMoved?.Invoke(this, System.EventArgs.Empty);
+        //}
+        //private void OnMouseLeave(object sender, System.EventArgs e)
+        //{
+        //    IsMouseInControl();
+        //    MouseMoved?.Invoke(this, System.EventArgs.Empty);
+        //}
+        //private void OnMouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
+        //{
+        //    IsMouseInControl();
+        //    MouseMoved?.Invoke(this, System.EventArgs.Empty);
+        //}
+        private void TXTBox_Enter(object sender, System.EventArgs e) {
+            if (string.IsNullOrEmpty(txbEingabe.Text)) {
                 CloseAndDispose("FilterDelete", null);
                 return;
             }
-            if (MultiAuswahlODER) {
-                CloseAndDispose("Filter", new FilterItem(Column, enFilterType.Istgleich_ODER_GroßKleinEgal, _SearchValue));
-                return;
+            if (Column.Format.IsZahl()) {
+                if (txbEingabe.Text.Contains("-")) {
+                    var tmp = txbEingabe.Text.Replace(" ", "");
+                    var l = modErgebnis.LastMinusIndex(tmp);
+                    if (l > 0 && l < tmp.Length - 1) {
+                        var Z1 = tmp.Substring(0, l);
+                        var Z2 = tmp.Substring(l + 1);
+                        if (Z1.IsDouble() && Z2.IsDouble()) {
+                            var Zd1 = double.Parse(Z1);
+                            var Zd2 = double.Parse(Z2);
+                            if (Zd2 < Zd1) {
+                                modAllgemein.Swap(ref Zd1, ref Zd2);
+                            }
+                            CloseAndDispose("Filter", new FilterItem(Column, enFilterType.Between | enFilterType.UND, Zd1.ToString(Constants.Format_Float9) + "|" + Zd2.ToString(Constants.Format_Float9)));
+                            return;
+                        }
+                    }
+                }
             }
-            if (MultiAuswahlUND) {
-                CloseAndDispose("Filter", new FilterItem(Column, enFilterType.Istgleich_UND_GroßKleinEgal, _SearchValue));
-                return;
-            }
-            Develop.DebugPrint("Filter Fehler!");
-            CloseAndDispose("FilterDelete", null);
+            CloseAndDispose("Filter", new FilterItem(Column, enFilterType.Instr | enFilterType.GroßKleinEgal, txbEingabe.Text));
         }
+
+        #endregion
     }
 }

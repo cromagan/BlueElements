@@ -1,6 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -17,11 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#endregion BlueElements - a collection of useful tools, database and controls
-
 namespace BlueDatabase.EventArgs {
 
     public class ProgressbarEventArgs : System.EventArgs {
+
+        #region Constructors
 
         public ProgressbarEventArgs(string name, int current, int count, bool beginns, bool ends) {
             Name = name;
@@ -31,10 +29,16 @@ namespace BlueDatabase.EventArgs {
             Ends = ends;
         }
 
+        #endregion
+
+        #region Properties
+
+        public bool Beginns { get; }
         public int Count { get; }
         public int Current { get; }
-        public string Name { get; }
-        public bool Beginns { get; }
         public bool Ends { get; }
+        public string Name { get; }
+
+        #endregion
     }
 }
