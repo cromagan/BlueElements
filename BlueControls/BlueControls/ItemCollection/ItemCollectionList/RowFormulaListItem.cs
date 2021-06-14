@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -25,28 +28,31 @@ using System;
 using System.Drawing;
 
 namespace BlueControls.ItemCollection {
+
     public class RowFormulaListItem : BasicListItem {
 
-        #region  Variablen-Deklarationen 
+        #region Variablen-Deklarationen
+
         private RowItem _Row;
         private Bitmap _tmpBMP;
         private string _LayoutID;
-        #endregion
+
+        #endregion Variablen-Deklarationen
 
 
-        #region  Event-Deklarationen + Delegaten 
-        #endregion
 
+        #region Construktor + Initialize
 
-        #region  Construktor + Initialize 
         public RowFormulaListItem(RowItem row, string layoutID, string userDefCompareKey) : base(string.Empty) {
             _Row = row;
             _LayoutID = layoutID;
             UserDefCompareKey = userDefCompareKey;
         }
-        #endregion
+
+        #endregion Construktor + Initialize
 
         public override string QuickInfo => _Row == null ? string.Empty : _Row.CellFirstString().CreateHtmlCodes(true);
+
         public string LayoutID {
             get => _LayoutID;
             set {
@@ -76,6 +82,7 @@ namespace BlueControls.ItemCollection {
                 _tmpBMP = null;
             }
         }
+
         protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, bool Translate) {
             if (_tmpBMP == null) { GeneratePic(); }
             if (DrawBorderAndBack) {
@@ -112,8 +119,11 @@ namespace BlueControls.ItemCollection {
             _pad.Unselect();
             _pad.DrawCreativePadToBitmap(_tmpBMP, enStates.Standard, zoomv, (decimal)slidervalues.X, (decimal)slidervalues.Y, null);
         }
+
         protected override Size ComputeSizeUntouchedForListBox() => new(300, 300);
+
         public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) => (int)(columnWidth * 0.8);
+
         protected override string GetCompareKey() => _Row.CellFirstString();
     }
 }

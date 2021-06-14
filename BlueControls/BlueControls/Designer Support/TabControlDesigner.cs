@@ -8,13 +8,16 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms.Design;
 
 namespace BlueControls.Designer_Support {
+
     internal sealed class TabControlDesigner : ParentControlDesigner {
 
-        #region  Private Instance Variables 
+        #region Private Instance Variables
+
         private readonly DesignerVerbCollection m_verbs = new();
         private IDesignerHost m_DesignerHost;
         private ISelectionService m_SelectionService;
-        #endregion
+
+        #endregion Private Instance Variables
 
         public TabControlDesigner() {
             DesignerVerb verb1 = new("Add Tab", OnAddPage);
@@ -23,7 +26,8 @@ namespace BlueControls.Designer_Support {
             m_verbs.AddRange(new[] { verb1, verb2, verb3 });
         }
 
-        #region  Properties 
+        #region Properties
+
         public override DesignerVerbCollection Verbs {
             get {
                 if (m_verbs.Count == 3) {
@@ -39,6 +43,7 @@ namespace BlueControls.Designer_Support {
                 return m_verbs;
             }
         }
+
         public IDesignerHost DesignerHost {
             get {
                 if (m_DesignerHost == null) {
@@ -47,6 +52,7 @@ namespace BlueControls.Designer_Support {
                 return m_DesignerHost;
             }
         }
+
         public ISelectionService SelectionService {
             get {
                 if (m_SelectionService == null) {
@@ -55,7 +61,8 @@ namespace BlueControls.Designer_Support {
                 return m_SelectionService;
             }
         }
-        #endregion
+
+        #endregion Properties
 
         public void OnAddPage(object sender, System.EventArgs e) {
             var ParentControl = (AbstractTabControl)Control;
@@ -68,9 +75,11 @@ namespace BlueControls.Designer_Support {
             ParentControl.SelectedTab = P;
             SetVerbs();
         }
+
         protected override void OnPaintAdornments(System.Windows.Forms.PaintEventArgs pe) {
             //Don't want DrawGrid dots.
         }
+
         public void OnInsertPage(object sender, System.EventArgs e) {
             var ParentControl = (AbstractTabControl)Control;
             var oldTabs = ParentControl.Controls;
@@ -94,6 +103,7 @@ namespace BlueControls.Designer_Support {
             ParentControl.SelectedTab = P;
             SetVerbs();
         }
+
         public void OnRemovePage(object sender, System.EventArgs e) {
             var ParentControl = (AbstractTabControl)Control;
             var oldTabs = ParentControl.Controls;
@@ -104,10 +114,10 @@ namespace BlueControls.Designer_Support {
             SelectionService.SetSelectedComponents(new IComponent[] { ParentControl }, SelectionTypes.Auto);
             SetVerbs();
         }
+
         private void SetVerbs() {
             var ParentControl = (AbstractTabControl)Control;
             switch (ParentControl.TabPages.Count) {
-
                 case 0:
                     Verbs[1].Enabled = false;
                     Verbs[2].Enabled = false;
@@ -117,15 +127,18 @@ namespace BlueControls.Designer_Support {
                     Verbs[1].Enabled = false;
                     Verbs[2].Enabled = true;
                     break;
+
                 default:
                     Verbs[1].Enabled = true;
                     Verbs[2].Enabled = true;
                     break;
             }
         }
+
         private const int WM_NCHITTEST = 0x84;
         private const int HTTRANSPARENT = -1;
         private const int HTCLIENT = 1;
+
         protected override void WndProc(ref System.Windows.Forms.Message m) {
             base.WndProc(ref m);
             if (m.Msg == WM_NCHITTEST) {
@@ -135,11 +148,14 @@ namespace BlueControls.Designer_Support {
                 }
             }
         }
+
         private const int TCM_HITTEST = 0x130D;
+
         private struct TCHITTESTINFO {
             public Point pt;
             public TabControlHitTest flags;
         }
+
         protected override bool GetHitTest(Point point) {
             if ((System.Windows.Forms.Control)SelectionService.PrimarySelection == Control) {
                 TCHITTESTINFO hti = new() {
@@ -158,6 +174,7 @@ namespace BlueControls.Designer_Support {
             }
             return false;
         }
+
         //Fix the AllSizable selectiorule on System.Windows.Forms.DockStyle.Fill
         public override SelectionRules SelectionRules => Control.Dock == System.Windows.Forms.DockStyle.Fill ? SelectionRules.Visible : base.SelectionRules;
     }

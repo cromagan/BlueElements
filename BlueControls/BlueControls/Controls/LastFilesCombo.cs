@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
@@ -28,6 +31,7 @@ using System.IO;
 using static BlueBasics.FileOperations;
 
 namespace BlueControls.Controls {
+
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("ItemClicked")]
     public sealed class LastFilesCombo : ComboBox {
@@ -38,18 +42,21 @@ namespace BlueControls.Controls {
         //public string _specialcommand = string.Empty;
 
         #region Constructor
+
         public LastFilesCombo() : base() => SetLastFilesStyle();
-        #endregion
 
+        #endregion Constructor
 
-        #region  Events 
+        #region Events
+
         //public event System.EventHandler SpecialCommandClicked;
-        #endregion
+
+        #endregion Events
 
         /// <summary>
         /// Wohin die Datei gespeichtert werden soll, welche Dateien zuletzt benutzt wurden.
         /// </summary>
-        /// 
+        ///
         [DefaultValue("")]
         public string Filename {
             get => _filename;
@@ -60,10 +67,11 @@ namespace BlueControls.Controls {
                 GenerateMenu();
             }
         }
+
         ///// <summary>
         ///// Wenn an erster Stelle ein besonderer Befehl stehen soll. Das Event SpecialCommandClicked wird anstelle ItemClicked ausgelöst.
         ///// </summary>
-        ///// 
+        /////
         //[DefaultValue("")]
         //public string SpecialCommand
         //{
@@ -87,6 +95,7 @@ namespace BlueControls.Controls {
                 GenerateMenu();
             }
         }
+
         [DefaultValue(20)]
         public int MaxCount {
             get => _maxCount;
@@ -96,6 +105,7 @@ namespace BlueControls.Controls {
                 GenerateMenu();
             }
         }
+
         private void GenerateMenu() {
             var NR = -1;
             var Vis = false;
@@ -131,6 +141,7 @@ namespace BlueControls.Controls {
             }
             Enabled = Vis;
         }
+
         public void AddFileName(string FileName, string AdditionalText) {
             var s = FileName + "|" + AdditionalText;
             s = s.Replace("\r\n", ";");
@@ -144,16 +155,20 @@ namespace BlueControls.Controls {
             }
             GenerateMenu();
         }
+
         protected override void DrawControl(Graphics gr, enStates state) {
             SetLastFilesStyle();
             base.DrawControl(gr, state);
         }
+
         protected override void OnHandleCreated(System.EventArgs e) {
             base.OnHandleCreated(e);
             LoadFromDisk();
             GenerateMenu();
         }
+
         private string SaveFile() => !string.IsNullOrEmpty(_filename) ? _filename : System.Windows.Forms.Application.StartupPath + Name + "-Files.laf";
+
         private void LoadFromDisk() {
             LastD = new List<string>();
             if (FileExists(SaveFile())) {
@@ -162,6 +177,7 @@ namespace BlueControls.Controls {
                 LastD.AddRange(t.SplitByCR());
             }
         }
+
         private void SetLastFilesStyle() {
             if (DrawStyle == enComboboxStyle.TextBox) {
                 DrawStyle = enComboboxStyle.Button;
@@ -169,6 +185,7 @@ namespace BlueControls.Controls {
             if (string.IsNullOrEmpty(ImageCode)) { ImageCode = "Ordner"; }
             if (string.IsNullOrEmpty(Text)) { Text = "zuletzt geöffnete Dateien"; }
         }
+
         protected override void OnItemClicked(BasicListItemEventArgs e) {
             //if (!string.IsNullOrEmpty(_specialcommand) && e.Item.Internal == "#SPECIAL#")
             //{
@@ -179,6 +196,7 @@ namespace BlueControls.Controls {
             var t = (List<string>)e.Item.Tag;
             AddFileName(e.Item.Internal, t[0]);
         }
+
         //private void OnSpecialCommandClicked()
         //{
         //    SpecialCommandClicked?.Invoke(this, System.EventArgs.Empty);

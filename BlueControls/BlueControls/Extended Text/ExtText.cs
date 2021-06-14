@@ -1,21 +1,24 @@
 #region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
@@ -23,6 +26,7 @@ using BlueDatabase;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+
 // VTextTyp-Hirachie
 // ~~~~~~~~~~~~~~~~~
 // HTMLText, PlainText = Diese Texte wurden in den Speicher geschrieben und führen
@@ -47,9 +51,11 @@ using System.Drawing;
 // vState = vState Setzen (mit HTML_Code)
 
 namespace BlueControls {
+
     public sealed class ExtText {
 
-        #region  Variablen-Deklarationen 
+        #region Variablen-Deklarationen
+
         public enAlignment Ausrichtung;
         public bool Multiline;
         public string AllowedChars;
@@ -60,24 +66,26 @@ namespace BlueControls {
         private Size _TextDimensions;
         private int? _Width = null;
         private int? _Height = null;
+
         /// <summary>
         /// Falls mit einer Skalierung gezeichnet wird, müssen die Angaben bereits skaleiert sein.
         /// </summary>
         public Rectangle DrawingArea;
+
         /// <summary>
         /// Falls mit einer Skalierung gezeichnet wird, müssen die Angaben bereits skaleiert sein.
         /// </summary>
         public Point DrawingPos;
+
         private string _TMPHtmlText = string.Empty;
         private string _TMPPlainText = string.Empty;
-        #endregion
+
+        #endregion Variablen-Deklarationen
 
 
-        #region  Event-Deklarationen + Delegaten 
-        #endregion
 
+        #region Construktor + Initialize
 
-        #region  Construktor + Initialize 
         private void Initialize() {
             _Design = enDesign.Undefiniert;
             _State = enStates.Standard;
@@ -112,11 +120,13 @@ namespace BlueControls {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Fehler!");
             }
         }
-        #endregion
 
+        #endregion Construktor + Initialize
 
-        #region  Properties 
+        #region Properties
+
         public List<ExtChar> Chars { get; private set; }
+
         public float Zeilenabstand {
             get => _Zeilenabstand;
             set {
@@ -125,6 +135,7 @@ namespace BlueControls {
                 ResetPosition(false);
             }
         }
+
         /// <summary>
         /// Nach wieviel Pixeln der Zeilenumbruch stattfinden soll. -1 wenn kein Umbruch sein soll. Auch das Alingement richtet sich nach diesen Größen.
         /// </summary>
@@ -184,7 +195,8 @@ namespace BlueControls {
                 }
             }
         }
-        #endregion
+
+        #endregion Properties
 
         internal int WordStart(int Pos) {
             if (Chars.Count == 0) { return -1; }
@@ -196,6 +208,7 @@ namespace BlueControls {
                 if (Chars[Pos].isWordSeperator()) { return Pos + 1; }
             } while (true);
         }
+
         internal int WordEnd(int Pos) {
             if (Chars.Count == 0) { return -1; }
             if (Pos < 0 || Pos >= Chars.Count) { return -1; }
@@ -222,7 +235,8 @@ namespace BlueControls {
             }
         }
 
-        #region  Für Formatierung 
+        #region Für Formatierung
+
         /// <summary>
         /// Berechnet die Zeichen-Positionen mit korrekten Umbrüchen. Die enAlignment wird ebefalls mit eingerechnet.
         /// Cursor_ComputePixelXPos wird am Ende aufgerufen, einschließlich Cursor_Repair und SetNewAkt.
@@ -345,7 +359,8 @@ namespace BlueControls {
                 if (AugZeichen <= MinZeichen) { return Started; }
             } while (true);
         }
-        #endregion
+
+        #endregion Für Formatierung
 
         public void Draw(Graphics gr, float zoom) {
             while (_Width == null) { ReBreak(); }
@@ -389,7 +404,6 @@ namespace BlueControls {
             var EndX = (Chars[MarkEnd].Pos.X * czoom) + DrawingPos.X + (Chars[MarkEnd].Size.Width * czoom);
             var Endy = (Chars[MarkEnd].Pos.Y * czoom) + DrawingPos.Y + (Chars[MarkEnd].Size.Height * czoom);
             switch (ThisState) {
-
                 case enMarkState.None:
                     break;
 
@@ -408,6 +422,7 @@ namespace BlueControls {
                 case enMarkState.Other:
                     GR.FillRectangle(new SolidBrush(Color.FromArgb(80, 255, 255, 50)), StartX, StartY, EndX - StartX, Endy - StartY);
                     break;
+
                 default:
                     Develop.DebugPrint(ThisState);
                     break;
@@ -460,7 +475,6 @@ namespace BlueControls {
                     var CH = cactext[Pos];
                     if (IsRich) {
                         switch (CH) {
-
                             case '<': {
                                     DoHTMLCode(cactext, Pos, ref Zeichen, ref BF, ref Stufe, ref Markstate);
                                     var OP = 1;
@@ -477,6 +491,7 @@ namespace BlueControls {
                             case '&':
                                 DoSpecialEntities(cactext, ref Pos, ref Zeichen, ref BF, ref Stufe, ref Markstate);
                                 break;
+
                             default:
                                 // Normales Zeichen
                                 Zeichen++;
@@ -515,6 +530,7 @@ namespace BlueControls {
             }
             return T;
         }
+
         internal string ConvertCharToPlainText(int Von, int Bis) {
             try {
                 var T = string.Empty;
@@ -543,7 +559,6 @@ namespace BlueControls {
                 return;
             }
             switch (xHTMLTextx.Substring(xStartPosx, Endpos - xStartPosx + 1)) {
-
                 case "&uuml;":
                     Chars.Add(new ExtChar('ü', _Design, _State, f, Stufe, MarkState));
                     break;
@@ -611,6 +626,7 @@ namespace BlueControls {
                 case "&euro;":
                     Chars.Add(new ExtChar('€', _Design, _State, f, Stufe, MarkState));
                     break;
+
                 default:
                     Develop.DebugPrint(enFehlerArt.Info, "Unbekannter Code: " + xHTMLTextx.Substring(xStartPosx, Endpos - xStartPosx + 1));
                     Chars.Add(new ExtChar('&', _Design, _State, f, Stufe, MarkState));
@@ -638,7 +654,6 @@ namespace BlueControls {
                 Attribut = Oricode.Substring(Istgleich + 1).Trim('\"');
             }
             switch (Cod) {
-
                 case "B":
                     PF = BlueFont.Get(PF.FontName, PF.FontSize, true, PF.Italic, PF.Underline, PF.StrikeOut, PF.Outline, PF.Color_Main, PF.Color_Outline, PF.Kapitälchen, PF.OnlyUpper, PF.OnlyLower);
                     break;
@@ -796,6 +811,7 @@ namespace BlueControls {
                 case "":
                     // ist evtl. ein <> ausruck eines Textes
                     break;
+
                 default:
                     // Develop.DebugPrint("Unbekannter HTML-Code: " + Oricode);
                     break;
@@ -816,6 +832,7 @@ namespace BlueControls {
             while (_Width == null) { ReBreak(); }
             return _Width < 5 || _Height < 5 ? new Size(32, 16) : new Size((int)_Width, (int)_Height);
         }
+
         /// <summary>
         ///     Sucht den aktuellen Buchstaben, der unter den angegeben Koordinaten liegt.
         ///     Wird kein Char gefunden, wird der logischste Char gewählt. (z.B. Nach ZeilenEnde = Letzzter Buchstabe der Zeile)
@@ -881,7 +898,9 @@ namespace BlueControls {
         }
 
         public bool InsertImage(string Img, int Position) => InsertAnything(enASCIIKey.Undefined, Img, Position);
+
         public bool InsertChar(enASCIIKey KeyAscii, int Position) => InsertAnything(KeyAscii, string.Empty, Position);
+
         private bool InsertAnything(enASCIIKey KeyAscii, string img, int Position) {
             if (Position < 0 && !string.IsNullOrEmpty(PlainText)) { return false; }            // Text zwar da, aber kein Cursor angezeigt
             if (Position < 0) { Position = 0; }// Ist echt möglich!
@@ -919,6 +938,7 @@ namespace BlueControls {
             ResetPosition(true);
             return true;
         }
+
         internal void Mark(enMarkState markstate, int first, int last) {
             try {
                 for (var z = first; z <= last; z++) {
@@ -931,6 +951,7 @@ namespace BlueControls {
                 Mark(markstate, first, last);
             }
         }
+
         internal void Unmark(enMarkState markstate) {
             foreach (var t in Chars) {
                 if (t.Marking.HasFlag(markstate)) {

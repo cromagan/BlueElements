@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -31,21 +34,24 @@ using System.ComponentModel;
 using System.Drawing;
 
 namespace BlueControls.Controls {
+
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("TextChanged")]
     public partial class TextBox : GenericControl, IContextMenu {
 
         #region Constructor
+
         public TextBox() : base(true, true) {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             _MouseHighlight = false;
         }
-        #endregion
 
+        #endregion Constructor
 
-        #region  Variablen 
+        #region Variablen
+
         private enDataFormat _Format = enDataFormat.Text;
         private enSteuerelementVerhalten _Verhalten = enSteuerelementVerhalten.Scrollen_ohne_Textumbruch;
         private ExtText _eTxt;
@@ -62,10 +68,11 @@ namespace BlueControls.Controls {
         private int _Cursor_CharPos = -1;
         private int _MouseValue; //Zum Berechnen, was die Maus gerade macht
         private bool _Cursor_Visible;
-        #endregion
 
+        #endregion Variablen
 
-        #region  Properties 
+        #region Properties
+
         [DefaultValue(false)]
         public bool SpellChecking {
             get => _SpellChecking;
@@ -76,6 +83,7 @@ namespace BlueControls.Controls {
                 Invalidate();
             }
         }
+
         [DefaultValue(enSteuerelementVerhalten.Scrollen_ohne_Textumbruch)]
         public enSteuerelementVerhalten Verhalten {
             get => _Verhalten;
@@ -89,6 +97,7 @@ namespace BlueControls.Controls {
                 Invalidate();
             }
         }
+
         [DefaultValue("")]
         public string AllowedChars {
             get => _AllowedChars;
@@ -98,6 +107,7 @@ namespace BlueControls.Controls {
                 GenerateETXT(false);
             }
         }
+
         [DefaultValue("")]
         public string Suffix {
             get => _Suffix;
@@ -107,6 +117,7 @@ namespace BlueControls.Controls {
                 Invalidate();
             }
         }
+
         [DefaultValue(enDataFormat.Text)]
         public enDataFormat Format {
             get => _Format;
@@ -116,6 +127,7 @@ namespace BlueControls.Controls {
                 GenerateETXT(false);
             }
         }
+
         [DefaultValue("")]
         public new string Text {
             get => _eTxt == null ? string.Empty : _Format == enDataFormat.Text_mit_Formatierung ? _eTxt.HtmlText : _eTxt.PlainText;
@@ -143,6 +155,7 @@ namespace BlueControls.Controls {
                 }
             }
         }
+
         [DefaultValue(false)]
         public bool MultiLine {
             get => _Multiline;
@@ -157,21 +170,29 @@ namespace BlueControls.Controls {
                 Invalidate();
             }
         }
-        #endregion
 
+        #endregion Properties
 
-        #region  Events 
+        #region Events
+
         public new event EventHandler TextChanged;
+
         public new event EventHandler Enter;
+
         public event EventHandler ESC;
+
         public event EventHandler TAB;
+
         public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
+
         public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
+
         public event EventHandler<MultiUserFileGiveBackEventArgs> NeedDatabaseOfAdditinalSpecialChars;
-        #endregion
 
+        #endregion Events
 
-        #region  Form Ereignisse 
+        #region Form Ereignisse
+
         private void Blinker_Tick(object sender, System.EventArgs e) {
             if (!Focused()) { return; }
             if (!Enabled) { return; }
@@ -186,6 +207,7 @@ namespace BlueControls.Controls {
                 }
             }
         }
+
         // Fokus
         protected override void OnLostFocus(System.EventArgs e) {
             base.OnLostFocus(e);
@@ -196,6 +218,7 @@ namespace BlueControls.Controls {
             CursorClear();
             Invalidate(); // Muss sein, weil evtl. der Cursor stehen bleibt
         }
+
         protected override void OnGotFocus(System.EventArgs e) {
             base.OnGotFocus(e);
             if (!Enabled) { return; }
@@ -207,6 +230,7 @@ namespace BlueControls.Controls {
             }
             Blinker.Enabled = true;
         }
+
         // Tastatur
         protected override void OnKeyDown(System.Windows.Forms.KeyEventArgs e) {
             base.OnKeyDown(e);
@@ -214,7 +238,6 @@ namespace BlueControls.Controls {
             _LastUserActionForSpellChecking = DateTime.Now;
             if (_MouseValue != 0) { return; }
             switch (e.KeyCode) {
-
                 case System.Windows.Forms.Keys.Left:
                     Cursor_Richtung(-1, 0);
                     break;
@@ -240,7 +263,8 @@ namespace BlueControls.Controls {
             Invalidate();
         }
 
-        #region  Cursor Berechnung 
+        #region Cursor Berechnung
+
         private void Cursor_Richtung(short X, short Y) {
             if (X != 0) {
                 if (_Cursor_CharPos > -1) {
@@ -270,16 +294,16 @@ namespace BlueControls.Controls {
             if (_Cursor_CharPos < 0) { _Cursor_CharPos = 0; }
             _Cursor_Visible = true;
         }
-        #endregion
 
+        #endregion Cursor Berechnung
 
-        #region  Übergebene Form Ereignisse 
+        #region Übergebene Form Ereignisse
+
         // Tastatur
         internal new void KeyPress(enASCIIKey KeyAscii) {
             // http://www.manderby.com/informatik/allgemeines/ascii.php
             if (_MouseValue != 0) { return; }
             switch (KeyAscii) {
-
                 case enASCIIKey.DEL:
                     // Eigentlich auch noch Ascii Code - steht bei ISO als Del
                     Char_DelBereich(_Cursor_CharPos, _Cursor_CharPos + 1);
@@ -304,7 +328,6 @@ namespace BlueControls.Controls {
                             }
                         } else {
                             switch (KeyAscii) {
-
                                 case enASCIIKey.BackSpace:
                                     Char_DelBereich(_Cursor_CharPos - 1, _Cursor_CharPos);
                                     break;
@@ -341,10 +364,11 @@ namespace BlueControls.Controls {
             }
             CheckIfTextIsChanded(_eTxt.HtmlText);
         }
-        #endregion
 
+        #endregion Übergebene Form Ereignisse
 
-        #region  Clipboard 
+        #region Clipboard
+
         private void Clipboard_Paste() {
             // VORSICHT!
             // Seltsames Verhalten von VB.NET
@@ -381,7 +405,8 @@ namespace BlueControls.Controls {
             datobj.SetData(System.Windows.Forms.DataFormats.Text, tt);
             System.Windows.Clipboard.SetDataObject(datobj);
         }
-        #endregion
+
+        #endregion Clipboard
 
         protected override void OnKeyPress(System.Windows.Forms.KeyPressEventArgs e) {
             base.OnKeyPress(e);
@@ -391,7 +416,6 @@ namespace BlueControls.Controls {
                 if (e.KeyChar != (int)enASCIIKey.StrgC) { return; }
             }
             switch ((int)e.KeyChar) {
-
                 case (int)enASCIIKey.ENTER:
                     KeyPress((enASCIIKey)e.KeyChar);
                     OnEnter();
@@ -404,6 +428,7 @@ namespace BlueControls.Controls {
                 case (int)enASCIIKey.TAB:
                     OnTAB();
                     return;
+
                 default:
                     KeyPress((enASCIIKey)e.KeyChar);
                     break;
@@ -412,6 +437,7 @@ namespace BlueControls.Controls {
             if (IsDisposed) { return; }
             CheckIfTextIsChanded(_eTxt.HtmlText);
         }
+
         internal bool WordStarts(string word, int position) {
             if (InvokeRequired) {
                 return (bool)Invoke(new Func<bool>(() => WordStarts(word, position)));
@@ -431,8 +457,11 @@ namespace BlueControls.Controls {
         }
 
         private void OnTAB() => TAB?.Invoke(this, System.EventArgs.Empty);
+
         private void OnESC() => ESC?.Invoke(this, System.EventArgs.Empty);
+
         private void OnEnter() => Enter?.Invoke(this, System.EventArgs.Empty);
+
         // Mouse
         protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseDown(e);
@@ -446,6 +475,7 @@ namespace BlueControls.Controls {
             Selection_Repair(false);
             Invalidate();
         }
+
         protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseUp(e);
             _LastUserActionForSpellChecking = DateTime.Now;
@@ -473,6 +503,7 @@ namespace BlueControls.Controls {
             }
             Invalidate();
         }
+
         protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseMove(e);
             if (_eTxt == null) { return; }
@@ -484,7 +515,8 @@ namespace BlueControls.Controls {
             Selection_Repair(false);
             Invalidate();
         }
-        #endregion
+
+        #endregion Form Ereignisse
 
         public new void Focus() {
             if (Focused()) { return; }
@@ -492,6 +524,7 @@ namespace BlueControls.Controls {
         }
 
         public new bool Focused() => base.Focused || (_SliderY != null && _SliderY.Focused());
+
         private void CheckIfTextIsChanded(string NewPlainText) {
             if (NewPlainText == _LastCheckedText) { return; }
             _LastCheckedText = NewPlainText;
@@ -499,10 +532,12 @@ namespace BlueControls.Controls {
             OnTextChanged();
             return;
         }
+
         /// <summary>
         /// Löst das Ereignis aus und setzt _LastUserChangingTime auf NULL.
         /// </summary>
         protected virtual void OnTextChanged() => TextChanged?.Invoke(this, System.EventArgs.Empty);
+
         protected override bool IsInputKey(System.Windows.Forms.Keys keyData) =>
             // Ganz wichtig diese Routine!
             // Wenn diese NICHT ist, geht der Fokus weg, sobald der cursor gedrückt wird.
@@ -511,6 +546,7 @@ namespace BlueControls.Controls {
                 System.Windows.Forms.Keys.Up or System.Windows.Forms.Keys.Down or System.Windows.Forms.Keys.Left or System.Windows.Forms.Keys.Right => true,
                 _ => false,
             };
+
         /// <summary>
         /// Prüft - bei Multiline Zeile für Zeile - ob der Text in der Textbox zulässig ist.
         /// </summary>
@@ -524,6 +560,7 @@ namespace BlueControls.Controls {
             }
             return true;
         }
+
         /// <summary>
         /// Wenn das Format, die Maxlänge oder Multiline sich geändert haben,
         /// wird für das dementsprechende Format die Verbote/Erlaubnisse gesetzt.
@@ -556,7 +593,8 @@ namespace BlueControls.Controls {
             }
         }
 
-        #region  Markierung (Selection)
+        #region Markierung (Selection)
+
         private void Selection_WortMarkieren(int Pos) {
             if (_eTxt == null || _eTxt.Chars.Count == 0) {
                 MarkClear();
@@ -567,6 +605,7 @@ namespace BlueControls.Controls {
             CursorClear();
             Selection_Repair(true);
         }
+
         /// <summary>
         /// Prüft die den Selektions-Bereich auf nicht erlaubte Werte und Repariert diese.
         /// </summary>
@@ -583,7 +622,8 @@ namespace BlueControls.Controls {
                 modAllgemein.Swap(ref _MarkStart, ref _MarkEnd);
             }
         }
-        #endregion
+
+        #endregion Markierung (Selection)
 
         protected override void OnDoubleClick(System.EventArgs e) {
             base.OnDoubleClick(e);
@@ -624,7 +664,9 @@ namespace BlueControls.Controls {
         private int HotPosition() => _Cursor_CharPos > -1
 ? _Cursor_CharPos
 : _MarkStart > -1 && _MarkEnd < 0 ? _MarkEnd : _MarkStart > -1 && _MarkEnd > -1 ? _MarkEnd : -1;
+
         protected virtual enDesign GetDesign() => enDesign.TextBox;
+
         protected override void DrawControl(Graphics gr, enStates state) {
             if (_eTxt == null) { GenerateETXT(true); }
             if (state == enStates.Checked_Disabled) {
@@ -644,7 +686,6 @@ namespace BlueControls.Controls {
             sliderVisible = _Multiline ? _eTxt.Height() > (Height - 16) : _eTxt.Height() > Height;
             if (sliderVisible) { effectWidth = Width - 18; }
             switch (_Verhalten) {
-
                 case enSteuerelementVerhalten.Scrollen_mit_Textumbruch:
                     _eTxt.TextDimensions = new Size(effectWidth - (Skin.PaddingSmal * 2), -1);
                     _eTxt.DrawingArea = new Rectangle(0, 0, effectWidth, Height);
@@ -686,6 +727,7 @@ namespace BlueControls.Controls {
                     _eTxt.TextDimensions = Size.Empty;
                     _eTxt.DrawingArea = new Rectangle(0, 0, Width, Height);
                     break;
+
                 default:
                     Develop.DebugPrint(_Verhalten);
                     break;
@@ -731,6 +773,7 @@ namespace BlueControls.Controls {
         }
 
         private void SliderY_ValueChange(object sender, System.EventArgs e) => Invalidate();
+
         protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseWheel(e);
             if (_SliderY == null || !_SliderY.Visible) { return; }
@@ -738,7 +781,8 @@ namespace BlueControls.Controls {
             _SliderY.DoMouseWheel(e);
         }
 
-        #region  Einzel-Charakter - Manipulation
+        #region Einzel-Charakter - Manipulation
+
         /// <summary>
         /// Sucht den aktuellen Buchstaben, der unter den angegeben Koordinaten liegt.
         /// Wird auf die hintere Hälfte eines Zeichens gewählt, wird der nächste Buchstabe angegeben.
@@ -746,7 +790,7 @@ namespace BlueControls.Controls {
         /// <remarks></remarks>
         private int Cursor_PosAt(double PixX, double PixY) {
             if (_eTxt == null) { return -1; }
-            // Das geht am Einfachsten.... 
+            // Das geht am Einfachsten....
             if (PixX < _eTxt.DrawingPos.X && PixY < _eTxt.DrawingPos.Y) { return 0; }
             PixX = Math.Max(PixX, _eTxt.DrawingPos.X);
             PixY = Math.Max(PixY, _eTxt.DrawingPos.Y);
@@ -768,7 +812,8 @@ namespace BlueControls.Controls {
             _Cursor_CharPos = Von;
             _eTxt.Delete(Von, Bis);
         }
-        #endregion
+
+        #endregion Einzel-Charakter - Manipulation
 
         private void CursorClear() {
             _Cursor_CharPos = -1;
@@ -840,7 +885,6 @@ namespace BlueControls.Controls {
             if (SpellChecker.CancellationPending) { return; }
             var x = Convert.ToString(e.UserState).SplitBy(";");
             switch (x[0]) {
-
                 case "Unmark":
                     Unmark(enMarkState.Ringelchen);
                     Invalidate();
@@ -854,6 +898,7 @@ namespace BlueControls.Controls {
                 case "Done":
                     _MustCheck = false;
                     break;
+
                 default:
                     Develop.DebugPrint(Convert.ToString(e.UserState));
                     break;
@@ -861,8 +906,11 @@ namespace BlueControls.Controls {
         }
 
         public void Mark(enMarkState markstate, int first, int last) => _eTxt?.Mark(markstate, first, last);
+
         public void Unmark(enMarkState markstate) => _eTxt?.Unmark(markstate);
+
         private void SpellChecker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) => Dictionary.IsSpellChecking = false;
+
         private void AbortSpellChecking() {
             if (SpellChecker.IsBusy) { SpellChecker.CancelAsync(); }
         }
@@ -879,7 +927,6 @@ namespace BlueControls.Controls {
                 tmp = "#ChangeTo";
             }
             switch (tmp) {
-
                 case "#SpellAdd":
                     Dictionary.WordAdd(e.Tags.TagGet("Word"));
                     _MustCheck = true;
@@ -960,6 +1007,7 @@ namespace BlueControls.Controls {
         }
 
         public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
+
         private void AddSpecialChar() {
             var x = _Cursor_CharPos;
             MultiUserFileGiveBackEventArgs e = new();
@@ -992,6 +1040,7 @@ namespace BlueControls.Controls {
         }
 
         private void OnNeedDatabaseOfAdditinalSpecialChars(MultiUserFileGiveBackEventArgs e) => NeedDatabaseOfAdditinalSpecialChars?.Invoke(this, e);
+
         public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
             AbortSpellChecking();
             HotItem = null;
@@ -1043,6 +1092,7 @@ namespace BlueControls.Controls {
         }
 
         public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
+
         protected override void OnEnabledChanged(System.EventArgs e) {
             MarkClear();
             base.OnEnabledChanged(e);

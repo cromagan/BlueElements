@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -26,11 +29,14 @@ using System.Collections.Generic;
 using System.Drawing;
 
 namespace BlueControls.Forms {
+
     /// <summary>
     /// Typischerweise für Dropdownmenüs oder dem KontextMenu
     /// </summary>
     public partial class FloatingInputBoxListBoxStyle : FloatingForm {
+
         private FloatingInputBoxListBoxStyle() : base(enDesign.Form_QuickInfo) => InitializeComponent();
+
         private FloatingInputBoxListBoxStyle(ItemCollectionList Items, int Xpos, int Ypos, int SteuerWi, object Tag, System.Windows.Forms.Control ConnectedControl, bool Translate) : base(ConnectedControl, Items.ControlDesign) {
             InitializeComponent();
             this.Tag = Tag;
@@ -46,13 +52,19 @@ namespace BlueControls.Forms {
             //this.Focus();
             timer1.Enabled = true;
         }
+
         public event EventHandler<ContextMenuItemClickedEventArgs> ItemClicked;
+
         public event EventHandler Cancel;
+
         private bool _MouseWasDown = false;
+
         public static FloatingInputBoxListBoxStyle Show(ItemCollectionList Items, object Tag, System.Windows.Forms.Control ConnectedControl, bool Translate) => new(Items, System.Windows.Forms.Cursor.Position.X - 8, System.Windows.Forms.Cursor.Position.Y - 8, -1, Tag, ConnectedControl, Translate);
+
         public static FloatingInputBoxListBoxStyle Show(ItemCollectionList Items, int Xpos, int Ypos, int SteuerWi, object Tag, System.Windows.Forms.Control ConnectedControl, bool Translate) => new(Items, Xpos, Ypos, SteuerWi, Tag, ConnectedControl, Translate);
 
-        #region  ListBox1 
+        #region ListBox1
+
         public void Generate_ListBox1(ItemCollectionList ItemsOri, int MinWidth, enAddType AddNewAllowed, bool Translate) {
             var itemsClone = (ItemCollectionList)ItemsOri.Clone();
             (var BiggestItemX, var _, var HeightAdded, var _) = itemsClone.ItemData();
@@ -84,6 +96,7 @@ namespace BlueControls.Forms {
             lstbx.Item.CheckBehavior = itemsClone.CheckBehavior;
             lstbx.Item.AddRange(itemsClone);
         }
+
         private void ListBox1_ItemClicked(object sender, BasicListItemEventArgs e) {
             // Selectet Chanched bringt nix, da es ja drum geht, ob eine Node angeklickt wurde.
             // Nur Listboxen können überhaupt erst Checked werden!
@@ -98,10 +111,13 @@ namespace BlueControls.Forms {
                 }
             }
         }
+
         private void OnItemClicked(ContextMenuItemClickedEventArgs e) => ItemClicked?.Invoke(this, e);
-        #endregion
+
+        #endregion ListBox1
 
         private void OnCancel() => Cancel?.Invoke(this, System.EventArgs.Empty);
+
         private void timer1_Tick(object sender, System.EventArgs e) {
             var MouseIsDown = !string.IsNullOrEmpty(modAllgemein.LastMouseButton());
             if (MouseIsDown && !_MouseWasDown && !IsMouseInForm()) {
@@ -117,11 +133,13 @@ namespace BlueControls.Forms {
             }
             if (MouseIsDown) { _MouseWasDown = true; }
         }
+
         public override void Refresh() {
             Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
             base.Refresh();
             OnPaint(null);
         }
+
         public static void ContextMenuShow(IContextMenu Control, System.Windows.Forms.MouseEventArgs e) {
             Close(enBlueListBoxAppearance.KontextMenu);
             Close(Control);
@@ -161,6 +179,7 @@ namespace BlueControls.Forms {
                 }
             }
         }
+
         private static void _ContextMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
             var Infos = (List<object>)e.HotItem;
             var UserMmenu = (ItemCollectionList)Infos[0];

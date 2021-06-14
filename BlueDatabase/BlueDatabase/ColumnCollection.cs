@@ -1,21 +1,24 @@
 #region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
@@ -23,25 +26,37 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using static BlueBasics.FileOperations;
+
 namespace BlueDatabase {
+
     public sealed class ColumnCollection : ListExt<ColumnItem> {
-        #region  Variablen-Deklarationen 
+
+        #region Variablen-Deklarationen
+
         public Database Database { get; private set; }
         private int _LastColumnKey;
-        #endregion
-        #region  Event-Deklarationen + Delegaten 
-        #endregion
-        #region  Construktor + Initialize 
+
+        #endregion Variablen-Deklarationen
+
+
+
+        #region Construktor + Initialize
+
         public void Initialize() {
         }
+
         public ColumnCollection(Database database) {
             Database = database;
             Database.Disposing += Database_Disposing;
             Initialize();
         }
+
         private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
-        #endregion
-        #region  Properties 
+
+        #endregion Construktor + Initialize
+
+        #region Properties
+
         public new ColumnItem this[int index] {
             get {
                 if (Database == null) { return null; }
@@ -53,6 +68,7 @@ namespace BlueDatabase {
                 return base[index];
             }
         }
+
         public ColumnItem SearchByKey(int key) {
             try {
                 if (Database == null) { return null; }
@@ -70,6 +86,7 @@ namespace BlueDatabase {
                 return SearchByKey(key); // Sammlung wurde verändert
             }
         }
+
         public ColumnItem this[string columnName] {
             get {
                 Database.BlockReload(false);
@@ -78,7 +95,9 @@ namespace BlueDatabase {
                 return colum;
             }
         }
-        #endregion
+
+        #endregion Properties
+
         public ColumnItem Exists(string columnName) {
             if (Database == null) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Database ist null bei " + columnName);
@@ -94,11 +113,13 @@ namespace BlueDatabase {
             }
             return null;
         }
+
         internal string Load_310(enDatabaseDataType Art, string Wert) {
             switch (Art) {
                 case enDatabaseDataType.LastColumnKey:
                     _LastColumnKey = int.Parse(Wert);
                     break;
+
                 default:
                     if (Art.ToString() == ((int)Art).ToString()) {
                         Develop.DebugPrint(enFehlerArt.Info, "Laden von Datentyp '" + Art + "' nicht definiert.<br>Wert: " + Wert + "<br>Datei: " + Database.Filename);
@@ -109,6 +130,7 @@ namespace BlueDatabase {
             }
             return "";
         }
+
         public ColumnItem SysChapter { get; private set; }
         public ColumnItem SysCorrect { get; private set; }
         public ColumnItem SysLocked { get; private set; }
@@ -116,6 +138,7 @@ namespace BlueDatabase {
         public ColumnItem SysRowChanger { get; private set; }
         public ColumnItem SysRowCreateDate { get; private set; }
         public ColumnItem SysRowCreator { get; private set; }
+
         public new void Swap(ColumnItem column1, ColumnItem column2) {
             if (column1 == null || column2 == null) { return; }
             base.Swap(column1, column2);
@@ -123,6 +146,7 @@ namespace BlueDatabase {
             column2.Invalidate_ColumAndContent();
             Database.ColumnArrangements[0].ShowAllColumns(); // Damit die Datenbank mitbekommt, das sich da was geändert hat
         }
+
         internal void SaveToByteList(List<byte> List) {
             Database.SaveToByteList(List, enDatabaseDataType.LastColumnKey, _LastColumnKey.ToString());
             for (var ColumnCount = 0; ColumnCount < Count; ColumnCount++) {
@@ -131,6 +155,7 @@ namespace BlueDatabase {
                 }
             }
         }
+
         public void GetSystems() {
             SysLocked = null;
             SysRowCreateDate = null;
@@ -144,27 +169,35 @@ namespace BlueDatabase {
                     switch (ThisColumnItem.Identifier) {
                         case "":
                             break;
+
                         case "System: Locked":
                             SysLocked = ThisColumnItem;
                             break;
+
                         case "System: Creator":
                             SysRowCreator = ThisColumnItem;
                             break;
+
                         case "System: Changer":
                             SysRowChanger = ThisColumnItem;
                             break;
+
                         case "System: Date Created":
                             SysRowCreateDate = ThisColumnItem;
                             break;
+
                         case "System: Correct":
                             SysCorrect = ThisColumnItem;
                             break;
+
                         case "System: Date Changed":
                             SysRowChangeDate = ThisColumnItem;
                             break;
+
                         case "System: Chapter":
                             SysChapter = ThisColumnItem;
                             break;
+
                         default:
                             Develop.DebugPrint(enFehlerArt.Fehler, "Unbekannte Kennung: " + ThisColumnItem.Identifier);
                             break;
@@ -172,6 +205,7 @@ namespace BlueDatabase {
                 }
             }
         }
+
         public void Repair() {
             List<string> w = new()
             {
@@ -233,6 +267,7 @@ namespace BlueDatabase {
                 }
             } while (true);
         }
+
         internal int NextColumnKey {
             get {
                 do {
@@ -242,8 +277,11 @@ namespace BlueDatabase {
                 } while (true);
             }
         }
+
         internal static string ParsableColumnKey(ColumnItem Column) => Column == null ? "ColumnKey=?" : ParsableColumnKey(Column.Key);
+
         internal static string ParsableColumnKey(int Key) => "ColumnKey=" + Key;
+
         public static string ChangeKeysInString(string OriginalString, int OldKey, int NewKey) {
             var o = ParsableColumnKey(OldKey);
             if (!OriginalString.Contains(o)) { return OriginalString; }
@@ -262,6 +300,7 @@ namespace BlueDatabase {
             }
             return OriginalString;
         }
+
         public void GenerateOverView() {
             HTML da = new(Database.Filename.FileNameWithoutSuffix());
             da.AddCaption("Spaltenliste von: " + Database.Caption);
@@ -299,6 +338,7 @@ namespace BlueDatabase {
             da.AddFoot();
             da.Save(TempFile("", "Spaltenliste.html"), true);
         }
+
         public string Freename(string wunschname) {
             var nr = 0;
             wunschname = wunschname.ReduceToChars(Constants.AllowedCharsVariableName);
@@ -311,7 +351,9 @@ namespace BlueDatabase {
             } while (Exists(TestName) != null);
             return TestName;
         }
+
         #region Add
+
         public ColumnItem AddACloneFrom(ColumnItem source) {
             var c = Add();
             c.Caption = source.Caption;
@@ -386,6 +428,7 @@ namespace BlueDatabase {
             c.Prefix = source.Prefix;
             return c;
         }
+
         private void AddSystem(string identifier) {
             foreach (var ThisColumn in this) {
                 if (ThisColumn != null && ThisColumn.Identifier.ToUpper() == identifier.ToUpper()) { return; }
@@ -394,11 +437,13 @@ namespace BlueDatabase {
             c.Load(enDatabaseDataType.co_Identifier, identifier);
             c.ResetSystemToDefault(true);
         }
+
         [Obsolete]
         public new ColumnItem Add(ColumnItem column) {
             Develop.DebugPrint(enFehlerArt.Fehler, "Direkter Aufruf nicht erlaubt!");
             return null;
         }
+
         /// <summary>
         /// Diese Routine sollte nur bei einem Reload benutzt werden. AddPending wir nicht mehr ausgelöst.
         /// </summary>
@@ -409,11 +454,17 @@ namespace BlueDatabase {
             if (Contains(column)) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte bereits vorhanden!"); }
             base.Add(column);
         }
+
         public ColumnItem Add(string internalName) => Add(NextColumnKey, internalName, internalName, string.Empty, enDataFormat.Text);
+
         public ColumnItem Add(int colKey) => Add(colKey, string.Empty, string.Empty, string.Empty, enDataFormat.Text);
+
         public ColumnItem Add() => Add(NextColumnKey, string.Empty, string.Empty, string.Empty, enDataFormat.Text);
+
         public ColumnItem Add(string internalName, string caption, enDataFormat format) => Add(NextColumnKey, internalName, caption, string.Empty, format);
+
         public ColumnItem Add(string internalName, string caption, string suffix, enDataFormat format) => Add(NextColumnKey, internalName, caption, suffix, format);
+
         public ColumnItem Add(int colKey, string internalName, string caption, string suffix, enDataFormat format) {
             Database.AddPending(enDatabaseDataType.AddColumn, colKey, -1, string.Empty, colKey.ToString(), true);
             // Ruft anschließen AddFromParserAuf, der die Spalte endgülrig dazumacht
@@ -424,7 +475,9 @@ namespace BlueDatabase {
             c.Suffix = suffix;
             return c;
         }
-        #endregion
+
+        #endregion Add
+
         protected override void Dispose(bool disposing) {
             Database.Disposing -= Database_Disposing;
             Database = null;

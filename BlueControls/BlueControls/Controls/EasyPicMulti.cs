@@ -7,11 +7,13 @@ using System.Collections.Generic;
 using System.Drawing;
 
 namespace BlueControls.Controls {
+
     public partial class EasyPicMulti : GenericControl, IBackgroundNone // System.Windows.Forms.UserControl //
     {
         private int _nr = 0;
         private readonly List<BitmapExt> pic = new();
         private List<string> files = new();
+
         public List<string> Files {
             get => files;
             set {
@@ -23,7 +25,9 @@ namespace BlueControls.Controls {
                 SetPic();
             }
         }
+
         public EasyPicMulti() => InitializeComponent();// pic.ItemInternalChanged += Pic_ItemInternalChanged;
+
         //private void Pic_ItemInternalChanged(object sender, BlueBasics.EventArgs.ListEventArgs e) {
         //    _nr = 0;
         //    Invalidate();
@@ -33,15 +37,18 @@ namespace BlueControls.Controls {
             if (_nr > pic.Count - 1) { _nr = pic.Count - 1; }
             SetPic();
         }
+
         private void btnLeft_Click(object sender, System.EventArgs e) {
             _nr--;
             if (_nr < 0) { _nr = 0; }
             SetPic();
         }
+
         private void btnSchnittView_Click(object sender, System.EventArgs e) {
             PictureView x = new(Files, false, string.Empty);
             x.Show();
         }
+
         private void SetPic() {
             Bitmap _Bitmap = null;
             if (pic.Count > 0) {
@@ -52,6 +59,7 @@ namespace BlueControls.Controls {
             }
             zoompic.BMP = _Bitmap;
         }
+
         protected override void DrawControl(Graphics GR, enStates vState) {
             if (Convert.ToBoolean(vState & enStates.Standard_MouseOver)) { vState ^= enStates.Standard_MouseOver; }
             if (Convert.ToBoolean(vState & enStates.Standard_MousePressed)) { vState ^= enStates.Standard_MousePressed; }

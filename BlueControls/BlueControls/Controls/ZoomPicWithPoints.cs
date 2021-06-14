@@ -14,15 +14,20 @@ using static BlueBasics.Extensions;
 using static BlueBasics.FileOperations;
 
 namespace BlueControls.Controls {
+
     [Designer(typeof(BasicDesigner))]
     public partial class ZoomPicWithPoints : ZoomPic {
 
         #region Constructor
+
         public ZoomPicWithPoints() : base() => InitializeComponent();
-        #endregion
+
+        #endregion Constructor
 
         private readonly List<PointM> points = new();
+
         public event EventHandler PointSetByUser;
+
         public List<string> Tags = new();
         public string Feedback = string.Empty;
         private bool _PointAdding = false;
@@ -30,6 +35,7 @@ namespace BlueControls.Controls {
         private static readonly Brush Brush_RotTransp = new SolidBrush(Color.FromArgb(200, 255, 0, 0));
         private enOrientation _MittelLinie = enOrientation.Ohne;
         private enHelpers _Helper = enHelpers.Ohne;
+
         [DefaultValue((enOrientation)(-1))]
         public enOrientation Mittellinie {
             get => _MittelLinie;
@@ -39,6 +45,7 @@ namespace BlueControls.Controls {
                 Invalidate();
             }
         }
+
         [DefaultValue(enHelpers.Ohne)]
         public enHelpers Helper {
             get => _Helper;
@@ -48,6 +55,7 @@ namespace BlueControls.Controls {
                 Invalidate();
             }
         }
+
         protected override RectangleM MaxBounds() {
             var r = base.MaxBounds();
             foreach (var thisP in points) {
@@ -58,6 +66,7 @@ namespace BlueControls.Controls {
             }
             return r;
         }
+
         //protected override void DrawControl(Graphics gr, enStates state)
         //{
         //    PrepareOverlay();
@@ -75,6 +84,7 @@ namespace BlueControls.Controls {
                 }
             }
         }
+
         public void LoadData(string PathOfPicture) {
             var x = LoadFromDisk(PathOfPicture);
             BMP = x.Item1;
@@ -82,6 +92,7 @@ namespace BlueControls.Controls {
             GeneratePointsFromTags();
             Invalidate();
         }
+
         private void GeneratePointsFromTags() {
             var Names = Tags.TagGet("AllPointNames").FromNonCritical().SplitBy("|");
             points.Clear();
@@ -90,10 +101,12 @@ namespace BlueControls.Controls {
                 points.Add(new PointM(null, s));
             }
         }
+
         public static BitmapListItem GenerateBitmapListItem(string pathOfPicture) {
             var x = LoadFromDisk(pathOfPicture);
             return GenerateBitmapListItem(x.Item1, x.Item2);
         }
+
         public static BitmapListItem GenerateBitmapListItem(Bitmap bmp, List<string> tags) {
             var FilenamePNG = tags.TagGet("ImageFile");
             BitmapListItem i = new(bmp, FilenamePNG, FilenamePNG.FileNameWithoutSuffix()) {
@@ -102,10 +115,12 @@ namespace BlueControls.Controls {
             };
             return i;
         }
+
         public BitmapListItem GenerateBitmapListItem() {
             WritePointsInTags();
             return GenerateBitmapListItem(BMP, Tags);
         }
+
         private void WritePointsInTags() {
             var Old = Tags.TagGet("AllPointNames").FromNonCritical().SplitBy("|");
             foreach (var thisO in Old) {
@@ -118,19 +133,24 @@ namespace BlueControls.Controls {
             }
             Tags.TagSet("AllPointNames", s.TrimEnd("|").ToNonCritical());
         }
+
         public PointM GetPoint(string name) {
             foreach (var thisp in points) {
                 if (thisp != null && thisp.Name.ToUpper() == name.ToUpper()) { return thisp; }
             }
             return null;
         }
+
         public void PointClear() {
             points.Clear();
             WritePointsInTags();
             Invalidate();
         }
+
         public void PointSet(string name, int x, int y) => PointSet(name, x, (decimal)y);
+
         public void PointSet(string name, double x, double y) => PointSet(name, (decimal)x, (decimal)y);
+
         public void PointSet(string name, decimal x, decimal y) {
             var p = GetPoint(name);
             if (p == null) {
@@ -147,19 +167,24 @@ namespace BlueControls.Controls {
             }
             WritePointsInTags();
         }
+
         protected override void OnMouseMove(MouseEventArgs e) {
             base.OnMouseMove(e);
             Invalidate();
         }
+
         protected override void OnMouseDown(MouseEventArgs e) {
             base.OnMouseDown(e);
             Invalidate(); // Mousedown bereits in _MouseDown gespeichert
         }
+
         protected override void OnMouseLeave(System.EventArgs e) {
             base.OnMouseLeave(e);
             Invalidate();
         }
+
         public static string FilenameTXT(string PathOfPicture) => PathOfPicture.FilePath() + PathOfPicture.FileNameWithoutSuffix() + ".txt";//            return PathOfPicture.TrimEnd(".PNG").TrimEnd(".JPG").TrimEnd(".JPG") + ".txt";
+
         public static Tuple<Bitmap, List<string>> LoadFromDisk(string PathOfPicture) {
             Bitmap bmp = null;
             List<string> tags = new();
@@ -173,6 +198,7 @@ namespace BlueControls.Controls {
             tags.TagSet("ImageFile", PathOfPicture);
             return new Tuple<Bitmap, List<string>>(bmp, tags);
         }
+
         private void DrawMittelLinien(AdditionalDrawing eg) {
             if (BMP == null) { return; }
             PositionEventArgs e = new(MousePos_1_1.X, MousePos_1_1.Y);
@@ -239,6 +265,7 @@ namespace BlueControls.Controls {
                 }
             }
         }
+
         public void PointRemove(string name) {
             var p = GetPoint(name);
             if (p == null) { return; }
@@ -246,6 +273,7 @@ namespace BlueControls.Controls {
             WritePointsInTags();
             Invalidate();
         }
+
         public void LetUserAddAPoint(string pointName, enHelpers helper, enOrientation mittelline) {
             _MittelLinie = mittelline;
             _Helper = helper;
@@ -253,6 +281,7 @@ namespace BlueControls.Controls {
             _PointAdding = true;
             Invalidate();
         }
+
         protected override void OnImageMouseUp(MouseEventArgs1_1 e) {
             if (_PointAdding && !string.IsNullOrEmpty(Feedback)) {
                 PointSet(Feedback, e.X, e.Y);
@@ -262,7 +291,9 @@ namespace BlueControls.Controls {
             base.OnImageMouseUp(e); // erst nachher, dass die MouseUpRoutine das Feedback nicht änddern kann
             //Feedback = string.Empty;
         }
+
         protected virtual void OnPointSetByUser() => PointSetByUser?.Invoke(this, System.EventArgs.Empty);
+
         public void SaveData() {
             WritePointsInTags();
             var Path = Tags.TagGet("ImageFile");
@@ -281,6 +312,7 @@ namespace BlueControls.Controls {
                 MessageBox.Show("Fehler beim Speichern");
             }
         }
+
         public static Tuple<Bitmap, List<string>> ResizeData(Bitmap pic, List<string> tags, int width, int height) {
             var zoomx = (decimal)width / pic.Width;
             var zoomy = (decimal)height / pic.Height;

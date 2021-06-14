@@ -1,35 +1,42 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using System;
 using System.Drawing;
 
 namespace BlueControls.Forms {
+
     public partial class Notification : FloatingForm {
         private int _Timer_Tick_count;
         private bool _Timer_Tick_WasVisible;
         private DateTime _FirstTimer; // Startzeit für UnloadAfterSek
         private const int UpDownSpeed = 250;
+
         //internal int UnloadAfterSek = -999;
         internal int FloatInAndOutMilliSek = -999;
+
         private Notification() : base(Enums.enDesign.Form_DesktopBenachrichtigung) => InitializeComponent();
+
         private Notification(string Text) : this() {
             //InitializeComponent();
             capTXT.Text = Text;
@@ -41,18 +48,21 @@ namespace BlueControls.Forms {
             timNote.Enabled = true;
             _FirstTimer = DateTime.Now;
         }
+
         public static void Show(string Text) {
             CloseAll();
             if (string.IsNullOrEmpty(Text)) { return; }
             Notification x = new(Text);
             x.Show();
         }
+
         public static void Show(string TXT, enImageCode Pic) {
             if (Pic != enImageCode.None) {
                 TXT = "<ImageCode=" + Enum.GetName(Pic.GetType(), Pic) + "|32> <zbx_store><top>" + TXT;
             }
             Show(TXT);
         }
+
         public static void CloseAll() {
             foreach (var ThisForm in AllBoxes) {
                 if (!ThisForm.IsDisposed && ThisForm is Notification) {
@@ -66,6 +76,7 @@ namespace BlueControls.Forms {
                 }
             }
         }
+
         public new void Close() {
             foreach (var ThisForm in AllBoxes) {
                 if (!ThisForm.IsDisposed && ThisForm is Notification) {
@@ -78,6 +89,7 @@ namespace BlueControls.Forms {
                 }
             }
         }
+
         private void timNote_Tick(object sender, System.EventArgs e) {
             var MS = DateTime.Now.Subtract(_FirstTimer).TotalMilliseconds;
             _Timer_Tick_count++;
@@ -122,6 +134,7 @@ namespace BlueControls.Forms {
                 Opacity = _Proz;
             }
         }
+
         //private void _Timer_Tick(object sender, System.EventArgs e)
         //{
         //    var MS = DateTime.Now.Subtract(_FirstTimer).TotalMilliseconds;
@@ -208,6 +221,7 @@ namespace BlueControls.Forms {
                 FloatInAndOutMilliSek = 300;
             }
         }
+
         private void capTXT_Click(object sender, System.EventArgs e) => FadeOut();
     }
 }

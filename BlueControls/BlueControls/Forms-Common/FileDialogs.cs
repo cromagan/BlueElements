@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using static BlueBasics.FileOperations;
 
 namespace BlueControls.Forms {
+
     public static class FileDialogs {
+
         //#region FileDialogs
         //public static void DeleteDir(string Pfad, bool Meldungen = true)
         //{
@@ -43,7 +45,7 @@ namespace BlueControls.Forms {
         //    }
         //}
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="Filelist"></param>
         /// <param name="Meldungen"></param>
@@ -65,8 +67,9 @@ namespace BlueControls.Forms {
             }
             return false; //nein geklickt
         }
+
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="Filelist"></param>
         /// <param name="Meldungen"></param>
@@ -78,6 +81,7 @@ namespace BlueControls.Forms {
             };
             return DeleteFile(f, Rückfrage);
         }
+
         //public static string RenameFile(string OldN, string NewN)
         //{
         //    if (OldN == NewN) { return string.Empty; }

@@ -13,6 +13,7 @@ using static BlueBasics.Extensions;
 using static BlueBasics.modConverter;
 
 namespace BlueControls.Controls {
+
     // https://stackoverflow.com/questions/724143/how-do-i-create-a-delegate-for-a-net-property
     // http://peisker.net/dotnet/propertydelegates.htm
     // http://geekswithblogs.net/akraus1/archive/2006/02/10/69047.aspx
@@ -32,17 +33,27 @@ namespace BlueControls.Controls {
         //public event System.EventHandler LoadedFromDisk;
 
         #region Constructor
+
         public FlexiControlForProperty(object propertyObject, string propertyName, int rowCount, ItemCollectionList list, enImageCode image) : this() {
             _propertyObject = propertyObject;
             _propertyName = propertyName;
             UpdateControlData(true, rowCount, list, image);
             CheckEnabledState();
         }
-        public FlexiControlForProperty(object propertyObject, string propertyName, ItemCollectionList list) : this(propertyObject, propertyName, 1, list, enImageCode.None) { }
-        public FlexiControlForProperty(object propertyObject, string propertyName, int rowCount) : this(propertyObject, propertyName, rowCount, null, enImageCode.None) { }
-        public FlexiControlForProperty(object propertyObject, string propertyName, enImageCode image) : this(propertyObject, propertyName, 1, null, image) { }
-        public FlexiControlForProperty(object propertyObject, string propertyName) : this(propertyObject, propertyName, 1, null, enImageCode.None) { }
-        #endregion
+
+        public FlexiControlForProperty(object propertyObject, string propertyName, ItemCollectionList list) : this(propertyObject, propertyName, 1, list, enImageCode.None) {
+        }
+
+        public FlexiControlForProperty(object propertyObject, string propertyName, int rowCount) : this(propertyObject, propertyName, rowCount, null, enImageCode.None) {
+        }
+
+        public FlexiControlForProperty(object propertyObject, string propertyName, enImageCode image) : this(propertyObject, propertyName, 1, null, image) {
+        }
+
+        public FlexiControlForProperty(object propertyObject, string propertyName) : this(propertyObject, propertyName, 1, null, enImageCode.None) {
+        }
+
+        #endregion Constructor
 
         public FlexiControlForProperty() : base() {
             GenFehlerText();
@@ -57,12 +68,14 @@ namespace BlueControls.Controls {
             EditType = enEditTypeFormula.Textfeld;
             Size = new Size(200, 24);
         }
+
         private void Checker_Tick(object sender, System.EventArgs e) {
             //if (_IsFilling) { return; }
             if (!_allinitialized) { return; }
             if (_LastTextChange != null) { return; } // Noch am bearbeiten
             SetValueFromProperty();
         }
+
         /// <summary>
         /// Der Getter/Setter des UserControls. Dabei werden Sonderzeichen in _ umgewandelt. Punkte gelöscht. Zwei __ werden zu einem geändert, und die Anzegige nach den beiden _ wird optisch abgeschnitten.
         /// </summary>
@@ -76,6 +89,7 @@ namespace BlueControls.Controls {
                 CheckEnabledState();
             }
         }
+
         //[DefaultValue(true)]
         //public new bool Enabled {
         //    get => _enabled;
@@ -103,6 +117,7 @@ namespace BlueControls.Controls {
                 //}
             }
         }
+
         //private void OnLoadedFromDisk(object sender, System.EventArgs e) {
         //    FillPropertyNow();
         //    _propertyObject = null;  //Das Objekt ist tot und irgendwo im Nirvana verschwunden
@@ -139,6 +154,7 @@ namespace BlueControls.Controls {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Art unbekannt!");
             }
         }
+
         private void FillPropertyNow() {
             //if (_IsFilling) { return; }
             if (!_allinitialized) { return; }
@@ -180,6 +196,7 @@ namespace BlueControls.Controls {
             if (OldVal == Value) { return; }
             _propInfo.SetValue(_propertyObject, toSet, null);
         }
+
         internal bool CheckEnabledState() {
             if (DesignMode) {
                 DisabledReason = string.Empty;
@@ -208,14 +225,17 @@ namespace BlueControls.Controls {
             DisabledReason = string.Empty;
             return true;
         }
+
         protected override void OnValueChanged() {
             FillPropertyNow(); // erst befüllen, bevor das Event ausgelöst wird
             GenFehlerText(); // erst Standard fehler Text, bevor das Event ausgelöst wird
             base.OnValueChanged();
         }
+
         private void UpdateControlData(bool withCreate, int TextLines, ItemCollectionList list, enImageCode image) {
 
             #region propInfo & _propertynamecpl befüllen
+
             if (string.IsNullOrEmpty(_propertyName) || _propertyObject == null) {
                 _methInfo = null;
                 _propInfo = null;
@@ -231,10 +251,11 @@ namespace BlueControls.Controls {
                 _propInfo = _propertyObject.GetType().GetProperty(_propertynamecpl);
                 _methInfo = _propertyObject.GetType().GetMethod(_propertynamecpl);
             }
-            #endregion
 
+            #endregion propInfo & _propertynamecpl befüllen
 
             #region Caption setzen
+
             if (!string.IsNullOrEmpty(_propertyName)) {
                 var x = _propertyName.SplitBy("__");
                 Caption = x[0].Replace("_", " ") + ":";
@@ -242,10 +263,11 @@ namespace BlueControls.Controls {
             } else {
                 Caption = "[unbekannt]";
             }
-            #endregion
 
+            #endregion Caption setzen
 
             #region Art des Steuerelements bestimmen
+
             if (withCreate && _methInfo != null) {
                 EditType = enEditTypeFormula.Button;
                 CaptionPosition = enÜberschriftAnordnung.ohne;
@@ -324,10 +346,11 @@ namespace BlueControls.Controls {
             //{
             //    Develop.DebugPrint(_propertyName + " hat keine Zuordnung");
             //}
-            #endregion
 
+            #endregion Art des Steuerelements bestimmen
 
             #region QuickInfo setzen
+
             // https://stackoverflow.com/questions/32901771/multiple-enum-descriptions
             // [PropertyAttributes("", false)] setzen
             //_FehlerWennLeer = true;
@@ -351,11 +374,13 @@ namespace BlueControls.Controls {
                     QuickInfo = string.Empty;
                 }
             }
-            #endregion
+
+            #endregion QuickInfo setzen
 
             SetValueFromProperty();
             GenFehlerText();
         }
+
         public static void SetAllFlexControls(Control _in, object _to) {
             if (_in == null || _in.IsDisposed) { return; }
             foreach (var thisc in _in.Controls) {
@@ -369,10 +394,12 @@ namespace BlueControls.Controls {
                 }
             }
         }
+
         protected override void OnControlAdded(ControlEventArgs e) {
             CheckEnabledState();
             base.OnControlAdded(e);
         }
+
         private void GenFehlerText() {
             if (_propInfo == null) {
                 InfoText = string.Empty;
@@ -392,6 +419,7 @@ namespace BlueControls.Controls {
             //}
             InfoText = string.Empty;
         }
+
         public ComboBox GetComboBox() {
             if (!_allinitialized) { return null; }
             foreach (var thiscon in Controls) {
@@ -399,16 +427,19 @@ namespace BlueControls.Controls {
             }
             return null;
         }
+
         protected override void OnHandleDestroyed(System.EventArgs e) {
             FillPropertyNow();
             base.OnHandleDestroyed(e);
         }
+
         protected override void OnButtonClicked() {
             base.OnButtonClicked();
             if (_methInfo != null) {
                 _methInfo.Invoke(_propertyObject, null);
             }
         }
+
         protected override void Dispose(bool disposing) {
             _IdleTimer.Tick -= Checker_Tick;
             //if (_propertyObject is IReloadable LS) { LS.LoadedFromDisk -= OnLoadedFromDisk; }

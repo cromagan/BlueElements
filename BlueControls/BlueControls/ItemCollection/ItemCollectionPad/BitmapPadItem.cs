@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -31,28 +34,40 @@ using System.Drawing.Imaging;
 using static BlueBasics.FileOperations;
 
 namespace BlueControls.ItemCollection {
+
     public class BitmapPadItem : FormPadItemRectangle, ICanHaveColumnVariables {
 
-        #region  Variablen-Deklarationen 
+        #region Variablen-Deklarationen
+
         public bool Hintergrund_weiß_füllen { get; set; }
         public int Padding;
         public List<QuickImage> Overlays;
         public enSizeModes Bild_Modus { get; set; }
+
         [Description("Hier kann ein Platzhalter, der mit dem Code-Generator erzeugt wurde, eingefügt werden.")]
         public string Platzhalter_für_Layout { get; set; }
-        #endregion
+
+        #endregion Variablen-Deklarationen
 
 
-        #region  Event-Deklarationen + Delegaten 
-        #endregion
 
+        #region Construktor + Initialize
 
-        #region  Construktor + Initialize 
-        public BitmapPadItem(ItemCollectionPad parent) : this(parent, string.Empty, null, Size.Empty) { }
-        public BitmapPadItem(ItemCollectionPad parent, string internalname, string FileToLoad) : this(parent, internalname, (Bitmap)BitmapExt.Image_FromFile(FileToLoad), Size.Empty) { }
-        public BitmapPadItem(ItemCollectionPad parent, string internalname, Bitmap bmp) : this(parent, internalname, bmp, Size.Empty) { }
-        public BitmapPadItem(ItemCollectionPad parent, Bitmap bmp, Size size) : this(parent, string.Empty, bmp, size) { }
-        public BitmapPadItem(ItemCollectionPad parent, Bitmap bmp) : this(parent, string.Empty, bmp, Size.Empty) { }
+        public BitmapPadItem(ItemCollectionPad parent) : this(parent, string.Empty, null, Size.Empty) {
+        }
+
+        public BitmapPadItem(ItemCollectionPad parent, string internalname, string FileToLoad) : this(parent, internalname, (Bitmap)BitmapExt.Image_FromFile(FileToLoad), Size.Empty) {
+        }
+
+        public BitmapPadItem(ItemCollectionPad parent, string internalname, Bitmap bmp) : this(parent, internalname, bmp, Size.Empty) {
+        }
+
+        public BitmapPadItem(ItemCollectionPad parent, Bitmap bmp, Size size) : this(parent, string.Empty, bmp, size) {
+        }
+
+        public BitmapPadItem(ItemCollectionPad parent, Bitmap bmp) : this(parent, string.Empty, bmp, Size.Empty) {
+        }
+
         public BitmapPadItem(ItemCollectionPad parent, string internalname, Bitmap bmp, Size size) : base(parent, internalname) {
             Bitmap = bmp;
             SetCoordinates(new RectangleM(0, 0, size.Width, size.Height), true);
@@ -62,17 +77,20 @@ namespace BlueControls.ItemCollection {
             Bild_Modus = enSizeModes.EmptySpace;
             Stil = PadStyles.Undefiniert; // Kein Rahmen
         }
-        #endregion
 
+        #endregion Construktor + Initialize
 
-        #region  Properties 
+        #region Properties
+
         public Bitmap Bitmap { get; set; }
+
         public void Bildschirmbereich_wählen() {
             if (Bitmap != null) {
                 if (MessageBox.Show("Vorhandenes Bild überschreiben?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
             }
             Bitmap = ScreenShot.GrabArea(null, 2000, 2000).Pic;
         }
+
         public void Datei_laden() {
             if (Bitmap != null) {
                 if (MessageBox.Show("Vorhandenes Bild überschreiben?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
@@ -87,9 +105,11 @@ namespace BlueControls.ItemCollection {
             if (!FileExists(e.FileName)) { return; }
             Bitmap = (Bitmap)BitmapExt.Image_FromFile(e.FileName);
         }
-        #endregion
+
+        #endregion Properties
 
         protected override string ClassId() => "IMAGE";
+
         protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
             DCoordinates.Inflate(-Padding, -Padding);
             RectangleF r1 = new(DCoordinates.Left + Padding, DCoordinates.Top + Padding, DCoordinates.Width - (Padding * 2), DCoordinates.Height - (Padding * 2));
@@ -98,7 +118,6 @@ namespace BlueControls.ItemCollection {
             if (Bitmap != null) {
                 r3 = new RectangleF(0, 0, Bitmap.Width, Bitmap.Height);
                 switch (Bild_Modus) {
-
                     case enSizeModes.Verzerren: {
                             r2 = r1;
                             break;
@@ -160,10 +179,10 @@ namespace BlueControls.ItemCollection {
             }
             base.DrawExplicit(GR, DCoordinates, cZoom, shiftX, shiftY, vState, SizeOfParentControl, ForPrinting);
         }
+
         public override bool ParseThis(string tag, string value) {
             if (base.ParseThis(tag, value)) { return true; }
             switch (tag) {
-
                 case "stretchallowed": // ALT
                     return true;
 
@@ -189,7 +208,10 @@ namespace BlueControls.ItemCollection {
             }
             return false;
         }
-        protected override void ParseFinished() { }
+
+        protected override void ParseFinished() {
+        }
+
         public override string ToString() {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
@@ -207,6 +229,7 @@ namespace BlueControls.ItemCollection {
             }
             return t.Trim(", ") + "}";
         }
+
         public bool ReplaceVariable(BlueScript.Variable variable) {
             if (string.IsNullOrEmpty(Platzhalter_für_Layout)) { return false; }
             if ("&" + variable.Name.ToLower() + ";" != Platzhalter_für_Layout.ToLower()) { return false; }
@@ -220,6 +243,7 @@ namespace BlueControls.ItemCollection {
                 return false;
             }
         }
+
         public bool ResetVariables() {
             if (!string.IsNullOrEmpty(Platzhalter_für_Layout) && Bitmap != null) {
                 Bitmap.Dispose();
@@ -229,6 +253,7 @@ namespace BlueControls.ItemCollection {
             }
             return false;
         }
+
         public override List<FlexiControl> GetStyleOptions() {
             List<FlexiControl> l = new()
             {
@@ -251,6 +276,7 @@ namespace BlueControls.ItemCollection {
             l.AddRange(base.GetStyleOptions());
             return l;
         }
+
         //public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
         //{
         //    base.DoStyleCommands(sender, Tags, ref CloseMenu);

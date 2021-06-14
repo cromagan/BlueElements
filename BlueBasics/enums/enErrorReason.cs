@@ -1,4 +1,5 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
+
 // Authors:
 // Christian Peter
 //
@@ -15,33 +16,43 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-#endregion
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using System;
 
 namespace BlueBasics.Enums {
+
     [Flags]
     public enum enErrorReason {
+
         /// <summary>
         /// Ob der Wert gelesen werden kann. Ein Speichern/Bearbeiten ist nicht geplant.
         /// </summary>
         OnlyRead = 1,
+
         ///// <summary>
         ///// Ob das Feld im allgemeinen bearbeitet werden kann, wenn keine Prozesse dazwischenpfuschen
         ///// </summary>
         EditNormaly = 2,
+
         /// <summary>
         /// Wenn die Daten eigentlich geschrieben werden müssen
         /// </summary>
         EditAcut = 4,
+
         /// <summary>
         /// Es ist noch Zeit, der Benutzer kann ausgesperrt werden
         /// </summary>
         EditGeneral = 8,
+
         Save = 16,
+
         /// <summary>
         ///  Wenn die Daten von der Festplatte geladen und auch weiterverarbeitet werdern sollen
         /// </summary>
         Load = 32,
+
         /// <summary>
         /// Wenn die Daten von der Festplatte geladen - aber wieder verworfen werdern. Nur für Kontrollzwecke benutzen!
         /// </summary>

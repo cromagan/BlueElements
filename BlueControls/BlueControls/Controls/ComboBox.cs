@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -30,11 +33,13 @@ using System.Drawing;
 using System.Drawing.Design;
 
 namespace BlueControls.Controls {
+
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("TextChanged")]
     public partial class ComboBox : TextBox {
 
         #region Constructor
+
         public ComboBox() : base() {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
@@ -49,20 +54,22 @@ namespace BlueControls.Controls {
             btnDropDown.Top = 0;
             btnDropDown.Height = Height;
         }
-        #endregion
 
+        #endregion Constructor
 
-        #region  Variablen 
+        #region Variablen
+
         private string _Initialtext;
         private bool _btnDropDownIsIn = false;
         private System.Windows.Forms.ComboBoxStyle _DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown;
         private enComboboxStyle _DrawStyle = enComboboxStyle.TextBox;
         private string _ImageCode = string.Empty;
         private string _LastClickedText = "####~~~~|||||";
-        #endregion
 
+        #endregion Variablen
 
-        #region  Properties 
+        #region Properties
+
         [DefaultValue("")]
         [Category("Darstellung")]
         [Editor(typeof(QuickPicSelector), typeof(UITypeEditor))]
@@ -78,6 +85,7 @@ namespace BlueControls.Controls {
         }
 
         public ItemCollectionList Item { get; }
+
         [DefaultValue(System.Windows.Forms.ComboBoxStyle.DropDown)]
         public System.Windows.Forms.ComboBoxStyle DropDownStyle {
             get => _DropDownStyle;
@@ -89,6 +97,7 @@ namespace BlueControls.Controls {
                 SetStyle();
             }
         }
+
         [DefaultValue(enComboboxStyle.TextBox)]
         public enComboboxStyle DrawStyle {
             get => _DrawStyle;
@@ -100,13 +109,16 @@ namespace BlueControls.Controls {
                 SetStyle();
             }
         }
-        #endregion
 
+        #endregion Properties
 
-        #region  Events 
+        #region Events
+
         public event EventHandler<BasicListItemEventArgs> ItemClicked;
+
         public event EventHandler DropDownShowing;
-        #endregion
+
+        #endregion Events
 
         private void DropDownMenu_Cancel(object sender, object MouseOver) {
             Item.UncheckAll();
@@ -124,7 +136,9 @@ namespace BlueControls.Controls {
             }
             Focus();
         }
+
         protected virtual void OnItemClicked(BasicListItemEventArgs e) => ItemClicked?.Invoke(this, e);
+
         protected override enDesign GetDesign() => ParentType() is enPartentType.RibbonGroupBox or enPartentType.RibbonPage
                                         ? enDesign.Ribbon_ComboBox_Textbox
                                         : enDesign.ComboBox_Textbox;
@@ -180,7 +194,9 @@ namespace BlueControls.Controls {
                 btnDropDown.Invalidate();
             }
         }
+
         internal bool WasThisValueClicked() => Text == _LastClickedText;
+
         protected override void OnEnabledChanged(System.EventArgs e) {
             base.OnEnabledChanged(e);
             FloatingForm.Close(this);
@@ -189,9 +205,7 @@ namespace BlueControls.Controls {
         }
 
         public void ShowMenu(object sender, System.Windows.Forms.MouseEventArgs ex) {
-            if (_btnDropDownIsIn) { return; }
-            if (IsDisposed) { return; }
-            if (!Enabled) { return; }
+            if (_btnDropDownIsIn || IsDisposed || !Enabled) { return; }
             _btnDropDownIsIn = true;
             OnDropDownShowing();
             if (Item.Count == 0) { _btnDropDownIsIn = false; return; }
@@ -212,6 +226,7 @@ namespace BlueControls.Controls {
         }
 
         private void OnDropDownShowing() => DropDownShowing?.Invoke(this, System.EventArgs.Empty);
+
         protected override void OnGotFocus(System.EventArgs e) {
             if (_DropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDownList) {
                 btnDropDown.Focus();
@@ -220,10 +235,12 @@ namespace BlueControls.Controls {
             }
             FloatingForm.Close(this);
         }
+
         protected override void OnLostFocus(System.EventArgs e) {
             Invalidate();
             CheckLostFocus(e);
         }
+
         protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
             if (e.Button != System.Windows.Forms.MouseButtons.Right) {
                 // nicht bei rechts, ansonsten gibt's evtl. Kontextmenü (von der Textbox aus gesteuert) UND den Auswahldialog
@@ -238,6 +255,7 @@ namespace BlueControls.Controls {
         }
 
         private void btnDropDown_LostFocus(object sender, System.EventArgs e) => CheckLostFocus(e);
+
         private void CheckLostFocus(System.EventArgs e) {
             try {
                 if (btnDropDown == null) { return; }
@@ -268,6 +286,7 @@ namespace BlueControls.Controls {
                 // ImageCode = string.Empty; - Egal, wird eh ignoriert wenn es nicht gebraucht wird
             }
         }
+
         //protected override void OnMouseEnter(System.EventArgs e)
         //{
         //    base.OnMouseEnter(e);

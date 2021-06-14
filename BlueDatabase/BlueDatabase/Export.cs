@@ -1,28 +1,34 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueDatabase.EventArgs;
 using System.Collections.Generic;
 using System.IO;
 using static BlueBasics.FileOperations;
+
 namespace BlueDatabase {
+
     public static class Export {
+
         public static List<string> SaveAsBitmap(List<RowItem> Row, string LayoutID, string Path) {
             List<string> l = new();
             foreach (var ThisRow in Row) {
@@ -32,7 +38,9 @@ namespace BlueDatabase {
             }
             return l;
         }
+
         public static void SaveAsBitmap(RowItem Row, string LayoutID, string Filename) => Row.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventargs(Row, LayoutID, Filename));
+
         //public static object ParseVariable(string platzhaltertxt, string variablename, object value) {
         //    var kennungstart = 0;
         //    if (string.IsNullOrEmpty(platzhaltertxt)) { return platzhaltertxt; }
@@ -407,6 +415,7 @@ namespace BlueDatabase {
             };
             return GenerateLayout_FileSystem(l, Layout, DestinationFile, false, string.Empty);
         }
+
         //Shared Sub SaveAsBitmap(Row As RowItem)
         //    If Row Is Nothing Then
         //        MessageBox.Show("Kein Eintrag gewählt.", enImageCode.Information, "OK")
@@ -452,6 +461,7 @@ namespace BlueDatabase {
             //End If
             return l;
         }
+
         //public static string CreateLayout(RowItem Row, string LoadedFile, bool ToNonCriticalText) {
         //    if (string.IsNullOrEmpty(LoadedFile)) {
         //        return string.Empty;
@@ -474,10 +484,12 @@ namespace BlueDatabase {
             };
             InternalCreateLayout(TMPList, File.ReadAllText(LoadFile, Constants.Win1252), SaveFile, false);
         }
+
         public static void CreateLayout(List<RowItem> Rows, string LoadFile, string SaveFile) {
             if (!FileExists(LoadFile)) { return; }
             InternalCreateLayout(Rows, File.ReadAllText(LoadFile, Constants.Win1252), SaveFile, false);
         }
+
         private static string InternalCreateLayout(List<RowItem> Rows, string FileLoaded, string SaveFile, bool ToNonCriticalText) {
             var Head = "";
             var Foot = "";

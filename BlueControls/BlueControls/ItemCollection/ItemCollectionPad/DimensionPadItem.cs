@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -25,9 +28,11 @@ using System.Collections.Generic;
 using System.Drawing;
 
 namespace BlueControls.ItemCollection {
+
     public class DimensionPadItem : BasicPadItem {
 
-        #region  Variablen-Deklarationen 
+        #region Variablen-Deklarationen
+
         private readonly PointM Point1 = new(null, "Punkt 1", 0, 0);
         private readonly PointM Point2 = new(null, "Punkt 2", 0, 0);
         private readonly PointM TextPointx = new(null, "Mitte Text", 0, 0);
@@ -39,6 +44,7 @@ namespace BlueControls.ItemCollection {
         private decimal _Länge;
         private string _text_oben = string.Empty;
         public int Nachkommastellen { get; set; } = 1;
+
         public string Text_oben {
             get => _text_oben;
             set {
@@ -49,21 +55,26 @@ namespace BlueControls.ItemCollection {
         }
 
         public string Text_unten { get; set; } = string.Empty;
+
         //http://www.kurztutorial.info/programme/punkt-mm/rechner.html
         // Dim Ausgleich As Double = mmToPixel(1 / 72 * 25.4, 300)
         public decimal Skalierung { get; set; } = 3.07m;
+
         public string Präfix { get; set; } = string.Empty;
         public string Suffix { get; set; } = string.Empty;
-        #endregion
+
+        #endregion Variablen-Deklarationen
 
 
-        #region  Event-Deklarationen + Delegaten 
-        #endregion
 
+        #region Construktor + Initialize
 
-        #region  Construktor + Initialize 
-        public DimensionPadItem(ItemCollectionPad parent) : this(parent, string.Empty, null, null, 0) { }
-        public DimensionPadItem(ItemCollectionPad parent, PointM cPoint1, PointM cPoint2, int AbstandinMM) : this(parent, string.Empty, cPoint1, cPoint2, AbstandinMM) { }
+        public DimensionPadItem(ItemCollectionPad parent) : this(parent, string.Empty, null, null, 0) {
+        }
+
+        public DimensionPadItem(ItemCollectionPad parent, PointM cPoint1, PointM cPoint2, int AbstandinMM) : this(parent, string.Empty, cPoint1, cPoint2, AbstandinMM) {
+        }
+
         public DimensionPadItem(ItemCollectionPad parent, string internalname, PointM cPoint1, PointM cPoint2, int AbstandinMM) : base(parent, internalname) {
             if (cPoint1 != null) { Point1.SetTo(cPoint1.X, cPoint1.Y); }
             if (cPoint2 != null) { Point2.SetTo(cPoint2.X, cPoint2.Y); }
@@ -90,17 +101,14 @@ namespace BlueControls.ItemCollection {
             PointsForSuccesfullyMove.AddRange(MovablePoint);
         }
 
-        public DimensionPadItem(ItemCollectionPad parent, PointF cPoint1, PointF cPoint2, int AbstandInMM) : this(parent, new PointM(cPoint1), new PointM(cPoint2), AbstandInMM) { }
-        #endregion
+        public DimensionPadItem(ItemCollectionPad parent, PointF cPoint1, PointF cPoint2, int AbstandInMM) : this(parent, new PointM(cPoint1), new PointM(cPoint2), AbstandInMM) {
+        }
 
-
-        #region  Properties 
-        #endregion
+        #endregion Construktor + Initialize
 
         public override bool ParseThis(string tag, string value) {
             if (base.ParseThis(tag, value)) { return true; }
             switch (tag) {
-
                 case "text": // TODO: Alt 06.09.2019
 
                 case "text1":
@@ -141,7 +149,10 @@ namespace BlueControls.ItemCollection {
             }
             return false;
         }
-        protected override void ParseFinished() { }
+
+        protected override void ParseFinished() {
+        }
+
         public override string ToString() {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
@@ -166,7 +177,9 @@ namespace BlueControls.ItemCollection {
         }
 
         public decimal Länge_in_MM => Math.Round(modConverter.PixelToMM(_Länge, ItemCollectionPad.DPI), Nachkommastellen);
+
         protected override string ClassId() => "DIMENSION";
+
         public override bool Contains(PointF value, decimal zoomfactor) {
             var ne = 5 / zoomfactor;
             return value.DistanzZuStrecke(Point1, _Bezugslinie1) < ne
@@ -175,6 +188,7 @@ namespace BlueControls.ItemCollection {
                     || value.DistanzZuStrecke(_SchnittPunkt1, TextPointx) < ne
                     || GeometryDF.Länge(new PointM(value), TextPointx) < ne * 10;
         }
+
         protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
             if (Stil == PadStyles.Undefiniert) { return; }
             var geszoom = Parent.SheetStyleScale * Skalierung * cZoom;
@@ -215,6 +229,7 @@ namespace BlueControls.ItemCollection {
             GR.DrawString(Text_unten, f.Font(geszoom), f.Brush_Color_Main, new PointF((float)(-sz2.Width / 2.0), (float)(-sz2.Height / 2.0)));
             GR.Restore(x);
         }
+
         protected override RectangleM CalculateUsedArea() {
             if (Stil == PadStyles.Undefiniert) { return new RectangleM(0, 0, 0, 0); }
             var geszoom = Parent.SheetStyleScale * Skalierung;
@@ -226,7 +241,7 @@ namespace BlueControls.ItemCollection {
             X.ExpandTo(_Bezugslinie1);
             X.ExpandTo(_Bezugslinie2);
             X.ExpandTo(TextPointx, maxrad);
-            //return new RectangleM(P1_x - 2, P1_y - 2, P2_x - P1_x + 4, P2_y - P1_y + 4); 
+            //return new RectangleM(P1_x - 2, P1_y - 2, P2_x - P1_x + 4, P2_y - P1_y + 4);
             X.Inflate(-2, -2); // die Sicherheits koordinaten damit nicht linien abgeschnitten werden
             return X;
         }
@@ -268,6 +283,7 @@ namespace BlueControls.ItemCollection {
             l.AddRange(base.GetStyleOptions());
             return l;
         }
+
         //public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
         //{
         //    Text_oben = Tags.TagGet("Text (oben)").FromNonCritical();

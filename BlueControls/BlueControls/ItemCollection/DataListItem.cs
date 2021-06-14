@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
@@ -25,9 +28,11 @@ using System.Drawing;
 using static BlueBasics.FileOperations;
 
 namespace BlueControls.ItemCollection {
+
     public class DataListItem : BasicListItem {
 
-        #region  Variablen-Deklarationen 
+        #region Variablen-Deklarationen
+
         private byte[] _bin;
         private string _caption;
         private List<string> _captiontmp = new();
@@ -37,14 +42,13 @@ namespace BlueControls.ItemCollection {
         private readonly string _EncryptionKey;
         private int _captionlines = 2;
         private const int ConstMY = 15;
-        #endregion
+
+        #endregion Variablen-Deklarationen
 
 
-        #region  Event-Deklarationen + Delegaten 
-        #endregion
 
+        #region Construktor + Initialize
 
-        #region  Construktor + Initialize 
         public DataListItem(byte[] b, string internalname, string caption) : base(internalname) {
             _caption = caption;
             _captiontmp.Clear();
@@ -52,6 +56,7 @@ namespace BlueControls.ItemCollection {
             _padding = 0;
             _overlays.Clear();
         }
+
         public DataListItem(string Filename, string internalname, string caption, string encryptionKey) : base(internalname) {
             _caption = caption;
             _captiontmp.Clear();
@@ -60,10 +65,11 @@ namespace BlueControls.ItemCollection {
             _padding = 0;
             _overlays.Clear();
         }
-        #endregion
 
+        #endregion Construktor + Initialize
 
-        #region  Properties 
+        #region Properties
+
         public byte[] Bin {
             get {
                 GetBin();
@@ -108,7 +114,8 @@ namespace BlueControls.ItemCollection {
 
         public List<QuickImage> Overlays => _overlays;
         public override string QuickInfo => string.Empty;
-        #endregion
+
+        #endregion Properties
 
         protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, bool Translate) {
             if (DrawBorderAndBack) {
@@ -159,7 +166,9 @@ namespace BlueControls.ItemCollection {
                 Skin.Draw_Border(GR, itemdesign, vState, PositionModified);
             }
         }
+
         protected override Size ComputeSizeUntouchedForListBox() => new(300, 300);
+
         private void GetBin() {
             if (string.IsNullOrEmpty(_filename)) { return; }
             if (_bin != null) { return; }
@@ -179,7 +188,9 @@ namespace BlueControls.ItemCollection {
             enBlueListBoxAppearance.FileSystem => 110 + (_captionlines * ConstMY),
             _ => (int)(columnWidth * 0.8),
         };
+
         protected override string GetCompareKey() => Internal;
+
         public override bool FilterMatch(string FilterText) => base.FilterMatch(FilterText) || Caption.ToUpper().Contains(FilterText.ToUpper()) || _filename.ToUpper().Contains(FilterText.ToUpper());
     }
 }

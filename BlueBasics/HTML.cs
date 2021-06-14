@@ -2,8 +2,10 @@
 using System.Drawing;
 
 namespace BlueBasics {
+
     public class HTML {
         private List<string> Code { get; set; }
+
         // https://www.w3schools.com/html/html_tables.asp
         public HTML(string title) => Code = new List<string>
             {
@@ -40,16 +42,22 @@ namespace BlueBasics {
                 "  </head>",
                 "<body>"
             };
+
         public void AddFoot() {
             Code.Add("  </body>");
             Code.Add("</html>");
         }
 
         public void AddCaption(string _Caption) => AddCaption(_Caption, 1);
+
         public void Add(string what) => Code.Add(what);
+
         public void RowBeginn() => Code.Add("      <tr>");
+
         public void RowEnd() => Code.Add("      </tr>");
+
         public void Save(string filename, bool executeafter) => Code.Save(filename, executeafter, System.Text.Encoding.UTF8);
+
         public void TableBeginn() {
             // da.Add("  <Font face=\"Arial\" Size=\"2\"><table border=\"1\" BORDERCOLOR=\"#aaaaaa\" cellspacing=\"0\" cellpadding=\"0\" align=\"left\">");
             Code.Add("<Font face=\"Arial\" Size=\"2\">");
@@ -59,11 +67,13 @@ namespace BlueBasics {
         }
 
         public void TableEnd() => Code.Add("    </table>");
+
         public void CellAdd(string content) => Code.Add("              <th>" + content + "</th>");
+
         public void CellAdd(string content, Color c) => Code.Add("        <th  bgcolor=\"#" + c.ToHTMLCode() + "\">" + content + "</th>");
+
         public void AddCaption(string _caption, int size) {
             switch (size) {
-
                 case 1:
                     Code.Add("  <h1>" + _caption + "</h1><br>");
                     break;
@@ -75,6 +85,7 @@ namespace BlueBasics {
                 case 3:
                     Code.Add("  <h3>" + _caption + "</h3><br>");
                     break;
+
                 default:
                     Develop.DebugPrint("Size nicht definert");
                     break;

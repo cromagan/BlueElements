@@ -1,21 +1,24 @@
 #region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Forms;
@@ -28,23 +31,29 @@ using System.Drawing.Imaging;
 using System.Runtime.CompilerServices;
 
 namespace BlueControls {
+
     /// <summary>
     /// Eine Klasse, die alle möglichen Arten von Screenshots zurückgibt.
     /// </summary>
     public sealed partial class ScreenShot {
+
         private ScreenShot() => InitializeComponent();
 
-        #region  +++ Deklarationen +++ 
+        #region +++ Deklarationen +++
+
         //private enSelectModus Modus = enSelectModus.Unbekannt;
         private bool MousesWasUp;
+
         private Bitmap ClipedArea;
         private Bitmap ScreenShotBMP;
         private strScreenData FeedBack;
         private string DrawText = "";
         private int DrawSize = 20;
         private List<strScreenData> AllS = new();
+
         [AccessedThroughProperty(nameof(Hook))]
         private SystemInputHook _Hook;
+
         private SystemInputHook Hook {
             [DebuggerNonUserCode]
             get => _Hook;
@@ -69,7 +78,8 @@ namespace BlueControls {
         private Point HookEndPoint;
         private bool HookFinish;
         private Overlay Rahm;
-        #endregion
+
+        #endregion +++ Deklarationen +++
 
         public static Bitmap GrabAllScreens() {
             do {
@@ -87,7 +97,9 @@ namespace BlueControls {
         }
 
         public static Bitmap GrabArea(Rectangle R) => R.Width < 2 || R.Height < 2 ? null : GrabAllScreens().Area(R);
+
         public static strScreenData GrabArea() => GrabArea(null, -1, -1);
+
         /// <summary>
         /// Erstellt einen Screenshot, dann kann der User einen Bereich wählen - und gibt diesen zurück.
         /// </summary>
@@ -210,12 +222,14 @@ namespace BlueControls {
             }
         }
 
-        #region  Form-Ereignisse 
+        #region Form-Ereignisse
+
         protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseDown(e);
             if (!MousesWasUp) { return; }
             FeedBack.Point1 = new Point(e.X, e.Y);
         }
+
         protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseUp(e);
             if (!MousesWasUp) {
@@ -232,6 +246,7 @@ namespace BlueControls {
             }
             Close();
         }
+
         protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseMove(e);
             if (e != null && e.Button == System.Windows.Forms.MouseButtons.None && !MousesWasUp) {
@@ -260,7 +275,8 @@ namespace BlueControls {
             }
             Refresh();
         }
-        #endregion
+
+        #endregion Form-Ereignisse
 
         private void PrintText(Graphics GR, System.Windows.Forms.MouseEventArgs e) {
             Brush bs = new SolidBrush(Color.FromArgb(150, 0, 0, 0));
@@ -271,6 +287,7 @@ namespace BlueControls {
             GR.FillRectangle(bs, 0, yPos - 5, Width, f.Height + 10);
             GR.DrawString(DrawText, fn, bf, 2, yPos + 2);
         }
+
         /// <summary>
         /// Vorbereitende Routine, die das Backgroundimage mit dem Screenshot füllt.
         /// </summary>

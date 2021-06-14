@@ -1,4 +1,5 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
+
 // Authors:
 // Christian Peter
 //
@@ -15,11 +16,15 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-#endregion
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using System;
 
 namespace BlueBasics {
+
     public static class modErgebnis {
+
         public static double? Ergebnis(string formel) {
             formel = formel.ToUpper();
             formel = formel.Replace(" ", string.Empty);
@@ -28,6 +33,7 @@ namespace BlueBasics {
             // Formel = Formel.Replace("RND()", "XND(0,1)");
             return ErgebnisCore(formel);
         }
+
         private static double? ErgebnisCore(string formel) {
             // var TMP = 0;
             formel = formel.DeKlammere(true, false, false, true);
@@ -140,10 +146,13 @@ namespace BlueBasics {
                 case "/":
                     if (w2 == 0) { return null; }
                     return w1 / w2;
+
                 case "*":
                     return w1 * w2;
+
                 case "-":
                     return w1 - w2;
+
                 case "+":
                     return w1 + w2;
                     // case ">":
@@ -170,6 +179,7 @@ namespace BlueBasics {
             }
             return null;
         }
+
         public static int LastMinusIndex(string formel) {
             if (!formel.Contains("-")) { return -1; }
             var LastMin = 1;

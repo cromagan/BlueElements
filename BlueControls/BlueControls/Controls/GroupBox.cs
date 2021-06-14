@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
@@ -25,31 +28,36 @@ using System.Drawing;
 using System.Windows.Forms;
 
 namespace BlueControls.Controls {
+
     //[Designer("System.Windows.Forms.Design.ParentControlDesigner,System.Design", typeof(IDesigner))]
     [ToolboxBitmap(typeof(System.Windows.Forms.GroupBox))]
     public partial class GroupBox : System.Windows.Forms.GroupBox, IUseMyBackColor {
 
         #region Constructor
+
         public GroupBox() : base() =>
             //// Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             //SetNotFocusable();
             //_MouseHighlight = false;
             SetStandardValues();
-        #endregion
 
+        #endregion Constructor
 
-        #region  Variablen 
+        #region Variablen
+
         //private string _Text = string.Empty;
         private enGroupBoxStyle _GroupBoxStyle = enGroupBoxStyle.Normal;
-        #endregion
 
+        #endregion Variablen
 
-        #region  Events 
+        #region Events
+
         //public new event EventHandler TextChanged;
-        #endregion
 
+        #endregion Events
 
-        #region  Properties 
+        #region Properties
+
         [DefaultValue(enGroupBoxStyle.Normal)]
         public enGroupBoxStyle GroupBoxStyle {
             get => _GroupBoxStyle;
@@ -60,6 +68,7 @@ namespace BlueControls.Controls {
                 Invalidate();
             }
         }
+
         //[DefaultValue(0)]
         //public new int TabIndex
         //{
@@ -99,23 +108,27 @@ namespace BlueControls.Controls {
         //        //OnTextChanged();
         //    }
         //}
-        #endregion
+
+        #endregion Properties
 
         protected override void OnParentChanged(System.EventArgs e) {
             base.OnParentChanged(e);
             SetStandardValues();
             ChildControls_RibbonBar();
         }
+
         protected override void OnControlAdded(ControlEventArgs e) {
             base.OnControlAdded(e);
             SetStandardValues();
             ChildControls_RibbonBar();
         }
+
         protected override void OnControlRemoved(ControlEventArgs e) {
             base.OnControlRemoved(e);
             SetStandardValues();
             ChildControls_RibbonBar();
         }
+
         protected override void OnDockChanged(System.EventArgs e) {
             base.OnDockChanged(e);
             SetStandardValues();
@@ -126,7 +139,6 @@ namespace BlueControls.Controls {
             var l = GenericControl.Typ(Parent);
             if (_GroupBoxStyle == enGroupBoxStyle.RibbonBar) { l = enPartentType.RibbonPage; }
             switch (l) {
-
                 case enPartentType.RibbonPage:
                     GroupBoxStyle = enGroupBoxStyle.RibbonBar;
                     BackColor = Skin.Color_Back(enDesign.RibbonBar_Body, enStates.Standard);
@@ -141,9 +153,11 @@ namespace BlueControls.Controls {
                     break;
             }
         }
+
         protected override void OnPaintBackground(PaintEventArgs pevent) {
             // base.OnPaintBackground(pevent);
         }
+
         protected override void OnPaint(PaintEventArgs e) {
             //      base.OnPaint(e);
             var state = enStates.Standard;
@@ -151,7 +165,6 @@ namespace BlueControls.Controls {
             Rectangle r = new(0, 0, Width, Height);
             e.Graphics.Clear(BackColor);
             switch (_GroupBoxStyle) {
-
                 case enGroupBoxStyle.RibbonBar:
                     Skin.Draw_Border(e.Graphics, enDesign.RibbonBar_Frame, state, r);
                     if (!string.IsNullOrEmpty(Text)) {
@@ -169,6 +182,7 @@ namespace BlueControls.Controls {
                         }
                     }
                     break;
+
                 default:
                     Skin.Draw_Back_Transparent(e.Graphics, DisplayRectangle, this);
                     break;
@@ -183,7 +197,6 @@ namespace BlueControls.Controls {
             if (Controls.Count == 0) { return; }
             foreach (Control thisControl in Controls) {
                 switch (thisControl) {
-
                     case Caption Caption:
                         if (Caption.TextAnzeigeVerhalten == enSteuerelementVerhalten.Steuerelement_Anpassen) { Caption.TextAnzeigeVerhalten = enSteuerelementVerhalten.Text_Abschneiden; }
                         thisControl.Top = ((int)(thisControl.Top / 22.0) * 22) + 2;

@@ -1,4 +1,5 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
+
 // Authors:
 // Christian Peter
 //
@@ -15,12 +16,17 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-#endregion
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using System.Collections.Generic;
 
 namespace BlueBasics.EventArgs {
+
     public class MultiUserFileStopWorkingEventArgs : System.EventArgs {
+
         public MultiUserFileStopWorkingEventArgs() => AllreadyStopped = new List<string>();
+
         public List<string> AllreadyStopped { get; }
     }
 }

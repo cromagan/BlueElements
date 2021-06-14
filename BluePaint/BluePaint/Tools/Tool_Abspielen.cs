@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2019 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueControls.Forms;
 using BluePaint.EventArgs;
@@ -24,10 +27,12 @@ using System.Drawing;
 using static BlueBasics.FileOperations;
 
 namespace BluePaint {
-    public partial class Tool_Abspielen : GenericTool   // BlueControls.Forms.Form// 
+
+    public partial class Tool_Abspielen : GenericTool   // BlueControls.Forms.Form//
     {
         private readonly List<string> _macro;
         private readonly List<GenericTool> _merker;
+
         public Tool_Abspielen(List<string> macro, List<GenericTool> merker) : base() {
             InitializeComponent();
             OnOverridePic(null);
@@ -36,6 +41,7 @@ namespace BluePaint {
         }
 
         public override void ToolFirstShown() => OnZoomFit();
+
         private void optNeuerName_Click(object sender, System.EventArgs e) {
         }
 
@@ -104,6 +110,7 @@ namespace BluePaint {
         }
 
         private void ThisTool_NeedCurrentPic(object sender, BitmapEventArgs e) => e.BMP = OnNeedCurrentPic();
+
         private void ThisTool_OverridePic(object sender, BitmapEventArgs e) => OnOverridePic(e.BMP);
     }
 }

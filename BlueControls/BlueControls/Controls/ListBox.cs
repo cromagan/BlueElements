@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -31,11 +34,13 @@ using System.ComponentModel;
 using System.Drawing;
 
 namespace BlueControls.Controls {
+
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("ItemClicked")]
     public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone {
 
         #region Constructor
+
         public ListBox() : base(true, false) {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
@@ -48,7 +53,8 @@ namespace BlueControls.Controls {
             Item.ItemRemoving += _Item_ItemRemoving;
             _Appearance = enBlueListBoxAppearance.Listbox;
         }
-        #endregion
+
+        #endregion Constructor
 
         private enBlueListBoxAppearance _Appearance; //Muss was gesetzt werden, sonst hat der Designer nachher einen Fehler
         private BasicListItem _MouseOverItem;
@@ -57,33 +63,45 @@ namespace BlueControls.Controls {
         private bool _FilterAllowed;
         private enAddType _AddAlloweds = enAddType.Text;
 
-        #region  Events 
+        #region Events
+
         public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
+
         public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
+
         public event EventHandler ItemCheckedChanged;
+
         public event EventHandler<ListEventArgs> ItemAdded;
+
         /// <summary>
         /// Wird vor jedem entfernen eines Items ausgelöst. Auch beim Initialisiern oder bei einem Clear.
-        /// Soll eine Benutzerinteraktion abgefragt werden, ist RemoveClicked besser. 
+        /// Soll eine Benutzerinteraktion abgefragt werden, ist RemoveClicked besser.
         /// </summary>
         public event EventHandler<ListEventArgs> ItemRemoving;
+
         /// <summary>
         /// Wird nach jedem entfernen eines Items ausgelöst. Auch beim Initialisiern oder bei einem Clear.
-        /// Soll eine Benutzerinteraktion abgefragt werden, ist RemoveClicked besser. 
+        /// Soll eine Benutzerinteraktion abgefragt werden, ist RemoveClicked besser.
         /// </summary>
         public event EventHandler ItemRemoved;
+
         public event EventHandler<BasicListItemEventArgs> ItemDoubleClick;
+
         public event EventHandler<BasicListItemEventArgs> ItemClicked;
+
         public event EventHandler AddClicked;
+
         /// <summary>
         /// Wird nur ausgelöst, wenn explicit der Button gedrückt wird.
         /// </summary>
         public event EventHandler<ListOfBasicListItemEventArgs> RemoveClicked;
+
         public event EventHandler ListOrItemChanged;
-        #endregion
 
+        #endregion Events
 
-        #region  Properties 
+        #region Properties
+
         [DefaultValue(enCheckBehavior.SingleSelection)]
         public enCheckBehavior CheckBehavior {
             get => Item.CheckBehavior;
@@ -153,7 +171,8 @@ namespace BlueControls.Controls {
                 CheckButtons();
             }
         }
-        #endregion
+
+        #endregion Properties
 
         protected override void OnVisibleChanged(System.EventArgs e) {
             CheckButtons();
@@ -186,6 +205,7 @@ namespace BlueControls.Controls {
                 }
             }
         }
+
         protected override void OnParentEnabledChanged(System.EventArgs e) {
             if (IsDisposed) { return; }
             Down.Invalidate();
@@ -198,6 +218,7 @@ namespace BlueControls.Controls {
             CheckButtons();
             base.OnEnabledChanged(e);
         }
+
         protected override void OnHandleCreated(System.EventArgs e) {
             base.OnHandleCreated(e);
             // Um den allerersten Check nicht zu verpassen
@@ -205,15 +226,17 @@ namespace BlueControls.Controls {
         }
 
         public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) => false;
+
         public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
+
         private BasicListItem MouseOverNode(int X, int Y) => ButtonsVisible() && Y >= Height - Plus.Height ? null : Item[X, (int)(Y + SliderY.Value)];
+
         protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseUp(e);
             if (!Enabled) { return; }
             var ND = MouseOverNode(e.X, e.Y);
             if (ND != null && !ND.Enabled) { return; }
             switch (e.Button) {
-
                 case System.Windows.Forms.MouseButtons.Left:
                     if (ND != null) {
                         if (Appearance is enBlueListBoxAppearance.Listbox or enBlueListBoxAppearance.Autofilter or enBlueListBoxAppearance.Gallery or enBlueListBoxAppearance.FileSystem) {
@@ -230,11 +253,13 @@ namespace BlueControls.Controls {
         }
 
         private void OnItemClicked(BasicListItemEventArgs e) => ItemClicked?.Invoke(this, e);
+
         protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseWheel(e);
             if (!SliderY.Visible) { return; }
             SliderY.DoMouseWheel(e);
         }
+
         protected override void OnDoubleClick(System.EventArgs e) {
             if (!Enabled) { return; }
             var ND = MouseOverNode(MousePos().X, MousePos().Y);
@@ -243,7 +268,9 @@ namespace BlueControls.Controls {
         }
 
         private void OnItemDoubleClick(BasicListItemEventArgs e) => ItemDoubleClick?.Invoke(this, e);
+
         private bool ButtonsVisible() => Plus.Visible || Minus.Visible || Up.Visible || Down.Visible || FilterTxt.Visible;
+
         protected override void DrawControl(Graphics gr, enStates state) {
             if (Item != null) { Item.Appearance = _Appearance; }
             var tmp = enDesign.ListBox;
@@ -299,11 +326,13 @@ namespace BlueControls.Controls {
             if (IsDisposed) { return; }
             Invalidate();
         }
+
         private void _Item_ListOrItemChanged(object sender, System.EventArgs e) {
             if (IsDisposed) { return; }
             Invalidate();
             OnListOrItemChanged();
         }
+
         protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseMove(e);
             var ND = MouseOverNode(MousePos().X, MousePos().Y);
@@ -313,6 +342,7 @@ namespace BlueControls.Controls {
                 DoQuickInfo();
             }
         }
+
         protected override void OnMouseLeave(System.EventArgs e) {
             base.OnMouseLeave(e);
             if (_MouseOverItem != null) {
@@ -320,6 +350,7 @@ namespace BlueControls.Controls {
                 Invalidate();
             }
         }
+
         public override string QuickInfoText {
             get {
                 var t1 = base.QuickInfoText;
@@ -334,13 +365,16 @@ namespace BlueControls.Controls {
                 }
             }
         }
+
         private void _Item_ItemCheckedChanged(object sender, System.EventArgs e) {
             if (IsDisposed) { return; }
             CheckButtons();
             Invalidate();
             OnItemCheckedChanged();
         }
+
         private void OnItemCheckedChanged() => ItemCheckedChanged?.Invoke(this, System.EventArgs.Empty);
+
         //private void SwapItems(BasicListItem Nr1, BasicListItem Nr2)
         //{
         //    Item.Swap(ref Nr1, ref Nr2);
@@ -360,6 +394,7 @@ namespace BlueControls.Controls {
                 }
             }
         }
+
         private void Down_Click(object sender, System.EventArgs e) {
             var LN = -1;
             for (var z = Item.Count - 1; z >= 0; z--) {
@@ -374,6 +409,7 @@ namespace BlueControls.Controls {
                 }
             }
         }
+
         private void Minus_Click(object sender, System.EventArgs e) {
             OnRemoveClicked(new ListOfBasicListItemEventArgs(Item.Checked()));
             foreach (var ThisItem in Item.Checked()) {
@@ -381,6 +417,7 @@ namespace BlueControls.Controls {
             }
             CheckButtons();
         }
+
         private void OnRemoveClicked(ListOfBasicListItemEventArgs e) => RemoveClicked?.Invoke(this, e);
 
         public BasicListItem Add_FromFileSystem() {
@@ -400,6 +437,7 @@ namespace BlueControls.Controls {
             var rück = InputBoxListBoxStyle.Show("Bitte wählen sie einen Wert:", Suggestions, enAddType.None, true);
             return rück == null || rück.Count == 0 ? null : Add_Text(rück[0]);
         }
+
         public TextListItem Add_Text(string Val) {
             if (string.IsNullOrEmpty(Val)) { return null; }
             foreach (var thisItem in Item) {
@@ -409,14 +447,15 @@ namespace BlueControls.Controls {
             i.Checked = true;
             return i;
         }
+
         public TextListItem Add_Text() {
             var Val = InputBoxComboStyle.Show("Bitte geben sie einen Wert ein:", Suggestions, true);
             return Add_Text(Val);
         }
+
         private void Plus_Click(object sender, System.EventArgs e) {
             OnAddClicked();
             switch (_AddAlloweds) {
-
                 case enAddType.UserDef:
                     break;
 
@@ -434,40 +473,54 @@ namespace BlueControls.Controls {
                 case enAddType.BinarysFromFileSystem:
                     Add_FromFileSystem();
                     break;
+
                 default:
                     Develop.DebugPrint(_AddAlloweds);
                     break;
             }
             CheckButtons();
         }
+
         private void OnAddClicked() => AddClicked?.Invoke(this, System.EventArgs.Empty);
+
         public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) => HotItem = MouseOverNode(e.X, e.Y);
+
         public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
+
         public new void Focus() {
             if (Focused()) { return; }
             base.Focus();
         }
+
         public new bool Focused() => base.Focused || Plus.Focused || Minus.Focused || Up.Focused || Down.Focused || SliderY.Focused() || FilterCap.Focused || FilterTxt.Focused();
+
         private void _Item_ItemAdded(object sender, ListEventArgs e) {
             if (IsDisposed) { return; }
             //Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
             Invalidate();
             OnItemAdded(e);
         }
+
         protected void OnItemAdded(ListEventArgs e) => ItemAdded?.Invoke(this, e);
+
         protected void OnItemRemoved(System.EventArgs e) => ItemRemoved?.Invoke(this, e);
+
         protected void OnItemRemoving(ListEventArgs e) => ItemRemoving?.Invoke(this, e);
+
         private void _Item_ItemRemoving(object sender, ListEventArgs e) {
             if (IsDisposed) { return; }
             Invalidate();
             OnItemRemoving(e);
         }
+
         private void _Item_ItemRemoved(object sender, System.EventArgs e) {
             if (IsDisposed) { return; }
             Invalidate();
             OnItemRemoved(e);
         }
+
         private void FilterTxt_TextChanged(object sender, System.EventArgs e) => Invalidate();
+
         public void OnListOrItemChanged() => ListOrItemChanged?.Invoke(this, System.EventArgs.Empty);
     }
 }

@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -34,14 +37,17 @@ using static BlueBasics.FileOperations;
 using static BlueBasics.modConverter;
 
 namespace BlueControls.BlueDatabaseDialogs {
-    public partial class tabAdministration : TabPage // System.Windows.Forms.UserControl // 
+
+    public partial class tabAdministration : TabPage // System.Windows.Forms.UserControl //
     {
         private Table _TableView;
         private Database _originalDB;
+
         public tabAdministration() : base() {
             InitializeComponent();
             Check_OrderButtons();
         }
+
         [DefaultValue((Table)null)]
         public Table Table {
             get => _TableView;
@@ -61,11 +67,14 @@ namespace BlueControls.BlueDatabaseDialogs {
                 }
             }
         }
+
         private void TableView_EnabledChanged(object sender, System.EventArgs e) => Check_OrderButtons();
+
         private void TableView_DatabaseChanged(object sender, System.EventArgs e) {
             ChangeDatabase(_TableView.Database);
             Check_OrderButtons();
         }
+
         public static void CheckDatabase(object sender, LoadedEventArgs e) {
             var _database = (Database)sender;
             if (_database != null && !_database.ReadOnly) {
@@ -83,6 +92,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 }
             }
         }
+
         private void ChangeDatabase(Database database) {
             if (_originalDB != null) {
                 _originalDB.Disposing -= _originalDB_Disposing;
@@ -92,7 +102,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             CheckDatabase(database, null);
             Check_OrderButtons();
         }
+
         private void _originalDB_Disposing(object sender, System.EventArgs e) => ChangeDatabase(null);
+
         public static void OpenColumnEditor(ColumnItem column, RowItem Row, Table tableview) {
             if (column == null) { return; }
             if (Row == null) {
@@ -102,7 +114,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             ColumnItem column2 = null;
             var PosError = false;
             switch (column.Format) {
-
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                     var Txt = Row.CellGetString(column);
                     if (int.TryParse(Txt, out var ColKey)) {
@@ -126,12 +137,15 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
             OpenColumnEditor(column, tableview);
         }
+
         public static void OpenColumnEditor(ColumnItem column, Table tableview) {
             using ColumnEditor w = new(column, tableview);
             w.ShowDialog();
             column.Invalidate_ColumAndContent();
         }
+
         private void btnSpaltenUebersicht_Click(object sender, System.EventArgs e) => _TableView.Database.Column.GenerateOverView();
+
         private void Check_OrderButtons() {
             if (InvokeRequired) {
                 Invoke(new Action(() => Check_OrderButtons()));
@@ -150,6 +164,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             grpTabellenAnsicht.Enabled = enTabellenAnsicht;
             Enabled = true;
         }
+
         /// <summary>
         /// Löst das DatabaseLoadedEvengt aus, weil es fast einem Neuladen gleichkommt.
         /// </summary>
@@ -161,11 +176,13 @@ namespace BlueControls.BlueDatabaseDialogs {
             w.ShowDialog();
             // DB.OnLoaded(new LoadedEventArgs(true));
         }
+
         private void btnLayouts_Click(object sender, System.EventArgs e) {
             Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
             if (_TableView.Database == null) { return; }
             OpenLayoutEditor(_TableView.Database, string.Empty);
         }
+
         public static void OpenLayoutEditor(Database DB, string LayoutToOpen) {
             var x = DB.ErrorReason(enErrorReason.EditNormaly);
             if (!string.IsNullOrEmpty(x)) {
@@ -177,8 +194,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (!string.IsNullOrEmpty(LayoutToOpen)) { w.LoadLayout(LayoutToOpen); }
             w.ShowDialog();
         }
+
         private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => OpenDatabaseHeadEditor(_TableView.Database);
+
         private void btnClipboardImport_Click(object sender, System.EventArgs e) => _TableView.ImportClipboard();
+
         private void btnVorherigeVersion_Click(object sender, System.EventArgs e) {
             btnVorherigeVersion.Enabled = false;
             if (_originalDB != null && _TableView.Database != _originalDB) {
@@ -211,6 +231,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             btnVorherigeVersion.Text = "zurück";
             btnVorherigeVersion.Enabled = true;
         }
+
         public static ItemCollectionList Vorgängervsersionen(Database db) {
             List<string> Zusatz = new();
             ItemCollectionList L = new();
@@ -234,16 +255,19 @@ namespace BlueControls.BlueDatabaseDialogs {
             L.Sort();
             return L;
         }
+
         private void btnAdminMenu_Click(object sender, System.EventArgs e) {
             if (_TableView == null) { return; }
             AdminMenu adm = new(_TableView);
             adm.Show();
             adm.BringToFront();
         }
+
         private void btnDatenüberprüfung_Click(object sender, System.EventArgs e) {
             if (_TableView.Database == null || !_TableView.Database.IsAdministrator()) { return; }
             _TableView.Database.Row.DoAutomatic(_TableView.Filter, true, _TableView.PinnedRows, "manual check");
         }
+
         private void btnZeileLöschen_Click(object sender, System.EventArgs e) {
             if (!_TableView.Database.IsAdministrator()) { return; }
             var m = MessageBox.Show("Angezeigte Zeilen löschen?", enImageCode.Warnung, "Ja", "Nein");

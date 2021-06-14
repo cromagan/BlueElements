@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -25,9 +28,11 @@ using System.Collections.Generic;
 using System.Drawing;
 
 namespace BlueControls.ItemCollection {
+
     public abstract class FormPadItemRectangle : BasicPadItem {
 
-        #region  Variablen-Deklarationen 
+        #region Variablen-Deklarationen
+
         internal PointM p_LO;
         internal PointM p_RO;
         internal PointM p_RU;
@@ -37,6 +42,7 @@ namespace BlueControls.ItemCollection {
         internal PointM p_L;
         internal PointM p_R;
         private int _drehwinkel = 0;
+
         //private bool _größe_fixiert = false;
         public int Drehwinkel {
             get => _drehwinkel;
@@ -46,14 +52,13 @@ namespace BlueControls.ItemCollection {
                 OnChanged();
             }
         }
-        #endregion
+
+        #endregion Variablen-Deklarationen
 
 
-        #region  Event-Deklarationen + Delegaten 
-        #endregion
 
+        #region Construktor
 
-        #region  Construktor 
         public FormPadItemRectangle(ItemCollectionPad parent, string internalname) : base(parent, internalname) {
             p_LO = new PointM(this, "LO", 0, 0);
             p_RO = new PointM(this, "RO", 0, 0);
@@ -75,7 +80,8 @@ namespace BlueControls.ItemCollection {
             PointsForSuccesfullyMove.Add(p_RU);
             Drehwinkel = 0;
         }
-        #endregion
+
+        #endregion Construktor
 
         public override List<FlexiControl> GetStyleOptions() {
             List<FlexiControl> l = new()
@@ -87,6 +93,7 @@ namespace BlueControls.ItemCollection {
             l.AddRange(base.GetStyleOptions());
             return l;
         }
+
         public void SetCoordinates(RectangleM r, bool overrideFixedSize) {
             if (!overrideFixedSize) {
                 var vr = r.PointOf(enAlignment.Horizontal_Vertical_Center);
@@ -98,8 +105,10 @@ namespace BlueControls.ItemCollection {
                 p_RU.SetTo(r.PointOf(enAlignment.Bottom_Right));
             }
         }
+
         protected override RectangleM CalculateUsedArea() => p_LO == null || p_RU == null ? new RectangleM()
 : new RectangleM(Math.Min(p_LO.X, p_RU.X), Math.Min(p_LO.Y, p_RU.Y), Math.Abs(p_RU.X - p_LO.X), Math.Abs(p_RU.Y - p_LO.Y));
+
         public override void PointMoved(PointM point) {
             //PointM Second = null;
             var x = 0m;
@@ -155,24 +164,28 @@ namespace BlueControls.ItemCollection {
             p_O.X = p_LO.X + ((p_RO.X - p_LO.X) / 2);
             p_U.X = p_O.X;
         }
+
         public override bool ParseThis(string tag, string value) {
             if (base.ParseThis(tag, value)) { return true; }
             switch (tag) {
                 case "fixsize": // TODO: Entfernt am 24.05.2021
                     //_größe_fixiert = value.FromPlusMinus();
                     return true;
+
                 case "rotation":
                     _drehwinkel = int.Parse(value);
                     return true;
             }
             return false;
         }
+
         public override string ToString() {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
             if (Drehwinkel != 0) { t = t + "Rotation=" + Drehwinkel + ", "; }
             return t.Trim(", ") + "}";
         }
+
         protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
             try {
                 if (!ForPrinting) {
@@ -187,6 +200,7 @@ namespace BlueControls.ItemCollection {
                 }
             } catch { }
         }
+
         //internal PointM PointOf(enAlignment P)
         //{
         //    switch (P)

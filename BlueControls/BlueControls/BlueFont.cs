@@ -1,21 +1,24 @@
 #region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -27,9 +30,11 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 
 namespace BlueControls {
+
     public sealed class BlueFont : IReadableTextWithChanging {
 
-        #region  Variablen-Deklarationen 
+        #region Variablen-Deklarationen
+
         private string _Code;
         private Font _Font;
         private Font _FontOL;
@@ -46,15 +51,17 @@ namespace BlueControls {
         private QuickImage NameInStyle_sym;
         private BitmapExt SampleText_sym;
         private QuickImage SymbolOfLine_sym;
-        #endregion
 
+        #endregion Variablen-Deklarationen
 
-        #region  Event-Deklarationen + Delegaten 
+        #region Event-Deklarationen + Delegaten
+
         public event EventHandler Changed;
-        #endregion
 
+        #endregion Event-Deklarationen + Delegaten
 
-        #region  Construktor + Initialize 
+        #region Construktor + Initialize
+
         private BlueFont() {
             _Code = "";
             _Font = null;
@@ -83,10 +90,11 @@ namespace BlueControls {
         }
 
         private BlueFont(string codeToParse) : this() => Parse(codeToParse);
-        #endregion
 
+        #endregion Construktor + Initialize
 
-        #region  Properties 
+        #region Properties
+
         public Font Font(decimal Zoom) {
             if (Math.Abs(Zoom - 1) < 0.001m && SizeOK(_Font.Size)) { return _Font; }
             var GR = _FontOL.Size * (float)Zoom / Skin.Scale;
@@ -94,6 +102,7 @@ namespace BlueControls {
         }
 
         public Font Font() => SizeOK(_Font.Size) ? _Font : new Font("Arial", _FontOL.Size, _Font.Style, _Font.Unit);
+
         public Font FontWithoutLines(float Zoom) {
             if (Math.Abs(Zoom - 1) < 0.001 && SizeOK(_FontOL.Size)) { return _FontOL; }
             var GR = _FontOL.Size * Zoom / Skin.Scale;
@@ -101,6 +110,7 @@ namespace BlueControls {
         }
 
         public Font FontWithoutLinesForCapitals(float Zoom) => new(_FontOL.Name, _FontOL.Size * Zoom * 0.8F / Skin.Scale, _FontOL.Style, _FontOL.Unit);
+
         public bool Italic { get; private set; }
         public bool Bold { get; private set; }
         public bool Underline { get; private set; }
@@ -111,15 +121,22 @@ namespace BlueControls {
         public bool StrikeOut { get; private set; }
         public float FontSize { get; private set; }
         public string FontName { get; private set; }
+
         public Pen Pen(float czoom) => Math.Abs(czoom - 1) < 0.001 ? _Pen : GeneratePen(czoom);
+
         public Pen Pen(decimal czoom) => Math.Abs(czoom - 1) < 0.001m ? _Pen : GeneratePen((float)czoom);
+
         public Brush Brush_Color_Main { get; private set; }
         public Brush Brush_Color_Outline { get; private set; }
         public Color Color_Main { get; private set; }
         public Color Color_Outline { get; private set; }
+
         public SizeF CharSize(float DummyWidth) => new(DummyWidth, _Zeilenabstand);
+
         internal float Oberlänge(float Zoom) => _Oberlängex * Zoom;
+
         internal float KapitälchenPlus(float Zoom) => _KapitälchenPlus * Zoom;
+
         internal SizeF CharSize(char vChar) {
             if (vChar <= _CharSize.GetUpperBound(0)) {
                 if (_CharSize[vChar].Height <= 0) {
@@ -129,7 +146,8 @@ namespace BlueControls {
             }
             return Compute_Size(vChar);
         }
-        #endregion
+
+        #endregion Properties
 
         private bool SizeOK(float S) {
             // Windwos mach seltsamerweiße bei manchen Schriften einen Fehler. Seit dem neuen Firmen-Windows-Update vom 08.06.2015
@@ -144,6 +162,7 @@ namespace BlueControls {
                 return false;
             }
         }
+
         internal SizeF Compute_Size(char vChar) {
             if (vChar is >= (char)0 and <= (char)31) { return new SizeF(0, _Zeilenabstand); }
             if (vChar >= (int)enASCIIKey.ImageStart) {
@@ -168,7 +187,6 @@ namespace BlueControls {
             ToParse = ToParse.Replace(",", ", "); // TODO: Entferen wenn inv bei den exports repariert wurde
             foreach (var pair in ToParse.GetAllTags()) {
                 switch (pair.Key) {
-
                     case "name":
 
                     case "fontname":
@@ -227,6 +245,7 @@ namespace BlueControls {
                     case "onlyupper":
                         OnlyUpper = true;
                         break;
+
                     default:
                         Develop.DebugPrint(enFehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
                         break;
@@ -273,7 +292,9 @@ namespace BlueControls {
             Brush_Color_Outline = new SolidBrush(Color_Outline);
             _Code = ToString(FontName, FontSize, Bold, Italic, Underline, StrikeOut, Outline, Color_Main.ToHTMLCode(), Color_Outline.ToHTMLCode(), Kapitälchen, OnlyUpper, OnlyLower);
         }
+
         internal BlueFont Scale(double fontScale) => Math.Abs(1 - fontScale) < 0.01 ? this : Get(FontName, (float)(FontSize * fontScale), Bold, Italic, Underline, StrikeOut, Outline, Color_Main, Color_Outline, Kapitälchen, OnlyUpper, OnlyLower);
+
         private Pen GeneratePen(float cZoom) {
             var linDi = _Zeilenabstand / 10 * cZoom;
             if (Bold) { linDi *= 1.5F; }
@@ -281,6 +302,7 @@ namespace BlueControls {
         }
 
         public new string ToString() => _Code;
+
         private static string ToString(string FontName, float FontSize, bool Bold, bool Italic, bool Underline, bool Strikeout, bool OutLine, string Color_Main, string Color_Outline, bool vKapitälchen, bool vonlyuppe, bool vonlylower) {
             var c = "{Name=" + FontName + ", Size=" + FontSize.ToString().ToNonCritical();
             if (Bold) { c += ", Bold=True"; }
@@ -296,8 +318,11 @@ namespace BlueControls {
         }
 
         public static BlueFont Get(FontFamily vFont, float Size) => Get(vFont.Name, Size, false, false, false, false, false, "000000", "FFFFFF", false, false, false);
+
         public static BlueFont Get(string FontName, float FontSize, bool Bold, bool Italic, bool Underline, bool Strikeout, bool OutLine, string Color_Main, string Color_Outline, bool Kapitälchen, bool OnlyUpper, bool OnlyLower) => Get(ToString(FontName, FontSize, Bold, Italic, Underline, Strikeout, OutLine, Color_Main, Color_Outline, Kapitälchen, OnlyUpper, OnlyLower));
+
         public static BlueFont Get(string FontName, float FontSize, bool Bold, bool Italic, bool Underline, bool Strikeout, bool OutLine, Color Color_Main, Color Color_Outline, bool Kapitälchen, bool OnlyUpper, bool OnlyLower) => Get(FontName, FontSize, Bold, Italic, Underline, Strikeout, OutLine, Color_Main.ToHTMLCode(), Color_Outline.ToHTMLCode(), Kapitälchen, OnlyUpper, OnlyLower);
+
         public static BlueFont Get(string Code) {
             if (string.IsNullOrEmpty(Code)) { return null; }
             if (!Code.Contains("{")) { Code = "{Name=Arial, Size=10, Color=ff0000}"; }
@@ -399,7 +424,9 @@ namespace BlueControls {
         }
 
         public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
+
         public SizeF MeasureString(string s) => MeasureString(s, _FontOL);
+
         public static SizeF MeasureString(string s, Font f) {
             using var g = Graphics.FromHwnd(IntPtr.Zero);
             return g.MeasureString(s, f);

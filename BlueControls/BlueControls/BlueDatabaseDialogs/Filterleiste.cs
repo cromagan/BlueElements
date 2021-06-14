@@ -12,10 +12,11 @@ using System.ComponentModel;
 using System.Drawing;
 
 namespace BlueControls.BlueDatabaseDialogs {
+
     public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserControl //
     {
-
         #region Variablen
+
         private Table _TableView;
         private enOrientation _orientation = enOrientation.Waagerecht;
         private enFilterTypesToShow _Filtertypes = enFilterTypesToShow.DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter;
@@ -25,18 +26,20 @@ namespace BlueControls.BlueDatabaseDialogs {
         private ColumnViewCollection _ähnliche = null;
         private bool _AutoPin = false;
         private string _LastLooked = string.Empty;
-        #endregion
 
+        #endregion Variablen
 
         #region Konstruktor
+
         public Filterleiste() {
             InitializeComponent();
             FillFilters();
         }
-        #endregion
 
+        #endregion Konstruktor
 
         #region Properties
+
         [DefaultValue(enOrientation.Waagerecht)]
         public enOrientation Orientation {
             get => _orientation;
@@ -45,6 +48,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 _orientation = value;
             }
         }
+
         [DefaultValue(enFilterTypesToShow.DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter)]
         public enFilterTypesToShow Filtertypes {
             get => _Filtertypes;
@@ -53,6 +57,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 _Filtertypes = value;
             }
         }
+
         /// <summary>
         /// Welche Knöpfe angezeigt werden sollen. Muss der Name einer Spaltenanordnung sein.
         /// </summary>
@@ -64,6 +69,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 _AnsichtName = value;
             }
         }
+
         /// <summary>
         /// Wenn "Ähnliche" als Knopd vorhanden sein soll, muss hier der Name einer Spaltenanordnung stehen
         /// </summary>
@@ -76,6 +82,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 GetÄhnlich();
             }
         }
+
         [DefaultValue(false)]
         public bool AutoPin {
             get => _AutoPin;
@@ -84,6 +91,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 _AutoPin = value;
             }
         }
+
         [DefaultValue((Table)null)]
         public Table Table {
             get => _TableView;
@@ -112,7 +120,8 @@ namespace BlueControls.BlueDatabaseDialogs {
                 }
             }
         }
-        #endregion
+
+        #endregion Properties
 
         private void GetÄhnlich() {
             _ähnliche = null;
@@ -125,6 +134,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
             DoÄhnlich();
         }
+
         private void DoÄhnlich() {
             //_TableView.Database.Column.Count == 0 Ist eine nigelnagelneue Datenbank
             if (_TableView == null || _TableView.Database == null || _TableView.Database.Column.Count == 0) { return; }
@@ -148,8 +158,11 @@ namespace BlueControls.BlueDatabaseDialogs {
                 }
             }
         }
+
         private void _TableView_ViewChanged(object sender, System.EventArgs e) => FillFilters();
+
         private void _TableView_PinnedOrFilterChanged(object sender, System.EventArgs e) => FillFilters();
+
         internal void FillFilters() {
             if (InvokeRequired) {
                 Invoke(new Action(() => FillFilters()));
@@ -163,10 +176,12 @@ namespace BlueControls.BlueDatabaseDialogs {
             btnPinZurück.Enabled = _TableView != null && _TableView.Database != null && _TableView.PinnedRows != null && _TableView.PinnedRows.Count > 0;
 
             #region ZeilenFilter befüllen
+
             txbZeilenFilter.Text = _TableView != null && _TableView.Database != null && _TableView.Filter.IsRowFilterActiv()
                 ? _TableView.Filter.RowFilterText
                 : string.Empty;
-            #endregion
+
+            #endregion ZeilenFilter befüllen
 
             var toppos = 0;
             var leftpos = 0;
@@ -181,6 +196,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             var afterBreakAddY = -1;
 
             #region Variablen für Waagerecht / Senkrecht bestimmen
+
             if (_orientation == enOrientation.Waagerecht) {
                 toppos = btnAlleFilterAus.Top;
                 beginnx = btnPinZurück.Right + (Skin.Padding * 3);
@@ -200,10 +216,11 @@ namespace BlueControls.BlueDatabaseDialogs {
                 down = txbZeilenFilter.Height + Skin.Padding;
                 showPic = _TableView != null && _TableView.Database != null && !string.IsNullOrEmpty(_TableView.Database.FilterImagePfad);
             }
-            #endregion
 
+            #endregion Variablen für Waagerecht / Senkrecht bestimmen
 
-            #region  Bild bei Bedarf laden und Visble richtig setze
+            #region Bild bei Bedarf laden und Visble richtig setze
+
             if (showPic) {
                 pic.Height = (int)Math.Min(pic.Width * 0.7, Height * 0.6);
                 var filename = _TableView.Database.FilterImagePfad;
@@ -222,18 +239,21 @@ namespace BlueControls.BlueDatabaseDialogs {
             } else {
                 pic.Visible = false;
             }
-            #endregion
+
+            #endregion Bild bei Bedarf laden und Visble richtig setze
 
             List<FlexiControlForFilter> flexsToDelete = new();
 
             #region Vorhandene Flexis ermitteln
+
             foreach (var ThisControl in Controls) {
                 if (ThisControl is FlexiControlForFilter flx) { flexsToDelete.Add(flx); }
             }
-            #endregion
 
+            #endregion Vorhandene Flexis ermitteln
 
             #region Neue Flexis erstellen / updaten
+
             if (_TableView != null && _TableView.Database != null && _TableView.Filter != null) {
                 List<ColumnItem> columSort = new();
                 ColumnViewCollection orderArrangement = null;
@@ -245,6 +265,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 if (orderArrangement is null) { orderArrangement = _TableView?.CurrentArrangement; }
 
                 #region Reihenfolge der Spalten bestimmen
+
                 if (orderArrangement != null) {
                     foreach (var thisclsVitem in orderArrangement) {
                         columSort.AddIfNotExists(thisclsVitem.Column);
@@ -258,7 +279,8 @@ namespace BlueControls.BlueDatabaseDialogs {
                 foreach (var thisColumn in _TableView.Database.Column) {
                     columSort.AddIfNotExists(thisColumn);
                 }
-                #endregion
+
+                #endregion Reihenfolge der Spalten bestimmen
 
                 foreach (var thisColumn in columSort) {
                     var ShowMe = false;
@@ -267,11 +289,13 @@ namespace BlueControls.BlueDatabaseDialogs {
                     var FilterItem = _TableView.Filter[thisColumn];
 
                     #region Sichtbarkeit des Filterelemts bestimmen
+
                     if (thisColumn.AutoFilterSymbolPossible()) {
                         if (ViewItemOrder != null && _Filtertypes.HasFlag(enFilterTypesToShow.NachDefinierterAnsicht)) { ShowMe = true; }
                         if (ViewItemCurrent != null && FilterItem != null && _Filtertypes.HasFlag(enFilterTypesToShow.AktuelleAnsicht_AktiveFilter)) { ShowMe = true; }
                     }
-                    #endregion
+
+                    #endregion Sichtbarkeit des Filterelemts bestimmen
 
                     if (FilterItem == null && ShowMe) {
                         // Dummy-Filter, nicht in der Collection
@@ -327,10 +351,11 @@ namespace BlueControls.BlueDatabaseDialogs {
                     }
                 }
             }
-            #endregion
 
+            #endregion Neue Flexis erstellen / updaten
 
-            #region  Unnötige Flexis löschen
+            #region Unnötige Flexis löschen
+
             foreach (var thisFlexi in flexsToDelete) {
                 thisFlexi.ValueChanged -= Flx_ValueChanged;
                 thisFlexi.ButtonClicked -= Flx_ButtonClicked;
@@ -339,10 +364,12 @@ namespace BlueControls.BlueDatabaseDialogs {
                 Controls.Remove(thisFlexi);
                 thisFlexi.Dispose();
             }
-            #endregion
+
+            #endregion Unnötige Flexis löschen
 
             _isFilling = false;
         }
+
         private void Flx_ButtonClicked(object sender, System.EventArgs e) {
             var f = (FlexiControlForFilter)sender;
             if (f.CaptionPosition == enÜberschriftAnordnung.ohne) {
@@ -358,12 +385,14 @@ namespace BlueControls.BlueDatabaseDialogs {
             autofilter.FilterComand += AutoFilter_FilterComand;
             Develop.Debugprint_BackgroundThread();
         }
+
         private void AutoFilter_FilterComand(object sender, FilterComandEventArgs e) {
             _TableView.Filter.Remove(e.Column);
             if (e.Comand != "Filter") { return; }
             //e.Filter.Herkunft = "Filterleiste";
             _TableView.Filter.Add(e.Filter);
         }
+
         private void Flx_ValueChanged(object sender, System.EventArgs e) {
             if (_isFilling) { return; }
             if (sender is FlexiControlForFilter flx) {
@@ -394,6 +423,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 }
             }
         }
+
         private FlexiControlForFilter FlexiItemOf(FilterItem filter) {
             foreach (var ThisControl in Controls) {
                 if (ThisControl is FlexiControlForFilter flx) {
@@ -402,15 +432,18 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
             return null;
         }
+
         private void _TableView_DatabaseChanged(object sender, System.EventArgs e) {
             GetÄhnlich();
             FillFilters();
         }
+
         private void _TableView_EnabledChanged(object sender, System.EventArgs e) {
             var HasDB = _TableView != null && _TableView.Database != null;
             txbZeilenFilter.Enabled = HasDB && LanguageTool.Translation == null && Enabled && _TableView.Enabled;
             btnAlleFilterAus.Enabled = HasDB && Enabled && _TableView.Enabled;
         }
+
         private void txbZeilenFilter_TextChanged(object sender, System.EventArgs e) {
             var NeuerT = txbZeilenFilter.Text.TrimStart();
             btnTextLöschen.Enabled = !string.IsNullOrEmpty(NeuerT);
@@ -425,7 +458,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             Filter_ZeilenFilterSetzen();
             DoÄhnlich();
         }
+
         private void txbZeilenFilter_Enter(object sender, System.EventArgs e) => Filter_ZeilenFilterSetzen();
+
         private void Filter_ZeilenFilterSetzen() {
             if (_TableView == null || _TableView.Database == null) {
                 DoÄhnlich();
@@ -442,6 +477,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             _TableView.Filter.RowFilterText = newF;
             DoÄhnlich();
         }
+
         private void btnAlleFilterAus_Click(object sender, System.EventArgs e) {
             _LastLooked = string.Empty;
             if (_TableView.Database != null) {
@@ -449,17 +485,22 @@ namespace BlueControls.BlueDatabaseDialogs {
                 //if (_AutoPin) { _TableView.Pin(null); }
             }
         }
+
         private void btnTextLöschen_Click(object sender, System.EventArgs e) => txbZeilenFilter.Text = string.Empty;
+
         public bool Textbox_hasFocus() => txbZeilenFilter.Focused();
+
         private void btnPinZurück_Click(object sender, System.EventArgs e) {
             _LastLooked = string.Empty;
             if (_TableView == null) { return; }
             _TableView.Pin(null);
         }
+
         private void btnPin_Click(object sender, System.EventArgs e) {
             if (_TableView == null) { return; }
             _TableView.Pin(_TableView.SortedRows());
         }
+
         private void btnAdmin_Click(object sender, System.EventArgs e) {
             BlueBasics.MultiUserFile.clsMultiUserFile.SaveAll(false);
             frmTableView x = new(_TableView.Database, false, true);
@@ -467,9 +508,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             x.Dispose();
             BlueBasics.MultiUserFile.clsMultiUserFile.SaveAll(false);
         }
+
         private void Filterleiste_SizeChanged(object sender, System.EventArgs e) {
             if (pic.Visible || _orientation == enOrientation.Waagerecht) { FillFilters(); }
         }
+
         private void btnÄhnliche_Click(object sender, System.EventArgs e) {
             List<FilterItem> fl = new() { new FilterItem(_TableView.Database.Column[0], enFilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text) };
             var r = _TableView.Database.Row.CalculateSortedRows(fl, null, null);

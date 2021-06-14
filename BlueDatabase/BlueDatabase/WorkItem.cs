@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -24,19 +27,24 @@ using System;
 using static BlueBasics.modConverter;
 
 namespace BlueDatabase {
+
     public class WorkItem : IParseable, ICompareKey {
+
         public event EventHandler Changed;
 
-        #region  Variablen-Deklarationen 
+        #region Variablen-Deklarationen
+
         private enItemState _state;
         private int _colKey;
         private int _rowKey;
         private string _changedTo;
-        #endregion
 
+        #endregion Variablen-Deklarationen
 
         #region Properties
+
         public bool IsParsing { get; private set; }
+
         internal enItemState State {
             get => _state;
             set {
@@ -48,6 +56,7 @@ namespace BlueDatabase {
 
         public string CellKey => CellCollection.KeyOfCell(ColKey, RowKey);
         public enDatabaseDataType Comand { get; private set; }
+
         public int ColKey {
             get => _colKey;
             set {
@@ -69,6 +78,7 @@ namespace BlueDatabase {
         public DateTime Date { get; private set; }
         public string User { get; private set; }
         public string PreviousValue { get; private set; }
+
         public string ChangedTo {
             get => _changedTo;
             set {
@@ -79,7 +89,8 @@ namespace BlueDatabase {
         }
 
         public bool HistorischRelevant => State is enItemState.Pending or enItemState.Undo;
-        #endregion
+
+        #endregion Properties
 
         public WorkItem(enDatabaseDataType Comand, int ColKey, int RowKey, string PreviousValue, string ChangedTo, string User) {
             _state = enItemState.Pending;
@@ -93,11 +104,11 @@ namespace BlueDatabase {
         }
 
         public WorkItem(string s) => Parse(s);
+
         public void Parse(string ToParse) {
             IsParsing = true;
             foreach (var pair in ToParse.GetAllTags()) {
                 switch (pair.Key) {
-
                     case "st":
                         _state = (enItemState)int.Parse(pair.Value);
                         break;
@@ -166,6 +177,7 @@ namespace BlueDatabase {
                     case "ct":
                         _changedTo = pair.Value.FromNonCritical();
                         break;
+
                     default:
                         Develop.DebugPrint(enFehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
                         break;
@@ -183,6 +195,7 @@ namespace BlueDatabase {
 ", PV=" + PreviousValue.ToNonCritical() +
 ", CT=" + _changedTo.ToNonCritical() +
 "}";// ", G=" + Group.ToNonCritical() +
+
         public string UndoTextTableMouseOver() {
             var a = "'" + PreviousValue + "'";
             var n = "'" + ChangedTo + "'";
@@ -192,6 +205,7 @@ namespace BlueDatabase {
         }
 
         public string CompareKey() => Date.ToString(Constants.Format_Date) + ColKey;
+
         public void OnChanged() {
             if (IsParsing) {
                 Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!");
@@ -199,6 +213,7 @@ namespace BlueDatabase {
             }
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
+
         internal bool LogsUndo(Database database) => database.Column.SearchByKey(ColKey) is ColumnItem C && C.ShowUndo;
     }
 }

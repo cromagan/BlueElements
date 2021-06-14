@@ -125,7 +125,7 @@ namespace BlueControls.Forms
             // 
             // btnTextExport
             // 
-            this.btnTextExport.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_RibbonBar;
+            this.btnTextExport.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_Big_Borderless;
             this.btnTextExport.ImageCode = "Textdatei||||||||||Pfeil_Unten";
             this.btnTextExport.Location = new System.Drawing.Point(80, 2);
             this.btnTextExport.Name = "btnTextExport";
@@ -136,7 +136,7 @@ namespace BlueControls.Forms
             // 
             // btnBilderExport
             // 
-            this.btnBilderExport.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_RibbonBar;
+            this.btnBilderExport.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_Big_Borderless;
             this.btnBilderExport.ImageCode = "Bild||||||||||Pfeil_Unten";
             this.btnBilderExport.Location = new System.Drawing.Point(8, 2);
             this.btnBilderExport.Name = "btnBilderExport";

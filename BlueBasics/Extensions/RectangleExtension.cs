@@ -1,4 +1,5 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
+
 // Authors:
 // Christian Peter
 //
@@ -15,16 +16,19 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-#endregion
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics.Enums;
 using System;
 using System.Drawing;
 
 namespace BlueBasics {
+
     public static partial class Extensions {
+
         public static Point PointOf(this Rectangle r, enAlignment p) {
             switch (p) {
-
                 case enAlignment.Bottom_Left:
                     return new Point(r.Left, r.Bottom);
 
@@ -51,11 +55,13 @@ namespace BlueBasics {
 
                 case enAlignment.Horizontal_Vertical_Center:
                     return new Point((int)(r.Left + (r.Width / 2.0)), (int)(r.Top + (r.Height / 2.0)));
+
                 default:
                     Develop.DebugPrint(p);
                     return Point.Empty;
             }
         }
+
         public static Point NearestCornerOF(this Rectangle r, Point p) {
             var LO = r.PointOf(enAlignment.Top_Left);
             var rO = r.PointOf(enAlignment.Top_Right);

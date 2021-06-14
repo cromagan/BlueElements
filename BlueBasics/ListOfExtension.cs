@@ -1,4 +1,5 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
+
 // Authors:
 // Christian Peter
 //
@@ -15,7 +16,9 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-#endregion
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System;
@@ -27,7 +30,9 @@ using static BlueBasics.FileOperations;
 using static BlueBasics.modConverter;
 
 namespace BlueBasics {
+
     public static class ListOfExtension {
+
         /// <summary>
         /// Führt bei allem Typen ein ToString aus und addiert diese mittels \r. Enthält ein ToString ein \r, dann wird abgebrochen.
         /// </summary>
@@ -48,6 +53,7 @@ namespace BlueBasics {
             }
             return tmp.TrimCr();
         }
+
         public static void SplitByCR(this List<string> list, string textToSplit) {
             List<string> l = new();
             l.AddRange(textToSplit.SplitByCR());
@@ -55,6 +61,7 @@ namespace BlueBasics {
             if (list.Count > 0) { list.Clear(); }
             list.AddRange(l);
         }
+
         public static void SplitByCR_QuickSortAndRemoveDouble(this List<string> list, string textToSplit) {
             List<string> l = new();
             l.AddRange(textToSplit.SplitByCR());
@@ -63,6 +70,7 @@ namespace BlueBasics {
             if (list.Count > 0) { list.Clear(); }
             list.AddRange(l);
         }
+
         public static bool RemoveNullOrEmpty<T>(this List<T> l) where T : ICanBeEmpty {
             if (l == null || l.Count == 0) { return false; }
             var Did = false;
@@ -77,9 +85,11 @@ namespace BlueBasics {
             }
             return Did;
         }
+
         public static bool IsDifferentTo<T>(this List<T> list1, List<T> list2) =>
             // https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.sequenceequal?redirectedfrom=MSDN&view=netcore-3.1#System_Linq_Enumerable_SequenceEqual__1_System_Collections_Generic_IEnumerable___0__System_Collections_Generic_IEnumerable___0__
             list1 != list2 && (list1 is null || list2 is null || !list1.SequenceEqual(list2));
+
         // public static bool IsDifferentTo<T>(this List<T> List1, List<T> List2) where T : IParseable
         // {
         //    if (List1.Count != List2.Count) { return true; }
@@ -107,6 +117,7 @@ namespace BlueBasics {
                 }
             }
         }
+
         ///// <summary>
         ///// Falls der Dateityp String ist, WIRD zwischen Gross und Kleinschreibung unterschieden!
         ///// </summary>
@@ -130,6 +141,7 @@ namespace BlueBasics {
                 }
             }
         }
+
         public static bool RemoveNull<T>(this List<T> l) {
             if (l == null || l.Count == 0) { return false; }
             var Did = false;
@@ -144,11 +156,13 @@ namespace BlueBasics {
             }
             return Did;
         }
+
         public static void Load(this List<string> l, string filename, System.Text.Encoding code) {
             var t = File.ReadAllText(filename, code);
             l.Clear();
             l.AddRange(t.SplitByCR());
         }
+
         public static void Save(this List<string> l, string dateiName, bool executeAfter, System.Text.Encoding code) {
             var t = l.JoinWith("\r\n").TrimEnd("\r\n");
             if (!PathExists(dateiName.FilePath())) {
@@ -156,6 +170,7 @@ namespace BlueBasics {
             }
             SaveToDisk(dateiName, t, executeAfter, code);
         }
+
         /// <summary>
         ///  Falls der Dateityp String ist, WIRD zwischen Gross und Kleinschreibung unterschieden! Dafür kann RemoveString benutzt werden.
         /// </summary>
@@ -165,6 +180,7 @@ namespace BlueBasics {
         public static void Remove<T>(this List<T> l, T value) where T : IComparable {
             do { } while (l.Remove(value));
         }
+
         public static void RemoveString(this List<string> l, string value, bool caseSensitive) {
             var cas = StringComparison.OrdinalIgnoreCase;
             if (!caseSensitive) { cas = StringComparison.Ordinal; }
@@ -177,16 +193,19 @@ namespace BlueBasics {
                 }
             }
         }
+
         public static void RemoveString(this List<string> l, List<string> value, bool caseSensitive) {
             foreach (var t in value) {
                 l.RemoveString(t, caseSensitive);
             }
         }
+
         public static void RemoveString(this List<string> l, string[] value, bool caseSensitive) {
             for (var z = 0; z <= value.GetUpperBound(0); z++) {
                 l.RemoveString(value[z], caseSensitive);
             }
         }
+
         public static List<string> TagGetAll(this ICollection<string> _String, string tagName) {
             List<string> l = new();
             if (_String == null) { return l; }
@@ -207,9 +226,13 @@ namespace BlueBasics {
             }
             return l;
         }
+
         public static int TagGetInt(this ICollection<string> _String, string tagName) => IntParse(TagGet(_String, tagName));
+
         public static decimal TagGetDecimal(this ICollection<string> _String, string tagName) => DecimalParse(TagGet(_String, tagName));
+
         public static double TagGetDouble(this ICollection<string> _String, string tagName) => DoubleParse(TagGet(_String, tagName));
+
         public static string TagGet(this ICollection<string> _String, string tagName) {
             if (_String == null) { return string.Empty; }
             var uTagName = tagName.ToUpper().Trim();
@@ -223,6 +246,7 @@ namespace BlueBasics {
             }
             return string.Empty;
         }
+
         public static void TagSet(this ICollection<string> _String, string tagNamex, string value) {
             var uTagName = tagNamex.ToUpper() + ":";
             var Found = -1;
@@ -245,6 +269,7 @@ namespace BlueBasics {
             }
             _String.Add(n);
         }
+
         public static bool AddIfNotExists<T>(this List<T> l, BindingList<T> values) {
             if (values == null || values.Count == 0) { return false; }
             var ok1 = false;
@@ -255,6 +280,7 @@ namespace BlueBasics {
             }
             return ok1;
         }
+
         public static bool AddIfNotExists<T>(this List<T> l, List<T> values) {
             if (values == null || values.Count == 0) { return false; }
             var ok1 = false;
@@ -265,6 +291,7 @@ namespace BlueBasics {
             }
             return ok1;
         }
+
         public static bool AddIfNotExists<T>(this List<T> l, T value) {
             if (!l.Contains(value)) {
                 l.Add(value);

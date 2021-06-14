@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
@@ -24,6 +27,7 @@ using System.Collections.Generic;
 using System.Drawing;
 
 namespace BlueDatabase {
+
     /// <summary>
     /// Diese Klasse enthält nur das Aussehen und gibt keinerlei Events ab. Deswegen INTERNAL!
     /// </summary>
@@ -31,15 +35,18 @@ namespace BlueDatabase {
         private string _value = string.Empty;
 
         #region Konstruktor
+
         public CellItem(string value, int width, int height) {
             _value = value;
             if (width > 0) { Size = new Size(width, height); }
         }
-        #endregion
 
+        #endregion Konstruktor
 
         #region Properties
+
         public Size Size { get; set; }
+
         //public Color BackColor { get; set; }
         //public Color FontColor { get; set; }
         //public bool Editable { get; set; }
@@ -52,9 +59,11 @@ namespace BlueDatabase {
                 InvalidateSize();
             }
         }
-        #endregion
+
+        #endregion Properties
 
         internal void InvalidateSize() => Size = Size.Empty;
+
         /// <summary>
         /// Jede Zeile für sich richtig formatiert.
         /// </summary>
@@ -81,6 +90,7 @@ namespace BlueDatabase {
             }
             return ret;
         }
+
         public static Tuple<string, enAlignment, QuickImage> GetDrawingData(ColumnItem column, string originalText, enShortenStyle style, enBildTextVerhalten bildTextverhalten) {
             var tmpText = ValueReadable(column, originalText, style, bildTextverhalten, true);
             var tmpAlign = StandardAlignment(column, bildTextverhalten);
@@ -93,6 +103,7 @@ namespace BlueDatabase {
             }
             return new Tuple<string, enAlignment, QuickImage>(tmpText, tmpAlign, tmpImageCode);
         }
+
         /// <summary>
         /// Gibt eine einzelne Zeile richtig ersetzt mit Prä- und Suffix zurück.
         /// </summary>
@@ -119,10 +130,12 @@ namespace BlueDatabase {
                         txt = txt.Replace("\r", " ");
                     }
                     break;
+
                 case enDataFormat.BildCode:
                 case enDataFormat.Button:
                     txt = LanguageTool.ColumnReplace(txt, column, style);
                     break;
+
                 case enDataFormat.Bit:
                     if (txt == true.ToPlusMinus()) {
                         txt = "Ja";
@@ -139,6 +152,7 @@ namespace BlueDatabase {
                     }
                     txt = LanguageTool.ColumnReplace(txt, column, style);
                     break;
+
                 case enDataFormat.FarbeInteger:
                     if (!string.IsNullOrEmpty(txt) && txt.IsFormat(enDataFormat.FarbeInteger)) {
                         var col = Color.FromArgb(int.Parse(txt));
@@ -146,12 +160,14 @@ namespace BlueDatabase {
                     }
                     txt = LanguageTool.ColumnReplace(txt, column, style);
                     break;
+
                 case enDataFormat.Schrift:
                     //    Develop.DebugPrint_NichtImplementiert();
                     //if (string.IsNullOrEmpty(Txt) || Txt.Substring(0, 1) != "{") { return Txt; }
                     //if (CompactView) { return string.Empty; }
                     //return BlueFont.Get(Txt).ReadableText();
                     return txt;
+
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                     // Hier kommt die Spalten-ID  an
                     if (string.IsNullOrEmpty(txt)) { return string.Empty; }
@@ -162,6 +178,7 @@ namespace BlueDatabase {
                     if (C == null) { return "Columnkey nicht gefunden"; }
                     txt = LanguageTool.ColumnReplace(C.ReadableText(), column, style);
                     break;
+
                 default:
                     Develop.DebugPrint(column.Format);
                     break;
@@ -177,6 +194,7 @@ namespace BlueDatabase {
             }
             return txt;
         }
+
         public static QuickImage StandardErrorImage(int gr, enBildTextVerhalten bildTextverhalten) => bildTextverhalten switch {
             enBildTextVerhalten.Fehlendes_Bild_zeige_Fragezeichen => QuickImage.Get("Fragezeichen|" + gr + "|||||200|||80"),
             enBildTextVerhalten.Fehlendes_Bild_zeige_Kreis => QuickImage.Get("Kreis2|" + gr),
@@ -187,6 +205,7 @@ namespace BlueDatabase {
             enBildTextVerhalten.Fehlendes_Bild_zeige_Kritischzeichen => QuickImage.Get("Kritisch|" + gr),
             _ => null,
         };
+
         private static QuickImage StandardImage(ColumnItem column, string originalText, string replacedText, enShortenStyle style, enBildTextVerhalten bildTextverhalten) {
             // replacedText kann auch empty sein. z.B. wenn er nicht angezeigt wird
             if (bildTextverhalten == enBildTextVerhalten.Nur_Text) { return null; }
@@ -207,10 +226,12 @@ namespace BlueDatabase {
                                                     : originalText == "?"
                                                                             ? QuickImage.Get(enImageCode.Fragezeichen, 16)
                                                                             : string.IsNullOrEmpty(replacedText) ? null : StandardErrorImage(16, bildTextverhalten);
+
                 case enDataFormat.Button:
                     if (column == null) { return null; }// z.B. Dropdownmenu-Textfeld mit bereits definierten Icon
                     if (string.IsNullOrEmpty(replacedText)) { return null; }
                     return QuickImage.Get("Stern|16");
+
                 case enDataFormat.BildCode:
                     if (column == null) { return null; }// z.B. Dropdownmenu-Textfeld mit bereits definierten Icon
                     if (string.IsNullOrEmpty(replacedText)) { return null; }
@@ -221,6 +242,7 @@ namespace BlueDatabase {
                     var gr = 16;
                     if (column.BildCode_ConstantHeight > 0) { gr = column.BildCode_ConstantHeight; }
                     return StandardErrorImage(gr, bildTextverhalten);
+
                 case enDataFormat.FarbeInteger:
                     if (!string.IsNullOrEmpty(replacedText) && replacedText.IsFormat(enDataFormat.FarbeInteger)) {
                         var col = Color.FromArgb(int.Parse(replacedText));
@@ -234,25 +256,31 @@ namespace BlueDatabase {
                 case enDataFormat.Link_To_Filesystem:
                     if (replacedText.FileType() == enFileFormat.Unknown) { return StandardErrorImage(48, bildTextverhalten); }
                     return QuickImage.Get(replacedText.FileType(), 48);
+
                 case enDataFormat.Schrift:
                     //  Develop.DebugPrint_NichtImplementiert();
                     //if (string.IsNullOrEmpty(Txt) || Txt.Substring(0, 1) != "{") { return defaultImage; }
                     // return Skin.BlueFont.Get(Txt).SymbolForReadableText();
                     return null;
+
                 case enDataFormat.LinkedCell:
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                 case enDataFormat.Values_für_LinkedCellDropdown:
                     return null;
+
                 default:
                     return null;
             }
         }
+
         public static enAlignment StandardAlignment(ColumnItem column, enBildTextVerhalten bildTextverhalten) {
             switch (column.Align) {
                 case enAlignmentHorizontal.Links:
                     return enAlignment.Top_Left;
+
                 case enAlignmentHorizontal.Rechts:
                     return enAlignment.Top_Right;
+
                 case enAlignmentHorizontal.Zentriert:
                     return enAlignment.HorizontalCenter;
             }
@@ -260,13 +288,16 @@ namespace BlueDatabase {
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.Gleitkommazahl:
                     return enAlignment.Top_Right;
+
                 case enDataFormat.Bit:
                     if (bildTextverhalten is enBildTextVerhalten.Nur_Bild or enBildTextVerhalten.Bild_oder_Text) { return enAlignment.Top_HorizontalCenter; }
                     return enAlignment.Top_Left;
+
                 default:
                     return enAlignment.Top_Left;
             }
         }
+
         //public static string ValueForHTMLExport(ColumnItem Column, string Einstiegstext)
         //{
         //    switch (Column.Format)

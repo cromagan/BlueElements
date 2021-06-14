@@ -1,21 +1,24 @@
 #region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -29,82 +32,85 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.Reflection;
+
 //  = A3 & ".Design.Add(enStates."&B3&", enKontur."& C3 & ", " &D3&", "&E3&", "&F3&","&G3&", enHintergrundArt."&H3&","&I3&",'"&J3&"','"&K3&"','"&L3&"',enRahmenArt."&M3&",'"&N3&"','"&O3&"','"&P3&"','"&Q3&"','"&R3&"');"
+
 #region Win 10
+
 //	Control	Status	Kontur	X1	X2	Y1	Y2	Draw Back	Verlauf Mitte	Color Back 1	Color Back 2	Color Back 3	Border Style	Color Border 1	Color Border 2	Color Border 3	Schrift	StandardPic
-//	Button	Standard	Rechteck					Solide		EAEAEA			Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15}	
-//	Button	Standard_HasFocus_MousePressed	Rechteck					Solide		EAEAEA			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Button	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Solide		EAEAEA			Solide_3px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Button	Standard_Disabled	Rechteck					Solide		EFEFEF			Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15, Color=9d9d9d}	
-//	Button	Standard_MouseOver	Rechteck					Solide		EAEAEA			Solide_3px	B6B6B6			{Name=Calibri, Size=10[K]15}	
-//	Button	Standard_HasFocus	Rechteck					Solide		EAEAEA			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Button	Standard_MouseOver_HasFocus	Rechteck					Solide		EAEAEA			Solide_3px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Button_CheckBox	Standard	Rechteck					Solide		EAEAEA			Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15}	
-//	Button_CheckBox	Checked	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			{Name=Calibri, Size=10[K]15}	
-//	Button_CheckBox	Checked_Disabled	Rechteck					Solide		DFDFDF			Solide_1px	B7B7B7			{Name=Calibri, Size=10[K]15, Color=ffffff}	
-//	Button_CheckBox	Checked_MouseOver	Rechteck					Solide		BFDFFF			Solide_3px	81B8EF			{Name=Calibri, Size=10[K]15}	
-//	Button_CheckBox	Standard_Disabled	Rechteck					Solide		EFEFEF			Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15, Color=9d9d9d}	
-//	Button_CheckBox	Checked_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Button_CheckBox	Checked_MouseOver_HasFocus	Rechteck					Solide		BFDFFF			Solide_3px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Button_CheckBox	Checked_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Button_CheckBox	Standard_MouseOver	Rechteck					Solide		EAEAEA			Solide_3px	B6B6B6			{Name=Calibri, Size=10[K]15}	
-//	Button_CheckBox	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_3px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Button_CheckBox	Standard_HasFocus	Rechteck					Solide		EAEAEA			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Button_CheckBox	Standard_MouseOver_HasFocus	Rechteck					Solide		EAEAEA			Solide_3px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Button_OptionButton	Standard	Rechteck					Solide		EAEAEA			Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15}	
-//	Button_OptionButton	Checked	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			{Name=Calibri, Size=10[K]15}	
-//	Button_OptionButton	Checked_Disabled	Rechteck					Solide		DFDFDF			Solide_1px	B7B7B7			{Name=Calibri, Size=10[K]15, Color=ffffff}	
-//	Button_OptionButton	Checked_MouseOver	Rechteck					Solide		BFDFFF			Solide_3px	81B8EF			{Name=Calibri, Size=10[K]15}	
-//	Button_OptionButton	Standard_Disabled	Rechteck					Solide		EFEFEF			Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15, Color=9d9d9d}	
-//	Button_OptionButton	Checked_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Button_OptionButton	Checked_MouseOver_HasFocus	Rechteck					Solide		BFDFFF			Solide_3px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Button_OptionButton	Checked_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Button_OptionButton	Standard_MouseOver	Rechteck					Solide		EAEAEA			Solide_3px	B6B6B6			{Name=Calibri, Size=10[K]15}	
-//	Button_OptionButton	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_3px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Button_OptionButton	Standard_HasFocus	Rechteck					Solide		EAEAEA			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Button_OptionButton	Standard_MouseOver_HasFocus															{Name=Calibri, Size=10[K]15}	
-//	Button_AutoFilter	Standard	Rechteck					Solide		EAEAEA			Solide_1px	B6B6B6				
-//	Button_AutoFilter	Checked	Rechteck					Solide		BFDFFF			Solide_1px	FF0000				
-//	Button_AutoFilter	Standard_Disabled	Rechteck					Solide		EFEFEF			Solide_1px	D8D8D8				
-//	Button_ComboBox	Standard	Rechteck	-3	-3	-3	-3	Solide		FFFFFF			Ohne					
-//	Button_ComboBox	Standard_HasFocus_MousePressed	Rechteck	-3	-3	-3	-3	Solide		FFFFFF			Ohne					
-//	Button_ComboBox	Standard_MouseOver_HasFocus_MousePressed	Rechteck	-3	-3	-3	-3	Solide		FFFFFF			Ohne					
-//	Button_ComboBox	Standard_Disabled	Rechteck	-3	-3	-3	-3	Solide		FFFFFF			Ohne					
-//	Button_ComboBox	Standard_MouseOver	Rechteck					Solide		EAEAEA			Solide_3px	B6B6B6				
-//	Button_ComboBox	Standard_HasFocus	Rechteck	-3	-3	-3	-3	Solide		FFFFFF			Ohne					
-//	Button_ComboBox	Standard_MouseOver_HasFocus	Rechteck	-3	-3	-3	-3	Solide		FFFFFF			Ohne					
-//	Button_Slider_Waagerecht	Standard	Rechteck					Solide		CDCDCD			Solide_1px	B7B7B7				
-//	Button_Slider_Waagerecht	Standard_MouseOver_MousePressed	Rechteck					Solide		CECECE			Solide_3px	B7B7B7				
-//	Button_Slider_Waagerecht	Standard_Disabled	Ohne					Ohne					Ohne					
-//	Button_Slider_Waagerecht	Standard_MouseOver	Rechteck					Solide		CECECE			Solide_3px	B7B7B7				
-//	Button_Slider_Senkrecht	Standard	Rechteck					Solide		CDCDCD			Solide_1px	B7B7B7				
-//	Button_Slider_Senkrecht	Standard_MouseOver_MousePressed	Rechteck					Solide		CECECE			Solide_3px	B7B7B7				
-//	Button_Slider_Senkrecht	Standard_Disabled	Ohne					Ohne					Ohne					
-//	Button_Slider_Senkrecht	Standard_MouseOver	Rechteck					Solide		CECECE			Solide_3px	B7B7B7				
-//	Button_SliderDesign	Standard	Rechteck					Solide		F0F0F0			Ohne					
-//	Button_SliderDesign	Standard_HasFocus_MousePressed	Rechteck					Solide		EFEFEF			Solide_1px	3399FF				
-//	Button_SliderDesign	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Solide		F0F0F0			Solide_3px	3399FF				
-//	Button_SliderDesign	Standard_Disabled	Rechteck					Solide		F9F9F9			Ohne	D8D8D8				
-//	Button_SliderDesign	Standard_MouseOver	Rechteck					Solide		F0F0F0			Ohne	B6B6B6				
-//	Button_SliderDesign	Standard_HasFocus	Rechteck					Solide		F0F0F0			Solide_1px	3399FF				
-//	Button_SliderDesign	Standard_MouseOver_HasFocus	Rechteck					Solide		F0F0F0			Solide_3px	3399FF				
-//	Button_EckpunktSchieber	Standard	Rechteck					Solide		FFFFFF			Solide_1px	0				
-//	Button_EckpunktSchieber	Checked_MousePressed	Rechteck					Solide		0072BC			Solide_1px	0				
-//	Button_EckpunktSchieber_Phantom	Standard	Rechteck					Ohne					Solide_1px	D8D8D8				
-//	TabStrip_Head	Standard	Rechteck			-2	5	Verlauf_Vertical_Solide	0,5	F0F0F0	E4E4E4		Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15}	
-//	TabStrip_Head	Checked	Rechteck				5	Solide		FFFFFF			Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15}	
-//	TabStrip_Head	Checked_Disabled	Rechteck				5	Solide		DFDFDF			Solide_1px	B7B7B7			{Name=Calibri, Size=10[K]15, Color=ffffff}	
-//	TabStrip_Head	Checked_MouseOver	Rechteck				5	Solide		FFFFFF			Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15}	
-//	TabStrip_Head	Standard_Disabled	Rechteck			-2	5	Solide		FFFFFF			Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15, Color=9d9d9d}	
-//	TabStrip_Head	Standard_MouseOver	Rechteck			-2	5	Verlauf_Vertical_Solide	0,5	F0F0F0	E4E4E4		Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15}	
-//	RibbonBar_Head	Standard	Rechteck				5	Solide		FFFFFF			Ohne				{Name=Calibri, Size=10[K]15}	
-//	RibbonBar_Head	Checked	Rechteck				5	Solide		F4F5F6			Solide_1px	E5E4E5			{Name=Calibri, Size=10[K]15}	
-//	RibbonBar_Head	Checked_Disabled	Rechteck				5	Solide		F4F5F6			Solide_1px	E5E4E5			{Name=Calibri, Size=10[K]15, Color=9d9d9d}	
-//	RibbonBar_Head	Checked_MouseOver	Rechteck				5	Solide		F4F5F6			Solide_1px	E5E4E5			{Name=Calibri, Size=10[K]15, Color=0000ff}	
-//	RibbonBar_Head	Standard_Disabled	Rechteck				5	Solide		FFFFFF			Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}	
-//	RibbonBar_Head	Standard_MouseOver	Rechteck				5	Solide		FFFFFF			Ohne				{Name=Calibri, Size=10[K]15, Color=0000ff}	
-//	Caption	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}	
-//	Caption	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}	
+//	Button	Standard	Rechteck					Solide		EAEAEA			Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15}
+//	Button	Standard_HasFocus_MousePressed	Rechteck					Solide		EAEAEA			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Button	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Solide		EAEAEA			Solide_3px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Button	Standard_Disabled	Rechteck					Solide		EFEFEF			Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15, Color=9d9d9d}
+//	Button	Standard_MouseOver	Rechteck					Solide		EAEAEA			Solide_3px	B6B6B6			{Name=Calibri, Size=10[K]15}
+//	Button	Standard_HasFocus	Rechteck					Solide		EAEAEA			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Button	Standard_MouseOver_HasFocus	Rechteck					Solide		EAEAEA			Solide_3px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Button_CheckBox	Standard	Rechteck					Solide		EAEAEA			Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15}
+//	Button_CheckBox	Checked	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			{Name=Calibri, Size=10[K]15}
+//	Button_CheckBox	Checked_Disabled	Rechteck					Solide		DFDFDF			Solide_1px	B7B7B7			{Name=Calibri, Size=10[K]15, Color=ffffff}
+//	Button_CheckBox	Checked_MouseOver	Rechteck					Solide		BFDFFF			Solide_3px	81B8EF			{Name=Calibri, Size=10[K]15}
+//	Button_CheckBox	Standard_Disabled	Rechteck					Solide		EFEFEF			Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15, Color=9d9d9d}
+//	Button_CheckBox	Checked_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Button_CheckBox	Checked_MouseOver_HasFocus	Rechteck					Solide		BFDFFF			Solide_3px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Button_CheckBox	Checked_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Button_CheckBox	Standard_MouseOver	Rechteck					Solide		EAEAEA			Solide_3px	B6B6B6			{Name=Calibri, Size=10[K]15}
+//	Button_CheckBox	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_3px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Button_CheckBox	Standard_HasFocus	Rechteck					Solide		EAEAEA			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Button_CheckBox	Standard_MouseOver_HasFocus	Rechteck					Solide		EAEAEA			Solide_3px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Button_OptionButton	Standard	Rechteck					Solide		EAEAEA			Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15}
+//	Button_OptionButton	Checked	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			{Name=Calibri, Size=10[K]15}
+//	Button_OptionButton	Checked_Disabled	Rechteck					Solide		DFDFDF			Solide_1px	B7B7B7			{Name=Calibri, Size=10[K]15, Color=ffffff}
+//	Button_OptionButton	Checked_MouseOver	Rechteck					Solide		BFDFFF			Solide_3px	81B8EF			{Name=Calibri, Size=10[K]15}
+//	Button_OptionButton	Standard_Disabled	Rechteck					Solide		EFEFEF			Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15, Color=9d9d9d}
+//	Button_OptionButton	Checked_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Button_OptionButton	Checked_MouseOver_HasFocus	Rechteck					Solide		BFDFFF			Solide_3px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Button_OptionButton	Checked_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Button_OptionButton	Standard_MouseOver	Rechteck					Solide		EAEAEA			Solide_3px	B6B6B6			{Name=Calibri, Size=10[K]15}
+//	Button_OptionButton	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_3px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Button_OptionButton	Standard_HasFocus	Rechteck					Solide		EAEAEA			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Button_OptionButton	Standard_MouseOver_HasFocus															{Name=Calibri, Size=10[K]15}
+//	Button_AutoFilter	Standard	Rechteck					Solide		EAEAEA			Solide_1px	B6B6B6
+//	Button_AutoFilter	Checked	Rechteck					Solide		BFDFFF			Solide_1px	FF0000
+//	Button_AutoFilter	Standard_Disabled	Rechteck					Solide		EFEFEF			Solide_1px	D8D8D8
+//	Button_ComboBox	Standard	Rechteck	-3	-3	-3	-3	Solide		FFFFFF			Ohne
+//	Button_ComboBox	Standard_HasFocus_MousePressed	Rechteck	-3	-3	-3	-3	Solide		FFFFFF			Ohne
+//	Button_ComboBox	Standard_MouseOver_HasFocus_MousePressed	Rechteck	-3	-3	-3	-3	Solide		FFFFFF			Ohne
+//	Button_ComboBox	Standard_Disabled	Rechteck	-3	-3	-3	-3	Solide		FFFFFF			Ohne
+//	Button_ComboBox	Standard_MouseOver	Rechteck					Solide		EAEAEA			Solide_3px	B6B6B6
+//	Button_ComboBox	Standard_HasFocus	Rechteck	-3	-3	-3	-3	Solide		FFFFFF			Ohne
+//	Button_ComboBox	Standard_MouseOver_HasFocus	Rechteck	-3	-3	-3	-3	Solide		FFFFFF			Ohne
+//	Button_Slider_Waagerecht	Standard	Rechteck					Solide		CDCDCD			Solide_1px	B7B7B7
+//	Button_Slider_Waagerecht	Standard_MouseOver_MousePressed	Rechteck					Solide		CECECE			Solide_3px	B7B7B7
+//	Button_Slider_Waagerecht	Standard_Disabled	Ohne					Ohne					Ohne
+//	Button_Slider_Waagerecht	Standard_MouseOver	Rechteck					Solide		CECECE			Solide_3px	B7B7B7
+//	Button_Slider_Senkrecht	Standard	Rechteck					Solide		CDCDCD			Solide_1px	B7B7B7
+//	Button_Slider_Senkrecht	Standard_MouseOver_MousePressed	Rechteck					Solide		CECECE			Solide_3px	B7B7B7
+//	Button_Slider_Senkrecht	Standard_Disabled	Ohne					Ohne					Ohne
+//	Button_Slider_Senkrecht	Standard_MouseOver	Rechteck					Solide		CECECE			Solide_3px	B7B7B7
+//	Button_SliderDesign	Standard	Rechteck					Solide		F0F0F0			Ohne
+//	Button_SliderDesign	Standard_HasFocus_MousePressed	Rechteck					Solide		EFEFEF			Solide_1px	3399FF
+//	Button_SliderDesign	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Solide		F0F0F0			Solide_3px	3399FF
+//	Button_SliderDesign	Standard_Disabled	Rechteck					Solide		F9F9F9			Ohne	D8D8D8
+//	Button_SliderDesign	Standard_MouseOver	Rechteck					Solide		F0F0F0			Ohne	B6B6B6
+//	Button_SliderDesign	Standard_HasFocus	Rechteck					Solide		F0F0F0			Solide_1px	3399FF
+//	Button_SliderDesign	Standard_MouseOver_HasFocus	Rechteck					Solide		F0F0F0			Solide_3px	3399FF
+//	Button_EckpunktSchieber	Standard	Rechteck					Solide		FFFFFF			Solide_1px	0
+//	Button_EckpunktSchieber	Checked_MousePressed	Rechteck					Solide		0072BC			Solide_1px	0
+//	Button_EckpunktSchieber_Phantom	Standard	Rechteck					Ohne					Solide_1px	D8D8D8
+//	TabStrip_Head	Standard	Rechteck			-2	5	Verlauf_Vertical_Solide	0,5	F0F0F0	E4E4E4		Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15}
+//	TabStrip_Head	Checked	Rechteck				5	Solide		FFFFFF			Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15}
+//	TabStrip_Head	Checked_Disabled	Rechteck				5	Solide		DFDFDF			Solide_1px	B7B7B7			{Name=Calibri, Size=10[K]15, Color=ffffff}
+//	TabStrip_Head	Checked_MouseOver	Rechteck				5	Solide		FFFFFF			Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15}
+//	TabStrip_Head	Standard_Disabled	Rechteck			-2	5	Solide		FFFFFF			Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15, Color=9d9d9d}
+//	TabStrip_Head	Standard_MouseOver	Rechteck			-2	5	Verlauf_Vertical_Solide	0,5	F0F0F0	E4E4E4		Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15}
+//	RibbonBar_Head	Standard	Rechteck				5	Solide		FFFFFF			Ohne				{Name=Calibri, Size=10[K]15}
+//	RibbonBar_Head	Checked	Rechteck				5	Solide		F4F5F6			Solide_1px	E5E4E5			{Name=Calibri, Size=10[K]15}
+//	RibbonBar_Head	Checked_Disabled	Rechteck				5	Solide		F4F5F6			Solide_1px	E5E4E5			{Name=Calibri, Size=10[K]15, Color=9d9d9d}
+//	RibbonBar_Head	Checked_MouseOver	Rechteck				5	Solide		F4F5F6			Solide_1px	E5E4E5			{Name=Calibri, Size=10[K]15, Color=0000ff}
+//	RibbonBar_Head	Standard_Disabled	Rechteck				5	Solide		FFFFFF			Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}
+//	RibbonBar_Head	Standard_MouseOver	Rechteck				5	Solide		FFFFFF			Ohne				{Name=Calibri, Size=10[K]15, Color=0000ff}
+//	Caption	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}
+//	Caption	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}
 //	CheckBox_TextStyle	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}	CheckBox
 //	CheckBox_TextStyle	Checked	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}	CheckBox_Checked
 //	CheckBox_TextStyle	Checked_Disabled	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}	CheckBox_Disabled_Checked
@@ -129,247 +135,250 @@ using System.Reflection;
 //	OptionButton_TextStyle	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Ohne					FocusDotLine			0	{Name=Calibri, Size=10[K]15}	OptionBox_Checked_MouseOver
 //	OptionButton_TextStyle	Standard_HasFocus	Rechteck					Ohne					FocusDotLine			0	{Name=Calibri, Size=10[K]15}	OptionBox
 //	OptionButton_TextStyle	Standard_MouseOver_HasFocus	Rechteck					Ohne					FocusDotLine			0	{Name=Calibri, Size=10[K]15}	OptionBox_MouseOver
-//	TextBox	Standard	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15}	
-//	TextBox	Checked	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}	
-//	TextBox	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15, Color=9d9d9d}	
-//	TextBox	Checked_HasFocus	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}	
-//	TextBox	Standard_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	ListBox	Standard	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6				
-//	ListBox	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8				
-//	ComboBox_Textbox	Standard	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15}	
-//	ComboBox_Textbox	Standard_HasFocus_MousePressed	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	ComboBox_Textbox	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	ComboBox_Textbox	Checked	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}	
-//	ComboBox_Textbox	Checked_MouseOver	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}	
-//	ComboBox_Textbox	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15, Color=9d9d9d}	
-//	ComboBox_Textbox	Checked_HasFocus	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}	
-//	ComboBox_Textbox	Checked_MouseOver_HasFocus	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}	
-//	ComboBox_Textbox	Checked_HasFocus_MousePressed	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}	
-//	ComboBox_Textbox	Standard_MouseOver	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15}	
-//	ComboBox_Textbox	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}	
-//	ComboBox_Textbox	Standard_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	ComboBox_Textbox	Standard_MouseOver_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Table_And_Pad	Standard	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6				
-//	Table_And_Pad	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8				
-//	Table_And_Pad	Standard_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF				
-//	EasyPic	Standard	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6				
-//	EasyPic	Standard_HasFocus_MousePressed	Rechteck					Solide		FFFFFF			Solide_1px	3399FF				
-//	EasyPic	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Solide		FFFFFF			Solide_1px	3399FF				
-//	EasyPic	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8				
-//	EasyPic	Standard_MouseOver	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6				
-//	EasyPic	Standard_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF				
-//	TextBox_Stufe3	Standard	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6			{Name=Calibri, Size=12, Bold=True, Underline=True}	
-//	TextBox_Stufe3	Checked	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=12, Bold=True, Underline=True, Color=ffffff}	
-//	TextBox_Stufe3	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			{Name=Calibri, Size=12, Bold=True, Underline=True, Color=c0c0c0}	
-//	TextBox_Stufe3	Checked_HasFocus	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=12, Bold=True, Underline=True, Color=ffffff}	
-//	TextBox_Stufe3	Standard_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			{Name=Calibri, Size=12, Bold=True, Underline=True}	
-//	TextBox_Bold	Standard	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15, Bold=True}	
-//	TextBox_Bold	Checked	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Bold=True, Color=ffffff}	
-//	TextBox_Bold	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15, Bold=True, Color=9d9d9d}	
-//	TextBox_Bold	Checked_HasFocus	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Bold=True, Color=ffffff}	
-//	TextBox_Bold	Standard_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15, Bold=True}	
-//	Slider_Hintergrund_Waagerecht	Standard	Rechteck					Solide		F0F0F0			Ohne					
-//	Slider_Hintergrund_Waagerecht	Standard_MouseOver_MousePressed	Rechteck					Solide		EFEFEF			Ohne	B7B7B7				
-//	Slider_Hintergrund_Waagerecht	Standard_Disabled	Rechteck					Solide		F9F9F9			Ohne	D8D8D8				
-//	Slider_Hintergrund_Waagerecht	Standard_MouseOver	Rechteck					Solide		EFEFEF			Ohne	B7B7B7				
-//	Slider_Hintergrund_Waagerecht	Standard_MousePressed	Rechteck					Solide		EFEFEF			Ohne	B7B7B7				
-//	Slider_Hintergrund_Senkrecht	Standard	Rechteck					Solide		F0F0F0			Ohne					
-//	Slider_Hintergrund_Senkrecht	Standard_MouseOver_MousePressed	Rechteck					Solide		EFEFEF			Ohne	B7B7B7				
-//	Slider_Hintergrund_Senkrecht	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Solide		EFEFEF			Ohne	B7B7B7				
-//	Slider_Hintergrund_Senkrecht	Standard_Disabled	Rechteck					Solide		F9F9F9			Ohne	D8D8D8				
-//	Slider_Hintergrund_Senkrecht	Standard_MouseOver	Rechteck					Solide		EFEFEF			Ohne	B7B7B7				
-//	Slider_Hintergrund_Senkrecht	Standard_MousePressed	Rechteck					Solide		EFEFEF			Ohne	B7B7B7				
-//	Ribbonbar_Button	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}	
-//	Ribbonbar_Button	Standard_HasFocus_MousePressed	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}	
-//	Ribbonbar_Button	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Ohne					Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Ribbonbar_Button	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}	
-//	Ribbonbar_Button	Standard_MouseOver	Rechteck					Ohne					Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15}	
-//	Ribbonbar_Button	Standard_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Ribbonbar_Button	Standard_MouseOver_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Ribbonbar_Button_CheckBox	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}	
-//	Ribbonbar_Button_CheckBox	Checked	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			{Name=Calibri, Size=10[K]15}	
-//	Ribbonbar_Button_CheckBox	Checked_Disabled	Rechteck					Solide		DFDFDF			Solide_1px	B7B7B7			{Name=Calibri, Size=10[K]15, Color=ffffff}	
-//	Ribbonbar_Button_CheckBox	Checked_MouseOver	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			{Name=Calibri, Size=10[K]15}	
-//	Ribbonbar_Button_CheckBox	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}	
-//	Ribbonbar_Button_CheckBox	Checked_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Ribbonbar_Button_CheckBox	Checked_MouseOver_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Ribbonbar_Button_CheckBox	Checked_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Ribbonbar_Button_CheckBox	Standard_MouseOver	Rechteck					Ohne					Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15}	
-//	Ribbonbar_Button_CheckBox	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Ribbonbar_Button_CheckBox	Standard_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Ribbonbar_Button_CheckBox	Standard_MouseOver_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Ribbonbar_Button_OptionButton	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}	
-//	Ribbonbar_Button_OptionButton	Checked	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			{Name=Calibri, Size=10[K]15}	
-//	Ribbonbar_Button_OptionButton	Checked_Disabled	Rechteck					Solide		DFDFDF			Solide_1px	B7B7B7			{Name=Calibri, Size=10[K]15, Color=ffffff}	
-//	Ribbonbar_Button_OptionButton	Checked_MouseOver	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			{Name=Calibri, Size=10[K]15}	
-//	Ribbonbar_Button_OptionButton	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}	
-//	Ribbonbar_Button_OptionButton	Checked_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Ribbonbar_Button_OptionButton	Checked_MouseOver_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Ribbonbar_Button_OptionButton	Checked_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Ribbonbar_Button_OptionButton	Standard_MouseOver	Rechteck					Ohne					Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15}	
-//	Ribbonbar_Button_OptionButton	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Ribbonbar_Button_OptionButton	Standard_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Ribbonbar_Button_OptionButton	Standard_MouseOver_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Ribbon_ComboBox_Textbox	Standard	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15}	
-//	Ribbon_ComboBox_Textbox	Standard_HasFocus_MousePressed	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Ribbon_ComboBox_Textbox	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Ribbon_ComboBox_Textbox	Checked	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}	
-//	Ribbon_ComboBox_Textbox	Checked_MouseOver	Rechteck					Solide		0072BC			Solide_1px	0			{Name=Calibri, Size=10[K]15, Color=ffffff}	
-//	Ribbon_ComboBox_Textbox	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15, Color=9d9d9d}	
-//	Ribbon_ComboBox_Textbox	Checked_HasFocus	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}	
-//	Ribbon_ComboBox_Textbox	Checked_MouseOver_HasFocus	Rechteck					Solide		0072BC			Solide_1px	0			{Name=Calibri, Size=10[K]15, Color=ffffff}	
-//	Ribbon_ComboBox_Textbox	Checked_HasFocus_MousePressed	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}	
-//	Ribbon_ComboBox_Textbox	Standard_MouseOver	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15}	
-//	Ribbon_ComboBox_Textbox	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		0072BC			Solide_1px	0			{Name=Calibri, Size=10[K]15, Color=ffffff}	
-//	Ribbon_ComboBox_Textbox	Standard_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Ribbon_ComboBox_Textbox	Standard_MouseOver_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}	
-//	Ribbonbar_Caption	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}	
-//	Ribbonbar_Caption	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}	
-//	Ribbonbar_Button_Combobox	Standard	Ohne					Ohne					Ohne					
-//	Ribbonbar_Button_Combobox	Standard_HasFocus_MousePressed	Ohne					Ohne					Ohne					
-//	Ribbonbar_Button_Combobox	Standard_MouseOver_HasFocus_MousePressed	Ohne					Ohne					Ohne					
-//	Ribbonbar_Button_Combobox	Standard_Disabled	Ohne					Ohne					Ohne					
-//	Ribbonbar_Button_Combobox	Standard_MouseOver	Ohne					Ohne					Ohne					
-//	Ribbonbar_Button_Combobox	Standard_HasFocus	Ohne					Ohne					Ohne					
-//	Ribbonbar_Button_Combobox	Standard_MouseOver_HasFocus	Ohne					Ohne					Ohne					
-//	RibbonBar_Frame	Standard	Rechteck	1	0	1	1	Ohne					Solide_1px	ACACAC			{Name=Calibri, Size=10[K]15, Italic=True}	
-//	RibbonBar_Frame	Standard_Disabled	Rechteck	1	0	1	1	Ohne					Solide_1px	ACACAC			{Name=Calibri, Size=10[K]15, Italic=True, Color=9d9d9d}	
-//	Form_Standard	Standard	Rechteck					Solide		F0F0F0			Ohne					
-//	Form_MsgBox	Standard	Rechteck					Solide		F0F0F0			Ohne				{Name=Calibri, Size=10[K]15}	
-//	Form_QuickInfo	Standard	Rechteck					Solide		BFDFFF			Solide_1px	4DA1B5			{Name=Calibri, Size=10[K]15}	
-//	Form_DesktopBenachrichtigung	Standard	Rechteck					Solide		1F1F1F			Solide_3px	484848			{Name=Calibri, Size=12[K]5, Color=ffffff}	
-//	Form_BitteWarten	Standard	Rechteck					Solide		BFDFFF			Solide_1px	4DA1B5			{Name=Calibri, Size=10[K]15}	
-//	Form_AutoFilter	Standard	Rechteck					Solide		FFFFFF			Solide_1px	0			{Name=Calibri, Size=10[K]15}	
-//	Form_AutoFilter	Standard_Disabled															{Name=Calibri, Size=10[K]15, Color=9d9d9d}	
-//	Form_KontextMenu	Standard	Rechteck					Solide		F0F0F0			Solide_1px	0				
-//	Form_SelectBox_Dropdown	Standard	Rechteck					Solide		FFFFFF			Solide_1px	0			{Name=Calibri, Size=10[K]15}	
-//	Item_DropdownMenu	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}	
-//	Item_DropdownMenu	Checked	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}	
-//	Item_DropdownMenu	Checked_Disabled	Rechteck					Solide		5D5D5D			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}	
-//	Item_DropdownMenu	Checked_MouseOver	Rechteck					Solide		0072BC			Solide_1px	0			{Name=Calibri, Size=10[K]15, Color=ffffff}	
-//	Item_DropdownMenu	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}	
-//	Item_DropdownMenu	Standard_MouseOver	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}	
-//	Item_KontextMenu	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}	
-//	Item_KontextMenu	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}	
-//	Item_KontextMenu	Standard_MouseOver	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}	
-//	Item_KontextMenu_Caption	Standard	Rechteck					Solide		BFDFFF			Ohne				{Name=Calibri, Size=10[K]15, Bold=True}	
-//	Item_KontextMenu_Caption	Standard_Disabled	Rechteck					Solide		BFDFFF			Ohne				{Name=Calibri, Size=10[K]15, Bold=True}	
-//	Item_KontextMenu_Caption	Standard_MouseOver	Rechteck					Solide		BFDFFF			Solide_1px	4DA1B5			{Name=Calibri, Size=10[K]15, Bold=True}	
-//	Item_Autofilter	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}	
-//	Item_Autofilter	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}	
-//	Item_Autofilter	Checked	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}	
-//	Item_Autofilter	Checked_Disabled	Rechteck					Solide		5D5D5D			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}	
-//	Item_Autofilter	Checked_MouseOver	Rechteck					Solide		0072BC			Solide_1px	0			{Name=Calibri, Size=10[K]15, Color=ffffff}	
-//	Item_Autofilter	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}	
-//	Item_Autofilter	Standard_MouseOver	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}	
-//	Item_Autofilter	Standard_HasFocus	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}	
-//	Item_Autofilter	Standard_MouseOver_HasFocus	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}	
-//	Item_Listbox	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}	
-//	Item_Listbox	Standard_MouseOver_MousePressed	Rechteck					Solide		CCE8FF			Solide_1px	99D1FF			{Name=Calibri, Size=10[K]15, Underline=True}	
-//	Item_Listbox	Checked	Rechteck					Solide		CCE8FF			Solide_1px	99D1FF			{Name=Calibri, Size=10[K]15}	
-//	Item_Listbox	Checked_Disabled	Rechteck					Solide		DFDFDF			Solide_1px	B7B7B7			{Name=Calibri, Size=10[K]15, Color=ffffff}	
-//	Item_Listbox	Checked_MouseOver	Rechteck					Solide		CCE8FF			Solide_1px	99D1FF			{Name=Calibri, Size=10[K]15, Underline=True}	
-//	Item_Listbox	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}	
-//	Item_Listbox	Checked_MousePressed	Rechteck					Solide		CCE8FF			Solide_1px	99D1FF			{Name=Calibri, Size=10[K]15}	
-//	Item_Listbox	Standard_MouseOver	Rechteck					Solide		E5F3FF			Ohne				{Name=Calibri, Size=10[K]15, Underline=True}	
-//	Item_Listbox	Standard_MousePressed	Rechteck					Solide		CCE8FF			Solide_1px	99D1FF			{Name=Calibri, Size=10[K]15}	
-//	Item_Listbox_Caption	Standard	Rechteck					Solide		BFDFFF			Ohne				{Name=Calibri, Size=10[K]15, Bold=True}	
-//	Item_Listbox_Caption	Standard_Disabled	Rechteck					Solide		DFDFDF			Ohne				{Name=Calibri, Size=10[K]15, Bold=True, Color=ffffff}	
-//	Item_Listbox_Caption	Standard_MouseOver	Rechteck					Solide		BFDFFF			Solide_1px	4DA1B5			{Name=Calibri, Size=10[K]15, Bold=True}	
-//	Frame	Standard	Rechteck			-7		Ohne					Solide_1px	ACACAC			{Name=Calibri, Size=10[K]15}	
-//	Frame	Standard_Disabled	Rechteck			-7		Ohne					Solide_1px	ACACAC			{Name=Calibri, Size=10[K]15, Color=9d9d9d}	
-//	TabStrip_Body	Standard	Rechteck					Solide		FFFFFF			Solide_1px	ACACAC				
-//	TabStrip_Body	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	ACACAC				
-//	RibbonBar_Body	Standard	Rechteck					Solide		F4F5F6			Solide_1px	E5E4E5				
-//	RibbonBar_Body	Standard_Disabled	Rechteck					Solide		F4F5F6			Solide_1px	E5E4E5				
-//	RibbonBar_Back	Standard	Rechteck				5	Solide		FFFFFF			Ohne					
-//	TabStrip_Back	Standard	Ohne					Ohne					Ohne					
-//	Progressbar	Standard	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6				
-//	Progressbar_Füller	Standard	Rechteck					Solide		0072BC			Ohne					
-//	Table_Lines_thick	Standard	Ohne					Ohne					Ohne	ACACAC				
-//	Table_Lines_thin	Standard	Ohne					Ohne					Ohne	D8D8D8				
-//	Table_Cursor	Standard	Rechteck	-1	-1	-1	-1	Ohne					Solide_3px	ACACAC				
-//	Table_Cursor	Standard_HasFocus	Rechteck	-1	-1	-1	-1	Ohne					Solide_3px	3399FF				
-//	Table_Cell	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}	
-//	Table_Cell_New	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Italic=True}	
-//	Table_Column	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Bold=True}	
-//	Table_Cell_Chapter	Standard															{Name=Calibri, Size=15, Bold=True, Underline=True}	
-#endregion
+//	TextBox	Standard	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15}
+//	TextBox	Checked	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
+//	TextBox	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15, Color=9d9d9d}
+//	TextBox	Checked_HasFocus	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
+//	TextBox	Standard_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	ListBox	Standard	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6
+//	ListBox	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8
+//	ComboBox_Textbox	Standard	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15}
+//	ComboBox_Textbox	Standard_HasFocus_MousePressed	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	ComboBox_Textbox	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	ComboBox_Textbox	Checked	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
+//	ComboBox_Textbox	Checked_MouseOver	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
+//	ComboBox_Textbox	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15, Color=9d9d9d}
+//	ComboBox_Textbox	Checked_HasFocus	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
+//	ComboBox_Textbox	Checked_MouseOver_HasFocus	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
+//	ComboBox_Textbox	Checked_HasFocus_MousePressed	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
+//	ComboBox_Textbox	Standard_MouseOver	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15}
+//	ComboBox_Textbox	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
+//	ComboBox_Textbox	Standard_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	ComboBox_Textbox	Standard_MouseOver_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Table_And_Pad	Standard	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6
+//	Table_And_Pad	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8
+//	Table_And_Pad	Standard_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF
+//	EasyPic	Standard	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6
+//	EasyPic	Standard_HasFocus_MousePressed	Rechteck					Solide		FFFFFF			Solide_1px	3399FF
+//	EasyPic	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Solide		FFFFFF			Solide_1px	3399FF
+//	EasyPic	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8
+//	EasyPic	Standard_MouseOver	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6
+//	EasyPic	Standard_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF
+//	TextBox_Stufe3	Standard	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6			{Name=Calibri, Size=12, Bold=True, Underline=True}
+//	TextBox_Stufe3	Checked	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=12, Bold=True, Underline=True, Color=ffffff}
+//	TextBox_Stufe3	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			{Name=Calibri, Size=12, Bold=True, Underline=True, Color=c0c0c0}
+//	TextBox_Stufe3	Checked_HasFocus	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=12, Bold=True, Underline=True, Color=ffffff}
+//	TextBox_Stufe3	Standard_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			{Name=Calibri, Size=12, Bold=True, Underline=True}
+//	TextBox_Bold	Standard	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6			{Name=Calibri, Size=10[K]15, Bold=True}
+//	TextBox_Bold	Checked	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Bold=True, Color=ffffff}
+//	TextBox_Bold	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15, Bold=True, Color=9d9d9d}
+//	TextBox_Bold	Checked_HasFocus	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Bold=True, Color=ffffff}
+//	TextBox_Bold	Standard_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15, Bold=True}
+//	Slider_Hintergrund_Waagerecht	Standard	Rechteck					Solide		F0F0F0			Ohne
+//	Slider_Hintergrund_Waagerecht	Standard_MouseOver_MousePressed	Rechteck					Solide		EFEFEF			Ohne	B7B7B7
+//	Slider_Hintergrund_Waagerecht	Standard_Disabled	Rechteck					Solide		F9F9F9			Ohne	D8D8D8
+//	Slider_Hintergrund_Waagerecht	Standard_MouseOver	Rechteck					Solide		EFEFEF			Ohne	B7B7B7
+//	Slider_Hintergrund_Waagerecht	Standard_MousePressed	Rechteck					Solide		EFEFEF			Ohne	B7B7B7
+//	Slider_Hintergrund_Senkrecht	Standard	Rechteck					Solide		F0F0F0			Ohne
+//	Slider_Hintergrund_Senkrecht	Standard_MouseOver_MousePressed	Rechteck					Solide		EFEFEF			Ohne	B7B7B7
+//	Slider_Hintergrund_Senkrecht	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Solide		EFEFEF			Ohne	B7B7B7
+//	Slider_Hintergrund_Senkrecht	Standard_Disabled	Rechteck					Solide		F9F9F9			Ohne	D8D8D8
+//	Slider_Hintergrund_Senkrecht	Standard_MouseOver	Rechteck					Solide		EFEFEF			Ohne	B7B7B7
+//	Slider_Hintergrund_Senkrecht	Standard_MousePressed	Rechteck					Solide		EFEFEF			Ohne	B7B7B7
+//	Ribbonbar_Button	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}
+//	Ribbonbar_Button	Standard_HasFocus_MousePressed	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}
+//	Ribbonbar_Button	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Ohne					Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Ribbonbar_Button	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}
+//	Ribbonbar_Button	Standard_MouseOver	Rechteck					Ohne					Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15}
+//	Ribbonbar_Button	Standard_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Ribbonbar_Button	Standard_MouseOver_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Ribbonbar_Button_CheckBox	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}
+//	Ribbonbar_Button_CheckBox	Checked	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			{Name=Calibri, Size=10[K]15}
+//	Ribbonbar_Button_CheckBox	Checked_Disabled	Rechteck					Solide		DFDFDF			Solide_1px	B7B7B7			{Name=Calibri, Size=10[K]15, Color=ffffff}
+//	Ribbonbar_Button_CheckBox	Checked_MouseOver	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			{Name=Calibri, Size=10[K]15}
+//	Ribbonbar_Button_CheckBox	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}
+//	Ribbonbar_Button_CheckBox	Checked_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Ribbonbar_Button_CheckBox	Checked_MouseOver_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Ribbonbar_Button_CheckBox	Checked_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Ribbonbar_Button_CheckBox	Standard_MouseOver	Rechteck					Ohne					Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15}
+//	Ribbonbar_Button_CheckBox	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Ribbonbar_Button_CheckBox	Standard_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Ribbonbar_Button_CheckBox	Standard_MouseOver_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Ribbonbar_Button_OptionButton	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}
+//	Ribbonbar_Button_OptionButton	Checked	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			{Name=Calibri, Size=10[K]15}
+//	Ribbonbar_Button_OptionButton	Checked_Disabled	Rechteck					Solide		DFDFDF			Solide_1px	B7B7B7			{Name=Calibri, Size=10[K]15, Color=ffffff}
+//	Ribbonbar_Button_OptionButton	Checked_MouseOver	Rechteck					Solide		BFDFFF			Solide_1px	81B8EF			{Name=Calibri, Size=10[K]15}
+//	Ribbonbar_Button_OptionButton	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}
+//	Ribbonbar_Button_OptionButton	Checked_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Ribbonbar_Button_OptionButton	Checked_MouseOver_HasFocus	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Ribbonbar_Button_OptionButton	Checked_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Ribbonbar_Button_OptionButton	Standard_MouseOver	Rechteck					Ohne					Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15}
+//	Ribbonbar_Button_OptionButton	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		BFDFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Ribbonbar_Button_OptionButton	Standard_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Ribbonbar_Button_OptionButton	Standard_MouseOver_HasFocus	Rechteck					Ohne					Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Ribbon_ComboBox_Textbox	Standard	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15}
+//	Ribbon_ComboBox_Textbox	Standard_HasFocus_MousePressed	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Ribbon_ComboBox_Textbox	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Ribbon_ComboBox_Textbox	Checked	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
+//	Ribbon_ComboBox_Textbox	Checked_MouseOver	Rechteck					Solide		0072BC			Solide_1px	0			{Name=Calibri, Size=10[K]15, Color=ffffff}
+//	Ribbon_ComboBox_Textbox	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15, Color=9d9d9d}
+//	Ribbon_ComboBox_Textbox	Checked_HasFocus	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
+//	Ribbon_ComboBox_Textbox	Checked_MouseOver_HasFocus	Rechteck					Solide		0072BC			Solide_1px	0			{Name=Calibri, Size=10[K]15, Color=ffffff}
+//	Ribbon_ComboBox_Textbox	Checked_HasFocus_MousePressed	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
+//	Ribbon_ComboBox_Textbox	Standard_MouseOver	Rechteck					Solide		FFFFFF			Solide_1px	D8D8D8			{Name=Calibri, Size=10[K]15}
+//	Ribbon_ComboBox_Textbox	Checked_MouseOver_HasFocus_MousePressed	Rechteck					Solide		0072BC			Solide_1px	0			{Name=Calibri, Size=10[K]15, Color=ffffff}
+//	Ribbon_ComboBox_Textbox	Standard_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Ribbon_ComboBox_Textbox	Standard_MouseOver_HasFocus	Rechteck					Solide		FFFFFF			Solide_1px	3399FF			{Name=Calibri, Size=10[K]15}
+//	Ribbonbar_Caption	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}
+//	Ribbonbar_Caption	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}
+//	Ribbonbar_Button_Combobox	Standard	Ohne					Ohne					Ohne
+//	Ribbonbar_Button_Combobox	Standard_HasFocus_MousePressed	Ohne					Ohne					Ohne
+//	Ribbonbar_Button_Combobox	Standard_MouseOver_HasFocus_MousePressed	Ohne					Ohne					Ohne
+//	Ribbonbar_Button_Combobox	Standard_Disabled	Ohne					Ohne					Ohne
+//	Ribbonbar_Button_Combobox	Standard_MouseOver	Ohne					Ohne					Ohne
+//	Ribbonbar_Button_Combobox	Standard_HasFocus	Ohne					Ohne					Ohne
+//	Ribbonbar_Button_Combobox	Standard_MouseOver_HasFocus	Ohne					Ohne					Ohne
+//	RibbonBar_Frame	Standard	Rechteck	1	0	1	1	Ohne					Solide_1px	ACACAC			{Name=Calibri, Size=10[K]15, Italic=True}
+//	RibbonBar_Frame	Standard_Disabled	Rechteck	1	0	1	1	Ohne					Solide_1px	ACACAC			{Name=Calibri, Size=10[K]15, Italic=True, Color=9d9d9d}
+//	Form_Standard	Standard	Rechteck					Solide		F0F0F0			Ohne
+//	Form_MsgBox	Standard	Rechteck					Solide		F0F0F0			Ohne				{Name=Calibri, Size=10[K]15}
+//	Form_QuickInfo	Standard	Rechteck					Solide		BFDFFF			Solide_1px	4DA1B5			{Name=Calibri, Size=10[K]15}
+//	Form_DesktopBenachrichtigung	Standard	Rechteck					Solide		1F1F1F			Solide_3px	484848			{Name=Calibri, Size=12[K]5, Color=ffffff}
+//	Form_BitteWarten	Standard	Rechteck					Solide		BFDFFF			Solide_1px	4DA1B5			{Name=Calibri, Size=10[K]15}
+//	Form_AutoFilter	Standard	Rechteck					Solide		FFFFFF			Solide_1px	0			{Name=Calibri, Size=10[K]15}
+//	Form_AutoFilter	Standard_Disabled															{Name=Calibri, Size=10[K]15, Color=9d9d9d}
+//	Form_KontextMenu	Standard	Rechteck					Solide		F0F0F0			Solide_1px	0
+//	Form_SelectBox_Dropdown	Standard	Rechteck					Solide		FFFFFF			Solide_1px	0			{Name=Calibri, Size=10[K]15}
+//	Item_DropdownMenu	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}
+//	Item_DropdownMenu	Checked	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
+//	Item_DropdownMenu	Checked_Disabled	Rechteck					Solide		5D5D5D			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
+//	Item_DropdownMenu	Checked_MouseOver	Rechteck					Solide		0072BC			Solide_1px	0			{Name=Calibri, Size=10[K]15, Color=ffffff}
+//	Item_DropdownMenu	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}
+//	Item_DropdownMenu	Standard_MouseOver	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
+//	Item_KontextMenu	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}
+//	Item_KontextMenu	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}
+//	Item_KontextMenu	Standard_MouseOver	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
+//	Item_KontextMenu_Caption	Standard	Rechteck					Solide		BFDFFF			Ohne				{Name=Calibri, Size=10[K]15, Bold=True}
+//	Item_KontextMenu_Caption	Standard_Disabled	Rechteck					Solide		BFDFFF			Ohne				{Name=Calibri, Size=10[K]15, Bold=True}
+//	Item_KontextMenu_Caption	Standard_MouseOver	Rechteck					Solide		BFDFFF			Solide_1px	4DA1B5			{Name=Calibri, Size=10[K]15, Bold=True}
+//	Item_Autofilter	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}
+//	Item_Autofilter	Standard_MouseOver_HasFocus_MousePressed	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
+//	Item_Autofilter	Checked	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
+//	Item_Autofilter	Checked_Disabled	Rechteck					Solide		5D5D5D			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
+//	Item_Autofilter	Checked_MouseOver	Rechteck					Solide		0072BC			Solide_1px	0			{Name=Calibri, Size=10[K]15, Color=ffffff}
+//	Item_Autofilter	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}
+//	Item_Autofilter	Standard_MouseOver	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
+//	Item_Autofilter	Standard_HasFocus	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}
+//	Item_Autofilter	Standard_MouseOver_HasFocus	Rechteck					Solide		0072BC			Ohne				{Name=Calibri, Size=10[K]15, Color=ffffff}
+//	Item_Listbox	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}
+//	Item_Listbox	Standard_MouseOver_MousePressed	Rechteck					Solide		CCE8FF			Solide_1px	99D1FF			{Name=Calibri, Size=10[K]15, Underline=True}
+//	Item_Listbox	Checked	Rechteck					Solide		CCE8FF			Solide_1px	99D1FF			{Name=Calibri, Size=10[K]15}
+//	Item_Listbox	Checked_Disabled	Rechteck					Solide		DFDFDF			Solide_1px	B7B7B7			{Name=Calibri, Size=10[K]15, Color=ffffff}
+//	Item_Listbox	Checked_MouseOver	Rechteck					Solide		CCE8FF			Solide_1px	99D1FF			{Name=Calibri, Size=10[K]15, Underline=True}
+//	Item_Listbox	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Color=9d9d9d}
+//	Item_Listbox	Checked_MousePressed	Rechteck					Solide		CCE8FF			Solide_1px	99D1FF			{Name=Calibri, Size=10[K]15}
+//	Item_Listbox	Standard_MouseOver	Rechteck					Solide		E5F3FF			Ohne				{Name=Calibri, Size=10[K]15, Underline=True}
+//	Item_Listbox	Standard_MousePressed	Rechteck					Solide		CCE8FF			Solide_1px	99D1FF			{Name=Calibri, Size=10[K]15}
+//	Item_Listbox_Caption	Standard	Rechteck					Solide		BFDFFF			Ohne				{Name=Calibri, Size=10[K]15, Bold=True}
+//	Item_Listbox_Caption	Standard_Disabled	Rechteck					Solide		DFDFDF			Ohne				{Name=Calibri, Size=10[K]15, Bold=True, Color=ffffff}
+//	Item_Listbox_Caption	Standard_MouseOver	Rechteck					Solide		BFDFFF			Solide_1px	4DA1B5			{Name=Calibri, Size=10[K]15, Bold=True}
+//	Frame	Standard	Rechteck			-7		Ohne					Solide_1px	ACACAC			{Name=Calibri, Size=10[K]15}
+//	Frame	Standard_Disabled	Rechteck			-7		Ohne					Solide_1px	ACACAC			{Name=Calibri, Size=10[K]15, Color=9d9d9d}
+//	TabStrip_Body	Standard	Rechteck					Solide		FFFFFF			Solide_1px	ACACAC
+//	TabStrip_Body	Standard_Disabled	Rechteck					Solide		FFFFFF			Solide_1px	ACACAC
+//	RibbonBar_Body	Standard	Rechteck					Solide		F4F5F6			Solide_1px	E5E4E5
+//	RibbonBar_Body	Standard_Disabled	Rechteck					Solide		F4F5F6			Solide_1px	E5E4E5
+//	RibbonBar_Back	Standard	Rechteck				5	Solide		FFFFFF			Ohne
+//	TabStrip_Back	Standard	Ohne					Ohne					Ohne
+//	Progressbar	Standard	Rechteck					Solide		FFFFFF			Solide_1px	B6B6B6
+//	Progressbar_Füller	Standard	Rechteck					Solide		0072BC			Ohne
+//	Table_Lines_thick	Standard	Ohne					Ohne					Ohne	ACACAC
+//	Table_Lines_thin	Standard	Ohne					Ohne					Ohne	D8D8D8
+//	Table_Cursor	Standard	Rechteck	-1	-1	-1	-1	Ohne					Solide_3px	ACACAC
+//	Table_Cursor	Standard_HasFocus	Rechteck	-1	-1	-1	-1	Ohne					Solide_3px	3399FF
+//	Table_Cell	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15}
+//	Table_Cell_New	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Italic=True}
+//	Table_Column	Standard	Ohne					Ohne					Ohne				{Name=Calibri, Size=10[K]15, Bold=True}
+//	Table_Cell_Chapter	Standard															{Name=Calibri, Size=15, Bold=True, Underline=True}
+
+#endregion Win 10
+
 #region Win XP
+
 //	Control	Status	Kontur	X1	X2	Y1	Y2	Draw Back	Verlauf Mitte	Color Back 1	Color Back 2	Color Back 3	Border Style	Color Border 1	Color Border 2	Color Border 3	Schrift	StandardPic
-//	Button	Standard	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	DCD7CB	Solide_1px	003C74			{Name=Arial, Size=9, Color=000000}	
-//	Button	Standard_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	DCD7CB	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}	
-//	Button	Standard_MouseOver_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	EFEEEA	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}	
-//	Button	Standard_Disabled	Rechteck_R4	0	0	0	0	Solide		F5F4EA			Solide_1px	C9C7BA			{Name=Arial, Size=9, Color=a6a6a6}	
-//	Button	Standard_MouseOver	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	DCD7CB	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}	
-//	Button	Standard_HasFocus	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	DCD7CB	Solide_1px_DuoColor	003C74	C2DBFF	8CB4F2	{Name=Arial, Size=9, Color=000000}	
-//	Button	Standard_MouseOver_HasFocus	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	DCD7CB	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}	
-//	Button_CheckBox	Standard	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	DCD7CB	Solide_1px	003C74			{Name=Arial, Size=9, Color=000000}	
-//	Button_CheckBox	Checked	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	DCD7CB	Solide_1px	003C74			{Name=Arial, Size=9, Color=000000}	
-//	Button_CheckBox	Checked_Disabled	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	DCD7CB	Solide_1px	C9C7BA			{Name=Arial, Size=9, Color=000000}	
-//	Button_CheckBox	Checked_MouseOver	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	EFEEEA	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}	
-//	Button_CheckBox	Standard_Disabled	Rechteck_R4	0	0	0	0	Solide		F5F4EA			Solide_1px	C9C7BA			{Name=Arial, Size=9, Color=a6a6a6}	
-//	Button_CheckBox	Checked_HasFocus	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	EFEEEA	Solide_1px_DuoColor	003C74	C2DBFF	8CB4F2	{Name=Arial, Size=9, Color=000000}	
-//	Button_CheckBox	Checked_MouseOver_HasFocus	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	EFEEEA	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}	
-//	Button_CheckBox	Checked_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	EFEEEA	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}	
-//	Button_CheckBox	Standard_MouseOver	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	DCD7CB	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}	
-//	Button_CheckBox	Checked_MouseOver_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	EFEEEA	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}	
-//	Button_CheckBox	Standard_HasFocus	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	DCD7CB	Solide_1px_DuoColor	003C74	C2DBFF	8CB4F2	{Name=Arial, Size=9, Color=000000}	
-//	Button_CheckBox	Standard_MouseOver_HasFocus	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	DCD7CB	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}	
-//	Button_OptionButton	Standard	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	DCD7CB	Solide_1px	003C74			{Name=Arial, Size=9, Color=000000}	
-//	Button_OptionButton	Checked	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	DCD7CB	Solide_1px	003C74			{Name=Arial, Size=9, Color=000000}	
-//	Button_OptionButton	Checked_Disabled	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	DCD7CB	Solide_1px	C9C7BA			{Name=Arial, Size=9, Color=a6a6a6}	
-//	Button_OptionButton	Checked_MouseOver	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	EFEEEA	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}	
-//	Button_OptionButton	Standard_Disabled	Rechteck_R4	0	0	0	0	Solide		F5F4EA			Solide_1px	C9C7BA			{Name=Arial, Size=9, Color=a6a6a6}	
-//	Button_OptionButton	Checked_HasFocus	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	EFEEEA	Solide_1px_DuoColor	003C74	C2DBFF	8CB4F2	{Name=Arial, Size=9, Color=000000}	
-//	Button_OptionButton	Checked_MouseOver_HasFocus	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	EFEEEA	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}	
-//	Button_OptionButton	Checked_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	EFEEEA	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}	
-//	Button_OptionButton	Standard_MouseOver	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	DCD7CB	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}	
-//	Button_OptionButton	Checked_MouseOver_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	EFEEEA	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}	
-//	Button_OptionButton	Standard_HasFocus	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	DCD7CB	Solide_1px_DuoColor	003C74	C2DBFF	8CB4F2	{Name=Arial, Size=9, Color=000000}	
-//	Button_OptionButton	Standard_MouseOver_HasFocus	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	DCD7CB	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}	
-//	Button_AutoFilter	Standard	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	DCD7CB	Solide_1px	003C74				
-//	Button_AutoFilter	Checked	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0	D1CCC1	E3E2DA	DCD7CB	Solide_1px	003C74				
-//	Button_AutoFilter	Standard_Disabled	Rechteck_R4	0	0	0	0	Solide		F5F4EA			Solide_1px	C9C7BA				
-//	Button_ComboBox	Standard	Rechteck_R4	-3	-3	-3	-3	Verlauf_Vertical_3	0,7	E6EEFC	C1D3FB	AEC8F7	Solide_1px	97AEE2				
-//	Button_ComboBox	Standard_HasFocus_MousePressed	Rechteck_R4	-3	-3	-3	-3	Verlauf_Diagonal_3	0,7	AEC8F7	C1D3FB	E6EEFC	Solide_1px	97AEE2				
-//	Button_ComboBox	Standard_MouseOver_HasFocus_MousePressed	Rechteck_R4	-3	-3	-3	-3	Verlauf_Diagonal_3	0,7	AEC8F7	C1D3FB	E6EEFC	Solide_1px	97AEE2				
-//	Button_ComboBox	Standard_Disabled	Rechteck_R4	-3	-3	-3	-3	Verlauf_Vertical_3	0,7	F7F7F4	EDEDE6	E6E6DD	Solide_1px	E8E8DF				
-//	Button_ComboBox	Standard_MouseOver	Rechteck_R4	-3	-3	-3	-3	Verlauf_Diagonal_3	0,7	FDFFFF	D2EAFE	B9DDFB	Solide_1px	97AEE2				
-//	Button_ComboBox	Standard_HasFocus	Rechteck_R4	-3	-3	-3	-3	Verlauf_Vertical_3	0,7	E6EEFC	C1D3FB	AEC8F7	Solide_1px	97AEE2				
-//	Button_ComboBox	Standard_MouseOver_HasFocus	Rechteck_R4	-3	-3	-3	-3	Verlauf_Diagonal_3	0,7	FDFFFF	D2EAFE	B9DDFB	Solide_1px	97AEE2				
-//	Button_Slider_Waagerecht	Standard	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,7	E6EEFC	C1D3FB	AEC8F7	Solide_1px	97AEE2				
-//	Button_Slider_Waagerecht	Standard_MouseOver_MousePressed	Rechteck_R4	0	0	0	0	Verlauf_Diagonal_3	0,5	AEC8F7	C1D3FB	E6EEFC	Solide_1px	97AEE2				
-//	Button_Slider_Waagerecht	Standard_Disabled	Ohne					Ohne					Ohne					
-//	Button_Slider_Waagerecht	Standard_MouseOver	Rechteck_R4	0	0	0	0	Verlauf_Diagonal_3	0,7	FDFFFF	D2EAFE	B9DDFB	Solide_1px	97AEE2				
-//	Button_Slider_Senkrecht	Standard	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,7	E6EEFC	C1D3FB	AEC8F7	Solide_1px	97AEE2				
-//	Button_Slider_Senkrecht	Standard_MouseOver_MousePressed	Rechteck_R4	0	0	0	0	Verlauf_Diagonal_3	0,5	AEC8F7	C1D3FB	E6EEFC	Solide_1px	97AEE2				
-//	Button_Slider_Senkrecht	Standard_Disabled	Ohne					Ohne					Ohne					
-//	Button_Slider_Senkrecht	Standard_MouseOver	Rechteck_R4	0	0	0	0	Verlauf_Diagonal_3	0,7	FDFFFF	D2EAFE	B9DDFB	Solide_1px	97AEE2				
-//	Button_SliderDesign	Standard	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,7	E6EEFC	C1D3FB	AEC8F7	Solide_1px	97AEE2				
-//	Button_SliderDesign	Standard_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Verlauf_Diagonal_3	0,7	AEC8F7	C1D3FB	E6EEFC	Solide_1px	97AEE2				
-//	Button_SliderDesign	Standard_MouseOver_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Verlauf_Diagonal_3	0,7	AEC8F7	C1D3FB	E6EEFC	Solide_1px	97AEE2				
-//	Button_SliderDesign	Standard_Disabled	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,7	F7F7F4	EDEDE6	E6E6DD	Solide_1px	E8E8DF				
-//	Button_SliderDesign	Standard_MouseOver	Rechteck_R4	0	0	0	0	Verlauf_Diagonal_3	0,7	FDFFFF	D2EAFE	B9DDFB	Solide_1px	97AEE2				
-//	Button_SliderDesign	Standard_HasFocus	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,7	E6EEFC	C1D3FB	AEC8F7	Solide_1px	97AEE2				
-//	Button_SliderDesign	Standard_MouseOver_HasFocus	Rechteck_R4	0	0	0	0	Verlauf_Diagonal_3	0,7	FDFFFF	D2EAFE	B9DDFB	Solide_1px	97AEE2				
-//	Button_EckpunktSchieber	Standard	Rechteck	0	0	0	0	Verlauf_Vertical_3	0,7	E6EEFC	C1D3FB	AEC8F7	Solide_1px	97AEE2				
-//	Button_EckpunktSchieber	Checked_MousePressed	Rechteck	0	0	0	0	Verlauf_Vertical_3	0,7	AEC8F7	C1D3FB	AEC8F7	Solide_1px	97AEE2				
-//	Button_EckpunktSchieber_Phantom	Standard	Rechteck	0	0	0	0	Ohne					Solide_1px	97AEE2				
-//	TabStrip_Head	Standard	Rechteck_R4	0	0	0	5	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	DCD7CB	Solide_1px	003C74			{Name=Arial, Size=9, Color=000000}	
-//	TabStrip_Head	Checked	Rechteck_R4	0	0	0	5	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	F4F3EE	Solide_1px	919B9C			{Name=Arial, Size=9, Color=000000}	
-//	TabStrip_Head	Checked_Disabled	Rechteck_R4	0	0	0	5	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	F4F3EE	Solide_1px	C9C7BA			{Name=Arial, Size=9, Color=a6a6a6}	
-//	TabStrip_Head	Checked_MouseOver	Rechteck_R4	0	0	0	5	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	F4F3EE	Solide_1px_DuoColor_NurOben	919B9C	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}	
-//	TabStrip_Head	Standard_Disabled	Rechteck_R4	0	0	0	5	Solide		F5F4EA			Solide_1px	C9C7BA			{Name=Arial, Size=9, Color=a6a6a6}	
-//	TabStrip_Head	Standard_MouseOver	Rechteck_R4	0	0	0	5	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	DCD7CB	Solide_1px_DuoColor_NurOben	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}	
-//	RibbonBar_Head	Standard	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=000000}	
-//	RibbonBar_Head	Checked	Rechteck	0	0	0	5	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	F4F3EE	Solide_1px	919B9C			{Name=Arial, Size=9, Color=000000}	
-//	RibbonBar_Head	Checked_Disabled	Rechteck	0	0	0	5	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	F4F3EE	Solide_1px	C9C7BA			{Name=Arial, Size=9, Color=a6a6a6}	
-//	RibbonBar_Head	Checked_MouseOver	Rechteck	0	0	0	5	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	F4F3EE	Solide_1px	919B9C			{Name=Arial, Size=9, Color=0000ff}	
-//	RibbonBar_Head	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=a6a6a6}	
-//	RibbonBar_Head	Standard_MouseOver	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=0000ff}	
-//	Caption	Standard	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=000000}	
-//	Caption	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=a6a6a6}	
+//	Button	Standard	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	DCD7CB	Solide_1px	003C74			{Name=Arial, Size=9, Color=000000}
+//	Button	Standard_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	DCD7CB	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}
+//	Button	Standard_MouseOver_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	EFEEEA	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}
+//	Button	Standard_Disabled	Rechteck_R4	0	0	0	0	Solide		F5F4EA			Solide_1px	C9C7BA			{Name=Arial, Size=9, Color=a6a6a6}
+//	Button	Standard_MouseOver	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	DCD7CB	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}
+//	Button	Standard_HasFocus	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	DCD7CB	Solide_1px_DuoColor	003C74	C2DBFF	8CB4F2	{Name=Arial, Size=9, Color=000000}
+//	Button	Standard_MouseOver_HasFocus	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	DCD7CB	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}
+//	Button_CheckBox	Standard	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	DCD7CB	Solide_1px	003C74			{Name=Arial, Size=9, Color=000000}
+//	Button_CheckBox	Checked	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	DCD7CB	Solide_1px	003C74			{Name=Arial, Size=9, Color=000000}
+//	Button_CheckBox	Checked_Disabled	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	DCD7CB	Solide_1px	C9C7BA			{Name=Arial, Size=9, Color=000000}
+//	Button_CheckBox	Checked_MouseOver	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	EFEEEA	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}
+//	Button_CheckBox	Standard_Disabled	Rechteck_R4	0	0	0	0	Solide		F5F4EA			Solide_1px	C9C7BA			{Name=Arial, Size=9, Color=a6a6a6}
+//	Button_CheckBox	Checked_HasFocus	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	EFEEEA	Solide_1px_DuoColor	003C74	C2DBFF	8CB4F2	{Name=Arial, Size=9, Color=000000}
+//	Button_CheckBox	Checked_MouseOver_HasFocus	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	EFEEEA	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}
+//	Button_CheckBox	Checked_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	EFEEEA	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}
+//	Button_CheckBox	Standard_MouseOver	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	DCD7CB	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}
+//	Button_CheckBox	Checked_MouseOver_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	EFEEEA	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}
+//	Button_CheckBox	Standard_HasFocus	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	DCD7CB	Solide_1px_DuoColor	003C74	C2DBFF	8CB4F2	{Name=Arial, Size=9, Color=000000}
+//	Button_CheckBox	Standard_MouseOver_HasFocus	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	DCD7CB	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}
+//	Button_OptionButton	Standard	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	DCD7CB	Solide_1px	003C74			{Name=Arial, Size=9, Color=000000}
+//	Button_OptionButton	Checked	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	DCD7CB	Solide_1px	003C74			{Name=Arial, Size=9, Color=000000}
+//	Button_OptionButton	Checked_Disabled	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	DCD7CB	Solide_1px	C9C7BA			{Name=Arial, Size=9, Color=a6a6a6}
+//	Button_OptionButton	Checked_MouseOver	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	EFEEEA	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}
+//	Button_OptionButton	Standard_Disabled	Rechteck_R4	0	0	0	0	Solide		F5F4EA			Solide_1px	C9C7BA			{Name=Arial, Size=9, Color=a6a6a6}
+//	Button_OptionButton	Checked_HasFocus	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	EFEEEA	Solide_1px_DuoColor	003C74	C2DBFF	8CB4F2	{Name=Arial, Size=9, Color=000000}
+//	Button_OptionButton	Checked_MouseOver_HasFocus	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	EFEEEA	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}
+//	Button_OptionButton	Checked_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	EFEEEA	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}
+//	Button_OptionButton	Standard_MouseOver	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	DCD7CB	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}
+//	Button_OptionButton	Checked_MouseOver_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	EFEEEA	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}
+//	Button_OptionButton	Standard_HasFocus	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	DCD7CB	Solide_1px_DuoColor	003C74	C2DBFF	8CB4F2	{Name=Arial, Size=9, Color=000000}
+//	Button_OptionButton	Standard_MouseOver_HasFocus	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	DCD7CB	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}
+//	Button_AutoFilter	Standard	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	DCD7CB	Solide_1px	003C74
+//	Button_AutoFilter	Checked	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0	D1CCC1	E3E2DA	DCD7CB	Solide_1px	003C74
+//	Button_AutoFilter	Standard_Disabled	Rechteck_R4	0	0	0	0	Solide		F5F4EA			Solide_1px	C9C7BA
+//	Button_ComboBox	Standard	Rechteck_R4	-3	-3	-3	-3	Verlauf_Vertical_3	0,7	E6EEFC	C1D3FB	AEC8F7	Solide_1px	97AEE2
+//	Button_ComboBox	Standard_HasFocus_MousePressed	Rechteck_R4	-3	-3	-3	-3	Verlauf_Diagonal_3	0,7	AEC8F7	C1D3FB	E6EEFC	Solide_1px	97AEE2
+//	Button_ComboBox	Standard_MouseOver_HasFocus_MousePressed	Rechteck_R4	-3	-3	-3	-3	Verlauf_Diagonal_3	0,7	AEC8F7	C1D3FB	E6EEFC	Solide_1px	97AEE2
+//	Button_ComboBox	Standard_Disabled	Rechteck_R4	-3	-3	-3	-3	Verlauf_Vertical_3	0,7	F7F7F4	EDEDE6	E6E6DD	Solide_1px	E8E8DF
+//	Button_ComboBox	Standard_MouseOver	Rechteck_R4	-3	-3	-3	-3	Verlauf_Diagonal_3	0,7	FDFFFF	D2EAFE	B9DDFB	Solide_1px	97AEE2
+//	Button_ComboBox	Standard_HasFocus	Rechteck_R4	-3	-3	-3	-3	Verlauf_Vertical_3	0,7	E6EEFC	C1D3FB	AEC8F7	Solide_1px	97AEE2
+//	Button_ComboBox	Standard_MouseOver_HasFocus	Rechteck_R4	-3	-3	-3	-3	Verlauf_Diagonal_3	0,7	FDFFFF	D2EAFE	B9DDFB	Solide_1px	97AEE2
+//	Button_Slider_Waagerecht	Standard	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,7	E6EEFC	C1D3FB	AEC8F7	Solide_1px	97AEE2
+//	Button_Slider_Waagerecht	Standard_MouseOver_MousePressed	Rechteck_R4	0	0	0	0	Verlauf_Diagonal_3	0,5	AEC8F7	C1D3FB	E6EEFC	Solide_1px	97AEE2
+//	Button_Slider_Waagerecht	Standard_Disabled	Ohne					Ohne					Ohne
+//	Button_Slider_Waagerecht	Standard_MouseOver	Rechteck_R4	0	0	0	0	Verlauf_Diagonal_3	0,7	FDFFFF	D2EAFE	B9DDFB	Solide_1px	97AEE2
+//	Button_Slider_Senkrecht	Standard	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,7	E6EEFC	C1D3FB	AEC8F7	Solide_1px	97AEE2
+//	Button_Slider_Senkrecht	Standard_MouseOver_MousePressed	Rechteck_R4	0	0	0	0	Verlauf_Diagonal_3	0,5	AEC8F7	C1D3FB	E6EEFC	Solide_1px	97AEE2
+//	Button_Slider_Senkrecht	Standard_Disabled	Ohne					Ohne					Ohne
+//	Button_Slider_Senkrecht	Standard_MouseOver	Rechteck_R4	0	0	0	0	Verlauf_Diagonal_3	0,7	FDFFFF	D2EAFE	B9DDFB	Solide_1px	97AEE2
+//	Button_SliderDesign	Standard	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,7	E6EEFC	C1D3FB	AEC8F7	Solide_1px	97AEE2
+//	Button_SliderDesign	Standard_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Verlauf_Diagonal_3	0,7	AEC8F7	C1D3FB	E6EEFC	Solide_1px	97AEE2
+//	Button_SliderDesign	Standard_MouseOver_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Verlauf_Diagonal_3	0,7	AEC8F7	C1D3FB	E6EEFC	Solide_1px	97AEE2
+//	Button_SliderDesign	Standard_Disabled	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,7	F7F7F4	EDEDE6	E6E6DD	Solide_1px	E8E8DF
+//	Button_SliderDesign	Standard_MouseOver	Rechteck_R4	0	0	0	0	Verlauf_Diagonal_3	0,7	FDFFFF	D2EAFE	B9DDFB	Solide_1px	97AEE2
+//	Button_SliderDesign	Standard_HasFocus	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,7	E6EEFC	C1D3FB	AEC8F7	Solide_1px	97AEE2
+//	Button_SliderDesign	Standard_MouseOver_HasFocus	Rechteck_R4	0	0	0	0	Verlauf_Diagonal_3	0,7	FDFFFF	D2EAFE	B9DDFB	Solide_1px	97AEE2
+//	Button_EckpunktSchieber	Standard	Rechteck	0	0	0	0	Verlauf_Vertical_3	0,7	E6EEFC	C1D3FB	AEC8F7	Solide_1px	97AEE2
+//	Button_EckpunktSchieber	Checked_MousePressed	Rechteck	0	0	0	0	Verlauf_Vertical_3	0,7	AEC8F7	C1D3FB	AEC8F7	Solide_1px	97AEE2
+//	Button_EckpunktSchieber_Phantom	Standard	Rechteck	0	0	0	0	Ohne					Solide_1px	97AEE2
+//	TabStrip_Head	Standard	Rechteck_R4	0	0	0	5	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	DCD7CB	Solide_1px	003C74			{Name=Arial, Size=9, Color=000000}
+//	TabStrip_Head	Checked	Rechteck_R4	0	0	0	5	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	F4F3EE	Solide_1px	919B9C			{Name=Arial, Size=9, Color=000000}
+//	TabStrip_Head	Checked_Disabled	Rechteck_R4	0	0	0	5	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	F4F3EE	Solide_1px	C9C7BA			{Name=Arial, Size=9, Color=a6a6a6}
+//	TabStrip_Head	Checked_MouseOver	Rechteck_R4	0	0	0	5	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	F4F3EE	Solide_1px_DuoColor_NurOben	919B9C	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}
+//	TabStrip_Head	Standard_Disabled	Rechteck_R4	0	0	0	5	Solide		F5F4EA			Solide_1px	C9C7BA			{Name=Arial, Size=9, Color=a6a6a6}
+//	TabStrip_Head	Standard_MouseOver	Rechteck_R4	0	0	0	5	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	DCD7CB	Solide_1px_DuoColor_NurOben	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}
+//	RibbonBar_Head	Standard	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=000000}
+//	RibbonBar_Head	Checked	Rechteck	0	0	0	5	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	F4F3EE	Solide_1px	919B9C			{Name=Arial, Size=9, Color=000000}
+//	RibbonBar_Head	Checked_Disabled	Rechteck	0	0	0	5	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	F4F3EE	Solide_1px	C9C7BA			{Name=Arial, Size=9, Color=a6a6a6}
+//	RibbonBar_Head	Checked_MouseOver	Rechteck	0	0	0	5	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	F4F3EE	Solide_1px	919B9C			{Name=Arial, Size=9, Color=0000ff}
+//	RibbonBar_Head	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=a6a6a6}
+//	RibbonBar_Head	Standard_MouseOver	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=0000ff}
+//	Caption	Standard	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=000000}
+//	Caption	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=a6a6a6}
 //	CheckBox_TextStyle	Standard	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=000000}	CheckBox
 //	CheckBox_TextStyle	Checked	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=000000}	CheckBox_Checked
 //	CheckBox_TextStyle	Checked_Disabled	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=a6a6a6}	CheckBox_Disabled_Checked
@@ -394,247 +403,250 @@ using System.Reflection;
 //	OptionButton_TextStyle	Checked_MouseOver_HasFocus_MousePressed	Rechteck	0	0	0	0	Ohne					FocusDotLine			404040	{Name=Arial, Size=9, Color=000000}	OptionBox_Checked_MouseOver
 //	OptionButton_TextStyle	Standard_HasFocus	Rechteck	0	0	0	0	Ohne					FocusDotLine			404040	{Name=Arial, Size=9, Color=000000}	OptionBox
 //	OptionButton_TextStyle	Standard_MouseOver_HasFocus	Rechteck	0	0	0	0	Ohne					FocusDotLine			404040	{Name=Arial, Size=9, Color=000000}	OptionBox_MouseOver
-//	TextBox	Standard	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9			{Name=Arial, Size=9, Color=000000}	
-//	TextBox	Checked	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}	
-//	TextBox	Standard_Disabled	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	C9C7BA			{Name=Arial, Size=9, Color=a6a6a6}	
-//	TextBox	Checked_HasFocus	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}	
-//	TextBox	Standard_HasFocus	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9			{Name=Arial, Size=9, Color=000000}	
-//	ListBox	Standard	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9				
-//	ListBox	Standard_Disabled	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	C9C7BA				
-//	ComboBox_Textbox	Standard	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9			{Name=Arial, Size=9, Color=000000}	
-//	ComboBox_Textbox	Standard_HasFocus_MousePressed	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px_FocusDotLine	7F9DB9		0	{Name=Arial, Size=9, Color=000000}	
-//	ComboBox_Textbox	Standard_MouseOver_HasFocus_MousePressed	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px_FocusDotLine	7F9DB9		0	{Name=Arial, Size=9, Color=000000}	
-//	ComboBox_Textbox	Checked	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}	
-//	ComboBox_Textbox	Checked_MouseOver	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}	
-//	ComboBox_Textbox	Standard_Disabled	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	C9C7BA			{Name=Arial, Size=9, Color=a6a6a6}	
-//	ComboBox_Textbox	Checked_HasFocus	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}	
-//	ComboBox_Textbox	Checked_MouseOver_HasFocus	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}	
-//	ComboBox_Textbox	Checked_HasFocus_MousePressed	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}	
-//	ComboBox_Textbox	Standard_MouseOver	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9			{Name=Arial, Size=9, Color=000000}	
-//	ComboBox_Textbox	Checked_MouseOver_HasFocus_MousePressed	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}	
-//	ComboBox_Textbox	Standard_HasFocus	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px_FocusDotLine	7F9DB9		0	{Name=Arial, Size=9, Color=000000}	
-//	ComboBox_Textbox	Standard_MouseOver_HasFocus	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px_FocusDotLine	7F9DB9		0	{Name=Arial, Size=9, Color=000000}	
-//	Table_And_Pad	Standard	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9				
-//	Table_And_Pad	Standard_Disabled	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	C9C7BA				
-//	Table_And_Pad	Standard_HasFocus	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	003C74				
-//	EasyPic	Standard	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9				
-//	EasyPic	Standard_HasFocus_MousePressed	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9				
-//	EasyPic	Standard_MouseOver_HasFocus_MousePressed	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9				
-//	EasyPic	Standard_Disabled	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	C9C7BA				
-//	EasyPic	Standard_MouseOver	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9				
-//	EasyPic	Standard_HasFocus	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9				
-//	TextBox_Stufe3	Standard	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9			{Name=Arial, Size=12, Bold=True, Underline=True, Color=000000}	
-//	TextBox_Stufe3	Checked	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=12, Bold=True, Underline=True, Color=ffffff}	
-//	TextBox_Stufe3	Standard_Disabled	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	C9C7BA			{Name=Arial, Size=12, Bold=True, Underline=True, Color=a6a6a6}	
-//	TextBox_Stufe3	Checked_HasFocus	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=12, Bold=True, Underline=True, Color=ffffff}	
-//	TextBox_Stufe3	Standard_HasFocus	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9			{Name=Arial, Size=12, Bold=True, Underline=True, Color=000000}	
-//	TextBox_Bold	Standard	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9			{Name=Arial, Size=9, Bold=True, Color=000000}	
-//	TextBox_Bold	Checked	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Bold=True, Color=ffffff}	
-//	TextBox_Bold	Standard_Disabled	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	C9C7BA			{Name=Arial, Size=9, Bold=True, Color=a6a6a6}	
-//	TextBox_Bold	Checked_HasFocus	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Bold=True, Color=ffffff}	
-//	TextBox_Bold	Standard_HasFocus	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9			{Name=Arial, Size=9, Bold=True, Color=000000}	
-//	Slider_Hintergrund_Waagerecht	Standard	Rechteck	3	3	0	0	Verlauf_Vertical_Solide		F3F3EC	FEFEFB		Solide_1px	EEEDE5				
-//	Slider_Hintergrund_Waagerecht	Standard_MouseOver_MousePressed	Rechteck	3	3	0	0	Verlauf_Vertical_Solide		F3F3EC	FEFEFB		Solide_1px	EEEDE5				
-//	Slider_Hintergrund_Waagerecht	Standard_Disabled	Rechteck	3	3	0	0	Verlauf_Vertical_Solide		F3F3EC	FEFEFB		Solide_1px	EEEDE5				
-//	Slider_Hintergrund_Waagerecht	Standard_MouseOver	Rechteck	3	3	0	0	Verlauf_Vertical_Solide		F3F3EC	FEFEFB		Solide_1px	EEEDE5				
-//	Slider_Hintergrund_Waagerecht	Standard_MousePressed	Rechteck	3	3	0	0	Verlauf_Vertical_Solide		F3F3EC	FEFEFB		Solide_1px	EEEDE5				
-//	Slider_Hintergrund_Senkrecht	Standard	Rechteck	0	0	3	3	Verlauf_Horizontal_Solide		F3F3EC	FEFEFB		Solide_1px	EEEDE5				
-//	Slider_Hintergrund_Senkrecht	Standard_MouseOver_MousePressed	Rechteck	0	0	3	3	Verlauf_Horizontal_Solide		F3F3EC	FEFEFB		Solide_1px	EEEDE5				
-//	Slider_Hintergrund_Senkrecht	Standard_MouseOver_HasFocus_MousePressed	Rechteck	0	0	3	3	Verlauf_Horizontal_Solide		F3F3EC	FEFEFB		Solide_1px	EEEDE5				
-//	Slider_Hintergrund_Senkrecht	Standard_Disabled	Rechteck	0	0	3	3	Verlauf_Horizontal_Solide		F3F3EC	FEFEFB		Solide_1px	EEEDE5				
-//	Slider_Hintergrund_Senkrecht	Standard_MouseOver	Rechteck	0	0	3	3	Verlauf_Horizontal_Solide		F3F3EC	FEFEFB		Solide_1px	EEEDE5				
-//	Slider_Hintergrund_Senkrecht	Standard_MousePressed	Rechteck	0	0	3	3	Verlauf_Horizontal_Solide		F3F3EC	FEFEFB		Solide_1px	EEEDE5				
-//	Ribbonbar_Button	Standard	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=000000}	
-//	Ribbonbar_Button	Standard_HasFocus_MousePressed	Rechteck_R4	0	0	-4	-4	Ohne					FocusDotLine			404040	{Name=Arial, Size=9, Color=000000}	
-//	Ribbonbar_Button	Standard_MouseOver_HasFocus_MousePressed	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	FFB834	FFDA8C	FFE696	Solide_1px_FocusDotLine	0		404040	{Name=Arial, Size=9, Color=000000}	
-//	Ribbonbar_Button	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=a6a6a6}	
-//	Ribbonbar_Button	Standard_MouseOver	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	FFE696	FFDA8C	FFB834	Solide_1px	0			{Name=Arial, Size=9, Color=000000}	
-//	Ribbonbar_Button	Standard_HasFocus	Rechteck_R4	0	0	-4	-4	Ohne					FocusDotLine			404040	{Name=Arial, Size=9, Color=000000}	
-//	Ribbonbar_Button	Standard_MouseOver_HasFocus	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	FFE696	FFDA8C	FFB834	Solide_1px_FocusDotLine	0		404040	{Name=Arial, Size=9, Color=000000}	
-//	Ribbonbar_Button_CheckBox	Standard	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=000000}	
-//	Ribbonbar_Button_CheckBox	Checked	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	DCD7CB	Solide_1px	0			{Name=Arial, Size=9, Color=000000}	
-//	Ribbonbar_Button_CheckBox	Checked_Disabled	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	BDBAA2	ECE9D8	FFFFFF	Solide_1px	C9C7BA			{Name=Arial, Size=9, Color=a6a6a6}	
-//	Ribbonbar_Button_CheckBox	Checked_MouseOver	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	FFB834	FFDA8C	FFE696	Solide_1px	0			{Name=Arial, Size=9, Color=000000}	
-//	Ribbonbar_Button_CheckBox	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=a6a6a6}	
-//	Ribbonbar_Button_CheckBox	Checked_HasFocus	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	DCD7CB	Solide_1px_FocusDotLine	0		404040	{Name=Arial, Size=9, Color=000000}	
-//	Ribbonbar_Button_CheckBox	Checked_MouseOver_HasFocus	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	FFB834	FFDA8C	FFE696	Solide_1px_FocusDotLine	0		404040	{Name=Arial, Size=9, Color=000000}	
-//	Ribbonbar_Button_CheckBox	Checked_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	EFEEEA	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}	
-//	Ribbonbar_Button_CheckBox	Standard_MouseOver	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	FFE696	FFDA8C	FFB834	Solide_1px	0			{Name=Arial, Size=9, Color=000000}	
-//	Ribbonbar_Button_CheckBox	Checked_MouseOver_HasFocus_MousePressed	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	FFB834	FFDA8C	FFE696	Solide_1px_FocusDotLine	0		404040	{Name=Arial, Size=9, Color=000000}	
-//	Ribbonbar_Button_CheckBox	Standard_HasFocus	Rechteck_R4	0	0	-4	-4	Ohne					FocusDotLine			404040	{Name=Arial, Size=9, Color=000000}	
-//	Ribbonbar_Button_CheckBox	Standard_MouseOver_HasFocus	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	FFE696	FFDA8C	FFB834	Solide_1px_FocusDotLine	0		404040	{Name=Arial, Size=9, Color=000000}	
-//	Ribbonbar_Button_OptionButton	Standard	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=000000}	
-//	Ribbonbar_Button_OptionButton	Checked	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	DCD7CB	Solide_1px	0			{Name=Arial, Size=9, Color=000000}	
-//	Ribbonbar_Button_OptionButton	Checked_Disabled	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	BDBAA2	ECE9D8	FFFFFF	Solide_1px	C9C7BA			{Name=Arial, Size=9, Color=a6a6a6}	
-//	Ribbonbar_Button_OptionButton	Checked_MouseOver	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	FFB834	FFDA8C	FFE696	Solide_1px	0			{Name=Arial, Size=9, Color=000000}	
-//	Ribbonbar_Button_OptionButton	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=a6a6a6}	
-//	Ribbonbar_Button_OptionButton	Checked_HasFocus	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	DCD7CB	Solide_1px_FocusDotLine	0		404040	{Name=Arial, Size=9, Color=000000}	
-//	Ribbonbar_Button_OptionButton	Checked_MouseOver_HasFocus	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	FFB834	FFDA8C	FFE696	Solide_1px_FocusDotLine	0		404040	{Name=Arial, Size=9, Color=000000}	
-//	Ribbonbar_Button_OptionButton	Checked_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	EFEEEA	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}	
-//	Ribbonbar_Button_OptionButton	Standard_MouseOver	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	FFE696	FFDA8C	FFB834	Solide_1px	0			{Name=Arial, Size=9, Color=000000}	
-//	Ribbonbar_Button_OptionButton	Checked_MouseOver_HasFocus_MousePressed	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	FFB834	FFDA8C	FFE696	Solide_1px_FocusDotLine	0		404040	{Name=Arial, Size=9, Color=000000}	
-//	Ribbonbar_Button_OptionButton	Standard_HasFocus	Rechteck_R4	0	0	-4	-4	Ohne					FocusDotLine			404040	{Name=Arial, Size=9, Color=000000}	
-//	Ribbonbar_Button_OptionButton	Standard_MouseOver_HasFocus	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	FFE696	FFDA8C	FFB834	Solide_1px_FocusDotLine	0		404040	{Name=Arial, Size=9, Color=000000}	
-//	Ribbon_ComboBox_Textbox	Standard	Rechteck_R4	0	-3	-3	-3	Ohne					Solide_1px	7F9DB9			{Name=Arial, Size=9, Color=000000}	
-//	Ribbon_ComboBox_Textbox	Standard_HasFocus_MousePressed	Rechteck_R4	0	-3	-3	-3	Ohne					Solide_1px	7F9DB9			{Name=Arial, Size=9, Color=000000}	
-//	Ribbon_ComboBox_Textbox	Standard_MouseOver_HasFocus_MousePressed	Rechteck_R4	0	-3	-3	-3	Verlauf_Vertical_3	0,5	FFB834	FFDA8C	FFE696	Solide_1px	0			{Name=Arial, Size=9, Color=000000}	
-//	Ribbon_ComboBox_Textbox	Checked	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}	
-//	Ribbon_ComboBox_Textbox	Checked_MouseOver	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}	
-//	Ribbon_ComboBox_Textbox	Standard_Disabled	Rechteck_R4	0	-3	-3	-3	Ohne					Solide_1px	C9C7BA			{Name=Arial, Size=9, Color=a6a6a6}	
-//	Ribbon_ComboBox_Textbox	Checked_HasFocus	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}	
-//	Ribbon_ComboBox_Textbox	Checked_MouseOver_HasFocus	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}	
-//	Ribbon_ComboBox_Textbox	Checked_HasFocus_MousePressed	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}	
-//	Ribbon_ComboBox_Textbox	Standard_MouseOver	Rechteck_R4	0	-3	-3	-3	Verlauf_Vertical_3	0,5	FFE696	FFDA8C	FFB834	Solide_1px	0			{Name=Arial, Size=9, Color=000000}	
-//	Ribbon_ComboBox_Textbox	Checked_MouseOver_HasFocus_MousePressed	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}	
-//	Ribbon_ComboBox_Textbox	Standard_HasFocus	Rechteck_R4	0	-3	-3	-3	Ohne					Solide_1px	7F9DB9			{Name=Arial, Size=9, Color=000000}	
-//	Ribbon_ComboBox_Textbox	Standard_MouseOver_HasFocus	Rechteck_R4	0	-3	-3	-3	Verlauf_Vertical_3	0,5	FFE696	FFDA8C	FFB834	Solide_1px	0			{Name=Arial, Size=9, Color=000000}	
-//	Ribbonbar_Caption	Standard	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=000000}	
-//	Ribbonbar_Caption	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=a6a6a6}	
-//	Ribbonbar_Button_Combobox	Standard	Rechteck_R4	0	0	0	0	Ohne					Ohne	7F9DB9				
-//	Ribbonbar_Button_Combobox	Standard_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Ohne					Ohne	7F9DB9				
-//	Ribbonbar_Button_Combobox	Standard_MouseOver_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Ohne					Ohne	7F9DB9				
-//	Ribbonbar_Button_Combobox	Standard_Disabled	Rechteck_R4	0	0	0	0	Ohne					Ohne	7F9DB9				
-//	Ribbonbar_Button_Combobox	Standard_MouseOver	Rechteck_R4	0	0	0	0	Ohne					Ohne	7F9DB9				
-//	Ribbonbar_Button_Combobox	Standard_HasFocus	Rechteck_R4	0	0	0	0	Ohne					Ohne	7F9DB9				
-//	Ribbonbar_Button_Combobox	Standard_MouseOver_HasFocus	Rechteck_R4	0	0	0	0	Ohne					Ohne	7F9DB9				
-//	RibbonBar_Frame	Standard	Rechteck	1	0	1	1	Ohne					Solide_1px	0			{Name=Arial, Size=9, Color=0000ff}	
-//	RibbonBar_Frame	Standard_Disabled	Rechteck	1	0	1	1	Ohne					Solide_1px	C9C7BA			{Name=Arial, Size=9, Color=a6a6a6}	
-//	Form_Standard	Standard	Rechteck	0	0	0	0	Solide		ECE9D8			Ohne					
-//	Form_MsgBox	Standard	Rechteck	0	0	0	0	Solide		ECE9D8			Ohne	7F9DB9			{Name=Arial, Size=9, Color=000000}	
-//	Form_QuickInfo	Standard	Rechteck	0	0	0	0	Solide		FFFFEE			Solide_1px	0			{Name=Arial, Size=9, Color=000000}	
-//	Form_DesktopBenachrichtigung	Standard	Rechteck	0	0	0	0	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	DCD7CB	Solide_1px	0			{Name=Arial, Size=9, Color=000000}	
-//	Form_BitteWarten	Standard	Rechteck_R4	0	0	0	0	Solide		FFFFEE			Solide_1px	0			{Name=Arial, Size=9, Color=000000}	
-//	Form_AutoFilter	Standard	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	0			{Name=Arial, Size=9, Color=000000}	
-//	Form_AutoFilter	Standard_Disabled															{Name=Arial, Size=9, Color=a6a6a6}	
-//	Form_KontextMenu	Standard	Rechteck	0	0	0	0	Solide		F4F3EE			Solide_1px	0				
-//	Form_SelectBox_Dropdown	Standard	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	0			{Name=Arial, Size=9, Color=000000}	
-//	Item_DropdownMenu	Standard	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=000000}	
-//	Item_DropdownMenu	Checked	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}	
-//	Item_DropdownMenu	Checked_Disabled	Rechteck	0	0	0	0	Solide		BDBAA2			Ohne				{Name=Arial, Size=9, Color=ffffff}	
-//	Item_DropdownMenu	Checked_MouseOver	Rechteck	0	0	0	0	Verlauf_Vertical_3	0,5	316AC5	C1D3FB	316AC5	Solide_1px	97AEE2			{Name=Arial, Size=9, Color=ffffff}	
-//	Item_DropdownMenu	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=a6a6a6}	
-//	Item_DropdownMenu	Standard_MouseOver	Rechteck	0	0	0	0	Verlauf_Vertical_3	0,5	E6EEFC	C1D3FB	AEC8F7	Solide_1px	97AEE2			{Name=Arial, Size=9, Color=000000}	
-//	Item_KontextMenu	Standard	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=000000}	
-//	Item_KontextMenu	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=a6a6a6}	
-//	Item_KontextMenu	Standard_MouseOver	Rechteck	0	0	0	0	Verlauf_Vertical_3	0,5	E6EEFC	C1D3FB	AEC8F7	Solide_1px	97AEE2			{Name=Arial, Size=9, Color=000000}	
-//	Item_KontextMenu_Caption	Standard	Rechteck	0	0	0	0	Verlauf_Horizontal_3	0,5	AEC8F7	F4F3EE	F4F3EE	Ohne	97AEE2			{Name=Arial, Size=9, Bold=True, Color=000000}	
-//	Item_KontextMenu_Caption	Standard_Disabled	Rechteck	0	0	0	0	Verlauf_Horizontal_3	0,5	BDBAA2	F4F3EE	F4F3EE	Ohne				{Name=Arial, Size=9, Bold=True, Color=a6a6a6}	
-//	Item_KontextMenu_Caption	Standard_MouseOver	Rechteck	0	0	0	0	Verlauf_Horizontal_3	0,5	AEC8F7	F4F3EE	F4F3EE	Solide_1px	97AEE2			{Name=Arial, Size=9, Bold=True, Color=000000}	
-//	Item_Autofilter	Standard	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=000000}	
-//	Item_Autofilter	Standard_MouseOver_HasFocus_MousePressed	Rechteck	0	0	0	0	Verlauf_Vertical_3	0,5	AEC8F7	C1D3FB	E6EEFC	Solide_1px	97AEE2			{Name=Arial, Size=9, Color=000000}	
-//	Item_Autofilter	Checked	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}	
-//	Item_Autofilter	Checked_Disabled	Rechteck	0	0	0	0	Solide		BDBAA2			Ohne				{Name=Arial, Size=9, Color=ffffff}	
-//	Item_Autofilter	Checked_MouseOver	Rechteck	0	0	0	0	Verlauf_Vertical_3	0,5	316AC5	C1D3FB	316AC5	Solide_1px	97AEE2			{Name=Arial, Size=9, Color=ffffff}	
-//	Item_Autofilter	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=a6a6a6}	
-//	Item_Autofilter	Standard_MouseOver	Rechteck	0	0	0	0	Verlauf_Vertical_3	0,5	E6EEFC	C1D3FB	AEC8F7	Solide_1px	97AEE2			{Name=Arial, Size=9, Color=000000}	
-//	Item_Autofilter	Standard_HasFocus	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=000000}	
-//	Item_Autofilter	Standard_MouseOver_HasFocus	Rechteck	0	0	0	0	Verlauf_Vertical_3	0,5	E6EEFC	C1D3FB	AEC8F7	Solide_1px	97AEE2			{Name=Arial, Size=9, Color=000000}	
-//	Item_Listbox	Standard	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=000000}	
-//	Item_Listbox	Standard_MouseOver_MousePressed	Rechteck	0	0	0	0	Verlauf_Vertical_3	0,5	E6EEFC	C1D3FB	AEC8F7	Solide_1px	97AEE2			{Name=Arial, Size=9, Color=ffffff}	
-//	Item_Listbox	Checked	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}	
-//	Item_Listbox	Checked_Disabled	Rechteck	0	0	0	0	Solide		BDBAA2			Ohne				{Name=Arial, Size=9, Color=ffffff}	
-//	Item_Listbox	Checked_MouseOver	Rechteck	0	0	0	0	Verlauf_Vertical_3	0,5	316AC5	C1D3FB	316AC5	Solide_1px	97AEE2			{Name=Arial, Size=9, Color=ffffff}	
-//	Item_Listbox	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=a6a6a6}	
-//	Item_Listbox	Checked_MousePressed	Rechteck	0	0	0	0	Verlauf_Vertical_3	0,5	E6EEFC	C1D3FB	AEC8F7	Solide_1px	97AEE2			{Name=Arial, Size=9, Color=ffffff}	
-//	Item_Listbox	Standard_MouseOver	Rechteck	0	0	0	0	Verlauf_Vertical_3	0,5	E6EEFC	C1D3FB	AEC8F7	Solide_1px	97AEE2			{Name=Arial, Size=9, Color=ffffff}	
-//	Item_Listbox	Standard_MousePressed	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=000000}	
-//	Item_Listbox_Caption	Standard	Rechteck	0	0	0	0	Verlauf_Horizontal_3	0,5	AEC8F7	F4F3EE	F4F3EE	Solide_1px	97AEE2			{Name=Arial, Size=9, Bold=True, Color=000000}	
-//	Item_Listbox_Caption	Standard_Disabled	Rechteck	0	0	0	0	Verlauf_Horizontal_3	0,5	BDBAA2	F4F3EE	F4F3EE	Ohne				{Name=Arial, Size=9, Bold=True, Color=a6a6a6}	
-//	Item_Listbox_Caption	Standard_MouseOver	Rechteck	0	0	0	0	Verlauf_Horizontal_3	0,5	AEC8F7	F4F3EE	F4F3EE	Solide_1px	97AEE2			{Name=Arial, Size=9, Bold=True, Color=000000}	
-//	Frame	Standard	Rechteck_RRechteckRechteck	0	0	-6	0	Ohne					Solide_1px	919B9C			{Name=Arial, Size=9, Color=0000ff}	
-//	Frame	Standard_Disabled	Rechteck_RRechteckRechteck	0	0	-6	0	Ohne					Solide_1px	919B9C			{Name=Arial, Size=9, Color=a6a6a6}	
-//	TabStrip_Body	Standard	Rechteck	0	0	0	0	Solide		F4F3EE			ShadowBox	919B9C	D0CEBF	E3E0D0		
-//	TabStrip_Body	Standard_Disabled	Rechteck	0	0	0	0	Solide		F4F3EE			ShadowBox	919B9C	D0CEBF	E3E0D0		
-//	RibbonBar_Body	Standard	Rechteck	0	0	0	0	Verlauf_Vertical_Solide	0,5	F4F3EE	FFFFFF		Solide_1px	003C74				
-//	RibbonBar_Body	Standard_Disabled	Rechteck	0	0	0	0	Verlauf_Vertical_Solide	0,5	F4F3EE	FFFFFF		Solide_1px	003C74				
-//	RibbonBar_Back	Standard	Rechteck	0	0	0	5	Solide		ECE9D8			Ohne					
-//	TabStrip_Back	Standard						Ohne					Ohne					
-//	Progressbar	Standard	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9				
-//	Progressbar_Füller	Standard	Rechteck	0	0	0	0	Verlauf_Vertical_Solide		FFFFFF	0000FF		Solide_1px	7F9DB9				
-//	Table_Lines_thick	Standard	Ohne					Ohne					Ohne	003C74				
-//	Table_Lines_thin	Standard	Ohne					Ohne					Ohne	C9C7BA				
-//	Table_Cursor	Standard	Rechteck	-1	-1	-1	-1	Ohne					Solide_3px	C9C7BA				
-//	Table_Cursor	Standard_HasFocus	Rechteck	-1	-1	-1	-1	Ohne					Solide_3px	0				
-//	Table_Cell	Standard	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=000000}	
-//	Table_Cell_New	Standard	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Italic=True, Color=a6a6a6}	
-//	Table_Column	Standard	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Bold=True, Color=ffffff}	
-//	Table_Cell_Chapter	Standard															{Name=Arial, Size=14, Bold=True, Underline=True, Color=000000}	
-#endregion
+//	TextBox	Standard	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9			{Name=Arial, Size=9, Color=000000}
+//	TextBox	Checked	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}
+//	TextBox	Standard_Disabled	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	C9C7BA			{Name=Arial, Size=9, Color=a6a6a6}
+//	TextBox	Checked_HasFocus	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}
+//	TextBox	Standard_HasFocus	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9			{Name=Arial, Size=9, Color=000000}
+//	ListBox	Standard	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9
+//	ListBox	Standard_Disabled	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	C9C7BA
+//	ComboBox_Textbox	Standard	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9			{Name=Arial, Size=9, Color=000000}
+//	ComboBox_Textbox	Standard_HasFocus_MousePressed	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px_FocusDotLine	7F9DB9		0	{Name=Arial, Size=9, Color=000000}
+//	ComboBox_Textbox	Standard_MouseOver_HasFocus_MousePressed	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px_FocusDotLine	7F9DB9		0	{Name=Arial, Size=9, Color=000000}
+//	ComboBox_Textbox	Checked	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}
+//	ComboBox_Textbox	Checked_MouseOver	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}
+//	ComboBox_Textbox	Standard_Disabled	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	C9C7BA			{Name=Arial, Size=9, Color=a6a6a6}
+//	ComboBox_Textbox	Checked_HasFocus	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}
+//	ComboBox_Textbox	Checked_MouseOver_HasFocus	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}
+//	ComboBox_Textbox	Checked_HasFocus_MousePressed	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}
+//	ComboBox_Textbox	Standard_MouseOver	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9			{Name=Arial, Size=9, Color=000000}
+//	ComboBox_Textbox	Checked_MouseOver_HasFocus_MousePressed	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}
+//	ComboBox_Textbox	Standard_HasFocus	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px_FocusDotLine	7F9DB9		0	{Name=Arial, Size=9, Color=000000}
+//	ComboBox_Textbox	Standard_MouseOver_HasFocus	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px_FocusDotLine	7F9DB9		0	{Name=Arial, Size=9, Color=000000}
+//	Table_And_Pad	Standard	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9
+//	Table_And_Pad	Standard_Disabled	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	C9C7BA
+//	Table_And_Pad	Standard_HasFocus	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	003C74
+//	EasyPic	Standard	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9
+//	EasyPic	Standard_HasFocus_MousePressed	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9
+//	EasyPic	Standard_MouseOver_HasFocus_MousePressed	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9
+//	EasyPic	Standard_Disabled	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	C9C7BA
+//	EasyPic	Standard_MouseOver	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9
+//	EasyPic	Standard_HasFocus	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9
+//	TextBox_Stufe3	Standard	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9			{Name=Arial, Size=12, Bold=True, Underline=True, Color=000000}
+//	TextBox_Stufe3	Checked	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=12, Bold=True, Underline=True, Color=ffffff}
+//	TextBox_Stufe3	Standard_Disabled	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	C9C7BA			{Name=Arial, Size=12, Bold=True, Underline=True, Color=a6a6a6}
+//	TextBox_Stufe3	Checked_HasFocus	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=12, Bold=True, Underline=True, Color=ffffff}
+//	TextBox_Stufe3	Standard_HasFocus	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9			{Name=Arial, Size=12, Bold=True, Underline=True, Color=000000}
+//	TextBox_Bold	Standard	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9			{Name=Arial, Size=9, Bold=True, Color=000000}
+//	TextBox_Bold	Checked	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Bold=True, Color=ffffff}
+//	TextBox_Bold	Standard_Disabled	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	C9C7BA			{Name=Arial, Size=9, Bold=True, Color=a6a6a6}
+//	TextBox_Bold	Checked_HasFocus	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Bold=True, Color=ffffff}
+//	TextBox_Bold	Standard_HasFocus	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9			{Name=Arial, Size=9, Bold=True, Color=000000}
+//	Slider_Hintergrund_Waagerecht	Standard	Rechteck	3	3	0	0	Verlauf_Vertical_Solide		F3F3EC	FEFEFB		Solide_1px	EEEDE5
+//	Slider_Hintergrund_Waagerecht	Standard_MouseOver_MousePressed	Rechteck	3	3	0	0	Verlauf_Vertical_Solide		F3F3EC	FEFEFB		Solide_1px	EEEDE5
+//	Slider_Hintergrund_Waagerecht	Standard_Disabled	Rechteck	3	3	0	0	Verlauf_Vertical_Solide		F3F3EC	FEFEFB		Solide_1px	EEEDE5
+//	Slider_Hintergrund_Waagerecht	Standard_MouseOver	Rechteck	3	3	0	0	Verlauf_Vertical_Solide		F3F3EC	FEFEFB		Solide_1px	EEEDE5
+//	Slider_Hintergrund_Waagerecht	Standard_MousePressed	Rechteck	3	3	0	0	Verlauf_Vertical_Solide		F3F3EC	FEFEFB		Solide_1px	EEEDE5
+//	Slider_Hintergrund_Senkrecht	Standard	Rechteck	0	0	3	3	Verlauf_Horizontal_Solide		F3F3EC	FEFEFB		Solide_1px	EEEDE5
+//	Slider_Hintergrund_Senkrecht	Standard_MouseOver_MousePressed	Rechteck	0	0	3	3	Verlauf_Horizontal_Solide		F3F3EC	FEFEFB		Solide_1px	EEEDE5
+//	Slider_Hintergrund_Senkrecht	Standard_MouseOver_HasFocus_MousePressed	Rechteck	0	0	3	3	Verlauf_Horizontal_Solide		F3F3EC	FEFEFB		Solide_1px	EEEDE5
+//	Slider_Hintergrund_Senkrecht	Standard_Disabled	Rechteck	0	0	3	3	Verlauf_Horizontal_Solide		F3F3EC	FEFEFB		Solide_1px	EEEDE5
+//	Slider_Hintergrund_Senkrecht	Standard_MouseOver	Rechteck	0	0	3	3	Verlauf_Horizontal_Solide		F3F3EC	FEFEFB		Solide_1px	EEEDE5
+//	Slider_Hintergrund_Senkrecht	Standard_MousePressed	Rechteck	0	0	3	3	Verlauf_Horizontal_Solide		F3F3EC	FEFEFB		Solide_1px	EEEDE5
+//	Ribbonbar_Button	Standard	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=000000}
+//	Ribbonbar_Button	Standard_HasFocus_MousePressed	Rechteck_R4	0	0	-4	-4	Ohne					FocusDotLine			404040	{Name=Arial, Size=9, Color=000000}
+//	Ribbonbar_Button	Standard_MouseOver_HasFocus_MousePressed	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	FFB834	FFDA8C	FFE696	Solide_1px_FocusDotLine	0		404040	{Name=Arial, Size=9, Color=000000}
+//	Ribbonbar_Button	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=a6a6a6}
+//	Ribbonbar_Button	Standard_MouseOver	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	FFE696	FFDA8C	FFB834	Solide_1px	0			{Name=Arial, Size=9, Color=000000}
+//	Ribbonbar_Button	Standard_HasFocus	Rechteck_R4	0	0	-4	-4	Ohne					FocusDotLine			404040	{Name=Arial, Size=9, Color=000000}
+//	Ribbonbar_Button	Standard_MouseOver_HasFocus	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	FFE696	FFDA8C	FFB834	Solide_1px_FocusDotLine	0		404040	{Name=Arial, Size=9, Color=000000}
+//	Ribbonbar_Button_CheckBox	Standard	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=000000}
+//	Ribbonbar_Button_CheckBox	Checked	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	DCD7CB	Solide_1px	0			{Name=Arial, Size=9, Color=000000}
+//	Ribbonbar_Button_CheckBox	Checked_Disabled	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	BDBAA2	ECE9D8	FFFFFF	Solide_1px	C9C7BA			{Name=Arial, Size=9, Color=a6a6a6}
+//	Ribbonbar_Button_CheckBox	Checked_MouseOver	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	FFB834	FFDA8C	FFE696	Solide_1px	0			{Name=Arial, Size=9, Color=000000}
+//	Ribbonbar_Button_CheckBox	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=a6a6a6}
+//	Ribbonbar_Button_CheckBox	Checked_HasFocus	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	DCD7CB	Solide_1px_FocusDotLine	0		404040	{Name=Arial, Size=9, Color=000000}
+//	Ribbonbar_Button_CheckBox	Checked_MouseOver_HasFocus	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	FFB834	FFDA8C	FFE696	Solide_1px_FocusDotLine	0		404040	{Name=Arial, Size=9, Color=000000}
+//	Ribbonbar_Button_CheckBox	Checked_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	EFEEEA	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}
+//	Ribbonbar_Button_CheckBox	Standard_MouseOver	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	FFE696	FFDA8C	FFB834	Solide_1px	0			{Name=Arial, Size=9, Color=000000}
+//	Ribbonbar_Button_CheckBox	Checked_MouseOver_HasFocus_MousePressed	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	FFB834	FFDA8C	FFE696	Solide_1px_FocusDotLine	0		404040	{Name=Arial, Size=9, Color=000000}
+//	Ribbonbar_Button_CheckBox	Standard_HasFocus	Rechteck_R4	0	0	-4	-4	Ohne					FocusDotLine			404040	{Name=Arial, Size=9, Color=000000}
+//	Ribbonbar_Button_CheckBox	Standard_MouseOver_HasFocus	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	FFE696	FFDA8C	FFB834	Solide_1px_FocusDotLine	0		404040	{Name=Arial, Size=9, Color=000000}
+//	Ribbonbar_Button_OptionButton	Standard	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=000000}
+//	Ribbonbar_Button_OptionButton	Checked	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	DCD7CB	Solide_1px	0			{Name=Arial, Size=9, Color=000000}
+//	Ribbonbar_Button_OptionButton	Checked_Disabled	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	BDBAA2	ECE9D8	FFFFFF	Solide_1px	C9C7BA			{Name=Arial, Size=9, Color=a6a6a6}
+//	Ribbonbar_Button_OptionButton	Checked_MouseOver	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	FFB834	FFDA8C	FFE696	Solide_1px	0			{Name=Arial, Size=9, Color=000000}
+//	Ribbonbar_Button_OptionButton	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=a6a6a6}
+//	Ribbonbar_Button_OptionButton	Checked_HasFocus	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	DCD7CB	Solide_1px_FocusDotLine	0		404040	{Name=Arial, Size=9, Color=000000}
+//	Ribbonbar_Button_OptionButton	Checked_MouseOver_HasFocus	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	FFB834	FFDA8C	FFE696	Solide_1px_FocusDotLine	0		404040	{Name=Arial, Size=9, Color=000000}
+//	Ribbonbar_Button_OptionButton	Checked_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	D1CCC1	E3E2DA	EFEEEA	Solide_1px_DuoColor	003C74	FFDA8C	FFB834	{Name=Arial, Size=9, Color=000000}
+//	Ribbonbar_Button_OptionButton	Standard_MouseOver	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	FFE696	FFDA8C	FFB834	Solide_1px	0			{Name=Arial, Size=9, Color=000000}
+//	Ribbonbar_Button_OptionButton	Checked_MouseOver_HasFocus_MousePressed	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	FFB834	FFDA8C	FFE696	Solide_1px_FocusDotLine	0		404040	{Name=Arial, Size=9, Color=000000}
+//	Ribbonbar_Button_OptionButton	Standard_HasFocus	Rechteck_R4	0	0	-4	-4	Ohne					FocusDotLine			404040	{Name=Arial, Size=9, Color=000000}
+//	Ribbonbar_Button_OptionButton	Standard_MouseOver_HasFocus	Rechteck_R4	0	0	-4	-4	Verlauf_Vertical_3	0,5	FFE696	FFDA8C	FFB834	Solide_1px_FocusDotLine	0		404040	{Name=Arial, Size=9, Color=000000}
+//	Ribbon_ComboBox_Textbox	Standard	Rechteck_R4	0	-3	-3	-3	Ohne					Solide_1px	7F9DB9			{Name=Arial, Size=9, Color=000000}
+//	Ribbon_ComboBox_Textbox	Standard_HasFocus_MousePressed	Rechteck_R4	0	-3	-3	-3	Ohne					Solide_1px	7F9DB9			{Name=Arial, Size=9, Color=000000}
+//	Ribbon_ComboBox_Textbox	Standard_MouseOver_HasFocus_MousePressed	Rechteck_R4	0	-3	-3	-3	Verlauf_Vertical_3	0,5	FFB834	FFDA8C	FFE696	Solide_1px	0			{Name=Arial, Size=9, Color=000000}
+//	Ribbon_ComboBox_Textbox	Checked	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}
+//	Ribbon_ComboBox_Textbox	Checked_MouseOver	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}
+//	Ribbon_ComboBox_Textbox	Standard_Disabled	Rechteck_R4	0	-3	-3	-3	Ohne					Solide_1px	C9C7BA			{Name=Arial, Size=9, Color=a6a6a6}
+//	Ribbon_ComboBox_Textbox	Checked_HasFocus	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}
+//	Ribbon_ComboBox_Textbox	Checked_MouseOver_HasFocus	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}
+//	Ribbon_ComboBox_Textbox	Checked_HasFocus_MousePressed	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}
+//	Ribbon_ComboBox_Textbox	Standard_MouseOver	Rechteck_R4	0	-3	-3	-3	Verlauf_Vertical_3	0,5	FFE696	FFDA8C	FFB834	Solide_1px	0			{Name=Arial, Size=9, Color=000000}
+//	Ribbon_ComboBox_Textbox	Checked_MouseOver_HasFocus_MousePressed	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}
+//	Ribbon_ComboBox_Textbox	Standard_HasFocus	Rechteck_R4	0	-3	-3	-3	Ohne					Solide_1px	7F9DB9			{Name=Arial, Size=9, Color=000000}
+//	Ribbon_ComboBox_Textbox	Standard_MouseOver_HasFocus	Rechteck_R4	0	-3	-3	-3	Verlauf_Vertical_3	0,5	FFE696	FFDA8C	FFB834	Solide_1px	0			{Name=Arial, Size=9, Color=000000}
+//	Ribbonbar_Caption	Standard	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=000000}
+//	Ribbonbar_Caption	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=a6a6a6}
+//	Ribbonbar_Button_Combobox	Standard	Rechteck_R4	0	0	0	0	Ohne					Ohne	7F9DB9
+//	Ribbonbar_Button_Combobox	Standard_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Ohne					Ohne	7F9DB9
+//	Ribbonbar_Button_Combobox	Standard_MouseOver_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Ohne					Ohne	7F9DB9
+//	Ribbonbar_Button_Combobox	Standard_Disabled	Rechteck_R4	0	0	0	0	Ohne					Ohne	7F9DB9
+//	Ribbonbar_Button_Combobox	Standard_MouseOver	Rechteck_R4	0	0	0	0	Ohne					Ohne	7F9DB9
+//	Ribbonbar_Button_Combobox	Standard_HasFocus	Rechteck_R4	0	0	0	0	Ohne					Ohne	7F9DB9
+//	Ribbonbar_Button_Combobox	Standard_MouseOver_HasFocus	Rechteck_R4	0	0	0	0	Ohne					Ohne	7F9DB9
+//	RibbonBar_Frame	Standard	Rechteck	1	0	1	1	Ohne					Solide_1px	0			{Name=Arial, Size=9, Color=0000ff}
+//	RibbonBar_Frame	Standard_Disabled	Rechteck	1	0	1	1	Ohne					Solide_1px	C9C7BA			{Name=Arial, Size=9, Color=a6a6a6}
+//	Form_Standard	Standard	Rechteck	0	0	0	0	Solide		ECE9D8			Ohne
+//	Form_MsgBox	Standard	Rechteck	0	0	0	0	Solide		ECE9D8			Ohne	7F9DB9			{Name=Arial, Size=9, Color=000000}
+//	Form_QuickInfo	Standard	Rechteck	0	0	0	0	Solide		FFFFEE			Solide_1px	0			{Name=Arial, Size=9, Color=000000}
+//	Form_DesktopBenachrichtigung	Standard	Rechteck	0	0	0	0	Verlauf_Vertical_3	0,5	FFFFFF	F4F2E8	DCD7CB	Solide_1px	0			{Name=Arial, Size=9, Color=000000}
+//	Form_BitteWarten	Standard	Rechteck_R4	0	0	0	0	Solide		FFFFEE			Solide_1px	0			{Name=Arial, Size=9, Color=000000}
+//	Form_AutoFilter	Standard	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	0			{Name=Arial, Size=9, Color=000000}
+//	Form_AutoFilter	Standard_Disabled															{Name=Arial, Size=9, Color=a6a6a6}
+//	Form_KontextMenu	Standard	Rechteck	0	0	0	0	Solide		F4F3EE			Solide_1px	0
+//	Form_SelectBox_Dropdown	Standard	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	0			{Name=Arial, Size=9, Color=000000}
+//	Item_DropdownMenu	Standard	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=000000}
+//	Item_DropdownMenu	Checked	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}
+//	Item_DropdownMenu	Checked_Disabled	Rechteck	0	0	0	0	Solide		BDBAA2			Ohne				{Name=Arial, Size=9, Color=ffffff}
+//	Item_DropdownMenu	Checked_MouseOver	Rechteck	0	0	0	0	Verlauf_Vertical_3	0,5	316AC5	C1D3FB	316AC5	Solide_1px	97AEE2			{Name=Arial, Size=9, Color=ffffff}
+//	Item_DropdownMenu	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=a6a6a6}
+//	Item_DropdownMenu	Standard_MouseOver	Rechteck	0	0	0	0	Verlauf_Vertical_3	0,5	E6EEFC	C1D3FB	AEC8F7	Solide_1px	97AEE2			{Name=Arial, Size=9, Color=000000}
+//	Item_KontextMenu	Standard	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=000000}
+//	Item_KontextMenu	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=a6a6a6}
+//	Item_KontextMenu	Standard_MouseOver	Rechteck	0	0	0	0	Verlauf_Vertical_3	0,5	E6EEFC	C1D3FB	AEC8F7	Solide_1px	97AEE2			{Name=Arial, Size=9, Color=000000}
+//	Item_KontextMenu_Caption	Standard	Rechteck	0	0	0	0	Verlauf_Horizontal_3	0,5	AEC8F7	F4F3EE	F4F3EE	Ohne	97AEE2			{Name=Arial, Size=9, Bold=True, Color=000000}
+//	Item_KontextMenu_Caption	Standard_Disabled	Rechteck	0	0	0	0	Verlauf_Horizontal_3	0,5	BDBAA2	F4F3EE	F4F3EE	Ohne				{Name=Arial, Size=9, Bold=True, Color=a6a6a6}
+//	Item_KontextMenu_Caption	Standard_MouseOver	Rechteck	0	0	0	0	Verlauf_Horizontal_3	0,5	AEC8F7	F4F3EE	F4F3EE	Solide_1px	97AEE2			{Name=Arial, Size=9, Bold=True, Color=000000}
+//	Item_Autofilter	Standard	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=000000}
+//	Item_Autofilter	Standard_MouseOver_HasFocus_MousePressed	Rechteck	0	0	0	0	Verlauf_Vertical_3	0,5	AEC8F7	C1D3FB	E6EEFC	Solide_1px	97AEE2			{Name=Arial, Size=9, Color=000000}
+//	Item_Autofilter	Checked	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}
+//	Item_Autofilter	Checked_Disabled	Rechteck	0	0	0	0	Solide		BDBAA2			Ohne				{Name=Arial, Size=9, Color=ffffff}
+//	Item_Autofilter	Checked_MouseOver	Rechteck	0	0	0	0	Verlauf_Vertical_3	0,5	316AC5	C1D3FB	316AC5	Solide_1px	97AEE2			{Name=Arial, Size=9, Color=ffffff}
+//	Item_Autofilter	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=a6a6a6}
+//	Item_Autofilter	Standard_MouseOver	Rechteck	0	0	0	0	Verlauf_Vertical_3	0,5	E6EEFC	C1D3FB	AEC8F7	Solide_1px	97AEE2			{Name=Arial, Size=9, Color=000000}
+//	Item_Autofilter	Standard_HasFocus	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=000000}
+//	Item_Autofilter	Standard_MouseOver_HasFocus	Rechteck	0	0	0	0	Verlauf_Vertical_3	0,5	E6EEFC	C1D3FB	AEC8F7	Solide_1px	97AEE2			{Name=Arial, Size=9, Color=000000}
+//	Item_Listbox	Standard	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=000000}
+//	Item_Listbox	Standard_MouseOver_MousePressed	Rechteck	0	0	0	0	Verlauf_Vertical_3	0,5	E6EEFC	C1D3FB	AEC8F7	Solide_1px	97AEE2			{Name=Arial, Size=9, Color=ffffff}
+//	Item_Listbox	Checked	Rechteck	0	0	0	0	Solide		316AC5			Ohne				{Name=Arial, Size=9, Color=ffffff}
+//	Item_Listbox	Checked_Disabled	Rechteck	0	0	0	0	Solide		BDBAA2			Ohne				{Name=Arial, Size=9, Color=ffffff}
+//	Item_Listbox	Checked_MouseOver	Rechteck	0	0	0	0	Verlauf_Vertical_3	0,5	316AC5	C1D3FB	316AC5	Solide_1px	97AEE2			{Name=Arial, Size=9, Color=ffffff}
+//	Item_Listbox	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=a6a6a6}
+//	Item_Listbox	Checked_MousePressed	Rechteck	0	0	0	0	Verlauf_Vertical_3	0,5	E6EEFC	C1D3FB	AEC8F7	Solide_1px	97AEE2			{Name=Arial, Size=9, Color=ffffff}
+//	Item_Listbox	Standard_MouseOver	Rechteck	0	0	0	0	Verlauf_Vertical_3	0,5	E6EEFC	C1D3FB	AEC8F7	Solide_1px	97AEE2			{Name=Arial, Size=9, Color=ffffff}
+//	Item_Listbox	Standard_MousePressed	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=000000}
+//	Item_Listbox_Caption	Standard	Rechteck	0	0	0	0	Verlauf_Horizontal_3	0,5	AEC8F7	F4F3EE	F4F3EE	Solide_1px	97AEE2			{Name=Arial, Size=9, Bold=True, Color=000000}
+//	Item_Listbox_Caption	Standard_Disabled	Rechteck	0	0	0	0	Verlauf_Horizontal_3	0,5	BDBAA2	F4F3EE	F4F3EE	Ohne				{Name=Arial, Size=9, Bold=True, Color=a6a6a6}
+//	Item_Listbox_Caption	Standard_MouseOver	Rechteck	0	0	0	0	Verlauf_Horizontal_3	0,5	AEC8F7	F4F3EE	F4F3EE	Solide_1px	97AEE2			{Name=Arial, Size=9, Bold=True, Color=000000}
+//	Frame	Standard	Rechteck_RRechteckRechteck	0	0	-6	0	Ohne					Solide_1px	919B9C			{Name=Arial, Size=9, Color=0000ff}
+//	Frame	Standard_Disabled	Rechteck_RRechteckRechteck	0	0	-6	0	Ohne					Solide_1px	919B9C			{Name=Arial, Size=9, Color=a6a6a6}
+//	TabStrip_Body	Standard	Rechteck	0	0	0	0	Solide		F4F3EE			ShadowBox	919B9C	D0CEBF	E3E0D0
+//	TabStrip_Body	Standard_Disabled	Rechteck	0	0	0	0	Solide		F4F3EE			ShadowBox	919B9C	D0CEBF	E3E0D0
+//	RibbonBar_Body	Standard	Rechteck	0	0	0	0	Verlauf_Vertical_Solide	0,5	F4F3EE	FFFFFF		Solide_1px	003C74
+//	RibbonBar_Body	Standard_Disabled	Rechteck	0	0	0	0	Verlauf_Vertical_Solide	0,5	F4F3EE	FFFFFF		Solide_1px	003C74
+//	RibbonBar_Back	Standard	Rechteck	0	0	0	5	Solide		ECE9D8			Ohne
+//	TabStrip_Back	Standard						Ohne					Ohne
+//	Progressbar	Standard	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9
+//	Progressbar_Füller	Standard	Rechteck	0	0	0	0	Verlauf_Vertical_Solide		FFFFFF	0000FF		Solide_1px	7F9DB9
+//	Table_Lines_thick	Standard	Ohne					Ohne					Ohne	003C74
+//	Table_Lines_thin	Standard	Ohne					Ohne					Ohne	C9C7BA
+//	Table_Cursor	Standard	Rechteck	-1	-1	-1	-1	Ohne					Solide_3px	C9C7BA
+//	Table_Cursor	Standard_HasFocus	Rechteck	-1	-1	-1	-1	Ohne					Solide_3px	0
+//	Table_Cell	Standard	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Color=000000}
+//	Table_Cell_New	Standard	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Italic=True, Color=a6a6a6}
+//	Table_Column	Standard	Ohne					Ohne					Ohne				{Name=Arial, Size=9, Bold=True, Color=ffffff}
+//	Table_Cell_Chapter	Standard															{Name=Arial, Size=14, Bold=True, Underline=True, Color=000000}
+
+#endregion Win XP
+
 #region GlossyCyan
+
 //	Control	Status	Kontur	X1	X2	Y1	Y2	Draw Back	Verlauf Mitte	Color Back 1	Color Back 2	Color Back 3	Border Style	Color Border 1	Color Border 2	Color Border 3	Schrift	StandardPic
-//	Button	Standard	Rechteck_R2Ohne	0	0	0	0	Glossy		0095DD			Solide_1px	FFFFFF			{Name=Comic Sans MS, Size=9, Color=ffffff}	
-//	Button	Standard_HasFocus_MousePressed	Rechteck_R2Ohne	-3	-3	-3	-3	Glossy		0095DD			Solide_1px_FocusDotLine	FFFFFF		FFFFFF	{Name=Comic Sans MS, Size=9, Color=ffffff}	
-//	Button	Standard_MouseOver_HasFocus_MousePressed	Rechteck_R2Ohne	-3	-3	-3	-3	Glossy		2FBBFF			Solide_1px_FocusDotLine	FFFFFF		FFFFFF	{Name=Comic Sans MS, Size=9, Color=ffffff}	
-//	Button	Standard_Disabled	Rechteck_R2Ohne	0	0	0	0	Glossy		87B7CD			Solide_1px	C9C7BA			{Name=Comic Sans MS, Size=9, Color=dbdbdb}	
-//	Button	Standard_MouseOver	Rechteck_R2Ohne	0	0	0	0	Glossy		2FBBFF			Solide_1px	FFFFFF			{Name=Comic Sans MS, Size=9, Color=ffffff}	
-//	Button	Standard_HasFocus	Rechteck_R2Ohne	0	0	0	0	Glossy		0095DD			Solide_1px_FocusDotLine	FFFFFF		FFFFFF	{Name=Comic Sans MS, Size=9, Color=ffffff}	
-//	Button	Standard_MouseOver_HasFocus	Rechteck_R2Ohne	0	0	0	0	Glossy		2FBBFF			Solide_1px_FocusDotLine	FFFFFF		FFFFFF	{Name=Comic Sans MS, Size=9, Color=ffffff}	
-//	Button_CheckBox	Standard	Rechteck_R2Ohne	0	0	0	0	Glossy		0095DD			Solide_1px	FFFFFF			{Name=Comic Sans MS, Size=9, Color=ffffff}	
-//	Button_CheckBox	Checked	Rechteck_R2Ohne	0	0	0	0	GlossyPressed		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}	
-//	Button_CheckBox	Checked_Disabled	Rechteck_R2Ohne	0	0	0	0	Verlauf_Vertical_Solide		ECE9D8	F8DFB1		Solide_1px	FFB834			{Name=Comic Sans MS, Size=9, Color=a6a6a6}	
-//	Button_CheckBox	Checked_MouseOver	Rechteck_R2Ohne	0	0	0	0	GlossyPressed		FFDA8C			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}	
-//	Button_CheckBox	Standard_Disabled	Rechteck_R2Ohne	0	0	0	0	Glossy		87B7CD			Solide_1px	C9C7BA			{Name=Comic Sans MS, Size=9, Color=dbdbdb}	
-//	Button_CheckBox	Checked_HasFocus	Rechteck_R2Ohne	0	0	0	0	GlossyPressed		FFB834			Solide_1px_FocusDotLine	0		FFFFFF	{Name=Comic Sans MS, Size=9, Color=000000}	
-//	Button_CheckBox	Checked_MouseOver_HasFocus	Rechteck_R2Ohne	0	0	0	0	GlossyPressed		FFDA8C			Solide_1px_FocusDotLine	0		FFFFFF	{Name=Comic Sans MS, Size=9, Color=000000}	
-//	Button_CheckBox	Checked_HasFocus_MousePressed	Rechteck_R2Ohne	-3	-3	-3	-3	GlossyPressed		FFB834			Solide_1px_FocusDotLine	0		FFFFFF	{Name=Comic Sans MS, Size=9, Color=000000}	
-//	Button_CheckBox	Standard_MouseOver	Rechteck_R2Ohne	0	0	0	0	Glossy		2FBBFF			Solide_1px	FFFFFF			{Name=Comic Sans MS, Size=9, Color=ffffff}	
-//	Button_CheckBox	Checked_MouseOver_HasFocus_MousePressed	Rechteck_R2Ohne	-3	-3	-3	-3	GlossyPressed		FFDA8C			Solide_1px_FocusDotLine	0		FFFFFF	{Name=Comic Sans MS, Size=9, Color=000000}	
-//	Button_CheckBox	Standard_HasFocus	Rechteck_R2Ohne	0	0	0	0	Glossy		0095DD			Solide_1px_FocusDotLine	FFFFFF		FFFFFF	{Name=Comic Sans MS, Size=9, Color=ffffff}	
-//	Button_CheckBox	Standard_MouseOver_HasFocus	Rechteck_R2Ohne	0	0	0	0	Glossy		0095DD			Solide_1px_FocusDotLine	FFFFFF		FFFFFF	{Name=Comic Sans MS, Size=9, Color=ffffff}	
-//	Button_OptionButton	Standard	Rechteck_R2Ohne	0	0	0	0	Glossy		0095DD			Solide_1px	FFFFFF			{Name=Comic Sans MS, Size=9, Color=ffffff}	
-//	Button_OptionButton	Checked	Rechteck_R2Ohne	0	0	0	0	GlossyPressed		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}	
-//	Button_OptionButton	Checked_Disabled	Rechteck_R2Ohne	0	0	0	0	Verlauf_Vertical_Solide		ECE9D8	F8DFB1		Solide_1px	FFB834			{Name=Comic Sans MS, Size=9, Color=a6a6a6}	
-//	Button_OptionButton	Checked_MouseOver	Rechteck_R2Ohne	0	0	0	0	GlossyPressed		FFDA8C			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}	
-//	Button_OptionButton	Standard_Disabled	Rechteck_R2Ohne	0	0	0	0	Glossy		87B7CD			Solide_1px	C9C7BA			{Name=Comic Sans MS, Size=9, Color=dbdbdb}	
-//	Button_OptionButton	Checked_HasFocus	Rechteck_R2Ohne	0	0	0	0	GlossyPressed		FFB834			Solide_1px_FocusDotLine	0		FFFFFF	{Name=Comic Sans MS, Size=9, Color=000000}	
-//	Button_OptionButton	Checked_MouseOver_HasFocus	Rechteck_R2Ohne	0	0	0	0	GlossyPressed		FFDA8C			Solide_1px_FocusDotLine	0		FFFFFF	{Name=Comic Sans MS, Size=9, Color=000000}	
-//	Button_OptionButton	Checked_HasFocus_MousePressed	Rechteck_R2Ohne	-3	-3	-3	-3	GlossyPressed		FFB834			Solide_1px_FocusDotLine	0		FFFFFF	{Name=Comic Sans MS, Size=9, Color=000000}	
-//	Button_OptionButton	Standard_MouseOver	Rechteck_R2Ohne	0	0	0	0	Glossy		2FBBFF			Solide_1px	FFFFFF			{Name=Comic Sans MS, Size=9, Color=ffffff}	
-//	Button_OptionButton	Checked_MouseOver_HasFocus_MousePressed	Rechteck_R2Ohne	-3	-3	-3	-3	GlossyPressed		FFDA8C			Solide_1px_FocusDotLine	0		FFFFFF	{Name=Comic Sans MS, Size=9, Color=000000}	
-//	Button_OptionButton	Standard_HasFocus	Rechteck_R2Ohne	0	0	0	0	Glossy		0095DD			Solide_1px_FocusDotLine	FFFFFF		FFFFFF	{Name=Comic Sans MS, Size=9, Color=ffffff}	
-//	Button_OptionButton	Standard_MouseOver_HasFocus	Rechteck_R2Ohne	0	0	0	0	Glossy		0095DD			Solide_1px_FocusDotLine	FFFFFF		FFFFFF	{Name=Comic Sans MS, Size=9, Color=ffffff}	
-//	Button_AutoFilter	Standard	Rechteck_R2Ohne	0	0	0	0	Glossy		0095DD			Solide_1px	FFFFFF				
-//	Button_AutoFilter	Checked	Rechteck_R2Ohne	0	0	0	0	GlossyPressed		FFB834			Solide_1px	0				
-//	Button_AutoFilter	Standard_Disabled	Rechteck_R2Ohne	0	0	0	0	Glossy		87B7CD			Solide_1px	C9C7BA				
-//	Button_ComboBox	Standard	Rechteck_R2Ohne	-2	-2	-2	-2	Glossy		0095DD			Solide_1px	FFFFFF				
-//	Button_ComboBox	Standard_HasFocus_MousePressed	Rechteck_R2Ohne	-4	-4	-4	-4	Glossy		0095DD			Solide_1px_FocusDotLine	FFFFFF		FFFFFF		
-//	Button_ComboBox	Standard_MouseOver_HasFocus_MousePressed	Rechteck_R2Ohne	-4	-4	-4	-4	Glossy		2FBBFF			Solide_1px_FocusDotLine	FFFFFF		FFFFFF		
-//	Button_ComboBox	Standard_Disabled	Rechteck_R2Ohne	-2	-2	-2	-2	Glossy		87B7CD			Solide_1px	C9C7BA				
-//	Button_ComboBox	Standard_MouseOver	Rechteck_R2Ohne	-2	-2	-2	-2	Glossy		2FBBFF			Solide_1px	FFFFFF				
-//	Button_ComboBox	Standard_HasFocus	Rechteck_R2Ohne	-2	-2	-2	-2	Glossy		0095DD			Solide_1px_FocusDotLine	FFFFFF		FFFFFF		
-//	Button_ComboBox	Standard_MouseOver_HasFocus	Rechteck_R2Ohne	-2	-2	-2	-2	Glossy		0095DD			Solide_1px_FocusDotLine	FFFFFF		FFFFFF		
-//	Button_Slider_Waagerecht	Standard	Rechteck_R2Ohne	0	0	0	0	Glossy		0095DD			Solide_1px	FFFFFF				
-//	Button_Slider_Waagerecht	Standard_MouseOver_MousePressed	Rechteck_R2Ohne	-1	-1	-1	-1	Glossy		2FBBFF			Solide_1px_FocusDotLine	FFFFFF		FFFFFF		
-//	Button_Slider_Waagerecht	Standard_Disabled	Ohne					Ohne					Ohne					
-//	Button_Slider_Waagerecht	Standard_MouseOver	Rechteck_R2Ohne	0	0	0	0	Glossy		2FBBFF			Solide_1px	FFFFFF				
-//	Button_Slider_Senkrecht	Standard	Rechteck_R2Ohne	0	0	0	0	Glossy		0095DD			Solide_1px	FFFFFF				
-//	Button_Slider_Senkrecht	Standard_MouseOver_MousePressed	Rechteck_R2Ohne	-1	-1	-1	-1	Glossy		2FBBFF			Solide_1px_FocusDotLine	FFFFFF		FFFFFF		
-//	Button_Slider_Senkrecht	Standard_Disabled	Ohne					Ohne					Ohne					
-//	Button_Slider_Senkrecht	Standard_MouseOver	Rechteck_R2Ohne	0	0	0	0	Glossy		2FBBFF			Solide_1px	FFFFFF				
-//	Button_SliderDesign	Standard	Rechteck_R4	0	0	0	0	Solide		0095DD			Solide_1px	FFFFFF				
-//	Button_SliderDesign	Standard_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Solide		0095DD			Solide_1px_FocusDotLine	FFFFFF		FFFFFF		
-//	Button_SliderDesign	Standard_MouseOver_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Solide		2FBBFF			Solide_1px_FocusDotLine	FFFFFF		FFFFFF		
-//	Button_SliderDesign	Standard_Disabled	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	C9C7BA				
-//	Button_SliderDesign	Standard_MouseOver	Rechteck_R4	0	0	0	0	Solide		2FBBFF			Solide_1px	FFFFFF				
-//	Button_SliderDesign	Standard_HasFocus	Rechteck_R4	0	0	0	0	Solide		0095DD			Solide_1px_FocusDotLine	FFFFFF		FFFFFF		
-//	Button_SliderDesign	Standard_MouseOver_HasFocus	Rechteck_R4	0	0	0	0	Solide		0095DD			Solide_1px_FocusDotLine	FFFFFF		FFFFFF		
-//	Button_EckpunktSchieber	Standard	Rechteck_R4					Solide		FFB834			Solide_1px	0				
-//	Button_EckpunktSchieber	Checked_MousePressed	Rechteck_R4					Solide		FFE696			Solide_1px	C9C7BA				
-//	Button_EckpunktSchieber_Phantom	Standard	Rechteck_R4					Ohne					Solide_1px	0				
-//	TabStrip_Head	Standard	Rechteck_R2Ohne	0	0	0	15	Glossy		0095DD			Solide_1px	498DAB			{Name=Comic Sans MS, Size=9, Color=ffffff}	
-//	TabStrip_Head	Checked	Rechteck_R2Ohne	0	0	0	15	GlossyPressed		FFB834			Solide_1px	FFB834			{Name=Comic Sans MS, Size=9, Color=000000}	
-//	TabStrip_Head	Checked_Disabled	Rechteck_R2Ohne	0	0	0	8	Verlauf_Vertical_Solide		ECE9D8	F8DFB1		Solide_1px	FFB834			{Name=Comic Sans MS, Size=9, Color=a6a6a6}	
-//	TabStrip_Head	Checked_MouseOver	Rechteck_R2Ohne	0	0	0	15	GlossyPressed		FFDA8C			Solide_1px	FFB834			{Name=Comic Sans MS, Size=9, Color=000000}	
-//	TabStrip_Head	Standard_Disabled	Rechteck_R2Ohne	0	0	0	15	Glossy		87B7CD			Solide_1px	498DAB			{Name=Comic Sans MS, Size=9, Color=dbdbdb}	
-//	TabStrip_Head	Standard_MouseOver	Rechteck_R2Ohne	0	0	0	15	Glossy		2FBBFF			Solide_1px	498DAB			{Name=Comic Sans MS, Size=9, Color=ffffff}	
-//	RibbonBar_Head	Standard	Rechteck_R2Ohne	0	0	0	15	Glossy		BCDFED			Solide_1px	97AEE2			{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	RibbonBar_Head	Checked	Rechteck_R2Ohne	0	0	0	15	GlossyPressed		FFE696			Solide_1px	FFB834			{Name=Comic Sans MS, Size=9, Color=000000}	
-//	RibbonBar_Head	Checked_Disabled	Rechteck_R2Ohne	0	0	0	8	Verlauf_Vertical_Solide		ECE9D8	F8DFB1		Solide_1px	F8DFB1			{Name=Comic Sans MS, Size=9, Color=a6a6a6}	
-//	RibbonBar_Head	Checked_MouseOver	Rechteck_R2Ohne	0	0	0	15	GlossyPressed		FFE696			Solide_1px	FFB834			{Name=Comic Sans MS, Size=9, Color=ffffff}	
-//	RibbonBar_Head	Standard_Disabled	Rechteck_R2Ohne	0	0	0	15	Glossy		ECE9D8			Solide_1px	C9C7BA			{Name=Comic Sans MS, Size=9, Color=a6a6a6}	
-//	RibbonBar_Head	Standard_MouseOver	Rechteck_R2Ohne	0	0	0	15	Glossy		BCDFED			Solide_1px	97AEE2			{Name=Comic Sans MS, Size=9, Color=ffffff}	
-//	Caption	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Caption	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=a6a6a6}	
+//	Button	Standard	Rechteck_R2Ohne	0	0	0	0	Glossy		0095DD			Solide_1px	FFFFFF			{Name=Comic Sans MS, Size=9, Color=ffffff}
+//	Button	Standard_HasFocus_MousePressed	Rechteck_R2Ohne	-3	-3	-3	-3	Glossy		0095DD			Solide_1px_FocusDotLine	FFFFFF		FFFFFF	{Name=Comic Sans MS, Size=9, Color=ffffff}
+//	Button	Standard_MouseOver_HasFocus_MousePressed	Rechteck_R2Ohne	-3	-3	-3	-3	Glossy		2FBBFF			Solide_1px_FocusDotLine	FFFFFF		FFFFFF	{Name=Comic Sans MS, Size=9, Color=ffffff}
+//	Button	Standard_Disabled	Rechteck_R2Ohne	0	0	0	0	Glossy		87B7CD			Solide_1px	C9C7BA			{Name=Comic Sans MS, Size=9, Color=dbdbdb}
+//	Button	Standard_MouseOver	Rechteck_R2Ohne	0	0	0	0	Glossy		2FBBFF			Solide_1px	FFFFFF			{Name=Comic Sans MS, Size=9, Color=ffffff}
+//	Button	Standard_HasFocus	Rechteck_R2Ohne	0	0	0	0	Glossy		0095DD			Solide_1px_FocusDotLine	FFFFFF		FFFFFF	{Name=Comic Sans MS, Size=9, Color=ffffff}
+//	Button	Standard_MouseOver_HasFocus	Rechteck_R2Ohne	0	0	0	0	Glossy		2FBBFF			Solide_1px_FocusDotLine	FFFFFF		FFFFFF	{Name=Comic Sans MS, Size=9, Color=ffffff}
+//	Button_CheckBox	Standard	Rechteck_R2Ohne	0	0	0	0	Glossy		0095DD			Solide_1px	FFFFFF			{Name=Comic Sans MS, Size=9, Color=ffffff}
+//	Button_CheckBox	Checked	Rechteck_R2Ohne	0	0	0	0	GlossyPressed		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}
+//	Button_CheckBox	Checked_Disabled	Rechteck_R2Ohne	0	0	0	0	Verlauf_Vertical_Solide		ECE9D8	F8DFB1		Solide_1px	FFB834			{Name=Comic Sans MS, Size=9, Color=a6a6a6}
+//	Button_CheckBox	Checked_MouseOver	Rechteck_R2Ohne	0	0	0	0	GlossyPressed		FFDA8C			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}
+//	Button_CheckBox	Standard_Disabled	Rechteck_R2Ohne	0	0	0	0	Glossy		87B7CD			Solide_1px	C9C7BA			{Name=Comic Sans MS, Size=9, Color=dbdbdb}
+//	Button_CheckBox	Checked_HasFocus	Rechteck_R2Ohne	0	0	0	0	GlossyPressed		FFB834			Solide_1px_FocusDotLine	0		FFFFFF	{Name=Comic Sans MS, Size=9, Color=000000}
+//	Button_CheckBox	Checked_MouseOver_HasFocus	Rechteck_R2Ohne	0	0	0	0	GlossyPressed		FFDA8C			Solide_1px_FocusDotLine	0		FFFFFF	{Name=Comic Sans MS, Size=9, Color=000000}
+//	Button_CheckBox	Checked_HasFocus_MousePressed	Rechteck_R2Ohne	-3	-3	-3	-3	GlossyPressed		FFB834			Solide_1px_FocusDotLine	0		FFFFFF	{Name=Comic Sans MS, Size=9, Color=000000}
+//	Button_CheckBox	Standard_MouseOver	Rechteck_R2Ohne	0	0	0	0	Glossy		2FBBFF			Solide_1px	FFFFFF			{Name=Comic Sans MS, Size=9, Color=ffffff}
+//	Button_CheckBox	Checked_MouseOver_HasFocus_MousePressed	Rechteck_R2Ohne	-3	-3	-3	-3	GlossyPressed		FFDA8C			Solide_1px_FocusDotLine	0		FFFFFF	{Name=Comic Sans MS, Size=9, Color=000000}
+//	Button_CheckBox	Standard_HasFocus	Rechteck_R2Ohne	0	0	0	0	Glossy		0095DD			Solide_1px_FocusDotLine	FFFFFF		FFFFFF	{Name=Comic Sans MS, Size=9, Color=ffffff}
+//	Button_CheckBox	Standard_MouseOver_HasFocus	Rechteck_R2Ohne	0	0	0	0	Glossy		0095DD			Solide_1px_FocusDotLine	FFFFFF		FFFFFF	{Name=Comic Sans MS, Size=9, Color=ffffff}
+//	Button_OptionButton	Standard	Rechteck_R2Ohne	0	0	0	0	Glossy		0095DD			Solide_1px	FFFFFF			{Name=Comic Sans MS, Size=9, Color=ffffff}
+//	Button_OptionButton	Checked	Rechteck_R2Ohne	0	0	0	0	GlossyPressed		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}
+//	Button_OptionButton	Checked_Disabled	Rechteck_R2Ohne	0	0	0	0	Verlauf_Vertical_Solide		ECE9D8	F8DFB1		Solide_1px	FFB834			{Name=Comic Sans MS, Size=9, Color=a6a6a6}
+//	Button_OptionButton	Checked_MouseOver	Rechteck_R2Ohne	0	0	0	0	GlossyPressed		FFDA8C			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}
+//	Button_OptionButton	Standard_Disabled	Rechteck_R2Ohne	0	0	0	0	Glossy		87B7CD			Solide_1px	C9C7BA			{Name=Comic Sans MS, Size=9, Color=dbdbdb}
+//	Button_OptionButton	Checked_HasFocus	Rechteck_R2Ohne	0	0	0	0	GlossyPressed		FFB834			Solide_1px_FocusDotLine	0		FFFFFF	{Name=Comic Sans MS, Size=9, Color=000000}
+//	Button_OptionButton	Checked_MouseOver_HasFocus	Rechteck_R2Ohne	0	0	0	0	GlossyPressed		FFDA8C			Solide_1px_FocusDotLine	0		FFFFFF	{Name=Comic Sans MS, Size=9, Color=000000}
+//	Button_OptionButton	Checked_HasFocus_MousePressed	Rechteck_R2Ohne	-3	-3	-3	-3	GlossyPressed		FFB834			Solide_1px_FocusDotLine	0		FFFFFF	{Name=Comic Sans MS, Size=9, Color=000000}
+//	Button_OptionButton	Standard_MouseOver	Rechteck_R2Ohne	0	0	0	0	Glossy		2FBBFF			Solide_1px	FFFFFF			{Name=Comic Sans MS, Size=9, Color=ffffff}
+//	Button_OptionButton	Checked_MouseOver_HasFocus_MousePressed	Rechteck_R2Ohne	-3	-3	-3	-3	GlossyPressed		FFDA8C			Solide_1px_FocusDotLine	0		FFFFFF	{Name=Comic Sans MS, Size=9, Color=000000}
+//	Button_OptionButton	Standard_HasFocus	Rechteck_R2Ohne	0	0	0	0	Glossy		0095DD			Solide_1px_FocusDotLine	FFFFFF		FFFFFF	{Name=Comic Sans MS, Size=9, Color=ffffff}
+//	Button_OptionButton	Standard_MouseOver_HasFocus	Rechteck_R2Ohne	0	0	0	0	Glossy		0095DD			Solide_1px_FocusDotLine	FFFFFF		FFFFFF	{Name=Comic Sans MS, Size=9, Color=ffffff}
+//	Button_AutoFilter	Standard	Rechteck_R2Ohne	0	0	0	0	Glossy		0095DD			Solide_1px	FFFFFF
+//	Button_AutoFilter	Checked	Rechteck_R2Ohne	0	0	0	0	GlossyPressed		FFB834			Solide_1px	0
+//	Button_AutoFilter	Standard_Disabled	Rechteck_R2Ohne	0	0	0	0	Glossy		87B7CD			Solide_1px	C9C7BA
+//	Button_ComboBox	Standard	Rechteck_R2Ohne	-2	-2	-2	-2	Glossy		0095DD			Solide_1px	FFFFFF
+//	Button_ComboBox	Standard_HasFocus_MousePressed	Rechteck_R2Ohne	-4	-4	-4	-4	Glossy		0095DD			Solide_1px_FocusDotLine	FFFFFF		FFFFFF
+//	Button_ComboBox	Standard_MouseOver_HasFocus_MousePressed	Rechteck_R2Ohne	-4	-4	-4	-4	Glossy		2FBBFF			Solide_1px_FocusDotLine	FFFFFF		FFFFFF
+//	Button_ComboBox	Standard_Disabled	Rechteck_R2Ohne	-2	-2	-2	-2	Glossy		87B7CD			Solide_1px	C9C7BA
+//	Button_ComboBox	Standard_MouseOver	Rechteck_R2Ohne	-2	-2	-2	-2	Glossy		2FBBFF			Solide_1px	FFFFFF
+//	Button_ComboBox	Standard_HasFocus	Rechteck_R2Ohne	-2	-2	-2	-2	Glossy		0095DD			Solide_1px_FocusDotLine	FFFFFF		FFFFFF
+//	Button_ComboBox	Standard_MouseOver_HasFocus	Rechteck_R2Ohne	-2	-2	-2	-2	Glossy		0095DD			Solide_1px_FocusDotLine	FFFFFF		FFFFFF
+//	Button_Slider_Waagerecht	Standard	Rechteck_R2Ohne	0	0	0	0	Glossy		0095DD			Solide_1px	FFFFFF
+//	Button_Slider_Waagerecht	Standard_MouseOver_MousePressed	Rechteck_R2Ohne	-1	-1	-1	-1	Glossy		2FBBFF			Solide_1px_FocusDotLine	FFFFFF		FFFFFF
+//	Button_Slider_Waagerecht	Standard_Disabled	Ohne					Ohne					Ohne
+//	Button_Slider_Waagerecht	Standard_MouseOver	Rechteck_R2Ohne	0	0	0	0	Glossy		2FBBFF			Solide_1px	FFFFFF
+//	Button_Slider_Senkrecht	Standard	Rechteck_R2Ohne	0	0	0	0	Glossy		0095DD			Solide_1px	FFFFFF
+//	Button_Slider_Senkrecht	Standard_MouseOver_MousePressed	Rechteck_R2Ohne	-1	-1	-1	-1	Glossy		2FBBFF			Solide_1px_FocusDotLine	FFFFFF		FFFFFF
+//	Button_Slider_Senkrecht	Standard_Disabled	Ohne					Ohne					Ohne
+//	Button_Slider_Senkrecht	Standard_MouseOver	Rechteck_R2Ohne	0	0	0	0	Glossy		2FBBFF			Solide_1px	FFFFFF
+//	Button_SliderDesign	Standard	Rechteck_R4	0	0	0	0	Solide		0095DD			Solide_1px	FFFFFF
+//	Button_SliderDesign	Standard_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Solide		0095DD			Solide_1px_FocusDotLine	FFFFFF		FFFFFF
+//	Button_SliderDesign	Standard_MouseOver_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Solide		2FBBFF			Solide_1px_FocusDotLine	FFFFFF		FFFFFF
+//	Button_SliderDesign	Standard_Disabled	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	C9C7BA
+//	Button_SliderDesign	Standard_MouseOver	Rechteck_R4	0	0	0	0	Solide		2FBBFF			Solide_1px	FFFFFF
+//	Button_SliderDesign	Standard_HasFocus	Rechteck_R4	0	0	0	0	Solide		0095DD			Solide_1px_FocusDotLine	FFFFFF		FFFFFF
+//	Button_SliderDesign	Standard_MouseOver_HasFocus	Rechteck_R4	0	0	0	0	Solide		0095DD			Solide_1px_FocusDotLine	FFFFFF		FFFFFF
+//	Button_EckpunktSchieber	Standard	Rechteck_R4					Solide		FFB834			Solide_1px	0
+//	Button_EckpunktSchieber	Checked_MousePressed	Rechteck_R4					Solide		FFE696			Solide_1px	C9C7BA
+//	Button_EckpunktSchieber_Phantom	Standard	Rechteck_R4					Ohne					Solide_1px	0
+//	TabStrip_Head	Standard	Rechteck_R2Ohne	0	0	0	15	Glossy		0095DD			Solide_1px	498DAB			{Name=Comic Sans MS, Size=9, Color=ffffff}
+//	TabStrip_Head	Checked	Rechteck_R2Ohne	0	0	0	15	GlossyPressed		FFB834			Solide_1px	FFB834			{Name=Comic Sans MS, Size=9, Color=000000}
+//	TabStrip_Head	Checked_Disabled	Rechteck_R2Ohne	0	0	0	8	Verlauf_Vertical_Solide		ECE9D8	F8DFB1		Solide_1px	FFB834			{Name=Comic Sans MS, Size=9, Color=a6a6a6}
+//	TabStrip_Head	Checked_MouseOver	Rechteck_R2Ohne	0	0	0	15	GlossyPressed		FFDA8C			Solide_1px	FFB834			{Name=Comic Sans MS, Size=9, Color=000000}
+//	TabStrip_Head	Standard_Disabled	Rechteck_R2Ohne	0	0	0	15	Glossy		87B7CD			Solide_1px	498DAB			{Name=Comic Sans MS, Size=9, Color=dbdbdb}
+//	TabStrip_Head	Standard_MouseOver	Rechteck_R2Ohne	0	0	0	15	Glossy		2FBBFF			Solide_1px	498DAB			{Name=Comic Sans MS, Size=9, Color=ffffff}
+//	RibbonBar_Head	Standard	Rechteck_R2Ohne	0	0	0	15	Glossy		BCDFED			Solide_1px	97AEE2			{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	RibbonBar_Head	Checked	Rechteck_R2Ohne	0	0	0	15	GlossyPressed		FFE696			Solide_1px	FFB834			{Name=Comic Sans MS, Size=9, Color=000000}
+//	RibbonBar_Head	Checked_Disabled	Rechteck_R2Ohne	0	0	0	8	Verlauf_Vertical_Solide		ECE9D8	F8DFB1		Solide_1px	F8DFB1			{Name=Comic Sans MS, Size=9, Color=a6a6a6}
+//	RibbonBar_Head	Checked_MouseOver	Rechteck_R2Ohne	0	0	0	15	GlossyPressed		FFE696			Solide_1px	FFB834			{Name=Comic Sans MS, Size=9, Color=ffffff}
+//	RibbonBar_Head	Standard_Disabled	Rechteck_R2Ohne	0	0	0	15	Glossy		ECE9D8			Solide_1px	C9C7BA			{Name=Comic Sans MS, Size=9, Color=a6a6a6}
+//	RibbonBar_Head	Standard_MouseOver	Rechteck_R2Ohne	0	0	0	15	Glossy		BCDFED			Solide_1px	97AEE2			{Name=Comic Sans MS, Size=9, Color=ffffff}
+//	Caption	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Caption	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=a6a6a6}
 //	CheckBox_TextStyle	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}	CheckBox
 //	CheckBox_TextStyle	Checked	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}	CheckBox_Checked
 //	CheckBox_TextStyle	Checked_Disabled	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=a6a6a6}	CheckBox_Disabled_Checked
@@ -659,174 +671,176 @@ using System.Reflection;
 //	OptionButton_TextStyle	Checked_MouseOver_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Ohne					FocusDotLine			404040	{Name=Comic Sans MS, Size=9, Color=0046d5}	OptionBox_Checked_MouseOver
 //	OptionButton_TextStyle	Standard_HasFocus	Rechteck_R4	0	0	0	0	Ohne					FocusDotLine			404040	{Name=Comic Sans MS, Size=9, Color=0046d5}	OptionBox
 //	OptionButton_TextStyle	Standard_MouseOver_HasFocus	Rechteck_R4	0	0	0	0	Ohne					FocusDotLine			404040	{Name=Comic Sans MS, Size=9, Color=0046d5}	OptionBox_MouseOver
-//	TextBox	Standard	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	97AEE2			{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	TextBox	Checked	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}	
-//	TextBox	Standard_Disabled	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	C9C7BA			{Name=Comic Sans MS, Size=9, Color=a6a6a6}	
-//	TextBox	Checked_HasFocus	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}	
-//	TextBox	Standard_HasFocus	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	97AEE2			{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	ListBox	Standard	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	97AEE2				
-//	ListBox	Standard_Disabled	Rechteck_RRechteckRechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	C9C7BA				
-//	ComboBox_Textbox	Standard	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	97AEE2			{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	ComboBox_Textbox	Standard_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9			{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	ComboBox_Textbox	Standard_MouseOver_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9			{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	ComboBox_Textbox	Checked	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}	
-//	ComboBox_Textbox	Checked_MouseOver	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}	
-//	ComboBox_Textbox	Standard_Disabled	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	C9C7BA			{Name=Comic Sans MS, Size=9, Color=a6a6a6}	
-//	ComboBox_Textbox	Checked_HasFocus	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}	
-//	ComboBox_Textbox	Checked_MouseOver_HasFocus	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}	
-//	ComboBox_Textbox	Checked_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}	
-//	ComboBox_Textbox	Standard_MouseOver	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	97AEE2			{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	ComboBox_Textbox	Checked_MouseOver_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}	
-//	ComboBox_Textbox	Standard_HasFocus	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9			{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	ComboBox_Textbox	Standard_MouseOver_HasFocus	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9			{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Table_And_Pad	Standard	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	97AEE2				
-//	Table_And_Pad	Standard_Disabled	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	C9C7BA				
-//	Table_And_Pad	Standard_HasFocus	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9				
-//	EasyPic	Standard	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	97AEE2				
-//	EasyPic	Standard_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	97AEE2				
-//	EasyPic	Standard_MouseOver_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	97AEE2				
-//	EasyPic	Standard_Disabled	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	C9C7BA				
-//	EasyPic	Standard_MouseOver	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	97AEE2				
-//	EasyPic	Standard_HasFocus	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	97AEE2				
-//	TextBox_Stufe3	Standard	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	97AEE2			{Name=Comic Sans MS, Size=12, Underline=True, Color=0046d5}	
-//	TextBox_Stufe3	Checked	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=12, Underline=True, Color=000000}	
-//	TextBox_Stufe3	Standard_Disabled	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	C9C7BA			{Name=Comic Sans MS, Size=12, Underline=True, Color=a6a6a6}	
-//	TextBox_Stufe3	Checked_HasFocus	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=12, Underline=True, Color=000000}	
-//	TextBox_Stufe3	Standard_HasFocus	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	97AEE2			{Name=Comic Sans MS, Size=12, Underline=True, Color=0046d5}	
-//	TextBox_Bold	Standard	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	97AEE2			{Name=Comic Sans MS, Size=9, Bold=True, Color=0046d5}	
-//	TextBox_Bold	Checked	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Bold=True, Color=000000}	
-//	TextBox_Bold	Standard_Disabled	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	C9C7BA			{Name=Comic Sans MS, Size=9, Bold=True, Color=a6a6a6}	
-//	TextBox_Bold	Checked_HasFocus	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Bold=True, Color=000000}	
-//	TextBox_Bold	Standard_HasFocus	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	97AEE2			{Name=Comic Sans MS, Size=9, Bold=True, Color=0046d5}	
-//	Slider_Hintergrund_Waagerecht	Standard	Rechteck	5	5	0	0	Verlauf_Horizontal_3	0,5	BCDFED	FEFEFB	BCDFED	Solide_1px	97AEE2				
-//	Slider_Hintergrund_Waagerecht	Standard_MouseOver_MousePressed	Rechteck	5	5	0	0	Verlauf_Horizontal_3	0,5	BCDFED	FEFEFB	BCDFED	Solide_1px	97AEE2				
-//	Slider_Hintergrund_Waagerecht	Standard_Disabled	Rechteck	5	5	0	0	Solide		FFFFFF			Solide_1px	EEEDE5				
-//	Slider_Hintergrund_Waagerecht	Standard_MouseOver	Rechteck	5	5	0	0	Verlauf_Horizontal_3	0,5	BCDFED	FEFEFB	BCDFED	Solide_1px	97AEE2				
-//	Slider_Hintergrund_Waagerecht	Standard_MousePressed	Rechteck	5	5	0	0	Verlauf_Horizontal_3	0,5	BCDFED	FEFEFB	BCDFED	Solide_1px	97AEE2				
-//	Slider_Hintergrund_Senkrecht	Standard	Rechteck	0	0	5	5	Verlauf_Vertical_3	0,5	BCDFED	FEFEFB	BCDFED	Solide_1px	97AEE2				
-//	Slider_Hintergrund_Senkrecht	Standard_MouseOver_MousePressed	Rechteck	0	0	5	5	Verlauf_Vertical_3	0,5	BCDFED	FEFEFB	BCDFED	Solide_1px	97AEE2				
-//	Slider_Hintergrund_Senkrecht	Standard_MouseOver_HasFocus_MousePressed	Rechteck	0	0	5	5	Verlauf_Vertical_3	0,5	BCDFED	FEFEFB	BCDFED	Solide_1px	97AEE2				
-//	Slider_Hintergrund_Senkrecht	Standard_Disabled	Rechteck	0	0	5	5	Solide		FFFFFF			Solide_1px	EEEDE5				
-//	Slider_Hintergrund_Senkrecht	Standard_MouseOver	Rechteck	0	0	5	5	Verlauf_Vertical_3	0,5	BCDFED	FEFEFB	BCDFED	Solide_1px	97AEE2				
-//	Slider_Hintergrund_Senkrecht	Standard_MousePressed	Rechteck	0	0	5	5	Verlauf_Vertical_3	0,5	BCDFED	FEFEFB	BCDFED	Solide_1px	97AEE2				
-//	Ribbonbar_Button	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Ribbonbar_Button	Standard_HasFocus_MousePressed	Rechteck_R2Ohne	0	0	0	0	Ohne					Solide_1px	0046D5			{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Ribbonbar_Button	Standard_MouseOver_HasFocus_MousePressed	Rechteck_R2Ohne	0	0	0	0	Verlauf_Vertical_3	0,5	F7FAFB	E4EFF3	F7FAFB	Solide_1px	0046D5			{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Ribbonbar_Button	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=a6a6a6}	
-//	Ribbonbar_Button	Standard_MouseOver	Rechteck_R2Ohne	0	0	0	0	Verlauf_Vertical_3	0,5	E4EFF3	F7FAFB	E4EFF3	Ohne	0046D5			{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Ribbonbar_Button	Standard_HasFocus	Rechteck_R2Ohne	0	0	0	0	Ohne					Solide_1px	0046D5			{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Ribbonbar_Button	Standard_MouseOver_HasFocus	Rechteck_R2Ohne	0	0	0	0	Verlauf_Vertical_3	0,5	E4EFF3	F7FAFB	E4EFF3	Solide_1px	0046D5			{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Ribbonbar_Button_CheckBox	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Ribbonbar_Button_CheckBox	Checked	Rechteck_R2Ohne	-2	-2	-2	-2	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}	
-//	Ribbonbar_Button_CheckBox	Checked_Disabled	Rechteck_R2Ohne	-2	-2	-2	-2	Verlauf_Vertical_Solide	0,5	ECE9D8	F8DFB1		Solide_1px	FFB834			{Name=Comic Sans MS, Size=9, Color=a6a6a6}	
-//	Ribbonbar_Button_CheckBox	Checked_MouseOver	Rechteck_R2Ohne	-2	-2	-2	-2	Solide		FFE696			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}	
-//	Ribbonbar_Button_CheckBox	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=a6a6a6}	
-//	Ribbonbar_Button_CheckBox	Checked_HasFocus	Rechteck_R2Ohne	-2	-2	-2	-2	Solide		FFB834			Solide_1px_FocusDotLine	0		FFFFFF	{Name=Comic Sans MS, Size=9, Color=000000}	
-//	Ribbonbar_Button_CheckBox	Checked_MouseOver_HasFocus	Rechteck_R2Ohne	-2	-2	-2	-2	Solide		FFDA8C			Solide_1px_FocusDotLine	0		FFFFFF	{Name=Comic Sans MS, Size=9, Color=000000}	
-//	Ribbonbar_Button_CheckBox	Checked_HasFocus_MousePressed	Rechteck_R2Ohne	-2	-2	-2	-2	Solide		FFB834			Solide_1px_FocusDotLine	0		FFFFFF	{Name=Comic Sans MS, Size=9, Color=000000}	
-//	Ribbonbar_Button_CheckBox	Standard_MouseOver	Rechteck_R2Ohne	0	0	0	0	Verlauf_Vertical_3	0,5	E4EFF3	F7FAFB	E4EFF3	Ohne	0046D5			{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Ribbonbar_Button_CheckBox	Checked_MouseOver_HasFocus_MousePressed	Rechteck_R2Ohne	-2	-2	-2	-2	Solide		FFDA8C			Solide_1px_FocusDotLine	0		FFFFFF	{Name=Comic Sans MS, Size=9, Color=000000}	
-//	Ribbonbar_Button_CheckBox	Standard_HasFocus	Rechteck_R2Ohne	0	0	0	0	Ohne					Solide_1px	0046D5			{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Ribbonbar_Button_CheckBox	Standard_MouseOver_HasFocus	Rechteck_R2Ohne	0	0	0	0	Verlauf_Vertical_3	0,5	E4EFF3	F7FAFB	E4EFF3	Solide_1px	0046D5			{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Ribbonbar_Button_OptionButton	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Ribbonbar_Button_OptionButton	Checked	Rechteck_R2Ohne	-2	-2	-2	-2	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}	
-//	Ribbonbar_Button_OptionButton	Checked_Disabled	Rechteck_R2Ohne	-2	-2	-2	-2	Verlauf_Vertical_Solide	0,5	ECE9D8	F8DFB1		Solide_1px	FFB834			{Name=Comic Sans MS, Size=9, Color=a6a6a6}	
-//	Ribbonbar_Button_OptionButton	Checked_MouseOver	Rechteck_R2Ohne	-2	-2	-2	-2	Solide		FFE696			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}	
-//	Ribbonbar_Button_OptionButton	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=a6a6a6}	
-//	Ribbonbar_Button_OptionButton	Checked_HasFocus	Rechteck_R2Ohne	-2	-2	-2	-2	Solide		FFB834			Solide_1px_FocusDotLine	0		FFFFFF	{Name=Comic Sans MS, Size=9, Color=000000}	
-//	Ribbonbar_Button_OptionButton	Checked_MouseOver_HasFocus	Rechteck_R2Ohne	-2	-2	-2	-2	Solide		FFDA8C			Solide_1px_FocusDotLine	0		FFFFFF	{Name=Comic Sans MS, Size=9, Color=000000}	
-//	Ribbonbar_Button_OptionButton	Checked_HasFocus_MousePressed	Rechteck_R2Ohne	-2	-2	-2	-2	Solide		FFB834			Solide_1px_FocusDotLine	0		FFFFFF	{Name=Comic Sans MS, Size=9, Color=000000}	
-//	Ribbonbar_Button_OptionButton	Standard_MouseOver	Rechteck_R2Ohne	0	0	0	0	Verlauf_Vertical_3	0,5	E4EFF3	F7FAFB	E4EFF3	Ohne	0046D5			{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Ribbonbar_Button_OptionButton	Checked_MouseOver_HasFocus_MousePressed	Rechteck_R2Ohne	-2	-2	-2	-2	Solide		FFDA8C			Solide_1px_FocusDotLine	0		FFFFFF	{Name=Comic Sans MS, Size=9, Color=000000}	
-//	Ribbonbar_Button_OptionButton	Standard_HasFocus	Rechteck_R2Ohne	0	0	0	0	Ohne					Solide_1px	0046D5			{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Ribbonbar_Button_OptionButton	Standard_MouseOver_HasFocus	Rechteck_R2Ohne	0	0	0	0	Verlauf_Vertical_3	0,5	E4EFF3	F7FAFB	E4EFF3	Solide_1px	0046D5			{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Ribbon_ComboBox_Textbox	Standard	Rechteck_R4	0	0	0	0	Ohne					Solide_1px	0046D5			{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Ribbon_ComboBox_Textbox	Standard_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Ohne					Solide_1px	FFFFFF			{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Ribbon_ComboBox_Textbox	Standard_MouseOver_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Ohne					Solide_1px	FFFFFF			{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Ribbon_ComboBox_Textbox	Checked	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}	
-//	Ribbon_ComboBox_Textbox	Checked_MouseOver	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}	
-//	Ribbon_ComboBox_Textbox	Standard_Disabled	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	C9C7BA			{Name=Comic Sans MS, Size=9, Color=a6a6a6}	
-//	Ribbon_ComboBox_Textbox	Checked_HasFocus	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}	
-//	Ribbon_ComboBox_Textbox	Checked_MouseOver_HasFocus	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}	
-//	Ribbon_ComboBox_Textbox	Checked_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}	
-//	Ribbon_ComboBox_Textbox	Standard_MouseOver	Rechteck_R4	0	0	0	0	Ohne					Solide_1px	0046D5			{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Ribbon_ComboBox_Textbox	Checked_MouseOver_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}	
-//	Ribbon_ComboBox_Textbox	Standard_HasFocus	Rechteck_R4	0	0	0	0	Ohne					Solide_1px	FFFFFF			{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Ribbon_ComboBox_Textbox	Standard_MouseOver_HasFocus	Rechteck_R4	0	0	0	0	Ohne					Solide_1px	FFFFFF			{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Ribbonbar_Caption	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Ribbonbar_Caption	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=a6a6a6}	
-//	Ribbonbar_Button_Combobox	Standard	Ohne					Ohne					Ohne					
-//	Ribbonbar_Button_Combobox	Standard_HasFocus_MousePressed	Ohne					Ohne					Ohne					
-//	Ribbonbar_Button_Combobox	Standard_MouseOver_HasFocus_MousePressed	Ohne					Ohne					Ohne					
-//	Ribbonbar_Button_Combobox	Standard_Disabled	Ohne					Ohne					Ohne					
-//	Ribbonbar_Button_Combobox	Standard_MouseOver	Ohne					Ohne					Ohne					
-//	Ribbonbar_Button_Combobox	Standard_HasFocus	Ohne					Ohne					Ohne					
-//	Ribbonbar_Button_Combobox	Standard_MouseOver_HasFocus	Ohne					Ohne					Ohne					
-//	RibbonBar_Frame	Standard	Rechteck	1	0	1	1	Ohne					Solide_1px	FFB834			{Name=Comic Sans MS, Size=9, Color=000000}	
-//	RibbonBar_Frame	Standard_Disabled	Rechteck	1	0	1	1	Ohne					Solide_1px	C9C7BA			{Name=Comic Sans MS, Size=9, Color=a6a6a6}	
-//	Form_Standard	Standard	Rechteck	0	0	0	0	Solide		D7E7EE			Ohne					
-//	Form_MsgBox	Standard	Rechteck	0	0	0	0	Solide		D7E7EE			Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Form_QuickInfo	Standard	Rechteck_R4	0	0	0	0	Solide		F7FAFB			Solide_1px	498DAB			{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Form_DesktopBenachrichtigung	Standard	Rechteck_R4	0	0	0	0	Solide		F7FAFB			Solide_1px	498DAB			{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Form_BitteWarten	Standard	Rechteck_R2Ohne	0	0	0	0	Solide		F7FAFB			Solide_1px	498DAB			{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Form_AutoFilter	Standard	Rechteck_R4	0	0	0	0	Solide		F7FAFB			Solide_1px	498DAB			{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Form_AutoFilter	Standard_Disabled															{Name=Comic Sans MS, Size=9, Color=dbdbdb}	
-//	Form_KontextMenu	Standard	Rechteck_R4	0	0	0	0	Solide		F7FAFB			Solide_1px	498DAB				
-//	Form_SelectBox_Dropdown	Standard	Rechteck_R4	0	0	0	0	Solide		F7FAFB			Solide_1px	498DAB			{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Item_DropdownMenu	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Item_DropdownMenu	Checked	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}	
-//	Item_DropdownMenu	Checked_Disabled	Rechteck_R4	0	0	0	0	Ohne					Solide_1px	C9C7BA			{Name=Comic Sans MS, Size=9, Color=dbdbdb}	
-//	Item_DropdownMenu	Checked_MouseOver	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFE696	FFDA8C	FFB834	Solide_1px	0			{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}	
-//	Item_DropdownMenu	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=dbdbdb}	
-//	Item_DropdownMenu	Standard_MouseOver	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFE696	FFDA8C	FFB834	Solide_1px	0			{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}	
-//	Item_KontextMenu	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Item_KontextMenu	Standard_Disabled	Rechteck	0	0	0	0	Solide		F7FAFB			Ohne				{Name=Comic Sans MS, Size=9, Color=dbdbdb}	
-//	Item_KontextMenu	Standard_MouseOver	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFE696	FFDA8C	FFB834	Solide_1px	0			{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}	
-//	Item_KontextMenu_Caption	Standard	Rechteck	0	0	0	0	Verlauf_Horizontal_Solide	0,5	BCDFED	F7FAFB		Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Item_KontextMenu_Caption	Standard_Disabled	Rechteck	0	0	0	0	Verlauf_Horizontal_Solide	0,5	ECE9D8	F7FAFB		Ohne				{Name=Comic Sans MS, Size=9, Color=a6a6a6}	
-//	Item_KontextMenu_Caption	Standard_MouseOver	Rechteck_R4	0	0	0	0	Verlauf_Horizontal_Solide	0,5	BCDFED	F7FAFB		Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}	
-//	Item_Autofilter	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Item_Autofilter	Standard_MouseOver_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Ohne					Solide_1px	0046D5			{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Item_Autofilter	Checked	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}	
-//	Item_Autofilter	Checked_Disabled	Rechteck_R4	0	0	0	0	Ohne					Solide_1px	C9C7BA			{Name=Comic Sans MS, Size=9, Color=dbdbdb}	
-//	Item_Autofilter	Checked_MouseOver	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFE696	FFDA8C	FFB834	Solide_1px	0			{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}	
-//	Item_Autofilter	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Italic=True, Color=dbdbdb}	
-//	Item_Autofilter	Standard_MouseOver	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFE696	FFDA8C	FFB834	Solide_1px	0			{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}	
-//	Item_Autofilter	Standard_HasFocus	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Item_Autofilter	Standard_MouseOver_HasFocus	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFE696	FFDA8C	FFB834	Solide_1px	0			{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}	
-//	Item_Listbox	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Item_Listbox	Standard_MouseOver_MousePressed	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}	
-//	Item_Listbox	Checked	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}	
-//	Item_Listbox	Checked_Disabled	Rechteck_R4	0	0	0	0	Verlauf_Vertical_Solide		ECE9D8	F8DFB1		Solide_1px	FFB834			{Name=Comic Sans MS, Size=9, Color=a6a6a6}	
-//	Item_Listbox	Checked_MouseOver	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFE696	FFDA8C	FFB834	Solide_1px	0			{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}	
-//	Item_Listbox	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=a6a6a6}	
-//	Item_Listbox	Checked_MousePressed	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}	
-//	Item_Listbox	Standard_MouseOver	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFE696	FFDA8C	FFB834	Solide_1px	0			{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}	
-//	Item_Listbox	Standard_MousePressed	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Item_Listbox_Caption	Standard	Rechteck	0	0	0	0	Verlauf_Horizontal_Solide	0,5	BCDFED	F7FAFB		Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Item_Listbox_Caption	Standard_Disabled	Rechteck	0	0	0	0	Verlauf_Horizontal_Solide	0,5	ECE9D8	F7FAFB		Ohne				{Name=Comic Sans MS, Size=9, Color=a6a6a6}	
-//	Item_Listbox_Caption	Standard_MouseOver	Rechteck	0	0	0	0	Verlauf_Horizontal_Solide	0,5	BCDFED	F7FAFB		Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Frame	Standard	Rechteck_R2Ohne	-2	-2	-10	-2	Ohne					Solide_3px	FFB834			{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Frame	Standard_Disabled	Rechteck_R2Ohne	-1	-1	-10	-1	Ohne					Solide_1px	A6A6A6			{Name=Comic Sans MS, Size=9, Color=a6a6a6}	
-//	TabStrip_Body	Standard	Rechteck_RRechteckRechteck	-1	-1	-1	-1	Solide		E4EFF3			Solide_3px	FFB834	69A5BE	A2C7D7		
-//	TabStrip_Body	Standard_Disabled	Rechteck_RRechteckRechteck	-1	-1	-1	-1	Solide		E4EFF3			Solide_3px	498DAB	69A5BE	A2C7D7		
-//	RibbonBar_Body	Standard	Rechteck	0	0	0	0	Solide		E4EFF3			Solide_1px	FFB834				
-//	RibbonBar_Body	Standard_Disabled	Rechteck	0	0	0	0	Solide		E4EFF3			Solide_1px	C9C7BA				
-//	RibbonBar_Back	Standard	Rechteck	0	0	0	8	Solide		D7E7EE								
-//	TabStrip_Back	Standard	Ohne					Ohne					Ohne					
-//	Progressbar	Standard	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9				
-//	Progressbar_Füller	Standard	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	498DAB				
-//	Table_Lines_thick	Standard	Ohne					Ohne					Ohne	0046D5				
-//	Table_Lines_thin	Standard	Ohne					Ohne					Ohne	97AEE2				
-//	Table_Cursor	Standard	Rechteck_RRechteckRechteck	-1	-1	-1	-1	Ohne					Solide_3px	F8DFB1				
-//	Table_Cursor	Standard_HasFocus	Rechteck_RRechteckRechteck	-1	-1	-1	-1	Ohne					Solide_3px	FFB834				
-//	Table_Cell	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}	
-//	Table_Cell_New	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Italic=True, Color=0046d5}	
-//	Table_Column	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9,4, Bold=True, Color=0046d5}	
-//	Table_Cell_Chapter	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=13, Bold=True, Underline=True, Color=0046d5}	
-#endregion
+//	TextBox	Standard	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	97AEE2			{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	TextBox	Checked	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}
+//	TextBox	Standard_Disabled	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	C9C7BA			{Name=Comic Sans MS, Size=9, Color=a6a6a6}
+//	TextBox	Checked_HasFocus	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}
+//	TextBox	Standard_HasFocus	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	97AEE2			{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	ListBox	Standard	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	97AEE2
+//	ListBox	Standard_Disabled	Rechteck_RRechteckRechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	C9C7BA
+//	ComboBox_Textbox	Standard	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	97AEE2			{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	ComboBox_Textbox	Standard_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9			{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	ComboBox_Textbox	Standard_MouseOver_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9			{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	ComboBox_Textbox	Checked	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}
+//	ComboBox_Textbox	Checked_MouseOver	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}
+//	ComboBox_Textbox	Standard_Disabled	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	C9C7BA			{Name=Comic Sans MS, Size=9, Color=a6a6a6}
+//	ComboBox_Textbox	Checked_HasFocus	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}
+//	ComboBox_Textbox	Checked_MouseOver_HasFocus	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}
+//	ComboBox_Textbox	Checked_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}
+//	ComboBox_Textbox	Standard_MouseOver	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	97AEE2			{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	ComboBox_Textbox	Checked_MouseOver_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}
+//	ComboBox_Textbox	Standard_HasFocus	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9			{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	ComboBox_Textbox	Standard_MouseOver_HasFocus	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9			{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Table_And_Pad	Standard	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	97AEE2
+//	Table_And_Pad	Standard_Disabled	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	C9C7BA
+//	Table_And_Pad	Standard_HasFocus	Rechteck	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9
+//	EasyPic	Standard	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	97AEE2
+//	EasyPic	Standard_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	97AEE2
+//	EasyPic	Standard_MouseOver_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	97AEE2
+//	EasyPic	Standard_Disabled	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	C9C7BA
+//	EasyPic	Standard_MouseOver	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	97AEE2
+//	EasyPic	Standard_HasFocus	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	97AEE2
+//	TextBox_Stufe3	Standard	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	97AEE2			{Name=Comic Sans MS, Size=12, Underline=True, Color=0046d5}
+//	TextBox_Stufe3	Checked	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=12, Underline=True, Color=000000}
+//	TextBox_Stufe3	Standard_Disabled	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	C9C7BA			{Name=Comic Sans MS, Size=12, Underline=True, Color=a6a6a6}
+//	TextBox_Stufe3	Checked_HasFocus	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=12, Underline=True, Color=000000}
+//	TextBox_Stufe3	Standard_HasFocus	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	97AEE2			{Name=Comic Sans MS, Size=12, Underline=True, Color=0046d5}
+//	TextBox_Bold	Standard	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	97AEE2			{Name=Comic Sans MS, Size=9, Bold=True, Color=0046d5}
+//	TextBox_Bold	Checked	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Bold=True, Color=000000}
+//	TextBox_Bold	Standard_Disabled	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	C9C7BA			{Name=Comic Sans MS, Size=9, Bold=True, Color=a6a6a6}
+//	TextBox_Bold	Checked_HasFocus	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Bold=True, Color=000000}
+//	TextBox_Bold	Standard_HasFocus	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	97AEE2			{Name=Comic Sans MS, Size=9, Bold=True, Color=0046d5}
+//	Slider_Hintergrund_Waagerecht	Standard	Rechteck	5	5	0	0	Verlauf_Horizontal_3	0,5	BCDFED	FEFEFB	BCDFED	Solide_1px	97AEE2
+//	Slider_Hintergrund_Waagerecht	Standard_MouseOver_MousePressed	Rechteck	5	5	0	0	Verlauf_Horizontal_3	0,5	BCDFED	FEFEFB	BCDFED	Solide_1px	97AEE2
+//	Slider_Hintergrund_Waagerecht	Standard_Disabled	Rechteck	5	5	0	0	Solide		FFFFFF			Solide_1px	EEEDE5
+//	Slider_Hintergrund_Waagerecht	Standard_MouseOver	Rechteck	5	5	0	0	Verlauf_Horizontal_3	0,5	BCDFED	FEFEFB	BCDFED	Solide_1px	97AEE2
+//	Slider_Hintergrund_Waagerecht	Standard_MousePressed	Rechteck	5	5	0	0	Verlauf_Horizontal_3	0,5	BCDFED	FEFEFB	BCDFED	Solide_1px	97AEE2
+//	Slider_Hintergrund_Senkrecht	Standard	Rechteck	0	0	5	5	Verlauf_Vertical_3	0,5	BCDFED	FEFEFB	BCDFED	Solide_1px	97AEE2
+//	Slider_Hintergrund_Senkrecht	Standard_MouseOver_MousePressed	Rechteck	0	0	5	5	Verlauf_Vertical_3	0,5	BCDFED	FEFEFB	BCDFED	Solide_1px	97AEE2
+//	Slider_Hintergrund_Senkrecht	Standard_MouseOver_HasFocus_MousePressed	Rechteck	0	0	5	5	Verlauf_Vertical_3	0,5	BCDFED	FEFEFB	BCDFED	Solide_1px	97AEE2
+//	Slider_Hintergrund_Senkrecht	Standard_Disabled	Rechteck	0	0	5	5	Solide		FFFFFF			Solide_1px	EEEDE5
+//	Slider_Hintergrund_Senkrecht	Standard_MouseOver	Rechteck	0	0	5	5	Verlauf_Vertical_3	0,5	BCDFED	FEFEFB	BCDFED	Solide_1px	97AEE2
+//	Slider_Hintergrund_Senkrecht	Standard_MousePressed	Rechteck	0	0	5	5	Verlauf_Vertical_3	0,5	BCDFED	FEFEFB	BCDFED	Solide_1px	97AEE2
+//	Ribbonbar_Button	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Ribbonbar_Button	Standard_HasFocus_MousePressed	Rechteck_R2Ohne	0	0	0	0	Ohne					Solide_1px	0046D5			{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Ribbonbar_Button	Standard_MouseOver_HasFocus_MousePressed	Rechteck_R2Ohne	0	0	0	0	Verlauf_Vertical_3	0,5	F7FAFB	E4EFF3	F7FAFB	Solide_1px	0046D5			{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Ribbonbar_Button	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=a6a6a6}
+//	Ribbonbar_Button	Standard_MouseOver	Rechteck_R2Ohne	0	0	0	0	Verlauf_Vertical_3	0,5	E4EFF3	F7FAFB	E4EFF3	Ohne	0046D5			{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Ribbonbar_Button	Standard_HasFocus	Rechteck_R2Ohne	0	0	0	0	Ohne					Solide_1px	0046D5			{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Ribbonbar_Button	Standard_MouseOver_HasFocus	Rechteck_R2Ohne	0	0	0	0	Verlauf_Vertical_3	0,5	E4EFF3	F7FAFB	E4EFF3	Solide_1px	0046D5			{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Ribbonbar_Button_CheckBox	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Ribbonbar_Button_CheckBox	Checked	Rechteck_R2Ohne	-2	-2	-2	-2	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}
+//	Ribbonbar_Button_CheckBox	Checked_Disabled	Rechteck_R2Ohne	-2	-2	-2	-2	Verlauf_Vertical_Solide	0,5	ECE9D8	F8DFB1		Solide_1px	FFB834			{Name=Comic Sans MS, Size=9, Color=a6a6a6}
+//	Ribbonbar_Button_CheckBox	Checked_MouseOver	Rechteck_R2Ohne	-2	-2	-2	-2	Solide		FFE696			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}
+//	Ribbonbar_Button_CheckBox	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=a6a6a6}
+//	Ribbonbar_Button_CheckBox	Checked_HasFocus	Rechteck_R2Ohne	-2	-2	-2	-2	Solide		FFB834			Solide_1px_FocusDotLine	0		FFFFFF	{Name=Comic Sans MS, Size=9, Color=000000}
+//	Ribbonbar_Button_CheckBox	Checked_MouseOver_HasFocus	Rechteck_R2Ohne	-2	-2	-2	-2	Solide		FFDA8C			Solide_1px_FocusDotLine	0		FFFFFF	{Name=Comic Sans MS, Size=9, Color=000000}
+//	Ribbonbar_Button_CheckBox	Checked_HasFocus_MousePressed	Rechteck_R2Ohne	-2	-2	-2	-2	Solide		FFB834			Solide_1px_FocusDotLine	0		FFFFFF	{Name=Comic Sans MS, Size=9, Color=000000}
+//	Ribbonbar_Button_CheckBox	Standard_MouseOver	Rechteck_R2Ohne	0	0	0	0	Verlauf_Vertical_3	0,5	E4EFF3	F7FAFB	E4EFF3	Ohne	0046D5			{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Ribbonbar_Button_CheckBox	Checked_MouseOver_HasFocus_MousePressed	Rechteck_R2Ohne	-2	-2	-2	-2	Solide		FFDA8C			Solide_1px_FocusDotLine	0		FFFFFF	{Name=Comic Sans MS, Size=9, Color=000000}
+//	Ribbonbar_Button_CheckBox	Standard_HasFocus	Rechteck_R2Ohne	0	0	0	0	Ohne					Solide_1px	0046D5			{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Ribbonbar_Button_CheckBox	Standard_MouseOver_HasFocus	Rechteck_R2Ohne	0	0	0	0	Verlauf_Vertical_3	0,5	E4EFF3	F7FAFB	E4EFF3	Solide_1px	0046D5			{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Ribbonbar_Button_OptionButton	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Ribbonbar_Button_OptionButton	Checked	Rechteck_R2Ohne	-2	-2	-2	-2	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}
+//	Ribbonbar_Button_OptionButton	Checked_Disabled	Rechteck_R2Ohne	-2	-2	-2	-2	Verlauf_Vertical_Solide	0,5	ECE9D8	F8DFB1		Solide_1px	FFB834			{Name=Comic Sans MS, Size=9, Color=a6a6a6}
+//	Ribbonbar_Button_OptionButton	Checked_MouseOver	Rechteck_R2Ohne	-2	-2	-2	-2	Solide		FFE696			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}
+//	Ribbonbar_Button_OptionButton	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=a6a6a6}
+//	Ribbonbar_Button_OptionButton	Checked_HasFocus	Rechteck_R2Ohne	-2	-2	-2	-2	Solide		FFB834			Solide_1px_FocusDotLine	0		FFFFFF	{Name=Comic Sans MS, Size=9, Color=000000}
+//	Ribbonbar_Button_OptionButton	Checked_MouseOver_HasFocus	Rechteck_R2Ohne	-2	-2	-2	-2	Solide		FFDA8C			Solide_1px_FocusDotLine	0		FFFFFF	{Name=Comic Sans MS, Size=9, Color=000000}
+//	Ribbonbar_Button_OptionButton	Checked_HasFocus_MousePressed	Rechteck_R2Ohne	-2	-2	-2	-2	Solide		FFB834			Solide_1px_FocusDotLine	0		FFFFFF	{Name=Comic Sans MS, Size=9, Color=000000}
+//	Ribbonbar_Button_OptionButton	Standard_MouseOver	Rechteck_R2Ohne	0	0	0	0	Verlauf_Vertical_3	0,5	E4EFF3	F7FAFB	E4EFF3	Ohne	0046D5			{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Ribbonbar_Button_OptionButton	Checked_MouseOver_HasFocus_MousePressed	Rechteck_R2Ohne	-2	-2	-2	-2	Solide		FFDA8C			Solide_1px_FocusDotLine	0		FFFFFF	{Name=Comic Sans MS, Size=9, Color=000000}
+//	Ribbonbar_Button_OptionButton	Standard_HasFocus	Rechteck_R2Ohne	0	0	0	0	Ohne					Solide_1px	0046D5			{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Ribbonbar_Button_OptionButton	Standard_MouseOver_HasFocus	Rechteck_R2Ohne	0	0	0	0	Verlauf_Vertical_3	0,5	E4EFF3	F7FAFB	E4EFF3	Solide_1px	0046D5			{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Ribbon_ComboBox_Textbox	Standard	Rechteck_R4	0	0	0	0	Ohne					Solide_1px	0046D5			{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Ribbon_ComboBox_Textbox	Standard_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Ohne					Solide_1px	FFFFFF			{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Ribbon_ComboBox_Textbox	Standard_MouseOver_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Ohne					Solide_1px	FFFFFF			{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Ribbon_ComboBox_Textbox	Checked	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}
+//	Ribbon_ComboBox_Textbox	Checked_MouseOver	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}
+//	Ribbon_ComboBox_Textbox	Standard_Disabled	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	C9C7BA			{Name=Comic Sans MS, Size=9, Color=a6a6a6}
+//	Ribbon_ComboBox_Textbox	Checked_HasFocus	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}
+//	Ribbon_ComboBox_Textbox	Checked_MouseOver_HasFocus	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}
+//	Ribbon_ComboBox_Textbox	Checked_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}
+//	Ribbon_ComboBox_Textbox	Standard_MouseOver	Rechteck_R4	0	0	0	0	Ohne					Solide_1px	0046D5			{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Ribbon_ComboBox_Textbox	Checked_MouseOver_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}
+//	Ribbon_ComboBox_Textbox	Standard_HasFocus	Rechteck_R4	0	0	0	0	Ohne					Solide_1px	FFFFFF			{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Ribbon_ComboBox_Textbox	Standard_MouseOver_HasFocus	Rechteck_R4	0	0	0	0	Ohne					Solide_1px	FFFFFF			{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Ribbonbar_Caption	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Ribbonbar_Caption	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=a6a6a6}
+//	Ribbonbar_Button_Combobox	Standard	Ohne					Ohne					Ohne
+//	Ribbonbar_Button_Combobox	Standard_HasFocus_MousePressed	Ohne					Ohne					Ohne
+//	Ribbonbar_Button_Combobox	Standard_MouseOver_HasFocus_MousePressed	Ohne					Ohne					Ohne
+//	Ribbonbar_Button_Combobox	Standard_Disabled	Ohne					Ohne					Ohne
+//	Ribbonbar_Button_Combobox	Standard_MouseOver	Ohne					Ohne					Ohne
+//	Ribbonbar_Button_Combobox	Standard_HasFocus	Ohne					Ohne					Ohne
+//	Ribbonbar_Button_Combobox	Standard_MouseOver_HasFocus	Ohne					Ohne					Ohne
+//	RibbonBar_Frame	Standard	Rechteck	1	0	1	1	Ohne					Solide_1px	FFB834			{Name=Comic Sans MS, Size=9, Color=000000}
+//	RibbonBar_Frame	Standard_Disabled	Rechteck	1	0	1	1	Ohne					Solide_1px	C9C7BA			{Name=Comic Sans MS, Size=9, Color=a6a6a6}
+//	Form_Standard	Standard	Rechteck	0	0	0	0	Solide		D7E7EE			Ohne
+//	Form_MsgBox	Standard	Rechteck	0	0	0	0	Solide		D7E7EE			Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Form_QuickInfo	Standard	Rechteck_R4	0	0	0	0	Solide		F7FAFB			Solide_1px	498DAB			{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Form_DesktopBenachrichtigung	Standard	Rechteck_R4	0	0	0	0	Solide		F7FAFB			Solide_1px	498DAB			{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Form_BitteWarten	Standard	Rechteck_R2Ohne	0	0	0	0	Solide		F7FAFB			Solide_1px	498DAB			{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Form_AutoFilter	Standard	Rechteck_R4	0	0	0	0	Solide		F7FAFB			Solide_1px	498DAB			{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Form_AutoFilter	Standard_Disabled															{Name=Comic Sans MS, Size=9, Color=dbdbdb}
+//	Form_KontextMenu	Standard	Rechteck_R4	0	0	0	0	Solide		F7FAFB			Solide_1px	498DAB
+//	Form_SelectBox_Dropdown	Standard	Rechteck_R4	0	0	0	0	Solide		F7FAFB			Solide_1px	498DAB			{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Item_DropdownMenu	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Item_DropdownMenu	Checked	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}
+//	Item_DropdownMenu	Checked_Disabled	Rechteck_R4	0	0	0	0	Ohne					Solide_1px	C9C7BA			{Name=Comic Sans MS, Size=9, Color=dbdbdb}
+//	Item_DropdownMenu	Checked_MouseOver	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFE696	FFDA8C	FFB834	Solide_1px	0			{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}
+//	Item_DropdownMenu	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=dbdbdb}
+//	Item_DropdownMenu	Standard_MouseOver	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFE696	FFDA8C	FFB834	Solide_1px	0			{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}
+//	Item_KontextMenu	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Item_KontextMenu	Standard_Disabled	Rechteck	0	0	0	0	Solide		F7FAFB			Ohne				{Name=Comic Sans MS, Size=9, Color=dbdbdb}
+//	Item_KontextMenu	Standard_MouseOver	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFE696	FFDA8C	FFB834	Solide_1px	0			{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}
+//	Item_KontextMenu_Caption	Standard	Rechteck	0	0	0	0	Verlauf_Horizontal_Solide	0,5	BCDFED	F7FAFB		Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Item_KontextMenu_Caption	Standard_Disabled	Rechteck	0	0	0	0	Verlauf_Horizontal_Solide	0,5	ECE9D8	F7FAFB		Ohne				{Name=Comic Sans MS, Size=9, Color=a6a6a6}
+//	Item_KontextMenu_Caption	Standard_MouseOver	Rechteck_R4	0	0	0	0	Verlauf_Horizontal_Solide	0,5	BCDFED	F7FAFB		Solide_1px	0			{Name=Comic Sans MS, Size=9, Color=000000}
+//	Item_Autofilter	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Item_Autofilter	Standard_MouseOver_HasFocus_MousePressed	Rechteck_R4	0	0	0	0	Ohne					Solide_1px	0046D5			{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Item_Autofilter	Checked	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}
+//	Item_Autofilter	Checked_Disabled	Rechteck_R4	0	0	0	0	Ohne					Solide_1px	C9C7BA			{Name=Comic Sans MS, Size=9, Color=dbdbdb}
+//	Item_Autofilter	Checked_MouseOver	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFE696	FFDA8C	FFB834	Solide_1px	0			{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}
+//	Item_Autofilter	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Italic=True, Color=dbdbdb}
+//	Item_Autofilter	Standard_MouseOver	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFE696	FFDA8C	FFB834	Solide_1px	0			{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}
+//	Item_Autofilter	Standard_HasFocus	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Item_Autofilter	Standard_MouseOver_HasFocus	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFE696	FFDA8C	FFB834	Solide_1px	0			{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}
+//	Item_Listbox	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Item_Listbox	Standard_MouseOver_MousePressed	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}
+//	Item_Listbox	Checked	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}
+//	Item_Listbox	Checked_Disabled	Rechteck_R4	0	0	0	0	Verlauf_Vertical_Solide		ECE9D8	F8DFB1		Solide_1px	FFB834			{Name=Comic Sans MS, Size=9, Color=a6a6a6}
+//	Item_Listbox	Checked_MouseOver	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFE696	FFDA8C	FFB834	Solide_1px	0			{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}
+//	Item_Listbox	Standard_Disabled	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=a6a6a6}
+//	Item_Listbox	Checked_MousePressed	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	0			{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}
+//	Item_Listbox	Standard_MouseOver	Rechteck_R4	0	0	0	0	Verlauf_Vertical_3	0,5	FFE696	FFDA8C	FFB834	Solide_1px	0			{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}
+//	Item_Listbox	Standard_MousePressed	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Item_Listbox_Caption	Standard	Rechteck	0	0	0	0	Verlauf_Horizontal_Solide	0,5	BCDFED	F7FAFB		Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Item_Listbox_Caption	Standard_Disabled	Rechteck	0	0	0	0	Verlauf_Horizontal_Solide	0,5	ECE9D8	F7FAFB		Ohne				{Name=Comic Sans MS, Size=9, Color=a6a6a6}
+//	Item_Listbox_Caption	Standard_MouseOver	Rechteck	0	0	0	0	Verlauf_Horizontal_Solide	0,5	BCDFED	F7FAFB		Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Frame	Standard	Rechteck_R2Ohne	-2	-2	-10	-2	Ohne					Solide_3px	FFB834			{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Frame	Standard_Disabled	Rechteck_R2Ohne	-1	-1	-10	-1	Ohne					Solide_1px	A6A6A6			{Name=Comic Sans MS, Size=9, Color=a6a6a6}
+//	TabStrip_Body	Standard	Rechteck_RRechteckRechteck	-1	-1	-1	-1	Solide		E4EFF3			Solide_3px	FFB834	69A5BE	A2C7D7
+//	TabStrip_Body	Standard_Disabled	Rechteck_RRechteckRechteck	-1	-1	-1	-1	Solide		E4EFF3			Solide_3px	498DAB	69A5BE	A2C7D7
+//	RibbonBar_Body	Standard	Rechteck	0	0	0	0	Solide		E4EFF3			Solide_1px	FFB834
+//	RibbonBar_Body	Standard_Disabled	Rechteck	0	0	0	0	Solide		E4EFF3			Solide_1px	C9C7BA
+//	RibbonBar_Back	Standard	Rechteck	0	0	0	8	Solide		D7E7EE
+//	TabStrip_Back	Standard	Ohne					Ohne					Ohne
+//	Progressbar	Standard	Rechteck_R4	0	0	0	0	Solide		FFFFFF			Solide_1px	7F9DB9
+//	Progressbar_Füller	Standard	Rechteck_R4	0	0	0	0	Solide		FFB834			Solide_1px	498DAB
+//	Table_Lines_thick	Standard	Ohne					Ohne					Ohne	0046D5
+//	Table_Lines_thin	Standard	Ohne					Ohne					Ohne	97AEE2
+//	Table_Cursor	Standard	Rechteck_RRechteckRechteck	-1	-1	-1	-1	Ohne					Solide_3px	F8DFB1
+//	Table_Cursor	Standard_HasFocus	Rechteck_RRechteckRechteck	-1	-1	-1	-1	Ohne					Solide_3px	FFB834
+//	Table_Cell	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Color=0046d5}
+//	Table_Cell_New	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9, Italic=True, Color=0046d5}
+//	Table_Column	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=9,4, Bold=True, Color=0046d5}
+//	Table_Cell_Chapter	Standard	Ohne					Ohne					Ohne				{Name=Comic Sans MS, Size=13, Bold=True, Underline=True, Color=0046d5}
+
+#endregion GlossyCyan
 
 namespace BlueControls {
+
     public static class Skin {
         public static Database StyleDB;
         public static bool inited = false;
@@ -840,6 +854,7 @@ namespace BlueControls {
         public static readonly int PaddingSmal = 3; // Der Abstand von z.B. in Textboxen: Text Linke Koordinate
         public static readonly int Padding = 9;
         public static readonly Dictionary<enDesign, Dictionary<enStates, clsDesign>> Design = new();
+
         public static void LoadSkin() {
             //_SkinString = "Windows10";
             //SkinDB = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), _SkinString + ".skn", "Skin", true, Convert.ToBoolean(Develop.AppName() == "SkinDesigner"));
@@ -1107,35 +1122,24 @@ namespace BlueControls {
             Design.Add(enDesign.Table_Column, enStates.Standard, enKontur.Ohne, 0, 0, 0, 0, enHintergrundArt.Ohne, 0, "", "", "", enRahmenArt.Ohne, "", "", "", "{Name=Calibri, Size=10[K]15,Bold=True}", "");
             Design.Add(enDesign.Table_Cell_Chapter, enStates.Standard, enKontur.Ohne, 0, 0, 0, 0, enHintergrundArt.Ohne, 0, "", "", "", enRahmenArt.Ohne, "", "", "", "{Name=Calibri, Size=15,Bold=True,Underline=True}", "");
             inited = true;
-            //ColX1 = SkinDB.Column["X1"];
-            //ColX2 = SkinDB.Column["X2"];
-            //ColY1 = SkinDB.Column["Y1"];
-            //ColY2 = SkinDB.Column["Y2"];
-            //col_Color_Back_1 = SkinDB.Column["Color_Back_1"];
-            //col_Color_Back_2 = SkinDB.Column["Color_Back_2"];
-            ////col_Color_Back_3 = SkinDB.Column["Color_Back_3"];
-            //col_Color_Border_1 = SkinDB.Column["Color_Border_1"];
-            //col_Color_Border_2 = SkinDB.Column["Color_Border_2"];
-            //col_Color_Border_3 = SkinDB.Column["Color_Border_3"];
-            //col_Kontur = SkinDB.Column["Kontur"];
-            //col_Draw_Back = SkinDB.Column["Draw_Back"];
-            //col_Verlauf_Mitte = SkinDB.Column["Verlauf_Mitte"];
-            //col_Border_Style = SkinDB.Column["Border_Style"];
-            ////col_Status = SkinDB.Column["Status"];
-            //col_Font = SkinDB.Column["Font"];
-            //col_StandardPic = SkinDB.Column["StandardPic"];
+
             ST[0] = enImageCodeEffect.WindowsXPDisabled;
-            //ST[0] = (enImageCodeEffect)int.Parse(SkinDB?.Tags[0]);
+
             Pen_LinieDünn = new Pen(Color_Border(enDesign.Table_Lines_thin, enStates.Standard));
             Pen_LinieKräftig = new Pen(Color_Border(enDesign.Table_Lines_thick, enStates.Standard));
             Pen_LinieDick = new Pen(Color_Border(enDesign.Table_Lines_thick, enStates.Standard), 3);
         }
+
         public static enImageCodeEffect AdditionalState(enStates vState) => vState.HasFlag(enStates.Standard_Disabled) ? ST[0] : enImageCodeEffect.Ohne;
+
         public static Color Color_Back(enDesign vDesign, enStates vState) => DesignOf(vDesign, vState).BackColor1;
+
         internal static Color Color_Border(enDesign vDesign, enStates vState) => DesignOf(vDesign, vState).BorderColor1;
 
-        #region  Back 
+        #region Back
+
         public static void Draw_Back(Graphics gr, enDesign design, enStates state, Rectangle r, System.Windows.Forms.Control control, bool needTransparenz) => Draw_Back(gr, DesignOf(design, state), r, control, needTransparenz);
+
         public static clsDesign DesignOf(enDesign design, enStates state) {
             try {
                 return Design[design][state];
@@ -1151,6 +1155,7 @@ namespace BlueControls {
                 return d;
             }
         }
+
         public static void Draw_Back(Graphics gr, clsDesign design, Rectangle r, System.Windows.Forms.Control control, bool needTransparenz) {
             try {
                 if (design.Need) {
@@ -1172,12 +1177,12 @@ namespace BlueControls {
                 switch (design.HintergrundArt) {
                     case enHintergrundArt.Ohne:
                         break;
+
                     case enHintergrundArt.Solide:
                         gr.FillPath(new SolidBrush(design.BackColor1), Kontur(design.Kontur, r));
                         break;
+
                     case enHintergrundArt.Verlauf_Vertical_2:
-                        //var c1 = Color.FromArgb(Value(row, col_Color_Back_1, 0));
-                        //var c2 = Color.FromArgb(Value(row, col_Color_Back_2, 0));
                         LinearGradientBrush lgb = new(r, design.BackColor1, design.BackColor2, LinearGradientMode.Vertical);
                         gr.FillPath(lgb, Kontur(design.Kontur, r));
                         break;
@@ -1216,6 +1221,7 @@ namespace BlueControls {
                     //    break;
                     case enHintergrundArt.Unbekannt:
                         break;
+
                     default:
                         Develop.DebugPrint(design.HintergrundArt);
                         break;
@@ -1224,40 +1230,50 @@ namespace BlueControls {
                 Develop.DebugPrint(ex);
             }
         }
+
         public static void Draw_Back_Transparent(Graphics gr, Rectangle r, System.Windows.Forms.Control control) {
             if (control?.Parent == null) { return; }
             switch (control.Parent) {
                 case IUseMyBackColor _:
                     gr.FillRectangle(new SolidBrush(control.Parent.BackColor), r);
                     return;
+
                 case IBackgroundNone _:
                     Draw_Back_Transparent(gr, r, control.Parent);
                     break;
+
                 case GenericControl TRB:
                     if (TRB.BitmapOfControl() == null) { return; }
                     gr.DrawImage(TRB.BitmapOfControl(), r, new Rectangle(control.Left + r.Left, control.Top + r.Top, r.Width, r.Height), GraphicsUnit.Pixel);
                     break;
+
                 case System.Windows.Forms.Form frm:
                     gr.FillRectangle(new SolidBrush(frm.BackColor), r);
                     break;
+
                 case System.Windows.Forms.SplitContainer _:
                     Draw_Back_Transparent(gr, r, control.Parent);
                     break;
+
                 case System.Windows.Forms.SplitterPanel _:
                     Draw_Back_Transparent(gr, r, control.Parent);
                     break;
+
                 case System.Windows.Forms.TableLayoutPanel _:
                     Draw_Back_Transparent(gr, r, control.Parent);
                     break;
+
                 case System.Windows.Forms.Panel _:
                     Draw_Back_Transparent(gr, r, control.Parent);
                     break;
+
                 default:
                     System.Windows.Forms.ButtonRenderer.DrawParentBackground(gr, r, control); // Ein Versuch ist es allemal wert..
                     Develop.DebugPrint("Unbekannter Typ: " + control.Parent.Name);
                     break;
             }
         }
+
         //private static void Draw_Back_Verlauf_Vertical_Glanzpunkt(Graphics GR, RowItem Row, Rectangle r) {
         //    var cb = new ColorBlend();
         //    var c1 = Color.FromArgb(Value(Row, col_Color_Back_1, 0));
@@ -1356,7 +1372,8 @@ namespace BlueControls {
         //    GR.FillRectangle(b, new Rectangle(rect.Left + r2, rect.Top, rect.Width - r, rect.Height));
         //    GR.FillRectangle(b, new Rectangle(rect.Left, rect.Top + r2, rect.Width, rect.Height - r));
         //}
-        #endregion
+
+        #endregion Back
 
         private static GraphicsPath Kontur(enKontur Kon, Rectangle r) => Kon switch {
             enKontur.Rechteck => modAllgemein.Poly_Rechteck(r),// GR.SmoothingModex = Drawing2D.SmoothingMode.None
@@ -1371,8 +1388,10 @@ namespace BlueControls {
             _ => modAllgemein.Poly_Rechteck(r),//  GR.SmoothingModex = Drawing2D.SmoothingMode.None
         };
 
-        #region  Border 
+        #region Border
+
         public static void Draw_Border(Graphics GR, enDesign vDesign, enStates vState, Rectangle r) => Draw_Border(GR, DesignOf(vDesign, vState), r);
+
         //[Obsolete]
         //public static void Draw_Border(Graphics GR, RowItem row, Rectangle r) {
         //    if (row == null) { return; }
@@ -1412,6 +1431,7 @@ namespace BlueControls {
                         PenX = new Pen(design.BorderColor1);
                         if (PathX != null) { GR.DrawPath(PenX, PathX); }
                         break;
+
                     case enRahmenArt.Solide_1px_FocusDotLine:
                         PathX = Kontur(design.Kontur, r);
                         PenX = new Pen(design.BorderColor1);
@@ -1423,6 +1443,7 @@ namespace BlueControls {
                         };
                         if (PathX != null) { GR.DrawPath(PenX, PathX); }
                         break;
+
                     case enRahmenArt.FocusDotLine:
                         PenX = new Pen(design.BorderColor3) {
                             DashStyle = DashStyle.Dot
@@ -1431,11 +1452,13 @@ namespace BlueControls {
                         PathX = Kontur(design.Kontur, r);
                         if (PathX != null) { GR.DrawPath(PenX, PathX); }
                         break;
+
                     case enRahmenArt.Solide_3px:
                         PathX = Kontur(design.Kontur, r);
                         PenX = new Pen(design.BorderColor1, 3);
                         if (PathX != null) { GR.DrawPath(PenX, PathX); }
                         break;
+
                     default:
                         PathX = Kontur(design.Kontur, r);
                         PenX = new Pen(Color.Red);
@@ -1447,6 +1470,7 @@ namespace BlueControls {
                 Develop.DebugPrint(ex);
             }
         }
+
         //private static void Draw_Border_DuoColor(Graphics GR, RowItem Row, Rectangle r, bool NurOben) {
         //    var c1 = Color.FromArgb(Value(Row, col_Color_Border_2, 0));
         //    var c2 = Color.FromArgb(Value(Row, col_Color_Border_3, 0));
@@ -1463,7 +1487,8 @@ namespace BlueControls {
         //    }
         //    GR.SmoothingMode = x;
         //}
-        #endregion
+
+        #endregion Border
 
         /// <summary>
         /// Bild wird in dieser Routine nicht mehr gändert, aber in der nachfolgenden
@@ -1478,6 +1503,7 @@ namespace BlueControls {
         /// <param name="child"></param>
         /// <param name="deleteBack"></param>
         public static void Draw_FormatedText(Graphics gr, string txt, enDesign design, enStates state, QuickImage imageCode, enAlignment align, Rectangle fitInRect, System.Windows.Forms.Control child, bool deleteBack, bool translate) => Draw_FormatedText(gr, txt, imageCode, DesignOf(design, state), align, fitInRect, child, deleteBack, translate);
+
         /// <summary>
         /// Status des Bildes (Disabled) wird geändert
         /// </summary>
@@ -1494,6 +1520,7 @@ namespace BlueControls {
             if (qi != null) { tmpImage = QuickImage.Get(qi, AdditionalState(design.Status)); }
             Draw_FormatedText(gr, txt, tmpImage, align, fitInRect, child, deleteBack, design.bFont, translate);
         }
+
         public static ItemCollectionList GetRahmenArt(RowItem SheetStyle, bool MitOhne) {
             ItemCollectionList Rahms = new();
             if (MitOhne) {
@@ -1509,6 +1536,7 @@ namespace BlueControls {
             Rahms.Sort();
             return Rahms;
         }
+
         public static ItemCollectionList GetFonts(RowItem SheetStyle) {
             ItemCollectionList Rahms = new()
             {
@@ -1524,6 +1552,7 @@ namespace BlueControls {
             Rahms.Sort();
             return Rahms;
         }
+
         /// <summary>
         /// Zeichnet den Text und das Bild ohne weitere Modifikation
         /// </summary>
@@ -1573,6 +1602,7 @@ namespace BlueControls {
                 //Develop.DebugPrint(ex);
             }
         }
+
         public static Size FormatedText_NeededSize(string text, QuickImage image, BlueFont font, int minSie) {
             try {
                 var pSize = SizeF.Empty;
@@ -1590,42 +1620,52 @@ namespace BlueControls {
                 return FormatedText_NeededSize(text, image, font, minSie);
             }
         }
+
         internal static BlueFont GetBlueFont(int design, enStates state, RowItem rowOfStyle, int stufe) => design > 10000 ? GetBlueFont((PadStyles)design, rowOfStyle, stufe) : GetBlueFont((enDesign)design, state, stufe);
+
         internal static BlueFont GetBlueFont(PadStyles padStyle, RowItem rowOfStyle, int stufe) {
             switch (stufe) {
                 case 4:
                     return GetBlueFont(padStyle, rowOfStyle);
+
                 case 3:
                     switch (padStyle) {
                         case PadStyles.Style_Standard:
                             return GetBlueFont(PadStyles.Style_Überschrift_Kapitel, rowOfStyle);
+
                         case PadStyles.Style_StandardFett:
                             return GetBlueFont(PadStyles.Style_Überschrift_Kapitel, rowOfStyle);
                             //    Case Else : Return BlueFont(vDesign, vState)
                     }
                     break;
+
                 case 2:
                     switch (padStyle) {
                         case PadStyles.Style_Standard:
                             return GetBlueFont(PadStyles.Style_Überschrift_Untertitel, rowOfStyle);
+
                         case PadStyles.Style_StandardFett:
                             return GetBlueFont(PadStyles.Style_Überschrift_Untertitel, rowOfStyle);
                             //    Case Else : Return BlueFont(vDesign, vState)
                     }
                     break;
+
                 case 1:
                     switch (padStyle) {
                         case PadStyles.Style_Standard:
                             return GetBlueFont(PadStyles.Style_Überschrift_Haupt, rowOfStyle);
+
                         case PadStyles.Style_StandardFett:
                             return GetBlueFont(PadStyles.Style_Überschrift_Haupt, rowOfStyle);
                             //  Case Else : Return BlueFont(vDesign, vState)
                     }
                     break;
+
                 case 7:
                     switch (padStyle) {
                         case PadStyles.Style_Standard:
                             return GetBlueFont(PadStyles.Style_StandardFett, rowOfStyle);
+
                         case PadStyles.Style_StandardFett:
                             return GetBlueFont(PadStyles.Style_Standard, rowOfStyle);
                             //default: : Return BlueFont(vDesign, vState)
@@ -1635,6 +1675,7 @@ namespace BlueControls {
             Develop.DebugPrint(enFehlerArt.Fehler, "Stufe " + stufe + " nicht definiert.");
             return null;
         }
+
         internal static BlueFont GetBlueFont(enDesign design, enStates state, int stufe) {
             if (stufe != 4 && design != enDesign.TextBox) {
                 if (design == enDesign.Form_QuickInfo) { return GetBlueFont(design, state); } // QuickInfo kann jeden Text enthatlten
@@ -1644,23 +1685,30 @@ namespace BlueControls {
             switch (stufe) {
                 case 4:
                     return GetBlueFont(design, state);
+
                 case 3:
                     return GetBlueFont(enDesign.TextBox_Stufe3, state);
+
                 case 2:
                     return GetBlueFont(enDesign.TextBox_Stufe3, state);
+
                 case 1:
                     return GetBlueFont(enDesign.TextBox_Stufe3, state);
+
                 case 7:
                     return GetBlueFont(enDesign.TextBox_Bold, state);
             }
             Develop.DebugPrint(enFehlerArt.Fehler, "Stufe " + stufe + " nicht definiert.");
             return GetBlueFont(design, state);
         }
+
         public static BlueFont GetBlueFont(PadStyles format, RowItem rowOfStyle) {
             if (StyleDB == null) { InitStyles(); }
             return StyleDB == null || rowOfStyle == null ? BlueFont.Get(ErrorFont) : GetBlueFont(StyleDB, ((int)format).ToString(), rowOfStyle);
         }
+
         public static BlueFont GetBlueFont(Database styleDB, string column, RowItem row) => GetBlueFont(styleDB, styleDB.Column[column], row);
+
         public static BlueFont GetBlueFont(Database styleDB, ColumnItem column, RowItem row) {
             var _String = styleDB.Cell.GetString(column, row);
             if (string.IsNullOrEmpty(_String)) {
@@ -1669,15 +1717,18 @@ namespace BlueControls {
             }
             return BlueFont.Get(_String);
         }
+
         public static BlueFont GetBlueFont(enDesign design, enStates state) => DesignOf(design, state).bFont;
 
-        #region  Styles 
+        #region Styles
+
         public static List<string> AllStyles() {
             if (StyleDB == null) { InitStyles(); }
             return StyleDB?.Column[0].Contents(null, null);
         }
-        public static void InitStyles() => StyleDB = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Styles.MDB", "Styles", true, false);
-        #endregion
 
+        public static void InitStyles() => StyleDB = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Styles.MDB", "Styles", true, false);
+
+        #endregion Styles
     }
 }

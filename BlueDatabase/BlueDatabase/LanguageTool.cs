@@ -1,31 +1,36 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
 
 namespace BlueDatabase {
+
     public static class LanguageTool {
         public static Database Translation = null;
         private static string German = string.Empty;
         private static string English = string.Empty;
         private static readonly object[] EmptyArgs = new object[0];
+
         /// <summary>
         /// Fügt Präfix und Suffix hinzu und ersetzt den Text nach dem gewünschten Stil.
         /// </summary>
@@ -54,13 +59,16 @@ namespace BlueDatabase {
             }
             return style == enShortenStyle.Replaced || style == enShortenStyle.HTML || OT == txt ? txt : OT + " (" + txt + ")";
         }
+
         private static string ColumnReplaceTranslated(string newTXT, ColumnItem column) => column.Format switch {
             enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl or enDataFormat.Datum_und_Uhrzeit or enDataFormat.FarbeInteger or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem => newTXT,
             _ => DoTranslate(newTXT, false),
         };
+
         public static string DoTranslate(string txt) => DoTranslate(txt, true, EmptyArgs);
+
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="txt"></param>
         /// <param name="mustTranslate">TRUE erstellt einen Eintrag in der Englisch-Datenbank, falls nicht vorhanden.</param>

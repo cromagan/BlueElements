@@ -4,11 +4,14 @@ using System;
 using System.Collections.Generic;
 
 namespace BlueControls.Forms {
+
     public partial class EditBoxFlexiControl : DialogWithOkAndCancel {
         private List<string> GiveBack = null;
 
         #region Konstruktor
+
         private EditBoxFlexiControl() : base() => InitializeComponent();
+
         private EditBoxFlexiControl(List<FlexiControl> Flexis) : this() {
             var top = Skin.Padding;
             var we = 300 + (Skin.Padding * 4);
@@ -28,13 +31,15 @@ namespace BlueControls.Forms {
             }
             Setup(we, top, true, false);
         }
-        #endregion
+
+        #endregion Konstruktor
 
         public static List<string> Show(List<FlexiControl> Flexis) {
             EditBoxFlexiControl MB = new(Flexis);
             MB.ShowDialog();
             return MB.GiveBack;
         }
+
         protected override void SetValue(bool canceled) {
             GiveBack = new List<string>();
             if (!canceled) {

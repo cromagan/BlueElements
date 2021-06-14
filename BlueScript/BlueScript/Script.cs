@@ -1,42 +1,50 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using System;
 using System.Collections.Generic;
 
 namespace BlueScript {
+
     public class Script {
         private string _error;
         private string _errorCode;
         public bool EndSkript = false;
         public int Line { get; internal set; }
+
         public string Error {
             get => _error;
             private set => _error = value.Replace("{", "").Replace("}", "");
         }
+
         public string ErrorCode {
             get => _errorCode;
             private set => _errorCode = value.Replace("{", "").Replace("}", "");
         }
+
         private string _ScriptText = string.Empty;
         public static List<Method> Comands = null;
         public readonly List<Variable> Variablen;
+
         public static List<T> GetEnumerableOfType<T>(params object[] constructorArgs) where T : class {
             List<T> l = new();
             foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {
@@ -80,6 +88,7 @@ namespace BlueScript {
             //    //   //objects.Sort();
             //    return objects;
         }
+
         //public static IEnumerable<T> GetEnumerableOfType<T>(params object[] constructorArgs) where T : class {
         //    var objects = new List<T>();
         //    IEnumerable<Type> types = null;
@@ -116,6 +125,7 @@ namespace BlueScript {
             }
             Variablen = variablen;
         }
+
         public string ScriptText {
             get => _ScriptText;
             set {
@@ -124,6 +134,7 @@ namespace BlueScript {
                 _ScriptText = value;
             }
         }
+
         private static string ReduceText(string txt) {
             System.Text.StringBuilder s = new();
             var gänsef = false;
@@ -133,7 +144,6 @@ namespace BlueScript {
                 var c = txt.Substring(pos, 1);
                 var addt = true;
                 switch (c) {
-
                     case "\"":
                         if (!comment) { gänsef = !gänsef; }
                         break;
@@ -165,6 +175,7 @@ namespace BlueScript {
             }
             return s.ToString();
         }
+
         public static (string, string) Parse(string scriptText, bool reduce, Script s) {
             var pos = 0;
             s.EndSkript = false;
@@ -194,10 +205,12 @@ namespace BlueScript {
                 }
             } while (true);
         }
+
         public bool Parse() {
             (Error, ErrorCode) = Parse(_ScriptText, true, this);
             return !string.IsNullOrEmpty(Error);
         }
+
         public static strDoItWithEndedPosFeedback ComandOnPosition(string txt, int pos, Script s, bool expectedvariablefeedback) {
             foreach (var thisC in Comands) {
                 var f = thisC.CanDo(txt, pos, expectedvariablefeedback, s);
@@ -209,6 +222,7 @@ namespace BlueScript {
             }
 
             #region Prüfen für bessere Fehlermeldung, ob der Rückgabetyp falsch gesetzt wurde
+
             foreach (var thisC in Comands) {
                 var f = thisC.CanDo(txt, pos, !expectedvariablefeedback, s);
                 if (f.MustAbort) { return new strDoItWithEndedPosFeedback(f.ErrorMessage); }
@@ -218,10 +232,12 @@ namespace BlueScript {
                         : new strDoItWithEndedPosFeedback("Dieser Befehl hat einen Rückgabewert, der nicht verwendet wird: " + txt.Substring(pos));
                 }
             }
-            #endregion
+
+            #endregion Prüfen für bessere Fehlermeldung, ob der Rückgabetyp falsch gesetzt wurde
 
             return new strDoItWithEndedPosFeedback("Kann nicht geparsed werden: " + txt.Substring(pos));
         }
+
         //public static void AddScriptComands() {
         //    Comands.Add(new Method_Add());
         //    Comands.Add(new Method_BerechneVariable());

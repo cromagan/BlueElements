@@ -1,4 +1,5 @@
 #region BlueElements - a collection of useful tools, database and controls
+
 // Authors:
 // Christian Peter
 //
@@ -15,7 +16,9 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-#endregion
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics.Enums;
 using System.Runtime.InteropServices;
 
@@ -26,6 +29,7 @@ namespace BlueBasics
         private const int KEYEVENTF_KEYUP = 0x2; // Release key
         private const int KEYEVENTF_EXTENDEDKEY = 0x1;
         private const int KEYEVENTF_KEYDOWN = 0x0;
+
         // VK_CANCEL = &H3 'Used for control-break processing.
         // '****************
         //    VK_CRSEL = &HF7
@@ -39,14 +43,19 @@ namespace BlueBasics
         //    CAPSLOCK_ON = &H80    '  the capslock light is on.
         [DllImport("user32.dll", EntryPoint = "keybd_event", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         private static extern int keybd_event(byte bVk, byte bScan, int dwFlags, int dwExtraInfo);
+
         public static void KeyDown(enTaste k) => keybd_event((byte)k, 0, KEYEVENTF_KEYDOWN, 0);
+
         public static void KeyUp(enTaste k) => keybd_event((byte)k, 0, KEYEVENTF_KEYUP, 0);
 
         #region shift ,altgr and alt release sub
-        public static void shiftrelease() => keybd_event((byte)enTaste.VK_SHIFT, 0, 2, 0);
-        public static void altrelease() => keybd_event((byte)enTaste.VK_MENU, 0, KEYEVENTF_EXTENDEDKEY | 2, 0);
-        public static void leftaltrelease() => keybd_event((byte)enTaste.VK_MENU, 0, KEYEVENTF_KEYUP, 0);
-        #endregion
 
+        public static void shiftrelease() => keybd_event((byte)enTaste.VK_SHIFT, 0, 2, 0);
+
+        public static void altrelease() => keybd_event((byte)enTaste.VK_MENU, 0, KEYEVENTF_EXTENDEDKEY | 2, 0);
+
+        public static void leftaltrelease() => keybd_event((byte)enTaste.VK_MENU, 0, KEYEVENTF_KEYUP, 0);
+
+        #endregion shift ,altgr and alt release sub
     }
 }

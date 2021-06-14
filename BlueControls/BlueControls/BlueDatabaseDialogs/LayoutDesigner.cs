@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -26,8 +29,10 @@ using BlueDatabase;
 using static BlueBasics.FileOperations;
 
 namespace BlueControls.BlueDatabaseDialogs {
+
     internal partial class LayoutDesigner : PadEditor {
         public Database Database { get; private set; }
+
         //private string _LoadedLayout = string.Empty;
         public LayoutDesigner(Database database) : base() {
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -39,16 +44,19 @@ namespace BlueControls.BlueDatabaseDialogs {
             befülleLayoutDropdown();
             CheckButtons();
         }
+
         private void Database_Disposing(object sender, System.EventArgs e) {
             Database.Disposing -= Database_Disposing;
             scriptEditor.Database = null;
             Database = null;
             Close();
         }
+
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
             base.OnFormClosing(e);
             SaveCurrentLayout();
         }
+
         private void CheckButtons() {
             if (Database == null) {
                 DisablePad();
@@ -88,6 +96,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             //    btnLayoutUmbenennen.Enabled = false;
             //}
         }
+
         private void btnLayoutHinzu_Click(object sender, System.EventArgs e) {
             SaveCurrentLayout();
             var ex = InputBox.Show("Geben sie den Namen<br>des neuen Layouts ein:", "", enDataFormat.Text);
@@ -100,6 +109,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             LoadLayout(c.Item.ID);
             CheckButtons();
         }
+
         private void btnLayoutLöschen_Click(object sender, System.EventArgs e) {
             SaveCurrentLayout();
             var ind = Database.Layouts.LayoutIDToIndex(Pad.Item.ID);
@@ -113,6 +123,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             befülleLayoutDropdown();
             CheckButtons();
         }
+
         private void btnLayoutUmbenennen_Click(object sender, System.EventArgs e) {
             SaveCurrentLayout();
             var ind = Database.Layouts.LayoutIDToIndex(Pad.Item.ID);
@@ -127,7 +138,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             befülleLayoutDropdown();
             CheckButtons();
         }
+
         private void cbxLayout_ItemClicked(object sender, BasicListItemEventArgs e) => LoadLayout(e.Item.Internal);
+
         internal void LoadLayout(string fileOrLayoutID) {
             SaveCurrentLayout();
             cbxLayout.Text = fileOrLayoutID;
@@ -151,10 +164,12 @@ namespace BlueControls.BlueDatabaseDialogs {
                 LoadFromString(Database.Layouts[ind], fileOrLayoutID);
             }
         }
+
         public override void ItemChanged() {
             base.ItemChanged();
             CheckButtons();
         }
+
         private void SaveCurrentLayout() {
             scriptEditor.WriteScriptBack();
             if (Database == null) { return; }
@@ -167,8 +182,11 @@ namespace BlueControls.BlueDatabaseDialogs {
                 SaveToDisk(Pad.Item.ID, newl, false, System.Text.Encoding.UTF8);
             }
         }
+
         private void btnTextEditor_Click(object sender, System.EventArgs e) => ExecuteFile("notepad.exe", cbxLayout.Text, false);
+
         private void btnLayoutOeffnen_Click(object sender, System.EventArgs e) => ExecuteFile(cbxLayout.Text, null, false);
+
         private void btnLayoutVerzeichnis_Click(object sender, System.EventArgs e) {
             if (Database == null) { return; }
             if (!string.IsNullOrEmpty(Database.AdditionaFilesPfadWhole())) {
@@ -176,12 +194,14 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
             ExecuteFile(Database.Filename.FilePath() + "Layouts\\");
         }
+
         private void befülleLayoutDropdown() {
             if (Database != null) {
                 cbxLayout.Item.Clear();
                 ExportDialog.AddLayoutsOff(cbxLayout.Item, Database, true);
             }
         }
+
         private void Pad_ClickedItemChanged(object sender, System.EventArgs e) {
             tabElementEigenschaften.Controls.Clear();
             if (Pad.LastClickedItem == null) { return; }

@@ -1,5 +1,4 @@
-﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright (c) 2021 Christian Peter
@@ -15,7 +14,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-#endregion
+
 using BlueBasics.Enums;
 using System;
 using System.Drawing;
@@ -26,70 +25,52 @@ using System.Runtime.InteropServices;
 using static BlueBasics.FileOperations;
 
 namespace BlueBasics {
+
     // https://stackoverflow.com/questions/24701703/c-sharp-faster-alternatives-to-setpixel-and-getpixel-for-bitmaps-for-windows-f
     // Todo: Obselete Routinen:
     // Image_FromFile
     // Resize
     public class BitmapExt {
+
+        #region Fields
+
+        public PixelFormat _pixelformat = PixelFormat.Format32bppArgb;
+
+        #endregion Fields
+
+        #region Constructors
+
+        // public PixelFormat _pixelformat = PixelFormat.Format32bppPArgb;
+        public BitmapExt(string filename) : this((Bitmap)Image_FromFile(filename)) { }
+
+        public BitmapExt(string filename, bool setDummyPicIfFails) => FromFile(filename, setDummyPicIfFails);
+
+        public BitmapExt(int width, int height) => EmptyBitmap(width, height);
+
+        public BitmapExt(Icon icon) : this(icon.ToBitmap()) {
+        }
+
+        /// <summary>
+        /// Achtung, das eingehende Bild wird zerstört!
+        /// </summary>
+        /// <param name="bmp"></param>
+        public BitmapExt(Bitmap bmp) => SetBitmap(bmp);
+
+        #endregion Constructors
+
+        #region Properties
+
         public Bitmap Bitmap { get; private set; }
         public int[] Bits { get; private set; } // Int32 = int
         public bool Disposed { get; private set; }
         public int Height { get; private set; }
         public int Width { get; private set; }
         protected GCHandle BitsHandle { get; private set; }
-        public PixelFormat _pixelformat = PixelFormat.Format32bppArgb;
-        // public PixelFormat _pixelformat = PixelFormat.Format32bppPArgb;
-        public BitmapExt(string filename) : this((Bitmap)Image_FromFile(filename)) { }
-        public BitmapExt(string filename, bool setDummyPicIfFails) => FromFile(filename, setDummyPicIfFails);
-        public BitmapExt(int width, int height) => EmptyBitmap(width, height);
-        public BitmapExt(Icon icon) : this(icon.ToBitmap()) { }
-        /// <summary>
-        /// Achtung, das eingehende Bild wird zerstört!
-        /// </summary>
-        /// <param name="bmp"></param>
-        public BitmapExt(Bitmap bmp) => SetBitmap(bmp);
-        /// <summary>
-        /// Achtung, das eingehende Bild wird zerstört!
-        /// </summary>
-        /// <param name="bmp"></param>
-        private void SetBitmap(Bitmap bmp) {
-            if (bmp == null) {
-                Width = -1;
-                Height = -1;
-                return;
-            }
-            try {
-                Width = bmp.Width;
-                Height = bmp.Height;
-                Bits = new int[Width * Height];
-                BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
-                Bitmap = new Bitmap(Width, Height, Width * 4, _pixelformat, BitsHandle.AddrOfPinnedObject());
-                using (var gr = Graphics.FromImage(Bitmap)) {
-                    gr.DrawImage(bmp, new Rectangle(0, 0, Width, Height));
-                }
-                bmp.Dispose(); // Sichherheithalber, da es ja nun ein neues Bild ist.
-            } catch (Exception ex) {
-                Develop.DebugPrint(ex);
-                Width = -1;
-                Height = -1;
-                Bitmap = null;
-            }
-        }
-        public void SetPixel(int x, int y, Color colour) => Bits[x + (y * Width)] = colour.ToArgb();
-        public Color GetPixel(int x, int y) => Color.FromArgb(Bits[x + (y * Width)]);
-        public void Dispose() {
-            if (Disposed) { return; }
-            Disposed = true;
-            Bitmap.Dispose();
-            BitsHandle.Free();
-        }
-        public void FromFile(string dateiName, bool setDummyPicIfFails) {
-            var x = (Bitmap)Image_FromFile(dateiName);
-            if (x == null && setDummyPicIfFails) {
-                x = QuickImage.Get(enImageCode.Warnung).BMP;
-            }
-            SetBitmap(x);
-        }
+
+        #endregion Properties
+
+        #region Methods
+
         /// <summary>
         /// Diese Routine ist genau so schnell wie Image.fromFile, setzt aber KEINEN Datei-Lock.
         /// </summary>
@@ -109,6 +90,7 @@ namespace BlueBasics {
                 return null;
             }
         }
+
         public static Bitmap Resize(Bitmap bmp, int width, int height, enSizeModes sizeMode, InterpolationMode interpolationMode, bool collectGarbage) {
             if (bmp == null) { return null; }
             if (width < 1 && height < 1) { return null; }
@@ -117,7 +99,6 @@ namespace BlueBasics {
             if (height < 1) { height = 1; }
             var Scale = Math.Min(width / (double)bmp.Width, height / (double)bmp.Height);
             switch (sizeMode) {
-
                 case enSizeModes.EmptySpace:
                     break;
 
@@ -140,6 +121,7 @@ namespace BlueBasics {
                 case enSizeModes.Verzerren:
                     Scale = 1; // Dummy setzen
                     break;
+
                 default:
                     Develop.DebugPrint(sizeMode);
                     return null;
@@ -180,6 +162,7 @@ namespace BlueBasics {
                        : null;
             }
         }
+
         public BitmapExt Crop(Rectangle re) {
             BitmapExt newBMP = new(re.Width, re.Height);
             using (var GR = Graphics.FromImage(newBMP.Bitmap)) {
@@ -189,6 +172,26 @@ namespace BlueBasics {
             }
             return newBMP;
         }
+
+        public void Dispose() {
+            if (Disposed) { return; }
+            Disposed = true;
+            Bitmap.Dispose();
+            BitsHandle.Free();
+        }
+
+        public void FromFile(string dateiName, bool setDummyPicIfFails) {
+            var x = (Bitmap)Image_FromFile(dateiName);
+            if (x == null && setDummyPicIfFails) {
+                x = QuickImage.Get(enImageCode.Warnung).BMP;
+            }
+            SetBitmap(x);
+        }
+
+        public Color GetPixel(int x, int y) => Color.FromArgb(Bits[x + (y * Width)]);
+
+        public void MakeTransparent(Color color) => Bitmap.MakeTransparent(color);
+
         public void Resize(int width, int height, enSizeModes sizeMode, InterpolationMode interpolationMode, bool collectGarbage) {
             if (Bitmap == null) { return; }
             if (collectGarbage) { modAllgemein.CollectGarbage(); }
@@ -196,7 +199,6 @@ namespace BlueBasics {
             if (height < 1) { height = 1; }
             var Scale = Math.Min(width / (double)Width, height / (double)Height);
             switch (sizeMode) {
-
                 case enSizeModes.EmptySpace:
                     break;
 
@@ -219,6 +221,7 @@ namespace BlueBasics {
                 case enSizeModes.Verzerren:
                     Scale = 1; // Dummy setzen
                     break;
+
                 default:
                     Develop.DebugPrint(sizeMode);
                     return;
@@ -261,6 +264,11 @@ namespace BlueBasics {
                 // return null;
             }
         }
+
+        public void Save(string name, ImageFormat imageFormat) => Bitmap.Save(name, imageFormat);
+
+        public void SetPixel(int x, int y, Color colour) => Bits[x + (y * Width)] = colour.ToArgb();
+
         private void EmptyBitmap(int width, int height) {
             Width = width;
             Height = height;
@@ -268,7 +276,35 @@ namespace BlueBasics {
             BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
             Bitmap = new Bitmap(Width, Height, Width * 4, _pixelformat, BitsHandle.AddrOfPinnedObject());
         }
-        public void MakeTransparent(Color color) => Bitmap.MakeTransparent(color);
-        public void Save(string name, ImageFormat imageFormat) => Bitmap.Save(name, imageFormat);
+
+        /// <summary>
+        /// Achtung, das eingehende Bild wird zerstört!
+        /// </summary>
+        /// <param name="bmp"></param>
+        private void SetBitmap(Bitmap bmp) {
+            if (bmp == null) {
+                Width = -1;
+                Height = -1;
+                return;
+            }
+            try {
+                Width = bmp.Width;
+                Height = bmp.Height;
+                Bits = new int[Width * Height];
+                BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
+                Bitmap = new Bitmap(Width, Height, Width * 4, _pixelformat, BitsHandle.AddrOfPinnedObject());
+                using (var gr = Graphics.FromImage(Bitmap)) {
+                    gr.DrawImage(bmp, new Rectangle(0, 0, Width, Height));
+                }
+                bmp.Dispose(); // Sichherheithalber, da es ja nun ein neues Bild ist.
+            } catch (Exception ex) {
+                Develop.DebugPrint(ex);
+                Width = -1;
+                Height = -1;
+                Bitmap = null;
+            }
+        }
+
+        #endregion Methods
     }
 }

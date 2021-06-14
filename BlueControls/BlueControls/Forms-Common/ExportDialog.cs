@@ -1,21 +1,24 @@
 #region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.BlueDatabaseDialogs;
@@ -32,14 +35,20 @@ using static BlueBasics.FileOperations;
 using static BlueBasics.modConverter;
 
 namespace BlueControls.Forms {
+
     public sealed partial class ExportDialog {
         private readonly List<RowItem> _RowsForExport;
         public Database Database { get; private set; } = null;
         private readonly string _ZielPfad = "";
         private readonly string _SaveTo = "";
         private int _ItemNrForPrint;
-        public ExportDialog(Database db, string autosaveFile) : this(db, null, autosaveFile) { }
-        public ExportDialog(Database db, List<RowItem> rows) : this(db, rows, string.Empty) { }
+
+        public ExportDialog(Database db, string autosaveFile) : this(db, null, autosaveFile) {
+        }
+
+        public ExportDialog(Database db, List<RowItem> rows) : this(db, rows, string.Empty) {
+        }
+
         public ExportDialog(Database db, List<RowItem> rows, string autosaveFile) {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
@@ -63,13 +72,16 @@ namespace BlueControls.Forms {
             EintragsText();
             NurStartEnablen();
         }
+
         private void NurStartEnablen() {
             tabStart.Enabled = true;
             tabDrucken.Enabled = false;
             tabDateiExport.Enabled = false;
             tabBildSchachteln.Enabled = false;
         }
+
         private void _Database_Disposing(object sender, System.EventArgs e) => Close();
+
         private string Fehler() {
             if (_RowsForExport == null || _RowsForExport.Count == 0) { return "Es sind keine Einträge für den Export gewählt."; }
             if (string.IsNullOrEmpty(cbxLayoutWahl.Text)) { return "Es sind keine Layout für den Export gewählt."; }
@@ -86,6 +98,7 @@ namespace BlueControls.Forms {
 : _RowsForExport.Count == 1
 ? "Es ist genau ein Eintrag gewählt:<br> <b>-" + _RowsForExport[0].CellFirstString().Replace("\r\n", " ")
 : "Es sind <b>" + _RowsForExport.Count + "</b> Einträge gewählt.";
+
         public static void AddLayoutsOff(ItemCollectionList addHere, Database database, bool addDiskLayouts) {
             if (database != null) {
                 for (var z = 0; z < database.Layouts.Count; z++) {
@@ -113,6 +126,7 @@ namespace BlueControls.Forms {
             cbxLayoutWahl.Item.Clear();
             AddLayoutsOff(cbxLayoutWahl.Item, Database, true);
         }
+
         private void LayoutEditor_Click(object sender, System.EventArgs e) {
             Enabled = false;
             var n = cbxLayoutWahl.Text;
@@ -124,7 +138,9 @@ namespace BlueControls.Forms {
             }
             Enabled = true;
         }
+
         private void Button1_Click(object sender, System.EventArgs e) => ExecuteFile(_ZielPfad);
+
         private void cbxLayoutWahl_TextChanged(object sender, System.EventArgs e) {
             if (Database.Layouts.LayoutIDToIndex(cbxLayoutWahl.Text) > -1) {
                 padVorschau.ShowInPrintMode = true;
@@ -134,6 +150,7 @@ namespace BlueControls.Forms {
                 padVorschau.Item.Clear();
             }
         }
+
         private void WeiterAktion_Click(object sender, System.EventArgs e) {
             var f = Fehler();
             if (!string.IsNullOrEmpty(f)) {
@@ -161,23 +178,30 @@ namespace BlueControls.Forms {
                 Exported.Item.AddRange(l);
             }
         }
+
         private void Exported_ItemClicked(object sender, BasicListItemEventArgs e) => ExecuteFile(e.Item.Internal);
+
         private void FrmDrucken_Drucken_Click(object sender, System.EventArgs e) => Close();
+
         private void Button_PageSetup_Click(object sender, System.EventArgs e) {
             padPrint.ShowPrinterPageSetup();
             padPrint.CopyPrinterSettingsToWorkingArea();
             GeneratePrintPad(padPrint, 0, cbxLayoutWahl.Text, _RowsForExport, 0);
         }
+
         private void btnDrucken_Click(object sender, System.EventArgs e) => padPrint.Print();// Den Rest mach 'PrintPad.PrintPage'
+
         private void PrintPad_PrintPage(object sender, PrintPageEventArgs e) {
             var l = _ItemNrForPrint;
             _ItemNrForPrint = GeneratePrintPad(padPrint, _ItemNrForPrint, cbxLayoutWahl.Text, _RowsForExport, 0);
             if (l == _ItemNrForPrint) { return; }
             e.HasMorePages = Convert.ToBoolean(_ItemNrForPrint < _RowsForExport.Count);
         }
+
         private void Vorschau_Click(object sender, System.EventArgs e) => padPrint.ShowPrintPreview();
+
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="pad"></param>
         /// <param name="startNr"></param>
@@ -211,7 +235,9 @@ namespace BlueControls.Forms {
             pad.ZoomFit();
             return startNr;
         }
+
         private void PrintPad_BeginnPrint(object sender, PrintEventArgs e) => _ItemNrForPrint = 0;
+
         protected override void OnFormClosing(FormClosingEventArgs e) {
             if (Database != null) {
                 Database.Disposing -= _Database_Disposing;
@@ -219,11 +245,13 @@ namespace BlueControls.Forms {
             }
             base.OnFormClosing(e);
         }
+
         private void Tabs_SelectedIndexChanged(object sender, System.EventArgs e) {
             if (Tabs.SelectedTab == tabStart && tabStart.Enabled) {
                 NurStartEnablen();
             }
         }
+
         private void Attribute_Changed(object sender, System.EventArgs e) {
             var b = FloatParse(flxBreite.Value);
             var h = FloatParse(flxHöhe.Value);
@@ -236,6 +264,7 @@ namespace BlueControls.Forms {
             padSchachteln.Item.BackColor = System.Drawing.Color.Transparent;
             GeneratePrintPad(padSchachteln, 0, cbxLayoutWahl.Text, _RowsForExport, ab);
         }
+
         private void btnSchachtelnSpeichern_Click(object sender, System.EventArgs e) {
             var b = FloatParse(flxBreite.Value);
             var h = FloatParse(flxHöhe.Value);

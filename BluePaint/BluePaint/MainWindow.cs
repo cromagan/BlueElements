@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2019 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Forms;
@@ -27,15 +30,19 @@ using static BlueBasics.Extensions;
 using static BlueBasics.FileOperations;
 
 namespace BluePaint {
+
     public partial class MainWindow {
         private string _filename = string.Empty;
         private GenericTool CurrentTool;
         private Bitmap _PicUndo = null;
         private bool _isSaved = true;
         private static List<string> _macro = null;
+
         // Merkt sich im Falle einer Aufnahme die benutzen Tools. So können sie ganz einfach wieder aufgerufen werden
         private static List<GenericTool> _merker = null;
+
         private bool _aufnahme = false;
+
         private MainWindow() : this(true) {
         }
 
@@ -47,6 +54,7 @@ namespace BluePaint {
         }
 
         public MainWindow(string filename, bool LoadSaveEnabled) : this(LoadSaveEnabled) => LoadFromDisk(filename);
+
         private void LoadFromDisk(string filename) {
             if (!IsSaved()) { return; }
             if (FileExists(filename)) {
@@ -59,7 +67,9 @@ namespace BluePaint {
         }
 
         private void Screenshot_Click(object sender, System.EventArgs e) => SetTool(new Tool_Screenshot(), !_aufnahme);
+
         private void Clipping_Click(object sender, System.EventArgs e) => SetTool(new Tool_Clipping(_aufnahme), !_aufnahme);
+
         /// <summary>
         /// Filename wird entfernt!
         /// </summary>
@@ -141,14 +151,19 @@ namespace BluePaint {
         }
 
         private void CurrentTool_NeedCurrentPic(object sender, BitmapEventArgs e) => e.BMP = P.BMP;
+
         private void CurrentTool_DoInvalidate(object sender, System.EventArgs e) => P.Invalidate();
+
         private void CurrentTool_ZoomFit(object sender, System.EventArgs e) => P.ZoomFit();
+
         //private void CurrentTool_PicChangedByTool(object sender, System.EventArgs e)
         //{
         //    P.Invalidate();
         //}
         private void CurrentTool_HideMainWindow(object sender, System.EventArgs e) => Hide();
+
         private void CurrentTool_ShowMainWindow(object sender, System.EventArgs e) => Show();
+
         private void CurrentTool_OverridePic(object sender, BitmapEventArgs e) {
             CurrentTool_ForceUndoSaving(this, System.EventArgs.Empty);
             P.BMP = e.BMP;
@@ -176,10 +191,15 @@ namespace BluePaint {
         }
 
         private void Bruchlinie_Click(object sender, System.EventArgs e) => SetTool(new Tool_Bruchlinie(), !_aufnahme);
+
         private void Spiegeln_Click(object sender, System.EventArgs e) => SetTool(new Tool_Spiegeln(), !_aufnahme);
+
         private void Zeichnen_Click(object sender, System.EventArgs e) => SetTool(new Tool_Paint(), !_aufnahme);
+
         private void Radiergummi_Click(object sender, System.EventArgs e) => SetTool(new Tool_Eraser(_aufnahme), !_aufnahme);
+
         private void Kontrast_Click(object sender, System.EventArgs e) => SetTool(new Tool_Kontrast(), !_aufnahme);
+
         private void Rückg_Click(object sender, System.EventArgs e) {
             if (_PicUndo == null) { return; }
             btnRückgänig.Enabled = false;
@@ -201,6 +221,7 @@ namespace BluePaint {
         }
 
         private void P_ImageMouseDown(object sender, BlueControls.EventArgs.MouseEventArgs1_1 e) => CurrentTool?.MouseDown(e, P.BMP);
+
         private void P_ImageMouseMove(object sender, BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e) {
             CurrentTool?.MouseMove(e, P.BMP);
             if (e.Current.IsInPic) {
@@ -214,6 +235,7 @@ namespace BluePaint {
         }
 
         private void P_ImageMouseUp(object sender, BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e) => CurrentTool?.MouseUp(e, P.BMP);
+
         public new Bitmap ShowDialog() {
             if (Visible) { Visible = false; }
             base.ShowDialog();
@@ -226,8 +248,11 @@ namespace BluePaint {
         }
 
         private void P_MouseLeave(object sender, System.EventArgs e) => InfoText.Text = "";
+
         private void Dummy_Click(object sender, System.EventArgs e) => SetTool(new Tool_DummyGenerator(), !_aufnahme);
+
         private void btnZoomFit_Click(object sender, System.EventArgs e) => P.ZoomFit();
+
         private void btnNeu_Click(object sender, System.EventArgs e) {
             if (!IsSaved()) { return; }
             SetPic(new Bitmap(100, 100));
@@ -260,7 +285,6 @@ namespace BluePaint {
             if (_isSaved) { return true; }
             if (string.IsNullOrEmpty(_filename)) { return true; }
             switch (MessageBox.Show("Es sind ungespeicherte Änderungen vorhanden.<br>Was möchten sie tun?", enImageCode.Diskette, "Speichern", "Verwerfen", "Abbrechen")) {
-
                 case 0:
                     Speichern();
                     break;
@@ -276,6 +300,7 @@ namespace BluePaint {
         }
 
         private void btnSave_Click(object sender, System.EventArgs e) => Speichern();
+
         private void Speichern() {
             SetTool(null, false); // um OnToolChangeAuszulösen
             if (_filename == "*") {
@@ -284,7 +309,6 @@ namespace BluePaint {
             }
             try {
                 switch (_filename.FileSuffix().ToUpper()) {
-
                     case "JPG":
                         P.BMP.Save(_filename, System.Drawing.Imaging.ImageFormat.Jpeg);
                         _isSaved = true;
@@ -308,12 +332,14 @@ namespace BluePaint {
         }
 
         private void LoadTab_FileOk(object sender, System.ComponentModel.CancelEventArgs e) => LoadFromDisk(LoadTab.FileName);
+
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
             if (!IsSaved()) { e.Cancel = true; }
             base.OnFormClosing(e);
         }
 
         private void P_DoAdditionalDrawing(object sender, BlueControls.EventArgs.AdditionalDrawing e) => CurrentTool?.DoAdditionalDrawing(e, P.BMP);
+
         private void btnAufnahme_Click(object sender, System.EventArgs e) {
             if (P.BMP == null) {
                 MessageBox.Show("Kein Bild vorhanden.");
@@ -345,7 +371,9 @@ namespace BluePaint {
         }
 
         private void btnGrößeÄndern_Click(object sender, System.EventArgs e) => SetTool(new Tool_Resize(), !_aufnahme);
+
         private void btn100_Click(object sender, System.EventArgs e) => P.Zoom100();
+
         private void btnCopy_Click(object sender, System.EventArgs e) {
             SetTool(null, false); // um OnToolChangeAuszulösen
             if (P.BMP == null) {

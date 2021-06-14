@@ -1,4 +1,5 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
+
 // Authors:
 // Christian Peter
 //
@@ -15,9 +16,11 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-#endregion
+
+#endregion BlueElements - a collection of useful tools, database and controls
 
 namespace BlueBasics.Enums {
+
     public enum enTaste : byte {
         VK_LBUTTON = 0x1, // Left mouse button.
         VK_RBUTTON = 0x2, // Right mouse button.
@@ -98,8 +101,10 @@ namespace BlueBasics.Enums {
         VK_NUMPAD9 = 0x69,
         VK_MULTIPLY = 0x6A, // * (keypad)
         VK_ADD = 0x6B,
+
         // VK_SEPARATER = &H6C
         VK_SEPARATOR = 0x6C,
+
         VK_SUBTRACT = 0x6D,
         VK_DECIMAL = 0x6E,
         VK_DIVIDE = 0x6F,

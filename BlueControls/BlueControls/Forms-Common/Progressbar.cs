@@ -1,26 +1,30 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 
 namespace BlueControls.Forms {
+
     public partial class Progressbar : FloatingForm {
         private int eProgressbar_LastCurrent = int.MaxValue;
         private readonly Dictionary<int, DateTime> eProgressbar_TimeDic = new();
@@ -28,7 +32,9 @@ namespace BlueControls.Forms {
         private DateTime eProgressbar_LastTimeUpdate = DateTime.Now;
         private int _count = 0;
         private string _baseText = string.Empty;
+
         private Progressbar() : base(Enums.enDesign.Form_BitteWarten) => InitializeComponent();
+
         private Progressbar(string Text) : this() {
             // InitializeComponent();
             capTXT.Text = Text;
@@ -36,6 +42,7 @@ namespace BlueControls.Forms {
             var Wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
             Size = new Size(Wi + (capTXT.Left * 2), He + (capTXT.Top * 2));
         }
+
         public static Progressbar Show(string Text) {
             Progressbar P = new(Text) {
                 _baseText = Text
@@ -43,6 +50,7 @@ namespace BlueControls.Forms {
             P.Show();
             return P;
         }
+
         public static Progressbar Show(string Text, int Count) {
             Progressbar P = new(Text) {
                 _baseText = Text,
@@ -53,6 +61,7 @@ namespace BlueControls.Forms {
             P.BringToFront();
             return P;
         }
+
         private string CalculateText(string BaseText, int Current, int Count) {
             if (Current < eProgressbar_LastCurrent) {
                 eProgressbar_TimeDic.Clear();
@@ -102,12 +111,13 @@ namespace BlueControls.Forms {
                       : eProgressbar_LastCalulatedSeconds > 10 ? "<br>" + PRT + " % - Geschätzte Restzeit: " + (eProgressbar_LastCalulatedSeconds / 5 * 5) + " Sekunden<tab>"
                       : eProgressbar_LastCalulatedSeconds > 0 ? "<br>" + PRT + " % - Geschätzte Restzeit: <<> 10 Sekunden<tab>"
                       : "<br>100 % - ...abgeschlossen!<tab>");
-
         }
+
         public void Update(string Text) {
             _baseText = Text;
             UpdateInternal(Text);
         }
+
         public void Update(int current) {
             if (InvokeRequired) {
                 // Es kommt zwar die ganze Berechnung durcheinander, aber besser als ein Fehler
@@ -116,6 +126,7 @@ namespace BlueControls.Forms {
             }
             UpdateInternal(CalculateText(_baseText, current, _count));
         }
+
         private void UpdateInternal(string Text) {
             if (Text != capTXT.Text) {
                 capTXT.Text = Text;

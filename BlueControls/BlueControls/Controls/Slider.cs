@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics.Enums;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
@@ -25,11 +28,13 @@ using System.ComponentModel;
 using System.Drawing;
 
 namespace BlueControls.Controls {
+
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("ValueChanged")]
     public partial class Slider : IBackgroundNone {
 
         #region Constructor
+
         public Slider() : base(false, false) {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
@@ -37,10 +42,11 @@ namespace BlueControls.Controls {
             SetNotFocusable();
             SetStyle(System.Windows.Forms.ControlStyles.ContainerControl, true);
         }
-        #endregion
 
+        #endregion Constructor
 
-        #region  Variablen 
+        #region Variablen
+
         private double? LastFiredValue;
         private readonly object Lock_UserAction = new();
         private readonly object Lock_RaiseEvent = new();
@@ -55,20 +61,23 @@ namespace BlueControls.Controls {
         private Rectangle _Slider;
         private bool _SliderContainsMouse;
         private const int _ButtonSize = 18;
-        #endregion
 
+        #endregion Variablen
 
-        #region  Properties 
+        #region Properties
+
         [DefaultValue(0)]
         public new int TabIndex {
             get => 0;
             set => base.TabIndex = 0;
         }
+
         [DefaultValue(false)]
         public new bool TabStop {
             get => false;
             set => base.TabStop = false;
         }
+
         [DefaultValue(enOrientation.Waagerecht)]
         public enOrientation Orientation {
             get => _Orientation;
@@ -78,6 +87,7 @@ namespace BlueControls.Controls {
                 GenerateButtons();
             }
         }
+
         [DefaultValue(0D)]
         public double Minimum {
             get => Math.Min(_Minimum, _Maximum);
@@ -89,6 +99,7 @@ namespace BlueControls.Controls {
                 Value = CheckMinMax(_Value);
             }
         }
+
         [DefaultValue(100.0D)]
         public double Maximum {
             get => Math.Max(_Minimum, _Maximum);
@@ -100,12 +111,16 @@ namespace BlueControls.Controls {
                 Value = CheckMinMax(_Value);
             }
         }
+
         [DefaultValue(10.0D)]
         public double LargeChange { get; set; } = 10;
+
         [DefaultValue(1.0D)]
         public double SmallChange { get; set; } = 1;
+
         [DefaultValue(1.0D)]
         public double MouseChange { get; set; } = 1;
+
         [DefaultValue(0D)]
         public double Value {
             get => _Value;
@@ -127,14 +142,17 @@ namespace BlueControls.Controls {
                 }
             }
         }
-        #endregion
 
+        #endregion Properties
 
-        #region  Event-Deklarationen 
+        #region Event-Deklarationen
+
         public event EventHandler ValueChanged;
-        #endregion
+
+        #endregion Event-Deklarationen
 
         private void OnValueChanged() => ValueChanged?.Invoke(this, System.EventArgs.Empty);
+
         private void But1_Click(object sender, System.EventArgs e) {
             lock (Lock_UserAction) {
                 _SliderContainsMouse = false;
@@ -152,6 +170,7 @@ namespace BlueControls.Controls {
                 Value += SmallChange;
             }
         }
+
         protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseDown(e);
             lock (Lock_UserAction) {
@@ -161,6 +180,7 @@ namespace BlueControls.Controls {
                 Invalidate();
             }
         }
+
         protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseMove(e);
             lock (Lock_UserAction) {
@@ -170,6 +190,7 @@ namespace BlueControls.Controls {
                 if (e.Button == System.Windows.Forms.MouseButtons.Left) { DoMouseAction(e, true); }
             }
         }
+
         protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseUp(e);
             lock (Lock_UserAction) {
@@ -182,6 +203,7 @@ namespace BlueControls.Controls {
         }
 
         public new bool Focused() => base.Focused || But1.Focused || But2.Focused;
+
         private void GenerateButtons() {
             _SliderContainsMouse = false;
             _ClickAreaContainsMouse = false;
@@ -226,12 +248,14 @@ namespace BlueControls.Controls {
             if (Math.Abs(TestVal - _Value) < 0.00001) { return; }
             Value = TestVal;
         }
+
         protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseWheel(e);
             if (!Enabled) { return; }
             if (e.Delta > 0) { But1_Click(But1, e); }
             if (e.Delta < 0) { But2_Click(But2, e); }
         }
+
         protected override void DrawControl(Graphics gr, enStates state) {
             var vState_Back = state;
             var vState_Slider = state;
@@ -268,6 +292,7 @@ namespace BlueControls.Controls {
                 Skin.Draw_Border(gr, _SliderStyle, vState_Slider, _Slider);
             }
         }
+
         protected override void OnMouseEnter(System.EventArgs e) {
             base.OnMouseEnter(e);
             _SliderContainsMouse = _Slider.Contains(MousePos().X, MousePos().Y);
@@ -275,6 +300,7 @@ namespace BlueControls.Controls {
             if (!Enabled) { return; }
             Invalidate();
         }
+
         protected override void OnMouseLeave(System.EventArgs e) {
             base.OnMouseLeave(e);
             _SliderContainsMouse = false;
@@ -282,10 +308,12 @@ namespace BlueControls.Controls {
             if (!Enabled) { return; }
             Invalidate();
         }
+
         protected override void OnSizeChanged(System.EventArgs e) {
             base.OnSizeChanged(e);
             GenerateButtons();
         }
+
         protected override void OnEnabledChanged(System.EventArgs e) {
             base.OnEnabledChanged(e);
             CheckButtonEnabledState();
@@ -309,6 +337,7 @@ namespace BlueControls.Controls {
             if (ol1 != But1.Enabled) { But1.Invalidate(); }
             if (ol2 != But2.Enabled) { But2.Invalidate(); }
         }
+
         internal void DoMouseWheel(System.Windows.Forms.MouseEventArgs e) => OnMouseWheel(e);
     }
 }

@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -25,25 +28,30 @@ using System.Collections.Generic;
 using System.Drawing;
 
 namespace BlueControls.ItemCollection {
+
     public class LinePadItem : BasicPadItem {
 
-        #region  Variablen-Deklarationen 
+        #region Variablen-Deklarationen
+
         internal PointM Point1;
         internal PointM Point2;
         private string CalcTempPoints_Code = string.Empty;
         private List<PointM> _TempPoints;
         private DateTime _LastRecalc = DateTime.Now.AddHours(-1);
         public enConectorStyle Linien_Verhalten { get; set; }
-        #endregion
+
+        #endregion Variablen-Deklarationen
 
 
-        #region  Event-Deklarationen + Delegaten 
-        #endregion
 
+        #region Construktor + Initialize
 
-        #region  Construktor + Initialize 
-        public LinePadItem(ItemCollectionPad parent) : this(parent, PadStyles.Style_Standard, Point.Empty, Point.Empty) { }
-        public LinePadItem(ItemCollectionPad parent, PadStyles format, Point point1, Point point2) : this(parent, string.Empty, PadStyles.Style_Standard, point1, point2) { }
+        public LinePadItem(ItemCollectionPad parent) : this(parent, PadStyles.Style_Standard, Point.Empty, Point.Empty) {
+        }
+
+        public LinePadItem(ItemCollectionPad parent, PadStyles format, Point point1, Point point2) : this(parent, string.Empty, PadStyles.Style_Standard, point1, point2) {
+        }
+
         public LinePadItem(ItemCollectionPad parent, string internalname, PadStyles format, Point point1, Point point2) : base(parent, internalname) {
             Point1 = new PointM(this, "Punkt 1", 0, 0);
             Point2 = new PointM(this, "Punkt 2", 0, 0);
@@ -56,6 +64,7 @@ namespace BlueControls.ItemCollection {
             _TempPoints = new List<PointM>();
             Linien_Verhalten = enConectorStyle.Direct;
         }
+
         //public LinePadItem(string vInternal, PadStyles vFormat, enConectorStyle vArt, PointM cPoint1, PointM cPoint2)
         //{
         //    _Internal = vInternal;
@@ -68,13 +77,11 @@ namespace BlueControls.ItemCollection {
         //        Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben.");
         //    }
         //}
-        #endregion
 
-
-        #region  Properties 
-        #endregion
+        #endregion Construktor + Initialize
 
         protected override string ClassId() => "LINE";
+
         public override bool Contains(PointF value, decimal zoomfactor) {
             var ne = 5 / zoomfactor;
             if (Point1.X == 0M && Point2.X == 0M && Point1.Y == 0M && Point2.Y == 0M) { return false; }
@@ -85,6 +92,7 @@ namespace BlueControls.ItemCollection {
             }
             return false;
         }
+
         protected override RectangleM CalculateUsedArea() {
             if (Point1.X == 0M && Point2.X == 0M && Point1.Y == 0M && Point2.Y == 0M) { return new RectangleM(); }
             if (_TempPoints.Count == 0) { CalcTempPoints(); }
@@ -102,6 +110,7 @@ namespace BlueControls.ItemCollection {
             return new RectangleM(x1, y1, x2 - x1, y2 - y1);
             //Return New Rectangle(CInt(Math.Min(Point1.X, Point2.X)), CInt(Math.Min(Point1.Y, Point2.Y)), CInt(Math.Abs(Point2.X - Point1.X)), CInt(Math.Abs(Point2.Y - Point1.Y)))
         }
+
         protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
             if (Stil == PadStyles.Undefiniert) { return; }
             CalcTempPoints();
@@ -110,6 +119,7 @@ namespace BlueControls.ItemCollection {
                 GR.DrawLine(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(cZoom * Parent.SheetStyleScale), _TempPoints[z].ZoomAndMove(cZoom, shiftX, shiftY), _TempPoints[z + 1].ZoomAndMove(cZoom, shiftX, shiftY));
             }
         }
+
         //public void Move(decimal x, decimal y) {
         //    _LastRecalc = DateTime.Now.AddHours(-1);
         //    Point1.SetTo(Point1.X + x, Point1.Y + y);
@@ -125,20 +135,23 @@ namespace BlueControls.ItemCollection {
         public override bool ParseThis(string tag, string value) {
             if (base.ParseThis(tag, value)) { return true; }
             switch (tag) {
-
                 case "connection":
                     Linien_Verhalten = (enConectorStyle)int.Parse(value);
                     return true;
             }
             return false;
         }
-        protected override void ParseFinished() { }
+
+        protected override void ParseFinished() {
+        }
+
         public override string ToString() {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
             if (Linien_Verhalten != enConectorStyle.Direct) { t = t + "Connection=" + (int)Linien_Verhalten + ", "; }
             return t.TrimEnd(", ") + "}";
         }
+
         private void CalcTempPoints() {
             var NewCode = Point1 + Point2.ToString();
             if (CalcTempPoints_Code != NewCode) {
@@ -193,6 +206,7 @@ namespace BlueControls.ItemCollection {
                 if (count > 50) { break; }
             } while (true);
         }
+
         private bool IsVerdeckt(decimal X, decimal Y) {
             foreach (var ThisBasicItem in Parent) {
                 if (ThisBasicItem != null) {
@@ -207,6 +221,7 @@ namespace BlueControls.ItemCollection {
             }
             return false;
         }
+
         private bool SchneidetWas(decimal X1, decimal Y1, decimal X2, decimal Y2) {
             PointM p1 = new(X1, Y1);
             PointM p2 = new(X2, Y2);
@@ -215,6 +230,7 @@ namespace BlueControls.ItemCollection {
             }
             return false;
         }
+
         private bool SchneidetDas(BasicPadItem ThisBasicItem, PointM P1, PointM P2) {
             if (ThisBasicItem == null) { return false; }
             if (ThisBasicItem is not LinePadItem) {
@@ -232,6 +248,7 @@ namespace BlueControls.ItemCollection {
             }
             return false;
         }
+
         private bool Vereinfache(int P1) {
             if (Linien_Verhalten != enConectorStyle.AusweichenUndGerade) {
                 if (P1 > 0 && P1 < _TempPoints.Count - 1) {
@@ -279,6 +296,7 @@ namespace BlueControls.ItemCollection {
             }
             return false;
         }
+
         private bool WeicheAus(int P1) {
             if (_TempPoints.Count > 100) { return false; }
             if (P1 >= _TempPoints.Count - 1) { return false; }
@@ -429,6 +447,7 @@ namespace BlueControls.ItemCollection {
             }
             return false;
         }
+
         private bool Begradige(int P1) {
             if (P1 >= _TempPoints.Count - 1) { return false; }
             if ((int)_TempPoints[P1].X == (int)_TempPoints[P1 + 1].X || (int)_TempPoints[P1].Y == (int)_TempPoints[P1 + 1].Y) { return false; }
@@ -447,6 +466,7 @@ namespace BlueControls.ItemCollection {
             }
             return true;
         }
+
         private bool LöscheVerdeckte(int P1) {
             if (_TempPoints[P1] == Point1) {
                 return false;
@@ -460,7 +480,9 @@ namespace BlueControls.ItemCollection {
             }
             return false;
         }
+
         public override void PointMoved(PointM point) => CalcTempPoints();
+
         public override List<FlexiControl> GetStyleOptions() {
             List<FlexiControl> l = new();
             ItemCollectionList Verhalt = new()
@@ -474,6 +496,7 @@ namespace BlueControls.ItemCollection {
             l.AddRange(base.GetStyleOptions());
             return l;
         }
+
         //public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
         //{
         //    Stil = (PadStyles)int.Parse(Tags.TagGet("Stil"));

@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2019 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.EventArgs;
@@ -26,7 +29,9 @@ using static BlueBasics.Develop;
 using static BlueBasics.modAllgemein;
 
 namespace BluePaint {
+
     public partial class Tool_Clipping {
+
         public Tool_Clipping(bool aufnahme) : base() {
             InitializeComponent();
             if (aufnahme) {
@@ -45,8 +50,11 @@ namespace BluePaint {
         }
 
         public override void OnToolChanging() => WollenSieDenZuschnittÜbernehmen();
+
         public override void MouseDown(MouseEventArgs1_1 e, Bitmap OriginalPic) => OnDoInvalidate();
+
         public override void MouseMove(MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) => OnDoInvalidate();
+
         public override void MouseUp(MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) {
             if (OriginalPic == null) { return; }
             Links.Value = Math.Min(e.Current.TrimmedX, e.MouseDown.TrimmedX) + 1;
@@ -70,6 +78,7 @@ namespace BluePaint {
         }
 
         private void ValueChangedByClicking(object sender, System.EventArgs e) => OnDoInvalidate();
+
         public void DrawZusatz(AdditionalDrawing e, Bitmap OriginalPic) {
             SolidBrush Brush_Blau = new(Color.FromArgb(120, 0, 0, 255));
             if (Links.Value != 0) {
@@ -110,11 +119,13 @@ namespace BluePaint {
             Unten.Value = pa.Bottom;
             OnDoInvalidate();
         }
+
         private void WollenSieDenZuschnittÜbernehmen() {
             if (Links.Value <= 0 && Recht.Value >= 0 && Oben.Value <= 0 && Unten.Value >= 0) { return; }
             if (MessageBox.Show("Soll der <b>aktuelle</b> Zuschnitt<br>übernommen werden?", enImageCode.Zuschneiden, "Ja", "Nein") == 1) { return; }
             ZuschnittOK_Click(null, System.EventArgs.Empty);
         }
+
         public void Set(int Left, int Top, int Right, int Bottom) {
             if (Left < 0 || Top < 0 || Right > 0 || Bottom > 0) {
                 DebugPrint(enFehlerArt.Warnung, "Fehler in den Angaben");
@@ -136,6 +147,7 @@ namespace BluePaint {
         }
 
         public override string MacroKennung() => "Clipping";
+
         public override void ExcuteCommand(string command) {
             var c = command.SplitBy(";");
             if (c[0] == "AutoZuschnitt") {

@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -27,20 +30,19 @@ using System.Collections.Generic;
 using System.Drawing;
 
 namespace BlueControls.ItemCollection {
+
     public class RowFormulaPadItem : FormPadItemRectangle {
 
-        #region  Variablen-Deklarationen 
+        #region Variablen-Deklarationen
+
         private Database _Database;
         private int _RowKey;
         public Bitmap GeneratedBitmap;
         private string _LayoutID;
         private string _tmpQuickInfo;
         private string _lastQuickInfo;
-        #endregion
 
-
-        #region  Event-Deklarationen + Delegaten 
-        #endregion
+        #endregion Variablen-Deklarationen
 
         public override string QuickInfo {
             get {
@@ -58,10 +60,17 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        #region  Construktor 
-        public RowFormulaPadItem(ItemCollectionPad parent, string internalname) : this(parent, internalname, null, 0, string.Empty) { }
-        public RowFormulaPadItem(ItemCollectionPad parent, Database database, int rowkey) : this(parent, string.Empty, database, rowkey, string.Empty) { }
-        public RowFormulaPadItem(ItemCollectionPad parent, Database database, int rowkey, string layoutID) : this(parent, string.Empty, database, rowkey, layoutID) { }
+        #region Construktor
+
+        public RowFormulaPadItem(ItemCollectionPad parent, string internalname) : this(parent, internalname, null, 0, string.Empty) {
+        }
+
+        public RowFormulaPadItem(ItemCollectionPad parent, Database database, int rowkey) : this(parent, string.Empty, database, rowkey, string.Empty) {
+        }
+
+        public RowFormulaPadItem(ItemCollectionPad parent, Database database, int rowkey, string layoutID) : this(parent, string.Empty, database, rowkey, layoutID) {
+        }
+
         public RowFormulaPadItem(ItemCollectionPad parent, string internalname, Database database, int rowkey, string layoutID) : base(parent, internalname) {
             _Database = database;
             _Database.Disposing += _Database_Disposing;
@@ -74,7 +83,8 @@ namespace BlueControls.ItemCollection {
             RemovePic();
             GeneratePic(true);
         }
-        #endregion
+
+        #endregion Construktor
 
         // Namen so lassen, wegen Kontextmenu
         public string Layout_ID {
@@ -86,13 +96,18 @@ namespace BlueControls.ItemCollection {
                 GeneratePic(true);
             }
         }
+
         public RowItem Row => _Database?.Row.SearchByKey(_RowKey);
+
         private void RemovePic() {
             if (GeneratedBitmap != null) { GeneratedBitmap.Dispose(); }
             GeneratedBitmap = null;
         }
+
         public override void DesignOrStyleChanged() => RemovePic();
+
         protected override string ClassId() => "ROW";
+
         protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
             if (GeneratedBitmap == null) { GeneratePic(false); }
             if (GeneratedBitmap != null) {
@@ -109,12 +124,14 @@ namespace BlueControls.ItemCollection {
             }
             base.DrawExplicit(GR, DCoordinates, cZoom, shiftX, shiftY, vState, SizeOfParentControl, ForPrinting);
         }
+
         public override bool ParseThis(string tag, string value) {
             if (base.ParseThis(tag, value)) { return true; }
             switch (tag) {
                 case "layoutid":
                     _LayoutID = value.FromNonCritical();
                     return true;
+
                 case "database":
                     _Database = (Database)BlueBasics.MultiUserFile.clsMultiUserFile.GetByFilename(value, false);
                     if (_Database == null) {
@@ -122,12 +139,14 @@ namespace BlueControls.ItemCollection {
                     }
                     _Database.Disposing += _Database_Disposing;
                     return true;
+
                 case "rowid": // TODO: alt
                 case "rowkey":
                     _RowKey = int.Parse(value);
                     //Row = ParseExplicit_TMPDatabase.Row.SearchByKey(int.Parse(value));
                     //if (_Row != null) { ParseExplicit_TMPDatabase = null; }
                     return true;
+
                 case "firstvalue":
                     var n = value.FromNonCritical();
                     if (Row != null) {
@@ -147,6 +166,7 @@ namespace BlueControls.ItemCollection {
             }
             return false;
         }
+
         public override string ToString() {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
@@ -156,6 +176,7 @@ namespace BlueControls.ItemCollection {
             if (Row is RowItem r) { t = t + "FirstValue=" + r.CellFirstString().ToNonCritical() + ", "; }
             return t.Trim(", ") + "}";
         }
+
         private void GeneratePic(bool SizeChangeAllowed) {
             if (string.IsNullOrEmpty(_LayoutID) || !_LayoutID.StartsWith("#")) {
                 GeneratedBitmap = (Bitmap)QuickImage.Get(enImageCode.Warnung, 128).BMP.Clone();
@@ -182,6 +203,7 @@ namespace BlueControls.ItemCollection {
             if (SizeChangeAllowed) { p_RU.SetTo(p_LO.X + GeneratedBitmap.Width, p_LO.Y + GeneratedBitmap.Height); }
             PointMoved(null);
         }
+
         //Public Overrides Function ContextMenuItemClicked(sender As Object, ClickedComand As ItemCollection.BasicListItem) As Boolean
         //    If ClickedComand.StartsWith("Layout;") Then
         //        _LayoutNr = Integer.Parse(ClickedComand.Substring(7))
@@ -202,6 +224,7 @@ namespace BlueControls.ItemCollection {
         //    Return False
         //End Function
         protected override void ParseFinished() => GeneratePic(true);
+
         public override List<FlexiControl> GetStyleOptions() {
             List<FlexiControl> l = new()
             {
@@ -217,15 +240,18 @@ namespace BlueControls.ItemCollection {
             l.AddRange(base.GetStyleOptions());
             return l;
         }
+
         public void Datensatz_bearbeiten() {
             _tmpQuickInfo = string.Empty; // eigentlich unnötig, da RowChanged anschlagen müsste
             EditBoxRow.Show("Datensatz bearbeiten:", Row, true);
         }
+
         private void _Database_Disposing(object sender, System.EventArgs e) {
             _Database.Disposing -= _Database_Disposing;
             _Database = null;
             RemovePic();
         }
+
         //public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
         //{
         //    if (Tags.TagGet("Datensatz bearbeiten").FromPlusMinus())

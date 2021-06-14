@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueControls.Enums;
 using System;
@@ -23,26 +26,29 @@ using System.Drawing;
 using System.Drawing.Text;
 
 namespace BlueControls {
+
     public class ExtChar {
 
-        #region  Variablen-Deklarationen 
+        #region Variablen-Deklarationen
+
         public PointF Pos = PointF.Empty;
         private readonly char _Char;
         private enDesign _Design = enDesign.Undefiniert;
         private enStates _State = enStates.Undefiniert;
         private SizeF _Size = SizeF.Empty;
         private int _Stufe = 4;
+
         //  public const int ImagesStart = 5000;
         public const char Top = (char)4;
+
         public const char StoreX = (char)5;
-        #endregion
+
+        #endregion Variablen-Deklarationen
 
 
-        #region  Event-Deklarationen + Delegaten 
-        #endregion
 
+        #region Construktor + Initialize
 
-        #region  Construktor + Initialize 
         internal ExtChar(char charcode, enDesign cDesign, enStates cState, BlueFont cFont, int Stufe, enMarkState cMarkState) {
             _Design = cDesign;
             _Char = charcode;
@@ -51,12 +57,14 @@ namespace BlueControls {
             _State = cState;
             Marking = cMarkState;
         }
-        #endregion
 
+        #endregion Construktor + Initialize
 
-        #region  Properties 
+        #region Properties
+
         internal BlueFont Font { get; private set; } = null;
         public int Char => _Char;
+
         public SizeF Size {
             get {
                 if (!_Size.IsEmpty) { return _Size; }
@@ -64,8 +72,9 @@ namespace BlueControls {
                 return _Size;
             }
         }
+
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="zoom"></param>
         /// <param name="drawingPos">Muss bereits Skaliert sein</param>
@@ -75,6 +84,7 @@ namespace BlueControls {
 && (drawingArea.Height <= 0 || (Pos.Y * zoom) + drawingPos.Y <= drawingArea.Bottom)
 && ((Pos.X + Size.Width) * zoom) + drawingPos.X >= drawingArea.Left
 && ((Pos.Y + Size.Height) * zoom) + drawingPos.Y >= drawingArea.Top);
+
         public enDesign Design {
             get => _Design;
             set {
@@ -82,6 +92,7 @@ namespace BlueControls {
                 ChangeState(value, _State, _Stufe);
             }
         }
+
         public enStates State {
             get => _State;
             set {
@@ -89,7 +100,9 @@ namespace BlueControls {
                 ChangeState(_Design, value, _Stufe);
             }
         }
+
         public enMarkState Marking { get; set; }
+
         public int Stufe {
             get => _Stufe;
             set {
@@ -97,7 +110,8 @@ namespace BlueControls {
                 ChangeState(_Design, _State, value);
             }
         }
-        #endregion
+
+        #endregion Properties
 
         private void ChangeState(enDesign vDesign, enStates vState, int vStufe) {
             if (vState == _State && vStufe == _Stufe && vDesign == _Design) { return; }
@@ -107,16 +121,21 @@ namespace BlueControls {
             _Stufe = vStufe;
             Font = vDesign == enDesign.Undefiniert || vState == enStates.Undefiniert ? null : Skin.GetBlueFont(vDesign, vState, vStufe);
         }
+
         public bool isSpace() => (int)_Char switch {
             32 or 0 or 9 => true,
             _ => false,
         };
+
         public bool isPossibleLineBreak() => _Char.isPossibleLineBreak();
+
         public bool isWordSeperator() => _Char.isWordSeperator();
+
         public bool isLineBreak() => (int)_Char switch {
             11 or 13 or Top => true,
             _ => false,
         };
+
         public void Draw(Graphics GR, Point PosModificator, float czoom) {
             if (_Char < 20) { return; }
             var DrawX = (Pos.X * czoom) + PosModificator.X;
@@ -181,6 +200,7 @@ namespace BlueControls {
                 }
             }
         }
+
         public string ToHTML() => (int)_Char switch {
             13 => "<br>",
             //case enEtxtCodes.HorizontalLine:

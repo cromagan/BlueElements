@@ -1,21 +1,24 @@
 #region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -25,16 +28,20 @@ using BlueDatabase.Enums;
 using System.IO;
 using System.Text.RegularExpressions;
 using static BlueBasics.Extensions;
+
 namespace BlueControls.BlueDatabaseDialogs {
+
     internal sealed partial class ColumnEditor {
         private ColumnItem _Column;
         private readonly Table _Table;
+
         public ColumnEditor(ColumnItem column, Table table) : base() {
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
             InitializeComponent();
             _Table = table;
             Column_DatenAuslesen(column);
         }
+
         private void Column_DatenAuslesen(ColumnItem FromColumn) {
             _Column = FromColumn;
             cbxFormat.Item.AddRange(typeof(enDataFormat));
@@ -163,6 +170,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             SetKeyTo(_Column.Database, cbxVorschlagSpalte, _Column.VorschlagsColumn);
             cbxLinkedDatabase_TextChanged(null, System.EventArgs.Empty);
         }
+
         private void SetKeyTo(Database database, ComboBox combobox, int columnKey) {
             if (database is null || columnKey < 0) {
                 combobox.Text = "#Ohne";
@@ -171,11 +179,13 @@ namespace BlueControls.BlueDatabaseDialogs {
                 combobox.Text = c == null ? "#Ohne" : c.Name;
             }
         }
+
         private int ColumKeyFrom(Database database, string columnName) {
             if (database == null) { return -1; }
             var c = database.Column.Exists(columnName);
             return c is null ? -1 : c.Key;
         }
+
         private bool AllOk() {
             var Feh = "";
             // Diese Fehler sind so schwer und darf auf keinen Fall in die Umwelt gelassen werden
@@ -200,10 +210,12 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
             return true;
         }
+
         private void btnOk_Click(object sender, System.EventArgs e) {
             if (!AllOk()) { return; }
             Close();
         }
+
         private void Column_DatenZurückschreibenx() {
             if (_Column.Database.ReadOnly) { return; }
             _Column.Name = tbxName.Text;
@@ -309,17 +321,21 @@ namespace BlueControls.BlueDatabaseDialogs {
             _Column.SaveContent = butSaveContent.Checked;
             //_Column.Database.Rules.Sort();
         }
+
         private void H_Color_Click(object sender, System.EventArgs e) {
             ColorDia.Color = QuickImage.Get(H_Colorx.ImageCode).ChangeGreenTo.FromHTMLCode();
             ColorDia.ShowDialog();
             H_Colorx.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", ColorDia.Color.ToHTMLCode()).ToString();
         }
+
         private void T_Color_Click(object sender, System.EventArgs e) {
             ColorDia.Color = QuickImage.Get(T_Colorx.ImageCode).ChangeGreenTo.FromHTMLCode();
             ColorDia.ShowDialog();
             T_Colorx.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", ColorDia.Color.ToHTMLCode()).ToString();
         }
+
         private void QI_Vorschau_Click(object sender, System.EventArgs e) => Notification.Show(tbxQuickinfo.Text.Replace("\r", "<BR>") + "<br><br><br>" + tbxAdminInfo.Text.Replace("\r", "<BR>"));
+
         private void btnZurueck_Click(object sender, System.EventArgs e) {
             if (!AllOk()) { return; }
             //if (_Column.Previous() == null)
@@ -329,6 +345,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             //}
             Column_DatenAuslesen(_Column.Previous());
         }
+
         private void btnVor_Click(object sender, System.EventArgs e) {
             if (!AllOk()) { return; }
             //if (_Column.Next() == null)
@@ -338,16 +355,20 @@ namespace BlueControls.BlueDatabaseDialogs {
             //}
             Column_DatenAuslesen(_Column.Next());
         }
+
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
             base.OnFormClosing(e);
             if (!AllOk()) { e.Cancel = true; }
         }
+
         private void cbxFormat_TextChanged(object sender, System.EventArgs e) => ButtonCheck();
+
         private void btnStandard_Click(object sender, System.EventArgs e) {
             if (!AllOk()) { return; }
             _Column.ResetSystemToDefault(true);
             Column_DatenAuslesen(_Column);
         }
+
         private void ButtonCheck() {
             var tmpFormat = (enDataFormat)int.Parse(cbxFormat.Text);
             // Mehrzeilig
@@ -379,6 +400,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // Format: LinkedCell
             grpVerlinkteZellen.Enabled = tmpFormat == enDataFormat.LinkedCell;
         }
+
         /// <summary>
         /// Kümmert sich um erlaubte Spalten für LinkedCell
         /// </summary>
@@ -428,6 +450,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (btnColumnKeyInColumn.Enabled && _Column.LinkedCell_ColumnValueFoundIn > -1) { btnColumnKeyInColumn.Checked = true; } // Nicht perfekt die Lösung :-(
             if (btnTargetColumn.Enabled && _Column.LinkedCell_ColumnKey > -1) { btnTargetColumn.Checked = true; } // Nicht perfekt die Lösung :-(
         }
+
         private void butAktuellZurueck_Click(object sender, System.EventArgs e) {
             if (!AllOk()) { return; }
             //if (_Column.Previous() == null)
@@ -437,6 +460,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             //}
             Column_DatenAuslesen(_Table.CurrentArrangement[_Column].PreviewsVisible(_Table.CurrentArrangement).Column);
         }
+
         private void butAktuellVor_Click(object sender, System.EventArgs e) {
             if (!AllOk()) { return; }
             //if (_Column.Previous() == null)
@@ -446,6 +470,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             //}
             Column_DatenAuslesen(_Table.CurrentArrangement[_Column].NextVisible(_Table.CurrentArrangement).Column);
         }
+
         private void btnVerwendung_Click(object sender, System.EventArgs e) => MessageBox.Show(_Column.Verwendung());
     }
 }

@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.BlueDatabaseDialogs;
@@ -34,20 +37,27 @@ using System.Drawing;
 using static BlueBasics.FileOperations;
 
 namespace BlueControls.Controls {
+
     [Designer(typeof(BasicDesigner))]
     public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
+
         /// <summary>
         /// ACHTUNG: Das Control wird niemals den Filter selbst ändern.
         /// Der Filter wird nur zur einfacheren Identifizierung der nachfolgenden Steuerelemente behalten.
         /// </summary>
         public readonly FilterItem Filter = null;
+
         public readonly Table TableView = null;
+
         public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
+
         public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
+
         public FlexiControlForFilter() : this(null, null, null) {
             // Dieser Aufruf ist für den Designer erforderlich.
             // InitializeComponent();
         }
+
         public FlexiControlForFilter(Table tableView, FilterItem filter, Filterleiste myParent) {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
@@ -59,7 +69,9 @@ namespace BlueControls.Controls {
             InstantChangedEvent = true;
             Filter.Changed += Filter_Changed;
         }
+
         private void Filter_Changed(object sender, System.EventArgs e) => UpdateFilterData((Filterleiste)Parent);
+
         private void UpdateFilterData(Filterleiste myParent) {
             if (Filter == null || Filter.Column == null) {
                 DisabledReason = "Bezug zum Filter verloren.";
@@ -98,6 +110,7 @@ namespace BlueControls.Controls {
                 }
             }
         }
+
         protected override void OnControlAdded(System.Windows.Forms.ControlEventArgs e) {
             base.OnControlAdded(e);
             e.Control.MouseUp += Control_MouseUp;
@@ -129,17 +142,20 @@ namespace BlueControls.Controls {
                 }
             }
         }
+
         private void Control_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
             if (e.Button == System.Windows.Forms.MouseButtons.Right) {
                 FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
             }
         }
+
         protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseUp(e);
             if (e.Button == System.Windows.Forms.MouseButtons.Right) {
                 FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
             }
         }
+
         private void Cbx_DropDownShowing(object sender, System.EventArgs e) {
             var cbx = (ComboBox)sender;
             cbx.Item.Clear();
@@ -158,6 +174,7 @@ namespace BlueControls.Controls {
                 cbx.Item.Add("Zu viele Einträge", "|~", enImageCode.Kreuz, false);
             }
         }
+
         internal ComboBox GetComboBox() {
             foreach (var thisc in Controls) {
                 if (thisc is ComboBox cbx) {
@@ -166,10 +183,12 @@ namespace BlueControls.Controls {
             }
             return null;
         }
+
         internal bool WasThisValueClicked() {
             var cb = GetComboBox();
             return cb != null && cb.WasThisValueClicked();
         }
+
         public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
             HotItem = null;
             if (Filter == null) { return; }
@@ -184,9 +203,9 @@ namespace BlueControls.Controls {
                 }
             }
         }
+
         public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
             switch (e.ClickedComand.ToLower()) {
-
                 case "#columnedit":
                     if (e.HotItem is ColumnItem col) {
                         tabAdministration.OpenColumnEditor(col, null);
@@ -218,6 +237,7 @@ namespace BlueControls.Controls {
                     ExecuteFile(p.FilePath());
                     MessageBox.Show("Aktuelle Datei:<br>" + p);
                     return true;
+
                 default:
                     if (Parent is Formula f) {
                         return f.ContextMenuItemClickedInternalProcessig(sender, e);
@@ -226,7 +246,9 @@ namespace BlueControls.Controls {
             }
             return false;
         }
+
         public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
+
         public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
     }
 }

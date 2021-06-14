@@ -1,45 +1,58 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using System;
 using System.Drawing;
 
 namespace BlueControls {
+
     public class RectangleM : ICloneable {
         public decimal X;
         public decimal Y;
         public decimal Width;
         public decimal Height;
-        public RectangleM() : this(0M, 0M, 0M, 0M) { }
-        public RectangleM(Rectangle r) : this(r.X, r.Y, r.Width, r.Height) { }
-        public RectangleM(PointM p1, PointM p2) : this(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Abs(p1.X - p2.X), Math.Abs(p1.Y - p2.Y)) { }
+
+        public RectangleM() : this(0M, 0M, 0M, 0M) {
+        }
+
+        public RectangleM(Rectangle r) : this(r.X, r.Y, r.Width, r.Height) {
+        }
+
+        public RectangleM(PointM p1, PointM p2) : this(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y), Math.Abs(p1.X - p2.X), Math.Abs(p1.Y - p2.Y)) {
+        }
+
         public RectangleM(decimal x, decimal y, decimal width, decimal height) {
             X = x;
             Y = y;
             Width = width;
             Height = height;
         }
+
         public decimal Left => X;
         public decimal Top => Y;
         public decimal Right => X + Width;
         public decimal Bottom => Y + Height;
+
         /// <summary>
         /// Positive Werte verkleinern das Rechteck, negative vergrößern es.
         /// </summary>
@@ -51,9 +64,9 @@ namespace BlueControls {
             Width -= xVal * 2;
             Height -= yVal * 2;
         }
+
         public PointM PointOf(enAlignment corner) {
             switch (corner) {
-
                 case enAlignment.Bottom_Left:
                     return new PointM(Left, Bottom);
 
@@ -80,11 +93,13 @@ namespace BlueControls {
 
                 case enAlignment.Horizontal_Vertical_Center:
                     return new PointM(Left + (Width / 2m), Top + (Height / 2m));
+
                 default:
                     Develop.DebugPrint(corner);
                     return new PointM();
             }
         }
+
         public PointM NearestCornerOF(PointM P) {
             var LO = PointOf(enAlignment.Top_Left);
             var rO = PointOf(enAlignment.Top_Right);
@@ -97,10 +112,13 @@ namespace BlueControls {
             var Erg = Math.Min(Math.Min(llo, lro), Math.Min(llu, lru));
             return Erg == llo ? LO : Erg == lro ? rO : Erg == llu ? lu : Erg == lru ? ru : null;
         }
+
         public bool Contains(PointM p) => Contains(p.X, p.Y);
+
         public bool Contains(decimal pX, decimal pY) => pX >= X && pY >= Y && pX <= X + Width && pY <= Y + Height;
+
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="zoom"></param>
         /// <param name="shiftX"></param>
@@ -125,6 +143,7 @@ namespace BlueControls {
                                       (float)(Height * zoom));
             }
         }
+
         /// <summary>
         /// Erweitert das Rechteck, dass ein Kreis mit den angegebenen Parametern ebenfalls umschlossen wird.
         /// </summary>
@@ -136,6 +155,7 @@ namespace BlueControls {
             ExpandTo(new PointM(middle.X + radius, middle.Y));
             ExpandTo(new PointM(middle.X - radius, middle.Y));
         }
+
         /// <summary>
         /// Erweitert das Rechteck, dass der Angegebene Punkt ebenfalls umschlossen wird.
         /// </summary>
@@ -156,7 +176,9 @@ namespace BlueControls {
                 Height = P.Y - Y;
             }
         }
+
         public object Clone() => new RectangleM(X, Y, Width, Height);
+
         public static explicit operator RectangleF(RectangleM r) {
             return new((float)r.X, (float)r.Y, (float)r.Width, (float)r.Height);
         }

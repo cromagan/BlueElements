@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -28,6 +31,7 @@ using System;
 using System.Collections.Generic;
 
 namespace BlueControls.BlueDatabaseDialogs {
+
     public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserControl //
     {
         public AutoFilter(ColumnItem column, FilterCollection filter, List<RowItem> pinned) : base(enDesign.Form_AutoFilter) {
@@ -48,6 +52,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             Column = column;
             GenerateAll(filter, pinned);
         }
+
         public void GenerateAll(FilterCollection filter, List<RowItem> pinned) {
             var nochOk = true;
             var List_FilterString = Column.Autofilter_ItemList(filter, pinned);
@@ -129,24 +134,29 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
         }
 
-        #region  Variablen 
+        #region Variablen
+
         private readonly ColumnItem Column;
         private bool MultiAuswahlUND;
         private bool MultiAuswahlODER;
         private bool NegativAuswahl;
-        #endregion
 
+        #endregion Variablen
 
-        #region  Events 
+        #region Events
+
         public event EventHandler<FilterComandEventArgs> FilterComand;
-        #endregion
+
+        #endregion Events
 
         private void CloseAndDispose(string Comand, FilterItem NewFilter) {
             if (IsClosed) { return; }
             Close();
             OnFilterComand(new FilterComandEventArgs(Comand, Column, NewFilter));
         }
+
         private void OnFilterComand(FilterComandEventArgs e) => FilterComand?.Invoke(this, e);
+
         private void Timer1_Tick(object sender, System.EventArgs e) {
             BringToFront();
             if (Timer1x.Interval < 5000) {
@@ -156,6 +166,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 }
             }
         }
+
         private void FiltItems_ItemClicked(object sender, BasicListItemEventArgs e) {
             if (MultiAuswahlUND || MultiAuswahlODER) { return; }
             var DoJoker = true;
@@ -173,10 +184,12 @@ namespace BlueControls.BlueDatabaseDialogs {
                 CloseAndDispose("Filter", new FilterItem(Column, enFilterType.Istgleich_ODER_GroßKleinEgal, l));
             }
         }
+
         protected override void OnLostFocus(System.EventArgs e) {
             base.OnLostFocus(e);
             Something_LostFocus(this, e);
         }
+
         private void Something_LostFocus(object sender, System.EventArgs e) {
             if (IsClosed) { return; }
             if (txbEingabe.Focused()) { return; }
@@ -186,6 +199,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (butFertig.Focused) { return; }
             CloseAndDispose(string.Empty, null);
         }
+
         //private void OnMouseEnter(object sender, System.EventArgs e)
         //{
         //    IsMouseInControl();
@@ -227,9 +241,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
             CloseAndDispose("Filter", new FilterItem(Column, enFilterType.Instr | enFilterType.GroßKleinEgal, txbEingabe.Text));
         }
+
         private void sFilter_ItemClicked(object sender, BasicListItemEventArgs e) {
             switch (e.Item.Internal.ToLower()) {
-
                 case "filterleere": {
                         CloseAndDispose("Filter", new FilterItem(Column, enFilterType.Istgleich | enFilterType.MultiRowIgnorieren, ""));
                         break;
@@ -297,12 +311,14 @@ namespace BlueControls.BlueDatabaseDialogs {
                     }
             }
         }
+
         private void ChangeToMultiOder() {
             var F = Skin.GetBlueFont(enDesign.Caption, enStates.Standard);
             MultiAuswahlODER = true;
             capInfo.Text = LanguageTool.DoTranslate("<fontsize=15><b><u>ODER-Filterung:</u></b><fontsize=" + F.FontSize.ToString() + "><br><br>Wählen sie Einträge, von denen <b>einer</b> zutreffen muss:");
             ChangeDesign();
         }
+
         private void ChangeDesign() {
             lsbStandardFilter.Visible = false;
             capWas.Visible = false;
@@ -312,12 +328,14 @@ namespace BlueControls.BlueDatabaseDialogs {
             capInfo.Visible = true;
             butFertig.Visible = true;
         }
+
         private void ChangeToMultiUnd() {
             MultiAuswahlUND = true;
             var F = Skin.GetBlueFont(enDesign.Caption, enStates.Standard);
             capInfo.Text = LanguageTool.DoTranslate("<fontsize=15><b><u>UND-Filterung:</u></b><fontsize=" + F.FontSize.ToString() + "><br><br>Wählen sie welche Einträge <b>alle</b> zutreffen müssen:");
             ChangeDesign();
         }
+
         private void butFertig_Click(object sender, System.EventArgs e) {
             var _SearchValue = lsbFilterItems.Item.Checked().ToListOfString();
             if (_SearchValue.Count == 0) {

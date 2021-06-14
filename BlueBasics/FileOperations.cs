@@ -1,4 +1,5 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
+
 // Authors:
 // Christian Peter
 //
@@ -15,7 +16,9 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-#endregion
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
@@ -25,12 +28,17 @@ using System.Security.Cryptography;
 using static BlueBasics.modAllgemein;
 
 namespace BlueBasics {
+
     public static class FileOperations {
+
         private delegate bool DoThis(string file1, string file2);
+
         // private static string LastCheck = string.Empty;
         // private static bool LastErg = false;
         private static readonly List<string> WriteAccess = new();
+
         private static readonly List<string> NoWriteAccess = new();
+
         private static bool ProcessFile(DoThis processMethod, string file1, string file2, bool toBeSure) {
             var tries = 0;
             var startTime = DateTime.Now;
@@ -44,20 +52,14 @@ namespace BlueBasics {
             return true;
         }
 
-
         private static string _LastFilePath = string.Empty;
 
         public static List<string> GetFilesWithFileSelector(string defaultpath, bool multi) {
-
-
             if (string.IsNullOrEmpty(_LastFilePath)) {
-
                 if (!string.IsNullOrEmpty(defaultpath)) {
                     _LastFilePath = defaultpath;
                 }
             }
-
-
 
             using System.Windows.Forms.OpenFileDialog f = new();
             f.CheckFileExists = true;
@@ -68,21 +70,12 @@ namespace BlueBasics {
             f.ShowDialog();
             if (f.FileNames == null) { return null; }
 
-
             if (!multi && f.FileNames.Length != 1) { return null; }
             var x = new List<string>();
             x.AddRange(f.FileNames);
             _LastFilePath = f.FileNames[0].FilePath();
             return x;
-
         }
-
-
-
-
-
-
-
 
         private static bool TryDeleteDir(string pfad, string willBeIgnored) {
             pfad = pfad.CheckPath();
@@ -94,6 +87,7 @@ namespace BlueBasics {
             }
             return !PathExists(pfad);
         }
+
         /// <summary>
         ///
         /// </summary>
@@ -111,10 +105,15 @@ namespace BlueBasics {
             }
             return del;
         }
+
         public static bool DeleteFile(string file, bool toBeSure) => !FileExists(file) || ProcessFile(TryDeleteFile, file, file, toBeSure);
+
         public static bool RenameFile(string oldName, string newName, bool toBeSure) => ProcessFile(TryRenameFile, oldName, newName, toBeSure);
+
         public static bool CopyFile(string source, string target, bool toBeSure) => ProcessFile(TryCopyFile, source, target, toBeSure);
+
         public static bool DeleteDir(string directory, bool toBeSure) => ProcessFile(TryDeleteDir, directory, directory, toBeSure);
+
         private static bool TryDeleteFile(string thisFile, string willbeIgnored) {
             // Komisch, manche Dateien können zwar gelöscht werden, die Attribute aber nicht geändert (Berechtigungen?)
             try {
@@ -133,6 +132,7 @@ namespace BlueBasics {
             }
             return !FileExists(thisFile);
         }
+
         private static bool TryRenameFile(string oldName, string newName) {
             if (oldName == newName) { return true; }
             if (!FileExists(oldName)) { return false; }
@@ -145,6 +145,7 @@ namespace BlueBasics {
             }
             return true; // FileExists(newName) && !FileExists(oldName);
         }
+
         private static bool TryCopyFile(string source, string target) {
             if (source == target) { return true; }
             if (!FileExists(source)) { return false; }
@@ -157,7 +158,9 @@ namespace BlueBasics {
             }
             return true; // FileExists(target);
         }
+
         public static bool FileExists(string file) => file != null && !string.IsNullOrEmpty(file) && !file.ContainsChars(Constants.Char_PfadSonderZeichen) && File.Exists(file);
+
         // public static bool CanWriteInDirectory(string DirectoryPath)
         // {
         //    if (string.IsNullOrEmpty(DirectoryPath)) { return false; }
@@ -200,10 +203,12 @@ namespace BlueBasics {
                 return false;
             }
         }
+
         private static DateTime _canWrite_LastCheck = DateTime.Now.Subtract(new TimeSpan(10, 10, 10));
         private static bool _canWrite_LastResult;
         private static string _canWrite_LastFile = string.Empty;
         public static int _canWrite_tryintervall = 10;
+
         public static bool CanWrite(string filename, double tryItForSeconds) {
             if (!CanWriteInDirectory(filename.FilePath())) { return false; }
             var s = DateTime.Now;
@@ -213,6 +218,7 @@ namespace BlueBasics {
                 if (DateTime.Now.Subtract(s).TotalSeconds > tryItForSeconds) { return false; }
             }
         }
+
         private static bool CanWrite(string file) {
             // Private lassen, das andere CanWrite greift auf diese zu.
             // Aber das andere prüft zusätzlich die Schreibrechte im Verzeichnis
@@ -238,19 +244,24 @@ namespace BlueBasics {
             _canWrite_LastFile = file.ToUpper();
             return _canWrite_LastResult;
         }
+
         public static bool PathExists(string pfad) => pfad.Length >= 3 && Directory.Exists(pfad.CheckPath());
+
         public static string TempFile(string newPath, string filename) {
             var dn = filename.FileNameWithoutSuffix();
             var ds = filename.FileSuffix();
             return TempFile(newPath, dn, ds);
         }
+
         public static string TempFile(string fullName) {
             var dp = fullName.FilePath();
             var dn = fullName.FileNameWithoutSuffix();
             var ds = fullName.FileSuffix();
             return TempFile(dp, dn, ds);
         }
+
         public static string TempFile() => TempFile(string.Empty, string.Empty, string.Empty);
+
         public static string TempFile(string pfad, string wunschname, string suffix) {
             if (string.IsNullOrEmpty(pfad)) { pfad = Path.GetTempPath(); }
             if (string.IsNullOrEmpty(suffix)) { suffix = "tmp"; }
@@ -266,6 +277,7 @@ namespace BlueBasics {
             } while (FileExists(filename));
             return filename;
         }
+
         public static string CalculateMD5(string filename) {
             if (!FileExists(filename)) { return string.Empty; }
             using var md5 = MD5.Create();
@@ -273,6 +285,7 @@ namespace BlueBasics {
             var hash = md5.ComputeHash(stream);
             return BitConverter.ToString(hash).Replace("-", string.Empty).ToLowerInvariant();
         }
+
         public static bool ExecuteFile(string fileName, string arguments = null, bool waitForExit = false, bool logException = true) {
             try {
                 if (string.IsNullOrEmpty(fileName) && string.IsNullOrEmpty(arguments)) { return false; }
@@ -288,6 +301,7 @@ namespace BlueBasics {
             }
             return true;
         }
+
         public static string ChecksumFileName(string name) {
             name = name.Replace("\\", "}");
             name = name.Replace("/", "}");
@@ -302,6 +316,7 @@ namespace BlueBasics {
             nn += name.Substring(name.Length - 20);
             return nn;
         }
+
         public static void SaveToDisk(string dateiName, string text2Save, bool executeAfter, System.Text.Encoding code) {
             try {
                 // switch (DateiName.FileType()) {
@@ -322,6 +337,7 @@ namespace BlueBasics {
                 Develop.DebugPrint(ex);
             }
         }
+
         // public static string LoadFromDisk(string DateiName) {
         // switch (DateiName.FileSuffix()) {
         //        case "XML":

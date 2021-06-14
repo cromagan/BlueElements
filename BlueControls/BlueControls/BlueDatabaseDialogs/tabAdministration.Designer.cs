@@ -62,7 +62,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnLayouts
             // 
-            this.btnLayouts.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_RibbonBar;
+            this.btnLayouts.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_Big_Borderless;
             this.btnLayouts.ImageCode = "Layout";
             this.btnLayouts.Location = new System.Drawing.Point(72, 0);
             this.btnLayouts.Name = "btnLayouts";
@@ -73,7 +73,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnVorherigeVersion
             // 
-            this.btnVorherigeVersion.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_RibbonBar;
+            this.btnVorherigeVersion.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_Big_Borderless;
             this.btnVorherigeVersion.ImageCode = "Uhr";
             this.btnVorherigeVersion.Location = new System.Drawing.Point(200, 0);
             this.btnVorherigeVersion.Name = "btnVorherigeVersion";
@@ -84,7 +84,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnDatenbankKopf
             // 
-            this.btnDatenbankKopf.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_RibbonBar;
+            this.btnDatenbankKopf.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_Big_Borderless;
             this.btnDatenbankKopf.ImageCode = "Datenbank";
             this.btnDatenbankKopf.Location = new System.Drawing.Point(8, 0);
             this.btnDatenbankKopf.Name = "btnDatenbankKopf";
@@ -95,7 +95,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnSpaltenUebersicht
             // 
-            this.btnSpaltenUebersicht.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_RibbonBar;
+            this.btnSpaltenUebersicht.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_Big_Borderless;
             this.btnSpaltenUebersicht.ImageCode = "Spalte";
             this.btnSpaltenUebersicht.Location = new System.Drawing.Point(128, 0);
             this.btnSpaltenUebersicht.Name = "btnSpaltenUebersicht";
@@ -106,7 +106,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnClipboardImport
             // 
-            this.btnClipboardImport.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_RibbonBar;
+            this.btnClipboardImport.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_Big_Borderless;
             this.btnClipboardImport.ImageCode = "Tabelle||||||||||Pfeil_Links";
             this.btnClipboardImport.Location = new System.Drawing.Point(8, 0);
             this.btnClipboardImport.Name = "btnClipboardImport";
@@ -143,7 +143,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnZeileLöschen
             // 
-            this.btnZeileLöschen.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_RibbonBar;
+            this.btnZeileLöschen.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_Big_Borderless;
             this.btnZeileLöschen.ImageCode = "Zeile||||||||||Kreuz";
             this.btnZeileLöschen.Location = new System.Drawing.Point(144, 0);
             this.btnZeileLöschen.Name = "btnZeileLöschen";
@@ -155,7 +155,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnDatenüberprüfung
             // 
-            this.btnDatenüberprüfung.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_RibbonBar;
+            this.btnDatenüberprüfung.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_Big_Borderless;
             this.btnDatenüberprüfung.ImageCode = "Zeile||||||||||Häkchen";
             this.btnDatenüberprüfung.Location = new System.Drawing.Point(72, 0);
             this.btnDatenüberprüfung.Name = "btnDatenüberprüfung";
@@ -167,7 +167,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnAdminMenu
             // 
-            this.btnAdminMenu.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_RibbonBar;
+            this.btnAdminMenu.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_Big_Borderless;
             this.btnAdminMenu.ImageCode = "Zahnrad||||FF0000";
             this.btnAdminMenu.Location = new System.Drawing.Point(8, 0);
             this.btnAdminMenu.Name = "btnAdminMenu";

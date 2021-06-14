@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -28,6 +31,7 @@ using static BlueBasics.FileOperations;
 using static BlueBasics.modConverter;
 
 namespace BlueDatabase {
+
     //Der Export wird nur Intern verwaltet und gibt keine Ereignisse aus.
     //Wenn mal ein LAyout geändert wird, sind es gleich 100 und mehr AddPenduings mit imensen Daten.
     public class ExportDefinition : IParseable, IReadableTextWithChanging, ICompareKey, ICheckable, IDisposable {
@@ -43,13 +47,16 @@ namespace BlueDatabase {
         private FilterCollection _Filter;
         private bool disposedValue;
 
-        #region  Event-Deklarationen + Delegaten 
+        #region Event-Deklarationen + Delegaten
+
         public event EventHandler Changed;
-        #endregion
 
+        #endregion Event-Deklarationen + Delegaten
 
-        #region  Properties 
+        #region Properties
+
         public bool IsParsing { get; private set; }
+
         public string Verzeichnis {
             get => _Verzeichnis;
             set {
@@ -58,6 +65,7 @@ namespace BlueDatabase {
                 OnChanged();
             }
         }
+
         public enExportTyp Typ {
             get => _Typ;
             set {
@@ -66,6 +74,7 @@ namespace BlueDatabase {
                 OnChanged();
             }
         }
+
         public float Intervall {
             get => _Intervall;
             set {
@@ -74,6 +83,7 @@ namespace BlueDatabase {
                 OnChanged();
             }
         }
+
         public float AutomatischLöschen {
             get => _AutomatischLöschen;
             set {
@@ -82,6 +92,7 @@ namespace BlueDatabase {
                 OnChanged();
             }
         }
+
         public string ExportFormularID {
             get => _ExportFormularID;
             set {
@@ -90,6 +101,7 @@ namespace BlueDatabase {
                 OnChanged();
             }
         }
+
         public int ExportSpaltenAnsicht {
             get => _ExportSpaltenAnsicht;
             set {
@@ -98,6 +110,7 @@ namespace BlueDatabase {
                 OnChanged();
             }
         }
+
         public FilterCollection Filter {
             get => _Filter;
             set {
@@ -112,7 +125,9 @@ namespace BlueDatabase {
                 OnChanged();
             }
         }
+
         public List<string> BereitsExportiert => _BereitsExportiert;
+
         public DateTime LastExportTimeUTC {
             get => _LastExportTimeUTC;
             set {
@@ -121,10 +136,11 @@ namespace BlueDatabase {
                 OnChanged();
             }
         }
-        #endregion
 
+        #endregion Properties
 
-        #region  Construktor + Initialize 
+        #region Construktor + Initialize
+
         private void Initialize() {
             _Verzeichnis = string.Empty;
             _Typ = enExportTyp.DatenbankOriginalFormat;
@@ -137,13 +153,17 @@ namespace BlueDatabase {
             _BereitsExportiert.Changed += _BereitsExportiert_ListOrItemChanged;
             _LastExportTimeUTC = new DateTime(1900, 1, 1);
         }
+
         public ExportDefinition(Database database, string verzeichnis, enExportTyp typ, float intervall, float automatischlöschen) : this(database) {
             _Verzeichnis = verzeichnis;
             _Typ = typ;
             _Intervall = intervall;
             _AutomatischLöschen = automatischlöschen;
         }
-        public ExportDefinition(Database database, string toParse) : this(database, toParse, false) { }
+
+        public ExportDefinition(Database database, string toParse) : this(database, toParse, false) {
+        }
+
         public ExportDefinition(Database database, string toParse, bool DeleteLastExportInfos) : this(database) {
             Parse(toParse);
             if (DeleteLastExportInfos) {
@@ -151,19 +171,25 @@ namespace BlueDatabase {
                 _LastExportTimeUTC = new DateTime(1900, 1, 1);
             }
         }
+
         public ExportDefinition(Database database) {
             Database = database;
             Database.Disposing += Database_Disposing;
             Initialize();
         }
+
         private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
-        #endregion
+
+        #endregion Construktor + Initialize
 
         private void _Filter_Changed(object sender, System.EventArgs e) => OnChanged();
+
         private void _BereitsExportiert_ListOrItemChanged(object sender, System.EventArgs e) => OnChanged();
+
         public void OnChanged() =>
             //if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
             Changed?.Invoke(this, System.EventArgs.Empty);
+
         public void Parse(string ToParse) {
             IsParsing = true;
             Initialize();
@@ -174,39 +200,49 @@ namespace BlueDatabase {
                     case "sho":
                         shortener = pair.Value.FromNonCritical();
                         break;
+
                     case "dest":
                     case "destination":// ALT, 02.10.2019
                         _Verzeichnis = pair.Value.FromNonCritical();
                         break;
+
                     case "typ":
                     case "type":// ALT, 02.10.2019
                         _Typ = (enExportTyp)int.Parse(pair.Value);
                         break;
+
                     case "itv":
                     case "interval":// ALT, 02.10.2019
                         _Intervall = float.Parse(pair.Value.FromNonCritical());
                         break;
+
                     case "aud":
                     case "autodelete":// ALT, 02.10.2019
                         _AutomatischLöschen = float.Parse(pair.Value.FromNonCritical());
                         break;
+
                     case "exportformula":
                         // _ExportFormular = pair.Value.FromNonCritical(); ALT, 16.07.2019
                         break;
+
                     case "exid":
                         _ExportFormularID = pair.Value.FromNonCritical();
                         break;
+
                     case "exc":
                     case "exportcolumnorder": // ALT, 02.10.2019
                         _ExportSpaltenAnsicht = int.Parse(pair.Value);
                         break;
+
                     case "flt":
                     case "filter": // ALT, 02.10.2019
                         Filter = new FilterCollection(Database, pair.Value);
                         break;
+
                     case "exported": // ALT, 02.10.2019
                         _BereitsExportiert.AddRange(pair.Value.FromNonCritical().SplitBy("#"));
                         break;
+
                     case "exp":
                         var tmp = pair.Value.FromNonCritical().SplitBy("#");
                         _BereitsExportiert.Clear();
@@ -218,10 +254,12 @@ namespace BlueDatabase {
                             }
                         }
                         break;
+
                     case "let":
                     case "lastexporttime":
                         _LastExportTimeUTC = DateTimeParse(pair.Value);
                         break;
+
                     default:
                         Develop.DebugPrint(enFehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
                         break;
@@ -230,7 +268,9 @@ namespace BlueDatabase {
             _BereitsExportiert.ThrowEvents = true;
             IsParsing = false;
         }
+
         public string CompareKey() => ((int)_Typ).ToString(Constants.Format_Integer3) + "|" + _Verzeichnis + "|" + _ExportFormularID + "|" + _Intervall + "|" + _AutomatischLöschen;
+
         public string ReadableText() {
             var t = ErrorReason();
             if (!string.IsNullOrEmpty(t)) {
@@ -240,16 +280,20 @@ namespace BlueDatabase {
                 case enExportTyp.DatenbankCSVFormat:
                     t = "Gesamte Datenbank als CSV-Datei";
                     break;
+
                 case enExportTyp.DatenbankHTMLFormat:
                     t = "Gesamte Datenbank als HTML-Datei";
                     break;
+
                 case enExportTyp.DatenbankOriginalFormat:
                     t = "Sicherheitskopie im Originalformat";
                     break;
+
                 case enExportTyp.EinzelnMitFormular:
                     t = "Einzeleinträge";
                     //   Case Is = enExportTyp.EinzelnAlsHTML : t = "Einzeleinträge als HTML-Datei"
                     break;
+
                 default:
                     Develop.DebugPrint(_Typ);
                     return "Unbekannte Aktion";
@@ -276,15 +320,19 @@ namespace BlueDatabase {
             }
             return t;
         }
+
         public QuickImage SymbolForReadableText() {
             if (!IsOk()) { return QuickImage.Get(enImageCode.Kritisch); }
             switch (_Typ) {
                 case enExportTyp.DatenbankCSVFormat:
                     return QuickImage.Get(enImageCode.Excel);
+
                 case enExportTyp.DatenbankHTMLFormat:
                     return QuickImage.Get(enImageCode.Globus);
+
                 case enExportTyp.DatenbankOriginalFormat:
                     return QuickImage.Get(enImageCode.Häkchen);
+
                 case enExportTyp.EinzelnMitFormular:
                     return QuickImage.Get(enImageCode.Stern);
                 //     Case Is = enExportTyp.EinzelnAlsHTML : Return QuickImage.[Get](enImageCode.InternetExplorer, 16, "00FF00", "")
@@ -293,6 +341,7 @@ namespace BlueDatabase {
                     return QuickImage.Get(enImageCode.Kritisch);
             }
         }
+
         //public override string ToString()
         //{
         //    var Result = "{";
@@ -356,6 +405,7 @@ namespace BlueDatabase {
                 return ToString();
             }
         }
+
         private string GetShortener() {
             if (_BereitsExportiert.Count < 2) { return string.Empty; }
             var ze = 1;
@@ -374,6 +424,7 @@ namespace BlueDatabase {
             }
             while (true);
         }
+
         //#region IDisposable Support
         //// IDisposable
         //protected virtual void Dispose(bool disposing)
@@ -425,6 +476,7 @@ namespace BlueDatabase {
             }
             _BereitsExportiert.RemoveNullOrEmpty();
         }
+
         internal bool DeleteOutdatedBackUps(BackgroundWorker worker) {
             var Did = false;
             if (!IsOk()) { return false; }
@@ -485,7 +537,9 @@ namespace BlueDatabase {
             }
             return Did;
         }
+
         public bool IsOk() => string.IsNullOrEmpty(ErrorReason());
+
         public string ErrorReason() {
             if (string.IsNullOrEmpty(Database.Filename)) {
                 return "Nur von Datenbanken, die auch auf der Festplatte gespeichert sind, kann ein Export stattfinden.";
@@ -523,6 +577,7 @@ namespace BlueDatabase {
                 ? "Das Zielverzeichnis existiert nicht."
                 : !CanWriteInDirectory(_Verzeichnis) ? "Sie besitzen im Zielverzeichnis keine Schreibrechte." : string.Empty;
         }
+
         //#endregion
         internal bool DoBackUp(BackgroundWorker worker) {
             if (!IsOk()) { return false; }
@@ -547,18 +602,21 @@ namespace BlueDatabase {
                         if (!FileExists(SingleFileExport)) { File.Copy(Database.Filename, SingleFileExport); }
                         Added.Add(SingleFileExport + "|" + tim);
                         break;
+
                     case enExportTyp.DatenbankCSVFormat:
                         if (_Intervall > (float)DateTime.UtcNow.Subtract(_LastExportTimeUTC).TotalDays) { return false; }
                         SingleFileExport = TempFile(SingleFileExport + ".CSV");
                         if (!FileExists(SingleFileExport)) { SaveToDisk(SingleFileExport, Database.Export_CSV(enFirstRow.ColumnInternalName, _ExportSpaltenAnsicht, _Filter, null), false, System.Text.Encoding.GetEncoding(1252)); }
                         Added.Add(SingleFileExport + "|" + tim);
                         break;
+
                     case enExportTyp.DatenbankHTMLFormat:
                         if (_Intervall > (float)DateTime.UtcNow.Subtract(_LastExportTimeUTC).TotalDays) { return false; }
                         SingleFileExport = TempFile(SingleFileExport + ".HTML");
                         if (!FileExists(SingleFileExport)) { Database.Export_HTML(SingleFileExport, _ExportSpaltenAnsicht, _Filter, null); }
                         Added.Add(SingleFileExport + "|" + tim);
                         break;
+
                     case enExportTyp.EinzelnMitFormular:
                         foreach (var Thisrow in Database.Row) {
                             if (Thisrow != null) {
@@ -586,6 +644,7 @@ namespace BlueDatabase {
                             if (worker != null && worker.CancellationPending) { break; }
                         }
                         break;
+
                     default:
                         Develop.DebugPrint(_Typ);
                         return false;
@@ -607,6 +666,7 @@ namespace BlueDatabase {
             _LastExportTimeUTC = tim2;
             return DidAndOk;
         }
+
         private bool DeleteId(long Id, BackgroundWorker Worker) {
             var Did = false;
             for (var f = 0; f < _BereitsExportiert.Count; f++) {
@@ -627,7 +687,9 @@ namespace BlueDatabase {
             }
             return Did;
         }
+
         public object Clone() => new ExportDefinition(Database, ToString());
+
         protected virtual void Dispose(bool disposing) {
             if (!disposedValue) {
                 if (disposing) {
@@ -642,11 +704,13 @@ namespace BlueDatabase {
                 disposedValue = true;
             }
         }
+
         // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
         ~ExportDefinition() {
             // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
             Dispose(disposing: false);
         }
+
         public void Dispose() {
             // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
             Dispose(disposing: true);

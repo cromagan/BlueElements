@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Interfaces;
 using Skript.Enums;
@@ -24,8 +27,11 @@ using System.Linq;
 using static BlueBasics.Extensions;
 
 namespace BlueScript {
+
     public abstract class Method : IReadableText {
+
         public abstract List<string> Comand(Script s);
+
         public abstract string Description { get; }
         public abstract string Syntax { get; }
         public abstract string StartSequence { get; }
@@ -34,7 +40,9 @@ namespace BlueScript {
         public abstract enVariableDataType Returns { get; }
         public abstract List<enVariableDataType> Args { get; }
         public abstract bool EndlessArgs { get; }
+
         public abstract strDoItFeedback DoIt(strCanDoFeedback infos, Script s);
+
         public strCanDoFeedback CanDo(string scriptText, int pos, bool expectedvariablefeedback, Script s) {
             if (!expectedvariablefeedback && Returns != enVariableDataType.Null) {
                 return new strCanDoFeedback(pos, "Befehl an dieser Stelle nicht möglich", false);
@@ -84,6 +92,7 @@ namespace BlueScript {
             }
             return new strCanDoFeedback(pos, "Kann nicht geparst werden", false);
         }
+
         private strGetEndFeedback GetEnd(string scriptText, int startpos, int lenghtStartSequence) {
             (var pos, var witch) = NextText(scriptText, startpos, new List<string>() { EndSequence }, false, false);
             if (pos < startpos) {
@@ -92,6 +101,7 @@ namespace BlueScript {
             var txtBTW = scriptText.Substring(startpos + lenghtStartSequence, pos - startpos - lenghtStartSequence);
             return new strGetEndFeedback(pos + witch.Length, txtBTW);
         }
+
         public static strGetEndFeedback ReplaceComands(string txt, IEnumerable<Method> comands, Script s) {
             List<string> c = new();
             foreach (var thisc in comands) {
@@ -113,6 +123,7 @@ namespace BlueScript {
                 posc = pos;
             } while (true);
         }
+
         public static strGetEndFeedback ReplaceVariable(string txt, List<Variable> vars) {
             var posc = 0;
             var v = vars.AllNames();
@@ -128,11 +139,13 @@ namespace BlueScript {
                 posc = pos;
             } while (true);
         }
+
         public static List<string> SplitAttributeToString(string attributtext) {
             if (string.IsNullOrEmpty(attributtext)) { return null; }
             List<string> attributes = new();
 
             #region Liste der Attribute splitten
+
             var posc = 0;
             do {
                 (var pos, var _) = NextText(attributtext, posc, Komma, false, false);
@@ -143,10 +156,12 @@ namespace BlueScript {
                 attributes.Add(attributtext.Substring(posc, pos - posc).DeKlammere(true, true, false, true));
                 posc = pos + 1;
             } while (true);
-            #endregion
+
+            #endregion Liste der Attribute splitten
 
             return attributes;
         }
+
         public static strSplittedAttributesFeedback SplitAttributeToVars(string attributtext, Script s, List<enVariableDataType> types, bool EndlessArgs) {
             var attributes = SplitAttributeToString(attributtext);
             if (attributes == null || attributes.Count == 0) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Allgemeiner Fehler."); }
@@ -183,8 +198,11 @@ namespace BlueScript {
             }
             return new strSplittedAttributesFeedback(vars);
         }
+
         public string ReadableText() => Syntax;
+
         public QuickImage SymbolForReadableText() => null;
+
         public string HintText() {
             var co = "Syntax:\r\n";
             co += "~~~~~~\r\n";

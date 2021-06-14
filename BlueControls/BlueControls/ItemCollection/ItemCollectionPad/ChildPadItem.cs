@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -27,11 +30,14 @@ using System.ComponentModel;
 using System.Drawing;
 
 namespace BlueControls.ItemCollection {
+
     public class ChildPadItem : FormPadItemRectangle, IMouseAndKeyHandle, ICanHaveColumnVariables {
 
-        #region  Variablen-Deklarationen 
+        #region Variablen-Deklarationen
+
         private Bitmap _tmpBMP;
         private CreativePad _PadInternal;
+
         public CreativePad PadInternal {
             get => _PadInternal;
             set {
@@ -44,18 +50,17 @@ namespace BlueControls.ItemCollection {
                 }
             }
         }
+
         private string _Name;
         public List<BasicPadItem> VisibleItems = null;
         public List<BasicPadItem> ZoomItems = null;
         public enAlignment Textlage { get; set; } = (enAlignment)(-1);
         public Color Randfarbe { get; set; } = Color.Transparent;
+
         [Description("Soll eine Umrandung einer anderen Ansicht hier angezeigt werden,<br>muss dessen Name hier eingegeben werden.")]
         public List<string> Eingebettete_Ansichten { get; set; } = new List<string>();
-        #endregion
 
-
-        #region  Event-Deklarationen + Delegaten 
-        #endregion
+        #endregion Variablen-Deklarationen
 
         [Description("Name und gleichzeitig eventuelle Beschriftung dieser Ansicht.")]
         public string Name {
@@ -67,8 +72,11 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        #region  Construktor  
-        public ChildPadItem(ItemCollectionPad parent) : this(parent, string.Empty) { }
+        #region Construktor
+
+        public ChildPadItem(ItemCollectionPad parent) : this(parent, string.Empty) {
+        }
+
         public ChildPadItem(ItemCollectionPad parent, string internalname) : base(parent, internalname) {
             PadInternal = null; // new CreativePad();
             _tmpBMP = null;
@@ -81,7 +89,8 @@ namespace BlueControls.ItemCollection {
             //_VariableText = string.Empty;
             Eingebettete_Ansichten = new List<string>();
         }
-        #endregion
+
+        #endregion Construktor
 
         public override void DesignOrStyleChanged() {
             if (_tmpBMP != null) {
@@ -91,7 +100,9 @@ namespace BlueControls.ItemCollection {
             PadInternal.Item.SheetStyle = Parent.SheetStyle;
             PadInternal.Item.SheetStyleScale = Parent.SheetStyleScale;
         }
+
         protected override string ClassId() => "CHILDPAD";
+
         protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
             try {
                 var trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
@@ -167,6 +178,7 @@ namespace BlueControls.ItemCollection {
             }
             base.DrawExplicit(GR, DCoordinates, cZoom, shiftX, shiftY, vState, SizeOfParentControl, ForPrinting);
         }
+
         public override bool ParseThis(string tag, string value) {
             if (base.ParseThis(tag, value)) { return true; }
             switch (tag) {
@@ -205,7 +217,10 @@ namespace BlueControls.ItemCollection {
             }
             return false;
         }
-        protected override void ParseFinished() { }
+
+        protected override void ParseFinished() {
+        }
+
         public override string ToString() {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
@@ -219,10 +234,12 @@ namespace BlueControls.ItemCollection {
             }
             return t.Trim(", ") + "}";
         }
+
         private void _Pad_DoInvalidate(object sender, System.EventArgs e) {
             if (IsParsing) { return; }
             OnChanged();
         }
+
         public bool MouseDown(object sender, System.Windows.Forms.MouseEventArgs e, decimal cZoom, decimal shiftX, decimal shiftY) {
             if (PadInternal == null || PadInternal.Item.Count == 0) { return false; }
             var l1 = UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY, false);
@@ -247,6 +264,7 @@ namespace BlueControls.ItemCollection {
             PadInternal.DoMouseDown(e2);
             return true;
         }
+
         public bool MouseMove(object sender, System.Windows.Forms.MouseEventArgs e, decimal cZoom, decimal shiftX, decimal shiftY) {
             if (PadInternal == null || PadInternal.Item.Count == 0) { return false; }
             var l1 = UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY, false);
@@ -272,6 +290,7 @@ namespace BlueControls.ItemCollection {
             PadInternal.DoMouseMove(e2);
             return true;
         }
+
         public bool MouseUp(object sender, System.Windows.Forms.MouseEventArgs e, decimal cZoom, decimal shiftX, decimal shiftY) {
             if (PadInternal.Item.Count == 0) { return false; }
             var l1 = UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY, false);
@@ -296,23 +315,27 @@ namespace BlueControls.ItemCollection {
             PadInternal.DoMouseUp(e2);
             return true;
         }
+
         public bool ReplaceVariable(BlueScript.Variable variable) {
             if (PadInternal == null) { return false; }
             var b = PadInternal.Item.ParseVariable(variable);
             if (b) { OnChanged(); }
             return b;
         }
+
         public bool KeyUp(object sender, System.Windows.Forms.KeyEventArgs e, decimal cZoom, decimal shiftX, decimal shiftY) {
             if (PadInternal.Item.Count == 0) { return false; }
             PadInternal.DoKeyUp(e, false);
             return true;
         }
+
         public bool ResetVariables() {
             if (PadInternal == null) { return false; }
             var b = PadInternal.Item.ResetVariables();
             if (b) { OnChanged(); }
             return b;
         }
+
         public override List<FlexiControl> GetStyleOptions() {
             List<FlexiControl> l = new()
             {
@@ -329,6 +352,7 @@ namespace BlueControls.ItemCollection {
             l.AddRange(base.GetStyleOptions());
             return l;
         }
+
         //public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
         //{
         //    _Name = Tags.TagGet("name").FromNonCritical();

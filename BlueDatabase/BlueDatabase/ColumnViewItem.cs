@@ -1,21 +1,24 @@
 #region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
@@ -23,37 +26,45 @@ using System;
 using System.Drawing;
 
 namespace BlueDatabase {
+
     public sealed class ColumnViewItem {
 
-        #region  Variablen-Deklarationen 
+        #region Variablen-Deklarationen
+
         private enViewType _ViewType;
+
         /// <summary>
         /// Koordinaten Angabe in "Spalten"
         /// </summary>
         private int _Spalte_X1;
+
         /// <summary>
         /// Koordinaten Angabe in "Spalten"
         /// </summary>
         private int _Spalte_Width;
+
         /// <summary>
         /// // Koordinaten Angabe in "Spalten"
         /// </summary>
         private int _Spalte_Height;
+
         private enÜberschriftAnordnung _ÜberschriftAnordnung;
         public int? OrderTMP_Spalte_X1;
         public Rectangle _TMP_AutoFilterLocation;
         public Rectangle _TMP_ReduceLocation;
         public int? _TMP_DrawWidth;
         public bool _TMP_Reduced;
-        #endregion
 
+        #endregion Variablen-Deklarationen
 
-        #region  Event-Deklarationen + Delegaten 
+        #region Event-Deklarationen + Delegaten
+
         public event EventHandler Changed;
-        #endregion
 
+        #endregion Event-Deklarationen + Delegaten
 
-        #region  Construktor + Initialize 
+        #region Construktor + Initialize
+
         /// <summary>
         /// Info: Es wird keine Änderung ausgelöst
         /// </summary>
@@ -70,6 +81,7 @@ namespace BlueDatabase {
             _TMP_DrawWidth = null;
             _TMP_Reduced = false;
         }
+
         /// <summary>
         /// Info: Es wird keine Änderung ausgelöst
         /// </summary>
@@ -79,6 +91,7 @@ namespace BlueDatabase {
             _ViewType = Type;
             this.Column.CheckFormulaEditType();
         }
+
         /// <summary>
         /// Info: Es wird keine Änderung ausgelöst
         /// </summary>
@@ -89,6 +102,7 @@ namespace BlueDatabase {
             _ÜberschriftAnordnung = Überschrift;
             this.Column.CheckFormulaEditType();
         }
+
         /// <summary>
         /// Info: Es wird keine Änderung ausgelöst
         /// </summary>
@@ -96,7 +110,6 @@ namespace BlueDatabase {
             Initialize();
             foreach (var pair in codeToParse.GetAllTags()) {
                 switch (pair.Key) {
-
                     case "column":
 
                     case "columnname":// Columname wichtg, wegen CopyLayout
@@ -130,6 +143,7 @@ namespace BlueDatabase {
                     case "type":
                         _ViewType = (enViewType)int.Parse(pair.Value);
                         break;
+
                     default:
                         Develop.DebugPrint(enFehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
                         break;
@@ -138,10 +152,11 @@ namespace BlueDatabase {
             if (Column != null && _ViewType == enViewType.None) { _ViewType = enViewType.Column; }
             if (Column != null && _ViewType != enViewType.None) { Column.CheckFormulaEditType(); }
         }
-        #endregion
 
+        #endregion Construktor + Initialize
 
-        #region  Properties 
+        #region Properties
+
         public enViewType ViewType {
             get => _ViewType;
             set {
@@ -159,6 +174,7 @@ namespace BlueDatabase {
                 OnChanged();
             }
         }
+
         /// <summary>
         /// Nur wichtig für Formular
         /// </summary>
@@ -170,6 +186,7 @@ namespace BlueDatabase {
                 OnChanged();
             }
         }
+
         /// <summary>
         /// Nur wichtig für Formular
         /// </summary>
@@ -192,7 +209,8 @@ namespace BlueDatabase {
         }
 
         public ColumnItem Column { get; private set; }
-        #endregion
+
+        #endregion Properties
 
         /// <summary>
         /// Info: Es wird keine Änderung ausgelöst
@@ -230,7 +248,9 @@ namespace BlueDatabase {
         }
 
         public ColumnViewItem PreviewsVisible(ColumnViewCollection _Parent) => _Parent?.PreviousVisible(this);
+
         public ColumnViewItem NextVisible(ColumnViewCollection _Parent) => _Parent?.NextVisible(this);
+
         public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
     }
 }

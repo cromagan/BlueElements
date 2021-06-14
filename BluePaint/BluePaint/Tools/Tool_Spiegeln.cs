@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2019 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueControls;
 using BlueControls.EventArgs;
 using System;
@@ -24,10 +27,13 @@ using System.Drawing.Drawing2D;
 using static BlueBasics.modAllgemein;
 
 namespace BluePaint {
-    public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserControl // 
+
+    public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserControl //
     {
         private bool _ausricht = false;
+
         public Tool_Spiegeln() : base() => InitializeComponent();
+
         private void SpiegelnH_Click(object sender, System.EventArgs e) {
             _ausricht = false;
             var _Pic = OnNeedCurrentPic();
@@ -37,6 +43,7 @@ namespace BluePaint {
             OnOverridePic(_Pic);
             OnZoomFit();
         }
+
         private void SpiegelnV_Click(object sender, System.EventArgs e) {
             _ausricht = false;
             var _Pic = OnNeedCurrentPic();
@@ -46,6 +53,7 @@ namespace BluePaint {
             OnOverridePic(_Pic);
             OnZoomFit();
         }
+
         private void btnDrehenR_Click(object sender, System.EventArgs e) {
             _ausricht = false;
             var _Pic = OnNeedCurrentPic();
@@ -55,6 +63,7 @@ namespace BluePaint {
             OnOverridePic(_Pic);
             OnZoomFit();
         }
+
         private void btnDrehenL_Click(object sender, System.EventArgs e) {
             _ausricht = false;
             var _Pic = OnNeedCurrentPic();
@@ -64,10 +73,12 @@ namespace BluePaint {
             OnOverridePic(_Pic);
             OnZoomFit();
         }
+
         private void btnAusrichten_Click(object sender, System.EventArgs e) {
             _ausricht = true;
             OnDoInvalidate();
         }
+
         public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic) {
             if (!_ausricht) { return; }
             var _Pic = OnNeedCurrentPic();
@@ -80,14 +91,17 @@ namespace BluePaint {
                 e.DrawLine(Pen_RedTransp, e.Current.TrimmedX, e.Current.TrimmedY, e.MouseDown.TrimmedX, e.MouseDown.TrimmedY);
             }
         }
+
         public override void MouseDown(MouseEventArgs1_1 e, Bitmap OriginalPic) {
             if (!_ausricht) { return; }
             MouseMove(new MouseEventArgs1_1DownAndCurrent(e, e), OriginalPic);
         }
+
         public override void MouseMove(MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) {
             if (!_ausricht) { return; }
             OnDoInvalidate();
         }
+
         public override void MouseUp(MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) {
             if (!_ausricht) { return; }
             _ausricht = false;

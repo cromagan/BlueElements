@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -37,11 +40,15 @@ using System.Windows.Forms;
 using static BlueBasics.FileOperations;
 
 namespace BlueControls.Controls {
+
     [Designer(typeof(BasicDesigner))]
     public partial class FlexiControlForCell : FlexiControl, IContextMenu {
 
         #region Constructor
-        public FlexiControlForCell() : this(null, -1, enÜberschriftAnordnung.Über_dem_Feld) { }
+
+        public FlexiControlForCell() : this(null, -1, enÜberschriftAnordnung.Über_dem_Feld) {
+        }
+
         public FlexiControlForCell(Database database, int columnKey, enÜberschriftAnordnung captionPosition) : base() {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
@@ -52,17 +59,22 @@ namespace BlueControls.Controls {
             Database = database;
             ColumnKey = columnKey;
         }
-        #endregion
+
+        #endregion Constructor
 
         // Für automatisches Datenbank-Management
         private int _ColKey = -1;
+
         private int _RowKey = -1;
         private Database _Database = null;
         private string _ColumnName = string.Empty;
         private ColumnItem _tmpColumn = null;
         private RowItem _tmpRow = null;
+
         public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
+
         public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
+
         [Description("Dieses Feld kann für den Forms-Editor verwendet werden. Falls ein Key und ein Name befüllt sind, ist der Name führend.")]
         [DefaultValue("")]
         public string ColumnName {
@@ -75,6 +87,7 @@ namespace BlueControls.Controls {
                 SetValueFromCell();
             }
         }
+
         public int RowKey {
             get => _RowKey;
             set {
@@ -86,6 +99,7 @@ namespace BlueControls.Controls {
                 CheckEnabledState();
             }
         }
+
         [Description("Falls ein Key und ein Name befüllt sind, ist der Name führend.")]
         public int ColumnKey {
             //get {
@@ -100,6 +114,7 @@ namespace BlueControls.Controls {
                 SetValueFromCell();
             }
         }
+
         public Database Database {
             get => _Database;
             set {
@@ -136,13 +151,16 @@ namespace BlueControls.Controls {
                 CheckEnabledState();
             }
         }
+
         private void _Database_Disposing(object sender, System.EventArgs e) => Database = null;
+
         private void Row_RowRemoving(object sender, RowEventArgs e) {
             if (e.Row.Key == _RowKey) {
                 _RowKey = -1;
                 GetTmpVariables();
             }
         }
+
         private void _Database_Loaded(object sender, LoadedEventArgs e) {
             if (InvokeRequired) {
                 Invoke(new Action(() => _Database_Loaded(sender, e)));
@@ -151,6 +169,7 @@ namespace BlueControls.Controls {
             UpdateColumnData();
             SetValueFromCell();
         }
+
         private void GetTmpVariables() {
             if (_Database != null) {
                 _tmpColumn = !string.IsNullOrEmpty(_ColumnName)
@@ -162,6 +181,7 @@ namespace BlueControls.Controls {
                 _tmpRow = null;
             }
         }
+
         private void UpdateColumnData() {
             if (_tmpColumn == null) {
                 if (string.IsNullOrEmpty(_ColumnName)) {
@@ -184,6 +204,7 @@ namespace BlueControls.Controls {
                 }
             }
         }
+
         private void Database_RowChecked(object sender, RowCheckedEventArgs e) {
             if (e.Row != _tmpRow) { return; }
             var NewT = string.Empty;
@@ -196,6 +217,7 @@ namespace BlueControls.Controls {
             }
             InfoText = NewT;
         }
+
         private void Database_CellValueChanged(object sender, CellEventArgs e) {
             if (e.Row != _tmpRow) { return; }
             if (e.Column == _tmpColumn) {
@@ -205,6 +227,7 @@ namespace BlueControls.Controls {
                 CheckEnabledState();
             }
         }
+
         private void SetValueFromCell() {
             if (_tmpColumn == null || _tmpRow == null) {
                 ValueSet(string.Empty, true, true);
@@ -230,12 +253,15 @@ namespace BlueControls.Controls {
                     //    Develop.DebugPrint(enFehlerArt.Warnung, "Werte ungleich: " + Value + " - " + tmp2.JoinWithCr());
                     //}
                     break;
+
                 default:
                     ValueSet(_tmpRow.CellGetString(_tmpColumn), true, true);
                     break;
             }
         }
+
         private void Database_ConnectedControlsStopAllWorking(object sender, System.EventArgs e) => FillCellNow();
+
         private void Column_ItemInternalChanged(object sender, ListEventArgs e) {
             if ((ColumnItem)e.Item == _tmpColumn) {
                 UpdateColumnData();
@@ -243,6 +269,7 @@ namespace BlueControls.Controls {
                 OnNeedRefresh();
             }
         }
+
         internal void CheckEnabledState() {
             if (Parent == null || !Parent.Enabled || _tmpColumn == null || _tmpRow == null) {
                 DisabledReason = "Bezug zur Zelle verloren.";
@@ -250,6 +277,7 @@ namespace BlueControls.Controls {
             }
             DisabledReason = CellCollection.ErrorReason(_tmpColumn, _tmpRow, enErrorReason.EditNormaly); // Rechteverwaltung einfliesen lassen.
         }
+
         private void FillCellNow() {
             if (_IsFilling) { return; }
             if (!Enabled) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.
@@ -266,6 +294,7 @@ namespace BlueControls.Controls {
                     }
                     NewValue = tmp2.JoinWithCr();
                     break;
+
                 default:
                     NewValue = Value;
                     break;
@@ -275,13 +304,15 @@ namespace BlueControls.Controls {
             _tmpRow.CellSet(_tmpColumn, NewValue);
             if (OldVal != _tmpRow.CellGetString(_tmpColumn)) { _tmpRow.DoAutomatic(false, false, 1, "value changed"); }
         }
+
         private void textBox_NeedDatabaseOfAdditinalSpecialChars(object sender, MultiUserFileGiveBackEventArgs e) => e.File = _Database;
+
         protected override void OnControlAdded(ControlEventArgs e) {
             base.OnControlAdded(e);
             if (e.Control is Caption) { return; } // z.B. Info Caption
             var column1 = _tmpColumn;
             if (column1 == null) {
-                //            Develop.DebugPrint("Column nicht gefunden"); 
+                //            Develop.DebugPrint("Column nicht gefunden");
                 // Bei Steuerelementen, die manuell hinzugefügt werden
                 return;
             }
@@ -309,28 +340,33 @@ namespace BlueControls.Controls {
                     }
                     comboBox.GotFocus += GotFocus_ComboBox;
                     break;
+
                 case EasyPic easyPic:
                     easyPic.ConnectedDatabase += EasyPicConnectedDatabase;
                     easyPic.ImageChanged += EasyPicImageChanged;
                     break;
+
                 case TextBox textBox:
                     StyleTextBox(textBox, column1.AllowedChars, column1.SpellCheckingEnabled);
                     textBox.NeedDatabaseOfAdditinalSpecialChars += textBox_NeedDatabaseOfAdditinalSpecialChars;
                     textBox.GotFocus += GotFocus_TextBox;
                     textBox.TextChanged += TextBox_TextChanged;
                     break;
+
                 case ListBox listBox:
                     StyleListBox(listBox, column1);
                     listBox.ContextMenuInit += ListBox_ContextMenuInit;
                     listBox.ContextMenuItemClicked += ListBox_ContextMenuItemClicked;
                     listBox.AddClicked += ListBox_AddClicked;
                     break;
+
                 case SwapListBox swapListBox:
                     StyleSwapListBox(swapListBox, column1);
                     //swapListBox.ContextMenuInit += ListBox_ContextMenuInit;
                     //swapListBox.ContextMenuItemClicked += ListBox_ContextMenuItemClicked;
                     swapListBox.AddClicked += ListBox_AddClicked;
                     break;
+
                 case Button _:
                     break;
                 //case Caption _:
@@ -340,6 +376,7 @@ namespace BlueControls.Controls {
                     break;
             }
         }
+
         private void TextBox_TextChanged(object sender, System.EventArgs e) {
             while (Marker.IsBusy) {
                 if (!Marker.CancellationPending) { Marker.CancelAsync(); }
@@ -349,42 +386,52 @@ namespace BlueControls.Controls {
             if (_tmpColumn.Format != enDataFormat.RelationText) { return; }
             Marker.RunWorkerAsync();
         }
+
         protected override void OnControlRemoved(ControlEventArgs e) {
             base.OnControlRemoved(e);
             switch (e.Control) {
                 case ComboBox comboBox:
                     comboBox.GotFocus -= GotFocus_ComboBox;
                     break;
+
                 case EasyPic easyPic:
                     easyPic.ConnectedDatabase -= EasyPicConnectedDatabase;
                     easyPic.ImageChanged -= EasyPicImageChanged;
                     break;
+
                 case TextBox textBox:
                     textBox.NeedDatabaseOfAdditinalSpecialChars -= textBox_NeedDatabaseOfAdditinalSpecialChars;
                     textBox.GotFocus -= GotFocus_TextBox;
                     textBox.TextChanged -= TextBox_TextChanged;
                     break;
+
                 case ListBox listBox:
                     listBox.ContextMenuInit -= ListBox_ContextMenuInit;
                     listBox.ContextMenuItemClicked -= ListBox_ContextMenuItemClicked;
                     listBox.AddClicked -= ListBox_AddClicked;
                     break;
+
                 case SwapListBox swaplistBox:
                     //swaplistBox.ContextMenuInit -= ListBox_ContextMenuInit;
                     //swaplistBox.ContextMenuItemClicked -= ListBox_ContextMenuItemClicked;
                     swaplistBox.AddClicked -= ListBox_AddClicked;
                     break;
+
                 case Caption _:
                     break;
+
                 case Button _:
                     break;
+
                 case Line _:
                     break;
+
                 default:
                     Develop.DebugPrint("Control unbekannt");
                     break;
             }
         }
+
         private void EasyPicImageChanged(object sender, System.EventArgs e) {
             foreach (Control ThisControl in Controls) {
                 if (ThisControl is EasyPic ep) {
@@ -397,9 +444,11 @@ namespace BlueControls.Controls {
                             ep.ChangeSource(fil, enSorceType.LoadedFromDisk, false);
                             ValueSet(fil, false, true);
                             return;
+
                         case enSorceType.Nichts:
                             ValueSet(string.Empty, false, true);
                             return;
+
                         case enSorceType.LoadedFromDisk:
                             if (ep.SorceName != _tmpColumn.SimplyFile(ep.SorceName)) {
                                 // DEr name kann nur vereifacht werden, wenn es bereits im richtigen Verzeichniss ist. Name wird vereinfacht (ungleich) - bereits im richtigen verzeichniss!
@@ -415,6 +464,7 @@ namespace BlueControls.Controls {
                             ep.ChangeSource(fil2, enSorceType.LoadedFromDisk, false);
                             ValueSet(fil2, false, true);
                             return;
+
                         case enSorceType.EntryWithoutPic:
                             ValueSet(ep.SorceName, false, true);
                             // Entweder ein Dummy eintrag (Bildzeichen-Liste, wo Haupt das Bild sein sollte, aber eben nur bei den 3 Seitensichten eines da ist
@@ -425,21 +475,26 @@ namespace BlueControls.Controls {
             }
             Develop.DebugPrint_NichtImplementiert();
         }
+
         private void EasyPicConnectedDatabase(object sender, MultiUserFileGiveBackEventArgs e) => e.File = _Database;
+
         private void GotFocus_ComboBox(object sender, System.EventArgs e) {
             if (_tmpColumn == null || _tmpRow == null) { return; }
             if (!string.IsNullOrEmpty(((ComboBox)sender).Text)) { return; }
             ValueSet(CellCollection.AutomaticInitalValue(_tmpColumn, _tmpRow), true, true);
         }
+
         private void GotFocus_TextBox(object sender, System.EventArgs e) {
             if (_tmpColumn == null || _tmpRow == null) { return; }
             if (!string.IsNullOrEmpty(((TextBox)sender).Text)) { return; }
             ValueSet(CellCollection.AutomaticInitalValue(_tmpColumn, _tmpRow), true, true);
         }
+
         protected override void OnValueChanged() {
             base.OnValueChanged();
             FillCellNow();
         }
+
         private void ListBox_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
             switch (e.ClickedComand.ToLower()) {
                 case "dateiöffnen":
@@ -455,6 +510,7 @@ namespace BlueControls.Controls {
                         }
                     }
                     break;
+
                 case "bild öffnen":
                     if (e.HotItem is BitmapListItem bi) {
                         if (bi.ImageLoaded()) {
@@ -472,6 +528,7 @@ namespace BlueControls.Controls {
                     break;
             }
         }
+
         private void ListBox_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
             if (e.HotItem is TextListItem t) {
                 if (FileExists(t.Internal)) {
@@ -498,7 +555,6 @@ namespace BlueControls.Controls {
                     // korrektheit der Zelle bereits geprüft
                     var l = Table.FileSystem(_tmpColumn);
 
-
                     if (l == null) { return; }
 
                     foreach (var thisF in l) {
@@ -520,9 +576,6 @@ namespace BlueControls.Controls {
                     return;
             }
         }
-
-
-
 
         private void Marker_DoWork(object sender, DoWorkEventArgs e) {
             TextBox TXB = null;
@@ -568,6 +621,7 @@ namespace BlueControls.Controls {
                 }
             } while (!Ok);
         }
+
         private void Marker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
             //Ja, Multithreading ist kompliziert...
             if (Marker.CancellationPending) { return; }
@@ -578,40 +632,48 @@ namespace BlueControls.Controls {
                     TXB.Unmark(enMarkState.MyOwn);
                     TXB.Invalidate();
                     break;
+
                 case "Unmark2":
                     TXB.Unmark(enMarkState.Other);
                     TXB.Invalidate();
                     break;
+
                 case "Mark1":
                     TXB.Mark(enMarkState.MyOwn, (int)x[2], (int)x[3]);
                     TXB.Invalidate();
                     break;
+
                 case "Mark2":
                     TXB.Mark(enMarkState.Other, (int)x[2], (int)x[3]);
                     TXB.Invalidate();
                     break;
+
                 default:
                     Develop.DebugPrint((string)x[1]);
                     break;
             }
         }
+
         private void _Database_RowKeyChanged(object sender, KeyChangedEventArgs e) {
             if (e.KeyOld != _RowKey) { return; }
             _RowKey = e.KeyNew;
             GetTmpVariables();
             SetValueFromCell();
         }
+
         private void _Database_ColumnKeyChanged(object sender, KeyChangedEventArgs e) {
             if (e.KeyOld != _ColKey) { return; }
             _ColKey = e.KeyNew;
             GetTmpVariables();
             SetValueFromCell();
         }
+
         protected override void RemoveAll() {
             FillCellNow();
             base.RemoveAll();
             //base.OnRemovingAll();
         }
+
         public void GetContextMenuItems(MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
             GetTmpVariables();
             if (_tmpColumn != null && _tmpColumn.Database.IsAdministrator()) {
@@ -632,6 +694,7 @@ namespace BlueControls.Controls {
             }
             HotItem = _tmpColumn;
         }
+
         public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
             GetTmpVariables();
             //var CellKey = e.Tags.TagGet("CellKey");
@@ -641,9 +704,11 @@ namespace BlueControls.Controls {
                 case "spalteneigenschaftenbearbeiten":
                     tabAdministration.OpenColumnEditor(_tmpColumn, null);
                     return true;
+
                 case "vorherigeninhaltwiederherstellen":
                     Table.DoUndo(_tmpColumn, _tmpRow);
                     return true;
+
                 default:
                     if (Parent is Formula f) {
                         return f.ContextMenuItemClickedInternalProcessig(sender, e);
@@ -652,7 +717,9 @@ namespace BlueControls.Controls {
             }
             return false;
         }
+
         public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
+
         public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
     }
 }

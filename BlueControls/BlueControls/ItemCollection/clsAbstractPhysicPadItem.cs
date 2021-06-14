@@ -1,29 +1,34 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueControls.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 
 namespace BlueControls.ItemCollection {
+
     public abstract class clsAbstractPhysicPadItem : BasicPadItem {
         public readonly List<PointM> Edges = new();
+
         protected clsAbstractPhysicPadItem(ItemCollectionPad parent, string internalname) : base(parent, internalname) {
             MovablePoint.Add(new PointM(5, 0));
             MovablePoint.Add(new PointM(10, 10));
@@ -31,6 +36,7 @@ namespace BlueControls.ItemCollection {
             PointsForSuccesfullyMove.AddRange(MovablePoint);
             Edges.Clear();
         }
+
         protected override RectangleM CalculateUsedArea() {
             var minx = decimal.MaxValue;
             var miny = decimal.MaxValue;
@@ -44,6 +50,7 @@ namespace BlueControls.ItemCollection {
             }
             return new RectangleM(minx, miny, maxx - minx, maxy - miny);
         }
+
         protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, decimal cZoom, decimal shiftX, decimal shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
             if (MovablePoint.Count < 1) { return; }
             var lastP = MovablePoint[MovablePoint.Count - 1];
@@ -52,7 +59,10 @@ namespace BlueControls.ItemCollection {
                 lastP = thisP;
             }
         }
-        protected override void ParseFinished() { }
+
+        protected override void ParseFinished() {
+        }
+
         public void BuildEdges() {
             Edges.Clear();
             for (var i = 0; i < MovablePoint.Count; i++) {
@@ -63,6 +73,7 @@ namespace BlueControls.ItemCollection {
                 }
             }
         }
+
         public PointM Center {
             get {
                 decimal totalX = 0;
@@ -74,9 +85,11 @@ namespace BlueControls.ItemCollection {
                 return new PointM(totalX / MovablePoint.Count, totalY / MovablePoint.Count);
             }
         }
+
         public void Move(PointM v) => Move(v.X, v.Y);
 
         #region Polygon Union
+
         //   http://csharphelper.com/blog/2016/01/find-a-polygon-union-in-c/
         // Return the union of the two polygons.
         public List<PointF> FindPolygonUnion(List<PointF>[] polygons) {
@@ -165,6 +178,7 @@ namespace BlueControls.ItemCollection {
             }
             return union;
         }
+
         // Find the point of intersection between
         // the lines p1 --> p2 and p3 --> p4.
         private void FindIntersection(PointF p1, PointF p2, PointF p3, PointF p4,
@@ -209,8 +223,10 @@ namespace BlueControls.ItemCollection {
             close_p1 = new PointF(p1.X + (dx12 * t1), p1.Y + (dy12 * t1));
             close_p2 = new PointF(p3.X + (dx34 * t2), p3.Y + (dy34 * t2));
         }
+
         // Return true if the polygon is oriented clockwise.
         public bool PolygonIsOrientedClockwise(List<PointF> points) => SignedPolygonArea(points) < 0;
+
         private float SignedPolygonArea(List<PointF> points) {
             // Add the first point to the end.
             var num_points = points.Count;
@@ -227,12 +243,14 @@ namespace BlueControls.ItemCollection {
             // Return the result.
             return area;
         }
-        #endregion
 
+        #endregion Polygon Union
 
         #region Collission Calculation
+
         // https://www.codeproject.com/Articles/15573/2D-Polygon-Collision-Detection
         public strPolygonCollisionResult ColidesWith(clsAbstractPhysicPadItem polygonB, PointM velocity) => PolygonCollision(this, polygonB, velocity);
+
         // Check if polygon A is going to collide with polygon B for the given velocity
         public static strPolygonCollisionResult PolygonCollision(clsAbstractPhysicPadItem polygonA, clsAbstractPhysicPadItem polygonB, PointM velocity) {
             strPolygonCollisionResult result = new() {
@@ -299,6 +317,7 @@ namespace BlueControls.ItemCollection {
             }
 
             #region Example
+
             //var playerTranslation = velocity;
             //foreach (var polygon in polygons)
             //{
@@ -311,13 +330,16 @@ namespace BlueControls.ItemCollection {
             //    }
             //}
             //player.Move(playerTranslation);
-            #endregion
+
+            #endregion Example
 
             return result;
         }
+
         // Calculate the distance between [minA, maxA] and [minB, maxB]
         // The distance will be negative if the intervals overlap
         public static decimal IntervalDistance(decimal minA, decimal maxA, decimal minB, decimal maxB) => minA < minB ? minB - maxA : minA - maxB;
+
         // Calculate the projection of a polygon on an axis and returns it as a [min, max] interval
         public static void ProjectPolygon(PointM axis, clsAbstractPhysicPadItem polygon, ref decimal min, ref decimal max) {
             // To project a point on an axis use the dot product
@@ -335,10 +357,11 @@ namespace BlueControls.ItemCollection {
                 }
             }
         }
-        #endregion
 
+        #endregion Collission Calculation
 
         #region Schwerpunkt
+
         //   http://csharphelper.com/blog/2014/07/find-the-centroid-of-a-polygon-in-c/
         // Find the polygon's centroid.
         public PointM FindCentroid() {
@@ -370,10 +393,11 @@ namespace BlueControls.ItemCollection {
             }
             return new PointM(X, Y);
         }
-        #endregion
 
+        #endregion Schwerpunkt
 
         #region Flächenberechnung
+
         //http://csharphelper.com/blog/2014/07/calculate-the-area-of-a-polygon-in-c/
         // Return the polygon's area in "square units."
         // The value will be negative if the polygon is
@@ -392,16 +416,18 @@ namespace BlueControls.ItemCollection {
             // Return the result.
             return area;
         }
+
         // Return the polygon's area in "square units."
         public decimal PolygonArea() =>
             // Return the absolute value of the signed area.
             // The signed area is negative if the polyogn is
             // oriented clockwise.
             Math.Abs(SignedPolygonArea());
-        #endregion
 
+        #endregion Flächenberechnung
 
         #region Point in Polygon
+
         //http://csharphelper.com/blog/2014/07/determine-whether-a-point-is-inside-a-polygon-in-c/
         // Alternative:  https://stackoverflow.com/questions/4243042/c-sharp-point-in-polygon
         // Return True if the point is in the polygon.
@@ -425,6 +451,7 @@ namespace BlueControls.ItemCollection {
             //return (Math.Abs(total_angle) > 0.000001);
             return Math.Abs(total_angle) > 1;
         }
+
         // Return the angle ABC.
         // Return a value between PI and -PI.
         // Note that the value is the opposite of what you might
@@ -437,6 +464,7 @@ namespace BlueControls.ItemCollection {
             // Calculate the angle.
             return Math.Atan2((double)cross_product, (double)dot_product);
         }
+
         // Return the dot product AB · BC.
         // Note that AB · BC = |AB| * |BC| * Cos(theta).
         private static decimal DotProduct(decimal Ax, decimal Ay, decimal Bx, decimal By, decimal Cx, decimal Cy) {
@@ -448,10 +476,11 @@ namespace BlueControls.ItemCollection {
             // Calculate the dot product.
             return (BAx * BCx) + (BAy * BCy);
         }
-        #endregion
 
+        #endregion Point in Polygon
 
         #region IsConvex
+
         //http://csharphelper.com/blog/2014/07/determine-whether-a-polygon-is-convex-in-c/
         // Return True if the polygon is convex.
         public bool PolygonIsConvex() {
@@ -485,6 +514,7 @@ namespace BlueControls.ItemCollection {
             // If we got this far, the polygon is convex.
             return true;
         }
+
         // Return the cross product AB x BC.
         // The cross product is a vector perpendicular to AB
         // and BC having length |AB| * |BC| * Sin(theta) and
@@ -501,7 +531,7 @@ namespace BlueControls.ItemCollection {
             // Calculate the Z coordinate of the cross product.
             return (BAx * BCy) - (BAy * BCx);
         }
-        #endregion
 
+        #endregion IsConvex
     }
 }

@@ -1,4 +1,5 @@
 #region BlueElements - a collection of useful tools, database and controls
+
 // Authors:
 // Christian Peter
 //
@@ -15,7 +16,9 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-#endregion
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
@@ -23,25 +26,36 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 
 namespace BlueBasics {
+
     public static partial class modFernsteuerung {
+
         [DllImport("user32", EntryPoint = "GetClassNameA", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         private static extern int GetClassName(IntPtr hWnd, string lpClassName, int nMaxCount);
+
         [DllImport("user32", EntryPoint = "GetWindowTextA", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         private static extern int GetWindowText(IntPtr hWnd, string lpstring, int cch);
+
         [DllImport("user32", EntryPoint = "GetWindowTextLengthA", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         private static extern int GetWindowTextLength(IntPtr hwnd);
+
         [DllImport("user32", EntryPoint = "GetWindowThreadProcessId", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         private static extern int GetWindowThreadProcessId(IntPtr hWnd, ref int lpdwProcessId);
+
         [DllImport("user32", EntryPoint = "GetParent", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         private static extern IntPtr GetParent(IntPtr hWnd);
+
         [DllImport("user32", EntryPoint = "GetTopWindow", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         private static extern IntPtr GetTopWindow(IntPtr hWnd);
+
         [DllImport("user32", EntryPoint = "GetWindowModuleFileNameA", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         private static extern int GetWindowModuleFileName(IntPtr hWnd, string pszFileName, int cchFileNameMax);
+
         [DllImport("user32", EntryPoint = "ShowWindow", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         public static extern int ShowWindow(IntPtr hWnd, int nCmdShow);
+
         [DllImport("user32", EntryPoint = "GetWindow", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         private static extern IntPtr GetWindow(IntPtr hwnd, int wCmd);
+
         /// <summary>
         /// Setzt ein Fenster an eine andere Position
         /// </summary>
@@ -56,8 +70,10 @@ namespace BlueBasics {
         /// <remarks></remarks>
         [DllImport("user32", EntryPoint = "SetWindowPos", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         private static extern int SetWindowPos(IntPtr hWnd, int hWndInsertAfter, int x, int y, int cx, int cy, int wFlags);
+
         [DllImport("user32", EntryPoint = "GetWindowRect", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         private static extern int GetWindowRect(IntPtr hWnd, ref Rectangle lpRect);
+
         /// <summary>
         ///  Liest den Titel der Anwendung aus.
         /// </summary>
@@ -70,6 +86,7 @@ namespace BlueBasics {
             _ = GetWindowText(handle, buffer, l);
             return buffer.Substring(0, buffer.Length);
         }
+
         /// <summary>
         /// Liest den KlassenNames aus.
         /// </summary>
@@ -82,6 +99,7 @@ namespace BlueBasics {
             // If String.IsNullOrEmpty(buffer) Then Return String.Empty
             return buffer.Substring(0, l);
         }
+
         /// <summary>
         /// Liest den vollständigen Pfad und den Exe-Dateinamen aus.
         /// </summary>
@@ -97,6 +115,7 @@ namespace BlueBasics {
             }
             return string.Empty;
         }
+
         /// <summary>
         /// Liest Informationen des Zielfensters aus
         /// </summary>
@@ -116,6 +135,7 @@ namespace BlueBasics {
             wDescr.ExeName = WinExeName(wDescr.MainWindowHandle);
             wDescr.prid = prid;
         }
+
         /// <summary>
         /// Diese Funktion Sucht alle offenen Fenster.
         /// </summary>
@@ -157,7 +177,9 @@ namespace BlueBasics {
         }
 
         public static void FensterMinimieren(IntPtr handle) => ShowWindow(handle, (int)enSW.ShowMinimized);
+
         public static void FensterMaximieren(IntPtr handle) => ShowWindow(handle, (int)enSW.ShowMaximized);
+
         public static void FensterRestore(IntPtr handle) => ShowWindow(handle, (int)enSW.Restore);
     }
 }

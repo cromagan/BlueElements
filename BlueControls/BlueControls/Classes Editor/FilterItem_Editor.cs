@@ -7,11 +7,15 @@ using BlueDatabase.Enums;
 using System.Drawing;
 
 namespace BlueControls.Classes_Editor {
+
     internal sealed partial class FilterItem_Editor : AbstractClassEditor<FilterItem> //System.Windows.Forms.UserControl // :
     {
         public FilterItem_Editor() : base() => InitializeComponent();
+
         private AutoFilter autofilter;
+
         protected override void PrepaireFormula() => Col.Item.AddRange(Item.Database.Column, false, false, true);
+
         protected override void EnabledAndFillFormula() {
             Enabled = true;
             if (Item?.Column == null) {
@@ -20,6 +24,7 @@ namespace BlueControls.Classes_Editor {
             }
             Col.Text = Item.Column.Name;
         }
+
         protected override void DisableAndClearFormula() {
             Enabled = false;
             Col.Text = string.Empty;

@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -24,8 +27,10 @@ using System.Collections.Generic;
 using System.Drawing;
 
 namespace BlueControls.Forms {
+
     public partial class MessageBox : Form {
         private Button Pressed = null;
+
         //private MessageBox()
         //{
         //    InitializeComponent();
@@ -54,6 +59,7 @@ namespace BlueControls.Forms {
                 StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             }
         }
+
         public List<Button> Generate_Buttons(string[] Names) {
             var MyX = Width - Skin.Padding - BorderWidth;
             ExtText erT = new(enDesign.Button, enStates.Standard);
@@ -68,7 +74,6 @@ namespace BlueControls.Forms {
                     };
                     var W = 2;
                     switch (B.Text.ToLower()) {
-
                         case "ja":
 
                         case "ok":
@@ -103,6 +108,7 @@ namespace BlueControls.Forms {
                             B.ImageCode = "Ordner|16";
                             W = 4;
                             break;
+
                         default:
                             B.ImageCode = string.Empty;
                             break;
@@ -119,13 +125,18 @@ namespace BlueControls.Forms {
             }
             return Buts;
         }
+
         private void ThisButton_Click(object sender, System.EventArgs e) {
             Pressed = (Button)sender;
             Close();
         }
+
         public static void Show(string TXT) => Show(TXT, enImageCode.None, true, "OK");
+
         public static void Show(string TXT, enImageCode Pic, string Buttons) => Show(TXT, Pic, true, Buttons);
+
         public static int Show(string TXT, enImageCode Pic, params string[] Buttons) => Show(TXT, Pic, true, Buttons);
+
         public static int Show(string TXT, enImageCode Pic, bool Dialog, params string[] Buttons) {
             MessageBox MB = new(TXT, Pic, Buttons);
             if (Dialog) {

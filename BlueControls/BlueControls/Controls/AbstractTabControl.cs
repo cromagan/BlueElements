@@ -1,21 +1,24 @@
 #region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Designer_Support;
@@ -32,15 +35,21 @@ using System.Drawing.Design;
 using System.Runtime.InteropServices;
 
 namespace BlueControls.Controls {
+
     [ToolboxBitmap(typeof(System.Windows.Forms.TabControl))]
     [Designer(typeof(TabControlDesigner))]
     public abstract class AbstractTabControl : System.Windows.Forms.TabControl, IContextMenu, IUseMyBackColor, ISupportsBeginnEdit {
+
         public event EventHandler<TabControlEventArgs> SelectedIndexChanging;
+
         private TabPage _HotTab;
+
         public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
+
         public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
 
         #region Constructor
+
         public AbstractTabControl() : base() {
             //This call is required by the Windows Form Designer.
             //Add any initialization after the InitializeComponent() call
@@ -54,15 +63,17 @@ namespace BlueControls.Controls {
             SetStyle(System.Windows.Forms.ControlStyles.AllPaintingInWmPaint, true);
             SetStyle(System.Windows.Forms.ControlStyles.UserPaint, true);
         }
-        #endregion
 
+        #endregion Constructor
 
-        #region  Interop for SelectedIndexChanging event 
+        #region Interop for SelectedIndexChanging event
+
         [StructLayout(LayoutKind.Sequential)]
         private struct NMHDR {
             private readonly int HWND;
             private readonly int idFrom;
             public readonly int code;
+
             public override string ToString() => string.Format("Hwnd: {0}, ControlID: {1}, Code: {2}", HWND, idFrom, code);
         }
 
@@ -71,12 +82,14 @@ namespace BlueControls.Controls {
         // Private Const WM_USER As Int32 = &H400&
         //   Private Const WM_NOTIFY As Int32 = &H4E&
         //  Private Const WM_REFLECT As Int32 = WM_USER + &H1C00&
-        #endregion
 
+        #endregion Interop for SelectedIndexChanging event
 
-        #region  AutoScale deaktivieren 
+        #region AutoScale deaktivieren
+
         // https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
         private bool _IndexChanged = false;
+
         public void PerformAutoScale() {
             // NIX TUN!!!!
         }
@@ -84,27 +97,33 @@ namespace BlueControls.Controls {
         public void Scale() {
             // NIX TUN!!!!
         }
+
         protected override void ScaleControl(SizeF factor, System.Windows.Forms.BoundsSpecified specified) {
             factor = new SizeF(1, 1);
             base.ScaleControl(factor, specified);
         }
+
         protected override bool ScaleChildren => false; //MyBase.ScaleChildren
+
         [DefaultValue(false)]
         public override bool AutoSize {
             get => false; //MyBase.AutoSize
             set => base.AutoSize = false;
         }
+
         protected override Rectangle GetScaledBounds(Rectangle tbounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified) => tbounds; //MyBase.GetScaledBounds(bounds, factor, specified)
-        #endregion
 
+        #endregion AutoScale deaktivieren
 
-        #region  Properties 
+        #region Properties
+
         [Editor(typeof(TabPageCollectionEditor), typeof(UITypeEditor))]
         public new TabPageCollection TabPages => base.TabPages;
-        #endregion
 
+        #endregion Properties
 
-        #region  SelectedIndexChanging event Implementation 
+        #region SelectedIndexChanging event Implementation
+
         protected override void WndProc(ref System.Windows.Forms.Message m) {
             try {
                 if (m.Msg == (int)enWndProc.WM_REFLECT + (int)enWndProc.WM_NOTIFY) {
@@ -127,23 +146,27 @@ namespace BlueControls.Controls {
         }
 
         private void OnSelectedIndexChanging(TabControlEventArgs e) => SelectedIndexChanging?.Invoke(this, e);
-        #endregion
+
+        #endregion SelectedIndexChanging event Implementation
 
         protected override void OnMouseLeave(System.EventArgs e) {
             base.OnMouseLeave(e);
             _HotTab = null;
         }
+
         protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
             if (!HotTrack) { HotTrack = true; }
             base.OnMouseMove(e);
             _HotTab = (TabPage)TestTab(new Point(e.X, e.Y));
         }
+
         protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseUp(e);
             if (e.Button == System.Windows.Forms.MouseButtons.Right) { FloatingInputBoxListBoxStyle.ContextMenuShow(this, e); }
         }
 
-        #region  Custom Methods 
+        #region Custom Methods
+
         public void InsertTabPage(System.Windows.Forms.TabPage tabpage, int index) {
             if (index < 0 || index > TabCount) {
                 throw new ArgumentException("Index out of Range.");
@@ -175,12 +198,14 @@ namespace BlueControls.Controls {
             }
             return null;
         }
-        #endregion
+
+        #endregion Custom Methods
 
         protected override void OnPaintBackground(System.Windows.Forms.PaintEventArgs pevent) {
             // do not allow the background to be painted
             // Um flimmern zu vermeiden!
         }
+
         protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) {
             if (BeginnEditCounter > 0) {
                 e.Graphics.Clear(Color.LightBlue);
@@ -245,7 +270,9 @@ namespace BlueControls.Controls {
         }
 
         public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) => false;
+
         public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
+
         protected override void OnSelectedIndexChanged(System.EventArgs e) {
             if (_IndexChanged) { return; }
             _IndexChanged = true;
@@ -267,11 +294,13 @@ namespace BlueControls.Controls {
         public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
         #region ISupportsEdit
+
         [DefaultValue(0)]
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public int BeginnEditCounter { get; set; } = 0;
+
         public new void SuspendLayout() {
             BeginnEdit();
             base.SuspendLayout();
@@ -288,6 +317,7 @@ namespace BlueControls.Controls {
         }
 
         public void BeginnEdit() => BeginnEdit(1);
+
         public void BeginnEdit(int count) {
             if (DesignMode) { return; }
             foreach (var ThisControl in Controls) {
@@ -305,13 +335,14 @@ namespace BlueControls.Controls {
                 if (ThisControl is ISupportsBeginnEdit e) { e.EndEdit(); }
             }
         }
+
         protected override void OnControlAdded(System.Windows.Forms.ControlEventArgs e) {
             if (e.Control is TabPage tb) { tb.SetBackColor(); }
             if (DesignMode) { return; }
             if (e.Control is ISupportsBeginnEdit nc) { nc.BeginnEdit(BeginnEditCounter); }
             base.OnControlAdded(e);
         }
-        #endregion
 
+        #endregion ISupportsEdit
     }
 }

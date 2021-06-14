@@ -1,4 +1,5 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
+
 // Authors:
 // Christian Peter
 //
@@ -15,15 +16,20 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-#endregion
+
+#endregion BlueElements - a collection of useful tools, database and controls
 
 namespace BlueBasics.Interfaces {
+
     public interface IVersionable {
         public string SollVersion { get; }
         public string Version { get; set; }
     }
+
     public static class IVersionableExtensions {
+
         public static bool NeedUpdate(this IVersionable i) => i.Version != i.SollVersion;
+
         public static void VersionIsNowCorrect(this IVersionable i) => i.Version = i.SollVersion;
     }
 }

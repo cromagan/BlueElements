@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.EventArgs;
@@ -28,9 +31,11 @@ using static BlueBasics.FileOperations;
 using static BlueBasics.modConverter;
 
 namespace BlueControls.Classes_Editor {
-    internal sealed partial class ExportDefinition_Editor : AbstractClassEditor<ExportDefinition> //  System.Windows.Forms.UserControl// 
+
+    internal sealed partial class ExportDefinition_Editor : AbstractClassEditor<ExportDefinition> //  System.Windows.Forms.UserControl//
     {
         public ExportDefinition_Editor() : base() => InitializeComponent();
+
         protected override void DisableAndClearFormula() {
             Enabled = false;
             ExportCSVFormat.Checked = false;
@@ -44,10 +49,10 @@ namespace BlueControls.Classes_Editor {
             lbxFilter.Item.Clear();
             lsbExportDateien.Item.Clear();
         }
+
         protected override void EnabledAndFillFormula() {
             Enabled = true;
             switch (Item.Typ) {
-
                 case enExportTyp.DatenbankCSVFormat:
                     ExportCSVFormat.Checked = true;
                     break;
@@ -64,6 +69,7 @@ namespace BlueControls.Classes_Editor {
                     ExportalsBild.Checked = true;
                     Item.Intervall = 0;
                     break;
+
                 default:
                     Develop.DebugPrint(Item.Typ);
                     return;
@@ -92,6 +98,7 @@ namespace BlueControls.Classes_Editor {
                 }
             }
         }
+
         protected override void PrepaireFormula() {
             cbxExportFormularID.Item.Clear();
             Forms.ExportDialog.AddLayoutsOff(cbxExportFormularID.Item, Item.Database, true);
@@ -109,8 +116,11 @@ namespace BlueControls.Classes_Editor {
                 ExportalsBild.Enabled = true;
             }
         }
+
         private void ExportVerzeichnis_TextChanged(object sender, System.EventArgs e) => UpdateExport(true);
+
         private void cbxExportFormularID_ItemClicked(object sender, BasicListItemEventArgs e) => UpdateExport(true);
+
         private void ExportDateien_RemoveClicked(object sender, ListOfBasicListItemEventArgs e) {
             foreach (var thisItem in e.Items) {
                 if (thisItem is BasicListItem ThisItemBasic) {
@@ -125,7 +135,9 @@ namespace BlueControls.Classes_Editor {
                 }
             }
         }
+
         private void ExportOriginalFormat_CheckedChanged(object sender, System.EventArgs e) => UpdateExport(true);
+
         private void UpdateExport(bool MustDeleteAllExportFiles) {
             if (ExportOriginalFormat.Checked) {
                 ExportIntervall.Enabled = true;
@@ -178,6 +190,7 @@ namespace BlueControls.Classes_Editor {
             Item.BereitsExportiert.AddRange(lsbExportDateien.Item.ToListOfString());
             OnChanged(Item);
         }
+
         //private void ExportFilter_AddClicked(object sender, System.EventArgs e)
         //{
         //    Develop.DebugPrint_NichtImplementiert();
@@ -191,11 +204,13 @@ namespace BlueControls.Classes_Editor {
         //}
         private void ExportDateien_ListOrItemChanged(object sender, System.EventArgs e) => UpdateExport(false);
 
-        #region  Filter 
+        #region Filter
+
         private void lbxFilter_AddClicked(object sender, System.EventArgs e) {
             var NewFilterItem = lbxFilter.Item.Add(new FilterItem(Item.Database, string.Empty));
             NewFilterItem.Checked = true;
         }
+
         private void lbxFilter_ItemCheckedChanged(object sender, System.EventArgs e) {
             if (lbxFilter.Item.Checked().Count != 1) {
                 filterItemEditor.Item = null;
@@ -207,8 +222,10 @@ namespace BlueControls.Classes_Editor {
             }
             filterItemEditor.Item = (FilterItem)((TextListItem)lbxFilter.Item.Checked()[0]).Tag;
         }
+
         private void lbxFilter_ListOrItemChanged(object sender, System.EventArgs e) => UpdateExport(false);
-        #endregion
+
+        #endregion Filter
 
         private void filterItemEditor_Changed(object sender, System.EventArgs e) {
             if (IsFilling) { return; }

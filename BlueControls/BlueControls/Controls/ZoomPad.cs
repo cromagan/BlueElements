@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueControls.Designer_Support;
 using System;
@@ -24,12 +27,15 @@ using System.Drawing;
 using System.Windows.Forms;
 
 namespace BlueControls.Controls {
+
     [Designer(typeof(BasicDesigner))]
     public partial class ZoomPad : GenericControl {
 
         #region Constructor
+
         public ZoomPad() : base(true, true) => InitializeComponent();
-        #endregion
+
+        #endregion Constructor
 
         public static readonly Pen PenGray = new(Color.FromArgb(40, 0, 0, 0));
         public static readonly Pen PenGrayLarge = new(Color.FromArgb(40, 0, 0, 0), 5);
@@ -38,40 +44,49 @@ namespace BlueControls.Controls {
         protected bool _Fitting = true;
         protected decimal _shiftX = -1;
         protected decimal _shiftY = -1;
+
         /// <summary>
         /// Die Koordinaten, an der Stelle der Mausknopf gedrückt wurde. Zoom und Slider wurden eingerechnet, dass die Koordinaten Massstabsunabhängis sind.
         /// </summary>
         public Point MouseDownPos_1_1;
+
         /// <summary>
         /// Die Koordinaten, an der die der Mauspfeil zuletzt war. Zoom und Slider wurden eingerechnet, dass die Koordinaten Massstabsunabhängis sind.
         /// </summary>
         public Point MousePos_1_1;
+
         protected override void OnMouseDown(MouseEventArgs e) {
             MousePos_1_1 = KoordinatesUnscaled(e);
             MouseDownPos_1_1 = KoordinatesUnscaled(e);
             base.OnMouseDown(e);
         }
+
         protected override void OnMouseUp(MouseEventArgs e) {
             MousePos_1_1 = KoordinatesUnscaled(e);
             base.OnMouseUp(e);
             MouseDownPos_1_1 = Point.Empty;
         }
+
         protected override void OnMouseMove(MouseEventArgs e) {
             MousePos_1_1 = KoordinatesUnscaled(e);
             base.OnMouseMove(e);
         }
+
         protected override void OnMouseLeave(System.EventArgs e) {
             MousePos_1_1 = Point.Empty;
             base.OnMouseLeave(e);
         }
+
         public void ZoomIn(MouseEventArgs e) {
             MouseEventArgs x = new(e.Button, e.Clicks, e.X, e.Y, 1);
             OnMouseWheel(x);
         }
+
         public void ZoomOut(MouseEventArgs e) {
             MouseEventArgs x = new(e.Button, e.Clicks, e.X, e.Y, -1);
             OnMouseWheel(x);
         }
+
         public void ZoomFit() {
             _Fitting = true;
             var mb = MaxBounds();
@@ -81,6 +96,7 @@ namespace BlueControls.Controls {
             ZoomOrShiftChanged();
             Invalidate();
         }
+
         public void Zoom100() {
             _Fitting = true;
             var mb = MaxBounds();
@@ -90,12 +106,15 @@ namespace BlueControls.Controls {
             ZoomOrShiftChanged();
             Invalidate();
         }
+
         public decimal ZoomCurrent() => _Zoom;
+
         public decimal ZoomFitValue(RectangleM MaxBounds, bool sliderShowing, Size sizeOfPaintArea) => MaxBounds == null || MaxBounds.Width < 0.01m || MaxBounds.Height < 0.01m
 ? 1m
 : sliderShowing
 ? Math.Min((sizeOfPaintArea.Width - SliderY.Width - 32) / MaxBounds.Width, (sizeOfPaintArea.Height - SliderX.Height - 32) / MaxBounds.Height)
 : Math.Min(sizeOfPaintArea.Width / MaxBounds.Width, sizeOfPaintArea.Height / MaxBounds.Height);
+
         /// <summary>
         /// Berechnet Maus Koordinaten des Steuerelements in in Koordinaten um, als ob auf dem unscalierten Inhalt direkt gewählt werden würde.
         /// Falls die Maus-Koordinaten ausserhalb der grenzen sind, wird nichts getrimmt.
@@ -103,11 +122,15 @@ namespace BlueControls.Controls {
         /// <remarks>
         /// </remarks>
         protected Point KoordinatesUnscaled(MouseEventArgs e) => new((int)Math.Round(((e.X + _shiftX) / _Zoom) - 0.5m, 0), (int)Math.Round(((e.Y + _shiftY) / _Zoom) - 0.5m, 0));
+
         protected virtual RectangleM MaxBounds() {
             Develop.DebugPrint_RoutineMussUeberschriebenWerden();
             return null;
         }
-        protected virtual void ZoomOrShiftChanged() { }
+
+        protected virtual void ZoomOrShiftChanged() {
+        }
+
         protected override void OnMouseWheel(MouseEventArgs e) {
             base.OnMouseWheel(e);
             _Fitting = false;
@@ -132,21 +155,26 @@ namespace BlueControls.Controls {
             //SliderX.Value = (m.X * _Zoom) - (Width / 2) - SliderY.Width
             //SliderY.Value = (m.Y * _Zoom) - (Height / 2) - SliderX.Height
         }
+
         protected override void OnSizeChanged(System.EventArgs e) {
             ZoomFit();
             base.OnSizeChanged(e);
         }
+
         private void SliderX_ValueChanged(object sender, System.EventArgs e) {
             _shiftX = (decimal)SliderX.Value;
             ZoomOrShiftChanged();
             Invalidate();
         }
+
         private void SliderY_ValueChanged(object sender, System.EventArgs e) {
             _shiftY = (decimal)SliderY.Value;
             ZoomOrShiftChanged();
             Invalidate();
         }
+
         internal PointF SliderValues(RectangleM bounds, decimal ZoomToUse, Point TopLeftPos) => new((float)((bounds.Left * ZoomToUse) - (TopLeftPos.X / 2m)), (float)((bounds.Top * ZoomToUse) - (TopLeftPos.Y / 2m)));
+
         private void ComputeSliders(RectangleM maxBounds) {
             if (maxBounds == null || maxBounds.Width == 0) { return; }
             var p = CenterPos(maxBounds, true, Size, _Zoom);
@@ -177,6 +205,7 @@ namespace BlueControls.Controls {
             }
             Invalidate();
         }
+
         public void SetZoom(decimal Zoom) {
             _Zoom = Zoom;
             SliderX.Minimum = 0;
@@ -187,6 +216,7 @@ namespace BlueControls.Controls {
             SliderY.Value = 0;
             ZoomOrShiftChanged();
         }
+
         /// <summary>
         /// Gibt den Versatz der Linken oben Ecke aller Objekte zurück, um mittig zu sein.
         /// </summary>
@@ -206,6 +236,7 @@ namespace BlueControls.Controls {
             }
             return new Point((int)w, (int)h);
         }
+
         public Rectangle AvailablePaintArea() {
             var wi = Size.Width;
             if (SliderY.Visible) { wi -= SliderY.Width; }

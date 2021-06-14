@@ -1,33 +1,40 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace BlueControls {
+
     public sealed class SystemInputHook {
+
         [DllImport("user32.dll", EntryPoint = "GetAsyncKeyState", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         private static extern short GetAsyncKeyState(System.Windows.Forms.Keys nVirtKey);
 
-        #region  Variablen-Deklarationen 
+        #region Variablen-Deklarationen
+
         [AccessedThroughProperty(nameof(Tim))]
         private System.Windows.Forms.Timer _Tim;
+
         private System.Windows.Forms.Timer Tim {
             [DebuggerNonUserCode]
             get => _Tim;
@@ -50,19 +57,25 @@ namespace BlueControls {
         private System.Windows.Forms.MouseButtons Mouse_LastButton;
         private bool Key_IsPressing;
         private System.Windows.Forms.Keys Key_LastKey;
-        #endregion
 
+        #endregion Variablen-Deklarationen
 
-        #region  Event-Deklarationen + Delegaten 
+        #region Event-Deklarationen + Delegaten
+
         public event System.EventHandler<System.Windows.Forms.MouseEventArgs> MouseDown;
+
         public event System.EventHandler<System.Windows.Forms.MouseEventArgs> MouseUp;
+
         public event System.EventHandler<System.Windows.Forms.MouseEventArgs> MouseMove;
+
         public event System.EventHandler<System.Windows.Forms.KeyEventArgs> KeyDown;
+
         public event System.EventHandler<System.Windows.Forms.KeyEventArgs> KeyUp;
-        #endregion
 
+        #endregion Event-Deklarationen + Delegaten
 
-        #region  Construktor + Initialize 
+        #region Construktor + Initialize
+
         private void Initialize() {
             Tim = new System.Windows.Forms.Timer {
                 Interval = 1,
@@ -76,11 +89,8 @@ namespace BlueControls {
         }
 
         public SystemInputHook() => Initialize();
-        #endregion
 
-
-        #region  Properties 
-        #endregion
+        #endregion Construktor + Initialize
 
         public void InstallHook() {
             Tim.Enabled = true;
@@ -93,7 +103,9 @@ namespace BlueControls {
         }
 
         public void RemoveHook() => Tim.Enabled = false;
+
         public void CheckNow() => Tim_Tick(null, null);
+
         private void Tim_Tick(object sender, System.EventArgs e) {
             Tim.Enabled = false;
             DoMouse();
@@ -131,8 +143,11 @@ namespace BlueControls {
         }
 
         private void OnMouseDown(System.Windows.Forms.MouseEventArgs e) => MouseDown?.Invoke(null, e);
+
         private void OnMouseUp(System.Windows.Forms.MouseEventArgs e) => MouseUp?.Invoke(this, e);
+
         private void OnMouseMove(System.Windows.Forms.MouseEventArgs e) => MouseMove?.Invoke(this, e);
+
         public void DoKeyboard() {
             var k = System.Windows.Forms.Keys.None;
             if (GetAsyncKeyState(System.Windows.Forms.Keys.D1) != 0) {
@@ -325,6 +340,7 @@ namespace BlueControls {
         }
 
         private void OnKeyDown(System.Windows.Forms.KeyEventArgs e) => KeyDown?.Invoke(this, e);
+
         private void OnKeyUp(System.Windows.Forms.KeyEventArgs e) => KeyUp?.Invoke(null, e);
     }
 }

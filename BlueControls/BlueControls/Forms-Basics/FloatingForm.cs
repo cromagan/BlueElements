@@ -6,10 +6,14 @@ using System.Collections.Generic;
 using System.Drawing;
 
 namespace BlueControls.Forms {
+
     public partial class FloatingForm : Form {
         internal static List<FloatingForm> AllBoxes = new();
         private readonly System.Windows.Forms.Control _ConnectedControl = null;
-        public FloatingForm() : this(enDesign.Form_QuickInfo) { }
+
+        public FloatingForm() : this(enDesign.Form_QuickInfo) {
+        }
+
         protected FloatingForm(enDesign design) : base(design) {
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
             InitializeComponent();
@@ -29,10 +33,12 @@ namespace BlueControls.Forms {
             //TransparencyKey = Color.FromArgb(255, 0, 255);
             AllBoxes.Add(this);
         }
+
         protected FloatingForm(System.Windows.Forms.Control connectedControl, enDesign design) : this(design) =>
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
             //InitializeComponent();
             _ConnectedControl = connectedControl;//SetStyles();//AllBoxes.Add(this);
+
         /// <summary>
         /// Floating Forms sind immer Topmost, darf aber hier nicht gesetzt werden und wird über
         /// CreateParams gesteuert. Wenn TopMost true wäre, würde das Form den Focus bekommen.
@@ -41,6 +47,7 @@ namespace BlueControls.Forms {
             get => false;
             set => base.TopMost = false;
         }
+
         protected override System.Windows.Forms.CreateParams CreateParams {
             get {
                 var oParam = base.CreateParams;
@@ -49,10 +56,12 @@ namespace BlueControls.Forms {
                 return oParam;
             }
         }
+
         private void CheckMaxSize(int ScreenNr) {
             Width = Math.Min(Width, (int)(System.Windows.Forms.Screen.AllScreens[ScreenNr].WorkingArea.Width * 0.9));
             Height = Math.Min(Height, (int)(System.Windows.Forms.Screen.AllScreens[ScreenNr].WorkingArea.Height * 0.9));
         }
+
         public void Position_CenterScreen(Point BestPosition) {
             var ScreenNr = modAllgemein.PointOnScreenNr(BestPosition);
             CheckMaxSize(ScreenNr);
@@ -61,11 +70,13 @@ namespace BlueControls.Forms {
             var Ypos = System.Windows.Forms.Screen.AllScreens[ScreenNr].WorkingArea.Top + ((System.Windows.Forms.Screen.AllScreens[ScreenNr].WorkingArea.Height - Height) / 2.0);
             Position_SetWindowIntoScreen(ScreenNr, (int)Xpos, (int)Ypos);
         }
+
         public void Position_LocateToPosition(Point BestPosition) {
             var ScreenNr = modAllgemein.PointOnScreenNr(BestPosition);
             CheckMaxSize(ScreenNr);
             Position_SetWindowIntoScreen(ScreenNr, BestPosition.X, BestPosition.Y);
         }
+
         public void Position_LocateToMouse() {
             var ScreenNr = modAllgemein.PointOnScreenNr(System.Windows.Forms.Cursor.Position);
             CheckMaxSize(ScreenNr);
@@ -79,6 +90,7 @@ namespace BlueControls.Forms {
             }
             Position_SetWindowIntoScreen(ScreenNr, Xpos, Ypos);
         }
+
         public void Position_SetWindowIntoScreen(int ScreenNr, int Xpos, int Ypos) {
             //  Dim ScreenNr As Integer = PointOnScreenNr(BestPosition)
             CheckMaxSize(ScreenNr);
@@ -88,7 +100,9 @@ namespace BlueControls.Forms {
             if (Ypos + Height > System.Windows.Forms.Screen.AllScreens[ScreenNr].WorkingArea.Bottom) { Ypos = System.Windows.Forms.Screen.AllScreens[ScreenNr].WorkingArea.Bottom - Height; }
             Location = new Point(Xpos, Ypos);
         }
+
         public new void ShowDialog() => Develop.DebugPrint(enFehlerArt.Fehler, "FloatingForms können nur mit Show aufgerufen werden.");
+
         public new void Show() {
             try {
                 modFernsteuerung.ShowWindow(Handle, (int)enSW.ShowNoActivate);
@@ -98,10 +112,12 @@ namespace BlueControls.Forms {
                 Develop.DebugPrint(ex);
             }
         }
+
         public new void Close() {
             AllBoxes.Remove(this);
             base.Close();
         }
+
         internal static void Close(object ConnectedControl, enDesign Design) {
             foreach (var ThisForm in AllBoxes) {
                 if (!ThisForm.IsDisposed) {
@@ -119,14 +135,18 @@ namespace BlueControls.Forms {
                 }
             }
         }
+
         internal static void Close(enDesign Design) => Close(null, Design);
+
         internal static void Close(object ConnectedControl) => Close(ConnectedControl, enDesign.Undefiniert);
+
         internal static bool IsShowing(object ConnectedControl) {
             foreach (var ThisForm in AllBoxes) {
                 if (!ThisForm.IsDisposed && ConnectedControl == ThisForm._ConnectedControl) { return true; }
             }
             return false;
         }
+
         protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) {
             // MyBase.OnPaint(e) - comment out - do not call  http://stackoverflow.com/questions/592538/how-to-create-a-transparent-control-which-works-when-on-top-of-other-controls
             if (IsClosed || IsDisposed) { return; }

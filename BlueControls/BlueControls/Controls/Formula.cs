@@ -1,21 +1,24 @@
 #region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -34,23 +37,31 @@ using System.ComponentModel;
 using System.Drawing;
 
 namespace BlueControls.Controls {
+
     [Designer(typeof(BasicDesigner))]
     public partial class Formula : GenericControl, IBackgroundNone, IContextMenu {
 
         #region Constructor
+
         public Formula() : base(false, false) => InitializeComponent();
-        #endregion
+
+        #endregion Constructor
 
         private Database _Database;
         private RowItem _tmpShowingRow = null;
         private int _ShowingRowKey = -1;
         private bool _Inited;
+
         public event EventHandler<RowEventArgs> ShowingRowChanged;
+
         public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
+
         public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
+
         private List<FlexiControlForCell> _Control;
         private int _savedRowKey = int.MinValue;
         private long TabGeneratorCount;
+
         protected override void Dispose(bool disposing) {
             try {
                 if (disposing) {
@@ -63,6 +74,7 @@ namespace BlueControls.Controls {
                 base.Dispose(disposing);
             }
         }
+
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -98,7 +110,9 @@ namespace BlueControls.Controls {
                 EndEdit();
             }
         }
+
         private void _Database_Disposing(object sender, System.EventArgs e) => Database = null;
+
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -137,7 +151,9 @@ namespace BlueControls.Controls {
                 EndEdit();
             }
         }
+
         private void OnShowingRowChanged(RowEventArgs e) => ShowingRowChanged?.Invoke(this, e);
+
         // <Obsolete("Database darf nicht im Designer gesetzt werden.", True)>
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -148,6 +164,7 @@ namespace BlueControls.Controls {
                 return _tmpShowingRow;
             }
         }
+
         private void View_Init() {
             if (_Database == null) { return; }
             if (Parent == null) { return; } // Irgend ein Formular reagiert nioch?!?
@@ -169,6 +186,7 @@ namespace BlueControls.Controls {
             if (Tabs.TabPages.Count >= 0) { Tabs.SelectedIndex = 0; }
             EndEdit();
         }
+
         private void _DatabaseLoaded(object sender, LoadedEventArgs e) {
             if (InvokeRequired) {
                 Invoke(new Action(() => _DatabaseLoaded(sender, e)));
@@ -178,6 +196,7 @@ namespace BlueControls.Controls {
             _Inited = false;
             ShowingRowKey = _savedRowKey;
         }
+
         private void _Database_RowChecked(object sender, RowCheckedEventArgs e) {
             if (e.Row.Key != _ShowingRowKey) { return; }
             var nr = int.MaxValue;
@@ -205,6 +224,7 @@ namespace BlueControls.Controls {
                 _ = e.ColumnsWithErrors[nr].Split('|');
             }
         }
+
         /// <summary>
         /// Ermittelt, wie viele Spalten die Ansicht benutzt.
         /// </summary>
@@ -219,6 +239,7 @@ namespace BlueControls.Controls {
             }
             return MaxS;
         }
+
         private void Control_RepairSize_All() {
             var Count = -1;
             BeginnEdit();
@@ -278,6 +299,7 @@ namespace BlueControls.Controls {
             }
             EndEdit();
         }
+
         private void Control_Create(ColumnViewItem cd, System.Windows.Forms.Control vParent) {
             if (cd?.Column == null) { return; }
             Develop.Debugprint_BackgroundThread();
@@ -289,10 +311,12 @@ namespace BlueControls.Controls {
             vParent.Controls.Add(btb);
             _Control.Add(btb);
         }
+
         private void Btb_IAmInvalid(object sender, System.EventArgs e) {
             _Inited = false;
             Control_Remove_All();
         }
+
         private void SetButtonsToPosition(int TopPos) {
             var SPH = 1;
             var SPF = 1;
@@ -317,6 +341,7 @@ namespace BlueControls.Controls {
             }
             Tabs.Height = Height - TopPos;
         }
+
         private void Control_Create_All() {
             var Count = -1;
             BeginnEdit();
@@ -338,6 +363,7 @@ namespace BlueControls.Controls {
             }
             EndEdit();
         }
+
         private void Controls_SetCorrectEnabledState_All() {
             Develop.DebugPrint_Disposed(IsDisposed);
             BeginnEdit();
@@ -346,11 +372,13 @@ namespace BlueControls.Controls {
             }
             EndEdit();
         }
+
         public void HideViewEditor() {
             if (!Editor.Visible) { return; }
             Editor.Visible = false;
             View_Init();
         }
+
         private void ShowViewEditor() {
             if (_Database == null) { return; }
             if (Editor.Visible) { return; }
@@ -369,12 +397,12 @@ namespace BlueControls.Controls {
             View_Init();
             ColumnsEinfärben();
         }
+
         private void ColumnsEinfärben() {
             int ItC;
             for (ItC = -1; ItC <= Tabs.TabCount + 100; ItC++) {
                 string Nam;
                 switch (ItC) {
-
                     case -1:
                         Nam = "Unbenutzt";
                         break;
@@ -382,6 +410,7 @@ namespace BlueControls.Controls {
                     case 0:
                         Nam = "Kopfbereich";
                         break;
+
                     default: {
                             if (ItC >= 1 && ItC <= _Database.Views.Count - 1) {
                                 if (_Database.Views[ItC] == null) {
@@ -424,6 +453,7 @@ namespace BlueControls.Controls {
             lbxColumns.Item.Sort();
             lbxColumns.Invalidate();
         }
+
         private void Generate_Tabs() {
             if (_Database.Views.Count < 1) { return; }
             BeginnEdit();
@@ -441,7 +471,9 @@ namespace BlueControls.Controls {
             }
             EndEdit();
         }
+
         protected override void DrawControl(Graphics gr, enStates state) => Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
+
         protected override void OnSizeChanged(System.EventArgs e) {
             if (IsDisposed) { return; }
             base.OnSizeChanged(e);
@@ -451,11 +483,13 @@ namespace BlueControls.Controls {
             Editor.Left = Width - Editor.Width;
             Editor.Height = Height;
         }
+
         private void SpaltBEnde_Click(object sender, System.EventArgs e) {
             if (!Editor.Visible) { return; }
             Editor.Visible = false;
             View_Init();
         }
+
         private void Editor_CheckButtons(bool Blinki) {
             if (!Editor.Visible) { return; }
             ColumnViewItem ViewItem = null;
@@ -486,6 +520,7 @@ namespace BlueControls.Controls {
                 }
             }
         }
+
         private void lbxColumns_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
             var item = (BasicListItem)e.HotItem;
             if (item == null) { return; }
@@ -498,6 +533,7 @@ namespace BlueControls.Controls {
                 e.UserMenu.Add("Dieses Feld ausblenden", "#RemoveColumnFromView", enImageCode.Kreuz, Convert.ToBoolean(cd != null));
             }
         }
+
         private void lbxColumns_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
             //if (_Database.Views.Count == 0) { _Database.Views.Add(new ColumnViewCollection(_Database, "")); }
             var Column = _Database.Column[((BasicListItem)e.HotItem).Internal];
@@ -505,7 +541,6 @@ namespace BlueControls.Controls {
             var ViewItem = SearchViewItem(Column);
             var CurrView = CurrentView();
             switch (e.ClickedComand) {
-
                 case "#RemoveColumnFromView":
                     if (ViewItem != null) {
                         _Database.Views[0]?.Remove(ViewItem);
@@ -527,8 +562,11 @@ namespace BlueControls.Controls {
             RedoView();
             ColumnsEinfärben();
         }
+
         private string EditorSelectedColumn() => lbxColumns.Item.Checked().Count != 1 ? string.Empty : lbxColumns.Item.Checked()[0].Internal;
+
         private void lbxColumns_ItemCheckedChanged(object sender, System.EventArgs e) => Editor_CheckButtons(true);
+
         private void RedoView() {
             var i = Tabs.SelectedIndex;
             BeginnEdit();
@@ -540,6 +578,7 @@ namespace BlueControls.Controls {
             if (i >= 0) { Tabs.SelectedIndex = i; }
             EndEdit();
         }
+
         private void Arrangement_Swap(int Ri) {
             var vn = _Database.Views.IndexOf(CurrentView());
             if (vn < 1) { return; }
@@ -554,6 +593,7 @@ namespace BlueControls.Controls {
             _Database.Views[vn + Ri] = tmpx1;
             _Inited = false;
         }
+
         private void Rename_Click(object sender, System.EventArgs e) {
             var CurrView = CurrentView();
             if (CurrView == null || CurrView == _Database.Views[0]) { return; }
@@ -562,6 +602,7 @@ namespace BlueControls.Controls {
             RedoView();
             ColumnsEinfärben();
         }
+
         private void Rechte_Click(object sender, System.EventArgs e) {
             var CurrView = CurrentView();
             ItemCollectionList aa = new();
@@ -580,6 +621,7 @@ namespace BlueControls.Controls {
             CurrView.PermissionGroups_Show.RemoveString("#Administrator", false);
             if (CurrView == _Database.Views[1]) { CurrView.PermissionGroups_Show.Add("#Everybody"); }
         }
+
         private void OrderDelete_Click(object sender, System.EventArgs e) {
             var CurrView = CurrentView();
             if (CurrView == null) { return; }
@@ -590,6 +632,7 @@ namespace BlueControls.Controls {
             RedoView();
             ColumnsEinfärben();
         }
+
         private void OrderAdd_Click(object sender, System.EventArgs e) {
             var ex = InputBox.Show("Geben sie den Namen<br>der neuen Ansicht ein:", "", enDataFormat.Text);
             if (string.IsNullOrEmpty(ex)) { return; }
@@ -597,6 +640,7 @@ namespace BlueControls.Controls {
             RedoView();
             ColumnsEinfärben();
         }
+
         private void cbxCaptionPosition_ItemClicked(object sender, BasicListItemEventArgs e) {
             var Column = _Database.Column[EditorSelectedColumn()];
             _ = SearchColumnView(Column);
@@ -605,6 +649,7 @@ namespace BlueControls.Controls {
             RedoView();
             ColumnsEinfärben();
         }
+
         private void cbxControlType_ItemClicked(object sender, BasicListItemEventArgs e) {
             var Column = _Database.Column[EditorSelectedColumn()];
             _ = SearchColumnView(Column);
@@ -613,6 +658,7 @@ namespace BlueControls.Controls {
             RedoView();
             ColumnsEinfärben();
         }
+
         private void SLinks_Click(object sender, System.EventArgs e) {
             var Column = _Database.Column[EditorSelectedColumn()];
             _ = SearchColumnView(Column);
@@ -621,6 +667,7 @@ namespace BlueControls.Controls {
             RedoView();
             ColumnsEinfärben();
         }
+
         private void SRechts_Click(object sender, System.EventArgs e) {
             var Column = _Database.Column[EditorSelectedColumn()];
             _ = SearchColumnView(Column);
@@ -629,6 +676,7 @@ namespace BlueControls.Controls {
             RedoView();
             ColumnsEinfärben();
         }
+
         private void SOben_Click(object sender, System.EventArgs e) {
             var Column = _Database.Column[EditorSelectedColumn()];
             var View = SearchColumnView(Column);
@@ -637,6 +685,7 @@ namespace BlueControls.Controls {
             RedoView();
             ColumnsEinfärben();
         }
+
         private void SUnten_Click(object sender, System.EventArgs e) {
             var Column = _Database.Column[EditorSelectedColumn()];
             var View = SearchColumnView(Column);
@@ -645,6 +694,7 @@ namespace BlueControls.Controls {
             RedoView();
             ColumnsEinfärben();
         }
+
         private void EOben_Click(object sender, System.EventArgs e) {
             var Column = _Database.Column[EditorSelectedColumn()];
             _ = SearchColumnView(Column);
@@ -653,6 +703,7 @@ namespace BlueControls.Controls {
             RedoView();
             ColumnsEinfärben();
         }
+
         private void EUnten_Click(object sender, System.EventArgs e) {
             var Column = _Database.Column[EditorSelectedColumn()];
             _ = SearchColumnView(Column);
@@ -661,6 +712,7 @@ namespace BlueControls.Controls {
             RedoView();
             ColumnsEinfärben();
         }
+
         private void ELinks_Click(object sender, System.EventArgs e) {
             var Column = _Database.Column[EditorSelectedColumn()];
             _ = SearchColumnView(Column);
@@ -669,6 +721,7 @@ namespace BlueControls.Controls {
             RedoView();
             ColumnsEinfärben();
         }
+
         private void ERechts_Click(object sender, System.EventArgs e) {
             var Column = _Database.Column[EditorSelectedColumn()];
             _ = SearchColumnView(Column);
@@ -677,6 +730,7 @@ namespace BlueControls.Controls {
             RedoView();
             ColumnsEinfärben();
         }
+
         public void Control_Remove_All() {
             if (InvokeRequired) {
                 Invoke(new Action(() => Control_Remove_All()));
@@ -688,7 +742,6 @@ namespace BlueControls.Controls {
                 R = false;
                 foreach (System.Windows.Forms.Control o in Controls) {
                     switch (o.Name) {
-
                         case "Editor":
                             break;
 
@@ -698,6 +751,7 @@ namespace BlueControls.Controls {
                                 R = true;
                             }
                             break;
+
                         default:
                             RemoveControl(o);
                             R = true;
@@ -708,11 +762,11 @@ namespace BlueControls.Controls {
             _Control?.Clear();
             EndEdit();
         }
+
         private void RemoveControl(System.Windows.Forms.Control vObject) {
             if (vObject == null || vObject.IsDisposed) { return; }
             BeginnEdit();
             switch (vObject) {
-
                 case AbstractTabControl _:
                     foreach (System.Windows.Forms.Control o in vObject.Controls) {
                         RemoveControl(o);
@@ -725,6 +779,7 @@ namespace BlueControls.Controls {
                         RemoveControl(o);
                     }
                     break;
+
                 default:
                     var tempVar = (FlexiControlForCell)vObject;
                     tempVar.NeedRefresh -= Btb_IAmInvalid;
@@ -734,12 +789,16 @@ namespace BlueControls.Controls {
             vObject.Dispose();
             EndEdit();
         }
+
         private void Li_Click(object sender, System.EventArgs e) => Arrangement_Swap(-1);
+
         private void Re_Click(object sender, System.EventArgs e) => Arrangement_Swap(1);
+
         private void _Database_ColumnRemoved(object sender, System.EventArgs e) {
             if (IsDisposed) { return; }
             View_Init();
         }
+
         private void _Database_ColumnContentChanged(object sender, ListEventArgs e) {
             if (IsDisposed) { return; }
             var r = _ShowingRowKey;
@@ -747,16 +806,19 @@ namespace BlueControls.Controls {
             View_Init();
             ShowingRowKey = r;
         }
+
         private ColumnViewCollection CurrentView() {
             if (_Database.Views.Count == 0) { return null; }
             if (Tabs.SelectedIndex + 1 > _Database.Views.Count - 1) { Develop.DebugPrint(enFehlerArt.Fehler, "Index zu hoch"); }
             if (_Database.Views[Tabs.SelectedIndex + 1] == null) { Develop.DebugPrint(enFehlerArt.Fehler, "View ist Nothing"); }
             return _Database.Views[Tabs.SelectedIndex + 1];
         }
+
         private ColumnViewItem SearchViewItem(ColumnItem Column) {
             var ThisView = SearchColumnView(Column);
             return ThisView?[Column];
         }
+
         public static ColumnViewCollection SearchColumnView(ColumnItem Column) {
             if (Column == null) { return null; }
             foreach (var ThisView in Column.Database.Views) {
@@ -770,9 +832,11 @@ namespace BlueControls.Controls {
             }
             return null;
         }
+
         private void Tabs_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
             if (e.Button == System.Windows.Forms.MouseButtons.Right) { FloatingInputBoxListBoxStyle.ContextMenuShow(this, e); }
         }
+
         //private void Tabs_SelectedIndexChanged(object sender, System.EventArgs e)
         //{
         //    if (Editor.Visible) { ColumnsEinfärben(); }
@@ -784,7 +848,8 @@ namespace BlueControls.Controls {
             return null;
         }
 
-        #region  ContextMenu 
+        #region ContextMenu
+
         public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
             HotItem = null;
             if (_Database == null) {
@@ -797,10 +862,10 @@ namespace BlueControls.Controls {
                 Items.Add("Formular bearbeiten", "#Ansicht", QuickImage.Get(enImageCode.Textfeld), _Database != null);
             }
         }
+
         public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
             if (_Database == null) { return true; }
             switch (e.ClickedComand.ToLower()) {
-
                 case "#schnelleingabe":
                     if (ShowingRow == null) { return true; }
                     FormulaQuickSelect sh = new(ShowingRow);
@@ -813,18 +878,22 @@ namespace BlueControls.Controls {
             }
             return false;
         }
+
         public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
+
         public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
+
         private void _Database_StoreView(object sender, LoadingEventArgs e) {
             if (e.OnlyReload) { return; }
             _savedRowKey = ShowingRowKey;
         }
+
         private void _Database_RowKeyChanged(object sender, KeyChangedEventArgs e) {
             // Ist aktuell nur möglich,wenn Pending Changes eine neue Zeile machen
             // Jedes FlexControl beachtet für sich die Änderung
             if (e.KeyOld == _savedRowKey) { _savedRowKey = e.KeyNew; }
         }
-        #endregion
 
+        #endregion ContextMenu
     }
 }

@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -27,20 +30,24 @@ using System;
 using System.Drawing;
 
 namespace BlueControls {
+
     public sealed class PointM : IMoveable {
 
-        #region  Variablen-Deklarationen 
+        #region Variablen-Deklarationen
+
         private decimal _x;
         private decimal _y;
-        #endregion
 
+        #endregion Variablen-Deklarationen
 
-        #region  Event-Deklarationen + Delegaten 
+        #region Event-Deklarationen + Delegaten
+
         public event EventHandler Moved;
-        #endregion
 
+        #endregion Event-Deklarationen + Delegaten
 
-        #region  Construktor + Initialize 
+        #region Construktor + Initialize
+
         public PointM(object parent, string name, decimal startX, decimal startY, decimal laenge, decimal alpha) : this(parent) {
             Name = name;
             var tempVar = GeometryDF.PolarToCartesian(laenge, Convert.ToDouble(alpha));
@@ -48,9 +55,15 @@ namespace BlueControls {
             _y = startY + tempVar.Y;
             Tag = string.Empty;
         }
-        public PointM(PointM startPoint, decimal laenge, decimal alpha) : this(null, string.Empty, startPoint.X, startPoint.Y, laenge, alpha) { }
-        public PointM(PointF startPoint, decimal laenge, decimal alpha) : this(null, string.Empty, (decimal)startPoint.X, (decimal)startPoint.Y, laenge, alpha) { }
+
+        public PointM(PointM startPoint, decimal laenge, decimal alpha) : this(null, string.Empty, startPoint.X, startPoint.Y, laenge, alpha) {
+        }
+
+        public PointM(PointF startPoint, decimal laenge, decimal alpha) : this(null, string.Empty, (decimal)startPoint.X, (decimal)startPoint.Y, laenge, alpha) {
+        }
+
         public PointM(object parent, string codeToParse) : this(parent) => Parse(codeToParse);
+
         public PointM(object parent, string name, decimal x, decimal y, string tag) {
             Parent = parent;
             _x = x;
@@ -58,23 +71,47 @@ namespace BlueControls {
             Name = name;
             Tag = tag;
         }
-        public PointM() : this(null, string.Empty, 0m, 0m, string.Empty) { }
-        public PointM(object parent) : this(parent, string.Empty, 0m, 0m, string.Empty) { }
-        public PointM(string name, decimal x, decimal y) : this(null, name, x, y, string.Empty) { }
-        public PointM(object parent, string name, int x, int y) : this(parent, name, x, y, string.Empty) { }
-        public PointM(object parent, string name, decimal x, decimal y) : this(parent, name, x, y, string.Empty) { }
-        public PointM(PointF point) : this(null, string.Empty, (decimal)point.X, (decimal)point.Y, string.Empty) { }
-        public PointM(int x, int y) : this(null, string.Empty, x, y, string.Empty) { }
-        public PointM(double x, double y) : this(null, string.Empty, (decimal)x, (decimal)y, string.Empty) { }
-        public PointM(decimal x, decimal y) : this(null, string.Empty, x, y, string.Empty) { }
-        public PointM(PointM point) : this(null, string.Empty, point.X, point.Y, string.Empty) { }
-        public PointM(object parent, PointM template) : this(parent, template.Name, template.X, template.Y, template.Tag) { }
-        #endregion
 
+        public PointM() : this(null, string.Empty, 0m, 0m, string.Empty) {
+        }
 
-        #region  Properties 
+        public PointM(object parent) : this(parent, string.Empty, 0m, 0m, string.Empty) {
+        }
+
+        public PointM(string name, decimal x, decimal y) : this(null, name, x, y, string.Empty) {
+        }
+
+        public PointM(object parent, string name, int x, int y) : this(parent, name, x, y, string.Empty) {
+        }
+
+        public PointM(object parent, string name, decimal x, decimal y) : this(parent, name, x, y, string.Empty) {
+        }
+
+        public PointM(PointF point) : this(null, string.Empty, (decimal)point.X, (decimal)point.Y, string.Empty) {
+        }
+
+        public PointM(int x, int y) : this(null, string.Empty, x, y, string.Empty) {
+        }
+
+        public PointM(double x, double y) : this(null, string.Empty, (decimal)x, (decimal)y, string.Empty) {
+        }
+
+        public PointM(decimal x, decimal y) : this(null, string.Empty, x, y, string.Empty) {
+        }
+
+        public PointM(PointM point) : this(null, string.Empty, point.X, point.Y, string.Empty) {
+        }
+
+        public PointM(object parent, PointM template) : this(parent, template.Name, template.X, template.Y, template.Tag) {
+        }
+
+        #endregion Construktor + Initialize
+
+        #region Properties
+
         public string Name { get; private set; }
         public object Parent { get; set; }
+
         public decimal X {
             get => _x;
             set {
@@ -83,6 +120,7 @@ namespace BlueControls {
                 OnMoved();
             }
         }
+
         public decimal Y {
             get => _y;
             set {
@@ -91,13 +129,14 @@ namespace BlueControls {
                 OnMoved();
             }
         }
+
         public string Tag { get; set; }
-        #endregion
+
+        #endregion Properties
 
         public void Parse(string codeToParse) {
             foreach (var pair in codeToParse.GetAllTags()) {
                 switch (pair.Key) {
-
                     case "parentname":
                         break;
 
@@ -128,12 +167,14 @@ namespace BlueControls {
 
                     case "primarygridsnappoint": // TODO: Entfernt, 24.05.2021
                         break;
+
                     default:
                         Develop.DebugPrint(enFehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
                         break;
                 }
             }
         }
+
         public static explicit operator PointF(PointM p) {
             return new((float)p.X, (float)p.Y);
         }
@@ -143,11 +184,11 @@ namespace BlueControls {
         }
 
         public static PointM Empty() => new(0m, 0m);
+
         public override string ToString() {
             var t = "{";
             if (Parent != null) {
                 switch (Parent) {
-
                     case BasicPadItem _:
                         t = t + "ParentName=" + ((BasicPadItem)Parent).Internal.ToNonCritical() + ", ";
                         break;
@@ -159,6 +200,7 @@ namespace BlueControls {
                     case ItemCollectionPad _:
                         t += "ParentType=Main, ";
                         break;
+
                     default:
                         t = t + "ParentType=" + Parent.GetType().FullName + ", ";
                         break;
@@ -170,6 +212,7 @@ namespace BlueControls {
             if (!string.IsNullOrEmpty(Tag)) { t = t + "Tag=" + Tag.ToNonCritical() + ", "; }
             return t.Trim(", ") + "}";
         }
+
         //public bool IsOnScreen(decimal zoom, decimal shiftX, decimal shiftY, Rectangle displayRectangle) {
         //    var tx = (_x * zoom) - shiftX;
         //    var ty = (_y * zoom) - shiftY;
@@ -194,22 +237,31 @@ namespace BlueControls {
             //    gr.DrawString(textToDraw, SimpleArial, Brushes.Black, (float)tx, (float)ty - 16);
             //}
         }
+
         public PointF ZoomAndMove(AdditionalDrawing e) => ZoomAndMove(e.Zoom, e.ShiftX, e.ShiftY);
+
         public PointF ZoomAndMove(decimal zoom, decimal shiftX, decimal shiftY) => new((float)((_x * zoom) - shiftX + (zoom / 2)), (float)((_y * zoom) - shiftY + (zoom / 2)));
+
         public void SetTo(decimal x, decimal y) {
             if (x == _x && y == _y) { return; }
             _x = x;
             _y = y;
             OnMoved();
         }
+
         public void SetTo(double x, double y) => SetTo((decimal)x, (decimal)y);
+
         public void SetTo(PointM StartPoint, decimal Länge, decimal Alpha) {
             var tempVar = GeometryDF.PolarToCartesian(Länge, Convert.ToDouble(Alpha));
             SetTo(StartPoint.X + tempVar.X, Y = StartPoint.Y + tempVar.Y);
         }
+
         public void SetTo(PointM Point) => SetTo(Point.X, Point.Y);
+
         public void SetTo(Point point) => SetTo(point.X, (decimal)point.Y);
+
         public void SetTo(int x, int y) => SetTo(x, (decimal)y);
+
         //public int CompareTo(object obj) {
         //    if (obj is PointM tobj) {
         //        // hierist es egal, ob es ein DoAlways ist oder nicht. Es sollen nur Bedingugen VOR Aktionen kommen
@@ -221,21 +273,28 @@ namespace BlueControls {
         //}
         //internal string CompareKey() => _y.ToString(Constants.Format_Float5_1) + "-" + _x.ToString(Constants.Format_Float5_1);
         public decimal DistanzZuLinie(PointM P1, PointM P2) => DistanzZuLinie(P1.X, P1.Y, P2.X, P2.Y);
+
         public decimal DistanzZuLinie(decimal X1, decimal Y1, decimal X2, decimal Y2) => GeometryDF.Länge(this, GeometryDF.PointOnLine(this, X1, Y1, X2, Y2));
+
         public void OnMoved() => Moved?.Invoke(this, System.EventArgs.Empty);
+
         public decimal Magnitude => (decimal)Math.Sqrt((double)((_x * _x) + (_y * _y)));
+
         public void Normalize() {
             var magnitude = Magnitude;
             _x /= magnitude;
             _y /= magnitude;
         }
+
         public decimal DotProduct(PointM vector) => (_x * vector._x) + (_y * vector._y);
+
         public void Move(decimal x, decimal y) {
             if (x == 0 && y == 0) { return; }
             _x += x;
             _y += y;
             OnMoved();
         }
+
         public static PointM operator +(PointM a, PointM b) {
             return new(a._x + b._x, a._y + b._y);
         }

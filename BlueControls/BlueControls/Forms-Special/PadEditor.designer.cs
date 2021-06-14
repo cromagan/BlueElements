@@ -519,7 +519,7 @@ namespace BlueControls.Forms
             // btnHintergrundFarbe
             // 
             this.btnHintergrundFarbe.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnHintergrundFarbe.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_RibbonBar;
+            this.btnHintergrundFarbe.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_Big_Borderless;
             this.btnHintergrundFarbe.ImageCode = "Farben";
             this.btnHintergrundFarbe.Location = new System.Drawing.Point(376, 2);
             this.btnHintergrundFarbe.Name = "btnHintergrundFarbe";
@@ -531,7 +531,7 @@ namespace BlueControls.Forms
             // btnVorschauModus
             // 
             this.btnVorschauModus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnVorschauModus.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_RibbonBar;
+            this.btnVorschauModus.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Big_Borderless;
             this.btnVorschauModus.ImageCode = "Textdatei";
             this.btnVorschauModus.Location = new System.Drawing.Point(584, 2);
             this.btnVorschauModus.Name = "btnVorschauModus";

@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
@@ -25,9 +28,11 @@ using BlueDatabase;
 using System.Collections.Generic;
 
 namespace BlueControls.Forms {
+
     public partial class RelationDiagram : PadEditor {
         private Database Database;
         private readonly ColumnItem _column;
+
         //private bool RelationsValid;
         //   Dim ItS As New Size(60, 80)
         public RelationDiagram(Database database) {
@@ -45,7 +50,9 @@ namespace BlueControls.Forms {
                 }
             }
         }
+
         private void Database_Disposing(object sender, System.EventArgs e) => Close();
+
         private void Hinzu_Click(object sender, System.EventArgs e) {
             ItemCollectionList il = new();
             il.AddRange(Database.Column[0].Contents());
@@ -61,12 +68,14 @@ namespace BlueControls.Forms {
             }
             //RepairLinesAndFullProcessing();
         }
+
         public RowFormulaPadItem ItemOfRow(RowItem R) {
             foreach (var ThisItem in Pad.Item) {
                 if (ThisItem != null && ThisItem is RowFormulaPadItem tempVar && tempVar.Row == R) { return tempVar; }
             }
             return null;
         }
+
         public RowFormulaPadItem AddOne(string What, int xPos, int Ypos, string layoutID) {
             if (string.IsNullOrEmpty(What)) { return null; }
             if (Pad.Item[What] != null) { return null; }
@@ -84,12 +93,14 @@ namespace BlueControls.Forms {
             //RelationsValid = false;
             return i2;
         }
+
         private void Pad_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
             if (e.HotItem == null) { return; }
             //Dim i As BasicItem = DirectCast(MouseOver, BasicItem)
             if (e.HotItem is not RowFormulaPadItem) { return; }
             e.UserMenu.Add("Alle Einträge hinzufügen, die mit diesem hier Beziehungen haben", "Bez+", enImageCode.PlusZeichen);
         }
+
         private void Pad_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
             if (e.HotItem == null) { return; }
             if (e.HotItem is not RowFormulaPadItem) { return; }
@@ -98,12 +109,14 @@ namespace BlueControls.Forms {
                 case "Bez+":
                     BezPlus(i);
                     break;
+
                 default:
                     Develop.DebugPrint(e);
                     break;
             }
             //RepairLinesAndFullProcessing();
         }
+
         private void BezPlus(RowFormulaPadItem initialItem) {
             // Den Beziehungstext holen
             var t = initialItem.Row.CellGetString(_column).ToUpper();
@@ -164,6 +177,7 @@ namespace BlueControls.Forms {
             //    }
             //}
         }
+
         //private void RepairLinesAndFullProcessing() {
         //    //Develop.DebugPrint_NichtImplementiert();
         //    //if (RelationsValid)
@@ -283,6 +297,7 @@ namespace BlueControls.Forms {
                 }
             }
         }
+
         private void btnTextExport_Click(object sender, System.EventArgs e) {
             System.Windows.Forms.FolderBrowserDialog fl = new();
             fl.ShowDialog();
@@ -312,11 +327,13 @@ namespace BlueControls.Forms {
             var newn2 = FileOperations.TempFile(fl.SelectedPath, "+++ALLES+++", "txt");
             l.Save(newn2, true, System.Text.Encoding.GetEncoding(1252));
         }
+
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
             base.OnFormClosing(e);
             Database.Disposing -= Database_Disposing;
             Database = null;
         }
+
         //Private Sub Entwirren()
         //    CheckStackForOverflow()
         //    ' Dim Wirr As Boolean = False

@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics.Enums;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
@@ -24,10 +27,12 @@ using System.ComponentModel;
 using System.Drawing;
 
 namespace BlueControls.Controls {
+
     [Designer(typeof(BasicDesigner))]
     public class Line : GenericControl, IBackgroundNone {
 
         #region Constructor
+
         public Line() : base(false, false) {
             // Dieser Aufruf ist für den Designer erforderlich.
             //  InitializeComponent()
@@ -35,9 +40,11 @@ namespace BlueControls.Controls {
             SetNotFocusable();
             _MouseHighlight = false;
         }
-        #endregion
+
+        #endregion Constructor
 
         private enOrientation _Orientation = enOrientation.Waagerecht;
+
         [DefaultValue(enOrientation.Waagerecht)]
         public enOrientation Orientation {
             get => _Orientation;
@@ -50,16 +57,19 @@ namespace BlueControls.Controls {
                 Invalidate();
             }
         }
+
         [DefaultValue(0)]
         public new int TabIndex {
             get => 0;
             set => base.TabIndex = 0;
         }
+
         [DefaultValue(false)]
         public new bool TabStop {
             get => false;
             set => base.TabStop = false;
         }
+
         public void CheckSize() {
             if (_Orientation == enOrientation.Waagerecht) {
                 if (Width < 10) { Width = 10; }
@@ -69,6 +79,7 @@ namespace BlueControls.Controls {
                 if (Height < 10) { Height = 10; }
             }
         }
+
         protected override void DrawControl(Graphics gr, enStates state) {
             CheckSize();
             Pen DP = new(SystemColors.ControlDark);

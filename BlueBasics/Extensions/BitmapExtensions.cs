@@ -1,4 +1,5 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
+
 // Authors:
 // Christian Peter
 //
@@ -15,7 +16,9 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-#endregion
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
@@ -24,7 +27,9 @@ using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 
 namespace BlueBasics {
+
     public static partial class Extensions {
+
         public static Bitmap Area(this Bitmap sourceBitmap, Rectangle r) {
             if (r.Width < 2 || r.Height < 2) { return null; }
             Bitmap ClipedArea = new(r.Width, r.Height);
@@ -34,6 +39,7 @@ namespace BlueBasics {
             }
             return ClipedArea;
         }
+
         public static void AllePixelZuSchwarz(this Bitmap _Pic, double nearWhiteSchwelle) {
             for (var x = 0; x < _Pic.Width; x++) {
                 for (var y = 0; y < _Pic.Height; y++) {
@@ -44,6 +50,7 @@ namespace BlueBasics {
                 }
             }
         }
+
         public static void AllePixelZuWeiß(this Bitmap _Pic, double nearBlackSchwelle) {
             for (var x = 0; x < _Pic.Width; x++) {
                 for (var y = 0; y < _Pic.Height; y++) {
@@ -54,6 +61,7 @@ namespace BlueBasics {
                 }
             }
         }
+
         public static void Ausdünnen(this Bitmap pic, int staerke) {
             if (pic == null) { return; }
             for (var x = 0; x < pic.Width - 1; x++) {
@@ -94,6 +102,7 @@ namespace BlueBasics {
                 return x < 0 || y < 0 || x >= pic.Width || y >= pic.Height || pic.GetPixel(x, y).IsNearWhite(0.9);
             }
         }
+
         public static Bitmap Image_Clone(this Bitmap sourceBMP) {
             if (sourceBMP == null) { return null; }
             Bitmap bmp = new(sourceBMP.Width, sourceBMP.Height, PixelFormat.Format32bppArgb);
@@ -102,6 +111,7 @@ namespace BlueBasics {
             }
             return bmp;
         }
+
         public static Bitmap Invert(this Bitmap source) {
             // create a blank bitmap the same size as original
             Bitmap newBitmap = new(source.Width, source.Height);
@@ -125,7 +135,9 @@ namespace BlueBasics {
             g.Dispose();
             return newBitmap;
         }
+
         public static Bitmap Crop(this Bitmap _Pic, Rectangle r) => _Pic.Crop(r.Left, -(_Pic.Width - r.Right), r.Top, -(_Pic.Height - r.Bottom));
+
         /// <summary>
         ///
         /// </summary>
@@ -148,10 +160,12 @@ namespace BlueBasics {
             modAllgemein.CollectGarbage();
             return _BMP2;
         }
+
         public static Bitmap AutoCrop(this Bitmap _Pic, double minBrightness) {
             var pa = _Pic.GetAutoValuesForCrop(minBrightness);
             return Crop(_Pic, pa.Left, pa.Right, pa.Top, pa.Bottom);
         }
+
         public static System.Windows.Forms.Padding GetAutoValuesForCrop(this Bitmap _Pic, double minBrightness) {
             System.Windows.Forms.Padding pa = new(0, 0, 0, 0);
             if (_Pic == null) { return pa; }
@@ -217,6 +231,7 @@ namespace BlueBasics {
             pa.Bottom = Y - _Pic.Height + 1;
             return pa;
         }
+
         public static Bitmap AdjustGamma(this Bitmap image, float gamma) {
             // http://csharphelper.com/blog/2016/12/provide-gamma-correction-for-an-image-in-c/
             // Set the ImageAttributes object's gamma value.
@@ -241,6 +256,7 @@ namespace BlueBasics {
             // Return the result.
             return bm;
         }
+
         public static Bitmap AdjustBrightness(this Bitmap image, float brightness) {
             // http://csharphelper.com/blog/2014/10/use-an-imageattributes-object-to-adjust-an-images-brightness-in-c/
             // Make the ColorMatrix.
@@ -273,6 +289,7 @@ namespace BlueBasics {
             // Return the result.
             return bm;
         }
+
         public static Bitmap AdjustContrast(this Bitmap image, float value) {
             value = (100.0f + value) / 100.0f;
             value *= value;
@@ -313,6 +330,7 @@ namespace BlueBasics {
             NewBitmap.UnlockBits(data);
             return NewBitmap;
         }
+
         public static unsafe Bitmap ReplaceColor(this Bitmap source, Color toReplace, Color replacement) {
             // https://stackoverflow.com/questions/17208254/how-to-change-pixel-color-of-an-image-in-c-net
             const int pixelSize = 4; // 32 bits per pixel
@@ -347,6 +365,7 @@ namespace BlueBasics {
             }
             return target;
         }
+
         public static Bitmap Grayscale(this Bitmap original) {
             Bitmap newBitmap = new(original.Width, original.Height);
             var g = Graphics.FromImage(newBitmap);
@@ -365,6 +384,7 @@ namespace BlueBasics {
             g.Dispose();
             return newBitmap;
         }
+
         /// <summary>
         /// Helligkeit, Kontrast und Gammawert eines Bitmaps ändern
         /// </summary>
@@ -408,6 +428,7 @@ namespace BlueBasics {
             }
             return NewBmp;
         }
+
         public static void FillCircle(this Bitmap bMP, Color c, int x, int y, int r) {
             for (var adx = -r; adx <= r; adx++) {
                 for (var ady = -r; ady <= r; ady++) {
@@ -420,10 +441,10 @@ namespace BlueBasics {
                 }
             }
         }
+
         public static Bitmap ImageBlurFilter(this Bitmap sourceBitmap, BlurType blurType) {
             Bitmap resultBitmap = null;
             switch (blurType) {
-
                 case BlurType.Mean3x3: {
                         resultBitmap = sourceBitmap.ConvolutionFilter(clsImageMatrix.Mean3x3, 1.0 / 9.0, 0);
                     }
@@ -526,6 +547,7 @@ namespace BlueBasics {
             }
             return resultBitmap;
         }
+
         public static Bitmap MedianFilter(this Bitmap sourceBitmap, int matrixSize) {
             var sourceData =
                        sourceBitmap.LockBits(new Rectangle(0, 0,
@@ -563,6 +585,7 @@ namespace BlueBasics {
             resultBitmap.UnlockBits(resultData);
             return resultBitmap;
         }
+
         private static Bitmap ConvolutionFilter(this Bitmap sourceBitmap, double[,] filterMatrix, double factor = 1, int bias = 0) {
             var sourceData = sourceBitmap.LockBits(new Rectangle(0, 0, sourceBitmap.Width, sourceBitmap.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
             var pixelBuffer = new byte[sourceData.Stride * sourceData.Height];

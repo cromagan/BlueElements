@@ -1,4 +1,5 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
+
 // Authors:
 // Christian Peter
 //
@@ -15,7 +16,9 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-#endregion
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
@@ -25,7 +28,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 namespace BlueBasics {
+
     public static partial class Extensions {
+
         /// <summary>
         /// Entfernt ( und ), { und } und " und leerzeichen am Anfang/Ende
         /// </summary>
@@ -47,6 +52,7 @@ namespace BlueBasics {
             }
             return txt;
         }
+
         public static bool FromPlusMinus(this string value) {
             if (string.IsNullOrEmpty(value)) { return false; }
             switch (value.ToLower()) {
@@ -54,27 +60,35 @@ namespace BlueBasics {
                 case "wahr":
                 case "true":
                     return true;
+
                 case "-":
                 case "falsch":
                 case "false":
                 case "":
                     return false;
+
                 default:
                     Develop.DebugPrint(enFehlerArt.Warnung, "'" + value + "' unbekannt!");
                     return false;
             }
         }
+
         public static string RemoveHTMLCodes(this string html) => Regex.Replace(html, "<.*?>", string.Empty);
+
         public static string Reverse(this string tXT) {
             var charArray = tXT.ToCharArray();
             Array.Reverse(charArray);
             return new string(charArray);
         }
+
         public static byte[] UTF8_ToByte(this string tXT) => Encoding.UTF8.GetBytes(tXT);
+
         public static byte[] Unicode_ToByte(this string tXT) => Encoding.Unicode.GetBytes(tXT);
+
         public static byte[] ToByteWIN1252(this string tXT) =>
             // var enc1252 = CodePagesEncodingProvider.Instance.GetEncoding(1252);
             Encoding.GetEncoding(1252).GetBytes(tXT);
+
         // public static List<byte> ToByteList(this string TXT) {
         //    var x = new List<byte>();
         //    x.AddRange(Encoding.ASCII.GetBytes(TXT));
@@ -85,10 +99,12 @@ namespace BlueBasics {
             // Kein Doppelpunkt, weil auch 3:50 Uhr möglich ist
             return TR.Contains(value.ToString());
         }
+
         public static bool isWordSeperator(this char value) {
             const string TR = "~|=<>+`´\r\n\t";
             return char.IsPunctuation(value) || char.IsSeparator(value) || TR.Contains(value.ToString());
         }
+
         public static string Insert(this string tXT, string insertTxt, string afterTXT, string WhenNotContais) {
             if (string.IsNullOrEmpty(afterTXT)) { return tXT; }
             if (string.IsNullOrEmpty(insertTxt)) { return tXT; }
@@ -109,12 +125,19 @@ namespace BlueBasics {
             }
             return tXT;
         }
+
         public static bool IsHTMLColorCode(this string col) => !string.IsNullOrEmpty(col) && (col.Length == 6 || col.Length == 8) && col.ContainsOnlyChars(Constants.Char_Numerals + "abcdefABCDEF");
+
         public static bool IsNumeral(this string tXT) => tXT is not null && tXT.IsFormat(enDataFormat.Ganzzahl) || tXT.IsFormat(enDataFormat.Gleitkommazahl);
+
         public static bool IsLong(this string tXT) => tXT is not null && tXT.IsFormat(enDataFormat.Ganzzahl);
+
         public static bool IsDouble(this string tXT) => tXT is not null && tXT.IsFormat(enDataFormat.Gleitkommazahl);
+
         public static bool ContainsChars(this string tXT, string chars) => chars.Where((_, z) => tXT.Contains(chars.Substring(z, 1))).Any();
+
         public static bool ContainsOnlyChars(this string tXT, string chars) => !tXT.Where((_, z) => !chars.Contains(tXT.Substring(z, 1))).Any();
+
         /// <summary>
         /// Teilt einen String, der geparsed werden kann in seine Bestandteile auf.
         /// </summary>
@@ -162,12 +185,14 @@ namespace BlueBasics {
             while (noarunde);
             return Result;
         }
+
         public static List<string> Komma = new() { "," };
         public static List<string> Gleich = new() { "=" };
         public static List<string> KlammerAuf = new() { "(" };
         public static List<string> KlammerZu = new() { ")" };
         public static List<string> GeschKlammerAuf = new() { "{" };
         public static List<string> GeschKlammerZu = new() { "}" };
+
         public static (int pos, string witch) NextText(string txt, int startpos, List<string> searchfor, bool checkforSeparatorbefore, bool checkforSeparatorafter) {
             var klammern = 0;
             var Gans = false;
@@ -180,6 +205,7 @@ namespace BlueBasics {
                 if (pos >= maxl) { return (-1, string.Empty); ; }
 
                 #region Klammer und " erledigen
+
                 switch (txt.Substring(pos, 1)) {
                     // Gänsefüsschen, immer erlaubt
                     case "\"":
@@ -207,6 +233,7 @@ namespace BlueBasics {
                             klammern++;
                         }
                         break;
+
                     case ")":
                         if (!Gans) {
                             //if (EckigeKlammern > 0) { return (-1, string.Empty); }
@@ -223,6 +250,7 @@ namespace BlueBasics {
                             GeschwKlammern++;
                         }
                         break;
+
                     case "}":
                         if (!Gans) {
                             if (klammern > 0) { return (-1, string.Empty); }
@@ -232,10 +260,11 @@ namespace BlueBasics {
                         }
                         break;
                 }
-                #endregion
 
+                #endregion Klammer und " erledigen
 
                 #region Den Text suchen
+
                 if (klammern == 0 && !Gans && GeschwKlammern == 0) {
                     if (!checkforSeparatorbefore || pos == 0 || TR.Contains(txt.Substring(pos - 1, 1))) {
                         foreach (var thisEnd in searchfor) {
@@ -249,11 +278,13 @@ namespace BlueBasics {
                         }
                     }
                 }
-                #endregion
+
+                #endregion Den Text suchen
 
                 pos++;
             } while (true);
         }
+
         //public static string ParseTag(this string tXT, int startIndex) {
         //    var IG = tXT.IndexOf("=", startIndex);
         //    if (IG < 1) { return string.Empty; }
@@ -338,6 +369,7 @@ namespace BlueBasics {
             tXT = tXT.Replace("ß", "ss");
             return tXT;
         }
+
         /// <summary>
         /// Löscht alle Zeichen - außder dem erlaubten - aus dem String. Gross- und Kleinschreibung wird unterschieden.
         /// "RemoveChars" macht das Gegenteil
@@ -357,6 +389,7 @@ namespace BlueBasics {
             }
             return tXT;
         }
+
         /// <summary>
         /// Löscht alle angegebnen Zeichen aus dem String. Gross- und Kleinschreibung wird unterschieden.
         /// "ReduceToChars" macht das Gegenteil
@@ -371,8 +404,11 @@ namespace BlueBasics {
             }
             return tXT;
         }
+
         public static string EleminateSlash(this string txt) => txt.Replace("/", "[Slash]");
+
         public static string GenerateSlash(this string txt) => txt.Replace("[Slash]", "/");
+
         public static string HTMLSpecialToNormalChar(this string tXT, bool ignoreBR) {
             // http://sonderzeichentabelle.de/
             // http://www.htmlhelp.com/reference/html40/entities/special.html
@@ -403,6 +439,7 @@ namespace BlueBasics {
             tXT = tXT.Replace("&quot;", "\"");
             return tXT;
         }
+
         public static string CreateHtmlCodes(this string tXT, bool crlftoo) {
             // http://sonderzeichentabelle.de/
             // http://www.htmlhelp.com/reference/html40/entities/special.html
@@ -434,6 +471,7 @@ namespace BlueBasics {
             tXT = tXT.Replace(((char)1021).ToString(), ">");
             return tXT;
         }
+
         // public static string ToHTMLText(this string txt)
         // {
         //    txt = txt.Replace("&", "&amp;");
@@ -452,6 +490,7 @@ namespace BlueBasics {
             txt = txt.Replace("<>>", "&gt;");
             return txt;
         }
+
         public static string ToNonCritical(this string txt) {
             // http://www.theasciicode.com.ar/ascii-printable-characters/braces-curly-brackets-opening-ascii-code-123.html
             if (string.IsNullOrEmpty(txt)) { return string.Empty; }
@@ -470,6 +509,7 @@ namespace BlueBasics {
             txt = txt.Replace("&", "[L]");
             return txt;
         }
+
         public static string FromNonCritical(this string txt) {
             // http://www.theasciicode.com.ar/ascii-printable-characters/braces-curly-brackets-opening-ascii-code-123.html
             if (string.IsNullOrEmpty(txt)) { return string.Empty; }
@@ -491,6 +531,7 @@ namespace BlueBasics {
             txt = txt.Replace("[Z]", "[");
             return txt;
         }
+
         public static enFileFormat FileType(this string filename) => string.IsNullOrEmpty(filename)
 ? enFileFormat.Unknown
 : filename.FileSuffix() switch {
@@ -516,12 +557,14 @@ namespace BlueBasics {
     "BCR" => enFileFormat.BlueCreativeFile,
     _ => enFileFormat.Unknown,
 };
+
         public static string PathParent(this string pfad, int anzahlParents) {
             for (var z = 1; z <= anzahlParents; z++) {
                 pfad = pfad.PathParent();
             }
             return pfad;
         }
+
         public static string PathParent(this string pfad) {
             var z = pfad.Length;
             pfad = pfad.CheckPath();
@@ -531,6 +574,7 @@ namespace BlueBasics {
                 if (pfad.Substring(z - 1, 1) == "\\") { return pfad.Substring(0, z); }
             }
         }
+
         public static string Folder(this string pathx) {
             if (string.IsNullOrEmpty(pathx)) { return string.Empty; }
             // Kann vorkommen, wenn ein Benutzer einen Pfad
@@ -545,6 +589,7 @@ namespace BlueBasics {
                 if (z < 1) { return string.Empty; }
             }
         }
+
         /// <summary>
         /// Standard Pfad-Korrekturen. z.B. Doppelte Slashes, Backslashes. Gibt den Pfad mit abschließenden \ zurück.
         /// </summary>
@@ -560,6 +605,7 @@ namespace BlueBasics {
             if (pfad.Substring(0, 1) == "\\" && pfad.Substring(0, 2) != "\\\\") { Develop.DebugPrint("Achtung, Doppelslash: " + pfad); }
             return pfad;
         }
+
         /// <summary>
         /// Gibt den Dateipad eines Dateistrings zurück, mit abschließenden \.
         /// </summary>
@@ -572,13 +618,16 @@ namespace BlueBasics {
             var z = name.LastIndexOf("\\");
             return z < 0 ? string.Empty : name.Substring(0, z + 1);
         }
+
         public static string FileSuffix(this string name) {
             if (string.IsNullOrEmpty(name)) { return string.Empty; }
             if (!name.Contains(".")) { return string.Empty; }
             var l = Path.GetExtension(name);
             return string.IsNullOrEmpty(l) ? string.Empty : l.Substring(1).ToUpper();
         }
+
         public static string FileNameWithSuffix(this string name) => string.IsNullOrEmpty(name) ? string.Empty : Path.GetFileName(name);
+
         /// <summary>
         /// Gibt den Dateinamen ohne Suffix zurück.
         /// </summary>
@@ -586,11 +635,13 @@ namespace BlueBasics {
         /// <returns>Dateiname ohne Suffix</returns>
         /// <remarks></remarks>
         public static string FileNameWithoutSuffix(this string name) => string.IsNullOrEmpty(name) ? string.Empty : Path.GetFileNameWithoutExtension(name);
+
         public static string Trim(this string tXT, string was) {
             if (string.IsNullOrEmpty(tXT)) { return string.Empty; }
             tXT = tXT.TrimEnd(was);
             return string.IsNullOrEmpty(tXT) ? string.Empty : tXT.TrimStart(was);
         }
+
         public static string TrimEnd(this string tXT, string was) {
             if (string.IsNullOrEmpty(tXT)) { return string.Empty; }
             if (was.Length < 1) { Develop.DebugPrint(enFehlerArt.Fehler, "Trimmen nicht möglich mit: " + was); }
@@ -600,6 +651,7 @@ namespace BlueBasics {
             }
             return tXT;
         }
+
         public static string Replace(this string tXT, string alt, string neu, RegexOptions options) {
             if (options != RegexOptions.IgnoreCase) { Develop.DebugPrint(enFehlerArt.Fehler, "Regex option nicht erlaubt."); }
             if (string.IsNullOrEmpty(alt)) { Develop.DebugPrint(enFehlerArt.Fehler, "ALT is Empty"); }
@@ -615,7 +667,9 @@ namespace BlueBasics {
                 }
             }
         }
+
         public static bool ContainsWord(this string input, string value, RegexOptions options) => input.IndexOfWord(value, 0, options) >= 0;
+
         public static List<string> AllWords(this string input) {
             input = " " + input + " ";
             var position = 0;
@@ -632,6 +686,7 @@ namespace BlueBasics {
                 }
             }
         }
+
         public static int IndexOfWord(this string input, string value, int startIndex, RegexOptions options) {
             if (options != RegexOptions.IgnoreCase) { Develop.DebugPrint(enFehlerArt.Fehler, "Regex option nicht erlaubt."); }
             value = value.ToUpper();
@@ -649,6 +704,7 @@ namespace BlueBasics {
                 }
             }
         }
+
         public static string ReplaceWord(this string input, string alt, string replacement, RegexOptions options) {
             // return Regex.Replace(input, "\\b" + Alt + "\\b", replacement);
             if (options != RegexOptions.IgnoreCase) { Develop.DebugPrint(enFehlerArt.Fehler, "Regex option nicht erlaubt."); }
@@ -664,7 +720,9 @@ namespace BlueBasics {
                 input = input.Substring(0, start) + replacement + input.Substring(start + alt.Length);
             }
         }
+
         public static string TrimCr(this string tXT) => string.IsNullOrEmpty(tXT) ? string.Empty : tXT.Trim("\r");
+
         public static string TrimStart(this string tXT, string was) {
             if (string.IsNullOrEmpty(tXT)) { return string.Empty; }
             if (was.Length < 1) { Develop.DebugPrint(enFehlerArt.Fehler, "Trimmen nicht möglich mit: " + was); }
@@ -674,6 +732,7 @@ namespace BlueBasics {
             }
             return tXT;
         }
+
         /// <summary>
         /// Trennt den Text mittels dem Trennzeichen. Sind ein oder mehrere Trennzeichen am Ende, werden Leeren Felder diese nicht zurückgegeben.
         /// </summary>
@@ -688,6 +747,7 @@ namespace BlueBasics {
             if (w.Length == 1 && string.IsNullOrEmpty(w[0])) { w = new string[0]; }
             return w;
         }
+
         public static List<string> SplitByCRToList(this string textToSplit) {
             List<string> w = new();
             if (string.IsNullOrEmpty(textToSplit)) { return w; }
@@ -696,6 +756,7 @@ namespace BlueBasics {
             w.AddRange(textToSplit.SplitBy("\r"));
             return w;
         }
+
         public static string[] SplitByCR(this string textToSplit) {
             var w = new string[0];
             if (string.IsNullOrEmpty(textToSplit)) { return w; }
@@ -703,6 +764,7 @@ namespace BlueBasics {
             textToSplit = textToSplit.Replace("\n", "\r");
             return textToSplit.SplitBy("\r");
         }
+
         public static int CountString(this string text, string value) {
             var Anz = 0;
             for (var z = 0; z <= text.Length - value.Length; z++) {
@@ -710,6 +772,7 @@ namespace BlueBasics {
             }
             return Anz;
         }
+
         /// <summary>
         /// Reduziert den Text auf ein Minimum, Trennzeichen ist \r\n
         /// </summary>
@@ -732,6 +795,7 @@ namespace BlueBasics {
             }
             return txt;
         }
+
         public static string SetLenght(this string s, int anzahl) => s.Length == anzahl ? s : s.Length < anzahl ? s.PadRight(anzahl) : s.Substring(0, anzahl);
     }
 }

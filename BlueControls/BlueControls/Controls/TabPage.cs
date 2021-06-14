@@ -1,21 +1,24 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
@@ -25,11 +28,13 @@ using System.Drawing;
 using System.Windows.Forms.Design;
 
 namespace BlueControls.Controls {
+
     [ToolboxBitmap(typeof(System.Windows.Forms.TabPage))]
     [Designer(typeof(ScrollableControlDesigner))]
     public class TabPage : System.Windows.Forms.TabPage, IUseMyBackColor, ISupportsBeginnEdit {
 
         #region Constructor
+
         //public TabPage() : base()
         //{
         //    //This call is required by the Windows Form Designer.
@@ -45,9 +50,10 @@ namespace BlueControls.Controls {
         //    //SetStyle(System.Windows.Forms.ControlStyles.UserPaint, true);
         //    //SetBackColor();
         //}
-        #endregion
 
-        //#region  AutoScale deaktivieren 
+        #endregion Constructor
+
+        //#region  AutoScale deaktivieren
         //// https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
         //public void PerformAutoScale()
         //{
@@ -97,6 +103,7 @@ namespace BlueControls.Controls {
                 : Parent is TabControl ? Skin.Color_Back(enDesign.TabStrip_Body, enStates.Standard) : Color.Red;
             Invalidate();
         }
+
         //protected override void OnPaintBackground(System.Windows.Forms.PaintEventArgs pevent)
         //{
         //}
@@ -161,11 +168,13 @@ namespace BlueControls.Controls {
         //}
 
         #region ISupportsEdit
+
         [DefaultValue(0)]
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public int BeginnEditCounter { get; set; } = 0;
+
         public new void SuspendLayout() {
             BeginnEdit();
             base.SuspendLayout();
@@ -182,6 +191,7 @@ namespace BlueControls.Controls {
         }
 
         public void BeginnEdit() => BeginnEdit(1);
+
         public void BeginnEdit(int count) {
             if (DesignMode) { return; }
             foreach (var ThisControl in Controls) {
@@ -199,12 +209,13 @@ namespace BlueControls.Controls {
                 if (ThisControl is ISupportsBeginnEdit e) { e.EndEdit(); }
             }
         }
+
         protected override void OnControlAdded(System.Windows.Forms.ControlEventArgs e) {
             if (DesignMode) { return; }
             if (e.Control is ISupportsBeginnEdit nc) { nc.BeginnEdit(BeginnEditCounter); }
             base.OnControlAdded(e);
         }
-        #endregion
 
+        #endregion ISupportsEdit
     }
 }

@@ -4,12 +4,15 @@ using System;
 using static BlueBasics.Develop;
 
 namespace BlueControls.Forms {
+
     public partial class DialogWithOkAndCancel : Form {
         private bool _cancelPossible = false;
 
         #region Konstruktor
+
         public DialogWithOkAndCancel() : this(enDesign.Form_MsgBox) {
         }
+
         public DialogWithOkAndCancel(enDesign design) : base(design) {
             InitializeComponent();
             SetTopLevel(true);
@@ -17,7 +20,8 @@ namespace BlueControls.Forms {
                 StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             }
         }
-        #endregion
+
+        #endregion Konstruktor
 
         public void Setup(int MinWidth, int BottomOfLowestControl, bool CancelPossible, bool Sizeable) {
             Text = AppName();
@@ -38,6 +42,7 @@ namespace BlueControls.Forms {
                 FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             }
         }
+
         public void Setup(string TXT, GenericControl CenterControl, int MinWidth, bool CancelPossible, bool Sizeable) {
             var wi = Skin.Padding * 2;
             var he = Skin.Padding * 2;
@@ -60,26 +65,33 @@ namespace BlueControls.Forms {
                 CenterControl.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             }
         }
+
         /// <summary>
         /// Diese Routine wird aufgerufen, nachdem OK oder Cancel gedrückt wurde.
         /// </summary>
         protected virtual void SetValue(bool canceled) => DebugPrint_RoutineMussUeberschriebenWerden();
+
         protected void Ok() {
             SetValue(false);
             Close();
         }
+
         protected void Cancel() {
             SetValue(true);
             Close();
         }
+
         private void butAbbrechen_Click(object sender, System.EventArgs e) => Cancel();
+
         protected bool OK_Enabled {
             get => butOK.Enabled;
             set => butOK.Enabled = value;
         }
+
         private void butOK_Click(object sender, System.EventArgs e) => Ok();
+
         /// <summary>
-        /// Must handle some layout operations manually because Visual Studio 
+        /// Must handle some layout operations manually because Visual Studio
         /// 2005 arbitrarily changes some properties of inherited controls.
         /// </summary>
         /// <param name="e">Data for event.</param>

@@ -1,21 +1,24 @@
 #region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -28,16 +31,25 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 using System.Text.RegularExpressions;
+
 namespace BlueDatabase {
+
     public sealed class RowItem : ICanBeEmpty, IDisposable {
-        #region  Variablen-Deklarationen 
+
+        #region Variablen-Deklarationen
+
         public Database Database { get; private set; }
         private string? _tmpQuickInfo;
         private bool disposedValue;
-        #endregion
+
+        #endregion Variablen-Deklarationen
+
         public event EventHandler<RowCheckedEventArgs> RowChecked;
+
         public event EventHandler<DoRowAutomaticEventArgs> DoSpecialRules;
-        #region  Construktor + Initialize 
+
+        #region Construktor + Initialize
+
         public RowItem(Database database, int key) {
             Database = database;
             Key = key;
@@ -45,11 +57,18 @@ namespace BlueDatabase {
             Database.Cell.CellValueChanged += Cell_CellValueChanged;
             Database.Disposing += Database_Disposing;
         }
+
         private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
-        public RowItem(Database database) : this(database, database.Row.NextRowKey()) { }
-        #endregion
-        #region  Properties 
+
+        public RowItem(Database database) : this(database, database.Row.NextRowKey()) {
+        }
+
+        #endregion Construktor + Initialize
+
+        #region Properties
+
         public int Key { get; }
+
         public string QuickInfo {
             get {
                 if (_tmpQuickInfo != null) { return _tmpQuickInfo; }
@@ -57,64 +76,120 @@ namespace BlueDatabase {
                 return _tmpQuickInfo;
             }
         }
+
         private void GenerateQuickInfo() {
             if (string.IsNullOrEmpty(Database.ZeilenQuickInfo)) { _tmpQuickInfo = string.Empty; return; }
             _tmpQuickInfo = ReplaceVariables(Database.ZeilenQuickInfo, true, false);
         }
-        #endregion
+
+        #endregion Properties
+
         #region Cell Get / Set
+
         #region bool
+
         public bool CellGetBoolean(string columnName) => Database.Cell.GetBoolean(Database.Column[columnName], this);
+
         public bool CellGetBoolean(ColumnItem column) => Database.Cell.GetBoolean(column, this);
+
         public void CellSet(string columnName, bool value) => Database.Cell.Set(Database.Column[columnName], this, value);
+
         public void CellSet(ColumnItem column, bool value) => Database.Cell.Set(column, this, value);
-        #endregion
+
+        #endregion bool
+
         #region string
+
         public string CellFirstString() => Database.Cell.GetString(Database.Column[0], this);
+
         public string CellGetString(string columnName) => Database.Cell.GetString(Database.Column[columnName], this);
+
         public string CellGetString(ColumnItem column) => Database.Cell.GetString(column, this);
+
         public void CellSet(string columnName, string value) => Database.Cell.Set(Database.Column[columnName], this, value);
+
         public void CellSet(ColumnItem column, string value) => Database.Cell.Set(column, this, value);
-        #endregion
+
+        #endregion string
+
         #region double
+
         public double CellGetDouble(string columnName) => Database.Cell.GetDouble(Database.Column[columnName], this);
+
         public double CellGetDouble(ColumnItem column) => Database.Cell.GetDouble(column, this);
+
         public void CellSet(string columnName, double value) => Database.Cell.Set(Database.Column[columnName], this, value);
+
         public void CellSet(ColumnItem column, double value) => Database.Cell.Set(column, this, value);
-        #endregion
+
+        #endregion double
+
         #region decimal
+
         public decimal CellGetDecimal(string columnName) => Database.Cell.GetDecimal(Database.Column[columnName], this);
+
         public decimal CellGetDecimal(ColumnItem column) => Database.Cell.GetDecimal(column, this);
+
         public void CellSet(string columnName, decimal value) => Database.Cell.Set(Database.Column[columnName], this, value);
+
         public void CellSet(ColumnItem column, decimal value) => Database.Cell.Set(column, this, value);
-        #endregion
+
+        #endregion decimal
+
         #region int
+
         public int CellGetInteger(string columnName) => Database.Cell.GetInteger(Database.Column[columnName], this);
+
         public int CellGetInteger(ColumnItem column) => Database.Cell.GetInteger(column, this);
+
         public void CellSet(string columnName, int value) => Database.Cell.Set(Database.Column[columnName], this, value);
+
         public void CellSet(ColumnItem column, int value) => Database.Cell.Set(column, this, value);
-        #endregion
+
+        #endregion int
+
         #region Point
+
         public Point CellGetPoint(string columnName) => Database.Cell.GetPoint(Database.Column[columnName], this);
+
         public Point CellGetPoint(ColumnItem column) => Database.Cell.GetPoint(column, this);
+
         public void CellSet(string columnName, Point value) => Database.Cell.Set(Database.Column[columnName], this, value);
+
         public void CellSet(ColumnItem column, Point value) => Database.Cell.Set(column, this, value);
-        #endregion
+
+        #endregion Point
+
         #region List<string>
+
         public List<string> CellGetList(string columnName) => Database.Cell.GetList(Database.Column[columnName], this);
+
         public List<string> CellGetList(ColumnItem column) => Database.Cell.GetList(column, this);
+
         public void CellSet(string columnName, List<string> value) => Database.Cell.Set(Database.Column[columnName], this, value);
+
         public void CellSet(ColumnItem column, List<string> value) => Database.Cell.Set(column, this, value);
-        #endregion
+
+        #endregion List<string>
+
         #region DateTime
+
         public DateTime CellGetDateTime(string columnName) => Database.Cell.GetDateTime(Database.Column[columnName], this);
+
         public DateTime CellGetDateTime(ColumnItem column) => Database.Cell.GetDateTime(column, this);
+
         public void CellSet(string columnName, DateTime value) => Database.Cell.Set(Database.Column[columnName], this, value);
+
         public void CellSet(ColumnItem column, DateTime value) => Database.Cell.Set(column, this, value);
-        #endregion
+
+        #endregion DateTime
+
         #region color
+
         public Color CellGetColor(string columnName) => Database.Cell.GetColor(Database.Column[columnName], this);
+
         public Color CellGetColor(ColumnItem column) => Database.Cell.GetColor(column, this);
+
         //public void CellSet(string columnName, Color value)
         //{
         //    Database.Cell.Set(Database.Column[columnName], this, value, false);
@@ -132,13 +207,18 @@ namespace BlueDatabase {
         //    Database.Cell.Set(column, this, value);
         //}
         public int CellGetColorBGR(ColumnItem column) => Database.Cell.GetColorBGR(column, this);
-        #endregion
-        #endregion
+
+        #endregion color
+
+        #endregion Cell Get / Set
+
         public List<string> CellGetValuesReadable(ColumnItem Column, enShortenStyle style) => Database.Cell.ValuesReadable(Column, this, style);
+
         private void Cell_CellValueChanged(object sender, CellEventArgs e) {
             if (e.Row != this) { return; }
             _tmpQuickInfo = null;
         }
+
         private void VariableToCell(ColumnItem thisCol, List<Variable> vars) {
             var s = vars.Get(thisCol.Name);
             if (s == null) { return; }
@@ -155,10 +235,12 @@ namespace BlueDatabase {
                         CellSet(thisCol, false);
                     }
                     return;
+
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.Gleitkommazahl:
                     CellSet(thisCol, s.ValueString);
                     return;
+
                 case enDataFormat.Text:
                 case enDataFormat.BildCode:
                 case enDataFormat.Datum_und_Uhrzeit:
@@ -174,6 +256,7 @@ namespace BlueDatabase {
                     return;
             }
         }
+
         /// <summary>
         /// Diese Routine konvertiert den Inhalt der Zelle in eine vom Skript lesbaren Variable
         /// </summary>
@@ -193,6 +276,7 @@ namespace BlueDatabase {
                     _ => new Variable(column.Name, row.CellGetString(column), enVariableDataType.String, ro, false, "Spalte: " + column.ReadableText()),
                 };
         }
+
         /// <summary>
         /// Führt alle Regeln aus und löst das Ereignis DoSpecialRules aus. Setzt ansonsten keine Änderungen, wie z.B. SysCorrect oder Runden-Befehle.
         /// </summary>
@@ -203,7 +287,9 @@ namespace BlueDatabase {
                 {
                     new Variable("Startroutine", startRoutine, enVariableDataType.String, true, false, "ACHTUNG: Keinesfalls dürfen Startroutinenabhängig Werte verändert werden.\r\nMögliche Werte:\r\new row\r\nvalue changed\r\nscript testing\r\nmanual check\r\nto be sure\r\nimport, export")
                 };
+
                 #region Variablen für Skript erstellen
+
                 foreach (var thisCol in Database.Column) {
                     var v = CellToVariable(thisCol, this);
                     if (v != null) { vars.Add(v); }
@@ -222,7 +308,9 @@ namespace BlueDatabase {
                 //    vars.Add(new Variable("ReadOnly", "false", enVariableDataType.Bool, true, false));
                 //}
                 vars.Add(new Variable("Filename", Database.Filename, enVariableDataType.String, true, true, string.Empty));
-                #endregion
+
+                #endregion Variablen für Skript erstellen
+
                 Script script = new(vars) {
                     ScriptText = Database.RulesScript
                 };
@@ -243,7 +331,9 @@ namespace BlueDatabase {
                 return DoRules(onlyTest, startRoutine);
             }
         }
+
         public (bool didSuccesfullyCheck, string error, Script script) DoAutomatic(bool onlyTest, string startroutine) => DoAutomatic(false, false, onlyTest, startroutine);
+
         /// <summary>
         /// Führt Regeln aus, löst Ereignisses, setzt SysCorrect und auch die initalwerte der Zellen.
         /// Z.b: Runden, Großschreibung wird nur bei einem FullCheck korrigiert, das wird normalerweise vor dem Setzen bei CellSet bereits korrigiert.
@@ -261,6 +351,7 @@ namespace BlueDatabase {
                 if (DateTime.Now.Subtract(t).TotalSeconds > tryforsceonds) { return erg; }
             } while (true);
         }
+
         /// <summary>
         /// Führt Regeln aus, löst Ereignisses, setzt SysCorrect und auch die initalwerte der Zellen.
         /// Z.b: Runden, Großschreibung wird nur bei einem FullCheck korrigiert, das wird normalerweise vor dem Setzen bei CellSet bereits korrigiert.
@@ -319,6 +410,7 @@ namespace BlueDatabase {
             OnRowChecked(new RowCheckedEventArgs(this, cols));
             return (true, _InfoTXT, script);
         }
+
         public bool MatchesTo(FilterItem Filter) {
             if (Filter != null) {
                 if (Filter.FilterType is enFilterType.KeinFilter or enFilterType.GroßKleinEgal) { return true; } // Filter ohne Funktion
@@ -335,6 +427,7 @@ namespace BlueDatabase {
             }
             return true;
         }
+
         public bool MatchesTo(List<FilterItem> filter) {
             if (Database == null) { return false; }
             if (filter == null || filter.Count == 0) { return true; }
@@ -343,6 +436,7 @@ namespace BlueDatabase {
             }
             return true;
         }
+
         private bool RowFilterMatch(string searchText) {
             if (string.IsNullOrEmpty(searchText)) { return true; }
             searchText = searchText.ToUpper();
@@ -357,6 +451,7 @@ namespace BlueDatabase {
             }
             return false;
         }
+
         public bool IsNullOrEmpty() {
             foreach (var ThisColumnItem in Database.Column) {
                 if (ThisColumnItem != null) {
@@ -365,12 +460,19 @@ namespace BlueDatabase {
             }
             return true;
         }
+
         public bool IsNullOrEmpty(ColumnItem column) => Database.Cell.IsNullOrEmpty(column, this);
+
         public bool IsNullOrEmpty(string columnName) => Database.Cell.IsNullOrEmpty(Database.Column[columnName], this);
+
         public bool CellIsNullOrEmpty(string columnName) => Database.Cell.IsNullOrEmpty(Database.Column[columnName], this);
+
         public bool CellIsNullOrEmpty(ColumnItem column) => Database.Cell.IsNullOrEmpty(column, this);
+
         internal void OnRowChecked(RowCheckedEventArgs e) => RowChecked?.Invoke(this, e);
+
         internal void OnDoSpecialRules(DoRowAutomaticEventArgs e) => DoSpecialRules?.Invoke(this, e);
+
         /// <summary>
         /// Ersetzt Spaltennamen mit dem dementsprechenden Wert der Zelle. Format: &Spaltenname; oder &Spaltenname(L,8);
         /// </summary>
@@ -407,6 +509,7 @@ namespace BlueDatabase {
             }
             return erg;
         }
+
         /// <summary>
         /// Erstellt einen Sortierfähigen String eine Zeile
         /// </summary>
@@ -424,10 +527,12 @@ namespace BlueDatabase {
             r.Append(Constants.SecondSortChar + "<key>" + Key);
             return r.ToString();
         }
+
         public string CaptionReadable() {
             var c = CellGetString(Database.Column.SysChapter);
             return string.IsNullOrEmpty(c) ? "- ohne " + Database.Column.SysChapter.Caption + " -" : c.Replace("\r", ", ");
         }
+
         private void Dispose(bool disposing) {
             if (!disposedValue) {
                 if (disposing) {
@@ -442,11 +547,13 @@ namespace BlueDatabase {
                 disposedValue = true;
             }
         }
+
         // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
         ~RowItem() {
             // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
             Dispose(disposing: false);
         }
+
         public void Dispose() {
             // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
             Dispose(disposing: true);

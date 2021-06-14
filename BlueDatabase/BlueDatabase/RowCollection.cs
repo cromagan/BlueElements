@@ -1,21 +1,24 @@
 #region BlueElements - a collection of useful tools, database and controls
-// Authors: 
+
+// Authors:
 // Christian Peter
-// 
+//
 // Copyright (c) 2021 Christian Peter
 // https://github.com/cromagan/BlueElements
-// 
+//
 // License: GNU Affero General Public License v3.0
 // https://github.com/cromagan/BlueElements/blob/master/LICENSE
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER  
-// DEALINGS IN THE SOFTWARE. 
-#endregion
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
@@ -27,42 +30,53 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace BlueDatabase {
+
     public sealed class RowCollection : IEnumerable<RowItem>, IDisposable {
 
-        #region  Variablen-Deklarationen 
+        #region Variablen-Deklarationen
+
         private readonly ConcurrentDictionary<int, RowItem> _Internal = new();
         public Database Database { get; private set; }
         private int _LastRowKey;
         private bool disposedValue;
-        #endregion
 
+        #endregion Variablen-Deklarationen
 
-        #region  Event-Deklarationen + Delegaten 
+        #region Event-Deklarationen + Delegaten
+
         public event EventHandler<RowCheckedEventArgs> RowChecked;
+
         public event EventHandler<DoRowAutomaticEventArgs> DoSpecialRules;
+
         public event EventHandler<RowEventArgs> RowRemoving;
+
         public event EventHandler RowRemoved;
+
         public event EventHandler<RowEventArgs> RowAdded;
-        #endregion
 
+        #endregion Event-Deklarationen + Delegaten
 
-        #region  Construktor + Initialize 
+        #region Construktor + Initialize
+
         public void Initialize() => _LastRowKey = 0;
+
         public RowCollection(Database database) {
             Database = database;
             Database.Disposing += Database_Disposing;
             Initialize();
         }
-        #endregion
 
+        #endregion Construktor + Initialize
 
-        #region  Properties 
+        #region Properties
+
         /// <summary>
         /// Durchsucht die erste (interne) Spalte der Datenbank nach dem hier angegebenen Prmärschlüssel.
         /// </summary>
         /// <param name="primärSchlüssel">Der Primärschlüssel, nach dem gesucht werden soll. Groß/Kleinschreibung wird ignoriert.</param>
         /// <returns>Die Zeile, dessen erste Spalte den Primärschlüssel enthält oder - falls nicht gefunden - NULL.</returns>
         public RowItem this[string primärSchlüssel] => this[new FilterItem(Database.Column[0], enFilterType.Istgleich_GroßKleinEgal | enFilterType.MultiRowIgnorieren, primärSchlüssel)];
+
         public RowItem this[params FilterItem[] filter] {
             get {
                 if (filter == null || filter.Count() == 0) {
@@ -76,9 +90,11 @@ namespace BlueDatabase {
         }
 
         public RowItem this[FilterCollection filter] => Database == null ? null : _Internal.Values.FirstOrDefault(ThisRow => ThisRow != null && ThisRow.MatchesTo(filter));
-        #endregion
+
+        #endregion Properties
 
         private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
+
         internal int NextRowKey() {
             do {
                 if (_LastRowKey == int.MaxValue) { _LastRowKey = 0; }
@@ -101,6 +117,7 @@ namespace BlueDatabase {
         }
 
         public bool Clear() => Remove(new FilterCollection(Database));
+
         public bool Remove(FilterItem Filter) {
             FilterCollection NF = new(Database)
             {
@@ -116,12 +133,13 @@ namespace BlueDatabase {
             }
             return true;
         }
+
         internal string Load_310(enDatabaseDataType Art, string Wert) {
             switch (Art) {
-
                 case enDatabaseDataType.LastRowKey:
                     _LastRowKey = int.Parse(Wert);
                     break;
+
                 default:
                     if (Art.ToString() == ((int)Art).ToString()) {
                         Develop.DebugPrint(enFehlerArt.Info, "Laden von Datentyp '" + Art + "' nicht definiert.<br>Wert: " + Wert + "<br>Datei: " + Database.Filename);
@@ -139,7 +157,9 @@ namespace BlueDatabase {
         }
 
         private void OnRowChecked(object sender, RowCheckedEventArgs e) => RowChecked?.Invoke(this, e);
+
         private void OnDoSpecialRules(object sender, DoRowAutomaticEventArgs e) => DoSpecialRules?.Invoke(this, e);
+
         public RowItem Add(string ValueOfCellInFirstColumn) {
             if (string.IsNullOrEmpty(ValueOfCellInFirstColumn)) {
                 Develop.DebugPrint("Value = 0");
@@ -162,6 +182,7 @@ namespace BlueDatabase {
             if (Database.ReadOnly) { return; }
             DoAutomatic(CalculateSortedRows(filter, null, pinned), fullCheck, startroutine);
         }
+
         public void DoAutomatic(List<RowItem> x, bool fullCheck, string startroutine) {
             if (Database.ReadOnly) { return; }
             if (x == null || x.Count() == 0) { return; }
@@ -191,6 +212,7 @@ namespace BlueDatabase {
             if (Row == null) { return; }
             Remove(Row.Key);
         }
+
         internal void Repair() {
             foreach (var ThisRowItem in _Internal.Values) {
                 if (ThisRowItem != null) {
@@ -199,7 +221,9 @@ namespace BlueDatabase {
                 }
             }
         }
+
         internal void SaveToByteList(List<byte> l) => Database.SaveToByteList(l, enDatabaseDataType.LastRowKey, _LastRowKey.ToString());
+
         public RowItem SearchByKey(int Key) {
             try {
                 return Key < 0 ? null : !_Internal.ContainsKey(Key) ? null : _Internal[Key];
@@ -210,22 +234,31 @@ namespace BlueDatabase {
         }
 
         public RowItem First() => _Internal.Values.FirstOrDefault(ThisRowItem => ThisRowItem != null);//foreach (var ThisRowItem in _Internal.Values)//{//    if (ThisRowItem != null) { return ThisRowItem; }//}//return null;
+
         public IEnumerator<RowItem> GetEnumerator() => _Internal.Values.GetEnumerator();
+
         IEnumerator IEnumerable.GetEnumerator() => IEnumerable_GetEnumerator();
+
         private IEnumerator IEnumerable_GetEnumerator() => _Internal.Values.GetEnumerator();
+
         public int Count => _Internal.Count;
+
         internal void RemoveNullOrEmpty() => _Internal.RemoveNullOrEmpty();
+
         internal void OnRowAdded(RowEventArgs e) {
             e.Row.RowChecked += OnRowChecked;
             e.Row.DoSpecialRules += OnDoSpecialRules;
             RowAdded?.Invoke(this, e);
         }
+
         internal void OnRowRemoving(RowEventArgs e) {
             e.Row.RowChecked -= OnRowChecked;
             e.Row.DoSpecialRules -= OnDoSpecialRules;
             RowRemoving?.Invoke(this, e);
         }
+
         internal void OnRowRemoved() => RowRemoved?.Invoke(this, System.EventArgs.Empty);
+
         public bool RemoveOlderThan(float InHours) {
             var x = (from thisrowitem in _Internal.Values where thisrowitem != null let D = thisrowitem.CellGetDateTime(Database.Column.SysRowCreateDate) where DateTime.Now.Subtract(D).TotalHours > InHours select thisrowitem.Key).Select(dummy => (long)dummy).ToList();
             //foreach (var thisrowitem in _Internal.Values)
@@ -284,6 +317,7 @@ namespace BlueDatabase {
             _tmpSortedRows.InsertRange(0, newPinned);
             return _tmpSortedRows;
         }
+
         internal static List<RowItem> MatchesTo(FilterItem FilterItem) {
             List<RowItem> l = new();
             foreach (var ThisRow in FilterItem.Database.Row) {
@@ -293,6 +327,7 @@ namespace BlueDatabase {
             }
             return l;
         }
+
         private void Dispose(bool disposing) {
             if (!disposedValue) {
                 if (disposing) {
@@ -306,11 +341,13 @@ namespace BlueDatabase {
                 disposedValue = true;
             }
         }
+
         // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
         ~RowCollection() {
             // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
             Dispose(disposing: false);
         }
+
         public void Dispose() {
             // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
             Dispose(disposing: true);

@@ -1,4 +1,5 @@
 ﻿#region BlueElements - a collection of useful tools, database and controls
+
 // Authors:
 // Christian Peter
 //
@@ -15,12 +16,16 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-#endregion
+
+#endregion BlueElements - a collection of useful tools, database and controls
+
 using System.Collections.Generic;
 using System.Linq;
 
 namespace BlueBasics {
+
     public static partial class Extensions {
+
         public static List<string> SortedDistinctList(this List<string> arr) {
             var arr2 = arr.Distinct().ToList();
             if (arr2.Contains(string.Empty)) { arr2.Remove(string.Empty); }

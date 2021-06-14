@@ -4,10 +4,12 @@ using System;
 using System.Drawing;
 
 namespace BlueControls {
+
     public partial class Overlay : System.Windows.Forms.Form {
         private int Count;
         private readonly int Modus;
         private readonly GenericControl Control;
+
         public Overlay() {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
@@ -23,6 +25,7 @@ namespace BlueControls {
             Left = -Radius * 3;
             Top = -Radius * 3;
         }
+
         public Overlay(GenericControl OverControl) {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
@@ -34,6 +37,7 @@ namespace BlueControls {
             Control = OverControl;
             SetControl();
         }
+
         public void SetControl() {
             Width = Control.Width;
             Height = Control.Height;
@@ -41,11 +45,11 @@ namespace BlueControls {
             Left = p.X;
             Top = p.Y;
         }
+
         protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) {
             if (IsDisposed) { return; }
             base.OnPaint(e);
             switch (Modus) {
-
                 case 1:
                     Paint_RoterRahmenUmControlUndBlinken();
                     break;
@@ -53,11 +57,13 @@ namespace BlueControls {
                 case 2:
                     Paint_Radius();
                     break;
+
                 default:
                     Dispose();
                     break;
             }
         }
+
         public void Paint_Radius() {
             var g = CreateGraphics();
             g.Clear(Color.Magenta);
@@ -65,6 +71,7 @@ namespace BlueControls {
             g.DrawEllipse(Pens.Red, 1, 1, Width - 3, Height - 3);
             g.Dispose();
         }
+
         private void Paint_RoterRahmenUmControlUndBlinken() {
             SetControl();
             var g = CreateGraphics();
@@ -75,6 +82,7 @@ namespace BlueControls {
             g.Dispose();
             Blinker.Enabled = true;
         }
+
         private void Blinker_Tick(object sender, System.EventArgs e) {
             Opacity = Opacity > 0.5 ? 0.01 : 1;
             Count++;
@@ -83,6 +91,7 @@ namespace BlueControls {
                 Dispose();
             }
         }
+
         protected override System.Windows.Forms.CreateParams CreateParams {
             get {
                 var oParam = base.CreateParams;
