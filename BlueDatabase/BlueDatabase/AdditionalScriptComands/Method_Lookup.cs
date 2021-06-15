@@ -53,13 +53,12 @@ namespace BlueScript {
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+
             var f = s.Variablen.GetSystem("filename");
             if (f == null) { return new strDoItFeedback("System-Variable 'Filename' nicht gefunden."); }
-            foreach (var thisv in attvar.Attributes) {
-                if (thisv.Type != enVariableDataType.String) { return strDoItFeedback.FalscherDatentyp(); }
-            }
             var newf = f.ValueString.FilePath() + attvar.Attributes[0].ValueString + ".mdb";
             var db2 = BlueBasics.MultiUserFile.clsMultiUserFile.GetByFilename(newf, true);
+
             Database db;
             if (db2 == null) {
                 if (!FileOperations.FileExists(newf)) { return new strDoItFeedback("Datenbank nicht gefunden: " + newf); }
@@ -67,8 +66,10 @@ namespace BlueScript {
             } else {
                 db = (Database)db2;
             }
+
             var c = db.Column.Exists(attvar.Attributes[2].ValueString);
             if (c == null) { return new strDoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[2].ValueString); }
+
             var r = RowCollection.MatchesTo(new FilterItem(db.Column[0], BlueDatabase.Enums.enFilterType.Istgleich_GroßKleinEgal, attvar.Attributes[1].ValueString));
             if (r == null || r.Count == 0) {
                 if (attvar.Attributes.Count > 3) {
@@ -86,8 +87,10 @@ namespace BlueScript {
                 }
                 return new strDoItFeedback(string.Empty);
             }
+
             var v = RowItem.CellToVariable(c, r[0]);
             if (v == null || v.Count != 1) { return new strDoItFeedback("Wert konnte nicht erzeugt werden: " + attvar.Attributes[2].ValueString); }
+
             v[0].Readonly = false;
             v[0].Type = enVariableDataType.List;
             return new strDoItFeedback(v[0].ValueString, enVariableDataType.List);

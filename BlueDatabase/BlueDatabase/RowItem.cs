@@ -180,10 +180,6 @@ namespace BlueDatabase {
 
         public DateTime CellGetDateTime(ColumnItem column) => Database.Cell.GetDateTime(column, this);
 
-        public double CellGetDecimal(string columnName) => Database.Cell.GetDecimal(Database.Column[columnName], this);
-
-        public double CellGetDecimal(ColumnItem column) => Database.Cell.GetDecimal(column, this);
-
         public double CellGetDouble(string columnName) => Database.Cell.GetDouble(Database.Column[columnName], this);
 
         public double CellGetDouble(ColumnItem column) => Database.Cell.GetDouble(column, this);

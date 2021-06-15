@@ -239,9 +239,6 @@ namespace BlueControls.Controls {
             } else if (x is Enum) {
                 OldVal = ((int)x).ToString();
                 toSet = IntParse(Value);
-            } else if (x is double dc) {
-                OldVal = dc.ToString(Constants.Format_Float2);
-                toSet = DecimalParse(Value);
             } else if (x is double db) {
                 OldVal = db.ToString(Constants.Format_Float2);
                 toSet = DoubleParse(Value);
@@ -401,7 +398,8 @@ namespace BlueControls.Controls {
                                 Format = tmpName switch {
                                     "system.string" => enDataFormat.Text,
                                     "system.int32" => enDataFormat.Ganzzahl,
-                                    "system.decimal" => enDataFormat.Gleitkommazahl,
+                                    "system.float" => enDataFormat.Gleitkommazahl,
+                                    "system.double" => enDataFormat.Gleitkommazahl,
                                     "system.drawing.color" => enDataFormat.Text,
                                     _ => enDataFormat.Text,
                                 };

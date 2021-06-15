@@ -89,7 +89,7 @@ namespace BlueControls.Controls {
         #endregion
 
         private System.Windows.Forms.SplitContainer splitContainer1;
-        private ListBox Main;
+        public ListBox Main;
         private ListBox Suggest;
     }
 }

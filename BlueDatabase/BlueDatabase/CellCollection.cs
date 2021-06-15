@@ -291,14 +291,6 @@ namespace BlueDatabase {
             return string.IsNullOrEmpty(_String) ? default : DateTimeTryParse(_String, out var d) ? d : default;
         }
 
-        public double GetDecimal(string columnName, RowItem row) => GetDecimal(_database.Column[columnName], row);
-
-        public double GetDecimal(ColumnItem column, RowItem row) // Main Method
-        {
-            var x = GetString(column, row);
-            return string.IsNullOrEmpty(x) ? 0 : double.Parse(x);
-        }
-
         public double GetDouble(string columnName, RowItem row) => GetDouble(_database.Column[columnName], row);
 
         public double GetDouble(ColumnItem column, RowItem row) // Main Method

@@ -15,9 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueDatabase.EventArgs {
+using BlueDatabase;
 
-    public class CellDoubleClickEventArgs : CellEventArgs {
+namespace BlueControls.EventArgs {
+
+    public class CellDoubleClickEventArgs : BlueDatabase.EventArgs.CellEventArgs {
 
         #region Constructors
 

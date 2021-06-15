@@ -145,7 +145,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnPermanent
             // 
-            this.btnPermanent.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.btnPermanent.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
             this.btnPermanent.Location = new System.Drawing.Point(112, 32);
             this.btnPermanent.Name = "btnPermanent";
             this.btnPermanent.QuickInfo = "Die aktuelle Spalte wird immer<br>angezeigt und nicht verschoben.";
@@ -188,7 +188,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnSpalteNachRechts
             // 
-            this.btnSpalteNachRechts.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_Big_Borderless;
+            this.btnSpalteNachRechts.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnSpalteNachRechts.ImageCode = "Pfeil_Rechts";
             this.btnSpalteNachRechts.Location = new System.Drawing.Point(56, 32);
             this.btnSpalteNachRechts.Name = "btnSpalteNachRechts";
@@ -199,7 +199,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnSpalteNachLinks
             // 
-            this.btnSpalteNachLinks.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_Big_Borderless;
+            this.btnSpalteNachLinks.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnSpalteNachLinks.ImageCode = "Pfeil_Links";
             this.btnSpalteNachLinks.Location = new System.Drawing.Point(8, 32);
             this.btnSpalteNachLinks.Name = "btnSpalteNachLinks";
@@ -236,7 +236,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnSpalteEinblenden
             // 
-            this.btnSpalteEinblenden.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_Big_Borderless;
+            this.btnSpalteEinblenden.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnSpalteEinblenden.ImageCode = "Lupe";
             this.btnSpalteEinblenden.Location = new System.Drawing.Point(8, 24);
             this.btnSpalteEinblenden.Name = "btnSpalteEinblenden";
@@ -284,7 +284,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnAnsichtUmbenennen
             // 
-            this.btnAnsichtUmbenennen.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_Big_Borderless;
+            this.btnAnsichtUmbenennen.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnAnsichtUmbenennen.ImageCode = "Stift";
             this.btnAnsichtUmbenennen.Location = new System.Drawing.Point(144, 72);
             this.btnAnsichtUmbenennen.Name = "btnAnsichtUmbenennen";
@@ -318,7 +318,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnNeueAnsichtErstellen
             // 
-            this.btnNeueAnsichtErstellen.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_Big_Borderless;
+            this.btnNeueAnsichtErstellen.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnNeueAnsichtErstellen.ImageCode = "PlusZeichen";
             this.btnNeueAnsichtErstellen.Location = new System.Drawing.Point(16, 72);
             this.btnNeueAnsichtErstellen.Name = "btnNeueAnsichtErstellen";
@@ -329,7 +329,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnAktuelleAnsichtLoeschen
             // 
-            this.btnAktuelleAnsichtLoeschen.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_Big_Borderless;
+            this.btnAktuelleAnsichtLoeschen.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnAktuelleAnsichtLoeschen.ImageCode = "MinusZeichen";
             this.btnAktuelleAnsichtLoeschen.Location = new System.Drawing.Point(80, 72);
             this.btnAktuelleAnsichtLoeschen.Name = "btnAktuelleAnsichtLoeschen";
@@ -354,6 +354,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpAktuelleAnsicht.ResumeLayout(false);
             this.grpAnsichtsVerwaltung.ResumeLayout(false);
             this.ResumeLayout(false);
+
         }
         private TabControl tbcontrol;
         private TabPage tabAllgemein;

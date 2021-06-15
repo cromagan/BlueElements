@@ -24,11 +24,5 @@ namespace BlueControls.Enums {
         Ohne = 0,
         Rechteck = 1,
         Rechteck_R4 = 50,
-
-        [Obsolete]
-        Rechteck_R11 = 60,
-
-        [Obsolete]
-        Rechteck_R20 = 70
     }
 }

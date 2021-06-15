@@ -505,7 +505,13 @@ namespace BlueControls.Controls {
 
         private void ListBox_AddClicked(object sender, System.EventArgs e) {
             var Dia = ColumnItem.UserEditDialogTypeInTable(_tmpColumn, false);
-            var lbx = (ListBox)sender;
+
+            ListBox lbx = null;
+
+            if (sender is ListBox lbx2) { lbx = lbx2; }
+            if (sender is SwapListBox lbx3) { lbx = lbx3.Main; }
+
+            if (lbx == null) { return; }
 
             switch (Dia) {
                 case enEditTypeTable.None:

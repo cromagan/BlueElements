@@ -120,51 +120,24 @@ namespace BlueControls {
 
         public static PointM Empty() => new(0d, 0d);
 
-        public static explicit operator Point(PointM p) {
-            return new((int)p.X, (int)p.Y);
-        }
+        public static explicit operator Point(PointM p) => new((int)p.X, (int)p.Y);
 
-        public static explicit operator PointF(PointM p) {
-            return new((float)p.X, (float)p.Y);
-        }
+        public static explicit operator PointF(PointM p) => new((float)p.X, (float)p.Y);
 
-        public static PointM operator -(PointM a) {
-            return new(-a._x, -a._y);
-        }
+        public static PointM operator -(PointM a) => new(-a._x, -a._y);
 
-        public static PointM operator -(PointM a, PointM b) {
-            return new(a._x - b._x, a._y - b._y);
-        }
+        public static PointM operator -(PointM a, PointM b) => new(a._x - b._x, a._y - b._y);
 
-        public static PointM operator *(PointM a, double b) {
-            return new(a._x * b, a._y * b);
-        }
+        public static PointM operator *(PointM a, double b) => new(a._x * b, a._y * b);
 
-        public static PointM operator +(PointM a, PointM b) {
-            return new(a._x + b._x, a._y + b._y);
-        }
+        public static PointM operator +(PointM a, PointM b) => new(a._x + b._x, a._y + b._y);
 
-        //public int CompareTo(object obj) {
-        //    if (obj is PointM tobj) {
-        //        // hierist es egal, ob es ein DoAlways ist oder nicht. Es sollen nur Bedingugen VOR Aktionen kommen
-        //        return CompareKey().CompareTo(tobj.CompareKey());
-        //    } else {
-        //        Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Objecttyp!");
-        //        return 0;
-        //    }
-        //}
-        //internal string CompareKey() => _y.ToString(Constants.Format_Float5_1) + "-" + _x.ToString(Constants.Format_Float5_1);
         public double DistanzZuLinie(PointM P1, PointM P2) => DistanzZuLinie(P1.X, P1.Y, P2.X, P2.Y);
 
         public double DistanzZuLinie(double X1, double Y1, double X2, double Y2) => GeometryDF.Länge(this, GeometryDF.PointOnLine(this, X1, Y1, X2, Y2));
 
         public double DotProduct(PointM vector) => (_x * vector._x) + (_y * vector._y);
 
-        //public bool IsOnScreen(double zoom, double shiftX, double shiftY, Rectangle displayRectangle) {
-        //    var tx = (_x * zoom) - shiftX;
-        //    var ty = (_y * zoom) - shiftY;
-        //    return tx >= displayRectangle.Left && ty >= displayRectangle.Top && tx <= displayRectangle.Right && ty <= displayRectangle.Bottom;
-        //}
         public void Draw(Graphics gr, double zoom, double shiftX, double shiftY, enDesign type, enStates state) {
             var tx = (_x * zoom) - shiftX + (zoom / 2);
             var ty = (_y * zoom) - shiftY + (zoom / 2);

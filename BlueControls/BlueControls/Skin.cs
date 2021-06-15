@@ -1700,12 +1700,6 @@ namespace BlueControls {
         private static GraphicsPath Kontur(enKontur Kon, Rectangle r) => Kon switch {
             enKontur.Rechteck => modAllgemein.Poly_Rechteck(r),// GR.SmoothingModex = Drawing2D.SmoothingMode.None
             enKontur.Rechteck_R4 => modAllgemein.Poly_RoundRec(r, 4),// GR.SmoothingModex = Drawing2D.SmoothingMode.HighQuality
-            enKontur.Rechteck_R11 => modAllgemein.Poly_RoundRec(r, 11),//  GR.SmoothingModex = Drawing2D.SmoothingMode.HighQuality
-            enKontur.Rechteck_R20 => modAllgemein.Poly_RoundRec(r, 20),//    GR.SmoothingModex = Drawing2D.SmoothingMode.HighQuality
-                                                                       //break; case Is = enKontur.Rechteck_R4_NurOben
-                                                                       //    r.Y2 += 4
-                                                                       //    GR.SmoothingModex = Drawing2D.SmoothingMode.HighQuality
-                                                                       //    Return Poly_RoundRec(r, 4)
             enKontur.Ohne => null,
             _ => modAllgemein.Poly_Rechteck(r),//  GR.SmoothingModex = Drawing2D.SmoothingMode.None
         };

@@ -159,6 +159,9 @@
     <Compile Include="Enums\PadStyles.cs" />
     <Compile Include="Enums\TabControlHitTest.cs" />
     <Compile Include="EventArgs\AdditionalDrawing.cs" />
+    <Compile Include="EventArgs\ButtonCellEventArgs.cs" />
+    <Compile Include="EventArgs\CellDoubleClickEventArgs.cs" />
+    <Compile Include="EventArgs\CellValueChangingByUserEventArgs.cs" />
     <Compile Include="EventArgs\MouseEventArgs1_1DownAndCurrent.cs" />
     <Compile Include="EventArgs\PositionEventArgs.cs" />
     <Compile Include="EventArgs\MouseEventArgs1_1.cs" />

@@ -63,13 +63,9 @@ namespace BlueControls {
 
         #region Methods
 
-        public static explicit operator Rectangle(RectangleM r) {
-            return new((int)r.X, (int)r.Y, (int)r.Width, (int)r.Height);
-        }
+        public static explicit operator Rectangle(RectangleM r) => new((int)r.X, (int)r.Y, (int)r.Width, (int)r.Height);
 
-        public static explicit operator RectangleF(RectangleM r) {
-            return new((float)r.X, (float)r.Y, (float)r.Width, (float)r.Height);
-        }
+        public static explicit operator RectangleF(RectangleM r) => new((float)r.X, (float)r.Y, (float)r.Width, (float)r.Height);
 
         public object Clone() => new RectangleM(X, Y, Width, Height);
 

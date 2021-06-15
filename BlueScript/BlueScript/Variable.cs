@@ -70,19 +70,9 @@ namespace BlueScript {
         /// </summary>
         /// <param name="vars"></param>
         /// <param name="name"></param>
-        public static double GetDecimal(this List<Variable> vars, string name) {
-            var v = vars.Get(name);
-            return v == null ? 0d : (double)v.ValueDouble;
-        }
-
-        /// <summary>
-        /// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten 0
-        /// </summary>
-        /// <param name="vars"></param>
-        /// <param name="name"></param>
         public static double GetDouble(this List<Variable> vars, string name) {
             var v = vars.Get(name);
-            return v == null ? 0f : v.ValueDouble;
+            return v == null ? 0d : (double)v.ValueDouble;
         }
 
         /// <summary>

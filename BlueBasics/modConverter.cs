@@ -146,18 +146,6 @@ namespace BlueBasics {
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
-        public static double DecimalParse(string s) {
-            if (string.IsNullOrEmpty(s)) { return 0; }
-            if (double.TryParse(s, out var result)) { return result; }
-            // Develop.DebugPrint(enFehlerArt.Warnung, "double kann nicht geparsed werden: " + s);
-            return 0;
-        }
-
-        /// <summary>
-        /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
-        /// </summary>
-        /// <param name="s"></param>
-        /// <returns></returns>
         public static double DoubleParse(string s) {
             if (string.IsNullOrEmpty(s)) { return 0; }
             if (double.TryParse(s, out var result)) { return result; }

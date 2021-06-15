@@ -64,6 +64,7 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdditionalScriptComands\Method_AddRow.cs" />
     <Compile Include="AdditionalScriptComands\Method_Lookup.cs" />
     <Compile Include="AdditionalScriptComands\Method_SetError.cs" />
     <Compile Include="CellCollection.cs" />
@@ -89,10 +90,7 @@
     <Compile Include="Enums\enRoutinen.cs" />
     <Compile Include="Enums\enDatabaseDataType.cs" />
     <Compile Include="Enums\enViewType.cs" />
-    <Compile Include="EventArgs\BeforeNewValueEventArgs.cs" />
-    <Compile Include="EventArgs\ButtonCellEventArgs.cs" />
     <Compile Include="EventArgs\CellCancelEventArgs.cs" />
-    <Compile Include="EventArgs\CellDoubleClickEventArgs.cs" />
     <Compile Include="EventArgs\MessageEventArgs.cs" />
     <Compile Include="EventArgs\RenameColumnInLayoutEventArgs.cs" />
     <Compile Include="EventArgs\PasswordEventArgs.cs" />

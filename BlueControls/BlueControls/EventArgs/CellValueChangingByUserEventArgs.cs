@@ -15,14 +15,16 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueDatabase.EventArgs {
+using BlueDatabase;
 
-    public class BeforeNewValueEventArgs : CellCancelEventArgs {
+namespace BlueControls.EventArgs {
+
+    public class CellValueChangingByUserEventArgs : BlueDatabase.EventArgs.CellCancelEventArgs {
 
         #region Constructors
 
         //   ColumnItem Column, RowItem Row, Point MousePos, string NewVal, ref string CancelReason
-        public BeforeNewValueEventArgs(ColumnItem column, RowItem row, string newVal, string cancelReason) : base(column, row, cancelReason) => NewVal = newVal;
+        public CellValueChangingByUserEventArgs(ColumnItem column, RowItem row, string newVal, string cancelReason) : base(column, row, cancelReason) => NewVal = newVal;
 
         #endregion
 

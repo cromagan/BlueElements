@@ -248,8 +248,6 @@ namespace BlueBasics {
             return l;
         }
 
-        public static double TagGetDecimal(this ICollection<string> _String, string tagName) => DecimalParse(TagGet(_String, tagName));
-
         public static double TagGetDouble(this ICollection<string> _String, string tagName) => DoubleParse(TagGet(_String, tagName));
 
         public static int TagGetInt(this ICollection<string> _String, string tagName) => IntParse(TagGet(_String, tagName));

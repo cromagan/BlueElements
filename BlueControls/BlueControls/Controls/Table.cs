@@ -171,6 +171,8 @@ namespace BlueControls.Controls {
 
         public event EventHandler<CellEventArgs> CellValueChanged;
 
+        public event EventHandler<CellValueChangingByUserEventArgs> CellValueChangingByUser;
+
         public event EventHandler ColumnArrangementChanged;
 
         public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
@@ -186,8 +188,6 @@ namespace BlueControls.Controls {
         public event EventHandler<CellCancelEventArgs> EditBeforeBeginEdit;
 
         public event EventHandler<RowCancelEventArgs> EditBeforeNewRow;
-
-        public event EventHandler<BeforeNewValueEventArgs> EditBeforeNewValueSet;
 
         public event EventHandler FilterChanged;
 
@@ -1476,8 +1476,8 @@ namespace BlueControls.Controls {
             } else {
                 if (string.IsNullOrEmpty(newValue)) { return; }
             }
-            BeforeNewValueEventArgs ed = new(column, row, newValue, string.Empty);
-            table.OnEditBeforeNewValueSet(ed);
+            CellValueChangingByUserEventArgs ed = new(column, row, newValue, string.Empty);
+            table.OnCellValueChangingByUser(ed);
             var CancelReason = ed.CancelReason;
             if (string.IsNullOrEmpty(CancelReason) && formatWarnung && !string.IsNullOrEmpty(newValue)) {
                 if (!newValue.IsFormat(column.Format, column.MultiLine)) {
@@ -2943,6 +2943,8 @@ namespace BlueControls.Controls {
 
         private void OnCellValueChanged(CellEventArgs e) => CellValueChanged?.Invoke(this, e);
 
+        private void OnCellValueChangingByUser(CellValueChangingByUserEventArgs ed) => CellValueChangingByUser?.Invoke(this, ed);
+
         private void OnColumnArrangementChanged() => ColumnArrangementChanged?.Invoke(this, System.EventArgs.Empty);
 
         // Return ExpandRectangle(DisplayRectangle, 0, 0, -SliderY.Width, 0)
@@ -2953,8 +2955,6 @@ namespace BlueControls.Controls {
         private void OnEditBeforeBeginEdit(CellCancelEventArgs e) => EditBeforeBeginEdit?.Invoke(this, e);
 
         private void OnEditBeforeNewRow(RowCancelEventArgs e) => EditBeforeNewRow?.Invoke(this, e);
-
-        private void OnEditBeforeNewValueSet(BeforeNewValueEventArgs ed) => EditBeforeNewValueSet?.Invoke(this, ed);
 
         private void OnFilterChanged() => FilterChanged?.Invoke(this, System.EventArgs.Empty);
 

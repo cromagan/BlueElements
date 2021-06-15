@@ -16,10 +16,11 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueDatabase;
 
-namespace BlueDatabase.EventArgs {
+namespace BlueControls.EventArgs {
 
-    public class ButtonCellEventArgs : CellEventArgs {
+    public class ButtonCellEventArgs : BlueDatabase.EventArgs.CellEventArgs {
 
         #region Constructors
 

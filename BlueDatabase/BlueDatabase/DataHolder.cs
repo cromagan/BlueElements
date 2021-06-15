@@ -187,8 +187,6 @@ namespace BlueDatabase {
             System.GC.SuppressFinalize(this);
         }
 
-        public double GetDecimal(string dataName) => Row().CellGetDecimal(Column(dataName, string.Empty));
-
         public double GetDouble(string dataName) => Row().CellGetDouble(Column(dataName, string.Empty));
 
         public int GetInt(string dataName) => Row().CellGetInteger(Column(dataName, string.Empty));
