@@ -138,7 +138,7 @@ namespace BlueControls.Controls {
                     return enPartentType.Nothing;
 
                 case GroupBox _: {
-                        if (control.Parent is TabPage TP) {
+                        if (control.Parent is System.Windows.Forms.TabPage TP) {
                             if (TP.Parent == null) { return enPartentType.Unbekannt; }
                             if (TP.Parent is RibbonBar) { return enPartentType.RibbonGroupBox; }
                         }
@@ -165,10 +165,10 @@ namespace BlueControls.Controls {
 
                 case tabAdministration _:
 
-                case TabPage _ when control.Parent is RibbonBar:
+                case System.Windows.Forms.TabPage _ when control.Parent is RibbonBar:
                     return enPartentType.RibbonPage;
 
-                case TabPage _:
+                case System.Windows.Forms.TabPage _:
                     return enPartentType.TabPage;
                 //Is = "BlueBasics.Slider"
 

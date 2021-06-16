@@ -41,7 +41,7 @@ namespace BlueBasics {
             double L1 = sP.X - ep.X;
             double L2 = sP.Y - ep.Y;
             // ^2 ist langsamer, laut Project Analyzer
-            return Math.Sqrt((double)(L1 * L1 + L2 * L2));
+            return Math.Sqrt((double)((L1 * L1) + (L2 * L2)));
         }
 
         public static double Länge(PointF sP, PointF ep) {

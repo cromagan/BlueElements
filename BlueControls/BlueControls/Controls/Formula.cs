@@ -614,7 +614,7 @@ namespace BlueControls.Controls {
             foreach (var ThisView in _Database.Views) {
                 if (ThisView != null && ThisView != _Database.Views[0]) {
                     TabGeneratorCount++;
-                    TabPage tempPage = new() {
+                    System.Windows.Forms.TabPage tempPage = new() {
                         Text = "Seite #" + TabGeneratorCount
                     };
                     tempPage.Text = ThisView.Name;
@@ -732,7 +732,7 @@ namespace BlueControls.Controls {
                     }
                     return; // Raus hier
 
-                case TabPage _:
+                case System.Windows.Forms.TabPage _:
                     foreach (System.Windows.Forms.Control o in vObject.Controls) {
                         RemoveControl(o);
                     }
@@ -871,10 +871,12 @@ namespace BlueControls.Controls {
             if (Parent == null) { return; } // Irgend ein Formular reagiert nioch?!?
             _Inited = false;
             Control_Remove_All();
-            foreach (TabPage ThisTabpage in Tabs.TabPages) {
-                ThisTabpage.MouseUp -= Tabs_MouseUp;
-                ThisTabpage.Dispose();
-                Tabs.TabPages.Remove(ThisTabpage);
+            foreach (var ThisTabpage in Tabs.TabPages) {
+                if (ThisTabpage is System.Windows.Forms.TabPage tp) {
+                    tp.MouseUp -= Tabs_MouseUp;
+                    tp.Dispose();
+                    Tabs.TabPages.Remove(tp);
+                }
             }
             Tabs.TabPages.Clear();
             Generate_Tabs();

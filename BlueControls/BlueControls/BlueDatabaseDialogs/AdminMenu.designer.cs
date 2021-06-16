@@ -25,10 +25,10 @@ namespace BlueControls.BlueDatabaseDialogs
         private void InitializeComponent()
         {
             this.tbcontrol = new BlueControls.Controls.TabControl();
-            this.tabAllgemein = new BlueControls.Controls.TabPage();
+            this.tabAllgemein = new System.Windows.Forms.TabPage();
             this.btnDatenbankPfad = new BlueControls.Controls.Button();
             this.btnNeueSpalteErstellen = new BlueControls.Controls.Button();
-            this.tabAnsichten = new BlueControls.Controls.TabPage();
+            this.tabAnsichten = new System.Windows.Forms.TabPage();
             this.grpAktuelleSpalte = new BlueControls.Controls.GroupBox();
             this.btnPosEingeben = new BlueControls.Controls.Button();
             this.btnPermanent = new BlueControls.Controls.Button();
@@ -357,8 +357,8 @@ namespace BlueControls.BlueDatabaseDialogs
 
         }
         private TabControl tbcontrol;
-        private TabPage tabAllgemein;
-        private TabPage tabAnsichten;
+        private  System.Windows.Forms.TabPage tabAllgemein;
+        private  System.Windows.Forms.TabPage tabAnsichten;
         internal Button btnNeueSpalteErstellen;
         internal GroupBox grpAnsichtsVerwaltung;
         private Button btnAnsichtUmbenennen;

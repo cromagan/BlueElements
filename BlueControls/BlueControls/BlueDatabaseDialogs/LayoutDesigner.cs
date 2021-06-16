@@ -182,7 +182,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             Area_Drucken.Enabled = true;
             //} else {
             //    Area_Drucken.Enabled = false;
-            //    tabPageControl.Enabled = false;
+            //     System.Windows.Forms.TabPageControl.Enabled = false;
             //    grpDateiSystem.Enabled = false;
             //    btnLayoutLöschen.Enabled = false;
             //    btnLayoutUmbenennen.Enabled = false;

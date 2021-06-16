@@ -28,7 +28,7 @@ namespace BlueControls.Forms
             this.ZoomFitBut = new BlueControls.Controls.Button();
             this.Pad = new BlueControls.Controls.ZoomPic();
             this.Ribbon = new BlueControls.Controls.RibbonBar();
-            this.tabPageControl = new BlueControls.Controls.TabPage();
+            this.tabPageControl = new System.Windows.Forms.TabPage();
             this.grpWerkzeuge = new BlueControls.Controls.GroupBox();
             this.Auswahl = new BlueControls.Controls.Button();
             this.grpSeiten.SuspendLayout();
@@ -120,7 +120,7 @@ namespace BlueControls.Forms
             this.Ribbon.Size = new System.Drawing.Size(1334, 110);
             this.Ribbon.TabIndex = 2;
             // 
-            // tabPageControl
+            //  System.Windows.Forms.TabPageControl
             // 
             this.tabPageControl.Controls.Add(this.grpWerkzeuge);
             this.tabPageControl.Controls.Add(this.grpSeiten);
@@ -175,7 +175,7 @@ namespace BlueControls.Forms
 			private Button Auswahl;
 			public ZoomPic Pad;
 			protected RibbonBar Ribbon;
-			protected TabPage tabPageControl;
+			protected System.Windows.Forms.TabPage tabPageControl;
 			protected GroupBox grpSeiten;
 			protected GroupBox grpWerkzeuge;
 			private Button ZoomFitBut;

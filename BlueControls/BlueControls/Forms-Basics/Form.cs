@@ -16,16 +16,14 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
-using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
-using BlueControls.Interfaces;
 using System.ComponentModel;
 using System.Drawing;
 
 namespace BlueControls.Forms {
 
-    public partial class Form : System.Windows.Forms.Form, IUseMyBackColor {
+    public partial class Form : System.Windows.Forms.Form {
 
         #region Fields
 
@@ -160,11 +158,6 @@ namespace BlueControls.Forms {
         protected override void ScaleControl(SizeF factor, System.Windows.Forms.BoundsSpecified specified) {
             factor = new SizeF(1, 1);
             base.ScaleControl(factor, specified);
-        }
-
-        private void SkinChanged() {
-            BackColor = Skin.Color_Back(Design, enStates.Standard);
-            Invalidate();
         }
 
         #endregion

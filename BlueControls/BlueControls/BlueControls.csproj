@@ -247,8 +247,8 @@
     <Compile Include="Forms-Special\PictureView.designer.cs">
       <DependentUpon>PictureView.cs</DependentUpon>
     </Compile>
+    <Compile Include="Interfaces\IBackgroundNone.cs" />
     <Compile Include="Interfaces\IMoveable.cs" />
-    <Compile Include="Interfaces\IUseMyBackColor.cs" />
     <Compile Include="Forms-Common\Notification.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -323,8 +323,6 @@
     <Compile Include="Controls\CreativePad.Designer.cs">
       <DependentUpon>CreativePad.cs</DependentUpon>
     </Compile>
-    <Compile Include="EventArgs\TabControlEventArgs.cs" />
-    <Compile Include="Classes Editor\TabPageCollectionEditor.cs" />
     <Compile Include="Designer Support\BasicDesigner.cs" />
     <Compile Include="Designer Support\ButtonActionList.cs" />
     <Compile Include="Designer Support\ButtonDesigner.cs" />
@@ -332,7 +330,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Designer Support\QuickPicSelector.cs" />
-    <Compile Include="Designer Support\TabControlDesigner.cs" />
     <Compile Include="BlueDatabaseDialogs\AutoFilter.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -461,7 +458,6 @@
     <Compile Include="Controls\GroupBox.Designer.cs">
       <DependentUpon>GroupBox.cs</DependentUpon>
     </Compile>
-    <Compile Include="Interfaces\IBackgroundNone.cs" />
     <Compile Include="Interfaces\ICanHaveColumnVariables.cs" />
     <Compile Include="Interfaces\IContextMenu.cs" />
     <Compile Include="Interfaces\IMouseAndKeyHandle.cs" />
@@ -525,9 +521,6 @@
     </Compile>
     <Compile Include="Controls\Table.Designer.cs">
       <DependentUpon>Table.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\TabPage.cs">
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\TextBox.cs">
       <SubType>Component</SubType>

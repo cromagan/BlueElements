@@ -60,7 +60,7 @@ namespace BlueControls {
         public static double Länge(PointM SP, PointM Ep) {
             var L1 = SP.X - Ep.X;
             var L2 = SP.Y - Ep.Y;
-            return Math.Sqrt((double)(L1 * L1 + L2 * L2)); // ^ 2 ist langsamer, laut Project Analyzer
+            return Math.Sqrt((double)((L1 * L1) + (L2 * L2))); // ^ 2 ist langsamer, laut Project Analyzer
         }
 
         /// <summary>

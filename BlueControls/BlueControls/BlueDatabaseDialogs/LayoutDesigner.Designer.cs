@@ -38,8 +38,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnLayoutVerzeichnis = new BlueControls.Controls.Button();
             this.btnLayoutOeffnen = new BlueControls.Controls.Button();
             this.tabRightSide = new BlueControls.Controls.TabControl();
-            this.tabElementEigenschaften = new BlueControls.Controls.TabPage();
-            this.tabSkript = new BlueControls.Controls.TabPage();
+            this.tabElementEigenschaften = new System.Windows.Forms.TabPage();
+            this.tabSkript = new System.Windows.Forms.TabPage();
             this.scriptEditor = new BlueControls.ScriptEditor();
             this.Ribbon.SuspendLayout();
             this.tabPageControl.SuspendLayout();
@@ -63,11 +63,11 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.Ribbon.Size = new System.Drawing.Size(1340, 110);
             // 
-            // tabPageControl
+            //  System.Windows.Forms.TabPageControl
             // 
             this.tabPageControl.Size = new System.Drawing.Size(1332, 81);
             // 
-            // tabPageStart
+            //  System.Windows.Forms.TabPageStart
             // 
             this.tabPageStart.Controls.Add(this.grpExterneLayouts);
             this.tabPageStart.Controls.Add(this.grpLayoutSelection);
@@ -299,8 +299,8 @@ namespace BlueControls.BlueDatabaseDialogs
         private Button btnTextEditor;
         private Button btnLayoutVerzeichnis;
         private Button btnLayoutOeffnen;
-        private TabPage tabElementEigenschaften;
-        private TabPage tabSkript;
+        private  System.Windows.Forms.TabPage tabElementEigenschaften;
+        private  System.Windows.Forms.TabPage tabSkript;
         private TabControl tabRightSide;
         private ScriptEditor scriptEditor;
     }

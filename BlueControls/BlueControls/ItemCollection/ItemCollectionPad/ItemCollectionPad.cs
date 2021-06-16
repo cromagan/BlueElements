@@ -455,21 +455,16 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        //public void RecomputePointAndRelations()
-        //{
-        //    foreach (var thisItem in this)
-        //    {
-        //        thisItem?.GenerateInternalRelation();
-        //    }
-        //}
-        public void Swap(BasicPadItem Nr1, BasicPadItem Nr2) {
-            var g1 = Nr1.Gruppenzugehörigkeit;
-            Nr1.Gruppenzugehörigkeit = string.Empty;
-            var g2 = Nr2.Gruppenzugehörigkeit;
-            Nr2.Gruppenzugehörigkeit = string.Empty;
-            Swap(IndexOf(Nr1), IndexOf(Nr2));
-            Nr1.Gruppenzugehörigkeit = g1;
-            Nr2.Gruppenzugehörigkeit = g2;
+        public new void Swap(BasicPadItem item1, BasicPadItem item2) {
+            var g1 = item1.Gruppenzugehörigkeit;
+            item1.Gruppenzugehörigkeit = string.Empty;
+            var g2 = item2.Gruppenzugehörigkeit;
+            item2.Gruppenzugehörigkeit = string.Empty;
+
+            base.Swap(item1, item2);
+
+            item1.Gruppenzugehörigkeit = g1;
+            item2.Gruppenzugehörigkeit = g2;
             OnDoInvalidate();
         }
 

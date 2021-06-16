@@ -159,7 +159,7 @@ namespace BlueControls.Controls {
             if (_DrawStyle != enComboboxStyle.TextBox) {
                 if (string.IsNullOrEmpty(_Initialtext) && !string.IsNullOrEmpty(Text)) { _Initialtext = Text; }
                 Button.DrawButton(this, gr, (enDesign)_DrawStyle, state, QuickImage.Get(_ImageCode), enAlignment.Horizontal_Vertical_Center, true, null, _Initialtext, DisplayRectangle, Translate);
-                DoReturn();
+                btnDropDown.Invalidate();
                 return;
             }
             btnDropDown.Enabled = Item.Count > 0;
@@ -170,21 +170,21 @@ namespace BlueControls.Controls {
             var i = Item[Text];
             if (i == null) {
                 base.DrawControl(gr, state);
-                DoReturn();
+                btnDropDown.Invalidate();
                 return;
             }
             i.SetParent(Item); // Um den Stil zu wissen
             if (Focused() && _DropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDown) {
                 // Focused = Bearbeitung erwünscht, Cursor anzeigen und KEINE Items zeichnen
                 base.DrawControl(gr, state);
-                DoReturn();
+                btnDropDown.Invalidate();
                 return;
             }
             if (_DropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDown) {
                 if (i is TextListItem tempVar2) {
                     if (tempVar2.Symbol == null && tempVar2.IsClickable()) {
                         base.DrawControl(gr, state);
-                        DoReturn();
+                        btnDropDown.Invalidate();
                         return;
                     }
                 }
@@ -199,12 +199,7 @@ namespace BlueControls.Controls {
                 i.SetCoordinates(r);
             }
             Skin.Draw_Border(gr, vType, state, DisplayRectangle);
-            DoReturn();
-            void DoReturn() {
-                //gr.DrawImage(_BitmapOfControl, 0, 0);
-                //TMPGR.Dispose();
-                btnDropDown.Invalidate();
-            }
+            btnDropDown.Invalidate();
         }
 
         protected override enDesign GetDesign() => ParentType() is enPartentType.RibbonGroupBox or enPartentType.RibbonPage

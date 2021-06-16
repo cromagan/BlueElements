@@ -15,7 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
@@ -28,24 +27,17 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Design;
-using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
 namespace BlueControls.Controls {
 
     [ToolboxBitmap(typeof(System.Windows.Forms.TabControl))]
-    [Designer(typeof(TabControlDesigner))]
-    public abstract class AbstractTabControl : System.Windows.Forms.TabControl, IContextMenu, IUseMyBackColor {
+    public abstract partial class AbstractTabControl : System.Windows.Forms.TabControl, IContextMenu {
 
         #region Fields
 
-        private const int TCN_FIRST = -550;
+        private System.Windows.Forms.TabPage _HotTab;
 
-        //&HFFFFFFFFFFFFFDDA& unchecked((int)0xFFFFFFFFFFFFFDDA) & ;
-        private const int TCN_SELCHANGING = TCN_FIRST - 2;
-
-        private TabPage _HotTab;
-
-        // https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
         private bool _IndexChanged = false;
 
         #endregion
@@ -59,9 +51,9 @@ namespace BlueControls.Controls {
             //SetStyle(System.Windows.Forms.ControlStyles.ResizeRedraw, false);
             SetStyle(System.Windows.Forms.ControlStyles.SupportsTransparentBackColor, false);
             SetStyle(System.Windows.Forms.ControlStyles.Opaque, true);
+
             //The next 3 styles are allefor double buffering
             SetStyle(System.Windows.Forms.ControlStyles.DoubleBuffer, true);
-            // Me.SetStyle(System.Windows.Forms.ControlStyles.OptimizedDoubleBuffer, True)
             SetStyle(System.Windows.Forms.ControlStyles.AllPaintingInWmPaint, true);
             SetStyle(System.Windows.Forms.ControlStyles.UserPaint, true);
         }
@@ -74,8 +66,6 @@ namespace BlueControls.Controls {
 
         public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
 
-        public event EventHandler<TabControlEventArgs> SelectedIndexChanging;
-
         #endregion
 
         #region Properties
@@ -86,9 +76,6 @@ namespace BlueControls.Controls {
             set => base.AutoSize = false;
         }
 
-        [Editor(typeof(TabPageCollectionEditor), typeof(UITypeEditor))]
-        public new TabPageCollection TabPages => base.TabPages;
-
         protected override bool ScaleChildren => false;
 
         #endregion
@@ -97,72 +84,40 @@ namespace BlueControls.Controls {
 
         public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) => false;
 
-        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
-            if (e != null) {
-                HotItem = (TabPage)TestTab(new Point(e.X, e.Y));
-                if (_HotTab != null) {
-                    Tags.TagSet("Page", TabPages.IndexOf(_HotTab).ToString());
-                }
-            } else {
-                HotItem = null;
-            }
-        }
-
-        public void InsertTabPage(System.Windows.Forms.TabPage tabpage, int index) {
-            if (index < 0 || index > TabCount) {
-                throw new ArgumentException("Index out of Range.");
-            }
-            TabPages.Add(tabpage);
-            if (index < TabCount - 1) {
-                do {
-                    SwapTabPages(tabpage, TabPages[TabPages.IndexOf(tabpage) - 1]);
-                } while (TabPages.IndexOf(tabpage) != index);
-            }
-            SelectedTab = tabpage;
-        }
+        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) => HotItem = e != null ? TestTab(new Point(e.X, e.Y)) : null;
 
         public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
         public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
-        // Private Const WM_USER As Int32 = &H400&
-        //   Private Const WM_NOTIFY As Int32 = &H4E&
-        //  Private Const WM_REFLECT As Int32 = WM_USER + &H1C00&
-        public void PerformAutoScale() {
-            // NIX TUN!!!!
-        }
+        public void PerformAutoScale() { }
 
-        public void Scale() {
-            // NIX TUN!!!!
-        }
+        public void Scale() { }
 
-        public void SwapTabPages(System.Windows.Forms.TabPage tp1, System.Windows.Forms.TabPage tp2) {
-            if (TabPages.Contains(tp1) == false || TabPages.Contains(tp2) == false) {
-                throw new ArgumentException("TabPages must be in the TabCotrols TabPageCollection.");
-            }
-            var Index1 = TabPages.IndexOf(tp1);
-            var Index2 = TabPages.IndexOf(tp2);
-            TabPages[Index1] = tp2;
-            TabPages[Index2] = tp1;
-        }
-
-        //MyBase.ScaleChildren
         protected override Rectangle GetScaledBounds(Rectangle tbounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified) => tbounds;
 
-        protected override void OnControlAdded(System.Windows.Forms.ControlEventArgs e) {
-            if (e.Control is TabPage tb) { tb.SetBackColor(); }
+        protected override void OnControlAdded(ControlEventArgs e) {
             base.OnControlAdded(e);
+            if (e.Control is TabPage tp) {
+                tp.BackColor = this is RibbonBar ? Skin.Color_Back(enDesign.RibbonBar_Body, enStates.Standard)
+                             : this is TabControl ? Skin.Color_Back(enDesign.TabStrip_Body, enStates.Standard)
+                             : Color.Red;
+                Invalidate();
+            }
         }
 
+        // NIX TUN!!!!
+
+        // NIX TUN!!!!
         protected override void OnMouseLeave(System.EventArgs e) {
-            base.OnMouseLeave(e);
             _HotTab = null;
+            base.OnMouseLeave(e);
         }
 
         protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
             if (!HotTrack) { HotTrack = true; }
+            _HotTab = TestTab(new Point(e.X, e.Y));
             base.OnMouseMove(e);
-            _HotTab = (TabPage)TestTab(new Point(e.X, e.Y));
         }
 
         protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
@@ -208,25 +163,9 @@ namespace BlueControls.Controls {
             base.ScaleControl(factor, specified);
         }
 
-        //MyBase.GetScaledBounds(bounds, factor, specified)
         protected override void WndProc(ref System.Windows.Forms.Message m) {
-            try {
-                if (m.Msg == (int)enWndProc.WM_REFLECT + (int)enWndProc.WM_NOTIFY) {
-                    var hdr = (NMHDR)Marshal.PtrToStructure(m.LParam, typeof(NMHDR));
-                    if (hdr.code == TCN_SELCHANGING) {
-                        if (_HotTab != null) {
-                            TabControlEventArgs e = new(_HotTab, Controls.IndexOf(_HotTab));
-                            OnSelectedIndexChanging(e);
-                            if (e.Cancel || _HotTab.Enabled == false) {
-                                m.Result = new IntPtr(1);
-                                return;
-                            }
-                        }
-                    }
-                }
-                if (m.Msg == (int)enWndProc.WM_ERASEBKGND) { return; }
-                base.WndProc(ref m);
-            } catch { }
+            if (m.Msg == (int)enWndProc.WM_ERASEBKGND) { return; }
+            base.WndProc(ref m);
         }
 
         private void DrawTabBody(Graphics graphics, int id) {
@@ -265,8 +204,6 @@ namespace BlueControls.Controls {
             } catch { }
         }
 
-        private void OnSelectedIndexChanging(TabControlEventArgs e) => SelectedIndexChanging?.Invoke(this, e);
-
         private System.Windows.Forms.TabPage TestTab(Point pt) {
             for (var index = 0; index < TabCount; index++) {
                 if (GetTabRect(index).Contains(pt.X, pt.Y)) {
@@ -274,19 +211,6 @@ namespace BlueControls.Controls {
                 }
             }
             return null;
-        }
-
-        #endregion
-
-        #region Structs
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct NMHDR {
-            private readonly int HWND;
-            private readonly int idFrom;
-            public readonly int code;
-
-            public override string ToString() => string.Format("Hwnd: {0}, ControlID: {1}, Code: {2}", HWND, idFrom, code);
         }
 
         #endregion

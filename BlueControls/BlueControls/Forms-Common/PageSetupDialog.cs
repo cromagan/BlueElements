@@ -29,7 +29,6 @@ namespace BlueControls.Forms {
 
         #region Fields
 
-        private readonly PrintDocument OriD;
         private bool Doing;
         private PrintDocument GiveBack = null;
 
@@ -43,7 +42,6 @@ namespace BlueControls.Forms {
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             Doing = true;
             // _NurHoch = NurHochformat
-            OriD = _PrintDocument1;
             Format.Item.Clear();
             foreach (PaperSize ps in _PrintDocument1.PrinterSettings.PaperSizes) {
                 var nn = ps.Width + ";" + ps.Height;

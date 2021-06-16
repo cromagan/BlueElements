@@ -1,4 +1,6 @@
 ﻿
+using System.Windows.Forms;
+
 namespace BlueControls {
     partial class ScriptEditor {
         /// <summary> 
@@ -24,12 +26,12 @@ namespace BlueControls {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ScriptEditor));
             this.tabCSckript = new BlueControls.Controls.TabControl();
-            this.tabScriptAnzeige = new BlueControls.Controls.TabPage();
+            this.tabScriptAnzeige = new System.Windows.Forms.TabPage();
             this.txtSkript = new FastColoredTextBoxNS.FastColoredTextBox();
-            this.tabBefehle = new BlueControls.Controls.TabPage();
+            this.tabBefehle = new System.Windows.Forms.TabPage();
             this.txbComms = new BlueControls.Controls.TextBox();
             this.lstComands = new BlueControls.Controls.ListBox();
-            this.tabVariablen = new BlueControls.Controls.TabPage();
+            this.tabVariablen = new System.Windows.Forms.TabPage();
             this.tableVariablen = new BlueControls.Controls.Table();
             this.filterVariablen = new BlueControls.BlueDatabaseDialogs.Filterleiste();
             this.grpTextAllgemein = new BlueControls.Controls.GroupBox();
@@ -240,12 +242,12 @@ namespace BlueControls {
         }
         #endregion
         private Controls.TabControl tabCSckript;
-        private Controls.TabPage tabScriptAnzeige;
+        private TabPage tabScriptAnzeige;
         private FastColoredTextBoxNS.FastColoredTextBox txtSkript;
-        private Controls.TabPage tabBefehle;
+        private TabPage tabBefehle;
         private Controls.TextBox txbComms;
         private Controls.ListBox lstComands;
-        private Controls.TabPage tabVariablen;
+        private TabPage tabVariablen;
         private Controls.Table tableVariablen;
         private BlueDatabaseDialogs.Filterleiste filterVariablen;
         private Controls.GroupBox grpTextAllgemein;

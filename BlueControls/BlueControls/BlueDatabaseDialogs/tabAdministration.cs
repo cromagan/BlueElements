@@ -34,7 +34,7 @@ using static BlueBasics.modConverter;
 
 namespace BlueControls.BlueDatabaseDialogs {
 
-    public partial class tabAdministration : TabPage // System.Windows.Forms.UserControl //
+    public partial class tabAdministration : System.Windows.Forms.TabPage // System.Windows.Forms.UserControl //
     {
         #region Fields
 

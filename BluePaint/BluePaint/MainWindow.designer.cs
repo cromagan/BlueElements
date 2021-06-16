@@ -29,7 +29,7 @@ namespace BluePaint
         private void InitializeComponent()
         {
             this.tabRibbonbar = new BlueControls.Controls.RibbonBar();
-            this.Tab_Start = new BlueControls.Controls.TabPage();
+            this.Tab_Start = new System.Windows.Forms.TabPage();
             this.grpBearbteitung = new BlueControls.Controls.GroupBox();
             this.btnStop = new BlueControls.Controls.Button();
             this.btnAufnahme = new BlueControls.Controls.Button();
@@ -41,7 +41,7 @@ namespace BluePaint
             this.btnOeffnen = new BlueControls.Controls.Button();
             this.btnSaveAs = new BlueControls.Controls.Button();
             this.btnNeu = new BlueControls.Controls.Button();
-            this.Tab_Werkzeug = new BlueControls.Controls.TabPage();
+            this.Tab_Werkzeug = new System.Windows.Forms.TabPage();
             this.btnOK = new BlueControls.Controls.Button();
             this.grpNeu = new BlueControls.Controls.GroupBox();
             this.btnDummy = new BlueControls.Controls.Button();
@@ -59,7 +59,7 @@ namespace BluePaint
             this.btn100 = new BlueControls.Controls.Button();
             this.btnZoomFit = new BlueControls.Controls.Button();
             this.btnRückgänig = new BlueControls.Controls.Button();
-            this.tabExperimentell = new BlueControls.Controls.TabPage();
+            this.tabExperimentell = new System.Windows.Forms.TabPage();
             this.groupBox1 = new BlueControls.Controls.GroupBox();
             this.P = new BlueControls.Controls.ZoomPic();
             this.Split = new System.Windows.Forms.SplitContainer();
@@ -559,8 +559,8 @@ namespace BluePaint
             this.ResumeLayout(false);
         }
         internal RibbonBar tabRibbonbar;
-        internal TabPage Tab_Start;
-        internal TabPage Tab_Werkzeug;
+        internal  System.Windows.Forms.TabPage Tab_Start;
+        internal  System.Windows.Forms.TabPage Tab_Werkzeug;
         internal ZoomPic P;
         internal GroupBox grpSonstiges;
         internal Button btnClipping;
@@ -590,7 +590,7 @@ namespace BluePaint
         private System.Windows.Forms.OpenFileDialog LoadTab;
         private System.Windows.Forms.SaveFileDialog SaveTab;
         private Button btnSave;
-        private TabPage tabExperimentell;
+        private  System.Windows.Forms.TabPage tabExperimentell;
         internal GroupBox groupBox1;
         private GroupBox grpBearbteitung;
         private Button btnStop;

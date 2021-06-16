@@ -27,7 +27,7 @@ namespace BlueControls.Controls {
 
     //[Designer("System.Windows.Forms.Design.ParentControlDesigner,System.Design", typeof(IDesigner))]
     [ToolboxBitmap(typeof(System.Windows.Forms.GroupBox))]
-    public partial class GroupBox : System.Windows.Forms.GroupBox, IUseMyBackColor {
+    public partial class GroupBox : System.Windows.Forms.GroupBox {
 
         #region Fields
 

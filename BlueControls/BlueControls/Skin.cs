@@ -951,16 +951,15 @@ namespace BlueControls {
         public static void Draw_Back_Transparent(Graphics gr, Rectangle r, System.Windows.Forms.Control control) {
             if (control?.Parent == null) { return; }
             switch (control.Parent) {
-                case IUseMyBackColor _:
-                    gr.FillRectangle(new SolidBrush(control.Parent.BackColor), r);
-                    return;
-
                 case IBackgroundNone _:
                     Draw_Back_Transparent(gr, r, control.Parent);
                     break;
 
                 case GenericControl TRB:
-                    if (TRB.BitmapOfControl() == null) { return; }
+                    if (TRB.BitmapOfControl() == null) {
+                        gr.FillRectangle(new SolidBrush(control.Parent.BackColor), r);
+                        return;
+                    }
                     gr.DrawImage(TRB.BitmapOfControl(), r, new Rectangle(control.Left + r.Left, control.Top + r.Top, r.Width, r.Height), GraphicsUnit.Pixel);
                     break;
 
@@ -980,13 +979,16 @@ namespace BlueControls {
                     Draw_Back_Transparent(gr, r, control.Parent);
                     break;
 
+                case System.Windows.Forms.TabPage _: // TabPage leitet sich von Panel ab!
+                    gr.FillRectangle(new SolidBrush(control.Parent.BackColor), r);
+                    break;
+
                 case System.Windows.Forms.Panel _:
                     Draw_Back_Transparent(gr, r, control.Parent);
                     break;
 
                 default:
-                    System.Windows.Forms.ButtonRenderer.DrawParentBackground(gr, r, control); // Ein Versuch ist es allemal wert..
-                    Develop.DebugPrint("Unbekannter Typ: " + control.Parent.Name);
+                    gr.FillRectangle(new SolidBrush(control.Parent.BackColor), r);
                     break;
             }
         }

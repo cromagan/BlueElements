@@ -1,31 +1,26 @@
 using System.Diagnostics;
 using BlueControls.Controls;
 
-namespace BlueControls.Forms
-{
-    public partial class PadEditor
-        {
-			//Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
-			[DebuggerNonUserCode()]
-			protected override void Dispose(bool disposing)
-			{
-				if (disposing )
-				{
-				}
-				base.Dispose(disposing);
-			}
-			//Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
-			//Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
-			//Das Bearbeiten mit dem Code-Editor ist nicht möglich.
-			[DebuggerStepThrough()]
-			private void InitializeComponent()
-			{
+namespace BlueControls.Forms {
+    public partial class PadEditor {
+        //Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
+        [DebuggerNonUserCode()]
+        protected override void Dispose(bool disposing) {
+            if (disposing) {
+            }
+            base.Dispose(disposing);
+        }
+        //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
+        //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
+        //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
+        [DebuggerStepThrough()]
+        private void InitializeComponent() {
             this.btnZoomOut = new BlueControls.Controls.Button();
             this.btnZoomIn = new BlueControls.Controls.Button();
             this.btnZoomFit = new BlueControls.Controls.Button();
             this.Pad = new BlueControls.Controls.CreativePad();
             this.Ribbon = new BlueControls.Controls.RibbonBar();
-            this.tabPageStart = new BlueControls.Controls.TabPage();
+            this.tabPageStart = new System.Windows.Forms.TabPage();
             this.Area_Drucken = new BlueControls.Controls.GroupBox();
             this.Vorschau = new BlueControls.Controls.Button();
             this.Button_PageSetup = new BlueControls.Controls.Button();
@@ -37,7 +32,7 @@ namespace BlueControls.Forms
             this.btnNeu = new BlueControls.Controls.Button();
             this.btnOeffnen = new BlueControls.Controls.Button();
             this.btnSpeichern = new BlueControls.Controls.Button();
-            this.tabPageControl = new BlueControls.Controls.TabPage();
+            this.tabPageControl = new System.Windows.Forms.TabPage();
             this.grpKomponenteHinzufügen = new BlueControls.Controls.GroupBox();
             this.btnPhsyik = new BlueControls.Controls.Button();
             this.btnAddSymbol = new BlueControls.Controls.Button();
@@ -48,7 +43,7 @@ namespace BlueControls.Forms
             this.btnAddLine = new BlueControls.Controls.Button();
             this.grpWerkzeuge = new BlueControls.Controls.GroupBox();
             this.btnAuswahl = new BlueControls.Controls.Button();
-            this.Page_Settings = new BlueControls.Controls.TabPage();
+            this.Page_Settings = new System.Windows.Forms.TabPage();
             this.Area_Assistent = new BlueControls.Controls.GroupBox();
             this.capRasterFangen = new BlueControls.Controls.Caption();
             this.capRasterAnzeige = new BlueControls.Controls.Caption();
@@ -132,7 +127,7 @@ namespace BlueControls.Forms
             this.Ribbon.Size = new System.Drawing.Size(1334, 110);
             this.Ribbon.TabIndex = 2;
             // 
-            // tabPageStart
+            //  System.Windows.Forms.TabPageStart
             // 
             this.tabPageStart.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.tabPageStart.Controls.Add(this.Area_Drucken);
@@ -276,7 +271,7 @@ namespace BlueControls.Forms
             this.btnSpeichern.Text = "Speichern unter";
             this.btnSpeichern.Click += new System.EventHandler(this.btnSpeichern_Click);
             // 
-            // tabPageControl
+            //  System.Windows.Forms.TabPageControl
             // 
             this.tabPageControl.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.tabPageControl.Controls.Add(this.grpKomponenteHinzufügen);
@@ -552,7 +547,7 @@ namespace BlueControls.Forms
             // 
             // SchriftGröße
             // 
-            this.SchriftGröße.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.SchriftGröße.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.SchriftGröße.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.SchriftGröße.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -572,7 +567,7 @@ namespace BlueControls.Forms
             // 
             // PadDesign
             // 
-            this.PadDesign.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.PadDesign.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.PadDesign.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.PadDesign.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -625,39 +620,39 @@ namespace BlueControls.Forms
             this.Area_Assistent.ResumeLayout(false);
             this.Area_Design.ResumeLayout(false);
             this.ResumeLayout(false);
-			}
-			private Button btnZoomOut;
-			private Button btnAuswahl;
-			private Button btnAddText;
-			private Button btnAddImage;
-			private Button btnAddDimension;
-			private Button btnAddLine;
-			public CreativePad Pad;
-			protected RibbonBar Ribbon;
-			protected TabPage tabPageControl;
-			protected TabPage tabPageStart;
-			protected GroupBox grpWerkzeuge;
-			protected GroupBox grpKomponenteHinzufügen;
-			protected GroupBox Area_Drucken;
-			protected GroupBox Area_Design;
-			private Caption ssss;
-			protected GroupBox Area_Assistent;
-			private Button btnZoomFit;
-			private Button btnZoomIn;
-			private Button Drucken;
-			private Button Bild;
-			private Button Vorschau;
-			private ComboBox PadDesign;
-            protected Button ckbRaster;
-            private Caption capRasterFangen;
-			private Caption capRasterAnzeige;
-			private TextBox txbRasterFangen;
-			private TextBox txbRasterAnzeige;
-			internal ComboBox SchriftGröße;
-			internal Caption sscchrifthgöße;
-			protected internal Button Button_PageSetup;
-			protected internal Button ArbeitsbreichSetup;
-            private TabPage Page_Settings;
+        }
+        private Button btnZoomOut;
+        private Button btnAuswahl;
+        private Button btnAddText;
+        private Button btnAddImage;
+        private Button btnAddDimension;
+        private Button btnAddLine;
+        public CreativePad Pad;
+        protected RibbonBar Ribbon;
+        protected System.Windows.Forms.TabPage tabPageControl;
+        protected System.Windows.Forms.TabPage tabPageStart;
+        protected GroupBox grpWerkzeuge;
+        protected GroupBox grpKomponenteHinzufügen;
+        protected GroupBox Area_Drucken;
+        protected GroupBox Area_Design;
+        private Caption ssss;
+        protected GroupBox Area_Assistent;
+        private Button btnZoomFit;
+        private Button btnZoomIn;
+        private Button Drucken;
+        private Button Bild;
+        private Button Vorschau;
+        private ComboBox PadDesign;
+        protected Button ckbRaster;
+        private Caption capRasterFangen;
+        private Caption capRasterAnzeige;
+        private TextBox txbRasterFangen;
+        private TextBox txbRasterAnzeige;
+        internal ComboBox SchriftGröße;
+        internal Caption sscchrifthgöße;
+        protected internal Button Button_PageSetup;
+        protected internal Button ArbeitsbreichSetup;
+        private System.Windows.Forms.TabPage Page_Settings;
         private Button btnAddUnterStufe;
         private Button btnAddSymbol;
         private Button btnPhsyik;
@@ -674,4 +669,4 @@ namespace BlueControls.Forms
         private Button btnKeinHintergrund;
         protected Button btnImport;
     }
-	}
+}

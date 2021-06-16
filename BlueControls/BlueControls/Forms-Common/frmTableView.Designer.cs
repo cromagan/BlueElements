@@ -24,7 +24,6 @@ using ComboBox = BlueControls.Controls.ComboBox;
 using GroupBox = BlueControls.Controls.GroupBox;
 using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
 using SaveFileDialog = System.Windows.Forms.SaveFileDialog;
-using TabPage = BlueControls.Controls.TabPage;
 using TextBox = BlueControls.Controls.TextBox;
 
 namespace BlueControls.Forms
@@ -61,7 +60,7 @@ namespace BlueControls.Forms
             this.cbxColumnArr = new BlueControls.Controls.ComboBox();
             this.Zei = new BlueControls.Controls.Caption();
             this.MainRibbon = new BlueControls.Controls.RibbonBar();
-            this.tabDatei = new BlueControls.Controls.TabPage();
+            this.tabDatei = new System.Windows.Forms.TabPage();
             this.grpInformation = new BlueControls.Controls.GroupBox();
             this.Copyright = new BlueControls.Controls.Caption();
             this.btnInformation = new BlueControls.Controls.Button();
@@ -73,7 +72,7 @@ namespace BlueControls.Forms
             this.btnOeffnen = new BlueControls.Controls.Button();
             this.btnSaveAs = new BlueControls.Controls.Button();
             this.btnNeuDB = new BlueControls.Controls.Button();
-            this.tabStart = new BlueControls.Controls.TabPage();
+            this.tabStart = new System.Windows.Forms.TabPage();
             this.grpAnsicht = new BlueControls.Controls.GroupBox();
             this.SpaltAnsichtCap = new BlueControls.Controls.Caption();
             this.Ansicht3 = new BlueControls.Controls.Button();
@@ -95,7 +94,7 @@ namespace BlueControls.Forms
             this.btnNeu = new BlueControls.Controls.Button();
             this.btnDrucken = new BlueControls.Controls.ComboBox();
             this.btnLoeschen = new BlueControls.Controls.Button();
-            this.tabExtras = new BlueControls.Controls.TabPage();
+            this.tabExtras = new System.Windows.Forms.TabPage();
             this.grpEditor = new BlueControls.Controls.GroupBox();
             this.AllgemeinerEditor = new BlueControls.Controls.Button();
             this.BeziehungsEditor = new BlueControls.Controls.Button();
@@ -716,9 +715,9 @@ namespace BlueControls.Forms
         private Button Ansicht3;
         private Button btnTemporärenSpeicherortÖffnen;
         private Button BeziehungsEditor;
-        internal TabPage tabDatei;
-        internal TabPage tabStart;
-        internal TabPage tabExtras;
+        internal  System.Windows.Forms.TabPage tabDatei;
+        internal  System.Windows.Forms.TabPage tabStart;
+        internal  System.Windows.Forms.TabPage tabExtras;
         internal Button btnDatenbanken;
         internal Button Datenüberprüfung;
         internal LastFilesCombo btnLetzteDateien;

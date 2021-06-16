@@ -34,7 +34,7 @@ namespace BlueControls.Controls {
 
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("ValueChanged")]
-    public partial class FlexiControl : GenericControl, IUseMyBackColor {
+    public partial class FlexiControl : GenericControl, IBackgroundNone {
 
         #region Fields
 

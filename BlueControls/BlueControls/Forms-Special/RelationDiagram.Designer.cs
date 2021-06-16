@@ -5,31 +5,23 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 
-namespace BlueControls.Forms
-    {
-        public partial class RelationDiagram 
-		{
-			//Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
-			[DebuggerNonUserCode()]
-			protected override void Dispose(bool disposing)
-			{
-				try
-				{
-					if (disposing)
-					{
-					}
-				}
-				finally
-				{
-					base.Dispose(disposing);
-				}
-			}
-			//Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
-			//Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
-			//Das Bearbeiten mit dem Code-Editor ist nicht möglich.
-			[DebuggerStepThrough()]
-			private void InitializeComponent()
-			{
+namespace BlueControls.Forms {
+    public partial class RelationDiagram {
+        //Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
+        [DebuggerNonUserCode()]
+        protected override void Dispose(bool disposing) {
+            try {
+                if (disposing) {
+                }
+            } finally {
+                base.Dispose(disposing);
+            }
+        }
+        //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
+        //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
+        //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
+        [DebuggerStepThrough()]
+        private void InitializeComponent() {
             this.Hinzu = new BlueControls.Controls.Button();
             this.grpExtras = new BlueControls.Controls.GroupBox();
             this.btnTextExport = new BlueControls.Controls.Button();
@@ -56,7 +48,7 @@ namespace BlueControls.Forms
             this.Ribbon.SelectedIndex = 0;
             this.Ribbon.Size = new System.Drawing.Size(1290, 110);
             // 
-            // tabPageControl
+            //  System.Windows.Forms.TabPageControl
             // 
             this.tabPageControl.Controls.Add(this.grpExtras);
             this.tabPageControl.Size = new System.Drawing.Size(1282, 81);
@@ -64,7 +56,7 @@ namespace BlueControls.Forms
             this.tabPageControl.Controls.SetChildIndex(this.grpKomponenteHinzufügen, 0);
             this.tabPageControl.Controls.SetChildIndex(this.grpExtras, 0);
             // 
-            // tabPageStart
+            //  System.Windows.Forms.TabPageStart
             // 
             this.tabPageStart.Size = new System.Drawing.Size(1282, 81);
             // 
@@ -162,10 +154,10 @@ namespace BlueControls.Forms
             this.grpDateiSystem.ResumeLayout(false);
             this.grpExtras.ResumeLayout(false);
             this.ResumeLayout(false);
-			}
-			private Button Hinzu;
+        }
+        private Button Hinzu;
         private GroupBox grpExtras;
         private Button btnTextExport;
         private Button btnBilderExport;
     }
-	}
+}

@@ -24,7 +24,7 @@ namespace BlueControls.BlueDatabaseDialogs
 			{
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ColumnEditor));
             this.ColorDia = new System.Windows.Forms.ColorDialog();
-            this.tabDesign = new BlueControls.Controls.TabPage();
+            this.tabDesign = new System.Windows.Forms.TabPage();
             this.txbSpaltenbild = new BlueControls.Controls.TextBox();
             this.cbxBildTextVerhalten = new BlueControls.Controls.ComboBox();
             this.cbxAlign = new BlueControls.Controls.ComboBox();
@@ -57,7 +57,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpBildCode = new BlueControls.Controls.GroupBox();
             this.capBildCodeConstHeight = new BlueControls.Controls.Caption();
             this.txbBildCodeConstHeight = new BlueControls.Controls.TextBox();
-            this.tabRechte = new BlueControls.Controls.TabPage();
+            this.tabRechte = new System.Windows.Forms.TabPage();
             this.grpAuswahlmenuOptionen = new BlueControls.Controls.GroupBox();
             this.btnOtherValuesToo = new BlueControls.Controls.Button();
             this.tbxAuswaehlbareWerte = new BlueControls.Controls.TextBox();
@@ -70,7 +70,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnEditableStandard = new BlueControls.Controls.Button();
             this.Caption9 = new BlueControls.Controls.Caption();
             this.btnEditableDropdown = new BlueControls.Controls.Button();
-            this.tabAutoBearbeitung = new BlueControls.Controls.TabPage();
+            this.tabAutoBearbeitung = new System.Windows.Forms.TabPage();
             this.txbAutoReplace = new BlueControls.Controls.TextBox();
             this.capAutoReplace = new BlueControls.Controls.Caption();
             this.txbAutoRemove = new BlueControls.Controls.TextBox();
@@ -86,7 +86,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capVorschlag = new BlueControls.Controls.Caption();
             this.Caption11 = new BlueControls.Controls.Caption();
             this.btnAutoEditAutoSort = new BlueControls.Controls.Button();
-            this.tabFilter = new BlueControls.Controls.TabPage();
+            this.tabFilter = new System.Windows.Forms.TabPage();
             this.chkFilterOnlyOr = new BlueControls.Controls.Button();
             this.chkFilterOnlyAND = new BlueControls.Controls.Button();
             this.capDauerfilterPos = new BlueControls.Controls.Caption();
@@ -97,13 +97,13 @@ namespace BlueControls.BlueDatabaseDialogs
             this.AutoFilterMöglich = new BlueControls.Controls.Button();
             this.AutoFilterTXT = new BlueControls.Controls.Button();
             this.AutoFilterErw = new BlueControls.Controls.Button();
-            this.tabQuickInfo = new BlueControls.Controls.TabPage();
+            this.tabQuickInfo = new System.Windows.Forms.TabPage();
             this.tbxAdminInfo = new BlueControls.Controls.TextBox();
             this.tbxQuickinfo = new BlueControls.Controls.TextBox();
             this.Caption18 = new BlueControls.Controls.Caption();
             this.Caption17 = new BlueControls.Controls.Caption();
             this.QI_Vorschau = new BlueControls.Controls.Button();
-            this.tabSonstiges = new BlueControls.Controls.TabPage();
+            this.tabSonstiges = new System.Windows.Forms.TabPage();
             this.butSaveContent = new BlueControls.Controls.Button();
             this.txbSortMask = new BlueControls.Controls.TextBox();
             this.btnSpellChecking = new BlueControls.Controls.Button();
@@ -134,7 +134,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnZurueck = new BlueControls.Controls.Button();
             this.btnOk = new BlueControls.Controls.Button();
             this.tabControl = new BlueControls.Controls.TabControl();
-            this.tabSpezial = new BlueControls.Controls.TabPage();
+            this.tabSpezial = new System.Windows.Forms.TabPage();
             this.grpLinkToFileSystem = new BlueControls.Controls.GroupBox();
             this.grpLinkedDatabase = new BlueControls.Controls.GroupBox();
             this.grpColumnsForLinkedDatabase = new BlueControls.Controls.GroupBox();
@@ -1597,12 +1597,12 @@ namespace BlueControls.BlueDatabaseDialogs
 			private ComboBox cbxFormat;
 			private TextBox tbxTags;
 			private TabControl tabControl;
-			private TabPage tabDesign;
-			private TabPage tabRechte;
-			private TabPage tabAutoBearbeitung;
-			private TabPage tabFilter;
-			private TabPage tabQuickInfo;
-			private TabPage tabSonstiges;
+			private  System.Windows.Forms.TabPage tabDesign;
+			private  System.Windows.Forms.TabPage tabRechte;
+			private  System.Windows.Forms.TabPage tabAutoBearbeitung;
+			private  System.Windows.Forms.TabPage tabFilter;
+			private  System.Windows.Forms.TabPage tabQuickInfo;
+			private  System.Windows.Forms.TabPage tabSonstiges;
 			private Button btnEinzeiligDarstellen;
 			private Button btnIgnoreLock;
 			private Button btnLogUndo;
@@ -1653,7 +1653,7 @@ namespace BlueControls.BlueDatabaseDialogs
             private TextBox txbPrefix;
             private Caption caption7;
             private Button btnStandard;
-            private TabPage tabSpezial;
+            private  System.Windows.Forms.TabPage tabSpezial;
             private GroupBox grpLinkToFileSystem;
             private GroupBox grpLinkedDatabase;
             private ComboBox cbxSchlüsselspalte;

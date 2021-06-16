@@ -406,9 +406,8 @@ namespace BlueBasics {
             AddRad90(x, y, radius, 180); // OK
             tempPoly_RoundRec.CloseFigure();
             return tempPoly_RoundRec;
-            void AddRad90(int mxX, int mxY, int Radius, int gradStart) {
-                tempPoly_RoundRec.AddArc(mxX, mxY, Radius, Radius, gradStart, 90);
-            }
+
+            void AddRad90(int mxX, int mxY, int Radius, int gradStart) => tempPoly_RoundRec.AddArc(mxX, mxY, Radius, Radius, gradStart, 90);
         }
 
         public static GraphicsPath Poly_Triangle(PointF p1, PointF p2, PointF p3) {
