@@ -292,8 +292,6 @@ namespace BlueScript {
             Type = type;
         }
 
-        public Variable(string name, Bitmap bmp, bool ronly, bool system, string coment) : this(name, BitmapToBase64(bmp, System.Drawing.Imaging.ImageFormat.Png), enVariableDataType.Bitmap, ronly, system, coment) { }
-
         #endregion
 
         #region Properties

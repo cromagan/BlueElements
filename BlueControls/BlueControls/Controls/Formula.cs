@@ -80,7 +80,6 @@ namespace BlueControls.Controls {
             get => _Database;
             set {
                 if (_Database == value) { return; }
-                BeginnEdit();
                 if (Editor.Visible) { Editor.Visible = false; }
                 ShowingRowKey = -1; // Wichtig, dass ordenlich Showing-Row to Nothing gesetzt wird, weil dann alle Fokuse durch Enabled elemeniert werden und nachträglich nix mehr ausgelöst wird.
                 Control_Remove_All();
@@ -105,7 +104,6 @@ namespace BlueControls.Controls {
                     _Database.Disposing += _Database_Disposing;
                 }
                 _Inited = false;
-                EndEdit();
             }
         }
 
@@ -138,7 +136,6 @@ namespace BlueControls.Controls {
                     if (value < 0) { return; }
                     View_Init();
                 }
-                BeginnEdit();
                 _ShowingRowKey = value;
                 _tmpShowingRow = _Database?.Row.SearchByKey(_ShowingRowKey);
                 //Parallel.ForEach(_Control, thisFlex => {
@@ -155,7 +152,6 @@ namespace BlueControls.Controls {
                 }
                 OnShowingRowChanged(new RowEventArgs(ShowingRow));
                 ShowingRow?.DoAutomatic(false, false, false, "to be sure");
-                EndEdit();
             }
         }
 
@@ -199,7 +195,6 @@ namespace BlueControls.Controls {
                 return;
             }
             var R = false;
-            BeginnEdit();
             do {
                 R = false;
                 foreach (System.Windows.Forms.Control o in Controls) {
@@ -222,7 +217,6 @@ namespace BlueControls.Controls {
                 }
             } while (R);
             _Control?.Clear();
-            EndEdit();
         }
 
         public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
@@ -445,7 +439,6 @@ namespace BlueControls.Controls {
 
         private void Control_Create_All() {
             var Count = -1;
-            BeginnEdit();
             _Control = new List<FlexiControlForCell>();
             foreach (var ThisView in _Database.Views) {
                 if (ThisView != null) {
@@ -462,12 +455,10 @@ namespace BlueControls.Controls {
                     }
                 }
             }
-            EndEdit();
         }
 
         private void Control_RepairSize_All() {
             var Count = -1;
-            BeginnEdit();
             foreach (var ThisView in _Database.Views) {
                 Count++;
                 var View_Spalten = View_AnzahlSpalten(ThisView);
@@ -522,7 +513,6 @@ namespace BlueControls.Controls {
                 }
                 if (ViewN == 0) { SetButtonsToPosition(_BelegterBereichTop[0] + 3); }
             }
-            EndEdit();
         }
 
         //private void Tabs_SelectedIndexChanged(object sender, System.EventArgs e)
@@ -538,11 +528,9 @@ namespace BlueControls.Controls {
 
         private void Controls_SetCorrectEnabledState_All() {
             Develop.DebugPrint_Disposed(IsDisposed);
-            BeginnEdit();
             foreach (var ThisControl in _Control) {
                 if (ThisControl != null && !ThisControl.IsDisposed) { ThisControl.CheckEnabledState(); }
             }
-            EndEdit();
         }
 
         private ColumnViewCollection CurrentView() {
@@ -623,7 +611,6 @@ namespace BlueControls.Controls {
 
         private void Generate_Tabs() {
             if (_Database.Views.Count < 1) { return; }
-            BeginnEdit();
             foreach (var ThisView in _Database.Views) {
                 if (ThisView != null && ThisView != _Database.Views[0]) {
                     TabGeneratorCount++;
@@ -636,7 +623,6 @@ namespace BlueControls.Controls {
                     tempPage.MouseUp += Tabs_MouseUp;
                 }
             }
-            EndEdit();
         }
 
         private void lbxColumns_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
@@ -729,25 +715,21 @@ namespace BlueControls.Controls {
 
         private void RedoView() {
             var i = Tabs.SelectedIndex;
-            BeginnEdit();
             _Inited = false;
             View_Init();
             Editor_CheckButtons(true);
             if (i < 0) { i = 0; }
             if (i > Tabs.TabPages.Count - 1) { i = Tabs.TabPages.Count - 1; }
             if (i >= 0) { Tabs.SelectedIndex = i; }
-            EndEdit();
         }
 
         private void RemoveControl(System.Windows.Forms.Control vObject) {
             if (vObject == null || vObject.IsDisposed) { return; }
-            BeginnEdit();
             switch (vObject) {
                 case AbstractTabControl _:
                     foreach (System.Windows.Forms.Control o in vObject.Controls) {
                         RemoveControl(o);
                     }
-                    EndEdit();
                     return; // Raus hier
 
                 case TabPage _:
@@ -763,7 +745,6 @@ namespace BlueControls.Controls {
             }
             vObject.Parent.Controls.Remove(vObject);
             vObject.Dispose();
-            EndEdit();
         }
 
         private void Rename_Click(object sender, System.EventArgs e) {
@@ -888,7 +869,6 @@ namespace BlueControls.Controls {
         private void View_Init() {
             if (_Database == null) { return; }
             if (Parent == null) { return; } // Irgend ein Formular reagiert nioch?!?
-            BeginnEdit();
             _Inited = false;
             Control_Remove_All();
             foreach (TabPage ThisTabpage in Tabs.TabPages) {
@@ -904,7 +884,6 @@ namespace BlueControls.Controls {
             Tabs.Visible = _Database.Views.Count > 0;
             _Inited = true;
             if (Tabs.TabPages.Count >= 0) { Tabs.SelectedIndex = 0; }
-            EndEdit();
         }
 
         #endregion

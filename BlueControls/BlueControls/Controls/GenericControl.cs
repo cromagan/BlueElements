@@ -35,7 +35,7 @@ using System.Drawing.Imaging;
 
 namespace BlueControls.Controls {
 
-    public class GenericControl : System.Windows.Forms.Control, ISupportsBeginnEdit {
+    public class GenericControl : System.Windows.Forms.Control {
 
         #region Fields
 
@@ -89,12 +89,6 @@ namespace BlueControls.Controls {
             set => base.AutoSize = false;
         }
 
-        [DefaultValue(0)]
-        [Browsable(false)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public int BeginnEditCounter { get; set; } = 0;
-
         [Category("Darstellung")]
         [DefaultValue("")]
         [Editor(typeof(MultilineStringEditor), typeof(UITypeEditor))]
@@ -112,10 +106,10 @@ namespace BlueControls.Controls {
 
         public virtual string QuickInfoText => _QuickInfo;
 
-        protected override bool ScaleChildren => false;
-
         [DefaultValue(true)]
         public bool Translate { get; set; }
+
+        protected override bool ScaleChildren => false;
 
         #endregion
 
@@ -229,16 +223,6 @@ namespace BlueControls.Controls {
             }
         }
 
-        public void BeginnEdit() => BeginnEdit(1);
-
-        public void BeginnEdit(int count) {
-            if (DesignMode) { return; }
-            foreach (var ThisControl in Controls) {
-                if (ThisControl is ISupportsBeginnEdit e) { e.BeginnEdit(count); }
-            }
-            BeginnEditCounter += count;
-        }
-
         public Bitmap BitmapOfControl() {
             if (!_UseBackBitmap || _GeneratingBitmapOfControl) { return null; }
             _GeneratingBitmapOfControl = true;
@@ -258,16 +242,6 @@ namespace BlueControls.Controls {
                 } else {
                     Forms.QuickInfo.Close();
                 }
-            }
-        }
-
-        public void EndEdit() {
-            if (DesignMode) { return; }
-            if (BeginnEditCounter < 1) { Develop.DebugPrint(enFehlerArt.Warnung, "Bearbeitungsstapel instabil: " + BeginnEditCounter); }
-            BeginnEditCounter--;
-            if (BeginnEditCounter == 0) { Invalidate(); }
-            foreach (var ThisControl in Controls) {
-                if (ThisControl is ISupportsBeginnEdit e) { e.EndEdit(); }
             }
         }
 
@@ -293,23 +267,8 @@ namespace BlueControls.Controls {
             DoDraw(CreateGraphics());
         }
 
-        public new void ResumeLayout(bool performLayout) {
-            base.ResumeLayout(performLayout);
-            EndEdit();
-        }
-
-        public new void ResumeLayout() {
-            base.ResumeLayout();
-            EndEdit();
-        }
-
         public void Scale() {
             // NIX TUN!!!!
-        }
-
-        public new void SuspendLayout() {
-            BeginnEdit();
-            base.SuspendLayout();
         }
 
         internal static bool AllEnabled(System.Windows.Forms.Control control) {
@@ -336,12 +295,6 @@ namespace BlueControls.Controls {
         protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified) => bounds;
 
         protected bool MousePressing() => _MousePressing;
-
-        protected override void OnControlAdded(System.Windows.Forms.ControlEventArgs e) {
-            if (DesignMode) { return; }
-            if (e.Control is ISupportsBeginnEdit nc) { nc.BeginnEdit(BeginnEditCounter); }
-            base.OnControlAdded(e);
-        }
 
         protected override void OnEnabledChanged(System.EventArgs e) {
             if (InvokeRequired) {
@@ -502,11 +455,8 @@ namespace BlueControls.Controls {
                 gr.Clear(Color.Red);
                 return;
             }
-            if (BeginnEditCounter > 0) {
-                gr.Clear(Color.LightGray);
-                return;
-            }
-            if (Develop.Exited || IsDisposed || !Visible || BeginnEditCounter > 0) { return; }
+
+            if (Develop.Exited || IsDisposed || !Visible) { return; }
             lock (this) {
                 if (!Skin.inited) {
                     if (DesignMode) {

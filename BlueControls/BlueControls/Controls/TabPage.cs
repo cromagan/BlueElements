@@ -27,7 +27,7 @@ namespace BlueControls.Controls {
 
     [ToolboxBitmap(typeof(System.Windows.Forms.TabPage))]
     [Designer(typeof(ScrollableControlDesigner))]
-    public class TabPage : System.Windows.Forms.TabPage, IUseMyBackColor, ISupportsBeginnEdit {
+    public class TabPage : System.Windows.Forms.TabPage, IUseMyBackColor {
         //public TabPage() : base()
         //{
         //    //This call is required by the Windows Form Designer.
@@ -44,47 +44,7 @@ namespace BlueControls.Controls {
         //    //SetBackColor();
         //}
 
-        #region Properties
-
-        [DefaultValue(0)]
-        [Browsable(false)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public int BeginnEditCounter { get; set; } = 0;
-
-        #endregion
-
         #region Methods
-
-        public void BeginnEdit() => BeginnEdit(1);
-
-        public void BeginnEdit(int count) {
-            if (DesignMode) { return; }
-            foreach (var ThisControl in Controls) {
-                if (ThisControl is ISupportsBeginnEdit e) { e.BeginnEdit(count); }
-            }
-            BeginnEditCounter += count;
-        }
-
-        public void EndEdit() {
-            if (DesignMode) { return; }
-            if (BeginnEditCounter < 1) { Develop.DebugPrint(enFehlerArt.Warnung, "Bearbeitungsstapel instabil: " + BeginnEditCounter); }
-            BeginnEditCounter--;
-            if (BeginnEditCounter == 0) { Invalidate(); }
-            foreach (var ThisControl in Controls) {
-                if (ThisControl is ISupportsBeginnEdit e) { e.EndEdit(); }
-            }
-        }
-
-        public new void ResumeLayout(bool performLayout) {
-            base.ResumeLayout(performLayout);
-            EndEdit();
-        }
-
-        public new void ResumeLayout() {
-            base.ResumeLayout();
-            EndEdit();
-        }
 
         public void SetBackColor() {
             BackColor = Parent is RibbonBar
@@ -155,16 +115,6 @@ namespace BlueControls.Controls {
         //{
         //    //MyBase.OnLeave(e)
         //}
-        public new void SuspendLayout() {
-            BeginnEdit();
-            base.SuspendLayout();
-        }
-
-        protected override void OnControlAdded(System.Windows.Forms.ControlEventArgs e) {
-            if (DesignMode) { return; }
-            if (e.Control is ISupportsBeginnEdit nc) { nc.BeginnEdit(BeginnEditCounter); }
-            base.OnControlAdded(e);
-        }
 
         //#region  AutoScale deaktivieren
         //// https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx

@@ -25,7 +25,7 @@ using System.Drawing;
 
 namespace BlueControls.Forms {
 
-    public partial class Form : System.Windows.Forms.Form, ISupportsBeginnEdit, IUseMyBackColor {
+    public partial class Form : System.Windows.Forms.Form, IUseMyBackColor {
 
         #region Fields
 
@@ -74,12 +74,6 @@ namespace BlueControls.Forms {
             set => base.AutoSize = false;
         }
 
-        [DefaultValue(0)]
-        [Browsable(false)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public int BeginnEditCounter { get; set; } = 0;
-
         [DefaultValue(true)]
         public bool CloseButtonEnabled { get; set; } = true;
 
@@ -105,26 +99,6 @@ namespace BlueControls.Forms {
 
         #region Methods
 
-        public void BeginnEdit() => BeginnEdit(1);
-
-        public void BeginnEdit(int count) {
-            if (DesignMode) { return; }
-            foreach (var ThisControl in Controls) {
-                if (ThisControl is ISupportsBeginnEdit e) { e.BeginnEdit(count); }
-            }
-            BeginnEditCounter += count;
-        }
-
-        public void EndEdit() {
-            if (DesignMode) { return; }
-            if (BeginnEditCounter < 1) { Develop.DebugPrint(enFehlerArt.Warnung, "Bearbeitungsstapel instabil: " + BeginnEditCounter); }
-            BeginnEditCounter--;
-            if (BeginnEditCounter == 0) { Invalidate(); }
-            foreach (var ThisControl in Controls) {
-                if (ThisControl is ISupportsBeginnEdit e) { e.EndEdit(); }
-            }
-        }
-
         public bool IsMouseInForm() => new Rectangle(Location, Size).Contains(System.Windows.Forms.Cursor.Position);
 
         // https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
@@ -132,34 +106,12 @@ namespace BlueControls.Forms {
             // NIX TUN!!!!
         }
 
-        public new void ResumeLayout(bool performLayout) {
-            base.ResumeLayout(performLayout);
-            EndEdit();
-        }
-
-        public new void ResumeLayout() {
-            base.ResumeLayout();
-            EndEdit();
-        }
-
         public void Scale() {
             // NIX TUN!!!!
         }
 
-        public new void SuspendLayout() {
-            BeginnEdit();
-            base.SuspendLayout();
-        }
-
         //MyBase.ScaleChildren
         protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified) => bounds;
-
-        //MyBase.GetScaledBounds(bounds, factor, specified)
-        protected override void OnControlAdded(System.Windows.Forms.ControlEventArgs e) {
-            if (DesignMode) { return; }
-            if (e.Control is ISupportsBeginnEdit nc) { nc.BeginnEdit(BeginnEditCounter); }
-            base.OnControlAdded(e);
-        }
 
         protected override void OnCreateControl() {
             Develop.StartService();

@@ -382,7 +382,6 @@ namespace BlueControls.Forms {
             Formula.Database = cDatabase;
             Filter.Table = TableView;
             StandardTabx();
-            BeginnEdit();
             if (TableView.Database == null) {
                 SetDatabasetoNothing();
             } else {
@@ -397,7 +396,6 @@ namespace BlueControls.Forms {
             if (TableView.View_RowFirst() != null) {
                 TableView.CursorPos_Set(TableView.Database.Column[0], TableView.View_RowFirst(), false);
             }
-            EndEdit();
         }
 
         private void Datenüberprüfung_Click(object sender, System.EventArgs e) => TableView.Database.Row.DoAutomatic(TableView.Filter, true, TableView.PinnedRows, "manual check");

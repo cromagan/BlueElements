@@ -25,6 +25,7 @@ namespace BlueControls.BlueDatabaseDialogs
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ColumnEditor));
             this.ColorDia = new System.Windows.Forms.ColorDialog();
             this.tabDesign = new BlueControls.Controls.TabPage();
+            this.txbSpaltenbild = new BlueControls.Controls.TextBox();
             this.cbxBildTextVerhalten = new BlueControls.Controls.ComboBox();
             this.cbxAlign = new BlueControls.Controls.ComboBox();
             this.txbReplacer = new BlueControls.Controls.TextBox();
@@ -151,7 +152,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.caption5 = new BlueControls.Controls.Caption();
             this.butAktuellVor = new BlueControls.Controls.Button();
             this.butAktuellZurueck = new BlueControls.Controls.Button();
-            this.txbSpaltenbild = new BlueControls.Controls.TextBox();
             this.tabDesign.SuspendLayout();
             this.grpBildCode.SuspendLayout();
             this.tabRechte.SuspendLayout();
@@ -212,6 +212,16 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabDesign.Size = new System.Drawing.Size(912, 487);
             this.tabDesign.TabIndex = 0;
             this.tabDesign.Text = "Design";
+            // 
+            // txbSpaltenbild
+            // 
+            this.txbSpaltenbild.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txbSpaltenbild.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbSpaltenbild.Location = new System.Drawing.Point(528, 104);
+            this.txbSpaltenbild.Name = "txbSpaltenbild";
+            this.txbSpaltenbild.Size = new System.Drawing.Size(384, 24);
+            this.txbSpaltenbild.TabIndex = 40;
             // 
             // cbxBildTextVerhalten
             // 
@@ -348,7 +358,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnEinzeiligDarstellen
             // 
-            this.btnEinzeiligDarstellen.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.btnEinzeiligDarstellen.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
             this.btnEinzeiligDarstellen.Location = new System.Drawing.Point(8, 152);
             this.btnEinzeiligDarstellen.Name = "btnEinzeiligDarstellen";
             this.btnEinzeiligDarstellen.Size = new System.Drawing.Size(296, 16);
@@ -455,7 +465,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnMultiline
             // 
-            this.btnMultiline.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.btnMultiline.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
             this.btnMultiline.Location = new System.Drawing.Point(8, 128);
             this.btnMultiline.Name = "btnMultiline";
             this.btnMultiline.Size = new System.Drawing.Size(296, 16);
@@ -531,7 +541,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.btnOtherValuesToo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOtherValuesToo.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.btnOtherValuesToo.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
             this.btnOtherValuesToo.Location = new System.Drawing.Point(8, 304);
             this.btnOtherValuesToo.Name = "btnOtherValuesToo";
             this.btnOtherValuesToo.Size = new System.Drawing.Size(512, 32);
@@ -563,7 +573,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnCanBeEmpty
             // 
-            this.btnCanBeEmpty.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.btnCanBeEmpty.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
             this.btnCanBeEmpty.Location = new System.Drawing.Point(8, 24);
             this.btnCanBeEmpty.Name = "btnCanBeEmpty";
             this.btnCanBeEmpty.Size = new System.Drawing.Size(328, 16);
@@ -594,7 +604,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnIgnoreLock
             // 
-            this.btnIgnoreLock.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.btnIgnoreLock.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
             this.btnIgnoreLock.Location = new System.Drawing.Point(592, 328);
             this.btnIgnoreLock.Name = "btnIgnoreLock";
             this.btnIgnoreLock.Size = new System.Drawing.Size(288, 32);
@@ -614,7 +624,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnEditableStandard
             // 
-            this.btnEditableStandard.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.btnEditableStandard.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
             this.btnEditableStandard.Location = new System.Drawing.Point(8, 16);
             this.btnEditableStandard.Name = "btnEditableStandard";
             this.btnEditableStandard.Size = new System.Drawing.Size(544, 32);
@@ -633,7 +643,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnEditableDropdown
             // 
-            this.btnEditableDropdown.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.btnEditableDropdown.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
             this.btnEditableDropdown.Location = new System.Drawing.Point(8, 56);
             this.btnEditableDropdown.Name = "btnEditableDropdown";
             this.btnEditableDropdown.Size = new System.Drawing.Size(544, 16);
@@ -745,7 +755,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnAutoEditKleineFehler
             // 
-            this.btnAutoEditKleineFehler.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.btnAutoEditKleineFehler.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
             this.btnAutoEditKleineFehler.Location = new System.Drawing.Point(432, 64);
             this.btnAutoEditKleineFehler.Name = "btnAutoEditKleineFehler";
             this.btnAutoEditKleineFehler.Size = new System.Drawing.Size(440, 24);
@@ -754,7 +764,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnAutoEditToUpper
             // 
-            this.btnAutoEditToUpper.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.btnAutoEditToUpper.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
             this.btnAutoEditToUpper.Location = new System.Drawing.Point(8, 64);
             this.btnAutoEditToUpper.Name = "btnAutoEditToUpper";
             this.btnAutoEditToUpper.Size = new System.Drawing.Size(416, 24);
@@ -800,7 +810,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnAutoEditAutoSort
             // 
-            this.btnAutoEditAutoSort.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.btnAutoEditAutoSort.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
             this.btnAutoEditAutoSort.Location = new System.Drawing.Point(432, 88);
             this.btnAutoEditAutoSort.Name = "btnAutoEditAutoSort";
             this.btnAutoEditAutoSort.Size = new System.Drawing.Size(416, 24);
@@ -829,7 +839,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // chkFilterOnlyOr
             // 
-            this.chkFilterOnlyOr.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.chkFilterOnlyOr.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
             this.chkFilterOnlyOr.Location = new System.Drawing.Point(32, 88);
             this.chkFilterOnlyOr.Name = "chkFilterOnlyOr";
             this.chkFilterOnlyOr.Size = new System.Drawing.Size(192, 16);
@@ -838,7 +848,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // chkFilterOnlyAND
             // 
-            this.chkFilterOnlyAND.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.chkFilterOnlyAND.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
             this.chkFilterOnlyAND.Location = new System.Drawing.Point(32, 72);
             this.chkFilterOnlyAND.Name = "chkFilterOnlyAND";
             this.chkFilterOnlyAND.Size = new System.Drawing.Size(192, 16);
@@ -881,7 +891,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // ZeilenFilter
             // 
-            this.ZeilenFilter.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.ZeilenFilter.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
             this.ZeilenFilter.Location = new System.Drawing.Point(8, 144);
             this.ZeilenFilter.Name = "ZeilenFilter";
             this.ZeilenFilter.Size = new System.Drawing.Size(304, 16);
@@ -890,7 +900,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // AutoFilterMöglich
             // 
-            this.AutoFilterMöglich.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.AutoFilterMöglich.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
             this.AutoFilterMöglich.Location = new System.Drawing.Point(12, 15);
             this.AutoFilterMöglich.Name = "AutoFilterMöglich";
             this.AutoFilterMöglich.Size = new System.Drawing.Size(120, 16);
@@ -899,7 +909,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // AutoFilterTXT
             // 
-            this.AutoFilterTXT.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.AutoFilterTXT.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
             this.AutoFilterTXT.Location = new System.Drawing.Point(32, 32);
             this.AutoFilterTXT.Name = "AutoFilterTXT";
             this.AutoFilterTXT.Size = new System.Drawing.Size(208, 16);
@@ -908,7 +918,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // AutoFilterErw
             // 
-            this.AutoFilterErw.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.AutoFilterErw.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
             this.AutoFilterErw.Location = new System.Drawing.Point(32, 48);
             this.AutoFilterErw.Name = "AutoFilterErw";
             this.AutoFilterErw.Size = new System.Drawing.Size(192, 16);
@@ -1010,7 +1020,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // butSaveContent
             // 
             this.butSaveContent.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.butSaveContent.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.butSaveContent.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
             this.butSaveContent.Location = new System.Drawing.Point(512, 376);
             this.butSaveContent.Name = "butSaveContent";
             this.butSaveContent.Size = new System.Drawing.Size(352, 24);
@@ -1031,7 +1041,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // btnSpellChecking
             // 
             this.btnSpellChecking.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSpellChecking.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.btnSpellChecking.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
             this.btnSpellChecking.Location = new System.Drawing.Point(512, 248);
             this.btnSpellChecking.Name = "btnSpellChecking";
             this.btnSpellChecking.Size = new System.Drawing.Size(352, 16);
@@ -1060,7 +1070,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // btnLogUndo
             // 
             this.btnLogUndo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnLogUndo.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Text;
+            this.btnLogUndo.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
             this.btnLogUndo.Location = new System.Drawing.Point(512, 224);
             this.btnLogUndo.Name = "btnLogUndo";
             this.btnLogUndo.Size = new System.Drawing.Size(352, 16);
@@ -1449,7 +1459,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnTargetColumn
             // 
-            this.btnTargetColumn.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox_Text;
+            this.btnTargetColumn.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
             this.btnTargetColumn.Checked = true;
             this.btnTargetColumn.Location = new System.Drawing.Point(8, 72);
             this.btnTargetColumn.Name = "btnTargetColumn";
@@ -1459,7 +1469,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnColumnKeyInColumn
             // 
-            this.btnColumnKeyInColumn.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox_Text;
+            this.btnColumnKeyInColumn.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
             this.btnColumnKeyInColumn.Location = new System.Drawing.Point(8, 112);
             this.btnColumnKeyInColumn.Name = "btnColumnKeyInColumn";
             this.btnColumnKeyInColumn.Size = new System.Drawing.Size(320, 16);
@@ -1512,16 +1522,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.butAktuellZurueck.TabIndex = 18;
             this.butAktuellZurueck.Click += new System.EventHandler(this.butAktuellZurueck_Click);
             // 
-            // txbSpaltenbild
-            // 
-            this.txbSpaltenbild.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txbSpaltenbild.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbSpaltenbild.Location = new System.Drawing.Point(528, 104);
-            this.txbSpaltenbild.Name = "txbSpaltenbild";
-            this.txbSpaltenbild.Size = new System.Drawing.Size(384, 24);
-            this.txbSpaltenbild.TabIndex = 40;
-            // 
             // ColumnEditor
             // 
             this.ClientSize = new System.Drawing.Size(926, 671);
@@ -1554,6 +1554,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpColumnsForLinkedDatabase.ResumeLayout(false);
             this.grpVerlinkteZellen.ResumeLayout(false);
             this.ResumeLayout(false);
+
 			}
 			private Button btnOk;
 			private TextBox tbxName;

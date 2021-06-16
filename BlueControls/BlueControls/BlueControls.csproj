@@ -249,7 +249,6 @@
     </Compile>
     <Compile Include="Interfaces\IMoveable.cs" />
     <Compile Include="Interfaces\IUseMyBackColor.cs" />
-    <Compile Include="Interfaces\ISupportsBeginnEdit.cs" />
     <Compile Include="Forms-Common\Notification.cs">
       <SubType>Form</SubType>
     </Compile>

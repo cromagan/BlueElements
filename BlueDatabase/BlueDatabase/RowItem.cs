@@ -130,8 +130,8 @@ namespace BlueDatabase {
 
                     var f = column.Database.Cell.BestFile(column, row);
                     if (f.FileType() == enFileFormat.Image && FileOperations.FileExists(f)) {
-                        x.Add(new Variable(column.Name + "_File", (Bitmap)BitmapExt.Image_FromFile(f), true, false, "Spalte: " + column.ReadableText() + "\r\nEnthält die Bilddaten der zugehörigen Zelle."));
-                    }
+                        x.Add(new Variable(column.Name + "_ImageFileName", f, enVariableDataType.String, true, false, "Spalte: " + column.ReadableText() + "\r\nEnthält den vollen Dateinamen des Bildes der zugehörigen Zelle."));
+                   }
 
                     break;
 

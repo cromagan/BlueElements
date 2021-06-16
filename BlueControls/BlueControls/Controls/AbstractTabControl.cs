@@ -34,7 +34,7 @@ namespace BlueControls.Controls {
 
     [ToolboxBitmap(typeof(System.Windows.Forms.TabControl))]
     [Designer(typeof(TabControlDesigner))]
-    public abstract class AbstractTabControl : System.Windows.Forms.TabControl, IContextMenu, IUseMyBackColor, ISupportsBeginnEdit {
+    public abstract class AbstractTabControl : System.Windows.Forms.TabControl, IContextMenu, IUseMyBackColor {
 
         #region Fields
 
@@ -86,12 +86,6 @@ namespace BlueControls.Controls {
             set => base.AutoSize = false;
         }
 
-        [DefaultValue(0)]
-        [Browsable(false)]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public int BeginnEditCounter { get; set; } = 0;
-
         [Editor(typeof(TabPageCollectionEditor), typeof(UITypeEditor))]
         public new TabPageCollection TabPages => base.TabPages;
 
@@ -101,27 +95,7 @@ namespace BlueControls.Controls {
 
         #region Methods
 
-        public void BeginnEdit() => BeginnEdit(1);
-
-        public void BeginnEdit(int count) {
-            if (DesignMode) { return; }
-            foreach (var ThisControl in Controls) {
-                if (ThisControl is ISupportsBeginnEdit e) { e.BeginnEdit(count); }
-            }
-            BeginnEditCounter += count;
-        }
-
         public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) => false;
-
-        public void EndEdit() {
-            if (DesignMode) { return; }
-            if (BeginnEditCounter < 1) { Develop.DebugPrint(enFehlerArt.Warnung, "Bearbeitungsstapel instabil: " + BeginnEditCounter); }
-            BeginnEditCounter--;
-            if (BeginnEditCounter == 0) { Invalidate(); }
-            foreach (var ThisControl in Controls) {
-                if (ThisControl is ISupportsBeginnEdit e) { e.EndEdit(); }
-            }
-        }
 
         public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
             if (e != null) {
@@ -158,23 +132,8 @@ namespace BlueControls.Controls {
             // NIX TUN!!!!
         }
 
-        public new void ResumeLayout(bool performLayout) {
-            base.ResumeLayout(performLayout);
-            EndEdit();
-        }
-
-        public new void ResumeLayout() {
-            base.ResumeLayout();
-            EndEdit();
-        }
-
         public void Scale() {
             // NIX TUN!!!!
-        }
-
-        public new void SuspendLayout() {
-            BeginnEdit();
-            base.SuspendLayout();
         }
 
         public void SwapTabPages(System.Windows.Forms.TabPage tp1, System.Windows.Forms.TabPage tp2) {
@@ -192,8 +151,6 @@ namespace BlueControls.Controls {
 
         protected override void OnControlAdded(System.Windows.Forms.ControlEventArgs e) {
             if (e.Control is TabPage tb) { tb.SetBackColor(); }
-            if (DesignMode) { return; }
-            if (e.Control is ISupportsBeginnEdit nc) { nc.BeginnEdit(BeginnEditCounter); }
             base.OnControlAdded(e);
         }
 
@@ -214,11 +171,6 @@ namespace BlueControls.Controls {
         }
 
         protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) {
-            if (BeginnEditCounter > 0) {
-                e.Graphics.Clear(Color.LightBlue);
-                return;
-            }
-            //if (Skin.SkinDB == null) { return; }
             if (this is RibbonBar) {
                 Skin.Draw_Back(e.Graphics, enDesign.RibbonBar_Back, enStates.Standard, new Rectangle(0, 0, Width, Height), this, true);
             } else {
