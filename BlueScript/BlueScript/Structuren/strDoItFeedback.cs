@@ -17,6 +17,8 @@
 
 using BlueScript;
 using Skript.Enums;
+using System.Drawing;
+using static BlueBasics.modConverter;
 
 public struct strDoItFeedback {
 
@@ -44,6 +46,11 @@ public struct strDoItFeedback {
         ErrorMessage = string.Empty;
     }
 
+    public strDoItFeedback(Bitmap value) {
+        Value = Variable.ValueForReplace(BitmapToBase64(value, System.Drawing.Imaging.ImageFormat.Png), enVariableDataType.Bitmap);
+        ErrorMessage = string.Empty;
+    }
+
     #endregion
 
     #region Methods
@@ -55,8 +62,6 @@ public struct strDoItFeedback {
     public static strDoItFeedback FalscherDatentyp() => new("Falscher Datentyp.");
 
     public static strDoItFeedback Klammerfehler() => new("Fehler bei der Klammersetzung.");
-
-    public static strDoItFeedback VariableNichtGefunden() => new("Variable nicht gefunden.");
 
     public static strDoItFeedback Wahr() => new("true", enVariableDataType.Bool);
 

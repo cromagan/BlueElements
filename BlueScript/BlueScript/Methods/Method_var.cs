@@ -25,7 +25,7 @@ namespace BlueScript {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Bool_Numeral_or_String };
+        public override List<enVariableDataType> Args => new() { enVariableDataType.Bool_Numeral_String_List_or_Bitmap };
         public override string Description => "Erstellt eine neue Variable, der Typ wird automtisch bestimmt.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ";";

@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="Enums\enSkriptFehlerTyp.cs" />
     <Compile Include="Methods\Method.cs" />
+    <Compile Include="Methods\Method_LoadImage.cs" />
     <Compile Include="Methods\Method_ChangeDateTimeFormat.cs" />
     <Compile Include="Methods\Method_AddDays.cs" />
     <Compile Include="Methods\Method_Count.cs" />

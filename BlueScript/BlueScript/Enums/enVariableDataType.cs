@@ -37,6 +37,7 @@ namespace Skript.Enums {
         String_or_List = String | List,
         Bool_Numeral_or_String = Bool | Numeral | String,
         Bool_Numeral_String_or_List = Bool | Numeral | String | List,
+        Bool_Numeral_String_List_or_Bitmap = Bool | Numeral | String | List | Bitmap,
         Variable = 1024,
         Error = 2048,
         Null = 4096,
@@ -47,7 +48,7 @@ namespace Skript.Enums {
         Variable_Numeral = Variable | Numeral,
 
         Variable_List = Variable | List,
-        Variable_Stringx = Variable | String,
+        Variable_String = Variable | String,
         Variable_List_Or_String = Variable | String | List,
         Variable_List_String_Numeral_or_Bool = Variable | String | List | Numeral | Bool,
         Variable_String_or_Numeral = Variable | String | List | Numeral,

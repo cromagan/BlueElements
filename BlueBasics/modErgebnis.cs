@@ -24,11 +24,11 @@ namespace BlueBasics {
         #region Methods
 
         public static double? Ergebnis(string formel) {
-            formel = formel.ToUpper();
             formel = formel.Replace(" ", string.Empty);
             if (string.IsNullOrEmpty(formel)) { return null; }
-            // Formel = Formel.Replace("INT(", "XNT(0,");
-            // Formel = Formel.Replace("RND()", "XND(0,1)");
+
+            if (formel != formel.ReduceToChars(Constants.Char_Numerals +".,()+-/*")) { return null; }
+
             return ErgebnisCore(formel);
         }
 

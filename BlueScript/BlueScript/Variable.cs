@@ -225,7 +225,7 @@ namespace BlueScript {
             var txt = AttributeAuflösen(attributesText, s);
             if (!string.IsNullOrEmpty(txt.ErrorMessage)) { SetError(txt.ErrorMessage); return; }
 
-            #region Testen auf bool
+            #region Testen auf Bool
 
             if (txt.Value.Equals("true", System.StringComparison.InvariantCultureIgnoreCase) ||
                 txt.Value.Equals("false", System.StringComparison.InvariantCultureIgnoreCase)) {
@@ -236,24 +236,36 @@ namespace BlueScript {
                 return;
             }
 
-            #endregion Testen auf bool
+            #endregion
 
             #region Testen auf String
 
-            if (txt.Value.StartsWith("\"") && txt.Value.EndsWith("\"")) {
+            if (txt.Value.Length > 2 && txt.Value.StartsWith("\"") && txt.Value.EndsWith("\"")) {
                 if (Type is not enVariableDataType.NotDefinedYet and not enVariableDataType.String) { SetError("Variable ist kein String"); return; }
                 ValueString = txt.Value.Substring(1, txt.Value.Length - 2); // Nicht Trimmen! Ansonsten wird sowas falsch: "X=" + "";
                 ValueString = ValueString.Replace("\"+\"", string.Empty); // Zuvor die " entfernen! dann verketten! Ansonsten wird "+" mit nix ersetzte, anstelle einem  +
                 Type = enVariableDataType.String;
                 Readonly = true;
-                return;// new strDoItFeedback();
+                return;
             }
 
-            #endregion Testen auf String
+            #endregion
+
+            #region Testen auf Bitmap
+
+            if (txt.Value.Length > 2 && txt.Value.StartsWith(Constants.ImageKennung) && txt.Value.EndsWith(Constants.ImageKennung)) {
+                if (Type is not enVariableDataType.NotDefinedYet and not enVariableDataType.Bitmap) { SetError("Variable ist kein Bitmap"); return; }
+                ValueString = txt.Value.Substring(1, txt.Value.Length - 2);
+                Type = enVariableDataType.Bitmap;
+                Readonly = true;
+                return;
+            }
+
+            #endregion
 
             #region Testen auf Liste mit Strings
 
-            if (txt.Value.StartsWith("{\"") && txt.Value.EndsWith("\"}")) {
+            if (txt.Value.Length > 2 && txt.Value.StartsWith("{\"") && txt.Value.EndsWith("\"}")) {
                 if (Type is not enVariableDataType.NotDefinedYet and not enVariableDataType.List) { SetError("Variable ist keine Liste"); return; }
                 var t = txt.Value.DeKlammere(false, true, false, true);
                 var l = Method.SplitAttributeToVars(t, s, new List<enVariableDataType>() { enVariableDataType.String }, true);
@@ -264,7 +276,7 @@ namespace BlueScript {
                 return;// new strDoItFeedback();
             }
 
-            #endregion Testen auf Liste mit Strings
+            #endregion
 
             #region Testen auf Number
 
@@ -275,7 +287,7 @@ namespace BlueScript {
             Type = enVariableDataType.Numeral;
             Readonly = true;
 
-            #endregion Testen auf Number
+            #endregion
         }
 
         public Variable(string name, string value, enVariableDataType type, bool ronly, bool system, string coment) : this(name) {
@@ -310,10 +322,10 @@ namespace BlueScript {
         public enVariableDataType Type { get; set; }
 
         public Bitmap ValueBitmap {
-            get => StringUnicodeToBitmap(_ValueString);
+            get => Base64ToBitmap(_ValueString);
             set {
                 if (Readonly) { return; }
-                ValueString = BitmapToStringUnicode(value, System.Drawing.Imaging.ImageFormat.Png);
+                ValueString = BitmapToBase64(value, System.Drawing.Imaging.ImageFormat.Png);
             }
         }
 
@@ -457,6 +469,9 @@ namespace BlueScript {
 
                 case enVariableDataType.NotDefinedYet: // Wenn ne Routine die Werte einfach ersetzt.
                     return value;
+
+                case enVariableDataType.Bitmap:
+                    return Constants.ImageKennung + value + Constants.ImageKennung;
 
                 default:
                     Develop.DebugPrint_NichtImplementiert();

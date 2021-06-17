@@ -172,7 +172,7 @@ namespace BlueControls.Forms {
             this.Button_PageSetup.Name = "Button_PageSetup";
             this.Button_PageSetup.Size = new System.Drawing.Size(88, 66);
             this.Button_PageSetup.TabIndex = 12;
-            this.Button_PageSetup.Text = "Drucker-Seite einreichten";
+            this.Button_PageSetup.Text = "Drucker-Seite einrichten";
             this.Button_PageSetup.Click += new System.EventHandler(this.ButtonPageSetup_Click);
             // 
             // Bild
