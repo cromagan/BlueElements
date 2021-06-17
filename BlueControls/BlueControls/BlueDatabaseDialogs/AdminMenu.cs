@@ -335,5 +335,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void UpdateViewControls() => _TableView.WriteColumnArrangementsInto(cbxInternalColumnArrangementSelector);
 
         #endregion
+
     }
 }
