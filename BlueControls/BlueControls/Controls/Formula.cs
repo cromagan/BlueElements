@@ -333,17 +333,17 @@ namespace BlueControls.Controls {
 
         private void Arrangement_Swap(int Ri) {
             var vn = _Database.Views.IndexOf(CurrentView());
-            if (vn < 1) { return; }
-            if (vn >= _Database.Views.Count) { return; }
+            if (vn < 1 || vn >= _Database.Views.Count) { return; }
             if (Ri is 0 or > 1 or < -1) { return; }
             if (vn < 2 && Ri < 0) { return; }
             if (vn >= _Database.Views.Count - 1 && Ri > 0) { return; }
+
             var tmpx1 = _Database.Views[vn];
             var tmpx2 = _Database.Views[vn + Ri];
             // Binding List Changes müsste reagieren
             _Database.Views[vn] = tmpx2;
             _Database.Views[vn + Ri] = tmpx1;
-            _Inited = false;
+            RedoView();
         }
 
         private void Btb_IAmInvalid(object sender, System.EventArgs e) {

@@ -177,7 +177,7 @@ namespace BlueControls.Forms {
                     break;
 
                 case "ContentPaste":
-                    Row.CellSet(Column, Convert.ToString(System.Windows.Forms.Clipboard.GetDataObject().GetData(System.Windows.Forms.DataFormats.Text)));
+                    Row.CellSet(Column, System.Windows.Forms.Clipboard.GetText());
                     break;
 
                 case "ColumnContentDelete":
@@ -420,7 +420,7 @@ namespace BlueControls.Forms {
                     break;
 
                 case "csv":
-                    System.Windows.Forms.Clipboard.SetDataObject(TableView.Export_CSV(enFirstRow.ColumnCaption), true);
+                    System.Windows.Clipboard.SetText(TableView.Export_CSV(enFirstRow.ColumnCaption));
                     MessageBox.Show("Die gewünschten Daten<br>sind nun im Zwischenspeicher.", enImageCode.Clipboard, "Ok");
                     break;
 

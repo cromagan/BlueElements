@@ -174,7 +174,8 @@ namespace BluePaint {
                 MessageBox.Show("Kein Bild vorhanden.");
                 return;
             }
-            System.Windows.Forms.Clipboard.SetDataObject(P.BMP, false);
+            System.Windows.Forms.Clipboard.SetImage(P.BMP);
+            //System.Windows.Forms.Clipboard.SetDataObject(P.BMP, false);
             Notification.Show("Das Bild ist nun<br>in der Zwischenablage.", enImageCode.Clipboard);
         }
 
@@ -184,7 +185,7 @@ namespace BluePaint {
                 Notification.Show("Abbruch,<br>kein Bild im Zwischenspeicher!", enImageCode.Information);
                 return;
             }
-            SetPic((Bitmap)System.Windows.Forms.Clipboard.GetDataObject().GetData(System.Windows.Forms.DataFormats.Bitmap));
+            SetPic((Bitmap)System.Windows.Forms.Clipboard.GetImage());
             _isSaved = false;
             _filename = "*";
             P.ZoomFit();

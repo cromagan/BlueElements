@@ -823,9 +823,7 @@ namespace BlueControls.Controls {
             if (string.IsNullOrEmpty(tt)) { return; }
             tt = tt.Replace("\n", string.Empty);
             tt = tt.Replace("\r", "\r\n");
-            System.Windows.Forms.DataObject datobj = new();
-            datobj.SetData(System.Windows.Forms.DataFormats.Text, tt);
-            System.Windows.Clipboard.SetDataObject(datobj);
+            System.Windows.Clipboard.SetText(tt);
         }
 
         private void Clipboard_Paste() {
@@ -834,9 +832,9 @@ namespace BlueControls.Controls {
             // Anscheinend wird bei den Clipboard operationen ein DoEventXsx ausgelöst.
             // Dadurch kommt es zum Refresh des übergeordneten Steuerelementes, warscheinlich der Textbox.
             // Deshalb  muss 'Char_DelBereich' NACH den Clipboard-Operationen stattfinden.
-            if (!System.Windows.Forms.Clipboard.GetDataObject().GetDataPresent(System.Windows.Forms.DataFormats.Text)) { return; }
+            if (!System.Windows.Forms.Clipboard.ContainsText()) { return; }
             Char_DelBereich(-1, -1);
-            InsertText(Convert.ToString(System.Windows.Clipboard.GetDataObject().GetData(System.Windows.Forms.DataFormats.UnicodeText)));
+            InsertText(System.Windows.Forms.Clipboard.GetText());
         }
 
         /// <summary>

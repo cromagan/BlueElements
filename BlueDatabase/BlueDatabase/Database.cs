@@ -724,7 +724,7 @@ namespace BlueDatabase {
             // -------------------------------------
             // --- Importieren ---
             // -------------------------------------
-            OnDropMessage("Importiere...");
+            //OnDropMessage("Starte Importierevorgang...");
             for (var ZeilNo = StartZ; ZeilNo < Zeil.Count; ZeilNo++) {
                 //P?.Update(ZeilNo);
                 var tempVar2 = Math.Min(Zeil[ZeilNo].GetUpperBound(0) + 1, columns.Count);

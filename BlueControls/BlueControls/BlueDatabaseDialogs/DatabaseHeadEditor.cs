@@ -248,7 +248,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             x.Close();
         }
 
-        private void btnClipboard_Click(object sender, System.EventArgs e) => System.Windows.Forms.Clipboard.SetDataObject(tblUndo.Export_CSV(enFirstRow.ColumnCaption), true);
+        private void btnClipboard_Click(object sender, System.EventArgs e) => System.Windows.Forms.Clipboard.SetText(tblUndo.Export_CSV(enFirstRow.ColumnCaption));
 
         private void btnFremdImport_Click(object sender, System.EventArgs e) {
             if (_Database.ReadOnly) { return; }

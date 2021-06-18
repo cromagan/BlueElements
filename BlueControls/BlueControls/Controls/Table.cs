@@ -429,7 +429,7 @@ namespace BlueControls.Controls {
                     var c = Row.CellGetString(Column);
                     c = c.Replace("\r\n", "\r");
                     c = c.Replace("\r", "\r\n");
-                    System.Windows.Forms.Clipboard.SetDataObject(c, true);
+                    System.Windows.Forms.Clipboard.SetText(c);
                     if (Meldung) { Notification.Show(LanguageTool.DoTranslate("<b>{0}</b><br>ist nun in der Zwischenablage.", true, c), enImageCode.Kopieren); }
                 } else {
                     if (Meldung) { Notification.Show(LanguageTool.DoTranslate("Bei dieser Spalte nicht möglich."), enImageCode.Warnung); }
@@ -724,7 +724,7 @@ namespace BlueControls.Controls {
                 return;
             }
             //    If Not Editablexx("Import gerade nicht möglich") Then Exit Sub
-            var nt = Convert.ToString(System.Windows.Forms.Clipboard.GetDataObject().GetData(System.Windows.Forms.DataFormats.Text));
+            var nt = System.Windows.Forms.Clipboard.GetText();
             ImportCSV(nt);
         }
 
@@ -1178,12 +1178,12 @@ namespace BlueControls.Controls {
                                     ISIN_KeyDown = false;
                                     return;
                                 }
-                                if (!System.Windows.Forms.Clipboard.GetDataObject().GetDataPresent(System.Windows.Forms.DataFormats.Text)) {
+                                if (!System.Windows.Forms.Clipboard.ContainsText()) {
                                     NotEditableInfo("Kein Text in der Zwischenablage.");
                                     ISIN_KeyDown = false;
                                     return;
                                 }
-                                var ntxt = Convert.ToString(System.Windows.Forms.Clipboard.GetDataObject().GetData(System.Windows.Forms.DataFormats.UnicodeText));
+                                var ntxt = System.Windows.Forms.Clipboard.GetText();
                                 if (_CursorPosRow.Row.CellGetString(_CursorPosColumn) == ntxt) {
                                     ISIN_KeyDown = false;
                                     return;
@@ -1721,7 +1721,7 @@ namespace BlueControls.Controls {
                     }
 
                 case "doclipboard": {
-                        var ClipTMP = Convert.ToString(System.Windows.Forms.Clipboard.GetDataObject().GetData(System.Windows.Forms.DataFormats.Text));
+                        var ClipTMP = System.Windows.Forms.Clipboard.GetText();
                         ClipTMP = ClipTMP.RemoveChars(Constants.Char_NotFromClip);
                         ClipTMP = ClipTMP.TrimEnd("\r\n");
                         var SearchValue = new List<string>(ClipTMP.SplitByCR()).SortedDistinctList();
@@ -1733,7 +1733,7 @@ namespace BlueControls.Controls {
                     }
 
                 case "donotclipboard": {
-                        var ClipTMP = Convert.ToString(System.Windows.Forms.Clipboard.GetDataObject().GetData(System.Windows.Forms.DataFormats.Text));
+                        var ClipTMP = System.Windows.Forms.Clipboard.GetText();
                         ClipTMP = ClipTMP.RemoveChars(Constants.Char_NotFromClip);
                         ClipTMP = ClipTMP.TrimEnd("\r\n");
                         var ColumInhalt = Database.Export_CSV(enFirstRow.Without, e.Column, null).SplitByCRToList().SortedDistinctList();
