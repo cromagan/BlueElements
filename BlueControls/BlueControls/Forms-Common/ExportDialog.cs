@@ -187,12 +187,14 @@ namespace BlueControls.Forms {
             do {
                 var nr = _ItemNrForPrint;
                 _ItemNrForPrint = GeneratePrintPad(padSchachteln, _ItemNrForPrint, cbxLayoutWahl.Text, _RowsForExport, ab);
-                if (nr == _ItemNrForPrint) { break; }
-                if (_ItemNrForPrint >= _RowsForExport.Count) { break; }
-                var x = TempFile(_ZielPfad, "Schachteln", "png");
+
+                var x = TempFile(_ZielPfad, _RowsForExport[0].Database.Caption + "_" +  b.ToString() + "x" + h.ToString() + "_" + ab.ToString(), "png");
                 padSchachteln.Item.BackColor = System.Drawing.Color.Transparent;
                 padSchachteln.Item.SaveAsBitmap(x);
                 l.Add(x);
+                if (nr == _ItemNrForPrint) { break; }
+                if (_ItemNrForPrint >= _RowsForExport.Count) { break; }
+
             } while (true);
             tabStart.Enabled = false;
             tabBildSchachteln.Enabled = false;

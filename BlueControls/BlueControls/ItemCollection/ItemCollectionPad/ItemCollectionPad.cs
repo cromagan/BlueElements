@@ -354,13 +354,13 @@ namespace BlueControls.ItemCollection {
 
         public void OnDoInvalidate() => DoInvalidate?.Invoke(this, System.EventArgs.Empty);
 
-        public bool ParseVariable(string name, string wert) => ParseVariable(new BlueScript.Variable(name, wert, Skript.Enums.enVariableDataType.String));
+        public bool ParseVariable(string name, string wert) => ParseVariable(null, new BlueScript.Variable(name, wert, Skript.Enums.enVariableDataType.String));
 
-        public bool ParseVariable(BlueScript.Variable variable) {
+        public bool ParseVariable(BlueScript.Script s, BlueScript.Variable variable) {
             var did = false;
             foreach (var thisItem in this) {
                 if (thisItem is ICanHaveColumnVariables variables) {
-                    if (variables.ReplaceVariable(variable)) { did = true; }
+                    if (variables.ReplaceVariable(s, variable)) { did = true; }
                 }
             }
             return did;
@@ -370,7 +370,7 @@ namespace BlueControls.ItemCollection {
             if (row != null) {
                 (_, _, var script) = row.DoAutomatic(false, "export");
                 foreach (var thisV in script.Variablen) {
-                    ParseVariable(thisV);
+                    ParseVariable(script, thisV);
                 }
             }
         }

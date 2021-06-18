@@ -18,6 +18,7 @@
 using BlueBasics;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace BlueScript {
 
@@ -28,6 +29,7 @@ namespace BlueScript {
         public static List<Method> Comands = null;
         public readonly List<Variable> Variablen;
         public bool EndSkript = false;
+        internal readonly List<Bitmap> BitmapCache;
         private string _error;
         private string _errorCode;
         private string _ScriptText = string.Empty;
@@ -71,6 +73,7 @@ namespace BlueScript {
                 Comands = GetEnumerableOfType<Method>();
             }
             Variablen = variablen;
+            BitmapCache = new();
         }
 
         #endregion
@@ -206,6 +209,11 @@ namespace BlueScript {
         public bool Parse() {
             (Error, ErrorCode) = Parse(_ScriptText, true, this);
             return !string.IsNullOrEmpty(Error);
+        }
+
+        internal int AddBitmapToCache(Bitmap bmp) {
+            BitmapCache.Add(bmp);
+            return BitmapCache.IndexOf(bmp);
         }
 
         private static string ReduceText(string txt) {

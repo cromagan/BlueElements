@@ -20,6 +20,7 @@ using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
+using BlueScript;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -151,7 +152,7 @@ namespace BlueControls.ItemCollection {
         //    }
         //    p_RU.X = Math.Max(p_RU.X, p_LO.X + 10m * Skalierung * Parent.SheetStyleScale);
         //}
-        public bool ReplaceVariable(BlueScript.Variable variable) {
+        public bool ReplaceVariable(Script s, BlueScript.Variable variable) {
             if ("&" + variable.Name.ToLower() + ";" != Text.ToLower().TrimCr()) { return false; }
             if (variable.Type is not Skript.Enums.enVariableDataType.String and
                                  not Skript.Enums.enVariableDataType.List and

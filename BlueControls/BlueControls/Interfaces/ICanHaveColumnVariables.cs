@@ -15,13 +15,15 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueScript;
+
 namespace BlueControls.Interfaces {
 
     public interface ICanHaveColumnVariables {
 
         #region Methods
 
-        bool ReplaceVariable(BlueScript.Variable variable);
+        bool ReplaceVariable(Script s, BlueScript.Variable variable);
 
         bool ResetVariables();
 

@@ -21,6 +21,7 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
+using BlueScript;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -156,11 +157,11 @@ namespace BlueControls.ItemCollection {
             return false;
         }
 
-        public bool ReplaceVariable(BlueScript.Variable variable) {
+        public bool ReplaceVariable(Script s, Variable variable) {
             if (string.IsNullOrEmpty(Platzhalter_für_Layout)) { return false; }
             if ("&" + variable.Name.ToLower() + ";" != Platzhalter_für_Layout.ToLower()) { return false; }
             if (variable.Type != Skript.Enums.enVariableDataType.Bitmap) { return false; }
-            var ot = variable.ValueBitmap;
+            var ot = variable.GetValueBitmap(s);
             if (ot is Bitmap bmp) {
                 Bitmap = bmp;
                 OnChanged();

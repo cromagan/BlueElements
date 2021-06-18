@@ -20,6 +20,7 @@ using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
+using BlueScript;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -241,9 +242,9 @@ namespace BlueControls.ItemCollection {
             return false;
         }
 
-        public bool ReplaceVariable(BlueScript.Variable variable) {
+        public bool ReplaceVariable(Script s, BlueScript.Variable variable) {
             if (PadInternal == null) { return false; }
-            var b = PadInternal.Item.ParseVariable(variable);
+            var b = PadInternal.Item.ParseVariable(s, variable);
             if (b) { OnChanged(); }
             return b;
         }

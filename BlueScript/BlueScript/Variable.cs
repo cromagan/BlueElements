@@ -321,14 +321,6 @@ namespace BlueScript {
 
         public enVariableDataType Type { get; set; }
 
-        public Bitmap ValueBitmap {
-            get => Base64ToBitmap(_ValueString);
-            set {
-                if (Readonly) { return; }
-                ValueString = BitmapToBase64(value, System.Drawing.Imaging.ImageFormat.Png);
-            }
-        }
-
         public bool ValueBool => _ValueString == "true";
 
         public double ValueDouble {
@@ -477,6 +469,10 @@ namespace BlueScript {
                     Develop.DebugPrint_NichtImplementiert();
                     return value;
             }
+        }
+
+        public Bitmap GetValueBitmap(Script s) {
+            return s.BitmapCache[ValueInt];
         }
 
         public void PrepareForScript() => _ValueString = _ValueString.Replace("\"", BlueBasics.Constants.GänsefüßchenReplace);

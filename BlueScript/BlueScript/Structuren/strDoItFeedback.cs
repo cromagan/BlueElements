@@ -46,11 +46,6 @@ public struct strDoItFeedback {
         ErrorMessage = string.Empty;
     }
 
-    public strDoItFeedback(Bitmap value) {
-        Value = Variable.ValueForReplace(BitmapToBase64(value, System.Drawing.Imaging.ImageFormat.Png), enVariableDataType.Bitmap);
-        ErrorMessage = string.Empty;
-    }
-
     #endregion
 
     #region Methods
