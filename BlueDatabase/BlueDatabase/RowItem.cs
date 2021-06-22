@@ -131,7 +131,7 @@ namespace BlueDatabase {
                     var f = column.Database.Cell.BestFile(column, row);
                     if (f.FileType() == enFileFormat.Image && FileOperations.FileExists(f)) {
                         x.Add(new Variable(column.Name + "_ImageFileName", f, enVariableDataType.String, true, false, "Spalte: " + column.ReadableText() + "\r\nEnthält den vollen Dateinamen des Bildes der zugehörigen Zelle."));
-                   }
+                    }
 
                     break;
 
@@ -389,7 +389,7 @@ namespace BlueDatabase {
             var erg = formel;
             // Variablen ersetzen
             foreach (var thisColumnItem in Database.Column) {
-                if (!erg.Contains("&")) { return erg; }
+                if (!erg.Contains("~")) { return erg; }
                 if (thisColumnItem != null) {
                     var txt = CellGetString(thisColumnItem);
                     if (fulltext) { txt = CellItem.ValueReadable(thisColumnItem, txt, enShortenStyle.Replaced, enBildTextVerhalten.Nur_Text, removeLineBreaks); }
@@ -397,9 +397,10 @@ namespace BlueDatabase {
                         txt = txt.Replace("\r\n", " ");
                         txt = txt.Replace("\r", " ");
                     }
-                    erg = erg.Replace("&" + thisColumnItem.Name.ToUpper() + ";", txt, RegexOptions.IgnoreCase);
-                    while (erg.ToUpper().Contains("&" + thisColumnItem.Name.ToUpper() + "(")) {
-                        var x = erg.ToUpper().IndexOf("&" + thisColumnItem.Name.ToUpper() + "(");
+
+                    erg = erg.Replace("~" + thisColumnItem.Name.ToUpper() + "~", txt, RegexOptions.IgnoreCase);
+                    while (erg.ToUpper().Contains("~" + thisColumnItem.Name.ToUpper() + "(")) {
+                        var x = erg.ToUpper().IndexOf("~" + thisColumnItem.Name.ToUpper() + "(");
                         var x2 = erg.IndexOf(")", x);
                         if (x2 < x) { return erg; }
                         var ww = erg.Substring(x + thisColumnItem.Name.Length + 2, x2 - x - thisColumnItem.Name.Length - 2);

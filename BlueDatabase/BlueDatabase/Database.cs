@@ -638,7 +638,7 @@ namespace BlueDatabase {
                         da.CellAdd("-", ThisColumn.BackColor);
                         //da.Add("        <th BORDERCOLOR=\"#aaaaaa\" align=\"left\" valign=\"middle\" bgcolor=\"#" + ThisColumn.BackColor.ToHTMLCode() + "\">-</th>");
                     } else {
-                        da.CellAdd("&sum; " + s, ThisColumn.BackColor);
+                        da.CellAdd("~sum~ " + s, ThisColumn.BackColor);
                         //da.Add("        <th BORDERCOLOR=\"#aaaaaa\" align=\"left\" valign=\"middle\" bgcolor=\"#" + ThisColumn.BackColor.ToHTMLCode() + "\">&sum; " + s + "</th>");
                     }
                 }
@@ -985,8 +985,8 @@ namespace BlueDatabase {
             // _Views-----------------------------------------
             // Nicht nötig, da die Spalten als Verweiß gespeichert sind
             // Zeilen-Quick-Info -----------------------------------------
-            ZeilenQuickInfo = ZeilenQuickInfo.Replace("&" + oldName + ";", "&" + newName.Name + ";", RegexOptions.IgnoreCase);
-            ZeilenQuickInfo = ZeilenQuickInfo.Replace("&" + oldName + "(", "&" + newName.Name + "(", RegexOptions.IgnoreCase);
+            ZeilenQuickInfo = ZeilenQuickInfo.Replace("~" + oldName + ";", "~" + newName.Name + ";", RegexOptions.IgnoreCase);
+            ZeilenQuickInfo = ZeilenQuickInfo.Replace("~" + oldName + "(", "~" + newName.Name + "(", RegexOptions.IgnoreCase);
         }
 
         internal string Column_UsedIn(ColumnItem column) {

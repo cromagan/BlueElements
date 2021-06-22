@@ -153,7 +153,7 @@ namespace BlueControls.ItemCollection {
         //    p_RU.X = Math.Max(p_RU.X, p_LO.X + 10m * Skalierung * Parent.SheetStyleScale);
         //}
         public bool ReplaceVariable(Script s, BlueScript.Variable variable) {
-            if ("&" + variable.Name.ToLower() + ";" != Text.ToLower().TrimCr()) { return false; }
+            if ("~" + variable.Name.ToLower() + "~" != Text.ToLower().TrimCr()) { return false; }
             if (variable.Type is not Skript.Enums.enVariableDataType.String and
                                  not Skript.Enums.enVariableDataType.List and
                                  not Skript.Enums.enVariableDataType.Integer and

@@ -240,7 +240,7 @@ namespace BlueScript {
 
             #region Testen auf String
 
-            if (txt.Value.Length > 2 && txt.Value.StartsWith("\"") && txt.Value.EndsWith("\"")) {
+            if (txt.Value.Length > 1 && txt.Value.StartsWith("\"") && txt.Value.EndsWith("\"")) {
                 if (Type is not enVariableDataType.NotDefinedYet and not enVariableDataType.String) { SetError("Variable ist kein String"); return; }
                 ValueString = txt.Value.Substring(1, txt.Value.Length - 2); // Nicht Trimmen! Ansonsten wird sowas falsch: "X=" + "";
                 ValueString = ValueString.Replace("\"+\"", string.Empty); // Zuvor die " entfernen! dann verketten! Ansonsten wird "+" mit nix ersetzte, anstelle einem  +

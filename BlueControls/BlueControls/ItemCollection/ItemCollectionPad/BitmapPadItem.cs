@@ -159,7 +159,7 @@ namespace BlueControls.ItemCollection {
 
         public bool ReplaceVariable(Script s, Variable variable) {
             if (string.IsNullOrEmpty(Platzhalter_für_Layout)) { return false; }
-            if ("&" + variable.Name.ToLower() + ";" != Platzhalter_für_Layout.ToLower()) { return false; }
+            if ("~" + variable.Name.ToLower() + "~" != Platzhalter_für_Layout.ToLower()) { return false; }
             if (variable.Type != Skript.Enums.enVariableDataType.Bitmap) { return false; }
             var ot = variable.GetValueBitmap(s);
             if (ot is Bitmap bmp) {
