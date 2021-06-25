@@ -180,17 +180,6 @@ namespace BlueControls.Controls {
             }
         }
 
-        //[DefaultValue(typeof(Color), "Transparent")]
-        //public Color Color {
-        //    get {
-        //        return _Color;
-        //    }
-        //    set {
-        //        if (_Color == value) { return; }
-        //        _Color = value;
-        //        Invalidate();
-        //    }
-        //}
         /// <summary>
         /// DisabledReason befüllen, um das Steuerelement zu disablen
         /// </summary>
@@ -295,6 +284,9 @@ namespace BlueControls.Controls {
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public new string Text { get; set; }
 
+        /// <summary>
+        /// Zum setzen des Wertes muss ValueSet benutzt werden.
+        /// </summary>
         [DefaultValue("")]
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]

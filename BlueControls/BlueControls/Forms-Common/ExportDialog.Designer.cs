@@ -50,6 +50,7 @@ namespace BlueControls.Forms
             this.Button_PageSetup = new BlueControls.Controls.Button();
             this.padPrint = new BlueControls.Controls.CreativePad();
             this.tabBildSchachteln = new System.Windows.Forms.TabPage();
+            this.btnEinstellung = new BlueControls.Controls.Button();
             this.capDPI = new BlueControls.Controls.Caption();
             this.flxAbstand = new BlueControls.Controls.FlexiControl();
             this.flxHöhe = new BlueControls.Controls.FlexiControl();
@@ -58,7 +59,7 @@ namespace BlueControls.Forms
             this.padSchachteln = new BlueControls.Controls.CreativePad();
             this.tabDateiExport = new System.Windows.Forms.TabPage();
             this.Caption4 = new BlueControls.Controls.Caption();
-            this.Exported = new BlueControls.Controls.ListBox();
+            this.lstExported = new BlueControls.Controls.ListBox();
             this.Tabs.SuspendLayout();
             this.tabStart.SuspendLayout();
             this.grpArt.SuspendLayout();
@@ -210,7 +211,7 @@ namespace BlueControls.Forms
             // 
             // optSpezialFormat
             // 
-            this.optSpezialFormat.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox_Text;
+            this.optSpezialFormat.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
             this.optSpezialFormat.ImageCode = "Diskette";
             this.optSpezialFormat.Location = new System.Drawing.Point(8, 168);
             this.optSpezialFormat.Name = "optSpezialFormat";
@@ -221,7 +222,7 @@ namespace BlueControls.Forms
             // 
             // optBildSchateln
             // 
-            this.optBildSchateln.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox_Text;
+            this.optBildSchateln.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
             this.optBildSchateln.ImageCode = "Diskette";
             this.optBildSchateln.Location = new System.Drawing.Point(8, 120);
             this.optBildSchateln.Name = "optBildSchateln";
@@ -231,7 +232,7 @@ namespace BlueControls.Forms
             // 
             // optSpeichern
             // 
-            this.optSpeichern.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox_Text;
+            this.optSpeichern.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
             this.optSpeichern.Checked = true;
             this.optSpeichern.ImageCode = "Diskette";
             this.optSpeichern.Location = new System.Drawing.Point(8, 24);
@@ -242,7 +243,7 @@ namespace BlueControls.Forms
             // 
             // optDrucken
             // 
-            this.optDrucken.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox_Text;
+            this.optDrucken.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
             this.optDrucken.ImageCode = "Drucker";
             this.optDrucken.Location = new System.Drawing.Point(8, 72);
             this.optDrucken.Name = "optDrucken";
@@ -291,7 +292,7 @@ namespace BlueControls.Forms
             // 
             this.Vorschau.ImageCode = "Datei|36|||||||||Lupe";
             this.Vorschau.Location = new System.Drawing.Point(184, 8);
-            this.Vorschau.Name = "btnVorschau";
+            this.Vorschau.Name = "Vorschau";
             this.Vorschau.Size = new System.Drawing.Size(168, 48);
             this.Vorschau.TabIndex = 15;
             this.Vorschau.Text = "btnVorschau";
@@ -330,12 +331,13 @@ namespace BlueControls.Forms
             this.padPrint.ShowInPrintMode = true;
             this.padPrint.Size = new System.Drawing.Size(849, 568);
             this.padPrint.TabIndex = 2;
-            this.padPrint.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(this.PrintPad_PrintPage);
             this.padPrint.BeginnPrint += new System.Drawing.Printing.PrintEventHandler(this.PrintPad_BeginnPrint);
+            this.padPrint.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(this.PrintPad_PrintPage);
             // 
             // tabBildSchachteln
             // 
             this.tabBildSchachteln.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabBildSchachteln.Controls.Add(this.btnEinstellung);
             this.tabBildSchachteln.Controls.Add(this.capDPI);
             this.tabBildSchachteln.Controls.Add(this.flxAbstand);
             this.tabBildSchachteln.Controls.Add(this.flxHöhe);
@@ -348,12 +350,21 @@ namespace BlueControls.Forms
             this.tabBildSchachteln.TabIndex = 5;
             this.tabBildSchachteln.Text = "Bild Schachteln";
             // 
+            // btnEinstellung
+            // 
+            this.btnEinstellung.Location = new System.Drawing.Point(592, 8);
+            this.btnEinstellung.Name = "btnEinstellung";
+            this.btnEinstellung.Size = new System.Drawing.Size(128, 24);
+            this.btnEinstellung.TabIndex = 19;
+            this.btnEinstellung.Text = "Einstellung laden";
+            this.btnEinstellung.Click += new System.EventHandler(this.btnEinstellung_Click);
+            // 
             // capDPI
             // 
             this.capDPI.CausesValidation = false;
-            this.capDPI.Location = new System.Drawing.Point(464, 8);
+            this.capDPI.Location = new System.Drawing.Point(440, 8);
             this.capDPI.Name = "capDPI";
-            this.capDPI.Size = new System.Drawing.Size(272, 24);
+            this.capDPI.Size = new System.Drawing.Size(112, 24);
             this.capDPI.Text = "DPI: 300";
             // 
             // flxAbstand
@@ -428,7 +439,7 @@ namespace BlueControls.Forms
             // 
             this.tabDateiExport.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabDateiExport.Controls.Add(this.Caption4);
-            this.tabDateiExport.Controls.Add(this.Exported);
+            this.tabDateiExport.Controls.Add(this.lstExported);
             this.tabDateiExport.Controls.Add(this.FrmDrucken_ExportVerzeichniss);
             this.tabDateiExport.Controls.Add(this.MachZu);
             this.tabDateiExport.Location = new System.Drawing.Point(4, 25);
@@ -445,20 +456,22 @@ namespace BlueControls.Forms
             this.Caption4.Size = new System.Drawing.Size(328, 24);
             this.Caption4.Text = "Erstellte Dateien:";
             // 
-            // Exported
+            // lstExported
             // 
-            this.Exported.AddAllowed = BlueControls.Enums.enAddType.None;
-            this.Exported.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.lstExported.AddAllowed = BlueControls.Enums.enAddType.None;
+            this.lstExported.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.Exported.CheckBehavior = BlueControls.Enums.enCheckBehavior.NoSelection;
-            this.Exported.FilterAllowed = true;
-            this.Exported.Location = new System.Drawing.Point(8, 40);
-            this.Exported.Name = "Exported";
-            this.Exported.Size = new System.Drawing.Size(847, 593);
-            this.Exported.TabIndex = 88;
-            this.Exported.Text = "Exported";
-            this.Exported.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.Exported_ItemClicked);
+            this.lstExported.CheckBehavior = BlueControls.Enums.enCheckBehavior.NoSelection;
+            this.lstExported.FilterAllowed = true;
+            this.lstExported.Location = new System.Drawing.Point(8, 40);
+            this.lstExported.Name = "lstExported";
+            this.lstExported.Size = new System.Drawing.Size(847, 593);
+            this.lstExported.TabIndex = 88;
+            this.lstExported.Text = "Exported";
+            this.lstExported.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.lstExported_ContextMenuInit);
+            this.lstExported.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.lstExported_ContextMenuItemClicked);
+            this.lstExported.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.Exported_ItemClicked);
             // 
             // ExportDialog
             // 
@@ -479,6 +492,7 @@ namespace BlueControls.Forms
             this.tabBildSchachteln.ResumeLayout(false);
             this.tabDateiExport.ResumeLayout(false);
             this.ResumeLayout(false);
+
 			}
 			private ComboBox cbxLayoutWahl;
 			private Caption c_Layoutx;
@@ -495,7 +509,7 @@ namespace BlueControls.Forms
 			private Button optDrucken;
 			internal  System.Windows.Forms.TabPage tabDrucken;
 			internal Caption Caption4;
-			internal ListBox Exported;
+			internal ListBox lstExported;
 			internal Button btnWeiter;
 			internal CreativePad padPrint;
 			internal Button Button_PageSetup;
@@ -513,5 +527,6 @@ namespace BlueControls.Forms
         private FlexiControl flxHöhe;
         private FlexiControl flxBreite;
         private Caption capDPI;
+        private Button btnEinstellung;
     }
 	}

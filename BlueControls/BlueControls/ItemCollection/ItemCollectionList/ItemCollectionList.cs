@@ -342,6 +342,11 @@ namespace BlueControls.ItemCollection {
             QuickImage _Symbol;
             string _ReadableText;
             switch (comand) {
+                case enContextMenuComands.DateiPfadÖffnen:
+                    _ReadableText = "Dateipfad öffnen";
+                    _Symbol = QuickImage.Get("Ordner|16");
+                    break;
+
                 case enContextMenuComands.Abbruch:
                     _ReadableText = "Abbrechen";
                     _Symbol = QuickImage.Get("TasteESC|16");

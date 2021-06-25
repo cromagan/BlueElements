@@ -19,6 +19,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Controls;
+using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
 using BlueDatabase;
@@ -173,6 +174,22 @@ namespace BlueControls.Forms {
 
         private void btnDrucken_Click(object sender, System.EventArgs e) => padPrint.Print();
 
+        private void btnEinstellung_Click(object sender, System.EventArgs e) {
+            switch (MessageBox.Show("Einstellung laden:", enImageCode.Stift, "A4", "Cricut Maker", "Abbrechen")) {
+                case 0:
+                    flxBreite.ValueSet("210", true, false);
+                    flxHöhe.ValueSet("297", true, false);
+                    flxAbstand.ValueSet("0", true, false);
+                    break;
+
+                case 1:
+                    flxBreite.ValueSet("171,1", true, false);
+                    flxHöhe.ValueSet("234,9", true, false);
+                    flxAbstand.ValueSet("2", true, false);
+                    break;
+            }
+        }
+
         private void btnSchachtelnSpeichern_Click(object sender, System.EventArgs e) {
             var b = FloatParse(flxBreite.Value);
             var h = FloatParse(flxHöhe.Value);
@@ -199,7 +216,7 @@ namespace BlueControls.Forms {
             tabBildSchachteln.Enabled = false;
             tabDateiExport.Enabled = true;
             Tabs.SelectedTab = tabDateiExport;
-            Exported.Item.AddRange(l);
+            lstExported.Item.AddRange(l);
         }
 
         private void Button_PageSetup_Click(object sender, System.EventArgs e) {
@@ -253,6 +270,27 @@ namespace BlueControls.Forms {
             Enabled = true;
         }
 
+        private void lstExported_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
+            e.UserMenu.Add(enContextMenuComands.DateiPfadÖffnen);
+            e.UserMenu.Add(enContextMenuComands.Kopieren);
+        }
+
+        private void lstExported_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
+            if (e.HotItem is not TextListItem tl) { return; }
+
+            switch (e.ClickedComand) {
+                case "DateiPfadÖffnen":
+                    ExecuteFile(tl.Internal.FilePath());
+                    break;
+
+                case "Kopieren":
+                    var x = new System.Collections.Specialized.StringCollection();
+                    x.Add(tl.Internal);
+                    Clipboard.SetFileDropList(x);
+                    break;
+            }
+        }
+
         private void NurStartEnablen() {
             tabStart.Enabled = true;
             tabDrucken.Enabled = false;
@@ -302,7 +340,7 @@ namespace BlueControls.Forms {
                 var l = Database.Layouts.LayoutIDToIndex(cbxLayoutWahl.Text) > -1
                     ? Export.SaveAsBitmap(_RowsForExport, cbxLayoutWahl.Text, _ZielPfad)
                     : Export.GenerateLayout_FileSystem(_RowsForExport, cbxLayoutWahl.Text, _SaveTo, optSpezialFormat.Checked, _ZielPfad);
-                Exported.Item.AddRange(l);
+                lstExported.Item.AddRange(l);
             }
         }
 

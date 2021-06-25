@@ -405,17 +405,15 @@ namespace BlueControls.Forms {
             switch (e.Item.Internal) {
                 case "erweitert":
                     Visible = false;
-                    TableView.Visible = false;
-                    List<RowItem> Ara = new();
-                    if (Formula.ShowingRow != null) {
-                        Ara.Add(Formula.ShowingRow);
+                    List<RowItem> selectedRows = new();
+                    if (Ansicht1.Checked && Formula.ShowingRow != null) {
+                        selectedRows.Add(Formula.ShowingRow);
                     } else {
-                        Ara = TableView.SortedRows(); //Database.Column().Liste_SingleRow(0, enListenOptionen.MitFilter_Sortiert_Unique)
+                        selectedRows = TableView.SortedRows(); //Database.Column().Liste_SingleRow(0, enListenOptionen.MitFilter_Sortiert_Unique)
                     }
-                    using (ExportDialog l = new(TableView.Database, Ara)) {
+                    using (ExportDialog l = new(TableView.Database, selectedRows)) {
                         l.ShowDialog();
                     }
-                    TableView.Visible = true;
                     Visible = true;
                     break;
 
@@ -714,6 +712,5 @@ namespace BlueControls.Forms {
         }
 
         #endregion
-
     }
 }

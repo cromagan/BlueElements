@@ -23,7 +23,7 @@ namespace BlueControls.Enums {
         DateiÖffnen = 2,
         Löschen = 3,
 
-        //PfadÖffnen = 4,
+        DateiPfadÖffnen = 4,
         Bearbeiten = 5,
 
         InhaltLöschen = 6,
