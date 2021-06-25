@@ -124,7 +124,7 @@ namespace BlueControls.Forms {
             pad.Item.SheetStyleScale = tmp.Item.SheetStyleScale;
             tmp.Dispose();
             var DruckB = pad.Item.DruckbereichRect();
-            var abstand = Math.Round(mmToPixel((double)abstandMM, ItemCollectionPad.DPI), 1);
+            var abstand = Math.Round(mmToPixel(abstandMM, ItemCollectionPad.DPI), 1);
             var tempVar = Math.Max(1, (int)Math.Floor((DruckB.Width / (double)(OneItem.Width + abstand)) + 0.01));
             for (var x = 0; x < tempVar; x++) {
                 var tempVar2 = Math.Max(1, (int)Math.Floor((DruckB.Height / (double)(OneItem.Height + abstand)) + 0.01));
@@ -188,13 +188,12 @@ namespace BlueControls.Forms {
                 var nr = _ItemNrForPrint;
                 _ItemNrForPrint = GeneratePrintPad(padSchachteln, _ItemNrForPrint, cbxLayoutWahl.Text, _RowsForExport, ab);
 
-                var x = TempFile(_ZielPfad, _RowsForExport[0].Database.Caption + "_" +  b.ToString() + "x" + h.ToString() + "_" + ab.ToString(), "png");
+                var x = TempFile(_ZielPfad, _RowsForExport[0].Database.Caption + "_" + b.ToString() + "x" + h.ToString() + "_" + ab.ToString(), "png");
                 padSchachteln.Item.BackColor = System.Drawing.Color.Transparent;
                 padSchachteln.Item.SaveAsBitmap(x);
                 l.Add(x);
                 if (nr == _ItemNrForPrint) { break; }
                 if (_ItemNrForPrint >= _RowsForExport.Count) { break; }
-
             } while (true);
             tabStart.Enabled = false;
             tabBildSchachteln.Enabled = false;

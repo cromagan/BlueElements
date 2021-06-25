@@ -24,15 +24,15 @@ namespace BlueBasics {
 
         #region Fields
 
-        private const double Rad = (double)(Math.PI / 180);
+        private const double Rad = Math.PI / 180;
 
         #endregion
 
         #region Methods
 
-        public static double ArcTangens(double ta) => (double)(Math.Atan(Convert.ToDouble(ta)) / (double)Rad);
+        public static double ArcTangens(double ta) => (double)(Math.Atan(Convert.ToDouble(ta)) / Rad);
 
-        public static double Cosinus(double winkel) => Math.Cos(winkel * (double)Rad);
+        public static double Cosinus(double winkel) => Math.Cos(winkel * Rad);
 
         public static double DegToRad(double degAngle) => (double)((double)degAngle * (Math.PI / 180));
 
@@ -54,11 +54,11 @@ namespace BlueBasics {
 
         public static double RadToDeg(double radAngle) => (double)((double)radAngle * (180 / Math.PI));
 
-        public static double Sinus(double winkel) => Math.Sin(winkel * (double)Rad);
+        public static double Sinus(double winkel) => Math.Sin(winkel * Rad);
 
-        public static double Tangens(double winkel) => Math.Tan(winkel * (double)Rad);
+        public static double Tangens(double winkel) => Math.Tan(winkel * Rad);
 
-        public static double Winkel(PointF sp, PointF eP) => Winkel((double)sp.X, (double)sp.Y, (double)eP.X, (double)eP.Y);
+        public static double Winkel(PointF sp, PointF eP) => Winkel(sp.X, sp.Y, eP.X, eP.Y);
 
         public static double Winkel(double x1, double y1, double x2, double y2) {
             // http://de.wikipedia.org/wiki/Polarkoordinaten

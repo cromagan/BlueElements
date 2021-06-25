@@ -68,12 +68,12 @@ namespace BlueControls.Forms {
             // 
             // Button_PageSetup
             // 
-            this.Button_PageSetup.ButtonStyle = BlueControls.Enums.enButtonStyle.Button;
-            this.Button_PageSetup.Visible = false;
+            this.btnPageSetup.ButtonStyle = BlueControls.Enums.enButtonStyle.Button;
+            this.btnPageSetup.Visible = false;
             // 
             // ArbeitsbreichSetup
             // 
-            this.ArbeitsbreichSetup.ButtonStyle = BlueControls.Enums.enButtonStyle.Button;
+            this.btnArbeitsbreichSetup.ButtonStyle = BlueControls.Enums.enButtonStyle.Button;
             // 
             // btnLastFiles
             // 

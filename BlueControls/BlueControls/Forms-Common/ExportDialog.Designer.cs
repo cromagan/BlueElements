@@ -291,10 +291,10 @@ namespace BlueControls.Forms
             // 
             this.Vorschau.ImageCode = "Datei|36|||||||||Lupe";
             this.Vorschau.Location = new System.Drawing.Point(184, 8);
-            this.Vorschau.Name = "Vorschau";
+            this.Vorschau.Name = "btnVorschau";
             this.Vorschau.Size = new System.Drawing.Size(168, 48);
             this.Vorschau.TabIndex = 15;
-            this.Vorschau.Text = "Vorschau";
+            this.Vorschau.Text = "btnVorschau";
             this.Vorschau.Click += new System.EventHandler(this.Vorschau_Click);
             // 
             // btnDrucken

@@ -242,13 +242,13 @@ namespace BlueControls.Controls {
         }
 
         private void SliderX_ValueChanged(object sender, System.EventArgs e) {
-            _shiftX = (double)SliderX.Value;
+            _shiftX = SliderX.Value;
             ZoomOrShiftChanged();
             Invalidate();
         }
 
         private void SliderY_ValueChanged(object sender, System.EventArgs e) {
-            _shiftY = (double)SliderY.Value;
+            _shiftY = SliderY.Value;
             ZoomOrShiftChanged();
             Invalidate();
         }

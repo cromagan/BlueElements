@@ -40,7 +40,6 @@ namespace BlueControls.Controls {
 
         public bool _editAllowed = true;
 
-        //private readonly List<BasicPadItem> _ItemsSelected = new();
         private readonly List<IMoveable> _ItemsToMove = new();
 
         private IMouseAndKeyHandle _GivesMouseComandsTo;
@@ -83,6 +82,8 @@ namespace BlueControls.Controls {
 
         public event PrintEventHandler EndPrint;
 
+        public event EventHandler GotNewItemCollection;
+
         public event EventHandler PreviewModeChanged;
 
         public event PrintPageEventHandler PrintPage;
@@ -116,6 +117,8 @@ namespace BlueControls.Controls {
                     _Item.DoInvalidate += Item_DoInvalidate;
                     _Item.OnDoInvalidate();
                 }
+
+                OnGotNewItemCollection();
             }
         }
 
@@ -137,25 +140,6 @@ namespace BlueControls.Controls {
 
         #region Methods
 
-        //private void SnapToPoint(enXY toCheck, List<PointM> movedPoints, PointM move, ref PointM thisPointSnaps, ref PointM snapedToPoint) {
-        //    double ShortestDist = 10;
-        //    var Nearest = double.MaxValue;
-        //    if (!_AutoRelation.HasFlag(enAutoRelationMode.Senkrecht) &&
-        //        !_AutoRelation.HasFlag(enAutoRelationMode.Waagerecht) &&
-        //        !_AutoRelation.HasFlag(enAutoRelationMode.DirektVerbindungen)) {
-        //        return;
-        //    }
-        //    if (_AutoRelation.HasFlag(enAutoRelationMode.DirektVerbindungen)) {
-        //        if (!_AutoRelation.HasFlag(enAutoRelationMode.Senkrecht) && !_AutoRelation.HasFlag(enAutoRelationMode.Waagerecht)) { Nearest = 2; }
-        //    } else {
-        //        if (toCheck.HasFlag(enXY.X) && !_AutoRelation.HasFlag(enAutoRelationMode.Senkrecht)) { return; }
-        //        if (toCheck.HasFlag(enXY.Y) && !_AutoRelation.HasFlag(enAutoRelationMode.Waagerecht)) { return; }
-        //    }
-        //    // Berechne, welcher Punkt snappt
-        //    foreach (var thisPoint in movedPoints) {
-        //        SnapToPoint(toCheck, thisPoint, move, ref ShortestDist, ref thisPointSnaps, ref snapedToPoint, ref Nearest);
-        //    }
-        //}
         public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
             BasicPadItem thisItem = null;
             if (e.HotItem is BasicPadItem item) { thisItem = item; }
@@ -218,7 +202,7 @@ namespace BlueControls.Controls {
             }
             var Multi = 1D;
             if (Item.SnapMode == enSnapMode.SnapToGrid) {
-                Multi = modConverter.mmToPixel((double)Item.GridSnap, ItemCollectionPad.DPI);
+                Multi = modConverter.mmToPixel(Item.GridSnap, ItemCollectionPad.DPI);
             }
             if (Multi < 1) { Multi = 1D; }
             switch (e.KeyCode) {
@@ -340,7 +324,10 @@ namespace BlueControls.Controls {
             _Item.RandinMM = new System.Windows.Forms.Padding((int)(nOriD.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(nOriD.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(nOriD.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(nOriD.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
         }
 
-        public void Unselect() => _ItemsToMove.Clear();
+        public void Unselect() {
+            _ItemsToMove.Clear();
+            Invalidate();
+        }
 
         internal void DoMouseDown(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseDown(e);
@@ -440,73 +427,37 @@ namespace BlueControls.Controls {
             Invalidate();
         }
 
-        internal void DrawCreativePadTo(Graphics gr, Size maxs, enStates state, double zoom, double X, double Y, List<BasicPadItem> visibleItems) {
-            try {
-                gr.PixelOffsetMode = PixelOffsetMode.None;
-                if (_Item.SheetSizeInMM.Width > 0 && _Item.SheetSizeInMM.Height > 0) {
-                    //Skin.Draw_Back(gr, enDesign.Table_And_Pad, state, DisplayRectangle, this, true);
-                    var SSW = Math.Round(modConverter.mmToPixel((double)_Item.SheetSizeInMM.Width, ItemCollectionPad.DPI), 1);
-                    var SSH = Math.Round(modConverter.mmToPixel((double)_Item.SheetSizeInMM.Height, ItemCollectionPad.DPI), 1);
-                    var LO = new PointM(0d, 0d).ZoomAndMove(zoom, X, Y);
-                    var RU = new PointM(SSW, SSH).ZoomAndMove(zoom, X, Y);
-                    if (Item.BackColor.A > 0) {
-                        Rectangle R = new((int)LO.X, (int)LO.Y, (int)(RU.X - LO.X), (int)(RU.Y - LO.Y));
-                        gr.FillRectangle(new SolidBrush(Item.BackColor), R);
-                    }
-                    if (!_ShowInPrintMode) {
-                        var rLO = new PointM(_Item.P_rLO.X, _Item.P_rLO.Y).ZoomAndMove(zoom, X, Y);
-                        var rRU = new PointM(_Item.P_rRU.X, _Item.P_rRU.Y).ZoomAndMove(zoom, X, Y);
-                        Rectangle Rr = new((int)rLO.X, (int)rLO.Y, (int)(rRU.X - rLO.X), (int)(rRU.Y - rLO.Y));
-                        gr.DrawRectangle(PenGray, Rr);
-                    }
-                } else {
-                    if (Item.BackColor.A > 0) {
-                        gr.Clear(Item.BackColor);
-                    }
-                }
-                gr.PixelOffsetMode = PixelOffsetMode.None;
-                if (!_Item.Draw(gr, zoom, X, Y, maxs, _ShowInPrintMode, visibleItems)) {
-                    DrawCreativePadTo(gr, maxs, state, zoom, X, Y, visibleItems);
-                    return;
-                }
-                // Dann die selectiereren Punkte
-                foreach (var thisItem in _ItemsToMove) {
-                    if (thisItem is BasicPadItem BPI) {
-                        foreach (var P in BPI.MovablePoint) {
-                            P.Draw(gr, zoom, X, Y, enDesign.Button_EckpunktSchieber, enStates.Standard);
-                        }
-                    }
-                    if (thisItem is PointM P2) {
-                        if (P2.Parent is BasicPadItem BPI2) {
-                            foreach (var P in BPI2.MovablePoint) {
-                                P.Draw(gr, zoom, X, Y, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard);
-                            }
-                        }
-                        P2.Draw(gr, zoom, X, Y, enDesign.Button_EckpunktSchieber, enStates.Standard);
-                    }
-                }
-                if (_GivesMouseComandsTo is BasicPadItem PA) {
-                    var DCoordinates = PA.UsedArea().ZoomAndMoveRect(zoom, X, Y, false);
-                    gr.DrawRectangle(new Pen(Brushes.Red, 3), DCoordinates);
-                }
-                //   TMPGR.Dispose();
-            } catch {
-                DrawCreativePadTo(gr, maxs, state, zoom, X, Y, visibleItems);
-            }
-        }
-
-        internal void DrawCreativePadToBitmap(Bitmap BMP, enStates vState, double zoomf, double X, double Y, List<BasicPadItem> visibleItems) {
-            var gr = Graphics.FromImage(BMP);
-            DrawCreativePadTo(gr, BMP.Size, vState, zoomf, X, Y, visibleItems);
-            gr.Dispose();
-        }
-
         internal Point MiddleOfVisiblesScreen() => new((int)(((Width / 2) + _shiftX) / _Zoom), (int)(((Height / 2) + _shiftY) / _Zoom));
 
         protected override void DrawControl(Graphics gr, enStates state) {
             LinearGradientBrush lgb = new(ClientRectangle, Color.White, Color.LightGray, LinearGradientMode.Vertical);
             gr.FillRectangle(lgb, ClientRectangle);
-            DrawCreativePadTo(gr, Size, state, _Zoom, _shiftX, _shiftY, null);
+            _Item.DrawCreativePadTo(gr, Size, state, _Zoom, _shiftX, _shiftY, null, _ShowInPrintMode);
+
+            #region Dann die selectiereren Punkte
+
+            foreach (var thisItem in _ItemsToMove) {
+                if (thisItem is BasicPadItem BPI) {
+                    foreach (var P in BPI.MovablePoint) {
+                        P.Draw(gr, _Zoom, _shiftX, _shiftY, enDesign.Button_EckpunktSchieber, enStates.Standard);
+                    }
+                }
+                if (thisItem is PointM P2) {
+                    if (P2.Parent is BasicPadItem BPI2) {
+                        foreach (var P in BPI2.MovablePoint) {
+                            P.Draw(gr, _Zoom, _shiftX, _shiftY, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard);
+                        }
+                    }
+                    P2.Draw(gr, _Zoom, _shiftX, _shiftY, enDesign.Button_EckpunktSchieber, enStates.Standard);
+                }
+            }
+            if (_GivesMouseComandsTo is BasicPadItem PA) {
+                var DCoordinates = PA.UsedArea().ZoomAndMoveRect(_Zoom, _shiftX, _shiftY, false);
+                gr.DrawRectangle(new Pen(Brushes.Red, 3), DCoordinates);
+            }
+
+            #endregion
+
             Skin.Draw_Border(gr, enDesign.Table_And_Pad, state, DisplayRectangle);
         }
 
@@ -523,16 +474,12 @@ namespace BlueControls.Controls {
 
         protected override void OnKeyUp(System.Windows.Forms.KeyEventArgs e) => DoKeyUp(e, true);
 
-        // Kann nicht public gemacht werden, deswegen Umleitung
-        protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) => DoMouseDown(e);
+        protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) => DoMouseDown(e); // Kann nicht public gemacht werden, deswegen Umleitung
 
-        // Kann nicht public gemacht werden, deswegen Umleitung
-        protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) => DoMouseMove(e);
+        protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) => DoMouseMove(e); // Kann nicht public gemacht werden, deswegen Umleitung
 
-        // Kann nicht public gemacht werden, deswegen Umleitung
-        protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) => DoMouseUp(e);
+        protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) => DoMouseUp(e); // Kann nicht public gemacht werden, deswegen Umleitung
 
-        // Kann nicht public gemacht werden, deswegen Umleitung
         private void _Item_ItemRemoved(object sender, System.EventArgs e) {
             CheckHotItem(null, true);
             Unselect();
@@ -576,10 +523,6 @@ namespace BlueControls.Controls {
         private void Item_DoInvalidate(object sender, System.EventArgs e) => Invalidate();
 
         private void MoveItems(double x, double y, bool doSnap, bool modifyMouseDown) {
-            //PointM ThisPointSnapsX = null;
-            //PointM ThisPointSnapsY = null;
-            //PointM PointSnapedToX = null;
-            //PointM PointSnapedToY = null;
             PointM pointToMove = null;
             foreach (var thisIt in _ItemsToMove) {
                 if (thisIt is PointM p) { pointToMove = p; break; }
@@ -591,33 +534,11 @@ namespace BlueControls.Controls {
                     }
                 }
             }
-            if (pointToMove != null && x != 0d) {
-                x = SnapToGrid(true, pointToMove, x);
-                //    if (!_Grid || Math.Abs(_Gridsnap) < 0.001 || move.X == 0M) {
-                //        if (_AutoRelation != enAutoRelationMode.None) { SnapToPoint(enXY.X, _pointsSelected, move, ref ThisPointSnapsX, ref PointSnapedToX); }
-                //        if (ThisPointSnapsX != null) { move.X = PointSnapedToX.X - ThisPointSnapsX.X; }
-                //    }
-                //} else {
-                //    move.X = 0D;
-            }
-            if (pointToMove != null && y != 0d) {
-                y = SnapToGrid(false, pointToMove, y);
-                //    if (!_Grid || Math.Abs(_Gridsnap) < 0.001 || move.Y == 0M) {
-                //        if (_AutoRelation != enAutoRelationMode.None) { SnapToPoint(enXY.Y, _pointsSelected, move, ref ThisPointSnapsY, ref PointSnapedToY); }
-                //        if (ThisPointSnapsY != null) { move.Y = PointSnapedToY.Y - ThisPointSnapsY.Y; }
-                //    }
-                //} else {
-                //    move.Y = 0D;
-            }
+            if (pointToMove != null && x != 0d) { x = SnapToGrid(true, pointToMove, x); }
+            if (pointToMove != null && y != 0d) { y = SnapToGrid(false, pointToMove, y); }
+
             if (x == 0d && y == 0d) { return; }
-            //if (MoveSelectedPoints(move.X, move.Y)) {
-            //    // Wenn Strongmode true ist es für den Anwender unerklärlich, warum er denn nix macht,obwohl kein Fehler da ist...
-            //    if (_Item.NotPerforming(false) == 0) {
-            //        AddAllAutoRelations(ThisPointSnapsX, PointSnapedToX, ThisPointSnapsY, PointSnapedToY);
-            //    } else {
-            //        _NewAutoRelations.Clear();
-            //    }
-            //}
+
             foreach (var thisIt in _ItemsToMove) {
                 thisIt.Move(x, y);
             }
@@ -634,6 +555,8 @@ namespace BlueControls.Controls {
         private void OnClickedItemChanged() => ClickedItemChanged?.Invoke(this, System.EventArgs.Empty);
 
         private void OnEndPrint(PrintEventArgs e) => EndPrint?.Invoke(this, e);
+
+        private void OnGotNewItemCollection() => GotNewItemCollection?.Invoke(this, System.EventArgs.Empty);
 
         private void OnPreviewModeChanged() => PreviewModeChanged?.Invoke(this, System.EventArgs.Empty);
 
@@ -664,29 +587,11 @@ namespace BlueControls.Controls {
             DruckerDokument.DefaultPageSettings.Margins = new Margins((int)(_Item.RandinMM.Left / 25.4 * 100), (int)(_Item.RandinMM.Right / 25.4 * 100), (int)(_Item.RandinMM.Top / 25.4 * 100), (int)(_Item.RandinMM.Bottom / 25.4 * 100));
         }
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="doX"></param>
-        /// <param name="movedPoint">Die zu verschiebenden (testenden) Punkte. Die Reihenfolge muss nach Wichtigkeit sortiert sein</param>
-        /// <param name="mouseMovedTo"></param>
-        /// <returns></returns>
         private double SnapToGrid(bool doX, PointM movedPoint, double mouseMovedTo) {
             if (Item.SnapMode != enSnapMode.SnapToGrid || Math.Abs(Item.GridSnap) < 0.001) { return mouseMovedTo; }
             if (movedPoint is null) { return 0D; }
-            //PointM MasterPoint = null;
-            //PointM LowOrderPoint = null;
-            //f
-            //foreach (var thisPoint in Movep) {
-            //    if (thisPoint == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Punkt verworfen"); }// Keine Lust das zu berücksichten. Muss halt stimmen!
-            //    if (thisPoint.PrimaryGridSnapPoint) {
-            //        if (MasterPoint == null) { MasterPoint = thisPoint; }
-            //    } else if (LowOrderPoint == null) {
-            //        LowOrderPoint = thisPoint;
-            //    }
-            //}
-            //if (MasterPoint == null) { MasterPoint = LowOrderPoint; }
-            var Multi = modConverter.mmToPixel((double)Item.GridSnap, ItemCollectionPad.DPI);
+
+            var Multi = modConverter.mmToPixel(Item.GridSnap, ItemCollectionPad.DPI);
             double Value;
             if (doX) {
                 Value = movedPoint.X + mouseMovedTo;

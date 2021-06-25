@@ -993,7 +993,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.QI_Vorschau.Name = "QI_Vorschau";
             this.QI_Vorschau.Size = new System.Drawing.Size(96, 24);
             this.QI_Vorschau.TabIndex = 1;
-            this.QI_Vorschau.Text = "Vorschau";
+            this.QI_Vorschau.Text = "btnVorschau";
             this.QI_Vorschau.Click += new System.EventHandler(this.QI_Vorschau_Click);
             // 
             // tabSonstiges

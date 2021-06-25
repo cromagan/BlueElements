@@ -48,7 +48,7 @@ namespace BlueControls {
 
         public PointM(PointM startPoint, double laenge, double alpha) : this(null, string.Empty, startPoint.X, startPoint.Y, laenge, alpha) { }
 
-        public PointM(PointF startPoint, double laenge, double alpha) : this(null, string.Empty, (double)startPoint.X, (double)startPoint.Y, laenge, alpha) { }
+        public PointM(PointF startPoint, double laenge, double alpha) : this(null, string.Empty, startPoint.X, startPoint.Y, laenge, alpha) { }
 
         public PointM(object parent, string codeToParse) : this(parent) => Parse(codeToParse);
 
@@ -70,7 +70,7 @@ namespace BlueControls {
 
         public PointM(object parent, string name, double x, double y) : this(parent, name, x, y, string.Empty) { }
 
-        public PointM(PointF point) : this(null, string.Empty, (double)point.X, (double)point.Y, string.Empty) { }
+        public PointM(PointF point) : this(null, string.Empty, point.X, point.Y, string.Empty) { }
 
         public PointM(int x, int y) : this(null, string.Empty, x, y, string.Empty) { }
 

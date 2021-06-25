@@ -17,6 +17,7 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
@@ -25,6 +26,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 
 namespace BlueControls.ItemCollection {
@@ -189,7 +191,7 @@ namespace BlueControls.ItemCollection {
             set {
                 if (_GridShow == value) { return; }
                 _GridShow = value;
-                CheckGrid();
+                OnDoInvalidate();
             }
         }
 
@@ -199,7 +201,7 @@ namespace BlueControls.ItemCollection {
             set {
                 if (_Gridsnap == value) { return; }
                 _Gridsnap = value;
-                CheckGrid();
+                OnDoInvalidate();
             }
         }
 
@@ -258,7 +260,7 @@ namespace BlueControls.ItemCollection {
             set {
                 if (_SnapMode == value) { return; }
                 _SnapMode = value;
-                CheckGrid();
+                OnDoInvalidate();
             }
         }
 
@@ -307,7 +309,13 @@ namespace BlueControls.ItemCollection {
             OnDoInvalidate();
         }
 
-        public bool Draw(Graphics gr, double zoom, double shiftX, double shiftY, Size sizeOfParentControl, bool forPrinting, List<BasicPadItem> visibleItems) {
+        public void DrawCreativePadToBitmap(Bitmap BMP, enStates vState, double zoomf, double X, double Y, List<BasicPadItem> visibleItems) {
+            var gr = Graphics.FromImage(BMP);
+            DrawCreativePadTo(gr, BMP.Size, vState, zoomf, X, Y, visibleItems, true);
+            gr.Dispose();
+        }
+
+        public bool DrawItems(Graphics gr, double zoom, double shiftX, double shiftY, Size sizeOfParentControl, bool forPrinting, List<BasicPadItem> visibleItems) {
             try {
                 if (SheetStyle == null || SheetStyleScale < 0.1d) { return true; }
                 foreach (var thisItem in this) {
@@ -323,27 +331,6 @@ namespace BlueControls.ItemCollection {
                 modAllgemein.CollectGarbage();
                 return false;
             }
-        }
-
-        public RectangleM MaximumBounds(List<BasicPadItem> ZoomItems) {
-            var x1 = double.MaxValue;
-            var y1 = double.MaxValue;
-            var x2 = double.MinValue;
-            var y2 = double.MinValue;
-            var Done = false;
-            foreach (var ThisItem in this) {
-                if (ThisItem != null) {
-                    if (ZoomItems == null || ZoomItems.Contains(ThisItem)) {
-                        var UA = ThisItem.ZoomToArea();
-                        x1 = Math.Min(x1, UA.Left);
-                        y1 = Math.Min(y1, UA.Top);
-                        x2 = Math.Max(x2, UA.Right);
-                        y2 = Math.Max(y2, UA.Bottom);
-                        Done = true;
-                    }
-                }
-            }
-            return !Done ? new RectangleM() : new RectangleM(x1, y1, x2 - x1, y2 - y1);
         }
 
         public override void OnChanged() {
@@ -471,7 +458,9 @@ namespace BlueControls.ItemCollection {
         public Bitmap ToBitmap(double scale) {
             var r = MaxBounds(null);
             if (r.Width == 0) { return null; }
+
             modAllgemein.CollectGarbage();
+
             do {
                 if ((int)(r.Width * scale) > 15000) {
                     scale *= 0.8d;
@@ -483,10 +472,12 @@ namespace BlueControls.ItemCollection {
                     break;
                 }
             } while (true);
+
             Bitmap I = new((int)(r.Width * scale), (int)(r.Height * scale));
+
             using (var gr = Graphics.FromImage(I)) {
                 gr.Clear(BackColor);
-                if (!Draw(gr, scale, r.Left * scale, r.Top * scale, Size.Empty, true, null)) {
+                if (!DrawCreativePadTo(gr, I.Size, enStates.Standard, scale, r.Left * scale, r.Top * scale, null, true)) {
                     return ToBitmap(scale);
                 }
             }
@@ -519,9 +510,85 @@ namespace BlueControls.ItemCollection {
             return t.TrimEnd(", ") + "}";
         }
 
-        internal Rectangle DruckbereichRect() => P_rLO == null
-? new Rectangle(0, 0, 0, 0)
-: new Rectangle((int)P_rLO.X, (int)P_rLO.Y, (int)(P_rRU.X - P_rLO.X), (int)(P_rRU.Y - P_rLO.Y));
+        internal bool DrawCreativePadTo(Graphics gr, Size sizeOfParentControl, enStates state, double zoom, double shiftX, double shiftY, List<BasicPadItem> visibleItems, bool showinprintmode) {
+            try {
+                gr.PixelOffsetMode = PixelOffsetMode.None;
+
+                #region Hintergrund und evtl. Zeichenbereich
+
+                if (SheetSizeInMM.Width > 0 && SheetSizeInMM.Height > 0) {
+                    //Skin.Draw_Back(gr, enDesign.Table_And_Pad, state, DisplayRectangle, this, true);
+                    var SSW = Math.Round(modConverter.mmToPixel(SheetSizeInMM.Width, ItemCollectionPad.DPI), 1);
+                    var SSH = Math.Round(modConverter.mmToPixel(SheetSizeInMM.Height, ItemCollectionPad.DPI), 1);
+                    var LO = new PointM(0d, 0d).ZoomAndMove(zoom, shiftX, shiftY);
+                    var RU = new PointM(SSW, SSH).ZoomAndMove(zoom, shiftX, shiftY);
+
+                    if (BackColor.A > 0) {
+                        Rectangle R = new((int)LO.X, (int)LO.Y, (int)(RU.X - LO.X), (int)(RU.Y - LO.Y));
+                        gr.FillRectangle(new SolidBrush(BackColor), R);
+                    }
+
+                    if (!showinprintmode) {
+                        var rLO = new PointM(P_rLO.X, P_rLO.Y).ZoomAndMove(zoom, shiftX, shiftY);
+                        var rRU = new PointM(P_rRU.X, P_rRU.Y).ZoomAndMove(zoom, shiftX, shiftY);
+                        Rectangle Rr = new((int)rLO.X, (int)rLO.Y, (int)(rRU.X - rLO.X), (int)(rRU.Y - rLO.Y));
+                        gr.DrawRectangle(ZoomPad.PenGray, Rr);
+                    }
+                } else {
+                    if (BackColor.A > 0) {
+                        gr.Clear(BackColor);
+                    }
+                }
+
+                #endregion
+
+                #region Grid
+
+                if (_GridShow > 0.1) {
+                    var po = new PointM(0, 0).ZoomAndMove(zoom, shiftX, shiftY);
+                    var mo = modConverter.mmToPixel(_GridShow, DPI) * zoom;
+
+                    var p = new Pen(Color.FromArgb(10, 0, 0, 0));
+                    double ex = 0;
+
+                    for (var z = 0; z < 20; z++) {
+                        if (mo < 5) { mo *= 2; }
+                    }
+
+                    if (mo >= 5) {
+                        do {
+                            gr.DrawLine(p, po.X + (int)ex, 0, po.X + (int)ex, sizeOfParentControl.Height);
+                            gr.DrawLine(p, 0, po.Y + (int)ex, sizeOfParentControl.Width, po.Y + (int)ex);
+
+                            if (ex > 0) {
+                                // erste Linie nicht doppelt zeichnen
+                                gr.DrawLine(p, po.X - (int)ex, 0, po.X - (int)ex, sizeOfParentControl.Height);
+                                gr.DrawLine(p, 0, po.Y - (int)ex, sizeOfParentControl.Width, po.Y - (int)ex);
+                            }
+                            ex += mo;
+                            if (po.X - ex < 0 && po.Y - ex < 0 && po.X + ex > sizeOfParentControl.Width && po.Y + ex > sizeOfParentControl.Height) {
+                                break;
+                            }
+                        } while (true);
+                    }
+                }
+
+                #endregion
+
+                #region Items selbst
+
+                if (!DrawItems(gr, zoom, shiftX, shiftY, sizeOfParentControl, showinprintmode, visibleItems)) {
+                    return DrawCreativePadTo(gr, sizeOfParentControl, state, zoom, shiftX, shiftY, visibleItems, showinprintmode);
+                }
+
+                #endregion
+            } catch {
+                return DrawCreativePadTo(gr, sizeOfParentControl, state, zoom, shiftX, shiftY, visibleItems, showinprintmode);
+            }
+            return true;
+        }
+
+        internal Rectangle DruckbereichRect() => P_rLO == null ? new Rectangle(0, 0, 0, 0) : new Rectangle((int)P_rLO.X, (int)P_rLO.Y, (int)(P_rRU.X - P_rLO.X), (int)(P_rRU.Y - P_rLO.Y));
 
         internal void InDenHintergrund(BasicPadItem ThisItem) {
             if (IndexOf(ThisItem) == 0) { return; }
@@ -548,8 +615,8 @@ namespace BlueControls.ItemCollection {
             if (SheetSizeInMM.Width > 0 && SheetSizeInMM.Height > 0) {
                 var X1 = Math.Min(r.Left, 0);
                 var y1 = Math.Min(r.Top, 0);
-                var x2 = Math.Max(r.Right, modConverter.mmToPixel((double)SheetSizeInMM.Width, DPI));
-                var y2 = Math.Max(r.Bottom, modConverter.mmToPixel((double)SheetSizeInMM.Height, DPI));
+                var x2 = Math.Max(r.Right, modConverter.mmToPixel(SheetSizeInMM.Width, DPI));
+                var y2 = Math.Max(r.Bottom, modConverter.mmToPixel(SheetSizeInMM.Height, DPI));
                 return new RectangleM(X1, y1, x2 - X1, y2 - y1);
             }
             return r;
@@ -585,10 +652,6 @@ namespace BlueControls.ItemCollection {
             OnDoInvalidate();
         }
 
-        private void CheckGrid() {
-            // Todo: bei erschiedenen SnapModes muss hier evtl. was gemacht werden.
-        }
-
         private void GenPoints() {
             if (Math.Abs(_SheetSizeInMM.Width) < 0.001 || Math.Abs(_SheetSizeInMM.Height) < 0.001) {
                 if (P_rLO != null) {
@@ -609,8 +672,8 @@ namespace BlueControls.ItemCollection {
                 P_rRU = new PointM(this, "Druckbereich RU", 0, 0);
                 P_rLU = new PointM(this, "Druckbereich LU", 0, 0);
             }
-            var SSW = Math.Round(modConverter.mmToPixel((double)_SheetSizeInMM.Width, DPI), 1);
-            var SSH = Math.Round(modConverter.mmToPixel((double)_SheetSizeInMM.Height, DPI), 1);
+            var SSW = Math.Round(modConverter.mmToPixel(_SheetSizeInMM.Width, DPI), 1);
+            var SSH = Math.Round(modConverter.mmToPixel(_SheetSizeInMM.Height, DPI), 1);
             var rr = Math.Round(modConverter.mmToPixel(_RandinMM.Right, DPI), 1);
             var rl = Math.Round(modConverter.mmToPixel(_RandinMM.Left, DPI), 1);
             var ro = Math.Round(modConverter.mmToPixel(_RandinMM.Top, DPI), 1);
@@ -619,13 +682,34 @@ namespace BlueControls.ItemCollection {
             P_rRO.SetTo(SSW - rr, ro);
             P_rRU.SetTo(SSW - rr, SSH - ru);
             P_rLU.SetTo(rl, SSH - ru);
-            CheckGrid();
+            OnDoInvalidate();
             OnDoInvalidate();
         }
 
         private void Item_Changed(object sender, System.EventArgs e) {
             IsSaved = false;
             OnDoInvalidate();
+        }
+
+        private RectangleM MaximumBounds(List<BasicPadItem> ZoomItems) {
+            var x1 = double.MaxValue;
+            var y1 = double.MaxValue;
+            var x2 = double.MinValue;
+            var y2 = double.MinValue;
+            var Done = false;
+            foreach (var ThisItem in this) {
+                if (ThisItem != null) {
+                    if (ZoomItems == null || ZoomItems.Contains(ThisItem)) {
+                        var UA = ThisItem.ZoomToArea();
+                        x1 = Math.Min(x1, UA.Left);
+                        y1 = Math.Min(y1, UA.Top);
+                        x2 = Math.Max(x2, UA.Right);
+                        y2 = Math.Max(y2, UA.Bottom);
+                        Done = true;
+                    }
+                }
+            }
+            return !Done ? new RectangleM() : new RectangleM(x1, y1, x2 - x1, y2 - y1);
         }
 
         private void ParseItems(string ToParse) {

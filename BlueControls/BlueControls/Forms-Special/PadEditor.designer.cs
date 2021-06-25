@@ -22,10 +22,10 @@ namespace BlueControls.Forms {
             this.Ribbon = new BlueControls.Controls.RibbonBar();
             this.tabPageStart = new System.Windows.Forms.TabPage();
             this.Area_Drucken = new BlueControls.Controls.GroupBox();
-            this.Vorschau = new BlueControls.Controls.Button();
-            this.Button_PageSetup = new BlueControls.Controls.Button();
-            this.Bild = new BlueControls.Controls.Button();
-            this.Drucken = new BlueControls.Controls.Button();
+            this.btnVorschau = new BlueControls.Controls.Button();
+            this.btnPageSetup = new BlueControls.Controls.Button();
+            this.btnAlsBildSpeichern = new BlueControls.Controls.Button();
+            this.btnDruckerDialog = new BlueControls.Controls.Button();
             this.grpDateiSystem = new BlueControls.Controls.GroupBox();
             this.btnImport = new BlueControls.Controls.Button();
             this.btnLastFiles = new BlueControls.Controls.LastFilesCombo();
@@ -34,7 +34,7 @@ namespace BlueControls.Forms {
             this.btnSpeichern = new BlueControls.Controls.Button();
             this.tabPageControl = new System.Windows.Forms.TabPage();
             this.grpKomponenteHinzufügen = new BlueControls.Controls.GroupBox();
-            this.btnPhsyik = new BlueControls.Controls.Button();
+            this.btnAddPhsyik = new BlueControls.Controls.Button();
             this.btnAddSymbol = new BlueControls.Controls.Button();
             this.btnAddUnterStufe = new BlueControls.Controls.Button();
             this.btnAddText = new BlueControls.Controls.Button();
@@ -54,11 +54,11 @@ namespace BlueControls.Forms {
             this.btnKeinHintergrund = new BlueControls.Controls.Button();
             this.btnHintergrundFarbe = new BlueControls.Controls.Button();
             this.btnVorschauModus = new BlueControls.Controls.Button();
-            this.ArbeitsbreichSetup = new BlueControls.Controls.Button();
-            this.SchriftGröße = new BlueControls.Controls.ComboBox();
-            this.sscchrifthgöße = new BlueControls.Controls.Caption();
+            this.btnArbeitsbreichSetup = new BlueControls.Controls.Button();
+            this.cbxSchriftGröße = new BlueControls.Controls.ComboBox();
+            this.capSchriftgröße = new BlueControls.Controls.Caption();
             this.PadDesign = new BlueControls.Controls.ComboBox();
-            this.ssss = new BlueControls.Controls.Caption();
+            this.capDesign = new BlueControls.Controls.Caption();
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
             this.ColorDia = new System.Windows.Forms.ColorDialog();
@@ -76,7 +76,8 @@ namespace BlueControls.Forms {
             // 
             // btnZoomOut
             // 
-            this.btnZoomOut.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox;
+            this.btnZoomOut.ButtonStyle = ((BlueControls.Enums.enButtonStyle)(((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Button_Big) 
+            | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnZoomOut.ImageCode = "LupeMinus";
             this.btnZoomOut.Location = new System.Drawing.Point(120, 2);
             this.btnZoomOut.Name = "btnZoomOut";
@@ -86,7 +87,8 @@ namespace BlueControls.Forms {
             // 
             // btnZoomIn
             // 
-            this.btnZoomIn.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox;
+            this.btnZoomIn.ButtonStyle = ((BlueControls.Enums.enButtonStyle)(((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Button_Big) 
+            | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnZoomIn.ImageCode = "LupePlus";
             this.btnZoomIn.Location = new System.Drawing.Point(176, 2);
             this.btnZoomIn.Name = "btnZoomIn";
@@ -96,6 +98,7 @@ namespace BlueControls.Forms {
             // 
             // btnZoomFit
             // 
+            this.btnZoomFit.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnZoomFit.ImageCode = "ZoomFit";
             this.btnZoomFit.Location = new System.Drawing.Point(8, 2);
             this.btnZoomFit.Name = "btnZoomFit";
@@ -111,6 +114,7 @@ namespace BlueControls.Forms {
             this.Pad.Name = "Pad";
             this.Pad.Size = new System.Drawing.Size(1334, 571);
             this.Pad.TabIndex = 0;
+            this.Pad.GotNewItemCollection += new System.EventHandler(this.Pad_GotNewItemCollection);
             this.Pad.PreviewModeChanged += new System.EventHandler(this.Pad_PreviewModChanged);
             this.Pad.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Pad_MouseUp);
             // 
@@ -127,7 +131,7 @@ namespace BlueControls.Forms {
             this.Ribbon.Size = new System.Drawing.Size(1334, 110);
             this.Ribbon.TabIndex = 2;
             // 
-            //  System.Windows.Forms.TabPageStart
+            // tabPageStart
             // 
             this.tabPageStart.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.tabPageStart.Controls.Add(this.Area_Drucken);
@@ -142,10 +146,10 @@ namespace BlueControls.Forms {
             // 
             this.Area_Drucken.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.Area_Drucken.CausesValidation = false;
-            this.Area_Drucken.Controls.Add(this.Vorschau);
-            this.Area_Drucken.Controls.Add(this.Button_PageSetup);
-            this.Area_Drucken.Controls.Add(this.Bild);
-            this.Area_Drucken.Controls.Add(this.Drucken);
+            this.Area_Drucken.Controls.Add(this.btnVorschau);
+            this.Area_Drucken.Controls.Add(this.btnPageSetup);
+            this.Area_Drucken.Controls.Add(this.btnAlsBildSpeichern);
+            this.Area_Drucken.Controls.Add(this.btnDruckerDialog);
             this.Area_Drucken.Dock = System.Windows.Forms.DockStyle.Left;
             this.Area_Drucken.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
             this.Area_Drucken.Location = new System.Drawing.Point(376, 0);
@@ -155,46 +159,50 @@ namespace BlueControls.Forms {
             this.Area_Drucken.TabStop = false;
             this.Area_Drucken.Text = "Drucken";
             // 
-            // Vorschau
+            // btnVorschau
             // 
-            this.Vorschau.ImageCode = "Datei||||||||||Lupe";
-            this.Vorschau.Location = new System.Drawing.Point(224, 2);
-            this.Vorschau.Name = "Vorschau";
-            this.Vorschau.Size = new System.Drawing.Size(56, 66);
-            this.Vorschau.TabIndex = 13;
-            this.Vorschau.Text = "Vorschau";
-            this.Vorschau.Click += new System.EventHandler(this.Vorschau_Click);
+            this.btnVorschau.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnVorschau.ImageCode = "Datei||||||||||Lupe";
+            this.btnVorschau.Location = new System.Drawing.Point(224, 2);
+            this.btnVorschau.Name = "btnVorschau";
+            this.btnVorschau.Size = new System.Drawing.Size(56, 66);
+            this.btnVorschau.TabIndex = 13;
+            this.btnVorschau.Text = "btnVorschau";
+            this.btnVorschau.Click += new System.EventHandler(this.btnVorschau_Click);
             // 
-            // Button_PageSetup
+            // btnPageSetup
             // 
-            this.Button_PageSetup.ImageCode = "SeiteEinrichten";
-            this.Button_PageSetup.Location = new System.Drawing.Point(136, 2);
-            this.Button_PageSetup.Name = "Button_PageSetup";
-            this.Button_PageSetup.Size = new System.Drawing.Size(88, 66);
-            this.Button_PageSetup.TabIndex = 12;
-            this.Button_PageSetup.Text = "Drucker-Seite einrichten";
-            this.Button_PageSetup.Click += new System.EventHandler(this.ButtonPageSetup_Click);
+            this.btnPageSetup.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnPageSetup.ImageCode = "SeiteEinrichten";
+            this.btnPageSetup.Location = new System.Drawing.Point(136, 2);
+            this.btnPageSetup.Name = "btnPageSetup";
+            this.btnPageSetup.Size = new System.Drawing.Size(88, 66);
+            this.btnPageSetup.TabIndex = 12;
+            this.btnPageSetup.Text = "Drucker-Seite einrichten";
+            this.btnPageSetup.Click += new System.EventHandler(this.btnPageSetup_Click);
             // 
-            // Bild
+            // btnAlsBildSpeichern
             // 
-            this.Bild.ImageCode = "Bild";
-            this.Bild.Location = new System.Drawing.Point(72, 2);
-            this.Bild.Name = "Bild";
-            this.Bild.Size = new System.Drawing.Size(64, 66);
-            this.Bild.TabIndex = 11;
-            this.Bild.Text = "Als Bild speichern";
-            this.Bild.Click += new System.EventHandler(this.Bild_Click);
+            this.btnAlsBildSpeichern.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnAlsBildSpeichern.ImageCode = "Bild";
+            this.btnAlsBildSpeichern.Location = new System.Drawing.Point(72, 2);
+            this.btnAlsBildSpeichern.Name = "btnAlsBildSpeichern";
+            this.btnAlsBildSpeichern.Size = new System.Drawing.Size(64, 66);
+            this.btnAlsBildSpeichern.TabIndex = 11;
+            this.btnAlsBildSpeichern.Text = "Als Bild speichern";
+            this.btnAlsBildSpeichern.Click += new System.EventHandler(this.btnAlsBildSpeichern_Click);
             // 
-            // Drucken
+            // btnDruckerDialog
             // 
-            this.Drucken.ImageCode = "Drucker";
-            this.Drucken.Location = new System.Drawing.Point(8, 2);
-            this.Drucken.Name = "Drucken";
-            this.Drucken.QuickInfo = "Öffnet den Drucker-Dialog.";
-            this.Drucken.Size = new System.Drawing.Size(64, 66);
-            this.Drucken.TabIndex = 10;
-            this.Drucken.Text = "Drucken";
-            this.Drucken.Click += new System.EventHandler(this.Drucken_Click);
+            this.btnDruckerDialog.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnDruckerDialog.ImageCode = "Drucker";
+            this.btnDruckerDialog.Location = new System.Drawing.Point(8, 2);
+            this.btnDruckerDialog.Name = "btnDruckerDialog";
+            this.btnDruckerDialog.QuickInfo = "Öffnet den Drucker-Dialog.";
+            this.btnDruckerDialog.Size = new System.Drawing.Size(64, 66);
+            this.btnDruckerDialog.TabIndex = 10;
+            this.btnDruckerDialog.Text = "Drucken";
+            this.btnDruckerDialog.Click += new System.EventHandler(this.btnDruckerDialog_Click);
             // 
             // grpDateiSystem
             // 
@@ -216,6 +224,7 @@ namespace BlueControls.Forms {
             // 
             // btnImport
             // 
+            this.btnImport.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnImport.ImageCode = "Textdatei||||||||||Pfeil_Links";
             this.btnImport.Location = new System.Drawing.Point(240, 2);
             this.btnImport.Name = "btnImport";
@@ -241,6 +250,7 @@ namespace BlueControls.Forms {
             // 
             // btnNeu
             // 
+            this.btnNeu.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnNeu.ImageCode = "Datei";
             this.btnNeu.Location = new System.Drawing.Point(8, 2);
             this.btnNeu.Name = "btnNeu";
@@ -252,6 +262,7 @@ namespace BlueControls.Forms {
             // 
             // btnOeffnen
             // 
+            this.btnOeffnen.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnOeffnen.ImageCode = "Ordner";
             this.btnOeffnen.Location = new System.Drawing.Point(72, 2);
             this.btnOeffnen.Name = "btnOeffnen";
@@ -263,6 +274,7 @@ namespace BlueControls.Forms {
             // 
             // btnSpeichern
             // 
+            this.btnSpeichern.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnSpeichern.ImageCode = "Diskette";
             this.btnSpeichern.Location = new System.Drawing.Point(304, 2);
             this.btnSpeichern.Name = "btnSpeichern";
@@ -271,7 +283,7 @@ namespace BlueControls.Forms {
             this.btnSpeichern.Text = "Speichern unter";
             this.btnSpeichern.Click += new System.EventHandler(this.btnSpeichern_Click);
             // 
-            //  System.Windows.Forms.TabPageControl
+            // tabPageControl
             // 
             this.tabPageControl.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.tabPageControl.Controls.Add(this.grpKomponenteHinzufügen);
@@ -286,7 +298,7 @@ namespace BlueControls.Forms {
             // 
             this.grpKomponenteHinzufügen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpKomponenteHinzufügen.CausesValidation = false;
-            this.grpKomponenteHinzufügen.Controls.Add(this.btnPhsyik);
+            this.grpKomponenteHinzufügen.Controls.Add(this.btnAddPhsyik);
             this.grpKomponenteHinzufügen.Controls.Add(this.btnAddSymbol);
             this.grpKomponenteHinzufügen.Controls.Add(this.btnAddUnterStufe);
             this.grpKomponenteHinzufügen.Controls.Add(this.btnAddText);
@@ -302,18 +314,20 @@ namespace BlueControls.Forms {
             this.grpKomponenteHinzufügen.TabStop = false;
             this.grpKomponenteHinzufügen.Text = "Komponente hinzufügen";
             // 
-            // btnPhsyik
+            // btnAddPhsyik
             // 
-            this.btnPhsyik.ImageCode = "Formel|16";
-            this.btnPhsyik.Location = new System.Drawing.Point(168, 24);
-            this.btnPhsyik.Name = "btnPhsyik";
-            this.btnPhsyik.Size = new System.Drawing.Size(88, 22);
-            this.btnPhsyik.TabIndex = 10;
-            this.btnPhsyik.Text = "Physik";
-            this.btnPhsyik.Click += new System.EventHandler(this.btnPhsyik_Click);
+            this.btnAddPhsyik.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnAddPhsyik.ImageCode = "Formel|16";
+            this.btnAddPhsyik.Location = new System.Drawing.Point(168, 24);
+            this.btnAddPhsyik.Name = "btnAddPhsyik";
+            this.btnAddPhsyik.Size = new System.Drawing.Size(88, 22);
+            this.btnAddPhsyik.TabIndex = 10;
+            this.btnAddPhsyik.Text = "Physik";
+            this.btnAddPhsyik.Click += new System.EventHandler(this.btnAddPhsyik_Click);
             // 
             // btnAddSymbol
             // 
+            this.btnAddSymbol.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnAddSymbol.ImageCode = "Stern|16|||||137|0";
             this.btnAddSymbol.Location = new System.Drawing.Point(8, 46);
             this.btnAddSymbol.Name = "btnAddSymbol";
@@ -324,6 +338,7 @@ namespace BlueControls.Forms {
             // 
             // btnAddUnterStufe
             // 
+            this.btnAddUnterStufe.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnAddUnterStufe.ImageCode = "Datei|16";
             this.btnAddUnterStufe.Location = new System.Drawing.Point(168, 2);
             this.btnAddUnterStufe.Name = "btnAddUnterStufe";
@@ -334,16 +349,18 @@ namespace BlueControls.Forms {
             // 
             // btnAddText
             // 
+            this.btnAddText.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnAddText.ImageCode = "Textfeld|16";
             this.btnAddText.Location = new System.Drawing.Point(8, 2);
             this.btnAddText.Name = "btnAddText";
             this.btnAddText.Size = new System.Drawing.Size(80, 22);
             this.btnAddText.TabIndex = 4;
             this.btnAddText.Text = "Text";
-            this.btnAddText.Click += new System.EventHandler(this.AddText_Click);
+            this.btnAddText.Click += new System.EventHandler(this.btnAddText_Click);
             // 
             // btnAddImage
             // 
+            this.btnAddImage.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnAddImage.ImageCode = "Bild|16";
             this.btnAddImage.Location = new System.Drawing.Point(8, 24);
             this.btnAddImage.Name = "btnAddImage";
@@ -354,6 +371,7 @@ namespace BlueControls.Forms {
             // 
             // btnAddDimension
             // 
+            this.btnAddDimension.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnAddDimension.ImageCode = "Bemaßung|16";
             this.btnAddDimension.Location = new System.Drawing.Point(96, 2);
             this.btnAddDimension.Name = "btnAddDimension";
@@ -364,6 +382,7 @@ namespace BlueControls.Forms {
             // 
             // btnAddLine
             // 
+            this.btnAddLine.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnAddLine.ImageCode = "Linie|16";
             this.btnAddLine.Location = new System.Drawing.Point(96, 24);
             this.btnAddLine.Name = "btnAddLine";
@@ -391,7 +410,8 @@ namespace BlueControls.Forms {
             // 
             // btnAuswahl
             // 
-            this.btnAuswahl.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox;
+            this.btnAuswahl.ButtonStyle = ((BlueControls.Enums.enButtonStyle)(((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Button_Big) 
+            | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnAuswahl.Checked = true;
             this.btnAuswahl.ImageCode = "Mauspfeil";
             this.btnAuswahl.Location = new System.Drawing.Point(64, 2);
@@ -455,7 +475,7 @@ namespace BlueControls.Forms {
             this.txbRasterFangen.Suffix = "mm";
             this.txbRasterFangen.TabIndex = 6;
             this.txbRasterFangen.Text = "10";
-            this.txbRasterFangen.TextChanged += new System.EventHandler(this.RasterFangen_TextChanged);
+            this.txbRasterFangen.TextChanged += new System.EventHandler(this.txbRasterFangen_TextChanged);
             // 
             // txbRasterAnzeige
             // 
@@ -471,7 +491,8 @@ namespace BlueControls.Forms {
             // 
             // ckbRaster
             // 
-            this.ckbRaster.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox;
+            this.ckbRaster.ButtonStyle = ((BlueControls.Enums.enButtonStyle)(((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Button_Big) 
+            | BlueControls.Enums.enButtonStyle.Borderless)));
             this.ckbRaster.ImageCode = "Raster|18";
             this.ckbRaster.Location = new System.Drawing.Point(8, 2);
             this.ckbRaster.Name = "ckbRaster";
@@ -487,11 +508,11 @@ namespace BlueControls.Forms {
             this.Area_Design.Controls.Add(this.btnKeinHintergrund);
             this.Area_Design.Controls.Add(this.btnHintergrundFarbe);
             this.Area_Design.Controls.Add(this.btnVorschauModus);
-            this.Area_Design.Controls.Add(this.ArbeitsbreichSetup);
-            this.Area_Design.Controls.Add(this.SchriftGröße);
-            this.Area_Design.Controls.Add(this.sscchrifthgöße);
+            this.Area_Design.Controls.Add(this.btnArbeitsbreichSetup);
+            this.Area_Design.Controls.Add(this.cbxSchriftGröße);
+            this.Area_Design.Controls.Add(this.capSchriftgröße);
             this.Area_Design.Controls.Add(this.PadDesign);
-            this.Area_Design.Controls.Add(this.ssss);
+            this.Area_Design.Controls.Add(this.capDesign);
             this.Area_Design.Dock = System.Windows.Forms.DockStyle.Left;
             this.Area_Design.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
             this.Area_Design.Location = new System.Drawing.Point(0, 0);
@@ -504,6 +525,7 @@ namespace BlueControls.Forms {
             // btnKeinHintergrund
             // 
             this.btnKeinHintergrund.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnKeinHintergrund.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnKeinHintergrund.Location = new System.Drawing.Point(464, 2);
             this.btnKeinHintergrund.Name = "btnKeinHintergrund";
             this.btnKeinHintergrund.Size = new System.Drawing.Size(112, 22);
@@ -514,7 +536,7 @@ namespace BlueControls.Forms {
             // btnHintergrundFarbe
             // 
             this.btnHintergrundFarbe.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnHintergrundFarbe.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_Big_Borderless;
+            this.btnHintergrundFarbe.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnHintergrundFarbe.ImageCode = "Farben";
             this.btnHintergrundFarbe.Location = new System.Drawing.Point(376, 2);
             this.btnHintergrundFarbe.Name = "btnHintergrundFarbe";
@@ -526,7 +548,8 @@ namespace BlueControls.Forms {
             // btnVorschauModus
             // 
             this.btnVorschauModus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnVorschauModus.ButtonStyle = BlueControls.Enums.enButtonStyle.Checkbox_Big_Borderless;
+            this.btnVorschauModus.ButtonStyle = ((BlueControls.Enums.enButtonStyle)(((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Button_Big) 
+            | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnVorschauModus.ImageCode = "Textdatei";
             this.btnVorschauModus.Location = new System.Drawing.Point(584, 2);
             this.btnVorschauModus.Name = "btnVorschauModus";
@@ -535,39 +558,40 @@ namespace BlueControls.Forms {
             this.btnVorschauModus.Text = "Vorschau-Modus";
             this.btnVorschauModus.CheckedChanged += new System.EventHandler(this.btnVorschauModus_CheckedChanged);
             // 
-            // ArbeitsbreichSetup
+            // btnArbeitsbreichSetup
             // 
-            this.ArbeitsbreichSetup.ImageCode = "SeiteEinrichten";
-            this.ArbeitsbreichSetup.Location = new System.Drawing.Point(8, 2);
-            this.ArbeitsbreichSetup.Name = "ArbeitsbreichSetup";
-            this.ArbeitsbreichSetup.Size = new System.Drawing.Size(96, 66);
-            this.ArbeitsbreichSetup.TabIndex = 13;
-            this.ArbeitsbreichSetup.Text = "Arbeitsbereich einreichten";
-            this.ArbeitsbreichSetup.Click += new System.EventHandler(this.ArbeitsbreichSetup_Click);
+            this.btnArbeitsbreichSetup.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnArbeitsbreichSetup.ImageCode = "SeiteEinrichten";
+            this.btnArbeitsbreichSetup.Location = new System.Drawing.Point(8, 2);
+            this.btnArbeitsbreichSetup.Name = "btnArbeitsbreichSetup";
+            this.btnArbeitsbreichSetup.Size = new System.Drawing.Size(96, 66);
+            this.btnArbeitsbreichSetup.TabIndex = 13;
+            this.btnArbeitsbreichSetup.Text = "Arbeitsbereich einreichten";
+            this.btnArbeitsbreichSetup.Click += new System.EventHandler(this.btnArbeitsbreichSetup_Click);
             // 
-            // SchriftGröße
+            // cbxSchriftGröße
             // 
-            this.SchriftGröße.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.cbxSchriftGröße.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.SchriftGröße.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.SchriftGröße.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.SchriftGröße.Location = new System.Drawing.Point(208, 46);
-            this.SchriftGröße.Name = "SchriftGröße";
-            this.SchriftGröße.Size = new System.Drawing.Size(168, 22);
-            this.SchriftGröße.TabIndex = 3;
-            this.SchriftGröße.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.SchriftGröße_ItemClicked);
+            this.cbxSchriftGröße.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxSchriftGröße.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxSchriftGröße.Location = new System.Drawing.Point(208, 46);
+            this.cbxSchriftGröße.Name = "cbxSchriftGröße";
+            this.cbxSchriftGröße.Size = new System.Drawing.Size(168, 22);
+            this.cbxSchriftGröße.TabIndex = 3;
+            this.cbxSchriftGröße.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.cbxSchriftGröße_ItemClicked);
             // 
-            // sscchrifthgöße
+            // capSchriftgröße
             // 
-            this.sscchrifthgöße.CausesValidation = false;
-            this.sscchrifthgöße.Location = new System.Drawing.Point(112, 46);
-            this.sscchrifthgöße.Name = "sscchrifthgöße";
-            this.sscchrifthgöße.Size = new System.Drawing.Size(88, 22);
-            this.sscchrifthgöße.Text = "Schrift-Größe:";
+            this.capSchriftgröße.CausesValidation = false;
+            this.capSchriftgröße.Location = new System.Drawing.Point(112, 46);
+            this.capSchriftgröße.Name = "capSchriftgröße";
+            this.capSchriftgröße.Size = new System.Drawing.Size(88, 22);
+            this.capSchriftgröße.Text = "Schrift-Größe:";
             // 
             // PadDesign
             // 
-            this.PadDesign.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.PadDesign.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.PadDesign.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.PadDesign.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -577,14 +601,14 @@ namespace BlueControls.Forms {
             this.PadDesign.TabIndex = 1;
             this.PadDesign.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.PadDesign_ItemClicked);
             // 
-            // ssss
+            // capDesign
             // 
-            this.ssss.CausesValidation = false;
-            this.ssss.Location = new System.Drawing.Point(112, 2);
-            this.ssss.Name = "ssss";
-            this.ssss.Size = new System.Drawing.Size(77, 22);
-            this.ssss.Text = "Design:";
-            this.ssss.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_ohne_Textumbruch;
+            this.capDesign.CausesValidation = false;
+            this.capDesign.Location = new System.Drawing.Point(112, 2);
+            this.capDesign.Name = "capDesign";
+            this.capDesign.Size = new System.Drawing.Size(77, 22);
+            this.capDesign.Text = "Design:";
+            this.capDesign.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_ohne_Textumbruch;
             // 
             // LoadTab
             // 
@@ -620,6 +644,7 @@ namespace BlueControls.Forms {
             this.Area_Assistent.ResumeLayout(false);
             this.Area_Design.ResumeLayout(false);
             this.ResumeLayout(false);
+
         }
         private Button btnZoomOut;
         private Button btnAuswahl;
@@ -627,7 +652,7 @@ namespace BlueControls.Forms {
         private Button btnAddImage;
         private Button btnAddDimension;
         private Button btnAddLine;
-        public CreativePad Pad;
+        protected CreativePad Pad;
         protected RibbonBar Ribbon;
         protected System.Windows.Forms.TabPage tabPageControl;
         protected System.Windows.Forms.TabPage tabPageStart;
@@ -635,27 +660,27 @@ namespace BlueControls.Forms {
         protected GroupBox grpKomponenteHinzufügen;
         protected GroupBox Area_Drucken;
         protected GroupBox Area_Design;
-        private Caption ssss;
+        private Caption capDesign;
         protected GroupBox Area_Assistent;
         private Button btnZoomFit;
         private Button btnZoomIn;
-        private Button Drucken;
-        private Button Bild;
-        private Button Vorschau;
+        private Button btnDruckerDialog;
+        private Button btnAlsBildSpeichern;
+        private Button btnVorschau;
         private ComboBox PadDesign;
         protected Button ckbRaster;
         private Caption capRasterFangen;
         private Caption capRasterAnzeige;
         private TextBox txbRasterFangen;
         private TextBox txbRasterAnzeige;
-        internal ComboBox SchriftGröße;
-        internal Caption sscchrifthgöße;
-        protected internal Button Button_PageSetup;
-        protected internal Button ArbeitsbreichSetup;
+        internal ComboBox cbxSchriftGröße;
+        internal Caption capSchriftgröße;
+        protected internal Button btnPageSetup;
+        protected internal Button btnArbeitsbreichSetup;
         private System.Windows.Forms.TabPage Page_Settings;
         private Button btnAddUnterStufe;
         private Button btnAddSymbol;
-        private Button btnPhsyik;
+        private Button btnAddPhsyik;
         private Button btnVorschauModus;
         private System.Windows.Forms.OpenFileDialog LoadTab;
         private System.Windows.Forms.SaveFileDialog SaveTab;

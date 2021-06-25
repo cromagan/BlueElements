@@ -355,8 +355,8 @@ namespace BlueControls.Forms {
             btnSaveAs.Enabled = DatenbankDa;
             btnDrucken.Item["csv"].Enabled = DatenbankDa && TableView.Design != enBlueTableAppearance.OnlyMainColumnWithoutHead;
             btnDrucken.Item["html"].Enabled = DatenbankDa && TableView.Design != enBlueTableAppearance.OnlyMainColumnWithoutHead;
-            Vorwärts.Enabled = DatenbankDa;
-            zurück.Enabled = DatenbankDa;
+            btnVorwärts.Enabled = DatenbankDa;
+            btnZurück.Enabled = DatenbankDa;
             such.Enabled = DatenbankDa;
             Filter.Enabled = DatenbankDa && TableView.Design != enBlueTableAppearance.OnlyMainColumnWithoutHead;
         }
@@ -714,5 +714,6 @@ namespace BlueControls.Forms {
         }
 
         #endregion
+
     }
 }

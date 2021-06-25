@@ -88,8 +88,8 @@ namespace BlueControls.Forms
             this.grpFormularSteuerung = new BlueControls.Controls.GroupBox();
             this.SuchB = new BlueControls.Controls.Button();
             this.such = new BlueControls.Controls.TextBox();
-            this.Vorwärts = new BlueControls.Controls.Button();
-            this.zurück = new BlueControls.Controls.Button();
+            this.btnVorwärts = new BlueControls.Controls.Button();
+            this.btnZurück = new BlueControls.Controls.Button();
             this.grpAllgemein = new BlueControls.Controls.GroupBox();
             this.btnNeu = new BlueControls.Controls.Button();
             this.btnDrucken = new BlueControls.Controls.ComboBox();
@@ -141,11 +141,11 @@ namespace BlueControls.Forms
             this.TableView.ShowWaitScreen = true;
             this.TableView.Size = new System.Drawing.Size(192, 562);
             this.TableView.TabIndex = 73;
+            this.TableView.ColumnArrangementChanged += new System.EventHandler(this.TableView_ColumnArrangementChanged);
             this.TableView.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.TableView_ContextMenu_Init);
             this.TableView.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.TableView_ContextMenuItemClicked);
-            this.TableView.EditBeforeBeginEdit += new System.EventHandler<BlueDatabase.EventArgs.CellCancelEventArgs>(this.TableView_EditBeforeBeginEdit);
             this.TableView.CursorPosChanged += new System.EventHandler<BlueDatabase.EventArgs.CellEventArgs>(this.TableView_CursorPosChanged);
-            this.TableView.ColumnArrangementChanged += new System.EventHandler(this.TableView_ColumnArrangementChanged);
+            this.TableView.EditBeforeBeginEdit += new System.EventHandler<BlueDatabase.EventArgs.CellCancelEventArgs>(this.TableView_EditBeforeBeginEdit);
             this.TableView.ViewChanged += new System.EventHandler(this.TableView_ViewChanged);
             this.TableView.VisibleRowsChanged += new System.EventHandler(this.TableView_RowsSorted);
             // 
@@ -220,6 +220,7 @@ namespace BlueControls.Forms
             // 
             // btnInformation
             // 
+            this.btnInformation.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnInformation.ImageCode = "Information";
             this.btnInformation.Location = new System.Drawing.Point(8, 2);
             this.btnInformation.Name = "btnInformation";
@@ -246,6 +247,7 @@ namespace BlueControls.Forms
             // 
             // btnDatenbanken
             // 
+            this.btnDatenbanken.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnDatenbanken.ImageCode = "Ordner";
             this.btnDatenbanken.Location = new System.Drawing.Point(8, 2);
             this.btnDatenbanken.Name = "btnDatenbanken";
@@ -257,6 +259,7 @@ namespace BlueControls.Forms
             // 
             // btnTemporärenSpeicherortÖffnen
             // 
+            this.btnTemporärenSpeicherortÖffnen.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnTemporärenSpeicherortÖffnen.ImageCode = "Ordner||||0000ff||126";
             this.btnTemporärenSpeicherortÖffnen.Location = new System.Drawing.Point(96, 2);
             this.btnTemporärenSpeicherortÖffnen.Name = "btnTemporärenSpeicherortÖffnen";
@@ -299,6 +302,7 @@ namespace BlueControls.Forms
             // 
             // btnOeffnen
             // 
+            this.btnOeffnen.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnOeffnen.ImageCode = "Ordner";
             this.btnOeffnen.Location = new System.Drawing.Point(72, 2);
             this.btnOeffnen.Name = "btnOeffnen";
@@ -309,6 +313,7 @@ namespace BlueControls.Forms
             // 
             // btnSaveAs
             // 
+            this.btnSaveAs.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnSaveAs.ImageCode = "Diskette";
             this.btnSaveAs.Location = new System.Drawing.Point(232, 2);
             this.btnSaveAs.Name = "btnSaveAs";
@@ -319,6 +324,7 @@ namespace BlueControls.Forms
             // 
             // btnNeuDB
             // 
+            this.btnNeuDB.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnNeuDB.ImageCode = "Datei";
             this.btnNeuDB.Location = new System.Drawing.Point(8, 2);
             this.btnNeuDB.Name = "btnNeuDB";
@@ -370,7 +376,7 @@ namespace BlueControls.Forms
             // 
             // Ansicht3
             // 
-            this.Ansicht3.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox_Text;
+            this.Ansicht3.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
             this.Ansicht3.Location = new System.Drawing.Point(216, 24);
             this.Ansicht3.Name = "Ansicht3";
             this.Ansicht3.Size = new System.Drawing.Size(240, 22);
@@ -380,7 +386,7 @@ namespace BlueControls.Forms
             // 
             // Ansicht2
             // 
-            this.Ansicht2.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox_Text;
+            this.Ansicht2.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
             this.Ansicht2.Location = new System.Drawing.Point(216, 2);
             this.Ansicht2.Name = "Ansicht2";
             this.Ansicht2.Size = new System.Drawing.Size(240, 22);
@@ -390,7 +396,7 @@ namespace BlueControls.Forms
             // 
             // Ansicht1
             // 
-            this.Ansicht1.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox_Text;
+            this.Ansicht1.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
             this.Ansicht1.Location = new System.Drawing.Point(8, 24);
             this.Ansicht1.Name = "Ansicht1";
             this.Ansicht1.Size = new System.Drawing.Size(192, 22);
@@ -400,7 +406,7 @@ namespace BlueControls.Forms
             // 
             // Ansicht0
             // 
-            this.Ansicht0.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox_Text;
+            this.Ansicht0.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
             this.Ansicht0.Location = new System.Drawing.Point(8, 2);
             this.Ansicht0.Name = "Ansicht0";
             this.Ansicht0.Size = new System.Drawing.Size(104, 22);
@@ -428,6 +434,7 @@ namespace BlueControls.Forms
             // 
             // btnAlleSchließen
             // 
+            this.btnAlleSchließen.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnAlleSchließen.Enabled = false;
             this.btnAlleSchließen.ImageCode = "Pfeil_Oben_Scrollbar|14|||||0";
             this.btnAlleSchließen.Location = new System.Drawing.Point(248, 24);
@@ -440,6 +447,7 @@ namespace BlueControls.Forms
             // 
             // btnAlleErweitern
             // 
+            this.btnAlleErweitern.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnAlleErweitern.Enabled = false;
             this.btnAlleErweitern.ImageCode = "Pfeil_Unten_Scrollbar|14|||ff0000||200|200";
             this.btnAlleErweitern.Location = new System.Drawing.Point(248, 2);
@@ -452,6 +460,7 @@ namespace BlueControls.Forms
             // 
             // Datenüberprüfung
             // 
+            this.Datenüberprüfung.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.Datenüberprüfung.ImageCode = "Zeile||||||||||Häkchen";
             this.Datenüberprüfung.Location = new System.Drawing.Point(88, 2);
             this.Datenüberprüfung.Name = "Datenüberprüfung";
@@ -463,6 +472,7 @@ namespace BlueControls.Forms
             // 
             // AngezeigteZeilenLöschen
             // 
+            this.AngezeigteZeilenLöschen.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.AngezeigteZeilenLöschen.ImageCode = "Zeile||||||||||Kreuz";
             this.AngezeigteZeilenLöschen.Location = new System.Drawing.Point(168, 2);
             this.AngezeigteZeilenLöschen.Name = "AngezeigteZeilenLöschen";
@@ -474,6 +484,7 @@ namespace BlueControls.Forms
             // 
             // SuchenUndErsetzen
             // 
+            this.SuchenUndErsetzen.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.SuchenUndErsetzen.ImageCode = "Fernglas";
             this.SuchenUndErsetzen.Location = new System.Drawing.Point(8, 2);
             this.SuchenUndErsetzen.Name = "SuchenUndErsetzen";
@@ -488,8 +499,8 @@ namespace BlueControls.Forms
             this.grpFormularSteuerung.CausesValidation = false;
             this.grpFormularSteuerung.Controls.Add(this.SuchB);
             this.grpFormularSteuerung.Controls.Add(this.such);
-            this.grpFormularSteuerung.Controls.Add(this.Vorwärts);
-            this.grpFormularSteuerung.Controls.Add(this.zurück);
+            this.grpFormularSteuerung.Controls.Add(this.btnVorwärts);
+            this.grpFormularSteuerung.Controls.Add(this.btnZurück);
             this.grpFormularSteuerung.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpFormularSteuerung.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
             this.grpFormularSteuerung.Location = new System.Drawing.Point(208, 0);
@@ -501,6 +512,7 @@ namespace BlueControls.Forms
             // 
             // SuchB
             // 
+            this.SuchB.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.SuchB.Enabled = false;
             this.SuchB.ImageCode = "Lupe|16";
             this.SuchB.Location = new System.Drawing.Point(112, 24);
@@ -518,32 +530,32 @@ namespace BlueControls.Forms
             this.such.Name = "such";
             this.such.Size = new System.Drawing.Size(120, 22);
             this.such.TabIndex = 6;
-            this.such.TextChanged += new System.EventHandler(this.such_TextChanged);
             this.such.Enter += new System.EventHandler(this.such_Enter);
+            this.such.TextChanged += new System.EventHandler(this.such_TextChanged);
             // 
-            // Vorwärts
+            // btnVorwärts
             // 
-            this.Vorwärts.ButtonStyle = BlueControls.Enums.enButtonStyle.SliderButton;
-            this.Vorwärts.ImageCode = "Pfeil_Rechts";
-            this.Vorwärts.Location = new System.Drawing.Point(56, 2);
-            this.Vorwärts.Name = "Vorwärts";
-            this.Vorwärts.QuickInfo = "Nächsten Eintrag anzeigen";
-            this.Vorwärts.Size = new System.Drawing.Size(48, 66);
-            this.Vorwärts.TabIndex = 5;
-            this.Vorwärts.Text = "vor";
-            this.Vorwärts.Click += new System.EventHandler(this.vor_Click);
+            this.btnVorwärts.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnVorwärts.ImageCode = "Pfeil_Rechts";
+            this.btnVorwärts.Location = new System.Drawing.Point(56, 2);
+            this.btnVorwärts.Name = "btnVorwärts";
+            this.btnVorwärts.QuickInfo = "Nächsten Eintrag anzeigen";
+            this.btnVorwärts.Size = new System.Drawing.Size(48, 66);
+            this.btnVorwärts.TabIndex = 5;
+            this.btnVorwärts.Text = "vor";
+            this.btnVorwärts.Click += new System.EventHandler(this.vor_Click);
             // 
-            // zurück
+            // btnZurück
             // 
-            this.zurück.ButtonStyle = BlueControls.Enums.enButtonStyle.SliderButton;
-            this.zurück.ImageCode = "Pfeil_Links";
-            this.zurück.Location = new System.Drawing.Point(8, 2);
-            this.zurück.Name = "zurück";
-            this.zurück.QuickInfo = "Vorherigen Eintrag anzeigen";
-            this.zurück.Size = new System.Drawing.Size(48, 66);
-            this.zurück.TabIndex = 4;
-            this.zurück.Text = "zurück";
-            this.zurück.Click += new System.EventHandler(this.zurück_Click);
+            this.btnZurück.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnZurück.ImageCode = "Pfeil_Links";
+            this.btnZurück.Location = new System.Drawing.Point(8, 2);
+            this.btnZurück.Name = "btnZurück";
+            this.btnZurück.QuickInfo = "Vorherigen Eintrag anzeigen";
+            this.btnZurück.Size = new System.Drawing.Size(48, 66);
+            this.btnZurück.TabIndex = 4;
+            this.btnZurück.Text = "zurück";
+            this.btnZurück.Click += new System.EventHandler(this.zurück_Click);
             // 
             // grpAllgemein
             // 
@@ -563,6 +575,7 @@ namespace BlueControls.Forms
             // 
             // btnNeu
             // 
+            this.btnNeu.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnNeu.ImageCode = "PlusZeichen";
             this.btnNeu.Location = new System.Drawing.Point(8, 2);
             this.btnNeu.Name = "btnNeu";
@@ -586,6 +599,7 @@ namespace BlueControls.Forms
             // 
             // btnLoeschen
             // 
+            this.btnLoeschen.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnLoeschen.ImageCode = "Papierkorb";
             this.btnLoeschen.Location = new System.Drawing.Point(64, 2);
             this.btnLoeschen.Name = "btnLoeschen";
@@ -621,6 +635,7 @@ namespace BlueControls.Forms
             // 
             // AllgemeinerEditor
             // 
+            this.AllgemeinerEditor.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.AllgemeinerEditor.ImageCode = "Stern";
             this.AllgemeinerEditor.Location = new System.Drawing.Point(8, 2);
             this.AllgemeinerEditor.Name = "AllgemeinerEditor";
@@ -631,6 +646,7 @@ namespace BlueControls.Forms
             // 
             // BeziehungsEditor
             // 
+            this.BeziehungsEditor.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.BeziehungsEditor.ImageCode = "Hierarchie";
             this.BeziehungsEditor.Location = new System.Drawing.Point(80, 2);
             this.BeziehungsEditor.Name = "BeziehungsEditor";
@@ -686,14 +702,15 @@ namespace BlueControls.Forms
             this.tabExtras.ResumeLayout(false);
             this.grpEditor.ResumeLayout(false);
             this.ResumeLayout(false);
+
         }
 
         private Table TableView;
         private GroupBox grpFormularSteuerung;
         private Button SuchB;
         private TextBox such;
-        private Button Vorwärts;
-        private Button zurück;
+        private Button btnVorwärts;
+        private Button btnZurück;
         private Button btnLoeschen;
         private Button btnNeu;
         private ComboBox btnDrucken;

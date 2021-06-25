@@ -132,7 +132,7 @@ namespace BlueControls.ItemCollection {
             var l1 = UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY, false);
             var l2 = PadInternal.Item.MaxBounds(ZoomItems);
             if (l1.Width <= 0 || l2.Height <= 0) { return false; }
-            var tZo = Math.Min((double)l1.Width / l2.Width, (double)l1.Height / l2.Height);
+            var tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height);
             PadInternal.SetZoom(1);
             // Coordinaten auf Maßstab 1/1 scalieren
             var x = (e.X - (double)l1.X) / tZo;
@@ -141,8 +141,8 @@ namespace BlueControls.ItemCollection {
             x += l2.X;
             y += l2.Y;
             // Und noch berücksichtigen, daß das Bild in den Rahmen eingepasst wurde
-            x += (l2.Width - ((double)l1.Width / tZo)) / 2;
-            y += (l2.Height - ((double)l1.Height / tZo)) / 2;
+            x += (l2.Width - (l1.Width / tZo)) / 2;
+            y += (l2.Height - (l1.Height / tZo)) / 2;
             x = Math.Min(x, int.MaxValue / 2.0d);
             y = Math.Min(y, int.MaxValue / 2.0d);
             x = Math.Max(x, int.MinValue / 2.0d);
@@ -158,7 +158,7 @@ namespace BlueControls.ItemCollection {
             var l2 = PadInternal.Item.MaxBounds(ZoomItems);
             if (l1.Width <= 0 || l2.Height <= 0) { return false; }
             double tZo = 1;
-            if (l2.Width > 0 && l2.Height > 0) { tZo = Math.Min((double)l1.Width / l2.Width, (double)l1.Height / l2.Height); }
+            if (l2.Width > 0 && l2.Height > 0) { tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height); }
             PadInternal.SetZoom(1);
             // Coordinaten auf Maßstab 1/1 scalieren
             var x = (e.X - (double)l1.X) / tZo;
@@ -167,8 +167,8 @@ namespace BlueControls.ItemCollection {
             x += l2.X;
             y += l2.Y;
             // Und noch berücksichtigen, daß das Bild in den Rahmen eingepasst wurde
-            x += (l2.Width - ((double)l1.Width / tZo)) / 2;
-            y += (l2.Height - ((double)l1.Height / tZo)) / 2;
+            x += (l2.Width - (l1.Width / tZo)) / 2;
+            y += (l2.Height - (l1.Height / tZo)) / 2;
             x = Math.Min(x, int.MaxValue / 2.0d);
             y = Math.Min(y, int.MaxValue / 2.0d);
             x = Math.Max(x, int.MinValue / 2.0d);
@@ -183,7 +183,7 @@ namespace BlueControls.ItemCollection {
             var l1 = UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY, false);
             var l2 = PadInternal.Item.MaxBounds(ZoomItems);
             if (l1.Width <= 0 || l2.Height <= 0) { return false; }
-            var tZo = Math.Min((double)l1.Width / l2.Width, (double)l1.Height / l2.Height);
+            var tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height);
             PadInternal.SetZoom(1);
             // Coordinaten auf Maßstab 1/1 scalieren
             var x = (e.X - (double)l1.X) / tZo;
@@ -192,8 +192,8 @@ namespace BlueControls.ItemCollection {
             x += l2.X;
             y += l2.Y;
             // Und noch berücksichtigen, daß das Bild in den Rahmen eingepasst wurde
-            x += (l2.Width - ((double)l1.Width / tZo)) / 2;
-            y += (l2.Height - ((double)l1.Height / tZo)) / 2;
+            x += (l2.Width - (l1.Width / tZo)) / 2;
+            y += (l2.Height - (l1.Height / tZo)) / 2;
             x = Math.Min(x, int.MaxValue / 2.0d);
             y = Math.Min(y, int.MaxValue / 2.0d);
             x = Math.Max(x, int.MinValue / 2.0d);
@@ -298,7 +298,7 @@ namespace BlueControls.ItemCollection {
                     var slidervalues = PadInternal.SliderValues(mb, zoomv, centerpos);
                     PadInternal.ShowInPrintMode = ForPrinting;
                     if (ForPrinting) { PadInternal.Unselect(); }
-                    PadInternal.DrawCreativePadToBitmap(_tmpBMP, enStates.Standard, zoomv, (double)slidervalues.X, (double)slidervalues.Y, VisibleItems);
+                    PadInternal.Item.DrawCreativePadToBitmap(_tmpBMP, enStates.Standard, zoomv, slidervalues.X, slidervalues.Y, VisibleItems);
                     if (_tmpBMP != null) {
                         foreach (var thisA in Eingebettete_Ansichten) {
                             ChildPadItem Pad = null;
@@ -317,7 +317,7 @@ namespace BlueControls.ItemCollection {
                                 Pen p = new(Pad.Randfarbe, (float)(8.7d * cZoom));
                                 Pen p2 = new(Color.White, (float)(8.7d * cZoom) + 2f);
                                 p.DashPattern = new float[] { 5, 1, 1, 1 };
-                                var DC2 = mb2.ZoomAndMoveRect(zoomv, (double)slidervalues.X, (double)slidervalues.Y, false);
+                                var DC2 = mb2.ZoomAndMoveRect(zoomv, slidervalues.X, slidervalues.Y, false);
                                 tmpG.DrawRectangle(p2, DC2);
                                 tmpG.DrawRectangle(p, DC2);
                                 if (Pad.Textlage != (enAlignment)(-1)) {

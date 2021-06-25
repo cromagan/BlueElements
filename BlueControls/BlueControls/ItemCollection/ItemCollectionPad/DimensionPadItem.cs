@@ -279,14 +279,14 @@ namespace BlueControls.ItemCollection {
             var TextWinkel = (float)(_Winkel % 360);
             if (TextWinkel is > 90 and <= 270) { TextWinkel = (float)(_Winkel - 180); }
             if (geszoom < 0.15d) { return; } // Schrift zu klein, würde abstürzen
-            PointM Mitte1 = new(Mitte, (double)(sz1.Height / 2.1), (double)(TextWinkel + 90));
+            PointM Mitte1 = new(Mitte, (double)(sz1.Height / 2.1), TextWinkel + 90);
             var x = GR.Save();
             GR.TranslateTransform((float)Mitte1.X, (float)Mitte1.Y);
             GR.RotateTransform(-TextWinkel);
             GR.FillRectangle(new SolidBrush(Color.White), new RectangleF((int)(-sz1.Width * 0.9 / 2), (int)(-sz1.Height * 0.8 / 2), (int)(sz1.Width * 0.9), (int)(sz1.Height * 0.8)));
             GR.DrawString(AngezeigterText1(), f.Font(geszoom), f.Brush_Color_Main, new PointF((float)(-sz1.Width / 2.0), (float)(-sz1.Height / 2.0)));
             GR.Restore(x);
-            PointM Mitte2 = new(Mitte, (double)(sz2.Height / 2.1), (double)(TextWinkel - 90));
+            PointM Mitte2 = new(Mitte, (double)(sz2.Height / 2.1), TextWinkel - 90);
             x = GR.Save();
             GR.TranslateTransform((float)Mitte2.X, (float)Mitte2.Y);
             GR.RotateTransform(-TextWinkel);

@@ -767,8 +767,5 @@
   <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Styles\Styles.MDB" />
   </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Ressourcen\Metafile\Nullpunkt.emf" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
