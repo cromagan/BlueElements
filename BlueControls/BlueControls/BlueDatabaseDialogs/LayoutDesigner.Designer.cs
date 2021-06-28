@@ -44,9 +44,9 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Ribbon.SuspendLayout();
             this.tabPageControl.SuspendLayout();
             this.tabPageStart.SuspendLayout();
-            this.Area_Drucken.SuspendLayout();
-            this.Area_Design.SuspendLayout();
-            this.Area_Assistent.SuspendLayout();
+            this.grpDrucken.SuspendLayout();
+            this.grpDesign.SuspendLayout();
+            this.grpAssistent.SuspendLayout();
             this.grpDateiSystem.SuspendLayout();
             this.grpLayoutSelection.SuspendLayout();
             this.grpExterneLayouts.SuspendLayout();
@@ -73,14 +73,14 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabPageStart.Controls.Add(this.grpLayoutSelection);
             this.tabPageStart.Size = new System.Drawing.Size(1332, 81);
             this.tabPageStart.Controls.SetChildIndex(this.grpDateiSystem, 0);
-            this.tabPageStart.Controls.SetChildIndex(this.Area_Drucken, 0);
+            this.tabPageStart.Controls.SetChildIndex(this.grpDrucken, 0);
             this.tabPageStart.Controls.SetChildIndex(this.grpLayoutSelection, 0);
             this.tabPageStart.Controls.SetChildIndex(this.grpExterneLayouts, 0);
             // 
-            // Area_Drucken
+            // grpDrucken
             // 
-            this.Area_Drucken.Location = new System.Drawing.Point(208, 0);
-            this.Area_Drucken.Visible = false;
+            this.grpDrucken.Location = new System.Drawing.Point(208, 0);
+            this.grpDrucken.Visible = false;
             // 
             // grpDateiSystem
             // 
@@ -278,9 +278,9 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Ribbon.ResumeLayout(false);
             this.tabPageControl.ResumeLayout(false);
             this.tabPageStart.ResumeLayout(false);
-            this.Area_Drucken.ResumeLayout(false);
-            this.Area_Design.ResumeLayout(false);
-            this.Area_Assistent.ResumeLayout(false);
+            this.grpDrucken.ResumeLayout(false);
+            this.grpDesign.ResumeLayout(false);
+            this.grpAssistent.ResumeLayout(false);
             this.grpDateiSystem.ResumeLayout(false);
             this.grpLayoutSelection.ResumeLayout(false);
             this.grpExterneLayouts.ResumeLayout(false);

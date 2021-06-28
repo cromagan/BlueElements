@@ -169,7 +169,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 btnTextEditor.Enabled = true;
                 btnLayoutOeffnen.Enabled = true;
                 tabPageControl.Enabled = false;
-                Area_Drucken.Enabled = false;
+                grpDrucken.Enabled = false;
             } else {
                 btnTextEditor.Enabled = false;
                 btnLayoutOeffnen.Enabled = false;
@@ -179,9 +179,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             grpDateiSystem.Enabled = true;
             btnLayoutLöschen.Enabled = true;
             btnLayoutUmbenennen.Enabled = true;
-            Area_Drucken.Enabled = true;
+            grpDrucken.Enabled = true;
             //} else {
-            //    Area_Drucken.Enabled = false;
+            //    grpDrucken.Enabled = false;
             //     System.Windows.Forms.TabPageControl.Enabled = false;
             //    grpDateiSystem.Enabled = false;
             //    btnLayoutLöschen.Enabled = false;

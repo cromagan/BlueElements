@@ -30,9 +30,9 @@ namespace BlueControls.Forms {
             this.tabPageControl.SuspendLayout();
             this.tabPageStart.SuspendLayout();
             this.grpKomponenteHinzufügen.SuspendLayout();
-            this.Area_Drucken.SuspendLayout();
-            this.Area_Design.SuspendLayout();
-            this.Area_Assistent.SuspendLayout();
+            this.grpDrucken.SuspendLayout();
+            this.grpDesign.SuspendLayout();
+            this.grpAssistent.SuspendLayout();
             this.grpDateiSystem.SuspendLayout();
             this.grpExtras.SuspendLayout();
             this.SuspendLayout();
@@ -148,9 +148,9 @@ namespace BlueControls.Forms {
             this.tabPageControl.ResumeLayout(false);
             this.tabPageStart.ResumeLayout(false);
             this.grpKomponenteHinzufügen.ResumeLayout(false);
-            this.Area_Drucken.ResumeLayout(false);
-            this.Area_Design.ResumeLayout(false);
-            this.Area_Assistent.ResumeLayout(false);
+            this.grpDrucken.ResumeLayout(false);
+            this.grpDesign.ResumeLayout(false);
+            this.grpAssistent.ResumeLayout(false);
             this.grpDateiSystem.ResumeLayout(false);
             this.grpExtras.ResumeLayout(false);
             this.ResumeLayout(false);

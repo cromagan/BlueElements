@@ -21,7 +21,7 @@ namespace BlueControls.Forms {
             this.Pad = new BlueControls.Controls.CreativePad();
             this.Ribbon = new BlueControls.Controls.RibbonBar();
             this.tabPageStart = new System.Windows.Forms.TabPage();
-            this.Area_Drucken = new BlueControls.Controls.GroupBox();
+            this.grpDrucken = new BlueControls.Controls.GroupBox();
             this.btnVorschau = new BlueControls.Controls.Button();
             this.btnPageSetup = new BlueControls.Controls.Button();
             this.btnAlsBildSpeichern = new BlueControls.Controls.Button();
@@ -44,13 +44,13 @@ namespace BlueControls.Forms {
             this.grpWerkzeuge = new BlueControls.Controls.GroupBox();
             this.btnAuswahl = new BlueControls.Controls.Button();
             this.Page_Settings = new System.Windows.Forms.TabPage();
-            this.Area_Assistent = new BlueControls.Controls.GroupBox();
+            this.grpAssistent = new BlueControls.Controls.GroupBox();
             this.capRasterFangen = new BlueControls.Controls.Caption();
             this.capRasterAnzeige = new BlueControls.Controls.Caption();
             this.txbRasterFangen = new BlueControls.Controls.TextBox();
             this.txbRasterAnzeige = new BlueControls.Controls.TextBox();
             this.ckbRaster = new BlueControls.Controls.Button();
-            this.Area_Design = new BlueControls.Controls.GroupBox();
+            this.grpDesign = new BlueControls.Controls.GroupBox();
             this.btnKeinHintergrund = new BlueControls.Controls.Button();
             this.btnHintergrundFarbe = new BlueControls.Controls.Button();
             this.btnVorschauModus = new BlueControls.Controls.Button();
@@ -64,14 +64,14 @@ namespace BlueControls.Forms {
             this.ColorDia = new System.Windows.Forms.ColorDialog();
             this.Ribbon.SuspendLayout();
             this.tabPageStart.SuspendLayout();
-            this.Area_Drucken.SuspendLayout();
+            this.grpDrucken.SuspendLayout();
             this.grpDateiSystem.SuspendLayout();
             this.tabPageControl.SuspendLayout();
             this.grpKomponenteHinzufügen.SuspendLayout();
             this.grpWerkzeuge.SuspendLayout();
             this.Page_Settings.SuspendLayout();
-            this.Area_Assistent.SuspendLayout();
-            this.Area_Design.SuspendLayout();
+            this.grpAssistent.SuspendLayout();
+            this.grpDesign.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnZoomOut
@@ -134,7 +134,7 @@ namespace BlueControls.Forms {
             // tabPageStart
             // 
             this.tabPageStart.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.tabPageStart.Controls.Add(this.Area_Drucken);
+            this.tabPageStart.Controls.Add(this.grpDrucken);
             this.tabPageStart.Controls.Add(this.grpDateiSystem);
             this.tabPageStart.Location = new System.Drawing.Point(4, 25);
             this.tabPageStart.Name = "tabPageStart";
@@ -142,22 +142,22 @@ namespace BlueControls.Forms {
             this.tabPageStart.TabIndex = 1;
             this.tabPageStart.Text = "Start";
             // 
-            // Area_Drucken
+            // grpDrucken
             // 
-            this.Area_Drucken.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.Area_Drucken.CausesValidation = false;
-            this.Area_Drucken.Controls.Add(this.btnVorschau);
-            this.Area_Drucken.Controls.Add(this.btnPageSetup);
-            this.Area_Drucken.Controls.Add(this.btnAlsBildSpeichern);
-            this.Area_Drucken.Controls.Add(this.btnDruckerDialog);
-            this.Area_Drucken.Dock = System.Windows.Forms.DockStyle.Left;
-            this.Area_Drucken.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
-            this.Area_Drucken.Location = new System.Drawing.Point(376, 0);
-            this.Area_Drucken.Name = "Area_Drucken";
-            this.Area_Drucken.Size = new System.Drawing.Size(288, 81);
-            this.Area_Drucken.TabIndex = 0;
-            this.Area_Drucken.TabStop = false;
-            this.Area_Drucken.Text = "Drucken";
+            this.grpDrucken.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpDrucken.CausesValidation = false;
+            this.grpDrucken.Controls.Add(this.btnVorschau);
+            this.grpDrucken.Controls.Add(this.btnPageSetup);
+            this.grpDrucken.Controls.Add(this.btnAlsBildSpeichern);
+            this.grpDrucken.Controls.Add(this.btnDruckerDialog);
+            this.grpDrucken.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpDrucken.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
+            this.grpDrucken.Location = new System.Drawing.Point(376, 0);
+            this.grpDrucken.Name = "grpDrucken";
+            this.grpDrucken.Size = new System.Drawing.Size(288, 81);
+            this.grpDrucken.TabIndex = 0;
+            this.grpDrucken.TabStop = false;
+            this.grpDrucken.Text = "Drucken";
             // 
             // btnVorschau
             // 
@@ -423,31 +423,31 @@ namespace BlueControls.Forms {
             // Page_Settings
             // 
             this.Page_Settings.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.Page_Settings.Controls.Add(this.Area_Assistent);
-            this.Page_Settings.Controls.Add(this.Area_Design);
+            this.Page_Settings.Controls.Add(this.grpAssistent);
+            this.Page_Settings.Controls.Add(this.grpDesign);
             this.Page_Settings.Location = new System.Drawing.Point(4, 25);
             this.Page_Settings.Name = "Page_Settings";
             this.Page_Settings.Size = new System.Drawing.Size(1326, 81);
             this.Page_Settings.TabIndex = 2;
             this.Page_Settings.Text = "Einstellungen";
             // 
-            // Area_Assistent
+            // grpAssistent
             // 
-            this.Area_Assistent.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.Area_Assistent.CausesValidation = false;
-            this.Area_Assistent.Controls.Add(this.capRasterFangen);
-            this.Area_Assistent.Controls.Add(this.capRasterAnzeige);
-            this.Area_Assistent.Controls.Add(this.txbRasterFangen);
-            this.Area_Assistent.Controls.Add(this.txbRasterAnzeige);
-            this.Area_Assistent.Controls.Add(this.ckbRaster);
-            this.Area_Assistent.Dock = System.Windows.Forms.DockStyle.Left;
-            this.Area_Assistent.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
-            this.Area_Assistent.Location = new System.Drawing.Point(648, 0);
-            this.Area_Assistent.Name = "Area_Assistent";
-            this.Area_Assistent.Size = new System.Drawing.Size(152, 81);
-            this.Area_Assistent.TabIndex = 0;
-            this.Area_Assistent.TabStop = false;
-            this.Area_Assistent.Text = "Assistenten";
+            this.grpAssistent.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpAssistent.CausesValidation = false;
+            this.grpAssistent.Controls.Add(this.capRasterFangen);
+            this.grpAssistent.Controls.Add(this.capRasterAnzeige);
+            this.grpAssistent.Controls.Add(this.txbRasterFangen);
+            this.grpAssistent.Controls.Add(this.txbRasterAnzeige);
+            this.grpAssistent.Controls.Add(this.ckbRaster);
+            this.grpAssistent.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpAssistent.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
+            this.grpAssistent.Location = new System.Drawing.Point(648, 0);
+            this.grpAssistent.Name = "grpAssistent";
+            this.grpAssistent.Size = new System.Drawing.Size(152, 81);
+            this.grpAssistent.TabIndex = 0;
+            this.grpAssistent.TabStop = false;
+            this.grpAssistent.Text = "Assistenten";
             // 
             // capRasterFangen
             // 
@@ -501,26 +501,26 @@ namespace BlueControls.Forms {
             this.ckbRaster.Text = "Raster";
             this.ckbRaster.CheckedChanged += new System.EventHandler(this.ckbRaster_CheckedChanged);
             // 
-            // Area_Design
+            // grpDesign
             // 
-            this.Area_Design.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.Area_Design.CausesValidation = false;
-            this.Area_Design.Controls.Add(this.btnKeinHintergrund);
-            this.Area_Design.Controls.Add(this.btnHintergrundFarbe);
-            this.Area_Design.Controls.Add(this.btnVorschauModus);
-            this.Area_Design.Controls.Add(this.btnArbeitsbreichSetup);
-            this.Area_Design.Controls.Add(this.cbxSchriftGröße);
-            this.Area_Design.Controls.Add(this.capSchriftgröße);
-            this.Area_Design.Controls.Add(this.PadDesign);
-            this.Area_Design.Controls.Add(this.capDesign);
-            this.Area_Design.Dock = System.Windows.Forms.DockStyle.Left;
-            this.Area_Design.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
-            this.Area_Design.Location = new System.Drawing.Point(0, 0);
-            this.Area_Design.Name = "Area_Design";
-            this.Area_Design.Size = new System.Drawing.Size(648, 81);
-            this.Area_Design.TabIndex = 1;
-            this.Area_Design.TabStop = false;
-            this.Area_Design.Text = "Design";
+            this.grpDesign.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpDesign.CausesValidation = false;
+            this.grpDesign.Controls.Add(this.btnKeinHintergrund);
+            this.grpDesign.Controls.Add(this.btnHintergrundFarbe);
+            this.grpDesign.Controls.Add(this.btnVorschauModus);
+            this.grpDesign.Controls.Add(this.btnArbeitsbreichSetup);
+            this.grpDesign.Controls.Add(this.cbxSchriftGröße);
+            this.grpDesign.Controls.Add(this.capSchriftgröße);
+            this.grpDesign.Controls.Add(this.PadDesign);
+            this.grpDesign.Controls.Add(this.capDesign);
+            this.grpDesign.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpDesign.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
+            this.grpDesign.Location = new System.Drawing.Point(0, 0);
+            this.grpDesign.Name = "grpDesign";
+            this.grpDesign.Size = new System.Drawing.Size(648, 81);
+            this.grpDesign.TabIndex = 1;
+            this.grpDesign.TabStop = false;
+            this.grpDesign.Text = "Design";
             // 
             // btnKeinHintergrund
             // 
@@ -635,14 +635,14 @@ namespace BlueControls.Forms {
             this.TopMost = true;
             this.Ribbon.ResumeLayout(false);
             this.tabPageStart.ResumeLayout(false);
-            this.Area_Drucken.ResumeLayout(false);
+            this.grpDrucken.ResumeLayout(false);
             this.grpDateiSystem.ResumeLayout(false);
             this.tabPageControl.ResumeLayout(false);
             this.grpKomponenteHinzufügen.ResumeLayout(false);
             this.grpWerkzeuge.ResumeLayout(false);
             this.Page_Settings.ResumeLayout(false);
-            this.Area_Assistent.ResumeLayout(false);
-            this.Area_Design.ResumeLayout(false);
+            this.grpAssistent.ResumeLayout(false);
+            this.grpDesign.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -658,10 +658,10 @@ namespace BlueControls.Forms {
         protected System.Windows.Forms.TabPage tabPageStart;
         protected GroupBox grpWerkzeuge;
         protected GroupBox grpKomponenteHinzufügen;
-        protected GroupBox Area_Drucken;
-        protected GroupBox Area_Design;
+        protected GroupBox grpDrucken;
+        protected GroupBox grpDesign;
         private Caption capDesign;
-        protected GroupBox Area_Assistent;
+        protected GroupBox grpAssistent;
         private Button btnZoomFit;
         private Button btnZoomIn;
         private Button btnDruckerDialog;
