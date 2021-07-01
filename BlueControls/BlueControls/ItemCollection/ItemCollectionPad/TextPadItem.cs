@@ -153,13 +153,16 @@ namespace BlueControls.ItemCollection {
         //    p_RU.X = Math.Max(p_RU.X, p_LO.X + 10m * Skalierung * Parent.SheetStyleScale);
         //}
         public bool ReplaceVariable(Script s, BlueScript.Variable variable) {
-            if ("~" + variable.Name.ToLower() + "~" != Text.ToLower().TrimCr()) { return false; }
+            if (!Text.ToLower().Contains("~" + variable.Name.ToLower() + "~")) { return false; }
+
             if (variable.Type is not Skript.Enums.enVariableDataType.String and
                                  not Skript.Enums.enVariableDataType.List and
                                  not Skript.Enums.enVariableDataType.Integer and
                                  not Skript.Enums.enVariableDataType.Bool and
                                  not Skript.Enums.enVariableDataType.Numeral) { return false; }
-            var nt = variable.ValueString;
+
+            var nt = Text.Replace("~" + variable.Name + "~", variable.ValueString, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
             if (nt is string txt) {
                 if (txt == Text) { return false; }
                 Text = txt;

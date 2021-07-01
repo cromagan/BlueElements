@@ -171,7 +171,14 @@ namespace BlueBasics {
             return true;
         }
 
-        public static bool FileExists(string file) => file != null && !string.IsNullOrEmpty(file) && !file.ContainsChars(Constants.Char_PfadSonderZeichen) && File.Exists(file);
+        public static bool FileExists(string file) {
+            try {
+                return file != null && !string.IsNullOrEmpty(file) && !file.ContainsChars(Constants.Char_PfadSonderZeichen) && File.Exists(file);
+            } catch {
+                // Objekt wird an anderer stelle benutzt?!?
+                return FileExists(file);
+            }
+        }
 
         // public static string LoadFromDisk(string DateiName) {
         // switch (DateiName.FileSuffix()) {
