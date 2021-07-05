@@ -24,50 +24,51 @@ namespace BlueControls.Forms {
 
         #region Fields
 
-        private string GiveBack = string.Empty;
+        private string _giveBack = string.Empty;
 
         #endregion
 
         #region Constructors
 
-        private InputBoxComboStyle() : base() => InitializeComponent();
+        private InputBoxComboStyle() : this(string.Empty, string.Empty, null, false) { }
 
-        private InputBoxComboStyle(string TXT, string VorschlagsText, ItemCollectionList SuggestOriginal, bool TexteingabeErlaubt) : this() {
-            cbxText.Text = VorschlagsText;
-            var SuggestClone = (ItemCollectionList)SuggestOriginal.Clone();
+        private InputBoxComboStyle(string txt, string vorschlagsText, ItemCollectionList suggestOriginal, bool texteingabeErlaubt) : base(true, true) {
+            InitializeComponent();
+            cbxText.Text = vorschlagsText;
+            var SuggestClone = (ItemCollectionList)suggestOriginal.Clone();
             cbxText.Item.CheckBehavior = SuggestClone.CheckBehavior;
             cbxText.Item.AddRange(SuggestClone);
-            cbxText.DropDownStyle = TexteingabeErlaubt ? System.Windows.Forms.ComboBoxStyle.DropDown : System.Windows.Forms.ComboBoxStyle.DropDownList;
-            Setup(TXT, cbxText, 250, true, true);
-            GiveBack = VorschlagsText;
+            cbxText.DropDownStyle = texteingabeErlaubt ? System.Windows.Forms.ComboBoxStyle.DropDown : System.Windows.Forms.ComboBoxStyle.DropDownList;
+            Setup(txt, cbxText, 250);
+            _giveBack = vorschlagsText;
         }
 
         #endregion
 
         #region Methods
 
-        public static string Show(string TXT, ItemCollectionList Suggest, bool TexteingabeErlaubt) => Show(TXT, string.Empty, Suggest, TexteingabeErlaubt);
+        public static string Show(string txt, ItemCollectionList suggest, bool texteingabeErlaubt) => Show(txt, string.Empty, suggest, texteingabeErlaubt);
 
-        public static string Show(string TXT, List<string> Suggest, bool TexteingabeErlaubt) {
-            ItemCollectionList cSuggest = new();
-            cSuggest.AddRange(Suggest);
-            cSuggest.Sort();
-            return Show(TXT, string.Empty, cSuggest, TexteingabeErlaubt);
+        public static string Show(string txt, List<string> suggest, bool texteingabeErlaubt) {
+            ItemCollectionList Suggest = new();
+            Suggest.AddRange(suggest);
+            Suggest.Sort();
+            return Show(txt, string.Empty, Suggest, texteingabeErlaubt);
         }
 
-        protected override void SetValue(bool canceled) => GiveBack = canceled ? string.Empty : cbxText.Text;
+        protected override void SetValue(bool canceled) => _giveBack = canceled ? string.Empty : cbxText.Text;
 
         /// <summary>
         ///
         /// </summary>
-        /// <param name="TXT"></param>
-        /// <param name="VorschlagsText"></param>
-        /// <param name="SuggestOriginal">Wird geklont, es kann auch aus einer Listbox kommen, und dann stimmen die Events nicht mehr. Es muss auch einbe ItemCollection bleiben, damit aus der Datenbank auch Bilder etc. angezeigt werden können.</param>
+        /// <param name="txt"></param>
+        /// <param name="vorschlagsText"></param>
+        /// <param name="suggest">Wird geklont, es kann auch aus einer Listbox kommen, und dann stimmen die Events nicht mehr. Es muss auch einbe ItemCollection bleiben, damit aus der Datenbank auch Bilder etc. angezeigt werden können.</param>
         /// <returns></returns>
-        private static string Show(string TXT, string VorschlagsText, ItemCollectionList SuggestOriginal, bool TexteingabeErlaubt) {
-            InputBoxComboStyle MB = new(TXT, VorschlagsText, SuggestOriginal, TexteingabeErlaubt);
+        private static string Show(string txt, string vorschlagsText, ItemCollectionList suggest, bool texteingabeErlaubt) {
+            InputBoxComboStyle MB = new(txt, vorschlagsText, suggest, texteingabeErlaubt);
             MB.ShowDialog();
-            return MB.GiveBack;
+            return MB._giveBack;
         }
 
         private void cbxText_Enter(object sender, System.EventArgs e) => Ok();

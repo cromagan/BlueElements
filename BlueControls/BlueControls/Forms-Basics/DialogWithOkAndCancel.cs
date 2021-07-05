@@ -1,4 +1,21 @@
-﻿using BlueControls.Controls;
+﻿// Authors:
+// Christian Peter
+//
+// Copyright (c) 2021 Christian Peter
+// https://github.com/cromagan/BlueElements
+//
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+using BlueControls.Controls;
 using BlueControls.Enums;
 using System;
 using static BlueBasics.Develop;
@@ -15,14 +32,22 @@ namespace BlueControls.Forms {
 
         #region Constructors
 
-        public DialogWithOkAndCancel() : this(enDesign.Form_MsgBox) {
-        }
+        public DialogWithOkAndCancel() : this(enDesign.Form_MsgBox, true, false) { }
 
-        public DialogWithOkAndCancel(enDesign design) : base(design) {
+        public DialogWithOkAndCancel(bool cancelPossible, bool sizeable) : this(enDesign.Form_MsgBox, cancelPossible, sizeable) { }
+
+        public DialogWithOkAndCancel(enDesign design, bool cancelPossible, bool sizeable) : base(design) {
             InitializeComponent();
             SetTopLevel(true);
+
+            _cancelPossible = cancelPossible;
+
             if (Owner == null) {
                 StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            }
+
+            if (sizeable) {
+                FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             }
         }
 
@@ -39,46 +64,44 @@ namespace BlueControls.Forms {
 
         #region Methods
 
-        public void Setup(int MinWidth, int BottomOfLowestControl, bool CancelPossible, bool Sizeable) {
+        public void Setup(int minWidth, int bottomOfLowestControl) {
             Text = AppName();
-            _cancelPossible = CancelPossible;
-            MinWidth = Math.Max(Width, MinWidth);
-            Size = new System.Drawing.Size(MinWidth, BottomOfLowestControl + butOK.Height + BorderHeight + Skin.Padding);
-            if (CancelPossible) {
-                butAbbrechen.Left = MinWidth - Skin.Padding - butAbbrechen.Width - BorderWidth;
+
+            minWidth = Math.Max(Width, minWidth);
+            Size = new System.Drawing.Size(minWidth, bottomOfLowestControl + butOK.Height + BorderHeight + Skin.Padding);
+            if (_cancelPossible) {
+                butAbbrechen.Left = minWidth - Skin.Padding - butAbbrechen.Width - BorderWidth;
                 butOK.Left = butAbbrechen.Left - Skin.Padding - butOK.Width;
             } else {
                 butAbbrechen.Visible = false;
                 butAbbrechen.Enabled = false;
-                butOK.Left = MinWidth - Skin.Padding - butOK.Width - BorderWidth;
+                butOK.Left = minWidth - Skin.Padding - butOK.Width - BorderWidth;
             }
-            butOK.Top = BottomOfLowestControl;
-            butAbbrechen.Top = BottomOfLowestControl;
-            if (Sizeable) {
-                FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
-            }
+            butAbbrechen.Visible = _cancelPossible;
+            butOK.Top = bottomOfLowestControl;
+            butAbbrechen.Top = bottomOfLowestControl;
         }
 
-        public void Setup(string TXT, GenericControl CenterControl, int MinWidth, bool CancelPossible, bool Sizeable) {
+        public void Setup(string txt, GenericControl centerControl, int minWidth) {
             var wi = Skin.Padding * 2;
             var he = Skin.Padding * 2;
-            _cancelPossible = CancelPossible;
-            if (!string.IsNullOrEmpty(TXT)) {
+
+            if (!string.IsNullOrEmpty(txt)) {
                 capText.Visible = true;
                 capText.Translate = false;
-                capText.Text = TXT;
+                capText.Text = txt;
                 capText.Refresh();
                 wi += capText.Width;
                 he += capText.Height;
             }
-            if (CenterControl != null) {
-                CenterControl.Top = he;
-                he = he + CenterControl.Height + Skin.Padding;
+            if (centerControl != null) {
+                centerControl.Top = he;
+                he = he + centerControl.Height + Skin.Padding;
             }
-            wi = Math.Max(wi + BorderWidth, MinWidth);
-            Setup(wi, he, CancelPossible, Sizeable);
-            if (CenterControl != null) {
-                CenterControl.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            wi = Math.Max(wi + BorderWidth, minWidth);
+            Setup(wi, he);
+            if (centerControl != null) {
+                centerControl.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             }
         }
 

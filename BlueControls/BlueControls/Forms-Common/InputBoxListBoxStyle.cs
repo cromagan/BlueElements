@@ -33,41 +33,42 @@ namespace BlueControls.Forms {
 
         #region Constructors
 
-        private InputBoxListBoxStyle() : base() => InitializeComponent();
+        private InputBoxListBoxStyle() : this(string.Empty, null, enAddType.None, true) { }
 
-        private InputBoxListBoxStyle(string TXT, ItemCollectionList ItemsOriginal, enAddType AddNewAllowed, bool CancelErl) : this() {
-            if (ItemsOriginal.Appearance != enBlueListBoxAppearance.Listbox) {
+        private InputBoxListBoxStyle(string txt, ItemCollectionList itemsOriginal, enAddType addNewAllowed, bool cancelErl) : base(cancelErl, true) {
+            InitializeComponent();
+            if (itemsOriginal.Appearance != enBlueListBoxAppearance.Listbox) {
                 Develop.DebugPrint("Design nicht Listbox");
             }
-            var itemsClone = (ItemCollectionList)ItemsOriginal.Clone();
+            var itemsClone = (ItemCollectionList)itemsOriginal.Clone();
             txbText.Item.CheckBehavior = itemsClone.CheckBehavior;
             txbText.Item.AddRange(itemsClone);
             txbText.MoveAllowed = false;
             txbText.RemoveAllowed = false;
-            txbText.AddAllowed = AddNewAllowed;
-            txbText.AddAllowed = AddNewAllowed;
-            Setup(TXT, txbText, 250, CancelErl, true);
+            txbText.AddAllowed = addNewAllowed;
+            txbText.AddAllowed = addNewAllowed;
+            Setup(txt, txbText, 250);
         }
 
         #endregion
 
         #region Methods
 
-        public static string Show(string TXT, List<string> Items) {
-            if (Items == null || Items.Count == 0) {
-                return InputBox.Show(TXT, "", enDataFormat.Text);
+        public static string Show(string txt, List<string> items) {
+            if (items == null || items.Count == 0) {
+                return InputBox.Show(txt, "", enDataFormat.Text);
             }
             ItemCollectionList x = new(enBlueListBoxAppearance.Listbox) {
                 CheckBehavior = enCheckBehavior.AlwaysSingleSelection
             };
-            x.AddRange(Items);
+            x.AddRange(items);
             x.Sort();
-            var erg = Show(TXT, x, enAddType.None, true);
+            var erg = Show(txt, x, enAddType.None, true);
             return erg is null || erg.Count != 1 ? string.Empty : erg[0];
         }
 
-        public static List<string> Show(string TXT, ItemCollectionList ItemsOriginal, enAddType AddNewAllowed, bool CancelErl) {
-            InputBoxListBoxStyle MB = new(TXT, ItemsOriginal, AddNewAllowed, CancelErl);
+        public static List<string> Show(string txt, ItemCollectionList items, enAddType addNewAllowed, bool cancelErl) {
+            InputBoxListBoxStyle MB = new(txt, items, addNewAllowed, cancelErl);
             MB.ShowDialog();
             return MB.GiveBack;
         }
