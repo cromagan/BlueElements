@@ -491,7 +491,7 @@ namespace BlueControls.Controls {
             foreach (var thisf in f) {
                 var b = modConverter.FileToByte(thisf);
 
-                if (!string.IsNullOrEmpty(_tmpColumn.Database.FileEncryptionKey)) { b = modAllgemein.SimpleCrypt(b, _tmpColumn.Database.FileEncryptionKey, 1); }
+                if (!string.IsNullOrEmpty(_tmpColumn.Database.FileEncryptionKey)) { b = Cryptography.SimpleCrypt(b, _tmpColumn.Database.FileEncryptionKey, 1); }
 
                 var neu = thisf.FileNameWithSuffix();
                 neu = _tmpColumn.BestFile(neu.FileNameWithSuffix(), true);

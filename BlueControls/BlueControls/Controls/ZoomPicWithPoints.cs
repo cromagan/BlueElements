@@ -194,7 +194,7 @@ namespace BlueControls.Controls {
                 if (Tags != null) {
                     Tags.TagSet("Erstellt", modAllgemein.UserName());
                     Tags.TagSet("Datum", DateTime.Now.ToString(Constants.Format_Date5));
-                    Tags.Save(pathtxt, false, System.Text.Encoding.GetEncoding(1252));
+                    Tags.Save(pathtxt, Constants.Win1252, false);
                 }
             } catch {
                 Develop.DebugPrint("Fehler beim Speichern: " + pathtxt);

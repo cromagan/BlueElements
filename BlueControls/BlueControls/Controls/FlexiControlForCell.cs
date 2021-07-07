@@ -563,7 +563,7 @@ namespace BlueControls.Controls {
                     if (e.HotItem is TextListItem t) {
                         if (FileExists(t.Internal)) {
                             var b = modConverter.FileToByte(t.Internal);
-                            b = modAllgemein.SimpleCrypt(b, FileEncryptionKey, -1);
+                            b = Cryptography.SimpleCrypt(b, FileEncryptionKey, -1);
                             var tmp = TempFile(string.Empty, string.Empty, t.Internal.FileSuffix());
                             modConverter.ByteToFile(tmp, b);
                             ExecuteFile(tmp, null, true, false);

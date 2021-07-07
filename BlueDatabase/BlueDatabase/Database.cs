@@ -1273,7 +1273,7 @@ namespace BlueDatabase {
                     if (Inhalt.FromPlusMinus()) {
                         PasswordEventArgs e = new();
                         OnNeedPassword(e);
-                        B = modAllgemein.SimpleCrypt(B, e.Password, -1, Pointer, B.Length - 1);
+                        B = Cryptography.SimpleCrypt(B, e.Password, -1, Pointer, B.Length - 1);
                         if (B[Pointer + 1] != 3 || B[Pointer + 2] != 0 || B[Pointer + 3] != 0 || B[Pointer + 4] != 2 || B[Pointer + 5] != 79 || B[Pointer + 6] != 75) {
                             RemoveFilename();
                             LoadedVersion = "9.99";
@@ -1386,7 +1386,7 @@ namespace BlueDatabase {
                 if (Works2.Count > _UndoCount) { Works2.RemoveRange(0, Works2.Count - _UndoCount); }
                 SaveToByteList(l, enDatabaseDataType.UndoInOne, Works2.JoinWithCr());
                 SaveToByteList(l, enDatabaseDataType.EOF, "END");
-                return CryptPos > 0 ? modAllgemein.SimpleCrypt(l.ToArray(), _GlobalShowPass, 1, CryptPos, l.Count - 1) : l.ToArray();
+                return CryptPos > 0 ? Cryptography.SimpleCrypt(l.ToArray(), _GlobalShowPass, 1, CryptPos, l.Count - 1) : l.ToArray();
             } catch {
                 return ToListOfByte();
             }
@@ -1751,12 +1751,6 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.BinaryDataInOne:
-                    //Bins.Clear();
-                    //var l = new List<string>(content.SplitByCR());
-                    //foreach (var t in l)
-                    //{
-                    //  var nb = new clsNamedBinary(t);
-                    //    nb._picture.Save(@"D:\01_Data\" + nb.Name + ".png", System.Drawing.Imaging.ImageFormat.Png);
                     break;
 
                 case enDatabaseDataType.Layouts:

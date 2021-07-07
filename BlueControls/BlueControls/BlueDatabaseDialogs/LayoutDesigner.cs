@@ -223,7 +223,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 if (Database.Layouts[ind] == newl) { return; }
                 Database.Layouts[ind] = newl;
             } else if (Pad.Item.ID.FileSuffix().ToUpper() == "BCR") {
-                SaveToDisk(Pad.Item.ID, newl, false, System.Text.Encoding.UTF8);
+                WriteAllText(Pad.Item.ID, newl, System.Text.Encoding.UTF8, false);
             }
         }
 

@@ -62,22 +62,6 @@ namespace BlueBasics {
             }
         }
 
-        /// <summary>
-        /// Standard Pfad-Korrekturen. z.B. Doppelte Slashes, Backslashes. Gibt den Pfad mit abschließenden \ zurück.
-        /// </summary>
-        /// <param name="pfad"></param>
-        /// <returns></returns>
-        public static string CheckPath(this string pfad) {
-            if (string.IsNullOrEmpty(pfad)) { return string.Empty; } // Kann vorkommen, wenn ein Benutzer einen Pfad per Hand eingeben darf
-            if (pfad.Length > 6 && string.Equals(pfad.Substring(0, 7), "http://", StringComparison.OrdinalIgnoreCase)) { return pfad; }
-            if (pfad.Length > 7 && string.Equals(pfad.Substring(0, 8), "https://", StringComparison.OrdinalIgnoreCase)) { return pfad; }
-            if (pfad.Contains("/")) { pfad = pfad.Replace("/", "\\"); }
-            if (pfad.Substring(pfad.Length - 1) != "\\") { pfad += "\\"; }
-            if (pfad.IndexOf("\\\\", 1) > 0) { Develop.DebugPrint("Achtung, Doppelslash: " + pfad); }
-            if (pfad.Substring(0, 1) == "\\" && pfad.Substring(0, 2) != "\\\\") { Develop.DebugPrint("Achtung, Doppelslash: " + pfad); }
-            return pfad;
-        }
-
         public static bool ContainsChars(this string tXT, string chars) => chars.Where((_, z) => tXT.Contains(chars.Substring(z, 1))).Any();
 
         public static bool ContainsOnlyChars(this string tXT, string chars) => !tXT.Where((_, z) => !chars.Contains(tXT.Substring(z, 1))).Any();
@@ -151,79 +135,6 @@ namespace BlueBasics {
                 return txt.Substring(1, txt.Length - 2).DeKlammere(klammern, geschklammern, gänsef, trimspace); // Unnötige Klammern entfernen und noch Ne Runde!!!!
             }
             return txt;
-        }
-
-        public static string EleminateSlash(this string txt) => txt.Replace("/", "[Slash]");
-
-        /// <summary>
-        /// Gibt den Dateinamen ohne Suffix zurück.
-        /// </summary>
-        /// <param name="name">Der ganze Pfad der Datei.</param>
-        /// <returns>Dateiname ohne Suffix</returns>
-        /// <remarks></remarks>
-        public static string FileNameWithoutSuffix(this string name) => string.IsNullOrEmpty(name) ? string.Empty : Path.GetFileNameWithoutExtension(name);
-
-        public static string FileNameWithSuffix(this string name) => string.IsNullOrEmpty(name) ? string.Empty : Path.GetFileName(name);
-
-        /// <summary>
-        /// Gibt den Dateipad eines Dateistrings zurück, mit abschließenden \.
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public static string FilePath(this string name) {
-            if (string.IsNullOrEmpty(name)) { return string.Empty; }
-            // Return Path.GetDirectoryName(Name) & "\" ' <---- Versagt ab 260 Zeichen
-            name = name.Replace("/", "\\");
-            var z = name.LastIndexOf("\\");
-            return z < 0 ? string.Empty : name.Substring(0, z + 1);
-        }
-
-        public static string FileSuffix(this string name) {
-            if (string.IsNullOrEmpty(name)) { return string.Empty; }
-            if (!name.Contains(".")) { return string.Empty; }
-            var l = Path.GetExtension(name);
-            return string.IsNullOrEmpty(l) ? string.Empty : l.Substring(1).ToUpper();
-        }
-
-        public static enFileFormat FileType(this string filename) => string.IsNullOrEmpty(filename)
-                ? enFileFormat.Unknown
-                : filename.FileSuffix() switch {
-                    "DOC" or "DOCX" or "RTF" or "ODT" => enFileFormat.WordKind,
-                    "TXT" or "INI" or "INFO" => enFileFormat.Textdocument,
-                    "XLS" or "CSV" or "XLA" or "XLSX" or "XLSM" or "ODS" => enFileFormat.ExcelKind,
-                    "PPT" or "PPS" or "PPA" => enFileFormat.PowerPointKind,
-                    "MSG" or "EML" => enFileFormat.EMail,
-                    "PDF" => enFileFormat.Pdf,
-                    "HTM" or "HTML" => enFileFormat.HTML,
-                    "JPG" or "JPEG" or "BMP" or "TIFF" or "TIF" or "GIF" or "PNG" => enFileFormat.Image,
-                    "ICO" => enFileFormat.Icon,
-                    "ZIP" or "RAR" or "7Z" => enFileFormat.CompressedArchive,
-                    "AVI" or "DIVX" or "MPG" or "MPEG" or "WMV" or "FLV" or "MP4" or "MKV" or "M4V" => enFileFormat.Movie,
-                    "EXE" or "BAT" or "SCR" => enFileFormat.Executable,
-                    "CHM" => enFileFormat.HelpFile,
-                    "XML" => enFileFormat.XMLFile,
-                    "VCF" => enFileFormat.Visitenkarte,
-                    "MP3" or "WAV" or "AAC" => enFileFormat.Sound,
-                    "B4A" or "BAS" or "CS" => enFileFormat.ProgrammingCode,// case "DLL":
-                    "DB" or "MDB" => enFileFormat.Database,
-                    "LNK" or "URL" => enFileFormat.Link,
-                    "BCR" => enFileFormat.BlueCreativeFile,
-                    _ => enFileFormat.Unknown,
-                };
-
-        public static string Folder(this string pathx) {
-            if (string.IsNullOrEmpty(pathx)) { return string.Empty; }
-            // Kann vorkommen, wenn ein Benutzer einen Pfad
-            // per Hand eingeben darf
-            pathx = pathx.Replace("/", "\\").TrimEnd('\\');
-            if (!pathx.Contains("\\")) { return pathx; }
-            var z = pathx.Length;
-            if (z < 2) { return string.Empty; }
-            while (true) {
-                z--;
-                if (pathx.Substring(z, 1) == "\\") { return pathx.Substring(z + 1); }
-                if (z < 1) { return string.Empty; }
-            }
         }
 
         public static string FromNonCritical(this string txt) {
@@ -504,23 +415,6 @@ namespace BlueBasics {
             } while (true);
         }
 
-        public static string PathParent(this string pfad, int anzahlParents) {
-            for (var z = 1; z <= anzahlParents; z++) {
-                pfad = pfad.PathParent();
-            }
-            return pfad;
-        }
-
-        public static string PathParent(this string pfad) {
-            var z = pfad.Length;
-            pfad = pfad.CheckPath();
-            while (true) {
-                z--;
-                if (z <= 1) { return string.Empty; }
-                if (pfad.Substring(z - 1, 1) == "\\") { return pfad.Substring(0, z); }
-            }
-        }
-
         /// <summary>
         /// Löscht alle Zeichen - außder dem erlaubten - aus dem String. Gross- und Kleinschreibung wird unterschieden.
         /// "RemoveChars" macht das Gegenteil
@@ -738,10 +632,6 @@ namespace BlueBasics {
             return tXT;
         }
 
-        public static byte[] ToByteWIN1252(this string tXT) =>
-            // var enc1252 = CodePagesEncodingProvider.Instance.GetEncoding(1252);
-            Encoding.GetEncoding(1252).GetBytes(tXT);
-
         public static string ToNonCritical(this string txt) {
             // http://www.theasciicode.com.ar/ascii-printable-characters/braces-curly-brackets-opening-ascii-code-123.html
             if (string.IsNullOrEmpty(txt)) { return string.Empty; }
@@ -793,6 +683,10 @@ namespace BlueBasics {
 
         public static byte[] UTF8_ToByte(this string tXT) => Encoding.UTF8.GetBytes(tXT);
 
+        public static byte[] WIN1252_toByte(this string tXT) => Encoding.GetEncoding(1252).GetBytes(tXT);
+
         #endregion
+
+        // var enc1252 = CodePagesEncodingProvider.Instance.GetEncoding(1252);
     }
 }

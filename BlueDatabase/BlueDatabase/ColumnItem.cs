@@ -1822,8 +1822,6 @@ namespace BlueDatabase {
 
                 case enDatabaseDataType.co_CaptionBitmap:
                     if (!string.IsNullOrEmpty(Wert)) {
-                        //var _CaptionBitmapx = modConverter.StringWIN1252ToBitmap(Wert);
-                        // _CaptionBitmapx.Save(@"C:\01_data\co_" + _Name + ".PNG", System.Drawing.Imaging.ImageFormat.Png);
                         _CaptionBitmapTXT = "co_" + _Name;
                     }
                     break;

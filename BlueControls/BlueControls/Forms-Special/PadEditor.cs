@@ -236,7 +236,7 @@ namespace BlueControls.Forms {
 
         private void SaveTab_FileOk(object sender, System.ComponentModel.CancelEventArgs e) {
             var t = Pad.Item.ToString();
-            SaveToDisk(SaveTab.FileName, t, false, System.Text.Encoding.GetEncoding(1252));
+            WriteAllText(SaveTab.FileName, t, Constants.Win1252, false);
             btnLastFiles.AddFileName(SaveTab.FileName, string.Empty);
         }
 

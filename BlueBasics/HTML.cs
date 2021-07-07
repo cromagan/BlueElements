@@ -99,7 +99,7 @@ namespace BlueBasics {
 
         public void RowEnd() => Code.Add("      </tr>");
 
-        public void Save(string filename, bool executeafter) => Code.Save(filename, executeafter, System.Text.Encoding.UTF8);
+        public void Save(string filename, bool executeafter) => Code.Save(filename, System.Text.Encoding.UTF8, executeafter);
 
         public void TableBeginn() {
             // da.Add("  <Font face=\"Arial\" Size=\"2\"><table border=\"1\" BORDERCOLOR=\"#aaaaaa\" cellspacing=\"0\" cellpadding=\"0\" align=\"left\">");

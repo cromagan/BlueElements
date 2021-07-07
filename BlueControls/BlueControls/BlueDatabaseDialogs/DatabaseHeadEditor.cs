@@ -314,7 +314,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => _Database.Column.GenerateOverView();
 
         private void btnSperreAufheben_Click(object sender, System.EventArgs e) {
-            tblUndo.Database.Export_HTML(@"C:\01_Data\texxxxst.html", tblUndo.Database.ColumnArrangements[0], tblUndo.SortedRows(), false);
             _Database.UnlockHard();
             MessageBox.Show("Erledigt.", enImageCode.Information, "OK");
         }
@@ -343,7 +342,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 NewKey = new string(Enumerable.Repeat("abcdefghijklmnopqrstuvwxyz הצü#_-<>ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 10).Select(s => s[Constants.GlobalRND.Next(s.Length)]).ToArray());
                 foreach (var ThisFile in lLCase) {
                     var b = modConverter.FileToByte(ThisFile);
-                    b = modAllgemein.SimpleCrypt(b, NewKey, 1);
+                    b = Cryptography.SimpleCrypt(b, NewKey, 1);
                     FileOperations.DeleteFile(ThisFile, true);
                     modConverter.ByteToFile(ThisFile, b);
                 }
@@ -351,7 +350,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 NewKey = string.Empty;
                 foreach (var ThisFile in lLCase) {
                     var b = modConverter.FileToByte(ThisFile);
-                    b = modAllgemein.SimpleCrypt(b, _Database.FileEncryptionKey, -1);
+                    b = Cryptography.SimpleCrypt(b, _Database.FileEncryptionKey, -1);
                     FileOperations.DeleteFile(ThisFile, true);
                     modConverter.ByteToFile(ThisFile, b);
                 }

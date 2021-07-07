@@ -293,11 +293,11 @@ namespace BlueControls.Forms {
                     no = no.Replace(",", "_");
                     no = no.Replace("__", "_");
                     var newn = FileOperations.TempFile(fl.SelectedPath, no, "txt");
-                    t.Save(newn, false, System.Text.Encoding.GetEncoding(1252));
+                    t.Save(newn, Constants.Win1252, false);
                 }
             }
             var newn2 = FileOperations.TempFile(fl.SelectedPath, "+++ALLES+++", "txt");
-            l.Save(newn2, true, System.Text.Encoding.GetEncoding(1252));
+            l.Save(newn2, Constants.Win1252, true);
         }
 
         private void Database_Disposing(object sender, System.EventArgs e) => Close();

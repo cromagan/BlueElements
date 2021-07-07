@@ -190,7 +190,7 @@ namespace BlueControls.ItemCollection {
                 if (FileExists(_ImageFilename)) {
                     if (!string.IsNullOrEmpty(_EncryptionKey)) {
                         var b = modConverter.FileToByte(_ImageFilename);
-                        b = modAllgemein.SimpleCrypt(b, _EncryptionKey, -1);
+                        b = Cryptography.SimpleCrypt(b, _EncryptionKey, -1);
                         _Bitmap = modConverter.ByteToBitmap(b);
                     } else {
                         _Bitmap = (Bitmap)BitmapExt.Image_FromFile(_ImageFilename);

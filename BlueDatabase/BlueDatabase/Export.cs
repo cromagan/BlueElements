@@ -515,7 +515,7 @@ namespace BlueDatabase {
             tmpSave += Foot;
             if (!string.IsNullOrEmpty(SaveFile)) // Dateien ohne SUfiix-Angabe könenn nicht gespeichert werden
             {
-                SaveToDisk(SaveFile, tmpSave, false, System.Text.Encoding.GetEncoding(1252));
+                WriteAllText(SaveFile, tmpSave, Constants.Win1252, false);
             }
             return tmpSave;
         }

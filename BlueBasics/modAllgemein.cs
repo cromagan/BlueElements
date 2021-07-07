@@ -441,34 +441,6 @@ namespace BlueBasics {
         /// <returns></returns>
         public static double Sigmoid(double x) => 1 / (1 + Math.Exp(-x));
 
-        public static byte[] SimpleCrypt(byte[] b, string pass, int direction, int start, int end) {
-            if (string.IsNullOrEmpty(pass)) { return b; }
-            if (end <= start) { return b; }
-            for (var z = start; z <= end; z++) {
-                var TMP = b[z] + (pass[z % pass.Length] * direction);
-                if (TMP < 0) { TMP += 256; }
-                if (TMP > 255) { TMP -= 256; }
-                b[z] = (byte)TMP;
-            }
-            return b;
-        }
-
-        public static byte[] SimpleCrypt(byte[] b, string pass, int direction) => SimpleCrypt(b, pass, direction, 0, b.GetUpperBound(0));
-
-        public static List<byte> SimpleCrypt(List<byte> b, string pass, int direction, int start, int end) {
-            if (string.IsNullOrEmpty(pass)) { return b; }
-            if (end <= start) { return b; }
-            for (var z = start; z <= end; z++) {
-                var TMP = b[z] + (pass[z % pass.Length] * direction);
-                if (TMP < 0) { TMP += 256; }
-                if (TMP > 255) { TMP -= 256; }
-                b[z] = (byte)TMP;
-            }
-            return b;
-        }
-
-        public static List<byte> SimpleCrypt(List<byte> b, string pass, int direction) => SimpleCrypt(b, pass, direction, 0, b.Count - 1);
-
         public static List<Bitmap> SplitTiff(string fileName, int maxSize) {
             // Open a Stream and decode a TIFF image
             FileStream imageStreamSource = new(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);

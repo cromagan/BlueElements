@@ -589,7 +589,7 @@ namespace BlueDatabase {
                     case enExportTyp.DatenbankCSVFormat:
                         if (_Intervall > (float)DateTime.UtcNow.Subtract(_LastExportTimeUTC).TotalDays) { return false; }
                         SingleFileExport = TempFile(SingleFileExport + ".CSV");
-                        if (!FileExists(SingleFileExport)) { SaveToDisk(SingleFileExport, Database.Export_CSV(enFirstRow.ColumnInternalName, _ExportSpaltenAnsicht, _Filter, null), false, System.Text.Encoding.GetEncoding(1252)); }
+                        if (!FileExists(SingleFileExport)) { WriteAllText(SingleFileExport, Database.Export_CSV(enFirstRow.ColumnInternalName, _ExportSpaltenAnsicht, _Filter, null), Constants.Win1252, false); }
                         Added.Add(SingleFileExport + "|" + tim);
                         break;
 

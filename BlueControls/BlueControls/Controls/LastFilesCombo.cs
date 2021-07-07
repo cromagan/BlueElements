@@ -41,15 +41,11 @@ namespace BlueControls.Controls {
 
         #endregion
 
-        //public string _specialcommand = string.Empty;
-
         #region Constructors
 
         public LastFilesCombo() : base() => SetLastFilesStyle();
 
         #endregion
-
-        //public event System.EventHandler SpecialCommandClicked;
 
         #region Properties
 
@@ -78,24 +74,6 @@ namespace BlueControls.Controls {
             }
         }
 
-        ///// <summary>
-        ///// Wenn an erster Stelle ein besonderer Befehl stehen soll. Das Event SpecialCommandClicked wird anstelle ItemClicked ausgelöst.
-        ///// </summary>
-        /////
-        //[DefaultValue("")]
-        //public string SpecialCommand
-        //{
-        //    get
-        //    {
-        //        return _specialcommand;
-        //    }
-        //    set
-        //    {
-        //        if (_specialcommand == value) { return; }
-        //        _specialcommand = value;
-        //        GenerateMenu();
-        //    }
-        //}
         [DefaultValue(true)]
         public bool MustExist {
             get => _mustExists;
@@ -119,7 +97,7 @@ namespace BlueControls.Controls {
                 if (LastD.Count > 0) { LastD.RemoveString(FileName, false); }
                 if (LastD.Count > 0) { LastD.RemoveString(s, false); }
                 LastD.Add(s);
-                LastD.Save(SaveFile(), false, System.Text.Encoding.GetEncoding(1252));
+                LastD.Save(SaveFile(), System.Text.Encoding.UTF8, false);
             }
             GenerateMenu();
         }
@@ -136,11 +114,6 @@ namespace BlueControls.Controls {
         }
 
         protected override void OnItemClicked(BasicListItemEventArgs e) {
-            //if (!string.IsNullOrEmpty(_specialcommand) && e.Item.Internal == "#SPECIAL#")
-            //{
-            //    OnSpecialCommandClicked();
-            //    return;
-            //}
             base.OnItemClicked(e);
             var t = (List<string>)e.Item.Tag;
             AddFileName(e.Item.Internal, t[0]);
@@ -185,13 +158,13 @@ namespace BlueControls.Controls {
         private void LoadFromDisk() {
             LastD = new List<string>();
             if (FileExists(SaveFile())) {
-                var t = File.ReadAllText(SaveFile(), Constants.Win1252);
+                var t = File.ReadAllText(SaveFile(), System.Text.Encoding.UTF8);
                 t = t.RemoveChars("\n");
                 LastD.AddRange(t.SplitByCR());
             }
         }
 
-        private string SaveFile() => !string.IsNullOrEmpty(_filename) ? _filename : System.Windows.Forms.Application.StartupPath + Name + "-Files.laf";
+        private string SaveFile() => !string.IsNullOrEmpty(_filename) ? _filename.CheckFile() : System.Windows.Forms.Application.StartupPath + Name + "-Files.laf";
 
         private void SetLastFilesStyle() {
             if (DrawStyle == enComboboxStyle.TextBox) {
@@ -202,10 +175,5 @@ namespace BlueControls.Controls {
         }
 
         #endregion
-
-        //private void OnSpecialCommandClicked()
-        //{
-        //    SpecialCommandClicked?.Invoke(this, System.EventArgs.Empty);
-        //}
     }
 }

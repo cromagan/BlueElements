@@ -160,12 +160,12 @@ namespace BlueBasics {
             }
         }
 
-        public static void Save(this List<string> l, string dateiName, bool executeAfter, System.Text.Encoding code) {
+        public static void Save(this List<string> l, string dateiName, System.Text.Encoding code, bool executeAfter) {
             var t = l.JoinWith("\r\n").TrimEnd("\r\n");
             if (!PathExists(dateiName.FilePath())) {
                 Directory.CreateDirectory(dateiName.FilePath());
             }
-            SaveToDisk(dateiName, t, executeAfter, code);
+            WriteAllText(dateiName, t, code, executeAfter);
         }
 
         // public static bool IsDifferentTo<T>(this List<T> List1, List<T> List2) where T : IParseable

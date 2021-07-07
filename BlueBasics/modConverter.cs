@@ -285,7 +285,7 @@ namespace BlueBasics {
             if (string.IsNullOrEmpty(tXT)) {
                 return null;
             }
-            var b = tXT.ToByteWIN1252();
+            var b = tXT.WIN1252_toByte();
             var BMP = ByteToBitmap(b);
             return BMP;
         }
