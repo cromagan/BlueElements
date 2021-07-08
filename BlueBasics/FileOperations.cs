@@ -359,7 +359,7 @@ namespace BlueBasics {
             if (string.IsNullOrEmpty(suffix)) { suffix = "tmp"; }
             if (string.IsNullOrEmpty(wunschname)) { wunschname = UserName() + DateTime.Now.ToString(Constants.Format_Date6); }
             var z = -1;
-            pfad = pfad.TrimEnd("\\") + "\\";
+            pfad = pfad.CheckPath();
             if (!PathExists(pfad)) { Directory.CreateDirectory(pfad); }
             wunschname = wunschname.RemoveChars(Constants.Char_DateiSonderZeichen);
             string filename;
@@ -370,8 +370,20 @@ namespace BlueBasics {
             return filename;
         }
 
+        /// <summary>
+        /// Speichert den Text. Der Pfad wird - falls es nicht existiert - erstellt.
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <param name="contents"></param>
+        /// <param name="encoding"></param>
+        /// <param name="executeAfter"></param>
         public static void WriteAllText(string filename, string contents, System.Text.Encoding encoding, bool executeAfter) {
             try {
+                filename = filename.CheckFile();
+
+                var pfad = filename.FilePath();
+                if (!PathExists(pfad)) { Directory.CreateDirectory(pfad); }
+
                 File.WriteAllText(filename, contents, encoding);
                 if (executeAfter) { ExecuteFile(filename); }
             } catch (Exception ex) {
