@@ -74,10 +74,10 @@ namespace BlueDatabase {
         public static string DoTranslate(string txt, bool mustTranslate, params object[] args) {
             try {
                 if (Translation == null) {
-                    return !txt.Contains("{0}") ? txt : string.Format(txt, args);
+                    return args.GetUpperBound(0) < 0  ? txt : string.Format(txt, args);
                 }
                 if (string.IsNullOrEmpty(txt)) { return string.Empty; }
-                if (German == txt) { return string.Format(English, args); }
+                if (German == txt) { return args.GetUpperBound(0) < 0 ? English : string.Format(English, args); }
                 German = txt;
                 //if (txt.ContainsChars(Constants.Char_Numerals)) { English = German; return string.Format(English, args); }
                 //if (txt.ToLower().Contains("imagecode")) { English = German; return string.Format(English, args); }
@@ -89,14 +89,14 @@ namespace BlueDatabase {
                 txt = txt.Replace("\r\n", "\r");
                 var r = Translation.Row[txt];
                 if (r == null) {
-                    if (Translation.ReadOnly) { English = German; return string.Format(English, args); }
-                    if (!mustTranslate) { English = German; return string.Format(English, args); }
+                    if (Translation.ReadOnly) { English = German; return args.GetUpperBound(0) < 0 ? English : string.Format(English, args); }
+                    if (!mustTranslate) { English = German; return args.GetUpperBound(0) < 0 ? English : string.Format(English, args); }
                     r = Translation.Row.Add(txt);
                 }
                 var t = r.CellGetString("Translation");
-                if (string.IsNullOrEmpty(t)) { English = German; return string.Format(English, args); }
+                if (string.IsNullOrEmpty(t)) { English = German; return args.GetUpperBound(0) < 0 ? English : string.Format(English, args); }
                 English = t + addend;
-                return string.Format(English, args);
+                return args.GetUpperBound(0) < 0 ? English : string.Format(English, args);
             } catch {
                 return txt;
             }

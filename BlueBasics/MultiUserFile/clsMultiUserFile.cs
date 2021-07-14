@@ -361,30 +361,39 @@ namespace BlueBasics.MultiUserFile {
         /// </summary>
         public void Load_Reload() {
             WaitLoaded(true);
+
             if (string.IsNullOrEmpty(Filename)) { return; }
+
             IsLoading = true;
             _loadingThreadId = Thread.CurrentThread.ManagedThreadId;
+
             //// Wichtig, das _LastSaveCode geprüft wird, das ReloadNeeded im EasyMode immer false zurück gibt.
             //if (!string.IsNullOrEmpty(_LastSaveCode) && !ReloadNeeded) { IsLoading = false; return; }
             //var OnlyReload = !string.IsNullOrEmpty(_LastSaveCode);
             if (_InitialLoadDone && !ReloadNeeded) { IsLoading = false; return; } // Wird in der Schleife auch geprüft
+
             LoadingEventArgs ec = new(_InitialLoadDone);
             OnLoading(ec);
+
             if (_InitialLoadDone && ReadOnly && ec.TryCancel) { IsLoading = false; return; }
+
             (var _BLoaded, var tmpLastSaveCode) = LoadBytesFromDisk(enErrorReason.Load);
             if (_BLoaded == null) { IsLoading = false; return; }
             _dataOnDisk = _BLoaded;
             PrepeareDataForCheckingBeforeLoad();
             ParseInternal(_BLoaded);
             _LastSaveCode = tmpLastSaveCode; // initialize setzt zurück
+
             var OnlyReload = _InitialLoadDone;
             _InitialLoadDone = true;
             _CheckedAndReloadNeed = false;
+
             CheckDataAfterReload();
             OnLoaded(new LoadedEventArgs(OnlyReload));
             RepairOldBlockFiles();
+
             IsLoading = false;
-            WaitLoaded(true); // nur um BlockRelaod neu zu setzen
+            WaitLoaded(true); // nur um BlockReload neu zu setzen
         }
 
         public void OnConnectedControlsStopAllWorking(MultiUserFileStopWorkingEventArgs e) {
@@ -799,7 +808,11 @@ namespace BlueBasics.MultiUserFile {
                         if (tmpLastSaveCode1 == tmpLastSaveCode2) { break; }
                         f = "Datei wurde während des Ladens verändert.";
                     }
-                    Develop.DebugPrint(enFehlerArt.Info, f + "\r\n" + Filename);
+
+                    if (DateTime.UtcNow.Subtract(StartTime).TotalSeconds > 20) {
+                        Develop.DebugPrint(enFehlerArt.Warnung, f + "\r\n" + Filename);
+                    }
+
                     Pause(0.5, false);
                 } catch (Exception ex) {
                     // Home Office kann lange blokieren....

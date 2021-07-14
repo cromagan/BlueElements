@@ -125,11 +125,11 @@ namespace BlueControls.Controls {
 
         public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
             HotItem = null;
-            if (Filter == null) { return; }
-            if (Filter.Column == null) { return; }
-            if (!Filter.Column.Database.IsAdministrator()) { return; }
+            if (Filter == null || Filter.Column == null || !Filter.Column.Database.IsAdministrator()) { return; }
+
             HotItem = Filter.Column;
             Items.Add("Spalte bearbeiten", "#ColumnEdit", QuickImage.Get(enImageCode.Spalte));
+
             if (Parent is Filterleiste f) {
                 if (f.pic.Visible) {
                     Items.Add("Filter verschieben", "#FilterVerschieben", QuickImage.Get(enImageCode.Trichter));
@@ -173,16 +173,18 @@ namespace BlueControls.Controls {
                 cbx.DropDownShowing += Cbx_DropDownShowing;
             }
             if (e.Control is Button btn) {
+                btn.Translate = false;
+
                 if (CaptionPosition == enÜberschriftAnordnung.ohne) {
                     btn.ImageCode = "Trichter|16||1";
                     btn.Text = Filter.ReadableText();
                 } else {
                     if (Filter != null && Filter.SearchValue != null && Filter.SearchValue.Count > 0 && !string.IsNullOrEmpty(Filter.SearchValue[0])) {
                         btn.ImageCode = "Trichter|16";
-                        btn.Text = "wählen (" + Filter.SearchValue.Count.ToString() + ")";
+                        btn.Text = LanguageTool.DoTranslate("wählen ({0})", true, Filter.SearchValue.Count.ToString());
                     } else {
                         btn.ImageCode = "Trichter|16";
-                        btn.Text = "wählen";
+                        btn.Text = LanguageTool.DoTranslate("wählen");
                     }
                 }
             }
