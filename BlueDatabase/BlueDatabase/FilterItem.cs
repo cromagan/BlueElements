@@ -40,8 +40,7 @@ namespace BlueDatabase {
 
         #region Constructors
 
-        public FilterItem(Database database, enFilterType filterType, string searchValue) : this(database, filterType, new List<string>() { searchValue }) {
-        }
+        public FilterItem(Database database, enFilterType filterType, string searchValue) : this(database, filterType, new List<string>() { searchValue }) { }
 
         public FilterItem(Database database, enFilterType filterType, List<string> searchValue) {
             Database = database;
@@ -51,10 +50,19 @@ namespace BlueDatabase {
             SearchValue.Changed += SearchValue_ListOrItemChanged;
         }
 
-        public FilterItem(Database database, string FilterCode) {
+        public FilterItem(Database database, string filterCode) {
             Database = database;
             Database.Disposing += Database_Disposing;
-            Parse(FilterCode);
+            Parse(filterCode);
+            SearchValue.Changed += SearchValue_ListOrItemChanged;
+        }
+
+        /// <summary>
+        /// Bei diesem Construktor mus der Tag database vorkommen!
+        /// </summary>
+        /// <param name="filterCode"></param>
+        public FilterItem(string filterCode) {
+            Parse(filterCode);
             SearchValue.Changed += SearchValue_ListOrItemChanged;
         }
 
@@ -164,6 +172,12 @@ namespace BlueDatabase {
                         }
                         break;
 
+                    case "database":
+                        if (Database != null) { Database.Disposing -= Database_Disposing; }
+                        Database = Database.GetByFilename(pair.Value.FromNonCritical(), false);
+                        Database.Disposing += Database_Disposing;
+                        break;
+
                     case "type":
                         _FilterType = (enFilterType)int.Parse(pair.Value);
                         break;
@@ -252,9 +266,12 @@ namespace BlueDatabase {
 
         public QuickImage SymbolForReadableText() => null;
 
-        public override string ToString() {
+        public string ToString(bool withdatabaseTag) {
             if (!IsOk()) { return string.Empty; }
             var Result = "{Type=" + (int)_FilterType;
+
+            if (Database != null && withdatabaseTag) { Result = Result + ", Database=" + Database.Filename.ToNonCritical(); }
+
             if (_Column != null) { Result = Result + ", " + _Column.ParsableColumnKey(); }
             foreach (var t in SearchValue) {
                 Result = Result + ", Value=" + t.ToNonCritical();
@@ -262,6 +279,8 @@ namespace BlueDatabase {
             if (!string.IsNullOrEmpty(Herkunft)) { Result = Result + ", Herkunft=" + Herkunft.ToNonCritical(); }
             return Result + "}";
         }
+
+        public override string ToString() => ToString(false);
 
         private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
 

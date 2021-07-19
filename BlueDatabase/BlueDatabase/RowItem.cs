@@ -374,6 +374,8 @@ namespace BlueDatabase {
             if (Database == null) { return false; }
             if (filter == null || filter.Count == 0) { return true; }
             foreach (var ThisFilter in filter) {
+                if (ThisFilter.Database != filter[0].Database) { Develop.DebugPrint_NichtImplementiert(); }
+
                 if (!MatchesTo(ThisFilter)) { return false; }
             }
             return true;

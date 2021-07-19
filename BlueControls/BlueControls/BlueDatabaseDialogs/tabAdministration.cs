@@ -231,11 +231,8 @@ namespace BlueControls.BlueDatabaseDialogs {
                 btnVorherigeVersion.Enabled = true;
                 return;
             }
-            var tmp = (Database)BlueBasics.MultiUserFile.clsMultiUserFile.GetByFilename(Files[0], false);
-            if (tmp == null) {
-                tmp = new Database(Files[0], true, false);
-            }
-            _TableView.Database = tmp;
+
+            _TableView.Database = Database.GetByFilename(Files[0], false);
             _originalDB = _merker;
             _originalDB.Disposing += _originalDB_Disposing;
             btnVorherigeVersion.Text = "zurück";

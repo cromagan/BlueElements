@@ -66,7 +66,6 @@
   <ItemGroup>
     <Compile Include="AdditionalScriptComands\Method_AddRow.cs" />
     <Compile Include="AdditionalScriptComands\Method_LookupFilter.cs" />
-    <Compile Include="AdditionalScriptComands\Method_LookupExt.cs" />
     <Compile Include="AdditionalScriptComands\Method_Lookup.cs" />
     <Compile Include="AdditionalScriptComands\Method_Filter.cs" />
     <Compile Include="AdditionalScriptComands\Method_SetError.cs" />
@@ -99,7 +98,6 @@
     <Compile Include="EventArgs\PasswordEventArgs.cs" />
     <Compile Include="EventArgs\CellEventArgs.cs" />
     <Compile Include="EventArgs\ColumnEventArgs.cs" />
-    <Compile Include="EventArgs\DatabaseSettingsEventHandler.cs" />
     <Compile Include="EventArgs\DoRowAutomaticEventArgs.cs" />
     <Compile Include="EventArgs\FilterEventArgs.cs" />
     <Compile Include="EventArgs\KeyChangedEventArgs.cs" />

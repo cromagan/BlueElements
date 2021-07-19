@@ -26,7 +26,7 @@ namespace BlueScript {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Bool_Numeral_String_List_or_Bitmap };
+        public override List<enVariableDataType> Args => new() { enVariableDataType.Bool_Numeral_String_List_Bitmap_or_Object };
         public override string Description => "Berechnet eine Variable. Der Typ der Variable und des Ergebnisses müssen übereinstimmen.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ";";

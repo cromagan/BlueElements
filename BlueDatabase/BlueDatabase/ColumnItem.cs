@@ -1313,19 +1313,11 @@ namespace BlueDatabase {
         public Database LinkedDatabase() {
             if (_TMP_LinkedDatabase != null) { return _TMP_LinkedDatabase; }
             if (string.IsNullOrEmpty(_LinkedDatabaseFile)) { return null; }
-            var el = FileExists(_LinkedDatabaseFile)
-                ? new DatabaseSettingsEventHandler(this, _LinkedDatabaseFile, Database.ReadOnly)
-                : new DatabaseSettingsEventHandler(this, Database.Filename.FilePath() + _LinkedDatabaseFile, Database.ReadOnly);
-            TMP_LinkedDatabase = (Database)clsMultiUserFile.GetByFilename(el.Filenname, true);
-            if (_TMP_LinkedDatabase == null) {
-                Database.OnLoadingLinkedDatabase(el);
-            }
-            TMP_LinkedDatabase = (Database)clsMultiUserFile.GetByFilename(el.Filenname, true); // Event wird ausgelöst, Multitasking pfuscht rein, nochmal prüfen!!!!
-            if (_TMP_LinkedDatabase == null) {
-                if (FileExists(el.Filenname)) {
-                    TMP_LinkedDatabase = new Database(el.Filenname, el.ReadOnly, false); // Wichtig, NICHT _TMP_LinkedDatabase
-                }
-            }
+
+            TMP_LinkedDatabase = _LinkedDatabaseFile.Contains(@"\")
+                ? Database.GetByFilename(_LinkedDatabaseFile, true)
+                : Database.GetByFilename(Database.Filename.FilePath() + _LinkedDatabaseFile, true);
+
             if (_TMP_LinkedDatabase != null) { _TMP_LinkedDatabase.UserGroup = Database.UserGroup; }
             return _TMP_LinkedDatabase;
         }

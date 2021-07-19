@@ -27,6 +27,7 @@ namespace Skript.Enums {
         List = 16,
 
         Bitmap = 32,
+        Object = 64,
 
         /// <summary>
         /// Nur für Attribute
@@ -38,6 +39,7 @@ namespace Skript.Enums {
         Bool_Numeral_or_String = Bool | Numeral | String,
         Bool_Numeral_String_or_List = Bool | Numeral | String | List,
         Bool_Numeral_String_List_or_Bitmap = Bool | Numeral | String | List | Bitmap,
+        Bool_Numeral_String_List_Bitmap_or_Object = Bool | Numeral | String | List | Bitmap | Object,
         Variable = 1024,
         Error = 2048,
         Null = 4096,
@@ -52,6 +54,6 @@ namespace Skript.Enums {
         Variable_List_Or_String = Variable | String | List,
         Variable_List_String_Numeral_or_Bool = Variable | String | List | Numeral | Bool,
         Variable_String_or_Numeral = Variable | String | List | Numeral,
-        Variable_Any = Variable | String | List | Numeral | Bool | Error | NotDefinedYet
+        Variable_Any = Variable | String | List | Numeral | Bool | Error | NotDefinedYet | Object,
     }
 }

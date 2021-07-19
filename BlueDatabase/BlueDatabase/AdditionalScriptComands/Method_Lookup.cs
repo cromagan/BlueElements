@@ -57,15 +57,9 @@ namespace BlueScript {
             var f = s.Variablen.GetSystem("filename");
             if (f == null) { return new strDoItFeedback("System-Variable 'Filename' nicht gefunden."); }
             var newf = f.ValueString.FilePath() + attvar.Attributes[0].ValueString + ".mdb";
-            var db2 = BlueBasics.MultiUserFile.clsMultiUserFile.GetByFilename(newf, true);
 
-            Database db;
-            if (db2 == null) {
-                if (!FileOperations.FileExists(newf)) { return new strDoItFeedback("Datenbank nicht gefunden: " + newf); }
-                db = new Database(newf, false, false);
-            } else {
-                db = (Database)db2;
-            }
+            var db = Database.GetByFilename(newf, true);
+            if (db == null) { return new strDoItFeedback("Datenbank nicht gefunden: " + newf); }
 
             var c = db.Column.Exists(attvar.Attributes[2].ValueString);
             if (c == null) { return new strDoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[2].ValueString); }

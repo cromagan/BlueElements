@@ -119,6 +119,7 @@ namespace BlueBasics {
 
         public static readonly string GänsefüßchenReplace = ((char)9000).ToString();
         public static readonly string ImageKennung = ((char)9001).ToString();
+        public static readonly string ObjectKennung = ((char)9002).ToString();
 
         //Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         //    var enc1252 = Encoding.GetEncoding(1252);

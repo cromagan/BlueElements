@@ -369,10 +369,7 @@ namespace BlueControls.Forms {
             }
             btnLetzteDateien.AddFileName(Datei, string.Empty);
             LoadTab.FileName = Datei;
-            var tmpDatabase = (Database)BlueBasics.MultiUserFile.clsMultiUserFile.GetByFilename(Datei, false);
-            if (tmpDatabase == null) {
-                tmpDatabase = new Database(Datei, false, false);
-            }
+            var tmpDatabase = Database.GetByFilename(Datei, false);
             if (tmpDatabase == null) { return; }
             DatabaseSet(tmpDatabase);
         }

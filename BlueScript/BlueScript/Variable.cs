@@ -278,6 +278,18 @@ namespace BlueScript {
 
             #endregion
 
+            #region Testen auf Object
+
+            if (txt.Value.Length > 2 && txt.Value.StartsWith(Constants.ObjectKennung) && txt.Value.EndsWith(Constants.ObjectKennung)) {
+                if (Type is not enVariableDataType.NotDefinedYet and not enVariableDataType.Object) { SetError("Variable ist kein Object"); return; }
+                ValueString = txt.Value.Substring(1, txt.Value.Length - 2);
+                Type = enVariableDataType.Object;
+                Readonly = true;
+                return;
+            }
+
+            #endregion
+
             #region Testen auf Number
 
             if (Type is not enVariableDataType.NotDefinedYet and not enVariableDataType.Numeral) { SetError("Variable ist keine Zahl"); return; }
@@ -465,14 +477,30 @@ namespace BlueScript {
                 case enVariableDataType.Bitmap:
                     return Constants.ImageKennung + value + Constants.ImageKennung;
 
+                case enVariableDataType.Object:
+                    return Constants.ObjectKennung + value + Constants.ObjectKennung;
+
                 default:
                     Develop.DebugPrint_NichtImplementiert();
                     return value;
             }
         }
 
-        public Bitmap GetValueBitmap(Script s) {
-            return s.BitmapCache[ValueInt];
+        public Bitmap GetValueBitmap(Script s) => s.BitmapCache[ValueInt];
+
+        public string ObjectData() {
+            if (Type != enVariableDataType.Object) { return string.Empty; }
+            var x = _ValueString.SplitBy("&");
+            return x == null || x.GetUpperBound(0) != 1
+                    ? string.Empty
+                    : x[1].FromNonCritical();
+        }
+
+        public bool ObjectType(string toCheck) {
+            if (Type != enVariableDataType.Object) { return false; }
+
+            var x = _ValueString.SplitBy("&");
+            return x != null && x.GetUpperBound(0) == 1 && x[0] == toCheck.ToUpper().ReduceToChars(Constants.Char_AZ + Constants.Char_Numerals);
         }
 
         public void PrepareForScript() => _ValueString = _ValueString.Replace("\"", BlueBasics.Constants.GänsefüßchenReplace);
@@ -488,10 +516,13 @@ namespace BlueScript {
                 enVariableDataType.Bool => "{bol} " + zusatz + Name + " = " + ValueString,
                 enVariableDataType.List => "{lst} " + zusatz + Name + " = " + ValueString,
                 enVariableDataType.Bitmap => "{bmp} " + zusatz + Name + " = [BitmapData]",
+                enVariableDataType.Object => "{obj} " + zusatz + Name + " = [ObjectData]",
                 enVariableDataType.Error => "{err} " + zusatz + Name + " = " + ValueString,
                 _ => "{ukn} " + zusatz + Name + " = " + ValueString,
             };
         }
+
+        internal static string GenerateObject(string objecttype, string value) => objecttype.ToUpper().ReduceToChars(Constants.Char_AZ + Constants.Char_Numerals) + "&" + value.ToNonCritical();
 
         private void SetError(string coment) {
             Readonly = false;

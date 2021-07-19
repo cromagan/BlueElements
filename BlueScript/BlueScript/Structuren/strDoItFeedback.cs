@@ -46,6 +46,11 @@ public struct strDoItFeedback {
         ErrorMessage = string.Empty;
     }
 
+    public strDoItFeedback(string value, string objecttype) {
+        Value = Variable.ValueForReplace(Variable.GenerateObject(objecttype, value), enVariableDataType.Object);
+        ErrorMessage = string.Empty;
+    }
+
     #endregion
 
     #region Methods

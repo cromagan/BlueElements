@@ -118,14 +118,11 @@ namespace BlueDatabase {
 
         #region Constructors
 
-        public Database(Stream Stream) : this(Stream, string.Empty, true, false) {
-        }
+        public Database(Stream Stream) : this(Stream, string.Empty, true, false) { }
 
-        public Database(bool readOnly) : this(null, string.Empty, readOnly, true) {
-        }
+        public Database(bool readOnly) : this(null, string.Empty, readOnly, true) { }
 
-        public Database(string filename, bool readOnly, bool create) : this(null, filename, readOnly, create) {
-        }
+        public Database(string filename, bool readOnly, bool create) : this(null, filename, readOnly, create) { }
 
         private Database(Stream stream, string filename, bool readOnly, bool create) : base(readOnly, true) {
             CultureInfo culture = new("de-DE");
@@ -173,8 +170,6 @@ namespace BlueDatabase {
         public event CancelEventHandler Exporting;
 
         public event EventHandler<GenerateLayoutInternalEventargs> GenerateLayoutInternal;
-
-        public event EventHandler<DatabaseSettingsEventHandler> LoadingLinkedDatabase;
 
         public event EventHandler<PasswordEventArgs> NeedPassword;
 
@@ -346,6 +341,16 @@ namespace BlueDatabase {
         #endregion
 
         #region Methods
+
+        public static new Database GetByFilename(string filename, bool checkOnlyFilenameToo) {
+            var tmpDB = BlueBasics.MultiUserFile.clsMultiUserFile.GetByFilename(filename, checkOnlyFilenameToo);
+
+            if (tmpDB is Database db) { return db; }
+
+            if (tmpDB != null) { return null; }//  Daten im Speicher, aber keine Datenbank!
+
+            return !FileOperations.FileExists(filename) ? null : new Database(filename, false, false);
+        }
 
         public static Database LoadResource(Assembly assembly, string Name, string BlueBasicsSubDir, bool FehlerAusgeben, bool MustBeStream) {
             if (Develop.IsHostRunning() && !MustBeStream) {
@@ -755,8 +760,8 @@ namespace BlueDatabase {
         public void InjectCommand(enDatabaseDataType Comand, string ChangedTo) => AddPending(Comand, -1, -1, string.Empty, ChangedTo, true);
 
         public bool IsAdministrator() => DatenbankAdmin.Contains("#User: " + UserName, false)
-|| (!string.IsNullOrEmpty(UserGroup) && (DatenbankAdmin.Contains(UserGroup, false)
-|| UserGroup.ToUpper() == "#ADMINISTRATOR"));
+    || (!string.IsNullOrEmpty(UserGroup) && (DatenbankAdmin.Contains(UserGroup, false)
+    || UserGroup.ToUpper() == "#ADMINISTRATOR"));
 
         public void Parse(byte[] _BLoaded, ref int Pointer, ref enDatabaseDataType Art, ref int ColNR, ref int RowNR, ref string Wert, ref int X, ref int Y) {
             int Les;
@@ -1041,11 +1046,6 @@ namespace BlueDatabase {
             GenerateLayoutInternal?.Invoke(this, e);
         }
 
-        internal void OnLoadingLinkedDatabase(DatabaseSettingsEventHandler e) {
-            if (Disposed) { return; }
-            LoadingLinkedDatabase?.Invoke(this, e);
-        }
-
         internal void OnProgressbarInfo(ProgressbarEventArgs e) {
             if (Disposed) { return; }
             ProgressbarInfo?.Invoke(this, e);
@@ -1328,7 +1328,7 @@ namespace BlueDatabase {
                 SaveToByteList(l, enDatabaseDataType.Formatkennung, "BlueDatabase");
                 SaveToByteList(l, enDatabaseDataType.Version, DatabaseVersion);
                 SaveToByteList(l, enDatabaseDataType.Werbung, "                                                                    BlueDataBase - (c) by Christian Peter                                                                                        "); // Die Werbung dient als Dummy-Platzhalter, falls doch mal was vergessen wurde...
-                // Passwörter ziemlich am Anfang speicher, dass ja keinen Weiteren Daten geladen werden können
+                                                                                                                                                                                                                                                                    // Passwörter ziemlich am Anfang speicher, dass ja keinen Weiteren Daten geladen werden können
                 if (string.IsNullOrEmpty(_GlobalShowPass)) {
                     SaveToByteList(l, enDatabaseDataType.CryptionState, false.ToPlusMinus());
                 } else {

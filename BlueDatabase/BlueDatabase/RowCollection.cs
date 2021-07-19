@@ -280,10 +280,26 @@ namespace BlueDatabase {
             }
         }
 
-        internal static List<RowItem> MatchesTo(FilterItem FilterItem) {
+        internal static List<RowItem> MatchesTo(FilterItem filterItem) {
             List<RowItem> l = new();
-            foreach (var ThisRow in FilterItem.Database.Row) {
-                if (ThisRow.MatchesTo(FilterItem)) {
+
+            if (filterItem == null) { return l; }
+
+            foreach (var ThisRow in filterItem.Database.Row) {
+                if (ThisRow.MatchesTo(filterItem)) {
+                    l.Add(ThisRow);
+                }
+            }
+            return l;
+        }
+
+        internal static List<RowItem> MatchesTo(List<FilterItem> filterItem) {
+            List<RowItem> l = new();
+
+            if (filterItem == null || filterItem.Count < 1) { return l; }
+
+            foreach (var ThisRow in filterItem[0].Database.Row) {
+                if (ThisRow.MatchesTo(filterItem)) {
                     l.Add(ThisRow);
                 }
             }

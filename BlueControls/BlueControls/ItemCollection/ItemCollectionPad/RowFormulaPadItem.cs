@@ -132,10 +132,7 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "database":
-                    _Database = (Database)BlueBasics.MultiUserFile.clsMultiUserFile.GetByFilename(value, false);
-                    if (_Database == null) {
-                        _Database = new Database(value, false, false);
-                    }
+                    _Database = Database.GetByFilename(value, false);
                     _Database.Disposing += _Database_Disposing;
                     return true;
 
