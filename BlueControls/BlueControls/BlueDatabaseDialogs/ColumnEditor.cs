@@ -94,41 +94,21 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void btnVor_Click(object sender, System.EventArgs e) {
             if (!AllOk()) { return; }
-            //if (_Column.Next() == null)
-            //{
-            //    MessageBox.Show("Spalte nicht gültig!", enImageCode.Warnung, "OK");
-            //    return;
-            //}
             Column_DatenAuslesen(_Column.Next());
         }
 
         private void btnZurueck_Click(object sender, System.EventArgs e) {
             if (!AllOk()) { return; }
-            //if (_Column.Previous() == null)
-            //{
-            //    MessageBox.Show("Spalte nicht gültig!", enImageCode.Warnung, "OK");
-            //    return;
-            //}
             Column_DatenAuslesen(_Column.Previous());
         }
 
         private void butAktuellVor_Click(object sender, System.EventArgs e) {
             if (!AllOk()) { return; }
-            //if (_Column.Previous() == null)
-            //{
-            //    MessageBox.Show("Spalte nicht gültig!", enImageCode.Warnung, "OK");
-            //    return;
-            //}
             Column_DatenAuslesen(_Table.CurrentArrangement[_Column].NextVisible(_Table.CurrentArrangement).Column);
         }
 
         private void butAktuellZurueck_Click(object sender, System.EventArgs e) {
             if (!AllOk()) { return; }
-            //if (_Column.Previous() == null)
-            //{
-            //    MessageBox.Show("Spalte nicht gültig!", enImageCode.Warnung, "OK");
-            //    return;
-            //}
             Column_DatenAuslesen(_Table.CurrentArrangement[_Column].PreviewsVisible(_Table.CurrentArrangement).Column);
         }
 
@@ -173,11 +153,16 @@ namespace BlueControls.BlueDatabaseDialogs {
         /// <param name="e"></param>
         private void cbxLinkedDatabase_TextChanged(object sender, System.EventArgs e) {
             _Column.LinkedDatabaseFile = cbxLinkedDatabase.Text;
+
             cbxColumnKeyInColumn.Item.Clear();
             cbxColumnKeyInColumn.Item.Add("#Ohne");
+
             cbxRowKeyInColumn.Item.Clear();
             cbxRowKeyInColumn.Item.Add("#Ohne");
+            cbxRowKeyInColumn.Item.Add("<Skript-gesteuert>");
+
             cbxTargetColumn.Item.Clear();
+
             if (_Column.LinkedDatabase() != null) {
                 foreach (var ThisColumn in _Column.Database.Column) {
                     if (ThisColumn.Format.CanBeCheckedByRules() && !ThisColumn.MultiLine && !ThisColumn.Format.NeedTargetDatabase()) {
@@ -219,7 +204,9 @@ namespace BlueControls.BlueDatabaseDialogs {
         private int ColumKeyFrom(Database database, string columnName) {
             if (database == null) { return -1; }
             var c = database.Column.Exists(columnName);
-            return c is null ? -1 : c.Key;
+            if (c != null) { return c.Key; }
+
+            return columnName.ToLower() == "<skript-gesteuert>" ? -9999 : -1;
         }
 
         private void Column_DatenAuslesen(ColumnItem FromColumn) {
@@ -251,6 +238,9 @@ namespace BlueControls.BlueDatabaseDialogs {
                 cbxEinheit.Item.Add("g", enImageCode.Gewicht);
                 cbxEinheit.Item.Add("kg", enImageCode.Gewicht);
                 cbxEinheit.Item.Add("t", enImageCode.Gewicht);
+                cbxEinheit.Item.Add("h", enImageCode.Uhr);
+                cbxEinheit.Item.Add("min", enImageCode.Uhr);
+                cbxEinheit.Item.Add("St.", enImageCode.Eins);
             }
             lbxCellEditor.Suggestions.Clear();
             lbxCellEditor.Suggestions.AddRange(_Column.Database.Permission_AllUsed(false));

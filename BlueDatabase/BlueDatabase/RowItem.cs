@@ -109,38 +109,48 @@ namespace BlueDatabase {
 
             if (column.MultiLine && column.Format == enDataFormat.Link_To_Filesystem) { return null; }
 
-            var x = new List<Variable>();
+
+            var wert = row.CellGetString(column);
+
+
+            var vars = new List<Variable>();
+
+            if (column.Format == enDataFormat.LinkedCell && column.LinkedCell_RowKey == -9999) {
+                wert = string.Empty;
+                //vars.Add(new Variable(column.Name, wert, enVariableDataType.List, ro, false, "Spalte: " + column.ReadableText() + "\r\nBeim Skript-Start ist dieser Wert immer leer, da die Verlinkung erst erstellt werden muss."));
+                vars.Add(new Variable(column.Name + "_link", string.Empty, enVariableDataType.String, true, true, "Dieser Wert kann nur mit SetLink verändert werden.\r\nBeim Skript-Start ist dieser Wert immer leer, da die Verlinkung erst erstellt werden muss."));
+            }
 
             if (column.MultiLine) {
-                x.Add(new Variable(column.Name, row.CellGetString(column), enVariableDataType.List, ro, false, "Spalte: " + column.ReadableText() + "\r\nMehrzeilige Spalten können nur als Liste bearbeitet werden."));
-                return x;
+                vars.Add(new Variable(column.Name, wert, enVariableDataType.List, ro, false, "Spalte: " + column.ReadableText() + "\r\nMehrzeilige Spalten können nur als Liste bearbeitet werden."));
+                return vars;
             }
 
             switch (column.Format) {
                 case enDataFormat.Bit:
-                    x.Add(row.CellGetString(column) == "+" ? new Variable(column.Name, "true", enVariableDataType.Bool, ro, false, "Spalte: " + column.ReadableText()) : new Variable(column.Name, "false", enVariableDataType.Bool, ro, false, "Spalte: " + column.ReadableText()));
+                    vars.Add(wert == "+" ? new Variable(column.Name, "true", enVariableDataType.Bool, ro, false, "Spalte: " + column.ReadableText()) : new Variable(column.Name, "false", enVariableDataType.Bool, ro, false, "Spalte: " + column.ReadableText()));
                     break;
 
                 case enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl:
-                    x.Add(new Variable(column.Name, row.CellGetString(column), enVariableDataType.Numeral, ro, false, "Spalte: " + column.ReadableText()));
+                    vars.Add(new Variable(column.Name, wert, enVariableDataType.Numeral, ro, false, "Spalte: " + column.ReadableText()));
                     break;
 
                 case enDataFormat.Link_To_Filesystem:
-                    x.Add(new Variable(column.Name, row.CellGetString(column), enVariableDataType.String, ro, false, "Spalte: " + column.ReadableText()));
+                    vars.Add(new Variable(column.Name, wert, enVariableDataType.String, ro, false, "Spalte: " + column.ReadableText()));
 
                     var f = column.Database.Cell.BestFile(column, row);
                     if (f.FileType() == enFileFormat.Image && FileOperations.FileExists(f)) {
-                        x.Add(new Variable(column.Name + "_ImageFileName", f, enVariableDataType.String, true, false, "Spalte: " + column.ReadableText() + "\r\nEnthält den vollen Dateinamen des Bildes der zugehörigen Zelle."));
+                        vars.Add(new Variable(column.Name + "_ImageFileName", f, enVariableDataType.String, true, false, "Spalte: " + column.ReadableText() + "\r\nEnthält den vollen Dateinamen des Bildes der zugehörigen Zelle."));
                     }
 
                     break;
 
                 default:
-                    x.Add(new Variable(column.Name, row.CellGetString(column), enVariableDataType.String, ro, false, "Spalte: " + column.ReadableText()));
+                    vars.Add(new Variable(column.Name, wert, enVariableDataType.String, ro, false, "Spalte: " + column.ReadableText()));
                     break;
             };
 
-            return x;
+            return vars;
         }
 
         public string CaptionReadable() {
@@ -474,16 +484,26 @@ namespace BlueDatabase {
 
                 #endregion Variablen für Skript erstellen
 
+                #region Script ausführen
+
                 Script script = new(vars) {
                     ScriptText = Database.RulesScript
                 };
                 script.Parse();
+
+                #endregion
+
                 if (!onlyTest) {
+
+                    #region Variablen zurückschreiben und Special Rules ausführen
+
                     if (!string.IsNullOrEmpty(script.Error)) { return script; }
                     foreach (var thisCol in Database.Column) { VariableToCell(thisCol, vars); }
                     // Gucken, ob noch ein Fehler da ist, der von einer besonderen anderen Routine kommt. Beispiel Bildzeichen-Liste: Bandart und Einläufe
                     DoRowAutomaticEventArgs e = new(this);
                     OnDoSpecialRules(e);
+
+                    #endregion
                 }
                 return script;
             } catch {
@@ -511,26 +531,35 @@ namespace BlueDatabase {
             return false;
         }
 
-        private void VariableToCell(ColumnItem thisCol, List<Variable> vars) {
-            var s = vars.Get(thisCol.Name);
-            if (s == null) { return; }
-            if (s.Readonly) { return; }
-            if (thisCol.MultiLine) {
-                CellSet(thisCol, s.ValueString);
+        private void VariableToCell(ColumnItem column, List<Variable> vars) {
+            var ColumnVar = vars.Get(column.Name);
+            if (ColumnVar == null) { return; }
+
+            if (ColumnVar.Readonly) { return; }
+
+            if (column.Format == enDataFormat.LinkedCell) {
+                var ColumnLinkVar = vars.GetSystem(column.Name + "_Link");
+                if (ColumnLinkVar != null) {
+                    column.Database.Cell.SetValueBehindLinkedValue(column, this, ColumnLinkVar.ValueString);
+                }
+            }
+
+            if (column.MultiLine) {
+                CellSet(column, ColumnVar.ValueString);
                 return;
             }
-            switch (thisCol.Format) {
+            switch (column.Format) {
                 case enDataFormat.Bit:
-                    if (s.ValueString.ToLower() == "true") {
-                        CellSet(thisCol, true);
+                    if (ColumnVar.ValueString.ToLower() == "true") {
+                        CellSet(column, true);
                     } else {
-                        CellSet(thisCol, false);
+                        CellSet(column, false);
                     }
                     return;
 
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.Gleitkommazahl:
-                    CellSet(thisCol, s.ValueString);
+                    CellSet(column, ColumnVar.ValueString);
                     return;
 
                 case enDataFormat.Text:
@@ -544,7 +573,7 @@ namespace BlueDatabase {
                 case enDataFormat.LinkedCell:
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                 case enDataFormat.Values_für_LinkedCellDropdown:
-                    CellSet(thisCol, s.ValueString);
+                    CellSet(column, ColumnVar.ValueString);
                     return;
             }
         }

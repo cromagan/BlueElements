@@ -253,9 +253,9 @@ namespace BlueScript {
 
             #region Testen auf Bitmap
 
-            if (txt.Value.Length > 2 && txt.Value.StartsWith(Constants.ImageKennung) && txt.Value.EndsWith(Constants.ImageKennung)) {
+            if (txt.Value.Length > 4 && txt.Value.StartsWith(Constants.ImageKennung + "\"") && txt.Value.EndsWith("\"" + Constants.ImageKennung)) {
                 if (Type is not enVariableDataType.NotDefinedYet and not enVariableDataType.Bitmap) { SetError("Variable ist kein Bitmap"); return; }
-                ValueString = txt.Value.Substring(1, txt.Value.Length - 2);
+                ValueString = txt.Value.Substring(2, txt.Value.Length - 4).Replace(BlueBasics.Constants.GänsefüßchenReplace, "\"");
                 Type = enVariableDataType.Bitmap;
                 Readonly = true;
                 return;
@@ -280,9 +280,9 @@ namespace BlueScript {
 
             #region Testen auf Object
 
-            if (txt.Value.Length > 2 && txt.Value.StartsWith(Constants.ObjectKennung) && txt.Value.EndsWith(Constants.ObjectKennung)) {
+            if (txt.Value.Length > 2 && txt.Value.StartsWith(Constants.ObjectKennung + "\"") && txt.Value.EndsWith("\"" + Constants.ObjectKennung)) {
                 if (Type is not enVariableDataType.NotDefinedYet and not enVariableDataType.Object) { SetError("Variable ist kein Object"); return; }
-                ValueString = txt.Value.Substring(1, txt.Value.Length - 2);
+                ValueString = txt.Value.Substring(2, txt.Value.Length - 4).Replace(BlueBasics.Constants.GänsefüßchenReplace, "\"");
                 Type = enVariableDataType.Object;
                 Readonly = true;
                 return;
@@ -475,10 +475,10 @@ namespace BlueScript {
                     return value;
 
                 case enVariableDataType.Bitmap:
-                    return Constants.ImageKennung + value + Constants.ImageKennung;
+                    return Constants.ImageKennung + "\"" + value.Replace("\"", Constants.GänsefüßchenReplace) + "\"" + Constants.ImageKennung;
 
                 case enVariableDataType.Object:
-                    return Constants.ObjectKennung + value + Constants.ObjectKennung;
+                    return Constants.ObjectKennung + "\"" + value.Replace("\"", Constants.GänsefüßchenReplace) + "\"" + Constants.ObjectKennung;
 
                 default:
                     Develop.DebugPrint_NichtImplementiert();

@@ -1089,7 +1089,7 @@ namespace BlueDatabase {
                     if (!string.IsNullOrEmpty(_CellInitValue)) { return "Dieses Format kann keinen Initial-Text haben."; }
                     if (_KeyColumnKey > -1) { return "Dieses Format darf keine Verknüpfung zu einer Schlüsselspalte haben."; }
                     if (IsFirst()) { return "Dieses Format ist bei der ersten (intern) erste Spalte nicht erlaubt."; }
-                    if (_LinkedCell_RowKey < 0) { return "Die Angabe der Spalte, aus der der Schlüsselwert geholt wird, fehlt."; }
+                    if (_LinkedCell_RowKey is < 0 and not (-9999)) { return "Die Angabe der Spalte, aus der der Schlüsselwert geholt wird, fehlt."; }
                     if (_LinkedCell_ColumnValueFoundIn < 0 && _LinkedCell_ColumnKey < 0) { return "Information fehlt, welche Spalte der Zieldatenbank verwendet werden soll."; }
                     if (_LinkedCell_ColumnValueFoundIn > -1 && _LinkedCell_ColumnKey > -1) { return "Doppelte Informationen, welche Spalte der Zieldatenbank verwendet werden soll."; }
                     if (_LinkedCell_ColumnValueFoundIn < 0 && !string.IsNullOrEmpty(LinkedCell_ColumnValueAdd)) { return "Falsche Ziel-Spalte ODER Spalten-Vortext flasch."; }

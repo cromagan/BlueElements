@@ -26,13 +26,16 @@ namespace BlueScript {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List, enVariableDataType.String, enVariableDataType.Object };
+        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List_Or_String, enVariableDataType.String, enVariableDataType.Object };
 
-        public override string Description => "Setzt in der verlinkten Datenbank den Link zur Zelle manuell. Ein Filter kann mit dem Befehl 'Filter' erstellt werden. Gibt zurück, ob der Link erstellt werden konnte.";
+        public override string Description => "Setzt in der verlinkten Datenbank den Link zur Zelle manuell.\r\n" +
+                                              "Ein Filter kann mit dem Befehl 'Filter' erstellt werden.\r\n" +
+                                              "Gibt zurück, ob der Link erstellt werden konnte.\r\n" +
+                                              "WICHTIG: Der Wert in ColumnInThisDatabase wird verworfen und durch den neuen Inhalt der verlinkten Zelle ersetzt!";
 
         public override bool EndlessArgs => true;
 
-        public override string EndSequence => ");";
+        public override string EndSequence => ")";
 
         public override bool GetCodeBlockAfter => false;
 
@@ -53,16 +56,28 @@ namespace BlueScript {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
+            #region Datenbank: db
+
+            var f = s.Variablen.GetSystem("filename");
+            if (f == null) { return new strDoItFeedback("System-Variable 'Filename' nicht gefunden."); }
+
+            var db = Database.GetByFilename(f.ValueString, true);
+            if (db == null) { return new strDoItFeedback("Datenbank nicht gefunden: " + f); }
+
+            #endregion
+
+            #region Filter prüfen: allFi
+
             var allFi = new List<FilterItem>();
 
-            for (var z = 3; z < attvar.Attributes.Count; z++) {
+            for (var z = 2; z < attvar.Attributes.Count; z++) {
                 if (!attvar.Attributes[z].ObjectType("rowfilter")) { return new strDoItFeedback("Kein Filter übergeben."); }
 
                 var fi = new BlueDatabase.FilterItem(attvar.Attributes[z].ObjectData());
 
                 if (!fi.IsOk()) { return new strDoItFeedback("Filter fehlerhaft"); }
 
-                if (z > 3) {
+                if (z > 2) {
                     if (fi.Database != allFi[0].Database) { return new strDoItFeedback("Filter über verschiedene Datenbanken wird nicht unterstützt."); }
                 }
                 allFi.Add(fi);
@@ -70,27 +85,52 @@ namespace BlueScript {
 
             if (allFi.Count < 1) { return new strDoItFeedback("Fehler im Filter"); }
 
-            var returncolumn = allFi[0].Database.Column.Exists(attvar.Attributes[0].ValueString);
-            if (returncolumn == null) { return new strDoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[4].ValueString); }
+            #endregion
+
+            #region Ziel Spalte in Ziel-Datenbank finden: LinkTaregtColumn
+
+            var LinkTaregtColumn = allFi[0].Database.Column.Exists(attvar.Attributes[1].ValueString);
+            if (LinkTaregtColumn == null) { return new strDoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[1].ValueString); }
+
+            #endregion
+
+            #region Spalte, die geändert werden soll, finden: ChangeColumn
+
+            var ChangeColumn = db.Column.Exists(attvar.Attributes[0].Name);
+            if (ChangeColumn.Format != BlueBasics.Enums.enDataFormat.LinkedCell) { return new strDoItFeedback("Spalte hat das falsche Format: " + attvar.Attributes[1].ValueString); }
+            if (ChangeColumn.LinkedCell_RowKey > -1) { return new strDoItFeedback("Spalte wird automatisiert befüllt: " + attvar.Attributes[1].ValueString); }
+
+            #endregion
+
+            #region Spalte mit den Link-Daten finden: Linkvar
+
+            var Linkvar = s.Variablen.GetSystem(attvar.Attributes[0].Name + "_link");
+            Linkvar.Readonly = false;
+
+            #endregion
+
+            if (allFi[0].Database != ChangeColumn.LinkedDatabase()) { return new strDoItFeedback("Filter zeigen auf eine andere Datenbank als die, die in der Spalte als Verlinkung angegeben ist."); }
+
+            #region Verknüpfung schlägt fehl
 
             var r = RowCollection.MatchesTo(allFi);
-            if (r == null || r.Count == 0) {
-                attvar.Attributes[1].Readonly = false; // 5 = NothingFoundValue
-                attvar.Attributes[1].Type = enVariableDataType.List;
-                return new strDoItFeedback(attvar.Attributes[1].ValueString, enVariableDataType.List);
-            }
-            if (r.Count > 1) {
-                attvar.Attributes[2].Readonly = false; // 6 = to MuchFound
-                attvar.Attributes[2].Type = enVariableDataType.List;
-                return new strDoItFeedback(attvar.Attributes[2].ValueString, enVariableDataType.List);
+            if (r == null || r.Count != 1) {
+                Linkvar.ValueString = string.Empty;
+                attvar.Attributes[0].ValueString = string.Empty;
+                Linkvar.Readonly = true;
+                return strDoItFeedback.Falsch();
             }
 
-            var v = RowItem.CellToVariable(returncolumn, r[0]);
-            if (v == null || v.Count != 1) { return new strDoItFeedback("Wert konnte nicht erzeugt werden: " + attvar.Attributes[4].ValueString); }
+            #endregion
 
-            v[0].Readonly = false;
-            v[0].Type = enVariableDataType.List;
-            return new strDoItFeedback(v[0].ValueString, enVariableDataType.List);
+            var tmpv = RowItem.CellToVariable(LinkTaregtColumn, r[0]);
+            if (tmpv == null || tmpv.Count != 1) { return new strDoItFeedback("Wert konnte nicht erzeugt werden: " + attvar.Attributes[4].ValueString); }
+            tmpv[0].Type = enVariableDataType.List;
+
+            attvar.Attributes[0].ValueString = tmpv[0].ValueString;
+            Linkvar.ValueString = CellCollection.KeyOfCell(LinkTaregtColumn, r[0]);
+            Linkvar.Readonly = true;
+            return strDoItFeedback.Wahr();
         }
 
         #endregion
