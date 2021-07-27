@@ -46,8 +46,8 @@ namespace BlueControls.Forms {
             _FileList = FileList;
             LoadPic(0);
             InitWindow(MitScreenResize, WindowCaption, -1);
-            ZoomIn.Checked = true;
-            Auswahl.Enabled = false;
+            btnZoomIn.Checked = true;
+            btnChoose.Enabled = false;
         }
 
         public PictureView(Bitmap BMP) {
@@ -57,8 +57,8 @@ namespace BlueControls.Forms {
             InitWindow(false, "", -1);
             Pad.BMP = BMP;
             Pad.ZoomFit();
-            ZoomIn.Checked = true;
-            Auswahl.Enabled = false;
+            btnZoomIn.Checked = true;
+            btnChoose.Enabled = false;
         }
 
         public PictureView(List<string> FileList, bool MitScreenResize, string WindowCaption, int OpenOnScreen) {
@@ -68,8 +68,8 @@ namespace BlueControls.Forms {
             LoadPic(0);
             InitWindow(MitScreenResize, WindowCaption, OpenOnScreen);
             grpSeiten.Visible = FileList != null && FileList.Count > 1;
-            ZoomIn.Checked = true;
-            Auswahl.Enabled = false;
+            btnZoomIn.Checked = true;
+            btnChoose.Enabled = false;
         }
 
         #endregion
@@ -107,12 +107,12 @@ namespace BlueControls.Forms {
             Ribbon.SelectedIndex = 1;
             grpSeiten.Visible = _FileList != null && _FileList.Count > 1;
             if (_FileList == null || _FileList.Count == 0) {
-                Links.Enabled = false;
-                Rechts.Enabled = false;
+                btnZurueck.Enabled = false;
+                btnVor.Enabled = false;
             } else {
                 grpSeiten.Enabled = true;
-                Links.Enabled = Convert.ToBoolean(_NR > 0);
-                Rechts.Enabled = Convert.ToBoolean(_NR < _FileList.Count - 1);
+                btnZurueck.Enabled = Convert.ToBoolean(_NR > 0);
+                btnVor.Enabled = Convert.ToBoolean(_NR < _FileList.Count - 1);
             }
             Pad.ZoomFit();
         }
@@ -140,25 +140,26 @@ namespace BlueControls.Forms {
             if (Develop.IsHostRunning()) { TopMost = false; }
         }
 
-        private void Links_Click(object sender, System.EventArgs e) {
+        private void btnZurueck_Click(object sender, System.EventArgs e) {
             _NR--;
             if (_NR <= 0) { _NR = 0; }
             LoadPic(_NR);
         }
 
         private void Pad_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
-            if (ZoomIn.Checked) { Pad.ZoomIn(e); }
-            if (ZoomOut.Checked) { Pad.ZoomOut(e); }
+            if (btnZoomIn.Checked) { Pad.ZoomIn(e); }
+            if (btnZoomOut.Checked) { Pad.ZoomOut(e); }
         }
 
-        private void Rechts_Click(object sender, System.EventArgs e) {
+        private void btnVor_Click(object sender, System.EventArgs e) {
             _NR++;
             if (_NR >= _FileList.Count - 1) { _NR = _FileList.Count - 1; }
             LoadPic(_NR);
         }
 
-        private void ZoomFitBut_Click(object sender, System.EventArgs e) => Pad.ZoomFit();
+        private void btnZoomFit_Click(object sender, System.EventArgs e) => Pad.ZoomFit();
 
         #endregion
+
     }
 }

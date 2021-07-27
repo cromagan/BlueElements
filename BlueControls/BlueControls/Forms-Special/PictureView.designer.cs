@@ -21,16 +21,16 @@ namespace BlueControls.Forms
 			private void InitializeComponent()
 			{
             this.grpSeiten = new BlueControls.Controls.GroupBox();
-            this.Rechts = new BlueControls.Controls.Button();
-            this.Links = new BlueControls.Controls.Button();
-            this.ZoomOut = new BlueControls.Controls.Button();
-            this.ZoomIn = new BlueControls.Controls.Button();
-            this.ZoomFitBut = new BlueControls.Controls.Button();
+            this.btnVor = new BlueControls.Controls.Button();
+            this.btnZurueck = new BlueControls.Controls.Button();
+            this.btnZoomOut = new BlueControls.Controls.Button();
+            this.btnZoomIn = new BlueControls.Controls.Button();
+            this.btnZoomFit = new BlueControls.Controls.Button();
             this.Pad = new BlueControls.Controls.ZoomPic();
             this.Ribbon = new BlueControls.Controls.RibbonBar();
             this.tabPageControl = new System.Windows.Forms.TabPage();
             this.grpWerkzeuge = new BlueControls.Controls.GroupBox();
-            this.Auswahl = new BlueControls.Controls.Button();
+            this.btnChoose = new BlueControls.Controls.Button();
             this.grpSeiten.SuspendLayout();
             this.Ribbon.SuspendLayout();
             this.tabPageControl.SuspendLayout();
@@ -39,69 +39,77 @@ namespace BlueControls.Forms
             // 
             // grpSeiten
             // 
-            this.grpSeiten.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(236)))), ((int)(((byte)(233)))), ((int)(((byte)(216)))));
+            this.grpSeiten.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpSeiten.CausesValidation = false;
-            this.grpSeiten.Controls.Add(this.Rechts);
-            this.grpSeiten.Controls.Add(this.Links);
+            this.grpSeiten.Controls.Add(this.btnVor);
+            this.grpSeiten.Controls.Add(this.btnZurueck);
             this.grpSeiten.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpSeiten.Location = new System.Drawing.Point(0, 0);
             this.grpSeiten.Name = "grpSeiten";
             this.grpSeiten.Size = new System.Drawing.Size(112, 81);
+            this.grpSeiten.TabIndex = 1;
+            this.grpSeiten.TabStop = false;
             this.grpSeiten.Text = "Seiten";
             // 
-            // Rechts
+            // btnVor
             // 
-            this.Rechts.ImageCode = "Pfeil_Rechts";
-            this.Rechts.Location = new System.Drawing.Point(56, 2);
-            this.Rechts.Name = "Rechts";
-            this.Rechts.Size = new System.Drawing.Size(48, 66);
-            this.Rechts.TabIndex = 6;
-            this.Rechts.Text = "vor";
-            this.Rechts.Click += new System.EventHandler(this.Rechts_Click);
+            this.btnVor.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnVor.ImageCode = "Pfeil_Rechts";
+            this.btnVor.Location = new System.Drawing.Point(56, 2);
+            this.btnVor.Name = "btnVor";
+            this.btnVor.Size = new System.Drawing.Size(48, 66);
+            this.btnVor.TabIndex = 6;
+            this.btnVor.Text = "vor";
+            this.btnVor.Click += new System.EventHandler(this.btnVor_Click);
             // 
-            // Links
+            // btnZurueck
             // 
-            this.Links.ImageCode = "Pfeil_Links";
-            this.Links.Location = new System.Drawing.Point(7, 2);
-            this.Links.Name = "Links";
-            this.Links.Size = new System.Drawing.Size(49, 66);
-            this.Links.TabIndex = 5;
-            this.Links.Text = "zurück";
-            this.Links.Click += new System.EventHandler(this.Links_Click);
+            this.btnZurueck.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnZurueck.ImageCode = "Pfeil_Links";
+            this.btnZurueck.Location = new System.Drawing.Point(7, 2);
+            this.btnZurueck.Name = "btnZurueck";
+            this.btnZurueck.Size = new System.Drawing.Size(49, 66);
+            this.btnZurueck.TabIndex = 5;
+            this.btnZurueck.Text = "zurück";
+            this.btnZurueck.Click += new System.EventHandler(this.btnZurueck_Click);
             // 
-            // ZoomOut
+            // btnZoomOut
             // 
-            this.ZoomOut.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox;
-            this.ZoomOut.ImageCode = "LupeMinus";
-            this.ZoomOut.Location = new System.Drawing.Point(120, 2);
-            this.ZoomOut.Name = "ZoomOut";
-            this.ZoomOut.Size = new System.Drawing.Size(56, 66);
-            this.ZoomOut.TabIndex = 2;
-            this.ZoomOut.Text = "kleiner";
+            this.btnZoomOut.ButtonStyle = ((BlueControls.Enums.enButtonStyle)(((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Button_Big) 
+            | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnZoomOut.ImageCode = "LupeMinus";
+            this.btnZoomOut.Location = new System.Drawing.Point(120, 2);
+            this.btnZoomOut.Name = "btnZoomOut";
+            this.btnZoomOut.Size = new System.Drawing.Size(56, 66);
+            this.btnZoomOut.TabIndex = 2;
+            this.btnZoomOut.Text = "kleiner";
             // 
-            // ZoomIn
+            // btnZoomIn
             // 
-            this.ZoomIn.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox;
-            this.ZoomIn.ImageCode = "LupePlus";
-            this.ZoomIn.Location = new System.Drawing.Point(176, 2);
-            this.ZoomIn.Name = "ZoomIn";
-            this.ZoomIn.Size = new System.Drawing.Size(56, 66);
-            this.ZoomIn.TabIndex = 1;
-            this.ZoomIn.Text = "größer";
+            this.btnZoomIn.ButtonStyle = ((BlueControls.Enums.enButtonStyle)(((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Button_Big) 
+            | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnZoomIn.ImageCode = "LupePlus";
+            this.btnZoomIn.Location = new System.Drawing.Point(176, 2);
+            this.btnZoomIn.Name = "btnZoomIn";
+            this.btnZoomIn.Size = new System.Drawing.Size(56, 66);
+            this.btnZoomIn.TabIndex = 1;
+            this.btnZoomIn.Text = "größer";
             // 
-            // ZoomFitBut
+            // btnZoomFit
             // 
-            this.ZoomFitBut.ImageCode = "ZoomFit";
-            this.ZoomFitBut.Location = new System.Drawing.Point(8, 2);
-            this.ZoomFitBut.Name = "ZoomFitBut";
-            this.ZoomFitBut.Size = new System.Drawing.Size(48, 66);
-            this.ZoomFitBut.TabIndex = 0;
-            this.ZoomFitBut.Text = "ein-passen";
-            this.ZoomFitBut.Click += new System.EventHandler(this.ZoomFitBut_Click);
+            this.btnZoomFit.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnZoomFit.ImageCode = "ZoomFit";
+            this.btnZoomFit.Location = new System.Drawing.Point(8, 2);
+            this.btnZoomFit.Name = "btnZoomFit";
+            this.btnZoomFit.Size = new System.Drawing.Size(48, 66);
+            this.btnZoomFit.TabIndex = 0;
+            this.btnZoomFit.Text = "ein-passen";
+            this.btnZoomFit.Click += new System.EventHandler(this.btnZoomFit_Click);
             // 
             // Pad
             // 
             this.Pad.AlwaysSmooth = true;
+            this.Pad.BMP = null;
             this.Pad.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Pad.Location = new System.Drawing.Point(0, 110);
             this.Pad.Name = "Pad";
@@ -117,11 +125,13 @@ namespace BlueControls.Forms
             this.Ribbon.HotTrack = true;
             this.Ribbon.Location = new System.Drawing.Point(0, 0);
             this.Ribbon.Name = "Ribbon";
+            this.Ribbon.SelectedIndex = 0;
             this.Ribbon.Size = new System.Drawing.Size(1334, 110);
             this.Ribbon.TabIndex = 2;
             // 
-            //  System.Windows.Forms.TabPageControl
+            // tabPageControl
             // 
+            this.tabPageControl.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.tabPageControl.Controls.Add(this.grpWerkzeuge);
             this.tabPageControl.Controls.Add(this.grpSeiten);
             this.tabPageControl.Location = new System.Drawing.Point(4, 25);
@@ -132,27 +142,31 @@ namespace BlueControls.Forms
             // 
             // grpWerkzeuge
             // 
+            this.grpWerkzeuge.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpWerkzeuge.CausesValidation = false;
-            this.grpWerkzeuge.Controls.Add(this.Auswahl);
-            this.grpWerkzeuge.Controls.Add(this.ZoomFitBut);
-            this.grpWerkzeuge.Controls.Add(this.ZoomOut);
-            this.grpWerkzeuge.Controls.Add(this.ZoomIn);
+            this.grpWerkzeuge.Controls.Add(this.btnChoose);
+            this.grpWerkzeuge.Controls.Add(this.btnZoomFit);
+            this.grpWerkzeuge.Controls.Add(this.btnZoomOut);
+            this.grpWerkzeuge.Controls.Add(this.btnZoomIn);
             this.grpWerkzeuge.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpWerkzeuge.Location = new System.Drawing.Point(112, 0);
             this.grpWerkzeuge.Name = "grpWerkzeuge";
             this.grpWerkzeuge.Size = new System.Drawing.Size(240, 81);
+            this.grpWerkzeuge.TabIndex = 0;
+            this.grpWerkzeuge.TabStop = false;
             this.grpWerkzeuge.Text = "Werkzeuge";
             // 
-            // Auswahl
+            // btnChoose
             // 
-            this.Auswahl.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox;
-            this.Auswahl.Checked = true;
-            this.Auswahl.ImageCode = "Mauspfeil";
-            this.Auswahl.Location = new System.Drawing.Point(64, 2);
-            this.Auswahl.Name = "Auswahl";
-            this.Auswahl.Size = new System.Drawing.Size(56, 66);
-            this.Auswahl.TabIndex = 3;
-            this.Auswahl.Text = "wählen";
+            this.btnChoose.ButtonStyle = ((BlueControls.Enums.enButtonStyle)(((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Button_Big) 
+            | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnChoose.Checked = true;
+            this.btnChoose.ImageCode = "Mauspfeil";
+            this.btnChoose.Location = new System.Drawing.Point(64, 2);
+            this.btnChoose.Name = "btnChoose";
+            this.btnChoose.Size = new System.Drawing.Size(56, 66);
+            this.btnChoose.TabIndex = 3;
+            this.btnChoose.Text = "wählen";
             // 
             // PictureView
             // 
@@ -168,17 +182,18 @@ namespace BlueControls.Forms
             this.tabPageControl.ResumeLayout(false);
             this.grpWerkzeuge.ResumeLayout(false);
             this.ResumeLayout(false);
+
 			}
-			private Button Links;
-			private Button Rechts;
-			private Button ZoomOut;
-			private Button Auswahl;
+			private Button btnZurueck;
+			private Button btnVor;
+			private Button btnZoomOut;
+			private Button btnChoose;
 			public ZoomPic Pad;
 			protected RibbonBar Ribbon;
 			protected System.Windows.Forms.TabPage tabPageControl;
 			protected GroupBox grpSeiten;
 			protected GroupBox grpWerkzeuge;
-			private Button ZoomFitBut;
-			private Button ZoomIn;
+			private Button btnZoomFit;
+			private Button btnZoomIn;
     }
 	}
