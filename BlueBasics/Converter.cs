@@ -26,7 +26,7 @@ using static BlueBasics.FileOperations;
 
 namespace BlueBasics {
 
-    public static class modConverter {
+    public static class Converter {
 
         #region Methods
 

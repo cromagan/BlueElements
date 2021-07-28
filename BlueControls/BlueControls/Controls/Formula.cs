@@ -31,6 +31,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using static BlueBasics.Converter;
 
 namespace BlueControls.Controls {
 
@@ -80,7 +81,7 @@ namespace BlueControls.Controls {
             get => _Database;
             set {
                 if (_Database == value) { return; }
-                if (Editor.Visible) { Editor.Visible = false; }
+                if (grpEditor.Visible) { grpEditor.Visible = false; }
                 ShowingRowKey = -1; // Wichtig, dass ordenlich Showing-Row to Nothing gesetzt wird, weil dann alle Fokuse durch Enabled elemeniert werden und nachträglich nix mehr ausgelöst wird.
                 Control_Remove_All();
                 if (_Database != null) {
@@ -129,7 +130,7 @@ namespace BlueControls.Controls {
             set {
                 Develop.DebugPrint_Disposed(IsDisposed);
                 if (value < 0) { value = -1; }
-                if (Editor.Visible) { value = -1; }
+                if (grpEditor.Visible) { value = -1; }
                 if (value == _ShowingRowKey) { return; }
                 if (value > -1 && _Database == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Database is nothing"); }
                 if (!_Inited) {
@@ -159,13 +160,13 @@ namespace BlueControls.Controls {
 
         #region Methods
 
-        public static ColumnViewCollection SearchColumnView(ColumnItem Column) {
-            if (Column == null) { return null; }
-            foreach (var ThisView in Column.Database.Views) {
+        public static ColumnViewCollection SearchColumnView(ColumnItem column) {
+            if (column == null) { return null; }
+            foreach (var ThisView in column.Database.Views) {
                 if (ThisView != null) {
                     foreach (var thisViewItem in ThisView) {
                         if (thisViewItem?.Column != null) {
-                            if (thisViewItem.Column == Column) { return ThisView; }
+                            if (thisViewItem.Column == column) { return ThisView; }
                         }
                     }
                 }
@@ -233,8 +234,8 @@ namespace BlueControls.Controls {
         }
 
         public void HideViewEditor() {
-            if (!Editor.Visible) { return; }
-            Editor.Visible = false;
+            if (!grpEditor.Visible) { return; }
+            grpEditor.Visible = false;
             View_Init();
         }
 
@@ -263,8 +264,8 @@ namespace BlueControls.Controls {
             if (_Database != null && _Inited) {
                 Control_RepairSize_All();
             }
-            Editor.Left = Width - Editor.Width;
-            Editor.Height = Height;
+            grpEditor.Left = Width - grpEditor.Width;
+            grpEditor.Height = Height;
         }
 
         private void _Database_ColumnContentChanged(object sender, ListEventArgs e) {
@@ -351,78 +352,126 @@ namespace BlueControls.Controls {
             Control_Remove_All();
         }
 
-        private void cbxCaptionPosition_ItemClicked(object sender, BasicListItemEventArgs e) {
-            var Column = _Database.Column[EditorSelectedColumn()];
-            _ = SearchColumnView(Column);
+        private void btnAnsichtHinzufuegen_Click(object sender, System.EventArgs e) {
+            var ex = InputBox.Show("Geben sie den Namen<br>der neuen Ansicht ein:", "", enDataFormat.Text);
+            if (string.IsNullOrEmpty(ex)) { return; }
+            _Database.Views.Add(new ColumnViewCollection(_Database, "", ex));
+            RedoView();
+            SortColumnList();
+        }
+
+        private void btnAnsichtloeschen_Click(object sender, System.EventArgs e) {
+            var CurrView = CurrentView();
+            if (CurrView == null) { return; }
+            var i = _Database.Views.IndexOf(CurrView);
+            if (i < 1) { return; } // 0 darf auch nicht gelöscht werden
+            if (MessageBox.Show("Ansicht <b>'" + CurrView.Name + "'</b><br>wirklich löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+            _Database.Views.RemoveAt(i);
+            RedoView();
+            SortColumnList();
+        }
+
+        private void btnExitEditor_Click(object sender, System.EventArgs e) {
+            if (!grpEditor.Visible) { return; }
+            grpEditor.Visible = false;
+            View_Init();
+        }
+
+        private void btnGroesseLinks_Click(object sender, System.EventArgs e) {
+            var ViewItem = SearchViewItem(EditorSelectedColumn());
+            ViewItem?.KoordÄndern(0, -1, 0);
+            RedoView();
+            SortColumnList();
+        }
+
+        private void btnGroesseOben_Click(object sender, System.EventArgs e) {
+            var ViewItem = SearchViewItem(EditorSelectedColumn());
+            ViewItem?.KoordÄndern(0, 0, -1);
+            RedoView();
+            SortColumnList();
+        }
+
+        private void btnGroesseRechts_Click(object sender, System.EventArgs e) {
+            var ViewItem = SearchViewItem(EditorSelectedColumn());
+            ViewItem?.KoordÄndern(0, 1, 0);
+            RedoView();
+            SortColumnList();
+        }
+
+        private void btnGroesseUnten_Click(object sender, System.EventArgs e) {
+            var ViewItem = SearchViewItem(EditorSelectedColumn());
+            ViewItem?.KoordÄndern(0, 0, 1);
+            RedoView();
+            SortColumnList();
+        }
+
+        private void btnPositionLinks_Click(object sender, System.EventArgs e) {
+            var ViewItem = SearchViewItem(EditorSelectedColumn());
+            ViewItem?.KoordÄndern(-1, 0, 0);
+            RedoView();
+            SortColumnList();
+        }
+
+        private void btnPositionOben_Click(object sender, System.EventArgs e) {
+            var Column = EditorSelectedColumn();
+            var View = SearchColumnView(Column);
             var ViewItem = SearchViewItem(Column);
+            if (ViewItem != null) { View.Swap(ViewItem, ViewItem.PreviewsVisible(View)); }
+            RedoView();
+            SortColumnList();
+        }
+
+        private void btnPositionRechts_Click(object sender, System.EventArgs e) {
+            var ViewItem = SearchViewItem(EditorSelectedColumn());
+            ViewItem?.KoordÄndern(1, 0, 0);
+            RedoView();
+            SortColumnList();
+        }
+
+        private void btnRechteFuerAnsicht_Click(object sender, System.EventArgs e) {
+            var CurrView = CurrentView();
+            ItemCollectionList aa = new();
+            aa.AddRange(_Database.Permission_AllUsed(true));
+            aa.CheckBehavior = enCheckBehavior.MultiSelection;
+            aa.Check(CurrView.PermissionGroups_Show, true);
+            if (_Database.Views.Count > 1 && CurrView == _Database.Views[1]) {
+                aa["#Everybody"].Enabled = false;
+                aa["#Everybody"].Checked = true;
+            }
+            aa.Sort();
+            var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, enAddType.Text, true);
+            if (b == null) { return; }
+            CurrView.PermissionGroups_Show.Clear();
+            CurrView.PermissionGroups_Show.AddRange(b.ToArray());
+            CurrView.PermissionGroups_Show.RemoveString("#Administrator", false);
+            if (CurrView == _Database.Views[1]) { CurrView.PermissionGroups_Show.Add("#Everybody"); }
+        }
+
+        private void btnReiterNachLinks_Click(object sender, System.EventArgs e) => Arrangement_Swap(-1);
+
+        private void btnReiterNachRechts_Click(object sender, System.EventArgs e) => Arrangement_Swap(1);
+
+        private void btnRename_Click(object sender, System.EventArgs e) {
+            var CurrView = CurrentView();
+            if (CurrView == null || CurrView == _Database.Views[0]) { return; }
+            var n = InputBox.Show("Umbenennen:", CurrView.Name, enDataFormat.Text);
+            if (!string.IsNullOrEmpty(n)) { CurrView.Name = n; }
+            RedoView();
+            SortColumnList();
+        }
+
+        private void cbxCaptionPosition_ItemClicked(object sender, BasicListItemEventArgs e) {
+            var ViewItem = SearchViewItem(EditorSelectedColumn());
             if (ViewItem != null) { ViewItem.ÜberschriftAnordnung = (enÜberschriftAnordnung)int.Parse(cbxCaptionPosition.Text); }
             RedoView();
-            ColumnsEinfärben();
+            SortColumnList();
         }
 
         private void cbxControlType_ItemClicked(object sender, BasicListItemEventArgs e) {
-            var Column = _Database.Column[EditorSelectedColumn()];
-            _ = SearchColumnView(Column);
-            var ViewItem = SearchViewItem(Column);
+            var ViewItem = SearchViewItem(EditorSelectedColumn());
             if (ViewItem != null) { ViewItem.Column.EditType = (enEditTypeFormula)int.Parse(cbxControlType.Text); }
             RedoView();
-            ColumnsEinfärben();
-        }
-
-        private void ColumnsEinfärben() {
-            int ItC;
-            for (ItC = -1; ItC <= Tabs.TabCount + 100; ItC++) {
-                string Nam;
-                switch (ItC) {
-                    case -1:
-                        Nam = "Unbenutzt";
-                        break;
-
-                    case 0:
-                        Nam = "Kopfbereich";
-                        break;
-
-                    default: {
-                            if (ItC >= 1 && ItC <= _Database.Views.Count - 1) {
-                                if (_Database.Views[ItC] == null) {
-                                    Nam = string.Empty;
-                                } else {
-                                    Nam = _Database.Views[ItC].Name + " "; // Leerzeichen wegen evtl. leeren namen
-                                }
-                            } else {
-                                Nam = string.Empty;
-                            }
-                            break;
-                        }
-                }
-                var intName = "@Ansicht" + ItC.ToString();
-                if (string.IsNullOrEmpty(Nam)) {
-                    if (lbxColumns.Item[intName] != null) { lbxColumns.Item.Remove(intName); }
-                } else {
-                    if (lbxColumns.Item[intName] == null) { lbxColumns.Item.Add(Nam, intName, true, (ItC + 1).ToString(Constants.Format_Integer3) + "|A"); }
-                }
-            }
-            ItC = -1;
-            do {
-                if (lbxColumns.Item.RemoveNull()) { ItC = -1; }
-                ItC++;
-                if (ItC > lbxColumns.Item.Count - 1) { break; }
-                if (lbxColumns.Item[ItC] != null) {
-                    if (lbxColumns.Item[ItC].IsClickable()) {
-                        var ThisItem = (TextListItem)lbxColumns.Item[ItC];
-                        var co = (ColumnItem)ThisItem.Tag; //  _Database.Column[ThisItem.Internal];
-                        if (co == null) {
-                            lbxColumns.Item.Remove(ThisItem);
-                        } else {
-                            var cv = SearchColumnView(co);
-                            var Sort = cv == null ? 0 : _Database.Views.IndexOf(cv) + 1;
-                            ThisItem.UserDefCompareKey = Sort.ToString(Constants.Format_Integer3) + "|Z" + ThisItem.CompareKey(); // ObjectReadable.ReadableText
-                        }
-                    }
-                }
-            } while (true);
-            lbxColumns.Item.Sort();
-            lbxColumns.Invalidate();
+            SortColumnList();
         }
 
         private void Control_Create(ColumnViewItem cd, System.Windows.Forms.Control vParent) {
@@ -470,7 +519,7 @@ namespace BlueControls.Controls {
                 if (ViewN == 0) {
                     WidthInPixelOfParent = Width - 4;
                     HeightOfParent = Height;
-                    if (Editor.Visible) { WidthInPixelOfParent = Width - Editor.Width - 8; }
+                    if (grpEditor.Visible) { WidthInPixelOfParent = Width - grpEditor.Width - 8; }
                     MoveIn = 0;
                 } else {
                     HeightOfParent = Tabs.Height - Tabs.TabPages[Count - 1].Top;
@@ -541,13 +590,13 @@ namespace BlueControls.Controls {
         }
 
         private void Editor_CheckButtons(bool Blinki) {
-            if (!Editor.Visible) { return; }
+            if (!grpEditor.Visible) { return; }
             ColumnViewItem ViewItem = null;
             if (lbxColumns.Item.Checked().Count == 1) {
                 ViewItem = SearchViewItem(_Database.Column[lbxColumns.Item.Checked()[0].Internal]);
             }
-            x1.Enabled = ViewItem != null;
-            x2.Enabled = ViewItem != null;
+            grpPosition.Enabled = ViewItem != null;
+            grpGroesse.Enabled = ViewItem != null;
             cbxCaptionPosition.Enabled = ViewItem != null;
             cbxControlType.Enabled = ViewItem != null;
             if (ViewItem != null) {
@@ -571,43 +620,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        private string EditorSelectedColumn() => lbxColumns.Item.Checked().Count != 1 ? string.Empty : lbxColumns.Item.Checked()[0].Internal;
-
-        private void ELinks_Click(object sender, System.EventArgs e) {
-            var Column = _Database.Column[EditorSelectedColumn()];
-            _ = SearchColumnView(Column);
-            var ViewItem = SearchViewItem(Column);
-            ViewItem?.KoordÄndern(0, -1, 0);
-            RedoView();
-            ColumnsEinfärben();
-        }
-
-        private void EOben_Click(object sender, System.EventArgs e) {
-            var Column = _Database.Column[EditorSelectedColumn()];
-            _ = SearchColumnView(Column);
-            var ViewItem = SearchViewItem(Column);
-            ViewItem?.KoordÄndern(0, 0, -1);
-            RedoView();
-            ColumnsEinfärben();
-        }
-
-        private void ERechts_Click(object sender, System.EventArgs e) {
-            var Column = _Database.Column[EditorSelectedColumn()];
-            _ = SearchColumnView(Column);
-            var ViewItem = SearchViewItem(Column);
-            ViewItem?.KoordÄndern(0, 1, 0);
-            RedoView();
-            ColumnsEinfärben();
-        }
-
-        private void EUnten_Click(object sender, System.EventArgs e) {
-            var Column = _Database.Column[EditorSelectedColumn()];
-            _ = SearchColumnView(Column);
-            var ViewItem = SearchViewItem(Column);
-            ViewItem?.KoordÄndern(0, 0, 1);
-            RedoView();
-            ColumnsEinfärben();
-        }
+        private ColumnItem EditorSelectedColumn() => lbxColumns.Item.Checked().Count != 1 ? null : _Database.Column.SearchByKey(IntParse(lbxColumns.Item.Checked()[0].Internal));
 
         private void Generate_Tabs() {
             if (_Database.Views.Count < 1) { return; }
@@ -664,54 +677,12 @@ namespace BlueControls.Controls {
                     break;
             }
             RedoView();
-            ColumnsEinfärben();
+            SortColumnList();
         }
 
         private void lbxColumns_ItemCheckedChanged(object sender, System.EventArgs e) => Editor_CheckButtons(true);
 
-        private void Li_Click(object sender, System.EventArgs e) => Arrangement_Swap(-1);
-
         private void OnShowingRowChanged(RowEventArgs e) => ShowingRowChanged?.Invoke(this, e);
-
-        private void OrderAdd_Click(object sender, System.EventArgs e) {
-            var ex = InputBox.Show("Geben sie den Namen<br>der neuen Ansicht ein:", "", enDataFormat.Text);
-            if (string.IsNullOrEmpty(ex)) { return; }
-            _Database.Views.Add(new ColumnViewCollection(_Database, "", ex));
-            RedoView();
-            ColumnsEinfärben();
-        }
-
-        private void OrderDelete_Click(object sender, System.EventArgs e) {
-            var CurrView = CurrentView();
-            if (CurrView == null) { return; }
-            var i = _Database.Views.IndexOf(CurrView);
-            if (i < 1) { return; } // 0 darf auch nicht gelöscht werden
-            if (MessageBox.Show("Ansicht <b>'" + CurrView.Name + "'</b><br>wirklich löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-            _Database.Views.RemoveAt(i);
-            RedoView();
-            ColumnsEinfärben();
-        }
-
-        private void Re_Click(object sender, System.EventArgs e) => Arrangement_Swap(1);
-
-        private void Rechte_Click(object sender, System.EventArgs e) {
-            var CurrView = CurrentView();
-            ItemCollectionList aa = new();
-            aa.AddRange(_Database.Permission_AllUsed(true));
-            aa.CheckBehavior = enCheckBehavior.MultiSelection;
-            aa.Check(CurrView.PermissionGroups_Show, true);
-            if (_Database.Views.Count > 1 && CurrView == _Database.Views[1]) {
-                aa["#Everybody"].Enabled = false;
-                aa["#Everybody"].Checked = true;
-            }
-            aa.Sort();
-            var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, enAddType.Text, true);
-            if (b == null) { return; }
-            CurrView.PermissionGroups_Show.Clear();
-            CurrView.PermissionGroups_Show.AddRange(b.ToArray());
-            CurrView.PermissionGroups_Show.RemoveString("#Administrator", false);
-            if (CurrView == _Database.Views[1]) { CurrView.PermissionGroups_Show.Add("#Everybody"); }
-        }
 
         private void RedoView() {
             var i = Tabs.SelectedIndex;
@@ -747,15 +718,6 @@ namespace BlueControls.Controls {
             vObject.Dispose();
         }
 
-        private void Rename_Click(object sender, System.EventArgs e) {
-            var CurrView = CurrentView();
-            if (CurrView == null || CurrView == _Database.Views[0]) { return; }
-            var n = InputBox.Show("Umbenennen:", CurrView.Name, enDataFormat.Text);
-            if (!string.IsNullOrEmpty(n)) { CurrView.Name = n; }
-            RedoView();
-            ColumnsEinfärben();
-        }
-
         private ColumnViewItem SearchViewItem(ColumnItem Column) {
             var ThisView = SearchColumnView(Column);
             return ThisView?[Column];
@@ -765,8 +727,8 @@ namespace BlueControls.Controls {
             var SPH = 1;
             var SPF = 1;
             var WidthOfParent = Width - 4;
-            if (Editor.Visible) {
-                WidthOfParent = Width - Editor.Width - 8;
+            if (grpEditor.Visible) {
+                WidthOfParent = Width - grpEditor.Width - 8;
             }
             foreach (var ThisView in _Database.Views) {
                 if (_Database.Views.IndexOf(ThisView) == 0) {
@@ -787,64 +749,91 @@ namespace BlueControls.Controls {
         }
 
         private void ShowViewEditor() {
-            if (_Database == null) { return; }
-            if (Editor.Visible) { return; }
-            if (!_Database.IsAdministrator()) { return; }
+            if (_Database == null || grpEditor.Visible || !_Database.IsAdministrator()) { return; }
+
             _Database.Load_Reload();
             _Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
+
             if (!_Inited) { View_Init(); }
+
             ShowingRowKey = -1;
+
             lbxColumns.Item.Clear();
-            lbxColumns.Item.AddRange(_Database.Column, false, false, false);
+            lbxColumns.Item.AddRange(_Database.Column, false);
             lbxColumns.Item.Sort();
+
             cbxCaptionPosition.Item.AddRange(typeof(enÜberschriftAnordnung));
             cbxControlType.Item.Clear();
             Editor_CheckButtons(false);
-            Editor.Visible = true;
+            grpEditor.Visible = true;
+
             View_Init();
-            ColumnsEinfärben();
+            SortColumnList();
         }
 
-        private void SLinks_Click(object sender, System.EventArgs e) {
-            var Column = _Database.Column[EditorSelectedColumn()];
-            _ = SearchColumnView(Column);
-            var ViewItem = SearchViewItem(Column);
-            ViewItem?.KoordÄndern(-1, 0, 0);
-            RedoView();
-            ColumnsEinfärben();
-        }
+        private void SortColumnList() {
 
-        private void SOben_Click(object sender, System.EventArgs e) {
-            var Column = _Database.Column[EditorSelectedColumn()];
-            var View = SearchColumnView(Column);
-            var ViewItem = SearchViewItem(Column);
-            if (ViewItem != null) { View.Swap(ViewItem, ViewItem.PreviewsVisible(View)); }
-            RedoView();
-            ColumnsEinfärben();
-        }
+            #region Zuerst die Überschriften (Namen der Views) erstellen oder löschen
 
-        private void SpaltBEnde_Click(object sender, System.EventArgs e) {
-            if (!Editor.Visible) { return; }
-            Editor.Visible = false;
-            View_Init();
-        }
+            for (var viewNo = -1; viewNo < _Database.Views.Count; viewNo++) {
+                string Nam;
+                switch (viewNo) {
+                    case -1:
+                        Nam = "Unbenutzt";
+                        break;
 
-        private void SRechts_Click(object sender, System.EventArgs e) {
-            var Column = _Database.Column[EditorSelectedColumn()];
-            _ = SearchColumnView(Column);
-            var ViewItem = SearchViewItem(Column);
-            ViewItem?.KoordÄndern(1, 0, 0);
-            RedoView();
-            ColumnsEinfärben();
+                    case 0:
+                        Nam = "Kopfbereich";
+                        break;
+
+                    default:
+                        Nam = _Database.Views[viewNo] == null ? string.Empty : _Database.Views[viewNo].Name + " "; // Leerzeichen wegen evtl. leeren namen
+                        break;
+                }
+
+                var intName = "@Ansicht" + viewNo.ToString();
+                if (string.IsNullOrEmpty(Nam)) {
+                    if (lbxColumns.Item[intName] != null) { lbxColumns.Item.Remove(intName); }
+                } else {
+                    if (lbxColumns.Item[intName] == null) { lbxColumns.Item.Add(Nam, intName, true, (viewNo + 1).ToString(Constants.Format_Integer3) + "|A"); }
+                }
+            }
+
+            #endregion
+
+            #region Dann die Spalten den Überschriften zuordnen
+
+            var columNo = -1;
+            do {
+                if (lbxColumns.Item.RemoveNull()) { columNo = -1; }
+                columNo++;
+                if (columNo > lbxColumns.Item.Count - 1) { break; }
+
+                if (lbxColumns.Item[columNo] is TextListItem ThisItem && ThisItem.IsClickable()) {
+                    var co = (ColumnItem)ThisItem.Tag;
+                    if (co == null) {
+                        lbxColumns.Item.Remove(ThisItem);
+                    } else {
+                        var cv = SearchColumnView(co);
+                        var Sort = cv == null ? 0 : _Database.Views.IndexOf(cv) + 1;
+                        ThisItem.UserDefCompareKey = Sort.ToString(Constants.Format_Integer3) + "|Z" + ThisItem.CompareKey();
+                    }
+                }
+            } while (true);
+
+            #endregion
+
+            lbxColumns.Item.Sort();
+            lbxColumns.Invalidate();
         }
 
         private void SUnten_Click(object sender, System.EventArgs e) {
-            var Column = _Database.Column[EditorSelectedColumn()];
+            var Column = EditorSelectedColumn();
             var View = SearchColumnView(Column);
             var ViewItem = SearchViewItem(Column);
             if (ViewItem != null) { View.Swap(ViewItem, ViewItem.NextVisible(View)); }
             RedoView();
-            ColumnsEinfärben();
+            SortColumnList();
         }
 
         private void Tabs_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {

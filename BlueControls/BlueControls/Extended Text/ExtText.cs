@@ -522,7 +522,7 @@ namespace BlueControls {
                     break;
 
                 case "FONTSIZE":
-                    PF = BlueFont.Get(PF.FontName, modConverter.FloatParse(Attribut), PF.Bold, PF.Italic, PF.Underline, PF.StrikeOut, PF.Outline, PF.Color_Main, PF.Color_Outline, PF.Kapitälchen, PF.OnlyUpper, PF.OnlyLower);
+                    PF = BlueFont.Get(PF.FontName, Converter.FloatParse(Attribut), PF.Bold, PF.Italic, PF.Underline, PF.StrikeOut, PF.Outline, PF.Color_Main, PF.Color_Outline, PF.Kapitälchen, PF.OnlyUpper, PF.OnlyLower);
                     break;
 
                 case "FONTNAME":

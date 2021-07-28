@@ -19,7 +19,6 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
-using BlueBasics.MultiUserFile;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using System;
@@ -95,15 +94,17 @@ namespace BlueDatabase {
         /// <summary>
         /// ...zusätzlich folgende Zeichenkette hinzufügen
         /// </summary>
+        [Obsolete]
         private string _LinkedCell_ColumnValueAdd;
 
         /// <summary>
         /// Die zu suchende Spalte ist in dieser Spalte zu finden
         /// </summary>
+        [Obsolete]
         private int _LinkedCell_ColumnValueFoundIn;
 
         /// <summary>
-        /// Die zu Suchende ZEile ist in dieser Spalte zu finden
+        /// Die zu suchende Zeile ist in dieser Spalte zu finden
         /// </summary>
         private int _LinkedCell_RowKey;
 
@@ -623,6 +624,7 @@ namespace BlueDatabase {
             }
         }
 
+        [Obsolete]
         public string LinkedCell_ColumnValueAdd {
             get => _LinkedCell_ColumnValueAdd;
             set {
@@ -633,6 +635,7 @@ namespace BlueDatabase {
             }
         }
 
+        [Obsolete]
         public int LinkedCell_ColumnValueFoundIn {
             get => _LinkedCell_ColumnValueFoundIn;
             set {

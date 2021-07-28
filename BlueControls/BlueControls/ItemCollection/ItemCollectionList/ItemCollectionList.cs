@@ -326,17 +326,6 @@ namespace BlueControls.ItemCollection {
             return i;
         }
 
-        //public BasicListItem Add(clsNamedBinary binary) {
-        //    if (binary.Picture != null) {
-        //        return Add(binary.Picture, binary.Name);
-        //    } else {
-        //        return Add(binary.Name, binary.Binary);
-        //    }
-        //}
-        public TextListItem Add(ColumnItem column, bool doCaptionSort) => doCaptionSort
-? Add(column, column.Name, column.Ueberschriften + Constants.SecondSortChar + column.Name)
-: Add(column, column.Name, string.Empty);
-
         public TextListItem Add(enContextMenuComands comand, bool enabled = true) {
             var _Internal = comand.ToString();
             QuickImage _Symbol;
@@ -470,25 +459,12 @@ namespace BlueControls.ItemCollection {
             return null;
         }
 
-        public void AddRange(ColumnCollection Columns, bool OnlyExportableTextformatForLayout, bool NoCritical, bool DoCaptionSort) {
-            foreach (var ThisColumnItem in Columns) {
-                if (ThisColumnItem != null) {
-                    var addx = true;
-                    if (addx && OnlyExportableTextformatForLayout && !ThisColumnItem.ExportableTextformatForLayout()) { addx = false; }
-                    if (addx && NoCritical && !ThisColumnItem.Format.CanBeCheckedByRules()) { addx = false; }
-                    if (addx && this[ThisColumnItem.Name] != null) { addx = false; }
-                    if (addx) {
-                        Add(ThisColumnItem, DoCaptionSort);
-                        if (DoCaptionSort) {
-                            var capt = ThisColumnItem.Ueberschriften;
-                            if (this[capt] == null) {
-                                Add(new TextListItem(capt, capt, null, true, true, capt + Constants.FirstSortChar));
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        /// <summary>
+        /// Fügt die Spalte hinzu. Als interner Name wird der Column.Key verwendet.
+        /// </summary>
+        /// <param name="column"></param>
+        /// <returns></returns>
+        public TextListItem Add(ColumnItem column) => Add(column, column.Key.ToString());
 
         public void AddRange(Type type) {
             foreach (int z1 in Enum.GetValues(type)) {
@@ -522,21 +498,33 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        ///// <summary>
-        ///// Kann mit GetNamedBinaries zurückgeholt werden
-        ///// </summary>
-        ///// <param name="list"></param>
-        //public void AddRange(ListExt<clsNamedBinary> list) {
-        //    if (list == null) { return; }
-        //    foreach (var ThisBin in list) {
-        //        Add(ThisBin);
-        //    }
-        //}
         public void AddRange(List<string> list) {
             if (list == null) { return; }
             foreach (var thisstring in list) {
                 if (!string.IsNullOrEmpty(thisstring)) {
                     if (this[thisstring] == null) { Add(thisstring, thisstring); }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Fügt die Spalte hinzu. Als interner Name wird der Column.Key verwendet.
+        /// </summary>
+        /// <param name="columns"></param>
+        /// <param name="doCaptionSort">Bei True werden auch die Überschriften der Spalte als Text hinzugefügt und auch danach sortiert</param>
+        public void AddRange(ColumnCollection columns, bool doCaptionSort) {
+            foreach (var ThisColumnItem in columns) {
+                if (ThisColumnItem != null) {
+                    var co = Add(ThisColumnItem);
+
+                    if (doCaptionSort) {
+                        co.UserDefCompareKey = ThisColumnItem.Ueberschriften + Constants.SecondSortChar + ThisColumnItem.Name;
+
+                        var capt = ThisColumnItem.Ueberschriften;
+                        if (this[capt] == null) {
+                            Add(new TextListItem(capt, capt, null, true, true, capt + Constants.FirstSortChar));
+                        }
+                    }
                 }
             }
         }

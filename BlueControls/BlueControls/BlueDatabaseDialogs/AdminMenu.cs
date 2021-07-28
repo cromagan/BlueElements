@@ -27,6 +27,7 @@ using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using System;
 using static BlueBasics.FileOperations;
+using static BlueBasics.Converter;
 
 namespace BlueControls.BlueDatabaseDialogs {
 
@@ -209,7 +210,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void btnSpalteEinblenden_Click(object sender, System.EventArgs e) {
             ItemCollectionList ic = new();
             foreach (var ThisColumnItem in _TableView.Database.Column) {
-                if (ThisColumnItem != null && _TableView.CurrentArrangement[ThisColumnItem] == null) { ic.Add(ThisColumnItem, false); }
+                if (ThisColumnItem != null && _TableView.CurrentArrangement[ThisColumnItem] == null) { ic.Add(ThisColumnItem); }
             }
             if (ic.Count == 0) {
                 if (MessageBox.Show("Es werden bereits alle<br>Spalten angezeigt.<br><br>Wollen sie eine neue Spalte erstellen?", enImageCode.Frage, "Ja", "Nein") == 0) { btnNeueSpalteErstellen_Click(sender, e); }
@@ -218,7 +219,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             ic.Sort();
             var r = InputBoxListBoxStyle.Show("Wählen sie:", ic, enAddType.None, true);
             if (r == null || r.Count == 0) { return; }
-            _TableView.CurrentArrangement.Add(_TableView.Database.Column[r[0]], false);
+            _TableView.CurrentArrangement.Add(_TableView.Database.Column.SearchByKey(IntParse(r[0])), false);
             _TableView.Invalidate_HeadSize();
         }
 
@@ -335,6 +336,5 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void UpdateViewControls() => _TableView.WriteColumnArrangementsInto(cbxInternalColumnArrangementSelector);
 
         #endregion
-
     }
 }

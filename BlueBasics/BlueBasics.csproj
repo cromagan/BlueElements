@@ -150,8 +150,8 @@
     <Compile Include="modFernsteuerung.cs" />
     <Compile Include="Enums\enSizeModes.cs" />
     <Compile Include="Extensions\ColorExtension.cs" />
-    <Compile Include="modConverter.cs" />
-    <Compile Include="modTastaturSimulation.cs" />
+    <Compile Include="Converter.cs" />
+    <Compile Include="KeyboardSimulation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Application.Designer.cs">
       <AutoGen>True</AutoGen>

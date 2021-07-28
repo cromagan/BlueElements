@@ -55,11 +55,11 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Für.Name = "Für";
             this.Für.Size = new System.Drawing.Size(320, 18);
             // 
-            // Caption2
+            // capBearbeitungsMethode
             // 
             this.Caption2.CausesValidation = false;
             this.Caption2.Location = new System.Drawing.Point(8, 64);
-            this.Caption2.Name = "Caption2";
+            this.Caption2.Name = "capBearbeitungsMethode";
             this.Caption2.Size = new System.Drawing.Size(176, 18);
             this.Caption2.Text = "Wert ist bzw. enthält Text:";
             // 

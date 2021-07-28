@@ -20,7 +20,7 @@ using Skript.Enums;
 using System.Collections.Generic;
 using System.Drawing;
 using static BlueBasics.Extensions;
-using static BlueBasics.modConverter;
+using static BlueBasics.Converter;
 
 namespace BlueScript {
 

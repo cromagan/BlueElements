@@ -202,7 +202,7 @@ namespace BlueControls.Controls {
             if (f is null) { return null; }
 
             var Picture = BitmapExt.Image_FromFile(f[0]);
-            return Picture != null ? Item.Add((Bitmap)Picture, f[0]) : Item.Add(modConverter.FileToByte(f[0]), f[0]);
+            return Picture != null ? Item.Add((Bitmap)Picture, f[0]) : Item.Add(Converter.FileToByte(f[0]), f[0]);
         }
 
         public TextListItem Add_Text(string Val) {

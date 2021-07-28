@@ -562,10 +562,10 @@ namespace BlueControls.Controls {
                 case "dateiöffnen":
                     if (e.HotItem is TextListItem t) {
                         if (FileExists(t.Internal)) {
-                            var b = modConverter.FileToByte(t.Internal);
+                            var b = Converter.FileToByte(t.Internal);
                             b = Cryptography.SimpleCrypt(b, FileEncryptionKey, -1);
                             var tmp = TempFile(string.Empty, string.Empty, t.Internal.FileSuffix());
-                            modConverter.ByteToFile(tmp, b);
+                            Converter.ByteToFile(tmp, b);
                             ExecuteFile(tmp, null, true, false);
                             MessageBox.Show("Warte...");
                             DeleteFile(tmp, true);

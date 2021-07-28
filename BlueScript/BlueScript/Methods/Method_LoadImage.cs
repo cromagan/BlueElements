@@ -16,7 +16,6 @@
 // DEALINGS IN THE SOFTWARE.
 
 using Skript.Enums;
-using static BlueBasics.Extensions;
 using System.Collections.Generic;
 using System.Drawing;
 using BlueBasics;

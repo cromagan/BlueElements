@@ -30,7 +30,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using static BlueBasics.FileOperations;
-using static BlueBasics.modConverter;
+using static BlueBasics.Converter;
 
 namespace BlueControls.BlueDatabaseDialogs {
 

@@ -147,7 +147,7 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "image":
-                    Bitmap = modConverter.Base64ToBitmap(value);
+                    Bitmap = Converter.Base64ToBitmap(value);
                     return true;
 
                 case "placeholder":
@@ -194,7 +194,7 @@ namespace BlueControls.ItemCollection {
             }
             t = t + "Padding=" + Padding + ", ";
             if (Bitmap != null) {
-                t = t + "Image=" + modConverter.BitmapToBase64(Bitmap, ImageFormat.Png) + ", ";
+                t = t + "Image=" + Converter.BitmapToBase64(Bitmap, ImageFormat.Png) + ", ";
             }
             return t.Trim(", ") + "}";
         }

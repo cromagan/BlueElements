@@ -5,6 +5,7 @@ using BlueControls.Forms;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System.Drawing;
+using static BlueBasics.Converter;
 
 namespace BlueControls.Classes_Editor {
 
@@ -12,7 +13,7 @@ namespace BlueControls.Classes_Editor {
     {
         #region Fields
 
-        private AutoFilter autofilter;
+        private AutoFilter _autofilter;
 
         #endregion
 
@@ -26,19 +27,19 @@ namespace BlueControls.Classes_Editor {
 
         protected override void DisableAndClearFormula() {
             Enabled = false;
-            Col.Text = string.Empty;
+            cbxColumns.Text = string.Empty;
         }
 
         protected override void EnabledAndFillFormula() {
             Enabled = true;
             if (Item?.Column == null) {
-                Col.Text = string.Empty;
+                cbxColumns.Text = string.Empty;
                 return;
             }
-            Col.Text = Item.Column.Name;
+            cbxColumns.Text = Item.Column.Key.ToString();
         }
 
-        protected override void PrepaireFormula() => Col.Item.AddRange(Item.Database.Column, false, false, true);
+        protected override void PrepaireFormula() => cbxColumns.Item.AddRange(Item.Database.Column, true);
 
         private void AutoFilter_FilterComand(object sender, FilterComandEventArgs e) {
             if (IsFilling) { return; }
@@ -52,27 +53,27 @@ namespace BlueControls.Classes_Editor {
             OnChanged(Item);
         }
 
-        private void Col_TextChanged(object sender, System.EventArgs e) {
+        private void btnFilterWahl_Click(object sender, System.EventArgs e) {
+            var c = Item.Database.Column.SearchByKey(IntParse(cbxColumns.Text));
+            if (c == null || !c.AutoFilterSymbolPossible()) { return; }
+            FilterCollection tmpfc = new(Item.Database);
+            if (Item.FilterType != enFilterType.KeinFilter) { tmpfc.Add(Item); }
+            _autofilter = new AutoFilter(c, tmpfc, null);
+            var p = btnFilterWahl.PointToScreen(Point.Empty);
+            _autofilter.Position_LocateToPosition(new Point(p.X, p.Y + btnFilterWahl.Height));
+            _autofilter.Show();
+            _autofilter.FilterComand += AutoFilter_FilterComand;
+            Develop.Debugprint_BackgroundThread();
+        }
+
+        private void cbxColumns_TextChanged(object sender, System.EventArgs e) {
             if (IsFilling) { return; }
-            var c = Item.Database.Column[Col.Text];
-            FiltWahl.Enabled = c == null || c.AutoFilterSymbolPossible() || true;
+            var c = Item.Database.Column.SearchByKey(IntParse(cbxColumns.Text));
+            btnFilterWahl.Enabled = c == null || c.AutoFilterSymbolPossible() || true;
             Item.Column = c;
             Item.FilterType = enFilterType.KeinFilter;
             Item.SearchValue.Clear();
             OnChanged(Item);
-        }
-
-        private void FiltWahl_Click(object sender, System.EventArgs e) {
-            var c = Item.Database.Column[Col.Text];
-            if (c == null || !c.AutoFilterSymbolPossible()) { return; }
-            FilterCollection tmpfc = new(Item.Database);
-            if (Item.FilterType != enFilterType.KeinFilter) { tmpfc.Add(Item); }
-            autofilter = new AutoFilter(c, tmpfc, null);
-            var p = FiltWahl.PointToScreen(Point.Empty);
-            autofilter.Position_LocateToPosition(new Point(p.X, p.Y + FiltWahl.Height));
-            autofilter.Show();
-            autofilter.FilterComand += AutoFilter_FilterComand;
-            Develop.Debugprint_BackgroundThread();
         }
 
         #endregion

@@ -29,7 +29,7 @@ using System.Drawing.Printing;
 using System.IO;
 using System.Windows.Forms;
 using static BlueBasics.FileOperations;
-using static BlueBasics.modConverter;
+using static BlueBasics.Converter;
 
 namespace BlueControls.Forms {
 

@@ -18,7 +18,7 @@
 using Skript.Enums;
 using System.Collections.Generic;
 using static BlueBasics.Constants;
-using static BlueBasics.modConverter;
+using static BlueBasics.Converter;
 
 namespace BlueScript {
 

@@ -17,10 +17,8 @@
 
 using BlueBasics;
 using BlueDatabase;
-using BlueDatabase.Enums;
 using Skript.Enums;
 using System.Collections.Generic;
-using static BlueBasics.modConverter;
 
 namespace BlueScript {
 

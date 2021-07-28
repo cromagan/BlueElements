@@ -14,35 +14,35 @@ namespace BlueControls.Controls
         private void InitializeComponent()
         {
             this.Tabs = new BlueControls.Controls.TabControl();
-            this.Editor = new BlueControls.Controls.GroupBox();
-            this.Caption2 = new BlueControls.Controls.Caption();
-            this.Re = new BlueControls.Controls.Button();
-            this.Li = new BlueControls.Controls.Button();
+            this.grpEditor = new BlueControls.Controls.GroupBox();
+            this.capBearbeitungsMethode = new BlueControls.Controls.Caption();
+            this.btnReiterNachRechts = new BlueControls.Controls.Button();
+            this.btnReiterNachLinks = new BlueControls.Controls.Button();
             this.lbxColumns = new BlueControls.Controls.ListBox();
             this.capUeberschrift = new BlueControls.Controls.Caption();
             this.BlueLine2 = new BlueControls.Controls.Line();
             this.cbxControlType = new BlueControls.Controls.ComboBox();
             this.cbxCaptionPosition = new BlueControls.Controls.ComboBox();
             this.BlueLine1 = new BlueControls.Controls.Line();
-            this.x2 = new BlueControls.Controls.GroupBox();
-            this.ERechts = new BlueControls.Controls.Button();
-            this.EOben = new BlueControls.Controls.Button();
-            this.ELinks = new BlueControls.Controls.Button();
-            this.EUnten = new BlueControls.Controls.Button();
-            this.x1 = new BlueControls.Controls.GroupBox();
-            this.SRechts = new BlueControls.Controls.Button();
-            this.SOben = new BlueControls.Controls.Button();
-            this.SLinks = new BlueControls.Controls.Button();
-            this.SUnten = new BlueControls.Controls.Button();
-            this.Rename = new BlueControls.Controls.Button();
-            this.SpaltBEnde = new BlueControls.Controls.Button();
-            this.Rechtex = new BlueControls.Controls.Button();
-            this.OrderDelete = new BlueControls.Controls.Button();
-            this.OrderAdd = new BlueControls.Controls.Button();
+            this.grpGroesse = new BlueControls.Controls.GroupBox();
+            this.btnGroesseRechts = new BlueControls.Controls.Button();
+            this.btnGroesseOben = new BlueControls.Controls.Button();
+            this.btnGroesseLinks = new BlueControls.Controls.Button();
+            this.btnGroesseUnten = new BlueControls.Controls.Button();
+            this.grpPosition = new BlueControls.Controls.GroupBox();
+            this.btnPositionRechts = new BlueControls.Controls.Button();
+            this.btnPositionOben = new BlueControls.Controls.Button();
+            this.btnPositionLinks = new BlueControls.Controls.Button();
+            this.btnPositionUnten = new BlueControls.Controls.Button();
+            this.btnRename = new BlueControls.Controls.Button();
+            this.btnExitEditor = new BlueControls.Controls.Button();
+            this.btnRechteFuerAnsicht = new BlueControls.Controls.Button();
+            this.btnAnsichtloeschen = new BlueControls.Controls.Button();
+            this.btnAnsichtHinzufuegen = new BlueControls.Controls.Button();
             this.ColDiax = new System.Windows.Forms.ColorDialog();
-            this.Editor.SuspendLayout();
-            this.x2.SuspendLayout();
-            this.x1.SuspendLayout();
+            this.grpEditor.SuspendLayout();
+            this.grpGroesse.SuspendLayout();
+            this.grpPosition.SuspendLayout();
             this.SuspendLayout();
             // 
             // Tabs
@@ -54,59 +54,59 @@ namespace BlueControls.Controls
             this.Tabs.TabIndex = 2;
             this.Tabs.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Tabs_MouseUp);
             // 
-            // Editor
+            // grpEditor
             // 
-            this.Editor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.grpEditor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.Editor.CausesValidation = false;
-            this.Editor.Controls.Add(this.Caption2);
-            this.Editor.Controls.Add(this.Re);
-            this.Editor.Controls.Add(this.Li);
-            this.Editor.Controls.Add(this.lbxColumns);
-            this.Editor.Controls.Add(this.capUeberschrift);
-            this.Editor.Controls.Add(this.BlueLine2);
-            this.Editor.Controls.Add(this.cbxControlType);
-            this.Editor.Controls.Add(this.cbxCaptionPosition);
-            this.Editor.Controls.Add(this.BlueLine1);
-            this.Editor.Controls.Add(this.x2);
-            this.Editor.Controls.Add(this.x1);
-            this.Editor.Controls.Add(this.Rename);
-            this.Editor.Controls.Add(this.SpaltBEnde);
-            this.Editor.Controls.Add(this.Rechtex);
-            this.Editor.Controls.Add(this.OrderDelete);
-            this.Editor.Controls.Add(this.OrderAdd);
-            this.Editor.Location = new System.Drawing.Point(144, 0);
-            this.Editor.Name = "Editor";
-            this.Editor.Size = new System.Drawing.Size(176, 347);
-            this.Editor.Text = "Formular-Editor:";
-            this.Editor.Visible = false;
+            this.grpEditor.CausesValidation = false;
+            this.grpEditor.Controls.Add(this.capBearbeitungsMethode);
+            this.grpEditor.Controls.Add(this.btnReiterNachRechts);
+            this.grpEditor.Controls.Add(this.btnReiterNachLinks);
+            this.grpEditor.Controls.Add(this.lbxColumns);
+            this.grpEditor.Controls.Add(this.capUeberschrift);
+            this.grpEditor.Controls.Add(this.BlueLine2);
+            this.grpEditor.Controls.Add(this.cbxControlType);
+            this.grpEditor.Controls.Add(this.cbxCaptionPosition);
+            this.grpEditor.Controls.Add(this.BlueLine1);
+            this.grpEditor.Controls.Add(this.grpGroesse);
+            this.grpEditor.Controls.Add(this.grpPosition);
+            this.grpEditor.Controls.Add(this.btnRename);
+            this.grpEditor.Controls.Add(this.btnExitEditor);
+            this.grpEditor.Controls.Add(this.btnRechteFuerAnsicht);
+            this.grpEditor.Controls.Add(this.btnAnsichtloeschen);
+            this.grpEditor.Controls.Add(this.btnAnsichtHinzufuegen);
+            this.grpEditor.Location = new System.Drawing.Point(144, 0);
+            this.grpEditor.Name = "grpEditor";
+            this.grpEditor.Size = new System.Drawing.Size(176, 347);
+            this.grpEditor.Text = "Formular-Editor:";
+            this.grpEditor.Visible = false;
             // 
-            // Caption2
+            // capBearbeitungsMethode
             // 
-            this.Caption2.Location = new System.Drawing.Point(8, 272);
-            this.Caption2.Name = "Caption2";
-            this.Caption2.Size = new System.Drawing.Size(130, 16);
-            this.Caption2.Text = "Bearbeitungs-Methode:";
+            this.capBearbeitungsMethode.Location = new System.Drawing.Point(8, 272);
+            this.capBearbeitungsMethode.Name = "capBearbeitungsMethode";
+            this.capBearbeitungsMethode.Size = new System.Drawing.Size(130, 16);
+            this.capBearbeitungsMethode.Text = "Bearbeitungs-Methode:";
             // 
-            // Re
+            // btnReiterNachRechts
             // 
-            this.Re.ImageCode = "Pfeil_Rechts|16";
-            this.Re.Location = new System.Drawing.Point(144, 24);
-            this.Re.Name = "Re";
-            this.Re.QuickInfo = "Reiter-Anordnung ändern";
-            this.Re.Size = new System.Drawing.Size(24, 24);
-            this.Re.TabIndex = 41;
-            this.Re.Click += new System.EventHandler(this.Re_Click);
+            this.btnReiterNachRechts.ImageCode = "Pfeil_Rechts|16";
+            this.btnReiterNachRechts.Location = new System.Drawing.Point(144, 24);
+            this.btnReiterNachRechts.Name = "btnReiterNachRechts";
+            this.btnReiterNachRechts.QuickInfo = "Reiter-Anordnung ändern";
+            this.btnReiterNachRechts.Size = new System.Drawing.Size(24, 24);
+            this.btnReiterNachRechts.TabIndex = 41;
+            this.btnReiterNachRechts.Click += new System.EventHandler(this.btnReiterNachRechts_Click);
             // 
-            // Li
+            // btnReiterNachLinks
             // 
-            this.Li.ImageCode = "Pfeil_Links|16";
-            this.Li.Location = new System.Drawing.Point(120, 24);
-            this.Li.Name = "Li";
-            this.Li.QuickInfo = "Reiter-Anordnung ändern";
-            this.Li.Size = new System.Drawing.Size(24, 24);
-            this.Li.TabIndex = 40;
-            this.Li.Click += new System.EventHandler(this.Li_Click);
+            this.btnReiterNachLinks.ImageCode = "Pfeil_Links|16";
+            this.btnReiterNachLinks.Location = new System.Drawing.Point(120, 24);
+            this.btnReiterNachLinks.Name = "Li";
+            this.btnReiterNachLinks.QuickInfo = "Reiter-Anordnung ändern";
+            this.btnReiterNachLinks.Size = new System.Drawing.Size(24, 24);
+            this.btnReiterNachLinks.TabIndex = 40;
+            this.btnReiterNachLinks.Click += new System.EventHandler(this.btnReiterNachLinks_Click);
             // 
             // lbxColumns
             // 
@@ -169,193 +169,193 @@ namespace BlueControls.Controls
             this.BlueLine1.Size = new System.Drawing.Size(160, 2);
             this.BlueLine1.Text = "BlueLine1";
             // 
-            // x2
+            // grpGroesse
             // 
-            this.x2.CausesValidation = false;
-            this.x2.Controls.Add(this.ERechts);
-            this.x2.Controls.Add(this.EOben);
-            this.x2.Controls.Add(this.ELinks);
-            this.x2.Controls.Add(this.EUnten);
-            this.x2.Enabled = false;
-            this.x2.Location = new System.Drawing.Point(88, 96);
-            this.x2.Name = "x2";
-            this.x2.Size = new System.Drawing.Size(80, 120);
-            this.x2.Text = "Ende";
+            this.grpGroesse.CausesValidation = false;
+            this.grpGroesse.Controls.Add(this.btnGroesseRechts);
+            this.grpGroesse.Controls.Add(this.btnGroesseOben);
+            this.grpGroesse.Controls.Add(this.btnGroesseLinks);
+            this.grpGroesse.Controls.Add(this.btnGroesseUnten);
+            this.grpGroesse.Enabled = false;
+            this.grpGroesse.Location = new System.Drawing.Point(88, 96);
+            this.grpGroesse.Name = "grpGroesse";
+            this.grpGroesse.Size = new System.Drawing.Size(80, 120);
+            this.grpGroesse.Text = "Ende";
             // 
-            // ERechts
+            // btnGroesseRechts
             // 
-            this.ERechts.ImageCode = "Pfeil_Rechts|12|||0088FF";
-            this.ERechts.Location = new System.Drawing.Point(40, 48);
-            this.ERechts.Name = "ERechts";
-            this.ERechts.Size = new System.Drawing.Size(32, 32);
-            this.ERechts.TabIndex = 5;
-            this.ERechts.Click += new System.EventHandler(this.ERechts_Click);
+            this.btnGroesseRechts.ImageCode = "Pfeil_Rechts|12|||0088FF";
+            this.btnGroesseRechts.Location = new System.Drawing.Point(40, 48);
+            this.btnGroesseRechts.Name = "btnGroesseRechts";
+            this.btnGroesseRechts.Size = new System.Drawing.Size(32, 32);
+            this.btnGroesseRechts.TabIndex = 5;
+            this.btnGroesseRechts.Click += new System.EventHandler(this.btnGroesseRechts_Click);
             // 
-            // EOben
+            // btnGroesseOben
             // 
-            this.EOben.ImageCode = "Pfeil_Oben|16|||0088FF";
-            this.EOben.Location = new System.Drawing.Point(24, 16);
-            this.EOben.Name = "EOben";
-            this.EOben.Size = new System.Drawing.Size(32, 32);
-            this.EOben.TabIndex = 37;
-            this.EOben.Click += new System.EventHandler(this.EOben_Click);
+            this.btnGroesseOben.ImageCode = "Pfeil_Oben|16|||0088FF";
+            this.btnGroesseOben.Location = new System.Drawing.Point(24, 16);
+            this.btnGroesseOben.Name = "btnGroesseOben";
+            this.btnGroesseOben.Size = new System.Drawing.Size(32, 32);
+            this.btnGroesseOben.TabIndex = 37;
+            this.btnGroesseOben.Click += new System.EventHandler(this.btnGroesseOben_Click);
             // 
-            // ELinks
+            // btnGroesseLinks
             // 
-            this.ELinks.ImageCode = "Pfeil_Links|12|||0088FF";
-            this.ELinks.Location = new System.Drawing.Point(8, 48);
-            this.ELinks.Name = "ELinks";
-            this.ELinks.Size = new System.Drawing.Size(32, 32);
-            this.ELinks.TabIndex = 4;
-            this.ELinks.Click += new System.EventHandler(this.ELinks_Click);
+            this.btnGroesseLinks.ImageCode = "Pfeil_Links|12|||0088FF";
+            this.btnGroesseLinks.Location = new System.Drawing.Point(8, 48);
+            this.btnGroesseLinks.Name = "btnGroesseLinks";
+            this.btnGroesseLinks.Size = new System.Drawing.Size(32, 32);
+            this.btnGroesseLinks.TabIndex = 4;
+            this.btnGroesseLinks.Click += new System.EventHandler(this.btnGroesseLinks_Click);
             // 
-            // EUnten
+            // btnGroesseUnten
             // 
-            this.EUnten.ImageCode = "Pfeil_Unten|16|||0088FF";
-            this.EUnten.Location = new System.Drawing.Point(24, 80);
-            this.EUnten.Name = "EUnten";
-            this.EUnten.Size = new System.Drawing.Size(32, 32);
-            this.EUnten.TabIndex = 36;
-            this.EUnten.Click += new System.EventHandler(this.EUnten_Click);
+            this.btnGroesseUnten.ImageCode = "Pfeil_Unten|16|||0088FF";
+            this.btnGroesseUnten.Location = new System.Drawing.Point(24, 80);
+            this.btnGroesseUnten.Name = "btnGroesseUnten";
+            this.btnGroesseUnten.Size = new System.Drawing.Size(32, 32);
+            this.btnGroesseUnten.TabIndex = 36;
+            this.btnGroesseUnten.Click += new System.EventHandler(this.btnGroesseUnten_Click);
             // 
-            // x1
+            // grpPosition
             // 
-            this.x1.CausesValidation = false;
-            this.x1.Controls.Add(this.SRechts);
-            this.x1.Controls.Add(this.SOben);
-            this.x1.Controls.Add(this.SLinks);
-            this.x1.Controls.Add(this.SUnten);
-            this.x1.Enabled = false;
-            this.x1.Location = new System.Drawing.Point(8, 96);
-            this.x1.Name = "x1";
-            this.x1.Size = new System.Drawing.Size(80, 120);
-            this.x1.Text = "Start";
+            this.grpPosition.CausesValidation = false;
+            this.grpPosition.Controls.Add(this.btnPositionRechts);
+            this.grpPosition.Controls.Add(this.btnPositionOben);
+            this.grpPosition.Controls.Add(this.btnPositionLinks);
+            this.grpPosition.Controls.Add(this.btnPositionUnten);
+            this.grpPosition.Enabled = false;
+            this.grpPosition.Location = new System.Drawing.Point(8, 96);
+            this.grpPosition.Name = "grpPosition";
+            this.grpPosition.Size = new System.Drawing.Size(80, 120);
+            this.grpPosition.Text = "Start";
             // 
-            // SRechts
+            // btnPositionRechts
             // 
-            this.SRechts.ImageCode = "Pfeil_Rechts|12|||FF7700";
-            this.SRechts.Location = new System.Drawing.Point(40, 48);
-            this.SRechts.Name = "SRechts";
-            this.SRechts.Size = new System.Drawing.Size(32, 32);
-            this.SRechts.TabIndex = 5;
-            this.SRechts.Click += new System.EventHandler(this.SRechts_Click);
+            this.btnPositionRechts.ImageCode = "Pfeil_Rechts|12|||FF7700";
+            this.btnPositionRechts.Location = new System.Drawing.Point(40, 48);
+            this.btnPositionRechts.Name = "btnPositionRechts";
+            this.btnPositionRechts.Size = new System.Drawing.Size(32, 32);
+            this.btnPositionRechts.TabIndex = 5;
+            this.btnPositionRechts.Click += new System.EventHandler(this.btnPositionRechts_Click);
             // 
-            // SOben
+            // btnPositionOben
             // 
-            this.SOben.ImageCode = "Pfeil_Oben|16|||FF7700";
-            this.SOben.Location = new System.Drawing.Point(24, 16);
-            this.SOben.Name = "SOben";
-            this.SOben.Size = new System.Drawing.Size(32, 32);
-            this.SOben.TabIndex = 37;
-            this.SOben.Click += new System.EventHandler(this.SOben_Click);
+            this.btnPositionOben.ImageCode = "Pfeil_Oben|16|||FF7700";
+            this.btnPositionOben.Location = new System.Drawing.Point(24, 16);
+            this.btnPositionOben.Name = "btnPositionOben";
+            this.btnPositionOben.Size = new System.Drawing.Size(32, 32);
+            this.btnPositionOben.TabIndex = 37;
+            this.btnPositionOben.Click += new System.EventHandler(this.btnPositionOben_Click);
             // 
-            // SLinks
+            // btnPositionLinks
             // 
-            this.SLinks.ImageCode = "Pfeil_Links|12|||FF7700";
-            this.SLinks.Location = new System.Drawing.Point(8, 48);
-            this.SLinks.Name = "SLinks";
-            this.SLinks.Size = new System.Drawing.Size(32, 32);
-            this.SLinks.TabIndex = 4;
-            this.SLinks.Click += new System.EventHandler(this.SLinks_Click);
+            this.btnPositionLinks.ImageCode = "Pfeil_Links|12|||FF7700";
+            this.btnPositionLinks.Location = new System.Drawing.Point(8, 48);
+            this.btnPositionLinks.Name = "btnPositionLinks";
+            this.btnPositionLinks.Size = new System.Drawing.Size(32, 32);
+            this.btnPositionLinks.TabIndex = 4;
+            this.btnPositionLinks.Click += new System.EventHandler(this.btnPositionLinks_Click);
             // 
-            // SUnten
+            // btnPositionUnten
             // 
-            this.SUnten.ImageCode = "Pfeil_Unten|16|||FF7700";
-            this.SUnten.Location = new System.Drawing.Point(24, 80);
-            this.SUnten.Name = "SUnten";
-            this.SUnten.Size = new System.Drawing.Size(32, 32);
-            this.SUnten.TabIndex = 36;
-            this.SUnten.Click += new System.EventHandler(this.SUnten_Click);
+            this.btnPositionUnten.ImageCode = "Pfeil_Unten|16|||FF7700";
+            this.btnPositionUnten.Location = new System.Drawing.Point(24, 80);
+            this.btnPositionUnten.Name = "btnPositionUnten";
+            this.btnPositionUnten.Size = new System.Drawing.Size(32, 32);
+            this.btnPositionUnten.TabIndex = 36;
+            this.btnPositionUnten.Click += new System.EventHandler(this.SUnten_Click);
             // 
             // Rename
             // 
-            this.Rename.ImageCode = "Stift|16";
-            this.Rename.Location = new System.Drawing.Point(80, 24);
-            this.Rename.Name = "Rename";
-            this.Rename.QuickInfo = "Reiter-Beschriftung der<br>aktuellen Ansicht ändern";
-            this.Rename.Size = new System.Drawing.Size(32, 24);
-            this.Rename.TabIndex = 35;
-            this.Rename.Click += new System.EventHandler(this.Rename_Click);
+            this.btnRename.ImageCode = "Stift|16";
+            this.btnRename.Location = new System.Drawing.Point(80, 24);
+            this.btnRename.Name = "Rename";
+            this.btnRename.QuickInfo = "Reiter-Beschriftung der<br>aktuellen Ansicht ändern";
+            this.btnRename.Size = new System.Drawing.Size(32, 24);
+            this.btnRename.TabIndex = 35;
+            this.btnRename.Click += new System.EventHandler(this.btnRename_Click);
             // 
-            // SpaltBEnde
+            // btnExitEditor
             // 
-            this.SpaltBEnde.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.SpaltBEnde.ImageCode = "Kreuz|26";
-            this.SpaltBEnde.Location = new System.Drawing.Point(152, 0);
-            this.SpaltBEnde.Name = "SpaltBEnde";
-            this.SpaltBEnde.QuickInfo = "Formular-Editor beenden";
-            this.SpaltBEnde.Size = new System.Drawing.Size(24, 24);
-            this.SpaltBEnde.TabIndex = 34;
-            this.SpaltBEnde.Click += new System.EventHandler(this.SpaltBEnde_Click);
+            this.btnExitEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnExitEditor.ImageCode = "Kreuz|26";
+            this.btnExitEditor.Location = new System.Drawing.Point(152, 0);
+            this.btnExitEditor.Name = "btnExitEditor";
+            this.btnExitEditor.QuickInfo = "Formular-Editor beenden";
+            this.btnExitEditor.Size = new System.Drawing.Size(24, 24);
+            this.btnExitEditor.TabIndex = 34;
+            this.btnExitEditor.Click += new System.EventHandler(this.btnExitEditor_Click);
             // 
-            // Rechtex
+            // btnRechteFuerAnsicht
             // 
-            this.Rechtex.ImageCode = "Schild|16";
-            this.Rechtex.Location = new System.Drawing.Point(8, 56);
-            this.Rechtex.Name = "Rechtex";
-            this.Rechtex.QuickInfo = "Berechtigungsgruppen für<br>aktuelle Ansicht bearbeiten";
-            this.Rechtex.Size = new System.Drawing.Size(160, 24);
-            this.Rechtex.TabIndex = 32;
-            this.Rechtex.Text = "Berechtigungsgruppen";
-            this.Rechtex.Click += new System.EventHandler(this.Rechte_Click);
+            this.btnRechteFuerAnsicht.ImageCode = "Schild|16";
+            this.btnRechteFuerAnsicht.Location = new System.Drawing.Point(8, 56);
+            this.btnRechteFuerAnsicht.Name = "btnRechteFuerAnsicht";
+            this.btnRechteFuerAnsicht.QuickInfo = "Berechtigungsgruppen für<br>aktuelle Ansicht bearbeiten";
+            this.btnRechteFuerAnsicht.Size = new System.Drawing.Size(160, 24);
+            this.btnRechteFuerAnsicht.TabIndex = 32;
+            this.btnRechteFuerAnsicht.Text = "Berechtigungsgruppen";
+            this.btnRechteFuerAnsicht.Click += new System.EventHandler(this.btnRechteFuerAnsicht_Click);
             // 
-            // OrderDelete
+            // btnAnsichtloeschen
             // 
-            this.OrderDelete.ImageCode = "MinusZeichen|16";
-            this.OrderDelete.Location = new System.Drawing.Point(40, 24);
-            this.OrderDelete.Name = "OrderDelete";
-            this.OrderDelete.QuickInfo = "Aktuelle Ansicht<br>löschen";
-            this.OrderDelete.Size = new System.Drawing.Size(32, 24);
-            this.OrderDelete.TabIndex = 6;
-            this.OrderDelete.Click += new System.EventHandler(this.OrderDelete_Click);
+            this.btnAnsichtloeschen.ImageCode = "MinusZeichen|16";
+            this.btnAnsichtloeschen.Location = new System.Drawing.Point(40, 24);
+            this.btnAnsichtloeschen.Name = "btnAnsichtloeschen";
+            this.btnAnsichtloeschen.QuickInfo = "Aktuelle Ansicht<br>löschen";
+            this.btnAnsichtloeschen.Size = new System.Drawing.Size(32, 24);
+            this.btnAnsichtloeschen.TabIndex = 6;
+            this.btnAnsichtloeschen.Click += new System.EventHandler(this.btnAnsichtloeschen_Click);
             // 
-            // OrderAdd
+            // btnAnsichtHinzufuegen
             // 
-            this.OrderAdd.ImageCode = "PlusZeichen|16";
-            this.OrderAdd.Location = new System.Drawing.Point(8, 24);
-            this.OrderAdd.Name = "OrderAdd";
-            this.OrderAdd.QuickInfo = "Neue Ansicht<br>erstellen";
-            this.OrderAdd.Size = new System.Drawing.Size(32, 24);
-            this.OrderAdd.TabIndex = 2;
-            this.OrderAdd.Click += new System.EventHandler(this.OrderAdd_Click);
+            this.btnAnsichtHinzufuegen.ImageCode = "PlusZeichen|16";
+            this.btnAnsichtHinzufuegen.Location = new System.Drawing.Point(8, 24);
+            this.btnAnsichtHinzufuegen.Name = "btnAnsichtHinzufuegen";
+            this.btnAnsichtHinzufuegen.QuickInfo = "Neue Ansicht<br>erstellen";
+            this.btnAnsichtHinzufuegen.Size = new System.Drawing.Size(32, 24);
+            this.btnAnsichtHinzufuegen.TabIndex = 2;
+            this.btnAnsichtHinzufuegen.Click += new System.EventHandler(this.btnAnsichtHinzufuegen_Click);
             // 
             // Formula
             // 
             this.Controls.Add(this.Tabs);
-            this.Controls.Add(this.Editor);
+            this.Controls.Add(this.grpEditor);
             this.MinimumSize = new System.Drawing.Size(320, 350);
             this.Name = "Formula";
             this.Size = new System.Drawing.Size(320, 350);
             this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Tabs_MouseUp);
-            this.Editor.ResumeLayout(false);
-            this.x2.ResumeLayout(false);
-            this.x1.ResumeLayout(false);
+            this.grpEditor.ResumeLayout(false);
+            this.grpGroesse.ResumeLayout(false);
+            this.grpPosition.ResumeLayout(false);
             this.ResumeLayout(false);
         }
-        private GroupBox Editor;
-        private Button SUnten;
-        private Button SpaltBEnde;
-        private Button Rechtex;
-        private Button OrderDelete;
-        private Button SRechts;
-        private Button SLinks;
-        private Button OrderAdd;
-        private Button SOben;
-        private GroupBox x2;
-        private Button ERechts;
-        private Button EOben;
-        private Button ELinks;
-        private Button EUnten;
-        private GroupBox x1;
+        private GroupBox grpEditor;
+        private Button btnPositionUnten;
+        private Button btnExitEditor;
+        private Button btnRechteFuerAnsicht;
+        private Button btnAnsichtloeschen;
+        private Button btnPositionRechts;
+        private Button btnPositionLinks;
+        private Button btnAnsichtHinzufuegen;
+        private Button btnPositionOben;
+        private GroupBox grpGroesse;
+        private Button btnGroesseRechts;
+        private Button btnGroesseOben;
+        private Button btnGroesseLinks;
+        private Button btnGroesseUnten;
+        private GroupBox grpPosition;
         private Line BlueLine1;
         private ListBox lbxColumns;
         private Caption capUeberschrift;
         private Line BlueLine2;
         private ComboBox cbxCaptionPosition;
-        private Button Rename;
-        private Button Re;
-        private Button Li;
-        private Caption Caption2;
+        private Button btnRename;
+        private Button btnReiterNachRechts;
+        private Button btnReiterNachLinks;
+        private Caption capBearbeitungsMethode;
         private ComboBox cbxControlType;
         private TabControl Tabs;
         private System.Windows.Forms.ColorDialog ColDiax;

@@ -38,6 +38,7 @@ using System.Linq;
 using System.Threading;
 using static BlueBasics.FileOperations;
 using static BlueBasics.ListOfExtension;
+using static BlueBasics.Converter;
 
 namespace BlueControls.Controls {
 
@@ -489,13 +490,13 @@ namespace BlueControls.Controls {
             List<string> NewFiles = new();
 
             foreach (var thisf in f) {
-                var b = modConverter.FileToByte(thisf);
+                var b = Converter.FileToByte(thisf);
 
                 if (!string.IsNullOrEmpty(_tmpColumn.Database.FileEncryptionKey)) { b = Cryptography.SimpleCrypt(b, _tmpColumn.Database.FileEncryptionKey, 1); }
 
                 var neu = thisf.FileNameWithSuffix();
                 neu = _tmpColumn.BestFile(neu.FileNameWithSuffix(), true);
-                modConverter.ByteToFile(neu, b);
+                Converter.ByteToFile(neu, b);
 
                 NewFiles.Add(neu);
                 DelList.Add(thisf);
@@ -1699,17 +1700,21 @@ namespace BlueControls.Controls {
                 case "dospaltenvergleich": {
                         List<RowItem> ro = new();
                         ro.AddRange(SortedRows());
+
                         ItemCollectionList ic = new();
                         foreach (var ThisColumnItem in e.Column.Database.Column) {
-                            if (ThisColumnItem != null && ThisColumnItem != e.Column) { ic.Add(ThisColumnItem, false); }
+                            if (ThisColumnItem != null && ThisColumnItem != e.Column) { ic.Add(ThisColumnItem); }
                         }
                         ic.Sort();
+
                         var r = InputBoxListBoxStyle.Show("Mit welcher Spalte vergleichen?", ic, enAddType.None, true);
                         if (r == null || r.Count == 0) { return; }
-                        //Filter.Remove(e.Column);
+
+                        var c = e.Column.Database.Column.SearchByKey(IntParse(r[0]));
+
                         List<string> d = new();
                         foreach (var thisR in ro) {
-                            if (thisR.CellGetString(e.Column) != thisR.CellGetString(r[0])) { d.Add(thisR.CellFirstString()); }
+                            if (thisR.CellGetString(e.Column) != thisR.CellGetString(c)) { d.Add(thisR.CellFirstString()); }
                         }
                         if (d.Count > 0) {
                             Filter.Add(new FilterItem(e.Column.Database.Column[0], enFilterType.Istgleich_ODER_GroßKleinEgal, d));

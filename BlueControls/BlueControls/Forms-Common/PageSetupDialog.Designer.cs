@@ -128,11 +128,11 @@ namespace BlueControls.Forms
             this.Caption4.Size = new System.Drawing.Size(48, 18);
             this.Caption4.Text = "Rechts:";
             // 
-            // Caption2
+            // capBearbeitungsMethode
             // 
             this.Caption2.CausesValidation = false;
             this.Caption2.Location = new System.Drawing.Point(8, 56);
-            this.Caption2.Name = "Caption2";
+            this.Caption2.Name = "capBearbeitungsMethode";
             this.Caption2.Size = new System.Drawing.Size(40, 18);
             this.Caption2.Text = "Links:";
             // 

@@ -18,10 +18,9 @@
 using BlueBasics.Enums;
 using System.Runtime.InteropServices;
 
-namespace BlueBasics
-// TODO: Enums erzeugen
-{
-    internal static class modTastaturSimulation {
+namespace BlueBasics {
+
+    internal static class KeyboardSimulation {
 
         #region Fields
 
@@ -34,15 +33,15 @@ namespace BlueBasics
         #region Methods
 
         // Release key
-        public static void altrelease() => keybd_event((byte)enTaste.VK_MENU, 0, KEYEVENTF_EXTENDEDKEY | 2, 0);
+        public static void AltRelease() => keybd_event((byte)enTaste.VK_MENU, 0, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
 
         public static void KeyDown(enTaste k) => keybd_event((byte)k, 0, KEYEVENTF_KEYDOWN, 0);
 
         public static void KeyUp(enTaste k) => keybd_event((byte)k, 0, KEYEVENTF_KEYUP, 0);
 
-        public static void leftaltrelease() => keybd_event((byte)enTaste.VK_MENU, 0, KEYEVENTF_KEYUP, 0);
+        public static void LeftAltRelease() => keybd_event((byte)enTaste.VK_MENU, 0, KEYEVENTF_KEYUP, 0);
 
-        public static void shiftrelease() => keybd_event((byte)enTaste.VK_SHIFT, 0, 2, 0);
+        public static void ShiftRelease() => keybd_event((byte)enTaste.VK_SHIFT, 0, KEYEVENTF_KEYUP, 0);
 
         // VK_CANCEL = &H3 'Used for control-break processing.
         // '****************

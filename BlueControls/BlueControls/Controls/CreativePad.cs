@@ -202,7 +202,7 @@ namespace BlueControls.Controls {
             }
             var Multi = 1D;
             if (Item.SnapMode == enSnapMode.SnapToGrid) {
-                Multi = modConverter.mmToPixel(Item.GridSnap, ItemCollectionPad.DPI);
+                Multi = Converter.mmToPixel(Item.GridSnap, ItemCollectionPad.DPI);
             }
             if (Multi < 1) { Multi = 1D; }
             switch (e.KeyCode) {
@@ -591,7 +591,7 @@ namespace BlueControls.Controls {
             if (Item.SnapMode != enSnapMode.SnapToGrid || Math.Abs(Item.GridSnap) < 0.001) { return mouseMovedTo; }
             if (movedPoint is null) { return 0D; }
 
-            var Multi = modConverter.mmToPixel(Item.GridSnap, ItemCollectionPad.DPI);
+            var Multi = Converter.mmToPixel(Item.GridSnap, ItemCollectionPad.DPI);
             double Value;
             if (doX) {
                 Value = movedPoint.X + mouseMovedTo;

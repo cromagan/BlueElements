@@ -25,7 +25,7 @@ using System.Drawing;
 using System.Text.RegularExpressions;
 using static BlueBasics.Extensions;
 using static BlueBasics.modAllgemein;
-using static BlueBasics.modConverter;
+using static BlueBasics.Converter;
 
 namespace BlueDatabase {
 

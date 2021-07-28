@@ -17,8 +17,6 @@
 
 using BlueScript;
 using Skript.Enums;
-using System.Drawing;
-using static BlueBasics.modConverter;
 
 public struct strDoItFeedback {
 

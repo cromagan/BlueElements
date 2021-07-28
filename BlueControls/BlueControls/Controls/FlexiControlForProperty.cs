@@ -10,7 +10,7 @@ using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
 using static BlueBasics.Extensions;
-using static BlueBasics.modConverter;
+using static BlueBasics.Converter;
 
 namespace BlueControls.Controls {
 

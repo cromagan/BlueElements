@@ -24,7 +24,7 @@ using BlueDatabase.Enums;
 using System;
 using System.Drawing;
 using static BlueBasics.FileOperations;
-using static BlueBasics.modConverter;
+using static BlueBasics.Converter;
 
 namespace BlueControls.Classes_Editor {
 

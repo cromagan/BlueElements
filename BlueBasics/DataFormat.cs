@@ -18,7 +18,7 @@
 using BlueBasics.Enums;
 using System.Linq;
 using System.Text.RegularExpressions;
-using static BlueBasics.modConverter;
+using static BlueBasics.Converter;
 
 namespace BlueBasics {
 

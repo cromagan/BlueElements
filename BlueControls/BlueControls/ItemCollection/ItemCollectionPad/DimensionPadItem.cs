@@ -54,7 +54,7 @@ namespace BlueControls.ItemCollection {
             if (cPoint1 != null) { Point1.SetTo(cPoint1.X, cPoint1.Y); }
             if (cPoint2 != null) { Point2.SetTo(cPoint2.X, cPoint2.Y); }
             ComputeData();
-            var a = GeometryDF.PolarToCartesian(modConverter.mmToPixel(AbstandinMM, ItemCollectionPad.DPI), Convert.ToDouble(_Winkel - 90));
+            var a = GeometryDF.PolarToCartesian(Converter.mmToPixel(AbstandinMM, ItemCollectionPad.DPI), Convert.ToDouble(_Winkel - 90));
             TextPointx.SetTo(Point1, _Länge / 2, _Winkel);
             TextPointx.X += a.X;
             TextPointx.Y += a.Y;
@@ -83,7 +83,7 @@ namespace BlueControls.ItemCollection {
 
         #region Properties
 
-        public double Länge_in_MM => Math.Round(modConverter.PixelToMM(_Länge, ItemCollectionPad.DPI), Nachkommastellen);
+        public double Länge_in_MM => Math.Round(Converter.PixelToMM(_Länge, ItemCollectionPad.DPI), Nachkommastellen);
         public int Nachkommastellen { get; set; } = 1;
 
         public string Präfix { get; set; } = string.Empty;
@@ -208,7 +208,7 @@ namespace BlueControls.ItemCollection {
 
         public override void PointMoved(PointM point) {
             var tmppW = -90;
-            var MHLAb = modConverter.mmToPixel(1.5d * Skalierung / 3.07d, ItemCollectionPad.DPI); // Den Abstand der Maßhilsfline, in echten MM
+            var MHLAb = Converter.mmToPixel(1.5d * Skalierung / 3.07d, ItemCollectionPad.DPI); // Den Abstand der Maßhilsfline, in echten MM
             ComputeData();
             //Gegeben sind:
             // Point1, Point2 und Textpoint

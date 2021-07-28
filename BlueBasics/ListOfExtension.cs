@@ -23,7 +23,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using static BlueBasics.FileOperations;
-using static BlueBasics.modConverter;
+using static BlueBasics.Converter;
 
 namespace BlueBasics {
 

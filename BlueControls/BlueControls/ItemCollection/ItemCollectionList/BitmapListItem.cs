@@ -189,9 +189,9 @@ namespace BlueControls.ItemCollection {
             try {
                 if (FileExists(_ImageFilename)) {
                     if (!string.IsNullOrEmpty(_EncryptionKey)) {
-                        var b = modConverter.FileToByte(_ImageFilename);
+                        var b = Converter.FileToByte(_ImageFilename);
                         b = Cryptography.SimpleCrypt(b, _EncryptionKey, -1);
-                        _Bitmap = modConverter.ByteToBitmap(b);
+                        _Bitmap = Converter.ByteToBitmap(b);
                     } else {
                         _Bitmap = (Bitmap)BitmapExt.Image_FromFile(_ImageFilename);
                     }

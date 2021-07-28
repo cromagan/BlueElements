@@ -519,8 +519,8 @@ namespace BlueControls.ItemCollection {
 
                 if (SheetSizeInMM.Width > 0 && SheetSizeInMM.Height > 0) {
                     //Skin.Draw_Back(gr, enDesign.Table_And_Pad, state, DisplayRectangle, this, true);
-                    var SSW = Math.Round(modConverter.mmToPixel(SheetSizeInMM.Width, ItemCollectionPad.DPI), 1);
-                    var SSH = Math.Round(modConverter.mmToPixel(SheetSizeInMM.Height, ItemCollectionPad.DPI), 1);
+                    var SSW = Math.Round(Converter.mmToPixel(SheetSizeInMM.Width, ItemCollectionPad.DPI), 1);
+                    var SSH = Math.Round(Converter.mmToPixel(SheetSizeInMM.Height, ItemCollectionPad.DPI), 1);
                     var LO = new PointM(0d, 0d).ZoomAndMove(zoom, shiftX, shiftY);
                     var RU = new PointM(SSW, SSH).ZoomAndMove(zoom, shiftX, shiftY);
 
@@ -547,7 +547,7 @@ namespace BlueControls.ItemCollection {
 
                 if (_GridShow > 0.1) {
                     var po = new PointM(0, 0).ZoomAndMove(zoom, shiftX, shiftY);
-                    var mo = modConverter.mmToPixel(_GridShow, DPI) * zoom;
+                    var mo = Converter.mmToPixel(_GridShow, DPI) * zoom;
 
                     var p = new Pen(Color.FromArgb(10, 0, 0, 0));
                     double ex = 0;
@@ -616,8 +616,8 @@ namespace BlueControls.ItemCollection {
             if (SheetSizeInMM.Width > 0 && SheetSizeInMM.Height > 0) {
                 var X1 = Math.Min(r.Left, 0);
                 var y1 = Math.Min(r.Top, 0);
-                var x2 = Math.Max(r.Right, modConverter.mmToPixel(SheetSizeInMM.Width, DPI));
-                var y2 = Math.Max(r.Bottom, modConverter.mmToPixel(SheetSizeInMM.Height, DPI));
+                var x2 = Math.Max(r.Right, Converter.mmToPixel(SheetSizeInMM.Width, DPI));
+                var y2 = Math.Max(r.Bottom, Converter.mmToPixel(SheetSizeInMM.Height, DPI));
                 return new RectangleM(X1, y1, x2 - X1, y2 - y1);
             }
             return r;
@@ -673,12 +673,12 @@ namespace BlueControls.ItemCollection {
                 P_rRU = new PointM(this, "Druckbereich RU", 0, 0);
                 P_rLU = new PointM(this, "Druckbereich LU", 0, 0);
             }
-            var SSW = Math.Round(modConverter.mmToPixel(_SheetSizeInMM.Width, DPI), 1);
-            var SSH = Math.Round(modConverter.mmToPixel(_SheetSizeInMM.Height, DPI), 1);
-            var rr = Math.Round(modConverter.mmToPixel(_RandinMM.Right, DPI), 1);
-            var rl = Math.Round(modConverter.mmToPixel(_RandinMM.Left, DPI), 1);
-            var ro = Math.Round(modConverter.mmToPixel(_RandinMM.Top, DPI), 1);
-            var ru = Math.Round(modConverter.mmToPixel(_RandinMM.Bottom, DPI), 1);
+            var SSW = Math.Round(Converter.mmToPixel(_SheetSizeInMM.Width, DPI), 1);
+            var SSH = Math.Round(Converter.mmToPixel(_SheetSizeInMM.Height, DPI), 1);
+            var rr = Math.Round(Converter.mmToPixel(_RandinMM.Right, DPI), 1);
+            var rl = Math.Round(Converter.mmToPixel(_RandinMM.Left, DPI), 1);
+            var ro = Math.Round(Converter.mmToPixel(_RandinMM.Top, DPI), 1);
+            var ru = Math.Round(Converter.mmToPixel(_RandinMM.Bottom, DPI), 1);
             P_rLO.SetTo(rl, ro);
             P_rRO.SetTo(SSW - rr, ro);
             P_rRU.SetTo(SSW - rr, SSH - ru);

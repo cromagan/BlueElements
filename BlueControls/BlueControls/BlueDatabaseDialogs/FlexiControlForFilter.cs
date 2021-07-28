@@ -94,12 +94,12 @@ namespace BlueControls.Controls {
                         while (true) {
                             var nx = InputBox.Show("X, von 0 bis 10000", col2.DauerFilterPos.X.ToString(), enDataFormat.Ganzzahl);
                             if (string.IsNullOrEmpty(nx)) { return true; }
-                            var nxi = modConverter.IntParse(nx);
+                            var nxi = Converter.IntParse(nx);
                             nxi = Math.Max(nxi, 0);
                             nxi = Math.Min(nxi, 10000);
                             var ny = InputBox.Show("Y, von 0 bis 10000", col2.DauerFilterPos.Y.ToString(), enDataFormat.Ganzzahl);
                             if (string.IsNullOrEmpty(ny)) { return true; }
-                            var nyi = modConverter.IntParse(ny);
+                            var nyi = Converter.IntParse(ny);
                             nyi = Math.Max(nyi, 0);
                             nyi = Math.Min(nyi, 10000);
                             col2.DauerFilterPos = new Point(nxi, nyi);

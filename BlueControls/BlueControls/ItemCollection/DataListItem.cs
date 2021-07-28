@@ -179,7 +179,7 @@ namespace BlueControls.ItemCollection {
             if (string.IsNullOrEmpty(_filename)) { return; }
             if (_bin != null) { return; }
             try {
-                _bin = modConverter.FileToByte(_filename);
+                _bin = Converter.FileToByte(_filename);
                 if (FileExists(_filename)) {
                     if (!string.IsNullOrEmpty(_EncryptionKey)) {
                         _bin = Cryptography.SimpleCrypt(_bin, _EncryptionKey, -1);

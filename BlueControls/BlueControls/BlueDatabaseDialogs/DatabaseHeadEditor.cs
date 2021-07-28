@@ -85,7 +85,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 btnSortRichtung.Checked = _Database.SortDefinition.Reverse;
                 if (_Database.SortDefinition.Columns != null) {
                     foreach (var ThisColumn in _Database.SortDefinition.Columns) {
-                        if (ThisColumn != null) { lbxSortierSpalten.Item.Add(ThisColumn, false); }
+                        if (ThisColumn != null) { lbxSortierSpalten.Item.Add(ThisColumn); }
                     }
                 }
             }
@@ -111,11 +111,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             DatenbankAdmin.Suggestions.Clear();
             DatenbankAdmin.Suggestions.AddRange(_Database.Permission_AllUsed(true));
             lbxSortierSpalten.Suggestions.Clear();
-            lbxSortierSpalten.Suggestions.AddRange(_Database.Column, false, false, false);
-            //foreach (var ThisColumnItem in _Database.Column)
-            //{
-            //    if (ThisColumnItem != null) { lbxSortierSpalten.Suggestions.Add(ThisColumnItem); }
-            //}
+            lbxSortierSpalten.Suggestions.AddRange(_Database.Column, false);
             GenerateUndoTabelle();
             CryptStatus();
             GenerateInfoText();
@@ -341,18 +337,18 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (string.IsNullOrEmpty(_Database.FileEncryptionKey)) {
                 NewKey = new string(Enumerable.Repeat("abcdefghijklmnopqrstuvwxyz הצü#_-<>ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 10).Select(s => s[Constants.GlobalRND.Next(s.Length)]).ToArray());
                 foreach (var ThisFile in lLCase) {
-                    var b = modConverter.FileToByte(ThisFile);
+                    var b = Converter.FileToByte(ThisFile);
                     b = Cryptography.SimpleCrypt(b, NewKey, 1);
                     FileOperations.DeleteFile(ThisFile, true);
-                    modConverter.ByteToFile(ThisFile, b);
+                    Converter.ByteToFile(ThisFile, b);
                 }
             } else {
                 NewKey = string.Empty;
                 foreach (var ThisFile in lLCase) {
-                    var b = modConverter.FileToByte(ThisFile);
+                    var b = Converter.FileToByte(ThisFile);
                     b = Cryptography.SimpleCrypt(b, _Database.FileEncryptionKey, -1);
                     FileOperations.DeleteFile(ThisFile, true);
-                    modConverter.ByteToFile(ThisFile, b);
+                    Converter.ByteToFile(ThisFile, b);
                 }
             }
             _Database.FileEncryptionKey = NewKey;

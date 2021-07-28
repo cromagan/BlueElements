@@ -16,11 +16,9 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
-using BlueBasics.Enums;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Enums;
 using BlueControls.Forms;
-using BlueControls.Interfaces;
 using System;
 using System.ComponentModel;
 using System.ComponentModel.Design;

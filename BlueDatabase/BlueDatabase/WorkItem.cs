@@ -20,7 +20,7 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using System;
-using static BlueBasics.modConverter;
+using static BlueBasics.Converter;
 
 namespace BlueDatabase {
 
