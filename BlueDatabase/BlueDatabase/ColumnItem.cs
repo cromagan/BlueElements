@@ -92,18 +92,6 @@ namespace BlueDatabase {
         private int _LinkedCell_ColumnKey;
 
         /// <summary>
-        /// ...zusätzlich folgende Zeichenkette hinzufügen
-        /// </summary>
-        [Obsolete]
-        private string _LinkedCell_ColumnValueAdd;
-
-        /// <summary>
-        /// Die zu suchende Spalte ist in dieser Spalte zu finden
-        /// </summary>
-        [Obsolete]
-        private int _LinkedCell_ColumnValueFoundIn;
-
-        /// <summary>
         /// Die zu suchende Zeile ist in dieser Spalte zu finden
         /// </summary>
         private int _LinkedCell_RowKey;
@@ -158,8 +146,6 @@ namespace BlueDatabase {
             _CellInitValue = string.Empty;
             _LinkedCell_RowKey = -1;
             _LinkedCell_ColumnKey = -1;
-            _LinkedCell_ColumnValueFoundIn = -1;
-            _LinkedCell_ColumnValueAdd = string.Empty;
             _SortMask = string.Empty;
             //_ZellenZusammenfassen = false;
             _DropDownKey = -1;
@@ -624,28 +610,6 @@ namespace BlueDatabase {
             }
         }
 
-        [Obsolete]
-        public string LinkedCell_ColumnValueAdd {
-            get => _LinkedCell_ColumnValueAdd;
-            set {
-                if (_LinkedCell_ColumnValueAdd == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_LinkedCell_ColumnValueAdd, this, _LinkedCell_ColumnValueAdd, value, true);
-                Invalidate_ColumAndContent();
-                OnChanged();
-            }
-        }
-
-        [Obsolete]
-        public int LinkedCell_ColumnValueFoundIn {
-            get => _LinkedCell_ColumnValueFoundIn;
-            set {
-                if (_LinkedCell_ColumnValueFoundIn == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_LinkedCell_ColumnValueFoundIn, this, _LinkedCell_ColumnValueFoundIn.ToString(), value.ToString(), true);
-                Invalidate_ColumAndContent();
-                OnChanged();
-            }
-        }
-
         public int LinkedCell_RowKey {
             get => _LinkedCell_RowKey;
             set {
@@ -1093,9 +1057,6 @@ namespace BlueDatabase {
                     if (_KeyColumnKey > -1) { return "Dieses Format darf keine Verknüpfung zu einer Schlüsselspalte haben."; }
                     if (IsFirst()) { return "Dieses Format ist bei der ersten (intern) erste Spalte nicht erlaubt."; }
                     if (_LinkedCell_RowKey is < 0 and not (-9999)) { return "Die Angabe der Spalte, aus der der Schlüsselwert geholt wird, fehlt."; }
-                    if (_LinkedCell_ColumnValueFoundIn < 0 && _LinkedCell_ColumnKey < 0) { return "Information fehlt, welche Spalte der Zieldatenbank verwendet werden soll."; }
-                    if (_LinkedCell_ColumnValueFoundIn > -1 && _LinkedCell_ColumnKey > -1) { return "Doppelte Informationen, welche Spalte der Zieldatenbank verwendet werden soll."; }
-                    if (_LinkedCell_ColumnValueFoundIn < 0 && !string.IsNullOrEmpty(LinkedCell_ColumnValueAdd)) { return "Falsche Ziel-Spalte ODER Spalten-Vortext flasch."; }
                     if (_VorschlagsColumn > 0) { return "Dieses Format kann keine Vorschlags-Spalte haben."; }
                     if (_LinkedCell_ColumnKey > 0) {
                         var c = LinkedDatabase().Column.SearchByKey(_LinkedCell_ColumnKey);
@@ -1107,6 +1068,7 @@ namespace BlueDatabase {
                     break;
 
                 case enDataFormat.Values_für_LinkedCellDropdown:
+                    Develop.DebugPrint("Values_für_LinkedCellDropdown Verwendung bei:" + Database.Filename); //TODO: 29.07.2021 Values_für_LinkedCellDropdown Format entfernen
                     if (!string.IsNullOrEmpty(_CellInitValue)) { return "Dieses Format kann keinen Initial-Text haben."; }
                     if (KeyColumnKey > -1) { return "Dieses Format darf keine Verknüpfung zu einer Schlüsselspalte haben."; }
                     if (_VorschlagsColumn > 0) { return "Dieses Format kann keine Vorschlags-Spalte haben."; }
@@ -1215,7 +1177,6 @@ namespace BlueDatabase {
             if (_Format != enDataFormat.LinkedCell) {
                 if (_LinkedCell_RowKey > -1) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
                 if (_LinkedCell_ColumnKey > -1) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
-                if (_LinkedCell_ColumnValueFoundIn > -1) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
             }
             return string.Empty;
         }
@@ -1739,7 +1700,7 @@ namespace BlueDatabase {
             foreach (var ThisColumn in Database.Column) {
                 if (ThisColumn.KeyColumnKey == Key) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; } // Werte Gleichhalten
                 if (ThisColumn.LinkedCell_RowKey == Key) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
-                if (ThisColumn.LinkedCell_ColumnValueFoundIn == Key) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
+                //if (ThisColumn.LinkedCell_ColumnValueFoundIn == Key) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
             }
             if (_Format == enDataFormat.Columns_für_LinkedCellDropdown) { I_Am_A_Key_For_Other_Column = "Die Spalte selbst durch das Format"; }
         }
@@ -2004,11 +1965,9 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.co_LinkedCell_ColumnValueFoundIn:
-                    _LinkedCell_ColumnValueFoundIn = int.Parse(Wert);
                     break;
 
                 case enDatabaseDataType.co_LinkedCell_ColumnValueAdd:
-                    _LinkedCell_ColumnValueAdd = Wert;
                     break;
 
                 case enDatabaseDataType.co_SortMask:
@@ -2100,8 +2059,8 @@ namespace BlueDatabase {
             Database.SaveToByteList(l, enDatabaseDataType.co_KeyColumnKey, _KeyColumnKey.ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_RowKey, _LinkedCell_RowKey.ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_ColumnKey, _LinkedCell_ColumnKey.ToString(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_ColumnValueFoundIn, _LinkedCell_ColumnValueFoundIn.ToString(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_ColumnValueAdd, _LinkedCell_ColumnValueAdd, Key);
+            //Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_ColumnValueFoundIn, _LinkedCell_ColumnValueFoundIn.ToString(), Key);
+            //Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_ColumnValueAdd, _LinkedCell_ColumnValueAdd, Key);
             //Database.SaveToByteList(l, enDatabaseDataType.co_ZellenZusammenfassen, _ZellenZusammenfassen.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_DropDownKey, _DropDownKey.ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_VorschlagColumn, _VorschlagsColumn.ToString(), Key);

@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System;
+
 namespace BlueBasics.Enums {
 
     public enum enDataFormat {
@@ -55,7 +57,10 @@ namespace BlueBasics.Enums {
 
         LinkedCell = 74,
         Columns_für_LinkedCellDropdown = 75,
+
+        [Obsolete]
         Values_für_LinkedCellDropdown = 76,
+
         RelationText = 77,
 
         // KeyForSame = 78

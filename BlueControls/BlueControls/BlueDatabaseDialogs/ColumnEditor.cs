@@ -159,9 +159,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             grpVerlinkteZellen.Enabled = tmpFormat == enDataFormat.LinkedCell;
         }
 
-        private void cbxColumnKeyInColumn_TextChanged(object sender, System.EventArgs e) {
-        }
-
         private void cbxFormat_TextChanged(object sender, System.EventArgs e) => ButtonCheck();
 
         /// <summary>
@@ -171,9 +168,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         /// <param name="e"></param>
         private void cbxLinkedDatabase_TextChanged(object sender, System.EventArgs e) {
             _Column.LinkedDatabaseFile = cbxLinkedDatabase.Text;
-
-            cbxColumnKeyInColumn.Item.Clear();
-            cbxColumnKeyInColumn.Item.Add("#Ohne", "-1");
 
             cbxRowKeyInColumn.Item.Clear();
             cbxRowKeyInColumn.Item.Add("#Ohne", "-1");
@@ -189,9 +183,6 @@ namespace BlueControls.BlueDatabaseDialogs {
                     if (ThisColumn.Format == enDataFormat.Values_für_LinkedCellDropdown && ThisColumn.LinkedDatabase() == _Column.LinkedDatabase()) {
                         cbxRowKeyInColumn.Item.Add(ThisColumn);
                     }
-                    if (ThisColumn.Format == enDataFormat.Columns_für_LinkedCellDropdown && ThisColumn.LinkedDatabase() == _Column.LinkedDatabase()) {
-                        cbxColumnKeyInColumn.Item.Add(ThisColumn);
-                    }
                 }
                 foreach (var ThisLinkedColumn in _Column.LinkedDatabase().Column) {
                     if (!ThisLinkedColumn.IsFirst() && ThisLinkedColumn.Format.CanBeChangedByRules() && !ThisLinkedColumn.Format.NeedTargetDatabase()) {
@@ -200,23 +191,15 @@ namespace BlueControls.BlueDatabaseDialogs {
                 }
             }
             cbxTargetColumn.Item.Sort();
-            cbxColumnKeyInColumn.Item.Sort();
             cbxRowKeyInColumn.Item.Sort();
-            cbxColumnKeyInColumn.Enabled = cbxColumnKeyInColumn.Item.Count > 0;
-            btnColumnKeyInColumn.Enabled = cbxColumnKeyInColumn.Enabled;
-            txbZeichenkette.Enabled = cbxColumnKeyInColumn.Enabled;
             cbxRowKeyInColumn.Enabled = cbxRowKeyInColumn.Item.Count > 0;
             SetKeyTo(cbxRowKeyInColumn, _Column.LinkedCell_RowKey);
-            SetKeyTo(cbxColumnKeyInColumn, _Column.LinkedCell_ColumnValueFoundIn);
             SetKeyTo(cbxTargetColumn, _Column.LinkedCell_ColumnKey);
             cbxTargetColumn.Enabled = cbxTargetColumn.Item.Count > 0;
-            btnTargetColumn.Enabled = cbxTargetColumn.Enabled;
+            capTargetColumn.Enabled = cbxTargetColumn.Enabled;
             if (!cbxTargetColumn.Enabled) {
                 cbxTargetColumn.Text = string.Empty;
-                btnTargetColumn.Checked = false;
             }
-            if (btnColumnKeyInColumn.Enabled && _Column.LinkedCell_ColumnValueFoundIn > -1) { btnColumnKeyInColumn.Checked = true; } // Nicht perfekt die Lösung :-(
-            if (btnTargetColumn.Enabled && _Column.LinkedCell_ColumnKey > -1) { btnTargetColumn.Checked = true; } // Nicht perfekt die Lösung :-(
         }
 
         private int ColumKeyFrom(Database database, string columnKey) => database == null ? -1 : IntParse(columnKey);
@@ -325,7 +308,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             txbBestFileStandardSuffix.Text = _Column.BestFile_StandardSuffix;
             cbxLinkedDatabase.Text = _Column.LinkedDatabaseFile;
             txbLinkedKeyKennung.Text = _Column.LinkedKeyKennung;
-            txbZeichenkette.Text = _Column.LinkedCell_ColumnValueAdd;
             txbSortMask.Text = _Column.SortMask;
             txbAutoRemove.Text = _Column.AutoRemove;
             butSaveContent.Checked = _Column.SaveContent;
@@ -444,14 +426,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             _Column.LinkedKeyKennung = txbLinkedKeyKennung.Text;
             _Column.KeyColumnKey = ColumKeyFrom(_Column.Database, cbxSchlüsselspalte.Text);
             _Column.LinkedCell_RowKey = ColumKeyFrom(_Column.Database, cbxRowKeyInColumn.Text);
-            if (btnTargetColumn.Checked) {
-                _Column.LinkedCell_ColumnKey = ColumKeyFrom(_Column.LinkedDatabase(), cbxTargetColumn.Text); // LINKED DATABASE
-                _Column.LinkedCell_ColumnValueFoundIn = -1;
-            } else {
-                _Column.LinkedCell_ColumnKey = -1;
-                _Column.LinkedCell_ColumnValueFoundIn = ColumKeyFrom(_Column.Database, cbxColumnKeyInColumn.Text);
-            }
-            _Column.LinkedCell_ColumnValueAdd = txbZeichenkette.Text;
+            _Column.LinkedCell_ColumnKey = ColumKeyFrom(_Column.LinkedDatabase(), cbxTargetColumn.Text); // LINKED DATABASE
             _Column.DropdownKey = ColumKeyFrom(_Column.Database, cbxDropDownKey.Text);
             _Column.VorschlagsColumn = ColumKeyFrom(_Column.Database, cbxVorschlagSpalte.Text);
             _Column.Align = (enAlignmentHorizontal)int.Parse(cbxAlign.Text);

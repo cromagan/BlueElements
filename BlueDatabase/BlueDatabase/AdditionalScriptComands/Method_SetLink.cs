@@ -86,20 +86,15 @@ namespace BlueScript {
 
             #endregion
 
-            #region Ziel Spalte in Ziel-Datenbank finden: LinkTaregtColumn
-
-            var LinkTaregtColumn = allFi[0].Database.Column.Exists(attvar.Attributes[1].ValueString);
-            if (LinkTaregtColumn == null) { return new strDoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[1].ValueString); }
-
-            #endregion
-
             #region Spalte, die geändert werden soll, finden: ChangeColumn
 
             var ChangeColumn = db.Column.Exists(attvar.Attributes[0].Name);
             if (ChangeColumn.Format != BlueBasics.Enums.enDataFormat.LinkedCell) { return new strDoItFeedback("Spalte hat das falsche Format: " + attvar.Attributes[1].ValueString); }
-            if (ChangeColumn.LinkedCell_RowKey > -1) { return new strDoItFeedback("Spalte wird automatisiert befüllt: " + attvar.Attributes[1].ValueString); }
+            if (ChangeColumn.LinkedCell_RowKey >= -1) { return new strDoItFeedback("Spalte wird automatisiert befüllt: " + attvar.Attributes[1].ValueString); }
 
             #endregion
+
+            if (allFi[0].Database != ChangeColumn.LinkedDatabase()) { return new strDoItFeedback("Filter zeigen auf eine andere Datenbank als die, die in der Spalte als Verlinkung angegeben ist."); }
 
             #region Spalte mit den Link-Daten finden: Linkvar
 
@@ -108,9 +103,19 @@ namespace BlueScript {
 
             #endregion
 
-            if (allFi[0].Database != ChangeColumn.LinkedDatabase()) { return new strDoItFeedback("Filter zeigen auf eine andere Datenbank als die, die in der Spalte als Verlinkung angegeben ist."); }
+            #region Ziel Spalte in Ziel-Datenbank finden: LinkTaregtColumn -> Schlägt evtl fehl wenn mit Variablen gearbeitet wird.
 
-            #region Verknüpfung schlägt fehl
+            var LinkTaregtColumn = allFi[0].Database.Column.Exists(attvar.Attributes[1].ValueString);
+            if (LinkTaregtColumn == null) {
+                Linkvar.ValueString = string.Empty;
+                attvar.Attributes[0].ValueString = string.Empty;
+                Linkvar.Readonly = true;
+                return strDoItFeedback.Falsch();
+            }
+
+            #endregion
+
+            #region Verknüpfung schlägt fehl (Zeile nicht gefunden)
 
             var r = RowCollection.MatchesTo(allFi);
             if (r == null || r.Count != 1) {

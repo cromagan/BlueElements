@@ -186,9 +186,6 @@ namespace BlueDatabase {
             c.KeyColumnKey = source.KeyColumnKey;
             c.LinkedCell_RowKey = source.LinkedCell_RowKey;
             c.LinkedCell_ColumnKey = source.LinkedCell_ColumnKey;
-            c.LinkedCell_ColumnValueFoundIn = source.LinkedCell_ColumnValueFoundIn;
-            c.LinkedCell_ColumnValueAdd = source.LinkedCell_ColumnValueAdd;
-            //c.ZellenZusammenfassen = Source.ZellenZusammenfassen;
             c.DropdownKey = source.DropdownKey;
             c.VorschlagsColumn = source.VorschlagsColumn;
             c.Align = source.Align;

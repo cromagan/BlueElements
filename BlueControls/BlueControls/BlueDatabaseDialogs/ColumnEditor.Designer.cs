@@ -2,26 +2,22 @@ using System.Diagnostics;
 using BlueControls.Controls;
 using BlueControls.Forms;
 
-namespace BlueControls.BlueDatabaseDialogs
-	{
-		internal sealed partial class ColumnEditor : Form
-        {
-			//Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
-			[DebuggerNonUserCode()]
-			protected override void Dispose(bool disposing)
-			{
-				//if (disposing && components != null)
-				//{
-				//	components.Dispose();
-				//}
-				base.Dispose(disposing);
-			}
-			//Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
-			//Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
-			//Das Bearbeiten mit dem Code-Editor ist nicht möglich.
-			[DebuggerStepThrough()]
-			private void InitializeComponent()
-			{
+namespace BlueControls.BlueDatabaseDialogs {
+    internal sealed partial class ColumnEditor : Form {
+        //Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
+        [DebuggerNonUserCode()]
+        protected override void Dispose(bool disposing) {
+            //if (disposing && components != null)
+            //{
+            //	components.Dispose();
+            //}
+            base.Dispose(disposing);
+        }
+        //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
+        //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
+        //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
+        [DebuggerStepThrough()]
+        private void InitializeComponent() {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ColumnEditor));
             this.ColorDia = new System.Windows.Forms.ColorDialog();
             this.tabDesign = new System.Windows.Forms.TabPage();
@@ -139,14 +135,9 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpLinkedDatabase = new BlueControls.Controls.GroupBox();
             this.grpColumnsForLinkedDatabase = new BlueControls.Controls.GroupBox();
             this.grpVerlinkteZellen = new BlueControls.Controls.GroupBox();
-            this.txbZeichenkette = new BlueControls.Controls.TextBox();
-            this.capZeichenkette = new BlueControls.Controls.TextBox();
-            this.line1 = new BlueControls.Controls.Line();
             this.cbxTargetColumn = new BlueControls.Controls.ComboBox();
-            this.cbxColumnKeyInColumn = new BlueControls.Controls.ComboBox();
             this.cbxRowKeyInColumn = new BlueControls.Controls.ComboBox();
-            this.btnTargetColumn = new BlueControls.Controls.Button();
-            this.btnColumnKeyInColumn = new BlueControls.Controls.Button();
+            this.capTargetColumn = new BlueControls.Controls.Caption();
             this.capRowKeyInColumn = new BlueControls.Controls.Caption();
             this.capIntern = new BlueControls.Controls.Caption();
             this.caption5 = new BlueControls.Controls.Caption();
@@ -215,7 +206,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // txbSpaltenbild
             // 
-            this.txbSpaltenbild.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.txbSpaltenbild.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txbSpaltenbild.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbSpaltenbild.Location = new System.Drawing.Point(528, 104);
@@ -243,8 +234,8 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // txbReplacer
             // 
-            this.txbReplacer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.txbReplacer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txbReplacer.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbReplacer.Location = new System.Drawing.Point(8, 264);
@@ -539,7 +530,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnOtherValuesToo
             // 
-            this.btnOtherValuesToo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            this.btnOtherValuesToo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.btnOtherValuesToo.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
             this.btnOtherValuesToo.Location = new System.Drawing.Point(8, 304);
@@ -551,8 +542,8 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // tbxAuswaehlbareWerte
             // 
-            this.tbxAuswaehlbareWerte.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.tbxAuswaehlbareWerte.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbxAuswaehlbareWerte.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.tbxAuswaehlbareWerte.Location = new System.Drawing.Point(8, 64);
@@ -582,8 +573,8 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // cbxDropDownKey
             // 
-            this.cbxDropDownKey.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.cbxDropDownKey.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbxDropDownKey.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxDropDownKey.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -676,8 +667,8 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // txbAutoReplace
             // 
-            this.txbAutoReplace.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.txbAutoReplace.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txbAutoReplace.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbAutoReplace.Location = new System.Drawing.Point(8, 288);
@@ -698,7 +689,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // txbAutoRemove
             // 
-            this.txbAutoRemove.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.txbAutoRemove.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txbAutoRemove.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbAutoRemove.Location = new System.Drawing.Point(8, 240);
@@ -716,7 +707,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // cbxSchlüsselspalte
             // 
-            this.cbxSchlüsselspalte.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.cbxSchlüsselspalte.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbxSchlüsselspalte.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxSchlüsselspalte.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -727,7 +718,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // tbxInitValue
             // 
-            this.tbxInitValue.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.tbxInitValue.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbxInitValue.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.tbxInitValue.Location = new System.Drawing.Point(8, 32);
@@ -781,7 +772,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // cbxVorschlagSpalte
             // 
-            this.cbxVorschlagSpalte.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.cbxVorschlagSpalte.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbxVorschlagSpalte.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxVorschlagSpalte.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -942,7 +933,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // tbxAdminInfo
             // 
-            this.tbxAdminInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.tbxAdminInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbxAdminInfo.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.tbxAdminInfo.Location = new System.Drawing.Point(560, 24);
@@ -955,8 +946,8 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // tbxQuickinfo
             // 
-            this.tbxQuickinfo.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.tbxQuickinfo.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbxQuickinfo.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.tbxQuickinfo.Location = new System.Drawing.Point(8, 24);
@@ -1107,8 +1098,8 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // tbxTags
             // 
-            this.tbxTags.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.tbxTags.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbxTags.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.tbxTags.Location = new System.Drawing.Point(4, 31);
@@ -1194,7 +1185,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // BlueFrame1
             // 
-            this.BlueFrame1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.BlueFrame1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.BlueFrame1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.BlueFrame1.CausesValidation = false;
@@ -1258,7 +1249,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // tbxCaption
             // 
-            this.tbxCaption.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.tbxCaption.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbxCaption.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.tbxCaption.Location = new System.Drawing.Point(312, 32);
@@ -1300,8 +1291,8 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // tabControl
             // 
-            this.tabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.tabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tabControl.Controls.Add(this.tabDesign);
             this.tabControl.Controls.Add(this.tabRechte);
@@ -1354,7 +1345,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpLinkedDatabase.Controls.Add(this.capLinkedDatabase);
             this.grpLinkedDatabase.Location = new System.Drawing.Point(8, 120);
             this.grpLinkedDatabase.Name = "grpLinkedDatabase";
-            this.grpLinkedDatabase.Size = new System.Drawing.Size(888, 360);
+            this.grpLinkedDatabase.Size = new System.Drawing.Size(888, 224);
             this.grpLinkedDatabase.TabIndex = 1;
             this.grpLinkedDatabase.TabStop = false;
             this.grpLinkedDatabase.Text = "Format: LinkedCell (und dessen Columns / Values)";
@@ -1373,82 +1364,34 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // grpVerlinkteZellen
             // 
-            this.grpVerlinkteZellen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.grpVerlinkteZellen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.grpVerlinkteZellen.CausesValidation = false;
-            this.grpVerlinkteZellen.Controls.Add(this.txbZeichenkette);
-            this.grpVerlinkteZellen.Controls.Add(this.capZeichenkette);
-            this.grpVerlinkteZellen.Controls.Add(this.line1);
             this.grpVerlinkteZellen.Controls.Add(this.cbxTargetColumn);
-            this.grpVerlinkteZellen.Controls.Add(this.cbxColumnKeyInColumn);
             this.grpVerlinkteZellen.Controls.Add(this.cbxRowKeyInColumn);
-            this.grpVerlinkteZellen.Controls.Add(this.btnTargetColumn);
-            this.grpVerlinkteZellen.Controls.Add(this.btnColumnKeyInColumn);
+            this.grpVerlinkteZellen.Controls.Add(this.capTargetColumn);
             this.grpVerlinkteZellen.Controls.Add(this.capRowKeyInColumn);
             this.grpVerlinkteZellen.Location = new System.Drawing.Point(8, 128);
             this.grpVerlinkteZellen.Name = "grpVerlinkteZellen";
-            this.grpVerlinkteZellen.Size = new System.Drawing.Size(872, 224);
+            this.grpVerlinkteZellen.Size = new System.Drawing.Size(872, 88);
             this.grpVerlinkteZellen.TabIndex = 1;
             this.grpVerlinkteZellen.TabStop = false;
             this.grpVerlinkteZellen.Text = "Format: Verlinkte Zellen";
             // 
-            // txbZeichenkette
-            // 
-            this.txbZeichenkette.AllowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_";
-            this.txbZeichenkette.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txbZeichenkette.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbZeichenkette.Location = new System.Drawing.Point(336, 136);
-            this.txbZeichenkette.Name = "txbZeichenkette";
-            this.txbZeichenkette.QuickInfo = resources.GetString("txbZeichenkette.QuickInfo");
-            this.txbZeichenkette.Size = new System.Drawing.Size(520, 24);
-            this.txbZeichenkette.TabIndex = 7;
-            // 
-            // capZeichenkette
-            // 
-            this.capZeichenkette.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.capZeichenkette.Location = new System.Drawing.Point(40, 136);
-            this.capZeichenkette.Name = "capZeichenkette";
-            this.capZeichenkette.Size = new System.Drawing.Size(288, 24);
-            this.capZeichenkette.TabIndex = 6;
-            this.capZeichenkette.Text = "...zusätzlich folgende Zeichenkette voranstellen:";
-            // 
-            // line1
-            // 
-            this.line1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.line1.CausesValidation = false;
-            this.line1.Location = new System.Drawing.Point(8, 56);
-            this.line1.Name = "line1";
-            this.line1.Size = new System.Drawing.Size(856, 2);
-            this.line1.Text = "line1";
-            // 
             // cbxTargetColumn
             // 
-            this.cbxTargetColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.cbxTargetColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbxTargetColumn.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxTargetColumn.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxTargetColumn.Location = new System.Drawing.Point(336, 72);
+            this.cbxTargetColumn.Location = new System.Drawing.Point(336, 48);
             this.cbxTargetColumn.Name = "cbxTargetColumn";
             this.cbxTargetColumn.Size = new System.Drawing.Size(520, 24);
             this.cbxTargetColumn.TabIndex = 5;
             // 
-            // cbxColumnKeyInColumn
-            // 
-            this.cbxColumnKeyInColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbxColumnKeyInColumn.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxColumnKeyInColumn.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxColumnKeyInColumn.Location = new System.Drawing.Point(336, 112);
-            this.cbxColumnKeyInColumn.Name = "cbxColumnKeyInColumn";
-            this.cbxColumnKeyInColumn.Size = new System.Drawing.Size(520, 24);
-            this.cbxColumnKeyInColumn.TabIndex = 4;
-            this.cbxColumnKeyInColumn.TextChanged += new System.EventHandler(this.cbxColumnKeyInColumn_TextChanged);
-            // 
             // cbxRowKeyInColumn
             // 
-            this.cbxRowKeyInColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.cbxRowKeyInColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbxRowKeyInColumn.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxRowKeyInColumn.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -1457,24 +1400,14 @@ namespace BlueControls.BlueDatabaseDialogs
             this.cbxRowKeyInColumn.Size = new System.Drawing.Size(520, 24);
             this.cbxRowKeyInColumn.TabIndex = 3;
             // 
-            // btnTargetColumn
+            // capTargetColumn
             // 
-            this.btnTargetColumn.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
-            this.btnTargetColumn.Checked = true;
-            this.btnTargetColumn.Location = new System.Drawing.Point(8, 72);
-            this.btnTargetColumn.Name = "btnTargetColumn";
-            this.btnTargetColumn.Size = new System.Drawing.Size(320, 32);
-            this.btnTargetColumn.TabIndex = 2;
-            this.btnTargetColumn.Text = "Die Quell-Spalte (aus der verlinkten Datenbank) ist immer:";
-            // 
-            // btnColumnKeyInColumn
-            // 
-            this.btnColumnKeyInColumn.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
-            this.btnColumnKeyInColumn.Location = new System.Drawing.Point(8, 112);
-            this.btnColumnKeyInColumn.Name = "btnColumnKeyInColumn";
-            this.btnColumnKeyInColumn.Size = new System.Drawing.Size(320, 16);
-            this.btnColumnKeyInColumn.TabIndex = 1;
-            this.btnColumnKeyInColumn.Text = "Die zu suchende Spalte ist in dieser Spalte zu finden:";
+            this.capTargetColumn.CausesValidation = false;
+            this.capTargetColumn.Location = new System.Drawing.Point(8, 48);
+            this.capTargetColumn.Name = "capTargetColumn";
+            this.capTargetColumn.Size = new System.Drawing.Size(320, 32);
+            this.capTargetColumn.Text = "Die Quell-Spalte (aus der verlinkten Datenbank) ist immer:";
+            this.capTargetColumn.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // capRowKeyInColumn
             // 
@@ -1555,124 +1488,119 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpVerlinkteZellen.ResumeLayout(false);
             this.ResumeLayout(false);
 
-			}
-			private Button btnOk;
-			private TextBox tbxName;
-			private Caption Caption3;
-			private System.Windows.Forms.ColorDialog ColorDia;
-			private Button btnQI_Vorschau;
-			private TextBox tbxQuickinfo;
-			private Button btnZeilenFilterIgnorieren;
-			private Button btnAutoFilterErweitertErlaubt;
-			private Button btnAutoFilterTXTErlaubt;
-			private Button btnAutoFilterMoeglich;
-			private Caption capInfo;
-			private Button btnZurueck;
-			private Button btnVor;
-			private Button btnMultiline;
-			private Caption capRechterRand;
-			private Caption capLinkerRand;
-			private Button btnTextColor;
-			private Button btnBackColor;
-			private Caption Caption2;
-			private TextBox tbxCaption;
-			private GroupBox BlueFrame1;
-			private Button btnEditableDropdown;
-			private Button btnEditableStandard;
-			private TextBox tbxAuswaehlbareWerte;
-			private Button btnCanBeEmpty;
-			private Caption capUserGroupEdit;
-			private Caption Caption8;
-			private ComboBox cbxRandRechts;
-			private ComboBox cbxRandLinks;
-			private Caption Caption13;
-			private TextBox tbxAllowedChars;
-			private Caption capImmerWerte;
-			private Caption capFormat;
-			private Caption Caption18;
-			private TextBox tbxAdminInfo;
-			private Caption Caption17;
-			private Button btnOtherValuesToo;
-			private ListBox lbxCellEditor;
-			private ComboBox cbxFormat;
-			private TextBox tbxTags;
-			private TabControl tabControl;
-			private  System.Windows.Forms.TabPage tabDesign;
-			private  System.Windows.Forms.TabPage tabRechte;
-			private  System.Windows.Forms.TabPage tabAutoBearbeitung;
-			private  System.Windows.Forms.TabPage tabFilter;
-			private  System.Windows.Forms.TabPage tabQuickInfo;
-			private  System.Windows.Forms.TabPage tabSonstiges;
-			private Button btnEinzeiligDarstellen;
-			private Button btnIgnoreLock;
-			private Button btnLogUndo;
-			private Button btnSpellChecking;
-			private Caption capSpaltenbild;
-			private Caption capEinheit;
-			private ComboBox cbxEinheit;
-			private TextBox tbxJoker;
-			private Caption capJokerValue;
-			private TextBox tbxInitValue;
-			private Caption Caption12;
-			private Button btnAutoEditKleineFehler;
-			private Button btnAutoEditToUpper;
-			private TextBox tbxRunden;
-			private Caption capNachkommastellen;
-			private Button btnAutoEditAutoSort;
-            private ComboBox cbxBildTextVerhalten;
-            private Caption capBildCodeImageNotfound;
-            private Caption capBildCodeConstHeight;
-            private TextBox txbBildCodeConstHeight;
-            private TextBox txbLinkedKeyKennung;
-            private Caption capLinkedKeyKennung;
-            private ComboBox cbxLinkedDatabase;
-            private Caption capLinkedDatabase;
-            private Caption capBestFileStandardSuffix;
-            private TextBox txbBestFileStandardSuffix;
-            private Caption capBestFileStandardFolder;
-            private TextBox txbBestFileStandardFolder;
-            private GroupBox grpVerlinkteZellen;
-            private ComboBox cbxTargetColumn;
-            private ComboBox cbxColumnKeyInColumn;
-            private ComboBox cbxRowKeyInColumn;
-            private Button btnTargetColumn;
-            private Button btnColumnKeyInColumn;
-            private Caption capRowKeyInColumn;
-            private TextBox capZeichenkette;
-            private Line line1;
-            private TextBox txbZeichenkette;
-            private TextBox txbReplacer;
-            private Caption capReplacer;
-            private Caption capUeberschrift3;
-            private Caption capUeberschrift2;
-            private Caption capUeberschrift1;
-            private TextBox txbUeberschift3;
-            private TextBox txbUeberschift2;
-            private TextBox txbUeberschift1;
-            private GroupBox grpBildCode;
-            private TextBox txbPrefix;
-            private Caption capPraefix;
-            private Button btnStandard;
-            private  System.Windows.Forms.TabPage tabSpezial;
-            private GroupBox grpLinkToFileSystem;
-            private GroupBox grpLinkedDatabase;
-            private ComboBox cbxSchlüsselspalte;
-            private Caption capSchlüsselspalte;
-            private GroupBox grpColumnsForLinkedDatabase;
-            private TextBox txbSortMask;
-            private Caption capSortiermaske;
-            private TextBox txbRegex;
-            private Caption capRegex;
-            private ComboBox cbxAlign;
-            private Caption capAlign;
-            private ComboBox cbxVorschlagSpalte;
-            private Caption capVorschlag;
-            private ComboBox cbxDropDownKey;
-            private Caption capDropDownKey;
-            private GroupBox grpAuswahlmenuOptionen;
-            private TextBox txbAutoRemove;
-            private Caption capAutoRemove;
-            private Button butSaveContent;
+        }
+        private Button btnOk;
+        private TextBox tbxName;
+        private Caption Caption3;
+        private System.Windows.Forms.ColorDialog ColorDia;
+        private Button btnQI_Vorschau;
+        private TextBox tbxQuickinfo;
+        private Button btnZeilenFilterIgnorieren;
+        private Button btnAutoFilterErweitertErlaubt;
+        private Button btnAutoFilterTXTErlaubt;
+        private Button btnAutoFilterMoeglich;
+        private Caption capInfo;
+        private Button btnZurueck;
+        private Button btnVor;
+        private Button btnMultiline;
+        private Caption capRechterRand;
+        private Caption capLinkerRand;
+        private Button btnTextColor;
+        private Button btnBackColor;
+        private Caption Caption2;
+        private TextBox tbxCaption;
+        private GroupBox BlueFrame1;
+        private Button btnEditableDropdown;
+        private Button btnEditableStandard;
+        private TextBox tbxAuswaehlbareWerte;
+        private Button btnCanBeEmpty;
+        private Caption capUserGroupEdit;
+        private Caption Caption8;
+        private ComboBox cbxRandRechts;
+        private ComboBox cbxRandLinks;
+        private Caption Caption13;
+        private TextBox tbxAllowedChars;
+        private Caption capImmerWerte;
+        private Caption capFormat;
+        private Caption Caption18;
+        private TextBox tbxAdminInfo;
+        private Caption Caption17;
+        private Button btnOtherValuesToo;
+        private ListBox lbxCellEditor;
+        private ComboBox cbxFormat;
+        private TextBox tbxTags;
+        private TabControl tabControl;
+        private System.Windows.Forms.TabPage tabDesign;
+        private System.Windows.Forms.TabPage tabRechte;
+        private System.Windows.Forms.TabPage tabAutoBearbeitung;
+        private System.Windows.Forms.TabPage tabFilter;
+        private System.Windows.Forms.TabPage tabQuickInfo;
+        private System.Windows.Forms.TabPage tabSonstiges;
+        private Button btnEinzeiligDarstellen;
+        private Button btnIgnoreLock;
+        private Button btnLogUndo;
+        private Button btnSpellChecking;
+        private Caption capSpaltenbild;
+        private Caption capEinheit;
+        private ComboBox cbxEinheit;
+        private TextBox tbxJoker;
+        private Caption capJokerValue;
+        private TextBox tbxInitValue;
+        private Caption Caption12;
+        private Button btnAutoEditKleineFehler;
+        private Button btnAutoEditToUpper;
+        private TextBox tbxRunden;
+        private Caption capNachkommastellen;
+        private Button btnAutoEditAutoSort;
+        private ComboBox cbxBildTextVerhalten;
+        private Caption capBildCodeImageNotfound;
+        private Caption capBildCodeConstHeight;
+        private TextBox txbBildCodeConstHeight;
+        private TextBox txbLinkedKeyKennung;
+        private Caption capLinkedKeyKennung;
+        private ComboBox cbxLinkedDatabase;
+        private Caption capLinkedDatabase;
+        private Caption capBestFileStandardSuffix;
+        private TextBox txbBestFileStandardSuffix;
+        private Caption capBestFileStandardFolder;
+        private TextBox txbBestFileStandardFolder;
+        private GroupBox grpVerlinkteZellen;
+        private ComboBox cbxTargetColumn;
+        private ComboBox cbxRowKeyInColumn;
+        private Caption capTargetColumn;
+        private Caption capRowKeyInColumn;
+        private TextBox txbReplacer;
+        private Caption capReplacer;
+        private Caption capUeberschrift3;
+        private Caption capUeberschrift2;
+        private Caption capUeberschrift1;
+        private TextBox txbUeberschift3;
+        private TextBox txbUeberschift2;
+        private TextBox txbUeberschift1;
+        private GroupBox grpBildCode;
+        private TextBox txbPrefix;
+        private Caption capPraefix;
+        private Button btnStandard;
+        private System.Windows.Forms.TabPage tabSpezial;
+        private GroupBox grpLinkToFileSystem;
+        private GroupBox grpLinkedDatabase;
+        private ComboBox cbxSchlüsselspalte;
+        private Caption capSchlüsselspalte;
+        private GroupBox grpColumnsForLinkedDatabase;
+        private TextBox txbSortMask;
+        private Caption capSortiermaske;
+        private TextBox txbRegex;
+        private Caption capRegex;
+        private ComboBox cbxAlign;
+        private Caption capAlign;
+        private ComboBox cbxVorschlagSpalte;
+        private Caption capVorschlag;
+        private ComboBox cbxDropDownKey;
+        private Caption capDropDownKey;
+        private GroupBox grpAuswahlmenuOptionen;
+        private TextBox txbAutoRemove;
+        private Caption capAutoRemove;
+        private Button butSaveContent;
         private Caption capDauerfilterPos;
         private TextBox txbDauerFilterPos;
         private Caption capIntern;
@@ -1686,4 +1614,4 @@ namespace BlueControls.BlueDatabaseDialogs
         private Button btnVerwendung;
         private TextBox txbSpaltenbild;
     }
-	}
+}

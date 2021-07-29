@@ -109,15 +109,12 @@ namespace BlueDatabase {
 
             if (column.MultiLine && column.Format == enDataFormat.Link_To_Filesystem) { return null; }
 
-
             var wert = row.CellGetString(column);
-
 
             var vars = new List<Variable>();
 
             if (column.Format == enDataFormat.LinkedCell && column.LinkedCell_RowKey == -9999) {
-                wert = string.Empty;
-                //vars.Add(new Variable(column.Name, wert, enVariableDataType.List, ro, false, "Spalte: " + column.ReadableText() + "\r\nBeim Skript-Start ist dieser Wert immer leer, da die Verlinkung erst erstellt werden muss."));
+                wert = string.Empty; // Beim Skript-Start ist dieser Wert immer leer, da die Verlinkung erst erstellt werden muss.
                 vars.Add(new Variable(column.Name + "_link", string.Empty, enVariableDataType.String, true, true, "Dieser Wert kann nur mit SetLink verändert werden.\r\nBeim Skript-Start ist dieser Wert immer leer, da die Verlinkung erst erstellt werden muss."));
             }
 
@@ -128,7 +125,9 @@ namespace BlueDatabase {
 
             switch (column.Format) {
                 case enDataFormat.Bit:
-                    vars.Add(wert == "+" ? new Variable(column.Name, "true", enVariableDataType.Bool, ro, false, "Spalte: " + column.ReadableText()) : new Variable(column.Name, "false", enVariableDataType.Bool, ro, false, "Spalte: " + column.ReadableText()));
+                    vars.Add(wert == "+" ?
+                        new Variable(column.Name, "true", enVariableDataType.Bool, ro, false, "Spalte: " + column.ReadableText()) :
+                        new Variable(column.Name, "false", enVariableDataType.Bool, ro, false, "Spalte: " + column.ReadableText()));
                     break;
 
                 case enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl:
@@ -143,6 +142,16 @@ namespace BlueDatabase {
                         vars.Add(new Variable(column.Name + "_ImageFileName", f, enVariableDataType.String, true, false, "Spalte: " + column.ReadableText() + "\r\nEnthält den vollen Dateinamen des Bildes der zugehörigen Zelle."));
                     }
 
+                    break;
+
+                case enDataFormat.Columns_für_LinkedCellDropdown:
+                    var nw = string.Empty;
+
+                    if (int.TryParse(wert, out var ColKey)) {
+                        var C = column.LinkedDatabase().Column.SearchByKey(ColKey);
+                        if (C != null) { nw = C.Name; }
+                    }
+                    vars.Add(new Variable(column.Name, nw, enVariableDataType.String, true, false, "Spalte: " + column.ReadableText()));
                     break;
 
                 default:

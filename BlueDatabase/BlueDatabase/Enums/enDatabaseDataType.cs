@@ -209,7 +209,11 @@ namespace BlueDatabase.Enums {
         co_KeyColumnKey = 178,
         co_LinkedCell_RowKey = 179,
         co_LinkedCell_ColumnKey = 180,
+
+        [Obsolete]
         co_LinkedCell_ColumnValueFoundIn = 181,
+
+        [Obsolete]
         co_LinkedCell_ColumnValueAdd = 182,
 
         //co_LinkedCell_Behaviour = 183,

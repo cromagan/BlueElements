@@ -667,23 +667,8 @@ namespace BlueDatabase {
             ///
             /// Spaltenschlüssel in der Ziel-Datenbank ermitteln
             ///
-            if (column.LinkedCell_ColumnKey >= 0) {
-                // Fixe angabe
-                targetColumn = linkedDatabase.Column.SearchByKey(column.LinkedCell_ColumnKey);
-            } else {
-                // Spalte aus einer Spalte lesen
-                var LinkedCell_ColumnValueFoundInColumn = column.Database.Column.SearchByKey(column.LinkedCell_ColumnValueFoundIn);
-                if (LinkedCell_ColumnValueFoundInColumn == null) { return Ergebnis("Die Spalte, aus der der Spaltenschlüssel kommen soll, existiert nicht."); }
-                if (!int.TryParse(row.CellGetString(LinkedCell_ColumnValueFoundInColumn), out var colKey)) { return Ergebnis("Der Text Spalte der Spalte, aus der der Spaltenschlüssel kommen soll, ist fehlerhaft."); }
-                if (string.IsNullOrEmpty(column.LinkedCell_ColumnValueAdd)) {   // Ohne Vorsatz
-                    targetColumn = linkedDatabase.Column.SearchByKey(colKey);
-                } else {
-                    // Mit Vorsatz
-                    var tarCx = linkedDatabase.Column.SearchByKey(colKey);
-                    if (tarCx == null) { return Ergebnis("Die Spalte, aus der der Spaltenschlüssel (mit anschließenden Zusatz) kommen soll, existiert nicht."); }
-                    targetColumn = linkedDatabase.Column[column.LinkedCell_ColumnValueAdd + tarCx.Name];
-                }
-            }
+            targetColumn = linkedDatabase.Column.SearchByKey(column.LinkedCell_ColumnKey);
+
             if (targetColumn == null) { return Ergebnis("Die Spalte ist in der Zieldatenbank nicht vorhanden."); }
 
             ///
@@ -926,7 +911,7 @@ namespace BlueDatabase {
             List<RowItem> Rows = null;
             var ownRow = _database.Row.SearchByKey(rowKey);
             foreach (var ThisColumn in _database.Column) {
-                if (ThisColumn.LinkedCell_RowKey == column.Key || ThisColumn.LinkedCell_ColumnValueFoundIn == column.Key) {
+                if (ThisColumn.LinkedCell_RowKey == column.Key) {
                     LinkedCellData(ThisColumn, ownRow, true, false); // Repariert auch Zellbezüge
                 }
                 if (ThisColumn.KeyColumnKey == column.Key) {

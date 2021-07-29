@@ -125,9 +125,6 @@
 casesensitive&lt;br&gt;
 casesensitive oder instr ist optional</value>
   </data>
-  <data name="txbZeichenkette.QuickInfo" xml:space="preserve">
-    <value>Mit dieser zusätlichen Zeichenkette ist es möglich&lt;br&gt;trotz nur einer Ziel-Spalten-Angabe, den Wert&lt;br&gt;aus einer anderen Spalte anzeigen zu lassen.&lt;br&gt;&lt;br&gt;Der Spaltenname wird um die hier angegebene&lt;br&gt;Zeichenkette erweitert.&lt;br&gt;&lt;br&gt;&lt;b&gt;Wichtig:&lt;/b&gt;&lt;br&gt;Der Text wird VORNE angestellt,&lt;br&gt;um einen Konflikt mit der Spalten-Findung&lt;br&gt;zu vermeiden.</value>
-  </data>
   <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>34</value>
   </metadata>
