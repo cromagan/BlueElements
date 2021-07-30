@@ -199,21 +199,15 @@ namespace BlueControls.Controls {
             do {
                 R = false;
                 foreach (System.Windows.Forms.Control o in Controls) {
-                    switch (o.Name) {
-                        case "Editor":
-                            break;
-
-                        case "Tabs":
-                            if (((AbstractTabControl)o).TabCount > 0) {
-                                RemoveControl(o);
-                                R = true;
-                            }
-                            break;
-
-                        default:
+                    if (o is GroupBox g && g == grpEditor) {
+                    } else if (o is TabControl t && t == Tabs) {
+                        if (t.TabCount > 0) {
                             RemoveControl(o);
                             R = true;
-                            break;
+                        }
+                    } else {
+                        RemoveControl(o);
+                        R = true;
                     }
                 }
             } while (R);
@@ -593,7 +587,7 @@ namespace BlueControls.Controls {
             if (!grpEditor.Visible) { return; }
             ColumnViewItem ViewItem = null;
             if (lbxColumns.Item.Checked().Count == 1) {
-                ViewItem = SearchViewItem(_Database.Column[lbxColumns.Item.Checked()[0].Internal]);
+                ViewItem = SearchViewItem(_Database.Column.SearchByKey(IntParse(lbxColumns.Item.Checked()[0].Internal)));
             }
             grpPosition.Enabled = ViewItem != null;
             grpGroesse.Enabled = ViewItem != null;
@@ -642,7 +636,7 @@ namespace BlueControls.Controls {
             var item = (BasicListItem)e.HotItem;
             if (item == null) { return; }
             item.Checked = true;
-            var cd = SearchViewItem(_Database.Column[item.Internal]);
+            var cd = SearchViewItem(_Database.Column.SearchByKey(IntParse(item.Internal)));
             if (cd == null) {
                 e.UserMenu.Add("Zum Kopfbereich hinzufügen", "#AddColumnToHead", enImageCode.Sonne);
                 e.UserMenu.Add("Zum Körperbereich hinzufügen", "#AddColumnToBody", enImageCode.Kreis, _Database.Views.Count > 1);
@@ -652,9 +646,9 @@ namespace BlueControls.Controls {
         }
 
         private void lbxColumns_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-            //if (_Database.Views.Count == 0) { _Database.Views.Add(new ColumnViewCollection(_Database, "")); }
-            var Column = _Database.Column[((BasicListItem)e.HotItem).Internal];
-            _ = SearchColumnView(Column);
+
+            var Column = _Database.Column.SearchByKey(IntParse(((BasicListItem)e.HotItem).Internal));
+
             var ViewItem = SearchViewItem(Column);
             var CurrView = CurrentView();
             switch (e.ClickedComand) {

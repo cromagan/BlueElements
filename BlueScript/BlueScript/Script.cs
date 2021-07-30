@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -142,38 +143,10 @@ namespace BlueScript {
                         }
                     }
                 } catch (Exception ex) {
-                    Develop.DebugPrint(ex);
+                    Develop.DebugPrint(enFehlerArt.Info, ex);
                 }
             }
             return l;
-            //    var objects = new List<T>();
-            //    IEnumerable<Type> types = null;
-            //    try {
-            //        types =
-            //           from a in AppDomain.CurrentDomain.GetAssemblies()
-            //           from t in a.GetTypes()
-            //           select t;
-            //    }
-            //    catch (Exception ex) {
-            //        Develop.DebugPrint(ex);
-            //        if (ex is System.Reflection.ReflectionTypeLoadException typeLoadException) {
-            //            Develop.DebugPrint(typeLoadException.LoaderExceptions.ToString());
-            //            //var loaderExceptions = typeLoadException.LoaderExceptions;
-            //        }
-            //        return objects;
-            //    }
-            //    foreach (var type in types.Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(T)))) {
-            //        objects.Add((T)Activator.CreateInstance(type, constructorArgs));
-            //    }
-            //    //foreach( var thisa in  AppDomain.CurrentDomain.GetAssemblies())
-            //    //       {
-            //    //   foreach (var type in
-            //    //       Assembly.GetAssembly(typeof(T)).GetTypes()
-            //    //       .Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(T)))) {
-            //    //       objects.Add((T)Activator.CreateInstance(type, constructorArgs));
-            //    //   }
-            //    //   //objects.Sort();
-            //    return objects;
         }
 
         public static (string, string) Parse(string scriptText, bool reduce, Script s) {

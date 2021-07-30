@@ -46,10 +46,10 @@ namespace BluePaint {
 
         #region Constructors
 
-        public MainWindow(bool LoadSaveEnabled) : base() {
+        public MainWindow(bool loadSaveEnabled) : base() {
             InitializeComponent();
-            Tab_Start.Enabled = LoadSaveEnabled;
-            btnOK.Visible = !LoadSaveEnabled;
+            Tab_Start.Enabled = loadSaveEnabled;
+            btnOK.Visible = !loadSaveEnabled;
             tabRibbonbar.SelectedIndex = 1;
         }
 
