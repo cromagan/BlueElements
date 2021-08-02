@@ -202,7 +202,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
         }
 
-        private int ColumKeyFrom(Database database, string columnKey) => database == null ? -1 : IntParse(columnKey);
+        private int ColumKeyFrom(Database database, string columnKey) => database == null || string.IsNullOrEmpty(columnKey) ? -1 : IntParse(columnKey);
 
         private void Column_DatenAuslesen(ColumnItem FromColumn) {
             _Column = FromColumn;
