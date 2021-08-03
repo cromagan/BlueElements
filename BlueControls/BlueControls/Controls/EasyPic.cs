@@ -31,6 +31,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using static BlueBasics.BitmapExt;
 using static BlueBasics.Extensions;
 using static BlueBasics.FileOperations;
 
@@ -155,7 +156,7 @@ namespace BlueControls.Controls {
                 return;
             }
             var ix = (Bitmap)BitmapExt.Image_FromFile(Filename);
-            var i = ix.Image_Clone();
+            var i = Image_Clone(ix);
             if (_MaxSize > 0) {
                 _Bitmap = BitmapExt.Resize(i, _MaxSize, _MaxSize, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true);
                 SorceType = enSorceType.LoadedFromDiskAndResized;

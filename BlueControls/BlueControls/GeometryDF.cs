@@ -142,7 +142,7 @@ namespace BlueControls {
             };
         }
 
-        public static double Winkel(PointM Sp, PointM EP) => Geometry.Winkel(Sp.X, Sp.Y, EP.X, EP.Y);
+        public static double Winkel(PointM Sp, PointM EP) => Geometry.GetAngle(Sp.X, Sp.Y, EP.X, EP.Y);
 
         #endregion
     }

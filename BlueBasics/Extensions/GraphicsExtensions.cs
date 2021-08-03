@@ -34,8 +34,8 @@ namespace BlueBasics {
         public static void DrawImageInRectAspectRatio(this Graphics gR, Bitmap bmp, Rectangle r) => DrawImageInRectAspectRatio(gR, bmp, r.Left, r.Top, r.Width, r.Height);
 
         public static void DrawRad(this Graphics gR, Pen pen, PointF middle, PointF startP, float wink) {
-            var radius = (float)Math.Abs(Geometry.Länge(middle, startP));
-            var startw = (float)Geometry.Winkel(middle, startP);
+            var radius = (float)Math.Abs(Geometry.GetLenght(middle, startP));
+            var startw = (float)Geometry.GetAngle(middle, startP);
             gR.DrawArc(pen, middle.X - radius, middle.Y - radius, radius * 2, radius * 2, -startw, -wink);
         }
 

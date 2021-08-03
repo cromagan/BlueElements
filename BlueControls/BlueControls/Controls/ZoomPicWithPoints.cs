@@ -192,7 +192,7 @@ namespace BlueControls.Controls {
                     BMP.Save(Path, System.Drawing.Imaging.ImageFormat.Png);
                 }
                 if (Tags != null) {
-                    Tags.TagSet("Erstellt", modAllgemein.UserName());
+                    Tags.TagSet("Erstellt", Generic.UserName());
                     Tags.TagSet("Datum", DateTime.Now.ToString(Constants.Format_Date5));
                     Tags.Save(pathtxt, Constants.Win1252, false);
                 }

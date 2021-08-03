@@ -21,8 +21,9 @@ using BlueControls.EventArgs;
 using BlueControls.Forms;
 using System;
 using System.Drawing;
+using static BlueBasics.BitmapExt;
 using static BlueBasics.Develop;
-using static BlueBasics.modAllgemein;
+using static BlueBasics.Generic;
 
 namespace BluePaint {
 
@@ -132,7 +133,7 @@ namespace BluePaint {
             WollenSieDenZuschnittÜbernehmen();
             var _Pic = base.OnNeedCurrentPic();
             OnZoomFit();
-            var pa = _Pic.GetAutoValuesForCrop(0.9);
+            var pa = GetAutoValuesForCrop(_Pic, 0.9);
             Links.Value = pa.Left;
             Recht.Value = pa.Right;
             Oben.Value = pa.Top;
@@ -150,7 +151,7 @@ namespace BluePaint {
 
         private void ZuschnittOK_Click(object sender, System.EventArgs e) {
             var _Pic = OnNeedCurrentPic();
-            var _BMP2 = _Pic.Crop((int)Links.Value, (int)Recht.Value, (int)Oben.Value, (int)Unten.Value);
+            var _BMP2 = Crop(_Pic, (int)Links.Value, (int)Recht.Value, (int)Oben.Value, (int)Unten.Value);
             OnOverridePic(_BMP2);
             Links.Value = 0;
             Recht.Value = 0;

@@ -49,10 +49,10 @@ namespace BlueControls.Forms {
             Ypos -= Skin.PaddingSmal;
             Generate_ListBox1(Items, SteuerWi, enAddType.None, Translate);
             //UnloadLostFocus = true;
-            Position_SetWindowIntoScreen(modAllgemein.PointOnScreenNr(new Point(Xpos, Ypos)), Xpos, Ypos);
+            Position_SetWindowIntoScreen(Generic.PointOnScreenNr(new Point(Xpos, Ypos)), Xpos, Ypos);
             //Develop.DoEvents();
             Show();
-            while (!string.IsNullOrEmpty(modAllgemein.LastMouseButton())) { Develop.DoEvents(); }
+            while (!string.IsNullOrEmpty(WindowsRemoteControl.LastMouseButton())) { Develop.DoEvents(); }
             //this.Focus();
             timer1.Enabled = true;
         }
@@ -200,7 +200,7 @@ namespace BlueControls.Forms {
         private void OnItemClicked(ContextMenuItemClickedEventArgs e) => ItemClicked?.Invoke(this, e);
 
         private void timer1_Tick(object sender, System.EventArgs e) {
-            var MouseIsDown = !string.IsNullOrEmpty(modAllgemein.LastMouseButton());
+            var MouseIsDown = !string.IsNullOrEmpty(WindowsRemoteControl.LastMouseButton());
             if (MouseIsDown && !_MouseWasDown && !IsMouseInForm()) {
                 // erster Klick ausserhalb des Forms
                 Close();

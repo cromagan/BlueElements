@@ -285,7 +285,7 @@ namespace BlueControls.ItemCollection {
                         if (_tmpBMP.Width != DCoordinates.Width || DCoordinates.Height != _tmpBMP.Height) {
                             _tmpBMP.Dispose();
                             _tmpBMP = null;
-                            modAllgemein.CollectGarbage();
+                            Generic.CollectGarbage();
                         }
                     }
                     if (DCoordinates.Width < 1 || DCoordinates.Height < 1 || DCoordinates.Width > 20000 || DCoordinates.Height > 20000) { return; }

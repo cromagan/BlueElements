@@ -481,7 +481,7 @@ namespace BlueDatabase {
                     var v = CellToVariable(thisCol, this);
                     if (v != null) { vars.AddRange(v); }
                 }
-                vars.Add(new Variable("User", modAllgemein.UserName(), enVariableDataType.String, true, false, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
+                vars.Add(new Variable("User", Generic.UserName(), enVariableDataType.String, true, false, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
                 vars.Add(new Variable("Usergroup", Database.UserGroup, enVariableDataType.String, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
                 if (Database.IsAdministrator()) {
                     vars.Add(new Variable("Administrator", "true", enVariableDataType.Bool, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));

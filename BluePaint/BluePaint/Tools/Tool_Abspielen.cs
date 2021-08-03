@@ -82,7 +82,7 @@ namespace BluePaint {
                 var newf = TempFile(p, thisf.FileNameWithoutSuffix(), "PNG");
                 var B = OnNeedCurrentPic();
                 B.Save(newf, System.Drawing.Imaging.ImageFormat.Png);
-                modAllgemein.CollectGarbage();
+                Generic.CollectGarbage();
             }
         }
 

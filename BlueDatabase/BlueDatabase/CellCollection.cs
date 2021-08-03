@@ -23,9 +23,9 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text.RegularExpressions;
-using static BlueBasics.Extensions;
-using static BlueBasics.modAllgemein;
 using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
+using static BlueBasics.Generic;
 
 namespace BlueDatabase {
 

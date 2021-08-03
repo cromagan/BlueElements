@@ -117,7 +117,7 @@ namespace BlueControls.Forms {
                 ho = double.Parse(Höhe.Text);
                 if (ho < 5) { makeP = false; }
             }
-            if (Querformat.Checked) { modAllgemein.Swap(ref br, ref ho); }
+            if (Querformat.Checked) { Generic.Swap(ref br, ref ho); }
             if (makeP) {
                 OK_Enabled = true;
                 var Z = Math.Min(Sample.Width / br, Sample.Height / ho);

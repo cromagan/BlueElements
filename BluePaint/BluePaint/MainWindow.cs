@@ -22,6 +22,7 @@ using BluePaint.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using static BlueBasics.BitmapExt;
 using static BlueBasics.Extensions;
 using static BlueBasics.FileOperations;
 
@@ -258,7 +259,7 @@ namespace BluePaint {
                 btnRückgänig.Enabled = false;
                 return;
             }
-            _PicUndo = P.BMP.Image_Clone();
+            _PicUndo = Image_Clone(P.BMP);
             btnRückgänig.Enabled = true;
         }
 
@@ -352,7 +353,7 @@ namespace BluePaint {
             btnRückgänig.Enabled = false;
             _isSaved = false;
             var _bmp = P.BMP;
-            modAllgemein.Swap(ref _bmp, ref _PicUndo);
+            Generic.Swap(ref _bmp, ref _PicUndo);
             P.BMP = _bmp;
             if (P.BMP.Width != _PicUndo.Width || P.BMP.Height != _PicUndo.Height) {
                 P.ZoomFit();

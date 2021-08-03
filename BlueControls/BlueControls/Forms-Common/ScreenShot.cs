@@ -25,6 +25,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Runtime.CompilerServices;
+using static BlueBasics.BitmapExt;
 
 namespace BlueControls {
 
@@ -99,19 +100,19 @@ namespace BlueControls {
         public static Bitmap GrabAllScreens() {
             do {
                 try {
-                    var r = modAllgemein.RectangleOfAllScreens();
+                    var r = Generic.RectangleOfAllScreens();
                     Bitmap b = new(r.Width, r.Height, PixelFormat.Format32bppPArgb);
                     using (var GR = Graphics.FromImage(b)) {
                         GR.CopyFromScreen(r.X, r.Y, 0, 0, b.Size);
                     }
                     return b;
                 } catch {
-                    modAllgemein.CollectGarbage();
+                    Generic.CollectGarbage();
                 }
             } while (true);
         }
 
-        public static Bitmap GrabArea(Rectangle R) => R.Width < 2 || R.Height < 2 ? null : GrabAllScreens().Area(R);
+        public static Bitmap GrabArea(Rectangle R) => R.Width < 2 || R.Height < 2 ? null : Area(GrabAllScreens(), R);
 
         public static strScreenData GrabArea() => GrabArea(null, -1, -1);
 
@@ -132,7 +133,7 @@ namespace BlueControls {
             ScreenShot x = new();
             var im = x.GrabContinuusIntern();
             x.Dispose();
-            modAllgemein.CollectGarbage();
+            Generic.CollectGarbage();
             return im;
         }
 
@@ -148,7 +149,7 @@ namespace BlueControls {
                 MousesWasUp = true;
                 return;
             }
-            var r = modAllgemein.RectangleOfAllScreens();
+            var r = Generic.RectangleOfAllScreens();
             Left = r.Left;
             Top = r.Top;
             Width = r.Width;
@@ -157,7 +158,7 @@ namespace BlueControls {
             GR.DrawImage(ScreenShotBMP, 0, 0);
             if (e != null) {
                 PrintText(GR, e);
-                modAllgemein.Magnify(ScreenShotBMP, new Point(e.X, e.Y), GR, false);
+                Magnify(ScreenShotBMP, new Point(e.X, e.Y), GR, false);
                 if (e.Button != System.Windows.Forms.MouseButtons.None) {
                     GR.DrawLine(new Pen(Color.Red), 0, FeedBack.Point1.Y, Width, FeedBack.Point1.Y);
                     GR.DrawLine(new Pen(Color.Red), FeedBack.Point1.X, 0, FeedBack.Point1.X, Height);
@@ -197,10 +198,10 @@ namespace BlueControls {
                 if (frm != null) {
                     WS = frm.WindowState;
                     frm.WindowState = System.Windows.Forms.FormWindowState.Minimized;
-                    modAllgemein.Pause(0.5, true); // 0.3 ist zu wenig!
+                    Generic.Pause(0.5, true); // 0.3 ist zu wenig!
                 }
                 PrepareForm();
-                var r = modAllgemein.RectangleOfAllScreens();
+                var r = Generic.RectangleOfAllScreens();
                 Left = r.Left;
                 Top = r.Top;
                 Width = r.Width;
@@ -253,7 +254,7 @@ namespace BlueControls {
                     HookStartPoint = new Point(int.MinValue, int.MinValue);
                     HookEndPoint = new Point(int.MinValue, int.MinValue);
                     LastMouse = new Point(int.MinValue, int.MinValue);
-                    modAllgemein.Pause(0.5, false);
+                    Generic.Pause(0.5, false);
                     Rahm.Visible = true;
                     Hook.InstallHook();
                 }
@@ -274,7 +275,7 @@ namespace BlueControls {
                 maxx = Math.Max(VersX + AllS[0].GrabedArea().Width, maxx);
                 maxy = Math.Max(VersY + AllS[0].GrabedArea().Height, maxy);
             }
-            modAllgemein.CollectGarbage();
+            Generic.CollectGarbage();
             Bitmap bmp = new(maxx - MinX, maxy - MinY, PixelFormat.Format32bppPArgb);
             var gr = Graphics.FromImage(bmp);
             gr.Clear(Color.White);

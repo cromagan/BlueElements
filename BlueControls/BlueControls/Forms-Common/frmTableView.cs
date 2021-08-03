@@ -415,7 +415,7 @@ namespace BlueControls.Forms {
                     break;
 
                 case "csv":
-                    System.Windows.Clipboard.SetText(TableView.Export_CSV(enFirstRow.ColumnCaption));
+                    Generic.CopytoClipboard(TableView.Export_CSV(enFirstRow.ColumnCaption));
                     MessageBox.Show("Die gewünschten Daten<br>sind nun im Zwischenspeicher.", enImageCode.Clipboard, "Ok");
                     break;
 

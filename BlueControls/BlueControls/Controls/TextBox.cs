@@ -823,7 +823,7 @@ namespace BlueControls.Controls {
             if (string.IsNullOrEmpty(tt)) { return; }
             tt = tt.Replace("\n", string.Empty);
             tt = tt.Replace("\r", "\r\n");
-            System.Windows.Clipboard.SetText(tt);
+            Generic.CopytoClipboard(tt);
         }
 
         private void Clipboard_Paste() {
@@ -1015,7 +1015,7 @@ namespace BlueControls.Controls {
             _MarkEnd = Math.Max(_MarkEnd, 0);
             _MarkEnd = Math.Min(_MarkEnd, _eTxt.Chars.Count);
             if (SwapThem && _MarkStart > _MarkEnd) {
-                modAllgemein.Swap(ref _MarkStart, ref _MarkEnd);
+                Generic.Swap(ref _MarkStart, ref _MarkEnd);
             }
         }
 

@@ -26,8 +26,8 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using System;
-using static BlueBasics.FileOperations;
 using static BlueBasics.Converter;
+using static BlueBasics.FileOperations;
 
 namespace BlueControls.BlueDatabaseDialogs {
 

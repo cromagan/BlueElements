@@ -22,6 +22,7 @@ using BlueControls.Enums;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using static BlueBasics.Polygons;
 
 namespace BlueControls.ItemCollection {
 
@@ -129,19 +130,19 @@ namespace BlueControls.ItemCollection {
                     break;
 
                 case enSymbol.Pfeil:
-                    p = modAllgemein.Poly_Arrow(d2.ToRect());
+                    p = Poly_Arrow(d2.ToRect());
                     break;
 
                 case enSymbol.Bruchlinie:
-                    p = modAllgemein.Poly_Bruchlinie(d2.ToRect());
+                    p = Poly_Bruchlinie(d2.ToRect());
                     break;
 
                 case enSymbol.Rechteck:
-                    p = modAllgemein.Poly_Rechteck(d2.ToRect());
+                    p = Poly_Rechteck(d2.ToRect());
                     break;
 
                 case enSymbol.Rechteck_gerundet:
-                    p = modAllgemein.Poly_RoundRec(d2.ToRect(), (int)(20 * cZoom));
+                    p = Poly_RoundRec(d2.ToRect(), (int)(20 * cZoom));
                     break;
 
                 default:

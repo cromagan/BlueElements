@@ -28,8 +28,8 @@ using System.Collections.Generic;
 using System.Drawing.Printing;
 using System.IO;
 using System.Windows.Forms;
-using static BlueBasics.FileOperations;
 using static BlueBasics.Converter;
+using static BlueBasics.FileOperations;
 
 namespace BlueControls.Forms {
 
@@ -118,7 +118,7 @@ namespace BlueControls.Forms {
         /// <returns>Gibt das Item zurück, dass nicht mehr auf den Druckbereich gepasst hat</returns>
         public static int GeneratePrintPad(CreativePad pad, int startNr, string layout, List<RowItem> rowsForExport, float abstandMM) {
             pad.Item.Clear();
-            modAllgemein.CollectGarbage();
+            Generic.CollectGarbage();
             CreativePad tmp = new(new ItemCollectionPad(layout, rowsForExport[0].Database, rowsForExport[0].Key));
             var OneItem = tmp.Item.MaxBounds(null);
             pad.Item.SheetStyle = tmp.Item.SheetStyle;
@@ -284,8 +284,9 @@ namespace BlueControls.Forms {
                     break;
 
                 case "Kopieren":
-                    var x = new System.Collections.Specialized.StringCollection();
-                    x.Add(tl.Internal);
+                    var x = new System.Collections.Specialized.StringCollection {
+                        tl.Internal
+                    };
                     Clipboard.SetFileDropList(x);
                     break;
             }

@@ -22,8 +22,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using static BlueBasics.FileOperations;
 using static BlueBasics.Converter;
+using static BlueBasics.FileOperations;
 
 namespace BlueBasics {
 

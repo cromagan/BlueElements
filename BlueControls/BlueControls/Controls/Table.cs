@@ -36,9 +36,9 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.Linq;
 using System.Threading;
+using static BlueBasics.Converter;
 using static BlueBasics.FileOperations;
 using static BlueBasics.ListOfExtension;
-using static BlueBasics.Converter;
 
 namespace BlueControls.Controls {
 
@@ -430,7 +430,7 @@ namespace BlueControls.Controls {
                     var c = Row.CellGetString(Column);
                     c = c.Replace("\r\n", "\r");
                     c = c.Replace("\r", "\r\n");
-                    System.Windows.Forms.Clipboard.SetText(c);
+                    Generic.CopytoClipboard(c);
                     if (Meldung) { Notification.Show(LanguageTool.DoTranslate("<b>{0}</b><br>ist nun in der Zwischenablage.", true, c), enImageCode.Kopieren); }
                 } else {
                     if (Meldung) { Notification.Show(LanguageTool.DoTranslate("Bei dieser Spalte nicht möglich."), enImageCode.Warnung); }
@@ -959,14 +959,19 @@ namespace BlueControls.Controls {
                 Invoke(new Action(() => DrawControl(gr, state)));
                 return;
             }
+
+            tmpCursorRect = Rectangle.Empty;
+
             // Listboxen bekommen keinen Focus, also Tabellen auch nicht. Basta.
             if (Convert.ToBoolean(state & enStates.Standard_HasFocus)) {
                 state ^= enStates.Standard_HasFocus;
             }
+
             if (_Database == null || DesignMode || ShowWaitScreen) {
-                DrawWeitScreen(gr);
+                DrawWaitScreen(gr);
                 return;
             }
+
             lock (Lock_UserAction) {
                 //if (_InvalidExternal) { FillExternalControls(); }
                 if (Convert.ToBoolean(state & enStates.Standard_Disabled)) { CursorPos_Reset(); }
@@ -974,7 +979,7 @@ namespace BlueControls.Controls {
                 // Haupt-Aufbau-Routine ------------------------------------
                 gr.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
                 if (!ComputeAllColumnPositions()) {
-                    DrawWeitScreen(gr);
+                    DrawWaitScreen(gr);
                     return;
                 }
                 var FirstVisibleRow = SortedRowData().Count;
@@ -2379,49 +2384,49 @@ namespace BlueControls.Controls {
             Draw_Border(GR, cellInThisDatabaseColumn, displayRectangleWOSlider, false);
         }
 
-        private void Draw_Column_Cells(Graphics GR, ColumnViewItem ViewItem, Rectangle displayRectangleWOSlider, int FirstVisibleRow, int LastVisibleRow, int lfdno) {
+        private void Draw_Column_Cells(Graphics gr, ColumnViewItem viewItem, Rectangle displayRectangleWOSlider, int firstVisibleRow, int lastVisibleRow, int lfdno) {
             // Die Cursorposition ermittleln
-            if (!Thread.CurrentThread.IsBackground && _CursorPosColumn != null && _CursorPosRow != null && ViewItem.Column == _CursorPosColumn) {
+            if (!Thread.CurrentThread.IsBackground && _CursorPosColumn != null && _CursorPosRow != null && viewItem.Column == _CursorPosColumn) {
                 if (IsOnScreen(_CursorPosColumn, _CursorPosRow, displayRectangleWOSlider)) {
-                    tmpCursorRect = new Rectangle((int)ViewItem.OrderTMP_Spalte_X1, DrawY(_CursorPosRow) + 1, Column_DrawWidth(ViewItem, displayRectangleWOSlider), _CursorPosRow.DrawHeight - 1);
-                    Draw_Cursor(GR, displayRectangleWOSlider, false);
+                    tmpCursorRect = new Rectangle((int)viewItem.OrderTMP_Spalte_X1, DrawY(_CursorPosRow) + 1, Column_DrawWidth(viewItem, displayRectangleWOSlider), _CursorPosRow.DrawHeight - 1);
+                    Draw_Cursor(gr, displayRectangleWOSlider, false);
                 }
             }
             //  Neue Zeile
-            if (UserEdit_NewRowAllowed() && ViewItem == CurrentArrangement[Database.Column[0]]) {
-                Skin.Draw_FormatedText(GR, "[Neue Zeile]", QuickImage.Get(enImageCode.PlusZeichen, Pix16), enAlignment.Left, new Rectangle((int)ViewItem.OrderTMP_Spalte_X1 + 1, (int)(-SliderY.Value + HeadSize() + 1), (int)ViewItem._TMP_DrawWidth - 2, 16 - 2), this, false, _NewRow_Font, Translate);
+            if (UserEdit_NewRowAllowed() && viewItem == CurrentArrangement[Database.Column[0]]) {
+                Skin.Draw_FormatedText(gr, "[Neue Zeile]", QuickImage.Get(enImageCode.PlusZeichen, Pix16), enAlignment.Left, new Rectangle((int)viewItem.OrderTMP_Spalte_X1 + 1, (int)(-SliderY.Value + HeadSize() + 1), (int)viewItem._TMP_DrawWidth - 2, 16 - 2), this, false, _NewRow_Font, Translate);
             }
             // Zeilen Zeichnen (Alle Zellen)
-            for (var Zei = FirstVisibleRow; Zei <= LastVisibleRow; Zei++) {
+            for (var Zei = firstVisibleRow; Zei <= lastVisibleRow; Zei++) {
                 var CurrentRow = SortedRowData()[Zei];
-                GR.SmoothingMode = SmoothingMode.None;
+                gr.SmoothingMode = SmoothingMode.None;
                 if (CurrentRow.Expanded) {
-                    GR.DrawLine(Skin.Pen_LinieDünn, (int)ViewItem.OrderTMP_Spalte_X1, DrawY(CurrentRow), (int)ViewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(ViewItem, displayRectangleWOSlider) - 1, DrawY(CurrentRow));
+                    gr.DrawLine(Skin.Pen_LinieDünn, (int)viewItem.OrderTMP_Spalte_X1, DrawY(CurrentRow), (int)viewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(viewItem, displayRectangleWOSlider) - 1, DrawY(CurrentRow));
                     // Zelleninhalt Zeichnen
-                    Draw_CellTransparent(GR, ViewItem, CurrentRow, displayRectangleWOSlider, _Cell_Font);
+                    Draw_CellTransparent(gr, viewItem, CurrentRow, displayRectangleWOSlider, _Cell_Font);
                 }
                 if (_Unterschiede != null && _Unterschiede != CurrentRow.Row) {
-                    if (CurrentRow.Row.CellGetString(ViewItem.Column) != _Unterschiede.CellGetString(ViewItem.Column)) {
-                        Rectangle tmpr = new((int)ViewItem.OrderTMP_Spalte_X1 + 1, DrawY(CurrentRow) + 1, Column_DrawWidth(ViewItem, displayRectangleWOSlider) - 2, CurrentRow.DrawHeight - 2);
-                        GR.DrawRectangle(new Pen(Color.Red, 1), tmpr);
+                    if (CurrentRow.Row.CellGetString(viewItem.Column) != _Unterschiede.CellGetString(viewItem.Column)) {
+                        Rectangle tmpr = new((int)viewItem.OrderTMP_Spalte_X1 + 1, DrawY(CurrentRow) + 1, Column_DrawWidth(viewItem, displayRectangleWOSlider) - 2, CurrentRow.DrawHeight - 2);
+                        gr.DrawRectangle(new Pen(Color.Red, 1), tmpr);
                     }
                 }
                 if (lfdno == 1) {
                     // Überschrift in der ersten Spalte zeichnen
                     CurrentRow.CaptionPos = Rectangle.Empty;
                     if (!string.IsNullOrEmpty(CurrentRow.Chapter)) {
-                        var si = GR.MeasureString(CurrentRow.Chapter, _Chapter_Font.Font());
-                        GR.FillRectangle(new SolidBrush(Skin.Color_Back(enDesign.Table_And_Pad, enStates.Standard).SetAlpha(50)), 1, DrawY(CurrentRow) - RowCaptionSizeY, displayRectangleWOSlider.Width - 2, RowCaptionSizeY);
+                        var si = gr.MeasureString(CurrentRow.Chapter, _Chapter_Font.Font());
+                        gr.FillRectangle(new SolidBrush(Skin.Color_Back(enDesign.Table_And_Pad, enStates.Standard).SetAlpha(50)), 1, DrawY(CurrentRow) - RowCaptionSizeY, displayRectangleWOSlider.Width - 2, RowCaptionSizeY);
                         CurrentRow.CaptionPos = new Rectangle(1, DrawY(CurrentRow) - RowCaptionFontY, (int)si.Width + 28, (int)si.Height);
                         if (_collapsed.Contains(CurrentRow.Chapter)) {
-                            Button.DrawButton(this, GR, enDesign.Button_CheckBox, enStates.Checked, null, enAlignment.Horizontal_Vertical_Center, false, null, string.Empty, CurrentRow.CaptionPos, false);
-                            GR.DrawImage(QuickImage.Get("Pfeil_Unten_Scrollbar|14|||FF0000||200|200").BMP, 5, DrawY(CurrentRow) - RowCaptionFontY + 6);
+                            Button.DrawButton(this, gr, enDesign.Button_CheckBox, enStates.Checked, null, enAlignment.Horizontal_Vertical_Center, false, null, string.Empty, CurrentRow.CaptionPos, false);
+                            gr.DrawImage(QuickImage.Get("Pfeil_Unten_Scrollbar|14|||FF0000||200|200").BMP, 5, DrawY(CurrentRow) - RowCaptionFontY + 6);
                         } else {
-                            Button.DrawButton(this, GR, enDesign.Button_CheckBox, enStates.Standard, null, enAlignment.Horizontal_Vertical_Center, false, null, string.Empty, CurrentRow.CaptionPos, false);
-                            GR.DrawImage(QuickImage.Get("Pfeil_Rechts_Scrollbar|14|||||0").BMP, 5, DrawY(CurrentRow) - RowCaptionFontY + 6);
+                            Button.DrawButton(this, gr, enDesign.Button_CheckBox, enStates.Standard, null, enAlignment.Horizontal_Vertical_Center, false, null, string.Empty, CurrentRow.CaptionPos, false);
+                            gr.DrawImage(QuickImage.Get("Pfeil_Rechts_Scrollbar|14|||||0").BMP, 5, DrawY(CurrentRow) - RowCaptionFontY + 6);
                         }
-                        GR.DrawString(CurrentRow.Chapter, _Chapter_Font.Font(), _Chapter_Font.Brush_Color_Main, 23, DrawY(CurrentRow) - RowCaptionFontY);
-                        GR.DrawLine(Skin.Pen_LinieDick, 0, DrawY(CurrentRow), displayRectangleWOSlider.Width, DrawY(CurrentRow));
+                        gr.DrawString(CurrentRow.Chapter, _Chapter_Font.Font(), _Chapter_Font.Brush_Color_Main, 23, DrawY(CurrentRow) - RowCaptionFontY);
+                        gr.DrawLine(Skin.Pen_LinieDick, 0, DrawY(CurrentRow), displayRectangleWOSlider.Width, DrawY(CurrentRow));
                     }
                 }
             }
@@ -2652,7 +2657,6 @@ namespace BlueControls.Controls {
 
         private void Draw_Table_Std(Graphics GR, enStates State, Rectangle displayRectangleWOSlider, int FirstVisibleRow, int LastVisibleRow) {
             try {
-                tmpCursorRect = Rectangle.Empty;
                 if (_Database.ColumnArrangements == null || _ArrangementNr >= _Database.ColumnArrangements.Count) { return; }   // Kommt vor, dass spontan doch geparsed wird...
                 Skin.Draw_Back(GR, enDesign.Table_And_Pad, State, DisplayRectangle, this, true);
                 /// Maximale Rechten Pixel der Permanenten Columns ermitteln
@@ -2726,16 +2730,18 @@ namespace BlueControls.Controls {
             }
         }
 
-        private void DrawWeitScreen(Graphics GR) {
+        private void DrawWaitScreen(Graphics GR) {
             if (SliderX != null) { SliderX.Enabled = false; }
             if (SliderY != null) { SliderY.Enabled = false; }
+
             Skin.Draw_Back(GR, enDesign.Table_And_Pad, enStates.Standard_Disabled, DisplayRectangle, this, true);
+
             var i = QuickImage.Get(enImageCode.Uhr, 64).BMP;
             GR.DrawImage(i, (Width - 64) / 2, (Height - 64) / 2);
             Skin.Draw_Border(GR, enDesign.Table_And_Pad, enStates.Standard_Disabled, DisplayRectangle);
         }
 
-        private int DrawY(clsRowDrawData r) => r.Y + HeadSize() - (int)SliderY.Value;
+        private int DrawY(clsRowDrawData r) => r == null ? 0 : r.Y + HeadSize() - (int)SliderY.Value;
 
         private void DropDownMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
             FloatingForm.Close(this);

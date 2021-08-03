@@ -80,7 +80,7 @@ namespace BlueControls.Forms {
             } else {
                 MB.Show();
                 while (MB.Pressed == null) {
-                    modAllgemein.Pause(0.1, true);
+                    Generic.Pause(0.1, true);
                 }
             }
             return int.Parse(MB.Pressed.Name);

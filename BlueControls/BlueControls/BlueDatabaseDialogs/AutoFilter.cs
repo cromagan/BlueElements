@@ -348,7 +348,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                             var Zd1 = double.Parse(Z1);
                             var Zd2 = double.Parse(Z2);
                             if (Zd2 < Zd1) {
-                                modAllgemein.Swap(ref Zd1, ref Zd2);
+                                Generic.Swap(ref Zd1, ref Zd2);
                             }
                             CloseAndDispose("Filter", new FilterItem(Column, enFilterType.Between | enFilterType.UND, Zd1.ToString(Constants.Format_Float9) + "|" + Zd2.ToString(Constants.Format_Float9)));
                             return;

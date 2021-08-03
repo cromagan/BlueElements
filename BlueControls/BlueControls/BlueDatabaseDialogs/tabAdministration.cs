@@ -29,8 +29,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
-using static BlueBasics.FileOperations;
 using static BlueBasics.Converter;
+using static BlueBasics.FileOperations;
 
 namespace BlueControls.BlueDatabaseDialogs {
 

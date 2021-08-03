@@ -26,7 +26,7 @@ namespace BlueControls.Forms {
 
         #region Fields
 
-        private bool _cancelPossible = false;
+        private readonly bool _cancelPossible = false;
 
         #endregion
 

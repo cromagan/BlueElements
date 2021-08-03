@@ -23,8 +23,8 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using System.IO;
 using System.Text.RegularExpressions;
-using static BlueBasics.Extensions;
 using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 
 namespace BlueControls.BlueDatabaseDialogs {
 

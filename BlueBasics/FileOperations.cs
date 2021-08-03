@@ -21,7 +21,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Security.Cryptography;
-using static BlueBasics.modAllgemein;
+using static BlueBasics.Generic;
 
 namespace BlueBasics {
 
@@ -34,7 +34,7 @@ namespace BlueBasics {
         private static DateTime _canWrite_LastCheck = DateTime.Now.Subtract(new TimeSpan(10, 10, 10));
         private static string _canWrite_LastFile = string.Empty;
         private static bool _canWrite_LastResult;
-        private static int _canWrite_tryintervall = 10;
+        private static readonly int _canWrite_tryintervall = 10;
         private static string _LastFilePath = string.Empty;
 
         #endregion

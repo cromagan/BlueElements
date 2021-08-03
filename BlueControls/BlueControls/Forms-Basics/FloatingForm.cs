@@ -80,7 +80,7 @@ namespace BlueControls.Forms {
         }
 
         public void Position_CenterScreen(Point BestPosition) {
-            var ScreenNr = modAllgemein.PointOnScreenNr(BestPosition);
+            var ScreenNr = Generic.PointOnScreenNr(BestPosition);
             CheckMaxSize(ScreenNr);
             StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             var Xpos = System.Windows.Forms.Screen.AllScreens[ScreenNr].WorkingArea.Left + ((System.Windows.Forms.Screen.AllScreens[ScreenNr].WorkingArea.Width - Width) / 2.0);
@@ -89,7 +89,7 @@ namespace BlueControls.Forms {
         }
 
         public void Position_LocateToMouse() {
-            var ScreenNr = modAllgemein.PointOnScreenNr(System.Windows.Forms.Cursor.Position);
+            var ScreenNr = Generic.PointOnScreenNr(System.Windows.Forms.Cursor.Position);
             CheckMaxSize(ScreenNr);
             var Ypos = System.Windows.Forms.Cursor.Position.Y + 15;
             var Xpos = System.Windows.Forms.Cursor.Position.X + 15;
@@ -103,7 +103,7 @@ namespace BlueControls.Forms {
         }
 
         public void Position_LocateToPosition(Point BestPosition) {
-            var ScreenNr = modAllgemein.PointOnScreenNr(BestPosition);
+            var ScreenNr = Generic.PointOnScreenNr(BestPosition);
             CheckMaxSize(ScreenNr);
             Position_SetWindowIntoScreen(ScreenNr, BestPosition.X, BestPosition.Y);
         }
@@ -120,7 +120,7 @@ namespace BlueControls.Forms {
 
         public new void Show() {
             try {
-                modFernsteuerung.ShowWindow(Handle, (int)enSW.ShowNoActivate);
+                WindowsRemoteControl.ShowWindow(Handle, (int)enSW.ShowNoActivate);
             } catch (ObjectDisposedException) {
                 // kommt vor, wenn der Aufbau zu lange dauert. Ignorierbar.
             } catch (Exception ex) {

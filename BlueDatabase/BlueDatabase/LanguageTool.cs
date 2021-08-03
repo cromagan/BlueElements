@@ -74,7 +74,7 @@ namespace BlueDatabase {
         public static string DoTranslate(string txt, bool mustTranslate, params object[] args) {
             try {
                 if (Translation == null) {
-                    return args.GetUpperBound(0) < 0  ? txt : string.Format(txt, args);
+                    return args.GetUpperBound(0) < 0 ? txt : string.Format(txt, args);
                 }
                 if (string.IsNullOrEmpty(txt)) { return string.Empty; }
                 if (German == txt) { return args.GetUpperBound(0) < 0 ? English : string.Format(English, args); }

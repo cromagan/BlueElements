@@ -63,7 +63,7 @@ namespace BlueDatabase {
 
         public readonly ListExt<string> Tags = new();
 
-        public readonly string UserName = modAllgemein.UserName().ToUpper();
+        public readonly string UserName = Generic.UserName().ToUpper();
 
         public readonly ListExt<ColumnViewCollection> Views = new();
 
@@ -405,13 +405,13 @@ namespace BlueDatabase {
                     }
                     if (FileExists(pf)) {
                         var tmp = GetByFilename(pf, false);
-                        if (tmp != null) { return (Database)tmp; }
+                        if (tmp != null) { return tmp; }
                         tmp = new Database(pf, false, false);
-                        return (Database)tmp;
+                        return tmp;
                     }
                 } while (pf != string.Empty);
             }
-            var d = modAllgemein.GetEmmbedResource(assembly, Name);
+            var d = Generic.GetEmmbedResource(assembly, Name);
             if (d != null) { return new Database(d); }
             if (FehlerAusgeben) { Develop.DebugPrint(enFehlerArt.Fehler, "Ressource konnte nicht initialisiert werden: " + BlueBasicsSubDir + " - " + Name); }
             return null;

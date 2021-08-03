@@ -30,10 +30,10 @@ namespace BlueBasics {
             var rO = r.PointOf(enAlignment.Top_Right);
             var ru = r.PointOf(enAlignment.Bottom_Right);
             var lu = r.PointOf(enAlignment.Bottom_Left);
-            var llo = Geometry.Länge(p, LO);
-            var lro = Geometry.Länge(p, rO);
-            var llu = Geometry.Länge(p, lu);
-            var lru = Geometry.Länge(p, ru);
+            var llo = Geometry.GetLenght(p, LO);
+            var lro = Geometry.GetLenght(p, rO);
+            var llu = Geometry.GetLenght(p, lu);
+            var lru = Geometry.GetLenght(p, ru);
             var Erg = Math.Min(Math.Min(llo, lro), Math.Min(llu, lru));
             return Erg == llo ? LO : Erg == lro ? rO : Erg == llu ? lu : Erg == lru ? ru : Point.Empty;
         }

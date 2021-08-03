@@ -23,9 +23,22 @@ using System.Runtime.InteropServices;
 
 namespace BlueBasics {
 
-    public static partial class modFernsteuerung {
+    public static partial class WindowsRemoteControl {
+
+        #region Fields
+
+        private const int KEYEVENTF_EXTENDEDKEY = 0x1;
+
+        private const int KEYEVENTF_KEYDOWN = 0x0;
+
+        private const int KEYEVENTF_KEYUP = 0x2;
+
+        #endregion
 
         #region Methods
+
+        // Release key
+        public static void AltRelease() => keybd_event((byte)enTaste.VK_MENU, 0, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
 
         /// <summary>
         /// Diese Funktion Sucht alle offenen Fenster.
@@ -93,6 +106,19 @@ namespace BlueBasics {
             wDescr.prid = prid;
         }
 
+        public static void KeyDown(enTaste k) => keybd_event((byte)k, 0, KEYEVENTF_KEYDOWN, 0);
+
+        public static void KeyUp(enTaste k) => keybd_event((byte)k, 0, KEYEVENTF_KEYUP, 0);
+
+        public static string LastMouseButton() => Convert.ToBoolean(GetAsyncKeyState(0x1)) ? "Links"
+                : Convert.ToBoolean(GetAsyncKeyState(0x2)) ? "Rechts"
+: Convert.ToBoolean(GetAsyncKeyState(0x4)) ? "Mitte"
+: string.Empty;
+
+        public static void LeftAltRelease() => keybd_event((byte)enTaste.VK_MENU, 0, KEYEVENTF_KEYUP, 0);
+
+        public static void ShiftRelease() => keybd_event((byte)enTaste.VK_SHIFT, 0, KEYEVENTF_KEYUP, 0);
+
         [DllImport("user32", EntryPoint = "ShowWindow", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         public static extern int ShowWindow(IntPtr hWnd, int nCmdShow);
 
@@ -138,6 +164,9 @@ namespace BlueBasics {
             return buffer.Substring(0, buffer.Length);
         }
 
+        [DllImport("user32", EntryPoint = "GetAsyncKeyState", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
+        private static extern short GetAsyncKeyState(int vKey);
+
         [DllImport("user32", EntryPoint = "GetClassNameA", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         private static extern int GetClassName(IntPtr hWnd, string lpClassName, int nMaxCount);
 
@@ -164,6 +193,20 @@ namespace BlueBasics {
 
         [DllImport("user32", EntryPoint = "GetWindowThreadProcessId", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         private static extern int GetWindowThreadProcessId(IntPtr hWnd, ref int lpdwProcessId);
+
+        // VK_CANCEL = &H3 'Used for control-break processing.
+        // '****************
+        //    VK_CRSEL = &HF7
+        //    VK_EREOF = &HF9
+        //    VK_EXECUTE = &H2B
+        //    VK_EXSEL = &HF8
+        //    VK_NONAME = &HFC
+        //    VK_OEM_CLEAR = &HFE
+        //    VK_PA1 = &HFD
+        //    VK_PROCESSKEY = &HE5
+        //    CAPSLOCK_ON = &H80    '  the capslock light is on.
+        [DllImport("user32.dll", EntryPoint = "keybd_event", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
+        private static extern int keybd_event(byte bVk, byte bScan, int dwFlags, int dwExtraInfo);
 
         /// <summary>
         /// Setzt ein Fenster an eine andere Position

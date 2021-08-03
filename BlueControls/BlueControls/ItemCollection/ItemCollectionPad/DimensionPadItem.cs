@@ -22,6 +22,7 @@ using BlueControls.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using static BlueBasics.Polygons;
 
 namespace BlueControls.ItemCollection {
 
@@ -123,7 +124,7 @@ namespace BlueControls.ItemCollection {
             var m1 = FontSize * 1.5d;
             var Px2 = GeometryDF.PolarToCartesian(m1, Winkel + 10);
             var Px3 = GeometryDF.PolarToCartesian(m1, Winkel - 10);
-            var pa = modAllgemein.Poly_Triangle(Point, new PointF(Point.X + (float)Px2.X, Point.Y + (float)Px2.Y), new PointF(Point.X + (float)Px3.X, Point.Y + (float)Px3.Y));
+            var pa = Poly_Triangle(Point, new PointF(Point.X + (float)Px2.X, Point.Y + (float)Px2.Y), new PointF(Point.X + (float)Px3.X, Point.Y + (float)Px3.Y));
             GR.FillPath(new SolidBrush(Col), pa);
         }
 
@@ -268,7 +269,7 @@ namespace BlueControls.ItemCollection {
             var sz2 = GR.MeasureString(Text_unten, f.Font(geszoom));
             var P1 = _SchnittPunkt1.ZoomAndMove(cZoom, shiftX, shiftY);
             var P2 = _SchnittPunkt2.ZoomAndMove(cZoom, shiftX, shiftY);
-            if (sz1.Width + (PfeilG * 2f) < Geometry.Länge(P1, P2)) {
+            if (sz1.Width + (PfeilG * 2f) < Geometry.GetLenght(P1, P2)) {
                 DrawPfeil(GR, P1, Convert.ToDouble(_Winkel), f.Color_Main, PfeilG);
                 DrawPfeil(GR, P2, Convert.ToDouble(_Winkel + 180), f.Color_Main, PfeilG);
             } else {

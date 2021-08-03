@@ -250,7 +250,7 @@ namespace BlueControls.ItemCollection {
                     GR.DrawImage(Bitmap, r2, r3, GraphicsUnit.Pixel);
                 }
             } catch {
-                modAllgemein.CollectGarbage();
+                Generic.CollectGarbage();
             }
             if (Stil != PadStyles.Undefiniert) {
                 if (Parent.SheetStyleScale > 0 && Parent.SheetStyle != null) {

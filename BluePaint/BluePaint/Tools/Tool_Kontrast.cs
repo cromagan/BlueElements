@@ -18,6 +18,7 @@
 using BlueBasics;
 using BlueControls.EventArgs;
 using System.Drawing;
+using static BlueBasics.BitmapExt;
 using static BlueBasics.Extensions;
 
 namespace BluePaint {
@@ -35,17 +36,17 @@ namespace BluePaint {
         public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic) {
             if (OriginalPic == null) { return; }
             if (sldKontrast.Value != 0) {
-                var _PicPreview = OriginalPic.AdjustContrast((float)sldKontrast.Value);
+                var _PicPreview = AdjustContrast(OriginalPic, (float)sldKontrast.Value);
                 e.DrawImage(_PicPreview);
                 return;
             }
             if (sldGamma.Value != 1) {
-                var _PicPreview = OriginalPic.AdjustGamma((float)sldGamma.Value);
+                var _PicPreview = AdjustGamma(OriginalPic, (float)sldGamma.Value);
                 e.DrawImage(_PicPreview);
                 return;
             }
             if (sldHelligkeit.Value != 1) {
-                var _PicPreview = OriginalPic.AdjustBrightness((float)sldHelligkeit.Value);
+                var _PicPreview = AdjustBrightness(OriginalPic, (float)sldHelligkeit.Value);
                 e.DrawImage(_PicPreview);
                 return;
             }
@@ -107,7 +108,7 @@ namespace BluePaint {
             var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
             OnForceUndoSaving();
-            _Pic.AllePixelZuSchwarz(1f);
+            AllePixelZuSchwarz(_Pic, 1f);
             sldGamma.Value = 1f;
             sldKontrast.Value = 0f;
             sldHelligkeit.Value = 1f;
@@ -120,7 +121,7 @@ namespace BluePaint {
             if (_Pic == null) { return; }
             OnForceUndoSaving();
             OnCommandForMacro("Ausdünnen");
-            _Pic.Ausdünnen(4);
+            Ausdünnen(_Pic, 4);
             sldGamma.Value = 1f;
             sldKontrast.Value = 0f;
             sldHelligkeit.Value = 1f;
@@ -131,7 +132,7 @@ namespace BluePaint {
         private void btnGamma_Click(object sender, System.EventArgs e) {
             var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
-            OnOverridePic(_Pic.AdjustGamma((float)sldGamma.Value));
+            OnOverridePic(AdjustGamma(_Pic, (float)sldGamma.Value));
             OnCommandForMacro("Gamma;" + (float)sldGamma.Value);
             sldGamma.Value = 1f;
             sldKontrast.Value = 0f;
@@ -141,7 +142,7 @@ namespace BluePaint {
         private void btnGraustufen_Click(object sender, System.EventArgs e) {
             var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
-            OnOverridePic(_Pic.Grayscale());
+            OnOverridePic(Grayscale(_Pic));
             sldGamma.Value = 1f;
             sldKontrast.Value = 0f;
             sldHelligkeit.Value = 1f;
@@ -151,7 +152,7 @@ namespace BluePaint {
         private void btnHelligkeit_Click(object sender, System.EventArgs e) {
             var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
-            OnOverridePic(_Pic.AdjustBrightness((float)sldHelligkeit.Value));
+            OnOverridePic(AdjustBrightness(_Pic, (float)sldHelligkeit.Value));
             OnCommandForMacro("Helligkeit;" + (float)sldHelligkeit.Value);
             sldGamma.Value = 1f;
             sldKontrast.Value = 0f;
@@ -161,7 +162,7 @@ namespace BluePaint {
         private void btnKontrastErhoehen_Click(object sender, System.EventArgs e) {
             var _Pic = OnNeedCurrentPic();
             if (_Pic == null) { return; }
-            OnOverridePic(_Pic.AdjustContrast((float)sldKontrast.Value));
+            OnOverridePic(AdjustContrast(_Pic, (float)sldKontrast.Value));
             OnCommandForMacro("Kontrast;" + (float)sldKontrast.Value);
             sldGamma.Value = 1f;
             sldKontrast.Value = 0f;

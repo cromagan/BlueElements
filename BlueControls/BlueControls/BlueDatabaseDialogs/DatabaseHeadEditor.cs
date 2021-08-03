@@ -229,7 +229,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             foreach (var thisf in alle) {
                 nDB++;
                 x.Update(nDB);
-                var db = (Database)Database.GetByFilename(thisf, false);
+                var db = Database.GetByFilename(thisf, false);
                 var disp = db == null;
                 if (db == null) {
                     db = new Database(thisf, true, false);
@@ -244,7 +244,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             x.Close();
         }
 
-        private void btnClipboard_Click(object sender, System.EventArgs e) => System.Windows.Forms.Clipboard.SetText(tblUndo.Export_CSV(enFirstRow.ColumnCaption));
+        private void btnClipboard_Click(object sender, System.EventArgs e) => Generic.CopytoClipboard(tblUndo.Export_CSV(enFirstRow.ColumnCaption));
 
         private void btnFremdImport_Click(object sender, System.EventArgs e) {
             if (_Database.ReadOnly) { return; }

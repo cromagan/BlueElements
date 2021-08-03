@@ -19,6 +19,7 @@ using BlueBasics;
 using BlueControls.EventArgs;
 using System;
 using System.Drawing;
+using static BlueBasics.BitmapExt;
 using static BlueBasics.Extensions;
 
 namespace BluePaint {
@@ -73,7 +74,7 @@ namespace BluePaint {
             if (c[0] == "Replace") {
                 var OriginalPic = OnNeedCurrentPic();
                 var cc = Color.FromArgb(int.Parse(c[1]));
-                OnOverridePic(OriginalPic.ReplaceColor(cc, Color.Transparent));
+                OnOverridePic(ReplaceColor(OriginalPic, cc, Color.Transparent));
             } else {
                 Develop.DebugPrint_NichtImplementiert();
             }
@@ -90,7 +91,7 @@ namespace BluePaint {
             if (e.Current.Button == System.Windows.Forms.MouseButtons.Left) {
                 if (Razi.Checked) {
                     var _Pic = OnNeedCurrentPic();
-                    _Pic.FillCircle(Color.White, e.Current.TrimmedX, e.Current.TrimmedY, 3);
+                    FillCircle(_Pic, Color.White, e.Current.TrimmedX, e.Current.TrimmedY, 3);
                 }
             }
             OnDoInvalidate();
@@ -108,7 +109,7 @@ namespace BluePaint {
                     var cc = _Pic.GetPixel(e.Current.X, e.Current.Y);
                     if (cc.ToArgb() == 0) { return; }
                     OnCommandForMacro("Replace;" + cc.ToArgb());
-                    OnOverridePic(OriginalPic.ReplaceColor(cc, Color.Transparent));
+                    OnOverridePic(ReplaceColor(OriginalPic, cc, Color.Transparent));
                     return;
                 }
             }

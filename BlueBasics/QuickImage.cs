@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Reflection;
+using static BlueBasics.BitmapExt;
 using static BlueBasics.Converter;
 
 namespace BlueBasics {
@@ -373,7 +374,7 @@ namespace BlueBasics {
         public string CompareKey() => ToString();
 
         public BitmapExt GetBitmap(string tmpname) {
-            var vbmp = modAllgemein.GetEmmbedBitmap(Assembly.GetAssembly(typeof(QuickImage)), tmpname + ".png");
+            var vbmp = GetEmmbedBitmap(Assembly.GetAssembly(typeof(QuickImage)), tmpname + ".png");
             if (vbmp != null) { return vbmp; }
             lock (_locker) {
                 var i = GetIndex(tmpname);

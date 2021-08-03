@@ -20,7 +20,7 @@ using BlueControls.EventArgs;
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using static BlueBasics.modAllgemein;
+using static BlueBasics.Generic;
 
 namespace BluePaint {
 

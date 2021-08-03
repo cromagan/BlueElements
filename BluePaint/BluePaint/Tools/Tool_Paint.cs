@@ -15,9 +15,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
 using BlueControls.EventArgs;
 using System.Drawing;
+using static BlueBasics.BitmapExt;
 
 namespace BluePaint {
 
@@ -44,7 +44,7 @@ namespace BluePaint {
         public override void MouseMove(MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) {
             if (e.Current.Button == System.Windows.Forms.MouseButtons.Left) {
                 var _Pic = OnNeedCurrentPic();
-                _Pic.FillCircle(Color.Black, e.Current.TrimmedX, e.Current.TrimmedY, 2);
+                FillCircle(_Pic, Color.Black, e.Current.TrimmedX, e.Current.TrimmedY, 2);
                 OnDoInvalidate();
             } else {
                 OnDoInvalidate();

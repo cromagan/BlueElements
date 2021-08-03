@@ -36,7 +36,7 @@ namespace BluePaint {
 
         private void DoScreenShot() {
             OnHideMainWindow();
-            BlueBasics.modAllgemein.Pause(1, true);
+            BlueBasics.Generic.Pause(1, true);
             var _Pic = ScreenShot.GrabArea(null, 0, 0).Pic;
             if (_Pic != null) { OnOverridePic(_Pic); }
             OnShowMainWindow();

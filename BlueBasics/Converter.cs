@@ -113,7 +113,7 @@ namespace BlueBasics {
         // }
         public static void CartesianToPolar(PointF ko, ref double r, ref double win) {
             r = Math.Sqrt((ko.X * ko.X) + (ko.Y * ko.Y));
-            win = Convert.ToDouble(Geometry.Winkel(0d, 0d, ko.X, ko.Y));
+            win = Convert.ToDouble(Geometry.GetAngle(0d, 0d, ko.X, ko.Y));
         }
 
         /// <summary>
@@ -291,7 +291,7 @@ namespace BlueBasics {
         }
 
         private static Bitmap Bitmap_ChangePixelFormat(Bitmap oldBmp) {
-            modAllgemein.CollectGarbage();
+            Generic.CollectGarbage();
             return new Bitmap(oldBmp);
             // Return oldBmp.Clone(New Rectangle(0, 0, oldBmp.Width, oldBmp.Height), NewFormat)
         }

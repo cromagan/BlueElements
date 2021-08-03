@@ -67,7 +67,7 @@ namespace BlueControls {
             foreach (var ThisRowItem in _DictWords.Row) {
                 if (ThisRowItem != null) {
                     var w = ThisRowItem.CellFirstString();
-                    var di = modAllgemein.LevenshteinDistance(Word.ToLower(), w.ToLower());
+                    var di = Generic.LevenshteinDistance(Word.ToLower(), w.ToLower());
                     if (di < Word.Length / 2.0 || di < w.Length / 2.0) {
                         l.Add(di.ToString(Constants.Format_Integer5) + w);
                     }

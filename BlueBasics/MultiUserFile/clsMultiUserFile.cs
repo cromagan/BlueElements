@@ -24,7 +24,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Threading;
 using static BlueBasics.FileOperations;
-using static BlueBasics.modAllgemein;
+using static BlueBasics.Generic;
 
 namespace BlueBasics.MultiUserFile {
 

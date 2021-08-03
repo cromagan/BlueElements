@@ -110,6 +110,7 @@
     <Compile Include="EventArgs\LoadingEventArgs.cs" />
     <Compile Include="Extensions\GraphicsExtensions.cs" />
     <Compile Include="ListExt.cs" />
+    <Compile Include="Polygons.cs" />
     <Compile Include="strProcess.cs" />
     <Compile Include="Enums\enMouseEvent.cs" />
     <Compile Include="QuickImage.cs" />
@@ -141,17 +142,16 @@
     <Compile Include="Extensions\PointFExtension.cs" />
     <Compile Include="Extensions\RectangleExtension.cs" />
     <Compile Include="Extensions\SizeFExtension.cs" />
-    <Compile Include="Extensions\SortierExtensions.cs" />
+    <Compile Include="Extensions\SortExtensions.cs" />
     <Compile Include="Extensions\StringExtension.cs" />
     <Compile Include="modErgebnis.cs" />
     <Compile Include="Extensions\BooleanExtensions.cs" />
     <Compile Include="Interfaces\ICanBeEmpty.cs" />
-    <Compile Include="modAllgemein.cs" />
-    <Compile Include="modFernsteuerung.cs" />
+    <Compile Include="Generic.cs" />
+    <Compile Include="WindowsRemoteControl.cs" />
     <Compile Include="Enums\enSizeModes.cs" />
     <Compile Include="Extensions\ColorExtension.cs" />
     <Compile Include="Converter.cs" />
-    <Compile Include="KeyboardSimulation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Application.Designer.cs">
       <AutoGen>True</AutoGen>

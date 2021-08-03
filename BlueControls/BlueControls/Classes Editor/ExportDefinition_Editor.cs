@@ -23,8 +23,8 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
 using System.Drawing;
-using static BlueBasics.FileOperations;
 using static BlueBasics.Converter;
+using static BlueBasics.FileOperations;
 
 namespace BlueControls.Classes_Editor {
 

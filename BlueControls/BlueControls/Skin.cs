@@ -28,6 +28,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.Reflection;
+using static BlueBasics.Polygons;
 
 //  = A3 & ".Design.Add(enStates."&B3&", enKontur."& C3 & ", " &D3&", "&E3&", "&F3&","&G3&", enHintergrundArt."&H3&","&I3&",'"&J3&"','"&K3&"','"&L3&"',enRahmenArt."&M3&",'"&N3&"','"&O3&"','"&P3&"','"&Q3&"','"&R3&"');"
 
@@ -1700,10 +1701,10 @@ namespace BlueControls {
         }
 
         private static GraphicsPath Kontur(enKontur Kon, Rectangle r) => Kon switch {
-            enKontur.Rechteck => modAllgemein.Poly_Rechteck(r),// GR.SmoothingModex = Drawing2D.SmoothingMode.None
-            enKontur.Rechteck_R4 => modAllgemein.Poly_RoundRec(r, 4),// GR.SmoothingModex = Drawing2D.SmoothingMode.HighQuality
+            enKontur.Rechteck => Poly_Rechteck(r),// GR.SmoothingModex = Drawing2D.SmoothingMode.None
+            enKontur.Rechteck_R4 => Poly_RoundRec(r, 4),// GR.SmoothingModex = Drawing2D.SmoothingMode.HighQuality
             enKontur.Ohne => null,
-            _ => modAllgemein.Poly_Rechteck(r),//  GR.SmoothingModex = Drawing2D.SmoothingMode.None
+            _ => Poly_Rechteck(r),//  GR.SmoothingModex = Drawing2D.SmoothingMode.None
         };
 
         #endregion

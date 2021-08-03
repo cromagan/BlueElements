@@ -328,7 +328,7 @@ namespace BlueControls.ItemCollection {
                 }
                 return true;
             } catch {
-                modAllgemein.CollectGarbage();
+                Generic.CollectGarbage();
                 return false;
             }
         }
@@ -356,7 +356,7 @@ namespace BlueControls.ItemCollection {
         public void ParseVariable(RowItem row) {
             if (row != null) {
                 (_, _, var script) = row.DoAutomatic(false, "export");
-                if(script == null) { return; }
+                if (script == null) { return; }
                 foreach (var thisV in script.Variablen) {
                     ParseVariable(script, thisV);
                 }
@@ -460,7 +460,7 @@ namespace BlueControls.ItemCollection {
             var r = MaxBounds(null);
             if (r.Width == 0) { return null; }
 
-            modAllgemein.CollectGarbage();
+            Generic.CollectGarbage();
 
             do {
                 if ((int)(r.Width * scale) > 15000) {
