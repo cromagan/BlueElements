@@ -45,7 +45,7 @@ namespace BlueScript {
             attvar.Attributes[0].Readonly = false;
             attvar.Attributes[0].ValueString = attvar.Attributes[0].ValueString.Replace(attvar.Attributes[1].ValueString, "\r");
             attvar.Attributes[0].Type = enVariableDataType.List;
-            return new strDoItFeedback(attvar.Attributes[0].ValueString, enVariableDataType.String);
+            return new strDoItFeedback(attvar.Attributes[0].ValueString, enVariableDataType.List);
         }
 
         #endregion
