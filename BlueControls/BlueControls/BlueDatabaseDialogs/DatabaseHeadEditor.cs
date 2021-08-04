@@ -110,8 +110,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             PermissionGroups_NewRow.Suggestions.AddRange(_Database.Permission_AllUsed(true));
             DatenbankAdmin.Suggestions.Clear();
             DatenbankAdmin.Suggestions.AddRange(_Database.Permission_AllUsed(true));
+
             lbxSortierSpalten.Suggestions.Clear();
             lbxSortierSpalten.Suggestions.AddRange(_Database.Column, false);
+
             GenerateUndoTabelle();
             CryptStatus();
             GenerateInfoText();
@@ -509,7 +511,17 @@ namespace BlueControls.BlueDatabaseDialogs {
             _Database.JoinTyp = (enJoinTyp)int.Parse(cbxJoinTyp.Text);
             _Database.VerwaisteDaten = (enVerwaisteDaten)int.Parse(cbxVerwaisteDaten.Text);
             _Database.Ansicht = (enAnsicht)int.Parse(cbxAnsicht.Text);
-            _Database.SortDefinition = new RowSortDefinition(_Database, lbxSortierSpalten.Item.ToListOfString(), btnSortRichtung.Checked);
+
+            #region Sortierung
+
+            var colnam = new List<string>();
+            foreach (var thisk in lbxSortierSpalten.Item) {
+                colnam.Add(((ColumnItem)thisk.Tag).Name);
+            }
+            _Database.SortDefinition = new RowSortDefinition(_Database, colnam, btnSortRichtung.Checked);
+
+            #endregion
+
             // Export ------------
             List<ExportDefinition> NewExports = new();
             foreach (var ThisItem in lbxExportSets.Item) {

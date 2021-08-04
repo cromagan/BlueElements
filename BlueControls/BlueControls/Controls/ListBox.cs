@@ -220,14 +220,17 @@ namespace BlueControls.Controls {
             return Add_Text(Val);
         }
 
-        public BasicListItem Add_TextBySuggestion() {
+        public void Add_TextBySuggestion() {
             if (Suggestions == null || Suggestions.Count == 0) {
                 MessageBox.Show("Keine (weiteren) Werte vorhanden.", enImageCode.Information, "OK");
-                return null;
+                return;
             }
             Suggestions.CheckBehavior = enCheckBehavior.SingleSelection;
             var rück = InputBoxListBoxStyle.Show("Bitte wählen sie einen Wert:", Suggestions, enAddType.None, true);
-            return rück == null || rück.Count == 0 ? null : Add_Text(rück[0]);
+
+            if (rück == null || rück.Count == 0) { return; }
+
+            Suggestions[rück[0]].CloneToNewCollection(Item);
         }
 
         public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) => false;

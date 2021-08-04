@@ -1384,7 +1384,7 @@ namespace BlueDatabase {
                 }
                 SaveToByteList(l, enDatabaseDataType.UndoCount, _UndoCount.ToString());
                 if (Works2.Count > _UndoCount) { Works2.RemoveRange(0, Works2.Count - _UndoCount); }
-                SaveToByteList(l, enDatabaseDataType.UndoInOne, Works2.JoinWithCr());
+                SaveToByteList(l, enDatabaseDataType.UndoInOne, Works2.JoinWithCr((int)(16581375 * 0.9)));
                 SaveToByteList(l, enDatabaseDataType.EOF, "END");
                 return CryptPos > 0 ? Cryptography.SimpleCrypt(l.ToArray(), _GlobalShowPass, 1, CryptPos, l.Count - 1) : l.ToArray();
             } catch {
@@ -1930,21 +1930,21 @@ namespace BlueDatabase {
 
         private void Row_RowRemoving(object sender, RowEventArgs e) => AddPending(enDatabaseDataType.dummyComand_RemoveRow, -1, e.Row.Key, "", e.Row.Key.ToString(), false);
 
-        private void SaveToByteList(List<byte> List, int NrToAdd, int ByteAnzahl) {
-            switch (ByteAnzahl) {
+        private void SaveToByteList(List<byte> list, int numberToAdd, int byteCount) {
+            switch (byteCount) {
                 case 3:
-                    List.Add(Convert.ToByte(Math.Truncate(NrToAdd / 65025.0)));
-                    List.Add(Convert.ToByte(Math.Truncate(NrToAdd % 65025 / 255.0)));
-                    List.Add((byte)(NrToAdd % 65025 % 255));
+                    list.Add(Convert.ToByte(Math.Truncate(numberToAdd / 65025.0)));
+                    list.Add(Convert.ToByte(Math.Truncate(numberToAdd % 65025 / 255.0)));
+                    list.Add((byte)(numberToAdd % 65025 % 255));
                     break;
 
                 case 2:
-                    List.Add(Convert.ToByte(Math.Truncate(NrToAdd / 255.0)));
-                    List.Add((byte)(NrToAdd % 255));
+                    list.Add(Convert.ToByte(Math.Truncate(numberToAdd / 255.0)));
+                    list.Add((byte)(numberToAdd % 255));
                     break;
 
                 case 1:
-                    List.Add((byte)NrToAdd);
+                    list.Add((byte)numberToAdd);
                     break;
 
                 default:

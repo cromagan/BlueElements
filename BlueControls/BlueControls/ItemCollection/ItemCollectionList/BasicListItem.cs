@@ -111,6 +111,10 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
+        /// <summary>
+        /// Klont das aktuelle Objekt (es wird ein neues Objekt des gleichen Typs erstellt) und fügt es in die angegebene ItemCollection hinzu
+        /// </summary>
+        /// <param name="newParent"></param>
         public virtual void CloneToNewCollection(ItemCollectionList newParent) => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
 
         public void CloneToNewCollection(ItemCollectionList newParent, BasicListItem newItem) {

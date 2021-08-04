@@ -658,7 +658,7 @@ namespace BlueControls.Forms {
             }
             e.UserMenu.Add("Zeile", true);
             e.UserMenu.Add(enContextMenuComands.ZeileLöschen, Row != null);
-            e.UserMenu.Add("Fehler anzeigen", "Fehlersuche", enImageCode.Kritisch, Row != null);
+            e.UserMenu.Add("Zeile prüfen", "Fehlersuche", enImageCode.Zeile, Row != null);
         }
 
         private void TableView_CursorPosChanged(object sender, CellEventArgs e) {

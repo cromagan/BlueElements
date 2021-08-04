@@ -18,6 +18,7 @@
 using BlueBasics.Enums;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace BlueBasics {
 
@@ -25,14 +26,35 @@ namespace BlueBasics {
 
         #region Methods
 
-        public static bool Contains(this ICollection<string> iC, string searchKeyword, bool caseSensitive) {
+        public static bool Contains(this ICollection<string> collection, string searchKeyword, bool caseSensitive) {
             if (caseSensitive) { Develop.DebugPrint(enFehlerArt.Fehler, "CaseSensitive = True"); }
-            return iC.Any(item => string.Equals(item, searchKeyword, System.StringComparison.OrdinalIgnoreCase));
+            return collection.Any(item => string.Equals(item, searchKeyword, System.StringComparison.OrdinalIgnoreCase));
         }
 
-        public static string JoinWith(this ICollection<string> iC, string joinChar) => string.Join(joinChar, iC.ToArray());
+        public static string JoinWith(this ICollection<string> collection, string joinChar) => string.Join(joinChar, collection.ToArray());
 
-        public static string JoinWithCr(this ICollection<string> iC) => iC == null || iC.Count == 0 ? string.Empty : iC.JoinWith("\r");
+        public static string JoinWithCr(this ICollection<string> collection) => collection == null || collection.Count == 0 ? string.Empty : collection.JoinWith("\r");
+
+        /// <summary>
+        /// Gibt einen String zurück, der alle Elemet der Collection mittels einem Zeilenumbruch zusammenfügt.
+        /// Alle Elemente, die nach erreichen der Maximallänge noch übrig sind, werden verworfen.
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <param name="maxlenght"></param>
+        /// <returns></returns>
+        public static string JoinWithCr(this ICollection<string> collection, long maxlenght) {
+            StringBuilder sb = new();
+
+            foreach (var thisitem in collection) {
+                if (sb.Length + thisitem.Length <= maxlenght) {
+                    if (sb.Length > 0) { sb.Append("\r"); }
+                    sb.Append(thisitem);
+                } else {
+                    return sb.ToString();
+                }
+            }
+            return sb.ToString();
+        }
 
         // .TrimEnd(JoinChar);
 
