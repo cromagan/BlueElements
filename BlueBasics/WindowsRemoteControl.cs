@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
 namespace BlueBasics {
 
@@ -32,6 +33,32 @@ namespace BlueBasics {
         private const int KEYEVENTF_KEYDOWN = 0x0;
 
         private const int KEYEVENTF_KEYUP = 0x2;
+
+        #endregion
+
+        #region Enums
+
+        private enum InputType {
+            INPUT_MOUSE = 0,
+            INPUT_KEYBOARD = 1,
+            INPUT_HARDWARE = 2,
+        }
+
+        [Flags()]
+        private enum MOUSEEVENTF {
+            MOVE = 0x0001,  // mouse move
+            LEFTDOWN = 0x0002,  // left button down
+            LEFTUP = 0x0004,  // left button up
+            RIGHTDOWN = 0x0008,  // right button down
+            RIGHTUP = 0x0010,  // right button up
+            MIDDLEDOWN = 0x0020,  // middle button down
+            MIDDLEUP = 0x0040,  // middle button up
+            XDOWN = 0x0080,  // x button down
+            XUP = 0x0100,  // x button down
+            WHEEL = 0x0800,  // wheel button rolled
+            VIRTUALDESK = 0x4000,  // map to entire virtual desktop
+            ABSOLUTE = 0x8000,  // absolute move
+        }
 
         #endregion
 
@@ -117,6 +144,29 @@ namespace BlueBasics {
 
         public static void LeftAltRelease() => keybd_event((byte)enTaste.VK_MENU, 0, KEYEVENTF_KEYUP, 0);
 
+        /// <summary>
+        /// Diese Funktion bewegt den Mauscursor an einen bestimmten Punkt.
+        /// </summary>
+        /// <param name="x">X Koordinate der Position als absoluter Pixelwert</param>
+        /// <param name="y">Y Koordinate der Position als absoluter Pixelwert</param>
+        /// <returns>Liefert 1 bei Erfolg und 0, wenn der Eingabestream schon blockiert war zurück.</returns>
+        public static uint MoveMouse(int x, int y) {
+            // Bildschirm Auflösung
+            float ScreenWidth = Screen.PrimaryScreen.Bounds.Width;
+            float ScreenHeight = Screen.PrimaryScreen.Bounds.Height;
+            var input_move = new INPUT {
+                type = InputType.INPUT_MOUSE
+            };
+            input_move.mi.dx = (int)Math.Round(x * (65535 / ScreenWidth), 0);
+            input_move.mi.dy = (int)Math.Round(y * (65535 / ScreenHeight), 0);
+            input_move.mi.mouseData = 0;
+            input_move.mi.dwFlags = MOUSEEVENTF.MOVE | MOUSEEVENTF.ABSOLUTE;
+            input_move.mi.time = 0;
+            input_move.mi.dwExtraInfo = GetMessageExtraInfo();
+            INPUT[] input = { input_move };
+            return SendInput(1, input, Marshal.SizeOf(input_move));
+        }
+
         public static void ShiftRelease() => keybd_event((byte)enTaste.VK_SHIFT, 0, KEYEVENTF_KEYUP, 0);
 
         [DllImport("user32", EntryPoint = "ShowWindow", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
@@ -170,6 +220,9 @@ namespace BlueBasics {
         [DllImport("user32", EntryPoint = "GetClassNameA", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         private static extern int GetClassName(IntPtr hWnd, string lpClassName, int nMaxCount);
 
+        [DllImport("user32.dll", EntryPoint = "GetMessageExtraInfo", SetLastError = true)]
+        private static extern IntPtr GetMessageExtraInfo();
+
         [DllImport("user32", EntryPoint = "GetParent", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         private static extern IntPtr GetParent(IntPtr hWnd);
 
@@ -208,6 +261,9 @@ namespace BlueBasics {
         [DllImport("user32.dll", EntryPoint = "keybd_event", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         private static extern int keybd_event(byte bVk, byte bScan, int dwFlags, int dwExtraInfo);
 
+        [DllImport("user32.dll", EntryPoint = "SendInput", SetLastError = true)]
+        private static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
+
         /// <summary>
         /// Setzt ein Fenster an eine andere Position
         /// </summary>
@@ -222,6 +278,39 @@ namespace BlueBasics {
         /// <remarks></remarks>
         [DllImport("user32", EntryPoint = "SetWindowPos", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         private static extern int SetWindowPos(IntPtr hWnd, int hWndInsertAfter, int x, int y, int cx, int cy, int wFlags);
+
+        #endregion
+
+        #region Structs
+
+        public struct strProcess {
+
+            #region Fields
+
+            public string ExeName;
+            public string Klasse;
+            public IntPtr MainWindowHandle;
+            public string MainWindowTitle;
+            public int prid;
+
+            #endregion
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct INPUT {
+            public InputType type;
+            public MOUSEINPUT mi;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct MOUSEINPUT {
+            public int dx;
+            public int dy;
+            public int mouseData;
+            public MOUSEEVENTF dwFlags;
+            public int time;
+            public IntPtr dwExtraInfo;
+        }
 
         #endregion
     }

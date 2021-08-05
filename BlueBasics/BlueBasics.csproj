@@ -111,7 +111,6 @@
     <Compile Include="Extensions\GraphicsExtensions.cs" />
     <Compile Include="ListExt.cs" />
     <Compile Include="Polygons.cs" />
-    <Compile Include="strProcess.cs" />
     <Compile Include="Enums\enMouseEvent.cs" />
     <Compile Include="QuickImage.cs" />
     <Compile Include="EventArgs\ListEventArgs.cs" />

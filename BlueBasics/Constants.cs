@@ -60,6 +60,8 @@ namespace BlueBasics {
         public const string Format_Date5 = "dd.MM.yyyy HH:mm:ss";
         public const string Format_Date6 = "dd.MM.yyyy";
         public const string Format_Date7 = "dd.MM.yyyy HH:mm:ss.fff";
+        public const string Format_Date8 = "HH:mm";
+
         public const string Format_Float1 = "0.#";
         public const string Format_Float10 = "0.##########";
 
