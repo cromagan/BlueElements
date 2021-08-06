@@ -57,7 +57,7 @@ namespace BlueScript {
             if (f == null) { return new strDoItFeedback("System-Variable 'Filename' nicht gefunden."); }
             var newf = f.ValueString.FilePath() + attvar.Attributes[0].ValueString + ".mdb";
 
-            var db = Database.GetByFilename(newf, true);
+            var db = Database.GetByFilename(newf, true, false);
             if (db == null) { return new strDoItFeedback("Datenbank nicht gefunden: " + newf); }
 
             var c = db.Column.Exists(attvar.Attributes[2].ValueString);

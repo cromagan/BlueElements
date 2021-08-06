@@ -212,8 +212,8 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void btnVorherigeVersion_Click(object sender, System.EventArgs e) {
             btnVorherigeVersion.Enabled = false;
             if (_originalDB != null && _TableView.Database != _originalDB) {
-                _TableView.Database = _originalDB;
                 _originalDB.Disposing -= _originalDB_Disposing;
+                _TableView.Database = _originalDB;
                 _originalDB = null;
                 btnVorherigeVersion.Text = "Vorherige Version";
                 btnVorherigeVersion.Enabled = true;
@@ -232,7 +232,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 return;
             }
 
-            _TableView.Database = Database.GetByFilename(Files[0], false);
+            _TableView.Database = Database.GetByFilename(Files[0], false, true);
             _originalDB = _merker;
             _originalDB.Disposing += _originalDB_Disposing;
             btnVorherigeVersion.Text = "zurück";

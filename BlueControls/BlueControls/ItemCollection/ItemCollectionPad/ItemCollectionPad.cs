@@ -320,7 +320,7 @@ namespace BlueControls.ItemCollection {
                 if (SheetStyle == null || SheetStyleScale < 0.1d) { return true; }
                 foreach (var thisItem in this) {
                     if (thisItem != null) {
-                        gr.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.None;
+                        gr.PixelOffsetMode = PixelOffsetMode.None;
                         if (visibleItems == null || visibleItems.Contains(thisItem)) {
                             thisItem.Draw(gr, zoom, shiftX, shiftY, 0, sizeOfParentControl, forPrinting);
                         }
@@ -519,8 +519,8 @@ namespace BlueControls.ItemCollection {
 
                 if (SheetSizeInMM.Width > 0 && SheetSizeInMM.Height > 0) {
                     //Skin.Draw_Back(gr, enDesign.Table_And_Pad, state, DisplayRectangle, this, true);
-                    var SSW = Math.Round(Converter.mmToPixel(SheetSizeInMM.Width, ItemCollectionPad.DPI), 1);
-                    var SSH = Math.Round(Converter.mmToPixel(SheetSizeInMM.Height, ItemCollectionPad.DPI), 1);
+                    var SSW = Math.Round(Converter.mmToPixel(SheetSizeInMM.Width, DPI), 1);
+                    var SSH = Math.Round(Converter.mmToPixel(SheetSizeInMM.Height, DPI), 1);
                     var LO = new PointM(0d, 0d).ZoomAndMove(zoom, shiftX, shiftY);
                     var RU = new PointM(SSW, SSH).ZoomAndMove(zoom, shiftX, shiftY);
 

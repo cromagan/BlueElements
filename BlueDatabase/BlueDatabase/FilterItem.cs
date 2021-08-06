@@ -174,7 +174,7 @@ namespace BlueDatabase {
 
                     case "database":
                         if (Database != null) { Database.Disposing -= Database_Disposing; }
-                        Database = Database.GetByFilename(pair.Value.FromNonCritical(), false);
+                        Database = Database.GetByFilename(pair.Value.FromNonCritical(), false, false);
                         Database.Disposing += Database_Disposing;
                         break;
 

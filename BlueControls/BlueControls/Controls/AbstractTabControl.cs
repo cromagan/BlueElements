@@ -47,13 +47,13 @@ namespace BlueControls.Controls {
             //Add any initialization after the InitializeComponent() call
             //   Me.SetStyle(System.Windows.Forms.ControlStyles.AllPaintingInWmPaint Or System.Windows.Forms.ControlStyles.OptimizedDoubleBuffer Or System.Windows.Forms.ControlStyles.ResizeRedraw Or System.Windows.Forms.ControlStyles.UserPaint, True)
             //SetStyle(System.Windows.Forms.ControlStyles.ResizeRedraw, false);
-            SetStyle(System.Windows.Forms.ControlStyles.SupportsTransparentBackColor, false);
-            SetStyle(System.Windows.Forms.ControlStyles.Opaque, true);
+            SetStyle(ControlStyles.SupportsTransparentBackColor, false);
+            SetStyle(ControlStyles.Opaque, true);
 
             //The next 3 styles are allefor double buffering
-            SetStyle(System.Windows.Forms.ControlStyles.DoubleBuffer, true);
-            SetStyle(System.Windows.Forms.ControlStyles.AllPaintingInWmPaint, true);
-            SetStyle(System.Windows.Forms.ControlStyles.UserPaint, true);
+            SetStyle(ControlStyles.DoubleBuffer, true);
+            SetStyle(ControlStyles.AllPaintingInWmPaint, true);
+            SetStyle(ControlStyles.UserPaint, true);
         }
 
         #endregion
@@ -120,7 +120,7 @@ namespace BlueControls.Controls {
 
         protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseUp(e);
-            if (e.Button == System.Windows.Forms.MouseButtons.Right) { FloatingInputBoxListBoxStyle.ContextMenuShow(this, e); }
+            if (e.Button == MouseButtons.Right) { FloatingInputBoxListBoxStyle.ContextMenuShow(this, e); }
         }
 
         protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) {

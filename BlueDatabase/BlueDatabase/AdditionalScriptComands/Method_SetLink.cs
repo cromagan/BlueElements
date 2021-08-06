@@ -60,7 +60,7 @@ namespace BlueScript {
             var f = s.Variablen.GetSystem("filename");
             if (f == null) { return new strDoItFeedback("System-Variable 'Filename' nicht gefunden."); }
 
-            var db = Database.GetByFilename(f.ValueString, true);
+            var db = Database.GetByFilename(f.ValueString, true, false);
             if (db == null) { return new strDoItFeedback("Datenbank nicht gefunden: " + f); }
 
             #endregion

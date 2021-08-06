@@ -364,7 +364,7 @@ namespace BlueBasics {
                 bitmap = new Bitmap(outStream);
             }
             if (maxSize > 0) {
-                bitmap = BitmapExt.Resize(bitmap, maxSize, maxSize, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true);
+                bitmap = Resize(bitmap, maxSize, maxSize, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true);
             }
             return bitmap;
         }
@@ -838,8 +838,8 @@ namespace BlueBasics {
                 try {
                     l.Clear();
                     Generic.CollectGarbage();
-                    var x = (Bitmap)BitmapExt.Image_FromFile(fileName);
-                    l.Add(BitmapExt.Resize(x, maxSize, maxSize, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true));
+                    var x = (Bitmap)Image_FromFile(fileName);
+                    l.Add(Resize(x, maxSize, maxSize, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true));
                     if (frames > 1) {
                         Bitmap x2 = new(200, 200);
                         var gr = Graphics.FromImage(x2);

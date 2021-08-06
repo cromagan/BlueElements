@@ -78,7 +78,7 @@ namespace BlueDatabase {
             ID = id;
             Typ = "MAIN";
             var filename = MyDefaultFileName();
-            InternalDatabase = Database.GetByFilename(filename, false);
+            InternalDatabase = Database.GetByFilename(filename, false, false);
             Parent = null;
             if (InternalDatabase == null) {
                 InternalDatabase = new Database(filename, false, true);

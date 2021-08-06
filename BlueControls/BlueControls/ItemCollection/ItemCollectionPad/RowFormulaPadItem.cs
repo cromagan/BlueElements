@@ -132,7 +132,7 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "database":
-                    _Database = Database.GetByFilename(value, false);
+                    _Database = Database.GetByFilename(value, false, false);
                     _Database.Disposing += _Database_Disposing;
                     return true;
 

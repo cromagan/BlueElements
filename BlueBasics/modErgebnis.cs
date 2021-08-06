@@ -27,9 +27,7 @@ namespace BlueBasics {
             formel = formel.Replace(" ", string.Empty);
             if (string.IsNullOrEmpty(formel)) { return null; }
 
-            if (formel != formel.ReduceToChars(Constants.Char_Numerals + ".,()+-/*")) { return null; }
-
-            return ErgebnisCore(formel);
+            return formel != formel.ReduceToChars(Constants.Char_Numerals + ".,()+-/*") ? null : ErgebnisCore(formel);
         }
 
         public static int LastMinusIndex(string formel) {

@@ -231,7 +231,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             foreach (var thisf in alle) {
                 nDB++;
                 x.Update(nDB);
-                var db = Database.GetByFilename(thisf, false);
+                var db = Database.GetByFilename(thisf, false, true);
                 var disp = db == null;
                 if (db == null) {
                     db = new Database(thisf, true, false);

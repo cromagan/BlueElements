@@ -292,7 +292,7 @@ namespace BlueControls.Forms {
             SaveTab.ShowDialog();
             if (!PathExists(SaveTab.FileName.FilePath())) { return; }
             if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
-            StandardTabx();
+            SelectStandardTab();
             if (bu.Name == "btnNeuDB") {
                 DatabaseSet(new Database(false)); // Ab jetzt in der Variable _Database zu finden
             }
@@ -361,24 +361,24 @@ namespace BlueControls.Forms {
             Filter.Enabled = DatenbankDa && TableView.Design != enBlueTableAppearance.OnlyMainColumnWithoutHead;
         }
 
-        private void DatabaseSet(string Datei) {
+        private void DatabaseSet(string filename) {
             SetDatabasetoNothing();
-            if (!FileExists(Datei)) {
+            if (!FileExists(filename)) {
                 CheckButtons();
                 return;
             }
-            btnLetzteDateien.AddFileName(Datei, string.Empty);
-            LoadTab.FileName = Datei;
-            var tmpDatabase = Database.GetByFilename(Datei, false);
+            btnLetzteDateien.AddFileName(filename, string.Empty);
+            LoadTab.FileName = filename;
+            var tmpDatabase = Database.GetByFilename(filename, false, false);
             if (tmpDatabase == null) { return; }
             DatabaseSet(tmpDatabase);
         }
 
-        private void DatabaseSet(Database cDatabase) {
-            TableView.Database = cDatabase;
-            Formula.Database = cDatabase;
+        private void DatabaseSet(Database database) {
+            TableView.Database = database;
+            Formula.Database = database;
             Filter.Table = TableView;
-            StandardTabx();
+            SelectStandardTab();
             if (TableView.Database == null) {
                 SetDatabasetoNothing();
             } else {
@@ -531,16 +531,16 @@ namespace BlueControls.Forms {
 
         private void Ordn_Click(object sender, System.EventArgs e) {
             BlueBasics.MultiUserFile.clsMultiUserFile.SaveAll(false);
-            StandardTabx();
+            SelectStandardTab();
             ExecuteFile(TableView.Database.Filename.FilePath());
         }
+
+        private void SelectStandardTab() => MainRibbon.SelectedIndex = 1;
 
         private void SetDatabasetoNothing() {
             Formula.Database = null;
             TableView.Database = null;
         }
-
-        private void StandardTabx() => MainRibbon.SelectedIndex = 1;
 
         private void such_Enter(object sender, System.EventArgs e) {
             if (SuchB.Enabled) { SuchB_Click(SuchB, null); }
@@ -687,7 +687,7 @@ namespace BlueControls.Forms {
 
         private void Tempor‰renSpeicherort÷ffnen_Click(object sender, System.EventArgs e) {
             BlueBasics.MultiUserFile.clsMultiUserFile.SaveAll(false);
-            StandardTabx();
+            SelectStandardTab();
             ExecuteFile(Path.GetTempPath());
         }
 

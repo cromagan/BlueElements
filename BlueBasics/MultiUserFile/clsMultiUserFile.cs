@@ -185,31 +185,6 @@ namespace BlueBasics.MultiUserFile {
         /// <summary>
         ///
         /// </summary>
-        /// <param name="filePath"></param>
-        /// <param name="checkOnlyFilenameToo">Prüft, ob die Datei ohne Dateipfad - also nur Dateiname und Suffix - existiert und gibt diese zurück.</param>
-        /// <returns></returns>
-        public static clsMultiUserFile GetByFilename(string filePath, bool checkOnlyFilenameToo) {
-            //filePath = modConverter.SerialNr2Path(filePath);
-            foreach (var ThisFile in AllFiles) {
-                if (ThisFile != null && string.Equals(ThisFile.Filename, filePath, StringComparison.OrdinalIgnoreCase)) {
-                    ThisFile.BlockReload(false);
-                    return ThisFile;
-                }
-            }
-            if (checkOnlyFilenameToo) {
-                foreach (var ThisFile in AllFiles) {
-                    if (ThisFile != null && ThisFile.Filename.ToLower().FileNameWithSuffix() == filePath.ToLower().FileNameWithSuffix()) {
-                        ThisFile.BlockReload(false);
-                        return ThisFile;
-                    }
-                }
-            }
-            return null;
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="mustSave">Falls TRUE wird zuvor automatisch ein Speichervorgang mit FALSE eingeleitet, um so viel wie möglich zu speichern - falls eine Datei blockiert ist.</param>
         public static void SaveAll(bool mustSave) {
             if (mustSave) { SaveAll(false); } // Beenden, was geht, dann erst der muss
@@ -563,6 +538,31 @@ namespace BlueBasics.MultiUserFile {
             // Repair NACH _isParsing, da es auch abgespeichert werden soll
             OnParsed();
             RepairAfterParse();
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="checkOnlyFilenameToo">Prüft, ob die Datei ohne Dateipfad - also nur Dateiname und Suffix - existiert und gibt diese zurück.</param>
+        /// <returns></returns>
+        protected static clsMultiUserFile GetByFilename(string filePath, bool checkOnlyFilenameToo) {
+            //filePath = modConverter.SerialNr2Path(filePath);
+            foreach (var ThisFile in AllFiles) {
+                if (ThisFile != null && string.Equals(ThisFile.Filename, filePath, StringComparison.OrdinalIgnoreCase)) {
+                    ThisFile.BlockReload(false);
+                    return ThisFile;
+                }
+            }
+            if (checkOnlyFilenameToo) {
+                foreach (var ThisFile in AllFiles) {
+                    if (ThisFile != null && ThisFile.Filename.ToLower().FileNameWithSuffix() == filePath.ToLower().FileNameWithSuffix()) {
+                        ThisFile.BlockReload(false);
+                        return ThisFile;
+                    }
+                }
+            }
+            return null;
         }
 
         /// <summary>

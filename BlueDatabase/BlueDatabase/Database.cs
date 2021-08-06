@@ -342,14 +342,14 @@ namespace BlueDatabase {
 
         #region Methods
 
-        public static new Database GetByFilename(string filename, bool checkOnlyFilenameToo) {
-            var tmpDB = BlueBasics.MultiUserFile.clsMultiUserFile.GetByFilename(filename, checkOnlyFilenameToo);
+        public static Database GetByFilename(string filename, bool checkOnlyFilenameToo, bool read_only) {
+            var tmpDB = GetByFilename(filename, checkOnlyFilenameToo);
 
             if (tmpDB is Database db) { return db; }
 
             if (tmpDB != null) { return null; }//  Daten im Speicher, aber keine Datenbank!
 
-            return !FileOperations.FileExists(filename) ? null : new Database(filename, false, false);
+            return !FileExists(filename) ? null : new Database(filename, read_only, false);
         }
 
         public static Database LoadResource(Assembly assembly, string Name, string BlueBasicsSubDir, bool FehlerAusgeben, bool MustBeStream) {
@@ -404,7 +404,7 @@ namespace BlueDatabase {
                             break;
                     }
                     if (FileExists(pf)) {
-                        var tmp = GetByFilename(pf, false);
+                        var tmp = GetByFilename(pf, false, false);
                         if (tmp != null) { return tmp; }
                         tmp = new Database(pf, false, false);
                         return tmp;

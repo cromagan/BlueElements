@@ -1279,8 +1279,8 @@ namespace BlueDatabase {
             if (string.IsNullOrEmpty(_LinkedDatabaseFile)) { return null; }
 
             TMP_LinkedDatabase = _LinkedDatabaseFile.Contains(@"\")
-                ? Database.GetByFilename(_LinkedDatabaseFile, true)
-                : Database.GetByFilename(Database.Filename.FilePath() + _LinkedDatabaseFile, true);
+                ? Database.GetByFilename(_LinkedDatabaseFile, true, false)
+                : Database.GetByFilename(Database.Filename.FilePath() + _LinkedDatabaseFile, true, false);
 
             if (_TMP_LinkedDatabase != null) { _TMP_LinkedDatabase.UserGroup = Database.UserGroup; }
             return _TMP_LinkedDatabase;

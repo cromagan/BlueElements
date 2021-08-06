@@ -255,7 +255,7 @@ namespace BlueScript {
 
             if (txt.Value.Length > 4 && txt.Value.StartsWith(Constants.ImageKennung + "\"") && txt.Value.EndsWith("\"" + Constants.ImageKennung)) {
                 if (Type is not enVariableDataType.NotDefinedYet and not enVariableDataType.Bitmap) { SetError("Variable ist kein Bitmap"); return; }
-                ValueString = txt.Value.Substring(2, txt.Value.Length - 4).Replace(BlueBasics.Constants.GänsefüßchenReplace, "\"");
+                ValueString = txt.Value.Substring(2, txt.Value.Length - 4).Replace(Constants.GänsefüßchenReplace, "\"");
                 Type = enVariableDataType.Bitmap;
                 Readonly = true;
                 return;
@@ -282,7 +282,7 @@ namespace BlueScript {
 
             if (txt.Value.Length > 2 && txt.Value.StartsWith(Constants.ObjectKennung + "\"") && txt.Value.EndsWith("\"" + Constants.ObjectKennung)) {
                 if (Type is not enVariableDataType.NotDefinedYet and not enVariableDataType.Object) { SetError("Variable ist kein Object"); return; }
-                ValueString = txt.Value.Substring(2, txt.Value.Length - 4).Replace(BlueBasics.Constants.GänsefüßchenReplace, "\"");
+                ValueString = txt.Value.Substring(2, txt.Value.Length - 4).Replace(Constants.GänsefüßchenReplace, "\"");
                 Type = enVariableDataType.Object;
                 Readonly = true;
                 return;
@@ -503,9 +503,9 @@ namespace BlueScript {
             return x != null && x.GetUpperBound(0) == 1 && x[0] == toCheck.ToUpper().ReduceToChars(Constants.Char_AZ + Constants.Char_Numerals);
         }
 
-        public void PrepareForScript() => _ValueString = _ValueString.Replace("\"", BlueBasics.Constants.GänsefüßchenReplace);
+        public void PrepareForScript() => _ValueString = _ValueString.Replace("\"", Constants.GänsefüßchenReplace);
 
-        public void ScriptFinished() => _ValueString = _ValueString.Replace(BlueBasics.Constants.GänsefüßchenReplace, "\"");
+        public void ScriptFinished() => _ValueString = _ValueString.Replace(Constants.GänsefüßchenReplace, "\"");
 
         public override string ToString() {
             var zusatz = string.Empty;

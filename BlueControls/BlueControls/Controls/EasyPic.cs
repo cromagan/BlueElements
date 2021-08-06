@@ -155,7 +155,7 @@ namespace BlueControls.Controls {
                 Clear();
                 return;
             }
-            var ix = (Bitmap)BitmapExt.Image_FromFile(Filename);
+            var ix = (Bitmap)Image_FromFile(Filename);
             var i = Image_Clone(ix);
             if (_MaxSize > 0) {
                 _Bitmap = BitmapExt.Resize(i, _MaxSize, _MaxSize, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true);

@@ -311,7 +311,7 @@ namespace BluePaint {
         private void LoadFromDisk(string filename) {
             if (!IsSaved()) { return; }
             if (FileExists(filename)) {
-                SetPic((Bitmap)BitmapExt.Image_FromFile(filename));
+                SetPic((Bitmap)Image_FromFile(filename));
                 _filename = filename;
                 _isSaved = true;
                 btnLetzteDateien.AddFileName(filename, string.Empty);

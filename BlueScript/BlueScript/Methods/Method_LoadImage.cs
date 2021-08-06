@@ -49,7 +49,7 @@ namespace BlueScript {
                 return new strDoItFeedback("Datei ist kein Bildformat: " + attvar.Attributes[0].ValueString);
             }
 
-            if (!BlueBasics.FileOperations.FileExists(attvar.Attributes[0].ValueString)) {
+            if (!FileOperations.FileExists(attvar.Attributes[0].ValueString)) {
                 return new strDoItFeedback("Datei nicht gefunden: " + attvar.Attributes[0].ValueString);
             }
 

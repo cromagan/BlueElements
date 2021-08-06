@@ -482,7 +482,7 @@ namespace BlueControls.Controls {
         public static List<string> FileSystem(ColumnItem _tmpColumn) {
             if (_tmpColumn == null) { return null; }
 
-            var f = FileOperations.GetFilesWithFileSelector(_tmpColumn.Database.Filename.FilePath(), _tmpColumn.MultiLine);
+            var f = GetFilesWithFileSelector(_tmpColumn.Database.Filename.FilePath(), _tmpColumn.MultiLine);
 
             if (f == null) { return null; }
 
@@ -490,19 +490,19 @@ namespace BlueControls.Controls {
             List<string> NewFiles = new();
 
             foreach (var thisf in f) {
-                var b = Converter.FileToByte(thisf);
+                var b = FileToByte(thisf);
 
                 if (!string.IsNullOrEmpty(_tmpColumn.Database.FileEncryptionKey)) { b = Cryptography.SimpleCrypt(b, _tmpColumn.Database.FileEncryptionKey, 1); }
 
                 var neu = thisf.FileNameWithSuffix();
                 neu = _tmpColumn.BestFile(neu.FileNameWithSuffix(), true);
-                Converter.ByteToFile(neu, b);
+                ByteToFile(neu, b);
 
                 NewFiles.Add(neu);
                 DelList.Add(thisf);
             }
 
-            Forms.FileDialogs.DeleteFile(DelList, true);
+            FileDialogs.DeleteFile(DelList, true);
             return NewFiles;
         }
 
@@ -2020,7 +2020,7 @@ namespace BlueControls.Controls {
         }
 
         private void Cell_Edit_FileSystem(ColumnItem cellInThisDatabaseColumn, clsRowDrawData cellInThisDatabaseRow) {
-            var l = Table.FileSystem(cellInThisDatabaseColumn);
+            var l = FileSystem(cellInThisDatabaseColumn);
             if (l == null) { return; }
             UserEdited(this, l.JoinWithCr(), cellInThisDatabaseColumn, cellInThisDatabaseRow?.Row, false);
         }
