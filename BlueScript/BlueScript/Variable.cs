@@ -28,6 +28,13 @@ namespace BlueScript {
 
         #region Methods
 
+        public static void AddComent(this List<Variable> vars, string additionalComent) {
+            foreach (var thisvar in vars) {
+                if (!string.IsNullOrEmpty(thisvar.Coment)) { thisvar.Coment += "\r"; }
+                thisvar.Coment += additionalComent;
+            }
+        }
+
         public static List<string> AllNames(this List<Variable> vars) {
             List<string> l = new();
             foreach (var thisvar in vars) {
@@ -120,6 +127,17 @@ namespace BlueScript {
             foreach (var thisv in vars) {
                 thisv.PrepareForScript();
             }
+        }
+
+        public static void RemoveWithComent(this List<Variable> vars, string coment) {
+            var z = 0;
+            do {
+                if (vars[z].Coment != null && vars[z].Coment.Contains(coment)) {
+                    vars.RemoveAt(z);
+                } else {
+                    z++;
+                }
+            } while (z < vars.Count);
         }
 
         public static void ScriptFinished(this List<Variable> vars) {
