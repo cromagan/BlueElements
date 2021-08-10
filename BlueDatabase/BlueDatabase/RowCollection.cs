@@ -128,13 +128,14 @@ namespace BlueDatabase {
             return Row;
         }
 
-        public List<RowItem> CalculateSortedRows(List<FilterItem> Filter, RowSortDefinition rowSortDefinition, List<RowItem> pinnedRows) {
+        public List<RowItem> CalculateSortedRows(List<FilterItem> filter, RowSortDefinition rowSortDefinition, List<RowItem> pinnedRows) {
             List<string> TMP = new();
             List<RowItem> _tmpSortedRows = new();
             if (pinnedRows == null) { pinnedRows = new List<RowItem>(); }
+
             foreach (var ThisRowItem in Database.Row) {
                 if (ThisRowItem != null) {
-                    if (ThisRowItem.MatchesTo(Filter) && !pinnedRows.Contains(ThisRowItem)) {
+                    if (ThisRowItem.MatchesTo(filter) && !pinnedRows.Contains(ThisRowItem)) {
                         if (rowSortDefinition == null) {
                             TMP.Add(ThisRowItem.CompareKey(null));
                         } else {
@@ -144,6 +145,7 @@ namespace BlueDatabase {
                 }
             }
             TMP.Sort();
+
             int cc;
             if (rowSortDefinition == null || !rowSortDefinition.Reverse) {
                 foreach (var t in TMP) {
@@ -160,12 +162,14 @@ namespace BlueDatabase {
                     }
                 }
             }
+
             List<RowItem> newPinned = new();
             foreach (var thisPinned in pinnedRows) {
                 if (Database.Row.Contains(thisPinned)) {
                     newPinned.Add(thisPinned);
                 }
             }
+
             _tmpSortedRows.InsertRange(0, newPinned);
             return _tmpSortedRows;
         }

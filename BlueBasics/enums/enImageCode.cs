@@ -23,6 +23,7 @@ namespace BlueBasics.Enums {
         Anwendung,
         Aufnahme,
         AZ,
+        Balken,
         Bemaßung,
         Bild,
         BildmodusVerzerren,

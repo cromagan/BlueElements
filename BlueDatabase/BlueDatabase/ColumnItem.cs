@@ -1525,6 +1525,53 @@ namespace BlueDatabase {
                 : BestFile(tmpfile, false).ToLower() == fullFileName.ToLower() ? tmpfile : fullFileName;
         }
 
+        public void Statisik(List<FilterItem> filter, List<RowItem> pinnedRows) {
+            var r = Database.Row.CalculateSortedRows(filter, null, pinnedRows);
+
+            if (r == null || r.Count < 1) { return; }
+
+            var d = new Dictionary<string, int>();
+
+            foreach (var thisRow in r) {
+                var KeyValue = thisRow.CellGetString(this);
+                if (string.IsNullOrEmpty(KeyValue)) { KeyValue = "[empty]"; }
+
+                KeyValue = KeyValue.Replace("\r", ";");
+
+                var Count = 0;
+                if (d.ContainsKey(KeyValue)) {
+                    d.TryGetValue(KeyValue, out Count);
+                    d.Remove(KeyValue);
+                }
+                Count++;
+                d.Add(KeyValue, Count);
+            }
+
+            var l = new List<string>();
+
+            l.Add("Statisik der vorkommenden Werte der Spalte: " + ReadableText());
+            l.Add(" - nur aktuell angezeigte Zeilen");
+            l.Add(" - Zelleninhalte werden als ganzes behandelt");
+            l.Add(" ");
+
+            do {
+                var MaxCount = 0;
+                var KeyValue = string.Empty;
+
+                foreach (var thisKey in d) {
+                    if (thisKey.Value > MaxCount) {
+                        KeyValue = thisKey.Key;
+                        MaxCount = thisKey.Value;
+                    }
+                }
+
+                d.Remove(KeyValue);
+                l.Add(MaxCount.ToString() + " - " + KeyValue);
+            } while (d.Count > 0);
+
+            l.Save(TempFile(string.Empty, string.Empty, "txt"), System.Text.Encoding.UTF8, true);
+        }
+
         public double? Summe(FilterCollection Filter) {
             double summ = 0;
             foreach (var thisrow in Database.Row) {

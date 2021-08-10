@@ -158,6 +158,8 @@ namespace BlueBasics {
             return txt;
         }
 
+        public static string FromNonCriticalWithQuote(this string txt) => txt.Substring(1, txt.Length - 2).FromNonCritical();
+
         public static bool FromPlusMinus(this string value) {
             if (string.IsNullOrEmpty(value)) { return false; }
             switch (value.ToLower()) {
@@ -649,6 +651,8 @@ namespace BlueBasics {
             txt = txt.Replace("&", "[L]");
             return txt;
         }
+
+        public static string ToNonCriticalWithQuote(this string txt) => "\"" + txt.ToNonCritical() + "\"";
 
         public static string Trim(this string tXT, string was) {
             if (string.IsNullOrEmpty(tXT)) { return string.Empty; }

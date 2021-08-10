@@ -172,6 +172,10 @@ namespace BlueControls.Forms {
                     }
                     break;
 
+                case "Statistik":
+                    Column.Statisik(TableView.Filter, TableView.PinnedRows);
+                    break;
+
                 case "VorherigenInhaltWiederherstellen":
                     Table.DoUndo(Column, Row);
                     break;
@@ -652,6 +656,7 @@ namespace BlueControls.Forms {
                 e.UserMenu.AddSeparator();
                 e.UserMenu.Add("Spalte", true);
                 e.UserMenu.Add(enContextMenuComands.SpaltenEigenschaftenBearbeiten, Column != null);
+                e.UserMenu.Add("Statistik", "Statistik", QuickImage.Get(enImageCode.Balken, 16), Column != null);
                 e.UserMenu.Add("Inhalte aller angezeigten Zellen dieser Spalte löschen", "ColumnContentDelete", enImageCode.Radiergummi, Column != null && Column.Format.CanBeChangedByRules());
                 e.UserMenu.Add("Summe", "Summe", enImageCode.Summe, Column != null);
                 e.UserMenu.AddSeparator();

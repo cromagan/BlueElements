@@ -186,19 +186,25 @@ namespace BlueDatabase {
                         break;
 
                     case "previousvalue":
-
-                    case "pv":
+                    case "pv": // Todo: alt: 10.08.2021
                         PreviousValue = pair.Value.FromNonCritical();
                         break;
 
-                    case "changedto":
+                    case "c":
+                        _changedTo = pair.Value.FromNonCriticalWithQuote();
+                        break;
 
-                    case "ct":
+                    case "p":
+                        PreviousValue = pair.Value.FromNonCriticalWithQuote();
+                        break;
+
+                    case "changedto":
+                    case "ct": // Todo: alt: 10.08.2021
                         _changedTo = pair.Value.FromNonCritical();
                         break;
 
                     default:
-                        Develop.DebugPrint(enFehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
+                        Develop.DebugPrint(enFehlerArt.Warnung, "Tag unbekannt: " + pair.Key);
                         break;
                 }
             }
@@ -211,9 +217,9 @@ namespace BlueDatabase {
 ", RK=" + _rowKey +
 ", D=" + Date +
 ", U=" + User.ToNonCritical() +
-", PV=" + PreviousValue.ToNonCritical() +
-", CT=" + _changedTo.ToNonCritical() +
-"}";// ", G=" + Group.ToNonCritical() +
+", P=" + PreviousValue.ToNonCriticalWithQuote() +
+", C=" + _changedTo.ToNonCriticalWithQuote() +
+"}";
 
         public string UndoTextTableMouseOver() {
             var a = "'" + PreviousValue + "'";
