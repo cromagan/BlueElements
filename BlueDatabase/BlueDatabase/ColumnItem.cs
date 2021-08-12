@@ -1651,7 +1651,7 @@ namespace BlueDatabase {
                 case enDataFormat.Datum_und_Uhrzeit:
                 case enDataFormat.BildCode:
                 case enDataFormat.RelationText:
-                    if (_TextBearbeitungErlaubt && EditType_To_Check == enEditTypeFormula.Textfeld) { return true; } // Textfeld immer erlauben auch wenn beide Bearbeitungen nicht erlaubt sind, um die Anzeieg zu gewährleisten.
+                    if (EditType_To_Check == enEditTypeFormula.Textfeld) { return true; } // Textfeld immer erlauben auch wenn beide Bearbeitungen nicht erlaubt sind. Einfach der Übersichtlichktei
                     if (_MultiLine && EditType_To_Check == enEditTypeFormula.Textfeld_mit_Auswahlknopf) { return false; }
                     if (_DropdownBearbeitungErlaubt && EditType_To_Check == enEditTypeFormula.Textfeld_mit_Auswahlknopf) { return true; }
                     if (_DropdownBearbeitungErlaubt && _DropdownWerteAndererZellenAnzeigen && EditType_To_Check == enEditTypeFormula.SwapListBox) { return true; }

@@ -389,7 +389,24 @@ namespace BlueScript {
 
         public static strDoItFeedback AttributeAuflösen(string txt, Script s) {
             // Die Trims werden benötigtn, wenn eine Liste kommt, dass die Leerzeichen vor und nach den Kommas weggeschnitten werden.
+
+            #region Prüfen, Ob noch mehre Klammern da sind, oder Anfangs/End-Klammern erntfernen
+
+            if (txt.StartsWith("(")) {
+                (var pose, var _) = NextText(txt, 0, KlammerZu, false, false);
+                if (pose < txt.Length - 1) {
+                    /// Wir haben so einen Fall: (true) || (true)
+                    var txt1 = AttributeAuflösen(txt.Substring(1, pose - 1), s);
+                    return !string.IsNullOrEmpty(txt1.ErrorMessage)
+                        ? new strDoItFeedback("Befehls-Berechnungsfehler in ():" + txt1.ErrorMessage)
+                        : AttributeAuflösen(txt1.Value + txt.Substring(pose + 1), s);
+                }
+            }
+
             txt = txt.DeKlammere(true, false, false, true);
+
+            #endregion
+
             if (s != null) {
 
                 #region Variablen ersetzen
@@ -436,12 +453,12 @@ namespace BlueScript {
                     return new strDoItFeedback("Befehls-Berechnungsfehler: " + t2.ErrorMessage);
                 }
 
-                #endregion Routinen ersetzen, vor den Klammern, das ansonsten Min(x,y,z) falsch anschlägt
+                #endregion
 
                 txt = t2.AttributeText;
             }
 
-            #region Klammern am ende berechnen, das ansonsten Min(x,y,z) falsch anschlägt
+            #region Klammern am Ende berechnen, das ansonsten Min(x,y,z) falsch anschlägt
 
             (var posa, var _) = NextText(txt, 0, KlammerAuf, false, false);
             if (posa > -1) {
@@ -453,7 +470,7 @@ namespace BlueScript {
                     : AttributeAuflösen(txt.Substring(0, posa) + tmp.Value + txt.Substring(pose + 1), s);
             }
 
-            #endregion Klammern am ende berechnen, das ansonsten Min(x,y,z) falsch anschlägt
+            #endregion
 
             #region Vergleichsoperatoren ersetzen und vereinfachen
 
@@ -463,7 +480,7 @@ namespace BlueScript {
                 if (txt == null) { return new strDoItFeedback("Der Inhalt zwischen den Klammern () konnte nicht berechnet werden."); }
             }
 
-            #endregion Vergleichsoperatoren ersetzen und vereinfachen
+            #endregion
 
             return new strDoItFeedback(txt, enVariableDataType.NotDefinedYet);
         }

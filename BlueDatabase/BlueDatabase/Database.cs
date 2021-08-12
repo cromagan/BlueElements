@@ -1019,6 +1019,7 @@ namespace BlueDatabase {
             if (layout) { t += " - Layouts<br>"; }
             var l = column.Contents(null, null);
             if (l.Count > 0) {
+                t = t + "<br><br><b>Zusatz-Info:</b><br>";
                 t = t + " - Befüllt mit " + l.Count.ToString() + " verschiedenen Werten";
             }
             return t;
