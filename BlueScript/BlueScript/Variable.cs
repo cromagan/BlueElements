@@ -363,8 +363,18 @@ namespace BlueScript {
 
         public int ValueInt => IntParse(_ValueString);
 
+        /// <summary>
+        /// Es wird der String in eine Liste umgewandelt (bzw. andersrum). Leere Einträge auch am Ende bleiben erhalten.
+        /// </summary>
         public List<string> ValueListString {
-            get => _ValueString.SplitByCRToList();
+            get {
+                List<string> w = new();
+                if (string.IsNullOrEmpty(_ValueString)) { return w; }
+                var x = _ValueString.Replace("\r\n", "\r").Replace("\n", "\r");
+                var nl = x.Split(new[] { "\r" }, System.StringSplitOptions.None);
+                w.AddRange(nl);
+                return w;
+            }
             set {
                 if (Readonly) { return; }
                 ValueString = value.JoinWithCr();

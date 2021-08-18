@@ -29,12 +29,12 @@ namespace BlueBasics {
 
         #region Fields
 
+        private static readonly int _canWrite_tryintervall = 10;
         private static readonly List<string> _noWriteAccess = new();
         private static readonly List<string> _writeAccess = new();
         private static DateTime _canWrite_LastCheck = DateTime.Now.Subtract(new TimeSpan(10, 10, 10));
         private static string _canWrite_LastFile = string.Empty;
         private static bool _canWrite_LastResult;
-        private static readonly int _canWrite_tryintervall = 10;
         private static string _LastFilePath = string.Empty;
 
         #endregion

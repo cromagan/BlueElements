@@ -38,6 +38,7 @@ namespace BlueControls {
         #endregion
 
         #region Methods
+
         public static bool DictionaryRunning(bool TryToInit) {
             if (TryToInit && _DictWords == null) {
                 Init();

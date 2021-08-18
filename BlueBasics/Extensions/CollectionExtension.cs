@@ -31,8 +31,19 @@ namespace BlueBasics {
             return collection.Any(item => string.Equals(item, searchKeyword, System.StringComparison.OrdinalIgnoreCase));
         }
 
+        /// <summary>
+        /// Verbindet die Collection mit Trennzeichen und überflüssige Trennzeichen am Ende werden nicht abgeschnitten
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <param name="joinChar"></param>
+        /// <returns></returns>
         public static string JoinWith(this ICollection<string> collection, string joinChar) => string.Join(joinChar, collection.ToArray());
 
+        /// <summary>
+        /// Verbindet die Collection mit \r und überflüssige \r am Ende werden nicht abgeschnitten
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <returns></returns>
         public static string JoinWithCr(this ICollection<string> collection) => collection == null || collection.Count == 0 ? string.Empty : collection.JoinWith("\r");
 
         /// <summary>

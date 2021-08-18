@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="Enums\enSkriptFehlerTyp.cs" />
     <Compile Include="Methods\Method.cs" />
+    <Compile Include="Methods\Method_CountString.cs" />
     <Compile Include="Methods\Method_LoadImage.cs" />
     <Compile Include="Methods\Method_ChangeDateTimeFormat.cs" />
     <Compile Include="Methods\Method_AddDays.cs" />
@@ -55,7 +56,9 @@
     <Compile Include="Methods\Method_Clear.cs" />
     <Compile Include="Methods\Method_Element.cs" />
     <Compile Include="Methods\Method_IsDateTime.cs" />
+    <Compile Include="Methods\Method_SortNum.cs" />
     <Compile Include="Methods\Method_ToLower.cs" />
+    <Compile Include="Methods\Method_ReduceToChars.cs" />
     <Compile Include="Methods\Method_ToUpper.cs" />
     <Compile Include="Methods\Method_StartsWith.cs" />
     <Compile Include="Methods\Method_IsType.cs" />

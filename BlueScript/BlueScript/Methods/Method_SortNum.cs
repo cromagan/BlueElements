@@ -22,13 +22,13 @@ using static BlueBasics.Extensions;
 
 namespace BlueScript {
 
-    internal class Method_Sort : Method {
+    internal class Method_SortNum : Method {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List, enVariableDataType.Bool };
+        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List, enVariableDataType.Numeral };
 
-        public override string Description => "Sortiert die Liste. Falls das zweite Attribut TRUE ist, entfernt Doubletten und leere Einräge.";
+        public override string Description => "Sortiert die Liste. Der Zahlenwert wird verwendet wenn der String nicht in eine Zahl umgewandelt werden kann.";
 
         public override bool EndlessArgs => false;
 
@@ -40,25 +40,30 @@ namespace BlueScript {
 
         public override string StartSequence => "(";
 
-        //public Method_Sort(Script parent) : base(parent) { }
-        public override string Syntax => "Sort(ListVariable, EliminateDupes);";
+        public override string Syntax => "SortNum(ListVariable, Defaultwert);";
 
         #endregion
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "sort" };
+        public override List<string> Comand(Script s) => new() { "sortnum" };
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
-            var x = attvar.Attributes[0].ValueListString;
-            if (attvar.Attributes[1].ValueBool) {
-                x = x.SortedDistinctList();
-            } else {
-                x.Sort();
+
+            var nums = new List<double>();
+            foreach (string txt in attvar.Attributes[0].ValueListString) {
+                if (txt.IsNumeral()) {
+                    nums.Add(double.Parse(txt));
+                } else {
+                    nums.Add(attvar.Attributes[1].ValueDouble);
+                }
             }
-            attvar.Attributes[0].ValueListString = x;
+
+            nums.Sort();
+
+            attvar.Attributes[0].ValueListString = nums.ConvertAll<string>(delegate (double i) { return i.ToString(); });
             return new strDoItFeedback();
         }
 

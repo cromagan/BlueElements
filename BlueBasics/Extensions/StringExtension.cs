@@ -517,7 +517,7 @@ namespace BlueBasics {
         public static string SetLenght(this string s, int anzahl) => s.Length == anzahl ? s : s.Length < anzahl ? s.PadRight(anzahl) : s.Substring(0, anzahl);
 
         /// <summary>
-        /// Trennt den Text mittels dem Trennzeichen. Sind ein oder mehrere Trennzeichen am Ende, werden Leeren Felder diese nicht zurückgegeben.
+        /// Trennt den Text mittels dem Trennzeichen. Sind ein oder mehrere Trennzeichen am Ende, werden die leeren Felder nicht zurückgegeben.
         /// </summary>
         /// <param name="textToSplit"></param>
         /// <param name="trennzeichen"></param>
@@ -531,6 +531,11 @@ namespace BlueBasics {
             return w;
         }
 
+        /// <summary>
+        /// Erstellt eine Liste aus dem String, wobei als Trenner \r\n, \r oder \n benutzt werden. Leere Einträge am Ende werden gelöscht.
+        /// </summary>
+        /// <param name="textToSplit"></param>
+        /// <returns></returns>
         public static string[] SplitByCR(this string textToSplit) {
             var w = new string[0];
             if (string.IsNullOrEmpty(textToSplit)) { return w; }
@@ -539,6 +544,11 @@ namespace BlueBasics {
             return textToSplit.SplitBy("\r");
         }
 
+        /// <summary>
+        /// Erstellt eine Liste aus dem String, wobei als Trenner \r\n, \r oder \n benutzt werden. Leere Einträge am Ende werden gelöscht.
+        /// </summary>
+        /// <param name="textToSplit"></param>
+        /// <returns></returns>
         public static List<string> SplitByCRToList(this string textToSplit) {
             List<string> w = new();
             if (string.IsNullOrEmpty(textToSplit)) { return w; }

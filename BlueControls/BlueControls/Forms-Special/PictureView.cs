@@ -117,6 +117,20 @@ namespace BlueControls.Forms {
             Pad.ZoomFit();
         }
 
+        private void btnVor_Click(object sender, System.EventArgs e) {
+            _NR++;
+            if (_NR >= _FileList.Count - 1) { _NR = _FileList.Count - 1; }
+            LoadPic(_NR);
+        }
+
+        private void btnZoomFit_Click(object sender, System.EventArgs e) => Pad.ZoomFit();
+
+        private void btnZurueck_Click(object sender, System.EventArgs e) {
+            _NR--;
+            if (_NR <= 0) { _NR = 0; }
+            LoadPic(_NR);
+        }
+
         private void InitWindow(bool fitWindowToBest, string windowCaption, int openOnScreen) {
             //    Me.ShowInTaskbar = False
             if (_FileList == null || _FileList.Count < 2) { grpSeiten.Enabled = false; }
@@ -140,26 +154,11 @@ namespace BlueControls.Forms {
             if (Develop.IsHostRunning()) { TopMost = false; }
         }
 
-        private void btnZurueck_Click(object sender, System.EventArgs e) {
-            _NR--;
-            if (_NR <= 0) { _NR = 0; }
-            LoadPic(_NR);
-        }
-
         private void Pad_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
             if (btnZoomIn.Checked) { Pad.ZoomIn(e); }
             if (btnZoomOut.Checked) { Pad.ZoomOut(e); }
         }
 
-        private void btnVor_Click(object sender, System.EventArgs e) {
-            _NR++;
-            if (_NR >= _FileList.Count - 1) { _NR = _FileList.Count - 1; }
-            LoadPic(_NR);
-        }
-
-        private void btnZoomFit_Click(object sender, System.EventArgs e) => Pad.ZoomFit();
-
         #endregion
-
     }
 }

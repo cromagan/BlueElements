@@ -646,7 +646,6 @@ namespace BlueControls.Controls {
         }
 
         private void lbxColumns_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-
             var Column = _Database.Column.SearchByKey(IntParse(((BasicListItem)e.HotItem).Internal));
 
             var ViewItem = SearchViewItem(Column);

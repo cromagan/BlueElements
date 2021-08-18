@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace BlueControls {
+
     public partial class ScriptEditor : GroupBox // System.Windows.Forms.UserControl
     {
         #region Fields

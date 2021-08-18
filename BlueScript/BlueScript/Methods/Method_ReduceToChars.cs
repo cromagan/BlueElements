@@ -17,32 +17,33 @@
 
 using Skript.Enums;
 using System.Collections.Generic;
+using static BlueBasics.Extensions;
 
 namespace BlueScript {
 
-    internal class Method_Join : Method {
+    internal class Method_ReduceToChars : Method {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List, enVariableDataType.String };
-        public override string Description => "Wandelt eine Liste in einen Text um. Es verbindet den Text dabei mitteles dem angegebenen Verbindungszeichen. Sind leere Einträge am Ende der Liste, werden die Trennzeichen am Ende nicht abgeschnitten.";
+        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.String };
+        public override string Description => "Entfernt aus dem Text alle Zeichen die nicht erlaubt sind";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.String;
         public override string StartSequence => "(";
-        public override string Syntax => "Join(VariableListe, Verbindungszeichen)";
+        public override string Syntax => "ReduceToChars(OriginalString, ErlaubteZeichenString)";
 
         #endregion
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "join" };
+        public override List<string> Comand(Script s) => new() { "reducetochars" };
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             return !string.IsNullOrEmpty(attvar.ErrorMessage) ? strDoItFeedback.AttributFehler(this, attvar)
-                                                              : new strDoItFeedback(attvar.Attributes[0].ValueString.Replace("\r", attvar.Attributes[1].ValueString), enVariableDataType.String);
+                                                             : new strDoItFeedback(attvar.Attributes[0].ValueString.ReduceToChars(attvar.Attributes[1].ValueString), enVariableDataType.String);
         }
 
         #endregion
