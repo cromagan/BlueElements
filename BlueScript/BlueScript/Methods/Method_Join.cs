@@ -41,8 +41,14 @@ namespace BlueScript {
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            return !string.IsNullOrEmpty(attvar.ErrorMessage) ? strDoItFeedback.AttributFehler(this, attvar)
-                                                              : new strDoItFeedback(attvar.Attributes[0].ValueString.Replace("\r", attvar.Attributes[1].ValueString), enVariableDataType.String);
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+
+            if (string.IsNullOrEmpty(attvar.Attributes[0].ValueString)) { return new strDoItFeedback(string.Empty, enVariableDataType.String); }
+
+            var tmp = attvar.Attributes[0].ValueString;
+            tmp = tmp.Substring(0, tmp.Length - 1); // Listen mit Einträgen haben zur Erkennung immer noch einen zusätzlichen Zeilenumbruch
+
+            return new strDoItFeedback(tmp.Replace("\r", attvar.Attributes[1].ValueString), enVariableDataType.String);
         }
 
         #endregion

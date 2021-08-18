@@ -81,11 +81,17 @@ namespace BlueScript {
 
         #region Properties
 
+        /// <summary>
+        /// Es sind keine {} in diesem Text erlaubt und werden eliminiert
+        /// </summary>
         public string Error {
             get => _error;
             private set => _error = value.Replace("{", "").Replace("}", "");
         }
 
+        /// <summary>
+        /// Es sind keine {} in diesem Text erlaubt und werden eliminiert
+        /// </summary>
         public string ErrorCode {
             get => _errorCode;
             private set => _errorCode = value.Replace("{", "").Replace("}", "");

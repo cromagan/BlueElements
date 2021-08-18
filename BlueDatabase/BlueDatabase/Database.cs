@@ -760,8 +760,8 @@ namespace BlueDatabase {
         public void InjectCommand(enDatabaseDataType Comand, string ChangedTo) => AddPending(Comand, -1, -1, string.Empty, ChangedTo, true);
 
         public bool IsAdministrator() => DatenbankAdmin.Contains("#User: " + UserName, false)
-    || (!string.IsNullOrEmpty(UserGroup) && (DatenbankAdmin.Contains(UserGroup, false)
-    || UserGroup.ToUpper() == "#ADMINISTRATOR"));
+                                        || (!string.IsNullOrEmpty(UserGroup) && DatenbankAdmin.Contains(UserGroup, false))
+                                        || UserGroup.ToUpper() == "#ADMINISTRATOR";
 
         public void Parse(byte[] _BLoaded, ref int Pointer, ref enDatabaseDataType Art, ref int ColNR, ref int RowNR, ref string Wert, ref int X, ref int Y) {
             int Les;

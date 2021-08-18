@@ -124,14 +124,17 @@ namespace BlueBasics {
         /// <returns></returns>
         public static string DeKlammere(this string txt, bool klammern, bool geschklammern, bool gänsef, bool trimspace) {
             if (trimspace) { txt = txt.Trim(); }
-            if (klammern && txt.StartsWith("(") && txt.EndsWith(")")) {
-                return txt.Substring(1, txt.Length - 2).DeKlammere(klammern, geschklammern, gänsef, trimspace); // Unnötige Klammern entfernen und noch Ne Runde!!!!
+
+            if (klammern && txt.CanCut("(", ")")) {
+                return txt.Substring(1, txt.Length - 2).DeKlammere(klammern, geschklammern, gänsef, trimspace);
             }
-            if (geschklammern && txt.StartsWith("{") && txt.EndsWith("}")) {
-                return txt.Substring(1, txt.Length - 2).DeKlammere(klammern, geschklammern, gänsef, trimspace); // Unnötige Klammern entfernen und noch Ne Runde!!!!
+
+            if (geschklammern && txt.CanCut("{", "}")) {
+                return txt.Substring(1, txt.Length - 2).DeKlammere(klammern, geschklammern, gänsef, trimspace);
             }
-            if (gänsef && txt.StartsWith("\"") && txt.EndsWith("\"")) {
-                return txt.Substring(1, txt.Length - 2).DeKlammere(klammern, geschklammern, gänsef, trimspace); // Unnötige Klammern entfernen und noch Ne Runde!!!!
+
+            if (gänsef && txt.CanCut("\"", "\"")) {
+                return txt.Substring(1, txt.Length - 2).DeKlammere(klammern, geschklammern, gänsef, trimspace);
             }
             return txt;
         }
@@ -154,6 +157,7 @@ namespace BlueBasics {
             txt = txt.Replace("[K]", ",");
             txt = txt.Replace("[L]", "&");
             txt = txt.Replace("[M]", "/");
+            txt = txt.Replace("[N]", "\""); // Um Anfang und Ende von Texten richtig zu finden. z.B. 1 1/2"
             txt = txt.Replace("[Z]", "[");
             return txt;
         }
@@ -191,18 +195,14 @@ namespace BlueBasics {
             List<KeyValuePair<string, string>> Result = new();
             if (string.IsNullOrEmpty(value) || value.Length < 3) { return Result; }
             if (value.Substring(0, 1) != "{") { return Result; }
-            //var Beg = 0;
-            //while (true) {
-            //    Beg++;
-            //    if (Beg > value.Length) { break; }
-            //    var T = value.ParseTag(Beg);
-            //    var V = value.ParseValue(T, Beg);
-            //    if (!string.IsNullOrEmpty(T) && !string.IsNullOrEmpty(V)) {
-            //        Result.Add(new KeyValuePair<string, string>(T, V));
-            //    }
-            //    Beg = Beg + T.Length + V.Length + 2;
-            //}
+
             value = value.DeKlammere(false, true, false, true);
+
+            if (value.StartsWith("{") && value.EndsWith("}")) {
+                Develop.DebugPrint("Entklammerung fehlgeschlagen: " + value);
+                value = value.Substring(1, value.Length - 2);
+            }
+
             value = value.TrimEnd(",");
             var start = 0;
             var noarunde = true;
@@ -659,6 +659,8 @@ namespace BlueBasics {
             txt = txt.Replace("=", "[J]");
             txt = txt.Replace(",", "[K]");
             txt = txt.Replace("&", "[L]");
+            txt = txt.Replace("/", "[M]");
+            txt = txt.Replace("\"", "[N]");
             return txt;
         }
 
@@ -697,6 +699,13 @@ namespace BlueBasics {
         public static byte[] UTF8_ToByte(this string tXT) => Encoding.UTF8.GetBytes(tXT);
 
         public static byte[] WIN1252_toByte(this string tXT) => Encoding.GetEncoding(1252).GetBytes(tXT);
+
+        private static bool CanCut(this string txt, string start, string ende) {
+            if (!txt.StartsWith(start) || !txt.EndsWith(ende)) { return false; }
+
+            (var pose, var _) = NextText(txt, 0, new List<string> { ende }, false, false);
+            return pose == txt.Length - 1;
+        }
 
         #endregion
 

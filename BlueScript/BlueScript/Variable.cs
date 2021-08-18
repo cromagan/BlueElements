@@ -262,6 +262,7 @@ namespace BlueScript {
                 if (Type is not enVariableDataType.NotDefinedYet and not enVariableDataType.String) { SetError("Variable ist kein String"); return; }
                 ValueString = txt.Value.Substring(1, txt.Value.Length - 2); // Nicht Trimmen! Ansonsten wird sowas falsch: "X=" + "";
                 ValueString = ValueString.Replace("\"+\"", string.Empty); // Zuvor die " entfernen! dann verketten! Ansonsten wird "+" mit nix ersetzte, anstelle einem  +
+                if (ValueString.Contains("\"")) { SetError("Verkettungsfehler"); return; } // Beispiel: s ist nicht definiert und "jj" + s + "kk
                 Type = enVariableDataType.String;
                 Readonly = true;
                 return;
@@ -283,12 +284,17 @@ namespace BlueScript {
 
             #region Testen auf Liste mit Strings
 
-            if (txt.Value.Length > 2 && txt.Value.StartsWith("{\"") && txt.Value.EndsWith("\"}")) {
+            if (txt.Value.Length > 1 && txt.Value.StartsWith("{") && txt.Value.EndsWith("}")) {
                 if (Type is not enVariableDataType.NotDefinedYet and not enVariableDataType.List) { SetError("Variable ist keine Liste"); return; }
                 var t = txt.Value.DeKlammere(false, true, false, true);
-                var l = Method.SplitAttributeToVars(t, s, new List<enVariableDataType>() { enVariableDataType.String }, true);
-                if (!string.IsNullOrEmpty(l.ErrorMessage)) { SetError(l.ErrorMessage); return; }
-                ValueListString = l.Attributes.AllValues();
+
+                if (string.IsNullOrEmpty(t)) {
+                    ValueListString = new List<string>(); // Leere Liste
+                } else {
+                    var l = Method.SplitAttributeToVars(t, s, new List<enVariableDataType>() { enVariableDataType.String }, true);
+                    if (!string.IsNullOrEmpty(l.ErrorMessage)) { SetError(l.ErrorMessage); return; }
+                    ValueListString = l.Attributes.AllValues();
+                }
                 Type = enVariableDataType.List;
                 Readonly = true;
                 return;// new strDoItFeedback();
@@ -370,14 +376,18 @@ namespace BlueScript {
             get {
                 List<string> w = new();
                 if (string.IsNullOrEmpty(_ValueString)) { return w; }
-                var x = _ValueString.Replace("\r\n", "\r").Replace("\n", "\r");
+                var x = _ValueString.Substring(0, _ValueString.Length-1).Replace("\r\n", "\r").Replace("\n", "\r");
                 var nl = x.Split(new[] { "\r" }, System.StringSplitOptions.None);
                 w.AddRange(nl);
                 return w;
             }
             set {
                 if (Readonly) { return; }
-                ValueString = value.JoinWithCr();
+                if (value == null || value.Count == 0) {
+                    ValueString = string.Empty;
+                } else {
+                    ValueString = value.JoinWithCr() + "\r";
+                }
             }
         }
 
@@ -400,7 +410,7 @@ namespace BlueScript {
         public static strDoItFeedback AttributeAuflösen(string txt, Script s) {
             // Die Trims werden benötigtn, wenn eine Liste kommt, dass die Leerzeichen vor und nach den Kommas weggeschnitten werden.
 
-            #region Prüfen, Ob noch mehre Klammern da sind, oder Anfangs/End-Klammern erntfernen
+            #region Prüfen, Ob noch mehre Klammern da sind, oder Anfangs/End-Klammern entfernen
 
             if (txt.StartsWith("(")) {
                 (var pose, var _) = NextText(txt, 0, KlammerZu, false, false);

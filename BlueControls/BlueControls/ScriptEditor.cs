@@ -143,7 +143,7 @@ namespace BlueControls {
             }
             txbSkriptInfo.Text = string.IsNullOrEmpty(s.Error)
                 ? "[" + DateTime.Now.ToLongTimeString() + "] Erfolgreich, wenn auch IF-Routinen nicht geprüft wurden."
-                : "[" + DateTime.Now.ToLongTimeString() + "] Fehler in Zeile: " + s.Line.ToString() + "\r\n" + s.Error + "\r\n >>> " + s.ErrorCode;
+                : "[" + DateTime.Now.ToLongTimeString() + "] Fehler in Zeile: " + s.Line.ToString() + "\r\n" + s.Error + "\r\n >>> " + s.ErrorCode.Replace(Constants.GänsefüßchenReplace,"\\\"");
         }
 
         private void GenerateVariableTable() {
@@ -202,7 +202,7 @@ namespace BlueControls {
                         var inh = r.CellGetString("Inhalt");
                         inh = inh.Replace("\r", ";");
                         inh = inh.Replace("\n", ";");
-                        inh = inh.Replace("\"", string.Empty);
+                        //inh = inh.Replace("\"", string.Empty);
                         if (inh.Length > 25) { inh = inh.Substring(0, 20) + "..."; }
                         e.ToolTipTitle = "(" + r.CellGetString("Typ") + ") " + hoveredWordnew + " = " + inh;
                         e.ToolTipText = r.CellGetString("Kommentar") + " ";

@@ -28,7 +28,6 @@ namespace BlueScript {
 
         public static readonly List<string> OderOder = new() { "||" };
 
-        //public static readonly List<string> VergleichsOperatoren2 = new() { "||", "&&", "==", "!=", "<", ">", ">=", "<=" };
         public static readonly List<string> UndUnd = new() { "&&" };
 
         public static readonly List<string> VergleichsOperatoren = new() { "!", "||", "&&", "==", "!=", "<", ">", ">=", "<=" };
@@ -52,42 +51,12 @@ namespace BlueScript {
 
         public static string? GetBool(string txt) {
             txt = txt.DeKlammere(true, false, false, true);
+
             switch (txt.ToLower()) {
-                case "true":
-                    return "true";
-
-                case "false":
-                    return "false";
-                //
-                case "true&&true":
-                //    return "true";
-                //
-                case "true&&false":
-                //    return "false";
-                //
-                case "false&&true":
-                //    return "false";
-                //
-                case "false&&false":
-                //    return "false";
-                //
-                case "true||true":
-                //    return "true";
-                //
-                case "true||false":
-                //    return "true";
-                //
-                case "false||true":
-                //    return "true";
-                //
-                case "false||false":
-                //    return "false";
-
-                case "!true":
-                    return "false";
-
-                case "!false":
-                    return "true";
+                case "true": return "true";
+                case "false": return "false";
+                case "!true": return "false";
+                case "!false": return "true";
             }
 
             #region Klammern zuerst berechnen
@@ -186,27 +155,11 @@ namespace BlueScript {
                 case "==":
                     replacer = "false";
                     if (v1.ValueString == v2.ValueString) { replacer = "true"; }
-                    //if (s1.IsNumeral()) {
-                    //    if (s2.IsNumeral()) {
-                    //        if (FloatParse(s1) == FloatParse(s2)) { replacer = "true"; }
-                    //    }
-                    //    else {
-                    //        replacer = string.Empty;
-                    //    }
-                    //}
                     break;
 
                 case "!=":
                     replacer = "false";
                     if (v1.ValueString != v2.ValueString) { replacer = "true"; }
-                    //if (s1.IsNumeral()) {
-                    //    if (s2.IsNumeral()) {
-                    //        if (FloatParse(s1) != FloatParse(s2)) { replacer = "true"; }
-                    //    }
-                    //    else {
-                    //        replacer = string.Empty;
-                    //    }
-                    //}
                     break;
 
                 case ">=":
@@ -247,7 +200,7 @@ namespace BlueScript {
 
                 case "!":
                     // S1 dürfte eigentlich nie was sein: !False||!false
-                    // entwederist es ganz am anfang, oder direkt nach einem Trenneichen
+                    // entweder ist es ganz am anfang, oder direkt nach einem Trenneichen
                     if (v2.Type != enVariableDataType.Bool) { return string.Empty; }
                     replacer = "false";
                     if (!v2.ValueBool) { replacer = "true"; }
@@ -257,7 +210,8 @@ namespace BlueScript {
                     Develop.DebugPrint_NichtImplementiert();
                     break;
             }
-            return string.IsNullOrEmpty(replacer) ? string.Empty : txt.Substring(0, start + 1) + replacer + txt.Substring(ende);
+            return string.IsNullOrEmpty(replacer) ? string.Empty
+                                                  : txt.Substring(0, start + 1) + replacer + txt.Substring(ende);
         }
 
         #endregion

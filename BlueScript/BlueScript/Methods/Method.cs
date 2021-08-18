@@ -113,12 +113,16 @@ namespace BlueScript {
             if (attributes == null || attributes.Count == 0) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Allgemeiner Fehler."); }
             if (attributes.Count < types.Count) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Zu wenige Attribute erhalten."); ; }
             if (!EndlessArgs && attributes.Count > types.Count) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Zu viele Attribute erhalten."); }
+
             //  Variablen und Routinen ersetzen
             List<Variable> vars = new();
             for (var n = 0; n < attributes.Count; n++) {
-                var lb = attributes[n].Count(c => c == '¶');
-                attributes[n] = attributes[n].RemoveChars("¶");
-                var exceptetType = n < types.Count ? types[n] : types[types.Count - 1];
+                var lb = attributes[n].Count(c => c == '¶'); // Zeilenzähler weitersetzen
+                attributes[n] = attributes[n].RemoveChars("¶"); // Zeilenzähler entfernen
+
+                var exceptetType = n < types.Count ? types[n] : types[types.Count - 1]; // Bei Endlessargs den letzten nehmen
+
+                // Variable ermitteln oder eine Dummy-Variable als Rückgabe ermitteln
                 Variable v = null;
                 if (exceptetType.HasFlag(enVariableDataType.Variable)) {
                     if (!Variable.IsValidName(attributes[n])) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.VariableErwartet, "Variablenname erwartet bei Attribut " + (n + 1).ToString()); }
@@ -128,6 +132,8 @@ namespace BlueScript {
                     v = new Variable("dummy", attributes[n], s);
                     if (v == null) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.BerechnungFehlgeschlagen, "Berechnungsfehler bei Attribut " + (n + 1).ToString()); }
                 }
+
+                // Den Typ der Variable checken
                 if (!exceptetType.HasFlag(v.Type)) {
                     if (v.Type == enVariableDataType.Error) {
                         return new strSplittedAttributesFeedback(enSkriptFehlerTyp.BerechnungFehlgeschlagen, "Attribut " + (n + 1).ToString() + ": " + v.Coment);
@@ -139,7 +145,9 @@ namespace BlueScript {
                         return new strSplittedAttributesFeedback(enSkriptFehlerTyp.FalscherDatentyp, "Attribut " + (n + 1).ToString() + " ist nicht der erwartete Typ");
                     }
                 }
+
                 vars.Add(v);
+
                 if (s != null) { s.Line += lb; }
             }
             return new strSplittedAttributesFeedback(vars);
