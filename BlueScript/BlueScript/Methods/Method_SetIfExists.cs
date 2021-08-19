@@ -15,49 +15,44 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
-using static BlueBasics.Extensions;
 
 namespace BlueScript {
 
-    internal class Method_Sort : Method {
+    internal class Method_SetIfExists : Method {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List, enVariableDataType.Bool };
-
-        public override string Description => "Sortiert die Liste. Falls das zweite Attribut TRUE ist, entfernt Doubletten und leere Einräge.";
-
-        public override bool EndlessArgs => false;
-
+        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List_String_Numeral_or_Bool, enVariableDataType.Any };
+        public override string Description => "Diese Routine setzt den ersten Wert, der keinen Fehler verursacht in die erste Variable. Dabei müssen die Datentypen übereinstimmen. Falls einer der Werte ein Variable ist, die nicht existiert, wird diese einfach übergangen.";
+        public override bool EndlessArgs => true;
         public override string EndSequence => ");";
-
         public override bool GetCodeBlockAfter => false;
-
         public override enVariableDataType Returns => enVariableDataType.Null;
-
         public override string StartSequence => "(";
-
-        public override string Syntax => "Sort(ListVariable, EliminateDupes);";
+        public override string Syntax => "SetIfExists(Variable, Werte, ...)";
 
         #endregion
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "sort" };
+        public override List<string> Comand(Script s) => new() { "SetIfExists" };
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
-            var x = attvar.Attributes[0].ValueListString;
-            if (attvar.Attributes[1].ValueBool) {
-                x = x.SortedDistinctList();
-            } else {
-                x.Sort();
+
+            if (attvar.Attributes[0].Readonly) { return new strDoItFeedback("Ausgangsvariable schreibgeschützt."); }
+
+            for (var z = 1; z < attvar.Attributes.Count; z++) {
+                if (attvar.Attributes[z].Type != enVariableDataType.Error) {
+                    if (attvar.Attributes[z].Type != attvar.Attributes[0].Type) { return new strDoItFeedback("Variablentyp zur Ausgangsvariable unterschiedlich."); }
+                    attvar.Attributes[0].ValueString = attvar.Attributes[z].ValueString;
+                    return new strDoItFeedback();
+                }
             }
-            attvar.Attributes[0].ValueListString = x;
+
             return new strDoItFeedback();
         }
 

@@ -81,6 +81,8 @@ namespace BlueScript {
 
         #region Properties
 
+        public bool BreakFired { get; internal set; }
+
         /// <summary>
         /// Es sind keine {} in diesem Text erlaubt und werden eliminiert
         /// </summary>
@@ -98,6 +100,8 @@ namespace BlueScript {
         }
 
         public int Line { get; internal set; }
+
+        public int Schleife { get; internal set; }
 
         public string ScriptText {
             get => _ScriptText;
@@ -158,27 +162,34 @@ namespace BlueScript {
         public static (string, string) Parse(string scriptText, bool reduce, Script s) {
             var pos = 0;
             s.EndSkript = false;
-            string tmptxt;
+
+            string tmpScript;
             if (reduce) {
-                tmptxt = ReduceText(scriptText);
+                tmpScript = ReduceText(scriptText);
                 s.Line = 1;
+                s.BreakFired = false;
+                s.Schleife = 0;
                 s.Variablen.PrepareForScript();
             } else {
-                tmptxt = scriptText;
+                tmpScript = scriptText;
             }
+
             do {
-                if (pos >= tmptxt.Length || s.EndSkript) {
+                if (pos >= tmpScript.Length || s.EndSkript) {
                     if (reduce) { s.Variablen.ScriptFinished(); }
                     return (string.Empty, string.Empty);
                 }
-                if (tmptxt.Substring(pos, 1) == "¶") {
+
+                if (s.BreakFired) { return (string.Empty, string.Empty); }
+
+                if (tmpScript.Substring(pos, 1) == "¶") {
                     s.Line++;
                     pos++;
                 } else {
-                    var f = ComandOnPosition(tmptxt, pos, s, false);
+                    var f = ComandOnPosition(tmpScript, pos, s, false);
                     if (!string.IsNullOrEmpty(f.ErrorMessage)) {
                         if (reduce) { s.Variablen.ScriptFinished(); }
-                        return (f.ErrorMessage, tmptxt.Substring(pos, Math.Min(30, tmptxt.Length - pos)));
+                        return (f.ErrorMessage, tmpScript.Substring(pos, Math.Min(30, tmpScript.Length - pos)));
                     }
                     pos = f.Position;
                 }

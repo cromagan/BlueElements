@@ -196,15 +196,15 @@ namespace BlueBasics {
             if (string.IsNullOrEmpty(value) || value.Length < 3) { return Result; }
             if (value.Substring(0, 1) != "{") { return Result; }
 
-            value = value.DeKlammere(false, true, false, true);
+            //value = value.DeKlammere(false, true, false, true);
 
-            if (value.StartsWith("{") && value.EndsWith("}")) {
-                Develop.DebugPrint("Entklammerung fehlgeschlagen: " + value);
-                value = value.Substring(1, value.Length - 2);
-            }
+            //if (value.StartsWith("{") && value.EndsWith("}")) {
+            //    //Develop.DebugPrint("Entklammerung fehlgeschlagen: " + value);
+            //    value = value.Substring(1, value.Length - 2);
+            //}
 
-            value = value.TrimEnd(",");
-            var start = 0;
+            //value = value.TrimEnd(",");
+            var start = 1;
             var noarunde = true;
             do {
                 (var gleichpos, var _) = NextText(value, start, Gleich, false, false);
@@ -218,7 +218,7 @@ namespace BlueBasics {
                 (var kommapos, var _) = NextText(value, gleichpos, Komma, false, true);
                 string tagval;
                 if (kommapos < 0) {
-                    tagval = value.Substring(gleichpos + 1).Trim();
+                    tagval = value.Substring(gleichpos + 1, value.Length - gleichpos - 2).Trim();
                     noarunde = false;
                 } else {
                     tagval = value.Substring(gleichpos + 1, kommapos - gleichpos - 1).Trim();
@@ -325,78 +325,71 @@ namespace BlueBasics {
         }
 
         public static (int pos, string witch) NextText(string txt, int startpos, List<string> searchfor, bool checkforSeparatorbefore, bool checkforSeparatorafter) {
-            var klammern = 0;
+            //var klammern = 0;
             var Gans = false;
-            var GeschwKlammern = 0;
+            //var GeschwKlammern = 0;
             //var EckigeKlammern = 0;
             var pos = startpos;
             var maxl = txt.Length;
             const string TR = "&.,;\\?!\" ~|=<>+-(){}[]/*`´\r\n\t";
+
+            var historie = string.Empty;
+
             do {
                 if (pos >= maxl) { return (-1, string.Empty); ; }
 
                 #region Klammer und " erledigen
 
                 switch (txt.Substring(pos, 1)) {
-                    // Gänsefüsschen, immer erlaubt
                     case "\"":
-                        Gans = !Gans;
-                        break;
-                    //// Ekige klammern könne in { oder ( vorkommen, immer erlaubt
-                    //case "[":
-                    //    if (!Gans) {
-                    //        EckigeKlammern++;
-                    //    }
-                    //    break;
-                    //case "]":
-                    //    if (!Gans) {
-                    //        if (EckigeKlammern < 1) { return (-1, string.Empty); }
-                    //        EckigeKlammern--;
-                    //    }
-                    //    break;
-                    // Runde klammern können in { vorkommen
-                    case "(":
-                        if (!Gans) {
-                            //if (EckigeKlammern > 0) { return (-1, string.Empty); }
-                            if (klammern == 0 && GeschwKlammern == 0 && searchfor.Contains("(")) {
-                                return (pos, "(");
-                            }
-                            klammern++;
+                        if (historie.EndsWith("\"")) {
+                            historie = historie.Substring(0, historie.Length - 1);
+                            Gans = false;
+                        } else {
+                            historie += "\"";
+                            Gans = true;
                         }
+                        break;
+
+                    case "[":
+                        if (!Gans) { historie += "["; }
+                        break;
+
+                    case "]":
+                        if (!Gans) {
+                            if (!historie.EndsWith("[")) { return (-1, string.Empty); }
+                            historie = historie.Substring(0, historie.Length - 1);
+                        }
+                        break;
+
+                    case "(":
+                        if (!Gans) { historie += "("; }
                         break;
 
                     case ")":
                         if (!Gans) {
-                            //if (EckigeKlammern > 0) { return (-1, string.Empty); }
-                            if (klammern < 1) { return (-1, string.Empty); }
-                            klammern--;
+                            if (!historie.EndsWith("(")) { return (-1, string.Empty); }
+                            historie = historie.Substring(0, historie.Length - 1);
                         }
                         break;
-                    // Gescheifte klammern müssen immer sauber auf und zu gemacht werdrn!
+
                     case "{":
-                        if (!Gans) {
-                            if (klammern > 0) { return (-1, string.Empty); }
-                            //if (EckigeKlammern > 0) { return (-1, string.Empty); }
-                            //if (GeschwKlammern) { return (-1, string.Empty); }
-                            GeschwKlammern++;
-                        }
+                        if (!Gans) { historie += "{"; }
                         break;
 
                     case "}":
                         if (!Gans) {
-                            if (klammern > 0) { return (-1, string.Empty); }
-                            //if (EckigeKlammern > 0) { return (-1, string.Empty); }
-                            if (GeschwKlammern < 1) { return (-1, string.Empty); }
-                            GeschwKlammern--;
+                            if (!historie.EndsWith("{")) { return (-1, string.Empty); }
+                            historie = historie.Substring(0, historie.Length - 1);
                         }
                         break;
                 }
 
-                #endregion Klammer und " erledigen
+                #endregion
 
                 #region Den Text suchen
 
-                if (klammern == 0 && !Gans && GeschwKlammern == 0) {
+                if (string.IsNullOrEmpty(historie)) {
                     if (!checkforSeparatorbefore || pos == 0 || TR.Contains(txt.Substring(pos - 1, 1))) {
                         foreach (var thisEnd in searchfor) {
                             if (pos + thisEnd.Length <= maxl) {

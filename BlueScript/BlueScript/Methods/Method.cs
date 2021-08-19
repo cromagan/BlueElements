@@ -99,7 +99,7 @@ namespace BlueScript {
                     attributes.Add(attributtext.Substring(posc).DeKlammere(true, false, false, true));
                     break;
                 }
-                attributes.Add(attributtext.Substring(posc, pos - posc).DeKlammere(true, true, false, true));
+                attributes.Add(attributtext.Substring(posc, pos - posc).DeKlammere(true, false, false, true));
                 posc = pos + 1;
             } while (true);
 
@@ -109,6 +109,12 @@ namespace BlueScript {
         }
 
         public static strSplittedAttributesFeedback SplitAttributeToVars(string attributtext, Script s, List<enVariableDataType> types, bool EndlessArgs) {
+            if (types.Count == 0) {
+                return string.IsNullOrEmpty(attributtext)
+                    ? new strSplittedAttributesFeedback(new List<Variable>())
+                    : new strSplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Keine Attribute erwartet, aber erhalten.");
+            }
+
             var attributes = SplitAttributeToString(attributtext);
             if (attributes == null || attributes.Count == 0) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Allgemeiner Fehler."); }
             if (attributes.Count < types.Count) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Zu wenige Attribute erhalten."); ; }
@@ -237,10 +243,16 @@ namespace BlueScript {
         public QuickImage SymbolForReadableText() => null;
 
         private strGetEndFeedback GetEnd(string scriptText, int startpos, int lenghtStartSequence) {
+            //z.B: beim Befehl DO
+            if (string.IsNullOrEmpty(EndSequence)) {
+                return new strGetEndFeedback(startpos, string.Empty);
+            }
+
             (var pos, var witch) = NextText(scriptText, startpos, new List<string>() { EndSequence }, false, false);
             if (pos < startpos) {
                 return new strGetEndFeedback("Keinen Endpunkt gefunden.");
             }
+
             var txtBTW = scriptText.Substring(startpos + lenghtStartSequence, pos - startpos - lenghtStartSequence);
             return new strGetEndFeedback(pos + witch.Length, txtBTW);
         }

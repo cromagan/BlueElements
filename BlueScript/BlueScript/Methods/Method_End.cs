@@ -20,7 +20,7 @@ using System.Collections.Generic;
 
 namespace BlueScript {
 
-    internal class Method_Break : Method {
+    internal class Method_End : Method {
 
         #region Properties
 

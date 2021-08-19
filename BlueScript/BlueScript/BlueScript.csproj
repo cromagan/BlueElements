@@ -48,6 +48,10 @@
     <Compile Include="Enums\enSkriptFehlerTyp.cs" />
     <Compile Include="Methods\Method.cs" />
     <Compile Include="Methods\Method_CountString.cs" />
+    <Compile Include="Methods\Method_Do.cs" />
+    <Compile Include="Methods\Method_Break.cs" />
+    <Compile Include="Methods\Method_SetIfHasValue.cs" />
+    <Compile Include="Methods\Method_SetIfExists.cs" />
     <Compile Include="Methods\Method_LoadImage.cs" />
     <Compile Include="Methods\Method_ChangeDateTimeFormat.cs" />
     <Compile Include="Methods\Method_AddDays.cs" />

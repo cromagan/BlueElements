@@ -20,28 +20,38 @@ using System.Collections.Generic;
 
 namespace BlueScript {
 
-    internal class Method_Exists : Method {
+    internal class Method_Break : Method {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_Any };
-        public override string Description => "Gibt TRUE zurück, wenn die Variable existiert.";
+        public override List<enVariableDataType> Args => new() { };
+
+        public override string Description => "Beendet eine Schleife sofort. Kann auch nur innerhalb von Schleifen erwendet werden.";
+
         public override bool EndlessArgs => false;
-        public override string EndSequence => ")";
+
+        public override string EndSequence => ";";
+
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.Bool;
-        public override string StartSequence => "(";
-        public override string Syntax => "Exists(Variable)";
+
+        public override enVariableDataType Returns => enVariableDataType.Null;
+
+        public override string StartSequence => "";
+
+        public override string Syntax => "Break;";
 
         #endregion
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "exists" };
+        public override List<string> Comand(Script s) => new() { "break" };
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            return !string.IsNullOrEmpty(attvar.ErrorMessage) ? strDoItFeedback.Falsch() : strDoItFeedback.Wahr();
+            if (s.Schleife < 1) { return new strDoItFeedback("Break nur innerhalb einer Schleife erlaubt."); }
+
+            if (s.BreakFired) { return new strDoItFeedback("Break doppelt ausgelöst."); }
+            s.BreakFired = true;
+            return new strDoItFeedback();
         }
 
         #endregion
