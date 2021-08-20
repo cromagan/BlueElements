@@ -373,14 +373,7 @@ namespace BlueScript {
         /// Es wird der String in eine Liste umgewandelt (bzw. andersrum). Leere Einträge auch am Ende bleiben erhalten.
         /// </summary>
         public List<string> ValueListString {
-            get {
-                List<string> w = new();
-                if (string.IsNullOrEmpty(_ValueString)) { return w; }
-                var x = _ValueString.Substring(0, _ValueString.Length-1).Replace("\r\n", "\r").Replace("\n", "\r");
-                var nl = x.Split(new[] { "\r" }, System.StringSplitOptions.None);
-                w.AddRange(nl);
-                return w;
-            }
+            get => SplitToList(_ValueString);
             set {
                 if (Readonly) { return; }
                 if (value == null || value.Count == 0) {
@@ -524,7 +517,7 @@ namespace BlueScript {
                     return value;
 
                 case enVariableDataType.List:
-                    return "{\"" + value.Replace("\"", Constants.GänsefüßchenReplace).SplitByCRToList().JoinWith("\", \"").TrimEnd(", \"") + "\"}";
+                    return "{\"" + SplitToList(value.Replace("\"", Constants.GänsefüßchenReplace)).JoinWith("\", \"") + "\"}";
 
                 case enVariableDataType.NotDefinedYet: // Wenn ne Routine die Werte einfach ersetzt.
                     return value;
@@ -578,6 +571,15 @@ namespace BlueScript {
         }
 
         internal static string GenerateObject(string objecttype, string value) => objecttype.ToUpper().ReduceToChars(Constants.Char_AZ + Constants.Char_Numerals) + "&" + value.ToNonCritical();
+
+        private static List<string> SplitToList(string _ValueString) {
+            List<string> w = new();
+            if (string.IsNullOrEmpty(_ValueString)) { return w; }
+            var x = _ValueString.Substring(0, _ValueString.Length - 1).Replace("\r\n", "\r").Replace("\n", "\r");
+            var nl = x.Split(new[] { "\r" }, System.StringSplitOptions.None);
+            w.AddRange(nl);
+            return w;
+        }
 
         private void SetError(string coment) {
             Readonly = false;

@@ -325,10 +325,7 @@ namespace BlueBasics {
         }
 
         public static (int pos, string witch) NextText(string txt, int startpos, List<string> searchfor, bool checkforSeparatorbefore, bool checkforSeparatorafter) {
-            //var klammern = 0;
             var Gans = false;
-            //var GeschwKlammern = 0;
-            //var EckigeKlammern = 0;
             var pos = startpos;
             var maxl = txt.Length;
             const string TR = "&.,;\\?!\" ~|=<>+-(){}[]/*`´\r\n\t";

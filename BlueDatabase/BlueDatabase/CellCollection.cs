@@ -232,7 +232,7 @@ namespace BlueDatabase {
         /// <param name="PreviewsValue"></param>
         /// <param name="DoAlways">Auch wenn der PreviewsValue gleich dem CurrentValue ist, wird die Routine durchberechnet</param>
         public void DoSpecialFormats(ColumnItem Column, int RowKey, string PreviewsValue, bool DoAlways) {
-            if (Column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
+            if (Column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
             var CurrentValue = GetString(Column, _database.Row.SearchByKey(RowKey));
             if (!DoAlways && CurrentValue == PreviewsValue) { return; }
             switch (Column.Format) {
@@ -334,7 +334,7 @@ namespace BlueDatabase {
         public string GetString(ColumnItem column, RowItem row) // Main Method
         {
             try {
-                if (column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
+                if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
                 if (row == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeile ungültig!<br>" + _database.Filename); }
                 if (column.Format == enDataFormat.LinkedCell) {
                     (var lcolumn, var lrow) = LinkedCellData(column, row, false, false);
@@ -468,7 +468,7 @@ namespace BlueDatabase {
         public void Set(ColumnItem column, RowItem row, string value) // Main Method
         {
             _database.BlockReload(false);
-            if (column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
+            if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
             if (row == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeile ungültig!!<br>" + _database.Filename); }
             if (column.Format == enDataFormat.LinkedCell) {
                 (var lcolumn, var lrow) = LinkedCellData(column, row, true, !string.IsNullOrEmpty(value));
@@ -646,7 +646,7 @@ namespace BlueDatabase {
         }
 
         internal void SystemSet(ColumnItem Column, RowItem Row, string Value) {
-            if (Column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
+            if (Column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
             if (Row == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeile ungültig!<br>" + _database.Filename); }
             if (string.IsNullOrEmpty(Column.Identifier)) { Develop.DebugPrint(enFehlerArt.Fehler, "SystemSet nur bei System-Spalten möglich: " + ToString()); }
             if (!Column.SaveContent) { return; }

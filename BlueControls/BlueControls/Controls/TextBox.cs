@@ -405,6 +405,7 @@ namespace BlueControls.Controls {
         internal new void KeyPress(enASCIIKey KeyAscii) {
             // http://www.manderby.com/informatik/allgemeines/ascii.php
             if (_MouseValue != 0) { return; }
+
             switch (KeyAscii) {
                 case enASCIIKey.DEL:
                     // Eigentlich auch noch Ascii Code - steht bei ISO als Del
@@ -412,7 +413,6 @@ namespace BlueControls.Controls {
                     break;
 
                 case enASCIIKey.ENTER: {
-                        // war vorher mal vAutoumbruch
                         if (MultiLine) {
                             Char_DelBereich(-1, -1);
                             if (_eTxt.InsertChar(KeyAscii, _Cursor_CharPos)) {
@@ -448,11 +448,7 @@ namespace BlueControls.Controls {
                                     break;
 
                                 case enASCIIKey.StrgF:
-
-                                case enASCIIKey.LineFeed:
-                                //Zeilenumbruch
-                                // Kommt vor, wen man was aus einem anderen Programm kopiert,
-
+                                case enASCIIKey.LineFeed:   //Zeilenumbruch, Kommt vor, wen man was aus einem anderen Programm kopiert,
                                 case enASCIIKey.TAB:
                                     return;
 
@@ -472,7 +468,6 @@ namespace BlueControls.Controls {
                 return (bool)Invoke(new Func<bool>(() => WordStarts(word, position)));
             }
             try {
-                //if (word.StartsWith("ACE A") && position == 11) { word = word; }
                 if (_eTxt == null) { GenerateETXT(true); }
                 if (_eTxt == null) { return false; }
                 if (position + word.Length > _eTxt.Chars.Count + 1) { return false; }
@@ -622,9 +617,11 @@ namespace BlueControls.Controls {
         // Tastatur
         protected override void OnKeyDown(System.Windows.Forms.KeyEventArgs e) {
             base.OnKeyDown(e);
+
             if (!Enabled) { return; }
             _LastUserActionForSpellChecking = DateTime.Now;
-            if (_MouseValue != 0) { return; }
+            if (_MouseValue != 0 || e == null) { return; }
+
             switch (e.KeyCode) {
                 case System.Windows.Forms.Keys.Left:
                     Cursor_Richtung(-1, 0);
@@ -647,6 +644,7 @@ namespace BlueControls.Controls {
                     CheckIfTextIsChanded(_eTxt.HtmlText);
                     break;
             }
+
             _Cursor_Visible = true;
             Invalidate();
         }
@@ -658,17 +656,17 @@ namespace BlueControls.Controls {
                 if (e.KeyChar != (int)enASCIIKey.StrgX) { e.KeyChar = (char)enASCIIKey.StrgC; }
                 if (e.KeyChar != (int)enASCIIKey.StrgC) { return; }
             }
-            switch ((int)e.KeyChar) {
-                case (int)enASCIIKey.ENTER:
+            switch ((enASCIIKey)e.KeyChar) {
+                case enASCIIKey.ENTER:
                     KeyPress((enASCIIKey)e.KeyChar);
                     OnEnter();
                     return;
 
-                case (int)enASCIIKey.ESC:
+                case enASCIIKey.ESC:
                     OnESC();
                     return;
 
-                case (int)enASCIIKey.TAB:
+                case enASCIIKey.TAB:
                     OnTAB();
                     return;
 
@@ -684,7 +682,6 @@ namespace BlueControls.Controls {
         // Fokus
         protected override void OnLostFocus(System.EventArgs e) {
             base.OnLostFocus(e);
-            //if (_LastTextChange != null) { OnTextChanged(); }
             _LastUserActionForSpellChecking = DateTime.Now.AddSeconds(-30);
             if (!FloatingForm.IsShowing(this)) { MarkClear(); }
             Blinker.Enabled = false;
@@ -952,9 +949,8 @@ namespace BlueControls.Controls {
             return _SliderY;
         }
 
-        private int HotPosition() => _Cursor_CharPos > -1
-? _Cursor_CharPos
-: _MarkStart > -1 && _MarkEnd < 0 ? _MarkEnd : _MarkStart > -1 && _MarkEnd > -1 ? _MarkEnd : -1;
+        private int HotPosition() => _Cursor_CharPos > -1 ? _Cursor_CharPos
+                                                          : _MarkStart > -1 && _MarkEnd < 0 ? _MarkEnd : _MarkStart > -1 && _MarkEnd > -1 ? _MarkEnd : -1;
 
         private void MarkAll() {
             if (_eTxt != null && _eTxt.Chars.Count > 0) {
@@ -1010,10 +1006,13 @@ namespace BlueControls.Controls {
         private void Selection_Repair(bool SwapThem) {
             if (_eTxt == null || _eTxt.Chars.Count == 0) { MarkClear(); }
             if (_MarkStart < 0 && _MarkEnd < 0) { return; }
+
             _MarkStart = Math.Max(_MarkStart, 0);
             _MarkStart = Math.Min(_MarkStart, _eTxt.Chars.Count);
+
             _MarkEnd = Math.Max(_MarkEnd, 0);
             _MarkEnd = Math.Min(_MarkEnd, _eTxt.Chars.Count);
+
             if (SwapThem && _MarkStart > _MarkEnd) {
                 Generic.Swap(ref _MarkStart, ref _MarkEnd);
             }
@@ -1046,10 +1045,13 @@ namespace BlueControls.Controls {
             try {
                 if (Dictionary.IsSpellChecking) { return; }
                 if (DateTime.Now.Subtract(_LastUserActionForSpellChecking).TotalSeconds < 2) { return; }
+
                 Dictionary.IsSpellChecking = true;
                 if (!_SpellChecking) { return; }
+
                 if (!Dictionary.DictionaryRunning(true)) { return; }
                 if (_eTxt == null) { return; }
+
                 var Pos = 0;
                 var woEnd = -1;
                 bool Ok;
@@ -1059,9 +1061,12 @@ namespace BlueControls.Controls {
                     try {
                         do {
                             if (SpellChecker.CancellationPending) { return; }
+
                             Pos = Math.Max(woEnd + 1, Pos + 1);
-                            if (_eTxt == null) { return; }// Das TExtfeld ist spontan geschlossen worden.
+                            if (_eTxt == null) { return; }// Das Textfeld ist spontan geschlossen worden.
+
                             if (Pos >= _eTxt.Chars.Count) { break; }
+
                             var woStart = _eTxt.WordStart(Pos);
                             if (woStart > -1) {
                                 woEnd = _eTxt.WordEnd(Pos);
@@ -1083,9 +1088,10 @@ namespace BlueControls.Controls {
         }
 
         private void SpellChecker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
-            //Ja, Multithreading ist kompliziert...
-            if (SpellChecker.CancellationPending) { return; }
-            var x = Convert.ToString(e.UserState).SplitBy(";");
+            if (SpellChecker.CancellationPending) { return; }//Ja, Multithreading ist kompliziert...
+
+            var x = ((string)e.UserState).SplitBy(";");
+
             switch (x[0]) {
                 case "Unmark":
                     Unmark(enMarkState.Ringelchen);

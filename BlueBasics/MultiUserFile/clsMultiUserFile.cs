@@ -406,8 +406,8 @@ namespace BlueBasics.MultiUserFile {
                         Develop.DebugPrint(enFehlerArt.Info, "Autoreparatur fehlgeschlagen 2: " + Filename);
                     }
                 }
-            } catch (Exception ex) {
-                Develop.DebugPrint(ex);
+            } catch {
+                //Develop.DebugPrint(ex);
             }
         }
 
