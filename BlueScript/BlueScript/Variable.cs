@@ -575,7 +575,10 @@ namespace BlueScript {
         private static List<string> SplitToList(string _ValueString) {
             List<string> w = new();
             if (string.IsNullOrEmpty(_ValueString)) { return w; }
-            var x = _ValueString.Substring(0, _ValueString.Length - 1).Replace("\r\n", "\r").Replace("\n", "\r");
+            var x = _ValueString.Substring(0, _ValueString.Length);
+            //            var x = _ValueString.Substring(0, _ValueString.Length - 1);
+            x = x.Replace("\r\n", "\r");
+            x = x.Replace("\n", "\r");
             var nl = x.Split(new[] { "\r" }, System.StringSplitOptions.None);
             w.AddRange(nl);
             return w;
