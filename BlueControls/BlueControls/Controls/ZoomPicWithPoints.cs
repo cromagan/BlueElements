@@ -100,7 +100,7 @@ namespace BlueControls.Controls {
             }
             var ftxt = FilenameTXT(PathOfPicture);
             if (FileExists(ftxt)) {
-                tags = File.ReadAllText(ftxt, System.Text.Encoding.UTF8).SplitByCRToList();
+                tags = File.ReadAllText(ftxt, System.Text.Encoding.UTF8).SplitAndCutByCRToList();
             }
             tags.TagSet("ImageFile", PathOfPicture);
             return new Tuple<Bitmap, List<string>>(bmp, tags);
@@ -111,7 +111,7 @@ namespace BlueControls.Controls {
             var zoomy = (double)height / pic.Height;
             var pic2 = BitmapExt.Resize(pic, width, height, enSizeModes.Verzerren, System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic, true);
             List<string> tags2 = new(tags);
-            var Names = tags2.TagGet("AllPointNames").FromNonCritical().SplitBy("|");
+            var Names = tags2.TagGet("AllPointNames").FromNonCritical().SplitAndCutBy("|");
             foreach (var thisO in Names) {
                 var s = tags2.TagGet(thisO);
                 PointM ThisP = new(null, s);
@@ -327,7 +327,7 @@ namespace BlueControls.Controls {
         }
 
         private void GeneratePointsFromTags() {
-            var Names = Tags.TagGet("AllPointNames").FromNonCritical().SplitBy("|");
+            var Names = Tags.TagGet("AllPointNames").FromNonCritical().SplitAndCutBy("|");
             points.Clear();
             foreach (var thisO in Names) {
                 var s = Tags.TagGet(thisO);
@@ -336,7 +336,7 @@ namespace BlueControls.Controls {
         }
 
         private void WritePointsInTags() {
-            var Old = Tags.TagGet("AllPointNames").FromNonCritical().SplitBy("|");
+            var Old = Tags.TagGet("AllPointNames").FromNonCritical().SplitAndCutBy("|");
             foreach (var thisO in Old) {
                 Tags.TagSet(thisO, string.Empty);
             }

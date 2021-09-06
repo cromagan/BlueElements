@@ -62,7 +62,7 @@ namespace BlueBasics {
                 //    // --- Es ist die Letzte Klammer, deswegen KANN in der Funktion keine mehr sein.
                 //    // --- Und die Kommas stellen den Seperator dar.
                 //    // --------------------------------------------------------------------------------------------------------------------------------
-                //    var Att = Formel.Substring(a + 1, e - a - 1).SplitBy(",");
+                //    var Att = Formel.Substring(a + 1, e - a - 1).SplitAndCutBy(",");
                 //    var Att2 = new double?[Att.Length];
                 // for (TMP = 0; TMP < Att.Length; TMP++)
                 //    {

@@ -1090,7 +1090,7 @@ namespace BlueControls.Controls {
         private void SpellChecker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
             if (SpellChecker.CancellationPending) { return; }//Ja, Multithreading ist kompliziert...
 
-            var x = ((string)e.UserState).SplitBy(";");
+            var x = ((string)e.UserState).SplitAndCutBy(";");
 
             switch (x[0]) {
                 case "Unmark":

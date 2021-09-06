@@ -19,6 +19,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Forms;
+using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System.IO;
@@ -378,17 +379,17 @@ namespace BlueControls.BlueDatabaseDialogs {
                 _Column.PermissionGroups_ChangeCell.Clear();
                 _Column.PermissionGroups_ChangeCell.AddRange(lbxCellEditor.Item.ToListOfString());
             }
-            var NewDD = tbxAuswaehlbareWerte.Text.SplitByCRToList().SortedDistinctList();
+            var NewDD = tbxAuswaehlbareWerte.Text.SplitAndCutByCRToList().SortedDistinctList();
             if (NewDD.IsDifferentTo(_Column.DropDownItems)) {
                 _Column.DropDownItems.Clear();
                 _Column.DropDownItems.AddRange(NewDD);
             }
-            var NewRep = txbReplacer.Text.SplitByCRToList();
+            var NewRep = txbReplacer.Text.SplitAndCutByCRToList();
             if (NewRep.IsDifferentTo(_Column.OpticalReplace)) {
                 _Column.OpticalReplace.Clear();
                 _Column.OpticalReplace.AddRange(NewRep);
             }
-            var NewRep2 = txbAutoReplace.Text.SplitByCRToList();
+            var NewRep2 = txbAutoReplace.Text.SplitAndCutByCRToList();
             if (NewRep2.IsDifferentTo(_Column.AfterEdit_AutoReplace)) {
                 _Column.AfterEdit_AutoReplace.Clear();
                 _Column.AfterEdit_AutoReplace.AddRange(NewRep2);
@@ -400,12 +401,12 @@ namespace BlueControls.BlueDatabaseDialogs {
             _Column.Prefix = txbPrefix.Text;
             _Column.CaptionBitmap = txbSpaltenbild.Text;
             _Column.DauerFilterPos = Extensions.PointParse(txbDauerFilterPos.Text);
-            var NewTags = tbxTags.Text.SplitByCRToList();
+            var NewTags = tbxTags.Text.SplitAndCutByCRToList();
             if (NewTags.IsDifferentTo(_Column.Tags)) {
                 _Column.Tags.Clear();
                 _Column.Tags.AddRange(NewTags);
             }
-            var NewRegex = txbRegex.Text.SplitByCRToList();
+            var NewRegex = txbRegex.Text.SplitAndCutByCRToList();
             if (NewRegex.IsDifferentTo(_Column.Regex)) {
                 _Column.Regex.Clear();
                 _Column.Regex.AddRange(NewRegex);

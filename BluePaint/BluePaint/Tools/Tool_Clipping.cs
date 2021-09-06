@@ -86,7 +86,7 @@ namespace BluePaint {
         }
 
         public override void ExcuteCommand(string command) {
-            var c = command.SplitBy(";");
+            var c = command.SplitAndCutBy(";");
             if (c[0] == "AutoZuschnitt") {
                 CheckMinMax();
                 AutoZ_Click(null, null);

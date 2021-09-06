@@ -226,7 +226,7 @@ namespace BlueDatabase {
         public void DeleteAllBackups() {
             for (var n = 0; n < _BereitsExportiert.Count; n++) {
                 if (!string.IsNullOrEmpty(_BereitsExportiert[n])) {
-                    var x = _BereitsExportiert[n].SplitBy("|");
+                    var x = _BereitsExportiert[n].SplitAndCutBy("|");
                     if (FileExists(x[0])) {
                         DeleteFile(x[0], false);
                         _BereitsExportiert[n] = string.Empty;
@@ -336,11 +336,11 @@ namespace BlueDatabase {
                         break;
 
                     case "exported": // ALT, 02.10.2019
-                        _BereitsExportiert.AddRange(pair.Value.FromNonCritical().SplitBy("#"));
+                        _BereitsExportiert.AddRange(pair.Value.FromNonCritical().SplitAndCutBy("#"));
                         break;
 
                     case "exp":
-                        var tmp = pair.Value.FromNonCritical().SplitBy("#");
+                        var tmp = pair.Value.FromNonCritical().SplitAndCutBy("#");
                         _BereitsExportiert.Clear();
                         foreach (var thise in tmp) {
                             if (thise.StartsWith("@")) {
@@ -507,7 +507,7 @@ namespace BlueDatabase {
                 for (var n = 0; n < _BereitsExportiert.Count; n++) {
                     if (worker != null && worker.CancellationPending) { break; }
                     if (!string.IsNullOrEmpty(_BereitsExportiert[n])) {
-                        var x = _BereitsExportiert[n].SplitBy("|");
+                        var x = _BereitsExportiert[n].SplitAndCutBy("|");
                         if ((float)DateTime.Now.Subtract(DateTimeParse(x[1])).TotalDays > _AutomatischLöschen) {
                             if (FileExists(x[0])) { DeleteFile(x[0], false); }
                         }
@@ -544,7 +544,7 @@ namespace BlueDatabase {
                 for (var n = 0; n < _BereitsExportiert.Count; n++) {
                     if (worker != null && worker.CancellationPending) { break; }
                     if (!string.IsNullOrEmpty(_BereitsExportiert[n])) {
-                        var x = _BereitsExportiert[n].SplitBy("|");
+                        var x = _BereitsExportiert[n].SplitAndCutBy("|");
                         if (x.GetUpperBound(0) > 1 && Database.Row.SearchByKey(int.Parse(x[2])) == null) {
                             if (FileExists(x[0])) { DeleteFile(x[0], false); }
                         }
@@ -638,7 +638,7 @@ namespace BlueDatabase {
             }
             var DidAndOk = false;
             foreach (var ThisString in Added) {
-                var x = ThisString.SplitBy("|");
+                var x = ThisString.SplitAndCutBy("|");
                 if (FileExists(x[0])) {
                     if (!_BereitsExportiert.Contains(ThisString)) {
                         _BereitsExportiert.Add(ThisString);
@@ -677,7 +677,7 @@ namespace BlueDatabase {
                 if (Worker.CancellationPending) { break; }
                 if (!string.IsNullOrEmpty(_BereitsExportiert[f])) {
                     if (_BereitsExportiert[f].EndsWith("|" + Id)) {
-                        var x = _BereitsExportiert[f].SplitBy("|");
+                        var x = _BereitsExportiert[f].SplitAndCutBy("|");
                         if (FileExists(x[0])) { DeleteFile(x[0], false); }
                         if (!FileExists(x[0])) {
                             _BereitsExportiert[f] = string.Empty;

@@ -228,7 +228,7 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "embedded":
-                    Eingebettete_Ansichten = value.FromNonCritical().SplitByCRToList();
+                    Eingebettete_Ansichten = value.FromNonCritical().SplitAndCutByCRToList();
                     return true;
 
                 case "color":
@@ -362,7 +362,7 @@ namespace BlueControls.ItemCollection {
         //{
         //    _Name = Tags.TagGet("name").FromNonCritical();
         //    TextLage = (enAlignment)int.Parse(Tags.TagGet("Textlage"));
-        //    AnsichtenVonMir = Tags.TagGet("Eingebettete Ansichten").FromNonCritical().SplitByCRToList();
+        //    AnsichtenVonMir = Tags.TagGet("Eingebettete Ansichten").FromNonCritical().SplitAndCutByCRToList();
         //    Randfarbe = Tags.TagGet("Randfarbe").FromHTMLCode();
         //    base.DoStyleCommands(sender, Tags, ref CloseMenu);
         //}

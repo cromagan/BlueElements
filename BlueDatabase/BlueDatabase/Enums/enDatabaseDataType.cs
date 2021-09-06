@@ -70,6 +70,8 @@ namespace BlueDatabase.Enums {
         ColumnArrangement = 32,
         Views = 33,
         LastRowKey = 34,
+
+        [Obsolete]
         Rules_ALT = 35,
 
         //    VorgängerDateien_ALT = 37

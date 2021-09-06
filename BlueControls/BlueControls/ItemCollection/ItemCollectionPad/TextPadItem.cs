@@ -227,7 +227,7 @@ namespace BlueControls.ItemCollection {
         //    //    var t1 = nt.Substring(stx, enx - stx + 2);
         //    //    if (string.IsNullOrEmpty(t1)) { break; }
         //    //    if (!t1.Contains("//TS/000")) { break; }
-        //    //    var l = t1.SplitBy("/");
+        //    //    var l = t1.SplitAndCutBy("/");
         //    //    if (l.Length < 3) { break; }
         //    //    var Nam = "";
         //    //    var Vor = "";

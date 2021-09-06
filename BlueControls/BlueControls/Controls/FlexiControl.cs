@@ -1042,7 +1042,7 @@ namespace BlueControls.Controls {
         /// <summary>
         /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.
         /// </summary>
-        private void UpdateValueTo_ListBox(ItemCollectionList Main) => Main.SetValuesTo(_Value.SplitByCRToList(), FileEncryptionKey);
+        private void UpdateValueTo_ListBox(ItemCollectionList Main) => Main.SetValuesTo(_Value.SplitAndCutByCRToList(), FileEncryptionKey);
 
         /// <summary>
         /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.

@@ -87,7 +87,7 @@ namespace BluePaint {
         }
 
         private void DoMakro(string thisS) {
-            var t = thisS.SplitBy(";");
+            var t = thisS.SplitAndCutBy(";");
             foreach (var ThisTool in _merker) {
                 if (ThisTool.MacroKennung() == t[0].FromNonCritical()) {
                     ThisTool.OverridePic += ThisTool_OverridePic;

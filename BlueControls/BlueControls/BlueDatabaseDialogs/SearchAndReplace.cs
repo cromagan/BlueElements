@@ -154,7 +154,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                         } else if (ErsetzeKomplett.Checked) {
                             GeändeterText = ErsetzText;
                         } else if (FügeHinzu.Checked) {
-                            List<string> tmp = new(OriginalText.SplitByCR())
+                            List<string> tmp = new(OriginalText.SplitAndCutByCR())
                             {
                                 ErsetzText
                             };

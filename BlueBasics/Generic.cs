@@ -127,7 +127,7 @@ namespace BlueBasics {
         public static Stream GetEmmbedResource(Assembly assembly, string name) => (from ThisString in assembly.GetManifestResourceNames() where ThisString.EndsWith("." + name) select assembly.GetManifestResourceStream(ThisString)).FirstOrDefault();
 
         public static string GetUrlFileDestination(string filename) {
-            var D = File.ReadAllText(filename, Encoding.UTF8).SplitByCRToList();
+            var D = File.ReadAllText(filename, Encoding.UTF8).SplitAndCutByCRToList();
             return D.TagGet("URL");
         }
 

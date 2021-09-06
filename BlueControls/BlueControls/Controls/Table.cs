@@ -1734,7 +1734,7 @@ namespace BlueControls.Controls {
                         var ClipTMP = System.Windows.Forms.Clipboard.GetText();
                         ClipTMP = ClipTMP.RemoveChars(Constants.Char_NotFromClip);
                         ClipTMP = ClipTMP.TrimEnd("\r\n");
-                        var SearchValue = new List<string>(ClipTMP.SplitByCR()).SortedDistinctList();
+                        var SearchValue = new List<string>(ClipTMP.SplitAndCutByCR()).SortedDistinctList();
                         Filter.Remove(e.Column);
                         if (SearchValue.Count > 0) {
                             Filter.Add(new FilterItem(e.Column, enFilterType.IstGleich_ODER | enFilterType.GroßKleinEgal, SearchValue));
@@ -1746,8 +1746,8 @@ namespace BlueControls.Controls {
                         var ClipTMP = System.Windows.Forms.Clipboard.GetText();
                         ClipTMP = ClipTMP.RemoveChars(Constants.Char_NotFromClip);
                         ClipTMP = ClipTMP.TrimEnd("\r\n");
-                        var ColumInhalt = Database.Export_CSV(enFirstRow.Without, e.Column, null).SplitByCRToList().SortedDistinctList();
-                        ColumInhalt.RemoveString(ClipTMP.SplitByCRToList().SortedDistinctList(), false);
+                        var ColumInhalt = Database.Export_CSV(enFirstRow.Without, e.Column, null).SplitAndCutByCRToList().SortedDistinctList();
+                        ColumInhalt.RemoveString(ClipTMP.SplitAndCutByCRToList().SortedDistinctList(), false);
                         Filter.Remove(e.Column);
                         if (ColumInhalt.Count > 0) {
                             Filter.Add(new FilterItem(e.Column, enFilterType.IstGleich_ODER | enFilterType.GroßKleinEgal, ColumInhalt));
@@ -2352,7 +2352,7 @@ namespace BlueControls.Controls {
             if (!ContentHolderCellColumn.MultiLine || !toDraw.Contains("\r")) {
                 Draw_CellTransparentDirect_OneLine(GR, toDraw, cellInThisDatabaseColumn, DrawY(cellInThisDatabaseRow), 0, ContentHolderCellColumn, true, vfont, cellInThisDatabaseRow.DrawHeight, cw);
             } else {
-                var MEI = toDraw.SplitByCR();
+                var MEI = toDraw.SplitAndCutByCR();
                 if (ContentHolderCellColumn.ShowMultiLineInOneLine) {
                     Draw_CellTransparentDirect_OneLine(GR, MEI.JoinWith("; "), cellInThisDatabaseColumn, DrawY(cellInThisDatabaseRow), 0, ContentHolderCellColumn, true, vfont, cellInThisDatabaseRow.DrawHeight, cw);
                 } else {

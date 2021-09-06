@@ -223,7 +223,7 @@ namespace BlueControls.Forms {
         //    if (TableView.Database != null) { TableView.Filter.Remove_RowFilter(); }
         //    if (TableView.Database != null && !string.IsNullOrEmpty(ZeilenFilter_TextFeld.Text))
         //    {
-        //        TableView.Filter.Add(enFilterType.Instr_UND_GroﬂKleinEgal, new List<string>(ZeilenFilter_TextFeld.Text.SplitBy("+")));
+        //        TableView.Filter.Add(enFilterType.Instr_UND_GroﬂKleinEgal, new List<string>(ZeilenFilter_TextFeld.Text.SplitAndCutBy("+")));
         //    }
         //}
         //private void AlleFilterAus_Click(object sender, System.EventArgs e)

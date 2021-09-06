@@ -269,6 +269,63 @@ namespace BlueControls {
 
         internal BlueFont Scale(double fontScale) => Math.Abs(1 - fontScale) < 0.01 ? this : Get(FontName, (float)(FontSize * fontScale), Bold, Italic, Underline, StrikeOut, Outline, Color_Main, Color_Outline, Kapitälchen, OnlyUpper, OnlyLower);
 
+        internal List<string> SplitByWidth(string txt, float maxWidth, int maxLines) {
+            List<string> _broken = new();
+            var pos = 0;
+            var FoundCut = 0;
+            var Rest = txt;
+            if (maxLines < 1) { maxLines = 100; }
+
+            do {
+                pos++;
+                var ToTEst = Rest.Substring(0, pos);
+                var s = MeasureString(ToTEst, Font());
+                if (pos < Rest.Length && Convert.ToChar(Rest.Substring(pos, 1)).isPossibleLineBreak()) { FoundCut = pos; }
+                if (s.Width > maxWidth || pos == Rest.Length) {
+                    if (pos == Rest.Length) {
+                        _broken.Add(Rest);
+                        return _broken;
+                    } // Alles untergebracht
+                    if (_broken.Count == maxLines - 1) {
+                        // Ok, werden zu viele Zeilen. Also diese Kürzen.
+                        _broken.Add(TrimByWidth(Rest, maxWidth));
+                        return _broken;
+                    }
+                    if (FoundCut > 1) {
+                        pos = FoundCut + 1;
+                        ToTEst = Rest.Substring(0, pos);
+                        FoundCut = 0;
+                    }
+                    _broken.Add(ToTEst);
+                    Rest = Rest.Substring(pos);
+                    pos = -1; // wird gleich erhöht
+                }
+            } while (true);
+        }
+
+        internal string TrimByWidth(string txt, float maxWidth) {
+            var tSize = MeasureString(txt, Font());
+            if (tSize.Width - 1 > maxWidth && txt.Length > 1) {
+                var Min = 0;
+                var Max = txt.Length;
+                int Middle;
+                do {
+                    Middle = (int)(Min + ((Max - Min) / 2.0));
+                    tSize = MeasureString(txt.Substring(0, Middle) + "...", Font());
+                    if (tSize.Width + 3 > maxWidth) {
+                        Max = Middle;
+                    } else {
+                        Min = Middle;
+                    }
+                } while (Max - Min > 1);
+                if (Middle == 1 && tSize.Width - 2 > maxWidth) {
+                    return string.Empty;  // ACHTUNG: 5 Pixel breiter (Beachte oben +4 und hier +2)
+                }
+                return txt.Substring(0, Middle) + "...";
+            }
+            return txt;
+        }
+
         private static string ToString(string FontName, float FontSize, bool Bold, bool Italic, bool Underline, bool Strikeout, bool OutLine, string Color_Main, string Color_Outline, bool vKapitälchen, bool vonlyuppe, bool vonlylower) {
             var c = "{Name=" + FontName + ", Size=" + FontSize.ToString().ToNonCritical();
             if (Bold) { c += ", Bold=True"; }

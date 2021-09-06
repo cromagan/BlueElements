@@ -855,7 +855,7 @@ namespace BlueDatabase {
 
         public string AutoCorrect(string Value) {
             if (Format == enDataFormat.Link_To_Filesystem) {
-                List<string> l = new(Value.SplitByCR());
+                List<string> l = new(Value.SplitAndCutByCR());
                 List<string> l2 = new();
                 foreach (var thisFile in l) {
                     l2.Add(SimplyFile(thisFile));
@@ -865,9 +865,9 @@ namespace BlueDatabase {
             if (_AfterEdit_DoUCase) { Value = Value.ToUpper(); }
             if (!string.IsNullOrEmpty(_AutoRemove)) { Value = Value.RemoveChars(_AutoRemove); }
             if (AfterEdit_AutoReplace.Count > 0) {
-                List<string> l = new(Value.SplitByCR());
+                List<string> l = new(Value.SplitAndCutByCR());
                 foreach (var thisar in AfterEdit_AutoReplace) {
-                    var rep = thisar.SplitBy("|");
+                    var rep = thisar.SplitAndCutBy("|");
                     for (var z = 0; z < l.Count; z++) {
                         var r = string.Empty;
                         if (rep.Length > 1) { r = rep[1].Replace(";cr;", "\r"); }
@@ -891,7 +891,7 @@ namespace BlueDatabase {
                 Value = erg.ToString();
             }
             if (_AfterEdit_QuickSortRemoveDouble) {
-                var l = new List<string>(Value.SplitByCR()).SortedDistinctList();
+                var l = new List<string>(Value.SplitAndCutByCR()).SortedDistinctList();
                 Value = l.JoinWithCr();
             }
             return Value;
@@ -1844,23 +1844,23 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.co_DropDownItems:
-                    DropDownItems.SplitByCR_QuickSortAndRemoveDouble(Wert);
+                    DropDownItems.SplitAndCutByCR_QuickSortAndRemoveDouble(Wert);
                     break;
 
                 case enDatabaseDataType.co_OpticalReplace:
-                    OpticalReplace.SplitByCR(Wert);
+                    OpticalReplace.SplitAndCutByCR(Wert);
                     break;
 
                 case enDatabaseDataType.co_AfterEdit_AutoReplace:
-                    AfterEdit_AutoReplace.SplitByCR(Wert);
+                    AfterEdit_AutoReplace.SplitAndCutByCR(Wert);
                     break;
 
                 case enDatabaseDataType.co_Regex:
-                    Regex.SplitByCR(Wert);
+                    Regex.SplitAndCutByCR(Wert);
                     break;
 
                 case enDatabaseDataType.co_Tags:
-                    Tags.SplitByCR(Wert);
+                    Tags.SplitAndCutByCR(Wert);
                     break;
 
                 case enDatabaseDataType.co_AutoFilterJoker:
@@ -1868,7 +1868,7 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.co_PermissionGroups_ChangeCell:
-                    PermissionGroups_ChangeCell.SplitByCR_QuickSortAndRemoveDouble(Wert);
+                    PermissionGroups_ChangeCell.SplitAndCutByCR_QuickSortAndRemoveDouble(Wert);
                     break;
 
                 case enDatabaseDataType.co_AllowedChars:

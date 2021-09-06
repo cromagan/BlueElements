@@ -61,6 +61,13 @@ namespace BlueBasics {
             }
         }
 
+        public static bool CanCut(this string txt, string start, string ende) {
+            if (!txt.StartsWith(start) || !txt.EndsWith(ende)) { return false; }
+
+            (var pose, var _) = NextText(txt, 0, new List<string> { ende }, false, false);
+            return pose == txt.Length - 1;
+        }
+
         public static bool ContainsChars(this string tXT, string chars) => chars.Where((_, z) => tXT.Contains(chars.Substring(z, 1))).Any();
 
         public static bool ContainsOnlyChars(this string tXT, string chars) => !tXT.Where((_, z) => !chars.Contains(tXT.Substring(z, 1))).Any();
@@ -512,12 +519,16 @@ namespace BlueBasics {
         /// <param name="textToSplit"></param>
         /// <param name="trennzeichen"></param>
         /// <returns></returns>
-        public static string[] SplitBy(this string textToSplit, string trennzeichen) {
+        public static string[] SplitAndCutBy(this string textToSplit, string trennzeichen) {
             var w = new string[0];
             if (string.IsNullOrEmpty(textToSplit)) { return w; }
+
             textToSplit = textToSplit.TrimEnd(trennzeichen);
+
+            if (string.IsNullOrEmpty(textToSplit)) { return w; }
+
             w = textToSplit.Split(new[] { trennzeichen }, StringSplitOptions.None);
-            if (w.Length == 1 && string.IsNullOrEmpty(w[0])) { w = new string[0]; }
+            //if (w.Length == 1 && string.IsNullOrEmpty(w[0])) { w = new string[0]; }
             return w;
         }
 
@@ -526,12 +537,11 @@ namespace BlueBasics {
         /// </summary>
         /// <param name="textToSplit"></param>
         /// <returns></returns>
-        public static string[] SplitByCR(this string textToSplit) {
+        public static string[] SplitAndCutByCR(this string textToSplit) {
             var w = new string[0];
             if (string.IsNullOrEmpty(textToSplit)) { return w; }
-            textToSplit = textToSplit.Replace("\r\n", "\r");
-            textToSplit = textToSplit.Replace("\n", "\r");
-            return textToSplit.SplitBy("\r");
+            textToSplit = textToSplit.Replace("\r\n", "\r").Replace("\n", "\r");
+            return textToSplit.SplitAndCutBy("\r");
         }
 
         /// <summary>
@@ -539,12 +549,37 @@ namespace BlueBasics {
         /// </summary>
         /// <param name="textToSplit"></param>
         /// <returns></returns>
+        public static List<string> SplitAndCutByCRToList(this string textToSplit) {
+            List<string> w = new();
+            if (string.IsNullOrEmpty(textToSplit)) { return w; }
+            w.AddRange(textToSplit.SplitAndCutByCR());
+            return w;
+        }
+
+        /// <summary>
+        /// Splittet den String, ohne etwas zu kürzen.ACHTUNG: Wenn der Text leer ist, wird ein Array mit der Länge 0 zurückgegeben.
+        /// </summary>
+        /// <param name="textToSplit"></param>
+        /// <param name="trennzeichen"></param>
+        /// <returns></returns>
+        public static string[] SplitBy(this string textToSplit, string trennzeichen) => string.IsNullOrEmpty(textToSplit) ? new string[0] : textToSplit.Split(new[] { trennzeichen }, StringSplitOptions.None);
+
+        /// <summary>
+        /// Splittet den String, ohne etwas zu kürzen. Zeilenumrüche werden aber vereinfach (\r\n => \r). ACHTUNG: Wenn der Text leer ist, wird ein Array mit der Länge 0 zurückgegeben.
+        /// </summary>
+        /// <param name="textToSplit"></param>
+        /// <returns></returns>
+        public static string[] SplitByCR(this string textToSplit) => string.IsNullOrEmpty(textToSplit) ? new string[0] : textToSplit.Replace("\r\n", "\r").Replace("\n", "\r").SplitBy("\r");
+
+        /// <summary>
+        /// Splittet den String, ohne etwas zu kürzen. Zeilenumrüche werden aber vereinfach (\r\n => \r). ACHTUNG: Wenn der Text leer ist, wird eine Liste mit der Länge 0 zurückgegeben.
+        /// </summary>
+        /// <param name="textToSplit"></param>
+        /// <returns></returns>
         public static List<string> SplitByCRToList(this string textToSplit) {
             List<string> w = new();
             if (string.IsNullOrEmpty(textToSplit)) { return w; }
-            textToSplit = textToSplit.Replace("\r\n", "\r");
-            textToSplit = textToSplit.Replace("\n", "\r");
-            w.AddRange(textToSplit.SplitBy("\r"));
+            w.AddRange(textToSplit.SplitByCR());
             return w;
         }
 
@@ -689,13 +724,6 @@ namespace BlueBasics {
         public static byte[] UTF8_ToByte(this string tXT) => Encoding.UTF8.GetBytes(tXT);
 
         public static byte[] WIN1252_toByte(this string tXT) => Encoding.GetEncoding(1252).GetBytes(tXT);
-
-        private static bool CanCut(this string txt, string start, string ende) {
-            if (!txt.StartsWith(start) || !txt.EndsWith(ende)) { return false; }
-
-            (var pose, var _) = NextText(txt, 0, new List<string> { ende }, false, false);
-            return pose == txt.Length - 1;
-        }
 
         #endregion
 

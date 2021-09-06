@@ -397,7 +397,7 @@ namespace BlueControls.Controls {
             if (e.Row != _tmpRow) { return; }
             var NewT = string.Empty;
             foreach (var ThisString in e.ColumnsWithErrors) {
-                var X = ThisString.SplitBy("|");
+                var X = ThisString.SplitAndCutBy("|");
                 if (_tmpColumn != null && X[0].ToUpper() == _tmpColumn.Name.ToUpper()) {
                     if (!string.IsNullOrEmpty(InfoText)) { InfoText += "<br><hr><br>"; }
                     NewT += X[1];
@@ -461,7 +461,7 @@ namespace BlueControls.Controls {
             string NewValue;
             switch (_tmpColumn.Format) {
                 case enDataFormat.Link_To_Filesystem:
-                    var tmp = Value.SplitByCRToList();
+                    var tmp = Value.SplitAndCutByCRToList();
                     List<string> tmp2 = new();
                     foreach (var file in tmp) {
                         tmp2.Add(_tmpColumn.SimplyFile(file));

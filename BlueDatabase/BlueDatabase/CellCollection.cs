@@ -160,7 +160,7 @@ namespace BlueDatabase {
             var Key = column.Database.Cell.GetStringBehindLinkedValue(column, row);
             if (string.IsNullOrEmpty(Key)) { return (null, null); }
 
-            var V = Key.SplitBy("|");
+            var V = Key.SplitAndCutBy("|");
             if (V.Length != 2) { return skriptgesteuert ? (null, null) : RepairLinkedCellValue(LinkedDatabase, column, row, addRowIfNotExists); }
             var LinkedColumn = LinkedDatabase.Column.SearchByKey(int.Parse(V[0]));
             var LinkedRow = LinkedDatabase.Row.SearchByKey(int.Parse(V[1]));
@@ -204,7 +204,7 @@ namespace BlueDatabase {
                 Row = null;
                 return;
             }
-            var cd = CellKey.SplitBy("|");
+            var cd = CellKey.SplitAndCutBy("|");
             if (cd.GetUpperBound(0) != 1) { Develop.DebugPrint(enFehlerArt.Fehler, "Falscher CellKey übergeben: " + CellKey); }
             Column = _database.Column.SearchByKey(int.Parse(cd[0]));
             Row = _database.Row.SearchByKey(int.Parse(cd[1]));
@@ -314,7 +314,7 @@ namespace BlueDatabase {
         public List<string> GetList(string columnName, RowItem row) => GetList(_database.Column[columnName], row);
 
         public List<string> GetList(ColumnItem column, RowItem row) // Main Method
-=> GetString(column, row).SplitByCRToList();
+=> GetString(column, row).SplitAndCutByCRToList();
 
         public Point GetPoint(string columnName, RowItem row) => GetPoint(_database.Column[columnName], row);
 
@@ -434,7 +434,7 @@ namespace BlueDatabase {
                     }
                     return BedingungErfüllt;
                 }
-                List<string> VorhandenWerte = new(_String.SplitByCR());
+                List<string> VorhandenWerte = new(_String.SplitAndCutByCR());
                 if (VorhandenWerte.Count == 0) // Um den Filter, der nach 'Leere' Sucht, zu befriediegen
                 {
                     VorhandenWerte.Add("");
@@ -522,7 +522,7 @@ namespace BlueDatabase {
         internal static List<RowItem> ConnectedRowsOfRelations(string CompleteRelationText, RowItem Row) {
             List<RowItem> AllRows = new();
             var Names = Row.Database.Column[0].GetUcaseNamesSortedByLenght();
-            var RelationTextLine = CompleteRelationText.ToUpper().SplitByCR();
+            var RelationTextLine = CompleteRelationText.ToUpper().SplitAndCutByCR();
             foreach (var thisTextLine in RelationTextLine) {
                 var tmp = thisTextLine;
                 List<RowItem> R = new();
@@ -785,7 +785,7 @@ namespace BlueDatabase {
                 case enFilterType.Between:
                     if (!IstValue.IsNumeral()) { return false; }
                     var ival = DoubleParse(IstValue);
-                    var fval = FilterValue.SplitBy("|");
+                    var fval = FilterValue.SplitAndCutBy("|");
                     if (ival < DoubleParse(fval[0])) { return false; }
                     if (ival > DoubleParse(fval[1])) { return false; }
                     //if (double.Parse)
@@ -854,11 +854,11 @@ namespace BlueDatabase {
                         if (!string.IsNullOrEmpty(OldValue) && t.ToUpper().Contains(OldValue.ToUpper())) {
                             t = ChangeTextToRowId(t, OldValue, NewValue, RowKey);
                             t = ChangeTextFromRowId(t);
-                            var t2 = t.SplitByCRToList().SortedDistinctList();
+                            var t2 = t.SplitAndCutByCRToList().SortedDistinctList();
                             ThisRowItem.CellSet(ColumnToRepair, t2);
                         }
                         if (t.ToUpper().Contains(NewValue.ToUpper())) {
-                            MakeNewRelations(ColumnToRepair, ThisRowItem, new List<string>(), t.SplitByCRToList());
+                            MakeNewRelations(ColumnToRepair, ThisRowItem, new List<string>(), t.SplitAndCutByCRToList());
                         }
                     }
                 }
@@ -879,8 +879,8 @@ namespace BlueDatabase {
                 Set(Column, Row, CurrentString);
                 return;
             }
-            var OldBZ = new List<string>(PreviewsValue.SplitByCR()).SortedDistinctList();
-            var NewBZ = new List<string>(CurrentString.SplitByCR()).SortedDistinctList();
+            var OldBZ = new List<string>(PreviewsValue.SplitAndCutByCR()).SortedDistinctList();
+            var NewBZ = new List<string>(CurrentString.SplitAndCutByCR()).SortedDistinctList();
             // Zuerst Beziehungen LÖSCHEN
             foreach (var t in OldBZ) {
                 if (!NewBZ.Contains(t)) {

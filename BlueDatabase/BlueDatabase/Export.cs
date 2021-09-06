@@ -220,14 +220,14 @@ namespace BlueDatabase {
         //            TXT = TXT.Replace("\r", CodeNr.Substring(3));
         //            break;
         //        case "103": // Vortext
-        //            var ts = TXT.SplitByCR();
+        //            var ts = TXT.SplitAndCutByCR();
         //            for (var tz = 0; tz <= ts.GetUpperBound(0); tz++) {
         //                ts[tz] = CodeNr.Substring(3) + ts[tz];
         //            }
         //            TXT = string.Join("\r", ts);
         //            break;
         //        case "104": // Nachtext
-        //            var ts2 = TXT.SplitByCR();
+        //            var ts2 = TXT.SplitAndCutByCR();
         //            for (var tz = 0; tz <= ts2.GetUpperBound(0); tz++) {
         //                ts2[tz] = ts2[tz] + CodeNr.Substring(3);
         //            }
@@ -305,7 +305,7 @@ namespace BlueDatabase {
         //            break;
         //        case "107":
         //            q
-        //            var ts3 = TXT.SplitByCR();
+        //            var ts3 = TXT.SplitAndCutByCR();
         //            for (var tz = 0; tz <= ts3.GetUpperBound(0); tz++) {
         //                ts3[tz] = CellItem.ValueReadable(column, ts3[tz], enShortenStyle.HTML, enBildTextVerhalten.Nur_Text, true);
         //            }

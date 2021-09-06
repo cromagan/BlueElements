@@ -50,7 +50,7 @@ namespace BlueDatabase {
             if (style == enShortenStyle.Unreplaced || column.OpticalReplace.Count == 0) { return txt; }
             var OT = txt;
             foreach (var ThisString in column.OpticalReplace) {
-                var x = ThisString.SplitBy("|");
+                var x = ThisString.SplitAndCutBy("|");
                 if (x.Length == 2) {
                     if (string.IsNullOrEmpty(x[0])) {
                         if (string.IsNullOrEmpty(txt)) { txt = x[1]; }

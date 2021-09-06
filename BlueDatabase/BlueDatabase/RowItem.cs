@@ -426,7 +426,7 @@ namespace BlueDatabase {
                         if (x2 < x) { return erg; }
                         var ww = erg.Substring(x + thisColumnItem.Name.Length + 2, x2 - x - thisColumnItem.Name.Length - 2);
                         ww = ww.Replace(" ", string.Empty).ToUpper();
-                        var vals = ww.SplitBy(",");
+                        var vals = ww.SplitAndCutBy(",");
                         if (vals.Length != 2) { return formel; }
                         if (vals[0] != "L") { return formel; }
                         if (!int.TryParse(vals[1], out var Stellen)) { return formel; }

@@ -414,10 +414,10 @@ namespace BlueControls.Forms {
         //Private Sub OpenFileDialog1_FileOk(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles OpenFileDialog1.FileOk
         //    Pad.Item.Clear()
         //    Dim l As String = LoadFromDisk(OpenFileDialog1.FileName)
-        //    Dim n() As String = l.SplitByCR
+        //    Dim n() As String = l.SplitAndCutByCR
         //    Dim p() As String
         //    For z As Integer = 0 To n.GetUpperBound(0)
-        //        p = n(z).SplitBy("|")
+        //        p = n(z).SplitAndCutBy("|")
         //        AddOne(p(0), Integer.Parse(p(1)) * 15, Integer.Parse(p(2)) * 15)
         //    Next
         //    RepairLinesAndFullProcessing()

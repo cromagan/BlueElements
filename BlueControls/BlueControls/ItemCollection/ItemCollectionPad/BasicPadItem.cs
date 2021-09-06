@@ -376,7 +376,7 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "removetoo": // TODO: Alt, löschen, 02.03.2020
-                    //RemoveToo.AddRange(value.FromNonCritical().SplitByCR());
+                    //RemoveToo.AddRange(value.FromNonCritical().SplitAndCutByCR());
                     return true;
 
                 case "removetoogroup":

@@ -139,7 +139,7 @@ namespace BlueControls.Classes_Editor {
                 if (thisItem is BasicListItem ThisItemBasic) {
                     string fil;
                     if (ThisItemBasic.Internal.Contains("|")) {
-                        var f = ThisItemBasic.Internal.SplitBy("|");
+                        var f = ThisItemBasic.Internal.SplitAndCutBy("|");
                         fil = f[0];
                     } else {
                         fil = ThisItemBasic.Internal;

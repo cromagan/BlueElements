@@ -190,7 +190,7 @@ namespace BlueControls.Forms {
             if (Doing) { return; }
             Doing = true;
             if (Format.Text.Contains(";")) {
-                var l = Format.Text.SplitBy(";");
+                var l = Format.Text.SplitAndCutBy(";");
                 FillHöheBreite(int.Parse(l[0]), int.Parse(l[1]));
             } else {
                 Format.Text = "neu";

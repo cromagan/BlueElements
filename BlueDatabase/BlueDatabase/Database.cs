@@ -676,7 +676,7 @@ namespace BlueDatabase {
         public string Import(string importText, bool spalteZuordnen, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart, bool dorowautmatic) {
             // Vorbereitung des Textes -----------------------------
             importText = importText.Replace("\r\n", "\r").Trim("\r");
-            var ein = importText.SplitByCR();
+            var ein = importText.SplitAndCutByCR();
             List<string[]> Zeil = new();
             var neuZ = 0;
             for (var z = 0; z <= ein.GetUpperBound(0); z++) {
@@ -687,7 +687,7 @@ namespace BlueDatabase {
                     ein[z] = ein[z].TrimStart(splitChar);
                 }
                 ein[z] = ein[z].TrimEnd(splitChar);
-                Zeil.Add(ein[z].SplitBy(splitChar));
+                Zeil.Add(ein[z].SplitAndCutBy(splitChar));
             }
             if (Zeil.Count == 0) {
                 OnDropMessage("Import kann nicht ausgeführt werden.");
@@ -744,7 +744,7 @@ namespace BlueDatabase {
                         }
                     } else {
                         if (row != null) {
-                            row.CellSet(columns[SpaltNo], Zeil[ZeilNo][SpaltNo].SplitBy("|").JoinWithCr());
+                            row.CellSet(columns[SpaltNo], Zeil[ZeilNo][SpaltNo].SplitAndCutBy("|").JoinWithCr());
                         }
                     }
                     if (row != null && dorowautmatic) { row.DoAutomatic(true, true, false, "import"); }
@@ -1716,7 +1716,7 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.DatenbankAdmin:
-                    DatenbankAdmin.SplitByCR_QuickSortAndRemoveDouble(content);
+                    DatenbankAdmin.SplitAndCutByCR_QuickSortAndRemoveDouble(content);
                     break;
 
                 case enDatabaseDataType.SortDefinition:
@@ -1748,19 +1748,19 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.Tags:
-                    Tags.SplitByCR(content);
+                    Tags.SplitAndCutByCR(content);
                     break;
 
                 case enDatabaseDataType.BinaryDataInOne:
                     break;
 
                 case enDatabaseDataType.Layouts:
-                    Layouts.SplitByCR_QuickSortAndRemoveDouble(content);
+                    Layouts.SplitAndCutByCR_QuickSortAndRemoveDouble(content);
                     break;
 
                 case enDatabaseDataType.AutoExport:
                     Export.Clear();
-                    List<string> AE = new(content.SplitByCR());
+                    List<string> AE = new(content.SplitAndCutByCR());
                     foreach (var t in AE) {
                         Export.Add(new ExportDefinition(this, t));
                     }
@@ -1768,7 +1768,7 @@ namespace BlueDatabase {
 
                 case enDatabaseDataType.Rules_ALT:
                     //var Rules = new List<RuleItem_Old>();
-                    //var RU = content.SplitByCR();
+                    //var RU = content.SplitAndCutByCR();
                     //for (var z = 0; z <= RU.GetUpperBound(0); z++) {
                     //    Rules.Add(new RuleItem_Old(this, RU[z]));
                     //}
@@ -1777,7 +1777,7 @@ namespace BlueDatabase {
 
                 case enDatabaseDataType.ColumnArrangement:
                     ColumnArrangements.Clear();
-                    List<string> CA = new(content.SplitByCR());
+                    List<string> CA = new(content.SplitAndCutByCR());
                     foreach (var t in CA) {
                         ColumnArrangements.Add(new ColumnViewCollection(this, t));
                     }
@@ -1785,14 +1785,14 @@ namespace BlueDatabase {
 
                 case enDatabaseDataType.Views:
                     Views.Clear();
-                    List<string> VI = new(content.SplitByCR());
+                    List<string> VI = new(content.SplitAndCutByCR());
                     foreach (var t in VI) {
                         Views.Add(new ColumnViewCollection(this, t));
                     }
                     break;
 
                 case enDatabaseDataType.PermissionGroups_NewRow:
-                    PermissionGroups_NewRow.SplitByCR_QuickSortAndRemoveDouble(content);
+                    PermissionGroups_NewRow.SplitAndCutByCR_QuickSortAndRemoveDouble(content);
                     break;
 
                 case enDatabaseDataType.LastRowKey:
@@ -1849,7 +1849,7 @@ namespace BlueDatabase {
 
                 case enDatabaseDataType.UndoInOne:
                     Works.Clear();
-                    var UIO = content.SplitByCR();
+                    var UIO = content.SplitAndCutByCR();
                     for (var z = 0; z <= UIO.GetUpperBound(0); z++) {
                         WorkItem tmpWork = new(UIO[z]) {
                             State = enItemState.Undo // Beim Erstellen des strings ist noch nicht sicher, ob gespeichter wird. Deswegen die alten "Pendings" zu Undos ändern.

@@ -182,7 +182,7 @@ namespace BlueBasics {
         /// <remarks></remarks>
         public static bool IsFormat(this string txt, enDataFormat format, bool multiLine) {
             if (multiLine) {
-                var ex = txt.SplitByCR();
+                var ex = txt.SplitAndCutByCR();
                 return ex.All(thisString => string.IsNullOrEmpty(thisString) || thisString.IsFormat(format));
             }
             return txt.IsFormat(format);

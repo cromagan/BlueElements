@@ -54,7 +54,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void Auswahl_ItemClicked(object sender, BasicListItemEventArgs e) {
-            var x = e.Item.Internal.SplitBy("|");
+            var x = e.Item.Internal.SplitAndCutBy("|");
             if (Row.Database.Column[x[0]].MultiLine) {
                 var val = Row.CellGetList(Row.Database.Column[x[0]]);
                 if (e.Item.Checked) {

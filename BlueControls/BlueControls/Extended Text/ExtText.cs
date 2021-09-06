@@ -916,7 +916,7 @@ namespace BlueControls {
                 if (Convert.ToBoolean(Ausrichtung & enAlignment.VerticalCenter)) { KY = (float)((_TextDimensions.Height - (int)_Height) / 2.0); }
                 if (Convert.ToBoolean(Ausrichtung & enAlignment.Bottom)) { KY = _TextDimensions.Height - (int)_Height; }
                 foreach (var t in RI) {
-                    var o = t.SplitBy(";");
+                    var o = t.SplitAndCutBy(";");
                     var Z1 = int.Parse(o[0]);
                     var Z2 = int.Parse(o[1]);
                     float KX = 0;

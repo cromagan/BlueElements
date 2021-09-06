@@ -123,7 +123,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (work.HistorischRelevant) {
                 var l = tblUndo.Database.Row[work.ToString()];
                 if (l != null) { return; }
-                var cd = work.CellKey.SplitBy("|");
+                var cd = work.CellKey.SplitAndCutBy("|");
                 _Database.Cell.DataOfCellKey(work.CellKey, out var Col, out var Row);
                 var r = tblUndo.Database.Row.Add(work.ToString());
                 r.CellSet("ColumnKey", cd[0]);
@@ -497,7 +497,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             _Database.ZeilenQuickInfo = txbZeilenQuickInfo.Text.Replace("\r", "<br>");
             if (tbxTags.Text != _Database.Tags.JoinWithCr()) {
                 _Database.Tags.Clear();
-                _Database.Tags.AddRange(tbxTags.Text.SplitByCR());
+                _Database.Tags.AddRange(tbxTags.Text.SplitAndCutByCR());
             }
             if (DatenbankAdmin.Item.ToListOfString().IsDifferentTo(_Database.DatenbankAdmin)) {
                 _Database.DatenbankAdmin.Clear();

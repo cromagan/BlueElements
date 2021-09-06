@@ -36,7 +36,7 @@ namespace BluePaint {
         #region Methods
 
         public override void ExcuteCommand(string command) {
-            var c = command.SplitBy(";");
+            var c = command.SplitAndCutBy(";");
             if (c[0] == "ResizeProzent") {
                 flxProzent.ValueSet(c[1], true, true);
                 btnDoResize_Click(null, null);

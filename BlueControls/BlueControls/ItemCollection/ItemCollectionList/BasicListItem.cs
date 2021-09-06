@@ -20,9 +20,31 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace BlueControls.ItemCollection {
+
+    public static class BasicListItemExtensions {
+
+        #region Methods
+
+        public static List<string> ToListOfString(this List<BasicListItem> Items) {
+            List<string> w = new();
+            if (Items == null) { return w; }
+
+            foreach (var ThisItem in Items) {
+                if (ThisItem != null) {
+                    if (!string.IsNullOrEmpty(ThisItem.Internal)) {
+                        w.Add(ThisItem.Internal);
+                    }
+                }
+            }
+            return w;
+        }
+
+        #endregion
+    }
 
     public abstract class BasicListItem : ICompareKey, IComparable {
 

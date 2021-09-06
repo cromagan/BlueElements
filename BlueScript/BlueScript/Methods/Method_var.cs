@@ -42,7 +42,7 @@ namespace BlueScript {
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
-            var bs = infos.AttributText.SplitBy("=");
+            var bs = infos.AttributText.SplitAndCutBy("=");
             if (bs.GetUpperBound(0) != 1) { return new strDoItFeedback("Fehler mit = - Zeichen"); }
             if (!Variable.IsValidName(bs[0])) { return new strDoItFeedback(bs[0] + "ist kein gültiger Variablen-Name"); }
             var v = s.Variablen.Get(bs[0]);

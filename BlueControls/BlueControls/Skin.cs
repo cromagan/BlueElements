@@ -1128,12 +1128,12 @@ namespace BlueControls {
         /// <param name="gr"></param>
         /// <param name="txt"></param>
         /// <param name="qi"></param>
-        /// <param name="vAlign"></param>
-        /// <param name="FitInRect"></param>
+        /// <param name="align"></param>
+        /// <param name="fitInRect"></param>
         /// <param name="Child"></param>
-        /// <param name="DeleteBack"></param>
-        /// <param name="F"></param>
-        public static void Draw_FormatedText(Graphics gr, string txt, QuickImage qi, enAlignment vAlign, Rectangle FitInRect, System.Windows.Forms.Control Child, bool DeleteBack, BlueFont F, bool Translate) {
+        /// <param name="deleteBack"></param>
+        /// <param name="bFont"></param>
+        public static void Draw_FormatedText(Graphics gr, string txt, QuickImage qi, enAlignment align, Rectangle fitInRect, System.Windows.Forms.Control Child, bool deleteBack, BlueFont bFont, bool translate) {
             if (gr.TextRenderingHint != TextRenderingHint.ClearTypeGridFit) {
                 gr.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
             }
@@ -1144,28 +1144,28 @@ namespace BlueControls {
             float YP1 = 0;
             float YP2 = 0;
             if (qi != null) { pSize = qi.BMP.Size; }
-            if (LanguageTool.Translation != null) { txt = LanguageTool.DoTranslate(txt, Translate); }
-            if (F != null) {
-                if (FitInRect.Width > 0) { txt = txt.TrimByWidth(FitInRect.Width - pSize.Width, F); }
-                tSize = gr.MeasureString(txt, F.Font());
+            if (LanguageTool.Translation != null) { txt = LanguageTool.DoTranslate(txt, translate); }
+            if (bFont != null) {
+                if (fitInRect.Width > 0) { txt = bFont.TrimByWidth(txt, fitInRect.Width - pSize.Width); }
+                tSize = gr.MeasureString(txt, bFont.Font());
             }
-            if (vAlign.HasFlag(enAlignment.Right)) { XP = FitInRect.Width - pSize.Width - tSize.Width; }
-            if (vAlign.HasFlag(enAlignment.HorizontalCenter)) { XP = (float)((FitInRect.Width - pSize.Width - tSize.Width) / 2.0); }
-            if (vAlign.HasFlag(enAlignment.VerticalCenter)) {
-                YP1 = (float)((FitInRect.Height - pSize.Height) / 2.0);
-                YP2 = (float)((FitInRect.Height - tSize.Height) / 2.0);
+            if (align.HasFlag(enAlignment.Right)) { XP = fitInRect.Width - pSize.Width - tSize.Width; }
+            if (align.HasFlag(enAlignment.HorizontalCenter)) { XP = (float)((fitInRect.Width - pSize.Width - tSize.Width) / 2.0); }
+            if (align.HasFlag(enAlignment.VerticalCenter)) {
+                YP1 = (float)((fitInRect.Height - pSize.Height) / 2.0);
+                YP2 = (float)((fitInRect.Height - tSize.Height) / 2.0);
             }
-            if (vAlign.HasFlag(enAlignment.Bottom)) {
-                YP1 = FitInRect.Height - pSize.Height;
-                YP2 = FitInRect.Height - tSize.Height;
+            if (align.HasFlag(enAlignment.Bottom)) {
+                YP1 = fitInRect.Height - pSize.Height;
+                YP2 = fitInRect.Height - tSize.Height;
             }
-            if (DeleteBack) {
-                if (!string.IsNullOrEmpty(txt)) { Draw_Back_Transparent(gr, new Rectangle((int)(FitInRect.X + pSize.Width + XP - 1), (int)(FitInRect.Y + YP2 - 1), (int)(tSize.Width + 2), (int)(tSize.Height + 2)), Child); }
-                if (qi != null) { Draw_Back_Transparent(gr, new Rectangle((int)(FitInRect.X + XP), (int)(FitInRect.Y + YP1), (int)pSize.Width, (int)pSize.Height), Child); }
+            if (deleteBack) {
+                if (!string.IsNullOrEmpty(txt)) { Draw_Back_Transparent(gr, new Rectangle((int)(fitInRect.X + pSize.Width + XP - 1), (int)(fitInRect.Y + YP2 - 1), (int)(tSize.Width + 2), (int)(tSize.Height + 2)), Child); }
+                if (qi != null) { Draw_Back_Transparent(gr, new Rectangle((int)(fitInRect.X + XP), (int)(fitInRect.Y + YP1), (int)pSize.Width, (int)pSize.Height), Child); }
             }
             try {
-                if (qi != null) { gr.DrawImage(qi.BMP, (int)(FitInRect.X + XP), (int)(FitInRect.Y + YP1)); }
-                if (!string.IsNullOrEmpty(txt)) { gr.DrawString(txt, F.Font(), F.Brush_Color_Main, FitInRect.X + pSize.Width + XP, FitInRect.Y + YP2); }
+                if (qi != null) { gr.DrawImage(qi.BMP, (int)(fitInRect.X + XP), (int)(fitInRect.Y + YP1)); }
+                if (!string.IsNullOrEmpty(txt)) { gr.DrawString(txt, bFont.Font(), bFont.Brush_Color_Main, fitInRect.X + pSize.Width + XP, fitInRect.Y + YP2); }
             } catch (Exception) {
                 // es kommt selten vor, dass das Graphics-Objekt an anderer Stelle verwendet wird. Was immer das auch heiﬂen mag...
                 //Develop.DebugPrint(ex);

@@ -130,16 +130,16 @@ namespace BlueControls.ItemCollection {
 
         protected override Size ComputeSizeUntouchedForListBox() => new(300, 300);
 
-        protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, bool Translate) {
-            if (DrawBorderAndBack) {
-                Skin.Draw_Back(GR, itemdesign, vState, PositionModified, null, false);
-            }
+        protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign itemdesign, enStates state, bool DrawBorderAndBack, bool Translate) {
+            if (DrawBorderAndBack) { Skin.Draw_Back(GR, itemdesign, state, PositionModified, null, false); }
+
             var DCoordinates = PositionModified;
             DCoordinates.Inflate(-_padding, -_padding);
-            RectangleF ScaledImagePosition = new();
-            RectangleF AreaOfWholeImage = new();
+            var ScaledImagePosition = RectangleF.Empty;
+            var AreaOfWholeImage = RectangleF.Empty;
+            var bFont = Skin.GetBlueFont(itemdesign, state);
             GetImage();
-            if (!string.IsNullOrEmpty(_caption) && _captiontmp.Count == 0) { _captiontmp = _caption.SplitByWidth(DCoordinates.Width, _captionlines, enDesign.Item_Listbox, enStates.Standard); }
+            if (!string.IsNullOrEmpty(_caption) && _captiontmp.Count == 0) { _captiontmp = bFont.SplitByWidth(_caption, DCoordinates.Width, _captionlines); }
             if (_Bitmap != null) {
                 AreaOfWholeImage = new RectangleF(0, 0, _Bitmap.Width, _Bitmap.Height);
                 var scale = (float)Math.Min((DCoordinates.Width - (_padding * 2)) / (double)_Bitmap.Width,
@@ -163,7 +163,7 @@ namespace BlueControls.ItemCollection {
                 var Ausgl = (c - _captionlines) * ConstMY / 2;
                 foreach (var ThisCap in _captiontmp) {
                     c--;
-                    var s = Skin.FormatedText_NeededSize(ThisCap, null, Skin.GetBlueFont(enDesign.Item_Listbox, vState), 16);
+                    var s = Skin.FormatedText_NeededSize(ThisCap, null, bFont, 16);
                     Rectangle r = new((int)(DCoordinates.Left + ((DCoordinates.Width - s.Width) / 2.0)), DCoordinates.Bottom - s.Height - 3, s.Width, s.Height);
                     r.X -= trp.X;
                     r.Y -= trp.Y;
@@ -171,13 +171,13 @@ namespace BlueControls.ItemCollection {
                     //r = new Rectangle(r.Left - trp.X, r.Top - trp.Y, r.Width, r.Height);
                     //GenericControl.Skin.Draw_Back(GR, enDesign.Item_Listbox_Unterschrift, vState, r, null, false);
                     //GenericControl.Skin.Draw_Border(GR, enDesign.Item_Listbox_Unterschrift, vState, r);
-                    Skin.Draw_FormatedText(GR, ThisCap, enDesign.Item_Listbox, vState, null, enAlignment.Horizontal_Vertical_Center, r, null, false, false);
+                    Skin.Draw_FormatedText(GR, ThisCap, enDesign.Item_Listbox, state, null, enAlignment.Horizontal_Vertical_Center, r, null, false, false);
                 }
             }
             GR.TranslateTransform(-trp.X, -trp.Y);
             GR.ResetTransform();
             if (DrawBorderAndBack) {
-                Skin.Draw_Border(GR, itemdesign, vState, PositionModified);
+                Skin.Draw_Border(GR, itemdesign, state, PositionModified);
             }
         }
 

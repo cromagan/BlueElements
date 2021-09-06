@@ -21,6 +21,7 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
+using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System;

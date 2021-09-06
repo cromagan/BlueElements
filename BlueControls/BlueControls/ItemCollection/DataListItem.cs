@@ -123,16 +123,16 @@ namespace BlueControls.ItemCollection {
 
         protected override Size ComputeSizeUntouchedForListBox() => new(300, 300);
 
-        protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, bool Translate) {
-            if (DrawBorderAndBack) {
-                Skin.Draw_Back(GR, itemdesign, vState, PositionModified, null, false);
-            }
-            var DCoordinates = PositionModified;
+        protected override void DrawExplicit(Graphics gr, Rectangle positionModified, enDesign itemdesign, enStates state, bool drawBorderAndBack, bool translate) {
+            if (drawBorderAndBack) { Skin.Draw_Back(gr, itemdesign, state, positionModified, null, false); }
+
+            var DCoordinates = positionModified;
             DCoordinates.Inflate(-_padding, -_padding);
-            RectangleF ScaledImagePosition = new();
-            RectangleF AreaOfWholeImage = new();
-            //GetBin();
-            if (!string.IsNullOrEmpty(_caption) && _captiontmp.Count == 0) { _captiontmp = _caption.SplitByWidth(DCoordinates.Width, _captionlines, enDesign.Item_Listbox, enStates.Standard); }
+            var ScaledImagePosition = RectangleF.Empty;
+            var AreaOfWholeImage = RectangleF.Empty;
+            var bFont = Skin.GetBlueFont(itemdesign, state);
+
+            if (!string.IsNullOrEmpty(_caption) && _captiontmp.Count == 0) { _captiontmp = bFont.SplitByWidth(_caption, DCoordinates.Width, _captionlines); }
             var binim = QuickImage.Get(_filename.FileType(), 48).BMP;
             if (_bin != null) {
                 AreaOfWholeImage = new RectangleF(0, 0, binim.Width, binim.Height);
@@ -145,17 +145,17 @@ namespace BlueControls.ItemCollection {
             }
             var trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
             ScaledImagePosition = new RectangleF(ScaledImagePosition.Left - trp.X, ScaledImagePosition.Top - trp.Y, ScaledImagePosition.Width, ScaledImagePosition.Height);
-            GR.TranslateTransform(trp.X, trp.Y);
-            if (_bin != null) { GR.DrawImage(binim, ScaledImagePosition, AreaOfWholeImage, GraphicsUnit.Pixel); }
+            gr.TranslateTransform(trp.X, trp.Y);
+            if (_bin != null) { gr.DrawImage(binim, ScaledImagePosition, AreaOfWholeImage, GraphicsUnit.Pixel); }
             foreach (var thisQI in Overlays) {
-                GR.DrawImage(thisQI.BMP, ScaledImagePosition.Left + 8, ScaledImagePosition.Top + 8);
+                gr.DrawImage(thisQI.BMP, ScaledImagePosition.Left + 8, ScaledImagePosition.Top + 8);
             }
             if (!string.IsNullOrEmpty(_caption)) {
                 var c = _captiontmp.Count;
                 var Ausgl = (c - _captionlines) * ConstMY / 2;
                 foreach (var ThisCap in _captiontmp) {
                     c--;
-                    var s = Skin.FormatedText_NeededSize(ThisCap, null, Skin.GetBlueFont(enDesign.Item_Listbox, vState), 16);
+                    var s = Skin.FormatedText_NeededSize(ThisCap, null, bFont, 16);
                     Rectangle r = new((int)(DCoordinates.Left + ((DCoordinates.Width - s.Width) / 2.0)), DCoordinates.Bottom - s.Height - 3, s.Width, s.Height);
                     r.X -= trp.X;
                     r.Y -= trp.Y;
@@ -163,13 +163,13 @@ namespace BlueControls.ItemCollection {
                     //r = new Rectangle(r.Left - trp.X, r.Top - trp.Y, r.Width, r.Height);
                     //GenericControl.Skin.Draw_Back(GR, enDesign.Item_Listbox_Unterschrift, vState, r, null, false);
                     //GenericControl.Skin.Draw_Border(GR, enDesign.Item_Listbox_Unterschrift, vState, r);
-                    Skin.Draw_FormatedText(GR, ThisCap, enDesign.Item_Listbox, vState, null, enAlignment.Horizontal_Vertical_Center, r, null, false, false);
+                    Skin.Draw_FormatedText(gr, ThisCap, enDesign.Item_Listbox, state, null, enAlignment.Horizontal_Vertical_Center, r, null, false, false);
                 }
             }
-            GR.TranslateTransform(-trp.X, -trp.Y);
-            GR.ResetTransform();
-            if (DrawBorderAndBack) {
-                Skin.Draw_Border(GR, itemdesign, vState, PositionModified);
+            gr.TranslateTransform(-trp.X, -trp.Y);
+            gr.ResetTransform();
+            if (drawBorderAndBack) {
+                Skin.Draw_Border(gr, itemdesign, state, positionModified);
             }
         }
 

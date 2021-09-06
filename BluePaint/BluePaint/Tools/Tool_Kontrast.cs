@@ -53,7 +53,7 @@ namespace BluePaint {
         }
 
         public override void ExcuteCommand(string command) {
-            var c = command.SplitBy(";");
+            var c = command.SplitAndCutBy(";");
             switch (c[0]) {
                 case "Kontrast":
                     sldKontrast.Value = double.Parse(c[1]);

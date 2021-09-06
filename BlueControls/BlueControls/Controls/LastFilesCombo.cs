@@ -124,7 +124,7 @@ namespace BlueControls.Controls {
             var Vis = false;
             Item.Clear();
             for (var Z = LastD.Count - 1; Z >= 0; Z--) {
-                var x = LastD[Z].SplitBy("|");
+                var x = LastD[Z].SplitAndCutBy("|");
                 if (x != null && x.GetUpperBound(0) >= 0 && !string.IsNullOrEmpty(x[0]) && Item[x[0]] is null) {
                     if (!_mustExists || FileExists(x[0])) {
                         NR++;
@@ -160,7 +160,7 @@ namespace BlueControls.Controls {
             if (FileExists(SaveFile())) {
                 var t = File.ReadAllText(SaveFile(), System.Text.Encoding.UTF8);
                 t = t.RemoveChars("\n");
-                LastD.AddRange(t.SplitByCR());
+                LastD.AddRange(t.SplitAndCutByCR());
             }
         }
 

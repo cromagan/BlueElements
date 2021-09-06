@@ -70,7 +70,7 @@ namespace BluePaint {
         }
 
         public override void ExcuteCommand(string command) {
-            var c = command.SplitBy(";");
+            var c = command.SplitAndCutBy(";");
             if (c[0] == "Replace") {
                 var OriginalPic = OnNeedCurrentPic();
                 var cc = Color.FromArgb(int.Parse(c[1]));

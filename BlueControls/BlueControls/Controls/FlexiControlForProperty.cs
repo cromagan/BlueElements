@@ -226,7 +226,7 @@ namespace BlueControls.Controls {
                 toSet = Value;
             } else if (x is List<string> ls) {
                 OldVal = ls.JoinWithCr();
-                toSet = Value.SplitByCRToList();
+                toSet = Value.SplitAndCutByCRToList();
             } else if (x is bool bo) {
                 OldVal = bo.ToPlusMinus();
                 toSet = Value.FromPlusMinus();
@@ -331,7 +331,7 @@ namespace BlueControls.Controls {
             #region Caption setzen
 
             if (!string.IsNullOrEmpty(_propertyName)) {
-                var x = _propertyName.SplitBy("__");
+                var x = _propertyName.SplitAndCutBy("__");
                 Caption = x[0].Replace("_", " ") + ":";
                 FileEncryptionKey = string.Empty;
             } else {

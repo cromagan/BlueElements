@@ -373,7 +373,7 @@ namespace BlueScript {
         /// Es wird der String in eine Liste umgewandelt (bzw. andersrum). Leere Einträge auch am Ende bleiben erhalten.
         /// </summary>
         public List<string> ValueListString {
-            get => SplitToList(_ValueString);
+            get => _ValueString.SplitByCRToList();
             set {
                 if (Readonly) { return; }
                 if (value == null || value.Count == 0) {
@@ -517,7 +517,7 @@ namespace BlueScript {
                     return value;
 
                 case enVariableDataType.List:
-                    return "{\"" + SplitToList(value.Replace("\"", Constants.GänsefüßchenReplace)).JoinWith("\", \"") + "\"}";
+                    return "{\"" + (value.Replace("\"", Constants.GänsefüßchenReplace)).SplitByCRToList().JoinWith("\", \"") + "\"}";
 
                 case enVariableDataType.NotDefinedYet: // Wenn ne Routine die Werte einfach ersetzt.
                     return value;
@@ -538,7 +538,7 @@ namespace BlueScript {
 
         public string ObjectData() {
             if (Type != enVariableDataType.Object) { return string.Empty; }
-            var x = _ValueString.SplitBy("&");
+            var x = _ValueString.SplitAndCutBy("&");
             return x == null || x.GetUpperBound(0) != 1
                     ? string.Empty
                     : x[1].FromNonCritical();
@@ -547,7 +547,7 @@ namespace BlueScript {
         public bool ObjectType(string toCheck) {
             if (Type != enVariableDataType.Object) { return false; }
 
-            var x = _ValueString.SplitBy("&");
+            var x = _ValueString.SplitAndCutBy("&");
             return x != null && x.GetUpperBound(0) == 1 && x[0] == toCheck.ToUpper().ReduceToChars(Constants.Char_AZ + Constants.Char_Numerals);
         }
 
@@ -571,18 +571,6 @@ namespace BlueScript {
         }
 
         internal static string GenerateObject(string objecttype, string value) => objecttype.ToUpper().ReduceToChars(Constants.Char_AZ + Constants.Char_Numerals) + "&" + value.ToNonCritical();
-
-        private static List<string> SplitToList(string _ValueString) {
-            List<string> w = new();
-            if (string.IsNullOrEmpty(_ValueString)) { return w; }
-            var x = _ValueString.Substring(0, _ValueString.Length);
-            //            var x = _ValueString.Substring(0, _ValueString.Length - 1);
-            x = x.Replace("\r\n", "\r");
-            x = x.Replace("\n", "\r");
-            var nl = x.Split(new[] { "\r" }, System.StringSplitOptions.None);
-            w.AddRange(nl);
-            return w;
-        }
 
         private void SetError(string coment) {
             Readonly = false;
