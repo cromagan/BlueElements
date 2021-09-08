@@ -119,7 +119,7 @@ namespace BlueDatabase {
             }
 
             if (column.MultiLine) {
-                vars.Add(new Variable(column.Name, wert, enVariableDataType.List, ro, false, "Spalte: " + column.ReadableText() + "\r\nMehrzeilige Spalten können nur als Liste bearbeitet werden."));
+                vars.Add(new Variable(column.Name, wert.SplitAndCutByCRToList(), ro, false, "Spalte: " + column.ReadableText() + "\r\nMehrzeilige Spalten können nur als Liste bearbeitet werden."));
                 return vars;
             }
 
@@ -553,8 +553,8 @@ namespace BlueDatabase {
                 }
             }
 
-            if (column.MultiLine) {
-                CellSet(column, ColumnVar.ValueString);
+            if (ColumnVar.Type == enVariableDataType.List) {
+                CellSet(column, ColumnVar.ValueListString);
                 return;
             }
             switch (column.Format) {

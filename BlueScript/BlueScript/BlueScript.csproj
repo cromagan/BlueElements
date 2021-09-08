@@ -50,6 +50,7 @@
     <Compile Include="Methods\Method_CountString.cs" />
     <Compile Include="Methods\Method_Do.cs" />
     <Compile Include="Methods\Method_Break.cs" />
+    <Compile Include="Methods\Method_ReplaceList.cs" />
     <Compile Include="Methods\Method_SetIfHasValue.cs" />
     <Compile Include="Methods\Method_SetIfExists.cs" />
     <Compile Include="Methods\Method_LoadImage.cs" />

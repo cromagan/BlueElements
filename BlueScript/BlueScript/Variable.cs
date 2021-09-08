@@ -226,6 +226,9 @@ namespace BlueScript {
 
         #region Fields
 
+        /// <summary>
+        /// Listen werden immer mit einem \r am Ende gespeichert, ausser die Länge ist 0
+        /// </summary>
         private string _ValueString = string.Empty;
 
         #endregion
@@ -335,6 +338,15 @@ namespace BlueScript {
             Coment = coment;
         }
 
+        public Variable(string name, List<string> value, bool ronly, bool system, string coment) : this(name) {
+            Name = system ? "*" + name.ToLower() : name.ToLower();
+            ValueListString = value;
+            Type = enVariableDataType.List;
+            Readonly = ronly;
+            SystemVariable = system;
+            Coment = coment;
+        }
+
         public Variable(string name, string value, enVariableDataType type) : this(name) {
             ValueString = value;
             Type = type;
@@ -373,14 +385,18 @@ namespace BlueScript {
         /// Es wird der String in eine Liste umgewandelt (bzw. andersrum). Leere Einträge auch am Ende bleiben erhalten.
         /// </summary>
         public List<string> ValueListString {
-            get => _ValueString.SplitByCRToList();
+            get {
+                if (string.IsNullOrEmpty(_ValueString)) { return new List<string>(); }
+                if (!_ValueString.EndsWith("\r")) {
+                    Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Fehler, "Objekttypfehler:" + _ValueString);
+                }
+
+                var x = _ValueString.Substring(0, _ValueString.Length - 1);
+                return x.SplitByCRToList();
+            }
             set {
                 if (Readonly) { return; }
-                if (value == null || value.Count == 0) {
-                    ValueString = string.Empty;
-                } else {
-                    ValueString = value.JoinWithCr() + "\r";
-                }
+                ValueString = value == null || value.Count == 0 ? string.Empty : value.JoinWithCr() + "\r";
             }
         }
 

@@ -25,12 +25,6 @@ namespace BlueDatabase.EventArgs {
 
         #endregion
 
-        #region Properties
-
-        public bool Done { get; set; }
-        public string Feedback { get; set; }
-        public ColumnItem FeedbackColumn { get; set; }
-
-        #endregion
+        //public bool Done { get; set; }
     }
 }

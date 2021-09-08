@@ -53,7 +53,7 @@ namespace BlueScript {
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
             var nums = new List<double>();
-            foreach (string txt in attvar.Attributes[0].ValueListString) {
+            foreach (var txt in attvar.Attributes[0].ValueListString) {
                 if (txt.IsNumeral()) {
                     nums.Add(double.Parse(txt));
                 } else {

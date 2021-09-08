@@ -32,7 +32,7 @@ namespace BlueBasics {
         }
 
         /// <summary>
-        /// Verbindet die Collection mit Trennzeichen und überflüssige Trennzeichen am Ende werden nicht abgeschnitten
+        /// Verbindet die Collection mit Trennzeichen und doppelte Trennzeichen am Ende werden nicht abgeschnitten
         /// </summary>
         /// <param name="collection"></param>
         /// <param name="joinChar"></param>
@@ -40,7 +40,7 @@ namespace BlueBasics {
         public static string JoinWith(this ICollection<string> collection, string joinChar) => string.Join(joinChar, collection.ToArray());
 
         /// <summary>
-        /// Verbindet die Collection mit \r und überflüssige \r am Ende werden nicht abgeschnitten
+        /// Verbindet die Collection mit \r und doppelte \r am Ende werden nicht abgeschnitten.
         /// </summary>
         /// <param name="collection"></param>
         /// <returns></returns>
