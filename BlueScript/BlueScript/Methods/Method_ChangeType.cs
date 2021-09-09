@@ -24,14 +24,14 @@ namespace BlueScript {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List_String_Numeral_or_Bool, enVariableDataType.String };
-        public override string Description => "Ändert den Variabelntyp einfach um. Ohne jegliche Prüfung. Alle Variablen werden Intern als Text gespeichert, weshalb diese Änderung möglich ist. Evtl. entstehen dadurch Variablen, die an sich kaputt sind, aber nicht als solches markiert sind.";
+        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_String_Numeral_or_Bool, enVariableDataType.String };
+        public override string Description => "Ändert den Variablentyp einfach um. Ohne jegliche Prüfung.\r\nAlle Variablen werden intern als Text gespeichert, weshalb diese Änderung möglich ist.\r\nEvtl. entstehen dadurch Variablen, die an sich kaputt sind, aber nicht als solches markiert sind.\r\nListen können aber nur mit Join und Split konvertiert werden.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.Null;
         public override string StartSequence => "(";
-        public override string Syntax => "ChangeType(Variable, num / str / lst / dat / bol);";
+        public override string Syntax => "ChangeType(Variable, num / str / dat / bol);";
 
         #endregion
 
@@ -51,11 +51,11 @@ namespace BlueScript {
                     attvar.Attributes[0].Type = enVariableDataType.String;
                     break;
 
-                case "lst":
-                    attvar.Attributes[0].Type = enVariableDataType.List;
-                    break;
+                //case "lst":
+                //    attvar.Attributes[0].Type = enVariableDataType.List;
+                //    break;
                 //
-                case "dat":
+                //case "dat":
                 //    attvar.Attributes[0].Type = enVariableDataType.Date;
                 //    break;
 

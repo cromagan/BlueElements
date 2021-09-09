@@ -201,8 +201,9 @@ namespace BlueDatabase {
                 (var didSuccesfullyCheck, var _, var skript) = x[0].DoAutomatic(true, fullCheck, false, startroutine);
 
                 if (skript != null && !string.IsNullOrEmpty(skript.Error)) {
+                    var w = x[0].CellFirstString();
                     x.Clear();
-                    Database.OnDropMessage("Skript fehlerhaft: " + skript.Error);
+                    Database.OnDropMessage("Skript fehlerhaft bei " + w + "\r\n" + skript.Error);
                     break;
                 }
                 if (didSuccesfullyCheck) { x.RemoveAt(0); }

@@ -25,6 +25,10 @@ namespace BlueDatabase.EventArgs {
 
         #endregion
 
-        //public bool Done { get; set; }
+        #region Properties
+
+        public bool Done { get; set; }
+
+        #endregion
     }
 }
