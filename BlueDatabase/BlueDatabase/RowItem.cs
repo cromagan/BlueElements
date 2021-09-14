@@ -97,6 +97,7 @@ namespace BlueDatabase {
         /// <returns></returns>
         public static List<Variable> CellToVariable(ColumnItem column, RowItem row) {
             if (!column.Format.CanBeCheckedByRules()) { return null; }
+            if (!column.SaveContent) { return null; }
 
             #region ReadOnly bestimmen
 
@@ -543,6 +544,7 @@ namespace BlueDatabase {
         private void VariableToCell(ColumnItem column, List<Variable> vars) {
             var ColumnVar = vars.Get(column.Name);
             if (ColumnVar == null) { return; }
+            if (!column.SaveContent) { return; }
 
             if (ColumnVar.Readonly) { return; }
 
