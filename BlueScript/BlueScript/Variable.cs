@@ -308,7 +308,7 @@ namespace BlueScript {
             #region Testen auf Object
 
             if (txt.Value.Length > 2 && txt.Value.StartsWith(Constants.ObjectKennung + "\"") && txt.Value.EndsWith("\"" + Constants.ObjectKennung)) {
-                if (Type is not enVariableDataType.NotDefinedYet and not enVariableDataType.Object) { SetError("Variable ist kein Object"); return; }
+                if (Type is not enVariableDataType.NotDefinedYet and not enVariableDataType.Object) { SetError("Variable ist kein Objekt"); return; }
                 ValueString = txt.Value.Substring(2, txt.Value.Length - 4).Replace(Constants.GänsefüßchenReplace, "\"");
                 Type = enVariableDataType.Object;
                 Readonly = true;
@@ -401,8 +401,8 @@ namespace BlueScript {
         }
 
         /// <summary>
-        /// Der direkte Text, der in der Variabel gespeichert ist.
-        /// Ohne Anführungsstrichchen. Falls es in Wahrheit eine Liste ist, der Text gejoinded mit \r
+        /// Der direkte Text, der in der Variable gespeichert ist.
+        /// Ohne Anführungsstrichchen. Falls es in Wahrheit eine Liste ist, ist der Text 'gejoined' mit \r
         /// </summary>
         public string ValueString {
             get => _ValueString;
@@ -543,6 +543,9 @@ namespace BlueScript {
 
                 case enVariableDataType.Object:
                     return Constants.ObjectKennung + "\"" + value.Replace("\"", Constants.GänsefüßchenReplace) + "\"" + Constants.ObjectKennung;
+
+                case enVariableDataType.Variable:
+                    return value;
 
                 default:
                     Develop.DebugPrint_NichtImplementiert();

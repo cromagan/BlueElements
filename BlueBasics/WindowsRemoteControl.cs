@@ -18,6 +18,7 @@
 using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
@@ -167,10 +168,34 @@ namespace BlueBasics {
             return SendInput(1, input, Marshal.SizeOf(input_move));
         }
 
+        public static void RebootComputer() {
+            BlueBasics.MultiUserFile.clsMultiUserFile.SaveAll(true);
+            Develop.TraceLogging_End();
+
+            var psi = new ProcessStartInfo("shutdown.exe", "-r -t 0");
+            psi.CreateNoWindow = true;
+            psi.UseShellExecute = false;
+            Process.Start(psi);
+
+            Develop.AbortExe();
+        }
+
         public static void ShiftRelease() => keybd_event((byte)enTaste.VK_SHIFT, 0, KEYEVENTF_KEYUP, 0);
 
         [DllImport("user32", EntryPoint = "ShowWindow", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
         public static extern int ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        public static void ShutdownComputer() {
+            BlueBasics.MultiUserFile.clsMultiUserFile.SaveAll(true);
+            Develop.TraceLogging_End();
+
+            var psi = new ProcessStartInfo("shutdown", "/s /t 0");
+            psi.CreateNoWindow = true;
+            psi.UseShellExecute = false;
+            Process.Start(psi);
+
+            Develop.AbortExe();
+        }
 
         /// <summary>
         /// Liest den KlassenNames aus.

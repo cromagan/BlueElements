@@ -58,7 +58,7 @@ namespace BlueScript {
             }
             var f2 = r.DoIt(f, s);
             return !string.IsNullOrEmpty(f2.ErrorMessage)
-                ? new strDoItFeedback("Berechung fehlerhaft: " + f2.ErrorMessage)
+                ? new strDoItFeedback("Berechnung fehlerhaft: " + f2.ErrorMessage)
                 : new strDoItFeedback();
         }
 
