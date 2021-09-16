@@ -28,6 +28,8 @@ namespace Skript.Enums {
         BerechnungFehlgeschlagen = 3,
 
         VariableNichtGefunden = 4,
-        VariableErwartet = 5
+        VariableErwartet = 5,
+
+        VariablenNamenBerechnungFehler = 6
     }
 }

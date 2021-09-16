@@ -440,7 +440,7 @@ namespace BlueScript {
 
                 #region Variablen ersetzen
 
-                var t = Method.ReplaceVariable(txt, s.Variablen);
+                var t = Method.ReplaceVariable(txt, s);
                 if (!string.IsNullOrEmpty(t.ErrorMessage)) {
                     return new strDoItFeedback("Variablen-Berechnungsfehler: " + t.ErrorMessage);
                 }
@@ -533,7 +533,14 @@ namespace BlueScript {
                     return value;
 
                 case enVariableDataType.List:
-                    return "{\"" + (value.Replace("\"", Constants.GänsefüßchenReplace)).SplitByCRToList().JoinWith("\", \"") + "\"}";
+                    if (string.IsNullOrEmpty(value)) { return "{ }"; }
+
+                    if (!value.EndsWith("\r")) {
+                        Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Fehler, "Objekttypfehler:" + value);
+                    }
+
+                    var x = value.Substring(0, value.Length - 1);
+                    return "{\"" + (x.Replace("\"", Constants.GänsefüßchenReplace)).SplitByCRToList().JoinWith("\", \"") + "\"}";
 
                 case enVariableDataType.NotDefinedYet: // Wenn ne Routine die Werte einfach ersetzt.
                     return value;

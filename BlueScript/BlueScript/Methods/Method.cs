@@ -70,18 +70,38 @@ namespace BlueScript {
             } while (true);
         }
 
-        public static strGetEndFeedback ReplaceVariable(string txt, List<Variable> vars) {
+        public static strGetEndFeedback ReplaceVariable(string txt, Script s) {
             var posc = 0;
-            var v = vars.AllNames();
+            var v = s.Variablen.AllNames();
+
             do {
-                (var pos, var witch) = NextText(txt, posc, v, true, true);
-                if (pos < 0) { return new strGetEndFeedback(0, txt); }
-                var thisV = vars.Get(witch);
-                if (thisV == null) { return new strGetEndFeedback("Variablen-Fehler " + witch); }
-                if (thisV.Type == enVariableDataType.NotDefinedYet) {
-                    return new strGetEndFeedback("Variable " + witch + " ist keinem Typ zugeordnet");
+                (var pos, var which) = NextText(txt, posc, v, true, true);
+
+                if (txt.Contains("~")) {
+                    (var postmp, var _) = NextText(txt, posc, Tilde, false, false);
+                    if ((postmp >= 0 && postmp < pos) || pos < 0) { pos = postmp; which = "~"; }
                 }
-                txt = txt.Substring(0, pos) + Variable.ValueForReplace(thisV.ValueString, thisV.Type) + txt.Substring(pos + witch.Length);
+
+                if (pos < 0) { return new strGetEndFeedback(0, txt); }
+
+                Variable thisV;
+                int endz;
+
+                if (which == "~") {
+                    (var pose, var _) = NextText(txt, pos + 1, Tilde, false, false);
+                    if (pose <= pos) { return new strGetEndFeedback("Variablen-Findung End-~-Zeichen nicht gefunden."); }
+                    var x = new Variable("dummy", txt.Substring(pos + 1, pose - pos - 1), s);
+                    if (x.Type != enVariableDataType.String) { return new strGetEndFeedback("Fehler beim Berechnen des Variablen-Namens."); }
+                    thisV = s.Variablen.Get(x.ValueString);
+                    endz = pose + 1;
+                } else {
+                    thisV = s.Variablen.Get(which);
+                    endz = pos + which.Length;
+                }
+                if (thisV == null) { return new strGetEndFeedback("Variablen-Fehler " + which); }
+
+                if (thisV.Type == enVariableDataType.NotDefinedYet) { return new strGetEndFeedback("Variable " + thisV.Name + " ist keinem Typ zugeordnet"); }
+                txt = txt.Substring(0, pos) + Variable.ValueForReplace(thisV.ValueString, thisV.Type) + txt.Substring(endz);
                 posc = pos;
             } while (true);
         }
@@ -131,8 +151,15 @@ namespace BlueScript {
                 // Variable ermitteln oder eine Dummy-Variable als Rückgabe ermitteln
                 Variable v = null;
                 if (exceptetType.HasFlag(enVariableDataType.Variable)) {
-                    if (!Variable.IsValidName(attributes[n])) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.VariableErwartet, "Variablenname erwartet bei Attribut " + (n + 1).ToString()); }
-                    v = s.Variablen.Get(attributes[n]);
+                    var varn = attributes[n];
+                    if (varn.StartsWith("~") && varn.EndsWith("~")) {
+                        var tmp2 = new Variable("dummy", varn.Substring(1, varn.Length - 2), s);
+                        if (tmp2.Type != enVariableDataType.String) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.VariablenNamenBerechnungFehler, "Variablenname konnte nicht berechnet werden bei Attribut " + (n + 1).ToString()); }
+                        varn = tmp2.ValueString;
+                    }
+
+                    if (!Variable.IsValidName(varn)) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.VariableErwartet, "Variablenname erwartet bei Attribut " + (n + 1).ToString()); }
+                    v = s.Variablen.Get(varn);
                     if (v == null) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1).ToString()); }
                 } else {
                     v = new Variable("dummy", attributes[n], s);
@@ -167,12 +194,11 @@ namespace BlueScript {
                 return new strCanDoFeedback(pos, "Befehl an dieser Stelle nicht möglich", false);
             }
             var maxl = scriptText.Length;
-            //if (parent != null) {
-            //    var al = AllowedInIDs;
-            //    if (al != null && !al.Contains(parent.ID)) {
-            //        return new strCanDoFeedback(pos, "Befehl an dieser Stelle nicht möglich", false);
-            //    }
-            //}
+
+            if (scriptText.Substring(pos, 1) == "~") {
+                hier weitermachen
+            }
+
             foreach (var thiscomand in Comand(s)) {
                 var comandtext = thiscomand + StartSequence;
                 var l = comandtext.Length;
@@ -248,13 +274,13 @@ namespace BlueScript {
                 return new strGetEndFeedback(startpos, string.Empty);
             }
 
-            (var pos, var witch) = NextText(scriptText, startpos, new List<string>() { EndSequence }, false, false);
+            (var pos, var which) = NextText(scriptText, startpos, new List<string>() { EndSequence }, false, false);
             if (pos < startpos) {
                 return new strGetEndFeedback("Keinen Endpunkt gefunden.");
             }
 
             var txtBTW = scriptText.Substring(startpos + lenghtStartSequence, pos - startpos - lenghtStartSequence);
-            return new strGetEndFeedback(pos + witch.Length, txtBTW);
+            return new strGetEndFeedback(pos + which.Length, txtBTW);
         }
 
         #endregion

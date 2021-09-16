@@ -172,7 +172,7 @@ namespace BlueBasics {
             BlueBasics.MultiUserFile.clsMultiUserFile.SaveAll(true);
             Develop.TraceLogging_End();
 
-            var psi = new ProcessStartInfo("shutdown.exe", "-r -t 0");
+            var psi = new ProcessStartInfo("shutdown.exe", "-r -f -t 0");
             psi.CreateNoWindow = true;
             psi.UseShellExecute = false;
             Process.Start(psi);

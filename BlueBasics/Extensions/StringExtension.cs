@@ -29,16 +29,12 @@ namespace BlueBasics {
         #region Fields
 
         public static List<string> GeschKlammerAuf = new() { "{" };
-
         public static List<string> GeschKlammerZu = new() { "}" };
-
         public static List<string> Gleich = new() { "=" };
-
         public static List<string> KlammerAuf = new() { "(" };
-
         public static List<string> KlammerZu = new() { ")" };
-
         public static List<string> Komma = new() { "," };
+        public static List<string> Tilde = new() { "~" };
 
         #endregion
 
@@ -331,7 +327,7 @@ namespace BlueBasics {
             return char.IsPunctuation(value) || char.IsSeparator(value) || TR.Contains(value.ToString());
         }
 
-        public static (int pos, string witch) NextText(string txt, int startpos, List<string> searchfor, bool checkforSeparatorbefore, bool checkforSeparatorafter) {
+        public static (int pos, string which) NextText(string txt, int startpos, List<string> searchfor, bool checkforSeparatorbefore, bool checkforSeparatorafter) {
             var Gans = false;
             var pos = startpos;
             var maxl = txt.Length;
