@@ -76,19 +76,23 @@ namespace BlueScript {
             if (r == null || r.Count == 0) {
                 attvar.Attributes[1].Readonly = false; // 5 = NothingFoundValue
                 attvar.Attributes[1].Type = enVariableDataType.List;
-                return new strDoItFeedback(attvar.Attributes[1].ValueString, enVariableDataType.List);
+                return new strDoItFeedback(attvar.Attributes[1].ValueString + "\r", enVariableDataType.List);
             }
             if (r.Count > 1) {
                 attvar.Attributes[2].Readonly = false; // 6 = to MuchFound
                 attvar.Attributes[2].Type = enVariableDataType.List;
-                return new strDoItFeedback(attvar.Attributes[2].ValueString, enVariableDataType.List);
+                return new strDoItFeedback(attvar.Attributes[2].ValueString + "\r", enVariableDataType.List);
             }
 
             var v = RowItem.CellToVariable(returncolumn, r[0]);
             if (v == null || v.Count != 1) { return new strDoItFeedback("Wert konnte nicht erzeugt werden: " + attvar.Attributes[4].ValueString); }
 
             v[0].Readonly = false;
-            v[0].Type = enVariableDataType.List;
+
+            if (v[0].Type != enVariableDataType.List) {
+                v[0].Type = enVariableDataType.List;
+                return new strDoItFeedback(v[0].ValueString + "\r", enVariableDataType.List);
+            }
             return new strDoItFeedback(v[0].ValueString, enVariableDataType.List);
         }
 
