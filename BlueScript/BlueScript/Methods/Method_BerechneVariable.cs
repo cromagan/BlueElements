@@ -53,6 +53,21 @@ namespace BlueScript {
             return new strDoItFeedback();
         }
 
+        internal strDoItFeedback DoitKomplett(string newcommand, Script s, strCanDoFeedback originalinfos) {
+            var f = Script.BerechneVariable.CanDo(newcommand, 0, false, s);
+            if (!string.IsNullOrEmpty(f.ErrorMessage)) {
+                return new strDoItFeedback("Befehl nicht erkannt, " + f.ErrorMessage + ": " + originalinfos.AttributText);
+            }
+            //if (originalinfos.AttributText.Length != f.ContinueOrErrorPosition - 1) {
+            //    return new strDoItFeedback("Falsch gesetztes Semikolon");
+            //}
+            var f2 = Script.BerechneVariable.DoIt(f, s);
+
+            return !string.IsNullOrEmpty(f2.ErrorMessage)
+                ? new strDoItFeedback("Berechnung fehlerhaft: " + f2.ErrorMessage)
+                : new strDoItFeedback();
+        }
+
         #endregion
     }
 }

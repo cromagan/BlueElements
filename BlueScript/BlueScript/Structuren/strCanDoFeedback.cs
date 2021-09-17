@@ -32,7 +32,7 @@ public struct strCanDoFeedback {
     public string CodeBlockAfterText;
 
     /// <summary>
-    /// Der Text, mit dem eingetiegen wird. Also der Behel mit dem StartString.
+    /// Der Text, mit dem eingestiegen wird. Also der Befehl mit dem StartString.
     /// </summary>
     public string ComandText;
 

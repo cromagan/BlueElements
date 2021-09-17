@@ -22,7 +22,7 @@ using System.Collections.Generic;
 
 namespace BlueScript {
 
-    public class Method_Lookup : Method {
+    public class Method_Lookup : MethodDatabase {
 
         #region Properties
 
@@ -53,12 +53,8 @@ namespace BlueScript {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
-            var f = s.Variablen.GetSystem("filename");
-            if (f == null) { return new strDoItFeedback("System-Variable 'Filename' nicht gefunden."); }
-            var newf = f.ValueString.FilePath() + attvar.Attributes[0].ValueString + ".mdb";
-
-            var db = Database.GetByFilename(newf, true, false);
-            if (db == null) { return new strDoItFeedback("Datenbank nicht gefunden: " + newf); }
+            var db = DatabaseOf(s, attvar.Attributes[0].ValueString);
+            if (db == null) { return new strDoItFeedback("Datenbank nicht gefunden"); }
 
             var c = db.Column.Exists(attvar.Attributes[2].ValueString);
             if (c == null) { return new strDoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[2].ValueString); }

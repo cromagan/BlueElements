@@ -21,7 +21,7 @@ using System.Collections.Generic;
 
 namespace BlueScript {
 
-    public class Method_LookupFilter : Method {
+    public class Method_LookupFilter : MethodDatabase {
 
         #region Properties
 

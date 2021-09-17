@@ -21,7 +21,7 @@ using System.Collections.Generic;
 
 namespace BlueScript {
 
-    public class Method_SetLink : Method {
+    public class Method_SetLink : MethodDatabase {
 
         #region Properties
 
@@ -55,15 +55,8 @@ namespace BlueScript {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
-            #region Datenbank: db
-
-            var f = s.Variablen.GetSystem("filename");
-            if (f == null) { return new strDoItFeedback("System-Variable 'Filename' nicht gefunden."); }
-
-            var db = Database.GetByFilename(f.ValueString, true, false);
-            if (db == null) { return new strDoItFeedback("Datenbank nicht gefunden: " + f); }
-
-            #endregion
+            var db = MyDatabase(s);
+            if (db == null) { return new strDoItFeedback("Datenbank nicht gefunden"); }
 
             #region Filter prüfen: allFi
 

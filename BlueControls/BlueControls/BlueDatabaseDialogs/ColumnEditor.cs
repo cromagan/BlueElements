@@ -94,6 +94,21 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void btnQI_Vorschau_Click(object sender, System.EventArgs e) => Notification.Show(tbxQuickinfo.Text.Replace("\r", "<BR>") + "<br><br><br>" + tbxAdminInfo.Text.Replace("\r", "<BR>"));
 
+        private void btnRegexEmail_Click(object sender, System.EventArgs e) {
+            //http://emailregex.com/
+            txbRegex.Text = "^[a-z1-9A-Z._-]{1,40}[@][a-z1-9A-Z._-]{1,40}[.][a-zA-Z]{1,3}$";
+        }
+
+        private void btnRegexTelefonnummer_Click(object sender, System.EventArgs e) {
+            //https://regex101.com/r/OzJr8j/1
+            txbRegex.Text = @"^[+][1-9][\s0-9]*[0-9]$";
+        }
+
+        private void btnRegexUrl_Click(object sender, System.EventArgs e) {
+            //    https://regex101.com/r/S2CbwM/1
+            txbRegex.Text = @"^(https:|http:|www\.)\S*$";
+        }
+
         private void btnStandard_Click(object sender, System.EventArgs e) {
             if (!AllOk()) { return; }
             _Column.ResetSystemToDefault(true);

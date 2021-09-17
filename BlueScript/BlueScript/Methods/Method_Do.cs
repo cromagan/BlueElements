@@ -52,7 +52,7 @@ namespace BlueScript {
                 du++;
                 if (du > 10000) { return new strDoItFeedback("Do-Schleife nach 10.000 Durchläufen abgebrochen."); }
 
-                (var err, var _) = Script.Parse(infos.CodeBlockAfterText, false, s);
+                (var err, var _) = s.Parse(infos.CodeBlockAfterText, false);
                 if (!string.IsNullOrEmpty(err)) { return new strDoItFeedback(err); }
 
                 if (s.BreakFired) { break; }

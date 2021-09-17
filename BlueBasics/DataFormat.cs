@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics.Enums;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using static BlueBasics.Converter;
@@ -180,12 +181,12 @@ namespace BlueBasics {
         /// <param name="multiLine"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static bool IsFormat(this string txt, enDataFormat format, bool multiLine) {
+        public static bool IsFormat(this string txt, enDataFormat format, bool multiLine, List<string> additionalRegex) {
             if (multiLine) {
                 var ex = txt.SplitAndCutByCR();
-                return ex.All(thisString => string.IsNullOrEmpty(thisString) || thisString.IsFormat(format));
+                return ex.All(thisString => string.IsNullOrEmpty(thisString) || thisString.IsFormat(format, additionalRegex));
             }
-            return txt.IsFormat(format);
+            return txt.IsFormat(format, additionalRegex);
         }
 
         /// <summary>
@@ -197,6 +198,8 @@ namespace BlueBasics {
         /// <param name="format"></param>
         /// <returns></returns>
         /// <remarks></remarks>
+        public static bool IsFormat(this string txt, enDataFormat format, List<string> additionalRegex) => Text_LängeCheck(txt, format) && Text_SchabloneCheck(txt, format) && txt.ContainsOnlyChars(AllowedChars(format)) && Text_ValueCheck(txt, format) && Text_RegexCheck(txt, additionalRegex);
+
         public static bool IsFormat(this string txt, enDataFormat format) => Text_LängeCheck(txt, format) && Text_SchabloneCheck(txt, format) && txt.ContainsOnlyChars(AllowedChars(format)) && Text_ValueCheck(txt, format);
 
         public static bool IsZahl(this enDataFormat format) => format switch {
@@ -229,19 +232,6 @@ namespace BlueBasics {
             _ => false,
         };
 
-        // public static bool CompactPossible(this enDataFormat format)
-        // {
-        //    switch (format)
-        //    {
-        //        case enDataFormat.Bit:
-        //        case enDataFormat.BildCode:
-        //        case enDataFormat.FarbeInteger:
-        //        case enDataFormat.Schrift:
-        //            return true;
-        //        default:
-        //            return false;
-        //    }
-        // }
         public static bool SaveSizeData(this enDataFormat format) => format switch {
             enDataFormat.Text or enDataFormat.Bit or enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl or enDataFormat.BildCode or enDataFormat.Datum_und_Uhrzeit or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.Values_für_LinkedCellDropdown => true,
             _ => false,
@@ -252,10 +242,10 @@ namespace BlueBasics {
             _ => false,
         };
 
-        public static bool Text_LängeCheck(string tXT, enDataFormat format) {
+        public static bool Text_LängeCheck(string txt, enDataFormat format) {
             var ml = Text_MaximaleLänge(format);
             var il = 0;
-            if (tXT != null) { il = tXT.Length; }
+            if (txt != null) { il = txt.Length; }
             if (ml > -1 && il > ml) { return false; }
             switch (format) {
                 case enDataFormat.Text:
@@ -325,14 +315,23 @@ namespace BlueBasics {
             }
         }
 
+        public static bool Text_RegexCheck(string txt, List<string> regex) {
+            if (regex == null || regex.Count == 0) { return true; }
+
+            foreach (var thisregex in regex) {
+                if (new Regex(thisregex).IsMatch(txt)) { return true; }
+            }
+            return false;
+        }
+
         /// <summary>
         /// Gibt zurück, ob der Text in die vordefinierte Schablone paßt.
         /// </summary>
-        /// <param name="tXT"></param>
+        /// <param name="txt"></param>
         /// <param name="format"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static bool Text_SchabloneCheck(string tXT, enDataFormat format) {
+        public static bool Text_SchabloneCheck(string txt, enDataFormat format) {
             switch (format) {
                 case enDataFormat.Text:
                 case enDataFormat.Text_mit_Formatierung:
@@ -345,29 +344,29 @@ namespace BlueBasics {
                     return true;
 
                 case enDataFormat.Bit:
-                    return tXT.Length == 1;
+                    return txt.Length == 1;
 
                 case enDataFormat.Gleitkommazahl:
-                    if (tXT == "0") { return true; }
-                    if (tXT == "-") { return false; }
-                    if (tXT.Length > 1 && tXT.Substring(0, 2) == "00") { return false; }
-                    if (tXT.Length > 2 && tXT.Substring(0, 3) == "-00") { return false; }
-                    if (tXT.Length > 2 && tXT.IndexOf("-", 1) > -1) { return false; }
+                    if (txt == "0") { return true; }
+                    if (txt == "-") { return false; }
+                    if (txt.Length > 1 && txt.Substring(0, 2) == "00") { return false; }
+                    if (txt.Length > 2 && txt.Substring(0, 3) == "-00") { return false; }
+                    if (txt.Length > 2 && txt.IndexOf("-", 1) > -1) { return false; }
                     return true;
 
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.FarbeInteger:
-                    if (tXT == "0") { return true; }
-                    if (tXT == "-") { return false; }
-                    if (!string.IsNullOrEmpty(tXT) && tXT.Substring(0, 1) == "0") { return false; }
-                    if (tXT.Length > 1 && tXT.Substring(0, 2) == "-0") { return false; }
-                    if (tXT.Length > 2 && tXT.IndexOf("-", 1) > -1) { return false; }
+                    if (txt == "0") { return true; }
+                    if (txt == "-") { return false; }
+                    if (!string.IsNullOrEmpty(txt) && txt.Substring(0, 1) == "0") { return false; }
+                    if (txt.Length > 1 && txt.Substring(0, 2) == "-0") { return false; }
+                    if (txt.Length > 2 && txt.IndexOf("-", 1) > -1) { return false; }
                     return true;
 
                 case enDataFormat.Datum_und_Uhrzeit:
-                    if (new Regex(@"^\d{2}.\d{2}.\d{4}$").IsMatch(tXT)) { return true; }
-                    if (new Regex(@"^\d{2}.\d{2}.\d{4} \d{2}:\d{2}:\d{2}$").IsMatch(tXT)) { return true; }
-                    if (new Regex(@"^\d{2}.\d{2}.\d{4} \d{2}:\d{2}$").IsMatch(tXT)) { return true; }
+                    if (new Regex(@"^\d{2}.\d{2}.\d{4}$").IsMatch(txt)) { return true; }
+                    if (new Regex(@"^\d{2}.\d{2}.\d{4} \d{2}:\d{2}:\d{2}$").IsMatch(txt)) { return true; }
+                    if (new Regex(@"^\d{2}.\d{2}.\d{4} \d{2}:\d{2}$").IsMatch(txt)) { return true; }
                     return false;
 
                 case enDataFormat.LinkedCell:

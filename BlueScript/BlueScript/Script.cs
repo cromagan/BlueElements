@@ -30,6 +30,7 @@ namespace BlueScript {
         public static List<Method> Comands = null;
         public readonly List<Variable> Variablen;
         public bool EndSkript = false;
+        internal static Method_BerechneVariable BerechneVariable = null;
         internal readonly List<Bitmap> BitmapCache;
         private string _error;
         private string _errorCode;
@@ -159,51 +160,61 @@ namespace BlueScript {
             return l;
         }
 
-        public static (string, string) Parse(string scriptText, bool reduce, Script s) {
-            var pos = 0;
-            s.EndSkript = false;
-
-            string tmpScript;
-            if (reduce) {
-                tmpScript = ReduceText(scriptText);
-                s.Line = 1;
-                s.BreakFired = false;
-                s.Schleife = 0;
-                s.Variablen.PrepareForScript();
-            } else {
-                tmpScript = scriptText;
-            }
-
-            do {
-                if (pos >= tmpScript.Length || s.EndSkript) {
-                    if (reduce) { s.Variablen.ScriptFinished(); }
-                    return (string.Empty, string.Empty);
-                }
-
-                if (s.BreakFired) { return (string.Empty, string.Empty); }
-
-                if (tmpScript.Substring(pos, 1) == "¶") {
-                    s.Line++;
-                    pos++;
-                } else {
-                    var f = ComandOnPosition(tmpScript, pos, s, false);
-                    if (!string.IsNullOrEmpty(f.ErrorMessage)) {
-                        if (reduce) { s.Variablen.ScriptFinished(); }
-                        return (f.ErrorMessage, tmpScript.Substring(pos, Math.Min(30, tmpScript.Length - pos)));
-                    }
-                    pos = f.Position;
-                }
-            } while (true);
-        }
-
         public bool Parse() {
-            (Error, ErrorCode) = Parse(_ScriptText, true, this);
+            (Error, ErrorCode) = Parse(_ScriptText, true);
             return !string.IsNullOrEmpty(Error);
         }
 
         internal int AddBitmapToCache(Bitmap bmp) {
             BitmapCache.Add(bmp);
             return BitmapCache.IndexOf(bmp);
+        }
+
+        internal (string, string) Parse(string scriptText, bool reduce) {
+            var pos = 0;
+            EndSkript = false;
+
+            string tmpScript;
+            if (reduce) {
+                tmpScript = ReduceText(scriptText);
+                Line = 1;
+                BreakFired = false;
+                Schleife = 0;
+                Variablen.PrepareForScript();
+
+                BerechneVariable = null;
+
+                foreach (var thisC in Comands) {
+                    if (thisC is Method_BerechneVariable bv) { BerechneVariable = bv; }
+                }
+
+                if (BerechneVariable == null) {
+                    Develop.DebugPrint(enFehlerArt.Fehler, "Method_BerechneVariable ist nicht definiet.");
+                }
+            } else {
+                tmpScript = scriptText;
+            }
+
+            do {
+                if (pos >= tmpScript.Length || EndSkript) {
+                    if (reduce) { Variablen.ScriptFinished(); }
+                    return (string.Empty, string.Empty);
+                }
+
+                if (BreakFired) { return (string.Empty, string.Empty); }
+
+                if (tmpScript.Substring(pos, 1) == "¶") {
+                    Line++;
+                    pos++;
+                } else {
+                    var f = ComandOnPosition(tmpScript, pos, this, false);
+                    if (!string.IsNullOrEmpty(f.ErrorMessage)) {
+                        if (reduce) { Variablen.ScriptFinished(); }
+                        return (f.ErrorMessage, tmpScript.Substring(pos, Math.Min(30, tmpScript.Length - pos)));
+                    }
+                    pos = f.Position;
+                }
+            } while (true);
         }
 
         private static string ReduceText(string txt) {

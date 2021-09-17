@@ -303,13 +303,13 @@ namespace BlueBasics {
             return tXT;
         }
 
-        public static bool IsDouble(this string tXT) => tXT is not null && tXT.IsFormat(enDataFormat.Gleitkommazahl);
+        public static bool IsDouble(this string txt) => txt is not null && txt.IsFormat(enDataFormat.Gleitkommazahl);
 
-        public static bool IsHTMLColorCode(this string col) => !string.IsNullOrEmpty(col) && (col.Length == 6 || col.Length == 8) && col.ContainsOnlyChars(Constants.Char_Numerals + "abcdefABCDEF");
+        public static bool IsHTMLColorCode(this string txt) => !string.IsNullOrEmpty(txt) && (txt.Length == 6 || txt.Length == 8) && txt.ContainsOnlyChars(Constants.Char_Numerals + "abcdefABCDEF");
 
-        public static bool IsLong(this string tXT) => tXT is not null && tXT.IsFormat(enDataFormat.Ganzzahl);
+        public static bool IsLong(this string txt) => txt is not null && txt.IsFormat(enDataFormat.Ganzzahl);
 
-        public static bool IsNumeral(this string tXT) => tXT is not null && tXT.IsFormat(enDataFormat.Ganzzahl) || tXT.IsFormat(enDataFormat.Gleitkommazahl);
+        public static bool IsNumeral(this string txt) => txt is not null && txt.IsFormat(enDataFormat.Ganzzahl) || txt.IsFormat(enDataFormat.Gleitkommazahl);
 
         // public static List<byte> ToByteList(this string TXT) {
         //    var x = new List<byte>();

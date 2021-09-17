@@ -48,18 +48,8 @@ namespace BlueScript {
             var v = s.Variablen.Get(bs[0]);
             if (v != null) { return new strDoItFeedback("Variable " + bs[0] + " ist bereits vorhanden."); }
             s.Variablen.Add(new Variable(bs[0]));
-            Method_BerechneVariable r = new();
-            var f = r.CanDo(infos.AttributText + ";", 0, false, s);
-            if (!string.IsNullOrEmpty(f.ErrorMessage)) {
-                return new strDoItFeedback("Befehl nicht erkannt, " + f.ErrorMessage + ": " + infos.AttributText);
-            }
-            if (infos.AttributText.Length != f.ContinueOrErrorPosition - 1) {
-                return new strDoItFeedback("Falsch gesetztes Semikolon");
-            }
-            var f2 = r.DoIt(f, s);
-            return !string.IsNullOrEmpty(f2.ErrorMessage)
-                ? new strDoItFeedback("Berechnung fehlerhaft: " + f2.ErrorMessage)
-                : new strDoItFeedback();
+
+            return Script.BerechneVariable.DoitKomplett(infos.AttributText + ";", s, infos);
         }
 
         #endregion

@@ -21,7 +21,7 @@ using System.Collections.Generic;
 
 namespace BlueScript {
 
-    public class Method_SetError : Method {
+    public class Method_SetError : MethodDatabase {
 
         #region Properties
 
@@ -51,7 +51,11 @@ namespace BlueScript {
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+
             for (var z = 1; z < attvar.Attributes.Count; z++) {
+                var column = Column(s, attvar.Attributes[z].Name);
+                if (column == null) { return new strDoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[z].Name); }
+
                 var n = attvar.Attributes[z].Name.ToLower() + "_error";
                 var ve = s.Variablen.GetSystem(n);
                 if (ve == null) {
@@ -62,6 +66,7 @@ namespace BlueScript {
                 l.AddIfNotExists(attvar.Attributes[0].ValueString);
                 ve.ValueListString = l;
             }
+
             return new strDoItFeedback();
         }
 

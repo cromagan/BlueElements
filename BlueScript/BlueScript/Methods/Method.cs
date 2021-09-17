@@ -128,7 +128,7 @@ namespace BlueScript {
             return attributes;
         }
 
-        public static strSplittedAttributesFeedback SplitAttributeToVars(string attributtext, Script s, List<enVariableDataType> types, bool EndlessArgs) {
+        public static strSplittedAttributesFeedback SplitAttributeToVars(string attributtext, Script s, List<enVariableDataType> types, bool endlessArgs) {
             if (types.Count == 0) {
                 return string.IsNullOrEmpty(attributtext)
                     ? new strSplittedAttributesFeedback(new List<Variable>())
@@ -138,7 +138,7 @@ namespace BlueScript {
             var attributes = SplitAttributeToString(attributtext);
             if (attributes == null || attributes.Count == 0) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Allgemeiner Fehler."); }
             if (attributes.Count < types.Count) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Zu wenige Attribute erhalten."); ; }
-            if (!EndlessArgs && attributes.Count > types.Count) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Zu viele Attribute erhalten."); }
+            if (!endlessArgs && attributes.Count > types.Count) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Zu viele Attribute erhalten."); }
 
             //  Variablen und Routinen ersetzen
             List<Variable> vars = new();
@@ -194,10 +194,6 @@ namespace BlueScript {
                 return new strCanDoFeedback(pos, "Befehl an dieser Stelle nicht möglich", false);
             }
             var maxl = scriptText.Length;
-
-            if (scriptText.Substring(pos, 1) == "~") {
-                hier weitermachen
-            }
 
             foreach (var thiscomand in Comand(s)) {
                 var comandtext = thiscomand + StartSequence;

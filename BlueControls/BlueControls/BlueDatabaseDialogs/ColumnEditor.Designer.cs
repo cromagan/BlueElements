@@ -100,6 +100,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.Caption17 = new BlueControls.Controls.Caption();
             this.btnQI_Vorschau = new BlueControls.Controls.Button();
             this.tabSonstiges = new System.Windows.Forms.TabPage();
+            this.btnRegexUrl = new BlueControls.Controls.Button();
+            this.btnRegexEmail = new BlueControls.Controls.Button();
+            this.btnRegexTelefonnummer = new BlueControls.Controls.Button();
             this.butSaveContent = new BlueControls.Controls.Button();
             this.txbSortMask = new BlueControls.Controls.TextBox();
             this.btnSpellChecking = new BlueControls.Controls.Button();
@@ -206,7 +209,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // txbSpaltenbild
             // 
-            this.txbSpaltenbild.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.txbSpaltenbild.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txbSpaltenbild.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbSpaltenbild.Location = new System.Drawing.Point(528, 104);
@@ -234,8 +237,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // txbReplacer
             // 
-            this.txbReplacer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.txbReplacer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txbReplacer.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbReplacer.Location = new System.Drawing.Point(8, 264);
@@ -530,7 +533,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // btnOtherValuesToo
             // 
-            this.btnOtherValuesToo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
+            this.btnOtherValuesToo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.btnOtherValuesToo.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
             this.btnOtherValuesToo.Location = new System.Drawing.Point(8, 304);
@@ -542,8 +545,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // tbxAuswaehlbareWerte
             // 
-            this.tbxAuswaehlbareWerte.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.tbxAuswaehlbareWerte.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbxAuswaehlbareWerte.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.tbxAuswaehlbareWerte.Location = new System.Drawing.Point(8, 64);
@@ -573,8 +576,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // cbxDropDownKey
             // 
-            this.cbxDropDownKey.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.cbxDropDownKey.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbxDropDownKey.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxDropDownKey.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -667,8 +670,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // txbAutoReplace
             // 
-            this.txbAutoReplace.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.txbAutoReplace.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txbAutoReplace.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbAutoReplace.Location = new System.Drawing.Point(8, 288);
@@ -689,7 +692,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // txbAutoRemove
             // 
-            this.txbAutoRemove.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.txbAutoRemove.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txbAutoRemove.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbAutoRemove.Location = new System.Drawing.Point(8, 240);
@@ -707,7 +710,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // cbxSchlüsselspalte
             // 
-            this.cbxSchlüsselspalte.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.cbxSchlüsselspalte.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbxSchlüsselspalte.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxSchlüsselspalte.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -718,7 +721,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // tbxInitValue
             // 
-            this.tbxInitValue.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.tbxInitValue.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbxInitValue.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.tbxInitValue.Location = new System.Drawing.Point(8, 32);
@@ -772,7 +775,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // cbxVorschlagSpalte
             // 
-            this.cbxVorschlagSpalte.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.cbxVorschlagSpalte.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbxVorschlagSpalte.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxVorschlagSpalte.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -933,7 +936,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // tbxAdminInfo
             // 
-            this.tbxAdminInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            this.tbxAdminInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbxAdminInfo.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.tbxAdminInfo.Location = new System.Drawing.Point(560, 24);
@@ -946,8 +949,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // tbxQuickinfo
             // 
-            this.tbxQuickinfo.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.tbxQuickinfo.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbxQuickinfo.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.tbxQuickinfo.Location = new System.Drawing.Point(8, 24);
@@ -989,6 +992,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             // tabSonstiges
             // 
             this.tabSonstiges.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabSonstiges.Controls.Add(this.btnRegexUrl);
+            this.tabSonstiges.Controls.Add(this.btnRegexEmail);
+            this.tabSonstiges.Controls.Add(this.btnRegexTelefonnummer);
             this.tabSonstiges.Controls.Add(this.butSaveContent);
             this.tabSonstiges.Controls.Add(this.txbSortMask);
             this.tabSonstiges.Controls.Add(this.btnSpellChecking);
@@ -1006,6 +1012,33 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabSonstiges.Size = new System.Drawing.Size(912, 487);
             this.tabSonstiges.TabIndex = 4;
             this.tabSonstiges.Text = "Sonstiges allgemein";
+            // 
+            // btnRegexUrl
+            // 
+            this.btnRegexUrl.Location = new System.Drawing.Point(832, 176);
+            this.btnRegexUrl.Name = "btnRegexUrl";
+            this.btnRegexUrl.Size = new System.Drawing.Size(72, 24);
+            this.btnRegexUrl.TabIndex = 37;
+            this.btnRegexUrl.Text = "Url";
+            this.btnRegexUrl.Click += new System.EventHandler(this.btnRegexUrl_Click);
+            // 
+            // btnRegexEmail
+            // 
+            this.btnRegexEmail.Location = new System.Drawing.Point(832, 152);
+            this.btnRegexEmail.Name = "btnRegexEmail";
+            this.btnRegexEmail.Size = new System.Drawing.Size(72, 24);
+            this.btnRegexEmail.TabIndex = 36;
+            this.btnRegexEmail.Text = "E-Mail";
+            this.btnRegexEmail.Click += new System.EventHandler(this.btnRegexEmail_Click);
+            // 
+            // btnRegexTelefonnummer
+            // 
+            this.btnRegexTelefonnummer.Location = new System.Drawing.Point(832, 128);
+            this.btnRegexTelefonnummer.Name = "btnRegexTelefonnummer";
+            this.btnRegexTelefonnummer.Size = new System.Drawing.Size(72, 24);
+            this.btnRegexTelefonnummer.TabIndex = 35;
+            this.btnRegexTelefonnummer.Text = "Telefonnr.";
+            this.btnRegexTelefonnummer.Click += new System.EventHandler(this.btnRegexTelefonnummer_Click);
             // 
             // butSaveContent
             // 
@@ -1045,7 +1078,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbRegex.Location = new System.Drawing.Point(512, 128);
             this.txbRegex.MultiLine = true;
             this.txbRegex.Name = "txbRegex";
-            this.txbRegex.Size = new System.Drawing.Size(392, 96);
+            this.txbRegex.Size = new System.Drawing.Size(320, 96);
             this.txbRegex.TabIndex = 9;
             // 
             // capSortiermaske
@@ -1098,8 +1131,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // tbxTags
             // 
-            this.tbxTags.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.tbxTags.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbxTags.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.tbxTags.Location = new System.Drawing.Point(4, 31);
@@ -1185,7 +1218,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // BlueFrame1
             // 
-            this.BlueFrame1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.BlueFrame1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.BlueFrame1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.BlueFrame1.CausesValidation = false;
@@ -1249,7 +1282,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // tbxCaption
             // 
-            this.tbxCaption.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.tbxCaption.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbxCaption.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.tbxCaption.Location = new System.Drawing.Point(312, 32);
@@ -1291,8 +1324,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // tabControl
             // 
-            this.tabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.tabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tabControl.Controls.Add(this.tabDesign);
             this.tabControl.Controls.Add(this.tabRechte);
@@ -1364,7 +1397,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // grpVerlinkteZellen
             // 
-            this.grpVerlinkteZellen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.grpVerlinkteZellen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.grpVerlinkteZellen.CausesValidation = false;
             this.grpVerlinkteZellen.Controls.Add(this.cbxTargetColumn);
@@ -1380,7 +1413,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // cbxTargetColumn
             // 
-            this.cbxTargetColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.cbxTargetColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbxTargetColumn.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxTargetColumn.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -1391,7 +1424,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // cbxRowKeyInColumn
             // 
-            this.cbxRowKeyInColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.cbxRowKeyInColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbxRowKeyInColumn.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxRowKeyInColumn.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -1613,5 +1646,8 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Button chkFilterOnlyOr;
         private Button btnVerwendung;
         private TextBox txbSpaltenbild;
+        private Button btnRegexUrl;
+        private Button btnRegexEmail;
+        private Button btnRegexTelefonnummer;
     }
 }

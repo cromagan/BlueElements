@@ -15,55 +15,54 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
-using BlueDatabase;
 using Skript.Enums;
 using System.Collections.Generic;
+using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
+using static BlueBasics.DataFormat;
 
 namespace BlueScript {
 
-    public class Method_AddRow : MethodDatabase {
+    internal class Method_MatchColumnFormat : MethodDatabase {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.String, enVariableDataType.Bool };
-
-        public override string Description => "Lädt eine andere Datenbank (Database) und erstellt eine neue Zeile, wenn diese nicht existiert. Bei Always wird immer eine neue Zeile erstellt. Gibt zurück, ob eine neue Zeile erstellt wurde.";
-
+        public override List<enVariableDataType> Args => new() { enVariableDataType.String_or_List, enVariableDataType.Variable_Any };
+        public override string Description => "Prüft, ob der Inhalt der Variable mit dem Format der angegebenen Spalte übereinstimmt. Leere Inhalte sind dabei TRUE.";
         public override bool EndlessArgs => false;
-
         public override string EndSequence => ")";
-
         public override bool GetCodeBlockAfter => false;
-
         public override enVariableDataType Returns => enVariableDataType.Bool;
-
         public override string StartSequence => "(";
-
-        public override string Syntax => "AddRow(database, keyvalue, always);";
+        public override string Syntax => "MatchColumnFormat(Value, Column)";
 
         #endregion
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "addrow" };
+        public override List<string> Comand(Script s) => new() { "matchcolumnformat" };
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
-            var db = DatabaseOf(s, attvar.Attributes[0].ValueString);
-            if (db == null) { return new strDoItFeedback("Datenbank nicht gefunden"); }
+            var column = Column(s, attvar.Attributes[1].Name);
+            if (column == null) { new strDoItFeedback("Spalte in Ziel-Datenbank nicht gefunden"); }
 
-            if (db.ReadOnly) { return strDoItFeedback.Falsch(); }
+            var tocheck = new List<string>();
+            if (attvar.Attributes[0].Type == enVariableDataType.List) {
+                tocheck.AddRange(attvar.Attributes[0].ValueListString);
+            } else {
+                tocheck.Add(attvar.Attributes[0].ValueString);
+            }
 
-            var r = db.Row[attvar.Attributes[1].ValueString];
+            tocheck = tocheck.SortedDistinctList();
 
-            if (r != null && !attvar.Attributes[2].ValueBool) { return strDoItFeedback.Falsch(); }
+            foreach (var thisstring in tocheck) {
+                if (!thisstring.IsFormat(column.Format, column.Regex)) { return strDoItFeedback.Falsch(); }
+            }
 
-            r = db.Row.Add(attvar.Attributes[1].ValueString);
-
-            return r == null ? strDoItFeedback.Falsch() : strDoItFeedback.Wahr();
+            return strDoItFeedback.Wahr();
         }
 
         #endregion

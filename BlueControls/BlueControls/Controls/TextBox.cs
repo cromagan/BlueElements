@@ -315,51 +315,51 @@ namespace BlueControls.Controls {
 
         public new bool Focused() => base.Focused || (_SliderY != null && _SliderY.Focused());
 
-        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
+        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList items, out object hotItem, List<string> tags, ref bool cancel, ref bool translate) {
             AbortSpellChecking();
-            HotItem = null;
-            Tags.TagSet("CursorPosBeforeClick", _Cursor_CharPos.ToString());
+            hotItem = null;
+            tags.TagSet("CursorPosBeforeClick", _Cursor_CharPos.ToString());
             var tmp = Cursor_PosAt(e.X, e.Y);
-            Tags.TagSet("Char", tmp.ToString());
-            Tags.TagSet("MarkStart", _MarkStart.ToString());
-            Tags.TagSet("MarkEnd", _MarkEnd.ToString());
-            Tags.TagSet("Cursorpos", _Cursor_CharPos.ToString());
+            tags.TagSet("Char", tmp.ToString());
+            tags.TagSet("MarkStart", _MarkStart.ToString());
+            tags.TagSet("MarkEnd", _MarkEnd.ToString());
+            tags.TagSet("Cursorpos", _Cursor_CharPos.ToString());
             var tmpWord = _eTxt.Word(tmp);
-            Tags.TagSet("Word", tmpWord);
+            tags.TagSet("Word", tmpWord);
             if (_SpellChecking && !Dictionary.IsWordOk(tmpWord)) {
-                Items.Add("Rechtschreibprüfung", true);
+                items.Add("Rechtschreibprüfung", true);
                 if (Dictionary.IsSpellChecking) {
-                    Items.Add("Gerade ausgelastet...", "Gerade ausgelastet...", false);
-                    Items.AddSeparator();
+                    items.Add("Gerade ausgelastet...", "Gerade ausgelastet...", false);
+                    items.AddSeparator();
                 } else {
                     var sim = Dictionary.SimilarTo(tmpWord);
                     if (sim != null) {
                         foreach (var ThisS in sim) {
-                            Items.Add(" - " + ThisS, "#ChangeTo:" + ThisS);
+                            items.Add(" - " + ThisS, "#ChangeTo:" + ThisS);
                         }
-                        Items.AddSeparator();
+                        items.AddSeparator();
                     }
-                    Items.Add("'" + tmpWord + "' ins Wörterbuch aufnehmen", "#SpellAdd", Dictionary.IsWriteable());
+                    items.Add("'" + tmpWord + "' ins Wörterbuch aufnehmen", "#SpellAdd", Dictionary.IsWriteable());
                     if (tmpWord.ToLower() != tmpWord) {
-                        Items.Add("'" + tmpWord.ToLower() + "' ins Wörterbuch aufnehmen", "#SpellAddLower", Dictionary.IsWriteable());
+                        items.Add("'" + tmpWord.ToLower() + "' ins Wörterbuch aufnehmen", "#SpellAddLower", Dictionary.IsWriteable());
                     }
-                    Items.Add("Schnelle Rechtschreibprüfung", "#SpellChecking", Dictionary.IsWriteable());
-                    Items.Add("Alle Wörter sind ok", "#SpellChecking2", Dictionary.IsWriteable());
-                    Items.AddSeparator();
+                    items.Add("Schnelle Rechtschreibprüfung", "#SpellChecking", Dictionary.IsWriteable());
+                    items.Add("Alle Wörter sind ok", "#SpellChecking2", Dictionary.IsWriteable());
+                    items.AddSeparator();
                 }
             }
             if (this is not ComboBox cbx || cbx.DropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDown) {
-                Items.Add(enContextMenuComands.Ausschneiden, Convert.ToBoolean(_MarkStart >= 0) && Enabled);
-                Items.Add(enContextMenuComands.Kopieren, Convert.ToBoolean(_MarkStart >= 0));
-                Items.Add(enContextMenuComands.Einfügen, System.Windows.Forms.Clipboard.ContainsText() && Enabled);
+                items.Add(enContextMenuComands.Ausschneiden, Convert.ToBoolean(_MarkStart >= 0) && Enabled);
+                items.Add(enContextMenuComands.Kopieren, Convert.ToBoolean(_MarkStart >= 0));
+                items.Add(enContextMenuComands.Einfügen, System.Windows.Forms.Clipboard.ContainsText() && Enabled);
                 if (_Format == enDataFormat.Text_mit_Formatierung) {
-                    Items.AddSeparator();
-                    Items.Add("Sonderzeichen einfügen", "#Sonderzeichen", QuickImage.Get(enImageCode.Sonne, 16), _Cursor_CharPos > -1);
+                    items.AddSeparator();
+                    items.Add("Sonderzeichen einfügen", "#Sonderzeichen", QuickImage.Get(enImageCode.Sonne, 16), _Cursor_CharPos > -1);
                     if (Convert.ToBoolean(_MarkEnd > -1)) {
-                        Items.AddSeparator();
-                        Items.Add("Als Überschrift markieren", "#Caption", Skin.GetBlueFont(enDesign.TextBox_Stufe3, enStates.Standard).SymbolForReadableText(), _MarkEnd > -1);
-                        Items.Add("Fettschrift", "#Bold", Skin.GetBlueFont(enDesign.TextBox_Bold, enStates.Standard).SymbolForReadableText(), Convert.ToBoolean(_MarkEnd > -1));
-                        Items.Add("Als normalen Text markieren", "#NoCaption", Skin.GetBlueFont(enDesign.TextBox, enStates.Standard).SymbolForReadableText(), Convert.ToBoolean(_MarkEnd > -1));
+                        items.AddSeparator();
+                        items.Add("Als Überschrift markieren", "#Caption", Skin.GetBlueFont(enDesign.TextBox_Stufe3, enStates.Standard).SymbolForReadableText(), _MarkEnd > -1);
+                        items.Add("Fettschrift", "#Bold", Skin.GetBlueFont(enDesign.TextBox_Bold, enStates.Standard).SymbolForReadableText(), Convert.ToBoolean(_MarkEnd > -1));
+                        items.Add("Als normalen Text markieren", "#NoCaption", Skin.GetBlueFont(enDesign.TextBox, enStates.Standard).SymbolForReadableText(), Convert.ToBoolean(_MarkEnd > -1));
                     }
                 }
             }
@@ -388,12 +388,12 @@ namespace BlueControls.Controls {
         /// <summary>
         /// Prüft - bei Multiline Zeile für Zeile - ob der Text in der Textbox zulässig ist.
         /// </summary>
-        /// <param name="MitMeldung"></param>
+        /// <param name="mitMeldung"></param>
         /// <returns>Ergibt Wahr, wenn der komplette Text dem Format entspricht. Andernfalls Falsch.</returns>
         /// <remarks></remarks>
-        public bool Text_IsOkay(bool MitMeldung) {
-            if (!_eTxt.PlainText.IsFormat(_Format, _Multiline)) {
-                if (MitMeldung) { MessageBox.Show("Ihre Eingabe entspricht nicht<br>dem erwarteten Format.", enImageCode.Warnung, "OK"); }
+        public bool Text_IsOkay(bool mitMeldung) {
+            if (!_eTxt.PlainText.IsFormat(_Format, _Multiline, null)) {
+                if (mitMeldung) { MessageBox.Show("Ihre Eingabe entspricht nicht<br>dem erwarteten Format.", enImageCode.Warnung, "OK"); }
                 return false;
             }
             return true;

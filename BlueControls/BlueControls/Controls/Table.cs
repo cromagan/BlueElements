@@ -1486,7 +1486,7 @@ namespace BlueControls.Controls {
             table.OnCellValueChangingByUser(ed);
             var CancelReason = ed.CancelReason;
             if (string.IsNullOrEmpty(CancelReason) && formatWarnung && !string.IsNullOrEmpty(newValue)) {
-                if (!newValue.IsFormat(column.Format, column.MultiLine)) {
+                if (!newValue.IsFormat(column.Format, column.MultiLine, column.Regex)) {
                     if (MessageBox.Show("Ihre Eingabe entspricht<br><u>nicht</u> dem erwarteten Format!<br><br>Trotzdem übernehmen?", enImageCode.Information, "Ja", "Nein") != 0) {
                         CancelReason = "Abbruch, das das erwartete Format nicht eingehalten wurde.";
                     }
