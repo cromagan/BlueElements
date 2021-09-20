@@ -64,7 +64,7 @@ namespace BlueScript {
                 if (attvar.Attributes.Count > 3) {
                     attvar.Attributes[3].Readonly = false;
                     attvar.Attributes[3].Type = enVariableDataType.List;
-                    return new strDoItFeedback(attvar.Attributes[3].ValueString, enVariableDataType.List);
+                    return new strDoItFeedback(attvar.Attributes[3].ValueString + "\r", enVariableDataType.List);
                 }
                 return new strDoItFeedback(string.Empty);
             }
@@ -72,7 +72,7 @@ namespace BlueScript {
                 if (attvar.Attributes.Count > 4) {
                     attvar.Attributes[4].Readonly = false;
                     attvar.Attributes[4].Type = enVariableDataType.List;
-                    return new strDoItFeedback(attvar.Attributes[4].ValueString, enVariableDataType.List);
+                    return new strDoItFeedback(attvar.Attributes[4].ValueString + "\r", enVariableDataType.List);
                 }
                 return new strDoItFeedback(string.Empty);
             }
@@ -80,9 +80,11 @@ namespace BlueScript {
             var v = RowItem.CellToVariable(c, r[0]);
             if (v == null || v.Count != 1) { return new strDoItFeedback("Wert konnte nicht erzeugt werden: " + attvar.Attributes[2].ValueString); }
 
-            v[0].Readonly = false;
-            v[0].Type = enVariableDataType.List;
+            if (v[0].Type != enVariableDataType.List) {
+                return new strDoItFeedback(v[0].ValueString + "\r", enVariableDataType.List);
+            }
             return new strDoItFeedback(v[0].ValueString, enVariableDataType.List);
+
         }
 
         #endregion

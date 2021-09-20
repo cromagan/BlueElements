@@ -87,10 +87,7 @@ namespace BlueScript {
             var v = RowItem.CellToVariable(returncolumn, r[0]);
             if (v == null || v.Count != 1) { return new strDoItFeedback("Wert konnte nicht erzeugt werden: " + attvar.Attributes[4].ValueString); }
 
-            v[0].Readonly = false;
-
             if (v[0].Type != enVariableDataType.List) {
-                v[0].Type = enVariableDataType.List;
                 return new strDoItFeedback(v[0].ValueString + "\r", enVariableDataType.List);
             }
             return new strDoItFeedback(v[0].ValueString, enVariableDataType.List);
