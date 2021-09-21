@@ -76,7 +76,7 @@ namespace BlueScript {
                 default:
                     return new strDoItFeedback("Es wir als zweites Attribut ein String mit dem Inhalt num, str, lst oder bol erwartet.");
             }
-            return new strDoItFeedback();
+            return strDoItFeedback.Null();
         }
 
         #endregion

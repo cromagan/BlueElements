@@ -52,7 +52,7 @@ namespace BlueScript {
                 }
             }
             attvar.Attributes[0].ValueListString = tmpList;
-            return new strDoItFeedback();
+            return strDoItFeedback.Null();
         }
 
         #endregion

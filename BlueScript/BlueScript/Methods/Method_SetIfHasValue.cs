@@ -57,12 +57,12 @@ namespace BlueScript {
 
                     if (hasvalue) {
                         attvar.Attributes[0].ValueString = attvar.Attributes[z].ValueString;
-                        return new strDoItFeedback();
+                        return strDoItFeedback.Null();
                     }
                 }
             }
 
-            return new strDoItFeedback();
+            return strDoItFeedback.Null();
         }
 
         #endregion

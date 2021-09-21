@@ -51,7 +51,7 @@ namespace BlueScript {
 
             if (s.BreakFired) { return new strDoItFeedback("Break doppelt ausgelöst."); }
             s.BreakFired = true;
-            return new strDoItFeedback();
+            return strDoItFeedback.Null();
         }
 
         #endregion

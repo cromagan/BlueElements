@@ -47,7 +47,7 @@ namespace BlueScript {
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
             var column = Column(s, attvar.Attributes[1].Name);
-            if (column == null) { new strDoItFeedback("Spalte in Ziel-Datenbank nicht gefunden"); }
+            if (column == null) { new strDoItFeedback("Spalte in Datenbank nicht gefunden"); }
 
             var tocheck = new List<string>();
             if (attvar.Attributes[0].Type == enVariableDataType.List) {

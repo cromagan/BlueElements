@@ -49,7 +49,7 @@ namespace BlueScript {
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             s.EndSkript = true;
-            return new strDoItFeedback();
+            return strDoItFeedback.Null();
         }
 
         #endregion

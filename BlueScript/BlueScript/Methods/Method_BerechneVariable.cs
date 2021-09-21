@@ -50,7 +50,7 @@ namespace BlueScript {
             if (variable.Type != enVariableDataType.NotDefinedYet && attvar.Attributes[0].Type != variable.Type) { return new strDoItFeedback("Variable '" + variableName + "' ist nicht der erwartete Typ: " + variable.Type.ToString()); }
             variable.ValueString = attvar.Attributes[0].ValueString;
             variable.Type = attvar.Attributes[0].Type;
-            return new strDoItFeedback();
+            return strDoItFeedback.Null();
         }
 
         internal strDoItFeedback DoitKomplett(string newcommand, Script s, strCanDoFeedback originalinfos) {
@@ -65,7 +65,7 @@ namespace BlueScript {
 
             return !string.IsNullOrEmpty(f2.ErrorMessage)
                 ? new strDoItFeedback("Berechnung fehlerhaft: " + f2.ErrorMessage)
-                : new strDoItFeedback();
+                : strDoItFeedback.Null();
         }
 
         #endregion

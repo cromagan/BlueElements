@@ -300,7 +300,7 @@ namespace BlueScript {
                 }
                 Type = enVariableDataType.List;
                 Readonly = true;
-                return;// new strDoItFeedback();
+                return;
             }
 
             #endregion
@@ -321,7 +321,7 @@ namespace BlueScript {
 
             if (Type is not enVariableDataType.NotDefinedYet and not enVariableDataType.Numeral) { SetError("Variable ist keine Zahl"); return; }
             var erg = modErgebnis.Ergebnis(txt.Value);
-            if (erg == null) { SetError("Berechnungsfehler der Formel: " + txt.ErrorMessage); return; }//return new strDoItFeedback();
+            if (erg == null) { SetError("Berechnungsfehler der Formel: " + txt.ErrorMessage); return; }
             ValueDouble = (double)erg;
             Type = enVariableDataType.Numeral;
             Readonly = true;

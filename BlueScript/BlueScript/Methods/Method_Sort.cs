@@ -58,7 +58,7 @@ namespace BlueScript {
                 x.Sort();
             }
             attvar.Attributes[0].ValueListString = x;
-            return new strDoItFeedback();
+            return strDoItFeedback.Null();
         }
 
         #endregion

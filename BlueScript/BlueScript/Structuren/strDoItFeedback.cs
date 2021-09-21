@@ -61,6 +61,8 @@ public struct strDoItFeedback {
 
     public static strDoItFeedback Klammerfehler() => new("Fehler bei der Klammersetzung.");
 
+    public static strDoItFeedback Null() => new();
+
     public static strDoItFeedback Wahr() => new("true", enVariableDataType.Bool);
 
     #endregion

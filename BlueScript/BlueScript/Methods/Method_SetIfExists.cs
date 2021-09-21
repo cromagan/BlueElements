@@ -49,11 +49,11 @@ namespace BlueScript {
                 if (attvar.Attributes[z].Type != enVariableDataType.Error) {
                     if (attvar.Attributes[z].Type != attvar.Attributes[0].Type) { return new strDoItFeedback("Variablentyp zur Ausgangsvariable unterschiedlich."); }
                     attvar.Attributes[0].ValueString = attvar.Attributes[z].ValueString;
-                    return new strDoItFeedback();
+                    return strDoItFeedback.Null();
                 }
             }
 
-            return new strDoItFeedback();
+            return strDoItFeedback.Null();
         }
 
         #endregion

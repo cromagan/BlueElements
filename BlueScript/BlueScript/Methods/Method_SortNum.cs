@@ -64,7 +64,7 @@ namespace BlueScript {
             nums.Sort();
 
             attvar.Attributes[0].ValueListString = nums.ConvertAll<string>(delegate (double i) { return i.ToString(); });
-            return new strDoItFeedback();
+            return strDoItFeedback.Null();
         }
 
         #endregion

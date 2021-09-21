@@ -67,7 +67,7 @@ namespace BlueScript {
                 ve.ValueListString = l;
             }
 
-            return new strDoItFeedback();
+            return strDoItFeedback.Null();
         }
 
         #endregion

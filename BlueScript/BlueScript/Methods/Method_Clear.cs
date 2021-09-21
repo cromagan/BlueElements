@@ -43,7 +43,7 @@ namespace BlueScript {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
             attvar.Attributes[0].ValueListString = new List<string>();
-            return new strDoItFeedback();
+            return strDoItFeedback.Null();
         }
 
         #endregion
