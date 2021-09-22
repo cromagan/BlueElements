@@ -33,7 +33,7 @@ namespace BlueScript {
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.Bitmap;
         public override string StartSequence => "(";
-        public override string Syntax => "LoadImage(Filname)";
+        public override string Syntax => "LoadImage(Filename)";
 
         #endregion
 

@@ -257,11 +257,9 @@ namespace BlueControls.Controls {
                 if (_Bitmap != null) {
                     if (MessageBox.Show("Vorhandenes Bild überschreiben?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
                 }
-                string n;
-                var lLCase = DB.AllConnectedFilesLCase();
-                using (ItemSelect x = new()) {
-                    n = x.SelectOne_OfDataSystem(lLCase, DB.FileEncryptionKey);
-                }
+
+                var n = ItemSelect.Show(DB.AllConnectedFilesLCase(), DB.FileEncryptionKey);
+
                 if (string.IsNullOrEmpty(n)) { return; }
                 FromFile(n);
                 OnImageChanged();

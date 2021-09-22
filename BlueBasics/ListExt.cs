@@ -91,6 +91,9 @@ namespace BlueBasics {
             }
             set {
                 Develop.DebugPrint_Disposed(Disposed);
+
+                if (base[index] is string s1 && value is string s2 && s1 == s2) { return; }
+
                 if (base[index] != null) {
                     OnItemRemoving(base[index]);
                     base[index] = value;
@@ -98,6 +101,7 @@ namespace BlueBasics {
                 } else {
                     base[index] = value;
                 }
+
                 if (value != null) {
                     OnItemAdded(base[index]);
                     OnItemSeted(base[index]);

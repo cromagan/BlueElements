@@ -66,7 +66,7 @@ namespace BlueControls.Forms {
         /// <param name="suggest">Wird geklont, es kann auch aus einer Listbox kommen, und dann stimmen die Events nicht mehr. Es muss auch einbe ItemCollection bleiben, damit aus der Datenbank auch Bilder etc. angezeigt werden können.</param>
         /// <returns></returns>
         private static string Show(string txt, string vorschlagsText, ItemCollectionList suggest, bool texteingabeErlaubt) {
-            InputBoxComboStyle MB = new(txt, vorschlagsText, suggest, texteingabeErlaubt);
+            var MB = new InputBoxComboStyle(txt, vorschlagsText, suggest, texteingabeErlaubt);
             MB.ShowDialog();
             return MB._giveBack;
         }

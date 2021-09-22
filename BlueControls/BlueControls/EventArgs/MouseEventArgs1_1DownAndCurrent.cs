@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics;
 using System;
 using System.Drawing;
 
@@ -40,7 +41,16 @@ namespace BlueControls.EventArgs {
 
         #region Methods
 
-        public Rectangle TrimmedRectangle() => new(Math.Min(MouseDown.TrimmedX, Current.TrimmedX), Math.Min(MouseDown.TrimmedY, Current.TrimmedY), Math.Abs(MouseDown.TrimmedX - Current.TrimmedX) + 1, Math.Abs(MouseDown.TrimmedY - Current.TrimmedY) + 1);
+        public Rectangle TrimmedRectangle() {
+
+
+            if (MouseDown == null || Current == null) {
+                Develop.DebugPrint("Trimmen nicht möglich.");
+                return Rectangle.Empty;
+            }
+
+            return new(Math.Min(MouseDown.TrimmedX, Current.TrimmedX), Math.Min(MouseDown.TrimmedY, Current.TrimmedY), Math.Abs(MouseDown.TrimmedX - Current.TrimmedX) + 1, Math.Abs(MouseDown.TrimmedY - Current.TrimmedY) + 1);
+        }
 
         #endregion
     }

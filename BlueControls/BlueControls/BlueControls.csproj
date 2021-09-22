@@ -419,11 +419,11 @@
     <Compile Include="Forms-Basics\Form.Designer.cs">
       <DependentUpon>Form.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms-Common\TODELETE_ItemSelect.cs">
+    <Compile Include="Forms-Common\ItemSelect.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms-Common\TODELETE_ItemSelect.Designer.cs">
-      <DependentUpon>TODELETE_ItemSelect.cs</DependentUpon>
+    <Compile Include="Forms-Common\ItemSelect.Designer.cs">
+      <DependentUpon>ItemSelect.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms-Common\PageSetupDialog.cs">
       <SubType>Form</SubType>
@@ -696,8 +696,8 @@
       <DependentUpon>Form.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Common\TODELETE_ItemSelect.resx">
-      <DependentUpon>TODELETE_ItemSelect.cs</DependentUpon>
+    <EmbeddedResource Include="Forms-Common\ItemSelect.resx">
+      <DependentUpon>ItemSelect.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms-Common\PageSetupDialog.resx">
