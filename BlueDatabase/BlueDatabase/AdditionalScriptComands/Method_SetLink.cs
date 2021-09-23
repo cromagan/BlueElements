@@ -125,6 +125,11 @@ namespace BlueScript {
             tmpv[0].Type = enVariableDataType.List;
 
             attvar.Attributes[0].ValueString = tmpv[0].ValueString;
+
+            if (attvar.Attributes[0].Type == enVariableDataType.List && !string.IsNullOrEmpty(attvar.Attributes[0].ValueString) && !attvar.Attributes[0].ValueString.EndsWith("\r")) {
+                attvar.Attributes[0].ValueString += "\r";
+            }
+
             Linkvar.ValueString = CellCollection.KeyOfCell(LinkTaregtColumn, r[0]);
             Linkvar.Readonly = true;
             return strDoItFeedback.Wahr();

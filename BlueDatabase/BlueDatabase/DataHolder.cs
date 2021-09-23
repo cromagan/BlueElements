@@ -27,6 +27,13 @@ namespace BlueDatabase {
 
         #region Methods
 
+        /// <summary>
+        /// Sucht in der gegebenen Liste die ID-Nummer und gibt dessen Objekt zurück.
+        /// </summary>
+        /// <typeparam name="t">Ein Objekt des Typs DataHolder</typeparam>
+        /// <param name="items">Die Items, in denen gesucht werden soll.</param>
+        /// <param name="id">Die ID, nach der gesucht werden soll.</param>
+        /// <returns>Wenn in der Liste die ID vorhanden ist, wird dieses Objekt zurückgegeben, ansonsten wird NULL zurückgegeben.</returns>
         public static t GetByID<t>(this List<t> items, string id) where t : DataHolder {
             foreach (var thisit in items) {
                 if (thisit.ID.ToUpper() == id.ToUpper()) { return thisit; }
@@ -140,7 +147,7 @@ namespace BlueDatabase {
             set => InternalDatabase.Creator = value;
         }
 
-        public Database InternalDatabase { get; set; }
+        public Database InternalDatabase { get; private set; }
 
         #endregion
 
@@ -314,6 +321,11 @@ namespace BlueDatabase {
             }
         }
 
+        /// <summary>
+        /// Ein Sicherheitsmerkal, das verhindert, dass die Daten falsch abgespeichert werden.
+        /// TRUE bedeutet, dass die Daten dieses DataHolder eine Extra datei benötigen. Das hat den Vorteil,
+        /// </summary>
+        /// <returns></returns>
         public abstract bool UseExtraFile();
 
         protected virtual void Dispose(bool disposing) {

@@ -101,6 +101,8 @@ namespace BlueScript {
                 if (thisV == null) { return new strGetEndFeedback("Variablen-Fehler " + which); }
 
                 if (thisV.Type == enVariableDataType.NotDefinedYet) { return new strGetEndFeedback("Variable " + thisV.Name + " ist keinem Typ zugeordnet"); }
+                if (thisV.Type == enVariableDataType.List && !string.IsNullOrEmpty(thisV.ValueString) && !thisV.ValueString.EndsWith("\r")) { return new strGetEndFeedback("List-Variable " + thisV.Name + " fehlerhaft"); }
+
                 txt = txt.Substring(0, pos) + Variable.ValueForReplace(thisV.ValueString, thisV.Type) + txt.Substring(endz);
                 posc = pos;
             } while (true);
