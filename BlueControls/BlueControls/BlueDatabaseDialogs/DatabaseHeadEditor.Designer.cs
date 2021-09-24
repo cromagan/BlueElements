@@ -42,9 +42,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capCaption = new BlueControls.Controls.Caption();
             this.capTags = new BlueControls.Controls.Caption();
             this.capInfo = new BlueControls.Controls.Caption();
-            this.Caption14 = new BlueControls.Controls.Caption();
-            this.Caption13 = new BlueControls.Controls.Caption();
-            this.Caption11 = new BlueControls.Controls.Caption();
             this.GlobalTab = new BlueControls.Controls.TabControl();
             this.Tab_Allgemein = new System.Windows.Forms.TabPage();
             this.txbAdditionalFiles = new BlueControls.Controls.TextBox();
@@ -64,23 +61,23 @@ namespace BlueControls.BlueDatabaseDialogs
             this.cbxAnsicht = new BlueControls.Controls.ComboBox();
             this.cbxJoinTyp = new BlueControls.Controls.ComboBox();
             this.capAnsicht = new BlueControls.Controls.Caption();
+            this.Tab_Regeln = new System.Windows.Forms.TabPage();
+            this.scriptEditor = new BlueControls.ScriptEditor();
+            this.Tab_Rechte = new System.Windows.Forms.TabPage();
+            this.grpDateiVerschluesselung = new BlueControls.Controls.GroupBox();
+            this.capDateiverschluesselungInfo = new BlueControls.Controls.Caption();
+            this.btnDateiSchluessel = new BlueControls.Controls.Button();
+            this.Tab_Sortierung = new System.Windows.Forms.TabPage();
+            this.Tab_Backup = new System.Windows.Forms.TabPage();
+            this.ExportEditor = new BlueControls.Classes_Editor.ExportDefinition_Editor();
+            this.grpExport = new BlueControls.Controls.GroupBox();
+            this.lbxExportSets = new BlueControls.Controls.ListBox();
             this.Tab_Undo = new System.Windows.Forms.TabPage();
             this.btnClipboard = new BlueControls.Controls.Button();
             this.btnAlleUndos = new BlueControls.Controls.Button();
             this.tbxUndoAnzahl = new BlueControls.Controls.TextBox();
             this.capUndoAnzahl = new BlueControls.Controls.Caption();
             this.tblUndo = new BlueControls.Controls.Table();
-            this.Tab_Regeln = new System.Windows.Forms.TabPage();
-            this.scriptEditor = new BlueControls.ScriptEditor();
-            this.Tab_Backup = new System.Windows.Forms.TabPage();
-            this.ExportEditor = new BlueControls.Classes_Editor.ExportDefinition_Editor();
-            this.grpExport = new BlueControls.Controls.GroupBox();
-            this.lbxExportSets = new BlueControls.Controls.ListBox();
-            this.Tab_Rechte = new System.Windows.Forms.TabPage();
-            this.grpDateiVerschluesselung = new BlueControls.Controls.GroupBox();
-            this.capDateiverschluesselungInfo = new BlueControls.Controls.Caption();
-            this.btnDateiSchluessel = new BlueControls.Controls.Button();
-            this.Tab_Sortierung = new System.Windows.Forms.TabPage();
             this.Tab_Expermimentell = new System.Windows.Forms.TabPage();
             this.btnFremdImport = new BlueControls.Controls.Button();
             this.capExperimentellWarnung = new BlueControls.Controls.Caption();
@@ -90,13 +87,13 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpKennwort.SuspendLayout();
             this.GlobalTab.SuspendLayout();
             this.Tab_Allgemein.SuspendLayout();
-            this.Tab_Undo.SuspendLayout();
             this.Tab_Regeln.SuspendLayout();
-            this.Tab_Backup.SuspendLayout();
-            this.grpExport.SuspendLayout();
             this.Tab_Rechte.SuspendLayout();
             this.grpDateiVerschluesselung.SuspendLayout();
             this.Tab_Sortierung.SuspendLayout();
+            this.Tab_Backup.SuspendLayout();
+            this.grpExport.SuspendLayout();
+            this.Tab_Undo.SuspendLayout();
             this.Tab_Expermimentell.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -301,31 +298,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capInfo.Name = "capInfo";
             this.capInfo.Size = new System.Drawing.Size(552, 90);
             this.capInfo.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
-            // 
-            // Caption14
-            // 
-            this.Caption14.CausesValidation = false;
-            this.Caption14.Location = new System.Drawing.Point(448, 24);
-            this.Caption14.Name = "Caption14";
-            this.Caption14.Size = new System.Drawing.Size(79, 18);
-            this.Caption14.Text = "(in der Spalte)";
-            // 
-            // Caption13
-            // 
-            this.Caption13.CausesValidation = false;
-            this.Caption13.Location = new System.Drawing.Point(264, 24);
-            this.Caption13.Name = "Caption13";
-            this.Caption13.Size = new System.Drawing.Size(42, 18);
-            this.Caption13.Text = "Dann...";
-            // 
-            // Caption11
-            // 
-            this.Caption11.CausesValidation = false;
-            this.Caption11.Location = new System.Drawing.Point(8, 16);
-            this.Caption11.Name = "Caption11";
-            this.Caption11.Size = new System.Drawing.Size(232, 16);
-            this.Caption11.Text = "Dann führe all diese Aktionen aus:";
-            this.Caption11.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // GlobalTab
             // 
@@ -546,6 +518,145 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capAnsicht.Size = new System.Drawing.Size(120, 18);
             this.capAnsicht.Text = "Bevorzugte Ansicht:";
             // 
+            // Tab_Regeln
+            // 
+            this.Tab_Regeln.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.Tab_Regeln.Controls.Add(this.scriptEditor);
+            this.Tab_Regeln.Location = new System.Drawing.Point(4, 25);
+            this.Tab_Regeln.Name = "Tab_Regeln";
+            this.Tab_Regeln.Padding = new System.Windows.Forms.Padding(3);
+            this.Tab_Regeln.Size = new System.Drawing.Size(1039, 616);
+            this.Tab_Regeln.TabIndex = 3;
+            this.Tab_Regeln.Text = "Skript";
+            // 
+            // scriptEditor
+            // 
+            this.scriptEditor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.scriptEditor.Database = null;
+            this.scriptEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.scriptEditor.Location = new System.Drawing.Point(3, 3);
+            this.scriptEditor.Name = "scriptEditor";
+            this.scriptEditor.Size = new System.Drawing.Size(1033, 610);
+            this.scriptEditor.TabIndex = 0;
+            this.scriptEditor.TabStop = false;
+            // 
+            // Tab_Rechte
+            // 
+            this.Tab_Rechte.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.Tab_Rechte.Controls.Add(this.grpDateiVerschluesselung);
+            this.Tab_Rechte.Controls.Add(this.grpKennwort);
+            this.Tab_Rechte.Controls.Add(this.grpBenutzergruppen);
+            this.Tab_Rechte.Location = new System.Drawing.Point(4, 25);
+            this.Tab_Rechte.Name = "Tab_Rechte";
+            this.Tab_Rechte.Padding = new System.Windows.Forms.Padding(3);
+            this.Tab_Rechte.Size = new System.Drawing.Size(1039, 616);
+            this.Tab_Rechte.TabIndex = 4;
+            this.Tab_Rechte.Text = "Rechte";
+            // 
+            // grpDateiVerschluesselung
+            // 
+            this.grpDateiVerschluesselung.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.grpDateiVerschluesselung.CausesValidation = false;
+            this.grpDateiVerschluesselung.Controls.Add(this.capDateiverschluesselungInfo);
+            this.grpDateiVerschluesselung.Controls.Add(this.btnDateiSchluessel);
+            this.grpDateiVerschluesselung.Location = new System.Drawing.Point(400, 120);
+            this.grpDateiVerschluesselung.Name = "grpDateiVerschluesselung";
+            this.grpDateiVerschluesselung.Size = new System.Drawing.Size(232, 176);
+            this.grpDateiVerschluesselung.TabIndex = 0;
+            this.grpDateiVerschluesselung.TabStop = false;
+            this.grpDateiVerschluesselung.Text = "Datei-Verschlüsselung:";
+            // 
+            // capDateiverschluesselungInfo
+            // 
+            this.capDateiverschluesselungInfo.CausesValidation = false;
+            this.capDateiverschluesselungInfo.Location = new System.Drawing.Point(8, 24);
+            this.capDateiverschluesselungInfo.Name = "capDateiverschluesselungInfo";
+            this.capDateiverschluesselungInfo.Size = new System.Drawing.Size(216, 72);
+            this.capDateiverschluesselungInfo.Text = "Dazugehörige Dateien im Dateisystem können mit diesen Kopf verschlüsselt oder wie" +
+    "der entschlüsselt werden.";
+            this.capDateiverschluesselungInfo.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            // 
+            // btnDateiSchluessel
+            // 
+            this.btnDateiSchluessel.Location = new System.Drawing.Point(8, 112);
+            this.btnDateiSchluessel.Name = "btnDateiSchluessel";
+            this.btnDateiSchluessel.Size = new System.Drawing.Size(216, 48);
+            this.btnDateiSchluessel.TabIndex = 1;
+            this.btnDateiSchluessel.Text = "Dateien ";
+            this.btnDateiSchluessel.Click += new System.EventHandler(this.DateienSchlüssel_Click);
+            // 
+            // Tab_Sortierung
+            // 
+            this.Tab_Sortierung.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.Tab_Sortierung.Controls.Add(this.lbxSortierSpalten);
+            this.Tab_Sortierung.Controls.Add(this.capSortierspalten);
+            this.Tab_Sortierung.Controls.Add(this.btnSortRichtung);
+            this.Tab_Sortierung.Location = new System.Drawing.Point(4, 25);
+            this.Tab_Sortierung.Name = "Tab_Sortierung";
+            this.Tab_Sortierung.Padding = new System.Windows.Forms.Padding(3);
+            this.Tab_Sortierung.Size = new System.Drawing.Size(1039, 616);
+            this.Tab_Sortierung.TabIndex = 2;
+            this.Tab_Sortierung.Text = "Sortierung";
+            // 
+            // Tab_Backup
+            // 
+            this.Tab_Backup.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.Tab_Backup.Controls.Add(this.ExportEditor);
+            this.Tab_Backup.Controls.Add(this.grpExport);
+            this.Tab_Backup.Location = new System.Drawing.Point(4, 25);
+            this.Tab_Backup.Name = "Tab_Backup";
+            this.Tab_Backup.Padding = new System.Windows.Forms.Padding(3);
+            this.Tab_Backup.Size = new System.Drawing.Size(1039, 616);
+            this.Tab_Backup.TabIndex = 5;
+            this.Tab_Backup.Text = "Backup & Export";
+            // 
+            // ExportEditor
+            // 
+            this.ExportEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ExportEditor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.ExportEditor.CausesValidation = false;
+            this.ExportEditor.Enabled = false;
+            this.ExportEditor.Location = new System.Drawing.Point(8, 176);
+            this.ExportEditor.Name = "ExportEditor";
+            this.ExportEditor.Size = new System.Drawing.Size(1031, 437);
+            this.ExportEditor.TabIndex = 0;
+            this.ExportEditor.TabStop = false;
+            this.ExportEditor.Text = "Export-Editor:";
+            this.ExportEditor.Changed += new System.EventHandler(this.ExportEditor_Changed);
+            // 
+            // grpExport
+            // 
+            this.grpExport.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.grpExport.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.grpExport.CausesValidation = false;
+            this.grpExport.Controls.Add(this.lbxExportSets);
+            this.grpExport.Location = new System.Drawing.Point(8, 8);
+            this.grpExport.Name = "grpExport";
+            this.grpExport.Size = new System.Drawing.Size(1031, 168);
+            this.grpExport.TabIndex = 1;
+            this.grpExport.TabStop = false;
+            this.grpExport.Text = "Alle Export-Aufgaben:";
+            // 
+            // lbxExportSets
+            // 
+            this.lbxExportSets.AddAllowed = BlueControls.Enums.enAddType.UserDef;
+            this.lbxExportSets.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lbxExportSets.FilterAllowed = true;
+            this.lbxExportSets.Location = new System.Drawing.Point(8, 24);
+            this.lbxExportSets.Name = "lbxExportSets";
+            this.lbxExportSets.RemoveAllowed = true;
+            this.lbxExportSets.Size = new System.Drawing.Size(2046, 304);
+            this.lbxExportSets.TabIndex = 0;
+            this.lbxExportSets.Text = "ExportAufgaben";
+            this.lbxExportSets.AddClicked += new System.EventHandler(this.ExportSets_AddClicked);
+            this.lbxExportSets.ItemCheckedChanged += new System.EventHandler(this.lbxExportSets_ItemCheckedChanged);
+            this.lbxExportSets.RemoveClicked += new System.EventHandler<BlueControls.EventArgs.ListOfBasicListItemEventArgs>(this.lbxExportSets_RemoveClicked);
+            // 
             // Tab_Undo
             // 
             this.Tab_Undo.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
@@ -611,145 +722,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tblUndo.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.tblUndo_ContextMenuInit);
             this.tblUndo.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.tblUndo_ContextMenuItemClicked);
             // 
-            // Tab_Regeln
-            // 
-            this.Tab_Regeln.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.Tab_Regeln.Controls.Add(this.scriptEditor);
-            this.Tab_Regeln.Location = new System.Drawing.Point(4, 25);
-            this.Tab_Regeln.Name = "Tab_Regeln";
-            this.Tab_Regeln.Padding = new System.Windows.Forms.Padding(3);
-            this.Tab_Regeln.Size = new System.Drawing.Size(1039, 616);
-            this.Tab_Regeln.TabIndex = 3;
-            this.Tab_Regeln.Text = "Skript";
-            // 
-            // scriptEditor
-            // 
-            this.scriptEditor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.scriptEditor.Database = null;
-            this.scriptEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.scriptEditor.Location = new System.Drawing.Point(3, 3);
-            this.scriptEditor.Name = "scriptEditor";
-            this.scriptEditor.Size = new System.Drawing.Size(1033, 610);
-            this.scriptEditor.TabIndex = 0;
-            this.scriptEditor.TabStop = false;
-            // 
-            // Tab_Backup
-            // 
-            this.Tab_Backup.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.Tab_Backup.Controls.Add(this.ExportEditor);
-            this.Tab_Backup.Controls.Add(this.grpExport);
-            this.Tab_Backup.Location = new System.Drawing.Point(4, 25);
-            this.Tab_Backup.Name = "Tab_Backup";
-            this.Tab_Backup.Padding = new System.Windows.Forms.Padding(3);
-            this.Tab_Backup.Size = new System.Drawing.Size(1039, 616);
-            this.Tab_Backup.TabIndex = 5;
-            this.Tab_Backup.Text = "Backup & Export";
-            // 
-            // ExportEditor
-            // 
-            this.ExportEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.ExportEditor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.ExportEditor.CausesValidation = false;
-            this.ExportEditor.Enabled = false;
-            this.ExportEditor.Location = new System.Drawing.Point(8, 176);
-            this.ExportEditor.Name = "ExportEditor";
-            this.ExportEditor.Size = new System.Drawing.Size(1031, 437);
-            this.ExportEditor.TabIndex = 0;
-            this.ExportEditor.TabStop = false;
-            this.ExportEditor.Text = "Export-Editor:";
-            this.ExportEditor.Changed += new System.EventHandler(this.ExportEditor_Changed);
-            // 
-            // grpExport
-            // 
-            this.grpExport.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.grpExport.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.grpExport.CausesValidation = false;
-            this.grpExport.Controls.Add(this.lbxExportSets);
-            this.grpExport.Location = new System.Drawing.Point(8, 8);
-            this.grpExport.Name = "grpExport";
-            this.grpExport.Size = new System.Drawing.Size(1031, 168);
-            this.grpExport.TabIndex = 1;
-            this.grpExport.TabStop = false;
-            this.grpExport.Text = "Alle Export-Aufgaben:";
-            // 
-            // lbxExportSets
-            // 
-            this.lbxExportSets.AddAllowed = BlueControls.Enums.enAddType.UserDef;
-            this.lbxExportSets.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lbxExportSets.FilterAllowed = true;
-            this.lbxExportSets.Location = new System.Drawing.Point(8, 24);
-            this.lbxExportSets.Name = "lbxExportSets";
-            this.lbxExportSets.RemoveAllowed = true;
-            this.lbxExportSets.Size = new System.Drawing.Size(2046, 304);
-            this.lbxExportSets.TabIndex = 0;
-            this.lbxExportSets.Text = "ExportAufgaben";
-            this.lbxExportSets.ItemCheckedChanged += new System.EventHandler(this.lbxExportSets_ItemCheckedChanged);
-            this.lbxExportSets.AddClicked += new System.EventHandler(this.ExportSets_AddClicked);
-            this.lbxExportSets.RemoveClicked += new System.EventHandler<BlueControls.EventArgs.ListOfBasicListItemEventArgs>(this.lbxExportSets_RemoveClicked);
-            // 
-            // Tab_Rechte
-            // 
-            this.Tab_Rechte.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.Tab_Rechte.Controls.Add(this.grpDateiVerschluesselung);
-            this.Tab_Rechte.Controls.Add(this.grpKennwort);
-            this.Tab_Rechte.Controls.Add(this.grpBenutzergruppen);
-            this.Tab_Rechte.Location = new System.Drawing.Point(4, 25);
-            this.Tab_Rechte.Name = "Tab_Rechte";
-            this.Tab_Rechte.Padding = new System.Windows.Forms.Padding(3);
-            this.Tab_Rechte.Size = new System.Drawing.Size(1039, 616);
-            this.Tab_Rechte.TabIndex = 4;
-            this.Tab_Rechte.Text = "Rechte";
-            // 
-            // grpDateiVerschluesselung
-            // 
-            this.grpDateiVerschluesselung.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.grpDateiVerschluesselung.CausesValidation = false;
-            this.grpDateiVerschluesselung.Controls.Add(this.capDateiverschluesselungInfo);
-            this.grpDateiVerschluesselung.Controls.Add(this.btnDateiSchluessel);
-            this.grpDateiVerschluesselung.Location = new System.Drawing.Point(400, 120);
-            this.grpDateiVerschluesselung.Name = "grpDateiVerschluesselung";
-            this.grpDateiVerschluesselung.Size = new System.Drawing.Size(232, 176);
-            this.grpDateiVerschluesselung.TabIndex = 0;
-            this.grpDateiVerschluesselung.TabStop = false;
-            this.grpDateiVerschluesselung.Text = "Datei-Verschlüsselung:";
-            // 
-            // capDateiverschluesselungInfo
-            // 
-            this.capDateiverschluesselungInfo.CausesValidation = false;
-            this.capDateiverschluesselungInfo.Location = new System.Drawing.Point(8, 24);
-            this.capDateiverschluesselungInfo.Name = "capDateiverschluesselungInfo";
-            this.capDateiverschluesselungInfo.Size = new System.Drawing.Size(216, 72);
-            this.capDateiverschluesselungInfo.Text = "Dazugehörige Dateien im Dateisystem können mit diesen Kopf verschlüsselt oder wie" +
-    "der entschlüsselt werden.";
-            this.capDateiverschluesselungInfo.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
-            // 
-            // btnDateiSchluessel
-            // 
-            this.btnDateiSchluessel.Location = new System.Drawing.Point(8, 112);
-            this.btnDateiSchluessel.Name = "btnDateiSchluessel";
-            this.btnDateiSchluessel.Size = new System.Drawing.Size(216, 48);
-            this.btnDateiSchluessel.TabIndex = 1;
-            this.btnDateiSchluessel.Text = "Dateien ";
-            this.btnDateiSchluessel.Click += new System.EventHandler(this.DateienSchlüssel_Click);
-            // 
-            // Tab_Sortierung
-            // 
-            this.Tab_Sortierung.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.Tab_Sortierung.Controls.Add(this.lbxSortierSpalten);
-            this.Tab_Sortierung.Controls.Add(this.capSortierspalten);
-            this.Tab_Sortierung.Controls.Add(this.btnSortRichtung);
-            this.Tab_Sortierung.Location = new System.Drawing.Point(4, 25);
-            this.Tab_Sortierung.Name = "Tab_Sortierung";
-            this.Tab_Sortierung.Padding = new System.Windows.Forms.Padding(3);
-            this.Tab_Sortierung.Size = new System.Drawing.Size(1039, 616);
-            this.Tab_Sortierung.TabIndex = 2;
-            this.Tab_Sortierung.Text = "Sortierung";
-            // 
             // Tab_Expermimentell
             // 
             this.Tab_Expermimentell.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
@@ -814,13 +786,13 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpKennwort.ResumeLayout(false);
             this.GlobalTab.ResumeLayout(false);
             this.Tab_Allgemein.ResumeLayout(false);
-            this.Tab_Undo.ResumeLayout(false);
             this.Tab_Regeln.ResumeLayout(false);
-            this.Tab_Backup.ResumeLayout(false);
-            this.grpExport.ResumeLayout(false);
             this.Tab_Rechte.ResumeLayout(false);
             this.grpDateiVerschluesselung.ResumeLayout(false);
             this.Tab_Sortierung.ResumeLayout(false);
+            this.Tab_Backup.ResumeLayout(false);
+            this.grpExport.ResumeLayout(false);
+            this.Tab_Undo.ResumeLayout(false);
             this.Tab_Expermimentell.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -838,9 +810,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private TextBox tbxTags;
         private ListBox lbxSortierSpalten;
         private Button btnSperreAufheben;
-        private Caption Caption11;
-        private Caption Caption14;
-        private Caption Caption13;
         private Caption Caption22;
         private ListBox DatenbankAdmin;
         private  System.Windows.Forms.TabPage Tab_Allgemein;

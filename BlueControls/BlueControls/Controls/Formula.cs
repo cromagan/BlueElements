@@ -87,9 +87,8 @@ namespace BlueControls.Controls {
                 if (_Database != null) {
                     _Database.Loading -= _Database_StoreView;
                     _Database.Loaded -= _DatabaseLoaded;
-                    _Database.Row.RowChecked -= _Database_RowChecked;
                     _Database.Column.ItemRemoved -= _Database_ColumnRemoved;
-                    _Database.Column.ItemInternalChanged -= _Database_ColumnContentChanged;
+                    _Database.Column.ItemInternalChanged -= _Database_ItemInternalChanged;
                     _Database.RowKeyChanged -= _Database_RowKeyChanged;
                     _Database.Disposing -= _Database_Disposing;
                     _Database.Save(false); // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
@@ -98,9 +97,8 @@ namespace BlueControls.Controls {
                 if (_Database != null) {
                     _Database.Loading += _Database_StoreView;
                     _Database.Loaded += _DatabaseLoaded;
-                    _Database.Row.RowChecked += _Database_RowChecked;
                     _Database.Column.ItemRemoved += _Database_ColumnRemoved;
-                    _Database.Column.ItemInternalChanged += _Database_ColumnContentChanged;
+                    _Database.Column.ItemInternalChanged += _Database_ItemInternalChanged;
                     _Database.RowKeyChanged += _Database_RowKeyChanged;
                     _Database.Disposing += _Database_Disposing;
                 }
@@ -262,14 +260,6 @@ namespace BlueControls.Controls {
             grpEditor.Height = Height;
         }
 
-        private void _Database_ColumnContentChanged(object sender, ListEventArgs e) {
-            if (IsDisposed) { return; }
-            var r = _ShowingRowKey;
-            ShowingRowKey = -1;
-            View_Init();
-            ShowingRowKey = r;
-        }
-
         private void _Database_ColumnRemoved(object sender, System.EventArgs e) {
             if (IsDisposed) { return; }
             View_Init();
@@ -277,33 +267,41 @@ namespace BlueControls.Controls {
 
         private void _Database_Disposing(object sender, System.EventArgs e) => Database = null;
 
-        private void _Database_RowChecked(object sender, RowCheckedEventArgs e) {
-            if (e.Row.Key != _ShowingRowKey) { return; }
-            var nr = int.MaxValue;
-            var ColNr = int.MaxValue;
-            for (var cc = 0; cc < e.ColumnsWithErrors.Count; cc++) {
-                var p = e.ColumnsWithErrors[cc].Split('|');
-                foreach (var ThisColumnItem in e.Row.Database.Column) {
-                    if (ThisColumnItem != null) {
-                        if (p[0].ToUpper() == ThisColumnItem.Name.ToUpper()) {
-                            //Bitte jeden Fehler anzeigen..... Es verursacht mehr Rätsel, wenn die Zeile einfach Fehlerhaft ist und überhaut kein Hinweis kommt
-                            var CD = SearchViewItem(ThisColumnItem);
-                            var View = SearchColumnView(ThisColumnItem);
-                            var tmp = CD == null
-                                ? ThisColumnItem.Index() + 200000
-                                : View == CurrentView() ? ThisColumnItem.Index() : ThisColumnItem.Index() + 100000;
-                            if (tmp < ColNr) {
-                                ColNr = tmp;
-                                nr = cc;
-                            }
-                        }
-                    }
-                }
-            }
-            if (nr < int.MaxValue) {
-                _ = e.ColumnsWithErrors[nr].Split('|');
-            }
+        private void _Database_ItemInternalChanged(object sender, ListEventArgs e) {
+            if (IsDisposed) { return; }
+            var r = _ShowingRowKey;
+            ShowingRowKey = -1;
+            View_Init();
+            ShowingRowKey = r;
         }
+
+        //private void _Database_RowChecked(object sender, RowCheckedEventArgs e) {
+        //if (e.Row.Key != _ShowingRowKey) { return; }
+        //var nr = int.MaxValue;
+        //var ColNr = int.MaxValue;
+        //for (var cc = 0; cc < e.ColumnsWithErrors.Count; cc++) {
+        //    var p = e.ColumnsWithErrors[cc].Split('|');
+        //    foreach (var ThisColumnItem in e.Row.Database.Column) {
+        //        if (ThisColumnItem != null) {
+        //            if (p[0].ToUpper() == ThisColumnItem.Name.ToUpper()) {
+        //                //Bitte jeden Fehler anzeigen..... Es verursacht mehr Rätsel, wenn die Zeile einfach Fehlerhaft ist und überhaut kein Hinweis kommt
+        //                var CD = SearchViewItem(ThisColumnItem);
+        //                var View = SearchColumnView(ThisColumnItem);
+        //                var tmp = CD == null
+        //                    ? ThisColumnItem.Index() + 200000
+        //                    : View == CurrentView() ? ThisColumnItem.Index() : ThisColumnItem.Index() + 100000;
+        //                if (tmp < ColNr) {
+        //                    ColNr = tmp;
+        //                    nr = cc;
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
+        //if (nr < int.MaxValue) {
+        //    _ = e.ColumnsWithErrors[nr].Split('|');
+        //}
+        //}
 
         private void _Database_RowKeyChanged(object sender, KeyChangedEventArgs e) {
             // Ist aktuell nur möglich,wenn Pending Changes eine neue Zeile machen

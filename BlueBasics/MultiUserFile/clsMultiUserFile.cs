@@ -960,8 +960,12 @@ namespace BlueBasics.MultiUserFile {
         }
 
         private void StartBackgroundWorker() {
-            if (!string.IsNullOrEmpty(ErrorReason(enErrorReason.EditNormaly))) { return; }
-            if (!BackgroundWorker.IsBusy) { BackgroundWorker.RunWorkerAsync(); }
+            try {
+                if (!string.IsNullOrEmpty(ErrorReason(enErrorReason.EditNormaly))) { return; }
+                if (!BackgroundWorker.IsBusy) { BackgroundWorker.RunWorkerAsync(); }
+            } catch {
+                StartBackgroundWorker();
+            }
         }
 
         /// <summary>

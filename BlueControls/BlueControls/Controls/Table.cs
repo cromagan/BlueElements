@@ -2217,7 +2217,7 @@ namespace BlueControls.Controls {
         private void CursorPos_Set(ColumnItem column, clsRowDrawData row, bool ensureVisible) {
             //if (column != null) { column = Database.Column.SearchByKey(column.Key); }
             //if (row != null) { row = Database.Row.SearchByKey(row.Key); }
-            if (_Database.ColumnArrangements.Count == 0 || CurrentArrangement[column] == null || !SortedRowData().Contains(row)) {
+            if (_Database == null || _Database.ColumnArrangements.Count == 0 || CurrentArrangement[column] == null || !SortedRowData().Contains(row)) {
                 column = null;
                 row = null;
             }
@@ -2887,6 +2887,7 @@ namespace BlueControls.Controls {
 
         private void Invalidate_RowSort() {
             _SortedRows = null;
+            CursorPos_Reset();
             Invalidate_SortedRowData();
         }
 

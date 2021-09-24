@@ -24,28 +24,20 @@ using System.Windows.Forms;
 
 namespace BlueControls.Controls {
 
-    //[Designer("System.Windows.Forms.Design.ParentControlDesigner,System.Design", typeof(IDesigner))]
     [ToolboxBitmap(typeof(System.Windows.Forms.GroupBox))]
     public partial class GroupBox : System.Windows.Forms.GroupBox {
 
         #region Fields
 
-        //private string _Text = string.Empty;
         private enGroupBoxStyle _GroupBoxStyle = enGroupBoxStyle.Normal;
 
         #endregion
 
         #region Constructors
 
-        public GroupBox() : base() =>
-                    //// Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-                    //SetNotFocusable();
-                    //_MouseHighlight = false;
-                    SetStandardValues();
+        public GroupBox() : base() => SetStandardValues();
 
         #endregion
-
-        //public new event EventHandler TextChanged;
 
         #region Properties
 
@@ -61,46 +53,6 @@ namespace BlueControls.Controls {
         }
 
         #endregion
-
-        //[DefaultValue(0)]
-        //public new int TabIndex
-        //{
-        //    get
-        //    {
-        //        return 0;
-        //    }
-        //    set
-        //    {
-        //        base.TabIndex = 0;
-        //    }
-        //}
-        //[DefaultValue(false)]
-        //public new bool TabStop
-        //{
-        //    get
-        //    {
-        //        return false;
-        //    }
-        //    set
-        //    {
-        //        base.TabStop = false;
-        //    }
-        //}
-        //[DefaultValue("")]
-        //public new string Text
-        //{
-        //    get
-        //    {
-        //        return _Text;
-        //    }
-        //    set
-        //    {
-        //        if (_Text == value) { return; }
-        //        _Text = value;
-        //        Invalidate();
-        //        //OnTextChanged();
-        //    }
-        //}
 
         #region Methods
 
@@ -123,11 +75,11 @@ namespace BlueControls.Controls {
         }
 
         protected override void OnPaint(PaintEventArgs e) {
-            //      base.OnPaint(e);
             var state = enStates.Standard;
             if (!GenericControl.AllEnabled(Parent)) { state = enStates.Standard_Disabled; }
             Rectangle r = new(0, 0, Width, Height);
             e.Graphics.Clear(BackColor);
+
             switch (_GroupBoxStyle) {
                 case enGroupBoxStyle.RibbonBar:
                     Skin.Draw_Border(e.Graphics, enDesign.RibbonBar_Frame, state, r);
@@ -154,9 +106,7 @@ namespace BlueControls.Controls {
             if (DesignMode) { ChildControls_RibbonBar(); }
         }
 
-        protected override void OnPaintBackground(PaintEventArgs pevent) {
-            // base.OnPaintBackground(pevent);
-        }
+        protected override void OnPaintBackground(PaintEventArgs pevent) { }
 
         protected override void OnParentChanged(System.EventArgs e) {
             base.OnParentChanged(e);
@@ -166,9 +116,9 @@ namespace BlueControls.Controls {
 
         private void ChildControls_RibbonBar() {
             if (_GroupBoxStyle != enGroupBoxStyle.RibbonBar) { return; }
-            //if (Parent == null) { return; }
             if (Width < 10 || Height < 10) { return; }
             if (Controls.Count == 0) { return; }
+
             foreach (Control thisControl in Controls) {
                 switch (thisControl) {
                     case Caption Caption:

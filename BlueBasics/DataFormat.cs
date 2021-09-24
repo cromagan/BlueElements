@@ -86,8 +86,18 @@ namespace BlueBasics {
             var CompareKey_S_NOK = Constants.SecondSortChar + "A";
             switch (format) {
                 case enDataFormat.Ganzzahl:
-                    if (string.IsNullOrEmpty(isValue)) { return CompareKey_S_NOK + "0000000000"; }
-                    return int.TryParse(isValue, out var w) ? CompareKey_S_OK + w.ToString(Constants.Format_Integer10) : CompareKey_S_NOK + isValue;
+                    if (string.IsNullOrEmpty(isValue)) { return CompareKey_S_NOK + "A0000000000"; }
+                    if (int.TryParse(isValue, out var w)) {
+
+                        if (w >= 0) {
+                            return CompareKey_S_OK + "A" + w.ToString(Constants.Format_Integer10);
+                        } else {
+                            return CompareKey_S_OK + w.ToString(Constants.Format_Integer10);
+                        }
+
+                    } else {
+                        return CompareKey_S_NOK + isValue;
+                    }
 
                 case enDataFormat.Bit:
                 case enDataFormat.FarbeInteger:
@@ -128,11 +138,12 @@ namespace BlueBasics {
                     return Constants.SecondSortChar + isValue;
 
                 case enDataFormat.Gleitkommazahl:
-                    if (string.IsNullOrEmpty(isValue)) { return "0000000000,000"; }
+                    if (string.IsNullOrEmpty(isValue)) { return "A0000000000,000"; }
                     if (double.TryParse(isValue, out var dw)) {
                         var t = dw.ToString(Constants.Format_Float10_3);
                         if (!t.Contains(",")) { t += ",000"; };
-                        while (t.Length < 14) { t += "0"; }
+                        if (dw >= 0) { t = "A" + t; }
+                        while (t.Length < 15) { t += "0"; }
                         return CompareKey_S_OK + t;
                     } else {
                         return CompareKey_S_NOK + isValue;
