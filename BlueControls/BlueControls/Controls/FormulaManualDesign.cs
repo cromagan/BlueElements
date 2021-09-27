@@ -35,8 +35,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.Controls {
 
-    [Designer(typeof(BasicDesigner))]
-    public partial class FormulaManualDesign : BlueControls.Controls.GroupBox {
+    public partial class FormulaManualDesign : System.Windows.Forms.Panel {
 
         #region Fields
 

@@ -52,22 +52,9 @@ namespace BlueScript {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
-            var allFi = new List<FilterItem>();
+            var allFi = Method_Filter.Filter(attvar.Attributes, 3);
 
-            for (var z = 3; z < attvar.Attributes.Count; z++) {
-                if (!attvar.Attributes[z].ObjectType("rowfilter")) { return new strDoItFeedback("Kein Filter übergeben."); }
-
-                var fi = new BlueDatabase.FilterItem(attvar.Attributes[z].ObjectData());
-
-                if (!fi.IsOk()) { return new strDoItFeedback("Filter fehlerhaft"); }
-
-                if (z > 3) {
-                    if (fi.Database != allFi[0].Database) { return new strDoItFeedback("Filter über verschiedene Datenbanken wird nicht unterstützt."); }
-                }
-                allFi.Add(fi);
-            }
-
-            if (allFi.Count < 1) { return new strDoItFeedback("Fehler im Filter"); }
+            if (allFi is null) { return new strDoItFeedback("Fehler im Filter"); }
 
             var returncolumn = allFi[0].Database.Column.Exists(attvar.Attributes[0].ValueString);
             if (returncolumn == null) { return new strDoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[4].ValueString); }

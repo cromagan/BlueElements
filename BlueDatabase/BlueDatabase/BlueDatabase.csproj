@@ -66,6 +66,8 @@
   <ItemGroup>
     <Compile Include="AdditionalScriptComands\MethodDatabase.cs" />
     <Compile Include="AdditionalScriptComands\Method_AddRow.cs" />
+    <Compile Include="AdditionalScriptComands\Method_CellSetFilter.cs" />
+    <Compile Include="AdditionalScriptComands\Method_Row.cs" />
     <Compile Include="AdditionalScriptComands\Method_MatchColumnFormat.cs" />
     <Compile Include="AdditionalScriptComands\Method_SetLink.cs" />
     <Compile Include="AdditionalScriptComands\Method_LookupFilter.cs" />

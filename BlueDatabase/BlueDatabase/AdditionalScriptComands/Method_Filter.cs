@@ -46,6 +46,25 @@ namespace BlueScript {
 
         #region Methods
 
+        public static List<FilterItem> Filter(List<Variable> arrtibutes, int ab) {
+            var allFi = new List<FilterItem>();
+
+            for (var z = ab; z < arrtibutes.Count; z++) {
+                if (!arrtibutes[z].ObjectType("rowfilter")) { return null; } // new strDoItFeedback("Kein Filter übergeben.");
+
+                var fi = new BlueDatabase.FilterItem(arrtibutes[z].ObjectData());
+
+                if (!fi.IsOk()) { return null; }// new strDoItFeedback("Filter fehlerhaft"); }
+
+                if (z > ab) {
+                    if (fi.Database != allFi[0].Database) { return null; }// new strDoItFeedback("Filter über verschiedene Datenbanken wird nicht unterstützt."); }
+                }
+                allFi.Add(fi);
+            }
+
+            return allFi.Count < 1 ? null : allFi;
+        }
+
         public override List<string> Comand(Script s) => new() { "filter" };
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
