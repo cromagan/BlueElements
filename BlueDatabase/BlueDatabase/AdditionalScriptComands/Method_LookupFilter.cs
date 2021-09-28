@@ -52,7 +52,7 @@ namespace BlueScript {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
-            var allFi = Method_Filter.Filter(attvar.Attributes, 3);
+            var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 3);
 
             if (allFi is null) { return new strDoItFeedback("Fehler im Filter"); }
 

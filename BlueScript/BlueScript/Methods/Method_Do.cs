@@ -27,7 +27,7 @@ namespace BlueScript {
         #region Properties
 
         public override List<enVariableDataType> Args => new() { };
-        public override string Description => "Führt den Codeblock dauerhaft aus, bis der Befehl Break empfangen wurde.";
+        public override string Description => "Führt den Codeblock dauerhaft aus, bis der Befehl Break empfangen wurde. Variablen, die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.";
         public override bool EndlessArgs => false;
         public override string EndSequence => string.Empty;
         public override bool GetCodeBlockAfter => true;
@@ -52,8 +52,16 @@ namespace BlueScript {
                 du++;
                 if (du > 10000) { return new strDoItFeedback("Do-Schleife nach 10.000 Durchläufen abgebrochen."); }
 
+
+                var tmpv = new List<Variable>();
+                tmpv.AddRange(s.Variablen);
+
                 (var err, var _) = s.Parse(infos.CodeBlockAfterText, false);
                 if (!string.IsNullOrEmpty(err)) { return new strDoItFeedback(err); }
+
+
+                s.Variablen.Clear();
+                s.Variablen.AddRange(tmpv);
 
                 if (s.BreakFired) { break; }
             } while (true);

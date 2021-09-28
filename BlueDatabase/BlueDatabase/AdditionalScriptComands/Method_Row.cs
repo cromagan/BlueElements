@@ -46,22 +46,35 @@ namespace BlueScript {
 
         #region Methods
 
+        public static RowItem ObjectToRow(Variable attribute) {
+            if (!attribute.ObjectType("row")) { return null; }
+
+            var d = attribute.ObjectData();
+            if (d.ToUpper() == "NULL") { return null; }
+
+            var d2 = d.SplitAndCutBy("|");
+
+            var db = Database.GetByFilename(d2[0], true, false);
+
+            return db == null ? null : db.Row.SearchByKey(int.Parse(d2[1]));
+        }
+
+        public static strDoItFeedback RowToObject(RowItem row) => row == null
+                        ? new strDoItFeedback("NULL", "row")
+                : new strDoItFeedback(row.Database.Filename + "|" + row.Key.ToString(), "row");
+
         public override List<string> Comand(Script s) => new() { "row" };
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
-            var allFi = Method_Filter.Filter(attvar.Attributes, 0);
+            var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0);
             if (allFi is null) { return new strDoItFeedback("Fehler im Filter"); }
 
             var r = RowCollection.MatchesTo(allFi);
 
-            if (r == null || r.Count == 0 || r.Count > 1) {
-                return new strDoItFeedback("NULL", "row");
-            }
-
-            return new strDoItFeedback(allFi[0].Database.Filename + "|" + r[0].Key.ToString(), "row");
+            return r == null || r.Count == 0 || r.Count > 1 ? RowToObject(null) : RowToObject(r[0]);
         }
 
         #endregion

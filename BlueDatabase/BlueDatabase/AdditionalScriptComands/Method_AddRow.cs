@@ -28,7 +28,7 @@ namespace BlueScript {
 
         public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.String, enVariableDataType.Bool };
 
-        public override string Description => "Lädt eine andere Datenbank (Database) und erstellt eine neue Zeile, wenn diese nicht existiert. Bei Always wird immer eine neue Zeile erstellt. Gibt zurück, ob eine neue Zeile erstellt wurde.";
+        public override string Description => "Lädt eine andere Datenbank (Database) und erstellt eine neue Zeile, wenn diese nicht existiert. Bei Always wird immer eine neue Zeile erstellt. Gibt die neu erstellte oder bereits existierende Zeile zurück.";
 
         public override bool EndlessArgs => false;
 
@@ -36,7 +36,7 @@ namespace BlueScript {
 
         public override bool GetCodeBlockAfter => false;
 
-        public override enVariableDataType Returns => enVariableDataType.Bool;
+        public override enVariableDataType Returns => enVariableDataType.Object;
 
         public override string StartSequence => "(";
 
@@ -59,11 +59,11 @@ namespace BlueScript {
 
             var r = db.Row[attvar.Attributes[1].ValueString];
 
-            if (r != null && !attvar.Attributes[2].ValueBool) { return strDoItFeedback.Falsch(); }
+            if (r != null && !attvar.Attributes[2].ValueBool) { return Method_Row.RowToObject(r); }
 
             r = db.Row.Add(attvar.Attributes[1].ValueString);
 
-            return r == null ? strDoItFeedback.Falsch() : strDoItFeedback.Wahr();
+            return Method_Row.RowToObject(r);
         }
 
         #endregion

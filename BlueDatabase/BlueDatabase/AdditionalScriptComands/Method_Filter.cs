@@ -46,13 +46,13 @@ namespace BlueScript {
 
         #region Methods
 
-        public static List<FilterItem> Filter(List<Variable> arrtibutes, int ab) {
+        public static List<FilterItem> ObjectToFilter(List<Variable> attributes, int ab) {
             var allFi = new List<FilterItem>();
 
-            for (var z = ab; z < arrtibutes.Count; z++) {
-                if (!arrtibutes[z].ObjectType("rowfilter")) { return null; } // new strDoItFeedback("Kein Filter übergeben.");
+            for (var z = ab; z < attributes.Count; z++) {
+                if (!attributes[z].ObjectType("rowfilter")) { return null; } // new strDoItFeedback("Kein Filter übergeben.");
 
-                var fi = new BlueDatabase.FilterItem(arrtibutes[z].ObjectData());
+                var fi = new BlueDatabase.FilterItem(attributes[z].ObjectData());
 
                 if (!fi.IsOk()) { return null; }// new strDoItFeedback("Filter fehlerhaft"); }
 
