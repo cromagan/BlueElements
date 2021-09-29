@@ -68,6 +68,7 @@
     <Compile Include="AdditionalScriptComands\Method_AddRow.cs" />
     <Compile Include="AdditionalScriptComands\Method_CellSetRow.cs" />
     <Compile Include="AdditionalScriptComands\Method_CellSetFilter.cs" />
+    <Compile Include="AdditionalScriptComands\Method_RowIsNull.cs" />
     <Compile Include="AdditionalScriptComands\Method_Row.cs" />
     <Compile Include="AdditionalScriptComands\Method_MatchColumnFormat.cs" />
     <Compile Include="AdditionalScriptComands\Method_SetLink.cs" />

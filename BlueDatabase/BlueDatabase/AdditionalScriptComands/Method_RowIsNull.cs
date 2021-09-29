@@ -15,34 +15,48 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics;
+using BlueDatabase;
 using Skript.Enums;
 using System.Collections.Generic;
 
 namespace BlueScript {
 
-    internal class Method_Split : Method {
+    public class Method_RowIsNull : MethodDatabase {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.String };
-        public override string Description => "Wandelt einen Text in eine Liste um.\r\nEs trennt den Text dabei mitteles dem angegebenen Trennzeichen.\r\nEs wird dabei immer eine Liste mit mindestens einen Eintrag erzeugt,\r\ndieser kann aber leer sein.";
+        public override List<enVariableDataType> Args => new() { enVariableDataType.Object };
+
+        public override string Description => "Prüft, ob die übergebene Zeile NULL ist.";
+
         public override bool EndlessArgs => false;
+
         public override string EndSequence => ")";
+
         public override bool GetCodeBlockAfter => false;
-        public override enVariableDataType Returns => enVariableDataType.List;
+
+        public override enVariableDataType Returns => enVariableDataType.Bool;
+
         public override string StartSequence => "(";
-        public override string Syntax => "Split(String, Trennzeichen)";
+
+        public override string Syntax => "RowIsNull(Row)";
 
         #endregion
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "split" };
+        public override List<string> Comand(Script s) => new() { "rowisnull" };
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
-            return new strDoItFeedback(attvar.Attributes[0].ValueString.Replace(attvar.Attributes[1].ValueString, "\r") + "\r", enVariableDataType.List);
+
+            if (!attvar.Attributes[0].ObjectType("row")) { return new strDoItFeedback("Kein Zeilenobjekt übergeben."); }
+
+            var r = Method_Row.ObjectToRow(attvar.Attributes[0]);
+
+            return r == null ? strDoItFeedback.Wahr() : strDoItFeedback.Falsch();
         }
 
         #endregion

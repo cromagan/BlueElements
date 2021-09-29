@@ -77,7 +77,7 @@ namespace BlueScript {
             #region Spalte ermitteln
 
             var filterColumn = db.Column.Exists(attvar.Attributes[1].ValueString);
-            if (filterColumn == null) { new strDoItFeedback("Spalte in Ziel-Datenbank nicht gefunden"); }
+            if (filterColumn == null) { return new strDoItFeedback("Spalte in Ziel-Datenbank nicht gefunden"); }
 
             #endregion
 

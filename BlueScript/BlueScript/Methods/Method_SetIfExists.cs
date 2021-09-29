@@ -25,13 +25,13 @@ namespace BlueScript {
         #region Properties
 
         public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List_String_Numeral_or_Bool, enVariableDataType.Any };
-        public override string Description => "Diese Routine setzt den ersten Wert, der keinen Fehler verursacht in die erste Variable. Dabei müssen die Datentypen übereinstimmen. Falls einer der Werte ein Variable ist, die nicht existiert, wird diese einfach übergangen.";
+        public override string Description => "Diese Routine setzt den ersten Wert, der keinen Fehler verursacht in die erste Variable.\r\nDabei müssen die Datentypen übereinstimmen.\r\nFalls einer der Werte eine Variable ist, die nicht existiert, wird diese einfach übergangen.";
         public override bool EndlessArgs => true;
         public override string EndSequence => ");";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.Null;
         public override string StartSequence => "(";
-        public override string Syntax => "SetIfExists(Variable, Werte, ...)";
+        public override string Syntax => "SetIfExists(Variable, Werte, ...);";
 
         #endregion
 

@@ -28,7 +28,7 @@ namespace BlueScript {
 
         public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.String, enVariableDataType.Bool };
 
-        public override string Description => "Lädt eine andere Datenbank (Database) und erstellt eine neue Zeile, wenn diese nicht existiert. Bei Always wird immer eine neue Zeile erstellt. Gibt die neu erstellte oder bereits existierende Zeile zurück.";
+        public override string Description => "Lädt eine andere Datenbank (Database) und erstellt eine neue Zeile, wenn diese nicht existiert.\r\nBei Always wird immer eine neue Zeile erstellt.\r\nGibt die neu erstellte oder bereits existierende Zeile zurück.";
 
         public override bool EndlessArgs => false;
 

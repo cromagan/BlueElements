@@ -198,6 +198,10 @@ namespace BlueScript {
             v.Readonly = false; // sonst werden keine Daten geschrieben
             v.Type = enVariableDataType.List;
             v.ValueListString = value;
+
+            //TODO: 29.09.2021 bei Zeiten wieder entfernen
+            if (v.ValueListString.Count != value.Count) { Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Fehler, "Convertierung fehlgechlagen!"); }
+
             v.Readonly = true;
         }
 
@@ -390,8 +394,8 @@ namespace BlueScript {
                 if (!_ValueString.EndsWith("\r")) {
                     Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Fehler, "Objekttypfehler:" + _ValueString);
                 }
-
                 var x = _ValueString.Substring(0, _ValueString.Length - 1);
+                if (string.IsNullOrEmpty((x))) { return new List<string>() { string.Empty }; }
                 return x.SplitByCRToList();
             }
             set {
