@@ -41,6 +41,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabElementEigenschaften = new System.Windows.Forms.TabPage();
             this.tabSkript = new System.Windows.Forms.TabPage();
             this.scriptEditor = new BlueControls.ScriptEditor();
+            this.btnCopyID = new BlueControls.Controls.Button();
             this.Ribbon.SuspendLayout();
             this.tabPageControl.SuspendLayout();
             this.tabPageStart.SuspendLayout();
@@ -63,11 +64,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.Ribbon.Size = new System.Drawing.Size(1340, 110);
             // 
-            //  System.Windows.Forms.TabPageControl
-            // 
-            this.tabPageControl.Size = new System.Drawing.Size(1332, 81);
-            // 
-            //  System.Windows.Forms.TabPageStart
+            // tabPageStart
             // 
             this.tabPageStart.Controls.Add(this.grpExterneLayouts);
             this.tabPageStart.Controls.Add(this.grpLayoutSelection);
@@ -99,12 +96,12 @@ namespace BlueControls.BlueDatabaseDialogs
             // btnSpeichern
             // 
             this.btnSpeichern.Location = new System.Drawing.Point(136, 2);
-            this.btnSpeichern.Text = "Speichern unter";
             // 
             // grpLayoutSelection
             // 
             this.grpLayoutSelection.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpLayoutSelection.CausesValidation = false;
+            this.grpLayoutSelection.Controls.Add(this.btnCopyID);
             this.grpLayoutSelection.Controls.Add(this.btnLayoutUmbenennen);
             this.grpLayoutSelection.Controls.Add(this.btnLayoutLöschen);
             this.grpLayoutSelection.Controls.Add(this.btnLayoutHinzu);
@@ -112,7 +109,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpLayoutSelection.Controls.Add(this.cbxLayout);
             this.grpLayoutSelection.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpLayoutSelection.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
-            this.grpLayoutSelection.Location = new System.Drawing.Point(504, 0);
+            this.grpLayoutSelection.Location = new System.Drawing.Point(496, 0);
             this.grpLayoutSelection.Name = "grpLayoutSelection";
             this.grpLayoutSelection.Size = new System.Drawing.Size(232, 81);
             this.grpLayoutSelection.TabIndex = 2;
@@ -121,6 +118,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnLayoutUmbenennen
             // 
+            this.btnLayoutUmbenennen.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnLayoutUmbenennen.ImageCode = "Stift|16";
             this.btnLayoutUmbenennen.Location = new System.Drawing.Point(120, 46);
             this.btnLayoutUmbenennen.Name = "btnLayoutUmbenennen";
@@ -130,6 +128,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnLayoutLöschen
             // 
+            this.btnLayoutLöschen.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnLayoutLöschen.ImageCode = "MinusZeichen|16";
             this.btnLayoutLöschen.Location = new System.Drawing.Point(72, 46);
             this.btnLayoutLöschen.Name = "btnLayoutLöschen";
@@ -139,6 +138,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnLayoutHinzu
             // 
+            this.btnLayoutHinzu.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnLayoutHinzu.ImageCode = "PlusZeichen|16";
             this.btnLayoutHinzu.Location = new System.Drawing.Point(40, 46);
             this.btnLayoutHinzu.Name = "btnLayoutHinzu";
@@ -183,7 +183,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpExterneLayouts.Controls.Add(this.btnLayoutOeffnen);
             this.grpExterneLayouts.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpExterneLayouts.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
-            this.grpExterneLayouts.Location = new System.Drawing.Point(736, 0);
+            this.grpExterneLayouts.Location = new System.Drawing.Point(728, 0);
             this.grpExterneLayouts.Name = "grpExterneLayouts";
             this.grpExterneLayouts.Size = new System.Drawing.Size(336, 81);
             this.grpExterneLayouts.TabIndex = 1;
@@ -192,6 +192,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnTextEditor
             // 
+            this.btnTextEditor.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnTextEditor.ImageCode = "Textdatei";
             this.btnTextEditor.Location = new System.Drawing.Point(8, 2);
             this.btnTextEditor.Name = "btnTextEditor";
@@ -203,6 +204,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnLayoutVerzeichnis
             // 
+            this.btnLayoutVerzeichnis.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnLayoutVerzeichnis.ImageCode = "Ordner|16";
             this.btnLayoutVerzeichnis.Location = new System.Drawing.Point(96, 24);
             this.btnLayoutVerzeichnis.Name = "btnLayoutVerzeichnis";
@@ -213,6 +215,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnLayoutOeffnen
             // 
+            this.btnLayoutOeffnen.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnLayoutOeffnen.ImageCode = "Anwendung|16";
             this.btnLayoutOeffnen.Location = new System.Drawing.Point(96, 2);
             this.btnLayoutOeffnen.Name = "btnLayoutOeffnen";
@@ -263,6 +266,17 @@ namespace BlueControls.BlueDatabaseDialogs
             this.scriptEditor.TabIndex = 1;
             this.scriptEditor.TabStop = false;
             // 
+            // btnCopyID
+            // 
+            this.btnCopyID.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnCopyID.ImageCode = "Clipboard|16";
+            this.btnCopyID.Location = new System.Drawing.Point(176, 2);
+            this.btnCopyID.Name = "btnCopyID";
+            this.btnCopyID.Size = new System.Drawing.Size(48, 22);
+            this.btnCopyID.TabIndex = 4;
+            this.btnCopyID.Text = "ID";
+            this.btnCopyID.Click += new System.EventHandler(this.btnCopyID_Click);
+            // 
             // LayoutDesigner
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -287,6 +301,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabRightSide.ResumeLayout(false);
             this.tabSkript.ResumeLayout(false);
             this.ResumeLayout(false);
+
         }
         internal GroupBox grpLayoutSelection;
         internal Button btnLayoutUmbenennen;
@@ -303,5 +318,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private  System.Windows.Forms.TabPage tabSkript;
         private TabControl tabRightSide;
         private ScriptEditor scriptEditor;
+        internal Button btnCopyID;
     }
 }

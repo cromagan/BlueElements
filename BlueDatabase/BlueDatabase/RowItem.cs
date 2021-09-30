@@ -278,7 +278,7 @@ namespace BlueDatabase {
             GC.SuppressFinalize(this);
         }
 
-        public (bool didSuccesfullyCheck, string error, Script script) DoAutomatic(bool onlyTest, string startroutine) => DoAutomatic(false, false, onlyTest, startroutine);
+        public (bool checkPerformed, string error, Script script) DoAutomatic(bool onlyTest, string startroutine) => DoAutomatic(false, false, onlyTest, startroutine);
 
         /// <summary>
         /// Führt Regeln aus, löst Ereignisses, setzt SysCorrect und auch die initalwerte der Zellen.
@@ -287,13 +287,13 @@ namespace BlueDatabase {
         /// <param name="doFemdZelleInvalidate">bei verlinkten Zellen wird der verlinkung geprüft und erneuert.</param>
         /// <param name="fullCheck">Runden, Großschreibung, etc. wird ebenfalls durchgefphrt</param>
         /// <param name="tryforsceonds"></param>
-        /// <returns></returns>
-        public (bool didSuccesfullyCheck, string error, Script script) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, float tryforsceonds, string startroutine) {
+        /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
+        public (bool checkPerformed, string error, Script script) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, float tryforsceonds, string startroutine) {
             if (Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
             var t = DateTime.Now;
             do {
                 var erg = DoAutomatic(doFemdZelleInvalidate, fullCheck, false, startroutine);
-                if (erg.didSuccesfullyCheck) { return erg; }
+                if (erg.checkPerformed) { return erg; }
                 if (DateTime.Now.Subtract(t).TotalSeconds > tryforsceonds) { return erg; }
             } while (true);
         }
@@ -304,7 +304,8 @@ namespace BlueDatabase {
         /// </summary>
         /// <param name="doFemdZelleInvalidate">bei verlinkten Zellen wird der verlinkung geprüft und erneuert.</param>
         /// <param name="fullCheck">Runden, Großschreibung, etc. wird ebenfalls durchgeführt</param>
-        public (bool didSuccesfullyCheck, string error, Script skript) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, bool onlyTest, string startroutine) {
+        /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
+        public (bool checkPerformed, string error, Script skript) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, bool onlyTest, string startroutine) {
             if (Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
 
             var feh = Database.ErrorReason(enErrorReason.EditAcut);
@@ -314,8 +315,11 @@ namespace BlueDatabase {
             var script = DoRules(onlyTest, startroutine);
             if (onlyTest) { return (true, string.Empty, script); }
 
-            /// didSuccesfullyCheck geht von Dateisystemfehlern aus
-            if (!string.IsNullOrEmpty(script.Error)) { return (true, "<b>Das Skript ist fehlerhaft:</b>\r\n" + "Zeile: " + script.Line.ToString() + "\r\n" + script.Error + "\r\n" + script.ErrorCode, script); }
+            /// checkPerformed geht von Dateisystemfehlern aus
+            if (!string.IsNullOrEmpty(script.Error)) {
+                Database.OnScriptError(new RowEventArgs(this));
+                return (true, "<b>Das Skript ist fehlerhaft:</b>\r\n" + "Zeile: " + script.Line.ToString() + "\r\n" + script.Error + "\r\n" + script.ErrorCode, script);
+            }
 
             // Dann die Abschließenden Korrekturen vornehmen
             foreach (var ThisColum in Database.Column) {

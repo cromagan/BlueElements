@@ -31,8 +31,6 @@ namespace BlueControls.ItemCollection {
 
         #endregion
 
-        //private readonly enDataFormat _Format = enDataFormat.Text;
-
         #region Constructors
 
         public TextListItem(string readableText, string internalname, QuickImage symbol, bool isCaption, bool enabled, string userDefCompareKey) : base(internalname) {

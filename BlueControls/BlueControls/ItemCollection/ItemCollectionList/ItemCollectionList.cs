@@ -316,8 +316,6 @@ namespace BlueControls.ItemCollection {
             return i;
         }
 
-        public RowFormulaListItem Add(RowItem row) => Add(row, string.Empty, string.Empty);
-
         public RowFormulaListItem Add(RowItem row, string layoutID) => Add(row, layoutID, string.Empty);
 
         public RowFormulaListItem Add(RowItem row, string layoutID, string userDefCompareKey) {
@@ -495,6 +493,14 @@ namespace BlueControls.ItemCollection {
             }
             foreach (var thisstring in Values) {
                 Add(thisstring, ColumnStyle, Style, bildTextverhalten); // If Item(thisstring) Is Nothing Then Add(New CellLikeItem(thisstring, ColumnStyle))
+            }
+        }
+
+        public void AddRange(List<RowItem> list, string layoutID) {
+            if (list == null || list.Count == 0) { return; }
+
+            foreach (var thisRow in list) {
+                Add(thisRow, layoutID);
             }
         }
 

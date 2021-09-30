@@ -93,6 +93,12 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
         }
 
+        private void btnCopyID_Click(object sender, System.EventArgs e) {
+            SaveCurrentLayout();
+            Generic.CopytoClipboard(Pad.Item.ID);
+            Notification.Show("ID kopiert.", enImageCode.Clipboard);
+        }
+
         private void btnLayoutHinzu_Click(object sender, System.EventArgs e) {
             SaveCurrentLayout();
             var ex = InputBox.Show("Geben sie den Namen<br>des neuen Layouts ein:", "", enDataFormat.Text);
@@ -179,6 +185,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             grpDateiSystem.Enabled = true;
             btnLayoutLöschen.Enabled = true;
             btnLayoutUmbenennen.Enabled = true;
+            btnCopyID.Enabled = true;
             grpDrucken.Enabled = true;
             //} else {
             //    grpDrucken.Enabled = false;

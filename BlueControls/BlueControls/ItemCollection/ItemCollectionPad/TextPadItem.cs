@@ -66,7 +66,7 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        [Description("Text der angezeigt werden soll.<br>Alternativ kann ein Variablenname im Format &Name; angegeben werden.")]
+        [Description("Text der angezeigt werden soll.<br>Alternativ kann ein (oder mehrere)  Variablenname im Format ~Name~ angegeben werden.")]
         public string Interner_Text {
             get => _VariableText;
             set {

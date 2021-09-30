@@ -30,18 +30,22 @@ namespace BlueControls.ItemCollection {
         #region Fields
 
         private string _LayoutID;
+
         private RowItem _Row;
+
         private Bitmap _tmpBMP;
 
         #endregion
 
         #region Constructors
 
-        public RowFormulaListItem(RowItem row, string layoutID, string userDefCompareKey) : base(string.Empty) {
+        public RowFormulaListItem(RowItem row, string internalname, string layoutID, string userDefCompareKey) : base(internalname) {
             _Row = row;
             _LayoutID = layoutID;
             UserDefCompareKey = userDefCompareKey;
         }
+
+        public RowFormulaListItem(RowItem row, string layoutID, string userDefCompareKey) : this(row, string.Empty, layoutID, userDefCompareKey) { }
 
         #endregion
 
@@ -75,6 +79,8 @@ namespace BlueControls.ItemCollection {
         #endregion
 
         #region Methods
+
+        public override void CloneToNewCollection(ItemCollectionList newParent) => CloneToNewCollection(newParent, new RowFormulaListItem(_Row, Internal, _LayoutID, UserDefCompareKey));
 
         public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) => (int)(columnWidth * 0.8);
 

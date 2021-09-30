@@ -976,6 +976,12 @@ namespace BlueDatabase {
 
         public List<string> Contents() => Contents(null, null);
 
+        //public List<string> Contents(FilterItem fi, List<RowItem> pinned) {
+        //    var x = new FilterCollection(fi.Database);
+        //    x.Add(fi);
+        //    return Contents(x, pinned);
+        //}
+
         public List<string> Contents(FilterCollection filter, List<RowItem> pinned) {
             List<string> list = new();
             foreach (var ThisRowItem in Database.Row) {

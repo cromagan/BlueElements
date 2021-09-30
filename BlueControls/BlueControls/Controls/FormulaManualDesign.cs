@@ -121,6 +121,7 @@ namespace BlueControls.Controls {
 
                 foreach (var thisFlex in Controls) {
                     if (thisFlex is FlexiControlForCell flx && !flx.IsDisposed) {
+                        flx.Database = _Database;
                         flx.RowKey = _ShowingRowKey;
                         flx.CheckEnabledState();
                     }
