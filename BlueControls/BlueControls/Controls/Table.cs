@@ -977,7 +977,7 @@ namespace BlueControls.Controls {
                 if (Convert.ToBoolean(state & enStates.Standard_Disabled)) { CursorPos_Reset(); }
                 var displayRectangleWOSlider = DisplayRectangleWithoutSlider();
                 // Haupt-Aufbau-Routine ------------------------------------
-                gr.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
+                //gr.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
                 if (!ComputeAllColumnPositions()) {
                     DrawWaitScreen(gr);
                     return;
@@ -2425,7 +2425,7 @@ namespace BlueControls.Controls {
                             Button.DrawButton(this, gr, enDesign.Button_CheckBox, enStates.Standard, null, enAlignment.Horizontal_Vertical_Center, false, null, string.Empty, CurrentRow.CaptionPos, false);
                             gr.DrawImage(QuickImage.Get("Pfeil_Rechts_Scrollbar|14|||||0").BMP, 5, DrawY(CurrentRow) - RowCaptionFontY + 6);
                         }
-                        gr.DrawString(CurrentRow.Chapter, _Chapter_Font.Font(), _Chapter_Font.Brush_Color_Main, 23, DrawY(CurrentRow) - RowCaptionFontY);
+                        _Chapter_Font.DrawString(gr, CurrentRow.Chapter, 23, DrawY(CurrentRow) - RowCaptionFontY);
                         gr.DrawLine(Skin.Pen_LinieDick, 0, DrawY(CurrentRow), displayRectangleWOSlider.Width, DrawY(CurrentRow));
                     }
                 }
@@ -2498,12 +2498,12 @@ namespace BlueControls.Controls {
                 var s = _Column_Font.MeasureString(TrichterText);
                 for (var x = -1; x < 2; x++) {
                     for (var y = -1; y < 2; y++) {
-                        GR.DrawString(TrichterText, _Column_Font.Font(), Brushes.Red,
+                        BlueFont.DrawString(GR, TrichterText, _Column_Font.Font(), Brushes.Red,
                                            ViewItem._TMP_AutoFilterLocation.Left + ((_AutoFilterSize - s.Width) / 2) + x,
                                            ViewItem._TMP_AutoFilterLocation.Top + ((_AutoFilterSize - s.Height) / 2) + y);
                     }
                 }
-                GR.DrawString(TrichterText, _Column_Font.Font(), Brushes.White,
+                BlueFont.DrawString(GR, TrichterText, _Column_Font.Font(), Brushes.White,
                                     ViewItem._TMP_AutoFilterLocation.Left + ((_AutoFilterSize - s.Width) / 2),
                                     ViewItem._TMP_AutoFilterLocation.Top + ((_AutoFilterSize - s.Height) / 2));
             }
@@ -2518,10 +2518,10 @@ namespace BlueControls.Controls {
             if (_ShowNumber) {
                 for (var x = -1; x < 2; x++) {
                     for (var y = -1; y < 2; y++) {
-                        GR.DrawString("#" + lfdNo.ToString(), _Column_Font.Font(), Brushes.Black, (int)ViewItem.OrderTMP_Spalte_X1 + x, ViewItem._TMP_AutoFilterLocation.Top + y);
+                        BlueFont.DrawString(GR, "#" + lfdNo.ToString(), _Column_Font.Font(), Brushes.Black, (int)ViewItem.OrderTMP_Spalte_X1 + x, ViewItem._TMP_AutoFilterLocation.Top + y);
                     }
                 }
-                GR.DrawString("#" + lfdNo.ToString(), _Column_Font.Font(), Brushes.White, (int)ViewItem.OrderTMP_Spalte_X1, ViewItem._TMP_AutoFilterLocation.Top);
+                BlueFont.DrawString(GR, "#" + lfdNo.ToString(), _Column_Font.Font(), Brushes.White, (int)ViewItem.OrderTMP_Spalte_X1, ViewItem._TMP_AutoFilterLocation.Top);
             }
 
             #endregion LaufendeNummer
@@ -2537,15 +2537,15 @@ namespace BlueControls.Controls {
                 GR.DrawImageInRectAspectRatio(ViewItem.Column.TMP_CaptionBitmap, (int)ViewItem.OrderTMP_Spalte_X1 + 2, (int)(pos.Y + FS.Height), Column_DrawWidth(ViewItem, displayRectangleWOSlider) - 4, HeadSize() - (int)(pos.Y + FS.Height) - 6 - 18);
                 // Dann der Text
                 GR.TranslateTransform(pos.X, pos.Y);
-                GR.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
-                GR.DrawString(tx, _Column_Font.Font(), new SolidBrush(ViewItem.Column.ForeColor), 0, 0);
+                //GR.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
+                BlueFont.DrawString(GR, tx, _Column_Font.Font(), new SolidBrush(ViewItem.Column.ForeColor), 0, 0);
                 GR.TranslateTransform(-pos.X, -pos.Y);
             } else {
                 Point pos = new((int)ViewItem.OrderTMP_Spalte_X1 + (int)((Column_DrawWidth(ViewItem, displayRectangleWOSlider) - FS.Height) / 2.0), HeadSize() - 4 - _AutoFilterSize);
                 GR.TranslateTransform(pos.X, pos.Y);
                 GR.RotateTransform(-90);
-                GR.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
-                GR.DrawString(tx, _Column_Font.Font(), new SolidBrush(ViewItem.Column.ForeColor), 0, 0);
+                //GR.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
+                BlueFont.DrawString(GR, tx, _Column_Font.Font(), new SolidBrush(ViewItem.Column.ForeColor), 0, 0);
                 GR.TranslateTransform(-pos.X, -pos.Y);
                 GR.ResetTransform();
             }
@@ -2649,7 +2649,7 @@ namespace BlueControls.Controls {
                     GR.DrawImage(QuickImage.Get("Warnung|16||||||120||50").BMP, new Point(r.Right - 19, (int)(r.Top + ((r.Height - 16) / 2.0))));
                 }
                 if (!string.IsNullOrEmpty(Row.Chapter)) {
-                    GR.DrawString(Row.Chapter, _Chapter_Font.Font(), _Chapter_Font.Brush_Color_Main, 0, DrawY(Row) - RowCaptionFontY);
+                    BlueFont.DrawString(GR, Row.Chapter, _Chapter_Font.Font(), _Chapter_Font.Brush_Color_Main, 0, DrawY(Row) - RowCaptionFontY);
                 }
             }
             Skin.Draw_Border(GR, enDesign.ListBox, vState, displayRectangleWOSlider);

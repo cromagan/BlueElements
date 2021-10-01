@@ -765,8 +765,7 @@ namespace BlueControls.ItemCollection {
         ///  BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
         /// </summary>
         /// <returns></returns>
-        internal (int BiggestItemX, int BiggestItemY, int HeightAdded, enOrientation SenkrechtAllowed) ItemData() // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
-        {
+        internal (int BiggestItemX, int BiggestItemY, int HeightAdded, enOrientation SenkrechtAllowed) ItemData() {
             var w = 16;
             var h = 0;
             var hall = 0;

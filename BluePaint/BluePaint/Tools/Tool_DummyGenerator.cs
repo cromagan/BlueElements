@@ -17,6 +17,7 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueControls;
 using BlueControls.Forms;
 using System.Drawing;
 
@@ -52,7 +53,7 @@ namespace BluePaint {
                 var fs = gr.MeasureString(TXT.Text, f);
                 gr.TranslateTransform((float)(newPic.Width / 2.0), (float)(newPic.Height / 2.0));
                 gr.RotateTransform(-90);
-                gr.DrawString(TXT.Text, f, new SolidBrush(Color.Black), new PointF((float)(-fs.Width / 2.0), (float)(-fs.Height / 2.0)));
+                BlueFont.DrawString(gr, TXT.Text, f, new SolidBrush(Color.Black), (float)(-fs.Width / 2.0), (float)(-fs.Height / 2.0));
             }
             OnOverridePic(newPic);
         }

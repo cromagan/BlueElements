@@ -151,10 +151,10 @@ namespace BlueControls {
             //if (!string.IsNullOrEmpty(textToDraw)) {
             //    for (var x = -1; x < 2; x++) {
             //        for (var y = -1; y < 2; y++) {
-            //            gr.DrawString(textToDraw, SimpleArial, Brushes.White, (float)tx + x, (float)ty + y - 16);
+            //            BlueFont.DrawString(GR,textToDraw, SimpleArial, Brushes.White, (float)tx + x, (float)ty + y - 16);
             //        }
             //    }
-            //    gr.DrawString(textToDraw, SimpleArial, Brushes.Black, (float)tx, (float)ty - 16);
+            //    BlueFont.DrawString(GR,textToDraw, SimpleArial, Brushes.Black, (float)tx, (float)ty - 16);
             //}
         }
 

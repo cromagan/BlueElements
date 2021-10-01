@@ -1134,9 +1134,9 @@ namespace BlueControls {
         /// <param name="deleteBack"></param>
         /// <param name="bFont"></param>
         public static void Draw_FormatedText(Graphics gr, string txt, QuickImage qi, enAlignment align, Rectangle fitInRect, System.Windows.Forms.Control Child, bool deleteBack, BlueFont bFont, bool translate) {
-            if (gr.TextRenderingHint != TextRenderingHint.ClearTypeGridFit) {
-                gr.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
-            }
+            //if (gr.TextRenderingHint != TextRenderingHint.AntiAliasGridFit) {
+            //    gr.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
+            //}
             //  GR.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit
             var pSize = SizeF.Empty;
             var tSize = SizeF.Empty;
@@ -1165,7 +1165,7 @@ namespace BlueControls {
             }
             try {
                 if (qi != null) { gr.DrawImage(qi.BMP, (int)(fitInRect.X + XP), (int)(fitInRect.Y + YP1)); }
-                if (!string.IsNullOrEmpty(txt)) { gr.DrawString(txt, bFont.Font(), bFont.Brush_Color_Main, fitInRect.X + pSize.Width + XP, fitInRect.Y + YP2); }
+                if (!string.IsNullOrEmpty(txt)) { bFont.DrawString(gr, txt, fitInRect.X + pSize.Width + XP, fitInRect.Y + YP2); }
             } catch (Exception) {
                 // es kommt selten vor, dass das Graphics-Objekt an anderer Stelle verwendet wird. Was immer das auch heiﬂen mag...
                 //Develop.DebugPrint(ex);

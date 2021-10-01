@@ -333,7 +333,7 @@ namespace BlueControls {
             var f = GR.MeasureString(DrawText, fn);
             var yPos = e == null ? 0 : e.Y > f.Height + 50 ? 0 : (int)(Height - f.Height - 5);
             GR.FillRectangle(bs, 0, yPos - 5, Width, f.Height + 10);
-            GR.DrawString(DrawText, fn, bf, 2, yPos + 2);
+            BlueFont.DrawString(GR, DrawText, fn, bf, 2, yPos + 2);
         }
 
         #endregion

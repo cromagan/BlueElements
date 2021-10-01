@@ -64,7 +64,16 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public override string QuickInfo => _Row == null ? string.Empty : _Row.CellFirstString().CreateHtmlCodes(true);
+        public override string QuickInfo {
+            get {
+                if (_Row == null) { return null; }
+
+                if (!string.IsNullOrEmpty(_Row.Database.ZeilenQuickInfo)) {
+                    return _Row.QuickInfo.CreateHtmlCodes(true);
+                }
+                return _Row.CellFirstString().CreateHtmlCodes(true);
+            }
+        }
 
         public RowItem Row {
             get => _Row;
@@ -82,9 +91,27 @@ namespace BlueControls.ItemCollection {
 
         public override void CloneToNewCollection(ItemCollectionList newParent) => CloneToNewCollection(newParent, new RowFormulaListItem(_Row, Internal, _LayoutID, UserDefCompareKey));
 
-        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) => (int)(columnWidth * 0.8);
+        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) {
+            if (_tmpBMP == null) { GeneratePic(); }
+            if (_tmpBMP == null) { return 200; }
 
-        protected override Size ComputeSizeUntouchedForListBox() => new(300, 300);
+            var sc = ((float)_tmpBMP.Height / _tmpBMP.Width);
+
+            if (sc > 1) { sc = 1; }
+
+            return (int)(sc * columnWidth);
+        }
+
+        protected override Size ComputeSizeUntouchedForListBox() {
+            if (_tmpBMP == null) { GeneratePic(); }
+            if (_tmpBMP == null) { return new Size(200, 200); }
+
+            var sc = ((float)_tmpBMP.Height / _tmpBMP.Width);
+
+            if (sc > 1) { sc = 1; }
+
+            return new Size(300, (int)(sc * 300));
+        }
 
         protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, bool Translate) {
             if (_tmpBMP == null) { GeneratePic(); }
@@ -123,6 +150,8 @@ namespace BlueControls.ItemCollection {
             _pad.ShowInPrintMode = true;
             _pad.Unselect();
             _pad.Item.DrawCreativePadToBitmap(_tmpBMP, enStates.Standard, zoomv, slidervalues.X, slidervalues.Y, null);
+
+            //_tmpBMP.Save(@"C:\test.png", System.Drawing.Imaging.ImageFormat.Png);
         }
 
         private void removePic() {

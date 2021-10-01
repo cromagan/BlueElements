@@ -285,14 +285,14 @@ namespace BlueControls.ItemCollection {
             GR.TranslateTransform((float)Mitte1.X, (float)Mitte1.Y);
             GR.RotateTransform(-TextWinkel);
             GR.FillRectangle(new SolidBrush(Color.White), new RectangleF((int)(-sz1.Width * 0.9 / 2), (int)(-sz1.Height * 0.8 / 2), (int)(sz1.Width * 0.9), (int)(sz1.Height * 0.8)));
-            GR.DrawString(AngezeigterText1(), f.Font(geszoom), f.Brush_Color_Main, new PointF((float)(-sz1.Width / 2.0), (float)(-sz1.Height / 2.0)));
+            f.DrawString(GR, AngezeigterText1(), (float)(-sz1.Width / 2.0), (float)(-sz1.Height / 2.0), (float)geszoom);
             GR.Restore(x);
             PointM Mitte2 = new(Mitte, (double)(sz2.Height / 2.1), TextWinkel - 90);
             x = GR.Save();
             GR.TranslateTransform((float)Mitte2.X, (float)Mitte2.Y);
             GR.RotateTransform(-TextWinkel);
             GR.FillRectangle(new SolidBrush(Color.White), new RectangleF((int)(-sz2.Width * 0.9 / 2), (int)(-sz2.Height * 0.8 / 2), (int)(sz2.Width * 0.9), (int)(sz2.Height * 0.8)));
-            GR.DrawString(Text_unten, f.Font(geszoom), f.Brush_Color_Main, new PointF((float)(-sz2.Width / 2.0), (float)(-sz2.Height / 2.0)));
+            f.DrawString(GR, Text_unten, (float)(-sz2.Width / 2.0), (float)(-sz2.Height / 2.0), (float)geszoom);
             GR.Restore(x);
         }
 

@@ -265,7 +265,7 @@ namespace BlueControls.ItemCollection {
             if (!ForPrinting) {
                 if (!string.IsNullOrEmpty(Platzhalter_für_Layout)) {
                     Font f = new("Arial", 8);
-                    GR.DrawString(Platzhalter_für_Layout, f, Brushes.Black, DCoordinates.Left, DCoordinates.Top);
+                    BlueFont.DrawString(GR, Platzhalter_für_Layout, f, Brushes.Black, DCoordinates.Left, DCoordinates.Top);
                 }
             }
             base.DrawExplicit(GR, DCoordinates, cZoom, shiftX, shiftY, vState, SizeOfParentControl, ForPrinting);

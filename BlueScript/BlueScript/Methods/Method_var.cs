@@ -49,7 +49,7 @@ namespace BlueScript {
             if (v != null) { return new strDoItFeedback("Variable " + bs[0] + " ist bereits vorhanden."); }
             s.Variablen.Add(new Variable(bs[0]));
 
-            return Script.BerechneVariable.DoitKomplett(infos.AttributText + ";", s, infos);
+            return s._berechneVariable.DoitKomplett(infos.AttributText + ";", s, infos);
         }
 
         #endregion

@@ -121,14 +121,31 @@ namespace BlueControls.ItemCollection {
 
         public override bool FilterMatch(string FilterText) => base.FilterMatch(FilterText) || Caption.ToUpper().Contains(FilterText.ToUpper()) || _ImageFilename != null && _ImageFilename.ToUpper().Contains(FilterText.ToUpper());
 
-        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) => style switch {
-            enBlueListBoxAppearance.FileSystem => 110 + (_captionlines * ConstMY),
-            _ => (int)(columnWidth * 0.8),
-        };
+        public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) {
+            if (style == enBlueListBoxAppearance.FileSystem) {
+                return 110 + (_captionlines * ConstMY);
+            }
+
+            if (_Bitmap == null) { return (int)(columnWidth*0.8); }
+
+            var sc = ((float)_Bitmap.Height / _Bitmap.Width);
+
+            if (sc > 1) { sc = 1; }
+
+            return (int)(sc * columnWidth);
+        }
 
         public bool ImageLoaded() => _Bitmap != null;
 
-        protected override Size ComputeSizeUntouchedForListBox() => new(300, 300);
+        protected override Size ComputeSizeUntouchedForListBox() {
+            if (_Bitmap == null) { return new Size(300, 300); }
+
+            var sc = ((float)_Bitmap.Height / _Bitmap.Width);
+
+            if (sc > 1) { sc = 1; }
+
+            return new Size(300, (int)(sc * 300));
+        }
 
         protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign itemdesign, enStates state, bool DrawBorderAndBack, bool Translate) {
             if (DrawBorderAndBack) { Skin.Draw_Back(GR, itemdesign, state, PositionModified, null, false); }
