@@ -56,12 +56,12 @@ namespace BlueControls {
         public enAlignment Ausrichtung;
 
         /// <summary>
-        /// Falls mit einer Skalierung gezeichnet wird, müssen die Angaben bereits skaleiert sein.
+        /// Falls mit einer Skalierung gezeichnet wird, müssen die Angaben bereits skaliert sein.
         /// </summary>
         public Rectangle DrawingArea;
 
         /// <summary>
-        /// Falls mit einer Skalierung gezeichnet wird, müssen die Angaben bereits skaleiert sein.
+        /// Falls mit einer Skalierung gezeichnet wird, müssen die Angaben bereits skaliert sein.
         /// </summary>
         public Point DrawingPos;
 
@@ -80,18 +80,16 @@ namespace BlueControls {
 
         #region Constructors
 
-        public ExtText(enDesign vDesign, enStates state) {
+        public ExtText(enDesign design, enStates state) {
             Initialize();
-            _Design = vDesign;
+            _Design = design;
             _State = state;
             _Row = null;
         }
 
-        public ExtText(PadStyles vDesign, RowItem SkinRow) {
-            Initialize();
-            _Design = (enDesign)vDesign;
-            _State = enStates.Standard;
-            _Row = SkinRow;
+        public ExtText(PadStyles design, RowItem skinRow) : this((enDesign)design, enStates.Standard) {
+            _Row = skinRow;
+
             if ((int)_Design < 10000 || _Row == null) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Fehler!");
             }
@@ -181,38 +179,31 @@ namespace BlueControls {
         ///     Wird kein Char gefunden, wird der logischste Char gewählt. (z.B. Nach ZeilenEnde = Letzzter Buchstabe der Zeile)
         /// </summary>
         /// <remarks></remarks>
-        public int Char_Search(double PixX, double PixY) {
+        public int Char_Search(double pixX, double pixY) {
             var cZ = -1;
             var XDi = double.MaxValue;
             var YDi = double.MaxValue;
             var XNr = -1;
             var YNr = -1;
-            // Passiert dann, wenn wäherend des Klickens der Text geändert wird, z.B. PLZ ->Ort
-            //  If Not CBool(_TextTyp And enTextTyp.Converted) Then HTML2Char()
-            //  Dim RLC As Integer = ReallyLastChar()
+
             do {
                 cZ++;
-                if (cZ > Chars.Count - 1) // Das Ende des Textes
-                {
-                    break;
-                }
+                if (cZ > Chars.Count - 1) { break; }// Das Ende des Textes
                 if (Chars[cZ].Char > 0 && Chars[cZ].Size.Width > 0) {
-                    var X = Convert.ToBoolean(PixX >= DrawingPos.X + Chars[cZ].Pos.X && PixX <= DrawingPos.X + Chars[cZ].Pos.X + Chars[cZ].Size.Width);
-                    var Y = Convert.ToBoolean(PixY >= DrawingPos.Y + Chars[cZ].Pos.Y && PixY <= DrawingPos.Y + Chars[cZ].Pos.Y + Chars[cZ].Size.Height);
-                    //If PixX >= Left + vChars(cZ).Pos.X AndAlso PixX <= Left + vChars(cZ).Pos.X + vChars(cZ).Size.Width Then X = True
-                    //If PixY >= Top + vChars(cZ).Pos.Y AndAlso PixY <= Top + vChars(cZ).Pos.Y + vChars(cZ).Size.Height Then Y = True
-                    if (X && Y) {
-                        return cZ;
-                    }
+                    var MatchX = pixX >= DrawingPos.X + Chars[cZ].Pos.X && pixX <= DrawingPos.X + Chars[cZ].Pos.X + Chars[cZ].Size.Width;
+                    var MatchY = pixY >= DrawingPos.Y + Chars[cZ].Pos.Y && pixY <= DrawingPos.Y + Chars[cZ].Pos.Y + Chars[cZ].Size.Height;
+
+                    if (MatchX && MatchY) { return cZ; }
+
                     double TmpDi;
-                    if (X == false && Y) {
-                        TmpDi = Math.Abs(PixX - (DrawingPos.X + Chars[cZ].Pos.X + (Chars[cZ].Size.Width / 2.0)));
+                    if (!MatchX && MatchY) {
+                        TmpDi = Math.Abs(pixX - (DrawingPos.X + Chars[cZ].Pos.X + (Chars[cZ].Size.Width / 2.0)));
                         if (TmpDi < XDi) {
                             XNr = cZ;
                             XDi = TmpDi;
                         }
-                    } else if (X && Y == false) {
-                        TmpDi = Math.Abs(PixY - (DrawingPos.Y + Chars[cZ].Pos.Y + (Chars[cZ].Size.Height / 2.0)));
+                    } else if (MatchX && !MatchY) {
+                        TmpDi = Math.Abs(pixY - (DrawingPos.Y + Chars[cZ].Pos.Y + (Chars[cZ].Size.Height / 2.0)));
                         if (TmpDi < YDi) {
                             YNr = cZ;
                             YDi = TmpDi;
@@ -220,25 +211,20 @@ namespace BlueControls {
                     }
                 }
             } while (true);
-            //   Dim RN As Integer = cZ
+
             cZ--;
             return XNr >= 0 ? XNr : YNr >= 0 ? YNr : cZ >= 0 ? cZ : 0;
-            //Do
-            //    If RN < 1 Then Return 0
-            //    If vChars(RN - 1).Char <> 0 Then Return RN
-            //    RN -= 1
-            //Loop
         }
 
-        public void Check(int Von, int Bis, bool Checkstat) {
-            for (var cc = Von; cc <= Bis; cc++) {
+        public void Check(int first, int last, bool checkstate) {
+            for (var cc = first; cc <= last; cc++) {
                 if (Chars[cc].State != enStates.Undefiniert) {
-                    if (Checkstat) {
-                        if (!Convert.ToBoolean(Chars[cc].State & enStates.Checked)) {
+                    if (checkstate) {
+                        if (!Chars[cc].State.HasFlag(enStates.Checked)) {
                             Chars[cc].State |= enStates.Checked;
                         }
                     } else {
-                        if (Convert.ToBoolean(Chars[cc].State & enStates.Checked)) {
+                        if (Chars[cc].State.HasFlag(enStates.Checked)) {
                             Chars[cc].State = Chars[cc].State ^ enStates.Checked;
                         }
                     }
@@ -246,38 +232,38 @@ namespace BlueControls {
             }
         }
 
-        public Rectangle CursorPixelPosx(int CharPos) {
+        public Rectangle CursorPixelPosX(int charPos) {
             while (_Width == null) { ReBreak(); }
-            if (CharPos > Chars.Count + 1) { CharPos = Chars.Count + 1; }
-            if (Chars.Count > 0 && CharPos < 0) { CharPos = 0; }
+            if (charPos > Chars.Count + 1) { charPos = Chars.Count + 1; }
+            if (Chars.Count > 0 && charPos < 0) { charPos = 0; }
             float X = 0;
             float Y = 0;
             float He = 14;
             if (Chars.Count == 0) {
                 // Kein Text vorhanden
-            } else if (CharPos < Chars.Count) {
+            } else if (charPos < Chars.Count) {
                 // Cursor vor einem Zeichen
-                X = Chars[CharPos].Pos.X;
-                Y = Chars[CharPos].Pos.Y;
-                He = Chars[CharPos].Size.Height;
-            } else if (CharPos > 0 && CharPos < Chars.Count + 1 && Chars[CharPos - 1].Char == 13) {
+                X = Chars[charPos].Pos.X;
+                Y = Chars[charPos].Pos.Y;
+                He = Chars[charPos].Size.Height;
+            } else if (charPos > 0 && charPos < Chars.Count + 1 && Chars[charPos - 1].Char == 13) {
                 // Vorzeichen = Zeilenumbruch
-                Y = Chars[CharPos - 1].Pos.Y + Chars[CharPos - 1].Size.Height;
-                He = Chars[CharPos - 1].Size.Height;
-            } else if (CharPos > 0 && CharPos < Chars.Count + 1) {
+                Y = Chars[charPos - 1].Pos.Y + Chars[charPos - 1].Size.Height;
+                He = Chars[charPos - 1].Size.Height;
+            } else if (charPos > 0 && charPos < Chars.Count + 1) {
                 // Vorzeichen = Echtes Char
-                X = Chars[CharPos - 1].Pos.X + Chars[CharPos - 1].Size.Width;
-                Y = Chars[CharPos - 1].Pos.Y;
-                He = Chars[CharPos - 1].Size.Height;
+                X = Chars[charPos - 1].Pos.X + Chars[charPos - 1].Size.Width;
+                Y = Chars[charPos - 1].Pos.Y;
+                He = Chars[charPos - 1].Size.Height;
             }
             return new Rectangle((int)X, (int)(Y - 1), 0, (int)(He + 2));
         }
 
-        public void Delete(int Von, int Bis) {
-            var tempVar = Bis - Von;
+        public void Delete(int first, int last) {
+            var tempVar = last - first;
             for (var z = 1; z <= tempVar; z++) {
-                if (Von < Chars.Count) {
-                    Chars.RemoveAt(Von);
+                if (first < Chars.Count) {
+                    Chars.RemoveAt(first);
                 }
             }
             ResetPosition(true);
@@ -305,32 +291,32 @@ namespace BlueControls {
             return _Width < 5 || _Height < 5 ? new Size(32, 16) : new Size((int)_Width, (int)_Height);
         }
 
-        public void StufeÄndern(int Von, int Bis, int stufe) {
-            for (var cc = Von; cc <= Bis; cc++) {
+        public void StufeÄndern(int first, int last, int stufe) {
+            for (var cc = first; cc <= last; cc++) {
                 Chars[cc].Stufe = stufe;
             }
             ResetPosition(true);
         }
 
-        public string Substring(int StartIndex, int lenght) => ConvertCharToPlainText(StartIndex, StartIndex + lenght - 1);
+        public string Substring(int startIndex, int lenght) => ConvertCharToPlainText(startIndex, startIndex + lenght - 1);
 
         public int Width() {
             while (_Width == null) { ReBreak(); }
             return (int)_Width;
         }
 
-        public string Word(int Pos) {
-            var S = WordStart(Pos);
-            var E = WordEnd(Pos);
+        public string Word(int atPosition) {
+            var S = WordStart(atPosition);
+            var E = WordEnd(atPosition);
             return Substring(S, E - S);
         }
 
-        internal string ConvertCharToPlainText(int Von, int Bis) {
+        internal string ConvertCharToPlainText(int first, int last) {
             try {
                 var T = string.Empty;
-                var cZ = Von;
-                Bis = Math.Min(Bis, Chars.Count - 1);
-                while (cZ <= Bis && Chars[cZ].Char > 0) {
+                var cZ = first;
+                last = Math.Min(last, Chars.Count - 1);
+                while (cZ <= last && Chars[cZ].Char > 0) {
                     if (Chars[cZ].Char < (int)enASCIIKey.ImageStart) {
                         T += Convert.ToChar(Chars[cZ].Char).ToString();
                     }
@@ -340,7 +326,7 @@ namespace BlueControls {
                 return T;
             } catch {
                 // Wenn Chars geändter wird (und dann der Count nimmer stimmt)
-                return ConvertCharToPlainText(Von, Bis);
+                return ConvertCharToPlainText(first, last);
             }
         }
 
@@ -365,34 +351,34 @@ namespace BlueControls {
             }
         }
 
-        internal int WordEnd(int Pos) {
+        internal int WordEnd(int pos) {
             if (Chars.Count == 0) { return -1; }
-            if (Pos < 0 || Pos >= Chars.Count) { return -1; }
-            if (Chars[Pos].isWordSeperator()) { return -1; }
+            if (pos < 0 || pos >= Chars.Count) { return -1; }
+            if (Chars[pos].isWordSeperator()) { return -1; }
             do {
-                Pos++;
-                if (Pos >= Chars.Count) { return Chars.Count; }
-                if (Chars[Pos].isWordSeperator()) { return Pos; }
+                pos++;
+                if (pos >= Chars.Count) { return Chars.Count; }
+                if (Chars[pos].isWordSeperator()) { return pos; }
             } while (true);
         }
 
-        internal int WordStart(int Pos) {
+        internal int WordStart(int pos) {
             if (Chars.Count == 0) { return -1; }
-            if (Pos < 0 || Pos >= Chars.Count) { return -1; }
-            if (Chars[Pos].isWordSeperator()) { return -1; }
+            if (pos < 0 || pos >= Chars.Count) { return -1; }
+            if (Chars[pos].isWordSeperator()) { return -1; }
             do {
-                Pos--;
-                if (Pos < 0) { return 0; }
-                if (Chars[Pos].isWordSeperator()) { return Pos + 1; }
+                pos--;
+                if (pos < 0) { return 0; }
+                if (Chars[pos].isWordSeperator()) { return pos + 1; }
             } while (true);
         }
 
-        private string ConvertCharToHTMLText(int Von, int Bis) {
+        private string ConvertCharToHTMLText(int first, int last) {
             var T = "";
-            var cZ = Von;
-            Bis = Math.Min(Bis, Chars.Count - 1);
+            var cZ = first;
+            last = Math.Min(last, Chars.Count - 1);
             var LastStufe = 4;
-            while (cZ <= Bis && Chars[cZ].Char > 0) {
+            while (cZ <= last && Chars[cZ].Char > 0) {
                 if (Chars[cZ].Char < (int)enASCIIKey.ImageStart) {
                     if (LastStufe != Chars[cZ].Stufe) {
                         T = T + "<H" + Chars[cZ].Stufe + ">";
@@ -462,14 +448,15 @@ namespace BlueControls {
             ResetPosition(false);
         }
 
-        private void DoHTMLCode(string HTMLText, int StartPos, ref int Position, ref BlueFont PF, ref int Stufe, ref enMarkState MarkState) {
-            if (PF == null) { return; }  // wenn die Datenbanken entladen wurden bei Programmende
-            var Endpos = HTMLText.IndexOf('>', StartPos + 1);
-            if (Endpos <= StartPos) {
+        private void DoHTMLCode(string HTMLText, int start, ref int Position, ref BlueFont font, ref int Stufe, ref enMarkState MarkState) {
+            if (font == null) { return; }  // wenn die Datenbanken entladen wurden bei Programmende
+
+            var Endpos = HTMLText.IndexOf('>', start + 1);
+            if (Endpos <= start) {
                 Develop.DebugPrint("String-Fehler, > erwartet. " + HTMLText);
                 return;
             }
-            var Oricode = HTMLText.Substring(StartPos + 1, Endpos - StartPos - 1);
+            var Oricode = HTMLText.Substring(start + 1, Endpos - start - 1);
             var Istgleich = Oricode.IndexOf('=');
             string Cod, Attribut;
             if (Istgleich < 0) {
@@ -482,64 +469,64 @@ namespace BlueControls {
             }
             switch (Cod) {
                 case "B":
-                    PF = BlueFont.Get(PF.FontName, PF.FontSize, true, PF.Italic, PF.Underline, PF.StrikeOut, PF.Outline, PF.Color_Main, PF.Color_Outline, PF.Kapitälchen, PF.OnlyUpper, PF.OnlyLower);
+                    font = BlueFont.Get(font.FontName, font.FontSize, true, font.Italic, font.Underline, font.StrikeOut, font.Outline, font.Color_Main, font.Color_Outline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
                     break;
 
                 case "/B":
-                    PF = BlueFont.Get(PF.FontName, PF.FontSize, false, PF.Italic, PF.Underline, PF.StrikeOut, PF.Outline, PF.Color_Main, PF.Color_Outline, PF.Kapitälchen, PF.OnlyUpper, PF.OnlyLower);
+                    font = BlueFont.Get(font.FontName, font.FontSize, false, font.Italic, font.Underline, font.StrikeOut, font.Outline, font.Color_Main, font.Color_Outline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
                     break;
 
                 case "I":
-                    PF = BlueFont.Get(PF.FontName, PF.FontSize, PF.Bold, true, PF.Underline, PF.StrikeOut, PF.Outline, PF.Color_Main, PF.Color_Outline, PF.Kapitälchen, PF.OnlyUpper, PF.OnlyLower);
+                    font = BlueFont.Get(font.FontName, font.FontSize, font.Bold, true, font.Underline, font.StrikeOut, font.Outline, font.Color_Main, font.Color_Outline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
                     break;
 
                 case "/I":
-                    PF = BlueFont.Get(PF.FontName, PF.FontSize, PF.Bold, false, PF.Underline, PF.StrikeOut, PF.Outline, PF.Color_Main, PF.Color_Outline, PF.Kapitälchen, PF.OnlyUpper, PF.OnlyLower);
+                    font = BlueFont.Get(font.FontName, font.FontSize, font.Bold, false, font.Underline, font.StrikeOut, font.Outline, font.Color_Main, font.Color_Outline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
                     break;
 
                 case "U":
-                    PF = BlueFont.Get(PF.FontName, PF.FontSize, PF.Bold, PF.Italic, true, PF.StrikeOut, PF.Outline, PF.Color_Main, PF.Color_Outline, PF.Kapitälchen, PF.OnlyUpper, PF.OnlyLower);
+                    font = BlueFont.Get(font.FontName, font.FontSize, font.Bold, font.Italic, true, font.StrikeOut, font.Outline, font.Color_Main, font.Color_Outline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
                     break;
 
                 case "/U":
-                    PF = BlueFont.Get(PF.FontName, PF.FontSize, PF.Bold, PF.Italic, false, PF.StrikeOut, PF.Outline, PF.Color_Main, PF.Color_Outline, PF.Kapitälchen, PF.OnlyUpper, PF.OnlyLower);
+                    font = BlueFont.Get(font.FontName, font.FontSize, font.Bold, font.Italic, false, font.StrikeOut, font.Outline, font.Color_Main, font.Color_Outline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
                     break;
 
                 case "STRIKE":
-                    PF = BlueFont.Get(PF.FontName, PF.FontSize, PF.Bold, PF.Italic, PF.Underline, true, PF.Outline, PF.Color_Main, PF.Color_Outline, PF.Kapitälchen, PF.OnlyUpper, PF.OnlyLower);
+                    font = BlueFont.Get(font.FontName, font.FontSize, font.Bold, font.Italic, font.Underline, true, font.Outline, font.Color_Main, font.Color_Outline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
                     break;
 
                 case "/STRIKE":
-                    PF = BlueFont.Get(PF.FontName, PF.FontSize, PF.Bold, PF.Italic, PF.Underline, false, PF.Outline, PF.Color_Main, PF.Color_Outline, PF.Kapitälchen, PF.OnlyUpper, PF.OnlyLower);
+                    font = BlueFont.Get(font.FontName, font.FontSize, font.Bold, font.Italic, font.Underline, false, font.Outline, font.Color_Main, font.Color_Outline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
                     break;
 
                 case "3":
-                    PF = BlueFont.Get(PF.FontName, PF.FontSize, PF.Bold, PF.Italic, PF.Underline, PF.StrikeOut, true, PF.Color_Main, PF.Color_Outline, PF.Kapitälchen, PF.OnlyUpper, PF.OnlyLower);
+                    font = BlueFont.Get(font.FontName, font.FontSize, font.Bold, font.Italic, font.Underline, font.StrikeOut, true, font.Color_Main, font.Color_Outline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
                     break;
 
                 case "/3":
-                    PF = BlueFont.Get(PF.FontName, PF.FontSize, PF.Bold, PF.Italic, PF.Underline, PF.StrikeOut, false, PF.Color_Main, PF.Color_Outline, PF.Kapitälchen, PF.OnlyUpper, PF.OnlyLower);
+                    font = BlueFont.Get(font.FontName, font.FontSize, font.Bold, font.Italic, font.Underline, font.StrikeOut, false, font.Color_Main, font.Color_Outline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
                     break;
 
                 case "FONTSIZE":
-                    PF = BlueFont.Get(PF.FontName, Converter.FloatParse(Attribut), PF.Bold, PF.Italic, PF.Underline, PF.StrikeOut, PF.Outline, PF.Color_Main, PF.Color_Outline, PF.Kapitälchen, PF.OnlyUpper, PF.OnlyLower);
+                    font = BlueFont.Get(font.FontName, Converter.FloatParse(Attribut), font.Bold, font.Italic, font.Underline, font.StrikeOut, font.Outline, font.Color_Main, font.Color_Outline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
                     break;
 
                 case "FONTNAME":
-                    PF = BlueFont.Get(Attribut, PF.FontSize, PF.Bold, PF.Italic, PF.Underline, PF.StrikeOut, PF.Outline, PF.Color_Main, PF.Color_Outline, PF.Kapitälchen, PF.OnlyUpper, PF.OnlyLower);
+                    font = BlueFont.Get(Attribut, font.FontSize, font.Bold, font.Italic, font.Underline, font.StrikeOut, font.Outline, font.Color_Main, font.Color_Outline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
                     break;
 
                 case "FONTCOLOR":
-                    PF = BlueFont.Get(PF.FontName, PF.FontSize, PF.Bold, PF.Italic, PF.Underline, PF.StrikeOut, PF.Outline, Attribut, PF.Color_Outline.ToHTMLCode(), PF.Kapitälchen, PF.OnlyUpper, PF.OnlyLower);
+                    font = BlueFont.Get(font.FontName, font.FontSize, font.Bold, font.Italic, font.Underline, font.StrikeOut, font.Outline, Attribut, font.Color_Outline.ToHTMLCode(), font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
                     break;
 
                 case "FONTOUTLINE":
-                    PF = BlueFont.Get(PF.FontName, PF.FontSize, PF.Bold, PF.Italic, PF.Underline, PF.StrikeOut, PF.Outline, PF.Color_Main.ToHTMLCode(), Attribut, PF.Kapitälchen, PF.OnlyUpper, PF.OnlyLower);
+                    font = BlueFont.Get(font.FontName, font.FontSize, font.Bold, font.Italic, font.Underline, font.StrikeOut, font.Outline, font.Color_Main.ToHTMLCode(), Attribut, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
                     break;
 
                 case "BR":
                     Position++;
-                    Chars.Add(new ExtChar((char)13, _Design, _State, PF, Stufe, enMarkState.None));
+                    Chars.Add(new ExtChar((char)13, _Design, _State, font, Stufe, enMarkState.None));
                     break;
                 //
                 case "HR":
@@ -551,12 +538,12 @@ namespace BlueControls {
 
                 case "TAB":
                     Position++;
-                    Chars.Add(new ExtChar((char)9, _Design, _State, PF, Stufe, enMarkState.None));
+                    Chars.Add(new ExtChar((char)9, _Design, _State, font, Stufe, enMarkState.None));
                     break;
 
                 case "ZBX_STORE":
                     Position++;
-                    Chars.Add(new ExtChar(ExtChar.StoreX, _Design, _State, PF, Stufe, enMarkState.None));
+                    Chars.Add(new ExtChar(ExtChar.StoreX, _Design, _State, font, Stufe, enMarkState.None));
                     break;
                 //
                 case "ZBX_RESET":
@@ -566,7 +553,7 @@ namespace BlueControls {
 
                 case "TOP":
                     Position++;
-                    Chars.Add(new ExtChar(ExtChar.Top, _Design, _State, PF, Stufe, enMarkState.None));
+                    Chars.Add(new ExtChar(ExtChar.Top, _Design, _State, font, Stufe, enMarkState.None));
                     break;
                 //
                 case "ZBY_STORE":
@@ -586,9 +573,9 @@ namespace BlueControls {
 
                 case "IMAGECODE":
                     QuickImage x;
-                    x = !Attribut.Contains("|") && PF != null ? QuickImage.Get(Attribut, (int)PF.Oberlänge(1)) : QuickImage.Get(Attribut);
+                    x = !Attribut.Contains("|") && font != null ? QuickImage.Get(Attribut, (int)font.Oberlänge(1)) : QuickImage.Get(Attribut);
                     Position++;
-                    Chars.Add(new ExtChar((char)(QuickImage.GetIndex(x) + (int)enASCIIKey.ImageStart), _Design, _State, PF, Stufe, enMarkState.None));
+                    Chars.Add(new ExtChar((char)(QuickImage.GetIndex(x) + (int)enASCIIKey.ImageStart), _Design, _State, font, Stufe, enMarkState.None));
                     break;
                 //
                 case "PROGRESSBAR":
@@ -598,37 +585,37 @@ namespace BlueControls {
 
                 case "H7":
                     Stufe = 7;
-                    PF = Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
+                    font = Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
 
                 case "H6":
                     Stufe = 6;
-                    PF = Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
+                    font = Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
 
                 case "H5":
                     Stufe = 5;
-                    PF = Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
+                    font = Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
 
                 case "H4":
                     Stufe = 4;
-                    PF = Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
+                    font = Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
 
                 case "H3":
                     Stufe = 3;
-                    PF = Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
+                    font = Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
 
                 case "H2":
                     Stufe = 2;
-                    PF = Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
+                    font = Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
 
                 case "H1":
                     Stufe = 1;
-                    PF = Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
+                    font = Skin.GetBlueFont((int)_Design, _State, _Row, Stufe);
                     break;
 
                 case "MARKSTATE":
@@ -854,12 +841,14 @@ namespace BlueControls {
             _Width = 0;
             _Height = 0;
             if (Chars.Count == 0) { return; }
+
             List<string> RI = new();
             var vZBX_Pixel = 0f;
             var IsX = 0f;
             var IsY = 0f;
             var ZB_Char = 0;
             var Akt = -1;
+
             do {
                 Akt++;
                 if (Akt > Chars.Count - 1) {
@@ -880,6 +869,7 @@ namespace BlueControls {
                         IsY = 0;
                         break;
                 }
+
                 if (!Chars[Akt].isSpace()) {
                     if (Akt > ZB_Char && _TextDimensions.Width > 0) {
                         if (IsX + Chars[Akt].Size.Width + 0.5 > _TextDimensions.Width) {
@@ -893,10 +883,13 @@ namespace BlueControls {
                     _Width = Math.Max((int)_Width, (int)(IsX + Chars[Akt].Size.Width + 0.5));
                     _Height = Math.Max((int)_Height, (int)(IsY + Chars[Akt].Size.Height + 0.5));
                 }
+
                 Chars[Akt].Pos.X = (float)IsX;
                 Chars[Akt].Pos.Y = (float)IsY;
+
                 // Diese Zeile garantiert, dass immer genau EIN Pixel frei ist zwischen zwei Buchstaben.
                 IsX = (float)(IsX + Math.Truncate(Chars[Akt].Size.Width + 0.5));
+
                 if (Chars[Akt].isLineBreak()) {
                     IsX = vZBX_Pixel;
                     if (Chars[Akt].Char == ExtChar.Top) {
@@ -909,19 +902,19 @@ namespace BlueControls {
                     ZB_Char = Akt + 1;
                 }
             } while (true);
-            //    vHeight = CInt(Math.Max(vHeight, _Chars(ZB_Char).Pos.Y + _Chars(ZB_Char).Size.Height))
+
             // enAlignment berechnen -------------------------------------
             if (Ausrichtung != enAlignment.Top_Left) {
                 float KY = 0;
-                if (Convert.ToBoolean(Ausrichtung & enAlignment.VerticalCenter)) { KY = (float)((_TextDimensions.Height - (int)_Height) / 2.0); }
-                if (Convert.ToBoolean(Ausrichtung & enAlignment.Bottom)) { KY = _TextDimensions.Height - (int)_Height; }
+                if (Ausrichtung.HasFlag(enAlignment.VerticalCenter)) { KY = (float)((_TextDimensions.Height - (int)_Height) / 2.0); }
+                if (Ausrichtung.HasFlag(Ausrichtung & enAlignment.Bottom)) { KY = _TextDimensions.Height - (int)_Height; }
                 foreach (var t in RI) {
                     var o = t.SplitAndCutBy(";");
                     var Z1 = int.Parse(o[0]);
                     var Z2 = int.Parse(o[1]);
                     float KX = 0;
-                    if (Convert.ToBoolean(Ausrichtung & enAlignment.Right)) { KX = _TextDimensions.Width - Chars[Z2].Pos.X - Chars[Z2].Size.Width; }
-                    if (Convert.ToBoolean(Ausrichtung & enAlignment.HorizontalCenter)) { KX = (_TextDimensions.Width - Chars[Z2].Pos.X - Chars[Z2].Size.Width) / 2; }
+                    if (Ausrichtung.HasFlag(Ausrichtung & enAlignment.Right)) { KX = _TextDimensions.Width - Chars[Z2].Pos.X - Chars[Z2].Size.Width; }
+                    if (Ausrichtung.HasFlag(Ausrichtung & enAlignment.HorizontalCenter)) { KX = (_TextDimensions.Width - Chars[Z2].Pos.X - Chars[Z2].Size.Width) / 2; }
                     for (var Z3 = Z1; Z3 <= Z2; Z3++) {
                         Chars[Z3].Pos.X += KX;
                         Chars[Z3].Pos.Y += KY;
@@ -939,12 +932,12 @@ namespace BlueControls {
             }
         }
 
-        private float Row_SetOnLine(int Von, int Nach) {
+        private float Row_SetOnLine(int first, int last) {
             float Abstand = 0;
-            for (var z = Von; z <= Nach; z++) {
+            for (var z = first; z <= last; z++) {
                 Abstand = Math.Max(Abstand, Chars[z].Size.Height);
             }
-            for (var z = Von; z <= Nach; z++) {
+            for (var z = first; z <= last; z++) {
                 if (Chars[z].Char != ExtChar.Top) {
                     Chars[z].Pos.Y = Chars[z].Pos.Y + Abstand - Chars[z].Size.Height;
                 }

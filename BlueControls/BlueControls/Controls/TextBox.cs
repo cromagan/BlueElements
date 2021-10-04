@@ -515,7 +515,7 @@ namespace BlueControls.Controls {
                     } else if (hp > _eTxt.Chars.Count - 1) {
                         _eTxt.DrawingPos.X = _eTxt.Width() > Width - (Skin.PaddingSmal * 2) ? Width - _eTxt.Width() - (Skin.PaddingSmal * 2) : Skin.PaddingSmal;
                     } else {
-                        var r = _eTxt.CursorPixelPosx(hp);
+                        var r = _eTxt.CursorPixelPosX(hp);
                         if (r.X > Width - (Skin.PaddingSmal * 4) - _eTxt.DrawingPos.X) {
                             _eTxt.DrawingPos.X = Width - (Skin.PaddingSmal * 4) - r.X + 1;
                         } else if (r.X + _eTxt.DrawingPos.X < Skin.PaddingSmal * 2) {
@@ -865,7 +865,7 @@ namespace BlueControls.Controls {
                 }
             }
             MarkClear();
-            var ri = _eTxt.CursorPixelPosx(_Cursor_CharPos);
+            var ri = _eTxt.CursorPixelPosX(_Cursor_CharPos);
             if (_Cursor_CharPos < 0) { _Cursor_CharPos = 0; }
             if (Y > 0) {
                 _Cursor_CharPos = _Cursor_CharPos >= _eTxt.Chars.Count
@@ -885,7 +885,7 @@ namespace BlueControls.Controls {
         private void Cursor_Show(Graphics GR) {
             if (!_Cursor_Visible) { return; }
             if (_Cursor_CharPos < 0) { return; }
-            var r = _eTxt.CursorPixelPosx(_Cursor_CharPos);
+            var r = _eTxt.CursorPixelPosX(_Cursor_CharPos);
             GR.DrawLine(new Pen(Color.Black), r.Left + _eTxt.DrawingPos.X, r.Top + _eTxt.DrawingPos.Y, r.Left + _eTxt.DrawingPos.X, r.Bottom + _eTxt.DrawingPos.Y);
         }
 

@@ -2495,7 +2495,7 @@ namespace BlueControls.Controls {
                 GR.DrawImage(TrichterIcon.BMP, ViewItem._TMP_AutoFilterLocation.Left + 2, ViewItem._TMP_AutoFilterLocation.Top + 2);
             }
             if (!string.IsNullOrEmpty(TrichterText)) {
-                var s = _Column_Font.MeasureString(TrichterText);
+                var s = _Column_Font.MeasureString(TrichterText, StringFormat.GenericDefault);
                 for (var x = -1; x < 2; x++) {
                     for (var y = -1; y < 2; y++) {
                         BlueFont.DrawString(GR, TrichterText, _Column_Font.Font(), Brushes.Red,

@@ -19,7 +19,6 @@ using BlueBasics;
 using BlueControls.Enums;
 using System;
 using System.Drawing;
-using System.Drawing.Text;
 
 namespace BlueControls {
 
@@ -28,11 +27,9 @@ namespace BlueControls {
         #region Fields
 
         public const char StoreX = (char)5;
-
-        //  public const int ImagesStart = 5000;
         public const char Top = (char)4;
-
         public PointF Pos = PointF.Empty;
+
         private readonly char _Char;
         private enDesign _Design = enDesign.Undefiniert;
         private SizeF _Size = SizeF.Empty;
@@ -43,13 +40,13 @@ namespace BlueControls {
 
         #region Constructors
 
-        internal ExtChar(char charcode, enDesign cDesign, enStates cState, BlueFont cFont, int Stufe, enMarkState cMarkState) {
-            _Design = cDesign;
+        internal ExtChar(char charcode, enDesign design, enStates state, BlueFont font, int stufe, enMarkState markState) {
+            _Design = design;
             _Char = charcode;
-            Font = cFont;
-            _Stufe = Stufe;
-            _State = cState;
-            Marking = cMarkState;
+            Font = font;
+            _Stufe = stufe;
+            _State = state;
+            Marking = markState;
         }
 
         #endregion
@@ -98,28 +95,28 @@ namespace BlueControls {
 
         #region Methods
 
-        public void Draw(Graphics GR, Point PosModificator, float czoom) {
+        public void Draw(Graphics gr, Point posModificator, float zoom) {
             if (_Char < 20) { return; }
-            var DrawX = (Pos.X * czoom) + PosModificator.X;
-            var DrawY = (Pos.Y * czoom) + PosModificator.Y;
+            var DrawX = (Pos.X * zoom) + posModificator.X;
+            var DrawY = (Pos.Y * zoom) + posModificator.Y;
 
             if (_Char < (int)enASCIIKey.ImageStart) {
                 try {
-                    Font?.DrawString(GR, _Char.ToString(), DrawX, DrawY, czoom);
+                    Font?.DrawString(gr, _Char.ToString(), DrawX, DrawY, zoom, StringFormat.GenericTypographic);
                 } catch { }
                 return;
             }
 
-            if (Math.Abs(czoom - 1) < 0.001) {
+            if (Math.Abs(zoom - 1) < 0.001) {
                 var BNR = QuickImage.Get(_Char - (int)enASCIIKey.ImageStart);
                 if (BNR == null) { return; }
                 // Sind es KEINE Integer bei DrawX / DrawY, kommt es zu extrem unschönen Effekten. Gerade Linien scheinen verschwommen zu sein. (Checkbox-Kästchen)
-                GR.DrawImage(BNR.BMP, (int)DrawX, (int)DrawY);
+                gr.DrawImage(BNR.BMP, (int)DrawX, (int)DrawY);
             } else {
                 var l = QuickImage.Get(_Char - (int)enASCIIKey.ImageStart);
                 if (l == null || l.Width == 0) { l = QuickImage.Get("Warnung|16"); }
                 if (l.Width > 0) {
-                    GR.DrawImage(QuickImage.Get(l.Name, (int)(l.Width * czoom)).BMP, (int)DrawX, (int)DrawY);
+                    gr.DrawImage(QuickImage.Get(l.Name, (int)(l.Width * zoom)).BMP, (int)DrawX, (int)DrawY);
                 }
             }
         }
@@ -158,13 +155,13 @@ namespace BlueControls {
             _ => Convert.ToChar(_Char).ToString().CreateHtmlCodes(true),
         };
 
-        private void ChangeState(enDesign vDesign, enStates vState, int vStufe) {
-            if (vState == _State && vStufe == _Stufe && vDesign == _Design) { return; }
+        private void ChangeState(enDesign design, enStates state, int stufe) {
+            if (state == _State && stufe == _Stufe && design == _Design) { return; }
             _Size = SizeF.Empty;
-            _Design = vDesign;
-            _State = vState;
-            _Stufe = vStufe;
-            Font = vDesign == enDesign.Undefiniert || vState == enStates.Undefiniert ? null : Skin.GetBlueFont(vDesign, vState, vStufe);
+            _Design = design;
+            _State = state;
+            _Stufe = stufe;
+            Font = design == enDesign.Undefiniert || state == enStates.Undefiniert ? null : Skin.GetBlueFont(design, state, stufe);
         }
 
         #endregion
