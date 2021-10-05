@@ -177,7 +177,7 @@ namespace BlueDatabase {
 
         public event EventHandler<KeyChangedEventArgs> RowKeyChanged;
 
-        public event EventHandler<RowEventArgs> ScriptError;
+        public event EventHandler<RowCancelEventArgs> ScriptError;
 
         public event EventHandler SortParameterChanged;
 
@@ -1054,7 +1054,7 @@ namespace BlueDatabase {
             ProgressbarInfo?.Invoke(this, e);
         }
 
-        internal void OnScriptError(RowEventArgs e) {
+        internal void OnScriptError(RowCancelEventArgs e) {
             if (Disposed) { return; }
             ScriptError?.Invoke(this, e);
         }

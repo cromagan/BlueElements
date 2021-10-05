@@ -317,7 +317,7 @@ namespace BlueDatabase {
 
             /// checkPerformed geht von Dateisystemfehlern aus
             if (!string.IsNullOrEmpty(script.Error)) {
-                Database.OnScriptError(new RowEventArgs(this));
+                Database.OnScriptError(new RowCancelEventArgs(this, "Zeile: " + script.Line.ToString() + "\r\n" + script.Error + "\r\n" + script.ErrorCode));
                 return (true, "<b>Das Skript ist fehlerhaft:</b>\r\n" + "Zeile: " + script.Line.ToString() + "\r\n" + script.Error + "\r\n" + script.ErrorCode, script);
             }
 
