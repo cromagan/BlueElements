@@ -15,7 +15,7 @@ namespace BlueControls.Controls {
             // 
             // FormulaManualDesign
             // 
-            this.MinimumSize = new System.Drawing.Size(320, 350);
+            this.MinimumSize = new System.Drawing.Size(16, 16);
             this.Name = "Formula";
             this.Size = new System.Drawing.Size(320, 350);
             this.ResumeLayout(false);
