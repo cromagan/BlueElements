@@ -898,7 +898,7 @@ namespace BlueDatabase {
         }
 
         public List<string> Autofilter_ItemList(FilterCollection filter, List<RowItem> pinned) {
-            if (filter == null || filter.Count < 0) { return Contents(null, pinned); }
+            if (filter == null || filter.Count < 0) { return Contents((FilterCollection)null, pinned); }
             FilterCollection tfilter = new(Database);
             foreach (var ThisFilter in filter) {
                 if (ThisFilter != null && this != ThisFilter.Column) { tfilter.Add(ThisFilter); }
@@ -922,12 +922,13 @@ namespace BlueDatabase {
         /// <returns> Gibt den Dateinamen mit Pfad und Suffix zurück</returns>
         public string BestFile(string filename, bool mustBeFree) {
             if (_Format != enDataFormat.Link_To_Filesystem) { Develop.DebugPrint(enFehlerArt.Fehler, "Nur bei Link_To_Filesystem erlaubt!"); }
-            //FileNameWithoutPath = FileNameWithoutPath.RemoveChars(Constants.Char_DateiSonderZeichen); // Falls ein Korrekter Pfad übergeben wurde, würde er hier verstümmelt werden
+
             if (string.IsNullOrEmpty(filename)) {
                 if (!mustBeFree) { return string.Empty; }
                 filename = (_Name.Substring(0, 1) + DateTime.Now.ToString("mm.fff")).RemoveChars(Constants.Char_DateiSonderZeichen + ".");
             }
             if (filename.Contains("\r")) { Develop.DebugPrint_NichtImplementiert(); }
+
             // Wenn FileNameWithoutPath kein Suffix hat, das Standard Suffix hinzufügen
             var suffix = filename.FileSuffix();
             var cleanfilename = filename;
@@ -974,13 +975,13 @@ namespace BlueDatabase {
             return tmp;
         }
 
-        public List<string> Contents() => Contents(null, null);
+        public List<string> Contents() => Contents((FilterCollection)null, null);
 
-        //public List<string> Contents(FilterItem fi, List<RowItem> pinned) {
-        //    var x = new FilterCollection(fi.Database);
-        //    x.Add(fi);
-        //    return Contents(x, pinned);
-        //}
+        public List<string> Contents(FilterItem fi, List<RowItem> pinned) {
+            var x = new FilterCollection(fi.Database);
+            x.Add(fi);
+            return Contents(x, pinned);
+        }
 
         public List<string> Contents(FilterCollection filter, List<RowItem> pinned) {
             List<string> list = new();
@@ -1191,7 +1192,7 @@ namespace BlueDatabase {
 
         public List<string> GetUcaseNamesSortedByLenght() {
             if (_UcaseNamesSortedByLenght != null) { return _UcaseNamesSortedByLenght; }
-            var tmp = Contents(null, null);
+            var tmp = Contents((FilterCollection)null, null);
             for (var Z = 0; Z < tmp.Count; Z++) {
                 tmp[Z] = tmp[Z].Length.ToString(Constants.Format_Integer10) + tmp[Z].ToUpper();
             }

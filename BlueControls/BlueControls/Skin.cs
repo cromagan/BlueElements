@@ -851,7 +851,7 @@ namespace BlueControls {
 
         public static List<string> AllStyles() {
             if (StyleDB == null) { InitStyles(); }
-            return StyleDB?.Column[0].Contents(null, null);
+            return StyleDB?.Column[0].Contents();
         }
 
         public static Color Color_Back(enDesign vDesign, enStates vState) => DesignOf(vDesign, vState).BackColor1;

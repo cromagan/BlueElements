@@ -442,7 +442,7 @@ namespace BlueDatabase {
             foreach (var ThisColumnItem in Column) {
                 if (ThisColumnItem != null) {
                     if (ThisColumnItem.Format == enDataFormat.Link_To_Filesystem) {
-                        var tmp = ThisColumnItem.Contents(null, null);
+                        var tmp = ThisColumnItem.Contents();
                         foreach (var thisTmp in tmp) {
                             Column_All.AddIfNotExists(ThisColumnItem.BestFile(thisTmp, false).ToLower());
                         }
@@ -1019,7 +1019,7 @@ namespace BlueDatabase {
                 if (thisLayout.Contains(column.Name.ToUpper())) { layout = true; }
             }
             if (layout) { t += " - Layouts<br>"; }
-            var l = column.Contents(null, null);
+            var l = column.Contents();
             if (l.Count > 0) {
                 t = t + "<br><br><b>Zusatz-Info:</b><br>";
                 t = t + " - Befüllt mit " + l.Count.ToString() + " verschiedenen Werten";

@@ -135,8 +135,13 @@ namespace BlueControls {
         public static void DrawString(Graphics gr, string text, Font font, Brush brush, float x, float y) => DrawString(gr, text, font, brush, x, y, StringFormat.GenericDefault);
 
         public static void DrawString(Graphics gr, string text, Font font, Brush brush, float x, float y, StringFormat stringFormat) {
-            SetTextRenderingHint(gr, font);
-            gr.DrawString(text, font, brush, x, y, stringFormat);
+            try {
+                SetTextRenderingHint(gr, font);
+                gr.DrawString(text, font, brush, x, y, stringFormat);
+            } catch {
+                // Wird bereits an anderer Stelle verwendet... Multitasking, wenn mehrere items auf einmal generiert werden.
+                DrawString(gr, text, font, brush, x, y, stringFormat);
+            }
         }
 
         public static BlueFont Get(FontFamily font, float fontSize) => Get(font.Name, fontSize, false, false, false, false, false, "000000", "FFFFFF", false, false, false);
@@ -165,15 +170,24 @@ namespace BlueControls {
         }
 
         public static SizeF MeasureString(string text, Font font) {
-            using var g = Graphics.FromHwnd(IntPtr.Zero);
-            SetTextRenderingHint(g, font);
-            return g.MeasureString(text, font, 9999, StringFormat.GenericDefault);
+            try {
+                using var g = Graphics.FromHwnd(IntPtr.Zero);
+                SetTextRenderingHint(g, font);
+                return g.MeasureString(text, font, 9999, StringFormat.GenericDefault);
+            } catch {
+                return SizeF.Empty;
+            }
         }
 
         public static SizeF MeasureString(string text, Font font, StringFormat stringformat) {
-            using var g = Graphics.FromHwnd(IntPtr.Zero);
-            SetTextRenderingHint(g, font);
-            return g.MeasureString(text, font, 9999, stringformat);
+            try {
+
+                using var g = Graphics.FromHwnd(IntPtr.Zero);
+                SetTextRenderingHint(g, font);
+                return g.MeasureString(text, font, 9999, stringformat);
+            } catch {
+                return SizeF.Empty;
+            }
         }
 
         public static SizeF MeasureStringOfCaption(string text) => MeasureString(text, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());

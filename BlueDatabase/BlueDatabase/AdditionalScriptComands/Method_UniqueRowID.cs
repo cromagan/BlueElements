@@ -22,13 +22,13 @@ using System.Collections.Generic;
 
 namespace BlueScript {
 
-    public class Method_AddRow : MethodDatabase {
+    public class Method_UniqueRowID : MethodDatabase {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.String };
+        public override List<enVariableDataType> Args => new() { };
 
-        public override string Description => "Lädt eine andere Datenbank (Database) und erstellt eine neue Zeile. KeyValue muss einen Wert enthalten- zur Not kann UniqueRowId() benutzt werden.";
+        public override string Description => "Gibt eine Systemweit einzigartige Zeilen-ID aller geladenen Datenbanken aus.";
 
         public override bool EndlessArgs => false;
 
@@ -36,35 +36,22 @@ namespace BlueScript {
 
         public override bool GetCodeBlockAfter => false;
 
-        public override enVariableDataType Returns => enVariableDataType.Object;
+        public override enVariableDataType Returns => enVariableDataType.String;
 
         public override string StartSequence => "(";
 
-        public override string Syntax => "AddRow(database, keyvalue);";
+        public override string Syntax => "UniqueRowID()";
 
         #endregion
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "addrow" };
+        public override List<string> Comand(Script s) => new() { "uniquerowid" };
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
-
-            var db = DatabaseOf(s, attvar.Attributes[0].ValueString);
-            if (db == null) { return new strDoItFeedback("Datenbank nicht gefunden"); }
-
-            if (db.ReadOnly) { return strDoItFeedback.Falsch(); }
-
-            if (string.IsNullOrEmpty(attvar.Attributes[1].ValueString)) { return new strDoItFeedback("KeyValue muss einen Wert enthalten."); }
-            //var r = db.Row[attvar.Attributes[1].ValueString];
-
-            //if (r != null && !attvar.Attributes[2].ValueBool) { return Method_Row.RowToObject(r); }
-
-            var r = db.Row.Add(attvar.Attributes[1].ValueString);
-
-            return Method_Row.RowToObject(r);
+            return new strDoItFeedback(RowCollection.UniqueKeyValue(), enVariableDataType.String);
         }
 
         #endregion

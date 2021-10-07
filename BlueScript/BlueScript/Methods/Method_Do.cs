@@ -50,7 +50,7 @@ namespace BlueScript {
             do {
                 s.Line = tmpline;
                 du++;
-                if (du > 10000) { return new strDoItFeedback("Do-Schleife nach 10.000 Durchläufen abgebrochen."); }
+                if (du > 100000) { return new strDoItFeedback("Do-Schleife nach 100.000 Durchläufen abgebrochen."); }
 
 
                 var tmpv = new List<Variable>();

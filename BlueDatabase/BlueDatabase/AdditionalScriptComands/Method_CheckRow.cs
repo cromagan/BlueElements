@@ -15,56 +15,45 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
 using BlueDatabase;
 using Skript.Enums;
 using System.Collections.Generic;
 
 namespace BlueScript {
 
-    public class Method_AddRow : MethodDatabase {
+    public class Method_CheckRow : MethodDatabase {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.String };
+        public override List<enVariableDataType> Args => new() { enVariableDataType.Object };
 
-        public override string Description => "Lädt eine andere Datenbank (Database) und erstellt eine neue Zeile. KeyValue muss einen Wert enthalten- zur Not kann UniqueRowId() benutzt werden.";
+        public override string Description => "Prüft die angegebene Zeile mit der Startroutine 'script'. Wenn die Zeile Null ist, wird kein Fehler ausgegeben.";
 
         public override bool EndlessArgs => false;
 
-        public override string EndSequence => ")";
+        public override string EndSequence => ");";
 
         public override bool GetCodeBlockAfter => false;
 
-        public override enVariableDataType Returns => enVariableDataType.Object;
+        public override enVariableDataType Returns => enVariableDataType.Null;
 
         public override string StartSequence => "(";
 
-        public override string Syntax => "AddRow(database, keyvalue);";
+        public override string Syntax => "CheckRow(Row);";
 
         #endregion
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "addrow" };
+        public override List<string> Comand(Script s) => new() { "checkrow" };
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
-            var db = DatabaseOf(s, attvar.Attributes[0].ValueString);
-            if (db == null) { return new strDoItFeedback("Datenbank nicht gefunden"); }
-
-            if (db.ReadOnly) { return strDoItFeedback.Falsch(); }
-
-            if (string.IsNullOrEmpty(attvar.Attributes[1].ValueString)) { return new strDoItFeedback("KeyValue muss einen Wert enthalten."); }
-            //var r = db.Row[attvar.Attributes[1].ValueString];
-
-            //if (r != null && !attvar.Attributes[2].ValueBool) { return Method_Row.RowToObject(r); }
-
-            var r = db.Row.Add(attvar.Attributes[1].ValueString);
-
-            return Method_Row.RowToObject(r);
+            var row = Method_Row.ObjectToRow(attvar.Attributes[0]);
+            row?.DoAutomatic(false, "script");
+            return strDoItFeedback.Null();
         }
 
         #endregion

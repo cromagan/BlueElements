@@ -105,6 +105,30 @@ namespace BlueDatabase {
 
         #region Methods
 
+        /// <summary>
+        /// Gibt einen Zeilenschlüssel zurück, der bei allen aktuell geladenen Datenbanken einzigartig ist.
+        /// </summary>
+        /// <returns></returns>
+        public static string UniqueKeyValue() {
+            var x = 9999;
+            do {
+                x += 1;
+                if (x > 99999) { Develop.DebugPrint(enFehlerArt.Fehler, "Unique ID konnte nicht erzeugt werden"); }
+
+                var unique = ("X" + DateTime.Now.ToString("mm.fff") + x.ToString(Constants.Format_Integer5)).RemoveChars(Constants.Char_DateiSonderZeichen + ".");
+                var ok = true;
+
+                foreach (var thisfile in BlueBasics.MultiUserFile.clsMultiUserFile.AllFiles) {
+                    if (thisfile is Database db) {
+                        var row = db.Row[unique];
+                        if (row != null) { ok = false; break; }
+                    }
+                }
+
+                if (ok) { return unique; }
+            } while (true);
+        }
+
         public void Add(RowItem Row) {
             if (!_Internal.TryAdd(Row.Key, Row)) { Develop.DebugPrint(enFehlerArt.Fehler, "Add Failed"); }
             OnRowAdded(new RowEventArgs(Row));

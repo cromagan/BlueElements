@@ -71,6 +71,7 @@ namespace BlueControls.Controls {
             CaptionPosition = captionPosition;
             Database = database;
             ColumnKey = columnKey;
+            CheckEnabledState();
         }
 
         #endregion
@@ -216,7 +217,7 @@ namespace BlueControls.Controls {
 
         internal void CheckEnabledState() {
             if (Parent == null || !Parent.Enabled || _tmpColumn == null || _tmpRow == null) {
-                DisabledReason = "Bezug zur Zelle verloren.";
+                DisabledReason = "Kein Bezug zu einer Zelle.";
                 return;
             }
             DisabledReason = CellCollection.ErrorReason(_tmpColumn, _tmpRow, enErrorReason.EditNormaly); // Rechteverwaltung einfliesen lassen.

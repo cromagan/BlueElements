@@ -104,7 +104,11 @@ namespace BlueControls {
                     ro.CellSet("typ", thisv.Type.ToString());
                     ro.CellSet("RO", thisv.Readonly);
                     ro.CellSet("System", thisv.SystemVariable);
-                    ro.CellSet("Inhalt", thisv.ValueString);
+
+                    var tmpi = thisv.ValueString;
+                    if(tmpi.Length> 500) { tmpi = tmpi.Substring(0, 500) + "..."; }
+
+                    ro.CellSet("Inhalt", tmpi);
                     ro.CellSet("Kommentar", thisv.Coment);
                 }
             }
