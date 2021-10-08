@@ -85,7 +85,7 @@ namespace BlueBasics {
         public static void DebugPrint(string warnung) => DebugPrint(enFehlerArt.Warnung, warnung);
 
         public static void DebugPrint(enFehlerArt art, Exception ex) {
-            if (art != enFehlerArt.Info && art != enFehlerArt.DevelopInfo && IsHostRunning()) { Debugger.Break(); }
+            if (art != enFehlerArt.Info && art != enFehlerArt.DevelopInfo && IsHostRunning()) {Debugger.Break(); }
             DebugPrint(art, "Es wurde ein allgemeiner Fehler abgefangen.\r\nMeldung: " + ex.Message + "\r\n" + ex.StackTrace.ToString());
         }
 
