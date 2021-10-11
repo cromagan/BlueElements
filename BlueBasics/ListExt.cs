@@ -119,6 +119,14 @@ namespace BlueBasics {
             OnItemAdded(item);
         }
 
+        public bool AddIfNotExists(T item) {
+            if (!Contains(item)) {
+                Add(item);
+                return true;
+            }
+            return false;
+        }
+
         public new void AddRange(IEnumerable<T> collection) {
             Develop.DebugPrint_Disposed(Disposed);
             if (collection is null) { return; }

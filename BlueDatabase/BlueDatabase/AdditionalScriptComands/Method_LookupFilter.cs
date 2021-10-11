@@ -57,7 +57,7 @@ namespace BlueScript {
             if (allFi is null) { return new strDoItFeedback("Fehler im Filter"); }
 
             var returncolumn = allFi[0].Database.Column.Exists(attvar.Attributes[0].ValueString);
-            if (returncolumn == null) { return new strDoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[4].ValueString); }
+            if (returncolumn == null) { return new strDoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[0].ValueString); }
 
             var r = RowCollection.MatchesTo(allFi);
             if (r == null || r.Count == 0) {

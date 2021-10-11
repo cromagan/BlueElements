@@ -977,6 +977,13 @@ namespace BlueDatabase {
 
         public List<string> Contents() => Contents((FilterCollection)null, null);
 
+        public List<string> Contents(List<FilterItem> fi, List<RowItem> pinned) {
+            if (fi == null || fi.Count == 0) { return Contents((FilterCollection)null, null); }
+            var ficol = new FilterCollection(fi[0].Database);
+            ficol.AddRange(fi);
+            return Contents(ficol, pinned);
+        }
+
         public List<string> Contents(FilterItem fi, List<RowItem> pinned) {
             var x = new FilterCollection(fi.Database);
             x.Add(fi);
