@@ -72,12 +72,12 @@ namespace BlueScript {
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
             var db = DatabaseOf(s, attvar.Attributes[0].ValueString);
-            if (db == null) { return new strDoItFeedback("Datenbank nicht gefunden"); }
+            if (db == null) { return new strDoItFeedback("Datenbank '" + attvar.Attributes[0].ValueString + "' nicht gefunden"); }
 
             #region Spalte ermitteln
 
             var filterColumn = db.Column.Exists(attvar.Attributes[1].ValueString);
-            if (filterColumn == null) { return new strDoItFeedback("Spalte in Ziel-Datenbank nicht gefunden"); }
+            if (filterColumn == null) { return new strDoItFeedback("Spalte '" + attvar.Attributes[1].ValueString + "' in Ziel-Datenbank nicht gefunden"); }
 
             #endregion
 

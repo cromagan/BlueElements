@@ -56,7 +56,7 @@ namespace BlueScript {
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
             var db = MyDatabase(s);
-            if (db == null) { return new strDoItFeedback("Datenbank nicht gefunden"); }
+            if (db == null) { return new strDoItFeedback("Interner Fehler, eigene Datenbank nicht gefunden"); }
 
             #region Filter prüfen: allFi
 

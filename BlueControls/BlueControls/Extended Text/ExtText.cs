@@ -852,6 +852,7 @@ namespace BlueControls {
             do {
                 Akt++;
                 if (Akt > Chars.Count - 1) {
+                    Row_SetOnLine(ZB_Char, Akt-1);
                     RI.Add(ZB_Char + ";" + (Akt - 1));
                     break;
                 }

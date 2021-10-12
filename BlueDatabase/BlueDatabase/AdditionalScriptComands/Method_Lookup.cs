@@ -54,7 +54,7 @@ namespace BlueScript {
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
             var db = DatabaseOf(s, attvar.Attributes[0].ValueString);
-            if (db == null) { return new strDoItFeedback("Datenbank nicht gefunden"); }
+            if (db == null) { return new strDoItFeedback("Datenbank '" + attvar.Attributes[0].ValueString + "' nicht gefunden"); }
 
             var c = db.Column.Exists(attvar.Attributes[2].ValueString);
             if (c == null) { return new strDoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[2].ValueString); }
@@ -84,7 +84,6 @@ namespace BlueScript {
                 return new strDoItFeedback(v[0].ValueString + "\r", enVariableDataType.List);
             }
             return new strDoItFeedback(v[0].ValueString, enVariableDataType.List);
-
         }
 
         #endregion

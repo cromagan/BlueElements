@@ -53,7 +53,7 @@ namespace BlueScript {
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
             var db = DatabaseOf(s, attvar.Attributes[0].ValueString);
-            if (db == null) { return new strDoItFeedback("Datenbank nicht gefunden"); }
+            if (db == null) { return new strDoItFeedback("Datenbank '" + attvar.Attributes[0].ValueString + "' nicht gefunden"); }
 
             if (db.ReadOnly) { return strDoItFeedback.Falsch(); }
 

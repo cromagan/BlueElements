@@ -55,7 +55,7 @@ namespace BlueScript {
             if (row is null) { return new strDoItFeedback("Fehler in der Zeile"); }
 
             var columnToSet = row.Database.Column.Exists(attvar.Attributes[1].ValueString);
-            if (columnToSet == null) { return new strDoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[4].ValueString); }
+            if (columnToSet == null) { return new strDoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[1].ValueString); }
 
             row.CellSet(columnToSet, attvar.Attributes[0].ValueString);
 

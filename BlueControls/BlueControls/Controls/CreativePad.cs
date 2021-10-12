@@ -109,11 +109,13 @@ namespace BlueControls.Controls {
                 if (_Item == value) { return; }
                 if (_Item != null) {
                     _Item.ItemRemoved -= _Item_ItemRemoved;
+                    _Item.ItemAdded -= _Item_ItemAdded;
                     _Item.DoInvalidate -= Item_DoInvalidate;
                 }
                 _Item = value;
                 if (_Item != null) {
                     _Item.ItemRemoved += _Item_ItemRemoved;
+                    _Item.ItemAdded += _Item_ItemAdded;
                     _Item.DoInvalidate += Item_DoInvalidate;
                     _Item.OnDoInvalidate();
                 }
@@ -123,6 +125,7 @@ namespace BlueControls.Controls {
         }
 
         public BasicPadItem LastClickedItem { get; private set; } = null;
+
         public override string QuickInfoText => _LastQuickInfo;
 
         [DefaultValue(false)]
@@ -474,13 +477,28 @@ namespace BlueControls.Controls {
 
         protected override void OnKeyUp(System.Windows.Forms.KeyEventArgs e) => DoKeyUp(e, true);
 
-        protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) => DoMouseDown(e); // Kann nicht public gemacht werden, deswegen Umleitung
+        protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) => DoMouseDown(e);
 
-        protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) => DoMouseMove(e); // Kann nicht public gemacht werden, deswegen Umleitung
+        protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) => DoMouseMove(e);
 
-        protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) => DoMouseUp(e); // Kann nicht public gemacht werden, deswegen Umleitung
+        protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) => DoMouseUp(e);
+
+        private void _Item_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
+            CalculateZoomFitAndSliders(-1);
+            if (_Item.Count == 1 || _Fitting) { ZoomFit(); }
+        }
+
+        // Kann nicht public gemacht werden, deswegen Umleitung
+
+        // Kann nicht public gemacht werden, deswegen Umleitung
+
+        // Kann nicht public gemacht werden, deswegen Umleitung
 
         private void _Item_ItemRemoved(object sender, System.EventArgs e) {
+            CalculateZoomFitAndSliders(-1);
+
+            if (_Fitting) { ZoomFit(); }
+
             CheckHotItem(null, true);
             Unselect();
             ZoomFit();

@@ -102,27 +102,11 @@ namespace BlueControls.Controls {
             ZoomOrShiftChanged();
         }
 
-        public void Zoom100() {
-            _Fitting = true;
-            var mb = MaxBounds();
-            _ZoomFit = ZoomFitValue(mb, true, Size);
-            _Zoom = 1D;
-            ComputeSliders(mb);
-            ZoomOrShiftChanged();
-            Invalidate();
-        }
+        public void Zoom100() => CalculateZoomFitAndSliders(1D);
 
         public double ZoomCurrent() => _Zoom;
 
-        public void ZoomFit() {
-            _Fitting = true;
-            var mb = MaxBounds();
-            _ZoomFit = ZoomFitValue(mb, true, Size);
-            _Zoom = _ZoomFit;
-            ComputeSliders(mb);
-            ZoomOrShiftChanged();
-            Invalidate();
-        }
+        public void ZoomFit() => CalculateZoomFitAndSliders(_ZoomFit);
 
         public double ZoomFitValue(RectangleM MaxBounds, bool sliderShowing, Size sizeOfPaintArea) => MaxBounds == null || MaxBounds.Width < 0.01d || MaxBounds.Height < 0.01d
 ? 1d
@@ -141,6 +125,26 @@ namespace BlueControls.Controls {
         }
 
         internal PointF SliderValues(RectangleM bounds, double ZoomToUse, Point TopLeftPos) => new((float)((bounds.Left * ZoomToUse) - (TopLeftPos.X / 2d)), (float)((bounds.Top * ZoomToUse) - (TopLeftPos.Y / 2d)));
+
+        /// <summary>
+        /// Kümmert sich um Slider und Maximal-Setting.
+        /// Bei einem negativen Wert wird der neue Zoom nicht gesetzt.
+        /// </summary>
+        /// <param name="newzoom"></param>
+        protected void CalculateZoomFitAndSliders(double newzoom) {
+            var mb = MaxBounds();
+            _ZoomFit = ZoomFitValue(mb, true, Size);
+            if (newzoom >= 0) {
+                _Zoom = newzoom;
+
+                _Fitting = Math.Abs(_Zoom - newzoom) < 0.01;
+            }
+            ComputeSliders(mb);
+            if (newzoom >= 0) {
+                ZoomOrShiftChanged();
+                Invalidate();
+            }
+        }
 
         /// <summary>
         /// Berechnet Maus Koordinaten des Steuerelements in in Koordinaten um, als ob auf dem unscalierten Inhalt direkt gewählt werden würde.
