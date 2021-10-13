@@ -54,6 +54,7 @@ namespace BlueScript {
             }
 
             try {
+                Generic.CollectGarbage();
                 var bmp = (Bitmap)BitmapExt.Image_FromFile(attvar.Attributes[0].ValueString);
                 var nr = s.AddBitmapToCache(bmp);
 

@@ -19,6 +19,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.ItemCollection;
 using BlueDatabase;
+using System;
 using System.Collections.Generic;
 
 namespace BlueControls.Forms {
@@ -51,13 +52,20 @@ namespace BlueControls.Forms {
         #region Methods
 
         public static RowItem Show(List<RowItem> rows, string layoutID) {
-            var items = new List<BasicListItem>();
-            foreach (var ThisRow in rows) {
-                items.Add(new RowFormulaListItem(ThisRow, layoutID, string.Empty));
-            }
+            try {
+                var items = new List<BasicListItem>();
+                foreach (var ThisRow in rows) {
+                    items.Add(new RowFormulaListItem(ThisRow, layoutID, string.Empty));
+                }
 
-            var x = Show(items);
-            return (x as RowFormulaListItem)?.Row;
+                var x = Show(items);
+                return (x as RowFormulaListItem)?.Row;
+            }
+            catch (Exception ex){
+                Develop.DebugPrint(ex);
+                return null;
+
+            }
         }
 
         public static string Show(List<string> files, string fileEncryptionKey) {

@@ -106,7 +106,11 @@ namespace BlueControls.Controls {
 
         public double ZoomCurrent() => _Zoom;
 
-        public void ZoomFit() => CalculateZoomFitAndSliders(_ZoomFit);
+        public void ZoomFit() {
+        CalculateZoomFitAndSliders(-1);
+            CalculateZoomFitAndSliders(_ZoomFit);
+        }
+
 
         public double ZoomFitValue(RectangleM MaxBounds, bool sliderShowing, Size sizeOfPaintArea) => MaxBounds == null || MaxBounds.Width < 0.01d || MaxBounds.Height < 0.01d
 ? 1d

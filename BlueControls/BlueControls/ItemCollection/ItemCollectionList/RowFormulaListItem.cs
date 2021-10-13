@@ -60,7 +60,6 @@ namespace BlueControls.ItemCollection {
                     _tmpBMP.Dispose();
                     _tmpBMP = null;
                 }
-                //OnChanged();
             }
         }
 
@@ -81,7 +80,6 @@ namespace BlueControls.ItemCollection {
                 if (_Row == value) { return; }
                 _Row = value;
                 removePic();
-                //OnChanged();
             }
         }
 
@@ -143,15 +141,17 @@ namespace BlueControls.ItemCollection {
                     _tmpBMP = null;
                 }
             }
-            if (_tmpBMP == null) { _tmpBMP = new Bitmap((int)mb.Width, (int)mb.Height); }
+
+            var InternalZoom = Math.Min(500 / mb.Width, 500 / mb.Height);
+            InternalZoom = Math.Min(1, InternalZoom);
+
+            if (_tmpBMP == null) { _tmpBMP = new Bitmap((int)(mb.Width * InternalZoom), (int)(mb.Height * InternalZoom)); }
             var zoomv = _pad.ZoomFitValue(mb, false, _tmpBMP.Size);
             var centerpos = _pad.CenterPos(mb, false, _tmpBMP.Size, zoomv);
             var slidervalues = _pad.SliderValues(mb, zoomv, centerpos);
             _pad.ShowInPrintMode = true;
             _pad.Unselect();
             _pad.Item.DrawCreativePadToBitmap(_tmpBMP, enStates.Standard, zoomv, slidervalues.X, slidervalues.Y, null);
-
-            //_tmpBMP.Save(@"C:\test.png", System.Drawing.Imaging.ImageFormat.Png);
         }
 
         private void removePic() {

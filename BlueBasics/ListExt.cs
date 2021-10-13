@@ -20,6 +20,7 @@ using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BlueBasics {
 
@@ -202,8 +203,14 @@ namespace BlueBasics {
         public new void Sort(Comparison<T> comparison) => Develop.DebugPrint_NichtImplementiert();
 
         public new void Sort() {
+            if (base.Count < 2) { return; }
+
+            var tmp = new List<T>(this);
             base.Sort();
-            OnChanged();
+
+            if (!tmp.SequenceEqual(this)) {
+                OnChanged();
+            }
         }
 
         public new void Sort(IComparer<T> comparer) => Develop.DebugPrint_NichtImplementiert();

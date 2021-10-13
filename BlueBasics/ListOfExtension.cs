@@ -250,31 +250,27 @@ namespace BlueBasics {
             return l;
         }
 
-        public static double TagGetDouble(this ICollection<string> _String, string tagName) => DoubleParse(TagGet(_String, tagName));
+        public static double TagGetDouble(this ICollection<string> col, string tagname) => DoubleParse(TagGet(col, tagname));
 
-        public static int TagGetInt(this ICollection<string> _String, string tagName) => IntParse(TagGet(_String, tagName));
+        public static int TagGetInt(this ICollection<string> col, string tagname) => IntParse(TagGet(col, tagname));
 
-        public static void TagSet(this ICollection<string> _String, string tagNamex, string value) {
-            var uTagName = tagNamex.ToUpper() + ":";
-            var Found = -1;
-            for (var z = 0; z < _String.Count; z++) {
-                if (_String.ElementAtOrDefault(z)?.Length > uTagName.Length + 1 && _String.ElementAtOrDefault(z)?.Substring(0, uTagName.Length + 1).ToUpper() == uTagName + " ") {
-                    Found = z;
-                    break;
-                }
-                if (_String.ElementAtOrDefault(z)?.Length > uTagName.Length && _String.ElementAtOrDefault(z)?.Substring(0, uTagName.Length).ToUpper() == uTagName) {
-                    Found = z;
-                    break;
-                }
-            }
-            var n = tagNamex + ": " + value;
+        public static void TagRemove(this ICollection<string> col, string tagname) {
+            var Found = col.TagGetPosition(tagname);
             if (Found >= 0) {
-                if (_String.ElementAtOrDefault(Found) == n) {
-                    return;
-                }
-                _String.Remove(_String.ElementAtOrDefault(Found));
+                col.Remove(col.ElementAtOrDefault(Found));
             }
-            _String.Add(n);
+        }
+
+        public static void TagSet(this ICollection<string> col, string tagname, string value) {
+            var Found = col.TagGetPosition(tagname);
+            var n = tagname + ": " + value;
+
+            if (Found >= 0) {
+                if (col.ElementAtOrDefault(Found) == n) { return; }
+                col.Remove(col.ElementAtOrDefault(Found));
+            }
+
+            col.Add(n);
         }
 
         /// <summary>
@@ -296,6 +292,21 @@ namespace BlueBasics {
                 }
             }
             return tmp.TrimCr();
+        }
+
+        private static int TagGetPosition(this ICollection<string> col, string tagname) {
+            var UTagName = tagname.ToUpper() + ":";
+
+            for (var z = 0; z < col.Count; z++) {
+                if (col.ElementAtOrDefault(z)?.Length > UTagName.Length + 1 && col.ElementAtOrDefault(z)?.Substring(0, UTagName.Length + 1).ToUpper() == UTagName + " ") {
+                    return z;
+                }
+                if (col.ElementAtOrDefault(z)?.Length > UTagName.Length && col.ElementAtOrDefault(z)?.Substring(0, UTagName.Length).ToUpper() == UTagName) {
+                    return z;
+                }
+            }
+
+            return -1;
         }
 
         #endregion

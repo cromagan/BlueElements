@@ -724,7 +724,7 @@ namespace BlueControls.Controls {
                 Notification.Show("Abbruch,<br>kein Text im Zwischenspeicher!", enImageCode.Information);
                 return;
             }
-            //    If Not Editablexx("Import gerade nicht möglich") Then Exit Sub
+
             var nt = System.Windows.Forms.Clipboard.GetText();
             ImportCSV(nt);
         }

@@ -243,12 +243,12 @@ namespace BlueControls.ItemCollection {
             var f = Skin.GetBlueFont(Stil, Parent.SheetStyle);
             var sz1 = BlueFont.MeasureString(AngezeigterText1(), f.Font(geszoom));
             var sz2 = BlueFont.MeasureString(Text_unten, f.Font(geszoom));
-            var maxrad = (double)((Math.Max(Math.Max(sz1.Width, sz1.Height), Math.Max(sz2.Width, sz2.Height)) / 2) + 10);
+            var maxrad = (double)((Math.Max(Math.Max(sz1.Width, sz1.Height), Math.Max(sz2.Width, sz2.Height))));
             RectangleM X = new(Point1, Point2);
             X.ExpandTo(_Bezugslinie1);
             X.ExpandTo(_Bezugslinie2);
             X.ExpandTo(TextPointx, maxrad);
-            //return new RectangleM(P1_x - 2, P1_y - 2, P2_x - P1_x + 4, P2_y - P1_y + 4);
+
             X.Inflate(-2, -2); // die Sicherheits koordinaten damit nicht linien abgeschnitten werden
             return X;
         }
@@ -261,6 +261,10 @@ namespace BlueControls.ItemCollection {
             var f = Skin.GetBlueFont(Stil, Parent.SheetStyle);
             var PfeilG = f.Font(geszoom).Size * 0.8f;
             var pen2 = f.Pen(cZoom);
+
+            //GR.DrawLine(pen2, UsedArea().PointOf(enAlignment.Top_Left).ZoomAndMove(cZoom, shiftX, shiftY), UsedArea().PointOf(enAlignment.Bottom_Right).ZoomAndMove(cZoom, shiftX, shiftY)); // Bezugslinie 1
+            //GR.DrawLine(pen2, UsedArea().PointOf(enAlignment.Top_Left).ZoomAndMove(cZoom, shiftX, shiftY), UsedArea().PointOf(enAlignment.Bottom_Left).ZoomAndMove(cZoom, shiftX, shiftY)); // Bezugslinie 1
+
             GR.DrawLine(pen2, Point1.ZoomAndMove(cZoom, shiftX, shiftY), _Bezugslinie1.ZoomAndMove(cZoom, shiftX, shiftY)); // Bezugslinie 1
             GR.DrawLine(pen2, Point2.ZoomAndMove(cZoom, shiftX, shiftY), _Bezugslinie2.ZoomAndMove(cZoom, shiftX, shiftY)); // Bezugslinie 2
             GR.DrawLine(pen2, _SchnittPunkt1.ZoomAndMove(cZoom, shiftX, shiftY), _SchnittPunkt2.ZoomAndMove(cZoom, shiftX, shiftY)); // Maßhilfslinie

@@ -27,7 +27,7 @@ namespace BlueControls.Controls {
 
         public static clsRowDrawData Get(this List<clsRowDrawData> l, RowItem row) {
             foreach (var thisr in l) {
-                if (thisr.Row == row) { return thisr; }
+                if (thisr?.Row == row) { return thisr; }
             }
             return null;
         }

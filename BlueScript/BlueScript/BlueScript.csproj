@@ -48,6 +48,9 @@
     <Compile Include="Enums\enSkriptFehlerTyp.cs" />
     <Compile Include="Methods\Method.cs" />
     <Compile Include="Methods\Method_BerechneVariable_Tilde.cs" />
+    <Compile Include="Methods\Method_RandomInt.cs" />
+    <Compile Include="Methods\Method_DateTimeDifferenceInDays.cs" />
+    <Compile Include="Methods\Method_DateTimeUTCNow.cs" />
     <Compile Include="Methods\Method_CountString.cs" />
     <Compile Include="Methods\Method_Do.cs" />
     <Compile Include="Methods\Method_Break.cs" />
