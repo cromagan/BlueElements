@@ -31,6 +31,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using static BlueBasics.FileOperations;
+using static BlueBasics.Extensions;
 
 namespace BlueControls.Controls {
 
@@ -235,8 +236,8 @@ namespace BlueControls.Controls {
             } else {
                 DisabledReason = !string.IsNullOrEmpty(Filter.Herkunft) ? "Dieser Filter ist automatisch<br>gesetzt worden." : string.Empty;
                 var qi = Filter.Column.QuickInfoText(string.Empty);
-                QuickInfo = string.IsNullOrEmpty(qi) ? "<b>Filter:</b><br>" + Filter.ReadableText()
-                                                     : "<b>Filter:</b><br>" + Filter.ReadableText() + "<br><br><b>Info:</b><br>" + qi;
+                QuickInfo = string.IsNullOrEmpty(qi) ? "<b>Filter:</b><br>" + Filter.ReadableText().CreateHtmlCodes(false)
+                                                     : "<b>Filter:</b><br>" + Filter.ReadableText().CreateHtmlCodes(false) + "<br><br><b>Info:</b><br>" + qi.CreateHtmlCodes(false);
                 if (!Filter.Column.AutoFilterSymbolPossible()) {
                     EditType = enEditTypeFormula.None;
                 } else {

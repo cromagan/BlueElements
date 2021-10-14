@@ -1067,19 +1067,23 @@ namespace BlueControls.Controls {
 
         protected override void OnKeyDown(System.Windows.Forms.KeyEventArgs e) {
             base.OnKeyDown(e);
+
             if (_Database == null) { return; }
+
             lock (Lock_UserAction) {
                 if (ISIN_KeyDown) { return; }
                 ISIN_KeyDown = true;
-                Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
+
+                _Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
+
                 switch (e.KeyCode) {
                     case System.Windows.Forms.Keys.Oemcomma: // normales ,
                         if (e.Modifiers == System.Windows.Forms.Keys.Control) {
-                            var lp = CellCollection.ErrorReason(_CursorPosColumn, _CursorPosRow.Row, enErrorReason.EditGeneral);
-                            Neighbour(_CursorPosColumn, _CursorPosRow.Row, enDirection.Oben, out var _newCol, out var _newRow);
-                            if (_newRow == _CursorPosRow.Row) { lp = "Das geht nicht bei dieser Zeile."; }
+                            var lp = CellCollection.ErrorReason(_CursorPosColumn, _CursorPosRow?.Row, enErrorReason.EditGeneral);
+                            Neighbour(_CursorPosColumn, _CursorPosRow?.Row, enDirection.Oben, out var _newCol, out var _newRow);
+                            if (_newRow == _CursorPosRow?.Row) { lp = "Das geht nicht bei dieser Zeile."; }
                             if (string.IsNullOrEmpty(lp) && _newRow != null) {
-                                UserEdited(this, _newRow.CellGetString(_CursorPosColumn), _CursorPosColumn, _CursorPosRow.Row, true);
+                                UserEdited(this, _newRow.CellGetString(_CursorPosColumn), _CursorPosColumn, _CursorPosRow?.Row, true);
                             } else {
                                 NotEditableInfo(lp);
                             }
@@ -1088,14 +1092,14 @@ namespace BlueControls.Controls {
 
                     case System.Windows.Forms.Keys.X:
                         if (e.Modifiers == System.Windows.Forms.Keys.Control) {
-                            CopyToClipboard(_CursorPosColumn, _CursorPosRow.Row, true);
-                            if (_CursorPosRow.Row.CellIsNullOrEmpty(_CursorPosColumn)) {
+                            CopyToClipboard(_CursorPosColumn, _CursorPosRow?.Row, true);
+                            if (_CursorPosRow is null || _CursorPosRow.Row.CellIsNullOrEmpty(_CursorPosColumn)) {
                                 ISIN_KeyDown = false;
                                 return;
                             }
-                            var l2 = CellCollection.ErrorReason(_CursorPosColumn, _CursorPosRow.Row, enErrorReason.EditGeneral);
+                            var l2 = CellCollection.ErrorReason(_CursorPosColumn, _CursorPosRow?.Row, enErrorReason.EditGeneral);
                             if (string.IsNullOrEmpty(l2)) {
-                                UserEdited(this, string.Empty, _CursorPosColumn, _CursorPosRow.Row, true);
+                                UserEdited(this, string.Empty, _CursorPosColumn, _CursorPosRow?.Row, true);
                             } else {
                                 NotEditableInfo(l2);
                             }
@@ -1103,13 +1107,13 @@ namespace BlueControls.Controls {
                         break;
 
                     case System.Windows.Forms.Keys.Delete:
-                        if (_CursorPosRow.Row.CellIsNullOrEmpty(_CursorPosColumn)) {
+                        if (_CursorPosRow is null || _CursorPosRow.Row.CellIsNullOrEmpty(_CursorPosColumn)) {
                             ISIN_KeyDown = false;
                             return;
                         }
-                        var l = CellCollection.ErrorReason(_CursorPosColumn, _CursorPosRow.Row, enErrorReason.EditGeneral);
+                        var l = CellCollection.ErrorReason(_CursorPosColumn, _CursorPosRow?.Row, enErrorReason.EditGeneral);
                         if (string.IsNullOrEmpty(l)) {
-                            UserEdited(this, string.Empty, _CursorPosColumn, _CursorPosRow.Row, true);
+                            UserEdited(this, string.Empty, _CursorPosColumn, _CursorPosRow?.Row, true);
                         } else {
                             NotEditableInfo(l);
                         }
@@ -1161,7 +1165,7 @@ namespace BlueControls.Controls {
 
                     case System.Windows.Forms.Keys.C:
                         if (e.Modifiers == System.Windows.Forms.Keys.Control) {
-                            CopyToClipboard(_CursorPosColumn, _CursorPosRow.Row, true);
+                            CopyToClipboard(_CursorPosColumn, _CursorPosRow?.Row, true);
                         }
                         break;
 
@@ -1190,13 +1194,13 @@ namespace BlueControls.Controls {
                                     return;
                                 }
                                 var ntxt = System.Windows.Forms.Clipboard.GetText();
-                                if (_CursorPosRow.Row.CellGetString(_CursorPosColumn) == ntxt) {
+                                if (_CursorPosRow?.Row.CellGetString(_CursorPosColumn) == ntxt) {
                                     ISIN_KeyDown = false;
                                     return;
                                 }
-                                var l2 = CellCollection.ErrorReason(_CursorPosColumn, _CursorPosRow.Row, enErrorReason.EditGeneral);
+                                var l2 = CellCollection.ErrorReason(_CursorPosColumn, _CursorPosRow?.Row, enErrorReason.EditGeneral);
                                 if (string.IsNullOrEmpty(l2)) {
-                                    UserEdited(this, ntxt, _CursorPosColumn, _CursorPosRow.Row, true);
+                                    UserEdited(this, ntxt, _CursorPosColumn, _CursorPosRow?.Row, true);
                                 } else {
                                     NotEditableInfo(l2);
                                 }

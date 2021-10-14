@@ -742,20 +742,16 @@ namespace BlueBasics.MultiUserFile {
                     x.Close();
                 }
                 _inhaltBlockdatei = tmpInhalt;
-            } catch (Exception ex) {
-                Develop.DebugPrint(enFehlerArt.Warnung, ex);
+            } catch {
+                //Develop.DebugPrint(enFehlerArt.Warnung, ex);
                 return false;
             }
-            // if (!done)
-            // {
-            //    // Letztens aufgetreten, dass eine Blockdatei schon vorhanden war. Anscheinden Zeitgleiche Kopie?
-            //    Develop.DebugPrint(enFehlerArt.Info, "Befehl anscheinend abgebrochen:\r\n" + Filename);
-            //    return false;
-            // }
+
             if (AgeOfBlockDatei() < 0) {
                 Develop.DebugPrint("Block-Datei Konflikt 1\r\n" + Filename);
                 return false;
             }
+
             // Kontrolle, ob kein Netzwerkkonflikt vorliegt
             Pause(1, false);
             return BlockDateiCheck();
