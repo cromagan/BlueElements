@@ -201,9 +201,9 @@ namespace BlueControls.ItemCollection {
 
         protected override string ClassId() => "IMAGE";
 
-        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, double cZoom, double shiftX, double shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
-            DCoordinates.Inflate(-Padding, -Padding);
-            RectangleF r1 = new(DCoordinates.Left + Padding, DCoordinates.Top + Padding, DCoordinates.Width - (Padding * 2), DCoordinates.Height - (Padding * 2));
+        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, double zoom, double shiftX, double shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
+            drawingCoordinates.Inflate(-Padding, -Padding);
+            RectangleF r1 = new(drawingCoordinates.Left + Padding, drawingCoordinates.Top + Padding, drawingCoordinates.Width - (Padding * 2), drawingCoordinates.Height - (Padding * 2));
             RectangleF r2 = new();
             RectangleF r3 = new();
             if (Bitmap != null) {
@@ -215,60 +215,60 @@ namespace BlueControls.ItemCollection {
                         }
 
                     case enSizeModes.BildAbschneiden: {
-                            var scale = (float)Math.Max((DCoordinates.Width - (Padding * 2)) / (double)Bitmap.Width, (DCoordinates.Height - (Padding * 2)) / (double)Bitmap.Height);
-                            var tmpw = (DCoordinates.Width - (Padding * 2)) / scale;
-                            var tmph = (DCoordinates.Height - (Padding * 2)) / scale;
+                            var scale = (float)Math.Max((drawingCoordinates.Width - (Padding * 2)) / (double)Bitmap.Width, (drawingCoordinates.Height - (Padding * 2)) / (double)Bitmap.Height);
+                            var tmpw = (drawingCoordinates.Width - (Padding * 2)) / scale;
+                            var tmph = (drawingCoordinates.Height - (Padding * 2)) / scale;
                             r3 = new RectangleF((Bitmap.Width - tmpw) / 2, (Bitmap.Height - tmph) / 2, tmpw, tmph);
                             r2 = r1;
                             break;
                         }
                     default: // Is = enSizeModes.WeißerRand
                         {
-                            var scale = (float)Math.Min((DCoordinates.Width - (Padding * 2)) / (double)Bitmap.Width, (DCoordinates.Height - (Padding * 2)) / (double)Bitmap.Height);
-                            r2 = new RectangleF(((DCoordinates.Width - (Bitmap.Width * scale)) / 2) + DCoordinates.Left, ((DCoordinates.Height - (Bitmap.Height * scale)) / 2) + DCoordinates.Top, Bitmap.Width * scale, Bitmap.Height * scale);
+                            var scale = (float)Math.Min((drawingCoordinates.Width - (Padding * 2)) / (double)Bitmap.Width, (drawingCoordinates.Height - (Padding * 2)) / (double)Bitmap.Height);
+                            r2 = new RectangleF(((drawingCoordinates.Width - (Bitmap.Width * scale)) / 2) + drawingCoordinates.Left, ((drawingCoordinates.Height - (Bitmap.Height * scale)) / 2) + drawingCoordinates.Top, Bitmap.Width * scale, Bitmap.Height * scale);
                             break;
                         }
                 }
             }
-            var trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
-            GR.TranslateTransform(trp.X, trp.Y);
-            GR.RotateTransform(-Drehwinkel);
+            var trp = drawingCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
+            gr.TranslateTransform(trp.X, trp.Y);
+            gr.RotateTransform(-Drehwinkel);
             r1 = new RectangleF(r1.Left - trp.X, r1.Top - trp.Y, r1.Width, r1.Height);
             r2 = new RectangleF(r2.Left - trp.X, r2.Top - trp.Y, r2.Width, r2.Height);
             if (Hintergrund_weiß_füllen) {
-                GR.FillRectangle(Brushes.White, r1);
+                gr.FillRectangle(Brushes.White, r1);
             }
             try {
                 if (Bitmap != null) {
-                    if (ForPrinting) {
-                        GR.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                        GR.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                    if (forPrinting) {
+                        gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                        gr.PixelOffsetMode = PixelOffsetMode.HighQuality;
                     } else {
-                        GR.InterpolationMode = InterpolationMode.Low;
-                        GR.PixelOffsetMode = PixelOffsetMode.HighSpeed;
+                        gr.InterpolationMode = InterpolationMode.Low;
+                        gr.PixelOffsetMode = PixelOffsetMode.HighSpeed;
                     }
-                    GR.DrawImage(Bitmap, r2, r3, GraphicsUnit.Pixel);
+                    gr.DrawImage(Bitmap, r2, r3, GraphicsUnit.Pixel);
                 }
             } catch {
                 Generic.CollectGarbage();
             }
             if (Stil != PadStyles.Undefiniert) {
                 if (Parent.SheetStyleScale > 0 && Parent.SheetStyle != null) {
-                    GR.DrawRectangle(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(cZoom * Parent.SheetStyleScale), r1);
+                    gr.DrawRectangle(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(zoom * Parent.SheetStyleScale), r1);
                 }
             }
             foreach (var thisQI in Overlays) {
-                GR.DrawImage(thisQI.BMP, r2.Left + 8, r2.Top + 8);
+                gr.DrawImage(thisQI.BMP, r2.Left + 8, r2.Top + 8);
             }
-            GR.TranslateTransform(-trp.X, -trp.Y);
-            GR.ResetTransform();
-            if (!ForPrinting) {
+            gr.TranslateTransform(-trp.X, -trp.Y);
+            gr.ResetTransform();
+            if (!forPrinting) {
                 if (!string.IsNullOrEmpty(Platzhalter_für_Layout)) {
                     Font f = new("Arial", 8);
-                    BlueFont.DrawString(GR, Platzhalter_für_Layout, f, Brushes.Black, DCoordinates.Left, DCoordinates.Top);
+                    BlueFont.DrawString(gr, Platzhalter_für_Layout, f, Brushes.Black, drawingCoordinates.Left, drawingCoordinates.Top);
                 }
             }
-            base.DrawExplicit(GR, DCoordinates, cZoom, shiftX, shiftY, vState, SizeOfParentControl, ForPrinting);
+            base.DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, state, sizeOfParentControl, forPrinting);
         }
 
         protected override void ParseFinished() {

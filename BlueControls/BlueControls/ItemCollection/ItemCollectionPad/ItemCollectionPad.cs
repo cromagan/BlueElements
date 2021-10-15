@@ -633,7 +633,7 @@ namespace BlueControls.ItemCollection {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Der Auflistung soll ein Item hinzugefügt werden, welches keinen Namen hat " + item.Internal);
             }
             base.OnItemAdded(item);
-            item.PointMoved(null);
+
             IsSaved = false;
             item.Changed += Item_Changed;
             if (item.Parent != this) {

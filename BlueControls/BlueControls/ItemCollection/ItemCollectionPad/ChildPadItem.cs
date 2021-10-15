@@ -47,14 +47,11 @@ namespace BlueControls.ItemCollection {
 
         public ChildPadItem(ItemCollectionPad parent, string internalname) : base(parent, internalname) {
             PadInternal = null; // new CreativePad();
-            _tmpBMP = null;
             VisibleItems = null;
             ZoomItems = null;
             _Name = string.Empty;
             Textlage = (enAlignment)(-1);
             Randfarbe = Color.Transparent;
-            //_ReadableText = string.Empty;
-            //_VariableText = string.Empty;
             Eingebettete_Ansichten = new List<string>();
         }
 
@@ -96,10 +93,7 @@ namespace BlueControls.ItemCollection {
         #region Methods
 
         public override void DesignOrStyleChanged() {
-            if (_tmpBMP != null) {
-                _tmpBMP.Dispose();
-                _tmpBMP = null;
-            }
+            RemovePic();
             PadInternal.Item.SheetStyle = Parent.SheetStyle;
             PadInternal.Item.SheetStyleScale = Parent.SheetStyleScale;
         }
@@ -152,9 +146,9 @@ namespace BlueControls.ItemCollection {
             return true;
         }
 
-        public bool MouseMove(object sender, System.Windows.Forms.MouseEventArgs e, double cZoom, double shiftX, double shiftY) {
+        public bool MouseMove(object sender, System.Windows.Forms.MouseEventArgs e, double zoom, double shiftX, double shiftY) {
             if (PadInternal == null || PadInternal.Item.Count == 0) { return false; }
-            var l1 = UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY, false);
+            var l1 = UsedArea().ZoomAndMoveRect(zoom, shiftX, shiftY, false);
             var l2 = PadInternal.Item.MaxBounds(ZoomItems);
             if (l1.Width <= 0 || l2.Height <= 0) { return false; }
             double tZo = 1;
@@ -178,9 +172,9 @@ namespace BlueControls.ItemCollection {
             return true;
         }
 
-        public bool MouseUp(object sender, System.Windows.Forms.MouseEventArgs e, double cZoom, double shiftX, double shiftY) {
+        public bool MouseUp(object sender, System.Windows.Forms.MouseEventArgs e, double zoom, double shiftX, double shiftY) {
             if (PadInternal.Item.Count == 0) { return false; }
-            var l1 = UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY, false);
+            var l1 = UsedArea().ZoomAndMoveRect(zoom, shiftX, shiftY, false);
             var l2 = PadInternal.Item.MaxBounds(ZoomItems);
             if (l1.Width <= 0 || l2.Height <= 0) { return false; }
             var tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height);
@@ -208,9 +202,9 @@ namespace BlueControls.ItemCollection {
             switch (tag) {
                 //
                 case "readabletext":
-                //    _ReadableText = value.FromNonCritical();
-                //    _VariableText = _ReadableText;
-                //    return true;
+                    //    _ReadableText = value.FromNonCritical();
+                    //    _VariableText = _ReadableText;
+                    return true;
 
                 case "fixsize": // TODO: Entfernt am 24.05.2021
                     //Größe_fixiert = value.FromPlusMinus();
@@ -272,32 +266,32 @@ namespace BlueControls.ItemCollection {
 
         protected override string ClassId() => "CHILDPAD";
 
-        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, double cZoom, double shiftX, double shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
+        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, double zoom, double shiftX, double shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
             try {
-                var trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
-                GR.TranslateTransform(trp.X, trp.Y);
-                GR.RotateTransform(-Drehwinkel);
-                Font font = new("Arial", (float)(30 * cZoom));
+                var trp = drawingCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
+                gr.TranslateTransform(trp.X, trp.Y);
+                gr.RotateTransform(-Drehwinkel);
+                Font font = new("Arial", (float)(30 * zoom));
                 if (PadInternal != null) {
                     PadInternal.Item.SheetStyle = Parent.SheetStyle;
                     PadInternal.Item.SheetStyleScale = Parent.SheetStyleScale;
                     if (_tmpBMP != null) {
-                        if (_tmpBMP.Width != DCoordinates.Width || DCoordinates.Height != _tmpBMP.Height) {
+                        if (_tmpBMP.Width != drawingCoordinates.Width || drawingCoordinates.Height != _tmpBMP.Height) {
                             _tmpBMP.Dispose();
-                            _tmpBMP = null;
+                            RemovePic();
                             Generic.CollectGarbage();
                         }
                     }
-                    if (DCoordinates.Width < 1 || DCoordinates.Height < 1 || DCoordinates.Width > 20000 || DCoordinates.Height > 20000) { return; }
+                    if (drawingCoordinates.Width < 1 || drawingCoordinates.Height < 1 || drawingCoordinates.Width > 20000 || drawingCoordinates.Height > 20000) { return; }
                     if (_tmpBMP == null) {
-                        _tmpBMP = new Bitmap((int)Math.Abs(DCoordinates.Width), (int)Math.Abs(DCoordinates.Height));
+                        _tmpBMP = new Bitmap((int)Math.Abs(drawingCoordinates.Width), (int)Math.Abs(drawingCoordinates.Height));
                     }
                     var mb = PadInternal.Item.MaxBounds(ZoomItems);
                     var zoomv = PadInternal.ZoomFitValue(mb, false, _tmpBMP.Size);
                     var centerpos = PadInternal.CenterPos(mb, false, _tmpBMP.Size, zoomv);
                     var slidervalues = PadInternal.SliderValues(mb, zoomv, centerpos);
-                    PadInternal.ShowInPrintMode = ForPrinting;
-                    if (ForPrinting) { PadInternal.Unselect(); }
+                    PadInternal.ShowInPrintMode = forPrinting;
+                    if (forPrinting) { PadInternal.Unselect(); }
                     PadInternal.Item.DrawCreativePadToBitmap(_tmpBMP, enStates.Standard, zoomv, slidervalues.X, slidervalues.Y, VisibleItems);
                     if (_tmpBMP != null) {
                         foreach (var thisA in Eingebettete_Ansichten) {
@@ -314,38 +308,38 @@ namespace BlueControls.ItemCollection {
                                 var mb2 = Pad.PadInternal.Item.MaxBounds(Pad.ZoomItems);
                                 mb2.Inflate(-1, -1);
                                 var tmpG = Graphics.FromImage(_tmpBMP);
-                                Pen p = new(Pad.Randfarbe, (float)(8.7d * cZoom));
-                                Pen p2 = new(Color.White, (float)(8.7d * cZoom) + 2f);
+                                Pen p = new(Pad.Randfarbe, (float)(8.7d * zoom));
+                                Pen p2 = new(Color.White, (float)(8.7d * zoom) + 2f);
                                 p.DashPattern = new float[] { 5, 1, 1, 1 };
                                 var DC2 = mb2.ZoomAndMoveRect(zoomv, slidervalues.X, slidervalues.Y, false);
                                 tmpG.DrawRectangle(p2, DC2);
                                 tmpG.DrawRectangle(p, DC2);
                                 if (Pad.Textlage != (enAlignment)(-1)) {
                                     var s = tmpG.MeasureString(Pad.Name, font);
-                                    tmpG.FillRectangle(Brushes.White, new RectangleF((float)DC2.Left, (float)(DC2.Top - s.Height - (9f * (float)cZoom)), s.Width, s.Height));
-                                    BlueFont.DrawString(tmpG, Pad.Name, font, new SolidBrush(Pad.Randfarbe), (float)DC2.Left, (float)(DC2.Top - s.Height - (9f * (float)cZoom)));
+                                    tmpG.FillRectangle(Brushes.White, new RectangleF((float)DC2.Left, (float)(DC2.Top - s.Height - (9f * (float)zoom)), s.Width, s.Height));
+                                    BlueFont.DrawString(tmpG, Pad.Name, font, new SolidBrush(Pad.Randfarbe), (float)DC2.Left, (float)(DC2.Top - s.Height - (9f * (float)zoom)));
                                 }
                             }
                         }
-                        GR.DrawImage(_tmpBMP, new Rectangle((int)-DCoordinates.Width / 2, (int)-DCoordinates.Height / 2, (int)DCoordinates.Width, (int)DCoordinates.Height));
+                        gr.DrawImage(_tmpBMP, new Rectangle((int)-drawingCoordinates.Width / 2, (int)-drawingCoordinates.Height / 2, (int)drawingCoordinates.Width, (int)drawingCoordinates.Height));
                     }
                 }
-                GR.TranslateTransform(-trp.X, -trp.Y);
-                GR.ResetTransform();
-                if (!ForPrinting) {
-                    BlueFont.DrawString(GR, Name, font, Brushes.Gray, (float)DCoordinates.Left, (float)DCoordinates.Top);
+                gr.TranslateTransform(-trp.X, -trp.Y);
+                gr.ResetTransform();
+                if (!forPrinting) {
+                    BlueFont.DrawString(gr, Name, font, Brushes.Gray, (float)drawingCoordinates.Left, (float)drawingCoordinates.Top);
                 }
                 if (Textlage != (enAlignment)(-1)) {
-                    Pen p = new(Randfarbe, (float)(8.7d * cZoom)) {
+                    Pen p = new(Randfarbe, (float)(8.7d * zoom)) {
                         DashPattern = new float[] { 10, 2, 1, 2 }
                     };
-                    GR.DrawRectangle(p, DCoordinates);
-                    var s = GR.MeasureString(Name, font);
-                    BlueFont.DrawString(GR, Name, font, new SolidBrush(Randfarbe), (float)DCoordinates.Left, (float)(DCoordinates.Top - s.Height - (9f * (float)cZoom)));
+                    gr.DrawRectangle(p, drawingCoordinates);
+                    var s = gr.MeasureString(Name, font);
+                    BlueFont.DrawString(gr, Name, font, new SolidBrush(Randfarbe), (float)drawingCoordinates.Left, (float)(drawingCoordinates.Top - s.Height - (9f * (float)zoom)));
                 }
             } catch {
             }
-            base.DrawExplicit(GR, DCoordinates, cZoom, shiftX, shiftY, vState, SizeOfParentControl, ForPrinting);
+            base.DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, state, sizeOfParentControl, forPrinting);
         }
 
         protected override void ParseFinished() {
@@ -356,15 +350,13 @@ namespace BlueControls.ItemCollection {
             OnChanged();
         }
 
-        #endregion
+        private void RemovePic() {
+            if (_tmpBMP != null) {
+                _tmpBMP.Dispose();
+                _tmpBMP = null;
+            }
+        }
 
-        //public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
-        //{
-        //    _Name = Tags.TagGet("name").FromNonCritical();
-        //    TextLage = (enAlignment)int.Parse(Tags.TagGet("Textlage"));
-        //    AnsichtenVonMir = Tags.TagGet("Eingebettete Ansichten").FromNonCritical().SplitAndCutByCRToList();
-        //    Randfarbe = Tags.TagGet("Randfarbe").FromHTMLCode();
-        //    base.DoStyleCommands(sender, Tags, ref CloseMenu);
-        //}
+        #endregion
     }
 }

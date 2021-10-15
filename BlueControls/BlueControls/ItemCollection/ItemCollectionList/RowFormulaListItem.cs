@@ -56,10 +56,7 @@ namespace BlueControls.ItemCollection {
             set {
                 if (value == _LayoutID) { return; }
                 _LayoutID = value;
-                if (_tmpBMP != null) {
-                    _tmpBMP.Dispose();
-                    _tmpBMP = null;
-                }
+                RemovePic();
             }
         }
 
@@ -79,7 +76,7 @@ namespace BlueControls.ItemCollection {
             set {
                 if (_Row == value) { return; }
                 _Row = value;
-                removePic();
+                RemovePic();
             }
         }
 
@@ -93,22 +90,26 @@ namespace BlueControls.ItemCollection {
             if (_tmpBMP == null) { GeneratePic(); }
             if (_tmpBMP == null) { return 200; }
 
-            var sc = ((float)_tmpBMP.Height / _tmpBMP.Width);
+            return _tmpBMP.Height;
 
-            if (sc > 1) { sc = 1; }
+            //var sc = ((float)_tmpBMP.Height / _tmpBMP.Width);
 
-            return (int)(sc * columnWidth);
+            //if (sc > 1) { sc = 1; }
+
+            //return (int)(sc * columnWidth);
         }
 
         protected override Size ComputeSizeUntouchedForListBox() {
             if (_tmpBMP == null) { GeneratePic(); }
             if (_tmpBMP == null) { return new Size(200, 200); }
 
-            var sc = ((float)_tmpBMP.Height / _tmpBMP.Width);
+            return _tmpBMP.Size;
 
-            if (sc > 1) { sc = 1; }
+            //var sc = ((float)_tmpBMP.Height / _tmpBMP.Width);
 
-            return new Size(300, (int)(sc * 300));
+            //if (sc > 1) { sc = 1; }
+
+            //return new Size(300, (int)(sc * 300));
         }
 
         protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, bool Translate) {
@@ -137,8 +138,7 @@ namespace BlueControls.ItemCollection {
             var mb = _pad.Item.MaxBounds(null);
             if (_tmpBMP != null) {
                 if (_tmpBMP.Width != mb.Width || _tmpBMP.Height != mb.Height) {
-                    _tmpBMP.Dispose();
-                    _tmpBMP = null;
+                    RemovePic();
                 }
             }
 
@@ -154,7 +154,7 @@ namespace BlueControls.ItemCollection {
             _pad.Item.DrawCreativePadToBitmap(_tmpBMP, enStates.Standard, zoomv, slidervalues.X, slidervalues.Y, null);
         }
 
-        private void removePic() {
+        private void RemovePic() {
             if (_tmpBMP != null) {
                 _tmpBMP.Dispose();
                 _tmpBMP = null;

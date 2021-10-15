@@ -117,14 +117,14 @@ namespace BlueControls.ItemCollection {
 
         protected override string ClassId() => "Symbol";
 
-        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, double cZoom, double shiftX, double shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
-            var trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
-            GR.TranslateTransform(trp.X, trp.Y);
-            GR.RotateTransform(-Drehwinkel);
+        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, double zoom, double shiftX, double shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
+            var trp = drawingCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
+            gr.TranslateTransform(trp.X, trp.Y);
+            gr.RotateTransform(-Drehwinkel);
             GraphicsPath p = null;
-            var d2 = DCoordinates;
-            d2.X = -DCoordinates.Width / 2;
-            d2.Y = -DCoordinates.Height / 2;
+            var d2 = drawingCoordinates;
+            d2.X = -drawingCoordinates.Width / 2;
+
             switch (Symbol) {
                 case enSymbol.Ohne:
                     break;
@@ -142,24 +142,25 @@ namespace BlueControls.ItemCollection {
                     break;
 
                 case enSymbol.Rechteck_gerundet:
-                    p = Poly_RoundRec(d2.ToRect(), (int)(20 * cZoom));
+                    p = Poly_RoundRec(d2.ToRect(), (int)(20 * zoom));
                     break;
 
                 default:
                     Develop.DebugPrint(Symbol);
                     break;
             }
+
             if (p != null) {
-                GR.FillPath(new SolidBrush(Hintergrundfarbe), p);
-                GR.DrawPath(new Pen(Randfarbe, (float)(Randdicke * cZoom * Parent.SheetStyleScale)), p);
+                gr.FillPath(new SolidBrush(Hintergrundfarbe), p);
+                gr.DrawPath(new Pen(Randfarbe, (float)(Randdicke * zoom * Parent.SheetStyleScale)), p);
             }
-            GR.TranslateTransform(-trp.X, -trp.Y);
-            GR.ResetTransform();
-            base.DrawExplicit(GR, DCoordinates, cZoom, shiftX, shiftY, vState, SizeOfParentControl, ForPrinting);
+
+            gr.TranslateTransform(-trp.X, -trp.Y);
+            gr.ResetTransform();
+            base.DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, state, sizeOfParentControl, forPrinting);
         }
 
-        protected override void ParseFinished() {
-        }
+        protected override void ParseFinished() { }
 
         #endregion
     }

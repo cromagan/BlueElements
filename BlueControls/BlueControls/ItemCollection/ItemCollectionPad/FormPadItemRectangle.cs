@@ -69,7 +69,6 @@ namespace BlueControls.ItemCollection {
 
         #region Properties
 
-        //private bool _größe_fixiert = false;
         public int Drehwinkel {
             get => _drehwinkel;
             set {
@@ -98,7 +97,7 @@ namespace BlueControls.ItemCollection {
             if (base.ParseThis(tag, value)) { return true; }
             switch (tag) {
                 case "fixsize": // TODO: Entfernt am 24.05.2021
-                                //_größe_fixiert = value.FromPlusMinus();
+                    //_größe_fixiert = value.FromPlusMinus();
                     return true;
 
                 case "rotation":
@@ -108,60 +107,61 @@ namespace BlueControls.ItemCollection {
             return false;
         }
 
-        public override void PointMoved(PointM point) {
-            //PointM Second = null;
+        public override void PointMoved(object sender, System.EventArgs e) {
+            base.PointMoved(sender, e);
             var x = 0D;
             var y = 0D;
+
+            var point = (PointM)sender;
+
             if (point != null) {
                 x = point.X;
                 y = point.Y;
             }
+
             if (point == p_LO) {
                 p_O.Y = y;
                 p_L.X = x;
+                SizeChanged();
             }
+
             if (point == p_RO) {
                 p_O.Y = y;
                 p_R.X = x;
+                SizeChanged();
             }
+
             if (point == p_LU) {
                 p_L.X = x;
                 p_U.Y = y;
+                SizeChanged();
             }
+
             if (point == p_RU) {
                 p_R.X = x;
                 p_U.Y = y;
+                SizeChanged();
             }
+
             if (point == p_O) {
                 p_LO.Y = y;
                 p_RO.Y = y;
             }
+
             if (point == p_U) {
                 p_LU.Y = y;
                 p_RU.Y = y;
             }
+
             if (point == p_L) {
                 p_LO.X = x;
                 p_LU.X = x;
             }
+
             if (point == p_R) {
                 p_RO.X = x;
                 p_RU.X = x;
             }
-            if (point is null) {
-                //  Wichtig, weil wenn p_r, p_l, p_o, p_u mittig gesetzt werde und diese auf null sind, ist das schlecht.
-                var x1 = p_RU.X;
-                var y1 = p_RU.Y;
-                PointMoved(p_LO);
-                p_RU.SetTo(x1, y1);
-                return;
-            }
-            //p_RO.SetTo(p_RU.X, p_LO.Y);
-            //p_LU.SetTo(p_LO.X, p_RU.Y);
-            p_L.Y = p_LO.Y + ((p_LU.Y - p_LO.Y) / 2);
-            p_R.Y = p_L.Y;
-            p_O.X = p_LO.X + ((p_RO.X - p_LO.X) / 2);
-            p_U.X = p_O.X;
         }
 
         public void SetCoordinates(RectangleM r, bool overrideFixedSize) {
@@ -176,6 +176,21 @@ namespace BlueControls.ItemCollection {
             }
         }
 
+        public virtual void SizeChanged() {
+            ////  Wichtig, weil wenn p_r, p_l, p_o, p_u mittig gesetzt werden und diese auf null sind, ist das schlecht.
+            //var x1 = p_RU.X;
+            //var y1 = p_RU.Y;
+            //PointMoved(p_LO, System.EventArgs.Empty);
+            //p_RU.SetTo(x1, y1);
+
+            p_L.Y = p_LO.Y + ((p_LU.Y - p_LO.Y) / 2);
+            p_R.Y = p_L.Y;
+            p_O.X = p_LO.X + ((p_RO.X - p_LO.X) / 2);
+            p_U.X = p_O.X;
+
+            //return;
+        }
+
         public override string ToString() {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
@@ -186,37 +201,21 @@ namespace BlueControls.ItemCollection {
         protected override RectangleM CalculateUsedArea() => p_LO == null || p_RU == null ? new RectangleM()
         : new RectangleM(Math.Min(p_LO.X, p_RU.X), Math.Min(p_LO.Y, p_RU.Y), Math.Abs(p_RU.X - p_LO.X), Math.Abs(p_RU.Y - p_LO.Y));
 
-        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, double cZoom, double shiftX, double shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
+        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, double zoom, double shiftX, double shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
             try {
-                if (!ForPrinting) {
-                    if (cZoom > 1) {
-                        GR.DrawRectangle(new Pen(Color.Gray, (float)cZoom), DCoordinates);
+                if (!forPrinting) {
+                    if (zoom > 1) {
+                        gr.DrawRectangle(new Pen(Color.Gray, (float)zoom), drawingCoordinates);
                     } else {
-                        GR.DrawRectangle(ZoomPad.PenGray, DCoordinates);
+                        gr.DrawRectangle(ZoomPad.PenGray, drawingCoordinates);
                     }
-                    if (DCoordinates.Width < 1 || DCoordinates.Height < 1) {
-                        GR.DrawEllipse(new Pen(Color.Gray, 3), DCoordinates.Left - 5, DCoordinates.Top + 5, 10, 10);
+                    if (drawingCoordinates.Width < 1 || drawingCoordinates.Height < 1) {
+                        gr.DrawEllipse(new Pen(Color.Gray, 3), drawingCoordinates.Left - 5, drawingCoordinates.Top + 5, 10, 10);
                     }
                 }
             } catch { }
         }
 
         #endregion
-
-        //internal PointM PointOf(enAlignment P)
-        //{
-        //    switch (P)
-        //    {
-        //        case enAlignment.Bottom_Left: return p_LU;
-        //        case enAlignment.Bottom_Right: return p_RU;
-        //        case enAlignment.Top_Left: return p_LO;
-        //        case enAlignment.Top_Right: return p_RO;
-        //        case enAlignment.Bottom_HorizontalCenter: return p_U;
-        //        case enAlignment.Top_HorizontalCenter: return p_O;
-        //        case enAlignment.VerticalCenter_Left: return p_L;
-        //        case enAlignment.VerticalCenter_Right: return p_R;
-        //        default: return null;
-        //    }
-        //}
     }
 }

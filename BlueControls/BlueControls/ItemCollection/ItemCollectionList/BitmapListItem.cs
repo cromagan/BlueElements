@@ -126,7 +126,7 @@ namespace BlueControls.ItemCollection {
                 return 110 + (_captionlines * ConstMY);
             }
 
-            if (_Bitmap == null) { return (int)(columnWidth*0.8); }
+            if (_Bitmap == null) { return (int)(columnWidth * 0.8); }
 
             var sc = ((float)_Bitmap.Height / _Bitmap.Width);
 
@@ -150,23 +150,23 @@ namespace BlueControls.ItemCollection {
         protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign itemdesign, enStates state, bool DrawBorderAndBack, bool Translate) {
             if (DrawBorderAndBack) { Skin.Draw_Back(GR, itemdesign, state, PositionModified, null, false); }
 
-            var DCoordinates = PositionModified;
-            DCoordinates.Inflate(-_padding, -_padding);
+            var drawingCoordinates = PositionModified;
+            drawingCoordinates.Inflate(-_padding, -_padding);
             var ScaledImagePosition = RectangleF.Empty;
             var AreaOfWholeImage = RectangleF.Empty;
             var bFont = Skin.GetBlueFont(itemdesign, state);
             GetImage();
-            if (!string.IsNullOrEmpty(_caption) && _captiontmp.Count == 0) { _captiontmp = bFont.SplitByWidth(_caption, DCoordinates.Width, _captionlines); }
+            if (!string.IsNullOrEmpty(_caption) && _captiontmp.Count == 0) { _captiontmp = bFont.SplitByWidth(_caption, drawingCoordinates.Width, _captionlines); }
             if (_Bitmap != null) {
                 AreaOfWholeImage = new RectangleF(0, 0, _Bitmap.Width, _Bitmap.Height);
-                var scale = (float)Math.Min((DCoordinates.Width - (_padding * 2)) / (double)_Bitmap.Width,
-                                              (DCoordinates.Height - (_padding * 2) - (_captionlines * ConstMY)) / (double)_Bitmap.Height);
-                ScaledImagePosition = new RectangleF(((DCoordinates.Width - (_Bitmap.Width * scale)) / 2) + DCoordinates.Left,
-                                                     ((DCoordinates.Height - (_Bitmap.Height * scale)) / 2) + DCoordinates.Top - (_captionlines * ConstMY / 2),
+                var scale = (float)Math.Min((drawingCoordinates.Width - (_padding * 2)) / (double)_Bitmap.Width,
+                                              (drawingCoordinates.Height - (_padding * 2) - (_captionlines * ConstMY)) / (double)_Bitmap.Height);
+                ScaledImagePosition = new RectangleF(((drawingCoordinates.Width - (_Bitmap.Width * scale)) / 2) + drawingCoordinates.Left,
+                                                     ((drawingCoordinates.Height - (_Bitmap.Height * scale)) / 2) + drawingCoordinates.Top - (_captionlines * ConstMY / 2),
                                                     _Bitmap.Width * scale,
                                                     _Bitmap.Height * scale);
             }
-            var trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
+            var trp = drawingCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
             ScaledImagePosition = new RectangleF(ScaledImagePosition.Left - trp.X, ScaledImagePosition.Top - trp.Y, ScaledImagePosition.Width, ScaledImagePosition.Height);
             lock (GR) {
                 GR.TranslateTransform(trp.X, trp.Y);
@@ -181,7 +181,7 @@ namespace BlueControls.ItemCollection {
                 foreach (var ThisCap in _captiontmp) {
                     c--;
                     var s = Skin.FormatedText_NeededSize(ThisCap, null, bFont, 16);
-                    Rectangle r = new((int)(DCoordinates.Left + ((DCoordinates.Width - s.Width) / 2.0)), DCoordinates.Bottom - s.Height - 3, s.Width, s.Height);
+                    Rectangle r = new((int)(drawingCoordinates.Left + ((drawingCoordinates.Width - s.Width) / 2.0)), drawingCoordinates.Bottom - s.Height - 3, s.Width, s.Height);
                     r.X -= trp.X;
                     r.Y -= trp.Y;
                     r.Y = r.Y - (ConstMY * c) + Ausgl;

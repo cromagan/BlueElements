@@ -31,7 +31,6 @@ namespace BlueControls.ItemCollection {
 
         #region Fields
 
-        public Bitmap GeneratedBitmap;
         private Database _Database;
         private string _lastQuickInfo;
         private string _LayoutID;
@@ -42,14 +41,11 @@ namespace BlueControls.ItemCollection {
 
         #region Constructors
 
-        public RowFormulaPadItem(ItemCollectionPad parent, string internalname) : this(parent, internalname, null, 0, string.Empty) {
-        }
+        public RowFormulaPadItem(ItemCollectionPad parent, string internalname) : this(parent, internalname, null, 0, string.Empty) { }
 
-        public RowFormulaPadItem(ItemCollectionPad parent, Database database, int rowkey) : this(parent, string.Empty, database, rowkey, string.Empty) {
-        }
+        public RowFormulaPadItem(ItemCollectionPad parent, Database database, int rowkey) : this(parent, string.Empty, database, rowkey, string.Empty) { }
 
-        public RowFormulaPadItem(ItemCollectionPad parent, Database database, int rowkey, string layoutID) : this(parent, string.Empty, database, rowkey, layoutID) {
-        }
+        public RowFormulaPadItem(ItemCollectionPad parent, Database database, int rowkey, string layoutID) : this(parent, string.Empty, database, rowkey, layoutID) { }
 
         public RowFormulaPadItem(ItemCollectionPad parent, string internalname, Database database, int rowkey, string layoutID) : base(parent, internalname) {
             _Database = database;
@@ -67,6 +63,8 @@ namespace BlueControls.ItemCollection {
         #endregion
 
         #region Properties
+
+        public Bitmap GeneratedBitmap { get; private set; }
 
         // Namen so lassen, wegen Kontextmenu
         public string Layout_ID {
@@ -175,42 +173,23 @@ namespace BlueControls.ItemCollection {
 
         protected override string ClassId() => "ROW";
 
-        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, double cZoom, double shiftX, double shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
+        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, double zoom, double shiftX, double shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
             if (GeneratedBitmap == null) { GeneratePic(false); }
             if (GeneratedBitmap != null) {
-                var scale = (float)Math.Min(DCoordinates.Width / (double)GeneratedBitmap.Width, DCoordinates.Height / (double)GeneratedBitmap.Height);
-                RectangleF r2 = new(DCoordinates.Left, DCoordinates.Top, GeneratedBitmap.Width * scale, GeneratedBitmap.Height * scale);
-                if (ForPrinting) {
-                    GR.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                    GR.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+                var scale = (float)Math.Min(drawingCoordinates.Width / (double)GeneratedBitmap.Width, drawingCoordinates.Height / (double)GeneratedBitmap.Height);
+                RectangleF r2 = new(drawingCoordinates.Left, drawingCoordinates.Top, GeneratedBitmap.Width * scale, GeneratedBitmap.Height * scale);
+                if (forPrinting) {
+                    gr.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                    gr.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
                 } else {
-                    GR.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Low;
-                    GR.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+                    gr.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Low;
+                    gr.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
                 }
-                GR.DrawImage(GeneratedBitmap, r2, new RectangleF(0, 0, GeneratedBitmap.Width, GeneratedBitmap.Height), GraphicsUnit.Pixel);
+                gr.DrawImage(GeneratedBitmap, r2, new RectangleF(0, 0, GeneratedBitmap.Width, GeneratedBitmap.Height), GraphicsUnit.Pixel);
             }
-            base.DrawExplicit(GR, DCoordinates, cZoom, shiftX, shiftY, vState, SizeOfParentControl, ForPrinting);
+            base.DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, state, sizeOfParentControl, forPrinting);
         }
 
-        //Public Overrides Function ContextMenuItemClicked(sender As Object, ClickedComand As ItemCollection.BasicListItem) As Boolean
-        //    If ClickedComand.StartsWith("Layout;") Then
-        //        _LayoutNr = Integer.Parse(ClickedComand.Substring(7))
-        //        GeneratePic(True)
-        //        If _tmpBMP Is Nothing Then Return True
-        //        'p_RU.X = p_LO.X + _tmpImage.Width
-        //        'p_RU.Y = p_LO.Y + _tmpImage.Height
-        //        KeepInternalLogic()
-        //        ' RecomputePointAndRelations()
-        //        Return True
-        //    End If
-        //   switch (ClickedComand
-        //        Case Is = "Bearbeiten"
-        //            eInputBox("Datensatz bearbeiten:", _Row)
-        //            GeneratePic(True)
-        //            Return True
-        //    End Select
-        //    Return False
-        //End Function
         protected override void ParseFinished() => GeneratePic(true);
 
         private void _Database_Disposing(object sender, System.EventArgs e) {
@@ -219,13 +198,17 @@ namespace BlueControls.ItemCollection {
             RemovePic();
         }
 
-        private void GeneratePic(bool SizeChangeAllowed) {
+        private void GeneratePic(bool sizeChangeAllowed) {
             if (string.IsNullOrEmpty(_LayoutID) || !_LayoutID.StartsWith("#")) {
                 GeneratedBitmap = (Bitmap)QuickImage.Get(enImageCode.Warnung, 128).BMP.Clone();
-                PointMoved(null);
-                if (SizeChangeAllowed) { p_RU.SetTo(p_LO.X + GeneratedBitmap.Width, p_LO.Y + GeneratedBitmap.Height); }
+
+                if (sizeChangeAllowed) {
+                    SizeChanged();
+                    p_RU.SetTo(p_LO.X + GeneratedBitmap.Width, p_LO.Y + GeneratedBitmap.Height);
+                }
                 return;
             }
+
             CreativePad _pad = new(new ItemCollectionPad(_LayoutID, _Database, _RowKey));
             var re = _pad.Item.MaxBounds(null);
             if (GeneratedBitmap != null) {
@@ -233,6 +216,7 @@ namespace BlueControls.ItemCollection {
                     RemovePic();
                 }
             }
+
             if (GeneratedBitmap == null) { GeneratedBitmap = new Bitmap((int)re.Width, (int)re.Height); }
             var mb = _pad.Item.MaxBounds(null);
             var zoomv = _pad.ZoomFitValue(mb, false, GeneratedBitmap.Size);
@@ -242,8 +226,8 @@ namespace BlueControls.ItemCollection {
             _pad.Unselect();
             if (Parent.SheetStyle != null) { _pad.Item.SheetStyle = Parent.SheetStyle; }
             _pad.Item.DrawCreativePadToBitmap(GeneratedBitmap, enStates.Standard, zoomv, slidervalues.X, slidervalues.Y, null);
-            if (SizeChangeAllowed) { p_RU.SetTo(p_LO.X + GeneratedBitmap.Width, p_LO.Y + GeneratedBitmap.Height); }
-            PointMoved(null);
+            if (sizeChangeAllowed) { p_RU.SetTo(p_LO.X + GeneratedBitmap.Width, p_LO.Y + GeneratedBitmap.Height); }
+            SizeChanged();
         }
 
         private void RemovePic() {
@@ -252,27 +236,5 @@ namespace BlueControls.ItemCollection {
         }
 
         #endregion
-
-        //public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
-        //{
-        //    if (Tags.TagGet("Datensatz bearbeiten").FromPlusMinus())
-        //    {
-        //        CloseMenu = false;
-        //        EditBoxRow.Show("Datensatz bearbeiten:", _Row, true);
-        //        GeneratePic(true);
-        //        return;
-        //    }
-        //    var newl = Tags.TagGet("LayoutId");
-        //    if (newl != _LayoutID)
-        //    {
-        //        _LayoutID = newl;
-        //        GeneratePic(true);
-        //        if (_tmpBMP != null)
-        //        {
-        //            KeepInternalLogic();
-        //        }
-        //        KeepInternalLogic();
-        //    }
-        //}
     }
 }

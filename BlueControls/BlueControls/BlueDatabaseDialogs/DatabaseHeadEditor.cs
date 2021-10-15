@@ -534,6 +534,5 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         #endregion
-
     }
 }

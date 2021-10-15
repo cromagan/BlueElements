@@ -42,6 +42,7 @@ namespace BlueControls.Forms {
             this.btnAddDimension = new BlueControls.Controls.Button();
             this.btnAddLine = new BlueControls.Controls.Button();
             this.grpWerkzeuge = new BlueControls.Controls.GroupBox();
+            this.btnZoom11 = new BlueControls.Controls.Button();
             this.btnAuswahl = new BlueControls.Controls.Button();
             this.Page_Settings = new System.Windows.Forms.TabPage();
             this.grpAssistent = new BlueControls.Controls.GroupBox();
@@ -79,7 +80,7 @@ namespace BlueControls.Forms {
             this.btnZoomOut.ButtonStyle = ((BlueControls.Enums.enButtonStyle)(((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Button_Big) 
             | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnZoomOut.ImageCode = "LupeMinus";
-            this.btnZoomOut.Location = new System.Drawing.Point(120, 2);
+            this.btnZoomOut.Location = new System.Drawing.Point(176, 2);
             this.btnZoomOut.Name = "btnZoomOut";
             this.btnZoomOut.Size = new System.Drawing.Size(56, 66);
             this.btnZoomOut.TabIndex = 2;
@@ -90,7 +91,7 @@ namespace BlueControls.Forms {
             this.btnZoomIn.ButtonStyle = ((BlueControls.Enums.enButtonStyle)(((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Button_Big) 
             | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnZoomIn.ImageCode = "LupePlus";
-            this.btnZoomIn.Location = new System.Drawing.Point(176, 2);
+            this.btnZoomIn.Location = new System.Drawing.Point(232, 2);
             this.btnZoomIn.Name = "btnZoomIn";
             this.btnZoomIn.Size = new System.Drawing.Size(56, 66);
             this.btnZoomIn.TabIndex = 1;
@@ -307,7 +308,7 @@ namespace BlueControls.Forms {
             this.grpKomponenteHinzufügen.Controls.Add(this.btnAddLine);
             this.grpKomponenteHinzufügen.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpKomponenteHinzufügen.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
-            this.grpKomponenteHinzufügen.Location = new System.Drawing.Point(240, 0);
+            this.grpKomponenteHinzufügen.Location = new System.Drawing.Point(296, 0);
             this.grpKomponenteHinzufügen.Name = "grpKomponenteHinzufügen";
             this.grpKomponenteHinzufügen.Size = new System.Drawing.Size(264, 81);
             this.grpKomponenteHinzufügen.TabIndex = 0;
@@ -395,6 +396,7 @@ namespace BlueControls.Forms {
             // 
             this.grpWerkzeuge.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpWerkzeuge.CausesValidation = false;
+            this.grpWerkzeuge.Controls.Add(this.btnZoom11);
             this.grpWerkzeuge.Controls.Add(this.btnAuswahl);
             this.grpWerkzeuge.Controls.Add(this.btnZoomFit);
             this.grpWerkzeuge.Controls.Add(this.btnZoomOut);
@@ -403,10 +405,21 @@ namespace BlueControls.Forms {
             this.grpWerkzeuge.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
             this.grpWerkzeuge.Location = new System.Drawing.Point(0, 0);
             this.grpWerkzeuge.Name = "grpWerkzeuge";
-            this.grpWerkzeuge.Size = new System.Drawing.Size(240, 81);
+            this.grpWerkzeuge.Size = new System.Drawing.Size(296, 81);
             this.grpWerkzeuge.TabIndex = 1;
             this.grpWerkzeuge.TabStop = false;
             this.grpWerkzeuge.Text = "Werkzeuge";
+            // 
+            // btnZoom11
+            // 
+            this.btnZoom11.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnZoom11.ImageCode = "Bild||||||149|10";
+            this.btnZoom11.Location = new System.Drawing.Point(64, 2);
+            this.btnZoom11.Name = "btnZoom11";
+            this.btnZoom11.Size = new System.Drawing.Size(48, 66);
+            this.btnZoom11.TabIndex = 4;
+            this.btnZoom11.Text = "1:1";
+            this.btnZoom11.Click += new System.EventHandler(this.btnZoom11_Click);
             // 
             // btnAuswahl
             // 
@@ -414,7 +427,7 @@ namespace BlueControls.Forms {
             | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnAuswahl.Checked = true;
             this.btnAuswahl.ImageCode = "Mauspfeil";
-            this.btnAuswahl.Location = new System.Drawing.Point(64, 2);
+            this.btnAuswahl.Location = new System.Drawing.Point(120, 2);
             this.btnAuswahl.Name = "btnAuswahl";
             this.btnAuswahl.Size = new System.Drawing.Size(56, 66);
             this.btnAuswahl.TabIndex = 3;
@@ -693,5 +706,6 @@ namespace BlueControls.Forms {
         private System.Windows.Forms.ColorDialog ColorDia;
         private Button btnKeinHintergrund;
         protected Button btnImport;
+        private Button btnZoom11;
     }
 }

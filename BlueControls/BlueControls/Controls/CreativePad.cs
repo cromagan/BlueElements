@@ -455,8 +455,8 @@ namespace BlueControls.Controls {
                 }
             }
             if (_GivesMouseComandsTo is BasicPadItem PA) {
-                var DCoordinates = PA.UsedArea().ZoomAndMoveRect(_Zoom, _shiftX, _shiftY, false);
-                gr.DrawRectangle(new Pen(Brushes.Red, 3), DCoordinates);
+                var drawingCoordinates = PA.UsedArea().ZoomAndMoveRect(_Zoom, _shiftX, _shiftY, false);
+                gr.DrawRectangle(new Pen(Brushes.Red, 3), drawingCoordinates);
             }
 
             #endregion

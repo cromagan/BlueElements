@@ -126,14 +126,8 @@ namespace BlueControls.ItemCollection {
             return false;
         }
 
-        public override void PointMoved(PointM point) => CalcTempPoints();
+        public override void PointMoved(object sender, System.EventArgs e) => CalcTempPoints();
 
-        //public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
-        //{
-        //    Stil = (PadStyles)int.Parse(Tags.TagGet("Stil"));
-        //    _TempPoints = null;
-        //    Linien_Verhalten = (enConectorStyle)int.Parse(Tags.TagGet("Linien-Verhalten"));
-        //}
         public void SetCoordinates(double px1, double py1, double px2, double py2) {
             Point1.SetTo(px1, py1);
             Point2.SetTo(px2, py2);
@@ -169,12 +163,12 @@ namespace BlueControls.ItemCollection {
 
         protected override string ClassId() => "LINE";
 
-        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, double cZoom, double shiftX, double shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
+        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, double zoom, double shiftX, double shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
             if (Stil == PadStyles.Undefiniert) { return; }
             CalcTempPoints();
             if (_TempPoints.Count == 0) { return; }
             for (var z = 0; z <= _TempPoints.Count - 2; z++) {
-                GR.DrawLine(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(cZoom * Parent.SheetStyleScale), _TempPoints[z].ZoomAndMove(cZoom, shiftX, shiftY), _TempPoints[z + 1].ZoomAndMove(cZoom, shiftX, shiftY));
+                gr.DrawLine(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(zoom * Parent.SheetStyleScale), _TempPoints[z].ZoomAndMove(zoom, shiftX, shiftY), _TempPoints[z + 1].ZoomAndMove(zoom, shiftX, shiftY));
             }
         }
 

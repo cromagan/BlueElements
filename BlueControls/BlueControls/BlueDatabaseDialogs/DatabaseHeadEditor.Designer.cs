@@ -777,8 +777,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.GlobalTab);
             this.Controls.Add(this.btnOk);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MinimizeBox = false;
             this.Name = "DatabaseHeadEditor";
             this.ShowInTaskbar = false;
             this.Text = "Datenbank-Eigenschaften";

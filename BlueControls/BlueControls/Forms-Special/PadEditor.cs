@@ -145,7 +145,7 @@ namespace BlueControls.Forms {
 
         private void btnAddText_Click(object sender, System.EventArgs e) {
             TextPadItem b = new(Pad.Item) {
-                Interner_Text = string.Empty,
+                Text = string.Empty,
                 Stil = PadStyles.Style_Standard
             };
             Pad.Item.Add(b);
@@ -196,6 +196,8 @@ namespace BlueControls.Forms {
         private void btnVorschau_Click(object sender, System.EventArgs e) => Pad.ShowPrintPreview();
 
         private void btnVorschauModus_CheckedChanged(object sender, System.EventArgs e) => Pad.ShowInPrintMode = btnVorschauModus.Checked;
+
+        private void btnZoom11_Click(object sender, System.EventArgs e) => Pad.Zoom100();
 
         private void btnZoomFit_Click(object sender, System.EventArgs e) => Pad.ZoomFit();
 

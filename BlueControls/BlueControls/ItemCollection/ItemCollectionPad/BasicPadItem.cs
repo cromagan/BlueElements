@@ -102,7 +102,6 @@ namespace BlueControls.ItemCollection {
                 if (_Style == value) { return; }
                 _Style = value;
                 DesignOrStyleChanged();
-                PointMoved(null);
             }
         }
 
@@ -250,19 +249,18 @@ namespace BlueControls.ItemCollection {
             return tmp.Contains(value);
         }
 
-        public virtual void DesignOrStyleChanged() {
-        }
+        public virtual void DesignOrStyleChanged() { }
 
         public void Draw(Graphics gr, double zoom, double shiftX, double shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
             if (Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent nicht definiert"); }
             if (forPrinting && !_Bei_Export_sichtbar) { return; }
-            var DCoordinates = UsedArea().ZoomAndMoveRect(zoom, shiftX, shiftY, false);
+            var drawingCoordinates = UsedArea().ZoomAndMoveRect(zoom, shiftX, shiftY, false);
             if (Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent = null"); }
-            if (!IsInDrawingArea(DCoordinates, sizeOfParentControl)) { return; }
-            DrawExplicit(gr, DCoordinates, zoom, shiftX, shiftY, state, sizeOfParentControl, forPrinting);
+            if (!IsInDrawingArea(drawingCoordinates, sizeOfParentControl)) { return; }
+            DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, state, sizeOfParentControl, forPrinting);
             if (!_Bei_Export_sichtbar) {
-                if (IsInDrawingArea(DCoordinates, sizeOfParentControl)) {
-                    gr.DrawImage(QuickImage.Get("Drucker|16||1").BMP, DCoordinates.X, DCoordinates.Y);
+                if (IsInDrawingArea(drawingCoordinates, sizeOfParentControl)) {
+                    gr.DrawImage(QuickImage.Get("Drucker|16||1").BMP, drawingCoordinates.X, drawingCoordinates.Y);
                 }
             }
         }
@@ -333,7 +331,7 @@ namespace BlueControls.ItemCollection {
                     Develop.DebugPrint(enFehlerArt.Warnung, "Kann nicht geparsed werden: " + pair.Key + "/" + pair.Value + "/" + ToParse);
                 }
             }
-            PointMoved(null);
+
             ParseFinished();
             IsParsing = false;
         }
@@ -402,8 +400,9 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public virtual void PointMoved(PointM point) {
-        }
+        public virtual void PointMoved(object sender, System.EventArgs e) => OnChanged();
+
+        public virtual void PointMoving(object sender, System.EventArgs e) { }
 
         public override string ToString() {
             var t = "{";
@@ -463,7 +462,6 @@ namespace BlueControls.ItemCollection {
             } while (true);
         }
 
-        //l.Add(new FlexiControlForProperty("Umrandung", ((int)Stil).ToString(), Skin.GetRahmenArt(Parent.SheetStyle, true)));
         internal BasicPadItem Previous() {
             var ItemCount = Parent.IndexOf(this);
             if (ItemCount < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Item im SortDefinition nicht enthalten"); }
@@ -478,28 +476,24 @@ namespace BlueControls.ItemCollection {
 
         protected abstract string ClassId();
 
-        protected abstract void DrawExplicit(Graphics GR, RectangleF DCoordinates, double cZoom, double shiftX, double shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting);
+        protected abstract void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, double zoom, double shiftX, double shiftY, enStates state, Size sizeOfParentControl, bool forPrinting);
 
-        //l.Add(new FlexiControl("Stil", ((int)Stil).ToString()));
         protected bool IsInDrawingArea(RectangleF DrawingKoordinates, Size SizeOfParentControl) => SizeOfParentControl.IsEmpty || SizeOfParentControl.Width == 0 || SizeOfParentControl.Height == 0
 || DrawingKoordinates.IntersectsWith(new Rectangle(Point.Empty, SizeOfParentControl));
 
         protected abstract void ParseFinished();
 
-        private void Point_Moved(object sender, System.EventArgs e) {
-            PointMoved((PointM)sender);
-            OnChanged();
-        }
-
         private void Points_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
             if (e.Item is PointM P) {
-                P.Moved += Point_Moved;
+                P.Moving += PointMoving;
+                P.Moved += PointMoved;
             }
         }
 
         private void Points_ItemRemoving(object sender, BlueBasics.EventArgs.ListEventArgs e) {
             if (e.Item is PointM P) {
-                P.Moved -= Point_Moved;
+                P.Moving -= PointMoving;
+                P.Moved -= PointMoved;
             }
         }
 

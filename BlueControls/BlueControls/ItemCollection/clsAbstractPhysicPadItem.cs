@@ -416,11 +416,11 @@ namespace BlueControls.ItemCollection {
             return new RectangleM(minx, miny, maxx - minx, maxy - miny);
         }
 
-        protected override void DrawExplicit(Graphics GR, RectangleF DCoordinates, double cZoom, double shiftX, double shiftY, enStates vState, Size SizeOfParentControl, bool ForPrinting) {
+        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, double zoom, double shiftX, double shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
             if (MovablePoint.Count < 1) { return; }
             var lastP = MovablePoint[MovablePoint.Count - 1];
             foreach (var thisP in MovablePoint) {
-                GR.DrawLine(Pens.Black, lastP.ZoomAndMove(cZoom, shiftX, shiftY), thisP.ZoomAndMove(cZoom, shiftX, shiftY));
+                gr.DrawLine(Pens.Black, lastP.ZoomAndMove(zoom, shiftX, shiftY), thisP.ZoomAndMove(zoom, shiftX, shiftY));
                 lastP = thisP;
             }
         }

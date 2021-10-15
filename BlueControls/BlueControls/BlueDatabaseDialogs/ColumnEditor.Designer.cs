@@ -987,6 +987,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnQI_Vorschau.Name = "btnQI_Vorschau";
             this.btnQI_Vorschau.Size = new System.Drawing.Size(96, 24);
             this.btnQI_Vorschau.TabIndex = 1;
+            this.btnQI_Vorschau.Text = "Vorschau";
             this.btnQI_Vorschau.Click += new System.EventHandler(this.btnQI_Vorschau_Click);
             // 
             // tabSonstiges

@@ -86,7 +86,7 @@ namespace BlueControls.ItemCollection {
             }
             if (string.IsNullOrEmpty(Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
             _Checked = false;
-            Pos = new Rectangle(0, 0, 0, 0);
+            Pos = Rectangle.Empty;
             _UserDefCompareKey = string.Empty;
         }
 

@@ -126,24 +126,24 @@ namespace BlueControls.ItemCollection {
         protected override void DrawExplicit(Graphics gr, Rectangle positionModified, enDesign itemdesign, enStates state, bool drawBorderAndBack, bool translate) {
             if (drawBorderAndBack) { Skin.Draw_Back(gr, itemdesign, state, positionModified, null, false); }
 
-            var DCoordinates = positionModified;
-            DCoordinates.Inflate(-_padding, -_padding);
+            var drawingCoordinates = positionModified;
+            drawingCoordinates.Inflate(-_padding, -_padding);
             var ScaledImagePosition = RectangleF.Empty;
             var AreaOfWholeImage = RectangleF.Empty;
             var bFont = Skin.GetBlueFont(itemdesign, state);
 
-            if (!string.IsNullOrEmpty(_caption) && _captiontmp.Count == 0) { _captiontmp = bFont.SplitByWidth(_caption, DCoordinates.Width, _captionlines); }
+            if (!string.IsNullOrEmpty(_caption) && _captiontmp.Count == 0) { _captiontmp = bFont.SplitByWidth(_caption, drawingCoordinates.Width, _captionlines); }
             var binim = QuickImage.Get(_filename.FileType(), 48).BMP;
             if (_bin != null) {
                 AreaOfWholeImage = new RectangleF(0, 0, binim.Width, binim.Height);
-                var scale = (float)Math.Min((DCoordinates.Width - (_padding * 2)) / (double)binim.Width,
-                                              (DCoordinates.Height - (_padding * 2) - (_captionlines * ConstMY)) / (double)binim.Height);
-                ScaledImagePosition = new RectangleF(((DCoordinates.Width - (binim.Width * scale)) / 2) + DCoordinates.Left,
-                                                     ((DCoordinates.Height - (binim.Height * scale)) / 2) + DCoordinates.Top - (_captionlines * ConstMY / 2),
+                var scale = (float)Math.Min((drawingCoordinates.Width - (_padding * 2)) / (double)binim.Width,
+                                              (drawingCoordinates.Height - (_padding * 2) - (_captionlines * ConstMY)) / (double)binim.Height);
+                ScaledImagePosition = new RectangleF(((drawingCoordinates.Width - (binim.Width * scale)) / 2) + drawingCoordinates.Left,
+                                                     ((drawingCoordinates.Height - (binim.Height * scale)) / 2) + drawingCoordinates.Top - (_captionlines * ConstMY / 2),
                                                     binim.Width * scale,
                                                     binim.Height * scale);
             }
-            var trp = DCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
+            var trp = drawingCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
             ScaledImagePosition = new RectangleF(ScaledImagePosition.Left - trp.X, ScaledImagePosition.Top - trp.Y, ScaledImagePosition.Width, ScaledImagePosition.Height);
             gr.TranslateTransform(trp.X, trp.Y);
             if (_bin != null) { gr.DrawImage(binim, ScaledImagePosition, AreaOfWholeImage, GraphicsUnit.Pixel); }
@@ -156,7 +156,7 @@ namespace BlueControls.ItemCollection {
                 foreach (var ThisCap in _captiontmp) {
                     c--;
                     var s = Skin.FormatedText_NeededSize(ThisCap, null, bFont, 16);
-                    Rectangle r = new((int)(DCoordinates.Left + ((DCoordinates.Width - s.Width) / 2.0)), DCoordinates.Bottom - s.Height - 3, s.Width, s.Height);
+                    Rectangle r = new((int)(drawingCoordinates.Left + ((drawingCoordinates.Width - s.Width) / 2.0)), drawingCoordinates.Bottom - s.Height - 3, s.Width, s.Height);
                     r.X -= trp.X;
                     r.Y -= trp.Y;
                     r.Y = r.Y - (ConstMY * c) + Ausgl;
