@@ -2214,7 +2214,7 @@ namespace BlueControls.Controls {
         /// <remarks></remarks>
         private void Cursor_Move(enDirection Richtung) {
             if (_Database == null) { return; }
-            Neighbour(_CursorPosColumn, _CursorPosRow.Row, Richtung, out var _newCol, out var _newRow);
+            Neighbour(_CursorPosColumn, _CursorPosRow?.Row, Richtung, out var _newCol, out var _newRow);
             CursorPos_Set(_newCol, _newRow, Richtung != enDirection.Nichts);
         }
 
@@ -3005,25 +3005,25 @@ namespace BlueControls.Controls {
             if (_PinnedRows.Contains(e.Row)) { _PinnedRows.Remove(e.Row); }
         }
 
-        private string RowCaptionOnCoordinate(int XPos, int YPos) {
+        private string RowCaptionOnCoordinate(int pixelX, int pixelY) {
             try {
                 var s = SortedRowData();
                 foreach (var thisRow in s) {
                     if (thisRow.CaptionPos is Rectangle r) {
-                        if (r.Contains(XPos, YPos)) { return thisRow.Chapter; }
+                        if (r.Contains(pixelX, pixelY)) { return thisRow.Chapter; }
                     }
                 }
             } catch { }
             return string.Empty;
         }
 
-        private clsRowDrawData RowOnCoordinate(int y) {
-            if (_Database == null || y <= HeadSize()) { return null; }
+        private clsRowDrawData RowOnCoordinate(int pixelY) {
+            if (_Database == null || pixelY <= HeadSize()) { return null; }
             var s = SortedRowData();
             foreach (var ThisRowItem in s) {
                 if (ThisRowItem != null) {
-                    if (y >= DrawY(ThisRowItem) &&
-                        y <= DrawY(ThisRowItem) + ThisRowItem.DrawHeight
+                    if (pixelY >= DrawY(ThisRowItem) &&
+                        pixelY <= DrawY(ThisRowItem) + ThisRowItem.DrawHeight
                         && ThisRowItem.Expanded) {
                         return ThisRowItem;
                     }

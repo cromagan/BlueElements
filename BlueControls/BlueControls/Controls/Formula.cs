@@ -87,6 +87,7 @@ namespace BlueControls.Controls {
                 if (_Database != null) {
                     _Database.Loading -= _Database_StoreView;
                     _Database.Loaded -= _DatabaseLoaded;
+                    _Database.Row.RowRemoving -= Row_RowRemoving;
                     _Database.Column.ItemRemoved -= _Database_ColumnRemoved;
                     _Database.Column.ItemInternalChanged -= _Database_ItemInternalChanged;
                     _Database.RowKeyChanged -= _Database_RowKeyChanged;
@@ -97,6 +98,7 @@ namespace BlueControls.Controls {
                 if (_Database != null) {
                     _Database.Loading += _Database_StoreView;
                     _Database.Loaded += _DatabaseLoaded;
+                    _Database.Row.RowRemoving += Row_RowRemoving;
                     _Database.Column.ItemRemoved += _Database_ColumnRemoved;
                     _Database.Column.ItemInternalChanged += _Database_ItemInternalChanged;
                     _Database.RowKeyChanged += _Database_RowKeyChanged;
@@ -275,6 +277,12 @@ namespace BlueControls.Controls {
             ShowingRowKey = r;
         }
 
+        private void _Database_RowKeyChanged(object sender, KeyChangedEventArgs e) {
+            // Ist aktuell nur möglich,wenn Pending Changes eine neue Zeile machen
+            // Jedes FlexControl beachtet für sich die Änderung
+            if (e.KeyOld == _savedRowKey) { _savedRowKey = e.KeyNew; }
+        }
+
         //private void _Database_RowChecked(object sender, RowCheckedEventArgs e) {
         //if (e.Row.Key != _ShowingRowKey) { return; }
         //var nr = int.MaxValue;
@@ -302,13 +310,6 @@ namespace BlueControls.Controls {
         //    _ = e.ColumnsWithErrors[nr].Split('|');
         //}
         //}
-
-        private void _Database_RowKeyChanged(object sender, KeyChangedEventArgs e) {
-            // Ist aktuell nur möglich,wenn Pending Changes eine neue Zeile machen
-            // Jedes FlexControl beachtet für sich die Änderung
-            if (e.KeyOld == _savedRowKey) { _savedRowKey = e.KeyNew; }
-        }
-
         private void _Database_StoreView(object sender, LoadingEventArgs e) {
             if (e.OnlyReload) { return; }
             _savedRowKey = ShowingRowKey;
@@ -707,6 +708,12 @@ namespace BlueControls.Controls {
             }
             vObject.Parent.Controls.Remove(vObject);
             vObject.Dispose();
+        }
+
+        private void Row_RowRemoving(object sender, RowEventArgs e) {
+            if (_ShowingRowKey == e.Row.Key) {
+                ShowingRowKey = -1;
+            }
         }
 
         private ColumnViewItem SearchViewItem(ColumnItem Column) {

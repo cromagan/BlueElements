@@ -127,7 +127,7 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        protected override string GetCompareKey() => _Row.CellFirstString();
+        protected override string GetCompareKey() => _Row.CompareKey();
 
         private void GeneratePic() {
             if (string.IsNullOrEmpty(_LayoutID) || !_LayoutID.StartsWith("#")) {

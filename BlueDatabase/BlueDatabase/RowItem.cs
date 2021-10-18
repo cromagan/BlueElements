@@ -255,6 +255,13 @@ namespace BlueDatabase {
         public void CellSet(ColumnItem column, DateTime value) => Database.Cell.Set(column, this, value);
 
         /// <summary>
+        /// Erstellt einen sortierfähigen String eine Zeile mit der Standard sortierung
+        /// </summary>
+        /// <param name="columns">Nur diese Spalten in deser Reihenfolge werden berücksichtigt</param>
+        /// <returns>Den String mit dem abschluß <<>key<>> und dessen Key.</returns>
+        public string CompareKey() => CompareKey(Database.SortDefinition?.Columns);
+
+        /// <summary>
         /// Erstellt einen Sortierfähigen String eine Zeile
         /// </summary>
         /// <param name="columns">Nur diese Spalten in deser Reihenfolge werden berücksichtigt</param>

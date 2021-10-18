@@ -198,7 +198,7 @@ namespace BlueDatabase {
             return _tmpSortedRows;
         }
 
-        public bool Clear() => Remove(new FilterCollection(Database));
+        public bool Clear() => Remove(new FilterCollection(Database), null);
 
         public void Dispose() {
             // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
@@ -244,44 +244,45 @@ namespace BlueDatabase {
 
         public void Initialize() => _LastRowKey = 0;
 
-        public void Remove(int Key) {
-            var e = SearchByKey(Key);
-            if (e == null) { return; }
+        public bool Remove(int key) {
+            var e = SearchByKey(key);
+            if (e == null) { return false; }
             OnRowRemoving(new RowEventArgs(e));
             foreach (var ThisColumnItem in Database.Column) {
                 if (ThisColumnItem != null) {
-                    Database.Cell.Delete(ThisColumnItem, Key);
+                    Database.Cell.Delete(ThisColumnItem, key);
                 }
             }
-            if (!_Internal.TryRemove(Key, out _)) { Develop.DebugPrint(enFehlerArt.Fehler, "Remove Failed"); }
+            if (!_Internal.TryRemove(key, out _)) { Develop.DebugPrint(enFehlerArt.Fehler, "Remove Failed"); }
             OnRowRemoved();
-        }
-
-        public bool Remove(FilterItem Filter) {
-            FilterCollection NF = new(Database)
-            {
-                Filter
-            };
-            return Remove(NF);
-        }
-
-        public bool Remove(FilterCollection Filter) {
-            var x = (from thisrowitem in _Internal.Values where thisrowitem != null && thisrowitem.MatchesTo(Filter) select thisrowitem.Key).Select(dummy => (long)dummy).ToList();
-            foreach (int ThisKey in x) {
-                Remove(ThisKey);
-            }
             return true;
         }
 
-        public void Remove(RowItem Row) {
-            //if (Database.InvokeRequired)
-            //{
-            //    Database.Invoke(new Action(() => Database.Row.Remove(Row)));
-            //    return;
-            //}
-            if (Row == null) { return; }
-            Remove(Row.Key);
+        public bool Remove(FilterItem filter, List<RowItem> pinned) {
+            FilterCollection NF = new(Database)
+            {
+                filter
+            };
+            return Remove(NF, pinned);
         }
+
+        public bool Remove(FilterCollection filter, List<RowItem> pinned) {
+            var Keys = (from thisrowitem in _Internal.Values where thisrowitem != null && thisrowitem.MatchesTo(filter) select thisrowitem.Key).Select(dummy => (long)dummy).ToList();
+            var did = false;
+            foreach (int thisKey in Keys) {
+                if (Remove(thisKey)) { did = true; }
+            }
+
+            if (pinned != null) {
+                foreach (var thisRow in pinned) {
+                    if (Remove(thisRow)) { did = true; }
+                }
+            }
+
+            return did;
+        }
+
+        public bool Remove(RowItem row) => row != null && Remove(row.Key);
 
         public bool RemoveOlderThan(float InHours) {
             var x = (from thisrowitem in _Internal.Values where thisrowitem != null let D = thisrowitem.CellGetDateTime(Database.Column.SysRowCreateDate) where DateTime.Now.Subtract(D).TotalHours > InHours select thisrowitem.Key).Select(dummy => (long)dummy).ToList();

@@ -111,8 +111,7 @@ namespace BlueControls.Forms {
                 TableView.CursorPos_Set(column, row, false);
                 TableView.Database.Row.Remove(tmpr);
             } else {
-                Formula.ShowingRowKey = -1;
-                TableView.Database.Row.Remove(TableView.Filter);
+                TableView.Database.Row.Remove(TableView.Filter, TableView.PinnedRows);
             }
         }
 
@@ -256,7 +255,7 @@ namespace BlueControls.Forms {
         }
 
         private void AngezeigteZeilenLöschen_Click(object sender, System.EventArgs e) {
-            TableView.Database.Row.Remove(TableView.Filter);
+            TableView.Database.Row.Remove(TableView.Filter, TableView.PinnedRows);
             CheckButtons();
         }
 

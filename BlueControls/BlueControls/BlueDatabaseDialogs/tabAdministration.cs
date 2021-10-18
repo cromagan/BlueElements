@@ -243,7 +243,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (!_TableView.Database.IsAdministrator()) { return; }
             var m = MessageBox.Show("Angezeigte Zeilen löschen?", enImageCode.Warnung, "Ja", "Nein");
             if (m != 0) { return; }
-            _TableView.Database.Row.Remove(_TableView.Filter);
+            _TableView.Database.Row.Remove(_TableView.Filter, _TableView.PinnedRows);
         }
 
         private void ChangeDatabase(Database database) {
