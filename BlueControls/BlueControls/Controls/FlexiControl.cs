@@ -62,6 +62,7 @@ namespace BlueControls.Controls {
         protected DateTime? _LastTextChange;
 
         protected bool _MultiLine = false;
+
         private Caption _CaptionObject;
 
         // None ist -1 und muss gesetzt sein!
@@ -82,8 +83,7 @@ namespace BlueControls.Controls {
         public FlexiControl() : base(false, false) {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
-            // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+
             _EditType = enEditTypeFormula.Line;
             Size = new Size(200, 8);
         }
@@ -91,11 +91,11 @@ namespace BlueControls.Controls {
         /// <summary>
         /// Einfacher Info Text. Wird nirgends mehr zurück gegeben.
         /// </summary>
-        /// <param name="CaptionText"></param>
-        public FlexiControl(string CaptionText) : base(false, false) {
+        /// <param name="captionText"></param>
+        public FlexiControl(string captionText) : base(false, false) {
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             _EditType = enEditTypeFormula.None;
-            _Caption = CaptionText;
+            _Caption = captionText;
             _CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
             ValueId = string.Empty;
             var s = BlueFont.MeasureString(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
@@ -307,12 +307,10 @@ namespace BlueControls.Controls {
             if (newvalue == null) { newvalue = string.Empty; }
             if (_Value == null && string.IsNullOrEmpty(newvalue)) { return; }
             if (_Value == newvalue) { return; }
+
             _LastTextChange = DateTime.UtcNow;
             _Value = newvalue;
-            if (updateControls) {
-                UpdateValueToControl();
-                //return; // kein CheckedIfChanged. Der Wert kommt ja von der Zelle / Property / etc. und ist somit gesetzt und wir nicht geändert
-            }
+            if (updateControls) { UpdateValueToControl(); }
             if (alwaysValueChanged || InvokeRequired || !Focused || _InstantChangedEvent) { CheckIfChanged(); }
         }
 
@@ -325,10 +323,12 @@ namespace BlueControls.Controls {
                 Develop.DebugPrint(enFehlerArt.Warnung, "Bereits initialisiert");
                 return null;
             }
+
             if (Width < 5 || Height < 5) {
                 Develop.DebugPrint(enFehlerArt.Warnung, "Width / Height zu klein");
                 return null;
             }
+
             _allinitialized = true;
             GenericControl c = null;
             switch (_EditType) {
@@ -345,8 +345,6 @@ namespace BlueControls.Controls {
                     break;
 
                 case enEditTypeFormula.Gallery:
-                //case enEditTypeFormula.Listbox_1_Zeile:
-                //case enEditTypeFormula.Listbox_3_Zeilen:
                 case enEditTypeFormula.Listbox:
                     c = Control_Create_ListBox();
                     break;
@@ -433,7 +431,6 @@ namespace BlueControls.Controls {
             base.OnControlAdded(e);
             switch (e.Control) {
                 case ComboBox ComboBox:
-                    //ComboBox.ItemClicked += ComboBoxItemClicked;
                     ComboBox.TextChanged += ValueChanged_ComboBox;
                     ComboBox.LostFocus += TextEditControl_LostFocus;
                     break;
@@ -453,13 +450,11 @@ namespace BlueControls.Controls {
                     break;
 
                 case SwapListBox SwapListBox:
-                    //ListBox.ItemClicked += ListBox_ItemClicked;
                     SwapListBox.ItemAdded += SwapListBox_ItemAdded;
                     SwapListBox.ItemRemoved += SwapListBox_ItemRemoved;
                     break;
 
                 case ListBox ListBox:
-                    //ListBox.ItemClicked += ListBox_ItemClicked;
                     ListBox.ItemAdded += ListBox_ItemAdded;
                     ListBox.ItemRemoved += ListBox_ItemRemoved;
                     break;
@@ -495,7 +490,6 @@ namespace BlueControls.Controls {
             base.OnControlRemoved(e);
             switch (e.Control) {
                 case ComboBox ComboBox:
-                    //ComboBox.ItemClicked -= ComboBoxItemClicked;
                     ComboBox.TextChanged -= ValueChanged_ComboBox;
                     ComboBox.LostFocus -= TextEditControl_LostFocus;
                     break;
@@ -513,13 +507,11 @@ namespace BlueControls.Controls {
                     break;
 
                 case ListBox ListBox:
-                    //ListBox.ItemClicked -= ListBox_ItemClicked;
                     ListBox.ItemAdded -= ListBox_ItemAdded;
                     ListBox.ItemRemoved -= ListBox_ItemRemoved;
                     break;
 
                 case SwapListBox SwapListBox:
-                    //ListBox.ItemClicked -= ListBox_ItemClicked;
                     SwapListBox.ItemAdded -= SwapListBox_ItemAdded;
                     SwapListBox.ItemRemoved -= SwapListBox_ItemRemoved;
                     break;
@@ -552,9 +544,6 @@ namespace BlueControls.Controls {
             if (e.Control == _CaptionObject) { _CaptionObject = null; }
         }
 
-        //protected virtual void OnRemovingAll() {
-        //    RemovingAll?.Invoke(this, System.EventArgs.Empty);
-        //}
         protected virtual void OnNeedRefresh() => NeedRefresh?.Invoke(this, System.EventArgs.Empty);
 
         protected override void OnQuickInfoChanged() {
@@ -568,23 +557,17 @@ namespace BlueControls.Controls {
         /// Entfernt alle Controls und löst dessen die Events auf. Setzt _allinitialized auf false.
         /// </summary>
         protected virtual void RemoveAll() {
-            //if (Controls.Count > 0) { OnRemovingAll(); }
             List<Control> l = new();
             for (var z = 0; z < Controls.Count; z++) { l.Add(Controls[z]); }
+
             foreach (var thisc in l) {
                 thisc.Visible = false;
                 if (thisc != _CaptionObject && thisc != _InfoCaption) {
-                    thisc.Dispose(); // Dispose entfernt da Control aus der Collection // Controls.Remove(Controls[0]);
+                    thisc.Dispose(); // Dispose entfernt dass Control aus der Collection
                 }
             }
-            //while (Controls.Count > 0) {
-            //    Controls[0].Visible = false;
-            //    Controls[0].Dispose(); // Dispose entfernt da Control aus der Collection
-            //                           // Controls.Remove(Controls[0]);
-            //}
-            //Controls.Clear();
+
             _allinitialized = false;
-            //Invalidate();
         }
 
         protected void StyleComboBox(ComboBox Control, ItemCollectionList list, ComboBoxStyle Style) {

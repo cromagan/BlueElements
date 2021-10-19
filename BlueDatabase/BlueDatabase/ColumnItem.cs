@@ -511,50 +511,6 @@ namespace BlueDatabase {
             }
         }
 
-        //public bool AutoFilterErlaubt
-        //{
-        //    get
-        //    {
-        //        if (!_Format.Autofilter_möglich()) { return false; }
-        //        return _AutofilterErlaubt;
-        //    }
-        //    set
-        //    {
-        //        if (_AutofilterErlaubt == value) { return; }
-        //        Database.AddPending(enDatabaseDataType.co_AutoFilterErlaubt, this, _AutofilterErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
-        //        Invalidate_TmpVariables();
-        //        OnChanged();
-        //    }
-        //}
-        //public bool AutoFilterErweitertErlaubt
-        //{
-        //    get
-        //    {
-        //        if (!AutoFilterErlaubt) { return false; }
-        //        return _AutoFilterErweitertErlaubt;
-        //    }
-        //    set
-        //    {
-        //        if (_AutoFilterErweitertErlaubt == value) { return; }
-        //        Database.AddPending(enDatabaseDataType.co_AutoFilterErweitertErlaubt, this, _AutoFilterErweitertErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
-        //        OnChanged();
-        //    }
-        //}
-        //public bool AutofilterTextFilterErlaubt
-        //{
-        //    get
-        //    {
-        //        if (!AutoFilterErlaubt) { return false; }
-        //        if (!_Format.TextboxEditPossible()) { return false; }
-        //        return _AutofilterTextFilterErlaubt;
-        //    }
-        //    set
-        //    {
-        //        if (_AutofilterTextFilterErlaubt == value) { return; }
-        //        Database.AddPending(enDatabaseDataType.co_AutoFilterTextFilterErlaubt, this, _AutofilterTextFilterErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
-        //        OnChanged();
-        //    }
-        //}
         public bool IgnoreAtRowFilter {
             get => !_Format.Autofilter_möglich() || _IgnoreAtRowFilter;
             set {
@@ -659,7 +615,6 @@ namespace BlueDatabase {
                 if (string.IsNullOrEmpty(value)) { return; }
                 var old = _Name;
                 Database.AddPending(enDatabaseDataType.co_Name, this, _Name, value, true);
-                //_Name = value;
                 Database.Column_NameChanged(old, this);
                 OnChanged();
             }
@@ -814,11 +769,11 @@ namespace BlueDatabase {
 
         #region Methods
 
-        public static enEditTypeTable UserEditDialogTypeInTable(ColumnItem vColumn, bool DoDropDown) => UserEditDialogTypeInTable(vColumn.Format, DoDropDown, vColumn.TextBearbeitungErlaubt, vColumn.MultiLine);
+        public static enEditTypeTable UserEditDialogTypeInTable(ColumnItem column, bool doDropDown) => UserEditDialogTypeInTable(column.Format, doDropDown, column.TextBearbeitungErlaubt, column.MultiLine);
 
-        public static enEditTypeTable UserEditDialogTypeInTable(enDataFormat Format, bool DoDropDown, bool KeybordInputAllowed, bool isMultiline) {
-            if (!DoDropDown && !KeybordInputAllowed) { return enEditTypeTable.None; }
-            switch (Format) {
+        public static enEditTypeTable UserEditDialogTypeInTable(enDataFormat format, bool doDropDown, bool keybordInputAllowed, bool isMultiline) {
+            if (!doDropDown && !keybordInputAllowed) { return enEditTypeTable.None; }
+            switch (format) {
                 case enDataFormat.Bit:
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                 case enDataFormat.Values_für_LinkedCellDropdown:
@@ -828,11 +783,11 @@ namespace BlueDatabase {
                     return enEditTypeTable.FileHandling_InDateiSystem;
 
                 case enDataFormat.FarbeInteger:
-                    if (DoDropDown) { return enEditTypeTable.Dropdown_Single; }
+                    if (doDropDown) { return enEditTypeTable.Dropdown_Single; }
                     return enEditTypeTable.Farb_Auswahl_Dialog;
 
                 case enDataFormat.Schrift:
-                    if (DoDropDown) { return enEditTypeTable.Dropdown_Single; }
+                    if (doDropDown) { return enEditTypeTable.Dropdown_Single; }
                     return enEditTypeTable.Font_AuswahlDialog;
 
                 case enDataFormat.Button:
@@ -841,31 +796,31 @@ namespace BlueDatabase {
                 case enDataFormat.Text_mit_Formatierung:
                     return enEditTypeTable.WarnungNurFormular; // Wegen dem Sonderzeichen
                 default:
-                    if (Format.TextboxEditPossible()) {
-                        return !DoDropDown
+                    if (format.TextboxEditPossible()) {
+                        return !doDropDown
                             ? enEditTypeTable.Textfeld
                             : isMultiline
                             ? enEditTypeTable.Dropdown_Single
-                            : KeybordInputAllowed ? enEditTypeTable.Textfeld_mit_Auswahlknopf : enEditTypeTable.Dropdown_Single;
+                            : keybordInputAllowed ? enEditTypeTable.Textfeld_mit_Auswahlknopf : enEditTypeTable.Dropdown_Single;
                     }
-                    Develop.DebugPrint(Format);
+                    Develop.DebugPrint(format);
                     return enEditTypeTable.None;
             }
         }
 
-        public string AutoCorrect(string Value) {
+        public string AutoCorrect(string value) {
             if (Format == enDataFormat.Link_To_Filesystem) {
-                List<string> l = new(Value.SplitAndCutByCR());
+                List<string> l = new(value.SplitAndCutByCR());
                 List<string> l2 = new();
                 foreach (var thisFile in l) {
                     l2.Add(SimplyFile(thisFile));
                 }
-                Value = l2.SortedDistinctList().JoinWithCr();
+                value = l2.SortedDistinctList().JoinWithCr();
             }
-            if (_AfterEdit_DoUCase) { Value = Value.ToUpper(); }
-            if (!string.IsNullOrEmpty(_AutoRemove)) { Value = Value.RemoveChars(_AutoRemove); }
+            if (_AfterEdit_DoUCase) { value = value.ToUpper(); }
+            if (!string.IsNullOrEmpty(_AutoRemove)) { value = value.RemoveChars(_AutoRemove); }
             if (AfterEdit_AutoReplace.Count > 0) {
-                List<string> l = new(Value.SplitAndCutByCR());
+                List<string> l = new(value.SplitAndCutByCR());
                 foreach (var thisar in AfterEdit_AutoReplace) {
                     var rep = thisar.SplitAndCutBy("|");
                     for (var z = 0; z < l.Count; z++) {
@@ -883,18 +838,18 @@ namespace BlueDatabase {
                         }
                     }
                 }
-                Value = l.JoinWithCr();
+                value = l.JoinWithCr();
             }
-            if (_AfterEdit_AutoCorrect) { Value = KleineFehlerCorrect(Value); }
-            if (_AfterEdit_Runden > -1 && double.TryParse(Value, out var erg)) {
+            if (_AfterEdit_AutoCorrect) { value = KleineFehlerCorrect(value); }
+            if (_AfterEdit_Runden > -1 && double.TryParse(value, out var erg)) {
                 erg = Math.Round(erg, _AfterEdit_Runden);
-                Value = erg.ToString();
+                value = erg.ToString();
             }
             if (_AfterEdit_QuickSortRemoveDouble) {
-                var l = new List<string>(Value.SplitAndCutByCR()).SortedDistinctList();
-                Value = l.JoinWithCr();
+                var l = new List<string>(value.SplitAndCutByCR()).SortedDistinctList();
+                value = l.JoinWithCr();
             }
-            return Value;
+            return value;
         }
 
         public List<string> Autofilter_ItemList(FilterCollection filter, List<RowItem> pinned) {
@@ -1656,7 +1611,7 @@ namespace BlueDatabase {
             }
         }
 
-        public bool UserEditDialogTypeInFormula(enEditTypeFormula EditType_To_Check) {
+        public bool UserEditDialogTypeInFormula(enEditTypeFormula editType_To_Check) {
             switch (_Format) {
                 case enDataFormat.Text:
                 case enDataFormat.Text_mit_Formatierung:
@@ -1665,45 +1620,53 @@ namespace BlueDatabase {
                 case enDataFormat.Datum_und_Uhrzeit:
                 case enDataFormat.BildCode:
                 case enDataFormat.RelationText:
-                    if (EditType_To_Check == enEditTypeFormula.Textfeld) { return true; } // Textfeld immer erlauben auch wenn beide Bearbeitungen nicht erlaubt sind. Einfach der Übersichtlichktei
-                    if (_MultiLine && EditType_To_Check == enEditTypeFormula.Textfeld_mit_Auswahlknopf) { return false; }
-                    if (_DropdownBearbeitungErlaubt && EditType_To_Check == enEditTypeFormula.Textfeld_mit_Auswahlknopf) { return true; }
-                    if (_DropdownBearbeitungErlaubt && _DropdownWerteAndererZellenAnzeigen && EditType_To_Check == enEditTypeFormula.SwapListBox) { return true; }
+                    if (editType_To_Check == enEditTypeFormula.Textfeld) { return true; } // Textfeld immer erlauben auch wenn beide Bearbeitungen nicht erlaubt sind. Einfach der Übersichtlichktei
+                    if (_MultiLine && editType_To_Check == enEditTypeFormula.Textfeld_mit_Auswahlknopf) { return false; }
+                    if (_DropdownBearbeitungErlaubt && editType_To_Check == enEditTypeFormula.Textfeld_mit_Auswahlknopf) { return true; }
+                    if (_DropdownBearbeitungErlaubt && _DropdownWerteAndererZellenAnzeigen && editType_To_Check == enEditTypeFormula.SwapListBox) { return true; }
                     //if (_MultiLine && _DropdownBearbeitungErlaubt && EditType_To_Check == enEditTypeFormula.Listbox_3_Zeilen) { return true; }
-                    if (_MultiLine && _DropdownBearbeitungErlaubt && EditType_To_Check == enEditTypeFormula.Listbox) { return true; }
-                    if (EditType_To_Check == enEditTypeFormula.nur_als_Text_anzeigen) { return true; }
+                    if (_MultiLine && _DropdownBearbeitungErlaubt && editType_To_Check == enEditTypeFormula.Listbox) { return true; }
+                    if (editType_To_Check == enEditTypeFormula.nur_als_Text_anzeigen) { return true; }
                     return false;
 
                 case enDataFormat.LinkedCell:
-                    if (EditType_To_Check == enEditTypeFormula.None) { return true; }
+                    if (editType_To_Check == enEditTypeFormula.None) { return true; }
                     //if (EditType_To_Check != enEditTypeFormula.Textfeld &&
                     //    EditType_To_Check != enEditTypeFormula.nur_als_Text_anzeigen) { return false; }
                     if (Database.IsParsing) { return true; }
+
+                    var skriptgesteuert = LinkedCell_RowKey == -9999;
+                    if (skriptgesteuert) {
+                        if (editType_To_Check == enEditTypeFormula.Textfeld) { return true; }
+                        if (editType_To_Check == enEditTypeFormula.nur_als_Text_anzeigen) { return true; }
+                        return false;
+                    }
+
                     if (LinkedDatabase() == null) { return false; }
                     if (_LinkedCell_ColumnKey < 0) { return false; }
                     var col = LinkedDatabase().Column.SearchByKey(_LinkedCell_ColumnKey);
                     if (col == null) { return false; }
-                    return col.UserEditDialogTypeInFormula(EditType_To_Check);
+                    return col.UserEditDialogTypeInFormula(editType_To_Check);
 
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                 case enDataFormat.Values_für_LinkedCellDropdown:
-                    if (EditType_To_Check == enEditTypeFormula.Textfeld_mit_Auswahlknopf) { return true; }
+                    if (editType_To_Check == enEditTypeFormula.Textfeld_mit_Auswahlknopf) { return true; }
                     return false;
 
                 case enDataFormat.Bit:
                     if (_MultiLine) { return false; }
-                    if (EditType_To_Check == enEditTypeFormula.Ja_Nein_Knopf) {
+                    if (editType_To_Check == enEditTypeFormula.Ja_Nein_Knopf) {
                         return !_DropdownWerteAndererZellenAnzeigen && DropDownItems.Count <= 0;
                     }
-                    if (EditType_To_Check == enEditTypeFormula.Textfeld_mit_Auswahlknopf) { return true; }
+                    if (editType_To_Check == enEditTypeFormula.Textfeld_mit_Auswahlknopf) { return true; }
                     return false;
 
                 case enDataFormat.Link_To_Filesystem:
                     if (_MultiLine) {
                         //if (EditType_To_Check == enEditType.Listbox) { return true; }
-                        if (EditType_To_Check == enEditTypeFormula.Gallery) { return true; }
+                        if (editType_To_Check == enEditTypeFormula.Gallery) { return true; }
                     } else {
-                        if (EditType_To_Check == enEditTypeFormula.EasyPic) { return true; }
+                        if (editType_To_Check == enEditTypeFormula.EasyPic) { return true; }
                     }
                     return false;
                 //case enDataFormat.Relation:
@@ -1717,11 +1680,11 @@ namespace BlueDatabase {
                 //            return false;
                 //    }
                 case enDataFormat.FarbeInteger:
-                    if (EditType_To_Check == enEditTypeFormula.Farb_Auswahl_Dialog) { return true; }
+                    if (editType_To_Check == enEditTypeFormula.Farb_Auswahl_Dialog) { return true; }
                     return false;
 
                 case enDataFormat.Schrift:
-                    if (EditType_To_Check == enEditTypeFormula.Font_AuswahlDialog) { return true; }
+                    if (editType_To_Check == enEditTypeFormula.Font_AuswahlDialog) { return true; }
                     return false;
 
                 case enDataFormat.Button:

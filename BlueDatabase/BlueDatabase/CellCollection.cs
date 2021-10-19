@@ -100,6 +100,7 @@ namespace BlueDatabase {
             var tmpf = Column.Database.ErrorReason(mode);
             if (!string.IsNullOrEmpty(tmpf)) { return LanguageTool.DoTranslate(tmpf); }
             if (!Column.SaveContent) { return LanguageTool.DoTranslate("Der Spalteninhalt wird nicht gespeichert."); }
+
             if (Column.Format == enDataFormat.LinkedCell) {
                 (var lcolumn, var lrow) = LinkedCellData(Column, Row, true, false);
                 if (lcolumn != null && lrow != null) {
@@ -147,7 +148,22 @@ namespace BlueDatabase {
                 : Column == null ? KeyOfCell(-1, Row.Key) : Row == null ? KeyOfCell(Column.Key, -1) : KeyOfCell(Column.Key, Row.Key);
         }
 
-        public static (ColumnItem column, RowItem row) LinkedCellData(ColumnItem column, RowItem row, bool repairEmpties, bool addRowIfNotExists) {
+        public static (ColumnItem column, RowItem row) LinkedCellData(string column, RowItem row, bool repairLinkedValue, bool addRowIfNotExists) {
+            if (row == null) { return (null, null); }
+
+            var col = row.Database.Column[column];
+            return LinkedCellData(col, row, repairLinkedValue, addRowIfNotExists);
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="column"></param>
+        /// <param name="row"></param>
+        /// <param name="repairLinkedValue">Repariert - wenn möglich - denn Zellenbezug und schreibt ihn im Hintergrund in die Zelle.</param>
+        /// <param name="addRowIfNotExists"></param>
+        /// <returns></returns>
+        public static (ColumnItem column, RowItem row) LinkedCellData(ColumnItem column, RowItem row, bool repairLinkedValue, bool addRowIfNotExists) {
             if (column == null || row == null || column.Format != enDataFormat.LinkedCell) { return (null, null); }
 
             var LinkedDatabase = column.LinkedDatabase();
@@ -155,7 +171,7 @@ namespace BlueDatabase {
 
             var skriptgesteuert = column.LinkedCell_RowKey == -9999;
 
-            if (repairEmpties && !skriptgesteuert) { return RepairLinkedCellValue(LinkedDatabase, column, row, addRowIfNotExists); }
+            if (repairLinkedValue && !skriptgesteuert) { return RepairLinkedCellValue(LinkedDatabase, column, row, addRowIfNotExists); }
 
             var Key = column.Database.Cell.GetStringBehindLinkedValue(column, row);
             if (string.IsNullOrEmpty(Key)) { return (null, null); }
@@ -174,11 +190,11 @@ namespace BlueDatabase {
         ///  Gibt zurück, ob die Zelle bearbeitet werden kann.
         ///  Optional zusätzlich mit den Dateirechten.
         /// </summary>
-        /// <param name="Column"></param>
-        /// <param name="Row"></param>
+        /// <param name="column"></param>
+        /// <param name="row"></param>
         /// <param name="DateiRechtePrüfen"></param>
         /// <returns></returns>
-        public static bool UserEditPossible(ColumnItem Column, RowItem Row, enErrorReason mode) => string.IsNullOrEmpty(ErrorReason(Column, Row, mode));
+        public static bool UserEditPossible(ColumnItem column, RowItem row, enErrorReason mode) => string.IsNullOrEmpty(ErrorReason(column, row, mode));
 
         /// <summary>
         /// Gibt einen Datainamen/Pfad zurück, der sich aus dem Standard Angaben der Spalte und den Zelleninhalt zusammensetzt.
@@ -210,8 +226,8 @@ namespace BlueDatabase {
             Row = _database.Row.SearchByKey(int.Parse(cd[1]));
         }
 
-        public void Delete(ColumnItem Column, int RowKey) {
-            var CellKey = KeyOfCell(Column.Key, RowKey);
+        public void Delete(ColumnItem column, int rowKey) {
+            var CellKey = KeyOfCell(column.Key, rowKey);
             if (!ContainsKey(CellKey)) { return; }
             //           var Inhalt = _cells[CellKey].Value;
             Remove(CellKey);
@@ -227,30 +243,30 @@ namespace BlueDatabase {
         /// <summary>
         ///
         /// </summary>
-        /// <param name="Column"></param>
+        /// <param name="column"></param>
         /// <param name="RowKey"></param>
-        /// <param name="PreviewsValue"></param>
-        /// <param name="DoAlways">Auch wenn der PreviewsValue gleich dem CurrentValue ist, wird die Routine durchberechnet</param>
-        public void DoSpecialFormats(ColumnItem Column, int RowKey, string PreviewsValue, bool DoAlways) {
-            if (Column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
-            var CurrentValue = GetString(Column, _database.Row.SearchByKey(RowKey));
-            if (!DoAlways && CurrentValue == PreviewsValue) { return; }
-            switch (Column.Format) {
+        /// <param name="previewsValue"></param>
+        /// <param name="doAlways">Auch wenn der PreviewsValue gleich dem CurrentValue ist, wird die Routine durchberechnet</param>
+        public void DoSpecialFormats(ColumnItem column, int RowKey, string previewsValue, bool doAlways) {
+            if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
+            var CurrentValue = GetString(column, _database.Row.SearchByKey(RowKey));
+            if (!doAlways && CurrentValue == previewsValue) { return; }
+            switch (column.Format) {
                 case enDataFormat.RelationText:
-                    RepairRelationText(Column, _database.Row.SearchByKey(RowKey), PreviewsValue);
-                    SetSameValueOfKey(Column, RowKey, CurrentValue);
+                    RepairRelationText(column, _database.Row.SearchByKey(RowKey), previewsValue);
+                    SetSameValueOfKey(column, RowKey, CurrentValue);
                     break;
 
                 case enDataFormat.LinkedCell:
-                    if (DoAlways) {
-                        LinkedCellData(Column, _database.Row.SearchByKey(RowKey), true, false); // Repariert auch Cellbezüge
+                    if (doAlways) {
+                        LinkedCellData(column, _database.Row.SearchByKey(RowKey), true, false); // Repariert auch Cellbezüge
                     }
                     break;
             }
-            if (!string.IsNullOrEmpty(Column.I_Am_A_Key_For_Other_Column)) {
-                SetSameValueOfKey(Column, RowKey, CurrentValue);
+            if (!string.IsNullOrEmpty(column.I_Am_A_Key_For_Other_Column)) {
+                SetSameValueOfKey(column, RowKey, CurrentValue);
             }
-            if (Column.IsFirst()) {
+            if (column.IsFirst()) {
                 foreach (var ThisColumnItem in _database.Column) {
                     if (ThisColumnItem != null) {
                         switch (ThisColumnItem.Format) {
@@ -258,26 +274,24 @@ namespace BlueDatabase {
                             //    RelationNameChanged(ThisColumnItem, PreviewsValue, CurrentValue);
                             //    break;
                             case enDataFormat.RelationText:
-                                RelationTextNameChanged(ThisColumnItem, RowKey, PreviewsValue, CurrentValue);
+                                RelationTextNameChanged(ThisColumnItem, RowKey, previewsValue, CurrentValue);
                                 break;
                         }
                     }
                 }
             }
-            if (Column.KeyColumnKey > -1) {
-                ChangeValueOfKey(CurrentValue, Column, RowKey);
+            if (column.KeyColumnKey > -1) {
+                ChangeValueOfKey(CurrentValue, column, RowKey);
             }
         }
 
         public bool GetBoolean(string columnName, RowItem row) => GetBoolean(_database.Column[columnName], row);
 
-        public bool GetBoolean(ColumnItem column, RowItem row) // Main Method
-=> GetString(column, row).FromPlusMinus();
+        public bool GetBoolean(ColumnItem column, RowItem row) => GetString(column, row).FromPlusMinus();// Main Method
 
         public Color GetColor(string columnName, RowItem row) => GetColor(_database.Column[columnName], row);
 
-        public Color GetColor(ColumnItem column, RowItem row) // Main Method
-=> Color.FromArgb(GetInteger(column, row));
+        public Color GetColor(ColumnItem column, RowItem row) => Color.FromArgb(GetInteger(column, row)); // Main Method
 
         public int GetColorBGR(ColumnItem Column, RowItem Row) {
             var c = GetColor(Column, Row);
@@ -313,8 +327,7 @@ namespace BlueDatabase {
 
         public List<string> GetList(string columnName, RowItem row) => GetList(_database.Column[columnName], row);
 
-        public List<string> GetList(ColumnItem column, RowItem row) // Main Method
-=> GetString(column, row).SplitAndCutByCRToList();
+        public List<string> GetList(ColumnItem column, RowItem row) => GetString(column, row).SplitAndCutByCRToList();// Main Method
 
         public Point GetPoint(string columnName, RowItem row) => GetPoint(_database.Column[columnName], row);
 
@@ -492,10 +505,7 @@ namespace BlueDatabase {
 
         public void Set(string columnName, RowItem row, Point value) => Set(_database.Column[columnName], row, value);
 
-        public void Set(ColumnItem column, RowItem row, Point value) // Main Method
-=>
-            // {X=253,Y=194} MUSS ES SEIN, prüfen
-            Set(column, row, value.ToString());
+        public void Set(ColumnItem column, RowItem row, Point value) => Set(column, row, value.ToString());      // Main Method// {X=253,Y=194} MUSS ES SEIN, prüfen
 
         public void Set(string columnName, RowItem row, int value) => Set(_database.Column[columnName], row, value.ToString());
 
@@ -562,17 +572,17 @@ namespace BlueDatabase {
             }
         }
 
-        internal void Load_310(ColumnItem _Column, RowItem _Row, string Value, int Width, int Height) {
-            if (_Row == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Row konnte nicht generiert werden."); }
-            if (_Column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Column konnte nicht generiert werden."); }
-            var CellKey = KeyOfCell(_Column, _Row);
+        internal void Load_310(ColumnItem column, RowItem row, string value, int width, int height) {
+            if (row == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Row konnte nicht generiert werden."); }
+            if (column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Column konnte nicht generiert werden."); }
+            var CellKey = KeyOfCell(column, row);
             if (ContainsKey(CellKey)) {
                 var c = this[CellKey];
-                c.Value = Value; // Auf jeden Fall setzen. Auch falls es nachher entfernt wird, so ist es sicher leer
-                c.Size = Width > 0 ? new Size(Width, Height) : Size.Empty;
-                if (string.IsNullOrEmpty(Value)) { Remove(CellKey); }
+                c.Value = value; // Auf jeden Fall setzen. Auch falls es nachher entfernt wird, so ist es sicher leer
+                c.Size = width > 0 ? new Size(width, height) : Size.Empty;
+                if (string.IsNullOrEmpty(value)) { Remove(CellKey); }
             } else {
-                Add(CellKey, new CellItem(Value, Width, Height));
+                Add(CellKey, new CellItem(value, width, height));
             }
         }
 

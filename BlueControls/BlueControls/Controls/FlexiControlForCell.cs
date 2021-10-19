@@ -121,7 +121,6 @@ namespace BlueControls.Controls {
                 FillCellNow();
                 if (_Database != null) {
                     _Database.Cell.CellValueChanged -= Database_CellValueChanged;
-                    //_Database.Row.RowRemoved -= Database_RowRemoved;
                     _Database.Row.RowRemoving -= Row_RowRemoving;
                     _Database.Column.ItemInternalChanged -= Column_ItemInternalChanged;
                     _Database.ConnectedControlsStopAllWorking -= Database_ConnectedControlsStopAllWorking;
@@ -226,25 +225,9 @@ namespace BlueControls.Controls {
         protected override void OnControlAdded(ControlEventArgs e) {
             base.OnControlAdded(e);
             if (e.Control is Caption) { return; } // z.B. Info Caption
-            var column1 = _tmpColumn;
-            if (column1 == null) {
-                //            Develop.DebugPrint("Column nicht gefunden");
-                // Bei Steuerelementen, die manuell hinzugefügt werden
-                return;
-            }
-            if (column1.Format == enDataFormat.LinkedCell) {
-                column1 = null;
-                if (_tmpColumn.LinkedDatabase() != null && _tmpColumn.LinkedCell_ColumnKey > -1) {
-                    column1 = _tmpColumn.LinkedDatabase().Column.SearchByKey(_tmpColumn.LinkedCell_ColumnKey);
-                }
-                if (column1 == null) {
-                    Develop.DebugPrint("Column nicht gefunden");
-                    return;
-                }
-            }
-            Suffix = column1.Suffix;
-            Format = column1.Format;
-            MultiLine = column1.MultiLine;
+
+            var column1 = GetRealColumn(_tmpColumn, null);
+
             switch (e.Control) {
                 case ComboBox comboBox:
                     ItemCollectionList Item2 = new();
@@ -263,7 +246,11 @@ namespace BlueControls.Controls {
                     break;
 
                 case TextBox textBox:
-                    StyleTextBox(textBox, column1.AllowedChars, column1.SpellCheckingEnabled);
+                    if (column1 == null) {
+                        StyleTextBox(textBox, string.Empty, false);
+                    } else {
+                        StyleTextBox(textBox, column1.AllowedChars, column1.SpellCheckingEnabled);
+                    }
                     textBox.NeedDatabaseOfAdditinalSpecialChars += textBox_NeedDatabaseOfAdditinalSpecialChars;
                     textBox.GotFocus += GotFocus_TextBox;
                     textBox.TextChanged += TextBox_TextChanged;
@@ -384,12 +371,10 @@ namespace BlueControls.Controls {
 
         private void Database_CellValueChanged(object sender, CellEventArgs e) {
             if (e.Row != _tmpRow) { return; }
-            if (e.Column == _tmpColumn) {
-                SetValueFromCell();
-            }
-            if (e.Column == _tmpColumn || e.Column == e.Column.Database.Column.SysLocked) {
-                CheckEnabledState();
-            }
+
+            if (e.Column == _tmpColumn) { SetValueFromCell(); }
+
+            if (e.Column == _tmpColumn || e.Column == e.Column.Database.Column.SysLocked) { CheckEnabledState(); }
         }
 
         private void Database_ConnectedControlsStopAllWorking(object sender, System.EventArgs e) => FillCellNow();
@@ -478,6 +463,41 @@ namespace BlueControls.Controls {
             _tmpRow.Database.WaitEditable();
             _tmpRow.CellSet(_tmpColumn, NewValue);
             if (OldVal != _tmpRow.CellGetString(_tmpColumn)) { _tmpRow.DoAutomatic(false, false, 1, "value changed"); }
+        }
+
+        private ColumnItem GetRealColumn(ColumnItem column, RowItem row) {
+            ColumnItem gbColumn;
+
+            if (column.Format == enDataFormat.LinkedCell) {
+                //var skriptgesteuert = column.LinkedCell_RowKey == -9999;
+
+                //if (column.LinkedDatabase() != null && column.LinkedCell_ColumnKey > -1) {
+                //    gbColumn = column.LinkedDatabase().Column.SearchByKey(column.LinkedCell_ColumnKey);
+                //}
+
+                //if(gbColumn == null && skriptgesteuert) {
+                (gbColumn, _) = CellCollection.LinkedCellData(column, row, true, false);
+                //}
+
+                //if (gbColumn == null) {
+                //    Develop.DebugPrint("Column nicht gefunden");
+                //    return null;
+                //}
+            } else {
+                gbColumn = column;
+            }
+
+            if (gbColumn != null) {
+                Suffix = gbColumn.Suffix;
+                Format = gbColumn.Format;
+                MultiLine = gbColumn.MultiLine;
+            } else {
+                if (column == null) { return null; }  // Bei Steuerelementen, die manuell hinzugefügt werden
+                if (row == null) { return null; }  // Beim initualisieren des Controls und Linked Cell kann das vorkommen
+                Develop.DebugPrint("Column nicht gefunden");
+            }
+
+            return gbColumn;
         }
 
         private void GetTmpVariables() {
@@ -594,9 +614,11 @@ namespace BlueControls.Controls {
 
         private void Marker_DoWork(object sender, DoWorkEventArgs e) {
             TextBox TXB = null;
+
             foreach (var Control in Controls) {
                 if (Control is TextBox t) { TXB = t; }
             }
+
             if (Marker.CancellationPending) { return; }
             if (TXB == null) { return; }
             if (_tmpRow == null) { return; }
@@ -607,6 +629,7 @@ namespace BlueControls.Controls {
             var myname = _tmpRow.CellFirstString().ToUpper();
             var InitT = TXB.Text;
             bool Ok;
+
             do {
                 Ok = true;
                 Marker.ReportProgress(0, new List<object> { TXB, "Unmark1" });
@@ -682,6 +705,7 @@ namespace BlueControls.Controls {
                 InfoText = string.Empty;
                 return;
             }
+
             switch (_tmpColumn.Format) {
                 case enDataFormat.Link_To_Filesystem:
                     var tmp = _tmpRow.CellGetList(_tmpColumn);
@@ -700,6 +724,11 @@ namespace BlueControls.Controls {
                     //  Ode noch ni existiert hat
                     //    Develop.DebugPrint(enFehlerArt.Warnung, "Werte ungleich: " + Value + " - " + tmp2.JoinWithCr());
                     //}
+                    break;
+
+                case enDataFormat.LinkedCell:
+                    GetRealColumn(_tmpColumn, _tmpRow);
+                    ValueSet(_tmpRow.CellGetString(_tmpColumn), true, true);
                     break;
 
                 default:
@@ -738,7 +767,6 @@ namespace BlueControls.Controls {
                     QuickInfo = _tmpColumn.QuickInfoText(string.Empty);
                 } else {
                     _tmpColumn.EditType = EditType;
-                    //_tmpColumn.Quickinfo = QuickInfo;
                 }
             }
         }
