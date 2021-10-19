@@ -35,8 +35,6 @@ namespace BlueControls.ItemCollection {
         public readonly ListExt<PointM> MovablePoint = new();
         public readonly ItemCollectionPad Parent = null;
         public readonly List<PointM> PointsForSuccesfullyMove = new();
-        public RectangleM tmpUsedArea = null;
-        protected int _ZoomPadding = 0;
         private static int UniqueInternal_Count;
         private static string UniqueInternal_LastTime = "InitialDummy";
 
@@ -53,6 +51,8 @@ namespace BlueControls.ItemCollection {
         private bool _Bei_Export_sichtbar = true;
 
         private PadStyles _Style = PadStyles.Undefiniert;
+        private int _ZoomPadding = 0;
+        private RectangleM tmpUsedArea = null;
 
         #endregion
 
@@ -265,7 +265,15 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public void DrawOutline(Graphics GR, double cZoom, double shiftX, double shiftY, Color c) => GR.DrawRectangle(new Pen(c), UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY, false));
+        /// <summary>
+        /// Zeichnet die UsedArea. mehr für Debugging gedacht.
+        /// </summary>
+        /// <param name="gr"></param>
+        /// <param name="zoom"></param>
+        /// <param name="shiftX"></param>
+        /// <param name="shiftY"></param>
+        /// <param name="c"></param>
+        public void DrawOutline(Graphics gr, double zoom, double shiftX, double shiftY, Color c) => gr.DrawRectangle(new Pen(c), UsedArea().ZoomAndMoveRect(zoom, shiftX, shiftY, false));
 
         public void EineEbeneNachHinten() {
             if (Parent == null) { return; }
