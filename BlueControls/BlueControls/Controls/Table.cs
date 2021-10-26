@@ -1655,10 +1655,11 @@ namespace BlueControls.Controls {
 
         private void _Database_ViewChanged(object sender, System.EventArgs e) {
             InitializeSkin(); // Sicher ist sicher, um die neuen Schrift-Größen zu haben.
+
             Invalidate_HeadSize();
             Invalidate_AllDraw(true);
-            Invalidate_RowSort();
-            CursorPos_Set(_CursorPosColumn, _CursorPosRow, false);
+            //Invalidate_RowSort();
+            CursorPos_Set(_CursorPosColumn, _CursorPosRow, true);
             Invalidate();
         }
 

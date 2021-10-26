@@ -468,7 +468,7 @@ namespace BlueControls.Controls {
         private ColumnItem GetRealColumn(ColumnItem column, RowItem row) {
             ColumnItem gbColumn;
 
-            if (column.Format == enDataFormat.LinkedCell) {
+            if (column?.Format == enDataFormat.LinkedCell) {
                 //var skriptgesteuert = column.LinkedCell_RowKey == -9999;
 
                 //if (column.LinkedDatabase() != null && column.LinkedCell_ColumnKey > -1) {

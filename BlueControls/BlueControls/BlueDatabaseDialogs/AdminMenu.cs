@@ -172,9 +172,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             Check_OrderButtons();
         }
 
-        private void btnPermanent_Click(object sender, System.EventArgs e) {
-        }
-
         private void btnPosEingeben_Click(object sender, System.EventArgs e) {
             if (_TableView.Arrangement < 0) { return; }
             var c = _TableView.CursorPosColumn();
@@ -224,6 +221,9 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void btnSpalteNachLinks_Click(object sender, System.EventArgs e) {
+            var tmpc = _TableView.CursorPosColumn();
+            var tmpr = _TableView.CursorPosRow();
+
             if (_TableView.Arrangement > 0) {
                 ColumnViewItem ViewItem = null;
                 if (_TableView.CursorPosColumn() != null) { ViewItem = _TableView.CurrentArrangement[_TableView.CursorPosColumn()]; }
@@ -231,14 +231,15 @@ namespace BlueControls.BlueDatabaseDialogs {
             } else {
                 _TableView.Database.Column.Swap(_TableView.CursorPosColumn(), _TableView.CursorPosColumn().Previous());
             }
-            _TableView.EnsureVisible(_TableView.CursorPosColumn(), _TableView.CursorPosRow());
+
+            _TableView.CursorPos_Set(tmpc, tmpr, true);
             Check_OrderButtons();
         }
 
         private void btnSpalteNachRechts_Click(object sender, System.EventArgs e) {
-        }
+            var tmpc = _TableView.CursorPosColumn();
+            var tmpr = _TableView.CursorPosRow();
 
-        private void btnSpalteNachRechts_Click_1(object sender, System.EventArgs e) {
             if (_TableView.Arrangement > 0) {
                 ColumnViewItem ViewItem = null;
                 if (_TableView.CursorPosColumn() != null) { ViewItem = _TableView.CurrentArrangement[_TableView.CursorPosColumn()]; }
@@ -246,7 +247,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             } else {
                 _TableView.Database.Column.Swap(_TableView.CursorPosColumn(), _TableView.CursorPosColumn().Next());
             }
-            _TableView.EnsureVisible(_TableView.CursorPosColumn(), _TableView.CursorPosRow());
+
+            _TableView.CursorPos_Set(tmpc, tmpr, true);
             Check_OrderButtons();
         }
 

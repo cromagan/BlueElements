@@ -153,7 +153,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnPermanent.TabIndex = 9;
             this.btnPermanent.Text = "permanent";
             this.btnPermanent.CheckedChanged += new System.EventHandler(this.btnPermanent_CheckedChanged);
-            this.btnPermanent.Click += new System.EventHandler(this.btnPermanent_Click);
             // 
             // btnSpalteDauerhaftloeschen
             // 
@@ -195,7 +194,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnSpalteNachRechts.Size = new System.Drawing.Size(48, 66);
             this.btnSpalteNachRechts.TabIndex = 5;
             this.btnSpalteNachRechts.Text = "nach rechts";
-            this.btnSpalteNachRechts.Click += new System.EventHandler(this.btnSpalteNachRechts_Click_1);
+            this.btnSpalteNachRechts.Click += new System.EventHandler(this.btnSpalteNachRechts_Click);
             // 
             // btnSpalteNachLinks
             // 

@@ -208,8 +208,13 @@ namespace BlueBasics {
             var tmp = new List<T>(this);
             base.Sort();
 
-            if (!tmp.SequenceEqual(this)) {
-                OnChanged();
+            try {
+                if (!tmp.SequenceEqual(this)) {
+                    OnChanged();
+                }
+            } catch {
+                // Enumeration wurde geändert
+                OnChanged(); // Sicherheitshalber
             }
         }
 
