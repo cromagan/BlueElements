@@ -62,6 +62,7 @@ namespace BlueBasics.MultiUserFile {
 
         private DateTime _EditNormalyNextCheckUTC = DateTime.UtcNow.AddSeconds(-30);
 
+        private string _Filename;
         private string _inhaltBlockdatei = string.Empty;
 
         private bool _InitialLoadDone = false;
@@ -73,7 +74,6 @@ namespace BlueBasics.MultiUserFile {
         private int _loadingThreadId = -1;
 
         private int Checker_Tick_count = -5;
-
         private FileSystemWatcher Watcher;
 
         #endregion
@@ -150,7 +150,17 @@ namespace BlueBasics.MultiUserFile {
         /// <summary>
         /// Load oder SaveAsAndChangeTo benutzen
         /// </summary>
-        public string Filename { get; private set; }
+        public string Filename {
+            get => _Filename;
+            private set {
+                if (string.IsNullOrEmpty(value)) {
+                    _Filename = string.Empty;
+                } else {
+                    var tmp = Path.GetFullPath(value);
+                    _Filename = tmp;
+                }
+            }
+        }
 
         /// <summary>
         /// Ab aktuell die "Save" Routine vom Code aufgerufen wird, und diese auf einen erfolgreichen Speichervorgang abwartet

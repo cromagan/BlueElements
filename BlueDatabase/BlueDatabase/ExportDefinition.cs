@@ -632,8 +632,8 @@ namespace BlueDatabase {
                         Develop.DebugPrint(_Typ);
                         return false;
                 }
-            } catch (Exception ex) {
-                Develop.DebugPrint("Backup konnte nicht erstellt werden:<br>" + SingleFileExport + "<br>" + ex.Message + "<br>" + ToString());
+            } catch {
+                //Develop.DebugPrint("Backup konnte nicht erstellt werden:<br>" + SingleFileExport + "<br>" + ex.Message + "<br>" + ToString());
                 return false;
             }
             var DidAndOk = false;
