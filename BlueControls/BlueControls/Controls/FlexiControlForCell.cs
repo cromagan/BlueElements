@@ -460,9 +460,13 @@ namespace BlueControls.Controls {
                     break;
             }
             if (OldVal == NewValue) { return; }
-            _tmpRow.Database.WaitEditable();
-            _tmpRow.CellSet(_tmpColumn, NewValue);
-            if (OldVal != _tmpRow.CellGetString(_tmpColumn)) { _tmpRow.DoAutomatic(false, false, 1, "value changed"); }
+
+            var _tmpR2 = _tmpRow; // Manchmal wird die Sortierung verändert, was zur Folge hat, dass der Cursor verschwindet, wass die _tmpRow verwirft....
+            var _tmpC2 = _tmpColumn;
+
+            _tmpR2.Database.WaitEditable();
+            _tmpR2.CellSet(_tmpC2, NewValue);
+            if (OldVal != _tmpRow.CellGetString(_tmpC2)) { _tmpR2.DoAutomatic(false, false, 1, "value changed"); }
         }
 
         private ColumnItem GetRealColumn(ColumnItem column, RowItem row) {

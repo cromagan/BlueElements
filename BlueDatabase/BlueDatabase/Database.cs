@@ -428,6 +428,7 @@ namespace BlueDatabase {
                 _AdditionaFilesPfadtmp = t;
                 return t;
             }
+
             t = (Filename.FilePath() + _AdditionaFilesPfad.Trim("\\") + "\\").CheckPath();
             if (PathExists(t)) {
                 _AdditionaFilesPfadtmp = t;

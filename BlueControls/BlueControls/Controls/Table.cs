@@ -2892,7 +2892,7 @@ namespace BlueControls.Controls {
 
         private void Invalidate_RowSort() {
             _SortedRows = null;
-            CursorPos_Reset();
+            //CursorPos_Reset(); // Gibt Probleme bei Formularen, wenn die Key-Spalte geändert wird. Mal abgesehen davon macht es einen Sinn, den Cursor proforma zu löschen, dass soll der RowSorter übernehmen.
             Invalidate_SortedRowData();
         }
 
@@ -3076,7 +3076,11 @@ namespace BlueControls.Controls {
 
                 _SortedRowData = new List<clsRowDrawData>();
                 foreach (var ThisRow in sr) {
-                    clsRowDrawData ThisRowData = new(ThisRow) { Y = MaxY };
+                    clsRowDrawData ThisRowData = new(ThisRow);
+
+                    if (_MouseOverRow != null && _MouseOverRow.Row == ThisRow) { ThisRowData = _MouseOverRow; } // Mouse-Daten wiederverwenden
+                    if (_CursorPosRow != null && _CursorPosRow.Row == ThisRow) { ThisRowData = _CursorPosRow; } // Cursor-Daten wiederverwenden
+                    ThisRowData.Y = MaxY;
 
                     #region Caption bestimmen
 
@@ -3105,6 +3109,8 @@ namespace BlueControls.Controls {
 
                     _SortedRowData.Add(ThisRowData);
                 }
+
+                if (!_SortedRowData.Contains(_CursorPosRow)) { CursorPos_Reset(); }
 
                 #region Slider berechnen
 
