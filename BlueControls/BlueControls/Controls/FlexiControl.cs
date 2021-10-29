@@ -726,7 +726,7 @@ namespace BlueControls.Controls {
             }
             _CaptionObject.Enabled = Enabled;
             _CaptionObject.TextAnzeigeVerhalten = enSteuerelementVerhalten.Text_Abschneiden; // nicht enSteuerelementVerhalten.Steuerelement_Anpassen! weil sonst beim einem Resize die Koordinaten geändert werden und das kann zum Ping Pong führen
-            _CaptionObject.Text = _Caption;
+            _CaptionObject.Text = _Caption.ReplaceLowerSign();
             _CaptionObject.Size = _CaptionObject.TextRequiredSize();
             _CaptionObject.Left = 0;
             _CaptionObject.Top = 0;

@@ -485,6 +485,8 @@ namespace BlueBasics {
             }
         }
 
+        public static string ReplaceLowerSign(this string tXT) => tXT.Replace("<", "<<>");
+
         public static string ReplaceWord(this string input, string alt, string replacement, RegexOptions options) {
             // return Regex.Replace(input, "\\b" + Alt + "\\b", replacement);
             if (options != RegexOptions.IgnoreCase) { Develop.DebugPrint(enFehlerArt.Fehler, "Regex option nicht erlaubt."); }
