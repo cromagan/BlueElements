@@ -59,7 +59,7 @@ namespace BlueScript {
             }
             var posc = 0;
             do {
-                (var pos, var _) = NextText(txt, posc, c, true, false);
+                (var pos, var _) = NextText(txt, posc, c, true, false, KlammernStd);
                 if (pos < 0) { return new strGetEndFeedback(0, txt); }
                 var f = Script.ComandOnPosition(txt, pos, s, true);
                 if (!string.IsNullOrEmpty(f.ErrorMessage)) {
@@ -75,10 +75,10 @@ namespace BlueScript {
             var v = s.Variablen.AllNames();
 
             do {
-                (var pos, var which) = NextText(txt, posc, v, true, true);
+                (var pos, var which) = NextText(txt, posc, v, true, true, KlammernStd);
 
                 if (txt.Contains("~")) {
-                    (var postmp, var _) = NextText(txt, posc, Tilde, false, false);
+                    (var postmp, var _) = NextText(txt, posc, Tilde, false, false, KlammernStd);
                     if ((postmp >= 0 && postmp < pos) || pos < 0) { pos = postmp; which = "~"; }
                 }
 
@@ -88,7 +88,7 @@ namespace BlueScript {
                 int endz;
 
                 if (which == "~") {
-                    (var pose, var _) = NextText(txt, pos + 1, Tilde, false, false);
+                    (var pose, var _) = NextText(txt, pos + 1, Tilde, false, false, KlammernStd);
                     if (pose <= pos) { return new strGetEndFeedback("Variablen-Findung End-~-Zeichen nicht gefunden."); }
                     var x = new Variable("dummy", txt.Substring(pos + 1, pose - pos - 1), s);
                     if (x.Type != enVariableDataType.String) { return new strGetEndFeedback("Fehler beim Berechnen des Variablen-Namens."); }
@@ -116,7 +116,7 @@ namespace BlueScript {
 
             var posc = 0;
             do {
-                (var pos, var _) = NextText(attributtext, posc, Komma, false, false);
+                (var pos, var _) = NextText(attributtext, posc, Komma, false, false, KlammernStd);
                 if (pos < 0) {
                     attributes.Add(attributtext.Substring(posc).DeKlammere(true, false, false, true));
                     break;
@@ -216,7 +216,7 @@ namespace BlueScript {
                                 cont++;
                                 s.Line++;
                             } while (true);
-                            (var posek, var _) = NextText(scriptText, cont, GeschKlammerZu, false, false);
+                            (var posek, var _) = NextText(scriptText, cont, GeschKlammerZu, false, false, KlammernStd);
                             if (posek < cont) {
                                 return new strCanDoFeedback(cont, "Kein Codeblock Ende bei " + comandtext, true);
                             }
@@ -272,7 +272,7 @@ namespace BlueScript {
                 return new strGetEndFeedback(startpos, string.Empty);
             }
 
-            (var pos, var which) = NextText(scriptText, startpos, new List<string>() { EndSequence }, false, false);
+            (var pos, var which) = NextText(scriptText, startpos, new List<string>() { EndSequence }, false, false, KlammernStd);
             if (pos < startpos) {
                 return new strGetEndFeedback("Keinen Endpunkt gefunden.");
             }

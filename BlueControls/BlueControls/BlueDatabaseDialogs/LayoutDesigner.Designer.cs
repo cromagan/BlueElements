@@ -27,6 +27,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private void InitializeComponent()
         {
             this.grpLayoutSelection = new BlueControls.Controls.GroupBox();
+            this.btnCopyID = new BlueControls.Controls.Button();
             this.btnLayoutUmbenennen = new BlueControls.Controls.Button();
             this.btnLayoutLöschen = new BlueControls.Controls.Button();
             this.btnLayoutHinzu = new BlueControls.Controls.Button();
@@ -41,7 +42,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabElementEigenschaften = new System.Windows.Forms.TabPage();
             this.tabSkript = new System.Windows.Forms.TabPage();
             this.scriptEditor = new BlueControls.ScriptEditor();
-            this.btnCopyID = new BlueControls.Controls.Button();
             this.Ribbon.SuspendLayout();
             this.tabPageControl.SuspendLayout();
             this.tabPageStart.SuspendLayout();
@@ -115,6 +115,17 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpLayoutSelection.TabIndex = 2;
             this.grpLayoutSelection.TabStop = false;
             this.grpLayoutSelection.Text = "Datenbank";
+            // 
+            // btnCopyID
+            // 
+            this.btnCopyID.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnCopyID.ImageCode = "Clipboard|16";
+            this.btnCopyID.Location = new System.Drawing.Point(176, 2);
+            this.btnCopyID.Name = "btnCopyID";
+            this.btnCopyID.Size = new System.Drawing.Size(48, 22);
+            this.btnCopyID.TabIndex = 4;
+            this.btnCopyID.Text = "ID";
+            this.btnCopyID.Click += new System.EventHandler(this.btnCopyID_Click);
             // 
             // btnLayoutUmbenennen
             // 
@@ -265,17 +276,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.scriptEditor.Size = new System.Drawing.Size(516, 473);
             this.scriptEditor.TabIndex = 1;
             this.scriptEditor.TabStop = false;
-            // 
-            // btnCopyID
-            // 
-            this.btnCopyID.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
-            this.btnCopyID.ImageCode = "Clipboard|16";
-            this.btnCopyID.Location = new System.Drawing.Point(176, 2);
-            this.btnCopyID.Name = "btnCopyID";
-            this.btnCopyID.Size = new System.Drawing.Size(48, 22);
-            this.btnCopyID.TabIndex = 4;
-            this.btnCopyID.Text = "ID";
-            this.btnCopyID.Click += new System.EventHandler(this.btnCopyID_Click);
             // 
             // LayoutDesigner
             // 

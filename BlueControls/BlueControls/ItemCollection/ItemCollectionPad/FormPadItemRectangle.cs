@@ -211,6 +211,7 @@ namespace BlueControls.ItemCollection {
                     }
                     if (drawingCoordinates.Width < 1 || drawingCoordinates.Height < 1) {
                         gr.DrawEllipse(new Pen(Color.Gray, 3), drawingCoordinates.Left - 5, drawingCoordinates.Top + 5, 10, 10);
+                        gr.DrawLine(ZoomPad.PenGray, drawingCoordinates.PointOf(enAlignment.Top_Left), drawingCoordinates.PointOf(enAlignment.Bottom_Right));
                     }
                 }
             } catch { }

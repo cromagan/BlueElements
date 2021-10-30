@@ -32,6 +32,8 @@ namespace BlueBasics {
         public static List<string> GeschKlammerZu = new() { "}" };
         public static List<string> Gleich = new() { "=" };
         public static List<string> KlammerAuf = new() { "(" };
+        public static List<List<string>> KlammernGeschweift = new() { new() { "{", "}" } };
+        public static List<List<string>> KlammernStd = new() { new() { "(", ")" }, new() { "{", "}" }, new() { "[", "]" } };
         public static List<string> KlammerZu = new() { ")" };
         public static List<string> Komma = new() { "," };
         public static List<string> Tilde = new() { "~" };
@@ -60,7 +62,7 @@ namespace BlueBasics {
         public static bool CanCut(this string txt, string start, string ende) {
             if (!txt.StartsWith(start) || !txt.EndsWith(ende)) { return false; }
 
-            (var pose, var _) = NextText(txt, 0, new List<string> { ende }, false, false);
+            (var pose, var _) = NextText(txt, 0, new List<string> { ende }, false, false, KlammernStd);
             return pose == txt.Length - 1;
         }
 
@@ -210,7 +212,7 @@ namespace BlueBasics {
             var start = 1;
             var noarunde = true;
             do {
-                (var gleichpos, var _) = NextText(value, start, Gleich, false, false);
+                (var gleichpos, var _) = NextText(value, start, Gleich, false, false, KlammernGeschweift);
                 if (gleichpos < 0) {
                     Develop.DebugPrint(enFehlerArt.Fehler, "Parsen nicht möglich:" + value);
                 }
@@ -218,7 +220,7 @@ namespace BlueBasics {
                 if (string.IsNullOrEmpty(tag)) {
                     Develop.DebugPrint(enFehlerArt.Fehler, "Parsen nicht möglich:" + value);
                 }
-                (var kommapos, var _) = NextText(value, gleichpos, Komma, false, true);
+                (var kommapos, var _) = NextText(value, gleichpos, Komma, false, true, KlammernGeschweift);
                 string tagval;
                 if (kommapos < 0) {
                     tagval = value.Substring(gleichpos + 1, value.Length - gleichpos - 2).Trim();
@@ -327,7 +329,7 @@ namespace BlueBasics {
             return char.IsPunctuation(value) || char.IsSeparator(value) || TR.Contains(value.ToString());
         }
 
-        public static (int pos, string which) NextText(string txt, int startpos, List<string> searchfor, bool checkforSeparatorbefore, bool checkforSeparatorafter) {
+        public static (int pos, string which) NextText(string txt, int startpos, List<string> searchfor, bool checkforSeparatorbefore, bool checkforSeparatorafter, List<List<string>> klammern) {
             var Gans = false;
             var pos = startpos;
             var maxl = txt.Length;
@@ -340,50 +342,70 @@ namespace BlueBasics {
 
                 #region Klammer und " erledigen
 
-                switch (txt.Substring(pos, 1)) {
-                    case "\"":
-                        if (historie.EndsWith("\"")) {
-                            historie = historie.Substring(0, historie.Length - 1);
-                            Gans = false;
-                        } else {
-                            historie += "\"";
-                            Gans = true;
+                var ch = txt.Substring(pos, 1);
+
+                if (Gans) {
+                    // Wenn ein Gänsefüßchen offen ist, NUR auf weitere Gänsefüßchen reagieren - in einem String darf alles sein.
+                    if (ch == "\"") { Gans = false; }
+                } else {
+                    if (ch == "\"") {
+                        Gans = true;  // Ab hier fogt ein String
+                    } else {
+                        // Nur die andern Klammern-Paare prüfen. Bei einem Klammer Fehler -1 zurück geben.
+                        foreach (var thisc in klammern) {
+                            if (ch == thisc[0]) { historie += thisc[0]; }
+                            if (ch == thisc[1]) {
+                                if (!historie.EndsWith(thisc[0])) { return (-1, string.Empty); }
+                                historie = historie.Substring(0, historie.Length - 1);
+                            }
                         }
-                        break;
-
-                    case "[":
-                        if (!Gans) { historie += "["; }
-                        break;
-
-                    case "]":
-                        if (!Gans) {
-                            if (!historie.EndsWith("[")) { return (-1, string.Empty); }
-                            historie = historie.Substring(0, historie.Length - 1);
-                        }
-                        break;
-
-                    case "(":
-                        if (!Gans) { historie += "("; }
-                        break;
-
-                    case ")":
-                        if (!Gans) {
-                            if (!historie.EndsWith("(")) { return (-1, string.Empty); }
-                            historie = historie.Substring(0, historie.Length - 1);
-                        }
-                        break;
-
-                    case "{":
-                        if (!Gans) { historie += "{"; }
-                        break;
-
-                    case "}":
-                        if (!Gans) {
-                            if (!historie.EndsWith("{")) { return (-1, string.Empty); }
-                            historie = historie.Substring(0, historie.Length - 1);
-                        }
-                        break;
+                    }
                 }
+
+                //switch (txt.Substring(pos, 1)) {
+                //    case "\"":
+                //        if (historie.EndsWith("\"")) {
+                //            historie = historie.Substring(0, historie.Length - 1);
+                //            Gans = false;
+                //        } else {
+                //            historie += "\"";
+                //            Gans = true;
+                //        }
+                //        break;
+
+                //    case "[":
+                //        if (!Gans) { historie += "["; }
+                //        break;
+
+                //    case "]":
+                //        if (!Gans) {
+                //            if (!historie.EndsWith("[")) { return (-1, string.Empty); }
+                //            historie = historie.Substring(0, historie.Length - 1);
+                //        }
+                //        break;
+
+                //    case "(":
+                //        if (!Gans) { historie += "("; }
+                //        break;
+
+                //    case ")":
+                //        if (!Gans) {
+                //            if (!historie.EndsWith("(")) { return (-1, string.Empty); }
+                //            historie = historie.Substring(0, historie.Length - 1);
+                //        }
+                //        break;
+
+                //    case "{":
+                //        if (!Gans) { historie += "{"; }
+                //        break;
+
+                //    case "}":
+                //        if (!Gans) {
+                //            if (!historie.EndsWith("{")) { return (-1, string.Empty); }
+                //            historie = historie.Substring(0, historie.Length - 1);
+                //        }
+                //        break;
+                //}
 
                 #endregion
 
@@ -403,7 +425,7 @@ namespace BlueBasics {
                     }
                 }
 
-                #endregion Den Text suchen
+                #endregion
 
                 pos++;
             } while (true);

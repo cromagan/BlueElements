@@ -52,13 +52,11 @@ namespace BlueScript {
                 du++;
                 if (du > 100000) { return new strDoItFeedback("Do-Schleife nach 100.000 Durchläufen abgebrochen."); }
 
-
                 var tmpv = new List<Variable>();
                 tmpv.AddRange(s.Variablen);
 
                 (var err, var _) = s.Parse(infos.CodeBlockAfterText, false);
                 if (!string.IsNullOrEmpty(err)) { return new strDoItFeedback(err); }
-
 
                 s.Variablen.Clear();
                 s.Variablen.AddRange(tmpv);
@@ -73,7 +71,7 @@ namespace BlueScript {
         }
 
         private static string GetBoolTMP(string txt, string check) {
-            (var i, var _) = NextText(txt, 0, new List<string>() { check }, false, false);
+            (var i, var _) = NextText(txt, 0, new List<string>() { check }, false, false, KlammernStd);
             if (i < 0) { return string.Empty; }
             if (i < 1 && check != "!") { return string.Empty; } // <1, weil ja mindestens ein Zeichen vorher sein MUSS!
             if (i >= txt.Length - 1) { return string.Empty; } // siehe oben

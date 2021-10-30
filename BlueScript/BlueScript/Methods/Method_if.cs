@@ -61,9 +61,9 @@ namespace BlueScript {
 
             #region Klammern zuerst berechnen
 
-            (var posa, var _) = NextText(txt, 0, KlammerAuf, false, false);
+            (var posa, var _) = NextText(txt, 0, KlammerAuf, false, false, KlammernStd);
             if (posa > -1) {
-                (var pose, var _) = NextText(txt, posa, KlammerZu, false, false);
+                (var pose, var _) = NextText(txt, posa, KlammerZu, false, false, KlammernStd);
                 if (pose < posa) { return null; }
                 var tmp = GetBool(txt.Substring(posa + 1, pose - posa - 1));
                 return tmp == null ? null : GetBool(txt.Substring(0, posa) + tmp + txt.Substring(pose + 1));
@@ -112,7 +112,7 @@ namespace BlueScript {
         }
 
         private static string GetBoolTMP(string txt, string check) {
-            (var i, var _) = NextText(txt, 0, new List<string>() { check }, false, false);
+            (var i, var _) = NextText(txt, 0, new List<string>() { check }, false, false, KlammernStd);
             if (i < 0) { return string.Empty; }
             if (i < 1 && check != "!") { return string.Empty; } // <1, weil ja mindestens ein Zeichen vorher sein MUSS!
             if (i >= txt.Length - 1) { return string.Empty; } // siehe oben

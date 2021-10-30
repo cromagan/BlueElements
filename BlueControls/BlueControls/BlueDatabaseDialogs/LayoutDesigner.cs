@@ -60,10 +60,12 @@ namespace BlueControls.BlueDatabaseDialogs {
         internal void LoadLayout(string fileOrLayoutID) {
             SaveCurrentLayout();
             cbxLayout.Text = fileOrLayoutID;
+
             if (string.IsNullOrEmpty(fileOrLayoutID)) {
                 DisablePad();
                 return;
             }
+
             var ind = Database.Layouts.LayoutIDToIndex(fileOrLayoutID);
             if (ind < 0) {
                 if (fileOrLayoutID.FileSuffix().ToUpper() == "BCR") {

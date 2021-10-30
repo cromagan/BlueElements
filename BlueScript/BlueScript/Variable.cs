@@ -426,7 +426,7 @@ namespace BlueScript {
             #region Prüfen, Ob noch mehre Klammern da sind, oder Anfangs/End-Klammern entfernen
 
             if (txt.StartsWith("(")) {
-                (var pose, var _) = NextText(txt, 0, KlammerZu, false, false);
+                (var pose, var _) = NextText(txt, 0, KlammerZu, false, false, KlammernStd);
                 if (pose < txt.Length - 1) {
                     /// Wir haben so einen Fall: (true) || (true)
                     var txt1 = AttributeAuflösen(txt.Substring(1, pose - 1), s);
@@ -455,7 +455,7 @@ namespace BlueScript {
 
                 #region AndAlso
 
-                (var uu, var _) = NextText(txt, 0, Method_if.UndUnd, false, false);
+                (var uu, var _) = NextText(txt, 0, Method_if.UndUnd, false, false, KlammernStd);
                 if (uu > 0) {
                     var txt1 = AttributeAuflösen(txt.Substring(0, uu), s);
                     return !string.IsNullOrEmpty(txt1.ErrorMessage) ? new strDoItFeedback("Befehls-Berechnungsfehler vor &&: " + txt1.ErrorMessage)
@@ -467,7 +467,7 @@ namespace BlueScript {
 
                 #region OrElse
 
-                (var oo, var _) = NextText(txt, 0, Method_if.OderOder, false, false);
+                (var oo, var _) = NextText(txt, 0, Method_if.OderOder, false, false, KlammernStd);
                 if (oo > 0) {
                     var txt1 = AttributeAuflösen(txt.Substring(0, oo), s);
                     return !string.IsNullOrEmpty(txt1.ErrorMessage)
@@ -493,9 +493,9 @@ namespace BlueScript {
 
             #region Klammern am Ende berechnen, das ansonsten Min(x,y,z) falsch anschlägt
 
-            (var posa, var _) = NextText(txt, 0, KlammerAuf, false, false);
+            (var posa, var _) = NextText(txt, 0, KlammerAuf, false, false, KlammernStd);
             if (posa > -1) {
-                (var pose, var _) = NextText(txt, posa, KlammerZu, false, false);
+                (var pose, var _) = NextText(txt, posa, KlammerZu, false, false, KlammernStd);
                 if (pose <= posa) { return strDoItFeedback.Klammerfehler(); }
                 var tmp = AttributeAuflösen(txt.Substring(posa + 1, pose - posa - 1), s);
                 return !string.IsNullOrEmpty(tmp.ErrorMessage)
@@ -507,7 +507,7 @@ namespace BlueScript {
 
             #region Vergleichsoperatoren ersetzen und vereinfachen
 
-            (var pos, var _) = NextText(txt, 0, Method_if.VergleichsOperatoren, false, false);
+            (var pos, var _) = NextText(txt, 0, Method_if.VergleichsOperatoren, false, false, KlammernStd);
             if (pos >= 0) {
                 txt = Method_if.GetBool(txt);
                 if (txt == null) { return new strDoItFeedback("Der Inhalt zwischen den Klammern () konnte nicht berechnet werden."); }
