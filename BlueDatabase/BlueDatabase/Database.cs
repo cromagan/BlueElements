@@ -110,9 +110,9 @@ namespace BlueDatabase {
 
         private enVerwaisteDaten _VerwaisteDaten;
 
-        private string _ZeilenQuickInfo;
+        private string _WorkItemsBefore = string.Empty;
 
-        private string WVorher = string.Empty;
+        private string _ZeilenQuickInfo;
 
         #endregion
 
@@ -972,7 +972,7 @@ namespace BlueDatabase {
                 return;
             }
             // Keine Doppelten Rausfiltern, ansonstn stimmen die Undo nicht mehr
-            UserEditedAktionUTC = DateTime.UtcNow;
+            SetUserDidSomething();
             if (RowKey < -100) { Develop.DebugPrint(enFehlerArt.Fehler, "RowKey darf hier nicht <-100 sein!"); }
             if (ColumnKey < -100) { Develop.DebugPrint(enFehlerArt.Fehler, "ColKey darf hier nicht <-100 sein!"); }
             Works.Add(new WorkItem(Comand, ColumnKey, RowKey, PreviousValue, ChangedTo, UserName));
@@ -1100,6 +1100,12 @@ namespace BlueDatabase {
             List.AddRange(b);
         }
 
+        protected override bool BlockDiskOperations() {
+            if (RowItem.DoingScript) { return true; }
+
+            return base.BlockDiskOperations();
+        }
+
         protected override void CheckDataAfterReload() {
             try {
                 // Leztes WorkItem suchen. Auch Ohne LogUndo MUSS es vorhanden sein.
@@ -1117,7 +1123,7 @@ namespace BlueDatabase {
                     }
                     if (!ok && string.IsNullOrEmpty(ok2)) {
                         if (!Filename.Contains("AutoVue") && !Filename.Contains("Plandaten") && !Filename.Contains("Ketten.") && !Filename.Contains("Kettenräder.") && !Filename.Contains("TVW") && !Filename.Contains("Work")) {
-                            Develop.DebugPrint(enFehlerArt.Warnung, "WorkItem verschwunden<br>" + _LastWorkItem + "<br>" + Filename + "<br><br>Vorher:<br>" + WVorher + "<br><br>Nachher:<br>" + Works.ToString());
+                            Develop.DebugPrint(enFehlerArt.Warnung, "WorkItem verschwunden<br>" + _LastWorkItem + "<br>" + Filename + "<br><br>Vorher:<br>" + _WorkItemsBefore + "<br><br>Nachher:<br>" + Works.ToString());
                         }
                     }
                 }
@@ -1210,8 +1216,6 @@ namespace BlueDatabase {
             FilesAfterLoadingLCase.AddRange(FilesNewLCase);
             if (Writer_FilesToDeleteLCase.Count > 0) { DeleteFile(Writer_FilesToDeleteLCase); }
         }
-
-        protected override bool isSomethingDiscOperatingsBlocking() => false;
 
         protected override bool IsThereBackgroundWorkToDo() {
             if (HasPendingChanges()) { return true; }
@@ -1315,7 +1319,7 @@ namespace BlueDatabase {
 
         protected override void PrepeareDataForCheckingBeforeLoad() {
             // Letztes WorkItem speichern, als Kontrolle
-            WVorher = string.Empty;
+            _WorkItemsBefore = string.Empty;
             _LastWorkItem = string.Empty;
             if (Works != null && Works.Count > 0) {
                 var c = 0;
@@ -1325,7 +1329,7 @@ namespace BlueDatabase {
                     var wn = Works.Count - c;
                     if (Works[wn].LogsUndo(this) && Works[wn].HistorischRelevant) { _LastWorkItem = Works[wn].ToString(); }
                 } while (string.IsNullOrEmpty(_LastWorkItem));
-                WVorher = Works.ToString();
+                _WorkItemsBefore = Works.ToString();
             }
         }
 
@@ -1405,12 +1409,12 @@ namespace BlueDatabase {
 
         private static int NummerCode3(byte[] b, int pointer) => (b[pointer] * 65025) + (b[pointer + 1] * 255) + b[pointer + 2];
 
-        private void ChangeColumnKeyInPending(int OldKey, int NewKey) {
+        private void ChangeColumnKeyInPending(int oldKey, int newKey) {
             foreach (var ThisPending in Works) {
                 if (ThisPending.State == enItemState.Pending) {
-                    if (ThisPending.ColKey == OldKey) {
+                    if (ThisPending.ColKey == oldKey) {
                         if (ThisPending.ToString() == _LastWorkItem) { _LastWorkItem = "X"; }
-                        ThisPending.ColKey = NewKey; // Generell den Schlüssel ändern
+                        ThisPending.ColKey = newKey; // Generell den Schlüssel ändern
                         if (_LastWorkItem == "X") {
                             _LastWorkItem = ThisPending.ToString();
                             Develop.DebugPrint(enFehlerArt.Info, "LastWorkitem geändert: " + _LastWorkItem);
@@ -1418,21 +1422,21 @@ namespace BlueDatabase {
                         switch (ThisPending.Comand) {
                             case enDatabaseDataType.AddColumn:
                             case enDatabaseDataType.dummyComand_RemoveColumn:
-                                ThisPending.ChangedTo = NewKey.ToString();
+                                ThisPending.ChangedTo = newKey.ToString();
                                 break;
 
                             default:
-                                if (ThisPending.PreviousValue.Contains(ColumnCollection.ParsableColumnKey(OldKey))) {
-                                    Develop.DebugPrint("Replace machen (Old): " + OldKey);
+                                if (ThisPending.PreviousValue.Contains(ColumnCollection.ParsableColumnKey(oldKey))) {
+                                    Develop.DebugPrint("Replace machen (Old): " + oldKey);
                                 }
-                                if (ThisPending.ChangedTo.Contains(ColumnCollection.ParsableColumnKey(OldKey))) {
-                                    Develop.DebugPrint("Replace machen (New): " + OldKey);
+                                if (ThisPending.ChangedTo.Contains(ColumnCollection.ParsableColumnKey(oldKey))) {
+                                    Develop.DebugPrint("Replace machen (New): " + oldKey);
                                 }
                                 break;
                         }
                     }
                 }
-                OnColumnKeyChanged(new KeyChangedEventArgs(OldKey, NewKey));
+                OnColumnKeyChanged(new KeyChangedEventArgs(oldKey, newKey));
             }
         }
 
@@ -1682,19 +1686,19 @@ namespace BlueDatabase {
             SortParameterChanged?.Invoke(this, System.EventArgs.Empty);
         }
 
-        private string ParseThis(enDatabaseDataType Art, string content, ColumnItem column, RowItem row, int width, int height) {
-            if (Art is >= enDatabaseDataType.Info_ColumDataSart and <= enDatabaseDataType.Info_ColumnDataEnd) {
-                return column.Load(Art, content);
+        private string ParseThis(enDatabaseDataType type, string value, ColumnItem column, RowItem row, int width, int height) {
+            if (type is >= enDatabaseDataType.Info_ColumDataSart and <= enDatabaseDataType.Info_ColumnDataEnd) {
+                return column.Load(type, value);
             }
-            switch (Art) {
+            switch (type) {
                 case enDatabaseDataType.Formatkennung:
                     break;
 
                 case enDatabaseDataType.Version:
-                    LoadedVersion = content.Trim();
+                    LoadedVersion = value.Trim();
                     if (LoadedVersion != DatabaseVersion) {
                         Initialize();
-                        LoadedVersion = content.Trim();
+                        LoadedVersion = value.Trim();
                     } else {
                         //Cell.RemoveOrphans();
                         Row.RemoveNullOrEmpty();
@@ -1712,63 +1716,63 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.Creator:
-                    _Creator = content;
+                    _Creator = value;
                     break;
 
                 case enDatabaseDataType.CreateDate:
-                    _CreateDate = content;
+                    _CreateDate = value;
                     break;
 
                 case enDatabaseDataType.ReloadDelaySecond:
-                    _ReloadDelaySecond = int.Parse(content);
+                    _ReloadDelaySecond = int.Parse(value);
                     break;
 
                 case enDatabaseDataType.DatenbankAdmin:
-                    DatenbankAdmin.SplitAndCutByCR_QuickSortAndRemoveDouble(content);
+                    DatenbankAdmin.SplitAndCutByCR_QuickSortAndRemoveDouble(value);
                     break;
 
                 case enDatabaseDataType.SortDefinition:
-                    _sortDefinition = new RowSortDefinition(this, content);
+                    _sortDefinition = new RowSortDefinition(this, value);
                     break;
 
                 case enDatabaseDataType.Caption:
-                    _Caption = content;
+                    _Caption = value;
                     break;
 
                 case enDatabaseDataType.GlobalScale:
-                    _GlobalScale = double.Parse(content);
+                    _GlobalScale = double.Parse(value);
                     break;
 
                 case enDatabaseDataType.FilterImagePfad:
-                    _FilterImagePfad = content;
+                    _FilterImagePfad = value;
                     break;
 
                 case enDatabaseDataType.AdditionaFilesPfad:
-                    _AdditionaFilesPfad = content;
+                    _AdditionaFilesPfad = value;
                     break;
 
                 case enDatabaseDataType.ZeilenQuickInfo:
-                    _ZeilenQuickInfo = content;
+                    _ZeilenQuickInfo = value;
                     break;
 
                 case enDatabaseDataType.Ansicht:
-                    _Ansicht = (enAnsicht)int.Parse(content);
+                    _Ansicht = (enAnsicht)int.Parse(value);
                     break;
 
                 case enDatabaseDataType.Tags:
-                    Tags.SplitAndCutByCR(content);
+                    Tags.SplitAndCutByCR(value);
                     break;
 
                 case enDatabaseDataType.BinaryDataInOne:
                     break;
 
                 case enDatabaseDataType.Layouts:
-                    Layouts.SplitAndCutByCR_QuickSortAndRemoveDouble(content);
+                    Layouts.SplitAndCutByCR_QuickSortAndRemoveDouble(value);
                     break;
 
                 case enDatabaseDataType.AutoExport:
                     Export.Clear();
-                    List<string> AE = new(content.SplitAndCutByCR());
+                    List<string> AE = new(value.SplitAndCutByCR());
                     foreach (var t in AE) {
                         Export.Add(new ExportDefinition(this, t));
                     }
@@ -1785,7 +1789,7 @@ namespace BlueDatabase {
 
                 case enDatabaseDataType.ColumnArrangement:
                     ColumnArrangements.Clear();
-                    List<string> CA = new(content.SplitAndCutByCR());
+                    List<string> CA = new(value.SplitAndCutByCR());
                     foreach (var t in CA) {
                         ColumnArrangements.Add(new ColumnViewCollection(this, t));
                     }
@@ -1793,24 +1797,24 @@ namespace BlueDatabase {
 
                 case enDatabaseDataType.Views:
                     Views.Clear();
-                    List<string> VI = new(content.SplitAndCutByCR());
+                    List<string> VI = new(value.SplitAndCutByCR());
                     foreach (var t in VI) {
                         Views.Add(new ColumnViewCollection(this, t));
                     }
                     break;
 
                 case enDatabaseDataType.PermissionGroups_NewRow:
-                    PermissionGroups_NewRow.SplitAndCutByCR_QuickSortAndRemoveDouble(content);
+                    PermissionGroups_NewRow.SplitAndCutByCR_QuickSortAndRemoveDouble(value);
                     break;
 
                 case enDatabaseDataType.LastRowKey:
-                    return Row.Load_310(Art, content);
+                    return Row.Load_310(type, value);
 
                 case enDatabaseDataType.LastColumnKey:
-                    return Column.Load_310(Art, content);
+                    return Column.Load_310(type, value);
 
                 case enDatabaseDataType.GlobalShowPass:
-                    _GlobalShowPass = content;
+                    _GlobalShowPass = value;
                     break;
 
                 case (enDatabaseDataType)30:
@@ -1822,42 +1826,42 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.JoinTyp:
-                    _JoinTyp = (enJoinTyp)int.Parse(content);
+                    _JoinTyp = (enJoinTyp)int.Parse(value);
                     break;
 
                 case enDatabaseDataType.VerwaisteDaten:
-                    _VerwaisteDaten = (enVerwaisteDaten)int.Parse(content);
+                    _VerwaisteDaten = (enVerwaisteDaten)int.Parse(value);
                     break;
 
                 case (enDatabaseDataType)63://                    enDatabaseDataType.ImportScript:
                     break;
 
                 case enDatabaseDataType.RulesScript:
-                    _RulesScript = content;
+                    _RulesScript = value;
                     break;
 
                 case enDatabaseDataType.FileEncryptionKey:
-                    _FileEncryptionKey = content;
+                    _FileEncryptionKey = value;
                     break;
 
                 case enDatabaseDataType.ce_Value_withSizeData:
                 case enDatabaseDataType.ce_UTF8Value_withSizeData:
                 case enDatabaseDataType.ce_Value_withoutSizeData:
-                    if (Art == enDatabaseDataType.ce_UTF8Value_withSizeData) {
+                    if (type == enDatabaseDataType.ce_UTF8Value_withSizeData) {
                         //Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
                         var enc1252 = Encoding.GetEncoding(1252);
-                        content = Encoding.UTF8.GetString(enc1252.GetBytes(content));
+                        value = Encoding.UTF8.GetString(enc1252.GetBytes(value));
                     }
-                    Cell.Load_310(column, row, content, width, height);
+                    Cell.Load_310(column, row, value, width, height);
                     break;
 
                 case enDatabaseDataType.UndoCount:
-                    _UndoCount = int.Parse(content);
+                    _UndoCount = int.Parse(value);
                     break;
 
                 case enDatabaseDataType.UndoInOne:
                     Works.Clear();
-                    var UIO = content.SplitAndCutByCR();
+                    var UIO = value.SplitAndCutByCR();
                     for (var z = 0; z <= UIO.GetUpperBound(0); z++) {
                         WorkItem tmpWork = new(UIO[z]) {
                             State = enItemState.Undo // Beim Erstellen des strings ist noch nicht sicher, ob gespeichter wird. Deswegen die alten "Pendings" zu Undos ändern.
@@ -1867,36 +1871,36 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.dummyComand_AddRow:
-                    var addRowKey = int.Parse(content);
+                    var addRowKey = int.Parse(value);
                     if (Row.SearchByKey(addRowKey) == null) { Row.Add(new RowItem(this, addRowKey)); }
                     break;
 
                 case enDatabaseDataType.AddColumn:
-                    var addColumnKey = int.Parse(content);
+                    var addColumnKey = int.Parse(value);
                     if (Column.SearchByKey(addColumnKey) == null) { Column.AddFromParser(new ColumnItem(this, addColumnKey)); }
                     break;
 
                 case enDatabaseDataType.dummyComand_RemoveRow:
-                    var removeRowKey = int.Parse(content);
+                    var removeRowKey = int.Parse(value);
                     if (Row.SearchByKey(removeRowKey) is RowItem) { Row.Remove(removeRowKey); }
                     break;
 
                 case enDatabaseDataType.dummyComand_RemoveColumn:
-                    var removeColumnKey = int.Parse(content);
+                    var removeColumnKey = int.Parse(value);
                     if (Column.SearchByKey(removeColumnKey) is ColumnItem col) { Column.Remove(col); }
                     break;
 
                 case enDatabaseDataType.EOF:
-                    return "";
+                    return string.Empty;
 
                 default:
                     LoadedVersion = "9.99";
                     if (!ReadOnly) {
-                        Develop.DebugPrint(enFehlerArt.Fehler, "Laden von Datentyp \'" + Art + "\' nicht definiert.<br>Wert: " + content + "<br>Datei: " + Filename);
+                        Develop.DebugPrint(enFehlerArt.Fehler, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Datei: " + Filename);
                     }
                     break;
             }
-            return "";
+            return string.Empty;
         }
 
         private bool PermissionCheckWithoutAdmin(string allowed, RowItem row) {

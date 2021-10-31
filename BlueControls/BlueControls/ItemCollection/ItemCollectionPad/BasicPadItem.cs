@@ -20,6 +20,7 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -408,9 +409,9 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public virtual void PointMoved(object sender, System.EventArgs e) => OnChanged();
+        public virtual void PointMoved(object sender, MoveEventArgs e) => OnChanged();
 
-        public virtual void PointMoving(object sender, System.EventArgs e) { }
+        public virtual void PointMoving(object sender, MoveEventArgs e) { }
 
         public override string ToString() {
             var t = "{";

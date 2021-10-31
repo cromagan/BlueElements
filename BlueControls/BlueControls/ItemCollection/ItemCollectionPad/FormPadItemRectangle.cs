@@ -19,6 +19,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using BlueControls.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -107,7 +108,7 @@ namespace BlueControls.ItemCollection {
             return false;
         }
 
-        public override void PointMoved(object sender, System.EventArgs e) {
+        public override void PointMoved(object sender, MoveEventArgs e) {
             base.PointMoved(sender, e);
             var x = 0D;
             var y = 0D;
@@ -120,48 +121,46 @@ namespace BlueControls.ItemCollection {
             }
 
             if (point == p_LO) {
-                p_O.Y = y;
-                p_L.X = x;
-                SizeChanged();
+                if (e.Y) { p_O.Y = y; }
+                if (e.X) { p_L.X = x; }
             }
 
             if (point == p_RO) {
-                p_O.Y = y;
-                p_R.X = x;
-                SizeChanged();
+                if (e.Y) { p_O.Y = y; }
+                if (e.X) { p_R.X = x; }
             }
 
             if (point == p_LU) {
-                p_L.X = x;
-                p_U.Y = y;
-                SizeChanged();
+                if (e.X) { p_L.X = x; }
+                if (e.Y) { p_U.Y = y; }
             }
 
             if (point == p_RU) {
-                p_R.X = x;
-                p_U.Y = y;
-                SizeChanged();
+                if (e.X) { p_R.X = x; }
+                if (e.Y) { p_U.Y = y; }
             }
 
-            if (point == p_O) {
+            if (point == p_O && e.Y) {
                 p_LO.Y = y;
                 p_RO.Y = y;
             }
 
-            if (point == p_U) {
+            if (point == p_U && e.Y) {
                 p_LU.Y = y;
                 p_RU.Y = y;
             }
 
-            if (point == p_L) {
+            if (point == p_L && e.X) {
                 p_LO.X = x;
                 p_LU.X = x;
             }
 
-            if (point == p_R) {
+            if (point == p_R && e.X) {
                 p_RO.X = x;
                 p_RU.X = x;
             }
+
+            SizeChanged();
         }
 
         public void SetCoordinates(RectangleM r, bool overrideFixedSize) {
@@ -177,18 +176,11 @@ namespace BlueControls.ItemCollection {
         }
 
         public virtual void SizeChanged() {
-            ////  Wichtig, weil wenn p_r, p_l, p_o, p_u mittig gesetzt werden und diese auf null sind, ist das schlecht.
-            //var x1 = p_RU.X;
-            //var y1 = p_RU.Y;
-            //PointMoved(p_LO, System.EventArgs.Empty);
-            //p_RU.SetTo(x1, y1);
-
-            p_L.Y = p_LO.Y + ((p_LU.Y - p_LO.Y) / 2);
-            p_R.Y = p_L.Y;
-            p_O.X = p_LO.X + ((p_RO.X - p_LO.X) / 2);
-            p_U.X = p_O.X;
-
-            //return;
+            // Punkte immer komplett setzen. Um eventuelle Parsing-Fehler auszugleichen
+            p_L.SetTo(p_LO.X, p_LO.Y + (p_LU.Y - p_LO.Y) / 2);
+            p_R.SetTo(p_RO.X, p_LO.Y + (p_LU.Y - p_LO.Y) / 2);
+            p_U.SetTo(p_LO.X + (p_RO.X - p_LO.X) / 2, p_RU.Y);
+            p_O.SetTo(p_LO.X + (p_RO.X - p_LO.X) / 2, p_RO.Y);
         }
 
         public override string ToString() {
@@ -216,6 +208,8 @@ namespace BlueControls.ItemCollection {
                 }
             } catch { }
         }
+
+        protected override void ParseFinished() => SizeChanged();
 
         #endregion
     }

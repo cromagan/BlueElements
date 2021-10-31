@@ -425,8 +425,7 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        protected override void ParseFinished() {
-        }
+        protected override void ParseFinished() { }
 
         // Return the dot product AB · BC.
         // Note that AB · BC = |AB| * |BC| * Cos(theta).

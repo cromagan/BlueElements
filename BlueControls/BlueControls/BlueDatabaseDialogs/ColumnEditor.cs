@@ -45,6 +45,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             InitializeComponent();
             _Table = table;
             Column_DatenAuslesen(column);
+
+            _Column.Database.ShouldICancelDiscOperations += Database_ShouldICancelDiscOperations;
         }
 
         #endregion
@@ -53,7 +55,11 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
             base.OnFormClosing(e);
-            if (!AllOk()) { e.Cancel = true; }
+            if (!AllOk()) {
+                e.Cancel = true;
+            } else {
+                _Column.Database.ShouldICancelDiscOperations -= Database_ShouldICancelDiscOperations;
+            }
         }
 
         private bool AllOk() {
@@ -451,6 +457,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             _Column.SaveContent = butSaveContent.Checked;
             //_Column.Database.Rules.Sort();
         }
+
+        private void Database_ShouldICancelDiscOperations(object sender, System.ComponentModel.CancelEventArgs e) => e.Cancel = true;
 
         private void SetKeyTo(ComboBox combobox, int columnKey) => combobox.Text = columnKey.ToString();
 

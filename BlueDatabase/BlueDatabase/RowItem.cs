@@ -35,6 +35,7 @@ namespace BlueDatabase {
         #region Fields
 
         private string? _tmpQuickInfo;
+
         private bool disposedValue;
 
         #endregion
@@ -73,6 +74,11 @@ namespace BlueDatabase {
         #endregion
 
         #region Properties
+
+        /// <summary>
+        /// Sehr rudimentäre Angabe!
+        /// </summary>
+        public static bool DoingScript { get; private set; } = false;
 
         public Database Database { get; private set; }
         public int Key { get; }
@@ -319,7 +325,9 @@ namespace BlueDatabase {
             if (!string.IsNullOrEmpty(feh)) { return (false, feh, null); }
 
             // Zuerst die Aktionen ausführen und falls es einen Fehler gibt, die Spalten und Fehler auch ermitteln
+            DoingScript = true;
             var script = DoRules(onlyTest, startroutine);
+            DoingScript = false;
             if (onlyTest) { return (true, string.Empty, script); }
 
             /// checkPerformed geht von Dateisystemfehlern aus

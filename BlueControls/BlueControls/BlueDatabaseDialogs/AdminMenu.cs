@@ -36,6 +36,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         #region Fields
 
         private readonly Table _TableView;
+        private Database tmpDatabase;
 
         #endregion
 
@@ -52,6 +53,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 _TableView.ViewChanged += _TableView_ViewChanged;
                 _TableView.EnabledChanged += _TableView_EnabledChanged;
             }
+            SetDatabase(_TableView?.Database);
             UpdateViewControls();
             Check_OrderButtons();
         }
@@ -61,6 +63,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         #region Methods
 
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
+            SetDatabase(null);
             if (_TableView != null) {
                 _TableView.DatabaseChanged -= _TableView_DatabaseChanged;
                 _TableView.CursorPosChanged -= _TableView_CursorPosChanged;
@@ -73,6 +76,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void _TableView_CursorPosChanged(object sender, CellEventArgs e) => Check_OrderButtons();
 
         private void _TableView_DatabaseChanged(object sender, System.EventArgs e) {
+            SetDatabase(_TableView.Database);
             UpdateViewControls();
             Check_OrderButtons();
         }
@@ -334,6 +338,18 @@ namespace BlueControls.BlueDatabaseDialogs {
                 _TableView.Database.ColumnArrangements.Add(new ColumnViewCollection(_TableView.Database, "", newname));
             }
         }
+
+        private void SetDatabase(Database database) {
+            if (tmpDatabase != null) {
+                tmpDatabase.ShouldICancelDiscOperations -= TmpDatabase_ShouldICancelDiscOperations;
+            }
+            tmpDatabase = database;
+            if (tmpDatabase != null) {
+                tmpDatabase.ShouldICancelDiscOperations += TmpDatabase_ShouldICancelDiscOperations;
+            }
+        }
+
+        private void TmpDatabase_ShouldICancelDiscOperations(object sender, System.ComponentModel.CancelEventArgs e) => e.Cancel = true;
 
         private void UpdateViewControls() => _TableView.WriteColumnArrangementsInto(cbxInternalColumnArrangementSelector);
 

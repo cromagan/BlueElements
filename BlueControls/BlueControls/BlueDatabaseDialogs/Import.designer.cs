@@ -24,24 +24,24 @@ namespace BlueControls.BlueDatabaseDialogs
         [DebuggerStepThrough()]
         private void InitializeComponent()
         {
-            this.Fertig = new Button();
-            this.Aufa = new Button();
-            this.BlueFrame1 = new GroupBox();
-            this.aTXT = new TextBox();
-            this.TabStopp = new Button();
-            this.Andere = new Button();
-            this.Semikolon = new Button();
-            this.Leerzeichen = new Button();
-            this.Komma = new Button();
-            this.Eintr = new Caption();
-            this.AnfTre = new Button();
-            this.BlueFrame3 = new GroupBox();
-            this.SpalteNachderReihe = new Button();
-            this.SpalteZuordnen = new Button();
-            this.Cancel = new Button();
-            this.GroupBox1 = new GroupBox();
-            this.ZeilenAlle = new Button();
-            this.ZeilenZuorden = new Button();
+            this.Fertig = new BlueControls.Controls.Button();
+            this.Aufa = new BlueControls.Controls.Button();
+            this.BlueFrame1 = new BlueControls.Controls.GroupBox();
+            this.aTXT = new BlueControls.Controls.TextBox();
+            this.TabStopp = new BlueControls.Controls.Button();
+            this.Andere = new BlueControls.Controls.Button();
+            this.Semikolon = new BlueControls.Controls.Button();
+            this.Leerzeichen = new BlueControls.Controls.Button();
+            this.Komma = new BlueControls.Controls.Button();
+            this.Eintr = new BlueControls.Controls.Caption();
+            this.AnfTre = new BlueControls.Controls.Button();
+            this.BlueFrame3 = new BlueControls.Controls.GroupBox();
+            this.SpalteNachderReihe = new BlueControls.Controls.Button();
+            this.SpalteZuordnen = new BlueControls.Controls.Button();
+            this.Cancel = new BlueControls.Controls.Button();
+            this.GroupBox1 = new BlueControls.Controls.GroupBox();
+            this.ZeilenAlle = new BlueControls.Controls.Button();
+            this.ZeilenZuorden = new BlueControls.Controls.Button();
             this.BlueFrame1.SuspendLayout();
             this.BlueFrame3.SuspendLayout();
             this.GroupBox1.SuspendLayout();
@@ -50,24 +50,26 @@ namespace BlueControls.BlueDatabaseDialogs
             // Fertig
             // 
             this.Fertig.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.Fertig.Location = new Point(712, 248);
+            this.Fertig.ImageCode = "Textfeld|16";
+            this.Fertig.Location = new System.Drawing.Point(704, 248);
             this.Fertig.Name = "Fertig";
-            this.Fertig.Size = new Size(96, 32);
+            this.Fertig.Size = new System.Drawing.Size(104, 32);
             this.Fertig.TabIndex = 9;
             this.Fertig.Text = "Importieren";
-            this.Fertig.Click += new EventHandler(this.Fertig_Click);
+            this.Fertig.Click += new System.EventHandler(this.Fertig_Click);
             // 
             // Aufa
             // 
-            this.Aufa.ButtonStyle = enButtonStyle.Checkbox_Text;
-            this.Aufa.Location = new Point(8, 40);
+            this.Aufa.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
+            this.Aufa.Location = new System.Drawing.Point(8, 40);
             this.Aufa.Name = "Aufa";
-            this.Aufa.Size = new Size(376, 16);
+            this.Aufa.Size = new System.Drawing.Size(376, 16);
             this.Aufa.TabIndex = 7;
             this.Aufa.Text = "Aufeinanderfolgende Trennzeichen als ein Zeichen behandeln";
             // 
             // BlueFrame1
             // 
+            this.BlueFrame1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.BlueFrame1.CausesValidation = false;
             this.BlueFrame1.Controls.Add(this.aTXT);
             this.BlueFrame1.Controls.Add(this.TabStopp);
@@ -75,161 +77,170 @@ namespace BlueControls.BlueDatabaseDialogs
             this.BlueFrame1.Controls.Add(this.Semikolon);
             this.BlueFrame1.Controls.Add(this.Leerzeichen);
             this.BlueFrame1.Controls.Add(this.Komma);
-            this.BlueFrame1.Location = new Point(8, 80);
+            this.BlueFrame1.Location = new System.Drawing.Point(8, 80);
             this.BlueFrame1.Name = "BlueFrame1";
-            this.BlueFrame1.Size = new Size(168, 160);
+            this.BlueFrame1.Size = new System.Drawing.Size(168, 160);
+            this.BlueFrame1.TabIndex = 13;
+            this.BlueFrame1.TabStop = false;
             this.BlueFrame1.Text = "Trennzeichen";
             // 
             // aTXT
             // 
             this.aTXT.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.aTXT.Location = new Point(88, 112);
+            this.aTXT.Location = new System.Drawing.Point(88, 116);
             this.aTXT.Name = "aTXT";
-            this.aTXT.Size = new Size(64, 24);
+            this.aTXT.Size = new System.Drawing.Size(64, 24);
             this.aTXT.TabIndex = 6;
             // 
             // TabStopp
             // 
-            this.TabStopp.ButtonStyle = enButtonStyle.Optionbox_Text;
+            this.TabStopp.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
             this.TabStopp.Checked = true;
-            this.TabStopp.Location = new Point(16, 24);
+            this.TabStopp.Location = new System.Drawing.Point(16, 24);
             this.TabStopp.Name = "TabStopp";
-            this.TabStopp.Size = new Size(80, 16);
+            this.TabStopp.Size = new System.Drawing.Size(80, 16);
             this.TabStopp.TabIndex = 1;
             this.TabStopp.Text = "TabStop";
             // 
             // Andere
             // 
-            this.Andere.ButtonStyle = enButtonStyle.Optionbox_Text;
-            this.Andere.Location = new Point(16, 120);
+            this.Andere.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
+            this.Andere.Location = new System.Drawing.Point(16, 120);
             this.Andere.Name = "Andere";
-            this.Andere.Size = new Size(64, 16);
+            this.Andere.Size = new System.Drawing.Size(64, 16);
             this.Andere.TabIndex = 5;
             this.Andere.Text = "Andere:";
             // 
             // Semikolon
             // 
-            this.Semikolon.ButtonStyle = enButtonStyle.Optionbox_Text;
-            this.Semikolon.Location = new Point(16, 72);
+            this.Semikolon.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
+            this.Semikolon.Location = new System.Drawing.Point(16, 72);
             this.Semikolon.Name = "Semikolon";
-            this.Semikolon.Size = new Size(80, 16);
+            this.Semikolon.Size = new System.Drawing.Size(80, 16);
             this.Semikolon.TabIndex = 2;
             this.Semikolon.Text = "Semikolon";
             // 
             // Leerzeichen
             // 
-            this.Leerzeichen.ButtonStyle = enButtonStyle.Optionbox_Text;
-            this.Leerzeichen.Location = new Point(16, 48);
+            this.Leerzeichen.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
+            this.Leerzeichen.Location = new System.Drawing.Point(16, 48);
             this.Leerzeichen.Name = "Leerzeichen";
-            this.Leerzeichen.Size = new Size(88, 16);
+            this.Leerzeichen.Size = new System.Drawing.Size(88, 16);
             this.Leerzeichen.TabIndex = 4;
             this.Leerzeichen.Text = "Leerzeichen";
             // 
             // Komma
             // 
-            this.Komma.ButtonStyle = enButtonStyle.Optionbox_Text;
-            this.Komma.Location = new Point(16, 96);
+            this.Komma.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
+            this.Komma.Location = new System.Drawing.Point(16, 96);
             this.Komma.Name = "Komma";
-            this.Komma.Size = new Size(64, 16);
+            this.Komma.Size = new System.Drawing.Size(64, 16);
             this.Komma.TabIndex = 3;
             this.Komma.Text = "Komma";
             // 
             // Eintr
             // 
-            this.Eintr.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                                                 | System.Windows.Forms.AnchorStyles.Right)));
+            this.Eintr.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.Eintr.CausesValidation = false;
-            this.Eintr.Location = new Point(8, 8);
+            this.Eintr.Location = new System.Drawing.Point(8, 8);
             this.Eintr.Name = "Eintr";
-            this.Eintr.Size = new Size(807, 24);
-            this.Eintr.TextAnzeigeVerhalten = enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            this.Eintr.Size = new System.Drawing.Size(807, 24);
+            this.Eintr.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // AnfTre
             // 
-            this.AnfTre.ButtonStyle = enButtonStyle.Checkbox_Text;
-            this.AnfTre.Location = new Point(8, 56);
+            this.AnfTre.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
+            this.AnfTre.Location = new System.Drawing.Point(8, 56);
             this.AnfTre.Name = "AnfTre";
-            this.AnfTre.Size = new Size(224, 16);
+            this.AnfTre.Size = new System.Drawing.Size(224, 16);
             this.AnfTre.TabIndex = 10;
             this.AnfTre.Text = "Trennzeichen am Anfang entfernen";
             // 
             // BlueFrame3
             // 
+            this.BlueFrame3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.BlueFrame3.CausesValidation = false;
             this.BlueFrame3.Controls.Add(this.SpalteNachderReihe);
             this.BlueFrame3.Controls.Add(this.SpalteZuordnen);
-            this.BlueFrame3.Location = new Point(184, 80);
+            this.BlueFrame3.Location = new System.Drawing.Point(184, 80);
             this.BlueFrame3.Name = "BlueFrame3";
-            this.BlueFrame3.Size = new Size(624, 72);
+            this.BlueFrame3.Size = new System.Drawing.Size(624, 72);
+            this.BlueFrame3.TabIndex = 12;
+            this.BlueFrame3.TabStop = false;
             this.BlueFrame3.Text = "Spalten-Optionen";
             // 
             // SpalteNachderReihe
             // 
-            this.SpalteNachderReihe.ButtonStyle = enButtonStyle.Optionbox_Text;
-            this.SpalteNachderReihe.Location = new Point(8, 40);
+            this.SpalteNachderReihe.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
+            this.SpalteNachderReihe.Location = new System.Drawing.Point(8, 40);
             this.SpalteNachderReihe.Name = "SpalteNachderReihe";
-            this.SpalteNachderReihe.Size = new Size(600, 24);
+            this.SpalteNachderReihe.Size = new System.Drawing.Size(600, 24);
             this.SpalteNachderReihe.TabIndex = 1;
             this.SpalteNachderReihe.Text = "Alle Einträge importieren, <b>interne Spaltenreihenfolge</b> benutzen und nichts " +
-                                           "zuordnen.";
+    "zuordnen.";
             // 
             // SpalteZuordnen
             // 
-            this.SpalteZuordnen.ButtonStyle = enButtonStyle.Optionbox_Text;
+            this.SpalteZuordnen.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
             this.SpalteZuordnen.Checked = true;
-            this.SpalteZuordnen.Location = new Point(8, 16);
+            this.SpalteZuordnen.Location = new System.Drawing.Point(8, 16);
             this.SpalteZuordnen.Name = "SpalteZuordnen";
-            this.SpalteZuordnen.Size = new Size(600, 24);
+            this.SpalteZuordnen.Size = new System.Drawing.Size(600, 24);
             this.SpalteZuordnen.TabIndex = 0;
             this.SpalteZuordnen.Text = "Die <b>erste Zeile</b> enthält den Spaltennamen und zu diesen zuordnen.";
             // 
             // Cancel
             // 
             this.Cancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.Cancel.Location = new Point(608, 248);
+            this.Cancel.ImageCode = "Kreuz|16";
+            this.Cancel.Location = new System.Drawing.Point(592, 248);
             this.Cancel.Name = "Cancel";
-            this.Cancel.Size = new Size(96, 32);
+            this.Cancel.Size = new System.Drawing.Size(104, 32);
             this.Cancel.TabIndex = 11;
             this.Cancel.Text = "Abbrechen";
-            this.Cancel.Click += new EventHandler(this.Cancel_Click);
+            this.Cancel.Click += new System.EventHandler(this.Cancel_Click);
             // 
             // GroupBox1
             // 
+            this.GroupBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.GroupBox1.CausesValidation = false;
             this.GroupBox1.Controls.Add(this.ZeilenAlle);
             this.GroupBox1.Controls.Add(this.ZeilenZuorden);
-            this.GroupBox1.Location = new Point(184, 152);
+            this.GroupBox1.Location = new System.Drawing.Point(184, 152);
             this.GroupBox1.Name = "GroupBox1";
-            this.GroupBox1.Size = new Size(624, 88);
+            this.GroupBox1.Size = new System.Drawing.Size(624, 88);
+            this.GroupBox1.TabIndex = 0;
+            this.GroupBox1.TabStop = false;
             this.GroupBox1.Text = "Zeilen-Optionen";
             // 
             // ZeilenAlle
             // 
-            this.ZeilenAlle.ButtonStyle = enButtonStyle.Optionbox_Text;
-            this.ZeilenAlle.Location = new Point(8, 56);
+            this.ZeilenAlle.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
+            this.ZeilenAlle.Location = new System.Drawing.Point(8, 56);
             this.ZeilenAlle.Name = "ZeilenAlle";
-            this.ZeilenAlle.Size = new Size(608, 24);
+            this.ZeilenAlle.Size = new System.Drawing.Size(608, 24);
             this.ZeilenAlle.TabIndex = 1;
             this.ZeilenAlle.Text = "<b>Jede Zeile</b> importieren, auch wenn dadurch <b>doppelte</b> Einträge entsteh" +
-                                   "en.";
+    "en.";
             // 
             // ZeilenZuorden
             // 
-            this.ZeilenZuorden.ButtonStyle = enButtonStyle.Optionbox_Text;
+            this.ZeilenZuorden.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
             this.ZeilenZuorden.Checked = true;
-            this.ZeilenZuorden.Location = new Point(8, 24);
+            this.ZeilenZuorden.Location = new System.Drawing.Point(8, 24);
             this.ZeilenZuorden.Name = "ZeilenZuorden";
-            this.ZeilenZuorden.Size = new Size(608, 32);
+            this.ZeilenZuorden.Size = new System.Drawing.Size(608, 32);
             this.ZeilenZuorden.TabIndex = 0;
             this.ZeilenZuorden.Text = "Die <b>erste Spalte</b> des Imports soll der <b>ersten Spalte</b> der Datenbank z" +
-                                      "ugeordnet werden. <br>Wenn der Eintrag nicht in der Datenbank vorhanden ist, wir" +
-                                      "d eine neue Zeile erstellt.";
+    "ugeordnet werden. <br>Wenn der Eintrag nicht in der Datenbank vorhanden ist, wir" +
+    "d eine neue Zeile erstellt.";
             // 
             // Import
             // 
-            this.AutoScaleDimensions = new SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new Size(817, 284);
+            this.ClientSize = new System.Drawing.Size(817, 284);
             this.Controls.Add(this.GroupBox1);
             this.Controls.Add(this.Cancel);
             this.Controls.Add(this.BlueFrame3);
@@ -247,6 +258,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.BlueFrame3.ResumeLayout(false);
             this.GroupBox1.ResumeLayout(false);
             this.ResumeLayout(false);
+
         }
         private Caption Eintr;
         private Button TabStopp;

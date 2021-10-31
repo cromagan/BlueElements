@@ -22,6 +22,7 @@ using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.ItemCollection;
 using BlueDatabase;
+using System.ComponentModel;
 using static BlueBasics.FileOperations;
 
 namespace BlueControls.BlueDatabaseDialogs {
@@ -38,6 +39,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             Database = database;
             scriptEditor.Database = database;
             Database.Disposing += Database_Disposing;
+            Database.ShouldICancelDiscOperations += Database_ShouldICancelDiscOperations;
             befülleLayoutDropdown();
             CheckButtons();
         }
@@ -84,8 +86,12 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
-            base.OnFormClosing(e);
+            Database.Disposing -= Database_Disposing;
+            Database.ShouldICancelDiscOperations -= Database_ShouldICancelDiscOperations;
             SaveCurrentLayout();
+            scriptEditor.Database = null;
+            Database = null;
+            base.OnFormClosing(e);
         }
 
         private void befülleLayoutDropdown() {
@@ -198,12 +204,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             //}
         }
 
-        private void Database_Disposing(object sender, System.EventArgs e) {
-            Database.Disposing -= Database_Disposing;
-            scriptEditor.Database = null;
-            Database = null;
-            Close();
-        }
+        private void Database_Disposing(object sender, System.EventArgs e) => Close();
+
+        private void Database_ShouldICancelDiscOperations(object sender, CancelEventArgs e) => e.Cancel = true;
 
         private void Pad_ClickedItemChanged(object sender, System.EventArgs e) {
             tabElementEigenschaften.Controls.Clear();

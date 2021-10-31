@@ -440,21 +440,21 @@ namespace BlueDatabase {
 
         internal static string ParsableColumnKey(int Key) => "ColumnKey=" + Key;
 
-        internal string Load_310(enDatabaseDataType Art, string Wert) {
-            switch (Art) {
+        internal string Load_310(enDatabaseDataType type, string value) {
+            switch (type) {
                 case enDatabaseDataType.LastColumnKey:
-                    _LastColumnKey = int.Parse(Wert);
+                    _LastColumnKey = int.Parse(value);
                     break;
 
                 default:
-                    if (Art.ToString() == ((int)Art).ToString()) {
-                        Develop.DebugPrint(enFehlerArt.Info, "Laden von Datentyp '" + Art + "' nicht definiert.<br>Wert: " + Wert + "<br>Datei: " + Database.Filename);
+                    if (type.ToString() == ((int)type).ToString()) {
+                        Develop.DebugPrint(enFehlerArt.Info, "Laden von Datentyp '" + type + "' nicht definiert.<br>Wert: " + value + "<br>Datei: " + Database.Filename);
                     } else {
-                        return "Interner Fehler: Für den Datentyp  '" + Art + "'  wurde keine Laderegel definiert.";
+                        return "Interner Fehler: Für den Datentyp  '" + type + "'  wurde keine Laderegel definiert.";
                     }
                     break;
             }
-            return "";
+            return string.Empty;
         }
 
         internal void SaveToByteList(List<byte> List) {

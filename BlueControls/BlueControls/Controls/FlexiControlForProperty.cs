@@ -163,7 +163,7 @@ namespace BlueControls.Controls {
                 return false;
             }
             if (_propInfo != null && !_propInfo.CanWrite) {
-                DisabledReason = "Feld kann generell nicht beschrieben werdern.";
+                DisabledReason = "Feld kann generell nicht beschrieben werden.";
                 return false;
             }
             //if (_alwaysDiabled) {

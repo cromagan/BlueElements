@@ -160,8 +160,6 @@ namespace BlueControls.ItemCollection {
             base.DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, state, sizeOfParentControl, forPrinting);
         }
 
-        protected override void ParseFinished() { }
-
         #endregion
     }
 }

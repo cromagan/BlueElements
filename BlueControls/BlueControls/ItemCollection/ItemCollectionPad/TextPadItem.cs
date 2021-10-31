@@ -223,7 +223,10 @@ namespace BlueControls.ItemCollection {
             base.DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, state, sizeOfParentControl, forPrinting);
         }
 
-        protected override void ParseFinished() => InvalidateText();
+        protected override void ParseFinished() {
+            base.ParseFinished();
+            InvalidateText();
+        }
 
         private void InvalidateText() => _txt = null;
 

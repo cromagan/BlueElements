@@ -19,6 +19,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using BlueControls.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -215,7 +216,7 @@ namespace BlueControls.ItemCollection {
             return false;
         }
 
-        public override void PointMoved(object sender, System.EventArgs e) => CalculateOtherPoints();
+        public override void PointMoved(object sender, MoveEventArgs e) => CalculateOtherPoints();
 
         public override string ToString() {
             var t = base.ToString();

@@ -342,9 +342,6 @@ namespace BlueControls.ItemCollection {
             base.DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, state, sizeOfParentControl, forPrinting);
         }
 
-        protected override void ParseFinished() {
-        }
-
         private void _Pad_DoInvalidate(object sender, System.EventArgs e) {
             if (IsParsing) { return; }
             OnChanged();

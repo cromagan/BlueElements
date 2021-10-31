@@ -84,9 +84,9 @@ namespace BlueControls {
 
         #region Events
 
-        public event EventHandler Moved;
+        public event EventHandler<MoveEventArgs> Moved;
 
-        public event EventHandler Moving;
+        public event EventHandler<MoveEventArgs> Moving;
 
         #endregion
 
@@ -102,9 +102,7 @@ namespace BlueControls {
             get => _x;
             set {
                 if (_x == value) { return; }
-                OnMoving();
-                _x = value;
-                OnMoved();
+                SetTo(value, _y);
             }
         }
 
@@ -112,9 +110,7 @@ namespace BlueControls {
             get => _y;
             set {
                 if (_y == value) { return; }
-                OnMoving();
-                _y = value;
-                OnMoved();
+                SetTo(_x, value);
             }
         }
 
@@ -162,23 +158,16 @@ namespace BlueControls {
             //}
         }
 
-        public void Move(double x, double y) {
-            if (x == 0 && y == 0) { return; }
-            OnMoving();
-            _x += x;
-            _y += y;
-            OnMoved();
-        }
+        public void Move(double x, double y) => SetTo(_x + x, _y + y);
 
         public void Normalize() {
             var magnitude = Magnitude;
-            _x /= magnitude;
-            _y /= magnitude;
+            SetTo(_x / magnitude, _y / magnitude);
         }
 
-        public void OnMoved() => Moved?.Invoke(this, System.EventArgs.Empty);
+        public void OnMoved(MoveEventArgs e) => Moved?.Invoke(this, e);
 
-        public void OnMoving() => Moving?.Invoke(this, System.EventArgs.Empty);
+        public void OnMoving(MoveEventArgs e) => Moving?.Invoke(this, e);
 
         public void Parse(string codeToParse) {
             foreach (var pair in codeToParse.GetAllTags()) {
@@ -222,11 +211,14 @@ namespace BlueControls {
         }
 
         public void SetTo(double x, double y) {
-            if (x == _x && y == _y) { return; }
-            OnMoving();
+            var mx = x != _x;
+            var my = y != _y;
+
+            if (!mx && !my) { return; }
+            OnMoving(new MoveEventArgs(mx, my));
             _x = x;
             _y = y;
-            OnMoved();
+            OnMoved(new MoveEventArgs(mx, my));
         }
 
         public void SetTo(PointM StartPoint, double Länge, double Alpha) {

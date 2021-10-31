@@ -19,6 +19,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using BlueControls.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -126,7 +127,7 @@ namespace BlueControls.ItemCollection {
             return false;
         }
 
-        public override void PointMoved(object sender, System.EventArgs e) => CalcTempPoints();
+        public override void PointMoved(object sender, MoveEventArgs e) => CalcTempPoints();
 
         public void SetCoordinates(double px1, double py1, double px2, double py2) {
             Point1.SetTo(px1, py1);
@@ -172,8 +173,7 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        protected override void ParseFinished() {
-        }
+        protected override void ParseFinished() { }
 
         private bool Begradige(int P1) {
             if (P1 >= _TempPoints.Count - 1) { return false; }

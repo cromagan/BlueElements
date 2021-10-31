@@ -190,7 +190,10 @@ namespace BlueControls.ItemCollection {
             base.DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, state, sizeOfParentControl, forPrinting);
         }
 
-        protected override void ParseFinished() => GeneratePic(true);
+        protected override void ParseFinished() {
+            base.ParseFinished();
+            GeneratePic(true);
+        }
 
         private void _Database_Disposing(object sender, System.EventArgs e) {
             _Database.Disposing -= _Database_Disposing;

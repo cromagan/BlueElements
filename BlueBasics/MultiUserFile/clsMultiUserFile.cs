@@ -34,45 +34,26 @@ namespace BlueBasics.MultiUserFile {
 
         public static readonly ListExt<clsMultiUserFile> AllFiles = new();
 
-        public DateTime UserEditedAktionUTC;
-
         protected byte[] _dataOnDisk;
-
         protected int _ReloadDelaySecond = 10;
-
         private readonly bool _zipped;
-
         private readonly BackgroundWorker BackgroundWorker;
-
         private readonly Timer Checker;
-
         private readonly BackgroundWorker PureBinSaver;
-
         private DateTime _BlockReload = new(1900, 1, 1);
-
         private string _CanWriteError = string.Empty;
-
         private DateTime _CanWriteNextCheckUTC = DateTime.UtcNow.AddSeconds(-30);
-
         private bool _CheckedAndReloadNeed;
-
         private bool _DoingTempFile = false;
-
         private string _EditNormalyError = string.Empty;
-
         private DateTime _EditNormalyNextCheckUTC = DateTime.UtcNow.AddSeconds(-30);
-
         private string _Filename;
         private string _inhaltBlockdatei = string.Empty;
-
         private bool _InitialLoadDone = false;
-
         private DateTime _LastMessageUTC = DateTime.UtcNow.AddMinutes(-10);
-
         private string _LastSaveCode;
-
+        private DateTime _LastUserActionUTC = new DateTime(1900, 1, 1);
         private int _loadingThreadId = -1;
-
         private int Checker_Tick_count = -5;
         private FileSystemWatcher Watcher;
 
@@ -102,7 +83,6 @@ namespace BlueBasics.MultiUserFile {
             _dataOnDisk = new byte[0];
             ReadOnly = readOnly;
             AutoDeleteBAK = false;
-            UserEditedAktionUTC = new DateTime(1900, 1, 1);
             BlockReload(false);
             Checker.Change(2000, 2000);
         }
@@ -130,7 +110,6 @@ namespace BlueBasics.MultiUserFile {
         // Disposing leider als Variable vorhanden
         public event EventHandler<LoadingEventArgs> Loading;
 
-        //public static event EventHandler<MultiUserFileGiveBackEventArgs> MultiUserFileCreated;
         /// <summary>
         /// Wird ausgegeben, sobald isParsed false ist, noch vor den automatischen Reperaturen.
         /// Dieses Event kann verwendet werden, um die Datei automatisch zu reparieren, bevor sich automatische Dialoge öffnen.
@@ -138,6 +117,11 @@ namespace BlueBasics.MultiUserFile {
         public event EventHandler Parsed;
 
         public event EventHandler SavedToDisk;
+
+        /// <summary>
+        /// Dient dazu, offene Dialoge abzufragen
+        /// </summary>
+        public event EventHandler<CancelEventArgs> ShouldICancelDiscOperations;
 
         #endregion
 
@@ -256,22 +240,26 @@ namespace BlueBasics.MultiUserFile {
 
         public virtual string ErrorReason(enErrorReason mode) {
             if (mode == enErrorReason.OnlyRead) { return string.Empty; }
+
             //----------Load, vereinfachte Prüfung ------------------------------------------------------------------------
             if (mode is enErrorReason.Load or enErrorReason.LoadForCheckingOnly) {
                 if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
                 var sec = AgeOfBlockDatei();
                 if (sec is >= 0 and < 10) { return "Ein anderer Computer speichert gerade Daten ab."; }
             }
+
             if (mode == enErrorReason.Load) {
                 var x = DateTime.UtcNow.Subtract(_BlockReload).TotalSeconds;
                 if (x < 5 && _InitialLoadDone) { return "Laden noch " + (5 - x).ToString() + " Sekunden blockiert."; }
-                return DateTime.UtcNow.Subtract(UserEditedAktionUTC).TotalSeconds < 6 ? "Aktuell werden Daten berabeitet."
-                        : PureBinSaver.IsBusy ? "Aktuell werden im Hintergrund Daten gespeichert."
-                        : BackgroundWorker.IsBusy ? "Ein Hintergrundprozess verhindert aktuell das Neuladen."
-                        : IsParsing ? "Es werden aktuell Daten geparsed."
-                        : isSomethingDiscOperatingsBlocking() ? "Reload unmöglich, vererbte Klasse gab Fehler zurück"
-                        : string.Empty; // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen
+
+                if (DateTime.UtcNow.Subtract(_LastUserActionUTC).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; }  // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
+                if (PureBinSaver.IsBusy) { return "Aktuell werden im Hintergrund Daten gespeichert."; }
+                if (BackgroundWorker.IsBusy) { return "Ein Hintergrundprozess verhindert aktuell das Neuladen."; }
+                if (IsParsing) { return "Es werden aktuell Daten geparsed."; }
+                if (BlockDiskOperations()) { return "Reload unmöglich, vererbte Klasse gab Fehler zurück"; }
+                return string.Empty;
             }
+
             //----------Alle Edits und Save ------------------------------------------------------------------------
             //  Generelle Prüfung, die eigentlich immer benötigt wird. Mehr allgemeine Fehler, wo sich nicht so schnell ändern
             //  und eine Prüfung, die nicht auf die Sekunde genau wichtig ist.
@@ -287,6 +275,7 @@ namespace BlueBasics.MultiUserFile {
                     return _EditNormalyError;
                 }
             }
+
             //----------EditAcut, EditGeneral ----------------------------------------------------------------------
             if (mode.HasFlag(enErrorReason.EditAcut) || mode.HasFlag(enErrorReason.EditGeneral)) {
                 // Wird gespeichert, werden am Ende Penings zu Undos. Diese werden evtl nicht mitgespeichert.
@@ -294,15 +283,18 @@ namespace BlueBasics.MultiUserFile {
                 if (IsInSaveingLoop) { return "Aktuell werden Daten gespeichert."; }
                 if (IsLoading) { return "Aktuell werden Daten geladen."; }
             }
+
             //----------EditGeneral, Save------------------------------------------------------------------------------------------
             if (mode.HasFlag(enErrorReason.EditGeneral) || mode.HasFlag(enErrorReason.Save)) {
                 if (BackgroundWorker.IsBusy) { return "Ein Hintergrundprozess verhindert aktuell die Bearbeitung."; }
                 if (ReloadNeeded) { return "Die Datei muss neu eingelesen werden."; }
             }
+
             //---------- Save ------------------------------------------------------------------------------------------
             if (mode.HasFlag(enErrorReason.Save)) {
                 if (IsLoading) { return "Speichern aktuell nicht möglich, da gerade Daten geladen werden."; }
-                if (DateTime.UtcNow.Subtract(UserEditedAktionUTC).TotalSeconds < 6) { return "Aktuell werden Daten berabeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
+                if (DateTime.UtcNow.Subtract(_LastUserActionUTC).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
+                if (BlockDiskOperations()) { return "Speichern unmöglich, vererbte Klasse gab Fehler zurück"; }
                 if (string.IsNullOrEmpty(Filename)) { return string.Empty; } // EXIT -------------------
                 if (!FileExists(Filename)) { return string.Empty; } // EXIT -------------------
                 if (CheckForLastError(ref _CanWriteNextCheckUTC, ref _CanWriteError) && !string.IsNullOrEmpty(_CanWriteError)) {
@@ -430,11 +422,11 @@ namespace BlueBasics.MultiUserFile {
         public bool Save(bool mustSave) {
             if (ReadOnly) { return false; }
             if (IsInSaveingLoop) { return false; }
-            if (isSomethingDiscOperatingsBlocking()) {
-                if (!mustSave) { RepairOldBlockFiles(); return false; }
-                Develop.DebugPrint(enFehlerArt.Warnung, "Release unmöglich, Dateistatus geblockt");
-                return false;
-            }
+            //if (isSomethingDiscOperatingsBlocking()) {
+            //    if (!mustSave) { RepairOldBlockFiles(); return false; }
+            //    Develop.DebugPrint(enFehlerArt.Warnung, "Release unmöglich, Dateistatus geblockt");
+            //    return false;
+            //}
             if (string.IsNullOrEmpty(Filename)) { return false; }
             OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs()); // Sonst meint der Benutzer evtl. noch, er könne Weiterarbeiten... Und Controlls haben die Möglichkeit, ihre Änderungen einzuchecken
             var D = DateTime.UtcNow; // Manchmal ist eine Block-Datei vorhanden, die just in dem Moment gelöscht wird. Also ein ganz kurze "Löschzeit" eingestehen.
@@ -487,6 +479,10 @@ namespace BlueBasics.MultiUserFile {
         public void SetReadOnly() {
             Develop.DebugPrint(enFehlerArt.Info, "ReadOnly gesetzt<br>" + Filename);
             ReadOnly = true;
+        }
+
+        public void SetUserDidSomething() {
+            _LastUserActionUTC = DateTime.UtcNow;
         }
 
         public void UnlockHard() {
@@ -576,6 +572,20 @@ namespace BlueBasics.MultiUserFile {
         }
 
         /// <summary>
+        /// Alle Abfragen, die nicht durch Standard abfragen gehandelt werden kann.
+        /// Z.B. Offen Dialoge, Prozesse die nur die die abgeleitete Klasse kennt
+        /// Die offenen Dialoge werden aber bereits hier mit dem Event mit AreDiskOperationsBlocked abgefragt
+        /// </summary>
+        /// <returns></returns>
+        protected virtual bool BlockDiskOperations() {
+            var e = new CancelEventArgs();
+            e.Cancel = false;
+            OnShouldICancelDiscOperations(e);
+
+            return e.Cancel;
+        }
+
+        /// <summary>
         /// gibt die Möglichkeit, Fehler in ein Protokoll zu schreiben, wenn nach dem Reload eine Inkonsitenz aufgetreten ist.
         /// Nicht für Reperaturzwecke gedacht.
         /// </summary>
@@ -619,8 +629,6 @@ namespace BlueBasics.MultiUserFile {
             }
             return true;
         }
-
-        protected abstract bool isSomethingDiscOperatingsBlocking();
 
         protected abstract bool IsThereBackgroundWorkToDo();
 
@@ -691,8 +699,10 @@ namespace BlueBasics.MultiUserFile {
             if (IsLoading) { return; }
             if (PureBinSaver.IsBusy || IsSaving) { return; }
             if (string.IsNullOrEmpty(Filename)) { return; }
+
             Checker_Tick_count++;
             if (Checker_Tick_count < 0) { return; }
+
             // Ausstehende Arbeiten ermittelen
             var _editable = string.IsNullOrEmpty(ErrorReason(enErrorReason.EditNormaly));
             var _MustReload = ReloadNeeded;
@@ -703,38 +713,41 @@ namespace BlueBasics.MultiUserFile {
                 Checker_Tick_count = 0;
                 return;
             }
+
             // Zeiten berechnen
             _ReloadDelaySecond = Math.Max(_ReloadDelaySecond, 10);
-            var Count_BackUp = Math.Min((int)(_ReloadDelaySecond / 10.0) + 1, 10); // Soviele Sekunden können vergehen, bevor Backups gemacht werden. Der Wert muss kleiner sein, als Count_Save
+            var Count_BackUp = Math.Min(_ReloadDelaySecond / 10f + 1, 10); // Soviele Sekunden können vergehen, bevor Backups gemacht werden. Der Wert muss kleiner sein, als Count_Save
             var Count_Save = (Count_BackUp * 2) + 1; // Soviele Sekunden können vergehen, bevor gespeichert werden muss. Muss größer sein, als Backup. Weil ansonsten der Backup-BackgroundWorker beendet wird
-            var Count_UserWork = (Count_Save / 5) + 2; // Soviele Sekunden hat die User-Bearbeitung vorrang. Verhindert, dass die Bearbeitung des Users spontan abgebrochen wird.
-            if (DateTime.UtcNow.Subtract(UserEditedAktionUTC).TotalSeconds < Count_UserWork) { return; } // Benutzer arbeiten lassen
+            var Count_UserWork = (Count_Save / 5f) + 2; // Soviele Sekunden hat die User-Bearbeitung vorrang. Verhindert, dass die Bearbeitung des Users spontan abgebrochen wird.
+
+            if (DateTime.UtcNow.Subtract(_LastUserActionUTC).TotalSeconds < Count_UserWork) { CancelBackGroundWorker(); return; } // Benutzer arbeiten lassen
+
             if (Checker_Tick_count > Count_Save && _MustSave) { CancelBackGroundWorker(); }
             if (Checker_Tick_count > _ReloadDelaySecond && _MustReload) { CancelBackGroundWorker(); }
             if (BackgroundWorker.IsBusy) { return; }
-            if (_MustBackup && !_MustReload && Checker_Tick_count < Count_Save && Checker_Tick_count >= Count_BackUp && string.IsNullOrEmpty(ErrorReason(enErrorReason.EditAcut))) {
+
+            if (_MustBackup && !_MustReload && Checker_Tick_count < Count_Save && Checker_Tick_count >= Count_BackUp && !BlockDiskOperations() && string.IsNullOrEmpty(ErrorReason(enErrorReason.EditAcut))) {
                 StartBackgroundWorker();
                 return;
             }
+
             if (_MustReload && _MustSave) {
-                var f = ErrorReason(enErrorReason.Load);
-                if (!string.IsNullOrEmpty(f)) { return; }
+                if (!string.IsNullOrEmpty(ErrorReason(enErrorReason.Load))) { return; }
                 // Checker_Tick_count nicht auf 0 setzen, dass der Saver noch stimmt.
                 Load_Reload();
                 return;
             }
+
             if (_MustSave && Checker_Tick_count > Count_Save) {
-                var f = ErrorReason(enErrorReason.Save);
-                if (!string.IsNullOrEmpty(f)) { return; }
-                // Eigentlich sollte die folgende Abfrage überflüssig sein. Ist sie aber nicht
-                if (!PureBinSaver.IsBusy) { PureBinSaver.RunWorkerAsync(); }
+                if (!string.IsNullOrEmpty(ErrorReason(enErrorReason.Save))) { return; }
+                if (!PureBinSaver.IsBusy) { PureBinSaver.RunWorkerAsync(); } // Eigentlich sollte diese Abfrage überflüssig sein. Ist sie aber nicht
                 Checker_Tick_count = 0;
                 return;
             }
+
             // Überhaupt nix besonderes. Ab und zu mal Reloaden
-            if (_MustReload && Checker_Tick_count > _ReloadDelaySecond && string.IsNullOrEmpty(ErrorReason(enErrorReason.Load))) {
-                var f = ErrorReason(enErrorReason.Load);
-                if (!string.IsNullOrEmpty(f)) { return; }
+            if (_MustReload && Checker_Tick_count > _ReloadDelaySecond) {
+                if (!string.IsNullOrEmpty(ErrorReason(enErrorReason.Load))) { return; }
                 Load_Reload();
                 Checker_Tick_count = 0;
             }
@@ -853,6 +866,10 @@ namespace BlueBasics.MultiUserFile {
         private void OnSavedToDisk() {
             if (Disposed) { return; }
             SavedToDisk?.Invoke(this, System.EventArgs.Empty);
+        }
+
+        private void OnShouldICancelDiscOperations(CancelEventArgs e) {
+            ShouldICancelDiscOperations?.Invoke(this, e);
         }
 
         private void PureBinSaver_DoWork(object sender, DoWorkEventArgs e) {
@@ -1041,7 +1058,7 @@ namespace BlueBasics.MultiUserFile {
                     // Also, im NICHT-parallelen Prozess ist explizit der Save angestoßen worden.
                     // Somit sollte des Prgramm auf Warteschleife sein und keine Benutzereingabe mehr kommen.
                     // Problem: Wenn die ganze Save-Routine in einem Parallelen-Thread ist
-                    UserEditedAktionUTC = new DateTime(1900, 1, 1);
+                    _LastUserActionUTC = new DateTime(1900, 1, 1);
                 }
                 var f = ErrorReason(enErrorReason.Save);
                 if (!string.IsNullOrEmpty(f)) { _DoingTempFile = false; return (string.Empty, string.Empty, null); }

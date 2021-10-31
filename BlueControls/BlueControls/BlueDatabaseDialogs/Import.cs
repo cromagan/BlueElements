@@ -18,6 +18,7 @@
 using BlueBasics.Enums;
 using BlueControls.Forms;
 using BlueDatabase;
+using System.ComponentModel;
 using static BlueBasics.Extensions;
 
 namespace BlueControls.BlueDatabaseDialogs {
@@ -41,6 +42,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             Eintr.Text = Ein.Count + " zum Importieren bereit.";
             Database = database;
             Database.Disposing += Database_Disposing;
+            Database.ShouldICancelDiscOperations += Database_ShouldICancelDiscOperations;
         }
 
         #endregion
@@ -53,12 +55,17 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         #region Methods
 
+        protected override void OnClosing(CancelEventArgs e) {
+            Database.Disposing -= Database_Disposing;
+            Database.ShouldICancelDiscOperations -= Database_ShouldICancelDiscOperations;
+            base.OnClosing(e);
+        }
+
         private void Cancel_Click(object sender, System.EventArgs e) => Close();
 
-        private void Database_Disposing(object sender, System.EventArgs e) {
-            Database.Disposing -= Database_Disposing;
-            Close();
-        }
+        private void Database_Disposing(object sender, System.EventArgs e) => Close();
+
+        private void Database_ShouldICancelDiscOperations(object sender, CancelEventArgs e) => e.Cancel = true;
 
         private void Fertig_Click(object sender, System.EventArgs e) {
             var TR = string.Empty;
