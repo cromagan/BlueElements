@@ -411,7 +411,7 @@ namespace BlueBasics {
 
                 #region Den Text suchen
 
-                if (string.IsNullOrEmpty(historie)) {
+                if (!Gans && string.IsNullOrEmpty(historie)) {
                     if (!checkforSeparatorbefore || pos == 0 || TR.Contains(txt.Substring(pos - 1, 1))) {
                         foreach (var thisEnd in searchfor) {
                             if (pos + thisEnd.Length <= maxl) {

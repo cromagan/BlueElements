@@ -65,7 +65,6 @@ namespace BlueControls.Controls {
             TableView = tableView;
             Filter = filter;
             UpdateFilterData(myParent);
-            InstantChangedEvent = true;
             Filter.Changed += Filter_Changed;
         }
 

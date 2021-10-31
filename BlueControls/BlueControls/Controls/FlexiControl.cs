@@ -71,7 +71,6 @@ namespace BlueControls.Controls {
         private enDataFormat _Format = enDataFormat.Text;
         private Caption _InfoCaption;
         private string _InfoText = string.Empty;
-        private bool _InstantChangedEvent = false;
         private bool _ShowInfoWhenDisabled = false;
         private string _Suffix = string.Empty;
         private string _Value = string.Empty;
@@ -97,7 +96,6 @@ namespace BlueControls.Controls {
             _EditType = enEditTypeFormula.None;
             _Caption = captionText;
             _CaptionPosition = enÜberschriftAnordnung.Links_neben_Dem_Feld;
-            ValueId = string.Empty;
             var s = BlueFont.MeasureString(_Caption, Skin.GetBlueFont(enDesign.Caption, enStates.Standard).Font());
             Size = new Size((int)(s.Width + 2), (int)(s.Height + 2));
         }
@@ -226,19 +224,6 @@ namespace BlueControls.Controls {
         }
 
         /// <summary>
-        /// Falls das Steuerelement eine InstantChangeEvent unterstützt, wird dieses umgesetzt
-        /// </summary>
-        [DefaultValue(false)]
-        public bool InstantChangedEvent {
-            get => _InstantChangedEvent;
-            set {
-                if (_InstantChangedEvent == value) { return; }
-                _InstantChangedEvent = value;
-                CheckIfChanged();
-            }
-        }
-
-        /// <summary>
         /// Falls das Steuerelement Multiline unterstützt, wird dieser angezeigt
         /// </summary>
         [DefaultValue(false)]
@@ -311,7 +296,7 @@ namespace BlueControls.Controls {
             _LastTextChange = DateTime.UtcNow;
             _Value = newvalue;
             if (updateControls) { UpdateValueToControl(); }
-            if (alwaysValueChanged || InvokeRequired || !Focused || _InstantChangedEvent) { CheckIfChanged(); }
+            if (alwaysValueChanged || InvokeRequired || !Focused) { RaiseEventIfChanged(); }
         }
 
         /// <summary>
@@ -546,6 +531,15 @@ namespace BlueControls.Controls {
 
         protected virtual void OnNeedRefresh() => NeedRefresh?.Invoke(this, System.EventArgs.Empty);
 
+        protected override void OnParentChanged(System.EventArgs e) {
+            base.OnParentChanged(e);
+
+            var parentForm = ParentForm();
+            if (parentForm == null) { return; }
+
+            parentForm.FormClosing += ParentForm_FormClosing;
+        }
+
         protected override void OnQuickInfoChanged() {
             base.OnQuickInfoChanged();
             UpdateControls();
@@ -645,7 +639,7 @@ namespace BlueControls.Controls {
             if (_LastTextChange == null) { return; }
             if (DateTime.UtcNow.Subtract((DateTime)_LastTextChange).TotalSeconds < 20) { return; }
             Focus(); // weitere Tastatureingabn verhindern. Z.B: wenn was mariert wird und dann entfernen gedrück wird. Wenn die Box neu sortiert wird, ist dsa ergebnis nicht schön
-            CheckIfChanged();
+            RaiseEventIfChanged();
         }
 
         private void _InfoCaption_Click(object sender, System.EventArgs e) {
@@ -656,12 +650,6 @@ namespace BlueControls.Controls {
                     return;
                 }
             }
-        }
-
-        private void CheckIfChanged() {
-            if (_LastTextChange == null) { return; }
-            _LastTextChange = null;
-            OnValueChanged();
         }
 
         private void ColorButton_Click(object sender, System.EventArgs e) => Develop.DebugPrint_NichtImplementiert();
@@ -868,6 +856,14 @@ namespace BlueControls.Controls {
             ValueSet(((ListBox)sender).Item.ToListOfString().JoinWithCr(), false, true);
         }
 
+        private void ParentForm_FormClosing(object sender, FormClosingEventArgs e) => RaiseEventIfChanged(); // Versuchen, die Werte noch zurückzugeben
+
+        private void RaiseEventIfChanged() {
+            if (_LastTextChange == null) { return; }
+            _LastTextChange = null;
+            OnValueChanged();
+        }
+
         /// <summary>
         /// Erstellt zuerst die Standard-Caption, dessen Events werden registriert.
         /// Kümmert sich dann um die Position des Controls im Bezug auf die Caption. Setzt die Sichtbarkeit, korrigiert Anachor und fügt das Control zu der Controll Collection hinzu.
@@ -922,7 +918,7 @@ namespace BlueControls.Controls {
             ValueSet(((SwapListBox)sender).Item.ToListOfString().JoinWithCr(), false, true);
         }
 
-        private void TextEditControl_LostFocus(object sender, System.EventArgs e) => CheckIfChanged();
+        private void TextEditControl_LostFocus(object sender, System.EventArgs e) => RaiseEventIfChanged();
 
         private void UpdateControls() {
             foreach (Control Control in Controls) {

@@ -278,18 +278,21 @@ namespace BlueControls.Controls {
                     if (_MarkStart < 0 || _MarkEnd < 0) { return true; }
                     Selection_Repair(true);
                     _eTxt.StufeÄndern(_MarkStart, _MarkEnd - 1, 3);
+                    CheckIfTextIsChanded(_eTxt.HtmlText);
                     return true;
 
                 case "#NoCaption":
                     if (_MarkStart < 0 || _MarkEnd < 0) { return true; }
                     Selection_Repair(true);
                     _eTxt.StufeÄndern(_MarkStart, _MarkEnd - 1, 4);
+                    CheckIfTextIsChanded(_eTxt.HtmlText);
                     return true;
 
                 case "#Bold":
                     if (_MarkStart < 0 || _MarkEnd < 0) { return true; }
                     Selection_Repair(true);
                     _eTxt.StufeÄndern(_MarkStart, _MarkEnd - 1, 7);
+                    CheckIfTextIsChanded(_eTxt.HtmlText);
                     return true;
 
                 case "#Sonderzeichen":

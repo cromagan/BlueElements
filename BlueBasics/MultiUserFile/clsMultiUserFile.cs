@@ -727,7 +727,6 @@ namespace BlueBasics.MultiUserFile {
             if (Checker_Tick_count > _ReloadDelaySecond && _MustReload) { CancelBackGroundWorker(); }
             if (BackgroundWorker.IsBusy) { return; }
 
-
             if (_MustReload && _MustSave) {
                 if (!string.IsNullOrEmpty(ErrorReason(enErrorReason.Load))) { return; }
                 // Checker_Tick_count nicht auf 0 setzen, dass der Saver noch stimmt.
@@ -742,16 +741,13 @@ namespace BlueBasics.MultiUserFile {
                 return;
             }
 
-
-            if (_MustBackup && !_MustReload && !_MustSave &&  Checker_Tick_count >= Count_BackUp && string.IsNullOrEmpty(ErrorReason(enErrorReason.EditAcut))) {
+            if (_MustBackup && !_MustReload && !_MustSave && Checker_Tick_count >= Count_BackUp && string.IsNullOrEmpty(ErrorReason(enErrorReason.EditAcut))) {
                 var nowsek = (DateTime.UtcNow.Ticks - _startTick) / 30000000;
                 if (nowsek % 20 != 0) { return; } // Lasten startabhängig verteilen. Bei Pending changes ist es eh immer true;
 
                 StartBackgroundWorker();
                 return;
             }
-
-
 
             // Überhaupt nix besonderes. Ab und zu mal Reloaden
             if (_MustReload && Checker_Tick_count > _ReloadDelaySecond) {

@@ -970,7 +970,12 @@ namespace BlueDatabase {
                 return;
             }
             // Keine Doppelten Rausfiltern, ansonstn stimmen die Undo nicht mehr
-            SetUserDidSomething();
+
+
+            if (Comand != enDatabaseDataType.AutoExport) { SetUserDidSomething(); } // Ansonsten wir der Export dauernd unterbrochen
+
+
+
             if (RowKey < -100) { Develop.DebugPrint(enFehlerArt.Fehler, "RowKey darf hier nicht <-100 sein!"); }
             if (ColumnKey < -100) { Develop.DebugPrint(enFehlerArt.Fehler, "ColKey darf hier nicht <-100 sein!"); }
             Works.Add(new WorkItem(Comand, ColumnKey, RowKey, PreviousValue, ChangedTo, UserName));
@@ -1165,41 +1170,22 @@ namespace BlueDatabase {
 
         protected override void DoBackGroundWork(BackgroundWorker listenToMyCancel) {
             if (ReadOnly) { return; }
-            try {
-                foreach (var ThisExport in Export) {
-                    if (string.IsNullOrEmpty(ThisExport.Verzeichnis)) { return; }
-                    if (!PathExists(ThisExport.Verzeichnis)) { return; }
-                    if (listenToMyCancel.CancellationPending) { break; }
-                    if (!CanWriteInDirectory(ThisExport.Verzeichnis)) { return; }
-                    if (listenToMyCancel.CancellationPending) { break; }
-                }
-            } catch { return; }
-            if (!HasPendingChanges()) {
-                CancelEventArgs ec = new(false);
-                OnExporting(ec);
-                if (ec.Cancel) { return; }
-            }
-            var ReportAChange = false;
-            var tmp = false;
-            try {
-                if (!listenToMyCancel.CancellationPending) {
-                    foreach (var ThisExport in Export) {
-                        if (ThisExport != null) { tmp = ThisExport.DeleteOutdatedBackUps(listenToMyCancel); }
-                        if (tmp) { ReportAChange = true; }
-                        if (listenToMyCancel.CancellationPending) { break; }
+
+            foreach (var thisExport in Export) {
+                if (listenToMyCancel.CancellationPending) { return; }
+
+                if (thisExport.IsOk()) {
+                    if (!HasPendingChanges()) {
+                        CancelEventArgs ec = new(false);
+                        OnExporting(ec);
+                        if (ec.Cancel) { return; }
                     }
+
+                    thisExport.DeleteOutdatedBackUps(listenToMyCancel);
+                    if (listenToMyCancel.CancellationPending) { return; }
+                    thisExport.DoBackUp(listenToMyCancel);
+                    if (listenToMyCancel.CancellationPending) { return; }
                 }
-                if (!listenToMyCancel.CancellationPending) {
-                    foreach (var ThisExport in Export) {
-                        if (ThisExport != null) { tmp = ThisExport.DoBackUp(listenToMyCancel); }
-                        if (tmp) { ReportAChange = true; }
-                    }
-                }
-            } catch (Exception ex) {
-                Develop.DebugPrint(ex);
-            }
-            if (ReportAChange) {
-                AddPending(enDatabaseDataType.AutoExport, -1, Export.ToString(true), false);
             }
         }
 
@@ -1625,21 +1611,17 @@ namespace BlueDatabase {
             _sortDefinition = null;
         }
 
-        private void InvalidateExports(string LayoutID) {
+        private void InvalidateExports(string layoutID) {
             if (ReadOnly) { return; }
-            var Done = false;
-            foreach (var ThisExport in Export) {
-                if (ThisExport != null) {
-                    if (ThisExport.Typ == enExportTyp.EinzelnMitFormular) {
-                        if (ThisExport.ExportFormularID == LayoutID) {
-                            Done = true;
-                            ThisExport.LastExportTimeUTC = new DateTime(1900, 1, 1);
+
+            foreach (var thisExport in Export) {
+                if (thisExport != null) {
+                    if (thisExport.Typ == enExportTyp.EinzelnMitFormular) {
+                        if (thisExport.ExportFormularID == layoutID) {
+                            thisExport.LastExportTimeUTC = new DateTime(1900, 1, 1);
                         }
                     }
                 }
-            }
-            if (Done) {
-                AddPending(enDatabaseDataType.AutoExport, -1, Export.ToString(true), false);
             }
         }
 

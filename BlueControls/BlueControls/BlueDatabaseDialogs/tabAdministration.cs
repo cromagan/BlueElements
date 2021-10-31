@@ -164,7 +164,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             ItemCollectionList L = new();
             foreach (var ThisExport in db.Export) {
                 if (ThisExport.Typ == enExportTyp.DatenbankOriginalFormat) {
-                    foreach (var ThisString in ThisExport._BereitsExportiert) {
+                    foreach (var ThisString in ThisExport.BereitsExportiert) {
                         var t = ThisString.SplitAndCutBy("|");
                         if (FileExists(t[0])) {
                             var q1 = QuickImage.Get(enImageCode.Kugel, 16, Extensions.MixColor(Color.Red, Color.Green, DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / ThisExport.AutomatischLöschen).ToHTMLCode(), "");

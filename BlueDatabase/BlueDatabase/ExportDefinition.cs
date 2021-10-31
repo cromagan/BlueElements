@@ -28,13 +28,10 @@ using static BlueBasics.FileOperations;
 
 namespace BlueDatabase {
 
-    //Der Export wird nur Intern verwaltet und gibt keine Ereignisse aus.
-    //Wenn mal ein LAyout geändert wird, sind es gleich 100 und mehr AddPenduings mit imensen Daten.
     public class ExportDefinition : IParseable, IReadableTextWithChanging, ICompareKey, ICheckable, IDisposable {
 
         #region Fields
 
-        public ListExt<string> _BereitsExportiert;
         private float _AutomatischLöschen;
         private string _ExportFormularID;
         private int _ExportSpaltenAnsicht;
@@ -56,21 +53,27 @@ namespace BlueDatabase {
             _AutomatischLöschen = automatischlöschen;
         }
 
-        public ExportDefinition(Database database, string toParse) : this(database, toParse, false) {
-        }
-
-        public ExportDefinition(Database database, string toParse, bool DeleteLastExportInfos) : this(database) {
+        public ExportDefinition(Database database, string toParse) : this(database) {
             Parse(toParse);
-            if (DeleteLastExportInfos) {
-                _BereitsExportiert.Clear();
-                _LastExportTimeUTC = new DateTime(1900, 1, 1);
-            }
+            //if (DeleteLastExportInfos) {
+            //    BereitsExportiert.Clear();
+            //    _LastExportTimeUTC = new DateTime(1900, 1, 1);
+            //}
         }
 
         public ExportDefinition(Database database) {
             Database = database;
             Database.Disposing += Database_Disposing;
-            Initialize();
+            _Verzeichnis = string.Empty;
+            _Typ = enExportTyp.DatenbankOriginalFormat;
+            _Intervall = 1;
+            _AutomatischLöschen = 30;
+            _ExportFormularID = string.Empty;
+            _ExportSpaltenAnsicht = 0;
+            Filter = new FilterCollection(Database);
+            BereitsExportiert = new ListExt<string>();
+            BereitsExportiert.Changed += _BereitsExportiert_ListOrItemChanged;
+            _LastExportTimeUTC = new DateTime(1900, 1, 1);
         }
 
         #endregion
@@ -102,7 +105,7 @@ namespace BlueDatabase {
             }
         }
 
-        public List<string> BereitsExportiert => _BereitsExportiert;
+        public ListExt<string> BereitsExportiert { get; private set; }
         public Database Database { get; private set; }
 
         public string ExportFormularID {
@@ -224,16 +227,16 @@ namespace BlueDatabase {
         //    // GC.SuppressFinalize(Me)
         //}
         public void DeleteAllBackups() {
-            for (var n = 0; n < _BereitsExportiert.Count; n++) {
-                if (!string.IsNullOrEmpty(_BereitsExportiert[n])) {
-                    var x = _BereitsExportiert[n].SplitAndCutBy("|");
+            for (var n = 0; n < BereitsExportiert.Count; n++) {
+                if (!string.IsNullOrEmpty(BereitsExportiert[n])) {
+                    var x = BereitsExportiert[n].SplitAndCutBy("|");
                     if (FileExists(x[0])) {
                         DeleteFile(x[0], false);
-                        _BereitsExportiert[n] = string.Empty;
+                        BereitsExportiert[n] = string.Empty;
                     }
                 }
             }
-            _BereitsExportiert.RemoveNullOrEmpty();
+            BereitsExportiert.RemoveNullOrEmpty();
         }
 
         public void Dispose() {
@@ -246,9 +249,11 @@ namespace BlueDatabase {
             if (string.IsNullOrEmpty(Database.Filename)) {
                 return "Nur von Datenbanken, die auch auf der Festplatte gespeichert sind, kann ein Export stattfinden.";
             }
+
             if (!string.IsNullOrEmpty(Database.GlobalShowPass) && _Typ != enExportTyp.DatenbankOriginalFormat) {
                 return "Von passwortgeschützten Datenbanken können nur Exporte im Originalformat stattfinden.";
             }
+
             if (_Typ == enExportTyp.EinzelnMitFormular) {
                 if (string.IsNullOrEmpty(_ExportFormularID)) {
                     return "Layout-Vorlage nicht definiert.";
@@ -282,14 +287,11 @@ namespace BlueDatabase {
 
         public bool IsOk() => string.IsNullOrEmpty(ErrorReason());
 
-        public void OnChanged() =>
-            //if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
-            Changed?.Invoke(this, System.EventArgs.Empty);
+        public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 
         public void Parse(string ToParse) {
             IsParsing = true;
-            Initialize();
-            _BereitsExportiert.ThrowEvents = false;
+            BereitsExportiert.ThrowEvents = false;
             var shortener = string.Empty;
             foreach (var pair in ToParse.GetAllTags()) {
                 switch (pair.Key) {
@@ -336,17 +338,17 @@ namespace BlueDatabase {
                         break;
 
                     case "exported": // ALT, 02.10.2019
-                        _BereitsExportiert.AddRange(pair.Value.FromNonCritical().SplitAndCutBy("#"));
+                        BereitsExportiert.AddRange(pair.Value.FromNonCritical().SplitAndCutBy("#"));
                         break;
 
                     case "exp":
                         var tmp = pair.Value.FromNonCritical().SplitAndCutBy("#");
-                        _BereitsExportiert.Clear();
+                        BereitsExportiert.Clear();
                         foreach (var thise in tmp) {
                             if (thise.StartsWith("@")) {
-                                _BereitsExportiert.Add(shortener + thise.TrimStart("@"));
+                                BereitsExportiert.Add(shortener + thise.TrimStart("@"));
                             } else {
-                                _BereitsExportiert.Add(thise);
+                                BereitsExportiert.Add(thise);
                             }
                         }
                         break;
@@ -361,7 +363,7 @@ namespace BlueDatabase {
                         break;
                 }
             }
-            _BereitsExportiert.ThrowEvents = true;
+            BereitsExportiert.ThrowEvents = true;
             IsParsing = false;
         }
 
@@ -385,18 +387,19 @@ namespace BlueDatabase {
 
                 case enExportTyp.EinzelnMitFormular:
                     t = "Einzeleinträge";
-                    //   Case Is = enExportTyp.EinzelnAlsHTML : t = "Einzeleinträge als HTML-Datei"
                     break;
 
                 default:
                     Develop.DebugPrint(_Typ);
                     return "Unbekannte Aktion";
             }
+
             if (_Intervall > 0) {
                 t = t + ", alle " + _Intervall + " Tage";
             } else {
                 t += ", wenn sich was geändert hat";
             }
+
             if (_Typ == enExportTyp.EinzelnMitFormular) {
                 if (!string.IsNullOrEmpty(_ExportFormularID)) {
                     t += " mit einem gewählten Formular. Einträge werden immer aktualisiert und gelöschte Einträge auch gelöscht.";
@@ -406,6 +409,7 @@ namespace BlueDatabase {
                     t += " nur bestimmte Spalten.";
                 }
             }
+
             if (_Filter.Count > 0) {
                 t += " Nur bestimmte Einträge.";
             }
@@ -429,42 +433,13 @@ namespace BlueDatabase {
 
                 case enExportTyp.EinzelnMitFormular:
                     return QuickImage.Get(enImageCode.Stern);
-                //     Case Is = enExportTyp.EinzelnAlsHTML : Return QuickImage.[Get](enImageCode.InternetExplorer, 16, "00FF00", "")
+
                 default:
                     Develop.DebugPrint(_Typ);
                     return QuickImage.Get(enImageCode.Kritisch);
             }
         }
 
-        //public override string ToString()
-        //{
-        //    var Result = "{";
-        //    Result = Result + "Destination=" + _Verzeichnis.ToNonCritical() + ", ";
-        //    Result = Result + "Type=" + (int)_Typ + ", ";
-        //    Result = Result + "LastExportTime=" + _LastExportTime + ", ";
-        //    Result = Result + "Interval=" + _Intervall + ", ";
-        //    if (_Typ == enExportTyp.DatenbankCSVFormat || _Typ == enExportTyp.DatenbankHTMLFormat || _Typ == enExportTyp.DatenbankOriginalFormat)
-        //    {
-        //        Result = Result + "AutoDelete=" + _AutomatischLöschen + ", ";
-        //        if (_Typ != enExportTyp.DatenbankOriginalFormat)
-        //        {
-        //            Result = Result + "ExportColumnOrder=" + _ExportSpaltenAnsicht + ", ";
-        //        }
-        //    }
-        //    else
-        //    {
-        //        Result = Result + "exid=" + _ExportFormularID.ToNonCritical() + ", ";
-        //    }
-        //    if (Filter.Count() > 0)
-        //    {
-        //        Result = Result + "Filter=" + Filter + ", ";
-        //    }
-        //    if (_BereitsExportiert.Count > 0)
-        //    {
-        //        Result = Result + "Exported=" + _BereitsExportiert.JoinWith("#").ToNonCritical() + ", ";
-        //    }
-        //    return Result.TrimEnd(", ") + "}";
-        //}
         public override string ToString() {
             try {
                 var shortener = GetShortener();
@@ -485,9 +460,9 @@ namespace BlueDatabase {
                 if (_Filter.Count > 0) {
                     Result = Result + "flt=" + _Filter.ToString() + ", ";
                 }
-                if (_BereitsExportiert.Count > 0) {
+                if (BereitsExportiert.Count > 0) {
                     Result += "exp=";
-                    foreach (var thise in _BereitsExportiert) {
+                    foreach (var thise in BereitsExportiert) {
                         Result = !string.IsNullOrEmpty(shortener) && thise.StartsWith(shortener)
                             ? Result + "@" + thise.TrimStart(shortener) + "#"
                             : Result + thise + "#";
@@ -504,15 +479,15 @@ namespace BlueDatabase {
             var Did = false;
             if (!IsOk()) { return false; }
             if (_Typ is enExportTyp.DatenbankCSVFormat or enExportTyp.DatenbankHTMLFormat or enExportTyp.DatenbankOriginalFormat) {
-                for (var n = 0; n < _BereitsExportiert.Count; n++) {
+                for (var n = 0; n < BereitsExportiert.Count; n++) {
                     if (worker != null && worker.CancellationPending) { break; }
-                    if (!string.IsNullOrEmpty(_BereitsExportiert[n])) {
-                        var x = _BereitsExportiert[n].SplitAndCutBy("|");
+                    if (!string.IsNullOrEmpty(BereitsExportiert[n])) {
+                        var x = BereitsExportiert[n].SplitAndCutBy("|");
                         if ((float)DateTime.Now.Subtract(DateTimeParse(x[1])).TotalDays > _AutomatischLöschen) {
                             if (FileExists(x[0])) { DeleteFile(x[0], false); }
                         }
                         if (!FileExists(x[0])) {
-                            _BereitsExportiert[n] = string.Empty;
+                            BereitsExportiert[n] = string.Empty;
                             Did = true;
                         }
                     }
@@ -541,27 +516,26 @@ namespace BlueDatabase {
                 }
                 // Gelöschte Einträge der Datenbank auch hier löschen
                 // Zusätzlich Einträge löschen, die nicht mehr auf der Festplatte sind.
-                for (var n = 0; n < _BereitsExportiert.Count; n++) {
+                for (var n = 0; n < BereitsExportiert.Count; n++) {
                     if (worker != null && worker.CancellationPending) { break; }
-                    if (!string.IsNullOrEmpty(_BereitsExportiert[n])) {
-                        var x = _BereitsExportiert[n].SplitAndCutBy("|");
+                    if (!string.IsNullOrEmpty(BereitsExportiert[n])) {
+                        var x = BereitsExportiert[n].SplitAndCutBy("|");
                         if (x.GetUpperBound(0) > 1 && Database.Row.SearchByKey(int.Parse(x[2])) == null) {
                             if (FileExists(x[0])) { DeleteFile(x[0], false); }
                         }
                         if (!FileExists(x[0])) {
-                            _BereitsExportiert[n] = string.Empty;
+                            BereitsExportiert[n] = string.Empty;
                             Did = true;
                         }
                     }
                 }
             }
             if (Did) {
-                _BereitsExportiert.RemoveNullOrEmpty();
+                BereitsExportiert.RemoveNullOrEmpty();
             }
             return Did;
         }
 
-        //#endregion
         internal bool DoBackUp(BackgroundWorker worker) {
             if (!IsOk()) { return false; }
             string SavePath;
@@ -606,7 +580,7 @@ namespace BlueDatabase {
                                 if (_Filter == null || _Filter.Count < 1 || Thisrow.MatchesTo(_Filter)) {
                                     var Id = Thisrow.Key.ToString();
                                     var Found = false;
-                                    foreach (var thisstring in _BereitsExportiert) {
+                                    foreach (var thisstring in BereitsExportiert) {
                                         if (thisstring.EndsWith("|" + Id)) {
                                             Found = true;
                                             break;
@@ -640,8 +614,8 @@ namespace BlueDatabase {
             foreach (var ThisString in Added) {
                 var x = ThisString.SplitAndCutBy("|");
                 if (FileExists(x[0])) {
-                    if (!_BereitsExportiert.Contains(ThisString)) {
-                        _BereitsExportiert.Add(ThisString);
+                    if (!BereitsExportiert.Contains(ThisString)) {
+                        BereitsExportiert.Add(ThisString);
                         DidAndOk = true;
                     }
                 }
@@ -658,9 +632,10 @@ namespace BlueDatabase {
                 Database.Disposing -= Database_Disposing;
                 Database = null;
                 Filter.Dispose();
-                _BereitsExportiert = new ListExt<string>();
-                _BereitsExportiert.Changed -= _BereitsExportiert_ListOrItemChanged;
-                _BereitsExportiert.Dispose();
+
+                BereitsExportiert.Changed -= _BereitsExportiert_ListOrItemChanged;
+                BereitsExportiert = new ListExt<string>();
+                BereitsExportiert.Dispose();
                 disposedValue = true;
             }
         }
@@ -673,31 +648,31 @@ namespace BlueDatabase {
 
         private bool DeleteId(long Id, BackgroundWorker Worker) {
             var Did = false;
-            for (var f = 0; f < _BereitsExportiert.Count; f++) {
+            for (var f = 0; f < BereitsExportiert.Count; f++) {
                 if (Worker.CancellationPending) { break; }
-                if (!string.IsNullOrEmpty(_BereitsExportiert[f])) {
-                    if (_BereitsExportiert[f].EndsWith("|" + Id)) {
-                        var x = _BereitsExportiert[f].SplitAndCutBy("|");
+                if (!string.IsNullOrEmpty(BereitsExportiert[f])) {
+                    if (BereitsExportiert[f].EndsWith("|" + Id)) {
+                        var x = BereitsExportiert[f].SplitAndCutBy("|");
                         if (FileExists(x[0])) { DeleteFile(x[0], false); }
                         if (!FileExists(x[0])) {
-                            _BereitsExportiert[f] = string.Empty;
+                            BereitsExportiert[f] = string.Empty;
                             Did = true;
                         }
                     }
                 }
             }
             if (Did) {
-                _BereitsExportiert.RemoveNullOrEmpty();
+                BereitsExportiert.RemoveNullOrEmpty();
             }
             return Did;
         }
 
         private string GetShortener() {
-            if (_BereitsExportiert.Count < 2) { return string.Empty; }
+            if (BereitsExportiert.Count < 2) { return string.Empty; }
             var ze = 1;
             var last = string.Empty;
             do {
-                foreach (var thiss in _BereitsExportiert) {
+                foreach (var thiss in BereitsExportiert) {
                     if (ze > thiss.Length - 2) { return thiss.Substring(0, ze - 1); }
                     if (!string.IsNullOrEmpty(last)) {
                         if (thiss.Substring(0, ze) != last) { return thiss.Substring(0, ze - 1); }
@@ -709,19 +684,6 @@ namespace BlueDatabase {
                 last = string.Empty;
             }
             while (true);
-        }
-
-        private void Initialize() {
-            _Verzeichnis = string.Empty;
-            _Typ = enExportTyp.DatenbankOriginalFormat;
-            _Intervall = 1;
-            _AutomatischLöschen = 30;
-            _ExportFormularID = string.Empty;
-            _ExportSpaltenAnsicht = 0;
-            Filter = new FilterCollection(Database);
-            _BereitsExportiert = new ListExt<string>();
-            _BereitsExportiert.Changed += _BereitsExportiert_ListOrItemChanged;
-            _LastExportTimeUTC = new DateTime(1900, 1, 1);
         }
 
         #endregion
