@@ -194,7 +194,7 @@ namespace BlueControls.Controls {
             } else {
                 _Zoom *= 1d / 1.5d;
             }
-            _Zoom = Math.Max(_ZoomFit / 1.2d, _Zoom);
+            _Zoom = Math.Max(_ZoomFit / 10d, _Zoom);
             _Zoom = Math.Min(20, _Zoom);
             var mb = MaxBounds();
             ComputeSliders(mb);

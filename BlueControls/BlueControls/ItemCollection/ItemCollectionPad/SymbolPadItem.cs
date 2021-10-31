@@ -57,10 +57,8 @@ namespace BlueControls.ItemCollection {
         #region Methods
 
         public override List<FlexiControl> GetStyleOptions() {
-            List<FlexiControl> l = new()
-            {
-                new FlexiControl()
-            };
+
+
             ItemCollectionList Comms = new()
             {
                 { "Ohne", ((int)enSymbol.Ohne).ToString(), QuickImage.Get("Datei|32") },
@@ -69,7 +67,7 @@ namespace BlueControls.ItemCollection {
                 { "Pfeil", ((int)enSymbol.Pfeil).ToString(), QuickImage.Get("Pfeil_Rechts|32") },
                 { "Bruchlinie", ((int)enSymbol.Bruchlinie).ToString() }
             };
-            l.Add(new FlexiControl());
+            List<FlexiControl> l = new();
             l.Add(new FlexiControlForProperty(this, "Symbol", Comms));
             l.Add(new FlexiControlForProperty(this, "Randdicke"));
             l.Add(new FlexiControlForProperty(this, "Randfarbe"));
@@ -122,8 +120,11 @@ namespace BlueControls.ItemCollection {
             gr.TranslateTransform(trp.X, trp.Y);
             gr.RotateTransform(-Drehwinkel);
             GraphicsPath p = null;
+
+            // Wegen der Nullpunktverschiebung wird ein temporäres Rechteck benötigt
             var d2 = drawingCoordinates;
             d2.X = -drawingCoordinates.Width / 2;
+            d2.Y = -drawingCoordinates.Height / 2;
 
             switch (Symbol) {
                 case enSymbol.Ohne:

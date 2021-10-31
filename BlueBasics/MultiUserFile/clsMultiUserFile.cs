@@ -36,6 +36,7 @@ namespace BlueBasics.MultiUserFile {
 
         protected byte[] _dataOnDisk;
         protected int _ReloadDelaySecond = 10;
+        private readonly long _startTick = DateTime.UtcNow.Ticks;
         private readonly bool _zipped;
         private readonly BackgroundWorker BackgroundWorker;
         private readonly Timer Checker;
@@ -720,16 +721,12 @@ namespace BlueBasics.MultiUserFile {
             var Count_Save = (Count_BackUp * 2) + 1; // Soviele Sekunden können vergehen, bevor gespeichert werden muss. Muss größer sein, als Backup. Weil ansonsten der Backup-BackgroundWorker beendet wird
             var Count_UserWork = (Count_Save / 5f) + 2; // Soviele Sekunden hat die User-Bearbeitung vorrang. Verhindert, dass die Bearbeitung des Users spontan abgebrochen wird.
 
-            if (DateTime.UtcNow.Subtract(_LastUserActionUTC).TotalSeconds < Count_UserWork) { CancelBackGroundWorker(); return; } // Benutzer arbeiten lassen
+            if (DateTime.UtcNow.Subtract(_LastUserActionUTC).TotalSeconds < Count_UserWork || BlockDiskOperations()) { CancelBackGroundWorker(); return; } // Benutzer arbeiten lassen
 
             if (Checker_Tick_count > Count_Save && _MustSave) { CancelBackGroundWorker(); }
             if (Checker_Tick_count > _ReloadDelaySecond && _MustReload) { CancelBackGroundWorker(); }
             if (BackgroundWorker.IsBusy) { return; }
 
-            if (_MustBackup && !_MustReload && Checker_Tick_count < Count_Save && Checker_Tick_count >= Count_BackUp && !BlockDiskOperations() && string.IsNullOrEmpty(ErrorReason(enErrorReason.EditAcut))) {
-                StartBackgroundWorker();
-                return;
-            }
 
             if (_MustReload && _MustSave) {
                 if (!string.IsNullOrEmpty(ErrorReason(enErrorReason.Load))) { return; }
@@ -744,6 +741,17 @@ namespace BlueBasics.MultiUserFile {
                 Checker_Tick_count = 0;
                 return;
             }
+
+
+            if (_MustBackup && !_MustReload && !_MustSave &&  Checker_Tick_count >= Count_BackUp && string.IsNullOrEmpty(ErrorReason(enErrorReason.EditAcut))) {
+                var nowsek = (DateTime.UtcNow.Ticks - _startTick) / 30000000;
+                if (nowsek % 20 != 0) { return; } // Lasten startabhängig verteilen. Bei Pending changes ist es eh immer true;
+
+                StartBackgroundWorker();
+                return;
+            }
+
+
 
             // Überhaupt nix besonderes. Ab und zu mal Reloaden
             if (_MustReload && Checker_Tick_count > _ReloadDelaySecond) {

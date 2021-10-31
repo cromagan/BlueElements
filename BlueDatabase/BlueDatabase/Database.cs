@@ -71,8 +71,6 @@ namespace BlueDatabase {
 
         public ListExt<WorkItem> Works;
 
-        private readonly long _startTick = DateTime.UtcNow.Ticks;
-
         private readonly List<string> FilesAfterLoadingLCase;
 
         private string _AdditionaFilesPfad;
@@ -363,7 +361,7 @@ namespace BlueDatabase {
                     pf = string.Empty;
                     switch (x) {
                         case 0:
-                            // BeCreative, At Home, 10.11.2018
+                            // BeCreative, At Home, 31.11.2021
                             pf = System.Windows.Forms.Application.StartupPath + "\\..\\..\\..\\..\\BlueControls\\BlueControls\\Ressourcen\\" + BlueBasicsSubDir + "\\" + Name;
                             break;
 
@@ -1222,8 +1220,7 @@ namespace BlueDatabase {
             CancelEventArgs ec = new(false);
             OnExporting(ec);
             if (ec.Cancel) { return false; }
-            var nowsek = (DateTime.UtcNow.Ticks - _startTick) / 10000000;
-            if (nowsek % 60 != 0) { return false; } // Lasten startabhängig verteilen. Bei Pending changes ist es eh immer true;
+
             foreach (var ThisExport in Export) {
                 if (ThisExport != null) {
                     if (ThisExport.Typ == enExportTyp.EinzelnMitFormular) { return true; }

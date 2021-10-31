@@ -160,6 +160,13 @@ namespace BlueControls.BlueDatabaseDialogs {
                         Symb = enImageCode.Karton;
                         break;
 
+                    case enDatabaseDataType.Layouts:
+                        aenderung = "Layouts verändert";
+                        alt = "";
+                        neu = "";
+                        Symb = enImageCode.Layout;
+                        break;
+
                     case enDatabaseDataType.dummyComand_AddRow:
                         aenderung = "Neue Zeile";
                         Symb = enImageCode.PlusZeichen;

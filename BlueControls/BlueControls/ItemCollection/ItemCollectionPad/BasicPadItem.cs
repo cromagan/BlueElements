@@ -301,6 +301,7 @@ namespace BlueControls.ItemCollection {
         public virtual List<FlexiControl> GetStyleOptions() {
             List<FlexiControl> l = new()
             {
+                new FlexiControl(),
                 new FlexiControlForProperty(this, "Gruppenzugehörigkeit"),
                 new FlexiControlForProperty(this, "Bei_Export_sichtbar")
             };

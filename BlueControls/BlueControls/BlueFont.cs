@@ -227,7 +227,7 @@ namespace BlueControls {
             if (Outline) {
                 for (var PX = -1; PX <= 1; PX++) {
                     for (var PY = -1; PY <= 1; PY++) {
-                        BlueFont.DrawString(gr, text, f, Brush_Color_Outline, x + PX, y + PY);
+                        BlueFont.DrawString(gr, text, f, Brush_Color_Outline, x + PX*zoom, y + PY * zoom, stringFormat);
                     }
                 }
             }

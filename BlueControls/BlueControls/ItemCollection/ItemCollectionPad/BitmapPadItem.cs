@@ -71,7 +71,7 @@ namespace BlueControls.ItemCollection {
         public Bitmap Bitmap { get; set; }
         public bool Hintergrund_weiß_füllen { get; set; }
 
-        [Description("Hier kann ein Platzhalter, der mit dem Code-Generator erzeugt wurde, eingefügt werden.")]
+        [Description("Hier kann ein Variablenname als Platzhalter eingegeben werden. Beispiel: ~Bild~")]
         public string Platzhalter_für_Layout { get; set; }
 
         #endregion

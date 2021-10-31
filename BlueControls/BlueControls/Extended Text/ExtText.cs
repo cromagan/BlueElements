@@ -852,7 +852,7 @@ namespace BlueControls {
             do {
                 Akt++;
                 if (Akt > Chars.Count - 1) {
-                    Row_SetOnLine(ZB_Char, Akt-1);
+                    Row_SetOnLine(ZB_Char, Akt - 1);
                     RI.Add(ZB_Char + ";" + (Akt - 1));
                     break;
                 }
@@ -906,16 +906,16 @@ namespace BlueControls {
 
             // enAlignment berechnen -------------------------------------
             if (Ausrichtung != enAlignment.Top_Left) {
-                float KY = 0;
+                var KY = 0f;
                 if (Ausrichtung.HasFlag(enAlignment.VerticalCenter)) { KY = (float)((_TextDimensions.Height - (int)_Height) / 2.0); }
-                if (Ausrichtung.HasFlag(Ausrichtung & enAlignment.Bottom)) { KY = _TextDimensions.Height - (int)_Height; }
+                if (Ausrichtung.HasFlag(enAlignment.Bottom)) { KY = _TextDimensions.Height - (int)_Height; }
                 foreach (var t in RI) {
                     var o = t.SplitAndCutBy(";");
                     var Z1 = int.Parse(o[0]);
                     var Z2 = int.Parse(o[1]);
                     float KX = 0;
-                    if (Ausrichtung.HasFlag(Ausrichtung & enAlignment.Right)) { KX = _TextDimensions.Width - Chars[Z2].Pos.X - Chars[Z2].Size.Width; }
-                    if (Ausrichtung.HasFlag(Ausrichtung & enAlignment.HorizontalCenter)) { KX = (_TextDimensions.Width - Chars[Z2].Pos.X - Chars[Z2].Size.Width) / 2; }
+                    if (Ausrichtung.HasFlag(enAlignment.Right)) { KX = _TextDimensions.Width - Chars[Z2].Pos.X - Chars[Z2].Size.Width; }
+                    if (Ausrichtung.HasFlag(enAlignment.HorizontalCenter)) { KX = (_TextDimensions.Width - Chars[Z2].Pos.X - Chars[Z2].Size.Width) / 2; }
                     for (var Z3 = Z1; Z3 <= Z2; Z3++) {
                         Chars[Z3].Pos.X += KX;
                         Chars[Z3].Pos.Y += KY;

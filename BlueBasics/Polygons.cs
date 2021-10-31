@@ -82,14 +82,15 @@ namespace BlueBasics {
             GraphicsPath tempPoly_RoundRec = new();
             if (radius > (height / 2.0) + 2) { radius = (int)(height / 2.0) + 2; }
             if (radius > (width / 2.0) + 2) { radius = (int)(width / 2.0) + 2; }
+
             tempPoly_RoundRec.AddLine(x + radius, y, x + width - radius, y);
-            AddRad90(x + width - radius, y, radius, 270); // OK
+            if (radius > 0) { AddRad90(x + width - radius, y, radius, 270); }
             tempPoly_RoundRec.AddLine(x + width, y + radius, x + width, y + height - radius);
-            AddRad90(x + width - radius, y + height - radius, radius, 0);
+            if (radius > 0) { AddRad90(x + width - radius, y + height - radius, radius, 0); }
             tempPoly_RoundRec.AddLine(x + width - radius, y + height, x + radius, y + height);
-            AddRad90(x, y + height - radius, radius, 90);
+            if (radius > 0) { AddRad90(x, y + height - radius, radius, 90); }
             tempPoly_RoundRec.AddLine(x, y + height - radius, x, y + radius);
-            AddRad90(x, y, radius, 180); // OK
+            if (radius > 0) { AddRad90(x, y, radius, 180); }
             tempPoly_RoundRec.CloseFigure();
             return tempPoly_RoundRec;
 
