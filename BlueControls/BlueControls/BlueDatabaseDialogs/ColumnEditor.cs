@@ -46,7 +46,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             _Table = table;
             Column_DatenAuslesen(column);
 
-            _Column.Database.ShouldICancelDiscOperations += Database_ShouldICancelDiscOperations;
+            _Column.Database.ShouldICancelSaveOperations += Database_ShouldICancelDiscOperations;
         }
 
         #endregion
@@ -58,7 +58,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (!AllOk()) {
                 e.Cancel = true;
             } else {
-                _Column.Database.ShouldICancelDiscOperations -= Database_ShouldICancelDiscOperations;
+                _Column.Database.ShouldICancelSaveOperations -= Database_ShouldICancelDiscOperations;
             }
         }
 

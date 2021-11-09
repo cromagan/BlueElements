@@ -971,10 +971,7 @@ namespace BlueDatabase {
             }
             // Keine Doppelten Rausfiltern, ansonstn stimmen die Undo nicht mehr
 
-
             if (Comand != enDatabaseDataType.AutoExport) { SetUserDidSomething(); } // Ansonsten wir der Export dauernd unterbrochen
-
-
 
             if (RowKey < -100) { Develop.DebugPrint(enFehlerArt.Fehler, "RowKey darf hier nicht <-100 sein!"); }
             if (ColumnKey < -100) { Develop.DebugPrint(enFehlerArt.Fehler, "ColKey darf hier nicht <-100 sein!"); }
@@ -1103,10 +1100,10 @@ namespace BlueDatabase {
             List.AddRange(b);
         }
 
-        protected override bool BlockDiskOperations() {
+        protected override bool BlockSaveOperations() {
             if (RowItem.DoingScript) { return true; }
 
-            return base.BlockDiskOperations();
+            return base.BlockSaveOperations();
         }
 
         protected override void CheckDataAfterReload() {

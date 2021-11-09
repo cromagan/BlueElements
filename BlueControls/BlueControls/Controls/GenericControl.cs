@@ -124,8 +124,11 @@ namespace BlueControls.Controls {
                     case Form frm:
                         return frm;
 
+                    case null:
+                        return null;
+
                     default:
-                        o = o.Parent;
+                        o = o?.Parent; //Manchmal ist o null. MultiThreading?
                         break;
                 }
             } while (true);

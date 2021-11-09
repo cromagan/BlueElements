@@ -341,11 +341,11 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void SetDatabase(Database database) {
             if (tmpDatabase != null) {
-                tmpDatabase.ShouldICancelDiscOperations -= TmpDatabase_ShouldICancelDiscOperations;
+                tmpDatabase.ShouldICancelSaveOperations -= TmpDatabase_ShouldICancelDiscOperations;
             }
             tmpDatabase = database;
             if (tmpDatabase != null) {
-                tmpDatabase.ShouldICancelDiscOperations += TmpDatabase_ShouldICancelDiscOperations;
+                tmpDatabase.ShouldICancelSaveOperations += TmpDatabase_ShouldICancelDiscOperations;
             }
         }
 

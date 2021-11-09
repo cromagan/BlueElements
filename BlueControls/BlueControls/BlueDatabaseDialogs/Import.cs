@@ -42,7 +42,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             Eintr.Text = Ein.Count + " zum Importieren bereit.";
             Database = database;
             Database.Disposing += Database_Disposing;
-            Database.ShouldICancelDiscOperations += Database_ShouldICancelDiscOperations;
+            Database.ShouldICancelSaveOperations += Database_ShouldICancelDiscOperations;
         }
 
         #endregion
@@ -57,7 +57,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         protected override void OnClosing(CancelEventArgs e) {
             Database.Disposing -= Database_Disposing;
-            Database.ShouldICancelDiscOperations -= Database_ShouldICancelDiscOperations;
+            Database.ShouldICancelSaveOperations -= Database_ShouldICancelDiscOperations;
             base.OnClosing(e);
         }
 

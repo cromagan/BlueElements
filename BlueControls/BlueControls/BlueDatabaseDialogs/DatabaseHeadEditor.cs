@@ -48,7 +48,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             InitializeComponent();
             _Database = cDatabase;
             _Database.Disposing += Database_Disposing;
-            _Database.ShouldICancelDiscOperations += Database_ShouldICancelDiscOperations;
+            _Database.ShouldICancelSaveOperations += Database_ShouldICancelSaveOperations;
         }
 
         #endregion
@@ -339,7 +339,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             Close();
         }
 
-        private void Database_ShouldICancelDiscOperations(object sender, System.ComponentModel.CancelEventArgs e) => e.Cancel = true;
+        private void Database_ShouldICancelSaveOperations(object sender, System.ComponentModel.CancelEventArgs e) => e.Cancel = true;
 
         private void DateienSchlüssel_Click(object sender, System.EventArgs e) {
             btnDateiSchluessel.Enabled = false;
@@ -459,7 +459,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void RemoveDatabase() {
             if (_Database == null) { return; }
             _Database.Disposing -= Database_Disposing;
-            _Database.ShouldICancelDiscOperations -= Database_ShouldICancelDiscOperations;
+            _Database.ShouldICancelSaveOperations -= Database_ShouldICancelSaveOperations;
             _Database = null;
         }
 

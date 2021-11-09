@@ -122,7 +122,7 @@ namespace BlueBasics.MultiUserFile {
         /// <summary>
         /// Dient dazu, offene Dialoge abzufragen
         /// </summary>
-        public event EventHandler<CancelEventArgs> ShouldICancelDiscOperations;
+        public event EventHandler<CancelEventArgs> ShouldICancelSaveOperations;
 
         #endregion
 
@@ -257,7 +257,7 @@ namespace BlueBasics.MultiUserFile {
                 if (PureBinSaver.IsBusy) { return "Aktuell werden im Hintergrund Daten gespeichert."; }
                 if (BackgroundWorker.IsBusy) { return "Ein Hintergrundprozess verhindert aktuell das Neuladen."; }
                 if (IsParsing) { return "Es werden aktuell Daten geparsed."; }
-                if (BlockDiskOperations()) { return "Reload unmöglich, vererbte Klasse gab Fehler zurück"; }
+                //if (BlockDiskOperations()) { return "Reload unmöglich, vererbte Klasse gab Fehler zurück"; }
                 return string.Empty;
             }
 
@@ -295,7 +295,7 @@ namespace BlueBasics.MultiUserFile {
             if (mode.HasFlag(enErrorReason.Save)) {
                 if (IsLoading) { return "Speichern aktuell nicht möglich, da gerade Daten geladen werden."; }
                 if (DateTime.UtcNow.Subtract(_LastUserActionUTC).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
-                if (BlockDiskOperations()) { return "Speichern unmöglich, vererbte Klasse gab Fehler zurück"; }
+                if (BlockSaveOperations()) { return "Speichern unmöglich, vererbte Klasse blockiert Speichervorgänge"; }
                 if (string.IsNullOrEmpty(Filename)) { return string.Empty; } // EXIT -------------------
                 if (!FileExists(Filename)) { return string.Empty; } // EXIT -------------------
                 if (CheckForLastError(ref _CanWriteNextCheckUTC, ref _CanWriteError) && !string.IsNullOrEmpty(_CanWriteError)) {
@@ -573,16 +573,14 @@ namespace BlueBasics.MultiUserFile {
         }
 
         /// <summary>
-        /// Alle Abfragen, die nicht durch Standard abfragen gehandelt werden kann.
+        /// Alle Abfragen, die nicht durch standard Abfragen gehandelt werden können.
         /// Z.B. Offen Dialoge, Prozesse die nur die die abgeleitete Klasse kennt
-        /// Die offenen Dialoge werden aber bereits hier mit dem Event mit AreDiskOperationsBlocked abgefragt
         /// </summary>
         /// <returns></returns>
-        protected virtual bool BlockDiskOperations() {
+        protected virtual bool BlockSaveOperations() {
             var e = new CancelEventArgs();
             e.Cancel = false;
-            OnShouldICancelDiscOperations(e);
-
+            OnShouldICancelSaveOperations(e);
             return e.Cancel;
         }
 
@@ -721,7 +719,7 @@ namespace BlueBasics.MultiUserFile {
             var Count_Save = (Count_BackUp * 2) + 1; // Soviele Sekunden können vergehen, bevor gespeichert werden muss. Muss größer sein, als Backup. Weil ansonsten der Backup-BackgroundWorker beendet wird
             var Count_UserWork = (Count_Save / 5f) + 2; // Soviele Sekunden hat die User-Bearbeitung vorrang. Verhindert, dass die Bearbeitung des Users spontan abgebrochen wird.
 
-            if (DateTime.UtcNow.Subtract(_LastUserActionUTC).TotalSeconds < Count_UserWork || BlockDiskOperations()) { CancelBackGroundWorker(); return; } // Benutzer arbeiten lassen
+            if (DateTime.UtcNow.Subtract(_LastUserActionUTC).TotalSeconds < Count_UserWork || BlockSaveOperations()) { CancelBackGroundWorker(); return; } // Benutzer arbeiten lassen
 
             if (Checker_Tick_count > Count_Save && _MustSave) { CancelBackGroundWorker(); }
             if (Checker_Tick_count > _ReloadDelaySecond && _MustReload) { CancelBackGroundWorker(); }
@@ -872,8 +870,8 @@ namespace BlueBasics.MultiUserFile {
             SavedToDisk?.Invoke(this, System.EventArgs.Empty);
         }
 
-        private void OnShouldICancelDiscOperations(CancelEventArgs e) {
-            ShouldICancelDiscOperations?.Invoke(this, e);
+        private void OnShouldICancelSaveOperations(CancelEventArgs e) {
+            ShouldICancelSaveOperations?.Invoke(this, e);
         }
 
         private void PureBinSaver_DoWork(object sender, DoWorkEventArgs e) {

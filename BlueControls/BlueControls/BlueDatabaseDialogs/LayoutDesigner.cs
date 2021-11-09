@@ -39,7 +39,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             Database = database;
             scriptEditor.Database = database;
             Database.Disposing += Database_Disposing;
-            Database.ShouldICancelDiscOperations += Database_ShouldICancelDiscOperations;
+            Database.ShouldICancelSaveOperations += Database_ShouldICancelDiscOperations;
             befülleLayoutDropdown();
             CheckButtons();
         }
@@ -87,7 +87,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
             Database.Disposing -= Database_Disposing;
-            Database.ShouldICancelDiscOperations -= Database_ShouldICancelDiscOperations;
+            Database.ShouldICancelSaveOperations -= Database_ShouldICancelDiscOperations;
             SaveCurrentLayout();
             scriptEditor.Database = null;
             Database = null;
