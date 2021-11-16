@@ -32,11 +32,19 @@ namespace BlueDatabase {
 
         #region Fields
 
-        private float _AutomatischLöschen;
+        /// <summary>
+        /// Das maximale Alter der Backups in Tagen, nachdem sie gelöscht werden
+        /// </summary>
+        private float _AutoDelete;
+
+        /// <summary>
+        /// Intervall der Backups in Tagen
+        /// </summary>
+        private float _BackupInterval;
+
         private string _ExportFormularID;
         private int _ExportSpaltenAnsicht;
         private FilterCollection _Filter;
-        private float _Intervall;
         private DateTime _LastExportTimeUTC;
         private enExportTyp _Typ;
         private string _Verzeichnis;
@@ -46,28 +54,30 @@ namespace BlueDatabase {
 
         #region Constructors
 
-        public ExportDefinition(Database database, string verzeichnis, enExportTyp typ, float intervall, float automatischlöschen) : this(database) {
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="database"></param>
+        /// <param name="verzeichnis"></param>
+        /// <param name="typ"></param>
+        /// <param name="backupinterval">Intervall der Backups in Tagen</param>
+        /// <param name="autodelete">Das maximale Alter der Backups in Tagen, nachdem sie gelöscht werden</param>
+        public ExportDefinition(Database database, string verzeichnis, enExportTyp typ, float backupinterval, float autodelete) : this(database) {
             _Verzeichnis = verzeichnis;
             _Typ = typ;
-            _Intervall = intervall;
-            _AutomatischLöschen = automatischlöschen;
+            _BackupInterval = backupinterval;
+            _AutoDelete = autodelete;
         }
 
-        public ExportDefinition(Database database, string toParse) : this(database) {
-            Parse(toParse);
-            //if (DeleteLastExportInfos) {
-            //    BereitsExportiert.Clear();
-            //    _LastExportTimeUTC = new DateTime(1900, 1, 1);
-            //}
-        }
+        public ExportDefinition(Database database, string toParse) : this(database) => Parse(toParse);
 
         public ExportDefinition(Database database) {
             Database = database;
             Database.Disposing += Database_Disposing;
             _Verzeichnis = string.Empty;
             _Typ = enExportTyp.DatenbankOriginalFormat;
-            _Intervall = 1;
-            _AutomatischLöschen = 30;
+            _BackupInterval = 1;
+            _AutoDelete = 30;
             _ExportFormularID = string.Empty;
             _ExportSpaltenAnsicht = 0;
             Filter = new FilterCollection(Database);
@@ -96,11 +106,26 @@ namespace BlueDatabase {
 
         #region Properties
 
-        public float AutomatischLöschen {
-            get => _AutomatischLöschen;
+        /// <summary>
+        /// Das maximale Alter der Backups in Tagen, nachdem sie gelöscht werden
+        /// </summary>
+        public float AutoDelete {
+            get => _AutoDelete;
             set {
-                if (_AutomatischLöschen == value) { return; }
-                _AutomatischLöschen = value;
+                if (_AutoDelete == value) { return; }
+                _AutoDelete = value;
+                OnChanged();
+            }
+        }
+
+        /// <summary>
+        /// Intervall der Backups in Tagen
+        /// </summary>
+        public float BackupInterval {
+            get => _BackupInterval;
+            set {
+                if (_BackupInterval == value) { return; }
+                _BackupInterval = value;
                 OnChanged();
             }
         }
@@ -141,15 +166,6 @@ namespace BlueDatabase {
             }
         }
 
-        public float Intervall {
-            get => _Intervall;
-            set {
-                if (_Intervall == value) { return; }
-                _Intervall = value;
-                OnChanged();
-            }
-        }
-
         public bool IsParsing { get; private set; }
 
         public DateTime LastExportTimeUTC {
@@ -185,7 +201,7 @@ namespace BlueDatabase {
 
         public object Clone() => new ExportDefinition(Database, ToString());
 
-        public string CompareKey() => ((int)_Typ).ToString(Constants.Format_Integer3) + "|" + _Verzeichnis + "|" + _ExportFormularID + "|" + _Intervall + "|" + _AutomatischLöschen;
+        public string CompareKey() => ((int)_Typ).ToString(Constants.Format_Integer3) + "|" + _Verzeichnis + "|" + _ExportFormularID + "|" + _BackupInterval + "|" + _AutoDelete;
 
         //#region IDisposable Support
         //// IDisposable
@@ -269,15 +285,15 @@ namespace BlueDatabase {
                     }
                 }
             } else {
-                if (_Intervall < 0.00099F) // ALT: Auch bei Bild Export. Sonst wird bei jeder änderung der Durchlauf angestoßen und das hindert die Arbeit ungemein
+                if (_BackupInterval < 0.00099F) // ALT: Auch bei Bild Export. Sonst wird bei jeder änderung der Durchlauf angestoßen und das hindert die Arbeit ungemein
                 {
                     return "Intervall muss mindestens 0.001 sein.";
                 }
-                if (_AutomatischLöschen is < 0.00099F or > 10000) {
+                if (_AutoDelete is < 0.00099F or > 10000) {
                     return "Automatisch löschen muss zwischen 0.01 und 10000 sein.";
                 }
-                if (_Intervall * 1000 < _AutomatischLöschen) {
-                    return "Automatisch löschen darf bei diesem Intervall maximal " + (_Intervall * 1000) + " sein.";
+                if (_BackupInterval * 1000 < _AutoDelete) {
+                    return "Automatisch löschen darf bei diesem Intervall maximal " + (_BackupInterval * 1000) + " sein.";
                 }
             }
             return !string.IsNullOrEmpty(_Verzeichnis) && !PathExists(_Verzeichnis)
@@ -311,12 +327,12 @@ namespace BlueDatabase {
 
                     case "itv":
                     case "interval":// ALT, 02.10.2019
-                        _Intervall = float.Parse(pair.Value.FromNonCritical());
+                        _BackupInterval = float.Parse(pair.Value.FromNonCritical());
                         break;
 
                     case "aud":
                     case "autodelete":// ALT, 02.10.2019
-                        _AutomatischLöschen = float.Parse(pair.Value.FromNonCritical());
+                        _AutoDelete = float.Parse(pair.Value.FromNonCritical());
                         break;
 
                     case "exportformula":
@@ -394,8 +410,8 @@ namespace BlueDatabase {
                     return "Unbekannte Aktion";
             }
 
-            if (_Intervall > 0) {
-                t = t + ", alle " + _Intervall + " Tage";
+            if (_BackupInterval > 0) {
+                t = t + ", alle " + _BackupInterval + " Tage";
             } else {
                 t += ", wenn sich was geändert hat";
             }
@@ -413,7 +429,7 @@ namespace BlueDatabase {
             if (_Filter.Count > 0) {
                 t += " Nur bestimmte Einträge.";
             }
-            if (_AutomatischLöschen > 0) {
+            if (_AutoDelete > 0) {
                 t += " Automatische Bereinigung.";
             }
             return t;
@@ -448,9 +464,9 @@ namespace BlueDatabase {
                 Result = Result + "dest=" + _Verzeichnis.ToNonCritical() + ", ";
                 Result = Result + "typ=" + (int)_Typ + ", ";
                 Result = Result + "let=" + _LastExportTimeUTC.ToString(Constants.Format_Date5) + ", ";
-                Result = Result + "itv=" + _Intervall.ToString().ToNonCritical() + ", ";
+                Result = Result + "itv=" + _BackupInterval.ToString().ToNonCritical() + ", ";
                 if (_Typ is enExportTyp.DatenbankCSVFormat or enExportTyp.DatenbankHTMLFormat or enExportTyp.DatenbankOriginalFormat) {
-                    Result = Result + "aud=" + _AutomatischLöschen.ToString().ToNonCritical() + ", ";
+                    Result = Result + "aud=" + _AutoDelete.ToString().ToNonCritical() + ", ";
                     if (_Typ != enExportTyp.DatenbankOriginalFormat) {
                         Result = Result + "exc=" + _ExportSpaltenAnsicht + ", ";
                     }
@@ -483,7 +499,7 @@ namespace BlueDatabase {
                     if (worker != null && worker.CancellationPending) { break; }
                     if (!string.IsNullOrEmpty(BereitsExportiert[n])) {
                         var x = BereitsExportiert[n].SplitAndCutBy("|");
-                        if ((float)DateTime.Now.Subtract(DateTimeParse(x[1])).TotalDays > _AutomatischLöschen) {
+                        if ((float)DateTime.Now.Subtract(DateTimeParse(x[1])).TotalDays > _AutoDelete) {
                             if (FileExists(x[0])) { DeleteFile(x[0], false); }
                         }
                         if (!FileExists(x[0])) {
@@ -554,21 +570,21 @@ namespace BlueDatabase {
             try {
                 switch (_Typ) {
                     case enExportTyp.DatenbankOriginalFormat:
-                        if (_Intervall > (float)DateTime.UtcNow.Subtract(_LastExportTimeUTC).TotalDays) { return false; }
+                        if (_BackupInterval > (float)DateTime.UtcNow.Subtract(_LastExportTimeUTC).TotalDays) { return false; }
                         SingleFileExport = TempFile(SingleFileExport + ".MDB");
                         if (!FileExists(SingleFileExport)) { File.Copy(Database.Filename, SingleFileExport); }
                         Added.Add(SingleFileExport + "|" + tim);
                         break;
 
                     case enExportTyp.DatenbankCSVFormat:
-                        if (_Intervall > (float)DateTime.UtcNow.Subtract(_LastExportTimeUTC).TotalDays) { return false; }
+                        if (_BackupInterval > (float)DateTime.UtcNow.Subtract(_LastExportTimeUTC).TotalDays) { return false; }
                         SingleFileExport = TempFile(SingleFileExport + ".CSV");
                         if (!FileExists(SingleFileExport)) { WriteAllText(SingleFileExport, Database.Export_CSV(enFirstRow.ColumnInternalName, _ExportSpaltenAnsicht, _Filter, null), Constants.Win1252, false); }
                         Added.Add(SingleFileExport + "|" + tim);
                         break;
 
                     case enExportTyp.DatenbankHTMLFormat:
-                        if (_Intervall > (float)DateTime.UtcNow.Subtract(_LastExportTimeUTC).TotalDays) { return false; }
+                        if (_BackupInterval > (float)DateTime.UtcNow.Subtract(_LastExportTimeUTC).TotalDays) { return false; }
                         SingleFileExport = TempFile(SingleFileExport + ".HTML");
                         if (!FileExists(SingleFileExport)) { Database.Export_HTML(SingleFileExport, _ExportSpaltenAnsicht, _Filter, null); }
                         Added.Add(SingleFileExport + "|" + tim);

@@ -69,7 +69,7 @@ namespace BlueControls.Classes_Editor {
 
                 case enExportTyp.EinzelnMitFormular:
                     ExportalsBild.Checked = true;
-                    Item.Intervall = 0;
+                    Item.BackupInterval = 0;
                     break;
 
                 default:
@@ -77,8 +77,8 @@ namespace BlueControls.Classes_Editor {
                     return;
             }
             ExportVerzeichnis.Text = Item.Verzeichnis;
-            ExportIntervall.Text = Item.Intervall.ToString();
-            ExportAutomatischLöschen.Text = Item.AutomatischLöschen.ToString();
+            ExportIntervall.Text = Item.BackupInterval.ToString();
+            ExportAutomatischLöschen.Text = Item.AutoDelete.ToString();
             cbxExportFormularID.Text = Item.ExportFormularID;
             ExportSpaltenAnsicht.Text = Item.ExportSpaltenAnsicht.ToString();
             lbxFilter.Item.Clear();
@@ -94,7 +94,7 @@ namespace BlueControls.Classes_Editor {
                     if (!FileExists(t[0])) {
                         lsbExportDateien.Item.Add(t[0], t1, QuickImage.Get(enImageCode.Kritisch), true, "0000");
                     } else {
-                        var q1 = QuickImage.Get(enImageCode.Kugel, 16, Extensions.MixColor(Color.Red, Color.Green, DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / Item.AutomatischLöschen).ToHTMLCode(), "");
+                        var q1 = QuickImage.Get(enImageCode.Kugel, 16, Extensions.MixColor(Color.Red, Color.Green, DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / Item.AutoDelete).ToHTMLCode(), "");
                         lsbExportDateien.Item.Add(t[0], t1, q1, true, DataFormat.CompareKey(t[1], enDataFormat.Datum_und_Uhrzeit));
                     }
                 }
@@ -222,10 +222,10 @@ namespace BlueControls.Classes_Editor {
             }
             Item.Verzeichnis = ExportVerzeichnis.Text;
             if (!string.IsNullOrEmpty(ExportIntervall.Text)) {
-                Item.Intervall = float.Parse(ExportIntervall.Text);
+                Item.BackupInterval = float.Parse(ExportIntervall.Text);
             }
             if (!string.IsNullOrEmpty(ExportAutomatischLöschen.Text)) {
-                Item.AutomatischLöschen = float.Parse(ExportAutomatischLöschen.Text);
+                Item.AutoDelete = float.Parse(ExportAutomatischLöschen.Text);
             }
             Item.ExportFormularID = cbxExportFormularID.Text;
             Item.ExportSpaltenAnsicht = int.Parse(ExportSpaltenAnsicht.Text);

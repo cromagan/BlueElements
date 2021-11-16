@@ -498,7 +498,7 @@ namespace BlueControls.Controls {
             } else {
                 if (column == null) { return null; }  // Bei Steuerelementen, die manuell hinzugefügt werden
                 if (row == null) { return null; }  // Beim initualisieren des Controls und Linked Cell kann das vorkommen
-                Develop.DebugPrint("Column nicht gefunden");
+                Develop.DebugPrint("Column nicht gefunden: " + column.Name + " " + column.Database.Filename);
             }
 
             return gbColumn;

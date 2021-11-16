@@ -520,17 +520,17 @@ namespace BlueBasics.MultiUserFile {
 
         internal bool BlockDateiCheck() {
             if (AgeOfBlockDatei() < 0) {
-                Develop.DebugPrint("Block-Datei Konflikt 4\r\n" + Filename + "\r\nSoll: " + _inhaltBlockdatei);
+                Develop.DebugPrint(enFehlerArt.Info, "Block-Datei Konflikt: Block-Datei zu jung\r\n" + Filename + "\r\nSoll: " + _inhaltBlockdatei);
                 return false;
             }
             try {
                 var Inhalt2 = File.ReadAllText(Blockdateiname(), System.Text.Encoding.UTF8);
                 if (_inhaltBlockdatei != Inhalt2) {
-                    Develop.DebugPrint("Block-Datei Konflikt 3\r\n" + Filename + "\r\nSoll: " + _inhaltBlockdatei + "\r\n\r\nIst: " + Inhalt2);
+                    Develop.DebugPrint(enFehlerArt.Info, "Block-Datei Konflikt: Inhalte unterschiedlich\r\n" + Filename + "\r\nSoll: " + _inhaltBlockdatei + "\r\n\r\nIst: " + Inhalt2);
                     return false;
                 }
             } catch (Exception ex) {
-                Develop.DebugPrint(enFehlerArt.Warnung, ex);
+                Develop.DebugPrint(enFehlerArt.Info, ex);
                 return false;
             }
             return true;
@@ -802,7 +802,7 @@ namespace BlueBasics.MultiUserFile {
                 }
             }
             if (mustDoIt) {
-                Develop.DebugPrint("Block-Datei nicht gelöscht\r\n" + Filename + "\r\nSoll: " + _inhaltBlockdatei);
+                Develop.DebugPrint(enFehlerArt.Info, "Block-Datei nicht gelöscht\r\n" + Filename + "\r\nSoll: " + _inhaltBlockdatei);
             }
             return false;
         }
@@ -831,7 +831,7 @@ namespace BlueBasics.MultiUserFile {
                     }
 
                     if (DateTime.UtcNow.Subtract(StartTime).TotalSeconds > 20) {
-                        Develop.DebugPrint(enFehlerArt.Warnung, f + "\r\n" + Filename);
+                        Develop.DebugPrint(enFehlerArt.Info, f + "\r\n" + Filename);
                     }
 
                     Pause(0.5, false);
@@ -843,6 +843,7 @@ namespace BlueBasics.MultiUserFile {
                     }
                 }
             }
+
             if (_BLoaded.Length > 4 && BitConverter.ToInt32(_BLoaded, 0) == 67324752) {
                 // Gezipte Daten-Kennung gefunden
                 _BLoaded = UnzipIt(_BLoaded);

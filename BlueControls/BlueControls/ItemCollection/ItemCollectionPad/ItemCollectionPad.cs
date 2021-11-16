@@ -714,12 +714,12 @@ namespace BlueControls.ItemCollection {
         }
 
         private void ParseItems(string ToParse) {
-            ToParse = ToParse.Replace("}, Item={ClassID=TEXT", ", Item={ClassID=TEXT");
-            ToParse = ToParse.Replace(", Item={ClassID=TEXT", "}, Item={ClassID=TEXT");
-            ToParse = ToParse.Replace(", }", "}");
-            var tmp = ToParse.IndexOf("Item=");
+            //ToParse = ToParse.Replace("}, Item={ClassID=TEXT", ", Item={ClassID=TEXT");
+            //ToParse = ToParse.Replace(", Item={ClassID=TEXT", "}, Item={ClassID=TEXT");
+            //ToParse = ToParse.Replace(", }", "}");
+            //var tmp = ToParse.IndexOf("Item=");
 
-            ToParse = "{" + ToParse.Substring(tmp);
+            //ToParse = "{" + ToParse.Substring(tmp);
 
             foreach (var pair in ToParse.GetAllTags()) {
                 switch (pair.Key.ToLower()) {

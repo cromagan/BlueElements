@@ -2620,14 +2620,16 @@ namespace BlueControls.Controls {
             }
         }
 
-        private void Draw_Pinned(Graphics gR, Rectangle displayRectangleWOSlider, int startx, int endx) {
-            if (_PinnedRows == null || _PinnedRows.Count == 0) { return; }
+        private void Draw_Pinned(Graphics gr, Rectangle displayRectangleWOSlider, int start_x, int end_x) {
+            if (_PinnedRows == null || _PinnedRows.Count == 0 || gr == null) { return; }
+
             SolidBrush b = new(Color.FromArgb(180, 255, 255, 0));
+
             foreach (var ThisRowItem in _PinnedRows) {
                 var r = SortedRowData().Get(ThisRowItem);
                 var y = DrawY(r);
                 if (y >= 0 && y < displayRectangleWOSlider.Height) {
-                    gR.FillRectangle(b, startx, y, endx - startx, r.DrawHeight);
+                    gr.FillRectangle(b, start_x, y, end_x - start_x, r.DrawHeight);
                 }
             }
         }
