@@ -573,7 +573,7 @@ namespace BlueControls.Forms {
             }
         }
 
-        private void SuchEintragNoSave(enDirection Richtung, out ColumnItem column, out clsRowDrawData row) {
+        private void SuchEintragNoSave(enDirection Richtung, out ColumnItem column, out RowData row) {
             column = TableView.Database.Column[0];
             row = null;
             if (TableView.Database.Row.Count < 1) { return; }

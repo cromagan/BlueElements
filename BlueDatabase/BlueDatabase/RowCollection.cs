@@ -152,11 +152,11 @@ namespace BlueDatabase {
             return Row;
         }
 
-        public List<clsRowDrawData> CalculateSortedRows(List<FilterItem> filter, RowSortDefinition rowSortDefinition, List<RowItem> pinnedRows) => CalculateSortedRows(CalculateVisibleRows(filter, pinnedRows), rowSortDefinition, pinnedRows);
+        public List<RowData> CalculateSortedRows(List<FilterItem> filter, RowSortDefinition rowSortDefinition, List<RowItem> pinnedRows) => CalculateSortedRows(CalculateVisibleRows(filter, pinnedRows), rowSortDefinition, pinnedRows);
 
-        public List<clsRowDrawData> CalculateSortedRows(List<RowItem> visibleRows, RowSortDefinition rowSortDefinition, List<RowItem> pinnedRows) {
-            List<clsRowDrawData> _pinned = new();
-            List<clsRowDrawData> _rows = new();
+        public List<RowData> CalculateSortedRows(List<RowItem> visibleRows, RowSortDefinition rowSortDefinition, List<RowItem> pinnedRows) {
+            List<RowData> _pinned = new();
+            List<RowData> _rows = new();
 
             foreach (var thisRow in visibleRows) {
                 string adk;
@@ -167,7 +167,7 @@ namespace BlueDatabase {
                 }
 
                 if (pinnedRows.Contains(thisRow)) {
-                    _pinned.Add(new clsRowDrawData(thisRow, true, adk, "Angepinnt"));
+                    _pinned.Add(new RowData(thisRow, true, adk, "Angepinnt"));
                 }
 
                 var caps = thisRow.CellGetList(thisRow.Database.Column.SysChapter);
@@ -176,7 +176,7 @@ namespace BlueDatabase {
                 if (caps.Count == 0) { caps.Add(string.Empty); }
 
                 foreach (var thisCap in caps) {
-                    _pinned.Add(new clsRowDrawData(thisRow, true, adk, thisCap));
+                    _pinned.Add(new RowData(thisRow, true, adk, thisCap));
                 }
             }
             _pinned.Sort();

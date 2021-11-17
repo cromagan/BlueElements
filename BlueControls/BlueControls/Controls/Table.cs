@@ -79,7 +79,7 @@ namespace BlueControls.Controls {
 
         private ColumnItem _CursorPosColumn;
 
-        private clsRowDrawData _CursorPosRow;
+        private RowData _CursorPosRow;
 
         private Database _Database;
 
@@ -92,7 +92,7 @@ namespace BlueControls.Controls {
         /// </summary>
         private ColumnItem _MouseOverColumn;
 
-        private clsRowDrawData _MouseOverRow;
+        private RowData _MouseOverRow;
 
         private string _MouseOverText;
 
@@ -105,7 +105,7 @@ namespace BlueControls.Controls {
 
         private RowSortDefinition _sortDefinitionTemporary;
 
-        private List<clsRowDrawData> _SortedRowData;
+        private List<RowData> _SortedRowData;
 
         private string _StoredView = string.Empty;
 
@@ -513,7 +513,7 @@ namespace BlueControls.Controls {
             x.ShowDialog();
         }
 
-        public static void SearchNextText(string searchTXT, Table TableView, ColumnItem column, clsRowDrawData row, out ColumnItem foundColumn, out clsRowDrawData foundRow, bool VereinfachteSuche) {
+        public static void SearchNextText(string searchTXT, Table TableView, ColumnItem column, RowData row, out ColumnItem foundColumn, out RowData foundRow, bool VereinfachteSuche) {
             searchTXT = searchTXT.Trim();
             var ca = TableView.CurrentArrangement;
             if (TableView.Design == enBlueTableAppearance.OnlyMainColumnWithoutHead) {
@@ -641,7 +641,7 @@ namespace BlueControls.Controls {
 
         public void CursorPos_Reset() => CursorPos_Set(null, null, false);
 
-        public void CursorPos_Set(ColumnItem column, clsRowDrawData row, bool ensureVisible) {
+        public void CursorPos_Set(ColumnItem column, RowData row, bool ensureVisible) {
             if (_Database == null || _Database.ColumnArrangements.Count == 0 || CurrentArrangement[column] == null || !SortedRows().Contains(row)) {
                 column = null;
                 row = null;
@@ -658,9 +658,9 @@ namespace BlueControls.Controls {
 
         public ColumnItem CursorPosColumn() => _CursorPosColumn;
 
-        public clsRowDrawData CursorPosRow() => _CursorPosRow;
+        public RowData CursorPosRow() => _CursorPosRow;
 
-        public bool EnsureVisible(ColumnItem Column, clsRowDrawData Row) {
+        public bool EnsureVisible(ColumnItem Column, RowData Row) {
             var ok1 = EnsureVisible(CurrentArrangement[Column]);
             var ok2 = EnsureVisible(Row);
             return ok1 && ok2;
@@ -831,7 +831,7 @@ namespace BlueControls.Controls {
             OnPinnedChanged();
         }
 
-        public List<clsRowDrawData> SortedRows() {
+        public List<RowData> SortedRows() {
             if (AreRowsSorted()) { return _SortedRowData; }
 
             try {
@@ -841,9 +841,9 @@ namespace BlueControls.Controls {
                 var expanded = true;
                 var LastCap = string.Empty;
 
-                List<clsRowDrawData> _SortedRowDataNew;
+                List<RowData> _SortedRowDataNew;
                 if (Database == null) {
-                    _SortedRowDataNew = new List<clsRowDrawData>();
+                    _SortedRowDataNew = new List<RowData>();
                 } else {
                     _SortedRowDataNew = Database.Row.CalculateSortedRows(VisibleRows(), SortUsed(), _PinnedRows);
                 }
@@ -902,21 +902,21 @@ namespace BlueControls.Controls {
             }
         }
 
-        public clsRowDrawData View_NextRow(clsRowDrawData row) {
+        public RowData View_NextRow(RowData row) {
             if (_Database == null) { return null; }
             var RowNr = SortedRows().IndexOf(row);
             return RowNr < 0 || RowNr >= SortedRows().Count - 1 ? null : SortedRows()[RowNr + 1];
         }
 
-        public clsRowDrawData View_PreviousRow(clsRowDrawData row) {
+        public RowData View_PreviousRow(RowData row) {
             if (_Database == null) { return null; }
             var RowNr = SortedRows().IndexOf(row);
             return RowNr < 1 ? null : SortedRows()[RowNr - 1];
         }
 
-        public clsRowDrawData View_RowFirst() => _Database == null ? null : SortedRows().Count == 0 ? null : SortedRows()[0];
+        public RowData View_RowFirst() => _Database == null ? null : SortedRows().Count == 0 ? null : SortedRows()[0];
 
-        public clsRowDrawData View_RowLast() => _Database == null ? null : SortedRows().Count == 0 ? null : SortedRows()[SortedRows().Count - 1];
+        public RowData View_RowLast() => _Database == null ? null : SortedRows().Count == 0 ? null : SortedRows()[SortedRows().Count - 1];
 
         public string ViewToString() {
             var x = "{";
@@ -1881,7 +1881,7 @@ namespace BlueControls.Controls {
 
         private void BTB_NeedDatabaseOfAdditinalSpecialChars(object sender, MultiUserFileGiveBackEventArgs e) => e.File = Database;
 
-        private void Cell_Edit(ColumnItem cellInThisDatabaseColumn, clsRowDrawData cellInThisDatabaseRow, bool WithDropDown) {
+        private void Cell_Edit(ColumnItem cellInThisDatabaseColumn, RowData cellInThisDatabaseRow, bool WithDropDown) {
             Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
             ColumnItem ContentHolderCellColumn;
             RowItem ContentHolderCellRow;
@@ -2021,7 +2021,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        private void Cell_Edit_Color(ColumnItem cellInThisDatabaseColumn, clsRowDrawData cellInThisDatabaseRow) {
+        private void Cell_Edit_Color(ColumnItem cellInThisDatabaseColumn, RowData cellInThisDatabaseRow) {
             ColDia.Color = cellInThisDatabaseRow.Row.CellGetColor(cellInThisDatabaseColumn);
             ColDia.Tag = CellCollection.KeyOfCell(cellInThisDatabaseColumn, cellInThisDatabaseRow.Row);
             List<int> ColList = new();
@@ -2038,7 +2038,7 @@ namespace BlueControls.Controls {
             UserEdited(this, Color.FromArgb(255, ColDia.Color).ToArgb().ToString(), cellInThisDatabaseColumn, cellInThisDatabaseRow?.Row, false, cellInThisDatabaseRow?.Chapter);
         }
 
-        private void Cell_Edit_Dropdown(ColumnItem cellInThisDatabaseColumn, clsRowDrawData cellInThisDatabaseRow, ColumnItem ContentHolderCellColumn, RowItem ContentHolderCellRow) {
+        private void Cell_Edit_Dropdown(ColumnItem cellInThisDatabaseColumn, RowData cellInThisDatabaseRow, ColumnItem ContentHolderCellColumn, RowItem ContentHolderCellRow) {
             if (cellInThisDatabaseColumn != ContentHolderCellColumn) {
                 if (ContentHolderCellRow == null) {
                     NotEditableInfo("Bei Zellverweisen kann keine neue Zeile erstellt werden.");
@@ -2077,13 +2077,13 @@ namespace BlueControls.Controls {
             Develop.Debugprint_BackgroundThread();
         }
 
-        private void Cell_Edit_FileSystem(ColumnItem cellInThisDatabaseColumn, clsRowDrawData cellInThisDatabaseRow) {
+        private void Cell_Edit_FileSystem(ColumnItem cellInThisDatabaseColumn, RowData cellInThisDatabaseRow) {
             var l = FileSystem(cellInThisDatabaseColumn);
             if (l == null) { return; }
             UserEdited(this, l.JoinWithCr(), cellInThisDatabaseColumn, cellInThisDatabaseRow?.Row, false, cellInThisDatabaseRow?.Chapter);
         }
 
-        private bool Cell_Edit_TextBox(ColumnItem cellInThisDatabaseColumn, clsRowDrawData cellInThisDatabaseRow, ColumnItem ContentHolderCellColumn, RowItem ContentHolderCellRow, TextBox Box, int AddWith, int IsHeight) {
+        private bool Cell_Edit_TextBox(ColumnItem cellInThisDatabaseColumn, RowData cellInThisDatabaseRow, ColumnItem ContentHolderCellColumn, RowItem ContentHolderCellRow, TextBox Box, int AddWith, int IsHeight) {
             if (ContentHolderCellColumn != cellInThisDatabaseColumn) {
                 if (ContentHolderCellRow == null) {
                     NotEditableInfo("Bei Zellverweisen kann keine neue Zeile erstellt werden.");
@@ -2130,7 +2130,7 @@ namespace BlueControls.Controls {
             return true;
         }
 
-        private void CellOnCoordinate(int Xpos, int Ypos, out ColumnItem Column, out clsRowDrawData Row) {
+        private void CellOnCoordinate(int Xpos, int Ypos, out ColumnItem Column, out RowData Row) {
             Column = ColumnOnCoordinate(Xpos);
             Row = RowOnCoordinate(Ypos);
         }
@@ -2323,7 +2323,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        private void Draw_CellAsButton(Graphics gR, ColumnViewItem cellInThisDatabaseColumn, clsRowDrawData cellInThisDatabaseRow, int drawColumnWidth) {
+        private void Draw_CellAsButton(Graphics gR, ColumnViewItem cellInThisDatabaseColumn, RowData cellInThisDatabaseRow, int drawColumnWidth) {
             ButtonCellEventArgs e = new(cellInThisDatabaseColumn.Column, cellInThisDatabaseRow.Row);
             OnNeedButtonArgs(e);
             Rectangle r = new((int)cellInThisDatabaseColumn.OrderTMP_Spalte_X1,
@@ -2345,7 +2345,7 @@ namespace BlueControls.Controls {
         /// <param name="displayRectangleWOSlider"></param>
         /// <param name="vDesign"></param>
         /// <param name="vState"></param>
-        private void Draw_CellListBox(Graphics GR, ColumnViewItem Column, clsRowDrawData Row, Rectangle displayRectangleWOSlider, enDesign vDesign, enStates vState) {
+        private void Draw_CellListBox(Graphics GR, ColumnViewItem Column, RowData Row, Rectangle displayRectangleWOSlider, enDesign vDesign, enStates vState) {
             Skin.Draw_Back(GR, vDesign, vState, displayRectangleWOSlider, null, false);
             Skin.Draw_Border(GR, vDesign, vState, displayRectangleWOSlider);
             var f = Skin.GetBlueFont(vDesign, vState);
@@ -2361,7 +2361,7 @@ namespace BlueControls.Controls {
         /// <param name="cellInThisDatabaseRow"></param>
         /// <param name="displayRectangleWOSlider"></param>
         /// <param name="vfont"></param>
-        private void Draw_CellTransparent(Graphics GR, ColumnViewItem cellInThisDatabaseColumn, clsRowDrawData cellInThisDatabaseRow, Rectangle displayRectangleWOSlider, BlueFont vfont) {
+        private void Draw_CellTransparent(Graphics GR, ColumnViewItem cellInThisDatabaseColumn, RowData cellInThisDatabaseRow, Rectangle displayRectangleWOSlider, BlueFont vfont) {
             if (cellInThisDatabaseRow == null) { return; }
             if (cellInThisDatabaseColumn.Column.Format == enDataFormat.LinkedCell) {
                 (var lcolumn, var lrow) = CellCollection.LinkedCellData(cellInThisDatabaseColumn.Column, cellInThisDatabaseRow.Row, false, false);
@@ -2384,7 +2384,7 @@ namespace BlueControls.Controls {
         /// <param name="ContentHolderCellRow"></param>
         /// <param name="displayRectangleWOSlider"></param>
         /// <param name="vfont"></param>
-        private void Draw_CellTransparentDirect(Graphics GR, ColumnViewItem cellInThisDatabaseColumn, clsRowDrawData cellInThisDatabaseRow, ColumnItem ContentHolderCellColumn, RowItem ContentHolderCellRow, Rectangle displayRectangleWOSlider, BlueFont vfont) {
+        private void Draw_CellTransparentDirect(Graphics GR, ColumnViewItem cellInThisDatabaseColumn, RowData cellInThisDatabaseRow, ColumnItem ContentHolderCellColumn, RowItem ContentHolderCellRow, Rectangle displayRectangleWOSlider, BlueFont vfont) {
             //var rh = Row_DrawHeight(cellInThisDatabaseRow, displayRectangleWOSlider);
             var cw = Column_DrawWidth(cellInThisDatabaseColumn, displayRectangleWOSlider);
             if (cellInThisDatabaseColumn.Column.Format == enDataFormat.Button) {
@@ -2787,7 +2787,7 @@ namespace BlueControls.Controls {
             Skin.Draw_Border(GR, enDesign.Table_And_Pad, enStates.Standard_Disabled, DisplayRectangle);
         }
 
-        private int DrawY(clsRowDrawData r) => r == null ? 0 : r.Y + HeadSize() - (int)SliderY.Value;
+        private int DrawY(RowData r) => r == null ? 0 : r.Y + HeadSize() - (int)SliderY.Value;
 
         private void DropDownMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
             FloatingForm.Close(this);
@@ -2831,7 +2831,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        private bool EnsureVisible(clsRowDrawData rowdata) {
+        private bool EnsureVisible(RowData rowdata) {
             if (rowdata == null) { return false; }
             var r = DisplayRectangleWithoutSlider();
             if (DrawY(rowdata) < HeadSize()) {
@@ -2949,9 +2949,9 @@ namespace BlueControls.Controls {
             return false;
         }
 
-        private bool IsOnScreen(ColumnItem column, clsRowDrawData row, Rectangle displayRectangleWOSlider) => IsOnScreen(CurrentArrangement[column], displayRectangleWOSlider) && IsOnScreen(row, displayRectangleWOSlider);
+        private bool IsOnScreen(ColumnItem column, RowData row, Rectangle displayRectangleWOSlider) => IsOnScreen(CurrentArrangement[column], displayRectangleWOSlider) && IsOnScreen(row, displayRectangleWOSlider);
 
-        private bool IsOnScreen(clsRowDrawData vrow, Rectangle displayRectangleWOSlider) => vrow != null && DrawY(vrow) + vrow.DrawHeight >= HeadSize() && DrawY(vrow) <= displayRectangleWOSlider.Height;
+        private bool IsOnScreen(RowData vrow, Rectangle displayRectangleWOSlider) => vrow != null && DrawY(vrow) + vrow.DrawHeight >= HeadSize() && DrawY(vrow) <= displayRectangleWOSlider.Height;
 
         private bool Mouse_IsInAutofilter(ColumnViewItem ViewItem, System.Windows.Forms.MouseEventArgs e) => ViewItem != null && ViewItem._TMP_AutoFilterLocation.Width != 0 && ViewItem.Column.AutoFilterSymbolPossible() && ViewItem._TMP_AutoFilterLocation.Contains(e.X, e.Y);
 
@@ -2962,7 +2962,7 @@ namespace BlueControls.Controls {
         /// Gibt des keine Nachbarszelle, wird die Eingangszelle zurückgegeben.
         /// </summary>
         /// <remarks></remarks>
-        private void Neighbour(ColumnItem column, clsRowDrawData row, enDirection direction, out ColumnItem newColumn, out clsRowDrawData newRow) {
+        private void Neighbour(ColumnItem column, RowData row, enDirection direction, out ColumnItem newColumn, out RowData newRow) {
             newColumn = column;
             newRow = row;
             if (_Design == enBlueTableAppearance.OnlyMainColumnWithoutHead) {
@@ -3058,7 +3058,7 @@ namespace BlueControls.Controls {
             return string.Empty;
         }
 
-        private clsRowDrawData RowOnCoordinate(int pixelY) {
+        private RowData RowOnCoordinate(int pixelY) {
             if (_Database == null || pixelY <= HeadSize()) { return null; }
             var s = SortedRows();
             foreach (var ThisRowItem in s) {

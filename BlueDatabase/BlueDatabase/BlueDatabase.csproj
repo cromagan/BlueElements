@@ -81,7 +81,7 @@
     <Compile Include="AdditionalScriptComands\Method_SetError.cs" />
     <Compile Include="CellCollection.cs" />
     <Compile Include="CellItem.cs" />
-    <Compile Include="clsRowDrawData.cs" />
+    <Compile Include="RowData.cs" />
     <Compile Include="ColumnCollection.cs" />
     <Compile Include="ColumnItem.cs" />
     <Compile Include="ColumnViewCollection.cs" />

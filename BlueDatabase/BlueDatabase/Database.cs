@@ -451,11 +451,11 @@ namespace BlueDatabase {
             return Column_All.SortedDistinctList();
         }
 
-        public List<clsRowDrawData> AllRows() {
-            var sortedRows = new List<clsRowDrawData>();
+        public List<RowData> AllRows() {
+            var sortedRows = new List<RowData>();
             foreach (var thisRowItem in Row) {
                 if (thisRowItem != null) {
-                    sortedRows.Add(new clsRowDrawData(thisRowItem));
+                    sortedRows.Add(new RowData(thisRowItem));
                 }
             }
             return sortedRows;
@@ -483,7 +483,7 @@ namespace BlueDatabase {
         /// <param name="column">Die Spalte, die zurückgegeben wird.</param>
         /// <param name="sortedRows">Die Zeilen, die zurückgegeben werden. NULL gibt alle Zeilen zurück.</param>
         /// <returns></returns>
-        public string Export_CSV(enFirstRow firstRow, ColumnItem column, List<clsRowDrawData> sortedRows) =>
+        public string Export_CSV(enFirstRow firstRow, ColumnItem column, List<RowData> sortedRows) =>
             //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
             Export_CSV(firstRow, new List<ColumnItem>() { column }, sortedRows);
 
@@ -494,7 +494,7 @@ namespace BlueDatabase {
         /// <param name="columnList">Die Spalten, die zurückgegeben werden. NULL gibt alle Spalten zurück.</param>
         /// <param name="sortedRows">Die Zeilen, die zurückgegeben werden. NULL gibt alle ZEilen zurück.</param>
         /// <returns></returns>
-        public string Export_CSV(enFirstRow firstRow, List<ColumnItem> columnList, List<clsRowDrawData> sortedRows) {
+        public string Export_CSV(enFirstRow firstRow, List<ColumnItem> columnList, List<RowData> sortedRows) {
             if (columnList == null) {
                 columnList = new List<ColumnItem>();
                 foreach (var ThisColumnItem in Column) {
@@ -565,7 +565,7 @@ namespace BlueDatabase {
         /// <param name="arrangement">Die Spalten, die zurückgegeben werden. NULL gibt alle Spalten zurück.</param>
         /// <param name="sortedRows">Die Zeilen, die zurückgegeben werden. NULL gibt alle ZEilen zurück.</param>
         /// <returns></returns>
-        public string Export_CSV(enFirstRow firstRow, ColumnViewCollection arrangement, List<clsRowDrawData> sortedRows) =>
+        public string Export_CSV(enFirstRow firstRow, ColumnViewCollection arrangement, List<RowData> sortedRows) =>
             Export_CSV(firstRow, arrangement.ListOfUsedColumn(), sortedRows);
 
         /// <summary>
@@ -586,7 +586,7 @@ namespace BlueDatabase {
         /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
         /// </summary>
         /// <returns></returns>
-        public void Export_HTML(string filename, List<ColumnItem> columnList, List<clsRowDrawData> sortedRows, bool execute) {
+        public void Export_HTML(string filename, List<ColumnItem> columnList, List<RowData> sortedRows, bool execute) {
             if (columnList == null || columnList.Count == 0) {
                 columnList = new List<ColumnItem>();
                 foreach (var ThisColumnItem in Column) {
@@ -658,7 +658,7 @@ namespace BlueDatabase {
         /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
         /// </summary>
         /// <returns></returns>
-        public void Export_HTML(string filename, ColumnViewCollection arrangement, List<clsRowDrawData> sortedRows, bool execute) => Export_HTML(filename, arrangement.ListOfUsedColumn(), sortedRows, execute);
+        public void Export_HTML(string filename, ColumnViewCollection arrangement, List<RowData> sortedRows, bool execute) => Export_HTML(filename, arrangement.ListOfUsedColumn(), sortedRows, execute);
 
         public override bool HasPendingChanges() {
             try {

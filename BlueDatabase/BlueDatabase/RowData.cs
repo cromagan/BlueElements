@@ -29,14 +29,14 @@ namespace BlueDatabase {
 
         #region Methods
 
-        public static clsRowDrawData Get(this List<clsRowDrawData> l, RowItem row) {
+        public static RowData Get(this List<RowData> l, RowItem row) {
             foreach (var thisr in l) {
                 if (thisr?.Row == row) { return thisr; }
             }
             return null;
         }
 
-        public static clsRowDrawData Get(this List<clsRowDrawData> l, RowItem row, string chapter) {
+        public static RowData Get(this List<RowData> l, RowItem row, string chapter) {
             foreach (var thisr in l) {
                 if (thisr?.Row == row && thisr.Chapter == chapter) { return thisr; }
             }
@@ -53,26 +53,31 @@ namespace BlueDatabase {
         //}
     }
 
-    public class clsRowDrawData : IComparable, ICompareKey {
+    /// <summary>
+    /// Enthält Daten, wie eine Zeile angezeigt werden soll.
+    /// RowData kann mehrfach in einer Tabelle angezeigt werden.
+    /// Ein RowItem ist einzigartig, kann aber in mehreren RowData enthalten sein.
+    /// </summary>
+    public class RowData : IComparable, ICompareKey {
 
         #region Fields
 
+        public readonly string Chapter;
+        public readonly bool Pinned;
+        public readonly RowItem Row;
         public string AdditionalSort;
         public Rectangle CaptionPos;
-        public string Chapter;
         public int DrawHeight;
         public bool Expanded;
-        public bool Pinned;
-        public RowItem Row;
         public int Y;
 
         #endregion
 
         #region Constructors
 
-        public clsRowDrawData(RowItem row) : this(row, false, string.Empty, string.Empty) { }
+        public RowData(RowItem row) : this(row, false, string.Empty, string.Empty) { }
 
-        public clsRowDrawData(RowItem row, bool pinned, string additionalSort, string chapter) {
+        public RowData(RowItem row, bool pinned, string additionalSort, string chapter) {
             Row = row;
             Pinned = pinned;
             Y = -1;
@@ -96,7 +101,7 @@ namespace BlueDatabase {
         }
 
         public int CompareTo(object obj) {
-            if (obj is clsRowDrawData robj) {
+            if (obj is RowData robj) {
                 return CompareKey().CompareTo(robj.CompareKey());
             } else {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Objecttyp!");

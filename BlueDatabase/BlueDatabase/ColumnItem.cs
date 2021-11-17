@@ -1554,7 +1554,7 @@ namespace BlueDatabase {
             return summ;
         }
 
-        public double? Summe(List<clsRowDrawData> sort) {
+        public double? Summe(List<RowData> sort) {
             double summ = 0;
             foreach (var thisrow in sort) {
                 if (thisrow != null) {

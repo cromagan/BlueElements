@@ -31,7 +31,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private readonly Table _BlueTable;
         private ColumnItem _col = null;
-        private clsRowDrawData _row = null;
+        private RowData _row = null;
 
         #endregion
 
