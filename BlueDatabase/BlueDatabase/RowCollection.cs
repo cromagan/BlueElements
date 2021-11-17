@@ -152,49 +152,60 @@ namespace BlueDatabase {
             return Row;
         }
 
-        public List<RowItem> CalculateSortedRows(List<FilterItem> filter, RowSortDefinition rowSortDefinition, List<RowItem> pinnedRows) {
-            List<string> TMP = new();
+        public List<clsRowDrawData> CalculateSortedRows(List<FilterItem> filter, RowSortDefinition rowSortDefinition, List<RowItem> pinnedRows) => CalculateSortedRows(CalculateVisibleRows(filter, pinnedRows), rowSortDefinition, pinnedRows);
+
+        public List<clsRowDrawData> CalculateSortedRows(List<RowItem> visibleRows, RowSortDefinition rowSortDefinition, List<RowItem> pinnedRows) {
+            List<clsRowDrawData> _pinned = new();
+            List<clsRowDrawData> _rows = new();
+
+            foreach (var thisRow in visibleRows) {
+                string adk;
+                if (rowSortDefinition == null) {
+                    adk = thisRow.CompareKey(null);
+                } else {
+                    adk = thisRow.CompareKey(rowSortDefinition.Columns);
+                }
+
+                if (pinnedRows.Contains(thisRow)) {
+                    _pinned.Add(new clsRowDrawData(thisRow, true, adk, "Angepinnt"));
+                }
+
+                var caps = thisRow.CellGetList(thisRow.Database.Column.SysChapter);
+
+                if (caps.Count == 0 && _pinned.Count > 0) { caps.Add("Weitere Zeilen"); }
+                if (caps.Count == 0) { caps.Add(string.Empty); }
+
+                foreach (var thisCap in caps) {
+                    _pinned.Add(new clsRowDrawData(thisRow, true, adk, thisCap));
+                }
+            }
+            _pinned.Sort();
+            _rows.Sort();
+
+            if (rowSortDefinition.Reverse) { _rows.Reverse(); }
+
+            _rows.InsertRange(0, _pinned);
+            return _rows;
+        }
+
+        /// <summary>
+        /// Gibt die mit dieser Kombination sichtbaren Zeilen zurück. Ohne Sortierung. Jede Zeile kann maximal einmal vorkommen.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="pinnedRows"></param>
+        /// <returns></returns>
+        public List<RowItem> CalculateVisibleRows(List<FilterItem> filter, List<RowItem> pinnedRows) {
             List<RowItem> _tmpSortedRows = new();
             if (pinnedRows == null) { pinnedRows = new List<RowItem>(); }
 
-            foreach (var ThisRowItem in Database.Row) {
-                if (ThisRowItem != null) {
-                    if (ThisRowItem.MatchesTo(filter) && !pinnedRows.Contains(ThisRowItem)) {
-                        if (rowSortDefinition == null) {
-                            TMP.Add(ThisRowItem.CompareKey(null));
-                        } else {
-                            TMP.Add(ThisRowItem.CompareKey(rowSortDefinition.Columns));
-                        }
-                    }
-                }
-            }
-            TMP.Sort();
-
-            int cc;
-            if (rowSortDefinition == null || !rowSortDefinition.Reverse) {
-                foreach (var t in TMP) {
-                    if (!string.IsNullOrEmpty(t)) {
-                        cc = t.IndexOf(Constants.SecondSortChar + "<key>");
-                        _tmpSortedRows.Add(Database.Row.SearchByKey(int.Parse(t.Substring(cc + 6))));
-                    }
-                }
-            } else {
-                for (var z = TMP.Count - 1; z > -1; z--) {
-                    if (!string.IsNullOrEmpty(TMP[z])) {
-                        cc = TMP[z].IndexOf(Constants.SecondSortChar + "<key>");
-                        _tmpSortedRows.Add(Database.Row.SearchByKey(int.Parse(TMP[z].Substring(cc + 6))));
+            foreach (var thisRowItem in Database.Row) {
+                if (thisRowItem != null) {
+                    if (thisRowItem.MatchesTo(filter) && !pinnedRows.Contains(thisRowItem)) {
+                        _tmpSortedRows.Add(thisRowItem);
                     }
                 }
             }
 
-            List<RowItem> newPinned = new();
-            foreach (var thisPinned in pinnedRows) {
-                if (Database.Row.Contains(thisPinned)) {
-                    newPinned.Add(thisPinned);
-                }
-            }
-
-            _tmpSortedRows.InsertRange(0, newPinned);
             return _tmpSortedRows;
         }
 
@@ -208,7 +219,7 @@ namespace BlueDatabase {
 
         public void DoAutomatic(FilterCollection filter, bool fullCheck, List<RowItem> pinned, string startroutine) {
             if (Database.ReadOnly) { return; }
-            DoAutomatic(CalculateSortedRows(filter, null, pinned), fullCheck, startroutine);
+            DoAutomatic(CalculateVisibleRows(filter, pinned), fullCheck, startroutine);
         }
 
         public void DoAutomatic(List<RowItem> x, bool fullCheck, string startroutine) {

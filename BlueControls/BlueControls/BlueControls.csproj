@@ -274,7 +274,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="clsDesign.cs" />
-    <Compile Include="clsRowDrawData.cs" />
     <Compile Include="ScriptEditor.cs">
       <SubType>Component</SubType>
     </Compile>

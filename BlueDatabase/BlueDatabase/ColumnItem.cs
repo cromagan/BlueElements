@@ -1495,7 +1495,7 @@ namespace BlueDatabase {
         }
 
         public void Statisik(List<FilterItem> filter, List<RowItem> pinnedRows) {
-            var r = Database.Row.CalculateSortedRows(filter, null, pinnedRows);
+            var r = Database.Row.CalculateVisibleRows(filter, pinnedRows);
 
             if (r == null || r.Count < 1) { return; }
 
@@ -1554,13 +1554,13 @@ namespace BlueDatabase {
             return summ;
         }
 
-        public double? Summe(List<RowItem> sort) {
+        public double? Summe(List<clsRowDrawData> sort) {
             double summ = 0;
             foreach (var thisrow in sort) {
                 if (thisrow != null) {
-                    if (!thisrow.CellIsNullOrEmpty(this)) {
-                        if (!thisrow.CellGetString(this).IsDouble()) { return null; }
-                        summ += thisrow.CellGetDouble(this);
+                    if (!thisrow.Row.CellIsNullOrEmpty(this)) {
+                        if (!thisrow.Row.CellGetString(this).IsDouble()) { return null; }
+                        summ += thisrow.Row.CellGetDouble(this);
                     }
                 }
             }

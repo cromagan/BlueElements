@@ -45,11 +45,9 @@ namespace BlueControls.Forms {
 
         #region Constructors
 
-        public frmTableView() : this(null, true, true) {
-        }
+        public frmTableView() : this(null, true, true) { }
 
-        public frmTableView(Database Database) : this(Database, false, false) {
-        }
+        public frmTableView(Database Database) : this(Database, false, false) { }
 
         public frmTableView(Database database, bool loadTabVisible, bool adminTabVisible) {
             InitializeComponent();
@@ -88,15 +86,6 @@ namespace BlueControls.Forms {
         #endregion
 
         #region Methods
-
-        //private void btnTextLöschen_Click(object sender, System.EventArgs e)
-        //{
-        //    ZeilenFilter_TextFeld.Text = string.Empty;
-        //}
-        public List<RowItem> GetFilteredItems() {
-            ShowDialog();
-            return TableView.SortedRows();
-        }
 
         public void LöscheZeile(object sender, System.EventArgs e) {
             Formula.HideViewEditor();
@@ -199,40 +188,6 @@ namespace BlueControls.Forms {
             base.OnFormClosing(e);
         }
 
-        //private void ZeilenFilter_TextFeld_TextChanged(object sender, System.EventArgs e)
-        //{
-        //    if (grpFilter.Visible == false) { return; }
-        //    var NeuerT = ZeilenFilter_TextFeld.Text.TrimStart();
-        //    NeuerT = NeuerT.TrimStart('+');
-        //    NeuerT = NeuerT.Replace("++", "+");
-        //    if (NeuerT == "+") { NeuerT = string.Empty; }
-        //    if (NeuerT != ZeilenFilter_TextFeld.Text)
-        //    {
-        //        ZeilenFilter_TextFeld.Text = NeuerT;
-        //        return;
-        //    }
-        //    Filter_ZeilenFilterSetzen();
-        //}
-        //private void ZeilenFilter_TextFeld_Enter(object sender, System.EventArgs e)
-        //{
-        //    Filter_ZeilenFilterSetzen();
-        //}
-        //private void Filter_ZeilenFilterSetzen()
-        //{
-        //    if (TableView.Database != null) { TableView.Filter.Remove_RowFilter(); }
-        //    if (TableView.Database != null && !string.IsNullOrEmpty(ZeilenFilter_TextFeld.Text))
-        //    {
-        //        TableView.Filter.Add(enFilterType.Instr_UND_GroßKleinEgal, new List<string>(ZeilenFilter_TextFeld.Text.SplitAndCutBy("+")));
-        //    }
-        //}
-        //private void AlleFilterAus_Click(object sender, System.EventArgs e)
-        //{
-        //    ZeilenFilter_TextFeld.Text = string.Empty;
-        //    if (TableView.Filter != null)
-        //    {
-        //        TableView.Filter.Clear();
-        //    }
-        //}
         protected override void OnLoad(System.EventArgs e) {
             base.OnLoad(e);
             CheckButtons();
@@ -324,8 +279,7 @@ namespace BlueControls.Forms {
             TableView.Arrangement = int.Parse(e.Item.Internal);
         }
 
-        private void Check_SuchButton() => SuchB.Enabled = TableView.Database != null && TableView.Database.Row.Count >= 1
-&& !string.IsNullOrEmpty(such.Text) && !string.IsNullOrEmpty(such.Text.RemoveChars(" "));
+        private void Check_SuchButton() => SuchB.Enabled = TableView.Database != null && TableView.Database.Row.Count >= 1 && !string.IsNullOrEmpty(such.Text) && !string.IsNullOrEmpty(such.Text.RemoveChars(" "));
 
         private void CheckButtons() {
             var DatenbankDa = Convert.ToBoolean(TableView.Database != null);
@@ -409,7 +363,7 @@ namespace BlueControls.Forms {
                     if (Ansicht1.Checked && Formula.ShowingRow != null) {
                         selectedRows.Add(Formula.ShowingRow);
                     } else {
-                        selectedRows = TableView.SortedRows(); //Database.Column().Liste_SingleRow(0, enListenOptionen.MitFilter_Sortiert_Unique)
+                        selectedRows = TableView.VisibleRows();
                     }
                     using (ExportDialog l = new(TableView.Database, selectedRows)) {
                         l.ShowDialog();
@@ -491,7 +445,7 @@ namespace BlueControls.Forms {
                     if (TableView.CursorPosRow() == null && TableView.View_RowFirst() != null) {
                         TableView.CursorPos_Set(TableView.Database.Column[0], TableView.View_RowFirst(), false);
                     }
-                    if (TableView.CursorPosRow() != null) { Formula.ShowingRowKey = TableView.CursorPosRow().Key; }
+                    if (TableView.CursorPosRow() != null) { Formula.ShowingRowKey = TableView.CursorPosRow().Row.Key; }
                 }
             } else {
                 Formula.ShowingRowKey = -1;
@@ -529,7 +483,10 @@ namespace BlueControls.Forms {
                 enDataFormat.Datum_und_Uhrzeit => TableView.Database.Row.Add(NameRepair(DateTime.Now.ToString(Constants.Format_Date5), null)),
                 _ => TableView.Database.Row.Add(NameRepair("Neuer Eintrag", null)),
             };
-            TableView.CursorPos_Set(TableView.Database.Column[0], vRow, true);
+
+            var l = TableView.SortedRows();
+
+            TableView.CursorPos_Set(TableView.Database.Column[0], l.Get(vRow), true);
         }
 
         private void Ordn_Click(object sender, System.EventArgs e) {
@@ -558,7 +515,7 @@ namespace BlueControls.Forms {
                 MessageBox.Show("Bitte Text zum Suchen eingeben.", enImageCode.Information, "OK");
                 return;
             }
-            Table.SearchNextText(SuchtT, TableView, null, Formula.ShowingRow, out _, out var GefRow, true);
+            Table.SearchNextText(SuchtT, TableView, null, TableView.CursorPosRow(), out _, out var GefRow, true);
             //var CheckRow = BlueFormulax.ShowingRow;
             //RowItem GefRow = null;
             //if (CheckRow == null) { CheckRow = TableView.View_RowFirst(); }
@@ -608,7 +565,7 @@ namespace BlueControls.Forms {
             if (GefRow == null) {
                 MessageBox.Show("Kein Eintrag gefunden!", enImageCode.Information, "OK");
             } else {
-                if (GefRow == Formula.ShowingRow) {
+                if (GefRow?.Row == Formula.ShowingRow) {
                     MessageBox.Show("Text nur im <b>aktuellen Eintrag</b> gefunden,<br>aber sonst keine weiteren Einträge!", enImageCode.Information, "OK");
                 } else {
                     TableView.CursorPos_Set(TableView.Database.Column[0], GefRow, true);
@@ -616,17 +573,17 @@ namespace BlueControls.Forms {
             }
         }
 
-        private void SuchEintragNoSave(enDirection Richtung, out ColumnItem column, out RowItem row) {
+        private void SuchEintragNoSave(enDirection Richtung, out ColumnItem column, out clsRowDrawData row) {
             column = TableView.Database.Column[0];
             row = null;
             if (TableView.Database.Row.Count < 1) { return; }
             // Temporär berechnen, um geflacker zu vermeiden (Endabled - > Disabled bei Nothing)
             if (Convert.ToBoolean(Richtung & enDirection.Unten)) {
-                row = TableView.View_NextRow(Formula.ShowingRow);
+                row = TableView.View_NextRow(TableView.CursorPosRow());
                 if (row == null) { row = TableView.View_RowFirst(); }
             }
             if (Convert.ToBoolean(Richtung & enDirection.Oben)) {
-                row = TableView.View_PreviousRow(Formula.ShowingRow);
+                row = TableView.View_PreviousRow(TableView.CursorPosRow());
                 if (row == null) { row = TableView.View_RowLast(); }
             }
             if (row == null) { row = TableView.View_RowFirst(); }
@@ -665,12 +622,13 @@ namespace BlueControls.Forms {
             e.UserMenu.Add("Zeile prüfen", "Fehlersuche", enImageCode.Zeile, Row != null);
         }
 
-        private void TableView_CursorPosChanged(object sender, CellEventArgs e) {
+        private void TableView_CursorPosChanged(object sender, CellExtEventArgs e) {
             if (InvokeRequired) {
                 Invoke(new Action(() => TableView_CursorPosChanged(sender, e)));
                 return;
             }
-            Formula.ShowingRowKey = e.Column == null || _Ansicht == enAnsicht.Nur_Tabelle || e.Row == null ? -1 : e.Row.Key;
+            Formula.ShowingRowKey = e.Column == null || _Ansicht == enAnsicht.Nur_Tabelle || e.Row == null ? -1 : e.Row.Row.Key;
+
             if (_Ansicht == enAnsicht.Überschriften_und_Formular) {
                 TableView.EnsureVisible(e.Column, e.Row);
             }

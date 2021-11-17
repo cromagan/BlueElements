@@ -69,10 +69,12 @@ namespace BlueDatabase {
 
         public static string AutomaticInitalValue(ColumnItem column, RowItem row) {
             if (column == null || row == null) { return string.Empty; }
+
             if (column.Format == enDataFormat.LinkedCell) {
                 (var lcolumn, var lrow) = LinkedCellData(column, row, true, true);
                 return AutomaticInitalValue(lcolumn, lrow);
             }
+
             if (column.VorschlagsColumn < 0) { return string.Empty; }
             var cc = column.Database.Column.SearchByKey(column.VorschlagsColumn);
             if (cc == null) { return string.Empty; }
@@ -81,7 +83,7 @@ namespace BlueDatabase {
                 new FilterItem(cc, enFilterType.Istgleich_GroßKleinEgal, row.CellGetString(cc)),
                 new FilterItem(column, enFilterType.Ungleich_MultiRowIgnorieren, string.Empty)
             };
-            var rows = column.Database.Row.CalculateSortedRows(F, null, null);
+            var rows = column.Database.Row.CalculateVisibleRows(F, null);
             rows.Remove(row);
             return rows.Count == 0 ? string.Empty : rows[0].CellGetString(column);
         }

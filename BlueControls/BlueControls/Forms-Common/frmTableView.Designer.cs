@@ -144,7 +144,7 @@ namespace BlueControls.Forms
             this.TableView.ColumnArrangementChanged += new System.EventHandler(this.TableView_ColumnArrangementChanged);
             this.TableView.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.TableView_ContextMenu_Init);
             this.TableView.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.TableView_ContextMenuItemClicked);
-            this.TableView.CursorPosChanged += new System.EventHandler<BlueDatabase.EventArgs.CellEventArgs>(this.TableView_CursorPosChanged);
+            this.TableView.CursorPosChanged += new System.EventHandler<BlueDatabase.EventArgs.CellExtEventArgs>(this.TableView_CursorPosChanged);
             this.TableView.EditBeforeBeginEdit += new System.EventHandler<BlueDatabase.EventArgs.CellCancelEventArgs>(this.TableView_EditBeforeBeginEdit);
             this.TableView.ViewChanged += new System.EventHandler(this.TableView_ViewChanged);
             this.TableView.VisibleRowsChanged += new System.EventHandler(this.TableView_RowsSorted);

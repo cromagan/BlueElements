@@ -44,7 +44,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             _BlueTable = table;
             _BlueTable.CursorPosChanged += CursorPosChanged;
-            CursorPosChanged(_BlueTable, new CellEventArgs(_BlueTable.CursorPosColumn(), _BlueTable.CursorPosRow()));
+            CursorPosChanged(_BlueTable, new CellExtEventArgs(_BlueTable.CursorPosColumn(), _BlueTable.CursorPosRow()));
         }
 
         #endregion
@@ -103,7 +103,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             ers.Enabled = CanDo;
         }
 
-        private void CursorPosChanged(object sender, CellEventArgs e) {
+        private void CursorPosChanged(object sender, CellExtEventArgs e) {
             NurinAktuellerSpalte.Text = e.Column == null ? "Nur in der <b>aktuell gewählten Spalte</b> ersetzen."
                                                          : "Nur in Spalte <b>'" + e.Column.ReadableText() + "'</b> ersetzen.";
             Checkbuttons();

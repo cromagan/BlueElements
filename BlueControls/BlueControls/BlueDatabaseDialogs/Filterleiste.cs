@@ -366,11 +366,13 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void btnÄhnliche_Click(object sender, System.EventArgs e) {
             List<FilterItem> fl = new() { new FilterItem(_TableView.Database.Column[0], enFilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text) };
-            var r = _TableView.Database.Row.CalculateSortedRows(fl, null, null);
+
+            var r = _TableView.Database.Row.CalculateVisibleRows(fl, null);
             if (r == null || r.Count != 1 || _ähnliche == null || _ähnliche.Count == 0) {
                 MessageBox.Show("Aktion fehlgeschlagen", enImageCode.Information, "OK");
                 return;
             }
+
             btnAlleFilterAus_Click(null, null);
             foreach (var thiscolumnitem in _ähnliche) {
                 if (thiscolumnitem.Column.AutoFilterSymbolPossible()) {
@@ -401,7 +403,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void btnPin_Click(object sender, System.EventArgs e) {
             if (_TableView == null) { return; }
-            _TableView.Pin(_TableView.SortedRows());
+            _TableView.Pin(_TableView.VisibleRows());
         }
 
         private void btnPinZurück_Click(object sender, System.EventArgs e) {
@@ -424,13 +426,13 @@ namespace BlueControls.BlueDatabaseDialogs {
                 btnÄhnliche.Visible = false;
             }
             if (_AutoPin && r != null && r.Count == 1) {
-                if (_LastLooked != r[0].CellFirstString()) {
-                    var l = _TableView.SortedRows();
-                    if (!l.Contains(r[0])) {
+                if (_LastLooked != r[0].Row.CellFirstString()) {
+                    var l = _TableView.VisibleRows();
+                    if (!l.Contains(r[0].Row)) {
                         if (MessageBox.Show("Die Zeile wird durch Filterungen <b>ausgeblendet</b>.<br>Soll sie zusätzlich <b>angepinnt</b> werden?", enImageCode.Pinnadel, "Ja", "Nein") == 0) {
-                            _TableView.PinAdd(r[0]);
+                            _TableView.PinAdd(r[0].Row);
                         }
-                        _LastLooked = r[0].CellFirstString();
+                        _LastLooked = r[0].Row.CellFirstString();
                     }
                 }
             }

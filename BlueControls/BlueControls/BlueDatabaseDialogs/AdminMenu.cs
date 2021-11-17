@@ -73,7 +73,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             base.OnFormClosing(e);
         }
 
-        private void _TableView_CursorPosChanged(object sender, CellEventArgs e) => Check_OrderButtons();
+        private void _TableView_CursorPosChanged(object sender, CellExtEventArgs e) => Check_OrderButtons();
 
         private void _TableView_DatabaseChanged(object sender, System.EventArgs e) {
             SetDatabase(_TableView.Database);
@@ -201,7 +201,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             _TableView.CurrentArrangement.Remove(ViewItem);
         }
 
-        private void btnSpalteBearbeiten_Click(object sender, System.EventArgs e) => tabAdministration.OpenColumnEditor(_TableView.CursorPosColumn(), _TableView.CursorPosRow(), _TableView);
+        private void btnSpalteBearbeiten_Click(object sender, System.EventArgs e) => tabAdministration.OpenColumnEditor(_TableView.CursorPosColumn(), _TableView.CursorPosRow()?.Row, _TableView);
 
         private void btnSpalteDauerhaftloeschen_Click(object sender, System.EventArgs e) {
             if (MessageBox.Show("Spalte <b>" + _TableView.CursorPosColumn().ReadableText() + "</b> endgültig löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }

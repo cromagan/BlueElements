@@ -169,11 +169,6 @@ namespace BlueDatabase {
             return vars;
         }
 
-        public string CaptionReadable() {
-            var c = CellGetString(Database.Column.SysChapter);
-            return string.IsNullOrEmpty(c) ? "- ohne " + Database.Column.SysChapter.Caption + " -" : c.Replace("\r", ", ");
-        }
-
         public string CellFirstString() => Database.Cell.GetString(Database.Column[0], this);
 
         public bool CellGetBoolean(string columnName) => Database.Cell.GetBoolean(Database.Column[columnName], this);
@@ -184,22 +179,6 @@ namespace BlueDatabase {
 
         public Color CellGetColor(ColumnItem column) => Database.Cell.GetColor(column, this);
 
-        //public void CellSet(string columnName, Color value)
-        //{
-        //    Database.Cell.Set(Database.Column[columnName], this, value, false);
-        //}
-        //public void CellSet(string columnName, Color value)
-        //{
-        //    Database.Cell.Set(Database.Column[columnName], this, value);
-        //}
-        //public void CellSet(ColumnItem column, Color value)
-        //{
-        //    Database.Cell.Set(column, this, value, false);
-        //}
-        //public void CellSet(ColumnItem column, Color value)
-        //{
-        //    Database.Cell.Set(column, this, value);
-        //}
         public int CellGetColorBGR(ColumnItem column) => Database.Cell.GetColorBGR(column, this);
 
         public DateTime CellGetDateTime(string columnName) => Database.Cell.GetDateTime(Database.Column[columnName], this);

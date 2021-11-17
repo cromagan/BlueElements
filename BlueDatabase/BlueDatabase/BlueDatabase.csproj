@@ -81,6 +81,7 @@
     <Compile Include="AdditionalScriptComands\Method_SetError.cs" />
     <Compile Include="CellCollection.cs" />
     <Compile Include="CellItem.cs" />
+    <Compile Include="clsRowDrawData.cs" />
     <Compile Include="ColumnCollection.cs" />
     <Compile Include="ColumnItem.cs" />
     <Compile Include="ColumnViewCollection.cs" />
@@ -103,6 +104,7 @@
     <Compile Include="Enums\enDatabaseDataType.cs" />
     <Compile Include="Enums\enViewType.cs" />
     <Compile Include="EventArgs\CellCancelEventArgs.cs" />
+    <Compile Include="EventArgs\CellExtEventArgs.cs" />
     <Compile Include="EventArgs\MessageEventArgs.cs" />
     <Compile Include="EventArgs\RenameColumnInLayoutEventArgs.cs" />
     <Compile Include="EventArgs\PasswordEventArgs.cs" />

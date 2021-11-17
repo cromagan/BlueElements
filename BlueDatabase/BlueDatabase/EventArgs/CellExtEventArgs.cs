@@ -17,11 +17,11 @@
 
 namespace BlueDatabase.EventArgs {
 
-    public class CellEventArgs : System.EventArgs {
+    public class CellExtEventArgs : System.EventArgs {
 
         #region Constructors
 
-        public CellEventArgs(ColumnItem column, RowItem row) {
+        public CellExtEventArgs(ColumnItem column, clsRowDrawData row) {
             Column = column;
             Row = row;
         }
@@ -31,7 +31,7 @@ namespace BlueDatabase.EventArgs {
         #region Properties
 
         public ColumnItem Column { get; set; }
-        public RowItem Row { get; set; }
+        public clsRowDrawData Row { get; set; }
 
         #endregion
     }

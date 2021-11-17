@@ -96,9 +96,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
         }
 
-        public static void OpenColumnEditor(ColumnItem column, RowItem Row, Table tableview) {
+        public static void OpenColumnEditor(ColumnItem column, RowItem row, Table tableview) {
             if (column == null) { return; }
-            if (Row == null) {
+            if (row == null) {
                 OpenColumnEditor(column, tableview);
                 return;
             }
@@ -106,7 +106,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             var PosError = false;
             switch (column.Format) {
                 case enDataFormat.Columns_für_LinkedCellDropdown:
-                    var Txt = Row.CellGetString(column);
+                    var Txt = row.CellGetString(column);
                     if (int.TryParse(Txt, out var ColKey)) {
                         column2 = column.LinkedDatabase().Column.SearchByKey(ColKey);
                     }
@@ -115,7 +115,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 case enDataFormat.LinkedCell:
 
                 case enDataFormat.Values_für_LinkedCellDropdown:
-                    (column2, _) = CellCollection.LinkedCellData(column, Row, true, false);
+                    (column2, _) = CellCollection.LinkedCellData(column, row, true, false);
                     PosError = true;
                     break;
             }

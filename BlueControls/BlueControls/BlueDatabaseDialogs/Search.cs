@@ -31,7 +31,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private readonly Table _BlueTable;
         private ColumnItem _col = null;
-        private RowItem _row = null;
+        private clsRowDrawData _row = null;
 
         #endregion
 
@@ -43,7 +43,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             _BlueTable = table;
             _BlueTable.CursorPosChanged += CursorPosChanged;
-            CursorPosChanged(_BlueTable, new CellEventArgs(_BlueTable.CursorPosColumn(), _BlueTable.CursorPosRow()));
+            CursorPosChanged(_BlueTable, new CellExtEventArgs(_BlueTable.CursorPosColumn(), _BlueTable.CursorPosRow()));
         }
 
         #endregion
@@ -58,7 +58,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void btnSuchInCell_Click(object sender, System.EventArgs e) {
             var SuchtT = SuchText();
             if (string.IsNullOrEmpty(SuchtT)) { return; }
-            Table.SearchNextText(SuchtT, _BlueTable, _col, _row, out var found, out var GefRow, btnAehnliches.Checked);
+            Table.SearchNextText(SuchtT, _BlueTable, _col, _BlueTable.CursorPosRow(), out var found, out var GefRow, btnAehnliches.Checked);
             if (found == null) {
                 MessageBox.Show("Text nicht gefunden", enImageCode.Information, "OK");
                 return;
@@ -106,7 +106,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             txbSuchText.Focus();
         }
 
-        private void CursorPosChanged(object sender, CellEventArgs e) {
+        private void CursorPosChanged(object sender, CellExtEventArgs e) {
             _row = e.Row;
             _col = e.Column;
         }
