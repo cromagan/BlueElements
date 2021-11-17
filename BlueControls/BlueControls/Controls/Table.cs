@@ -1851,7 +1851,7 @@ namespace BlueControls.Controls {
 
             if (cellInThisDatabaseColumn.Format == enDataFormat.LinkedCell) {
                 (ContentHolderCellColumn, ContentHolderCellRow) = CellCollection.LinkedCellData(cellInThisDatabaseColumn, cellInThisDatabaseRow?.Row, true, true);
-                if (ContentHolderCellColumn == null) {
+                if (ContentHolderCellColumn == null || ContentHolderCellRow == null) {
                     NotEditableInfo("In verknüpfter Datenbank nicht vorhanden");
                     return;
                 }

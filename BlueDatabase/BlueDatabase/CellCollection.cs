@@ -702,7 +702,7 @@ namespace BlueDatabase {
                     return (targetColumn, targetRow);
                 } else {
                     column.Database.Cell.SetValueBehindLinkedValue(column, row, string.Empty);
-                    return (null, null);
+                    return (targetColumn, targetRow);
                 }
             }
 
