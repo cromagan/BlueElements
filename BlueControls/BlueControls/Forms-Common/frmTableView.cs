@@ -641,7 +641,7 @@ namespace BlueControls.Forms {
         }
 
         private void TableView_RowsSorted(object sender, System.EventArgs e) {
-            Zei.Text = TableView.Database.Column[0] != null ? "<ImageCode=Information|16>Zeilen: " + TableView.SortedRows().Count + " St." : "-";
+            Zei.Text = TableView.Database.Column[0] != null ? "<ImageCode=Information|16>" + LanguageTool.DoTranslate("Einzigartige Zeilen:") + " " + TableView.VisibleRows().Count + " St." : "-";
             CheckButtons();
         }
 

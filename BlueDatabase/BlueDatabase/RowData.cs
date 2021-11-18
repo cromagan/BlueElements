@@ -47,6 +47,17 @@ namespace BlueDatabase {
             return null;
         }
 
+        public static List<RowItem> ToUniqueRowList(this List<RowData> l) {
+            if (l == null) { return null; }
+
+            var n = new List<RowItem>();
+
+            foreach (var thisr in l) {
+                n.AddIfNotExists(thisr.Row);
+            }
+            return n;
+        }
+
         #endregion
 
         //public static int IndexOf(this List<clsRowDrawData> l, RowItem row) {

@@ -75,8 +75,9 @@ namespace BlueControls.Controls {
 
         private BlueFont _Chapter_Font;
 
-        private BlueFont _Column_Font;
+        private BlueFont _Column_Filter_Font;
 
+        private BlueFont _Column_Font;
         private ColumnItem _CursorPosColumn;
 
         private RowData _CursorPosRow;
@@ -868,7 +869,6 @@ namespace BlueControls.Controls {
                         ThisRowData.ShowCap = true;
                         LastCap = thisRow.Chapter;
                     } else {
-
                         ThisRowData.ShowCap = false;
                     }
 
@@ -1073,6 +1073,8 @@ namespace BlueControls.Controls {
             _Cell_Font = Skin.GetBlueFont(enDesign.Table_Cell, enStates.Standard).Scale(FontScale);
             _Column_Font = Skin.GetBlueFont(enDesign.Table_Column, enStates.Standard).Scale(FontScale);
             _Chapter_Font = Skin.GetBlueFont(enDesign.Table_Cell_Chapter, enStates.Standard).Scale(FontScale);
+            _Column_Filter_Font = BlueFont.Get(_Column_Font.FontName, _Column_Font.FontSize, false, false, false, false, true, Color.White, Color.Red, false, false, false);
+
             _NewRow_Font = Skin.GetBlueFont(enDesign.Table_Cell_New, enStates.Standard).Scale(FontScale);
             if (Database != null) {
                 Pix16 = GetPix(16, _Cell_Font, Database.GlobalScale);
@@ -1853,6 +1855,11 @@ namespace BlueControls.Controls {
             return false;
         }
 
+        /// <summary>
+        /// Gibt die Anzahl der SICHTBAREN Zeilen zurück, die mehr angezeigt werden würden, wenn dieser Filter deaktiviert wäre.
+        /// </summary>
+        /// <param name="column"></param>
+        /// <returns></returns>
         private int Autofilter_Text(ColumnItem column) {
             if (column.TMP_IfFilterRemoved != null) { return (int)column.TMP_IfFilterRemoved; }
             FilterCollection tfilter = new(Database);
@@ -1860,7 +1867,7 @@ namespace BlueControls.Controls {
                 if (ThisFilter != null && ThisFilter.Column != column) { tfilter.Add(ThisFilter); }
             }
             var temp = Database.Row.CalculateVisibleRows(tfilter, _PinnedRows);
-            column.TMP_IfFilterRemoved = SortedRows().Count - temp.Count;
+            column.TMP_IfFilterRemoved = VisibleRows().Count - temp.Count;
             return (int)column.TMP_IfFilterRemoved;
         }
 
@@ -2544,17 +2551,11 @@ namespace BlueControls.Controls {
                 GR.DrawImage(TrichterIcon.BMP, ViewItem._TMP_AutoFilterLocation.Left + 2, ViewItem._TMP_AutoFilterLocation.Top + 2);
             }
             if (!string.IsNullOrEmpty(TrichterText)) {
-                var s = _Column_Font.MeasureString(TrichterText, StringFormat.GenericDefault);
-                for (var x = -1; x < 2; x++) {
-                    for (var y = -1; y < 2; y++) {
-                        BlueFont.DrawString(GR, TrichterText, _Column_Font.Font(), Brushes.Red,
-                                           ViewItem._TMP_AutoFilterLocation.Left + ((_AutoFilterSize - s.Width) / 2) + x,
-                                           ViewItem._TMP_AutoFilterLocation.Top + ((_AutoFilterSize - s.Height) / 2) + y);
-                    }
-                }
-                BlueFont.DrawString(GR, TrichterText, _Column_Font.Font(), Brushes.White,
-                                    ViewItem._TMP_AutoFilterLocation.Left + ((_AutoFilterSize - s.Width) / 2),
-                                    ViewItem._TMP_AutoFilterLocation.Top + ((_AutoFilterSize - s.Height) / 2));
+                var s = _Column_Filter_Font.MeasureString(TrichterText, StringFormat.GenericDefault);
+
+                _Column_Filter_Font.DrawString(GR, TrichterText,
+                              ViewItem._TMP_AutoFilterLocation.Left + ((_AutoFilterSize - s.Width) / 2),
+                              ViewItem._TMP_AutoFilterLocation.Top + ((_AutoFilterSize - s.Height) / 2));
             }
             if (TrichterState == enStates.Undefiniert) {
                 ViewItem._TMP_AutoFilterLocation = new Rectangle(0, 0, 0, 0);
@@ -2600,7 +2601,7 @@ namespace BlueControls.Controls {
             }
             // Sortierrichtung Zeichnen
             var tmpSortDefinition = SortUsed();
-            if (tmpSortDefinition != null && tmpSortDefinition.UsedForRowSort(ViewItem.Column)) {
+            if (tmpSortDefinition != null && tmpSortDefinition.UsedForRowSort(ViewItem.Column) || ViewItem.Column == Database.Column.SysChapter) {
                 if (tmpSortDefinition.Reverse) {
                     GR.DrawImage(QuickImage.Get("ZA|11|5||||50").BMP, (float)(ViewItem.OrderTMP_Spalte_X1 + (Column_DrawWidth(ViewItem, displayRectangleWOSlider) / 2.0) - 6), HeadSize() - 6 - _AutoFilterSize);
                 } else {
