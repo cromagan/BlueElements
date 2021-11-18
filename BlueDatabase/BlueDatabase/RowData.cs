@@ -30,6 +30,8 @@ namespace BlueDatabase {
         #region Methods
 
         public static RowData Get(this List<RowData> l, RowItem row) {
+            if (l == null) { return null; }
+
             foreach (var thisr in l) {
                 if (thisr?.Row == row) { return thisr; }
             }
@@ -37,6 +39,8 @@ namespace BlueDatabase {
         }
 
         public static RowData Get(this List<RowData> l, RowItem row, string chapter) {
+            if (l == null) { return null; }
+
             foreach (var thisr in l) {
                 if (thisr?.Row == row && thisr.Chapter == chapter) { return thisr; }
             }
@@ -63,29 +67,31 @@ namespace BlueDatabase {
         #region Fields
 
         public readonly string Chapter;
-        public readonly bool Pinned;
         public readonly RowItem Row;
         public string AdditionalSort;
         public Rectangle CaptionPos;
         public int DrawHeight;
         public bool Expanded;
+        public bool Pinned;
+        public bool ShowCap;
         public int Y;
 
         #endregion
 
         #region Constructors
 
-        public RowData(RowItem row) : this(row, false, string.Empty, string.Empty) { }
+        public RowData(RowItem row) : this(row, string.Empty) { }
 
-        public RowData(RowItem row, bool pinned, string additionalSort, string chapter) {
+        public RowData(RowItem row, string chapter) {
             Row = row;
-            Pinned = pinned;
+            Pinned = false;
             Y = -1;
             Chapter = chapter;
             Expanded = true;
             DrawHeight = 0;
             CaptionPos = Rectangle.Empty;
-            AdditionalSort = additionalSort;
+            AdditionalSort = string.Empty;
+            ShowCap = false;
         }
 
         #endregion
@@ -106,6 +112,14 @@ namespace BlueDatabase {
             } else {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Objecttyp!");
                 return 0;
+            }
+        }
+
+        public override string ToString() {
+            if (Row == null) {
+                return Chapter + " -> null";
+            } else {
+                return Chapter + " -> " + Row.CellFirstString();
             }
         }
 

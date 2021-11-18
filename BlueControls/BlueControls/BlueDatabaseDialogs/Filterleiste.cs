@@ -418,21 +418,23 @@ namespace BlueControls.BlueDatabaseDialogs {
             //_TableView.Database.Column.Count == 0 Ist eine nigelnagelneue Datenbank
             if (_TableView == null || _TableView.Database == null || _TableView.Database.Column.Count == 0) { return; }
             List<FilterItem> fl = new() { new FilterItem(_TableView.Database.Column[0], enFilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text) };
-            var r = _TableView.Database.Row.CalculateSortedRows(fl, null, null);
+
+            var r = _TableView.Database.Row.CalculateVisibleRows(fl, null);
             if (_ähnliche != null) {
                 btnÄhnliche.Visible = true;
                 btnÄhnliche.Enabled = r != null && r.Count == 1;
             } else {
                 btnÄhnliche.Visible = false;
             }
+
             if (_AutoPin && r != null && r.Count == 1) {
-                if (_LastLooked != r[0].Row.CellFirstString()) {
+                if (_LastLooked != r[0].CellFirstString()) {
                     var l = _TableView.VisibleRows();
-                    if (!l.Contains(r[0].Row)) {
+                    if (!l.Contains(r[0])) {
                         if (MessageBox.Show("Die Zeile wird durch Filterungen <b>ausgeblendet</b>.<br>Soll sie zusätzlich <b>angepinnt</b> werden?", enImageCode.Pinnadel, "Ja", "Nein") == 0) {
-                            _TableView.PinAdd(r[0].Row);
+                            _TableView.PinAdd(r[0]);
                         }
-                        _LastLooked = r[0].Row.CellFirstString();
+                        _LastLooked = r[0].CellFirstString();
                     }
                 }
             }
