@@ -811,7 +811,6 @@ namespace BlueControls.Controls {
             rows = rows.Distinct().ToList();
             if (!rows.IsDifferentTo(_PinnedRows)) { return; }
 
-            Invalidate_Filterinfo();
             _PinnedRows.Clear();
             _PinnedRows.AddRange(rows);
             Invalidate_VisibleRows();
@@ -820,14 +819,12 @@ namespace BlueControls.Controls {
 
         public void PinAdd(RowItem row) {
             _PinnedRows.Add(row);
-            Invalidate_Filterinfo();
             Invalidate_VisibleRows();
             OnPinnedChanged();
         }
 
         public void PinRemove(RowItem row) {
             _PinnedRows.Remove(row);
-            Invalidate_Filterinfo();
             Invalidate_VisibleRows();
             OnPinnedChanged();
         }
@@ -1786,7 +1783,7 @@ namespace BlueControls.Controls {
                             Filter.Add(new FilterItem(e.Column.Database.Column[0], enFilterType.Istgleich_ODER_GroßKleinEgal, d));
                             Notification.Show("Die aktuell <b>unterschiedlichen</b> Einträge wurden berechnet<br>und als <b>ODER-Filter</b> in der <b>ersten Spalte</b> gespeichert.", enImageCode.Trichter);
                         } else {
-                            Notification.Show("Keine Filter verändert,<br>da <b>alle Einträge</b> indentisch sind.", enImageCode.Trichter);
+                            Notification.Show("Keine Filter verändert,<br>da <b>alle Einträge</b> identisch sind.", enImageCode.Trichter);
                         }
                         break;
                     }
@@ -2867,7 +2864,6 @@ namespace BlueControls.Controls {
         }
 
         private void Filter_Changed(object sender, System.EventArgs e) {
-            Invalidate_Filterinfo();
             Invalidate_VisibleRows();
             OnFilterChanged();
         }
@@ -2942,6 +2938,7 @@ namespace BlueControls.Controls {
         private void Invalidate_VisibleRows() {
             _VisibleRows = null;
             //CursorPos_Reset(); // Gibt Probleme bei Formularen, wenn die Key-Spalte geändert wird. Mal abgesehen davon macht es einen Sinn, den Cursor proforma zu löschen, dass soll der RowSorter übernehmen.
+            Invalidate_Filterinfo();
             Invalidate_SortedRowData();
         }
 
