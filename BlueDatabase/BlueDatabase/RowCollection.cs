@@ -171,10 +171,14 @@ namespace BlueDatabase {
             foreach (var thisRow in visibleRows) {
                 var adk = rowSortDefinition == null ? thisRow.CompareKey(null) : thisRow.CompareKey(rowSortDefinition.Columns);
 
+                var MarkYellow = false;
+
                 if (pinnedRows.Contains(thisRow)) {
                     var rd = reUseMe.Get(thisRow, "Angepinnt") is RowData r ? r : new RowData(thisRow, "Angepinnt");
                     _pinnedData.Add(rd);
-                    rd.Pinned = true;
+                    rd.AdditinalSort = "1";
+                    rd.MarkYellow = true;
+                    MarkYellow = true;
                     rd.AdditionalSort = adk;
                 }
 
@@ -186,7 +190,8 @@ namespace BlueDatabase {
                 foreach (var thisCap in caps) {
                     var rd = reUseMe.Get(thisRow, thisCap) is RowData r ? r : new RowData(thisRow, thisCap);
                     _rowData.Add(rd);
-                    rd.Pinned = false;
+                    rd.AdditinalSort = "2";
+                    rd.MarkYellow = MarkYellow;
                     rd.AdditionalSort = adk;
                 }
             }

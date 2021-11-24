@@ -50,6 +50,10 @@ namespace BlueControls.Controls {
 
         #region Fields
 
+        public static SolidBrush Brush_Yellow_Transparent = new(Color.FromArgb(180, 255, 255, 0));
+
+        public static Pen Pen_Red_1 = new(Color.Red, 1);
+
         private const int _AutoFilterSize = 22;
 
         private const int ColumnCaptionSizeY = 22;
@@ -471,10 +475,16 @@ namespace BlueControls.Controls {
         /// Status des Bildes (Disabled) wird geändert. Diese Routine sollte nicht innerhalb der Table Klasse aufgerufen werden.
         /// Sie dient nur dazu, das Aussehen eines Textes wie eine Zelle zu imitieren.
         /// </summary>
-        public static void Draw_FormatedText(ColumnItem column, string Txt, Graphics GR, Rectangle FitInRect, bool DeleteBack, enShortenStyle Style, enDesign vDesign, enStates vState, enBildTextVerhalten bildTextverhalten) {
-            if (string.IsNullOrEmpty(Txt)) { return; }
-            var d = Skin.DesignOf(vDesign, vState);
-            Draw_FormatedText(GR, column, Txt, FitInRect, DeleteBack, d.bFont, Style, vState, bildTextverhalten);
+        public static void Draw_FormatedText(Graphics gr, string text, ColumnItem column, Rectangle fitInRect, enDesign design, enStates state, enShortenStyle style, enBildTextVerhalten bildTextverhalten) {
+            if (string.IsNullOrEmpty(text)) { return; }
+            var d = Skin.DesignOf(design, state);
+
+            var tmpData = CellItem.GetDrawingData(column, text, style, bildTextverhalten);
+
+            Draw_CellTransparentDirect(gr, text, column, fitInRect, d.bFont, column, 16);
+            //Draw_CellTransparentDirect_OneLine
+
+            //Draw_CellTransparentDirect_OneLine(gr, column, text, fitInRect, d.bFont, style, state, bildTextverhalten);
         }
 
         public static List<string> FileSystem(ColumnItem _tmpColumn) {
@@ -852,8 +862,14 @@ namespace BlueControls.Controls {
 
                 foreach (var thisRow in _SortedRowDataNew) {
                     var ThisRowData = thisRow;
-                    if (_MouseOverRow != null && _MouseOverRow.Row == thisRow.Row && _MouseOverRow.Chapter == thisRow.Chapter) { ThisRowData = _MouseOverRow; } // Mouse-Daten wiederverwenden
-                    if (_CursorPosRow != null && _CursorPosRow.Row == thisRow.Row && _CursorPosRow.Chapter == thisRow.Chapter) { ThisRowData = _CursorPosRow; } // Cursor-Daten wiederverwenden
+                    if (_MouseOverRow != null && _MouseOverRow.Row == thisRow.Row && _MouseOverRow.Chapter == thisRow.Chapter) {
+                        _MouseOverRow.GetDataFrom(ThisRowData);
+                        ThisRowData = _MouseOverRow;
+                    } // Mouse-Daten wiederverwenden
+                    if (_CursorPosRow != null && _CursorPosRow.Row == thisRow.Row && _CursorPosRow.Chapter == thisRow.Chapter) {
+                        _CursorPosRow.GetDataFrom(ThisRowData);
+                        ThisRowData = _CursorPosRow;
+                    } // Cursor-Daten wiederverwenden
 
                     ThisRowData.Y = MaxY;
 
@@ -1502,6 +1518,25 @@ namespace BlueControls.Controls {
             Pad.SaveAsBitmap(e.Filename);
         }
 
+        private static void Draw_CellTransparentDirect(Graphics gr, string toDraw, ColumnItem cellInThisDatabaseColumn, Rectangle cellrectangle, BlueFont font, ColumnItem contentHolderCellColumn, int Pix16, enBildTextVerhalten) {
+            if (toDraw == null) { toDraw = string.Empty; }
+
+            if (!contentHolderCellColumn.MultiLine || !toDraw.Contains("\r")) {
+                Draw_CellTransparentDirect_OneLine(gr, toDraw, contentHolderCellColumn, cellrectangle, 0, true, font, Pix16);
+            } else {
+                var MEI = toDraw.SplitAndCutByCR();
+                if (contentHolderCellColumn.ShowMultiLineInOneLine) {
+                    Draw_CellTransparentDirect_OneLine(gr, MEI.JoinWith("; "), contentHolderCellColumn, cellrectangle, 0, true, font, Pix16);
+                } else {
+                    var y = 0;
+                    for (var z = 0; z <= MEI.GetUpperBound(0); z++) {
+                        Draw_CellTransparentDirect_OneLine(gr, MEI[z], contentHolderCellColumn, cellrectangle, y, (z == MEI.GetUpperBound(0)), font, Pix16);
+                        y += FormatedText_NeededSize(cellInThisDatabaseColumn, MEI[z], font, enShortenStyle.Replaced, Pix16 - 1, cellInThisDatabaseColumn.BildTextVerhalten).Height;
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// Der Status des Bildes wird geändert, Texte werden gekürzt
         /// </summary>
@@ -1512,11 +1547,24 @@ namespace BlueControls.Controls {
         /// <param name="Child"></param>
         /// <param name="deleteBack"></param>
         /// <param name="font"></param>
-        private static void Draw_FormatedText(Graphics gr, ColumnItem column, string originalText, Rectangle fitInRect, bool deleteBack, BlueFont font, enShortenStyle style, enStates state, enBildTextVerhalten bildTextverhalten) {
+        private static void Draw_CellTransparentDirect_OneLine(Graphics gr, ColumnItem column, string originalText, Rectangle fitInRect, BlueFont font, enShortenStyle style, enStates state, enBildTextVerhalten bildTextverhalten) {
             var tmpData = CellItem.GetDrawingData(column, originalText, style, bildTextverhalten);
             var tmpImageCode = tmpData.Item3;
             if (tmpImageCode != null) { tmpImageCode = QuickImage.Get(tmpImageCode, Skin.AdditionalState(state)); }
-            Skin.Draw_FormatedText(gr, tmpData.Item1, tmpImageCode, tmpData.Item2, fitInRect, null, deleteBack, font, false);
+            Skin.Draw_FormatedText(gr, tmpData.Item1, tmpImageCode, tmpData.Item2, fitInRect, null, false, font, false);
+        }
+
+        /// <summary>
+        /// Zeichnet die eine Zeile der Zelle ohne Hintergrund und prüft noch, ob der verlinkte Inhalt gezeichnet werden soll.
+        /// </summary>
+        private static void Draw_CellTransparentDirect_OneLine(Graphics gr, string drawString, ColumnItem contentHolderColumnStyle, Rectangle cellRectangle, int txtY, bool isLastRow, BlueFont font, int Pix16) {
+            Rectangle r = new(cellRectangle.Left, cellRectangle.Top + txtY, cellRectangle.Width, Pix16);
+
+            if (r.Bottom > cellRectangle.Bottom - Pix16) {
+                if (r.Bottom > cellRectangle.Bottom) { return; }
+                if (!isLastRow) { drawString = "..."; }// Die letzte Zeile noch ganz hinschreiben
+            }
+            Draw_CellTransparentDirect_OneLine(gr, contentHolderColumnStyle, drawString, r, font, enShortenStyle.Replaced, enStates.Standard, contentHolderColumnStyle.BildTextVerhalten);
         }
 
         private static int GetPix(int Pix, BlueFont F, double Scale) => Skin.FormatedText_NeededSize("@|", null, F, (int)((Pix * Scale) + 0.5)).Height;
@@ -2287,42 +2335,42 @@ namespace BlueControls.Controls {
 ? new Rectangle(DisplayRectangle.Left, DisplayRectangle.Left, DisplayRectangle.Width - SliderY.Width, DisplayRectangle.Height - SliderX.Height)
 : new Rectangle(DisplayRectangle.Left, DisplayRectangle.Left, DisplayRectangle.Width - SliderY.Width, DisplayRectangle.Height);
 
-        private void Draw_Border(Graphics GR, ColumnViewItem vcolumn, Rectangle displayRectangleWOSlider, bool Onlyhead) {
+        private void Draw_Border(Graphics gr, ColumnViewItem column, Rectangle displayRectangleWOSlider, bool onlyhead) {
             var yPos = displayRectangleWOSlider.Height;
-            if (Onlyhead) { yPos = HeadSize(); }
+            if (onlyhead) { yPos = HeadSize(); }
             for (var z = 0; z <= 1; z++) {
                 int xPos;
                 enColumnLineStyle Lin;
                 if (z == 0) {
-                    xPos = (int)vcolumn.OrderTMP_Spalte_X1;
-                    Lin = vcolumn.Column.LineLeft;
+                    xPos = (int)column.OrderTMP_Spalte_X1;
+                    Lin = column.Column.LineLeft;
                 } else {
-                    xPos = (int)vcolumn.OrderTMP_Spalte_X1 + Column_DrawWidth(vcolumn, displayRectangleWOSlider);
-                    Lin = vcolumn.Column.LineRight;
+                    xPos = (int)column.OrderTMP_Spalte_X1 + Column_DrawWidth(column, displayRectangleWOSlider);
+                    Lin = column.Column.LineRight;
                 }
                 switch (Lin) {
                     case enColumnLineStyle.Ohne:
                         break;
 
                     case enColumnLineStyle.Dünn:
-                        GR.DrawLine(Skin.Pen_LinieDünn, xPos, 0, xPos, yPos);
+                        gr.DrawLine(Skin.Pen_LinieDünn, xPos, 0, xPos, yPos);
                         break;
 
                     case enColumnLineStyle.Kräftig:
-                        GR.DrawLine(Skin.Pen_LinieKräftig, xPos, 0, xPos, yPos);
+                        gr.DrawLine(Skin.Pen_LinieKräftig, xPos, 0, xPos, yPos);
                         break;
 
                     case enColumnLineStyle.Dick:
-                        GR.DrawLine(Skin.Pen_LinieDick, xPos, 0, xPos, yPos);
+                        gr.DrawLine(Skin.Pen_LinieDick, xPos, 0, xPos, yPos);
                         break;
 
                     case enColumnLineStyle.ShadowRight:
                         var c = Skin.Color_Border(enDesign.Table_Lines_thick, enStates.Standard);
-                        GR.DrawLine(Skin.Pen_LinieKräftig, xPos, 0, xPos, yPos);
-                        GR.DrawLine(new Pen(Color.FromArgb(80, c.R, c.G, c.B)), xPos + 1, 0, xPos + 1, yPos);
-                        GR.DrawLine(new Pen(Color.FromArgb(60, c.R, c.G, c.B)), xPos + 2, 0, xPos + 2, yPos);
-                        GR.DrawLine(new Pen(Color.FromArgb(40, c.R, c.G, c.B)), xPos + 3, 0, xPos + 3, yPos);
-                        GR.DrawLine(new Pen(Color.FromArgb(20, c.R, c.G, c.B)), xPos + 4, 0, xPos + 4, yPos);
+                        gr.DrawLine(Skin.Pen_LinieKräftig, xPos, 0, xPos, yPos);
+                        gr.DrawLine(new Pen(Color.FromArgb(80, c.R, c.G, c.B)), xPos + 1, 0, xPos + 1, yPos);
+                        gr.DrawLine(new Pen(Color.FromArgb(60, c.R, c.G, c.B)), xPos + 2, 0, xPos + 2, yPos);
+                        gr.DrawLine(new Pen(Color.FromArgb(40, c.R, c.G, c.B)), xPos + 3, 0, xPos + 3, yPos);
+                        gr.DrawLine(new Pen(Color.FromArgb(20, c.R, c.G, c.B)), xPos + 4, 0, xPos + 4, yPos);
                         break;
 
                     default:
@@ -2332,138 +2380,170 @@ namespace BlueControls.Controls {
             }
         }
 
-        private void Draw_CellAsButton(Graphics gR, ColumnViewItem cellInThisDatabaseColumn, RowData cellInThisDatabaseRow, int drawColumnWidth) {
+        private void Draw_CellAsButton(Graphics gr, ColumnViewItem cellInThisDatabaseColumn, RowData cellInThisDatabaseRow, Rectangle cellrectangle) {
             ButtonCellEventArgs e = new(cellInThisDatabaseColumn.Column, cellInThisDatabaseRow.Row);
             OnNeedButtonArgs(e);
-            Rectangle r = new((int)cellInThisDatabaseColumn.OrderTMP_Spalte_X1,
-                                       DrawY(cellInThisDatabaseRow),
-                                       drawColumnWidth,
-                                        Math.Min(cellInThisDatabaseRow.DrawHeight, 24));
+
             var s = enStates.Standard;
             if (!Enabled) { s = enStates.Standard_Disabled; }
             if (e.Cecked) { s |= enStates.Checked; }
-            Button.DrawButton(this, gR, enDesign.Button_CheckBox, s, e.Image, enAlignment.Horizontal_Vertical_Center, false, null, e.Text, r, true);
+            Button.DrawButton(this, gr, enDesign.Button_CheckBox, s, e.Image, enAlignment.Horizontal_Vertical_Center, false, null, e.Text, cellrectangle, true);
         }
 
         /// <summary>
         /// Zeichnet die gesamte Zelle mit Listbox-Hintergrund und prüft noch, ob der verlinkte Inhalt gezeichnet werden soll.
         /// </summary>
-        /// <param name="GR"></param>
-        /// <param name="Column"></param>
-        /// <param name="Row"></param>
+        /// <param name="gr"></param>
+        /// <param name="column"></param>
+        /// <param name="row"></param>
         /// <param name="displayRectangleWOSlider"></param>
-        /// <param name="vDesign"></param>
-        /// <param name="vState"></param>
-        private void Draw_CellListBox(Graphics GR, ColumnViewItem Column, RowData Row, Rectangle displayRectangleWOSlider, enDesign vDesign, enStates vState) {
-            Skin.Draw_Back(GR, vDesign, vState, displayRectangleWOSlider, null, false);
-            Skin.Draw_Border(GR, vDesign, vState, displayRectangleWOSlider);
-            var f = Skin.GetBlueFont(vDesign, vState);
+        /// <param name="design"></param>
+        /// <param name="state"></param>
+        private void Draw_CellListBox(Graphics gr, ColumnViewItem column, RowData row, Rectangle cellrectangle, Rectangle displayRectangleWOSlider, enDesign design, enStates state) {
+            Skin.Draw_Back(gr, design, state, displayRectangleWOSlider, null, false);
+            Skin.Draw_Border(gr, design, state, displayRectangleWOSlider);
+            var f = Skin.GetBlueFont(design, state);
             if (f == null) { return; }
-            Draw_CellTransparent(GR, Column, Row, displayRectangleWOSlider, f);
+            Draw_CellTransparent(gr, column, row, cellrectangle, f);
         }
 
         /// <summary>
         /// Zeichnet die gesamte Zelle ohne Hintergrund und prüft noch, ob der verlinkte Inhalt gezeichnet werden soll.
         /// </summary>
-        /// <param name="GR"></param>
+        /// <param name="gr"></param>
         /// <param name="cellInThisDatabaseColumn"></param>
         /// <param name="cellInThisDatabaseRow"></param>
         /// <param name="displayRectangleWOSlider"></param>
-        /// <param name="vfont"></param>
-        private void Draw_CellTransparent(Graphics GR, ColumnViewItem cellInThisDatabaseColumn, RowData cellInThisDatabaseRow, Rectangle displayRectangleWOSlider, BlueFont vfont) {
+        /// <param name="font"></param>
+        private void Draw_CellTransparent(Graphics gr, ColumnViewItem cellInThisDatabaseColumn, RowData cellInThisDatabaseRow, Rectangle cellrectangle, BlueFont font) {
             if (cellInThisDatabaseRow == null) { return; }
+
             if (cellInThisDatabaseColumn.Column.Format == enDataFormat.LinkedCell) {
                 (var lcolumn, var lrow) = CellCollection.LinkedCellData(cellInThisDatabaseColumn.Column, cellInThisDatabaseRow.Row, false, false);
+
                 if (lcolumn != null && lrow != null) {
-                    Draw_CellTransparentDirect(GR, cellInThisDatabaseColumn, cellInThisDatabaseRow, lcolumn, lrow, displayRectangleWOSlider, vfont);
+                    Draw_CellTransparentDirect(gr, cellInThisDatabaseColumn, cellInThisDatabaseRow, cellrectangle, lcolumn, lrow, font);
                 }
                 return;
             }
-            Draw_CellTransparentDirect(GR, cellInThisDatabaseColumn, cellInThisDatabaseRow, cellInThisDatabaseColumn.Column, cellInThisDatabaseRow.Row, displayRectangleWOSlider, vfont);
+
+            Draw_CellTransparentDirect(gr, cellInThisDatabaseColumn, cellInThisDatabaseRow, cellrectangle, cellInThisDatabaseColumn.Column, cellInThisDatabaseRow.Row, font);
         }
 
         /// <summary>
         /// Zeichnet die gesamte Zelle ohne Hintergrund. Die verlinkte Zelle ist bereits bekannt.
         /// </summary>
-        /// <param name="GR"></param>
+        /// <param name="gr"></param>
         /// <param name="cellInThisDatabaseColumn"></param>
         /// <param name="cellInThisDatabaseRow"></param>
         /// <param name="rowY"></param>
-        /// <param name="ContentHolderCellColumn"></param>
-        /// <param name="ContentHolderCellRow"></param>
+        /// <param name="contentHolderCellColumn"></param>
+        /// <param name="contentHolderCellRow"></param>
         /// <param name="displayRectangleWOSlider"></param>
-        /// <param name="vfont"></param>
-        private void Draw_CellTransparentDirect(Graphics GR, ColumnViewItem cellInThisDatabaseColumn, RowData cellInThisDatabaseRow, ColumnItem ContentHolderCellColumn, RowItem ContentHolderCellRow, Rectangle displayRectangleWOSlider, BlueFont vfont) {
-            //var rh = Row_DrawHeight(cellInThisDatabaseRow, displayRectangleWOSlider);
-            var cw = Column_DrawWidth(cellInThisDatabaseColumn, displayRectangleWOSlider);
+        /// <param name="font"></param>
+        private void Draw_CellTransparentDirect(Graphics gr, ColumnViewItem cellInThisDatabaseColumn, RowData cellInThisDatabaseRow, Rectangle cellrectangle, ColumnItem contentHolderCellColumn, RowItem contentHolderCellRow, BlueFont font) {
             if (cellInThisDatabaseColumn.Column.Format == enDataFormat.Button) {
-                Draw_CellAsButton(GR, cellInThisDatabaseColumn, cellInThisDatabaseRow, cw);
+                Draw_CellAsButton(gr, cellInThisDatabaseColumn, cellInThisDatabaseRow, cellrectangle);
                 return;
             }
-            var toDraw = ContentHolderCellRow.CellGetString(ContentHolderCellColumn);
-            if (toDraw == null) { toDraw = string.Empty; }
-            if (!ContentHolderCellColumn.MultiLine || !toDraw.Contains("\r")) {
-                Draw_CellTransparentDirect_OneLine(GR, toDraw, cellInThisDatabaseColumn, DrawY(cellInThisDatabaseRow), 0, ContentHolderCellColumn, true, vfont, cellInThisDatabaseRow.DrawHeight, cw);
-            } else {
-                var MEI = toDraw.SplitAndCutByCR();
-                if (ContentHolderCellColumn.ShowMultiLineInOneLine) {
-                    Draw_CellTransparentDirect_OneLine(GR, MEI.JoinWith("; "), cellInThisDatabaseColumn, DrawY(cellInThisDatabaseRow), 0, ContentHolderCellColumn, true, vfont, cellInThisDatabaseRow.DrawHeight, cw);
-                } else {
-                    var y = 0;
-                    for (var z = 0; z <= MEI.GetUpperBound(0); z++) {
-                        Draw_CellTransparentDirect_OneLine(GR, MEI[z], cellInThisDatabaseColumn, DrawY(cellInThisDatabaseRow), y, ContentHolderCellColumn, Convert.ToBoolean(z == MEI.GetUpperBound(0)), vfont, cellInThisDatabaseRow.DrawHeight, cw);
-                        y += FormatedText_NeededSize(cellInThisDatabaseColumn.Column, MEI[z], vfont, enShortenStyle.Replaced, Pix16 - 1, cellInThisDatabaseColumn.Column.BildTextVerhalten).Height;
-                    }
-                }
-            }
+
+            var toDraw = contentHolderCellRow.CellGetString(contentHolderCellColumn);
+
+            Table.Draw_CellTransparentDirect(gr, toDraw, cellInThisDatabaseColumn.Column, cellrectangle, font, contentHolderCellColumn, Pix16);
+
+            //if (cellInThisDatabaseColumn.Column.Format == enDataFormat.Button) {
+            //    Draw_CellAsButton(gr, cellInThisDatabaseColumn, cellInThisDatabaseRow, cellrectangle);
+            //    return;
+            //}
+
+            //if (!contentHolderCellColumn.MultiLine || !toDraw.Contains("\r")) {
+            //    Draw_CellTransparentDirect_OneLine(gr, toDraw, 0, contentHolderCellColumn, true, font, cellrectangle);
+            //} else {
+            //    var MEI = toDraw.SplitAndCutByCR();
+            //    if (contentHolderCellColumn.ShowMultiLineInOneLine) {
+            //        Draw_CellTransparentDirect_OneLine(gr, MEI.JoinWith("; "), 0, contentHolderCellColumn, true, font, cellrectangle);
+            //    } else {
+            //        var y = 0;
+            //        for (var z = 0; z <= MEI.GetUpperBound(0); z++) {
+            //            Draw_CellTransparentDirect_OneLine(gr, MEI[z], y, contentHolderCellColumn, (z == MEI.GetUpperBound(0)), font, cellrectangle);
+            //            y += FormatedText_NeededSize(cellInThisDatabaseColumn.Column, MEI[z], font, enShortenStyle.Replaced, Pix16 - 1, cellInThisDatabaseColumn.Column.BildTextVerhalten).Height;
+            //        }
+            //    }
+            //}
         }
 
-        /// Zeichnet die eine Zeile der Zelle ohne Hintergrund und prüft noch, ob der verlinkte Inhalt gezeichnet werden soll.
-        private void Draw_CellTransparentDirect_OneLine(Graphics GR, string DrawString, ColumnViewItem cellInThisDatabaseColumn, int rowY, int TxtY, ColumnItem ContentHolderColumnStyle, bool IsLastRow, BlueFont vfont, int drawRowHeight, int drawColumnWidth) {
-            Rectangle r = new((int)cellInThisDatabaseColumn.OrderTMP_Spalte_X1,
-                                   rowY + TxtY,
-                                  drawColumnWidth,
-                                  Pix16);
-            if (r.Bottom > rowY + drawRowHeight - Pix16) {
-                if (r.Bottom > rowY + drawRowHeight) { return; }
-                if (!IsLastRow) { DrawString = "..."; }// Die Letzte Zeile noch ganz hinschreiben
-            }
-            Draw_FormatedText(GR, ContentHolderColumnStyle, DrawString, r, false, vfont, enShortenStyle.Replaced, enStates.Standard, ContentHolderColumnStyle.BildTextVerhalten);
-        }
-
-        private void Draw_Column_Body(Graphics GR, ColumnViewItem cellInThisDatabaseColumn, Rectangle displayRectangleWOSlider) {
-            GR.SmoothingMode = SmoothingMode.None;
-            GR.FillRectangle(new SolidBrush(cellInThisDatabaseColumn.Column.BackColor), (int)cellInThisDatabaseColumn.OrderTMP_Spalte_X1, HeadSize(), Column_DrawWidth(cellInThisDatabaseColumn, displayRectangleWOSlider), displayRectangleWOSlider.Height);
-            Draw_Border(GR, cellInThisDatabaseColumn, displayRectangleWOSlider, false);
+        private void Draw_Column_Body(Graphics gr, ColumnViewItem cellInThisDatabaseColumn, Rectangle displayRectangleWOSlider) {
+            gr.SmoothingMode = SmoothingMode.None;
+            gr.FillRectangle(new SolidBrush(cellInThisDatabaseColumn.Column.BackColor), (int)cellInThisDatabaseColumn.OrderTMP_Spalte_X1, HeadSize(), Column_DrawWidth(cellInThisDatabaseColumn, displayRectangleWOSlider), displayRectangleWOSlider.Height);
+            Draw_Border(gr, cellInThisDatabaseColumn, displayRectangleWOSlider, false);
         }
 
         private void Draw_Column_Cells(Graphics gr, ColumnViewItem viewItem, Rectangle displayRectangleWOSlider, int firstVisibleRow, int lastVisibleRow, int lfdno) {
-            // Die Cursorposition ermittleln
-            if (!Thread.CurrentThread.IsBackground && _CursorPosColumn != null && _CursorPosRow != null && viewItem.Column == _CursorPosColumn) {
-                if (IsOnScreen(_CursorPosColumn, _CursorPosRow, displayRectangleWOSlider)) {
-                    tmpCursorRect = new Rectangle((int)viewItem.OrderTMP_Spalte_X1, DrawY(_CursorPosRow) + 1, Column_DrawWidth(viewItem, displayRectangleWOSlider), _CursorPosRow.DrawHeight - 1);
-                    Draw_Cursor(gr, displayRectangleWOSlider, false);
-                }
-            }
-            //  Neue Zeile
+
+            #region Neue Zeile
+
             if (UserEdit_NewRowAllowed() && viewItem == CurrentArrangement[Database.Column[0]]) {
                 Skin.Draw_FormatedText(gr, "[Neue Zeile]", QuickImage.Get(enImageCode.PlusZeichen, Pix16), enAlignment.Left, new Rectangle((int)viewItem.OrderTMP_Spalte_X1 + 1, (int)(-SliderY.Value + HeadSize() + 1), (int)viewItem._TMP_DrawWidth - 2, 16 - 2), this, false, _NewRow_Font, Translate);
             }
-            // Zeilen Zeichnen (Alle Zellen)
+
+            #endregion
+
+            #region Zeilen Zeichnen (Alle Zellen)
+
             for (var Zei = firstVisibleRow; Zei <= lastVisibleRow; Zei++) {
                 var CurrentRow = SortedRows()[Zei];
                 gr.SmoothingMode = SmoothingMode.None;
-                if (CurrentRow.Expanded) {
-                    gr.DrawLine(Skin.Pen_LinieDünn, (int)viewItem.OrderTMP_Spalte_X1, DrawY(CurrentRow), (int)viewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(viewItem, displayRectangleWOSlider) - 1, DrawY(CurrentRow));
-                    // Zelleninhalt Zeichnen
-                    Draw_CellTransparent(gr, viewItem, CurrentRow, displayRectangleWOSlider, _Cell_Font);
+
+                Rectangle cellrectangle = new((int)viewItem.OrderTMP_Spalte_X1,
+                                       DrawY(CurrentRow),
+                                       Column_DrawWidth(viewItem, displayRectangleWOSlider),
+                                        Math.Min(CurrentRow.DrawHeight, 24));
+
+                #region Hintergrund gelb zeichnen
+
+                if (CurrentRow.MarkYellow) {
+                    gr.FillRectangle(Brush_Yellow_Transparent, cellrectangle);
                 }
+
+                #endregion
+
+                #region Trennlinie zeichnen
+
+                gr.DrawLine(Skin.Pen_LinieDünn, cellrectangle.Left, cellrectangle.Bottom - 1, cellrectangle.Width - 1, cellrectangle.Bottom - 1);
+
+                #endregion
+
+                #region Die Cursorposition ermittleln und Zeichnen
+
+                if (!Thread.CurrentThread.IsBackground && _CursorPosColumn == viewItem.Column && _CursorPosRow == CurrentRow) {
+                    tmpCursorRect = cellrectangle;
+                    tmpCursorRect.Height -= 1;
+                    Draw_Cursor(gr, displayRectangleWOSlider, false);
+                }
+
+                #endregion
+
+                #region Zelleninhalt zeichnen
+
+                if (CurrentRow.Expanded) {
+                    Draw_CellTransparent(gr, viewItem, CurrentRow, cellrectangle, _Cell_Font);
+                }
+
+                #endregion
+
+                #region Unterschiede rot markieren
+
                 if (_Unterschiede != null && _Unterschiede != CurrentRow.Row) {
                     if (CurrentRow.Row.CellGetString(viewItem.Column) != _Unterschiede.CellGetString(viewItem.Column)) {
                         Rectangle tmpr = new((int)viewItem.OrderTMP_Spalte_X1 + 1, DrawY(CurrentRow) + 1, Column_DrawWidth(viewItem, displayRectangleWOSlider) - 2, CurrentRow.DrawHeight - 2);
-                        gr.DrawRectangle(new Pen(Color.Red, 1), tmpr);
+                        gr.DrawRectangle(Pen_Red_1, tmpr);
                     }
                 }
+
+                #endregion
+
+                #region Spaltenüberschrift
+
                 if (lfdno == 1) {
                     // Überschrift in der ersten Spalte zeichnen
                     CurrentRow.CaptionPos = Rectangle.Empty;
@@ -2482,33 +2562,38 @@ namespace BlueControls.Controls {
                         gr.DrawLine(Skin.Pen_LinieDick, 0, DrawY(CurrentRow), displayRectangleWOSlider.Width, DrawY(CurrentRow));
                     }
                 }
+
+                #endregion
             }
+
+            #endregion
         }
 
-        private void Draw_Column_Head(Graphics GR, ColumnViewItem ViewItem, Rectangle displayRectangleWOSlider, int lfdNo) {
-            if (!IsOnScreen(ViewItem, displayRectangleWOSlider)) { return; }
+        private void Draw_Column_Head(Graphics gr, ColumnViewItem viewItem, Rectangle displayRectangleWOSlider, int lfdNo) {
+            if (!IsOnScreen(viewItem, displayRectangleWOSlider)) { return; }
             if (_Design == enBlueTableAppearance.OnlyMainColumnWithoutHead) { return; }
             if (_Column_Font == null) { return; }
-            GR.FillRectangle(new SolidBrush(ViewItem.Column.BackColor), (int)ViewItem.OrderTMP_Spalte_X1, 0, Column_DrawWidth(ViewItem, displayRectangleWOSlider), HeadSize());
-            Draw_Border(GR, ViewItem, displayRectangleWOSlider, true);
-            GR.FillRectangle(new SolidBrush(Color.FromArgb(100, 200, 200, 200)), (int)ViewItem.OrderTMP_Spalte_X1, 0, Column_DrawWidth(ViewItem, displayRectangleWOSlider), HeadSize());
+            gr.FillRectangle(new SolidBrush(viewItem.Column.BackColor), (int)viewItem.OrderTMP_Spalte_X1, 0, Column_DrawWidth(viewItem, displayRectangleWOSlider), HeadSize());
+            Draw_Border(gr, viewItem, displayRectangleWOSlider, true);
+            gr.FillRectangle(new SolidBrush(Color.FromArgb(100, 200, 200, 200)), (int)viewItem.OrderTMP_Spalte_X1, 0, Column_DrawWidth(viewItem, displayRectangleWOSlider), HeadSize());
+
             var Down = 0;
-            if (!string.IsNullOrEmpty(ViewItem.Column.Ueberschrift3)) {
+            if (!string.IsNullOrEmpty(viewItem.Column.Ueberschrift3)) {
                 Down = ColumnCaptionSizeY * 3;
-            } else if (!string.IsNullOrEmpty(ViewItem.Column.Ueberschrift2)) {
+            } else if (!string.IsNullOrEmpty(viewItem.Column.Ueberschrift2)) {
                 Down = ColumnCaptionSizeY * 2;
-            } else if (!string.IsNullOrEmpty(ViewItem.Column.Ueberschrift1)) {
+            } else if (!string.IsNullOrEmpty(viewItem.Column.Ueberschrift1)) {
                 Down = ColumnCaptionSizeY;
             }
 
             #region Recude-Button zeichnen
 
-            if (Column_DrawWidth(ViewItem, displayRectangleWOSlider) > 70 || ViewItem._TMP_Reduced) {
-                ViewItem._TMP_ReduceLocation = new Rectangle((int)ViewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(ViewItem, displayRectangleWOSlider) - 18, Down, 18, 18);
-                if (ViewItem._TMP_Reduced) {
-                    GR.DrawImage(QuickImage.Get("Pfeil_Rechts|16|||FF0000|||||20").BMP, ViewItem._TMP_ReduceLocation.Left + 2, ViewItem._TMP_ReduceLocation.Top + 2);
+            if (Column_DrawWidth(viewItem, displayRectangleWOSlider) > 70 || viewItem._TMP_Reduced) {
+                viewItem._TMP_ReduceLocation = new Rectangle((int)viewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(viewItem, displayRectangleWOSlider) - 18, Down, 18, 18);
+                if (viewItem._TMP_Reduced) {
+                    gr.DrawImage(QuickImage.Get("Pfeil_Rechts|16|||FF0000|||||20").BMP, viewItem._TMP_ReduceLocation.Left + 2, viewItem._TMP_ReduceLocation.Top + 2);
                 } else {
-                    GR.DrawImage(QuickImage.Get("Pfeil_Links|16||||||||75").BMP, ViewItem._TMP_ReduceLocation.Left + 2, ViewItem._TMP_ReduceLocation.Top + 2);
+                    gr.DrawImage(QuickImage.Get("Pfeil_Links|16||||||||75").BMP, viewItem._TMP_ReduceLocation.Left + 2, viewItem._TMP_ReduceLocation.Top + 2);
                 }
             }
 
@@ -2519,43 +2604,43 @@ namespace BlueControls.Controls {
             var TrichterText = string.Empty;
             QuickImage TrichterIcon = null;
             var TrichterState = enStates.Undefiniert;
-            ViewItem._TMP_AutoFilterLocation = new Rectangle((int)ViewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(ViewItem, displayRectangleWOSlider) - _AutoFilterSize, HeadSize() - _AutoFilterSize, _AutoFilterSize, _AutoFilterSize);
-            var filtIt = Filter[ViewItem.Column];
-            if (ViewItem.Column.AutoFilterSymbolPossible()) {
+            viewItem._TMP_AutoFilterLocation = new Rectangle((int)viewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(viewItem, displayRectangleWOSlider) - _AutoFilterSize, HeadSize() - _AutoFilterSize, _AutoFilterSize, _AutoFilterSize);
+            var filtIt = Filter[viewItem.Column];
+            if (viewItem.Column.AutoFilterSymbolPossible()) {
                 if (filtIt != null) {
                     TrichterState = enStates.Checked;
-                    var anz = Autofilter_Text(ViewItem.Column);
+                    var anz = Autofilter_Text(viewItem.Column);
                     TrichterText = anz > -100 ? (anz * -1).ToString() : "∞";
                 } else {
-                    TrichterState = Autofilter_Sinnvoll(ViewItem.Column) ? enStates.Standard : enStates.Standard_Disabled;
+                    TrichterState = Autofilter_Sinnvoll(viewItem.Column) ? enStates.Standard : enStates.Standard_Disabled;
                 }
             }
             var TrichterSize = (_AutoFilterSize - 4).ToString();
             if (filtIt != null) {
                 TrichterIcon = QuickImage.Get("Trichter|" + TrichterSize + "|||FF0000");
-            } else if (Filter.MayHasRowFilter(ViewItem.Column)) {
+            } else if (Filter.MayHasRowFilter(viewItem.Column)) {
                 TrichterIcon = QuickImage.Get("Trichter|" + TrichterSize + "|||227722");
-            } else if (ViewItem.Column.AutoFilterSymbolPossible()) {
-                TrichterIcon = Autofilter_Sinnvoll(ViewItem.Column)
+            } else if (viewItem.Column.AutoFilterSymbolPossible()) {
+                TrichterIcon = Autofilter_Sinnvoll(viewItem.Column)
                     ? QuickImage.Get("Trichter|" + TrichterSize)
                     : QuickImage.Get("Trichter|" + TrichterSize + "||128");
             }
             if (TrichterState != enStates.Undefiniert) {
-                Skin.Draw_Back(GR, enDesign.Button_AutoFilter, TrichterState, ViewItem._TMP_AutoFilterLocation, null, false);
-                Skin.Draw_Border(GR, enDesign.Button_AutoFilter, TrichterState, ViewItem._TMP_AutoFilterLocation);
+                Skin.Draw_Back(gr, enDesign.Button_AutoFilter, TrichterState, viewItem._TMP_AutoFilterLocation, null, false);
+                Skin.Draw_Border(gr, enDesign.Button_AutoFilter, TrichterState, viewItem._TMP_AutoFilterLocation);
             }
             if (TrichterIcon != null) {
-                GR.DrawImage(TrichterIcon.BMP, ViewItem._TMP_AutoFilterLocation.Left + 2, ViewItem._TMP_AutoFilterLocation.Top + 2);
+                gr.DrawImage(TrichterIcon.BMP, viewItem._TMP_AutoFilterLocation.Left + 2, viewItem._TMP_AutoFilterLocation.Top + 2);
             }
             if (!string.IsNullOrEmpty(TrichterText)) {
                 var s = _Column_Filter_Font.MeasureString(TrichterText, StringFormat.GenericDefault);
 
-                _Column_Filter_Font.DrawString(GR, TrichterText,
-                              ViewItem._TMP_AutoFilterLocation.Left + ((_AutoFilterSize - s.Width) / 2),
-                              ViewItem._TMP_AutoFilterLocation.Top + ((_AutoFilterSize - s.Height) / 2));
+                _Column_Filter_Font.DrawString(gr, TrichterText,
+                              viewItem._TMP_AutoFilterLocation.Left + ((_AutoFilterSize - s.Width) / 2),
+                              viewItem._TMP_AutoFilterLocation.Top + ((_AutoFilterSize - s.Height) / 2));
             }
             if (TrichterState == enStates.Undefiniert) {
-                ViewItem._TMP_AutoFilterLocation = new Rectangle(0, 0, 0, 0);
+                viewItem._TMP_AutoFilterLocation = new Rectangle(0, 0, 0, 0);
             }
 
             #endregion Filter-Knopf mit Trichter
@@ -2565,44 +2650,44 @@ namespace BlueControls.Controls {
             if (_ShowNumber) {
                 for (var x = -1; x < 2; x++) {
                     for (var y = -1; y < 2; y++) {
-                        BlueFont.DrawString(GR, "#" + lfdNo.ToString(), _Column_Font.Font(), Brushes.Black, (int)ViewItem.OrderTMP_Spalte_X1 + x, ViewItem._TMP_AutoFilterLocation.Top + y);
+                        BlueFont.DrawString(gr, "#" + lfdNo.ToString(), _Column_Font.Font(), Brushes.Black, (int)viewItem.OrderTMP_Spalte_X1 + x, viewItem._TMP_AutoFilterLocation.Top + y);
                     }
                 }
-                BlueFont.DrawString(GR, "#" + lfdNo.ToString(), _Column_Font.Font(), Brushes.White, (int)ViewItem.OrderTMP_Spalte_X1, ViewItem._TMP_AutoFilterLocation.Top);
+                BlueFont.DrawString(gr, "#" + lfdNo.ToString(), _Column_Font.Font(), Brushes.White, (int)viewItem.OrderTMP_Spalte_X1, viewItem._TMP_AutoFilterLocation.Top);
             }
 
             #endregion LaufendeNummer
 
-            var tx = ViewItem.Column.Caption;
+            var tx = viewItem.Column.Caption;
             tx = LanguageTool.DoTranslate(tx, Translate).Replace("\r", "\r\n");
-            var FS = GR.MeasureString(tx, _Column_Font.Font());
-            if (!string.IsNullOrEmpty(ViewItem.Column.CaptionBitmap) && ViewItem.Column.TMP_CaptionBitmap == null) {
-                ViewItem.Column.TMP_CaptionBitmap = QuickImage.Get(ViewItem.Column.CaptionBitmap).BMP;
+            var FS = gr.MeasureString(tx, _Column_Font.Font());
+            if (!string.IsNullOrEmpty(viewItem.Column.CaptionBitmap) && viewItem.Column.TMP_CaptionBitmap == null) {
+                viewItem.Column.TMP_CaptionBitmap = QuickImage.Get(viewItem.Column.CaptionBitmap).BMP;
             }
-            if (ViewItem.Column.TMP_CaptionBitmap != null && ViewItem.Column.TMP_CaptionBitmap.Width > 10) {
-                Point pos = new((int)ViewItem.OrderTMP_Spalte_X1 + (int)((Column_DrawWidth(ViewItem, displayRectangleWOSlider) - FS.Width) / 2.0), 3 + Down);
-                GR.DrawImageInRectAspectRatio(ViewItem.Column.TMP_CaptionBitmap, (int)ViewItem.OrderTMP_Spalte_X1 + 2, (int)(pos.Y + FS.Height), Column_DrawWidth(ViewItem, displayRectangleWOSlider) - 4, HeadSize() - (int)(pos.Y + FS.Height) - 6 - 18);
+            if (viewItem.Column.TMP_CaptionBitmap != null && viewItem.Column.TMP_CaptionBitmap.Width > 10) {
+                Point pos = new((int)viewItem.OrderTMP_Spalte_X1 + (int)((Column_DrawWidth(viewItem, displayRectangleWOSlider) - FS.Width) / 2.0), 3 + Down);
+                gr.DrawImageInRectAspectRatio(viewItem.Column.TMP_CaptionBitmap, (int)viewItem.OrderTMP_Spalte_X1 + 2, (int)(pos.Y + FS.Height), Column_DrawWidth(viewItem, displayRectangleWOSlider) - 4, HeadSize() - (int)(pos.Y + FS.Height) - 6 - 18);
                 // Dann der Text
-                GR.TranslateTransform(pos.X, pos.Y);
+                gr.TranslateTransform(pos.X, pos.Y);
                 //GR.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
-                BlueFont.DrawString(GR, tx, _Column_Font.Font(), new SolidBrush(ViewItem.Column.ForeColor), 0, 0);
-                GR.TranslateTransform(-pos.X, -pos.Y);
+                BlueFont.DrawString(gr, tx, _Column_Font.Font(), new SolidBrush(viewItem.Column.ForeColor), 0, 0);
+                gr.TranslateTransform(-pos.X, -pos.Y);
             } else {
-                Point pos = new((int)ViewItem.OrderTMP_Spalte_X1 + (int)((Column_DrawWidth(ViewItem, displayRectangleWOSlider) - FS.Height) / 2.0), HeadSize() - 4 - _AutoFilterSize);
-                GR.TranslateTransform(pos.X, pos.Y);
-                GR.RotateTransform(-90);
+                Point pos = new((int)viewItem.OrderTMP_Spalte_X1 + (int)((Column_DrawWidth(viewItem, displayRectangleWOSlider) - FS.Height) / 2.0), HeadSize() - 4 - _AutoFilterSize);
+                gr.TranslateTransform(pos.X, pos.Y);
+                gr.RotateTransform(-90);
                 //GR.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
-                BlueFont.DrawString(GR, tx, _Column_Font.Font(), new SolidBrush(ViewItem.Column.ForeColor), 0, 0);
-                GR.TranslateTransform(-pos.X, -pos.Y);
-                GR.ResetTransform();
+                BlueFont.DrawString(gr, tx, _Column_Font.Font(), new SolidBrush(viewItem.Column.ForeColor), 0, 0);
+                gr.TranslateTransform(-pos.X, -pos.Y);
+                gr.ResetTransform();
             }
             // Sortierrichtung Zeichnen
             var tmpSortDefinition = SortUsed();
-            if (tmpSortDefinition != null && tmpSortDefinition.UsedForRowSort(ViewItem.Column) || ViewItem.Column == Database.Column.SysChapter) {
+            if (tmpSortDefinition != null && tmpSortDefinition.UsedForRowSort(viewItem.Column) || viewItem.Column == Database.Column.SysChapter) {
                 if (tmpSortDefinition.Reverse) {
-                    GR.DrawImage(QuickImage.Get("ZA|11|5||||50").BMP, (float)(ViewItem.OrderTMP_Spalte_X1 + (Column_DrawWidth(ViewItem, displayRectangleWOSlider) / 2.0) - 6), HeadSize() - 6 - _AutoFilterSize);
+                    gr.DrawImage(QuickImage.Get("ZA|11|5||||50").BMP, (float)(viewItem.OrderTMP_Spalte_X1 + (Column_DrawWidth(viewItem, displayRectangleWOSlider) / 2.0) - 6), HeadSize() - 6 - _AutoFilterSize);
                 } else {
-                    GR.DrawImage(QuickImage.Get("AZ|11|5||||50").BMP, (float)(ViewItem.OrderTMP_Spalte_X1 + (Column_DrawWidth(ViewItem, displayRectangleWOSlider) / 2.0) - 6), HeadSize() - 6 - _AutoFilterSize);
+                    gr.DrawImage(QuickImage.Get("AZ|11|5||||50").BMP, (float)(viewItem.OrderTMP_Spalte_X1 + (Column_DrawWidth(viewItem, displayRectangleWOSlider) / 2.0) - 6), HeadSize() - 6 - _AutoFilterSize);
                 }
             }
         }
@@ -2649,30 +2734,18 @@ namespace BlueControls.Controls {
             }
         }
 
-        private void Draw_Cursor(Graphics GR, Rectangle displayRectangleWOSlider, bool OnlyCursorLines) {
+        private void Draw_Cursor(Graphics gr, Rectangle displayRectangleWOSlider, bool onlyCursorLines) {
             if (tmpCursorRect.Width < 1) { return; }
+
             var stat = enStates.Standard;
             if (Focused()) { stat = enStates.Standard_HasFocus; }
-            if (OnlyCursorLines) {
+
+            if (onlyCursorLines) {
                 Pen pen = new(Skin.Color_Border(enDesign.Table_Cursor, stat).SetAlpha(180));
-                GR.DrawRectangle(pen, new Rectangle(-1, tmpCursorRect.Top - 1, displayRectangleWOSlider.Width + 2, tmpCursorRect.Height + 1));
+                gr.DrawRectangle(pen, new Rectangle(-1, tmpCursorRect.Top - 1, displayRectangleWOSlider.Width + 2, tmpCursorRect.Height + 1));
             } else {
-                Skin.Draw_Back(GR, enDesign.Table_Cursor, stat, tmpCursorRect, this, false);
-                Skin.Draw_Border(GR, enDesign.Table_Cursor, stat, tmpCursorRect);
-            }
-        }
-
-        private void Draw_Pinned(Graphics gr, Rectangle displayRectangleWOSlider, int start_x, int end_x) {
-            if (_PinnedRows == null || _PinnedRows.Count == 0 || gr == null) { return; }
-
-            SolidBrush b = new(Color.FromArgb(180, 255, 255, 0));
-
-            foreach (var ThisRowItem in _PinnedRows) {
-                var r = SortedRows().Get(ThisRowItem, "Angepinnt");
-                var y = DrawY(r);
-                if (y >= 0 && y < displayRectangleWOSlider.Height) {
-                    gr.FillRectangle(b, start_x, y, end_x - start_x, r.DrawHeight);
-                }
+                Skin.Draw_Back(gr, enDesign.Table_Cursor, stat, tmpCursorRect, this, false);
+                Skin.Draw_Border(gr, enDesign.Table_Cursor, stat, tmpCursorRect);
             }
         }
 
@@ -2682,23 +2755,28 @@ namespace BlueControls.Controls {
             var Col = Database.Column[0];
             // Zeilen Zeichnen (Alle Zellen)
             for (var Zeiv = vFirstVisibleRow; Zeiv <= vLastVisibleRow; Zeiv++) {
-                var Row = SortedRows()[Zeiv];
+                var CurrentRow = SortedRows()[Zeiv];
                 var ViewItem = _Database.ColumnArrangements[0][Col];
-                Rectangle r = new(0, DrawY(Row), DisplayRectangleWithoutSlider().Width, Row.DrawHeight);
-                if (_CursorPosColumn != null && _CursorPosRow.Row == Row.Row) {
+                Rectangle r = new(0, DrawY(CurrentRow), DisplayRectangleWithoutSlider().Width, CurrentRow.DrawHeight);
+                if (_CursorPosColumn != null && _CursorPosRow.Row == CurrentRow.Row) {
                     ItStat |= enStates.Checked;
                 } else {
                     if (Convert.ToBoolean(ItStat & enStates.Checked)) {
                         ItStat ^= enStates.Checked;
                     }
                 }
-                ViewItem.OrderTMP_Spalte_X1 = 0;
-                Draw_CellListBox(GR, ViewItem, Row, r, enDesign.Item_Listbox, ItStat);
-                if (!Row.Row.CellGetBoolean(_Database.Column.SysCorrect)) {
+
+                Rectangle cellrectangle = new(0,
+                       DrawY(CurrentRow),
+                        displayRectangleWOSlider.Width,
+                        Math.Min(CurrentRow.DrawHeight, 24));
+
+                Draw_CellListBox(GR, ViewItem, CurrentRow, cellrectangle, r, enDesign.Item_Listbox, ItStat);
+                if (!CurrentRow.Row.CellGetBoolean(_Database.Column.SysCorrect)) {
                     GR.DrawImage(QuickImage.Get("Warnung|16||||||120||50").BMP, new Point(r.Right - 19, (int)(r.Top + ((r.Height - 16) / 2.0))));
                 }
-                if (Row.ShowCap) {
-                    BlueFont.DrawString(GR, Row.Chapter, _Chapter_Font.Font(), _Chapter_Font.Brush_Color_Main, 0, DrawY(Row) - RowCaptionFontY);
+                if (CurrentRow.ShowCap) {
+                    BlueFont.DrawString(GR, CurrentRow.Chapter, _Chapter_Font.Font(), _Chapter_Font.Brush_Color_Main, 0, DrawY(CurrentRow) - RowCaptionFontY);
                 }
             }
             Skin.Draw_Border(GR, enDesign.ListBox, vState, displayRectangleWOSlider);
@@ -2721,20 +2799,18 @@ namespace BlueControls.Controls {
                     }
                 }
                 Draw_Table_What(GR, enTableDrawColumn.NonPermament, enTableDrawType.ColumnBackBody, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
-                Draw_Table_What(GR, enTableDrawColumn.NonPermament, enTableDrawType.PinnedRows, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
                 Draw_Table_What(GR, enTableDrawColumn.NonPermament, enTableDrawType.Cells, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
                 Draw_Table_What(GR, enTableDrawColumn.Permament, enTableDrawType.ColumnBackBody, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
-                Draw_Table_What(GR, enTableDrawColumn.Permament, enTableDrawType.PinnedRows, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
                 Draw_Table_What(GR, enTableDrawColumn.Permament, enTableDrawType.Cells, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
-                //// PinnedRowsMarkieren
-                //Draw_Pinned(GR, displayRectangleWOSlider);
                 // Den CursorLines zeichnen
                 Draw_Cursor(GR, displayRectangleWOSlider, true);
                 Draw_Table_What(GR, enTableDrawColumn.NonPermament, enTableDrawType.ColumnHead, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
                 Draw_Table_What(GR, enTableDrawColumn.Permament, enTableDrawType.ColumnHead, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
+
                 /// Überschriften 1-3 Zeichnen
                 Draw_Column_Head_Captions(GR);
                 Skin.Draw_Border(GR, enDesign.Table_And_Pad, State, displayRectangleWOSlider);
+
                 if (Database.ReloadNeeded) { GR.DrawImage(QuickImage.Get(enImageCode.Uhr, 16).BMP, 8, 8); }
                 if (Database.HasPendingChanges()) { GR.DrawImage(QuickImage.Get(enImageCode.Stift, 16).BMP, 16, 8); }
                 if (Database.ReadOnly) { GR.DrawImage(QuickImage.Get(enImageCode.Schloss, 32).BMP, 16, 8); }
@@ -2745,15 +2821,7 @@ namespace BlueControls.Controls {
 
         private void Draw_Table_What(Graphics GR, enTableDrawColumn col, enTableDrawType type, int PermaX, Rectangle displayRectangleWOSlider, int FirstVisibleRow, int LastVisibleRow) {
             var lfdno = 0;
-            if (type == enTableDrawType.PinnedRows) {
-                if (col == enTableDrawColumn.Permament) {
-                    Draw_Pinned(GR, displayRectangleWOSlider, 0, PermaX);
-                }
-                if (col == enTableDrawColumn.NonPermament) {
-                    Draw_Pinned(GR, displayRectangleWOSlider, PermaX, displayRectangleWOSlider.Width);
-                }
-                return;
-            }
+
             foreach (var ViewItem in CurrentArrangement) {
                 if (ViewItem != null && ViewItem.Column != null) {
                     lfdno++;

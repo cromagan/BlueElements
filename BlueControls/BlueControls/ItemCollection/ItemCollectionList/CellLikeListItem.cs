@@ -80,7 +80,7 @@ namespace BlueControls.ItemCollection {
             if (DrawBorderAndBack) {
                 Skin.Draw_Back(GR, itemdesign, vState, PositionModified, null, false);
             }
-            Table.Draw_FormatedText(_StyleLikeThis, Internal, GR, PositionModified, false, _style, itemdesign, vState, _bildTextverhalten);
+            Table.Draw_FormatedText(GR, Internal, _StyleLikeThis, PositionModified, itemdesign, vState, _style, _bildTextverhalten);
             if (DrawBorderAndBack) {
                 Skin.Draw_Border(GR, itemdesign, vState, PositionModified);
             }

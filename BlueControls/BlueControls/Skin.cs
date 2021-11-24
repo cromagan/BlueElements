@@ -1134,10 +1134,6 @@ namespace BlueControls {
         /// <param name="deleteBack"></param>
         /// <param name="bFont"></param>
         public static void Draw_FormatedText(Graphics gr, string txt, QuickImage qi, enAlignment align, Rectangle fitInRect, System.Windows.Forms.Control Child, bool deleteBack, BlueFont bFont, bool translate) {
-            //if (gr.TextRenderingHint != TextRenderingHint.AntiAliasGridFit) {
-            //    gr.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
-            //}
-            //  GR.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit
             var pSize = SizeF.Empty;
             var tSize = SizeF.Empty;
             float XP = 0;

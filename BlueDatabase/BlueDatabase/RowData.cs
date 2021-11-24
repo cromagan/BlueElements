@@ -79,11 +79,12 @@ namespace BlueDatabase {
 
         public readonly string Chapter;
         public readonly RowItem Row;
+        public string AdditinalSort;
         public string AdditionalSort;
         public Rectangle CaptionPos;
         public int DrawHeight;
         public bool Expanded;
-        public bool Pinned;
+        public bool MarkYellow;
         public bool ShowCap;
         public int Y;
 
@@ -95,7 +96,7 @@ namespace BlueDatabase {
 
         public RowData(RowItem row, string chapter) {
             Row = row;
-            Pinned = false;
+            AdditinalSort = "2";
             Y = -1;
             Chapter = chapter;
             Expanded = true;
@@ -103,19 +104,14 @@ namespace BlueDatabase {
             CaptionPos = Rectangle.Empty;
             AdditionalSort = string.Empty;
             ShowCap = false;
+            MarkYellow = false;
         }
 
         #endregion
 
         #region Methods
 
-        public string CompareKey() {
-            if (Pinned) {
-                return "1;" + Chapter.ToUpper() + ";" + AdditionalSort;
-            } else {
-                return "2;" + Chapter.ToUpper() + ";" + AdditionalSort;
-            }
-        }
+        public string CompareKey() => AdditinalSort + ";" + Chapter.StarkeVereinfachung(" ") + ";" + AdditionalSort;
 
         public int CompareTo(object obj) {
             if (obj is RowData robj) {
@@ -132,6 +128,24 @@ namespace BlueDatabase {
             } else {
                 return Chapter + " -> " + Row.CellFirstString();
             }
+        }
+
+        public void GetDataFrom(RowData thisRowData) {
+
+            if (Row != thisRowData.Row || Chapter != thisRowData.Chapter) {
+                Develop.DebugPrint(enFehlerArt.Warnung, "RowData Kopie fehlgeschlagen!");
+            }
+
+            AdditinalSort = thisRowData.AdditinalSort;
+            Y = thisRowData.Y;
+
+            Expanded = thisRowData.Expanded;
+            DrawHeight = thisRowData.DrawHeight;
+            CaptionPos = thisRowData.CaptionPos;
+            AdditionalSort = thisRowData.AdditionalSort;
+            ShowCap = thisRowData.ShowCap;
+            MarkYellow = thisRowData.MarkYellow;
+
         }
 
         #endregion
