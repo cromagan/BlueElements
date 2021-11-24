@@ -479,12 +479,7 @@ namespace BlueControls.Controls {
             if (string.IsNullOrEmpty(text)) { return; }
             var d = Skin.DesignOf(design, state);
 
-            var tmpData = CellItem.GetDrawingData(column, text, style, bildTextverhalten);
-
-            Draw_CellTransparentDirect(gr, text, column, fitInRect, d.bFont, column, 16);
-            //Draw_CellTransparentDirect_OneLine
-
-            //Draw_CellTransparentDirect_OneLine(gr, column, text, fitInRect, d.bFont, style, state, bildTextverhalten);
+            Draw_CellTransparentDirect(gr, text, fitInRect, d.bFont, column, 16, style, bildTextverhalten, state);
         }
 
         public static List<string> FileSystem(ColumnItem _tmpColumn) {
@@ -653,7 +648,7 @@ namespace BlueControls.Controls {
         public void CursorPos_Reset() => CursorPos_Set(null, null, false);
 
         public void CursorPos_Set(ColumnItem column, RowData row, bool ensureVisible) {
-            if (_Database == null || _Database.ColumnArrangements.Count == 0 || CurrentArrangement[column] == null || !SortedRows().Contains(row)) {
+            if (_Database == null || _Database.ColumnArrangements.Count == 0 || CurrentArrangement[column] == null || SortedRows() == null || !SortedRows().Contains(row)) {
                 column = null;
                 row = null;
             }
@@ -892,6 +887,11 @@ namespace BlueControls.Controls {
                     ThisRowData.Expanded = expanded;
                     if (ThisRowData.Expanded) {
                         ThisRowData.DrawHeight = Row_DrawHeight(ThisRowData.Row, DisplayR);
+                        if (_SortedRowData == null) {
+                            // Folgender Fall: Die Row height reparirt die LinkedCell.
+                            // Dadruch wird eine Zelle geändert. Das wiederrum kann _SortedRowData auf null setzen..
+                            return null;
+                        }
                         MaxY += ThisRowData.DrawHeight;
                     }
 
@@ -1518,53 +1518,38 @@ namespace BlueControls.Controls {
             Pad.SaveAsBitmap(e.Filename);
         }
 
-        private static void Draw_CellTransparentDirect(Graphics gr, string toDraw, ColumnItem cellInThisDatabaseColumn, Rectangle cellrectangle, BlueFont font, ColumnItem contentHolderCellColumn, int Pix16, enBildTextVerhalten) {
+        private static void Draw_CellTransparentDirect(Graphics gr, string toDraw, Rectangle drawarea, BlueFont font, ColumnItem contentHolderCellColumn, int Pix16, enShortenStyle style, enBildTextVerhalten bildTextverhalten, enStates state) {
             if (toDraw == null) { toDraw = string.Empty; }
 
             if (!contentHolderCellColumn.MultiLine || !toDraw.Contains("\r")) {
-                Draw_CellTransparentDirect_OneLine(gr, toDraw, contentHolderCellColumn, cellrectangle, 0, true, font, Pix16);
+                Draw_CellTransparentDirect_OneLine(gr, toDraw, contentHolderCellColumn, drawarea, 0, false, font, Pix16, style, bildTextverhalten, state);
             } else {
                 var MEI = toDraw.SplitAndCutByCR();
                 if (contentHolderCellColumn.ShowMultiLineInOneLine) {
-                    Draw_CellTransparentDirect_OneLine(gr, MEI.JoinWith("; "), contentHolderCellColumn, cellrectangle, 0, true, font, Pix16);
+                    Draw_CellTransparentDirect_OneLine(gr, MEI.JoinWith("; "), contentHolderCellColumn, drawarea, 0, false, font, Pix16, style, bildTextverhalten, state);
                 } else {
                     var y = 0;
                     for (var z = 0; z <= MEI.GetUpperBound(0); z++) {
-                        Draw_CellTransparentDirect_OneLine(gr, MEI[z], contentHolderCellColumn, cellrectangle, y, (z == MEI.GetUpperBound(0)), font, Pix16);
-                        y += FormatedText_NeededSize(cellInThisDatabaseColumn, MEI[z], font, enShortenStyle.Replaced, Pix16 - 1, cellInThisDatabaseColumn.BildTextVerhalten).Height;
+                        Draw_CellTransparentDirect_OneLine(gr, MEI[z], contentHolderCellColumn, drawarea, y, z == MEI.GetUpperBound(0), font, Pix16, style, bildTextverhalten, state);
+                        y += FormatedText_NeededSize(contentHolderCellColumn, MEI[z], font, style, Pix16 - 1, bildTextverhalten).Height;
                     }
                 }
             }
         }
 
-        /// <summary>
-        /// Der Status des Bildes wird geändert, Texte werden gekürzt
-        /// </summary>
-        /// <param name="gr"></param>
-        /// <param name="column"></param>
-        /// <param name="originalText"></param>
-        /// <param name="fitInRect"></param>
-        /// <param name="Child"></param>
-        /// <param name="deleteBack"></param>
-        /// <param name="font"></param>
-        private static void Draw_CellTransparentDirect_OneLine(Graphics gr, ColumnItem column, string originalText, Rectangle fitInRect, BlueFont font, enShortenStyle style, enStates state, enBildTextVerhalten bildTextverhalten) {
-            var tmpData = CellItem.GetDrawingData(column, originalText, style, bildTextverhalten);
+        private static void Draw_CellTransparentDirect_OneLine(Graphics gr, string drawString, ColumnItem contentHolderColumnStyle, Rectangle drawarea, int txtYPix, bool changeToDot, BlueFont font, int Pix16, enShortenStyle style, enBildTextVerhalten bildTextverhalten, enStates state) {
+            Rectangle r = new(drawarea.Left, drawarea.Top + txtYPix, drawarea.Width, Pix16);
+
+            if (r.Bottom + Pix16 > drawarea.Bottom) {
+                if (r.Bottom > drawarea.Bottom) { return; }
+                if (changeToDot) { drawString = "..."; }// Die letzte Zeile noch ganz hinschreiben
+            }
+
+            var tmpData = CellItem.GetDrawingData(contentHolderColumnStyle, drawString, style, bildTextverhalten);
             var tmpImageCode = tmpData.Item3;
             if (tmpImageCode != null) { tmpImageCode = QuickImage.Get(tmpImageCode, Skin.AdditionalState(state)); }
-            Skin.Draw_FormatedText(gr, tmpData.Item1, tmpImageCode, tmpData.Item2, fitInRect, null, false, font, false);
-        }
 
-        /// <summary>
-        /// Zeichnet die eine Zeile der Zelle ohne Hintergrund und prüft noch, ob der verlinkte Inhalt gezeichnet werden soll.
-        /// </summary>
-        private static void Draw_CellTransparentDirect_OneLine(Graphics gr, string drawString, ColumnItem contentHolderColumnStyle, Rectangle cellRectangle, int txtY, bool isLastRow, BlueFont font, int Pix16) {
-            Rectangle r = new(cellRectangle.Left, cellRectangle.Top + txtY, cellRectangle.Width, Pix16);
-
-            if (r.Bottom > cellRectangle.Bottom - Pix16) {
-                if (r.Bottom > cellRectangle.Bottom) { return; }
-                if (!isLastRow) { drawString = "..."; }// Die letzte Zeile noch ganz hinschreiben
-            }
-            Draw_CellTransparentDirect_OneLine(gr, contentHolderColumnStyle, drawString, r, font, enShortenStyle.Replaced, enStates.Standard, contentHolderColumnStyle.BildTextVerhalten);
+            Skin.Draw_FormatedText(gr, tmpData.Item1, tmpImageCode, tmpData.Item2, drawarea, null, false, font, false);
         }
 
         private static int GetPix(int Pix, BlueFont F, double Scale) => Skin.FormatedText_NeededSize("@|", null, F, (int)((Pix * Scale) + 0.5)).Height;
@@ -2404,7 +2389,7 @@ namespace BlueControls.Controls {
             Skin.Draw_Border(gr, design, state, displayRectangleWOSlider);
             var f = Skin.GetBlueFont(design, state);
             if (f == null) { return; }
-            Draw_CellTransparent(gr, column, row, cellrectangle, f);
+            Draw_CellTransparent(gr, column, row, cellrectangle, f, state);
         }
 
         /// <summary>
@@ -2415,19 +2400,19 @@ namespace BlueControls.Controls {
         /// <param name="cellInThisDatabaseRow"></param>
         /// <param name="displayRectangleWOSlider"></param>
         /// <param name="font"></param>
-        private void Draw_CellTransparent(Graphics gr, ColumnViewItem cellInThisDatabaseColumn, RowData cellInThisDatabaseRow, Rectangle cellrectangle, BlueFont font) {
+        private void Draw_CellTransparent(Graphics gr, ColumnViewItem cellInThisDatabaseColumn, RowData cellInThisDatabaseRow, Rectangle cellrectangle, BlueFont font, enStates state) {
             if (cellInThisDatabaseRow == null) { return; }
 
             if (cellInThisDatabaseColumn.Column.Format == enDataFormat.LinkedCell) {
                 (var lcolumn, var lrow) = CellCollection.LinkedCellData(cellInThisDatabaseColumn.Column, cellInThisDatabaseRow.Row, false, false);
 
                 if (lcolumn != null && lrow != null) {
-                    Draw_CellTransparentDirect(gr, cellInThisDatabaseColumn, cellInThisDatabaseRow, cellrectangle, lcolumn, lrow, font);
+                    Draw_CellTransparentDirect(gr, cellInThisDatabaseColumn, cellInThisDatabaseRow, cellrectangle, lcolumn, lrow, font, state);
                 }
                 return;
             }
 
-            Draw_CellTransparentDirect(gr, cellInThisDatabaseColumn, cellInThisDatabaseRow, cellrectangle, cellInThisDatabaseColumn.Column, cellInThisDatabaseRow.Row, font);
+            Draw_CellTransparentDirect(gr, cellInThisDatabaseColumn, cellInThisDatabaseRow, cellrectangle, cellInThisDatabaseColumn.Column, cellInThisDatabaseRow.Row, font, state);
         }
 
         /// <summary>
@@ -2441,7 +2426,7 @@ namespace BlueControls.Controls {
         /// <param name="contentHolderCellRow"></param>
         /// <param name="displayRectangleWOSlider"></param>
         /// <param name="font"></param>
-        private void Draw_CellTransparentDirect(Graphics gr, ColumnViewItem cellInThisDatabaseColumn, RowData cellInThisDatabaseRow, Rectangle cellrectangle, ColumnItem contentHolderCellColumn, RowItem contentHolderCellRow, BlueFont font) {
+        private void Draw_CellTransparentDirect(Graphics gr, ColumnViewItem cellInThisDatabaseColumn, RowData cellInThisDatabaseRow, Rectangle cellrectangle, ColumnItem contentHolderCellColumn, RowItem contentHolderCellRow, BlueFont font, enStates state) {
             if (cellInThisDatabaseColumn.Column.Format == enDataFormat.Button) {
                 Draw_CellAsButton(gr, cellInThisDatabaseColumn, cellInThisDatabaseRow, cellrectangle);
                 return;
@@ -2449,27 +2434,7 @@ namespace BlueControls.Controls {
 
             var toDraw = contentHolderCellRow.CellGetString(contentHolderCellColumn);
 
-            Table.Draw_CellTransparentDirect(gr, toDraw, cellInThisDatabaseColumn.Column, cellrectangle, font, contentHolderCellColumn, Pix16);
-
-            //if (cellInThisDatabaseColumn.Column.Format == enDataFormat.Button) {
-            //    Draw_CellAsButton(gr, cellInThisDatabaseColumn, cellInThisDatabaseRow, cellrectangle);
-            //    return;
-            //}
-
-            //if (!contentHolderCellColumn.MultiLine || !toDraw.Contains("\r")) {
-            //    Draw_CellTransparentDirect_OneLine(gr, toDraw, 0, contentHolderCellColumn, true, font, cellrectangle);
-            //} else {
-            //    var MEI = toDraw.SplitAndCutByCR();
-            //    if (contentHolderCellColumn.ShowMultiLineInOneLine) {
-            //        Draw_CellTransparentDirect_OneLine(gr, MEI.JoinWith("; "), 0, contentHolderCellColumn, true, font, cellrectangle);
-            //    } else {
-            //        var y = 0;
-            //        for (var z = 0; z <= MEI.GetUpperBound(0); z++) {
-            //            Draw_CellTransparentDirect_OneLine(gr, MEI[z], y, contentHolderCellColumn, (z == MEI.GetUpperBound(0)), font, cellrectangle);
-            //            y += FormatedText_NeededSize(cellInThisDatabaseColumn.Column, MEI[z], font, enShortenStyle.Replaced, Pix16 - 1, cellInThisDatabaseColumn.Column.BildTextVerhalten).Height;
-            //        }
-            //    }
-            //}
+            Table.Draw_CellTransparentDirect(gr, toDraw, cellrectangle, font, contentHolderCellColumn, Pix16, enShortenStyle.Replaced, contentHolderCellColumn.BildTextVerhalten, state);
         }
 
         private void Draw_Column_Body(Graphics gr, ColumnViewItem cellInThisDatabaseColumn, Rectangle displayRectangleWOSlider) {
@@ -2478,7 +2443,7 @@ namespace BlueControls.Controls {
             Draw_Border(gr, cellInThisDatabaseColumn, displayRectangleWOSlider, false);
         }
 
-        private void Draw_Column_Cells(Graphics gr, ColumnViewItem viewItem, Rectangle displayRectangleWOSlider, int firstVisibleRow, int lastVisibleRow, int lfdno) {
+        private void Draw_Column_Cells(Graphics gr, ColumnViewItem viewItem, Rectangle displayRectangleWOSlider, int firstVisibleRow, int lastVisibleRow, int lfdno, enStates state) {
 
             #region Neue Zeile
 
@@ -2509,7 +2474,7 @@ namespace BlueControls.Controls {
 
                 #region Trennlinie zeichnen
 
-                gr.DrawLine(Skin.Pen_LinieDünn, cellrectangle.Left, cellrectangle.Bottom - 1, cellrectangle.Width - 1, cellrectangle.Bottom - 1);
+                gr.DrawLine(Skin.Pen_LinieDünn, cellrectangle.Left, cellrectangle.Bottom - 1, cellrectangle.Right - 1, cellrectangle.Bottom - 1);
 
                 #endregion
 
@@ -2526,7 +2491,7 @@ namespace BlueControls.Controls {
                 #region Zelleninhalt zeichnen
 
                 if (CurrentRow.Expanded) {
-                    Draw_CellTransparent(gr, viewItem, CurrentRow, cellrectangle, _Cell_Font);
+                    Draw_CellTransparent(gr, viewItem, CurrentRow, cellrectangle, _Cell_Font, state);
                 }
 
                 #endregion
@@ -2749,9 +2714,9 @@ namespace BlueControls.Controls {
             }
         }
 
-        private void Draw_Table_ListboxStyle(Graphics GR, enStates vState, Rectangle displayRectangleWOSlider, int vFirstVisibleRow, int vLastVisibleRow) {
-            var ItStat = vState;
-            Skin.Draw_Back(GR, enDesign.ListBox, vState, DisplayRectangle, this, true);
+        private void Draw_Table_ListboxStyle(Graphics GR, enStates state, Rectangle displayRectangleWOSlider, int vFirstVisibleRow, int vLastVisibleRow) {
+            var ItStat = state;
+            Skin.Draw_Back(GR, enDesign.ListBox, state, DisplayRectangle, this, true);
             var Col = Database.Column[0];
             // Zeilen Zeichnen (Alle Zellen)
             for (var Zeiv = vFirstVisibleRow; Zeiv <= vLastVisibleRow; Zeiv++) {
@@ -2779,37 +2744,37 @@ namespace BlueControls.Controls {
                     BlueFont.DrawString(GR, CurrentRow.Chapter, _Chapter_Font.Font(), _Chapter_Font.Brush_Color_Main, 0, DrawY(CurrentRow) - RowCaptionFontY);
                 }
             }
-            Skin.Draw_Border(GR, enDesign.ListBox, vState, displayRectangleWOSlider);
+            Skin.Draw_Border(GR, enDesign.ListBox, state, displayRectangleWOSlider);
         }
 
-        private void Draw_Table_Std(Graphics GR, enStates State, Rectangle displayRectangleWOSlider, int FirstVisibleRow, int LastVisibleRow) {
+        private void Draw_Table_Std(Graphics GR, enStates state, Rectangle displayRectangleWOSlider, int FirstVisibleRow, int LastVisibleRow) {
             try {
                 if (_Database.ColumnArrangements == null || _ArrangementNr >= _Database.ColumnArrangements.Count) { return; }   // Kommt vor, dass spontan doch geparsed wird...
-                Skin.Draw_Back(GR, enDesign.Table_And_Pad, State, DisplayRectangle, this, true);
+                Skin.Draw_Back(GR, enDesign.Table_And_Pad, state, DisplayRectangle, this, true);
                 /// Maximale Rechten Pixel der Permanenten Columns ermitteln
                 var PermaX = 0;
                 foreach (var ViewItem in CurrentArrangement) {
                     if (ViewItem != null && ViewItem.Column != null && ViewItem.ViewType == enViewType.PermanentColumn) {
                         if (ViewItem._TMP_DrawWidth == null) {
                             // Veränderte Werte!
-                            DrawControl(GR, State);
+                            DrawControl(GR, state);
                             return;
                         }
                         PermaX = Math.Max(PermaX, (int)ViewItem.OrderTMP_Spalte_X1 + (int)ViewItem._TMP_DrawWidth);
                     }
                 }
-                Draw_Table_What(GR, enTableDrawColumn.NonPermament, enTableDrawType.ColumnBackBody, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
-                Draw_Table_What(GR, enTableDrawColumn.NonPermament, enTableDrawType.Cells, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
-                Draw_Table_What(GR, enTableDrawColumn.Permament, enTableDrawType.ColumnBackBody, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
-                Draw_Table_What(GR, enTableDrawColumn.Permament, enTableDrawType.Cells, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
+                Draw_Table_What(GR, enTableDrawColumn.NonPermament, enTableDrawType.ColumnBackBody, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, state);
+                Draw_Table_What(GR, enTableDrawColumn.NonPermament, enTableDrawType.Cells, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, state);
+                Draw_Table_What(GR, enTableDrawColumn.Permament, enTableDrawType.ColumnBackBody, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, state);
+                Draw_Table_What(GR, enTableDrawColumn.Permament, enTableDrawType.Cells, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, state);
                 // Den CursorLines zeichnen
                 Draw_Cursor(GR, displayRectangleWOSlider, true);
-                Draw_Table_What(GR, enTableDrawColumn.NonPermament, enTableDrawType.ColumnHead, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
-                Draw_Table_What(GR, enTableDrawColumn.Permament, enTableDrawType.ColumnHead, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
+                Draw_Table_What(GR, enTableDrawColumn.NonPermament, enTableDrawType.ColumnHead, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, state);
+                Draw_Table_What(GR, enTableDrawColumn.Permament, enTableDrawType.ColumnHead, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, state);
 
                 /// Überschriften 1-3 Zeichnen
                 Draw_Column_Head_Captions(GR);
-                Skin.Draw_Border(GR, enDesign.Table_And_Pad, State, displayRectangleWOSlider);
+                Skin.Draw_Border(GR, enDesign.Table_And_Pad, state, displayRectangleWOSlider);
 
                 if (Database.ReloadNeeded) { GR.DrawImage(QuickImage.Get(enImageCode.Uhr, 16).BMP, 8, 8); }
                 if (Database.HasPendingChanges()) { GR.DrawImage(QuickImage.Get(enImageCode.Stift, 16).BMP, 16, 8); }
@@ -2819,7 +2784,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        private void Draw_Table_What(Graphics GR, enTableDrawColumn col, enTableDrawType type, int PermaX, Rectangle displayRectangleWOSlider, int FirstVisibleRow, int LastVisibleRow) {
+        private void Draw_Table_What(Graphics GR, enTableDrawColumn col, enTableDrawType type, int PermaX, Rectangle displayRectangleWOSlider, int FirstVisibleRow, int LastVisibleRow, enStates state) {
             var lfdno = 0;
 
             foreach (var ViewItem in CurrentArrangement) {
@@ -2834,7 +2799,7 @@ namespace BlueControls.Controls {
                                     break;
 
                                 case enTableDrawType.Cells:
-                                    Draw_Column_Cells(GR, ViewItem, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, lfdno);
+                                    Draw_Column_Cells(GR, ViewItem, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, lfdno, state);
                                     break;
 
                                 case enTableDrawType.ColumnHead:

@@ -25,7 +25,7 @@ namespace BlueScript {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List_Or_String, enVariableDataType.String, enVariableDataType.Object };
+        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List_Or_String, enVariableDataType.Object };
 
         public override string Description => "Setzt in der verlinkten Datenbank den Link zur Zelle manuell.\r\n" +
                                               "Ein Filter kann mit dem Befehl 'Filter' erstellt werden.\r\n" +
@@ -43,7 +43,7 @@ namespace BlueScript {
         public override string StartSequence => "(";
 
         //public Method_Lookup(Script parent) : base(parent) { }
-        public override string Syntax => "SetLink(ColumnInThisDatabase, ColumnInLinkedDatabase, Filter, ...)";
+        public override string Syntax => "SetLink(ColumnInThisDatabase,  Filter, ...)";
 
         #endregion
 
@@ -62,7 +62,7 @@ namespace BlueScript {
 
             var allFi = new List<FilterItem>();
 
-            for (var z = 2; z < attvar.Attributes.Count; z++) {
+            for (var z = 1; z < attvar.Attributes.Count; z++) {
                 if (!attvar.Attributes[z].ObjectType("rowfilter")) { return new strDoItFeedback("Kein Filter übergeben."); }
 
                 var fi = new BlueDatabase.FilterItem(attvar.Attributes[z].ObjectData());
@@ -98,7 +98,8 @@ namespace BlueScript {
 
             #region Ziel Spalte in Ziel-Datenbank finden: LinkTaregtColumn -> Schlägt evtl fehl wenn mit Variablen gearbeitet wird.
 
-            var LinkTaregtColumn = allFi[0].Database.Column.Exists(attvar.Attributes[1].ValueString);
+            var LinkTaregtColumn = allFi[0].Database.Column.SearchByKey(ChangeColumn.LinkedCell_ColumnKey);
+            //var LinkTaregtColumn = allFi[0].Database.Column.Exists(attvar.Attributes[1].ValueString);
             if (LinkTaregtColumn == null) {
                 Linkvar.ValueString = string.Empty;
                 attvar.Attributes[0].ValueString = string.Empty;

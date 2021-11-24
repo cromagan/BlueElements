@@ -1031,8 +1031,8 @@ namespace BlueDatabase {
                         var c = LinkedDatabase().Column.SearchByKey(_LinkedCell_ColumnKey);
                         if (c == null) { return "Die verknüpfte Spalte existiert nicht."; }
                         if (c.MultiLine != _MultiLine) { return "Multiline stimmt nicht mit der Ziel-Spalte Multiline überein"; }
-                    } else {
-                        if (!_MultiLine) { return "Dieses Format muss mehrzeilig sein, da es von der Ziel-Spalte gesteuert wird."; }
+                        //} else {
+                        //    if (!_MultiLine) { return "Dieses Format muss mehrzeilig sein, da es von der Ziel-Spalte gesteuert wird."; }
                     }
                     break;
 

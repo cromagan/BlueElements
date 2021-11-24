@@ -166,7 +166,7 @@ namespace BlueDatabase {
         /// <param name="addRowIfNotExists"></param>
         /// <returns></returns>
         public static (ColumnItem column, RowItem row) LinkedCellData(ColumnItem column, RowItem row, bool repairLinkedValue, bool addRowIfNotExists) {
-            if (column == null || row == null || column.Format != enDataFormat.LinkedCell) { return (null, null); }
+            if (column.Format != enDataFormat.LinkedCell) { return (null, null); }
 
             var LinkedDatabase = column.LinkedDatabase();
             if (LinkedDatabase == null) { return (null, null); }
@@ -176,16 +176,18 @@ namespace BlueDatabase {
             if (repairLinkedValue && !skriptgesteuert) { return RepairLinkedCellValue(LinkedDatabase, column, row, addRowIfNotExists); }
 
             var Key = column.Database.Cell.GetStringBehindLinkedValue(column, row);
-            if (string.IsNullOrEmpty(Key)) { return (null, null); }
+            if (string.IsNullOrEmpty(Key)) { 
+               return (LinkedDatabase.Column.SearchByKey(column.LinkedCell_ColumnKey) , null); 
+            }
 
             var V = Key.SplitAndCutBy("|");
-            if (V.Length != 2) { return skriptgesteuert ? (null, null) : RepairLinkedCellValue(LinkedDatabase, column, row, addRowIfNotExists); }
+            if (V.Length != 2) { return skriptgesteuert ? (LinkedDatabase.Column.SearchByKey(column.LinkedCell_ColumnKey), null) : RepairLinkedCellValue(LinkedDatabase, column, row, addRowIfNotExists); }
             var LinkedColumn = LinkedDatabase.Column.SearchByKey(int.Parse(V[0]));
             var LinkedRow = LinkedDatabase.Row.SearchByKey(int.Parse(V[1]));
 
             if (KeyOfCell(LinkedColumn, LinkedRow) == Key) { return (LinkedColumn, LinkedRow); }
 
-            return skriptgesteuert ? (null, null) : RepairLinkedCellValue(LinkedDatabase, column, row, addRowIfNotExists);
+            return skriptgesteuert ? (LinkedDatabase.Column.SearchByKey(column.LinkedCell_ColumnKey), null) : RepairLinkedCellValue(LinkedDatabase, column, row, addRowIfNotExists);
         }
 
         /// <summary>
