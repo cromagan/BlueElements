@@ -674,6 +674,7 @@ namespace BlueControls.Controls {
 
         public void ExpandAll() {
             _collapsed.Clear();
+            CursorPos_Reset(); // Wenn eine Zeile markiert ist, man scrollt und expandiert, springt der Screen zurück, was sehr irriteiert
             Invalidate_SortedRowData();
         }
 
@@ -1305,6 +1306,10 @@ namespace BlueControls.Controls {
                 //          MouseUp  -> Cursor wird umgesetzt, Ereginis CursorChanged wieder ausgelöst, noch ein Bildchen
                 if (_MouseOverRow == null) {
                     var rc = RowCaptionOnCoordinate(e.X, e.Y);
+                    CursorPos_Reset(); // Wenn eine Zeile markiert ist, man scrollt und expandiert, springt der Screen zurück, was sehr irriteiert
+                    _MouseOverColumn = null;
+                    _MouseOverRow = null;
+
                     if (!string.IsNullOrEmpty(rc)) {
                         if (_collapsed.Contains(rc)) {
                             _collapsed.Remove(rc);
@@ -1530,7 +1535,7 @@ namespace BlueControls.Controls {
                 } else {
                     var y = 0;
                     for (var z = 0; z <= MEI.GetUpperBound(0); z++) {
-                        Draw_CellTransparentDirect_OneLine(gr, MEI[z], contentHolderCellColumn, drawarea, y, z == MEI.GetUpperBound(0), font, Pix16, style, bildTextverhalten, state);
+                        Draw_CellTransparentDirect_OneLine(gr, MEI[z], contentHolderCellColumn, drawarea, y, z != MEI.GetUpperBound(0), font, Pix16, style, bildTextverhalten, state);
                         y += FormatedText_NeededSize(contentHolderCellColumn, MEI[z], font, style, Pix16 - 1, bildTextverhalten).Height;
                     }
                 }
@@ -1549,7 +1554,7 @@ namespace BlueControls.Controls {
             var tmpImageCode = tmpData.Item3;
             if (tmpImageCode != null) { tmpImageCode = QuickImage.Get(tmpImageCode, Skin.AdditionalState(state)); }
 
-            Skin.Draw_FormatedText(gr, tmpData.Item1, tmpImageCode, tmpData.Item2, drawarea, null, false, font, false);
+            Skin.Draw_FormatedText(gr, tmpData.Item1, tmpImageCode, tmpData.Item2, r, null, false, font, false);
         }
 
         private static int GetPix(int Pix, BlueFont F, double Scale) => Skin.FormatedText_NeededSize("@|", null, F, (int)((Pix * Scale) + 0.5)).Height;
@@ -2443,7 +2448,7 @@ namespace BlueControls.Controls {
             Draw_Border(gr, cellInThisDatabaseColumn, displayRectangleWOSlider, false);
         }
 
-        private void Draw_Column_Cells(Graphics gr, ColumnViewItem viewItem, Rectangle displayRectangleWOSlider, int firstVisibleRow, int lastVisibleRow, int lfdno, enStates state) {
+        private void Draw_Column_Cells(Graphics gr, ColumnViewItem viewItem, Rectangle displayRectangleWOSlider, int firstVisibleRow, int lastVisibleRow, enStates state, bool firstOnScreen) {
 
             #region Neue Zeile
 
@@ -2462,54 +2467,55 @@ namespace BlueControls.Controls {
                 Rectangle cellrectangle = new((int)viewItem.OrderTMP_Spalte_X1,
                                        DrawY(CurrentRow),
                                        Column_DrawWidth(viewItem, displayRectangleWOSlider),
-                                        Math.Min(CurrentRow.DrawHeight, 24));
-
-                #region Hintergrund gelb zeichnen
-
-                if (CurrentRow.MarkYellow) {
-                    gr.FillRectangle(Brush_Yellow_Transparent, cellrectangle);
-                }
-
-                #endregion
-
-                #region Trennlinie zeichnen
-
-                gr.DrawLine(Skin.Pen_LinieDünn, cellrectangle.Left, cellrectangle.Bottom - 1, cellrectangle.Right - 1, cellrectangle.Bottom - 1);
-
-                #endregion
-
-                #region Die Cursorposition ermittleln und Zeichnen
-
-                if (!Thread.CurrentThread.IsBackground && _CursorPosColumn == viewItem.Column && _CursorPosRow == CurrentRow) {
-                    tmpCursorRect = cellrectangle;
-                    tmpCursorRect.Height -= 1;
-                    Draw_Cursor(gr, displayRectangleWOSlider, false);
-                }
-
-                #endregion
-
-                #region Zelleninhalt zeichnen
+                                       Math.Max(CurrentRow.DrawHeight, Pix16));
 
                 if (CurrentRow.Expanded) {
-                    Draw_CellTransparent(gr, viewItem, CurrentRow, cellrectangle, _Cell_Font, state);
-                }
 
-                #endregion
+                    #region Hintergrund gelb zeichnen
 
-                #region Unterschiede rot markieren
-
-                if (_Unterschiede != null && _Unterschiede != CurrentRow.Row) {
-                    if (CurrentRow.Row.CellGetString(viewItem.Column) != _Unterschiede.CellGetString(viewItem.Column)) {
-                        Rectangle tmpr = new((int)viewItem.OrderTMP_Spalte_X1 + 1, DrawY(CurrentRow) + 1, Column_DrawWidth(viewItem, displayRectangleWOSlider) - 2, CurrentRow.DrawHeight - 2);
-                        gr.DrawRectangle(Pen_Red_1, tmpr);
+                    if (CurrentRow.MarkYellow) {
+                        gr.FillRectangle(Brush_Yellow_Transparent, cellrectangle);
                     }
-                }
 
-                #endregion
+                    #endregion
+
+                    #region Trennlinie zeichnen
+
+                    gr.DrawLine(Skin.Pen_LinieDünn, cellrectangle.Left, cellrectangle.Bottom - 1, cellrectangle.Right - 1, cellrectangle.Bottom - 1);
+
+                    #endregion
+
+                    #region Die Cursorposition ermittleln und Zeichnen
+
+                    if (!Thread.CurrentThread.IsBackground && _CursorPosColumn == viewItem.Column && _CursorPosRow == CurrentRow) {
+                        tmpCursorRect = cellrectangle;
+                        tmpCursorRect.Height -= 1;
+                        Draw_Cursor(gr, displayRectangleWOSlider, false);
+                    }
+
+                    #endregion
+
+                    #region Zelleninhalt zeichnen
+
+                    Draw_CellTransparent(gr, viewItem, CurrentRow, cellrectangle, _Cell_Font, state);
+
+                    #endregion
+
+                    #region Unterschiede rot markieren
+
+                    if (_Unterschiede != null && _Unterschiede != CurrentRow.Row) {
+                        if (CurrentRow.Row.CellGetString(viewItem.Column) != _Unterschiede.CellGetString(viewItem.Column)) {
+                            Rectangle tmpr = new((int)viewItem.OrderTMP_Spalte_X1 + 1, DrawY(CurrentRow) + 1, Column_DrawWidth(viewItem, displayRectangleWOSlider) - 2, CurrentRow.DrawHeight - 2);
+                            gr.DrawRectangle(Pen_Red_1, tmpr);
+                        }
+                    }
+
+                    #endregion
+                }
 
                 #region Spaltenüberschrift
 
-                if (lfdno == 1) {
+                if (firstOnScreen) {
                     // Überschrift in der ersten Spalte zeichnen
                     CurrentRow.CaptionPos = Rectangle.Empty;
                     if (CurrentRow.ShowCap) {
@@ -2787,6 +2793,8 @@ namespace BlueControls.Controls {
         private void Draw_Table_What(Graphics GR, enTableDrawColumn col, enTableDrawType type, int PermaX, Rectangle displayRectangleWOSlider, int FirstVisibleRow, int LastVisibleRow, enStates state) {
             var lfdno = 0;
 
+            bool firstOnScreen = true;
+
             foreach (var ViewItem in CurrentArrangement) {
                 if (ViewItem != null && ViewItem.Column != null) {
                     lfdno++;
@@ -2799,7 +2807,7 @@ namespace BlueControls.Controls {
                                     break;
 
                                 case enTableDrawType.Cells:
-                                    Draw_Column_Cells(GR, ViewItem, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, lfdno, state);
+                                    Draw_Column_Cells(GR, ViewItem, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, state, firstOnScreen);
                                     break;
 
                                 case enTableDrawType.ColumnHead:
@@ -2807,6 +2815,7 @@ namespace BlueControls.Controls {
                                     break;
                             }
                         }
+                        firstOnScreen = false;
                     }
                 }
             }
