@@ -1120,7 +1120,7 @@ namespace BlueDatabase {
                         }
                     }
                     if (!ok && string.IsNullOrEmpty(ok2)) {
-                        if (!Filename.Contains("AutoVue") && !Filename.Contains("Plandaten") && !Filename.Contains("Ketten.") && !Filename.Contains("Kettenräder.") && !Filename.Contains("TVW") && !Filename.Contains("Work")) {
+                        if (!Filename.Contains("AutoVue") && !Filename.Contains("Plandaten") && !Filename.Contains("Ketten.") && !Filename.Contains("Kettenräder.") && !Filename.Contains("TVW") && !Filename.Contains("Work") && !Filename.Contains("Behälter")) {
                             Develop.DebugPrint(enFehlerArt.Warnung, "WorkItem verschwunden<br>" + _LastWorkItem + "<br>" + Filename + "<br><br>Vorher:<br>" + _WorkItemsBefore + "<br><br>Nachher:<br>" + Works.ToString());
                         }
                     }
@@ -1395,7 +1395,7 @@ namespace BlueDatabase {
                         ThisPending.ColKey = newKey; // Generell den Schlüssel ändern
                         if (_LastWorkItem == "X") {
                             _LastWorkItem = ThisPending.ToString();
-                            Develop.DebugPrint(enFehlerArt.Info, "LastWorkitem geändert: " + _LastWorkItem);
+                            //Develop.DebugPrint(enFehlerArt.Info, "LastWorkitem geändert: " + _LastWorkItem);
                         }
                         switch (ThisPending.Comand) {
                             case enDatabaseDataType.AddColumn:
@@ -1426,7 +1426,7 @@ namespace BlueDatabase {
                         ThisPending.RowKey = NewKey; // Generell den Schlüssel ändern
                         if (_LastWorkItem == "X") {
                             _LastWorkItem = ThisPending.ToString();
-                            Develop.DebugPrint(enFehlerArt.Info, "LastWorkitem geändert: " + _LastWorkItem);
+                            //Develop.DebugPrint(enFehlerArt.Info, "LastWorkitem geändert: " + _LastWorkItem);
                         }
                         switch (ThisPending.Comand) {
                             case enDatabaseDataType.dummyComand_AddRow:

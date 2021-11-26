@@ -2014,7 +2014,7 @@ namespace BlueDatabase {
                 //case (enDatabaseDataType)193: break;
                 default:
                     if (Art.ToString() == ((int)Art).ToString()) {
-                        Develop.DebugPrint(enFehlerArt.Info, "Laden von Datentyp '" + Art + "' nicht definiert.<br>Wert: " + Wert + "<br>Datei: " + Database.Filename);
+                        //Develop.DebugPrint(enFehlerArt.Info, "Laden von Datentyp '" + Art + "' nicht definiert.<br>Wert: " + Wert + "<br>Datei: " + Database.Filename);
                     } else {
                         return "Interner Fehler: Für den Datentyp  '" + Art + "'  wurde keine Laderegel definiert.";
                     }

@@ -520,13 +520,13 @@ namespace BlueBasics.MultiUserFile {
 
         internal bool BlockDateiCheck() {
             if (AgeOfBlockDatei() < 0) {
-                Develop.DebugPrint(enFehlerArt.Info, "Block-Datei Konflikt: Block-Datei zu jung\r\n" + Filename + "\r\nSoll: " + _inhaltBlockdatei);
+                //Develop.DebugPrint(enFehlerArt.Info, "Block-Datei Konflikt: Block-Datei zu jung\r\n" + Filename + "\r\nSoll: " + _inhaltBlockdatei);
                 return false;
             }
             try {
                 var Inhalt2 = File.ReadAllText(Blockdateiname(), System.Text.Encoding.UTF8);
                 if (_inhaltBlockdatei != Inhalt2) {
-                    Develop.DebugPrint(enFehlerArt.Info, "Block-Datei Konflikt: Inhalte unterschiedlich\r\n" + Filename + "\r\nSoll: " + _inhaltBlockdatei + "\r\n\r\nIst: " + Inhalt2);
+                    //Develop.DebugPrint(enFehlerArt.Info, "Block-Datei Konflikt: Inhalte unterschiedlich\r\n" + Filename + "\r\nSoll: " + _inhaltBlockdatei + "\r\n\r\nIst: " + Inhalt2);
                     return false;
                 }
             } catch (Exception ex) {
@@ -794,16 +794,16 @@ namespace BlueBasics.MultiUserFile {
             }
         }
 
-        private bool DeleteBlockDatei(bool ignorechecking, bool mustDoIt) {
+        private bool DeleteBlockDatei(bool ignorechecking, bool tryHard) {
             if (ignorechecking || BlockDateiCheck()) {
-                if (DeleteFile(Blockdateiname(), mustDoIt)) {
+                if (DeleteFile(Blockdateiname(), tryHard)) {
                     _inhaltBlockdatei = string.Empty;
                     return true;
                 }
             }
-            if (mustDoIt) {
-                Develop.DebugPrint(enFehlerArt.Info, "Block-Datei nicht gelöscht\r\n" + Filename + "\r\nSoll: " + _inhaltBlockdatei);
-            }
+            //if (mustDoIt) {
+            //    Develop.DebugPrint(enFehlerArt.Info, "Block-Datei nicht gelöscht\r\n" + Filename + "\r\nSoll: " + _inhaltBlockdatei);
+            //}
             return false;
         }
 
@@ -979,7 +979,7 @@ namespace BlueBasics.MultiUserFile {
             return string.Empty;
             string Feedback(string txt) {
                 DeleteFile(tmpFileName, false);
-                Develop.DebugPrint(enFehlerArt.Info, "Speichern der Datei abgebrochen.<br>Datei: " + Filename + "<br><br>Grund:<br>" + txt);
+                //Develop.DebugPrint(enFehlerArt.Info, "Speichern der Datei abgebrochen.<br>Datei: " + Filename + "<br><br>Grund:<br>" + txt);
                 RepairOldBlockFiles();
                 return txt;
             }

@@ -176,8 +176,8 @@ namespace BlueDatabase {
             if (repairLinkedValue && !skriptgesteuert) { return RepairLinkedCellValue(LinkedDatabase, column, row, addRowIfNotExists); }
 
             var Key = column.Database.Cell.GetStringBehindLinkedValue(column, row);
-            if (string.IsNullOrEmpty(Key)) { 
-               return (LinkedDatabase.Column.SearchByKey(column.LinkedCell_ColumnKey) , null); 
+            if (string.IsNullOrEmpty(Key)) {
+                return (LinkedDatabase.Column.SearchByKey(column.LinkedCell_ColumnKey), null);
             }
 
             var V = Key.SplitAndCutBy("|");
@@ -676,21 +676,19 @@ namespace BlueDatabase {
         }
 
         private static (ColumnItem column, RowItem row) RepairLinkedCellValue(Database linkedDatabase, ColumnItem column, RowItem row, bool addRowIfNotExists) {
-            ColumnItem targetColumn = null;
+            ColumnItem targetColumn;
             RowItem targetRow = null;
-            ///
-            /// Spaltenschlüssel in der Ziel-Datenbank ermitteln
-            ///
-            targetColumn = linkedDatabase.Column.SearchByKey(column.LinkedCell_ColumnKey);
 
+            /// Spalte aus der Ziel-Datenbank ermitteln
+            targetColumn = linkedDatabase.Column.SearchByKey(column.LinkedCell_ColumnKey);
             if (targetColumn == null) { return Ergebnis("Die Spalte ist in der Zieldatenbank nicht vorhanden."); }
 
-            ///
-            /// Zeilenschlüssel lesen
-            ///
+            /// Zeile aus der Ziel-Datenbank ermitteln
+            if (row == null) { return Ergebnis("Keine Zeile zum finden des Zeilenschlüssels angegeben."); }
             var LinkedCell_RowColumn = column.Database.Column.SearchByKey(column.LinkedCell_RowKey);
             if (LinkedCell_RowColumn == null) { return Ergebnis("Die Spalte, aus der der Zeilenschlüssel kommen soll, existiert nicht."); }
             if (row.CellIsNullOrEmpty(LinkedCell_RowColumn)) { return Ergebnis("Kein Zeilenschlüssel angegeben."); }
+
             targetRow = linkedDatabase.Row[row.CellGetString(LinkedCell_RowColumn)];
             if (targetRow == null && addRowIfNotExists) {
                 targetRow = linkedDatabase.Row.Add(row.CellGetString(LinkedCell_RowColumn));
@@ -705,7 +703,7 @@ namespace BlueDatabase {
                     column.Database.Cell.SetValueBehindLinkedValue(column, row, KeyOfCell(targetColumn.Key, targetRow.Key));
                     return (targetColumn, targetRow);
                 } else {
-                    column.Database.Cell.SetValueBehindLinkedValue(column, row, string.Empty);
+                    if (column != null && row != null) { column.Database.Cell.SetValueBehindLinkedValue(column, row, string.Empty); }
                     return (targetColumn, targetRow);
                 }
             }

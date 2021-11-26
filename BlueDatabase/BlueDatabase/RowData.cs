@@ -47,18 +47,20 @@ namespace BlueDatabase {
             return null;
         }
 
-        public static List<RowItem> ToUniqueRowList(this List<RowData> l) {
-            if (l == null) { return null; }
-
-            var n = new List<RowItem>();
-
-            foreach (var thisr in l) {
-                n.AddIfNotExists(thisr.Row);
-            }
-            return n;
-        }
-
         #endregion
+
+        //public static List<RowItem> ToUniqueRowList(this List<RowData> l) {
+        //    if (l == null) { return null; }
+
+        //    var n = new List<RowItem>();
+
+        //    foreach (var thisr in l) {
+        //        if (thisr != null && thisr.Row != null) {
+        //            n.AddIfNotExists(thisr.Row);
+        //        }
+        //    }
+        //    return n;
+        //}
 
         //public static int IndexOf(this List<clsRowDrawData> l, RowItem row) {
         //    for (var z = 0; z < l.Count; z++) {
@@ -122,16 +124,7 @@ namespace BlueDatabase {
             }
         }
 
-        public override string ToString() {
-            if (Row == null) {
-                return Chapter + " -> null";
-            } else {
-                return Chapter + " -> " + Row.CellFirstString();
-            }
-        }
-
         public void GetDataFrom(RowData thisRowData) {
-
             if (Row != thisRowData.Row || Chapter != thisRowData.Chapter) {
                 Develop.DebugPrint(enFehlerArt.Warnung, "RowData Kopie fehlgeschlagen!");
             }
@@ -145,7 +138,14 @@ namespace BlueDatabase {
             AdditionalSort = thisRowData.AdditionalSort;
             ShowCap = thisRowData.ShowCap;
             MarkYellow = thisRowData.MarkYellow;
+        }
 
+        public override string ToString() {
+            if (Row == null) {
+                return Chapter + " -> null";
+            } else {
+                return Chapter + " -> " + Row.CellFirstString();
+            }
         }
 
         #endregion

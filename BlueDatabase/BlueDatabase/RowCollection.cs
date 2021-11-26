@@ -184,6 +184,13 @@ namespace BlueDatabase {
 
                 var caps = thisRow.CellGetList(thisRow.Database.Column.SysChapter);
 
+                if(caps.Count >0) {
+                    if(caps.Contains(string.Empty)) {
+                        caps.Remove(string.Empty);
+                        caps.Add("-?-");
+                    }
+                }
+
                 if (caps.Count == 0 && capName) { caps.Add("Weitere Zeilen"); }
                 if (caps.Count == 0) { caps.Add(string.Empty); }
 

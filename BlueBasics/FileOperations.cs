@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 using static BlueBasics.Generic;
 
 namespace BlueBasics {
@@ -163,16 +164,31 @@ namespace BlueBasics {
         /// <param name="filelist"></param>
         /// <returns>True, wenn mindestens eine Datei gelöscht wurde.</returns>
         public static bool DeleteFile(List<string> filelist) {
-            for (var Z = 0; Z < filelist.Count; Z++) {
-                if (!FileExists(filelist[Z])) { filelist[Z] = string.Empty; }
-            }
-            filelist = filelist.SortedDistinctList();
-            if (filelist.Count == 0) { return false; }
-            var del = false;
-            foreach (var ThisFile in filelist) {
-                if (DeleteFile(ThisFile, false)) { del = true; }
-            }
-            return del;
+            var lockMe = new object();
+            var did = false;
+
+            Parallel.ForEach(filelist, thisf => {
+                if (FileExists(thisf)) {
+                    DeleteFile(thisf, false);
+
+                    if (!did) {
+                        lock (lockMe) {
+                            did = true;
+                        }
+                    }
+                }
+            });
+
+            //for (var Z = 0; Z < filelist.Count; Z++) {
+            //    if (!FileExists(filelist[Z])) { filelist[Z] = string.Empty; }
+            //}
+            //filelist = filelist.SortedDistinctList();
+            //if (filelist.Count == 0) { return false; }
+            //var del = false;
+            //foreach (var ThisFile in filelist) {
+            //    if (DeleteFile(ThisFile, false)) { del = true; }
+            //}
+            return did;
         }
 
         public static bool DeleteFile(string file, bool toBeSure) => !FileExists(file) || ProcessFile(TryDeleteFile, file, file, toBeSure);
