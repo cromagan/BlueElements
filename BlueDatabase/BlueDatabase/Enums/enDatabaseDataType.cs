@@ -69,6 +69,8 @@ namespace BlueDatabase.Enums {
 
         ColumnArrangement = 32,
         Views = 33,
+
+        [Obsolete]
         LastRowKey = 34,
 
         [Obsolete]
@@ -96,12 +98,15 @@ namespace BlueDatabase.Enums {
         //BinaryCount = 57,
         ReloadDelaySecond = 58,
 
+        [Obsolete]
         LastColumnKey = 59,
 
         [Obsolete]
         BinaryDataInOne = 60,
 
+        [Obsolete]
         JoinTyp = 61,
+
         VerwaisteDaten = 62,
 
         //ImportScript = 63,

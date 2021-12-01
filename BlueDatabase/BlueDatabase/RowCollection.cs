@@ -24,6 +24,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace BlueDatabase {
 
@@ -31,8 +32,9 @@ namespace BlueDatabase {
 
         #region Fields
 
-        private readonly ConcurrentDictionary<int, RowItem> _Internal = new();
-        private int _LastRowKey;
+        private readonly ConcurrentDictionary<long, RowItem> _Internal = new();
+
+        //private int _LastRowKey;
         private bool disposedValue;
 
         #endregion
@@ -42,7 +44,7 @@ namespace BlueDatabase {
         public RowCollection(Database database) {
             Database = database;
             Database.Disposing += Database_Disposing;
-            Initialize();
+            //Initialize();
         }
 
         #endregion
@@ -184,8 +186,8 @@ namespace BlueDatabase {
 
                 var caps = thisRow.CellGetList(thisRow.Database.Column.SysChapter);
 
-                if(caps.Count >0) {
-                    if(caps.Contains(string.Empty)) {
+                if (caps.Count > 0) {
+                    if (caps.Contains(string.Empty)) {
                         caps.Remove(string.Empty);
                         caps.Add("-?-");
                     }
@@ -276,9 +278,7 @@ namespace BlueDatabase {
         //foreach (var ThisRowItem in _Internal.Values)//{//    if (ThisRowItem != null) { return ThisRowItem; }//}//return null;
         IEnumerator IEnumerable.GetEnumerator() => IEnumerable_GetEnumerator();
 
-        public void Initialize() => _LastRowKey = 0;
-
-        public bool Remove(int key) {
+        public bool Remove(long key) {
             var e = SearchByKey(key);
             if (e == null) { return false; }
             OnRowRemoving(new RowEventArgs(e));
@@ -335,7 +335,7 @@ namespace BlueDatabase {
             return true;
         }
 
-        public RowItem SearchByKey(int Key) {
+        public RowItem SearchByKey(long Key) {
             try {
                 return Key < 0 ? null : !_Internal.ContainsKey(Key) ? null : _Internal[Key];
             } catch {
@@ -370,29 +370,37 @@ namespace BlueDatabase {
             return l;
         }
 
-        internal string Load_310(enDatabaseDataType type, string value) {
-            switch (type) {
-                case enDatabaseDataType.LastRowKey:
-                    _LastRowKey = int.Parse(value);
-                    break;
+        //internal string Load_310(enDatabaseDataType type, string value) {
+        //    switch (type) {
+        //        case enDatabaseDataType.LastRowKey:
+        //            //_LastRowKey = long.Parse(value);
+        //            break;
 
-                default:
-                    if (type.ToString() == ((int)type).ToString()) {
-                        Develop.DebugPrint(enFehlerArt.Info, "Laden von Datentyp '" + type + "' nicht definiert.<br>Wert: " + value + "<br>Datei: " + Database.Filename);
-                    } else {
-                        return "Interner Fehler: Für den Datentyp  '" + type + "'  wurde keine Laderegel definiert.";
-                    }
-                    break;
-            }
-            return string.Empty;
-        }
+        //        default:
+        //            if (type.ToString() == ((int)type).ToString()) {
+        //                Develop.DebugPrint(enFehlerArt.Info, "Laden von Datentyp '" + type + "' nicht definiert.<br>Wert: " + value + "<br>Datei: " + Database.Filename);
+        //            } else {
+        //                return "Interner Fehler: Für den Datentyp  '" + type + "'  wurde keine Laderegel definiert.";
+        //            }
+        //            break;
+        //    }
+        //    return string.Empty;
+        //}
 
-        internal int NextRowKey() {
+        internal long NextRowKey() {
+            var x = DateTime.UtcNow.AddYears(-2020).Ticks;
+
+            var s = Generic.UserName() + "\r\n" + Thread.CurrentThread.ManagedThreadId + "\r\n" + Environment.MachineName;
+
+            var tmp = 0;
+            long key;
+
             do {
-                if (_LastRowKey == int.MaxValue) { _LastRowKey = 0; }
-                _LastRowKey++;
-            } while (SearchByKey(_LastRowKey) != null);
-            return _LastRowKey;
+                tmp++;
+                key = x + s.GetHashCode() * 100000000 + tmp;
+                if (key < 0) { key *= -1; }
+            } while (SearchByKey(key) != null);
+            return key;
         }
 
         internal void OnRowAdded(RowEventArgs e) {
@@ -411,16 +419,16 @@ namespace BlueDatabase {
 
         internal void RemoveNullOrEmpty() => _Internal.RemoveNullOrEmpty();
 
-        internal void Repair() {
-            foreach (var ThisRowItem in _Internal.Values) {
-                if (ThisRowItem != null) {
-                    //ThisRowItem.Repair();
-                    _LastRowKey = Math.Max(_LastRowKey, ThisRowItem.Key); // Die Letzte ID ermitteln,falls der gleadene Wert fehlerhaft ist
-                }
-            }
-        }
+        //internal void Repair() {
+        //    foreach (var ThisRowItem in _Internal.Values) {
+        //        if (ThisRowItem != null) {
+        //            //ThisRowItem.Repair();
+        //            _LastRowKey = Math.Max(_LastRowKey, ThisRowItem.Key); // Die Letzte ID ermitteln,falls der gleadene Wert fehlerhaft ist
+        //        }
+        //    }
+        //}
 
-        internal void SaveToByteList(List<byte> l) => Database.SaveToByteList(l, enDatabaseDataType.LastRowKey, _LastRowKey.ToString());
+        //internal void SaveToByteList(List<byte> l) => Database.SaveToByteList(l, enDatabaseDataType.LastRowKey, _LastRowKey.ToString());
 
         private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
 

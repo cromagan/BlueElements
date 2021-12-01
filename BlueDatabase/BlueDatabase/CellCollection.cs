@@ -139,7 +139,7 @@ namespace BlueDatabase {
                 : string.Empty;
         }
 
-        public static string KeyOfCell(int ColKey, int RowKey) => ColKey + "|" + RowKey;
+        public static string KeyOfCell(long ColKey, long RowKey) => ColKey + "|" + RowKey;
 
         public static string KeyOfCell(ColumnItem Column, RowItem Row) {
             // Alte verweise eleminieren.
@@ -227,10 +227,10 @@ namespace BlueDatabase {
             var cd = CellKey.SplitAndCutBy("|");
             if (cd.GetUpperBound(0) != 1) { Develop.DebugPrint(enFehlerArt.Fehler, "Falscher CellKey übergeben: " + CellKey); }
             Column = _database.Column.SearchByKey(int.Parse(cd[0]));
-            Row = _database.Row.SearchByKey(int.Parse(cd[1]));
+            Row = _database.Row.SearchByKey(long.Parse(cd[1]));
         }
 
-        public void Delete(ColumnItem column, int rowKey) {
+        public void Delete(ColumnItem column, long rowKey) {
             var CellKey = KeyOfCell(column.Key, rowKey);
             if (!ContainsKey(CellKey)) { return; }
             //           var Inhalt = _cells[CellKey].Value;
@@ -251,7 +251,7 @@ namespace BlueDatabase {
         /// <param name="RowKey"></param>
         /// <param name="previewsValue"></param>
         /// <param name="doAlways">Auch wenn der PreviewsValue gleich dem CurrentValue ist, wird die Routine durchberechnet</param>
-        public void DoSpecialFormats(ColumnItem column, int RowKey, string previewsValue, bool doAlways) {
+        public void DoSpecialFormats(ColumnItem column, long RowKey, string previewsValue, bool doAlways) {
             if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
             var CurrentValue = GetString(column, _database.Row.SearchByKey(RowKey));
             if (!doAlways && CurrentValue == previewsValue) { return; }
@@ -722,7 +722,7 @@ namespace BlueDatabase {
             return CompleteRelationText;
         }
 
-        private string ChangeTextToRowId(string CompleteRelationText, string OldValue, string NewValue, int KeyOfCHangedRow) {
+        private string ChangeTextToRowId(string CompleteRelationText, string OldValue, string NewValue, long KeyOfCHangedRow) {
             var Names = _database.Column[0].GetUcaseNamesSortedByLenght();
             var DidOld = false;
             var DidNew = false;
@@ -749,7 +749,7 @@ namespace BlueDatabase {
                 DoReplace(OldValue, KeyOfCHangedRow);
             }
             return CompleteRelationText;
-            void DoReplace(string Name, int Key) {
+            void DoReplace(string Name, long Key) {
                 if (!string.IsNullOrEmpty(Name)) {
                     CompleteRelationText = CompleteRelationText.Replace(Name, "/@X" + Key.ToString() + "X@/", RegexOptions.IgnoreCase);
                 }
@@ -762,7 +762,7 @@ namespace BlueDatabase {
         /// <param name="currentvalue"></param>
         /// <param name="column"></param>
         /// <param name="rowKey"></param>
-        private void ChangeValueOfKey(string currentvalue, ColumnItem column, int rowKey) {
+        private void ChangeValueOfKey(string currentvalue, ColumnItem column, long rowKey) {
             var keyc = _database.Column.SearchByKey(column.KeyColumnKey); // Schlüsselspalte für diese Spalte bestimmen
             if (keyc is null) { return; }
             List<RowItem> Rows;
@@ -857,7 +857,7 @@ namespace BlueDatabase {
             }
         }
 
-        private void RelationTextNameChanged(ColumnItem ColumnToRepair, int RowKey, string OldValue, string NewValue) {
+        private void RelationTextNameChanged(ColumnItem ColumnToRepair, long RowKey, string OldValue, string NewValue) {
             if (string.IsNullOrEmpty(NewValue)) { return; }
             foreach (var ThisRowItem in _database.Row) {
                 if (ThisRowItem != null) {
@@ -919,7 +919,7 @@ namespace BlueDatabase {
         /// <param name="column"></param>
         /// <param name="rowKey"></param>
         /// <param name="currentvalue"></param>
-        private void SetSameValueOfKey(ColumnItem column, int rowKey, string currentvalue) {
+        private void SetSameValueOfKey(ColumnItem column, long rowKey, string currentvalue) {
             List<RowItem> Rows = null;
             var ownRow = _database.Row.SearchByKey(rowKey);
             foreach (var ThisColumn in _database.Column) {

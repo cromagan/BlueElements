@@ -460,7 +460,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void Database_ShouldICancelDiscOperations(object sender, System.ComponentModel.CancelEventArgs e) => e.Cancel = true;
 
-        private void SetKeyTo(ComboBox combobox, int columnKey) => combobox.Text = columnKey.ToString();
+        private void SetKeyTo(ComboBox combobox, long columnKey) => combobox.Text = columnKey.ToString();
 
         #endregion
 

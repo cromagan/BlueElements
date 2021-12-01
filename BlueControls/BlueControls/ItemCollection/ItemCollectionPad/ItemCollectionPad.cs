@@ -73,7 +73,7 @@ namespace BlueControls.ItemCollection {
             if (Skin.StyleDB != null) { _SheetStyle = Skin.StyleDB.Row.First(); }
         }
 
-        public ItemCollectionPad(string layoutID, Database database, int rowkey) : this(database.Layouts[database.Layouts.LayoutIDToIndex(layoutID)], string.Empty) {
+        public ItemCollectionPad(string layoutID, Database database, long rowkey) : this(database.Layouts[database.Layouts.LayoutIDToIndex(layoutID)], string.Empty) {
             // Wenn nur die Row ankommt und diese null ist, kann gar nix generiert werden
             ResetVariables();
             ParseVariable(database.Row.SearchByKey(rowkey));

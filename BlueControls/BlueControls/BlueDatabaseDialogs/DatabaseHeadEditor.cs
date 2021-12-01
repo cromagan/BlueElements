@@ -67,9 +67,6 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         protected override void OnLoad(System.EventArgs e) {
             base.OnLoad(e);
-            cbxJoinTyp.Item.Clear();
-            cbxJoinTyp.Item.AddRange(typeof(enJoinTyp));
-            cbxJoinTyp.Text = ((int)_Database.JoinTyp).ToString();
             cbxVerwaisteDaten.Item.Clear();
             cbxVerwaisteDaten.Item.AddRange(typeof(enVerwaisteDaten));
             cbxVerwaisteDaten.Text = ((int)_Database.VerwaisteDaten).ToString();
@@ -287,11 +284,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             var B = clsMultiUserFile.UnzipIt(File.ReadAllBytes(GetFromFile));
             enDatabaseDataType Art = 0;
             var Pointer = 0;
-            var ColKey = 0;
-            var RowKey = 0;
+            long ColKey = 0;
+            long RowKey = 0;
             var X = 0;
             var Y = 0;
-            var Inhalt = "";
+            var Inhalt = string.Empty;
             var Such = (enDatabaseDataType)int.Parse(What);
             do {
                 if (Pointer > B.Length) { break; }
@@ -519,7 +516,6 @@ namespace BlueControls.BlueDatabaseDialogs {
                 _Database.PermissionGroups_NewRow.AddRange(PermissionGroups_NewRow.Item.ToListOfString());
                 _Database.PermissionGroups_NewRow.Remove("#Administrator");
             }
-            _Database.JoinTyp = (enJoinTyp)int.Parse(cbxJoinTyp.Text);
             _Database.VerwaisteDaten = (enVerwaisteDaten)int.Parse(cbxVerwaisteDaten.Text);
             _Database.Ansicht = (enAnsicht)int.Parse(cbxAnsicht.Text);
 

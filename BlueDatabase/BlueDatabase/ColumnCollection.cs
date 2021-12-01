@@ -21,17 +21,12 @@ using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Threading;
 using static BlueBasics.FileOperations;
 
 namespace BlueDatabase {
 
     public sealed class ColumnCollection : ListExt<ColumnItem> {
-
-        #region Fields
-
-        private int _LastColumnKey;
-
-        #endregion
 
         #region Constructors
 
@@ -59,16 +54,6 @@ namespace BlueDatabase {
         public ColumnItem SysRowCreateDate { get; private set; }
 
         public ColumnItem SysRowCreator { get; private set; }
-
-        internal int NextColumnKey {
-            get {
-                do {
-                    if (_LastColumnKey == int.MaxValue) { _LastColumnKey = 0; }
-                    _LastColumnKey++;
-                    if (SearchByKey(_LastColumnKey) == null) { return _LastColumnKey; }
-                } while (true);
-            }
-        }
 
         #endregion
 
@@ -124,17 +109,17 @@ namespace BlueDatabase {
             return null;
         }
 
-        public ColumnItem Add(string internalName) => Add(NextColumnKey, internalName, internalName, string.Empty, enDataFormat.Text);
+        public ColumnItem Add(string internalName) => Add(NextColumnKey(), internalName, internalName, string.Empty, enDataFormat.Text);
 
-        public ColumnItem Add(int colKey) => Add(colKey, string.Empty, string.Empty, string.Empty, enDataFormat.Text);
+        public ColumnItem Add(long colKey) => Add(colKey, string.Empty, string.Empty, string.Empty, enDataFormat.Text);
 
-        public ColumnItem Add() => Add(NextColumnKey, string.Empty, string.Empty, string.Empty, enDataFormat.Text);
+        public ColumnItem Add() => Add(NextColumnKey(), string.Empty, string.Empty, string.Empty, enDataFormat.Text);
 
-        public ColumnItem Add(string internalName, string caption, enDataFormat format) => Add(NextColumnKey, internalName, caption, string.Empty, format);
+        public ColumnItem Add(string internalName, string caption, enDataFormat format) => Add(NextColumnKey(), internalName, caption, string.Empty, format);
 
-        public ColumnItem Add(string internalName, string caption, string suffix, enDataFormat format) => Add(NextColumnKey, internalName, caption, suffix, format);
+        public ColumnItem Add(string internalName, string caption, string suffix, enDataFormat format) => Add(NextColumnKey(), internalName, caption, suffix, format);
 
-        public ColumnItem Add(int colKey, string internalName, string caption, string suffix, enDataFormat format) {
+        public ColumnItem Add(long colKey, string internalName, string caption, string suffix, enDataFormat format) {
             Database.AddPending(enDatabaseDataType.AddColumn, colKey, -1, string.Empty, colKey.ToString(), true);
             // Ruft anschließen AddFromParserAuf, der die Spalte endgülrig dazumacht
             var c = SearchByKey(colKey);
@@ -363,7 +348,7 @@ namespace BlueDatabase {
             // Den Wert Am I a Key Column ermitteln
             foreach (var ThisColumnItem in this) {
                 if (ThisColumnItem != null) {
-                    _LastColumnKey = Math.Max(_LastColumnKey, ThisColumnItem.Key);
+                    //_LastColumnKey = Math.Max(_LastColumnKey, ThisColumnItem.Key);
                     ThisColumnItem.CheckIfIAmAKeyColumn();
                 }
             }
@@ -410,7 +395,7 @@ namespace BlueDatabase {
             } while (true);
         }
 
-        public ColumnItem SearchByKey(int key) {
+        public ColumnItem SearchByKey(long key) {
             try {
                 if (Database == null) { return null; }
                 if (key < 0) { return null; } // Evtl. Gelöschte Spalte in irgendeiner Order
@@ -438,27 +423,40 @@ namespace BlueDatabase {
 
         internal static string ParsableColumnKey(ColumnItem Column) => Column == null ? "ColumnKey=?" : ParsableColumnKey(Column.Key);
 
-        internal static string ParsableColumnKey(int Key) => "ColumnKey=" + Key;
+        internal static string ParsableColumnKey(long Key) => "ColumnKey=" + Key;
 
-        internal string Load_310(enDatabaseDataType type, string value) {
-            switch (type) {
-                case enDatabaseDataType.LastColumnKey:
-                    _LastColumnKey = int.Parse(value);
-                    break;
+        internal long NextColumnKey() {
+            var s = Generic.UserName() + "\r\n" + Thread.CurrentThread.ManagedThreadId + "\r\n" + Environment.MachineName;
+            var tmp = 0;
+            long key;
 
-                default:
-                    if (type.ToString() == ((int)type).ToString()) {
-                        Develop.DebugPrint(enFehlerArt.Info, "Laden von Datentyp '" + type + "' nicht definiert.<br>Wert: " + value + "<br>Datei: " + Database.Filename);
-                    } else {
-                        return "Interner Fehler: Für den Datentyp  '" + type + "'  wurde keine Laderegel definiert.";
-                    }
-                    break;
-            }
-            return string.Empty;
+            do {
+                tmp++;
+                key = s.GetHashCode() * 100000000 + tmp;
+                if (key < 0) { key *= -1; }
+            } while (SearchByKey(key) != null);
+            return key;
         }
 
+        //internal string Load_310(enDatabaseDataType type, string value) {
+        //    switch (type) {
+        //        case enDatabaseDataType.LastColumnKey:
+        //            _LastColumnKey = int.Parse(value);
+        //            break;
+
+        //        default:
+        //            if (type.ToString() == ((int)type).ToString()) {
+        //                Develop.DebugPrint(enFehlerArt.Info, "Laden von Datentyp '" + type + "' nicht definiert.<br>Wert: " + value + "<br>Datei: " + Database.Filename);
+        //            } else {
+        //                return "Interner Fehler: Für den Datentyp  '" + type + "'  wurde keine Laderegel definiert.";
+        //            }
+        //            break;
+        //    }
+        //    return string.Empty;
+        //}
+
         internal void SaveToByteList(List<byte> List) {
-            Database.SaveToByteList(List, enDatabaseDataType.LastColumnKey, _LastColumnKey.ToString());
+            //Database.SaveToByteList(List, enDatabaseDataType.LastColumnKey, _LastColumnKey.ToString());
             for (var ColumnCount = 0; ColumnCount < Count; ColumnCount++) {
                 if (this[ColumnCount] != null && !string.IsNullOrEmpty(this[ColumnCount].Name)) {
                     this[ColumnCount].SaveToByteList(ref List);

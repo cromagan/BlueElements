@@ -112,7 +112,6 @@
     <Compile Include="EventArgs\ColumnEventArgs.cs" />
     <Compile Include="EventArgs\DoRowAutomaticEventArgs.cs" />
     <Compile Include="EventArgs\FilterEventArgs.cs" />
-    <Compile Include="EventArgs\KeyChangedEventArgs.cs" />
     <Compile Include="EventArgs\RowCancelEventArgs.cs" />
     <Compile Include="EventArgs\RowCheckedEventArgs.cs" />
     <Compile Include="EventArgs\ProgressbarEventArgs.cs" />

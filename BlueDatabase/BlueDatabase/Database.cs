@@ -23,6 +23,7 @@ using BlueDatabase.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -39,7 +40,7 @@ namespace BlueDatabase {
 
         #region Fields
 
-        public static readonly string DatabaseVersion = "3.51";
+        public static readonly string DatabaseVersion = "4.00";
 
         public readonly CellCollection Cell;
 
@@ -93,7 +94,7 @@ namespace BlueDatabase {
 
         private string _GlobalShowPass;
 
-        private enJoinTyp _JoinTyp;
+        //private enJoinTyp _JoinTyp;
 
         /// <summary>
         /// Variable nur temporär für den BinReloader, um mögliche Datenverluste zu entdecken.
@@ -161,8 +162,6 @@ namespace BlueDatabase {
 
         #region Events
 
-        public event EventHandler<KeyChangedEventArgs> ColumnKeyChanged;
-
         public event EventHandler<MessageEventArgs> DropMessage;
 
         public event CancelEventHandler Exporting;
@@ -172,8 +171,6 @@ namespace BlueDatabase {
         public event EventHandler<PasswordEventArgs> NeedPassword;
 
         public event EventHandler<ProgressbarEventArgs> ProgressbarInfo;
-
-        public event EventHandler<KeyChangedEventArgs> RowKeyChanged;
 
         public event EventHandler<RowCancelEventArgs> ScriptError;
 
@@ -267,14 +264,6 @@ namespace BlueDatabase {
             set {
                 if (_GlobalShowPass == value) { return; }
                 AddPending(enDatabaseDataType.GlobalShowPass, -1, -1, _GlobalShowPass, value, true);
-            }
-        }
-
-        public enJoinTyp JoinTyp {
-            get => _JoinTyp;
-            set {
-                if (_JoinTyp == value) { return; }
-                AddPending(enDatabaseDataType.JoinTyp, -1, -1, ((int)_JoinTyp).ToString(), ((int)value).ToString(), true);
             }
         }
 
@@ -762,89 +751,115 @@ namespace BlueDatabase {
                                         || (!string.IsNullOrEmpty(UserGroup) && DatenbankAdmin.Contains(UserGroup, false))
                                         || UserGroup.ToUpper() == "#ADMINISTRATOR";
 
-        public void Parse(byte[] _BLoaded, ref int Pointer, ref enDatabaseDataType Art, ref int ColNR, ref int RowNR, ref string Wert, ref int X, ref int Y) {
+        public void Parse(byte[] _BLoaded, ref int pointer, ref enDatabaseDataType type, ref long colKey, ref long rowKey, ref string value, ref int width, ref int height) {
             int Les;
-            switch ((enRoutinen)_BLoaded[Pointer]) {
+            switch ((enRoutinen)_BLoaded[pointer]) {
                 case enRoutinen.CellFormat: {
-                        Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
-                        Les = NummerCode3(_BLoaded, Pointer + 2);
-                        ColNR = NummerCode3(_BLoaded, Pointer + 5);
-                        RowNR = NummerCode3(_BLoaded, Pointer + 8);
+                        type = (enDatabaseDataType)_BLoaded[pointer + 1];
+                        Les = NummerCode3(_BLoaded, pointer + 2);
+                        colKey = NummerCode3(_BLoaded, pointer + 5);
+                        rowKey = NummerCode3(_BLoaded, pointer + 8);
                         var b = new byte[Les];
-                        Buffer.BlockCopy(_BLoaded, Pointer + 11, b, 0, Les);
-                        Wert = b.ToStringWIN1252();
-                        X = NummerCode2(_BLoaded, Pointer + 11 + Les);
-                        Y = NummerCode2(_BLoaded, Pointer + 11 + Les + 2);
-                        Pointer += 11 + Les + 4;
+                        Buffer.BlockCopy(_BLoaded, pointer + 11, b, 0, Les);
+                        value = b.ToStringWIN1252();
+                        width = NummerCode2(_BLoaded, pointer + 11 + Les);
+                        height = NummerCode2(_BLoaded, pointer + 11 + Les + 2);
+                        pointer += 11 + Les + 4;
                         break;
                     }
                 case enRoutinen.CellFormatUTF8: {
-                        Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
-                        Les = NummerCode3(_BLoaded, Pointer + 2);
-                        ColNR = NummerCode3(_BLoaded, Pointer + 5);
-                        RowNR = NummerCode3(_BLoaded, Pointer + 8);
+                        type = (enDatabaseDataType)_BLoaded[pointer + 1];
+                        Les = NummerCode3(_BLoaded, pointer + 2);
+                        colKey = NummerCode3(_BLoaded, pointer + 5);
+                        rowKey = NummerCode3(_BLoaded, pointer + 8);
                         var b = new byte[Les];
-                        Buffer.BlockCopy(_BLoaded, Pointer + 11, b, 0, Les);
-                        Wert = b.ToStringUTF8();
-                        X = NummerCode2(_BLoaded, Pointer + 11 + Les);
-                        Y = NummerCode2(_BLoaded, Pointer + 11 + Les + 2);
-                        Pointer += 11 + Les + 4;
+                        Buffer.BlockCopy(_BLoaded, pointer + 11, b, 0, Les);
+                        value = b.ToStringUTF8();
+                        width = NummerCode2(_BLoaded, pointer + 11 + Les);
+                        height = NummerCode2(_BLoaded, pointer + 11 + Les + 2);
+                        pointer += 11 + Les + 4;
+                        break;
+                    }
+                case enRoutinen.CellFormatUTF8_V400: {
+                        type = (enDatabaseDataType)_BLoaded[pointer + 1];
+                        Les = NummerCode3(_BLoaded, pointer + 2);
+                        colKey = NummerCode7(_BLoaded, pointer + 5);
+                        rowKey = NummerCode7(_BLoaded, pointer + 12);
+                        var b = new byte[Les];
+                        Buffer.BlockCopy(_BLoaded, pointer + 19, b, 0, Les);
+                        value = b.ToStringUTF8();
+                        width = NummerCode2(_BLoaded, pointer + 19 + Les);
+                        height = NummerCode2(_BLoaded, pointer + 19 + Les + 2);
+                        pointer += 19 + Les + 4;
                         break;
                     }
                 case enRoutinen.DatenAllgemein: {
-                        Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
-                        Les = NummerCode3(_BLoaded, Pointer + 2);
-                        ColNR = -1;
-                        RowNR = -1;
+                        type = (enDatabaseDataType)_BLoaded[pointer + 1];
+                        Les = NummerCode3(_BLoaded, pointer + 2);
+                        colKey = -1;
+                        rowKey = -1;
                         var b = new byte[Les];
-                        Buffer.BlockCopy(_BLoaded, Pointer + 5, b, 0, Les);
-                        Wert = b.ToStringWIN1252();
-                        X = 0;
-                        Y = 0;
-                        Pointer += 5 + Les;
+                        Buffer.BlockCopy(_BLoaded, pointer + 5, b, 0, Les);
+                        value = b.ToStringWIN1252();
+                        width = 0;
+                        height = 0;
+                        pointer += 5 + Les;
                         break;
                     }
                 case enRoutinen.DatenAllgemeinUTF8: {
-                        Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
-                        Les = NummerCode3(_BLoaded, Pointer + 2);
-                        ColNR = -1;
-                        RowNR = -1;
+                        type = (enDatabaseDataType)_BLoaded[pointer + 1];
+                        Les = NummerCode3(_BLoaded, pointer + 2);
+                        colKey = -1;
+                        rowKey = -1;
                         var b = new byte[Les];
-                        Buffer.BlockCopy(_BLoaded, Pointer + 5, b, 0, Les);
-                        Wert = b.ToStringUTF8();
-                        X = 0;
-                        Y = 0;
-                        Pointer += 5 + Les;
+                        Buffer.BlockCopy(_BLoaded, pointer + 5, b, 0, Les);
+                        value = b.ToStringUTF8();
+                        width = 0;
+                        height = 0;
+                        pointer += 5 + Les;
                         break;
                     }
                 case enRoutinen.Column: {
-                        Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
-                        Les = NummerCode3(_BLoaded, Pointer + 2);
-                        ColNR = NummerCode3(_BLoaded, Pointer + 5);
-                        RowNR = NummerCode3(_BLoaded, Pointer + 8);
+                        type = (enDatabaseDataType)_BLoaded[pointer + 1];
+                        Les = NummerCode3(_BLoaded, pointer + 2);
+                        colKey = NummerCode3(_BLoaded, pointer + 5);
+                        rowKey = NummerCode3(_BLoaded, pointer + 8);
                         var b = new byte[Les];
-                        Buffer.BlockCopy(_BLoaded, Pointer + 11, b, 0, Les);
-                        Wert = b.ToStringWIN1252();
-                        X = 0;
-                        Y = 0;
-                        Pointer += 11 + Les;
+                        Buffer.BlockCopy(_BLoaded, pointer + 11, b, 0, Les);
+                        value = b.ToStringWIN1252();
+                        width = 0;
+                        height = 0;
+                        pointer += 11 + Les;
                         break;
                     }
                 case enRoutinen.ColumnUTF8: {
-                        Art = (enDatabaseDataType)_BLoaded[Pointer + 1];
-                        Les = NummerCode3(_BLoaded, Pointer + 2);
-                        ColNR = NummerCode3(_BLoaded, Pointer + 5);
-                        RowNR = NummerCode3(_BLoaded, Pointer + 8);
+                        type = (enDatabaseDataType)_BLoaded[pointer + 1];
+                        Les = NummerCode3(_BLoaded, pointer + 2);
+                        colKey = NummerCode3(_BLoaded, pointer + 5);
+                        rowKey = NummerCode3(_BLoaded, pointer + 8);
                         var b = new byte[Les];
-                        Buffer.BlockCopy(_BLoaded, Pointer + 11, b, 0, Les);
-                        Wert = b.ToStringUTF8();
-                        X = 0;
-                        Y = 0;
-                        Pointer += 11 + Les;
+                        Buffer.BlockCopy(_BLoaded, pointer + 11, b, 0, Les);
+                        value = b.ToStringUTF8();
+                        width = 0;
+                        height = 0;
+                        pointer += 11 + Les;
+                        break;
+                    }
+                case enRoutinen.ColumnUTF8_V400: {
+                        type = (enDatabaseDataType)_BLoaded[pointer + 1];
+                        Les = NummerCode3(_BLoaded, pointer + 2);
+                        colKey = NummerCode7(_BLoaded, pointer + 5);
+                        rowKey = NummerCode7(_BLoaded, pointer + 12);
+                        var b = new byte[Les];
+                        Buffer.BlockCopy(_BLoaded, pointer + 19, b, 0, Les);
+                        value = b.ToStringUTF8();
+                        width = 0;
+                        height = 0;
+                        pointer += 19 + Les;
                         break;
                     }
                 default: {
-                        Develop.DebugPrint(enFehlerArt.Fehler, "Laderoutine nicht definiert: " + _BLoaded[Pointer]);
+                        Develop.DebugPrint(enFehlerArt.Fehler, "Laderoutine nicht definiert: " + _BLoaded[pointer]);
                         break;
                     }
             }
@@ -894,7 +909,7 @@ namespace BlueDatabase {
             // System-Spalten checken und alte Formate auf neuen Stand bringen
             Column.Repair();
             // Evtl. Defekte Rows reparieren
-            Row.Repair();
+            //Row.Repair();
             //Defekte Ansichten reparieren - Teil 1
             for (var z = 0; z <= 1; z++) {
                 if (ColumnArrangements.Count < z + 1) {
@@ -954,9 +969,9 @@ namespace BlueDatabase {
 
         internal void AddPending(enDatabaseDataType Comand, ColumnItem column, string PreviousValue, string ChangedTo, bool ExecuteNow) => AddPending(Comand, column.Key, -1, PreviousValue, ChangedTo, ExecuteNow);
 
-        internal void AddPending(enDatabaseDataType Comand, int ColumnKey, string ListExt, bool ExecuteNow) => AddPending(Comand, ColumnKey, -1, "", ListExt, ExecuteNow);
+        internal void AddPending(enDatabaseDataType Comand, long ColumnKey, string ListExt, bool ExecuteNow) => AddPending(Comand, ColumnKey, -1, "", ListExt, ExecuteNow);
 
-        internal void AddPending(enDatabaseDataType Comand, int ColumnKey, int RowKey, string PreviousValue, string ChangedTo, bool ExecuteNow) {
+        internal void AddPending(enDatabaseDataType Comand, long ColumnKey, long RowKey, string PreviousValue, string ChangedTo, bool ExecuteNow) {
             if (ExecuteNow) {
                 ParseThis(Comand, ChangedTo, Column.SearchByKey(ColumnKey), Row.SearchByKey(RowKey), -1, -1);
             }
@@ -1071,30 +1086,29 @@ namespace BlueDatabase {
             List.AddRange(b);
         }
 
-        internal void SaveToByteList(List<byte> List, KeyValuePair<string, CellItem> vCell) {
-            if (string.IsNullOrEmpty(vCell.Value.Value)) { return; }
-            Cell.DataOfCellKey(vCell.Key, out var tColumn, out var tRow);
+        internal void SaveToByteList(List<byte> list, KeyValuePair<string, CellItem> cell) {
+            if (string.IsNullOrEmpty(cell.Value.Value)) { return; }
+            Cell.DataOfCellKey(cell.Key, out var tColumn, out var tRow);
             if (!tColumn.SaveContent) { return; }
-            var b = vCell.Value.Value.UTF8_ToByte();
-            var tx = enDatabaseDataType.ce_Value_withSizeData;
-            List.Add((byte)enRoutinen.CellFormatUTF8);
-            List.Add((byte)tx);
-            SaveToByteList(List, b.Length, 3);
-            SaveToByteList(List, tColumn.Key, 3);
-            SaveToByteList(List, tRow.Key, 3);
-            List.AddRange(b);
-            var ContentSize = Cell.ContentSizeToSave(vCell, tColumn);
-            SaveToByteList(List, ContentSize.Width, 2);
-            SaveToByteList(List, ContentSize.Height, 2);
+            var b = cell.Value.Value.UTF8_ToByte();
+            list.Add((byte)enRoutinen.CellFormatUTF8_V400);
+            list.Add((byte)enDatabaseDataType.ce_Value_withSizeData);
+            SaveToByteList(list, b.Length, 3);
+            SaveToByteList(list, tColumn.Key, 7);
+            SaveToByteList(list, tRow.Key, 7);
+            list.AddRange(b);
+            var ContentSize = Cell.ContentSizeToSave(cell, tColumn);
+            SaveToByteList(list, ContentSize.Width, 2);
+            SaveToByteList(list, ContentSize.Height, 2);
         }
 
-        internal void SaveToByteList(List<byte> List, enDatabaseDataType DatabaseDataType, string Content, int TargetColumNr) {
+        internal void SaveToByteList(List<byte> List, enDatabaseDataType DatabaseDataType, string Content, long columnKey) {
             var b = Content.UTF8_ToByte();
-            List.Add((byte)enRoutinen.ColumnUTF8);
+            List.Add((byte)enRoutinen.ColumnUTF8_V400);
             List.Add((byte)DatabaseDataType);
             SaveToByteList(List, b.Length, 3);
-            SaveToByteList(List, TargetColumNr, 3);
-            SaveToByteList(List, 0, 3); //Zeile-Unötig
+            SaveToByteList(List, columnKey, 7);
+            SaveToByteList(List, 0, 7); //Zeile-Unötig
             List.AddRange(b);
         }
 
@@ -1220,8 +1234,8 @@ namespace BlueDatabase {
             RowItem _Row = null;
             var X = 0;
             var Y = 0;
-            var ColKey = 0;
-            var RowKey = 0;
+            long ColKey = 0;
+            long RowKey = 0;
             List<ColumnItem> ColumnsOld = new();
             ColumnsOld.AddRange(Column);
             Column.Clear();
@@ -1332,7 +1346,7 @@ namespace BlueDatabase {
                 SaveToByteList(l, enDatabaseDataType.Creator, _Creator);
                 SaveToByteList(l, enDatabaseDataType.CreateDate, _CreateDate);
                 SaveToByteList(l, enDatabaseDataType.Caption, _Caption);
-                SaveToByteList(l, enDatabaseDataType.JoinTyp, ((int)_JoinTyp).ToString());
+                //SaveToByteList(l, enDatabaseDataType.JoinTyp, ((int)_JoinTyp).ToString());
                 SaveToByteList(l, enDatabaseDataType.VerwaisteDaten, ((int)_VerwaisteDaten).ToString());
                 SaveToByteList(l, enDatabaseDataType.Tags, Tags.JoinWithCr());
                 SaveToByteList(l, enDatabaseDataType.PermissionGroups_NewRow, PermissionGroups_NewRow.JoinWithCr());
@@ -1347,7 +1361,7 @@ namespace BlueDatabase {
                 SaveToByteList(l, enDatabaseDataType.AdditionaFilesPfad, _AdditionaFilesPfad);
                 SaveToByteList(l, enDatabaseDataType.ZeilenQuickInfo, _ZeilenQuickInfo);
                 Column.SaveToByteList(l);
-                Row.SaveToByteList(l);
+                //Row.SaveToByteList(l);
                 Cell.SaveToByteList(ref l);
                 if (SortDefinition == null) {
                     // Ganz neue Datenbank
@@ -1387,63 +1401,71 @@ namespace BlueDatabase {
 
         private static int NummerCode3(byte[] b, int pointer) => (b[pointer] * 65025) + (b[pointer + 1] * 255) + b[pointer + 2];
 
-        private void ChangeColumnKeyInPending(int oldKey, int newKey) {
-            foreach (var ThisPending in Works) {
-                if (ThisPending.State == enItemState.Pending) {
-                    if (ThisPending.ColKey == oldKey) {
-                        if (ThisPending.ToString() == _LastWorkItem) { _LastWorkItem = "X"; }
-                        ThisPending.ColKey = newKey; // Generell den Schlüssel ändern
-                        if (_LastWorkItem == "X") {
-                            _LastWorkItem = ThisPending.ToString();
-                            //Develop.DebugPrint(enFehlerArt.Info, "LastWorkitem geändert: " + _LastWorkItem);
-                        }
-                        switch (ThisPending.Comand) {
-                            case enDatabaseDataType.AddColumn:
-                            case enDatabaseDataType.dummyComand_RemoveColumn:
-                                ThisPending.ChangedTo = newKey.ToString();
-                                break;
-
-                            default:
-                                if (ThisPending.PreviousValue.Contains(ColumnCollection.ParsableColumnKey(oldKey))) {
-                                    Develop.DebugPrint("Replace machen (Old): " + oldKey);
-                                }
-                                if (ThisPending.ChangedTo.Contains(ColumnCollection.ParsableColumnKey(oldKey))) {
-                                    Develop.DebugPrint("Replace machen (New): " + oldKey);
-                                }
-                                break;
-                        }
-                    }
-                }
-                OnColumnKeyChanged(new KeyChangedEventArgs(oldKey, newKey));
+        private static long NummerCode7(byte[] b, int pointer) {
+            long nu = 0;
+            for (var n = 0; n < 7; n++) {
+                nu += b[pointer + n] * (long)Math.Pow(255, 6 - n);
             }
+            return nu;
         }
 
-        private void ChangeRowKeyInPending(int OldKey, int NewKey) {
-            foreach (var ThisPending in Works) {
-                if (ThisPending.State == enItemState.Pending) {
-                    if (ThisPending.RowKey == OldKey) {
-                        if (ThisPending.ToString() == _LastWorkItem) { _LastWorkItem = "X"; }
-                        ThisPending.RowKey = NewKey; // Generell den Schlüssel ändern
-                        if (_LastWorkItem == "X") {
-                            _LastWorkItem = ThisPending.ToString();
-                            //Develop.DebugPrint(enFehlerArt.Info, "LastWorkitem geändert: " + _LastWorkItem);
-                        }
-                        switch (ThisPending.Comand) {
-                            case enDatabaseDataType.dummyComand_AddRow:
-                            case enDatabaseDataType.dummyComand_RemoveRow:
-                                ThisPending.ChangedTo = NewKey.ToString();
-                                break;
+        //private void ChangeColumnKeyInPending(int oldKey, int newKey) {
+        //    foreach (var ThisPending in Works) {
+        //        if (ThisPending.State == enItemState.Pending) {
+        //            if (ThisPending.ColKey == oldKey) {
+        //                if (ThisPending.ToString() == _LastWorkItem) { _LastWorkItem = "X"; }
+        //                ThisPending.ColKey = newKey; // Generell den Schlüssel ändern
+        //                if (_LastWorkItem == "X") {
+        //                    _LastWorkItem = ThisPending.ToString();
+        //                    //Develop.DebugPrint(enFehlerArt.Info, "LastWorkitem geändert: " + _LastWorkItem);
+        //                }
+        //                switch (ThisPending.Comand) {
+        //                    case enDatabaseDataType.AddColumn:
+        //                    case enDatabaseDataType.dummyComand_RemoveColumn:
+        //                        ThisPending.ChangedTo = newKey.ToString();
+        //                        break;
 
-                            default:
-                                if (ThisPending.PreviousValue.Contains("RowKey=" + OldKey)) { Develop.DebugPrint("Replace machen (Old): " + OldKey); }
-                                if (ThisPending.ChangedTo.Contains("RowKey=" + OldKey)) { Develop.DebugPrint("Replace machen (New): " + OldKey); }
-                                break;
-                        }
-                    }
-                }
-                OnRowKeyChanged(new KeyChangedEventArgs(OldKey, NewKey));
-            }
-        }
+        //                    default:
+        //                        if (ThisPending.PreviousValue.Contains(ColumnCollection.ParsableColumnKey(oldKey))) {
+        //                            Develop.DebugPrint("Replace machen (Old): " + oldKey);
+        //                        }
+        //                        if (ThisPending.ChangedTo.Contains(ColumnCollection.ParsableColumnKey(oldKey))) {
+        //                            Develop.DebugPrint("Replace machen (New): " + oldKey);
+        //                        }
+        //                        break;
+        //                }
+        //            }
+        //        }
+        //        OnColumnKeyChanged(new KeyChangedEventArgs(oldKey, newKey));
+        //    }
+        //}
+
+        //private void ChangeRowKeyInPending(int OldKey, int NewKey) {
+        //    foreach (var ThisPending in Works) {
+        //        if (ThisPending.State == enItemState.Pending) {
+        //            if (ThisPending.RowKey == OldKey) {
+        //                if (ThisPending.ToString() == _LastWorkItem) { _LastWorkItem = "X"; }
+        //                ThisPending.RowKey = NewKey; // Generell den Schlüssel ändern
+        //                if (_LastWorkItem == "X") {
+        //                    _LastWorkItem = ThisPending.ToString();
+        //                    //Develop.DebugPrint(enFehlerArt.Info, "LastWorkitem geändert: " + _LastWorkItem);
+        //                }
+        //                switch (ThisPending.Comand) {
+        //                    case enDatabaseDataType.dummyComand_AddRow:
+        //                    case enDatabaseDataType.dummyComand_RemoveRow:
+        //                        ThisPending.ChangedTo = NewKey.ToString();
+        //                        break;
+
+        //                    default:
+        //                        if (ThisPending.PreviousValue.Contains("RowKey=" + OldKey)) { Develop.DebugPrint("Replace machen (Old): " + OldKey); }
+        //                        if (ThisPending.ChangedTo.Contains("RowKey=" + OldKey)) { Develop.DebugPrint("Replace machen (New): " + OldKey); }
+        //                        break;
+        //                }
+        //            }
+        //        }
+        //        OnRowKeyChanged(new KeyChangedEventArgs(OldKey, NewKey));
+        //    }
+        //}
 
         private void ChangeWorkItems(enItemState OldState, enItemState NewState) {
             foreach (var ThisWork in Works) {
@@ -1495,43 +1517,43 @@ namespace BlueDatabase {
             if (!IsParsing) { Develop.DebugPrint(enFehlerArt.Fehler, "Nur während des Parsens möglich"); }
             if (!HasPendingChanges()) { return; }
             // Erst die Neuen Zeilen / Spalten alle neutralisieren
-            var dummy = -1000;
-            foreach (var ThisPending in Works) {
-                if (ThisPending.State == enItemState.Pending) {
-                    if (ThisPending.Comand == enDatabaseDataType.dummyComand_AddRow) {
-                        dummy--;
-                        ChangeRowKeyInPending(ThisPending.RowKey, dummy);
-                    }
-                    if (ThisPending.Comand == enDatabaseDataType.AddColumn) {
-                        dummy--;
-                        ChangeColumnKeyInPending(ThisPending.ColKey, dummy);
-                    }
-                }
-            }
-            // Dann den neuen Zeilen / Spalten Tatsächlich eine neue ID zuweisen
-            foreach (var ThisPending in Works) {
-                if (ThisPending.State == enItemState.Pending) {
-                    switch (ThisPending.Comand) {
-                        case enDatabaseDataType.dummyComand_AddRow when _JoinTyp == enJoinTyp.Intelligent_zusammenfassen: {
-                                var Value = SearchKeyValueInPendingsOf(ThisPending.RowKey);
-                                var fRow = Row[Value];
-                                if (!string.IsNullOrEmpty(Value) && fRow != null) {
-                                    ChangeRowKeyInPending(ThisPending.RowKey, fRow.Key);
-                                } else {
-                                    ChangeRowKeyInPending(ThisPending.RowKey, Row.NextRowKey());
-                                }
-                                break;
-                            }
-                        case enDatabaseDataType.dummyComand_AddRow:
-                            ChangeRowKeyInPending(ThisPending.RowKey, Row.NextRowKey());
-                            break;
+            //var dummy = -1000;
+            //foreach (var ThisPending in Works) {
+            //    if (ThisPending.State == enItemState.Pending) {
+            //        //if (ThisPending.Comand == enDatabaseDataType.dummyComand_AddRow) {
+            //        //    dummy--;
+            //        //    ChangeRowKeyInPending(ThisPending.RowKey, dummy);
+            //        //}
+            //        //if (ThisPending.Comand == enDatabaseDataType.AddColumn) {
+            //        //    dummy--;
+            //        //    ChangeColumnKeyInPending(ThisPending.ColKey, dummy);
+            //        //}
+            //    }
+            //}
+            //// Dann den neuen Zeilen / Spalten Tatsächlich eine neue ID zuweisen
+            //foreach (var ThisPending in Works) {
+            //    if (ThisPending.State == enItemState.Pending) {
+            //        switch (ThisPending.Comand) {
+            //            //case enDatabaseDataType.dummyComand_AddRow when _JoinTyp == enJoinTyp.Intelligent_zusammenfassen: {
+            //            //        var Value = SearchKeyValueInPendingsOf(ThisPending.RowKey);
+            //            //        var fRow = Row[Value];
+            //            //        if (!string.IsNullOrEmpty(Value) && fRow != null) {
+            //            //            ChangeRowKeyInPending(ThisPending.RowKey, fRow.Key);
+            //            //        } else {
+            //            //            ChangeRowKeyInPending(ThisPending.RowKey, Row.NextRowKey());
+            //            //        }
+            //            //        break;
+            //            //    }
+            //            //case enDatabaseDataType.dummyComand_AddRow:
+            //            //    ChangeRowKeyInPending(ThisPending.RowKey, Row.NextRowKey());
+            //            //    break;
 
-                        case enDatabaseDataType.AddColumn:
-                            ChangeColumnKeyInPending(ThisPending.ColKey, Column.NextColumnKey);
-                            break;
-                    }
-                }
-            }
+            //            //case enDatabaseDataType.AddColumn:
+            //            //    ChangeColumnKeyInPending(ThisPending.ColKey, Column.NextColumnKey);
+            //            //    break;
+            //        }
+            //    }
+            //}
             // Und nun alles ausführen!
             foreach (var ThisPending in Works) {
                 if (ThisPending.State == enItemState.Pending) {
@@ -1577,7 +1599,7 @@ namespace BlueDatabase {
         private void Initialize() {
             Cell.Initialize();
             Column.Initialize();
-            Row.Initialize();
+            //Row.Initialize();
             Works.Clear();
             ColumnArrangements.Clear();
             Layouts.Clear();
@@ -1594,7 +1616,7 @@ namespace BlueDatabase {
             _ReloadDelaySecond = 600;
             _UndoCount = 300;
             _Caption = string.Empty;
-            _JoinTyp = enJoinTyp.Zeilen_verdoppeln;
+            //_JoinTyp = enJoinTyp.Zeilen_verdoppeln;
             _VerwaisteDaten = enVerwaisteDaten.Ignorieren;
             LoadedVersion = DatabaseVersion;
             _RulesScript = string.Empty;
@@ -1635,10 +1657,10 @@ namespace BlueDatabase {
             AddPending(enDatabaseDataType.Layouts, -1, Layouts.JoinWithCr(), false);
         }
 
-        private void OnColumnKeyChanged(KeyChangedEventArgs e) {
-            if (Disposed) { return; }
-            ColumnKeyChanged?.Invoke(this, e);
-        }
+        //private void OnColumnKeyChanged(KeyChangedEventArgs e) {
+        //    if (Disposed) { return; }
+        //    ColumnKeyChanged?.Invoke(this, e);
+        //}
 
         private void OnExporting(CancelEventArgs e) {
             if (Disposed) { return; }
@@ -1650,10 +1672,10 @@ namespace BlueDatabase {
             NeedPassword?.Invoke(this, e);
         }
 
-        private void OnRowKeyChanged(KeyChangedEventArgs e) {
-            if (Disposed) { return; }
-            RowKeyChanged?.Invoke(this, e);
-        }
+        //private void OnRowKeyChanged(KeyChangedEventArgs e) {
+        //    if (Disposed) { return; }
+        //    RowKeyChanged?.Invoke(this, e);
+        //}
 
         private void OnSortParameterChanged() {
             if (Disposed) { return; }
@@ -1782,10 +1804,12 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.LastRowKey:
-                    return Row.Load_310(type, value);
+                    //return Row.Load_310(type, value);
+                    break;
 
                 case enDatabaseDataType.LastColumnKey:
-                    return Column.Load_310(type, value);
+                    //return Column.Load_310(type, value);
+                    break;
 
                 case enDatabaseDataType.GlobalShowPass:
                     _GlobalShowPass = value;
@@ -1800,7 +1824,7 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.JoinTyp:
-                    _JoinTyp = (enJoinTyp)int.Parse(value);
+                    //_JoinTyp = (enJoinTyp)int.Parse(value);
                     break;
 
                 case enDatabaseDataType.VerwaisteDaten:
@@ -1845,22 +1869,22 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.dummyComand_AddRow:
-                    var addRowKey = int.Parse(value);
+                    var addRowKey = long.Parse(value);
                     if (Row.SearchByKey(addRowKey) == null) { Row.Add(new RowItem(this, addRowKey)); }
                     break;
 
                 case enDatabaseDataType.AddColumn:
-                    var addColumnKey = int.Parse(value);
+                    var addColumnKey = long.Parse(value);
                     if (Column.SearchByKey(addColumnKey) == null) { Column.AddFromParser(new ColumnItem(this, addColumnKey)); }
                     break;
 
                 case enDatabaseDataType.dummyComand_RemoveRow:
-                    var removeRowKey = int.Parse(value);
+                    var removeRowKey = long.Parse(value);
                     if (Row.SearchByKey(removeRowKey) is RowItem) { Row.Remove(removeRowKey); }
                     break;
 
                 case enDatabaseDataType.dummyComand_RemoveColumn:
-                    var removeColumnKey = int.Parse(value);
+                    var removeColumnKey = long.Parse(value);
                     if (Column.SearchByKey(removeColumnKey) is ColumnItem col) { Column.Remove(col); }
                     break;
 
@@ -1917,30 +1941,29 @@ namespace BlueDatabase {
 
         private void Row_RowRemoving(object sender, RowEventArgs e) => AddPending(enDatabaseDataType.dummyComand_RemoveRow, -1, e.Row.Key, "", e.Row.Key.ToString(), false);
 
-        private void SaveToByteList(List<byte> list, int numberToAdd, int byteCount) {
-            switch (byteCount) {
-                case 3:
-                    list.Add(Convert.ToByte(Math.Truncate(numberToAdd / 65025.0)));
-                    list.Add(Convert.ToByte(Math.Truncate(numberToAdd % 65025 / 255.0)));
-                    list.Add((byte)(numberToAdd % 65025 % 255));
-                    break;
+        private void SaveToByteList(List<byte> list, long numberToAdd, int byteCount) {
+            //var tmp = numberToAdd;
+            //var nn = byteCount;
 
-                case 2:
-                    list.Add(Convert.ToByte(Math.Truncate(numberToAdd / 255.0)));
-                    list.Add((byte)(numberToAdd % 255));
-                    break;
+            do {
+                byteCount--;
+                var te = (long)Math.Pow(255, byteCount);
+                var mu = (byte)Math.Truncate((decimal)(numberToAdd / te));
 
-                case 1:
-                    list.Add((byte)numberToAdd);
-                    break;
+                list.Add(mu);
+                numberToAdd = numberToAdd % te;
+            } while (byteCount > 0);
 
-                default:
-                    Develop.DebugPrint(enFehlerArt.Fehler, "Byteanzahl unbekannt!");
-                    break;
-            }
+            //if (nn == 3) {
+            //    if (NummerCode3(list.ToArray(), list.Count - nn) != tmp) { Debugger.Break(); }
+            //}
+
+            //if (nn == 7) {
+            //    if (NummerCode7(list.ToArray(), list.Count - nn) != tmp) { Debugger.Break(); }
+            //}
         }
 
-        private string SearchKeyValueInPendingsOf(int RowKey) {
+        private string SearchKeyValueInPendingsOf(long RowKey) {
             var F = string.Empty;
             foreach (var ThisPending in Works) {
                 if (ThisPending.State == enItemState.Pending) {

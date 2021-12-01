@@ -30,9 +30,9 @@ namespace BlueDatabase {
 
         private string _changedTo;
 
-        private int _colKey;
+        private long _colKey;
 
-        private int _rowKey;
+        private long _rowKey;
 
         private enItemState _state;
 
@@ -40,7 +40,7 @@ namespace BlueDatabase {
 
         #region Constructors
 
-        public WorkItem(enDatabaseDataType Comand, int ColKey, int RowKey, string PreviousValue, string ChangedTo, string User) {
+        public WorkItem(enDatabaseDataType Comand, long ColKey, long RowKey, string PreviousValue, string ChangedTo, string User) {
             _state = enItemState.Pending;
             this.Comand = Comand;
             _colKey = ColKey;
@@ -74,7 +74,7 @@ namespace BlueDatabase {
             }
         }
 
-        public int ColKey {
+        public long ColKey {
             get => _colKey;
             set {
                 if (value == _colKey) { return; }
@@ -90,7 +90,7 @@ namespace BlueDatabase {
 
         public string PreviousValue { get; private set; }
 
-        public int RowKey {
+        public long RowKey {
             get => _rowKey;
             set {
                 if (value == _rowKey) { return; }
@@ -137,11 +137,11 @@ namespace BlueDatabase {
                         break;
 
                     case "ck":
-                        _colKey = int.Parse(pair.Value);
+                        _colKey = long.Parse(pair.Value);
                         break;
 
                     case "rk":
-                        _rowKey = int.Parse(pair.Value);
+                        _rowKey = long.Parse(pair.Value);
                         break;
 
                     case "undotype":
@@ -155,16 +155,16 @@ namespace BlueDatabase {
                         _CellKey = _CellKey.TrimEnd("}");
                         var x = _CellKey.SplitAndCutBy("|");
                         if (x.GetUpperBound(0) == 1) {
-                            int.TryParse(x[0], out _colKey);
-                            int.TryParse(x[1], out _rowKey);
+                            long.TryParse(x[0], out _colKey);
+                            long.TryParse(x[1], out _rowKey);
                         }
                         break;
 
                     case "cellkey":
                         _CellKey = pair.Value;
                         var x2 = _CellKey.SplitAndCutBy("|");
-                        int.TryParse(x2[0], out _colKey);
-                        int.TryParse(x2[1], out _rowKey);
+                        long.TryParse(x2[0], out _colKey);
+                        long.TryParse(x2[1], out _rowKey);
                         break;
 
                     case "date":

@@ -43,13 +43,13 @@ namespace BlueControls.Controls {
         #region Fields
 
         // Für automatisches Datenbank-Management
-        private int _ColKey = -1;
+        private long _ColKey = -1;
 
         private string _ColumnName = string.Empty;
 
         private Database _Database = null;
 
-        private int _RowKey = -1;
+        private long _RowKey = -1;
 
         private ColumnItem _tmpColumn = null;
 
@@ -62,7 +62,7 @@ namespace BlueControls.Controls {
         public FlexiControlForCell() : this(null, -1, enÜberschriftAnordnung.Über_dem_Feld) {
         }
 
-        public FlexiControlForCell(Database database, int columnKey, enÜberschriftAnordnung captionPosition) : base() {
+        public FlexiControlForCell(Database database, long columnKey, enÜberschriftAnordnung captionPosition) : base() {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
@@ -87,7 +87,7 @@ namespace BlueControls.Controls {
         #region Properties
 
         [Description("Falls ein Key und ein Name befüllt sind, ist der Name führend.")]
-        public int ColumnKey {
+        public long ColumnKey {
             //get {
             //    return _ColKey;
             //}
@@ -125,8 +125,8 @@ namespace BlueControls.Controls {
                     _Database.Column.ItemInternalChanged -= Column_ItemInternalChanged;
                     _Database.ConnectedControlsStopAllWorking -= Database_ConnectedControlsStopAllWorking;
                     _Database.Row.RowChecked -= Database_RowChecked;
-                    _Database.RowKeyChanged -= _Database_RowKeyChanged;
-                    _Database.ColumnKeyChanged -= _Database_ColumnKeyChanged;
+                    //_Database.RowKeyChanged -= _Database_RowKeyChanged;
+                    //_Database.ColumnKeyChanged -= _Database_ColumnKeyChanged;
                     _Database.Loaded -= _Database_Loaded;
                     _Database.Disposing -= _Database_Disposing;
                 }
@@ -140,9 +140,9 @@ namespace BlueControls.Controls {
                     _Database.Column.ItemInternalChanged += Column_ItemInternalChanged;
                     _Database.ConnectedControlsStopAllWorking += Database_ConnectedControlsStopAllWorking;
                     _Database.Row.RowChecked += Database_RowChecked;
-                    _Database.RowKeyChanged += _Database_RowKeyChanged;
+                    //_Database.RowKeyChanged += _Database_RowKeyChanged;
                     _Database.Loaded += _Database_Loaded;
-                    _Database.ColumnKeyChanged += _Database_ColumnKeyChanged;
+                    //_Database.ColumnKeyChanged += _Database_ColumnKeyChanged;
                     _Database.Disposing += _Database_Disposing;
                 }
                 SetValueFromCell();
@@ -150,7 +150,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        public int RowKey {
+        public long RowKey {
             get => _RowKey;
             set {
                 if (value == _RowKey) { return; }
@@ -336,12 +336,12 @@ namespace BlueControls.Controls {
             //base.OnRemovingAll();
         }
 
-        private void _Database_ColumnKeyChanged(object sender, KeyChangedEventArgs e) {
-            if (e.KeyOld != _ColKey) { return; }
-            _ColKey = e.KeyNew;
-            GetTmpVariables();
-            SetValueFromCell();
-        }
+        //private void _Database_ColumnKeyChanged(object sender, KeyChangedEventArgs e) {
+        //    if (e.KeyOld != _ColKey) { return; }
+        //    _ColKey = e.KeyNew;
+        //    GetTmpVariables();
+        //    SetValueFromCell();
+        //}
 
         private void _Database_Disposing(object sender, System.EventArgs e) => Database = null;
 
@@ -354,12 +354,12 @@ namespace BlueControls.Controls {
             SetValueFromCell();
         }
 
-        private void _Database_RowKeyChanged(object sender, KeyChangedEventArgs e) {
-            if (e.KeyOld != _RowKey) { return; }
-            _RowKey = e.KeyNew;
-            GetTmpVariables();
-            SetValueFromCell();
-        }
+        //private void _Database_RowKeyChanged(object sender, KeyChangedEventArgs e) {
+        //    if (e.KeyOld != _RowKey) { return; }
+        //    _RowKey = e.KeyNew;
+        //    GetTmpVariables();
+        //    SetValueFromCell();
+        //}
 
         private void Column_ItemInternalChanged(object sender, ListEventArgs e) {
             if ((ColumnItem)e.Item == _tmpColumn) {

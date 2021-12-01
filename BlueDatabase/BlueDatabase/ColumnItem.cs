@@ -69,7 +69,7 @@ namespace BlueDatabase {
         private bool _DropdownBearbeitungErlaubt;
 
         //private bool _ZellenZusammenfassen;
-        private int _DropDownKey;
+        private long _DropDownKey;
 
         private bool _DropdownWerteAndererZellenAnzeigen;
         private bool _EditTrotzSperreErlaubt;
@@ -81,7 +81,7 @@ namespace BlueDatabase {
         private bool _IgnoreAtRowFilter;
 
         //private enDauerfilter _AutoFilter_Dauerfilter;
-        private int _KeyColumnKey;
+        private long _KeyColumnKey;
 
         private enColumnLineStyle _LineLeft;
         private enColumnLineStyle _LineRight;
@@ -89,12 +89,12 @@ namespace BlueDatabase {
         /// <summary>
         /// Die Quell-Spalte (aus der verlinkten Datenbank) ist immer
         /// </summary>
-        private int _LinkedCell_ColumnKey;
+        private long _LinkedCell_ColumnKey;
 
         /// <summary>
         /// Die zu suchende Zeile ist in dieser Spalte zu finden
         /// </summary>
-        private int _LinkedCell_RowKey;
+        private long _LinkedCell_RowKey;
 
         private string _LinkedDatabaseFile;
         private string _LinkedKeyKennung;
@@ -112,14 +112,14 @@ namespace BlueDatabase {
         private string _Ueberschrift1;
         private string _Ueberschrift2;
         private string _Ueberschrift3;
-        private int _VorschlagsColumn;
+        private long _VorschlagsColumn;
         private bool disposedValue;
 
         #endregion
 
         #region Constructors
 
-        public ColumnItem(Database database, int columnkey) {
+        public ColumnItem(Database database, long columnkey) {
             Database = database;
             Database.Disposing += Database_Disposing;
             if (columnkey < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "ColumnKey <0"); }
@@ -435,7 +435,7 @@ namespace BlueDatabase {
         //        OnChanged();
         //    }
         //}
-        public int DropdownKey {
+        public long DropdownKey {
             get => _DropDownKey;
             set {
                 if (_DropDownKey == value) { return; }
@@ -520,12 +520,12 @@ namespace BlueDatabase {
             }
         }
 
-        public int Key { get; }
+        public long Key { get; }
 
         /// <summary>
         /// Hält Werte, dieser Spalte gleich, bezugnehmend der KeyColumn(key)
         /// </summary>
-        public int KeyColumnKey {
+        public long KeyColumnKey {
             get => _KeyColumnKey;
             set {
                 if (_KeyColumnKey == value) { return; }
@@ -556,7 +556,7 @@ namespace BlueDatabase {
             }
         }
 
-        public int LinkedCell_ColumnKey {
+        public long LinkedCell_ColumnKey {
             get => _LinkedCell_ColumnKey;
             set {
                 if (_LinkedCell_ColumnKey == value) { return; }
@@ -566,7 +566,7 @@ namespace BlueDatabase {
             }
         }
 
-        public int LinkedCell_RowKey {
+        public long LinkedCell_RowKey {
             get => _LinkedCell_RowKey;
             set {
                 if (_LinkedCell_RowKey == value) { return; }
@@ -741,7 +741,7 @@ namespace BlueDatabase {
             }
         }
 
-        public int VorschlagsColumn {
+        public long VorschlagsColumn {
             get => _VorschlagsColumn;
             set {
                 if (_VorschlagsColumn == value) { return; }
@@ -756,8 +756,8 @@ namespace BlueDatabase {
                 Invalidate_TmpVariables();
                 _TMP_LinkedDatabase = value;
                 if (_TMP_LinkedDatabase != null) {
-                    _TMP_LinkedDatabase.RowKeyChanged += _TMP_LinkedDatabase_RowKeyChanged;
-                    _TMP_LinkedDatabase.ColumnKeyChanged += _TMP_LinkedDatabase_ColumnKeyChanged;
+                    //_TMP_LinkedDatabase.RowKeyChanged += _TMP_LinkedDatabase_RowKeyChanged;
+                    //_TMP_LinkedDatabase.ColumnKeyChanged += _TMP_LinkedDatabase_ColumnKeyChanged;
                     _TMP_LinkedDatabase.ConnectedControlsStopAllWorking += _TMP_LinkedDatabase_ConnectedControlsStopAllWorking;
                     _TMP_LinkedDatabase.Cell.CellValueChanged += _TMP_LinkedDatabase_Cell_CellValueChanged;
                     _TMP_LinkedDatabase.Disposing += _TMP_LinkedDatabase_Disposing;
@@ -1738,8 +1738,8 @@ namespace BlueDatabase {
             TMP_CaptionText_Size = new SizeF(-1, -1);
             TMP_CaptionBitmap = null;
             if (_TMP_LinkedDatabase != null) {
-                _TMP_LinkedDatabase.RowKeyChanged -= _TMP_LinkedDatabase_RowKeyChanged;
-                _TMP_LinkedDatabase.ColumnKeyChanged -= _TMP_LinkedDatabase_ColumnKeyChanged;
+                //_TMP_LinkedDatabase.RowKeyChanged -= _TMP_LinkedDatabase_RowKeyChanged;
+                //_TMP_LinkedDatabase.ColumnKeyChanged -= _TMP_LinkedDatabase_ColumnKeyChanged;
                 _TMP_LinkedDatabase.ConnectedControlsStopAllWorking -= _TMP_LinkedDatabase_ConnectedControlsStopAllWorking;
                 _TMP_LinkedDatabase.Cell.CellValueChanged -= _TMP_LinkedDatabase_Cell_CellValueChanged;
                 _TMP_LinkedDatabase.Disposing -= _TMP_LinkedDatabase_Disposing;
@@ -1977,15 +1977,15 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.co_KeyColumnKey:
-                    _KeyColumnKey = int.Parse(Wert);
+                    _KeyColumnKey = long.Parse(Wert);
                     break;
 
                 case enDatabaseDataType.co_LinkedCell_RowKey:
-                    _LinkedCell_RowKey = int.Parse(Wert);
+                    _LinkedCell_RowKey = long.Parse(Wert);
                     break;
 
                 case enDatabaseDataType.co_LinkedCell_ColumnKey:
-                    _LinkedCell_ColumnKey = int.Parse(Wert);
+                    _LinkedCell_ColumnKey = long.Parse(Wert);
                     break;
 
                 case enDatabaseDataType.co_LinkedCell_ColumnValueFoundIn:
@@ -1999,11 +1999,11 @@ namespace BlueDatabase {
                     break;
                 //case enDatabaseDataType.co_ZellenZusammenfassen: _ZellenZusammenfassen = Wert.FromPlusMinus(); break;
                 case enDatabaseDataType.co_DropDownKey:
-                    _DropDownKey = int.Parse(Wert);
+                    _DropDownKey = long.Parse(Wert);
                     break;
 
                 case enDatabaseDataType.co_VorschlagColumn:
-                    _VorschlagsColumn = int.Parse(Wert);
+                    _VorschlagsColumn = long.Parse(Wert);
                     break;
 
                 case enDatabaseDataType.co_Align:
@@ -2108,28 +2108,28 @@ namespace BlueDatabase {
             }
         }
 
-        private void _TMP_LinkedDatabase_ColumnKeyChanged(object sender, KeyChangedEventArgs e) {
-            Database.BlockReload(false);
-            if (_Format != enDataFormat.Columns_für_LinkedCellDropdown) {
-                var os = e.KeyOld.ToString();
-                var ns = e.KeyNew.ToString();
-                foreach (var ThisRow in Database.Row) {
-                    if (Database.Cell.GetStringBehindLinkedValue(this, ThisRow) == os) {
-                        Database.Cell.SetValueBehindLinkedValue(this, ThisRow, ns);
-                    }
-                }
-            }
-            if (_Format != enDataFormat.LinkedCell) {
-                var os = e.KeyOld.ToString() + "|";
-                var ns = e.KeyNew.ToString() + "|";
-                foreach (var ThisRow in Database.Row) {
-                    var val = Database.Cell.GetStringBehindLinkedValue(this, ThisRow);
-                    if (val.StartsWith(os)) {
-                        Database.Cell.SetValueBehindLinkedValue(this, ThisRow, val.Replace(os, ns));
-                    }
-                }
-            }
-        }
+        //private void _TMP_LinkedDatabase_ColumnKeyChanged(object sender, KeyChangedEventArgs e) {
+        //    Database.BlockReload(false);
+        //    if (_Format != enDataFormat.Columns_für_LinkedCellDropdown) {
+        //        var os = e.KeyOld.ToString();
+        //        var ns = e.KeyNew.ToString();
+        //        foreach (var ThisRow in Database.Row) {
+        //            if (Database.Cell.GetStringBehindLinkedValue(this, ThisRow) == os) {
+        //                Database.Cell.SetValueBehindLinkedValue(this, ThisRow, ns);
+        //            }
+        //        }
+        //    }
+        //    if (_Format != enDataFormat.LinkedCell) {
+        //        var os = e.KeyOld.ToString() + "|";
+        //        var ns = e.KeyNew.ToString() + "|";
+        //        foreach (var ThisRow in Database.Row) {
+        //            var val = Database.Cell.GetStringBehindLinkedValue(this, ThisRow);
+        //            if (val.StartsWith(os)) {
+        //                Database.Cell.SetValueBehindLinkedValue(this, ThisRow, val.Replace(os, ns));
+        //            }
+        //        }
+        //    }
+        //}
 
         private void _TMP_LinkedDatabase_ConnectedControlsStopAllWorking(object sender, MultiUserFileStopWorkingEventArgs e) => Database.OnConnectedControlsStopAllWorking(e);
 
@@ -2144,18 +2144,18 @@ namespace BlueDatabase {
             Database.Dispose();
         }
 
-        private void _TMP_LinkedDatabase_RowKeyChanged(object sender, KeyChangedEventArgs e) {
-            if (_Format != enDataFormat.LinkedCell) {
-                var os = "|" + e.KeyOld.ToString();
-                var ns = "|" + e.KeyNew.ToString();
-                foreach (var ThisRow in Database.Row) {
-                    var val = Database.Cell.GetStringBehindLinkedValue(this, ThisRow);
-                    if (val.EndsWith(os)) {
-                        Database.Cell.SetValueBehindLinkedValue(this, ThisRow, val.Replace(os, ns));
-                    }
-                }
-            }
-        }
+        //private void _TMP_LinkedDatabase_RowKeyChanged(object sender, KeyChangedEventArgs e) {
+        //    if (_Format != enDataFormat.LinkedCell) {
+        //        var os = "|" + e.KeyOld.ToString();
+        //        var ns = "|" + e.KeyNew.ToString();
+        //        foreach (var ThisRow in Database.Row) {
+        //            var val = Database.Cell.GetStringBehindLinkedValue(this, ThisRow);
+        //            if (val.EndsWith(os)) {
+        //                Database.Cell.SetValueBehindLinkedValue(this, ThisRow, val.Replace(os, ns));
+        //            }
+        //        }
+        //    }
+        //}
 
         private void AfterEdit_AutoReplace_ListOrItemChanged(object sender, System.EventArgs e) {
             Database.AddPending(enDatabaseDataType.co_AfterEdit_AutoReplace, Key, AfterEdit_AutoReplace.JoinWithCr(), false);

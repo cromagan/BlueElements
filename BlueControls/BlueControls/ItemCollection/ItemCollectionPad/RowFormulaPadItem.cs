@@ -34,7 +34,7 @@ namespace BlueControls.ItemCollection {
         private Database _Database;
         private string _lastQuickInfo;
         private string _LayoutID;
-        private int _RowKey;
+        private long _RowKey;
         private string _tmpQuickInfo;
 
         #endregion
@@ -43,11 +43,11 @@ namespace BlueControls.ItemCollection {
 
         public RowFormulaPadItem(ItemCollectionPad parent, string internalname) : this(parent, internalname, null, 0, string.Empty) { }
 
-        public RowFormulaPadItem(ItemCollectionPad parent, Database database, int rowkey) : this(parent, string.Empty, database, rowkey, string.Empty) { }
+        public RowFormulaPadItem(ItemCollectionPad parent, Database database, long rowkey) : this(parent, string.Empty, database, rowkey, string.Empty) { }
 
-        public RowFormulaPadItem(ItemCollectionPad parent, Database database, int rowkey, string layoutID) : this(parent, string.Empty, database, rowkey, layoutID) { }
+        public RowFormulaPadItem(ItemCollectionPad parent, Database database, long rowkey, string layoutID) : this(parent, string.Empty, database, rowkey, layoutID) { }
 
-        public RowFormulaPadItem(ItemCollectionPad parent, string internalname, Database database, int rowkey, string layoutID) : base(parent, internalname) {
+        public RowFormulaPadItem(ItemCollectionPad parent, string internalname, Database database, long rowkey, string layoutID) : base(parent, internalname) {
             _Database = database;
             _Database.Disposing += _Database_Disposing;
             _RowKey = rowkey;
@@ -136,7 +136,7 @@ namespace BlueControls.ItemCollection {
 
                 case "rowid": // TODO: alt
                 case "rowkey":
-                    _RowKey = int.Parse(value);
+                    _RowKey = long.Parse(value);
                     //Row = ParseExplicit_TMPDatabase.Row.SearchByKey(int.Parse(value));
                     //if (_Row != null) { ParseExplicit_TMPDatabase = null; }
                     return true;

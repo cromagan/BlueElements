@@ -59,7 +59,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capJoinTyp = new BlueControls.Controls.Caption();
             this.capReloadVerzoegerung = new BlueControls.Controls.Caption();
             this.cbxAnsicht = new BlueControls.Controls.ComboBox();
-            this.cbxJoinTyp = new BlueControls.Controls.ComboBox();
             this.capAnsicht = new BlueControls.Controls.Caption();
             this.Tab_Regeln = new System.Windows.Forms.TabPage();
             this.scriptEditor = new BlueControls.ScriptEditor();
@@ -338,7 +337,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Allgemein.Controls.Add(this.capJoinTyp);
             this.Tab_Allgemein.Controls.Add(this.capReloadVerzoegerung);
             this.Tab_Allgemein.Controls.Add(this.cbxAnsicht);
-            this.Tab_Allgemein.Controls.Add(this.cbxJoinTyp);
             this.Tab_Allgemein.Controls.Add(this.capAnsicht);
             this.Tab_Allgemein.Controls.Add(this.capInfo);
             this.Tab_Allgemein.Controls.Add(this.capTags);
@@ -498,16 +496,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.cbxAnsicht.Name = "cbxAnsicht";
             this.cbxAnsicht.Size = new System.Drawing.Size(160, 24);
             this.cbxAnsicht.TabIndex = 32;
-            // 
-            // cbxJoinTyp
-            // 
-            this.cbxJoinTyp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.cbxJoinTyp.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxJoinTyp.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxJoinTyp.Location = new System.Drawing.Point(168, 466);
-            this.cbxJoinTyp.Name = "cbxJoinTyp";
-            this.cbxJoinTyp.Size = new System.Drawing.Size(160, 24);
-            this.cbxJoinTyp.TabIndex = 31;
             // 
             // capAnsicht
             // 
@@ -838,7 +826,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private Caption capDateiverschluesselungInfo;
         private Caption capNeueZeilenInfo;
         private Caption capJoinTyp;
-        private ComboBox cbxJoinTyp;
         private ComboBox cbxVerwaisteDaten;
         private Caption capVerwaisteDaten;
         private Caption capUndoAnzahl;

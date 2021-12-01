@@ -46,9 +46,9 @@ namespace BlueControls.Controls {
 
         private bool _Inited;
 
-        private int _savedRowKey = int.MinValue;
+        private long _savedRowKey = long.MinValue;
 
-        private int _ShowingRowKey = -1;
+        private long _ShowingRowKey = -1;
 
         private RowItem _tmpShowingRow = null;
 
@@ -90,7 +90,7 @@ namespace BlueControls.Controls {
                     _Database.Row.RowRemoving -= Row_RowRemoving;
                     _Database.Column.ItemRemoved -= _Database_ColumnRemoved;
                     _Database.Column.ItemInternalChanged -= _Database_ItemInternalChanged;
-                    _Database.RowKeyChanged -= _Database_RowKeyChanged;
+                    //_Database.RowKeyChanged -= _Database_RowKeyChanged;
                     _Database.Disposing -= _Database_Disposing;
                     _Database.Save(false); // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
                 }
@@ -101,7 +101,7 @@ namespace BlueControls.Controls {
                     _Database.Row.RowRemoving += Row_RowRemoving;
                     _Database.Column.ItemRemoved += _Database_ColumnRemoved;
                     _Database.Column.ItemInternalChanged += _Database_ItemInternalChanged;
-                    _Database.RowKeyChanged += _Database_RowKeyChanged;
+                    //_Database.RowKeyChanged += _Database_RowKeyChanged;
                     _Database.Disposing += _Database_Disposing;
                 }
                 _Inited = false;
@@ -122,7 +122,7 @@ namespace BlueControls.Controls {
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public int ShowingRowKey {
+        public long ShowingRowKey {
             get {
                 Develop.DebugPrint_Disposed(IsDisposed);
                 return _ShowingRowKey;
@@ -277,11 +277,11 @@ namespace BlueControls.Controls {
             ShowingRowKey = r;
         }
 
-        private void _Database_RowKeyChanged(object sender, KeyChangedEventArgs e) {
-            // Ist aktuell nur möglich,wenn Pending Changes eine neue Zeile machen
-            // Jedes FlexControl beachtet für sich die Änderung
-            if (e.KeyOld == _savedRowKey) { _savedRowKey = e.KeyNew; }
-        }
+        //private void _Database_RowKeyChanged(object sender, KeyChangedEventArgs e) {
+        //    // Ist aktuell nur möglich,wenn Pending Changes eine neue Zeile machen
+        //    // Jedes FlexControl beachtet für sich die Änderung
+        //    if (e.KeyOld == _savedRowKey) { _savedRowKey = e.KeyNew; }
+        //}
 
         //private void _Database_RowChecked(object sender, RowCheckedEventArgs e) {
         //if (e.Row.Key != _ShowingRowKey) { return; }

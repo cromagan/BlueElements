@@ -41,6 +41,21 @@ namespace BlueBasics {
             return true;
         }
 
+        public static bool RemoveNullOrEmpty<T>(this ConcurrentDictionary<long, T> l) where T : ICanBeEmpty {
+            if (l == null || l.Count == 0) { return false; }
+            List<long> remo = new();
+            foreach (var pair in l) {
+                if (pair.Value == null || pair.Value.IsNullOrEmpty()) { remo.Add(pair.Key); }
+            }
+            if (remo.Count == 0) { return false; }
+            foreach (var ThisInteger in remo) {
+                if (!l.TryRemove(ThisInteger, out _)) {
+                    Develop.DebugPrint(enFehlerArt.Fehler, "Remove failed: " + ThisInteger);
+                }
+            }
+            return true;
+        }
+
         #endregion
     }
 }

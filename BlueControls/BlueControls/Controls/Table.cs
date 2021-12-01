@@ -253,8 +253,8 @@ namespace BlueControls.Controls {
                     _Database.Loaded -= _Database_DatabaseLoaded;
                     _Database.Loading -= _Database_StoreView;
                     _Database.ViewChanged -= _Database_ViewChanged;
-                    _Database.RowKeyChanged -= _Database_RowKeyChanged;
-                    _Database.ColumnKeyChanged -= _Database_ColumnKeyChanged;
+                    //_Database.RowKeyChanged -= _Database_RowKeyChanged;
+                    //_Database.ColumnKeyChanged -= _Database_ColumnKeyChanged;
                     _Database.Column.ItemInternalChanged -= _Database_ColumnContentChanged;
                     _Database.SortParameterChanged -= _Database_SortParameterChanged;
                     _Database.Row.RowRemoving -= Row_RowRemoving;
@@ -279,8 +279,8 @@ namespace BlueControls.Controls {
                     _Database.Loaded += _Database_DatabaseLoaded;
                     _Database.Loading += _Database_StoreView;
                     _Database.ViewChanged += _Database_ViewChanged;
-                    _Database.RowKeyChanged += _Database_RowKeyChanged;
-                    _Database.ColumnKeyChanged += _Database_ColumnKeyChanged;
+                    //_Database.RowKeyChanged += _Database_RowKeyChanged;
+                    //_Database.ColumnKeyChanged += _Database_ColumnKeyChanged;
                     _Database.Column.ItemInternalChanged += _Database_ColumnContentChanged;
                     _Database.SortParameterChanged += _Database_SortParameterChanged;
                     _Database.Row.RowRemoving += Row_RowRemoving;
@@ -1640,11 +1640,11 @@ namespace BlueControls.Controls {
             Invalidate_SortedRowData();
         }
 
-        private void _Database_ColumnKeyChanged(object sender, KeyChangedEventArgs e) {
-            // Ist aktuell nur möglich,wenn Pending Changes eine neue Zeile machen
-            if (string.IsNullOrEmpty(_StoredView)) { return; }
-            _StoredView = ColumnCollection.ChangeKeysInString(_StoredView, e.KeyOld, e.KeyNew);
-        }
+        //private void _Database_ColumnKeyChanged(object sender, KeyChangedEventArgs e) {
+        //    // Ist aktuell nur möglich,wenn Pending Changes eine neue Zeile machen
+        //    if (string.IsNullOrEmpty(_StoredView)) { return; }
+        //    _StoredView = ColumnCollection.ChangeKeysInString(_StoredView, e.KeyOld, e.KeyNew);
+        //}
 
         private void _Database_DatabaseLoaded(object sender, LoadedEventArgs e) {
             // Wird auch bei einem Reload ausgeführt.
@@ -1726,11 +1726,11 @@ namespace BlueControls.Controls {
             Invalidate_VisibleRows();
         }
 
-        private void _Database_RowKeyChanged(object sender, KeyChangedEventArgs e) {
-            // Ist aktuell nur möglich, wenn Pending Changes eine neue Zeile machen
-            if (string.IsNullOrEmpty(_StoredView)) { return; }
-            _StoredView = _StoredView.Replace("RowKey=" + e.KeyOld + "}", "RowKey=" + e.KeyNew + "}");
-        }
+        //private void _Database_RowKeyChanged(object sender, KeyChangedEventArgs e) {
+        //    // Ist aktuell nur möglich, wenn Pending Changes eine neue Zeile machen
+        //    if (string.IsNullOrEmpty(_StoredView)) { return; }
+        //    _StoredView = _StoredView.Replace("RowKey=" + e.KeyOld + "}", "RowKey=" + e.KeyNew + "}");
+        //}
 
         private void _Database_RowRemoved(object sender, System.EventArgs e) => Invalidate_VisibleRows();
 

@@ -34,7 +34,14 @@ namespace BlueDatabase.Enums {
         CellFormat = 2,
 
         DatenAllgemeinUTF8 = 3,
+
+        [Obsolete]
         CellFormatUTF8 = 4,
-        ColumnUTF8 = 5
+
+        [Obsolete]
+        ColumnUTF8 = 5,
+
+        CellFormatUTF8_V400 = 6,
+        ColumnUTF8_V400 = 7
     }
 }

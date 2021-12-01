@@ -42,7 +42,7 @@ namespace BlueDatabase {
 
         #region Constructors
 
-        public RowItem(Database database, int key) {
+        public RowItem(Database database, long key) {
             Database = database;
             Key = key;
             _tmpQuickInfo = null;
@@ -50,8 +50,7 @@ namespace BlueDatabase {
             Database.Disposing += Database_Disposing;
         }
 
-        public RowItem(Database database) : this(database, database.Row.NextRowKey()) {
-        }
+        public RowItem(Database database) : this(database, database.Row.NextRowKey()) { }
 
         #endregion
 
@@ -81,7 +80,7 @@ namespace BlueDatabase {
         public static bool DoingScript { get; private set; } = false;
 
         public Database Database { get; private set; }
-        public int Key { get; }
+        public long Key { get; }
 
         public string QuickInfo {
             get {
