@@ -34,7 +34,6 @@ namespace BlueDatabase {
 
         private readonly ConcurrentDictionary<long, RowItem> _Internal = new();
 
-        //private int _LastRowKey;
         private bool disposedValue;
 
         #endregion
@@ -303,7 +302,7 @@ namespace BlueDatabase {
         public bool Remove(FilterCollection filter, List<RowItem> pinned) {
             var Keys = (from thisrowitem in _Internal.Values where thisrowitem != null && thisrowitem.MatchesTo(filter) select thisrowitem.Key).Select(dummy => (long)dummy).ToList();
             var did = false;
-            foreach (int thisKey in Keys) {
+            foreach (var thisKey in Keys) {
                 if (Remove(thisKey)) { did = true; }
             }
 
@@ -318,8 +317,8 @@ namespace BlueDatabase {
 
         public bool Remove(RowItem row) => row != null && Remove(row.Key);
 
-        public bool RemoveOlderThan(float InHours) {
-            var x = (from thisrowitem in _Internal.Values where thisrowitem != null let D = thisrowitem.CellGetDateTime(Database.Column.SysRowCreateDate) where DateTime.Now.Subtract(D).TotalHours > InHours select thisrowitem.Key).Select(dummy => (long)dummy).ToList();
+        public bool RemoveOlderThan(float inHours) {
+            var x = (from thisrowitem in _Internal.Values where thisrowitem != null let D = thisrowitem.CellGetDateTime(Database.Column.SysRowCreateDate) where DateTime.Now.Subtract(D).TotalHours > inHours select thisrowitem.Key).Select(dummy => (long)dummy).ToList();
             //foreach (var thisrowitem in _Internal.Values)
             //{
             //    if (thisrowitem != null)
@@ -329,7 +328,7 @@ namespace BlueDatabase {
             //    }
             //}
             if (x.Count == 0) { return false; }
-            foreach (int ThisKey in x) {
+            foreach (var ThisKey in x) {
                 Remove(ThisKey);
             }
             return true;
@@ -339,7 +338,6 @@ namespace BlueDatabase {
             try {
                 return Key < 0 ? null : !_Internal.ContainsKey(Key) ? null : _Internal[Key];
             } catch {
-                // Develop.DebugPrint(ex);
                 return SearchByKey(Key);
             }
         }
