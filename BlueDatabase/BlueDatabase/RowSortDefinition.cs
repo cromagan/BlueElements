@@ -98,7 +98,7 @@ namespace BlueDatabase {
                         break;
 
                     case "columnkey":
-                        _Columns.Add(Database.Column.SearchByKey(int.Parse(pair.Value)));
+                        _Columns.Add(Database.Column.SearchByKey(long.Parse(pair.Value)));
                         break;
 
                     default:

@@ -586,7 +586,7 @@ namespace BlueControls.Controls {
             if (!grpEditor.Visible) { return; }
             ColumnViewItem ViewItem = null;
             if (lbxColumns.Item.Checked().Count == 1) {
-                ViewItem = SearchViewItem(_Database.Column.SearchByKey(IntParse(lbxColumns.Item.Checked()[0].Internal)));
+                ViewItem = SearchViewItem(_Database.Column.SearchByKey(LongParse(lbxColumns.Item.Checked()[0].Internal)));
             }
             grpPosition.Enabled = ViewItem != null;
             grpGroesse.Enabled = ViewItem != null;
@@ -613,7 +613,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        private ColumnItem EditorSelectedColumn() => lbxColumns.Item.Checked().Count != 1 ? null : _Database.Column.SearchByKey(IntParse(lbxColumns.Item.Checked()[0].Internal));
+        private ColumnItem EditorSelectedColumn() => lbxColumns.Item.Checked().Count != 1 ? null : _Database.Column.SearchByKey(LongParse(lbxColumns.Item.Checked()[0].Internal));
 
         private void Generate_Tabs() {
             if (_Database.Views.Count < 1) { return; }
@@ -635,7 +635,7 @@ namespace BlueControls.Controls {
             var item = (BasicListItem)e.HotItem;
             if (item == null) { return; }
             item.Checked = true;
-            var cd = SearchViewItem(_Database.Column.SearchByKey(IntParse(item.Internal)));
+            var cd = SearchViewItem(_Database.Column.SearchByKey(LongParse(item.Internal)));
             if (cd == null) {
                 e.UserMenu.Add("Zum Kopfbereich hinzufügen", "#AddColumnToHead", enImageCode.Sonne);
                 e.UserMenu.Add("Zum Körperbereich hinzufügen", "#AddColumnToBody", enImageCode.Kreis, _Database.Views.Count > 1);
@@ -645,7 +645,7 @@ namespace BlueControls.Controls {
         }
 
         private void lbxColumns_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-            var Column = _Database.Column.SearchByKey(IntParse(((BasicListItem)e.HotItem).Internal));
+            var Column = _Database.Column.SearchByKey(LongParse(((BasicListItem)e.HotItem).Internal));
 
             var ViewItem = SearchViewItem(Column);
             var CurrView = CurrentView();

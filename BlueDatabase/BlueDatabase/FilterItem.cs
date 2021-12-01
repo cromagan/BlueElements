@@ -187,7 +187,7 @@ namespace BlueDatabase {
                         break;
 
                     case "columnkey":
-                        _Column = Database.Column.SearchByKey(int.Parse(pair.Value));
+                        _Column = Database.Column.SearchByKey(long.Parse(pair.Value));
                         break;
 
                     case "value":

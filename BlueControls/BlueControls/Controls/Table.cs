@@ -1811,7 +1811,7 @@ namespace BlueControls.Controls {
                         var r = InputBoxListBoxStyle.Show("Mit welcher Spalte vergleichen?", ic, enAddType.None, true);
                         if (r == null || r.Count == 0) { return; }
 
-                        var c = e.Column.Database.Column.SearchByKey(IntParse(r[0]));
+                        var c = e.Column.Database.Column.SearchByKey(LongParse(r[0]));
 
                         List<string> d = new();
                         foreach (var thisR in ro) {

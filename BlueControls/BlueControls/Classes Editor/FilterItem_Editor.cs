@@ -54,7 +54,7 @@ namespace BlueControls.Classes_Editor {
         }
 
         private void btnFilterWahl_Click(object sender, System.EventArgs e) {
-            var c = Item.Database.Column.SearchByKey(IntParse(cbxColumns.Text));
+            var c = Item.Database.Column.SearchByKey(LongParse(cbxColumns.Text));
             if (c == null || !c.AutoFilterSymbolPossible()) { return; }
             FilterCollection tmpfc = new(Item.Database);
             if (Item.FilterType != enFilterType.KeinFilter) { tmpfc.Add(Item); }
@@ -68,7 +68,7 @@ namespace BlueControls.Classes_Editor {
 
         private void cbxColumns_TextChanged(object sender, System.EventArgs e) {
             if (IsFilling) { return; }
-            var c = Item.Database.Column.SearchByKey(IntParse(cbxColumns.Text));
+            var c = Item.Database.Column.SearchByKey(LongParse(cbxColumns.Text));
             btnFilterWahl.Enabled = c == null || c.AutoFilterSymbolPossible() || true;
             Item.Column = c;
             Item.FilterType = enFilterType.KeinFilter;

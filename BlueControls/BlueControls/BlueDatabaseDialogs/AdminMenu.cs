@@ -220,7 +220,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             ic.Sort();
             var r = InputBoxListBoxStyle.Show("Wählen sie:", ic, enAddType.None, true);
             if (r == null || r.Count == 0) { return; }
-            _TableView.CurrentArrangement.Add(_TableView.Database.Column.SearchByKey(IntParse(r[0])), false);
+            _TableView.CurrentArrangement.Add(_TableView.Database.Column.SearchByKey(LongParse(r[0])), false);
             _TableView.Invalidate_HeadSize();
         }
 
