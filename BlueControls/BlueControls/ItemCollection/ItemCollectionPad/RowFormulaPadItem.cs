@@ -137,7 +137,7 @@ namespace BlueControls.ItemCollection {
                 case "rowid": // TODO: alt
                 case "rowkey":
                     _RowKey = long.Parse(value);
-                    //Row = ParseExplicit_TMPDatabase.Row.SearchByKey(int.Parse(value));
+                    //Row = ParseExplicit_TMPDatabase.Row.SearchByKey(long.Parse(value));
                     //if (_Row != null) { ParseExplicit_TMPDatabase = null; }
                     return true;
 

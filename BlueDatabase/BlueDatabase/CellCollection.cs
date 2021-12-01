@@ -182,8 +182,8 @@ namespace BlueDatabase {
 
             var V = Key.SplitAndCutBy("|");
             if (V.Length != 2) { return skriptgesteuert ? (LinkedDatabase.Column.SearchByKey(column.LinkedCell_ColumnKey), null) : RepairLinkedCellValue(LinkedDatabase, column, row, addRowIfNotExists); }
-            var LinkedColumn = LinkedDatabase.Column.SearchByKey(int.Parse(V[0]));
-            var LinkedRow = LinkedDatabase.Row.SearchByKey(int.Parse(V[1]));
+            var LinkedColumn = LinkedDatabase.Column.SearchByKey(long.Parse(V[0]));
+            var LinkedRow = LinkedDatabase.Row.SearchByKey(long.Parse(V[1]));
 
             if (KeyOfCell(LinkedColumn, LinkedRow) == Key) { return (LinkedColumn, LinkedRow); }
 
@@ -226,7 +226,7 @@ namespace BlueDatabase {
             }
             var cd = CellKey.SplitAndCutBy("|");
             if (cd.GetUpperBound(0) != 1) { Develop.DebugPrint(enFehlerArt.Fehler, "Falscher CellKey übergeben: " + CellKey); }
-            Column = _database.Column.SearchByKey(int.Parse(cd[0]));
+            Column = _database.Column.SearchByKey(long.Parse(cd[0]));
             Row = _database.Row.SearchByKey(long.Parse(cd[1]));
         }
 

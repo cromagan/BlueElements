@@ -787,7 +787,7 @@ namespace BlueControls.Controls {
                         break;
 
                     case "pin":
-                        _PinnedRows.Add(_Database.Row.SearchByKey(int.Parse(pair.Value)));
+                        _PinnedRows.Add(_Database.Row.SearchByKey(long.Parse(pair.Value)));
                         break;
 
                     case "collapsed":
@@ -795,7 +795,7 @@ namespace BlueControls.Controls {
                         break;
 
                     case "reduced":
-                        var c = _Database.Column.SearchByKey(int.Parse(pair.Value));
+                        var c = _Database.Column.SearchByKey(long.Parse(pair.Value));
                         var cv = CurrentArrangement[c];
                         if (cv != null) { cv._TMP_Reduced = true; }
                         break;
