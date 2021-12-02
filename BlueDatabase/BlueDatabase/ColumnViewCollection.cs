@@ -117,6 +117,12 @@ namespace BlueDatabase {
 
         public void Insert(int index, ColumnItem Column) => Insert(index, new ColumnViewItem(Column, enViewType.Column));
 
+        public void Invalidate_DrawWithOfAllItems() {
+            foreach (var ThisViewItem in this) {
+                ThisViewItem?.Invalidate_DrawWidth();
+            }
+        }
+
         public List<ColumnItem> ListOfUsedColumn() {
             List<ColumnItem> ColList = new();
             foreach (var t in this) {

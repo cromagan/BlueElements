@@ -217,7 +217,7 @@ namespace BlueControls.Controls {
                 if (value != _ArrangementNr) {
                     _ArrangementNr = value;
                     Invalidate_HeadSize();
-                    Invalidate_AllDraw(false);
+                    CurrentArrangement?.Invalidate_DrawWithOfAllItems();
                     Invalidate();
                     OnViewChanged();
                     CursorPos_Set(_CursorPosColumn, _CursorPosRow, true);
@@ -317,7 +317,7 @@ namespace BlueControls.Controls {
                     SliderX.Value = 0;
                 }
                 Invalidate_HeadSize();
-                Invalidate_AllDraw(false);
+                CurrentArrangement?.Invalidate_DrawWithOfAllItems();
                 Invalidate_VisibleRows();
                 OnViewChanged();
             }
@@ -732,6 +732,19 @@ namespace BlueControls.Controls {
         }
 
         public void ImportCSV(string csvtxt) => ImportCSV(_Database, csvtxt);
+
+        public void Invalidate_AllColumnArrangements() {
+            if(_Database== null) { return; }
+
+            foreach (var ThisArrangement in _Database.ColumnArrangements) {
+                if (ThisArrangement != null) {
+                    ThisArrangement.Invalidate_DrawWithOfAllItems();
+                    if (_Database.ColumnArrangements.IndexOf(ThisArrangement) == 0) {
+                        _Database.ColumnArrangements[0].ShowAllColumns();
+                    }
+                }
+            }
+        }
 
         public void Invalidate_HeadSize() {
             if (_HeadSize != null) { Invalidate(); }
@@ -1465,17 +1478,17 @@ namespace BlueControls.Controls {
             }
         }
 
-        protected override void OnResize(System.EventArgs e) {
-            base.OnResize(e);
-            if (_Database == null) { return; }
-            lock (Lock_UserAction) {
-                if (ISIN_Resize) { return; }
-                ISIN_Resize = true;
-                Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
-                Invalidate_AllDraw(false);
-                ISIN_Resize = false;
-            }
-        }
+        //protected override void OnResize(System.EventArgs e) {
+        //    base.OnResize(e);
+        //    if (_Database == null) { return; }
+        //    lock (Lock_UserAction) {
+        //        if (ISIN_Resize) { return; }
+        //        ISIN_Resize = true;
+        //        Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
+        //        Invalidate_AllDraw(false);
+        //        ISIN_Resize = false;
+        //    }
+        //}
 
         protected override void OnSizeChanged(System.EventArgs e) {
             base.OnSizeChanged(e);
@@ -1484,7 +1497,7 @@ namespace BlueControls.Controls {
                 if (ISIN_SizeChanged) { return; }
                 ISIN_SizeChanged = true;
                 Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
-                Invalidate_AllDraw(false);
+                CurrentArrangement?.Invalidate_DrawWithOfAllItems();
                 ISIN_SizeChanged = false;
             }
         }
@@ -1636,7 +1649,8 @@ namespace BlueControls.Controls {
         }
 
         private void _Database_ColumnContentChanged(object sender, ListEventArgs e) {
-            Invalidate_AllDraw(true);
+            Invalidate_AllColumnArrangements();
+            Invalidate_HeadSize();
             Invalidate_SortedRowData();
         }
 
@@ -1691,7 +1705,8 @@ namespace BlueControls.Controls {
                 _ArrangementNr = 1;
             }
             _sortDefinitionTemporary = null;
-            Invalidate_AllDraw(true);
+            Invalidate_AllColumnArrangements();
+            Invalidate_HeadSize();
             Invalidate_VisibleRows();
             OnViewChanged();
             if (e.OnlyReload) {
@@ -1748,7 +1763,7 @@ namespace BlueControls.Controls {
             InitializeSkin(); // Sicher ist sicher, um die neuen Schrift-Größen zu haben.
 
             Invalidate_HeadSize();
-            Invalidate_AllDraw(true);
+            Invalidate_AllColumnArrangements();
             //Invalidate_RowSort();
             CursorPos_Set(_CursorPosColumn, _CursorPosRow, true);
             Invalidate();
@@ -2931,36 +2946,7 @@ namespace BlueControls.Controls {
             return (int)_HeadSize;
         }
 
-        private void Invalidate_AllDraw(bool allOrder) {
-            if (_Database == null) { return; }
-            Invalidate_SortedRowData();
-            if (allOrder) {
-                foreach (var ThisArrangement in _Database.ColumnArrangements) {
-                    if (ThisArrangement != null) {
-                        foreach (var ThisViewItem in ThisArrangement) {
-                            Invalidate_DrawWidth(ThisViewItem);
-                        }
-                        if (_Database.ColumnArrangements.IndexOf(ThisArrangement) == 0) {
-                            _Database.ColumnArrangements[0].ShowAllColumns();
-                        }
-                    }
-                }
-                Invalidate_HeadSize();
-            } else {
-                if (_ArrangementNr < _Database.ColumnArrangements.Count - 1) {
-                    foreach (var ThisViewItem in CurrentArrangement) {
-                        Invalidate_DrawWidth(ThisViewItem);
-                    }
-                }
-            }
-        }
-
-        private void Invalidate_DrawWidth(ColumnItem vcolumn) => Invalidate_DrawWidth(CurrentArrangement[vcolumn]);
-
-        private void Invalidate_DrawWidth(ColumnViewItem ViewItem) {
-            if (ViewItem == null) { return; }
-            ViewItem._TMP_DrawWidth = null;
-        }
+        private void Invalidate_DrawWidth(ColumnItem vcolumn) => CurrentArrangement[vcolumn]?.Invalidate_DrawWidth();
 
         private void Invalidate_Filterinfo() {
             if (_Database == null) { return; }

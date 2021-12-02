@@ -193,6 +193,8 @@ namespace BlueDatabase {
 
         #region Methods
 
+        public void Invalidate_DrawWidth() => _TMP_DrawWidth = null;
+
         /// <summary>
         /// Info: Es wird keine Änderung ausgelöst
         /// </summary>
