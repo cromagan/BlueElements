@@ -25,6 +25,8 @@ namespace BlueBasics {
         #region Methods
 
         public static List<string> SortedDistinctList(this List<string> arr) {
+            if(arr == null) { return arr; }
+
             var arr2 = arr.Distinct().ToList();
             if (arr2.Contains(string.Empty)) { arr2.Remove(string.Empty); }
             arr2.Sort();

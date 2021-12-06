@@ -27,7 +27,9 @@ using static BlueBasics.FileOperations;
 using static BlueBasics.Generic;
 
 namespace BlueBasics.MultiUserFile {
+
     public abstract class clsMultiUserFile : IDisposable {
+
         #region Fields
 
         public static readonly ListExt<clsMultiUserFile> AllFiles = new();
@@ -527,8 +529,8 @@ namespace BlueBasics.MultiUserFile {
                     //Develop.DebugPrint(enFehlerArt.Info, "Block-Datei Konflikt: Inhalte unterschiedlich\r\n" + Filename + "\r\nSoll: " + _inhaltBlockdatei + "\r\n\r\nIst: " + Inhalt2);
                     return false;
                 }
-            } catch (Exception ex) {
-                Develop.DebugPrint(enFehlerArt.Info, ex);
+            } catch {
+                //Develop.DebugPrint(enFehlerArt.Info, ex);
                 return false;
             }
             return true;
@@ -964,7 +966,7 @@ namespace BlueBasics.MultiUserFile {
                 // OK, es sind andere Daten auf der Festplatte?!? Seltsam, zählt als sozusagen ungespeichter und ungeladen.
                 _CheckedAndReloadNeed = true;
                 _LastSaveCode = "Fehler";
-                Develop.DebugPrint(enFehlerArt.Warnung, "Speichern fehlgeschlagen!!! " + Filename);
+                //Develop.DebugPrint(enFehlerArt.Warnung, "Speichern fehlgeschlagen!!! " + Filename);
                 IsSaving = false;
                 return Feedback("Speichervorgang fehlgeschlagen.");
             } else {
