@@ -83,7 +83,7 @@ namespace BlueDatabase {
                 new FilterItem(cc, enFilterType.Istgleich_GroﬂKleinEgal, row.CellGetString(cc)),
                 new FilterItem(column, enFilterType.Ungleich_MultiRowIgnorieren, string.Empty)
             };
-            var rows = column.Database.Row.CalculateVisibleRows(F, null);
+            var rows = column.Database.Row.CalculateFilteredRows(F);
             rows.Remove(row);
             return rows.Count == 0 ? string.Empty : rows[0].CellGetString(column);
         }

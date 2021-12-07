@@ -1068,7 +1068,7 @@ namespace BlueDatabase {
             ProgressbarInfo?.Invoke(this, e);
         }
 
-        internal void OnScriptError(RowCancelEventArgs e) {
+        public void OnScriptError(RowCancelEventArgs e) {
             if (Disposed) { return; }
             ScriptError?.Invoke(this, e);
         }

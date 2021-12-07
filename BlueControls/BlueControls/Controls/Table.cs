@@ -36,6 +36,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using static BlueBasics.Converter;
 using static BlueBasics.FileOperations;
 using static BlueBasics.ListOfExtension;
@@ -90,6 +91,9 @@ namespace BlueControls.Controls {
 
         private enBlueTableAppearance _Design = enBlueTableAppearance.Standard;
 
+        // Die Sortierung der Zeile
+        private List<RowItem> _FilteredRows;
+
         private int? _HeadSize = null;
 
         /// <summary>
@@ -115,10 +119,6 @@ namespace BlueControls.Controls {
         private string _StoredView = string.Empty;
 
         private RowItem _Unterschiede;
-
-        // Die Sortierung der Zeile
-        private List<RowItem> _VisibleRows;
-
         private int _WiederHolungsSpaltenWidth;
 
         private bool ISIN_Click;
@@ -318,7 +318,7 @@ namespace BlueControls.Controls {
                 }
                 Invalidate_HeadSize();
                 CurrentArrangement?.Invalidate_DrawWithOfAllItems();
-                Invalidate_VisibleRows();
+                Invalidate_FilteredRows();
                 OnViewChanged();
             }
         }
@@ -692,6 +692,16 @@ namespace BlueControls.Controls {
             _Database.Export_HTML(Filename, CurrentArrangement, SortedRows(), Execute);
         }
 
+        /// <summary>
+        /// Alle gefilteren Zeilen. Jede Zeile ist maximal einmal in dieser Liste vorhanden. Angepinnte Zeilen addiert worden
+        /// </summary>
+        /// <returns></returns>
+        public List<RowItem> FilteredRows() {
+            if (_FilteredRows != null) { return _FilteredRows; }
+            _FilteredRows = Database.Row.CalculateFilteredRows(Filter);
+            return _FilteredRows;
+        }
+
         public new void Focus() {
             if (Focused()) { return; }
             base.Focus();
@@ -734,7 +744,7 @@ namespace BlueControls.Controls {
         public void ImportCSV(string csvtxt) => ImportCSV(_Database, csvtxt);
 
         public void Invalidate_AllColumnArrangements() {
-            if(_Database== null) { return; }
+            if (_Database == null) { return; }
 
             foreach (var ThisArrangement in _Database.ColumnArrangements) {
                 if (ThisArrangement != null) {
@@ -819,7 +829,7 @@ namespace BlueControls.Controls {
                 }
             }
             Filter.OnChanged();
-            Invalidate_VisibleRows(); // beim Parsen wirft der Filter kein Event ab
+            Invalidate_FilteredRows(); // beim Parsen wirft der Filter kein Event ab
         }
 
         public void Pin(List<RowItem> rows) {
@@ -832,19 +842,19 @@ namespace BlueControls.Controls {
 
             _PinnedRows.Clear();
             _PinnedRows.AddRange(rows);
-            Invalidate_VisibleRows();
+            Invalidate_SortedRowData();
             OnPinnedChanged();
         }
 
         public void PinAdd(RowItem row) {
             _PinnedRows.Add(row);
-            Invalidate_VisibleRows();
+            Invalidate_SortedRowData();
             OnPinnedChanged();
         }
 
         public void PinRemove(RowItem row) {
             _PinnedRows.Remove(row);
-            Invalidate_VisibleRows();
+            Invalidate_SortedRowData();
             OnPinnedChanged();
         }
 
@@ -862,7 +872,7 @@ namespace BlueControls.Controls {
                 if (Database == null) {
                     _SortedRowDataNew = new List<RowData>();
                 } else {
-                    _SortedRowDataNew = Database.Row.CalculateSortedRows(VisibleRows(), SortUsed(), _PinnedRows, _SortedRowData);
+                    _SortedRowDataNew = Database.Row.CalculateSortedRows(FilteredRows(), SortUsed(), _PinnedRows, _SortedRowData);
                 }
 
                 if (!_SortedRowData.IsDifferentTo(_SortedRowDataNew)) { return _SortedRowData; }
@@ -980,14 +990,20 @@ namespace BlueControls.Controls {
             return x + "}";
         }
 
-        /// <summary>
-        /// Alle sichtbaren Zeile. Jede Zeile ist maximal einmal in dieser Liste vorhanden.
-        /// </summary>
-        /// <returns></returns>
-        public List<RowItem> VisibleRows() {
-            if (_VisibleRows != null) { return _VisibleRows; }
-            _VisibleRows = Database.Row.CalculateVisibleRows(Filter, _PinnedRows);
-            return _VisibleRows;
+        public List<RowItem> VisibleUniqueRows() {
+            var l = new List<RowItem>();
+            var f = FilteredRows();
+            var lockMe = new object();
+            Parallel.ForEach(Database.Row, thisRowItem => {
+                if (thisRowItem != null) {
+                    if (f.Contains(thisRowItem) || PinnedRows.Contains(thisRowItem)) {
+                        lock (lockMe) { l.Add(thisRowItem); }
+                    }
+                }
+            });
+
+            return l;
+            //return Database.Row.CalculateVisibleRows(Filter, PinnedRows);
         }
 
         public void WriteColumnArrangementsInto(ComboBox _ColumnArrangementSelector) {
@@ -1071,22 +1087,24 @@ namespace BlueControls.Controls {
                     DrawWaitScreen(gr);
                     return;
                 }
-                var FirstVisibleRow = SortedRows().Count;
+                var sr = SortedRows();
+
+                var FirstVisibleRow = sr.Count;
                 var LastVisibleRow = -1;
-                foreach (var thisRow in SortedRows()) {
+                foreach (var thisRow in sr) {
                     if (IsOnScreen(thisRow, displayRectangleWOSlider)) {
-                        var T = SortedRows().IndexOf(thisRow);
+                        var T = sr.IndexOf(thisRow);
                         FirstVisibleRow = Math.Min(T, FirstVisibleRow);
                         LastVisibleRow = Math.Max(T, LastVisibleRow);
                     }
                 }
                 switch (_Design) {
                     case enBlueTableAppearance.Standard:
-                        Draw_Table_Std(gr, state, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
+                        Draw_Table_Std(gr, sr, state, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
                         break;
 
                     case enBlueTableAppearance.OnlyMainColumnWithoutHead:
-                        Draw_Table_ListboxStyle(gr, state, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
+                        Draw_Table_ListboxStyle(gr, sr, state, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow);
                         break;
 
                     default:
@@ -1639,7 +1657,7 @@ namespace BlueControls.Controls {
                     SortUsed().UsedForRowSort(e.Column) ||
                     Filter.MayHasRowFilter(e.Column) ||
                     e.Column == Database.Column.SysChapter) {
-                    Invalidate_VisibleRows();
+                    Invalidate_FilteredRows();
                 }
             }
             Invalidate_DrawWidth(e.Column);
@@ -1707,7 +1725,7 @@ namespace BlueControls.Controls {
             _sortDefinitionTemporary = null;
             Invalidate_AllColumnArrangements();
             Invalidate_HeadSize();
-            Invalidate_VisibleRows();
+            Invalidate_FilteredRows();
             OnViewChanged();
             if (e.OnlyReload) {
                 if (string.IsNullOrEmpty(_StoredView)) { Develop.DebugPrint("Stored View Empty!"); }
@@ -1738,7 +1756,7 @@ namespace BlueControls.Controls {
 
         private void _Database_Row_RowAdded(object sender, RowEventArgs e) {
             OnRowAdded(sender, e);
-            Invalidate_VisibleRows();
+            Invalidate_FilteredRows();
         }
 
         //private void _Database_RowKeyChanged(object sender, KeyChangedEventArgs e) {
@@ -1747,7 +1765,7 @@ namespace BlueControls.Controls {
         //    _StoredView = _StoredView.Replace("RowKey=" + e.KeyOld + "}", "RowKey=" + e.KeyNew + "}");
         //}
 
-        private void _Database_RowRemoved(object sender, System.EventArgs e) => Invalidate_VisibleRows();
+        private void _Database_RowRemoved(object sender, System.EventArgs e) => Invalidate_FilteredRows();
 
         private void _Database_SavedToDisk(object sender, System.EventArgs e) => Invalidate();
 
@@ -1793,7 +1811,7 @@ namespace BlueControls.Controls {
 
                 case "doeinzigartig":
                     Filter.Remove(e.Column);
-                    e.Column.GetUniques(VisibleRows(), out var Einzigartig, out _);
+                    e.Column.GetUniques(VisibleUniqueRows(), out var Einzigartig, out _);
                     if (Einzigartig.Count > 0) {
                         Filter.Add(new FilterItem(e.Column, enFilterType.Istgleich_ODER_GroßKleinEgal, Einzigartig));
                         Notification.Show("Die aktuell einzigartigen Einträge wurden berechnet<br>und als <b>ODER-Filter</b> gespeichert.", enImageCode.Trichter);
@@ -1804,7 +1822,7 @@ namespace BlueControls.Controls {
 
                 case "donichteinzigartig":
                     Filter.Remove(e.Column);
-                    e.Column.GetUniques(VisibleRows(), out _, out var xNichtEinzigartig);
+                    e.Column.GetUniques(VisibleUniqueRows(), out _, out var xNichtEinzigartig);
                     if (xNichtEinzigartig.Count > 0) {
                         Filter.Add(new FilterItem(e.Column, enFilterType.Istgleich_ODER_GroßKleinEgal, xNichtEinzigartig));
                         Notification.Show("Die aktuell <b>nicht</b> einzigartigen Einträge wurden berechnet<br>und als <b>ODER-Filter</b> gespeichert.", enImageCode.Trichter);
@@ -1815,7 +1833,7 @@ namespace BlueControls.Controls {
 
                 case "dospaltenvergleich": {
                         List<RowItem> ro = new();
-                        ro.AddRange(VisibleRows());
+                        ro.AddRange(VisibleUniqueRows());
 
                         ItemCollectionList ic = new();
                         foreach (var ThisColumnItem in e.Column.Database.Column) {
@@ -1916,8 +1934,8 @@ namespace BlueControls.Controls {
             foreach (var ThisFilter in Filter) {
                 if (ThisFilter != null && ThisFilter.Column != column) { tfilter.Add(ThisFilter); }
             }
-            var temp = Database.Row.CalculateVisibleRows(tfilter, _PinnedRows);
-            column.TMP_IfFilterRemoved = VisibleRows().Count - temp.Count;
+            var temp = Database.Row.CalculateFilteredRows(tfilter);
+            column.TMP_IfFilterRemoved = FilteredRows().Count - temp.Count;
             return (int)column.TMP_IfFilterRemoved;
         }
 
@@ -2463,7 +2481,7 @@ namespace BlueControls.Controls {
             Draw_Border(gr, cellInThisDatabaseColumn, displayRectangleWOSlider, false);
         }
 
-        private void Draw_Column_Cells(Graphics gr, ColumnViewItem viewItem, Rectangle displayRectangleWOSlider, int firstVisibleRow, int lastVisibleRow, enStates state, bool firstOnScreen) {
+        private void Draw_Column_Cells(Graphics gr, List<RowData> sr, ColumnViewItem viewItem, Rectangle displayRectangleWOSlider, int firstVisibleRow, int lastVisibleRow, enStates state, bool firstOnScreen) {
 
             #region Neue Zeile
 
@@ -2476,7 +2494,7 @@ namespace BlueControls.Controls {
             #region Zeilen Zeichnen (Alle Zellen)
 
             for (var Zei = firstVisibleRow; Zei <= lastVisibleRow; Zei++) {
-                var CurrentRow = SortedRows()[Zei];
+                var CurrentRow = sr[Zei];
                 gr.SmoothingMode = SmoothingMode.None;
 
                 Rectangle cellrectangle = new((int)viewItem.OrderTMP_Spalte_X1,
@@ -2735,13 +2753,13 @@ namespace BlueControls.Controls {
             }
         }
 
-        private void Draw_Table_ListboxStyle(Graphics GR, enStates state, Rectangle displayRectangleWOSlider, int vFirstVisibleRow, int vLastVisibleRow) {
+        private void Draw_Table_ListboxStyle(Graphics GR, List<RowData> sr, enStates state, Rectangle displayRectangleWOSlider, int vFirstVisibleRow, int vLastVisibleRow) {
             var ItStat = state;
             Skin.Draw_Back(GR, enDesign.ListBox, state, DisplayRectangle, this, true);
             var Col = Database.Column[0];
             // Zeilen Zeichnen (Alle Zellen)
             for (var Zeiv = vFirstVisibleRow; Zeiv <= vLastVisibleRow; Zeiv++) {
-                var CurrentRow = SortedRows()[Zeiv];
+                var CurrentRow = sr[Zeiv];
                 var ViewItem = _Database.ColumnArrangements[0][Col];
                 Rectangle r = new(0, DrawY(CurrentRow), DisplayRectangleWithoutSlider().Width, CurrentRow.DrawHeight);
                 if (_CursorPosColumn != null && _CursorPosRow.Row == CurrentRow.Row) {
@@ -2768,7 +2786,7 @@ namespace BlueControls.Controls {
             Skin.Draw_Border(GR, enDesign.ListBox, state, displayRectangleWOSlider);
         }
 
-        private void Draw_Table_Std(Graphics GR, enStates state, Rectangle displayRectangleWOSlider, int FirstVisibleRow, int LastVisibleRow) {
+        private void Draw_Table_Std(Graphics GR, List<RowData> sr, enStates state, Rectangle displayRectangleWOSlider, int FirstVisibleRow, int LastVisibleRow) {
             try {
                 if (_Database.ColumnArrangements == null || _ArrangementNr >= _Database.ColumnArrangements.Count) { return; }   // Kommt vor, dass spontan doch geparsed wird...
                 Skin.Draw_Back(GR, enDesign.Table_And_Pad, state, DisplayRectangle, this, true);
@@ -2784,14 +2802,14 @@ namespace BlueControls.Controls {
                         PermaX = Math.Max(PermaX, (int)ViewItem.OrderTMP_Spalte_X1 + (int)ViewItem._TMP_DrawWidth);
                     }
                 }
-                Draw_Table_What(GR, enTableDrawColumn.NonPermament, enTableDrawType.ColumnBackBody, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, state);
-                Draw_Table_What(GR, enTableDrawColumn.NonPermament, enTableDrawType.Cells, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, state);
-                Draw_Table_What(GR, enTableDrawColumn.Permament, enTableDrawType.ColumnBackBody, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, state);
-                Draw_Table_What(GR, enTableDrawColumn.Permament, enTableDrawType.Cells, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, state);
+                Draw_Table_What(GR, sr, enTableDrawColumn.NonPermament, enTableDrawType.ColumnBackBody, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, state);
+                Draw_Table_What(GR, sr, enTableDrawColumn.NonPermament, enTableDrawType.Cells, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, state);
+                Draw_Table_What(GR, sr, enTableDrawColumn.Permament, enTableDrawType.ColumnBackBody, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, state);
+                Draw_Table_What(GR, sr, enTableDrawColumn.Permament, enTableDrawType.Cells, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, state);
                 // Den CursorLines zeichnen
                 Draw_Cursor(GR, displayRectangleWOSlider, true);
-                Draw_Table_What(GR, enTableDrawColumn.NonPermament, enTableDrawType.ColumnHead, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, state);
-                Draw_Table_What(GR, enTableDrawColumn.Permament, enTableDrawType.ColumnHead, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, state);
+                Draw_Table_What(GR, sr, enTableDrawColumn.NonPermament, enTableDrawType.ColumnHead, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, state);
+                Draw_Table_What(GR, sr, enTableDrawColumn.Permament, enTableDrawType.ColumnHead, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, state);
 
                 /// Überschriften 1-3 Zeichnen
                 Draw_Column_Head_Captions(GR);
@@ -2805,7 +2823,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        private void Draw_Table_What(Graphics GR, enTableDrawColumn col, enTableDrawType type, int PermaX, Rectangle displayRectangleWOSlider, int FirstVisibleRow, int LastVisibleRow, enStates state) {
+        private void Draw_Table_What(Graphics GR, List<RowData> sr, enTableDrawColumn col, enTableDrawType type, int PermaX, Rectangle displayRectangleWOSlider, int FirstVisibleRow, int LastVisibleRow, enStates state) {
             var lfdno = 0;
 
             bool firstOnScreen = true;
@@ -2822,7 +2840,7 @@ namespace BlueControls.Controls {
                                     break;
 
                                 case enTableDrawType.Cells:
-                                    Draw_Column_Cells(GR, ViewItem, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, state, firstOnScreen);
+                                    Draw_Column_Cells(GR, sr, ViewItem, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, state, firstOnScreen);
                                     break;
 
                                 case enTableDrawType.ColumnHead:
@@ -2921,7 +2939,7 @@ namespace BlueControls.Controls {
         }
 
         private void Filter_Changed(object sender, System.EventArgs e) {
-            Invalidate_VisibleRows();
+            Invalidate_FilteredRows();
             OnFilterChanged();
         }
 
@@ -2948,6 +2966,13 @@ namespace BlueControls.Controls {
 
         private void Invalidate_DrawWidth(ColumnItem vcolumn) => CurrentArrangement[vcolumn]?.Invalidate_DrawWidth();
 
+        private void Invalidate_FilteredRows() {
+            _FilteredRows = null;
+            //CursorPos_Reset(); // Gibt Probleme bei Formularen, wenn die Key-Spalte geändert wird. Mal abgesehen davon macht es einen Sinn, den Cursor proforma zu löschen, dass soll der RowSorter übernehmen.
+            Invalidate_Filterinfo();
+            Invalidate_SortedRowData();
+        }
+
         private void Invalidate_Filterinfo() {
             if (_Database == null) { return; }
             foreach (var thisColumn in _Database.Column) {
@@ -2961,13 +2986,6 @@ namespace BlueControls.Controls {
         private void Invalidate_SortedRowData() {
             _SortedRowData = null;
             Invalidate();
-        }
-
-        private void Invalidate_VisibleRows() {
-            _VisibleRows = null;
-            //CursorPos_Reset(); // Gibt Probleme bei Formularen, wenn die Key-Spalte geändert wird. Mal abgesehen davon macht es einen Sinn, den Cursor proforma zu löschen, dass soll der RowSorter übernehmen.
-            Invalidate_Filterinfo();
-            Invalidate_SortedRowData();
         }
 
         private bool IsOnScreen(ColumnViewItem ViewItem, Rectangle displayRectangleWOSlider) {

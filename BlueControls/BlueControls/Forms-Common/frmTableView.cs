@@ -363,7 +363,7 @@ namespace BlueControls.Forms {
                     if (Ansicht1.Checked && Formula.ShowingRow != null) {
                         selectedRows.Add(Formula.ShowingRow);
                     } else {
-                        selectedRows = TableView.VisibleRows();
+                        selectedRows = TableView.VisibleUniqueRows();
                     }
                     using (ExportDialog l = new(TableView.Database, selectedRows)) {
                         l.ShowDialog();
@@ -484,9 +484,7 @@ namespace BlueControls.Forms {
                 _ => TableView.Database.Row.Add(NameRepair("Neuer Eintrag", null)),
             };
 
-            var l = TableView.SortedRows();
-
-            TableView.CursorPos_Set(TableView.Database.Column[0], l.Get(vRow), true);
+            TableView.CursorPos_Set(TableView.Database.Column[0], TableView.SortedRows().Get(vRow), true);
         }
 
         private void Ordn_Click(object sender, System.EventArgs e) {
@@ -641,7 +639,7 @@ namespace BlueControls.Forms {
         }
 
         private void TableView_RowsSorted(object sender, System.EventArgs e) {
-            Zei.Text = TableView.Database.Column[0] != null ? "<ImageCode=Information|16>" + LanguageTool.DoTranslate("Einzigartige Zeilen:") + " " + TableView.VisibleRows().Count + " St." : "-";
+            Zei.Text = TableView.Database.Column[0] != null ? "<ImageCode=Information|16>" + LanguageTool.DoTranslate("Einzigartige Zeilen:") + " " + TableView.Database.Row.VisibleRowCount + " St." : "-";
             CheckButtons();
         }
 

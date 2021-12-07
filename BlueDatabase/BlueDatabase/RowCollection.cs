@@ -25,6 +25,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace BlueDatabase {
 
@@ -76,6 +77,8 @@ namespace BlueDatabase {
 
         public int Count => _Internal.Count;
         public Database Database { get; private set; }
+
+        public long VisibleRowCount { get; private set; } = 0;
 
         #endregion
 
@@ -153,15 +156,47 @@ namespace BlueDatabase {
             return Row;
         }
 
-        public List<RowData> CalculateSortedRows(List<FilterItem> filter, RowSortDefinition rowSortDefinition, List<RowItem> pinnedRows, List<RowData> reUseMe) => CalculateSortedRows(CalculateVisibleRows(filter, pinnedRows), rowSortDefinition, pinnedRows, reUseMe);
+        /// <summary>
+        /// Gibt die mit dieser Kombination sichtbaren Zeilen zurück. Ohne Sortierung. Jede Zeile kann maximal einmal vorkommen.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="pinnedRows"></param>
+        /// <returns></returns>
+        public List<RowItem> CalculateFilteredRows(List<FilterItem> filter) {
+            List<RowItem> _tmpVisibleRows = new();
 
-        public List<RowData> CalculateSortedRows(List<RowItem> visibleRows, RowSortDefinition rowSortDefinition, List<RowItem> pinnedRows, List<RowData> reUseMe) {
-            List<RowData> _pinnedData = new();
-            List<RowData> _rowData = new();
+            var lockMe = new object();
+            Parallel.ForEach(Database.Row, thisRowItem => {
+                if (thisRowItem != null) {
+                    if (thisRowItem.MatchesTo(filter)) {
+                        lock (lockMe) { _tmpVisibleRows.Add(thisRowItem); }
+                    }
+                }
+            });
+
+            //r
+            //foreach (var thisRowItem in Database.Row) {
+            //    if (thisRowItem != null) {
+            //        if (thisRowItem.MatchesTo(filter)) {
+            //            _tmpVisibleRows.Add(thisRowItem);
+            //        }
+            //    }
+            //}
+
+            return _tmpVisibleRows;
+        }
+
+        public List<RowData> CalculateSortedRows(List<FilterItem> filter, RowSortDefinition rowSortDefinition, List<RowItem> pinnedRows, List<RowData> reUseMe) => CalculateSortedRows(CalculateFilteredRows(filter), rowSortDefinition, pinnedRows, reUseMe);
+
+        public List<RowData> CalculateSortedRows(List<RowItem> filteredRows, RowSortDefinition rowSortDefinition, List<RowItem> pinnedRows, List<RowData> reUseMe) {
+            var lockMe = new object();
+            VisibleRowCount = 0;
+
+            #region Ermitteln, ob mindestens eine Überschruft vorhanden ist (capName)
 
             var capName = pinnedRows.Count > 0;
             if (!capName) {
-                foreach (var thisRow in visibleRows) {
+                foreach (var thisRow in filteredRows) {
                     if (!thisRow.CellIsNullOrEmpty(thisRow.Database.Column.SysChapter)) {
                         capName = true;
                         break;
@@ -169,19 +204,33 @@ namespace BlueDatabase {
                 }
             }
 
-            foreach (var thisRow in visibleRows) {
+            #endregion
+
+            #region _Angepinnten Zeilen erstellen (_pinnedData)
+
+            List<RowData> _pinnedData = new();
+            Parallel.ForEach(pinnedRows, thisRow => {
+                var rd = reUseMe.Get(thisRow, "Angepinnt") is RowData r ? r : new RowData(thisRow, "Angepinnt");
+                rd.AdditinalSort = "1";
+                rd.MarkYellow = true;
+                rd.AdditionalSort = rowSortDefinition == null ? thisRow.CompareKey(null) : thisRow.CompareKey(rowSortDefinition.Columns); ;
+
+                lock (lockMe) {
+                    VisibleRowCount++;
+                    _pinnedData.Add(rd);
+                }
+            });
+
+            #endregion
+
+            #region Gefiltere Zeilen erstellen (_rowData)
+
+            List<RowData> _rowData = new();
+            Parallel.ForEach(filteredRows, thisRow => {
                 var adk = rowSortDefinition == null ? thisRow.CompareKey(null) : thisRow.CompareKey(rowSortDefinition.Columns);
 
-                var MarkYellow = false;
-
-                if (pinnedRows.Contains(thisRow)) {
-                    var rd = reUseMe.Get(thisRow, "Angepinnt") is RowData r ? r : new RowData(thisRow, "Angepinnt");
-                    _pinnedData.Add(rd);
-                    rd.AdditinalSort = "1";
-                    rd.MarkYellow = true;
-                    MarkYellow = true;
-                    rd.AdditionalSort = adk;
-                }
+                var MarkYellow = pinnedRows.Contains(thisRow);
+                var added = MarkYellow;
 
                 var caps = thisRow.CellGetList(thisRow.Database.Column.SysChapter);
 
@@ -197,12 +246,19 @@ namespace BlueDatabase {
 
                 foreach (var thisCap in caps) {
                     var rd = reUseMe.Get(thisRow, thisCap) is RowData r ? r : new RowData(thisRow, thisCap);
-                    _rowData.Add(rd);
+
                     rd.AdditinalSort = "2";
                     rd.MarkYellow = MarkYellow;
                     rd.AdditionalSort = adk;
+                    lock (lockMe) {
+                        _rowData.Add(rd);
+                        if (!added) { VisibleRowCount++; added = true; }
+                    }
                 }
-            }
+            });
+
+            #endregion
+
             _pinnedData.Sort();
             _rowData.Sort();
 
@@ -222,13 +278,22 @@ namespace BlueDatabase {
             List<RowItem> _tmpVisibleRows = new();
             if (pinnedRows == null) { pinnedRows = new List<RowItem>(); }
 
-            foreach (var thisRowItem in Database.Row) {
+            var lockMe = new object();
+            Parallel.ForEach(Database.Row, thisRowItem => {
                 if (thisRowItem != null) {
                     if (thisRowItem.MatchesTo(filter) || pinnedRows.Contains(thisRowItem)) {
-                        _tmpVisibleRows.Add(thisRowItem);
+                        lock (lockMe) { _tmpVisibleRows.Add(thisRowItem); }
                     }
                 }
-            }
+            });
+
+            //foreach (var thisRowItem in Database.Row) {
+            //    if (thisRowItem != null) {
+            //        if (thisRowItem.MatchesTo(filter) || pinnedRows.Contains(thisRowItem)) {
+            //            _tmpVisibleRows.Add(thisRowItem);
+            //        }
+            //    }
+            //}
 
             return _tmpVisibleRows;
         }

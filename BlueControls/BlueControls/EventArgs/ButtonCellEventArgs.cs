@@ -32,9 +32,7 @@ namespace BlueControls.EventArgs {
         #region Properties
 
         public bool Cecked { get; set; }
-        public ColumnItem Column { get; set; }
         public QuickImage Image { get; set; }
-        public RowItem Row { get; set; }
         public string Text { get; set; }
 
         #endregion
