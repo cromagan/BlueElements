@@ -336,7 +336,10 @@ namespace BlueBasics {
             if (!multi && f.FileNames.Length != 1) { return null; }
             var x = new List<string>();
             x.AddRange(f.FileNames);
-            _LastFilePath = f.FileNames[0].FilePath();
+            if (f.FileNames != null && f.FileNames.GetUpperBound(0) > 0) {
+                _LastFilePath = f.FileNames[0].FilePath();
+            }
+
             return x;
         }
 

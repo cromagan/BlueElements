@@ -395,7 +395,7 @@ namespace BlueScript {
                     Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Fehler, "Objekttypfehler:" + _ValueString);
                 }
                 var x = _ValueString.Substring(0, _ValueString.Length - 1);
-                if (string.IsNullOrEmpty((x))) { return new List<string>() { string.Empty }; }
+                if (string.IsNullOrEmpty(x)) { return new List<string>() { string.Empty }; }
                 return x.SplitByCRToList();
             }
             set {

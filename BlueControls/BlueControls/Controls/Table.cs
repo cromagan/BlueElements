@@ -59,7 +59,7 @@ namespace BlueControls.Controls {
 
         private const int ColumnCaptionSizeY = 22;
 
-        private const int RowCaptionFontY = 26;
+        private int RowCaptionFontY = 26;
 
         private const int RowCaptionSizeY = 50;
 
@@ -139,7 +139,7 @@ namespace BlueControls.Controls {
 
         private bool ISIN_MouseWheel;
 
-        private bool ISIN_Resize;
+        //private bool ISIN_Resize;
 
         private bool ISIN_SizeChanged;
 
@@ -1124,9 +1124,11 @@ namespace BlueControls.Controls {
             if (Database != null) {
                 Pix16 = GetPix(16, _Cell_Font, Database.GlobalScale);
                 Pix18 = GetPix(18, _Cell_Font, Database.GlobalScale);
+                RowCaptionFontY = GetPix(26, _Cell_Font, Database.GlobalScale);
             } else {
                 Pix16 = 16;
                 Pix18 = 18;
+                RowCaptionFontY = 26;
             }
         }
 
@@ -1635,7 +1637,21 @@ namespace BlueControls.Controls {
                     var f = CellCollection.ErrorReason(column.Database.Column[0], null, enErrorReason.EditGeneral);
                     if (!string.IsNullOrEmpty(f)) { table.NotEditableInfo(f); return; }
                     row = column.Database.Row.Add(newValue);
-                    if (table.Database == column.Database) { table.PinAdd(row); }
+                    if (table.Database == column.Database) {
+
+                        var l = table.FilteredRows();
+                        if (!l.Contains(row)) {
+                            if(MessageBox.Show("Die neue Zeile ist ausgeblendet.<br>Soll sie <b>angepinnt</b> werden?", enImageCode.Pinnadel,"anpinnen", "abbrechen") == 0) {
+                                table.PinAdd(row);
+                            }
+                        }
+
+                        var sr = table.SortedRows();
+                        var rd = sr.Get(row);
+                        table.CursorPos_Set(table.Database.Column[0], rd, true);
+
+
+                    }
                 } else {
                     var f = CellCollection.ErrorReason(column, row, enErrorReason.EditGeneral);
                     if (!string.IsNullOrEmpty(f)) { table.NotEditableInfo(f); return; }
@@ -1643,6 +1659,9 @@ namespace BlueControls.Controls {
                 }
                 if (table.Database == column.Database) { table.CursorPos_Set(column, row, false, chapter); }
                 row.DoAutomatic(true, false, 5, "value changed");
+
+
+
                 // EnsureVisible ganz schlecht: Daten verändert, keine Positionen bekannt - und da soll sichtbar gemacht werden?
                 // CursorPos.EnsureVisible(SliderX, SliderY, DisplayRectangle)
             } else {
@@ -3070,7 +3089,10 @@ namespace BlueControls.Controls {
 
         private void OnRowAdded(object sender, RowEventArgs e) => RowAdded?.Invoke(sender, e);
 
-        private void OnViewChanged() => ViewChanged?.Invoke(this, System.EventArgs.Empty);
+        private void OnViewChanged() { 
+            ViewChanged?.Invoke(this, System.EventArgs.Empty);
+            Invalidate_SortedRowData(); // evtl. muss [Neue Zeile] ein/ausgebelndet werden
+        }
 
         private void OnVisibleRowsChanged() => VisibleRowsChanged?.Invoke(this, System.EventArgs.Empty);
 

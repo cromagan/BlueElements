@@ -161,7 +161,7 @@ namespace BlueControls.Controls {
             _MouseCurrent = GenerateNewMouseEventArgs(e);
             OnImageMouseUp(_MouseCurrent);
             base.OnMouseUp(e);
-            _MouseDown = null;
+            //_MouseDown = null; Wenn die Leute immer beide Maustasten gleichzeitig klicken.
         }
 
         protected void OnOverwriteMouseImageData(PositionEventArgs e) => OverwriteMouseImageData?.Invoke(this, e);

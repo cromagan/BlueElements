@@ -398,15 +398,15 @@ namespace BlueBasics.MultiUserFile {
                 if (sec >= 900) {
                     if (!FileExists(Filename)) { return; }
                     var x = File.ReadAllText(Blockdateiname(), System.Text.Encoding.UTF8);
-                    Develop.DebugPrint(enFehlerArt.Info, "Repariere MultiUserFile: " + Filename + " \r\n" + x);
+                    //Develop.DebugPrint(enFehlerArt.Info, "Repariere MultiUserFile: " + Filename + " \r\n" + x);
                     if (!CreateBlockDatei()) { return; }
                     var AutoRepairName = TempFile(Filename.FilePath(), Filename.FileNameWithoutSuffix() + "_BeforeAutoRepair", "AUT");
                     if (!CopyFile(Filename, AutoRepairName, false)) {
-                        Develop.DebugPrint(enFehlerArt.Info, "Autoreparatur fehlgeschlagen 1: " + Filename);
+                        Develop.DebugPrint(enFehlerArt.Warnung, "Autoreparatur fehlgeschlagen 1: " + Filename);
                         return;
                     }
                     if (!DeleteBlockDatei(true, false)) {
-                        Develop.DebugPrint(enFehlerArt.Info, "Autoreparatur fehlgeschlagen 2: " + Filename);
+                        Develop.DebugPrint(enFehlerArt.Warnung, "Autoreparatur fehlgeschlagen 2: " + Filename);
                     }
                 }
             } catch {

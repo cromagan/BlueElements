@@ -114,9 +114,7 @@ namespace BlueControls.Controls {
         #region Methods
 
         public static System.Windows.Forms.Form ParentForm(System.Windows.Forms.Control o) {
-            if (o == null) { return null; }
-
-            Develop.DebugPrint_Disposed(o.IsDisposed);
+            if (o == null || o.IsDisposed) { return null; }
 
             do {
                 switch (o) {

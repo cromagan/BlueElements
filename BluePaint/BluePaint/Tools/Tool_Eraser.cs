@@ -102,6 +102,8 @@ namespace BluePaint {
                 Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Warnung, "e = null");
                 return;
             }
+           if(e.Current.Button != System.Windows.Forms.MouseButtons.Left) { return; }
+
             if (Razi.Checked) { return; }
             var _Pic = OnNeedCurrentPic();
             if (Eleminate.Checked) {

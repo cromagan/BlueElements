@@ -112,15 +112,14 @@ namespace BlueControls.BlueDatabaseDialogs {
             lbxSortierSpalten.Suggestions.Clear();
             lbxSortierSpalten.Suggestions.AddRange(_Database.Column, false);
 
-            GenerateUndoTabelle();
             CryptStatus();
             GenerateInfoText();
         }
 
-        private void AddUndoToTable(WorkItem work, int index, string db) {
+        private void AddUndoToTable(WorkItem work, int index, string db, bool checkNeeded) {
             if (work.HistorischRelevant) {
-                var l = tblUndo.Database.Row[work.ToString()];
-                if (l != null) { return; }
+                if (checkNeeded && tblUndo.Database.Row[work.ToString()] != null) { return; }
+
                 var cd = work.CellKey.SplitAndCutBy("|");
                 _Database.Cell.DataOfCellKey(work.CellKey, out var Col, out var Row);
                 var r = tblUndo.Database.Row.Add(work.ToString());
@@ -243,7 +242,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 }
                 if (db.Caption == _Database.Caption) {
                     for (var n = 0; n < db.Works.Count; n++) {
-                        AddUndoToTable(db.Works[n], n, db.Filename.FileNameWithoutSuffix());
+                        AddUndoToTable(db.Works[n], n, db.Filename.FileNameWithoutSuffix(), true);
                     }
                 }
                 if (disp) { db.Dispose(); }
@@ -419,13 +418,16 @@ namespace BlueControls.BlueDatabaseDialogs {
             tblUndo.Database = x;
             tblUndo.Arrangement = 1;
             for (var n = 0; n < _Database.Works.Count; n++) {
-                AddUndoToTable(_Database.Works[n], n, string.Empty);
+                AddUndoToTable(_Database.Works[n], n, string.Empty, false);
             }
         }
 
         private void GlobalTab_Selecting(object sender, System.Windows.Forms.TabControlCancelEventArgs e) {
-            if (e.TabPageIndex == 1) {
+            if (e.TabPage == Tab_Regeln) {
                 scriptEditor.Database = _Database;
+            }
+            if (e.TabPage == Tab_Undo) {
+                if (tblUndo.Database == null) { GenerateUndoTabelle(); }
             }
         }
 

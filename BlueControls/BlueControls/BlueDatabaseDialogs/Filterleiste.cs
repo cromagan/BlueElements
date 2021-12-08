@@ -134,7 +134,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
             if (_isFilling) { return; }
             _isFilling = true;
-            btnAdmin.Visible = _TableView != null && _TableView.Database != null && _TableView.Database.IsAdministrator();
+            //btnAdmin.Visible = _TableView != null && _TableView.Database != null && _TableView.Database.IsAdministrator();
             //btnPin.Enabled = !_AutoPin;
             //btnPin.Visible = !_AutoPin;
             btnPinZurück.Enabled = _TableView != null && _TableView.Database != null && _TableView.PinnedRows != null && _TableView.PinnedRows.Count > 0;
@@ -169,7 +169,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 right = constwi + Skin.PaddingSmal;
                 anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left;
                 down = 0;
-                breakafter = btnAdmin.Left;
+                //breakafter = btnAdmin.Left;
                 afterBreakAddY = txbZeilenFilter.Height + Skin.Padding;
             } else {
                 toppos = btnAlleFilterAus.Bottom + Skin.Padding;
@@ -356,13 +356,13 @@ namespace BlueControls.BlueDatabaseDialogs {
             _TableView.Filter.Add(e.Filter);
         }
 
-        private void btnAdmin_Click(object sender, System.EventArgs e) {
-            BlueBasics.MultiUserFile.clsMultiUserFile.SaveAll(false);
-            frmTableView x = new(_TableView.Database, false, true);
-            x.ShowDialog();
-            x.Dispose();
-            BlueBasics.MultiUserFile.clsMultiUserFile.SaveAll(false);
-        }
+        //private void btnAdmin_Click(object sender, System.EventArgs e) {
+        //    BlueBasics.MultiUserFile.clsMultiUserFile.SaveAll(false);
+        //    frmTableView x = new(_TableView.Database, false, true);
+        //    x.ShowDialog();
+        //    x.Dispose();
+        //    BlueBasics.MultiUserFile.clsMultiUserFile.SaveAll(false);
+        //}
 
         private void btnÄhnliche_Click(object sender, System.EventArgs e) {
             List<FilterItem> fl = new() { new FilterItem(_TableView.Database.Column[0], enFilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text) };
