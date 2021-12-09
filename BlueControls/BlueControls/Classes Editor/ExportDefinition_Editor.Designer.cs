@@ -84,6 +84,7 @@ namespace BlueControls.Classes_Editor
             // 
             // Caption1
             // 
+            this.Caption1.CausesValidation = false;
             this.Caption1.Location = new System.Drawing.Point(8, 46);
             this.Caption1.Name = "Caption1";
             this.Caption1.Size = new System.Drawing.Size(112, 22);
@@ -97,16 +98,16 @@ namespace BlueControls.Classes_Editor
             this.lbxFilter.FilterAllowed = true;
             this.lbxFilter.Location = new System.Drawing.Point(248, 32);
             this.lbxFilter.Name = "lbxFilter";
-            this.lbxFilter.QuickInfo = "";
             this.lbxFilter.RemoveAllowed = true;
             this.lbxFilter.Size = new System.Drawing.Size(328, 120);
             this.lbxFilter.TabIndex = 9;
-            this.lbxFilter.ItemCheckedChanged += new System.EventHandler(this.lbxFilter_ItemCheckedChanged);
             this.lbxFilter.AddClicked += new System.EventHandler(this.lbxFilter_AddClicked);
+            this.lbxFilter.ItemCheckedChanged += new System.EventHandler(this.lbxFilter_ItemCheckedChanged);
             this.lbxFilter.ListOrItemChanged += new System.EventHandler(this.lbxFilter_ListOrItemChanged);
             // 
             // Caption24
             // 
+            this.Caption24.CausesValidation = false;
             this.Caption24.Location = new System.Drawing.Point(8, 24);
             this.Caption24.Name = "Caption24";
             this.Caption24.Size = new System.Drawing.Size(104, 22);
@@ -125,6 +126,7 @@ namespace BlueControls.Classes_Editor
             // 
             // Caption26
             // 
+            this.Caption26.CausesValidation = false;
             this.Caption26.Location = new System.Drawing.Point(200, 46);
             this.Caption26.Name = "Caption26";
             this.Caption26.Size = new System.Drawing.Size(48, 22);
@@ -143,6 +145,7 @@ namespace BlueControls.Classes_Editor
             // 
             // Caption27
             // 
+            this.Caption27.CausesValidation = false;
             this.Caption27.Location = new System.Drawing.Point(248, 8);
             this.Caption27.Name = "Caption27";
             this.Caption27.Size = new System.Drawing.Size(240, 22);
@@ -191,7 +194,7 @@ namespace BlueControls.Classes_Editor
             // 
             // ExportOriginalFormat
             // 
-            this.ExportOriginalFormat.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox_Text;
+            this.ExportOriginalFormat.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
             this.ExportOriginalFormat.Location = new System.Drawing.Point(8, 24);
             this.ExportOriginalFormat.Name = "ExportOriginalFormat";
             this.ExportOriginalFormat.Size = new System.Drawing.Size(200, 22);
@@ -201,7 +204,7 @@ namespace BlueControls.Classes_Editor
             // 
             // ExportHTMLFormat
             // 
-            this.ExportHTMLFormat.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox_Text;
+            this.ExportHTMLFormat.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
             this.ExportHTMLFormat.Location = new System.Drawing.Point(8, 46);
             this.ExportHTMLFormat.Name = "ExportHTMLFormat";
             this.ExportHTMLFormat.Size = new System.Drawing.Size(200, 22);
@@ -211,7 +214,7 @@ namespace BlueControls.Classes_Editor
             // 
             // ExportCSVFormat
             // 
-            this.ExportCSVFormat.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox_Text;
+            this.ExportCSVFormat.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
             this.ExportCSVFormat.Location = new System.Drawing.Point(8, 68);
             this.ExportCSVFormat.Name = "ExportCSVFormat";
             this.ExportCSVFormat.Size = new System.Drawing.Size(200, 22);
@@ -221,7 +224,7 @@ namespace BlueControls.Classes_Editor
             // 
             // ExportalsBild
             // 
-            this.ExportalsBild.ButtonStyle = BlueControls.Enums.enButtonStyle.Optionbox_Text;
+            this.ExportalsBild.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Text)));
             this.ExportalsBild.Location = new System.Drawing.Point(8, 90);
             this.ExportalsBild.Name = "ExportalsBild";
             this.ExportalsBild.Size = new System.Drawing.Size(240, 22);
@@ -231,6 +234,7 @@ namespace BlueControls.Classes_Editor
             // 
             // Caption29
             // 
+            this.Caption29.CausesValidation = false;
             this.Caption29.Location = new System.Drawing.Point(264, 46);
             this.Caption29.Name = "Caption29";
             this.Caption29.Size = new System.Drawing.Size(132, 22);
@@ -259,12 +263,11 @@ namespace BlueControls.Classes_Editor
             this.lsbExportDateien.FilterAllowed = true;
             this.lsbExportDateien.Location = new System.Drawing.Point(8, 24);
             this.lsbExportDateien.Name = "lsbExportDateien";
-            this.lsbExportDateien.QuickInfo = "";
             this.lsbExportDateien.RemoveAllowed = true;
             this.lsbExportDateien.Size = new System.Drawing.Size(984, 133);
             this.lsbExportDateien.TabIndex = 0;
-            this.lsbExportDateien.RemoveClicked += new System.EventHandler<BlueControls.EventArgs.ListOfBasicListItemEventArgs>(this.ExportDateien_RemoveClicked);
             this.lsbExportDateien.ListOrItemChanged += new System.EventHandler(this.ExportDateien_ListOrItemChanged);
+            this.lsbExportDateien.RemoveClicked += new System.EventHandler<BlueControls.EventArgs.ListOfBasicListItemEventArgs>(this.ExportDateien_RemoveClicked);
             // 
             // ExportVerzeichnis
             // 
@@ -279,6 +282,7 @@ namespace BlueControls.Classes_Editor
             // 
             // Caption23
             // 
+            this.Caption23.CausesValidation = false;
             this.Caption23.Location = new System.Drawing.Point(16, 16);
             this.Caption23.Name = "Caption23";
             this.Caption23.Size = new System.Drawing.Size(120, 22);
@@ -297,6 +301,7 @@ namespace BlueControls.Classes_Editor
             this.BlueFrame2.ResumeLayout(false);
             this.BlueFrame9.ResumeLayout(false);
             this.ResumeLayout(false);
+
         }
         private GroupBox BlueFrame3;
         private Caption Caption1;

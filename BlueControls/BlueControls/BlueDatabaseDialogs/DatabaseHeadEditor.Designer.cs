@@ -218,7 +218,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnSortRichtung
             // 
-            this.btnSortRichtung.ButtonStyle = BlueControls.Enums.enButtonStyle.Pic1_or_Pic2;
+            this.btnSortRichtung.ButtonStyle = Enums.enButtonStyle.Pic1_or_Pic2;
             this.btnSortRichtung.ImageCode = "AZ|16|8";
             this.btnSortRichtung.ImageCode_Checked = "ZA|16|8";
             this.btnSortRichtung.Location = new System.Drawing.Point(288, 32);
@@ -638,7 +638,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.lbxExportSets.Location = new System.Drawing.Point(8, 24);
             this.lbxExportSets.Name = "lbxExportSets";
             this.lbxExportSets.RemoveAllowed = true;
-            this.lbxExportSets.Size = new System.Drawing.Size(2046, 304);
+            this.lbxExportSets.Size = new System.Drawing.Size(1016, 136);
             this.lbxExportSets.TabIndex = 0;
             this.lbxExportSets.Text = "ExportAufgaben";
             this.lbxExportSets.AddClicked += new System.EventHandler(this.ExportSets_AddClicked);

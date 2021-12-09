@@ -59,36 +59,23 @@ namespace BlueControls.Controls {
 
         private const int ColumnCaptionSizeY = 22;
 
-        private int RowCaptionFontY = 26;
-
         private const int RowCaptionSizeY = 50;
-
         private static bool ServiceStarted = false;
-
         private readonly List<string> _collapsed = new();
-
         private readonly List<RowItem> _PinnedRows = new();
 
         // Die Sortierung der Zeile
         private readonly object Lock_UserAction = new();
 
         private int _ArrangementNr = 1;
-
         private AutoFilter _AutoFilter;
-
         private BlueFont _Cell_Font;
-
         private BlueFont _Chapter_Font;
-
         private BlueFont _Column_Filter_Font;
-
         private BlueFont _Column_Font;
         private ColumnItem _CursorPosColumn;
-
         private RowData _CursorPosRow;
-
         private Database _Database;
-
         private enBlueTableAppearance _Design = enBlueTableAppearance.Standard;
 
         // Die Sortierung der Zeile
@@ -102,47 +89,30 @@ namespace BlueControls.Controls {
         private ColumnItem _MouseOverColumn;
 
         private RowData _MouseOverRow;
-
         private string _MouseOverText;
-
         private BlueFont _NewRow_Font;
-
         private SearchAndReplace _searchAndReplace;
 
         //private readonly FontSelectDialog _FDia = null;
         private bool _ShowNumber = false;
 
         private RowSortDefinition _sortDefinitionTemporary;
-
         private List<RowData> _SortedRowData;
-
         private string _StoredView = string.Empty;
-
         private RowItem _Unterschiede;
         private int _WiederHolungsSpaltenWidth;
-
         private bool ISIN_Click;
-
         private bool ISIN_DoubleClick;
-
         private bool ISIN_KeyDown;
-
         private bool ISIN_MouseDown;
-
         private bool ISIN_MouseEnter;
-
         private bool ISIN_MouseLeave;
-
         private bool ISIN_MouseMove;
-
         private bool ISIN_MouseUp;
-
         private bool ISIN_MouseWheel;
-
-        //private bool ISIN_Resize;
-
         private bool ISIN_SizeChanged;
 
+        //private bool ISIN_Resize;
         private bool ISIN_VisibleChanged;
 
         private Progressbar PG = null;
@@ -151,7 +121,7 @@ namespace BlueControls.Controls {
         private int Pix16 = 16;
 
         private int Pix18 = 18;
-
+        private int RowCaptionFontY = 26;
         private Rectangle tmpCursorRect = Rectangle.Empty;
 
         #endregion
@@ -633,8 +603,6 @@ namespace BlueControls.Controls {
             return i;
         }
 
-        public bool AreRowsSorted() => _SortedRowData != null;
-
         public void CollapesAll() {
             _collapsed.Clear();
             if (Database != null) {
@@ -859,7 +827,7 @@ namespace BlueControls.Controls {
         }
 
         public List<RowData> SortedRows() {
-            if (AreRowsSorted()) { return _SortedRowData; }
+            if (_SortedRowData != null) { return _SortedRowData; }
 
             try {
                 var DisplayR = DisplayRectangleWithoutSlider();
@@ -1638,10 +1606,9 @@ namespace BlueControls.Controls {
                     if (!string.IsNullOrEmpty(f)) { table.NotEditableInfo(f); return; }
                     row = column.Database.Row.Add(newValue);
                     if (table.Database == column.Database) {
-
                         var l = table.FilteredRows();
                         if (!l.Contains(row)) {
-                            if(MessageBox.Show("Die neue Zeile ist ausgeblendet.<br>Soll sie <b>angepinnt</b> werden?", enImageCode.Pinnadel,"anpinnen", "abbrechen") == 0) {
+                            if (MessageBox.Show("Die neue Zeile ist ausgeblendet.<br>Soll sie <b>angepinnt</b> werden?", enImageCode.Pinnadel, "anpinnen", "abbrechen") == 0) {
                                 table.PinAdd(row);
                             }
                         }
@@ -1649,8 +1616,6 @@ namespace BlueControls.Controls {
                         var sr = table.SortedRows();
                         var rd = sr.Get(row);
                         table.CursorPos_Set(table.Database.Column[0], rd, true);
-
-
                     }
                 } else {
                     var f = CellCollection.ErrorReason(column, row, enErrorReason.EditGeneral);
@@ -1660,8 +1625,6 @@ namespace BlueControls.Controls {
                 if (table.Database == column.Database) { table.CursorPos_Set(column, row, false, chapter); }
                 row.DoAutomatic(true, false, 5, "value changed");
 
-
-
                 // EnsureVisible ganz schlecht: Daten verändert, keine Positionen bekannt - und da soll sichtbar gemacht werden?
                 // CursorPos.EnsureVisible(SliderX, SliderY, DisplayRectangle)
             } else {
@@ -1670,7 +1633,7 @@ namespace BlueControls.Controls {
         }
 
         private void _Database_CellValueChanged(object sender, CellEventArgs e) {
-            if (AreRowsSorted()) {
+            if (_FilteredRows != null) {
                 if (Filter[e.Column] != null ||
                     SortUsed() == null ||
                     SortUsed().UsedForRowSort(e.Column) ||
@@ -1680,6 +1643,7 @@ namespace BlueControls.Controls {
                 }
             }
             Invalidate_DrawWidth(e.Column);
+
             Invalidate_SortedRowData();
             Invalidate();
             OnCellValueChanged(e);
@@ -3089,7 +3053,7 @@ namespace BlueControls.Controls {
 
         private void OnRowAdded(object sender, RowEventArgs e) => RowAdded?.Invoke(sender, e);
 
-        private void OnViewChanged() { 
+        private void OnViewChanged() {
             ViewChanged?.Invoke(this, System.EventArgs.Empty);
             Invalidate_SortedRowData(); // evtl. muss [Neue Zeile] ein/ausgebelndet werden
         }
