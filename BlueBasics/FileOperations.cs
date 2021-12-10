@@ -449,8 +449,9 @@ namespace BlueBasics {
                 tries++;
                 if (tries > 5) {
                     if (!toBeSure) { return false; }
-                    if (DateTime.Now.Subtract(startTime).TotalSeconds > 60) { Develop.DebugPrint(enFehlerArt.Fehler, "Befehl konnte nicht ausgeführt werden, " + file1 + " " + file2); }
+                    if (DateTime.Now.Subtract(startTime).TotalSeconds > 60) { Develop.DebugPrint(enFehlerArt.Fehler, "Datei-Befehl konnte nicht ausgeführt werden:\r\n" + file1 + "\r\n" + file2); }
                 }
+                Pause(0.2, false);
             }
             return true;
         }
@@ -461,41 +462,44 @@ namespace BlueBasics {
             if (FileExists(target)) { return false; }
             try {
                 File.Copy(source, target);
-            } catch (Exception ex) {
-                Develop.DebugPrint(enFehlerArt.Info, ex);
+            } catch {
+                //Develop.DebugPrint(enFehlerArt.Info, ex);
                 return false;
             }
             return true; // FileExists(target);
         }
 
-        private static bool TryDeleteDir(string pfad, string willBeIgnored) {
+        private static bool TryDeleteDir(string pfad, string _) {
             pfad = pfad.CheckPath();
             if (!PathExists(pfad)) { return true; }
             try {
                 Directory.Delete(pfad, true);
-            } catch (Exception ex) {
-                Develop.DebugPrint(enFehlerArt.Info, ex);
+            } catch {
+                //Develop.DebugPrint(enFehlerArt.Info, ex);
+                return false;
             }
-            return !PathExists(pfad);
+            return true; // Kein PathExist - evtl. hat ein anderer just den Pfad neu erstellt
         }
 
-        private static bool TryDeleteFile(string thisFile, string willbeIgnored) {
+        private static bool TryDeleteFile(string thisFile, string _) {
+            if (!FileExists(thisFile)) { return true; }
+
             // Komisch, manche Dateien können zwar gelöscht werden, die Attribute aber nicht geändert (Berechtigungen?)
             try {
                 if (File.GetAttributes(thisFile).HasFlag(FileAttributes.ReadOnly)) {
                     File.SetAttributes(thisFile, FileAttributes.Normal);
                 }
-            } catch (Exception ex) {
-                Develop.DebugPrint(enFehlerArt.Info, ex);
+            } catch {
+                //Develop.DebugPrint(enFehlerArt.Info, ex);
             }
             try {
                 CanWrite(thisFile, 0.5);
                 File.Delete(thisFile);
-            } catch (Exception ex) {
-                Develop.DebugPrint(enFehlerArt.Info, ex);
+            } catch {
+                //Develop.DebugPrint(enFehlerArt.Info, ex);
                 return false;
             }
-            return !FileExists(thisFile);
+            return true;  // Kein Fileexists - evtl. hat ein anderer just den Pfad neu erstellt
         }
 
         private static bool TryRenameFile(string oldName, string newName) {
@@ -504,8 +508,8 @@ namespace BlueBasics {
             if (FileExists(newName)) { return false; }
             try {
                 File.Move(oldName, newName);
-            } catch (Exception ex) {
-                Develop.DebugPrint(enFehlerArt.Info, ex);
+            } catch {
+                //Develop.DebugPrint(enFehlerArt.Info, ex);
                 return false;
             }
             return true; // FileExists(newName) && !FileExists(oldName);

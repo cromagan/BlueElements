@@ -751,6 +751,11 @@ namespace BlueDatabase {
                                         || (!string.IsNullOrEmpty(UserGroup) && DatenbankAdmin.Contains(UserGroup, false))
                                         || UserGroup.ToUpper() == "#ADMINISTRATOR";
 
+        public void OnScriptError(RowCancelEventArgs e) {
+            if (Disposed) { return; }
+            ScriptError?.Invoke(this, e);
+        }
+
         public void Parse(byte[] _BLoaded, ref int pointer, ref enDatabaseDataType type, ref long colKey, ref long rowKey, ref string value, ref int width, ref int height) {
             int Les;
             switch ((enRoutinen)_BLoaded[pointer]) {
@@ -1068,11 +1073,6 @@ namespace BlueDatabase {
             ProgressbarInfo?.Invoke(this, e);
         }
 
-        public void OnScriptError(RowCancelEventArgs e) {
-            if (Disposed) { return; }
-            ScriptError?.Invoke(this, e);
-        }
-
         internal void OnViewChanged() {
             if (Disposed) { return; }
             ViewChanged?.Invoke(this, System.EventArgs.Empty);
@@ -1139,8 +1139,8 @@ namespace BlueDatabase {
                         }
                     }
                 }
-            } catch (Exception ex) {
-                Develop.DebugPrint(ex);
+            } catch {
+                //Develop.DebugPrint(ex);
             }
         }
 

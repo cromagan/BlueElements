@@ -164,7 +164,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        private string SaveFile() => !string.IsNullOrEmpty(_filename) ? _filename.CheckFile() : System.Windows.Forms.Application.StartupPath + Name + "-Files.laf";
+        private string SaveFile() => !string.IsNullOrEmpty(_filename) ? _filename.CheckFile() : System.Windows.Forms.Application.StartupPath + "\\" + Name + "-Files.laf";
 
         private void SetLastFilesStyle() {
             if (DrawStyle == enComboboxStyle.TextBox) {
