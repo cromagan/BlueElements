@@ -322,7 +322,7 @@ namespace BlueDatabase {
             while (x.Count > 0) {
                 Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", all - x.Count(), all, false, false));
 
-                (var checkPerformed, var _, var skript) = x[0].DoAutomatic(true, fullCheck, false, startroutine);
+                (var checkPerformed, var _, var skript) = x[0].DoAutomatic(true, fullCheck, startroutine);
 
                 if (skript != null && !string.IsNullOrEmpty(skript.Error)) {
                     var w = x[0].CellFirstString();

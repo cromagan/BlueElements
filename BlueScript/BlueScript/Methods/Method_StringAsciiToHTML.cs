@@ -32,7 +32,7 @@ namespace BlueScript {
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.String;
         public override string StartSequence => "(";
-        public override string Syntax => "Method_StringAsciiToHTML(String, IgnoreBRbool)";
+        public override string Syntax => "StringAsciiToHTML(String, IgnoreBRbool)";
 
         #endregion
 

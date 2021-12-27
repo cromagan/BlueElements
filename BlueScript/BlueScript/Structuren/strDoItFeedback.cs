@@ -63,6 +63,8 @@ public struct strDoItFeedback {
 
     public static strDoItFeedback Null() => new();
 
+    public static strDoItFeedback Schreibgschützt() => new("Variable ist schreibgeschützt.");
+
     public static strDoItFeedback Wahr() => new("true", enVariableDataType.Bool);
 
     #endregion

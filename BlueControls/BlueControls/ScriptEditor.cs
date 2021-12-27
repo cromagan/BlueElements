@@ -97,7 +97,7 @@ namespace BlueControls {
                 MessageBox.Show("Zeile nicht gefunden.", enImageCode.Information, "OK");
                 return;
             }
-            (var _, var message, var s) = r.DoAutomatic(true, "script testing");
+            (var _, var message, var s) = r.DoAutomatic("script testing");
             if (s != null && s.Variablen != null) {
                 foreach (var thisv in s.Variablen) {
                     var ro = tableVariablen.Database.Row.Add(thisv.Name);
@@ -106,7 +106,7 @@ namespace BlueControls {
                     ro.CellSet("System", thisv.SystemVariable);
 
                     var tmpi = thisv.ValueString;
-                    if(tmpi.Length> 500) { tmpi = tmpi.Substring(0, 500) + "..."; }
+                    if (tmpi.Length > 500) { tmpi = tmpi.Substring(0, 500) + "..."; }
 
                     ro.CellSet("Inhalt", tmpi);
                     ro.CellSet("Kommentar", thisv.Coment);
@@ -147,7 +147,7 @@ namespace BlueControls {
             }
             txbSkriptInfo.Text = string.IsNullOrEmpty(s.Error)
                 ? "[" + DateTime.Now.ToLongTimeString() + "] Erfolgreich, wenn auch IF-Routinen nicht geprüft wurden."
-                : "[" + DateTime.Now.ToLongTimeString() + "] Fehler in Zeile: " + s.Line.ToString() + "\r\n" + s.Error + "\r\n >>> " + s.ErrorCode.Replace(Constants.GänsefüßchenReplace,"\\\"");
+                : "[" + DateTime.Now.ToLongTimeString() + "] Fehler in Zeile: " + s.Line.ToString() + "\r\n" + s.Error + "\r\n >>> " + s.ErrorCode.RestoreEscape();
         }
 
         private void GenerateVariableTable() {

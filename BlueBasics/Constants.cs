@@ -107,6 +107,7 @@ namespace BlueBasics {
         public const string Format_Integer6 = "000000";
         public const string Format_Integer7 = "0000000";
         public const char SecondSortChar = 'X';
+
         public static readonly string Char_NotFromClip = (char)3 + ((char)22).ToString() + (char)24 + "\n";
         public static readonly string Char_Sonderzeichen = "'()+-=$&´`^%˜°•øØμ@\\/*<>|[]{}#~µ_„\"²³€" + (char)0 + beChrW1 + "\t";
 
@@ -118,10 +119,6 @@ namespace BlueBasics {
                                                    (char)20 + (char)21 + (char)22 + (char)23 + (char)24 +
                                                    (char)25 + (char)26 + (char)27 + (char)28 + (char)29 +
                                                    (char)30;
-
-        public static readonly string GänsefüßchenReplace = ((char)9000).ToString();
-        public static readonly string ImageKennung = ((char)9001).ToString();
-        public static readonly string ObjectKennung = ((char)9002).ToString();
 
         //Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         //    var enc1252 = Encoding.GetEncoding(1252);

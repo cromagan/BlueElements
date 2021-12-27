@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
+using static BlueScript.Extensions;
 
 namespace BlueScript {
 
@@ -279,9 +280,9 @@ namespace BlueScript {
 
             #region Testen auf Bitmap
 
-            if (txt.Value.Length > 4 && txt.Value.StartsWith(Constants.ImageKennung + "\"") && txt.Value.EndsWith("\"" + Constants.ImageKennung)) {
+            if (txt.Value.Length > 4 && txt.Value.StartsWith(ImageKennung + "\"") && txt.Value.EndsWith("\"" + ImageKennung)) {
                 if (Type is not enVariableDataType.NotDefinedYet and not enVariableDataType.Bitmap) { SetError("Variable ist kein Bitmap"); return; }
-                ValueString = txt.Value.Substring(2, txt.Value.Length - 4).Replace(Constants.GänsefüßchenReplace, "\"");
+                ValueString = txt.Value.Substring(2, txt.Value.Length - 4).RestoreEscape();
                 Type = enVariableDataType.Bitmap;
                 Readonly = true;
                 return;
@@ -311,9 +312,9 @@ namespace BlueScript {
 
             #region Testen auf Object
 
-            if (txt.Value.Length > 2 && txt.Value.StartsWith(Constants.ObjectKennung + "\"") && txt.Value.EndsWith("\"" + Constants.ObjectKennung)) {
+            if (txt.Value.Length > 2 && txt.Value.StartsWith(ObjectKennung + "\"") && txt.Value.EndsWith("\"" + ObjectKennung)) {
                 if (Type is not enVariableDataType.NotDefinedYet and not enVariableDataType.Object) { SetError("Variable ist kein Objekt"); return; }
-                ValueString = txt.Value.Substring(2, txt.Value.Length - 4).Replace(Constants.GänsefüßchenReplace, "\"");
+                ValueString = txt.Value.Substring(2, txt.Value.Length - 4).RestoreEscape();
                 Type = enVariableDataType.Object;
                 Readonly = true;
                 return;
@@ -373,14 +374,14 @@ namespace BlueScript {
 
         public enVariableDataType Type { get; set; }
 
-        public bool ValueBool => _ValueString == "true";
+        public bool ValueBool {
+            get => _ValueString == "true";
+            set => ValueString = value ? "true" : "false";
+        }
 
         public double ValueDouble {
             get => DoubleParse(_ValueString);
-            set {
-                if (Readonly) { return; }
-                ValueString = value.ToString();
-            }
+            set => ValueString = value.ToString();
         }
 
         public int ValueInt => IntParse(_ValueString);
@@ -398,10 +399,7 @@ namespace BlueScript {
                 if (string.IsNullOrEmpty(x)) { return new List<string>() { string.Empty }; }
                 return x.SplitByCRToList();
             }
-            set {
-                if (Readonly) { return; }
-                ValueString = value == null || value.Count == 0 ? string.Empty : value.JoinWithCr() + "\r";
-            }
+            set => ValueString = value == null || value.Count == 0 ? string.Empty : value.JoinWithCr() + "\r";
         }
 
         /// <summary>
@@ -528,7 +526,7 @@ namespace BlueScript {
         public static string ValueForReplace(string value, enVariableDataType type) {
             switch (type) {
                 case enVariableDataType.String:
-                    return "\"" + value.Replace("\"", Constants.GänsefüßchenReplace) + "\"";
+                    return "\"" + value.RemoveEscape() + "\"";
 
                 case enVariableDataType.Bool:
                     return value;
@@ -544,16 +542,16 @@ namespace BlueScript {
                     }
 
                     var x = value.Substring(0, value.Length - 1);
-                    return "{\"" + (x.Replace("\"", Constants.GänsefüßchenReplace)).SplitByCRToList().JoinWith("\", \"") + "\"}";
+                    return "{\"" + (x.RemoveEscape()).SplitByCRToList().JoinWith("\", \"") + "\"}";
 
                 case enVariableDataType.NotDefinedYet: // Wenn ne Routine die Werte einfach ersetzt.
                     return value;
 
                 case enVariableDataType.Bitmap:
-                    return Constants.ImageKennung + "\"" + value.Replace("\"", Constants.GänsefüßchenReplace) + "\"" + Constants.ImageKennung;
+                    return ImageKennung + "\"" + value.RemoveEscape() + "\"" + ImageKennung;
 
                 case enVariableDataType.Object:
-                    return Constants.ObjectKennung + "\"" + value.Replace("\"", Constants.GänsefüßchenReplace) + "\"" + Constants.ObjectKennung;
+                    return ObjectKennung + "\"" + value.RemoveEscape() + "\"" + ObjectKennung;
 
                 case enVariableDataType.Variable:
                     return value;
@@ -563,8 +561,6 @@ namespace BlueScript {
                     return value;
             }
         }
-
-        public Bitmap GetValueBitmap(Script s) => s.BitmapCache[ValueInt];
 
         public string ObjectData() {
             if (Type != enVariableDataType.Object) { return string.Empty; }
@@ -581,9 +577,29 @@ namespace BlueScript {
             return x != null && x.GetUpperBound(0) == 1 && x[0] == toCheck.ToUpper().ReduceToChars(Constants.Char_AZ + Constants.Char_Numerals);
         }
 
-        public void PrepareForScript() => _ValueString = _ValueString.Replace("\"", Constants.GänsefüßchenReplace);
+        public void PrepareForScript() => _ValueString = _ValueString.RemoveEscape();
 
-        public void ScriptFinished() => _ValueString = _ValueString.Replace(Constants.GänsefüßchenReplace, "\"");
+        public string ReplaceInText(string txt) {
+            if (!txt.ToLower().Contains("~" + Name.ToLower() + "~")) { return txt; }
+
+            if (Type is not enVariableDataType.String and
+                        not enVariableDataType.List and
+                        not enVariableDataType.Integer and
+                        not enVariableDataType.Bool and
+                        not enVariableDataType.Numeral) { return txt; }
+
+            return txt.Replace("~" + Name + "~", ValueString, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        }
+
+        public void ScriptFinished() {
+            _ValueString = _ValueString.Replace("\\\"", "\"");
+            _ValueString = _ValueString.Replace("\\n", "\n");
+            _ValueString = _ValueString.Replace("\\r", "\r");
+            _ValueString = _ValueString.Replace("\\t", "\t");
+            _ValueString = _ValueString.Replace(BackSlashEscaped, "\\");
+            _ValueString = _ValueString.Replace(GänsefüßchenReplace, "\"");
+            _ValueString = _ValueString.Replace("\\\\", "\\");
+        }
 
         public override string ToString() {
             var zusatz = string.Empty;
@@ -599,6 +615,8 @@ namespace BlueScript {
                 _ => "{ukn} " + zusatz + Name + " = " + ValueString,
             };
         }
+
+        public Bitmap ValueBitmap(Script s) => s.BitmapCache[ValueInt];
 
         internal static string GenerateObject(string objecttype, string value) => objecttype.ToUpper().ReduceToChars(Constants.Char_AZ + Constants.Char_Numerals) + "&" + value.ToNonCritical();
 

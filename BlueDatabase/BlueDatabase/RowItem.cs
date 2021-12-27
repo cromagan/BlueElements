@@ -141,11 +141,11 @@ namespace BlueDatabase {
                     break;
 
                 case enDataFormat.Link_To_Filesystem:
-                    vars.Add(new Variable(column.Name, wert, enVariableDataType.String, ro, false, "Spalte: " + column.ReadableText()));
+                    vars.Add(new Variable(column.Name, wert, enVariableDataType.String, ro, false, "Spalte: " + column.ReadableText() + "\r\nFalls die Datei auf der Festplatte existiert, wird eine weitere\r\nVariable erzeugt: " + column.Name + "_FileName"));
 
                     var f = column.Database.Cell.BestFile(column, row);
                     if (f.FileType() == enFileFormat.Image && FileOperations.FileExists(f)) {
-                        vars.Add(new Variable(column.Name + "_ImageFileName", f, enVariableDataType.String, true, false, "Spalte: " + column.ReadableText() + "\r\nEnthält den vollen Dateinamen des Bildes der zugehörigen Zelle."));
+                        vars.Add(new Variable(column.Name + "_FileName", f, enVariableDataType.String, true, false, "Spalte: " + column.ReadableText() + "\r\nEnthält den vollen Dateinamen der Datei der zugehörigen Zelle.\r\nDie Existenz der Datei wurde geprüft und die Datei existert.\r\nAuf die Datei kann evtl. mit LoadImage zugegriffen werden."));
                     }
 
                     break;
@@ -269,7 +269,7 @@ namespace BlueDatabase {
             GC.SuppressFinalize(this);
         }
 
-        public (bool checkPerformed, string error, Script script) DoAutomatic(bool onlyTest, string startroutine) => DoAutomatic(false, false, onlyTest, startroutine);
+        public (bool checkPerformed, string error, Script script) DoAutomatic(string startroutine) => DoAutomatic(false, false, startroutine);
 
         /// <summary>
         /// Führt Regeln aus, löst Ereignisses, setzt SysCorrect und auch die initalwerte der Zellen.
@@ -283,7 +283,7 @@ namespace BlueDatabase {
             if (Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
             var t = DateTime.Now;
             do {
-                var erg = DoAutomatic(doFemdZelleInvalidate, fullCheck, false, startroutine);
+                var erg = DoAutomatic(doFemdZelleInvalidate, fullCheck, startroutine);
                 if (erg.checkPerformed) { return erg; }
                 if (DateTime.Now.Subtract(t).TotalSeconds > tryforsceonds) { return erg; }
             } while (true);
@@ -296,7 +296,7 @@ namespace BlueDatabase {
         /// <param name="doFemdZelleInvalidate">bei verlinkten Zellen wird der verlinkung geprüft und erneuert.</param>
         /// <param name="fullCheck">Runden, Großschreibung, etc. wird ebenfalls durchgeführt</param>
         /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
-        public (bool checkPerformed, string error, Script skript) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, bool onlyTest, string startroutine) {
+        public (bool checkPerformed, string error, Script skript) DoAutomatic(bool doFemdZelleInvalidate, bool fullCheck, string startroutine) {
             if (Database.ReadOnly) { return (false, "Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", null); }
 
             var feh = Database.ErrorReason(enErrorReason.EditAcut);
@@ -304,15 +304,18 @@ namespace BlueDatabase {
 
             // Zuerst die Aktionen ausführen und falls es einen Fehler gibt, die Spalten und Fehler auch ermitteln
             DoingScript = true;
-            var script = DoRules(onlyTest, startroutine);
+            var script = DoRules(startroutine);
             DoingScript = false;
-            if (onlyTest) { return (true, string.Empty, script); }
+
+            if (startroutine == "script testing") { return (true, string.Empty, script); }
 
             /// checkPerformed geht von Dateisystemfehlern aus
             if (!string.IsNullOrEmpty(script.Error)) {
                 Database.OnScriptError(new RowCancelEventArgs(this, "Zeile: " + script.Line.ToString() + "\r\n" + script.Error + "\r\n" + script.ErrorCode));
                 return (true, "<b>Das Skript ist fehlerhaft:</b>\r\n" + "Zeile: " + script.Line.ToString() + "\r\n" + script.Error + "\r\n" + script.ErrorCode, script);
             }
+
+            if (!script.Variablen.GetSystem("CellChangesEnabled").ValueBool) { return (true, string.Empty, script); }
 
             // Dann die Abschließenden Korrekturen vornehmen
             foreach (var ThisColum in Database.Column) {
@@ -466,11 +469,12 @@ namespace BlueDatabase {
         /// Führt alle Regeln aus und löst das Ereignis DoSpecialRules aus. Setzt ansonsten keine Änderungen, wie z.B. SysCorrect oder Runden-Befehle.
         /// </summary>
         /// <returns>Gibt Regeln, die einen Fehler verursachen zurück. z.B. SPALTE1|Die Splate darf nicht leer sein.</returns>
-        private Script DoRules(bool onlyTest, string startRoutine) {
+        private Script DoRules(string startRoutine) {
             try {
                 List<Variable> vars = new()
                 {
-                    new Variable("Startroutine", startRoutine, enVariableDataType.String, true, false, "ACHTUNG: Keinesfalls dürfen Startroutinenabhängig Werte verändert werden.\r\nMögliche Werte:\r\nnew row\r\nvalue changed\r\nscript testing\r\nmanual check\r\nto be sure\r\nimport\r\nexport\r\nscript")
+                    new Variable("Startroutine", startRoutine, enVariableDataType.String, true, false, "ACHTUNG: Keinesfalls dürfen Startroutinenabhängig Werte verändert werden.\r\nMögliche Werte:\r\nnew row\r\nvalue changed\r\nscript testing\r\nmanual check\r\nto be sure\r\nimport\r\nexport\r\nscript"),
+                    new Variable("CellChangesEnabled", "true", enVariableDataType.Bool, true, true, "Nur wenn TRUE werden nach dem Skript die Änderungen\r\nin die Datenbank aufgenommen.\r\nKann mit DisableCellChanges umgesetzt werden.")
                 };
 
                 #region Variablen für Skript erstellen
@@ -500,7 +504,7 @@ namespace BlueDatabase {
 
                 #endregion
 
-                if (!onlyTest) {
+                if (startRoutine != "script testing" && vars.GetSystem("CellChangesEnabled").ValueBool) {
 
                     #region Variablen zurückschreiben und Special Rules ausführen
 
@@ -514,7 +518,7 @@ namespace BlueDatabase {
                 }
                 return script;
             } catch {
-                return DoRules(onlyTest, startRoutine);
+                return DoRules(startRoutine);
             }
         }
 

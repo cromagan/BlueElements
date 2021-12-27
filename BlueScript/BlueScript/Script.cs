@@ -20,6 +20,7 @@ using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using static BlueScript.Extensions;
 
 namespace BlueScript {
 
@@ -221,7 +222,9 @@ namespace BlueScript {
             System.Text.StringBuilder s = new();
             var gänsef = false;
             var comment = false;
-            txt = txt.Replace("\\\"", Constants.GänsefüßchenReplace); // muss am Anfang gemacht werden, weil sonst die Zählweise nicht mehr stimmt
+
+            txt = txt.RemoveEscape();// muss am Anfang gemacht werden, weil sonst die Zählweise nicht mehr stimmt
+
             for (var pos = 0; pos < txt.Length; pos++) {
                 var c = txt.Substring(pos, 1);
                 var addt = true;
@@ -260,31 +263,5 @@ namespace BlueScript {
 
         #endregion
 
-        //public static void AddScriptComands() {
-        //    Comands.Add(new Method_Add());
-        //    Comands.Add(new Method_BerechneVariable());
-        //    Comands.Add(new Method_Break());
-        //    Comands.Add(new Method_ChangeType());
-        //    Comands.Add(new Method_Contains());
-        //    Comands.Add(new Method_EndsWith());
-        //    Comands.Add(new Method_Exception());
-        //    Comands.Add(new Method_Exists());
-        //    Comands.Add(new Method_if());
-        //    Comands.Add(new Method_Int());
-        //    Comands.Add(new Method_IsNullOrEmpty());
-        //    Comands.Add(new Method_IsType());
-        //    Comands.Add(new Method_Join());
-        //    Comands.Add(new Method_Max());
-        //    Comands.Add(new Method_Min());
-        //    Comands.Add(new Method_Number());
-        //    Comands.Add(new Method_Remove());
-        //    Comands.Add(new Method_Round());
-        //    Comands.Add(new Method_Sort());
-        //    Comands.Add(new Method_Split());
-        //    Comands.Add(new Method_StartsWith());
-        //    Comands.Add(new Method_String());
-        //       Comands.Add(new Method_Substring());
-        //    Comands.Add(new Method_Var());
-        //}
     }
 }

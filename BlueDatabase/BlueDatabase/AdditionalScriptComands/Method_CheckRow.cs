@@ -52,7 +52,7 @@ namespace BlueScript {
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
             var row = Method_Row.ObjectToRow(attvar.Attributes[0]);
-            row?.DoAutomatic(false, "script");
+            row?.DoAutomatic("script");
             return strDoItFeedback.Null();
         }
 

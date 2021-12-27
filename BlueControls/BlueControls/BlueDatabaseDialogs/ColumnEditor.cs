@@ -102,7 +102,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void btnRegexEmail_Click(object sender, System.EventArgs e) {
             //http://emailregex.com/
-            txbRegex.Text = "^[a-z1-9A-Z._-]{1,40}[@][a-z1-9A-Z._-]{1,40}[.][a-zA-Z]{1,3}$";
+            txbRegex.Text = "^[a-z0-9A-Z._-]{1,40}[@][a-z0-9A-Z._-]{1,40}[.][a-zA-Z]{1,3}$";
         }
 
         private void btnRegexTelefonnummer_Click(object sender, System.EventArgs e) {

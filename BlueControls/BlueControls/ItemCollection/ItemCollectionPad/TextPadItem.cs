@@ -155,15 +155,7 @@ namespace BlueControls.ItemCollection {
         /// <param name="variable"></param>
         /// <returns></returns>
         public bool ReplaceVariable(Script s, BlueScript.Variable variable) {
-            if (!_text_replaced.ToLower().Contains("~" + variable.Name.ToLower() + "~")) { return false; }
-
-            if (variable.Type is not Skript.Enums.enVariableDataType.String and
-                                 not Skript.Enums.enVariableDataType.List and
-                                 not Skript.Enums.enVariableDataType.Integer and
-                                 not Skript.Enums.enVariableDataType.Bool and
-                                 not Skript.Enums.enVariableDataType.Numeral) { return false; }
-
-            var nt = _text_replaced.Replace("~" + variable.Name + "~", variable.ValueString, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            var nt = variable.ReplaceInText(_text_replaced);
 
             if (nt is string txt) {
                 if (txt == _text_replaced) { return false; }

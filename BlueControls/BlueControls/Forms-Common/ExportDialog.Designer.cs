@@ -218,7 +218,7 @@ namespace BlueControls.Forms
             this.optSpezialFormat.Size = new System.Drawing.Size(216, 96);
             this.optSpezialFormat.TabIndex = 88;
             this.optSpezialFormat.Text = "<b>Spezial-Dateiformat</b><br>Das Vorlagen Layout enthält einen speziellen Code, " +
-    "so dass alle Einräge in eine Datei geschrieben werden";
+    "so dass alle Einträge in eine Datei geschrieben werden";
             // 
             // optBildSchateln
             // 

@@ -152,7 +152,7 @@ namespace BlueControls.Controls {
                     }
                 }
                 OnShowingRowChanged(new RowEventArgs(ShowingRow));
-                ShowingRow?.DoAutomatic(false, false, false, "to be sure");
+                ShowingRow?.DoAutomatic(false, false, "to be sure");
             }
         }
 

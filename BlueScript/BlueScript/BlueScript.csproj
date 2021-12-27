@@ -46,8 +46,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Enums\enSkriptFehlerTyp.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="Methods\Method.cs" />
+    <Compile Include="Methods\Method_AddPrefix.cs" />
     <Compile Include="Methods\Method_BerechneVariable_Tilde.cs" />
+    <Compile Include="Methods\Method_AddSuffix.cs" />
+    <Compile Include="Methods\Method_BitmapToBase64.cs" />
     <Compile Include="Methods\Method_RandomInt.cs" />
     <Compile Include="Methods\Method_DateTimeDifferenceInDays.cs" />
     <Compile Include="Methods\Method_DateTimeUTCNow.cs" />
@@ -66,6 +70,7 @@
     <Compile Include="Methods\Method_Element.cs" />
     <Compile Include="Methods\Method_IsDateTime.cs" />
     <Compile Include="Methods\Method_SortNum.cs" />
+    <Compile Include="Methods\Method_StringToUTF8.cs" />
     <Compile Include="Methods\Method_ToLower.cs" />
     <Compile Include="Methods\Method_ReduceToChars.cs" />
     <Compile Include="Methods\Method_ToUpper.cs" />

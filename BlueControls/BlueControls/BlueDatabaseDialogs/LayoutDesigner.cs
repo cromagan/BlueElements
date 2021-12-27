@@ -178,8 +178,8 @@ namespace BlueControls.BlueDatabaseDialogs {
                 cbxLayout.Text = string.Empty;
                 DisablePad();
             }
-            var ind = Database.Layouts.LayoutIDToIndex(Pad.Item.ID);
-            if (ind < 0 && Pad.Item.ID.FileSuffix().ToUpper() != "BCR" && FileExists(Pad.Item.ID)) {
+            var ind = Database.Layouts.LayoutIDToIndex(cbxLayout.Text);
+            if (ind < 0 && cbxLayout.Text.FileSuffix().ToUpper() != "BCR" && FileExists(cbxLayout.Text)) {
                 btnTextEditor.Enabled = true;
                 btnLayoutOeffnen.Enabled = true;
                 tabPageControl.Enabled = false;

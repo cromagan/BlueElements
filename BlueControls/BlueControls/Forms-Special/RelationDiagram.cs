@@ -276,7 +276,7 @@ namespace BlueControls.Forms {
             List<string> l = new();
             foreach (var thisR in Pad.Item) {
                 if (thisR is RowFormulaPadItem r) {
-                    r.Row.DoAutomatic(true, true, false, "to be sure");
+                    r.Row.DoAutomatic(true, true, "to be sure");
                     l.Add("#######################################################################");
                     l.Add(" ");
                     l.Add(r.Row.CellFirstString());

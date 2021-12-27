@@ -52,6 +52,8 @@ namespace BlueScript {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
+            if (attvar.Attributes[0].Readonly) { return strDoItFeedback.Schreibgschützt(); }
+
             var nums = new List<double>();
             foreach (var txt in attvar.Attributes[0].ValueListString) {
                 if (txt.IsNumeral()) {

@@ -47,12 +47,12 @@ namespace BlueDatabase {
             {
                 Row
             };
-            InternalCreateLayout(TMPList, File.ReadAllText(LoadFile, Constants.Win1252), SaveFile, false);
+            InternalCreateLayout(TMPList, File.ReadAllText(LoadFile, Constants.Win1252), SaveFile);
         }
 
         public static void CreateLayout(List<RowItem> Rows, string LoadFile, string SaveFile) {
             if (!FileExists(LoadFile)) { return; }
-            InternalCreateLayout(Rows, File.ReadAllText(LoadFile, Constants.Win1252), SaveFile, false);
+            InternalCreateLayout(Rows, File.ReadAllText(LoadFile, Constants.Win1252), SaveFile);
         }
 
         //Shared Sub SaveAsBitmap(Row As RowItem)
@@ -488,36 +488,40 @@ namespace BlueDatabase {
 
         public static void SaveAsBitmap(RowItem Row, string LayoutID, string Filename) => Row.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventargs(Row, LayoutID, Filename));
 
-        private static string InternalCreateLayout(List<RowItem> Rows, string FileLoaded, string SaveFile, bool ToNonCriticalText) {
-            var Head = "";
-            var Foot = "";
-            var stx = FileLoaded.ToUpper().IndexOf("//AS/300/AE");
-            var enx = FileLoaded.ToUpper().IndexOf("//AS/301/AE");
+        private static void InternalCreateLayout(List<RowItem> rows, string fileLoaded, string saveFileName) {
+            var Head = string.Empty;
+            var Foot = string.Empty;
+            var Body = fileLoaded;
+            var stx = fileLoaded.ToUpper().IndexOf("//AS/300/AE");
+            var enx = fileLoaded.ToUpper().IndexOf("//AS/301/AE");
             if (stx > -1 && enx > stx) {
-                Head = FileLoaded.Substring(0, stx);
-                _ = FileLoaded.Substring(stx + 11, enx - stx - 11);
-                Foot = FileLoaded.Substring(enx + 11);
+                Head = fileLoaded.Substring(0, stx);
+                Body = fileLoaded.Substring(stx + 11, enx - stx - 11);
+                Foot = fileLoaded.Substring(enx + 11);
             }
             var tmpSave = Head;
-            if (Rows != null) {
-                foreach (var ThisRow in Rows) // As Integer = 0 To Rows.GetUpperBound(0)
+            if (rows != null) {
+                foreach (var thisRow in rows) // As Integer = 0 To Rows.GetUpperBound(0)
                 {
-                    if (ThisRow != null) {
-                        Develop.DebugPrint_NichtImplementiert();
-                        //var tmpBody = Body;
-                        //tmpBody = DoLayoutCode("AS", tmpBody, ThisRow, "AE", ToNonCriticalText); // Anfangsbedingungen
-                        //tmpBody = DoLayoutCode("TS", tmpBody, ThisRow, "E", ToNonCriticalText); // Textbedingungen (Endcode NUR e, weil Pics sonst den zweiten Buchstaben IMMER löschen!
-                        //tmpBody = DoLayoutCode("XS", tmpBody, ThisRow, "XE", ToNonCriticalText); // Endbedingungen
-                        //tmpSave += tmpBody;
+                    if (thisRow != null) {
+                        var tmpBody = Body;
+
+                        (_, _, var script) = thisRow.DoAutomatic("export");
+                        if (script == null) { return; }
+                        foreach (var thisV in script.Variablen) {
+                            tmpBody=  thisV.ReplaceInText(tmpBody);
+                        }
+
+                        tmpSave += tmpBody;
                     }
                 }
             }
             tmpSave += Foot;
-            if (!string.IsNullOrEmpty(SaveFile)) // Dateien ohne SUfiix-Angabe könenn nicht gespeichert werden
+            if (!string.IsNullOrEmpty(saveFileName)) // Dateien ohne SUfiix-Angabe könenn nicht gespeichert werden
             {
-                WriteAllText(SaveFile, tmpSave, Constants.Win1252, false);
+                WriteAllText(saveFileName, tmpSave, Constants.Win1252, false);
             }
-            return tmpSave;
+            //return tmpSave;
         }
 
         #endregion

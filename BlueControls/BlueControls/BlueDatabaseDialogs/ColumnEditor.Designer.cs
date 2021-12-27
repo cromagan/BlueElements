@@ -1016,6 +1016,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // btnRegexUrl
             // 
+            this.btnRegexUrl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnRegexUrl.Location = new System.Drawing.Point(832, 176);
             this.btnRegexUrl.Name = "btnRegexUrl";
             this.btnRegexUrl.Size = new System.Drawing.Size(72, 24);
@@ -1025,6 +1026,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // btnRegexEmail
             // 
+            this.btnRegexEmail.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnRegexEmail.Location = new System.Drawing.Point(832, 152);
             this.btnRegexEmail.Name = "btnRegexEmail";
             this.btnRegexEmail.Size = new System.Drawing.Size(72, 24);
@@ -1034,6 +1036,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // btnRegexTelefonnummer
             // 
+            this.btnRegexTelefonnummer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnRegexTelefonnummer.Location = new System.Drawing.Point(832, 128);
             this.btnRegexTelefonnummer.Name = "btnRegexTelefonnummer";
             this.btnRegexTelefonnummer.Size = new System.Drawing.Size(72, 24);

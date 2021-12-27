@@ -156,7 +156,7 @@ namespace BlueControls.ItemCollection {
             if (string.IsNullOrEmpty(Platzhalter_für_Layout)) { return false; }
             if ("~" + variable.Name.ToLower() + "~" != Platzhalter_für_Layout.ToLower()) { return false; }
             if (variable.Type != Skript.Enums.enVariableDataType.Bitmap) { return false; }
-            var ot = variable.GetValueBitmap(s);
+            var ot = variable.ValueBitmap(s);
             if (ot is Bitmap bmp) {
                 Bitmap = bmp;
                 OnChanged();

@@ -43,6 +43,8 @@ namespace BlueScript {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
+            if (attvar.Attributes[0].Readonly) { return strDoItFeedback.Schreibgschützt(); }
+
             if (attvar.Attributes[0].Type == enVariableDataType.List) {
                 if (attvar.Attributes[0].ValueString.EndsWith("\r")) {
                     attvar.Attributes[0].ValueString = attvar.Attributes[0].ValueString.Substring(0, attvar.Attributes[0].ValueString.Length - 1);

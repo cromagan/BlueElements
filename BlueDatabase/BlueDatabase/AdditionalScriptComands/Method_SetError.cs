@@ -39,7 +39,6 @@ namespace BlueScript {
 
         public override string StartSequence => "(";
 
-        //public Method_SetError(Script parent) : base(parent) { }
         public override string Syntax => "SetError(Nachricht, Column1, Colum2, ...);";
 
         #endregion
@@ -62,9 +61,11 @@ namespace BlueScript {
                     ve = new Variable(n, string.Empty, enVariableDataType.List, false, true, string.Empty);
                     s.Variablen.Add(ve);
                 }
+                ve.Readonly = false;
                 var l = ve.ValueListString;
                 l.AddIfNotExists(attvar.Attributes[0].ValueString);
                 ve.ValueListString = l;
+                ve.Readonly = true;
             }
 
             return strDoItFeedback.Null();

@@ -355,7 +355,7 @@ namespace BlueControls.ItemCollection {
 
         public void ParseVariable(RowItem row) {
             if (row != null) {
-                (_, _, var script) = row.DoAutomatic(false, "export");
+                (_, _, var script) = row.DoAutomatic("export");
                 if (script == null) { return; }
                 foreach (var thisV in script.Variablen) {
                     ParseVariable(script, thisV);

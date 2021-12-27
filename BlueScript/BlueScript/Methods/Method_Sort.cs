@@ -28,7 +28,7 @@ namespace BlueScript {
 
         public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List, enVariableDataType.Bool };
 
-        public override string Description => "Sortiert die Liste. Falls das zweite Attribut TRUE ist, entfernt Doubletten und leere Einräge.";
+        public override string Description => "Sortiert die Liste. Falls das zweite Attribut TRUE ist, entfernt Doubletten und leere Einträge.";
 
         public override bool EndlessArgs => false;
 
@@ -51,6 +51,9 @@ namespace BlueScript {
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+
+            if (attvar.Attributes[0].Readonly) { return strDoItFeedback.Schreibgschützt(); }
+
             var x = attvar.Attributes[0].ValueListString;
             if (attvar.Attributes[1].ValueBool) {
                 x = x.SortedDistinctList();

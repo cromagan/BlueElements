@@ -735,7 +735,7 @@ namespace BlueDatabase {
                             row.CellSet(columns[SpaltNo], Zeil[ZeilNo][SpaltNo].SplitAndCutBy("|").JoinWithCr());
                         }
                     }
-                    if (row != null && dorowautmatic) { row.DoAutomatic(true, true, false, "import"); }
+                    if (row != null && dorowautmatic) { row.DoAutomatic(true, true, "import"); }
                 }
             }
             OnDropMessage("<b>Import abgeschlossen.</b>\r\n" + neuZ.ToString() + " neue Zeilen erstellt.");

@@ -43,6 +43,9 @@ namespace BlueScript {
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+
+            if (attvar.Attributes[0].Readonly) { return strDoItFeedback.Schreibgschützt(); }
+
             var tmpList = attvar.Attributes[0].ValueListString;
 
             if (attvar.Attributes[3].ValueString == attvar.Attributes[4].ValueString) { return new strDoItFeedback("Suchtext und Ersetzungstext sind identisch."); }
