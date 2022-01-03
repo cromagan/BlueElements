@@ -123,13 +123,6 @@ namespace BlueScript {
             return null;
         }
 
-        public static void PrepareForScript(this List<Variable> vars) {
-            if (vars == null || vars.Count == 0) { return; }
-            foreach (var thisv in vars) {
-                thisv.PrepareForScript();
-            }
-        }
-
         public static void RemoveWithComent(this List<Variable> vars, string coment) {
             var z = 0;
             do {
@@ -141,12 +134,12 @@ namespace BlueScript {
             } while (z < vars.Count);
         }
 
-        public static void ScriptFinished(this List<Variable> vars) {
-            if (vars == null || vars.Count == 0) { return; }
-            foreach (var thisv in vars) {
-                thisv.ScriptFinished();
-            }
-        }
+        //public static void ScriptFinished(this List<Variable> vars) {
+        //    if (vars == null || vars.Count == 0) { return; }
+        //    foreach (var thisv in vars) {
+        //        thisv.ScriptFinished();
+        //    }
+        //}
 
         /// <summary>
         /// Erstellt bei Bedarf eine neue Variable und setzt den Wert und auch ReadOnly
@@ -268,9 +261,10 @@ namespace BlueScript {
 
             if (txt.Value.Length > 1 && txt.Value.StartsWith("\"") && txt.Value.EndsWith("\"")) {
                 if (Type is not enVariableDataType.NotDefinedYet and not enVariableDataType.String) { SetError("Variable ist kein String"); return; }
-                ValueString = txt.Value.Substring(1, txt.Value.Length - 2); // Nicht Trimmen! Ansonsten wird sowas falsch: "X=" + "";
-                ValueString = ValueString.Replace("\"+\"", string.Empty); // Zuvor die " entfernen! dann verketten! Ansonsten wird "+" mit nix ersetzte, anstelle einem  +
-                if (ValueString.Contains("\"")) { SetError("Verkettungsfehler"); return; } // Beispiel: s ist nicht definiert und "jj" + s + "kk
+                var tmp = txt.Value.Substring(1, txt.Value.Length - 2); // Nicht Trimmen! Ansonsten wird sowas falsch: "X=" + "";
+                tmp = tmp.Replace("\"+\"", string.Empty); // Zuvor die " entfernen! dann verketten! Ansonsten wird "+" mit nix ersetzte, anstelle einem  +
+                if (tmp.Contains("\"")) { SetError("Verkettungsfehler"); return; } // Beispiel: s ist nicht definiert und "jj" + s + "kk
+                ValueString = tmp;
                 Type = enVariableDataType.String;
                 Readonly = true;
                 return;
@@ -282,7 +276,7 @@ namespace BlueScript {
 
             if (txt.Value.Length > 4 && txt.Value.StartsWith(ImageKennung + "\"") && txt.Value.EndsWith("\"" + ImageKennung)) {
                 if (Type is not enVariableDataType.NotDefinedYet and not enVariableDataType.Bitmap) { SetError("Variable ist kein Bitmap"); return; }
-                ValueString = txt.Value.Substring(2, txt.Value.Length - 4).RestoreEscape();
+                ValueString = txt.Value.Substring(2, txt.Value.Length - 4);
                 Type = enVariableDataType.Bitmap;
                 Readonly = true;
                 return;
@@ -314,7 +308,7 @@ namespace BlueScript {
 
             if (txt.Value.Length > 2 && txt.Value.StartsWith(ObjectKennung + "\"") && txt.Value.EndsWith("\"" + ObjectKennung)) {
                 if (Type is not enVariableDataType.NotDefinedYet and not enVariableDataType.Object) { SetError("Variable ist kein Objekt"); return; }
-                ValueString = txt.Value.Substring(2, txt.Value.Length - 4).RestoreEscape();
+                ValueString = txt.Value.Substring(2, txt.Value.Length - 4);
                 Type = enVariableDataType.Object;
                 Readonly = true;
                 return;
@@ -410,7 +404,7 @@ namespace BlueScript {
             get => _ValueString;
             set {
                 if (Readonly) { return; }
-                _ValueString = value;
+                _ValueString = value.RestoreCriticalVariableChars(); // Variablen enthalten immer den richtigen Wert (außer List, wegen dem Endzeichne) und es werden nur beim Ersetzen im Script die kritischen Zeichen entfernt
             }
         }
 
@@ -526,7 +520,7 @@ namespace BlueScript {
         public static string ValueForReplace(string value, enVariableDataType type) {
             switch (type) {
                 case enVariableDataType.String:
-                    return "\"" + value.RemoveEscape() + "\"";
+                    return "\"" + value.RemoveCriticalVariableChars() + "\"";
 
                 case enVariableDataType.Bool:
                     return value;
@@ -542,16 +536,16 @@ namespace BlueScript {
                     }
 
                     var x = value.Substring(0, value.Length - 1);
-                    return "{\"" + (x.RemoveEscape()).SplitByCRToList().JoinWith("\", \"") + "\"}";
+                    return "{\"" + (x.RemoveCriticalVariableChars()).SplitByCRToList().JoinWith("\", \"") + "\"}";
 
                 case enVariableDataType.NotDefinedYet: // Wenn ne Routine die Werte einfach ersetzt.
                     return value;
 
                 case enVariableDataType.Bitmap:
-                    return ImageKennung + "\"" + value.RemoveEscape() + "\"" + ImageKennung;
+                    return ImageKennung + "\"" + value.RemoveCriticalVariableChars() + "\"" + ImageKennung;
 
                 case enVariableDataType.Object:
-                    return ObjectKennung + "\"" + value.RemoveEscape() + "\"" + ObjectKennung;
+                    return ObjectKennung + "\"" + value.RemoveCriticalVariableChars() + "\"" + ObjectKennung;
 
                 case enVariableDataType.Variable:
                     return value;
@@ -577,8 +571,6 @@ namespace BlueScript {
             return x != null && x.GetUpperBound(0) == 1 && x[0] == toCheck.ToUpper().ReduceToChars(Constants.Char_AZ + Constants.Char_Numerals);
         }
 
-        public void PrepareForScript() => _ValueString = _ValueString.RemoveEscape();
-
         public string ReplaceInText(string txt) {
             if (!txt.ToLower().Contains("~" + Name.ToLower() + "~")) { return txt; }
 
@@ -591,15 +583,15 @@ namespace BlueScript {
             return txt.Replace("~" + Name + "~", ValueString, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
         }
 
-        public void ScriptFinished() {
-            _ValueString = _ValueString.Replace("\\\"", "\"");
-            _ValueString = _ValueString.Replace("\\n", "\n");
-            _ValueString = _ValueString.Replace("\\r", "\r");
-            _ValueString = _ValueString.Replace("\\t", "\t");
-            _ValueString = _ValueString.Replace(BackSlashEscaped, "\\");
-            _ValueString = _ValueString.Replace(GänsefüßchenReplace, "\"");
-            _ValueString = _ValueString.Replace("\\\\", "\\");
-        }
+        //public void ScriptFinished() {
+        //    _ValueString = _ValueString.Replace("\\\"", "\"");
+        //    _ValueString = _ValueString.Replace("\\n", "\n");
+        //    _ValueString = _ValueString.Replace("\\r", "\r");
+        //    _ValueString = _ValueString.Replace("\\t", "\t");
+        //    _ValueString = _ValueString.Replace(BackSlashEscaped, "\\");
+        //    _ValueString = _ValueString.Replace(GänsefüßchenReplace, "\"");
+        //    _ValueString = _ValueString.Replace("\\\\", "\\");
+        //}
 
         public override string ToString() {
             var zusatz = string.Empty;

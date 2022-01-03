@@ -181,7 +181,7 @@ namespace BlueScript {
                 Line = 1;
                 BreakFired = false;
                 Schleife = 0;
-                Variablen.PrepareForScript();
+                //Variablen.PrepareForScript();
 
                 _berechneVariable = null;
 
@@ -198,7 +198,7 @@ namespace BlueScript {
 
             do {
                 if (pos >= tmpScript.Length || EndSkript) {
-                    if (reduce) { Variablen.ScriptFinished(); }
+                    //if (reduce) { Variablen.ScriptFinished(); }
                     return (string.Empty, string.Empty);
                 }
 
@@ -210,7 +210,7 @@ namespace BlueScript {
                 } else {
                     var f = ComandOnPosition(tmpScript, pos, this, false);
                     if (!string.IsNullOrEmpty(f.ErrorMessage)) {
-                        if (reduce) { Variablen.ScriptFinished(); }
+                        //if (reduce) { Variablen.ScriptFinished(); }
                         return (f.ErrorMessage, tmpScript.Substring(pos, Math.Min(30, tmpScript.Length - pos)));
                     }
                     pos = f.Position;
@@ -262,6 +262,5 @@ namespace BlueScript {
         }
 
         #endregion
-
     }
 }

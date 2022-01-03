@@ -37,9 +37,21 @@ namespace BlueScript {
 
         #region Methods
 
+        public static string RemoveCriticalVariableChars(this string txt) {
+            txt = txt.Replace("\\", BackSlashEscaped);
+            txt = txt.Replace("\"", GänsefüßchenReplace);
+            return txt;
+        }
+
         public static string RemoveEscape(this string txt) {
             txt = txt.Replace("\\\\", BackSlashEscaped);
             txt = txt.Replace("\\\"", GänsefüßchenReplace);
+            return txt;
+        }
+
+        public static string RestoreCriticalVariableChars(this string txt) {
+            txt = txt.Replace(BackSlashEscaped, "\\");
+            txt = txt.Replace(GänsefüßchenReplace, "\"");
             return txt;
         }
 
