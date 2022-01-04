@@ -16,28 +16,32 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.Collections.Generic;
 
-namespace BlueBasics
-{
-    public static class modErgebnis
-    {
+namespace BlueBasics {
+
+    public static class modErgebnis {
+
+        #region Fields
+
+        public static readonly List<string> RechenOperatoren = new() { "*", "/", "+", "-" };
+
+        #endregion
+
         #region Methods
 
-        public static double? Ergebnis(string formel)
-        {
+        public static double? Ergebnis(string formel) {
             formel = formel.Replace(" ", string.Empty);
             if (string.IsNullOrEmpty(formel)) { return null; }
 
             return formel != formel.ReduceToChars(Constants.Char_Numerals + ".,()+-/*") ? null : ErgebnisCore(formel);
         }
 
-        public static int LastMinusIndex(string formel)
-        {
+        public static int LastMinusIndex(string formel) {
             if (!formel.Contains("-")) { return -1; }
             var LastMin = 1;
             var OkMin = -1;
-            while (true)
-            {
+            while (true) {
                 LastMin = formel.IndexOf("-", LastMin);
                 if (LastMin < 1) { break; }
                 var VorZ = formel.Substring(LastMin - 1, 1);
@@ -47,13 +51,11 @@ namespace BlueBasics
             return OkMin;
         }
 
-        private static double? ErgebnisCore(string formel)
-        {
+        private static double? ErgebnisCore(string formel) {
             // var TMP = 0;
             formel = formel.DeKlammere(true, false, false, true);
             // Das alles kann nur möglich sein, WENN eine Klammer vorhanden ist
-            if (formel.Contains("("))
-            {
+            if (formel.Contains("(")) {
                 // --------------------------------------------------------------------------------------------------------------------------------
                 // --- Eine Klammer auflösen, im Formelstring ersetzen und         mittels Rekursivität die nun einfachere Formel berechnen.
                 // --------------------------------------------------------------------------------------------------------------------------------
@@ -157,8 +159,7 @@ namespace BlueBasics
             if (w1 == null) { return null; }
             var w2 = ErgebnisCore(formel.Substring(TMP + Seperator.Length));
             if (w2 == null) { return null; }
-            switch (Seperator)
-            {
+            switch (Seperator) {
                 case "/":
                     if (w2 == 0) { return null; }
                     return w1 / w2;

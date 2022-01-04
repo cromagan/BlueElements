@@ -262,7 +262,7 @@ namespace BlueScript {
             if (txt.Value.Length > 1 && txt.Value.StartsWith("\"") && txt.Value.EndsWith("\"")) {
                 if (Type is not enVariableDataType.NotDefinedYet and not enVariableDataType.String) { SetError("Variable ist kein String"); return; }
                 var tmp = txt.Value.Substring(1, txt.Value.Length - 2); // Nicht Trimmen! Ansonsten wird sowas falsch: "X=" + "";
-                tmp = tmp.Replace("\"+\"", string.Empty); // Zuvor die " entfernen! dann verketten! Ansonsten wird "+" mit nix ersetzte, anstelle einem  +
+                //tmp = tmp.Replace("\"+\"", string.Empty); // Zuvor die " entfernen! dann verketten! Ansonsten wird "+" mit nix ersetzte, anstelle einem  +
                 if (tmp.Contains("\"")) { SetError("Verkettungsfehler"); return; } // Beispiel: s ist nicht definiert und "jj" + s + "kk
                 ValueString = tmp;
                 Type = enVariableDataType.String;
@@ -319,13 +319,17 @@ namespace BlueScript {
             #region Testen auf Number
 
             if (Type is not enVariableDataType.NotDefinedYet and not enVariableDataType.Numeral) { SetError("Variable ist keine Zahl"); return; }
-            var erg = modErgebnis.Ergebnis(txt.Value);
-            if (erg == null) { SetError("Berechnungsfehler der Formel: " + txt.ErrorMessage); return; }
-            ValueDouble = (double)erg;
-            Type = enVariableDataType.Numeral;
-            Readonly = true;
+
+            if (txt.Value.IsDouble()) {
+                ValueDouble = DoubleParse(txt.Value);
+                Type = enVariableDataType.Numeral;
+                Readonly = true;
+                return;
+            }
 
             #endregion
+
+            SetError("Unbekannter Typ: " + txt.Value);
         }
 
         public Variable(string name, string value, enVariableDataType type, bool ronly, bool system, string coment) : this(name) {
@@ -432,56 +436,57 @@ namespace BlueScript {
 
             #endregion
 
+            #region Auf boolsche Operatoren prüfen und nur die nötigen ausführen
+
+            #region AndAlso
+
+            (var uu, var _) = NextText(txt, 0, Method_if.UndUnd, false, false, KlammernStd);
+            if (uu > 0) {
+                var txt1 = AttributeAuflösen(txt.Substring(0, uu), s);
+                return !string.IsNullOrEmpty(txt1.ErrorMessage) ? new strDoItFeedback("Befehls-Berechnungsfehler vor &&: " + txt1.ErrorMessage)
+                    : txt1.Value == "false" ? txt1
+                    : AttributeAuflösen(txt.Substring(uu + 2), s);
+            }
+
+            #endregion AndAlso
+
+            #region OrElse
+
+            (var oo, var _) = NextText(txt, 0, Method_if.OderOder, false, false, KlammernStd);
+            if (oo > 0) {
+                var txt1 = AttributeAuflösen(txt.Substring(0, oo), s);
+                return !string.IsNullOrEmpty(txt1.ErrorMessage)
+                    ? new strDoItFeedback("Befehls-Berechnungsfehler vor ||: " + txt1.ErrorMessage)
+                    : txt1.Value == "true" ? txt1 : AttributeAuflösen(txt.Substring(oo + 2), s);
+            }
+
+            #endregion OrElse
+
+            #endregion Auf boolsche Operatoren prüfen und nur die nötigen ausführen
+
+            #region Variablen ersetzen
+
             if (s != null) {
-
-                #region Variablen ersetzen
-
                 var t = Method.ReplaceVariable(txt, s);
                 if (!string.IsNullOrEmpty(t.ErrorMessage)) {
                     return new strDoItFeedback("Variablen-Berechnungsfehler: " + t.ErrorMessage);
                 }
+                txt = t.AttributeText;
+            }
 
-                #endregion Variablen ersetzen
+            #endregion Variablen ersetzen
 
-                #region auf Boolsche Operatoren prüfen
+            #region Routinen ersetzen, vor den Klammern, das ansonsten Min(x,y,z) falsch anschlägt
 
-                #region AndAlso
-
-                (var uu, var _) = NextText(txt, 0, Method_if.UndUnd, false, false, KlammernStd);
-                if (uu > 0) {
-                    var txt1 = AttributeAuflösen(txt.Substring(0, uu), s);
-                    return !string.IsNullOrEmpty(txt1.ErrorMessage) ? new strDoItFeedback("Befehls-Berechnungsfehler vor &&: " + txt1.ErrorMessage)
-                        : txt1.Value == "false" ? txt1
-                        : AttributeAuflösen(txt.Substring(uu + 2), s);
-                }
-
-                #endregion AndAlso
-
-                #region OrElse
-
-                (var oo, var _) = NextText(txt, 0, Method_if.OderOder, false, false, KlammernStd);
-                if (oo > 0) {
-                    var txt1 = AttributeAuflösen(txt.Substring(0, oo), s);
-                    return !string.IsNullOrEmpty(txt1.ErrorMessage)
-                        ? new strDoItFeedback("Befehls-Berechnungsfehler vor ||: " + txt1.ErrorMessage)
-                        : txt1.Value == "true" ? txt1 : AttributeAuflösen(txt.Substring(oo + 2), s);
-                }
-
-                #endregion OrElse
-
-                #endregion auf Boolsche Operatoren prüfen
-
-                #region Routinen ersetzen, vor den Klammern, das ansonsten Min(x,y,z) falsch anschlägt
-
-                var t2 = Method.ReplaceComands(t.AttributeText, Script.Comands, s);
+            if (s != null) {
+                var t2 = Method.ReplaceComands(txt, Script.Comands, s);
                 if (!string.IsNullOrEmpty(t2.ErrorMessage)) {
                     return new strDoItFeedback("Befehls-Berechnungsfehler: " + t2.ErrorMessage);
                 }
-
-                #endregion
-
                 txt = t2.AttributeText;
             }
+
+            #endregion
 
             #region Klammern am Ende berechnen, das ansonsten Min(x,y,z) falsch anschlägt
 
@@ -497,12 +502,36 @@ namespace BlueScript {
 
             #endregion
 
+            #region String Joinen -- UND RAUS AUS DER ROUTINE
+
+            if (txt.Length > 1 && txt.StartsWith("\"") && txt.EndsWith("\"")) {
+                var tmp = txt.Substring(1, txt.Length - 2); // Nicht Trimmen! Ansonsten wird sowas falsch: "X=" + "";
+                tmp = tmp.Replace("\"+\"", string.Empty); // Zuvor die " entfernen! dann verketten! Ansonsten wird "+" mit nix ersetzte, anstelle einem  +
+                if (tmp.Contains("\"")) { return new strDoItFeedback("Verkettungsfehler: " + txt); } // Beispiel: s ist nicht definiert und "jj" + s + "kk
+                return new strDoItFeedback("\"" + tmp + "\"", enVariableDataType.NotDefinedYet);
+            }
+
+            #endregion
+
             #region Vergleichsoperatoren ersetzen und vereinfachen
 
             (var pos, var _) = NextText(txt, 0, Method_if.VergleichsOperatoren, false, false, KlammernStd);
             if (pos >= 0) {
-                txt = Method_if.GetBool(txt);
-                if (txt == null) { return new strDoItFeedback("Der Inhalt zwischen den Klammern () konnte nicht berechnet werden."); }
+                var tmp = Method_if.GetBool(txt);
+                if (tmp == null) { return new strDoItFeedback("Der Inhalt zwischen den Klammern (" + txt + ") konnte nicht berechnet werden."); }
+                txt = tmp;
+            }
+
+            #endregion
+
+            #region Rechenoperatoren ersetzen und vereinfachen
+
+            // String wird vorher abgebrochen, um nicht nochmal auf Gänsefüschen zutesten
+            (var pos2, var _) = NextText(txt, 0, modErgebnis.RechenOperatoren, false, false, KlammernStd);
+            if (pos2 >= 0) {
+                var erg = modErgebnis.Ergebnis(txt);
+                if (erg == null) { return new strDoItFeedback("Berechnungsfehler der Formel: " + txt); }
+                txt = erg.ToString();
             }
 
             #endregion
@@ -582,16 +611,6 @@ namespace BlueScript {
 
             return txt.Replace("~" + Name + "~", ValueString, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
         }
-
-        //public void ScriptFinished() {
-        //    _ValueString = _ValueString.Replace("\\\"", "\"");
-        //    _ValueString = _ValueString.Replace("\\n", "\n");
-        //    _ValueString = _ValueString.Replace("\\r", "\r");
-        //    _ValueString = _ValueString.Replace("\\t", "\t");
-        //    _ValueString = _ValueString.Replace(BackSlashEscaped, "\\");
-        //    _ValueString = _ValueString.Replace(GänsefüßchenReplace, "\"");
-        //    _ValueString = _ValueString.Replace("\\\\", "\\");
-        //}
 
         public override string ToString() {
             var zusatz = string.Empty;
