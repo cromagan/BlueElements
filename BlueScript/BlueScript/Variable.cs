@@ -417,7 +417,6 @@ namespace BlueScript {
         #region Methods
 
         public static strDoItFeedback AttributeAuflösen(string txt, Script s) {
-            // Die Trims werden benötigtn, wenn eine Liste kommt, dass die Leerzeichen vor und nach den Kommas weggeschnitten werden.
 
             #region Prüfen, Ob noch mehre Klammern da sind, oder Anfangs/End-Klammern entfernen
 
@@ -436,7 +435,7 @@ namespace BlueScript {
 
             #endregion
 
-            #region Auf boolsche Operatoren prüfen und nur die nötigen ausführen
+            #region Auf boolsche AndAlso und OrElse prüfen und nur die nötigen ausführen
 
             #region AndAlso
 
@@ -462,7 +461,7 @@ namespace BlueScript {
 
             #endregion OrElse
 
-            #endregion Auf boolsche Operatoren prüfen und nur die nötigen ausführen
+            #endregion
 
             #region Variablen ersetzen
 
@@ -513,20 +512,168 @@ namespace BlueScript {
 
             #endregion
 
-            #region Vergleichsoperatoren ersetzen und vereinfachen
+            //#region Vergleichsoperatoren ersetzen und vereinfachen
 
-            (var pos, var _) = NextText(txt, 0, Method_if.VergleichsOperatoren, false, false, KlammernStd);
-            if (pos >= 0) {
-                var tmp = Method_if.GetBool(txt);
-                if (tmp == null) { return new strDoItFeedback("Der Inhalt zwischen den Klammern (" + txt + ") konnte nicht berechnet werden."); }
-                txt = tmp;
+            //(var pos, var _) = NextText(txt, 0, Method_if.VergleichsOperatoren, false, false, KlammernStd);
+            //if (pos >= 0) {
+            //    var tmp = Method_if.GetBool(txt);
+            //    if (tmp == null) { return new strDoItFeedback("Der Inhalt zwischen den Klammern (" + txt + ") konnte nicht berechnet werden."); }
+            //    txt = tmp;
+            //}
+
+            //#endregion
+
+            #region Auf Restliche Boolsche Operationen testen
+
+            //foreach (var check in Method_if.VergleichsOperatoren) {
+            (var i, var check) = NextText(txt, 0, Method_if.VergleichsOperatoren, false, false, KlammernStd);
+            if (i > -1) {
+                if (i < 1 && check != "!") { return new strDoItFeedback("Operator (" + check + ") am String-Start nicht erlaubt: " + txt); } // <1, weil ja mindestens ein Zeichen vorher sein MUSS!
+                if (i >= txt.Length - 1) { return new strDoItFeedback("Operator (" + check + ") am String-Ende nicht erlaubt: " + txt); } // siehe oben
+
+                #region Die Werte vor und nach dem Trennzeichen in den Variablen v1 und v2 ablegen
+
+                //var start = i - 1;
+                //var ende = i + check.Length;
+                //var trenn = "(!|&<>=)";
+                //var gans = false;
+
+                #region Ersten Wert als s1 ermitteln
+
+                //do {
+                //    if (start < 0) { break; }
+                //    var ze = txt.Substring(start, 1);
+                //    if (!gans && trenn.Contains(ze)) { break; }
+                //    if (ze == "\"") { gans = !gans; }
+                //    start--;
+                //} while (true);
+
+                //(var op, var _) = NextText(txt, 0, Method_if.UndUnd, false, false, KlammernStd);
+                //if (uu > 0) {
+                //    var txt1 = AttributeAuflösen(txt.Substring(0, uu), s);
+                //    return !string.IsNullOrEmpty(txt1.ErrorMessage) ? new strDoItFeedback("Befehls-Berechnungsfehler vor &&: " + txt1.ErrorMessage)
+                //        : txt1.Value == "false" ? txt1
+                //        : AttributeAuflösen(txt.Substring(uu + 2), s);
+                //}
+
+                var s1 = txt.Substring(0, i);
+                if (string.IsNullOrEmpty(s1) && check != "!") { return new strDoItFeedback("Wert vor Operator (" + check + ") nicht gefunden: " + txt); }
+                if (!string.IsNullOrEmpty(s1)) {
+                    var tmp1 = AttributeAuflösen(s1, s);
+                    if (!string.IsNullOrEmpty(tmp1.ErrorMessage)) { new strDoItFeedback("Befehls-Berechnungsfehler in ():" + tmp1.ErrorMessage); }
+                    s1 = tmp1.Value;
+                }
+
+                #endregion
+
+                #region Zweiten Wert als s2 ermitteln
+
+                //do {
+                //    if (ende >= txt.Length) { break; }
+                //    var ze = txt.Substring(ende, 1);
+                //    if (!gans && trenn.Contains(ze)) { break; }
+                //    if (ze == "\"") { gans = !gans; }
+                //    ende++;
+                //} while (true);
+
+                var s2 = txt.Substring(i + check.Length);
+                if (string.IsNullOrEmpty(s2)) {
+                    return new strDoItFeedback("Wert nach Operator (" + check + ") nicht gefunden: " + txt);
+                } else {
+                    var tmp1 = AttributeAuflösen(s2, s);
+                    if (!string.IsNullOrEmpty(tmp1.ErrorMessage)) { new strDoItFeedback("Befehls-Berechnungsfehler in ():" + tmp1.ErrorMessage); }
+                    s2 = tmp1.Value;
+                }
+
+                #endregion
+
+                Variable v1 = null;
+                if (check != "!") { v1 = new Variable("dummy", s1, null); }
+                Variable v2 = new("dummy", s2, null);
+
+                // V2 braucht nicht peprüft werden, muss ja eh der gleiche TYpe wie V1 sein
+                if (v1 != null) {
+                    if (v1.Type != v2.Type) { return new strDoItFeedback("Typen unterschiedlich: " + txt); }
+                    if (v1.Type is not enVariableDataType.Bool and
+                                   not enVariableDataType.Numeral and
+                                   not enVariableDataType.String) { return new strDoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
+                } else {
+                    if (v2.Type != enVariableDataType.Bool) { return new strDoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
+                }
+
+                #endregion
+
+                var replacer = "false";
+                switch (check) {
+                    case "==":
+                        if (v1.ValueString == v2.ValueString) { replacer = "true"; }
+                        break;
+
+                    case "!=":
+                        if (v1.ValueString != v2.ValueString) { replacer = "true"; }
+                        break;
+
+                    case ">=":
+                        if (v1.Type != enVariableDataType.Numeral) { return new strDoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
+                        if (v1.ValueDouble >= v2.ValueDouble) { replacer = "true"; }
+                        break;
+
+                    case "<=":
+                        if (v1.Type != enVariableDataType.Numeral) { return new strDoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
+                        if (v1.ValueDouble <= v2.ValueDouble) { replacer = "true"; }
+                        break;
+
+                    case "<":
+                        if (v1.Type != enVariableDataType.Numeral) { return new strDoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
+                        if (v1.ValueDouble < v2.ValueDouble) { replacer = "true"; }
+                        break;
+
+                    case ">":
+                        if (v1.Type != enVariableDataType.Numeral) { return new strDoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
+                        if (v1.ValueDouble > v2.ValueDouble) { replacer = "true"; }
+                        break;
+
+                    case "||":
+                        if (v1.Type != enVariableDataType.Bool) { return new strDoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
+                        replacer = "false";
+                        if (v1.ValueBool || v2.ValueBool) { replacer = "true"; }
+                        break;
+
+                    case "&&":
+                        if (v1.Type != enVariableDataType.Bool) { return new strDoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
+                        if (v1.ValueBool && v2.ValueBool) { replacer = "true"; }
+                        break;
+
+                    case "!":
+                        // S1 dürfte eigentlich nie was sein: !False||!false
+                        // entweder ist es ganz am anfang, oder direkt nach einem Trenneichen
+                        if (v2.Type != enVariableDataType.Bool) { return new strDoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
+                        if (!v2.ValueBool) { replacer = "true"; }
+                        break;
+
+                    default:
+                        replacer = string.Empty;
+                        //Develop.DebugPrint_NichtImplementiert();
+                        return new strDoItFeedback("Operator (" + check + ") unbekannt: " + txt);
+                }
+                if (!string.IsNullOrEmpty(replacer)) { txt = replacer; }
+
+                //return string.IsNullOrEmpty(replacer) ? string.Empty
+                //                                      : txt.Substring(0, start + 1) + replacer + txt.Substring(ende);
             }
+
+            #endregion
+
+            #region testen auf bool
+
+            var x = Method_if.GetBool(txt);
+            if (x != null) { return new strDoItFeedback(x, enVariableDataType.NotDefinedYet); }
 
             #endregion
 
             #region Rechenoperatoren ersetzen und vereinfachen
 
-            // String wird vorher abgebrochen, um nicht nochmal auf Gänsefüschen zutesten
+            // String wird vorher abgebrochen, um nicht nochmal auf Gänsefüsschen zutesten
             (var pos2, var _) = NextText(txt, 0, modErgebnis.RechenOperatoren, false, false, KlammernStd);
             if (pos2 >= 0) {
                 var erg = modErgebnis.Ergebnis(txt);
