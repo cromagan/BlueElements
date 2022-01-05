@@ -28,7 +28,7 @@ namespace BlueScript {
 
         public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List, enVariableDataType.Bool };
 
-        public override string Description => "Sortiert die Liste. Falls das zweite Attribut TRUE ist, entfernt Doubletten und leere Einträge.";
+        public override string Description => "Sortiert die Liste. Falls das zweite Attribut TRUE ist, werden Doubletten und leere Einträge entfernt.";
 
         public override bool EndlessArgs => false;
 

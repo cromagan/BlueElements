@@ -31,15 +31,15 @@ namespace BlueScript {
 
         public override bool EndlessArgs => false;
 
-        public override string EndSequence => ";";
+        public override string EndSequence => ");";
 
         public override bool GetCodeBlockAfter => false;
 
         public override enVariableDataType Returns => enVariableDataType.Null;
 
-        public override string StartSequence => "";
+        public override string StartSequence => "(";
 
-        public override string Syntax => "DisableCellChanges;";
+        public override string Syntax => "DisableCellChanges();";
 
         #endregion
 

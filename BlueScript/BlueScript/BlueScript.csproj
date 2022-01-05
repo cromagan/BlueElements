@@ -70,6 +70,7 @@
     <Compile Include="Methods\Method_Element.cs" />
     <Compile Include="Methods\Method_IsDateTime.cs" />
     <Compile Include="Methods\Method_SortNum.cs" />
+    <Compile Include="Methods\Method_ExtractTags.cs" />
     <Compile Include="Methods\Method_StringToUTF8.cs" />
     <Compile Include="Methods\Method_ToLower.cs" />
     <Compile Include="Methods\Method_ReduceToChars.cs" />

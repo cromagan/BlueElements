@@ -501,16 +501,7 @@ namespace BlueScript {
 
             #endregion
 
-            #region String Joinen -- UND RAUS AUS DER ROUTINE
 
-            if (txt.Length > 1 && txt.StartsWith("\"") && txt.EndsWith("\"")) {
-                var tmp = txt.Substring(1, txt.Length - 2); // Nicht Trimmen! Ansonsten wird sowas falsch: "X=" + "";
-                tmp = tmp.Replace("\"+\"", string.Empty); // Zuvor die " entfernen! dann verketten! Ansonsten wird "+" mit nix ersetzte, anstelle einem  +
-                if (tmp.Contains("\"")) { return new strDoItFeedback("Verkettungsfehler: " + txt); } // Beispiel: s ist nicht definiert und "jj" + s + "kk
-                return new strDoItFeedback("\"" + tmp + "\"", enVariableDataType.NotDefinedYet);
-            }
-
-            #endregion
 
             //#region Vergleichsoperatoren ersetzen und vereinfachen
 
@@ -670,6 +661,19 @@ namespace BlueScript {
             if (x != null) { return new strDoItFeedback(x, enVariableDataType.NotDefinedYet); }
 
             #endregion
+
+
+            #region String Joinen -- UND RAUS AUS DER ROUTINE
+
+            if (txt.Length > 1 && txt.StartsWith("\"") && txt.EndsWith("\"")) {
+                var tmp = txt.Substring(1, txt.Length - 2); // Nicht Trimmen! Ansonsten wird sowas falsch: "X=" + "";
+                tmp = tmp.Replace("\"+\"", string.Empty); // Zuvor die " entfernen! dann verketten! Ansonsten wird "+" mit nix ersetzte, anstelle einem  +
+                if (tmp.Contains("\"")) { return new strDoItFeedback("Verkettungsfehler: " + txt); } // Beispiel: s ist nicht definiert und "jj" + s + "kk
+                return new strDoItFeedback("\"" + tmp + "\"", enVariableDataType.NotDefinedYet);
+            }
+
+            #endregion
+
 
             #region Rechenoperatoren ersetzen und vereinfachen
 
