@@ -23,13 +23,13 @@ using static BlueBasics.Extensions;
 
 namespace BlueScript {
 
-    internal class Method_Contains : Method {
+    internal class Method_ContainsWitch : Method {
 
         #region Properties
 
         public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List_Or_String, enVariableDataType.Bool, enVariableDataType.String };
 
-        public override string Description => "Bei Listen: Prüft, ob einer der Werte in der Liste steht. Bei String: Prüft ob eine der Zeichenketten vorkommt.";
+        public override string Description => "Bei Listen: Prüft, ob einer der Werte in der Liste steht. Bei String: Prüft ob eine der Zeichenketten vorkommt. Gibt dann als Liste alle gefundenen Strings zurück.";
 
         public override bool EndlessArgs => true;
 
@@ -37,31 +37,34 @@ namespace BlueScript {
 
         public override bool GetCodeBlockAfter => false;
 
-        public override enVariableDataType Returns => enVariableDataType.Bool;
+        public override enVariableDataType Returns => enVariableDataType.List;
 
         public override string StartSequence => "(";
 
-        public override string Syntax => "Contains(ListVariable/StringVariable, CaseSensitive, Value1, Value2, ...)";
+        public override string Syntax => "ContainsWich(ListVariable/StringVariable, CaseSensitive, Value1, Value2, ...)";
 
         #endregion
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "contains" };
+        public override List<string> Comand(Script s) => new() { "containswich" };
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+
+            var l = new List<string>();
 
             if (attvar.Attributes[0].Type == enVariableDataType.List) {
                 var x = attvar.Attributes[0].ValueListString;
                 for (var z = 2; z < attvar.Attributes.Count; z++) {
                     if (attvar.Attributes[z].Type != enVariableDataType.String) { return strDoItFeedback.FalscherDatentyp(); }
                     if (x.Contains(attvar.Attributes[z].ValueString, attvar.Attributes[1].ValueBool)) {
-                        return strDoItFeedback.Wahr();
+                        l.AddIfNotExists(attvar.Attributes[z].ValueString);
                     }
                 }
-                return strDoItFeedback.Falsch();
+
+                return new strDoItFeedback(l.JoinWithCr() + "\r", enVariableDataType.List);
             }
 
             if (attvar.Attributes[0].Type == enVariableDataType.String) {
@@ -69,15 +72,16 @@ namespace BlueScript {
                     if (attvar.Attributes[z].Type != enVariableDataType.String) { return strDoItFeedback.FalscherDatentyp(); }
                     if (attvar.Attributes[1].ValueBool) {
                         if (attvar.Attributes[0].ValueString.Contains(attvar.Attributes[z].ValueString)) {
-                            return strDoItFeedback.Wahr();
+                            l.AddIfNotExists(attvar.Attributes[z].ValueString);
                         }
                     } else {
                         if (attvar.Attributes[0].ValueString.ToLower().Contains(attvar.Attributes[z].ValueString.ToLower())) {
-                            return strDoItFeedback.Wahr();
+                            l.AddIfNotExists(attvar.Attributes[z].ValueString);
                         }
                     }
                 }
-                return strDoItFeedback.Falsch();
+
+                return new strDoItFeedback(l.JoinWithCr() + "\r", enVariableDataType.List);
             }
 
             return strDoItFeedback.FalscherDatentyp();

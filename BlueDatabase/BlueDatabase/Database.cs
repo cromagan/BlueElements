@@ -96,10 +96,10 @@ namespace BlueDatabase {
 
         //private enJoinTyp _JoinTyp;
 
-        /// <summary>
-        /// Variable nur temporär für den BinReloader, um mögliche Datenverluste zu entdecken.
-        /// </summary>
-        private string _LastWorkItem = string.Empty;
+        ///// <summary>
+        ///// Variable nur temporär für den BinReloader, um mögliche Datenverluste zu entdecken.
+        ///// </summary>
+        //private string _LastWorkItem = string.Empty;
 
         private string _RulesScript;
 
@@ -1118,31 +1118,31 @@ namespace BlueDatabase {
             return base.BlockSaveOperations();
         }
 
-        protected override void CheckDataAfterReload() {
-            try {
-                // Leztes WorkItem suchen. Auch Ohne LogUndo MUSS es vorhanden sein.
-                if (!string.IsNullOrEmpty(_LastWorkItem)) {
-                    var ok = false;
-                    var ok2 = string.Empty;
-                    foreach (var ThisWorkItem in Works) {
-                        var tmp = ThisWorkItem.ToString();
-                        if (tmp == _LastWorkItem) {
-                            ok = true;
-                            break;
-                        } else if (tmp.Substring(7) == _LastWorkItem.Substring(7)) {
-                            ok2 = tmp;
-                        }
-                    }
-                    if (!ok && string.IsNullOrEmpty(ok2)) {
-                        if (!Filename.Contains("AutoVue") && !Filename.Contains("Plandaten") && !Filename.Contains("Ketten.") && !Filename.Contains("Kettenräder.") && !Filename.Contains("TVW") && !Filename.Contains("Work") && !Filename.Contains("Behälter")) {
-                            Develop.DebugPrint(enFehlerArt.Warnung, "WorkItem verschwunden<br>" + _LastWorkItem + "<br>" + Filename + "<br><br>Vorher:<br>" + _WorkItemsBefore + "<br><br>Nachher:<br>" + Works.ToString());
-                        }
-                    }
-                }
-            } catch {
-                //Develop.DebugPrint(ex);
-            }
-        }
+        //protected override void CheckDataAfterReload() {
+        //    try {
+        //        // Leztes WorkItem suchen. Auch Ohne LogUndo MUSS es vorhanden sein.
+        //        if (!string.IsNullOrEmpty(_LastWorkItem)) {
+        //            var ok = false;
+        //            var ok2 = string.Empty;
+        //            foreach (var ThisWorkItem in Works) {
+        //                var tmp = ThisWorkItem.ToString();
+        //                if (tmp == _LastWorkItem) {
+        //                    ok = true;
+        //                    break;
+        //                } else if (tmp.Substring(7) == _LastWorkItem.Substring(7)) {
+        //                    ok2 = tmp;
+        //                }
+        //            }
+        //            if (!ok && string.IsNullOrEmpty(ok2)) {
+        //                if (!Filename.Contains("AutoVue") && !Filename.Contains("Plandaten") && !Filename.Contains("Ketten.") && !Filename.Contains("Kettenräder.") && !Filename.Contains("TVW") && !Filename.Contains("Work") && !Filename.Contains("Behälter")) {
+        //                    Develop.DebugPrint(enFehlerArt.Warnung, "WorkItem verschwunden<br>" + _LastWorkItem + "<br>" + Filename + "<br><br>Vorher:<br>" + _WorkItemsBefore + "<br><br>Nachher:<br>" + Works.ToString());
+        //                }
+        //            }
+        //        }
+        //    } catch {
+        //        //Develop.DebugPrint(ex);
+        //    }
+        //}
 
         protected override void Dispose(bool disposing) {
             if (!Disposed) { return; }
@@ -1309,21 +1309,21 @@ namespace BlueDatabase {
             if (int.Parse(LoadedVersion.Replace(".", "")) > int.Parse(DatabaseVersion.Replace(".", ""))) { SetReadOnly(); }
         }
 
-        protected override void PrepeareDataForCheckingBeforeLoad() {
-            // Letztes WorkItem speichern, als Kontrolle
-            _WorkItemsBefore = string.Empty;
-            _LastWorkItem = string.Empty;
-            if (Works != null && Works.Count > 0) {
-                var c = 0;
-                do {
-                    c++;
-                    if (c > 20 || Works.Count - c < 20) { break; }
-                    var wn = Works.Count - c;
-                    if (Works[wn].LogsUndo(this) && Works[wn].HistorischRelevant) { _LastWorkItem = Works[wn].ToString(); }
-                } while (string.IsNullOrEmpty(_LastWorkItem));
-                _WorkItemsBefore = Works.ToString();
-            }
-        }
+        //protected override void PrepeareDataForCheckingBeforeLoad() {
+        //    // Letztes WorkItem speichern, als Kontrolle
+        //    _WorkItemsBefore = string.Empty;
+        //    _LastWorkItem = string.Empty;
+        //    if (Works != null && Works.Count > 0) {
+        //        var c = 0;
+        //        do {
+        //            c++;
+        //            if (c > 20 || Works.Count - c < 20) { break; }
+        //            var wn = Works.Count - c;
+        //            if (Works[wn].LogsUndo(this) && Works[wn].HistorischRelevant) { _LastWorkItem = Works[wn].ToString(); }
+        //        } while (string.IsNullOrEmpty(_LastWorkItem));
+        //        _WorkItemsBefore = Works.ToString();
+        //    }
+        //}
 
         protected override byte[] ToListOfByte() {
             try {

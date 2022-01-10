@@ -52,6 +52,7 @@
     <Compile Include="Methods\Method_BerechneVariable_Tilde.cs" />
     <Compile Include="Methods\Method_AddSuffix.cs" />
     <Compile Include="Methods\Method_BitmapToBase64.cs" />
+    <Compile Include="Methods\Method_ContainsWich.cs" />
     <Compile Include="Methods\Method_RandomInt.cs" />
     <Compile Include="Methods\Method_DateTimeDifferenceInDays.cs" />
     <Compile Include="Methods\Method_DateTimeUTCNow.cs" />
@@ -71,6 +72,7 @@
     <Compile Include="Methods\Method_IsDateTime.cs" />
     <Compile Include="Methods\Method_SortNum.cs" />
     <Compile Include="Methods\Method_ExtractTags.cs" />
+    <Compile Include="Methods\Method_TrimSuffix.cs" />
     <Compile Include="Methods\Method_StringToUTF8.cs" />
     <Compile Include="Methods\Method_ToLower.cs" />
     <Compile Include="Methods\Method_ReduceToChars.cs" />

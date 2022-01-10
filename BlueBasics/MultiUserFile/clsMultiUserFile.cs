@@ -358,7 +358,7 @@ namespace BlueBasics.MultiUserFile {
             (var _BLoaded, var tmpLastSaveCode) = LoadBytesFromDisk(enErrorReason.Load);
             if (_BLoaded == null) { IsLoading = false; return; }
             _dataOnDisk = _BLoaded;
-            PrepeareDataForCheckingBeforeLoad();
+            //PrepeareDataForCheckingBeforeLoad();
             ParseInternal(_BLoaded);
             _LastSaveCode = tmpLastSaveCode; // initialize setzt zurück
 
@@ -366,7 +366,7 @@ namespace BlueBasics.MultiUserFile {
             _InitialLoadDone = true;
             _CheckedAndReloadNeed = false;
 
-            CheckDataAfterReload();
+            //CheckDataAfterReload();
             OnLoaded(new LoadedEventArgs(OnlyReload));
             RepairOldBlockFiles();
 
@@ -588,7 +588,7 @@ namespace BlueBasics.MultiUserFile {
         /// gibt die Möglichkeit, Fehler in ein Protokoll zu schreiben, wenn nach dem Reload eine Inkonsitenz aufgetreten ist.
         /// Nicht für Reperaturzwecke gedacht.
         /// </summary>
-        protected abstract void CheckDataAfterReload();
+        //protected abstract void CheckDataAfterReload();
 
         protected virtual void Dispose(bool disposing) {
             if (!Disposed) {
@@ -680,10 +680,10 @@ namespace BlueBasics.MultiUserFile {
 
         protected abstract void ParseExternal(byte[] bLoaded);
 
-        /// <summary>
-        /// Gibt die Möglichkeit, vor einem Reload Daten in Variablen zu speichern. Diese kann nach dem Reload mit CheckDataAfterReload zu prüfen, ob alles geklappt hat.
-        /// </summary>
-        protected abstract void PrepeareDataForCheckingBeforeLoad();
+        ///// <summary>
+        ///// Gibt die Möglichkeit, vor einem Reload Daten in Variablen zu speichern. Diese kann nach dem Reload mit CheckDataAfterReload zu prüfen, ob alles geklappt hat.
+        ///// </summary>
+        //protected abstract void PrepeareDataForCheckingBeforeLoad();
 
         protected abstract byte[] ToListOfByte();
 
