@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2021 Christian Peter
+// Copyright (c) 2022 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -105,7 +105,7 @@ namespace BlueDatabase {
         private bool _SaveContent;
         private bool _ShowMultiLineInOneLine;
         private bool _ShowUndo;
-        private string _SortMask;
+        private enSortierTyp _SortMask;
         private bool _SpellCheckingEnabled;
         private string _Suffix;
         private bool _TextBearbeitungErlaubt;
@@ -146,11 +146,11 @@ namespace BlueDatabase {
             _CellInitValue = string.Empty;
             _LinkedCell_RowKey = -1;
             _LinkedCell_ColumnKey = -1;
-            _SortMask = string.Empty;
+            _SortMask = enSortierTyp.Original_String;
             //_ZellenZusammenfassen = false;
             _DropDownKey = -1;
             _VorschlagsColumn = -1;
-            _Align = enAlignmentHorizontal.Keine_Präferenz;
+            _Align = enAlignmentHorizontal.Links;
             _KeyColumnKey = -1;
             _EditType = enEditTypeFormula.Textfeld;
             _Identifier = string.Empty;
@@ -667,11 +667,11 @@ namespace BlueDatabase {
             }
         }
 
-        public string SortMask {
+        public enSortierTyp SortMask {
             get => _SortMask;
             set {
                 if (_SortMask == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_SortMask, this, _SortMask, value, true);
+                Database.AddPending(enDatabaseDataType.co_SortMask, this, ((int)_SortMask).ToString(), ((int)value).ToString(), true);
                 OnChanged();
             }
         }
@@ -1995,8 +1995,13 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.co_SortMask:
-                    _SortMask = Wert;
+                    if (string.IsNullOrEmpty(Wert)) {
+                        _SortMask = enSortierTyp.Original_String;
+                    } else {
+                        _SortMask = (enSortierTyp)long.Parse(Wert);
+                    }
                     break;
+
                 //case enDatabaseDataType.co_ZellenZusammenfassen: _ZellenZusammenfassen = Wert.FromPlusMinus(); break;
                 case enDatabaseDataType.co_DropDownKey:
                     _DropDownKey = long.Parse(Wert);
@@ -2008,6 +2013,7 @@ namespace BlueDatabase {
 
                 case enDatabaseDataType.co_Align:
                     _Align = (enAlignmentHorizontal)int.Parse(Wert);
+                    if (_Align == (enAlignmentHorizontal)(-1)) { _Align = enAlignmentHorizontal.Links; }
                     break;
                 //case (enDatabaseDataType)189: break;
                 //case (enDatabaseDataType)192: break;
@@ -2089,7 +2095,7 @@ namespace BlueDatabase {
             Database.SaveToByteList(l, enDatabaseDataType.co_DropDownKey, _DropDownKey.ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_VorschlagColumn, _VorschlagsColumn.ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_Align, ((int)_Align).ToString(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_SortMask, _SortMask, Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_SortMask, ((int)_SortMask).ToString(), Key);
             //Database.SaveToByteList(l, enDatabaseDataType.co_Intelligenter_Multifilter, _Intelligenter_Multifilter, Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_DauerFilterPos, _DauerFilterPos.ToString(), Key);
             //Kennung UNBEDINGT zum Schluss, damit die Standard-Werte gesetzt werden können

@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2021 Christian Peter
+// Copyright (c) 2022 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -75,6 +75,13 @@ namespace BlueControls.Forms {
         [DefaultValue(true)]
         public bool CloseButtonEnabled { get; set; } = true;
 
+        [DefaultValue(enDesign.Form_Standard)]
+        public enDesign Design {
+            get;
+        } = enDesign.Form_Standard;
+
+        public bool IsClosed { get; private set; }
+
         protected override System.Windows.Forms.CreateParams CreateParams {
             get {
                 var oParam = base.CreateParams;
@@ -85,12 +92,6 @@ namespace BlueControls.Forms {
             }
         }
 
-        [DefaultValue(enDesign.Form_Standard)]
-        public enDesign Design {
-            get;
-        } = enDesign.Form_Standard;
-
-        public bool IsClosed { get; private set; }
         protected override bool ScaleChildren => false;
 
         #endregion

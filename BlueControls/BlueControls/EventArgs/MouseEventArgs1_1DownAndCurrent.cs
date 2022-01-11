@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2021 Christian Peter
+// Copyright (c) 2022 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -19,14 +19,13 @@ using BlueBasics;
 using System;
 using System.Drawing;
 
-namespace BlueControls.EventArgs
-{
-    public class MouseEventArgs1_1DownAndCurrent : System.EventArgs
-    {
+namespace BlueControls.EventArgs {
+
+    public class MouseEventArgs1_1DownAndCurrent : System.EventArgs {
+
         #region Constructors
 
-        public MouseEventArgs1_1DownAndCurrent(MouseEventArgs1_1 down, MouseEventArgs1_1 current) : base()
-        {
+        public MouseEventArgs1_1DownAndCurrent(MouseEventArgs1_1 down, MouseEventArgs1_1 current) : base() {
             MouseDown = down;
             Current = current;
         }
@@ -42,10 +41,8 @@ namespace BlueControls.EventArgs
 
         #region Methods
 
-        public Rectangle TrimmedRectangle()
-        {
-            if (MouseDown == null || Current == null)
-            {
+        public Rectangle TrimmedRectangle() {
+            if (MouseDown == null || Current == null) {
                 Develop.DebugPrint("Trimmen nicht möglich. " + (MouseDown == null).ToString() + " " + (Current == null).ToString());
                 return Rectangle.Empty;
             }

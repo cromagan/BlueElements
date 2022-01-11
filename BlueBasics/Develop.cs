@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2021 Christian Peter
+// Copyright (c) 2022 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -85,7 +85,7 @@ namespace BlueBasics {
         public static void DebugPrint(string warnung) => DebugPrint(enFehlerArt.Warnung, warnung);
 
         public static void DebugPrint(enFehlerArt art, Exception ex) {
-            if (art != enFehlerArt.Info && art != enFehlerArt.DevelopInfo && IsHostRunning()) {Debugger.Break(); }
+            if (art != enFehlerArt.Info && art != enFehlerArt.DevelopInfo && IsHostRunning()) { Debugger.Break(); }
             DebugPrint(art, "Es wurde ein allgemeiner Fehler abgefangen.\r\nMeldung: " + ex.Message + "\r\n" + ex.StackTrace.ToString());
         }
 

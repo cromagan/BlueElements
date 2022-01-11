@@ -15,24 +15,17 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueControls.EventArgs {
+using System;
 
-    public class MoveEventArgs : System.EventArgs {
+namespace BlueDatabase.Enums {
 
-        #region Constructors
+    [Flags]
+    public enum enAlignmentHorizontal {
 
-        public MoveEventArgs(bool x, bool y) {
-            X = x;
-            Y = y;
-        }
+        //Keine_Präferenz = -1,
+        Links = System.Windows.Forms.TextFormatFlags.Left,
 
-        #endregion
-
-        #region Properties
-
-        public bool X { get; set; }
-        public bool Y { get; set; }
-
-        #endregion
+        Rechts = System.Windows.Forms.TextFormatFlags.Right,
+        Zentriert = System.Windows.Forms.TextFormatFlags.HorizontalCenter
     }
 }

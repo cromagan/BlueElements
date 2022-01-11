@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2021 Christian Peter
+// Copyright (c) 2022 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -53,7 +53,7 @@ namespace BlueScript {
 
                     if (val.Length > suf.Length) {
                         if (val.ToLower().EndsWith(suf)) {
-                            var c = val.Substring(val.Length - suf.Length - 1,1);
+                            var c = val.Substring(val.Length - suf.Length - 1, 1);
                             if (Constants.Char_Numerals.Contains(c)) {
                                 return new strDoItFeedback(val.Substring(0, val.Length - suf.Length), enVariableDataType.String);
                             }

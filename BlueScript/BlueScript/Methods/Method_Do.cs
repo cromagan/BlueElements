@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2021 Christian Peter
+// Copyright (c) 2022 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -20,10 +20,10 @@ using Skript.Enums;
 using System.Collections.Generic;
 using static BlueBasics.Extensions;
 
-namespace BlueScript
-{
-    internal class Method_Do : Method
-    {
+namespace BlueScript {
+
+    internal class Method_Do : Method {
+
         #region Properties
 
         public override List<enVariableDataType> Args => new() { };
@@ -41,15 +41,13 @@ namespace BlueScript
 
         public override List<string> Comand(Script s) => new() { "do" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s)
-        {
+        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
             var tmpline = s.Line;
             var du = 0;
             s.Schleife++;
-            do
-            {
+            do {
                 s.Line = tmpline;
                 du++;
                 if (du > 100000) { return new strDoItFeedback("Do-Schleife nach 100.000 Durchläufen abgebrochen."); }
@@ -72,8 +70,7 @@ namespace BlueScript
             return new strDoItFeedback(string.Empty);
         }
 
-        private static string GetBoolTMP(string txt, string check)
-        {
+        private static string GetBoolTMP(string txt, string check) {
             (var i, var _) = NextText(txt, 0, new List<string>() { check }, false, false, KlammernStd);
             if (i < 0) { return string.Empty; }
             if (i < 1 && check != "!") { return string.Empty; } // <1, weil ja mindestens ein Zeichen vorher sein MUSS!
@@ -82,16 +79,14 @@ namespace BlueScript
             var ende = i + check.Length;
             var trenn = "(!|&<>=)";
             var gans = false;
-            do
-            {
+            do {
                 if (start < 0) { break; }
                 var ze = txt.Substring(start, 1);
                 if (!gans && trenn.Contains(ze)) { break; }
                 if (ze == "\"") { gans = !gans; }
                 start--;
             } while (true);
-            do
-            {
+            do {
                 if (ende >= txt.Length) { break; }
                 var ze = txt.Substring(ende, 1);
                 if (!gans && trenn.Contains(ze)) { break; }
@@ -106,20 +101,16 @@ namespace BlueScript
             if (check != "!") { v1 = new Variable("dummy", s1, null); }
             Variable v2 = new("dummy", s2, null);
             // V2 braucht nicht gepürft werden, muss ja eh der gleiche TYpe wie V1 sein
-            if (v1 != null)
-            {
+            if (v1 != null) {
                 if (v1.Type != v2.Type) { return string.Empty; }
                 if (v1.Type is not enVariableDataType.Bool and
                                not enVariableDataType.Numeral and
                                not enVariableDataType.String) { return string.Empty; }
-            }
-            else
-            {
+            } else {
                 if (v2.Type != enVariableDataType.Bool) { return string.Empty; }
             }
             var replacer = string.Empty;
-            switch (check)
-            {
+            switch (check) {
                 case "==":
                     replacer = "false";
                     if (v1.ValueString == v2.ValueString) { replacer = "true"; }

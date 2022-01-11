@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2021 Christian Peter
+// Copyright (c) 2022 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -481,7 +481,7 @@ namespace BlueControls.Controls {
 
         public static Size FormatedText_NeededSize(ColumnItem column, string originalText, BlueFont font, enShortenStyle style, int minSize, enBildTextVerhalten bildTextverhalten) {
             var tmpData = CellItem.GetDrawingData(column, originalText, style, bildTextverhalten);
-            return Skin.FormatedText_NeededSize(tmpData.Item1, tmpData.Item3, font, minSize);
+            return Skin.FormatedText_NeededSize(tmpData.Item1, tmpData.Item2, font, minSize);
         }
 
         public static void ImportCSV(Database _Database, string csvtxt) {
@@ -1552,10 +1552,10 @@ namespace BlueControls.Controls {
             }
 
             var tmpData = CellItem.GetDrawingData(contentHolderColumnStyle, drawString, style, bildTextverhalten);
-            var tmpImageCode = tmpData.Item3;
+            var tmpImageCode = tmpData.Item2;
             if (tmpImageCode != null) { tmpImageCode = QuickImage.Get(tmpImageCode, Skin.AdditionalState(state)); }
 
-            Skin.Draw_FormatedText(gr, tmpData.Item1, tmpImageCode, tmpData.Item2, r, null, false, font, false);
+            Skin.Draw_FormatedText(gr, tmpData.Item1, tmpImageCode, (enAlignment)contentHolderColumnStyle.Align, r, null, false, font, false);
         }
 
         private static int GetPix(int Pix, BlueFont F, double Scale) => Skin.FormatedText_NeededSize("@|", null, F, (int)((Pix * Scale) + 0.5)).Height;

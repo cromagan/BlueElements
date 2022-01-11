@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2021 Christian Peter
+// Copyright (c) 2022 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -28,12 +28,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 
-namespace BlueControls.Controls
-{
+namespace BlueControls.Controls {
+
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("Click")]
-    public partial class Caption : GenericControl, IContextMenu, IBackgroundNone
-    {
+    public partial class Caption : GenericControl, IContextMenu, IBackgroundNone {
+
         #region Fields
 
         private enDesign _design = enDesign.Undefiniert;
@@ -48,8 +48,7 @@ namespace BlueControls.Controls
 
         #region Constructors
 
-        public Caption() : base(false, false)
-        {
+        public Caption() : base(false, false) {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
@@ -69,24 +68,20 @@ namespace BlueControls.Controls
 
         #region Properties
 
-        public new int Height
-        {
+        public new int Height {
             get => Convert.ToBoolean(_TextAnzeigeverhalten & enSteuerelementVerhalten.Steuerelement_Anpassen)
                     ? TextRequiredSize().Height
                     : base.Height;
-            set
-            {
+            set {
                 GetDesign();
                 if (Convert.ToBoolean(_TextAnzeigeverhalten & enSteuerelementVerhalten.Steuerelement_Anpassen)) { return; }
                 base.Height = value;
             }
         }
 
-        public new Size Size
-        {
+        public new Size Size {
             get => Convert.ToBoolean(_TextAnzeigeverhalten & enSteuerelementVerhalten.Steuerelement_Anpassen) ? TextRequiredSize() : base.Size;
-            set
-            {
+            set {
                 GetDesign();
                 if (value.Width == base.Size.Width && value.Height == base.Size.Height) { return; }
                 base.Size = value;
@@ -97,8 +92,7 @@ namespace BlueControls.Controls
         /// Benötigt, dass der Designer das nicht erstellt
         /// </summary>
         [DefaultValue(0)]
-        public new int TabIndex
-        {
+        public new int TabIndex {
             get => 0;
             set => base.TabIndex = 0;
         }
@@ -107,18 +101,15 @@ namespace BlueControls.Controls
         /// Benötigt, dass der Designer das nicht erstellt
         /// </summary>
         [DefaultValue(false)]
-        public new bool TabStop
-        {
+        public new bool TabStop {
             get => false;
             set => base.TabStop = false;
         }
 
         [DefaultValue("")]
-        public new string Text
-        {
+        public new string Text {
             get => _Text;
-            set
-            {
+            set {
                 if (value is null) { value = string.Empty; }
                 if (_Text == value) { return; }
                 _Text = value;
@@ -127,24 +118,20 @@ namespace BlueControls.Controls
         }
 
         [DefaultValue(enSteuerelementVerhalten.Text_Abschneiden)]
-        public enSteuerelementVerhalten TextAnzeigeVerhalten
-        {
+        public enSteuerelementVerhalten TextAnzeigeVerhalten {
             get => _TextAnzeigeverhalten;
-            set
-            {
+            set {
                 if (_TextAnzeigeverhalten == value) { return; }
                 _TextAnzeigeverhalten = value;
                 ResetETextAndInvalidate();
             }
         }
 
-        public new int Width
-        {
+        public new int Width {
             get => Convert.ToBoolean(_TextAnzeigeverhalten & enSteuerelementVerhalten.Steuerelement_Anpassen)
                     ? TextRequiredSize().Width
                     : base.Width;
-            set
-            {
+            set {
                 GetDesign();
                 if (Convert.ToBoolean(_TextAnzeigeverhalten & enSteuerelementVerhalten.Steuerelement_Anpassen)) { return; }
                 base.Width = value;
@@ -163,64 +150,51 @@ namespace BlueControls.Controls
 
         public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
-        public void ResetETextAndInvalidate()
-        {
+        public void ResetETextAndInvalidate() {
             eText = null;
             if (!QuickModePossible()) { SetDoubleBuffering(); }
             Invalidate();
         }
 
-        public Size TextRequiredSize()
-        {
-            if (QuickModePossible())
-            {
+        public Size TextRequiredSize() {
+            if (QuickModePossible()) {
                 if (_design == enDesign.Undefiniert) { GetDesign(); }
                 var s = BlueFont.MeasureString(_Text, Skin.GetBlueFont(_design, enStates.Standard).Font());
                 return new Size((int)(s.Width + 1), (int)(s.Height + 1));
             }
-            if (eText == null)
-            {
+            if (eText == null) {
                 if (DesignMode) { Refresh(); }// Damit das skin Geinittet wird
                 DrawControl(null, enStates.Standard);
             }
             return eText != null ? eText.LastSize() : new Size(1, 1);
         }
 
-        protected override void DrawControl(Graphics gr, enStates state)
-        {
-            try
-            {
-                if (_design == enDesign.Undefiniert)
-                {
+        protected override void DrawControl(Graphics gr, enStates state) {
+            try {
+                if (_design == enDesign.Undefiniert) {
                     GetDesign();
                     if (_design == enDesign.Undefiniert) { return; }
                 }
-                if (state is not enStates.Standard and not enStates.Standard_Disabled)
-                {
+                if (state is not enStates.Standard and not enStates.Standard_Disabled) {
                     Develop.DebugPrint(state);
                     return;
                 }
-                if (!string.IsNullOrEmpty(_Text))
-                {
-                    if (QuickModePossible())
-                    {
+                if (!string.IsNullOrEmpty(_Text)) {
+                    if (QuickModePossible()) {
                         if (gr == null) { return; }
                         Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
                         Skin.Draw_FormatedText(gr, _Text, _design, state, null, enAlignment.Top_Left, new Rectangle(), null, false, Translate);
                         return;
                     }
-                    if (eText == null)
-                    {
-                        eText = new ExtText(_design, state)
-                        {
+                    if (eText == null) {
+                        eText = new ExtText(_design, state) {
                             HtmlText = BlueDatabase.LanguageTool.DoTranslate(_Text, Translate)
                         };
                         //eText.Zeilenabstand = _Zeilenabstand;
                     }
                     eText.State = state;
                     eText.Multiline = true;
-                    switch (_TextAnzeigeverhalten)
-                    {
+                    switch (_TextAnzeigeverhalten) {
                         case enSteuerelementVerhalten.Steuerelement_Anpassen:
                             eText.TextDimensions = Size.Empty;
                             Size = eText.LastSize();
@@ -243,25 +217,20 @@ namespace BlueControls.Controls
                 if (gr == null) { return; }// Wenn vorab die Größe abgefragt wird
                 Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
                 if (!string.IsNullOrEmpty(_Text)) { eText.Draw(gr, 1); }
-            }
-            catch
-            {
+            } catch {
             }
         }
 
-        protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e)
-        {
+        protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseUp(e);
             if (e.Button == System.Windows.Forms.MouseButtons.Right) { FloatingInputBoxListBoxStyle.ContextMenuShow(this, e); }
         }
 
-        private void GetDesign()
-        {
+        private void GetDesign() {
             _design = enDesign.Undefiniert;
             if (Parent == null) { return; }
             if (Parent is Form fm) { _design = fm.Design; }
-            switch (_design)
-            {
+            switch (_design) {
                 case enDesign.Form_QuickInfo:
 
                 case enDesign.Form_DesktopBenachrichtigung:
@@ -275,8 +244,7 @@ namespace BlueControls.Controls
                 case enDesign.Form_AutoFilter:
                     return;
             }
-            switch (ParentType())
-            {
+            switch (ParentType()) {
                 case enPartentType.RibbonGroupBox:
 
                 case enPartentType.RibbonPage:
@@ -305,8 +273,7 @@ namespace BlueControls.Controls
             }
         }
 
-        private bool QuickModePossible()
-        {
+        private bool QuickModePossible() {
             if (_TextAnzeigeverhalten != enSteuerelementVerhalten.Text_Abschneiden) { return false; }
             //if (Math.Abs(_Zeilenabstand - 1) > 0.01) { return false; }
             return !_Text.Contains("<");

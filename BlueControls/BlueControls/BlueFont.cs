@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2021 Christian Peter
+// Copyright (c) 2022 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -181,7 +181,6 @@ namespace BlueControls {
 
         public static SizeF MeasureString(string text, Font font, StringFormat stringformat) {
             try {
-
                 using var g = Graphics.FromHwnd(IntPtr.Zero);
                 SetTextRenderingHint(g, font);
                 return g.MeasureString(text, font, 9999, stringformat);
@@ -227,7 +226,7 @@ namespace BlueControls {
             if (Outline) {
                 for (var PX = -1; PX <= 1; PX++) {
                     for (var PY = -1; PY <= 1; PY++) {
-                        BlueFont.DrawString(gr, text, f, Brush_Color_Outline, x + PX*zoom, y + PY * zoom, stringFormat);
+                        BlueFont.DrawString(gr, text, f, Brush_Color_Outline, x + PX * zoom, y + PY * zoom, stringFormat);
                     }
                 }
             }

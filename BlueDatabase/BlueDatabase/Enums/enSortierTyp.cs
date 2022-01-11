@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2021 Christian Peter
+// Copyright (c) 2022 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -15,15 +15,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using System;
+namespace BlueDatabase.Enums {
 
-namespace BlueBasics.Enums {
-
-    [Flags]
-    public enum enAlignmentHorizontal {
-        Keine_Präferenz = -1,
-        Links = System.Windows.Forms.TextFormatFlags.Left,
-        Rechts = System.Windows.Forms.TextFormatFlags.Right,
-        Zentriert = System.Windows.Forms.TextFormatFlags.HorizontalCenter
+    public enum enSortierTyp {
+        Nicht_Erlaubt = -1,
+        Original_String = 0,
+        Sprachneutral_String = 1,
+        Zahlenwert = 100,
+        Datum_Uhrzeit = 200,
     }
 }

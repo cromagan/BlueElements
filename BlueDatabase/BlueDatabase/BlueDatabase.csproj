@@ -82,6 +82,8 @@
     <Compile Include="AdditionalScriptComands\Method_SetError.cs" />
     <Compile Include="CellCollection.cs" />
     <Compile Include="CellItem.cs" />
+    <Compile Include="Enums\enSortierTyp.cs" />
+    <Compile Include="Enums\enAlignmentHorizontal.cs" />
     <Compile Include="RowData.cs" />
     <Compile Include="ColumnCollection.cs" />
     <Compile Include="ColumnItem.cs" />

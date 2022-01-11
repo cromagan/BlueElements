@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2021 Christian Peter
+// Copyright (c) 2022 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -501,8 +501,6 @@ namespace BlueScript {
 
             #endregion
 
-
-
             //#region Vergleichsoperatoren ersetzen und vereinfachen
 
             //(var pos, var _) = NextText(txt, 0, Method_if.VergleichsOperatoren, false, false, KlammernStd);
@@ -662,7 +660,6 @@ namespace BlueScript {
 
             #endregion
 
-
             #region String Joinen -- UND RAUS AUS DER ROUTINE
 
             if (txt.Length > 1 && txt.StartsWith("\"") && txt.EndsWith("\"")) {
@@ -673,7 +670,6 @@ namespace BlueScript {
             }
 
             #endregion
-
 
             #region Rechenoperatoren ersetzen und vereinfachen
 

@@ -100,11 +100,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.Caption17 = new BlueControls.Controls.Caption();
             this.btnQI_Vorschau = new BlueControls.Controls.Button();
             this.tabSonstiges = new System.Windows.Forms.TabPage();
-            this.btnRegexUrl = new BlueControls.Controls.Button();
-            this.btnRegexEmail = new BlueControls.Controls.Button();
-            this.btnRegexTelefonnummer = new BlueControls.Controls.Button();
             this.butSaveContent = new BlueControls.Controls.Button();
-            this.txbSortMask = new BlueControls.Controls.TextBox();
             this.btnSpellChecking = new BlueControls.Controls.Button();
             this.txbRegex = new BlueControls.Controls.TextBox();
             this.capSortiermaske = new BlueControls.Controls.Caption();
@@ -133,6 +129,16 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnZurueck = new BlueControls.Controls.Button();
             this.btnOk = new BlueControls.Controls.Button();
             this.tabControl = new BlueControls.Controls.TabControl();
+            this.tabSchnellformat = new System.Windows.Forms.TabPage();
+            this.btnSchnellIInternetAdresse = new BlueControls.Controls.Button();
+            this.btnSchnellAuswahloptionen = new BlueControls.Controls.Button();
+            this.btnSchnellGleitkommazahl = new BlueControls.Controls.Button();
+            this.btnSchnellGanzzahl = new BlueControls.Controls.Button();
+            this.btnSchnellTelefonNummer = new BlueControls.Controls.Button();
+            this.btnSchnellEmail = new BlueControls.Controls.Button();
+            this.btnSchnellDatumUhrzeit = new BlueControls.Controls.Button();
+            this.btnSchnellDatum = new BlueControls.Controls.Button();
+            this.btnSchnellText = new BlueControls.Controls.Button();
             this.tabSpezial = new System.Windows.Forms.TabPage();
             this.grpLinkToFileSystem = new BlueControls.Controls.GroupBox();
             this.grpLinkedDatabase = new BlueControls.Controls.GroupBox();
@@ -146,6 +152,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.caption5 = new BlueControls.Controls.Caption();
             this.butAktuellVor = new BlueControls.Controls.Button();
             this.butAktuellZurueck = new BlueControls.Controls.Button();
+            this.cbxSort = new BlueControls.Controls.ComboBox();
             this.tabDesign.SuspendLayout();
             this.grpBildCode.SuspendLayout();
             this.tabRechte.SuspendLayout();
@@ -156,6 +163,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabSonstiges.SuspendLayout();
             this.BlueFrame1.SuspendLayout();
             this.tabControl.SuspendLayout();
+            this.tabSchnellformat.SuspendLayout();
             this.tabSpezial.SuspendLayout();
             this.grpLinkToFileSystem.SuspendLayout();
             this.grpLinkedDatabase.SuspendLayout();
@@ -993,11 +1001,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             // tabSonstiges
             // 
             this.tabSonstiges.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabSonstiges.Controls.Add(this.btnRegexUrl);
-            this.tabSonstiges.Controls.Add(this.btnRegexEmail);
-            this.tabSonstiges.Controls.Add(this.btnRegexTelefonnummer);
+            this.tabSonstiges.Controls.Add(this.cbxSort);
             this.tabSonstiges.Controls.Add(this.butSaveContent);
-            this.tabSonstiges.Controls.Add(this.txbSortMask);
             this.tabSonstiges.Controls.Add(this.btnSpellChecking);
             this.tabSonstiges.Controls.Add(this.txbRegex);
             this.tabSonstiges.Controls.Add(this.capSortiermaske);
@@ -1014,36 +1019,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabSonstiges.TabIndex = 4;
             this.tabSonstiges.Text = "Sonstiges allgemein";
             // 
-            // btnRegexUrl
-            // 
-            this.btnRegexUrl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRegexUrl.Location = new System.Drawing.Point(832, 176);
-            this.btnRegexUrl.Name = "btnRegexUrl";
-            this.btnRegexUrl.Size = new System.Drawing.Size(72, 24);
-            this.btnRegexUrl.TabIndex = 37;
-            this.btnRegexUrl.Text = "Url";
-            this.btnRegexUrl.Click += new System.EventHandler(this.btnRegexUrl_Click);
-            // 
-            // btnRegexEmail
-            // 
-            this.btnRegexEmail.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRegexEmail.Location = new System.Drawing.Point(832, 152);
-            this.btnRegexEmail.Name = "btnRegexEmail";
-            this.btnRegexEmail.Size = new System.Drawing.Size(72, 24);
-            this.btnRegexEmail.TabIndex = 36;
-            this.btnRegexEmail.Text = "E-Mail";
-            this.btnRegexEmail.Click += new System.EventHandler(this.btnRegexEmail_Click);
-            // 
-            // btnRegexTelefonnummer
-            // 
-            this.btnRegexTelefonnummer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnRegexTelefonnummer.Location = new System.Drawing.Point(832, 128);
-            this.btnRegexTelefonnummer.Name = "btnRegexTelefonnummer";
-            this.btnRegexTelefonnummer.Size = new System.Drawing.Size(72, 24);
-            this.btnRegexTelefonnummer.TabIndex = 35;
-            this.btnRegexTelefonnummer.Text = "Telefonnr.";
-            this.btnRegexTelefonnummer.Click += new System.EventHandler(this.btnRegexTelefonnummer_Click);
-            // 
             // butSaveContent
             // 
             this.butSaveContent.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -1053,17 +1028,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.butSaveContent.Size = new System.Drawing.Size(352, 24);
             this.butSaveContent.TabIndex = 34;
             this.butSaveContent.Text = "Inhalte der Zellen auf Festplatte speichern und laden";
-            // 
-            // txbSortMask
-            // 
-            this.txbSortMask.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.txbSortMask.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbSortMask.Enabled = false;
-            this.txbSortMask.Location = new System.Drawing.Point(512, 304);
-            this.txbSortMask.MultiLine = true;
-            this.txbSortMask.Name = "txbSortMask";
-            this.txbSortMask.Size = new System.Drawing.Size(392, 64);
-            this.txbSortMask.TabIndex = 11;
             // 
             // btnSpellChecking
             // 
@@ -1080,7 +1044,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbRegex.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.txbRegex.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbRegex.Location = new System.Drawing.Point(512, 128);
-            this.txbRegex.MultiLine = true;
             this.txbRegex.Name = "txbRegex";
             this.txbRegex.Size = new System.Drawing.Size(320, 96);
             this.txbRegex.TabIndex = 9;
@@ -1092,7 +1055,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capSortiermaske.Location = new System.Drawing.Point(512, 288);
             this.capSortiermaske.Name = "capSortiermaske";
             this.capSortiermaske.Size = new System.Drawing.Size(152, 24);
-            this.capSortiermaske.Text = "Sortiermaske:";
+            this.capSortiermaske.Text = "Sortierung nach:";
             // 
             // btnLogUndo
             // 
@@ -1331,6 +1294,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.tabControl.Controls.Add(this.tabSchnellformat);
             this.tabControl.Controls.Add(this.tabDesign);
             this.tabControl.Controls.Add(this.tabRechte);
             this.tabControl.Controls.Add(this.tabAutoBearbeitung);
@@ -1344,6 +1308,106 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabControl.SelectedIndex = 0;
             this.tabControl.Size = new System.Drawing.Size(920, 516);
             this.tabControl.TabIndex = 15;
+            // 
+            // tabSchnellformat
+            // 
+            this.tabSchnellformat.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabSchnellformat.Controls.Add(this.btnSchnellIInternetAdresse);
+            this.tabSchnellformat.Controls.Add(this.btnSchnellAuswahloptionen);
+            this.tabSchnellformat.Controls.Add(this.btnSchnellGleitkommazahl);
+            this.tabSchnellformat.Controls.Add(this.btnSchnellGanzzahl);
+            this.tabSchnellformat.Controls.Add(this.btnSchnellTelefonNummer);
+            this.tabSchnellformat.Controls.Add(this.btnSchnellEmail);
+            this.tabSchnellformat.Controls.Add(this.btnSchnellDatumUhrzeit);
+            this.tabSchnellformat.Controls.Add(this.btnSchnellDatum);
+            this.tabSchnellformat.Controls.Add(this.btnSchnellText);
+            this.tabSchnellformat.Location = new System.Drawing.Point(4, 25);
+            this.tabSchnellformat.Name = "tabSchnellformat";
+            this.tabSchnellformat.Padding = new System.Windows.Forms.Padding(3);
+            this.tabSchnellformat.Size = new System.Drawing.Size(912, 487);
+            this.tabSchnellformat.TabIndex = 10;
+            this.tabSchnellformat.Text = "Schnellformat";
+            // 
+            // btnSchnellIInternetAdresse
+            // 
+            this.btnSchnellIInternetAdresse.Location = new System.Drawing.Point(296, 80);
+            this.btnSchnellIInternetAdresse.Name = "btnSchnellIInternetAdresse";
+            this.btnSchnellIInternetAdresse.Size = new System.Drawing.Size(128, 48);
+            this.btnSchnellIInternetAdresse.TabIndex = 8;
+            this.btnSchnellIInternetAdresse.Text = "Internet-Adresse";
+            this.btnSchnellIInternetAdresse.Click += new System.EventHandler(this.btnSchnellIInternetAdresse_Click);
+            // 
+            // btnSchnellAuswahloptionen
+            // 
+            this.btnSchnellAuswahloptionen.Location = new System.Drawing.Point(160, 24);
+            this.btnSchnellAuswahloptionen.Name = "btnSchnellAuswahloptionen";
+            this.btnSchnellAuswahloptionen.Size = new System.Drawing.Size(128, 48);
+            this.btnSchnellAuswahloptionen.TabIndex = 7;
+            this.btnSchnellAuswahloptionen.Text = "Auswahl-Optionen";
+            this.btnSchnellAuswahloptionen.Click += new System.EventHandler(this.btnSchnellAuswahloptionen_Click);
+            // 
+            // btnSchnellGleitkommazahl
+            // 
+            this.btnSchnellGleitkommazahl.Location = new System.Drawing.Point(704, 24);
+            this.btnSchnellGleitkommazahl.Name = "btnSchnellGleitkommazahl";
+            this.btnSchnellGleitkommazahl.Size = new System.Drawing.Size(128, 48);
+            this.btnSchnellGleitkommazahl.TabIndex = 6;
+            this.btnSchnellGleitkommazahl.Text = "Gleitkommazahl";
+            this.btnSchnellGleitkommazahl.Click += new System.EventHandler(this.btnSchnellGleitkommazahl_Click);
+            // 
+            // btnSchnellGanzzahl
+            // 
+            this.btnSchnellGanzzahl.Location = new System.Drawing.Point(568, 24);
+            this.btnSchnellGanzzahl.Name = "btnSchnellGanzzahl";
+            this.btnSchnellGanzzahl.Size = new System.Drawing.Size(128, 48);
+            this.btnSchnellGanzzahl.TabIndex = 5;
+            this.btnSchnellGanzzahl.Text = "Ganzzahl";
+            this.btnSchnellGanzzahl.Click += new System.EventHandler(this.btnSchnellGanzzahl_Click);
+            // 
+            // btnSchnellTelefonNummer
+            // 
+            this.btnSchnellTelefonNummer.Location = new System.Drawing.Point(160, 80);
+            this.btnSchnellTelefonNummer.Name = "btnSchnellTelefonNummer";
+            this.btnSchnellTelefonNummer.Size = new System.Drawing.Size(128, 48);
+            this.btnSchnellTelefonNummer.TabIndex = 4;
+            this.btnSchnellTelefonNummer.Text = "Telefonnummer";
+            this.btnSchnellTelefonNummer.Click += new System.EventHandler(this.btnSchnellTelefonNummer_Click);
+            // 
+            // btnSchnellEmail
+            // 
+            this.btnSchnellEmail.Location = new System.Drawing.Point(24, 80);
+            this.btnSchnellEmail.Name = "btnSchnellEmail";
+            this.btnSchnellEmail.Size = new System.Drawing.Size(128, 48);
+            this.btnSchnellEmail.TabIndex = 3;
+            this.btnSchnellEmail.Text = "Email";
+            this.btnSchnellEmail.Click += new System.EventHandler(this.btnSchnellEmail_Click);
+            // 
+            // btnSchnellDatumUhrzeit
+            // 
+            this.btnSchnellDatumUhrzeit.Location = new System.Drawing.Point(432, 24);
+            this.btnSchnellDatumUhrzeit.Name = "btnSchnellDatumUhrzeit";
+            this.btnSchnellDatumUhrzeit.Size = new System.Drawing.Size(128, 48);
+            this.btnSchnellDatumUhrzeit.TabIndex = 2;
+            this.btnSchnellDatumUhrzeit.Text = "Datum/Uhrzeit";
+            this.btnSchnellDatumUhrzeit.Click += new System.EventHandler(this.btnSchnellDatumUhrzeit_Click);
+            // 
+            // btnSchnellDatum
+            // 
+            this.btnSchnellDatum.Location = new System.Drawing.Point(296, 24);
+            this.btnSchnellDatum.Name = "btnSchnellDatum";
+            this.btnSchnellDatum.Size = new System.Drawing.Size(128, 48);
+            this.btnSchnellDatum.TabIndex = 1;
+            this.btnSchnellDatum.Text = "Datum";
+            this.btnSchnellDatum.Click += new System.EventHandler(this.btnSchnellDatum_Click);
+            // 
+            // btnSchnellText
+            // 
+            this.btnSchnellText.Location = new System.Drawing.Point(24, 24);
+            this.btnSchnellText.Name = "btnSchnellText";
+            this.btnSchnellText.Size = new System.Drawing.Size(128, 48);
+            this.btnSchnellText.TabIndex = 0;
+            this.btnSchnellText.Text = "Text";
+            this.btnSchnellText.Click += new System.EventHandler(this.btnSchnellText_Click);
             // 
             // tabSpezial
             // 
@@ -1492,6 +1556,15 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.butAktuellZurueck.TabIndex = 18;
             this.butAktuellZurueck.Click += new System.EventHandler(this.butAktuellZurueck_Click);
             // 
+            // cbxSort
+            // 
+            this.cbxSort.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxSort.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxSort.Location = new System.Drawing.Point(512, 312);
+            this.cbxSort.Name = "cbxSort";
+            this.cbxSort.Size = new System.Drawing.Size(368, 24);
+            this.cbxSort.TabIndex = 35;
+            // 
             // ColumnEditor
             // 
             this.ClientSize = new System.Drawing.Size(926, 671);
@@ -1518,6 +1591,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabSonstiges.ResumeLayout(false);
             this.BlueFrame1.ResumeLayout(false);
             this.tabControl.ResumeLayout(false);
+            this.tabSchnellformat.ResumeLayout(false);
             this.tabSpezial.ResumeLayout(false);
             this.grpLinkToFileSystem.ResumeLayout(false);
             this.grpLinkedDatabase.ResumeLayout(false);
@@ -1624,7 +1698,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private ComboBox cbxSchlüsselspalte;
         private Caption capSchlüsselspalte;
         private GroupBox grpColumnsForLinkedDatabase;
-        private TextBox txbSortMask;
         private Caption capSortiermaske;
         private TextBox txbRegex;
         private Caption capRegex;
@@ -1650,8 +1723,16 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Button chkFilterOnlyOr;
         private Button btnVerwendung;
         private TextBox txbSpaltenbild;
-        private Button btnRegexUrl;
-        private Button btnRegexEmail;
-        private Button btnRegexTelefonnummer;
+        private System.Windows.Forms.TabPage tabSchnellformat;
+        private Button btnSchnellAuswahloptionen;
+        private Button btnSchnellGleitkommazahl;
+        private Button btnSchnellGanzzahl;
+        private Button btnSchnellTelefonNummer;
+        private Button btnSchnellEmail;
+        private Button btnSchnellDatumUhrzeit;
+        private Button btnSchnellDatum;
+        private Button btnSchnellText;
+        private Button btnSchnellIInternetAdresse;
+        private ComboBox cbxSort;
     }
 }

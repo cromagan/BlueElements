@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2021 Christian Peter
+// Copyright (c) 2022 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -60,11 +60,9 @@ namespace BlueControls.Forms {
 
                 var x = Show(items);
                 return (x as RowFormulaListItem)?.Row;
-            }
-            catch (Exception ex){
+            } catch (Exception ex) {
                 Develop.DebugPrint(ex);
                 return null;
-
             }
         }
 

@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2021 Christian Peter
+// Copyright (c) 2022 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -65,9 +65,9 @@ namespace BlueDatabase {
 
         #region Methods
 
-        public static Tuple<string, enAlignment, QuickImage> GetDrawingData(ColumnItem column, string originalText, enShortenStyle style, enBildTextVerhalten bildTextverhalten) {
+        public static Tuple<string, QuickImage> GetDrawingData(ColumnItem column, string originalText, enShortenStyle style, enBildTextVerhalten bildTextverhalten) {
             var tmpText = ValueReadable(column, originalText, style, bildTextverhalten, true);
-            var tmpAlign = StandardAlignment(column, bildTextverhalten);
+            //var tmpAlign = StandardAlignment(column, bildTextverhalten);
             var tmpImageCode = StandardImage(column, originalText, tmpText, style, bildTextverhalten);
             if (bildTextverhalten == enBildTextVerhalten.Bild_oder_Text) {
                 if (tmpImageCode != null) { tmpText = string.Empty; }
@@ -75,33 +75,33 @@ namespace BlueDatabase {
                     tmpImageCode = StandardErrorImage(16, enBildTextVerhalten.Fehlendes_Bild_zeige_Kritischzeichen);
                 }
             }
-            return new Tuple<string, enAlignment, QuickImage>(tmpText, tmpAlign, tmpImageCode);
+            return new Tuple<string, QuickImage>(tmpText, tmpImageCode);
         }
 
-        public static enAlignment StandardAlignment(ColumnItem column, enBildTextVerhalten bildTextverhalten) {
-            switch (column.Align) {
-                case enAlignmentHorizontal.Links:
-                    return enAlignment.Top_Left;
+        //public static enAlignment StandardAlignment(ColumnItem column, enBildTextVerhalten bildTextverhalten) {
+        //    switch (column.Align) {
+        //        case enAlignmentHorizontal.Links:
+        //            return enAlignment.Top_Left;
 
-                case enAlignmentHorizontal.Rechts:
-                    return enAlignment.Top_Right;
+        //        case enAlignmentHorizontal.Rechts:
+        //            return enAlignment.Top_Right;
 
-                case enAlignmentHorizontal.Zentriert:
-                    return enAlignment.HorizontalCenter;
-            }
-            switch (column.Format) {
-                case enDataFormat.Ganzzahl:
-                case enDataFormat.Gleitkommazahl:
-                    return enAlignment.Top_Right;
+        //        case enAlignmentHorizontal.Zentriert:
+        //            return enAlignment.HorizontalCenter;
+        //    }
+        //    switch (column.Format) {
+        //        case enDataFormat.Ganzzahl:
+        //        case enDataFormat.Gleitkommazahl:
+        //            return enAlignment.Top_Right;
 
-                case enDataFormat.Bit:
-                    if (bildTextverhalten is enBildTextVerhalten.Nur_Bild or enBildTextVerhalten.Bild_oder_Text) { return enAlignment.Top_HorizontalCenter; }
-                    return enAlignment.Top_Left;
+        //        case enDataFormat.Bit:
+        //            if (bildTextverhalten is enBildTextVerhalten.Nur_Bild or enBildTextVerhalten.Bild_oder_Text) { return enAlignment.Top_HorizontalCenter; }
+        //            return enAlignment.Top_Left;
 
-                default:
-                    return enAlignment.Top_Left;
-            }
-        }
+        //        default:
+        //            return enAlignment.Top_Left;
+        //    }
+        //}
 
         public static QuickImage StandardErrorImage(int gr, enBildTextVerhalten bildTextverhalten) => bildTextverhalten switch {
             enBildTextVerhalten.Fehlendes_Bild_zeige_Fragezeichen => QuickImage.Get("Fragezeichen|" + gr + "|||||200|||80"),

@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2021 Christian Peter
+// Copyright (c) 2022 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -107,10 +107,9 @@ namespace BlueControls.Controls {
         public double ZoomCurrent() => _Zoom;
 
         public void ZoomFit() {
-        CalculateZoomFitAndSliders(-1);
+            CalculateZoomFitAndSliders(-1);
             CalculateZoomFitAndSliders(_ZoomFit);
         }
-
 
         public double ZoomFitValue(RectangleM MaxBounds, bool sliderShowing, Size sizeOfPaintArea) => MaxBounds == null || MaxBounds.Width < 0.01d || MaxBounds.Height < 0.01d
 ? 1d

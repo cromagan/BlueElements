@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2021 Christian Peter
+// Copyright (c) 2022 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -208,7 +208,7 @@ namespace BlueControls {
                         inh = inh.Replace("\n", ";");
                         if (inh.Length > 25) { inh = inh.Substring(0, 20) + "..."; }
                         var ro = string.Empty;
-                        if(r.CellGetBoolean("RO")) { ro = "[ReadOnly] "; }
+                        if (r.CellGetBoolean("RO")) { ro = "[ReadOnly] "; }
 
                         e.ToolTipTitle = ro + "(" + r.CellGetString("Typ") + ") " + hoveredWordnew + " = " + inh;
                         e.ToolTipText = r.CellGetString("Kommentar") + " ";

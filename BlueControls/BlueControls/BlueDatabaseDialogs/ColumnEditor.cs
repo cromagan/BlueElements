@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2021 Christian Peter
+// Copyright (c) 2022 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -100,19 +100,71 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void btnQI_Vorschau_Click(object sender, System.EventArgs e) => Notification.Show(tbxQuickinfo.Text.Replace("\r", "<BR>") + "<br><br><br>" + tbxAdminInfo.Text.Replace("\r", "<BR>"));
 
-        private void btnRegexEmail_Click(object sender, System.EventArgs e) {
+        private void btnSchnellAuswahloptionen_Click(object sender, System.EventArgs e) {
+            txbRegex.Text = string.Empty;
+            tbxAllowedChars.Text = string.Empty;
+            cbxAlign.Text = ((int)enAlignmentHorizontal.Links).ToString();
+            cbxSort.Text = ((int)enSortierTyp.Sprachneutral_String).ToString();
+        }
+
+        private void btnSchnellDatum_Click(object sender, System.EventArgs e) {
+            txbRegex.Text = @"^(0[1-9]|[12][0-9]|3[01]):(0[1-9]|1[0-2]):\d{4}$";
+            tbxAllowedChars.Text = Constants.Char_Numerals + ".";
+            cbxAlign.Text = ((int)enAlignmentHorizontal.Links).ToString();
+            cbxSort.Text = ((int)enSortierTyp.Datum_Uhrzeit).ToString();
+        }
+
+        private void btnSchnellDatumUhrzeit_Click(object sender, System.EventArgs e) {
+            txbRegex.Text = @"^(0[1-9]|[12][0-9]|3[01])[.](0[1-9]|1[0-2])[.]\d{4}[ ](0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$";
+            tbxAllowedChars.Text = Constants.Char_Numerals + ":. ";
+            cbxAlign.Text = ((int)enAlignmentHorizontal.Links).ToString();
+            cbxSort.Text = ((int)enSortierTyp.Datum_Uhrzeit).ToString();
+        }
+
+        private void btnSchnellEmail_Click(object sender, System.EventArgs e) {
             //http://emailregex.com/
-            txbRegex.Text = "^[a-z0-9A-Z._-]{1,40}[@][a-z0-9A-Z._-]{1,40}[.][a-zA-Z]{1,3}$";
+            txbRegex.Text = @"^[a-z0-9A-Z._-]{1,40}[@][a-z0-9A-Z._-]{1,40}[.][a-zA-Z]{1,3}$";
+            tbxAllowedChars.Text = Constants.Char_Numerals + Constants.Char_AZ + Constants.Char_az + "@._";
+            cbxAlign.Text = ((int)enAlignmentHorizontal.Links).ToString();
+            cbxSort.Text = ((int)enSortierTyp.Original_String).ToString();
         }
 
-        private void btnRegexTelefonnummer_Click(object sender, System.EventArgs e) {
-            //https://regex101.com/r/OzJr8j/1
-            txbRegex.Text = @"^[+][1-9][\s0-9]*[0-9]$";
+        private void btnSchnellGanzzahl_Click(object sender, System.EventArgs e) {
+            txbRegex.Text = @"^((-?[1-9]\d*)|0)$";
+            tbxAllowedChars.Text = Constants.Char_Numerals;
+            cbxAlign.Text = ((int)enAlignmentHorizontal.Rechts).ToString();
+            cbxSort.Text = ((int)enSortierTyp.Zahlenwert).ToString();
         }
 
-        private void btnRegexUrl_Click(object sender, System.EventArgs e) {
+        private void btnSchnellGleitkommazahl_Click(object sender, System.EventArgs e) {
+            //https://regex101.com/r/onr0NZ/1
+            txbRegex.Text = @"(^-?([1-9]\d*)|^0)([.]\d*[1-9])?$";
+            tbxAllowedChars.Text = Constants.Char_Numerals + ",";
+            cbxAlign.Text = ((int)enAlignmentHorizontal.Rechts).ToString();
+            cbxSort.Text = ((int)enSortierTyp.Zahlenwert).ToString();
+        }
+
+        private void btnSchnellIInternetAdresse_Click(object sender, System.EventArgs e) {
             //    https://regex101.com/r/S2CbwM/1
             txbRegex.Text = @"^(https:|http:|www\.)\S*$";
+            tbxAllowedChars.Text = Constants.Char_Numerals + Constants.Char_AZ + Constants.Char_az + "._/";
+            cbxAlign.Text = ((int)enAlignmentHorizontal.Links).ToString();
+            cbxSort.Text = ((int)enSortierTyp.Original_String).ToString();
+        }
+
+        private void btnSchnellTelefonNummer_Click(object sender, System.EventArgs e) {
+            //https://regex101.com/r/OzJr8j/1
+            txbRegex.Text = @"^[+][1-9][\s0-9]*[0-9]$";
+            tbxAllowedChars.Text = Constants.Char_Numerals + "+ ";
+            cbxAlign.Text = ((int)enAlignmentHorizontal.Links).ToString();
+            cbxSort.Text = ((int)enSortierTyp.Original_String).ToString();
+        }
+
+        private void btnSchnellText_Click(object sender, System.EventArgs e) {
+            txbRegex.Text = string.Empty;
+            tbxAllowedChars.Text = string.Empty;
+            cbxAlign.Text = ((int)enAlignmentHorizontal.Links).ToString();
+            cbxSort.Text = ((int)enSortierTyp.Sprachneutral_String).ToString();
         }
 
         private void btnStandard_Click(object sender, System.EventArgs e) {
@@ -233,6 +285,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             cbxRandRechts.Item.AddRange(typeof(enColumnLineStyle));
             cbxBildTextVerhalten.Item.AddRange(typeof(enBildTextVerhalten));
             cbxAlign.Item.AddRange(typeof(enAlignmentHorizontal));
+            cbxSort.Item.AddRange(typeof(enSortierTyp));
             cbxLinkedDatabase.Item.Clear();
             if (!string.IsNullOrEmpty(_Column.Database.Filename)) {
                 var All = Directory.GetFiles(_Column.Database.Filename.FilePath(), "*.mdb", SearchOption.TopDirectoryOnly);
@@ -287,6 +340,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             cbxRandLinks.Text = ((int)_Column.LineLeft).ToString();
             cbxRandRechts.Text = ((int)_Column.LineRight).ToString();
             cbxAlign.Text = ((int)_Column.Align).ToString();
+            cbxSort.Text = ((int)_Column.SortMask).ToString();
             btnAutoFilterMoeglich.Checked = _Column.FilterOptions.HasFlag(enFilterOptions.Enabled);
             btnAutoFilterTXTErlaubt.Checked = _Column.FilterOptions.HasFlag(enFilterOptions.TextFilterEnabled);
             btnAutoFilterErweitertErlaubt.Checked = _Column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled);
@@ -330,7 +384,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             txbBestFileStandardSuffix.Text = _Column.BestFile_StandardSuffix;
             cbxLinkedDatabase.Text = _Column.LinkedDatabaseFile;
             txbLinkedKeyKennung.Text = _Column.LinkedKeyKennung;
-            txbSortMask.Text = _Column.SortMask;
+
             txbAutoRemove.Text = _Column.AutoRemove;
             butSaveContent.Checked = _Column.SaveContent;
 
@@ -452,7 +506,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             _Column.DropdownKey = ColumKeyFrom(_Column.Database, cbxDropDownKey.Text);
             _Column.VorschlagsColumn = ColumKeyFrom(_Column.Database, cbxVorschlagSpalte.Text);
             _Column.Align = (enAlignmentHorizontal)int.Parse(cbxAlign.Text);
-            _Column.SortMask = txbSortMask.Text;
+            _Column.SortMask = (enSortierTyp)int.Parse(cbxSort.Text);
             _Column.AutoRemove = txbAutoRemove.Text;
             _Column.SaveContent = butSaveContent.Checked;
             //_Column.Database.Rules.Sort();
