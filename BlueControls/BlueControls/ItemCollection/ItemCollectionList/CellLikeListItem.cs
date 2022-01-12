@@ -89,7 +89,7 @@ namespace BlueControls.ItemCollection {
         protected override string GetCompareKey() =>
             // Die hauptklasse frägt nach diesem Kompare-Key
             //    var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, enShortenStyle.HTML, true); // Muss Kompakt sein, um Suffixe zu vermeiden
-            DataFormat.CompareKey(Internal, _StyleLikeThis.Format) + "|" + Internal;
+            Internal.CompareKey(_StyleLikeThis.SortMask) + "|" + Internal;
 
         #endregion
     }

@@ -89,7 +89,7 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        protected override string GetCompareKey() => DataFormat.CompareKey(Internal, enDataFormat.Text);
+        protected override string GetCompareKey() => Internal.CompareKey(enSortierTyp.Sprachneutral_String);
 
         private enDesign tempDesign(enDesign itemdesign) {
             if (IsCaption) {

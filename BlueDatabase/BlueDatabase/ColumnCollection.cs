@@ -181,8 +181,8 @@ namespace BlueDatabase {
             c.OpticalReplace.AddRange(source.OpticalReplace);
             c.AfterEdit_AutoReplace.Clear();
             c.AfterEdit_AutoReplace.AddRange(source.OpticalReplace);
-            c.Regex.Clear();
-            c.Regex.AddRange(source.Regex);
+
+            c.Regex = source.Regex;
             //c.CompactView = Source.CompactView;
             c.ShowUndo = source.ShowUndo;
             c.ShowMultiLineInOneLine = source.ShowMultiLineInOneLine;
@@ -228,6 +228,8 @@ namespace BlueDatabase {
             }
             return null;
         }
+
+        public ColumnItem First() => this[0];
 
         public string Freename(string wunschname) {
             var nr = 0;

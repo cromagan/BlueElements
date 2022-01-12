@@ -77,7 +77,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 }
             }
             if (string.IsNullOrEmpty(Feh)) {
-                Column_DatenZurückschreibenx();
+                Column_DatenZurückschreiben();
                 if (string.IsNullOrEmpty(Feh)) { Feh = _Column.ErrorReason(); }
             }
             if (!string.IsNullOrEmpty(Feh)) {
@@ -101,70 +101,57 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void btnQI_Vorschau_Click(object sender, System.EventArgs e) => Notification.Show(tbxQuickinfo.Text.Replace("\r", "<BR>") + "<br><br><br>" + tbxAdminInfo.Text.Replace("\r", "<BR>"));
 
         private void btnSchnellAuswahloptionen_Click(object sender, System.EventArgs e) {
-            txbRegex.Text = string.Empty;
-            tbxAllowedChars.Text = string.Empty;
-            cbxAlign.Text = ((int)enAlignmentHorizontal.Links).ToString();
-            cbxSort.Text = ((int)enSortierTyp.Sprachneutral_String).ToString();
+            Column_DatenZurückschreiben();
+            _Column.SetFormatForTextOptions();
+            Column_DatenAuslesen(_Column);
         }
 
         private void btnSchnellDatum_Click(object sender, System.EventArgs e) {
-            txbRegex.Text = @"^(0[1-9]|[12][0-9]|3[01]):(0[1-9]|1[0-2]):\d{4}$";
-            tbxAllowedChars.Text = Constants.Char_Numerals + ".";
-            cbxAlign.Text = ((int)enAlignmentHorizontal.Links).ToString();
-            cbxSort.Text = ((int)enSortierTyp.Datum_Uhrzeit).ToString();
+            Column_DatenZurückschreiben();
+            _Column.SetFormatForDate();
+            Column_DatenAuslesen(_Column);
         }
 
         private void btnSchnellDatumUhrzeit_Click(object sender, System.EventArgs e) {
-            txbRegex.Text = @"^(0[1-9]|[12][0-9]|3[01])[.](0[1-9]|1[0-2])[.]\d{4}[ ](0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$";
-            tbxAllowedChars.Text = Constants.Char_Numerals + ":. ";
-            cbxAlign.Text = ((int)enAlignmentHorizontal.Links).ToString();
-            cbxSort.Text = ((int)enSortierTyp.Datum_Uhrzeit).ToString();
+            Column_DatenZurückschreiben();
+            _Column.SetFormatForDateTime();
+            Column_DatenAuslesen(_Column);
         }
 
         private void btnSchnellEmail_Click(object sender, System.EventArgs e) {
-            //http://emailregex.com/
-            txbRegex.Text = @"^[a-z0-9A-Z._-]{1,40}[@][a-z0-9A-Z._-]{1,40}[.][a-zA-Z]{1,3}$";
-            tbxAllowedChars.Text = Constants.Char_Numerals + Constants.Char_AZ + Constants.Char_az + "@._";
-            cbxAlign.Text = ((int)enAlignmentHorizontal.Links).ToString();
-            cbxSort.Text = ((int)enSortierTyp.Original_String).ToString();
+            Column_DatenZurückschreiben();
+            _Column.SetFormatForUrl();
+            Column_DatenAuslesen(_Column);
         }
 
         private void btnSchnellGanzzahl_Click(object sender, System.EventArgs e) {
-            txbRegex.Text = @"^((-?[1-9]\d*)|0)$";
-            tbxAllowedChars.Text = Constants.Char_Numerals;
-            cbxAlign.Text = ((int)enAlignmentHorizontal.Rechts).ToString();
-            cbxSort.Text = ((int)enSortierTyp.Zahlenwert).ToString();
+            Column_DatenZurückschreiben();
+            _Column.SetFormatForInteger();
+            Column_DatenAuslesen(_Column);
         }
 
         private void btnSchnellGleitkommazahl_Click(object sender, System.EventArgs e) {
-            //https://regex101.com/r/onr0NZ/1
-            txbRegex.Text = @"(^-?([1-9]\d*)|^0)([.]\d*[1-9])?$";
-            tbxAllowedChars.Text = Constants.Char_Numerals + ",";
-            cbxAlign.Text = ((int)enAlignmentHorizontal.Rechts).ToString();
-            cbxSort.Text = ((int)enSortierTyp.Zahlenwert).ToString();
+            Column_DatenZurückschreiben();
+            _Column.SetFormatForFloat();
+            Column_DatenAuslesen(_Column);
         }
 
         private void btnSchnellIInternetAdresse_Click(object sender, System.EventArgs e) {
-            //    https://regex101.com/r/S2CbwM/1
-            txbRegex.Text = @"^(https:|http:|www\.)\S*$";
-            tbxAllowedChars.Text = Constants.Char_Numerals + Constants.Char_AZ + Constants.Char_az + "._/";
-            cbxAlign.Text = ((int)enAlignmentHorizontal.Links).ToString();
-            cbxSort.Text = ((int)enSortierTyp.Original_String).ToString();
+            Column_DatenZurückschreiben();
+            _Column.SetFormatForUrl();
+            Column_DatenAuslesen(_Column);
         }
 
         private void btnSchnellTelefonNummer_Click(object sender, System.EventArgs e) {
-            //https://regex101.com/r/OzJr8j/1
-            txbRegex.Text = @"^[+][1-9][\s0-9]*[0-9]$";
-            tbxAllowedChars.Text = Constants.Char_Numerals + "+ ";
-            cbxAlign.Text = ((int)enAlignmentHorizontal.Links).ToString();
-            cbxSort.Text = ((int)enSortierTyp.Original_String).ToString();
+            Column_DatenZurückschreiben();
+            _Column.SetFormatForPhoneNumber();
+            Column_DatenAuslesen(_Column);
         }
 
         private void btnSchnellText_Click(object sender, System.EventArgs e) {
-            txbRegex.Text = string.Empty;
-            tbxAllowedChars.Text = string.Empty;
-            cbxAlign.Text = ((int)enAlignmentHorizontal.Links).ToString();
-            cbxSort.Text = ((int)enSortierTyp.Sprachneutral_String).ToString();
+            Column_DatenZurückschreiben();
+            _Column.SetFormatForText();
+            Column_DatenAuslesen(_Column);
         }
 
         private void btnStandard_Click(object sender, System.EventArgs e) {
@@ -368,7 +355,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             tbxAuswaehlbareWerte.Text = _Column.DropDownItems.JoinWithCr();
             txbReplacer.Text = _Column.OpticalReplace.JoinWithCr();
             txbAutoReplace.Text = _Column.AfterEdit_AutoReplace.JoinWithCr();
-            txbRegex.Text = _Column.Regex.JoinWithCr();
+            txbRegex.Text = _Column.Regex;
             tbxTags.Text = _Column.Tags.JoinWithCr();
             lbxCellEditor.Item.Clear();
             lbxCellEditor.Item.AddRange(_Column.PermissionGroups_ChangeCell.ToArray());
@@ -413,7 +400,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             cbxLinkedDatabase_TextChanged(null, System.EventArgs.Empty);
         }
 
-        private void Column_DatenZurückschreibenx() {
+        private void Column_DatenZurückschreiben() {
             if (_Column.Database.ReadOnly) { return; }
             _Column.Name = tbxName.Text;
             _Column.Caption = tbxCaption.Text.Replace("\r\n", "\r").Trim().Trim("\r").Trim();
@@ -481,11 +468,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 _Column.Tags.Clear();
                 _Column.Tags.AddRange(NewTags);
             }
-            var NewRegex = txbRegex.Text.SplitAndCutByCRToList();
-            if (NewRegex.IsDifferentTo(_Column.Regex)) {
-                _Column.Regex.Clear();
-                _Column.Regex.AddRange(NewRegex);
-            }
+            _Column.Regex = txbRegex.Text;
             _Column.TextBearbeitungErlaubt = btnEditableStandard.Checked;
             _Column.DropdownBearbeitungErlaubt = btnEditableDropdown.Checked;
             _Column.DropdownAllesAbwählenErlaubt = btnCanBeEmpty.Checked;

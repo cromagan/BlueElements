@@ -102,10 +102,12 @@ namespace BlueDatabase {
             }
         }
 
-        private static string ColumnReplaceTranslated(string newTXT, ColumnItem column) => column.Format switch {
-            enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl or enDataFormat.Datum_und_Uhrzeit or enDataFormat.FarbeInteger or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem => newTXT,
-            _ => DoTranslate(newTXT, false),
-        };
+        private static string ColumnReplaceTranslated(string newTXT, ColumnItem column) {
+            return column.Format switch {
+                enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl or enDataFormat.FarbeInteger or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem => newTXT,
+                _ => DoTranslate(newTXT, false),
+            };
+        }
 
         #endregion
     }

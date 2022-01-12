@@ -168,7 +168,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                         var t = ThisString.SplitAndCutBy("|");
                         if (FileExists(t[0])) {
                             var q1 = QuickImage.Get(enImageCode.Kugel, 16, Extensions.MixColor(Color.Red, Color.Green, DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / ThisExport.AutoDelete).ToHTMLCode(), "");
-                            L.Add(t[1], t[0], q1, true, DataFormat.CompareKey(t[1], enDataFormat.Datum_und_Uhrzeit));
+                            L.Add(t[1], t[0], q1, true, t[1].CompareKey(enSortierTyp.Datum_Uhrzeit));
                         }
                     }
                     Zusatz.AddRange(Directory.GetFiles(ThisExport.Verzeichnis, db.Filename.FileNameWithoutSuffix() + "_*.MDB"));
@@ -176,7 +176,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
             foreach (var ThisString in Zusatz) {
                 if (L[ThisString] == null) {
-                    L.Add(ThisString.FileNameWithSuffix(), ThisString, QuickImage.Get(enImageCode.Warnung), true, DataFormat.CompareKey(new FileInfo(ThisString).CreationTime.ToString(), enDataFormat.Datum_und_Uhrzeit));
+                    L.Add(ThisString.FileNameWithSuffix(), ThisString, QuickImage.Get(enImageCode.Warnung), true, new FileInfo(ThisString).CreationTime.ToString().CompareKey(enSortierTyp.Datum_Uhrzeit));
                 }
             }
             L.Sort();

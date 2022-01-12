@@ -479,12 +479,15 @@ namespace BlueControls.Forms {
         }
 
         private void Neu_Click(object sender, System.EventArgs e) {
-            var vRow = TableView.Database.Column[0].Format switch {
-                enDataFormat.Datum_und_Uhrzeit => TableView.Database.Row.Add(NameRepair(DateTime.Now.ToString(Constants.Format_Date5), null)),
-                _ => TableView.Database.Row.Add(NameRepair("Neuer Eintrag", null)),
-            };
+            RowItem r = null;
 
-            TableView.CursorPos_Set(TableView.Database.Column[0], TableView.SortedRows().Get(vRow), true);
+            if (TableView.Database.Column.First().SortMask == enSortierTyp.Datum_Uhrzeit) {
+                r = TableView.Database.Row.Add(NameRepair(DateTime.Now.ToString(Constants.Format_Date5), null));
+            } else {
+                r = TableView.Database.Row.Add(NameRepair("Neuer Eintrag", null));
+            }
+
+            TableView.CursorPos_Set(TableView.Database.Column.First(), TableView.SortedRows().Get(r), true);
         }
 
         private void Ordn_Click(object sender, System.EventArgs e) {

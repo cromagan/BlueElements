@@ -31,7 +31,7 @@ namespace BlueBasics.Enums {
         BildCode = 13,
 
         // Date_GermanFormat = 15
-        Datum_und_Uhrzeit = 16,
+        //Datum_und_Uhrzeit = 16,
 
         // Binärdaten_Bild = 19,
         // Passwort = 20, // String

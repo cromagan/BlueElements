@@ -576,7 +576,6 @@ namespace BlueDatabase {
 
                 case enDataFormat.Text:
                 case enDataFormat.BildCode:
-                case enDataFormat.Datum_und_Uhrzeit:
                 case enDataFormat.FarbeInteger:
                 case enDataFormat.RelationText:
                 case enDataFormat.Schrift:

@@ -558,7 +558,7 @@ namespace BlueDatabase {
             }
         }
 
-        internal string CompareKey(ColumnItem Column, RowItem Row) => DataFormat.CompareKey(GetString(Column, Row), Column.Format);
+        internal string CompareKey(ColumnItem Column, RowItem Row) => GetString(Column, Row).CompareKey(Column.SortMask);
 
         internal Size ContentSizeToSave(KeyValuePair<string, CellItem> vCell, ColumnItem Column) {
             if (Column.Format.SaveSizeData()) {

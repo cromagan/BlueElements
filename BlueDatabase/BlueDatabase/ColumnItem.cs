@@ -38,7 +38,6 @@ namespace BlueDatabase {
         public readonly ListExt<string> DropDownItems = new();
         public readonly ListExt<string> OpticalReplace = new();
         public readonly ListExt<string> PermissionGroups_ChangeCell = new();
-        public readonly ListExt<string> Regex = new();
         public readonly ListExt<string> Tags = new();
         public bool? TMP_AutoFilterSinnvoll = null;
         public Bitmap TMP_CaptionBitmap;
@@ -102,6 +101,7 @@ namespace BlueDatabase {
         private string _Name;
         private string _Prefix;
         private string _QuickInfo;
+        private string _Regex;
         private bool _SaveContent;
         private bool _ShowMultiLineInOneLine;
         private bool _ShowUndo;
@@ -196,7 +196,6 @@ namespace BlueDatabase {
             DropDownItems.Changed += DropDownItems_ListOrItemChanged;
             OpticalReplace.Changed += OpticalReplacer_ListOrItemChanged;
             AfterEdit_AutoReplace.Changed += AfterEdit_AutoReplace_ListOrItemChanged;
-            Regex.Changed += Regex_ListOrItemChanged;
             PermissionGroups_ChangeCell.Changed += PermissionGroups_ChangeCell_ListOrItemChanged;
             Tags.Changed += Tags_ListOrItemChanged;
             Invalidate_TmpVariables();
@@ -635,6 +634,15 @@ namespace BlueDatabase {
             set {
                 if (_QuickInfo == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_QuickInfo, this, _QuickInfo, value, true);
+                OnChanged();
+            }
+        }
+
+        public string Regex {
+            get => _Regex;
+            set {
+                if (_Regex == value) { return; }
+                Database.AddPending(enDatabaseDataType.co_Regex, this, _Regex, value, true);
                 OnChanged();
             }
         }
@@ -1103,8 +1111,7 @@ namespace BlueDatabase {
             if (_DropdownAllesAbwählenErlaubt && !_Format.DropdownUnselectAllAllowed()) { return "'Dropdownmenu alles abwählen' bei diesem Format nicht erlaubt."; }
             if (DropDownItems.Count > 0 && !_Format.DropdownItemsAllowed()) { return "Manuelle 'Dropdow-Items' bei diesem Format nicht erlaubt."; }
             if (_BildTextVerhalten != enBildTextVerhalten.Nur_Text) {
-                if (_Format is enDataFormat.Datum_und_Uhrzeit or
-                               enDataFormat.Ganzzahl or
+                if (_Format is enDataFormat.Ganzzahl or
                                enDataFormat.Gleitkommazahl or
                                enDataFormat.Text or
                                enDataFormat.Text_mit_Formatierung) {
@@ -1392,7 +1399,7 @@ namespace BlueDatabase {
                 case "System: Date Created":
                     _Name = "SYS_CreateDate";
                     _SpellCheckingEnabled = false;
-                    _Format = enDataFormat.Datum_und_Uhrzeit;
+                    SetFormatForDateTime();
                     if (SetAll) {
                         Caption = "Erstell-Datum";
                         ForeColor = Color.FromArgb(0, 0, 128);
@@ -1405,7 +1412,7 @@ namespace BlueDatabase {
                     _Name = "SYS_ChangeDate";
                     _SpellCheckingEnabled = false;
                     _ShowUndo = false;
-                    _Format = enDataFormat.Datum_und_Uhrzeit;
+                    SetFormatForDateTime();
                     _TextBearbeitungErlaubt = false;
                     _SpellCheckingEnabled = false;
                     _DropdownBearbeitungErlaubt = false;
@@ -1479,6 +1486,75 @@ namespace BlueDatabase {
                     Develop.DebugPrint("Unbekannte Kennung: " + _Identifier);
                     break;
             }
+        }
+
+        public void SetFormatForDate() {
+            Regex = @"^(0[1-9]|[12][0-9]|3[01]):(0[1-9]|1[0-2]):\d{4}$";
+            AllowedChars = Constants.Char_Numerals + ".";
+            Align = enAlignmentHorizontal.Links;
+            SortMask = enSortierTyp.Datum_Uhrzeit;
+        }
+
+        public void SetFormatForDateTime() {
+            Regex = @"^(0[1-9]|[12][0-9]|3[01])[.](0[1-9]|1[0-2])[.]\d{4}[ ](0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$";
+            AllowedChars = Constants.Char_Numerals + ":. ";
+            Align = enAlignmentHorizontal.Links;
+            SortMask = enSortierTyp.Datum_Uhrzeit;
+        }
+
+        public void SetFormatForEmail() {
+            //http://emailregex.com/
+            Regex = @"^[a-z0-9A-Z._-]{1,40}[@][a-z0-9A-Z._-]{1,40}[.][a-zA-Z]{1,3}$";
+            AllowedChars = Constants.Char_Numerals + Constants.Char_AZ + Constants.Char_az + "@._";
+            Align = enAlignmentHorizontal.Links;
+            SortMask = enSortierTyp.Original_String;
+        }
+
+        public void SetFormatForFloat() {
+            //https://regex101.com/r/onr0NZ/1
+            Regex = @"(^-?([1-9]\d*)|^0)([.]\d*[1-9])?$";
+            AllowedChars = Constants.Char_Numerals + ",";
+            Align = enAlignmentHorizontal.Rechts;
+
+            SortMask = enSortierTyp.ZahlenwertFloat;
+        }
+
+        public void SetFormatForInteger() {
+            Regex = @"^((-?[1-9]\d*)|0)$";
+
+            AllowedChars = Constants.Char_Numerals;
+            Align = enAlignmentHorizontal.Rechts;
+            SortMask = enSortierTyp.ZahlenwertInt;
+        }
+
+        public void SetFormatForPhoneNumber() {
+            //https://regex101.com/r/OzJr8j/1
+            Regex = @"^[+][1-9][\s0-9]*[0-9]$";
+            AllowedChars = Constants.Char_Numerals + "+ ";
+            Align = enAlignmentHorizontal.Links;
+            SortMask = enSortierTyp.Original_String;
+        }
+
+        public void SetFormatForText() {
+            Regex = string.Empty;
+            AllowedChars = string.Empty;
+            Align = enAlignmentHorizontal.Links;
+            SortMask = enSortierTyp.Sprachneutral_String;
+        }
+
+        public void SetFormatForTextOptions() {
+            Regex = string.Empty;
+            AllowedChars = string.Empty;
+            Align = enAlignmentHorizontal.Links;
+            SortMask = enSortierTyp.Sprachneutral_String;
+        }
+
+        public void SetFormatForUrl() {
+            //    https://regex101.com/r/S2CbwM/1
+            Regex = @"^(https:|http:|www\.)\S*$";
+            AllowedChars = Constants.Char_Numerals + Constants.Char_AZ + Constants.Char_az + "._/";
+            Align = enAlignmentHorizontal.Links;
+            SortMask = enSortierTyp.Original_String;
         }
 
         public string SimplyFile(string fullFileName) {
@@ -1574,7 +1650,6 @@ namespace BlueDatabase {
 : _Format switch {
     enDataFormat.Link_To_Filesystem => QuickImage.Get(enImageCode.Datei, 16),
     enDataFormat.RelationText => QuickImage.Get(enImageCode.Herz, 16),
-    enDataFormat.Datum_und_Uhrzeit => QuickImage.Get(enImageCode.Uhr, 16),
     enDataFormat.Bit => QuickImage.Get(enImageCode.Häkchen, 16),
     enDataFormat.FarbeInteger => QuickImage.Get(enImageCode.Pinsel, 16),
     enDataFormat.Ganzzahl => QuickImage.Get(enImageCode.Ganzzahl, 16),
@@ -1617,7 +1692,6 @@ namespace BlueDatabase {
                 case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.Ganzzahl:
                 case enDataFormat.Gleitkommazahl:
-                case enDataFormat.Datum_und_Uhrzeit:
                 case enDataFormat.BildCode:
                 case enDataFormat.RelationText:
                     if (editType_To_Check == enEditTypeFormula.Textfeld) { return true; } // Textfeld immer erlauben auch wenn beide Bearbeitungen nicht erlaubt sind. Einfach der Übersichtlichktei
@@ -1833,7 +1907,7 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.co_Regex:
-                    Regex.SplitAndCutByCR(Wert);
+                    _Regex = Wert;
                     break;
 
                 case enDatabaseDataType.co_Tags:
@@ -2066,7 +2140,7 @@ namespace BlueDatabase {
             Database.SaveToByteList(l, enDatabaseDataType.co_DropDownItems, DropDownItems.JoinWithCr(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_OpticalReplace, OpticalReplace.JoinWithCr(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_AfterEdit_AutoReplace, AfterEdit_AutoReplace.JoinWithCr(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_Regex, Regex.JoinWithCr(), Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_Regex, _Regex, Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_DropdownAllesAbwählenErlaubt, _DropdownAllesAbwählenErlaubt.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_DropdownWerteAndererZellenAnzeigen, _DropdownWerteAndererZellenAnzeigen.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_QuickInfo, _QuickInfo, Key);
@@ -2212,7 +2286,7 @@ namespace BlueDatabase {
                 if (oTXT.ToLower().Contains("ftp")) { break; }
                 if (oTXT.ToLower().Contains(".xml")) { break; }
                 if (oTXT.ToLower().Contains(".doc")) { break; }
-                if (oTXT.IsFormat(enDataFormat.Datum_und_Uhrzeit)) { break; }
+                if (oTXT.IsDateTime()) { break; }
                 TXT = TXT.Replace("\r\n", "\r");
                 // 1/2 l Milch
                 // 3-5 Stunden
@@ -2277,11 +2351,6 @@ namespace BlueDatabase {
 
         private void PermissionGroups_ChangeCell_ListOrItemChanged(object sender, System.EventArgs e) {
             Database.AddPending(enDatabaseDataType.co_PermissionGroups_ChangeCell, Key, PermissionGroups_ChangeCell.JoinWithCr(), false);
-            OnChanged();
-        }
-
-        private void Regex_ListOrItemChanged(object sender, System.EventArgs e) {
-            Database.AddPending(enDatabaseDataType.co_Regex, Key, Regex.JoinWithCr(), false);
             OnChanged();
         }
 

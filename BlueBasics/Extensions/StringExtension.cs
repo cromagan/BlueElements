@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using static BlueBasics.Converter;
 
 namespace BlueBasics {
 
@@ -64,6 +65,49 @@ namespace BlueBasics {
 
             (var pose, var _) = NextText(txt, 0, new List<string> { ende }, false, false, KlammernStd);
             return pose == txt.Length - 1;
+        }
+
+        public static string CompareKey(this string isValue, enSortierTyp format) {
+            var CompareKey_S_OK = Constants.SecondSortChar + "X";
+            var CompareKey_S_NOK = Constants.SecondSortChar + "A";
+            switch (format) {
+                case enSortierTyp.ZahlenwertInt:
+                    if (string.IsNullOrEmpty(isValue)) { return CompareKey_S_NOK + "A0000000000"; }
+                    if (int.TryParse(isValue, out var w)) {
+                        if (w >= 0) {
+                            return CompareKey_S_OK + "A" + w.ToString(Constants.Format_Integer10);
+                        } else {
+                            return CompareKey_S_OK + w.ToString(Constants.Format_Integer10);
+                        }
+                    } else {
+                        return CompareKey_S_NOK + isValue;
+                    }
+
+                case enSortierTyp.Original_String:
+                    return Constants.SecondSortChar + isValue;
+
+                case enSortierTyp.Sprachneutral_String:
+
+                    if (string.IsNullOrEmpty(isValue)) { return string.Empty; }
+
+                    return Constants.SecondSortChar + isValue.Sprachneutral();
+
+                case enSortierTyp.ZahlenwertFloat:
+                    if (string.IsNullOrEmpty(isValue)) { return "A0000000000,000"; }
+                    if (double.TryParse(isValue, out var dw)) {
+                        var t = dw.ToString(Constants.Format_Float10_3);
+                        if (!t.Contains(",")) { t += ",000"; };
+                        if (dw >= 0) { t = "A" + t; }
+                        while (t.Length < 15) { t += "0"; }
+                        return CompareKey_S_OK + t;
+                    } else {
+                        return CompareKey_S_NOK + isValue;
+                    }
+
+                default:
+                    Develop.DebugPrint(format);
+                    return Constants.SecondSortChar + isValue;
+            }
         }
 
         public static bool ContainsChars(this string tXT, string chars) => chars.Where((_, z) => tXT.Contains(chars.Substring(z, 1))).Any();
@@ -304,6 +348,8 @@ namespace BlueBasics {
             }
             return tXT;
         }
+
+        public static bool IsDateTime(this string txt) => DateTimeTryParse(txt, out var _);
 
         public static bool IsDouble(this string txt) => txt is not null && txt.IsFormat(enDataFormat.Gleitkommazahl);
 
@@ -601,6 +647,34 @@ namespace BlueBasics {
             if (string.IsNullOrEmpty(textToSplit)) { return w; }
             w.AddRange(textToSplit.SplitByCR());
             return w;
+        }
+
+        public static string Sprachneutral(this string isValue) {
+            isValue = isValue.ToLower();
+            isValue = isValue.Replace("ä", "a");
+            isValue = isValue.Replace("ö", "o");
+            isValue = isValue.Replace("ü", "u");
+            isValue = isValue.Replace("á", "a");
+            isValue = isValue.Replace("ó", "o");
+            isValue = isValue.Replace("ú", "u");
+            isValue = isValue.Replace("í", "i");
+            isValue = isValue.Replace("é", "e");
+            isValue = isValue.Replace("à", "a");
+            isValue = isValue.Replace("ò", "o");
+            isValue = isValue.Replace("ù", "u");
+            isValue = isValue.Replace("ì", "i");
+            isValue = isValue.Replace("è", "e");
+            isValue = isValue.Replace("â", "a");
+            isValue = isValue.Replace("ô", "o");
+            isValue = isValue.Replace("û", "u");
+            isValue = isValue.Replace("î", "i");
+            isValue = isValue.Replace("ê", "e");
+            isValue = isValue.Replace("ž", "z");
+            isValue = isValue.Replace("ß", "s");
+            isValue = isValue.TrimStart("\"");
+            isValue = isValue.TrimStart("'");
+            isValue = isValue.TrimStart(" ");
+            return isValue;
         }
 
         //public static string ParseTag(this string tXT, int startIndex) {

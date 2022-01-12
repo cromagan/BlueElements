@@ -258,7 +258,7 @@ namespace BlueControls.ItemCollection {
 
         public TextListItem Add(string internalAndReadableText, bool isCaption) => Add(internalAndReadableText, internalAndReadableText, null, isCaption, true, string.Empty);
 
-        public TextListItem Add(string internalAndReadableText, enDataFormat format) => Add(internalAndReadableText, internalAndReadableText, null, false, true, DataFormat.CompareKey(internalAndReadableText, format));
+        public TextListItem Add(string internalAndReadableText, enSortierTyp format) => Add(internalAndReadableText, internalAndReadableText, null, false, true, internalAndReadableText.CompareKey(format));
 
         public TextListItem Add(string internalAndReadableText, enImageCode symbol) => Add(internalAndReadableText, internalAndReadableText, symbol, false, true, string.Empty);
 

@@ -127,7 +127,6 @@ namespace BlueDatabase {
             switch (column.Format) {
                 case enDataFormat.Text:
                 case enDataFormat.Text_mit_Formatierung:
-                case enDataFormat.Datum_und_Uhrzeit:
                 case enDataFormat.Link_To_Filesystem:
                 case enDataFormat.Gleitkommazahl:
                 case enDataFormat.Ganzzahl:

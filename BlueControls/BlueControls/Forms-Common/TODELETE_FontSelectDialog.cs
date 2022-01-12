@@ -55,22 +55,22 @@ namespace BlueControls.Forms {
                 FNList.Sort();
                 FSList = new ItemCollectionList
                 {
-                    { "8", enDataFormat.Gleitkommazahl },
-                    { "9", enDataFormat.Gleitkommazahl },
-                    { "10", enDataFormat.Gleitkommazahl },
-                    { "11", enDataFormat.Gleitkommazahl },
-                    { "12", enDataFormat.Gleitkommazahl },
-                    { "14", enDataFormat.Gleitkommazahl },
-                    { "16", enDataFormat.Gleitkommazahl },
-                    { "18", enDataFormat.Gleitkommazahl },
-                    { "20", enDataFormat.Gleitkommazahl },
-                    { "22", enDataFormat.Gleitkommazahl },
-                    { "24", enDataFormat.Gleitkommazahl },
-                    { "26", enDataFormat.Gleitkommazahl },
-                    { "28", enDataFormat.Gleitkommazahl },
-                    { "36", enDataFormat.Gleitkommazahl },
-                    { "48", enDataFormat.Gleitkommazahl },
-                    { "72", enDataFormat.Gleitkommazahl }
+                    { "8",enSortierTyp.ZahlenwertFloat },
+                    { "9", enSortierTyp.ZahlenwertFloat },
+                    { "10", enSortierTyp.ZahlenwertFloat },
+                    { "11", enSortierTyp.ZahlenwertFloat },
+                    { "12", enSortierTyp.ZahlenwertFloat },
+                    { "14", enSortierTyp.ZahlenwertFloat },
+                    { "16", enSortierTyp.ZahlenwertFloat },
+                    { "18", enSortierTyp.ZahlenwertFloat },
+                    { "20", enSortierTyp.ZahlenwertFloat },
+                    { "22", enSortierTyp.ZahlenwertFloat },
+                    { "24", enSortierTyp.ZahlenwertFloat },
+                    { "26", enSortierTyp.ZahlenwertFloat },
+                    { "28", enSortierTyp.ZahlenwertFloat },
+                    { "36", enSortierTyp.ZahlenwertFloat },
+                    { "48", enSortierTyp.ZahlenwertFloat },
+                    { "72", enSortierTyp.ZahlenwertFloat }
                 };
                 FSList.Sort();
             }
