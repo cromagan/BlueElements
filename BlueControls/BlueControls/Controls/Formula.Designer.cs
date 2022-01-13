@@ -143,7 +143,6 @@ namespace BlueControls.Controls
             this.cbxControlType.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxControlType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxControlType.Enabled = false;
-            this.cbxControlType.Format = BlueBasics.Enums.enDataFormat.Text;
             this.cbxControlType.Location = new System.Drawing.Point(8, 288);
             this.cbxControlType.Name = "cbxControlType";
             this.cbxControlType.Size = new System.Drawing.Size(160, 24);
@@ -155,7 +154,6 @@ namespace BlueControls.Controls
             this.cbxCaptionPosition.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.cbxCaptionPosition.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxCaptionPosition.Enabled = false;
-            this.cbxCaptionPosition.Format = BlueBasics.Enums.enDataFormat.Text;
             this.cbxCaptionPosition.Location = new System.Drawing.Point(8, 240);
             this.cbxCaptionPosition.Name = "cbxCaptionPosition";
             this.cbxCaptionPosition.Size = new System.Drawing.Size(160, 24);

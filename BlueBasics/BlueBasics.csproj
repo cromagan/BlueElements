@@ -90,6 +90,7 @@
     <Compile Include="BitmapExt.cs" />
     <Compile Include="clsImageMatrix.cs" />
     <Compile Include="Enums\enBlurType.cs" />
+    <Compile Include="Enums\enVarType.cs" />
     <Compile Include="Enums\enEditTypeFormula.cs" />
     <Compile Include="Enums\enErrorReason.cs" />
     <Compile Include="Enums\enSortierTyp.cs" />

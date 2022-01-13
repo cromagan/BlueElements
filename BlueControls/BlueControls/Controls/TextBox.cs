@@ -24,6 +24,7 @@ using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
+using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -31,9 +32,9 @@ using System.Drawing;
 
 namespace BlueControls.Controls {
 
-    [Designer(typeof(BasicDesigner))]
+    [Designer(typeof(TextBoxDesigner))]
     [DefaultEvent("TextChanged")]
-    public partial class TextBox : GenericControl, IContextMenu {
+    public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
         #region Fields
 
@@ -45,8 +46,7 @@ namespace BlueControls.Controls {
 
         private ExtText _eTxt;
 
-        private enDataFormat _Format = enDataFormat.Text;
-
+        private bool _FormatierungErlaubt = false;
         private string _LastCheckedText = string.Empty;
 
         private DateTime _LastUserActionForSpellChecking = DateTime.Now;
@@ -58,9 +58,8 @@ namespace BlueControls.Controls {
         private int _MouseValue;
 
         private bool _Multiline;
-
         private bool _MustCheck = true;
-
+        private string _Regex;
         private Slider _SliderY = null;
 
         private bool _SpellChecking;
@@ -112,12 +111,12 @@ namespace BlueControls.Controls {
             }
         }
 
-        [DefaultValue(enDataFormat.Text)]
-        public enDataFormat Format {
-            get => _Format;
+        [DefaultValue(false)]
+        public bool FormatierungErlaubt {
+            get => _FormatierungErlaubt;
             set {
-                if (_Format == value) { return; }
-                _Format = value;
+                if (value == FormatierungErlaubt) { return; }
+                _FormatierungErlaubt = value;
                 GenerateETXT(false);
             }
         }
@@ -137,7 +136,16 @@ namespace BlueControls.Controls {
             }
         }
 
-        //Zum Berechnen, was die Maus gerade macht
+        [DefaultValue("")]
+        public string Regex {
+            get => _Regex;
+            set {
+                if (value == _Regex) { return; }
+                _Regex = value;
+                GenerateETXT(false);
+            }
+        }
+
         [DefaultValue(false)]
         public bool SpellChecking {
             get => _SpellChecking;
@@ -161,13 +169,13 @@ namespace BlueControls.Controls {
 
         [DefaultValue("")]
         public new string Text {
-            get => _eTxt == null ? string.Empty : _Format == enDataFormat.Text_mit_Formatierung ? _eTxt.HtmlText : _eTxt.PlainText;
+            get => _eTxt == null ? string.Empty : _FormatierungErlaubt ? _eTxt.HtmlText : _eTxt.PlainText;
             set {
                 if (!string.IsNullOrEmpty(value)) {
                     value = value.Replace("\n", string.Empty);
                     value = value.Replace("\r", "\r\n");
                 }
-                if (_Format == enDataFormat.Text_mit_Formatierung) {
+                if (_FormatierungErlaubt) {
                     if (_eTxt != null && value == _eTxt.HtmlText) { return; }
                 } else {
                     if (_eTxt != null && value == _eTxt.PlainText) { return; }
@@ -176,7 +184,7 @@ namespace BlueControls.Controls {
                 lock (Dictionary.Lock_SpellChecking) {
                     _eTxt = null;
                     GenerateETXT(true);
-                    if (_Format == enDataFormat.Text_mit_Formatierung) {
+                    if (_FormatierungErlaubt) {
                         _eTxt.HtmlText = value;
                     } else {
                         _eTxt.PlainText = value;
@@ -355,7 +363,7 @@ namespace BlueControls.Controls {
                 items.Add(enContextMenuComands.Ausschneiden, Convert.ToBoolean(_MarkStart >= 0) && Enabled);
                 items.Add(enContextMenuComands.Kopieren, Convert.ToBoolean(_MarkStart >= 0));
                 items.Add(enContextMenuComands.Einfügen, System.Windows.Forms.Clipboard.ContainsText() && Enabled);
-                if (_Format == enDataFormat.Text_mit_Formatierung) {
+                if (_FormatierungErlaubt) {
                     items.AddSeparator();
                     items.Add("Sonderzeichen einfügen", "#Sonderzeichen", QuickImage.Get(enImageCode.Sonne, 16), _Cursor_CharPos > -1);
                     if (Convert.ToBoolean(_MarkEnd > -1)) {
@@ -388,19 +396,21 @@ namespace BlueControls.Controls {
 
         public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
-        /// <summary>
-        /// Prüft - bei Multiline Zeile für Zeile - ob der Text in der Textbox zulässig ist.
-        /// </summary>
-        /// <param name="mitMeldung"></param>
-        /// <returns>Ergibt Wahr, wenn der komplette Text dem Format entspricht. Andernfalls Falsch.</returns>
-        /// <remarks></remarks>
-        public bool Text_IsOkay(bool mitMeldung) {
-            if (!_eTxt.PlainText.IsFormat(_Format, _Multiline, null)) {
-                if (mitMeldung) { MessageBox.Show("Ihre Eingabe entspricht nicht<br>dem erwarteten Format.", enImageCode.Warnung, "OK"); }
-                return false;
-            }
-            return true;
-        }
+        ///// <summary>
+        ///// Prüft - bei Multiline Zeile für Zeile - ob der Text in der Textbox zulässig ist.
+        ///// </summary>
+        ///// <param name="mitMeldung"></param>
+        ///// <returns>Ergibt Wahr, wenn der komplette Text dem Format entspricht. Andernfalls Falsch.</returns>
+        ///// <remarks></remarks>
+        //public bool Text_IsOkay(bool mitMeldung) {
+        //    var tmp=
+
+        //    if (!_eTxt.PlainText.IsFormat(_Format, _Multiline, null)) {
+        //        if (mitMeldung) { MessageBox.Show("Ihre Eingabe entspricht nicht<br>dem erwarteten Format.", enImageCode.Warnung, "OK"); }
+        //        return false;
+        //    }
+        //    return true;
+        //}
 
         public void Unmark(enMarkState markstate) => _eTxt?.Unmark(markstate);
 
@@ -915,7 +925,7 @@ namespace BlueControls.Controls {
                 ResetCoords = true;
             }
             _eTxt.Multiline = _Multiline;
-            _eTxt.AllowedChars = !string.IsNullOrEmpty(_AllowedChars) ? _AllowedChars : _Format.AllowedChars();
+            _eTxt.AllowedChars = _AllowedChars;
             if (ResetCoords) {
                 // Hier Standard-Werte Setzen, die Draw-Routine setzt bei Bedarf um
                 if (_SliderY != null) {

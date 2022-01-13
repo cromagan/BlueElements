@@ -116,7 +116,6 @@ namespace BlueControls.Classes_Editor
             // ExportIntervall
             // 
             this.ExportIntervall.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.ExportIntervall.Format = BlueBasics.Enums.enDataFormat.Gleitkommazahl;
             this.ExportIntervall.Location = new System.Drawing.Point(120, 24);
             this.ExportIntervall.Name = "ExportIntervall";
             this.ExportIntervall.Size = new System.Drawing.Size(80, 22);
@@ -135,7 +134,6 @@ namespace BlueControls.Classes_Editor
             // ExportAutomatischLöschen
             // 
             this.ExportAutomatischLöschen.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.ExportAutomatischLöschen.Format = BlueBasics.Enums.enDataFormat.Gleitkommazahl;
             this.ExportAutomatischLöschen.Location = new System.Drawing.Point(120, 46);
             this.ExportAutomatischLöschen.Name = "ExportAutomatischLöschen";
             this.ExportAutomatischLöschen.Size = new System.Drawing.Size(80, 22);

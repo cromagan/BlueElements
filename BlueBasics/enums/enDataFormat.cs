@@ -26,8 +26,10 @@ namespace BlueBasics.Enums {
         Text = 1,
 
         Bit = 2,
-        Ganzzahl = 3,
-        Gleitkommazahl = 6,
+
+        //Ganzzahl = 3,
+        //Gleitkommazahl = 6,
+
         BildCode = 13,
 
         // Date_GermanFormat = 15

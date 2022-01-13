@@ -128,8 +128,6 @@ namespace BlueDatabase {
                 case enDataFormat.Text:
                 case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.Link_To_Filesystem:
-                case enDataFormat.Gleitkommazahl:
-                case enDataFormat.Ganzzahl:
                 case enDataFormat.Values_für_LinkedCellDropdown:
                 case enDataFormat.RelationText:
                 case enDataFormat.LinkedCell:  // Bei LinkedCell kommt direkt der Text der verlinkten Zelle an

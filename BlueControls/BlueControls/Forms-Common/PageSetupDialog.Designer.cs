@@ -79,7 +79,6 @@ namespace BlueControls.Forms
             // Rechts
             // 
             this.Rechts.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.Rechts.Format = BlueBasics.Enums.enDataFormat.Gleitkommazahl;
             this.Rechts.Location = new System.Drawing.Point(160, 56);
             this.Rechts.Name = "Rechts";
             this.Rechts.Size = new System.Drawing.Size(56, 24);
@@ -90,7 +89,6 @@ namespace BlueControls.Forms
             // Links
             // 
             this.Links.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.Links.Format = BlueBasics.Enums.enDataFormat.Gleitkommazahl;
             this.Links.Location = new System.Drawing.Point(48, 56);
             this.Links.Name = "Links";
             this.Links.Size = new System.Drawing.Size(56, 24);
@@ -101,7 +99,6 @@ namespace BlueControls.Forms
             // Unten
             // 
             this.Unten.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.Unten.Format = BlueBasics.Enums.enDataFormat.Gleitkommazahl;
             this.Unten.Location = new System.Drawing.Point(160, 24);
             this.Unten.Name = "Unten";
             this.Unten.Size = new System.Drawing.Size(56, 24);
@@ -112,7 +109,6 @@ namespace BlueControls.Forms
             // Oben
             // 
             this.Oben.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.Oben.Format = BlueBasics.Enums.enDataFormat.Gleitkommazahl;
             this.Oben.Location = new System.Drawing.Point(48, 24);
             this.Oben.Name = "Oben";
             this.Oben.Size = new System.Drawing.Size(56, 24);
@@ -191,7 +187,6 @@ namespace BlueControls.Forms
             // Breite
             // 
             this.Breite.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.Breite.Format = BlueBasics.Enums.enDataFormat.Gleitkommazahl;
             this.Breite.Location = new System.Drawing.Point(184, 56);
             this.Breite.Name = "Breite";
             this.Breite.Size = new System.Drawing.Size(56, 24);
@@ -218,7 +213,6 @@ namespace BlueControls.Forms
             // Höhe
             // 
             this.Höhe.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.Höhe.Format = BlueBasics.Enums.enDataFormat.Gleitkommazahl;
             this.Höhe.Location = new System.Drawing.Point(296, 56);
             this.Höhe.Name = "Höhe";
             this.Höhe.Size = new System.Drawing.Size(56, 24);

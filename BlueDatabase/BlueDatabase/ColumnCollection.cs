@@ -18,6 +18,7 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
+using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -109,23 +110,23 @@ namespace BlueDatabase {
             return null;
         }
 
-        public ColumnItem Add(string internalName) => Add(NextColumnKey(), internalName, internalName, string.Empty, enDataFormat.Text);
+        public ColumnItem Add(string internalName) => Add(NextColumnKey(), internalName, internalName, string.Empty, enVarType.Text);
 
-        public ColumnItem Add(long colKey) => Add(colKey, string.Empty, string.Empty, string.Empty, enDataFormat.Text);
+        public ColumnItem Add(long colKey) => Add(colKey, string.Empty, string.Empty, string.Empty, enVarType.Text);
 
-        public ColumnItem Add() => Add(NextColumnKey(), string.Empty, string.Empty, string.Empty, enDataFormat.Text);
+        public ColumnItem Add() => Add(NextColumnKey(), string.Empty, string.Empty, string.Empty, enVarType.Text);
 
-        public ColumnItem Add(string internalName, string caption, enDataFormat format) => Add(NextColumnKey(), internalName, caption, string.Empty, format);
+        public ColumnItem Add(string internalName, string caption, enVarType format) => Add(NextColumnKey(), internalName, caption, string.Empty, format);
 
-        public ColumnItem Add(string internalName, string caption, string suffix, enDataFormat format) => Add(NextColumnKey(), internalName, caption, suffix, format);
+        public ColumnItem Add(string internalName, string caption, string suffix, enVarType format) => Add(NextColumnKey(), internalName, caption, suffix, format);
 
-        public ColumnItem Add(long colKey, string internalName, string caption, string suffix, enDataFormat format) {
+        public ColumnItem Add(long colKey, string internalName, string caption, string suffix, enVarType format) {
             Database.AddPending(enDatabaseDataType.AddColumn, colKey, -1, string.Empty, colKey.ToString(), true);
             // Ruft anschließen AddFromParserAuf, der die Spalte endgülrig dazumacht
             var c = SearchByKey(colKey);
             c.Name = internalName;
             c.Caption = caption;
-            c.Format = format;
+            c.SetFormat(format);
             c.Suffix = suffix;
             return c;
         }
@@ -185,6 +186,7 @@ namespace BlueDatabase {
             c.Regex = source.Regex;
             //c.CompactView = Source.CompactView;
             c.ShowUndo = source.ShowUndo;
+            c.Translate = source.Translate;
             c.ShowMultiLineInOneLine = source.ShowMultiLineInOneLine;
             c.Ueberschrift1 = source.Ueberschrift1;
             c.Ueberschrift2 = source.Ueberschrift2;
@@ -395,6 +397,10 @@ namespace BlueDatabase {
                     }
                 }
             } while (true);
+
+            foreach (var thisColumn in this) {
+                thisColumn.Repair();
+            }
         }
 
         public ColumnItem SearchByKey(long key) {

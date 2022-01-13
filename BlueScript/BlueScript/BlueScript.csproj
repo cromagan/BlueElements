@@ -52,7 +52,7 @@
     <Compile Include="Methods\Method_BerechneVariable_Tilde.cs" />
     <Compile Include="Methods\Method_AddSuffix.cs" />
     <Compile Include="Methods\Method_BitmapToBase64.cs" />
-    <Compile Include="Methods\Method_ContainsWich.cs" />
+    <Compile Include="Methods\Method_ContainsWhich.cs" />
     <Compile Include="Methods\Method_RandomInt.cs" />
     <Compile Include="Methods\Method_DateTimeDifferenceInDays.cs" />
     <Compile Include="Methods\Method_DateTimeUTCNow.cs" />

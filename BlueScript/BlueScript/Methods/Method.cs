@@ -90,7 +90,7 @@ namespace BlueScript {
                 if (which == "~") {
                     (var pose, var _) = NextText(txt, pos + 1, Tilde, false, false, KlammernStd);
                     if (pose <= pos) { return new strGetEndFeedback("Variablen-Findung End-~-Zeichen nicht gefunden."); }
-                    var x = new Variable("dummy", txt.Substring(pos + 1, pose - pos - 1), s);
+                    var x = new Variable("dummy1", txt.Substring(pos + 1, pose - pos - 1), s);
                     if (x.Type != enVariableDataType.String) { return new strGetEndFeedback("Fehler beim Berechnen des Variablen-Namens."); }
                     thisV = s.Variablen.Get(x.ValueString);
                     endz = pose + 1;
@@ -155,7 +155,7 @@ namespace BlueScript {
                 if (exceptetType.HasFlag(enVariableDataType.Variable)) {
                     var varn = attributes[n];
                     if (varn.StartsWith("~") && varn.EndsWith("~")) {
-                        var tmp2 = new Variable("dummy", varn.Substring(1, varn.Length - 2), s);
+                        var tmp2 = new Variable("dummy2", varn.Substring(1, varn.Length - 2), s);
                         if (tmp2.Type != enVariableDataType.String) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.VariablenNamenBerechnungFehler, "Variablenname konnte nicht berechnet werden bei Attribut " + (n + 1).ToString()); }
                         varn = tmp2.ValueString;
                     }
@@ -164,7 +164,7 @@ namespace BlueScript {
                     v = s.Variablen.Get(varn);
                     if (v == null) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1).ToString()); }
                 } else {
-                    v = new Variable("dummy", attributes[n], s);
+                    v = new Variable("dummy3", attributes[n], s);
                     if (v == null) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.BerechnungFehlgeschlagen, "Berechnungsfehler bei Attribut " + (n + 1).ToString()); }
                 }
 

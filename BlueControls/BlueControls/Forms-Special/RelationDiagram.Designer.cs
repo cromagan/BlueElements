@@ -77,7 +77,6 @@ namespace BlueControls.Forms {
             // 
             // btnLastFiles
             // 
-            this.btnLastFiles.Format = BlueBasics.Enums.enDataFormat.Text;
             this.btnLastFiles.Verhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_ohne_Textumbruch;
             // 
             // btnNeu

@@ -346,7 +346,7 @@ namespace BlueControls.Controls {
         }
 
         private void btnAnsichtHinzufuegen_Click(object sender, System.EventArgs e) {
-            var ex = InputBox.Show("Geben sie den Namen<br>der neuen Ansicht ein:", "", enDataFormat.Text);
+            var ex = InputBox.Show("Geben sie den Namen<br>der neuen Ansicht ein:", "", enVarType.Text);
             if (string.IsNullOrEmpty(ex)) { return; }
             _Database.Views.Add(new ColumnViewCollection(_Database, "", ex));
             RedoView();
@@ -447,7 +447,7 @@ namespace BlueControls.Controls {
         private void btnRename_Click(object sender, System.EventArgs e) {
             var CurrView = CurrentView();
             if (CurrView == null || CurrView == _Database.Views[0]) { return; }
-            var n = InputBox.Show("Umbenennen:", CurrView.Name, enDataFormat.Text);
+            var n = InputBox.Show("Umbenennen:", CurrView.Name, enVarType.Text);
             if (!string.IsNullOrEmpty(n)) { CurrView.Name = n; }
             RedoView();
             SortColumnList();

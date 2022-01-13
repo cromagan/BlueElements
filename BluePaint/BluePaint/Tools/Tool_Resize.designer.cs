@@ -48,7 +48,6 @@ namespace BluePaint
             this.flxProzent.CaptionPosition = BlueBasics.Enums.enÜberschriftAnordnung.Links_neben_Dem_Feld;
             this.flxProzent.EditType = BlueBasics.Enums.enEditTypeFormula.Textfeld;
             this.flxProzent.FileEncryptionKey = null;
-            this.flxProzent.Format = BlueBasics.Enums.enDataFormat.Gleitkommazahl;
             this.flxProzent.Location = new System.Drawing.Point(8, 8);
             this.flxProzent.Name = "flxProzent";
             this.flxProzent.Size = new System.Drawing.Size(168, 32);

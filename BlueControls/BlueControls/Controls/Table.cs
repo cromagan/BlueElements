@@ -415,7 +415,7 @@ namespace BlueControls.Controls {
         public static void Database_NeedPassword(object sender, PasswordEventArgs e) {
             if (e.Handled) { return; }
             e.Handled = true;
-            e.Password = InputBox.Show("Bitte geben sie das Passwort ein,<br>um Zugriff auf diese Datenbank<br>zu erhalten:", string.Empty, enDataFormat.Text);
+            e.Password = InputBox.Show("Bitte geben sie das Passwort ein,<br>um Zugriff auf diese Datenbank<br>zu erhalten:", string.Empty, enVarType.Text);
         }
 
         public static void DoUndo(ColumnItem column, RowItem row) {
@@ -2172,7 +2172,8 @@ namespace BlueControls.Controls {
                 Box.Text = "";
             }
 
-            Box.Format = ContentHolderCellColumn.Format;
+            Box.FormatierungErlaubt = ContentHolderCellColumn.Format == enDataFormat.Text_mit_Formatierung;
+            Box.Regex = ContentHolderCellColumn.Regex;
             Box.AllowedChars = ContentHolderCellColumn.AllowedChars;
             Box.MultiLine = ContentHolderCellColumn.MultiLine;
             Box.Tag = CellCollection.KeyOfCell(cellInThisDatabaseColumn, cellInThisDatabaseRow?.Row); // ThisDatabase, der Wert wird beim einchecken in die Fremdzelle geschrieben

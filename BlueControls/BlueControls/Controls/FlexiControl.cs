@@ -24,6 +24,7 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -34,7 +35,7 @@ namespace BlueControls.Controls {
 
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("ValueChanged")]
-    public partial class FlexiControl : GenericControl, IBackgroundNone {
+    public partial class FlexiControl : GenericControl, IBackgroundNone, IInputFormat {
 
         #region Fields
 
@@ -63,14 +64,17 @@ namespace BlueControls.Controls {
 
         protected bool _MultiLine = false;
 
+        private string _AllowedChars = string.Empty;
         private Caption _CaptionObject;
 
         // None ist -1 und muss gesetzt sein!
         private int _ControlX = -1;
 
-        private enDataFormat _Format = enDataFormat.Text;
+        //private enVarType _Format = enVarType.Text;
         private Caption _InfoCaption;
+
         private string _InfoText = string.Empty;
+        private string _Regex = string.Empty;
         private bool _ShowInfoWhenDisabled = false;
         private string _Suffix = string.Empty;
         private string _Value = string.Empty;
@@ -117,6 +121,16 @@ namespace BlueControls.Controls {
         #endregion
 
         #region Properties
+
+        [DefaultValue("")]
+        public string AllowedChars {
+            get => _AllowedChars;
+            set {
+                if (_AllowedChars == value) { return; }
+                _AllowedChars = value;
+                UpdateControls();
+            }
+        }
 
         [DefaultValue("")]
         public string Caption {
@@ -199,19 +213,6 @@ namespace BlueControls.Controls {
             }
         }
 
-        /// <summary>
-        /// Falls das Steuerelement eine Suffix unterstützt, wird dieser angezeigt
-        /// </summary>
-        [DefaultValue(enDataFormat.Text)]
-        public enDataFormat Format {
-            get => _Format;
-            set {
-                if (_Format == value) { return; }
-                _Format = value;
-                UpdateControls();
-            }
-        }
-
         [DefaultValue("")]
         [Description("Zeigt rechts oben im Eck ein kleines Symbol an, dessen hier eingegebener Text angezeigt wird.")]
         public string InfoText {
@@ -232,6 +233,16 @@ namespace BlueControls.Controls {
             set {
                 if (_MultiLine == value) { return; }
                 _MultiLine = value;
+                UpdateControls();
+            }
+        }
+
+        [DefaultValue("")]
+        public string Regex {
+            get => _Regex;
+            set {
+                if (_Regex == value) { return; }
+                _Regex = value;
                 UpdateControls();
             }
         }
@@ -564,30 +575,31 @@ namespace BlueControls.Controls {
             _allinitialized = false;
         }
 
-        protected void StyleComboBox(ComboBox Control, ItemCollectionList list, ComboBoxStyle Style) {
-            Control.Enabled = Enabled;
-            Control.Format = _Format;
-            Control.Suffix = _Suffix;
-            Control.DropDownStyle = Style;
-            Control.Item.Clear();
-            Control.Item.AddRange(list);
-            Control.Item.Sort();
+        protected void StyleComboBox(ComboBox control, ItemCollectionList list, ComboBoxStyle style) {
+            control.Enabled = Enabled;
+            control.Suffix = _Suffix;
+            control.Regex = _Regex;
+            control.AllowedChars = _AllowedChars;
+            control.DropDownStyle = style;
+            control.Item.Clear();
+            control.Item.AddRange(list);
+            control.Item.Sort();
         }
 
-        protected void StyleListBox(ListBox Control, ColumnItem Column) {
-            Control.Enabled = Enabled;
-            Control.Item.Clear();
-            Control.Item.CheckBehavior = enCheckBehavior.MultiSelection;
-            if (Column == null) { return; }
+        protected void StyleListBox(ListBox control, ColumnItem column) {
+            control.Enabled = Enabled;
+            control.Item.Clear();
+            control.Item.CheckBehavior = enCheckBehavior.MultiSelection;
+            if (column == null) { return; }
             ItemCollectionList Item = new();
-            if (Column.DropdownBearbeitungErlaubt) {
-                ItemCollectionList.GetItemCollection(Item, Column, null, enShortenStyle.Both, 10000);
-                if (!Column.DropdownWerteAndererZellenAnzeigen) {
+            if (column.DropdownBearbeitungErlaubt) {
+                ItemCollectionList.GetItemCollection(Item, column, null, enShortenStyle.Both, 10000);
+                if (!column.DropdownWerteAndererZellenAnzeigen) {
                     bool again;
                     do {
                         again = false;
                         foreach (var ThisItem in Item) {
-                            if (!Column.DropDownItems.Contains(ThisItem.Internal)) {
+                            if (!column.DropDownItems.Contains(ThisItem.Internal)) {
                                 again = true;
                                 Item.Remove(ThisItem);
                                 break;
@@ -596,18 +608,18 @@ namespace BlueControls.Controls {
                     } while (again);
                 }
             }
-            Control.AddAllowed = enAddType.UserDef;
-            Control.FilterAllowed = false;
-            Control.MoveAllowed = false;
+            control.AddAllowed = enAddType.UserDef;
+            control.FilterAllowed = false;
+            control.MoveAllowed = false;
             switch (_EditType) {
                 case enEditTypeFormula.Gallery:
-                    Control.Appearance = enBlueListBoxAppearance.Gallery;
-                    Control.RemoveAllowed = true;
+                    control.Appearance = enBlueListBoxAppearance.Gallery;
+                    control.RemoveAllowed = true;
                     break;
 
                 case enEditTypeFormula.Listbox:
-                    Control.RemoveAllowed = true;
-                    Control.Appearance = enBlueListBoxAppearance.Listbox;
+                    control.RemoveAllowed = true;
+                    control.Appearance = enBlueListBoxAppearance.Listbox;
                     break;
             }
         }
@@ -623,14 +635,14 @@ namespace BlueControls.Controls {
             Control.AddAllowed = enAddType.UserDef;
         }
 
-        protected void StyleTextBox(TextBox Control, string AllowedChars, bool SpellChecking) {
-            Control.Enabled = Enabled;
-            Control.Format = _Format;
-            Control.Suffix = _Suffix;
-            Control.AllowedChars = AllowedChars;
-            Control.MultiLine = _MultiLine;
-            Control.SpellChecking = SpellChecking;
-            Control.Verhalten = _MultiLine || Height > 20
+        protected void StyleTextBox(TextBox control, bool spellChecking) {
+            control.Enabled = Enabled;
+            control.Suffix = _Suffix;
+            control.AllowedChars = _AllowedChars;
+            control.Regex = _Regex;
+            control.MultiLine = _MultiLine;
+            control.SpellChecking = spellChecking;
+            control.Verhalten = _MultiLine || Height > 20
                 ? enSteuerelementVerhalten.Scrollen_mit_Textumbruch
                 : enSteuerelementVerhalten.Scrollen_ohne_Textumbruch;
         }
@@ -787,7 +799,7 @@ namespace BlueControls.Controls {
         /// </summary>
         private TextBox Control_Create_TextBox() {
             TextBox Control = new();
-            StyleTextBox(Control, string.Empty, false);
+            StyleTextBox(Control, false);
             UpdateValueToControl();
             StandardBehandlung(Control);
             return Control;
@@ -931,12 +943,10 @@ namespace BlueControls.Controls {
                 switch (Control) {
                     case ComboBox ComboBox:
                         ComboBox.Suffix = _Suffix;
-                        ComboBox.Format = _Format;
                         break;
 
                     case TextBox TextBox:
                         TextBox.Suffix = _Suffix;
-                        TextBox.Format = _Format;
                         break;
 
                     case EasyPic _:

@@ -103,12 +103,12 @@ namespace BlueControls.Forms {
 
         private void DrawSampleAndCheckButton() {
             var makeP = true;
-            if (!Breite.Text.IsFormat(enDataFormat.Gleitkommazahl)) { makeP = false; }
-            if (!Höhe.Text.IsFormat(enDataFormat.Gleitkommazahl)) { makeP = false; }
-            if (!Oben.Text.IsFormat(enDataFormat.Gleitkommazahl)) { makeP = false; }
-            if (!Unten.Text.IsFormat(enDataFormat.Gleitkommazahl)) { makeP = false; }
-            if (!Links.Text.IsFormat(enDataFormat.Gleitkommazahl)) { makeP = false; }
-            if (!Rechts.Text.IsFormat(enDataFormat.Gleitkommazahl)) { makeP = false; }
+            if (!Breite.Text.IsNumeral()) { makeP = false; }
+            if (!Höhe.Text.IsNumeral()) { makeP = false; }
+            if (!Oben.Text.IsNumeral()) { makeP = false; }
+            if (!Unten.Text.IsNumeral()) { makeP = false; }
+            if (!Links.Text.IsNumeral()) { makeP = false; }
+            if (!Rechts.Text.IsNumeral()) { makeP = false; }
             double br = 0;
             double ho = 0;
             if (makeP) {

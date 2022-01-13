@@ -104,7 +104,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void btnAnsichtUmbenennen_Click(object sender, System.EventArgs e) {
-            var n = InputBox.Show("Umbenennen:", _TableView.CurrentArrangement.Name, enDataFormat.Text);
+            var n = InputBox.Show("Umbenennen:", _TableView.CurrentArrangement.Name, enVarType.Text);
             if (!string.IsNullOrEmpty(n)) { _TableView.CurrentArrangement.Name = n; }
         }
 
@@ -180,7 +180,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (_TableView.Arrangement < 0) { return; }
             var c = _TableView.CursorPosColumn();
             if (c == null) { return; }
-            var p = InputBox.Show("<b>" + _TableView.CursorPosColumn().ReadableText() + "</b><br>Auf welche Position verschieben?<br>Info: Nummerierung beginnt mit 1", "", enDataFormat.Ganzzahl);
+            var p = InputBox.Show("<b>" + _TableView.CursorPosColumn().ReadableText() + "</b><br>Auf welche Position verschieben?<br>Info: Nummerierung beginnt mit 1", "", enVarType.Integer);
             if (int.TryParse(p, out var index)) {
                 if (index < 1) { return; }
                 index--;
@@ -329,11 +329,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
             string newname;
             if (MitVorlage) {
-                newname = InputBox.Show("Die aktuelle Ansicht wird <b>kopiert</b>.<br><br>Geben sie den Namen<br>der neuen Anordnung ein:", "", enDataFormat.Text);
+                newname = InputBox.Show("Die aktuelle Ansicht wird <b>kopiert</b>.<br><br>Geben sie den Namen<br>der neuen Anordnung ein:", "", enVarType.Text);
                 if (string.IsNullOrEmpty(newname)) { return; }
                 _TableView.Database.ColumnArrangements.Add(new ColumnViewCollection(_TableView.Database, _TableView.CurrentArrangement.ToString(), newname));
             } else {
-                newname = InputBox.Show("Geben sie den Namen<br>der neuen Anordnung ein:", "", enDataFormat.Text);
+                newname = InputBox.Show("Geben sie den Namen<br>der neuen Anordnung ein:", "", enVarType.Text);
                 if (string.IsNullOrEmpty(newname)) { return; }
                 _TableView.Database.ColumnArrangements.Add(new ColumnViewCollection(_TableView.Database, "", newname));
             }

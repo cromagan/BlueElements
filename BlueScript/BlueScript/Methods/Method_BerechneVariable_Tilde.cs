@@ -49,7 +49,7 @@ namespace BlueScript {
 
             if (postilde + 1 != posgleich) { return new strDoItFeedback("Variablen-Namen-Berechung kein gültiges End-~-Zeichen gefunden."); }
 
-            var x = new Variable("dummy", infos.AttributText.Substring(0, postilde), s);
+            var x = new Variable("dummy4", infos.AttributText.Substring(0, postilde), s);
             if (x.Type != enVariableDataType.String) { return new strDoItFeedback("Fehler beim Berechnen des Variablen-Namens."); }
 
             var newcommand = x.ValueString + infos.AttributText.Substring(posgleich) + ";";

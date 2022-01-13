@@ -244,6 +244,7 @@ namespace BlueControls.Forms {
             this.btnLastFiles.ImageCode = "Ordner";
             this.btnLastFiles.Location = new System.Drawing.Point(136, 2);
             this.btnLastFiles.Name = "btnLastFiles";
+            this.btnLastFiles.Regex = null;
             this.btnLastFiles.Size = new System.Drawing.Size(104, 66);
             this.btnLastFiles.TabIndex = 11;
             this.btnLastFiles.Text = "zuletzt geöffnete Dateien";
@@ -480,10 +481,11 @@ namespace BlueControls.Forms {
             // 
             // txbRasterFangen
             // 
+            this.txbRasterFangen.AllowedChars = "0123456789";
             this.txbRasterFangen.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbRasterFangen.Format = BlueBasics.Enums.enDataFormat.Gleitkommazahl;
             this.txbRasterFangen.Location = new System.Drawing.Point(72, 46);
             this.txbRasterFangen.Name = "txbRasterFangen";
+            this.txbRasterFangen.Regex = "^((-?[1-9]\\d*)|0)$";
             this.txbRasterFangen.Size = new System.Drawing.Size(64, 22);
             this.txbRasterFangen.Suffix = "mm";
             this.txbRasterFangen.TabIndex = 6;
@@ -492,10 +494,11 @@ namespace BlueControls.Forms {
             // 
             // txbRasterAnzeige
             // 
+            this.txbRasterAnzeige.AllowedChars = "0123456789";
             this.txbRasterAnzeige.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbRasterAnzeige.Format = BlueBasics.Enums.enDataFormat.Gleitkommazahl;
             this.txbRasterAnzeige.Location = new System.Drawing.Point(72, 24);
             this.txbRasterAnzeige.Name = "txbRasterAnzeige";
+            this.txbRasterAnzeige.Regex = "^((-?[1-9]\\d*)|0)$";
             this.txbRasterAnzeige.Size = new System.Drawing.Size(64, 22);
             this.txbRasterAnzeige.Suffix = "mm";
             this.txbRasterAnzeige.TabIndex = 5;
@@ -590,6 +593,7 @@ namespace BlueControls.Forms {
             this.cbxSchriftGröße.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cbxSchriftGröße.Location = new System.Drawing.Point(208, 46);
             this.cbxSchriftGröße.Name = "cbxSchriftGröße";
+            this.cbxSchriftGröße.Regex = null;
             this.cbxSchriftGröße.Size = new System.Drawing.Size(168, 22);
             this.cbxSchriftGröße.TabIndex = 3;
             this.cbxSchriftGröße.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.cbxSchriftGröße_ItemClicked);
@@ -610,6 +614,7 @@ namespace BlueControls.Forms {
             this.PadDesign.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.PadDesign.Location = new System.Drawing.Point(112, 24);
             this.PadDesign.Name = "PadDesign";
+            this.PadDesign.Regex = null;
             this.PadDesign.Size = new System.Drawing.Size(264, 22);
             this.PadDesign.TabIndex = 1;
             this.PadDesign.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.PadDesign_ItemClicked);

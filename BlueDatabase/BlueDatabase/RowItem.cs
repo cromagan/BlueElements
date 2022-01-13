@@ -136,10 +136,6 @@ namespace BlueDatabase {
                         new Variable(column.Name, "false", enVariableDataType.Bool, ro, false, "Spalte: " + column.ReadableText()));
                     break;
 
-                case enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl:
-                    vars.Add(new Variable(column.Name, wert, enVariableDataType.Numeral, ro, false, "Spalte: " + column.ReadableText()));
-                    break;
-
                 case enDataFormat.Link_To_Filesystem:
                     vars.Add(new Variable(column.Name, wert, enVariableDataType.String, ro, false, "Spalte: " + column.ReadableText() + "\r\nFalls die Datei auf der Festplatte existiert, wird eine weitere\r\nVariable erzeugt: " + column.Name + "_FileName"));
 
@@ -161,7 +157,11 @@ namespace BlueDatabase {
                     break;
 
                 default:
-                    vars.Add(new Variable(column.Name, wert, enVariableDataType.String, ro, false, "Spalte: " + column.ReadableText()));
+                    if (column.SortMask is enSortierTyp.ZahlenwertInt or enSortierTyp.ZahlenwertFloat) {
+                        vars.Add(new Variable(column.Name, wert, enVariableDataType.Numeral, ro, false, "Spalte: " + column.ReadableText()));
+                    } else {
+                        vars.Add(new Variable(column.Name, wert, enVariableDataType.String, ro, false, "Spalte: " + column.ReadableText()));
+                    }
                     break;
             };
 
@@ -569,10 +569,10 @@ namespace BlueDatabase {
                     }
                     return;
 
-                case enDataFormat.Ganzzahl:
-                case enDataFormat.Gleitkommazahl:
-                    CellSet(column, ColumnVar.ValueString);
-                    return;
+                //case enDataFormat.Ganzzahl:
+                //case enDataFormat.Gleitkommazahl:
+                //    CellSet(column, ColumnVar.ValueString);
+                //    return;
 
                 case enDataFormat.Text:
                 case enDataFormat.BildCode:

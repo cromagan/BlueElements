@@ -373,7 +373,6 @@ namespace BlueControls.Forms
             this.flxAbstand.CaptionPosition = BlueBasics.Enums.enÜberschriftAnordnung.Links_neben_Dem_Feld;
             this.flxAbstand.EditType = BlueBasics.Enums.enEditTypeFormula.Textfeld;
             this.flxAbstand.FileEncryptionKey = null;
-            this.flxAbstand.Format = BlueBasics.Enums.enDataFormat.Gleitkommazahl;
             this.flxAbstand.Location = new System.Drawing.Point(296, 8);
             this.flxAbstand.Name = "flxAbstand";
             this.flxAbstand.QuickInfo = "Abstand zwischen zwei Einträgen";
@@ -388,7 +387,6 @@ namespace BlueControls.Forms
             this.flxHöhe.CaptionPosition = BlueBasics.Enums.enÜberschriftAnordnung.Links_neben_Dem_Feld;
             this.flxHöhe.EditType = BlueBasics.Enums.enEditTypeFormula.Textfeld;
             this.flxHöhe.FileEncryptionKey = null;
-            this.flxHöhe.Format = BlueBasics.Enums.enDataFormat.Gleitkommazahl;
             this.flxHöhe.Location = new System.Drawing.Point(152, 8);
             this.flxHöhe.Name = "flxHöhe";
             this.flxHöhe.QuickInfo = "Höhe des endgültigen Bildes";
@@ -403,7 +401,6 @@ namespace BlueControls.Forms
             this.flxBreite.CaptionPosition = BlueBasics.Enums.enÜberschriftAnordnung.Links_neben_Dem_Feld;
             this.flxBreite.EditType = BlueBasics.Enums.enEditTypeFormula.Textfeld;
             this.flxBreite.FileEncryptionKey = null;
-            this.flxBreite.Format = BlueBasics.Enums.enDataFormat.Gleitkommazahl;
             this.flxBreite.Location = new System.Drawing.Point(8, 8);
             this.flxBreite.Name = "flxBreite";
             this.flxBreite.QuickInfo = "Breite des endgültigen Bildes";

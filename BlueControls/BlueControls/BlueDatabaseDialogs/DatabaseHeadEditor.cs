@@ -206,7 +206,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             var l = (BitmapListItem)e.HotItem;
             switch (e.ClickedComand) {
                 case "Umbenennen":
-                    var n = InputBox.Show("<b><u>Bild umbenennen:</u></b><br><br>Achtung! Dadruch können Bezüge<br> in Texten und Spalten verlorengehen!", l.Caption, enDataFormat.Text);
+                    var n = InputBox.Show("<b><u>Bild umbenennen:</u></b><br><br>Achtung! Dadruch können Bezüge<br> in Texten und Spalten verlorengehen!", l.Caption, enVarType.Text);
                     if (!string.IsNullOrEmpty(n)) { l.Caption = n; }
                     break;
 
@@ -388,20 +388,20 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void GenerateUndoTabelle() {
             Database x = new(true);
-            x.Column.Add("hidden", "hidden", enDataFormat.Text);
-            x.Column.Add("Index", "Index", enDataFormat.Ganzzahl);
-            x.Column.Add("db", "Herkunft", enDataFormat.Text);
-            x.Column.Add("ColumnKey", "Spalten-<br>Schlüssel", enDataFormat.Ganzzahl);
-            x.Column.Add("ColumnName", "Spalten-<br>Name", enDataFormat.Text);
-            x.Column.Add("ColumnCaption", "Spalten-<br>Beschriftung", enDataFormat.Text);
-            x.Column.Add("RowKey", "Zeilen-<br>Schlüssel", enDataFormat.Ganzzahl);
-            x.Column.Add("RowFirst", "Zeile, Wert der<br>1. Spalte", enDataFormat.Text);
-            x.Column.Add("Aenderzeit", "Änder-<br>Zeit", enDataFormat.Text);
-            x.Column.Add("Aenderer", "Änderer", enDataFormat.Text);
-            x.Column.Add("Symbol", "Symbol", enDataFormat.BildCode);
-            x.Column.Add("Aenderung", "Änderung", enDataFormat.Text);
-            x.Column.Add("WertAlt", "Wert alt", enDataFormat.Text);
-            x.Column.Add("WertNeu", "Wert neu", enDataFormat.Text);
+            x.Column.Add("hidden", "hidden", enVarType.Text);
+            x.Column.Add("Index", "Index", enVarType.Integer);
+            x.Column.Add("db", "Herkunft", enVarType.Text);
+            x.Column.Add("ColumnKey", "Spalten-<br>Schlüssel", enVarType.Integer);
+            x.Column.Add("ColumnName", "Spalten-<br>Name", enVarType.Text);
+            x.Column.Add("ColumnCaption", "Spalten-<br>Beschriftung", enVarType.Text);
+            x.Column.Add("RowKey", "Zeilen-<br>Schlüssel", enVarType.Integer);
+            x.Column.Add("RowFirst", "Zeile, Wert der<br>1. Spalte", enVarType.Text);
+            x.Column.Add("Aenderzeit", "Änder-<br>Zeit", enVarType.Text);
+            x.Column.Add("Aenderer", "Änderer", enVarType.Text);
+            x.Column.Add("Symbol", "Symbol", enVarType.Text);
+            x.Column.Add("Aenderung", "Änderung", enVarType.Text);
+            x.Column.Add("WertAlt", "Wert alt", enVarType.Text);
+            x.Column.Add("WertNeu", "Wert neu", enVarType.Text);
             foreach (var ThisColumn in x.Column) {
                 if (string.IsNullOrEmpty(ThisColumn.Identifier)) {
                     ThisColumn.MultiLine = true;

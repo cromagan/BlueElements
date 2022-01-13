@@ -243,6 +243,8 @@ namespace BlueDatabase.Enums {
         co_AfterEdit_AutoReplace = 195,
         co_FilterOptions = 196,
         co_CaptionBitmapTXT = 197,
+        co_Translate = 198,
+
         ce_Value_withoutSizeData = 200,
         ce_Value_withSizeData = 201,
 

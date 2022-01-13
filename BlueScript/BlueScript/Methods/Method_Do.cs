@@ -98,8 +98,8 @@ namespace BlueScript {
             if (string.IsNullOrEmpty(s1) && check != "!") { return string.Empty; }
             if (string.IsNullOrEmpty(s2)) { return string.Empty; }
             Variable v1 = null;
-            if (check != "!") { v1 = new Variable("dummy", s1, null); }
-            Variable v2 = new("dummy", s2, null);
+            if (check != "!") { v1 = new Variable("dummy5", s1, null); }
+            Variable v2 = new("dummy6", s2, null);
             // V2 braucht nicht gepürft werden, muss ja eh der gleiche TYpe wie V1 sein
             if (v1 != null) {
                 if (v1.Type != v2.Type) { return string.Empty; }

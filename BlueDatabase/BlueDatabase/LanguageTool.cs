@@ -103,10 +103,8 @@ namespace BlueDatabase {
         }
 
         private static string ColumnReplaceTranslated(string newTXT, ColumnItem column) {
-            return column.Format switch {
-                enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl or enDataFormat.FarbeInteger or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem => newTXT,
-                _ => DoTranslate(newTXT, false),
-            };
+            if (column.Translate == enTranslationType.Übersetzen) { return DoTranslate(newTXT, false); }
+            return newTXT;
         }
 
         #endregion

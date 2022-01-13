@@ -50,7 +50,7 @@ namespace BlueControls {
             if (!DictionaryRunning(true)) { return true; }
             if (string.IsNullOrEmpty(Word)) { return true; }
             if (Word.Length == 1) { return true; }
-            if (Word.IsFormat(enDataFormat.Gleitkommazahl)) { return true; }
+            if (Word.IsNumeral()) { return true; }
             if (Constants.Char_Numerals.Contains(Word.Substring(0, 1))) { return true; }// z.B. 00 oder 1b oder 2L
             if (Word != Word.ToLower() && Word != Word.ToUpper() && Word != Word.Substring(0, 1).ToUpper() + Word.Substring(1).ToLower()) { return false; }
             if (Word == Word.ToLower()) {

@@ -19,17 +19,18 @@ using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using static BlueBasics.Extensions;
 
 namespace BlueScript {
 
-    internal class Method_Contains : Method {
+    internal class Method_ContainsWhitch : Method {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.Variable_List_Or_String, enVariableDataType.Bool, enVariableDataType.String_or_List };
+        public override List<enVariableDataType> Args => new() { enVariableDataType.String_or_List, enVariableDataType.Bool, enVariableDataType.String_or_List };
 
-        public override string Description => "Bei Listen: Prüft, ob einer der Werte in der Liste steht. Bei String: Prüft ob eine der Zeichenketten vorkommt.";
+        public override string Description => "Prüft ob eine der Zeichenketten als ganzes Wort vorkommt. Gibt dann als Liste alle gefundenen Strings zurück.";
 
         public override bool EndlessArgs => true;
 
@@ -37,21 +38,23 @@ namespace BlueScript {
 
         public override bool GetCodeBlockAfter => false;
 
-        public override enVariableDataType Returns => enVariableDataType.Bool;
+        public override enVariableDataType Returns => enVariableDataType.List;
 
         public override string StartSequence => "(";
 
-        public override string Syntax => "Contains(ListVariable/StringVariable, CaseSensitive, Value1, Value2, ...)";
+        public override string Syntax => "ContainsWhich(String, CaseSensitive, Value1, Value2, ...)";
 
         #endregion
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "contains" };
+        public override List<string> Comand(Script s) => new() { "containswhich" };
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+
+            var found = new List<string>();
 
             #region Wortliste erzeugen
 
@@ -65,32 +68,16 @@ namespace BlueScript {
 
             #endregion
 
-            if (attvar.Attributes[0].Type == enVariableDataType.List) {
-                var x = attvar.Attributes[0].ValueListString;
-                foreach (var thisW in wordlist) {
-                    if (x.Contains(thisW, attvar.Attributes[1].ValueBool)) {
-                        return strDoItFeedback.Wahr();
-                    }
+            var rx = RegexOptions.None;
+            if (attvar.Attributes[1].ValueBool) { rx = RegexOptions.IgnoreCase; }
+
+            foreach (var thisW in wordlist) {
+                if (attvar.Attributes[0].ValueString.ContainsWord(thisW, rx)) {
+                    found.AddIfNotExists(thisW);
                 }
-                return strDoItFeedback.Falsch();
             }
 
-            if (attvar.Attributes[0].Type == enVariableDataType.String) {
-                foreach (var thisW in wordlist) {
-                    if (attvar.Attributes[1].ValueBool) {
-                        if (attvar.Attributes[0].ValueString.Contains(thisW)) {
-                            return strDoItFeedback.Wahr();
-                        }
-                    } else {
-                        if (attvar.Attributes[0].ValueString.ToLower().Contains(thisW.ToLower())) {
-                            return strDoItFeedback.Wahr();
-                        }
-                    }
-                }
-                return strDoItFeedback.Falsch();
-            }
-
-            return strDoItFeedback.FalscherDatentyp();
+            return new strDoItFeedback(found.JoinWithCr() + "\r", enVariableDataType.List);
         }
 
         #endregion

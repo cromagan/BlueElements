@@ -414,7 +414,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // txbGlobalScale
             // 
             this.txbGlobalScale.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbGlobalScale.Format = BlueBasics.Enums.enDataFormat.Gleitkommazahl;
             this.txbGlobalScale.Location = new System.Drawing.Point(168, 512);
             this.txbGlobalScale.Name = "txbGlobalScale";
             this.txbGlobalScale.Size = new System.Drawing.Size(160, 24);
@@ -462,7 +461,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // tbxReloadVerzoegerung
             // 
             this.tbxReloadVerzoegerung.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.tbxReloadVerzoegerung.Format = BlueBasics.Enums.enDataFormat.Ganzzahl;
             this.tbxReloadVerzoegerung.Location = new System.Drawing.Point(168, 488);
             this.tbxReloadVerzoegerung.Name = "tbxReloadVerzoegerung";
             this.tbxReloadVerzoegerung.Size = new System.Drawing.Size(160, 24);
@@ -682,7 +680,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // tbxUndoAnzahl
             // 
             this.tbxUndoAnzahl.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.tbxUndoAnzahl.Format = BlueBasics.Enums.enDataFormat.Ganzzahl;
             this.tbxUndoAnzahl.Location = new System.Drawing.Point(176, 8);
             this.tbxUndoAnzahl.Name = "tbxUndoAnzahl";
             this.tbxUndoAnzahl.Size = new System.Drawing.Size(88, 24);

@@ -70,6 +70,7 @@ namespace BlueBasics {
         public static string CompareKey(this string isValue, enSortierTyp format) {
             var CompareKey_S_OK = Constants.SecondSortChar + "X";
             var CompareKey_S_NOK = Constants.SecondSortChar + "A";
+
             switch (format) {
                 case enSortierTyp.ZahlenwertInt:
                     if (string.IsNullOrEmpty(isValue)) { return CompareKey_S_NOK + "A0000000000"; }
@@ -100,6 +101,13 @@ namespace BlueBasics {
                         if (dw >= 0) { t = "A" + t; }
                         while (t.Length < 15) { t += "0"; }
                         return CompareKey_S_OK + t;
+                    } else {
+                        return CompareKey_S_NOK + isValue;
+                    }
+
+                case enSortierTyp.Datum_Uhrzeit:
+                    if (DateTimeTryParse(isValue, out var d)) {
+                        return CompareKey_S_NOK + d.ToString(Constants.Format_Date);
                     } else {
                         return CompareKey_S_NOK + isValue;
                     }
@@ -351,13 +359,13 @@ namespace BlueBasics {
 
         public static bool IsDateTime(this string txt) => DateTimeTryParse(txt, out var _);
 
-        public static bool IsDouble(this string txt) => txt is not null && txt.IsFormat(enDataFormat.Gleitkommazahl);
+        public static bool IsDouble(this string txt) => txt is not null && double.TryParse(txt, out var _);
 
         public static bool IsHTMLColorCode(this string txt) => !string.IsNullOrEmpty(txt) && (txt.Length == 6 || txt.Length == 8) && txt.ContainsOnlyChars(Constants.Char_Numerals + "abcdefABCDEF");
 
-        public static bool IsLong(this string txt) => txt is not null && txt.IsFormat(enDataFormat.Ganzzahl);
+        public static bool IsLong(this string txt) => txt is not null && long.TryParse(txt, out var _);
 
-        public static bool IsNumeral(this string txt) => txt is not null && txt.IsFormat(enDataFormat.Ganzzahl) || txt.IsFormat(enDataFormat.Gleitkommazahl);
+        public static bool IsNumeral(this string txt) => txt is not null && txt.IsLong() || txt.IsDouble();
 
         // public static List<byte> ToByteList(this string TXT) {
         //    var x = new List<byte>();
@@ -519,6 +527,8 @@ namespace BlueBasics {
             }
             return txt;
         }
+
+        public static bool RegexMatch(this string txt, string regex) => string.IsNullOrEmpty(regex) || new Regex(regex).IsMatch(txt);
 
         /// <summary>
         /// Löscht alle angegebnen Zeichen aus dem String. Gross- und Kleinschreibung wird unterschieden.

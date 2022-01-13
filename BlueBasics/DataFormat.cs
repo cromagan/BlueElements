@@ -40,12 +40,8 @@ namespace BlueBasics {
                 case enDataFormat.Bit:
                     return "+-";
 
-                case enDataFormat.Ganzzahl:
                 case enDataFormat.FarbeInteger:
                     return Constants.Char_Numerals + "-";
-
-                case enDataFormat.Gleitkommazahl:
-                    return Constants.Char_Numerals + "-,";
 
                 case enDataFormat.Link_To_Filesystem:
                     return Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + Constants.Char_Numerals + ",.\\:_ +-()'";
@@ -64,37 +60,37 @@ namespace BlueBasics {
         }
 
         public static bool Autofilter_möglich(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.Bit or enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl or enDataFormat.BildCode or enDataFormat.FarbeInteger or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown or enDataFormat.RelationText => true,
+            enDataFormat.Text or enDataFormat.Bit or enDataFormat.BildCode or enDataFormat.FarbeInteger or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown or enDataFormat.RelationText => true,
             _ => false,
         };
 
         public static bool CanBeChangedByRules(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.Bit or enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl or enDataFormat.BildCode or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.LinkedCell => true,
+            enDataFormat.Text or enDataFormat.Bit or enDataFormat.BildCode or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.LinkedCell => true,
             _ => false,
         };
 
         public static bool CanBeCheckedByRules(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.Bit or enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl or enDataFormat.BildCode or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown => true,
+            enDataFormat.Text or enDataFormat.Bit or enDataFormat.BildCode or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown => true,
             _ => false,
         };
 
         public static bool DropdownItemsAllowed(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.Bit or enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl or enDataFormat.BildCode or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown or enDataFormat.RelationText => true,
+            enDataFormat.Text or enDataFormat.Bit or enDataFormat.BildCode or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown or enDataFormat.RelationText => true,
             _ => false,
         };
 
         public static bool DropdownItemsOfOtherCellsAllowed(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl or enDataFormat.BildCode or enDataFormat.FarbeInteger or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.LinkedCell or enDataFormat.RelationText => true,
+            enDataFormat.Text or enDataFormat.BildCode or enDataFormat.FarbeInteger or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.LinkedCell or enDataFormat.RelationText => true,
             _ => false,
         };
 
         public static bool DropdownUnselectAllAllowed(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl or enDataFormat.BildCode or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell => true,
+            enDataFormat.Text or enDataFormat.BildCode or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell => true,
             _ => false,
         };
 
         public static bool ExportableForLayout(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.Bit or enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl or enDataFormat.BildCode or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown => true,
+            enDataFormat.Text or enDataFormat.Bit or enDataFormat.BildCode or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown => true,
             _ => false,
         };
 
@@ -125,17 +121,12 @@ namespace BlueBasics {
         /// <param name="format"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static bool IsFormat(this string txt, enDataFormat format, string additionalRegex) => Text_LängeCheck(txt, format) && Text_SchabloneCheck(txt, format) && txt.ContainsOnlyChars(AllowedChars(format)) && Text_ValueCheck(txt, format) && Text_RegexCheck(txt, additionalRegex);
+        public static bool IsFormat(this string txt, enDataFormat format, string additionalRegex) => Text_LängeCheck(txt, format) && Text_SchabloneCheck(txt, format) && txt.ContainsOnlyChars(AllowedChars(format)) && Text_ValueCheck(txt, format) && txt.RegexMatch(additionalRegex);
 
         public static bool IsFormat(this string txt, enDataFormat format) => Text_LängeCheck(txt, format) && Text_SchabloneCheck(txt, format) && txt.ContainsOnlyChars(AllowedChars(format)) && Text_ValueCheck(txt, format);
 
-        public static bool IsZahl(this enDataFormat format) => format switch {
-            enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl => true,
-            _ => false,
-        };
-
         public static bool MultilinePossible(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl or enDataFormat.BildCode or enDataFormat.RelationText or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell => true,
+            enDataFormat.Text or enDataFormat.BildCode or enDataFormat.RelationText or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell => true,
             _ => false,
         };
 
@@ -160,7 +151,7 @@ namespace BlueBasics {
         };
 
         public static bool SaveSizeData(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.Bit or enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl or enDataFormat.BildCode or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.Values_für_LinkedCellDropdown => true,
+            enDataFormat.Text or enDataFormat.Bit or enDataFormat.BildCode or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.Values_für_LinkedCellDropdown => true,
             _ => false,
         };
 
@@ -186,8 +177,6 @@ namespace BlueBasics {
                 case enDataFormat.Bit:
                     return il == 1;
 
-                case enDataFormat.Ganzzahl:
-                case enDataFormat.Gleitkommazahl:
                 case enDataFormat.FarbeInteger:
                 case enDataFormat.BildCode:
                     return il > 0;
@@ -209,8 +198,6 @@ namespace BlueBasics {
             switch (format) {
                 case enDataFormat.Text:
                 case enDataFormat.Text_mit_Formatierung:
-                case enDataFormat.Gleitkommazahl:
-                case enDataFormat.Ganzzahl:
                 case enDataFormat.BildCode:
                 case enDataFormat.RelationText:
                 case enDataFormat.FarbeInteger:
@@ -234,8 +221,6 @@ namespace BlueBasics {
             }
         }
 
-        public static bool Text_RegexCheck(string txt, string regex) => string.IsNullOrEmpty(regex) || new Regex(regex).IsMatch(txt);
-
         /// <summary>
         /// Gibt zurück, ob der Text in die vordefinierte Schablone paßt.
         /// </summary>
@@ -258,15 +243,6 @@ namespace BlueBasics {
                 case enDataFormat.Bit:
                     return txt.Length == 1;
 
-                case enDataFormat.Gleitkommazahl:
-                    if (txt == "0") { return true; }
-                    if (txt == "-") { return false; }
-                    if (txt.Length > 1 && txt.Substring(0, 2) == "00") { return false; }
-                    if (txt.Length > 2 && txt.Substring(0, 3) == "-00") { return false; }
-                    if (txt.Length > 2 && txt.IndexOf("-", 1) > -1) { return false; }
-                    return true;
-
-                case enDataFormat.Ganzzahl:
                 case enDataFormat.FarbeInteger:
                     if (txt == "0") { return true; }
                     if (txt == "-") { return false; }
@@ -298,10 +274,6 @@ namespace BlueBasics {
                 case enDataFormat.Button:
                     return true;
 
-                case enDataFormat.Gleitkommazahl:
-                    return float.TryParse(tXT, out _);
-
-                case enDataFormat.Ganzzahl:
                 case enDataFormat.FarbeInteger:
                     return long.TryParse(tXT, out _);
 
@@ -316,7 +288,7 @@ namespace BlueBasics {
         }
 
         public static bool TextboxEditPossible(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.Ganzzahl or enDataFormat.Gleitkommazahl or enDataFormat.BildCode or enDataFormat.Text_mit_Formatierung or enDataFormat.LinkedCell or enDataFormat.RelationText => true,
+            enDataFormat.Text or enDataFormat.BildCode or enDataFormat.Text_mit_Formatierung or enDataFormat.LinkedCell or enDataFormat.RelationText => true,
             _ => false,
         };
 

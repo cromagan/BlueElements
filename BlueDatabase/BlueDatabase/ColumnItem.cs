@@ -27,10 +27,11 @@ using System.Drawing;
 using System.Text.RegularExpressions;
 using static BlueBasics.Extensions;
 using static BlueBasics.FileOperations;
+using BlueDatabase.Interfaces;
 
 namespace BlueDatabase {
 
-    public sealed class ColumnItem : IReadableTextWithChanging, ICompareKey, ICheckable, IDisposable {
+    public sealed class ColumnItem : IReadableTextWithChanging, ICompareKey, ICheckable, IDisposable, IInputFormat {
 
         #region Fields
 
@@ -109,6 +110,7 @@ namespace BlueDatabase {
         private bool _SpellCheckingEnabled;
         private string _Suffix;
         private bool _TextBearbeitungErlaubt;
+        private enTranslationType _Translate;
         private string _Ueberschrift1;
         private string _Ueberschrift2;
         private string _Ueberschrift3;
@@ -177,6 +179,7 @@ namespace BlueDatabase {
             _SpellCheckingEnabled = false;
             //_CompactView = true;
             _ShowUndo = true;
+            _Translate = enTranslationType.Original_Anzeigen;
             _ShowMultiLineInOneLine = false;
             _EditTrotzSperreErlaubt = false;
             _Suffix = string.Empty;
@@ -715,6 +718,15 @@ namespace BlueDatabase {
             }
         }
 
+        public enTranslationType Translate {
+            get => _Translate;
+            set {
+                if (_Translate == value) { return; }
+                Database.AddPending(enDatabaseDataType.co_Translate, this, ((int)_Translate).ToString(), ((int)value).ToString(), true);
+                OnChanged();
+            }
+        }
+
         public string Ueberschrift1 {
             get => _Ueberschrift1;
             set {
@@ -1081,7 +1093,7 @@ namespace BlueDatabase {
                 if (TMP_EditDialog == enEditTypeTable.None) { return "Format unterstützt keine Standard-Bearbeitung."; }
             } else {
                 if (_VorschlagsColumn > -1) { return "'Vorschlags-Text-Spalte' nur bei Texteingabe möglich."; }
-                if (!string.IsNullOrEmpty(_AllowedChars)) { return "'Erlaubte Zeichen' nur bei Texteingabe nötig."; }
+                //if (!string.IsNullOrEmpty(_AllowedChars)) { return "'Erlaubte Zeichen' nur bei Texteingabe nötig."; }
             }
             if (_DropdownBearbeitungErlaubt) {
                 if (_SpellCheckingEnabled) { return "Entweder Dropdownmenü oder Rechtschreibprüfung."; }
@@ -1111,9 +1123,7 @@ namespace BlueDatabase {
             if (_DropdownAllesAbwählenErlaubt && !_Format.DropdownUnselectAllAllowed()) { return "'Dropdownmenu alles abwählen' bei diesem Format nicht erlaubt."; }
             if (DropDownItems.Count > 0 && !_Format.DropdownItemsAllowed()) { return "Manuelle 'Dropdow-Items' bei diesem Format nicht erlaubt."; }
             if (_BildTextVerhalten != enBildTextVerhalten.Nur_Text) {
-                if (_Format is enDataFormat.Ganzzahl or
-                               enDataFormat.Gleitkommazahl or
-                               enDataFormat.Text or
+                if (_Format is enDataFormat.Text or
                                enDataFormat.Text_mit_Formatierung) {
                     // Performance-Teschnische Gründe
                     _BildTextVerhalten = enBildTextVerhalten.Nur_Text;
@@ -1136,8 +1146,6 @@ namespace BlueDatabase {
                 if (_Format is not enDataFormat.Text and
                     not enDataFormat.Columns_für_LinkedCellDropdown and
                     not enDataFormat.BildCode and
-                    not enDataFormat.Ganzzahl and
-                    not enDataFormat.Gleitkommazahl and
                     not enDataFormat.RelationText) { return "Format unterstützt keine Ersetzungen."; }
                 if (_FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled)) { return "Entweder 'Ersetzungen' oder 'erweiternden Autofilter'"; }
                 if (!string.IsNullOrEmpty(_AutoFilterJoker)) { return "Entweder 'Ersetzungen' oder 'Autofilter Joker'"; }
@@ -1489,72 +1497,79 @@ namespace BlueDatabase {
         }
 
         public void SetFormatForDate() {
-            Regex = @"^(0[1-9]|[12][0-9]|3[01]):(0[1-9]|1[0-2]):\d{4}$";
-            AllowedChars = Constants.Char_Numerals + ".";
+            Format = enDataFormat.Text;
+            this.SetFormat(enVarType.Date);
             Align = enAlignmentHorizontal.Links;
             SortMask = enSortierTyp.Datum_Uhrzeit;
+            Translate = enTranslationType.Datum;
         }
 
         public void SetFormatForDateTime() {
-            Regex = @"^(0[1-9]|[12][0-9]|3[01])[.](0[1-9]|1[0-2])[.]\d{4}[ ](0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$";
-            AllowedChars = Constants.Char_Numerals + ":. ";
+            Format = enDataFormat.Text;
+            this.SetFormat(enVarType.DateTime);
             Align = enAlignmentHorizontal.Links;
             SortMask = enSortierTyp.Datum_Uhrzeit;
+            Translate = enTranslationType.Datum;
         }
 
         public void SetFormatForEmail() {
-            //http://emailregex.com/
-            Regex = @"^[a-z0-9A-Z._-]{1,40}[@][a-z0-9A-Z._-]{1,40}[.][a-zA-Z]{1,3}$";
-            AllowedChars = Constants.Char_Numerals + Constants.Char_AZ + Constants.Char_az + "@._";
+            Format = enDataFormat.Text;
+            this.SetFormat(enVarType.Email);
+
             Align = enAlignmentHorizontal.Links;
             SortMask = enSortierTyp.Original_String;
+            Translate = enTranslationType.Original_Anzeigen;
         }
 
         public void SetFormatForFloat() {
-            //https://regex101.com/r/onr0NZ/1
-            Regex = @"(^-?([1-9]\d*)|^0)([.]\d*[1-9])?$";
-            AllowedChars = Constants.Char_Numerals + ",";
+            Format = enDataFormat.Text;
+            this.SetFormat(enVarType.Float);
             Align = enAlignmentHorizontal.Rechts;
+            Translate = enTranslationType.Gleitkommazahl;
 
             SortMask = enSortierTyp.ZahlenwertFloat;
         }
 
         public void SetFormatForInteger() {
-            Regex = @"^((-?[1-9]\d*)|0)$";
-
-            AllowedChars = Constants.Char_Numerals;
+            Format = enDataFormat.Text;
+            this.SetFormat(enVarType.Integer);
             Align = enAlignmentHorizontal.Rechts;
             SortMask = enSortierTyp.ZahlenwertInt;
+            Translate = enTranslationType.Original_Anzeigen;
         }
 
         public void SetFormatForPhoneNumber() {
-            //https://regex101.com/r/OzJr8j/1
-            Regex = @"^[+][1-9][\s0-9]*[0-9]$";
-            AllowedChars = Constants.Char_Numerals + "+ ";
+            Format = enDataFormat.Text;
+            this.SetFormat(enVarType.PhoneNumber);
             Align = enAlignmentHorizontal.Links;
             SortMask = enSortierTyp.Original_String;
+            Translate = enTranslationType.Original_Anzeigen;
         }
 
         public void SetFormatForText() {
+            Format = enDataFormat.Text;
+            this.SetFormat(enVarType.Text);
             Regex = string.Empty;
             AllowedChars = string.Empty;
             Align = enAlignmentHorizontal.Links;
             SortMask = enSortierTyp.Sprachneutral_String;
+            Translate = enTranslationType.Original_Anzeigen;
         }
 
         public void SetFormatForTextOptions() {
-            Regex = string.Empty;
-            AllowedChars = string.Empty;
+            this.SetFormat(enVarType.Text);
+            Format = enDataFormat.Text;
             Align = enAlignmentHorizontal.Links;
             SortMask = enSortierTyp.Sprachneutral_String;
+            Translate = enTranslationType.Übersetzen;
         }
 
         public void SetFormatForUrl() {
-            //    https://regex101.com/r/S2CbwM/1
-            Regex = @"^(https:|http:|www\.)\S*$";
-            AllowedChars = Constants.Char_Numerals + Constants.Char_AZ + Constants.Char_az + "._/";
+            Format = enDataFormat.Text;
+            this.SetFormat(enVarType.Url);
             Align = enAlignmentHorizontal.Links;
             SortMask = enSortierTyp.Original_String;
+            Translate = enTranslationType.Original_Anzeigen;
         }
 
         public string SimplyFile(string fullFileName) {
@@ -1652,8 +1667,6 @@ namespace BlueDatabase {
     enDataFormat.RelationText => QuickImage.Get(enImageCode.Herz, 16),
     enDataFormat.Bit => QuickImage.Get(enImageCode.Häkchen, 16),
     enDataFormat.FarbeInteger => QuickImage.Get(enImageCode.Pinsel, 16),
-    enDataFormat.Ganzzahl => QuickImage.Get(enImageCode.Ganzzahl, 16),
-    enDataFormat.Gleitkommazahl => QuickImage.Get(enImageCode.Gleitkommazahl, 16),
     enDataFormat.BildCode => QuickImage.Get(enImageCode.Smiley, 16),
     enDataFormat.LinkedCell => QuickImage.Get(enImageCode.Fernglas, 16),
     enDataFormat.Columns_für_LinkedCellDropdown => QuickImage.Get(enImageCode.Fernglas, 16, "FF0000", ""),
@@ -1690,8 +1703,6 @@ namespace BlueDatabase {
             switch (_Format) {
                 case enDataFormat.Text:
                 case enDataFormat.Text_mit_Formatierung:
-                case enDataFormat.Ganzzahl:
-                case enDataFormat.Gleitkommazahl:
                 case enDataFormat.BildCode:
                 case enDataFormat.RelationText:
                     if (editType_To_Check == enEditTypeFormula.Textfeld) { return true; } // Textfeld immer erlauben auch wenn beide Bearbeitungen nicht erlaubt sind. Einfach der Übersichtlichktei
@@ -1835,7 +1846,6 @@ namespace BlueDatabase {
 
                 case enDatabaseDataType.co_Format:
                     _Format = (enDataFormat)int.Parse(Wert);
-                    if (Wert == "21") { _Format = enDataFormat.Text; }
                     break;
 
                 case enDatabaseDataType.co_ForeColor:
@@ -2038,6 +2048,10 @@ namespace BlueDatabase {
                     _Prefix = Wert;
                     break;
 
+                case enDatabaseDataType.co_Translate:
+                    _Translate = (enTranslationType)int.Parse(Wert);
+                    break;
+
                 case enDatabaseDataType.co_BildTextVerhalten:
                     _BildTextVerhalten = (enBildTextVerhalten)int.Parse(Wert);
                     break;
@@ -2105,6 +2119,70 @@ namespace BlueDatabase {
 
         internal string ParsableColumnKey() => ColumnCollection.ParsableColumnKey(this);
 
+        internal void Repair() {
+            // Unbekannt = -1,
+            // Nothing = 0,
+            //    Text = 1,
+
+            //Bit = 2,
+
+            //BildCode = 13,
+
+            //// Binärdaten_Bild = 19,
+            //// Passwort = 20, // String
+            ////  Text_Ohne_Kritische_Zeichen = 21,
+            //// Binärdaten = 39,
+            //// Link_To_BlueDataSystem = 42
+            //// Telefonnummer = 43, // Spezielle Formate
+            //FarbeInteger = 45, // Color
+
+            //// Email = 46, // Spezielle Formate
+            //// InternetAdresse = 47, // Spezielle Formate
+            //// Relation = 65,
+            //// Event = 66,
+            //// Tendenz = 67
+            //// Einschätzung = 68,
+            //Schrift = 69,
+
+            //Text_mit_Formatierung = 70,
+
+            //// TextmitFormatierungUndLinkToAnotherDatabase = 71
+            //// Relation_And_Event_Mixed = 72,
+            //Link_To_Filesystem = 73,
+
+            //LinkedCell = 74,
+            //Columns_für_LinkedCellDropdown = 75,
+
+            //[Obsolete]
+            //    Values_für_LinkedCellDropdown = 76,
+
+            //RelationText = 77,
+
+            //// KeyForSame = 78
+            //Button = 79
+
+            //// bis 999 wird geprüft
+
+            switch ((int)_Format) {
+                case 21: //Text_Ohne_Kritische_Zeichen
+                    SetFormatForText();
+                    break;
+
+                case 15:// Date_GermanFormat = 15
+                case 16://Datum_und_Uhrzeit = 16,
+                    SetFormatForDateTime();
+                    break;
+
+                case 3:   //Ganzzahl = 3,
+                    SetFormatForInteger();
+                    break;
+
+                case 6:  //Gleitkommazahl = 6,
+                    SetFormatForFloat();
+                    break;
+            }
+        }
+
         internal void SaveToByteList(ref List<byte> l) {
             Database.SaveToByteList(l, enDatabaseDataType.co_Name, _Name, Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_Caption, _Caption, Key);
@@ -2159,6 +2237,7 @@ namespace BlueDatabase {
             Database.SaveToByteList(l, enDatabaseDataType.co_BestFile_StandardSuffix, _BestFile_StandardSuffix, Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_BildCode_ConstantHeight, _BildCode_ConstantHeight.ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_BildTextVerhalten, ((int)_BildTextVerhalten).ToString(), Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_Translate, ((int)_Translate).ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_Prefix, _Prefix, Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_KeyColumnKey, _KeyColumnKey.ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_RowKey, _LinkedCell_RowKey.ToString(), Key);

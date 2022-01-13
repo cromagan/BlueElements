@@ -152,12 +152,12 @@ namespace BlueControls {
 
         private void GenerateVariableTable() {
             Database x = new(true);
-            x.Column.Add("Name", "Name", enDataFormat.Text);
-            x.Column.Add("Typ", "Typ", enDataFormat.Text);
-            x.Column.Add("RO", "Schreibgeschützt", enDataFormat.Bit);
-            x.Column.Add("System", "Systemspalte", enDataFormat.Bit);
-            x.Column.Add("Inhalt", "Inhalt", enDataFormat.Text);
-            x.Column.Add("Kommentar", "Kommentar", enDataFormat.Text);
+            x.Column.Add("Name", "Name", enVarType.Text);
+            x.Column.Add("Typ", "Typ", enVarType.Text);
+            x.Column.Add("RO", "Schreibgeschützt", enVarType.Text);
+            x.Column.Add("System", "Systemspalte", enVarType.Text);
+            x.Column.Add("Inhalt", "Inhalt", enVarType.Text);
+            x.Column.Add("Kommentar", "Kommentar", enVarType.Text);
             foreach (var ThisColumn in x.Column) {
                 if (string.IsNullOrEmpty(ThisColumn.Identifier)) {
                     ThisColumn.MultiLine = true;

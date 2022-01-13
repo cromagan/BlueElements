@@ -109,7 +109,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void btnLayoutHinzu_Click(object sender, System.EventArgs e) {
             SaveCurrentLayout();
-            var ex = InputBox.Show("Geben sie den Namen<br>des neuen Layouts ein:", "", enDataFormat.Text);
+            var ex = InputBox.Show("Geben sie den Namen<br>des neuen Layouts ein:", "", enVarType.Text);
             if (string.IsNullOrEmpty(ex)) { return; }
             LoadLayout(string.Empty);
             CreativePad c = new();
@@ -143,7 +143,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 MessageBox.Show("Layout kann nur manuell umbenannt werden.");
                 return;
             }
-            var ex = InputBox.Show("Namen des Layouts ändern:", Pad.Item.Caption, enDataFormat.Text);
+            var ex = InputBox.Show("Namen des Layouts ändern:", Pad.Item.Caption, enVarType.Text);
             if (string.IsNullOrEmpty(ex)) { return; }
             Pad.Item.Caption = ex;
             SaveCurrentLayout();

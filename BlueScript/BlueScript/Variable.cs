@@ -577,8 +577,8 @@ namespace BlueScript {
                 #endregion
 
                 Variable v1 = null;
-                if (check != "!") { v1 = new Variable("dummy", s1, null); }
-                Variable v2 = new("dummy", s2, null);
+                if (check != "!") { v1 = new Variable("dummy7", s1, null); }
+                Variable v2 = new("dummy8", s2, null);
 
                 // V2 braucht nicht peprüft werden, muss ja eh der gleiche TYpe wie V1 sein
                 if (v1 != null) {

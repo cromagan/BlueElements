@@ -228,6 +228,12 @@ namespace BlueControls.Controls {
 
             var column1 = GetRealColumn(_tmpColumn, null);
 
+            if (column1 != null) {
+                Suffix = column1.Suffix;
+                Regex = column1.Regex;
+                AllowedChars = column1.AllowedChars;
+            }
+
             switch (e.Control) {
                 case ComboBox comboBox:
                     ItemCollectionList Item2 = new();
@@ -247,9 +253,9 @@ namespace BlueControls.Controls {
 
                 case TextBox textBox:
                     if (column1 == null) {
-                        StyleTextBox(textBox, string.Empty, false);
+                        StyleTextBox(textBox, false);
                     } else {
-                        StyleTextBox(textBox, column1.AllowedChars, column1.SpellCheckingEnabled);
+                        StyleTextBox(textBox, column1.SpellCheckingEnabled);
                     }
                     textBox.NeedDatabaseOfAdditinalSpecialChars += textBox_NeedDatabaseOfAdditinalSpecialChars;
                     textBox.GotFocus += GotFocus_TextBox;
@@ -493,7 +499,8 @@ namespace BlueControls.Controls {
 
             if (gbColumn != null) {
                 Suffix = gbColumn.Suffix;
-                Format = gbColumn.Format;
+                AllowedChars = gbColumn.AllowedChars;
+                Regex = gbColumn.Regex;
                 MultiLine = gbColumn.MultiLine;
             } else {
                 if (column == null) { return null; }  // Bei Steuerelementen, die manuell hinzugefügt werden

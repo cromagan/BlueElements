@@ -90,7 +90,7 @@ namespace BlueDatabase {
             if (InternalDatabase == null) {
                 InternalDatabase = new Database(filename, false, true);
                 if (InternalDatabase.Column.Exists("ID") == null) {
-                    InternalDatabase.Column.Add("ID", "ID", enDataFormat.Text);
+                    InternalDatabase.Column.Add("ID", "ID", enVarType.Text);
                     InternalDatabase.RepairAfterParse();
                     InternalDatabase.UndoCount = 50;
                     InternalDatabase.Column.SysCorrect.SaveContent = false;

@@ -139,6 +139,8 @@
     <Compile Include="Controls\ZoomPicWithPoints.Designer.cs">
       <DependentUpon>ZoomPicWithPoints.cs</DependentUpon>
     </Compile>
+    <Compile Include="Designer Support\TextBoxActionList.cs" />
+    <Compile Include="Designer Support\TextBoxDesigner.cs" />
     <Compile Include="Enums\enSnapMode.cs" />
     <Compile Include="Enums\enDesign.cs" />
     <Compile Include="Enums\enFilterTypesToShow.cs" />

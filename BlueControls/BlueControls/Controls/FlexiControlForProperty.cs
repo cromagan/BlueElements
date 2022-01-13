@@ -3,6 +3,7 @@ using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.ItemCollection;
 using BlueDatabase;
+using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -395,16 +396,18 @@ namespace BlueControls.Controls {
                                     Size = new Size(200, 24);
                                     _MultiLine = false;
                                 }
-                                Format = tmpName switch {
-                                    "system.string" => enDataFormat.Text,
-                                    "system.int32" => enDataFormat.Ganzzahl,
-                                    "system.float" => enDataFormat.Gleitkommazahl,
-                                    "system.double" => enDataFormat.Gleitkommazahl,
-                                    "system.drawing.color" => enDataFormat.Text,
-                                    _ => enDataFormat.Text,
-                                };
+
+                                switch (tmpName) {
+                                    case "system.string": this.SetFormat(enVarType.Text); break;
+                                    case "system.int32": this.SetFormat(enVarType.Integer); break;
+                                    case "system.float": this.SetFormat(enVarType.Float); break;
+                                    case "system.double": this.SetFormat(enVarType.Float); break;
+                                    case "system.drawing.color": this.SetFormat(enVarType.Text); break;
+                                    default: this.SetFormat(enVarType.Text); break;
+                                }
+
                                 var c = CreateSubControls();
-                                StyleTextBox((TextBox)c, string.Empty, false);
+                                StyleTextBox((TextBox)c, false);
                             }
                             break;
                         }

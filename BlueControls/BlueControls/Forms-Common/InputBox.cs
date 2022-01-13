@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics.Enums;
+using BlueDatabase.Interfaces;
 
 namespace BlueControls.Forms {
 
@@ -29,12 +30,12 @@ namespace BlueControls.Forms {
 
         #region Constructors
 
-        private InputBox() : this(string.Empty, string.Empty, enDataFormat.Text, false) { }
+        private InputBox() : this(string.Empty, string.Empty, enVarType.Text, false) { }
 
-        private InputBox(string txt, string vorschlagsText, enDataFormat textformat, bool bigMultiLineBox) : base() {
+        private InputBox(string txt, string vorschlagsText, enVarType textformat, bool bigMultiLineBox) : base() {
             InitializeComponent();
             txbText.Text = vorschlagsText;
-            txbText.Format = textformat;
+            txbText.SetFormat(textformat);
             txbText.MultiLine = bigMultiLineBox;
             if (bigMultiLineBox) { txbText.Height += 200; }
             Setup(txt, txbText, 250);
@@ -45,11 +46,11 @@ namespace BlueControls.Forms {
 
         #region Methods
 
-        public static string Show(string TXT) => Show(TXT, "", enDataFormat.Text, false);
+        public static string Show(string TXT) => Show(TXT, "", enVarType.Text, false);
 
-        public static string Show(string TXT, string VorschlagsText, enDataFormat Textformat) => Show(TXT, VorschlagsText, Textformat, false);
+        public static string Show(string TXT, string VorschlagsText, enVarType Textformat) => Show(TXT, VorschlagsText, Textformat, false);
 
-        public static string Show(string TXT, string VorschlagsText, enDataFormat Textformat, bool BigMultiLineBox) {
+        public static string Show(string TXT, string VorschlagsText, enVarType Textformat, bool BigMultiLineBox) {
             InputBox MB = new(TXT, VorschlagsText, Textformat, BigMultiLineBox);
             MB.ShowDialog();
             return MB._giveBack;

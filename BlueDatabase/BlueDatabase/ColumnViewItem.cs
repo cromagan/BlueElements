@@ -87,10 +87,12 @@ namespace BlueDatabase {
 
                     case "columnname":// Columname wichtg, wegen CopyLayout
                         Column = database.Column[pair.Value];
+                        Column?.Repair(); // Alte Formate reparieren
                         break;
 
                     case "columnkey":
                         Column = database.Column.SearchByKey(long.Parse(pair.Value));
+                        Column?.Repair(); // Alte Formate reparieren
                         break;
 
                     case "x":

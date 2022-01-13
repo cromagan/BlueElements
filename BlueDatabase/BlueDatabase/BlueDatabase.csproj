@@ -83,6 +83,8 @@
     <Compile Include="CellCollection.cs" />
     <Compile Include="CellItem.cs" />
     <Compile Include="Enums\enAlignmentHorizontal.cs" />
+    <Compile Include="Enums\enTranslationType.cs" />
+    <Compile Include="Interfaces\IInputFormat.cs" />
     <Compile Include="RowData.cs" />
     <Compile Include="ColumnCollection.cs" />
     <Compile Include="ColumnItem.cs" />
@@ -136,9 +138,7 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Interfaces\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\..\BlueBasics\BlueBasics.csproj">
       <Project>{e7e05bac-07cb-478d-861a-db24a27bbf75}</Project>
