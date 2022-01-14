@@ -24,6 +24,7 @@ using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
+using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -33,7 +34,7 @@ namespace BlueControls.Controls {
 
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("ItemClicked")]
-    public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone {
+    public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, ITranslateable {
 
         #region Fields
 
@@ -134,8 +135,6 @@ namespace BlueControls.Controls {
             set => Item.CheckBehavior = value;
         }
 
-        //public string LastFilePath { get; set; }
-
         [DefaultValue(false)]
         public bool FilterAllowed {
             get => _FilterAllowed;
@@ -147,6 +146,7 @@ namespace BlueControls.Controls {
             }
         }
 
+        //public string LastFilePath { get; set; }
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -192,6 +192,9 @@ namespace BlueControls.Controls {
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public ItemCollectionList Suggestions { get; } = new ItemCollectionList();
+
+        [DefaultValue(true)]
+        public bool Translate { get; set; } = true;
 
         #endregion
 

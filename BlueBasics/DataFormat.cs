@@ -30,7 +30,6 @@ namespace BlueBasics {
         public static string AllowedChars(this enDataFormat format) {
             switch (format) {
                 case enDataFormat.Text:
-                case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.BildCode:
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                 case enDataFormat.Values_für_LinkedCellDropdown:
@@ -60,73 +59,62 @@ namespace BlueBasics {
         }
 
         public static bool Autofilter_möglich(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.Bit or enDataFormat.BildCode or enDataFormat.FarbeInteger or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown or enDataFormat.RelationText => true,
+            enDataFormat.Text or enDataFormat.Bit or enDataFormat.BildCode or enDataFormat.FarbeInteger or enDataFormat.Schrift or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown or enDataFormat.RelationText => true,
             _ => false,
         };
 
         public static bool CanBeChangedByRules(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.Bit or enDataFormat.BildCode or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.LinkedCell => true,
+            enDataFormat.Text or enDataFormat.Bit or enDataFormat.BildCode or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.LinkedCell => true,
             _ => false,
         };
 
         public static bool CanBeCheckedByRules(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.Bit or enDataFormat.BildCode or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown => true,
+            enDataFormat.Text or enDataFormat.Bit or enDataFormat.BildCode or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown => true,
             _ => false,
         };
 
         public static bool DropdownItemsAllowed(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.Bit or enDataFormat.BildCode or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown or enDataFormat.RelationText => true,
+            enDataFormat.Text or enDataFormat.Bit or enDataFormat.BildCode or enDataFormat.Link_To_Filesystem or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown or enDataFormat.RelationText => true,
             _ => false,
         };
 
         public static bool DropdownItemsOfOtherCellsAllowed(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.BildCode or enDataFormat.FarbeInteger or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.LinkedCell or enDataFormat.RelationText => true,
+            enDataFormat.Text or enDataFormat.BildCode or enDataFormat.FarbeInteger or enDataFormat.Schrift or enDataFormat.LinkedCell or enDataFormat.RelationText => true,
             _ => false,
         };
 
         public static bool DropdownUnselectAllAllowed(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.BildCode or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell => true,
+            enDataFormat.Text or enDataFormat.BildCode or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell => true,
             _ => false,
         };
 
         public static bool ExportableForLayout(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.Bit or enDataFormat.BildCode or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown => true,
+            enDataFormat.Text or enDataFormat.Bit or enDataFormat.BildCode or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown => true,
             _ => false,
         };
 
-        /// <summary>
-        /// Prüft, ob ein String der geforderte Typ sein kann.
-        /// Dabei wird die Textlänge, die Schablone und die erlaubten Zeichen geprüft.
-        /// Ein Logigcheck (z.B. ob ein Datum gültig ist) wird ebenfalls ausgeführt.
-        /// </summary>
-        /// <param name="txt"></param>
-        /// <param name="format"></param>
-        /// <param name="multiLine"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public static bool IsFormat(this string txt, enDataFormat format, bool multiLine, string additionalRegex) {
-            if (multiLine) {
-                var ex = txt.SplitAndCutByCR();
-                return ex.All(thisString => string.IsNullOrEmpty(thisString) || thisString.IsFormat(format, additionalRegex));
-            }
-            return txt.IsFormat(format, additionalRegex);
-        }
-
-        /// <summary>
-        /// Prüft, ob ein String der geforderte Typ sein kann.
-        /// Dabei wird die Textlänge, die Schablone und die erlaubten Zeichen geprüft.
-        /// Ein Logigcheck (z.B. ob ein Datum gültig ist) wird ebenfalls ausgeführt.
-        /// </summary>
-        /// <param name="txt"></param>
-        /// <param name="format"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public static bool IsFormat(this string txt, enDataFormat format, string additionalRegex) => Text_LängeCheck(txt, format) && Text_SchabloneCheck(txt, format) && txt.ContainsOnlyChars(AllowedChars(format)) && Text_ValueCheck(txt, format) && txt.RegexMatch(additionalRegex);
+        ///// <summary>
+        ///// Prüft, ob ein String der geforderte Typ sein kann.
+        ///// Dabei wird die Textlänge, die Schablone und die erlaubten Zeichen geprüft.
+        ///// Ein Logigcheck (z.B. ob ein Datum gültig ist) wird ebenfalls ausgeführt.
+        ///// </summary>
+        ///// <param name="txt"></param>
+        ///// <param name="format"></param>
+        ///// <param name="multiLine"></param>
+        ///// <returns></returns>
+        ///// <remarks></remarks>
+        //public static bool IsFormat(this string txt, enDataFormat format, bool multiLine, string additionalRegex) {
+        //    if (multiLine) {
+        //        var ex = txt.SplitAndCutByCR();
+        //        return ex.All(thisString => string.IsNullOrEmpty(thisString) || thisString.IsFormat(format, additionalRegex));
+        //    }
+        //    return txt.IsFormat(format, additionalRegex);
+        //}
 
         public static bool IsFormat(this string txt, enDataFormat format) => Text_LängeCheck(txt, format) && Text_SchabloneCheck(txt, format) && txt.ContainsOnlyChars(AllowedChars(format)) && Text_ValueCheck(txt, format);
 
         public static bool MultilinePossible(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.BildCode or enDataFormat.RelationText or enDataFormat.Text_mit_Formatierung or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell => true,
+            enDataFormat.Text or enDataFormat.BildCode or enDataFormat.RelationText or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell => true,
             _ => false,
         };
 
@@ -135,28 +123,18 @@ namespace BlueBasics {
             _ => false,
         };
 
-        // public static bool NeedUTF8(this enDataFormat format) {
-        //    switch (format) {
-        //        case enDataFormat.Text:
-        //        case enDataFormat.RelationText:
-        //        case enDataFormat.Text_mit_Formatierung:
-        //            return true;
-        //        default:
-        //            return false;
-        //    }
-        // }
         public static bool NeedTargetDatabase(this enDataFormat format) => format switch {
             enDataFormat.LinkedCell or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown => true,
             _ => false,
         };
 
         public static bool SaveSizeData(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.Bit or enDataFormat.BildCode or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Text_mit_Formatierung or enDataFormat.Values_für_LinkedCellDropdown => true,
+            enDataFormat.Text or enDataFormat.Bit or enDataFormat.BildCode or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Values_für_LinkedCellDropdown => true,
             _ => false,
         };
 
         public static bool SpellCheckingPossible(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.Text_mit_Formatierung or enDataFormat.RelationText => true,
+            enDataFormat.Text or enDataFormat.RelationText => true,
             _ => false,
         };
 
@@ -167,7 +145,6 @@ namespace BlueBasics {
             if (ml > -1 && il > ml) { return false; }
             switch (format) {
                 case enDataFormat.Text:
-                case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.RelationText:
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                 case enDataFormat.Values_für_LinkedCellDropdown:
@@ -197,7 +174,6 @@ namespace BlueBasics {
         public static int Text_MaximaleLänge(this enDataFormat format) {
             switch (format) {
                 case enDataFormat.Text:
-                case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.BildCode:
                 case enDataFormat.RelationText:
                 case enDataFormat.FarbeInteger:
@@ -231,7 +207,6 @@ namespace BlueBasics {
         public static bool Text_SchabloneCheck(string txt, enDataFormat format) {
             switch (format) {
                 case enDataFormat.Text:
-                case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.BildCode:
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                 case enDataFormat.Values_für_LinkedCellDropdown:
@@ -264,7 +239,6 @@ namespace BlueBasics {
         public static bool Text_ValueCheck(string tXT, enDataFormat format) {
             switch (format) {
                 case enDataFormat.Text:
-                case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.BildCode:
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                 case enDataFormat.Values_für_LinkedCellDropdown:
@@ -288,7 +262,7 @@ namespace BlueBasics {
         }
 
         public static bool TextboxEditPossible(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.BildCode or enDataFormat.Text_mit_Formatierung or enDataFormat.LinkedCell or enDataFormat.RelationText => true,
+            enDataFormat.Text or enDataFormat.BildCode or enDataFormat.LinkedCell or enDataFormat.RelationText => true,
             _ => false,
         };
 

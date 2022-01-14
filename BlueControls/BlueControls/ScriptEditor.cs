@@ -82,7 +82,7 @@ namespace BlueControls {
                 MessageBox.Show("Keine Datenbank geladen.", enImageCode.Information, "OK");
                 return;
             }
-            _Database.RulesScript = txtSkript.Text;
+            _Database.RulesScript = txtSkript.Text.TrimEnd() + "   ";
             txbSkriptInfo.Text = string.Empty;
             tableVariablen.Database.Row.Clear();
             if (_Database.Row.Count == 0) {

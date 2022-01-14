@@ -74,7 +74,6 @@ namespace BlueControls.Controls {
                 SetDoubleBuffering();
             }
             _UseBackBitmap = useBackgroundBitmap;
-            Translate = true;
         }
 
         #endregion
@@ -103,9 +102,6 @@ namespace BlueControls.Controls {
         }
 
         public virtual string QuickInfoText => _QuickInfo;
-
-        [DefaultValue(true)]
-        public bool Translate { get; set; }
 
         protected override bool ScaleChildren => false;
 

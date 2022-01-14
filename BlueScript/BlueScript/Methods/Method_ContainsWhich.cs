@@ -28,7 +28,7 @@ namespace BlueScript {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String_or_List, enVariableDataType.Bool, enVariableDataType.String_or_List };
+        public override List<enVariableDataType> Args => new() { enVariableDataType.String_or_List, enVariableDataType.String_or_List };
 
         public override string Description => "Prüft ob eine der Zeichenketten als ganzes Wort vorkommt. Gibt dann als Liste alle gefundenen Strings zurück.";
 
@@ -42,7 +42,7 @@ namespace BlueScript {
 
         public override string StartSequence => "(";
 
-        public override string Syntax => "ContainsWhich(String, CaseSensitive, Value1, Value2, ...)";
+        public override string Syntax => "ContainsWhich(String, Value1, Value2, ...)";
 
         #endregion
 
@@ -60,7 +60,7 @@ namespace BlueScript {
 
             var wordlist = new List<string>();
 
-            for (var z = 2; z < attvar.Attributes.Count; z++) {
+            for (var z = 1; z < attvar.Attributes.Count; z++) {
                 if (attvar.Attributes[z].Type == enVariableDataType.String) { wordlist.Add(attvar.Attributes[z].ValueString); }
                 if (attvar.Attributes[z].Type == enVariableDataType.List) { wordlist.AddRange(attvar.Attributes[z].ValueListString); }
             }
@@ -68,8 +68,8 @@ namespace BlueScript {
 
             #endregion
 
-            var rx = RegexOptions.None;
-            if (attvar.Attributes[1].ValueBool) { rx = RegexOptions.IgnoreCase; }
+            var rx = RegexOptions.IgnoreCase;
+            //if (attvar.Attributes[1].ValueBool) { rx = RegexOptions.IgnoreCase; }
 
             foreach (var thisW in wordlist) {
                 if (attvar.Attributes[0].ValueString.ContainsWord(thisW, rx)) {

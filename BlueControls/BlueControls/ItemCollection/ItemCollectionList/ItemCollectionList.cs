@@ -47,8 +47,7 @@ namespace BlueControls.ItemCollection {
 
         #region Constructors
 
-        public ItemCollectionList() : this(enBlueListBoxAppearance.Listbox) {
-        }
+        public ItemCollectionList() : this(enBlueListBoxAppearance.Listbox) { }
 
         public ItemCollectionList(enBlueListBoxAppearance design) : base() {
             _CellposCorrect = Size.Empty;

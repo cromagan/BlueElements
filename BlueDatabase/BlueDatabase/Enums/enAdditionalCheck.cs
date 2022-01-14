@@ -17,18 +17,10 @@
 
 namespace BlueDatabase.Enums {
 
-    public enum enBildTextVerhalten {
-        Nur_Text = 0,
-        Wenn_möglich_Bild_und_immer_Text = 1,
-        Nur_Bild = 110,
-        Bild_oder_Text = 120,
-        Interpretiere_Bool = 200,
-        Fehlendes_Bild_zeige_Fragezeichen = 2,
-        Fehlendes_Bild_zeige_Häkchen = 3,
-        Fehlendes_Bild_zeige_Kreis = 4,
-        Fehlendes_Bild_zeige_Kreuz = 5,
-        Fehlendes_Bild_zeige_Infozeichen = 6,
-        Fehlendes_Bild_zeige_Warnung = 7,
-        Fehlendes_Bild_zeige_Kritischzeichen = 8,
+    public enum enAdditionalCheck {
+        None = 0,
+        Integer = 1,
+        Float = 2,
+        DateTime = 3
     }
 }

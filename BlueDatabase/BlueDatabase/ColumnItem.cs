@@ -47,6 +47,7 @@ namespace BlueDatabase {
         public int? TMP_IfFilterRemoved = null;
         internal Database _TMP_LinkedDatabase;
         internal List<string> _UcaseNamesSortedByLenght = null;
+        private enAdditionalCheck _AdditionalCheck;
         private string _AdminInfo;
         private bool _AfterEdit_AutoCorrect;
         private bool _AfterEdit_DoUCase;
@@ -77,6 +78,7 @@ namespace BlueDatabase {
         private enFilterOptions _FilterOptions;
         private Color _ForeColor;
         private enDataFormat _Format;
+        private bool _FormatierungErlaubt;
         private string _Identifier;
         private bool _IgnoreAtRowFilter;
 
@@ -106,7 +108,7 @@ namespace BlueDatabase {
         private bool _SaveContent;
         private bool _ShowMultiLineInOneLine;
         private bool _ShowUndo;
-        private enSortierTyp _SortMask;
+        private enSortierTyp _SortType;
         private bool _SpellCheckingEnabled;
         private string _Suffix;
         private bool _TextBearbeitungErlaubt;
@@ -148,7 +150,7 @@ namespace BlueDatabase {
             _CellInitValue = string.Empty;
             _LinkedCell_RowKey = -1;
             _LinkedCell_ColumnKey = -1;
-            _SortMask = enSortierTyp.Original_String;
+            _SortType = enSortierTyp.Original_String;
             //_ZellenZusammenfassen = false;
             _DropDownKey = -1;
             _VorschlagsColumn = -1;
@@ -172,6 +174,8 @@ namespace BlueDatabase {
             _AfterEdit_Runden = -1;
             _AfterEdit_AutoCorrect = false;
             _AfterEdit_DoUCase = false;
+            _FormatierungErlaubt = false;
+            _AdditionalCheck = enAdditionalCheck.None;
             _AutoRemove = string.Empty;
             _AutoFilterJoker = string.Empty;
             _SaveContent = true;
@@ -223,6 +227,15 @@ namespace BlueDatabase {
         #endregion
 
         #region Properties
+
+        public enAdditionalCheck AdditionalCheck {
+            get => _AdditionalCheck;
+            set {
+                if (_AdditionalCheck == value) { return; }
+                Database.AddPending(enDatabaseDataType.co_AdditionalCheck, this, ((int)_AdditionalCheck).ToString(), ((int)value).ToString(), true);
+                OnChanged();
+            }
+        }
 
         public string AdminInfo {
             get => _AdminInfo;
@@ -502,6 +515,15 @@ namespace BlueDatabase {
             }
         }
 
+        public bool FormatierungErlaubt {
+            get => _FormatierungErlaubt;
+            set {
+                if (_FormatierungErlaubt == value) { return; }
+                Database.AddPending(enDatabaseDataType.co_FormatierungErlaubt, this, _FormatierungErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
+                OnChanged();
+            }
+        }
+
         public string I_Am_A_Key_For_Other_Column { get; private set; }
 
         public string Identifier {
@@ -678,16 +700,16 @@ namespace BlueDatabase {
             }
         }
 
-        public enSortierTyp SortMask {
-            get => _SortMask;
+        public enSortierTyp SortType {
+            get => _SortType;
             set {
-                if (_SortMask == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_SortMask, this, ((int)_SortMask).ToString(), ((int)value).ToString(), true);
+                if (_SortType == value) { return; }
+                Database.AddPending(enDatabaseDataType.co_SortType, this, ((int)_SortType).ToString(), ((int)value).ToString(), true);
                 OnChanged();
             }
         }
 
-        public bool SpellCheckingEnabled {
+        public bool SpellChecking {
             get => _SpellCheckingEnabled;
             set {
                 if (_SpellCheckingEnabled == value) { return; }
@@ -813,8 +835,6 @@ namespace BlueDatabase {
                 case enDataFormat.Button:
                     return enEditTypeTable.None;
 
-                case enDataFormat.Text_mit_Formatierung:
-                    return enEditTypeTable.WarnungNurFormular; // Wegen dem Sonderzeichen
                 default:
                     if (format.TextboxEditPossible()) {
                         return !doDropDown
@@ -1073,10 +1093,6 @@ namespace BlueDatabase {
                     if (_AfterEdit_Runden != -1) { return "Dieses Format darf keine Autokorrektur-Maßnahmen haben haben."; }
                     if (AfterEdit_AutoReplace.Count > 0) { return "Dieses Format darf keine Autokorrektur-Maßnahmen haben haben."; }
                     break;
-
-                case enDataFormat.Text_mit_Formatierung:
-                    if (_AfterEdit_QuickSortRemoveDouble) { return "Format darf nicht sortiert werden."; }
-                    break;
             }
             if (_MultiLine) {
                 if (!_Format.MultilinePossible()) { return "Format unterstützt keine mehrzeiligen Texte."; }
@@ -1123,8 +1139,7 @@ namespace BlueDatabase {
             if (_DropdownAllesAbwählenErlaubt && !_Format.DropdownUnselectAllAllowed()) { return "'Dropdownmenu alles abwählen' bei diesem Format nicht erlaubt."; }
             if (DropDownItems.Count > 0 && !_Format.DropdownItemsAllowed()) { return "Manuelle 'Dropdow-Items' bei diesem Format nicht erlaubt."; }
             if (_BildTextVerhalten != enBildTextVerhalten.Nur_Text) {
-                if (_Format is enDataFormat.Text or
-                               enDataFormat.Text_mit_Formatierung) {
+                if (_Format is enDataFormat.Text) {
                     // Performance-Teschnische Gründe
                     _BildTextVerhalten = enBildTextVerhalten.Nur_Text;
                     //return "Bei diesem Format muss das Bild/Text-Verhalten 'Nur Text' sein.";
@@ -1371,7 +1386,7 @@ namespace BlueDatabase {
                         Caption = "Ersteller";
                         DropdownBearbeitungErlaubt = true;
                         DropdownWerteAndererZellenAnzeigen = true;
-                        SpellCheckingEnabled = false;
+                        SpellChecking = false;
                         ForeColor = Color.FromArgb(0, 0, 128);
                         BackColor = Color.FromArgb(185, 186, 255);
                     }
@@ -1500,7 +1515,7 @@ namespace BlueDatabase {
             Format = enDataFormat.Text;
             this.SetFormat(enVarType.Date);
             Align = enAlignmentHorizontal.Links;
-            SortMask = enSortierTyp.Datum_Uhrzeit;
+            SortType = enSortierTyp.Datum_Uhrzeit;
             Translate = enTranslationType.Datum;
         }
 
@@ -1508,7 +1523,7 @@ namespace BlueDatabase {
             Format = enDataFormat.Text;
             this.SetFormat(enVarType.DateTime);
             Align = enAlignmentHorizontal.Links;
-            SortMask = enSortierTyp.Datum_Uhrzeit;
+            SortType = enSortierTyp.Datum_Uhrzeit;
             Translate = enTranslationType.Datum;
         }
 
@@ -1517,7 +1532,7 @@ namespace BlueDatabase {
             this.SetFormat(enVarType.Email);
 
             Align = enAlignmentHorizontal.Links;
-            SortMask = enSortierTyp.Original_String;
+            SortType = enSortierTyp.Original_String;
             Translate = enTranslationType.Original_Anzeigen;
         }
 
@@ -1527,14 +1542,14 @@ namespace BlueDatabase {
             Align = enAlignmentHorizontal.Rechts;
             Translate = enTranslationType.Gleitkommazahl;
 
-            SortMask = enSortierTyp.ZahlenwertFloat;
+            SortType = enSortierTyp.ZahlenwertFloat;
         }
 
         public void SetFormatForInteger() {
             Format = enDataFormat.Text;
             this.SetFormat(enVarType.Integer);
             Align = enAlignmentHorizontal.Rechts;
-            SortMask = enSortierTyp.ZahlenwertInt;
+            SortType = enSortierTyp.ZahlenwertInt;
             Translate = enTranslationType.Original_Anzeigen;
         }
 
@@ -1542,7 +1557,7 @@ namespace BlueDatabase {
             Format = enDataFormat.Text;
             this.SetFormat(enVarType.PhoneNumber);
             Align = enAlignmentHorizontal.Links;
-            SortMask = enSortierTyp.Original_String;
+            SortType = enSortierTyp.Original_String;
             Translate = enTranslationType.Original_Anzeigen;
         }
 
@@ -1552,7 +1567,17 @@ namespace BlueDatabase {
             Regex = string.Empty;
             AllowedChars = string.Empty;
             Align = enAlignmentHorizontal.Links;
-            SortMask = enSortierTyp.Sprachneutral_String;
+            SortType = enSortierTyp.Sprachneutral_String;
+            Translate = enTranslationType.Original_Anzeigen;
+        }
+
+        public void SetFormatForTextMitFormatierung() {
+            Format = enDataFormat.Text;
+            this.SetFormat(enVarType.TextMitFormatierung);
+            Regex = string.Empty;
+            AllowedChars = string.Empty;
+            Align = enAlignmentHorizontal.Links;
+            SortType = enSortierTyp.Sprachneutral_String;
             Translate = enTranslationType.Original_Anzeigen;
         }
 
@@ -1560,7 +1585,7 @@ namespace BlueDatabase {
             this.SetFormat(enVarType.Text);
             Format = enDataFormat.Text;
             Align = enAlignmentHorizontal.Links;
-            SortMask = enSortierTyp.Sprachneutral_String;
+            SortType = enSortierTyp.Sprachneutral_String;
             Translate = enTranslationType.Übersetzen;
         }
 
@@ -1568,7 +1593,7 @@ namespace BlueDatabase {
             Format = enDataFormat.Text;
             this.SetFormat(enVarType.Url);
             Align = enAlignmentHorizontal.Links;
-            SortMask = enSortierTyp.Original_String;
+            SortType = enSortierTyp.Original_String;
             Translate = enTranslationType.Original_Anzeigen;
         }
 
@@ -1702,7 +1727,6 @@ namespace BlueDatabase {
         public bool UserEditDialogTypeInFormula(enEditTypeFormula editType_To_Check) {
             switch (_Format) {
                 case enDataFormat.Text:
-                case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.BildCode:
                 case enDataFormat.RelationText:
                     if (editType_To_Check == enEditTypeFormula.Textfeld) { return true; } // Textfeld immer erlauben auch wenn beide Bearbeitungen nicht erlaubt sind. Einfach der Übersichtlichktei
@@ -2052,12 +2076,20 @@ namespace BlueDatabase {
                     _Translate = (enTranslationType)int.Parse(Wert);
                     break;
 
+                case enDatabaseDataType.co_AdditionalCheck:
+                    _AdditionalCheck = (enAdditionalCheck)int.Parse(Wert);
+                    break;
+
                 case enDatabaseDataType.co_BildTextVerhalten:
                     _BildTextVerhalten = (enBildTextVerhalten)int.Parse(Wert);
                     break;
 
                 case enDatabaseDataType.co_EditTrotzSperreErlaubt:
                     _EditTrotzSperreErlaubt = Wert.FromPlusMinus();
+                    break;
+
+                case enDatabaseDataType.co_FormatierungErlaubt:
+                    _FormatierungErlaubt = Wert.FromPlusMinus();
                     break;
 
                 case enDatabaseDataType.co_CellInitValue:
@@ -2082,11 +2114,11 @@ namespace BlueDatabase {
                 case enDatabaseDataType.co_LinkedCell_ColumnValueAdd:
                     break;
 
-                case enDatabaseDataType.co_SortMask:
+                case enDatabaseDataType.co_SortType:
                     if (string.IsNullOrEmpty(Wert)) {
-                        _SortMask = enSortierTyp.Original_String;
+                        _SortType = enSortierTyp.Original_String;
                     } else {
-                        _SortMask = (enSortierTyp)long.Parse(Wert);
+                        _SortType = (enSortierTyp)long.Parse(Wert);
                     }
                     break;
 
@@ -2180,6 +2212,10 @@ namespace BlueDatabase {
                 case 6:  //Gleitkommazahl = 6,
                     SetFormatForFloat();
                     break;
+
+                case 70:
+                    SetFormatForTextMitFormatierung();
+                    break;
             }
         }
 
@@ -2210,6 +2246,7 @@ namespace BlueDatabase {
             //  Database.SaveToByteList(l, enDatabaseDataType.co_CompactView, _CompactView.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_ShowMultiLineInOneLine, _ShowMultiLineInOneLine.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_ShowUndo, _ShowUndo.ToPlusMinus(), Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_FormatierungErlaubt, _FormatierungErlaubt.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_ForeColor, _ForeColor.ToArgb().ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_BackColor, _BackColor.ToArgb().ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_LineLeft, ((int)_LineLeft).ToString(), Key);
@@ -2238,6 +2275,7 @@ namespace BlueDatabase {
             Database.SaveToByteList(l, enDatabaseDataType.co_BildCode_ConstantHeight, _BildCode_ConstantHeight.ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_BildTextVerhalten, ((int)_BildTextVerhalten).ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_Translate, ((int)_Translate).ToString(), Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_AdditionalCheck, ((int)_AdditionalCheck).ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_Prefix, _Prefix, Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_KeyColumnKey, _KeyColumnKey.ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_RowKey, _LinkedCell_RowKey.ToString(), Key);
@@ -2248,7 +2286,7 @@ namespace BlueDatabase {
             Database.SaveToByteList(l, enDatabaseDataType.co_DropDownKey, _DropDownKey.ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_VorschlagColumn, _VorschlagsColumn.ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_Align, ((int)_Align).ToString(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_SortMask, ((int)_SortMask).ToString(), Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_SortType, ((int)_SortType).ToString(), Key);
             //Database.SaveToByteList(l, enDatabaseDataType.co_Intelligenter_Multifilter, _Intelligenter_Multifilter, Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_DauerFilterPos, _DauerFilterPos.ToString(), Key);
             //Kennung UNBEDINGT zum Schluss, damit die Standard-Werte gesetzt werden können
@@ -2354,7 +2392,7 @@ namespace BlueDatabase {
             const char h2 = (char)1002; // überschrift
             const char h1 = (char)1001; // überschrift
             const char h7 = (char)1007; // bold
-            if (_Format == enDataFormat.Text_mit_Formatierung) { TXT = TXT.HTMLSpecialToNormalChar(false); }
+            if (FormatierungErlaubt) { TXT = TXT.HTMLSpecialToNormalChar(false); }
             string oTXT;
             do {
                 oTXT = TXT;
@@ -2415,7 +2453,7 @@ namespace BlueDatabase {
                 TXT = TXT.Trim("\r");
                 TXT = TXT.TrimEnd("\t");
             } while (oTXT != TXT);
-            if (Format == enDataFormat.Text_mit_Formatierung) {
+            if (FormatierungErlaubt) {
                 TXT = TXT.CreateHtmlCodes(true);
                 TXT = TXT.Replace("<br>", "\r");
             }

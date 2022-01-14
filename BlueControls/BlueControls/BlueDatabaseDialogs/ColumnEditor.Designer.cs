@@ -153,6 +153,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.caption5 = new BlueControls.Controls.Caption();
             this.butAktuellVor = new BlueControls.Controls.Button();
             this.butAktuellZurueck = new BlueControls.Controls.Button();
+            this.cbxTranslate = new BlueControls.Controls.ComboBox();
+            this.capTranslate = new BlueControls.Controls.Caption();
+            this.btnFormatierungErlaubt = new BlueControls.Controls.Button();
+            this.capcbxAdditionalCheck = new BlueControls.Controls.Caption();
+            this.cbxAdditionalCheck = new BlueControls.Controls.ComboBox();
             this.tabDesign.SuspendLayout();
             this.grpBildCode.SuspendLayout();
             this.tabRechte.SuspendLayout();
@@ -179,9 +184,12 @@ namespace BlueControls.BlueDatabaseDialogs {
             // tabDesign
             // 
             this.tabDesign.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabDesign.Controls.Add(this.btnFormatierungErlaubt);
             this.tabDesign.Controls.Add(this.txbSpaltenbild);
+            this.tabDesign.Controls.Add(this.cbxAdditionalCheck);
             this.tabDesign.Controls.Add(this.cbxBildTextVerhalten);
             this.tabDesign.Controls.Add(this.cbxAlign);
+            this.tabDesign.Controls.Add(this.capcbxAdditionalCheck);
             this.tabDesign.Controls.Add(this.txbReplacer);
             this.tabDesign.Controls.Add(this.capBildCodeImageNotfound);
             this.tabDesign.Controls.Add(this.btnStandard);
@@ -252,13 +260,13 @@ namespace BlueControls.BlueDatabaseDialogs {
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txbReplacer.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbReplacer.Location = new System.Drawing.Point(8, 264);
+            this.txbReplacer.Location = new System.Drawing.Point(8, 288);
             this.txbReplacer.MultiLine = true;
             this.txbReplacer.Name = "txbReplacer";
             this.txbReplacer.QuickInfo = "Texte in der Spalte werden mit diesen Angaben <b>optisch</b> ersetzt.<br><i><u>Be" +
     "ispiel:</i></u>Beispiel-Text|Bsp.-Txt";
             this.txbReplacer.Regex = null;
-            this.txbReplacer.Size = new System.Drawing.Size(904, 221);
+            this.txbReplacer.Size = new System.Drawing.Size(904, 197);
             this.txbReplacer.SpellChecking = true;
             this.txbReplacer.TabIndex = 35;
             // 
@@ -292,6 +300,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbPrefix.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbPrefix.Location = new System.Drawing.Point(56, 96);
             this.txbPrefix.Name = "txbPrefix";
+            this.txbPrefix.Regex = null;
             this.txbPrefix.Size = new System.Drawing.Size(168, 24);
             this.txbPrefix.TabIndex = 36;
             // 
@@ -335,6 +344,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbUeberschift3.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbUeberschift3.Location = new System.Drawing.Point(624, 56);
             this.txbUeberschift3.Name = "txbUeberschift3";
+            this.txbUeberschift3.Regex = null;
             this.txbUeberschift3.Size = new System.Drawing.Size(288, 24);
             this.txbUeberschift3.TabIndex = 38;
             // 
@@ -343,6 +353,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbUeberschift2.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbUeberschift2.Location = new System.Drawing.Point(624, 32);
             this.txbUeberschift2.Name = "txbUeberschift2";
+            this.txbUeberschift2.Regex = null;
             this.txbUeberschift2.Size = new System.Drawing.Size(288, 24);
             this.txbUeberschift2.TabIndex = 37;
             // 
@@ -351,13 +362,14 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbUeberschift1.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbUeberschift1.Location = new System.Drawing.Point(624, 8);
             this.txbUeberschift1.Name = "txbUeberschift1";
+            this.txbUeberschift1.Regex = null;
             this.txbUeberschift1.Size = new System.Drawing.Size(288, 24);
             this.txbUeberschift1.TabIndex = 36;
             // 
             // capReplacer
             // 
             this.capReplacer.CausesValidation = false;
-            this.capReplacer.Location = new System.Drawing.Point(8, 248);
+            this.capReplacer.Location = new System.Drawing.Point(8, 264);
             this.capReplacer.Name = "capReplacer";
             this.capReplacer.Size = new System.Drawing.Size(144, 24);
             this.capReplacer.Text = "Optische Ersetzungen:";
@@ -1021,6 +1033,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             // tabSonstiges
             // 
             this.tabSonstiges.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabSonstiges.Controls.Add(this.cbxTranslate);
+            this.tabSonstiges.Controls.Add(this.capTranslate);
             this.tabSonstiges.Controls.Add(this.cbxSort);
             this.tabSonstiges.Controls.Add(this.butSaveContent);
             this.tabSonstiges.Controls.Add(this.btnSpellChecking);
@@ -1053,7 +1067,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.butSaveContent.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.butSaveContent.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
-            this.butSaveContent.Location = new System.Drawing.Point(512, 376);
+            this.butSaveContent.Location = new System.Drawing.Point(512, 432);
             this.butSaveContent.Name = "butSaveContent";
             this.butSaveContent.Size = new System.Drawing.Size(352, 24);
             this.butSaveContent.TabIndex = 34;
@@ -1075,7 +1089,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbRegex.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbRegex.Location = new System.Drawing.Point(512, 128);
             this.txbRegex.Name = "txbRegex";
-            this.txbRegex.Regex = null;
             this.txbRegex.Size = new System.Drawing.Size(320, 96);
             this.txbRegex.TabIndex = 9;
             // 
@@ -1293,6 +1306,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tbxCaption.Location = new System.Drawing.Point(312, 32);
             this.tbxCaption.MultiLine = true;
             this.tbxCaption.Name = "tbxCaption";
+            this.tbxCaption.Regex = null;
             this.tbxCaption.Size = new System.Drawing.Size(600, 64);
             this.tbxCaption.TabIndex = 2;
             // 
@@ -1596,6 +1610,52 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.butAktuellZurueck.TabIndex = 18;
             this.butAktuellZurueck.Click += new System.EventHandler(this.butAktuellZurueck_Click);
             // 
+            // cbxTranslate
+            // 
+            this.cbxTranslate.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxTranslate.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxTranslate.Location = new System.Drawing.Point(512, 368);
+            this.cbxTranslate.Name = "cbxTranslate";
+            this.cbxTranslate.Regex = null;
+            this.cbxTranslate.Size = new System.Drawing.Size(368, 24);
+            this.cbxTranslate.TabIndex = 37;
+            // 
+            // capTranslate
+            // 
+            this.capTranslate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.capTranslate.CausesValidation = false;
+            this.capTranslate.Location = new System.Drawing.Point(512, 344);
+            this.capTranslate.Name = "capTranslate";
+            this.capTranslate.Size = new System.Drawing.Size(152, 24);
+            this.capTranslate.Text = "Übersetzen:";
+            // 
+            // btnFormatierungErlaubt
+            // 
+            this.btnFormatierungErlaubt.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
+            this.btnFormatierungErlaubt.Location = new System.Drawing.Point(8, 208);
+            this.btnFormatierungErlaubt.Name = "btnFormatierungErlaubt";
+            this.btnFormatierungErlaubt.Size = new System.Drawing.Size(296, 16);
+            this.btnFormatierungErlaubt.TabIndex = 41;
+            this.btnFormatierungErlaubt.Text = "Formatierung erlaubt";
+            // 
+            // capcbxAdditionalCheck
+            // 
+            this.capcbxAdditionalCheck.CausesValidation = false;
+            this.capcbxAdditionalCheck.Location = new System.Drawing.Point(8, 232);
+            this.capcbxAdditionalCheck.Name = "capcbxAdditionalCheck";
+            this.capcbxAdditionalCheck.Size = new System.Drawing.Size(136, 16);
+            this.capcbxAdditionalCheck.Text = "Zusätzlicher Check:";
+            // 
+            // cbxAdditionalCheck
+            // 
+            this.cbxAdditionalCheck.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxAdditionalCheck.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxAdditionalCheck.Location = new System.Drawing.Point(144, 232);
+            this.cbxAdditionalCheck.Name = "cbxAdditionalCheck";
+            this.cbxAdditionalCheck.Regex = null;
+            this.cbxAdditionalCheck.Size = new System.Drawing.Size(368, 24);
+            this.cbxAdditionalCheck.TabIndex = 34;
+            // 
             // ColumnEditor
             // 
             this.ClientSize = new System.Drawing.Size(926, 671);
@@ -1765,5 +1825,10 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Button btnSchnellText;
         private Button btnSchnellIInternetAdresse;
         private ComboBox cbxSort;
+        private ComboBox cbxTranslate;
+        private Caption capTranslate;
+        private Button btnFormatierungErlaubt;
+        private ComboBox cbxAdditionalCheck;
+        private Caption capcbxAdditionalCheck;
     }
 }

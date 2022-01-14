@@ -48,18 +48,7 @@ namespace BlueControls.Forms {
 
         #endregion
 
-        //SetStyles();//AllBoxes.Add(this);
-
         #region Properties
-
-        protected override System.Windows.Forms.CreateParams CreateParams {
-            get {
-                var oParam = base.CreateParams;
-                oParam.ExStyle |= (int)enExStyle.EX_NOACTIVATE | (int)enExStyle.EX_TOOLWINDOW | (int)enExStyle.EX_TOPMOST;
-                oParam.Parent = IntPtr.Zero;
-                return oParam;
-            }
-        }
 
         /// <summary>
         /// Floating Forms sind immer Topmost, darf aber hier nicht gesetzt werden und wird über
@@ -68,6 +57,15 @@ namespace BlueControls.Forms {
         public new bool TopMost {
             get => false;
             set => base.TopMost = false;
+        }
+
+        protected override System.Windows.Forms.CreateParams CreateParams {
+            get {
+                var oParam = base.CreateParams;
+                oParam.ExStyle |= (int)enExStyle.EX_NOACTIVATE | (int)enExStyle.EX_TOOLWINDOW | (int)enExStyle.EX_TOPMOST;
+                oParam.Parent = IntPtr.Zero;
+                return oParam;
+            }
         }
 
         #endregion

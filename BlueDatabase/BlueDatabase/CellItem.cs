@@ -126,7 +126,6 @@ namespace BlueDatabase {
             if (bildTextverhalten == enBildTextVerhalten.Nur_Bild && style != enShortenStyle.HTML) { return string.Empty; }
             switch (column.Format) {
                 case enDataFormat.Text:
-                case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.Link_To_Filesystem:
                 case enDataFormat.Values_für_LinkedCellDropdown:
                 case enDataFormat.RelationText:
@@ -238,7 +237,6 @@ namespace BlueDatabase {
             if (bildTextverhalten == enBildTextVerhalten.Nur_Bild) { replacedText = ValueReadable(column, originalText, style, enBildTextVerhalten.Nur_Text, true); }
             switch (column.Format) {
                 case enDataFormat.Text:
-                case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.RelationText:
                     return null; // z.B. KontextMenu
                 case enDataFormat.Bit:

@@ -112,7 +112,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (lColumn.FilterOptions is not enFilterOptions.Enabled_OnlyAndAllowed and not enFilterOptions.Enabled_OnlyOrAllowed) {
                 txbEingabe.Enabled = lColumn.FilterOptions.HasFlag(enFilterOptions.TextFilterEnabled);
                 capWas.Enabled = lColumn.FilterOptions.HasFlag(enFilterOptions.TextFilterEnabled);
-                if (lColumn.SortMask is enSortierTyp.ZahlenwertFloat or enSortierTyp.ZahlenwertInt) {
+                if (lColumn.SortType is enSortierTyp.ZahlenwertFloat or enSortierTyp.ZahlenwertInt) {
                     capWas.Text = "...oder von-bis:";
                 }
                 lsbStandardFilter.Item.Clear();
@@ -352,7 +352,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 CloseAndDispose("FilterDelete", null);
                 return;
             }
-            if (Column.SortMask is enSortierTyp.ZahlenwertFloat or enSortierTyp.ZahlenwertInt) {
+            if (Column.SortType is enSortierTyp.ZahlenwertFloat or enSortierTyp.ZahlenwertInt) {
                 if (txbEingabe.Text.Contains("-")) {
                     var tmp = txbEingabe.Text.Replace(" ", "");
                     var l = modErgebnis.LastMinusIndex(tmp);

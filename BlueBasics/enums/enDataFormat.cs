@@ -51,7 +51,7 @@ namespace BlueBasics.Enums {
         // Einschätzung = 68,
         Schrift = 69,
 
-        Text_mit_Formatierung = 70,
+        //Text_mit_Formatierung = 70,
 
         // TextmitFormatierungUndLinkToAnotherDatabase = 71
         // Relation_And_Event_Mixed = 72,

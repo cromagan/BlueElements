@@ -125,7 +125,8 @@ namespace BlueDatabase.Enums {
         co_ForeColor = 104,
         co_BackColor = 105,
 
-        // co_UseGlobalShowPass = 106
+        co_AdditionalCheck = 106,
+
         // co_UseGlobalChangePass = 107
         // co_ShowPass = 108
         // co_ChangePass = 109
@@ -229,7 +230,7 @@ namespace BlueDatabase.Enums {
         co_VorschlagColumn = 185,
         co_Align = 186,
         co_Regex = 187,
-        co_SortMask = 188,
+        co_SortType = 188,
 
         //co_ZellenZusammenfassen = 189,
         co_AutoRemove = 190,
@@ -244,6 +245,7 @@ namespace BlueDatabase.Enums {
         co_FilterOptions = 196,
         co_CaptionBitmapTXT = 197,
         co_Translate = 198,
+        co_FormatierungErlaubt = 199,
 
         ce_Value_withoutSizeData = 200,
         ce_Value_withSizeData = 201,

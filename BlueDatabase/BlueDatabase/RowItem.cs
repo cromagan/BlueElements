@@ -157,7 +157,7 @@ namespace BlueDatabase {
                     break;
 
                 default:
-                    if (column.SortMask is enSortierTyp.ZahlenwertInt or enSortierTyp.ZahlenwertFloat) {
+                    if (column.SortType is enSortierTyp.ZahlenwertInt or enSortierTyp.ZahlenwertFloat) {
                         vars.Add(new Variable(column.Name, wert, enVariableDataType.Numeral, ro, false, "Spalte: " + column.ReadableText()));
                     } else {
                         vars.Add(new Variable(column.Name, wert, enVariableDataType.String, ro, false, "Spalte: " + column.ReadableText()));
@@ -579,7 +579,6 @@ namespace BlueDatabase {
                 case enDataFormat.FarbeInteger:
                 case enDataFormat.RelationText:
                 case enDataFormat.Schrift:
-                case enDataFormat.Text_mit_Formatierung:
                 case enDataFormat.Link_To_Filesystem:
                 case enDataFormat.LinkedCell:
                 case enDataFormat.Columns_für_LinkedCellDropdown:

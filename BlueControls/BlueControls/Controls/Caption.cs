@@ -23,6 +23,7 @@ using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
+using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -32,7 +33,7 @@ namespace BlueControls.Controls {
 
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("Click")]
-    public partial class Caption : GenericControl, IContextMenu, IBackgroundNone {
+    public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, ITranslateable {
 
         #region Fields
 
@@ -126,6 +127,9 @@ namespace BlueControls.Controls {
                 ResetETextAndInvalidate();
             }
         }
+
+        [DefaultValue(true)]
+        public bool Translate { get; set; } = true;
 
         public new int Width {
             get => Convert.ToBoolean(_TextAnzeigeverhalten & enSteuerelementVerhalten.Steuerelement_Anpassen)

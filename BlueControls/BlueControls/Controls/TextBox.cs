@@ -24,6 +24,7 @@ using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
+using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -38,6 +39,7 @@ namespace BlueControls.Controls {
 
         #region Fields
 
+        private enAdditionalCheck _AdditionalCheck = enAdditionalCheck.None;
         private string _AllowedChars = string.Empty;
 
         private int _Cursor_CharPos = -1;
@@ -59,7 +61,7 @@ namespace BlueControls.Controls {
 
         private bool _Multiline;
         private bool _MustCheck = true;
-        private string _Regex;
+        private string _Regex = string.Empty;
         private Slider _SliderY = null;
 
         private bool _SpellChecking;
@@ -101,6 +103,16 @@ namespace BlueControls.Controls {
 
         #region Properties
 
+        [DefaultValue(enAdditionalCheck.None)]
+        public enAdditionalCheck AdditionalCheck {
+            get => _AdditionalCheck;
+            set {
+                if (_AdditionalCheck == value) { return; }
+                _AdditionalCheck = value;
+                //UpdateControls();
+            }
+        }
+
         [DefaultValue("")]
         public string AllowedChars {
             get => _AllowedChars;
@@ -135,6 +147,10 @@ namespace BlueControls.Controls {
                 Invalidate();
             }
         }
+
+        [Browsable(false)]
+        [DefaultValue("")]
+        public string Prefix { get; set; } = string.Empty;
 
         [DefaultValue("")]
         public string Regex {
@@ -396,21 +412,19 @@ namespace BlueControls.Controls {
 
         public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
-        ///// <summary>
-        ///// Prüft - bei Multiline Zeile für Zeile - ob der Text in der Textbox zulässig ist.
-        ///// </summary>
-        ///// <param name="mitMeldung"></param>
-        ///// <returns>Ergibt Wahr, wenn der komplette Text dem Format entspricht. Andernfalls Falsch.</returns>
-        ///// <remarks></remarks>
-        //public bool Text_IsOkay(bool mitMeldung) {
-        //    var tmp=
-
-        //    if (!_eTxt.PlainText.IsFormat(_Format, _Multiline, null)) {
-        //        if (mitMeldung) { MessageBox.Show("Ihre Eingabe entspricht nicht<br>dem erwarteten Format.", enImageCode.Warnung, "OK"); }
-        //        return false;
-        //    }
-        //    return true;
-        //}
+        /// <summary>
+        /// Prüft - bei Multiline Zeile für Zeile - ob der Text in der Textbox zulässig ist.
+        /// </summary>
+        /// <param name="mitMeldung"></param>
+        /// <returns>Ergibt Wahr, wenn der komplette Text dem Format entspricht. Andernfalls Falsch.</returns>
+        /// <remarks></remarks>
+        public bool Text_IsOkay(bool mitMeldung) {
+            if (!_eTxt.PlainText.IsFormat(this)) {
+                if (mitMeldung) { MessageBox.Show("Ihre Eingabe entspricht nicht<br>dem erwarteten Format.", enImageCode.Warnung, "OK"); }
+                return false;
+            }
+            return true;
+        }
 
         public void Unmark(enMarkState markstate) => _eTxt?.Unmark(markstate);
 
@@ -584,7 +598,7 @@ namespace BlueControls.Controls {
                     r.X += 2;
                     Skin.Draw_FormatedText(gr, _Suffix, _eTxt.Design, enStates.Standard_Disabled, null, enAlignment.Top_Left, r, this, false, false);
                 } else {
-                    Skin.Draw_FormatedText(gr, "[in " + _Suffix + "]", _eTxt.Design, enStates.Standard_Disabled, null, enAlignment.Top_Left, r, this, false, Translate);
+                    Skin.Draw_FormatedText(gr, "[in " + _Suffix + "]", _eTxt.Design, enStates.Standard_Disabled, null, enAlignment.Top_Left, r, this, false, true);
                 }
             }
             Skin.Draw_Border(gr, _eTxt.Design, state, DisplayRectangle);

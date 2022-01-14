@@ -23,6 +23,7 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.ItemCollection;
+using BlueDatabase.Interfaces;
 using System;
 using System.ComponentModel;
 using System.Drawing;
@@ -32,7 +33,7 @@ namespace BlueControls.Controls {
 
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("TextChanged")]
-    public partial class ComboBox : TextBox {
+    public partial class ComboBox : TextBox, ITranslateable {
 
         #region Fields
 
@@ -118,6 +119,9 @@ namespace BlueControls.Controls {
         }
 
         public ItemCollectionList Item { get; }
+
+        [DefaultValue(true)]
+        public bool Translate { get; set; } = true;
 
         #endregion
 

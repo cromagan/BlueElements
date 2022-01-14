@@ -149,17 +149,13 @@ namespace BlueDatabase {
             c.PermissionGroups_ChangeCell.AddRange(source.PermissionGroups_ChangeCell);
             c.Tags.Clear();
             c.Tags.AddRange(source.Tags);
-            c.AllowedChars = source.AllowedChars;
             c.AdminInfo = source.AdminInfo;
             c.FilterOptions = source.FilterOptions;
-            //c.AutoFilterErlaubt = Source.AutoFilterErlaubt;
-            //c.AutofilterTextFilterErlaubt = Source.AutofilterTextFilterErlaubt;
-            //c.AutoFilterErweitertErlaubt = Source.AutoFilterErweitertErlaubt;
             c.IgnoreAtRowFilter = source.IgnoreAtRowFilter;
             c.DropdownBearbeitungErlaubt = source.DropdownBearbeitungErlaubt;
             c.DropdownAllesAbwählenErlaubt = source.DropdownAllesAbwählenErlaubt;
             c.TextBearbeitungErlaubt = source.TextBearbeitungErlaubt;
-            c.SpellCheckingEnabled = source.SpellCheckingEnabled;
+            c.SpellChecking = source.SpellChecking;
             c.DropdownWerteAndererZellenAnzeigen = source.DropdownWerteAndererZellenAnzeigen;
             c.AfterEdit_QuickSortRemoveDouble = source.AfterEdit_QuickSortRemoveDouble;
             c.AfterEdit_Runden = source.AfterEdit_Runden;
@@ -175,24 +171,19 @@ namespace BlueDatabase {
             c.DropdownKey = source.DropdownKey;
             c.VorschlagsColumn = source.VorschlagsColumn;
             c.Align = source.Align;
-            c.SortMask = source.SortMask;
+            c.SortType = source.SortType;
             c.DropDownItems.Clear();
             c.DropDownItems.AddRange(source.DropDownItems);
             c.OpticalReplace.Clear();
             c.OpticalReplace.AddRange(source.OpticalReplace);
             c.AfterEdit_AutoReplace.Clear();
             c.AfterEdit_AutoReplace.AddRange(source.OpticalReplace);
-
-            c.Regex = source.Regex;
-            //c.CompactView = Source.CompactView;
+            c.GetStyleFrom(source); // regex, Allowed Chars, etc.
             c.ShowUndo = source.ShowUndo;
-            c.Translate = source.Translate;
             c.ShowMultiLineInOneLine = source.ShowMultiLineInOneLine;
             c.Ueberschrift1 = source.Ueberschrift1;
             c.Ueberschrift2 = source.Ueberschrift2;
             c.Ueberschrift3 = source.Ueberschrift3;
-            c.Suffix = source.Suffix;
-            //c.Intelligenter_Multifilter = Source.Intelligenter_Multifilter;
             c.DauerFilterPos = new Point(source.DauerFilterPos.X, source.DauerFilterPos.Y);
             c.LinkedKeyKennung = source.LinkedKeyKennung;
             c.LinkedDatabaseFile = source.LinkedDatabaseFile;
@@ -200,7 +191,6 @@ namespace BlueDatabase {
             c.BildCode_ConstantHeight = source.BildCode_ConstantHeight;
             c.BestFile_StandardSuffix = source.BestFile_StandardSuffix;
             c.BestFile_StandardFolder = source.BestFile_StandardFolder;
-            c.Prefix = source.Prefix;
             return c;
         }
 

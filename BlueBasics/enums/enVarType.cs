@@ -28,6 +28,7 @@ namespace BlueBasics.Enums {
         Url = 4,
         Email = 5,
         PhoneNumber = 8,
-        DateTime = 9
+        DateTime = 9,
+        TextMitFormatierung = 10
     }
 }

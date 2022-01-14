@@ -272,6 +272,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             cbxRandRechts.Item.AddRange(typeof(enColumnLineStyle));
             cbxBildTextVerhalten.Item.AddRange(typeof(enBildTextVerhalten));
             cbxAlign.Item.AddRange(typeof(enAlignmentHorizontal));
+            cbxAdditionalCheck.Item.AddRange(typeof(enAdditionalCheck));
+            cbxTranslate.Item.AddRange(typeof(enTranslationType));
             cbxSort.Item.AddRange(typeof(enSortierTyp));
             cbxLinkedDatabase.Item.Clear();
             if (!string.IsNullOrEmpty(_Column.Database.Filename)) {
@@ -327,7 +329,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             cbxRandLinks.Text = ((int)_Column.LineLeft).ToString();
             cbxRandRechts.Text = ((int)_Column.LineRight).ToString();
             cbxAlign.Text = ((int)_Column.Align).ToString();
-            cbxSort.Text = ((int)_Column.SortMask).ToString();
+            cbxSort.Text = ((int)_Column.SortType).ToString();
             btnAutoFilterMoeglich.Checked = _Column.FilterOptions.HasFlag(enFilterOptions.Enabled);
             btnAutoFilterTXTErlaubt.Checked = _Column.FilterOptions.HasFlag(enFilterOptions.TextFilterEnabled);
             btnAutoFilterErweitertErlaubt.Checked = _Column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled);
@@ -350,7 +352,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             txbPrefix.Text = _Column.Prefix;
             txbSpaltenbild.Text = _Column.CaptionBitmap;
             btnLogUndo.Checked = _Column.ShowUndo;
-            btnSpellChecking.Checked = _Column.SpellCheckingEnabled;
+            btnFormatierungErlaubt.Checked = _Column.FormatierungErlaubt;
+            btnSpellChecking.Checked = _Column.SpellChecking;
             btnEinzeiligDarstellen.Checked = _Column.ShowMultiLineInOneLine;
             tbxAuswaehlbareWerte.Text = _Column.DropDownItems.JoinWithCr();
             txbReplacer.Text = _Column.OpticalReplace.JoinWithCr();
@@ -425,7 +428,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             _Column.CellInitValue = tbxInitValue.Text;
             _Column.ShowMultiLineInOneLine = btnEinzeiligDarstellen.Checked;
             _Column.ShowUndo = btnLogUndo.Checked;
-            _Column.SpellCheckingEnabled = btnSpellChecking.Checked;
+            _Column.FormatierungErlaubt = btnFormatierungErlaubt.Checked;
+            _Column.SpellChecking = btnSpellChecking.Checked;
             var tmpf = enFilterOptions.None;
             if (btnAutoFilterMoeglich.Checked) { tmpf |= enFilterOptions.Enabled; }
             if (btnAutoFilterTXTErlaubt.Checked) { tmpf |= enFilterOptions.TextFilterEnabled; }
@@ -489,7 +493,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             _Column.DropdownKey = ColumKeyFrom(_Column.Database, cbxDropDownKey.Text);
             _Column.VorschlagsColumn = ColumKeyFrom(_Column.Database, cbxVorschlagSpalte.Text);
             _Column.Align = (enAlignmentHorizontal)int.Parse(cbxAlign.Text);
-            _Column.SortMask = (enSortierTyp)int.Parse(cbxSort.Text);
+            _Column.AdditionalCheck = (enAdditionalCheck)int.Parse(cbxAdditionalCheck.Text);
+            _Column.Translate = (enTranslationType)int.Parse(cbxTranslate.Text);
+            _Column.SortType = (enSortierTyp)int.Parse(cbxSort.Text);
             _Column.AutoRemove = txbAutoRemove.Text;
             _Column.SaveContent = butSaveContent.Checked;
             //_Column.Database.Rules.Sort();

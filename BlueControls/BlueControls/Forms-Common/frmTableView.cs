@@ -481,7 +481,7 @@ namespace BlueControls.Forms {
         private void Neu_Click(object sender, System.EventArgs e) {
             RowItem r = null;
 
-            if (TableView.Database.Column.First().SortMask == enSortierTyp.Datum_Uhrzeit) {
+            if (TableView.Database.Column.First().SortType == enSortierTyp.Datum_Uhrzeit) {
                 r = TableView.Database.Row.Add(NameRepair(DateTime.Now.ToString(Constants.Format_Date5), null));
             } else {
                 r = TableView.Database.Row.Add(NameRepair("Neuer Eintrag", null));

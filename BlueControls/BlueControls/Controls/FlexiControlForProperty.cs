@@ -407,7 +407,7 @@ namespace BlueControls.Controls {
                                 }
 
                                 var c = CreateSubControls();
-                                StyleTextBox((TextBox)c, false);
+                                StyleTextBox((TextBox)c);
                             }
                             break;
                         }

@@ -28,6 +28,7 @@ using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
+using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -47,7 +48,7 @@ namespace BlueControls.Controls {
     [DefaultEvent("CursorPosChanged")]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public partial class Table : GenericControl, IContextMenu, IBackgroundNone {
+    public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITranslateable {
 
         #region Fields
 
@@ -342,6 +343,9 @@ namespace BlueControls.Controls {
             }
         }
 
+        [DefaultValue(true)]
+        public bool Translate { get; set; } = true;
+
         //  <Obsolete("Database darf nicht im Designer gesetzt werden.", True)>
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -528,7 +532,7 @@ namespace BlueControls.Controls {
                     _Ist1 = ContenHolderCellRow.CellGetString(ContentHolderCellColumn);
                     _Ist2 = CellItem.ValuesReadable(ContentHolderCellColumn, ContenHolderCellRow, enShortenStyle.Both).JoinWithCr();
                 }
-                if (ContentHolderCellColumn != null && ContentHolderCellColumn.Format == enDataFormat.Text_mit_Formatierung) {
+                if (ContentHolderCellColumn != null && ContentHolderCellColumn.FormatierungErlaubt) {
                     ExtText l = new(enDesign.TextBox, enStates.Standard) {
                         HtmlText = _Ist1
                     };
@@ -1593,7 +1597,7 @@ namespace BlueControls.Controls {
             table.OnCellValueChangingByUser(ed);
             var CancelReason = ed.CancelReason;
             if (string.IsNullOrEmpty(CancelReason) && formatWarnung && !string.IsNullOrEmpty(newValue)) {
-                if (!newValue.IsFormat(column.Format, column.MultiLine, column.Regex)) {
+                if (!newValue.IsFormat(column)) {
                     if (MessageBox.Show("Ihre Eingabe entspricht<br><u>nicht</u> dem erwarteten Format!<br><br>Trotzdem übernehmen?", enImageCode.Information, "Ja", "Nein") != 0) {
                         CancelReason = "Abbruch, das das erwartete Format nicht eingehalten wurde.";
                     }
@@ -2172,10 +2176,8 @@ namespace BlueControls.Controls {
                 Box.Text = "";
             }
 
-            Box.FormatierungErlaubt = ContentHolderCellColumn.Format == enDataFormat.Text_mit_Formatierung;
-            Box.Regex = ContentHolderCellColumn.Regex;
-            Box.AllowedChars = ContentHolderCellColumn.AllowedChars;
-            Box.MultiLine = ContentHolderCellColumn.MultiLine;
+            Box.GetStyleFrom(ContentHolderCellColumn);
+
             Box.Tag = CellCollection.KeyOfCell(cellInThisDatabaseColumn, cellInThisDatabaseRow?.Row); // ThisDatabase, der Wert wird beim einchecken in die Fremdzelle geschrieben
             if (Box is ComboBox box) {
                 ItemCollectionList.GetItemCollection(box.Item, ContentHolderCellColumn, ContentHolderCellRow, enShortenStyle.Both, 1000);

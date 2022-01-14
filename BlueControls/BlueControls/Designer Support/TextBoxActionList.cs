@@ -37,9 +37,7 @@ namespace BlueControls.Designer_Support {
                     if (st.ToString() != z.ToString()) {
                         var x = new TextBox();
                         x.SetFormat(st);
-                        if (x.AllowedChars == ReverenceControl.AllowedChars &&
-                            x.Regex == ReverenceControl.Regex &&
-                            x.Suffix == ReverenceControl.Suffix) { return st; }
+                        if (x.IsFormatIdentical(ReverenceControl)) { return st; }
                     }
                 }
                 return enVarType.Unbekannt;

@@ -35,7 +35,7 @@ namespace BlueControls.Controls {
 
     [Designer(typeof(BasicDesigner))]
     [DefaultEvent("ValueChanged")]
-    public partial class FlexiControl : GenericControl, IBackgroundNone, IInputFormat {
+    public partial class FlexiControl : GenericControl, IBackgroundNone, IInputFormat, ITranslateable {
 
         #region Fields
 
@@ -46,9 +46,7 @@ namespace BlueControls.Controls {
         protected string _Caption;
 
         protected enÜberschriftAnordnung _CaptionPosition = enÜberschriftAnordnung.ohne;
-
         protected string _disabledReason = string.Empty;
-
         protected enEditTypeFormula _EditType = enEditTypeFormula.None;
 
         ///// <summary>
@@ -63,12 +61,16 @@ namespace BlueControls.Controls {
         protected DateTime? _LastTextChange;
 
         protected bool _MultiLine = false;
-
+        protected bool _SpellChecking = false;
+        protected bool _translateCaption = true;
+        private enAdditionalCheck _AdditionalCheck = enAdditionalCheck.None;
         private string _AllowedChars = string.Empty;
         private Caption _CaptionObject;
 
         // None ist -1 und muss gesetzt sein!
         private int _ControlX = -1;
+
+        private bool _FormatierungErlaubt;
 
         //private enVarType _Format = enVarType.Text;
         private Caption _InfoCaption;
@@ -121,6 +123,16 @@ namespace BlueControls.Controls {
         #endregion
 
         #region Properties
+
+        [DefaultValue(enAdditionalCheck.None)]
+        public enAdditionalCheck AdditionalCheck {
+            get => _AdditionalCheck;
+            set {
+                if (_AdditionalCheck == value) { return; }
+                _AdditionalCheck = value;
+                UpdateControls();
+            }
+        }
 
         [DefaultValue("")]
         public string AllowedChars {
@@ -213,6 +225,16 @@ namespace BlueControls.Controls {
             }
         }
 
+        [DefaultValue(false)]
+        public bool FormatierungErlaubt {
+            get => _FormatierungErlaubt;
+            set {
+                if (value == FormatierungErlaubt) { return; }
+                _FormatierungErlaubt = value;
+                UpdateControls();
+            }
+        }
+
         [DefaultValue("")]
         [Description("Zeigt rechts oben im Eck ein kleines Symbol an, dessen hier eingegebener Text angezeigt wird.")]
         public string InfoText {
@@ -237,6 +259,10 @@ namespace BlueControls.Controls {
             }
         }
 
+        [Browsable(false)]
+        [DefaultValue("")]
+        public string Prefix { get; set; } = string.Empty;
+
         [DefaultValue("")]
         public string Regex {
             get => _Regex;
@@ -254,6 +280,16 @@ namespace BlueControls.Controls {
                 if (_ShowInfoWhenDisabled == value) { return; }
                 _ShowInfoWhenDisabled = value;
                 Invalidate();
+            }
+        }
+
+        [DefaultValue(false)]
+        public bool SpellChecking {
+            get => _SpellChecking;
+            set {
+                if (_SpellChecking == value) { return; }
+                _SpellChecking = value;
+                UpdateControls();
             }
         }
 
@@ -279,6 +315,15 @@ namespace BlueControls.Controls {
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public new string Text { get; set; }
+
+        [DefaultValue(true)]
+        bool ITranslateable.Translate {
+            get => _translateCaption;
+            set {
+                if (_translateCaption == value) { return; }
+                if (_CaptionObject is Caption c) { c.Translate = _translateCaption; }
+            }
+        }
 
         /// <summary>
         /// Zum setzen des Wertes muss ValueSet benutzt werden.
@@ -577,9 +622,7 @@ namespace BlueControls.Controls {
 
         protected void StyleComboBox(ComboBox control, ItemCollectionList list, ComboBoxStyle style) {
             control.Enabled = Enabled;
-            control.Suffix = _Suffix;
-            control.Regex = _Regex;
-            control.AllowedChars = _AllowedChars;
+            control.GetStyleFrom(this);
             control.DropDownStyle = style;
             control.Item.Clear();
             control.Item.AddRange(list);
@@ -635,13 +678,9 @@ namespace BlueControls.Controls {
             Control.AddAllowed = enAddType.UserDef;
         }
 
-        protected void StyleTextBox(TextBox control, bool spellChecking) {
+        protected void StyleTextBox(TextBox control) {
             control.Enabled = Enabled;
-            control.Suffix = _Suffix;
-            control.AllowedChars = _AllowedChars;
-            control.Regex = _Regex;
-            control.MultiLine = _MultiLine;
-            control.SpellChecking = spellChecking;
+            control.GetStyleFrom(this);
             control.Verhalten = _MultiLine || Height > 20
                 ? enSteuerelementVerhalten.Scrollen_mit_Textumbruch
                 : enSteuerelementVerhalten.Scrollen_ohne_Textumbruch;
@@ -732,6 +771,7 @@ namespace BlueControls.Controls {
             _CaptionObject.Top = 0;
             _CaptionObject.Anchor = AnchorStyles.Top | AnchorStyles.Left;
             _CaptionObject.Visible = _CaptionPosition != enÜberschriftAnordnung.Ohne_mit_Abstand;
+            _CaptionObject.Translate = _translateCaption;
             _CaptionObject.BringToFront();
         }
 
@@ -799,7 +839,7 @@ namespace BlueControls.Controls {
         /// </summary>
         private TextBox Control_Create_TextBox() {
             TextBox Control = new();
-            StyleTextBox(Control, false);
+            StyleTextBox(Control);
             UpdateValueToControl();
             StandardBehandlung(Control);
             return Control;
@@ -940,41 +980,8 @@ namespace BlueControls.Controls {
                 } else {
                     Control.Enabled = true;
                 }
-                switch (Control) {
-                    case ComboBox ComboBox:
-                        ComboBox.Suffix = _Suffix;
-                        break;
 
-                    case TextBox TextBox:
-                        TextBox.Suffix = _Suffix;
-                        break;
-
-                    case EasyPic _:
-                        break;
-
-                    case ListBox _:
-                        //if (ListBox.Name == "Main") { UpdateValueTo_ListBox(); }
-                        break;
-
-                    case SwapListBox _:
-                        //if (ListBox.Name == "Main") { UpdateValueTo_ListBox(); }
-                        break;
-
-                    case Button _:
-                        //UpdateValueTo_Button(Button);
-                        break;
-
-                    case Caption _:
-                        //UpdateValueTo_Caption();
-                        break;
-
-                    case Line _:
-                        break;
-
-                    default:
-                        Develop.DebugPrint(Typ(Control));
-                        break;
-                }
+                if (Control is IInputFormat inf) { inf.GetStyleFrom(inf); }
             }
         }
 

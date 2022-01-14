@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueControls.Enums;
+using BlueDatabase.Enums;
 using System.Drawing;
 
 namespace BlueControls.ItemCollection {

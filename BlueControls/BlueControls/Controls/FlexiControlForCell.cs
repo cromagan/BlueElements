@@ -253,9 +253,9 @@ namespace BlueControls.Controls {
 
                 case TextBox textBox:
                     if (column1 == null) {
-                        StyleTextBox(textBox, false);
+                        StyleTextBox(textBox);
                     } else {
-                        StyleTextBox(textBox, column1.SpellCheckingEnabled);
+                        StyleTextBox(textBox);
                     }
                     textBox.NeedDatabaseOfAdditinalSpecialChars += textBox_NeedDatabaseOfAdditinalSpecialChars;
                     textBox.GotFocus += GotFocus_TextBox;

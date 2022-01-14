@@ -20,6 +20,7 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
+using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;

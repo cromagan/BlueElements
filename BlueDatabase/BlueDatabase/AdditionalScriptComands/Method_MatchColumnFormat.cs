@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
 using static BlueBasics.DataFormat;
+using BlueDatabase.Interfaces;
 
 namespace BlueScript {
 
@@ -59,7 +60,7 @@ namespace BlueScript {
             tocheck = tocheck.SortedDistinctList();
 
             foreach (var thisstring in tocheck) {
-                if (!thisstring.IsFormat(column.Format, column.Regex)) { return strDoItFeedback.Falsch(); }
+                if (!thisstring.IsFormat(column)) { return strDoItFeedback.Falsch(); }
             }
 
             return strDoItFeedback.Wahr();

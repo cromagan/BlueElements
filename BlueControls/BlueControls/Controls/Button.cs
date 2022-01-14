@@ -20,6 +20,7 @@ using BlueBasics.Enums;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
+using BlueDatabase.Interfaces;
 using System;
 using System.ComponentModel;
 using System.Drawing;
@@ -29,7 +30,7 @@ namespace BlueControls.Controls {
 
     [Designer(typeof(ButtonDesigner))]
     [DefaultEvent("Click")]
-    public sealed class Button : GenericControl, IBackgroundNone {
+    public sealed class Button : GenericControl, IBackgroundNone, ITranslateable {
 
         #region Fields
 
@@ -153,6 +154,9 @@ namespace BlueControls.Controls {
                 Invalidate();
             }
         }
+
+        [DefaultValue(true)]
+        public bool Translate { get; set; } = true;
 
         #endregion
 

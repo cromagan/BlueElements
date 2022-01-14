@@ -115,7 +115,6 @@ namespace BlueControls.Forms
             this.Pad.Name = "Pad";
             this.Pad.Size = new System.Drawing.Size(1334, 571);
             this.Pad.TabIndex = 0;
-            this.Pad.Translate = false;
             this.Pad.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Pad_MouseUp);
             // 
             // Ribbon
