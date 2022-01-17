@@ -54,6 +54,11 @@ namespace BlueDatabase.Interfaces {
 
         #region Methods
 
+        /// <summary>
+        /// Setzt: AllowedChars, Regex, Präfix, Suffix, FormatierungErlaubt, AdditionlCheck, SpellChecking und Multiline
+        /// </summary>
+        /// <param name="t"></param>
+        /// <param name="source"></param>
         public static void GetStyleFrom(this IInputFormat t, IInputFormat source) {
             t.AdditionalCheck = source.AdditionalCheck;
             t.AllowedChars = source.AllowedChars;
@@ -116,6 +121,11 @@ namespace BlueDatabase.Interfaces {
             t.FormatierungErlaubt == source.FormatierungErlaubt;
         }
 
+        /// <summary>
+        /// Setzt: AllowedChars, Regex, Präfix, Suffix, FormatierungErlaubt, AdditionlCheck, SpellChecking und Multiline
+        /// </summary>
+        /// <param name="t"></param>
+        /// <param name="type"></param>
         public static void SetFormat(this IInputFormat t, enVarType type) {
             switch (type) {
                 case enVarType.Text:
@@ -124,6 +134,9 @@ namespace BlueDatabase.Interfaces {
                     t.Suffix = string.Empty;
                     t.Prefix = string.Empty;
                     t.FormatierungErlaubt = false;
+                    t.AdditionalCheck = enAdditionalCheck.None;
+                    t.SpellChecking = true;
+                    t.MultiLine = false;
                     return;
 
                 case enVarType.TextMitFormatierung:
@@ -132,6 +145,9 @@ namespace BlueDatabase.Interfaces {
                     t.Suffix = string.Empty;
                     t.Prefix = string.Empty;
                     t.FormatierungErlaubt = true;
+                    t.AdditionalCheck = enAdditionalCheck.None;
+                    t.SpellChecking = true;
+                    t.MultiLine = true;
                     return;
 
                 case enVarType.Date:
@@ -140,6 +156,9 @@ namespace BlueDatabase.Interfaces {
                     t.Suffix = string.Empty;
                     t.Prefix = string.Empty;
                     t.FormatierungErlaubt = false;
+                    t.AdditionalCheck = enAdditionalCheck.DateTime;
+                    t.SpellChecking = false;
+                    t.MultiLine = false;
                     return;
 
                 case enVarType.Url:
@@ -149,6 +168,9 @@ namespace BlueDatabase.Interfaces {
                     t.Suffix = string.Empty;
                     t.Prefix = string.Empty;
                     t.FormatierungErlaubt = false;
+                    t.AdditionalCheck = enAdditionalCheck.None;
+                    t.SpellChecking = false;
+                    t.MultiLine = false;
                     return;
 
                 case enVarType.Email:
@@ -158,6 +180,9 @@ namespace BlueDatabase.Interfaces {
                     t.Suffix = string.Empty;
                     t.Prefix = string.Empty;
                     t.FormatierungErlaubt = false;
+                    t.AdditionalCheck = enAdditionalCheck.None;
+                    t.SpellChecking = false;
+                    t.MultiLine = false;
                     return;
 
                 case enVarType.Float:
@@ -167,6 +192,9 @@ namespace BlueDatabase.Interfaces {
                     t.Suffix = string.Empty;
                     t.Prefix = string.Empty;
                     t.FormatierungErlaubt = false;
+                    t.AdditionalCheck = enAdditionalCheck.Float;
+                    t.SpellChecking = false;
+                    t.MultiLine = false;
                     return;
 
                 case enVarType.Integer:
@@ -175,6 +203,9 @@ namespace BlueDatabase.Interfaces {
                     t.Suffix = string.Empty;
                     t.Prefix = string.Empty;
                     t.FormatierungErlaubt = false;
+                    t.AdditionalCheck = enAdditionalCheck.Integer;
+                    t.SpellChecking = false;
+                    t.MultiLine = false;
                     return;
 
                 case enVarType.PhoneNumber:
@@ -184,6 +215,9 @@ namespace BlueDatabase.Interfaces {
                     t.Suffix = string.Empty;
                     t.Prefix = string.Empty;
                     t.FormatierungErlaubt = false;
+                    t.AdditionalCheck = enAdditionalCheck.None;
+                    t.SpellChecking = false;
+                    t.MultiLine = false;
                     return;
 
                 case enVarType.DateTime:
@@ -192,6 +226,9 @@ namespace BlueDatabase.Interfaces {
                     t.Suffix = string.Empty;
                     t.Prefix = string.Empty;
                     t.FormatierungErlaubt = false;
+                    t.AdditionalCheck = enAdditionalCheck.DateTime;
+                    t.SpellChecking = false;
+                    t.MultiLine = false;
                     return;
 
                 default:

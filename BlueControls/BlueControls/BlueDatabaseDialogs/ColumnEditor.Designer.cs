@@ -21,9 +21,12 @@ namespace BlueControls.BlueDatabaseDialogs {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ColumnEditor));
             this.ColorDia = new System.Windows.Forms.ColorDialog();
             this.tabDesign = new System.Windows.Forms.TabPage();
+            this.btnFormatierungErlaubt = new BlueControls.Controls.Button();
             this.txbSpaltenbild = new BlueControls.Controls.TextBox();
+            this.cbxAdditionalCheck = new BlueControls.Controls.ComboBox();
             this.cbxBildTextVerhalten = new BlueControls.Controls.ComboBox();
             this.cbxAlign = new BlueControls.Controls.ComboBox();
+            this.capcbxAdditionalCheck = new BlueControls.Controls.Caption();
             this.txbReplacer = new BlueControls.Controls.TextBox();
             this.capBildCodeImageNotfound = new BlueControls.Controls.Caption();
             this.btnStandard = new BlueControls.Controls.Button();
@@ -100,6 +103,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.Caption17 = new BlueControls.Controls.Caption();
             this.btnQI_Vorschau = new BlueControls.Controls.Button();
             this.tabSonstiges = new System.Windows.Forms.TabPage();
+            this.cbxTranslate = new BlueControls.Controls.ComboBox();
+            this.capTranslate = new BlueControls.Controls.Caption();
             this.cbxSort = new BlueControls.Controls.ComboBox();
             this.butSaveContent = new BlueControls.Controls.Button();
             this.btnSpellChecking = new BlueControls.Controls.Button();
@@ -131,6 +136,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnOk = new BlueControls.Controls.Button();
             this.tabControl = new BlueControls.Controls.TabControl();
             this.tabSchnellformat = new System.Windows.Forms.TabPage();
+            this.btnSchnellBildCode = new BlueControls.Controls.Button();
             this.btnSchnellIInternetAdresse = new BlueControls.Controls.Button();
             this.btnSchnellAuswahloptionen = new BlueControls.Controls.Button();
             this.btnSchnellGleitkommazahl = new BlueControls.Controls.Button();
@@ -153,11 +159,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.caption5 = new BlueControls.Controls.Caption();
             this.butAktuellVor = new BlueControls.Controls.Button();
             this.butAktuellZurueck = new BlueControls.Controls.Button();
-            this.cbxTranslate = new BlueControls.Controls.ComboBox();
-            this.capTranslate = new BlueControls.Controls.Caption();
-            this.btnFormatierungErlaubt = new BlueControls.Controls.Button();
-            this.capcbxAdditionalCheck = new BlueControls.Controls.Caption();
-            this.cbxAdditionalCheck = new BlueControls.Controls.ComboBox();
+            this.cbxScriptType = new BlueControls.Controls.ComboBox();
+            this.capScriptType = new BlueControls.Controls.Caption();
             this.tabDesign.SuspendLayout();
             this.grpBildCode.SuspendLayout();
             this.tabRechte.SuspendLayout();
@@ -184,6 +187,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             // tabDesign
             // 
             this.tabDesign.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabDesign.Controls.Add(this.cbxScriptType);
+            this.tabDesign.Controls.Add(this.capScriptType);
             this.tabDesign.Controls.Add(this.btnFormatierungErlaubt);
             this.tabDesign.Controls.Add(this.txbSpaltenbild);
             this.tabDesign.Controls.Add(this.cbxAdditionalCheck);
@@ -223,6 +228,15 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabDesign.TabIndex = 0;
             this.tabDesign.Text = "Design";
             // 
+            // btnFormatierungErlaubt
+            // 
+            this.btnFormatierungErlaubt.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
+            this.btnFormatierungErlaubt.Location = new System.Drawing.Point(8, 208);
+            this.btnFormatierungErlaubt.Name = "btnFormatierungErlaubt";
+            this.btnFormatierungErlaubt.Size = new System.Drawing.Size(296, 16);
+            this.btnFormatierungErlaubt.TabIndex = 41;
+            this.btnFormatierungErlaubt.Text = "Formatierung erlaubt";
+            // 
             // txbSpaltenbild
             // 
             this.txbSpaltenbild.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -233,6 +247,16 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.txbSpaltenbild.Regex = null;
             this.txbSpaltenbild.Size = new System.Drawing.Size(384, 24);
             this.txbSpaltenbild.TabIndex = 40;
+            // 
+            // cbxAdditionalCheck
+            // 
+            this.cbxAdditionalCheck.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxAdditionalCheck.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxAdditionalCheck.Location = new System.Drawing.Point(144, 232);
+            this.cbxAdditionalCheck.Name = "cbxAdditionalCheck";
+            this.cbxAdditionalCheck.Regex = null;
+            this.cbxAdditionalCheck.Size = new System.Drawing.Size(368, 24);
+            this.cbxAdditionalCheck.TabIndex = 34;
             // 
             // cbxBildTextVerhalten
             // 
@@ -253,6 +277,14 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxAlign.Regex = null;
             this.cbxAlign.Size = new System.Drawing.Size(128, 24);
             this.cbxAlign.TabIndex = 7;
+            // 
+            // capcbxAdditionalCheck
+            // 
+            this.capcbxAdditionalCheck.CausesValidation = false;
+            this.capcbxAdditionalCheck.Location = new System.Drawing.Point(8, 232);
+            this.capcbxAdditionalCheck.Name = "capcbxAdditionalCheck";
+            this.capcbxAdditionalCheck.Size = new System.Drawing.Size(136, 16);
+            this.capcbxAdditionalCheck.Text = "Zusätzlicher Check:";
             // 
             // txbReplacer
             // 
@@ -1053,6 +1085,25 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabSonstiges.TabIndex = 4;
             this.tabSonstiges.Text = "Sonstiges allgemein";
             // 
+            // cbxTranslate
+            // 
+            this.cbxTranslate.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxTranslate.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxTranslate.Location = new System.Drawing.Point(512, 368);
+            this.cbxTranslate.Name = "cbxTranslate";
+            this.cbxTranslate.Regex = null;
+            this.cbxTranslate.Size = new System.Drawing.Size(368, 24);
+            this.cbxTranslate.TabIndex = 37;
+            // 
+            // capTranslate
+            // 
+            this.capTranslate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.capTranslate.CausesValidation = false;
+            this.capTranslate.Location = new System.Drawing.Point(512, 344);
+            this.capTranslate.Name = "capTranslate";
+            this.capTranslate.Size = new System.Drawing.Size(152, 24);
+            this.capTranslate.Text = "Übersetzen:";
+            // 
             // cbxSort
             // 
             this.cbxSort.Cursor = System.Windows.Forms.Cursors.IBeam;
@@ -1364,6 +1415,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // tabSchnellformat
             // 
             this.tabSchnellformat.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabSchnellformat.Controls.Add(this.btnSchnellBildCode);
             this.tabSchnellformat.Controls.Add(this.btnSchnellIInternetAdresse);
             this.tabSchnellformat.Controls.Add(this.btnSchnellAuswahloptionen);
             this.tabSchnellformat.Controls.Add(this.btnSchnellGleitkommazahl);
@@ -1379,6 +1431,15 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabSchnellformat.Size = new System.Drawing.Size(912, 487);
             this.tabSchnellformat.TabIndex = 10;
             this.tabSchnellformat.Text = "Schnellformat";
+            // 
+            // btnSchnellBildCode
+            // 
+            this.btnSchnellBildCode.Location = new System.Drawing.Point(432, 80);
+            this.btnSchnellBildCode.Name = "btnSchnellBildCode";
+            this.btnSchnellBildCode.Size = new System.Drawing.Size(128, 48);
+            this.btnSchnellBildCode.TabIndex = 9;
+            this.btnSchnellBildCode.Text = "Bild-Code";
+            this.btnSchnellBildCode.Click += new System.EventHandler(this.btnSchnellBildCode_Click);
             // 
             // btnSchnellIInternetAdresse
             // 
@@ -1610,51 +1671,23 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.butAktuellZurueck.TabIndex = 18;
             this.butAktuellZurueck.Click += new System.EventHandler(this.butAktuellZurueck_Click);
             // 
-            // cbxTranslate
+            // cbxScriptType
             // 
-            this.cbxTranslate.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxTranslate.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxTranslate.Location = new System.Drawing.Point(512, 368);
-            this.cbxTranslate.Name = "cbxTranslate";
-            this.cbxTranslate.Regex = null;
-            this.cbxTranslate.Size = new System.Drawing.Size(368, 24);
-            this.cbxTranslate.TabIndex = 37;
+            this.cbxScriptType.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxScriptType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxScriptType.Location = new System.Drawing.Point(600, 144);
+            this.cbxScriptType.Name = "cbxScriptType";
+            this.cbxScriptType.Regex = null;
+            this.cbxScriptType.Size = new System.Drawing.Size(304, 32);
+            this.cbxScriptType.TabIndex = 43;
             // 
-            // capTranslate
+            // capScriptType
             // 
-            this.capTranslate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.capTranslate.CausesValidation = false;
-            this.capTranslate.Location = new System.Drawing.Point(512, 344);
-            this.capTranslate.Name = "capTranslate";
-            this.capTranslate.Size = new System.Drawing.Size(152, 24);
-            this.capTranslate.Text = "Übersetzen:";
-            // 
-            // btnFormatierungErlaubt
-            // 
-            this.btnFormatierungErlaubt.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
-            this.btnFormatierungErlaubt.Location = new System.Drawing.Point(8, 208);
-            this.btnFormatierungErlaubt.Name = "btnFormatierungErlaubt";
-            this.btnFormatierungErlaubt.Size = new System.Drawing.Size(296, 16);
-            this.btnFormatierungErlaubt.TabIndex = 41;
-            this.btnFormatierungErlaubt.Text = "Formatierung erlaubt";
-            // 
-            // capcbxAdditionalCheck
-            // 
-            this.capcbxAdditionalCheck.CausesValidation = false;
-            this.capcbxAdditionalCheck.Location = new System.Drawing.Point(8, 232);
-            this.capcbxAdditionalCheck.Name = "capcbxAdditionalCheck";
-            this.capcbxAdditionalCheck.Size = new System.Drawing.Size(136, 16);
-            this.capcbxAdditionalCheck.Text = "Zusätzlicher Check:";
-            // 
-            // cbxAdditionalCheck
-            // 
-            this.cbxAdditionalCheck.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxAdditionalCheck.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxAdditionalCheck.Location = new System.Drawing.Point(144, 232);
-            this.cbxAdditionalCheck.Name = "cbxAdditionalCheck";
-            this.cbxAdditionalCheck.Regex = null;
-            this.cbxAdditionalCheck.Size = new System.Drawing.Size(368, 24);
-            this.cbxAdditionalCheck.TabIndex = 34;
+            this.capScriptType.CausesValidation = false;
+            this.capScriptType.Location = new System.Drawing.Point(528, 144);
+            this.capScriptType.Name = "capScriptType";
+            this.capScriptType.Size = new System.Drawing.Size(72, 24);
+            this.capScriptType.Text = "Skript-Typ:";
             // 
             // ColumnEditor
             // 
@@ -1830,5 +1863,8 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Button btnFormatierungErlaubt;
         private ComboBox cbxAdditionalCheck;
         private Caption capcbxAdditionalCheck;
+        private Button btnSchnellBildCode;
+        private ComboBox cbxScriptType;
+        private Caption capScriptType;
     }
 }

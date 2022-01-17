@@ -20,7 +20,7 @@ namespace BlueDatabase.Enums {
     public enum enTranslationType {
         Original_Anzeigen = 0,
         Übersetzen = 1,
-        Datum = 2,
-        Gleitkommazahl = 3
+        Datum = 20,
+        Zahl = 30
     }
 }

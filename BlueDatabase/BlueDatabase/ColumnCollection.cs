@@ -179,6 +179,7 @@ namespace BlueDatabase {
             c.AfterEdit_AutoReplace.Clear();
             c.AfterEdit_AutoReplace.AddRange(source.OpticalReplace);
             c.GetStyleFrom(source); // regex, Allowed Chars, etc.
+            c.ScriptType = source.ScriptType;
             c.ShowUndo = source.ShowUndo;
             c.ShowMultiLineInOneLine = source.ShowMultiLineInOneLine;
             c.Ueberschrift1 = source.Ueberschrift1;

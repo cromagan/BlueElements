@@ -575,7 +575,6 @@ namespace BlueDatabase {
                 //    return;
 
                 case enDataFormat.Text:
-                case enDataFormat.BildCode:
                 case enDataFormat.FarbeInteger:
                 case enDataFormat.RelationText:
                 case enDataFormat.Schrift:

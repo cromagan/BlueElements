@@ -137,7 +137,6 @@ namespace BlueDatabase {
                     }
                     break;
 
-                case enDataFormat.BildCode:
                 case enDataFormat.Button:
                     txt = LanguageTool.ColumnReplace(txt, column, style);
                     break;
@@ -159,13 +158,13 @@ namespace BlueDatabase {
                     txt = LanguageTool.ColumnReplace(txt, column, style);
                     break;
 
-                case enDataFormat.FarbeInteger:
-                    if (!string.IsNullOrEmpty(txt) && txt.IsFormat(enDataFormat.FarbeInteger)) {
-                        var col = Color.FromArgb(int.Parse(txt));
-                        txt = col.ToHTMLCode().ToUpper();
-                    }
-                    txt = LanguageTool.ColumnReplace(txt, column, style);
-                    break;
+                //case enDataFormat.FarbeInteger:
+                //    if (!string.IsNullOrEmpty(txt) && txt.IsFormat(enDataFormat.FarbeInteger)) {
+                //        var col = Color.FromArgb(int.Parse(txt));
+                //        txt = col.ToHTMLCode().ToUpper();
+                //    }
+                //    txt = LanguageTool.ColumnReplace(txt, column, style);
+                //    break;
 
                 case enDataFormat.Schrift:
                     //    Develop.DebugPrint_NichtImplementiert();
@@ -234,66 +233,28 @@ namespace BlueDatabase {
             // replacedText kann auch empty sein. z.B. wenn er nicht angezeigt wird
             if (bildTextverhalten == enBildTextVerhalten.Nur_Text) { return null; }
             if (style == enShortenStyle.HTML) { return null; }
+            if (column == null) { return null; }
             if (bildTextverhalten == enBildTextVerhalten.Nur_Bild) { replacedText = ValueReadable(column, originalText, style, enBildTextVerhalten.Nur_Text, true); }
-            switch (column.Format) {
-                case enDataFormat.Text:
-                case enDataFormat.RelationText:
-                    return null; // z.B. KontextMenu
-                case enDataFormat.Bit:
-                    return originalText == true.ToPlusMinus()
-                        ? column == column.Database.Column.SysCorrect ? QuickImage.Get("Häkchen|16||||||||80") : QuickImage.Get(enImageCode.Häkchen, 16)
-                        : originalText == false.ToPlusMinus()
-                            ? column == column.Database.Column.SysCorrect ? QuickImage.Get(enImageCode.Warnung, 16) : QuickImage.Get(enImageCode.Kreuz, 16)
-                            : originalText == "o" || replacedText == "O"
-                                                    ? QuickImage.Get(enImageCode.Kreis2, 16)
-                                                    : originalText == "?"
-                                                                            ? QuickImage.Get(enImageCode.Fragezeichen, 16)
-                                                                            : string.IsNullOrEmpty(replacedText) ? null : StandardErrorImage(16, bildTextverhalten);
+            if (string.IsNullOrEmpty(replacedText)) { return null; }
 
-                case enDataFormat.Button:
-                    if (column == null) { return null; }// z.B. Dropdownmenu-Textfeld mit bereits definierten Icon
-                    if (string.IsNullOrEmpty(replacedText)) { return null; }
-                    return QuickImage.Get("Stern|16");
-
-                case enDataFormat.BildCode:
-                    if (column == null) { return null; }// z.B. Dropdownmenu-Textfeld mit bereits definierten Icon
-                    if (string.IsNullOrEmpty(replacedText)) { return null; }
-                    //var code = column.Prefix + originalText + column.Suffix;
-                    if (column.BildCode_ConstantHeight > 0) { replacedText = replacedText + "|" + column.BildCode_ConstantHeight; }
-                    var defaultImage = QuickImage.Get(replacedText);
-                    if (defaultImage != null && !defaultImage.IsError) { return defaultImage; }
-                    var gr = 16;
-                    if (column.BildCode_ConstantHeight > 0) { gr = column.BildCode_ConstantHeight; }
-                    return StandardErrorImage(gr, bildTextverhalten);
-
-                case enDataFormat.FarbeInteger:
-                    if (!string.IsNullOrEmpty(replacedText) && replacedText.IsFormat(enDataFormat.FarbeInteger)) {
-                        var col = Color.FromArgb(int.Parse(replacedText));
-                        return QuickImage.Get(enImageCode.Kreis, 16, "", col.ToHTMLCode());
-                    }
-                    return null;
-                //case enDataFormat.Relation:
-                //    if (ImageCode != null) { return ImageCode; }
-                //    if (!string.IsNullOrEmpty(Txt)) { return new clsRelation(Column, null, Txt).SymbolForReadableText(); }
-                //    return null;
-                case enDataFormat.Link_To_Filesystem:
-                    if (replacedText.FileType() == enFileFormat.Unknown) { return StandardErrorImage(48, bildTextverhalten); }
-                    return QuickImage.Get(replacedText.FileType(), 48);
-
-                case enDataFormat.Schrift:
-                    //  Develop.DebugPrint_NichtImplementiert();
-                    //if (string.IsNullOrEmpty(Txt) || Txt.Substring(0, 1) != "{") { return defaultImage; }
-                    // return Skin.BlueFont.Get(Txt).SymbolForReadableText();
-                    return null;
-
-                case enDataFormat.LinkedCell:
-                case enDataFormat.Columns_für_LinkedCellDropdown:
-                case enDataFormat.Values_für_LinkedCellDropdown:
-                    return null;
-
-                default:
-                    return null;
+            if (column.Format == enDataFormat.Bit) {
+                return originalText == true.ToPlusMinus()
+                    ? column == column.Database.Column.SysCorrect ? QuickImage.Get("Häkchen|16||||||||80") : QuickImage.Get(enImageCode.Häkchen, 16)
+                    : originalText == false.ToPlusMinus()
+                        ? column == column.Database.Column.SysCorrect ? QuickImage.Get(enImageCode.Warnung, 16) : QuickImage.Get(enImageCode.Kreuz, 16)
+                        : originalText == "o" || replacedText == "O"
+                                                ? QuickImage.Get(enImageCode.Kreis2, 16)
+                                                : originalText == "?"
+                                                                        ? QuickImage.Get(enImageCode.Fragezeichen, 16)
+                                                                        : string.IsNullOrEmpty(replacedText) ? null : StandardErrorImage(16, bildTextverhalten);
             }
+
+            if (column.BildCode_ConstantHeight > 0) { replacedText = replacedText + "|" + column.BildCode_ConstantHeight; }
+            var defaultImage = QuickImage.Get(replacedText);
+            if (defaultImage != null && !defaultImage.IsError) { return defaultImage; }
+            var gr = 16;
+            if (column.BildCode_ConstantHeight > 0) { gr = column.BildCode_ConstantHeight; }
+            return StandardErrorImage(gr, bildTextverhalten);
         }
 
         #endregion

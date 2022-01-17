@@ -84,6 +84,7 @@
     <Compile Include="CellItem.cs" />
     <Compile Include="Enums\enAlignmentHorizontal.cs" />
     <Compile Include="Enums\enAdditionalCheck.cs" />
+    <Compile Include="Enums\enScriptType.cs" />
     <Compile Include="Enums\enTranslationType.cs" />
     <Compile Include="Interfaces\ITranslateAble.cs" />
     <Compile Include="Interfaces\IInputFormat.cs" />

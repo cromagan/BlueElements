@@ -30,7 +30,7 @@ namespace BlueBasics.Enums {
         //Ganzzahl = 3,
         //Gleitkommazahl = 6,
 
-        BildCode = 13,
+        //BildCode = 13,
 
         // Date_GermanFormat = 15
         //Datum_und_Uhrzeit = 16,

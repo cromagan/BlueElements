@@ -106,6 +106,12 @@ namespace BlueControls.BlueDatabaseDialogs {
             Column_DatenAuslesen(_Column);
         }
 
+        private void btnSchnellBildCode_Click(object sender, System.EventArgs e) {
+            Column_DatenZurückschreiben();
+            _Column.SetFormatForBildCode();
+            Column_DatenAuslesen(_Column);
+        }
+
         private void btnSchnellDatum_Click(object sender, System.EventArgs e) {
             Column_DatenZurückschreiben();
             _Column.SetFormatForDate();
@@ -120,7 +126,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void btnSchnellEmail_Click(object sender, System.EventArgs e) {
             Column_DatenZurückschreiben();
-            _Column.SetFormatForUrl();
+            _Column.SetFormatForEmail();
             Column_DatenAuslesen(_Column);
         }
 
@@ -196,18 +202,18 @@ namespace BlueControls.BlueDatabaseDialogs {
             // Rechtschreibprüfung
             btnSpellChecking.Enabled = tmpFormat.SpellCheckingPossible();
             if (!tmpFormat.SpellCheckingPossible()) { btnSpellChecking.Checked = false; }
-            // Format: Bildcode
-            grpBildCode.Enabled = tmpFormat == enDataFormat.BildCode;
-            if (tmpFormat != enDataFormat.BildCode) {
-                txbBildCodeConstHeight.Text = string.Empty;
-                cbxBildTextVerhalten.Text = string.Empty;
-            }
+            //// Format: Bildcode
+            //grpBildCode.Enabled = tmpFormat == enDataFormat.BildCode;
+            //if (tmpFormat != enDataFormat.BildCode) {
+            //    txbBildCodeConstHeight.Text = string.Empty;
+            //    cbxBildTextVerhalten.Text = string.Empty;
+            //}
             // Format: LinkToFileSystem
             grpLinkToFileSystem.Enabled = tmpFormat == enDataFormat.Link_To_Filesystem;
-            if (tmpFormat != enDataFormat.BildCode) {
-                txbBestFileStandardFolder.Text = string.Empty;
-                txbBestFileStandardSuffix.Text = string.Empty;
-            }
+            //if (tmpFormat != enDataFormat.BildCode) {
+            //    txbBestFileStandardFolder.Text = string.Empty;
+            //    txbBestFileStandardSuffix.Text = string.Empty;
+            //}
             // LinkedDatabase - Verknüpfte Datenbank
             grpLinkedDatabase.Enabled = tmpFormat.NeedTargetDatabase();
             if (!tmpFormat.NeedTargetDatabase()) {
@@ -273,6 +279,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             cbxBildTextVerhalten.Item.AddRange(typeof(enBildTextVerhalten));
             cbxAlign.Item.AddRange(typeof(enAlignmentHorizontal));
             cbxAdditionalCheck.Item.AddRange(typeof(enAdditionalCheck));
+            cbxScriptType.Item.AddRange(typeof(enScriptType));
             cbxTranslate.Item.AddRange(typeof(enTranslationType));
             cbxSort.Item.AddRange(typeof(enSortierTyp));
             cbxLinkedDatabase.Item.Clear();
@@ -329,6 +336,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             cbxRandLinks.Text = ((int)_Column.LineLeft).ToString();
             cbxRandRechts.Text = ((int)_Column.LineRight).ToString();
             cbxAlign.Text = ((int)_Column.Align).ToString();
+            cbxAdditionalCheck.Text = ((int)_Column.AdditionalCheck).ToString();
+            cbxScriptType.Text = ((int)_Column.ScriptType).ToString();
+            cbxTranslate.Text = ((int)_Column.Translate).ToString();
             cbxSort.Text = ((int)_Column.SortType).ToString();
             btnAutoFilterMoeglich.Checked = _Column.FilterOptions.HasFlag(enFilterOptions.Enabled);
             btnAutoFilterTXTErlaubt.Checked = _Column.FilterOptions.HasFlag(enFilterOptions.TextFilterEnabled);
@@ -494,6 +504,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             _Column.VorschlagsColumn = ColumKeyFrom(_Column.Database, cbxVorschlagSpalte.Text);
             _Column.Align = (enAlignmentHorizontal)int.Parse(cbxAlign.Text);
             _Column.AdditionalCheck = (enAdditionalCheck)int.Parse(cbxAdditionalCheck.Text);
+            _Column.ScriptType = (enScriptType)int.Parse(cbxScriptType.Text);
             _Column.Translate = (enTranslationType)int.Parse(cbxTranslate.Text);
             _Column.SortType = (enSortierTyp)int.Parse(cbxSort.Text);
             _Column.AutoRemove = txbAutoRemove.Text;

@@ -30,7 +30,6 @@ namespace BlueBasics {
         public static string AllowedChars(this enDataFormat format) {
             switch (format) {
                 case enDataFormat.Text:
-                case enDataFormat.BildCode:
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                 case enDataFormat.Values_für_LinkedCellDropdown:
                 case enDataFormat.RelationText:
@@ -59,37 +58,37 @@ namespace BlueBasics {
         }
 
         public static bool Autofilter_möglich(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.Bit or enDataFormat.BildCode or enDataFormat.FarbeInteger or enDataFormat.Schrift or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown or enDataFormat.RelationText => true,
+            enDataFormat.Text or enDataFormat.Bit or enDataFormat.FarbeInteger or enDataFormat.Schrift or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown or enDataFormat.RelationText => true,
             _ => false,
         };
 
         public static bool CanBeChangedByRules(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.Bit or enDataFormat.BildCode or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.LinkedCell => true,
+            enDataFormat.Text or enDataFormat.Bit or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.LinkedCell => true,
             _ => false,
         };
 
         public static bool CanBeCheckedByRules(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.Bit or enDataFormat.BildCode or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown => true,
+            enDataFormat.Text or enDataFormat.Bit or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown => true,
             _ => false,
         };
 
         public static bool DropdownItemsAllowed(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.Bit or enDataFormat.BildCode or enDataFormat.Link_To_Filesystem or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown or enDataFormat.RelationText => true,
+            enDataFormat.Text or enDataFormat.Bit or enDataFormat.Link_To_Filesystem or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown or enDataFormat.RelationText => true,
             _ => false,
         };
 
         public static bool DropdownItemsOfOtherCellsAllowed(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.BildCode or enDataFormat.FarbeInteger or enDataFormat.Schrift or enDataFormat.LinkedCell or enDataFormat.RelationText => true,
+            enDataFormat.Text or enDataFormat.FarbeInteger or enDataFormat.Schrift or enDataFormat.LinkedCell or enDataFormat.RelationText => true,
             _ => false,
         };
 
         public static bool DropdownUnselectAllAllowed(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.BildCode or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell => true,
+            enDataFormat.Text or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell => true,
             _ => false,
         };
 
         public static bool ExportableForLayout(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.Bit or enDataFormat.BildCode or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown => true,
+            enDataFormat.Text or enDataFormat.Bit or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown => true,
             _ => false,
         };
 
@@ -111,10 +110,10 @@ namespace BlueBasics {
         //    return txt.IsFormat(format, additionalRegex);
         //}
 
-        public static bool IsFormat(this string txt, enDataFormat format) => Text_LängeCheck(txt, format) && Text_SchabloneCheck(txt, format) && txt.ContainsOnlyChars(AllowedChars(format)) && Text_ValueCheck(txt, format);
+        //public static bool IsFormat(this string txt, enDataFormat format) => Text_LängeCheck(txt, format) && Text_SchabloneCheck(txt, format) && txt.ContainsOnlyChars(AllowedChars(format)) && Text_ValueCheck(txt, format);
 
         public static bool MultilinePossible(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.BildCode or enDataFormat.RelationText or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell => true,
+            enDataFormat.Text or enDataFormat.RelationText or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell => true,
             _ => false,
         };
 
@@ -129,7 +128,7 @@ namespace BlueBasics {
         };
 
         public static bool SaveSizeData(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.Bit or enDataFormat.BildCode or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Values_für_LinkedCellDropdown => true,
+            enDataFormat.Text or enDataFormat.Bit or enDataFormat.FarbeInteger or enDataFormat.RelationText or enDataFormat.Schrift or enDataFormat.Values_für_LinkedCellDropdown => true,
             _ => false,
         };
 
@@ -138,131 +137,131 @@ namespace BlueBasics {
             _ => false,
         };
 
-        public static bool Text_LängeCheck(string txt, enDataFormat format) {
-            var ml = Text_MaximaleLänge(format);
-            var il = 0;
-            if (txt != null) { il = txt.Length; }
-            if (ml > -1 && il > ml) { return false; }
-            switch (format) {
-                case enDataFormat.Text:
-                case enDataFormat.RelationText:
-                case enDataFormat.Columns_für_LinkedCellDropdown:
-                case enDataFormat.Values_für_LinkedCellDropdown:
-                case enDataFormat.Button:
-                    return true;
+        //public static bool Text_LängeCheck(string txt, enDataFormat format) {
+        //    var ml = Text_MaximaleLänge(format);
+        //    var il = 0;
+        //    if (txt != null) { il = txt.Length; }
+        //    if (ml > -1 && il > ml) { return false; }
+        //    switch (format) {
+        //        case enDataFormat.Text:
+        //        case enDataFormat.RelationText:
+        //        case enDataFormat.Columns_für_LinkedCellDropdown:
+        //        case enDataFormat.Values_für_LinkedCellDropdown:
+        //        case enDataFormat.Button:
+        //            return true;
 
-                case enDataFormat.Bit:
-                    return il == 1;
+        //        case enDataFormat.Bit:
+        //            return il == 1;
 
-                case enDataFormat.FarbeInteger:
-                case enDataFormat.BildCode:
-                    return il > 0;
+        //        case enDataFormat.FarbeInteger:
+        //        case enDataFormat.BildCode:
+        //            return il > 0;
 
-                case enDataFormat.LinkedCell:
-                    Develop.DebugPrint(enFehlerArt.Warnung, "LinkedCell kann nicht geprüft werden.");
-                    return true;
+        //        case enDataFormat.LinkedCell:
+        //            Develop.DebugPrint(enFehlerArt.Warnung, "LinkedCell kann nicht geprüft werden.");
+        //            return true;
 
-                case enDataFormat.Link_To_Filesystem:
-                    return il < 257;
+        //        case enDataFormat.Link_To_Filesystem:
+        //            return il < 257;
 
-                default:
-                    Develop.DebugPrint(format);
-                    return true;
-            }
-        }
+        //        default:
+        //            Develop.DebugPrint(format);
+        //            return true;
+        //    }
+        //}
 
-        public static int Text_MaximaleLänge(this enDataFormat format) {
-            switch (format) {
-                case enDataFormat.Text:
-                case enDataFormat.BildCode:
-                case enDataFormat.RelationText:
-                case enDataFormat.FarbeInteger:
-                case enDataFormat.LinkedCell:
-                case enDataFormat.Columns_für_LinkedCellDropdown:
-                case enDataFormat.Values_für_LinkedCellDropdown:
-                    return -1;
+        //public static int Text_MaximaleLänge(this enDataFormat format) {
+        //    switch (format) {
+        //        case enDataFormat.Text:
+        //        case enDataFormat.BildCode:
+        //        case enDataFormat.RelationText:
+        //        case enDataFormat.FarbeInteger:
+        //        case enDataFormat.LinkedCell:
+        //        case enDataFormat.Columns_für_LinkedCellDropdown:
+        //        case enDataFormat.Values_für_LinkedCellDropdown:
+        //            return -1;
 
-                case enDataFormat.Bit:
-                    return 1;
+        //        case enDataFormat.Bit:
+        //            return 1;
 
-                case enDataFormat.Link_To_Filesystem:
-                    return 260;
+        //        case enDataFormat.Link_To_Filesystem:
+        //            return 260;
 
-                case enDataFormat.Button:
-                    return 0;
+        //        case enDataFormat.Button:
+        //            return 0;
 
-                default:
-                    Develop.DebugPrint(format);
-                    return -1;
-            }
-        }
+        //        default:
+        //            Develop.DebugPrint(format);
+        //            return -1;
+        //    }
+        //}
 
-        /// <summary>
-        /// Gibt zurück, ob der Text in die vordefinierte Schablone paßt.
-        /// </summary>
-        /// <param name="txt"></param>
-        /// <param name="format"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public static bool Text_SchabloneCheck(string txt, enDataFormat format) {
-            switch (format) {
-                case enDataFormat.Text:
-                case enDataFormat.BildCode:
-                case enDataFormat.Columns_für_LinkedCellDropdown:
-                case enDataFormat.Values_für_LinkedCellDropdown:
-                case enDataFormat.RelationText:
-                case enDataFormat.Link_To_Filesystem:
-                case enDataFormat.Button:
-                    return true;
+        ///// <summary>
+        ///// Gibt zurück, ob der Text in die vordefinierte Schablone paßt.
+        ///// </summary>
+        ///// <param name="txt"></param>
+        ///// <param name="format"></param>
+        ///// <returns></returns>
+        ///// <remarks></remarks>
+        //public static bool Text_SchabloneCheck(string txt, enDataFormat format) {
+        //    switch (format) {
+        //        case enDataFormat.Text:
+        //        case enDataFormat.BildCode:
+        //        case enDataFormat.Columns_für_LinkedCellDropdown:
+        //        case enDataFormat.Values_für_LinkedCellDropdown:
+        //        case enDataFormat.RelationText:
+        //        case enDataFormat.Link_To_Filesystem:
+        //        case enDataFormat.Button:
+        //            return true;
 
-                case enDataFormat.Bit:
-                    return txt.Length == 1;
+        //        case enDataFormat.Bit:
+        //            return txt.Length == 1;
 
-                case enDataFormat.FarbeInteger:
-                    if (txt == "0") { return true; }
-                    if (txt == "-") { return false; }
-                    if (!string.IsNullOrEmpty(txt) && txt.Substring(0, 1) == "0") { return false; }
-                    if (txt.Length > 1 && txt.Substring(0, 2) == "-0") { return false; }
-                    if (txt.Length > 2 && txt.IndexOf("-", 1) > -1) { return false; }
-                    return true;
+        //        case enDataFormat.FarbeInteger:
+        //            if (txt == "0") { return true; }
+        //            if (txt == "-") { return false; }
+        //            if (!string.IsNullOrEmpty(txt) && txt.Substring(0, 1) == "0") { return false; }
+        //            if (txt.Length > 1 && txt.Substring(0, 2) == "-0") { return false; }
+        //            if (txt.Length > 2 && txt.IndexOf("-", 1) > -1) { return false; }
+        //            return true;
 
-                case enDataFormat.LinkedCell:
-                    Develop.DebugPrint(enFehlerArt.Warnung, "LinkedCell kann nicht geprüft werden.");
-                    return true;
+        //        case enDataFormat.LinkedCell:
+        //            Develop.DebugPrint(enFehlerArt.Warnung, "LinkedCell kann nicht geprüft werden.");
+        //            return true;
 
-                default:
-                    Develop.DebugPrint(format);
-                    return true;
-            }
-        }
+        //        default:
+        //            Develop.DebugPrint(format);
+        //            return true;
+        //    }
+        //}
 
-        public static bool Text_ValueCheck(string tXT, enDataFormat format) {
-            switch (format) {
-                case enDataFormat.Text:
-                case enDataFormat.BildCode:
-                case enDataFormat.Columns_für_LinkedCellDropdown:
-                case enDataFormat.Values_für_LinkedCellDropdown:
-                case enDataFormat.Bit:
-                case enDataFormat.RelationText:
-                case enDataFormat.Link_To_Filesystem:
-                case enDataFormat.Button:
-                    return true;
+        //public static bool Text_ValueCheck(string tXT, enDataFormat format) {
+        //    switch (format) {
+        //        case enDataFormat.Text:
+        //        case enDataFormat.BildCode:
+        //        case enDataFormat.Columns_für_LinkedCellDropdown:
+        //        case enDataFormat.Values_für_LinkedCellDropdown:
+        //        case enDataFormat.Bit:
+        //        case enDataFormat.RelationText:
+        //        case enDataFormat.Link_To_Filesystem:
+        //        case enDataFormat.Button:
+        //            return true;
 
-                case enDataFormat.FarbeInteger:
-                    return long.TryParse(tXT, out _);
+        //        case enDataFormat.FarbeInteger:
+        //            return long.TryParse(tXT, out _);
 
-                case enDataFormat.LinkedCell:
-                    Develop.DebugPrint(enFehlerArt.Warnung, "LinkedCell kann nicht geprüft werden.");
-                    return true;
+        //        case enDataFormat.LinkedCell:
+        //            Develop.DebugPrint(enFehlerArt.Warnung, "LinkedCell kann nicht geprüft werden.");
+        //            return true;
 
-                default:
-                    Develop.DebugPrint(format);
-                    return true;
-            }
-        }
+        //        default:
+        //            Develop.DebugPrint(format);
+        //            return true;
+        //    }
+        //}
 
         public static bool TextboxEditPossible(this enDataFormat format) => format switch {
-            enDataFormat.Text or enDataFormat.BildCode or enDataFormat.LinkedCell or enDataFormat.RelationText => true,
+            enDataFormat.Text or enDataFormat.LinkedCell or enDataFormat.RelationText => true,
             _ => false,
         };
 
