@@ -184,10 +184,10 @@ namespace BlueDatabase {
             }
         }
 
-        private void AddIfNotExists(FilterItem filterItem) {
-            if (Exists(filterItem)) { return; }
-            Add(filterItem);
-        }
+        //private void AddIfNotExists(FilterItem filterItem) {
+        //    if (Exists(filterItem)) { return; }
+        //    Add(filterItem);
+        //}
 
         private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
 

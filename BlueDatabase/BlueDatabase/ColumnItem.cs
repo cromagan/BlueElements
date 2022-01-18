@@ -1408,6 +1408,7 @@ namespace BlueDatabase {
                     _TextBearbeitungErlaubt = false;
                     _DropdownBearbeitungErlaubt = false;
                     _ShowUndo = false;
+                    _ScriptType = enScriptType.Nicht_vorhanden;
                     PermissionGroups_ChangeCell.Clear();
                     if (SetAll) {
                         Caption = "Änderer";
@@ -1448,6 +1449,7 @@ namespace BlueDatabase {
                     _TextBearbeitungErlaubt = false;
                     _SpellCheckingEnabled = false;
                     _DropdownBearbeitungErlaubt = false;
+                    _ScriptType = enScriptType.Nicht_vorhanden;
                     PermissionGroups_ChangeCell.Clear();
                     if (SetAll) {
                         Caption = "Änder-Datum";
@@ -1467,6 +1469,7 @@ namespace BlueDatabase {
                     //_AutofilterTextFilterErlaubt = false;
                     _IgnoreAtRowFilter = true;
                     _FilterOptions = enFilterOptions.Enabled;
+                    _ScriptType = enScriptType.Nicht_vorhanden;
                     if (SetAll) {
                         ForeColor = Color.FromArgb(128, 0, 0);
                         BackColor = Color.FromArgb(255, 185, 185);
@@ -1479,9 +1482,7 @@ namespace BlueDatabase {
                     _SpellCheckingEnabled = false;
                     _Format = enDataFormat.Bit;
                     _FilterOptions = enFilterOptions.Enabled;
-                    //_AutoFilterErweitertErlaubt = false;
                     _AutoFilterJoker = string.Empty;
-                    //_AutofilterTextFilterErlaubt = false;
                     _IgnoreAtRowFilter = true;
                     if (_TextBearbeitungErlaubt || _DropdownBearbeitungErlaubt) {
                         _QuickInfo = "Eine abgeschlossene Zeile kann<br>nicht mehr bearbeitet werden.";
@@ -1529,6 +1530,7 @@ namespace BlueDatabase {
             Translate = enTranslationType.Original_Anzeigen;
             AfterEdit_QuickSortRemoveDouble = false;
             BildTextVerhalten = enBildTextVerhalten.Bild_oder_Text;
+            ScriptType = enScriptType.String;
         }
 
         public void SetFormatForDate() {
@@ -1540,6 +1542,7 @@ namespace BlueDatabase {
             Translate = enTranslationType.Datum;
             AfterEdit_QuickSortRemoveDouble = false;
             BildTextVerhalten = enBildTextVerhalten.Nur_Text;
+            ScriptType = enScriptType.String;
         }
 
         public void SetFormatForDateTime() {
@@ -1551,6 +1554,7 @@ namespace BlueDatabase {
             Translate = enTranslationType.Datum;
             AfterEdit_QuickSortRemoveDouble = false;
             BildTextVerhalten = enBildTextVerhalten.Nur_Text;
+            ScriptType = enScriptType.String;
         }
 
         public void SetFormatForEmail() {
@@ -1562,6 +1566,7 @@ namespace BlueDatabase {
             Translate = enTranslationType.Original_Anzeigen;
             AfterEdit_QuickSortRemoveDouble = true;
             BildTextVerhalten = enBildTextVerhalten.Nur_Text;
+            ScriptType = enScriptType.String;
         }
 
         public void SetFormatForFloat() {
@@ -1573,6 +1578,7 @@ namespace BlueDatabase {
             SortType = enSortierTyp.ZahlenwertFloat;
             AfterEdit_QuickSortRemoveDouble = false;
             BildTextVerhalten = enBildTextVerhalten.Nur_Text;
+            ScriptType = enScriptType.Numeral;
         }
 
         public void SetFormatForInteger() {
@@ -1584,6 +1590,7 @@ namespace BlueDatabase {
             Translate = enTranslationType.Original_Anzeigen;
             AfterEdit_QuickSortRemoveDouble = false;
             BildTextVerhalten = enBildTextVerhalten.Nur_Text;
+            ScriptType = enScriptType.Numeral;
         }
 
         public void SetFormatForPhoneNumber() {
@@ -1595,6 +1602,7 @@ namespace BlueDatabase {
             Translate = enTranslationType.Original_Anzeigen;
             AfterEdit_QuickSortRemoveDouble = false;
             BildTextVerhalten = enBildTextVerhalten.Nur_Text;
+            ScriptType = enScriptType.String;
         }
 
         public void SetFormatForText() {
@@ -1606,6 +1614,8 @@ namespace BlueDatabase {
             Translate = enTranslationType.Original_Anzeigen;
             AfterEdit_QuickSortRemoveDouble = false;
             BildTextVerhalten = enBildTextVerhalten.Nur_Text;
+            ScriptType = enScriptType.String;
+            ScriptType = enScriptType.String;
         }
 
         public void SetFormatForTextMitFormatierung() {
@@ -1617,10 +1627,13 @@ namespace BlueDatabase {
             Translate = enTranslationType.Original_Anzeigen;
             AfterEdit_QuickSortRemoveDouble = false;
             BildTextVerhalten = enBildTextVerhalten.Nur_Text;
+            ScriptType = enScriptType.String;
         }
 
         public void SetFormatForTextOptions() {
             this.SetFormat(enVarType.Text);
+
+            MultiLine = true; // Verhalten von Setformat überschreiben
 
             Format = enDataFormat.Text;
             Align = enAlignmentHorizontal.Links;
@@ -1628,6 +1641,7 @@ namespace BlueDatabase {
             Translate = enTranslationType.Übersetzen;
             AfterEdit_QuickSortRemoveDouble = true;
             BildTextVerhalten = enBildTextVerhalten.Nur_Text;
+            ScriptType = enScriptType.List;
         }
 
         public void SetFormatForUrl() {
@@ -1639,6 +1653,7 @@ namespace BlueDatabase {
             Translate = enTranslationType.Original_Anzeigen;
             AfterEdit_QuickSortRemoveDouble = false;
             BildTextVerhalten = enBildTextVerhalten.Nur_Text;
+            ScriptType = enScriptType.String;
         }
 
         public string SimplyFile(string fullFileName) {
@@ -2264,6 +2279,19 @@ namespace BlueDatabase {
                 case 70:
                     SetFormatForTextMitFormatierung();
                     break;
+            }
+
+            if (ScriptType == enScriptType.undefiniert) {
+                if (Format == enDataFormat.Bit) {
+                    ScriptType = enScriptType.Bool;
+                } else if (MultiLine) {
+                    ScriptType = enScriptType.List;
+                } else if (Format == enDataFormat.Text) {
+                    if (SortType is enSortierTyp.ZahlenwertFloat or enSortierTyp.ZahlenwertInt) {
+                        ScriptType = enScriptType.Numeral;
+                    }
+                    ScriptType = enScriptType.String;
+                }
             }
         }
 

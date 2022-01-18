@@ -114,56 +114,61 @@ namespace BlueDatabase {
             #endregion
 
             if (column.MultiLine && column.Format == enDataFormat.Link_To_Filesystem) { return null; }
+            if (column.ScriptType == enScriptType.Nicht_vorhanden) { return null; }
 
             var wert = row.CellGetString(column);
+            var qi = "Spalte: " + column.ReadableText();
 
             var vars = new List<Variable>();
 
-            if (column.Format == enDataFormat.LinkedCell && column.LinkedCell_RowKey == -9999) {
-                wert = string.Empty; // Beim Skript-Start ist dieser Wert immer leer, da die Verlinkung erst erstellt werden muss.
-                vars.Add(new Variable(column.Name + "_link", string.Empty, enVariableDataType.String, true, true, "Dieser Wert kann nur mit SetLink verändert werden.\r\nBeim Skript-Start ist dieser Wert immer leer, da die Verlinkung erst erstellt werden muss."));
-            }
-
-            if (column.MultiLine) {
-                vars.Add(new Variable(column.Name, wert.SplitAndCutByCRToList(), ro, false, "Spalte: " + column.ReadableText() + "\r\nMehrzeilige Spalten können nur als Liste bearbeitet werden."));
-                return vars;
-            }
-
             switch (column.Format) {
-                case enDataFormat.Bit:
-                    vars.Add(wert == "+" ?
-                        new Variable(column.Name, "true", enVariableDataType.Bool, ro, false, "Spalte: " + column.ReadableText()) :
-                        new Variable(column.Name, "false", enVariableDataType.Bool, ro, false, "Spalte: " + column.ReadableText()));
+                case enDataFormat.LinkedCell:
+                    if (column.LinkedCell_RowKey == -9999) {
+                        wert = string.Empty; // Beim Skript-Start ist dieser Wert immer leer, da die Verlinkung erst erstellt werden muss.
+                        vars.Add(new Variable(column.Name + "_link", string.Empty, enVariableDataType.String, true, true, "Dieser Wert kann nur mit SetLink verändert werden.\r\nBeim Skript-Start ist dieser Wert immer leer, da die Verlinkung erst erstellt werden muss."));
+                    }
                     break;
 
                 case enDataFormat.Link_To_Filesystem:
-                    vars.Add(new Variable(column.Name, wert, enVariableDataType.String, ro, false, "Spalte: " + column.ReadableText() + "\r\nFalls die Datei auf der Festplatte existiert, wird eine weitere\r\nVariable erzeugt: " + column.Name + "_FileName"));
-
+                    qi = "Spalte: " + column.ReadableText() + "\r\nFalls die Datei auf der Festplatte existiert, wird eine weitere\r\nVariable erzeugt: " + column.Name + "_FileName";
                     var f = column.Database.Cell.BestFile(column, row);
                     if (f.FileType() == enFileFormat.Image && FileOperations.FileExists(f)) {
                         vars.Add(new Variable(column.Name + "_FileName", f, enVariableDataType.String, true, false, "Spalte: " + column.ReadableText() + "\r\nEnthält den vollen Dateinamen der Datei der zugehörigen Zelle.\r\nDie Existenz der Datei wurde geprüft und die Datei existert.\r\nAuf die Datei kann evtl. mit LoadImage zugegriffen werden."));
                     }
-
                     break;
 
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                     var nw = string.Empty;
-
                     if (int.TryParse(wert, out var ColKey)) {
                         var C = column.LinkedDatabase().Column.SearchByKey(ColKey);
-                        if (C != null) { nw = C.Name; }
+                        if (C != null) { wert = C.Name; }
                     }
-                    vars.Add(new Variable(column.Name, nw, enVariableDataType.String, true, false, "Spalte: " + column.ReadableText()));
+                    break;
+            }
+
+            switch (column.ScriptType) {
+                case enScriptType.Bool:
+                    vars.Add(wert == "+" ?
+                        new Variable(column.Name, "true", enVariableDataType.Bool, ro, false, qi) :
+                        new Variable(column.Name, "false", enVariableDataType.Bool, ro, false, qi));
+                    break;
+
+                case enScriptType.List:
+                    vars.Add(new Variable(column.Name, wert.SplitAndCutByCRToList(), ro, false, qi));
+                    break;
+
+                case enScriptType.Numeral:
+                    vars.Add(new Variable(column.Name, wert, enVariableDataType.Numeral, ro, false, qi));
+                    break;
+
+                case enScriptType.String:
+                    vars.Add(new Variable(column.Name, wert, enVariableDataType.String, ro, false, qi));
                     break;
 
                 default:
-                    if (column.SortType is enSortierTyp.ZahlenwertInt or enSortierTyp.ZahlenwertFloat) {
-                        vars.Add(new Variable(column.Name, wert, enVariableDataType.Numeral, ro, false, "Spalte: " + column.ReadableText()));
-                    } else {
-                        vars.Add(new Variable(column.Name, wert, enVariableDataType.String, ro, false, "Spalte: " + column.ReadableText()));
-                    }
+                    Develop.DebugPrint(column.ScriptType);
                     break;
-            };
+            }
 
             return vars;
         }

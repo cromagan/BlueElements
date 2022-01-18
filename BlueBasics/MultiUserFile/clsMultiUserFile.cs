@@ -53,7 +53,7 @@ namespace BlueBasics.MultiUserFile {
         private bool _InitialLoadDone = false;
         private DateTime _LastMessageUTC = DateTime.UtcNow.AddMinutes(-10);
         private string _LastSaveCode;
-        private DateTime _LastUserActionUTC = new DateTime(1900, 1, 1);
+        private DateTime _LastUserActionUTC = new(1900, 1, 1);
         private int _loadingThreadId = -1;
         private int Checker_Tick_count = -5;
         private FileSystemWatcher Watcher;

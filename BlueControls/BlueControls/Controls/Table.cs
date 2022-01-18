@@ -63,7 +63,6 @@ namespace BlueControls.Controls {
         private const int RowCaptionSizeY = 50;
         private static bool ServiceStarted = false;
         private readonly List<string> _collapsed = new();
-        private readonly List<RowItem> _PinnedRows = new();
 
         // Die Sortierung der Zeile
         private readonly object Lock_UserAction = new();
@@ -210,7 +209,7 @@ namespace BlueControls.Controls {
                 if (_Database == value) { return; }
                 CloseAllComponents();
                 _collapsed.Clear();
-                _PinnedRows.Clear();
+                PinnedRows.Clear();
                 _MouseOverColumn = null;
                 _MouseOverRow = null;
                 _CursorPosColumn = null;
@@ -299,7 +298,7 @@ namespace BlueControls.Controls {
         [DefaultValue(1.0f)]
         public double FontScale => _Database == null ? 1f : _Database.GlobalScale;
 
-        public List<RowItem> PinnedRows => _PinnedRows;
+        public List<RowItem> PinnedRows { get; } = new();
 
         public override string QuickInfoText {
             get {
@@ -750,7 +749,7 @@ namespace BlueControls.Controls {
 
         public void ParseView(string ToParse) {
             if (string.IsNullOrEmpty(ToParse)) { return; }
-            _PinnedRows.Clear();
+            PinnedRows.Clear();
             _collapsed.Clear();
             foreach (var pair in ToParse.GetAllTags()) {
                 switch (pair.Key) {
@@ -782,7 +781,7 @@ namespace BlueControls.Controls {
                         break;
 
                     case "pin":
-                        _PinnedRows.Add(_Database.Row.SearchByKey(long.Parse(pair.Value)));
+                        PinnedRows.Add(_Database.Row.SearchByKey(long.Parse(pair.Value)));
                         break;
 
                     case "collapsed":
@@ -810,22 +809,22 @@ namespace BlueControls.Controls {
             if (rows == null) { rows = new List<RowItem>(); }
 
             rows = rows.Distinct().ToList();
-            if (!rows.IsDifferentTo(_PinnedRows)) { return; }
+            if (!rows.IsDifferentTo(PinnedRows)) { return; }
 
-            _PinnedRows.Clear();
-            _PinnedRows.AddRange(rows);
+            PinnedRows.Clear();
+            PinnedRows.AddRange(rows);
             Invalidate_SortedRowData();
             OnPinnedChanged();
         }
 
         public void PinAdd(RowItem row) {
-            _PinnedRows.Add(row);
+            PinnedRows.Add(row);
             Invalidate_SortedRowData();
             OnPinnedChanged();
         }
 
         public void PinRemove(RowItem row) {
-            _PinnedRows.Remove(row);
+            PinnedRows.Remove(row);
             Invalidate_SortedRowData();
             OnPinnedChanged();
         }
@@ -844,7 +843,7 @@ namespace BlueControls.Controls {
                 if (Database == null) {
                     _SortedRowDataNew = new List<RowData>();
                 } else {
-                    _SortedRowDataNew = Database.Row.CalculateSortedRows(FilteredRows(), SortUsed(), _PinnedRows, _SortedRowData);
+                    _SortedRowDataNew = Database.Row.CalculateSortedRows(FilteredRows(), SortUsed(), PinnedRows, _SortedRowData);
                 }
 
                 if (!_SortedRowData.IsDifferentTo(_SortedRowDataNew)) { return _SortedRowData; }
@@ -942,8 +941,8 @@ namespace BlueControls.Controls {
             }
             x = x + ", SliderX=" + SliderX.Value;
             x = x + ", SliderY=" + SliderY.Value;
-            if (_PinnedRows != null && _PinnedRows.Count > 0) {
-                foreach (var thisRow in _PinnedRows) {
+            if (PinnedRows != null && PinnedRows.Count > 0) {
+                foreach (var thisRow in PinnedRows) {
                     x = x + ", Pin=" + thisRow.Key.ToString();
                 }
             }
@@ -3081,7 +3080,7 @@ namespace BlueControls.Controls {
         private void Row_RowRemoving(object sender, RowEventArgs e) {
             if (e.Row == _CursorPosRow?.Row) { CursorPos_Reset(); }
             if (e.Row == _MouseOverRow?.Row) { _MouseOverRow = null; }
-            if (_PinnedRows.Contains(e.Row)) { _PinnedRows.Remove(e.Row); }
+            if (PinnedRows.Contains(e.Row)) { PinnedRows.Remove(e.Row); }
         }
 
         private string RowCaptionOnCoordinate(int pixelX, int pixelY) {

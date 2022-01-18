@@ -19,9 +19,10 @@ namespace BlueDatabase.Enums {
 
     public enum enScriptType {
         Nicht_vorhanden = 0,
-        String = 1,
-        Numeral = 2,
-        List = 3,
+        Bool = 1,
+        String = 2,
+        Numeral = 3,
+        List = 4,
 
         undefiniert = 999
     }

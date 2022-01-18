@@ -40,12 +40,6 @@ namespace BlueControls.ItemCollection {
         private static string UniqueInternal_LastTime = "InitialDummy";
 
         /// <summary>
-        /// Falls eine Spezielle Information gespeichert und zurückgegeben werden soll
-        /// </summary>
-        /// <remarks></remarks>
-        private readonly List<string> _Tags = new();
-
-        /// <summary>
         /// Soll es gedruckt werden?
         /// </summary>
         /// <remarks></remarks>
@@ -106,7 +100,11 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public List<string> Tags => _Tags;
+        /// <summary>
+        /// Falls eine Spezielle Information gespeichert und zurückgegeben werden soll
+        /// </summary>
+        /// <remarks></remarks>
+        public List<string> Tags { get; } = new();
 
         public int ZoomPadding {
             get => _ZoomPadding;
@@ -360,7 +358,7 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "tag":
-                    _Tags.Add(value.FromNonCritical());
+                    Tags.Add(value.FromNonCritical());
                     return true;
 
                 case "print":
@@ -418,8 +416,8 @@ namespace BlueControls.ItemCollection {
             var t = "{";
             t = t + "ClassID=" + ClassId() + ", ";
             t = t + "InternalName=" + Internal.ToNonCritical() + ", ";
-            if (_Tags.Count > 0) {
-                foreach (var ThisTag in _Tags) {
+            if (Tags.Count > 0) {
+                foreach (var ThisTag in Tags) {
                     t = t + "Tag=" + ThisTag.ToNonCritical() + ", ";
                 }
             }
