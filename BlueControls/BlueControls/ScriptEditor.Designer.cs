@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Windows.Forms;
 
 namespace BlueControls {
@@ -110,6 +111,7 @@ namespace BlueControls {
             this.txtSkript.TabIndex = 2;
             this.txtSkript.Zoom = 100;
             this.txtSkript.ToolTipNeeded += new System.EventHandler<FastColoredTextBoxNS.ToolTipNeededEventArgs>(this.txtSkript_ToolTipNeeded);
+            this.txtSkript.MouseUp += new MouseEventHandler(this.TxtSkript_MouseUp); 
             // 
             // tabBefehle
             // 
@@ -240,6 +242,8 @@ namespace BlueControls {
             this.grpTextAllgemein.ResumeLayout(false);
             this.ResumeLayout(false);
         }
+
+
         #endregion
         private Controls.TabControl tabCSckript;
         private TabPage tabScriptAnzeige;

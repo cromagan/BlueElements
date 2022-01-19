@@ -525,6 +525,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.scriptEditor.Size = new System.Drawing.Size(1033, 610);
             this.scriptEditor.TabIndex = 0;
             this.scriptEditor.TabStop = false;
+            this.scriptEditor.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.scriptEditor_ContextMenuInit);
+            this.scriptEditor.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.scriptEditor_ContextMenuItemClicked);
             // 
             // Tab_Rechte
             // 

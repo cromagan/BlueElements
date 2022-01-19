@@ -20,6 +20,7 @@ using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
+using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueScript;
@@ -30,13 +31,15 @@ using System.Linq;
 
 namespace BlueControls {
 
-    public partial class ScriptEditor : GroupBox // System.Windows.Forms.UserControl
+    public partial class ScriptEditor : GroupBox, IContextMenu // System.Windows.Forms.UserControl
     {
         #region Fields
 
         private Database _Database = null;
-        private bool menuDone = false;
-        private AutocompleteMenu popupMenu;
+        private string _LastVariableContent = string.Empty;
+        private string _LastWord = string.Empty;
+        private bool _MenuDone = false;
+        private AutocompleteMenu _PopupMenu;
 
         #endregion
 
@@ -46,6 +49,14 @@ namespace BlueControls {
             InitializeComponent();
             GenerateVariableTable();
         }
+
+        #endregion
+
+        #region Events
+
+        public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
+
+        public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
 
         #endregion
 
@@ -69,6 +80,28 @@ namespace BlueControls {
         #endregion
 
         #region Methods
+
+        public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
+            switch (e.ClickedComand.ToLower()) {
+                case "variableninhalt kopieren":
+                    Generic.CopytoClipboard(_LastVariableContent);
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollection.ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
+            if (!string.IsNullOrEmpty(_LastVariableContent)) {
+                Items.Add("Variableninhalt kopieren");
+            }
+
+            HotItem = _LastWord;
+        }
+
+        public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
+
+        public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
         internal void WriteScriptBack() {
             if (_Database == null) { return; }
@@ -119,9 +152,9 @@ namespace BlueControls {
                 }
             }
             lstComands.Item.Sort();
-            if (!menuDone) {
-                menuDone = true;
-                popupMenu = new AutocompleteMenu(txtSkript) {
+            if (!_MenuDone) {
+                _MenuDone = true;
+                _PopupMenu = new AutocompleteMenu(txtSkript) {
                     //popupMenu.Items.ImageList = imageList1;
                     SearchPattern = @"[\w\.:=!<>]",
                     AllowTabKey = true
@@ -139,7 +172,7 @@ namespace BlueControls {
                     }
                 }
                 //set as autocomplete source
-                popupMenu.Items.SetAutocompleteItems(items);
+                _PopupMenu.Items.SetAutocompleteItems(items);
             }
             if (!string.IsNullOrEmpty(message)) {
                 txbSkriptInfo.Text = "[" + DateTime.Now.ToLongTimeString() + "] Allgemeiner Fehler: " + message;
@@ -183,8 +216,16 @@ namespace BlueControls {
             txbComms.Text = co;
         }
 
+        private void TxtSkript_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
+            if (e.Button == System.Windows.Forms.MouseButtons.Right) {
+                FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
+            }
+        }
+
         private void txtSkript_ToolTipNeeded(object sender, ToolTipNeededEventArgs e) {
             try {
+                _LastWord = string.Empty;
+                _LastVariableContent = string.Empty;
                 foreach (var thisc in lstComands.Item) {
                     if (thisc.Tag is Method m) {
                         if (m.Comand(null).Contains(e.HoveredWord, false)) {
@@ -201,9 +242,12 @@ namespace BlueControls {
                 //x.Column.Add("Inhalt", "Inhalt", enDataFormat.Text);
                 //x.Column.Add("Kommentar", "Kommentar", enDataFormat.Text);
                 var hoveredWordnew = new Range(txtSkript, e.Place, e.Place).GetFragment("[A-Za-z0-9_]").Text;
+                _LastWord = hoveredWordnew;
+
                 foreach (var r in tableVariablen.Database.Row) {
                     if (r.CellFirstString().ToLower() == hoveredWordnew.ToLower()) {
                         var inh = r.CellGetString("Inhalt");
+                        _LastVariableContent = inh;
                         inh = inh.Replace("\r", ";");
                         inh = inh.Replace("\n", ";");
                         if (inh.Length > 25) { inh = inh.Substring(0, 20) + "..."; }

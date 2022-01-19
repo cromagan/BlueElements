@@ -462,6 +462,29 @@ namespace BlueControls.BlueDatabaseDialogs {
             _Database = null;
         }
 
+        private void scriptEditor_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
+            if (e.HotItem is string txt) {
+                var c = _Database.Column.Exists(txt);
+                if (c is null) { return; }
+                e.UserMenu.Add(enContextMenuComands.SpaltenEigenschaftenBearbeiten);
+            }
+        }
+
+        private void scriptEditor_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
+            ColumnItem c = null;
+
+            if (e.HotItem is string txt) { c = _Database.Column.Exists(txt); }
+
+            switch (e.ClickedComand.ToLower()) {
+                case "spalteneigenschaftenbearbeiten":
+                    if (c != null) {
+                        tabAdministration.OpenColumnEditor(c, null, null);
+                    }
+
+                    break;
+            }
+        }
+
         private void tblUndo_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
             var bt = (Table)sender;
             var CellKey = e.Tags.TagGet("Cellkey");

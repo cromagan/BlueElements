@@ -822,8 +822,6 @@ namespace BlueDatabase {
 
         #region Methods
 
-        public static enEditTypeTable UserEditDialogTypeInTable(ColumnItem column, bool doDropDown) => UserEditDialogTypeInTable(column.Format, doDropDown, column.TextBearbeitungErlaubt, column.MultiLine);
-
         public static enEditTypeTable UserEditDialogTypeInTable(enDataFormat format, bool doDropDown, bool keybordInputAllowed, bool isMultiline) {
             if (!doDropDown && !keybordInputAllowed) { return enEditTypeTable.None; }
             switch (format) {
@@ -858,6 +856,8 @@ namespace BlueDatabase {
                     return enEditTypeTable.None;
             }
         }
+
+        public static enEditTypeTable UserEditDialogTypeInTable(ColumnItem column, bool doDropDown) => UserEditDialogTypeInTable(column.Format, doDropDown, column.TextBearbeitungErlaubt, column.MultiLine);
 
         public string AutoCorrect(string value) {
             if (Format == enDataFormat.Link_To_Filesystem) {
@@ -1081,8 +1081,8 @@ namespace BlueDatabase {
                     if (_LinkedCell_RowKey >= 0) {
                         var c = LinkedDatabase().Column.SearchByKey(_LinkedCell_ColumnKey);
                         if (c == null) { return "Die verknüpfte Spalte existiert nicht."; }
-                        this.GetStyleFrom(c);
-                        BildTextVerhalten = c.BildTextVerhalten;
+                        //this.GetStyleFrom(c);
+                        //BildTextVerhalten = c.BildTextVerhalten;
 
                         //_MultiLine = c.MultiLine;// != ) { return "Multiline stimmt nicht mit der Ziel-Spalte Multiline überein"; }
                         //} else {
@@ -1375,6 +1375,101 @@ namespace BlueDatabase {
                 }
             }
             return ret.Replace("\r", " ").Replace("  ", " ").TrimEnd(":");
+        }
+
+        public void Repair() {
+            // Unbekannt = -1,
+            // Nothing = 0,
+            //    Text = 1,
+
+            //Bit = 2,
+
+            //// Binärdaten_Bild = 19,
+            //// Passwort = 20, // String
+            ////  Text_Ohne_Kritische_Zeichen = 21,
+            //// Binärdaten = 39,
+            //// Link_To_BlueDataSystem = 42
+            //// Telefonnummer = 43, // Spezielle Formate
+            //FarbeInteger = 45, // Color
+
+            //// Email = 46, // Spezielle Formate
+            //// InternetAdresse = 47, // Spezielle Formate
+            //// Relation = 65,
+            //// Event = 66,
+            //// Tendenz = 67
+            //// Einschätzung = 68,
+            //Schrift = 69,
+
+            //Text_mit_Formatierung = 70,
+
+            //// TextmitFormatierungUndLinkToAnotherDatabase = 71
+            //// Relation_And_Event_Mixed = 72,
+            //Link_To_Filesystem = 73,
+
+            //LinkedCell = 74,
+            //Columns_für_LinkedCellDropdown = 75,
+
+            //[Obsolete]
+            //    Values_für_LinkedCellDropdown = 76,
+
+            //RelationText = 77,
+
+            //// KeyForSame = 78
+            //Button = 79
+
+            //// bis 999 wird geprüft
+
+            switch ((int)_Format) {
+                case 21: //Text_Ohne_Kritische_Zeichen
+                    SetFormatForText();
+                    break;
+
+                case 15:// Date_GermanFormat = 15
+                case 16://Datum_und_Uhrzeit = 16,
+                    SetFormatForDateTime();
+                    break;
+
+                case 3:   //Ganzzahl = 3,
+                    SetFormatForInteger();
+                    break;
+
+                case 6:  //Gleitkommazahl = 6,
+                    SetFormatForFloat();
+                    break;
+
+                case 13:         //BildCode = 13,
+                    SetFormatForBildCode();
+                    break;
+
+                case 70:
+                    SetFormatForTextMitFormatierung();
+                    break;
+            }
+
+            if (ScriptType == enScriptType.undefiniert) {
+                if (Format == enDataFormat.Bit) {
+                    ScriptType = enScriptType.Bool;
+                } else if (MultiLine) {
+                    ScriptType = enScriptType.List;
+                } else if (Format == enDataFormat.Text) {
+                    if (SortType is enSortierTyp.ZahlenwertFloat or enSortierTyp.ZahlenwertInt) {
+                        ScriptType = enScriptType.Numeral;
+                    }
+                    ScriptType = enScriptType.String;
+                }
+            }
+
+            if (_Format == enDataFormat.LinkedCell && _LinkedCell_RowKey >= 0) {
+                var c = LinkedDatabase().Column.SearchByKey(_LinkedCell_ColumnKey);
+                if (c != null) {
+                    this.GetStyleFrom(c);
+                    BildTextVerhalten = c.BildTextVerhalten;
+                    ScriptType = c.ScriptType;
+                    Translate = c.Translate;
+                }
+            }
+
+            ResetSystemToDefault(false);
         }
 
         public void ResetSystemToDefault(bool SetAll) {
@@ -2212,89 +2307,6 @@ namespace BlueDatabase {
 
         internal string ParsableColumnKey() => ColumnCollection.ParsableColumnKey(this);
 
-        internal void Repair() {
-            // Unbekannt = -1,
-            // Nothing = 0,
-            //    Text = 1,
-
-            //Bit = 2,
-
-            //// Binärdaten_Bild = 19,
-            //// Passwort = 20, // String
-            ////  Text_Ohne_Kritische_Zeichen = 21,
-            //// Binärdaten = 39,
-            //// Link_To_BlueDataSystem = 42
-            //// Telefonnummer = 43, // Spezielle Formate
-            //FarbeInteger = 45, // Color
-
-            //// Email = 46, // Spezielle Formate
-            //// InternetAdresse = 47, // Spezielle Formate
-            //// Relation = 65,
-            //// Event = 66,
-            //// Tendenz = 67
-            //// Einschätzung = 68,
-            //Schrift = 69,
-
-            //Text_mit_Formatierung = 70,
-
-            //// TextmitFormatierungUndLinkToAnotherDatabase = 71
-            //// Relation_And_Event_Mixed = 72,
-            //Link_To_Filesystem = 73,
-
-            //LinkedCell = 74,
-            //Columns_für_LinkedCellDropdown = 75,
-
-            //[Obsolete]
-            //    Values_für_LinkedCellDropdown = 76,
-
-            //RelationText = 77,
-
-            //// KeyForSame = 78
-            //Button = 79
-
-            //// bis 999 wird geprüft
-
-            switch ((int)_Format) {
-                case 21: //Text_Ohne_Kritische_Zeichen
-                    SetFormatForText();
-                    break;
-
-                case 15:// Date_GermanFormat = 15
-                case 16://Datum_und_Uhrzeit = 16,
-                    SetFormatForDateTime();
-                    break;
-
-                case 3:   //Ganzzahl = 3,
-                    SetFormatForInteger();
-                    break;
-
-                case 6:  //Gleitkommazahl = 6,
-                    SetFormatForFloat();
-                    break;
-
-                case 13:         //BildCode = 13,
-                    SetFormatForBildCode();
-                    break;
-
-                case 70:
-                    SetFormatForTextMitFormatierung();
-                    break;
-            }
-
-            if (ScriptType == enScriptType.undefiniert) {
-                if (Format == enDataFormat.Bit) {
-                    ScriptType = enScriptType.Bool;
-                } else if (MultiLine) {
-                    ScriptType = enScriptType.List;
-                } else if (Format == enDataFormat.Text) {
-                    if (SortType is enSortierTyp.ZahlenwertFloat or enSortierTyp.ZahlenwertInt) {
-                        ScriptType = enScriptType.Numeral;
-                    }
-                    ScriptType = enScriptType.String;
-                }
-            }
-        }
-
         internal void SaveToByteList(ref List<byte> l) {
             Database.SaveToByteList(l, enDatabaseDataType.co_Name, _Name, Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_Caption, _Caption, Key);
@@ -2493,7 +2505,7 @@ namespace BlueDatabase {
                 TXT = TXT.Insert(" ", ")", " .;!?\r");
                 TXT = TXT.Insert(" ", ";", " 1234567890\r");
                 TXT = TXT.Insert(" ", ":", "1234567890 \\/\r"); // auch 3:50 Uhr
-                // H4= Normaler Text
+                                                                // H4= Normaler Text
                 TXT = TXT.Replace(" " + h4, h4 + " "); // H4 = Normaler Text, nach links rutschen
                 TXT = TXT.Replace("\r" + h4, h4 + "\r");
                 // Dei restlichen Hs'

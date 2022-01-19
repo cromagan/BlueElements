@@ -359,7 +359,7 @@ namespace BlueBasics {
 
         public static bool IsDateTime(this string txt) => DateTimeTryParse(txt, out var _);
 
-        public static bool IsDouble(this string txt) => txt is not null && double.TryParse(txt, out var _);
+        public static bool IsDouble(this string txt) => txt is not null && double.TryParse(txt.Replace(".",","), out var _);
 
         public static bool IsHTMLColorCode(this string txt) => !string.IsNullOrEmpty(txt) && (txt.Length == 6 || txt.Length == 8) && txt.ContainsOnlyChars(Constants.Char_Numerals + "abcdefABCDEF");
 

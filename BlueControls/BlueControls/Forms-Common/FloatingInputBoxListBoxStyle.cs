@@ -73,19 +73,23 @@ namespace BlueControls.Forms {
         public static void ContextMenuShow(IContextMenu Control, System.Windows.Forms.MouseEventArgs e) {
             Close(enBlueListBoxAppearance.KontextMenu);
             Close(Control);
+
             ItemCollectionList ThisContextMenu = new(enBlueListBoxAppearance.KontextMenu);
             ItemCollectionList UserMenu = new(enBlueListBoxAppearance.KontextMenu);
+
             List<string> tags = new();
             var Cancel = false;
             var Translate = true;
             Control.GetContextMenuItems(e, ThisContextMenu, out var HotItem, tags, ref Cancel, ref Translate);
             if (Cancel) { return; }
+
             ContextMenuInitEventArgs ec = new(HotItem, tags, UserMenu);
             Control.OnContextMenuInit(ec);
             if (ec.Cancel) { return; }
             if (!ec.Translate) { Translate = false; }
             if (ThisContextMenu.Count > 0 && UserMenu.Count > 0) { ThisContextMenu.AddSeparator(); }
             if (UserMenu.Count > 0) { ThisContextMenu.AddRange(UserMenu); }
+
             var par = Control.ParentControlWithCommands();
             if (ThisContextMenu.Count > 0) {
                 if (par != null) {

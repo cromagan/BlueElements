@@ -509,6 +509,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             _Column.SortType = (enSortierTyp)int.Parse(cbxSort.Text);
             _Column.AutoRemove = txbAutoRemove.Text;
             _Column.SaveContent = butSaveContent.Checked;
+            _Column.Repair();
             //_Column.Database.Rules.Sort();
         }
 
