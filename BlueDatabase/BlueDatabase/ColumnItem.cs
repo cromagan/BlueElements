@@ -1455,7 +1455,7 @@ namespace BlueDatabase {
                     ScriptType = enScriptType.Bool;
                 } else if (MultiLine) {
                     ScriptType = enScriptType.List;
-                } else if (Format is  enDataFormat.Text or enDataFormat.Columns_für_LinkedCellDropdown) {
+                } else if (Format is  enDataFormat.Text or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Link_To_Filesystem) {
                     if (SortType is enSortierTyp.ZahlenwertFloat or enSortierTyp.ZahlenwertInt) {
                         ScriptType = enScriptType.Numeral;
                     }

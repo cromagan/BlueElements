@@ -61,7 +61,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.cbxAnsicht = new BlueControls.Controls.ComboBox();
             this.capAnsicht = new BlueControls.Controls.Caption();
             this.Tab_Regeln = new System.Windows.Forms.TabPage();
-            this.scriptEditor = new BlueControls.ScriptEditor();
+            this.scriptEditor = new BlueControls.ScriptEditorDatabase();
             this.Tab_Rechte = new System.Windows.Forms.TabPage();
             this.grpDateiVerschluesselung = new BlueControls.Controls.GroupBox();
             this.capDateiverschluesselungInfo = new BlueControls.Controls.Caption();
@@ -525,8 +525,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.scriptEditor.Size = new System.Drawing.Size(1033, 610);
             this.scriptEditor.TabIndex = 0;
             this.scriptEditor.TabStop = false;
-            this.scriptEditor.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.scriptEditor_ContextMenuInit);
-            this.scriptEditor.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.scriptEditor_ContextMenuItemClicked);
             // 
             // Tab_Rechte
             // 
@@ -841,7 +839,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private TextBox txbAdditionalFiles;
         private Caption capAdditional;
         private Button btnSave;
-        private ScriptEditor scriptEditor;
+        private ScriptEditorDatabase scriptEditor;
         private Button btnClipboard;
         private Button btnAlleUndos;
     }

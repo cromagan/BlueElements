@@ -31,11 +31,10 @@ using System.Linq;
 
 namespace BlueControls {
 
-    public partial class ScriptEditor : GroupBox, IContextMenu // System.Windows.Forms.UserControl
+    public partial class ScriptEditor : GroupBox, IContextMenu // System.Windows.Forms.UserControl//
     {
         #region Fields
 
-        private Database _Database = null;
         private string _LastVariableContent = string.Empty;
         private string _LastWord = string.Empty;
         private bool _MenuDone = false;
@@ -62,19 +61,9 @@ namespace BlueControls {
 
         #region Properties
 
-        public Database Database {
-            get => _Database;
-            set {
-                if (_Database != null) {
-                    _Database.RulesScript = txtSkript.Text;
-                    _Database.Disposing -= _Database_Disposing;
-                }
-                _Database = value;
-                if (_Database != null) {
-                    txtSkript.Text = _Database.RulesScript;
-                    _Database.Disposing += _Database_Disposing;
-                }
-            }
+        protected string ScriptText {
+            get => txtSkript.Text;
+            set { txtSkript.Text = value.TrimEnd(" ") + "    "; }
         }
 
         #endregion
@@ -99,52 +88,21 @@ namespace BlueControls {
             HotItem = _LastWord;
         }
 
+        public void Message(string txt) {
+            txbSkriptInfo.Text = "[" + DateTime.Now.ToLongTimeString() + "] " + txt;
+        }
+
         public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
         public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
-        internal void WriteScriptBack() {
-            if (_Database == null) { return; }
-            _Database.RulesScript = txtSkript.Text;
+        protected virtual Script GenerateAndDoScript() {
+            var s = new Script(null);
+            s.Parse();
+            return s;
         }
 
-        private void _Database_Disposing(object sender, System.EventArgs e) => Database = null;
-
-        private void btnTest_Click(object sender, System.EventArgs e) {
-            if (_Database == null) {
-                MessageBox.Show("Keine Datenbank geladen.", enImageCode.Information, "OK");
-                return;
-            }
-            _Database.RulesScript = txtSkript.Text.TrimEnd() + "   ";
-            txbSkriptInfo.Text = string.Empty;
-            tableVariablen.Database.Row.Clear();
-            if (_Database.Row.Count == 0) {
-                MessageBox.Show("Zum Test wird zumindest eine Zeile benötigt.", enImageCode.Information, "OK");
-                return;
-            }
-            if (string.IsNullOrEmpty(txbTestZeile.Text)) {
-                txbTestZeile.Text = _Database.Row.First().CellFirstString();
-            }
-            var r = _Database.Row[txbTestZeile.Text];
-            if (r == null) {
-                MessageBox.Show("Zeile nicht gefunden.", enImageCode.Information, "OK");
-                return;
-            }
-            (var _, var message, var s) = r.DoAutomatic("script testing");
-            if (s != null && s.Variablen != null) {
-                foreach (var thisv in s.Variablen) {
-                    var ro = tableVariablen.Database.Row.Add(thisv.Name);
-                    ro.CellSet("typ", thisv.Type.ToString());
-                    ro.CellSet("RO", thisv.Readonly);
-                    ro.CellSet("System", thisv.SystemVariable);
-
-                    var tmpi = thisv.ValueString;
-                    if (tmpi.Length > 500) { tmpi = tmpi.Substring(0, 500) + "..."; }
-
-                    ro.CellSet("Inhalt", tmpi);
-                    ro.CellSet("Kommentar", thisv.Coment);
-                }
-            }
+        protected void WriteComandsToList(Script s) {
             lstComands.Item.Clear();
             if (s != null && Script.Comands != null) {
                 foreach (var thisc in Script.Comands) {
@@ -174,13 +132,39 @@ namespace BlueControls {
                 //set as autocomplete source
                 _PopupMenu.Items.SetAutocompleteItems(items);
             }
-            if (!string.IsNullOrEmpty(message)) {
-                txbSkriptInfo.Text = "[" + DateTime.Now.ToLongTimeString() + "] Allgemeiner Fehler: " + message;
-                return;
+        }
+
+        protected void WriteVariablesToTable(Script s) {
+            if (s != null && s.Variablen != null) {
+                foreach (var thisv in s.Variablen) {
+                    var ro = tableVariablen.Database.Row.Add(thisv.Name);
+                    ro.CellSet("typ", thisv.Type.ToString());
+                    ro.CellSet("RO", thisv.Readonly);
+                    ro.CellSet("System", thisv.SystemVariable);
+
+                    var tmpi = thisv.ValueString;
+                    if (tmpi.Length > 500) { tmpi = tmpi.Substring(0, 500) + "..."; }
+
+                    ro.CellSet("Inhalt", tmpi);
+                    ro.CellSet("Kommentar", thisv.Coment);
+                }
             }
-            txbSkriptInfo.Text = string.IsNullOrEmpty(s.Error)
-                ? "[" + DateTime.Now.ToLongTimeString() + "] Erfolgreich, wenn auch IF-Routinen nicht geprüft wurden."
-                : "[" + DateTime.Now.ToLongTimeString() + "] Fehler in Zeile: " + s.Line.ToString() + "\r\n" + s.Error + "\r\n >>> " + s.ErrorCode.RestoreEscape();
+        }
+
+        private void btnTest_Click(object sender, System.EventArgs e) {
+            Message("Starte Skript");
+            tableVariablen.Database.Row.Clear();
+
+            var s = GenerateAndDoScript();
+
+            WriteVariablesToTable(s);
+            WriteComandsToList(s);
+
+            if (string.IsNullOrEmpty(s.Error)) {
+                Message("Erfolgreich, wenn auch IF-Routinen nicht geprüft wurden.");
+            } else {
+                Message("Fehler in Zeile: " + s.Line.ToString() + "\r\n" + s.Error + "\r\n >>> " + s.ErrorCode.RestoreEscape());
+            }
         }
 
         private void GenerateVariableTable() {

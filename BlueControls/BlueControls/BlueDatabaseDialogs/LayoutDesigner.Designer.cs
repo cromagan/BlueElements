@@ -41,7 +41,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabRightSide = new BlueControls.Controls.TabControl();
             this.tabElementEigenschaften = new System.Windows.Forms.TabPage();
             this.tabSkript = new System.Windows.Forms.TabPage();
-            this.scriptEditor = new BlueControls.ScriptEditor();
+            this.scriptEditor = new BlueControls.ScriptEditorDatabase();
             this.Ribbon.SuspendLayout();
             this.tabPageControl.SuspendLayout();
             this.tabPageStart.SuspendLayout();
@@ -317,7 +317,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private  System.Windows.Forms.TabPage tabElementEigenschaften;
         private  System.Windows.Forms.TabPage tabSkript;
         private TabControl tabRightSide;
-        private ScriptEditor scriptEditor;
+        private ScriptEditorDatabase scriptEditor;
         internal Button btnCopyID;
     }
 }

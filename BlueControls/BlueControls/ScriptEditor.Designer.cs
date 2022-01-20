@@ -26,50 +26,27 @@ namespace BlueControls {
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ScriptEditor));
-            this.tabCSckript = new BlueControls.Controls.TabControl();
-            this.tabScriptAnzeige = new System.Windows.Forms.TabPage();
             this.txtSkript = new FastColoredTextBoxNS.FastColoredTextBox();
-            this.tabBefehle = new System.Windows.Forms.TabPage();
             this.txbComms = new BlueControls.Controls.TextBox();
             this.lstComands = new BlueControls.Controls.ListBox();
-            this.tabVariablen = new System.Windows.Forms.TabPage();
             this.tableVariablen = new BlueControls.Controls.Table();
             this.filterVariablen = new BlueControls.BlueDatabaseDialogs.Filterleiste();
             this.grpTextAllgemein = new BlueControls.Controls.GroupBox();
-            this.txbTestZeile = new BlueControls.Controls.TextBox();
-            this.capTestZeile = new BlueControls.Controls.Caption();
             this.txbSkriptInfo = new BlueControls.Controls.TextBox();
             this.btnTest = new BlueControls.Controls.Button();
-            this.tabCSckript.SuspendLayout();
-            this.tabScriptAnzeige.SuspendLayout();
+            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             ((System.ComponentModel.ISupportInitialize)(this.txtSkript)).BeginInit();
-            this.tabBefehle.SuspendLayout();
-            this.tabVariablen.SuspendLayout();
             this.grpTextAllgemein.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
+            this.splitContainer1.Panel1.SuspendLayout();
+            this.splitContainer1.Panel2.SuspendLayout();
+            this.splitContainer1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
+            this.splitContainer2.Panel1.SuspendLayout();
+            this.splitContainer2.Panel2.SuspendLayout();
+            this.splitContainer2.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // tabCSckript
-            // 
-            this.tabCSckript.Controls.Add(this.tabScriptAnzeige);
-            this.tabCSckript.Controls.Add(this.tabBefehle);
-            this.tabCSckript.Controls.Add(this.tabVariablen);
-            this.tabCSckript.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabCSckript.HotTrack = true;
-            this.tabCSckript.Location = new System.Drawing.Point(3, 117);
-            this.tabCSckript.Name = "tabCSckript";
-            this.tabCSckript.SelectedIndex = 0;
-            this.tabCSckript.Size = new System.Drawing.Size(597, 383);
-            this.tabCSckript.TabIndex = 2;
-            // 
-            // tabScriptAnzeige
-            // 
-            this.tabScriptAnzeige.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabScriptAnzeige.Controls.Add(this.txtSkript);
-            this.tabScriptAnzeige.Location = new System.Drawing.Point(4, 25);
-            this.tabScriptAnzeige.Name = "tabScriptAnzeige";
-            this.tabScriptAnzeige.Size = new System.Drawing.Size(589, 354);
-            this.tabScriptAnzeige.TabIndex = 0;
-            this.tabScriptAnzeige.Text = "Skript-Text";
             // 
             // txtSkript
             // 
@@ -87,7 +64,7 @@ namespace BlueControls {
         '\''};
             this.txtSkript.AutoIndentCharsPatterns = "\r\n^\\s*[\\w\\.]+(\\s\\w+)?\\s*(?<range>=)\\s*(?<range>[^;]+);\r\n^\\s*(case|default)\\s*[^:]" +
     "*(?<range>:)\\s*(?<range>[^;]+);\r\n";
-            this.txtSkript.AutoScrollMinSize = new System.Drawing.Size(2, 14);
+            this.txtSkript.AutoScrollMinSize = new System.Drawing.Size(27, 14);
             this.txtSkript.BackBrush = null;
             this.txtSkript.BracketsHighlightStrategy = FastColoredTextBoxNS.BracketsHighlightStrategy.Strategy2;
             this.txtSkript.CharHeight = 14;
@@ -95,7 +72,6 @@ namespace BlueControls {
             this.txtSkript.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txtSkript.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
             this.txtSkript.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txtSkript.Font = new System.Drawing.Font("Courier New", 9.75F);
             this.txtSkript.IsReplaceMode = false;
             this.txtSkript.Language = FastColoredTextBoxNS.Language.CSharp;
             this.txtSkript.LeftBracket = '(';
@@ -107,54 +83,30 @@ namespace BlueControls {
             this.txtSkript.RightBracket2 = '}';
             this.txtSkript.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
             this.txtSkript.ServiceColors = ((FastColoredTextBoxNS.ServiceColors)(resources.GetObject("txtSkript.ServiceColors")));
-            this.txtSkript.Size = new System.Drawing.Size(589, 354);
+            this.txtSkript.Size = new System.Drawing.Size(328, 201);
             this.txtSkript.TabIndex = 2;
             this.txtSkript.Zoom = 100;
             this.txtSkript.ToolTipNeeded += new System.EventHandler<FastColoredTextBoxNS.ToolTipNeededEventArgs>(this.txtSkript_ToolTipNeeded);
-            this.txtSkript.MouseUp += new MouseEventHandler(this.TxtSkript_MouseUp); 
-            // 
-            // tabBefehle
-            // 
-            this.tabBefehle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabBefehle.Controls.Add(this.txbComms);
-            this.tabBefehle.Controls.Add(this.lstComands);
-            this.tabBefehle.Location = new System.Drawing.Point(4, 25);
-            this.tabBefehle.Name = "tabBefehle";
-            this.tabBefehle.Size = new System.Drawing.Size(589, 354);
-            this.tabBefehle.TabIndex = 2;
-            this.tabBefehle.Text = "Befehle";
+            this.txtSkript.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TxtSkript_MouseUp);
             // 
             // txbComms
             // 
             this.txbComms.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbComms.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txbComms.Location = new System.Drawing.Point(488, 0);
+            this.txbComms.Location = new System.Drawing.Point(28, 97);
             this.txbComms.Name = "txbComms";
-            this.txbComms.Size = new System.Drawing.Size(101, 354);
+            this.txbComms.Size = new System.Drawing.Size(101, 138);
             this.txbComms.TabIndex = 2;
             this.txbComms.Verhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // lstComands
             // 
             this.lstComands.AddAllowed = BlueControls.Enums.enAddType.None;
-            this.lstComands.Dock = System.Windows.Forms.DockStyle.Left;
             this.lstComands.FilterAllowed = true;
-            this.lstComands.Location = new System.Drawing.Point(0, 0);
+            this.lstComands.Location = new System.Drawing.Point(-36, -7);
             this.lstComands.Name = "lstComands";
-            this.lstComands.Size = new System.Drawing.Size(488, 354);
+            this.lstComands.Size = new System.Drawing.Size(136, 104);
             this.lstComands.TabIndex = 3;
             this.lstComands.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.lstComands_ItemClicked);
-            // 
-            // tabVariablen
-            // 
-            this.tabVariablen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabVariablen.Controls.Add(this.tableVariablen);
-            this.tabVariablen.Controls.Add(this.filterVariablen);
-            this.tabVariablen.Location = new System.Drawing.Point(4, 25);
-            this.tabVariablen.Name = "tabVariablen";
-            this.tabVariablen.Size = new System.Drawing.Size(589, 354);
-            this.tabVariablen.TabIndex = 1;
-            this.tabVariablen.Text = "Variablen";
             // 
             // tableVariablen
             // 
@@ -162,7 +114,7 @@ namespace BlueControls {
             this.tableVariablen.Location = new System.Drawing.Point(0, 40);
             this.tableVariablen.Name = "tableVariablen";
             this.tableVariablen.ShowWaitScreen = true;
-            this.tableVariablen.Size = new System.Drawing.Size(589, 314);
+            this.tableVariablen.Size = new System.Drawing.Size(603, 157);
             this.tableVariablen.TabIndex = 2;
             this.tableVariablen.Text = "tabVariablen";
             // 
@@ -173,40 +125,22 @@ namespace BlueControls {
             this.filterVariablen.Dock = System.Windows.Forms.DockStyle.Top;
             this.filterVariablen.Location = new System.Drawing.Point(0, 0);
             this.filterVariablen.Name = "filterVariablen";
-            this.filterVariablen.Size = new System.Drawing.Size(589, 40);
+            this.filterVariablen.Size = new System.Drawing.Size(603, 40);
             this.filterVariablen.TabIndex = 1;
             this.filterVariablen.TabStop = false;
             // 
             // grpTextAllgemein
             // 
             this.grpTextAllgemein.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.grpTextAllgemein.Controls.Add(this.txbTestZeile);
-            this.grpTextAllgemein.Controls.Add(this.capTestZeile);
             this.grpTextAllgemein.Controls.Add(this.txbSkriptInfo);
             this.grpTextAllgemein.Controls.Add(this.btnTest);
             this.grpTextAllgemein.Dock = System.Windows.Forms.DockStyle.Top;
-            this.grpTextAllgemein.Location = new System.Drawing.Point(3, 16);
+            this.grpTextAllgemein.Location = new System.Drawing.Point(0, 0);
             this.grpTextAllgemein.Name = "grpTextAllgemein";
-            this.grpTextAllgemein.Size = new System.Drawing.Size(597, 101);
+            this.grpTextAllgemein.Size = new System.Drawing.Size(603, 101);
             this.grpTextAllgemein.TabIndex = 3;
             this.grpTextAllgemein.TabStop = false;
             this.grpTextAllgemein.Text = "Allgemein";
-            // 
-            // txbTestZeile
-            // 
-            this.txbTestZeile.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbTestZeile.Location = new System.Drawing.Point(8, 64);
-            this.txbTestZeile.Name = "txbTestZeile";
-            this.txbTestZeile.Size = new System.Drawing.Size(144, 24);
-            this.txbTestZeile.TabIndex = 2;
-            // 
-            // capTestZeile
-            // 
-            this.capTestZeile.CausesValidation = false;
-            this.capTestZeile.Location = new System.Drawing.Point(8, 48);
-            this.capTestZeile.Name = "capTestZeile";
-            this.capTestZeile.Size = new System.Drawing.Size(72, 16);
-            this.capTestZeile.Text = "Test-Zeile:";
             // 
             // txbSkriptInfo
             // 
@@ -216,7 +150,7 @@ namespace BlueControls {
             this.txbSkriptInfo.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbSkriptInfo.Location = new System.Drawing.Point(160, 16);
             this.txbSkriptInfo.Name = "txbSkriptInfo";
-            this.txbSkriptInfo.Size = new System.Drawing.Size(428, 80);
+            this.txbSkriptInfo.Size = new System.Drawing.Size(434, 80);
             this.txbSkriptInfo.TabIndex = 1;
             this.txbSkriptInfo.Verhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
@@ -229,35 +163,74 @@ namespace BlueControls {
             this.btnTest.Text = "Testen";
             this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
             // 
+            // splitContainer1
+            // 
+            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer1.Location = new System.Drawing.Point(0, 101);
+            this.splitContainer1.Name = "splitContainer1";
+            this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
+            // 
+            // splitContainer1.Panel1
+            // 
+            this.splitContainer1.Panel1.Controls.Add(this.splitContainer2);
+            // 
+            // splitContainer1.Panel2
+            // 
+            this.splitContainer1.Panel2.Controls.Add(this.tableVariablen);
+            this.splitContainer1.Panel2.Controls.Add(this.filterVariablen);
+            this.splitContainer1.Size = new System.Drawing.Size(603, 402);
+            this.splitContainer1.SplitterDistance = 201;
+            this.splitContainer1.TabIndex = 4;
+            // 
+            // splitContainer2
+            // 
+            this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer2.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer2.Name = "splitContainer2";
+            // 
+            // splitContainer2.Panel1
+            // 
+            this.splitContainer2.Panel1.Controls.Add(this.txtSkript);
+            // 
+            // splitContainer2.Panel2
+            // 
+            this.splitContainer2.Panel2.Controls.Add(this.txbComms);
+            this.splitContainer2.Panel2.Controls.Add(this.lstComands);
+            this.splitContainer2.Size = new System.Drawing.Size(603, 201);
+            this.splitContainer2.SplitterDistance = 328;
+            this.splitContainer2.TabIndex = 0;
+            // 
             // ScriptEditor
             // 
-            this.Controls.Add(this.tabCSckript);
+            this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.grpTextAllgemein);
+            this.Name = "ScriptEditor";
             this.Size = new System.Drawing.Size(603, 503);
-            this.tabCSckript.ResumeLayout(false);
-            this.tabScriptAnzeige.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.txtSkript)).EndInit();
-            this.tabBefehle.ResumeLayout(false);
-            this.tabVariablen.ResumeLayout(false);
             this.grpTextAllgemein.ResumeLayout(false);
+            this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
+            this.splitContainer1.ResumeLayout(false);
+            this.splitContainer2.Panel1.ResumeLayout(false);
+            this.splitContainer2.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
+            this.splitContainer2.ResumeLayout(false);
             this.ResumeLayout(false);
+
         }
 
 
         #endregion
-        private Controls.TabControl tabCSckript;
-        private TabPage tabScriptAnzeige;
         private FastColoredTextBoxNS.FastColoredTextBox txtSkript;
-        private TabPage tabBefehle;
         private Controls.TextBox txbComms;
         private Controls.ListBox lstComands;
-        private TabPage tabVariablen;
         private Controls.Table tableVariablen;
         private BlueDatabaseDialogs.Filterleiste filterVariablen;
         private Controls.GroupBox grpTextAllgemein;
-        private Controls.TextBox txbTestZeile;
-        private Controls.Caption capTestZeile;
         private Controls.TextBox txbSkriptInfo;
         private Controls.Button btnTest;
+        private SplitContainer splitContainer1;
+        private SplitContainer splitContainer2;
     }
 }

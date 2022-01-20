@@ -282,6 +282,12 @@
     <Compile Include="ScriptEditor.Designer.cs">
       <DependentUpon>ScriptEditor.cs</DependentUpon>
     </Compile>
+    <Compile Include="ScriptEditorDatabase.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ScriptEditorDatabase.Designer.cs">
+      <DependentUpon>ScriptEditorDatabase.cs</DependentUpon>
+    </Compile>
     <Compile Include="SystemInputHook.cs" />
     <Compile Include="Controls\Button.cs">
       <SubType>Component</SubType>
@@ -761,6 +767,9 @@
     <EmbeddedResource Include="ScriptEditor.resx">
       <DependentUpon>ScriptEditor.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ScriptEditorDatabase.resx">
+      <DependentUpon>ScriptEditorDatabase.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
