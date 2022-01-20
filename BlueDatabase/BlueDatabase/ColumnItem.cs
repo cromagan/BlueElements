@@ -1420,6 +1420,10 @@ namespace BlueDatabase {
             //// bis 999 wird geprüft
 
             switch ((int)_Format) {
+                case (int)enDataFormat.Button:
+                    ScriptType = enScriptType.Nicht_vorhanden;
+                    break;
+
                 case 21: //Text_Ohne_Kritische_Zeichen
                     SetFormatForText();
                     break;
@@ -1451,7 +1455,7 @@ namespace BlueDatabase {
                     ScriptType = enScriptType.Bool;
                 } else if (MultiLine) {
                     ScriptType = enScriptType.List;
-                } else if (Format == enDataFormat.Text) {
+                } else if (Format is  enDataFormat.Text or enDataFormat.Columns_für_LinkedCellDropdown) {
                     if (SortType is enSortierTyp.ZahlenwertFloat or enSortierTyp.ZahlenwertInt) {
                         ScriptType = enScriptType.Numeral;
                     }
@@ -1467,6 +1471,10 @@ namespace BlueDatabase {
                     ScriptType = c.ScriptType;
                     Translate = c.Translate;
                 }
+            }
+
+            if (ScriptType == enScriptType.undefiniert) {
+                Develop.DebugPrint(enFehlerArt.Warnung, "Umsetzung fehlgeschlagen: " + Caption + " " + Database.Filename);
             }
 
             ResetSystemToDefault(false);
@@ -1503,7 +1511,7 @@ namespace BlueDatabase {
                     _TextBearbeitungErlaubt = false;
                     _DropdownBearbeitungErlaubt = false;
                     _ShowUndo = false;
-                    _ScriptType = enScriptType.Nicht_vorhanden;
+                    _ScriptType = enScriptType.String_Readonly;
                     PermissionGroups_ChangeCell.Clear();
                     if (SetAll) {
                         Caption = "Änderer";
@@ -1540,11 +1548,11 @@ namespace BlueDatabase {
                     _Name = "SYS_ChangeDate";
                     _SpellCheckingEnabled = false;
                     _ShowUndo = false;
-                    SetFormatForDateTime();
+                    // SetFormatForDateTime(); --Sriptt Type Chaos
                     _TextBearbeitungErlaubt = false;
                     _SpellCheckingEnabled = false;
                     _DropdownBearbeitungErlaubt = false;
-                    _ScriptType = enScriptType.Nicht_vorhanden;
+                    _ScriptType = enScriptType.String_Readonly;
                     PermissionGroups_ChangeCell.Clear();
                     if (SetAll) {
                         Caption = "Änder-Datum";

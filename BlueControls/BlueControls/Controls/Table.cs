@@ -1060,6 +1060,12 @@ namespace BlueControls.Controls {
                 }
                 var sr = SortedRows();
 
+                if (sr == null) {
+                    // Multitasking...
+                    DrawWaitScreen(gr);
+                    return;
+                }
+
                 var FirstVisibleRow = sr.Count;
                 var LastVisibleRow = -1;
                 foreach (var thisRow in sr) {

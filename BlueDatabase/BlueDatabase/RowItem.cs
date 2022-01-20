@@ -107,9 +107,9 @@ namespace BlueDatabase {
             #region ReadOnly bestimmen
 
             var ro = !column.Format.CanBeChangedByRules();
-            if (column == column.Database.Column.SysCorrect) { ro = true; }
-            if (column == column.Database.Column.SysRowChanger) { ro = true; }
-            if (column == column.Database.Column.SysRowChangeDate) { ro = true; }
+            //if (column == column.Database.Column.SysCorrect) { ro = true; }
+            //if (column == column.Database.Column.SysRowChanger) { ro = true; }
+            //if (column == column.Database.Column.SysRowChangeDate) { ro = true; }
 
             #endregion
 
@@ -163,6 +163,10 @@ namespace BlueDatabase {
 
                 case enScriptType.String:
                     vars.Add(new Variable(column.Name, wert, enVariableDataType.String, ro, false, qi));
+                    break;
+
+                case enScriptType.String_Readonly:
+                    vars.Add(new Variable(column.Name, wert, enVariableDataType.String, true, false, qi));
                     break;
 
                 default:

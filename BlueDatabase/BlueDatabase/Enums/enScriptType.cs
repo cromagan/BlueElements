@@ -23,6 +23,7 @@ namespace BlueDatabase.Enums {
         String = 2,
         Numeral = 3,
         List = 4,
+        String_Readonly = 5,
 
         undefiniert = 999
     }
