@@ -31,7 +31,7 @@ using System.Linq;
 
 namespace BlueControls {
 
-    public partial class ScriptEditor : GroupBox, IContextMenu // System.Windows.Forms.UserControl//
+    public partial class ScriptEditor : GroupBox, IContextMenu // System.Windows.Forms.UserControl, IContextMenu//
     {
         #region Fields
 
@@ -151,6 +151,9 @@ namespace BlueControls {
             }
         }
 
+        private void btnBefehlsUebersicht_Click(object sender, System.EventArgs e) {
+        }
+
         private void btnTest_Click(object sender, System.EventArgs e) {
             Message("Starte Skript");
             tableVariablen.Database.Row.Clear();
@@ -169,12 +172,12 @@ namespace BlueControls {
 
         private void GenerateVariableTable() {
             Database x = new(true);
-            x.Column.Add("Name", "Name", enVarType.Text);
-            x.Column.Add("Typ", "Typ", enVarType.Text);
-            x.Column.Add("RO", "Schreibgeschützt", enVarType.Text);
-            x.Column.Add("System", "Systemspalte", enVarType.Text);
-            x.Column.Add("Inhalt", "Inhalt", enVarType.Text);
-            x.Column.Add("Kommentar", "Kommentar", enVarType.Text);
+            x.Column.Add("Name", "Nam.", enVarType.Text, "Variablenname");
+            x.Column.Add("Typ", "Typ", enVarType.Text, "Variablentyp");
+            x.Column.Add("RO", "RO", enVarType.Text, "Readonly, Schreibgeschützt");
+            x.Column.Add("System", "Sys", enVarType.Text, "Systemspalte\r\nIm Script nicht verfügbar");
+            x.Column.Add("Inhalt", "Inh.", enVarType.Text, "Inhalt (gekürzte Ansicht)");
+            x.Column.Add("Kommentar", "Kom.", enVarType.Text, "Komentar");
             foreach (var ThisColumn in x.Column) {
                 if (string.IsNullOrEmpty(ThisColumn.Identifier)) {
                     ThisColumn.MultiLine = true;

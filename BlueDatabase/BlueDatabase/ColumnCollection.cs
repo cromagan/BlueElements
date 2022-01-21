@@ -110,17 +110,19 @@ namespace BlueDatabase {
             return null;
         }
 
-        public ColumnItem Add(string internalName) => Add(NextColumnKey(), internalName, internalName, string.Empty, enVarType.Text);
+        public ColumnItem Add(string internalName) => Add(NextColumnKey(), internalName, internalName, string.Empty, enVarType.Text, string.Empty);
 
-        public ColumnItem Add(long colKey) => Add(colKey, string.Empty, string.Empty, string.Empty, enVarType.Text);
+        public ColumnItem Add(long colKey) => Add(colKey, string.Empty, string.Empty, string.Empty, enVarType.Text, string.Empty);
 
-        public ColumnItem Add() => Add(NextColumnKey(), string.Empty, string.Empty, string.Empty, enVarType.Text);
+        public ColumnItem Add() => Add(NextColumnKey(), string.Empty, string.Empty, string.Empty, enVarType.Text, string.Empty);
 
-        public ColumnItem Add(string internalName, string caption, enVarType format) => Add(NextColumnKey(), internalName, caption, string.Empty, format);
+        public ColumnItem Add(string internalName, string caption, enVarType format) => Add(NextColumnKey(), internalName, caption, string.Empty, format, string.Empty);
 
-        public ColumnItem Add(string internalName, string caption, string suffix, enVarType format) => Add(NextColumnKey(), internalName, caption, suffix, format);
+        public ColumnItem Add(string internalName, string caption, enVarType format, string quickinfo) => Add(NextColumnKey(), internalName, caption, string.Empty, format, quickinfo);
 
-        public ColumnItem Add(long colKey, string internalName, string caption, string suffix, enVarType format) {
+        public ColumnItem Add(string internalName, string caption, string suffix, enVarType format) => Add(NextColumnKey(), internalName, caption, suffix, format, string.Empty);
+
+        public ColumnItem Add(long colKey, string internalName, string caption, string suffix, enVarType format, string quickinfo) {
             Database.AddPending(enDatabaseDataType.AddColumn, colKey, -1, string.Empty, colKey.ToString(), true);
             // Ruft anschließen AddFromParserAuf, der die Spalte endgülrig dazumacht
             var c = SearchByKey(colKey);

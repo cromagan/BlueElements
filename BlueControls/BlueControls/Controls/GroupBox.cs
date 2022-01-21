@@ -99,6 +99,21 @@ namespace BlueControls.Controls {
                     }
                     break;
 
+                case enGroupBoxStyle.NormalBold:
+                    if (Height > 33) {
+                        r.Inflate(-2, -2);
+                        for (var z = 0; z < 8; z++) {
+                            Skin.Draw_Border(e.Graphics, enDesign.Frame, state, r);
+                            r.Inflate(1, 1);
+                        }
+
+                        if (!string.IsNullOrEmpty(Text)) {
+                            Rectangle topTXT = new(Skin.Padding, 0, Width, Height);
+                            Skin.Draw_FormatedText(e.Graphics, Text, enDesign.Frame, state, null, enAlignment.Top_Left, topTXT, this, true, true);
+                        }
+                    }
+                    break;
+
                 default:
                     Skin.Draw_Back_Transparent(e.Graphics, DisplayRectangle, this);
                     break;

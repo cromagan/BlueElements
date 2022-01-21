@@ -25,33 +25,34 @@ namespace BlueControls {
         /// </summary>
         private void InitializeComponent() {
             this.txbTestZeile = new BlueControls.Controls.TextBox();
-            this.capTestZeile = new BlueControls.Controls.Caption();
+            this.grpMainBar.SuspendLayout();
             this.SuspendLayout();
+            // 
+            // grpMainBar
+            // 
+            this.grpMainBar.Controls.Add(this.txbTestZeile);
+            this.grpMainBar.Controls.SetChildIndex(this.btnTest, 0);
+            this.grpMainBar.Controls.SetChildIndex(this.txbTestZeile, 0);
+            this.grpMainBar.Controls.SetChildIndex(this.btnBefehlsUebersicht, 0);
+            // 
+            // btnBefehlsUebersicht
+            // 
+            this.btnBefehlsUebersicht.Location = new System.Drawing.Point(384, 16);
             // 
             // txbTestZeile
             // 
             this.txbTestZeile.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbTestZeile.Location = new System.Drawing.Point(229, 247);
+            this.txbTestZeile.Location = new System.Drawing.Point(120, 16);
             this.txbTestZeile.Name = "txbTestZeile";
-            this.txbTestZeile.Size = new System.Drawing.Size(144, 24);
+            this.txbTestZeile.Size = new System.Drawing.Size(256, 32);
             this.txbTestZeile.TabIndex = 4;
-            // 
-            // capTestZeile
-            // 
-            this.capTestZeile.CausesValidation = false;
-            this.capTestZeile.Location = new System.Drawing.Point(229, 231);
-            this.capTestZeile.Name = "capTestZeile";
-            this.capTestZeile.Size = new System.Drawing.Size(72, 16);
-            this.capTestZeile.Text = "Test-Zeile:";
             // 
             // ScriptEditorDatabase
             // 
-            this.Controls.Add(this.txbTestZeile);
-            this.Controls.Add(this.capTestZeile);
-            this.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.Normal;
             this.Name = "ScriptEditorDatabase";
             this.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.scriptEditor_ContextMenuInit);
-            this.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.scriptEditor_ContextMenuItemClicked); 
+            this.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.scriptEditor_ContextMenuItemClicked);
+            this.grpMainBar.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -59,6 +60,6 @@ namespace BlueControls {
         #endregion
 
         private Controls.TextBox txbTestZeile;
-        private Controls.Caption capTestZeile;
+
     }
 }

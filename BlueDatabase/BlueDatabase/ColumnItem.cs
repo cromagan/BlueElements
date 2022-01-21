@@ -1455,11 +1455,13 @@ namespace BlueDatabase {
                     ScriptType = enScriptType.Bool;
                 } else if (MultiLine) {
                     ScriptType = enScriptType.List;
-                } else if (Format is  enDataFormat.Text or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Link_To_Filesystem) {
+                } else if (Format is enDataFormat.Text or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Link_To_Filesystem) {
                     if (SortType is enSortierTyp.ZahlenwertFloat or enSortierTyp.ZahlenwertInt) {
                         ScriptType = enScriptType.Numeral;
                     }
                     ScriptType = enScriptType.String;
+                } else if (Format == enDataFormat.Schrift) {
+                    ScriptType = enScriptType.Nicht_vorhanden;
                 }
             }
 
