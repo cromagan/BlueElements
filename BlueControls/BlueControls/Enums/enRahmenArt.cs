@@ -25,6 +25,7 @@ namespace BlueControls.Enums {
         Solide_1px = 100,
         Solide_1px_FocusDotLine = 105,
         Solide_3px = 110,
+        Solide_7px = 112,
 
         [Obsolete]
         Solide_1px_DuoColor = 120,

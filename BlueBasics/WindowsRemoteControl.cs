@@ -172,9 +172,10 @@ namespace BlueBasics {
             BlueBasics.MultiUserFile.clsMultiUserFile.SaveAll(true);
             Develop.TraceLogging_End();
 
-            var psi = new ProcessStartInfo("shutdown.exe", "-r -f -t 0");
-            psi.CreateNoWindow = true;
-            psi.UseShellExecute = false;
+            var psi = new ProcessStartInfo("shutdown.exe", "-r -f -t 0") {
+                CreateNoWindow = true,
+                UseShellExecute = false
+            };
             Process.Start(psi);
 
             Develop.AbortExe();
@@ -189,9 +190,10 @@ namespace BlueBasics {
             BlueBasics.MultiUserFile.clsMultiUserFile.SaveAll(true);
             Develop.TraceLogging_End();
 
-            var psi = new ProcessStartInfo("shutdown", "/s /t 0");
-            psi.CreateNoWindow = true;
-            psi.UseShellExecute = false;
+            var psi = new ProcessStartInfo("shutdown", "/s /t 0") {
+                CreateNoWindow = true,
+                UseShellExecute = false
+            };
             Process.Start(psi);
 
             Develop.AbortExe();

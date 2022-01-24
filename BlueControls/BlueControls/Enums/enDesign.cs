@@ -107,12 +107,14 @@ namespace BlueControls.Enums {
         Item_Listbox_Caption = 2156,
 
         // Sonstiges 2200
-        Frame = 2200,
+        GroupBox = 2200,
 
         TabStrip_Body = 2201,
         RibbonBar_Body = 2202,
         RibbonBar_Back = 2203,
         TabStrip_Back = 2204,
+        GroupBoxBold = 2205,
+
         Progressbar = 2210,
         Progressbar_Füller = 2211,
 

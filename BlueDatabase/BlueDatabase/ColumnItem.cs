@@ -991,8 +991,7 @@ namespace BlueDatabase {
         }
 
         public List<string> Contents(FilterItem fi, List<RowItem> pinned) {
-            var x = new FilterCollection(fi.Database);
-            x.Add(fi);
+            var x = new FilterCollection(fi.Database) { fi };
             return Contents(x, pinned);
         }
 
@@ -1908,9 +1907,7 @@ namespace BlueDatabase {
 
                     var skriptgesteuert = LinkedCell_RowKey == -9999;
                     if (skriptgesteuert) {
-                        if (editType_To_Check == enEditTypeFormula.Textfeld) { return true; }
-                        if (editType_To_Check == enEditTypeFormula.nur_als_Text_anzeigen) { return true; }
-                        return false;
+                        return editType_To_Check is enEditTypeFormula.Textfeld or enEditTypeFormula.nur_als_Text_anzeigen;
                     }
 
                     if (LinkedDatabase() == null) { return false; }
@@ -2070,11 +2067,11 @@ namespace BlueDatabase {
                     _Ueberschrift3 = Wert;
                     break;
 
-                case enDatabaseDataType.co_CaptionBitmap:
-                    if (!string.IsNullOrEmpty(Wert)) {
-                        _CaptionBitmapTXT = "co_" + _Name;
-                    }
-                    break;
+                //case enDatabaseDataType.co_CaptionBitmap:
+                //    if (!string.IsNullOrEmpty(Wert)) {
+                //        _CaptionBitmapTXT = "co_" + _Name;
+                //    }
+                //    break;
 
                 case enDatabaseDataType.co_Identifier:
                     _Identifier = Wert;
@@ -2274,11 +2271,11 @@ namespace BlueDatabase {
                     _LinkedCell_ColumnKey = long.Parse(Wert);
                     break;
 
-                case enDatabaseDataType.co_LinkedCell_ColumnValueFoundIn:
-                    break;
+                //case enDatabaseDataType.co_LinkedCell_ColumnValueFoundIn:
+                //    break;
 
-                case enDatabaseDataType.co_LinkedCell_ColumnValueAdd:
-                    break;
+                //case enDatabaseDataType.co_LinkedCell_ColumnValueAdd:
+                //    break;
 
                 case enDatabaseDataType.co_SortType:
                     if (string.IsNullOrEmpty(Wert)) {

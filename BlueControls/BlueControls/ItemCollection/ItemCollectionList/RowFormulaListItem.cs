@@ -61,7 +61,7 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public override string QuickInfo {
+        public override string? QuickInfo {
             get {
                 if (_Row == null) { return null; }
 

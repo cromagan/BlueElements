@@ -56,7 +56,7 @@ namespace BlueScript {
 
             var db = Database.GetByFilename(d2[0], true, false);
 
-            return db == null ? null : db.Row.SearchByKey(long.Parse(d2[1]));
+            return db?.Row.SearchByKey(long.Parse(d2[1]));
         }
 
         public static strDoItFeedback RowToObject(RowItem row) => row == null

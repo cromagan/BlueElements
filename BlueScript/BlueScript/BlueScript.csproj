@@ -13,7 +13,7 @@
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
-	 <Nullable>enable</Nullable>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -73,6 +73,7 @@
     <Compile Include="Methods\Method_IsDateTime.cs" />
     <Compile Include="Methods\Method_SortNum.cs" />
     <Compile Include="Methods\Method_ExtractTags.cs" />
+    <Compile Include="Methods\Method_TrimPrefix.cs" />
     <Compile Include="Methods\Method_TrimSuffix.cs" />
     <Compile Include="Methods\Method_StringToUTF8.cs" />
     <Compile Include="Methods\Method_ToLower.cs" />

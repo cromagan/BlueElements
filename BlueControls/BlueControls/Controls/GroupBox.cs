@@ -91,27 +91,35 @@ namespace BlueControls.Controls {
 
                 case enGroupBoxStyle.Normal:
                     if (Height > 33) {
-                        Skin.Draw_Border(e.Graphics, enDesign.Frame, state, r);
+                        Skin.Draw_Border(e.Graphics, enDesign.GroupBox, state, r);
                         if (!string.IsNullOrEmpty(Text)) {
                             Rectangle topTXT = new(Skin.Padding, 0, Width, Height);
-                            Skin.Draw_FormatedText(e.Graphics, Text, enDesign.Frame, state, null, enAlignment.Top_Left, topTXT, this, true, true);
+                            Skin.Draw_FormatedText(e.Graphics, Text, enDesign.GroupBox, state, null, enAlignment.Top_Left, topTXT, this, true, true);
                         }
                     }
                     break;
 
                 case enGroupBoxStyle.NormalBold:
                     if (Height > 33) {
-                        r.Inflate(-2, -2);
-                        for (var z = 0; z < 8; z++) {
-                            Skin.Draw_Border(e.Graphics, enDesign.Frame, state, r);
-                            r.Inflate(1, 1);
-                        }
-
+                        Skin.Draw_Border(e.Graphics, enDesign.GroupBoxBold, state, r);
                         if (!string.IsNullOrEmpty(Text)) {
                             Rectangle topTXT = new(Skin.Padding, 0, Width, Height);
-                            Skin.Draw_FormatedText(e.Graphics, Text, enDesign.Frame, state, null, enAlignment.Top_Left, topTXT, this, true, true);
+                            Skin.Draw_FormatedText(e.Graphics, Text, enDesign.GroupBoxBold, state, null, enAlignment.Top_Left, topTXT, this, true, true);
                         }
                     }
+                    break;
+                    //if (Height > 33) {
+                    //    r.Inflate(-2, -2);
+                    //    for (var z = 0; z < 8; z++) {
+                    //        Skin.Draw_Border(e.Graphics, enDesign.Frame, state, r);
+                    //        r.Inflate(1, 1);
+                    //    }
+
+                    //    if (!string.IsNullOrEmpty(Text)) {
+                    //        Rectangle topTXT = new(Skin.Padding, 0, Width, Height);
+                    //        Skin.Draw_FormatedText(e.Graphics, Text, enDesign.Frame, state, null, enAlignment.Top_Left, topTXT, this, true, true);
+                    //    }
+                    //}
                     break;
 
                 default:

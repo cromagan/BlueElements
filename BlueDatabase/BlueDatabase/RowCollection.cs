@@ -460,7 +460,7 @@ namespace BlueDatabase {
 
             do {
                 tmp++;
-                key = x + s.GetHashCode() * 100000000 + tmp;
+                key = x + (s.GetHashCode() * 100000000) + tmp;
                 if (key < 0) { key *= -1; }
             } while (SearchByKey(key) != null);
             return key;

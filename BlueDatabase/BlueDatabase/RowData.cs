@@ -140,13 +140,7 @@ namespace BlueDatabase {
             MarkYellow = thisRowData.MarkYellow;
         }
 
-        public override string ToString() {
-            if (Row == null) {
-                return Chapter + " -> null";
-            } else {
-                return Chapter + " -> " + Row.CellFirstString();
-            }
-        }
+        public override string ToString() => Row == null ? Chapter + " -> null" : Chapter + " -> " + Row.CellFirstString();
 
         #endregion
     }

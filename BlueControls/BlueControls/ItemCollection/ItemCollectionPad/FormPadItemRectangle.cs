@@ -177,10 +177,10 @@ namespace BlueControls.ItemCollection {
 
         public virtual void SizeChanged() {
             // Punkte immer komplett setzen. Um eventuelle Parsing-Fehler auszugleichen
-            p_L.SetTo(p_LO.X, p_LO.Y + (p_LU.Y - p_LO.Y) / 2);
-            p_R.SetTo(p_RO.X, p_LO.Y + (p_LU.Y - p_LO.Y) / 2);
-            p_U.SetTo(p_LO.X + (p_RO.X - p_LO.X) / 2, p_RU.Y);
-            p_O.SetTo(p_LO.X + (p_RO.X - p_LO.X) / 2, p_RO.Y);
+            p_L.SetTo(p_LO.X, p_LO.Y + ((p_LU.Y - p_LO.Y) / 2));
+            p_R.SetTo(p_RO.X, p_LO.Y + ((p_LU.Y - p_LO.Y) / 2));
+            p_U.SetTo(p_LO.X + ((p_RO.X - p_LO.X) / 2), p_RU.Y);
+            p_O.SetTo(p_LO.X + ((p_RO.X - p_LO.X) / 2), p_RO.Y);
         }
 
         public override string ToString() {

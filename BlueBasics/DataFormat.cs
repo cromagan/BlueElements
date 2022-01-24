@@ -24,38 +24,37 @@ using static BlueBasics.Converter;
 namespace BlueBasics {
 
     public static class DataFormat {
+        //public static string AllowedChars(this enDataFormat format) {
+        //    switch (format) {
+        //        case enDataFormat.Text:
+        //        case enDataFormat.Columns_für_LinkedCellDropdown:
+        //        case enDataFormat.Values_für_LinkedCellDropdown:
+        //        case enDataFormat.RelationText:
+        //            return Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + Constants.Char_Numerals + Constants.Char_Satzzeichen + Constants.Char_Sonderzeichen;
+
+        //        case enDataFormat.Bit:
+        //            return "+-";
+
+        //        case enDataFormat.FarbeInteger:
+        //            return Constants.Char_Numerals + "-";
+
+        //        case enDataFormat.Link_To_Filesystem:
+        //            return Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + Constants.Char_Numerals + ",.\\:_ +-()'";
+
+        //        case enDataFormat.LinkedCell:
+        //            Develop.DebugPrint(enFehlerArt.Warnung, "LinkedCell kann nicht geprüft werden.");
+        //            return string.Empty;
+
+        //        case enDataFormat.Button:
+        //            return string.Empty;
+
+        //        default:
+        //            Develop.DebugPrint(format);
+        //            return string.Empty;
+        //    }
+        //}
 
         #region Methods
-
-        public static string AllowedChars(this enDataFormat format) {
-            switch (format) {
-                case enDataFormat.Text:
-                case enDataFormat.Columns_für_LinkedCellDropdown:
-                case enDataFormat.Values_für_LinkedCellDropdown:
-                case enDataFormat.RelationText:
-                    return Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + Constants.Char_Numerals + Constants.Char_Satzzeichen + Constants.Char_Sonderzeichen;
-
-                case enDataFormat.Bit:
-                    return "+-";
-
-                case enDataFormat.FarbeInteger:
-                    return Constants.Char_Numerals + "-";
-
-                case enDataFormat.Link_To_Filesystem:
-                    return Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + Constants.Char_Numerals + ",.\\:_ +-()'";
-
-                case enDataFormat.LinkedCell:
-                    Develop.DebugPrint(enFehlerArt.Warnung, "LinkedCell kann nicht geprüft werden.");
-                    return string.Empty;
-
-                case enDataFormat.Button:
-                    return string.Empty;
-
-                default:
-                    Develop.DebugPrint(format);
-                    return string.Empty;
-            }
-        }
 
         public static bool Autofilter_möglich(this enDataFormat format) => format switch {
             enDataFormat.Text or enDataFormat.Bit or enDataFormat.FarbeInteger or enDataFormat.Schrift or enDataFormat.Link_To_Filesystem or enDataFormat.LinkedCell or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Values_für_LinkedCellDropdown or enDataFormat.RelationText => true,

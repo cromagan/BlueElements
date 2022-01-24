@@ -109,7 +109,7 @@ namespace BlueDatabase {
 
         private enVerwaisteDaten _VerwaisteDaten;
 
-        private string _WorkItemsBefore = string.Empty;
+        //private string _WorkItemsBefore = string.Empty;
 
         private string _ZeilenQuickInfo;
 
@@ -1113,9 +1113,7 @@ namespace BlueDatabase {
         }
 
         protected override bool BlockSaveOperations() {
-            if (RowItem.DoingScript) { return true; }
-
-            return base.BlockSaveOperations();
+            return RowItem.DoingScript || base.BlockSaveOperations();
         }
 
         //protected override void CheckDataAfterReload() {
@@ -1759,8 +1757,8 @@ namespace BlueDatabase {
                     Tags.SplitAndCutByCR(value);
                     break;
 
-                case enDatabaseDataType.BinaryDataInOne:
-                    break;
+                //case enDatabaseDataType.BinaryDataInOne:
+                //    break;
 
                 case enDatabaseDataType.Layouts:
                     Layouts.SplitAndCutByCR_QuickSortAndRemoveDouble(value);
@@ -1774,14 +1772,14 @@ namespace BlueDatabase {
                     }
                     break;
 
-                case enDatabaseDataType.Rules_ALT:
-                    //var Rules = new List<RuleItem_Old>();
-                    //var RU = content.SplitAndCutByCR();
-                    //for (var z = 0; z <= RU.GetUpperBound(0); z++) {
-                    //    Rules.Add(new RuleItem_Old(this, RU[z]));
-                    //}
-                    _RulesScript = string.Empty;
-                    break;
+                //case enDatabaseDataType.Rules_ALT:
+                //    //var Rules = new List<RuleItem_Old>();
+                //    //var RU = content.SplitAndCutByCR();
+                //    //for (var z = 0; z <= RU.GetUpperBound(0); z++) {
+                //    //    Rules.Add(new RuleItem_Old(this, RU[z]));
+                //    //}
+                //    _RulesScript = string.Empty;
+                //    break;
 
                 case enDatabaseDataType.ColumnArrangement:
                     ColumnArrangements.Clear();
@@ -1803,13 +1801,13 @@ namespace BlueDatabase {
                     PermissionGroups_NewRow.SplitAndCutByCR_QuickSortAndRemoveDouble(value);
                     break;
 
-                case enDatabaseDataType.LastRowKey:
-                    //return Row.Load_310(type, value);
-                    break;
+                //case enDatabaseDataType.LastRowKey:
+                //    //return Row.Load_310(type, value);
+                //    break;
 
-                case enDatabaseDataType.LastColumnKey:
-                    //return Column.Load_310(type, value);
-                    break;
+                //case enDatabaseDataType.LastColumnKey:
+                //    //return Column.Load_310(type, value);
+                //    break;
 
                 case enDatabaseDataType.GlobalShowPass:
                     _GlobalShowPass = value;
@@ -1823,16 +1821,16 @@ namespace BlueDatabase {
                     // TODO: Entferne Skin
                     break;
 
-                case enDatabaseDataType.JoinTyp:
-                    //_JoinTyp = (enJoinTyp)int.Parse(value);
-                    break;
+                //case enDatabaseDataType.JoinTyp:
+                //    //_JoinTyp = (enJoinTyp)int.Parse(value);
+                //    break;
 
                 case enDatabaseDataType.VerwaisteDaten:
                     _VerwaisteDaten = (enVerwaisteDaten)int.Parse(value);
                     break;
 
-                case (enDatabaseDataType)63://                    enDatabaseDataType.ImportScript:
-                    break;
+                //case (enDatabaseDataType)63://                    enDatabaseDataType.ImportScript:
+                //    break;
 
                 case enDatabaseDataType.RulesScript:
                     _RulesScript = value;
@@ -1963,17 +1961,17 @@ namespace BlueDatabase {
             //}
         }
 
-        private string SearchKeyValueInPendingsOf(long RowKey) {
-            var F = string.Empty;
-            foreach (var ThisPending in Works) {
-                if (ThisPending.State == enItemState.Pending) {
-                    if (ThisPending.RowKey == RowKey && ThisPending.Comand == enDatabaseDataType.ce_Value_withoutSizeData && ThisPending.ColKey == Column[0].Key) {
-                        F = ThisPending.ChangedTo;
-                    }
-                }
-            }
-            return F;
-        }
+        //private string SearchKeyValueInPendingsOf(long RowKey) {
+        //    var F = string.Empty;
+        //    foreach (var ThisPending in Works) {
+        //        if (ThisPending.State == enItemState.Pending) {
+        //            if (ThisPending.RowKey == RowKey && ThisPending.Comand == enDatabaseDataType.ce_Value_withoutSizeData && ThisPending.ColKey == Column[0].Key) {
+        //                F = ThisPending.ChangedTo;
+        //            }
+        //        }
+        //    }
+        //    return F;
+        //}
 
         private void Views_ListOrItemChanged(object sender, System.EventArgs e) {
             if (IsParsing) { return; } // hier schon raus, es muss kein ToString ausgeführt werden. Kann zu Endlosschleifen führen.

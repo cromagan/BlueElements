@@ -996,24 +996,9 @@ namespace BlueControls {
 
         public static void Draw_Border(Graphics GR, enDesign vDesign, enStates vState, Rectangle r) => Draw_Border(GR, DesignOf(vDesign, vState), r);
 
-        //[Obsolete]
-        //public static void Draw_Border(Graphics GR, RowItem row, Rectangle r) {
-        //    if (row == null) { return; }
-        //    var d = new clsDesign();
-        //    d.Kontur = (enKontur)Value(row, col_Kontur, -1);
-        //    if (d.Kontur == enKontur.Ohne) { return; }
-        //    d.RahmenArt = (enRahmenArt)Value(row, col_Border_Style, -1);
-        //    if (d.RahmenArt == enRahmenArt.Ohne) { return; }
-        //    d.X1 = Value(row, ColX1, 0);
-        //    d.Y1 = Value(row, ColY1, 0);
-        //    d.X2 = Value(row, ColX2, 0);
-        //    d.Y2 = Value(row, ColY2, 0);
-        //    d.BorderColor1 = Color.FromArgb(Value(row, col_Color_Border_1, 0));
-        //    Draw_Border(GR, d, r);
-        //}
         public static void Draw_Border(Graphics GR, clsDesign design, Rectangle r) {
-            if (design.Kontur == enKontur.Ohne) { return; }
-            if (design.RahmenArt == enRahmenArt.Ohne) { return; }
+            if (design.Kontur == enKontur.Ohne || design.RahmenArt == enRahmenArt.Ohne) { return; }
+
             if (design.Kontur == enKontur.Unbekannt) {
                 design.Kontur = enKontur.Rechteck;
                 r.Width--;
@@ -1025,6 +1010,7 @@ namespace BlueControls {
                 r.Height += design.Y1 + design.Y2 - 1;
             }
             if (r.Width < 1 || r.Height < 1) { return; }
+
             // PathX kann durch die ganzen Expand mal zu klein werden, dann wird nothing zurückgegeben
             GraphicsPath PathX;
             Pen PenX;
@@ -1060,6 +1046,12 @@ namespace BlueControls {
                     case enRahmenArt.Solide_3px:
                         PathX = Kontur(design.Kontur, r);
                         PenX = new Pen(design.BorderColor1, 3);
+                        if (PathX != null) { GR.DrawPath(PenX, PathX); }
+                        break;
+
+                    case enRahmenArt.Solide_7px:
+                        PathX = Kontur(design.Kontur, r);
+                        PenX = new Pen(design.BorderColor1, 7);
                         if (PathX != null) { GR.DrawPath(PenX, PathX); }
                         break;
 
@@ -1307,12 +1299,12 @@ namespace BlueControls {
             Design.Add(enDesign.Button_EckpunktSchieber, enStates.Standard, enKontur.Rechteck, 0, 0, 0, 0, enHintergrundArt.Solide, 0, "FFFFFF", "", "", enRahmenArt.Solide_1px, "000000", "", "", "", "");
             Design.Add(enDesign.Button_EckpunktSchieber, enStates.Checked_MousePressed, enKontur.Rechteck, 0, 0, 0, 0, enHintergrundArt.Solide, 0, "0072BC", "", "", enRahmenArt.Solide_1px, "000000", "", "", "", "");
             Design.Add(enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard, enKontur.Rechteck, 0, 0, 0, 0, enHintergrundArt.Ohne, 0, "", "", "", enRahmenArt.Solide_1px, "D8D8D8", "", "", "", "");
-            Design.Add(enDesign.TabStrip_Head, enStates.Standard, enKontur.Rechteck, 0, 0, -2, 5, enHintergrundArt.Verlauf_Vertical_2, 0.5f, "F0F0F0", "E4E4E4", "", enRahmenArt.Solide_1px, "B6B6B6", "", "", "{Name=Calibri, Size=10[K]15}", "");
+            Design.Add(enDesign.TabStrip_Head, enStates.Standard, enKontur.Rechteck, 0, -2, 0, 5, enHintergrundArt.Verlauf_Vertical_2, 0.5f, "F0F0F0", "E4E4E4", "", enRahmenArt.Solide_1px, "B6B6B6", "", "", "{Name=Calibri, Size=10[K]15}", "");
             Design.Add(enDesign.TabStrip_Head, enStates.Checked, enKontur.Rechteck, 0, 0, 0, 5, enHintergrundArt.Solide, 0, "FFFFFF", "", "", enRahmenArt.Solide_1px, "B6B6B6", "", "", "{Name=Calibri, Size=10[K]15}", "");
             Design.Add(enDesign.TabStrip_Head, enStates.Checked_Disabled, enKontur.Rechteck, 0, 0, 0, 5, enHintergrundArt.Solide, 0, "DFDFDF", "", "", enRahmenArt.Solide_1px, "B7B7B7", "", "", "{Name=Calibri, Size=10[K]15, Color=ffffff}", "");
             Design.Add(enDesign.TabStrip_Head, enStates.Checked_MouseOver, enKontur.Rechteck, 0, 0, 0, 5, enHintergrundArt.Solide, 0, "FFFFFF", "", "", enRahmenArt.Solide_1px, "B6B6B6", "", "", "{Name=Calibri, Size=10[K]15}", "");
-            Design.Add(enDesign.TabStrip_Head, enStates.Standard_Disabled, enKontur.Rechteck, 0, 0, -2, 5, enHintergrundArt.Solide, 0, "FFFFFF", "", "", enRahmenArt.Solide_1px, "D8D8D8", "", "", "{Name=Calibri, Size=10[K]15, Color=9d9d9d}", "");
-            Design.Add(enDesign.TabStrip_Head, enStates.Standard_MouseOver, enKontur.Rechteck, 0, 0, -2, 5, enHintergrundArt.Verlauf_Vertical_2, 0.5f, "F0F0F0", "E4E4E4", "", enRahmenArt.Solide_1px, "B6B6B6", "", "", "{Name=Calibri, Size=10[K]15}", "");
+            Design.Add(enDesign.TabStrip_Head, enStates.Standard_Disabled, enKontur.Rechteck, 0, -2, 0, 5, enHintergrundArt.Solide, 0, "FFFFFF", "", "", enRahmenArt.Solide_1px, "D8D8D8", "", "", "{Name=Calibri, Size=10[K]15, Color=9d9d9d}", "");
+            Design.Add(enDesign.TabStrip_Head, enStates.Standard_MouseOver, enKontur.Rechteck, 0, -2, 0, 5, enHintergrundArt.Verlauf_Vertical_2, 0.5f, "F0F0F0", "E4E4E4", "", enRahmenArt.Solide_1px, "B6B6B6", "", "", "{Name=Calibri, Size=10[K]15}", "");
             Design.Add(enDesign.RibbonBar_Head, enStates.Standard, enKontur.Rechteck, 0, 0, 0, 5, enHintergrundArt.Solide, 0, "FFFFFF", "", "", enRahmenArt.Ohne, "", "", "", "{Name=Calibri, Size=10[K]15}", "");
             Design.Add(enDesign.RibbonBar_Head, enStates.Checked, enKontur.Rechteck, 0, 0, 0, 5, enHintergrundArt.Solide, 0, "F4F5F6", "", "", enRahmenArt.Solide_1px, "E5E4E5", "", "", "{Name=Calibri, Size=10[K]15}", "");
             Design.Add(enDesign.RibbonBar_Head, enStates.Checked_Disabled, enKontur.Rechteck, 0, 0, 0, 5, enHintergrundArt.Solide, 0, "F4F5F6", "", "", enRahmenArt.Solide_1px, "E5E4E5", "", "", "{Name=Calibri, Size=10[K]15, Color=9d9d9d}", "");
@@ -1448,8 +1440,8 @@ namespace BlueControls {
             Design.Add(enDesign.Ribbonbar_Button_Combobox, enStates.Standard_MouseOver, enKontur.Ohne, 0, 0, 0, 0, enHintergrundArt.Ohne, 0, "", "", "", enRahmenArt.Ohne, "", "", "", "", "");
             Design.Add(enDesign.Ribbonbar_Button_Combobox, enStates.Standard_HasFocus, enKontur.Ohne, 0, 0, 0, 0, enHintergrundArt.Ohne, 0, "", "", "", enRahmenArt.Ohne, "", "", "", "", "");
             Design.Add(enDesign.Ribbonbar_Button_Combobox, enStates.Standard_MouseOver_HasFocus, enKontur.Ohne, 0, 0, 0, 0, enHintergrundArt.Ohne, 0, "", "", "", enRahmenArt.Ohne, "", "", "", "", "");
-            Design.Add(enDesign.RibbonBar_Frame, enStates.Standard, enKontur.Rechteck, 1, 0, 1, 1, enHintergrundArt.Ohne, 0, "", "", "", enRahmenArt.Solide_1px, "ACACAC", "", "", "{Name=Calibri, Size=10[K]15,Italic=True}", "");
-            Design.Add(enDesign.RibbonBar_Frame, enStates.Standard_Disabled, enKontur.Rechteck, 1, 0, 1, 1, enHintergrundArt.Ohne, 0, "", "", "", enRahmenArt.Solide_1px, "ACACAC", "", "", "{Name=Calibri, Size=10[K]15,Italic=True,Color=9d9d9d}", "");
+            Design.Add(enDesign.RibbonBar_Frame, enStates.Standard, enKontur.Rechteck, 1, 1, 0, 1, enHintergrundArt.Ohne, 0, "", "", "", enRahmenArt.Solide_1px, "ACACAC", "", "", "{Name=Calibri, Size=10[K]15,Italic=True}", "");
+            Design.Add(enDesign.RibbonBar_Frame, enStates.Standard_Disabled, enKontur.Rechteck, 1, 1, 0, 1, enHintergrundArt.Ohne, 0, "", "", "", enRahmenArt.Solide_1px, "ACACAC", "", "", "{Name=Calibri, Size=10[K]15,Italic=True,Color=9d9d9d}", "");
             Design.Add(enDesign.Form_Standard, enStates.Standard, enKontur.Rechteck, 0, 0, 0, 0, enHintergrundArt.Solide, 0, "F0F0F0", "", "", enRahmenArt.Ohne, "", "", "", "", "");
             Design.Add(enDesign.Form_MsgBox, enStates.Standard, enKontur.Rechteck, 0, 0, 0, 0, enHintergrundArt.Solide, 0, "F0F0F0", "", "", enRahmenArt.Ohne, "", "", "", "{Name=Calibri, Size=10[K]15}", "");
             Design.Add(enDesign.Form_QuickInfo, enStates.Standard, enKontur.Rechteck, 0, 0, 0, 0, enHintergrundArt.Solide, 0, "BFDFFF", "", "", enRahmenArt.Solide_1px, "4DA1B5", "", "", "{Name=Calibri, Size=10[K]15}", "");
@@ -1492,8 +1484,10 @@ namespace BlueControls {
             Design.Add(enDesign.Item_Listbox_Caption, enStates.Standard, enKontur.Rechteck, 0, 0, 0, 0, enHintergrundArt.Solide, 0, "BFDFFF", "", "", enRahmenArt.Ohne, "", "", "", "{Name=Calibri, Size=10[K]15,Bold=True}", "");
             Design.Add(enDesign.Item_Listbox_Caption, enStates.Standard_Disabled, enKontur.Rechteck, 0, 0, 0, 0, enHintergrundArt.Solide, 0, "DFDFDF", "", "", enRahmenArt.Ohne, "", "", "", "{Name=Calibri, Size=10[K]15,Bold=True,Color=ffffff}", "");
             Design.Add(enDesign.Item_Listbox_Caption, enStates.Standard_MouseOver, enKontur.Rechteck, 0, 0, 0, 0, enHintergrundArt.Solide, 0, "BFDFFF", "", "", enRahmenArt.Solide_1px, "4DA1B5", "", "", "{Name=Calibri, Size=10[K]15,Bold=True}", "");
-            Design.Add(enDesign.Frame, enStates.Standard, enKontur.Rechteck, 0, 0, -7, 0, enHintergrundArt.Ohne, 0, "", "", "", enRahmenArt.Solide_1px, "ACACAC", "", "", "{Name=Calibri, Size=10[K]15}", "");
-            Design.Add(enDesign.Frame, enStates.Standard_Disabled, enKontur.Rechteck, 0, 0, -7, 0, enHintergrundArt.Ohne, 0, "", "", "", enRahmenArt.Solide_1px, "ACACAC", "", "", "{Name=Calibri, Size=10[K]15, Color=9d9d9d}", "");
+            Design.Add(enDesign.GroupBox, enStates.Standard, enKontur.Rechteck, 0, -7, 0, 0, enHintergrundArt.Ohne, 0, "", "", "", enRahmenArt.Solide_1px, "ACACAC", "", "", "{Name=Calibri, Size=10[K]15}", "");
+            Design.Add(enDesign.GroupBox, enStates.Standard_Disabled, enKontur.Rechteck, 0, -7, 0, 0, enHintergrundArt.Ohne, 0, "", "", "", enRahmenArt.Solide_1px, "ACACAC", "", "", "{Name=Calibri, Size=10[K]15, Color=9d9d9d}", "");
+            Design.Add(enDesign.GroupBoxBold, enStates.Standard, enKontur.Rechteck, -3, -10, -3, -3, enHintergrundArt.Ohne, 0, "", "", "", enRahmenArt.Solide_7px, "0072BC", "", "", "{Name=Calibri, Size=10[K]15}", "");
+            Design.Add(enDesign.GroupBoxBold, enStates.Standard_Disabled, enKontur.Rechteck, -3, -10, -3, -3, enHintergrundArt.Ohne, 0, "", "", "", enRahmenArt.Solide_7px, "ACACAC", "", "", "{Name=Calibri, Size=10[K]15, Color=9d9d9d}", "");
             Design.Add(enDesign.TabStrip_Body, enStates.Standard, enKontur.Rechteck, 0, 0, 0, 0, enHintergrundArt.Solide, 0, "FFFFFF", "", "", enRahmenArt.Solide_1px, "ACACAC", "", "", "", "");
             Design.Add(enDesign.TabStrip_Body, enStates.Standard_Disabled, enKontur.Rechteck, 0, 0, 0, 0, enHintergrundArt.Solide, 0, "FFFFFF", "", "", enRahmenArt.Solide_1px, "ACACAC", "", "", "", "");
             Design.Add(enDesign.RibbonBar_Body, enStates.Standard, enKontur.Rechteck, 0, 0, 0, 0, enHintergrundArt.Solide, 0, "F4F5F6", "", "", enRahmenArt.Solide_1px, "E5E4E5", "", "", "", "");

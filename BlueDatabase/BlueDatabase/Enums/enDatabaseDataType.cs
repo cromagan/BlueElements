@@ -70,11 +70,11 @@ namespace BlueDatabase.Enums {
         ColumnArrangement = 32,
         Views = 33,
 
-        [Obsolete]
-        LastRowKey = 34,
+        //[Obsolete]
+        //LastRowKey = 34,
 
-        [Obsolete]
-        Rules_ALT = 35,
+        //[Obsolete]
+        //Rules_ALT = 35,
 
         //    VorgängerDateien_ALT = 37
         DatenbankAdmin = 38,
@@ -98,14 +98,14 @@ namespace BlueDatabase.Enums {
         //BinaryCount = 57,
         ReloadDelaySecond = 58,
 
-        [Obsolete]
-        LastColumnKey = 59,
+        //[Obsolete]
+        //LastColumnKey = 59,
 
-        [Obsolete]
-        BinaryDataInOne = 60,
+        //[Obsolete]
+        //BinaryDataInOne = 60,
 
-        [Obsolete]
-        JoinTyp = 61,
+        //[Obsolete]
+        //JoinTyp = 61,
 
         VerwaisteDaten = 62,
 
@@ -189,8 +189,8 @@ namespace BlueDatabase.Enums {
 
         //co_TagsInternal_ALT = 157, // TODO: Entfernen
         //    co_QuickInfoImage = 158
-        [Obsolete]
-        co_CaptionBitmap = 159,
+
+        //co_CaptionBitmap = 159,
 
         co_Suffix = 160,
         co_AfterEdit_DoUcase = 161,
@@ -219,11 +219,11 @@ namespace BlueDatabase.Enums {
         co_LinkedCell_RowKey = 179,
         co_LinkedCell_ColumnKey = 180,
 
-        [Obsolete]
-        co_LinkedCell_ColumnValueFoundIn = 181,
+        //[Obsolete]
+        //co_LinkedCell_ColumnValueFoundIn = 181,
 
-        [Obsolete]
-        co_LinkedCell_ColumnValueAdd = 182,
+        //[Obsolete]
+        //co_LinkedCell_ColumnValueAdd = 182,
 
         //co_LinkedCell_Behaviour = 183,
         co_DropDownKey = 184,

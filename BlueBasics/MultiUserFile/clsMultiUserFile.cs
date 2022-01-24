@@ -578,8 +578,9 @@ namespace BlueBasics.MultiUserFile {
         /// </summary>
         /// <returns></returns>
         protected virtual bool BlockSaveOperations() {
-            var e = new CancelEventArgs();
-            e.Cancel = false;
+            var e = new CancelEventArgs {
+                Cancel = false
+            };
             OnShouldICancelSaveOperations(e);
             return e.Cancel;
         }
@@ -715,7 +716,7 @@ namespace BlueBasics.MultiUserFile {
 
             // Zeiten berechnen
             _ReloadDelaySecond = Math.Max(_ReloadDelaySecond, 10);
-            var Count_BackUp = Math.Min(_ReloadDelaySecond / 10f + 1, 10); // Soviele Sekunden können vergehen, bevor Backups gemacht werden. Der Wert muss kleiner sein, als Count_Save
+            var Count_BackUp = Math.Min((_ReloadDelaySecond / 10f) + 1, 10); // Soviele Sekunden können vergehen, bevor Backups gemacht werden. Der Wert muss kleiner sein, als Count_Save
             var Count_Save = (Count_BackUp * 2) + 1; // Soviele Sekunden können vergehen, bevor gespeichert werden muss. Muss größer sein, als Backup. Weil ansonsten der Backup-BackgroundWorker beendet wird
             var Count_UserWork = (Count_Save / 5f) + 2; // Soviele Sekunden hat die User-Bearbeitung vorrang. Verhindert, dass die Bearbeitung des Users spontan abgebrochen wird.
 

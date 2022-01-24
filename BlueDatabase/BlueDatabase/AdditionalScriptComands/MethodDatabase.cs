@@ -27,10 +27,7 @@ namespace BlueScript {
 
         #region Methods
 
-        protected ColumnItem Column(Script s, string name) {
-            var db = MyDatabase(s);
-            return db == null ? null : db.Column.Exists(name);
-        }
+        protected ColumnItem Column(Script s, string name) => MyDatabase(s)?.Column.Exists(name);
 
         protected Database DatabaseOf(Script s, string name) {
             var f = s.Variablen.GetSystem("filename");

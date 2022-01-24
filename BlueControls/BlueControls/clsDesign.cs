@@ -26,18 +26,20 @@ public static class clsDesignExtensions {
     #region Methods
 
     // Button.Design.Add(enStates.Standard, enKontur.Rechteck, 0, 0, 0, 0, enHintergrundArt.Solide, 0, "EAEAEA", "", "", enRahmenArt.Solide_1px, "B6B6B6", "", "", "{Name=Calibri, Size=10[K]15}", "");
-    public static void Add(this Dictionary<enDesign, Dictionary<enStates, clsDesign>> l, enDesign ds, enStates status, enKontur enKontur, int x1, int y1, int x2, int y2, enHintergrundArt hint, float verlauf, string bc1, string bc2, string bc3, enRahmenArt rahm, string boc1, string boc2, string boc3, string f, string pic) {
-        Dictionary<enStates, clsDesign> l2;
-        if (l.TryGetValue(ds, out var lg)) {
-            l2 = lg;
+    public static void Add(this Dictionary<enDesign, Dictionary<enStates, clsDesign>> dictControl, enDesign ds, enStates status, enKontur enKontur, int x1, int y1, int x2, int y2, enHintergrundArt hint, float verlauf, string bc1, string bc2, string bc3, enRahmenArt rahm, string boc1, string boc2, string boc3, string f, string pic) {
+        Dictionary<enStates, clsDesign> dictState;
+
+        if (dictControl.TryGetValue(ds, out var existingDictOfControl)) {
+            dictState = existingDictOfControl;
         } else {
-            l2 = new Dictionary<enStates, clsDesign>();
-            l.Add(ds, l2);
+            dictState = new Dictionary<enStates, clsDesign>();
+            dictControl.Add(ds, dictState);
         }
-        l2.Add(status, enKontur, x1, x2, y1, y2, hint, verlauf, bc1, bc2, bc3, rahm, boc1, boc2, boc3, f, pic);
+
+        dictState.Add(status, enKontur, x1, y1, x2, y2, hint, verlauf, bc1, bc2, bc3, rahm, boc1, boc2, boc3, f, pic);
     }
 
-    public static void Add(this Dictionary<enStates, clsDesign> l, enStates status, enKontur enKontur, int x1, int y1, int x2, int y2, enHintergrundArt hint, float verlauf, string bc1, string bc2, string bc3, enRahmenArt rahm, string boc1, string boc2, string boc3, string f, string pic) {
+    public static void Add(this Dictionary<enStates, clsDesign> dictStats, enStates status, enKontur enKontur, int x1, int y1, int x2, int y2, enHintergrundArt hint, float verlauf, string bc1, string bc2, string bc3, enRahmenArt rahm, string boc1, string boc2, string boc3, string f, string pic) {
         clsDesign des = new() {
             Need = true,
             Kontur = enKontur,
@@ -60,7 +62,7 @@ public static class clsDesignExtensions {
         //if (!string.IsNullOrEmpty(pic)) { des.Image = QuickImage.Get(pic); }
         des.Image = pic;
         des.Status = status;
-        l.Add(status, des);
+        dictStats.Add(status, des);
     }
 
     #endregion

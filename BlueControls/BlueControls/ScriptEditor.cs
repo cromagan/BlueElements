@@ -31,7 +31,7 @@ using System.Linq;
 
 namespace BlueControls {
 
-    public partial class ScriptEditor : GroupBox, IContextMenu // System.Windows.Forms.UserControl, IContextMenu//
+    public partial class ScriptEditor : GroupBox, IContextMenu //System.Windows.Forms.UserControl, IContextMenu//
     {
         #region Fields
 
@@ -103,13 +103,6 @@ namespace BlueControls {
         }
 
         protected void WriteComandsToList(Script s) {
-            lstComands.Item.Clear();
-            if (s != null && Script.Comands != null) {
-                foreach (var thisc in Script.Comands) {
-                    lstComands.Item.Add(thisc, thisc.Syntax.ToLower());
-                }
-            }
-            lstComands.Item.Sort();
             if (!_MenuDone) {
                 _MenuDone = true;
                 _PopupMenu = new AutocompleteMenu(txtSkript) {
@@ -152,6 +145,8 @@ namespace BlueControls {
         }
 
         private void btnBefehlsUebersicht_Click(object sender, System.EventArgs e) {
+            var x = new frmBefehlsreferenz();
+            x.Show();
         }
 
         private void btnTest_Click(object sender, System.EventArgs e) {
@@ -172,12 +167,12 @@ namespace BlueControls {
 
         private void GenerateVariableTable() {
             Database x = new(true);
-            x.Column.Add("Name", "Nam.", enVarType.Text, "Variablenname");
-            x.Column.Add("Typ", "Typ", enVarType.Text, "Variablentyp");
-            x.Column.Add("RO", "RO", enVarType.Text, "Readonly, Schreibgeschützt");
-            x.Column.Add("System", "Sys", enVarType.Text, "Systemspalte\r\nIm Script nicht verfügbar");
-            x.Column.Add("Inhalt", "Inh.", enVarType.Text, "Inhalt (gekürzte Ansicht)");
-            x.Column.Add("Kommentar", "Kom.", enVarType.Text, "Komentar");
+            x.Column.Add("Name", "N", enVarType.Text, "Variablenname");
+            x.Column.Add("Typ", "T", enVarType.Text, "Variablentyp");
+            x.Column.Add("RO", "R", enVarType.Text, "Readonly, Schreibgeschützt");
+            x.Column.Add("System", "S", enVarType.Text, "Systemspalte\r\nIm Script nicht verfügbar");
+            x.Column.Add("Inhalt", "I", enVarType.Text, "Inhalt (gekürzte Ansicht)");
+            x.Column.Add("Kommentar", "K", enVarType.Text, "Komentar");
             foreach (var ThisColumn in x.Column) {
                 if (string.IsNullOrEmpty(ThisColumn.Identifier)) {
                     ThisColumn.MultiLine = true;
@@ -195,12 +190,13 @@ namespace BlueControls {
             filterVariablen.Table = tableVariablen;
         }
 
-        private void lstComands_ItemClicked(object sender, BasicListItemEventArgs e) {
-            var co = string.Empty;
-            if (e.Item.Tag is Method thisc) {
-                co += thisc.HintText();
-            }
-            txbComms.Text = co;
+        private void lstFunktionen_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
+        }
+
+        private void lstFunktionen_ItemClicked(object sender, BasicListItemEventArgs e) {
+        }
+
+        private void lstFunktionen_ItemRemoving(object sender, BlueBasics.EventArgs.ListEventArgs e) {
         }
 
         private void TxtSkript_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
@@ -210,24 +206,18 @@ namespace BlueControls {
         }
 
         private void txtSkript_ToolTipNeeded(object sender, ToolTipNeededEventArgs e) {
+           if(Script.Comands == null) { return; }
+
             try {
                 _LastWord = string.Empty;
                 _LastVariableContent = string.Empty;
-                foreach (var thisc in lstComands.Item) {
-                    if (thisc.Tag is Method m) {
-                        if (m.Comand(null).Contains(e.HoveredWord, false)) {
-                            e.ToolTipTitle = m.Syntax;
-                            e.ToolTipText = m.HintText();
-                            return;
-                        }
+                foreach (var thisc in Script.Comands) {
+                    if (thisc.Comand(null).Contains(e.HoveredWord, false)) {
+                        e.ToolTipTitle = thisc.Syntax;
+                        e.ToolTipText = thisc.HintText();
+                        return;
                     }
                 }
-                //x.Column.Add("Name", "Name", enDataFormat.Text);
-                //x.Column.Add("Typ", "Typ", enDataFormat.Text);
-                //x.Column.Add("RO", "Schreibgeschützt", enDataFormat.Bit);
-                //x.Column.Add("System", "Systemspalte", enDataFormat.Bit);
-                //x.Column.Add("Inhalt", "Inhalt", enDataFormat.Text);
-                //x.Column.Add("Kommentar", "Kommentar", enDataFormat.Text);
                 var hoveredWordnew = new Range(txtSkript, e.Place, e.Place).GetFragment("[A-Za-z0-9_]").Text;
                 _LastWord = hoveredWordnew;
 

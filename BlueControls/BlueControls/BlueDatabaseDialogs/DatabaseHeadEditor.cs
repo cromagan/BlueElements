@@ -169,7 +169,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                         break;
 
                     case enDatabaseDataType.RulesScript:
-                    case enDatabaseDataType.Rules_ALT:
+                        //case enDatabaseDataType.Rules_ALT:
                         aenderung = "Regeln verändert";
                         Symb = enImageCode.Formel;
                         alt = "";

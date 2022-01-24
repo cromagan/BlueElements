@@ -130,6 +130,7 @@ namespace BlueDatabase {
             c.Caption = caption;
             c.SetFormat(format);
             c.Suffix = suffix;
+            c.Quickinfo = quickinfo;
             return c;
         }
 
@@ -433,7 +434,7 @@ namespace BlueDatabase {
 
             do {
                 tmp++;
-                key = s.GetHashCode() * 100000000 + tmp;
+                key = (s.GetHashCode() * 100000000) + tmp;
                 if (key < 0) { key *= -1; }
             } while (SearchByKey(key) != null);
             return key;
