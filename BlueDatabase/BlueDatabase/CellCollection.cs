@@ -106,6 +106,7 @@ namespace BlueDatabase {
             if (Column.Format == enDataFormat.LinkedCell) {
                 (var lcolumn, var lrow) = LinkedCellData(Column, Row, true, false);
                 if (lcolumn != null && lrow != null) {
+                    lcolumn.Database.PowerEdit = Column.Database.PowerEdit;
                     var tmp = ErrorReason(lcolumn, lrow, mode);
                     return !string.IsNullOrEmpty(tmp)
                         ? LanguageTool.DoTranslate("Die verlinkte Zelle kann nicht bearbeitet werden: ") + tmp
@@ -117,7 +118,10 @@ namespace BlueDatabase {
             }
             if (Row != null) {
                 if (Row.Database != Column.Database) { return LanguageTool.DoTranslate("Interner Fehler: Bezug der Datenbank zur Zeile ist fehlerhaft."); }
-                if (Column != Column.Database.Column.SysLocked && Row.CellGetBoolean(Column.Database.Column.SysLocked) && !Column.EditTrotzSperreErlaubt) { return LanguageTool.DoTranslate("Da die Zeile als abgeschlossen markiert ist, kann die Zelle nicht bearbeitet werden."); }
+
+                if (Column.Database.PowerEdit.Subtract(DateTime.Now).TotalSeconds < 0) {
+                    if (Column != Column.Database.Column.SysLocked && Row.CellGetBoolean(Column.Database.Column.SysLocked) && !Column.EditTrotzSperreErlaubt) { return LanguageTool.DoTranslate("Da die Zeile als abgeschlossen markiert ist, kann die Zelle nicht bearbeitet werden."); }
+                }
             } else {
                 //Auf neue Zeile wird geprüft
                 if (!Column.IsFirst()) { return LanguageTool.DoTranslate("Neue Zeilen müssen mit der ersten Spalte beginnen."); }

@@ -116,8 +116,11 @@ namespace BlueDatabase {
         private enTranslationType _Translate;
         private string _Ueberschrift1;
         private string _Ueberschrift2;
+
         private string _Ueberschrift3;
+
         private long _VorschlagsColumn;
+
         private bool disposedValue;
 
         #endregion
@@ -743,7 +746,10 @@ namespace BlueDatabase {
         }
 
         public bool TextBearbeitungErlaubt {
-            get => _TextBearbeitungErlaubt;
+            get {
+                if (Database.PowerEdit.Subtract(DateTime.Now).TotalSeconds > 0) { return true; }
+                return _TextBearbeitungErlaubt;
+            }
             set {
                 if (_TextBearbeitungErlaubt == value) { return; }
                 Database.AddPending(enDatabaseDataType.co_TextBearbeitungErlaubt, this, _TextBearbeitungErlaubt.ToPlusMinus(), value.ToPlusMinus(), true);
@@ -824,6 +830,7 @@ namespace BlueDatabase {
 
         public static enEditTypeTable UserEditDialogTypeInTable(enDataFormat format, bool doDropDown, bool keybordInputAllowed, bool isMultiline) {
             if (!doDropDown && !keybordInputAllowed) { return enEditTypeTable.None; }
+
             switch (format) {
                 case enDataFormat.Bit:
                 case enDataFormat.Columns_für_LinkedCellDropdown:
@@ -1625,8 +1632,26 @@ namespace BlueDatabase {
             }
         }
 
+        public void SetFormat(enVarType format) {
+            switch (format) {
+                case enVarType.Text: SetFormatForText(); break;
+                case enVarType.Date: SetFormatForDate(); break;
+                case enVarType.DateTime: SetFormatForDateTime(); break;
+                case enVarType.Email: SetFormatForEmail(); break;
+                case enVarType.Float: SetFormatForFloat(); break;
+                case enVarType.Integer: SetFormatForInteger(); break;
+                case enVarType.PhoneNumber: SetFormatForPhoneNumber(); break;
+                case enVarType.TextMitFormatierung: SetFormatForTextMitFormatierung(); break;
+                case enVarType.Url: SetFormatForUrl(); break;
+                case enVarType.Bit: SetFormatForBit(); break;
+                default:
+                    Develop.DebugPrint(enFehlerArt.Warnung);
+                    break;
+            }
+        }
+
         public void SetFormatForBildCode() {
-            this.SetFormat(enVarType.Text); // Standard Verhalten
+            ((IInputFormat)this).SetFormat(enVarType.Text); // Standard Verhalten
 
             Format = enDataFormat.Text;
             Align = enAlignmentHorizontal.Links;
@@ -1637,8 +1662,20 @@ namespace BlueDatabase {
             ScriptType = enScriptType.String;
         }
 
+        public void SetFormatForBit() {
+            ((IInputFormat)this).SetFormat(enVarType.Bit); // Standard Verhalten
+
+            Format = enDataFormat.Bit;
+            Align = enAlignmentHorizontal.Links;
+            SortType = enSortierTyp.Original_String;
+            Translate = enTranslationType.Original_Anzeigen;
+            AfterEdit_QuickSortRemoveDouble = false;
+            BildTextVerhalten = enBildTextVerhalten.Bild_oder_Text;
+            ScriptType = enScriptType.Bool;
+        }
+
         public void SetFormatForDate() {
-            this.SetFormat(enVarType.Date);
+            ((IInputFormat)this).SetFormat(enVarType.Date);
 
             Format = enDataFormat.Text;
             Align = enAlignmentHorizontal.Links;
@@ -1650,7 +1687,7 @@ namespace BlueDatabase {
         }
 
         public void SetFormatForDateTime() {
-            this.SetFormat(enVarType.DateTime);
+            ((IInputFormat)this).SetFormat(enVarType.DateTime);
 
             Format = enDataFormat.Text;
             Align = enAlignmentHorizontal.Links;
@@ -1662,7 +1699,7 @@ namespace BlueDatabase {
         }
 
         public void SetFormatForEmail() {
-            this.SetFormat(enVarType.Email);
+            ((IInputFormat)this).SetFormat(enVarType.Email);
 
             Format = enDataFormat.Text;
             Align = enAlignmentHorizontal.Links;
@@ -1674,7 +1711,7 @@ namespace BlueDatabase {
         }
 
         public void SetFormatForFloat() {
-            this.SetFormat(enVarType.Float);
+            ((IInputFormat)this).SetFormat(enVarType.Float);
 
             Format = enDataFormat.Text;
             Align = enAlignmentHorizontal.Rechts;
@@ -1686,7 +1723,7 @@ namespace BlueDatabase {
         }
 
         public void SetFormatForInteger() {
-            this.SetFormat(enVarType.Integer);
+            ((IInputFormat)this).SetFormat(enVarType.Integer);
 
             Format = enDataFormat.Text;
             Align = enAlignmentHorizontal.Rechts;
@@ -1698,7 +1735,7 @@ namespace BlueDatabase {
         }
 
         public void SetFormatForPhoneNumber() {
-            this.SetFormat(enVarType.PhoneNumber);
+            ((IInputFormat)this).SetFormat(enVarType.PhoneNumber);
 
             Format = enDataFormat.Text;
             Align = enAlignmentHorizontal.Links;
@@ -1710,7 +1747,7 @@ namespace BlueDatabase {
         }
 
         public void SetFormatForText() {
-            this.SetFormat(enVarType.Text);
+            ((IInputFormat)this).SetFormat(enVarType.Text);
 
             Format = enDataFormat.Text;
             Align = enAlignmentHorizontal.Links;
@@ -1723,7 +1760,7 @@ namespace BlueDatabase {
         }
 
         public void SetFormatForTextMitFormatierung() {
-            this.SetFormat(enVarType.TextMitFormatierung);
+            ((IInputFormat)this).SetFormat(enVarType.TextMitFormatierung);
 
             Format = enDataFormat.Text;
             Align = enAlignmentHorizontal.Links;
@@ -1735,7 +1772,7 @@ namespace BlueDatabase {
         }
 
         public void SetFormatForTextOptions() {
-            this.SetFormat(enVarType.Text);
+            ((IInputFormat)this).SetFormat(enVarType.Text);
 
             MultiLine = true; // Verhalten von Setformat überschreiben
 
@@ -1749,7 +1786,7 @@ namespace BlueDatabase {
         }
 
         public void SetFormatForUrl() {
-            this.SetFormat(enVarType.Url);
+            ((IInputFormat)this).SetFormat(enVarType.Url);
 
             Format = enDataFormat.Text;
             Align = enAlignmentHorizontal.Links;

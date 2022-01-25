@@ -21,6 +21,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ColumnEditor));
             this.ColorDia = new System.Windows.Forms.ColorDialog();
             this.tabDesign = new System.Windows.Forms.TabPage();
+            this.cbxScriptType = new BlueControls.Controls.ComboBox();
+            this.capScriptType = new BlueControls.Controls.Caption();
             this.btnFormatierungErlaubt = new BlueControls.Controls.Button();
             this.txbSpaltenbild = new BlueControls.Controls.TextBox();
             this.cbxAdditionalCheck = new BlueControls.Controls.ComboBox();
@@ -159,8 +161,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.caption5 = new BlueControls.Controls.Caption();
             this.butAktuellVor = new BlueControls.Controls.Button();
             this.butAktuellZurueck = new BlueControls.Controls.Button();
-            this.cbxScriptType = new BlueControls.Controls.ComboBox();
-            this.capScriptType = new BlueControls.Controls.Caption();
+            this.btnSchnellBit = new BlueControls.Controls.Button();
             this.tabDesign.SuspendLayout();
             this.grpBildCode.SuspendLayout();
             this.tabRechte.SuspendLayout();
@@ -227,6 +228,24 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabDesign.Size = new System.Drawing.Size(912, 487);
             this.tabDesign.TabIndex = 0;
             this.tabDesign.Text = "Design";
+            // 
+            // cbxScriptType
+            // 
+            this.cbxScriptType.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxScriptType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxScriptType.Location = new System.Drawing.Point(600, 144);
+            this.cbxScriptType.Name = "cbxScriptType";
+            this.cbxScriptType.Regex = null;
+            this.cbxScriptType.Size = new System.Drawing.Size(304, 32);
+            this.cbxScriptType.TabIndex = 43;
+            // 
+            // capScriptType
+            // 
+            this.capScriptType.CausesValidation = false;
+            this.capScriptType.Location = new System.Drawing.Point(528, 144);
+            this.capScriptType.Name = "capScriptType";
+            this.capScriptType.Size = new System.Drawing.Size(72, 24);
+            this.capScriptType.Text = "Skript-Typ:";
             // 
             // btnFormatierungErlaubt
             // 
@@ -1415,6 +1434,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // tabSchnellformat
             // 
             this.tabSchnellformat.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabSchnellformat.Controls.Add(this.btnSchnellBit);
             this.tabSchnellformat.Controls.Add(this.btnSchnellBildCode);
             this.tabSchnellformat.Controls.Add(this.btnSchnellIInternetAdresse);
             this.tabSchnellformat.Controls.Add(this.btnSchnellAuswahloptionen);
@@ -1434,7 +1454,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // btnSchnellBildCode
             // 
-            this.btnSchnellBildCode.Location = new System.Drawing.Point(432, 80);
+            this.btnSchnellBildCode.Location = new System.Drawing.Point(704, 80);
             this.btnSchnellBildCode.Name = "btnSchnellBildCode";
             this.btnSchnellBildCode.Size = new System.Drawing.Size(128, 48);
             this.btnSchnellBildCode.TabIndex = 9;
@@ -1443,7 +1463,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // btnSchnellIInternetAdresse
             // 
-            this.btnSchnellIInternetAdresse.Location = new System.Drawing.Point(296, 80);
+            this.btnSchnellIInternetAdresse.Location = new System.Drawing.Point(568, 80);
             this.btnSchnellIInternetAdresse.Name = "btnSchnellIInternetAdresse";
             this.btnSchnellIInternetAdresse.Size = new System.Drawing.Size(128, 48);
             this.btnSchnellIInternetAdresse.TabIndex = 8;
@@ -1479,7 +1499,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // btnSchnellTelefonNummer
             // 
-            this.btnSchnellTelefonNummer.Location = new System.Drawing.Point(160, 80);
+            this.btnSchnellTelefonNummer.Location = new System.Drawing.Point(432, 80);
             this.btnSchnellTelefonNummer.Name = "btnSchnellTelefonNummer";
             this.btnSchnellTelefonNummer.Size = new System.Drawing.Size(128, 48);
             this.btnSchnellTelefonNummer.TabIndex = 4;
@@ -1488,7 +1508,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // btnSchnellEmail
             // 
-            this.btnSchnellEmail.Location = new System.Drawing.Point(24, 80);
+            this.btnSchnellEmail.Location = new System.Drawing.Point(296, 80);
             this.btnSchnellEmail.Name = "btnSchnellEmail";
             this.btnSchnellEmail.Size = new System.Drawing.Size(128, 48);
             this.btnSchnellEmail.TabIndex = 3;
@@ -1497,7 +1517,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // btnSchnellDatumUhrzeit
             // 
-            this.btnSchnellDatumUhrzeit.Location = new System.Drawing.Point(432, 24);
+            this.btnSchnellDatumUhrzeit.Location = new System.Drawing.Point(160, 80);
             this.btnSchnellDatumUhrzeit.Name = "btnSchnellDatumUhrzeit";
             this.btnSchnellDatumUhrzeit.Size = new System.Drawing.Size(128, 48);
             this.btnSchnellDatumUhrzeit.TabIndex = 2;
@@ -1506,7 +1526,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // btnSchnellDatum
             // 
-            this.btnSchnellDatum.Location = new System.Drawing.Point(296, 24);
+            this.btnSchnellDatum.Location = new System.Drawing.Point(24, 80);
             this.btnSchnellDatum.Name = "btnSchnellDatum";
             this.btnSchnellDatum.Size = new System.Drawing.Size(128, 48);
             this.btnSchnellDatum.TabIndex = 1;
@@ -1671,23 +1691,14 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.butAktuellZurueck.TabIndex = 18;
             this.butAktuellZurueck.Click += new System.EventHandler(this.butAktuellZurueck_Click);
             // 
-            // cbxScriptType
+            // btnSchnellBit
             // 
-            this.cbxScriptType.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxScriptType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxScriptType.Location = new System.Drawing.Point(600, 144);
-            this.cbxScriptType.Name = "cbxScriptType";
-            this.cbxScriptType.Regex = null;
-            this.cbxScriptType.Size = new System.Drawing.Size(304, 32);
-            this.cbxScriptType.TabIndex = 43;
-            // 
-            // capScriptType
-            // 
-            this.capScriptType.CausesValidation = false;
-            this.capScriptType.Location = new System.Drawing.Point(528, 144);
-            this.capScriptType.Name = "capScriptType";
-            this.capScriptType.Size = new System.Drawing.Size(72, 24);
-            this.capScriptType.Text = "Skript-Typ:";
+            this.btnSchnellBit.Location = new System.Drawing.Point(296, 24);
+            this.btnSchnellBit.Name = "btnSchnellBit";
+            this.btnSchnellBit.Size = new System.Drawing.Size(128, 48);
+            this.btnSchnellBit.TabIndex = 10;
+            this.btnSchnellBit.Text = "Bit (Ja/Nein)";
+            this.btnSchnellBit.Click += new System.EventHandler(this.btnSchnellBit_Click);
             // 
             // ColumnEditor
             // 
@@ -1866,5 +1877,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Button btnSchnellBildCode;
         private ComboBox cbxScriptType;
         private Caption capScriptType;
+        private Button btnSchnellBit;
     }
 }

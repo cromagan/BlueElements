@@ -37,12 +37,12 @@ namespace BlueControls {
             // 
             // btnBefehlsUebersicht
             // 
-            this.btnBefehlsUebersicht.Location = new System.Drawing.Point(384, 24);
+            this.btnBefehlsUebersicht.Location = new System.Drawing.Point(384, 8);
             // 
             // txbTestZeile
             // 
             this.txbTestZeile.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbTestZeile.Location = new System.Drawing.Point(120, 24);
+            this.txbTestZeile.Location = new System.Drawing.Point(120, 8);
             this.txbTestZeile.Name = "txbTestZeile";
             this.txbTestZeile.Size = new System.Drawing.Size(256, 32);
             this.txbTestZeile.TabIndex = 4;

@@ -169,10 +169,11 @@ namespace BlueControls {
             Database x = new(true);
             x.Column.Add("Name", "N", enVarType.Text, "Variablenname");
             x.Column.Add("Typ", "T", enVarType.Text, "Variablentyp");
-            x.Column.Add("RO", "R", enVarType.Text, "Readonly, Schreibgeschützt");
-            x.Column.Add("System", "S", enVarType.Text, "Systemspalte\r\nIm Script nicht verfügbar");
+            x.Column.Add("RO", "R", enVarType.Bit, "Readonly, Schreibgeschützt");
+            x.Column.Add("System", "S", enVarType.Bit, "Systemspalte\r\nIm Script nicht verfügbar");
             x.Column.Add("Inhalt", "I", enVarType.Text, "Inhalt (gekürzte Ansicht)");
             x.Column.Add("Kommentar", "K", enVarType.Text, "Komentar");
+
             foreach (var ThisColumn in x.Column) {
                 if (string.IsNullOrEmpty(ThisColumn.Identifier)) {
                     ThisColumn.MultiLine = true;
@@ -181,6 +182,7 @@ namespace BlueControls {
                     ThisColumn.BildTextVerhalten = enBildTextVerhalten.Bild_oder_Text;
                 }
             }
+
             x.RepairAfterParse();
             x.ColumnArrangements[1].ShowAllColumns();
             x.ColumnArrangements[1].HideSystemColumns();
@@ -206,7 +208,7 @@ namespace BlueControls {
         }
 
         private void txtSkript_ToolTipNeeded(object sender, ToolTipNeededEventArgs e) {
-           if(Script.Comands == null) { return; }
+            if (Script.Comands == null) { return; }
 
             try {
                 _LastWord = string.Empty;

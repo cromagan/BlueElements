@@ -139,6 +139,17 @@ namespace BlueDatabase.Interfaces {
                     t.MultiLine = false;
                     return;
 
+                case enVarType.Bit:
+                    t.AllowedChars = "+-";
+                    t.Regex = @"^([+]|[-])$";
+                    t.Suffix = string.Empty;
+                    t.Prefix = string.Empty;
+                    t.FormatierungErlaubt = false;
+                    t.AdditionalCheck = enAdditionalCheck.None;
+                    t.SpellChecking = false;
+                    t.MultiLine = false;
+                    return;
+
                 case enVarType.TextMitFormatierung:
                     t.AllowedChars = string.Empty;
                     t.Regex = string.Empty;

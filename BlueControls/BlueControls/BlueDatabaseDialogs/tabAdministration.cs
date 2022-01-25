@@ -34,7 +34,7 @@ using static BlueBasics.FileOperations;
 
 namespace BlueControls.BlueDatabaseDialogs {
 
-    public partial class tabAdministration : System.Windows.Forms.TabPage // System.Windows.Forms.UserControl //
+    public partial class tabAdministration : System.Windows.Forms.TabPage //System.Windows.Forms.UserControl //
     {
         #region Fields
 
@@ -205,6 +205,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
             if (_TableView.Database == null) { return; }
             OpenLayoutEditor(_TableView.Database, string.Empty);
+        }
+
+        private void btnPowerBearbeitung_Click(object sender, System.EventArgs e) {
+            Notification.Show("20 Sekunden (fast) rechtefreies<br>Vearbeiten akiviert.", enImageCode.Stift);
+            _TableView.PowerEdit = DateTime.Now.AddSeconds(20);
         }
 
         private void btnSpaltenUebersicht_Click(object sender, System.EventArgs e) => _TableView.Database.Column.GenerateOverView();

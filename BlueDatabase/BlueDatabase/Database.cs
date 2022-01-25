@@ -269,6 +269,8 @@ namespace BlueDatabase {
 
         public string LoadedVersion { get; private set; }
 
+        public DateTime PowerEdit { get; set; }
+
         [Browsable(false)]
         public int ReloadDelaySecond {
             get => _ReloadDelaySecond;
@@ -456,13 +458,14 @@ namespace BlueDatabase {
 
         public override string ErrorReason(enErrorReason mode) {
             var f = base.ErrorReason(mode);
-            return !string.IsNullOrEmpty(f)
-                ? f
-                : mode == enErrorReason.OnlyRead
-                ? string.Empty
-                : int.Parse(LoadedVersion.Replace(".", "")) > int.Parse(DatabaseVersion.Replace(".", ""))
-                ? "Diese Programm kann nur Datenbanken bis Version " + DatabaseVersion + " speichern."
-                : string.Empty;
+
+            if (!string.IsNullOrEmpty(f)) { return f; }
+            if (mode == enErrorReason.OnlyRead) { return string.Empty; }
+
+            if (int.Parse(LoadedVersion.Replace(".", "")) > int.Parse(DatabaseVersion.Replace(".", ""))) {
+                return "Diese Programm kann nur Datenbanken bis Version " + DatabaseVersion + " speichern.";
+            }
+            return string.Empty;
         }
 
         /// <summary>
@@ -900,6 +903,7 @@ namespace BlueDatabase {
         public bool PermissionCheck(ListExt<string> allowed, RowItem row) {
             try {
                 if (IsAdministrator()) { return true; }
+                if (PowerEdit.Subtract(DateTime.Now).TotalSeconds > 0) { return true; }
                 if (allowed == null || allowed.Count == 0) { return false; }
                 foreach (var ThisString in allowed) {
                     if (PermissionCheckWithoutAdmin(ThisString, row)) { return true; }
@@ -1813,12 +1817,32 @@ namespace BlueDatabase {
                     _GlobalShowPass = value;
                     break;
 
+                case (enDatabaseDataType)34:
+                    // TODO: Entfernen
+                    break;
+
+                case (enDatabaseDataType)35:
+                    // TODO: Entfernen
+                    break;
+
                 case (enDatabaseDataType)30:
                     // TODO: Entferne GlobalInfo
                     break;
 
+                case (enDatabaseDataType)59:
+                    // TODO: Entferne Skin
+                    break;
+
                 case (enDatabaseDataType)52:
                     // TODO: Entferne Skin
+                    break;
+
+                case (enDatabaseDataType)61:
+                    // TODO: Entfernen
+                    break;
+
+                case (enDatabaseDataType)60:
+                    // TODO: Entfernen
                     break;
 
                 //case enDatabaseDataType.JoinTyp:
@@ -1829,8 +1853,8 @@ namespace BlueDatabase {
                     _VerwaisteDaten = (enVerwaisteDaten)int.Parse(value);
                     break;
 
-                //case (enDatabaseDataType)63://                    enDatabaseDataType.ImportScript:
-                //    break;
+                case (enDatabaseDataType)63://                    enDatabaseDataType.ImportScript:
+                    break;
 
                 case enDatabaseDataType.RulesScript:
                     _RulesScript = value;

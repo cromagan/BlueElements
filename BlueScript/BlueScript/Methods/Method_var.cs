@@ -42,12 +42,17 @@ namespace BlueScript {
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
-            var bs = infos.AttributText.SplitAndCutBy("=");
-            if (bs.GetUpperBound(0) != 1) { return new strDoItFeedback("Fehler mit = - Zeichen"); }
-            if (!Variable.IsValidName(bs[0])) { return new strDoItFeedback(bs[0] + "ist kein gültiger Variablen-Name"); }
-            var v = s.Variablen.Get(bs[0]);
-            if (v != null) { return new strDoItFeedback("Variable " + bs[0] + " ist bereits vorhanden."); }
-            s.Variablen.Add(new Variable(bs[0]));
+
+            var (pos, _) = NextText(infos.AttributText, 0, Gleich, false, false, null);
+
+            if (pos < 1 || pos > infos.AttributText.Length - 2) { return new strDoItFeedback("Fehler mit = - Zeichen"); }
+
+            var varnam = infos.AttributText.Substring(0, pos);
+
+            if (!Variable.IsValidName(varnam)) { return new strDoItFeedback(varnam + " ist kein gültiger Variablen-Name"); }
+            var v = s.Variablen.Get(varnam);
+            if (v != null) { return new strDoItFeedback("Variable " + varnam + " ist bereits vorhanden."); }
+            s.Variablen.Add(new Variable(varnam));
 
             return s._berechneVariable.DoitKomplett(infos.AttributText + ";", s, infos);
         }

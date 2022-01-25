@@ -59,7 +59,7 @@ namespace BlueControls {
             // splitContainer1
             // 
             this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer1.Location = new System.Drawing.Point(0, 173);
+            this.splitContainer1.Location = new System.Drawing.Point(0, 168);
             this.splitContainer1.Name = "splitContainer1";
             this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
             // 
@@ -70,8 +70,8 @@ namespace BlueControls {
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.grpVariablen);
-            this.splitContainer1.Size = new System.Drawing.Size(603, 330);
-            this.splitContainer1.SplitterDistance = 226;
+            this.splitContainer1.Size = new System.Drawing.Size(603, 335);
+            this.splitContainer1.SplitterDistance = 229;
             this.splitContainer1.SplitterWidth = 8;
             this.splitContainer1.TabIndex = 4;
             // 
@@ -88,7 +88,7 @@ namespace BlueControls {
             // splitContainer2.Panel2
             // 
             this.splitContainer2.Panel2.Controls.Add(this.grpRoutinen);
-            this.splitContainer2.Size = new System.Drawing.Size(603, 226);
+            this.splitContainer2.Size = new System.Drawing.Size(603, 229);
             this.splitContainer2.SplitterDistance = 535;
             this.splitContainer2.SplitterWidth = 8;
             this.splitContainer2.TabIndex = 0;
@@ -100,7 +100,7 @@ namespace BlueControls {
             this.grpCode.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.NormalBold;
             this.grpCode.Location = new System.Drawing.Point(0, 0);
             this.grpCode.Name = "grpCode";
-            this.grpCode.Size = new System.Drawing.Size(535, 226);
+            this.grpCode.Size = new System.Drawing.Size(535, 229);
             this.grpCode.TabIndex = 3;
             this.grpCode.TabStop = false;
             this.grpCode.Text = "Code";
@@ -136,14 +136,14 @@ namespace BlueControls {
             this.txtSkript.Language = FastColoredTextBoxNS.Language.CSharp;
             this.txtSkript.LeftBracket = '(';
             this.txtSkript.LeftBracket2 = '{';
-            this.txtSkript.Location = new System.Drawing.Point(8, 24);
+            this.txtSkript.Location = new System.Drawing.Point(8, 32);
             this.txtSkript.Name = "txtSkript";
             this.txtSkript.Paddings = new System.Windows.Forms.Padding(0);
             this.txtSkript.RightBracket = ')';
             this.txtSkript.RightBracket2 = '}';
             this.txtSkript.SelectionColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(255)))));
             this.txtSkript.ServiceColors = ((FastColoredTextBoxNS.ServiceColors)(resources.GetObject("txtSkript.ServiceColors")));
-            this.txtSkript.Size = new System.Drawing.Size(519, 189);
+            this.txtSkript.Size = new System.Drawing.Size(519, 188);
             this.txtSkript.TabIndex = 2;
             this.txtSkript.Zoom = 100;
             this.txtSkript.ToolTipNeeded += new System.EventHandler<FastColoredTextBoxNS.ToolTipNeededEventArgs>(this.txtSkript_ToolTipNeeded);
@@ -156,7 +156,7 @@ namespace BlueControls {
             this.grpRoutinen.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.NormalBold;
             this.grpRoutinen.Location = new System.Drawing.Point(0, 0);
             this.grpRoutinen.Name = "grpRoutinen";
-            this.grpRoutinen.Size = new System.Drawing.Size(60, 226);
+            this.grpRoutinen.Size = new System.Drawing.Size(60, 229);
             this.grpRoutinen.TabIndex = 4;
             this.grpRoutinen.TabStop = false;
             this.grpRoutinen.Text = "Routinen";
@@ -171,7 +171,7 @@ namespace BlueControls {
             this.lstFunktionen.Location = new System.Drawing.Point(16, 24);
             this.lstFunktionen.Name = "lstFunktionen";
             this.lstFunktionen.RemoveAllowed = true;
-            this.lstFunktionen.Size = new System.Drawing.Size(32, 187);
+            this.lstFunktionen.Size = new System.Drawing.Size(32, 190);
             this.lstFunktionen.TabIndex = 4;
             this.lstFunktionen.Translate = false;
             this.lstFunktionen.ItemAdded += new System.EventHandler<BlueBasics.EventArgs.ListEventArgs>(this.lstFunktionen_ItemAdded);
@@ -186,7 +186,7 @@ namespace BlueControls {
             this.grpVariablen.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.NormalBold;
             this.grpVariablen.Location = new System.Drawing.Point(0, 0);
             this.grpVariablen.Name = "grpVariablen";
-            this.grpVariablen.Size = new System.Drawing.Size(603, 96);
+            this.grpVariablen.Size = new System.Drawing.Size(603, 98);
             this.grpVariablen.TabIndex = 3;
             this.grpVariablen.TabStop = false;
             this.grpVariablen.Text = "Variablen";
@@ -199,7 +199,7 @@ namespace BlueControls {
             this.tableVariablen.Location = new System.Drawing.Point(8, 64);
             this.tableVariablen.Name = "tableVariablen";
             this.tableVariablen.ShowWaitScreen = true;
-            this.tableVariablen.Size = new System.Drawing.Size(584, 24);
+            this.tableVariablen.Size = new System.Drawing.Size(584, 26);
             this.tableVariablen.TabIndex = 2;
             this.tableVariablen.Text = "tabVariablen";
             // 
@@ -220,10 +220,9 @@ namespace BlueControls {
             this.grpAusgabeFenster.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.grpAusgabeFenster.Controls.Add(this.txbSkriptInfo);
             this.grpAusgabeFenster.Dock = System.Windows.Forms.DockStyle.Top;
-            this.grpAusgabeFenster.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.NormalBold;
-            this.grpAusgabeFenster.Location = new System.Drawing.Point(0, 72);
+            this.grpAusgabeFenster.Location = new System.Drawing.Point(0, 48);
             this.grpAusgabeFenster.Name = "grpAusgabeFenster";
-            this.grpAusgabeFenster.Size = new System.Drawing.Size(603, 101);
+            this.grpAusgabeFenster.Size = new System.Drawing.Size(603, 120);
             this.grpAusgabeFenster.TabIndex = 3;
             this.grpAusgabeFenster.TabStop = false;
             this.grpAusgabeFenster.Text = "Ausgabe";
@@ -234,9 +233,9 @@ namespace BlueControls {
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txbSkriptInfo.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbSkriptInfo.Location = new System.Drawing.Point(16, 24);
+            this.txbSkriptInfo.Location = new System.Drawing.Point(8, 24);
             this.txbSkriptInfo.Name = "txbSkriptInfo";
-            this.txbSkriptInfo.Size = new System.Drawing.Size(576, 64);
+            this.txbSkriptInfo.Size = new System.Drawing.Size(588, 91);
             this.txbSkriptInfo.TabIndex = 1;
             this.txbSkriptInfo.Verhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
@@ -246,17 +245,17 @@ namespace BlueControls {
             this.grpMainBar.Controls.Add(this.btnBefehlsUebersicht);
             this.grpMainBar.Controls.Add(this.btnTest);
             this.grpMainBar.Dock = System.Windows.Forms.DockStyle.Top;
-            this.grpMainBar.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.NormalBold;
+            this.grpMainBar.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.Nothing;
             this.grpMainBar.Location = new System.Drawing.Point(0, 0);
             this.grpMainBar.Name = "grpMainBar";
-            this.grpMainBar.Size = new System.Drawing.Size(603, 72);
+            this.grpMainBar.Size = new System.Drawing.Size(603, 48);
             this.grpMainBar.TabIndex = 5;
             this.grpMainBar.TabStop = false;
             // 
             // btnBefehlsUebersicht
             // 
             this.btnBefehlsUebersicht.ImageCode = "Tabelle|16";
-            this.btnBefehlsUebersicht.Location = new System.Drawing.Point(128, 24);
+            this.btnBefehlsUebersicht.Location = new System.Drawing.Point(128, 8);
             this.btnBefehlsUebersicht.Name = "btnBefehlsUebersicht";
             this.btnBefehlsUebersicht.Size = new System.Drawing.Size(136, 32);
             this.btnBefehlsUebersicht.TabIndex = 1;
@@ -266,7 +265,7 @@ namespace BlueControls {
             // btnTest
             // 
             this.btnTest.ImageCode = "Abspielen|16";
-            this.btnTest.Location = new System.Drawing.Point(16, 24);
+            this.btnTest.Location = new System.Drawing.Point(16, 8);
             this.btnTest.Name = "btnTest";
             this.btnTest.Size = new System.Drawing.Size(104, 32);
             this.btnTest.TabIndex = 0;

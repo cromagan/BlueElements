@@ -40,6 +40,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnZeileLöschen = new BlueControls.Controls.Button();
             this.btnDatenüberprüfung = new BlueControls.Controls.Button();
             this.btnAdminMenu = new BlueControls.Controls.Button();
+            this.btnPowerBearbeitung = new BlueControls.Controls.Button();
             this.grpAllgemein.SuspendLayout();
             this.grpTabellenAnsicht.SuspendLayout();
             this.grpBearbeitung.SuspendLayout();
@@ -62,7 +63,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnLayouts
             // 
-            this.btnLayouts.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_Big_Borderless;
+            this.btnLayouts.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnLayouts.ImageCode = "Layout";
             this.btnLayouts.Location = new System.Drawing.Point(72, 0);
             this.btnLayouts.Name = "btnLayouts";
@@ -73,7 +74,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnVorherigeVersion
             // 
-            this.btnVorherigeVersion.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_Big_Borderless;
+            this.btnVorherigeVersion.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnVorherigeVersion.ImageCode = "Uhr";
             this.btnVorherigeVersion.Location = new System.Drawing.Point(200, 0);
             this.btnVorherigeVersion.Name = "btnVorherigeVersion";
@@ -84,7 +85,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnDatenbankKopf
             // 
-            this.btnDatenbankKopf.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_Big_Borderless;
+            this.btnDatenbankKopf.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnDatenbankKopf.ImageCode = "Datenbank";
             this.btnDatenbankKopf.Location = new System.Drawing.Point(8, 0);
             this.btnDatenbankKopf.Name = "btnDatenbankKopf";
@@ -95,7 +96,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnSpaltenUebersicht
             // 
-            this.btnSpaltenUebersicht.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_Big_Borderless;
+            this.btnSpaltenUebersicht.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnSpaltenUebersicht.ImageCode = "Spalte";
             this.btnSpaltenUebersicht.Location = new System.Drawing.Point(128, 0);
             this.btnSpaltenUebersicht.Name = "btnSpaltenUebersicht";
@@ -106,7 +107,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnClipboardImport
             // 
-            this.btnClipboardImport.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_Big_Borderless;
+            this.btnClipboardImport.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnClipboardImport.ImageCode = "Tabelle||||||||||Pfeil_Links";
             this.btnClipboardImport.Location = new System.Drawing.Point(8, 0);
             this.btnClipboardImport.Name = "btnClipboardImport";
@@ -130,22 +131,23 @@ namespace BlueControls.BlueDatabaseDialogs
             // grpBearbeitung
             // 
             this.grpBearbeitung.CausesValidation = false;
+            this.grpBearbeitung.Controls.Add(this.btnPowerBearbeitung);
             this.grpBearbeitung.Controls.Add(this.btnZeileLöschen);
             this.grpBearbeitung.Controls.Add(this.btnDatenüberprüfung);
             this.grpBearbeitung.Controls.Add(this.btnAdminMenu);
             this.grpBearbeitung.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpBearbeitung.Location = new System.Drawing.Point(344, 0);
             this.grpBearbeitung.Name = "grpBearbeitung";
-            this.grpBearbeitung.Size = new System.Drawing.Size(224, 81);
+            this.grpBearbeitung.Size = new System.Drawing.Size(304, 81);
             this.grpBearbeitung.TabIndex = 5;
             this.grpBearbeitung.TabStop = false;
             this.grpBearbeitung.Text = "Bearbeitung";
             // 
             // btnZeileLöschen
             // 
-            this.btnZeileLöschen.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_Big_Borderless;
+            this.btnZeileLöschen.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnZeileLöschen.ImageCode = "Zeile||||||||||Kreuz";
-            this.btnZeileLöschen.Location = new System.Drawing.Point(144, 0);
+            this.btnZeileLöschen.Location = new System.Drawing.Point(224, 0);
             this.btnZeileLöschen.Name = "btnZeileLöschen";
             this.btnZeileLöschen.QuickInfo = "Angezeigte Zeilen löschen";
             this.btnZeileLöschen.Size = new System.Drawing.Size(72, 72);
@@ -155,9 +157,9 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnDatenüberprüfung
             // 
-            this.btnDatenüberprüfung.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_Big_Borderless;
+            this.btnDatenüberprüfung.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnDatenüberprüfung.ImageCode = "Zeile||||||||||Häkchen";
-            this.btnDatenüberprüfung.Location = new System.Drawing.Point(72, 0);
+            this.btnDatenüberprüfung.Location = new System.Drawing.Point(152, 0);
             this.btnDatenüberprüfung.Name = "btnDatenüberprüfung";
             this.btnDatenüberprüfung.QuickInfo = "Aktuell angezeigte Zeilen<br>automatisch überprüfen.";
             this.btnDatenüberprüfung.Size = new System.Drawing.Size(64, 72);
@@ -167,7 +169,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnAdminMenu
             // 
-            this.btnAdminMenu.ButtonStyle = BlueControls.Enums.enButtonStyle.Button_Big_Borderless;
+            this.btnAdminMenu.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnAdminMenu.ImageCode = "Zahnrad||||FF0000";
             this.btnAdminMenu.Location = new System.Drawing.Point(8, 0);
             this.btnAdminMenu.Name = "btnAdminMenu";
@@ -175,6 +177,18 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnAdminMenu.TabIndex = 40;
             this.btnAdminMenu.Text = "Admin-Menu";
             this.btnAdminMenu.Click += new System.EventHandler(this.btnAdminMenu_Click);
+            // 
+            // btnPowerBearbeitung
+            // 
+            this.btnPowerBearbeitung.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.btnPowerBearbeitung.ImageCode = "Stift||||FF0000||||||Uhr";
+            this.btnPowerBearbeitung.Location = new System.Drawing.Point(72, 0);
+            this.btnPowerBearbeitung.Name = "btnPowerBearbeitung";
+            this.btnPowerBearbeitung.QuickInfo = "Aktuell angezeigte Zeilen<br>automatisch überprüfen.";
+            this.btnPowerBearbeitung.Size = new System.Drawing.Size(72, 72);
+            this.btnPowerBearbeitung.TabIndex = 43;
+            this.btnPowerBearbeitung.Text = "Power-Bearbeitung";
+            this.btnPowerBearbeitung.Click += new System.EventHandler(this.btnPowerBearbeitung_Click);
             // 
             // tabAdministration
             // 
@@ -188,6 +202,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpTabellenAnsicht.ResumeLayout(false);
             this.grpBearbeitung.ResumeLayout(false);
             this.ResumeLayout(false);
+
         }
         #endregion
 
@@ -202,5 +217,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private Button btnAdminMenu;
         private Button btnDatenüberprüfung;
         private Button btnZeileLöschen;
+        private Button btnPowerBearbeitung;
     }
 }

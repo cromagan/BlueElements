@@ -359,7 +359,7 @@ namespace BlueBasics {
 
         public static bool IsDateTime(this string txt) => DateTimeTryParse(txt, out var _);
 
-        public static bool IsDouble(this string txt) => txt is not null && double.TryParse(txt.Replace(".",","), out var _);
+        public static bool IsDouble(this string txt) => txt is not null && double.TryParse(txt.Replace(".", ","), out var _);
 
         public static bool IsHTMLColorCode(this string txt) => !string.IsNullOrEmpty(txt) && (txt.Length == 6 || txt.Length == 8) && txt.ContainsOnlyChars(Constants.Char_Numerals + "abcdefABCDEF");
 
@@ -406,11 +406,13 @@ namespace BlueBasics {
                         Gans = true;  // Ab hier fogt ein String
                     } else {
                         // Nur die andern Klammern-Paare prüfen. Bei einem Klammer Fehler -1 zurück geben.
-                        foreach (var thisc in klammern) {
-                            if (ch == thisc[0]) { historie += thisc[0]; }
-                            if (ch == thisc[1]) {
-                                if (!historie.EndsWith(thisc[0])) { return (-1, string.Empty); }
-                                historie = historie.Substring(0, historie.Length - 1);
+                        if (klammern != null) {
+                            foreach (var thisc in klammern) {
+                                if (ch == thisc[0]) { historie += thisc[0]; }
+                                if (ch == thisc[1]) {
+                                    if (!historie.EndsWith(thisc[0])) { return (-1, string.Empty); }
+                                    historie = historie.Substring(0, historie.Length - 1);
+                                }
                             }
                         }
                     }

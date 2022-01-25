@@ -300,6 +300,14 @@ namespace BlueControls.Controls {
 
         public List<RowItem> PinnedRows { get; } = new();
 
+        public DateTime PowerEdit {
+            private get => _Database.PowerEdit;
+            set {
+                Database.PowerEdit = value;
+                Invalidate_SortedRowData(); // Neue Zeilen können nun erlaubt sein
+            }
+        }
+
         public override string QuickInfoText {
             get {
                 var t1 = base.QuickInfoText;
@@ -1130,7 +1138,7 @@ namespace BlueControls.Controls {
         }
 
         protected override void OnDoubleClick(System.EventArgs e) {
-            //    base.OnDoubleClick(e); Wird komplett selsbt gehandlet und das neue Ereigniss ausgelöst
+            //    base.OnDoubleClick(e); Wird komplett selbst gehandlet und das neue Ereigniss ausgelöst
             if (_Database == null) { return; }
             lock (Lock_UserAction) {
                 if (ISIN_DoubleClick) { return; }
@@ -1146,6 +1154,7 @@ namespace BlueControls.Controls {
                         DoubleClick?.Invoke(this, ea);
                     } else {
                         DoubleClick?.Invoke(this, ea);
+                        if (Database.PowerEdit.Subtract(DateTime.Now).TotalSeconds > 0) { ea.StartEdit = true; }
                         if (ea.StartEdit) { Cell_Edit(_MouseOverColumn, _MouseOverRow, true); }
                     }
                 }
@@ -1497,6 +1506,7 @@ namespace BlueControls.Controls {
                 CurrentArrangement?.Invalidate_DrawWithOfAllItems();
                 ISIN_SizeChanged = false;
             }
+            Invalidate_SortedRowData(); // Zellen können ihre Größe ändern. z.B. die Zeilenhöhe
         }
 
         protected override void OnVisibleChanged(System.EventArgs e) {
@@ -3167,13 +3177,18 @@ namespace BlueControls.Controls {
             Focus();
         }
 
-        private bool UserEdit_NewRowAllowed() => _Database != null && _Database.Column.Count != 0
-&& _Database.Column[0] != null
-&& _Design != enBlueTableAppearance.OnlyMainColumnWithoutHead
-&& _Database.ColumnArrangements.Count != 0
-&& (CurrentArrangement == null || CurrentArrangement[_Database.Column[0]] != null)
-&& _Database.PermissionCheck(_Database.PermissionGroups_NewRow, null)
-&& CellCollection.UserEditPossible(_Database.Column[0], null, enErrorReason.EditNormaly);
+        private bool UserEdit_NewRowAllowed() {
+            if (_Database == null || _Database.Column.Count == 0 || _Database.Column[0] == null) { return false; }
+            if (_Design == enBlueTableAppearance.OnlyMainColumnWithoutHead) { return false; }
+            if (_Database.ColumnArrangements.Count == 0) { return false; }
+            if (CurrentArrangement == null || CurrentArrangement[_Database.Column[0]] == null) { return false; }
+            if (!_Database.PermissionCheck(_Database.PermissionGroups_NewRow, null)) { return false; }
+
+            if (PowerEdit.Subtract(DateTime.Now).TotalSeconds > 0) { return true; }
+
+            if (!CellCollection.UserEditPossible(_Database.Column[0], null, enErrorReason.EditNormaly)) { return false; }
+            return true;
+        }
 
         #endregion
 

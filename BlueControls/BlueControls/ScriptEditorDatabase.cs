@@ -34,7 +34,7 @@ using System.Linq;
 namespace BlueControls {
 
     public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.UserControl
-                                                                                  {
+       {
         #region Fields
 
         private Database _Database = null;

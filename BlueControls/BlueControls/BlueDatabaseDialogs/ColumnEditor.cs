@@ -112,6 +112,12 @@ namespace BlueControls.BlueDatabaseDialogs {
             Column_DatenAuslesen(_Column);
         }
 
+        private void btnSchnellBit_Click(object sender, System.EventArgs e) {
+            Column_DatenZurückschreiben();
+            _Column.SetFormatForBit();
+            Column_DatenAuslesen(_Column);
+        }
+
         private void btnSchnellDatum_Click(object sender, System.EventArgs e) {
             Column_DatenZurückschreiben();
             _Column.SetFormatForDate();

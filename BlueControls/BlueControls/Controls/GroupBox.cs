@@ -103,24 +103,24 @@ namespace BlueControls.Controls {
                     if (Height > 33) {
                         Skin.Draw_Border(e.Graphics, enDesign.GroupBoxBold, state, r);
                         if (!string.IsNullOrEmpty(Text)) {
-                            Rectangle topTXT = new(Skin.Padding, 0, Width, Height);
-                            Skin.Draw_FormatedText(e.Graphics, Text, enDesign.GroupBoxBold, state, null, enAlignment.Top_Left, topTXT, this, true, true);
+                            Rectangle topTXT = new(Skin.Padding, Skin.PaddingSmal, Width, Height);
+                            Skin.Draw_FormatedText(e.Graphics, Text, enDesign.GroupBoxBold, state, null, enAlignment.Top_Left, topTXT, this, false, true);
                         }
                     }
                     break;
-                    //if (Height > 33) {
-                    //    r.Inflate(-2, -2);
-                    //    for (var z = 0; z < 8; z++) {
-                    //        Skin.Draw_Border(e.Graphics, enDesign.Frame, state, r);
-                    //        r.Inflate(1, 1);
-                    //    }
+                //if (Height > 33) {
+                //    r.Inflate(-2, -2);
+                //    for (var z = 0; z < 8; z++) {
+                //        Skin.Draw_Border(e.Graphics, enDesign.Frame, state, r);
+                //        r.Inflate(1, 1);
+                //    }
 
-                    //    if (!string.IsNullOrEmpty(Text)) {
-                    //        Rectangle topTXT = new(Skin.Padding, 0, Width, Height);
-                    //        Skin.Draw_FormatedText(e.Graphics, Text, enDesign.Frame, state, null, enAlignment.Top_Left, topTXT, this, true, true);
-                    //    }
-                    //}
-                    break;
+                //    if (!string.IsNullOrEmpty(Text)) {
+                //        Rectangle topTXT = new(Skin.Padding, 0, Width, Height);
+                //        Skin.Draw_FormatedText(e.Graphics, Text, enDesign.Frame, state, null, enAlignment.Top_Left, topTXT, this, true, true);
+                //    }
+                //}
+                //break;
 
                 default:
                     Skin.Draw_Back_Transparent(e.Graphics, DisplayRectangle, this);
