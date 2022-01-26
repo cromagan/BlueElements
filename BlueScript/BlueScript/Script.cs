@@ -103,6 +103,7 @@ namespace BlueScript {
 
         public int Line { get; internal set; }
 
+        public string ReducedScriptText { get; private set; }
         public int Schleife { get; internal set; }
 
         public string ScriptText {
@@ -162,7 +163,22 @@ namespace BlueScript {
         }
 
         public bool Parse() {
-            (Error, ErrorCode) = Parse(_ScriptText, true);
+            ReducedScriptText = ReduceText(ScriptText);
+            Line = 1;
+            BreakFired = false;
+            Schleife = 0;
+
+            _berechneVariable = null;
+
+            foreach (var thisC in Comands) {
+                if (thisC is Method_BerechneVariable bv) { _berechneVariable = bv; }
+            }
+
+            if (_berechneVariable == null) {
+                Develop.DebugPrint(enFehlerArt.Fehler, "Method_BerechneVariable ist nicht definiet.");
+            }
+
+            (Error, ErrorCode) = Parse(ReducedScriptText);
             return !string.IsNullOrEmpty(Error);
         }
 
@@ -171,47 +187,24 @@ namespace BlueScript {
             return BitmapCache.IndexOf(bmp);
         }
 
-        internal (string, string) Parse(string scriptText, bool reduce) {
+        internal (string, string) Parse(string redScriptText) {
             var pos = 0;
             EndSkript = false;
 
-            string tmpScript;
-            if (reduce) {
-                tmpScript = ReduceText(scriptText);
-                Line = 1;
-                BreakFired = false;
-                Schleife = 0;
-                //Variablen.PrepareForScript();
-
-                _berechneVariable = null;
-
-                foreach (var thisC in Comands) {
-                    if (thisC is Method_BerechneVariable bv) { _berechneVariable = bv; }
-                }
-
-                if (_berechneVariable == null) {
-                    Develop.DebugPrint(enFehlerArt.Fehler, "Method_BerechneVariable ist nicht definiet.");
-                }
-            } else {
-                tmpScript = scriptText;
-            }
-
             do {
-                if (pos >= tmpScript.Length || EndSkript) {
-                    //if (reduce) { Variablen.ScriptFinished(); }
+                if (pos >= redScriptText.Length || EndSkript) {
                     return (string.Empty, string.Empty);
                 }
 
                 if (BreakFired) { return (string.Empty, string.Empty); }
 
-                if (tmpScript.Substring(pos, 1) == "¶") {
+                if (redScriptText.Substring(pos, 1) == "¶") {
                     Line++;
                     pos++;
                 } else {
-                    var f = ComandOnPosition(tmpScript, pos, this, false);
+                    var f = ComandOnPosition(redScriptText, pos, this, false);
                     if (!string.IsNullOrEmpty(f.ErrorMessage)) {
-                        //if (reduce) { Variablen.ScriptFinished(); }
-                        return (f.ErrorMessage, tmpScript.Substring(pos, Math.Min(30, tmpScript.Length - pos)));
+                        return (f.ErrorMessage, ReducedScriptText.Substring(pos, Math.Min(30, ReducedScriptText.Length - pos)));
                     }
                     pos = f.Position;
                 }

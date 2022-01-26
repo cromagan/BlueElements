@@ -392,76 +392,29 @@ namespace BlueBasics {
             var historie = string.Empty;
 
             do {
-                if (pos >= maxl) { return (-1, string.Empty); ; }
-
-                #region Klammer und " erledigen
+                if (pos >= maxl) { return (-1, string.Empty); }
 
                 var ch = txt.Substring(pos, 1);
 
+                var machtezu = false;
+
+                #region Gänsefüßchen und Klammern zu machen
+
                 if (Gans) {
                     // Wenn ein Gänsefüßchen offen ist, NUR auf weitere Gänsefüßchen reagieren - in einem String darf alles sein.
-                    if (ch == "\"") { Gans = false; }
+                    if (ch == "\"") { Gans = false; machtezu = true; }
                 } else {
-                    if (ch == "\"") {
-                        Gans = true;  // Ab hier fogt ein String
-                    } else {
-                        // Nur die andern Klammern-Paare prüfen. Bei einem Klammer Fehler -1 zurück geben.
-                        if (klammern != null) {
-                            foreach (var thisc in klammern) {
-                                if (ch == thisc[0]) { historie += thisc[0]; }
-                                if (ch == thisc[1]) {
-                                    if (!historie.EndsWith(thisc[0])) { return (-1, string.Empty); }
-                                    historie = historie.Substring(0, historie.Length - 1);
-                                }
+                    if (klammern != null) {
+                        foreach (var thisc in klammern) {
+                            if (ch == thisc[1]) {
+                                if (!historie.EndsWith(thisc[0])) { return (-1, string.Empty); }
+                                historie = historie.Substring(0, historie.Length - 1);
+                                machtezu = true;
+                                break;
                             }
                         }
                     }
                 }
-
-                //switch (txt.Substring(pos, 1)) {
-                //    case "\"":
-                //        if (historie.EndsWith("\"")) {
-                //            historie = historie.Substring(0, historie.Length - 1);
-                //            Gans = false;
-                //        } else {
-                //            historie += "\"";
-                //            Gans = true;
-                //        }
-                //        break;
-
-                //    case "[":
-                //        if (!Gans) { historie += "["; }
-                //        break;
-
-                //    case "]":
-                //        if (!Gans) {
-                //            if (!historie.EndsWith("[")) { return (-1, string.Empty); }
-                //            historie = historie.Substring(0, historie.Length - 1);
-                //        }
-                //        break;
-
-                //    case "(":
-                //        if (!Gans) { historie += "("; }
-                //        break;
-
-                //    case ")":
-                //        if (!Gans) {
-                //            if (!historie.EndsWith("(")) { return (-1, string.Empty); }
-                //            historie = historie.Substring(0, historie.Length - 1);
-                //        }
-                //        break;
-
-                //    case "{":
-                //        if (!Gans) { historie += "{"; }
-                //        break;
-
-                //    case "}":
-                //        if (!Gans) {
-                //            if (!historie.EndsWith("{")) { return (-1, string.Empty); }
-                //            historie = historie.Substring(0, historie.Length - 1);
-                //        }
-                //        break;
-                //}
 
                 #endregion
 
@@ -476,6 +429,23 @@ namespace BlueBasics {
                                         return (pos, thisEnd);
                                     }
                                 }
+                            }
+                        }
+                    }
+                }
+
+                #endregion
+
+                #region Gänsefüßchen und Klammern aufmachen
+
+                if (!Gans && !machtezu) {
+                    if (ch == "\"") {
+                        Gans = true;  // Ab hier fogt ein String
+                    } else {
+                        // Nur die andern Klammern-Paare prüfen. Bei einem Klammer Fehler -1 zurück geben.
+                        if (klammern != null) {
+                            foreach (var thisc in klammern) {
+                                if (ch == thisc[0]) { historie += thisc[0]; break; }
                             }
                         }
                     }

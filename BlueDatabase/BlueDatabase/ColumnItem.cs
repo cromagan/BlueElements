@@ -1756,7 +1756,6 @@ namespace BlueDatabase {
             AfterEdit_QuickSortRemoveDouble = false;
             BildTextVerhalten = enBildTextVerhalten.Nur_Text;
             ScriptType = enScriptType.String;
-            ScriptType = enScriptType.String;
         }
 
         public void SetFormatForTextMitFormatierung() {

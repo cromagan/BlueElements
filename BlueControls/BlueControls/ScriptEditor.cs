@@ -179,7 +179,6 @@ namespace BlueControls {
                     ThisColumn.MultiLine = true;
                     ThisColumn.TextBearbeitungErlaubt = false;
                     ThisColumn.DropdownBearbeitungErlaubt = false;
-                    ThisColumn.BildTextVerhalten = enBildTextVerhalten.Bild_oder_Text;
                 }
             }
 

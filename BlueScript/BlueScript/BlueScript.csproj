@@ -73,6 +73,8 @@
     <Compile Include="Methods\Method_IsDateTime.cs" />
     <Compile Include="Methods\Method_SortNum.cs" />
     <Compile Include="Methods\Method_ExtractTags.cs" />
+    <Compile Include="Methods\Method_Call.cs" />
+    <Compile Include="Methods\Method_Sub.cs" />
     <Compile Include="Methods\Method_TrimPrefix.cs" />
     <Compile Include="Methods\Method_TrimSuffix.cs" />
     <Compile Include="Methods\Method_StringToUTF8.cs" />

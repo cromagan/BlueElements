@@ -48,6 +48,35 @@ namespace BlueScript {
 
         #region Methods
 
+        /// <summary>
+        /// Gibt den Text des Codeblocks zurück. Dabei werden die Zeilenumbrüche vor der { nicht entfernt, aber die Klammern {} selbst schon.
+        /// Das muss berücksichtigt werden, um die Skript-Position richtig zu setzen!
+        /// </summary>
+        /// <param name="scriptText"></param>
+        /// <param name="start"></param>
+        /// <returns></returns>
+        public static (string, string) GetCodeBlockText(string scriptText, int start) {
+            var maxl = scriptText.Length;
+
+            var tmp = start;
+
+            do {
+                if (tmp >= maxl) { return (string.Empty, "Keinen nachfolgenden Codeblock gefunden."); }
+                if (scriptText.Substring(tmp, 1) == "{") { break; }
+                if (scriptText.Substring(tmp, 1) != "¶") { return (string.Empty, "Keinen nachfolgenden Codeblock gefunden."); }
+                tmp++;
+            } while (true);
+
+            (var posek, var _) = NextText(scriptText, start, GeschKlammerZu, false, false, KlammernStd);
+            if (posek < start) {
+                return (string.Empty, "Kein Codeblock Ende gefunden.");
+            }
+
+            var s = scriptText.Substring(start, tmp - start) + scriptText.Substring(tmp + 1, posek - tmp - 1);
+
+            return (s, string.Empty);
+        }
+
         public static strGetEndFeedback ReplaceComands(string txt, IEnumerable<Method> comands, Script s) {
             List<string> c = new();
             foreach (var thisc in comands) {
@@ -209,22 +238,10 @@ namespace BlueScript {
                         var cont = f.ContinuePosition;
                         var codebltxt = string.Empty;
                         if (GetCodeBlockAfter) {
-                            do {
-                                if (cont >= maxl) { return new strCanDoFeedback(f.ContinuePosition, "Kein nachfolgender Codeblock bei " + comandtext, true); }
-                                if (scriptText.Substring(cont, 1) == "{") { break; }
-                                if (scriptText.Substring(cont, 1) != "¶") { return new strCanDoFeedback(f.ContinuePosition, "Kein nachfolgender Codeblock bei " + comandtext, true); }
-                                cont++;
-                                s.Line++;
-                            } while (true);
-                            (var posek, var _) = NextText(scriptText, cont, GeschKlammerZu, false, false, KlammernStd);
-                            if (posek < cont) {
-                                return new strCanDoFeedback(cont, "Kein Codeblock Ende bei " + comandtext, true);
-                            }
-                            codebltxt = scriptText.Substring(cont + 1, posek - cont - 1);
-                            //if (string.IsNullOrEmpty(codebltxt)) {
-                            //    return new strCanDoFeedback(cont, "Leerer Codeblock bei " + comandtext, true);
-                            //}
-                            cont = posek + 1;
+                            (string, string) x = GetCodeBlockText(scriptText, cont);
+                            if (!string.IsNullOrEmpty(x.Item2)) { return new strCanDoFeedback(f.ContinuePosition, x.Item2, true); }
+                            codebltxt = x.Item1;
+                            cont = cont + codebltxt.Length + 2;
                         }
                         return new strCanDoFeedback(cont, comandtext, f.AttributeText, codebltxt);
                     }

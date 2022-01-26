@@ -70,29 +70,13 @@ namespace BlueScript {
             return null;
         }
 
-        //    #region Klammern zuerst berechnen und auflösen
-
-        //    (var posa, var _) = NextText(txt, 0, KlammerAuf, false, false, KlammernStd);
-        //    (var pose, var _) = NextText(txt, Math.Max(posa, 0), KlammerZu, false, false, KlammernStd);
-        //    if (posa > -1 || pose > -1) {
-        //        if (pose < posa) { return null; }
-        //        var tmp = GetBool(txt.Substring(posa + 1, pose - posa - 1));
-        //        return tmp == null ? null : GetBool(txt.Substring(0, posa) + tmp + txt.Substring(pose + 1));
-        //    }
-
-        //    #endregion Klammern zuerst berechnen
-
-        //    return null;
-        //}
-
         public override List<string> Comand(Script s) => new() { "if" };
 
-        //public static readonly List<string> Vorbidden = new() { "exists", "istype", "isnullorempty", "isnullorzero" };
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
             if (attvar.Attributes[0].ValueBool) {
-                (var err, var _) = s.Parse(infos.CodeBlockAfterText, false);
+                (var err, var _) = s.Parse(infos.CodeBlockAfterText);
                 if (!string.IsNullOrEmpty(err)) { return new strDoItFeedback(err); }
             } else {
                 s.Line += infos.LineBreakInCodeBlock;

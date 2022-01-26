@@ -391,7 +391,7 @@ namespace BlueScript {
             get {
                 if (string.IsNullOrEmpty(_ValueString)) { return new List<string>(); }
                 if (!_ValueString.EndsWith("\r")) {
-                    Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Fehler, "Objekttypfehler:" + _ValueString);
+                    Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Fehler, "Objekttypfehler: " + _ValueString);
                 }
                 var x = _ValueString.Substring(0, _ValueString.Length - 1);
                 if (string.IsNullOrEmpty(x)) { return new List<string>() { string.Empty }; }
@@ -708,7 +708,7 @@ namespace BlueScript {
                     if (string.IsNullOrEmpty(value)) { return "{ }"; }
 
                     if (!value.EndsWith("\r")) {
-                        Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Fehler, "Objekttypfehler:" + value);
+                        Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Fehler, "Objekttypfehler: " + value);
                     }
 
                     var x = value.Substring(0, value.Length - 1);

@@ -55,7 +55,7 @@ namespace BlueScript {
                 var tmpv = new List<Variable>();
                 tmpv.AddRange(s.Variablen);
 
-                (var err, var _) = s.Parse(infos.CodeBlockAfterText, false);
+                (var err, var _) = s.Parse(infos.CodeBlockAfterText);
                 if (!string.IsNullOrEmpty(err)) { return new strDoItFeedback(err); }
 
                 s.Variablen.Clear();

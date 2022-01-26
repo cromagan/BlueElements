@@ -88,16 +88,19 @@ namespace BlueControls.Controls {
 
         #region Methods
 
-        public void AddFileName(string FileName, string AdditionalText) {
-            var s = FileName + "|" + AdditionalText;
+        public void AddFileName(string fileName, string additionalText) {
+            var s = fileName + "|" + additionalText;
             s = s.Replace("\r\n", ";");
             s = s.Replace("\r", ";");
             s = s.Replace("\n", ";");
-            if (!_mustExists || FileExists(FileName)) {
-                if (LastD.Count > 0) { LastD.RemoveString(FileName, false); }
+            if (!_mustExists || FileExists(fileName)) {
+                if (LastD.Count > 0) { LastD.RemoveString(fileName, false); }
                 if (LastD.Count > 0) { LastD.RemoveString(s, false); }
                 LastD.Add(s);
-                LastD.Save(SaveFile(), System.Text.Encoding.UTF8, false);
+
+                if (CanWriteInDirectory(SaveFileName().FilePath())) {
+                    LastD.Save(SaveFileName(), System.Text.Encoding.UTF8, false);
+                }
             }
             GenerateMenu();
         }
@@ -157,14 +160,14 @@ namespace BlueControls.Controls {
 
         private void LoadFromDisk() {
             LastD = new List<string>();
-            if (FileExists(SaveFile())) {
-                var t = File.ReadAllText(SaveFile(), System.Text.Encoding.UTF8);
+            if (FileExists(SaveFileName())) {
+                var t = File.ReadAllText(SaveFileName(), System.Text.Encoding.UTF8);
                 t = t.RemoveChars("\n");
                 LastD.AddRange(t.SplitAndCutByCR());
             }
         }
 
-        private string SaveFile() => !string.IsNullOrEmpty(_filename) ? _filename.CheckFile() : System.Windows.Forms.Application.StartupPath + "\\" + Name + "-Files.laf";
+        private string SaveFileName() => !string.IsNullOrEmpty(_filename) ? _filename.CheckFile() : System.Windows.Forms.Application.StartupPath + "\\" + Name + "-Files.laf";
 
         private void SetLastFilesStyle() {
             if (DrawStyle == enComboboxStyle.TextBox) {
