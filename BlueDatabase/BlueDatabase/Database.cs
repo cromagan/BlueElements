@@ -30,6 +30,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using static BlueBasics.FileOperations;
 
 namespace BlueDatabase {
@@ -429,16 +430,30 @@ namespace BlueDatabase {
 
         public List<string> AllConnectedFilesLCase() {
             List<string> Column_All = new();
+            var lockMe = new object();
+
             foreach (var ThisColumnItem in Column) {
-                if (ThisColumnItem != null) {
-                    if (ThisColumnItem.Format == enDataFormat.Link_To_Filesystem) {
-                        var tmp = ThisColumnItem.Contents();
-                        foreach (var thisTmp in tmp) {
-                            Column_All.AddIfNotExists(ThisColumnItem.BestFile(thisTmp, false).ToLower());
+                if (ThisColumnItem != null && ThisColumnItem.Format == enDataFormat.Link_To_Filesystem) {
+                    var tmp = ThisColumnItem.Contents();
+                    Parallel.ForEach(tmp, thisTmp => {
+                        var x = ThisColumnItem.BestFile(thisTmp, false).ToLower();
+                        lock (lockMe) {
+                            Column_All.Add(x);
                         }
-                    }
+                    });
                 }
             }
+            //foreach (var ThisColumnItem in Column) {
+            //    if (ThisColumnItem != null) {
+            //        if (ThisColumnItem.Format == enDataFormat.Link_To_Filesystem) {
+            //            var tmp = ThisColumnItem.Contents();
+            //            foreach (var thisTmp in tmp) {
+            //                Column_All.AddIfNotExists(ThisColumnItem.BestFile(thisTmp, false).ToLower());
+            //            }
+            //        }
+            //    }
+            //}
+
             return Column_All.SortedDistinctList();
         }
 

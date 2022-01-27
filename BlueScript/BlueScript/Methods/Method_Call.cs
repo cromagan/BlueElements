@@ -17,6 +17,7 @@
 
 using Skript.Enums;
 using System.Collections.Generic;
+using System.Linq;
 using static BlueBasics.Extensions;
 
 namespace BlueScript {
@@ -54,22 +55,33 @@ namespace BlueScript {
 
             if (pos < 0) { return new strDoItFeedback("Subroutine " + infos.AttributText + " nicht definert."); }
 
-            (var pos2, var _) = NextText(s.ReducedScriptText, pos, such, true, false, KlammernStd);
+            (var pos2, var _) = NextText(s.ReducedScriptText.ToLower(), pos + 1, such, true, false, KlammernStd);
             if (pos2 > 0) { return new strDoItFeedback("Subroutine " + infos.AttributText + " mehrfach definert."); }
 
-            var x = GetCodeBlockText(s.ScriptText, pos + such[0].Length);
+            var weiterLine = s.Line;
 
-            //LineBreakInCodeBlock = codeblockaftertext.Count(c => c == '¶');
 
-            //var t = NextText();
-            //var x = s.ScriptText.Next
+            var code = GetCodeBlockText(s.ReducedScriptText, pos + such[0].Length);
 
-            //if (attvar.Attributes[0].ValueBool) {
-            //    (var err, var _) = s.Parse(infos.CodeBlockAfterText, false);
-            //    if (!string.IsNullOrEmpty(err)) { return new strDoItFeedback(err); }
-            //} else {
-            //    s.Line += infos.LineBreakInCodeBlock;
-            //}
+            if (!string.IsNullOrEmpty(code.Item2)) { return new strDoItFeedback("Subroutine " + infos.AttributText + ": " + code.Item2); }
+
+            s.Line = s.ReducedScriptText.Substring(0, pos).Count(c => c == '¶')+1;
+            s.Sub++;
+
+            var tmpv = new List<Variable>();
+            tmpv.AddRange(s.Variablen);
+
+            (var err, var _) = s.Parse(code.Item1);
+            if (!string.IsNullOrEmpty(err)) { return new strDoItFeedback("Subroutine " + infos.AttributText + ": " + err); }
+
+            s.Variablen.Clear();
+            s.Variablen.AddRange(tmpv);
+            s.Sub--;
+
+
+            if (s.Schleife < 0) { return new strDoItFeedback("Subroutinen-Fehler"); }
+
+            s.Line = weiterLine;
 
             return new strDoItFeedback(string.Empty);
         }

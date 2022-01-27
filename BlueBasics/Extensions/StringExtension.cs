@@ -387,7 +387,7 @@ namespace BlueBasics {
             var Gans = false;
             var pos = startpos;
             var maxl = txt.Length;
-            const string TR = "&.,;\\?!\" ~|=<>+-(){}[]/*`´\r\n\t";
+            const string TR = "&.,;\\?!\" ~|=<>+-(){}[]/*`´\r\n\t¶";
 
             var historie = string.Empty;
 

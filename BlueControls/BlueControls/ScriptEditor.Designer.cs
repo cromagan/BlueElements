@@ -8,16 +8,6 @@ namespace BlueControls {
         /// Erforderliche Designervariable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
-        /// <summary> 
-        /// Verwendete Ressourcen bereinigen.
-        /// </summary>
-        /// <param name="disposing">True, wenn verwaltete Ressourcen gelöscht werden sollen; andernfalls False.</param>
-        protected override void Dispose(bool disposing) {
-            if (disposing && (components != null)) {
-                components.Dispose();
-            }
-            base.Dispose(disposing);
-        }
         #region Vom Komponenten-Designer generierter Code
         /// <summary> 
         /// Erforderliche Methode für die Designerunterstützung. 
@@ -163,20 +153,18 @@ namespace BlueControls {
             // 
             // lstFunktionen
             // 
-            this.lstFunktionen.AddAllowed = BlueControls.Enums.enAddType.Text;
+            this.lstFunktionen.AddAllowed = BlueControls.Enums.enAddType.None;
             this.lstFunktionen.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.lstFunktionen.CheckBehavior = Enums.enCheckBehavior.NoSelection;
             this.lstFunktionen.FilterAllowed = true;
-            this.lstFunktionen.Location = new System.Drawing.Point(16, 24);
+            this.lstFunktionen.Location = new System.Drawing.Point(8, 24);
             this.lstFunktionen.Name = "lstFunktionen";
-            this.lstFunktionen.RemoveAllowed = true;
-            this.lstFunktionen.Size = new System.Drawing.Size(32, 190);
+            this.lstFunktionen.Size = new System.Drawing.Size(44, 190);
             this.lstFunktionen.TabIndex = 4;
             this.lstFunktionen.Translate = false;
-            this.lstFunktionen.ItemAdded += new System.EventHandler<BlueBasics.EventArgs.ListEventArgs>(this.lstFunktionen_ItemAdded);
             this.lstFunktionen.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.lstFunktionen_ItemClicked);
-            this.lstFunktionen.ItemRemoving += new System.EventHandler<BlueBasics.EventArgs.ListEventArgs>(this.lstFunktionen_ItemRemoving);
             // 
             // grpVariablen
             // 

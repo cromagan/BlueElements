@@ -65,8 +65,12 @@ namespace BlueScript {
             } while (true);
 
             s.Schleife--;
+
+            if (s.Schleife <0) { return new strDoItFeedback("Schleifenfehler"); }
+
+
             s.BreakFired = false;
-            s.Line += infos.LineBreakInCodeBlock;
+            s.Line = tmpline + infos.LineBreakInCodeBlock;
             return new strDoItFeedback(string.Empty);
         }
 

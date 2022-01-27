@@ -576,13 +576,21 @@ namespace BlueControls.Controls {
                 // Beim Button reicht eine Abfrage mit Row null
                 Column.TMP_ColumnContentWidth = Cell_ContentSize(table, Column, null, CellFont, Pix16).Width;
             } else {
-                foreach (var ThisRowItem in Column.Database.Row) {
+                Parallel.ForEach(Column.Database.Row, ThisRowItem => {
                     if (ThisRowItem != null && !ThisRowItem.CellIsNullOrEmpty(Column)) {
                         var t = Column.TMP_ColumnContentWidth; // ja, dank Multithreading kann es sein, dass hier das hier null ist
                         if (t == null) { t = 0; }
                         Column.TMP_ColumnContentWidth = Math.Max((int)t, Cell_ContentSize(table, Column, ThisRowItem, CellFont, Pix16).Width);
                     }
-                }
+                });
+
+                //foreach (var ThisRowItem in Column.Database.Row) {
+                //    if (ThisRowItem != null && !ThisRowItem.CellIsNullOrEmpty(Column)) {
+                //        var t = Column.TMP_ColumnContentWidth; // ja, dank Multithreading kann es sein, dass hier das hier null ist
+                //        if (t == null) { t = 0; }
+                //        Column.TMP_ColumnContentWidth = Math.Max((int)t, Cell_ContentSize(table, Column, ThisRowItem, CellFont, Pix16).Width);
+                //    }
+                //}
             }
             return Column.TMP_ColumnContentWidth is int w ? w : 0;
         }

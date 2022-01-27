@@ -28,13 +28,20 @@ using FastColoredTextBoxNS;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Skript.Enums;
+
+using System.Collections.Generic;
+using System.Linq;
+
+using static BlueBasics.Extensions;
 
 namespace BlueControls {
 
-    public partial class ScriptEditor : GroupBox, IContextMenu //System.Windows.Forms.UserControl, IContextMenu//
+    public partial class ScriptEditor : GroupBox, IContextMenu, IDisposable //System.Windows.Forms.UserControl, IContextMenu//
     {
         #region Fields
 
+        private frmBefehlsreferenz _befehlsReferenz;
         private string _LastVariableContent = string.Empty;
         private string _LastWord = string.Empty;
         private bool _MenuDone = false;
@@ -62,8 +69,12 @@ namespace BlueControls {
         #region Properties
 
         protected string ScriptText {
-            get => txtSkript.Text;
-            set { txtSkript.Text = value.TrimEnd(" ") + "    "; }
+            get => txtSkript.Text.TrimEnd(" ");
+            set {
+                txtSkript.Text = value.TrimEnd(" ") + "    ";
+
+                UpdateSubs(Script.ReduceText(value));
+            }
         }
 
         #endregion
@@ -95,6 +106,25 @@ namespace BlueControls {
         public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
         public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
+
+        /// <summary>
+        /// Verwendete Ressourcen bereinigen.
+        /// </summary>
+        /// <param name="disposing">True, wenn verwaltete Ressourcen gelöscht werden sollen; andernfalls False.</param>
+        protected override void Dispose(bool disposing) {
+            if (disposing) {
+                if (components != null) {
+                    components.Dispose();
+                }
+
+                if (_befehlsReferenz != null && _befehlsReferenz.Visible) {
+                    _befehlsReferenz.Close();
+                    _befehlsReferenz.Dispose();
+                    _befehlsReferenz = null;
+                }
+            }
+            base.Dispose(disposing);
+        }
 
         protected virtual Script GenerateAndDoScript() {
             var s = new Script(null);
@@ -145,8 +175,14 @@ namespace BlueControls {
         }
 
         private void btnBefehlsUebersicht_Click(object sender, System.EventArgs e) {
-            var x = new frmBefehlsreferenz();
-            x.Show();
+            if (_befehlsReferenz != null && _befehlsReferenz.Visible) {
+                _befehlsReferenz.Close();
+                _befehlsReferenz.Dispose();
+                _befehlsReferenz = null;
+            }
+
+            _befehlsReferenz = new frmBefehlsreferenz();
+            _befehlsReferenz.Show();
         }
 
         private void btnTest_Click(object sender, System.EventArgs e) {
@@ -155,8 +191,15 @@ namespace BlueControls {
 
             var s = GenerateAndDoScript();
 
+
+            if (s == null) {
+                //Message("Interner Fehler. Skript nicht ausgeführt.");
+                return;
+            }
+
             WriteVariablesToTable(s);
             WriteComandsToList(s);
+            UpdateSubs(s?.ReducedScriptText);
 
             if (string.IsNullOrEmpty(s.Error)) {
                 Message("Erfolgreich, wenn auch IF-Routinen nicht geprüft wurden.");
@@ -191,13 +234,22 @@ namespace BlueControls {
             filterVariablen.Table = tableVariablen;
         }
 
-        private void lstFunktionen_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
-        }
-
         private void lstFunktionen_ItemClicked(object sender, BasicListItemEventArgs e) {
-        }
+            if (e.Item.Internal == "[Main]") {
+                txtSkript.Navigate(0);
+                return;
+            }
 
-        private void lstFunktionen_ItemRemoving(object sender, BlueBasics.EventArgs.ListEventArgs e) {
+            var sc = Script.ReduceText(txtSkript.Text).ToLower();
+            var x = new List<string>() { "sub" + e.Item.Internal.ToLower() + "()" };
+
+            (var pos, string _) = NextText(sc, 0, x, true, false, KlammernStd);
+            if (pos < 1) {
+                MessageBox.Show("Routine " + e.Item.Internal + " nicht gefunden.<br>Skript starten, um diese<br>Liste zu aktualisieren.", enImageCode.Information, "OK");
+                return;
+            }
+
+            txtSkript.Navigate(sc.Substring(0, pos).Count(c => c == '¶') + 1);
         }
 
         private void TxtSkript_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
@@ -240,6 +292,37 @@ namespace BlueControls {
             } catch (Exception ex) {
                 Develop.DebugPrint(ex);
             }
+        }
+
+        private void UpdateSubs(string s) {
+            lstFunktionen.Item.Clear();
+
+            lstFunktionen.Item.Add("[Main]");
+
+            if (s == null) { return; }
+
+            var st = new List<string>() { "sub" };
+            var en = new List<string>() { "()" };
+
+            var pos = 0;
+            do {
+                (var stp, _) = NextText(s, pos, st, true, false, KlammernStd);
+
+                if (stp > 0) {
+                    (var endp, _) = NextText(s, stp, en, false, false, KlammernStd);
+
+                    if (endp > stp) {
+                        var n = s.Substring(stp + 3, endp - stp - 3);
+                        if (!Variable.IsValidName(n)) { break; }
+                        lstFunktionen.Item.Add(n);
+                        pos = endp + 2;
+                    } else {
+                        break;
+                    }
+                } else {
+                    break;
+                }
+            } while (true);
         }
 
         #endregion

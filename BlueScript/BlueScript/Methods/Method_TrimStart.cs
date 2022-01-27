@@ -21,46 +21,38 @@ using System.Collections.Generic;
 
 namespace BlueScript {
 
-    internal class Method_TrimPrefix : Method {
+    internal class Method_TrimStart : Method {
 
         #region Properties
 
         public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.String };
-        public override string Description => "Entfernt die angegebenen Präfixe und evtl. übrige Leerzeichen. Die Präfixe werden nur entfernt, wenn vor dem Präfix ein Leerzeichen oder eine Zahl ist. Groß- und Kleinschreibung wird ignoriert.";
+        public override string Description => "Entfernt die angegebenen Texte am Anfang des Strings. Groß und Kleinschreibung wird ignoriert.";
         public override bool EndlessArgs => true;
         public override string EndSequence => ")";
         public override bool GetCodeBlockAfter => false;
         public override enVariableDataType Returns => enVariableDataType.String;
         public override string StartSequence => "(";
-        public override string Syntax => "TrimPrefix(string, prefix, ...)";
+        public override string Syntax => "TrimStart(String, TexttoTrim, ...)";
 
         #endregion
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "trimprefix" };
+        public override List<string> Comand(Script s) => new() { "trimstart" };
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
             var val = attvar.Attributes[0].ValueString;
 
-            for (var z = 1; z < attvar.Attributes.Count; z++) {
-                var suf = attvar.Attributes[z].ValueString.ToLower();
+            string txt;
 
-                for (var y = 0; y < 2; y++) {
-                    if (y == 1) { suf = suf + " "; }
-
-                    if (val.Length > suf.Length) {
-                        if (val.ToLower().StartsWith(suf)) {
-                            var c = val.Substring(suf.Length, 1);
-                            if (Constants.Char_Numerals.Contains(c)) {
-                                return new strDoItFeedback(val.Substring(suf.Length, val.Length - suf.Length), enVariableDataType.String);
-                            }
-                        }
-                    }
+            do {
+                txt = val;
+                for (var z = 1; z < attvar.Attributes.Count; z++) {
+                    val = val.TrimStart(attvar.Attributes[z].ValueString);
                 }
-            }
+            } while (txt != val);
 
             return new strDoItFeedback(val, enVariableDataType.String);
         }

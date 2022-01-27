@@ -26,7 +26,7 @@ namespace BlueScript {
 
         public override List<enVariableDataType> Args => new() { };
 
-        public override string Description => "Beendet eine Schleife sofort. Kann auch nur innerhalb von Schleifen erwendet werden.";
+        public override string Description => "Beendet eine Schleife oder Subroutine sofort.\r\nKann auch nur innerhalb von diesen verwendet werden.";
 
         public override bool EndlessArgs => false;
 
@@ -47,7 +47,7 @@ namespace BlueScript {
         public override List<string> Comand(Script s) => new() { "break" };
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            if (s.Schleife < 1) { return new strDoItFeedback("Break nur innerhalb einer Schleife erlaubt."); }
+            if (s.Schleife < 1 && s.Sub < 1) { return new strDoItFeedback("Break nur innerhalb einer Schleife oder Subroutine erlaubt."); }
 
             if (s.BreakFired) { return new strDoItFeedback("Break doppelt ausgelöst."); }
             s.BreakFired = true;

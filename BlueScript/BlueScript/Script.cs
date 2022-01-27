@@ -115,6 +115,8 @@ namespace BlueScript {
             }
         }
 
+        public int Sub { get; internal set; }
+
         #endregion
 
         #region Methods
@@ -162,11 +164,55 @@ namespace BlueScript {
             return l;
         }
 
+        public static string ReduceText(string txt) {
+            System.Text.StringBuilder s = new();
+            var gänsef = false;
+            var comment = false;
+
+            txt = txt.RemoveEscape();// muss am Anfang gemacht werden, weil sonst die Zählweise nicht mehr stimmt
+
+            for (var pos = 0; pos < txt.Length; pos++) {
+                var c = txt.Substring(pos, 1);
+                var addt = true;
+                switch (c) {
+                    case "\"":
+                        if (!comment) { gänsef = !gänsef; }
+                        break;
+
+                    case "/":
+                        if (!gänsef) {
+                            if (pos < txt.Length - 1 && txt.Substring(pos, 2) == "//") { comment = true; }
+                        }
+                        break;
+
+                    case "\r":
+                        if (gänsef) { s.Append("\";Exception(\"Fehler mit Anführungsstrichen\");"); }
+                        s.Append("¶");
+                        comment = false;
+                        addt = false;
+                        break;
+
+                    case " ":
+
+                    case "\n":
+
+                    case "\t":
+                        if (!gänsef) { addt = false; }
+                        break;
+                }
+                if (!comment && addt) {
+                    s.Append(c);
+                }
+            }
+            return s.ToString();
+        }
+
         public bool Parse() {
             ReducedScriptText = ReduceText(ScriptText);
             Line = 1;
             BreakFired = false;
             Schleife = 0;
+            Sub = 0;
 
             _berechneVariable = null;
 
@@ -209,49 +255,6 @@ namespace BlueScript {
                     pos = f.Position;
                 }
             } while (true);
-        }
-
-        private static string ReduceText(string txt) {
-            System.Text.StringBuilder s = new();
-            var gänsef = false;
-            var comment = false;
-
-            txt = txt.RemoveEscape();// muss am Anfang gemacht werden, weil sonst die Zählweise nicht mehr stimmt
-
-            for (var pos = 0; pos < txt.Length; pos++) {
-                var c = txt.Substring(pos, 1);
-                var addt = true;
-                switch (c) {
-                    case "\"":
-                        if (!comment) { gänsef = !gänsef; }
-                        break;
-
-                    case "/":
-                        if (!gänsef) {
-                            if (pos < txt.Length - 1 && txt.Substring(pos, 2) == "//") { comment = true; }
-                        }
-                        break;
-
-                    case "\r":
-                        if (gänsef) { s.Append("\";Exception(\"Fehler mit Anführungsstrichen\");"); }
-                        s.Append("¶");
-                        comment = false;
-                        addt = false;
-                        break;
-
-                    case " ":
-
-                    case "\n":
-
-                    case "\t":
-                        if (!gänsef) { addt = false; }
-                        break;
-                }
-                if (!comment && addt) {
-                    s.Append(c);
-                }
-            }
-            return s.ToString();
         }
 
         #endregion
