@@ -27,13 +27,10 @@ namespace BlueControls.Forms {
             this.btnTextExport = new BlueControls.Controls.Button();
             this.btnBilderExport = new BlueControls.Controls.Button();
             this.Ribbon.SuspendLayout();
-            this.tabPageControl.SuspendLayout();
-            this.tabPageStart.SuspendLayout();
+            this.tabBearbeiten.SuspendLayout();
             this.grpKomponenteHinzufügen.SuspendLayout();
-            this.grpDrucken.SuspendLayout();
             this.grpDesign.SuspendLayout();
             this.grpAssistent.SuspendLayout();
-            this.grpDateiSystem.SuspendLayout();
             this.grpExtras.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -50,15 +47,11 @@ namespace BlueControls.Forms {
             // 
             //  System.Windows.Forms.TabPageControl
             // 
-            this.tabPageControl.Controls.Add(this.grpExtras);
-            this.tabPageControl.Size = new System.Drawing.Size(1282, 81);
-            this.tabPageControl.Controls.SetChildIndex(this.grpWerkzeuge, 0);
-            this.tabPageControl.Controls.SetChildIndex(this.grpKomponenteHinzufügen, 0);
-            this.tabPageControl.Controls.SetChildIndex(this.grpExtras, 0);
-            // 
-            //  System.Windows.Forms.TabPageStart
-            // 
-            this.tabPageStart.Size = new System.Drawing.Size(1282, 81);
+            this.tabBearbeiten.Controls.Add(this.grpExtras);
+            this.tabBearbeiten.Size = new System.Drawing.Size(1282, 81);
+            this.tabBearbeiten.Controls.SetChildIndex(this.grpWerkzeuge, 0);
+            this.tabBearbeiten.Controls.SetChildIndex(this.grpKomponenteHinzufügen, 0);
+            this.tabBearbeiten.Controls.SetChildIndex(this.grpExtras, 0);
             // 
             // grpKomponenteHinzufügen
             // 
@@ -66,30 +59,9 @@ namespace BlueControls.Forms {
             this.grpKomponenteHinzufügen.Size = new System.Drawing.Size(336, 81);
             this.grpKomponenteHinzufügen.Controls.SetChildIndex(this.Hinzu, 0);
             // 
-            // Button_PageSetup
-            // 
-            this.btnPageSetup.ButtonStyle = BlueControls.Enums.enButtonStyle.Button;
-            this.btnPageSetup.Visible = false;
-            // 
             // ArbeitsbreichSetup
             // 
             this.btnArbeitsbreichSetup.ButtonStyle = BlueControls.Enums.enButtonStyle.Button;
-            // 
-            // btnLastFiles
-            // 
-            this.btnLastFiles.Verhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_ohne_Textumbruch;
-            // 
-            // btnNeu
-            // 
-            this.btnNeu.ButtonStyle = BlueControls.Enums.enButtonStyle.Button;
-            // 
-            // btnOeffnen
-            // 
-            this.btnOeffnen.ButtonStyle = BlueControls.Enums.enButtonStyle.Button;
-            // 
-            // btnSpeichern
-            // 
-            this.btnSpeichern.ButtonStyle = BlueControls.Enums.enButtonStyle.Button;
             // 
             // Hinzu
             // 
@@ -144,13 +116,10 @@ namespace BlueControls.Forms {
             this.Text = "Beziehungs-Editor";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Ribbon.ResumeLayout(false);
-            this.tabPageControl.ResumeLayout(false);
-            this.tabPageStart.ResumeLayout(false);
+            this.tabBearbeiten.ResumeLayout(false);
             this.grpKomponenteHinzufügen.ResumeLayout(false);
-            this.grpDrucken.ResumeLayout(false);
             this.grpDesign.ResumeLayout(false);
             this.grpAssistent.ResumeLayout(false);
-            this.grpDateiSystem.ResumeLayout(false);
             this.grpExtras.ResumeLayout(false);
             this.ResumeLayout(false);
         }

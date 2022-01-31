@@ -202,7 +202,7 @@ namespace BlueControls.Forms {
 
         private void AllgemeinerEditor_Click(object sender, System.EventArgs e) {
             Hide();
-            PadEditor r = new() {
+            PadEditorWithFileAccess r = new() {
                 WindowState = System.Windows.Forms.FormWindowState.Maximized
             };
             r.ShowDialog();
@@ -262,6 +262,9 @@ namespace BlueControls.Forms {
         private void btnOeffnen_Click(object sender, System.EventArgs e) {
             BlueBasics.MultiUserFile.clsMultiUserFile.SaveAll(false);
             LoadTab.ShowDialog();
+        }
+
+        private void button1_Click(object sender, System.EventArgs e) {
         }
 
         private void CaptionAnzeige() {

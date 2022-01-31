@@ -43,8 +43,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabSkript = new System.Windows.Forms.TabPage();
             this.scriptEditor = new BlueControls.ScriptEditorDatabase();
             this.Ribbon.SuspendLayout();
-            this.tabPageControl.SuspendLayout();
-            this.tabPageStart.SuspendLayout();
+            this.tabBearbeiten.SuspendLayout();
+            this.tabDatei.SuspendLayout();
             this.grpDrucken.SuspendLayout();
             this.grpDesign.SuspendLayout();
             this.grpAssistent.SuspendLayout();
@@ -64,15 +64,15 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.Ribbon.Size = new System.Drawing.Size(1340, 110);
             // 
-            // tabPageStart
+            // tabDatei
             // 
-            this.tabPageStart.Controls.Add(this.grpExterneLayouts);
-            this.tabPageStart.Controls.Add(this.grpLayoutSelection);
-            this.tabPageStart.Size = new System.Drawing.Size(1332, 81);
-            this.tabPageStart.Controls.SetChildIndex(this.grpDateiSystem, 0);
-            this.tabPageStart.Controls.SetChildIndex(this.grpDrucken, 0);
-            this.tabPageStart.Controls.SetChildIndex(this.grpLayoutSelection, 0);
-            this.tabPageStart.Controls.SetChildIndex(this.grpExterneLayouts, 0);
+            this.tabDatei.Controls.Add(this.grpExterneLayouts);
+            this.tabDatei.Controls.Add(this.grpLayoutSelection);
+            this.tabDatei.Size = new System.Drawing.Size(1332, 81);
+            this.tabDatei.Controls.SetChildIndex(this.grpDateiSystem, 0);
+            this.tabDatei.Controls.SetChildIndex(this.grpDrucken, 0);
+            this.tabDatei.Controls.SetChildIndex(this.grpLayoutSelection, 0);
+            this.tabDatei.Controls.SetChildIndex(this.grpExterneLayouts, 0);
             // 
             // grpDrucken
             // 
@@ -290,8 +290,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Controls.SetChildIndex(this.tabRightSide, 0);
             this.Controls.SetChildIndex(this.Pad, 0);
             this.Ribbon.ResumeLayout(false);
-            this.tabPageControl.ResumeLayout(false);
-            this.tabPageStart.ResumeLayout(false);
+            this.tabBearbeiten.ResumeLayout(false);
+            this.tabDatei.ResumeLayout(false);
             this.grpDrucken.ResumeLayout(false);
             this.grpDesign.ResumeLayout(false);
             this.grpAssistent.ResumeLayout(false);

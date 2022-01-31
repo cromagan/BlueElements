@@ -27,7 +27,7 @@ using static BlueBasics.FileOperations;
 
 namespace BlueControls.BlueDatabaseDialogs {
 
-    internal partial class LayoutDesigner : PadEditor {
+    internal partial class LayoutDesigner : PadEditorWithFileAccess {
 
         #region Constructors
 
@@ -182,14 +182,14 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (ind < 0 && cbxLayout.Text.FileSuffix().ToUpper() != "BCR" && FileExists(cbxLayout.Text)) {
                 btnTextEditor.Enabled = true;
                 btnLayoutOeffnen.Enabled = true;
-                tabPageControl.Enabled = false;
+                tabBearbeiten.Enabled = false;
                 grpDrucken.Enabled = false;
             } else {
                 btnTextEditor.Enabled = false;
                 btnLayoutOeffnen.Enabled = false;
             }
             //if (!string.IsNullOrEmpty(Pad.Item.ID)) {
-            tabPageControl.Enabled = true;
+            tabBearbeiten.Enabled = true;
             grpDateiSystem.Enabled = true;
             btnLayoutLöschen.Enabled = true;
             btnLayoutUmbenennen.Enabled = true;

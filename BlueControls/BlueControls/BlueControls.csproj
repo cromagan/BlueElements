@@ -251,6 +251,12 @@
     <Compile Include="Forms-Basics\FloatingForm.Designer.cs">
       <DependentUpon>FloatingForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms-Special\PadEditorWithFileAccess.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms-Special\PadEditorWithFileAccess.Designer.cs">
+      <DependentUpon>PadEditorWithFileAccess.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms-Special\PictureView.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -736,6 +742,9 @@
     <EmbeddedResource Include="Forms-Special\PadEditor.resx">
       <DependentUpon>PadEditor.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms-Special\PadEditorWithFileAccess.resx">
+      <DependentUpon>PadEditorWithFileAccess.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms-Special\PictureView.resx">
       <DependentUpon>PictureView.cs</DependentUpon>

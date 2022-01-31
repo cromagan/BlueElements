@@ -22,14 +22,9 @@ using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueDatabase;
-using BlueDatabase.Enums;
 using BlueScript;
 using FastColoredTextBoxNS;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using Skript.Enums;
-
 using System.Collections.Generic;
 using System.Linq;
 
@@ -190,7 +185,6 @@ namespace BlueControls {
             tableVariablen.Database.Row.Clear();
 
             var s = GenerateAndDoScript();
-
 
             if (s == null) {
                 //Message("Interner Fehler. Skript nicht ausgeführt.");

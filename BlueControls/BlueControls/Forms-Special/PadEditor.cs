@@ -98,16 +98,6 @@ namespace BlueControls.Forms {
         ///
         /// </summary>
         /// <param name="useThisID">Wenn das Blatt bereits eine Id hat, muss die Id verwendet werden. Wird das Feld leer gelassen, wird die beinhaltete Id benutzt.</param>
-        public void LoadFile(string fileName, string useThisID) {
-            var t = File.ReadAllText(fileName, Constants.Win1252);
-            LoadFromString(t, useThisID);
-            btnLastFiles.AddFileName(fileName, fileName.FileNameWithSuffix());
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="useThisID">Wenn das Blatt bereits eine Id hat, muss die Id verwendet werden. Wird das Feld leer gelassen, wird die beinhaltete Id benutzt.</param>
         public void LoadFromString(string data, string useThisID) {
             Pad.Enabled = true;
             Pad.Item = new ItemCollectionPad(data, useThisID);
@@ -176,22 +166,11 @@ namespace BlueControls.Forms {
             Pad.Invalidate();
         }
 
-        private void btnLastFiles_ItemClicked(object sender, BasicListItemEventArgs e) => LoadFile(e.Item.Internal, string.Empty);
 
-        private void btnNeu_Click(object sender, System.EventArgs e) {
-            Pad.Item.Clear();
-            Pad.ZoomFit();
-            Ribbon.SelectedIndex = 1;
-        }
 
-        private void btnOeffnen_Click(object sender, System.EventArgs e) {
-            LoadTab.Tag = sender;
-            LoadTab.ShowDialog();
-        }
 
         private void btnPageSetup_Click(object sender, System.EventArgs e) => Pad.ShowPrinterPageSetup();
 
-        private void btnSpeichern_Click(object sender, System.EventArgs e) => SaveTab.ShowDialog();
 
         private void btnVorschau_Click(object sender, System.EventArgs e) => Pad.ShowPrintPreview();
 
@@ -205,15 +184,7 @@ namespace BlueControls.Forms {
 
         private void ckbRaster_CheckedChanged(object sender, System.EventArgs e) => Pad.Item.SnapMode = ckbRaster.Checked ? enSnapMode.SnapToGrid : enSnapMode.Ohne;
 
-        private void LoadTab_FileOk(object sender, System.ComponentModel.CancelEventArgs e) {
-            if (sender == btnOeffnen) {
-                LoadFile(LoadTab.FileName, LoadTab.FileName);
-            } else {
-                // Kann nur der Import-Knopf sein
-                LoadFile(LoadTab.FileName, string.Empty);
-            }
-            Ribbon.SelectedIndex = 1;
-        }
+
 
         private void Pad_GotNewItemCollection(object sender, System.EventArgs e) {
             ckbRaster.Enabled = Pad.Item != null;
@@ -236,11 +207,6 @@ namespace BlueControls.Forms {
 
         private void PadDesign_ItemClicked(object sender, BasicListItemEventArgs e) => Pad.Item.SheetStyle = Skin.StyleDB.Row[e.Item.Internal];
 
-        private void SaveTab_FileOk(object sender, System.ComponentModel.CancelEventArgs e) {
-            var t = Pad.Item.ToString();
-            WriteAllText(SaveTab.FileName, t, Constants.Win1252, false);
-            btnLastFiles.AddFileName(SaveTab.FileName, string.Empty);
-        }
 
         private void txbRasterAnzeige_TextChanged(object sender, System.EventArgs e) {
             if (!txbRasterAnzeige.Text.IsNumeral()) { return; }
