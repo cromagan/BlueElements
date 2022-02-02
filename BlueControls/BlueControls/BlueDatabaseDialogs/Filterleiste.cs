@@ -534,9 +534,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             var NeuerT = txbZeilenFilter.Text.TrimStart();
             btnTextLöschen.Enabled = !string.IsNullOrEmpty(NeuerT);
             if (_isFilling) { return; }
-            //NeuerT = NeuerT.TrimStart('+');
-            //NeuerT = NeuerT.Replace("++", "+");
-            //if (NeuerT == "+") { NeuerT = string.Empty; }
+
             if (NeuerT != txbZeilenFilter.Text) {
                 txbZeilenFilter.Text = NeuerT;
                 return;

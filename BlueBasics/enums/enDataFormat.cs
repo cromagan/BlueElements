@@ -25,7 +25,7 @@ namespace BlueBasics.Enums {
         // Nothing = 0,
         Text = 1,
 
-        Bit = 2,
+        //Bit = 2,
 
         //Ganzzahl = 3,
         //Gleitkommazahl = 6,

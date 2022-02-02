@@ -45,7 +45,7 @@ namespace BlueControls.Forms {
             this.Ribbon.SelectedIndex = 0;
             this.Ribbon.Size = new System.Drawing.Size(1290, 110);
             // 
-            //  System.Windows.Forms.TabPageControl
+            //  System.Windows.Forms.tabBearbeiten
             // 
             this.tabBearbeiten.Controls.Add(this.grpExtras);
             this.tabBearbeiten.Size = new System.Drawing.Size(1282, 81);

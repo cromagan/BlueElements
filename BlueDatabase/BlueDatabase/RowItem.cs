@@ -552,10 +552,11 @@ namespace BlueDatabase {
         }
 
         private void VariableToCell(ColumnItem column, List<Variable> vars) {
+            if (Database.ReadOnly) { return; }
+
             var ColumnVar = vars.Get(column.Name);
             if (ColumnVar == null) { return; }
             if (!column.SaveContent) { return; }
-
             if (ColumnVar.Readonly) { return; }
 
             if (column.Format == enDataFormat.LinkedCell) {
@@ -569,31 +570,13 @@ namespace BlueDatabase {
                 CellSet(column, ColumnVar.ValueListString);
                 return;
             }
-            switch (column.Format) {
-                case enDataFormat.Bit:
-                    if (ColumnVar.ValueString.ToLower() == "true") {
-                        CellSet(column, true);
-                    } else {
-                        CellSet(column, false);
-                    }
-                    return;
 
-                //case enDataFormat.Ganzzahl:
-                //case enDataFormat.Gleitkommazahl:
-                //    CellSet(column, ColumnVar.ValueString);
-                //    return;
-
-                case enDataFormat.Text:
-                case enDataFormat.FarbeInteger:
-                case enDataFormat.RelationText:
-                case enDataFormat.Schrift:
-                case enDataFormat.Link_To_Filesystem:
-                case enDataFormat.LinkedCell:
-                case enDataFormat.Columns_für_LinkedCellDropdown:
-                case enDataFormat.Values_für_LinkedCellDropdown:
-                    CellSet(column, ColumnVar.ValueString);
-                    return;
+            if (ColumnVar.Type == enVariableDataType.Bool) {
+                CellSet(column, ColumnVar.ValueBool);
+                return;
             }
+
+            CellSet(column, ColumnVar.ValueString);
         }
 
         #endregion

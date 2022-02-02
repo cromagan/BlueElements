@@ -79,29 +79,11 @@ namespace BlueControls.Forms {
 
         #region Methods
 
-        /// <summary>
-        /// löscht den kompletten Inhalt des Pads auch die ID und setzt es auf Disabled
-        /// </summary>
-        public void DisablePad() {
-            Pad.Item = new ItemCollectionPad();
-            Pad.Enabled = false;
-        }
-
         public virtual void ItemChanged() {
             Pad.ZoomFit();
             Ribbon.SelectedIndex = 1;
             PadDesign.Text = Pad.Item.SheetStyle.CellFirstString();
             cbxSchriftGröße.Text = ((int)(Pad.Item.SheetStyleScale * 100)).ToString(Constants.Format_Integer3);
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="useThisID">Wenn das Blatt bereits eine Id hat, muss die Id verwendet werden. Wird das Feld leer gelassen, wird die beinhaltete Id benutzt.</param>
-        public void LoadFromString(string data, string useThisID) {
-            Pad.Enabled = true;
-            Pad.Item = new ItemCollectionPad(data, useThisID);
-            ItemChanged();
         }
 
         private void btnAddDimension_Click(object sender, System.EventArgs e) {
@@ -166,11 +148,7 @@ namespace BlueControls.Forms {
             Pad.Invalidate();
         }
 
-
-
-
         private void btnPageSetup_Click(object sender, System.EventArgs e) => Pad.ShowPrinterPageSetup();
-
 
         private void btnVorschau_Click(object sender, System.EventArgs e) => Pad.ShowPrintPreview();
 
@@ -183,8 +161,6 @@ namespace BlueControls.Forms {
         private void cbxSchriftGröße_ItemClicked(object sender, BasicListItemEventArgs e) => Pad.Item.SheetStyleScale = double.Parse(cbxSchriftGröße.Text) / 100d;
 
         private void ckbRaster_CheckedChanged(object sender, System.EventArgs e) => Pad.Item.SnapMode = ckbRaster.Checked ? enSnapMode.SnapToGrid : enSnapMode.Ohne;
-
-
 
         private void Pad_GotNewItemCollection(object sender, System.EventArgs e) {
             ckbRaster.Enabled = Pad.Item != null;
@@ -206,7 +182,6 @@ namespace BlueControls.Forms {
         private void Pad_PreviewModChanged(object sender, System.EventArgs e) => btnVorschauModus.Checked = Pad.ShowInPrintMode;
 
         private void PadDesign_ItemClicked(object sender, BasicListItemEventArgs e) => Pad.Item.SheetStyle = Skin.StyleDB.Row[e.Item.Internal];
-
 
         private void txbRasterAnzeige_TextChanged(object sender, System.EventArgs e) {
             if (!txbRasterAnzeige.Text.IsNumeral()) { return; }

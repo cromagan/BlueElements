@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
+using System.Threading.Tasks;
 using static BlueBasics.Converter;
 using static BlueBasics.FileOperations;
 
@@ -102,31 +103,36 @@ namespace BlueControls.BlueDatabaseDialogs {
                 OpenColumnEditor(column, tableview);
                 return;
             }
-            ColumnItem column2 = null;
+            ColumnItem columnLinked = null;
             var PosError = false;
             switch (column.Format) {
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                     var Txt = row.CellGetString(column);
                     if (int.TryParse(Txt, out var ColKey)) {
-                        column2 = column.LinkedDatabase().Column.SearchByKey(ColKey);
+                        columnLinked = column.LinkedDatabase().Column.SearchByKey(ColKey);
                     }
                     break;
 
                 case enDataFormat.LinkedCell:
 
                 case enDataFormat.Values_für_LinkedCellDropdown:
-                    (column2, _) = CellCollection.LinkedCellData(column, row, true, false);
+                    (columnLinked, _) = CellCollection.LinkedCellData(column, row, true, false);
                     PosError = true;
                     break;
             }
-            if (column2 != null) {
-                if (MessageBox.Show("Welche Spalte bearbeiten?", enImageCode.Frage, "Spalte in dieser Datenbank", "Verlinkte Spalte") == 1) { column = column2; }
+
+            var bearbColumn = column;
+            if (columnLinked != null) {
+                columnLinked.Repair();
+                if (MessageBox.Show("Welche Spalte bearbeiten?", enImageCode.Frage, "Spalte in dieser Datenbank", "Verlinkte Spalte") == 1) { bearbColumn = columnLinked; }
             } else {
                 if (PosError) {
                     Notification.Show("Keine aktive Verlinkung.<br>Spalte in dieser Datenbank wird angezeigt.<br><br>Ist die Ziel-Zelle in der Ziel-Datenbank vorhanden?", enImageCode.Information);
                 }
             }
-            OpenColumnEditor(column, tableview);
+            column.Repair();
+            OpenColumnEditor(bearbColumn, tableview);
+            bearbColumn.Repair();
         }
 
         public static void OpenColumnEditor(ColumnItem column, Table tableview) {
@@ -164,13 +170,24 @@ namespace BlueControls.BlueDatabaseDialogs {
             ItemCollectionList L = new();
             foreach (var ThisExport in db.Export) {
                 if (ThisExport.Typ == enExportTyp.DatenbankOriginalFormat) {
-                    foreach (var ThisString in ThisExport.BereitsExportiert) {
+                    var lockMe = new object();
+                    Parallel.ForEach(ThisExport.BereitsExportiert, (ThisString, state) => {
                         var t = ThisString.SplitAndCutBy("|");
                         if (FileExists(t[0])) {
                             var q1 = QuickImage.Get(enImageCode.Kugel, 16, Extensions.MixColor(Color.Red, Color.Green, DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / ThisExport.AutoDelete).ToHTMLCode(), "");
-                            L.Add(t[1], t[0], q1, true, t[1].CompareKey(enSortierTyp.Datum_Uhrzeit));
+                            lock (lockMe) {
+                                L.Add(t[1], t[0], q1, true, t[1].CompareKey(enSortierTyp.Datum_Uhrzeit));
+                            }
                         }
-                    }
+                    });
+
+                    //foreach (var ThisString in ThisExport.BereitsExportiert) {
+                    //    var t = ThisString.SplitAndCutBy("|");
+                    //    if (FileExists(t[0])) {
+                    //        var q1 = QuickImage.Get(enImageCode.Kugel, 16, Extensions.MixColor(Color.Red, Color.Green, DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / ThisExport.AutoDelete).ToHTMLCode(), "");
+                    //        L.Add(t[1], t[0], q1, true, t[1].CompareKey(enSortierTyp.Datum_Uhrzeit));
+                    //    }
+                    //}
                     Zusatz.AddRange(Directory.GetFiles(ThisExport.Verzeichnis, db.Filename.FileNameWithoutSuffix() + "_*.MDB"));
                 }
             }

@@ -654,7 +654,7 @@ namespace BlueControls.Controls {
         public RowData CursorPosRow() => _CursorPosRow;
 
         public bool EnsureVisible(ColumnItem Column, RowData Row) {
-            var ok1 = EnsureVisible(CurrentArrangement[Column]);
+            var ok1 = EnsureVisible(CurrentArrangement?[Column]);
             var ok2 = EnsureVisible(Row);
             return ok1 && ok2;
         }
@@ -2239,18 +2239,25 @@ namespace BlueControls.Controls {
 
         private int Column_DrawWidth(ColumnViewItem ViewItem, Rectangle displayRectangleWOSlider) {
             // Hier wird die ORIGINAL-Spalte gezeichnet, nicht die FremdZelle!!!!
-            //Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
+
             if (ViewItem._TMP_DrawWidth != null) { return (int)ViewItem._TMP_DrawWidth; }
             if (ViewItem == null || ViewItem.Column == null) { return 0; }
+
             if (_Design == enBlueTableAppearance.OnlyMainColumnWithoutHead) {
                 ViewItem._TMP_DrawWidth = displayRectangleWOSlider.Width - 1;
                 return (int)ViewItem._TMP_DrawWidth;
             }
-            ViewItem._TMP_DrawWidth = ViewItem._TMP_Reduced
-                ? ViewItem.Column.BildCode_ConstantHeight + 2
-                : ViewItem.ViewType == enViewType.PermanentColumn
-                    ? Math.Min(tmpColumnContentWidth(this, ViewItem.Column, _Cell_Font, Pix16), (int)(displayRectangleWOSlider.Width * 0.3))
-                    : Math.Min(tmpColumnContentWidth(this, ViewItem.Column, _Cell_Font, Pix16), (int)(displayRectangleWOSlider.Width * 0.75));
+
+            if (ViewItem._TMP_Reduced) {
+                ViewItem._TMP_DrawWidth = 16;
+            } else {
+                if (ViewItem.ViewType == enViewType.PermanentColumn) {
+                    ViewItem._TMP_DrawWidth = Math.Min(tmpColumnContentWidth(this, ViewItem.Column, _Cell_Font, Pix16), (int)(displayRectangleWOSlider.Width * 0.3));
+                } else {
+                    ViewItem._TMP_DrawWidth = Math.Min(tmpColumnContentWidth(this, ViewItem.Column, _Cell_Font, Pix16), (int)(displayRectangleWOSlider.Width * 0.75));
+                }
+            }
+
             ViewItem._TMP_DrawWidth = Math.Max((int)ViewItem._TMP_DrawWidth, _AutoFilterSize); // Mindestens so groß wie der Autofilter;
             ViewItem._TMP_DrawWidth = Math.Max((int)ViewItem._TMP_DrawWidth, (int)ColumnHead_Size(ViewItem.Column).Width);
             return (int)ViewItem._TMP_DrawWidth;

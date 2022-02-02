@@ -59,7 +59,7 @@ namespace BlueScript {
             return db?.Row.SearchByKey(long.Parse(d2[1]));
         }
 
-        public static strDoItFeedback RowToObject(RowItem row) => row == null
+        public static strDoItFeedback RowToObjectFeedback(RowItem row) => row == null
                         ? new strDoItFeedback("NULL", "row")
                 : new strDoItFeedback(row.Database.Filename + "|" + row.Key.ToString(), "row");
 
@@ -74,7 +74,7 @@ namespace BlueScript {
 
             var r = RowCollection.MatchesTo(allFi);
 
-            return r == null || r.Count == 0 || r.Count > 1 ? RowToObject(null) : RowToObject(r[0]);
+            return r == null || r.Count == 0 || r.Count > 1 ? RowToObjectFeedback(null) : RowToObjectFeedback(r[0]);
         }
 
         #endregion

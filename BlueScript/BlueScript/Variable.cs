@@ -417,6 +417,7 @@ namespace BlueScript {
         #region Methods
 
         public static strDoItFeedback AttributeAuflösen(string txt, Script s) {
+            Develop.CheckStackForOverflow();
 
             #region Prüfen, Ob noch mehre Klammern da sind, oder Anfangs/End-Klammern entfernen
 
@@ -686,6 +687,8 @@ namespace BlueScript {
             return new strDoItFeedback(txt, enVariableDataType.NotDefinedYet);
         }
 
+        public static string GenerateObject(string objecttype, string value) => objecttype.ToUpper().ReduceToChars(Constants.Char_AZ + Constants.Char_Numerals) + "&" + value.ToNonCritical();
+
         public static bool IsValidName(string v) {
             v = v.ToLower();
             var vo = v;
@@ -775,8 +778,6 @@ namespace BlueScript {
         }
 
         public Bitmap ValueBitmap(Script s) => s.BitmapCache[ValueInt];
-
-        internal static string GenerateObject(string objecttype, string value) => objecttype.ToUpper().ReduceToChars(Constants.Char_AZ + Constants.Char_Numerals) + "&" + value.ToNonCritical();
 
         private void SetError(string coment) {
             Readonly = false;

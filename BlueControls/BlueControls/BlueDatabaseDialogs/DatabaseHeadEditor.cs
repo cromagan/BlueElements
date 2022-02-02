@@ -303,14 +303,21 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void btnSave_Click(object sender, System.EventArgs e) {
+            btnSave.Enabled = false;
+            scriptEditor.Message("Speichervorgang...");
+
             var ok = false;
             if (_Database != null) {
                 WriteInfosBack();
                 ok = _Database.Save(false);
             }
-            if (!ok) {
+            if (ok) {
+                scriptEditor.Message("Speichern erfolgreich.");
+            } else {
+                scriptEditor.Message("Speichern fehlgeschlagen!");
                 MessageBox.Show("Speichern fehlgeschlagen!");
             }
+            btnSave.Enabled = true;
         }
 
         private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => _Database.Column.GenerateOverView();

@@ -67,13 +67,15 @@ namespace BlueDatabase {
 
         public static Tuple<string, QuickImage> GetDrawingData(ColumnItem column, string originalText, enShortenStyle style, enBildTextVerhalten bildTextverhalten) {
             var tmpText = ValueReadable(column, originalText, style, bildTextverhalten, true);
-            //var tmpAlign = StandardAlignment(column, bildTextverhalten);
             var tmpImageCode = StandardImage(column, originalText, tmpText, style, bildTextverhalten);
-            if (bildTextverhalten == enBildTextVerhalten.Bild_oder_Text) {
+
+            if (bildTextverhalten is enBildTextVerhalten.Bild_oder_Text or enBildTextVerhalten.Interpretiere_Bool) {
                 if (tmpImageCode != null) { tmpText = string.Empty; }
-                if (tmpImageCode == null && string.IsNullOrEmpty(tmpText) && !string.IsNullOrEmpty(originalText)) {
-                    tmpImageCode = StandardErrorImage(16, enBildTextVerhalten.Fehlendes_Bild_zeige_Kritischzeichen);
-                }
+                //if (tmpImageCode == null && string.IsNullOrEmpty(tmpText) && !string.IsNullOrEmpty(originalText)) {
+                //    tmpImageCode = StandardErrorImage(16, enBildTextVerhalten.Fehlendes_Bild_zeige_Kritischzeichen);
+                //}
+
+                //q
             }
             return new Tuple<string, QuickImage>(tmpText, tmpImageCode);
         }
@@ -103,16 +105,49 @@ namespace BlueDatabase {
         //    }
         //}
 
-        public static QuickImage StandardErrorImage(int gr, enBildTextVerhalten bildTextverhalten) => bildTextverhalten switch {
-            enBildTextVerhalten.Fehlendes_Bild_zeige_Fragezeichen => QuickImage.Get("Fragezeichen|" + gr + "|||||200|||80"),
-            enBildTextVerhalten.Fehlendes_Bild_zeige_Kreis => QuickImage.Get("Kreis2|" + gr),
-            enBildTextVerhalten.Fehlendes_Bild_zeige_Kreuz => QuickImage.Get("Kreuz|" + gr),
-            enBildTextVerhalten.Fehlendes_Bild_zeige_Häkchen => QuickImage.Get("Häkchen|" + gr),
-            enBildTextVerhalten.Fehlendes_Bild_zeige_Infozeichen => QuickImage.Get("Information|" + gr),
-            enBildTextVerhalten.Fehlendes_Bild_zeige_Warnung => QuickImage.Get("Warnung|" + gr),
-            enBildTextVerhalten.Fehlendes_Bild_zeige_Kritischzeichen => QuickImage.Get("Kritisch|" + gr),
-            _ => null,
-        };
+        public static QuickImage StandardErrorImage(string gr, enBildTextVerhalten bildTextverhalten, string originalText, ColumnItem column) {
+            switch (bildTextverhalten) {
+                case enBildTextVerhalten.Fehlendes_Bild_zeige_Fragezeichen:
+                    return QuickImage.Get("Fragezeichen|" + gr);
+
+                case enBildTextVerhalten.Fehlendes_Bild_zeige_Kreis:
+                    return QuickImage.Get("Kreis2|" + gr);
+
+                case enBildTextVerhalten.Fehlendes_Bild_zeige_Kreuz:
+                    return QuickImage.Get("Kreuz|" + gr);
+
+                case enBildTextVerhalten.Fehlendes_Bild_zeige_Häkchen:
+                    return QuickImage.Get("Häkchen|" + gr);
+
+                case enBildTextVerhalten.Fehlendes_Bild_zeige_Infozeichen:
+                    return QuickImage.Get("Information|" + gr);
+
+                case enBildTextVerhalten.Fehlendes_Bild_zeige_Warnung:
+                    return QuickImage.Get("Warnung|" + gr);
+
+                case enBildTextVerhalten.Fehlendes_Bild_zeige_Kritischzeichen:
+                    return QuickImage.Get("Kritisch|" + gr);
+
+                case enBildTextVerhalten.Interpretiere_Bool:
+                    if (originalText == "+") {
+                        return column == column.Database.Column.SysCorrect ? QuickImage.Get("Häkchen|" + gr.ToString() + "||||||||80") : QuickImage.Get("Häkchen|" + gr);
+                    } else if (originalText == "-") {
+                        return column == column.Database.Column.SysCorrect ? QuickImage.Get("Warnung|" + gr) :
+                            QuickImage.Get("Kreuz|" + gr);
+                    } else if (originalText.ToLower() == "o") {
+                        return QuickImage.Get("Kreis2|" + gr);
+                    } else if (originalText.ToLower() == "?") {
+                        return QuickImage.Get("Fragezeichen|" + gr);
+                    }
+                    return null;
+
+                case enBildTextVerhalten.Bild_oder_Text:
+                    return null;
+
+                default:
+                    return null;
+            }
+        }
 
         /// <summary>
         /// Gibt eine einzelne Zeile richtig ersetzt mit Prä- und Suffix zurück.
@@ -130,6 +165,19 @@ namespace BlueDatabase {
                 case enDataFormat.Values_für_LinkedCellDropdown:
                 case enDataFormat.RelationText:
                 case enDataFormat.LinkedCell:  // Bei LinkedCell kommt direkt der Text der verlinkten Zelle an
+
+                    //if (column.BildTextVerhalten == enBildTextVerhalten.Interpretiere_Bool) {
+                    //    if (txt == "+") {
+                    //        if (column == column.Database.Column.SysCorrect) { return "Ok"; }
+                    //        if (column == column.Database.Column.SysLocked) { return "gesperrt"; }
+                    //        return "ja";
+                    //    } else if (txt == "-") {
+                    //        if (column == column.Database.Column.SysCorrect) { return "fehlerhaft"; }
+                    //        if (column == column.Database.Column.SysLocked) { return "bearbeitbar"; }
+                    //        return "nein";
+                    //    }
+                    //}
+
                     txt = LanguageTool.ColumnReplace(txt, column, style);
                     if (removeLineBreaks) {
                         txt = txt.Replace("\r\n", " ");
@@ -138,23 +186,6 @@ namespace BlueDatabase {
                     break;
 
                 case enDataFormat.Button:
-                    txt = LanguageTool.ColumnReplace(txt, column, style);
-                    break;
-
-                case enDataFormat.Bit:
-                    if (txt == true.ToPlusMinus()) {
-                        txt = "Ja";
-                        if (column == column.Database.Column.SysCorrect) { return "Ok"; }
-                        if (column == column.Database.Column.SysLocked) { return "gesperrt"; }
-                    } else if (txt == false.ToPlusMinus()) {
-                        txt = "Nein";
-                        if (column == column.Database.Column.SysCorrect) { return "fehlerhaft"; }
-                        if (column == column.Database.Column.SysLocked) { return "bearbeitbar"; }
-                    } else if (txt is "o" or "O") {
-                        txt = "Neutral";
-                    } else if (txt == "?") {
-                        txt = "Unbekannt";
-                    }
                     txt = LanguageTool.ColumnReplace(txt, column, style);
                     break;
 
@@ -237,24 +268,18 @@ namespace BlueDatabase {
             if (bildTextverhalten == enBildTextVerhalten.Nur_Bild) { replacedText = ValueReadable(column, originalText, style, enBildTextVerhalten.Nur_Text, true); }
             if (string.IsNullOrEmpty(replacedText)) { return null; }
 
-            if (column.Format == enDataFormat.Bit) {
-                return originalText == true.ToPlusMinus()
-                    ? column == column.Database.Column.SysCorrect ? QuickImage.Get("Häkchen|16||||||||80") : QuickImage.Get(enImageCode.Häkchen, 16)
-                    : originalText == false.ToPlusMinus()
-                        ? column == column.Database.Column.SysCorrect ? QuickImage.Get(enImageCode.Warnung, 16) : QuickImage.Get(enImageCode.Kreuz, 16)
-                        : originalText == "o" || replacedText == "O"
-                                                ? QuickImage.Get(enImageCode.Kreis2, 16)
-                                                : originalText == "?"
-                                                                        ? QuickImage.Get(enImageCode.Fragezeichen, 16)
-                                                                        : string.IsNullOrEmpty(replacedText) ? null : StandardErrorImage(16, bildTextverhalten);
+            var gr = Math.Truncate(column.Database.GlobalScale * 16).ToString();
+            if (!string.IsNullOrEmpty(column.BildCode_ConstantHeight)) { gr = column.BildCode_ConstantHeight; }
+
+            if (replacedText.Contains("|")) {
+                var x = replacedText.SplitBy("|");
+                replacedText = x[0];
             }
 
-            if (column.BildCode_ConstantHeight > 0) { replacedText = replacedText + "|" + column.BildCode_ConstantHeight; }
-            var defaultImage = QuickImage.Get(replacedText);
+            var defaultImage = QuickImage.Get(replacedText + "|" + gr.ToString());
             if (defaultImage != null && !defaultImage.IsError) { return defaultImage; }
-            var gr = 16;
-            if (column.BildCode_ConstantHeight > 0) { gr = column.BildCode_ConstantHeight; }
-            return StandardErrorImage(gr, bildTextverhalten);
+
+            return StandardErrorImage(gr, bildTextverhalten, replacedText, column);
         }
 
         #endregion

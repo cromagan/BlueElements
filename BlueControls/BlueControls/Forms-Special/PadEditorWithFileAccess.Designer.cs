@@ -54,6 +54,7 @@ namespace BlueControls.Forms {
             // 
             this.Ribbon.Controls.Add(this.tabDatei);
             this.Ribbon.Size = new System.Drawing.Size(800, 110);
+            this.Ribbon.TabIndex = 3;
             this.Ribbon.Controls.SetChildIndex(this.tabExport, 0);
             this.Ribbon.Controls.SetChildIndex(this.tabBearbeiten, 0);
             this.Ribbon.Controls.SetChildIndex(this.tabDatei, 0);

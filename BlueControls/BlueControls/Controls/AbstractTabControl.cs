@@ -30,7 +30,7 @@ using System.Windows.Forms;
 namespace BlueControls.Controls {
 
     [ToolboxBitmap(typeof(System.Windows.Forms.TabControl))]
-    public abstract partial class AbstractTabControl : System.Windows.Forms.TabControl, IContextMenu {
+    public abstract partial class AbstractTabControl : System.Windows.Forms.TabControl {
 
         #region Fields
 
@@ -78,15 +78,15 @@ namespace BlueControls.Controls {
 
         #endregion
 
+        //public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) => false;
+
+        //public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) => HotItem = e != null ? TestTab(new Point(e.X, e.Y)) : null;
+
+        //public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
+
+        //public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
+
         #region Methods
-
-        public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) => false;
-
-        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) => HotItem = e != null ? TestTab(new Point(e.X, e.Y)) : null;
-
-        public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
-
-        public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
         public void PerformAutoScale() { }
 
@@ -105,8 +105,6 @@ namespace BlueControls.Controls {
         }
 
         // NIX TUN!!!!
-
-        // NIX TUN!!!!
         protected override void OnMouseLeave(System.EventArgs e) {
             _HotTab = null;
             base.OnMouseLeave(e);
@@ -118,10 +116,10 @@ namespace BlueControls.Controls {
             base.OnMouseMove(e);
         }
 
-        protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
-            base.OnMouseUp(e);
-            if (e.Button == MouseButtons.Right) { FloatingInputBoxListBoxStyle.ContextMenuShow(this, e); }
-        }
+        //protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
+        //    base.OnMouseUp(e);
+        //    if (e.Button == MouseButtons.Right) { FloatingInputBoxListBoxStyle.ContextMenuShow(this, e); }
+        //}
 
         protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) {
             if (this is RibbonBar) {

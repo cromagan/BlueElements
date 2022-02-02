@@ -169,10 +169,10 @@ namespace BlueControls.ItemCollection {
                 }
             }
             switch (column.Format) {
-                case enDataFormat.Bit:
-                    l.Add(true.ToPlusMinus());
-                    l.Add(false.ToPlusMinus());
-                    break;
+                //case enDataFormat.Bit:
+                //    l.Add(true.ToPlusMinus());
+                //    l.Add(false.ToPlusMinus());
+                //    break;
 
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                     var DB = column.LinkedDatabase();

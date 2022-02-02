@@ -19,6 +19,7 @@ using BlueBasics;
 using BlueDatabase;
 using Skript.Enums;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace BlueScript {
 
@@ -26,7 +27,7 @@ namespace BlueScript {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.String };
+        public override List<enVariableDataType> Args => new() { enVariableDataType.String, enVariableDataType.String, enVariableDataType.Bool };
 
         public override string Description => "Lädt eine andere Datenbank (Database) und erstellt eine neue Zeile. KeyValue muss einen Wert enthalten- zur Not kann UniqueRowId() benutzt werden.";
 
@@ -40,7 +41,7 @@ namespace BlueScript {
 
         public override string StartSequence => "(";
 
-        public override string Syntax => "AddRow(database, keyvalue);";
+        public override string Syntax => "AddRow(database, keyvalue, startScriptOfNewRow);";
 
         #endregion
 
@@ -62,9 +63,17 @@ namespace BlueScript {
 
             //if (r != null && !attvar.Attributes[2].ValueBool) { return Method_Row.RowToObject(r); }
 
-            var r = db.Row.Add(attvar.Attributes[1].ValueString);
+            if (attvar.Attributes[2].ValueBool) {
+                StackTrace stackTrace = new();
 
-            return Method_Row.RowToObject(r);
+                if (stackTrace.FrameCount > 400) {
+                    return new strDoItFeedback("Stapelspeicherüberlauf");
+                }
+            }
+
+            var r = db.Row.Add(attvar.Attributes[1].ValueString, attvar.Attributes[2].ValueBool);
+
+            return Method_Row.RowToObjectFeedback(r);
         }
 
         #endregion

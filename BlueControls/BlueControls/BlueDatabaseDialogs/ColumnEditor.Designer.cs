@@ -138,6 +138,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnOk = new BlueControls.Controls.Button();
             this.tabControl = new BlueControls.Controls.TabControl();
             this.tabSchnellformat = new System.Windows.Forms.TabPage();
+            this.btnSchnellBit = new BlueControls.Controls.Button();
             this.btnSchnellBildCode = new BlueControls.Controls.Button();
             this.btnSchnellIInternetAdresse = new BlueControls.Controls.Button();
             this.btnSchnellAuswahloptionen = new BlueControls.Controls.Button();
@@ -161,7 +162,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.caption5 = new BlueControls.Controls.Caption();
             this.butAktuellVor = new BlueControls.Controls.Button();
             this.butAktuellZurueck = new BlueControls.Controls.Button();
-            this.btnSchnellBit = new BlueControls.Controls.Button();
             this.tabDesign.SuspendLayout();
             this.grpBildCode.SuspendLayout();
             this.tabRechte.SuspendLayout();
@@ -1416,7 +1416,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tabControl.Controls.Add(this.tabSchnellformat);
             this.tabControl.Controls.Add(this.tabDesign);
             this.tabControl.Controls.Add(this.tabRechte);
             this.tabControl.Controls.Add(this.tabAutoBearbeitung);
@@ -1424,6 +1423,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabControl.Controls.Add(this.tabQuickInfo);
             this.tabControl.Controls.Add(this.tabSonstiges);
             this.tabControl.Controls.Add(this.tabSpezial);
+            this.tabControl.Controls.Add(this.tabSchnellformat);
             this.tabControl.HotTrack = true;
             this.tabControl.Location = new System.Drawing.Point(0, 120);
             this.tabControl.Name = "tabControl";
@@ -1451,6 +1451,15 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabSchnellformat.Size = new System.Drawing.Size(912, 487);
             this.tabSchnellformat.TabIndex = 10;
             this.tabSchnellformat.Text = "Schnellformat";
+            // 
+            // btnSchnellBit
+            // 
+            this.btnSchnellBit.Location = new System.Drawing.Point(296, 24);
+            this.btnSchnellBit.Name = "btnSchnellBit";
+            this.btnSchnellBit.Size = new System.Drawing.Size(128, 48);
+            this.btnSchnellBit.TabIndex = 10;
+            this.btnSchnellBit.Text = "Bit (Ja/Nein)";
+            this.btnSchnellBit.Click += new System.EventHandler(this.btnSchnellBit_Click);
             // 
             // btnSchnellBildCode
             // 
@@ -1690,15 +1699,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.butAktuellZurueck.Size = new System.Drawing.Size(72, 24);
             this.butAktuellZurueck.TabIndex = 18;
             this.butAktuellZurueck.Click += new System.EventHandler(this.butAktuellZurueck_Click);
-            // 
-            // btnSchnellBit
-            // 
-            this.btnSchnellBit.Location = new System.Drawing.Point(296, 24);
-            this.btnSchnellBit.Name = "btnSchnellBit";
-            this.btnSchnellBit.Size = new System.Drawing.Size(128, 48);
-            this.btnSchnellBit.TabIndex = 10;
-            this.btnSchnellBit.Text = "Bit (Ja/Nein)";
-            this.btnSchnellBit.Click += new System.EventHandler(this.btnSchnellBit_Click);
             // 
             // ColumnEditor
             // 

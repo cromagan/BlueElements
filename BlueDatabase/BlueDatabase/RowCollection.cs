@@ -138,21 +138,25 @@ namespace BlueDatabase {
             OnRowAdded(new RowEventArgs(Row));
         }
 
-        public RowItem Add(string ValueOfCellInFirstColumn) {
-            if (string.IsNullOrEmpty(ValueOfCellInFirstColumn)) {
+        public RowItem Add(string valueOfCellInFirstColumn) => Add(valueOfCellInFirstColumn, true);
+
+        public RowItem Add(string valueOfCellInFirstColumn, bool runScriptOfNewRow) {
+            if (string.IsNullOrEmpty(valueOfCellInFirstColumn)) {
                 Develop.DebugPrint("Value = 0");
                 return null;
             }
             RowItem Row = new(Database);
             Add(Row);
-            Row.CellSet(Database.Column[0], ValueOfCellInFirstColumn);
+            Row.CellSet(Database.Column[0], valueOfCellInFirstColumn);
             Database.Cell.SystemSet(Database.Column.SysRowCreator, Row, Database.UserName);
             Database.Cell.SystemSet(Database.Column.SysRowCreateDate, Row, DateTime.Now.ToString(Constants.Format_Date5));
             // Dann die Inital-Werte reinschreiben
             foreach (var ThisColum in Database.Column) {
                 if (ThisColum != null && !string.IsNullOrEmpty(ThisColum.CellInitValue)) { Row.CellSet(ThisColum, ThisColum.CellInitValue); }
             }
-            Row.DoAutomatic(false, false, 1, "new row");
+
+            if (runScriptOfNewRow) { Row.DoAutomatic(false, false, 1, "new row"); }
+
             return Row;
         }
 

@@ -84,6 +84,8 @@ namespace BlueControls.BlueDatabaseDialogs {
                 MessageBox.Show("<b><u>Bitte korrigieren sie zuerst folgenden Fehler:</u></b><br>" + Feh, enImageCode.Warnung, "Ok");
                 return false;
             }
+
+            _Column.Repair();
             return true;
         }
 
@@ -495,8 +497,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             _Column.DropdownWerteAndererZellenAnzeigen = btnOtherValuesToo.Checked;
             _Column.EditTrotzSperreErlaubt = btnIgnoreLock.Checked;
             _Column.AllowedChars = tbxAllowedChars.Text;
-            int.TryParse(txbBildCodeConstHeight.Text, out var Res);
-            _Column.BildCode_ConstantHeight = Res;
+
+            _Column.BildCode_ConstantHeight = txbBildCodeConstHeight.Text;
             int.TryParse(cbxBildTextVerhalten.Text, out var ImNF);
             _Column.BildTextVerhalten = (enBildTextVerhalten)ImNF;
             _Column.BestFile_StandardFolder = txbBestFileStandardFolder.Text;

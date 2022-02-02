@@ -197,7 +197,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             grpDrucken.Enabled = true;
             //} else {
             //    grpDrucken.Enabled = false;
-            //     System.Windows.Forms.TabPageControl.Enabled = false;
+            //     System.Windows.Forms.tabBearbeiten.Enabled = false;
             //    grpDateiSystem.Enabled = false;
             //    btnLayoutLöschen.Enabled = false;
             //    btnLayoutUmbenennen.Enabled = false;

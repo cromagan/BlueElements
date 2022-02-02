@@ -77,7 +77,7 @@ namespace BlueBasics {
 
         public static void CheckStackForOverflow() {
             StackTrace stackTrace = new();
-            if (stackTrace.GetFrames().GetUpperBound(0) > 300) {
+            if (stackTrace.FrameCount > 400) {
                 DebugPrint(enFehlerArt.Fehler, "Stack-Overflow abgefangen!");
             }
         }

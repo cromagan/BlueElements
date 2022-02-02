@@ -60,7 +60,7 @@ namespace BlueDatabase {
         private Color _BackColor;
         private string _BestFile_StandardFolder;
         private string _BestFile_StandardSuffix;
-        private int _BildCode_ConstantHeight;
+        private string _BildCode_ConstantHeight;
         private enBildTextVerhalten _BildTextVerhalten;
         private string _Caption;
         private string _CaptionBitmapTXT;
@@ -140,7 +140,7 @@ namespace BlueDatabase {
             _Name = Database.Column.Freename(string.Empty);
             _Caption = string.Empty;
             //_CaptionBitmap = null;
-            _Format = enDataFormat.Bit;
+            _Format = enDataFormat.Text;
             _LineLeft = enColumnLineStyle.Dünn;
             _LineRight = enColumnLineStyle.Ohne;
             _MultiLine = false;
@@ -195,7 +195,7 @@ namespace BlueDatabase {
             _LinkedKeyKennung = string.Empty;
             _LinkedDatabaseFile = string.Empty;
             _BildTextVerhalten = enBildTextVerhalten.Nur_Text;
-            _BildCode_ConstantHeight = 0;
+            _BildCode_ConstantHeight = string.Empty;
             _Prefix = string.Empty;
             _BestFile_StandardSuffix = string.Empty;
             _BestFile_StandardFolder = string.Empty;
@@ -350,11 +350,11 @@ namespace BlueDatabase {
             }
         }
 
-        public int BildCode_ConstantHeight {
+        public string BildCode_ConstantHeight {
             get => _BildCode_ConstantHeight;
             set {
                 if (_BildCode_ConstantHeight == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_BildCode_ConstantHeight, this, _BildCode_ConstantHeight.ToString(), value.ToString(), true);
+                Database.AddPending(enDatabaseDataType.co_BildCode_ConstantHeight, this, _BildCode_ConstantHeight, value, true);
                 Invalidate_ColumAndContent();
                 OnChanged();
             }
@@ -832,7 +832,6 @@ namespace BlueDatabase {
             if (!doDropDown && !keybordInputAllowed) { return enEditTypeTable.None; }
 
             switch (format) {
-                case enDataFormat.Bit:
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                 case enDataFormat.Values_für_LinkedCellDropdown:
                     return enEditTypeTable.Dropdown_Single;
@@ -1063,12 +1062,12 @@ namespace BlueDatabase {
                 }
             }
             switch (_Format) {
-                case enDataFormat.Bit:
-                    if (_FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled)) { return "Format unterstützt keinen 'erweiternden Autofilter'"; }
-                    if (_FilterOptions.HasFlag(enFilterOptions.TextFilterEnabled)) { return "Format unterstützt keine 'Texteingabe bei Autofilter'"; }
-                    if (!string.IsNullOrEmpty(_AutoFilterJoker)) { return "Format unterstützt keinen 'Autofilter Joker'"; }
-                    if (!_IgnoreAtRowFilter) { return "Format muss bei Zeilenfilter ignoriert werden.'"; }
-                    break;
+                //case enDataFormat.Bit:
+                //    if (_FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled)) { return "Format unterstützt keinen 'erweiternden Autofilter'"; }
+                //    if (_FilterOptions.HasFlag(enFilterOptions.TextFilterEnabled)) { return "Format unterstützt keine 'Texteingabe bei Autofilter'"; }
+                //    if (!string.IsNullOrEmpty(_AutoFilterJoker)) { return "Format unterstützt keinen 'Autofilter Joker'"; }
+                //    if (!_IgnoreAtRowFilter) { return "Format muss bei Zeilenfilter ignoriert werden.'"; }
+                //    break;
 
                 case enDataFormat.RelationText:
                     if (!_MultiLine) { return "Bei diesem Format muss mehrzeilig ausgewählt werden."; }
@@ -1147,7 +1146,7 @@ namespace BlueDatabase {
                 if (thisS.ToUpper() == "#ADMINISTRATOR") { return "'#Administrator' bei den Bearbeitern entfernen."; }
             }
             if (_DropdownBearbeitungErlaubt || TMP_EditDialog == enEditTypeTable.Dropdown_Single) {
-                if (_Format is not enDataFormat.Bit and not enDataFormat.Columns_für_LinkedCellDropdown and not enDataFormat.Values_für_LinkedCellDropdown) {
+                if (_Format is not enDataFormat.Columns_für_LinkedCellDropdown and not enDataFormat.Values_für_LinkedCellDropdown) {
                     if (!_DropdownWerteAndererZellenAnzeigen && DropDownItems.Count == 0) { return "Keine Dropdown-Items vorhanden bzw. Alles hinzufügen nicht angewählt."; }
                 }
             } else {
@@ -1439,6 +1438,10 @@ namespace BlueDatabase {
                     SetFormatForDateTime();
                     break;
 
+                case 2:   //Bit = 3,
+                    SetFormatForBit();
+                    break;
+
                 case 3:   //Ganzzahl = 3,
                     SetFormatForInteger();
                     break;
@@ -1457,9 +1460,7 @@ namespace BlueDatabase {
             }
 
             if (ScriptType == enScriptType.undefiniert) {
-                if (Format == enDataFormat.Bit) {
-                    ScriptType = enScriptType.Bool;
-                } else if (MultiLine) {
+                if (MultiLine) {
                     ScriptType = enScriptType.List;
                 } else if (Format is enDataFormat.Text or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Link_To_Filesystem) {
                     if (SortType is enSortierTyp.ZahlenwertFloat or enSortierTyp.ZahlenwertInt) {
@@ -1574,13 +1575,19 @@ namespace BlueDatabase {
                     _Name = "SYS_Correct";
                     _Caption = "Fehlerfrei";
                     _SpellCheckingEnabled = false;
-                    _Format = enDataFormat.Bit;
+                    _Format = enDataFormat.Text;
+                    _ScriptType = enScriptType.Bool;
                     //_AutoFilterErweitertErlaubt = false;
                     _AutoFilterJoker = string.Empty;
                     //_AutofilterTextFilterErlaubt = false;
                     _IgnoreAtRowFilter = true;
                     _FilterOptions = enFilterOptions.Enabled;
                     _ScriptType = enScriptType.Nicht_vorhanden;
+                    _Align = enAlignmentHorizontal.Zentriert;
+                    DropDownItems.Clear();
+                    _TextBearbeitungErlaubt = false;
+                    _DropdownBearbeitungErlaubt = false;
+
                     if (SetAll) {
                         ForeColor = Color.FromArgb(128, 0, 0);
                         BackColor = Color.FromArgb(255, 185, 185);
@@ -1591,16 +1598,25 @@ namespace BlueDatabase {
                 case "System: Locked":
                     _Name = "SYS_Locked";
                     _SpellCheckingEnabled = false;
-                    _Format = enDataFormat.Bit;
+                    _Format = enDataFormat.Text;
+                    _ScriptType = enScriptType.Bool;
                     _FilterOptions = enFilterOptions.Enabled;
                     _AutoFilterJoker = string.Empty;
                     _IgnoreAtRowFilter = true;
+                    _BildTextVerhalten = enBildTextVerhalten.Interpretiere_Bool;
+                    _Align = enAlignmentHorizontal.Zentriert;
+
                     if (_TextBearbeitungErlaubt || _DropdownBearbeitungErlaubt) {
                         _QuickInfo = "Eine abgeschlossene Zeile kann<br>nicht mehr bearbeitet werden.";
                         _TextBearbeitungErlaubt = false;
                         _DropdownBearbeitungErlaubt = true;
                         _EditTrotzSperreErlaubt = true;
+                        DropDownItems.AddIfNotExists("+");
+                        DropDownItems.AddIfNotExists("-");
+                    } else {
+                        DropDownItems.Clear();
                     }
+
                     if (SetAll) {
                         Caption = "Abgeschlossen";
                         ForeColor = Color.FromArgb(128, 0, 0);
@@ -1665,13 +1681,19 @@ namespace BlueDatabase {
         public void SetFormatForBit() {
             ((IInputFormat)this).SetFormat(enVarType.Bit); // Standard Verhalten
 
-            Format = enDataFormat.Bit;
-            Align = enAlignmentHorizontal.Links;
+            Format = enDataFormat.Text;
+            Align = enAlignmentHorizontal.Zentriert;
             SortType = enSortierTyp.Original_String;
             Translate = enTranslationType.Original_Anzeigen;
             AfterEdit_QuickSortRemoveDouble = false;
-            BildTextVerhalten = enBildTextVerhalten.Bild_oder_Text;
+            BildTextVerhalten = enBildTextVerhalten.Interpretiere_Bool;
             ScriptType = enScriptType.Bool;
+
+            DropdownAllesAbwählenErlaubt = false;
+            DropdownBearbeitungErlaubt = true;
+            TextBearbeitungErlaubt = false;
+            DropDownItems.AddIfNotExists("+");
+            DropDownItems.AddIfNotExists("-");
         }
 
         public void SetFormatForDate() {
@@ -1889,7 +1911,6 @@ namespace BlueDatabase {
 : _Format switch {
     enDataFormat.Link_To_Filesystem => QuickImage.Get(enImageCode.Datei, 16),
     enDataFormat.RelationText => QuickImage.Get(enImageCode.Herz, 16),
-    enDataFormat.Bit => QuickImage.Get(enImageCode.Häkchen, 16),
     enDataFormat.FarbeInteger => QuickImage.Get(enImageCode.Pinsel, 16),
     enDataFormat.LinkedCell => QuickImage.Get(enImageCode.Fernglas, 16),
     enDataFormat.Columns_für_LinkedCellDropdown => QuickImage.Get(enImageCode.Fernglas, 16, "FF0000", ""),
@@ -1933,6 +1954,7 @@ namespace BlueDatabase {
                     //if (_MultiLine && _DropdownBearbeitungErlaubt && EditType_To_Check == enEditTypeFormula.Listbox_3_Zeilen) { return true; }
                     if (_MultiLine && _DropdownBearbeitungErlaubt && editType_To_Check == enEditTypeFormula.Listbox) { return true; }
                     if (editType_To_Check == enEditTypeFormula.nur_als_Text_anzeigen) { return true; }
+                    if (!_MultiLine && editType_To_Check == enEditTypeFormula.Ja_Nein_Knopf) { return true; }
                     return false;
 
                 case enDataFormat.LinkedCell:
@@ -1957,13 +1979,13 @@ namespace BlueDatabase {
                     if (editType_To_Check == enEditTypeFormula.Textfeld_mit_Auswahlknopf) { return true; }
                     return false;
 
-                case enDataFormat.Bit:
-                    if (_MultiLine) { return false; }
-                    if (editType_To_Check == enEditTypeFormula.Ja_Nein_Knopf) {
-                        return !_DropdownWerteAndererZellenAnzeigen && DropDownItems.Count <= 0;
-                    }
-                    if (editType_To_Check == enEditTypeFormula.Textfeld_mit_Auswahlknopf) { return true; }
-                    return false;
+                //case enDataFormat.Bit:
+                //    if (_MultiLine) { return false; }
+                //    if (editType_To_Check == enEditTypeFormula.Ja_Nein_Knopf) {
+                //        return !_DropdownWerteAndererZellenAnzeigen && DropDownItems.Count <= 0;
+                //    }
+                //    if (editType_To_Check == enEditTypeFormula.Textfeld_mit_Auswahlknopf) { return true; }
+                //    return false;
 
                 case enDataFormat.Link_To_Filesystem:
                     if (_MultiLine) {
@@ -2260,7 +2282,8 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.co_BildCode_ConstantHeight:
-                    _BildCode_ConstantHeight = int.Parse(Wert);
+                    if (Wert == "0") { Wert = string.Empty; }
+                    _BildCode_ConstantHeight = Wert;
                     break;
 
                 case enDatabaseDataType.co_Prefix:
@@ -2403,7 +2426,7 @@ namespace BlueDatabase {
             Database.SaveToByteList(l, enDatabaseDataType.co_LinkKeyKennung, _LinkedKeyKennung, Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_BestFile_StandardFolder, _BestFile_StandardFolder, Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_BestFile_StandardSuffix, _BestFile_StandardSuffix, Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_BildCode_ConstantHeight, _BildCode_ConstantHeight.ToString(), Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_BildCode_ConstantHeight, _BildCode_ConstantHeight, Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_BildTextVerhalten, ((int)_BildTextVerhalten).ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_Translate, ((int)_Translate).ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_AdditionalCheck, ((int)_AdditionalCheck).ToString(), Key);
