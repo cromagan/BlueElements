@@ -54,6 +54,12 @@ namespace BlueControls.Forms {
             // 
             this.Ribbon.Controls.Add(this.tabDatei);
             this.Ribbon.Size = new System.Drawing.Size(800, 110);
+            this.Ribbon.TabDefault = this.tabDatei;
+            this.Ribbon.TabDefaultOrder = new string[] {
+        "Datei",
+        "Bearbeiten",
+        "Einstellungen",
+        "Export"};
             this.Ribbon.TabIndex = 3;
             this.Ribbon.Controls.SetChildIndex(this.tabExport, 0);
             this.Ribbon.Controls.SetChildIndex(this.tabBearbeiten, 0);
@@ -63,10 +69,6 @@ namespace BlueControls.Forms {
             // 
             this.tabBearbeiten.Size = new System.Drawing.Size(792, 81);
             // 
-            // tabExport
-            // 
-            this.tabExport.Size = new System.Drawing.Size(792, 81);
-            // 
             // tabDatei
             // 
             this.tabDatei.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
@@ -74,7 +76,7 @@ namespace BlueControls.Forms {
             this.tabDatei.Location = new System.Drawing.Point(4, 25);
             this.tabDatei.Name = "tabDatei";
             this.tabDatei.Padding = new System.Windows.Forms.Padding(3);
-            this.tabDatei.Size = new System.Drawing.Size(792, 81);
+            this.tabDatei.Size = new System.Drawing.Size(1326, 81);
             this.tabDatei.TabIndex = 3;
             this.tabDatei.Text = "Datei";
             // 

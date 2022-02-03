@@ -21,13 +21,13 @@ using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
+using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text.RegularExpressions;
 using static BlueBasics.Extensions;
 using static BlueBasics.FileOperations;
-using BlueDatabase.Interfaces;
 
 namespace BlueDatabase {
 
@@ -977,6 +977,73 @@ namespace BlueDatabase {
                     if (!FileExists(tmp)) { return tmp; }
                 }
             } while (true);
+        }
+
+        /// <summary>
+        /// Überschreibt alle Spalteeigenschaften mit dem der Vorlage.
+        /// Nur der Name bleibt unverändert.
+        /// </summary>
+        /// <param name="source"></param>
+        public void Clone(ColumnItem source) {
+            Caption = source.Caption;
+            CaptionBitmap = source.CaptionBitmap;
+            Format = source.Format;
+            LineLeft = source.LineLeft;
+            LineRight = source.LineRight;
+            MultiLine = source.MultiLine;
+            Quickinfo = source.Quickinfo;
+            ForeColor = source.ForeColor;
+            BackColor = source.BackColor;
+            EditTrotzSperreErlaubt = source.EditTrotzSperreErlaubt;
+            EditType = source.EditType;
+            Identifier = source.Identifier;
+            PermissionGroups_ChangeCell.Clear();
+            PermissionGroups_ChangeCell.AddRange(source.PermissionGroups_ChangeCell);
+            Tags.Clear();
+            Tags.AddRange(source.Tags);
+            AdminInfo = source.AdminInfo;
+            FilterOptions = source.FilterOptions;
+            IgnoreAtRowFilter = source.IgnoreAtRowFilter;
+            DropdownBearbeitungErlaubt = source.DropdownBearbeitungErlaubt;
+            DropdownAllesAbwählenErlaubt = source.DropdownAllesAbwählenErlaubt;
+            TextBearbeitungErlaubt = source.TextBearbeitungErlaubt;
+            SpellChecking = source.SpellChecking;
+            DropdownWerteAndererZellenAnzeigen = source.DropdownWerteAndererZellenAnzeigen;
+            AfterEdit_QuickSortRemoveDouble = source.AfterEdit_QuickSortRemoveDouble;
+            AfterEdit_Runden = source.AfterEdit_Runden;
+            AfterEdit_DoUCase = source.AfterEdit_DoUCase;
+            AfterEdit_AutoCorrect = source.AfterEdit_AutoCorrect;
+            AutoRemove = source.AutoRemove;
+            SaveContent = source.SaveContent;
+            CellInitValue = source.CellInitValue;
+            AutoFilterJoker = source.AutoFilterJoker;
+            KeyColumnKey = source.KeyColumnKey;
+            LinkedCell_RowKey = source.LinkedCell_RowKey;
+            LinkedCell_ColumnKey = source.LinkedCell_ColumnKey;
+            DropdownKey = source.DropdownKey;
+            VorschlagsColumn = source.VorschlagsColumn;
+            Align = source.Align;
+            SortType = source.SortType;
+            DropDownItems.Clear();
+            DropDownItems.AddRange(source.DropDownItems);
+            OpticalReplace.Clear();
+            OpticalReplace.AddRange(source.OpticalReplace);
+            AfterEdit_AutoReplace.Clear();
+            AfterEdit_AutoReplace.AddRange(source.OpticalReplace);
+            this.GetStyleFrom(source); // regex, Allowed Chars, etc.
+            ScriptType = source.ScriptType;
+            ShowUndo = source.ShowUndo;
+            ShowMultiLineInOneLine = source.ShowMultiLineInOneLine;
+            Ueberschrift1 = source.Ueberschrift1;
+            Ueberschrift2 = source.Ueberschrift2;
+            Ueberschrift3 = source.Ueberschrift3;
+            DauerFilterPos = new Point(source.DauerFilterPos.X, source.DauerFilterPos.Y);
+            LinkedKeyKennung = source.LinkedKeyKennung;
+            LinkedDatabaseFile = source.LinkedDatabaseFile;
+            BildTextVerhalten = source.BildTextVerhalten;
+            BildCode_ConstantHeight = source.BildCode_ConstantHeight;
+            BestFile_StandardSuffix = source.BestFile_StandardSuffix;
+            BestFile_StandardFolder = source.BestFile_StandardFolder;
         }
 
         public string CompareKey() {

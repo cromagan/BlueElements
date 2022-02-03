@@ -121,6 +121,11 @@ namespace BlueControls.Forms {
             this.Ribbon.Name = "Ribbon";
             this.Ribbon.SelectedIndex = 0;
             this.Ribbon.Size = new System.Drawing.Size(1334, 110);
+            this.Ribbon.TabDefault = this.tabBearbeiten;
+            this.Ribbon.TabDefaultOrder = new string[] {
+        "Bearbeiten",
+        "Einstellungen",
+        "Export"};
             this.Ribbon.TabIndex = 2;
             // 
             // tabBearbeiten

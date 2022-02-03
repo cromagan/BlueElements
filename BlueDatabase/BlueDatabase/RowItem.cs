@@ -349,21 +349,35 @@ namespace BlueDatabase {
                     }
                 }
             }
+
             List<string> cols = new();
             var _InfoTXT = "<b><u>" + CellGetString(Database.Column[0]) + "</b></u><br><br>";
-            foreach (var thisc in Database.Column) {
-                var n = thisc.Name + "_error";
-                var va = script.Variablen.GetSystem(n);
-                if (va != null) {
-                    cols.Add(thisc.Name + "|" + va.ValueString);
-                    _InfoTXT = _InfoTXT + "<b>" + thisc.ReadableText() + ":</b> " + va.ValueString + "<br><hr><br>";
+
+            var fs = script.Feedback.SplitAndCutByCRToList().SortedDistinctList();
+            foreach (var thiss in fs) {
+                cols.AddIfNotExists(thiss);
+                var t = thiss.SplitBy("|");
+                var thisc = Database.Column[t[0]];
+                if (thisc != null) {
+                    _InfoTXT = _InfoTXT + "<b>" + thisc.ReadableText() + ":</b> " + t[1] + "<br><hr><br>";
                 }
             }
+
+            //foreach (var thisc in Database.Column) {
+            //    var n = thisc.Name + "_error";
+            //    var va = script.Variablen.GetSystem(n);
+            //    if (va != null) {
+            //        cols.Add(thisc.Name + "|" + va.ValueString);
+            //        _InfoTXT = _InfoTXT + "<b>" + thisc.ReadableText() + ":</b> " + va.ValueString + "<br><hr><br>";
+            //    }
+            //}
             if (cols.Count == 0) {
                 _InfoTXT += "Diese Zeile ist fehlerfrei.";
             }
             if (Database.Column.SysCorrect.SaveContent) {
-                if (IsNullOrEmpty(Database.Column.SysCorrect) || cols.Count == 0 != CellGetBoolean(Database.Column.SysCorrect)) { CellSet(Database.Column.SysCorrect, cols.Count == 0); }
+                if (IsNullOrEmpty(Database.Column.SysCorrect) || cols.Count == 0 != CellGetBoolean(Database.Column.SysCorrect)) {
+                    CellSet(Database.Column.SysCorrect, cols.Count == 0);
+                }
             }
             OnRowChecked(new RowCheckedEventArgs(this, cols));
             return (true, _InfoTXT, script);

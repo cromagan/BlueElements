@@ -148,16 +148,14 @@ namespace BlueControls.BlueDatabaseDialogs {
                         return;
                 }
             }
-            ColumnItem newc;
+            ColumnItem newc = _TableView.Database.Column.Add();
             if (Vorlage != null) {
-                newc = _TableView.Database.Column.AddACloneFrom(Vorlage);
+                newc.Clone(Vorlage);
                 if (mitDaten) {
                     foreach (var thisR in _TableView.Database.Row) {
                         thisR.CellSet(newc, thisR.CellGetString(Vorlage));
                     }
                 }
-            } else {
-                newc = _TableView.Database.Column.Add();
             }
             using (ColumnEditor w = new(newc, _TableView)) {
                 w.ShowDialog();

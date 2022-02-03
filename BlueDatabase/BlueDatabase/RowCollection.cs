@@ -169,23 +169,18 @@ namespace BlueDatabase {
         public List<RowItem> CalculateFilteredRows(List<FilterItem> filter) {
             List<RowItem> _tmpVisibleRows = new();
 
-            var lockMe = new object();
-            Parallel.ForEach(Database.Row, thisRowItem => {
-                if (thisRowItem != null) {
-                    if (thisRowItem.MatchesTo(filter)) {
-                        lock (lockMe) { _tmpVisibleRows.Add(thisRowItem); }
+            try {
+                var lockMe = new object();
+                Parallel.ForEach(Database.Row, thisRowItem => {
+                    if (thisRowItem != null) {
+                        if (thisRowItem.MatchesTo(filter)) {
+                            lock (lockMe) { _tmpVisibleRows.Add(thisRowItem); }
+                        }
                     }
-                }
-            });
-
-            //r
-            //foreach (var thisRowItem in Database.Row) {
-            //    if (thisRowItem != null) {
-            //        if (thisRowItem.MatchesTo(filter)) {
-            //            _tmpVisibleRows.Add(thisRowItem);
-            //        }
-            //    }
-            //}
+                });
+            } catch {
+                return CalculateFilteredRows(filter);
+            }
 
             return _tmpVisibleRows;
         }

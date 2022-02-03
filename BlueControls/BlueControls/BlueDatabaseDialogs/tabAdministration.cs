@@ -83,10 +83,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             var _database = (Database)sender;
             if (_database != null && !_database.ReadOnly) {
                 if (_database.IsAdministrator()) {
-                    //while (!_database.AllRulesOK()) {
-                    //    MessageBox.Show("Bitte reparieren sie<br>die fehlerhaften Regeln.", enImageCode.Information, "OK");
-                    //    OpenDatabaseHeadEditor(_database);
-                    //}
                     foreach (var ThisColumnItem in _database.Column) {
                         while (!ThisColumnItem.IsOk()) {
                             MessageBox.Show("Die folgende Spalte enthält einen Fehler:<br>" + ThisColumnItem.ErrorReason() + "<br><br>Bitte reparieren.", enImageCode.Information, "OK");

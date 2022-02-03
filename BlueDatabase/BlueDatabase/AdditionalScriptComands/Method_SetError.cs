@@ -55,17 +55,19 @@ namespace BlueScript {
                 var column = Column(s, attvar.Attributes[z].Name);
                 if (column == null) { return new strDoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[z].Name); }
 
-                var n = attvar.Attributes[z].Name.ToLower() + "_error";
-                var ve = s.Variablen.GetSystem(n);
-                if (ve == null) {
-                    ve = new Variable(n, string.Empty, enVariableDataType.List, false, true, string.Empty);
-                    s.Variablen.Add(ve);
-                }
-                ve.Readonly = false;
-                var l = ve.ValueListString;
-                l.AddIfNotExists(attvar.Attributes[0].ValueString);
-                ve.ValueListString = l;
-                ve.Readonly = true;
+                s.Feedback = s.Feedback + attvar.Attributes[z].Name.ToUpper() + "|" + attvar.Attributes[0].ValueString + "\r";
+
+                //var n = attvar.Attributes[z].Name.ToLower() + "_error";
+                //var ve = s.Variablen.GetSystem(n);
+                //if (ve == null) {
+                //    ve = new Variable(n, string.Empty, enVariableDataType.List, false, true, string.Empty);
+                //    s.Variablen.Add(ve);
+                //}
+                //ve.Readonly = false;
+                //var l = ve.ValueListString;
+                //l.AddIfNotExists(attvar.Attributes[0].ValueString);
+                //ve.ValueListString = l;
+                //ve.Readonly = true;
             }
 
             return strDoItFeedback.Null();

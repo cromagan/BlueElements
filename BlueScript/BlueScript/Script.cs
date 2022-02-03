@@ -31,6 +31,12 @@ namespace BlueScript {
         public static List<Method> Comands = null;
         public readonly List<Variable> Variablen;
         public bool EndSkript = false;
+
+        /// <summary>
+        /// Dieses Feld enthält informationen, die nach dem Skript-Lauf abgegriffen werden können.
+        /// </summary>
+        public string Feedback = string.Empty;
+
         internal readonly List<Bitmap> BitmapCache;
         internal Method_BerechneVariable _berechneVariable = null; // Paralellisierung löscht ab und zu die Variable
         private string _error;
@@ -213,6 +219,7 @@ namespace BlueScript {
             BreakFired = false;
             Schleife = 0;
             Sub = 0;
+            Feedback = string.Empty;
 
             _berechneVariable = null;
 

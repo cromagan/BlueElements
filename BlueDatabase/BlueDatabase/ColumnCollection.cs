@@ -18,10 +18,8 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
-using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Threading;
 using static BlueBasics.FileOperations;
 
@@ -131,70 +129,6 @@ namespace BlueDatabase {
             c.SetFormat(format);
             c.Suffix = suffix;
             c.Quickinfo = quickinfo;
-            return c;
-        }
-
-        public ColumnItem AddACloneFrom(ColumnItem source) {
-            var c = Add();
-            c.Caption = source.Caption;
-            c.CaptionBitmap = source.CaptionBitmap;
-            c.Format = source.Format;
-            c.LineLeft = source.LineLeft;
-            c.LineRight = source.LineRight;
-            c.MultiLine = source.MultiLine;
-            c.Quickinfo = source.Quickinfo;
-            c.ForeColor = source.ForeColor;
-            c.BackColor = source.BackColor;
-            c.EditTrotzSperreErlaubt = source.EditTrotzSperreErlaubt;
-            c.EditType = source.EditType;
-            c.Identifier = source.Identifier;
-            c.PermissionGroups_ChangeCell.Clear();
-            c.PermissionGroups_ChangeCell.AddRange(source.PermissionGroups_ChangeCell);
-            c.Tags.Clear();
-            c.Tags.AddRange(source.Tags);
-            c.AdminInfo = source.AdminInfo;
-            c.FilterOptions = source.FilterOptions;
-            c.IgnoreAtRowFilter = source.IgnoreAtRowFilter;
-            c.DropdownBearbeitungErlaubt = source.DropdownBearbeitungErlaubt;
-            c.DropdownAllesAbwählenErlaubt = source.DropdownAllesAbwählenErlaubt;
-            c.TextBearbeitungErlaubt = source.TextBearbeitungErlaubt;
-            c.SpellChecking = source.SpellChecking;
-            c.DropdownWerteAndererZellenAnzeigen = source.DropdownWerteAndererZellenAnzeigen;
-            c.AfterEdit_QuickSortRemoveDouble = source.AfterEdit_QuickSortRemoveDouble;
-            c.AfterEdit_Runden = source.AfterEdit_Runden;
-            c.AfterEdit_DoUCase = source.AfterEdit_DoUCase;
-            c.AfterEdit_AutoCorrect = source.AfterEdit_AutoCorrect;
-            c.AutoRemove = source.AutoRemove;
-            c.SaveContent = source.SaveContent;
-            c.CellInitValue = source.CellInitValue;
-            c.AutoFilterJoker = source.AutoFilterJoker;
-            c.KeyColumnKey = source.KeyColumnKey;
-            c.LinkedCell_RowKey = source.LinkedCell_RowKey;
-            c.LinkedCell_ColumnKey = source.LinkedCell_ColumnKey;
-            c.DropdownKey = source.DropdownKey;
-            c.VorschlagsColumn = source.VorschlagsColumn;
-            c.Align = source.Align;
-            c.SortType = source.SortType;
-            c.DropDownItems.Clear();
-            c.DropDownItems.AddRange(source.DropDownItems);
-            c.OpticalReplace.Clear();
-            c.OpticalReplace.AddRange(source.OpticalReplace);
-            c.AfterEdit_AutoReplace.Clear();
-            c.AfterEdit_AutoReplace.AddRange(source.OpticalReplace);
-            c.GetStyleFrom(source); // regex, Allowed Chars, etc.
-            c.ScriptType = source.ScriptType;
-            c.ShowUndo = source.ShowUndo;
-            c.ShowMultiLineInOneLine = source.ShowMultiLineInOneLine;
-            c.Ueberschrift1 = source.Ueberschrift1;
-            c.Ueberschrift2 = source.Ueberschrift2;
-            c.Ueberschrift3 = source.Ueberschrift3;
-            c.DauerFilterPos = new Point(source.DauerFilterPos.X, source.DauerFilterPos.Y);
-            c.LinkedKeyKennung = source.LinkedKeyKennung;
-            c.LinkedDatabaseFile = source.LinkedDatabaseFile;
-            c.BildTextVerhalten = source.BildTextVerhalten;
-            c.BildCode_ConstantHeight = source.BildCode_ConstantHeight;
-            c.BestFile_StandardSuffix = source.BestFile_StandardSuffix;
-            c.BestFile_StandardFolder = source.BestFile_StandardFolder;
             return c;
         }
 

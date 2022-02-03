@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueControls.Enums;
+using System.Windows.Forms;
 
 namespace BlueControls.Controls {
 
@@ -28,6 +29,22 @@ namespace BlueControls.Controls {
             SendToBack();
             Dock = System.Windows.Forms.DockStyle.Top;
             BackColor = Skin.Color_Back(enDesign.RibbonBar_Body, enStates.Standard);
+        }
+
+        #endregion
+
+        #region Methods
+
+        protected override void OnControlAdded(ControlEventArgs e) {
+            base.OnControlAdded(e);
+            if (e.Control is TabPage tp) {
+                tp.BackColor = Skin.Color_Back(enDesign.RibbonBar_Body, enStates.Standard);
+                Invalidate();
+            }
+        }
+
+        protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) {
+            DrawControl(e, enDesign.RibbonBar_Back);
         }
 
         #endregion

@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -24,7 +25,9 @@ using BlueControls.ItemCollection;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.Design;
 using System.Drawing;
+using System.Drawing.Design;
 using System.Windows.Forms;
 
 namespace BlueControls.Controls {
@@ -33,8 +36,6 @@ namespace BlueControls.Controls {
     public abstract partial class AbstractTabControl : System.Windows.Forms.TabControl {
 
         #region Fields
-
-        private System.Windows.Forms.TabPage _HotTab;
 
         private bool _IndexChanged = false;
 
@@ -58,14 +59,6 @@ namespace BlueControls.Controls {
 
         #endregion
 
-        #region Events
-
-        public event EventHandler<ContextMenuInitEventArgs> ContextMenuInit;
-
-        public event EventHandler<ContextMenuItemClickedEventArgs> ContextMenuItemClicked;
-
-        #endregion
-
         #region Properties
 
         [DefaultValue(false)]
@@ -74,59 +67,29 @@ namespace BlueControls.Controls {
             set => base.AutoSize = false;
         }
 
+        public System.Windows.Forms.TabPage HotTab { get; private set; }
+
+        [Category("Verhalten")]
+        public TabPage TabDefault { get; set; }
+
+        [Category("Verhalten")]
+        public string[] TabDefaultOrder { get; set; }
+
         protected override bool ScaleChildren => false;
 
         #endregion
-
-        //public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) => false;
-
-        //public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) => HotItem = e != null ? TestTab(new Point(e.X, e.Y)) : null;
-
-        //public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
-
-        //public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
         #region Methods
 
         public void PerformAutoScale() { }
 
+        //public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
         public void Scale() { }
 
-        protected override Rectangle GetScaledBounds(Rectangle tbounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified) => tbounds;
+        //public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
+        protected void DrawControl(System.Windows.Forms.PaintEventArgs e, enDesign design) {
+            Skin.Draw_Back(e.Graphics, design, enStates.Standard, new Rectangle(0, 0, Width, Height), this, true);
 
-        protected override void OnControlAdded(ControlEventArgs e) {
-            base.OnControlAdded(e);
-            if (e.Control is TabPage tp) {
-                tp.BackColor = this is RibbonBar ? Skin.Color_Back(enDesign.RibbonBar_Body, enStates.Standard)
-                             : this is TabControl ? Skin.Color_Back(enDesign.TabStrip_Body, enStates.Standard)
-                             : Color.Red;
-                Invalidate();
-            }
-        }
-
-        // NIX TUN!!!!
-        protected override void OnMouseLeave(System.EventArgs e) {
-            _HotTab = null;
-            base.OnMouseLeave(e);
-        }
-
-        protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
-            if (!HotTrack) { HotTrack = true; }
-            _HotTab = TestTab(new Point(e.X, e.Y));
-            base.OnMouseMove(e);
-        }
-
-        //protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
-        //    base.OnMouseUp(e);
-        //    if (e.Button == MouseButtons.Right) { FloatingInputBoxListBoxStyle.ContextMenuShow(this, e); }
-        //}
-
-        protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) {
-            if (this is RibbonBar) {
-                Skin.Draw_Back(e.Graphics, enDesign.RibbonBar_Back, enStates.Standard, new Rectangle(0, 0, Width, Height), this, true);
-            } else {
-                Skin.Draw_Back(e.Graphics, enDesign.TabStrip_Back, enStates.Standard, new Rectangle(0, 0, Width, Height), this, true);
-            }
             if (TabCount == 0 && DesignMode) {
                 e.Graphics.DrawRectangle(Pens.Magenta, new Rectangle(0, 0, Width - 1, Height - 1));
                 return;
@@ -142,16 +105,78 @@ namespace BlueControls.Controls {
             }
         }
 
+        //public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) => HotItem = e != null ? TestTab(new Point(e.X, e.Y)) : null;
+        protected override Rectangle GetScaledBounds(Rectangle tbounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified) => tbounds;
+
+        // NIX TUN!!!!
+        protected override void OnMouseLeave(System.EventArgs e) {
+            HotTab = null;
+            base.OnMouseLeave(e);
+        }
+
+        //public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) => false;
+        //protected override void OnControlAdded(ControlEventArgs e) {
+        //    base.OnControlAdded(e);
+        //    if (e.Control is TabPage tp) {
+        //        tp.BackColor = this is RibbonBar ? Skin.Color_Back(enDesign.RibbonBar_Body, enStates.Standard)
+        //                     : this is TabControl ? Skin.Color_Back(enDesign.TabStrip_Body, enStates.Standard)
+        //                     : Color.Red;
+        //        Invalidate();
+        //    }
+        //}
+        protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
+            if (!HotTrack) { HotTrack = true; }
+            HotTab = TestTab(new Point(e.X, e.Y));
+            base.OnMouseMove(e);
+        }
+
+        //protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
+        //    base.OnMouseUp(e);
+        //    if (e.Button == MouseButtons.Right) { FloatingInputBoxListBoxStyle.ContextMenuShow(this, e); }
+        //}
         protected override void OnPaintBackground(System.Windows.Forms.PaintEventArgs pevent) {
             // do not allow the background to be painted
             // Um flimmern zu vermeiden!
         }
+
+        //protected override void OnParentChanged(System.EventArgs e) {
+        //    base.OnParentChanged(e);
+
+        //}
 
         protected override void OnSelectedIndexChanged(System.EventArgs e) {
             if (_IndexChanged) { return; }
             _IndexChanged = true;
             base.OnSelectedIndexChanged(e);
             _IndexChanged = false;
+        }
+
+        protected override void OnVisibleChanged(System.EventArgs e) {
+            try {
+                base.OnVisibleChanged(e);
+                if (Develop.IsHostRunning()) { return; }
+
+                if (TabDefaultOrder != null && TabDefaultOrder.GetUpperBound(0) > 0) {
+                    var neworder = new List<TabPage>();
+
+                    foreach (var thisTabName in TabDefaultOrder) {
+                        foreach (var thisTab in this.TabPages) {
+                            if (thisTab is TabPage tb) {
+                                if (tb.Text.ToLower() == thisTabName.ToLower()) {
+                                    neworder.AddIfNotExists(tb);
+                                }
+                            }
+                        }
+                    }
+
+                    this.TabPages.Clear();
+                    foreach (var thisTP in neworder) {
+                        this.TabPages.Add(thisTP);
+                    }
+                }
+
+                if (TabDefault != null && TabPages.Contains(TabDefault)) { SelectedTab = TabDefault; }
+            } catch { }
         }
 
         protected override void ScaleControl(SizeF factor, System.Windows.Forms.BoundsSpecified specified) {
@@ -184,7 +209,7 @@ namespace BlueControls.Controls {
                 var tmpState = enStates.Standard;
                 if (!TabPages[id].Enabled) { tmpState = enStates.Standard_Disabled; }
                 if (id == SelectedIndex) { tmpState |= enStates.Checked; }
-                if (TabPages[id].Enabled && _HotTab == TabPages[id]) { tmpState |= enStates.Standard_MouseOver; }
+                if (TabPages[id].Enabled && HotTab == TabPages[id]) { tmpState |= enStates.Standard_MouseOver; }
                 var r = GetTabRect(id);
                 r.Y -= 2;
                 r.X++;
