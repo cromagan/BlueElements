@@ -150,7 +150,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
             ColumnItem newc = _TableView.Database.Column.Add();
             if (Vorlage != null) {
-                newc.Clone(Vorlage);
+                newc.CloneFrom(Vorlage);
                 if (mitDaten) {
                     foreach (var thisR in _TableView.Database.Row) {
                         thisR.CellSet(newc, thisR.CellGetString(Vorlage));

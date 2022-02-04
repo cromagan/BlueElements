@@ -373,7 +373,7 @@ namespace BlueControls.Controls {
 
         public static Size Cell_ContentSize(Table table, ColumnItem Column, RowItem Row, BlueFont CellFont, int Pix16) {
             if (Column.Format == enDataFormat.LinkedCell) {
-                (var lcolumn, var lrow) = CellCollection.LinkedCellData(Column, Row, false, false);
+                (var lcolumn, var lrow, _) = CellCollection.LinkedCellData(Column, Row, false, false);
                 return lcolumn != null && lrow != null ? Cell_ContentSize(table, lcolumn, lrow, CellFont, Pix16) : new Size(Pix16, Pix16);
             }
             var _ContentSize = Column.Database.Cell.GetSizeOfCellContent(Column, Row);
@@ -433,7 +433,7 @@ namespace BlueControls.Controls {
             if (column == null) { return; }
             if (row == null) { return; }
             if (column.Format == enDataFormat.LinkedCell) {
-                (var lcolumn, var lrow) = CellCollection.LinkedCellData(column, row, true, false);
+                (var lcolumn, var lrow, _) = CellCollection.LinkedCellData(column, row, true, false);
                 if (lcolumn != null && lrow != null) { DoUndo(lcolumn, lrow); }
                 return;
             }
@@ -531,7 +531,7 @@ namespace BlueControls.Controls {
                 var ContentHolderCellColumn = column;
                 var ContenHolderCellRow = row?.Row;
                 if (column.Format == enDataFormat.LinkedCell) {
-                    (ContentHolderCellColumn, ContenHolderCellRow) = CellCollection.LinkedCellData(column, row?.Row, false, false);
+                    (ContentHolderCellColumn, ContenHolderCellRow, _) = CellCollection.LinkedCellData(column, row?.Row, false, false);
                 }
                 var _Ist1 = string.Empty;
                 var _Ist2 = string.Empty;
@@ -1401,8 +1401,14 @@ namespace BlueControls.Controls {
                                     case enDataFormat.LinkedCell:
 
                                     case enDataFormat.Values_für_LinkedCellDropdown:
-                                        (var lcolumn, var lrow) = CellCollection.LinkedCellData(_MouseOverColumn, _MouseOverRow.Row, false, false);
+                                        (var lcolumn, var lrow, var info) = CellCollection.LinkedCellData(_MouseOverColumn, _MouseOverRow.Row, false, false);
                                         if (lcolumn != null) { _MouseOverText = lcolumn.QuickInfoText(_MouseOverColumn.ReadableText() + " bei " + lcolumn.ReadableText() + ":"); }
+
+                                        if (!string.IsNullOrEmpty(info) && _MouseOverColumn.Database.IsAdministrator()) {
+                                            if (string.IsNullOrEmpty(_MouseOverText)) { _MouseOverText += "\r\n"; }
+                                            _MouseOverText = "Verlinkungs-Status: " + info;
+                                        }
+
                                         break;
 
                                     default:
@@ -1594,9 +1600,9 @@ namespace BlueControls.Controls {
             }
 
             if (column.Format == enDataFormat.LinkedCell) {
-                (var lcolumn, var lrow) = CellCollection.LinkedCellData(column, row, true, false);
+                (var lcolumn, var lrow, var info) = CellCollection.LinkedCellData(column, row, true, false);
                 if (lcolumn == null || lrow == null) {
-                    table.NotEditableInfo("Zelle in verlinkter Datenbank nicht vorhanden.");
+                    table.NotEditableInfo("Zelle in verlinkter Datenbank nicht vorhanden:\r\n" + info);
                     return;
                 }
                 UserEdited(table, newValue, lcolumn, lrow, chapter, formatWarnung);
@@ -1989,9 +1995,10 @@ namespace BlueControls.Controls {
             }
 
             if (cellInThisDatabaseColumn.Format == enDataFormat.LinkedCell) {
-                (ContentHolderCellColumn, ContentHolderCellRow) = CellCollection.LinkedCellData(cellInThisDatabaseColumn, cellInThisDatabaseRow?.Row, true, true);
+                string info;
+                (ContentHolderCellColumn, ContentHolderCellRow, info) = CellCollection.LinkedCellData(cellInThisDatabaseColumn, cellInThisDatabaseRow?.Row, true, true);
                 if (ContentHolderCellColumn == null || ContentHolderCellRow == null) {
-                    NotEditableInfo("In verknüpfter Datenbank nicht vorhanden");
+                    NotEditableInfo("In verknüpfter Datenbank nicht vorhanden:\r\n" + info);
                     return;
                 }
             } else {
@@ -2458,10 +2465,14 @@ namespace BlueControls.Controls {
             if (cellInThisDatabaseRow == null) { return; }
 
             if (cellInThisDatabaseColumn.Column.Format == enDataFormat.LinkedCell) {
-                (var lcolumn, var lrow) = CellCollection.LinkedCellData(cellInThisDatabaseColumn.Column, cellInThisDatabaseRow.Row, false, false);
+                (var lcolumn, var lrow, _) = CellCollection.LinkedCellData(cellInThisDatabaseColumn.Column, cellInThisDatabaseRow.Row, false, false);
 
                 if (lcolumn != null && lrow != null) {
                     Draw_CellTransparentDirect(gr, cellInThisDatabaseColumn, cellInThisDatabaseRow, cellrectangle, lcolumn, lrow, font, state);
+                } else {
+                    if (cellInThisDatabaseRow.Row.Database.IsAdministrator()) {
+                        gr.DrawImage(QuickImage.Get("Warnung|10||||||120||60").BMP, cellrectangle.Left + 3, cellrectangle.Top + 1);
+                    }
                 }
                 return;
             }

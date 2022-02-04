@@ -104,7 +104,7 @@ namespace BlueControls.Forms {
             this.Pad.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Pad.Location = new System.Drawing.Point(0, 110);
             this.Pad.Name = "Pad";
-            this.Pad.Size = new System.Drawing.Size(1334, 571);
+            this.Pad.Size = new System.Drawing.Size(884, 251);
             this.Pad.TabIndex = 0;
             this.Pad.GotNewItemCollection += new System.EventHandler(this.Pad_GotNewItemCollection);
             this.Pad.PreviewModeChanged += new System.EventHandler(this.Pad_PreviewModChanged);
@@ -120,12 +120,9 @@ namespace BlueControls.Forms {
             this.Ribbon.Location = new System.Drawing.Point(0, 0);
             this.Ribbon.Name = "Ribbon";
             this.Ribbon.SelectedIndex = 0;
-            this.Ribbon.Size = new System.Drawing.Size(1334, 110);
+            this.Ribbon.Size = new System.Drawing.Size(884, 110);
             this.Ribbon.TabDefault = this.tabBearbeiten;
-            this.Ribbon.TabDefaultOrder = new string[] {
-        "Bearbeiten",
-        "Einstellungen",
-        "Export"};
+            this.Ribbon.TabDefaultOrder = new string[0];
             this.Ribbon.TabIndex = 2;
             // 
             // tabBearbeiten
@@ -135,7 +132,7 @@ namespace BlueControls.Forms {
             this.tabBearbeiten.Controls.Add(this.grpWerkzeuge);
             this.tabBearbeiten.Location = new System.Drawing.Point(4, 25);
             this.tabBearbeiten.Name = "tabBearbeiten";
-            this.tabBearbeiten.Size = new System.Drawing.Size(1326, 81);
+            this.tabBearbeiten.Size = new System.Drawing.Size(876, 81);
             this.tabBearbeiten.TabIndex = 0;
             this.tabBearbeiten.Text = "Bearbeiten";
             // 
@@ -284,7 +281,7 @@ namespace BlueControls.Forms {
             this.tabEinstellungen.Controls.Add(this.grpDesign);
             this.tabEinstellungen.Location = new System.Drawing.Point(4, 25);
             this.tabEinstellungen.Name = "tabEinstellungen";
-            this.tabEinstellungen.Size = new System.Drawing.Size(1326, 81);
+            this.tabEinstellungen.Size = new System.Drawing.Size(876, 81);
             this.tabEinstellungen.TabIndex = 2;
             this.tabEinstellungen.Text = "Einstellungen";
             // 
@@ -477,7 +474,7 @@ namespace BlueControls.Forms {
             this.tabExport.Controls.Add(this.grpDrucken);
             this.tabExport.Location = new System.Drawing.Point(4, 25);
             this.tabExport.Name = "tabExport";
-            this.tabExport.Size = new System.Drawing.Size(1326, 81);
+            this.tabExport.Size = new System.Drawing.Size(876, 81);
             this.tabExport.TabIndex = 1;
             this.tabExport.Text = "Export";
             // 
@@ -545,7 +542,7 @@ namespace BlueControls.Forms {
             // 
             // PadEditor
             // 
-            this.ClientSize = new System.Drawing.Size(1334, 681);
+            this.ClientSize = new System.Drawing.Size(884, 361);
             this.Controls.Add(this.Pad);
             this.Controls.Add(this.Ribbon);
             this.Name = "PadEditor";
@@ -595,7 +592,7 @@ namespace BlueControls.Forms {
         internal Caption capSchriftgröße;
         protected internal Button btnPageSetup;
         protected internal Button btnArbeitsbreichSetup;
-        private System.Windows.Forms.TabPage tabEinstellungen;
+        protected System.Windows.Forms.TabPage tabEinstellungen;
         private Button btnAddUnterStufe;
         private Button btnAddSymbol;
         private Button btnAddPhsyik;

@@ -984,7 +984,7 @@ namespace BlueDatabase {
         /// Nur der Name bleibt unverändert.
         /// </summary>
         /// <param name="source"></param>
-        public void Clone(ColumnItem source) {
+        public void CloneFrom(ColumnItem source) {
             Caption = source.Caption;
             CaptionBitmap = source.CaptionBitmap;
             Format = source.Format;

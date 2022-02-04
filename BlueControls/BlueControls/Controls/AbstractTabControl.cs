@@ -154,12 +154,17 @@ namespace BlueControls.Controls {
         protected override void OnVisibleChanged(System.EventArgs e) {
             try {
                 base.OnVisibleChanged(e);
-                if (Develop.IsHostRunning()) { return; }
+                if (DesignMode) { return; }
+                if (!Visible) { return; }
 
-                if (TabDefaultOrder != null && TabDefaultOrder.GetUpperBound(0) > 0) {
+                var tmp = TabDefaultOrder;
+                if (tmp != null && tmp.GetUpperBound(0) == -1) { tmp = null; }
+                if (tmp != null && tmp.GetUpperBound(0) == 0 && string.IsNullOrEmpty(tmp[0])) { tmp = null; }
+
+                if (tmp != null) {
                     var neworder = new List<TabPage>();
 
-                    foreach (var thisTabName in TabDefaultOrder) {
+                    foreach (var thisTabName in tmp) {
                         foreach (var thisTab in this.TabPages) {
                             if (thisTab is TabPage tb) {
                                 if (tb.Text.ToLower() == thisTabName.ToLower()) {

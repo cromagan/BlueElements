@@ -61,9 +61,32 @@ namespace BlueBasics {
             return false;
         }
 
+        public static void CloneFrom<T>(this List<T> list1, List<T> list2) where T : IComparable {
+            if (!list1.IsDifferentTo(list2)) { return; }
+
+            //if (list2 == null) { list1 = null; return; }
+
+            if (list1 == null || list2 == null) {
+                Develop.DebugPrint("Null-Listen nicht unterstützt.");
+                return;
+            }
+
+            for (var z = 0; z < list2.Count; z++) {
+                if (z >= list1.Count) { list1.Add(list2[z]); }
+
+                if (list2[z] != null && !list1[z].Equals(list2[z])) { list1[z] = list2[z]; }
+
+                if (list1[z] != null && list2[z] == null) { list1[z] = default; }
+            }
+
+            while (list1.Count > list2.Count) {
+                list1.RemoveAt(list2.Count);
+            }
+        }
+
         public static bool IsDifferentTo<T>(this List<T> list1, List<T> list2) =>
-                    // https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.sequenceequal?redirectedfrom=MSDN&view=netcore-3.1#System_Linq_Enumerable_SequenceEqual__1_System_Collections_Generic_IEnumerable___0__System_Collections_Generic_IEnumerable___0__
-                    list1 != list2 && (list1 is null || list2 is null || !list1.SequenceEqual(list2));
+                            // https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.sequenceequal?redirectedfrom=MSDN&view=netcore-3.1#System_Linq_Enumerable_SequenceEqual__1_System_Collections_Generic_IEnumerable___0__System_Collections_Generic_IEnumerable___0__
+                            list1 != list2 && (list1 is null || list2 is null || !list1.SequenceEqual(list2));
 
         public static void Load(this List<string> l, string filename, System.Text.Encoding code) {
             var t = File.ReadAllText(filename, code);

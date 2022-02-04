@@ -486,7 +486,7 @@ namespace BlueControls.Controls {
                 //}
 
                 //if(gbColumn == null && skriptgesteuert) {
-                (gbColumn, _) = CellCollection.LinkedCellData(column, row, true, false);
+                (gbColumn, _, _) = CellCollection.LinkedCellData(column, row, true, false);
                 //}
 
                 //if (gbColumn == null) {

@@ -47,7 +47,7 @@ namespace BlueScript {
             if (variable == null) { return new strDoItFeedback("Variable '" + variableName + "' nicht gefunden"); }
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
-            if (variable.Type != enVariableDataType.NotDefinedYet && attvar.Attributes[0].Type != variable.Type) { return new strDoItFeedback("Variable '" + variableName + "' ist nicht der erwartete Typ: " + variable.Type.ToString()); }
+            if (variable.Type != enVariableDataType.NotDefinedYet && attvar.Attributes[0].Type != variable.Type) { return new strDoItFeedback("Variable '" + variableName + "' ist nicht der erwartete Typ " + attvar.Attributes[0].Type.ToString() + ", sondern " + variable.Type.ToString()); }
 
             if (variable.Readonly) { return strDoItFeedback.Schreibgschützt(); }
 

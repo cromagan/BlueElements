@@ -42,18 +42,14 @@ namespace BlueControls.Forms {
             this.grpDrucken.SuspendLayout();
             this.grpDesign.SuspendLayout();
             this.grpAssistent.SuspendLayout();
+            this.tabEinstellungen.SuspendLayout();
             this.tabDatei.SuspendLayout();
             this.grpDateiSystem.SuspendLayout();
             this.SuspendLayout();
             // 
-            // Pad
-            // 
-            this.Pad.Size = new System.Drawing.Size(800, 340);
-            // 
             // Ribbon
             // 
             this.Ribbon.Controls.Add(this.tabDatei);
-            this.Ribbon.Size = new System.Drawing.Size(800, 110);
             this.Ribbon.TabDefault = this.tabDatei;
             this.Ribbon.TabDefaultOrder = new string[] {
         "Datei",
@@ -62,12 +58,17 @@ namespace BlueControls.Forms {
         "Export"};
             this.Ribbon.TabIndex = 3;
             this.Ribbon.Controls.SetChildIndex(this.tabExport, 0);
+            this.Ribbon.Controls.SetChildIndex(this.tabEinstellungen, 0);
             this.Ribbon.Controls.SetChildIndex(this.tabBearbeiten, 0);
             this.Ribbon.Controls.SetChildIndex(this.tabDatei, 0);
             // 
             // tabBearbeiten
             // 
-            this.tabBearbeiten.Size = new System.Drawing.Size(792, 81);
+            this.tabBearbeiten.Size = new System.Drawing.Size(876, 81);
+            // 
+            // tabExport
+            // 
+            this.tabExport.Size = new System.Drawing.Size(876, 81);
             // 
             // tabDatei
             // 
@@ -76,7 +77,7 @@ namespace BlueControls.Forms {
             this.tabDatei.Location = new System.Drawing.Point(4, 25);
             this.tabDatei.Name = "tabDatei";
             this.tabDatei.Padding = new System.Windows.Forms.Padding(3);
-            this.tabDatei.Size = new System.Drawing.Size(1326, 81);
+            this.tabDatei.Size = new System.Drawing.Size(876, 81);
             this.tabDatei.TabIndex = 3;
             this.tabDatei.Text = "Datei";
             // 
@@ -185,7 +186,7 @@ namespace BlueControls.Forms {
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(884, 361);
             this.Name = "PadEditorWithFileAccess";
             this.Text = "PadEditorWithFileAccess";
             this.Ribbon.ResumeLayout(false);
@@ -194,6 +195,7 @@ namespace BlueControls.Forms {
             this.grpDrucken.ResumeLayout(false);
             this.grpDesign.ResumeLayout(false);
             this.grpAssistent.ResumeLayout(false);
+            this.tabEinstellungen.ResumeLayout(false);
             this.tabDatei.ResumeLayout(false);
             this.grpDateiSystem.ResumeLayout(false);
             this.ResumeLayout(false);

@@ -628,7 +628,7 @@ namespace BlueDatabase {
                             var LCColumn = ThisColumn;
                             var LCrow = ThisRow.Row;
                             if (ThisColumn.Format == enDataFormat.LinkedCell) {
-                                (LCColumn, LCrow) = CellCollection.LinkedCellData(ThisColumn, ThisRow.Row, false, false);
+                                (LCColumn, LCrow, _) = CellCollection.LinkedCellData(ThisColumn, ThisRow.Row, false, false);
                             }
                             if (LCrow != null && LCColumn != null) {
                                 da.CellAdd(LCrow.CellGetValuesReadable(LCColumn, enShortenStyle.HTML).JoinWith("<br>"), ThisColumn.BackColor);

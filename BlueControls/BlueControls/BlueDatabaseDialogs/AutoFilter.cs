@@ -85,7 +85,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             ColumnItem lColumn = null;
             if (Column.Format == enDataFormat.LinkedCell) {
-                (lColumn, _) = CellCollection.LinkedCellData(Column, null, false, false);
+                (lColumn, _, _) = CellCollection.LinkedCellData(Column, null, false, false);
             }
             if (lColumn == null) { lColumn = Column; }
 
