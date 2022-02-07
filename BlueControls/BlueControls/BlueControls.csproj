@@ -251,6 +251,12 @@
     <Compile Include="Forms-Basics\FloatingForm.Designer.cs">
       <DependentUpon>FloatingForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms-Special\PadEditorReadOnly.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms-Special\PadEditorReadOnly.designer.cs">
+      <DependentUpon>PadEditorReadOnly.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms-Special\PadEditorWithFileAccess.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -387,11 +393,11 @@
     <Compile Include="BlueDatabaseDialogs\Import.designer.cs">
       <DependentUpon>Import.cs</DependentUpon>
     </Compile>
-    <Compile Include="BlueDatabaseDialogs\LayoutDesigner.cs">
+    <Compile Include="BlueDatabaseDialogs\LayoutPadEditor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="BlueDatabaseDialogs\LayoutDesigner.Designer.cs">
-      <DependentUpon>LayoutDesigner.cs</DependentUpon>
+    <Compile Include="BlueDatabaseDialogs\LayoutPadEditor.Designer.cs">
+      <DependentUpon>LayoutPadEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="BlueDatabaseDialogs\SearchAndReplace.cs">
       <SubType>Form</SubType>
@@ -632,8 +638,8 @@
       <DependentUpon>Import.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="BlueDatabaseDialogs\LayoutDesigner.resx">
-      <DependentUpon>LayoutDesigner.cs</DependentUpon>
+    <EmbeddedResource Include="BlueDatabaseDialogs\LayoutPadEditor.resx">
+      <DependentUpon>LayoutPadEditor.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="BlueDatabaseDialogs\SearchAndReplace.resx">
@@ -737,6 +743,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms-Common\PageSetupDialog.resx">
       <DependentUpon>PageSetupDialog.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms-Special\PadEditorReadOnly.resx">
+      <DependentUpon>PadEditorReadOnly.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms-Special\PadEditor.resx">

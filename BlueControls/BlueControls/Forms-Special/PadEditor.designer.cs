@@ -15,12 +15,11 @@ namespace BlueControls.Forms {
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
         [DebuggerStepThrough()]
         private void InitializeComponent() {
-            this.btnZoomOut = new BlueControls.Controls.Button();
-            this.btnZoomIn = new BlueControls.Controls.Button();
-            this.btnZoomFit = new BlueControls.Controls.Button();
-            this.Pad = new BlueControls.Controls.CreativePad();
-            this.Ribbon = new BlueControls.Controls.RibbonBar();
-            this.tabBearbeiten = new System.Windows.Forms.TabPage();
+            this.capRasterFangen = new BlueControls.Controls.Caption();
+            this.capRasterAnzeige = new BlueControls.Controls.Caption();
+            this.txbRasterFangen = new BlueControls.Controls.TextBox();
+            this.txbRasterAnzeige = new BlueControls.Controls.TextBox();
+            this.ckbRaster = new BlueControls.Controls.Button();
             this.grpKomponenteHinzufügen = new BlueControls.Controls.GroupBox();
             this.btnAddPhsyik = new BlueControls.Controls.Button();
             this.btnAddSymbol = new BlueControls.Controls.Button();
@@ -29,112 +28,119 @@ namespace BlueControls.Forms {
             this.btnAddImage = new BlueControls.Controls.Button();
             this.btnAddDimension = new BlueControls.Controls.Button();
             this.btnAddLine = new BlueControls.Controls.Button();
-            this.grpWerkzeuge = new BlueControls.Controls.GroupBox();
-            this.btnZoom11 = new BlueControls.Controls.Button();
-            this.btnAuswahl = new BlueControls.Controls.Button();
-            this.tabEinstellungen = new System.Windows.Forms.TabPage();
-            this.grpAssistent = new BlueControls.Controls.GroupBox();
-            this.capRasterFangen = new BlueControls.Controls.Caption();
-            this.capRasterAnzeige = new BlueControls.Controls.Caption();
-            this.txbRasterFangen = new BlueControls.Controls.TextBox();
-            this.txbRasterAnzeige = new BlueControls.Controls.TextBox();
-            this.ckbRaster = new BlueControls.Controls.Button();
+            this.tabHintergrund = new System.Windows.Forms.TabPage();
             this.grpDesign = new BlueControls.Controls.GroupBox();
             this.btnKeinHintergrund = new BlueControls.Controls.Button();
             this.btnHintergrundFarbe = new BlueControls.Controls.Button();
-            this.btnVorschauModus = new BlueControls.Controls.Button();
             this.btnArbeitsbreichSetup = new BlueControls.Controls.Button();
             this.cbxSchriftGröße = new BlueControls.Controls.ComboBox();
             this.capSchriftgröße = new BlueControls.Controls.Caption();
             this.PadDesign = new BlueControls.Controls.ComboBox();
             this.capDesign = new BlueControls.Controls.Caption();
-            this.tabExport = new System.Windows.Forms.TabPage();
-            this.grpDrucken = new BlueControls.Controls.GroupBox();
-            this.btnVorschau = new BlueControls.Controls.Button();
-            this.btnPageSetup = new BlueControls.Controls.Button();
-            this.btnAlsBildSpeichern = new BlueControls.Controls.Button();
-            this.btnDruckerDialog = new BlueControls.Controls.Button();
             this.ColorDia = new System.Windows.Forms.ColorDialog();
+            this.tabRightSide = new BlueControls.Controls.TabControl();
+            this.tabElementEigenschaften = new System.Windows.Forms.TabPage();
             this.Ribbon.SuspendLayout();
-            this.tabBearbeiten.SuspendLayout();
-            this.grpKomponenteHinzufügen.SuspendLayout();
-            this.grpWerkzeuge.SuspendLayout();
-            this.tabEinstellungen.SuspendLayout();
+            this.tabStart.SuspendLayout();
             this.grpAssistent.SuspendLayout();
+            this.grpKomponenteHinzufügen.SuspendLayout();
+            this.tabHintergrund.SuspendLayout();
             this.grpDesign.SuspendLayout();
-            this.tabExport.SuspendLayout();
-            this.grpDrucken.SuspendLayout();
+            this.tabRightSide.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // btnZoomOut
-            // 
-            this.btnZoomOut.ButtonStyle = ((BlueControls.Enums.enButtonStyle)(((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Button_Big) 
-            | BlueControls.Enums.enButtonStyle.Borderless)));
-            this.btnZoomOut.ImageCode = "LupeMinus";
-            this.btnZoomOut.Location = new System.Drawing.Point(176, 2);
-            this.btnZoomOut.Name = "btnZoomOut";
-            this.btnZoomOut.Size = new System.Drawing.Size(56, 66);
-            this.btnZoomOut.TabIndex = 2;
-            this.btnZoomOut.Text = "kleiner";
-            // 
-            // btnZoomIn
-            // 
-            this.btnZoomIn.ButtonStyle = ((BlueControls.Enums.enButtonStyle)(((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Button_Big) 
-            | BlueControls.Enums.enButtonStyle.Borderless)));
-            this.btnZoomIn.ImageCode = "LupePlus";
-            this.btnZoomIn.Location = new System.Drawing.Point(232, 2);
-            this.btnZoomIn.Name = "btnZoomIn";
-            this.btnZoomIn.Size = new System.Drawing.Size(56, 66);
-            this.btnZoomIn.TabIndex = 1;
-            this.btnZoomIn.Text = "größer";
-            // 
-            // btnZoomFit
-            // 
-            this.btnZoomFit.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
-            this.btnZoomFit.ImageCode = "ZoomFit";
-            this.btnZoomFit.Location = new System.Drawing.Point(8, 2);
-            this.btnZoomFit.Name = "btnZoomFit";
-            this.btnZoomFit.Size = new System.Drawing.Size(48, 66);
-            this.btnZoomFit.TabIndex = 0;
-            this.btnZoomFit.Text = "ein-passen";
-            this.btnZoomFit.Click += new System.EventHandler(this.btnZoomFit_Click);
             // 
             // Pad
             // 
-            this.Pad.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.Pad.Location = new System.Drawing.Point(0, 110);
-            this.Pad.Name = "Pad";
-            this.Pad.Size = new System.Drawing.Size(884, 251);
-            this.Pad.TabIndex = 0;
+            this.Pad.Size = new System.Drawing.Size(512, 251);
+            this.Pad.ClickedItemChanged += new System.EventHandler(this.Pad_ClickedItemChanged);
             this.Pad.GotNewItemCollection += new System.EventHandler(this.Pad_GotNewItemCollection);
-            this.Pad.PreviewModeChanged += new System.EventHandler(this.Pad_PreviewModChanged);
-            this.Pad.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Pad_MouseUp);
             // 
             // Ribbon
             // 
-            this.Ribbon.Controls.Add(this.tabBearbeiten);
-            this.Ribbon.Controls.Add(this.tabEinstellungen);
-            this.Ribbon.Controls.Add(this.tabExport);
-            this.Ribbon.Dock = System.Windows.Forms.DockStyle.Top;
-            this.Ribbon.HotTrack = true;
-            this.Ribbon.Location = new System.Drawing.Point(0, 0);
-            this.Ribbon.Name = "Ribbon";
-            this.Ribbon.SelectedIndex = 0;
-            this.Ribbon.Size = new System.Drawing.Size(884, 110);
-            this.Ribbon.TabDefault = this.tabBearbeiten;
-            this.Ribbon.TabDefaultOrder = new string[0];
-            this.Ribbon.TabIndex = 2;
+            this.Ribbon.Controls.Add(this.tabHintergrund);
+            this.Ribbon.TabDefaultOrder = new string[] {
+        "Start",
+        "Hintergrund",
+        "Export"};
+            this.Ribbon.Controls.SetChildIndex(this.tabHintergrund, 0);
+            this.Ribbon.Controls.SetChildIndex(this.tabExport, 0);
+            this.Ribbon.Controls.SetChildIndex(this.tabStart, 0);
             // 
-            // tabBearbeiten
+            // tabStart
             // 
-            this.tabBearbeiten.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.tabBearbeiten.Controls.Add(this.grpKomponenteHinzufügen);
-            this.tabBearbeiten.Controls.Add(this.grpWerkzeuge);
-            this.tabBearbeiten.Location = new System.Drawing.Point(4, 25);
-            this.tabBearbeiten.Name = "tabBearbeiten";
-            this.tabBearbeiten.Size = new System.Drawing.Size(876, 81);
-            this.tabBearbeiten.TabIndex = 0;
-            this.tabBearbeiten.Text = "Bearbeiten";
+            this.tabStart.Controls.Add(this.grpKomponenteHinzufügen);
+            this.tabStart.Controls.SetChildIndex(this.grpAssistent, 0);
+            this.tabStart.Controls.SetChildIndex(this.grpKomponenteHinzufügen, 0);
+            // 
+            // grpAssistent
+            // 
+            this.grpAssistent.Controls.Add(this.capRasterFangen);
+            this.grpAssistent.Controls.Add(this.capRasterAnzeige);
+            this.grpAssistent.Controls.Add(this.txbRasterFangen);
+            this.grpAssistent.Controls.Add(this.txbRasterAnzeige);
+            this.grpAssistent.Controls.Add(this.ckbRaster);
+            this.grpAssistent.Size = new System.Drawing.Size(200, 81);
+            this.grpAssistent.Controls.SetChildIndex(this.ckbRaster, 0);
+            this.grpAssistent.Controls.SetChildIndex(this.txbRasterAnzeige, 0);
+            this.grpAssistent.Controls.SetChildIndex(this.txbRasterFangen, 0);
+            this.grpAssistent.Controls.SetChildIndex(this.capRasterAnzeige, 0);
+            this.grpAssistent.Controls.SetChildIndex(this.capRasterFangen, 0);
+            // 
+            // capRasterFangen
+            // 
+            this.capRasterFangen.CausesValidation = false;
+            this.capRasterFangen.Location = new System.Drawing.Point(72, 46);
+            this.capRasterFangen.Name = "capRasterFangen";
+            this.capRasterFangen.Size = new System.Drawing.Size(56, 22);
+            this.capRasterFangen.Text = "Fangen:";
+            // 
+            // capRasterAnzeige
+            // 
+            this.capRasterAnzeige.CausesValidation = false;
+            this.capRasterAnzeige.Location = new System.Drawing.Point(72, 24);
+            this.capRasterAnzeige.Name = "capRasterAnzeige";
+            this.capRasterAnzeige.Size = new System.Drawing.Size(56, 22);
+            this.capRasterAnzeige.Text = "Anzeige:";
+            // 
+            // txbRasterFangen
+            // 
+            this.txbRasterFangen.AdditionalCheck = BlueDatabase.Enums.enAdditionalCheck.Float;
+            this.txbRasterFangen.AllowedChars = "0123456789,";
+            this.txbRasterFangen.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbRasterFangen.Location = new System.Drawing.Point(128, 46);
+            this.txbRasterFangen.Name = "txbRasterFangen";
+            this.txbRasterFangen.Regex = "(^-?([1-9]\\d*)|^0)([.]\\d*[1-9])?$";
+            this.txbRasterFangen.Size = new System.Drawing.Size(64, 22);
+            this.txbRasterFangen.Suffix = "mm";
+            this.txbRasterFangen.TabIndex = 6;
+            this.txbRasterFangen.Text = "10";
+            this.txbRasterFangen.TextChanged += new System.EventHandler(this.txbRasterFangen_TextChanged);
+            // 
+            // txbRasterAnzeige
+            // 
+            this.txbRasterAnzeige.AdditionalCheck = BlueDatabase.Enums.enAdditionalCheck.Float;
+            this.txbRasterAnzeige.AllowedChars = "0123456789,";
+            this.txbRasterAnzeige.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbRasterAnzeige.Location = new System.Drawing.Point(128, 24);
+            this.txbRasterAnzeige.Name = "txbRasterAnzeige";
+            this.txbRasterAnzeige.Regex = "(^-?([1-9]\\d*)|^0)([.]\\d*[1-9])?$";
+            this.txbRasterAnzeige.Size = new System.Drawing.Size(64, 22);
+            this.txbRasterAnzeige.Suffix = "mm";
+            this.txbRasterAnzeige.TabIndex = 5;
+            this.txbRasterAnzeige.Text = "10";
+            this.txbRasterAnzeige.TextChanged += new System.EventHandler(this.txbRasterAnzeige_TextChanged);
+            // 
+            // ckbRaster
+            // 
+            this.ckbRaster.ButtonStyle = ((BlueControls.Enums.enButtonStyle)(((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Button_Big) 
+            | BlueControls.Enums.enButtonStyle.Borderless)));
+            this.ckbRaster.ImageCode = "Raster|18";
+            this.ckbRaster.Location = new System.Drawing.Point(72, 2);
+            this.ckbRaster.Name = "ckbRaster";
+            this.ckbRaster.Size = new System.Drawing.Size(120, 22);
+            this.ckbRaster.TabIndex = 4;
+            this.ckbRaster.Text = "Raster";
+            this.ckbRaster.CheckedChanged += new System.EventHandler(this.ckbRaster_CheckedChanged);
             // 
             // grpKomponenteHinzufügen
             // 
@@ -149,9 +155,9 @@ namespace BlueControls.Forms {
             this.grpKomponenteHinzufügen.Controls.Add(this.btnAddLine);
             this.grpKomponenteHinzufügen.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpKomponenteHinzufügen.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
-            this.grpKomponenteHinzufügen.Location = new System.Drawing.Point(296, 0);
+            this.grpKomponenteHinzufügen.Location = new System.Drawing.Point(496, 0);
             this.grpKomponenteHinzufügen.Name = "grpKomponenteHinzufügen";
-            this.grpKomponenteHinzufügen.Size = new System.Drawing.Size(264, 81);
+            this.grpKomponenteHinzufügen.Size = new System.Drawing.Size(272, 81);
             this.grpKomponenteHinzufügen.TabIndex = 0;
             this.grpKomponenteHinzufügen.TabStop = false;
             this.grpKomponenteHinzufügen.Text = "Komponente hinzufügen";
@@ -160,7 +166,7 @@ namespace BlueControls.Forms {
             // 
             this.btnAddPhsyik.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnAddPhsyik.ImageCode = "Formel|16";
-            this.btnAddPhsyik.Location = new System.Drawing.Point(168, 24);
+            this.btnAddPhsyik.Location = new System.Drawing.Point(176, 24);
             this.btnAddPhsyik.Name = "btnAddPhsyik";
             this.btnAddPhsyik.Size = new System.Drawing.Size(88, 22);
             this.btnAddPhsyik.TabIndex = 10;
@@ -182,7 +188,7 @@ namespace BlueControls.Forms {
             // 
             this.btnAddUnterStufe.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
             this.btnAddUnterStufe.ImageCode = "Datei|16";
-            this.btnAddUnterStufe.Location = new System.Drawing.Point(168, 2);
+            this.btnAddUnterStufe.Location = new System.Drawing.Point(176, 2);
             this.btnAddUnterStufe.Name = "btnAddUnterStufe";
             this.btnAddUnterStufe.Size = new System.Drawing.Size(88, 22);
             this.btnAddUnterStufe.TabIndex = 8;
@@ -233,129 +239,15 @@ namespace BlueControls.Forms {
             this.btnAddLine.Text = "Linie";
             this.btnAddLine.Click += new System.EventHandler(this.btnAddLine_Click);
             // 
-            // grpWerkzeuge
+            // tabHintergrund
             // 
-            this.grpWerkzeuge.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.grpWerkzeuge.CausesValidation = false;
-            this.grpWerkzeuge.Controls.Add(this.btnZoom11);
-            this.grpWerkzeuge.Controls.Add(this.btnAuswahl);
-            this.grpWerkzeuge.Controls.Add(this.btnZoomFit);
-            this.grpWerkzeuge.Controls.Add(this.btnZoomOut);
-            this.grpWerkzeuge.Controls.Add(this.btnZoomIn);
-            this.grpWerkzeuge.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpWerkzeuge.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
-            this.grpWerkzeuge.Location = new System.Drawing.Point(0, 0);
-            this.grpWerkzeuge.Name = "grpWerkzeuge";
-            this.grpWerkzeuge.Size = new System.Drawing.Size(296, 81);
-            this.grpWerkzeuge.TabIndex = 1;
-            this.grpWerkzeuge.TabStop = false;
-            this.grpWerkzeuge.Text = "Werkzeuge";
-            // 
-            // btnZoom11
-            // 
-            this.btnZoom11.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
-            this.btnZoom11.ImageCode = "Bild||||||149|10";
-            this.btnZoom11.Location = new System.Drawing.Point(64, 2);
-            this.btnZoom11.Name = "btnZoom11";
-            this.btnZoom11.Size = new System.Drawing.Size(48, 66);
-            this.btnZoom11.TabIndex = 4;
-            this.btnZoom11.Text = "1:1";
-            this.btnZoom11.Click += new System.EventHandler(this.btnZoom11_Click);
-            // 
-            // btnAuswahl
-            // 
-            this.btnAuswahl.ButtonStyle = ((BlueControls.Enums.enButtonStyle)(((BlueControls.Enums.enButtonStyle.Optionbox | BlueControls.Enums.enButtonStyle.Button_Big) 
-            | BlueControls.Enums.enButtonStyle.Borderless)));
-            this.btnAuswahl.Checked = true;
-            this.btnAuswahl.ImageCode = "Mauspfeil";
-            this.btnAuswahl.Location = new System.Drawing.Point(120, 2);
-            this.btnAuswahl.Name = "btnAuswahl";
-            this.btnAuswahl.Size = new System.Drawing.Size(56, 66);
-            this.btnAuswahl.TabIndex = 3;
-            this.btnAuswahl.Text = "wählen";
-            // 
-            // tabEinstellungen
-            // 
-            this.tabEinstellungen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.tabEinstellungen.Controls.Add(this.grpAssistent);
-            this.tabEinstellungen.Controls.Add(this.grpDesign);
-            this.tabEinstellungen.Location = new System.Drawing.Point(4, 25);
-            this.tabEinstellungen.Name = "tabEinstellungen";
-            this.tabEinstellungen.Size = new System.Drawing.Size(876, 81);
-            this.tabEinstellungen.TabIndex = 2;
-            this.tabEinstellungen.Text = "Einstellungen";
-            // 
-            // grpAssistent
-            // 
-            this.grpAssistent.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.grpAssistent.CausesValidation = false;
-            this.grpAssistent.Controls.Add(this.capRasterFangen);
-            this.grpAssistent.Controls.Add(this.capRasterAnzeige);
-            this.grpAssistent.Controls.Add(this.txbRasterFangen);
-            this.grpAssistent.Controls.Add(this.txbRasterAnzeige);
-            this.grpAssistent.Controls.Add(this.ckbRaster);
-            this.grpAssistent.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpAssistent.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
-            this.grpAssistent.Location = new System.Drawing.Point(648, 0);
-            this.grpAssistent.Name = "grpAssistent";
-            this.grpAssistent.Size = new System.Drawing.Size(152, 81);
-            this.grpAssistent.TabIndex = 0;
-            this.grpAssistent.TabStop = false;
-            this.grpAssistent.Text = "Assistenten";
-            // 
-            // capRasterFangen
-            // 
-            this.capRasterFangen.CausesValidation = false;
-            this.capRasterFangen.Location = new System.Drawing.Point(8, 46);
-            this.capRasterFangen.Name = "capRasterFangen";
-            this.capRasterFangen.Size = new System.Drawing.Size(56, 22);
-            this.capRasterFangen.Text = "Fangen:";
-            // 
-            // capRasterAnzeige
-            // 
-            this.capRasterAnzeige.CausesValidation = false;
-            this.capRasterAnzeige.Location = new System.Drawing.Point(8, 24);
-            this.capRasterAnzeige.Name = "capRasterAnzeige";
-            this.capRasterAnzeige.Size = new System.Drawing.Size(56, 22);
-            this.capRasterAnzeige.Text = "Anzeige:";
-            // 
-            // txbRasterFangen
-            // 
-            this.txbRasterFangen.AllowedChars = "0123456789";
-            this.txbRasterFangen.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbRasterFangen.Location = new System.Drawing.Point(72, 46);
-            this.txbRasterFangen.Name = "txbRasterFangen";
-            this.txbRasterFangen.Regex = "^((-?[1-9]\\d*)|0)$";
-            this.txbRasterFangen.Size = new System.Drawing.Size(64, 22);
-            this.txbRasterFangen.Suffix = "mm";
-            this.txbRasterFangen.TabIndex = 6;
-            this.txbRasterFangen.Text = "10";
-            this.txbRasterFangen.TextChanged += new System.EventHandler(this.txbRasterFangen_TextChanged);
-            // 
-            // txbRasterAnzeige
-            // 
-            this.txbRasterAnzeige.AllowedChars = "0123456789";
-            this.txbRasterAnzeige.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbRasterAnzeige.Location = new System.Drawing.Point(72, 24);
-            this.txbRasterAnzeige.Name = "txbRasterAnzeige";
-            this.txbRasterAnzeige.Regex = "^((-?[1-9]\\d*)|0)$";
-            this.txbRasterAnzeige.Size = new System.Drawing.Size(64, 22);
-            this.txbRasterAnzeige.Suffix = "mm";
-            this.txbRasterAnzeige.TabIndex = 5;
-            this.txbRasterAnzeige.Text = "10";
-            this.txbRasterAnzeige.TextChanged += new System.EventHandler(this.txbRasterAnzeige_TextChanged);
-            // 
-            // ckbRaster
-            // 
-            this.ckbRaster.ButtonStyle = ((BlueControls.Enums.enButtonStyle)(((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Button_Big) 
-            | BlueControls.Enums.enButtonStyle.Borderless)));
-            this.ckbRaster.ImageCode = "Raster|18";
-            this.ckbRaster.Location = new System.Drawing.Point(8, 2);
-            this.ckbRaster.Name = "ckbRaster";
-            this.ckbRaster.Size = new System.Drawing.Size(112, 22);
-            this.ckbRaster.TabIndex = 4;
-            this.ckbRaster.Text = "Raster";
-            this.ckbRaster.CheckedChanged += new System.EventHandler(this.ckbRaster_CheckedChanged);
+            this.tabHintergrund.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.tabHintergrund.Controls.Add(this.grpDesign);
+            this.tabHintergrund.Location = new System.Drawing.Point(4, 25);
+            this.tabHintergrund.Name = "tabHintergrund";
+            this.tabHintergrund.Size = new System.Drawing.Size(876, 81);
+            this.tabHintergrund.TabIndex = 3;
+            this.tabHintergrund.Text = "Hintergrund";
             // 
             // grpDesign
             // 
@@ -363,7 +255,6 @@ namespace BlueControls.Forms {
             this.grpDesign.CausesValidation = false;
             this.grpDesign.Controls.Add(this.btnKeinHintergrund);
             this.grpDesign.Controls.Add(this.btnHintergrundFarbe);
-            this.grpDesign.Controls.Add(this.btnVorschauModus);
             this.grpDesign.Controls.Add(this.btnArbeitsbreichSetup);
             this.grpDesign.Controls.Add(this.cbxSchriftGröße);
             this.grpDesign.Controls.Add(this.capSchriftgröße);
@@ -400,19 +291,6 @@ namespace BlueControls.Forms {
             this.btnHintergrundFarbe.TabIndex = 15;
             this.btnHintergrundFarbe.Text = "Hintergrund-Farbe";
             this.btnHintergrundFarbe.Click += new System.EventHandler(this.btnHintergrundFarbe_Click);
-            // 
-            // btnVorschauModus
-            // 
-            this.btnVorschauModus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnVorschauModus.ButtonStyle = ((BlueControls.Enums.enButtonStyle)(((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Button_Big) 
-            | BlueControls.Enums.enButtonStyle.Borderless)));
-            this.btnVorschauModus.ImageCode = "Textdatei";
-            this.btnVorschauModus.Location = new System.Drawing.Point(584, 2);
-            this.btnVorschauModus.Name = "btnVorschauModus";
-            this.btnVorschauModus.Size = new System.Drawing.Size(56, 66);
-            this.btnVorschauModus.TabIndex = 14;
-            this.btnVorschauModus.Text = "Vorschau-Modus";
-            this.btnVorschauModus.CheckedChanged += new System.EventHandler(this.btnVorschauModus_CheckedChanged);
             // 
             // btnArbeitsbreichSetup
             // 
@@ -468,120 +346,53 @@ namespace BlueControls.Forms {
             this.capDesign.Text = "Design:";
             this.capDesign.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_ohne_Textumbruch;
             // 
-            // tabExport
+            // tabRightSide
             // 
-            this.tabExport.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.tabExport.Controls.Add(this.grpDrucken);
-            this.tabExport.Location = new System.Drawing.Point(4, 25);
-            this.tabExport.Name = "tabExport";
-            this.tabExport.Size = new System.Drawing.Size(876, 81);
-            this.tabExport.TabIndex = 1;
-            this.tabExport.Text = "Export";
+            this.tabRightSide.Controls.Add(this.tabElementEigenschaften);
+            this.tabRightSide.Dock = System.Windows.Forms.DockStyle.Right;
+            this.tabRightSide.HotTrack = true;
+            this.tabRightSide.Location = new System.Drawing.Point(512, 110);
+            this.tabRightSide.Name = "tabRightSide";
+            this.tabRightSide.SelectedIndex = 0;
+            this.tabRightSide.Size = new System.Drawing.Size(372, 251);
+            this.tabRightSide.TabDefault = null;
+            this.tabRightSide.TabDefaultOrder = null;
+            this.tabRightSide.TabIndex = 4;
             // 
-            // grpDrucken
+            // tabElementEigenschaften
             // 
-            this.grpDrucken.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.grpDrucken.CausesValidation = false;
-            this.grpDrucken.Controls.Add(this.btnVorschau);
-            this.grpDrucken.Controls.Add(this.btnPageSetup);
-            this.grpDrucken.Controls.Add(this.btnAlsBildSpeichern);
-            this.grpDrucken.Controls.Add(this.btnDruckerDialog);
-            this.grpDrucken.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpDrucken.GroupBoxStyle = BlueControls.Enums.enGroupBoxStyle.RibbonBar;
-            this.grpDrucken.Location = new System.Drawing.Point(0, 0);
-            this.grpDrucken.Name = "grpDrucken";
-            this.grpDrucken.Size = new System.Drawing.Size(288, 81);
-            this.grpDrucken.TabIndex = 0;
-            this.grpDrucken.TabStop = false;
-            this.grpDrucken.Text = "Drucken";
-            // 
-            // btnVorschau
-            // 
-            this.btnVorschau.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
-            this.btnVorschau.ImageCode = "Datei||||||||||Lupe";
-            this.btnVorschau.Location = new System.Drawing.Point(224, 2);
-            this.btnVorschau.Name = "btnVorschau";
-            this.btnVorschau.Size = new System.Drawing.Size(56, 66);
-            this.btnVorschau.TabIndex = 13;
-            this.btnVorschau.Text = "Vorschau";
-            this.btnVorschau.Click += new System.EventHandler(this.btnVorschau_Click);
-            // 
-            // btnPageSetup
-            // 
-            this.btnPageSetup.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
-            this.btnPageSetup.ImageCode = "SeiteEinrichten";
-            this.btnPageSetup.Location = new System.Drawing.Point(136, 2);
-            this.btnPageSetup.Name = "btnPageSetup";
-            this.btnPageSetup.Size = new System.Drawing.Size(88, 66);
-            this.btnPageSetup.TabIndex = 12;
-            this.btnPageSetup.Text = "Drucker-Seite einrichten";
-            this.btnPageSetup.Click += new System.EventHandler(this.btnPageSetup_Click);
-            // 
-            // btnAlsBildSpeichern
-            // 
-            this.btnAlsBildSpeichern.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
-            this.btnAlsBildSpeichern.ImageCode = "Bild";
-            this.btnAlsBildSpeichern.Location = new System.Drawing.Point(72, 2);
-            this.btnAlsBildSpeichern.Name = "btnAlsBildSpeichern";
-            this.btnAlsBildSpeichern.Size = new System.Drawing.Size(64, 66);
-            this.btnAlsBildSpeichern.TabIndex = 11;
-            this.btnAlsBildSpeichern.Text = "Als Bild speichern";
-            this.btnAlsBildSpeichern.Click += new System.EventHandler(this.btnAlsBildSpeichern_Click);
-            // 
-            // btnDruckerDialog
-            // 
-            this.btnDruckerDialog.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Button_Big | BlueControls.Enums.enButtonStyle.Borderless)));
-            this.btnDruckerDialog.ImageCode = "Drucker";
-            this.btnDruckerDialog.Location = new System.Drawing.Point(8, 2);
-            this.btnDruckerDialog.Name = "btnDruckerDialog";
-            this.btnDruckerDialog.QuickInfo = "Öffnet den Drucker-Dialog.";
-            this.btnDruckerDialog.Size = new System.Drawing.Size(64, 66);
-            this.btnDruckerDialog.TabIndex = 10;
-            this.btnDruckerDialog.Text = "Drucken";
-            this.btnDruckerDialog.Click += new System.EventHandler(this.btnDruckerDialog_Click);
+            this.tabElementEigenschaften.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabElementEigenschaften.Location = new System.Drawing.Point(4, 25);
+            this.tabElementEigenschaften.Name = "tabElementEigenschaften";
+            this.tabElementEigenschaften.Size = new System.Drawing.Size(364, 222);
+            this.tabElementEigenschaften.TabIndex = 0;
+            this.tabElementEigenschaften.Text = "Element-Eigenschaften";
             // 
             // PadEditor
             // 
             this.ClientSize = new System.Drawing.Size(884, 361);
-            this.Controls.Add(this.Pad);
-            this.Controls.Add(this.Ribbon);
+            this.Controls.Add(this.tabRightSide);
             this.Name = "PadEditor";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
-            this.Text = "(c) Christian Peter";
-            this.TopMost = true;
+            this.Controls.SetChildIndex(this.Ribbon, 0);
+            this.Controls.SetChildIndex(this.tabRightSide, 0);
+            this.Controls.SetChildIndex(this.Pad, 0);
             this.Ribbon.ResumeLayout(false);
-            this.tabBearbeiten.ResumeLayout(false);
-            this.grpKomponenteHinzufügen.ResumeLayout(false);
-            this.grpWerkzeuge.ResumeLayout(false);
-            this.tabEinstellungen.ResumeLayout(false);
+            this.tabStart.ResumeLayout(false);
             this.grpAssistent.ResumeLayout(false);
+            this.grpKomponenteHinzufügen.ResumeLayout(false);
+            this.tabHintergrund.ResumeLayout(false);
             this.grpDesign.ResumeLayout(false);
-            this.tabExport.ResumeLayout(false);
-            this.grpDrucken.ResumeLayout(false);
+            this.tabRightSide.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
-        private Button btnZoomOut;
-        private Button btnAuswahl;
         private Button btnAddText;
         private Button btnAddImage;
         private Button btnAddDimension;
         private Button btnAddLine;
-        protected CreativePad Pad;
-        protected RibbonBar Ribbon;
-        protected System.Windows.Forms.TabPage tabBearbeiten;
-        protected System.Windows.Forms.TabPage tabExport;
-        protected GroupBox grpWerkzeuge;
         protected GroupBox grpKomponenteHinzufügen;
-        protected GroupBox grpDrucken;
         protected GroupBox grpDesign;
         private Caption capDesign;
-        protected GroupBox grpAssistent;
-        private Button btnZoomFit;
-        private Button btnZoomIn;
-        private Button btnDruckerDialog;
-        private Button btnAlsBildSpeichern;
-        private Button btnVorschau;
         private ComboBox PadDesign;
         protected Button ckbRaster;
         private Caption capRasterFangen;
@@ -590,16 +401,15 @@ namespace BlueControls.Forms {
         private TextBox txbRasterAnzeige;
         internal ComboBox cbxSchriftGröße;
         internal Caption capSchriftgröße;
-        protected internal Button btnPageSetup;
         protected internal Button btnArbeitsbreichSetup;
-        protected System.Windows.Forms.TabPage tabEinstellungen;
         private Button btnAddUnterStufe;
         private Button btnAddSymbol;
         private Button btnAddPhsyik;
-        private Button btnVorschauModus;
         private Button btnHintergrundFarbe;
         private System.Windows.Forms.ColorDialog ColorDia;
         private Button btnKeinHintergrund;
-        private Button btnZoom11;
+        private System.Windows.Forms.TabPage tabHintergrund;
+        private System.Windows.Forms.TabPage tabElementEigenschaften;
+        protected TabControl tabRightSide;
     }
 }

@@ -21,12 +21,10 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
 using System.Drawing;
-using System.IO;
-using static BlueBasics.FileOperations;
 
 namespace BlueControls.Forms {
 
-    public partial class PadEditor : Form {
+    public partial class PadEditor : PadEditorReadOnly {
 
         #region Constructors
 
@@ -130,11 +128,7 @@ namespace BlueControls.Forms {
             Pad.Item.Add(b);
         }
 
-        private void btnAlsBildSpeichern_Click(object sender, System.EventArgs e) => Pad.OpenSaveDialog(string.Empty);
-
         private void btnArbeitsbreichSetup_Click(object sender, System.EventArgs e) => Pad.ShowWorkingAreaSetup();
-
-        private void btnDruckerDialog_Click(object sender, System.EventArgs e) => Pad.Print();
 
         private void btnHintergrundFarbe_Click(object sender, System.EventArgs e) {
             ColorDia.Color = Pad.Item.BackColor;
@@ -148,19 +142,27 @@ namespace BlueControls.Forms {
             Pad.Invalidate();
         }
 
-        private void btnPageSetup_Click(object sender, System.EventArgs e) => Pad.ShowPrinterPageSetup();
-
-        private void btnVorschau_Click(object sender, System.EventArgs e) => Pad.ShowPrintPreview();
-
-        private void btnVorschauModus_CheckedChanged(object sender, System.EventArgs e) => Pad.ShowInPrintMode = btnVorschauModus.Checked;
-
-        private void btnZoom11_Click(object sender, System.EventArgs e) => Pad.Zoom100();
-
-        private void btnZoomFit_Click(object sender, System.EventArgs e) => Pad.ZoomFit();
-
         private void cbxSchriftGröße_ItemClicked(object sender, BasicListItemEventArgs e) => Pad.Item.SheetStyleScale = double.Parse(cbxSchriftGröße.Text) / 100d;
 
         private void ckbRaster_CheckedChanged(object sender, System.EventArgs e) => Pad.Item.SnapMode = ckbRaster.Checked ? enSnapMode.SnapToGrid : enSnapMode.Ohne;
+
+        private void Pad_ClickedItemChanged(object sender, System.EventArgs e) {
+            tabElementEigenschaften.Controls.Clear();
+            if (Pad.LastClickedItem == null) { return; }
+            var Flexis = Pad.LastClickedItem.GetStyleOptions();
+            if (Flexis.Count == 0) { return; }
+            var top = Skin.Padding;
+            foreach (var ThisFlexi in Flexis) {
+                tabElementEigenschaften.Controls.Add(ThisFlexi);
+                ThisFlexi.DisabledReason = string.Empty;
+                ThisFlexi.Left = Skin.Padding;
+                ThisFlexi.Top = top;
+                ThisFlexi.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+                top = top + Skin.Padding + ThisFlexi.Height;
+                ThisFlexi.Width = tabElementEigenschaften.Width - (Skin.Padding * 4);
+                //ThisFlexi.ButtonClicked += FlexiButtonClick;
+            }
+        }
 
         private void Pad_GotNewItemCollection(object sender, System.EventArgs e) {
             ckbRaster.Enabled = Pad.Item != null;
@@ -173,13 +175,6 @@ namespace BlueControls.Forms {
                 txbRasterFangen.Text = Pad.Item.GridSnap.ToString(Constants.Format_Float2);
             }
         }
-
-        private void Pad_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
-            if (btnZoomIn.Checked) { Pad.ZoomIn(e); }
-            if (btnZoomOut.Checked) { Pad.ZoomOut(e); }
-        }
-
-        private void Pad_PreviewModChanged(object sender, System.EventArgs e) => btnVorschauModus.Checked = Pad.ShowInPrintMode;
 
         private void PadDesign_ItemClicked(object sender, BasicListItemEventArgs e) => Pad.Item.SheetStyle = Skin.StyleDB.Row[e.Item.Internal];
 

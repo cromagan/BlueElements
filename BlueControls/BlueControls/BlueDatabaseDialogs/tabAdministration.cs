@@ -156,7 +156,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 return;
             }
             DB.CancelBackGroundWorker();
-            LayoutDesigner w = new(DB);
+            LayoutPadEditor w = new(DB);
             if (!string.IsNullOrEmpty(LayoutToOpen)) { w.LoadLayout(LayoutToOpen); }
             w.ShowDialog();
         }

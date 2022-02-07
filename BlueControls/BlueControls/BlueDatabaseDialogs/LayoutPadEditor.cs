@@ -27,12 +27,12 @@ using static BlueBasics.FileOperations;
 
 namespace BlueControls.BlueDatabaseDialogs {
 
-    internal partial class LayoutDesigner : PadEditorWithFileAccess {
+    internal partial class LayoutPadEditor : PadEditorWithFileAccess {
 
         #region Constructors
 
         //private string _LoadedLayout = string.Empty;
-        public LayoutDesigner(Database database) : base() {
+        public LayoutPadEditor(Database database) : base() {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
@@ -182,19 +182,17 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (ind < 0 && cbxLayout.Text.FileSuffix().ToUpper() != "BCR" && FileExists(cbxLayout.Text)) {
                 btnTextEditor.Enabled = true;
                 btnLayoutOeffnen.Enabled = true;
-                tabBearbeiten.Enabled = false;
-                grpDrucken.Enabled = false;
+                tabStart.Enabled = false;
             } else {
                 btnTextEditor.Enabled = false;
                 btnLayoutOeffnen.Enabled = false;
             }
             //if (!string.IsNullOrEmpty(Pad.Item.ID)) {
-            tabBearbeiten.Enabled = true;
+            tabStart.Enabled = true;
             grpDateiSystem.Enabled = true;
             btnLayoutLöschen.Enabled = true;
             btnLayoutUmbenennen.Enabled = true;
             btnCopyID.Enabled = true;
-            grpDrucken.Enabled = true;
             //} else {
             //    grpDrucken.Enabled = false;
             //     System.Windows.Forms.tabBearbeiten.Enabled = false;
@@ -207,24 +205,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void Database_Disposing(object sender, System.EventArgs e) => Close();
 
         private void Database_ShouldICancelDiscOperations(object sender, CancelEventArgs e) => e.Cancel = true;
-
-        private void Pad_ClickedItemChanged(object sender, System.EventArgs e) {
-            tabElementEigenschaften.Controls.Clear();
-            if (Pad.LastClickedItem == null) { return; }
-            var Flexis = Pad.LastClickedItem.GetStyleOptions();
-            if (Flexis.Count == 0) { return; }
-            var top = Skin.Padding;
-            foreach (var ThisFlexi in Flexis) {
-                tabElementEigenschaften.Controls.Add(ThisFlexi);
-                ThisFlexi.DisabledReason = string.Empty;
-                ThisFlexi.Left = Skin.Padding;
-                ThisFlexi.Top = top;
-                ThisFlexi.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-                top = top + Skin.Padding + ThisFlexi.Height;
-                ThisFlexi.Width = tabElementEigenschaften.Width - (Skin.Padding * 4);
-                //ThisFlexi.ButtonClicked += FlexiButtonClick;
-            }
-        }
 
         private void SaveCurrentLayout() {
             scriptEditor.WriteScriptBack();

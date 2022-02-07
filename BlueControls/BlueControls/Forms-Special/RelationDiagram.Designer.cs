@@ -27,7 +27,7 @@ namespace BlueControls.Forms {
             this.btnTextExport = new BlueControls.Controls.Button();
             this.btnBilderExport = new BlueControls.Controls.Button();
             this.Ribbon.SuspendLayout();
-            this.tabBearbeiten.SuspendLayout();
+            this.tabStart.SuspendLayout();
             this.grpKomponenteHinzufügen.SuspendLayout();
             this.grpDesign.SuspendLayout();
             this.grpAssistent.SuspendLayout();
@@ -45,13 +45,12 @@ namespace BlueControls.Forms {
             this.Ribbon.SelectedIndex = 0;
             this.Ribbon.Size = new System.Drawing.Size(1290, 110);
             // 
-            //  System.Windows.Forms.tabBearbeiten
+            //  System.Windows.Forms.tabStart
             // 
-            this.tabBearbeiten.Controls.Add(this.grpExtras);
-            this.tabBearbeiten.Size = new System.Drawing.Size(1282, 81);
-            this.tabBearbeiten.Controls.SetChildIndex(this.grpWerkzeuge, 0);
-            this.tabBearbeiten.Controls.SetChildIndex(this.grpKomponenteHinzufügen, 0);
-            this.tabBearbeiten.Controls.SetChildIndex(this.grpExtras, 0);
+            this.tabStart.Controls.Add(this.grpExtras);
+            this.tabStart.Size = new System.Drawing.Size(1282, 81);
+            this.tabStart.Controls.SetChildIndex(this.grpKomponenteHinzufügen, 0);
+            this.tabStart.Controls.SetChildIndex(this.grpExtras, 0);
             // 
             // grpKomponenteHinzufügen
             // 
@@ -116,7 +115,7 @@ namespace BlueControls.Forms {
             this.Text = "Beziehungs-Editor";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Ribbon.ResumeLayout(false);
-            this.tabBearbeiten.ResumeLayout(false);
+            this.tabStart.ResumeLayout(false);
             this.grpKomponenteHinzufügen.ResumeLayout(false);
             this.grpDesign.ResumeLayout(false);
             this.grpAssistent.ResumeLayout(false);
