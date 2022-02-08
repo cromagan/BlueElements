@@ -326,7 +326,7 @@ namespace BlueDatabase {
                 if (skript != null && !string.IsNullOrEmpty(skript.Error)) {
                     var w = x[0].CellFirstString();
                     x.Clear();
-                    Database.OnDropMessage("Skript fehlerhaft bei " + w + "\r\n" + skript.Error);
+                    Database.OnDropMessage(enFehlerArt.Warnung, "Skript fehlerhaft bei " + w + "\r\n" + skript.Error);
                     break;
                 }
                 if (checkPerformed) { x.RemoveAt(0); }

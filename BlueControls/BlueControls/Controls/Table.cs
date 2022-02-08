@@ -1028,6 +1028,7 @@ namespace BlueControls.Controls {
             ServiceStarted = true;
             BlueBasics.MultiUserFile.clsMultiUserFile.AllFiles.ItemAdded += AllFiles_ItemAdded;
             BlueBasics.MultiUserFile.clsMultiUserFile.AllFiles.ItemRemoving += AllFiles_ItemRemoving;
+            Database.DropConstructorMessage += Database_DropConstructorMessage;
         }
 
         internal bool NonPermanentPossible(ColumnViewItem ThisViewItem) {
@@ -1498,18 +1499,6 @@ namespace BlueControls.Controls {
             }
         }
 
-        //protected override void OnResize(System.EventArgs e) {
-        //    base.OnResize(e);
-        //    if (_Database == null) { return; }
-        //    lock (Lock_UserAction) {
-        //        if (ISIN_Resize) { return; }
-        //        ISIN_Resize = true;
-        //        Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
-        //        Invalidate_AllDraw(false);
-        //        ISIN_Resize = false;
-        //    }
-        //}
-
         protected override void OnSizeChanged(System.EventArgs e) {
             base.OnSizeChanged(e);
             if (_Database == null) { return; }
@@ -1523,6 +1512,17 @@ namespace BlueControls.Controls {
             Invalidate_SortedRowData(); // Zellen können ihre Größe ändern. z.B. die Zeilenhöhe
         }
 
+        //protected override void OnResize(System.EventArgs e) {
+        //    base.OnResize(e);
+        //    if (_Database == null) { return; }
+        //    lock (Lock_UserAction) {
+        //        if (ISIN_Resize) { return; }
+        //        ISIN_Resize = true;
+        //        Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
+        //        Invalidate_AllDraw(false);
+        //        ISIN_Resize = false;
+        //    }
+        //}
         protected override void OnVisibleChanged(System.EventArgs e) {
             base.OnVisibleChanged(e);
             if (_Database == null) { return; }
@@ -1548,6 +1548,19 @@ namespace BlueControls.Controls {
                 DB.GenerateLayoutInternal -= DB_GenerateLayoutInternal;
                 DB.Loaded -= tabAdministration.CheckDatabase;
             }
+        }
+
+        private static void Database_DropConstructorMessage(object sender, MessageEventArgs e) {
+            if (!e.Shown) {
+                e.Shown = true;
+                Notification.Show(e.Message, enImageCode.Datenbank);
+            }
+
+            if (e.Type is enFehlerArt.DevelopInfo or enFehlerArt.Info) { return; }
+
+            if (e.WrittenToLogifile) { return; }
+            e.WrittenToLogifile = true;
+            Develop.DebugPrint(e.Type, e.Message);
         }
 
         private static void DB_GenerateLayoutInternal(object sender, GenerateLayoutInternalEventargs e) {
@@ -2845,8 +2858,9 @@ namespace BlueControls.Controls {
                 if (Database.ReloadNeeded) { GR.DrawImage(QuickImage.Get(enImageCode.Uhr, 16).BMP, 8, 8); }
                 if (Database.HasPendingChanges()) { GR.DrawImage(QuickImage.Get(enImageCode.Stift, 16).BMP, 16, 8); }
                 if (Database.ReadOnly) { GR.DrawImage(QuickImage.Get(enImageCode.Schloss, 32).BMP, 16, 8); }
-            } catch (Exception ex) {
-                Develop.DebugPrint(ex);
+            } catch {
+                Invalidate();
+                //Develop.DebugPrint(ex);
             }
         }
 

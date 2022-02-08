@@ -18,8 +18,7 @@ namespace BlueControls.Forms {
 
         #region Constructors
 
-        public FloatingForm() : this(enDesign.Form_QuickInfo) {
-        }
+        public FloatingForm() : this(enDesign.Form_QuickInfo) { }
 
         protected FloatingForm(enDesign design) : base(design) {
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.

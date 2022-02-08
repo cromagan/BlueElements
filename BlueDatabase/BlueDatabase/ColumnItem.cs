@@ -28,6 +28,7 @@ using System.Drawing;
 using System.Text.RegularExpressions;
 using static BlueBasics.Extensions;
 using static BlueBasics.FileOperations;
+using static BlueDatabase.Database;
 
 namespace BlueDatabase {
 
@@ -1129,13 +1130,6 @@ namespace BlueDatabase {
                 }
             }
             switch (_Format) {
-                //case enDataFormat.Bit:
-                //    if (_FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled)) { return "Format unterstützt keinen 'erweiternden Autofilter'"; }
-                //    if (_FilterOptions.HasFlag(enFilterOptions.TextFilterEnabled)) { return "Format unterstützt keine 'Texteingabe bei Autofilter'"; }
-                //    if (!string.IsNullOrEmpty(_AutoFilterJoker)) { return "Format unterstützt keinen 'Autofilter Joker'"; }
-                //    if (!_IgnoreAtRowFilter) { return "Format muss bei Zeilenfilter ignoriert werden.'"; }
-                //    break;
-
                 case enDataFormat.RelationText:
                     if (!_MultiLine) { return "Bei diesem Format muss mehrzeilig ausgewählt werden."; }
                     if (_KeyColumnKey > -1) { return "Diese Format darf keine Verknüpfung zu einer Schlüsselspalte haben."; }
@@ -1180,6 +1174,7 @@ namespace BlueDatabase {
                     if (AfterEdit_AutoReplace.Count > 0) { return "Dieses Format darf keine Autokorrektur-Maßnahmen haben haben."; }
                     break;
             }
+
             if (_MultiLine) {
                 if (!_Format.MultilinePossible()) { return "Format unterstützt keine mehrzeiligen Texte."; }
                 if (_AfterEdit_Runden != -1) { return "Runden nur bei einzeiligen Texten möglich"; }
@@ -1490,70 +1485,74 @@ namespace BlueDatabase {
             //Button = 79
 
             //// bis 999 wird geprüft
+            ///
+            try {
+                switch ((int)_Format) {
+                    case (int)enDataFormat.Button:
+                        ScriptType = enScriptType.Nicht_vorhanden;
+                        break;
 
-            switch ((int)_Format) {
-                case (int)enDataFormat.Button:
-                    ScriptType = enScriptType.Nicht_vorhanden;
-                    break;
+                    case 21: //Text_Ohne_Kritische_Zeichen
+                        SetFormatForText();
+                        break;
 
-                case 21: //Text_Ohne_Kritische_Zeichen
-                    SetFormatForText();
-                    break;
+                    case 15:// Date_GermanFormat = 15
+                    case 16://Datum_und_Uhrzeit = 16,
+                        SetFormatForDateTime();
+                        break;
 
-                case 15:// Date_GermanFormat = 15
-                case 16://Datum_und_Uhrzeit = 16,
-                    SetFormatForDateTime();
-                    break;
+                    case 2:   //Bit = 3,
+                        SetFormatForBit();
+                        break;
 
-                case 2:   //Bit = 3,
-                    SetFormatForBit();
-                    break;
+                    case 3:   //Ganzzahl = 3,
+                        SetFormatForInteger();
+                        break;
 
-                case 3:   //Ganzzahl = 3,
-                    SetFormatForInteger();
-                    break;
+                    case 6:  //Gleitkommazahl = 6,
+                        SetFormatForFloat();
+                        break;
 
-                case 6:  //Gleitkommazahl = 6,
-                    SetFormatForFloat();
-                    break;
+                    case 13:         //BildCode = 13,
+                        SetFormatForBildCode();
+                        break;
 
-                case 13:         //BildCode = 13,
-                    SetFormatForBildCode();
-                    break;
+                    case 70:
+                        SetFormatForTextMitFormatierung();
+                        break;
+                }
 
-                case 70:
-                    SetFormatForTextMitFormatierung();
-                    break;
-            }
-
-            if (ScriptType == enScriptType.undefiniert) {
-                if (MultiLine) {
-                    ScriptType = enScriptType.List;
-                } else if (Format is enDataFormat.Text or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Link_To_Filesystem) {
-                    if (SortType is enSortierTyp.ZahlenwertFloat or enSortierTyp.ZahlenwertInt) {
-                        ScriptType = enScriptType.Numeral;
+                if (ScriptType == enScriptType.undefiniert) {
+                    if (MultiLine) {
+                        ScriptType = enScriptType.List;
+                    } else if (Format is enDataFormat.Text or enDataFormat.Columns_für_LinkedCellDropdown or enDataFormat.Link_To_Filesystem) {
+                        if (SortType is enSortierTyp.ZahlenwertFloat or enSortierTyp.ZahlenwertInt) {
+                            ScriptType = enScriptType.Numeral;
+                        }
+                        ScriptType = enScriptType.String;
+                    } else if (Format == enDataFormat.Schrift) {
+                        ScriptType = enScriptType.Nicht_vorhanden;
                     }
-                    ScriptType = enScriptType.String;
-                } else if (Format == enDataFormat.Schrift) {
-                    ScriptType = enScriptType.Nicht_vorhanden;
                 }
-            }
 
-            if (_Format == enDataFormat.LinkedCell && _LinkedCell_RowKey >= 0) {
-                var c = LinkedDatabase().Column.SearchByKey(_LinkedCell_ColumnKey);
-                if (c != null) {
-                    this.GetStyleFrom(c);
-                    BildTextVerhalten = c.BildTextVerhalten;
-                    ScriptType = c.ScriptType;
-                    Translate = c.Translate;
+                if (_Format == enDataFormat.LinkedCell && _LinkedCell_RowKey >= 0) {
+                    var c = LinkedDatabase().Column.SearchByKey(_LinkedCell_ColumnKey);
+                    if (c != null) {
+                        this.GetStyleFrom(c);
+                        BildTextVerhalten = c.BildTextVerhalten;
+                        ScriptType = c.ScriptType;
+                        Translate = c.Translate;
+                    }
                 }
-            }
 
-            if (ScriptType == enScriptType.undefiniert) {
-                Develop.DebugPrint(enFehlerArt.Warnung, "Umsetzung fehlgeschlagen: " + Caption + " " + Database.Filename);
-            }
+                if (ScriptType == enScriptType.undefiniert) {
+                    Develop.DebugPrint(enFehlerArt.Warnung, "Umsetzung fehlgeschlagen: " + Caption + " " + Database.Filename);
+                }
 
-            ResetSystemToDefault(false);
+                ResetSystemToDefault(false);
+            } catch (Exception ex) {
+                Develop.DebugPrint(ex);
+            }
         }
 
         public void ResetSystemToDefault(bool SetAll) {

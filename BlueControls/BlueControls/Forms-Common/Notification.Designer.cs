@@ -31,7 +31,6 @@ namespace BlueControls.Forms
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Notification));
             this.capTXT = new BlueControls.Controls.Caption();
-            this.timNote = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // capTXT
@@ -42,12 +41,6 @@ namespace BlueControls.Forms
             this.capTXT.Size = new System.Drawing.Size(10, 10);
             this.capTXT.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Steuerelement_Anpassen;
             this.capTXT.Translate = false;
-            this.capTXT.Click += new System.EventHandler(this.capTXT_Click);
-            // 
-            // timNote
-            // 
-            this.timNote.Interval = 10;
-            this.timNote.Tick += new System.EventHandler(this.timNote_Tick);
             // 
             // Notification
             // 
@@ -60,6 +53,5 @@ namespace BlueControls.Forms
         #endregion
 
         private Controls.Caption capTXT;
-        private System.Windows.Forms.Timer timNote;
     }
 }

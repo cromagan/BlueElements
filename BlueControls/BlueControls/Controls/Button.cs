@@ -229,6 +229,8 @@ namespace BlueControls.Controls {
 
                 #region State modifzieren
 
+                if (_IsFireing) { state = enStates.Standard_Disabled; } // Optische anzeige
+
                 if (_ButtonStyle.HasFlag(enButtonStyle.Checkbox) || _ButtonStyle.HasFlag(enButtonStyle.Optionbox)) {
                     if (_Checked || MousePressing()) { state |= enStates.Checked; }
                 }
@@ -301,6 +303,7 @@ namespace BlueControls.Controls {
 
             _ClickFired = true;
             _IsFireing = true;
+            Refresh();
 
             if (_ButtonStyle.HasFlag(enButtonStyle.Checkbox)) {
                 Checked = !Checked;
@@ -314,6 +317,7 @@ namespace BlueControls.Controls {
 
             base.OnClick(e);
             _IsFireing = false;
+            Invalidate();
         }
 
         protected override void OnCreateControl() {

@@ -15,19 +15,29 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Enums;
+
 namespace BlueDatabase.EventArgs {
 
     public class MessageEventArgs : System.EventArgs {
 
         #region Constructors
 
-        public MessageEventArgs(string message) => Message = message;
+        public MessageEventArgs(enFehlerArt type, string message) {
+            Message = message;
+            Type = type;
+            WrittenToLogifile = false;
+            Shown = false;
+        }
 
         #endregion
 
         #region Properties
 
         public string Message { get; }
+        public bool Shown { get; set; }
+        public enFehlerArt Type { get; }
+        public bool WrittenToLogifile { get; set; }
 
         #endregion
     }

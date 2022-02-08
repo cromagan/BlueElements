@@ -554,13 +554,13 @@ namespace BlueBasics.MultiUserFile {
         /// <param name="checkOnlyFilenameToo">Prüft, ob die Datei ohne Dateipfad - also nur Dateiname und Suffix - existiert und gibt diese zurück.</param>
         /// <returns></returns>
         protected static clsMultiUserFile GetByFilename(string filePath, bool checkOnlyFilenameToo) {
-            //filePath = modConverter.SerialNr2Path(filePath);
             foreach (var ThisFile in AllFiles) {
                 if (ThisFile != null && string.Equals(ThisFile.Filename, filePath, StringComparison.OrdinalIgnoreCase)) {
                     ThisFile.BlockReload(false);
                     return ThisFile;
                 }
             }
+
             if (checkOnlyFilenameToo) {
                 foreach (var ThisFile in AllFiles) {
                     if (ThisFile != null && ThisFile.Filename.ToLower().FileNameWithSuffix() == filePath.ToLower().FileNameWithSuffix()) {
@@ -690,7 +690,7 @@ namespace BlueBasics.MultiUserFile {
 
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) => DoBackGroundWork((BackgroundWorker)sender);
 
-        private string Backupdateiname() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".bak";
+        private string Backupdateiname() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".bak2";
 
         private string Blockdateiname() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".blk";
 

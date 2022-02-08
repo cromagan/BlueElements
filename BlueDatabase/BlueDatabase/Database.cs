@@ -150,6 +150,7 @@ namespace BlueDatabase {
             // _isParsing = false;
             UserGroup = "#Administrator";
             if (!string.IsNullOrEmpty(filename)) {
+                Database.DropConstructorMessage?.Invoke(this, new MessageEventArgs(enFehlerArt.Info, "Lade Datenbank aus Dateisystem: \r\n" + filename.FileNameWithoutSuffix()));
                 Load(filename, create);
             } else if (stream != null) {
                 LoadFromStream(stream);
@@ -162,6 +163,8 @@ namespace BlueDatabase {
         #endregion
 
         #region Events
+
+        public static event EventHandler<MessageEventArgs> DropConstructorMessage;
 
         public event EventHandler<MessageEventArgs> DropMessage;
 
@@ -696,7 +699,7 @@ namespace BlueDatabase {
                 Zeil.Add(ein[z].SplitAndCutBy(splitChar));
             }
             if (Zeil.Count == 0) {
-                OnDropMessage("Import kann nicht ausgeführt werden.");
+                OnDropMessage(enFehlerArt.Warnung, "Import kann nicht ausgeführt werden.");
                 return "Import kann nicht ausgeführt werden.";
             }
             List<ColumnItem> columns = new();
@@ -708,7 +711,7 @@ namespace BlueDatabase {
                 StartZ = 1;
                 for (var SpaltNo = 0; SpaltNo < Zeil[0].GetUpperBound(0) + 1; SpaltNo++) {
                     if (string.IsNullOrEmpty(Zeil[0][SpaltNo])) {
-                        OnDropMessage("Abbruch,<br>leerer Spaltenname.");
+                        OnDropMessage(enFehlerArt.Warnung, "Abbruch,<br>leerer Spaltenname.");
                         return "Abbruch,<br>leerer Spaltenname.";
                     }
                     Zeil[0][SpaltNo] = Zeil[0][SpaltNo].Replace(" ", "_").ReduceToChars(Constants.AllowedCharsVariableName);
@@ -756,7 +759,7 @@ namespace BlueDatabase {
                     if (row != null && dorowautmatic) { row.DoAutomatic(true, true, "import"); }
                 }
             }
-            OnDropMessage("<b>Import abgeschlossen.</b>\r\n" + neuZ.ToString() + " neue Zeilen erstellt.");
+            OnDropMessage(enFehlerArt.Info, "<b>Import abgeschlossen.</b>\r\n" + neuZ.ToString() + " neue Zeilen erstellt.");
             return string.Empty;
         }
 
@@ -1077,9 +1080,9 @@ namespace BlueDatabase {
             Develop.DebugPrint(enFehlerArt.Warnung, t);
         }
 
-        internal void OnDropMessage(string message) {
+        internal void OnDropMessage(enFehlerArt type, string message) {
             if (Disposed) { return; }
-            DropMessage?.Invoke(this, new MessageEventArgs(message));
+            DropMessage?.Invoke(this, new MessageEventArgs(type, message));
         }
 
         internal void OnGenerateLayoutInternal(GenerateLayoutInternalEventargs e) {
