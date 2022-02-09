@@ -1,5 +1,4 @@
-﻿
-namespace BlueControls.BlueDatabaseDialogs {
+﻿namespace BlueControls.BlueDatabaseDialogs {
     partial class frmColumnArrangementPadEditor {
         /// <summary>
         /// Required designer variable.
