@@ -198,11 +198,11 @@ namespace BlueControls.Forms {
         protected System.Windows.Forms.TabPage tabDatei;
         protected GroupBox grpDateiSystem;
         private Button btnDruckerDialog;
-        protected Button btnImport;
+        private Button btnImport;
         protected LastFilesCombo btnLastFiles;
-        protected Button btnNeu;
+        private Button btnNeu;
         protected Button btnOeffnen;
-        protected Button btnSpeichern;
+        private Button btnSpeichern;
         private System.Windows.Forms.OpenFileDialog LoadTab;
         private System.Windows.Forms.SaveFileDialog SaveTab;
     }

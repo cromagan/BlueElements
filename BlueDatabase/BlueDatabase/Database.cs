@@ -768,9 +768,14 @@ namespace BlueDatabase {
         /// </summary>
         public void InjectCommand(enDatabaseDataType Comand, string ChangedTo) => AddPending(Comand, -1, -1, string.Empty, ChangedTo, true);
 
-        public bool IsAdministrator() => DatenbankAdmin.Contains("#User: " + UserName, false)
-                                        || (!string.IsNullOrEmpty(UserGroup) && DatenbankAdmin.Contains(UserGroup, false))
-                                        || UserGroup.ToUpper() == "#ADMINISTRATOR";
+        public bool IsAdministrator() {
+            if (UserGroup.ToUpper() == "#ADMINISTRATOR") { return true; }
+            if (DatenbankAdmin == null || DatenbankAdmin.Count == 0) { return false; }
+            if (DatenbankAdmin.Contains("#EVERYBODY", false)) { return true; }
+            if (!string.IsNullOrEmpty(UserName) && DatenbankAdmin.Contains("#User: " + UserName, false)) { return true; }
+            if (!string.IsNullOrEmpty(UserGroup) && DatenbankAdmin.Contains(UserGroup, false)) { return true; }
+            return false;
+        }
 
         public void OnScriptError(RowCancelEventArgs e) {
             if (Disposed) { return; }
@@ -1385,7 +1390,7 @@ namespace BlueDatabase {
                 Cell.SaveToByteList(ref l);
                 if (SortDefinition == null) {
                     // Ganz neue Datenbank
-                    SaveToByteList(l, enDatabaseDataType.SortDefinition, "");
+                    SaveToByteList(l, enDatabaseDataType.SortDefinition, string.Empty);
                 } else {
                     SaveToByteList(l, enDatabaseDataType.SortDefinition, _sortDefinition.ToString());
                 }

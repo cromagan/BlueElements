@@ -622,6 +622,39 @@ namespace BlueControls.Controls {
             return i;
         }
 
+        public static void WriteColumnArrangementsInto(ComboBox columnArrangementSelector, Database _Database, int showingNo) {
+            //if (InvokeRequired) {
+            //    Invoke(new Action(() => WriteColumnArrangementsInto(columnArrangementSelector)));
+            //    return;
+            //}
+            if (columnArrangementSelector != null) {
+                columnArrangementSelector.Item.Clear();
+                columnArrangementSelector.Enabled = false;
+                columnArrangementSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            }
+
+            if (_Database == null || columnArrangementSelector == null) {
+                if (columnArrangementSelector != null) {
+                    columnArrangementSelector.Enabled = false;
+                    columnArrangementSelector.Text = string.Empty;
+                }
+                return;
+            }
+
+            foreach (var ThisArrangement in _Database.ColumnArrangements) {
+                if (ThisArrangement != null) {
+                    if (columnArrangementSelector != null && _Database.PermissionCheck(ThisArrangement.PermissionGroups_Show, null)) {
+                        columnArrangementSelector.Item.Add(ThisArrangement.Name, _Database.ColumnArrangements.IndexOf(ThisArrangement).ToString());
+                    }
+                }
+            }
+
+            if (columnArrangementSelector != null) {
+                columnArrangementSelector.Enabled = Convert.ToBoolean(columnArrangementSelector.Item.Count > 1);
+                columnArrangementSelector.Text = columnArrangementSelector.Item.Count > 0 ? showingNo.ToString() : string.Empty;
+            }
+        }
+
         public void CollapesAll() {
             _collapsed.Clear();
             if (Database != null) {
@@ -991,36 +1024,6 @@ namespace BlueControls.Controls {
 
             return l;
             //return Database.Row.CalculateVisibleRows(Filter, PinnedRows);
-        }
-
-        public void WriteColumnArrangementsInto(ComboBox _ColumnArrangementSelector) {
-            if (InvokeRequired) {
-                Invoke(new Action(() => WriteColumnArrangementsInto(_ColumnArrangementSelector)));
-                return;
-            }
-            if (_ColumnArrangementSelector != null) {
-                _ColumnArrangementSelector.Item.Clear();
-                _ColumnArrangementSelector.Enabled = false;
-                _ColumnArrangementSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            }
-            if (_Database == null || _Design != enBlueTableAppearance.Standard || _ColumnArrangementSelector == null) {
-                if (_ColumnArrangementSelector != null) {
-                    _ColumnArrangementSelector.Enabled = false;
-                    _ColumnArrangementSelector.Text = string.Empty;
-                }
-                return;
-            }
-            foreach (var ThisArrangement in _Database.ColumnArrangements) {
-                if (ThisArrangement != null) {
-                    if (_ColumnArrangementSelector != null && _Database.PermissionCheck(ThisArrangement.PermissionGroups_Show, null)) {
-                        _ColumnArrangementSelector.Item.Add(ThisArrangement.Name, _Database.ColumnArrangements.IndexOf(ThisArrangement).ToString());
-                    }
-                }
-            }
-            if (_ColumnArrangementSelector != null) {
-                _ColumnArrangementSelector.Enabled = Convert.ToBoolean(_ColumnArrangementSelector.Item.Count > 1);
-                _ColumnArrangementSelector.Text = _ColumnArrangementSelector.Item.Count > 0 ? _ArrangementNr.ToString() : string.Empty;
-            }
         }
 
         internal static void StartDatabaseService() {

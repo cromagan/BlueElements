@@ -595,7 +595,7 @@ namespace BlueControls.Forms {
 
         private void SuchenUndErsetzen_Click(object sender, System.EventArgs e) => TableView.OpenSearchAndReplace();
 
-        private void TableView_ColumnArrangementChanged(object sender, System.EventArgs e) => TableView.WriteColumnArrangementsInto(cbxColumnArr);
+        private void TableView_ColumnArrangementChanged(object sender, System.EventArgs e) => Table.WriteColumnArrangementsInto(cbxColumnArr, TableView.Database, TableView.Arrangement);
 
         private void TableView_ContextMenu_Init(object sender, ContextMenuInitEventArgs e) {
             var bt = (Table)sender;
@@ -649,7 +649,7 @@ namespace BlueControls.Forms {
             CheckButtons();
         }
 
-        private void TableView_ViewChanged(object sender, System.EventArgs e) => TableView.WriteColumnArrangementsInto(cbxColumnArr);
+        private void TableView_ViewChanged(object sender, System.EventArgs e) => Table.WriteColumnArrangementsInto(cbxColumnArr, TableView.Database, TableView.Arrangement);
 
         private void Tempor‰renSpeicherort÷ffnen_Click(object sender, System.EventArgs e) {
             BlueBasics.MultiUserFile.clsMultiUserFile.SaveAll(false);

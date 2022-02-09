@@ -66,6 +66,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tbcontrol.Name = "tbcontrol";
             this.tbcontrol.SelectedIndex = 0;
             this.tbcontrol.Size = new System.Drawing.Size(386, 420);
+            this.tbcontrol.TabDefault = null;
+            this.tbcontrol.TabDefaultOrder = null;
             this.tbcontrol.TabIndex = 0;
             // 
             // tabAllgemein

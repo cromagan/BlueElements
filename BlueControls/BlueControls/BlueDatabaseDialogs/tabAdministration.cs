@@ -85,6 +85,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 if (_database.IsAdministrator()) {
                     foreach (var ThisColumnItem in _database.Column) {
                         while (!ThisColumnItem.IsOk()) {
+                            Develop.DebugPrint(enFehlerArt.Info, "Datenbank:" + _database.Filename + "\r\nSpalte:" + ThisColumnItem.Name + "\r\nSpaltenfehler: " + ThisColumnItem.ErrorReason() + "\r\nUser: " + _database.UserName + "\r\nGroup: " + _database.UserGroup + "\r\nAdmins: " + _database.DatenbankAdmin.JoinWith(";"));
                             MessageBox.Show("Die folgende Spalte enthält einen Fehler:<br>" + ThisColumnItem.ErrorReason() + "<br><br>Bitte reparieren.", enImageCode.Information, "OK");
                             OpenColumnEditor(ThisColumnItem, null);
                         }

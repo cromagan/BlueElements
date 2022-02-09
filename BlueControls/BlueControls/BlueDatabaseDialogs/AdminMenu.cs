@@ -349,7 +349,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void TmpDatabase_ShouldICancelDiscOperations(object sender, System.ComponentModel.CancelEventArgs e) => e.Cancel = true;
 
-        private void UpdateViewControls() => _TableView.WriteColumnArrangementsInto(cbxInternalColumnArrangementSelector);
+        private void UpdateViewControls() => Table.WriteColumnArrangementsInto(cbxInternalColumnArrangementSelector, _TableView.Database, _TableView.Arrangement);
 
         #endregion
     }

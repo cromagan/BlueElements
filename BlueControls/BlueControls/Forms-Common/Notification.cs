@@ -191,68 +191,80 @@ namespace BlueControls.Forms {
         //}
 
         private static void Movement(object sender, DoWorkEventArgs e) {
-            Notification x = new((string)e.Argument);
-            x.Show();
+            Notification x = null;
+            try {
+                x = new((string)e.Argument);
+                x.Show();
 
-            var lowestY = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - x.Height - Skin.Padding;
+                var lowestY = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - x.Height - Skin.Padding;
+                var pixelfromLower = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Bottom - lowestY;
+                x.Top = lowestY;
 
-            x.Top = lowestY;
+                var _FirstTimer = DateTime.Now;
+                bool hiddenNow;
+                var outime = new DateTime(0);
 
-            var _FirstTimer = DateTime.Now;
-            bool hiddenNow;
-            var lastMS = 0d;
+                do {
+                    var MS = DateTime.Now.Subtract(_FirstTimer).TotalMilliseconds;
+                    //var diff = MS - lastMS;
+                    //lastMS = MS;
 
-            do {
-                var MS = DateTime.Now.Subtract(_FirstTimer).TotalMilliseconds;
-                var diff = MS - lastMS;
-                lastMS = MS;
+                    #region Anzeige-Status (Richtung, Prozent) bestimmen
 
-                #region Anzeige-Status (Richtung, Prozent) bestimmen
+                    var hasBelow = false;
+                    hiddenNow = false;
+                    var Speed = 250d; // Wegen Recheoperation
+                    var Left = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width - x.Width - (Skin.Padding * 2);
+                    var Top = x.Top;
 
-                var hasBelow = false;
-                hiddenNow = false;
-                var Speed = 250d; // Wegen Recheoperation
-                var Left = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width - x.Width - (Skin.Padding * 2);
-                var Top = x.Top;
-
-                if (x.NoteBelow != null && AllBoxes.Contains(x.NoteBelow)) {
-                    Top = x.NoteBelow.Top - Skin.Padding - x.Height;
-                    hasBelow = true;
-                }
-
-                if (MS < Speed) {
-                    // Kommt von Rechts reingeflogen
-                    x.Opacity = MS / Speed;
-                    Left = (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width - (x.Width - (Skin.Padding * 2)) * x.Opacity); // Opacity == Prozent
-                    Top = Math.Min(Top, lowestY);
-                } else if (x.Top > System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height) {
-                    //Lebensdauer überschritten
-                    hiddenNow = true;
-                } else if (MS > x.FloatInAndOutMilliSek - Speed) {
-                    // War lange genug da, darf wieder raus
-                    if (!hasBelow) {
-                        Top = x.Top + (int)Math.Max(diff / 17, 1);
-                        Left = x.Left + (int)Math.Max(diff / 17, 1);
-                        x.Opacity = x.Opacity * 0.96;
-                    } else {
-                        x.Opacity = 1;
+                    if (x.NoteBelow != null && AllBoxes.Contains(x.NoteBelow)) {
+                        Top = Math.Min(x.NoteBelow.Top - Skin.Padding - x.Height, lowestY);
+                        hasBelow = true;
                     }
-                } else {
-                    //Hauptanzeige ist gerade
-                    x.Opacity = 1;
-                    Top = Math.Min(Top, lowestY);
-                }
 
-                #endregion
+                    if (MS < Speed) {
+                        // Kommt von Rechts reingeflogen
+                        x.Opacity = MS / Speed;
+                        Left = (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width - (x.Width - (Skin.Padding * 2)) * x.Opacity); // Opacity == Prozent
+                        Top = Math.Min(Top, lowestY);
+                    } else if (x.Top >= System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height) {
+                        //Lebensdauer überschritten
+                        hiddenNow = true;
+                    } else if (MS > x.FloatInAndOutMilliSek - Speed) {
+                        // War lange genug da, darf wieder raus
+                        if (!hasBelow) {
+                            if (outime.Ticks == 0) { outime = DateTime.Now; }
 
-                x.Left = Left;
-                //x.Region = new Region(new Rectangle(0, 0, x.Width, (int)Math.Truncate(x.Height * Prozent)));
-                x.Top = Top;
+                            var MSo = DateTime.Now.Subtract(outime).TotalMilliseconds;
 
-                x.Refresh();
-                Develop.DoEvents();
-            } while (!hiddenNow);
-            x.Close();
+                            x.Opacity = 1 - MSo / Speed;
+                            Top = (int)(lowestY + pixelfromLower * (MSo / Speed)) + 1;
+                            //Left = x.Left + (int)Math.Max(diff / 17, 1);
+                            //x.Opacity = x.Opacity * 0.96;
+                        } else {
+                            x.Opacity = 1;
+                        }
+                    } else {
+                        //Hauptanzeige ist gerade
+                        x.Opacity = 1;
+                        Top = Math.Min(Top, lowestY);
+                    }
+
+                    #endregion
+
+                    if (x.Left != Left || x.Top != Top) {
+                        x.Left = Left;
+                        //x.Region = new Region(new Rectangle(0, 0, x.Width, (int)Math.Truncate(x.Height * Prozent)));
+                        x.Top = Top;
+                        //x.Refresh();
+                        Develop.DoEvents();
+                    }
+                } while (!hiddenNow);
+            } catch { }
+
+            try {
+                x.Close();
+            } catch { }
         }
 
         #endregion
