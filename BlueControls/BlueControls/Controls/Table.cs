@@ -769,9 +769,6 @@ namespace BlueControls.Controls {
             foreach (var ThisArrangement in _Database.ColumnArrangements) {
                 if (ThisArrangement != null) {
                     ThisArrangement.Invalidate_DrawWithOfAllItems();
-                    if (_Database.ColumnArrangements.IndexOf(ThisArrangement) == 0) {
-                        _Database.ColumnArrangements[0].ShowAllColumns();
-                    }
                 }
             }
         }

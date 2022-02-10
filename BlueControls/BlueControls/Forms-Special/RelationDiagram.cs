@@ -111,7 +111,8 @@ namespace BlueControls.Forms {
                 var ro = Database.Row[thisn];
                 var it = ItemOfRow(ro);
                 if (it == null) {
-                    lastit = AddOne(thisn, (int)lastit.p_RO.X, (int)lastit.p_RO.Y, lastit.Layout_ID);
+                    //lastit = AddOne(thisn, (int)lastit.p_RO.X, (int)lastit.p_RO.Y, lastit.Layout_ID);
+                    lastit = AddOne(thisn, 0, 0, lastit.Layout_ID);
                 }
             }
             //var Plus = 0;

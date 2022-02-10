@@ -30,14 +30,14 @@ namespace BlueControls.ItemCollection {
 
         #region Fields
 
-        internal PointM p_L;
-        internal PointM p_LO;
-        internal PointM p_LU;
-        internal PointM p_O;
-        internal PointM p_R;
-        internal PointM p_RO;
-        internal PointM p_RU;
-        internal PointM p_U;
+        protected PointM p_L;
+        protected PointM p_LO;
+        protected PointM p_LU;
+        protected PointM p_O;
+        protected PointM p_R;
+        protected PointM p_RO;
+        protected PointM p_RU;
+        protected PointM p_U;
         private int _drehwinkel = 0;
 
         #endregion

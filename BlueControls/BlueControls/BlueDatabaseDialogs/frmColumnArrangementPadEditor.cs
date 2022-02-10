@@ -51,6 +51,8 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         public static Database Database = null;
 
+        private int Arrangement = -1;
+
         #endregion
 
         #region Constructors
@@ -58,13 +60,22 @@ namespace BlueControls.BlueDatabaseDialogs {
         public frmColumnArrangementPadEditor(Database database) : this() {
             Database = database;
             Database.ShouldICancelSaveOperations += TmpDatabase_ShouldICancelDiscOperations;
-
-            _TableView.WriteColumnArrangementsInto(cbxInternalColumnArrangementSelector);
+            Arrangement = 1;
+            UpdateCombobox();
+            ShowOrder();
         }
 
         private frmColumnArrangementPadEditor() {
             InitializeComponent();
         }
+
+        #endregion
+
+        #region Properties
+
+        public ColumnViewCollection CurrentArrangement => Database == null || Database.ColumnArrangements == null || Database.ColumnArrangements.Count <= Arrangement
+                    ? null
+                    : Database.ColumnArrangements[Arrangement];
 
         #endregion
 
@@ -76,20 +87,24 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void btnAktuelleAnsichtLoeschen_Click(object sender, System.EventArgs e) {
-            if (_TableView.Arrangement < 2 || _TableView.Arrangement >= Database.ColumnArrangements.Count) { return; }
-            if (MessageBox.Show("Anordung <b>'" + _TableView.CurrentArrangement.Name + "'</b><br>wirklich löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-            Database.ColumnArrangements.RemoveAt(_TableView.Arrangement);
-            _TableView.Arrangement = 1;
+            if (Arrangement < 2 || Arrangement >= Database.ColumnArrangements.Count) { return; }
+            if (MessageBox.Show("Anordung <b>'" + CurrentArrangement.Name + "'</b><br>wirklich löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+            Database.ColumnArrangements.RemoveAt(Arrangement);
+            Arrangement = 1;
+            UpdateCombobox();
+            ShowOrder();
         }
 
         private void btnAlleSpaltenEinblenden_Click(object sender, System.EventArgs e) {
             if (MessageBox.Show("Alle Spalten anzeigen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-            _TableView.CurrentArrangement.ShowAllColumns();
+            CurrentArrangement.ShowAllColumns();
+            ShowOrder();
         }
 
         private void btnAnsichtUmbenennen_Click(object sender, System.EventArgs e) {
-            var n = InputBox.Show("Umbenennen:", _TableView.CurrentArrangement.Name, enVarType.Text);
-            if (!string.IsNullOrEmpty(n)) { _TableView.CurrentArrangement.Name = n; }
+            var n = InputBox.Show("Umbenennen:", CurrentArrangement.Name, enVarType.Text);
+            if (!string.IsNullOrEmpty(n)) { CurrentArrangement.Name = n; }
+            UpdateCombobox();
         }
 
         private void btnBerechtigungsgruppen_Click(object sender, System.EventArgs e) {
@@ -97,17 +112,17 @@ namespace BlueControls.BlueDatabaseDialogs {
             aa.AddRange(Database.Permission_AllUsed(true));
             aa.Sort();
             aa.CheckBehavior = enCheckBehavior.MultiSelection;
-            aa.Check(_TableView.CurrentArrangement.PermissionGroups_Show, true);
+            aa.Check(CurrentArrangement.PermissionGroups_Show, true);
             var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, enAddType.Text, true);
             if (b == null) { return; }
-            _TableView.CurrentArrangement.PermissionGroups_Show.Clear();
-            _TableView.CurrentArrangement.PermissionGroups_Show.AddRange(b.ToArray());
-            if (_TableView.Arrangement == 1) { _TableView.CurrentArrangement.PermissionGroups_Show.Add("#Everybody"); }
+            CurrentArrangement.PermissionGroups_Show.Clear();
+            CurrentArrangement.PermissionGroups_Show.AddRange(b.ToArray());
+            if (Arrangement == 1) { CurrentArrangement.PermissionGroups_Show.Add("#Everybody"); }
         }
 
         private void btnNeueAnsichtErstellen_Click(object sender, System.EventArgs e) {
             var MitVorlage = false;
-            if (_TableView.Arrangement > 0 && _TableView.CurrentArrangement != null) {
+            if (Arrangement > 0 && CurrentArrangement != null) {
                 MitVorlage = Convert.ToBoolean(MessageBox.Show("<b>Neue Spaltenanordnung erstellen:</b><br>Wollen sie die aktuelle Ansicht kopieren?", enImageCode.Frage, "Ja", "Nein") == 0);
             }
             if (Database.ColumnArrangements.Count < 1) {
@@ -117,18 +132,20 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (MitVorlage) {
                 newname = InputBox.Show("Die aktuelle Ansicht wird <b>kopiert</b>.<br><br>Geben sie den Namen<br>der neuen Anordnung ein:", "", enVarType.Text);
                 if (string.IsNullOrEmpty(newname)) { return; }
-                Database.ColumnArrangements.Add(new ColumnViewCollection(Database, _TableView.CurrentArrangement.ToString(), newname));
+                Database.ColumnArrangements.Add(new ColumnViewCollection(Database, CurrentArrangement.ToString(), newname));
             } else {
                 newname = InputBox.Show("Geben sie den Namen<br>der neuen Anordnung ein:", "", enVarType.Text);
                 if (string.IsNullOrEmpty(newname)) { return; }
                 Database.ColumnArrangements.Add(new ColumnViewCollection(Database, "", newname));
             }
+            UpdateCombobox();
+            ShowOrder();
         }
 
         private void btnSpalteEinblenden_Click(object sender, System.EventArgs e) {
             ItemCollectionList ic = new();
             foreach (var ThisColumnItem in Database.Column) {
-                if (ThisColumnItem != null && _TableView.CurrentArrangement[ThisColumnItem] == null) { ic.Add(ThisColumnItem); }
+                if (ThisColumnItem != null && CurrentArrangement[ThisColumnItem] == null) { ic.Add(ThisColumnItem); }
             }
             if (ic.Count == 0) {
                 MessageBox.Show("Es werden bereits alle<br>Spalten angezeigt.", enImageCode.Information, "Ok");
@@ -137,19 +154,42 @@ namespace BlueControls.BlueDatabaseDialogs {
             ic.Sort();
             var r = InputBoxListBoxStyle.Show("Wählen sie:", ic, enAddType.None, true);
             if (r == null || r.Count == 0) { return; }
-            _TableView.CurrentArrangement.Add(Database.Column.SearchByKey(LongParse(r[0])), false);
-            _TableView.Invalidate_HeadSize();
+            CurrentArrangement.Add(Database.Column.SearchByKey(LongParse(r[0])), false);
+            ShowOrder();
         }
 
-        private void btnSystemspaltenAusblenden_Click(object sender, System.EventArgs e) => _TableView.CurrentArrangement.HideSystemColumns();
+        private void btnSystemspaltenAusblenden_Click(object sender, System.EventArgs e) {
+            CurrentArrangement.HideSystemColumns();
+            ShowOrder();
+        }
 
         private void cbxInternalColumnArrangementSelector_ItemClicked(object sender, BasicListItemEventArgs e) {
             if (string.IsNullOrEmpty(cbxInternalColumnArrangementSelector.Text)) { return; }
-            _TableView.Arrangement = int.Parse(e.Item.Internal);
-            Check_OrderButtons();
+
+            var tmporder = int.Parse(e.Item.Internal);
+
+            if (Arrangement == tmporder) { return; }
+
+            Arrangement = tmporder;
+            ShowOrder();
+        }
+
+        private void ShowOrder() {
+            Pad.Item.Clear();
+
+            foreach (var thisc in CurrentArrangement) {
+                var it = new TextPadItem(Pad.Item, thisc.Column.Name, thisc.Column.ReadableText);
+
+                it.SetCoordinates(new RectangleM)
+                    Pad.Item.Add(it)
+            }
         }
 
         private void TmpDatabase_ShouldICancelDiscOperations(object sender, System.ComponentModel.CancelEventArgs e) => e.Cancel = true;
+
+        private void UpdateCombobox() {
+            Table.WriteColumnArrangementsInto(cbxInternalColumnArrangementSelector, Database, Arrangement);
+        }
 
         #endregion
     }

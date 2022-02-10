@@ -226,6 +226,14 @@ namespace BlueControls.BlueDatabaseDialogs {
             _TableView.PowerEdit = DateTime.Now.AddSeconds(20);
         }
 
+        private void btnSpaltenanordnung_Click(object sender, System.EventArgs e) {
+            var x = new frmColumnArrangementPadEditor(Table.Database);
+            x.ShowDialog();
+            Table.Database.ColumnArrangements[0].ShowAllColumns();
+            Table.Invalidate_HeadSize();
+            Table.Invalidate_AllColumnArrangements();
+        }
+
         private void btnSpaltenUebersicht_Click(object sender, System.EventArgs e) => _TableView.Database.Column.GenerateOverView();
 
         private void btnVorherigeVersion_Click(object sender, System.EventArgs e) {
