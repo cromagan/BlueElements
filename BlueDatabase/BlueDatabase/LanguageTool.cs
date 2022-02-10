@@ -16,7 +16,6 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
-using BlueBasics.Enums;
 using BlueDatabase.Enums;
 
 namespace BlueDatabase {

@@ -23,6 +23,7 @@ using BlueControls.Forms;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using System.ComponentModel;
+using System.Drawing;
 using static BlueBasics.FileOperations;
 
 namespace BlueControls.BlueDatabaseDialogs {
@@ -77,7 +78,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                     TextPadItem x = new(Pad.Item, "x", "Nicht editierbares Layout aus dem Dateisystem");
                     Pad.Item.Add(x);
                     x.Stil = Enums.PadStyles.Style_Überschrift_Haupt;
-                    x.SetCoordinates(new RectangleM(0, 0, 1000, 400), true);
+                    x.SetCoordinates(new RectangleF(0, 0, 1000, 400), true);
                     ItemChanged();
                 }
             } else {

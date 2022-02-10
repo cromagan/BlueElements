@@ -21,6 +21,7 @@ using System.Drawing;
 namespace BlueBasics {
 
     public static partial class Extensions {
+        //public static PointF ZoomAndMove(this PointF p, AdditionalDrawing e) => ZoomAndMove(e.Zoom, e.ShiftX, e.ShiftY);
 
         #region Methods
 
@@ -29,6 +30,8 @@ namespace BlueBasics {
             r.Inflate(toleranz, toleranz);
             return r.Contains(p);
         }
+
+        public static PointF ZoomAndMove(this PointF p, float zoom, float shiftX, float shiftY) => new((float)((p.X * zoom) - shiftX + (zoom / 2)), (float)((p.Y * zoom) - shiftY + (zoom / 2)));
 
         #endregion
     }

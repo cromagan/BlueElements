@@ -24,6 +24,7 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
 using System;
 using System.Drawing;
+using static BlueBasics.Geometry;
 
 namespace BlueControls {
 
@@ -31,28 +32,28 @@ namespace BlueControls {
 
         #region Fields
 
-        private double _x;
-        private double _y;
+        private float _x;
+        private float _y;
 
         #endregion
 
         #region Constructors
 
-        public PointM(object parent, string name, double startX, double startY, double laenge, double alpha) : this(parent) {
+        public PointM(object parent, string name, float startX, float startY, float laenge, float alpha) : this(parent) {
             Name = name;
-            var tempVar = GeometryDF.PolarToCartesian(laenge, Convert.ToDouble(alpha));
+            var tempVar = PolarToCartesian(laenge, alpha);
             _x = startX + tempVar.X;
             _y = startY + tempVar.Y;
             Tag = string.Empty;
         }
 
-        public PointM(PointM startPoint, double laenge, double alpha) : this(null, string.Empty, startPoint.X, startPoint.Y, laenge, alpha) { }
+        public PointM(PointM startPoint, float laenge, float alpha) : this(null, string.Empty, startPoint.X, startPoint.Y, laenge, alpha) { }
 
-        public PointM(PointF startPoint, double laenge, double alpha) : this(null, string.Empty, startPoint.X, startPoint.Y, laenge, alpha) { }
+        public PointM(PointF startPoint, float laenge, float alpha) : this(null, string.Empty, startPoint.X, startPoint.Y, laenge, alpha) { }
 
         public PointM(object parent, string codeToParse) : this(parent) => Parse(codeToParse);
 
-        public PointM(object parent, string name, double x, double y, string tag) {
+        public PointM(object parent, string name, float x, float y, string tag) {
             Parent = parent;
             _x = x;
             _y = y;
@@ -60,21 +61,21 @@ namespace BlueControls {
             Tag = tag;
         }
 
-        public PointM() : this(null, string.Empty, 0D, 0D, string.Empty) { }
+        public PointM() : this(null, string.Empty, 0f, 0f, string.Empty) { }
 
-        public PointM(object parent) : this(parent, string.Empty, 0D, 0D, string.Empty) { }
+        public PointM(object parent) : this(parent, string.Empty, 0f, 0f, string.Empty) { }
 
-        public PointM(string name, double x, double y) : this(null, name, x, y, string.Empty) { }
+        public PointM(string name, float x, float y) : this(null, name, x, y, string.Empty) { }
 
         public PointM(object parent, string name, int x, int y) : this(parent, name, x, y, string.Empty) { }
 
-        public PointM(object parent, string name, double x, double y) : this(parent, name, x, y, string.Empty) { }
+        public PointM(object parent, string name, float x, float y) : this(parent, name, x, y, string.Empty) { }
 
         public PointM(PointF point) : this(null, string.Empty, point.X, point.Y, string.Empty) { }
 
         public PointM(int x, int y) : this(null, string.Empty, x, y, string.Empty) { }
 
-        public PointM(double x, double y) : this(null, string.Empty, (double)x, (double)y, string.Empty) { }
+        public PointM(float x, float y) : this(null, string.Empty, (float)x, (float)y, string.Empty) { }
 
         public PointM(PointM point) : this(null, string.Empty, point.X, point.Y, string.Empty) { }
 
@@ -92,13 +93,13 @@ namespace BlueControls {
 
         #region Properties
 
-        public double Magnitude => (double)Math.Sqrt((double)((_x * _x) + (_y * _y)));
+        public float Magnitude => (float)Math.Sqrt((float)((_x * _x) + (_y * _y)));
         public string Name { get; private set; }
         public object Parent { get; set; }
 
         public string Tag { get; set; }
 
-        public double X {
+        public float X {
             get => _x;
             set {
                 if (_x == value) { return; }
@@ -106,7 +107,7 @@ namespace BlueControls {
             }
         }
 
-        public double Y {
+        public float Y {
             get => _y;
             set {
                 if (_y == value) { return; }
@@ -118,27 +119,27 @@ namespace BlueControls {
 
         #region Methods
 
-        public static PointM Empty() => new(0d, 0d);
+        public static PointM Empty() => new(0f, 0f);
 
-        public static explicit operator Point(PointM p) => new((int)p.X, (int)p.Y);
+        public static implicit operator Point(PointM p) => new((int)p.X, (int)p.Y);
 
-        public static explicit operator PointF(PointM p) => new((float)p.X, (float)p.Y);
+        public static implicit operator PointF(PointM p) => new((float)p.X, (float)p.Y);
 
         public static PointM operator -(PointM a) => new(-a._x, -a._y);
 
         public static PointM operator -(PointM a, PointM b) => new(a._x - b._x, a._y - b._y);
 
-        public static PointM operator *(PointM a, double b) => new(a._x * b, a._y * b);
+        public static PointM operator *(PointM a, float b) => new(a._x * b, a._y * b);
 
         public static PointM operator +(PointM a, PointM b) => new(a._x + b._x, a._y + b._y);
 
-        public double DistanzZuLinie(PointM P1, PointM P2) => DistanzZuLinie(P1.X, P1.Y, P2.X, P2.Y);
+        public float DistanzZuLinie(PointM P1, PointM P2) => DistanzZuLinie(P1.X, P1.Y, P2.X, P2.Y);
 
-        public double DistanzZuLinie(double X1, double Y1, double X2, double Y2) => GeometryDF.Länge(this, GeometryDF.PointOnLine(this, X1, Y1, X2, Y2));
+        public float DistanzZuLinie(float X1, float Y1, float X2, float Y2) => Länge(this, PointOnLine(this, X1, Y1, X2, Y2));
 
-        public double DotProduct(PointM vector) => (_x * vector._x) + (_y * vector._y);
+        public float DotProduct(PointM vector) => (_x * vector._x) + (_y * vector._y);
 
-        public void Draw(Graphics gr, double zoom, double shiftX, double shiftY, enDesign type, enStates state) {
+        public void Draw(Graphics gr, float zoom, float shiftX, float shiftY, enDesign type, enStates state) {
             var tx = (_x * zoom) - shiftX + (zoom / 2);
             var ty = (_y * zoom) - shiftY + (zoom / 2);
             Rectangle r = new((int)(tx - 4), (int)(ty - 4), 9, 9);
@@ -158,7 +159,7 @@ namespace BlueControls {
             //}
         }
 
-        public void Move(double x, double y) => SetTo(_x + x, _y + y);
+        public void Move(float x, float y) => SetTo(_x + x, _y + y);
 
         public void Normalize() {
             var magnitude = Magnitude;
@@ -184,11 +185,11 @@ namespace BlueControls {
                         break;
 
                     case "x":
-                        _x = double.Parse(pair.Value);
+                        _x = float.Parse(pair.Value);
                         break;
 
                     case "y":
-                        _y = double.Parse(pair.Value);
+                        _y = float.Parse(pair.Value);
                         break;
 
                     case "fix": // TODO: Entfernt, 24.05.2021
@@ -210,7 +211,7 @@ namespace BlueControls {
             }
         }
 
-        public void SetTo(double x, double y) {
+        public void SetTo(float x, float y) {
             var mx = x != _x;
             var my = y != _y;
 
@@ -221,16 +222,18 @@ namespace BlueControls {
             OnMoved(new MoveEventArgs(mx, my));
         }
 
-        public void SetTo(PointM StartPoint, double Länge, double Alpha) {
-            var tempVar = GeometryDF.PolarToCartesian(Länge, Convert.ToDouble(Alpha));
+        public void SetTo(PointM StartPoint, float Länge, float Alpha) {
+            var tempVar = PolarToCartesian(Länge, Alpha);
             SetTo(StartPoint.X + tempVar.X, Y = StartPoint.Y + tempVar.Y);
         }
 
+        public void SetTo(PointF Point) => SetTo(Point.X, Point.Y);
+
         public void SetTo(PointM Point) => SetTo(Point.X, Point.Y);
 
-        public void SetTo(Point point) => SetTo(point.X, (double)point.Y);
+        public void SetTo(Point point) => SetTo(point.X, (float)point.Y);
 
-        public void SetTo(int x, int y) => SetTo(x, (double)y);
+        public void SetTo(int x, int y) => SetTo(x, (float)y);
 
         public override string ToString() {
             var t = "{";
@@ -262,7 +265,7 @@ namespace BlueControls {
 
         public PointF ZoomAndMove(AdditionalDrawing e) => ZoomAndMove(e.Zoom, e.ShiftX, e.ShiftY);
 
-        public PointF ZoomAndMove(double zoom, double shiftX, double shiftY) => new((float)((_x * zoom) - shiftX + (zoom / 2)), (float)((_y * zoom) - shiftY + (zoom / 2)));
+        public PointF ZoomAndMove(float zoom, float shiftX, float shiftY) => new((float)((_x * zoom) - shiftX + (zoom / 2)), (float)((_y * zoom) - shiftY + (zoom / 2)));
 
         #endregion
     }

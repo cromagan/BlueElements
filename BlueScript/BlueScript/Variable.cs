@@ -715,7 +715,7 @@ namespace BlueScript {
                     }
 
                     var x = value.Substring(0, value.Length - 1);
-                    return "{\"" + (x.RemoveCriticalVariableChars()).SplitByCRToList().JoinWith("\", \"") + "\"}";
+                    return "{\"" + x.RemoveCriticalVariableChars().SplitByCRToList().JoinWith("\", \"") + "\"}";
 
                 case enVariableDataType.NotDefinedYet: // Wenn ne Routine die Werte einfach ersetzt.
                     return value;

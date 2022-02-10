@@ -173,10 +173,10 @@ namespace BlueControls.ItemCollection {
 
         protected override string ClassId() => "ROW";
 
-        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, double zoom, double shiftX, double shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
+        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
             if (GeneratedBitmap == null) { GeneratePic(false); }
             if (GeneratedBitmap != null) {
-                var scale = (float)Math.Min(drawingCoordinates.Width / (double)GeneratedBitmap.Width, drawingCoordinates.Height / (double)GeneratedBitmap.Height);
+                var scale = (float)Math.Min(drawingCoordinates.Width / GeneratedBitmap.Width, drawingCoordinates.Height / GeneratedBitmap.Height);
                 RectangleF r2 = new(drawingCoordinates.Left, drawingCoordinates.Top, GeneratedBitmap.Width * scale, GeneratedBitmap.Height * scale);
                 if (forPrinting) {
                     gr.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;

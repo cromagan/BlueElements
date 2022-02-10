@@ -219,6 +219,7 @@ namespace BlueControls.Controls {
             var OldVal = string.Empty;
             var x = _propInfo.GetValue(_propertyObject, null);
             object toSet = null;
+
             if (x is null) {
                 OldVal = string.Empty;
                 toSet = Value; // Wissen wir leider nicht, welcher Typ....
@@ -243,6 +244,9 @@ namespace BlueControls.Controls {
             } else if (x is double db) {
                 OldVal = db.ToString(Constants.Format_Float2);
                 toSet = DoubleParse(Value);
+            } else if (x is float fl) {
+                OldVal = fl.ToString(Constants.Format_Float2);
+                toSet = FloatParse(Value);
             } else {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Art unbekannt!");
             }
@@ -300,6 +304,8 @@ namespace BlueControls.Controls {
                 ValueSet(dc.ToString(Constants.Format_Float2), true, false);
             } else if (x is double db) {
                 ValueSet(db.ToString(Constants.Format_Float2), true, false);
+            } else if (x is float fl) {
+                ValueSet(fl.ToString(Constants.Format_Float2), true, false);
             } else if (x is Color co) {
                 ValueSet(co.ToHTMLCode(), true, false);
             } else {

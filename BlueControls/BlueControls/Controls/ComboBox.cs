@@ -207,8 +207,8 @@ namespace BlueControls.Controls {
         }
 
         protected override enDesign GetDesign() => ParentType() is enPartentType.RibbonGroupBox or enPartentType.RibbonPage
-                                        ? enDesign.Ribbon_ComboBox_Textbox
-                                        : enDesign.ComboBox_Textbox;
+   ? enDesign.Ribbon_ComboBox_Textbox
+   : enDesign.ComboBox_Textbox;
 
         protected override void OnEnabledChanged(System.EventArgs e) {
             base.OnEnabledChanged(e);

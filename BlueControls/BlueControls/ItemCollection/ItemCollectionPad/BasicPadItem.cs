@@ -47,7 +47,7 @@ namespace BlueControls.ItemCollection {
 
         private PadStyles _Style = PadStyles.Undefiniert;
         private int _ZoomPadding = 0;
-        private RectangleM tmpUsedArea = null;
+        private RectangleF tmpUsedArea = default;
 
         #endregion
 
@@ -241,8 +241,8 @@ namespace BlueControls.ItemCollection {
         /// Der Zoomfaktor wird nur benötigt, um Maßstabsunabhängige Punkt oder Linienberührungen zu berechnen.
         /// </summary>
         /// <remarks></remarks>
-        public virtual bool Contains(PointF value, double zoomfactor) {
-            var tmp = (RectangleF)UsedArea(); // Umwandlung, um den Bezug zur Klasse zu zerstören
+        public virtual bool Contains(PointF value, float zoomfactor) {
+            var tmp = UsedArea(); // Umwandlung, um den Bezug zur Klasse zu zerstören
             var ne = (float)(-5 / zoomfactor) + 1;
             tmp.Inflate(ne, ne);
             return tmp.Contains(value);
@@ -250,7 +250,7 @@ namespace BlueControls.ItemCollection {
 
         public virtual void DesignOrStyleChanged() { }
 
-        public void Draw(Graphics gr, double zoom, double shiftX, double shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
+        public void Draw(Graphics gr, float zoom, float shiftX, float shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
             if (Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent nicht definiert"); }
             if (forPrinting && !_Bei_Export_sichtbar) { return; }
             var drawingCoordinates = UsedArea().ZoomAndMoveRect(zoom, shiftX, shiftY, false);
@@ -272,7 +272,7 @@ namespace BlueControls.ItemCollection {
         /// <param name="shiftX"></param>
         /// <param name="shiftY"></param>
         /// <param name="c"></param>
-        public void DrawOutline(Graphics gr, double zoom, double shiftX, double shiftY, Color c) => gr.DrawRectangle(new Pen(c), UsedArea().ZoomAndMoveRect(zoom, shiftX, shiftY, false));
+        public void DrawOutline(Graphics gr, float zoom, float shiftX, float shiftY, Color c) => gr.DrawRectangle(new Pen(c), UsedArea().ZoomAndMoveRect(zoom, shiftX, shiftY, false));
 
         public void EineEbeneNachHinten() {
             if (Parent == null) { return; }
@@ -310,7 +310,7 @@ namespace BlueControls.ItemCollection {
 
         public void InDenVordergrund() => Parent?.InDenVordergrund(this);
 
-        public void Move(double x, double y) {
+        public void Move(float x, float y) {
             if (x == 0 && y == 0) { return; }
             for (var i = 0; i < PointsForSuccesfullyMove.Count; i++) {
                 PointsForSuccesfullyMove[i].Move(x, y);
@@ -328,7 +328,7 @@ namespace BlueControls.ItemCollection {
         //}
         public void OnChanged() {
             //if (this is IParseable O && O.IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
-            tmpUsedArea = null;
+            tmpUsedArea = default;
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
@@ -440,8 +440,8 @@ namespace BlueControls.ItemCollection {
         /// Gibt den Bereich zurück, den das Element benötigt, um komplett dargestellt zu werden. Unabhängig von der aktuellen Ansicht.
         /// </summary>
         /// <remarks></remarks>
-        public RectangleM UsedArea() {
-            if (tmpUsedArea == null) { tmpUsedArea = CalculateUsedArea(); }
+        public RectangleF UsedArea() {
+            if (tmpUsedArea.IsEmpty) { tmpUsedArea = CalculateUsedArea(); }
             return tmpUsedArea;
         }
 
@@ -449,7 +449,7 @@ namespace BlueControls.ItemCollection {
         /// Gibt den Bereich zurück, den das Element benötigt, um komplett dargestellt zu werden. Unabhängig von der aktuellen Ansicht. Zusätzlich mit dem Wert aus Padding.
         /// </summary>
         /// <remarks></remarks>
-        public RectangleM ZoomToArea() {
+        public RectangleF ZoomToArea() {
             var x = UsedArea();
             if (_ZoomPadding == 0) { return x; }
             x.Inflate(-ZoomPadding, -ZoomPadding);
@@ -480,11 +480,11 @@ namespace BlueControls.ItemCollection {
             } while (true);
         }
 
-        protected abstract RectangleM CalculateUsedArea();
+        protected abstract RectangleF CalculateUsedArea();
 
         protected abstract string ClassId();
 
-        protected abstract void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, double zoom, double shiftX, double shiftY, enStates state, Size sizeOfParentControl, bool forPrinting);
+        protected abstract void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, enStates state, Size sizeOfParentControl, bool forPrinting);
 
         protected bool IsInDrawingArea(RectangleF DrawingKoordinates, Size SizeOfParentControl) => SizeOfParentControl.IsEmpty || SizeOfParentControl.Width == 0 || SizeOfParentControl.Height == 0
 || DrawingKoordinates.IntersectsWith(new Rectangle(Point.Empty, SizeOfParentControl));

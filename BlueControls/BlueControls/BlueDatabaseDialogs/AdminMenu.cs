@@ -148,7 +148,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                         return;
                 }
             }
-            ColumnItem newc = _TableView.Database.Column.Add();
+            var newc = _TableView.Database.Column.Add();
             if (Vorlage != null) {
                 newc.CloneFrom(Vorlage);
                 if (mitDaten) {

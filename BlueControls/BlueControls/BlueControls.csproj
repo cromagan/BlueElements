@@ -527,7 +527,6 @@
     <Compile Include="Controls\ListBox.Designer.cs">
       <DependentUpon>ListBox.cs</DependentUpon>
     </Compile>
-    <Compile Include="GeometryDF.cs" />
     <Compile Include="Forms-Common\Overlay.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -539,7 +538,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RectangleM.cs" />
     <Compile Include="Forms-Common\ScreenShot.cs">
       <SubType>Form</SubType>
     </Compile>

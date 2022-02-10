@@ -19,7 +19,6 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace BlueDatabase.Interfaces {
 
@@ -110,8 +109,7 @@ namespace BlueDatabase.Interfaces {
             //return l.All(thisString => string.IsNullOrEmpty(thisString) || thisString.IsFormat(format, additionalRegex));
         }
 
-        public static bool IsFormatIdentical(this IInputFormat t, IInputFormat source) {
-            return t.AdditionalCheck == source.AdditionalCheck &&
+        public static bool IsFormatIdentical(this IInputFormat t, IInputFormat source) => t.AdditionalCheck == source.AdditionalCheck &&
             t.AllowedChars == source.AllowedChars &&
             t.Prefix == source.Prefix &&
             t.Regex == source.Regex &&
@@ -119,7 +117,6 @@ namespace BlueDatabase.Interfaces {
             t.MultiLine == source.MultiLine &&
             t.SpellChecking == source.SpellChecking &&
             t.FormatierungErlaubt == source.FormatierungErlaubt;
-        }
 
         /// <summary>
         /// Setzt: AllowedChars, Regex, Präfix, Suffix, FormatierungErlaubt, AdditionlCheck, SpellChecking und Multiline

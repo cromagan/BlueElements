@@ -139,7 +139,7 @@ namespace BlueBasics {
         public static void KeyUp(enTaste k) => keybd_event((byte)k, 0, KEYEVENTF_KEYUP, 0);
 
         public static string LastMouseButton() => Convert.ToBoolean(GetAsyncKeyState(0x1)) ? "Links"
-                : Convert.ToBoolean(GetAsyncKeyState(0x2)) ? "Rechts"
+: Convert.ToBoolean(GetAsyncKeyState(0x2)) ? "Rechts"
 : Convert.ToBoolean(GetAsyncKeyState(0x4)) ? "Mitte"
 : string.Empty;
 

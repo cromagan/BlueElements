@@ -364,7 +364,7 @@ namespace BlueDatabase {
         }
 
         public bool Remove(FilterCollection filter, List<RowItem> pinned) {
-            var Keys = (from thisrowitem in _Internal.Values where thisrowitem != null && thisrowitem.MatchesTo(filter) select thisrowitem.Key).Select(dummy => (long)dummy).ToList();
+            var Keys = (from thisrowitem in _Internal.Values where thisrowitem != null && thisrowitem.MatchesTo(filter) select thisrowitem.Key).Select(dummy => dummy).ToList();
             var did = false;
             foreach (var thisKey in Keys) {
                 if (Remove(thisKey)) { did = true; }
@@ -382,7 +382,7 @@ namespace BlueDatabase {
         public bool Remove(RowItem row) => row != null && Remove(row.Key);
 
         public bool RemoveOlderThan(float inHours) {
-            var x = (from thisrowitem in _Internal.Values where thisrowitem != null let D = thisrowitem.CellGetDateTime(Database.Column.SysRowCreateDate) where DateTime.Now.Subtract(D).TotalHours > inHours select thisrowitem.Key).Select(dummy => (long)dummy).ToList();
+            var x = (from thisrowitem in _Internal.Values where thisrowitem != null let D = thisrowitem.CellGetDateTime(Database.Column.SysRowCreateDate) where DateTime.Now.Subtract(D).TotalHours > inHours select thisrowitem.Key).Select(dummy => dummy).ToList();
             //foreach (var thisrowitem in _Internal.Values)
             //{
             //    if (thisrowitem != null)

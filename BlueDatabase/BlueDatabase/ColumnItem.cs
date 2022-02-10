@@ -28,7 +28,6 @@ using System.Drawing;
 using System.Text.RegularExpressions;
 using static BlueBasics.Extensions;
 using static BlueBasics.FileOperations;
-using static BlueDatabase.Database;
 
 namespace BlueDatabase {
 
@@ -1919,12 +1918,12 @@ namespace BlueDatabase {
                 d.Add(KeyValue, Count);
             }
 
-            var l = new List<string>();
-
-            l.Add("Statisik der vorkommenden Werte der Spalte: " + ReadableText());
-            l.Add(" - nur aktuell angezeigte Zeilen");
-            l.Add(" - Zelleninhalte werden als ganzes behandelt");
-            l.Add(" ");
+            var l = new List<string> {
+                "Statisik der vorkommenden Werte der Spalte: " + ReadableText(),
+                " - nur aktuell angezeigte Zeilen",
+                " - Zelleninhalte werden als ganzes behandelt",
+                " "
+            };
 
             do {
                 var MaxCount = 0;

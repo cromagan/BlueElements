@@ -23,6 +23,7 @@ using BlueControls.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using static BlueBasics.Geometry;
 using static BlueBasics.Polygons;
 
 namespace BlueControls.ItemCollection {
@@ -52,9 +53,9 @@ namespace BlueControls.ItemCollection {
         /// </summary>
         private readonly PointM _TextPoint = new(null, "Mitte Text", 0, 0);
 
-        private double _Länge;
+        private float _Länge;
         private string _text_oben = string.Empty;
-        private double _Winkel;
+        private float _Winkel;
 
         #endregion
 
@@ -71,7 +72,7 @@ namespace BlueControls.ItemCollection {
             if (point2 != null) { _Point2.SetTo(point2.X, point2.Y); }
             ComputeData();
 
-            var a = GeometryDF.PolarToCartesian(Converter.mmToPixel(abstandinMM, ItemCollectionPad.DPI), Convert.ToDouble(_Winkel - 90));
+            var a = PolarToCartesian(Converter.mmToPixel(abstandinMM, ItemCollectionPad.DPI), _Winkel - 90f);
             _TextPoint.SetTo(_Point1, _Länge / 2, _Winkel);
             _TextPoint.X += a.X;
             _TextPoint.Y += a.Y;
@@ -103,14 +104,14 @@ namespace BlueControls.ItemCollection {
 
         #region Properties
 
-        public double Länge_in_MM => Math.Round(Converter.PixelToMM(_Länge, ItemCollectionPad.DPI), Nachkommastellen);
+        public float Länge_in_MM => (float)Math.Round(Converter.PixelToMM(_Länge, ItemCollectionPad.DPI), Nachkommastellen);
         public int Nachkommastellen { get; set; } = 1;
 
         public string Präfix { get; set; } = string.Empty;
 
         //http://www.kurztutorial.info/programme/punkt-mm/rechner.html
-        // Dim Ausgleich As Double = mmToPixel(1 / 72 * 25.4, 300)
-        public double Skalierung { get; set; } = 3.07D;
+        // Dim Ausgleich As float = mmToPixel(1 / 72 * 25.4, 300)
+        public float Skalierung { get; set; } = 3.07f;
 
         public string Suffix { get; set; } = string.Empty;
 
@@ -129,10 +130,10 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
-        public static void DrawArrow(Graphics gr, PointF point, double winkel, Color col, double fontSize) {
-            var m1 = fontSize * 1.5d;
-            var Px2 = GeometryDF.PolarToCartesian(m1, winkel + 10);
-            var Px3 = GeometryDF.PolarToCartesian(m1, winkel - 10);
+        public static void DrawArrow(Graphics gr, PointF point, float winkel, Color col, float fontSize) {
+            var m1 = fontSize * 1.5f;
+            var Px2 = Geometry.PolarToCartesian(m1, winkel + 10);
+            var Px3 = Geometry.PolarToCartesian(m1, winkel - 10);
             var pa = Poly_Triangle(point, new PointF(point.X + (float)Px2.X, point.Y + (float)Px2.Y), new PointF(point.X + (float)Px3.X, point.Y + (float)Px3.Y));
             gr.FillPath(new SolidBrush(col), pa);
         }
@@ -148,13 +149,13 @@ namespace BlueControls.ItemCollection {
             return Präfix + s + Suffix;
         }
 
-        public override bool Contains(PointF value, double zoomfactor) {
+        public override bool Contains(PointF value, float zoomfactor) {
             var ne = 5 / zoomfactor;
             return value.DistanzZuStrecke(_Point1, _Bezugslinie1) < ne
                     || value.DistanzZuStrecke(_Point2, _Bezugslinie2) < ne
                     || value.DistanzZuStrecke(_SchnittPunkt1, _SchnittPunkt2) < ne
                     || value.DistanzZuStrecke(_SchnittPunkt1, _TextPoint) < ne
-                    || GeometryDF.Länge(new PointM(value), _TextPoint) < ne * 10;
+                    || Länge(new PointM(value), _TextPoint) < ne * 10;
         }
 
         public override List<FlexiControl> GetStyleOptions() {
@@ -210,7 +211,7 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "additionalscale":
-                    Skalierung = double.Parse(value.FromNonCritical());
+                    Skalierung = float.Parse(value.FromNonCritical());
                     return true;
             }
             return false;
@@ -230,17 +231,18 @@ namespace BlueControls.ItemCollection {
                    ", AdditionalScale=" + Skalierung.ToString().ToNonCritical() + "}";
         }
 
-        protected override RectangleM CalculateUsedArea() {
-            if (Stil == PadStyles.Undefiniert) { return new RectangleM(0, 0, 0, 0); }
+        protected override RectangleF CalculateUsedArea() {
+            if (Stil == PadStyles.Undefiniert) { return new RectangleF(0, 0, 0, 0); }
             var geszoom = Parent.SheetStyleScale * Skalierung;
             var f = Skin.GetBlueFont(Stil, Parent.SheetStyle);
             var sz1 = BlueFont.MeasureString(Angezeigter_Text_Oben(), f.Font(geszoom));
             var sz2 = BlueFont.MeasureString(Text_unten, f.Font(geszoom));
-            var maxrad = (double)((Math.Max(Math.Max(sz1.Width, sz1.Height), Math.Max(sz2.Width, sz2.Height))));
-            RectangleM X = new(_Point1, _Point2);
-            X.ExpandTo(_Bezugslinie1);
-            X.ExpandTo(_Bezugslinie2);
-            X.ExpandTo(_TextPoint, maxrad);
+            var maxrad = (float)Math.Max(Math.Max(sz1.Width, sz1.Height), Math.Max(sz2.Width, sz2.Height));
+            RectangleF X = new(_Point1, new SizeF(0, 0));
+            X = X.ExpandTo(_Point1);
+            X = X.ExpandTo(_Bezugslinie1);
+            X = X.ExpandTo(_Bezugslinie2);
+            X = X.ExpandTo(_TextPoint, maxrad);
 
             X.Inflate(-2, -2); // die Sicherheits koordinaten damit nicht linien abgeschnitten werden
             return X;
@@ -248,7 +250,7 @@ namespace BlueControls.ItemCollection {
 
         protected override string ClassId() => "DIMENSION";
 
-        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, double zoom, double shiftX, double shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
+        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
             if (Stil == PadStyles.Undefiniert) { return; }
             var geszoom = Parent.SheetStyleScale * Skalierung * zoom;
             var f = Skin.GetBlueFont(Stil, Parent.SheetStyle);
@@ -268,24 +270,24 @@ namespace BlueControls.ItemCollection {
             var P1 = _SchnittPunkt1.ZoomAndMove(zoom, shiftX, shiftY);
             var P2 = _SchnittPunkt2.ZoomAndMove(zoom, shiftX, shiftY);
             if (sz1.Width + (PfeilG * 2f) < Geometry.GetLenght(P1, P2)) {
-                DrawArrow(gr, P1, Convert.ToDouble(_Winkel), f.Color_Main, PfeilG);
-                DrawArrow(gr, P2, Convert.ToDouble(_Winkel + 180), f.Color_Main, PfeilG);
+                DrawArrow(gr, P1, _Winkel, f.Color_Main, PfeilG);
+                DrawArrow(gr, P2, _Winkel + 180, f.Color_Main, PfeilG);
             } else {
-                DrawArrow(gr, P1, Convert.ToDouble(_Winkel + 180), f.Color_Main, PfeilG);
-                DrawArrow(gr, P2, Convert.ToDouble(_Winkel), f.Color_Main, PfeilG);
+                DrawArrow(gr, P1, _Winkel + 180, f.Color_Main, PfeilG);
+                DrawArrow(gr, P2, _Winkel, f.Color_Main, PfeilG);
             }
             var Mitte = _TextPoint.ZoomAndMove(zoom, shiftX, shiftY);
-            var TextWinkel = (float)(_Winkel % 360);
-            if (TextWinkel is > 90 and <= 270) { TextWinkel = (float)(_Winkel - 180); }
+            var TextWinkel = _Winkel % 360;
+            if (TextWinkel is > 90 and <= 270) { TextWinkel = _Winkel - 180; }
             if (geszoom < 0.15d) { return; } // Schrift zu klein, würde abstürzen
-            PointM Mitte1 = new(Mitte, (double)(sz1.Height / 2.1), TextWinkel + 90);
+            PointM Mitte1 = new(Mitte, (float)(sz1.Height / 2.1), TextWinkel + 90);
             var x = gr.Save();
             gr.TranslateTransform((float)Mitte1.X, (float)Mitte1.Y);
             gr.RotateTransform(-TextWinkel);
             gr.FillRectangle(new SolidBrush(Color.White), new RectangleF((int)(-sz1.Width * 0.9 / 2), (int)(-sz1.Height * 0.8 / 2), (int)(sz1.Width * 0.9), (int)(sz1.Height * 0.8)));
             f.DrawString(gr, Angezeigter_Text_Oben(), (float)(-sz1.Width / 2.0), (float)(-sz1.Height / 2.0), (float)geszoom, StringFormat.GenericDefault);
             gr.Restore(x);
-            PointM Mitte2 = new(Mitte, (double)(sz2.Height / 2.1), TextWinkel - 90);
+            PointM Mitte2 = new(Mitte, (float)(sz2.Height / 2.1), TextWinkel - 90);
             x = gr.Save();
             gr.TranslateTransform((float)Mitte2.X, (float)Mitte2.Y);
             gr.RotateTransform(-TextWinkel);
@@ -298,7 +300,7 @@ namespace BlueControls.ItemCollection {
 
         private void CalculateOtherPoints() {
             var tmppW = -90;
-            var MHLAb = Converter.mmToPixel(1.5d * Skalierung / 3.07d, ItemCollectionPad.DPI); // Den Abstand der Maßhilsfline, in echten MM
+            var MHLAb = Converter.mmToPixel(1.5f * Skalierung / 3.07f, ItemCollectionPad.DPI); // Den Abstand der Maßhilsfline, in echten MM
             ComputeData();
 
             //Gegeben sind:
@@ -316,8 +318,8 @@ namespace BlueControls.ItemCollection {
         }
 
         private void ComputeData() {
-            _Länge = GeometryDF.Länge(_Point1, _Point2);
-            _Winkel = GeometryDF.Winkel(_Point1, _Point2);
+            _Länge = Länge(_Point1, _Point2);
+            _Winkel = Winkel(_Point1, _Point2);
         }
 
         #endregion

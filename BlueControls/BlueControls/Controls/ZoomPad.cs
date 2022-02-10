@@ -45,13 +45,13 @@ namespace BlueControls.Controls {
 
         protected bool _Fitting = true;
 
-        protected double _shiftX = -1;
+        protected float _shiftX = -1;
 
-        protected double _shiftY = -1;
+        protected float _shiftY = -1;
 
-        protected double _Zoom = 1;
+        protected float _Zoom = 1;
 
-        protected double _ZoomFit = 1;
+        protected float _ZoomFit = 1;
 
         #endregion
 
@@ -78,9 +78,9 @@ namespace BlueControls.Controls {
         /// <param name="sizeOfPaintArea"></param>
         /// <param name="ZoomToUse"></param>
         /// <returns></returns>
-        public Point CenterPos(RectangleM MaxBounds, bool SliderShowing, Size sizeOfPaintArea, double ZoomToUse) {
-            double w;
-            double h;
+        public Point CenterPos(RectangleF MaxBounds, bool SliderShowing, Size sizeOfPaintArea, float ZoomToUse) {
+            float w;
+            float h;
             if (SliderShowing) {
                 w = sizeOfPaintArea.Width - SliderY.Width - (MaxBounds.Width * ZoomToUse);
                 h = sizeOfPaintArea.Height - SliderX.Height - (MaxBounds.Height * ZoomToUse);
@@ -91,7 +91,7 @@ namespace BlueControls.Controls {
             return new Point((int)w, (int)h);
         }
 
-        public void SetZoom(double Zoom) {
+        public void SetZoom(float Zoom) {
             _Zoom = Zoom;
             SliderX.Minimum = 0;
             SliderX.Maximum = 0;
@@ -102,17 +102,17 @@ namespace BlueControls.Controls {
             ZoomOrShiftChanged();
         }
 
-        public void Zoom100() => CalculateZoomFitAndSliders(1D);
+        public void Zoom100() => CalculateZoomFitAndSliders(1f);
 
-        public double ZoomCurrent() => _Zoom;
+        public float ZoomCurrent() => _Zoom;
 
         public void ZoomFit() {
             CalculateZoomFitAndSliders(-1);
             CalculateZoomFitAndSliders(_ZoomFit);
         }
 
-        public double ZoomFitValue(RectangleM MaxBounds, bool sliderShowing, Size sizeOfPaintArea) => MaxBounds == null || MaxBounds.Width < 0.01d || MaxBounds.Height < 0.01d
-? 1d
+        public float ZoomFitValue(RectangleF MaxBounds, bool sliderShowing, Size sizeOfPaintArea) => MaxBounds == null || MaxBounds.Width < 0.01f || MaxBounds.Height < 0.01f
+? 1f
 : sliderShowing
 ? Math.Min((sizeOfPaintArea.Width - SliderY.Width - 32) / MaxBounds.Width, (sizeOfPaintArea.Height - SliderX.Height - 32) / MaxBounds.Height)
 : Math.Min(sizeOfPaintArea.Width / MaxBounds.Width, sizeOfPaintArea.Height / MaxBounds.Height);
@@ -127,14 +127,14 @@ namespace BlueControls.Controls {
             OnMouseWheel(x);
         }
 
-        internal PointF SliderValues(RectangleM bounds, double ZoomToUse, Point TopLeftPos) => new((float)((bounds.Left * ZoomToUse) - (TopLeftPos.X / 2d)), (float)((bounds.Top * ZoomToUse) - (TopLeftPos.Y / 2d)));
+        internal PointF SliderValues(RectangleF bounds, float ZoomToUse, Point TopLeftPos) => new((float)((bounds.Left * ZoomToUse) - (TopLeftPos.X / 2d)), (float)((bounds.Top * ZoomToUse) - (TopLeftPos.Y / 2d)));
 
         /// <summary>
         /// Kümmert sich um Slider und Maximal-Setting.
         /// Bei einem negativen Wert wird der neue Zoom nicht gesetzt.
         /// </summary>
         /// <param name="newzoom"></param>
-        protected void CalculateZoomFitAndSliders(double newzoom) {
+        protected void CalculateZoomFitAndSliders(float newzoom) {
             var mb = MaxBounds();
             _ZoomFit = ZoomFitValue(mb, true, Size);
             if (newzoom >= 0) {
@@ -157,9 +157,9 @@ namespace BlueControls.Controls {
         /// </remarks>
         protected Point KoordinatesUnscaled(MouseEventArgs e) => new((int)Math.Round(((e.X + _shiftX) / _Zoom) - 0.5d, 0), (int)Math.Round(((e.Y + _shiftY) / _Zoom) - 0.5d, 0));
 
-        protected virtual RectangleM MaxBounds() {
+        protected virtual RectangleF MaxBounds() {
             Develop.DebugPrint_RoutineMussUeberschriebenWerden();
-            return null;
+            return default;
         }
 
         protected override void OnMouseDown(MouseEventArgs e) {
@@ -189,11 +189,11 @@ namespace BlueControls.Controls {
             _Fitting = false;
             var m = KoordinatesUnscaled(e);
             if (e.Delta > 0) {
-                _Zoom *= 1.5d;
+                _Zoom *= 1.5f;
             } else {
-                _Zoom *= 1d / 1.5d;
+                _Zoom *= 1f / 1.5f;
             }
-            _Zoom = Math.Max(_ZoomFit / 10d, _Zoom);
+            _Zoom = Math.Max(_ZoomFit / 10f, _Zoom);
             _Zoom = Math.Min(20, _Zoom);
             var mb = MaxBounds();
             ComputeSliders(mb);
@@ -201,8 +201,8 @@ namespace BlueControls.Controls {
             // Der Slider ist abhängig vom Maßsstab - sowie die echten Mauskoordinaten ebenfalls.
             // Deswegen die M mit dem neuen Zoom-Faktor berechnen umrechen, um auch Masstababhängig zu sein
             // Die Verschiebung der echten Mauskoordinaten berechnen und den Slider auf den Wert setzen.
-            SliderX.Value = (double)((m.X * _Zoom) - e.X);
-            SliderY.Value = (double)((m.Y * _Zoom) - e.Y);
+            SliderX.Value = (float)((m.X * _Zoom) - e.X);
+            SliderY.Value = (float)((m.Y * _Zoom) - e.Y);
             ZoomOrShiftChanged();
             // Alte Berechnung für Mittig Setzen
             //SliderX.Value = (m.X * _Zoom) - (Width / 2) - SliderY.Width
@@ -214,17 +214,16 @@ namespace BlueControls.Controls {
             base.OnSizeChanged(e);
         }
 
-        protected virtual void ZoomOrShiftChanged() {
-        }
+        protected virtual void ZoomOrShiftChanged() { }
 
-        private void ComputeSliders(RectangleM maxBounds) {
+        private void ComputeSliders(RectangleF maxBounds) {
             if (maxBounds == null || maxBounds.Width == 0) { return; }
             var p = CenterPos(maxBounds, true, Size, _Zoom);
             var sliderv = SliderValues(maxBounds, _Zoom, p);
             if (p.X < 0) {
                 SliderX.Enabled = true;
-                SliderX.Minimum = (double)((maxBounds.Left * _Zoom) - (Width * 0.6d));
-                SliderX.Maximum = (double)((maxBounds.Right * _Zoom) - Width + (Width * 0.6d));
+                SliderX.Minimum = (float)((maxBounds.Left * _Zoom) - (Width * 0.6d));
+                SliderX.Maximum = (float)((maxBounds.Right * _Zoom) - Width + (Width * 0.6d));
             } else {
                 SliderX.Enabled = false;
                 if (MousePressing() == false) {
@@ -235,8 +234,8 @@ namespace BlueControls.Controls {
             }
             if (p.Y < 0) {
                 SliderY.Enabled = true;
-                SliderY.Minimum = (double)((maxBounds.Top * _Zoom) - (Height * 0.6d));
-                SliderY.Maximum = (double)((maxBounds.Bottom * _Zoom) - Height + (Height * 0.6d));
+                SliderY.Minimum = (float)((maxBounds.Top * _Zoom) - (Height * 0.6d));
+                SliderY.Maximum = (float)((maxBounds.Bottom * _Zoom) - Height + (Height * 0.6d));
             } else {
                 SliderY.Enabled = false;
                 if (MousePressing() == false) {

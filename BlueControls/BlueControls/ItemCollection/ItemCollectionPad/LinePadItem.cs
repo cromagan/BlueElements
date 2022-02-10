@@ -23,6 +23,7 @@ using BlueControls.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using static BlueBasics.Geometry;
 
 namespace BlueControls.ItemCollection {
 
@@ -33,7 +34,7 @@ namespace BlueControls.ItemCollection {
         internal PointM Point1;
         internal PointM Point2;
         private DateTime _LastRecalc = DateTime.Now.AddHours(-1);
-        private List<PointM> _TempPoints;
+        private List<PointF> _TempPoints;
         private string CalcTempPoints_Code = string.Empty;
 
         #endregion
@@ -53,7 +54,7 @@ namespace BlueControls.ItemCollection {
             MovablePoint.Add(Point2);
             PointsForSuccesfullyMove.AddRange(MovablePoint);
             Stil = format;
-            _TempPoints = new List<PointM>();
+            _TempPoints = new List<PointF>();
             Linien_Verhalten = enConectorStyle.Direct;
         }
 
@@ -80,7 +81,7 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
-        public override bool Contains(PointF value, double zoomfactor) {
+        public override bool Contains(PointF value, float zoomfactor) {
             var ne = 5 / zoomfactor;
             if (Point1.X == 0d && Point2.X == 0d && Point1.Y == 0d && Point2.Y == 0d) { return false; }
             if (_TempPoints.Count == 0) { CalcTempPoints(); }
@@ -105,12 +106,12 @@ namespace BlueControls.ItemCollection {
             return l;
         }
 
-        //public void Move(double x, double y) {
+        //public void Move(float x, float y) {
         //    _LastRecalc = DateTime.Now.AddHours(-1);
         //    Point1.SetTo(Point1.X + x, Point1.Y + y);
         //    Point2.SetTo(Point2.X + x, Point2.Y + y);
         //}
-        //public override void SetCoordinates(RectangleM r)
+        //public override void SetCoordinates(RectangleF r)
         //{
         //    _LastRecalc = DateTime.Now.AddHours(-1);
         //    Point1.SetTo(r.PointOf(enAlignment.Top_Left));
@@ -129,7 +130,7 @@ namespace BlueControls.ItemCollection {
 
         public override void PointMoved(object sender, MoveEventArgs e) => CalcTempPoints();
 
-        public void SetCoordinates(double px1, double py1, double px2, double py2) {
+        public void SetCoordinates(float px1, float py1, float px2, float py2) {
             Point1.SetTo(px1, py1);
             Point2.SetTo(px2, py2);
             //p_ML.SetTo(r.PointOf(enAlignment.VerticalCenter_Left));
@@ -144,27 +145,27 @@ namespace BlueControls.ItemCollection {
             return t.TrimEnd(", ") + "}";
         }
 
-        protected override RectangleM CalculateUsedArea() {
-            if (Point1.X == 0d && Point2.X == 0d && Point1.Y == 0d && Point2.Y == 0d) { return new RectangleM(); }
+        protected override RectangleF CalculateUsedArea() {
+            if (Point1.X == 0d && Point2.X == 0d && Point1.Y == 0d && Point2.Y == 0d) { return new RectangleF(); }
             if (_TempPoints.Count == 0) { CalcTempPoints(); }
-            if (_TempPoints.Count == 0) { return new RectangleM(); }
-            var x1 = double.MaxValue;
-            var y1 = double.MaxValue;
-            var x2 = double.MinValue;
-            var y2 = double.MinValue;
+            if (_TempPoints.Count == 0) { return new RectangleF(); }
+            var x1 = float.MaxValue;
+            var y1 = float.MaxValue;
+            var x2 = float.MinValue;
+            var y2 = float.MinValue;
             foreach (var ThisPoint in _TempPoints) {
                 x1 = Math.Min(ThisPoint.X, x1);
                 y1 = Math.Min(ThisPoint.Y, y1);
                 x2 = Math.Max(ThisPoint.X, x2);
                 y2 = Math.Max(ThisPoint.Y, y2);
             }
-            return new RectangleM(x1, y1, x2 - x1, y2 - y1);
+            return new RectangleF(x1, y1, x2 - x1, y2 - y1);
             //Return New Rectangle(CInt(Math.Min(Point1.X, Point2.X)), CInt(Math.Min(Point1.Y, Point2.Y)), CInt(Math.Abs(Point2.X - Point1.X)), CInt(Math.Abs(Point2.Y - Point1.Y)))
         }
 
         protected override string ClassId() => "LINE";
 
-        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, double zoom, double shiftX, double shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
+        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
             if (Stil == PadStyles.Undefiniert) { return; }
             CalcTempPoints();
             if (_TempPoints.Count == 0) { return; }
@@ -178,16 +179,16 @@ namespace BlueControls.ItemCollection {
         private bool Begradige(int P1) {
             if (P1 >= _TempPoints.Count - 1) { return false; }
             if ((int)_TempPoints[P1].X == (int)_TempPoints[P1 + 1].X || (int)_TempPoints[P1].Y == (int)_TempPoints[P1 + 1].Y) { return false; }
-            PointM NP1;
-            PointM NP2;
+            PointF NP1;
+            PointF NP2;
             if ((int)(_TempPoints[P1].X - _TempPoints[P1 + 1].X) > (int)(_TempPoints[P1].Y - _TempPoints[P1 + 1].Y)) {
-                NP1 = new PointM(_TempPoints[P1].X, (_TempPoints[P1].Y + _TempPoints[P1 + 1].Y) / 2);
-                NP2 = new PointM(_TempPoints[P1 + 1].X, (_TempPoints[P1].Y + _TempPoints[P1 + 1].Y) / 2);
+                NP1 = new PointF(_TempPoints[P1].X, (_TempPoints[P1].Y + _TempPoints[P1 + 1].Y) / 2);
+                NP2 = new PointF(_TempPoints[P1 + 1].X, (_TempPoints[P1].Y + _TempPoints[P1 + 1].Y) / 2);
                 _TempPoints.Insert(P1 + 1, NP1);
                 _TempPoints.Insert(P1 + 2, NP2);
             } else {
-                NP1 = new PointM((_TempPoints[P1].X + _TempPoints[P1 + 1].X) / 2, _TempPoints[P1].Y);
-                NP2 = new PointM((_TempPoints[P1].X + _TempPoints[P1 + 1].X) / 2, _TempPoints[P1 + 1].Y);
+                NP1 = new PointF((_TempPoints[P1].X + _TempPoints[P1 + 1].X) / 2, _TempPoints[P1].Y);
+                NP2 = new PointF((_TempPoints[P1].X + _TempPoints[P1 + 1].X) / 2, _TempPoints[P1 + 1].Y);
                 _TempPoints.Insert(P1 + 1, NP1);
                 _TempPoints.Insert(P1 + 2, NP2);
             }
@@ -211,7 +212,7 @@ namespace BlueControls.ItemCollection {
             if (_TempPoints != null && _TempPoints.Count > 1) { return; }
             _LastRecalc = DateTime.Now;
             CalcTempPoints_Code = NewCode;
-            _TempPoints = new List<PointM>
+            _TempPoints = new List<PointF>
             {
                 Point1,
                 Point2
@@ -249,11 +250,11 @@ namespace BlueControls.ItemCollection {
             } while (true);
         }
 
-        private bool IsVerdeckt(double X, double Y) {
+        private bool IsVerdeckt(float X, float Y) {
             foreach (var ThisBasicItem in Parent) {
                 if (ThisBasicItem != null) {
                     if (ThisBasicItem is not LinePadItem) {
-                        var a = (RectangleM)ThisBasicItem.UsedArea().Clone();
+                        var a = ThisBasicItem.UsedArea();
                         if (a.Width > 0 && a.Height > 0) {
                             a.Inflate(2, 2);
                             if (a.Contains(X, Y)) { return true; }
@@ -265,12 +266,9 @@ namespace BlueControls.ItemCollection {
         }
 
         private bool LöscheVerdeckte(int P1) {
-            if (_TempPoints[P1] == Point1) {
-                return false;
-            }
-            if (_TempPoints[P1] == Point2) {
-                return false;
-            }
+            if (_TempPoints[P1].Equals(Point1)) { return false; }
+            if (_TempPoints[P1].Equals(Point2)) { return false; }
+
             if (IsVerdeckt(_TempPoints[P1].X, _TempPoints[P1].Y)) {
                 _TempPoints.RemoveAt(P1);
                 return true;
@@ -281,22 +279,26 @@ namespace BlueControls.ItemCollection {
         private bool SchneidetDas(BasicPadItem ThisBasicItem, PointM P1, PointM P2) {
             if (ThisBasicItem == null) { return false; }
             if (ThisBasicItem is not LinePadItem) {
-                var a = (RectangleM)ThisBasicItem.UsedArea().Clone();
+                var a = ThisBasicItem.UsedArea();
                 if (a.Width > 0 && a.Height > 0) {
                     a.Inflate(2, 2);
+
+                    PointF tP1 = P1;
+                    PointF tP2 = P2;
                     var lo = a.PointOf(enAlignment.Top_Left);
                     var ro = a.PointOf(enAlignment.Top_Right);
                     var lu = a.PointOf(enAlignment.Bottom_Left);
                     var ru = a.PointOf(enAlignment.Bottom_Right);
-                    if (GeometryDF.LinesIntersect(P1, P2, lo, ro, true) != null || GeometryDF.LinesIntersect(P1, P2, lu, ru, true) != null || GeometryDF.LinesIntersect(P1, P2, lo, lu, true) != null || GeometryDF.LinesIntersect(P1, P2, ro, ru, true) != null) {
-                        return true;
-                    }
+                    if (!LinesIntersect(tP1, tP2, lo, ro, true).IsEmpty ||
+                        !LinesIntersect(tP1, tP2, lu, ru, true).IsEmpty ||
+                        !LinesIntersect(tP1, tP2, lo, lu, true).IsEmpty ||
+                        !LinesIntersect(tP1, tP2, ro, ru, true).IsEmpty) { return true; }
                 }
             }
             return false;
         }
 
-        private bool SchneidetWas(double X1, double Y1, double X2, double Y2) {
+        private bool SchneidetWas(float X1, float Y1, float X2, float Y2) {
             PointM p1 = new(X1, Y1);
             PointM p2 = new(X2, Y2);
             foreach (var ThisItemBasic in Parent) {
@@ -329,7 +331,7 @@ namespace BlueControls.ItemCollection {
                     if (!IsVerdeckt(_TempPoints[P1 + 2].X, _TempPoints[P1].Y)) {
                         if (!SchneidetWas(_TempPoints[P1 - 1].X, _TempPoints[P1 - 1].Y, _TempPoints[P1 + 2].X, _TempPoints[P1].Y)) {
                             if (!SchneidetWas(_TempPoints[P1 + 3].X, _TempPoints[P1 + 3].Y, _TempPoints[P1 + 2].X, _TempPoints[P1].Y)) {
-                                _TempPoints[P1].X = _TempPoints[P1 + 2].X;
+                                _TempPoints[P1] = new PointF(_TempPoints[P1 + 2].X, _TempPoints[P1].Y);
                                 _TempPoints.RemoveAt(P1 + 1);
                                 _TempPoints.RemoveAt(P1 + 1);
                                 return true;
@@ -341,7 +343,7 @@ namespace BlueControls.ItemCollection {
                     if (!IsVerdeckt(_TempPoints[P1].X, _TempPoints[P1 + 2].Y)) {
                         if (!SchneidetWas(_TempPoints[P1 - 1].X, _TempPoints[P1 - 1].Y, _TempPoints[P1].X, _TempPoints[P1 + 2].Y)) {
                             if (!SchneidetWas(_TempPoints[P1 + 3].X, _TempPoints[P1 + 3].Y, _TempPoints[P1].X, _TempPoints[P1 + 2].Y)) {
-                                _TempPoints[P1].Y = _TempPoints[P1 + 2].Y;
+                                _TempPoints[P1] = new PointF(_TempPoints[P1].X, _TempPoints[P1 + 2].Y);
                                 _TempPoints.RemoveAt(P1 + 1);
                                 _TempPoints.RemoveAt(P1 + 1);
                                 return true;
@@ -361,17 +363,17 @@ namespace BlueControls.ItemCollection {
                 if (ThisItemBasic != null) {
                     //    If ThisBasicItem IsNot Object1 AndAlso ThisBasicItem IsNot Object2 Then
                     if (ThisItemBasic is not LinePadItem) {
-                        var a = (RectangleM)ThisItemBasic.UsedArea().Clone(); // Umwandeln, um den Bezu zu brechen
+                        var a = ThisItemBasic.UsedArea();
                         if (a.Width > 0 && a.Height > 0) {
                             a.Inflate(2, 2);
                             var lo = a.PointOf(enAlignment.Top_Left);
                             var ro = a.PointOf(enAlignment.Top_Right);
                             var lu = a.PointOf(enAlignment.Bottom_Left);
                             var ru = a.PointOf(enAlignment.Bottom_Right);
-                            var tOben = GeometryDF.LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], lo, ro, true);
-                            var tUnten = GeometryDF.LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], lu, ru, true);
-                            var tLinks = GeometryDF.LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], lo, lu, true);
-                            var trechts = GeometryDF.LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], ro, ru, true);
+                            var tOben = LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], lo, ro, true);
+                            var tUnten = LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], lu, ru, true);
+                            var tLinks = LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], lo, lu, true);
+                            var trechts = LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], ro, ru, true);
                             //    If DirectCast(Object2, RowFormulaItem).Row.CellFirst().String.Contains("Lilo") AndAlso DirectCast(Object1, RowFormulaItem).Row.CellFirst().String.Contains("Karl") Then Stop
                             if (tOben != null || tUnten != null || tLinks != null || trechts != null) {
                                 a.Inflate(-50, -50);
@@ -379,10 +381,10 @@ namespace BlueControls.ItemCollection {
                                 ro = a.PointOf(enAlignment.Top_Right);
                                 lu = a.PointOf(enAlignment.Bottom_Left);
                                 ru = a.PointOf(enAlignment.Bottom_Right);
-                                var Oben = GeometryDF.LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], lo, ro, true);
-                                var Unten = GeometryDF.LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], lu, ru, true);
-                                var Links = GeometryDF.LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], lo, lu, true);
-                                var rechts = GeometryDF.LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], ro, ru, true);
+                                var Oben = LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], lo, ro, true);
+                                var Unten = LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], lu, ru, true);
+                                var Links = LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], lo, lu, true);
+                                var rechts = LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], ro, ru, true);
                                 if (Oben == null && tOben != null) {
                                     Oben = tOben;
                                 }

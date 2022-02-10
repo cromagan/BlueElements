@@ -25,6 +25,42 @@ namespace BlueBasics {
 
         #region Methods
 
+        /// <summary>
+        /// Erweitert das Rechteck, dass der Angegebene Punkt ebenfalls umschlossen wird.
+        /// </summary>
+        /// <param name="P"></param>
+        public static RectangleF ExpandTo(this RectangleF r, PointF P) {
+            if (P.X < r.X) {
+                r.Width = r.Right - P.X;
+                r.X = P.X;
+            }
+            if (P.Y < r.Y) {
+                r.Height = r.Bottom - P.Y;
+                r.Y = P.Y;
+            }
+            if (P.X > r.Right) {
+                r.Width = P.X - r.X;
+            }
+            if (P.Y > r.Bottom) {
+                r.Height = P.Y - r.Y;
+            }
+
+            return r;
+        }
+
+        /// <summary>
+        /// Erweitert das Rechteck, dass ein Kreis mit den angegebenen Parametern ebenfalls umschlossen wird.
+        /// </summary>
+        /// <param name="P"></param>
+        /// <param name="maxrad"></param>
+        public static RectangleF ExpandTo(this RectangleF r, PointF middle, float radius) {
+            r = r.ExpandTo(new PointF(middle.X, middle.Y + radius));
+            r = r.ExpandTo(new PointF(middle.X, middle.Y - radius));
+            r = r.ExpandTo(new PointF(middle.X + radius, middle.Y));
+            r = r.ExpandTo(new PointF(middle.X - radius, middle.Y));
+            return r;
+        }
+
         public static PointF NearestCornerOF(this RectangleF r, Point p) {
             var LO = r.PointOf(enAlignment.Top_Left);
             var rO = r.PointOf(enAlignment.Top_Right);
@@ -74,6 +110,33 @@ namespace BlueBasics {
         }
 
         public static Rectangle ToRect(this RectangleF r) => new((int)r.X, (int)r.Y, (int)r.Width, (int)r.Height);
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="zoom"></param>
+        /// <param name="shiftX"></param>
+        /// <param name="shiftY"></param>
+        /// <param name="outerLine">true = die Punkte komplett umschlossen (für Fills), false = Mitte der Punkte</param>
+        /// <returns></returns>
+        public static RectangleF ZoomAndMoveRect(this Rectangle r, float zoom, float shiftX, float shiftY, bool outerLine) {
+            if (outerLine) {
+                // Beispiel: bei X=0 und Width=5 muss bei einen zoom von 5
+                //               0 und 25 rauskommen
+                return new RectangleF((float)((r.X * zoom) - shiftX),
+                      (float)((r.Y * zoom) - shiftY),
+                      (float)(r.Width * zoom),
+                      (float)(r.Height * zoom));
+            } else {
+                // Beispiel: bei X=0 und Width=5 muss bei einen zoom von 5
+                //               2,5 und 27,5 rauskommen
+                var add = zoom / 2;
+                return new RectangleF((r.X * zoom) - shiftX + add,
+                                      (r.Y * zoom) - shiftY + add,
+                                      r.Width * zoom,
+                                      r.Height * zoom);
+            }
+        }
 
         #endregion
     }

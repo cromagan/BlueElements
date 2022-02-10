@@ -56,7 +56,7 @@ namespace BluePaint {
             var c = command.SplitAndCutBy(";");
             switch (c[0]) {
                 case "Kontrast":
-                    sldKontrast.Value = double.Parse(c[1]);
+                    sldKontrast.Value = float.Parse(c[1]);
                     btnKontrastErhoehen_Click(null, System.EventArgs.Empty);
                     break;
 
@@ -77,12 +77,12 @@ namespace BluePaint {
                     break;
 
                 case "Gamma":
-                    sldGamma.Value = double.Parse(c[1]);
+                    sldGamma.Value = float.Parse(c[1]);
                     btnGamma_Click(null, System.EventArgs.Empty);
                     break;
 
                 case "Helligkeit":
-                    sldHelligkeit.Value = double.Parse(c[1]);
+                    sldHelligkeit.Value = float.Parse(c[1]);
                     btnHelligkeit_Click(null, System.EventArgs.Empty);
                     break;
 

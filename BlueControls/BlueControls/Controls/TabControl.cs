@@ -38,9 +38,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) {
-            DrawControl(e, enDesign.TabStrip_Back);
-        }
+        protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) => DrawControl(e, enDesign.TabStrip_Back);
 
         #endregion
     }

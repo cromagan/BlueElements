@@ -43,9 +43,9 @@ namespace BlueControls.Controls {
 
         private bool _ClickAreaContainsMouse;
 
-        private double _Maximum = 100;
+        private float _Maximum = 100;
 
-        private double _Minimum;
+        private float _Minimum;
 
         private enOrientation _Orientation = enOrientation.Waagerecht;
 
@@ -55,9 +55,9 @@ namespace BlueControls.Controls {
 
         private enDesign _SliderStyle;
 
-        private double _Value;
+        private float _Value;
 
-        private double? LastFiredValue;
+        private float? LastFiredValue;
 
         #endregion
 
@@ -81,11 +81,11 @@ namespace BlueControls.Controls {
 
         #region Properties
 
-        [DefaultValue(10.0D)]
-        public double LargeChange { get; set; } = 10;
+        [DefaultValue(10f)]
+        public float LargeChange { get; set; } = 10;
 
-        [DefaultValue(100.0D)]
-        public double Maximum {
+        [DefaultValue(100f)]
+        public float Maximum {
             get => Math.Max(_Minimum, _Maximum);
             set {
                 if (_Maximum == value) { return; }
@@ -96,8 +96,8 @@ namespace BlueControls.Controls {
             }
         }
 
-        [DefaultValue(0D)]
-        public double Minimum {
+        [DefaultValue(0f)]
+        public float Minimum {
             get => Math.Min(_Minimum, _Maximum);
             set {
                 if (_Minimum == value) { return; }
@@ -108,8 +108,8 @@ namespace BlueControls.Controls {
             }
         }
 
-        [DefaultValue(1.0D)]
-        public double MouseChange { get; set; } = 1;
+        [DefaultValue(1f)]
+        public float MouseChange { get; set; } = 1;
 
         [DefaultValue(enOrientation.Waagerecht)]
         public enOrientation Orientation {
@@ -121,8 +121,8 @@ namespace BlueControls.Controls {
             }
         }
 
-        [DefaultValue(1.0D)]
-        public double SmallChange { get; set; } = 1;
+        [DefaultValue(1f)]
+        public float SmallChange { get; set; } = 1;
 
         [DefaultValue(0)]
         public new int TabIndex {
@@ -136,8 +136,8 @@ namespace BlueControls.Controls {
             set => base.TabStop = false;
         }
 
-        [DefaultValue(0D)]
-        public double Value {
+        [DefaultValue(0f)]
+        public float Value {
             get => _Value;
             set {
                 value = CheckMinMax(value);
@@ -304,7 +304,7 @@ namespace BlueControls.Controls {
             if (ol2 != But2.Enabled) { But2.Invalidate(); }
         }
 
-        private double CheckMinMax(double ValueToCheck) {
+        private float CheckMinMax(float ValueToCheck) {
             var _Min = Math.Min(_Minimum, _Maximum);
             var _Max = Math.Max(_Minimum, _Maximum);
             return ValueToCheck < _Min ? _Min : ValueToCheck > _Max ? _Max : ValueToCheck;
@@ -316,8 +316,8 @@ namespace BlueControls.Controls {
             if (_SliderContainsMouse && !MouseisMoving) { return; }
             if (_ClickArea.Width <= 0 || _ClickArea.Height <= 0) { return; }
             var TestVal = _Orientation == enOrientation.Waagerecht
-                ? Minimum + ((e.X - _ClickArea.Left - (_Slider.Width / 2.0)) / (_ClickArea.Width - _Slider.Width) * (Maximum - Minimum))
-                : Minimum + ((e.Y - _ClickArea.Top - (_Slider.Height / 2.0)) / (_ClickArea.Height - _Slider.Height) * (Maximum - Minimum));
+                ? Minimum + ((e.X - _ClickArea.Left - (_Slider.Width / 2f)) / (_ClickArea.Width - _Slider.Width) * (Maximum - Minimum))
+                : Minimum + ((e.Y - _ClickArea.Top - (_Slider.Height / 2f)) / (_ClickArea.Height - _Slider.Height) * (Maximum - Minimum));
             TestVal = CheckMinMax((int)(TestVal / MouseChange) * MouseChange);
             if (!MouseisMoving) {
                 TestVal = TestVal > _Value ? _Value + LargeChange : _Value - LargeChange;

@@ -103,13 +103,13 @@ namespace BlueControls.Forms {
 
         private void btnAddPhsyik_Click(object sender, System.EventArgs e) {
             clsPhysicPadItem b = new(Pad.Item);
-            //b.SetCoordinates(new RectangleM(100, 100, 300, 300));
+            //b.SetCoordinates(new RectangleF(100, 100, 300, 300));
             Pad.Item.Add(b);
         }
 
         private void btnAddSymbol_Click(object sender, System.EventArgs e) {
             SymbolPadItem b = new(Pad.Item);
-            b.SetCoordinates(new RectangleM(100, 100, 300, 300), true);
+            b.SetCoordinates(new RectangleF(100, 100, 300, 300), true);
             Pad.Item.Add(b);
         }
 
@@ -119,12 +119,12 @@ namespace BlueControls.Forms {
                 Stil = PadStyles.Style_Standard
             };
             Pad.Item.Add(b);
-            b.SetCoordinates(new RectangleM(10, 10, 200, 200), true);
+            b.SetCoordinates(new RectangleF(10, 10, 200, 200), true);
         }
 
         private void btnAddUnterStufe_Click(object sender, System.EventArgs e) {
             ChildPadItem b = new(Pad.Item);
-            b.SetCoordinates(new RectangleM(100, 100, 300, 300), true);
+            b.SetCoordinates(new RectangleF(100, 100, 300, 300), true);
             Pad.Item.Add(b);
         }
 
@@ -142,7 +142,7 @@ namespace BlueControls.Forms {
             Pad.Invalidate();
         }
 
-        private void cbxSchriftGröße_ItemClicked(object sender, BasicListItemEventArgs e) => Pad.Item.SheetStyleScale = double.Parse(cbxSchriftGröße.Text) / 100d;
+        private void cbxSchriftGröße_ItemClicked(object sender, BasicListItemEventArgs e) => Pad.Item.SheetStyleScale = float.Parse(cbxSchriftGröße.Text) / 100f;
 
         private void ckbRaster_CheckedChanged(object sender, System.EventArgs e) => Pad.Item.SnapMode = ckbRaster.Checked ? enSnapMode.SnapToGrid : enSnapMode.Ohne;
 

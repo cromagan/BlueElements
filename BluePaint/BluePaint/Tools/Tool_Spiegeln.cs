@@ -21,6 +21,7 @@ using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using static BlueBasics.Generic;
+using static BlueBasics.Geometry;
 
 namespace BluePaint {
 
@@ -68,7 +69,7 @@ namespace BluePaint {
             _ausricht = false;
             CollectGarbage();
             var _Pic = OnNeedCurrentPic();
-            var Wink = (float)GeometryDF.Winkel(new PointM(e.MouseDown.X, e.MouseDown.Y), new PointM(e.Current.X, e.Current.Y));
+            var Wink = (float)Winkel(new PointM(e.MouseDown.X, e.MouseDown.Y), new PointM(e.Current.X, e.Current.Y));
             // Make a Matrix to represent rotation by this angle.
             Matrix rotate_at_origin = new();
             rotate_at_origin.Rotate(Wink);

@@ -957,18 +957,18 @@ namespace BlueControls.Controls {
             if (_SliderY != null) { return _SliderY; }
             _SliderY = new Slider {
                 Dock = System.Windows.Forms.DockStyle.Right,
-                LargeChange = 10.0D,
+                LargeChange = 10f,
                 Location = new Point(Width - 18, 0),
-                Maximum = 100.0D,
-                Minimum = 0.0D,
-                MouseChange = 1.0D,
+                Maximum = 100f,
+                Minimum = 0f,
+                MouseChange = 1f,
                 Name = "SliderY",
                 Orientation = enOrientation.Senkrecht,
                 Size = new Size(18, Height),
-                SmallChange = 48.0D,
+                SmallChange = 48f,
                 TabIndex = 0,
                 TabStop = false,
-                Value = 0.0D,
+                Value = 0f,
                 Visible = true
             };
             _SliderY.ValueChanged += new EventHandler(SliderY_ValueChange);
@@ -977,7 +977,7 @@ namespace BlueControls.Controls {
         }
 
         private int HotPosition() => _Cursor_CharPos > -1 ? _Cursor_CharPos
-                                                          : _MarkStart > -1 && _MarkEnd < 0 ? _MarkEnd : _MarkStart > -1 && _MarkEnd > -1 ? _MarkEnd : -1;
+                                   : _MarkStart > -1 && _MarkEnd < 0 ? _MarkEnd : _MarkStart > -1 && _MarkEnd > -1 ? _MarkEnd : -1;
 
         private void MarkAll() {
             if (_eTxt != null && _eTxt.Chars.Count > 0) {

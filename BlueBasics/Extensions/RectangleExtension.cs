@@ -73,6 +73,33 @@ namespace BlueBasics {
             }
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="zoom"></param>
+        /// <param name="shiftX"></param>
+        /// <param name="shiftY"></param>
+        /// <param name="outerLine">true = die Punkte komplett umschlossen (für Fills), false = Mitte der Punkte</param>
+        /// <returns></returns>
+        public static RectangleF ZoomAndMoveRect(this RectangleF r, float zoom, float shiftX, float shiftY, bool outerLine) {
+            if (outerLine) {
+                // Beispiel: bei X=0 und Width=5 muss bei einen zoom von 5
+                //               0 und 25 rauskommen
+                return new RectangleF((r.X * zoom) - shiftX,
+                      (r.Y * zoom) - shiftY,
+                      r.Width * zoom,
+                      r.Height * zoom);
+            } else {
+                // Beispiel: bei X=0 und Width=5 muss bei einen zoom von 5
+                //               2,5 und 27,5 rauskommen
+                var add = zoom / 2;
+                return new RectangleF((r.X * zoom) - shiftX + add,
+                                      (r.Y * zoom) - shiftY + add,
+                                     r.Width * zoom,
+                                      r.Height * zoom);
+            }
+        }
+
         #endregion
     }
 }

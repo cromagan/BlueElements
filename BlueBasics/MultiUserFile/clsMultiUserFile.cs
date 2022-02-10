@@ -482,9 +482,7 @@ namespace BlueBasics.MultiUserFile {
             ReadOnly = true;
         }
 
-        public void SetUserDidSomething() {
-            _LastUserActionUTC = DateTime.UtcNow;
-        }
+        public void SetUserDidSomething() => _LastUserActionUTC = DateTime.UtcNow;
 
         public void UnlockHard() {
             try {
@@ -690,7 +688,7 @@ namespace BlueBasics.MultiUserFile {
 
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) => DoBackGroundWork((BackgroundWorker)sender);
 
-        private string Backupdateiname() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".bak2";
+        private string Backupdateiname() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".bak";
 
         private string Blockdateiname() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".blk";
 
@@ -872,9 +870,7 @@ namespace BlueBasics.MultiUserFile {
             SavedToDisk?.Invoke(this, System.EventArgs.Empty);
         }
 
-        private void OnShouldICancelSaveOperations(CancelEventArgs e) {
-            ShouldICancelSaveOperations?.Invoke(this, e);
-        }
+        private void OnShouldICancelSaveOperations(CancelEventArgs e) => ShouldICancelSaveOperations?.Invoke(this, e);
 
         private void PureBinSaver_DoWork(object sender, DoWorkEventArgs e) {
             try {
@@ -1032,8 +1028,8 @@ namespace BlueBasics.MultiUserFile {
         }
 
         private void Watcher_Error(object sender, ErrorEventArgs e) =>
-                                    // Im Verzeichnis wurden zu viele Änderungen gleichzeitig vorgenommen...
-                                    _CheckedAndReloadNeed = true;
+            // Im Verzeichnis wurden zu viele Änderungen gleichzeitig vorgenommen...
+            _CheckedAndReloadNeed = true;
 
         private void Watcher_Renamed(object sender, RenamedEventArgs e) {
             if (!string.Equals(e.FullPath, Filename, StringComparison.OrdinalIgnoreCase)) { return; }

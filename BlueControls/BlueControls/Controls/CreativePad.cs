@@ -29,6 +29,8 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Printing;
+using static BlueBasics.Extensions;
+using static BlueBasics.Geometry;
 
 namespace BlueControls.Controls {
 
@@ -203,11 +205,11 @@ namespace BlueControls.Controls {
             if (_GivesMouseComandsTo != null) {
                 if (_GivesMouseComandsTo.KeyUp(this, e, _Zoom, _shiftX, _shiftY)) { return; }
             }
-            var Multi = 1D;
+            var Multi = 1f;
             if (Item.SnapMode == enSnapMode.SnapToGrid) {
                 Multi = Converter.mmToPixel(Item.GridSnap, ItemCollectionPad.DPI);
             }
-            if (Multi < 1) { Multi = 1D; }
+            if (Multi < 1) { Multi = 1f; }
             switch (e.KeyCode) {
                 case System.Windows.Forms.Keys.Delete:
 
@@ -221,19 +223,19 @@ namespace BlueControls.Controls {
                     break;
 
                 case System.Windows.Forms.Keys.Up:
-                    MoveItems(0d, -1 * Multi, false, false);
+                    MoveItems(0, -1 * Multi, false, false);
                     break;
 
                 case System.Windows.Forms.Keys.Down:
-                    MoveItems(0d, 1 * Multi, false, false);
+                    MoveItems(0, 1 * Multi, false, false);
                     break;
 
                 case System.Windows.Forms.Keys.Left:
-                    MoveItems(-1 * Multi, 0d, false, false);
+                    MoveItems(-1 * Multi, 0, false, false);
                     break;
 
                 case System.Windows.Forms.Keys.Right:
-                    MoveItems(1 * Multi, 0d, false, false);
+                    MoveItems(1 * Multi, 0, false, false);
                     break;
             }
         }
@@ -349,7 +351,7 @@ namespace BlueControls.Controls {
                     foreach (var thisItem in _ItemsToMove) {
                         if (thisItem is BasicPadItem BPI) {
                             foreach (var thisPoint in BPI.MovablePoint) {
-                                if (GeometryDF.Länge(thisPoint, new PointM(p)) < 5d / _Zoom) {
+                                if (Länge(thisPoint, p) < 5f / _Zoom) {
                                     SelectItem(thisPoint, false);
                                     return;
                                 }
@@ -473,7 +475,7 @@ namespace BlueControls.Controls {
                 _ => false,
             };
 
-        protected override RectangleM MaxBounds() => _Item == null ? new RectangleM(0, 0, 0, 0) : _Item.MaxBounds(null);
+        protected override RectangleF MaxBounds() => _Item == null ? new RectangleF(0, 0, 0, 0) : _Item.MaxBounds(null);
 
         protected override void OnKeyUp(System.Windows.Forms.KeyEventArgs e) => DoKeyUp(e, true);
 
@@ -540,7 +542,7 @@ namespace BlueControls.Controls {
 
         private void Item_DoInvalidate(object sender, System.EventArgs e) => Invalidate();
 
-        private void MoveItems(double x, double y, bool doSnap, bool modifyMouseDown) {
+        private void MoveItems(float x, float y, bool doSnap, bool modifyMouseDown) {
             PointM pointToMove = null;
             foreach (var thisIt in _ItemsToMove) {
                 if (thisIt is PointM p) { pointToMove = p; break; }
@@ -605,12 +607,12 @@ namespace BlueControls.Controls {
             DruckerDokument.DefaultPageSettings.Margins = new Margins((int)(_Item.RandinMM.Left / 25.4 * 100), (int)(_Item.RandinMM.Right / 25.4 * 100), (int)(_Item.RandinMM.Top / 25.4 * 100), (int)(_Item.RandinMM.Bottom / 25.4 * 100));
         }
 
-        private double SnapToGrid(bool doX, PointM movedPoint, double mouseMovedTo) {
+        private float SnapToGrid(bool doX, PointM movedPoint, float mouseMovedTo) {
             if (Item.SnapMode != enSnapMode.SnapToGrid || Math.Abs(Item.GridSnap) < 0.001) { return mouseMovedTo; }
-            if (movedPoint is null) { return 0D; }
+            if (movedPoint is null) { return 0f; }
 
             var Multi = Converter.mmToPixel(Item.GridSnap, ItemCollectionPad.DPI);
-            double Value;
+            float Value;
             if (doX) {
                 Value = movedPoint.X + mouseMovedTo;
                 Value = (int)(Value / Multi) * Multi;

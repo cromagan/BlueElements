@@ -18,7 +18,6 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
-using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -129,7 +128,7 @@ namespace BlueControls.ItemCollection {
 
             if (_Bitmap == null) { return (int)(columnWidth * 0.8); }
 
-            var sc = ((float)_Bitmap.Height / _Bitmap.Width);
+            var sc = (float)_Bitmap.Height / _Bitmap.Width;
 
             if (sc > 1) { sc = 1; }
 
@@ -141,7 +140,7 @@ namespace BlueControls.ItemCollection {
         protected override Size ComputeSizeUntouchedForListBox() {
             if (_Bitmap == null) { return new Size(300, 300); }
 
-            var sc = ((float)_Bitmap.Height / _Bitmap.Width);
+            var sc = (float)_Bitmap.Height / _Bitmap.Width;
 
             if (sc > 1) { sc = 1; }
 

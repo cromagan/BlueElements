@@ -295,7 +295,7 @@ namespace BlueBasics {
         public static Color SetAlpha(this Color color, byte newAlpha) => Color.FromArgb(newAlpha, color.R, color.G, color.B);
 
         public static Color SoftLightMix(this Color baseColor, Color blendColor, double opacity) => MixColor(Color.FromArgb((int)SoftLightMath(baseColor.R, blendColor.R),
-                                                                                (int)SoftLightMath(baseColor.G, blendColor.G),
+(int)SoftLightMath(baseColor.G, blendColor.G),
 (int)SoftLightMath(baseColor.B, blendColor.B)), baseColor, opacity);
 
         public static Color ToGrey(this Color color) {

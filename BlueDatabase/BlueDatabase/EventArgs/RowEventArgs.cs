@@ -21,7 +21,7 @@ namespace BlueDatabase.EventArgs {
 
         #region Constructors
 
-        public RowEventArgs(RowItem row) => this.Row = row;
+        public RowEventArgs(RowItem row) => Row = row;
 
         #endregion
 

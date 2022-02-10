@@ -1,6 +1,5 @@
 ﻿using BlueBasics.Enums;
 using BlueControls.Controls;
-using BlueControls.Enums;
 using BlueDatabase.Interfaces;
 using System.ComponentModel;
 using System.ComponentModel.Design;
@@ -42,9 +41,7 @@ namespace BlueControls.Designer_Support {
                 }
                 return enVarType.Unbekannt;
             }
-            set {
-                ReverenceControl.SetFormat(value);
-            }
+            set => ReverenceControl.SetFormat(value);
         }
 
         #endregion

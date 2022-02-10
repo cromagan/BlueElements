@@ -21,7 +21,7 @@ namespace BlueControls.Interfaces {
 
         #region Methods
 
-        public void Move(double x, double y);
+        public void Move(float x, float y);
 
         #endregion
     }

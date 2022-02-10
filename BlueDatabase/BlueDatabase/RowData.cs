@@ -18,7 +18,6 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueDatabase;
 using System;
 using System.Collections.Generic;
 using System.Drawing;

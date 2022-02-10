@@ -94,9 +94,7 @@ namespace BlueControls {
             HotItem = _LastWord;
         }
 
-        public void Message(string txt) {
-            txbSkriptInfo.Text = "[" + DateTime.Now.ToLongTimeString() + "] " + txt;
-        }
+        public void Message(string txt) => txbSkriptInfo.Text = "[" + DateTime.Now.ToLongTimeString() + "] " + txt;
 
         public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
@@ -237,7 +235,7 @@ namespace BlueControls {
             var sc = Script.ReduceText(txtSkript.Text).ToLower();
             var x = new List<string>() { "sub" + e.Item.Internal.ToLower() + "()" };
 
-            (var pos, string _) = NextText(sc, 0, x, true, false, KlammernStd);
+            (var pos, var _) = NextText(sc, 0, x, true, false, KlammernStd);
             if (pos < 1) {
                 MessageBox.Show("Routine " + e.Item.Internal + " nicht gefunden.<br>Skript starten, um diese<br>Liste zu aktualisieren.", enImageCode.Information, "OK");
                 return;

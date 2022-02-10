@@ -117,7 +117,7 @@ namespace BluePaint
             // sldKontrast
             // 
             this.sldKontrast.Location = new System.Drawing.Point(16, 16);
-            this.sldKontrast.Minimum = -100D;
+            this.sldKontrast.Minimum = -100f;
             this.sldKontrast.Name = "sldKontrast";
             this.sldKontrast.Size = new System.Drawing.Size(248, 24);
             this.sldKontrast.ValueChanged += new System.EventHandler(this.sldKontrast_ValueChanged);
@@ -142,14 +142,14 @@ namespace BluePaint
             // 
             // sldGamma
             // 
-            this.sldGamma.LargeChange = 0.01D;
+            this.sldGamma.LargeChange = 0.01f;
             this.sldGamma.Location = new System.Drawing.Point(16, 16);
-            this.sldGamma.Maximum = 2.2D;
-            this.sldGamma.MouseChange = 0.01D;
+            this.sldGamma.Maximum = 2.2f;
+            this.sldGamma.MouseChange = 0.01f;
             this.sldGamma.Name = "sldGamma";
             this.sldGamma.Size = new System.Drawing.Size(248, 24);
-            this.sldGamma.SmallChange = 0.01D;
-            this.sldGamma.Value = 1D;
+            this.sldGamma.SmallChange = 0.01f;
+            this.sldGamma.Value = 1f;
             this.sldGamma.ValueChanged += new System.EventHandler(this.sldGamma_ValueChanged);
             // 
             // btnGamma
@@ -182,15 +182,15 @@ namespace BluePaint
             // 
             // sldHelligkeit
             // 
-            this.sldHelligkeit.LargeChange = 0.01D;
+            this.sldHelligkeit.LargeChange = 0.01f;
             this.sldHelligkeit.Location = new System.Drawing.Point(16, 16);
-            this.sldHelligkeit.Maximum = 2D;
-            this.sldHelligkeit.Minimum = 0D;
-            this.sldHelligkeit.MouseChange = 0.01D;
+            this.sldHelligkeit.Maximum = 2f;
+            this.sldHelligkeit.Minimum = 0f;
+            this.sldHelligkeit.MouseChange = 0.01f;
             this.sldHelligkeit.Name = "sldHelligkeit";
             this.sldHelligkeit.Size = new System.Drawing.Size(248, 24);
-            this.sldHelligkeit.SmallChange = 0.01D;
-            this.sldHelligkeit.Value = 1D;
+            this.sldHelligkeit.SmallChange = 0.01f;
+            this.sldHelligkeit.Value = 1f;
             this.sldHelligkeit.ValueChanged += new System.EventHandler(this.sldHelligkeit_ValueChanged);
             // 
             // btnHelligkeit

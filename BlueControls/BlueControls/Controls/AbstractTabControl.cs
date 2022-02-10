@@ -18,16 +18,9 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
-using BlueControls.EventArgs;
-using BlueControls.Forms;
-using BlueControls.Interfaces;
-using BlueControls.ItemCollection;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.Design;
 using System.Drawing;
-using System.Drawing.Design;
 using System.Windows.Forms;
 
 namespace BlueControls.Controls {
@@ -165,7 +158,7 @@ namespace BlueControls.Controls {
                     var neworder = new List<TabPage>();
 
                     foreach (var thisTabName in tmp) {
-                        foreach (var thisTab in this.TabPages) {
+                        foreach (var thisTab in TabPages) {
                             if (thisTab is TabPage tb) {
                                 if (tb.Text.ToLower() == thisTabName.ToLower()) {
                                     neworder.AddIfNotExists(tb);
@@ -174,9 +167,9 @@ namespace BlueControls.Controls {
                         }
                     }
 
-                    this.TabPages.Clear();
+                    TabPages.Clear();
                     foreach (var thisTP in neworder) {
-                        this.TabPages.Add(thisTP);
+                        TabPages.Add(thisTP);
                     }
                 }
 

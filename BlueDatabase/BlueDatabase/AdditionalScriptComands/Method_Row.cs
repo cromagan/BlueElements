@@ -60,8 +60,8 @@ namespace BlueScript {
         }
 
         public static strDoItFeedback RowToObjectFeedback(RowItem row) => row == null
-                        ? new strDoItFeedback("NULL", "row")
-                : new strDoItFeedback(row.Database.Filename + "|" + row.Key.ToString(), "row");
+? new strDoItFeedback("NULL", "row")
+: new strDoItFeedback(row.Database.Filename + "|" + row.Key.ToString(), "row");
 
         public override List<string> Comand(Script s) => new() { "row" };
 

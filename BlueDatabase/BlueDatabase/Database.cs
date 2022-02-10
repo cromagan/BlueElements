@@ -23,7 +23,6 @@ using BlueDatabase.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -575,22 +574,19 @@ namespace BlueDatabase {
         /// <param name="arrangement">Die Spalten, die zurückgegeben werden. NULL gibt alle Spalten zurück.</param>
         /// <param name="sortedRows">Die Zeilen, die zurückgegeben werden. NULL gibt alle ZEilen zurück.</param>
         /// <returns></returns>
-        public string Export_CSV(enFirstRow firstRow, ColumnViewCollection arrangement, List<RowData> sortedRows) =>
-            Export_CSV(firstRow, arrangement.ListOfUsedColumn(), sortedRows);
+        public string Export_CSV(enFirstRow firstRow, ColumnViewCollection arrangement, List<RowData> sortedRows) => Export_CSV(firstRow, arrangement.ListOfUsedColumn(), sortedRows);
 
         /// <summary>
         /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
         /// </summary>
         /// <returns></returns>
-        public string Export_CSV(enFirstRow firstRow, int arrangementNo, FilterCollection filter, List<RowItem> pinned) =>
-            Export_CSV(firstRow, ColumnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateSortedRows(filter, SortDefinition, pinned, null));
+        public string Export_CSV(enFirstRow firstRow, int arrangementNo, FilterCollection filter, List<RowItem> pinned) => Export_CSV(firstRow, ColumnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateSortedRows(filter, SortDefinition, pinned, null));
 
         /// <summary>
         /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
         /// </summary>
         /// <returns></returns>
-        public void Export_HTML(string filename, int arrangementNo, FilterCollection filter, List<RowItem> pinned) =>
-            Export_HTML(filename, ColumnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateSortedRows(filter, SortDefinition, pinned, null), false);
+        public void Export_HTML(string filename, int arrangementNo, FilterCollection filter, List<RowItem> pinned) => Export_HTML(filename, ColumnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateSortedRows(filter, SortDefinition, pinned, null), false);
 
         /// <summary>
         /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
@@ -1139,9 +1135,7 @@ namespace BlueDatabase {
             List.AddRange(b);
         }
 
-        protected override bool BlockSaveOperations() {
-            return RowItem.DoingScript || base.BlockSaveOperations();
-        }
+        protected override bool BlockSaveOperations() => RowItem.DoingScript || base.BlockSaveOperations();
 
         //protected override void CheckDataAfterReload() {
         //    try {

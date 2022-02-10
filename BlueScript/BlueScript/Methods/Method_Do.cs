@@ -15,10 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
-using static BlueBasics.Extensions;
 
 namespace BlueScript {
 
@@ -66,7 +64,7 @@ namespace BlueScript {
 
             s.Schleife--;
 
-            if (s.Schleife <0) { return new strDoItFeedback("Schleifenfehler"); }
+            if (s.Schleife < 0) { return new strDoItFeedback("Schleifenfehler"); }
 
 
             s.BreakFired = false;

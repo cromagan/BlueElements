@@ -107,8 +107,8 @@ namespace BlueControls.Controls {
         }
 
         public static Tuple<Bitmap, List<string>> ResizeData(Bitmap pic, List<string> tags, int width, int height) {
-            var zoomx = (double)width / pic.Width;
-            var zoomy = (double)height / pic.Height;
+            var zoomx = (float)width / pic.Width;
+            var zoomy = (float)height / pic.Height;
             var pic2 = BitmapExt.Resize(pic, width, height, enSizeModes.Verzerren, System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic, true);
             List<string> tags2 = new(tags);
             var Names = tags2.TagGet("AllPointNames").FromNonCritical().SplitAndCutBy("|");
@@ -164,9 +164,9 @@ namespace BlueControls.Controls {
             Invalidate();
         }
 
-        public void PointSet(string name, int x, int y) => PointSet(name, x, (double)y);
+        public void PointSet(string name, int x, int y) => PointSet(name, x, (float)y);
 
-        public void PointSet(string name, double x, double y) {
+        public void PointSet(string name, float x, float y) {
             var p = GetPoint(name);
             if (p == null) {
                 p = new PointM(name, x, y);
@@ -202,7 +202,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        protected override RectangleM MaxBounds() {
+        protected override RectangleF MaxBounds() {
             var r = base.MaxBounds();
             foreach (var thisP in points) {
                 r.X = Math.Min(r.X, thisP.X);
@@ -277,14 +277,14 @@ namespace BlueControls.Controls {
             // Mittellinie
             var PicturePos = base.MaxBounds();
             if (_MittelLinie.HasFlag(enOrientation.Waagerecht)) {
-                var p1 = PicturePos.PointOf(enAlignment.VerticalCenter_Left).ZoomAndMove(eg);
-                var p2 = PicturePos.PointOf(enAlignment.VerticalCenter_Right).ZoomAndMove(eg);
+                var p1 = PicturePos.PointOf(enAlignment.VerticalCenter_Left).ZoomAndMove(eg.Zoom, eg.ShiftX, eg.ShiftY);
+                var p2 = PicturePos.PointOf(enAlignment.VerticalCenter_Right).ZoomAndMove(eg.Zoom, eg.ShiftX, eg.ShiftY);
                 eg.G.DrawLine(new Pen(Color.FromArgb(10, 0, 0, 0), 3), p1, p2);
                 eg.G.DrawLine(new Pen(Color.FromArgb(220, 100, 255, 100)), p1, p2);
             }
             if (_MittelLinie.HasFlag(enOrientation.Senkrecht)) {
-                var p1 = PicturePos.PointOf(enAlignment.Top_HorizontalCenter).ZoomAndMove(eg);
-                var p2 = PicturePos.PointOf(enAlignment.Bottom_HorizontalCenter).ZoomAndMove(eg);
+                var p1 = PicturePos.PointOf(enAlignment.Top_HorizontalCenter).ZoomAndMove(eg.Zoom, eg.ShiftX, eg.ShiftY);
+                var p2 = PicturePos.PointOf(enAlignment.Bottom_HorizontalCenter).ZoomAndMove(eg.Zoom, eg.ShiftX, eg.ShiftY);
                 eg.G.DrawLine(new Pen(Color.FromArgb(10, 0, 0, 0), 3), p1, p2);
                 eg.G.DrawLine(new Pen(Color.FromArgb(220, 100, 255, 100)), p1, p2);
             }

@@ -25,6 +25,7 @@ using BlueControls.ItemCollection;
 using BlueDatabase;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Drawing.Printing;
 using System.IO;
 using System.Windows.Forms;
@@ -125,7 +126,7 @@ namespace BlueControls.Forms {
             pad.Item.SheetStyleScale = tmp.Item.SheetStyleScale;
             tmp.Dispose();
             var DruckB = pad.Item.DruckbereichRect();
-            var abstand = Math.Round(mmToPixel(abstandMM, ItemCollectionPad.DPI), 1);
+            var abstand = (float)Math.Round(mmToPixel(abstandMM, ItemCollectionPad.DPI), 1);
             var tempVar = Math.Max(1, (int)Math.Floor((DruckB.Width / (double)(OneItem.Width + abstand)) + 0.01));
             for (var x = 0; x < tempVar; x++) {
                 var tempVar2 = Math.Max(1, (int)Math.Floor((DruckB.Height / (double)(OneItem.Height + abstand)) + 0.01));
@@ -134,7 +135,7 @@ namespace BlueControls.Forms {
                         PadInternal = new CreativePad(new ItemCollectionPad(layout, rowsForExport[startNr].Database, rowsForExport[startNr].Key))
                     };
                     pad.Item.Add(It);
-                    It.SetCoordinates(new RectangleM(DruckB.Left + (x * (OneItem.Width + abstand)), DruckB.Top + (y * (OneItem.Height + abstand)), OneItem.Width, OneItem.Height), true);
+                    It.SetCoordinates(new RectangleF(DruckB.Left + (x * (OneItem.Width + abstand)), DruckB.Top + (y * (OneItem.Height + abstand)), OneItem.Width, OneItem.Height), true);
                     startNr++;
                     if (startNr >= rowsForExport.Count) { break; }
                 }

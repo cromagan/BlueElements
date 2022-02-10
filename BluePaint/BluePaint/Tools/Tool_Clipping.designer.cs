@@ -48,10 +48,10 @@ namespace BluePaint
             // 
             // Unten
             // 
-            this.Unten.LargeChange = 1D;
+            this.Unten.LargeChange = 1f;
             this.Unten.Location = new System.Drawing.Point(64, 256);
-            this.Unten.Maximum = 0D;
-            this.Unten.Minimum = -500D;
+            this.Unten.Maximum = 0f;
+            this.Unten.Minimum = -500f;
             this.Unten.Name = "Unten";
             this.Unten.Orientation = enOrientation.Senkrecht;
             this.Unten.Size = new System.Drawing.Size(144, 36);
@@ -60,9 +60,9 @@ namespace BluePaint
             // 
             // Oben
             // 
-            this.Oben.LargeChange = 1D;
+            this.Oben.LargeChange = 1f;
             this.Oben.Location = new System.Drawing.Point(64, 56);
-            this.Oben.Maximum = 500D;
+            this.Oben.Maximum = 500f;
             this.Oben.Name = "Oben";
             this.Oben.Orientation = enOrientation.Senkrecht;
             this.Oben.Size = new System.Drawing.Size(144, 36);
@@ -71,10 +71,10 @@ namespace BluePaint
             // 
             // Recht
             // 
-            this.Recht.LargeChange = 1D;
+            this.Recht.LargeChange = 1f;
             this.Recht.Location = new System.Drawing.Point(216, 104);
-            this.Recht.Maximum = 0D;
-            this.Recht.Minimum = -500D;
+            this.Recht.Maximum = 0f;
+            this.Recht.Minimum = -500f;
             this.Recht.Name = "Recht";
             this.Recht.Size = new System.Drawing.Size(36, 144);
             this.Recht.Text = "Slider2";
@@ -93,9 +93,9 @@ namespace BluePaint
             // 
             // Links
             // 
-            this.Links.LargeChange = 1D;
+            this.Links.LargeChange = 1f;
             this.Links.Location = new System.Drawing.Point(16, 104);
-            this.Links.Maximum = 500D;
+            this.Links.Maximum = 500f;
             this.Links.Name = "Links";
             this.Links.Size = new System.Drawing.Size(36, 144);
             this.Links.Text = "Slider1";

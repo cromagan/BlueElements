@@ -57,10 +57,10 @@ namespace BluePaint {
                     p1 = new Point(e.Current.TrimmedX, e.Current.TrimmedY);
                     p2 = new Point(e.Current.TrimmedX, e.Current.TrimmedY);
                 }
-                e.DrawLine(Pen_RedTransp, -0.5d, p1.Y - 0.5d, _Pic.Width + 0.5d, p1.Y - 0.5d);
-                e.DrawLine(Pen_RedTransp, p1.X - 0.5d, -0.5d, p1.X - 0.5d, _Pic.Height + 0.5d);
-                e.DrawLine(Pen_RedTransp, -0.5d, p2.Y + 0.5d, _Pic.Width + 0.5d, p2.Y + 0.5d);
-                e.DrawLine(Pen_RedTransp, p2.X + 0.5d, 0, p2.X + 0.5d, _Pic.Height + 0.5d);
+                e.DrawLine(Pen_RedTransp, -0.5f, p1.Y - 0.5f, _Pic.Width + 0.5f, p1.Y - 0.5f);
+                e.DrawLine(Pen_RedTransp, p1.X - 0.5f, -0.5f, p1.X - 0.5f, _Pic.Height + 0.5f);
+                e.DrawLine(Pen_RedTransp, -0.5f, p2.Y + 0.5f, _Pic.Width + 0.5f, p2.Y + 0.5f);
+                e.DrawLine(Pen_RedTransp, p2.X + 0.5f, 0, p2.X + 0.5f, _Pic.Height + 0.5f);
                 //if (e.Current.Button == System.Windows.Forms.MouseButtons.Left && e.MouseDown != null) {
                 //    e.DrawLine(Pen_RedTransp, -1, e.MouseDown.TrimmedY, _Pic.Width, e.MouseDown.TrimmedY);
                 //    e.DrawLine(Pen_RedTransp, e.MouseDown.TrimmedX, -1, e.MouseDown.TrimmedX, _Pic.Height);

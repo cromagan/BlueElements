@@ -92,8 +92,8 @@ namespace BlueControls.Designer_Support {
         #region Constructors
 
         public frmQuickPic() =>
-                                                                                                                                                                                                                                                            // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
-                                                                                                                                                                                                                                                            InitializeComponent();
+            // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
+            InitializeComponent();
 
         #endregion
 

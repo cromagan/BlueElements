@@ -115,13 +115,13 @@ namespace BlueControls.ItemCollection {
             return l;
         }
 
-        public bool KeyUp(object sender, System.Windows.Forms.KeyEventArgs e, double cZoom, double shiftX, double shiftY) {
+        public bool KeyUp(object sender, System.Windows.Forms.KeyEventArgs e, float cZoom, float shiftX, float shiftY) {
             if (PadInternal.Item.Count == 0) { return false; }
             PadInternal.DoKeyUp(e, false);
             return true;
         }
 
-        public bool MouseDown(object sender, System.Windows.Forms.MouseEventArgs e, double cZoom, double shiftX, double shiftY) {
+        public bool MouseDown(object sender, System.Windows.Forms.MouseEventArgs e, float cZoom, float shiftX, float shiftY) {
             if (PadInternal == null || PadInternal.Item.Count == 0) { return false; }
             var l1 = UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY, false);
             var l2 = PadInternal.Item.MaxBounds(ZoomItems);
@@ -129,50 +129,50 @@ namespace BlueControls.ItemCollection {
             var tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height);
             PadInternal.SetZoom(1);
             // Coordinaten auf Maßstab 1/1 scalieren
-            var x = (e.X - (double)l1.X) / tZo;
-            var y = (e.Y - (double)l1.Y) / tZo;
+            var x = (e.X - (float)l1.X) / tZo;
+            var y = (e.Y - (float)l1.Y) / tZo;
             // Nullpunkt verschiebung laut Maxbounds
             x += l2.X;
             y += l2.Y;
             // Und noch berücksichtigen, daß das Bild in den Rahmen eingepasst wurde
             x += (l2.Width - (l1.Width / tZo)) / 2;
             y += (l2.Height - (l1.Height / tZo)) / 2;
-            x = Math.Min(x, int.MaxValue / 2.0d);
-            y = Math.Min(y, int.MaxValue / 2.0d);
-            x = Math.Max(x, int.MinValue / 2.0d);
-            y = Math.Max(y, int.MinValue / 2.0d);
+            x = Math.Min(x, int.MaxValue / 2f);
+            y = Math.Min(y, int.MaxValue / 2f);
+            x = Math.Max(x, int.MinValue / 2f);
+            y = Math.Max(y, int.MinValue / 2f);
             System.Windows.Forms.MouseEventArgs e2 = new(e.Button, e.Clicks, (int)x, (int)y, e.Delta);
             PadInternal.DoMouseDown(e2);
             return true;
         }
 
-        public bool MouseMove(object sender, System.Windows.Forms.MouseEventArgs e, double zoom, double shiftX, double shiftY) {
+        public bool MouseMove(object sender, System.Windows.Forms.MouseEventArgs e, float zoom, float shiftX, float shiftY) {
             if (PadInternal == null || PadInternal.Item.Count == 0) { return false; }
             var l1 = UsedArea().ZoomAndMoveRect(zoom, shiftX, shiftY, false);
             var l2 = PadInternal.Item.MaxBounds(ZoomItems);
             if (l1.Width <= 0 || l2.Height <= 0) { return false; }
-            double tZo = 1;
+            float tZo = 1;
             if (l2.Width > 0 && l2.Height > 0) { tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height); }
             PadInternal.SetZoom(1);
             // Coordinaten auf Maßstab 1/1 scalieren
-            var x = (e.X - (double)l1.X) / tZo;
-            var y = (e.Y - (double)l1.Y) / tZo;
+            var x = (e.X - (float)l1.X) / tZo;
+            var y = (e.Y - (float)l1.Y) / tZo;
             // Nullpunkt verschiebung laut Maxbounds
             x += l2.X;
             y += l2.Y;
             // Und noch berücksichtigen, daß das Bild in den Rahmen eingepasst wurde
             x += (l2.Width - (l1.Width / tZo)) / 2;
             y += (l2.Height - (l1.Height / tZo)) / 2;
-            x = Math.Min(x, int.MaxValue / 2.0d);
-            y = Math.Min(y, int.MaxValue / 2.0d);
-            x = Math.Max(x, int.MinValue / 2.0d);
-            y = Math.Max(y, int.MinValue / 2.0d);
+            x = Math.Min(x, int.MaxValue / 2f);
+            y = Math.Min(y, int.MaxValue / 2f);
+            x = Math.Max(x, int.MinValue / 2f);
+            y = Math.Max(y, int.MinValue / 2f);
             System.Windows.Forms.MouseEventArgs e2 = new(e.Button, e.Clicks, (int)x, (int)y, e.Delta);
             PadInternal.DoMouseMove(e2);
             return true;
         }
 
-        public bool MouseUp(object sender, System.Windows.Forms.MouseEventArgs e, double zoom, double shiftX, double shiftY) {
+        public bool MouseUp(object sender, System.Windows.Forms.MouseEventArgs e, float zoom, float shiftX, float shiftY) {
             if (PadInternal.Item.Count == 0) { return false; }
             var l1 = UsedArea().ZoomAndMoveRect(zoom, shiftX, shiftY, false);
             var l2 = PadInternal.Item.MaxBounds(ZoomItems);
@@ -180,18 +180,18 @@ namespace BlueControls.ItemCollection {
             var tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height);
             PadInternal.SetZoom(1);
             // Coordinaten auf Maßstab 1/1 scalieren
-            var x = (e.X - (double)l1.X) / tZo;
-            var y = (e.Y - (double)l1.Y) / tZo;
+            var x = (e.X - (float)l1.X) / tZo;
+            var y = (e.Y - (float)l1.Y) / tZo;
             // Nullpunkt verschiebung laut Maxbounds
             x += l2.X;
             y += l2.Y;
             // Und noch berücksichtigen, daß das Bild in den Rahmen eingepasst wurde
             x += (l2.Width - (l1.Width / tZo)) / 2;
             y += (l2.Height - (l1.Height / tZo)) / 2;
-            x = Math.Min(x, int.MaxValue / 2.0d);
-            y = Math.Min(y, int.MaxValue / 2.0d);
-            x = Math.Max(x, int.MinValue / 2.0d);
-            y = Math.Max(y, int.MinValue / 2.0d);
+            x = Math.Min(x, int.MaxValue / 2f);
+            y = Math.Min(y, int.MaxValue / 2f);
+            x = Math.Max(x, int.MinValue / 2f);
+            y = Math.Max(y, int.MinValue / 2f);
             System.Windows.Forms.MouseEventArgs e2 = new(e.Button, e.Clicks, (int)x, (int)y, e.Delta);
             PadInternal.DoMouseUp(e2);
             return true;
@@ -266,7 +266,7 @@ namespace BlueControls.ItemCollection {
 
         protected override string ClassId() => "CHILDPAD";
 
-        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, double zoom, double shiftX, double shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
+        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
             try {
                 var trp = drawingCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
                 gr.TranslateTransform(trp.X, trp.Y);

@@ -30,8 +30,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using static BlueBasics.FileOperations;
 using static BlueBasics.Extensions;
+using static BlueBasics.FileOperations;
 
 namespace BlueControls.Controls {
 

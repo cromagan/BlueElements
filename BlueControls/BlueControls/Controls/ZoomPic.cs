@@ -23,6 +23,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
+using static BlueBasics.Extensions;
 
 namespace BlueControls.Controls {
 
@@ -105,7 +106,7 @@ namespace BlueControls.Controls {
             LinearGradientBrush lgb = new(ClientRectangle, Color.White, Color.LightGray, LinearGradientMode.Vertical);
             gr.FillRectangle(lgb, ClientRectangle);
             if (_bmp != null) {
-                var r = new RectangleM(0, 0, _bmp.Width, _bmp.Height).ZoomAndMoveRect(_Zoom, _shiftX, _shiftY, true);
+                var r = new RectangleF(0, 0, _bmp.Width, _bmp.Height).ZoomAndMoveRect(_Zoom, _shiftX, _shiftY, true);
                 if (_Zoom < 1 || AlwaysSmooth) {
                     gr.SmoothingMode = SmoothingMode.AntiAlias;
                     gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
@@ -125,7 +126,7 @@ namespace BlueControls.Controls {
             //gr.DrawImage(_BitmapOfControl, 0, 0);
         }
 
-        protected override RectangleM MaxBounds() => _bmp != null ? new RectangleM(0, 0, _bmp.Width, _bmp.Height) : new RectangleM(0, 0, 0, 0);
+        protected override RectangleF MaxBounds() => _bmp != null ? new RectangleF(0, 0, _bmp.Width, _bmp.Height) : new RectangleF(0, 0, 0, 0);
 
         protected virtual void OnDoAdditionalDrawing(AdditionalDrawing e) => DoAdditionalDrawing?.Invoke(this, e);
 

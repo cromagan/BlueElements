@@ -46,8 +46,8 @@ namespace BlueControls.ItemCollection {
 
         public PointM Center {
             get {
-                double totalX = 0;
-                double totalY = 0;
+                float totalX = 0;
+                float totalY = 0;
                 for (var i = 0; i < MovablePoint.Count; i++) {
                     totalX += MovablePoint[i].X;
                     totalY += MovablePoint[i].Y;
@@ -67,7 +67,7 @@ namespace BlueControls.ItemCollection {
         // For two vectors in the X-Y plane, the result is a
         // vector with X and Y components 0 so the Z component
         // gives the vector's length and direction.
-        public static double CrossProductLength(double Ax, double Ay, double Bx, double By, double Cx, double Cy) {
+        public static float CrossProductLength(float Ax, float Ay, float Bx, float By, float Cx, float Cy) {
             // Get the vectors' coordinates.
             var BAx = Ax - Bx;
             var BAy = Ay - By;
@@ -81,18 +81,18 @@ namespace BlueControls.ItemCollection {
         // Return a value between PI and -PI.
         // Note that the value is the opposite of what you might
         // expect because Y coordinates increase downward.
-        public static double GetAngle(double Ax, double Ay, double Bx, double By, double Cx, double Cy) {
+        public static float GetAngle(float Ax, float Ay, float Bx, float By, float Cx, float Cy) {
             // Get the dot product.
             var dot_product = DotProduct(Ax, Ay, Bx, By, Cx, Cy);
             // Get the cross product.
             var cross_product = CrossProductLength(Ax, Ay, Bx, By, Cx, Cy);
             // Calculate the angle.
-            return Math.Atan2((double)cross_product, (double)dot_product);
+            return (float)Math.Atan2((float)cross_product, (float)dot_product);
         }
 
         // Calculate the distance between [minA, maxA] and [minB, maxB]
         // The distance will be negative if the intervals overlap
-        public static double IntervalDistance(double minA, double maxA, double minB, double maxB) => minA < minB ? minB - maxA : minA - maxB;
+        public static float IntervalDistance(float minA, float maxA, float minB, float maxB) => minA < minB ? minB - maxA : minA - maxB;
 
         // Check if polygon A is going to collide with polygon B for the given velocity
         public static strPolygonCollisionResult PolygonCollision(clsAbstractPhysicPadItem polygonA, clsAbstractPhysicPadItem polygonB, PointM velocity) {
@@ -104,7 +104,7 @@ namespace BlueControls.ItemCollection {
             };
             var edgeCountA = polygonA.Edges.Count;
             var edgeCountB = polygonB.Edges.Count;
-            var minIntervalDistance = double.MaxValue;
+            var minIntervalDistance = float.MaxValue;
             PointM translationAxis = new(0, 0);
             PointM edge;
             // Loop through all the edges of both polygons
@@ -115,10 +115,10 @@ namespace BlueControls.ItemCollection {
                 PointM axis = new(-edge.Y, edge.X);
                 axis.Normalize();
                 // Find the projection of the polygon on the current axis
-                var minA = 0D;
-                var minB = 0D;
-                var maxA = 0D;
-                var maxB = 0D;
+                var minA = 0f;
+                var minB = 0f;
+                var maxA = 0f;
+                var maxB = 0f;
                 ProjectPolygon(axis, polygonA, ref minA, ref maxA);
                 ProjectPolygon(axis, polygonB, ref minB, ref maxB);
                 // Check if the polygon projections are currentlty intersecting
@@ -180,7 +180,7 @@ namespace BlueControls.ItemCollection {
         }
 
         // Calculate the projection of a polygon on an axis and returns it as a [min, max] interval
-        public static void ProjectPolygon(PointM axis, clsAbstractPhysicPadItem polygon, ref double min, ref double max) {
+        public static void ProjectPolygon(PointM axis, clsAbstractPhysicPadItem polygon, ref float min, ref float max) {
             // To project a point on an axis use the dot product
             var d = axis.DotProduct(polygon.MovablePoint[0]);
             min = d;
@@ -220,9 +220,9 @@ namespace BlueControls.ItemCollection {
             MovablePoint.CopyTo(pts, 0);
             pts[num_points] = MovablePoint[0];
             // Find the centroid.
-            double X = 0;
-            double Y = 0;
-            double second_factor;
+            float X = 0;
+            float Y = 0;
+            float second_factor;
             for (var i = 0; i < num_points; i++) {
                 second_factor =
                     (pts[i].X * pts[i + 1].Y) -
@@ -337,7 +337,7 @@ namespace BlueControls.ItemCollection {
         //http://csharphelper.com/blog/2014/07/determine-whether-a-point-is-inside-a-polygon-in-c/
         // Alternative:  https://stackoverflow.com/questions/4243042/c-sharp-point-in-polygon
         // Return True if the point is in the polygon.
-        public bool PointInPolygon(double X, double Y) {
+        public bool PointInPolygon(float X, float Y) {
             // Get the angle between the point and the
             // first and last vertices.
             var max_point = MovablePoint.Count - 2;
@@ -359,7 +359,7 @@ namespace BlueControls.ItemCollection {
         }
 
         // Return the polygon's area in "square units."
-        public double PolygonArea() =>
+        public float PolygonArea() =>
             // Return the absolute value of the signed area.
             // The signed area is negative if the polyogn is
             // oriented clockwise.
@@ -402,21 +402,21 @@ namespace BlueControls.ItemCollection {
         // Return true if the polygon is oriented clockwise.
         public bool PolygonIsOrientedClockwise(List<PointF> points) => SignedPolygonArea(points) < 0;
 
-        protected override RectangleM CalculateUsedArea() {
-            var minx = double.MaxValue;
-            var miny = double.MaxValue;
-            var maxx = double.MinValue;
-            var maxy = double.MinValue;
+        protected override RectangleF CalculateUsedArea() {
+            var minx = float.MaxValue;
+            var miny = float.MaxValue;
+            var maxx = float.MinValue;
+            var maxy = float.MinValue;
             foreach (var thisP in MovablePoint) {
                 minx = Math.Min(minx, thisP.X);
                 maxx = Math.Max(maxx, thisP.X);
                 miny = Math.Min(miny, thisP.Y);
                 maxy = Math.Max(maxy, thisP.Y);
             }
-            return new RectangleM(minx, miny, maxx - minx, maxy - miny);
+            return new RectangleF(minx, miny, maxx - minx, maxy - miny);
         }
 
-        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, double zoom, double shiftX, double shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
+        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
             if (MovablePoint.Count < 1) { return; }
             var lastP = MovablePoint[MovablePoint.Count - 1];
             foreach (var thisP in MovablePoint) {
@@ -429,7 +429,7 @@ namespace BlueControls.ItemCollection {
 
         // Return the dot product AB · BC.
         // Note that AB · BC = |AB| * |BC| * Cos(theta).
-        private static double DotProduct(double Ax, double Ay, double Bx, double By, double Cx, double Cy) {
+        private static float DotProduct(float Ax, float Ay, float Bx, float By, float Cx, float Cy) {
             // Get the vectors' coordinates.
             var BAx = Ax - Bx;
             var BAy = Ay - By;
@@ -505,14 +505,14 @@ namespace BlueControls.ItemCollection {
         // Return the polygon's area in "square units."
         // The value will be negative if the polygon is
         // oriented clockwise.
-        private double SignedPolygonArea() {
+        private float SignedPolygonArea() {
             // Add the first point to the end.
             var num_points = MovablePoint.Count - 1;
             var pts = new PointM[num_points + 1];
             MovablePoint.CopyTo(pts, 0);
             pts[num_points] = MovablePoint[0];
             // Get the areas.
-            double area = 0;
+            float area = 0;
             for (var i = 0; i < num_points; i++) {
                 area += (pts[i + 1].X - pts[i].X) * (pts[i + 1].Y + pts[i].Y) / 2;
             }

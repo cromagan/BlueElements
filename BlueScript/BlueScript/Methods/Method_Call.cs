@@ -65,7 +65,7 @@ namespace BlueScript {
 
             if (!string.IsNullOrEmpty(code.Item2)) { return new strDoItFeedback("Subroutine " + infos.AttributText + ": " + code.Item2); }
 
-            s.Line = s.ReducedScriptText.Substring(0, pos).Count(c => c == '¶')+1;
+            s.Line = s.ReducedScriptText.Substring(0, pos).Count(c => c == '¶') + 1;
             s.Sub++;
 
             var tmpv = new List<Variable>();

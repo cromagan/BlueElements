@@ -238,7 +238,7 @@ namespace BlueScript {
                         var cont = f.ContinuePosition;
                         var codebltxt = string.Empty;
                         if (GetCodeBlockAfter) {
-                            (string, string) x = GetCodeBlockText(scriptText, cont);
+                            var x = GetCodeBlockText(scriptText, cont);
                             if (!string.IsNullOrEmpty(x.Item2)) { return new strCanDoFeedback(f.ContinuePosition, x.Item2, true); }
                             codebltxt = x.Item1;
                             cont = cont + codebltxt.Length + 2;

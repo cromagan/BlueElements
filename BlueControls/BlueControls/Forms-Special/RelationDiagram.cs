@@ -22,6 +22,7 @@ using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace BlueControls.Forms {
 
@@ -70,7 +71,7 @@ namespace BlueControls.Forms {
             RowFormulaPadItem i2 = new(Pad.Item, Database, r.Key, layoutID);
             Pad.Item.Add(i2);
             //  Pad.Invalidate()
-            i2.SetCoordinates(new RectangleM(xPos, Ypos, i2.UsedArea().Width, i2.UsedArea().Height), false);
+            i2.SetCoordinates(new RectangleF(xPos, Ypos, i2.UsedArea().Width, i2.UsedArea().Height), false);
             i2.InDenVordergrund();
             //RelationsValid = false;
             return i2;

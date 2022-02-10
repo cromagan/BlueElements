@@ -16,11 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
-using System.Drawing;
 using System.IO;
 using static BlueBasics.FileOperations;
 
@@ -30,9 +27,7 @@ namespace BlueControls.Forms {
 
         #region Constructors
 
-        public PadEditorWithFileAccess() : base() {
-            InitializeComponent();
-        }
+        public PadEditorWithFileAccess() : base() => InitializeComponent();
 
         #endregion
 

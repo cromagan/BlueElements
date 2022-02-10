@@ -106,9 +106,9 @@ namespace BlueBasics {
         //        return string.Empty;
         //    }
         // }
-        public static void CartesianToPolar(PointF ko, ref double r, ref double win) {
-            r = Math.Sqrt((ko.X * ko.X) + (ko.Y * ko.Y));
-            win = Convert.ToDouble(Geometry.GetAngle(0d, 0d, ko.X, ko.Y));
+        public static void CartesianToPolar(PointF ko, ref float r, ref float win) {
+            r = (float)Math.Sqrt((ko.X * ko.X) + (ko.Y * ko.Y));
+            win = Geometry.GetAngle(0, 0, ko.X, ko.Y);
         }
 
         /// <summary>
@@ -271,15 +271,13 @@ namespace BlueBasics {
             return 0;
         }
 
-        public static double mmToPixel(double mM, int dPI) => mM * dPI / 25.4D;
+        public static float mmToPixel(float mM, int dPI) => mM * dPI / 25.4f;
 
-        public static double PixelToMM(double pixel, int dPI) => pixel / dPI * 25.4D;
+        public static float PixelToMM(float pixel, int dPI) => pixel / dPI * 25.4f;
 
         // public static string UTF8toString(string S) {
         // }
-        public static string StringtoUTF8(this string s) {
-            return Encoding.Default.GetString(Encoding.UTF8.GetBytes(s));
-        }
+        public static string StringtoUTF8(this string s) => Encoding.Default.GetString(Encoding.UTF8.GetBytes(s));
 
         public static Bitmap StringUnicodeToBitmap(string unicodeTXT) {
             if (string.IsNullOrEmpty(unicodeTXT)) {

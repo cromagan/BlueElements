@@ -34,7 +34,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Drawing.Text;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -2867,7 +2866,7 @@ namespace BlueControls.Controls {
         private void Draw_Table_What(Graphics GR, List<RowData> sr, enTableDrawColumn col, enTableDrawType type, int PermaX, Rectangle displayRectangleWOSlider, int FirstVisibleRow, int LastVisibleRow, enStates state) {
             var lfdno = 0;
 
-            bool firstOnScreen = true;
+            var firstOnScreen = true;
 
             foreach (var ViewItem in CurrentArrangement) {
                 if (ViewItem != null && ViewItem.Column != null) {

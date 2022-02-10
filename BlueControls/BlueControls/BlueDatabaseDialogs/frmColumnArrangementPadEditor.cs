@@ -15,33 +15,15 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
-using BlueControls.EventArgs;
-using BlueControls.Forms;
-using BlueControls.ItemCollection;
-using BlueDatabase;
-using System.ComponentModel;
-using static BlueBasics.FileOperations;
-
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Controls;
-
 using BlueControls.Enums;
-
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.ItemCollection;
 using BlueDatabase;
-
-using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
 using System;
 using static BlueBasics.Converter;
-
-using static BlueBasics.FileOperations;
 
 namespace BlueControls.BlueDatabaseDialogs {
 
@@ -65,9 +47,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             ShowOrder();
         }
 
-        private frmColumnArrangementPadEditor() {
-            InitializeComponent();
-        }
+        private frmColumnArrangementPadEditor() => InitializeComponent();
 
         #endregion
 
@@ -174,22 +154,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             ShowOrder();
         }
 
-        private void ShowOrder() {
-            Pad.Item.Clear();
-
-            foreach (var thisc in CurrentArrangement) {
-                var it = new TextPadItem(Pad.Item, thisc.Column.Name, thisc.Column.ReadableText);
-
-                it.SetCoordinates(new RectangleM)
-                    Pad.Item.Add(it)
-            }
-        }
+        private void ShowOrder() => Pad.Item.Clear();//foreach (var thisc in CurrentArrangement) {//    var it = new TextPadItem(Pad.Item, thisc.Column.Name, thisc.Column.ReadableText);//    it.SetCoordinates(new RectangleF)//        Pad.Item.Add(it)//}
 
         private void TmpDatabase_ShouldICancelDiscOperations(object sender, System.ComponentModel.CancelEventArgs e) => e.Cancel = true;
 
-        private void UpdateCombobox() {
-            Table.WriteColumnArrangementsInto(cbxInternalColumnArrangementSelector, Database, Arrangement);
-        }
+        private void UpdateCombobox() => Table.WriteColumnArrangementsInto(cbxInternalColumnArrangementSelector, Database, Arrangement);
 
         #endregion
     }

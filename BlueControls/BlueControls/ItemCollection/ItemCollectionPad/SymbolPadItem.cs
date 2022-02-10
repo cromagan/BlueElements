@@ -46,7 +46,7 @@ namespace BlueControls.ItemCollection {
 
         public Color Hintergrundfarbe { get; set; }
 
-        public double Randdicke { get; set; }
+        public float Randdicke { get; set; }
 
         public Color Randfarbe { get; set; }
 
@@ -90,7 +90,7 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "borderwidth":
-                    double.TryParse(value.FromNonCritical(), out var tRanddicke);
+                    float.TryParse(value.FromNonCritical(), out var tRanddicke);
                     Randdicke = tRanddicke;
                     return true;
 
@@ -113,7 +113,7 @@ namespace BlueControls.ItemCollection {
 
         protected override string ClassId() => "Symbol";
 
-        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, double zoom, double shiftX, double shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
+        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
             var trp = drawingCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
             gr.TranslateTransform(trp.X, trp.Y);
             gr.RotateTransform(-Drehwinkel);

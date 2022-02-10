@@ -50,7 +50,7 @@ namespace BlueControls.Forms {
 
         #region Methods
 
-        public new static void Close() => Close(false);
+        public static new void Close() => Close(false);
 
         public static void Show(string Text) {
             if (Text == _shownTXT) { return; }

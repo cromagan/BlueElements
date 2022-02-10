@@ -73,7 +73,7 @@ namespace BlueControls.Controls
             this.SliderX.Location = new Point(0, 414);
             this.SliderX.Name = "SliderX";
             this.SliderX.Size = new Size(1107, 18);
-            this.SliderX.SmallChange = 16D;
+            this.SliderX.SmallChange = 16f;
             this.SliderX.ValueChanged += new EventHandler(this.SliderX_ValueChanged);
             // 
             // SliderY
@@ -84,7 +84,7 @@ namespace BlueControls.Controls
             this.SliderY.Name = "SliderY";
             this.SliderY.Orientation = enOrientation.Senkrecht;
             this.SliderY.Size = new Size(18, 432);
-            this.SliderY.SmallChange = 16D;
+            this.SliderY.SmallChange = 16f;
             this.SliderY.ValueChanged += new EventHandler(this.SliderY_ValueChanged);
             // 
             // Table

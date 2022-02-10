@@ -15,21 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
-using BlueBasics.Enums;
 using BlueControls.BlueDatabaseDialogs;
-using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.Forms;
-using BlueControls.Interfaces;
 using BlueDatabase;
-using BlueDatabase.Enums;
 using BlueScript;
-using FastColoredTextBoxNS;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace BlueControls {
 
@@ -43,9 +33,7 @@ namespace BlueControls {
 
         #region Constructors
 
-        public ScriptEditorDatabase() {
-            InitializeComponent();
-        }
+        public ScriptEditorDatabase() => InitializeComponent();
 
         #endregion
 

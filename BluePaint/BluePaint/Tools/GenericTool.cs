@@ -79,19 +79,19 @@ namespace BluePaint {
         ///
         /// </summary>
         /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
-        public virtual new void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap OriginalPic) { }
+        public new virtual void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap OriginalPic) { }
 
         /// <summary>
         ///
         /// </summary>
         /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
-        public virtual new void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) { }
+        public new virtual void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) { }
 
         /// <summary>
         ///
         /// </summary>
         /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
-        public virtual new void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) { }
+        public new virtual void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) { }
 
         /// <summary>
         ///

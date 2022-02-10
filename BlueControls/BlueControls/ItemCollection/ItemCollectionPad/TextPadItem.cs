@@ -21,7 +21,6 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueScript;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -79,8 +78,8 @@ namespace BlueControls.ItemCollection {
         }
 
         //http://www.kurztutorial.info/programme/punkt-mm/rechner.html
-        // Dim Ausgleich As Double = mmToPixel(1 / 72 * 25.4, 300)
-        public double Skalierung { get; set; } = 3.07d;
+        // Dim Ausgleich As float = mmToPixel(1 / 72 * 25.4, 300)
+        public float Skalierung { get; set; } = 3.07f;
 
         /// <summary>
         ///
@@ -142,7 +141,7 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "additionalscale":
-                    Skalierung = double.Parse(value.FromNonCritical());
+                    Skalierung = float.Parse(value.FromNonCritical());
                     return true;
             }
             return false;
@@ -193,7 +192,7 @@ namespace BlueControls.ItemCollection {
 
         protected override string ClassId() => "TEXT";
 
-        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, double zoom, double shiftX, double shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
+        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
             if (Stil == PadStyles.Undefiniert) { return; }
             gr.SetClip(drawingCoordinates);
             var trp = drawingCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);

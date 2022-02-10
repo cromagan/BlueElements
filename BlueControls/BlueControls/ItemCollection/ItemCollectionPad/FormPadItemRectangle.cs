@@ -23,6 +23,7 @@ using BlueControls.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using static BlueBasics.Extensions;
 
 namespace BlueControls.ItemCollection {
 
@@ -110,8 +111,8 @@ namespace BlueControls.ItemCollection {
 
         public override void PointMoved(object sender, MoveEventArgs e) {
             base.PointMoved(sender, e);
-            var x = 0D;
-            var y = 0D;
+            var x = 0f;
+            var y = 0f;
 
             var point = (PointM)sender;
 
@@ -163,7 +164,7 @@ namespace BlueControls.ItemCollection {
             SizeChanged();
         }
 
-        public void SetCoordinates(RectangleM r, bool overrideFixedSize) {
+        public void SetCoordinates(RectangleF r, bool overrideFixedSize) {
             if (!overrideFixedSize) {
                 var vr = r.PointOf(enAlignment.Horizontal_Vertical_Center);
                 var ur = UsedArea();
@@ -190,10 +191,10 @@ namespace BlueControls.ItemCollection {
             return t.Trim(", ") + "}";
         }
 
-        protected override RectangleM CalculateUsedArea() => p_LO == null || p_RU == null ? new RectangleM()
-        : new RectangleM(Math.Min(p_LO.X, p_RU.X), Math.Min(p_LO.Y, p_RU.Y), Math.Abs(p_RU.X - p_LO.X), Math.Abs(p_RU.Y - p_LO.Y));
+        protected override RectangleF CalculateUsedArea() => p_LO == null || p_RU == null ? new RectangleF()
+: new RectangleF(Math.Min(p_LO.X, p_RU.X), Math.Min(p_LO.Y, p_RU.Y), Math.Abs(p_RU.X - p_LO.X), Math.Abs(p_RU.Y - p_LO.Y));
 
-        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, double zoom, double shiftX, double shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
+        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
             try {
                 if (!forPrinting) {
                     if (zoom > 1) {

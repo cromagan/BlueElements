@@ -55,7 +55,7 @@ namespace BlueControls.ItemCollection {
 
         public BitmapPadItem(ItemCollectionPad parent, string internalname, Bitmap bmp, Size size) : base(parent, internalname) {
             Bitmap = bmp;
-            SetCoordinates(new RectangleM(0, 0, size.Width, size.Height), true);
+            SetCoordinates(new RectangleF(0, 0, size.Width, size.Height), true);
             Overlays = new List<QuickImage>();
             Hintergrund_weiß_füllen = true;
             Padding = 0;
@@ -196,7 +196,7 @@ namespace BlueControls.ItemCollection {
 
         protected override string ClassId() => "IMAGE";
 
-        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, double zoom, double shiftX, double shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
+        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
             drawingCoordinates.Inflate(-Padding, -Padding);
             RectangleF r1 = new(drawingCoordinates.Left + Padding, drawingCoordinates.Top + Padding, drawingCoordinates.Width - (Padding * 2), drawingCoordinates.Height - (Padding * 2));
             RectangleF r2 = new();
@@ -210,7 +210,7 @@ namespace BlueControls.ItemCollection {
                         }
 
                     case enSizeModes.BildAbschneiden: {
-                            var scale = (float)Math.Max((drawingCoordinates.Width - (Padding * 2)) / (double)Bitmap.Width, (drawingCoordinates.Height - (Padding * 2)) / (double)Bitmap.Height);
+                            var scale = (float)Math.Max((drawingCoordinates.Width - (Padding * 2)) / Bitmap.Width, (drawingCoordinates.Height - (Padding * 2)) / Bitmap.Height);
                             var tmpw = (drawingCoordinates.Width - (Padding * 2)) / scale;
                             var tmph = (drawingCoordinates.Height - (Padding * 2)) / scale;
                             r3 = new RectangleF((Bitmap.Width - tmpw) / 2, (Bitmap.Height - tmph) / 2, tmpw, tmph);
@@ -219,7 +219,7 @@ namespace BlueControls.ItemCollection {
                         }
                     default: // Is = enSizeModes.WeißerRand
                         {
-                            var scale = (float)Math.Min((drawingCoordinates.Width - (Padding * 2)) / (double)Bitmap.Width, (drawingCoordinates.Height - (Padding * 2)) / (double)Bitmap.Height);
+                            var scale = (float)Math.Min((drawingCoordinates.Width - (Padding * 2)) / Bitmap.Width, (drawingCoordinates.Height - (Padding * 2)) / Bitmap.Height);
                             r2 = new RectangleF(((drawingCoordinates.Width - (Bitmap.Width * scale)) / 2) + drawingCoordinates.Left, ((drawingCoordinates.Height - (Bitmap.Height * scale)) / 2) + drawingCoordinates.Top, Bitmap.Width * scale, Bitmap.Height * scale);
                             break;
                         }
@@ -313,8 +313,8 @@ namespace BlueControls.ItemCollection {
         //        }
         //        var x = p_RU.X - p_LO.X;
         //        var y = p_RU.Y - p_LO.Y;
-        //        p_RU.X = (double)((double)p_LO.X + (double)x * sc);
-        //        p_RU.Y = (double)((double)p_LO.Y + (double)y * sc);
+        //        p_RU.X = (float)((float)p_LO.X + (float)x * sc);
+        //        p_RU.Y = (float)((float)p_LO.Y + (float)y * sc);
         //        KeepInternalLogic();
         //        return;
         //    }
