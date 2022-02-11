@@ -103,7 +103,7 @@ namespace BlueControls.Designer_Support {
 
         public void GeneratePreview() {
             try {
-                Preview.Image = QuickImage.Get(ICode()).BMP;
+                Preview.Image = QuickImage.Get(ICode());
             } catch {
                 Preview.Image = null;
             }
@@ -114,14 +114,14 @@ namespace BlueControls.Designer_Support {
             return QuickImage.GenerateCode(PicName.Text, int.Parse(GrX.Text), int.Parse(GrY.Text), e, Färb.Text, grün.Text, SAT.Value, Hell.Value, 0, Transp.Value, txbZweitsymbol.Text);
         }
 
-        public void StartAll(string C) {
+        public void StartAll(string qicode) {
             LB.Items.Clear();
             const enImageCode tempVar = (enImageCode)9999;
             for (enImageCode z = 0; z <= tempVar; z++) {
                 var w = Enum.GetName(z.GetType(), z);
                 if (!string.IsNullOrEmpty(w)) { LB.Items.Add(w); }
             }
-            QuickImage l = new(C);
+            QuickImage l = new(qicode);
             PicName.Text = l.Name;
             Färb.Text = l.Färbung;
             grün.Text = l.ChangeGreenTo;
@@ -129,7 +129,7 @@ namespace BlueControls.Designer_Support {
             SAT.Value = l.Sättigung;
             Hell.Value = l.Helligkeit;
             Transp.Value = l.Transparenz;
-            if (l.Effekt < 0) { l.Effekt = 0; }
+            //if (l.Effekt < 0) { l.Effekt =  enImageCodeEffect.Ohne; }
             chkbDurchgestrichen.Checked = Convert.ToBoolean(l.Effekt & enImageCodeEffect.Durchgestrichen);
             chkbMEDisabled.Checked = Convert.ToBoolean(l.Effekt & enImageCodeEffect.WindowsMEDisabled);
             chkbXPDisabled.Checked = Convert.ToBoolean(l.Effekt & enImageCodeEffect.WindowsXPDisabled);

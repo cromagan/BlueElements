@@ -77,7 +77,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabAnsichten.Controls.Add(this.grpAnsichtsVerwaltung);
             this.tabAnsichten.Location = new System.Drawing.Point(4, 25);
             this.tabAnsichten.Name = "tabAnsichten";
-            this.tabAnsichten.Size = new System.Drawing.Size(792, 81);
+            this.tabAnsichten.Size = new System.Drawing.Size(876, 81);
             this.tabAnsichten.TabIndex = 4;
             this.tabAnsichten.Text = "Ansichten";
             // 
@@ -219,6 +219,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Name = "frmColumnArrangementPadEditor";
             this.Text = "frmColumnArrangementPadEditor";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.grpDesign.ResumeLayout(false);
             this.Ribbon.ResumeLayout(false);
             this.tabStart.ResumeLayout(false);

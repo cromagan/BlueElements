@@ -39,6 +39,8 @@ namespace BlueBasics {
 
         public PixelFormat _pixelformat = PixelFormat.Format32bppArgb;
 
+        private Bitmap _bitmap;
+
         #endregion
 
         #region Constructors
@@ -50,24 +52,31 @@ namespace BlueBasics {
 
         public BitmapExt(int width, int height) => EmptyBitmap(width, height);
 
-        public BitmapExt(Icon icon) : this(icon.ToBitmap()) {
-        }
+        public BitmapExt() => EmptyBitmap(0, 0);
+
+        public BitmapExt(Icon icon) : this(icon.ToBitmap()) { }
 
         /// <summary>
-        /// Achtung, das eingehende Bild wird zerstört!
+        /// Achtung, das eingehende Bild wird geclont!
         /// </summary>
         /// <param name="bmp"></param>
-        public BitmapExt(Bitmap bmp) => SetBitmap(bmp);
+        public BitmapExt(Bitmap bmp) => CloneFromBitmap(bmp);
 
         #endregion
 
         #region Properties
 
-        public Bitmap Bitmap { get; private set; }
-        public int[] Bits { get; private set; } // Int32 = int
+        public int[] Bits { get; private set; }
+
+        // Int32 = int
         public bool Disposed { get; private set; }
+
         public int Height { get; private set; }
+
+        public Size Size { get => new(Width, Height); }
+
         public int Width { get; private set; }
+
         protected GCHandle BitsHandle { get; private set; }
 
         #endregion
@@ -438,108 +447,91 @@ namespace BlueBasics {
         public static Bitmap ImageBlurFilter(Bitmap bmp, BlurType blurType) {
             Bitmap resultBitmap = null;
             switch (blurType) {
-                case BlurType.Mean3x3: {
-                        resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.Mean3x3, 1.0 / 9.0, 0);
-                    }
+                case BlurType.Mean3x3:
+                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.Mean3x3, 1.0 / 9.0, 0);
                     break;
 
-                case BlurType.Mean5x5: {
-                        resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.Mean5x5, 1.0 / 25.0, 0);
-                    }
+                case BlurType.Mean5x5:
+                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.Mean5x5, 1.0 / 25.0, 0);
                     break;
 
-                case BlurType.Mean7x7: {
-                        resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.Mean7x7, 1.0 / 49.0, 0);
-                    }
+                case BlurType.Mean7x7:
+                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.Mean7x7, 1.0 / 49.0, 0);
                     break;
 
-                case BlurType.Mean9x9: {
-                        resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.Mean9x9, 1.0 / 81.0, 0);
-                    }
+                case BlurType.Mean9x9:
+                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.Mean9x9, 1.0 / 81.0, 0);
+
                     break;
 
-                case BlurType.GaussianBlur3x3: {
-                        resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.GaussianBlur3x3, 1.0 / 16.0, 0);
-                    }
+                case BlurType.GaussianBlur3x3:
+                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.GaussianBlur3x3, 1.0 / 16.0, 0);
                     break;
 
-                case BlurType.GaussianBlur5x5: {
-                        resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.GaussianBlur5x5, 1.0 / 159.0, 0);
-                    }
+                case BlurType.GaussianBlur5x5:
+                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.GaussianBlur5x5, 1.0 / 159.0, 0);
                     break;
 
-                case BlurType.MotionBlur5x5: {
-                        resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur5x5, 1.0 / 10.0, 0);
-                    }
+                case BlurType.MotionBlur5x5:
+                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur5x5, 1.0 / 10.0, 0);
                     break;
 
-                case BlurType.MotionBlur5x5At45Degrees: {
-                        resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur5x5At45Degrees, 1.0 / 5.0, 0);
-                    }
+                case BlurType.MotionBlur5x5At45Degrees:
+                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur5x5At45Degrees, 1.0 / 5.0, 0);
                     break;
 
-                case BlurType.MotionBlur5x5At135Degrees: {
-                        resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur5x5At135Degrees, 1.0 / 5.0, 0);
-                    }
+                case BlurType.MotionBlur5x5At135Degrees:
+                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur5x5At135Degrees, 1.0 / 5.0, 0);
                     break;
 
-                case BlurType.MotionBlur7x7: {
-                        resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur7x7, 1.0 / 14.0, 0);
-                    }
+                case BlurType.MotionBlur7x7:
+                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur7x7, 1.0 / 14.0, 0);
                     break;
 
-                case BlurType.MotionBlur7x7At45Degrees: {
-                        resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur7x7At45Degrees, 1.0 / 7.0, 0);
-                    }
+                case BlurType.MotionBlur7x7At45Degrees:
+                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur7x7At45Degrees, 1.0 / 7.0, 0);
                     break;
 
-                case BlurType.MotionBlur7x7At135Degrees: {
-                        resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur7x7At135Degrees, 1.0 / 7.0, 0);
-                    }
+                case BlurType.MotionBlur7x7At135Degrees:
+                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur7x7At135Degrees, 1.0 / 7.0, 0);
                     break;
 
-                case BlurType.MotionBlur9x9: {
-                        resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur9x9, 1.0 / 18.0, 0);
-                    }
+                case BlurType.MotionBlur9x9:
+                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur9x9, 1.0 / 18.0, 0);
                     break;
 
-                case BlurType.MotionBlur9x9At45Degrees: {
-                        resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur9x9At45Degrees, 1.0 / 9.0, 0);
-                    }
+                case BlurType.MotionBlur9x9At45Degrees:
+                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur9x9At45Degrees, 1.0 / 9.0, 0);
                     break;
 
-                case BlurType.MotionBlur9x9At135Degrees: {
-                        resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur9x9At135Degrees, 1.0 / 9.0, 0);
-                    }
+                case BlurType.MotionBlur9x9At135Degrees:
+                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur9x9At135Degrees, 1.0 / 9.0, 0);
                     break;
 
-                case BlurType.Median3x3: {
-                        resultBitmap = MedianFilter(bmp, 3);
-                    }
+                case BlurType.Median3x3:
+                    resultBitmap = MedianFilter(bmp, 3);
                     break;
 
-                case BlurType.Median5x5: {
-                        resultBitmap = MedianFilter(bmp, 5);
-                    }
+                case BlurType.Median5x5:
+                    resultBitmap = MedianFilter(bmp, 5);
                     break;
 
-                case BlurType.Median7x7: {
-                        resultBitmap = MedianFilter(bmp, 7);
-                    }
+                case BlurType.Median7x7:
+                    resultBitmap = MedianFilter(bmp, 7);
                     break;
 
-                case BlurType.Median9x9: {
-                        resultBitmap = MedianFilter(bmp, 9);
-                    }
+                case BlurType.Median9x9:
+                    resultBitmap = MedianFilter(bmp, 9);
                     break;
 
-                case BlurType.Median11x11: {
-                        resultBitmap = MedianFilter(bmp, 11);
-                    }
+                case BlurType.Median11x11:
+                    resultBitmap = MedianFilter(bmp, 11);
                     break;
             }
             return resultBitmap;
         }
+
+        public static implicit operator Bitmap(BitmapExt p) => p?._bitmap;
 
         public static void IntensifyBitmap(ref Bitmap bMP) {
             for (var X = 0; X < bMP.Width; X++) {
@@ -865,10 +857,10 @@ namespace BlueBasics {
 
         public BitmapExt Crop(Rectangle re) {
             BitmapExt newBMP = new(re.Width, re.Height);
-            using (var GR = Graphics.FromImage(newBMP.Bitmap)) {
+            using (var GR = Graphics.FromImage(newBMP._bitmap)) {
                 GR.Clear(Color.Transparent);
                 GR.PixelOffsetMode = PixelOffsetMode.Half;
-                GR.DrawImage(Bitmap, new Rectangle(0, 0, re.Width, re.Height), re.Left, re.Top, re.Width, re.Height, GraphicsUnit.Pixel);
+                GR.DrawImage(_bitmap, new Rectangle(0, 0, re.Width, re.Height), re.Left, re.Top, re.Width, re.Height, GraphicsUnit.Pixel);
             }
             return newBMP;
         }
@@ -876,24 +868,24 @@ namespace BlueBasics {
         public void Dispose() {
             if (Disposed) { return; }
             Disposed = true;
-            Bitmap.Dispose();
+            _bitmap.Dispose();
             BitsHandle.Free();
         }
 
         public void FromFile(string dateiName, bool setDummyPicIfFails) {
             var x = (Bitmap)Image_FromFile(dateiName);
             if (x == null && setDummyPicIfFails) {
-                x = QuickImage.Get(enImageCode.Warnung).BMP;
+                x = QuickImage.Get(enImageCode.Warnung);
             }
-            SetBitmap(x);
+            CloneFromBitmap(x);
         }
 
         public Color GetPixel(int x, int y) => Color.FromArgb(Bits[x + (y * Width)]);
 
-        public void MakeTransparent(Color color) => Bitmap.MakeTransparent(color);
+        public void MakeTransparent(Color color) => _bitmap.MakeTransparent(color);
 
         public void Resize(int width, int height, enSizeModes sizeMode, InterpolationMode interpolationMode, bool collectGarbage) {
-            if (Bitmap == null) { return; }
+            if (_bitmap == null) { return; }
             if (collectGarbage) { Generic.CollectGarbage(); }
             if (width < 1) { width = 1; }
             if (height < 1) { height = 1; }
@@ -933,9 +925,9 @@ namespace BlueBasics {
                 nh = height;
             }
             try {
-                var oldBMP = Bitmap;
+                var oldBMP = _bitmap;
                 EmptyBitmap(width, height);
-                using var GR = Graphics.FromImage(Bitmap);
+                using var GR = Graphics.FromImage(_bitmap);
                 GR.InterpolationMode = interpolationMode;
                 GR.PixelOffsetMode = PixelOffsetMode.Half;
                 // 20000 / 4 = 5000, also noch 1000 zum kleiner machen
@@ -965,9 +957,45 @@ namespace BlueBasics {
             }
         }
 
-        public void Save(string name, ImageFormat imageFormat) => Bitmap.Save(name, imageFormat);
+        public void Save(string name, ImageFormat imageFormat) => _bitmap.Save(name, imageFormat);
 
         public void SetPixel(int x, int y, Color colour) => Bits[x + (y * Width)] = colour.ToArgb();
+
+        protected void CloneFromBitmap(Bitmap bmp) {
+            if (bmp == null) {
+                Width = -1;
+                Height = -1;
+                return;
+            }
+            try {
+                Width = bmp.Width;
+                Height = bmp.Height;
+                Bits = new int[Width * Height];
+                BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
+                _bitmap = new Bitmap(Width, Height, Width * 4, _pixelformat, BitsHandle.AddrOfPinnedObject());
+                using var gr = Graphics.FromImage(_bitmap);
+                gr.DrawImage(bmp, new Rectangle(0, 0, Width, Height));
+            } catch (Exception ex) {
+                Develop.DebugPrint(ex);
+                Width = -1;
+                Height = -1;
+                _bitmap = null;
+            }
+        }
+
+        protected void EmptyBitmap(int width, int height) {
+            Width = width;
+            Height = height;
+            Bits = new int[Width * Height];
+            BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
+
+            if (Width < 1 || height < 1) {
+                _bitmap = null;
+                return;
+            }
+
+            _bitmap = new Bitmap(Width, Height, Width * 4, _pixelformat, BitsHandle.AddrOfPinnedObject());
+        }
 
         private static Bitmap ConvolutionFilter(Bitmap sourceBitmap, double[,] filterMatrix, double factor = 1, int bias = 0) {
             var sourceData = sourceBitmap.LockBits(new Rectangle(0, 0, sourceBitmap.Width, sourceBitmap.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
@@ -1009,42 +1037,6 @@ namespace BlueBasics {
             Marshal.Copy(resultBuffer, 0, resultData.Scan0, resultBuffer.Length);
             resultBitmap.UnlockBits(resultData);
             return resultBitmap;
-        }
-
-        private void EmptyBitmap(int width, int height) {
-            Width = width;
-            Height = height;
-            Bits = new int[Width * Height];
-            BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
-            Bitmap = new Bitmap(Width, Height, Width * 4, _pixelformat, BitsHandle.AddrOfPinnedObject());
-        }
-
-        /// <summary>
-        /// Achtung, das eingehende Bild wird zerstört!
-        /// </summary>
-        /// <param name="bmp"></param>
-        private void SetBitmap(Bitmap bmp) {
-            if (bmp == null) {
-                Width = -1;
-                Height = -1;
-                return;
-            }
-            try {
-                Width = bmp.Width;
-                Height = bmp.Height;
-                Bits = new int[Width * Height];
-                BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
-                Bitmap = new Bitmap(Width, Height, Width * 4, _pixelformat, BitsHandle.AddrOfPinnedObject());
-                using (var gr = Graphics.FromImage(Bitmap)) {
-                    gr.DrawImage(bmp, new Rectangle(0, 0, Width, Height));
-                }
-                bmp.Dispose(); // Sichherheithalber, da es ja nun ein neues Bild ist.
-            } catch (Exception ex) {
-                Develop.DebugPrint(ex);
-                Width = -1;
-                Height = -1;
-                Bitmap = null;
-            }
         }
 
         #endregion

@@ -70,7 +70,7 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
-        public override void CloneToNewCollection(ItemCollectionList newParent) => CloneToNewCollection(newParent, new TextListItem(_ReadableText, Internal, _Symbol, IsCaption, _Enabled, UserDefCompareKey));
+        public override object Clone() => new TextListItem(_ReadableText, Internal, _Symbol, IsCaption, _Enabled, UserDefCompareKey);
 
         public override bool FilterMatch(string FilterText) => base.FilterMatch(FilterText) || _ReadableText.ToUpper().Contains(FilterText.ToUpper());
 

@@ -42,10 +42,9 @@ namespace BlueControls.ItemCollection {
 
         #region Constructors
 
-        public ChildPadItem(ItemCollectionPad parent) : this(parent, string.Empty) {
-        }
+        public ChildPadItem() : this(string.Empty) { }
 
-        public ChildPadItem(ItemCollectionPad parent, string internalname) : base(parent, internalname) {
+        public ChildPadItem(string internalname) : base(internalname) {
             PadInternal = null; // new CreativePad();
             VisibleItems = null;
             ZoomItems = null;

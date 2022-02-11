@@ -87,7 +87,7 @@ namespace BlueControls.Forms {
             if (ec.Cancel) { return; }
             if (!ec.Translate) { Translate = false; }
             if (ThisContextMenu.Count > 0 && UserMenu.Count > 0) { ThisContextMenu.AddSeparator(); }
-            if (UserMenu.Count > 0) { ThisContextMenu.AddRange(UserMenu); }
+            if (UserMenu.Count > 0) { ThisContextMenu.AddClonesFrom(UserMenu); }
 
             var par = Control.ParentControlWithCommands();
             if (ThisContextMenu.Count > 0) {
@@ -117,11 +117,11 @@ namespace BlueControls.Forms {
 
         public static FloatingInputBoxListBoxStyle Show(ItemCollectionList Items, int Xpos, int Ypos, int SteuerWi, object Tag, System.Windows.Forms.Control ConnectedControl, bool Translate) => new(Items, Xpos, Ypos, SteuerWi, Tag, ConnectedControl, Translate);
 
-        public void Generate_ListBox1(ItemCollectionList ItemsOri, int MinWidth, enAddType AddNewAllowed, bool Translate) {
-            var itemsClone = (ItemCollectionList)ItemsOri.Clone();
-            (var BiggestItemX, var _, var HeightAdded, var _) = itemsClone.ItemData();
+        public void Generate_ListBox1(ItemCollectionList items, int MinWidth, enAddType AddNewAllowed, bool Translate) {
+            //var itemsClone = (ItemCollectionList)ItemsOri.Clone();
+            (var BiggestItemX, var _, var HeightAdded, var _) = items.ItemData();
             if (AddNewAllowed != enAddType.None) { HeightAdded += 24; }
-            lstbx.Appearance = (enBlueListBoxAppearance)itemsClone.ControlDesign;
+            lstbx.Appearance = (enBlueListBoxAppearance)items.ControlDesign;
             lstbx.Translate = Translate;
             //if (data.Item4 == BlueBasics.Enums.enOrientation.Senkrecht)
             //{
@@ -145,8 +145,8 @@ namespace BlueControls.Forms {
                 BiggestItemX += 20;
             }
             Size = new Size(BiggestItemX + (lstbx.Left * 2), HeightAdded + (lstbx.Top * 2));
-            lstbx.Item.CheckBehavior = itemsClone.CheckBehavior;
-            lstbx.Item.AddRange(itemsClone);
+            lstbx.Item.CheckBehavior = items.CheckBehavior;
+            lstbx.Item.AddClonesFrom(items);
         }
 
         public override void Refresh() {

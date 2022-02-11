@@ -34,9 +34,11 @@ namespace BlueControls.ItemCollection {
         #region Fields
 
         public readonly ListExt<PointM> MovablePoint = new();
-        public readonly ItemCollectionPad Parent = null;
+
         public readonly List<PointM> PointsForSuccesfullyMove = new();
+
         private static int UniqueInternal_Count;
+
         private static string UniqueInternal_LastTime = "InitialDummy";
 
         /// <summary>
@@ -45,16 +47,19 @@ namespace BlueControls.ItemCollection {
         /// <remarks></remarks>
         private bool _Bei_Export_sichtbar = true;
 
+        private ItemCollectionPad _Parent = null;
+
         private PadStyles _Style = PadStyles.Undefiniert;
+
         private int _ZoomPadding = 0;
+
         private RectangleF tmpUsedArea = default;
 
         #endregion
 
         #region Constructors
 
-        protected BasicPadItem(ItemCollectionPad parent, string internalname) {
-            Parent = parent;
+        protected BasicPadItem(string internalname) {
             Internal = string.IsNullOrEmpty(internalname) ? UniqueInternal() : internalname;
             if (string.IsNullOrEmpty(Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
             MovablePoint.ItemAdded += Points_ItemAdded;
@@ -88,7 +93,21 @@ namespace BlueControls.ItemCollection {
         public string Gruppenzugehörigkeit { get; set; } = string.Empty;
 
         public string Internal { get; private set; }
+
         public bool IsParsing { get; private set; }
+
+        public ItemCollectionPad Parent {
+            get => _Parent;
+            set {
+                if (_Parent == null || _Parent == value) {
+                    _Parent = value;
+                    return;
+                }
+
+                Develop.DebugPrint(enFehlerArt.Fehler, "Parent Fehler!");
+            }
+        }
+
         public virtual string QuickInfo { get; set; } = string.Empty;
 
         public PadStyles Stil {
@@ -119,7 +138,7 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
-        public static BasicPadItem NewByParsing(ItemCollectionPad parent, string code) {
+        public static BasicPadItem NewByParsing(string code) {
             BasicPadItem i = null;
             var x = code.GetAllTags();
             var ding = string.Empty;
@@ -147,27 +166,21 @@ namespace BlueControls.ItemCollection {
             }
             switch (ding.ToLower()) {
                 case "blueelements.clsitemtext":
-
                 case "blueelements.textitem":
-
                 case "text":
-                    i = new TextPadItem(parent, name, string.Empty);
+                    i = new TextPadItem(name, string.Empty);
                     break;
 
                 case "blueelements.clsitemdistanz": // Todo: Entfernt am 24.05.2021
-
                 case "blueelements.distanzitem": // Todo: Entfernt am 24.05.2021
-
                 case "spacer": // Todo: Entfernt am 24.05.2021
                     i = null;
                     break;
 
                 case "blueelements.clsitemimage":
-
                 case "blueelements.imageitem":
-
                 case "image":
-                    i = new BitmapPadItem(parent, name, string.Empty);
+                    i = new BitmapPadItem();
                     break;
 
                 case "blueelements.clsdimensionitem":
@@ -175,41 +188,34 @@ namespace BlueControls.ItemCollection {
                 case "blueelements.dimensionitem":
 
                 case "dimension":
-                    i = new DimensionPadItem(parent, name, null, null, 0);
+                    i = new DimensionPadItem(name, null, null, 0);
                     break;
 
                 case "blueelements.clsitemline":
-
                 case "blueelements.itemline":
-
                 case "line":
-                    i = new LinePadItem(parent, name, PadStyles.Style_Standard, Point.Empty, Point.Empty);
+                    i = new LinePadItem();
                     break;
 
                 case "blueelements.clsitempad":
-
                 case "blueelements.itempad":
-
                 case "childpad":
-                    i = new ChildPadItem(parent, name);
+                    i = new ChildPadItem(name);
                     break;
 
                 case "blueelements.clsitemgrid": // Todo: Entfernt am 24.05.2021
-
                 case "blueelements.itemgrid": // Todo: Entfernt am 24.05.2021
-
                 case "grid": // Todo: Entfernt am 24.05.2021
                     i = null;// new GridPadItem(parent, name);
                     break;
 
                 case "blueelements.rowformulaitem":
-
                 case "row":
-                    i = new RowFormulaPadItem(parent, name);
+                    i = new RowFormulaPadItem();
                     break;
 
                 case "symbol":
-                    i = new SymbolPadItem(parent, name);
+                    i = new SymbolPadItem(name);
                     break;
 
                 default:
@@ -231,10 +237,7 @@ namespace BlueControls.ItemCollection {
             return "Auto " + NeueZeit + " IDX" + UniqueInternal_Count;
         }
 
-        public object Clone() {
-            var t = ToString();
-            return NewByParsing(Parent, t);
-        }
+        public object Clone() { return NewByParsing(ToString()); }
 
         /// <summary>
         /// Prüft, ob die angegebenen Koordinaten das Element berühren.
@@ -251,15 +254,15 @@ namespace BlueControls.ItemCollection {
         public virtual void DesignOrStyleChanged() { }
 
         public void Draw(Graphics gr, float zoom, float shiftX, float shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
-            if (Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent nicht definiert"); }
+            if (_Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent nicht definiert"); }
             if (forPrinting && !_Bei_Export_sichtbar) { return; }
             var drawingCoordinates = UsedArea().ZoomAndMoveRect(zoom, shiftX, shiftY, false);
-            if (Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent = null"); }
+            if (_Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent = null"); }
             if (!IsInDrawingArea(drawingCoordinates, sizeOfParentControl)) { return; }
             DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, state, sizeOfParentControl, forPrinting);
             if (!_Bei_Export_sichtbar) {
                 if (IsInDrawingArea(drawingCoordinates, sizeOfParentControl)) {
-                    gr.DrawImage(QuickImage.Get("Drucker|16||1").BMP, drawingCoordinates.X, drawingCoordinates.Y);
+                    gr.DrawImage(QuickImage.Get("Drucker|16||1"), drawingCoordinates.X, drawingCoordinates.Y);
                 }
             }
         }
@@ -275,20 +278,20 @@ namespace BlueControls.ItemCollection {
         public void DrawOutline(Graphics gr, float zoom, float shiftX, float shiftY, Color c) => gr.DrawRectangle(new Pen(c), UsedArea().ZoomAndMoveRect(zoom, shiftX, shiftY, false));
 
         public void EineEbeneNachHinten() {
-            if (Parent == null) { return; }
+            if (_Parent == null) { return; }
             var i2 = Previous();
             if (i2 != null) {
                 var tempVar = this;
-                Parent.Swap(tempVar, i2);
+                _Parent.Swap(tempVar, i2);
             }
         }
 
         public void EineEbeneNachVorne() {
-            if (Parent == null) { return; }
+            if (_Parent == null) { return; }
             var i2 = Next();
             if (i2 != null) {
                 var tempVar = this;
-                Parent.Swap(tempVar, i2);
+                _Parent.Swap(tempVar, i2);
             }
         }
 
@@ -306,9 +309,9 @@ namespace BlueControls.ItemCollection {
             return l;
         }
 
-        public void InDenHintergrund() => Parent?.InDenHintergrund(this);
+        public void InDenHintergrund() => _Parent?.InDenHintergrund(this);
 
-        public void InDenVordergrund() => Parent?.InDenVordergrund(this);
+        public void InDenVordergrund() => _Parent?.InDenVordergrund(this);
 
         public void Move(float x, float y) {
             if (x == 0 && y == 0) { return; }
@@ -456,27 +459,27 @@ namespace BlueControls.ItemCollection {
             return x;
         }
 
-        internal void AddLineStyleOption(List<FlexiControl> l) => l.Add(new FlexiControlForProperty(this, "Stil", Skin.GetRahmenArt(Parent.SheetStyle, true)));
+        internal void AddLineStyleOption(List<FlexiControl> l) => l.Add(new FlexiControlForProperty(this, "Stil", Skin.GetRahmenArt(_Parent.SheetStyle, true)));
 
-        internal void AddStyleOption(List<FlexiControl> l) => l.Add(new FlexiControlForProperty(this, "Stil", Skin.GetFonts(Parent.SheetStyle)));
+        internal void AddStyleOption(List<FlexiControl> l) => l.Add(new FlexiControlForProperty(this, "Stil", Skin.GetFonts(_Parent.SheetStyle)));
 
         internal BasicPadItem Next() {
-            var ItemCount = Parent.IndexOf(this);
+            var ItemCount = _Parent.IndexOf(this);
             if (ItemCount < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Item im SortDefinition nicht enthalten"); }
             do {
                 ItemCount++;
-                if (ItemCount >= Parent.Count) { return null; }
-                if (Parent[ItemCount] != null) { return Parent[ItemCount]; }
+                if (ItemCount >= _Parent.Count) { return null; }
+                if (_Parent[ItemCount] != null) { return _Parent[ItemCount]; }
             } while (true);
         }
 
         internal BasicPadItem Previous() {
-            var ItemCount = Parent.IndexOf(this);
+            var ItemCount = _Parent.IndexOf(this);
             if (ItemCount < 0) { Develop.DebugPrint(enFehlerArt.Fehler, "Item im SortDefinition nicht enthalten"); }
             do {
                 ItemCount--;
                 if (ItemCount < 0) { return null; }
-                if (Parent[ItemCount] != null) { return Parent[ItemCount]; }
+                if (_Parent[ItemCount] != null) { return _Parent[ItemCount]; }
             } while (true);
         }
 

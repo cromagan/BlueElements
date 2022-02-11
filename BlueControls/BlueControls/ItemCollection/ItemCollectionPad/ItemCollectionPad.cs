@@ -632,13 +632,13 @@ namespace BlueControls.ItemCollection {
             if (string.IsNullOrEmpty(item.Internal)) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Der Auflistung soll ein Item hinzugefügt werden, welches keinen Namen hat " + item.Internal);
             }
+
+            item.Parent = this;
             base.OnItemAdded(item);
 
             IsSaved = false;
             item.Changed += Item_Changed;
-            if (item.Parent != this) {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Parent ungleich!");
-            }
+
             OnDoInvalidate();
         }
 
@@ -762,7 +762,7 @@ namespace BlueControls.ItemCollection {
                     //case "format": //_Format = DirectCast(Integer.Parse(pair.Value.Value), enDataFormat)
                     //    break;
                     case "item":
-                        var i = BasicPadItem.NewByParsing(this, pair.Value);
+                        var i = BasicPadItem.NewByParsing(pair.Value);
                         if (i != null) { Add(i); }
                         break;
 

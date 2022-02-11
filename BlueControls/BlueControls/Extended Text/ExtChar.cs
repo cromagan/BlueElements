@@ -111,12 +111,12 @@ namespace BlueControls {
                 var BNR = QuickImage.Get(_Char - (int)enASCIIKey.ImageStart);
                 if (BNR == null) { return; }
                 // Sind es KEINE Integer bei DrawX / DrawY, kommt es zu extrem unschönen Effekten. Gerade Linien scheinen verschwommen zu sein. (Checkbox-Kästchen)
-                gr.DrawImage(BNR.BMP, (int)DrawX, (int)DrawY);
+                gr.DrawImage(BNR, (int)DrawX, (int)DrawY);
             } else {
                 var l = QuickImage.Get(_Char - (int)enASCIIKey.ImageStart);
                 if (l == null || l.Width == 0) { l = QuickImage.Get("Warnung|16"); }
                 if (l.Width > 0) {
-                    gr.DrawImage(QuickImage.Get(l.Name, (int)(l.Width * zoom)).BMP, (int)DrawX, (int)DrawY);
+                    gr.DrawImage(QuickImage.Get(l.Name, (int)(l.Width * zoom)), (int)DrawX, (int)DrawY);
                 }
             }
         }

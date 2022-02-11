@@ -84,7 +84,11 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
-        public override void CloneToNewCollection(ItemCollectionList newParent) => CloneToNewCollection(newParent, new RowFormulaListItem(_Row, Internal, _LayoutID, UserDefCompareKey));
+        public override object Clone() {
+            var x = new RowFormulaListItem(_Row, Internal, _LayoutID, UserDefCompareKey);
+            x.CloneBasicStatesFrom(this);
+            return x;
+        }
 
         public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) {
             if (_tmpBMP == null) { GeneratePic(); }
@@ -131,7 +135,7 @@ namespace BlueControls.ItemCollection {
 
         private void GeneratePic() {
             if (string.IsNullOrEmpty(_LayoutID) || !_LayoutID.StartsWith("#")) {
-                _tmpBMP = (Bitmap)QuickImage.Get(enImageCode.Warnung, 128).BMP.Clone();
+                _tmpBMP = QuickImage.Get(enImageCode.Warnung, 128);
                 return;
             }
             CreativePad _pad = new(new ItemCollectionPad(_LayoutID, Row.Database, Row.Key));

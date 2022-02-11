@@ -581,8 +581,8 @@ namespace BlueControls.ItemCollection {
             ItemCollectionList x = new(_Appearance) {
                 CheckBehavior = _CheckBehavior
             };
-            foreach (var ThisItem in this) {
-                ThisItem.CloneToNewCollection(x);
+            foreach (var thisItem in this) {
+                x.Add((BasicListItem)thisItem.Clone());   /* ThisItem.CloneToNewCollection(x);*/
             }
             return x;
         }
@@ -647,117 +647,121 @@ namespace BlueControls.ItemCollection {
         }
 
         internal Size ComputeAllItemPositions(Size controlDrawingArea, Slider sliderY, int biggestItemX, int heightAdded, enOrientation senkrechtAllowed) {
-            if (Math.Abs(LastCheckedMaxSize.Width - controlDrawingArea.Width) > 0.1 || Math.Abs(LastCheckedMaxSize.Height - controlDrawingArea.Height) > 0.1) {
-                LastCheckedMaxSize = controlDrawingArea;
-                _CellposCorrect = Size.Empty;
-            }
-            if (!_CellposCorrect.IsEmpty) { return _CellposCorrect; }
-            if (Count == 0) {
-                _CellposCorrect = Size.Empty;
-                return Size.Empty;
-            }
-            PreComputeSize();
-            if (_ItemDesign == enDesign.Undefiniert) { GetDesigns(); }
-            if (BreakAfterItems < 1) { senkrechtAllowed = enOrientation.Waagerecht; }
-            var SliderWidth = 0;
-            if (sliderY != null) {
-                if (BreakAfterItems < 1 && heightAdded > controlDrawingArea.Height) {
-                    SliderWidth = sliderY.Width;
+            try {
+                if (Math.Abs(LastCheckedMaxSize.Width - controlDrawingArea.Width) > 0.1 || Math.Abs(LastCheckedMaxSize.Height - controlDrawingArea.Height) > 0.1) {
+                    LastCheckedMaxSize = controlDrawingArea;
+                    _CellposCorrect = Size.Empty;
                 }
-            }
-            int colWidth;
-            switch (_Appearance) {
-                case enBlueListBoxAppearance.Gallery:
-                    colWidth = 200;
-                    break;
-
-                case enBlueListBoxAppearance.FileSystem:
-                    colWidth = 110;
-                    break;
-
-                default:
-                    // u.a. Autofilter
-                    if (BreakAfterItems < 1) {
-                        colWidth = controlDrawingArea.Width - SliderWidth;
-                    } else {
-                        var colCount = Count / BreakAfterItems;
-                        var r = Count % colCount;
-                        if (r != 0) { colCount++; }
-                        colWidth = controlDrawingArea.Width < 5 ? biggestItemX : (controlDrawingArea.Width - SliderWidth) / colCount;
+                if (!_CellposCorrect.IsEmpty) { return _CellposCorrect; }
+                if (Count == 0) {
+                    _CellposCorrect = Size.Empty;
+                    return Size.Empty;
+                }
+                PreComputeSize();
+                if (_ItemDesign == enDesign.Undefiniert) { GetDesigns(); }
+                if (BreakAfterItems < 1) { senkrechtAllowed = enOrientation.Waagerecht; }
+                var SliderWidth = 0;
+                if (sliderY != null) {
+                    if (BreakAfterItems < 1 && heightAdded > controlDrawingArea.Height) {
+                        SliderWidth = sliderY.Width;
                     }
-                    break;
-            }
-            var MaxX = int.MinValue;
-            var Maxy = int.MinValue;
-            var itenc = -1;
-            BasicListItem previtem = null;
-            foreach (var ThisItem in this) {
-                // PaintmodX kann immer abgezogen werden, da es eh nur bei einspaltigen Listboxen verändert wird!
-                if (ThisItem != null) {
-                    var cx = 0;
-                    var cy = 0;
-                    var wi = colWidth;
-                    var he = 0;
-                    itenc++;
-                    if (senkrechtAllowed == enOrientation.Waagerecht) {
-                        if (ThisItem.IsCaption) { wi = controlDrawingArea.Width - SliderWidth; }
-                        he = ThisItem.HeightForListBox(_Appearance, wi);
-                    } else {
-                        he = ThisItem.HeightForListBox(_Appearance, wi);
-                    }
-                    if (previtem != null) {
-                        if (senkrechtAllowed == enOrientation.Waagerecht) {
-                            if (previtem.Pos.Right + colWidth > controlDrawingArea.Width || ThisItem.IsCaption) {
-                                cx = 0;
-                                cy = previtem.Pos.Bottom;
-                            } else {
-                                cx = previtem.Pos.Right;
-                                cy = previtem.Pos.Top;
-                            }
+                }
+                int colWidth;
+                switch (_Appearance) {
+                    case enBlueListBoxAppearance.Gallery:
+                        colWidth = 200;
+                        break;
+
+                    case enBlueListBoxAppearance.FileSystem:
+                        colWidth = 110;
+                        break;
+
+                    default:
+                        // u.a. Autofilter
+                        if (BreakAfterItems < 1) {
+                            colWidth = controlDrawingArea.Width - SliderWidth;
                         } else {
-                            if (itenc % BreakAfterItems == 0) {
-                                cx = previtem.Pos.Right;
-                                cy = 0;
+                            var colCount = Count / BreakAfterItems;
+                            var r = Count % colCount;
+                            if (r != 0) { colCount++; }
+                            colWidth = controlDrawingArea.Width < 5 ? biggestItemX : (controlDrawingArea.Width - SliderWidth) / colCount;
+                        }
+                        break;
+                }
+                var MaxX = int.MinValue;
+                var Maxy = int.MinValue;
+                var itenc = -1;
+                BasicListItem previtem = null;
+                foreach (var ThisItem in this) {
+                    // PaintmodX kann immer abgezogen werden, da es eh nur bei einspaltigen Listboxen verändert wird!
+                    if (ThisItem != null) {
+                        var cx = 0;
+                        var cy = 0;
+                        var wi = colWidth;
+                        var he = 0;
+                        itenc++;
+                        if (senkrechtAllowed == enOrientation.Waagerecht) {
+                            if (ThisItem.IsCaption) { wi = controlDrawingArea.Width - SliderWidth; }
+                            he = ThisItem.HeightForListBox(_Appearance, wi);
+                        } else {
+                            he = ThisItem.HeightForListBox(_Appearance, wi);
+                        }
+                        if (previtem != null) {
+                            if (senkrechtAllowed == enOrientation.Waagerecht) {
+                                if (previtem.Pos.Right + colWidth > controlDrawingArea.Width || ThisItem.IsCaption) {
+                                    cx = 0;
+                                    cy = previtem.Pos.Bottom;
+                                } else {
+                                    cx = previtem.Pos.Right;
+                                    cy = previtem.Pos.Top;
+                                }
                             } else {
-                                cx = previtem.Pos.Left;
-                                cy = previtem.Pos.Bottom;
+                                if (itenc % BreakAfterItems == 0) {
+                                    cx = previtem.Pos.Right;
+                                    cy = 0;
+                                } else {
+                                    cx = previtem.Pos.Left;
+                                    cy = previtem.Pos.Bottom;
+                                }
                             }
                         }
+                        ThisItem.SetCoordinates(new Rectangle(cx, cy, wi, he));
+                        MaxX = Math.Max(ThisItem.Pos.Right, MaxX);
+                        Maxy = Math.Max(ThisItem.Pos.Bottom, Maxy);
+                        previtem = ThisItem;
                     }
-                    ThisItem.SetCoordinates(new Rectangle(cx, cy, wi, he));
-                    MaxX = Math.Max(ThisItem.Pos.Right, MaxX);
-                    Maxy = Math.Max(ThisItem.Pos.Bottom, Maxy);
-                    previtem = ThisItem;
                 }
-            }
-            if (sliderY != null) {
-                bool SetTo0;
-                if (SliderWidth > 0) {
-                    if (Maxy - controlDrawingArea.Height <= 0) {
-                        sliderY.Enabled = false;
-                        SetTo0 = true;
+                if (sliderY != null) {
+                    bool SetTo0;
+                    if (SliderWidth > 0) {
+                        if (Maxy - controlDrawingArea.Height <= 0) {
+                            sliderY.Enabled = false;
+                            SetTo0 = true;
+                        } else {
+                            sliderY.Enabled = true;
+                            sliderY.Minimum = 0;
+                            sliderY.SmallChange = 16;
+                            sliderY.LargeChange = controlDrawingArea.Height;
+                            sliderY.Maximum = Maxy - controlDrawingArea.Height;
+                            SetTo0 = false;
+                        }
+                        sliderY.Height = controlDrawingArea.Height;
+                        sliderY.Visible = true;
                     } else {
-                        sliderY.Enabled = true;
-                        sliderY.Minimum = 0;
-                        sliderY.SmallChange = 16;
-                        sliderY.LargeChange = controlDrawingArea.Height;
-                        sliderY.Maximum = Maxy - controlDrawingArea.Height;
-                        SetTo0 = false;
+                        SetTo0 = true;
+                        sliderY.Visible = false;
                     }
-                    sliderY.Height = controlDrawingArea.Height;
-                    sliderY.Visible = true;
-                } else {
-                    SetTo0 = true;
-                    sliderY.Visible = false;
+                    if (SetTo0) {
+                        sliderY.Minimum = 0;
+                        sliderY.Maximum = 0;
+                        sliderY.Value = 0;
+                    }
                 }
-                if (SetTo0) {
-                    sliderY.Minimum = 0;
-                    sliderY.Maximum = 0;
-                    sliderY.Value = 0;
-                }
+                _CellposCorrect = new Size(MaxX, Maxy);
+                return _CellposCorrect;
+            } catch {
+                return ComputeAllItemPositions(controlDrawingArea, sliderY, biggestItemX, heightAdded, senkrechtAllowed);
             }
-            _CellposCorrect = new Size(MaxX, Maxy);
-            return _CellposCorrect;
         }
 
         /// <summary>
@@ -830,7 +834,7 @@ namespace BlueControls.ItemCollection {
             if (string.IsNullOrEmpty(item.Internal)) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Der Auflistung soll ein Item hinzugefügt werden, welches keinen Namen hat " + item.Internal);
             }
-            item.SetParent(this);
+            item.Parent = this;
             base.OnItemAdded(item);
             OnDoInvalidate();
         }

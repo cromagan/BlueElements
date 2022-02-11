@@ -61,11 +61,11 @@ namespace BlueControls.ItemCollection {
 
         #region Constructors
 
-        public DimensionPadItem(ItemCollectionPad parent) : this(parent, string.Empty, null, null, 0) { }
+        public DimensionPadItem() : this(string.Empty, null, null, 0) { }
 
-        public DimensionPadItem(ItemCollectionPad parent, PointM point1, PointM point2, int abstandinMM) : this(parent, string.Empty, point1, point2, abstandinMM) { }
+        public DimensionPadItem(PointM point1, PointM point2, int abstandinMM) : this(string.Empty, point1, point2, abstandinMM) { }
 
-        public DimensionPadItem(ItemCollectionPad parent, string internalname, PointM point1, PointM point2, int abstandinMM) : base(parent, internalname) {
+        public DimensionPadItem(string internalname, PointM point1, PointM point2, int abstandinMM) : base(internalname) {
             if (string.IsNullOrEmpty(Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
 
             if (point1 != null) { _Point1.SetTo(point1.X, point1.Y); }
@@ -98,7 +98,7 @@ namespace BlueControls.ItemCollection {
             CalculateOtherPoints();
         }
 
-        public DimensionPadItem(ItemCollectionPad parent, PointF point1, PointF point2, int abstandInMM) : this(parent, new PointM(point1), new PointM(point2), abstandInMM) { }
+        public DimensionPadItem(PointF point1, PointF point2, int abstandInMM) : this(new PointM(point1), new PointM(point2), abstandInMM) { }
 
         #endregion
 

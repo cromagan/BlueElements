@@ -264,9 +264,6 @@ namespace BlueControls.Forms {
             LoadTab.ShowDialog();
         }
 
-        private void button1_Click(object sender, System.EventArgs e) {
-        }
-
         private void CaptionAnzeige() {
             if (TableView.Database == null) {
                 Text = "Be Creative! V" + _Version;

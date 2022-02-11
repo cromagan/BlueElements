@@ -23,6 +23,7 @@ using BlueControls.Forms;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using System;
+using System.Drawing;
 using static BlueBasics.Converter;
 
 namespace BlueControls.BlueDatabaseDialogs {
@@ -154,7 +155,17 @@ namespace BlueControls.BlueDatabaseDialogs {
             ShowOrder();
         }
 
-        private void ShowOrder() => Pad.Item.Clear();//foreach (var thisc in CurrentArrangement) {//    var it = new TextPadItem(Pad.Item, thisc.Column.Name, thisc.Column.ReadableText);//    it.SetCoordinates(new RectangleF)//        Pad.Item.Add(it)//}
+        private void ShowOrder() {
+            Pad.Item.Clear();
+
+            var X = 0;
+
+            foreach (var thisc in CurrentArrangement) {
+                var it = new TextPadItem(thisc.Column.Name, thisc.Column.ReadableText());
+                it.SetCoordinates(new RectangleF(X, 0, 100, 100), true);
+                Pad.Item.Add(it);
+            }
+        }
 
         private void TmpDatabase_ShouldICancelDiscOperations(object sender, System.ComponentModel.CancelEventArgs e) => e.Cancel = true;
 

@@ -186,9 +186,9 @@ namespace BlueControls.Controls {
 
             if (picHeight44) {
                 // Großes Bild per automatik generieren und Zeichnen
-                if (pic.Width != -1 || pic.Height != -1) { Develop.DebugPrint("Bei Bildcode " + pic + " die Größenangabe entfernen, da es ein grosses Bild wird!"); }
-                var Zoom = Math.Min((control.Width - 6) / (double)pic.BMP.Width, 28 / (double)pic.BMP.Height);
-                var tmpPic = QuickImage.Get(QuickImage.GenerateCode(pic.Name, (int)(pic.BMP.Width * Zoom), (int)(pic.BMP.Height * Zoom), pic.Effekt, pic.Färbung, pic.ChangeGreenTo, pic.Sättigung, pic.Helligkeit, pic.DrehWinkel, pic.Transparenz, pic.Zweitsymbol));
+                //if (pic.Width != -1 || pic.Height != -1) { Develop.DebugPrint("Bei Bildcode " + pic + " die Größenangabe entfernen, da es ein grosses Bild wird!"); }
+                var Zoom = Math.Min((control.Width - 6) / (double)pic.Width, 28 / (double)pic.Height);
+                var tmpPic = QuickImage.Get(QuickImage.GenerateCode(pic.Name, (int)(pic.Width * Zoom), (int)(pic.Height * Zoom), pic.Effekt, pic.Färbung, pic.ChangeGreenTo, pic.Sättigung, pic.Helligkeit, pic.DrehWinkel, pic.Transparenz, pic.Zweitsymbol));
                 Skin.Draw_FormatedText(gr, string.Empty, tmpPic, Design, enAlignment.Horizontal_Vertical_Center, new Rectangle(0, 0, control.Width, 44), control, false, translate);
 
                 // Mehrzeiligen Text generieren und Zeichnen

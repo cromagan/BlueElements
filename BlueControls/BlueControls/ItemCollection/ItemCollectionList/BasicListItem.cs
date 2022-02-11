@@ -46,7 +46,7 @@ namespace BlueControls.ItemCollection {
         #endregion
     }
 
-    public abstract class BasicListItem : ICompareKey, IComparable {
+    public abstract class BasicListItem : ICompareKey, IComparable, ICloneable {
 
         #region Fields
 
@@ -70,6 +70,7 @@ namespace BlueControls.ItemCollection {
         /// <remarks></remarks>
         private bool _Checked;
 
+        private ItemCollectionList _Parent = null;
         private Size _SizeUntouchedForListBox = Size.Empty;
 
         private string _UserDefCompareKey = "";
@@ -97,9 +98,11 @@ namespace BlueControls.ItemCollection {
         public bool Checked {
             get => _Checked;
             set {
-                if (Parent == null) { Develop.DebugPrint(enFehlerArt.Warnung, "Parent == null!"); }
-                Parent?.SetNewCheckState(this, value, ref _Checked);
-                //OnChanged();
+                if (Parent == null) {
+                    _Checked = value;
+                } else {
+                    Parent?.SetNewCheckState(this, value, ref _Checked);
+                }
             }
         }
 
@@ -116,7 +119,17 @@ namespace BlueControls.ItemCollection {
 
         public bool IsCaption { get; protected set; }
 
-        public ItemCollectionList Parent { get; private set; }
+        public ItemCollectionList Parent {
+            get => _Parent;
+            set {
+                if (_Parent == null || _Parent == value) {
+                    _Parent = value;
+                    return;
+                }
+
+                Develop.DebugPrint(enFehlerArt.Fehler, "Parent Fehler!");
+            }
+        }
 
         public abstract string QuickInfo { get; }
 
@@ -133,22 +146,21 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
-        /// <summary>
-        /// Klont das aktuelle Objekt (es wird ein neues Objekt des gleichen Typs erstellt) und fügt es in die angegebene ItemCollection hinzu
-        /// </summary>
-        /// <param name="newParent"></param>
-        public virtual void CloneToNewCollection(ItemCollectionList newParent) => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
+        public abstract object Clone();
 
-        public void CloneToNewCollection(ItemCollectionList newParent, BasicListItem newItem) {
-            if (newItem.Internal != Internal) {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Clone fehlgeschlagen, Internal unterschiedlich");
-            }
-            newParent.Add(newItem);
-            newItem.Checked = Checked; // Parent muss gesetz sein!
-            newItem.Enabled = Enabled;
-            newItem.Tag = Tag;
-            newItem.UserDefCompareKey = UserDefCompareKey;
-            //return newItem;
+        ///// <summary>
+        ///// Klont das aktuelle Objekt (es wird ein neues Objekt des gleichen Typs erstellt) und fügt es in die angegebene ItemCollection hinzu
+        ///// </summary>
+        ///// <param name="newParent"></param>
+        //public virtual void CloneToNewCollection(ItemCollectionList newParent) => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
+
+        public void CloneBasicStatesFrom(BasicListItem sourceItem) {
+            Checked = sourceItem.Checked;
+            Enabled = sourceItem.Enabled;
+            Tag = sourceItem.Tag;
+            UserDefCompareKey = sourceItem.UserDefCompareKey;
+            Internal = sourceItem.Internal;
+            IsCaption = sourceItem.IsCaption;
         }
 
         public string CompareKey() {
@@ -201,8 +213,6 @@ namespace BlueControls.ItemCollection {
             }
             return _SizeUntouchedForListBox;
         }
-
-        internal void SetParent(ItemCollectionList list) => Parent = list;
 
         protected abstract Size ComputeSizeUntouchedForListBox();
 

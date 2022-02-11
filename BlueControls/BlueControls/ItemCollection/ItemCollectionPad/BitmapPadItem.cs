@@ -43,17 +43,17 @@ namespace BlueControls.ItemCollection {
 
         #region Constructors
 
-        public BitmapPadItem(ItemCollectionPad parent) : this(parent, string.Empty, null, Size.Empty) { }
+        public BitmapPadItem() : this(string.Empty, null, Size.Empty) { }
 
-        public BitmapPadItem(ItemCollectionPad parent, string internalname, string FileToLoad) : this(parent, internalname, (Bitmap)BitmapExt.Image_FromFile(FileToLoad), Size.Empty) { }
+        public BitmapPadItem(string internalname, string FileToLoad) : this(internalname, (Bitmap)BitmapExt.Image_FromFile(FileToLoad), Size.Empty) { }
 
-        public BitmapPadItem(ItemCollectionPad parent, string internalname, Bitmap bmp) : this(parent, internalname, bmp, Size.Empty) { }
+        public BitmapPadItem(string internalname, Bitmap bmp) : this(internalname, bmp, Size.Empty) { }
 
-        public BitmapPadItem(ItemCollectionPad parent, Bitmap bmp, Size size) : this(parent, string.Empty, bmp, size) { }
+        public BitmapPadItem(Bitmap bmp, Size size) : this(string.Empty, bmp, size) { }
 
-        public BitmapPadItem(ItemCollectionPad parent, Bitmap bmp) : this(parent, string.Empty, bmp, Size.Empty) { }
+        public BitmapPadItem(ItemCollectionPad parent, Bitmap bmp) : this(string.Empty, bmp, Size.Empty) { }
 
-        public BitmapPadItem(ItemCollectionPad parent, string internalname, Bitmap bmp, Size size) : base(parent, internalname) {
+        public BitmapPadItem(string internalname, Bitmap bmp, Size size) : base(internalname) {
             Bitmap = bmp;
             SetCoordinates(new RectangleF(0, 0, size.Width, size.Height), true);
             Overlays = new List<QuickImage>();
@@ -253,7 +253,7 @@ namespace BlueControls.ItemCollection {
                 }
             }
             foreach (var thisQI in Overlays) {
-                gr.DrawImage(thisQI.BMP, r2.Left + 8, r2.Top + 8);
+                gr.DrawImage(thisQI, r2.Left + 8, r2.Top + 8);
             }
             gr.TranslateTransform(-trp.X, -trp.Y);
             gr.ResetTransform();

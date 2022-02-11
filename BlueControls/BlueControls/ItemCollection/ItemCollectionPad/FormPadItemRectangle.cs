@@ -45,7 +45,7 @@ namespace BlueControls.ItemCollection {
 
         #region Constructors
 
-        public FormPadItemRectangle(ItemCollectionPad parent, string internalname) : base(parent, internalname) {
+        public FormPadItemRectangle(string internalname) : base(internalname) {
             p_LO = new PointM(this, "LO", 0, 0);
             p_RO = new PointM(this, "RO", 0, 0);
             p_RU = new PointM(this, "RU", 0, 0);

@@ -88,7 +88,7 @@ namespace BlueControls.Controls {
                 if (pic[_nr] == null) {
                     pic[_nr] = new BitmapExt(files[_nr], true);
                 }
-                _Bitmap = pic[_nr].Bitmap;
+                _Bitmap = pic[_nr];
             }
             zoompic.BMP = _Bitmap;
         }

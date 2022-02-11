@@ -100,7 +100,6 @@ namespace BlueControls.Forms
             this.BeziehungsEditor = new BlueControls.Controls.Button();
             this.tabAdmin = new BlueControls.BlueDatabaseDialogs.tabAdministration();
             this.Filter = new BlueControls.BlueDatabaseDialogs.Filterleiste();
-            this.button1 = new System.Windows.Forms.Button();
             this.MainRibbon.SuspendLayout();
             this.tabDatei.SuspendLayout();
             this.grpInformation.SuspendLayout();
@@ -679,20 +678,9 @@ namespace BlueControls.Forms
             this.Filter.TabStop = false;
             this.Filter.Text = "Filter";
             // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(208, 160);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(24, 16);
-            this.button1.TabIndex = 28;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
             // frmTableView
             // 
             this.ClientSize = new System.Drawing.Size(1212, 730);
-            this.Controls.Add(this.button1);
             this.Controls.Add(this.Formula);
             this.Controls.Add(this.TableView);
             this.Controls.Add(this.Zei);
@@ -764,6 +752,5 @@ namespace BlueControls.Forms
         private Filterleiste Filter;
         protected Button btnAlleSchließen;
         protected Button btnAlleErweitern;
-        private System.Windows.Forms.Button button1;
     }
 }

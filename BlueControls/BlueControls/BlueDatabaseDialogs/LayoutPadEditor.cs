@@ -75,7 +75,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                     LoadFile(fileOrLayoutID, fileOrLayoutID);
                 } else {
                     DisablePad();
-                    TextPadItem x = new(Pad.Item, "x", "Nicht editierbares Layout aus dem Dateisystem");
+                    TextPadItem x = new("x", "Nicht editierbares Layout aus dem Dateisystem");
                     Pad.Item.Add(x);
                     x.Stil = Enums.PadStyles.Style_Überschrift_Haupt;
                     x.SetCoordinates(new RectangleF(0, 0, 1000, 400), true);

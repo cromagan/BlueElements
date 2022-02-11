@@ -85,19 +85,19 @@ namespace BlueControls.Forms {
         }
 
         private void btnAddDimension_Click(object sender, System.EventArgs e) {
-            DimensionPadItem b = new(Pad.Item, new PointF(300, 300), new PointF(400, 300), 30);
+            DimensionPadItem b = new(new PointF(300, 300), new PointF(400, 300), 30);
             Pad.Item.Add(b);
         }
 
         private void btnAddImage_Click(object sender, System.EventArgs e) {
-            BitmapPadItem b = new(Pad.Item, QuickImage.Get(enImageCode.Fragezeichen).BMP, new Size(1000, 1000));
+            BitmapPadItem b = new(QuickImage.Get(enImageCode.Fragezeichen), new Size(1000, 1000));
             Pad.Item.Add(b);
         }
 
         private void btnAddLine_Click(object sender, System.EventArgs e) {
             var P = Pad.MiddleOfVisiblesScreen();
             var w = (int)(300 / Pad.ZoomCurrent());
-            LinePadItem b = new(Pad.Item, PadStyles.Style_Standard, new Point(P.X - w, P.Y), new Point(P.X + w, P.Y));
+            LinePadItem b = new(PadStyles.Style_Standard, new Point(P.X - w, P.Y), new Point(P.X + w, P.Y));
             Pad.Item.Add(b);
         }
 
@@ -108,13 +108,13 @@ namespace BlueControls.Forms {
         }
 
         private void btnAddSymbol_Click(object sender, System.EventArgs e) {
-            SymbolPadItem b = new(Pad.Item);
+            SymbolPadItem b = new();
             b.SetCoordinates(new RectangleF(100, 100, 300, 300), true);
             Pad.Item.Add(b);
         }
 
         private void btnAddText_Click(object sender, System.EventArgs e) {
-            TextPadItem b = new(Pad.Item) {
+            TextPadItem b = new() {
                 Text = string.Empty,
                 Stil = PadStyles.Style_Standard
             };
@@ -123,7 +123,7 @@ namespace BlueControls.Forms {
         }
 
         private void btnAddUnterStufe_Click(object sender, System.EventArgs e) {
-            ChildPadItem b = new(Pad.Item);
+            ChildPadItem b = new();
             b.SetCoordinates(new RectangleF(100, 100, 300, 300), true);
             Pad.Item.Add(b);
         }

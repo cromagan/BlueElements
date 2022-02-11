@@ -41,13 +41,15 @@ namespace BlueControls.ItemCollection {
 
         #region Constructors
 
-        public RowFormulaPadItem(ItemCollectionPad parent, string internalname) : this(parent, internalname, null, 0, string.Empty) { }
+        public RowFormulaPadItem() : this(string.Empty, null, -1, string.Empty) { }
 
-        public RowFormulaPadItem(ItemCollectionPad parent, Database database, long rowkey) : this(parent, string.Empty, database, rowkey, string.Empty) { }
+        public RowFormulaPadItem(string internalname) : this(internalname, null, -1, string.Empty) { }
 
-        public RowFormulaPadItem(ItemCollectionPad parent, Database database, long rowkey, string layoutID) : this(parent, string.Empty, database, rowkey, layoutID) { }
+        public RowFormulaPadItem(Database database, long rowkey) : this(database, rowkey, string.Empty) { }
 
-        public RowFormulaPadItem(ItemCollectionPad parent, string internalname, Database database, long rowkey, string layoutID) : base(parent, internalname) {
+        public RowFormulaPadItem(Database database, long rowkey, string layoutID) : this(string.Empty, database, rowkey, layoutID) { }
+
+        public RowFormulaPadItem(string internalname, Database database, long rowkey, string layoutID) : base(internalname) {
             _Database = database;
             _Database.Disposing += _Database_Disposing;
             _RowKey = rowkey;
@@ -203,7 +205,7 @@ namespace BlueControls.ItemCollection {
 
         private void GeneratePic(bool sizeChangeAllowed) {
             if (string.IsNullOrEmpty(_LayoutID) || !_LayoutID.StartsWith("#")) {
-                GeneratedBitmap = (Bitmap)QuickImage.Get(enImageCode.Warnung, 128).BMP.Clone();
+                GeneratedBitmap = QuickImage.Get(enImageCode.Warnung, 128);
 
                 if (sizeChangeAllowed) {
                     SizeChanged();

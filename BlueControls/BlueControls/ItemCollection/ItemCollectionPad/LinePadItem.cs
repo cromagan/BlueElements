@@ -41,11 +41,11 @@ namespace BlueControls.ItemCollection {
 
         #region Constructors
 
-        public LinePadItem(ItemCollectionPad parent) : this(parent, PadStyles.Style_Standard, Point.Empty, Point.Empty) { }
+        public LinePadItem() : this(string.Empty, PadStyles.Style_Standard, Point.Empty, Point.Empty) { }
 
-        public LinePadItem(ItemCollectionPad parent, PadStyles format, Point point1, Point point2) : this(parent, string.Empty, format, point1, point2) { }
+        public LinePadItem(PadStyles format, Point point1, Point point2) : this(string.Empty, format, point1, point2) { }
 
-        public LinePadItem(ItemCollectionPad parent, string internalname, PadStyles format, Point point1, Point point2) : base(parent, internalname) {
+        public LinePadItem(string internalname, PadStyles format, Point point1, Point point2) : base(internalname) {
             Point1 = new PointM(this, "Punkt 1", 0, 0);
             Point2 = new PointM(this, "Punkt 2", 0, 0);
             Point1.SetTo(point1);

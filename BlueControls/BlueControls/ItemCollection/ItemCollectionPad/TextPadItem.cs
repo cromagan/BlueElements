@@ -53,9 +53,9 @@ namespace BlueControls.ItemCollection {
 
         #region Constructors
 
-        public TextPadItem(ItemCollectionPad parent) : this(parent, string.Empty, string.Empty) { }
+        public TextPadItem() : this(string.Empty, string.Empty) { }
 
-        public TextPadItem(ItemCollectionPad parent, string internalname, string readableText) : base(parent, internalname) {
+        public TextPadItem(string internalname, string readableText) : base(internalname) {
             _text_replaced = readableText;
             _text_original = readableText;
             Stil = PadStyles.Undefiniert;

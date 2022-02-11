@@ -233,7 +233,8 @@ namespace BlueControls.Controls {
 
             if (rück == null || rück.Count == 0) { return; }
 
-            Suggestions[rück[0]].CloneToNewCollection(Item);
+            Item.Add((BasicListItem)Suggestions[rück[0]].Clone());
+            //.CloneToNewCollection(Item);
         }
 
         public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) => false;

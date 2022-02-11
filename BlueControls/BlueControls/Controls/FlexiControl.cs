@@ -625,7 +625,7 @@ namespace BlueControls.Controls {
             control.GetStyleFrom(this);
             control.DropDownStyle = style;
             control.Item.Clear();
-            control.Item.AddRange(list);
+            control.Item.AddClonesFrom(list);
             control.Item.Sort();
         }
 

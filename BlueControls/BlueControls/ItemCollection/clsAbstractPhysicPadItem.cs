@@ -32,7 +32,7 @@ namespace BlueControls.ItemCollection {
 
         #region Constructors
 
-        protected clsAbstractPhysicPadItem(ItemCollectionPad parent, string internalname) : base(parent, internalname) {
+        protected clsAbstractPhysicPadItem(string internalname) : base(internalname) {
             MovablePoint.Add(new PointM(5, 0));
             MovablePoint.Add(new PointM(10, 10));
             MovablePoint.Add(new PointM(0, 10));

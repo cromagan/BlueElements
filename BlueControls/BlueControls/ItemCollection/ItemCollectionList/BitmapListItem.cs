@@ -30,13 +30,21 @@ namespace BlueControls.ItemCollection {
         #region Fields
 
         private const int ConstMY = 15;
+
         private readonly string _EncryptionKey;
+
         private readonly ListExt<QuickImage> _overlays = new();
+
         private Bitmap _Bitmap;
+
         private string _caption;
+
         private int _captionlines = 2;
+
         private List<string> _captiontmp = new();
+
         private string _ImageFilename;
+
         private int _padding;
 
         #endregion
@@ -119,6 +127,11 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
+        public override object Clone() {
+            Develop.DebugPrint_NichtImplementiert();
+            return null;
+        }
+
         public override bool FilterMatch(string FilterText) => base.FilterMatch(FilterText) || Caption.ToUpper().Contains(FilterText.ToUpper()) || _ImageFilename != null && _ImageFilename.ToUpper().Contains(FilterText.ToUpper());
 
         public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) {
@@ -172,7 +185,7 @@ namespace BlueControls.ItemCollection {
                 GR.TranslateTransform(trp.X, trp.Y);
                 if (_Bitmap != null) { GR.DrawImage(_Bitmap, ScaledImagePosition, AreaOfWholeImage, GraphicsUnit.Pixel); }
                 foreach (var thisQI in Overlays) {
-                    GR.DrawImage(thisQI.BMP, ScaledImagePosition.Left + 8, ScaledImagePosition.Top + 8);
+                    GR.DrawImage(thisQI, ScaledImagePosition.Left + 8, ScaledImagePosition.Top + 8);
                 }
             }
             if (!string.IsNullOrEmpty(_caption)) {

@@ -29,7 +29,7 @@ namespace BlueControls.ItemCollection {
 
         #region Constructors
 
-        public clsPhysicPadItem(ItemCollectionPad parent) : base(parent, string.Empty) {
+        public clsPhysicPadItem(ItemCollectionPad parent) : base(string.Empty) {
         }
 
         #endregion

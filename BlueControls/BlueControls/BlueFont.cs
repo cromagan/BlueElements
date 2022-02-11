@@ -270,7 +270,10 @@ namespace BlueControls {
 
         public QuickImage NameInStyle() {
             if (_NameInStyle_sym != null) { return _NameInStyle_sym; }
-            QuickImage.Add("FontName-" + ToString(), Symbol(Font().Name, true));
+
+            var n = "FontName-" + ToString();
+            if (!QuickImage.Exists(n)) { _ = new QuickImage(n, Symbol(Font().Name, true)); }
+
             _NameInStyle_sym = QuickImage.Get("FontName-" + ToString());
             return _NameInStyle_sym;
         }
@@ -301,18 +304,20 @@ namespace BlueControls {
         }
 
         public QuickImage SymbolForReadableText() {
-            if (_SymbolForReadableText_sym != null) {
-                return _SymbolForReadableText_sym;
-            }
-            QuickImage.Add("Font-" + ToString(), Symbol("Abc", false));
+            if (_SymbolForReadableText_sym != null) { return _SymbolForReadableText_sym; }
+
+            var n = "Font-" + ToString();
+            if (!QuickImage.Exists(n)) { _ = new QuickImage(n, Symbol("Abc", false)); }
+
             _SymbolForReadableText_sym = QuickImage.Get("Font-" + ToString());
             return _SymbolForReadableText_sym;
         }
 
         public QuickImage SymbolOfLine() {
             if (_SymbolOfLine_sym != null) { return _SymbolOfLine_sym; }
+
             BitmapExt bmp = new(32, 12);
-            using (var gr = Graphics.FromImage(bmp.Bitmap)) {
+            using (var gr = Graphics.FromImage(bmp)) {
                 if (Color_Main.GetBrightness() > 0.9F) {
                     gr.Clear(Color.FromArgb(200, 200, 200));
                 } else {
@@ -321,7 +326,10 @@ namespace BlueControls {
                 gr.SmoothingMode = SmoothingMode.HighQuality;
                 gr.DrawLine(Pen(1f), 3, 4, 29, 8);
             }
-            QuickImage.Add("Line-" + ToString(), bmp);
+
+            var n = "Line-" + ToString();
+            if (!QuickImage.Exists(n)) { _ = new QuickImage(n, bmp); }
+
             _SymbolOfLine_sym = QuickImage.Get("Line-" + ToString());
             return _SymbolOfLine_sym;
         }
@@ -342,7 +350,7 @@ namespace BlueControls {
             if (c is >= (char)0 and <= (char)31) { return new SizeF(0, _Zeilenabstand); }
             if (c >= (int)enASCIIKey.ImageStart) {
                 var BNR = QuickImage.Get(c - (int)enASCIIKey.ImageStart);
-                return BNR == null ? SizeF.Empty : new SizeF(BNR.BMP.Width + 1, BNR.BMP.Height + 1);
+                return BNR == null ? SizeF.Empty : new SizeF(BNR.Width + 1, BNR.Height + 1);
             }
 
             SizeF s;
@@ -598,7 +606,7 @@ namespace BlueControls {
         private BitmapExt Symbol(string text, bool transparent) {
             var s = MeasureString(text, Font());
             BitmapExt bmp = new((int)(s.Width + 1), (int)(s.Height + 1));
-            using (var gr = Graphics.FromImage(bmp.Bitmap)) {
+            using (var gr = Graphics.FromImage(bmp)) {
                 if (transparent) {
                     gr.Clear(Color.FromArgb(180, 180, 180));
                 } else if (Color_Main.GetBrightness() > 0.9F) {
@@ -619,7 +627,7 @@ namespace BlueControls {
                 // BlueFont.DrawString(GR,"Text", Font(), Brush_Color_Main, 0, 0) ', System.Drawing.StringFormat.GenericTypographic)
             }
             if (transparent) {
-                bmp.Bitmap.MakeTransparent(Color.FromArgb(180, 180, 180));
+                bmp.MakeTransparent(Color.FromArgb(180, 180, 180));
             }
             return bmp;
         }

@@ -68,7 +68,7 @@ namespace BlueControls.Forms {
                 return null;
             }
             if (ItemOfRow(r) != null) { return null; }
-            RowFormulaPadItem i2 = new(Pad.Item, Database, r.Key, layoutID);
+            RowFormulaPadItem i2 = new(Database, r.Key, layoutID);
             Pad.Item.Add(i2);
             //  Pad.Invalidate()
             i2.SetCoordinates(new RectangleF(xPos, Ypos, i2.UsedArea().Width, i2.UsedArea().Height), false);

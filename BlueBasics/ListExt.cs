@@ -120,6 +120,14 @@ namespace BlueBasics {
             OnItemAdded(item);
         }
 
+        public void AddClonesFrom<T1>(List<T1> itemstoclone) where T1 : T, ICloneable {
+            if (itemstoclone == null || itemstoclone.Count == 0) { return; }
+
+            foreach (var thisItem in itemstoclone) {
+                Add((T)thisItem.Clone());
+            }
+        }
+
         public bool AddIfNotExists(T item) {
             if (!Contains(item)) {
                 Add(item);
@@ -161,7 +169,7 @@ namespace BlueBasics {
             OnItemAdded(item);
         }
 
-#pragma warning disable IDE0060 // Nicht verwendete Parameter entfernen
+        //#pragma warning disable IDE0060 // Nicht verwendete Parameter entfernen
 
         public new void InsertRange(int index, IEnumerable<T> collection) => Develop.DebugPrint_NichtImplementiert();
 
@@ -222,7 +230,7 @@ namespace BlueBasics {
 
         public new void Sort(IComparer<T> comparer) => Develop.DebugPrint_NichtImplementiert();
 
-#pragma warning restore IDE0060 // Nicht verwendete Parameter entfernen
+        //#pragma warning restore IDE0060 // Nicht verwendete Parameter entfernen
 
         public void Swap(T item1, T item2) {
             var nr1 = IndexOf(item1);

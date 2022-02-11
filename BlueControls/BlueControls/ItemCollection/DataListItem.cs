@@ -114,6 +114,11 @@ namespace BlueControls.ItemCollection {
 
         #region Methods
 
+        public override object Clone() {
+            Develop.DebugPrint_NichtImplementiert();
+            return null;
+        }
+
         public override bool FilterMatch(string FilterText) => base.FilterMatch(FilterText) || Caption.ToUpper().Contains(FilterText.ToUpper()) || _filename.ToUpper().Contains(FilterText.ToUpper());
 
         public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) => style switch {
@@ -133,7 +138,7 @@ namespace BlueControls.ItemCollection {
             var bFont = Skin.GetBlueFont(itemdesign, state);
 
             if (!string.IsNullOrEmpty(_caption) && _captiontmp.Count == 0) { _captiontmp = bFont.SplitByWidth(_caption, drawingCoordinates.Width, _captionlines); }
-            var binim = QuickImage.Get(_filename.FileType(), 48).BMP;
+            var binim = QuickImage.Get(_filename.FileType(), 48);
             if (_bin != null) {
                 AreaOfWholeImage = new RectangleF(0, 0, binim.Width, binim.Height);
                 var scale = (float)Math.Min((drawingCoordinates.Width - (_padding * 2)) / (double)binim.Width,
@@ -148,7 +153,7 @@ namespace BlueControls.ItemCollection {
             gr.TranslateTransform(trp.X, trp.Y);
             if (_bin != null) { gr.DrawImage(binim, ScaledImagePosition, AreaOfWholeImage, GraphicsUnit.Pixel); }
             foreach (var thisQI in Overlays) {
-                gr.DrawImage(thisQI.BMP, ScaledImagePosition.Left + 8, ScaledImagePosition.Top + 8);
+                gr.DrawImage(thisQI, ScaledImagePosition.Left + 8, ScaledImagePosition.Top + 8);
             }
             if (!string.IsNullOrEmpty(_caption)) {
                 var c = _captiontmp.Count;

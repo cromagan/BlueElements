@@ -2483,7 +2483,7 @@ namespace BlueControls.Controls {
                     Draw_CellTransparentDirect(gr, cellInThisDatabaseColumn, cellInThisDatabaseRow, cellrectangle, lcolumn, lrow, font, state);
                 } else {
                     if (cellInThisDatabaseRow.Row.Database.IsAdministrator()) {
-                        gr.DrawImage(QuickImage.Get("Warnung|10||||||120||60").BMP, cellrectangle.Left + 3, cellrectangle.Top + 1);
+                        gr.DrawImage(QuickImage.Get("Warnung|10||||||120||60"), cellrectangle.Left + 3, cellrectangle.Top + 1);
                     }
                 }
                 return;
@@ -2596,10 +2596,10 @@ namespace BlueControls.Controls {
                         CurrentRow.CaptionPos = new Rectangle(1, DrawY(CurrentRow) - RowCaptionFontY, (int)si.Width + 28, (int)si.Height);
                         if (_collapsed.Contains(CurrentRow.Chapter)) {
                             Button.DrawButton(this, gr, enDesign.Button_CheckBox, enStates.Checked, null, enAlignment.Horizontal_Vertical_Center, false, null, string.Empty, CurrentRow.CaptionPos, false);
-                            gr.DrawImage(QuickImage.Get("Pfeil_Unten_Scrollbar|14|||FF0000||200|200").BMP, 5, DrawY(CurrentRow) - RowCaptionFontY + 6);
+                            gr.DrawImage(QuickImage.Get("Pfeil_Unten_Scrollbar|14|||FF0000||200|200"), 5, DrawY(CurrentRow) - RowCaptionFontY + 6);
                         } else {
                             Button.DrawButton(this, gr, enDesign.Button_CheckBox, enStates.Standard, null, enAlignment.Horizontal_Vertical_Center, false, null, string.Empty, CurrentRow.CaptionPos, false);
-                            gr.DrawImage(QuickImage.Get("Pfeil_Rechts_Scrollbar|14|||||0").BMP, 5, DrawY(CurrentRow) - RowCaptionFontY + 6);
+                            gr.DrawImage(QuickImage.Get("Pfeil_Rechts_Scrollbar|14|||||0"), 5, DrawY(CurrentRow) - RowCaptionFontY + 6);
                         }
                         _Chapter_Font.DrawString(gr, CurrentRow.Chapter, 23, DrawY(CurrentRow) - RowCaptionFontY);
                         gr.DrawLine(Skin.Pen_LinieDick, 0, DrawY(CurrentRow), displayRectangleWOSlider.Width, DrawY(CurrentRow));
@@ -2634,9 +2634,9 @@ namespace BlueControls.Controls {
             if (Column_DrawWidth(viewItem, displayRectangleWOSlider) > 70 || viewItem._TMP_Reduced) {
                 viewItem._TMP_ReduceLocation = new Rectangle((int)viewItem.OrderTMP_Spalte_X1 + Column_DrawWidth(viewItem, displayRectangleWOSlider) - 18, Down, 18, 18);
                 if (viewItem._TMP_Reduced) {
-                    gr.DrawImage(QuickImage.Get("Pfeil_Rechts|16|||FF0000|||||20").BMP, viewItem._TMP_ReduceLocation.Left + 2, viewItem._TMP_ReduceLocation.Top + 2);
+                    gr.DrawImage(QuickImage.Get("Pfeil_Rechts|16|||FF0000|||||20"), viewItem._TMP_ReduceLocation.Left + 2, viewItem._TMP_ReduceLocation.Top + 2);
                 } else {
-                    gr.DrawImage(QuickImage.Get("Pfeil_Links|16||||||||75").BMP, viewItem._TMP_ReduceLocation.Left + 2, viewItem._TMP_ReduceLocation.Top + 2);
+                    gr.DrawImage(QuickImage.Get("Pfeil_Links|16||||||||75"), viewItem._TMP_ReduceLocation.Left + 2, viewItem._TMP_ReduceLocation.Top + 2);
                 }
             }
 
@@ -2673,7 +2673,7 @@ namespace BlueControls.Controls {
                 Skin.Draw_Border(gr, enDesign.Button_AutoFilter, TrichterState, viewItem._TMP_AutoFilterLocation);
             }
             if (TrichterIcon != null) {
-                gr.DrawImage(TrichterIcon.BMP, viewItem._TMP_AutoFilterLocation.Left + 2, viewItem._TMP_AutoFilterLocation.Top + 2);
+                gr.DrawImage(TrichterIcon, viewItem._TMP_AutoFilterLocation.Left + 2, viewItem._TMP_AutoFilterLocation.Top + 2);
             }
             if (!string.IsNullOrEmpty(TrichterText)) {
                 var s = _Column_Filter_Font.MeasureString(TrichterText, StringFormat.GenericDefault);
@@ -2705,7 +2705,7 @@ namespace BlueControls.Controls {
             tx = LanguageTool.DoTranslate(tx, Translate).Replace("\r", "\r\n");
             var FS = gr.MeasureString(tx, _Column_Font.Font());
             if (!string.IsNullOrEmpty(viewItem.Column.CaptionBitmap) && viewItem.Column.TMP_CaptionBitmap == null) {
-                viewItem.Column.TMP_CaptionBitmap = QuickImage.Get(viewItem.Column.CaptionBitmap).BMP;
+                viewItem.Column.TMP_CaptionBitmap = QuickImage.Get(viewItem.Column.CaptionBitmap);
             }
             if (viewItem.Column.TMP_CaptionBitmap != null && viewItem.Column.TMP_CaptionBitmap.Width > 10) {
                 Point pos = new((int)viewItem.OrderTMP_Spalte_X1 + (int)((Column_DrawWidth(viewItem, displayRectangleWOSlider) - FS.Width) / 2.0), 3 + Down);
@@ -2728,9 +2728,9 @@ namespace BlueControls.Controls {
             var tmpSortDefinition = SortUsed();
             if (tmpSortDefinition != null && tmpSortDefinition.UsedForRowSort(viewItem.Column) || viewItem.Column == Database.Column.SysChapter) {
                 if (tmpSortDefinition.Reverse) {
-                    gr.DrawImage(QuickImage.Get("ZA|11|5||||50").BMP, (float)(viewItem.OrderTMP_Spalte_X1 + (Column_DrawWidth(viewItem, displayRectangleWOSlider) / 2.0) - 6), HeadSize() - 6 - _AutoFilterSize);
+                    gr.DrawImage(QuickImage.Get("ZA|11|5||||50"), (float)(viewItem.OrderTMP_Spalte_X1 + (Column_DrawWidth(viewItem, displayRectangleWOSlider) / 2.0) - 6), HeadSize() - 6 - _AutoFilterSize);
                 } else {
-                    gr.DrawImage(QuickImage.Get("AZ|11|5||||50").BMP, (float)(viewItem.OrderTMP_Spalte_X1 + (Column_DrawWidth(viewItem, displayRectangleWOSlider) / 2.0) - 6), HeadSize() - 6 - _AutoFilterSize);
+                    gr.DrawImage(QuickImage.Get("AZ|11|5||||50"), (float)(viewItem.OrderTMP_Spalte_X1 + (Column_DrawWidth(viewItem, displayRectangleWOSlider) / 2.0) - 6), HeadSize() - 6 - _AutoFilterSize);
                 }
             }
         }
@@ -2816,7 +2816,7 @@ namespace BlueControls.Controls {
 
                 Draw_CellListBox(GR, ViewItem, CurrentRow, cellrectangle, r, enDesign.Item_Listbox, ItStat);
                 if (!CurrentRow.Row.CellGetBoolean(_Database.Column.SysCorrect)) {
-                    GR.DrawImage(QuickImage.Get("Warnung|16||||||120||50").BMP, new Point(r.Right - 19, (int)(r.Top + ((r.Height - 16) / 2.0))));
+                    GR.DrawImage(QuickImage.Get("Warnung|16||||||120||50"), new Point(r.Right - 19, (int)(r.Top + ((r.Height - 16) / 2.0))));
                 }
                 if (CurrentRow.ShowCap) {
                     BlueFont.DrawString(GR, CurrentRow.Chapter, _Chapter_Font.Font(), _Chapter_Font.Brush_Color_Main, 0, DrawY(CurrentRow) - RowCaptionFontY);
@@ -2825,38 +2825,38 @@ namespace BlueControls.Controls {
             Skin.Draw_Border(GR, enDesign.ListBox, state, displayRectangleWOSlider);
         }
 
-        private void Draw_Table_Std(Graphics GR, List<RowData> sr, enStates state, Rectangle displayRectangleWOSlider, int FirstVisibleRow, int LastVisibleRow) {
+        private void Draw_Table_Std(Graphics gr, List<RowData> sr, enStates state, Rectangle displayRectangleWOSlider, int FirstVisibleRow, int LastVisibleRow) {
             try {
                 if (_Database.ColumnArrangements == null || _ArrangementNr >= _Database.ColumnArrangements.Count) { return; }   // Kommt vor, dass spontan doch geparsed wird...
-                Skin.Draw_Back(GR, enDesign.Table_And_Pad, state, DisplayRectangle, this, true);
+                Skin.Draw_Back(gr, enDesign.Table_And_Pad, state, DisplayRectangle, this, true);
                 /// Maximale Rechten Pixel der Permanenten Columns ermitteln
                 var PermaX = 0;
                 foreach (var ViewItem in CurrentArrangement) {
                     if (ViewItem != null && ViewItem.Column != null && ViewItem.ViewType == enViewType.PermanentColumn) {
                         if (ViewItem._TMP_DrawWidth == null) {
                             // Veränderte Werte!
-                            DrawControl(GR, state);
+                            DrawControl(gr, state);
                             return;
                         }
                         PermaX = Math.Max(PermaX, (int)ViewItem.OrderTMP_Spalte_X1 + (int)ViewItem._TMP_DrawWidth);
                     }
                 }
-                Draw_Table_What(GR, sr, enTableDrawColumn.NonPermament, enTableDrawType.ColumnBackBody, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, state);
-                Draw_Table_What(GR, sr, enTableDrawColumn.NonPermament, enTableDrawType.Cells, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, state);
-                Draw_Table_What(GR, sr, enTableDrawColumn.Permament, enTableDrawType.ColumnBackBody, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, state);
-                Draw_Table_What(GR, sr, enTableDrawColumn.Permament, enTableDrawType.Cells, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, state);
+                Draw_Table_What(gr, sr, enTableDrawColumn.NonPermament, enTableDrawType.ColumnBackBody, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, state);
+                Draw_Table_What(gr, sr, enTableDrawColumn.NonPermament, enTableDrawType.Cells, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, state);
+                Draw_Table_What(gr, sr, enTableDrawColumn.Permament, enTableDrawType.ColumnBackBody, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, state);
+                Draw_Table_What(gr, sr, enTableDrawColumn.Permament, enTableDrawType.Cells, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, state);
                 // Den CursorLines zeichnen
-                Draw_Cursor(GR, displayRectangleWOSlider, true);
-                Draw_Table_What(GR, sr, enTableDrawColumn.NonPermament, enTableDrawType.ColumnHead, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, state);
-                Draw_Table_What(GR, sr, enTableDrawColumn.Permament, enTableDrawType.ColumnHead, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, state);
+                Draw_Cursor(gr, displayRectangleWOSlider, true);
+                Draw_Table_What(gr, sr, enTableDrawColumn.NonPermament, enTableDrawType.ColumnHead, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, state);
+                Draw_Table_What(gr, sr, enTableDrawColumn.Permament, enTableDrawType.ColumnHead, PermaX, displayRectangleWOSlider, FirstVisibleRow, LastVisibleRow, state);
 
                 /// Überschriften 1-3 Zeichnen
-                Draw_Column_Head_Captions(GR);
-                Skin.Draw_Border(GR, enDesign.Table_And_Pad, state, displayRectangleWOSlider);
+                Draw_Column_Head_Captions(gr);
+                Skin.Draw_Border(gr, enDesign.Table_And_Pad, state, displayRectangleWOSlider);
 
-                if (Database.ReloadNeeded) { GR.DrawImage(QuickImage.Get(enImageCode.Uhr, 16).BMP, 8, 8); }
-                if (Database.HasPendingChanges()) { GR.DrawImage(QuickImage.Get(enImageCode.Stift, 16).BMP, 16, 8); }
-                if (Database.ReadOnly) { GR.DrawImage(QuickImage.Get(enImageCode.Schloss, 32).BMP, 16, 8); }
+                if (Database.ReloadNeeded) { gr.DrawImage(QuickImage.Get(enImageCode.Uhr, 16), 8, 8); }
+                if (Database.HasPendingChanges()) { gr.DrawImage(QuickImage.Get(enImageCode.Stift, 16), 16, 8); }
+                if (Database.ReadOnly) { gr.DrawImage(QuickImage.Get(enImageCode.Schloss, 32), 16, 8); }
             } catch {
                 Invalidate();
                 //Develop.DebugPrint(ex);
@@ -2900,7 +2900,7 @@ namespace BlueControls.Controls {
 
             Skin.Draw_Back(GR, enDesign.Table_And_Pad, enStates.Standard_Disabled, DisplayRectangle, this, true);
 
-            var i = QuickImage.Get(enImageCode.Uhr, 64).BMP;
+            var i = QuickImage.Get(enImageCode.Uhr, 64);
             GR.DrawImage(i, (Width - 64) / 2, (Height - 64) / 2);
             Skin.Draw_Border(GR, enDesign.Table_And_Pad, enStates.Standard_Disabled, DisplayRectangle);
         }

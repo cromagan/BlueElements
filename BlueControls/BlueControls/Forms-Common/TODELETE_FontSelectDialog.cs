@@ -138,7 +138,7 @@ namespace BlueControls.Forms {
 
         private void UpdateSampleText() {
             if (Adding) { return; }
-            Sample.Image = Font.SampleText().Bitmap;
+            Sample.Image = Font.SampleText();
         }
 
         #endregion

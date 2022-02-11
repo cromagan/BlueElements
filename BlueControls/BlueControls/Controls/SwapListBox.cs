@@ -52,7 +52,7 @@ namespace BlueControls.Controls {
             foreach (var thisi in item) {
                 if (Main.Item[thisi.Internal] == null && Suggest.Item[thisi.Internal] == null) {
                     thisi.Checked = false;
-                    thisi.CloneToNewCollection(Suggest.Item);
+                    Suggest.Item.Add((BasicListItem)thisi.Clone());
                 }
             }
         }
@@ -64,7 +64,7 @@ namespace BlueControls.Controls {
             var SourceItem = Source.Item[Internal];
             var TargetItem = Target.Item[Internal];
             if (SourceItem != null && TargetItem == null) {
-                SourceItem.CloneToNewCollection(Target.Item);
+                Target.Item.Add((BasicListItem)SourceItem.Clone());
             } else if (SourceItem == null && TargetItem == null) {
                 TargetItem = new TextListItem(Internal, Internal, null, false, true, string.Empty);
                 Target.Item.Add(TargetItem);

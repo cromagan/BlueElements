@@ -64,7 +64,11 @@ namespace BlueControls.ItemCollection {
         #region Methods
 
         // unveränderter Text
-        public override void CloneToNewCollection(ItemCollectionList newParent) => CloneToNewCollection(newParent, new CellLikeListItem(Internal, _StyleLikeThis, _style, _Enabled, _bildTextverhalten));
+        public override object Clone() {
+            var x = new CellLikeListItem(Internal, _StyleLikeThis, _style, _Enabled, _bildTextverhalten);
+            x.CloneBasicStatesFrom(this);
+            return x;
+        }
 
         public override bool FilterMatch(string FilterText) {
             if (base.FilterMatch(FilterText)) { return true; }

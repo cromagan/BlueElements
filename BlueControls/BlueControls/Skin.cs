@@ -1130,7 +1130,7 @@ namespace BlueControls {
             float XP = 0;
             float YP1 = 0;
             float YP2 = 0;
-            if (qi != null) { pSize = qi.BMP.Size; }
+            if (qi != null) { pSize = qi.Size; }
             if (LanguageTool.Translation != null) { txt = LanguageTool.DoTranslate(txt, translate); }
             if (bFont != null) {
                 if (fitInRect.Width > 0) { txt = bFont.TrimByWidth(txt, fitInRect.Width - pSize.Width); }
@@ -1151,7 +1151,7 @@ namespace BlueControls {
                 if (qi != null) { Draw_Back_Transparent(gr, new Rectangle((int)(fitInRect.X + XP), (int)(fitInRect.Y + YP1), (int)pSize.Width, (int)pSize.Height), Child); }
             }
             try {
-                if (qi != null) { gr.DrawImage(qi.BMP, (int)(fitInRect.X + XP), (int)(fitInRect.Y + YP1)); }
+                if (qi != null) { gr.DrawImage(qi, (int)(fitInRect.X + XP), (int)(fitInRect.Y + YP1)); }
                 if (!string.IsNullOrEmpty(txt)) { bFont.DrawString(gr, txt, fitInRect.X + pSize.Width + XP, fitInRect.Y + YP2); }
             } catch (Exception) {
                 // es kommt selten vor, dass das Graphics-Objekt an anderer Stelle verwendet wird. Was immer das auch heiﬂen mag...
@@ -1164,7 +1164,7 @@ namespace BlueControls {
                 var pSize = SizeF.Empty;
                 var tSize = SizeF.Empty;
                 if (font == null) { return new Size(3, 3); }
-                if (image != null) { pSize = image.BMP.Size; }
+                if (image != null) { pSize = image.Size; }
                 if (!string.IsNullOrEmpty(text)) { tSize = BlueFont.MeasureString(text, font.Font()); }
                 return !string.IsNullOrEmpty(text)
                     ? image == null
