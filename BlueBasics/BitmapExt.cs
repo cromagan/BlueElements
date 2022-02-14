@@ -706,6 +706,7 @@ namespace BlueBasics {
             if (width < 1) { width = 1; }
             if (height < 1) { height = 1; }
             var Scale = Math.Min(width / (double)bmp.Width, height / (double)bmp.Height);
+
             switch (sizeMode) {
                 case enSizeModes.EmptySpace:
                     break;
@@ -740,6 +741,7 @@ namespace BlueBasics {
                 nw = width;
                 nh = height;
             }
+
             try {
                 Bitmap ImageResize = new(width, height); // Kein Format32bppPArgb --> Fehler
                 using (var GR = Graphics.FromImage(ImageResize)) {
@@ -890,6 +892,7 @@ namespace BlueBasics {
             if (width < 1) { width = 1; }
             if (height < 1) { height = 1; }
             var Scale = Math.Min(width / (double)Width, height / (double)Height);
+
             switch (sizeMode) {
                 case enSizeModes.EmptySpace:
                     break;

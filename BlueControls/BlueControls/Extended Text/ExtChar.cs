@@ -22,13 +22,11 @@ using System.Drawing;
 
 namespace BlueControls {
 
-    public class ExtChar {
+    public class ExtChar : ExtCharAbstract {
+        //public const char StoreX = (char)5;
+        //public const char Top = (char)4;
 
         #region Fields
-
-        public const char StoreX = (char)5;
-        public const char Top = (char)4;
-        public PointF Pos = PointF.Empty;
 
         private readonly char _Char;
         private enDesign _Design = enDesign.Undefiniert;
@@ -40,7 +38,7 @@ namespace BlueControls {
 
         #region Constructors
 
-        internal ExtChar(char charcode, enDesign design, enStates state, BlueFont font, int stufe, enMarkState markState) {
+        internal ExtChar(char charcode, enDesign design, enStates state, BlueFont font, int stufe, enMarkState markState) : base() {
             _Design = design;
             _Char = charcode;
             Font = font;
@@ -55,7 +53,7 @@ namespace BlueControls {
 
         public int Char => _Char;
 
-        public enDesign Design {
+        public override enDesign Design {
             get => _Design;
             set {
                 if (value == _Design) { return; }
@@ -63,9 +61,7 @@ namespace BlueControls {
             }
         }
 
-        public enMarkState Marking { get; set; }
-
-        public SizeF Size {
+        public override SizeF Size {
             get {
                 if (!_Size.IsEmpty) { return _Size; }
                 _Size = Font == null ? new SizeF(0, 16) : _Char < 0 ? Font.CharSize(0f) : Font.CharSize(_Char);
@@ -73,7 +69,7 @@ namespace BlueControls {
             }
         }
 
-        public enStates State {
+        public override enStates State {
             get => _State;
             set {
                 if (value == _State) { return; }
@@ -81,7 +77,7 @@ namespace BlueControls {
             }
         }
 
-        public int Stufe {
+        public override int Stufe {
             get => _Stufe;
             set {
                 if (_Stufe == value) { return; }
@@ -89,71 +85,50 @@ namespace BlueControls {
             }
         }
 
-        internal BlueFont Font { get; private set; } = null;
-
         #endregion
 
         #region Methods
 
-        public void Draw(Graphics gr, Point posModificator, float zoom) {
+        public override void Draw(Graphics gr, Point posModificator, float zoom) {
             if (_Char < 20) { return; }
             var DrawX = (Pos.X * zoom) + posModificator.X;
             var DrawY = (Pos.Y * zoom) + posModificator.Y;
 
-            if (_Char < (int)enASCIIKey.ImageStart) {
-                try {
-                    Font?.DrawString(gr, _Char.ToString(), DrawX, DrawY, zoom, StringFormat.GenericTypographic);
-                } catch { }
-                return;
-            }
+            try {
+                Font?.DrawString(gr, _Char.ToString(), DrawX, DrawY, zoom, StringFormat.GenericTypographic);
+            } catch { }
 
-            if (Math.Abs(zoom - 1) < 0.001) {
-                var BNR = QuickImage.Get(_Char - (int)enASCIIKey.ImageStart);
-                if (BNR == null) { return; }
-                // Sind es KEINE Integer bei DrawX / DrawY, kommt es zu extrem unschönen Effekten. Gerade Linien scheinen verschwommen zu sein. (Checkbox-Kästchen)
-                gr.DrawImage(BNR, (int)DrawX, (int)DrawY);
-            } else {
-                var l = QuickImage.Get(_Char - (int)enASCIIKey.ImageStart);
-                if (l == null || l.Width == 0) { l = QuickImage.Get("Warnung|16"); }
-                if (l.Width > 0) {
-                    gr.DrawImage(QuickImage.Get(l.Name, (int)(l.Width * zoom)), (int)DrawX, (int)DrawY);
-                }
-            }
+            //if (Math.Abs(zoom - 1) < 0.001) {
+            //    var BNR = QuickImage.Get(_Char - (int)enASCIIKey.ImageStart);
+            //    if (BNR == null) { return; }
+            //    // Sind es KEINE Integer bei DrawX / DrawY, kommt es zu extrem unschönen Effekten. Gerade Linien scheinen verschwommen zu sein. (Checkbox-Kästchen)
+            //    gr.DrawImage(BNR, (int)DrawX, (int)DrawY);
+            //} else {
+            //    var l = QuickImage.Get(_Char - (int)enASCIIKey.ImageStart);
+            //    if (l == null || l.Width == 0) { l = QuickImage.Get("Warnung|16"); }
+            //    if (l.Width > 0) {
+            //        gr.DrawImage(QuickImage.Get(l.Name, (int)(l.Width * zoom)), (int)DrawX, (int)DrawY);
+            //    }
+            //}
         }
 
-        public bool isLineBreak() => (int)_Char switch {
-            11 or 13 or Top => true,
+        public override string HTMLText() => Convert.ToChar(_Char).ToString().CreateHtmlCodes(false);
+
+        public override bool isLineBreak() => (int)_Char switch {
+            11 or 13 => true,
             _ => false,
         };
 
-        public bool isPossibleLineBreak() => _Char.isPossibleLineBreak();
+        public override bool isPossibleLineBreak() => _Char.isPossibleLineBreak();
 
-        public bool isSpace() => (int)_Char switch {
+        public override bool isSpace() => (int)_Char switch {
             32 or 0 or 9 => true,
             _ => false,
         };
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="zoom"></param>
-        /// <param name="drawingPos">Muss bereits Skaliert sein</param>
-        /// <returns></returns>
-        public bool IsVisible(float zoom, Point drawingPos, Rectangle drawingArea) => (drawingArea.Width < 1 && drawingArea.Height < 1)
-|| ((drawingArea.Width <= 0 || (Pos.X * zoom) + drawingPos.X <= drawingArea.Right)
-&& (drawingArea.Height <= 0 || (Pos.Y * zoom) + drawingPos.Y <= drawingArea.Bottom)
-&& ((Pos.X + Size.Width) * zoom) + drawingPos.X >= drawingArea.Left
-&& ((Pos.Y + Size.Height) * zoom) + drawingPos.Y >= drawingArea.Top);
+        public override bool isWordSeperator() => _Char.isWordSeperator();
 
-        public bool isWordSeperator() => _Char.isWordSeperator();
-
-        public string ToHTML() => (int)_Char switch {
-            13 => "<br>",
-            //case enEtxtCodes.HorizontalLine:
-            //    return "<hr>";
-            11 => string.Empty,
-            _ => Convert.ToChar(_Char).ToString().CreateHtmlCodes(true),
-        };
+        public override string PlainText() => Convert.ToChar(_Char).ToString();
 
         private void ChangeState(enDesign design, enStates state, int stufe) {
             if (state == _State && stufe == _Stufe && design == _Design) { return; }

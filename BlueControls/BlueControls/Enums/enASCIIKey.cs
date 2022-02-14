@@ -45,6 +45,6 @@ namespace BlueControls.Enums {
         //Chr255 = 255,
         Euro = 8364,
 
-        ImageStart = 20000
+        //ImageStart = 20000
     }
 }

@@ -184,6 +184,12 @@
     <Compile Include="Controls\FlexiControlForProperty.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Extended Text\ExtCharAbstract.cs" />
+    <Compile Include="Extended Text\ExtCharCRLFCode.cs" />
+    <Compile Include="Extended Text\ExtCharTabCode.cs" />
+    <Compile Include="Extended Text\ExtCharStoreXCode.cs" />
+    <Compile Include="Extended Text\ExtCharImageCode.cs" />
+    <Compile Include="Extended Text\ExtCharTopCode.cs" />
     <Compile Include="Forms-Basics\DialogWithOkAndCancel.cs">
       <SubType>Form</SubType>
     </Compile>

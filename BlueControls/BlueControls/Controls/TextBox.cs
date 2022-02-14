@@ -396,10 +396,9 @@ namespace BlueControls.Controls {
             if (nt == null) { nt = string.Empty; }
             nt = nt.Replace(Constants.beChrW1.ToString(), "\r");
             nt = nt.RemoveChars(Constants.Char_NotFromClip);
-            if (!MultiLine) { nt = nt.RemoveChars("\r"); }
+            if (!MultiLine) { nt = nt.RemoveChars("\r\t"); }
             foreach (var t in nt) {
-                var a = (enASCIIKey)t;
-                if (_eTxt.InsertChar(a, _Cursor_CharPos)) {
+                if (_eTxt.InsertChar((enASCIIKey)t, _Cursor_CharPos)) {
                     _Cursor_CharPos++;
                 }
             }
@@ -442,9 +441,8 @@ namespace BlueControls.Controls {
                 case enASCIIKey.ENTER: {
                         if (MultiLine) {
                             Char_DelBereich(-1, -1);
-                            if (_eTxt.InsertChar(KeyAscii, _Cursor_CharPos)) {
-                                _Cursor_CharPos++;
-                            }
+                            _eTxt.InsertCRLF(_Cursor_CharPos);
+                            _Cursor_CharPos++;
                         }
                         break;
                     }

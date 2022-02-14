@@ -22,6 +22,8 @@ using BlueDatabase;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Text;
+using System.Threading.Tasks;
 
 // VTextTyp-Hirachie
 // ~~~~~~~~~~~~~~~~~
@@ -52,6 +54,7 @@ namespace BlueControls {
 
         #region Fields
 
+        public readonly List<ExtCharAbstract> Chars = new();
         public string AllowedChars;
         public enAlignment Ausrichtung;
 
@@ -71,8 +74,8 @@ namespace BlueControls {
         private RowItem _Row;
         private enStates _State;
         private Size _TextDimensions;
-        private string _TMPHtmlText = string.Empty;
-        private string _TMPPlainText = string.Empty;
+        private string? _TMPHtmlText = null;
+        private string? _TMPPlainText = null;
         private int? _Width = null;
         private float _Zeilenabstand = 1;
 
@@ -81,10 +84,23 @@ namespace BlueControls {
         #region Constructors
 
         public ExtText(enDesign design, enStates state) {
-            Initialize();
+            _Design = enDesign.Undefiniert;
+            _State = enStates.Standard;
+            _Row = null;
+            DrawingPos = new Point(0, 0);
+            Ausrichtung = enAlignment.Top_Left;
+            Multiline = true;
+            AllowedChars = string.Empty;
+            DrawingArea = new Rectangle(0, 0, -1, -1);
+            _TextDimensions = Size.Empty;
+            _Width = null;
+            _Height = null;
+            _Zeilenabstand = 1;
+            _TMPHtmlText = null;
+            _TMPPlainText = null;
+
             _Design = design;
             _State = state;
-            _Row = null;
         }
 
         public ExtText(PadStyles design, RowItem skinRow) : this((enDesign)design, enStates.Standard) {
@@ -99,22 +115,19 @@ namespace BlueControls {
 
         #region Properties
 
-        public List<ExtChar> Chars { get; private set; }
-
         public enDesign Design {
             get => _Design;
             set {
                 if (value == _Design) { return; }
                 _Design = value;
-                foreach (var ch in Chars) {
-                    ch.Design = _Design;
-                }
+
+                Parallel.ForEach(Chars, ch => { ch.Design = _Design; });
             }
         }
 
         public string HtmlText {
             get {
-                if (string.IsNullOrEmpty(_TMPHtmlText)) {
+                if (_TMPHtmlText == null) {
                     _TMPHtmlText = ConvertCharToHTMLText(0, Chars.Count - 1);
                 }
                 return _TMPHtmlText;
@@ -127,7 +140,7 @@ namespace BlueControls {
 
         public string PlainText {
             get {
-                if (string.IsNullOrEmpty(_TMPPlainText)) {
+                if (_TMPPlainText == null) {
                     _TMPPlainText = ConvertCharToPlainText(0, Chars.Count - 1);
                 }
                 return _TMPPlainText;
@@ -143,9 +156,8 @@ namespace BlueControls {
             set {
                 if (value == _State) { return; }
                 _State = value;
-                foreach (var ch in Chars) {
-                    ch.State = _State;
-                }
+
+                Parallel.ForEach(Chars, ch => { ch.State = _State; });
             }
         }
 
@@ -189,7 +201,7 @@ namespace BlueControls {
             do {
                 cZ++;
                 if (cZ > Chars.Count - 1) { break; }// Das Ende des Textes
-                if (Chars[cZ].Char > 0 && Chars[cZ].Size.Width > 0) {
+                if (Chars[cZ].Size.Width > 0) {
                     var MatchX = pixX >= DrawingPos.X + Chars[cZ].Pos.X && pixX <= DrawingPos.X + Chars[cZ].Pos.X + Chars[cZ].Size.Width;
                     var MatchY = pixY >= DrawingPos.Y + Chars[cZ].Pos.Y && pixY <= DrawingPos.Y + Chars[cZ].Pos.Y + Chars[cZ].Size.Height;
 
@@ -234,11 +246,13 @@ namespace BlueControls {
 
         public Rectangle CursorPixelPosX(int charPos) {
             while (_Width == null) { ReBreak(); }
+
             if (charPos > Chars.Count + 1) { charPos = Chars.Count + 1; }
             if (Chars.Count > 0 && charPos < 0) { charPos = 0; }
             float X = 0;
             float Y = 0;
             float He = 14;
+
             if (Chars.Count == 0) {
                 // Kein Text vorhanden
             } else if (charPos < Chars.Count) {
@@ -246,7 +260,7 @@ namespace BlueControls {
                 X = Chars[charPos].Pos.X;
                 Y = Chars[charPos].Pos.Y;
                 He = Chars[charPos].Size.Height;
-            } else if (charPos > 0 && charPos < Chars.Count + 1 && Chars[charPos - 1].Char == 13) {
+            } else if (charPos > 0 && charPos < Chars.Count + 1 && Chars[charPos - 1].isLineBreak()) {
                 // Vorzeichen = Zeilenumbruch
                 Y = Chars[charPos - 1].Pos.Y + Chars[charPos - 1].Size.Height;
                 He = Chars[charPos - 1].Size.Height;
@@ -272,19 +286,48 @@ namespace BlueControls {
         public void Draw(Graphics gr, float zoom) {
             while (_Width == null) { ReBreak(); }
             DrawStates(gr, zoom);
-            foreach (var t in Chars) {
-                if (t.Char > 0 && t.IsVisible(zoom, DrawingPos, DrawingArea)) { t.Draw(gr, DrawingPos, zoom); }
-            }
+
+            var lockMe = new object();
+            //var results = new List<string>();
+            //Parallel.ForEach(all, (thisP, state) => {
+            //    if (FileExists(thisP)) {
+            //        lock (lockMe) {
+            //            results.AddIfNotExists(thisP);
+            //            state.Break();
+            //        }
+            //    }
+            //});
+
+            Parallel.ForEach(Chars, t => {
+                if (t.IsVisible(zoom, DrawingPos, DrawingArea)) {
+                    lock (lockMe) {
+                        t.Draw(gr, DrawingPos, zoom);
+                    }
+                }
+            });
         }
 
         public int Height() {
             while (_Width == null) { ReBreak(); }
+
             return (int)_Height;
         }
 
-        public bool InsertChar(enASCIIKey KeyAscii, int Position) => InsertAnything(KeyAscii, string.Empty, Position);
+        public bool InsertChar(enASCIIKey ascii, int position) {
+            if ((int)ascii < 13) { return false; }
+            var c = new ExtChar((char)ascii, Design, State, null, 5, enMarkState.None);
+            Insert(position, c);
+            return true;
+        }
 
-        public bool InsertImage(string Img, int Position) => InsertAnything(enASCIIKey.Undefined, Img, Position);
+        public bool InsertImage(string imagecode, int position) {
+            if (string.IsNullOrEmpty(imagecode)) { return false; }
+
+            var c = new ExtCharImageCode(imagecode);
+
+            Insert(position, c);
+            return true;
+        }
 
         public Size LastSize() {
             while (_Width == null) { ReBreak(); }
@@ -292,7 +335,7 @@ namespace BlueControls {
         }
 
         public void StufeÄndern(int first, int last, int stufe) {
-            for (var cc = first; cc <= last; cc++) {
+            for (var cc = first; cc <= Math.Min(last, Chars.Count - 1); cc++) {
                 Chars[cc].Stufe = stufe;
             }
             ResetPosition(true);
@@ -302,6 +345,7 @@ namespace BlueControls {
 
         public int Width() {
             while (_Width == null) { ReBreak(); }
+
             return (int)_Width;
         }
 
@@ -313,32 +357,29 @@ namespace BlueControls {
 
         internal string ConvertCharToPlainText(int first, int last) {
             try {
-                var T = string.Empty;
-                var cZ = first;
-                last = Math.Min(last, Chars.Count - 1);
-                while (cZ <= last && Chars[cZ].Char > 0) {
-                    if (Chars[cZ].Char < (int)enASCIIKey.ImageStart) {
-                        T += Convert.ToChar(Chars[cZ].Char).ToString();
-                    }
-                    cZ++;
+                var T = new StringBuilder();
+                for (var cZ = first; cZ <= Math.Min(last, Chars.Count - 1); cZ++) {
+                    T.Append(Chars[cZ].PlainText());
                 }
-                T = T.Replace("\n", "");
-                return T;
+                return T.ToString().Replace("\n", string.Empty);
             } catch {
-                // Wenn Chars geändter wird (und dann der Count nimmer stimmt)
+                // Wenn Chars geändert wird (und dann der Count nimmer stimmt)
                 return ConvertCharToPlainText(first, last);
             }
         }
 
+        internal void InsertCRLF(int position) {
+            Insert(position, new ExtCharCRLFCode());
+        }
+
         internal void Mark(enMarkState markstate, int first, int last) {
             try {
-                for (var z = first; z <= last; z++) {
-                    if (z >= Chars.Count) { return; }
+                for (var z = first; z <= Math.Min(last, Chars.Count - 1); z++) {
                     if (!Chars[z].Marking.HasFlag(markstate)) {
                         Chars[z].Marking = Chars[z].Marking | markstate;
                     }
                 }
-            } catch (Exception) {
+            } catch {
                 Mark(markstate, first, last);
             }
         }
@@ -374,45 +415,44 @@ namespace BlueControls {
         }
 
         private string ConvertCharToHTMLText(int first, int last) {
-            var T = "";
+            var t = new StringBuilder();
+
             var cZ = first;
             last = Math.Min(last, Chars.Count - 1);
             var LastStufe = 4;
-            while (cZ <= last && Chars[cZ].Char > 0) {
-                if (Chars[cZ].Char < (int)enASCIIKey.ImageStart) {
-                    if (LastStufe != Chars[cZ].Stufe) {
-                        T = T + "<H" + Chars[cZ].Stufe + ">";
-                        LastStufe = Chars[cZ].Stufe;
-                    }
-                    T += Chars[cZ].ToHTML();
-                } else {
-                    var index = Chars[cZ].Char - (int)enASCIIKey.ImageStart;
-                    var x = QuickImage.Get(index);
-                    if (x != null) { T += "<ImageCode=" + x.Name + ">"; }
+
+            for (var z = first; z <= last; z++) {
+                if (z <= first) { LastStufe = Chars[cZ].Stufe; }
+                if (z == first && LastStufe != 4) { t.Append("<H" + Chars[cZ].Stufe + ">"); }
+
+                if (LastStufe != Chars[cZ].Stufe) {
+                    t.Append("<H" + Chars[cZ].Stufe + ">");
+                    LastStufe = Chars[cZ].Stufe;
                 }
-                cZ++;
+
+                t.Append(Chars[cZ].HTMLText());
             }
-            return T;
+
+            return t.ToString();
         }
 
-        private void ConvertTextToChar(string cactext, bool IsRich) {
+        private void ConvertTextToChar(string cactext, bool isRitch) {
             var Pos = 0;
             var Zeichen = -1;
             var Stufe = 4;
             var Markstate = enMarkState.None;
-            Chars = new List<ExtChar>();
+            Chars.Clear();
             ResetPosition(false);
             var BF = (int)_Design > 10000 ? Skin.GetBlueFont((PadStyles)_Design, _Row) : Skin.GetBlueFont(_Design, _State);
-            if (BF == null) {
-                return;
-            }// Wenn die DAtenbanken entladen wurde, bei Programmende
+            if (BF == null) { return; }// Wenn die DAtenbanken entladen wurde, bei Programmende
+
             if (!string.IsNullOrEmpty(cactext)) {
-                cactext = IsRich ? cactext.ConvertFromHtmlToRich() : cactext.Replace("\r\n", "\r");
+                cactext = isRitch ? cactext.ConvertFromHtmlToRich() : cactext.Replace("\r\n", "\r");
                 var Lang = cactext.Length - 1;
                 do {
                     if (Pos > Lang) { break; }
                     var CH = cactext[Pos];
-                    if (IsRich) {
+                    if (isRitch) {
                         switch (CH) {
                             case '<': {
                                     DoHTMLCode(cactext, Pos, ref Zeichen, ref BF, ref Stufe, ref Markstate);
@@ -526,7 +566,7 @@ namespace BlueControls {
 
                 case "BR":
                     Position++;
-                    Chars.Add(new ExtChar((char)13, _Design, _State, font, Stufe, enMarkState.None));
+                    Chars.Add(new ExtCharCRLFCode());
                     break;
                 //
                 case "HR":
@@ -538,50 +578,25 @@ namespace BlueControls {
 
                 case "TAB":
                     Position++;
-                    Chars.Add(new ExtChar((char)9, _Design, _State, font, Stufe, enMarkState.None));
+                    Chars.Add(new ExtCharTabCode());
+                    //Chars.Add(new ExtChar((char)9, _Design, _State, font, Stufe, enMarkState.None));
                     break;
 
                 case "ZBX_STORE":
                     Position++;
-                    Chars.Add(new ExtChar(ExtChar.StoreX, _Design, _State, font, Stufe, enMarkState.None));
+                    Chars.Add(new ExtCharStoreXCode());
                     break;
-                //
-                case "ZBX_RESET":
-                //    Position++;
-                //    Chars.Add(new ExtChar((int)enEtxtCodes.ZBX_RESET, _Design, _State, PF, Stufe, MarkState));
-                //    break;
 
                 case "TOP":
                     Position++;
-                    Chars.Add(new ExtChar(ExtChar.Top, _Design, _State, font, Stufe, enMarkState.None));
+                    Chars.Add(new ExtCharTopCode());
                     break;
-                //
-                case "ZBY_STORE":
-                //    Position++;
-                //    Chars.Add(new ExtChar((int)enEtxtCodes.ZBY_STORE, _Design, _State, PF, Stufe, MarkState));
-                //    break;
-                //
-                case "ZBY_RESET":
-                //    Position++;
-                //    Chars.Add(new ExtChar((int)enEtxtCodes.ZBY_RESET, _Design, _State, PF, Stufe, MarkState));
-                //    break;
-                //
-                case "LEFT":
-                //    Position++;
-                //    Chars.Add(new ExtChar((int)enEtxtCodes.Left, _Design, _State, PF, Stufe, MarkState));
-                //    break;
 
                 case "IMAGECODE":
-                    QuickImage x;
-                    x = !Attribut.Contains("|") && font != null ? QuickImage.Get(Attribut, (int)font.Oberlänge(1)) : QuickImage.Get(Attribut);
+                    QuickImage x = !Attribut.Contains("|") && font != null ? QuickImage.Get(Attribut, (int)font.Oberlänge(1)) : QuickImage.Get(Attribut);
                     Position++;
-                    Chars.Add(new ExtChar((char)(QuickImage.GetIndex(x) + (int)enASCIIKey.ImageStart), _Design, _State, font, Stufe, enMarkState.None));
+                    Chars.Add(new ExtCharImageCode(x));
                     break;
-                //
-                case "PROGRESSBAR":
-                //    Position++;
-                //    Chars.Add(new ExtChar((int)((int)enEtxtCodes.ProgressBar0 + int.Parse(Attribut)), _Design, _State, PF, Stufe, MarkState));
-                //    break;
 
                 case "H7":
                     Stufe = 7;
@@ -722,10 +737,11 @@ namespace BlueControls {
             for (var Pos = 0; Pos < Chars.Count; Pos++) {
                 var tempVar = Chars[Pos];
                 var marked = tempVar.Marking.HasFlag(state);
+
                 if (marked && tmas < 0) {
                     tmas = Pos;
                 }
-                if (!marked || tempVar.Char == 0 || Pos == Chars.Count - 1) {
+                if (!marked || Pos == Chars.Count - 1) {
                     if (tmas > -1) {
                         if (Pos == Chars.Count - 1) {
                             DrawZone(GR, czoom, state, tmas, Pos);
@@ -776,61 +792,64 @@ namespace BlueControls {
             }
         }
 
-        private void Initialize() {
-            _Design = enDesign.Undefiniert;
-            _State = enStates.Standard;
-            _Row = null;
-            DrawingPos = new Point(0, 0);
-            Ausrichtung = enAlignment.Top_Left;
-            Multiline = true;
-            AllowedChars = string.Empty;
-            Chars = new List<ExtChar>();
-            DrawingArea = new Rectangle(0, 0, -1, -1);
-            _TextDimensions = Size.Empty;
-            _Width = null;
-            _Height = null;
-            _Zeilenabstand = 1;
-            _TMPHtmlText = string.Empty;
-            _TMPPlainText = string.Empty;
+        private void Insert(int Position, ExtCharAbstract c) {
+            if (Position < 0) { Position = 0; }
+            if (Position > Chars.Count) { Position = Chars.Count; }
+
+            ExtCharAbstract Style = null;
+
+            if (Position < Chars.Count) {
+                Style = Chars[Position];
+            } else if (Chars.Count > 0) {
+                Style = Chars[Chars.Count - 1];
+            }
+
+            if (Style != null) {
+                c.GetStyleFrom(c);
+            }
+
+            Chars.Insert(Position, c);
+            ResetPosition(true);
         }
 
-        private bool InsertAnything(enASCIIKey KeyAscii, string img, int Position) {
-            if (Position < 0 && !string.IsNullOrEmpty(PlainText)) { return false; }            // Text zwar da, aber kein Cursor angezeigt
-            if (Position < 0) { Position = 0; }// Ist echt möglich!
-            BlueFont tmpFont = null;
-            var tmpStufe = 4;
-            var tmpState = enStates.Undefiniert;
-            var tmpMarkState = enMarkState.None;
-            if (Position > Chars.Count) { Position = Chars.Count; }
-            if ((int)_Design > 10000) { Develop.DebugPrint(enFehlerArt.Fehler, "Falsche Art"); }
-            if (Position < Chars.Count && Chars[Position].Char > 0) {
-                tmpFont = Chars[Position].Font;
-                tmpState = Chars[Position].State;
-                tmpStufe = Chars[Position].Stufe;
-                tmpMarkState = Chars[Position].Marking;
-            }
-            if (tmpFont == null) {
-                tmpFont = Skin.GetBlueFont(_Design, _State);
-                tmpState = _State;
-                tmpStufe = 4;
-                tmpMarkState = enMarkState.None;
-            }
-            if (KeyAscii != enASCIIKey.Undefined) {
-                if (KeyAscii == enASCIIKey.ENTER) {
-                    if (!Multiline) { return false; }
-                } else {
-                    if (!string.IsNullOrEmpty(AllowedChars) && !AllowedChars.Contains(Convert.ToChar(KeyAscii).ToString())) { return false; }
-                }
-                Chars.Insert(Position, new ExtChar((char)KeyAscii, _Design, tmpState, tmpFont, tmpStufe, tmpMarkState));
-            } else if (!string.IsNullOrEmpty(img)) {
-                var x = QuickImage.Get(img, (int)tmpFont.Oberlänge(1));
-                Chars.Insert(Position, new ExtChar((char)(QuickImage.GetIndex(x) + (int)enASCIIKey.ImageStart), _Design, tmpState, tmpFont, tmpStufe, tmpMarkState));
-            } else {
-                return false;
-            }
-            ResetPosition(true);
-            return true;
-        }
+        //private bool InsertAnything(enASCIIKey KeyAscii, string img, int Position) {
+        //    q
+        //    if (Position < 0 && !string.IsNullOrEmpty(PlainText)) { return false; }  // Text zwar da, aber kein Cursor angezeigt
+        //    if (Position < 0) { Position = 0; }// Ist echt möglich!
+        //    BlueFont tmpFont = null;
+        //    var tmpStufe = 4;
+        //    var tmpState = enStates.Undefiniert;
+        //    var tmpMarkState = enMarkState.None;
+        //    if (Position > Chars.Count) { Position = Chars.Count; }
+        //    if ((int)_Design > 10000) { Develop.DebugPrint(enFehlerArt.Fehler, "Falsche Art"); }
+        //    if (Position < Chars.Count) {
+        //        tmpFont = Chars[Position].Font;
+        //        tmpState = Chars[Position].State;
+        //        tmpStufe = Chars[Position].Stufe;
+        //        tmpMarkState = Chars[Position].Marking;
+        //    }
+        //    if (tmpFont == null) {
+        //        tmpFont = Skin.GetBlueFont(_Design, _State);
+        //        tmpState = _State;
+        //        tmpStufe = 4;
+        //        tmpMarkState = enMarkState.None;
+        //    }
+        //    if (KeyAscii != enASCIIKey.Undefined) {
+        //        if (KeyAscii == enASCIIKey.ENTER) {
+        //            if (!Multiline) { return false; }
+        //        } else {
+        //            if (!string.IsNullOrEmpty(AllowedChars) && !AllowedChars.Contains(Convert.ToChar(KeyAscii).ToString())) { return false; }
+        //        }
+        //        Chars.Insert(Position, new ExtChar((char)KeyAscii, _Design, tmpState, tmpFont, tmpStufe, tmpMarkState));
+        //    } else if (!string.IsNullOrEmpty(img)) {
+        //        var x = QuickImage.Get(img, (int)tmpFont.Oberlänge(1));
+        //        Chars.Insert(Position, new ExtChar((char)(QuickImage.GetIndex(x) + (int)enASCIIKey.ImageStart), _Design, tmpState, tmpFont, tmpStufe, tmpMarkState));
+        //    } else {
+        //        return false;
+        //    }
+        //    ResetPosition(true);
+        //    return true;
+        //}
 
         /// <summary>
         /// Berechnet die Zeichen-Positionen mit korrekten Umbrüchen. Die enAlignment wird ebefalls mit eingerechnet.
@@ -856,20 +875,27 @@ namespace BlueControls {
                     RI.Add(ZB_Char + ";" + (Akt - 1));
                     break;
                 }
-                switch (Chars[Akt].Char) {
-                    //
-                    case 9:
-                    //    Chars[Akt].Width = (float)((Math.Truncate(IsX / 100) + 1) * 100 - IsX);
-                    //    break;
 
-                    case ExtChar.StoreX:
-                        vZBX_Pixel = IsX;
-                        break;
-
-                    case ExtChar.Top:
-                        IsY = 0;
-                        break;
+                if (Chars[Akt] is ExtCharStoreXCode) {
+                    vZBX_Pixel = IsX;
+                } else if (Chars[Akt] is ExtCharTopCode) {
+                    IsY = 0;
                 }
+
+                //switch (Chars[Akt].Char) {
+                //    //
+                //    case 9:
+                //    //    Chars[Akt].Width = (float)((Math.Truncate(IsX / 100) + 1) * 100 - IsX);
+                //    //    break;
+
+                //    case ExtChar.StoreX:
+                //        vZBX_Pixel = IsX;
+                //        break;
+
+                //    case ExtChar.Top:
+                //        IsY = 0;
+                //        break;
+                //}
 
                 if (!Chars[Akt].isSpace()) {
                     if (Akt > ZB_Char && _TextDimensions.Width > 0) {
@@ -893,7 +919,7 @@ namespace BlueControls {
 
                 if (Chars[Akt].isLineBreak()) {
                     IsX = vZBX_Pixel;
-                    if (Chars[Akt].Char == ExtChar.Top) {
+                    if (Chars[Akt] is ExtCharTopCode) {
                         Row_SetOnLine(ZB_Char, Akt);
                         RI.Add(ZB_Char + ";" + Akt);
                     } else {
@@ -928,8 +954,8 @@ namespace BlueControls {
             _Width = null;
             _Height = null;
             if (AndTmpText) {
-                _TMPHtmlText = string.Empty;
-                _TMPPlainText = string.Empty;
+                _TMPHtmlText = null;
+                _TMPPlainText = null;
             }
         }
 
@@ -939,7 +965,7 @@ namespace BlueControls {
                 Abstand = Math.Max(Abstand, Chars[z].Size.Height);
             }
             for (var z = first; z <= last; z++) {
-                if (Chars[z].Char != ExtChar.Top) {
+                if (Chars[z] is ExtCharTopCode) {
                     Chars[z].Pos.Y = Chars[z].Pos.Y + Abstand - Chars[z].Size.Height;
                 }
             }

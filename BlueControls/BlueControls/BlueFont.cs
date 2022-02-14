@@ -271,10 +271,10 @@ namespace BlueControls {
         public QuickImage NameInStyle() {
             if (_NameInStyle_sym != null) { return _NameInStyle_sym; }
 
-            var n = "FontName-" + ToString();
-            if (!QuickImage.Exists(n)) { _ = new QuickImage(n, Symbol(Font().Name, true)); }
+            var n = "FontName-" + ToString() + "|100|50";
+            if (!QuickImage.Exists(n)) { _ = new QuickImage(n, Symbol(Font().Name, true), 100, 50); }
 
-            _NameInStyle_sym = QuickImage.Get("FontName-" + ToString());
+            _NameInStyle_sym = QuickImage.Get(n);
             return _NameInStyle_sym;
         }
 
@@ -306,10 +306,10 @@ namespace BlueControls {
         public QuickImage SymbolForReadableText() {
             if (_SymbolForReadableText_sym != null) { return _SymbolForReadableText_sym; }
 
-            var n = "Font-" + ToString();
-            if (!QuickImage.Exists(n)) { _ = new QuickImage(n, Symbol("Abc", false)); }
+            var n = "Font-" + ToString() + "|100|50";
+            if (!QuickImage.Exists(n)) { _ = new QuickImage(n, Symbol("Abc", false), 100, 50); }
 
-            _SymbolForReadableText_sym = QuickImage.Get("Font-" + ToString());
+            _SymbolForReadableText_sym = QuickImage.Get(n);
             return _SymbolForReadableText_sym;
         }
 
@@ -327,10 +327,10 @@ namespace BlueControls {
                 gr.DrawLine(Pen(1f), 3, 4, 29, 8);
             }
 
-            var n = "Line-" + ToString();
-            if (!QuickImage.Exists(n)) { _ = new QuickImage(n, bmp); }
+            var n = "Line-" + ToString() + "|100|50";
+            if (!QuickImage.Exists(n)) { _ = new QuickImage(n, bmp, 100, 50); }
 
-            _SymbolOfLine_sym = QuickImage.Get("Line-" + ToString());
+            _SymbolOfLine_sym = QuickImage.Get(n);
             return _SymbolOfLine_sym;
         }
 
@@ -348,10 +348,6 @@ namespace BlueControls {
 
         internal SizeF Compute_Size(char c) {
             if (c is >= (char)0 and <= (char)31) { return new SizeF(0, _Zeilenabstand); }
-            if (c >= (int)enASCIIKey.ImageStart) {
-                var BNR = QuickImage.Get(c - (int)enASCIIKey.ImageStart);
-                return BNR == null ? SizeF.Empty : new SizeF(BNR.Width + 1, BNR.Height + 1);
-            }
 
             SizeF s;
 
