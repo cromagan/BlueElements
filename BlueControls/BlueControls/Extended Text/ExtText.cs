@@ -436,23 +436,23 @@ namespace BlueControls {
             return t.ToString();
         }
 
-        private void ConvertTextToChar(string cactext, bool isRitch) {
+        private void ConvertTextToChar(string cactext, bool isRich) {
             var Pos = 0;
             var Zeichen = -1;
             var Stufe = 4;
             var Markstate = enMarkState.None;
             Chars.Clear();
-            ResetPosition(false);
+            ResetPosition(true);
             var BF = (int)_Design > 10000 ? Skin.GetBlueFont((PadStyles)_Design, _Row) : Skin.GetBlueFont(_Design, _State);
             if (BF == null) { return; }// Wenn die DAtenbanken entladen wurde, bei Programmende
 
             if (!string.IsNullOrEmpty(cactext)) {
-                cactext = isRitch ? cactext.ConvertFromHtmlToRich() : cactext.Replace("\r\n", "\r");
+                cactext = isRich ? cactext.ConvertFromHtmlToRich() : cactext.Replace("\r\n", "\r");
                 var Lang = cactext.Length - 1;
                 do {
                     if (Pos > Lang) { break; }
                     var CH = cactext[Pos];
-                    if (isRitch) {
+                    if (isRich) {
                         switch (CH) {
                             case '<': {
                                     DoHTMLCode(cactext, Pos, ref Zeichen, ref BF, ref Stufe, ref Markstate);
@@ -485,7 +485,7 @@ namespace BlueControls {
                     Pos++;
                 } while (true);
             }
-            ResetPosition(false);
+            ResetPosition(true);
         }
 
         private void DoHTMLCode(string HTMLText, int start, ref int Position, ref BlueFont font, ref int Stufe, ref enMarkState MarkState) {

@@ -769,28 +769,32 @@ namespace BlueControls.ItemCollection {
         /// </summary>
         /// <returns></returns>
         internal (int BiggestItemX, int BiggestItemY, int HeightAdded, enOrientation SenkrechtAllowed) ItemData() {
-            var w = 16;
-            var h = 0;
-            var hall = 0;
-            var sameh = -1;
-            var or = enOrientation.Senkrecht;
-            PreComputeSize();
-            foreach (var ThisItem in this) {
-                if (ThisItem != null) {
-                    var s = ThisItem.SizeUntouchedForListBox();
-                    w = Math.Max(w, s.Width);
-                    h = Math.Max(h, s.Height);
-                    hall += s.Height;
-                    if (sameh < 0) {
-                        sameh = ThisItem.SizeUntouchedForListBox().Height;
-                    } else {
-                        if (sameh != ThisItem.SizeUntouchedForListBox().Height) { or = enOrientation.Waagerecht; }
-                        sameh = ThisItem.SizeUntouchedForListBox().Height;
+            try {
+                var w = 16;
+                var h = 0;
+                var hall = 0;
+                var sameh = -1;
+                var or = enOrientation.Senkrecht;
+                PreComputeSize();
+                foreach (var ThisItem in this) {
+                    if (ThisItem != null) {
+                        var s = ThisItem.SizeUntouchedForListBox();
+                        w = Math.Max(w, s.Width);
+                        h = Math.Max(h, s.Height);
+                        hall += s.Height;
+                        if (sameh < 0) {
+                            sameh = ThisItem.SizeUntouchedForListBox().Height;
+                        } else {
+                            if (sameh != ThisItem.SizeUntouchedForListBox().Height) { or = enOrientation.Waagerecht; }
+                            sameh = ThisItem.SizeUntouchedForListBox().Height;
+                        }
+                        if (ThisItem is not TextListItem and not CellLikeListItem) { or = enOrientation.Waagerecht; }
                     }
-                    if (ThisItem is not TextListItem and not CellLikeListItem) { or = enOrientation.Waagerecht; }
                 }
+                return (w, h, hall, or);
+            } catch {
+                return ItemData();
             }
-            return (w, h, hall, or);
         }
 
         internal void SetNewCheckState(BasicListItem This, bool value, ref bool CheckVariable) {

@@ -52,7 +52,7 @@ namespace BlueBasics {
 
         public BitmapExt(int width, int height) => EmptyBitmap(width, height);
 
-        public BitmapExt() => EmptyBitmap(0, 0);
+        public BitmapExt() => EmptyBitmap(1, 1);
 
         public BitmapExt(Icon icon) : this(icon.ToBitmap()) { }
 

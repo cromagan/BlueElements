@@ -271,8 +271,8 @@ namespace BlueControls {
         public QuickImage NameInStyle() {
             if (_NameInStyle_sym != null) { return _NameInStyle_sym; }
 
-            var n = "FontName-" + ToString() + "|100|50";
-            if (!QuickImage.Exists(n)) { _ = new QuickImage(n, Symbol(Font().Name, true), 100, 50); }
+            var n = "FontName-" + ToString();
+            if (!QuickImage.Exists(n)) { _ = new QuickImage(n, Symbol(Font().Name, true), -1, -1); }
 
             _NameInStyle_sym = QuickImage.Get(n);
             return _NameInStyle_sym;
@@ -306,8 +306,8 @@ namespace BlueControls {
         public QuickImage SymbolForReadableText() {
             if (_SymbolForReadableText_sym != null) { return _SymbolForReadableText_sym; }
 
-            var n = "Font-" + ToString() + "|100|50";
-            if (!QuickImage.Exists(n)) { _ = new QuickImage(n, Symbol("Abc", false), 100, 50); }
+            var n = "Font-" + ToString();
+            if (!QuickImage.Exists(n)) { _ = new QuickImage(n, Symbol("Abc", false), -1, -1); }
 
             _SymbolForReadableText_sym = QuickImage.Get(n);
             return _SymbolForReadableText_sym;
@@ -327,8 +327,8 @@ namespace BlueControls {
                 gr.DrawLine(Pen(1f), 3, 4, 29, 8);
             }
 
-            var n = "Line-" + ToString() + "|100|50";
-            if (!QuickImage.Exists(n)) { _ = new QuickImage(n, bmp, 100, 50); }
+            var n = "Line-" + ToString();
+            if (!QuickImage.Exists(n)) { _ = new QuickImage(n, bmp, -1, -1); }
 
             _SymbolOfLine_sym = QuickImage.Get(n);
             return _SymbolOfLine_sym;

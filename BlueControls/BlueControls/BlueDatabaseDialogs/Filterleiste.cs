@@ -125,7 +125,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         #region Methods
 
-        public bool Textbox_hasFocus() => txbZeilenFilter.Focused();
+        public bool Textbox_hasFocus() => txbZeilenFilter.Focused;
 
         internal void FillFilters() {
             if (InvokeRequired) {

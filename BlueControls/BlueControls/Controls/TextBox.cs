@@ -123,6 +123,8 @@ namespace BlueControls.Controls {
             }
         }
 
+        public override bool Focused { get => base.Focused || (_SliderY != null && _SliderY.Focused()); }
+
         [DefaultValue(false)]
         public bool FormatierungErlaubt {
             get => _FormatierungErlaubt;
@@ -191,12 +193,14 @@ namespace BlueControls.Controls {
                     value = value.Replace("\n", string.Empty);
                     value = value.Replace("\r", "\r\n");
                 }
+
                 if (_FormatierungErlaubt) {
                     if (_eTxt != null && value == _eTxt.HtmlText) { return; }
                 } else {
                     if (_eTxt != null && value == _eTxt.PlainText) { return; }
                 }
                 AbortSpellChecking();
+
                 lock (Dictionary.Lock_SpellChecking) {
                     _eTxt = null;
                     GenerateETXT(true);
@@ -335,13 +339,10 @@ namespace BlueControls.Controls {
             return false;
         }
 
-        public new void Focus() {
-            if (Focused()) { return; }
-            base.Focus();
-        }
-
-        public new bool Focused() => base.Focused || (_SliderY != null && _SliderY.Focused());
-
+        //public new void Focus() {
+        //    if (Focused()) { return; }
+        //    base.Focus();
+        //}
         public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList items, out object hotItem, List<string> tags, ref bool cancel, ref bool translate) {
             AbortSpellChecking();
             hotItem = null;
@@ -816,7 +817,7 @@ namespace BlueControls.Controls {
         }
 
         private void Blinker_Tick(object sender, System.EventArgs e) {
-            if (!Focused()) { return; }
+            if (!Focused) { return; }
             if (!Enabled) { return; }
             if (_MarkStart > -1 && _MarkEnd > -1) { _Cursor_CharPos = -1; }
             if (_Cursor_CharPos > -1) {

@@ -314,7 +314,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void Something_LostFocus(object sender, System.EventArgs e) {
             if (IsClosed) { return; }
-            if (txbEingabe.Focused()) { return; }
+            if (txbEingabe.Focused) { return; }
             if (Focused) { return; }
             if (lsbFilterItems.Focused()) { return; }
             if (lsbStandardFilter.Focused()) { return; }
@@ -327,7 +327,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (Timer1x.Interval < 5000) {
                 Timer1x.Interval = 5000;
                 if (txbEingabe.Enabled && txbEingabe.Visible) {
-                    if (!txbEingabe.Focused()) { txbEingabe.Focus(); }
+                    if (!txbEingabe.Focused) { txbEingabe.Focus(); }
                 }
             }
         }
