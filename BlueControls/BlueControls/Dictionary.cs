@@ -97,7 +97,7 @@ namespace BlueControls {
                 IsSpellChecking = true;
                 do {
                     Pos = Math.Max(woEnd + 1, Pos + 1);
-                    if (Pos >= _ETXT.Chars.Count) { break; }
+                    if (Pos >= _ETXT.Count) { break; }
                     var woStart = _ETXT.WordStart(Pos);
                     if (woStart > -1) {
                         woEnd = _ETXT.WordEnd(Pos);

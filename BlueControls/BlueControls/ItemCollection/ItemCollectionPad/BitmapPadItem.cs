@@ -51,7 +51,7 @@ namespace BlueControls.ItemCollection {
 
         public BitmapPadItem(Bitmap bmp, Size size) : this(string.Empty, bmp, size) { }
 
-        public BitmapPadItem(ItemCollectionPad parent, Bitmap bmp) : this(string.Empty, bmp, Size.Empty) { }
+        public BitmapPadItem(Bitmap bmp) : this(string.Empty, bmp, Size.Empty) { }
 
         public BitmapPadItem(string internalname, Bitmap bmp, Size size) : base(internalname) {
             Bitmap = bmp;

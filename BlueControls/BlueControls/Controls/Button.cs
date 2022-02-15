@@ -62,7 +62,9 @@ namespace BlueControls.Controls {
 
         #region Constructors
 
-        public Button() : base(true, false) { }
+        public Button() : base(true, false) {
+            _etxt = new ExtText(enDesign.Button, enStates.Standard);
+        }
 
         #endregion
 
@@ -191,20 +193,24 @@ namespace BlueControls.Controls {
                 var tmpPic = QuickImage.Get(QuickImage.GenerateCode(pic.Name, control.Width - 6, 28, pic.Effekt, pic.Färbung, pic.ChangeGreenTo, pic.Sättigung, pic.Helligkeit, pic.DrehWinkel, pic.Transparenz, pic.Zweitsymbol));
                 Skin.Draw_FormatedText(gr, string.Empty, tmpPic, Design, enAlignment.Horizontal_Vertical_Center, new Rectangle(0, 0, control.Width, 44), control, false, translate);
 
-                // Mehrzeiligen Text generieren und Zeichnen
-                if (etxt == null) { etxt = new ExtText(buttontype, state); }
-                etxt.State = state; // Fall es nicht nothing ist
-                etxt.Zeilenabstand = 0.65f;
-                etxt.DrawingPos = new Point(0, 43);
-                etxt.TextDimensions = new Size(displayRectangle.Width - (Skin.PaddingSmal / 2), 22);
-                etxt.Ausrichtung = enAlignment.Horizontal_Vertical_Center;
-                etxt.HtmlText = BlueDatabase.LanguageTool.DoTranslate(text, translate);
-                etxt.Draw(gr, 1);
+
+                var tt = BlueDatabase.LanguageTool.DoTranslate(text, translate);
+
+                if (!string.IsNullOrWhiteSpace(tt)) {
+                    // Mehrzeiligen Text generieren und Zeichnen
+                    etxt.State = state; // Fall es nicht nothing ist
+                    etxt.Zeilenabstand = 0.65f;
+                    etxt.DrawingPos = new Point(0, 43);
+                    etxt.TextDimensions = new Size(displayRectangle.Width - (Skin.PaddingSmal / 2), 22);
+                    etxt.Ausrichtung = enAlignment.Horizontal_Vertical_Center;
+                    etxt.HtmlText = tt;
+                    etxt.Draw(gr, 1);
+                }
             } else if (buttontype is not enDesign.OptionButton_TextStyle and not enDesign.CheckBox_TextStyle) {
                 Skin.Draw_FormatedText(gr, text, pic, Design, align, displayRectangle, control, false, translate);
             } else {
                 var tt = "<ImageCode=" + Design.Image + "> <zbx_store><top>" + BlueDatabase.LanguageTool.DoTranslate(text, translate);
-                if (etxt == null) { etxt = new ExtText(buttontype, state); }
+                etxt = new ExtText(buttontype, state);
                 etxt.State = state;
                 etxt.TextDimensions = displayRectangle.Size;
                 etxt.HtmlText = tt;

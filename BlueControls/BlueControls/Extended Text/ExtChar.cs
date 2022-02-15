@@ -28,25 +28,75 @@ namespace BlueControls {
 
         public PointF Pos = PointF.Empty;
 
+        private enDesign _Design = enDesign.Undefiniert;
+
+        private BlueFont _Font = null;
+
+        private SizeF _Size = SizeF.Empty;
+        private enStates _State = enStates.Undefiniert;
+
+        private int _Stufe = 4;
+
         #endregion
 
         #region Constructors
 
-        public ExtChar() : base() { }
+        public ExtChar(enDesign design, enStates state, BlueFont font, int stufe) : base() {
+            _Design = design;
+            _State = state;
+            _Stufe = stufe;
+            _Font = font;
+            _Size = SizeF.Empty;
+        }
 
         #endregion
 
         #region Properties
 
-        public abstract enDesign Design { get; set; }
+        public enDesign Design {
+            get => _Design;
+            set {
+                if (value == _Design) { return; }
+                ChangeState(value, _State, _Stufe);
+            }
+        }
 
-        public BlueFont Font { get; protected set; } = null;
+        public BlueFont Font {
+            get {
+                if (_Font == null) {
+                    _Font = Design == enDesign.Undefiniert || State == enStates.Undefiniert ? null : Skin.GetBlueFont(Design, State, Stufe);
+                    _Size = SizeF.Empty;
+                }
+                return _Font;
+            }
+
+            protected set => _Font = value;
+        }
+
         public enMarkState Marking { get; set; }
-        public abstract SizeF Size { get; }
 
-        public abstract enStates State { get; set; }
+        public SizeF Size {
+            get {
+                if (_Size.IsEmpty) { _Size = CalculateSize(); }
+                return _Size;
+            }
+        }
 
-        public abstract int Stufe { get; set; }
+        public enStates State {
+            get => _State;
+            set {
+                if (value == _State) { return; }
+                ChangeState(_Design, value, _Stufe);
+            }
+        }
+
+        public int Stufe {
+            get => _Stufe;
+            set {
+                if (_Stufe == value) { return; }
+                ChangeState(_Design, _State, value);
+            }
+        }
 
         #endregion
 
@@ -81,16 +131,19 @@ namespace BlueControls {
         public abstract string PlainText();
 
         internal void GetStyleFrom(ExtChar c) {
+            ChangeState(c.Design, c.State, c.Stufe);
             Font = c.Font;
+        }
 
-            Design = c.Design;
+        protected abstract SizeF CalculateSize();
 
-            //Marking = c.Marking;
-            //public abstract SizeF Size { get; }
-
-            State = c.State;
-
-            Stufe = c.Stufe;
+        private void ChangeState(enDesign design, enStates state, int stufe) {
+            if (state == _State && stufe == _Stufe && design == _Design) { return; }
+            _Size = SizeF.Empty;
+            _Design = design;
+            _State = state;
+            _Stufe = stufe;
+            _Font = null;
         }
 
         #endregion

@@ -32,22 +32,9 @@ namespace BlueControls {
 
         #region Constructors
 
-        public ExtCharImageCode(QuickImage qi) : base() { _QI = qi; }
+        public ExtCharImageCode(QuickImage qi, enDesign design, enStates state, BlueFont font, int stufe) : base(design, state, font, stufe) { _QI = qi; }
 
-        public ExtCharImageCode(string imagecode) : base() { _QI = QuickImage.Get(imagecode); }
-
-        #endregion
-
-        #region Properties
-
-        public override enDesign Design { get; set; }
-
-        public override SizeF Size {
-            get => _QI == null ? SizeF.Empty : new SizeF(_QI.Width + 1, _QI.Height + 1);
-        }
-
-        public override enStates State { get; set; }
-        public override int Stufe { get; set; }
+        public ExtCharImageCode(string imagecode, enDesign design, enStates state, BlueFont font, int stufe) : base(design, state, font, stufe) { _QI = QuickImage.Get(imagecode); }
 
         #endregion
 
@@ -79,6 +66,8 @@ namespace BlueControls {
         public override bool isWordSeperator() => true;
 
         public override string PlainText() => string.Empty;
+
+        protected override SizeF CalculateSize() => _QI == null ? SizeF.Empty : new SizeF(_QI.Width + 1, _QI.Height + 1);
 
         #endregion
     }

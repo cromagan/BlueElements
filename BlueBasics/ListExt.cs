@@ -34,11 +34,9 @@ namespace BlueBasics {
 
         #region Constructors
 
-        public ListExt() {
-        }
+        public ListExt() { }
 
-        public ListExt(IList<T> list) : base(list) {
-        }
+        public ListExt(IList<T> list) : base(list) { }
 
         #endregion
 

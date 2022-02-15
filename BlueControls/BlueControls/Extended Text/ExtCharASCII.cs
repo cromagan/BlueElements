@@ -29,21 +29,13 @@ namespace BlueControls {
         #region Fields
 
         private readonly char _Char;
-        private enDesign _Design = enDesign.Undefiniert;
-        private SizeF _Size = SizeF.Empty;
-        private enStates _State = enStates.Undefiniert;
-        private int _Stufe = 4;
 
         #endregion
 
         #region Constructors
 
-        internal ExtCharASCII(char charcode, enDesign design, enStates state, BlueFont font, int stufe, enMarkState markState) : base() {
-            _Design = design;
+        internal ExtCharASCII(char charcode, enDesign design, enStates state, BlueFont font, int stufe, enMarkState markState) : base(design, state, font, stufe) {
             _Char = charcode;
-            Font = font;
-            _Stufe = stufe;
-            _State = state;
             Marking = markState;
         }
 
@@ -52,38 +44,6 @@ namespace BlueControls {
         #region Properties
 
         public int Char => _Char;
-
-        public override enDesign Design {
-            get => _Design;
-            set {
-                if (value == _Design) { return; }
-                ChangeState(value, _State, _Stufe);
-            }
-        }
-
-        public override SizeF Size {
-            get {
-                if (!_Size.IsEmpty) { return _Size; }
-                _Size = Font == null ? new SizeF(0, 16) : _Char < 0 ? Font.CharSize(0f) : Font.CharSize(_Char);
-                return _Size;
-            }
-        }
-
-        public override enStates State {
-            get => _State;
-            set {
-                if (value == _State) { return; }
-                ChangeState(_Design, value, _Stufe);
-            }
-        }
-
-        public override int Stufe {
-            get => _Stufe;
-            set {
-                if (_Stufe == value) { return; }
-                ChangeState(_Design, _State, value);
-            }
-        }
 
         #endregion
 
@@ -130,14 +90,7 @@ namespace BlueControls {
 
         public override string PlainText() => Convert.ToChar(_Char).ToString();
 
-        private void ChangeState(enDesign design, enStates state, int stufe) {
-            if (state == _State && stufe == _Stufe && design == _Design) { return; }
-            _Size = SizeF.Empty;
-            _Design = design;
-            _State = state;
-            _Stufe = stufe;
-            Font = design == enDesign.Undefiniert || state == enStates.Undefiniert ? null : Skin.GetBlueFont(design, state, stufe);
-        }
+        protected override SizeF CalculateSize() => Font == null ? new SizeF(0, 16) : _Char < 0 ? Font.CharSize(0f) : Font.CharSize(_Char);
 
         #endregion
     }

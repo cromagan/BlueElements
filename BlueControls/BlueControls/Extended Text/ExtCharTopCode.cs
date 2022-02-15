@@ -24,15 +24,9 @@ namespace BlueControls {
 
     internal class ExtCharTopCode : ExtChar {
 
-        #region Properties
+        #region Constructors
 
-        public override enDesign Design { get; set; }
-
-        public override SizeF Size => SizeF.Empty;
-
-        public override enStates State { get; set; }
-
-        public override int Stufe { get; set; }
+        internal ExtCharTopCode(enDesign design, enStates state, BlueFont font, int stufe) : base(design, state, font, stufe) { }
 
         #endregion
 
@@ -51,6 +45,8 @@ namespace BlueControls {
         public override bool isWordSeperator() => true;
 
         public override string PlainText() => string.Empty;
+
+        protected override SizeF CalculateSize() => SizeF.Empty;
 
         #endregion
     }

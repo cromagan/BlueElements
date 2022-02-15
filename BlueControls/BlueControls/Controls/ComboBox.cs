@@ -38,11 +38,9 @@ namespace BlueControls.Controls {
         #region Fields
 
         private bool _btnDropDownIsIn = false;
-
         private enComboboxStyle _DrawStyle = enComboboxStyle.TextBox;
-
         private System.Windows.Forms.ComboBoxStyle _DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown;
-
+        private ExtText _eTxt2;
         private string _ImageCode = string.Empty;
 
         //private string _Initialtext;
@@ -162,7 +160,11 @@ namespace BlueControls.Controls {
         protected override void DrawControl(Graphics gr, enStates state) {
             if (_DrawStyle != enComboboxStyle.TextBox) {
                 //if (string.IsNullOrEmpty(_Initialtext) && !string.IsNullOrEmpty(Text)) { _Initialtext = Text; }
-                Button.DrawButton(this, gr, (enDesign)_DrawStyle, state, QuickImage.Get(_ImageCode), enAlignment.Horizontal_Vertical_Center, true, null, Text, DisplayRectangle, Translate);
+                if (_eTxt2 == null) {
+                    _eTxt2 = new ExtText((enDesign)_DrawStyle, state);
+                }
+
+                Button.DrawButton(this, gr, (enDesign)_DrawStyle, state, QuickImage.Get(_ImageCode), enAlignment.Horizontal_Vertical_Center, true, _eTxt2, Text, DisplayRectangle, Translate);
                 btnDropDown.Invalidate();
                 return;
             }

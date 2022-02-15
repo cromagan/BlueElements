@@ -28,7 +28,8 @@ namespace BlueControls.Controls
                 _MouseValue = 0;
                 _Cursor_Visible = false;
                 _Suffix = null;
-                _eTxt = null;
+                _eTxt.Changed -= _eTxt_Changed;
+                _eTxt.Dispose();
             }
         }
         //Wird vom Windows Form-Designer benötigt.

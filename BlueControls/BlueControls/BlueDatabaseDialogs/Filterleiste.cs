@@ -463,7 +463,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private FlexiControlForFilter FlexiItemOf(FilterItem filter) {
             foreach (var ThisControl in Controls) {
                 if (ThisControl is FlexiControlForFilter flx) {
-                    if (flx.Filter == filter) { return flx; }
+                    if (flx.Filter.ToString() == filter.ToString()) { return flx; }
                 }
             }
             return null;
