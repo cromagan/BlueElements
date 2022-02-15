@@ -22,7 +22,7 @@ using System.Drawing;
 
 namespace BlueControls {
 
-    internal class ExtCharStoreXCode : ExtCharAbstract {
+    internal class ExtCharStoreXCode : ExtChar {
 
         #region Properties
 

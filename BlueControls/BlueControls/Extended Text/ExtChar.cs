@@ -22,7 +22,7 @@ using System.Drawing;
 
 namespace BlueControls {
 
-    public abstract class ExtCharAbstract {
+    public abstract class ExtChar {
 
         #region Fields
 
@@ -32,7 +32,7 @@ namespace BlueControls {
 
         #region Constructors
 
-        public ExtCharAbstract() : base() { }
+        public ExtChar() : base() { }
 
         #endregion
 
@@ -80,7 +80,7 @@ namespace BlueControls {
 
         public abstract string PlainText();
 
-        internal void GetStyleFrom(ExtCharAbstract c) {
+        internal void GetStyleFrom(ExtChar c) {
             Font = c.Font;
 
             Design = c.Design;

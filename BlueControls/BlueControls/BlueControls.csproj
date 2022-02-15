@@ -184,7 +184,7 @@
     <Compile Include="Controls\FlexiControlForProperty.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Extended Text\ExtCharAbstract.cs" />
+    <Compile Include="Extended Text\ExtChar.cs" />
     <Compile Include="Extended Text\ExtCharCRLFCode.cs" />
     <Compile Include="Extended Text\ExtCharTabCode.cs" />
     <Compile Include="Extended Text\ExtCharStoreXCode.cs" />

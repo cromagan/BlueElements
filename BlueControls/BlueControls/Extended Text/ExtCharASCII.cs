@@ -22,7 +22,7 @@ using System.Drawing;
 
 namespace BlueControls {
 
-    public class ExtCharASCII : ExtCharAbstract {
+    public class ExtCharASCII : ExtChar {
         //public const char StoreX = (char)5;
         //public const char Top = (char)4;
 

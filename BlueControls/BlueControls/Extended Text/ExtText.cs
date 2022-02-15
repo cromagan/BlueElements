@@ -54,7 +54,7 @@ namespace BlueControls {
 
         #region Fields
 
-        public readonly List<ExtCharAbstract> Chars = new();
+        public readonly List<ExtChar> Chars = new();
         public string AllowedChars;
         public enAlignment Ausrichtung;
 
@@ -792,11 +792,11 @@ namespace BlueControls {
             }
         }
 
-        private void Insert(int Position, ExtCharAbstract c) {
+        private void Insert(int Position, ExtChar c) {
             if (Position < 0) { Position = 0; }
             if (Position > Chars.Count) { Position = Chars.Count; }
 
-            ExtCharAbstract Style = null;
+            ExtChar Style = null;
 
             if (Position < Chars.Count) {
                 Style = Chars[Position];

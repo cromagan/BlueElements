@@ -22,7 +22,7 @@ using System.Drawing;
 
 namespace BlueControls {
 
-    internal class ExtCharImageCode : ExtCharAbstract {
+    internal class ExtCharImageCode : ExtChar {
 
         #region Fields
 
