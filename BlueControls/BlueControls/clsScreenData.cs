@@ -15,19 +15,20 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics;
 using System;
 using System.Drawing;
 
 namespace BlueControls {
 
-    public struct strScreenData {
+    public class clsScreenData : BitmapExt {
+        //public Point HookP1;
+        //public Point HookP2;
+        //public bool IsResized;
+        //public BitmapExt BMP;
 
         #region Fields
 
-        public Point HookP1;
-        public Point HookP2;
-        public bool IsResized;
-        public Bitmap Pic;
         public Point Point1;
         public Point Point2;
 

@@ -82,7 +82,7 @@ namespace BlueControls.ItemCollection {
             if (Bitmap != null) {
                 if (MessageBox.Show("Vorhandenes Bild überschreiben?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
             }
-            Bitmap = ScreenShot.GrabArea(null, 2000, 2000).Pic;
+            Bitmap = ScreenShot.GrabArea(null);
         }
 
         public void Datei_laden() {

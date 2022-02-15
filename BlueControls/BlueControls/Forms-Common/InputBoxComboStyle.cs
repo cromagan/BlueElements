@@ -37,7 +37,7 @@ namespace BlueControls.Forms {
             cbxText.Text = vorschlagsText;
             var SuggestClone = (ItemCollectionList)suggestOriginal.Clone();
             cbxText.Item.CheckBehavior = SuggestClone.CheckBehavior;
-            cbxText.Item.AddRange(SuggestClone);
+            cbxText.Item.AddClonesFrom(SuggestClone);
             cbxText.DropDownStyle = texteingabeErlaubt ? System.Windows.Forms.ComboBoxStyle.DropDown : System.Windows.Forms.ComboBoxStyle.DropDownList;
             Setup(txt, cbxText, 250);
             _giveBack = vorschlagsText;

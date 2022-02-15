@@ -96,13 +96,13 @@ namespace BlueBasics {
             }
 
             if (bmp == null) {
-                var s = CorrectSize(width, height);
+                var s = CorrectSize(width, height, null);
                 GenerateErrorImage(s.Width, s.Height);
             } else {
                 CloneFromBitmap(bmp);
 
                 if (width > 0 || height > 0) {
-                    var s = CorrectSize(width, height);
+                    var s = CorrectSize(width, height, bmp);
                     Resize(s.Width, s.Height, enSizeModes.EmptySpace, InterpolationMode.High, false);
                 }
             }
@@ -294,13 +294,15 @@ namespace BlueBasics {
         //        return -1;
         //    }
         //}
-        private Size CorrectSize(int width, int height) {
+        private Size CorrectSize(int width, int height, Bitmap bmp) {
             if (width > 0 && height > 0) {
                 return new Size(width, height);
             } else if (width > 0) {
                 return new Size(width, width);
             } else if (height > 0) {
                 return new Size(height, height);
+            } else if (bmp != null) {
+                return bmp.Size;
             } else {
                 return new Size(16, 16);
             }
@@ -308,7 +310,7 @@ namespace BlueBasics {
 
         private void Generate(int width, int height) {
             var bmpOri = GetBitmap(Name);
-            var s = CorrectSize(width, height);
+            var s = CorrectSize(width, height, bmpOri);
 
             #region Fehlerhaftes Bild erzeugen
 
@@ -438,7 +440,7 @@ namespace BlueBasics {
             lock (_locker) {
                 // Evtl. hat die "OnNeedImage" das Bild auch in den Stack hochgeladen
                 // Falls nicht, hier noch erledigen
-                if (Exists(tmpname)) { return QuickImage.Get(tmpname); }
+                if (Exists(tmpname) && Get(tmpname) != this) { return Get(tmpname); }
             }
             return e.BMP;
         }

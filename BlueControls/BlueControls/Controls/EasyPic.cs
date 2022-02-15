@@ -316,7 +316,7 @@ namespace BlueControls.Controls {
             if (_Bitmap != null) {
                 if (MessageBox.Show("Vorhandenes Bild überschreiben?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
             }
-            _Bitmap = ScreenShot.GrabArea(ParentForm(), _MaxSize, _MaxSize).Pic;
+            _Bitmap = ScreenShot.GrabArea(ParentForm());
             SorceType = enSorceType.ScreenShot;
             SorceName = string.Empty;
             ZoomFitInvalidateAndCheckButtons();

@@ -575,11 +575,17 @@ namespace BlueControls.Controls {
                 // Beim Button reicht eine Abfrage mit Row null
                 Column.TMP_ColumnContentWidth = Cell_ContentSize(table, Column, null, CellFont, Pix16).Width;
             } else {
+                var locker = new object();
+
                 Parallel.ForEach(Column.Database.Row, ThisRowItem => {
                     if (ThisRowItem != null && !ThisRowItem.CellIsNullOrEmpty(Column)) {
-                        var t = Column.TMP_ColumnContentWidth; // ja, dank Multithreading kann es sein, dass hier das hier null ist
-                        if (t == null) { t = 0; }
-                        Column.TMP_ColumnContentWidth = Math.Max((int)t, Cell_ContentSize(table, Column, ThisRowItem, CellFont, Pix16).Width);
+                        var w = Cell_ContentSize(table, Column, ThisRowItem, CellFont, Pix16).Width;
+
+                        lock (locker) {
+                            var t = Column.TMP_ColumnContentWidth; // ja, dank Multithreading kann es sein, dass hier das hier null ist
+                            if (t == null) { t = 0; }
+                            Column.TMP_ColumnContentWidth = Math.Max((int)t, w);
+                        }
                     }
                 });
 
@@ -2704,10 +2710,19 @@ namespace BlueControls.Controls {
             var tx = viewItem.Column.Caption;
             tx = LanguageTool.DoTranslate(tx, Translate).Replace("\r", "\r\n");
             var FS = gr.MeasureString(tx, _Column_Font.Font());
+
+            #region Spalten-Kopf-Bild erzeugen
+
             if (!string.IsNullOrEmpty(viewItem.Column.CaptionBitmap) && viewItem.Column.TMP_CaptionBitmap == null) {
                 viewItem.Column.TMP_CaptionBitmap = QuickImage.Get(viewItem.Column.CaptionBitmap);
             }
-            if (viewItem.Column.TMP_CaptionBitmap != null && viewItem.Column.TMP_CaptionBitmap.Width > 10) {
+
+            #endregion
+
+            if (viewItem.Column.TMP_CaptionBitmap != null && !viewItem.Column.TMP_CaptionBitmap.IsError) {
+
+                #region Spalte mit Bild zeichnen
+
                 Point pos = new((int)viewItem.OrderTMP_Spalte_X1 + (int)((Column_DrawWidth(viewItem, displayRectangleWOSlider) - FS.Width) / 2.0), 3 + Down);
                 gr.DrawImageInRectAspectRatio(viewItem.Column.TMP_CaptionBitmap, (int)viewItem.OrderTMP_Spalte_X1 + 2, (int)(pos.Y + FS.Height), Column_DrawWidth(viewItem, displayRectangleWOSlider) - 4, HeadSize() - (int)(pos.Y + FS.Height) - 6 - 18);
                 // Dann der Text
@@ -2715,7 +2730,12 @@ namespace BlueControls.Controls {
                 //GR.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
                 BlueFont.DrawString(gr, tx, _Column_Font.Font(), new SolidBrush(viewItem.Column.ForeColor), 0, 0);
                 gr.TranslateTransform(-pos.X, -pos.Y);
+
+                #endregion
             } else {
+
+                #region Spalte ohne Bild zeichnen
+
                 Point pos = new((int)viewItem.OrderTMP_Spalte_X1 + (int)((Column_DrawWidth(viewItem, displayRectangleWOSlider) - FS.Height) / 2.0), HeadSize() - 4 - _AutoFilterSize);
                 gr.TranslateTransform(pos.X, pos.Y);
                 gr.RotateTransform(-90);
@@ -2723,8 +2743,12 @@ namespace BlueControls.Controls {
                 BlueFont.DrawString(gr, tx, _Column_Font.Font(), new SolidBrush(viewItem.Column.ForeColor), 0, 0);
                 gr.TranslateTransform(-pos.X, -pos.Y);
                 gr.ResetTransform();
+
+                #endregion
             }
-            // Sortierrichtung Zeichnen
+
+            #region Sortierrichtung Zeichnen
+
             var tmpSortDefinition = SortUsed();
             if (tmpSortDefinition != null && tmpSortDefinition.UsedForRowSort(viewItem.Column) || viewItem.Column == Database.Column.SysChapter) {
                 if (tmpSortDefinition.Reverse) {
@@ -2733,6 +2757,8 @@ namespace BlueControls.Controls {
                     gr.DrawImage(QuickImage.Get("AZ|11|5||||50"), (float)(viewItem.OrderTMP_Spalte_X1 + (Column_DrawWidth(viewItem, displayRectangleWOSlider) / 2.0) - 6), HeadSize() - 6 - _AutoFilterSize);
                 }
             }
+
+            #endregion
         }
 
         private void Draw_Column_Head_Captions(Graphics GR) {

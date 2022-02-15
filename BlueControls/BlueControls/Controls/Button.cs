@@ -198,6 +198,7 @@ namespace BlueControls.Controls {
 
                 if (!string.IsNullOrWhiteSpace(tt)) {
                     // Mehrzeiligen Text generieren und Zeichnen
+                    etxt.Design = buttontype;
                     etxt.State = state; // Fall es nicht nothing ist
                     etxt.Zeilenabstand = 0.65f;
                     etxt.DrawingPos = new Point(0, 43);
@@ -210,7 +211,8 @@ namespace BlueControls.Controls {
                 Skin.Draw_FormatedText(gr, text, pic, Design, align, displayRectangle, control, false, translate);
             } else {
                 var tt = "<ImageCode=" + Design.Image + "> <zbx_store><top>" + BlueDatabase.LanguageTool.DoTranslate(text, translate);
-                etxt = new ExtText(buttontype, state);
+                //etxt = new ExtText(buttontype, state);
+                etxt.Design = buttontype;
                 etxt.State = state;
                 etxt.TextDimensions = displayRectangle.Size;
                 etxt.HtmlText = tt;

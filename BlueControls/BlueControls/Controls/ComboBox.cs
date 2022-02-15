@@ -43,7 +43,11 @@ namespace BlueControls.Controls {
         private ExtText _eTxt2;
         private string _ImageCode = string.Empty;
 
-        //private string _Initialtext;
+        /// <summary>
+        /// Kümmert sich darum, wenn die ComboBox wie ein Button aussieht, dass immer
+        /// der Button-Text stehen bleibt und nicht der Ausgewählte
+        /// </summary>
+        private string _Initialtext;
 
         private string? _LastClickedText = null;
 
@@ -159,12 +163,13 @@ namespace BlueControls.Controls {
 
         protected override void DrawControl(Graphics gr, enStates state) {
             if (_DrawStyle != enComboboxStyle.TextBox) {
-                //if (string.IsNullOrEmpty(_Initialtext) && !string.IsNullOrEmpty(Text)) { _Initialtext = Text; }
+                if (string.IsNullOrEmpty(_Initialtext) && !string.IsNullOrEmpty(Text)) { _Initialtext = Text; }
+
                 if (_eTxt2 == null) {
                     _eTxt2 = new ExtText((enDesign)_DrawStyle, state);
                 }
 
-                Button.DrawButton(this, gr, (enDesign)_DrawStyle, state, QuickImage.Get(_ImageCode), enAlignment.Horizontal_Vertical_Center, true, _eTxt2, Text, DisplayRectangle, Translate);
+                Button.DrawButton(this, gr, (enDesign)_DrawStyle, state, QuickImage.Get(_ImageCode), enAlignment.Horizontal_Vertical_Center, true, _eTxt2, _Initialtext, DisplayRectangle, Translate);
                 btnDropDown.Invalidate();
                 return;
             }

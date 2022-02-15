@@ -41,7 +41,7 @@ namespace BlueDatabase {
         public readonly ListExt<string> PermissionGroups_ChangeCell = new();
         public readonly ListExt<string> Tags = new();
         public bool? TMP_AutoFilterSinnvoll = null;
-        public Bitmap TMP_CaptionBitmap;
+        public QuickImage TMP_CaptionBitmap;
         public SizeF TMP_CaptionText_Size = new(-1, -1);
         public int? TMP_ColumnContentWidth = null;
         public int? TMP_IfFilterRemoved = null;
@@ -1641,7 +1641,6 @@ namespace BlueDatabase {
                     _Caption = "Fehlerfrei";
                     _SpellCheckingEnabled = false;
                     _Format = enDataFormat.Text;
-                    _ScriptType = enScriptType.Bool;
                     //_AutoFilterErweitertErlaubt = false;
                     _AutoFilterJoker = string.Empty;
                     //_AutofilterTextFilterErlaubt = false;
@@ -1650,6 +1649,7 @@ namespace BlueDatabase {
                     _ScriptType = enScriptType.Nicht_vorhanden;
                     _Align = enAlignmentHorizontal.Zentriert;
                     DropDownItems.Clear();
+                    PermissionGroups_ChangeCell.Clear();
                     _TextBearbeitungErlaubt = false;
                     _DropdownBearbeitungErlaubt = false;
 

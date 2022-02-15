@@ -857,6 +857,28 @@ namespace BlueBasics {
             return l;
         }
 
+        public void CloneFromBitmap(Bitmap bmp) {
+            if (bmp == null) {
+                Width = -1;
+                Height = -1;
+                return;
+            }
+            try {
+                Width = bmp.Width;
+                Height = bmp.Height;
+                Bits = new int[Width * Height];
+                BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
+                _bitmap = new Bitmap(Width, Height, Width * 4, _pixelformat, BitsHandle.AddrOfPinnedObject());
+                using var gr = Graphics.FromImage(_bitmap);
+                gr.DrawImage(bmp, new Rectangle(0, 0, Width, Height));
+            } catch (Exception ex) {
+                Develop.DebugPrint(ex);
+                Width = -1;
+                Height = -1;
+                _bitmap = null;
+            }
+        }
+
         public BitmapExt Crop(Rectangle re) {
             BitmapExt newBMP = new(re.Width, re.Height);
             using (var GR = Graphics.FromImage(newBMP._bitmap)) {
@@ -963,28 +985,6 @@ namespace BlueBasics {
         public void Save(string name, ImageFormat imageFormat) => _bitmap.Save(name, imageFormat);
 
         public void SetPixel(int x, int y, Color colour) => Bits[x + (y * Width)] = colour.ToArgb();
-
-        protected void CloneFromBitmap(Bitmap bmp) {
-            if (bmp == null) {
-                Width = -1;
-                Height = -1;
-                return;
-            }
-            try {
-                Width = bmp.Width;
-                Height = bmp.Height;
-                Bits = new int[Width * Height];
-                BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
-                _bitmap = new Bitmap(Width, Height, Width * 4, _pixelformat, BitsHandle.AddrOfPinnedObject());
-                using var gr = Graphics.FromImage(_bitmap);
-                gr.DrawImage(bmp, new Rectangle(0, 0, Width, Height));
-            } catch (Exception ex) {
-                Develop.DebugPrint(ex);
-                Width = -1;
-                Height = -1;
-                _bitmap = null;
-            }
-        }
 
         protected void EmptyBitmap(int width, int height) {
             Width = width;
