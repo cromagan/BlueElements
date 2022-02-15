@@ -315,7 +315,7 @@ namespace BlueControls {
 
         public bool InsertChar(enASCIIKey ascii, int position) {
             if ((int)ascii < 13) { return false; }
-            var c = new ExtChar((char)ascii, Design, State, null, 5, enMarkState.None);
+            var c = new ExtCharASCII((char)ascii, Design, State, null, 5, enMarkState.None);
             Insert(position, c);
             return true;
         }
@@ -474,13 +474,13 @@ namespace BlueControls {
                             default:
                                 // Normales Zeichen
                                 Zeichen++;
-                                Chars.Add(new ExtChar(CH, _Design, _State, BF, Stufe, Markstate));
+                                Chars.Add(new ExtCharASCII(CH, _Design, _State, BF, Stufe, Markstate));
                                 break;
                         }
                     } else {
                         // Normales Zeichen
                         Zeichen++;
-                        Chars.Add(new ExtChar(CH, _Design, _State, BF, Stufe, Markstate));
+                        Chars.Add(new ExtCharASCII(CH, _Design, _State, BF, Stufe, Markstate));
                     }
                     Pos++;
                 } while (true);
@@ -652,81 +652,81 @@ namespace BlueControls {
             xPosition++;
             if (Endpos <= xStartPosx || Endpos > xStartPosx + 10) {
                 // Ein nicht konvertiertes &, einfach so übernehmen.
-                Chars.Add(new ExtChar('&', _Design, _State, f, Stufe, MarkState));
+                Chars.Add(new ExtCharASCII('&', _Design, _State, f, Stufe, MarkState));
                 return;
             }
             switch (xHTMLTextx.Substring(xStartPosx, Endpos - xStartPosx + 1)) {
                 case "&uuml;":
-                    Chars.Add(new ExtChar('ü', _Design, _State, f, Stufe, MarkState));
+                    Chars.Add(new ExtCharASCII('ü', _Design, _State, f, Stufe, MarkState));
                     break;
 
                 case "&auml;":
-                    Chars.Add(new ExtChar('ä', _Design, _State, f, Stufe, MarkState));
+                    Chars.Add(new ExtCharASCII('ä', _Design, _State, f, Stufe, MarkState));
                     break;
 
                 case "&ouml;":
-                    Chars.Add(new ExtChar('ö', _Design, _State, f, Stufe, MarkState));
+                    Chars.Add(new ExtCharASCII('ö', _Design, _State, f, Stufe, MarkState));
                     break;
 
                 case "&Uuml;":
-                    Chars.Add(new ExtChar('Ü', _Design, _State, f, Stufe, MarkState));
+                    Chars.Add(new ExtCharASCII('Ü', _Design, _State, f, Stufe, MarkState));
                     break;
 
                 case "&Auml;":
-                    Chars.Add(new ExtChar('Ä', _Design, _State, f, Stufe, MarkState));
+                    Chars.Add(new ExtCharASCII('Ä', _Design, _State, f, Stufe, MarkState));
                     break;
 
                 case "&Ouml;":
-                    Chars.Add(new ExtChar('Ö', _Design, _State, f, Stufe, MarkState));
+                    Chars.Add(new ExtCharASCII('Ö', _Design, _State, f, Stufe, MarkState));
                     break;
 
                 case "&szlig;":
-                    Chars.Add(new ExtChar('ß', _Design, _State, f, Stufe, MarkState));
+                    Chars.Add(new ExtCharASCII('ß', _Design, _State, f, Stufe, MarkState));
                     break;
 
                 case "&quot;":
-                    Chars.Add(new ExtChar('\"', _Design, _State, f, Stufe, MarkState));
+                    Chars.Add(new ExtCharASCII('\"', _Design, _State, f, Stufe, MarkState));
                     break;
 
                 case "&amp;":
-                    Chars.Add(new ExtChar('&', _Design, _State, f, Stufe, MarkState));
+                    Chars.Add(new ExtCharASCII('&', _Design, _State, f, Stufe, MarkState));
                     break;
 
                 case "&lt;":
-                    Chars.Add(new ExtChar('<', _Design, _State, f, Stufe, MarkState));
+                    Chars.Add(new ExtCharASCII('<', _Design, _State, f, Stufe, MarkState));
                     break;
 
                 case "&gt;":
-                    Chars.Add(new ExtChar('>', _Design, _State, f, Stufe, MarkState));
+                    Chars.Add(new ExtCharASCII('>', _Design, _State, f, Stufe, MarkState));
                     break;
 
                 case "&Oslash;":
-                    Chars.Add(new ExtChar('Ø', _Design, _State, f, Stufe, MarkState));
+                    Chars.Add(new ExtCharASCII('Ø', _Design, _State, f, Stufe, MarkState));
                     break;
 
                 case "&oslash;":
-                    Chars.Add(new ExtChar('ø', _Design, _State, f, Stufe, MarkState));
+                    Chars.Add(new ExtCharASCII('ø', _Design, _State, f, Stufe, MarkState));
                     break;
 
                 case "&bull;":
-                    Chars.Add(new ExtChar('•', _Design, _State, f, Stufe, MarkState));
+                    Chars.Add(new ExtCharASCII('•', _Design, _State, f, Stufe, MarkState));
                     break;
 
                 case "&eacute;":
-                    Chars.Add(new ExtChar('é', _Design, _State, f, Stufe, MarkState));
+                    Chars.Add(new ExtCharASCII('é', _Design, _State, f, Stufe, MarkState));
                     break;
 
                 case "&Eacute;":
-                    Chars.Add(new ExtChar('É', _Design, _State, f, Stufe, MarkState));
+                    Chars.Add(new ExtCharASCII('É', _Design, _State, f, Stufe, MarkState));
                     break;
 
                 case "&euro;":
-                    Chars.Add(new ExtChar('€', _Design, _State, f, Stufe, MarkState));
+                    Chars.Add(new ExtCharASCII('€', _Design, _State, f, Stufe, MarkState));
                     break;
 
                 default:
                     Develop.DebugPrint(enFehlerArt.Info, "Unbekannter Code: " + xHTMLTextx.Substring(xStartPosx, Endpos - xStartPosx + 1));
-                    Chars.Add(new ExtChar('&', _Design, _State, f, Stufe, MarkState));
+                    Chars.Add(new ExtCharASCII('&', _Design, _State, f, Stufe, MarkState));
                     return;
             }
             xStartPosx = Endpos;

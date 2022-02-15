@@ -22,7 +22,7 @@ using System.Drawing;
 
 namespace BlueControls {
 
-    public class ExtChar : ExtCharAbstract {
+    public class ExtCharASCII : ExtCharAbstract {
         //public const char StoreX = (char)5;
         //public const char Top = (char)4;
 
@@ -38,7 +38,7 @@ namespace BlueControls {
 
         #region Constructors
 
-        internal ExtChar(char charcode, enDesign design, enStates state, BlueFont font, int stufe, enMarkState markState) : base() {
+        internal ExtCharASCII(char charcode, enDesign design, enStates state, BlueFont font, int stufe, enMarkState markState) : base() {
             _Design = design;
             _Char = charcode;
             Font = font;

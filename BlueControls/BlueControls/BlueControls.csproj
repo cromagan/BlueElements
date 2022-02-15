@@ -353,7 +353,7 @@
     <Compile Include="Enums\enCheckBehavior.cs" />
     <Compile Include="Enums\enHintergrundArt.cs" />
     <Compile Include="Enums\enSteuerelementVerhalten.cs" />
-    <Compile Include="Extended Text\ExtChar.cs" />
+    <Compile Include="Extended Text\ExtCharASCII.cs" />
     <Compile Include="Extended Text\ExtText.cs" />
     <Compile Include="Skin.cs" />
     <Compile Include="Controls\ComboBox.cs">
