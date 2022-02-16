@@ -28,7 +28,7 @@ using System.Drawing;
 
 namespace BlueControls.ItemCollection {
 
-    public class ChildPadItem : FormPadItemRectangle, IMouseAndKeyHandle, ICanHaveColumnVariables {
+    public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveColumnVariables {
 
         #region Fields
 

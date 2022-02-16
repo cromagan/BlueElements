@@ -26,7 +26,7 @@ using static BlueBasics.Polygons;
 
 namespace BlueControls.ItemCollection {
 
-    public class SymbolPadItem : FormPadItemRectangle {
+    public class SymbolPadItem : RectanglePadItem {
 
         #region Constructors
 

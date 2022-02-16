@@ -32,7 +32,7 @@ using static BlueBasics.FileOperations;
 
 namespace BlueControls.ItemCollection {
 
-    public class BitmapPadItem : FormPadItemRectangle, ICanHaveColumnVariables {
+    public class BitmapPadItem : RectanglePadItem, ICanHaveColumnVariables {
 
         #region Fields
 

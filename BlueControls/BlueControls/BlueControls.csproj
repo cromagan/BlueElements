@@ -299,7 +299,9 @@
     <Compile Include="ItemCollection\clsPhysicPadItem.cs" />
     <Compile Include="ItemCollection\clsAbstractPhysicPadItem.cs" />
     <Compile Include="ItemCollection\DataListItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\FormPadItemRectangle.cs" />
+    <Compile Include="ItemCollection\ItemCollectionPad\ColumnPadItem.cs" />
+    <Compile Include="ItemCollection\ItemCollectionPad\FixedRectangleBitmapPadItem.cs" />
+    <Compile Include="ItemCollection\ItemCollectionPad\RectanglePadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\SymbolPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\Temporär\clsKraft.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\Temporär\strPolygonCollisionResult.cs" />

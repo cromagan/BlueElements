@@ -49,7 +49,7 @@ namespace BlueControls.ItemCollection {
 
         private ItemCollectionPad _Parent = null;
 
-        private PadStyles _Style = PadStyles.Undefiniert;
+        private PadStyles _Style = PadStyles.Style_Standard;
 
         private int _ZoomPadding = 0;
 

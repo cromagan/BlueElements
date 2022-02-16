@@ -158,13 +158,28 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void ShowOrder() {
             Pad.Item.Clear();
 
-            var X = 0;
+            var X = 0f;
 
             foreach (var thisc in CurrentArrangement) {
                 var it = new TextPadItem(thisc.Column.Name, thisc.Column.ReadableText());
+
+                var F = Skin.GetBlueFont(enDesign.Table_Cell, enStates.Standard);
+
+                //var wi = Table.tmpColumnContentWidth(null, thisc.Column);
+
                 it.SetCoordinates(new RectangleF(X, 0, 100, 100), true);
                 Pad.Item.Add(it);
+                X = it.UsedArea().Right;
             }
+
+            //TextPadItem b = new() {
+            //    Text = string.Empty,
+            //    Stil = PadStyles.Style_Standard
+            //};
+            //Pad.Item.Add(b);
+            //b.SetCoordinates(new RectangleF(10, 10, 200, 200), true);
+
+            Pad.ZoomFit();
         }
 
         private void TmpDatabase_ShouldICancelDiscOperations(object sender, System.ComponentModel.CancelEventArgs e) => e.Cancel = true;

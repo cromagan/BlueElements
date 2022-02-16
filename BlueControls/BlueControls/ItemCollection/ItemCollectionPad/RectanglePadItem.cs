@@ -27,7 +27,7 @@ using static BlueBasics.Extensions;
 
 namespace BlueControls.ItemCollection {
 
-    public abstract class FormPadItemRectangle : BasicPadItem {
+    public abstract class RectanglePadItem : BasicPadItem {
 
         #region Fields
 
@@ -45,7 +45,7 @@ namespace BlueControls.ItemCollection {
 
         #region Constructors
 
-        public FormPadItemRectangle(string internalname) : base(internalname) {
+        public RectanglePadItem(string internalname) : base(internalname) {
             p_LO = new PointM(this, "LO", 0, 0);
             p_RO = new PointM(this, "RO", 0, 0);
             p_RU = new PointM(this, "RU", 0, 0);

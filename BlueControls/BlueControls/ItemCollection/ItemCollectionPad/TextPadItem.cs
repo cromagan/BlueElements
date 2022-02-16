@@ -27,7 +27,7 @@ using System.Drawing;
 
 namespace BlueControls.ItemCollection {
 
-    public class TextPadItem : FormPadItemRectangle, ICanHaveColumnVariables {
+    public class TextPadItem : RectanglePadItem, ICanHaveColumnVariables {
 
         #region Fields
 
@@ -58,7 +58,6 @@ namespace BlueControls.ItemCollection {
         public TextPadItem(string internalname, string readableText) : base(internalname) {
             _text_replaced = readableText;
             _text_original = readableText;
-            Stil = PadStyles.Undefiniert;
             _ausrichtung = enAlignment.Top_Left;
             InvalidateText();
         }
