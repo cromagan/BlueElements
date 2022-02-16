@@ -180,7 +180,7 @@ namespace BlueControls.ItemCollection {
                 case "blueelements.clsitemimage":
                 case "blueelements.imageitem":
                 case "image":
-                    i = new BitmapPadItem();
+                    i = new BitmapPadItem(name);
                     break;
 
                 case "blueelements.clsdimensionitem":
@@ -194,7 +194,7 @@ namespace BlueControls.ItemCollection {
                 case "blueelements.clsitemline":
                 case "blueelements.itemline":
                 case "line":
-                    i = new LinePadItem();
+                    i = new LinePadItem(name);
                     break;
 
                 case "blueelements.clsitempad":
@@ -211,7 +211,7 @@ namespace BlueControls.ItemCollection {
 
                 case "blueelements.rowformulaitem":
                 case "row":
-                    i = new RowFormulaPadItem();
+                    i = new RowFormulaPadItem(name);
                     break;
 
                 case "symbol":

@@ -42,7 +42,7 @@ namespace BluePaint {
         #region Methods
 
         public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic) {
-            if (Razi.Checked) {
+            if (Razi.Checked && e.Current != null) {
                 e.FillCircle(ColorRedTransp, e.Current.TrimmedX, e.Current.TrimmedY, 3);
             }
             //e.FillRectangle(Brush_RedTransp, new Rectangle(e.Current.TrimmedX, e.Current.TrimmedY, 1, 1));

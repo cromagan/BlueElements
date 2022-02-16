@@ -2714,7 +2714,7 @@ namespace BlueControls.Controls {
             #region Spalten-Kopf-Bild erzeugen
 
             if (!string.IsNullOrEmpty(viewItem.Column.CaptionBitmap) && viewItem.Column.TMP_CaptionBitmap == null) {
-                viewItem.Column.TMP_CaptionBitmap = QuickImage.Get(viewItem.Column.CaptionBitmap);
+                viewItem.Column.TMP_CaptionBitmap = QuickImage.Get(viewItem.Column.CaptionBitmap + "|100");
             }
 
             #endregion

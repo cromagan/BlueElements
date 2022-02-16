@@ -43,7 +43,7 @@ namespace BlueControls.Controls {
 
         protected bool _allinitialized = false;
 
-        protected string _Caption;
+        protected string _Caption = string.Empty;
 
         protected enÜberschriftAnordnung _CaptionPosition = enÜberschriftAnordnung.ohne;
         protected string _disabledReason = string.Empty;

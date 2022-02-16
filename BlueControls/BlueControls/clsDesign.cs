@@ -25,7 +25,6 @@ public static class clsDesignExtensions {
 
     #region Methods
 
-    // Button.Design.Add(enStates.Standard, enKontur.Rechteck, 0, 0, 0, 0, enHintergrundArt.Solide, 0, "EAEAEA", "", "", enRahmenArt.Solide_1px, "B6B6B6", "", "", "{Name=Calibri, Size=10[K]15}", "");
     public static void Add(this Dictionary<enDesign, Dictionary<enStates, clsDesign>> dictControl, enDesign ds, enStates status, enKontur enKontur, int x1, int y1, int x2, int y2, enHintergrundArt hint, float verlauf, string bc1, string bc2, string bc3, enRahmenArt rahm, string boc1, string boc2, string boc3, string f, string pic) {
         Dictionary<enStates, clsDesign> dictState;
 
@@ -63,6 +62,12 @@ public static class clsDesignExtensions {
         des.Image = pic;
         des.Status = status;
         dictStats.Add(status, des);
+    }
+
+    public static void Remove(this Dictionary<enDesign, Dictionary<enStates, clsDesign>> dictControl, enDesign ds, enStates status) {
+        if (dictControl.TryGetValue(ds, out var existingDictOfControl)) {
+            existingDictOfControl.Remove(status);
+        }
     }
 
     #endregion

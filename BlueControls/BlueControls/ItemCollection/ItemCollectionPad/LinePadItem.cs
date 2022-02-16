@@ -41,7 +41,7 @@ namespace BlueControls.ItemCollection {
 
         #region Constructors
 
-        public LinePadItem() : this(string.Empty, PadStyles.Style_Standard, Point.Empty, Point.Empty) { }
+        public LinePadItem(string internalname) : this(internalname, PadStyles.Style_Standard, Point.Empty, Point.Empty) { }
 
         public LinePadItem(PadStyles format, Point point1, Point point2) : this(string.Empty, format, point1, point2) { }
 

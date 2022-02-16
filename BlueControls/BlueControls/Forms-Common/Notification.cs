@@ -36,7 +36,7 @@ namespace BlueControls.Forms {
             var Wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
             Size = new Size(Wi + (capTXT.Left * 2), He + (capTXT.Top * 2));
             Location = new Point(-Width - 10, Height - 10);
-            FloatInAndOutMilliSek = Math.Max(3200, text.Length * 110);
+            ScreenTime = Math.Max(3200, text.Length * 110);
 
             //Below müsste in Allboxes ja die letzte sein - außer sich selbst
             foreach (var thisParent in AllBoxes) {
@@ -52,9 +52,8 @@ namespace BlueControls.Forms {
 
         #region Properties
 
-        public int FloatInAndOutMilliSek { get; private set; } = -999;
-
         public Notification NoteBelow { get; private set; } = null;
+        public int ScreenTime { get; private set; } = -999;
 
         #endregion
 
@@ -196,7 +195,7 @@ namespace BlueControls.Forms {
                 x = new((string)e.Argument);
                 x.Show();
 
-                var lowestY = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - x.Height - Skin.Padding;
+                var lowestY = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - x.Height-1;// - Skin.Padding;
                 var pixelfromLower = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Bottom - lowestY;
                 x.Top = lowestY;
 
@@ -213,34 +212,34 @@ namespace BlueControls.Forms {
 
                     var hasBelow = false;
                     hiddenNow = false;
-                    var Speed = 250d; // Wegen Recheoperation
-                    var Left = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width - x.Width - (Skin.Padding * 2);
-                    var Top = x.Top;
+                    var SpeedIn = 250d; // Wegen Recheoperation
+                    var SpeedOut =100d; // Wegen Recheoperation
+                    var Left = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width - x.Width - 1;
+                    var Top = lowestY;
 
                     if (x.NoteBelow != null && AllBoxes.Contains(x.NoteBelow)) {
-                        Top = Math.Min(x.NoteBelow.Top - Skin.Padding - x.Height, lowestY);
+                        Top = Math.Min(x.NoteBelow.Top - x.Height-1, lowestY);
                         hasBelow = true;
-                    }
+                    } 
 
-                    if (MS < Speed) {
+                    if (MS < SpeedIn) {
                         // Kommt von Rechts reingeflogen
-                        x.Opacity = MS / Speed;
-                        Left = (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width - (x.Width - (Skin.Padding * 2)) * x.Opacity); // Opacity == Prozent
+                        x.Opacity = MS / SpeedIn;
+                        //Left = (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width - (x.Width - (Skin.Padding * 2)) * x.Opacity); // Opacity == Prozent
                         Top = Math.Min(Top, lowestY);
-                    } else if (x.Top >= System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height) {
+                    } else if (x.Top >= System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height || x.Opacity < 0.01) {
                         //Lebensdauer überschritten
                         hiddenNow = true;
-                    } else if (MS > x.FloatInAndOutMilliSek - Speed) {
+                    } else if (MS > x.ScreenTime - SpeedIn) {
                         // War lange genug da, darf wieder raus
                         if (!hasBelow) {
                             if (outime.Ticks == 0) { outime = DateTime.Now; }
 
                             var MSo = DateTime.Now.Subtract(outime).TotalMilliseconds;
 
-                            x.Opacity = 1 - MSo / Speed;
-                            Top = (int)(lowestY + pixelfromLower * (MSo / Speed)) + 1;
+                            x.Opacity = 1 - MSo / SpeedOut;
+                            //Top = (int)(lowestY + pixelfromLower * (MSo / SpeedOut)) + 1;
                             //Left = x.Left + (int)Math.Max(diff / 17, 1);
-                            //x.Opacity = x.Opacity * 0.96;
                         } else {
                             x.Opacity = 1;
                         }

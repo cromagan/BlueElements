@@ -43,7 +43,7 @@ namespace BlueControls.ItemCollection {
 
         #region Constructors
 
-        public BitmapPadItem() : this(string.Empty, null, Size.Empty) { }
+        public BitmapPadItem(string internalname) : this(internalname, null, Size.Empty) { }
 
         public BitmapPadItem(string internalname, string FileToLoad) : this(internalname, (Bitmap)BitmapExt.Image_FromFile(FileToLoad), Size.Empty) { }
 

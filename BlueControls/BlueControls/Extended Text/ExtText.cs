@@ -294,24 +294,20 @@ namespace BlueControls {
             while (_Width == null) { ReBreak(); }
             DrawStates(gr, zoom);
 
-            var lockMe = new object();
-            //var results = new List<string>();
-            //Parallel.ForEach(all, (thisP, state) => {
-            //    if (FileExists(thisP)) {
+            foreach (var t in this) {
+                if (t.IsVisible(zoom, DrawingPos, DrawingArea)) {
+                    t.Draw(gr, DrawingPos, zoom);
+                }
+            }
+
+            //var lockMe = new object();
+            //Parallel.ForEach(this, t => {
+            //    if (t.IsVisible(zoom, DrawingPos, DrawingArea)) {
             //        lock (lockMe) {
-            //            results.AddIfNotExists(thisP);
-            //            state.Break();
+            //            t.Draw(gr, DrawingPos, zoom);
             //        }
             //    }
             //});
-
-            Parallel.ForEach(this, t => {
-                if (t.IsVisible(zoom, DrawingPos, DrawingArea)) {
-                    lock (lockMe) {
-                        t.Draw(gr, DrawingPos, zoom);
-                    }
-                }
-            });
         }
 
         public int Height() {

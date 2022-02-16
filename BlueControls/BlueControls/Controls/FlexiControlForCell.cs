@@ -59,8 +59,7 @@ namespace BlueControls.Controls {
 
         #region Constructors
 
-        public FlexiControlForCell() : this(null, -1, enÜberschriftAnordnung.Über_dem_Feld) {
-        }
+        public FlexiControlForCell() : this(null, -1, enÜberschriftAnordnung.Über_dem_Feld) { }
 
         public FlexiControlForCell(Database database, long columnKey, enÜberschriftAnordnung captionPosition) : base() {
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -114,6 +113,9 @@ namespace BlueControls.Controls {
             }
         }
 
+        [Browsable(false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Database Database {
             get => _Database;
             set {
@@ -150,6 +152,9 @@ namespace BlueControls.Controls {
             }
         }
 
+        [Browsable(false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public long RowKey {
             get => _RowKey;
             set {
