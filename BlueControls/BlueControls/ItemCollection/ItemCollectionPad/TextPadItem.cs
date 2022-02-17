@@ -233,7 +233,7 @@ namespace BlueControls.ItemCollection {
                 //// muss etxt vorgegaukelt werden, daß der Drawberehich xxx% größer ist
                 //etxt.DrawingArea = new Rectangle((int)UsedArea().Left, (int)UsedArea().Top, (int)(UsedArea().Width / AdditionalScale / Parent.SheetStyleScale), -1);
                 //etxt.LineBreakWidth = etxt.DrawingArea.Width;
-                _txt.TextDimensions = new Size((int)(UsedArea().Width / Skalierung / Parent.SheetStyleScale), -1);
+                _txt.TextDimensions = new Size((int)(UsedArea.Width / Skalierung / Parent.SheetStyleScale), -1);
                 _txt.Ausrichtung = _ausrichtung;
             }
         }

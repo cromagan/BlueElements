@@ -40,10 +40,7 @@ namespace BlueControls.Forms {
             AllBoxes.Add(this);
         }
 
-        protected FloatingForm(System.Windows.Forms.Control connectedControl, enDesign design) : this(design) =>
-            // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
-            //InitializeComponent();
-            _ConnectedControl = connectedControl;
+        protected FloatingForm(System.Windows.Forms.Control connectedControl, enDesign design) : this(design) => _ConnectedControl = connectedControl;
 
         #endregion
 
@@ -72,8 +69,12 @@ namespace BlueControls.Forms {
         #region Methods
 
         public new void Close() {
-            AllBoxes.Remove(this);
-            base.Close();
+            try {
+                if (AllBoxes != null && AllBoxes.Contains(this)) { AllBoxes.Remove(this); }
+                base.Close();
+            } catch {
+                Close();
+            }
         }
 
         public void Position_CenterScreen(Point BestPosition) {

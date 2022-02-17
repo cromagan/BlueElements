@@ -637,7 +637,6 @@ namespace BlueControls.ItemCollection {
             base.OnItemAdded(item);
 
             IsSaved = false;
-            item.Changed += Item_Changed;
 
             OnDoInvalidate();
         }
@@ -648,7 +647,6 @@ namespace BlueControls.ItemCollection {
         }
 
         protected override void OnItemRemoving(BasicPadItem item) {
-            item.Changed -= Item_Changed;
             base.OnItemRemoving(item);
             OnDoInvalidate();
         }
@@ -687,11 +685,6 @@ namespace BlueControls.ItemCollection {
             OnDoInvalidate();
         }
 
-        private void Item_Changed(object sender, System.EventArgs e) {
-            IsSaved = false;
-            OnDoInvalidate();
-        }
-
         private RectangleF MaximumBounds(List<BasicPadItem> ZoomItems) {
             var x1 = float.MaxValue;
             var y1 = float.MaxValue;
@@ -710,7 +703,7 @@ namespace BlueControls.ItemCollection {
                     }
                 }
             }
-            return !Done ? new RectangleF() : new RectangleF(x1, y1, x2 - x1, y2 - y1);
+            return !Done ? RectangleF.Empty : new RectangleF(x1, y1, x2 - x1, y2 - y1);
         }
 
         private void ParseItems(string ToParse) {

@@ -193,7 +193,7 @@ namespace BlueDatabase {
 
             #region Ermitteln, ob mindestens eine Überschruft vorhanden ist (capName)
 
-            var capName = pinnedRows.Count > 0;
+            var capName = pinnedRows != null && pinnedRows.Count > 0;
             if (!capName) {
                 foreach (var thisRow in filteredRows) {
                     if (!thisRow.CellIsNullOrEmpty(thisRow.Database.Column.SysChapter)) {
@@ -208,17 +208,19 @@ namespace BlueDatabase {
             #region _Angepinnten Zeilen erstellen (_pinnedData)
 
             List<RowData> _pinnedData = new();
-            Parallel.ForEach(pinnedRows, thisRow => {
-                var rd = reUseMe.Get(thisRow, "Angepinnt") is RowData r ? r : new RowData(thisRow, "Angepinnt");
-                rd.AdditinalSort = "1";
-                rd.MarkYellow = true;
-                rd.AdditionalSort = rowSortDefinition == null ? thisRow.CompareKey(null) : thisRow.CompareKey(rowSortDefinition.Columns); ;
+            if (pinnedRows != null) {
+                Parallel.ForEach(pinnedRows, thisRow => {
+                    var rd = reUseMe.Get(thisRow, "Angepinnt") is RowData r ? r : new RowData(thisRow, "Angepinnt");
+                    rd.AdditinalSort = "1";
+                    rd.MarkYellow = true;
+                    rd.AdditionalSort = rowSortDefinition == null ? thisRow.CompareKey(null) : thisRow.CompareKey(rowSortDefinition.Columns); ;
 
-                lock (lockMe) {
-                    VisibleRowCount++;
-                    _pinnedData.Add(rd);
-                }
-            });
+                    lock (lockMe) {
+                        VisibleRowCount++;
+                        _pinnedData.Add(rd);
+                    }
+                });
+            }
 
             #endregion
 
@@ -228,7 +230,7 @@ namespace BlueDatabase {
             Parallel.ForEach(filteredRows, thisRow => {
                 var adk = rowSortDefinition == null ? thisRow.CompareKey(null) : thisRow.CompareKey(rowSortDefinition.Columns);
 
-                var MarkYellow = pinnedRows.Contains(thisRow);
+                var MarkYellow = pinnedRows != null && pinnedRows.Contains(thisRow);
                 var added = MarkYellow;
 
                 var caps = thisRow.CellGetList(thisRow.Database.Column.SysChapter);

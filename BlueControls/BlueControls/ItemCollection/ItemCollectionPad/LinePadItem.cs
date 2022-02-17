@@ -146,9 +146,9 @@ namespace BlueControls.ItemCollection {
         }
 
         protected override RectangleF CalculateUsedArea() {
-            if (Point1.X == 0d && Point2.X == 0d && Point1.Y == 0d && Point2.Y == 0d) { return new RectangleF(); }
+            if (Point1.X == 0d && Point2.X == 0d && Point1.Y == 0d && Point2.Y == 0d) { return RectangleF.Empty; }
             if (_TempPoints.Count == 0) { CalcTempPoints(); }
-            if (_TempPoints.Count == 0) { return new RectangleF(); }
+            if (_TempPoints.Count == 0) { return RectangleF.Empty; }
             var x1 = float.MaxValue;
             var y1 = float.MaxValue;
             var x2 = float.MinValue;
@@ -254,7 +254,7 @@ namespace BlueControls.ItemCollection {
             foreach (var ThisBasicItem in Parent) {
                 if (ThisBasicItem != null) {
                     if (ThisBasicItem is not LinePadItem) {
-                        var a = ThisBasicItem.UsedArea();
+                        var a = ThisBasicItem.UsedArea;
                         if (a.Width > 0 && a.Height > 0) {
                             a.Inflate(2, 2);
                             if (a.Contains(X, Y)) { return true; }
@@ -279,7 +279,7 @@ namespace BlueControls.ItemCollection {
         private bool SchneidetDas(BasicPadItem ThisBasicItem, PointM P1, PointM P2) {
             if (ThisBasicItem == null) { return false; }
             if (ThisBasicItem is not LinePadItem) {
-                var a = ThisBasicItem.UsedArea();
+                var a = ThisBasicItem.UsedArea;
                 if (a.Width > 0 && a.Height > 0) {
                     a.Inflate(2, 2);
 
@@ -363,7 +363,7 @@ namespace BlueControls.ItemCollection {
                 if (ThisItemBasic != null) {
                     //    If ThisBasicItem IsNot Object1 AndAlso ThisBasicItem IsNot Object2 Then
                     if (ThisItemBasic is not LinePadItem) {
-                        var a = ThisItemBasic.UsedArea();
+                        var a = ThisItemBasic.UsedArea;
                         if (a.Width > 0 && a.Height > 0) {
                             a.Inflate(2, 2);
                             var lo = a.PointOf(enAlignment.Top_Left);

@@ -42,9 +42,15 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection {
 
-    public class ColumnPadItem : BitmapPadItem {
+    public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
         #region Fields
+
+        public static BlueFont CellFont = Skin.GetBlueFont(enDesign.Table_Cell, enStates.Standard);
+
+        public static BlueFont Chapter_Font = Skin.GetBlueFont(enDesign.Table_Cell_Chapter, enStates.Standard);
+
+        public static BlueFont Column_Font = Skin.GetBlueFont(enDesign.Table_Column, enStates.Standard);
 
         public readonly ColumnItem Column;
 
@@ -52,11 +58,64 @@ namespace BlueControls.ItemCollection {
 
         #region Constructors
 
-        public ColumnPadItem(ColumnItem c) : base(c.Name) {
-            Column = c;
-            Bild_Modus = enSizeModes.Verzerren;
+        //public static BlueFont Column_Filter_Font = BlueFont.Get(Column_Font.FontName, Column_Font.FontSize, false, false, false, false, true, Color.White, Color.Red, false, false, false);
+        public ColumnPadItem(ColumnItem c) : base(c.Name) { Column = c; }
 
-            //Bitmap Bitmap { get; set; }
+        #endregion
+
+        #region Methods
+
+        public override string ToString() {
+            var t = base.ToString();
+            t = t.Substring(0, t.Length - 1) + ", ";
+            if (Column != null) {
+                t = t + "Database=" + Column.Database.Filename.ToNonCritical() + ", ";
+                t = t + "ColumnKey=" + Column.Key + ", ";
+                t = t + "ColumnName=" + Column.Name.ToNonCritical() + ", ";
+            }
+            return t.Trim(", ") + "}";
+        }
+
+        protected override string ClassId() => "Column";
+
+        protected override Bitmap GeneratePic() {
+            if (Column == null) {
+                return QuickImage.Get(enImageCode.Warnung, 128);
+            }
+
+            var wi = Table.tmpColumnContentWidth(null, Column, CellFont, 16);
+
+            var bmp = new Bitmap(Math.Max((int)(wi*0.7),30), 400);
+            var gr = Graphics.FromImage(bmp);
+
+            gr.Clear(Column.BackColor);
+            //gr.DrawString(Column.Caption, CellFont, )
+            //Table.Draw_FormatedText(gr,)
+
+            for (var z = 0; z < 3; z++) {
+                var N = Column.Ueberschrift(z);
+                if (!string.IsNullOrEmpty(N)) {
+                    Skin.Draw_FormatedText(gr, N, null, enAlignment.Horizontal_Vertical_Center, new Rectangle(0, z * 16, bmp.Width, 61), null, false, Column_Font, true);
+                }
+            }
+
+       
+            gr.TranslateTransform(bmp.Width / 2, 100);
+            gr.RotateTransform(-90);
+            Skin.Draw_FormatedText(gr, Column.Caption, null, enAlignment.VerticalCenter_Left, new Rectangle(-200, -200, 400, 400), null, false, Column_Font, true);
+
+            gr.TranslateTransform(-bmp.Width / 2, -100);
+            gr.ResetTransform();
+
+            gr.DrawLine(Pens.Black, 0, 310, bmp.Width, 310);
+
+            var r = Column.Database.Row.First();
+            if(r!= null) {
+                Table.Draw_FormatedText(gr, r.CellGetString(Column), Column, new Rectangle(0,310, bmp.Width, 90), enDesign.Table_Cell, enStates.Standard, BlueDatabase.Enums.enShortenStyle.Replaced, Column.BildTextVerhalten);
+            }
+
+
+            return bmp;
         }
 
         #endregion

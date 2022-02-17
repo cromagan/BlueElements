@@ -32,13 +32,20 @@ namespace BlueControls.ItemCollection {
         #region Fields
 
         protected PointM p_L;
+
+        /// <summary>
+        /// Dieser Punkt bestimmt die ganzen Koordinaten. Die anderen werden nur mitgeschleift
+        /// </summary>
         protected PointM p_LO;
+
         protected PointM p_LU;
         protected PointM p_O;
         protected PointM p_R;
         protected PointM p_RO;
         protected PointM p_RU;
         protected PointM p_U;
+
+        private Bitmap _GeneratedBitmap = null;
 
         #endregion
 
@@ -71,7 +78,13 @@ namespace BlueControls.ItemCollection {
 
         #region Properties
 
-        public Bitmap GeneratedBitmap { get; private set; }
+        public Bitmap GeneratedBitmap {
+            get {
+                if (_GeneratedBitmap != null) { return _GeneratedBitmap; }
+                _GeneratedBitmap = GeneratePic();
+                return _GeneratedBitmap;
+            }
+        }
 
         #endregion
 
@@ -116,23 +129,23 @@ namespace BlueControls.ItemCollection {
 
             if (point == p_LO) {
                 if (e.Y) {
+                    p_RU.Y = y + GeneratedBitmap.Height;
                     p_O.Y = y;
-                    p_RU.Y = p_LO.Y + GeneratedBitmap.Height;
                 }
                 if (e.X) {
+                    p_RU.X = x + GeneratedBitmap.Width;
                     p_L.X = x;
-                    p_RU.X = p_LO.X + GeneratedBitmap.Width;
                 }
             }
 
             if (point == p_RU) {
                 if (e.X) {
+                    p_LO.X = x - GeneratedBitmap.Width;
                     p_R.X = x;
-                    p_LO.X = p_RU.X - GeneratedBitmap.Width;
                 }
                 if (e.Y) {
+                    p_LO.Y = y - GeneratedBitmap.Height;
                     p_U.Y = y;
-                    p_LO.Y = p_RU.Y - GeneratedBitmap.Height;
                 }
             }
 
@@ -170,16 +183,20 @@ namespace BlueControls.ItemCollection {
         }
 
         public void RemovePic() {
-            if (GeneratedBitmap != null) { GeneratedBitmap.Dispose(); }
-            GeneratedBitmap = null;
+            if (_GeneratedBitmap != null) { _GeneratedBitmap.Dispose(); }
+            _GeneratedBitmap = null;
         }
 
-        public void SetCoordinates(RectangleF r) {
-            var vr = r.PointOf(enAlignment.Horizontal_Vertical_Center);
-            var ur = UsedArea();
-            p_LO.SetTo(vr.X - (ur.Width / 2), vr.Y - (ur.Height / 2));
-            p_RU.SetTo(p_LO.X + ur.Width, p_LO.Y + ur.Height);
+        public void SetLeftTopPoint(float x, float y) {
+            p_LO.SetTo(x,y);
         }
+
+        //    public void SetCoordinates(RectangleF r) {
+        //    var vr = r.PointOf(enAlignment.Horizontal_Vertical_Center);
+        //    var ur = UsedArea();
+        //    p_LO.SetTo(vr.X - (ur.Width / 2), vr.Y - (ur.Height / 2));
+        //    p_RU.SetTo(p_LO.X + ur.Width, p_LO.Y + ur.Height);
+        //}
 
         public virtual void SizeChanged() {
             // Punkte immer komplett setzen. Um eventuelle Parsing-Fehler auszugleichen
@@ -204,16 +221,19 @@ namespace BlueControls.ItemCollection {
         //    return t.Trim(", ") + "}";
         //}
 
-        protected override RectangleF CalculateUsedArea() => p_LO == null || p_RU == null ? new RectangleF()
-: new RectangleF(Math.Min(p_LO.X, p_RU.X), Math.Min(p_LO.Y, p_RU.Y), Math.Abs(p_RU.X - p_LO.X), Math.Abs(p_RU.Y - p_LO.Y));
+        protected override RectangleF CalculateUsedArea() {
+            var bmp = GeneratedBitmap;
+            if (bmp == null || p_LO == null) { return RectangleF.Empty; }
+            return new RectangleF(p_LO.X, p_LO.Y, bmp.Width, bmp.Height);
+        }
 
         protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
-            if (GeneratedBitmap == null) {
-                GeneratedBitmap = GeneratePic();
-            }
-            if (GeneratedBitmap != null) {
-                var scale = (float)Math.Min(drawingCoordinates.Width / GeneratedBitmap.Width, drawingCoordinates.Height / GeneratedBitmap.Height);
-                RectangleF r2 = new(drawingCoordinates.Left, drawingCoordinates.Top, GeneratedBitmap.Width * scale, GeneratedBitmap.Height * scale);
+            //if (GeneratedBitmap == null) {
+            //    GeneratedBitmap = GeneratePic();
+            //}
+            if (_GeneratedBitmap != null) {
+                //var scale = (float)Math.Min(drawingCoordinates.Width / _GeneratedBitmap.Width, drawingCoordinates.Height / _GeneratedBitmap.Height);
+                //RectangleF r2 = new(drawingCoordinates.Left, drawingCoordinates.Top, _GeneratedBitmap.Width * scale, _GeneratedBitmap.Height * scale);
                 if (forPrinting) {
                     gr.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
                     gr.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
@@ -221,7 +241,7 @@ namespace BlueControls.ItemCollection {
                     gr.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Low;
                     gr.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
                 }
-                gr.DrawImage(GeneratedBitmap, r2, new RectangleF(0, 0, GeneratedBitmap.Width, GeneratedBitmap.Height), GraphicsUnit.Pixel);
+                gr.DrawImage(_GeneratedBitmap, drawingCoordinates);
             }
             //    base.DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, state, sizeOfParentControl, forPrinting);
             //}
@@ -244,10 +264,8 @@ namespace BlueControls.ItemCollection {
 
         protected abstract Bitmap GeneratePic();
 
-        protected override void ParseFinished() { }
+        protected override void ParseFinished() => SizeChanged();
 
         #endregion
-
-        //protected override void ParseFinished() => SizeChanged();
     }
 }

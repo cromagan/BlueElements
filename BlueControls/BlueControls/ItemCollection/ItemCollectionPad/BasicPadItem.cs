@@ -51,9 +51,8 @@ namespace BlueControls.ItemCollection {
 
         private PadStyles _Style = PadStyles.Style_Standard;
 
+        private RectangleF _UsedArea = default;
         private int _ZoomPadding = 0;
-
-        private RectangleF tmpUsedArea = default;
 
         #endregion
 
@@ -124,6 +123,17 @@ namespace BlueControls.ItemCollection {
         /// </summary>
         /// <remarks></remarks>
         public List<string> Tags { get; } = new();
+
+        /// <summary>
+        /// Gibt den Bereich zurück, den das Element benötigt, um komplett dargestellt zu werden. Unabhängig von der aktuellen Ansicht.
+        /// </summary>
+        /// <remarks></remarks>
+        public RectangleF UsedArea {
+            get {
+                if (_UsedArea.IsEmpty) { _UsedArea = CalculateUsedArea(); }
+                return _UsedArea;
+            }
+        }
 
         public int ZoomPadding {
             get => _ZoomPadding;
@@ -245,7 +255,7 @@ namespace BlueControls.ItemCollection {
         /// </summary>
         /// <remarks></remarks>
         public virtual bool Contains(PointF value, float zoomfactor) {
-            var tmp = UsedArea(); // Umwandlung, um den Bezug zur Klasse zu zerstören
+            var tmp = UsedArea; // Umwandlung, um den Bezug zur Klasse zu zerstören
             var ne = (float)(-5 / zoomfactor) + 1;
             tmp.Inflate(ne, ne);
             return tmp.Contains(value);
@@ -256,7 +266,7 @@ namespace BlueControls.ItemCollection {
         public void Draw(Graphics gr, float zoom, float shiftX, float shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
             if (_Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent nicht definiert"); }
             if (forPrinting && !_Bei_Export_sichtbar) { return; }
-            var drawingCoordinates = UsedArea().ZoomAndMoveRect(zoom, shiftX, shiftY, false);
+            var drawingCoordinates = UsedArea.ZoomAndMoveRect(zoom, shiftX, shiftY, false);
             if (_Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent = null"); }
             if (!IsInDrawingArea(drawingCoordinates, sizeOfParentControl)) { return; }
             DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, state, sizeOfParentControl, forPrinting);
@@ -275,7 +285,7 @@ namespace BlueControls.ItemCollection {
         /// <param name="shiftX"></param>
         /// <param name="shiftY"></param>
         /// <param name="c"></param>
-        public void DrawOutline(Graphics gr, float zoom, float shiftX, float shiftY, Color c) => gr.DrawRectangle(new Pen(c), UsedArea().ZoomAndMoveRect(zoom, shiftX, shiftY, false));
+        public void DrawOutline(Graphics gr, float zoom, float shiftX, float shiftY, Color c) => gr.DrawRectangle(new Pen(c), UsedArea.ZoomAndMoveRect(zoom, shiftX, shiftY, false));
 
         public void EineEbeneNachHinten() {
             if (_Parent == null) { return; }
@@ -331,7 +341,7 @@ namespace BlueControls.ItemCollection {
         //}
         public void OnChanged() {
             //if (this is IParseable O && O.IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
-            tmpUsedArea = default;
+            _UsedArea = default;
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
@@ -440,20 +450,11 @@ namespace BlueControls.ItemCollection {
         }
 
         /// <summary>
-        /// Gibt den Bereich zurück, den das Element benötigt, um komplett dargestellt zu werden. Unabhängig von der aktuellen Ansicht.
-        /// </summary>
-        /// <remarks></remarks>
-        public RectangleF UsedArea() {
-            if (tmpUsedArea.IsEmpty) { tmpUsedArea = CalculateUsedArea(); }
-            return tmpUsedArea;
-        }
-
-        /// <summary>
         /// Gibt den Bereich zurück, den das Element benötigt, um komplett dargestellt zu werden. Unabhängig von der aktuellen Ansicht. Zusätzlich mit dem Wert aus Padding.
         /// </summary>
         /// <remarks></remarks>
         public RectangleF ZoomToArea() {
-            var x = UsedArea();
+            var x = UsedArea;
             if (_ZoomPadding == 0) { return x; }
             x.Inflate(-ZoomPadding, -ZoomPadding);
             return x;

@@ -167,7 +167,7 @@ namespace BlueControls.ItemCollection {
         public void SetCoordinates(RectangleF r, bool overrideFixedSize) {
             if (!overrideFixedSize) {
                 var vr = r.PointOf(enAlignment.Horizontal_Vertical_Center);
-                var ur = UsedArea();
+                var ur = UsedArea;
                 p_LO.SetTo(vr.X - (ur.Width / 2), vr.Y - (ur.Height / 2));
                 p_RU.SetTo(p_LO.X + ur.Width, p_LO.Y + ur.Height);
             } else {
@@ -191,7 +191,7 @@ namespace BlueControls.ItemCollection {
             return t.Trim(", ") + "}";
         }
 
-        protected override RectangleF CalculateUsedArea() => p_LO == null || p_RU == null ? new RectangleF()
+        protected override RectangleF CalculateUsedArea() => p_LO == null || p_RU == null ? RectangleF.Empty
 : new RectangleF(Math.Min(p_LO.X, p_RU.X), Math.Min(p_LO.Y, p_RU.Y), Math.Abs(p_RU.X - p_LO.X), Math.Abs(p_RU.Y - p_LO.Y));
 
         protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {

@@ -122,7 +122,7 @@ namespace BlueControls.ItemCollection {
 
         public bool MouseDown(object sender, System.Windows.Forms.MouseEventArgs e, float cZoom, float shiftX, float shiftY) {
             if (PadInternal == null || PadInternal.Item.Count == 0) { return false; }
-            var l1 = UsedArea().ZoomAndMoveRect(cZoom, shiftX, shiftY, false);
+            var l1 = UsedArea.ZoomAndMoveRect(cZoom, shiftX, shiftY, false);
             var l2 = PadInternal.Item.MaxBounds(ZoomItems);
             if (l1.Width <= 0 || l2.Height <= 0) { return false; }
             var tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height);
@@ -147,7 +147,7 @@ namespace BlueControls.ItemCollection {
 
         public bool MouseMove(object sender, System.Windows.Forms.MouseEventArgs e, float zoom, float shiftX, float shiftY) {
             if (PadInternal == null || PadInternal.Item.Count == 0) { return false; }
-            var l1 = UsedArea().ZoomAndMoveRect(zoom, shiftX, shiftY, false);
+            var l1 = UsedArea.ZoomAndMoveRect(zoom, shiftX, shiftY, false);
             var l2 = PadInternal.Item.MaxBounds(ZoomItems);
             if (l1.Width <= 0 || l2.Height <= 0) { return false; }
             float tZo = 1;
@@ -173,7 +173,7 @@ namespace BlueControls.ItemCollection {
 
         public bool MouseUp(object sender, System.Windows.Forms.MouseEventArgs e, float zoom, float shiftX, float shiftY) {
             if (PadInternal.Item.Count == 0) { return false; }
-            var l1 = UsedArea().ZoomAndMoveRect(zoom, shiftX, shiftY, false);
+            var l1 = UsedArea.ZoomAndMoveRect(zoom, shiftX, shiftY, false);
             var l2 = PadInternal.Item.MaxBounds(ZoomItems);
             if (l1.Width <= 0 || l2.Height <= 0) { return false; }
             var tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height);

@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
@@ -23,6 +24,7 @@ using BlueControls.Forms;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using static BlueBasics.Converter;
 
@@ -34,6 +36,8 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         public static Database Database = null;
 
+        public bool Generating = false;
+        public bool Sorting = false;
         private int Arrangement = -1;
 
         #endregion
@@ -155,31 +159,69 @@ namespace BlueControls.BlueDatabaseDialogs {
             ShowOrder();
         }
 
+        private void Pad_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
+            if (Generating || Sorting) { return; }
+            SortColumns();
+        }
+
         private void ShowOrder() {
+            if (Generating) { Develop.DebugPrint("Generating falsch!"); }
+
+            Generating = true;
             Pad.Item.Clear();
 
             var X = 0f;
 
             foreach (var thisc in CurrentArrangement) {
-                var it = new TextPadItem(thisc.Column.Name, thisc.Column.ReadableText());
-
-                var F = Skin.GetBlueFont(enDesign.Table_Cell, enStates.Standard);
-
-                //var wi = Table.tmpColumnContentWidth(null, thisc.Column);
-
-                it.SetCoordinates(new RectangleF(X, 0, 100, 100), true);
+                var it = new ColumnPadItem(thisc.Column);
                 Pad.Item.Add(it);
-                X = it.UsedArea().Right;
+                it.SetLeftTopPoint(X, 0);
+
+
+                if (thisc.Column.LinkedDatabase() != null) {
+                    if (thisc.Column.LinkedCell_ColumnKey >= 0) {
+                        var c2 = thisc.Column.LinkedDatabase().Column.SearchByKey(thisc.Column.LinkedCell_ColumnKey);
+                        var it2 = new ColumnPadItem(c2);
+                        Pad.Item.Add(it2);
+                        it2.SetLeftTopPoint(X, 600);
+                        //X = it.UsedArea.Right;
+                    }
+                }
+
+                X = it.UsedArea.Right;
             }
 
-            //TextPadItem b = new() {
-            //    Text = string.Empty,
-            //    Stil = PadStyles.Style_Standard
-            //};
-            //Pad.Item.Add(b);
-            //b.SetCoordinates(new RectangleF(10, 10, 200, 200), true);
-
+            SortColumns();
             Pad.ZoomFit();
+            Generating = false;
+        }
+
+        private void SortColumns() {
+            if (Sorting) { Develop.DebugPrint("Sorting falsch!"); }
+            Sorting = true;
+            var done = new List<BasicPadItem>();
+            FixedRectangleBitmapPadItem x;
+            var left = 0f;
+            do {
+                x = null;
+
+                foreach (var thisIt in Pad.Item) {
+                    if (!done.Contains(thisIt) && thisIt is ColumnPadItem fi)
+
+                        if (fi.Column.Database == Database) {
+                            if (x == null || thisIt.UsedArea.X < x.UsedArea.X) {
+                                x = fi;
+                            }
+                        }
+                }
+
+                if (x == null) { break; }
+                done.Add(x);
+                x.SetLeftTopPoint(left, 0);
+                left = x.UsedArea.Right;
+            } while (true);
+
+            Sorting = false;
         }
 
         private void TmpDatabase_ShouldICancelDiscOperations(object sender, System.ComponentModel.CancelEventArgs e) => e.Cancel = true;

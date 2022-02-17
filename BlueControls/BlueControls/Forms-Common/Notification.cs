@@ -195,7 +195,7 @@ namespace BlueControls.Forms {
                 x = new((string)e.Argument);
                 x.Show();
 
-                var lowestY = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - x.Height-1;// - Skin.Padding;
+                var lowestY = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - x.Height - 1;// - Skin.Padding;
                 var pixelfromLower = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Bottom - lowestY;
                 x.Top = lowestY;
 
@@ -213,14 +213,14 @@ namespace BlueControls.Forms {
                     var hasBelow = false;
                     hiddenNow = false;
                     var SpeedIn = 250d; // Wegen Recheoperation
-                    var SpeedOut =100d; // Wegen Recheoperation
+                    var SpeedOut = 100d; // Wegen Recheoperation
                     var Left = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width - x.Width - 1;
                     var Top = lowestY;
 
                     if (x.NoteBelow != null && AllBoxes.Contains(x.NoteBelow)) {
-                        Top = Math.Min(x.NoteBelow.Top - x.Height-1, lowestY);
+                        Top = Math.Min(x.NoteBelow.Top - x.Height - 1, lowestY);
                         hasBelow = true;
-                    } 
+                    }
 
                     if (MS < SpeedIn) {
                         // Kommt von Rechts reingeflogen
@@ -258,11 +258,14 @@ namespace BlueControls.Forms {
                         //x.Refresh();
                         Develop.DoEvents();
                     }
+
+                    if (_FirstTimer.Subtract(DateTime.Now).TotalMinutes > 2) { break; }
                 } while (!hiddenNow);
             } catch { }
 
             try {
                 x.Close();
+                x.Dispose();
             } catch { }
         }
 

@@ -457,7 +457,7 @@ namespace BlueControls.Controls {
                 }
             }
             if (_GivesMouseComandsTo is BasicPadItem PA) {
-                var drawingCoordinates = PA.UsedArea().ZoomAndMoveRect(_Zoom, _shiftX, _shiftY, false);
+                var drawingCoordinates = PA.UsedArea.ZoomAndMoveRect(_Zoom, _shiftX, _shiftY, false);
                 gr.DrawRectangle(new Pen(Brushes.Red, 3), drawingCoordinates);
             }
 
@@ -514,7 +514,7 @@ namespace BlueControls.Controls {
             HotItem = null;
             if (e != null) {
                 foreach (var ThisItem in l) {
-                    var a = (long)Math.Abs(ThisItem.UsedArea().Width) * (long)Math.Abs(ThisItem.UsedArea().Height);
+                    var a = (long)Math.Abs(ThisItem.UsedArea.Width) * (long)Math.Abs(ThisItem.UsedArea.Height);
                     if (a <= Mina) {
                         // Gleich deswegen, dass neuere, IDENTISCHE Items dass oberste gewählt wird.
                         Mina = a;

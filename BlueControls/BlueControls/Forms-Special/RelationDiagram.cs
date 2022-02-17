@@ -71,7 +71,7 @@ namespace BlueControls.Forms {
             RowFormulaPadItem i2 = new(Database, r.Key, layoutID);
             Pad.Item.Add(i2);
             //  Pad.Invalidate()
-            i2.SetCoordinates(new RectangleF(xPos, Ypos, i2.UsedArea().Width, i2.UsedArea().Height));
+            i2.SetLeftTopPoint(xPos, Ypos);
             i2.InDenVordergrund();
             //RelationsValid = false;
             return i2;
