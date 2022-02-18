@@ -31,6 +31,7 @@ namespace BlueControls.ItemCollection {
 
         #region Fields
 
+        public readonly List<FixedRectangleBitmapPadItem> ConnectsTo = new();
         protected PointM p_L;
 
         /// <summary>
@@ -188,7 +189,7 @@ namespace BlueControls.ItemCollection {
         }
 
         public void SetLeftTopPoint(float x, float y) {
-            p_LO.SetTo(x,y);
+            p_LO.SetTo(x, y);
         }
 
         //    public void SetCoordinates(RectangleF r) {
@@ -228,38 +229,59 @@ namespace BlueControls.ItemCollection {
         }
 
         protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
-            //if (GeneratedBitmap == null) {
-            //    GeneratedBitmap = GeneratePic();
-            //}
-            if (_GeneratedBitmap != null) {
-                //var scale = (float)Math.Min(drawingCoordinates.Width / _GeneratedBitmap.Width, drawingCoordinates.Height / _GeneratedBitmap.Height);
-                //RectangleF r2 = new(drawingCoordinates.Left, drawingCoordinates.Top, _GeneratedBitmap.Width * scale, _GeneratedBitmap.Height * scale);
-                if (forPrinting) {
-                    gr.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                    gr.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
-                } else {
-                    gr.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Low;
-                    gr.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
-                }
-                gr.DrawImage(_GeneratedBitmap, drawingCoordinates);
-            }
-            //    base.DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, state, sizeOfParentControl, forPrinting);
-            //}
 
-            //protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
+            #region Bild zeichnen
+
             try {
-                if (!forPrinting) {
-                    if (zoom > 1) {
-                        gr.DrawRectangle(new Pen(Color.Gray, (float)zoom), drawingCoordinates);
+                if (_GeneratedBitmap != null) {
+                    if (forPrinting) {
+                        gr.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                        gr.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
                     } else {
-                        gr.DrawRectangle(ZoomPad.PenGray, drawingCoordinates);
+                        gr.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Low;
+                        gr.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
                     }
+                    gr.DrawImage(_GeneratedBitmap, drawingCoordinates);
+                }
+            } catch { }
+
+            #endregion
+
+            var Line = 1f;
+            if (zoom > 1) { Line = zoom; }
+
+            #region Umrandung Zeichnen
+
+            try {
+                if (!forPrinting || _GeneratedBitmap == null) {
+                    gr.DrawRectangle(new Pen(Color.Gray, zoom), drawingCoordinates);
+
                     if (drawingCoordinates.Width < 1 || drawingCoordinates.Height < 1) {
                         gr.DrawEllipse(new Pen(Color.Gray, 3), drawingCoordinates.Left - 5, drawingCoordinates.Top + 5, 10, 10);
                         gr.DrawLine(ZoomPad.PenGray, drawingCoordinates.PointOf(enAlignment.Top_Left), drawingCoordinates.PointOf(enAlignment.Bottom_Right));
                     }
                 }
             } catch { }
+
+            #endregion
+
+            #region Verknüpfte Pfeile Zeichnen
+
+            foreach (var thisV in ConnectsTo) {
+                if (Parent.Contains(thisV) && thisV != null && thisV != this) {
+                    var m1 = UsedArea.PointOf(enAlignment.Horizontal_Vertical_Center);
+                    var m2 = thisV.UsedArea.PointOf(enAlignment.Horizontal_Vertical_Center);
+
+                    var t2 = UsedArea.NearestLineMiddle(m2).ZoomAndMove(zoom, shiftX, shiftY);
+                    var t1 = thisV.UsedArea.NearestLineMiddle(m1).ZoomAndMove(zoom, shiftX, shiftY);
+
+                    if (Geometry.GetLenght(t1, t2) > 1) {
+                        gr.DrawLine(new Pen(Color.Gray, zoom), t1, t2);
+                    }
+                }
+            }
+
+            #endregion
         }
 
         protected abstract Bitmap GeneratePic();

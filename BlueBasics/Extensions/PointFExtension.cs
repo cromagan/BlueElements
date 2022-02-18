@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace BlueBasics {
@@ -25,8 +26,24 @@ namespace BlueBasics {
 
         #region Methods
 
-        public static bool PointInRect(this PointF p, double x1, double y1, double x2, double y2, float toleranz) {
-            RectangleF r = new((float)Math.Min(x1, x2), (float)Math.Min(y1, y2), (float)Math.Abs(x1 - x2), (float)Math.Abs(y1 - y2));
+        public static PointF NearestPoint(this PointF p, List<PointF> pl) {
+            if (pl == null || pl.Count == 0) { return PointF.Empty; }
+            var minl = float.MaxValue;
+            var rp = PointF.Empty;
+
+            foreach (var thisP in pl) {
+                var l = Geometry.GetLenght(p, thisP);
+                if (l < minl) {
+                    minl = l;
+                    rp = thisP;
+                }
+            }
+
+            return rp;
+        }
+
+        public static bool PointInRect(this PointF p, float x1, float y1, float x2, float y2, float toleranz) {
+            RectangleF r = new(Math.Min(x1, x2), Math.Min(y1, y2), Math.Abs(x1 - x2), Math.Abs(y1 - y2));
             r.Inflate(toleranz, toleranz);
             return r.Contains(p);
         }

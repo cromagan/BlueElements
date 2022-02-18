@@ -40,9 +40,9 @@ namespace BlueControls.Forms {
             if (itemsOriginal.Appearance != enBlueListBoxAppearance.Listbox) {
                 Develop.DebugPrint("Design nicht Listbox");
             }
-            var itemsClone = (ItemCollectionList)itemsOriginal.Clone();
-            txbText.Item.CheckBehavior = itemsClone.CheckBehavior;
-            txbText.Item.AddRange(itemsClone);
+            //var itemsClone = (ItemCollectionList)itemsOriginal.Clone();
+            txbText.Item.CheckBehavior = itemsOriginal.CheckBehavior;
+            txbText.Item.AddClonesFrom(itemsOriginal);
             txbText.MoveAllowed = false;
             txbText.RemoveAllowed = false;
             txbText.AddAllowed = addNewAllowed;

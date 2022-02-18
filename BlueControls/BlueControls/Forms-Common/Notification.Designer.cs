@@ -50,6 +50,8 @@ namespace BlueControls.Forms
             this.Name = "Notification";
             this.ResumeLayout(false);
         }
+
+
         #endregion
 
         private Controls.Caption capTXT;

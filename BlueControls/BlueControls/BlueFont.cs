@@ -246,10 +246,10 @@ namespace BlueControls {
             //}
         }
 
-        public Font Font(double zoom) {
+        public Font Font(float zoom) {
             if (Math.Abs(zoom - 1) < 0.001d && SizeOK(_Font.Size)) { return _Font; }
 
-            var emSize = _FontOL.Size * (float)zoom / Skin.Scale;
+            var emSize = _FontOL.Size * zoom / Skin.Scale;
             return SizeOK(emSize) ? new Font(FontName, emSize, _Font.Style, _Font.Unit)
                                   : new Font("Arial", emSize, _Font.Style, _Font.Unit);
         }
@@ -281,8 +281,6 @@ namespace BlueControls {
         public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 
         public Pen Pen(float zoom) => Math.Abs(zoom - 1) < 0.001 ? _Pen : GeneratePen(zoom);
-
-        public Pen Pen(double zoom) => Math.Abs(zoom - 1) < 0.001d ? _Pen : GeneratePen((float)zoom);
 
         public string ReadableText() {
             var t = FontName + ", " + FontSize + " pt, ";

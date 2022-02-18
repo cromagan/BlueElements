@@ -198,7 +198,7 @@ namespace BlueControls.ItemCollection {
             try {
                 if (!forPrinting) {
                     if (zoom > 1) {
-                        gr.DrawRectangle(new Pen(Color.Gray, (float)zoom), drawingCoordinates);
+                        gr.DrawRectangle(new Pen(Color.Gray, zoom), drawingCoordinates);
                     } else {
                         gr.DrawRectangle(ZoomPad.PenGray, drawingCoordinates);
                     }

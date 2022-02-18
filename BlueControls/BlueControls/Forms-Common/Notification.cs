@@ -25,6 +25,12 @@ namespace BlueControls.Forms {
 
     public partial class Notification : FloatingForm {
 
+        #region Fields
+
+        private bool UserClicked = false;
+
+        #endregion
+
         #region Constructors
 
         // Startzeit für UnloadAfterSek
@@ -259,18 +265,18 @@ namespace BlueControls.Forms {
                         Develop.DoEvents();
                     }
 
-                    if (_FirstTimer.Subtract(DateTime.Now).TotalMinutes > 2) { break; }
+                    if (_FirstTimer.Subtract(DateTime.Now).TotalMinutes > 2 || x.UserClicked) { break; }
                 } while (!hiddenNow);
             } catch { }
 
             try {
-                x.Close();
-                x.Dispose();
+                if (x != null && !x.IsDisposed) {
+                    x.Close();
+                    x.Dispose();
+                }
             } catch { }
         }
 
         #endregion
-
-        //private void capTXT_Click(object sender, System.EventArgs e) => FadeOut();
     }
 }

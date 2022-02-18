@@ -183,6 +183,7 @@ namespace BlueControls.ItemCollection {
                             }
                         }
                     }
+                    //l = l.SortedDistinctList(); // Sind nur die Keys....
                     if (l.Count == 0) {
                         Notification.Show("Keine Spalten gefunden, die<br>mit '" + column.LinkedKeyKennung + "' beginnen.", enImageCode.Information);
                     }

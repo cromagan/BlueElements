@@ -315,8 +315,8 @@ namespace BlueControls.ItemCollection {
                                 tmpG.DrawRectangle(p, DC2);
                                 if (Pad.Textlage != (enAlignment)(-1)) {
                                     var s = tmpG.MeasureString(Pad.Name, font);
-                                    tmpG.FillRectangle(Brushes.White, new RectangleF((float)DC2.Left, (float)(DC2.Top - s.Height - (9f * (float)zoom)), s.Width, s.Height));
-                                    BlueFont.DrawString(tmpG, Pad.Name, font, new SolidBrush(Pad.Randfarbe), (float)DC2.Left, (float)(DC2.Top - s.Height - (9f * (float)zoom)));
+                                    tmpG.FillRectangle(Brushes.White, new RectangleF((float)DC2.Left, (float)(DC2.Top - s.Height - (9f * zoom)), s.Width, s.Height));
+                                    BlueFont.DrawString(tmpG, Pad.Name, font, new SolidBrush(Pad.Randfarbe), (float)DC2.Left, (float)(DC2.Top - s.Height - (9f * zoom)));
                                 }
                             }
                         }
@@ -334,7 +334,7 @@ namespace BlueControls.ItemCollection {
                     };
                     gr.DrawRectangle(p, drawingCoordinates);
                     var s = gr.MeasureString(Name, font);
-                    BlueFont.DrawString(gr, Name, font, new SolidBrush(Randfarbe), (float)drawingCoordinates.Left, (float)(drawingCoordinates.Top - s.Height - (9f * (float)zoom)));
+                    BlueFont.DrawString(gr, Name, font, new SolidBrush(Randfarbe), (float)drawingCoordinates.Left, (float)(drawingCoordinates.Top - s.Height - (9f * zoom)));
                 }
             } catch {
             }

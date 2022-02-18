@@ -90,10 +90,14 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        protected override string GetCompareKey() =>
+        protected override string GetCompareKey() {
             // Die hauptklasse frägt nach diesem Kompare-Key
-            //    var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, enShortenStyle.HTML, true); // Muss Kompakt sein, um Suffixe zu vermeiden
-            Internal.CompareKey(_StyleLikeThis.SortType) + "|" + Internal;
+            //var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, enShortenStyle.HTML, true); // Muss Kompakt sein, um Suffixe zu vermeiden
+            var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, enShortenStyle.HTML, _bildTextverhalten, true);
+
+            return txt.CompareKey(_StyleLikeThis.SortType) + "|" + Internal;
+            //Internal.CompareKey(_StyleLikeThis.SortType) + "|" + Internal;
+        }
 
         #endregion
     }

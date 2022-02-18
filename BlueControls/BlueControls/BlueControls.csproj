@@ -299,6 +299,7 @@
     <Compile Include="ItemCollection\clsPhysicPadItem.cs" />
     <Compile Include="ItemCollection\clsAbstractPhysicPadItem.cs" />
     <Compile Include="ItemCollection\DataListItem.cs" />
+    <Compile Include="ItemCollection\ItemCollectionPad\GenericConnectebilePadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\ColumnPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FixedRectangleBitmapPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\RectanglePadItem.cs" />

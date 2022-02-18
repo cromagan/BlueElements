@@ -34,8 +34,8 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         #region Fields
 
-        public static Database Database = null;
-
+        public readonly List<String> AllDatabases = new();
+        public readonly Database Database = null;
         public bool Generating = false;
         public bool Sorting = false;
         private int Arrangement = -1;
@@ -46,6 +46,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         public frmColumnArrangementPadEditor(Database database) : this() {
             Database = database;
+            AllDatabases.Add(Database.Filename);
             Database.ShouldICancelSaveOperations += TmpDatabase_ShouldICancelDiscOperations;
             Arrangement = 1;
             UpdateCombobox();
@@ -170,26 +171,87 @@ namespace BlueControls.BlueDatabaseDialogs {
             Generating = true;
             Pad.Item.Clear();
 
-            var X = 0f;
+            #region Erst alle Spalten der eigenen Datenbank erzeugen, um später verweisen zu können
 
+            var X = 0f;
             foreach (var thisc in CurrentArrangement) {
                 var it = new ColumnPadItem(thisc.Column);
                 Pad.Item.Add(it);
                 it.SetLeftTopPoint(X, 0);
+                X = it.UsedArea.Right;
+            }
 
+            #endregion
+
+            #region beim Zweiten Durchlauf nun die Verknüpfungen erstellen
+
+            foreach (var thisc in CurrentArrangement) {
+                var it = (ColumnPadItem)Pad.Item[thisc.Column.Name];
+
+                #region LinkedDatabes-Items erzeugen
 
                 if (thisc.Column.LinkedDatabase() != null) {
                     if (thisc.Column.LinkedCell_ColumnKey >= 0) {
+
+                        #region Database-Item databItem erzeugen
+
+                        // String als Namen als eindeutige Kennung
+                        var dbN = thisc.Column.LinkedDatabase().Filename + "|" + thisc.Column.LinkedCell_RowKey;
+
+                        // aufnehmen, wichtig um die Koorinaten zu merken
+                        AllDatabases.AddIfNotExists(dbN);
+
+                        ///Das Datenbank-Item suchen oder neu erzeugen
+                        var databItem = (GenericConnectebilePadItem)Pad.Item[dbN];
+                        if (databItem == null) {
+                            databItem = new GenericConnectebilePadItem(dbN, thisc.Column.LinkedDatabase().Filename.FileNameWithSuffix(), new Size(300, 30));
+                            Pad.Item.Add(databItem);
+                            databItem.SetLeftTopPoint(0f, AllDatabases.IndexOf(dbN) * 600);
+                        }
+
+                        #endregion
+
+                        #region Key aus eigener Datenbank zur Verknüpften Datenbank zeigen lassen
+
+                        // Wenn der Key-Wert aus der Spalte geholt wird (nicht vom Skript gesteuert)....
+                        if (thisc.Column.LinkedCell_RowKey >= 0) {
+                            ///...Die Spalte ermitteln...
+                            var rkcol = thisc.Column.Database.Column.SearchByKey(thisc.Column.LinkedCell_RowKey);
+
+                            if (rkcol != null) {
+                                //... das dazugehörige Item ermitteln ...
+                                var rkcolit = (ColumnPadItem)Pad.Item[rkcol.Name];
+
+                                //...und auf die Datenbank zeigen lassen, wenn diese existiert
+                                if (rkcolit != null) {
+                                    rkcolit.ConnectsTo.AddIfNotExists(databItem);
+                                }
+                            }
+                        }
+
+                        #endregion
+
+                        #region Dann die Spalte erzeugen, aus der der der Wert kommt
+
                         var c2 = thisc.Column.LinkedDatabase().Column.SearchByKey(thisc.Column.LinkedCell_ColumnKey);
                         var it2 = new ColumnPadItem(c2);
                         Pad.Item.Add(it2);
-                        it2.SetLeftTopPoint(X, 600);
-                        //X = it.UsedArea.Right;
+                        it2.SetLeftTopPoint(it.UsedArea.Left, 650);
+                        it2.ConnectsTo.Add(it);
+
+                        // und noch die Datenbank  auf die Spalte zeigen lassem
+                        if (databItem != null) {
+                            databItem.ConnectsTo.AddIfNotExists(it2);
+                        }
+
+                        #endregion
                     }
                 }
 
-                X = it.UsedArea.Right;
+                #endregion
             }
+
+            #endregion
 
             SortColumns();
             Pad.ZoomFit();
