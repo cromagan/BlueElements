@@ -32,9 +32,13 @@ namespace BlueControls.ItemCollection {
         #region Fields
 
         internal PointM Point1;
+
         internal PointM Point2;
+
         private DateTime _LastRecalc = DateTime.Now.AddHours(-1);
+
         private List<PointF> _TempPoints;
+
         private string CalcTempPoints_Code = string.Empty;
 
         #endregion
@@ -66,19 +70,6 @@ namespace BlueControls.ItemCollection {
 
         #endregion
 
-        //public LinePadItem(string vInternal, PadStyles vFormat, enConectorStyle vArt, PointM cPoint1, PointM cPoint2)
-        //{
-        //    _Internal = vInternal;
-        //    Point1.SetTo(cPoint1);
-        //    Point2.SetTo(cPoint2);
-        //    Style = vFormat;
-        //    Art = vArt;
-        //    if (string.IsNullOrEmpty(_Internal))
-        //    {
-        //        Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben.");
-        //    }
-        //}
-
         #region Methods
 
         public override bool Contains(PointF value, float zoomfactor) {
@@ -92,6 +83,18 @@ namespace BlueControls.ItemCollection {
             return false;
         }
 
+        //public LinePadItem(string vInternal, PadStyles vFormat, enConectorStyle vArt, PointM cPoint1, PointM cPoint2)
+        //{
+        //    _Internal = vInternal;
+        //    Point1.SetTo(cPoint1);
+        //    Point2.SetTo(cPoint2);
+        //    Style = vFormat;
+        //    Art = vArt;
+        //    if (string.IsNullOrEmpty(_Internal))
+        //    {
+        //        Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben.");
+        //    }
+        //}
         public override List<FlexiControl> GetStyleOptions() {
             List<FlexiControl> l = new();
             ItemCollectionList Verhalt = new()
@@ -165,7 +168,7 @@ namespace BlueControls.ItemCollection {
 
         protected override string ClassId() => "LINE";
 
-        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
+        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, bool forPrinting) {
             if (Stil == PadStyles.Undefiniert) { return; }
             CalcTempPoints();
             if (_TempPoints.Count == 0) { return; }

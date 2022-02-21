@@ -53,6 +53,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // Pad
             // 
             this.Pad.Size = new System.Drawing.Size(428, 340);
+            this.Pad.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Pad_MouseDown);
             this.Pad.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Pad_MouseUp);
             // 
             // Ribbon

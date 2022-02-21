@@ -144,7 +144,7 @@ namespace BlueBasics {
         }
 
         /// <summary>
-        ///  Leert nur die Objekte. Sonstige Einstellungen und die ID bleiben erhalten
+        ///  Leert nur die Objekte. Sonstige Einstellungen bleiben erhalten. Für jedes Item wird 'ItemRemoving' ausgelöst. Die Items selbst bleiben unberührt.
         /// </summary>
         public new void Clear() {
             if (Count == 0) { return; }
@@ -155,6 +155,9 @@ namespace BlueBasics {
             OnItemRemoved();
         }
 
+        /// <summary>
+        ///  Die Items selbst bleiben unberührt. Es wird kein 'ItemRemoving' ausgelöst. Dazu sollte vorher Clear benutzt werden.
+        /// </summary>
         public void Dispose() {
             // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
             Dispose(disposing: true);

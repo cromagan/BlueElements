@@ -91,12 +91,13 @@ namespace BlueDatabase {
         /// <summary>
         /// Die Quell-Spalte (aus der verlinkten Datenbank) ist immer
         /// </summary>
-        private long _LinkedCell_ColumnKey;
+        private long _LinkedCell_ColumnKeyOfLinkedDatabase;
 
         /// <summary>
-        /// Die zu suchende Zeile ist in dieser Spalte zu finden
+        /// Die zu suchende Zeile ist in dieser Spalte zu finden.
+        /// Ist der Wrt -9999 wird die Verknüpfung über das Script gesetzt.
         /// </summary>
-        private long _LinkedCell_RowKey;
+        private long _LinkedCell_RowKeyIsInColumn;
 
         private string _LinkedDatabaseFile;
         private string _LinkedKeyKennung;
@@ -152,8 +153,8 @@ namespace BlueDatabase {
             _ForeColor = Color.Black;
             _BackColor = Color.White;
             _CellInitValue = string.Empty;
-            _LinkedCell_RowKey = -1;
-            _LinkedCell_ColumnKey = -1;
+            _LinkedCell_RowKeyIsInColumn = -1;
+            _LinkedCell_ColumnKeyOfLinkedDatabase = -1;
             _SortType = enSortierTyp.Original_String;
             //_ZellenZusammenfassen = false;
             _DropDownKey = -1;
@@ -585,21 +586,28 @@ namespace BlueDatabase {
             }
         }
 
-        public long LinkedCell_ColumnKey {
-            get => _LinkedCell_ColumnKey;
+        /// <summary>
+        /// Die Quell-Spalte (aus der verlinkten Datenbank) ist immer
+        /// </summary>
+        public long LinkedCell_ColumnKeyOfLinkedDatabase {
+            get => _LinkedCell_ColumnKeyOfLinkedDatabase;
             set {
-                if (_LinkedCell_ColumnKey == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_LinkedCell_ColumnKey, this, _LinkedCell_ColumnKey.ToString(), value.ToString(), true);
+                if (_LinkedCell_ColumnKeyOfLinkedDatabase == value) { return; }
+                Database.AddPending(enDatabaseDataType.co_LinkedCell_ColumnKeyOfLinkedDatabase, this, _LinkedCell_ColumnKeyOfLinkedDatabase.ToString(), value.ToString(), true);
                 Invalidate_ColumAndContent();
                 OnChanged();
             }
         }
 
-        public long LinkedCell_RowKey {
-            get => _LinkedCell_RowKey;
+        /// <summary>
+        /// Die zu suchende Zeile ist in dieser Spalte zu finden.
+        /// Ist der Wrt -9999 wird die Verknüpfung über das Script gesetzt.
+        /// </summary>
+        public long LinkedCell_RowKeyIsInColumn {
+            get => _LinkedCell_RowKeyIsInColumn;
             set {
-                if (_LinkedCell_RowKey == value) { return; }
-                Database.AddPending(enDatabaseDataType.co_LinkedCell_RowKey, this, _LinkedCell_RowKey.ToString(), value.ToString(), true);
+                if (_LinkedCell_RowKeyIsInColumn == value) { return; }
+                Database.AddPending(enDatabaseDataType.co_LinkedCell_RowKeyIsInColumn, this, _LinkedCell_RowKeyIsInColumn.ToString(), value.ToString(), true);
                 Invalidate_ColumAndContent();
                 OnChanged();
             }
@@ -1018,8 +1026,8 @@ namespace BlueDatabase {
             CellInitValue = source.CellInitValue;
             AutoFilterJoker = source.AutoFilterJoker;
             KeyColumnKey = source.KeyColumnKey;
-            LinkedCell_RowKey = source.LinkedCell_RowKey;
-            LinkedCell_ColumnKey = source.LinkedCell_ColumnKey;
+            LinkedCell_RowKeyIsInColumn = source.LinkedCell_RowKeyIsInColumn;
+            LinkedCell_ColumnKeyOfLinkedDatabase = source.LinkedCell_ColumnKeyOfLinkedDatabase;
             DropdownKey = source.DropdownKey;
             VorschlagsColumn = source.VorschlagsColumn;
             Align = source.Align;
@@ -1141,10 +1149,10 @@ namespace BlueDatabase {
                     if (!string.IsNullOrEmpty(_CellInitValue)) { return "Dieses Format kann keinen Initial-Text haben."; }
                     if (_KeyColumnKey > -1) { return "Dieses Format darf keine Verknüpfung zu einer Schlüsselspalte haben."; }
                     if (IsFirst()) { return "Dieses Format ist bei der ersten (intern) erste Spalte nicht erlaubt."; }
-                    if (_LinkedCell_RowKey is < 0 and not (-9999)) { return "Die Angabe der Spalte, aus der der Schlüsselwert geholt wird, fehlt."; }
+                    if (_LinkedCell_RowKeyIsInColumn is < 0 and not (-9999)) { return "Die Angabe der Spalte, aus der der Schlüsselwert geholt wird, fehlt."; }
                     if (_VorschlagsColumn > 0) { return "Dieses Format kann keine Vorschlags-Spalte haben."; }
-                    if (_LinkedCell_RowKey >= 0) {
-                        var c = LinkedDatabase().Column.SearchByKey(_LinkedCell_ColumnKey);
+                    if (_LinkedCell_RowKeyIsInColumn >= 0) {
+                        var c = LinkedDatabase().Column.SearchByKey(_LinkedCell_ColumnKeyOfLinkedDatabase);
                         if (c == null) { return "Die verknüpfte Spalte existiert nicht."; }
                         //this.GetStyleFrom(c);
                         //BildTextVerhalten = c.BildTextVerhalten;
@@ -1249,8 +1257,8 @@ namespace BlueDatabase {
                 if (_KeyColumnKey > -1) { return "Die (intern) erste Spalte darf keine Verknüpfung zu einer andern Schlüsselspalte haben."; }
             }
             if (_Format != enDataFormat.LinkedCell) {
-                if (_LinkedCell_RowKey > -1) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
-                if (_LinkedCell_ColumnKey > -1) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
+                if (_LinkedCell_RowKeyIsInColumn > -1) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
+                if (_LinkedCell_ColumnKeyOfLinkedDatabase > -1) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
             }
             return string.Empty;
         }
@@ -1534,8 +1542,8 @@ namespace BlueDatabase {
                     }
                 }
 
-                if (_Format == enDataFormat.LinkedCell && _LinkedCell_RowKey >= 0) {
-                    var c = LinkedDatabase().Column.SearchByKey(_LinkedCell_ColumnKey);
+                if (_Format == enDataFormat.LinkedCell && _LinkedCell_RowKeyIsInColumn >= 0) {
+                    var c = LinkedDatabase().Column.SearchByKey(_LinkedCell_ColumnKeyOfLinkedDatabase);
                     if (c != null) {
                         this.GetStyleFrom(c);
                         BildTextVerhalten = c.BildTextVerhalten;
@@ -1979,7 +1987,6 @@ namespace BlueDatabase {
     enDataFormat.FarbeInteger => QuickImage.Get(enImageCode.Pinsel, 16),
     enDataFormat.LinkedCell => QuickImage.Get(enImageCode.Fernglas, 16),
     enDataFormat.Columns_für_LinkedCellDropdown => QuickImage.Get(enImageCode.Fernglas, 16, "FF0000", ""),
-    enDataFormat.Values_für_LinkedCellDropdown => QuickImage.Get(enImageCode.Fernglas, 16, "00FF00", ""),
     enDataFormat.Button => QuickImage.Get(enImageCode.Kugel, 16),
     _ => _Format.TextboxEditPossible()
     ? _MultiLine ? QuickImage.Get(enImageCode.Textfeld, 16, "FF0000", "") : QuickImage.Get(enImageCode.Textfeld)
@@ -2028,14 +2035,14 @@ namespace BlueDatabase {
                     //    EditType_To_Check != enEditTypeFormula.nur_als_Text_anzeigen) { return false; }
                     if (Database.IsParsing) { return true; }
 
-                    var skriptgesteuert = LinkedCell_RowKey == -9999;
+                    var skriptgesteuert = LinkedCell_RowKeyIsInColumn == -9999;
                     if (skriptgesteuert) {
                         return editType_To_Check is enEditTypeFormula.Textfeld or enEditTypeFormula.nur_als_Text_anzeigen;
                     }
 
                     if (LinkedDatabase() == null) { return false; }
-                    if (_LinkedCell_ColumnKey < 0) { return false; }
-                    var col = LinkedDatabase().Column.SearchByKey(_LinkedCell_ColumnKey);
+                    if (_LinkedCell_ColumnKeyOfLinkedDatabase < 0) { return false; }
+                    var col = LinkedDatabase().Column.SearchByKey(_LinkedCell_ColumnKeyOfLinkedDatabase);
                     if (col == null) { return false; }
                     return col.UserEditDialogTypeInFormula(editType_To_Check);
 
@@ -2114,7 +2121,7 @@ namespace BlueDatabase {
             I_Am_A_Key_For_Other_Column = string.Empty;
             foreach (var ThisColumn in Database.Column) {
                 if (ThisColumn.KeyColumnKey == Key) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; } // Werte Gleichhalten
-                if (ThisColumn.LinkedCell_RowKey == Key) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
+                if (ThisColumn.LinkedCell_RowKeyIsInColumn == Key) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
                 //if (ThisColumn.LinkedCell_ColumnValueFoundIn == Key) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
             }
             if (_Format == enDataFormat.Columns_für_LinkedCellDropdown) { I_Am_A_Key_For_Other_Column = "Die Spalte selbst durch das Format"; }
@@ -2387,12 +2394,12 @@ namespace BlueDatabase {
                     _KeyColumnKey = long.Parse(Wert);
                     break;
 
-                case enDatabaseDataType.co_LinkedCell_RowKey:
-                    _LinkedCell_RowKey = long.Parse(Wert);
+                case enDatabaseDataType.co_LinkedCell_RowKeyIsInColumn:
+                    _LinkedCell_RowKeyIsInColumn = long.Parse(Wert);
                     break;
 
-                case enDatabaseDataType.co_LinkedCell_ColumnKey:
-                    _LinkedCell_ColumnKey = long.Parse(Wert);
+                case enDatabaseDataType.co_LinkedCell_ColumnKeyOfLinkedDatabase:
+                    _LinkedCell_ColumnKeyOfLinkedDatabase = long.Parse(Wert);
                     break;
 
                 //case enDatabaseDataType.co_LinkedCell_ColumnValueFoundIn:
@@ -2498,8 +2505,8 @@ namespace BlueDatabase {
             Database.SaveToByteList(l, enDatabaseDataType.co_ScriptType, ((int)_ScriptType).ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_Prefix, _Prefix, Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_KeyColumnKey, _KeyColumnKey.ToString(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_RowKey, _LinkedCell_RowKey.ToString(), Key);
-            Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_ColumnKey, _LinkedCell_ColumnKey.ToString(), Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_RowKeyIsInColumn, _LinkedCell_RowKeyIsInColumn.ToString(), Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_ColumnKeyOfLinkedDatabase, _LinkedCell_ColumnKeyOfLinkedDatabase.ToString(), Key);
             //Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_ColumnValueFoundIn, _LinkedCell_ColumnValueFoundIn.ToString(), Key);
             //Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCell_ColumnValueAdd, _LinkedCell_ColumnValueAdd, Key);
             //Database.SaveToByteList(l, enDatabaseDataType.co_ZellenZusammenfassen, _ZellenZusammenfassen.ToPlusMinus(), Key);

@@ -33,6 +33,7 @@ namespace BlueControls.ItemCollection {
         #region Fields
 
         private readonly PointM _Bezugslinie1 = new(null, "Bezugslinie 1, Ende der Hilfslinie", 0, 0);
+
         private readonly PointM _Bezugslinie2 = new(null, "Bezugslinie 2, Ende der Hilfslinien", 0, 0);
 
         /// <summary>
@@ -46,6 +47,7 @@ namespace BlueControls.ItemCollection {
         private readonly PointM _Point2 = new(null, "Punkt 2", 0, 0);
 
         private readonly PointM _SchnittPunkt1 = new(null, "Schnittpunkt 1, Zeigt der Pfeil hin", 0, 0);
+
         private readonly PointM _SchnittPunkt2 = new(null, "Schnittpunkt 2, Zeigt der Pfeil hin", 0, 0);
 
         /// <summary>
@@ -54,7 +56,9 @@ namespace BlueControls.ItemCollection {
         private readonly PointM _TextPoint = new(null, "Mitte Text", 0, 0);
 
         private float _Länge;
+
         private string _text_oben = string.Empty;
+
         private float _Winkel;
 
         #endregion
@@ -105,6 +109,7 @@ namespace BlueControls.ItemCollection {
         #region Properties
 
         public float Länge_in_MM => (float)Math.Round(Converter.PixelToMM(_Länge, ItemCollectionPad.DPI), Nachkommastellen);
+
         public int Nachkommastellen { get; set; } = 1;
 
         public string Präfix { get; set; } = string.Empty;
@@ -250,7 +255,7 @@ namespace BlueControls.ItemCollection {
 
         protected override string ClassId() => "DIMENSION";
 
-        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
+        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, bool forPrinting) {
             if (Stil == PadStyles.Undefiniert) { return; }
             var geszoom = Parent.SheetStyleScale * Skalierung * zoom;
             var f = Skin.GetBlueFont(Stil, Parent.SheetStyle);

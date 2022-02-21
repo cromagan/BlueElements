@@ -34,10 +34,12 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         #region Fields
 
-        public readonly List<String> AllDatabases = new();
         public readonly Database Database = null;
+
         public bool Generating = false;
+
         public bool Sorting = false;
+
         private int Arrangement = -1;
 
         #endregion
@@ -46,7 +48,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         public frmColumnArrangementPadEditor(Database database) : this() {
             Database = database;
-            AllDatabases.Add(Database.Filename);
+            //AllDatabases.Add(Database.Filename);
             Database.ShouldICancelSaveOperations += TmpDatabase_ShouldICancelDiscOperations;
             Arrangement = 1;
             UpdateCombobox();
@@ -160,6 +162,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             ShowOrder();
         }
 
+        private void Pad_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e) {
+            if (Generating || Sorting) { return; }
+        }
+
         private void Pad_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
             if (Generating || Sorting) { return; }
             SortColumns();
@@ -183,70 +189,87 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             #endregion
 
-            #region beim Zweiten Durchlauf nun die Verknüpfungen erstellen
+            #region Im zweiten Durchlauf ermitteln, welche Verknüpfungen es gibt
 
-            foreach (var thisc in CurrentArrangement) {
-                var it = (ColumnPadItem)Pad.Item[thisc.Column.Name];
+            var verkn = new List<string>();
+            foreach (var thisc in Database.Column) {
+                if (thisc.LinkedDatabase() != null) {
+                    var dbN = thisc.LinkedDatabase().Filename + "|" + thisc.LinkedCell_RowKeyIsInColumn;
+                    verkn.AddIfNotExists(dbN);
+                }
+            }
 
-                #region LinkedDatabes-Items erzeugen
+            #endregion
 
-                if (thisc.Column.LinkedDatabase() != null) {
-                    if (thisc.Column.LinkedCell_ColumnKey >= 0) {
+            #region Im dritten Durchlauf nun die Verknüpfungen erstellen
 
-                        #region Database-Item databItem erzeugen
+            var kx = 0f;
+            foreach (var thiscode in verkn) {
+                foreach (var thisc in CurrentArrangement) {
+                    var it = (ColumnPadItem)Pad.Item[thisc.Column.Name];
 
+                    if (thisc.Column.LinkedDatabase() != null) {
                         // String als Namen als eindeutige Kennung
-                        var dbN = thisc.Column.LinkedDatabase().Filename + "|" + thisc.Column.LinkedCell_RowKey;
+                        var dbN = thisc.Column.LinkedDatabase().Filename + "|" + thisc.Column.LinkedCell_RowKeyIsInColumn;
 
-                        // aufnehmen, wichtig um die Koorinaten zu merken
-                        AllDatabases.AddIfNotExists(dbN);
+                        if (dbN == thiscode) {
 
-                        ///Das Datenbank-Item suchen oder neu erzeugen
-                        var databItem = (GenericConnectebilePadItem)Pad.Item[dbN];
-                        if (databItem == null) {
-                            databItem = new GenericConnectebilePadItem(dbN, thisc.Column.LinkedDatabase().Filename.FileNameWithSuffix(), new Size(300, 30));
-                            Pad.Item.Add(databItem);
-                            databItem.SetLeftTopPoint(0f, AllDatabases.IndexOf(dbN) * 600);
-                        }
+                            #region Database-Item 'databItem' erzeugen
 
-                        #endregion
+                            var databItem = (GenericConnectebilePadItem)Pad.Item[dbN];
+                            if (databItem == null) {
+                                var nam = thisc.Column.LinkedDatabase().Filename.FileNameWithSuffix();
+                                if (thisc.Column.LinkedCell_RowKeyIsInColumn == -9999) { nam += "\r\nSKRIPT"; }
+                                databItem = new GenericConnectebilePadItem(dbN, nam, new Size(100, 300));
+                                Pad.Item.Add(databItem);
+                                databItem.SetLeftTopPoint(Math.Max(kx, it.UsedArea.Left), 600);
+                                kx = databItem.UsedArea.Right;
+                            }
 
-                        #region Key aus eigener Datenbank zur Verknüpften Datenbank zeigen lassen
+                            #endregion
 
-                        // Wenn der Key-Wert aus der Spalte geholt wird (nicht vom Skript gesteuert)....
-                        if (thisc.Column.LinkedCell_RowKey >= 0) {
-                            ///...Die Spalte ermitteln...
-                            var rkcol = thisc.Column.Database.Column.SearchByKey(thisc.Column.LinkedCell_RowKey);
+                            #region LinkedDatabase-Items erzeugen
 
-                            if (rkcol != null) {
-                                //... das dazugehörige Item ermitteln ...
-                                var rkcolit = (ColumnPadItem)Pad.Item[rkcol.Name];
+                            #region Key aus eigener Datenbank zur Verknüpften Datenbank zeigen lassen
 
-                                //...und auf die Datenbank zeigen lassen, wenn diese existiert
-                                if (rkcolit != null) {
-                                    rkcolit.ConnectsTo.AddIfNotExists(databItem);
+                            // Wenn der Key-Wert aus der Spalte geholt wird (nicht vom Skript gesteuert)....
+                            if (thisc.Column.LinkedCell_RowKeyIsInColumn >= 0) {
+                                ///...Die Spalte ermitteln...
+                                var rkcol = thisc.Column.Database.Column.SearchByKey(thisc.Column.LinkedCell_RowKeyIsInColumn);
+
+                                if (rkcol != null) {
+                                    //... das dazugehörige Item ermitteln ...
+                                    var rkcolit = (ColumnPadItem)Pad.Item[rkcol.Name];
+
+                                    //...und auf die Datenbank zeigen lassen, wenn diese existiert
+                                    if (rkcolit != null) {
+                                        rkcolit.ConnectsTo.AddIfNotExists(new clsConnection(databItem, enConnectionType.Bottom, enConnectionType.Top));
+                                    }
                                 }
                             }
-                        }
 
-                        #endregion
+                            #endregion
 
-                        #region Dann die Spalte erzeugen, aus der der der Wert kommt
+                            #region Dann die Spalte erzeugen, aus der der der Wert kommt
 
-                        var c2 = thisc.Column.LinkedDatabase().Column.SearchByKey(thisc.Column.LinkedCell_ColumnKey);
-                        var it2 = new ColumnPadItem(c2);
-                        Pad.Item.Add(it2);
-                        it2.SetLeftTopPoint(it.UsedArea.Left, 650);
-                        it2.ConnectsTo.Add(it);
+                            var c2 = thisc.Column.LinkedDatabase().Column.SearchByKey(thisc.Column.LinkedCell_ColumnKeyOfLinkedDatabase);
+                            var it2 = new ColumnPadItem(c2);
+                            Pad.Item.Add(it2);
+                            it2.SetLeftTopPoint(kx, 600);
+                            it2.ConnectsTo.Add(new clsConnection(it, enConnectionType.Left, enConnectionType.Right));
+                            kx = it2.UsedArea.Right;
 
-                        // und noch die Datenbank  auf die Spalte zeigen lassem
-                        if (databItem != null) {
-                            databItem.ConnectsTo.AddIfNotExists(it2);
+                            // und noch die Datenbank  auf die Spalte zeigen lassem
+                            if (databItem != null) {
+                                databItem.ConnectsTo.AddIfNotExists(new clsConnection(it, enConnectionType.Bottom, enConnectionType.Top));
+                            }
                         }
 
                         #endregion
                     }
                 }
+
+                kx += 30;
 
                 #endregion
             }

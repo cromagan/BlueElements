@@ -148,6 +148,7 @@
     </Compile>
     <Compile Include="Designer Support\TextBoxActionList.cs" />
     <Compile Include="Designer Support\TextBoxDesigner.cs" />
+    <Compile Include="Enums\enConnectionType.cs" />
     <Compile Include="Enums\enSnapMode.cs" />
     <Compile Include="Enums\enDesign.cs" />
     <Compile Include="Enums\enFilterTypesToShow.cs" />
@@ -296,12 +297,13 @@
       <DependentUpon>Notification.cs</DependentUpon>
     </Compile>
     <Compile Include="Interfaces\ILastSavedBy.cs" />
+    <Compile Include="ItemCollection\clsConnection.cs" />
     <Compile Include="ItemCollection\clsPhysicPadItem.cs" />
     <Compile Include="ItemCollection\clsAbstractPhysicPadItem.cs" />
     <Compile Include="ItemCollection\DataListItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\GenericConnectebilePadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\ColumnPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\FixedRectangleBitmapPadItem.cs" />
+    <Compile Include="ItemCollection\ItemCollectionPad\FixedConnectibleRectangleBitmapPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\RectanglePadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\SymbolPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\Temporär\clsKraft.cs" />

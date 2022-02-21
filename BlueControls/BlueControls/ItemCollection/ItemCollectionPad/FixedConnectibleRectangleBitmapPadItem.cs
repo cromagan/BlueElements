@@ -27,11 +27,12 @@ using static BlueBasics.Extensions;
 
 namespace BlueControls.ItemCollection {
 
-    public abstract class FixedRectangleBitmapPadItem : BasicPadItem {
+    public abstract class FixedRectangleBitmapPadItem : BasicPadItem, IDisposable {
 
         #region Fields
 
-        public readonly List<FixedRectangleBitmapPadItem> ConnectsTo = new();
+        public readonly ListExt<clsConnection> ConnectsTo = new();
+
         protected PointM p_L;
 
         /// <summary>
@@ -40,13 +41,19 @@ namespace BlueControls.ItemCollection {
         protected PointM p_LO;
 
         protected PointM p_LU;
+
         protected PointM p_O;
+
         protected PointM p_R;
+
         protected PointM p_RO;
+
         protected PointM p_RU;
+
         protected PointM p_U;
 
         private Bitmap _GeneratedBitmap = null;
+        private bool disposedValue;
 
         #endregion
 
@@ -71,6 +78,9 @@ namespace BlueControls.ItemCollection {
             MovablePoint.Add(p_O);
             PointsForSuccesfullyMove.Add(p_LO);
 
+            ConnectsTo.ItemAdded += ConnectsTo_ItemAdded;
+            ConnectsTo.ItemRemoving += ConnectsTo_ItemRemoving;
+
             RemovePic();
             //GeneratePic(true);
         }
@@ -89,32 +99,13 @@ namespace BlueControls.ItemCollection {
 
         #endregion
 
-        //public override List<FlexiControl> GetStyleOptions() {
-        //    List<FlexiControl> l = new()
-        //    {
-        //        new FlexiControl(),
-        //        //new FlexiControlForProperty(this, "Drehwinkel"),
-        //        //new FlexiControlForProperty(this, "Größe_fixiert")
-        //    };
-        //    l.AddRange(base.GetStyleOptions());
-        //    return l;
-        //}
-
-        //public override bool ParseThis(string tag, string value) {
-        //    if (base.ParseThis(tag, value)) { return true; }
-        //    switch (tag) {
-        //        case "fixsize": // TODO: Entfernt am 24.05.2021
-        //            //_größe_fixiert = value.FromPlusMinus();
-        //            return true;
-
-        //        case "rotation":
-        //            _drehwinkel = int.Parse(value);
-        //            return true;
-        //    }
-        //    return false;
-        //}
-
         #region Methods
+
+        public void Dispose() {
+            // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
 
         public override void PointMoved(object sender, MoveEventArgs e) {
             base.PointMoved(sender, e);
@@ -183,21 +174,26 @@ namespace BlueControls.ItemCollection {
             SizeChanged();
         }
 
+        //        case "rotation":
+        //            _drehwinkel = int.Parse(value);
+        //            return true;
+        //    }
+        //    return false;
+        //}
         public void RemovePic() {
             if (_GeneratedBitmap != null) { _GeneratedBitmap.Dispose(); }
             _GeneratedBitmap = null;
         }
 
+        //public override bool ParseThis(string tag, string value) {
+        //    if (base.ParseThis(tag, value)) { return true; }
+        //    switch (tag) {
+        //        case "fixsize": // TODO: Entfernt am 24.05.2021
+        //            //_größe_fixiert = value.FromPlusMinus();
+        //            return true;
         public void SetLeftTopPoint(float x, float y) {
             p_LO.SetTo(x, y);
         }
-
-        //    public void SetCoordinates(RectangleF r) {
-        //    var vr = r.PointOf(enAlignment.Horizontal_Vertical_Center);
-        //    var ur = UsedArea();
-        //    p_LO.SetTo(vr.X - (ur.Width / 2), vr.Y - (ur.Height / 2));
-        //    p_RU.SetTo(p_LO.X + ur.Width, p_LO.Y + ur.Height);
-        //}
 
         public virtual void SizeChanged() {
             // Punkte immer komplett setzen. Um eventuelle Parsing-Fehler auszugleichen
@@ -207,13 +203,36 @@ namespace BlueControls.ItemCollection {
             p_O.SetTo(p_LO.X + ((p_RO.X - p_LO.X) / 2), p_RO.Y);
         }
 
-        //public virtual void SizeChanged() {
-        //    // Punkte immer komplett setzen. Um eventuelle Parsing-Fehler auszugleichen
-        //    p_L.SetTo(p_LO.X, p_LO.Y + ((p_LU.Y - p_LO.Y) / 2));
-        //    p_R.SetTo(p_RO.X, p_LO.Y + ((p_LU.Y - p_LO.Y) / 2));
-        //    p_U.SetTo(p_LO.X + ((p_RO.X - p_LO.X) / 2), p_RU.Y);
-        //    p_O.SetTo(p_LO.X + ((p_RO.X - p_LO.X) / 2), p_RO.Y);
-        //}
+        protected override RectangleF CalculateUsedArea() {
+            var bmp = GeneratedBitmap;
+            if (bmp == null || p_LO == null) { return RectangleF.Empty; }
+            var r = new RectangleF(p_LO.X, p_LO.Y, bmp.Width, bmp.Height);
+
+            if (ConnectsTo == null) { return r; }
+
+            foreach (var thisc in ConnectsTo) {
+                if (thisc.Item != null && !thisc.Item.UsedArea.IsEmpty) {
+                    r = RectangleF.Union(r, thisc.Item.UsedArea);
+                }
+            }
+            return r;
+        }
+
+        protected virtual void Dispose(bool disposing) {
+            if (!disposedValue) {
+                if (disposing) {
+                    // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
+                    ConnectsTo.ItemAdded -= ConnectsTo_ItemAdded;
+                    ConnectsTo.Clear();
+                    ConnectsTo.ItemRemoving -= ConnectsTo_ItemRemoving;
+                }
+                RemovePic();
+
+                // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
+                // TODO: Große Felder auf NULL setzen
+                disposedValue = true;
+            }
+        }
 
         //public override string ToString() {
         //    var t = base.ToString();
@@ -221,14 +240,7 @@ namespace BlueControls.ItemCollection {
         //    if (Drehwinkel != 0) { t = t + "Rotation=" + Drehwinkel + ", "; }
         //    return t.Trim(", ") + "}";
         //}
-
-        protected override RectangleF CalculateUsedArea() {
-            var bmp = GeneratedBitmap;
-            if (bmp == null || p_LO == null) { return RectangleF.Empty; }
-            return new RectangleF(p_LO.X, p_LO.Y, bmp.Width, bmp.Height);
-        }
-
-        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
+        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, bool forPrinting) {
 
             #region Bild zeichnen
 
@@ -254,7 +266,7 @@ namespace BlueControls.ItemCollection {
 
             try {
                 if (!forPrinting || _GeneratedBitmap == null) {
-                    gr.DrawRectangle(new Pen(Color.Gray, zoom), drawingCoordinates);
+                    gr.DrawRectangle(new Pen(Color.Gray, Line), drawingCoordinates);
 
                     if (drawingCoordinates.Width < 1 || drawingCoordinates.Height < 1) {
                         gr.DrawEllipse(new Pen(Color.Gray, 3), drawingCoordinates.Left - 5, drawingCoordinates.Top + 5, 10, 10);
@@ -268,15 +280,15 @@ namespace BlueControls.ItemCollection {
             #region Verknüpfte Pfeile Zeichnen
 
             foreach (var thisV in ConnectsTo) {
-                if (Parent.Contains(thisV) && thisV != null && thisV != this) {
+                if (Parent.Contains(thisV.Item) && thisV != null && thisV.Item != this) {
                     var m1 = UsedArea.PointOf(enAlignment.Horizontal_Vertical_Center);
-                    var m2 = thisV.UsedArea.PointOf(enAlignment.Horizontal_Vertical_Center);
+                    var m2 = thisV.Item.UsedArea.PointOf(enAlignment.Horizontal_Vertical_Center);
 
                     var t2 = UsedArea.NearestLineMiddle(m2).ZoomAndMove(zoom, shiftX, shiftY);
-                    var t1 = thisV.UsedArea.NearestLineMiddle(m1).ZoomAndMove(zoom, shiftX, shiftY);
+                    var t1 = thisV.Item.UsedArea.NearestLineMiddle(m1).ZoomAndMove(zoom, shiftX, shiftY);
 
                     if (Geometry.GetLenght(t1, t2) > 1) {
-                        gr.DrawLine(new Pen(Color.Gray, zoom), t1, t2);
+                        gr.DrawLine(new Pen(Color.Gray, Line), t1, t2);
                     }
                 }
             }
@@ -284,10 +296,55 @@ namespace BlueControls.ItemCollection {
             #endregion
         }
 
+        //public override List<FlexiControl> GetStyleOptions() {
+        //    List<FlexiControl> l = new()
+        //    {
+        //        new FlexiControl(),
+        //        //new FlexiControlForProperty(this, "Drehwinkel"),
+        //        //new FlexiControlForProperty(this, "Größe_fixiert")
+        //    };
+        //    l.AddRange(base.GetStyleOptions());
+        //    return l;
+        //}
+        //    public void SetCoordinates(RectangleF r) {
+        //    var vr = r.PointOf(enAlignment.Horizontal_Vertical_Center);
+        //    var ur = UsedArea();
+        //    p_LO.SetTo(vr.X - (ur.Width / 2), vr.Y - (ur.Height / 2));
+        //    p_RU.SetTo(p_LO.X + ur.Width, p_LO.Y + ur.Height);
+        //}
+        //public virtual void SizeChanged() {
+        //    // Punkte immer komplett setzen. Um eventuelle Parsing-Fehler auszugleichen
+        //    p_L.SetTo(p_LO.X, p_LO.Y + ((p_LU.Y - p_LO.Y) / 2));
+        //    p_R.SetTo(p_RO.X, p_LO.Y + ((p_LU.Y - p_LO.Y) / 2));
+        //    p_U.SetTo(p_LO.X + ((p_RO.X - p_LO.X) / 2), p_RU.Y);
+        //    p_O.SetTo(p_LO.X + ((p_RO.X - p_LO.X) / 2), p_RO.Y);
+        //}
         protected abstract Bitmap GeneratePic();
 
         protected override void ParseFinished() => SizeChanged();
 
+        private void ConnectsTo_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
+            var x = (clsConnection)e.Item;
+
+            x.Item.Changed += Item_Changed;
+        }
+
+        private void ConnectsTo_ItemRemoving(object sender, BlueBasics.EventArgs.ListEventArgs e) {
+            var x = (clsConnection)e.Item;
+            x.Item.Changed -= Item_Changed;
+        }
+
+        private void Item_Changed(object sender, System.EventArgs e) {
+            OnChanged();
+        }
+
         #endregion
+
+        // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
+        // ~FixedRectangleBitmapPadItem()
+        // {
+        //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+        //     Dispose(disposing: false);
+        // }
     }
 }

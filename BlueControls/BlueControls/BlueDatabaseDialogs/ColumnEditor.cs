@@ -268,8 +268,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             cbxTargetColumn.Item.Sort();
             cbxRowKeyInColumn.Item.Sort();
             cbxRowKeyInColumn.Enabled = cbxRowKeyInColumn.Item.Count > 0;
-            SetKeyTo(cbxRowKeyInColumn, _Column.LinkedCell_RowKey);
-            SetKeyTo(cbxTargetColumn, _Column.LinkedCell_ColumnKey);
+            SetKeyTo(cbxRowKeyInColumn, _Column.LinkedCell_RowKeyIsInColumn);
+            SetKeyTo(cbxTargetColumn, _Column.LinkedCell_ColumnKeyOfLinkedDatabase);
             cbxTargetColumn.Enabled = cbxTargetColumn.Item.Count > 0;
             capTargetColumn.Enabled = cbxTargetColumn.Enabled;
             if (!cbxTargetColumn.Enabled) {
@@ -506,8 +506,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             _Column.LinkedDatabaseFile = cbxLinkedDatabase.Text; // Muss vor LinkedCell_RowKey zurückgeschrieben werden
             _Column.LinkedKeyKennung = txbLinkedKeyKennung.Text;
             _Column.KeyColumnKey = ColumKeyFrom(_Column.Database, cbxSchlüsselspalte.Text);
-            _Column.LinkedCell_RowKey = ColumKeyFrom(_Column.Database, cbxRowKeyInColumn.Text);
-            _Column.LinkedCell_ColumnKey = ColumKeyFrom(_Column.LinkedDatabase(), cbxTargetColumn.Text); // LINKED DATABASE
+            _Column.LinkedCell_RowKeyIsInColumn = ColumKeyFrom(_Column.Database, cbxRowKeyInColumn.Text);
+            _Column.LinkedCell_ColumnKeyOfLinkedDatabase = ColumKeyFrom(_Column.LinkedDatabase(), cbxTargetColumn.Text); // LINKED DATABASE
             _Column.DropdownKey = ColumKeyFrom(_Column.Database, cbxDropDownKey.Text);
             _Column.VorschlagsColumn = ColumKeyFrom(_Column.Database, cbxVorschlagSpalte.Text);
             _Column.Align = (enAlignmentHorizontal)int.Parse(cbxAlign.Text);

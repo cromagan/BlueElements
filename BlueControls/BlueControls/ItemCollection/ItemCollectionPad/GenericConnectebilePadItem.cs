@@ -54,7 +54,7 @@ namespace BlueControls.ItemCollection {
             return t.Trim(", ") + "}";
         }
 
-        protected override string ClassId() => "GenericConnectebile";
+        protected override string ClassId() => "GenericConnectible";
 
         protected override Bitmap GeneratePic() {
             var bmp = new Bitmap(Size.Width, Size.Height);

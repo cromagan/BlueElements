@@ -191,7 +191,7 @@ namespace BlueControls.ItemCollection {
 
         protected override string ClassId() => "TEXT";
 
-        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
+        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, bool forPrinting) {
             if (Stil == PadStyles.Undefiniert) { return; }
             gr.SetClip(drawingCoordinates);
             var trp = drawingCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
@@ -210,7 +210,7 @@ namespace BlueControls.ItemCollection {
             gr.TranslateTransform(-trp.X, -trp.Y);
             gr.ResetTransform();
             gr.ResetClip();
-            base.DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, state, sizeOfParentControl, forPrinting);
+            base.DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, forPrinting);
         }
 
         protected override void ParseFinished() {

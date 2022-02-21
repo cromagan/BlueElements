@@ -32,12 +32,14 @@ using static BlueBasics.FileOperations;
 
 namespace BlueControls.ItemCollection {
 
-    public class BitmapPadItem : RectanglePadItem, ICanHaveColumnVariables {
+    public class BitmapPadItem : RectanglePadItem, ICanHaveColumnVariables, IDisposable {
 
         #region Fields
 
         public List<QuickImage> Overlays;
+
         public int Padding;
+        private bool disposedValue;
 
         #endregion
 
@@ -68,7 +70,9 @@ namespace BlueControls.ItemCollection {
         #region Properties
 
         public enSizeModes Bild_Modus { get; set; }
+
         public Bitmap Bitmap { get; set; }
+
         public bool Hintergrund_weiß_füllen { get; set; }
 
         [Description("Hier kann ein Variablenname als Platzhalter eingegeben werden. Beispiel: ~Bild~")]
@@ -98,6 +102,12 @@ namespace BlueControls.ItemCollection {
             e.ShowDialog();
             if (!FileExists(e.FileName)) { return; }
             Bitmap = (Bitmap)BitmapExt.Image_FromFile(e.FileName);
+        }
+
+        public void Dispose() {
+            // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
 
         public override List<FlexiControl> GetStyleOptions() {
@@ -196,7 +206,24 @@ namespace BlueControls.ItemCollection {
 
         protected override string ClassId() => "IMAGE";
 
-        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
+        protected virtual void Dispose(bool disposing) {
+            if (!disposedValue) {
+                if (disposing) {
+                    // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
+                }
+
+                // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
+                // TODO: Große Felder auf NULL setzen
+                if (Bitmap != null) {
+                    Bitmap.Dispose();
+                    Bitmap = null;
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, bool forPrinting) {
             drawingCoordinates.Inflate(-Padding, -Padding);
             RectangleF r1 = new(drawingCoordinates.Left + Padding, drawingCoordinates.Top + Padding, drawingCoordinates.Width - (Padding * 2), drawingCoordinates.Height - (Padding * 2));
             RectangleF r2 = new();
@@ -263,11 +290,17 @@ namespace BlueControls.ItemCollection {
                     BlueFont.DrawString(gr, Platzhalter_für_Layout, f, Brushes.Black, drawingCoordinates.Left, drawingCoordinates.Top);
                 }
             }
-            base.DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, state, sizeOfParentControl, forPrinting);
+            base.DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, forPrinting);
         }
 
         #endregion
 
+        // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
+        // ~BitmapPadItem()
+        // {
+        //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+        //     Dispose(disposing: false);
+        // }
         //public override void DoStyleCommands(object sender, List<string> Tags, ref bool CloseMenu)
         //{
         //    base.DoStyleCommands(sender, Tags, ref CloseMenu);

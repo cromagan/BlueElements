@@ -83,7 +83,7 @@ namespace BlueScript {
 
             var ChangeColumn = db.Column.Exists(attvar.Attributes[0].Name);
             if (ChangeColumn.Format != BlueBasics.Enums.enDataFormat.LinkedCell) { return new strDoItFeedback("Spalte hat das falsche Format: " + attvar.Attributes[1].ValueString); }
-            if (ChangeColumn.LinkedCell_RowKey >= -1) { return new strDoItFeedback("Spalte wird automatisiert befüllt: " + attvar.Attributes[1].ValueString); }
+            if (ChangeColumn.LinkedCell_RowKeyIsInColumn >= -1) { return new strDoItFeedback("Spalte wird automatisiert befüllt: " + attvar.Attributes[1].ValueString); }
 
             #endregion
 

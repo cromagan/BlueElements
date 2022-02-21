@@ -416,7 +416,7 @@ namespace BlueControls.ItemCollection {
             return new RectangleF(minx, miny, maxx - minx, maxy - miny);
         }
 
-        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
+        protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
             if (MovablePoint.Count < 1) { return; }
             var lastP = MovablePoint[MovablePoint.Count - 1];
             foreach (var thisP in MovablePoint) {

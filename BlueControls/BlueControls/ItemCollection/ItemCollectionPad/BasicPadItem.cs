@@ -263,15 +263,17 @@ namespace BlueControls.ItemCollection {
 
         public virtual void DesignOrStyleChanged() { }
 
-        public void Draw(Graphics gr, float zoom, float shiftX, float shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
+        public void Draw(Graphics gr, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting) {
             if (_Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent nicht definiert"); }
+
             if (forPrinting && !_Bei_Export_sichtbar) { return; }
+
             var drawingCoordinates = UsedArea.ZoomAndMoveRect(zoom, shiftX, shiftY, false);
-            if (_Parent == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Parent = null"); }
-            if (!IsInDrawingArea(drawingCoordinates, sizeOfParentControl)) { return; }
-            DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, state, sizeOfParentControl, forPrinting);
-            if (!_Bei_Export_sichtbar) {
-                if (IsInDrawingArea(drawingCoordinates, sizeOfParentControl)) {
+
+            if (IsInDrawingArea(drawingCoordinates, sizeOfParentControl)) {
+                DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, forPrinting);
+
+                if (!_Bei_Export_sichtbar) {
                     gr.DrawImage(QuickImage.Get("Drucker|16||1"), drawingCoordinates.X, drawingCoordinates.Y);
                 }
             }
@@ -488,7 +490,7 @@ namespace BlueControls.ItemCollection {
 
         protected abstract string ClassId();
 
-        protected abstract void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, enStates state, Size sizeOfParentControl, bool forPrinting);
+        protected abstract void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, bool forPrinting);
 
         protected bool IsInDrawingArea(RectangleF DrawingKoordinates, Size SizeOfParentControl) => SizeOfParentControl.IsEmpty || SizeOfParentControl.Width == 0 || SizeOfParentControl.Height == 0
 || DrawingKoordinates.IntersectsWith(new Rectangle(Point.Empty, SizeOfParentControl));

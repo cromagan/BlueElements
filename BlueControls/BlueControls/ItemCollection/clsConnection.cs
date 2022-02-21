@@ -15,28 +15,34 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueControls.Enums;
+using System;
 using System.Collections.Generic;
-using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace BlueControls.ItemCollection {
 
-    internal class clsPhysicPadItem : clsAbstractPhysicPadItem {
+    public class clsConnection {
 
         #region Fields
 
-        public readonly List<clsKraft> Kraft = new();
+        public FixedRectangleBitmapPadItem Item;
+
+        public enConnectionType MyItemType;
+
+        public enConnectionType OtherItemType;
 
         #endregion
 
         #region Constructors
 
-        public clsPhysicPadItem() : base(string.Empty) { }
-
-        #endregion
-
-        #region Methods
-
-        protected override string ClassId() => "Physics-Object";
+        public clsConnection(FixedRectangleBitmapPadItem item, enConnectionType otherItemType, enConnectionType myItemType) {
+            Item = item;
+            OtherItemType = otherItemType;
+            MyItemType = myItemType;
+        }
 
         #endregion
     }

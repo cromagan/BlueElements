@@ -33,9 +33,13 @@ namespace BlueControls.ItemCollection {
         #region Fields
 
         public List<BasicPadItem> VisibleItems = null;
+
         public List<BasicPadItem> ZoomItems = null;
+
         private string _Name;
+
         private CreativePad _PadInternal;
+
         private Bitmap _tmpBMP;
 
         #endregion
@@ -85,6 +89,7 @@ namespace BlueControls.ItemCollection {
         }
 
         public Color Randfarbe { get; set; } = Color.Transparent;
+
         public enAlignment Textlage { get; set; } = (enAlignment)(-1);
 
         #endregion
@@ -265,7 +270,7 @@ namespace BlueControls.ItemCollection {
 
         protected override string ClassId() => "CHILDPAD";
 
-        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, enStates state, Size sizeOfParentControl, bool forPrinting) {
+        protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, bool forPrinting) {
             try {
                 var trp = drawingCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
                 gr.TranslateTransform(trp.X, trp.Y);
@@ -338,7 +343,7 @@ namespace BlueControls.ItemCollection {
                 }
             } catch {
             }
-            base.DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, state, sizeOfParentControl, forPrinting);
+            base.DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, forPrinting);
         }
 
         private void _Pad_DoInvalidate(object sender, System.EventArgs e) {

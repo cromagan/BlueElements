@@ -123,7 +123,7 @@ namespace BlueDatabase {
 
             switch (column.Format) {
                 case enDataFormat.LinkedCell:
-                    if (column.LinkedCell_RowKey == -9999) {
+                    if (column.LinkedCell_RowKeyIsInColumn == -9999) {
                         wert = string.Empty; // Beim Skript-Start ist dieser Wert immer leer, da die Verlinkung erst erstellt werden muss.
                         vars.Add(new Variable(column.Name + "_link", string.Empty, enVariableDataType.String, true, true, "Dieser Wert kann nur mit SetLink verändert werden.\r\nBeim Skript-Start ist dieser Wert immer leer, da die Verlinkung erst erstellt werden muss."));
                     }

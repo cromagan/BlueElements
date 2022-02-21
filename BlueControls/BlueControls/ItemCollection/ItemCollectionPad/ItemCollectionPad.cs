@@ -322,7 +322,7 @@ namespace BlueControls.ItemCollection {
                     if (thisItem != null) {
                         gr.PixelOffsetMode = PixelOffsetMode.None;
                         if (visibleItems == null || visibleItems.Contains(thisItem)) {
-                            thisItem.Draw(gr, zoom, shiftX, shiftY, 0, sizeOfParentControl, forPrinting);
+                            thisItem.Draw(gr, zoom, shiftX, shiftY, sizeOfParentControl, forPrinting);
                         }
                     }
                 }

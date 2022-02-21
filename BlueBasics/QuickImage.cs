@@ -52,8 +52,6 @@ namespace BlueBasics {
         /// QuickImages werden immer in den Speicher für spätere Zugriffe aufgenommen!
         /// </summary>
         public QuickImage(string imageCode) : base() {
-            if (Exists(imageCode)) { return; }// Develop.DebugPrint_NichtImplementiert(); }
-
             var w = (imageCode + "||||||||||").Split('|');
             Name = w[0];
             var width = string.IsNullOrEmpty(w[1]) ? -1 : IntParse(w[1]);
@@ -69,7 +67,14 @@ namespace BlueBasics {
             Zweitsymbol = string.IsNullOrEmpty(w[10]) ? string.Empty : w[10];
 
             Code = GenerateCode(Name, width, height, Effekt, Färbung, ChangeGreenTo, Sättigung, Helligkeit, DrehWinkel, Transparenz, Zweitsymbol);
-            _pics.Add(Code, this);
+
+            if (Exists(Code)) { return; }
+
+            try {
+                _pics.Add(Code, this);
+            } catch {
+                return; // Multitasking....
+            }
 
             Generate();
         }

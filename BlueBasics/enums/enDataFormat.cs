@@ -60,7 +60,10 @@ namespace BlueBasics.Enums {
         LinkedCell = 74,
         Columns_für_LinkedCellDropdown = 75,
 
-        [Obsolete]
+        /// <summary>
+        /// Gibt die Werte einer anderen Spalte einer
+        /// anderen Datenbank als Dropdown Items wieder
+        /// </summary>
         Values_für_LinkedCellDropdown = 76,
 
         RelationText = 77,

@@ -85,7 +85,7 @@ namespace BlueControls.ItemCollection {
 
             var wi = Table.tmpColumnContentWidth(null, Column, CellFont, 16);
 
-            var bmp = new Bitmap(Math.Max((int)(wi*0.7),30), 400);
+            var bmp = new Bitmap(Math.Max((int)(wi * 0.7), 30), 300);
             var gr = Graphics.FromImage(bmp);
 
             gr.Clear(Column.BackColor);
@@ -99,21 +99,19 @@ namespace BlueControls.ItemCollection {
                 }
             }
 
-       
-            gr.TranslateTransform(bmp.Width / 2, 100);
+            gr.TranslateTransform(bmp.Width / 2, 50);
             gr.RotateTransform(-90);
-            Skin.Draw_FormatedText(gr, Column.Caption, null, enAlignment.VerticalCenter_Left, new Rectangle(-200, -200, 400, 400), null, false, Column_Font, true);
+            Skin.Draw_FormatedText(gr, Column.Caption, null, enAlignment.VerticalCenter_Left, new Rectangle(-150, -150, 300, 300), null, false, Column_Font, true);
 
-            gr.TranslateTransform(-bmp.Width / 2, -100);
+            gr.TranslateTransform(-bmp.Width / 2, -50);
             gr.ResetTransform();
 
-            gr.DrawLine(Pens.Black, 0, 310, bmp.Width, 310);
+            gr.DrawLine(Pens.Black, 0, 210, bmp.Width, 210);
 
             var r = Column.Database.Row.First();
-            if(r!= null) {
-                Table.Draw_FormatedText(gr, r.CellGetString(Column), Column, new Rectangle(0,310, bmp.Width, 90), enDesign.Table_Cell, enStates.Standard, BlueDatabase.Enums.enShortenStyle.Replaced, Column.BildTextVerhalten);
+            if (r != null) {
+                Table.Draw_FormatedText(gr, r.CellGetString(Column), Column, new Rectangle(0, 210, bmp.Width, 90), enDesign.Table_Cell, enStates.Standard, BlueDatabase.Enums.enShortenStyle.Replaced, Column.BildTextVerhalten);
             }
-
 
             return bmp;
         }
