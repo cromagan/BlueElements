@@ -29,10 +29,9 @@ namespace BlueDatabase {
 
         #region Constructors
 
-        public ColumnCollection(Database database) {
+        public ColumnCollection(Database database) : base() {
             Database = database;
             Database.Disposing += Database_Disposing;
-            Initialize();
         }
 
         #endregion
@@ -260,9 +259,6 @@ namespace BlueDatabase {
                     }
                 }
             }
-        }
-
-        public void Initialize() {
         }
 
         public void Repair() {

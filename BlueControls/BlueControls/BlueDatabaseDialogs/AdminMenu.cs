@@ -110,7 +110,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void btnBerechtigungsgruppen_Click(object sender, System.EventArgs e) {
             ItemCollectionList aa = new();
-            aa.AddRange(_TableView.Database.Permission_AllUsed(true));
+            aa.AddRange(_TableView.Database.Permission_AllUsed(false));
             aa.Sort();
             aa.CheckBehavior = enCheckBehavior.MultiSelection;
             aa.Check(_TableView.CurrentArrangement.PermissionGroups_Show, true);
@@ -162,7 +162,11 @@ namespace BlueControls.BlueDatabaseDialogs {
                 newc.Invalidate_ColumAndContent();
             }
             _TableView.Database.Column.Repair();
+
             if (_TableView.Arrangement > 0 && _TableView.CurrentArrangement != null) { _TableView.CurrentArrangement.Add(newc, false); }
+
+            //_TableView.Database.CheckViewsAndArrangements();
+
             _TableView.Invalidate_HeadSize();
         }
 

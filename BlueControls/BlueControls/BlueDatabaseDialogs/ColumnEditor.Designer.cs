@@ -137,6 +137,15 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnZurueck = new BlueControls.Controls.Button();
             this.btnOk = new BlueControls.Controls.Button();
             this.tabControl = new BlueControls.Controls.TabControl();
+            this.tabSpezial = new System.Windows.Forms.TabPage();
+            this.grpLinkToFileSystem = new BlueControls.Controls.GroupBox();
+            this.grpLinkedDatabase = new BlueControls.Controls.GroupBox();
+            this.grpColumnsForLinkedDatabase = new BlueControls.Controls.GroupBox();
+            this.grpVerlinkteZellen = new BlueControls.Controls.GroupBox();
+            this.cbxTargetColumn = new BlueControls.Controls.ComboBox();
+            this.cbxRowKeyInColumn = new BlueControls.Controls.ComboBox();
+            this.capTargetColumn = new BlueControls.Controls.Caption();
+            this.capRowKeyInColumn = new BlueControls.Controls.Caption();
             this.tabSchnellformat = new System.Windows.Forms.TabPage();
             this.btnSchnellBit = new BlueControls.Controls.Button();
             this.btnSchnellBildCode = new BlueControls.Controls.Button();
@@ -149,15 +158,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnSchnellDatumUhrzeit = new BlueControls.Controls.Button();
             this.btnSchnellDatum = new BlueControls.Controls.Button();
             this.btnSchnellText = new BlueControls.Controls.Button();
-            this.tabSpezial = new System.Windows.Forms.TabPage();
-            this.grpLinkToFileSystem = new BlueControls.Controls.GroupBox();
-            this.grpLinkedDatabase = new BlueControls.Controls.GroupBox();
-            this.grpColumnsForLinkedDatabase = new BlueControls.Controls.GroupBox();
-            this.grpVerlinkteZellen = new BlueControls.Controls.GroupBox();
-            this.cbxTargetColumn = new BlueControls.Controls.ComboBox();
-            this.cbxRowKeyInColumn = new BlueControls.Controls.ComboBox();
-            this.capTargetColumn = new BlueControls.Controls.Caption();
-            this.capRowKeyInColumn = new BlueControls.Controls.Caption();
             this.capIntern = new BlueControls.Controls.Caption();
             this.caption5 = new BlueControls.Controls.Caption();
             this.butAktuellVor = new BlueControls.Controls.Button();
@@ -172,12 +172,12 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabSonstiges.SuspendLayout();
             this.BlueFrame1.SuspendLayout();
             this.tabControl.SuspendLayout();
-            this.tabSchnellformat.SuspendLayout();
             this.tabSpezial.SuspendLayout();
             this.grpLinkToFileSystem.SuspendLayout();
             this.grpLinkedDatabase.SuspendLayout();
             this.grpColumnsForLinkedDatabase.SuspendLayout();
             this.grpVerlinkteZellen.SuspendLayout();
+            this.tabSchnellformat.SuspendLayout();
             this.SuspendLayout();
             // 
             // ColorDia
@@ -252,9 +252,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnFormatierungErlaubt.ButtonStyle = ((BlueControls.Enums.enButtonStyle)((BlueControls.Enums.enButtonStyle.Checkbox | BlueControls.Enums.enButtonStyle.Text)));
             this.btnFormatierungErlaubt.Location = new System.Drawing.Point(8, 208);
             this.btnFormatierungErlaubt.Name = "btnFormatierungErlaubt";
-            this.btnFormatierungErlaubt.Size = new System.Drawing.Size(296, 16);
+            this.btnFormatierungErlaubt.Size = new System.Drawing.Size(336, 16);
             this.btnFormatierungErlaubt.TabIndex = 41;
-            this.btnFormatierungErlaubt.Text = "Formatierung erlaubt";
+            this.btnFormatierungErlaubt.Text = "Text-Formatierung erlaubt (Fett, Kursiv, etc.)";
             // 
             // txbSpaltenbild
             // 
@@ -1429,7 +1429,120 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabControl.Name = "tabControl";
             this.tabControl.SelectedIndex = 0;
             this.tabControl.Size = new System.Drawing.Size(920, 516);
+            this.tabControl.TabDefault = null;
+            this.tabControl.TabDefaultOrder = null;
             this.tabControl.TabIndex = 15;
+            // 
+            // tabSpezial
+            // 
+            this.tabSpezial.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabSpezial.Controls.Add(this.grpLinkToFileSystem);
+            this.tabSpezial.Controls.Add(this.grpLinkedDatabase);
+            this.tabSpezial.Controls.Add(this.grpBildCode);
+            this.tabSpezial.Location = new System.Drawing.Point(4, 25);
+            this.tabSpezial.Name = "tabSpezial";
+            this.tabSpezial.Size = new System.Drawing.Size(912, 487);
+            this.tabSpezial.TabIndex = 9;
+            this.tabSpezial.Text = "Spezial-Formate";
+            // 
+            // grpLinkToFileSystem
+            // 
+            this.grpLinkToFileSystem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.grpLinkToFileSystem.CausesValidation = false;
+            this.grpLinkToFileSystem.Controls.Add(this.capBestFileStandardFolder);
+            this.grpLinkToFileSystem.Controls.Add(this.txbBestFileStandardFolder);
+            this.grpLinkToFileSystem.Controls.Add(this.txbBestFileStandardSuffix);
+            this.grpLinkToFileSystem.Controls.Add(this.capBestFileStandardSuffix);
+            this.grpLinkToFileSystem.Location = new System.Drawing.Point(8, 8);
+            this.grpLinkToFileSystem.Name = "grpLinkToFileSystem";
+            this.grpLinkToFileSystem.Size = new System.Drawing.Size(440, 104);
+            this.grpLinkToFileSystem.TabIndex = 0;
+            this.grpLinkToFileSystem.TabStop = false;
+            this.grpLinkToFileSystem.Text = "Format: Link To Filesystem";
+            // 
+            // grpLinkedDatabase
+            // 
+            this.grpLinkedDatabase.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.grpLinkedDatabase.CausesValidation = false;
+            this.grpLinkedDatabase.Controls.Add(this.grpColumnsForLinkedDatabase);
+            this.grpLinkedDatabase.Controls.Add(this.grpVerlinkteZellen);
+            this.grpLinkedDatabase.Controls.Add(this.cbxLinkedDatabase);
+            this.grpLinkedDatabase.Controls.Add(this.capLinkedDatabase);
+            this.grpLinkedDatabase.Location = new System.Drawing.Point(8, 120);
+            this.grpLinkedDatabase.Name = "grpLinkedDatabase";
+            this.grpLinkedDatabase.Size = new System.Drawing.Size(888, 224);
+            this.grpLinkedDatabase.TabIndex = 1;
+            this.grpLinkedDatabase.TabStop = false;
+            this.grpLinkedDatabase.Text = "Format: LinkedCell (und dessen Columns / Values)";
+            // 
+            // grpColumnsForLinkedDatabase
+            // 
+            this.grpColumnsForLinkedDatabase.CausesValidation = false;
+            this.grpColumnsForLinkedDatabase.Controls.Add(this.txbLinkedKeyKennung);
+            this.grpColumnsForLinkedDatabase.Controls.Add(this.capLinkedKeyKennung);
+            this.grpColumnsForLinkedDatabase.Location = new System.Drawing.Point(8, 64);
+            this.grpColumnsForLinkedDatabase.Name = "grpColumnsForLinkedDatabase";
+            this.grpColumnsForLinkedDatabase.Size = new System.Drawing.Size(872, 56);
+            this.grpColumnsForLinkedDatabase.TabIndex = 0;
+            this.grpColumnsForLinkedDatabase.TabStop = false;
+            this.grpColumnsForLinkedDatabase.Text = "Format: Columns_für_LinkedCellDropdown";
+            // 
+            // grpVerlinkteZellen
+            // 
+            this.grpVerlinkteZellen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.grpVerlinkteZellen.CausesValidation = false;
+            this.grpVerlinkteZellen.Controls.Add(this.cbxTargetColumn);
+            this.grpVerlinkteZellen.Controls.Add(this.cbxRowKeyInColumn);
+            this.grpVerlinkteZellen.Controls.Add(this.capTargetColumn);
+            this.grpVerlinkteZellen.Controls.Add(this.capRowKeyInColumn);
+            this.grpVerlinkteZellen.Location = new System.Drawing.Point(8, 128);
+            this.grpVerlinkteZellen.Name = "grpVerlinkteZellen";
+            this.grpVerlinkteZellen.Size = new System.Drawing.Size(872, 88);
+            this.grpVerlinkteZellen.TabIndex = 1;
+            this.grpVerlinkteZellen.TabStop = false;
+            this.grpVerlinkteZellen.Text = "Format: Verlinkte Zellen";
+            // 
+            // cbxTargetColumn
+            // 
+            this.cbxTargetColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbxTargetColumn.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxTargetColumn.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxTargetColumn.Location = new System.Drawing.Point(336, 48);
+            this.cbxTargetColumn.Name = "cbxTargetColumn";
+            this.cbxTargetColumn.Regex = null;
+            this.cbxTargetColumn.Size = new System.Drawing.Size(520, 24);
+            this.cbxTargetColumn.TabIndex = 5;
+            // 
+            // cbxRowKeyInColumn
+            // 
+            this.cbxRowKeyInColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cbxRowKeyInColumn.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.cbxRowKeyInColumn.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxRowKeyInColumn.Location = new System.Drawing.Point(336, 24);
+            this.cbxRowKeyInColumn.Name = "cbxRowKeyInColumn";
+            this.cbxRowKeyInColumn.Regex = null;
+            this.cbxRowKeyInColumn.Size = new System.Drawing.Size(520, 24);
+            this.cbxRowKeyInColumn.TabIndex = 3;
+            // 
+            // capTargetColumn
+            // 
+            this.capTargetColumn.CausesValidation = false;
+            this.capTargetColumn.Location = new System.Drawing.Point(8, 48);
+            this.capTargetColumn.Name = "capTargetColumn";
+            this.capTargetColumn.Size = new System.Drawing.Size(320, 32);
+            this.capTargetColumn.Text = "Die Quell-Spalte (aus der verlinkten Datenbank) ist immer:";
+            this.capTargetColumn.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            // 
+            // capRowKeyInColumn
+            // 
+            this.capRowKeyInColumn.CausesValidation = false;
+            this.capRowKeyInColumn.Location = new System.Drawing.Point(8, 24);
+            this.capRowKeyInColumn.Name = "capRowKeyInColumn";
+            this.capRowKeyInColumn.Size = new System.Drawing.Size(320, 16);
+            this.capRowKeyInColumn.Text = "Die zu suchende Zeile ist in dieser Spalte zu finden:";
             // 
             // tabSchnellformat
             // 
@@ -1551,117 +1664,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnSchnellText.Text = "Text";
             this.btnSchnellText.Click += new System.EventHandler(this.btnSchnellText_Click);
             // 
-            // tabSpezial
-            // 
-            this.tabSpezial.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabSpezial.Controls.Add(this.grpLinkToFileSystem);
-            this.tabSpezial.Controls.Add(this.grpLinkedDatabase);
-            this.tabSpezial.Controls.Add(this.grpBildCode);
-            this.tabSpezial.Location = new System.Drawing.Point(4, 25);
-            this.tabSpezial.Name = "tabSpezial";
-            this.tabSpezial.Size = new System.Drawing.Size(912, 487);
-            this.tabSpezial.TabIndex = 9;
-            this.tabSpezial.Text = "Spezial-Formate";
-            // 
-            // grpLinkToFileSystem
-            // 
-            this.grpLinkToFileSystem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.grpLinkToFileSystem.CausesValidation = false;
-            this.grpLinkToFileSystem.Controls.Add(this.capBestFileStandardFolder);
-            this.grpLinkToFileSystem.Controls.Add(this.txbBestFileStandardFolder);
-            this.grpLinkToFileSystem.Controls.Add(this.txbBestFileStandardSuffix);
-            this.grpLinkToFileSystem.Controls.Add(this.capBestFileStandardSuffix);
-            this.grpLinkToFileSystem.Location = new System.Drawing.Point(8, 8);
-            this.grpLinkToFileSystem.Name = "grpLinkToFileSystem";
-            this.grpLinkToFileSystem.Size = new System.Drawing.Size(440, 104);
-            this.grpLinkToFileSystem.TabIndex = 0;
-            this.grpLinkToFileSystem.TabStop = false;
-            this.grpLinkToFileSystem.Text = "Format: Link To Filesystem";
-            // 
-            // grpLinkedDatabase
-            // 
-            this.grpLinkedDatabase.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.grpLinkedDatabase.CausesValidation = false;
-            this.grpLinkedDatabase.Controls.Add(this.grpColumnsForLinkedDatabase);
-            this.grpLinkedDatabase.Controls.Add(this.grpVerlinkteZellen);
-            this.grpLinkedDatabase.Controls.Add(this.cbxLinkedDatabase);
-            this.grpLinkedDatabase.Controls.Add(this.capLinkedDatabase);
-            this.grpLinkedDatabase.Location = new System.Drawing.Point(8, 120);
-            this.grpLinkedDatabase.Name = "grpLinkedDatabase";
-            this.grpLinkedDatabase.Size = new System.Drawing.Size(888, 224);
-            this.grpLinkedDatabase.TabIndex = 1;
-            this.grpLinkedDatabase.TabStop = false;
-            this.grpLinkedDatabase.Text = "Format: LinkedCell (und dessen Columns / Values)";
-            // 
-            // grpColumnsForLinkedDatabase
-            // 
-            this.grpColumnsForLinkedDatabase.CausesValidation = false;
-            this.grpColumnsForLinkedDatabase.Controls.Add(this.txbLinkedKeyKennung);
-            this.grpColumnsForLinkedDatabase.Controls.Add(this.capLinkedKeyKennung);
-            this.grpColumnsForLinkedDatabase.Location = new System.Drawing.Point(8, 64);
-            this.grpColumnsForLinkedDatabase.Name = "grpColumnsForLinkedDatabase";
-            this.grpColumnsForLinkedDatabase.Size = new System.Drawing.Size(872, 56);
-            this.grpColumnsForLinkedDatabase.TabIndex = 0;
-            this.grpColumnsForLinkedDatabase.TabStop = false;
-            this.grpColumnsForLinkedDatabase.Text = "Format: Columns_für_LinkedCellDropdown";
-            // 
-            // grpVerlinkteZellen
-            // 
-            this.grpVerlinkteZellen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.grpVerlinkteZellen.CausesValidation = false;
-            this.grpVerlinkteZellen.Controls.Add(this.cbxTargetColumn);
-            this.grpVerlinkteZellen.Controls.Add(this.cbxRowKeyInColumn);
-            this.grpVerlinkteZellen.Controls.Add(this.capTargetColumn);
-            this.grpVerlinkteZellen.Controls.Add(this.capRowKeyInColumn);
-            this.grpVerlinkteZellen.Location = new System.Drawing.Point(8, 128);
-            this.grpVerlinkteZellen.Name = "grpVerlinkteZellen";
-            this.grpVerlinkteZellen.Size = new System.Drawing.Size(872, 88);
-            this.grpVerlinkteZellen.TabIndex = 1;
-            this.grpVerlinkteZellen.TabStop = false;
-            this.grpVerlinkteZellen.Text = "Format: Verlinkte Zellen";
-            // 
-            // cbxTargetColumn
-            // 
-            this.cbxTargetColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbxTargetColumn.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxTargetColumn.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxTargetColumn.Location = new System.Drawing.Point(336, 48);
-            this.cbxTargetColumn.Name = "cbxTargetColumn";
-            this.cbxTargetColumn.Regex = null;
-            this.cbxTargetColumn.Size = new System.Drawing.Size(520, 24);
-            this.cbxTargetColumn.TabIndex = 5;
-            // 
-            // cbxRowKeyInColumn
-            // 
-            this.cbxRowKeyInColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbxRowKeyInColumn.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxRowKeyInColumn.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxRowKeyInColumn.Location = new System.Drawing.Point(336, 24);
-            this.cbxRowKeyInColumn.Name = "cbxRowKeyInColumn";
-            this.cbxRowKeyInColumn.Regex = null;
-            this.cbxRowKeyInColumn.Size = new System.Drawing.Size(520, 24);
-            this.cbxRowKeyInColumn.TabIndex = 3;
-            // 
-            // capTargetColumn
-            // 
-            this.capTargetColumn.CausesValidation = false;
-            this.capTargetColumn.Location = new System.Drawing.Point(8, 48);
-            this.capTargetColumn.Name = "capTargetColumn";
-            this.capTargetColumn.Size = new System.Drawing.Size(320, 32);
-            this.capTargetColumn.Text = "Die Quell-Spalte (aus der verlinkten Datenbank) ist immer:";
-            this.capTargetColumn.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Scrollen_mit_Textumbruch;
-            // 
-            // capRowKeyInColumn
-            // 
-            this.capRowKeyInColumn.CausesValidation = false;
-            this.capRowKeyInColumn.Location = new System.Drawing.Point(8, 24);
-            this.capRowKeyInColumn.Name = "capRowKeyInColumn";
-            this.capRowKeyInColumn.Size = new System.Drawing.Size(320, 16);
-            this.capRowKeyInColumn.Text = "Die zu suchende Zeile ist in dieser Spalte zu finden:";
-            // 
             // capIntern
             // 
             this.capIntern.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -1726,12 +1728,12 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabSonstiges.ResumeLayout(false);
             this.BlueFrame1.ResumeLayout(false);
             this.tabControl.ResumeLayout(false);
-            this.tabSchnellformat.ResumeLayout(false);
             this.tabSpezial.ResumeLayout(false);
             this.grpLinkToFileSystem.ResumeLayout(false);
             this.grpLinkedDatabase.ResumeLayout(false);
             this.grpColumnsForLinkedDatabase.ResumeLayout(false);
             this.grpVerlinkteZellen.ResumeLayout(false);
+            this.tabSchnellformat.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }

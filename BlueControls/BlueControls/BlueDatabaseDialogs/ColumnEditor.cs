@@ -317,7 +317,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 cbxEinheit.Item.Add("St.", enImageCode.Eins);
             }
             lbxCellEditor.Suggestions.Clear();
-            lbxCellEditor.Suggestions.AddRange(_Column.Database.Permission_AllUsed(false));
+            lbxCellEditor.Suggestions.AddRange(_Column.Database.Permission_AllUsed(true));
             btnZurueck.Enabled = _Column.Previous() != null;
             btnVor.Enabled = _Column.Next() != null;
             if (_Table != null && _Table.CurrentArrangement != null) {

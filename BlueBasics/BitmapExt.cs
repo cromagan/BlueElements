@@ -863,20 +863,29 @@ namespace BlueBasics {
                 Height = -1;
                 return;
             }
-            try {
-                Width = bmp.Width;
-                Height = bmp.Height;
-                Bits = new int[Width * Height];
-                BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
-                _bitmap = new Bitmap(Width, Height, Width * 4, _pixelformat, BitsHandle.AddrOfPinnedObject());
-                using var gr = Graphics.FromImage(_bitmap);
-                gr.DrawImage(bmp, new Rectangle(0, 0, Width, Height));
-            } catch (Exception ex) {
-                Develop.DebugPrint(ex);
-                Width = -1;
-                Height = -1;
-                _bitmap = null;
-            }
+
+            var tim = DateTime.Now;
+
+            do {
+                try { // wird an anderer stelle verwendet
+                    Width = bmp.Width;
+                    Height = bmp.Height;
+                    Bits = new int[Width * Height];
+                    BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
+                    _bitmap = new Bitmap(Width, Height, Width * 4, _pixelformat, BitsHandle.AddrOfPinnedObject());
+                    using var gr = Graphics.FromImage(_bitmap);
+                    gr.DrawImage(bmp, new Rectangle(0, 0, Width, Height));
+                } catch (Exception ex) {
+                    if (DateTime.Now.Subtract(tim).TotalSeconds > 5) {
+                        Develop.DebugPrint(ex);
+                        Width = -1;
+                        Height = -1;
+                        _bitmap = null;
+                        return;
+                    }
+                    _bitmap = null;
+                }
+            } while (_bitmap == null);
         }
 
         public BitmapExt Crop(Rectangle re) {

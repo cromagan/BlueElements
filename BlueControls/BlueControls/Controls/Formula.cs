@@ -424,7 +424,7 @@ namespace BlueControls.Controls {
         private void btnRechteFuerAnsicht_Click(object sender, System.EventArgs e) {
             var CurrView = CurrentView();
             ItemCollectionList aa = new();
-            aa.AddRange(_Database.Permission_AllUsed(true));
+            aa.AddRange(_Database.Permission_AllUsed(false));
             aa.CheckBehavior = enCheckBehavior.MultiSelection;
             aa.Check(CurrView.PermissionGroups_Show, true);
             if (_Database.Views.Count > 1 && CurrView == _Database.Views[1]) {

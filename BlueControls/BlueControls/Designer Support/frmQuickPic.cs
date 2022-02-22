@@ -121,7 +121,7 @@ namespace BlueControls.Designer_Support {
                 var w = Enum.GetName(z.GetType(), z);
                 if (!string.IsNullOrEmpty(w)) { LB.Items.Add(w); }
             }
-            QuickImage l = new(qicode);
+            QuickImage l = new(qicode, true);
             PicName.Text = l.Name;
             Färb.Text = l.Färbung;
             grün.Text = l.ChangeGreenTo;

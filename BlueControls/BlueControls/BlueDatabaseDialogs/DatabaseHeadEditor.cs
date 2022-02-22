@@ -105,9 +105,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             txbZeilenQuickInfo.Text = _Database.ZeilenQuickInfo.Replace("<br>", "\r");
             tbxUndoAnzahl.Text = _Database.UndoCount.ToString();
             PermissionGroups_NewRow.Suggestions.Clear();
-            PermissionGroups_NewRow.Suggestions.AddRange(_Database.Permission_AllUsed(true));
+            PermissionGroups_NewRow.Suggestions.AddRange(_Database.Permission_AllUsed(false));
             DatenbankAdmin.Suggestions.Clear();
-            DatenbankAdmin.Suggestions.AddRange(_Database.Permission_AllUsed(true));
+            DatenbankAdmin.Suggestions.AddRange(_Database.Permission_AllUsed(false));
 
             lbxSortierSpalten.Suggestions.Clear();
             lbxSortierSpalten.Suggestions.AddRange(_Database.Column, false);

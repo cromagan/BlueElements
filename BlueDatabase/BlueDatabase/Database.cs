@@ -128,8 +128,16 @@ namespace BlueDatabase {
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
             Cell = new CellCollection(this);
-            Column = new ColumnCollection(this);
+
             Row = new RowCollection(this);
+            Row.RowRemoving += Row_RowRemoving;
+            Row.RowAdded += Row_RowAdded;
+
+            Column = new ColumnCollection(this);
+            Column.ItemRemoving += Column_ItemRemoving;
+            Column.ItemRemoved += Column_ItemRemoved;
+            Column.ItemAdded += Column_ItemAdded;
+
             Works = new ListExt<WorkItem>();
             FilesAfterLoadingLCase = new List<string>();
             ColumnArrangements.Changed += ColumnArrangements_ListOrItemChanged;
@@ -140,13 +148,9 @@ namespace BlueDatabase {
             Tags.Changed += DatabaseTags_ListOrItemChanged;
             Export.Changed += Export_ListOrItemChanged;
             DatenbankAdmin.Changed += DatabaseAdmin_ListOrItemChanged;
-            Row.RowRemoving += Row_RowRemoving;
-            Row.RowAdded += Row_RowAdded;
-            Column.ItemRemoving += Column_ItemRemoving;
-            Column.ItemRemoved += Column_ItemRemoved;
-            //  _isParsing = true;
+
             Initialize();
-            // _isParsing = false;
+
             UserGroup = "#Administrator";
             if (!string.IsNullOrEmpty(filename)) {
                 Database.DropConstructorMessage?.Invoke(this, new MessageEventArgs(enFehlerArt.Info, "Lade Datenbank aus Dateisystem: \r\n" + filename.FileNameWithoutSuffix()));
@@ -939,42 +943,10 @@ namespace BlueDatabase {
             // Evtl. Defekte Rows reparieren
             //Row.Repair();
             //Defekte Ansichten reparieren - Teil 1
-            for (var z = 0; z <= 1; z++) {
-                if (ColumnArrangements.Count < z + 1) {
-                    ColumnArrangements.Add(new ColumnViewCollection(this, ""));
-                }
-                if (string.IsNullOrEmpty(ColumnArrangements[z].Name)) {
-                    switch (z) {
-                        case 0:
-                            ColumnArrangements[z].Name = "Alle Spalten";
-                            if (ColumnArrangements[z].Count < 1) { ColumnArrangements[z].ShowAllColumns(); }
-                            break;
 
-                        case 1:
-                            ColumnArrangements[z].Name = "Standard";
-                            if (!ColumnArrangements[z].PermissionGroups_Show.Contains("#Everybody")) { ColumnArrangements[z].PermissionGroups_Show.Add("#Everybody"); }
-                            break;
-                            //case 2:
-                            //    if (ColumnArrangements[z].Name != "Filter waagerecht" && !string.IsNullOrEmpty(ColumnArrangements[z].Name))
-                            //    {
-                            //        ColumnArrangements.Add(new ColumnViewCollection(this, ""));
-                            //        ColumnArrangements.Swap(z, ColumnArrangements.Count - 1);
-                            //    }
-                            //    ColumnArrangements[z].Name = "Filter waagerecht";
-                            //    break;
-                            //case 3:
-                            //    if (ColumnArrangements[z].Name != "Filter senkrecht" && !string.IsNullOrEmpty(ColumnArrangements[z].Name))
-                            //    {
-                            //        ColumnArrangements.Add(new ColumnViewCollection(this, ""));
-                            //        ColumnArrangements.Swap(z, ColumnArrangements.Count - 1);
-                            //    }
-                            //    ColumnArrangements[z].Name = "Filter senkrecht";
-                            //    break;
-                    }
-                }
-                ColumnArrangements[z].PermissionGroups_Show.RemoveString("#Administrator", false);
-            }
             CheckViewsAndArrangements();
+
+            Layouts.Check();
         }
 
         public string UndoText(ColumnItem column, RowItem row) {
@@ -1137,6 +1109,42 @@ namespace BlueDatabase {
 
         protected override bool BlockSaveOperations() => RowItem.DoingScript || base.BlockSaveOperations();
 
+        protected override void Dispose(bool disposing) {
+            if (!Disposed) { return; }
+            base.Dispose(disposing); // speichert und löscht die ganzen Worker. setzt auch disposedValue und ReadOnly auf true
+            if (disposing) {
+                // TODO: verwalteten Zustand (verwaltete Objekte) entsorgen.
+            }
+            // TODO: nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer weiter unten überschreiben.
+            // TODO: große Felder auf Null setzen.
+            ColumnArrangements.Changed -= ColumnArrangements_ListOrItemChanged;
+            Layouts.Changed -= Layouts_ListOrItemChanged;
+            Layouts.ItemSeted -= Layouts_ItemSeted;
+            Views.Changed -= Views_ListOrItemChanged;
+            PermissionGroups_NewRow.Changed -= PermissionGroups_NewRow_ListOrItemChanged;
+            Tags.Changed -= DatabaseTags_ListOrItemChanged;
+            Export.Changed -= Export_ListOrItemChanged;
+            DatenbankAdmin.Changed -= DatabaseAdmin_ListOrItemChanged;
+
+            Row.RowRemoving -= Row_RowRemoving;
+            Row.RowAdded -= Row_RowAdded;
+
+            Column.ItemRemoving -= Column_ItemRemoving;
+            Column.ItemRemoved -= Column_ItemRemoved;
+            Column.ItemAdded -= Column_ItemAdded;
+            Column.Dispose();
+            Cell.Dispose();
+            Row.Dispose();
+            Works.Dispose();
+            ColumnArrangements.Dispose();
+            Views.Dispose();
+            Tags.Dispose();
+            Export.Dispose();
+            DatenbankAdmin.Dispose();
+            PermissionGroups_NewRow.Dispose();
+            Layouts.Dispose();
+        }
+
         //protected override void CheckDataAfterReload() {
         //    try {
         //        // Leztes WorkItem suchen. Auch Ohne LogUndo MUSS es vorhanden sein.
@@ -1162,40 +1170,6 @@ namespace BlueDatabase {
         //        //Develop.DebugPrint(ex);
         //    }
         //}
-
-        protected override void Dispose(bool disposing) {
-            if (!Disposed) { return; }
-            base.Dispose(disposing); // speichert und löscht die ganzen Worker. setzt auch disposedValue und ReadOnly auf true
-            if (disposing) {
-                // TODO: verwalteten Zustand (verwaltete Objekte) entsorgen.
-            }
-            // TODO: nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer weiter unten überschreiben.
-            // TODO: große Felder auf Null setzen.
-            ColumnArrangements.Changed -= ColumnArrangements_ListOrItemChanged;
-            Layouts.Changed -= Layouts_ListOrItemChanged;
-            Layouts.ItemSeted -= Layouts_ItemSeted;
-            Views.Changed -= Views_ListOrItemChanged;
-            PermissionGroups_NewRow.Changed -= PermissionGroups_NewRow_ListOrItemChanged;
-            Tags.Changed -= DatabaseTags_ListOrItemChanged;
-            Export.Changed -= Export_ListOrItemChanged;
-            DatenbankAdmin.Changed -= DatabaseAdmin_ListOrItemChanged;
-            Row.RowRemoving -= Row_RowRemoving;
-            Row.RowAdded -= Row_RowAdded;
-            Column.ItemRemoving -= Column_ItemRemoving;
-            Column.ItemRemoved -= Column_ItemRemoved;
-            Column.Dispose();
-            Cell.Dispose();
-            Row.Dispose();
-            Works.Dispose();
-            ColumnArrangements.Dispose();
-            Views.Dispose();
-            Tags.Dispose();
-            Export.Dispose();
-            DatenbankAdmin.Dispose();
-            PermissionGroups_NewRow.Dispose();
-            Layouts.Dispose();
-        }
-
         protected override void DoBackGroundWork(BackgroundWorker listenToMyCancel) {
             if (ReadOnly) { return; }
 
@@ -1328,22 +1302,6 @@ namespace BlueDatabase {
             if (int.Parse(LoadedVersion.Replace(".", "")) > int.Parse(DatabaseVersion.Replace(".", ""))) { SetReadOnly(); }
         }
 
-        //protected override void PrepeareDataForCheckingBeforeLoad() {
-        //    // Letztes WorkItem speichern, als Kontrolle
-        //    _WorkItemsBefore = string.Empty;
-        //    _LastWorkItem = string.Empty;
-        //    if (Works != null && Works.Count > 0) {
-        //        var c = 0;
-        //        do {
-        //            c++;
-        //            if (c > 20 || Works.Count - c < 20) { break; }
-        //            var wn = Works.Count - c;
-        //            if (Works[wn].LogsUndo(this) && Works[wn].HistorischRelevant) { _LastWorkItem = Works[wn].ToString(); }
-        //        } while (string.IsNullOrEmpty(_LastWorkItem));
-        //        _WorkItemsBefore = Works.ToString();
-        //    }
-        //}
-
         protected override byte[] ToListOfByte() {
             try {
                 var CryptPos = -1;
@@ -1416,6 +1374,21 @@ namespace BlueDatabase {
             }
         }
 
+        //protected override void PrepeareDataForCheckingBeforeLoad() {
+        //    // Letztes WorkItem speichern, als Kontrolle
+        //    _WorkItemsBefore = string.Empty;
+        //    _LastWorkItem = string.Empty;
+        //    if (Works != null && Works.Count > 0) {
+        //        var c = 0;
+        //        do {
+        //            c++;
+        //            if (c > 20 || Works.Count - c < 20) { break; }
+        //            var wn = Works.Count - c;
+        //            if (Works[wn].LogsUndo(this) && Works[wn].HistorischRelevant) { _LastWorkItem = Works[wn].ToString(); }
+        //        } while (string.IsNullOrEmpty(_LastWorkItem));
+        //        _WorkItemsBefore = Works.ToString();
+        //    }
+        //}
         private static int NummerCode2(byte[] b, int pointer) => (b[pointer] * 255) + b[pointer + 1];
 
         private static int NummerCode3(byte[] b, int pointer) => (b[pointer] * 65025) + (b[pointer + 1] * 255) + b[pointer + 2];
@@ -1426,6 +1399,42 @@ namespace BlueDatabase {
                 nu += b[pointer + n] * (long)Math.Pow(255, 6 - n);
             }
             return nu;
+        }
+
+        private void ChangeWorkItems(enItemState OldState, enItemState NewState) {
+            foreach (var ThisWork in Works) {
+                if (ThisWork.State == OldState) { ThisWork.State = NewState; }
+            }
+        }
+
+        private void CheckViewsAndArrangements() {
+            //if (ReadOnly) { return; }  // Gibt fehler bei Datenbanken, die nur Temporär erzeugt werden!
+
+            if (IsParsing) { return; }
+
+            for (var z = 0; z < Math.Max(2, ColumnArrangements.Count); z++) {
+                if (ColumnArrangements.Count < z + 1) { ColumnArrangements.Add(new ColumnViewCollection(this, "")); }
+                ColumnArrangements[z].Repair(z, true);
+            }
+
+            for (var z = 0; z < Math.Max(2, Views.Count); z++) {
+                if (Views.Count < z + 1) { Views.Add(new ColumnViewCollection(this, "")); }
+                Views[z].Repair(z, false);
+            }
+        }
+
+        private void Column_ItemAdded(object sender, ListEventArgs e) {
+            CheckViewsAndArrangements();
+            //            protected override void OnItemAdded(ColumnItem item) {
+            //    base.OnItemAdded(item);
+            //    Database.CheckViewsAndArrangements();
+
+            //}
+            //protected override void OnItemRemoved() {
+            //    base.OnItemRemoved();
+            //    Database.CheckViewsAndArrangements();
+            //    Database.Layouts.Check();
+            //}
         }
 
         //private void ChangeColumnKeyInPending(int oldKey, int newKey) {
@@ -1485,31 +1494,11 @@ namespace BlueDatabase {
         //        OnRowKeyChanged(new KeyChangedEventArgs(OldKey, NewKey));
         //    }
         //}
-
-        private void ChangeWorkItems(enItemState OldState, enItemState NewState) {
-            foreach (var ThisWork in Works) {
-                if (ThisWork.State == OldState) { ThisWork.State = NewState; }
-            }
-        }
-
-        private void CheckViewsAndArrangements() {
-            if (ReadOnly) { return; }
-            foreach (var ThisCol in ColumnArrangements) {
-                ThisCol.Repair();
-            }
-            foreach (var ThisCol in Views) {
-                ThisCol.Repair();
-            }
-            if (Views != null) {
-                if (Views.Count > 0 && Views[0].PermissionGroups_Show.Count > 0) { Views[0].PermissionGroups_Show.Clear(); }
-                if (Views.Count > 1 && !Views[1].PermissionGroups_Show.Contains("#Everybody")) { Views[1].PermissionGroups_Show.Add("#Everybody"); }
-            }
-            Layouts.Check();
-        }
-
         private void Column_ItemRemoved(object sender, System.EventArgs e) {
             if (IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Parsing Falsch!"); }
             CheckViewsAndArrangements();
+
+            Layouts.Check();
         }
 
         private void Column_ItemRemoving(object sender, ListEventArgs e) {
@@ -1617,7 +1606,7 @@ namespace BlueDatabase {
 
         private void Initialize() {
             Cell.Initialize();
-            Column.Initialize();
+            //Column.Initialize();
             //Row.Initialize();
             Works.Clear();
             ColumnArrangements.Clear();

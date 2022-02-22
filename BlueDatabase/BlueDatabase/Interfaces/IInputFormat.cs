@@ -79,9 +79,9 @@ namespace BlueDatabase.Interfaces {
             }
 
             foreach (var thisString in l) {
-                if (string.IsNullOrEmpty(thisString)) {
-                    if (!string.IsNullOrEmpty(formatToCheck.AllowedChars) || !thisString.ContainsOnlyChars(formatToCheck.AllowedChars)) { return false; }
-                    if (!string.IsNullOrEmpty(formatToCheck.Regex) || !thisString.RegexMatch(formatToCheck.Regex)) { return false; }
+                if (!string.IsNullOrEmpty(thisString)) {
+                    if (!string.IsNullOrEmpty(formatToCheck.AllowedChars) && !thisString.ContainsOnlyChars(formatToCheck.AllowedChars)) { return false; }
+                    if (!string.IsNullOrEmpty(formatToCheck.Regex) && !thisString.RegexMatch(formatToCheck.Regex)) { return false; }
 
                     switch (formatToCheck.AdditionalCheck) {
                         case enAdditionalCheck.None:
@@ -159,7 +159,7 @@ namespace BlueDatabase.Interfaces {
                     return;
 
                 case enVarType.Date:
-                    t.Regex = @"^(0[1-9]|[12][0-9]|3[01]):(0[1-9]|1[0-2]):\d{4}$";
+                    t.Regex = @"^(0[1-9]|[12][0-9]|3[01])[.](0[1-9]|1[0-2])[.]\d{4}$";
                     t.AllowedChars = Constants.Char_Numerals + ".";
                     t.Suffix = string.Empty;
                     t.Prefix = string.Empty;

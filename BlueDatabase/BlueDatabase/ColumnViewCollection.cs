@@ -259,21 +259,51 @@ namespace BlueDatabase {
             return Result + "}";
         }
 
-        internal void Repair() {
-            if (this == null || Count == 0) { return; }
+        internal void Repair(int number, bool isTableView) {
+            if (this == null) { return; }
+
+            #region Ungültige Spalten entfernen
+
             for (var z = 0; z < Count; z++) {
                 if (this[z].Column == null || !Database.Column.Contains(this[z].Column)) {
                     this[z] = null;
                 }
             }
             this.RemoveNull();
+
+            #endregion
+
             var tmp = PermissionGroups_Show.SortedDistinctList();
             tmp.RemoveString("#Administrator", false);
             tmp.RemoveNullOrEmpty();
+
+            if (isTableView) {
+                switch (number) {
+                    case 0:
+                        if (isTableView) {
+                            if (string.IsNullOrEmpty(Name)) { Name = "Alle Spalten"; }
+                            ShowAllColumns();
+                        } else {
+                            if (string.IsNullOrEmpty(Name)) { Name = "Kopf"; }
+                            if (PermissionGroups_Show.Count > 0) { PermissionGroups_Show.Clear(); }
+                        }
+                        break;
+
+                    case 1:
+                        if (string.IsNullOrEmpty(Name)) { Name = "Standard"; }
+                        tmp.AddIfNotExists("#Everybody");
+                        break;
+                }
+            }
+
+            tmp = tmp.SortedDistinctList();
+
             if (PermissionGroups_Show.IsDifferentTo(tmp)) {
                 PermissionGroups_Show.Clear();
                 PermissionGroups_Show.AddRange(tmp);
             }
+
+            if (string.IsNullOrEmpty(Name)) { Name = "Ansicht " + number.ToString(); }
         }
 
         protected override void Dispose(bool disposing) {

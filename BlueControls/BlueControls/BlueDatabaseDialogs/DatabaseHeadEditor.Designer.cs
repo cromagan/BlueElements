@@ -56,7 +56,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capVerwaisteDaten = new BlueControls.Controls.Caption();
             this.btnSpaltenuebersicht = new BlueControls.Controls.Button();
             this.tbxReloadVerzoegerung = new BlueControls.Controls.TextBox();
-            this.capJoinTyp = new BlueControls.Controls.Caption();
             this.capReloadVerzoegerung = new BlueControls.Controls.Caption();
             this.cbxAnsicht = new BlueControls.Controls.ComboBox();
             this.capAnsicht = new BlueControls.Controls.Caption();
@@ -218,7 +217,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnSortRichtung
             // 
-            this.btnSortRichtung.ButtonStyle = Enums.enButtonStyle.Pic1_or_Pic2;
+            this.btnSortRichtung.ButtonStyle = BlueControls.Enums.enButtonStyle.Pic1_or_Pic2;
             this.btnSortRichtung.ImageCode = "AZ|16|8";
             this.btnSortRichtung.ImageCode_Checked = "ZA|16|8";
             this.btnSortRichtung.Location = new System.Drawing.Point(288, 32);
@@ -315,6 +314,8 @@ namespace BlueControls.BlueDatabaseDialogs
             this.GlobalTab.Name = "GlobalTab";
             this.GlobalTab.SelectedIndex = 0;
             this.GlobalTab.Size = new System.Drawing.Size(1047, 645);
+            this.GlobalTab.TabDefault = null;
+            this.GlobalTab.TabDefaultOrder = null;
             this.GlobalTab.TabIndex = 21;
             this.GlobalTab.Selecting += new System.Windows.Forms.TabControlCancelEventHandler(this.GlobalTab_Selecting);
             // 
@@ -334,7 +335,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Tab_Allgemein.Controls.Add(this.tbxTags);
             this.Tab_Allgemein.Controls.Add(this.btnSpaltenuebersicht);
             this.Tab_Allgemein.Controls.Add(this.tbxReloadVerzoegerung);
-            this.Tab_Allgemein.Controls.Add(this.capJoinTyp);
             this.Tab_Allgemein.Controls.Add(this.capReloadVerzoegerung);
             this.Tab_Allgemein.Controls.Add(this.cbxAnsicht);
             this.Tab_Allgemein.Controls.Add(this.capAnsicht);
@@ -466,15 +466,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tbxReloadVerzoegerung.Size = new System.Drawing.Size(160, 24);
             this.tbxReloadVerzoegerung.Suffix = "Sek.";
             this.tbxReloadVerzoegerung.TabIndex = 34;
-            // 
-            // capJoinTyp
-            // 
-            this.capJoinTyp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.capJoinTyp.CausesValidation = false;
-            this.capJoinTyp.Location = new System.Drawing.Point(8, 466);
-            this.capJoinTyp.Name = "capJoinTyp";
-            this.capJoinTyp.Size = new System.Drawing.Size(152, 18);
-            this.capJoinTyp.Text = "Dopplte Zeilen Verhalten:";
             // 
             // capReloadVerzoegerung
             // 
@@ -822,7 +813,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private GroupBox grpDateiVerschluesselung;
         private Caption capDateiverschluesselungInfo;
         private Caption capNeueZeilenInfo;
-        private Caption capJoinTyp;
         private ComboBox cbxVerwaisteDaten;
         private Caption capVerwaisteDaten;
         private Caption capUndoAnzahl;

@@ -97,7 +97,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void btnBerechtigungsgruppen_Click(object sender, System.EventArgs e) {
             ItemCollectionList aa = new();
-            aa.AddRange(Database.Permission_AllUsed(true));
+            aa.AddRange(Database.Permission_AllUsed(false));
             aa.Sort();
             aa.CheckBehavior = enCheckBehavior.MultiSelection;
             aa.Check(CurrentArrangement.PermissionGroups_Show, true);

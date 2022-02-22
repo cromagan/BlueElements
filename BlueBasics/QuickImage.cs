@@ -43,6 +43,7 @@ namespace BlueBasics {
         public readonly int Transparenz;
         public readonly string Zweitsymbol;
         private static readonly Dictionary<string, QuickImage> _pics = new();
+        private static object Locker = new();
 
         #endregion
 
@@ -51,7 +52,7 @@ namespace BlueBasics {
         /// <summary>
         /// QuickImages werden immer in den Speicher für spätere Zugriffe aufgenommen!
         /// </summary>
-        public QuickImage(string imageCode) : base() {
+        public QuickImage(string imageCode, bool generate) : base() {
             var w = (imageCode + "||||||||||").Split('|');
             Name = w[0];
             var width = string.IsNullOrEmpty(w[1]) ? -1 : IntParse(w[1]);
@@ -66,17 +67,10 @@ namespace BlueBasics {
             Transparenz = string.IsNullOrEmpty(w[9]) ? 0 : int.Parse(w[9]);
             Zweitsymbol = string.IsNullOrEmpty(w[10]) ? string.Empty : w[10];
 
-            Code = GenerateCode(Name, width, height, Effekt, Färbung, ChangeGreenTo, Sättigung, Helligkeit, DrehWinkel, Transparenz, Zweitsymbol);
+            //Code = GenerateCode(Name, width, height, Effekt, Färbung, ChangeGreenTo, Sättigung, Helligkeit, DrehWinkel, Transparenz, Zweitsymbol);
+            Code = imageCode;
 
-            if (Exists(Code)) { return; }
-
-            try {
-                _pics.Add(Code, this);
-            } catch {
-                return; // Multitasking....
-            }
-
-            Generate();
+            if (generate) { Generate(); }
         }
 
         /// <summary>
@@ -90,8 +84,10 @@ namespace BlueBasics {
 
             Name = imagecode;
             Code = Name;
-            CorrectSize(-1, -1, bmp);
-            _pics.Add(Code, this);
+            lock (Locker) {
+                CorrectSize(-1, -1, bmp);
+                _pics.Add(Code, this);
+            }
 
             if (bmp == null) {
                 GenerateErrorImage();
@@ -111,7 +107,9 @@ namespace BlueBasics {
         #region Properties
 
         public new int Height { get; private set; }
+
         public bool IsError { get; private set; } = false;
+
         public new int Width { get; private set; }
 
         #endregion
@@ -185,8 +183,15 @@ namespace BlueBasics {
         public static QuickImage Get(string imageCode) {
             if (string.IsNullOrEmpty(imageCode)) { return null; }
 
-            if (_pics.TryGetValue(imageCode, out var p)) { return p; }
-            return new(imageCode);
+            QuickImage x;
+            lock (Locker) {
+                if (_pics.TryGetValue(imageCode, out var p)) { return p; }
+                x = new QuickImage(imageCode, false);
+                _pics.Add(imageCode, x);
+            }
+
+            x.Generate();
+            return x;
         }
 
         public static QuickImage Get(string image, int squareWidth) {
@@ -209,6 +214,23 @@ namespace BlueBasics {
 : Get(GenerateCode(Enum.GetName(image.GetType(), image), squareWidth, 0, enImageCodeEffect.Ohne, färbung, changeGreenTo, 100, 100, 0, 0, string.Empty));
 
         public static QuickImage Get(enFileFormat file, int size) => Get(FileTypeImage(file), size);
+
+        public static implicit operator Bitmap(QuickImage p) {
+            //if (!p._generated && !p._generating) { p.Generate(); }
+            Bitmap bmp;
+            var tim = DateTime.Now;
+
+            do {
+                if (DateTime.Now.Subtract(tim).TotalSeconds > 5) { return null; }
+
+                try { // .... wir an anderer Stelle verwendet....
+                    bmp = (BitmapExt)p;
+                    if (bmp == null || bmp.Width < p.Width) { bmp = null; }
+                } catch { bmp = null; }
+            } while (bmp == null);
+
+            return bmp;
+        }
 
         public string CompareKey() => ToString();
 
