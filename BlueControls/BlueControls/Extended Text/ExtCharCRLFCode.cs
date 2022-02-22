@@ -48,7 +48,7 @@ namespace BlueControls {
 
         public override string PlainText() => "\r\n";
 
-        protected override SizeF CalculateSize() => SizeF.Empty;
+        protected override SizeF CalculateSize() => Font == null ? new SizeF(0, 16) : new SizeF(0, Font.CharSize(65).Height);
 
         #endregion
     }

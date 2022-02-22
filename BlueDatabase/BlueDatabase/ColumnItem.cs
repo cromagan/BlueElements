@@ -1112,13 +1112,17 @@ namespace BlueDatabase {
 
         public string ErrorReason() {
             if (Key < 0) { return "Interner Fehler: ID nicht definiert"; }
-            if (string.IsNullOrEmpty(_Name)) { return "Spaltenname nicht definiert."; }
-            if (!Name.ContainsOnlyChars(Constants.AllowedCharsVariableName)) { return "Spaltenname enthält ungültige Zeichen. Erlaubt sind A-Z, 0-9 und _"; }
+            if (string.IsNullOrEmpty(_Name)) { return "Der Spaltenname ist nicht definiert."; }
+            if (!Name.ContainsOnlyChars(Constants.AllowedCharsVariableName)) { return "Der Spaltenname enthält ungültige Zeichen. Erlaubt sind A-Z, 0-9 und _"; }
+
+            //if (!Constants.Char_AZ.Contains(Name.Substring(0, 1).ToUpper())) { return "Der Spaltenname muss mit einem Buchstaben beginnen."; }
+
             foreach (var ThisColumn in Database.Column) {
                 if (ThisColumn != this && ThisColumn != null) {
                     if (_Name.ToUpper() == ThisColumn.Name.ToUpper()) { return "Spalten-Name bereits vorhanden."; }
                 }
             }
+
             if (string.IsNullOrEmpty(_Caption)) { return "Spalten Beschriftung fehlt."; }
             if (!_SaveContent && string.IsNullOrEmpty(_Identifier)) { return "Inhalt der Spalte muss gespeichert werden."; }
             if (!_SaveContent && _ShowUndo) { return "Wenn der Inhalt der Spalte nicht gespeichert wird, darf auch kein Undo geloggt werden."; }
