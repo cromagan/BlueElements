@@ -23,34 +23,45 @@ namespace BlueScript {
 
         public static readonly string ImageKennung = ((char)9001).ToString();
         public static readonly string ObjectKennung = ((char)9002).ToString();
-        internal static readonly string BackSlashEscaped = ((char)9003).ToString();
-        internal static readonly string GänsefüßchenReplace = ((char)9000).ToString();
+
+        internal static readonly string ReplacerForBackSlash = ((char)9003).ToString();
+        internal static readonly string ReplacerForN = ((char)9005).ToString();
+        internal static readonly string ReplacerForQuotes = ((char)9000).ToString();
+        internal static readonly string ReplacerForR = ((char)9004).ToString();
 
         #endregion
 
         #region Methods
 
         public static string RemoveCriticalVariableChars(this string txt) {
-            txt = txt.Replace("\\", BackSlashEscaped);
-            txt = txt.Replace("\"", GänsefüßchenReplace);
+            txt = txt.Replace("\\", ReplacerForBackSlash);
+            txt = txt.Replace("\"", ReplacerForQuotes);
+            txt = txt.Replace("\r", ReplacerForR);
+            txt = txt.Replace("\n", ReplacerForN);
             return txt;
         }
 
         public static string RemoveEscape(this string txt) {
-            txt = txt.Replace("\\\\", BackSlashEscaped);
-            txt = txt.Replace("\\\"", GänsefüßchenReplace);
+            txt = txt.Replace("\\\\", ReplacerForBackSlash);
+            txt = txt.Replace("\\\"", ReplacerForQuotes);
+            txt = txt.Replace("\\r", ReplacerForR);
+            txt = txt.Replace("\\n", ReplacerForN);
             return txt;
         }
 
         public static string RestoreCriticalVariableChars(this string txt) {
-            txt = txt.Replace(BackSlashEscaped, "\\");
-            txt = txt.Replace(GänsefüßchenReplace, "\"");
+            txt = txt.Replace(ReplacerForBackSlash, "\\");
+            txt = txt.Replace(ReplacerForQuotes, "\"");
+            txt = txt.Replace(ReplacerForR, "\r");
+            txt = txt.Replace(ReplacerForN, "\n");
             return txt;
         }
 
         public static string RestoreEscape(this string txt) {
-            txt = txt.Replace(BackSlashEscaped, "\\\\");
-            txt = txt.Replace(GänsefüßchenReplace, "\\\"");
+            txt = txt.Replace(ReplacerForBackSlash, "\\\\");
+            txt = txt.Replace(ReplacerForQuotes, "\\\"");
+            txt = txt.Replace(ReplacerForR, "\\r");
+            txt = txt.Replace(ReplacerForN, "\\n");
             return txt;
         }
 
