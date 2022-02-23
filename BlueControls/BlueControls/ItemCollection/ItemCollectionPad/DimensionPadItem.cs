@@ -137,8 +137,8 @@ namespace BlueControls.ItemCollection {
 
         public static void DrawArrow(Graphics gr, PointF point, float winkel, Color col, float fontSize) {
             var m1 = fontSize * 1.5f;
-            var Px2 = Geometry.PolarToCartesian(m1, winkel + 10);
-            var Px3 = Geometry.PolarToCartesian(m1, winkel - 10);
+            var Px2 = PolarToCartesian(m1, winkel + 10);
+            var Px3 = PolarToCartesian(m1, winkel - 10);
             var pa = Poly_Triangle(point, new PointF(point.X + (float)Px2.X, point.Y + (float)Px2.Y), new PointF(point.X + (float)Px3.X, point.Y + (float)Px3.Y));
             gr.FillPath(new SolidBrush(col), pa);
         }
@@ -274,7 +274,7 @@ namespace BlueControls.ItemCollection {
             var sz2 = gr.MeasureString(Text_unten, f.Font(geszoom));
             var P1 = _SchnittPunkt1.ZoomAndMove(zoom, shiftX, shiftY);
             var P2 = _SchnittPunkt2.ZoomAndMove(zoom, shiftX, shiftY);
-            if (sz1.Width + (PfeilG * 2f) < Geometry.GetLenght(P1, P2)) {
+            if (sz1.Width + (PfeilG * 2f) < GetLenght(P1, P2)) {
                 DrawArrow(gr, P1, _Winkel, f.Color_Main, PfeilG);
                 DrawArrow(gr, P2, _Winkel + 180, f.Color_Main, PfeilG);
             } else {

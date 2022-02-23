@@ -129,7 +129,8 @@ namespace BlueDatabase.Enums {
 
         co_ScriptType = 107,
 
-        // co_ShowPass = 108
+        co_LinkedCellFilter = 108, // co_ShowPass = 108
+
         // co_ChangePass = 109
         co_LineLeft = 110,
 

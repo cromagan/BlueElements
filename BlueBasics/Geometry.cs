@@ -174,7 +174,7 @@ namespace BlueBasics {
                 90 => new PointF(0, -R),
                 180 => new PointF(-R, 0),
                 270 => new PointF(0, R),
-                _ => new PointF((float)R * Geometry.Cosinus(Winkel), -(float)R * Geometry.Sinus(Winkel)),
+                _ => new PointF((float)R * Cosinus(Winkel), -(float)R * Sinus(Winkel)),
             };
         }
 
@@ -184,7 +184,7 @@ namespace BlueBasics {
 
         public static float Tangens(float winkel) => (float)Math.Tan(winkel * _rad);
 
-        public static float Winkel(PointF Sp, PointF EP) => Geometry.GetAngle(Sp.X, Sp.Y, EP.X, EP.Y);
+        public static float Winkel(PointF Sp, PointF EP) => GetAngle(Sp.X, Sp.Y, EP.X, EP.Y);
 
         #endregion
     }

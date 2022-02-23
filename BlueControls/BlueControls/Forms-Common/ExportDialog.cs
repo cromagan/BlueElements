@@ -164,7 +164,7 @@ namespace BlueControls.Forms {
             if (h < 10) { h = 10; }
             padSchachteln.Item.SheetSizeInMM = new System.Drawing.SizeF(b, h);
             padSchachteln.Item.RandinMM = Padding.Empty;
-            padSchachteln.Item.BackColor = System.Drawing.Color.Transparent;
+            padSchachteln.Item.BackColor = Color.Transparent;
             GeneratePrintPad(padSchachteln, 0, cbxLayoutWahl.Text, _RowsForExport, ab);
         }
 
@@ -207,7 +207,7 @@ namespace BlueControls.Forms {
                 _ItemNrForPrint = GeneratePrintPad(padSchachteln, _ItemNrForPrint, cbxLayoutWahl.Text, _RowsForExport, ab);
 
                 var x = TempFile(_ZielPfad, _RowsForExport[0].Database.Caption + "_" + b.ToString() + "x" + h.ToString() + "_" + ab.ToString(), "png");
-                padSchachteln.Item.BackColor = System.Drawing.Color.Transparent;
+                padSchachteln.Item.BackColor = Color.Transparent;
                 padSchachteln.Item.SaveAsBitmap(x);
                 l.Add(x);
                 if (nr == _ItemNrForPrint) { break; }

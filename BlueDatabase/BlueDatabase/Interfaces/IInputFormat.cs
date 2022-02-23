@@ -240,7 +240,7 @@ namespace BlueDatabase.Interfaces {
                     return;
 
                 default:
-                    BlueBasics.Develop.DebugPrint(t);
+                    Develop.DebugPrint(t);
                     break;
             }
         }

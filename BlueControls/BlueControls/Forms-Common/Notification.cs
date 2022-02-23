@@ -27,7 +27,21 @@ namespace BlueControls.Forms {
 
         #region Fields
 
-        private bool UserClicked = false;
+        private static readonly double SpeedIn = 250d;
+
+        // Wegen Recheoperation
+        private static readonly double SpeedOut = 100d;
+
+        // Wegen Recheoperation
+        private DateTime _FirstTimer = DateTime.Now;
+
+        private bool _hiddenNow = false;
+        private bool _isIn = false;
+        private DateTime _outime = new(0);
+        private int _ScreenTime = -999;
+        private bool _userClicked = false;
+
+        private int lowestY;
 
         #endregion
 
@@ -42,7 +56,7 @@ namespace BlueControls.Forms {
             var Wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
             Size = new Size(Wi + (capTXT.Left * 2), He + (capTXT.Top * 2));
             Location = new Point(-Width - 10, Height - 10);
-            ScreenTime = Math.Max(3200, text.Length * 110);
+            _ScreenTime = Math.Max(3200, text.Length * 110);
 
             //Below müsste in Allboxes ja die letzte sein - außer sich selbst
             foreach (var thisParent in AllBoxes) {
@@ -52,6 +66,23 @@ namespace BlueControls.Forms {
                     }
                 }
             }
+
+            lowestY = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - Height - 1;// - Skin.Padding;
+            //var pixelfromLower = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Bottom - lowestY;
+            Top = lowestY;
+            Opacity = 0;
+            Visible = true;
+
+            while (Opacity < 1) {
+                Timer_Tick(null, System.EventArgs.Empty);
+                Develop.DoEvents();
+                if (_hiddenNow) { return; }
+            }
+
+            var timer = new System.Windows.Forms.Timer();
+            timer.Interval = 1;
+            timer.Tick += Timer_Tick;
+            timer.Enabled = true;
         }
 
         #endregion
@@ -59,7 +90,105 @@ namespace BlueControls.Forms {
         #region Properties
 
         public Notification NoteBelow { get; private set; } = null;
-        public int ScreenTime { get; private set; } = -999;
+
+        #endregion
+
+        #region Methods
+
+        public static void Show(string text) {
+            if (string.IsNullOrEmpty(text)) { return; }
+
+            Notification x = new(text);
+            x.Show();
+
+            //var bg = new BackgroundWorker();
+            //bg.ReportProgress();
+            //bg.RunWorkerCompleted += Bg_RunWorkerCompleted;
+            //bg.DoWork += Movement;
+            //bg.RunWorkerAsync(x);
+        }
+
+        public static void Show(string text, enImageCode img) {
+            if (img != enImageCode.None) {
+                text = "<ImageCode=" + Enum.GetName(img.GetType(), img) + "|32> <zbx_store><top>" + text;
+            }
+            Show(text);
+        }
+
+        private void Timer_Tick(object sender, System.EventArgs e) {
+            if (_isIn) { return; }
+            _isIn = true;
+
+            try {
+                var MS = DateTime.Now.Subtract(_FirstTimer).TotalMilliseconds;
+
+                #region Anzeige-Status (Richtung, Prozent) bestimmen
+
+                var hasBelow = false;
+
+                var newLeft = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width - Width - 1;
+                var newTop = lowestY;
+
+                if (NoteBelow != null && AllBoxes.Contains(NoteBelow)) {
+                    newTop = Math.Min(NoteBelow.Top - Height - 1, lowestY);
+                    hasBelow = true;
+                }
+
+                if (MS < SpeedIn) {
+                    // Kommt von Rechts reingeflogen
+                    Opacity = MS / SpeedIn;
+                    //Left = (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width - (x.Width - (Skin.Padding * 2)) * x.Opacity); // Opacity == Prozent
+                    newTop = Math.Min(newTop, lowestY);
+                } else if (Top >= System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height || Opacity < 0.01) {
+                    //Lebensdauer überschritten
+                    _hiddenNow = true;
+                } else if (MS > _ScreenTime - SpeedIn) {
+                    // War lange genug da, darf wieder raus
+                    if (!hasBelow) {
+                        if (_outime.Ticks == 0) { _outime = DateTime.Now; }
+
+                        var MSo = DateTime.Now.Subtract(_outime).TotalMilliseconds;
+
+                        Opacity = 1 - MSo / SpeedOut;
+                        //Top = (int)(lowestY + pixelfromLower * (MSo / SpeedOut)) + 1;
+                        //Left = x.Left + (int)Math.Max(diff / 17, 1);
+                    } else {
+                        Opacity = 1;
+                    }
+                } else {
+                    //Hauptanzeige ist gerade
+                    Opacity = 1;
+                    newTop = Math.Min(newTop, lowestY);
+                }
+
+                #endregion
+
+                if (Left != newLeft || Top != newTop) {
+                    Left = newLeft;
+                    //x.Region = new Region(new Rectangle(0, 0, x.Width, (int)Math.Truncate(x.Height * Prozent)));
+                    Top = newTop;
+                    //x.Refresh();
+                    Develop.DoEvents();
+                }
+
+                if (_FirstTimer.Subtract(DateTime.Now).TotalMinutes > 2 || _userClicked) { _hiddenNow = true; }
+            } catch { }
+
+            if (_hiddenNow) {
+                try {
+                    if (sender is System.Windows.Forms.Timer tim) {
+                        tim.Enabled = false;
+                        tim.Tick -= Timer_Tick;
+                    }
+
+                    Visible = false;
+                    Close();
+                    if (!IsDisposed) { Dispose(); }
+                } catch { }
+            }
+
+            _isIn = false;
+        }
 
         #endregion
 
@@ -77,24 +206,18 @@ namespace BlueControls.Forms {
         //        }
         //    }
         //}
+        //private static void Bg_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
+        //    try {
+        //        if (e. is Notification x) {
+        //        }
 
-        #region Methods
+        //            if (x != null && !x.IsDisposed) {
+        //            x.Close();
+        //            x.Dispose();
+        //        }
 
-        public static void Show(string text) {
-            if (string.IsNullOrEmpty(text)) { return; }
-
-            var bg = new BackgroundWorker();
-            bg.DoWork += Movement;
-            bg.RunWorkerAsync(text);
-        }
-
-        public static void Show(string text, enImageCode img) {
-            if (img != enImageCode.None) {
-                text = "<ImageCode=" + Enum.GetName(img.GetType(), img) + "|32> <zbx_store><top>" + text;
-            }
-            Show(text);
-        }
-
+        //    }
+        //    }
         //public new void Close() {
         //    foreach (var ThisForm in AllBoxes) {
         //        if (!ThisForm.IsDisposed && ThisForm is Notification) {
@@ -194,89 +317,5 @@ namespace BlueControls.Forms {
         //        FloatInAndOutMilliSek = 300;
         //    }
         //}
-
-        private static void Movement(object sender, DoWorkEventArgs e) {
-            Notification x = null;
-            try {
-                x = new((string)e.Argument);
-                x.Show();
-
-                var lowestY = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - x.Height - 1;// - Skin.Padding;
-                var pixelfromLower = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Bottom - lowestY;
-                x.Top = lowestY;
-
-                var _FirstTimer = DateTime.Now;
-                bool hiddenNow;
-                var outime = new DateTime(0);
-
-                do {
-                    var MS = DateTime.Now.Subtract(_FirstTimer).TotalMilliseconds;
-                    //var diff = MS - lastMS;
-                    //lastMS = MS;
-
-                    #region Anzeige-Status (Richtung, Prozent) bestimmen
-
-                    var hasBelow = false;
-                    hiddenNow = false;
-                    var SpeedIn = 250d; // Wegen Recheoperation
-                    var SpeedOut = 100d; // Wegen Recheoperation
-                    var Left = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width - x.Width - 1;
-                    var Top = lowestY;
-
-                    if (x.NoteBelow != null && AllBoxes.Contains(x.NoteBelow)) {
-                        Top = Math.Min(x.NoteBelow.Top - x.Height - 1, lowestY);
-                        hasBelow = true;
-                    }
-
-                    if (MS < SpeedIn) {
-                        // Kommt von Rechts reingeflogen
-                        x.Opacity = MS / SpeedIn;
-                        //Left = (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width - (x.Width - (Skin.Padding * 2)) * x.Opacity); // Opacity == Prozent
-                        Top = Math.Min(Top, lowestY);
-                    } else if (x.Top >= System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height || x.Opacity < 0.01) {
-                        //Lebensdauer überschritten
-                        hiddenNow = true;
-                    } else if (MS > x.ScreenTime - SpeedIn) {
-                        // War lange genug da, darf wieder raus
-                        if (!hasBelow) {
-                            if (outime.Ticks == 0) { outime = DateTime.Now; }
-
-                            var MSo = DateTime.Now.Subtract(outime).TotalMilliseconds;
-
-                            x.Opacity = 1 - MSo / SpeedOut;
-                            //Top = (int)(lowestY + pixelfromLower * (MSo / SpeedOut)) + 1;
-                            //Left = x.Left + (int)Math.Max(diff / 17, 1);
-                        } else {
-                            x.Opacity = 1;
-                        }
-                    } else {
-                        //Hauptanzeige ist gerade
-                        x.Opacity = 1;
-                        Top = Math.Min(Top, lowestY);
-                    }
-
-                    #endregion
-
-                    if (x.Left != Left || x.Top != Top) {
-                        x.Left = Left;
-                        //x.Region = new Region(new Rectangle(0, 0, x.Width, (int)Math.Truncate(x.Height * Prozent)));
-                        x.Top = Top;
-                        //x.Refresh();
-                        Develop.DoEvents();
-                    }
-
-                    if (_FirstTimer.Subtract(DateTime.Now).TotalMinutes > 2 || x.UserClicked) { break; }
-                } while (!hiddenNow);
-            } catch { }
-
-            try {
-                if (x != null && !x.IsDisposed) {
-                    x.Close();
-                    x.Dispose();
-                }
-            } catch { }
-        }
-
-        #endregion
     }
 }

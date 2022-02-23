@@ -158,6 +158,10 @@ namespace BlueDatabase {
             return null;
         }
 
+        /// <summary>
+        /// Gib Spalte 0 zurück
+        /// </summary>
+        /// <returns></returns>
         public ColumnItem First() => this[0];
 
         public string Freename(string wunschname) {

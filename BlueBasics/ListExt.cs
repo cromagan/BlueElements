@@ -144,7 +144,7 @@ namespace BlueBasics {
         }
 
         /// <summary>
-        ///  Leert nur die Objekte. Sonstige Einstellungen bleiben erhalten. Für jedes Item wird 'ItemRemoving' ausgelöst. Die Items selbst bleiben unberührt.
+        /// Leert nur die Objekte. Sonstige Einstellungen bleiben erhalten. Für jedes Item wird 'ItemRemoving' ausgelöst. Die Items selbst bleiben unberührt.
         /// </summary>
         public new void Clear() {
             if (Count == 0) { return; }
@@ -214,7 +214,7 @@ namespace BlueBasics {
         public new void Sort(Comparison<T> comparison) => Develop.DebugPrint_NichtImplementiert();
 
         public new void Sort() {
-            if (base.Count < 2) { return; }
+            if (Count < 2) { return; }
 
             var tmp = new List<T>(this);
             base.Sort();

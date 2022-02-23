@@ -37,6 +37,7 @@ namespace BlueDatabase {
 
         public readonly ListExt<string> AfterEdit_AutoReplace = new();
         public readonly ListExt<string> DropDownItems = new();
+        public readonly ListExt<string> LinkedCellFilter = new();
         public readonly ListExt<string> OpticalReplace = new();
         public readonly ListExt<string> PermissionGroups_ChangeCell = new();
         public readonly ListExt<string> Tags = new();
@@ -206,6 +207,7 @@ namespace BlueDatabase {
 
             #endregion Standard-Werte
 
+            LinkedCellFilter.Changed += LinkedCellFilters_ListOrItemChanged;
             DropDownItems.Changed += DropDownItems_ListOrItemChanged;
             OpticalReplace.Changed += OpticalReplacer_ListOrItemChanged;
             AfterEdit_AutoReplace.Changed += AfterEdit_AutoReplace_ListOrItemChanged;
@@ -1034,6 +1036,8 @@ namespace BlueDatabase {
             SortType = source.SortType;
             DropDownItems.Clear();
             DropDownItems.AddRange(source.DropDownItems);
+            LinkedCellFilter.Clear();
+            LinkedCellFilter.AddRange(source.LinkedCellFilter);
             OpticalReplace.Clear();
             OpticalReplace.AddRange(source.OpticalReplace);
             AfterEdit_AutoReplace.Clear();
@@ -1150,6 +1154,7 @@ namespace BlueDatabase {
                     break;
 
                 case enDataFormat.LinkedCell:
+                    //case enDataFormat.Verknüpfung_zu_anderer_Datenbank:
                     if (!string.IsNullOrEmpty(_CellInitValue)) { return "Dieses Format kann keinen Initial-Text haben."; }
                     if (_KeyColumnKey > -1) { return "Dieses Format darf keine Verknüpfung zu einer Schlüsselspalte haben."; }
                     if (IsFirst()) { return "Dieses Format ist bei der ersten (intern) erste Spalte nicht erlaubt."; }
@@ -1260,7 +1265,7 @@ namespace BlueDatabase {
             if (IsFirst()) {
                 if (_KeyColumnKey > -1) { return "Die (intern) erste Spalte darf keine Verknüpfung zu einer andern Schlüsselspalte haben."; }
             }
-            if (_Format != enDataFormat.LinkedCell) {
+            if (_Format is not enDataFormat.LinkedCell and not enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 if (_LinkedCell_RowKeyIsInColumn > -1) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
                 if (_LinkedCell_ColumnKeyOfLinkedDatabase > -1) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
             }
@@ -1310,36 +1315,36 @@ namespace BlueDatabase {
             Einzigartig.RemoveString(NichtEinzigartig, false);
         }
 
-        /// <summary>
-        /// Füllt die Ersetzungen mittels eines übergebenen Enums aus.
-        /// </summary>
-        /// <param name="t">Beispiel: GetType(enDesign)</param>
-        /// <param name="ZumDropdownHinzuAb">Erster Wert der Enumeration, der Hinzugefügt werden soll. Inklusive deses Wertes</param>
-        /// <param name="ZumDropdownHinzuBis">Letzter Wert der Enumeration, der nicht mehr hinzugefügt wird, also exklusives diese Wertes</param>
-        public void GetValuesFromEnum(Type t, int ZumDropdownHinzuAb, int ZumDropdownHinzuBis) {
-            List<string> NewReplacer = new();
-            List<string> NewAuswahl = new();
-            var items = Enum.GetValues(t);
-            foreach (var thisItem in items) {
-                var te = Enum.GetName(t, thisItem);
-                var th = (int)thisItem;
-                if (!string.IsNullOrEmpty(te)) {
-                    NewReplacer.Add(th.ToString() + "|" + te);
-                    if (th >= ZumDropdownHinzuAb && th < ZumDropdownHinzuBis) {
-                        NewAuswahl.Add(th.ToString());
-                    }
-                }
-            }
-            NewReplacer.Reverse();
-            if (OpticalReplace.IsDifferentTo(NewReplacer)) {
-                OpticalReplace.Clear();
-                OpticalReplace.AddRange(NewReplacer);
-            }
-            if (DropDownItems.IsDifferentTo(NewAuswahl)) {
-                DropDownItems.Clear();
-                DropDownItems.AddRange(NewAuswahl);
-            }
-        }
+        ///// <summary>
+        ///// Füllt die Ersetzungen mittels eines übergebenen Enums aus.
+        ///// </summary>
+        ///// <param name="t">Beispiel: GetType(enDesign)</param>
+        ///// <param name="ZumDropdownHinzuAb">Erster Wert der Enumeration, der Hinzugefügt werden soll. Inklusive deses Wertes</param>
+        ///// <param name="ZumDropdownHinzuBis">Letzter Wert der Enumeration, der nicht mehr hinzugefügt wird, also exklusives diese Wertes</param>
+        //public void GetValuesFromEnum(Type t, int ZumDropdownHinzuAb, int ZumDropdownHinzuBis) {
+        //    List<string> NewReplacer = new();
+        //    List<string> NewAuswahl = new();
+        //    var items = Enum.GetValues(t);
+        //    foreach (var thisItem in items) {
+        //        var te = Enum.GetName(t, thisItem);
+        //        var th = (int)thisItem;
+        //        if (!string.IsNullOrEmpty(te)) {
+        //            NewReplacer.Add(th.ToString() + "|" + te);
+        //            if (th >= ZumDropdownHinzuAb && th < ZumDropdownHinzuBis) {
+        //                NewAuswahl.Add(th.ToString());
+        //            }
+        //        }
+        //    }
+        //    NewReplacer.Reverse();
+        //    if (OpticalReplace.IsDifferentTo(NewReplacer)) {
+        //        OpticalReplace.Clear();
+        //        OpticalReplace.AddRange(NewReplacer);
+        //    }
+        //    if (DropDownItems.IsDifferentTo(NewAuswahl)) {
+        //        DropDownItems.Clear();
+        //        DropDownItems.AddRange(NewAuswahl);
+        //    }
+        //}
 
         public int Index() => Database.Column.IndexOf(this);
 
@@ -1546,7 +1551,7 @@ namespace BlueDatabase {
                     }
                 }
 
-                if (_Format == enDataFormat.LinkedCell && _LinkedCell_RowKeyIsInColumn >= 0) {
+                if (_Format is enDataFormat.LinkedCell or enDataFormat.Verknüpfung_zu_anderer_Datenbank && _LinkedCell_RowKeyIsInColumn >= 0) {
                     var c = LinkedDatabase().Column.SearchByKey(_LinkedCell_ColumnKeyOfLinkedDatabase);
                     if (c != null) {
                         this.GetStyleFrom(c);
@@ -1661,6 +1666,7 @@ namespace BlueDatabase {
                     _ScriptType = enScriptType.Nicht_vorhanden;
                     _Align = enAlignmentHorizontal.Zentriert;
                     DropDownItems.Clear();
+                    LinkedCellFilter.Clear();
                     PermissionGroups_ChangeCell.Clear();
                     _TextBearbeitungErlaubt = false;
                     _DropdownBearbeitungErlaubt = false;
@@ -1989,6 +1995,7 @@ namespace BlueDatabase {
     enDataFormat.Link_To_Filesystem => QuickImage.Get(enImageCode.Datei, 16),
     enDataFormat.RelationText => QuickImage.Get(enImageCode.Herz, 16),
     enDataFormat.FarbeInteger => QuickImage.Get(enImageCode.Pinsel, 16),
+    enDataFormat.Verknüpfung_zu_anderer_Datenbank => QuickImage.Get(enImageCode.Fernglas, 16),
     enDataFormat.LinkedCell => QuickImage.Get(enImageCode.Fernglas, 16),
     enDataFormat.Columns_für_LinkedCellDropdown => QuickImage.Get(enImageCode.Fernglas, 16, "FF0000", ""),
     enDataFormat.Button => QuickImage.Get(enImageCode.Kugel, 16),
@@ -2034,6 +2041,7 @@ namespace BlueDatabase {
                     return false;
 
                 case enDataFormat.LinkedCell:
+                case enDataFormat.Verknüpfung_zu_anderer_Datenbank:
                     if (editType_To_Check == enEditTypeFormula.None) { return true; }
                     //if (EditType_To_Check != enEditTypeFormula.Textfeld &&
                     //    EditType_To_Check != enEditTypeFormula.nur_als_Text_anzeigen) { return false; }
@@ -2126,7 +2134,18 @@ namespace BlueDatabase {
             foreach (var ThisColumn in Database.Column) {
                 if (ThisColumn.KeyColumnKey == Key) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; } // Werte Gleichhalten
                 if (ThisColumn.LinkedCell_RowKeyIsInColumn == Key) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
-                //if (ThisColumn.LinkedCell_ColumnValueFoundIn == Key) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
+                                                                                                                                                                           //if (ThisColumn.LinkedCell_ColumnValueFoundIn == Key) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
+
+                if (ThisColumn.Format == enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
+                    foreach (var thisV in ThisColumn.LinkedCellFilter) {
+                        if (int.TryParse(thisV, out var key)) {
+                            if (key == Key) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; }
+                        }
+
+                    }
+
+                }
+
             }
             if (_Format == enDataFormat.Columns_für_LinkedCellDropdown) { I_Am_A_Key_For_Other_Column = "Die Spalte selbst durch das Format"; }
         }
@@ -2223,6 +2242,10 @@ namespace BlueDatabase {
 
                 case enDatabaseDataType.co_DropDownItems:
                     DropDownItems.SplitAndCutByCR_QuickSortAndRemoveDouble(Wert);
+                    break;
+
+                case enDatabaseDataType.co_LinkedCellFilter:
+                    LinkedCellFilter.SplitAndCutByCR(Wert);
                     break;
 
                 case enDatabaseDataType.co_OpticalReplace:
@@ -2483,6 +2506,7 @@ namespace BlueDatabase {
             Database.SaveToByteList(l, enDatabaseDataType.co_LinieRight, ((int)_LineRight).ToString(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_DropdownBearbeitungErlaubt, _DropdownBearbeitungErlaubt.ToPlusMinus(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_DropDownItems, DropDownItems.JoinWithCr(), Key);
+            Database.SaveToByteList(l, enDatabaseDataType.co_LinkedCellFilter, LinkedCellFilter.JoinWithCr(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_OpticalReplace, OpticalReplace.JoinWithCr(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_AfterEdit_AutoReplace, AfterEdit_AutoReplace.JoinWithCr(), Key);
             Database.SaveToByteList(l, enDatabaseDataType.co_Regex, _Regex, Key);
@@ -2597,13 +2621,26 @@ namespace BlueDatabase {
                 if (disposing) {
                     // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
                 }
-                Database.Disposing += Database_Disposing;
+                Database.Disposing -= Database_Disposing;
                 Invalidate_TmpVariables();
                 Database = null;
+
+                DropDownItems.Changed -= DropDownItems_ListOrItemChanged;
                 DropDownItems.Dispose();
+
+                LinkedCellFilter.Changed -= LinkedCellFilters_ListOrItemChanged;
+                LinkedCellFilter.Dispose();
+
+                Tags.Changed -= Tags_ListOrItemChanged;
                 Tags.Dispose();
+
+                PermissionGroups_ChangeCell.Changed -= PermissionGroups_ChangeCell_ListOrItemChanged;
                 PermissionGroups_ChangeCell.Dispose();
+
+                OpticalReplace.Changed -= OpticalReplacer_ListOrItemChanged;
                 OpticalReplace.Dispose();
+
+                AfterEdit_AutoReplace.Changed -= AfterEdit_AutoReplace_ListOrItemChanged;
                 AfterEdit_AutoReplace.Dispose();
                 // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
                 // TODO: Große Felder auf NULL setzen
@@ -2689,6 +2726,11 @@ namespace BlueDatabase {
                 TXT = TXT.Replace("<br>", "\r");
             }
             return TXT;
+        }
+
+        private void LinkedCellFilters_ListOrItemChanged(object sender, System.EventArgs e) {
+            Database.AddPending(enDatabaseDataType.co_LinkedCellFilter, Key, LinkedCellFilter.JoinWithCr(), false);
+            OnChanged();
         }
 
         private void OpticalReplacer_ListOrItemChanged(object sender, System.EventArgs e) {

@@ -153,7 +153,7 @@ namespace BlueDatabase {
 
             UserGroup = "#Administrator";
             if (!string.IsNullOrEmpty(filename)) {
-                Database.DropConstructorMessage?.Invoke(this, new MessageEventArgs(enFehlerArt.Info, "Lade Datenbank aus Dateisystem: \r\n" + filename.FileNameWithoutSuffix()));
+                DropConstructorMessage?.Invoke(this, new MessageEventArgs(enFehlerArt.Info, "Lade Datenbank aus Dateisystem: \r\n" + filename.FileNameWithoutSuffix()));
                 Load(filename, create);
             } else if (stream != null) {
                 LoadFromStream(stream);
@@ -630,7 +630,7 @@ namespace BlueDatabase {
                         if (ThisColumn != null) {
                             var LCColumn = ThisColumn;
                             var LCrow = ThisRow.Row;
-                            if (ThisColumn.Format == enDataFormat.LinkedCell) {
+                            if (ThisColumn.Format is enDataFormat.LinkedCell or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                                 (LCColumn, LCrow, _) = CellCollection.LinkedCellData(ThisColumn, ThisRow.Row, false, false);
                             }
                             if (LCrow != null && LCColumn != null) {

@@ -226,16 +226,16 @@ namespace BlueControls {
             if (Outline) {
                 for (var PX = -1; PX <= 1; PX++) {
                     for (var PY = -1; PY <= 1; PY++) {
-                        BlueFont.DrawString(gr, text, f, Brush_Color_Outline, x + (PX * zoom), y + (PY * zoom), stringFormat);
+                        DrawString(gr, text, f, Brush_Color_Outline, x + (PX * zoom), y + (PY * zoom), stringFormat);
                     }
                 }
             }
 
             if (IsCap) {
-                BlueFont.DrawString(gr, text, f, Brush_Color_Main, x + (0.3F * zoom), y, stringFormat);
+                DrawString(gr, text, f, Brush_Color_Main, x + (0.3F * zoom), y, stringFormat);
             }
 
-            BlueFont.DrawString(gr, text, f, Brush_Color_Main, x, y, stringFormat);
+            DrawString(gr, text, f, Brush_Color_Main, x, y, stringFormat);
 
             if (StrikeOut) {
                 gr.DrawLine(Pen(zoom), x - 1, (int)(y + (si.Height * 0.55)), (int)(x + 1 + si.Width), (int)(y + (si.Height * 0.55)));
@@ -552,7 +552,7 @@ namespace BlueControls {
                 if (du == 1) {
                     tmpfont = new Font(_FontOL.Name, _FontOL.Size * Multi * 0.8F / Skin.Scale, _FontOL.Style);
                 }
-                BlueFont.DrawString(gr, "Z", tmpfont, Brushes.Black, 0, 0);
+                DrawString(gr, "Z", tmpfont, Brushes.Black, 0, 0);
                 var miny = (int)(f.Height / 2.0);
 
                 for (var x = 1; x <= (f.Width - 1); x++) {

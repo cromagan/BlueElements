@@ -123,6 +123,7 @@ namespace BlueDatabase {
 
             switch (column.Format) {
                 case enDataFormat.LinkedCell:
+                case enDataFormat.Verknüpfung_zu_anderer_Datenbank:
                     if (column.LinkedCell_RowKeyIsInColumn == -9999) {
                         wert = string.Empty; // Beim Skript-Start ist dieser Wert immer leer, da die Verlinkung erst erstellt werden muss.
                         vars.Add(new Variable(column.Name + "_link", string.Empty, enVariableDataType.String, true, true, "Dieser Wert kann nur mit SetLink verändert werden.\r\nBeim Skript-Start ist dieser Wert immer leer, da die Verlinkung erst erstellt werden muss."));
@@ -332,7 +333,7 @@ namespace BlueDatabase {
                     if (fullCheck) {
                         var x = CellGetString(ThisColum);
                         var x2 = ThisColum.AutoCorrect(x);
-                        if (ThisColum.Format != enDataFormat.LinkedCell && x != x2) {
+                        if (ThisColum.Format is not enDataFormat.LinkedCell and not enDataFormat.Verknüpfung_zu_anderer_Datenbank && x != x2) {
                             Database.Cell.Set(ThisColum, this, x2);
                         } else {
                             if (!ThisColum.IsFirst()) {
@@ -573,7 +574,7 @@ namespace BlueDatabase {
             if (!column.SaveContent) { return; }
             if (ColumnVar.Readonly) { return; }
 
-            if (column.Format == enDataFormat.LinkedCell) {
+            if (column.Format is enDataFormat.LinkedCell or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 var ColumnLinkVar = vars.GetSystem(column.Name + "_Link");
                 if (ColumnLinkVar != null) {
                     column.Database.Cell.SetValueBehindLinkedValue(column, this, ColumnLinkVar.ValueString);

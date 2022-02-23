@@ -140,6 +140,42 @@ namespace BlueDatabase {
 
         public RowItem Add(string valueOfCellInFirstColumn) => Add(valueOfCellInFirstColumn, true);
 
+        /// <summary>
+        /// Erstellt eine neue Spalte mit den aus den Filterkriterien. nur Fiter IstGleich wird unterstützt.
+        /// Schägt irgendetwas fehl, wird NULL zurückgegeben.
+        /// Ist ein Filter mehrfach vorhanden, erhält die Zelle den LETZTEN Wert.
+        /// Am Schluß wird noch das Skript ausgeführt.
+        /// </summary>
+        /// <param name="fi"></param>
+        /// <returns></returns>
+        public RowItem Add(List<FilterItem> fi) {
+            List<string> first = null;
+
+            foreach (var thisfi in fi) {
+                if (Database.Column.First() == thisfi.Column) {
+                    if (first != null) { return null; }
+                    first = thisfi.SearchValue;
+                }
+                if (thisfi.FilterType != enFilterType.Istgleich) { return null; }
+                if (thisfi.Column == null) { return null; }
+                if (thisfi.Column.Database != Database) { return null; }
+            }
+
+            if (first == null) { return null; }
+
+            var Row = Add(first.JoinWithCr(), false);
+
+            if (Row == null) { return null; }
+
+            foreach (var thisfi in fi) {
+                Row.CellSet(thisfi.Column, thisfi.SearchValue);
+            }
+
+            Row.DoAutomatic(false, false, 1, "new row");
+
+            return Row;
+        }
+
         public RowItem Add(string valueOfCellInFirstColumn, bool runScriptOfNewRow) {
             if (string.IsNullOrEmpty(valueOfCellInFirstColumn)) {
                 Develop.DebugPrint("Value = 0");

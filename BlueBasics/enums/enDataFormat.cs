@@ -69,7 +69,9 @@ namespace BlueBasics.Enums {
         RelationText = 77,
 
         // KeyForSame = 78
-        Button = 79
+        Button = 79,
+
+        Verknüpfung_zu_anderer_Datenbank = 80
 
         // bis 999 wird geprüft
     }

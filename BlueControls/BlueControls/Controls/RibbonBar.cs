@@ -27,7 +27,7 @@ namespace BlueControls.Controls {
         public RibbonBar() : base() {
             Height = 110;
             SendToBack();
-            Dock = System.Windows.Forms.DockStyle.Top;
+            Dock = DockStyle.Top;
             BackColor = Skin.Color_Back(enDesign.RibbonBar_Body, enStates.Standard);
         }
 

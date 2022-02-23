@@ -164,7 +164,8 @@ namespace BlueDatabase {
                 case enDataFormat.Link_To_Filesystem:
                 case enDataFormat.Values_für_LinkedCellDropdown:
                 case enDataFormat.RelationText:
-                case enDataFormat.LinkedCell:  // Bei LinkedCell kommt direkt der Text der verlinkten Zelle an
+                case enDataFormat.LinkedCell:
+                case enDataFormat.Verknüpfung_zu_anderer_Datenbank: // Bei LinkedCell kommt direkt der Text der verlinkten Zelle an
 
                     //if (column.BildTextVerhalten == enBildTextVerhalten.Interpretiere_Bool) {
                     //    if (txt == "+") {
@@ -236,7 +237,7 @@ namespace BlueDatabase {
         /// </summary>
         /// <returns></returns>
         public static List<string> ValuesReadable(ColumnItem column, RowItem Row, enShortenStyle Style) {
-            if (column.Format == enDataFormat.LinkedCell) {
+            if (column.Format is enDataFormat.LinkedCell or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 //var LinkedData = CellCollection.LinkedCellData(column, Row, false, false);
                 //if (LinkedData.Item1 != null && LinkedData.Item2 != null) { return ValuesReadable(LinkedData.Item1, LinkedData.Item2, Style); }
                 //return new List<string>();

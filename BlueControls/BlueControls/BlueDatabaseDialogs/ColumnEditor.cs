@@ -231,7 +231,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             grpColumnsForLinkedDatabase.Enabled = tmpFormat.NeedLinkedKeyKennung();
             if (!tmpFormat.NeedLinkedKeyKennung()) { txbLinkedKeyKennung.Text = string.Empty; }
             // Format: LinkedCell
-            grpVerlinkteZellen.Enabled = tmpFormat == enDataFormat.LinkedCell;
+            grpVerlinkteZellen.Enabled = tmpFormat is enDataFormat.LinkedCell or enDataFormat.Verknüpfung_zu_anderer_Datenbank;
         }
 
         private void cbxFormat_TextChanged(object sender, System.EventArgs e) => ButtonCheck();
@@ -275,6 +275,12 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (!cbxTargetColumn.Enabled) {
                 cbxTargetColumn.Text = string.Empty;
             }
+
+            GeneratFilterListe();
+        }
+
+        private void cbxTargetColumn_TextChanged(object sender, System.EventArgs e) {
+            GeneratFilterListe();
         }
 
         private int ColumKeyFrom(Database database, string columnKey) => database == null || string.IsNullOrEmpty(columnKey) ? -1 : IntParse(columnKey);
@@ -517,13 +523,128 @@ namespace BlueControls.BlueDatabaseDialogs {
             _Column.SortType = (enSortierTyp)int.Parse(cbxSort.Text);
             _Column.AutoRemove = txbAutoRemove.Text;
             _Column.SaveContent = butSaveContent.Checked;
+            GetSuchText();
+
             _Column.Repair();
             //_Column.Database.Rules.Sort();
         }
 
         private void Database_ShouldICancelDiscOperations(object sender, System.ComponentModel.CancelEventArgs e) => e.Cancel = true;
 
+        private void GeneratFilterListe() {
+            GetSuchText();
+
+            _Column.LinkedDatabaseFile = cbxLinkedDatabase.Text;
+
+            var linkdb = _Column.LinkedDatabase();
+            if (linkdb == null) { tblFilterliste.Database = null; }
+            if (tblFilterliste.Database == null) { tblFilterliste.Database = null; }
+
+            if (tblFilterliste.Database != null && tblFilterliste.Database.Tags.TagGet("Filename") != linkdb.Filename) { tblFilterliste.Database = null; }
+
+
+
+            if (linkdb == null) { return; }
+
+            if (tblFilterliste.Database == null) {
+                Database x = new(false);
+                x.Column.Add("count", "count", enVarType.Integer);
+                var vis = x.Column.Add("visible", "visible", enVarType.Bit);
+                var sp = x.Column.Add("Spalte", "Spalte", enVarType.Text);
+                sp.Align = enAlignmentHorizontal.Rechts;
+                var b = x.Column.Add("Such", "Suchtext", enVarType.Text);
+                b.MultiLine = false;
+                //b.TextBearbeitungErlaubt = true;
+                b.DropdownAllesAbwählenErlaubt = true;
+                b.DropdownBearbeitungErlaubt = true;
+                //b.Prefix = " = ";
+                //b.Suffix = ";";
+
+                foreach (var ThisColumn in _Column.Database.Column) {
+                    if (ThisColumn.Format.CanBeCheckedByRules() && !ThisColumn.MultiLine && !ThisColumn.Format.NeedTargetDatabase()) {
+                        b.DropDownItems.Add(ThisColumn.Key.ToString());
+                        b.OpticalReplace.Add(ThisColumn.Key.ToString() + "|[" + ThisColumn.ReadableText() + "]");
+                    }
+                }
+
+                x.RepairAfterParse();
+                x.ColumnArrangements[1].ShowAllColumns();
+                x.ColumnArrangements[1].Hide("visible");
+                x.ColumnArrangements[1].HideSystemColumns();
+                x.SortDefinition = new RowSortDefinition(x, "Count", false);
+                tblFilterliste.Database = x;
+                tblFilterliste.Arrangement = 1;
+
+                x.Tags.TagSet("Filename", linkdb.Filename);
+
+                tblFilterliste.Filter.Add(vis, enFilterType.Istgleich, "+");
+            }
+
+            linkdb.RepairAfterParse(); // Dass ja die 0 Ansicht stimmt
+
+            var ok = int.TryParse(cbxTargetColumn.Text, out var key);
+            ColumnItem SpalteauDB = null;
+            if (ok) { SpalteauDB = linkdb.Column.SearchByKey(key); }
+
+            for (var z = 0; z < linkdb.Column.Count; z++) {
+                var col = linkdb.Column[z];
+
+                var r = tblFilterliste.Database.Row[z.ToString()];
+                if (r == null) {
+                    r = tblFilterliste.Database.Row.Add(z.ToString());
+                }
+
+                r.CellSet("Spalte", col.ReadableText() + " = ");
+
+                if (col.Format.Autofilter_möglich() && col.Format.MultilinePossible() && !col.MultiLine && col != SpalteauDB && !col.Format.NeedTargetDatabase() && string.IsNullOrEmpty(col.Identifier)) {
+                    r.CellSet("visible", true);
+                } else {
+                    r.CellSet("visible", false);
+                }
+
+                WriteSuchText();
+            }
+        }
+
+        /// <summary>
+        /// Holt die Werte aus tblFilterliste und schreibt sie in _Column.LinkedCellFilter
+        /// Hat tblFilterliste keine Datenbank, bleibt die Variable _Column.LinkedCellFilter unverändert
+        /// </summary>
+        private void GetSuchText() {
+            if (tblFilterliste.Database == null) { return; }
+
+            var nf = new ListExt<string>();
+            foreach (var thisr in tblFilterliste.Database.Row) {
+                var x = thisr.CellGetInteger("Count");
+
+                while (nf.Count <= x) { nf.Add(string.Empty); }
+
+                nf[x] = thisr.CellGetString("Such");
+            }
+
+            if (_Column.LinkedCellFilter.IsDifferentTo(nf)) {
+                _Column.LinkedCellFilter.Clear();
+                _Column.LinkedCellFilter.AddRange(nf);
+            }
+        }
+
         private void SetKeyTo(ComboBox combobox, long columnKey) => combobox.Text = columnKey.ToString();
+
+        /// <summary>
+        /// Holt die Werte aus _Column.LinkedCellFilter und schreibt sie in tblFilterliste
+        ///Leer evtl. Werte aus tblFilterliste
+        /// </summary>
+        private void WriteSuchText() {
+            foreach (var thisr in tblFilterliste.Database.Row) {
+                var x = thisr.CellGetInteger("Count");
+
+                if (x < _Column.LinkedCellFilter.Count) {
+                    thisr.CellSet("Such", _Column.LinkedCellFilter[x]);
+                } else {
+                    thisr.CellSet("Such", string.Empty);
+                }
+            }
+        }
 
         #endregion
 

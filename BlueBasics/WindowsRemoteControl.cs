@@ -169,7 +169,7 @@ namespace BlueBasics {
         }
 
         public static void RebootComputer() {
-            BlueBasics.MultiUserFile.clsMultiUserFile.SaveAll(true);
+            MultiUserFile.clsMultiUserFile.SaveAll(true);
             Develop.TraceLogging_End();
 
             var psi = new ProcessStartInfo("shutdown.exe", "-r -f -t 0") {
@@ -187,7 +187,7 @@ namespace BlueBasics {
         public static extern int ShowWindow(IntPtr hWnd, int nCmdShow);
 
         public static void ShutdownComputer() {
-            BlueBasics.MultiUserFile.clsMultiUserFile.SaveAll(true);
+            MultiUserFile.clsMultiUserFile.SaveAll(true);
             Develop.TraceLogging_End();
 
             var psi = new ProcessStartInfo("shutdown", "/s /t 0") {

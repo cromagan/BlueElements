@@ -371,7 +371,7 @@ namespace BlueControls.Controls {
         #region Methods
 
         public static Size Cell_ContentSize(Table table, ColumnItem Column, RowItem Row, BlueFont CellFont, int Pix16) {
-            if (Column.Format == enDataFormat.LinkedCell) {
+            if (Column.Format is enDataFormat.LinkedCell or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 (var lcolumn, var lrow, _) = CellCollection.LinkedCellData(Column, Row, false, false);
                 return lcolumn != null && lrow != null ? Cell_ContentSize(table, lcolumn, lrow, CellFont, Pix16) : new Size(Pix16, Pix16);
             }
@@ -431,7 +431,7 @@ namespace BlueControls.Controls {
         public static void DoUndo(ColumnItem column, RowItem row) {
             if (column == null) { return; }
             if (row == null) { return; }
-            if (column.Format == enDataFormat.LinkedCell) {
+            if (column.Format is enDataFormat.LinkedCell or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 (var lcolumn, var lrow, _) = CellCollection.LinkedCellData(column, row, true, false);
                 if (lcolumn != null && lrow != null) { DoUndo(lcolumn, lrow); }
                 return;
@@ -529,7 +529,7 @@ namespace BlueControls.Controls {
                 }
                 var ContentHolderCellColumn = column;
                 var ContenHolderCellRow = row?.Row;
-                if (column.Format == enDataFormat.LinkedCell) {
+                if (column.Format is enDataFormat.LinkedCell or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                     (ContentHolderCellColumn, ContenHolderCellRow, _) = CellCollection.LinkedCellData(column, row?.Row, false, false);
                 }
                 var _Ist1 = string.Empty;
@@ -720,8 +720,6 @@ namespace BlueControls.Controls {
             }
 
             #endregion
-
-
 
             #region Filter-Knopf mit Trichter
 
@@ -1550,7 +1548,7 @@ namespace BlueControls.Controls {
                                         break;
 
                                     case enDataFormat.LinkedCell:
-
+                                    case enDataFormat.Verknüpfung_zu_anderer_Datenbank:
                                     case enDataFormat.Values_für_LinkedCellDropdown:
                                         (var lcolumn, var lrow, var info) = CellCollection.LinkedCellData(_MouseOverColumn, _MouseOverRow.Row, false, false);
                                         if (lcolumn != null) { _MouseOverText = lcolumn.QuickInfoText(_MouseOverColumn.ReadableText() + " bei " + lcolumn.ReadableText() + ":"); }
@@ -1762,7 +1760,7 @@ namespace BlueControls.Controls {
                 return;
             }
 
-            if (column.Format == enDataFormat.LinkedCell) {
+            if (column.Format is enDataFormat.LinkedCell or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 (var lcolumn, var lrow, var info) = CellCollection.LinkedCellData(column, row, true, false);
                 if (lcolumn == null || lrow == null) {
                     table.NotEditableInfo("Zelle in verlinkter Datenbank nicht vorhanden:\r\n" + info);
@@ -2157,7 +2155,7 @@ namespace BlueControls.Controls {
                 return;
             }
 
-            if (cellInThisDatabaseColumn.Format == enDataFormat.LinkedCell) {
+            if (cellInThisDatabaseColumn.Format is enDataFormat.LinkedCell or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 string info;
                 (ContentHolderCellColumn, ContentHolderCellRow, info) = CellCollection.LinkedCellData(cellInThisDatabaseColumn, cellInThisDatabaseRow?.Row, true, true);
                 if (ContentHolderCellColumn == null || ContentHolderCellRow == null) {
@@ -2627,7 +2625,7 @@ namespace BlueControls.Controls {
         private void Draw_CellTransparent(Graphics gr, ColumnViewItem cellInThisDatabaseColumn, RowData cellInThisDatabaseRow, Rectangle cellrectangle, BlueFont font, enStates state) {
             if (cellInThisDatabaseRow == null) { return; }
 
-            if (cellInThisDatabaseColumn.Column.Format == enDataFormat.LinkedCell) {
+            if (cellInThisDatabaseColumn.Column.Format is enDataFormat.LinkedCell or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 (var lcolumn, var lrow, _) = CellCollection.LinkedCellData(cellInThisDatabaseColumn.Column, cellInThisDatabaseRow.Row, false, false);
 
                 if (lcolumn != null && lrow != null) {
@@ -2662,7 +2660,7 @@ namespace BlueControls.Controls {
 
             var toDraw = contentHolderCellRow.CellGetString(contentHolderCellColumn);
 
-            Table.Draw_CellTransparentDirect(gr, toDraw, cellrectangle, font, contentHolderCellColumn, Pix16, enShortenStyle.Replaced, contentHolderCellColumn.BildTextVerhalten, state);
+            Draw_CellTransparentDirect(gr, toDraw, cellrectangle, font, contentHolderCellColumn, Pix16, enShortenStyle.Replaced, contentHolderCellColumn.BildTextVerhalten, state);
         }
 
         private void Draw_Column_Body(Graphics gr, ColumnViewItem cellInThisDatabaseColumn, Rectangle displayRectangleWOSlider) {
