@@ -110,7 +110,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                     }
                     break;
 
-                case enDataFormat.LinkedCell:
+                case enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
                 case enDataFormat.Verknüpfung_zu_anderer_Datenbank:
                 case enDataFormat.Values_für_LinkedCellDropdown:
                     (columnLinked, _, _) = CellCollection.LinkedCellData(column, row, true, false);

@@ -231,7 +231,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             grpColumnsForLinkedDatabase.Enabled = tmpFormat.NeedLinkedKeyKennung();
             if (!tmpFormat.NeedLinkedKeyKennung()) { txbLinkedKeyKennung.Text = string.Empty; }
             // Format: LinkedCell
-            grpVerlinkteZellen.Enabled = tmpFormat is enDataFormat.LinkedCell or enDataFormat.Verknüpfung_zu_anderer_Datenbank;
+            grpVerlinkteZellen.Enabled = tmpFormat is enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank;
         }
 
         private void cbxFormat_TextChanged(object sender, System.EventArgs e) => ButtonCheck();
@@ -542,8 +542,6 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             if (tblFilterliste.Database != null && tblFilterliste.Database.Tags.TagGet("Filename") != linkdb.Filename) { tblFilterliste.Database = null; }
 
-
-
             if (linkdb == null) { return; }
 
             if (tblFilterliste.Database == null) {
@@ -618,8 +616,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 var x = thisr.CellGetInteger("Count");
 
                 while (nf.Count <= x) { nf.Add(string.Empty); }
-
-                nf[x] = thisr.CellGetString("Such");
+                if (thisr.CellGetBoolean("visible")) { nf[x] = thisr.CellGetString("Such"); }
             }
 
             if (_Column.LinkedCellFilter.IsDifferentTo(nf)) {

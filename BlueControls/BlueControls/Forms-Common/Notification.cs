@@ -73,11 +73,11 @@ namespace BlueControls.Forms {
             Opacity = 0;
             Visible = true;
 
-            while (Opacity < 1) {
-                Timer_Tick(null, System.EventArgs.Empty);
-                Develop.DoEvents();
-                if (_hiddenNow) { return; }
-            }
+            //while (Opacity < 1) {
+            //    Timer_Tick(null, System.EventArgs.Empty);
+            //    Develop.DoEvents();
+            //    if (_hiddenNow) { return; }
+            //}
 
             var timer = new System.Windows.Forms.Timer();
             timer.Interval = 1;
@@ -168,7 +168,7 @@ namespace BlueControls.Forms {
                     //x.Region = new Region(new Rectangle(0, 0, x.Width, (int)Math.Truncate(x.Height * Prozent)));
                     Top = newTop;
                     //x.Refresh();
-                    Develop.DoEvents();
+                    //Develop.DoEvents();
                 }
 
                 if (_FirstTimer.Subtract(DateTime.Now).TotalMinutes > 2 || _userClicked) { _hiddenNow = true; }

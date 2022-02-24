@@ -630,7 +630,7 @@ namespace BlueDatabase {
                         if (ThisColumn != null) {
                             var LCColumn = ThisColumn;
                             var LCrow = ThisRow.Row;
-                            if (ThisColumn.Format is enDataFormat.LinkedCell or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
+                            if (ThisColumn.Format is enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                                 (LCColumn, LCrow, _) = CellCollection.LinkedCellData(ThisColumn, ThisRow.Row, false, false);
                             }
                             if (LCrow != null && LCColumn != null) {

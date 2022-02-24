@@ -82,7 +82,7 @@ namespace BlueScript {
             #region Spalte, die geändert werden soll, finden: ChangeColumn
 
             var ChangeColumn = db.Column.Exists(attvar.Attributes[0].Name);
-            if (ChangeColumn.Format is not BlueBasics.Enums.enDataFormat.LinkedCell and not BlueBasics.Enums.enDataFormat.Verknüpfung_zu_anderer_Datenbank) { return new strDoItFeedback("Spalte hat das falsche Format: " + attvar.Attributes[1].ValueString); }
+            if (ChangeColumn.Format is not BlueBasics.Enums.enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert and not BlueBasics.Enums.enDataFormat.Verknüpfung_zu_anderer_Datenbank) { return new strDoItFeedback("Spalte hat das falsche Format: " + attvar.Attributes[1].ValueString); }
             if (ChangeColumn.LinkedCell_RowKeyIsInColumn >= -1) { return new strDoItFeedback("Spalte wird automatisiert befüllt: " + attvar.Attributes[1].ValueString); }
 
             #endregion

@@ -70,7 +70,7 @@ namespace BlueDatabase {
         public static string AutomaticInitalValue(ColumnItem column, RowItem row) {
             if (column == null || row == null) { return string.Empty; }
 
-            if (column.Format is enDataFormat.LinkedCell or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
+            if (column.Format is enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 (var lcolumn, var lrow, var _) = LinkedCellData(column, row, true, true);
                 return AutomaticInitalValue(lcolumn, lrow);
             }
@@ -103,7 +103,7 @@ namespace BlueDatabase {
             if (!string.IsNullOrEmpty(tmpf)) { return LanguageTool.DoTranslate(tmpf); }
             if (!Column.SaveContent) { return LanguageTool.DoTranslate("Der Spalteninhalt wird nicht gespeichert."); }
 
-            if (Column.Format is enDataFormat.LinkedCell or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
+            if (Column.Format is enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 (var lcolumn, var lrow, var info) = LinkedCellData(Column, Row, true, false);
                 if (lcolumn != null && lrow != null) {
                     lcolumn.Database.PowerEdit = Column.Database.PowerEdit;
@@ -171,7 +171,7 @@ namespace BlueDatabase {
         /// <param name="addRowIfNotExists"></param>
         /// <returns></returns>
         public static (ColumnItem column, RowItem row, string info) LinkedCellData(ColumnItem column, RowItem row, bool repairLinkedValue, bool addRowIfNotExists) {
-            if (column.Format is not enDataFormat.LinkedCell and not enDataFormat.Verknüpfung_zu_anderer_Datenbank) { return (null, null, "Format ist nicht LinkedCell."); }
+            if (column.Format is not enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert and not enDataFormat.Verknüpfung_zu_anderer_Datenbank) { return (null, null, "Format ist nicht LinkedCell."); }
 
             var LinkedDatabase = column.LinkedDatabase();
             if (LinkedDatabase == null) { return (null, null, "Verlinkte Datenbank nicht gefunden."); }
@@ -268,7 +268,7 @@ namespace BlueDatabase {
                     SetSameValueOfKey(column, RowKey, CurrentValue);
                     break;
 
-                case enDataFormat.LinkedCell:
+                case enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
                 case enDataFormat.Verknüpfung_zu_anderer_Datenbank:
                     if (doAlways) {
                         LinkedCellData(column, _database.Row.SearchByKey(RowKey), true, false); // Repariert auch Cellbezüge
@@ -361,7 +361,7 @@ namespace BlueDatabase {
             try {
                 if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
                 if (row == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeile ungültig!<br>" + _database.Filename); }
-                if (column.Format is enDataFormat.LinkedCell or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
+                if (column.Format is enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                     (var lcolumn, var lrow, var _) = LinkedCellData(column, row, false, false);
                     return lcolumn != null && lrow != null ? lrow.CellGetString(lcolumn) : string.Empty;
                 }
@@ -384,7 +384,7 @@ namespace BlueDatabase {
         public bool IsNullOrEmpty(ColumnItem Column, RowItem Row) {
             if (Column == null) { return true; }
             if (Row == null) { return true; }
-            if (Column.Format is enDataFormat.LinkedCell or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
+            if (Column.Format is enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 (var lcolumn, var lrow, var _) = LinkedCellData(Column, Row, false, false);
                 return lcolumn == null || lrow == null || lrow.CellIsNullOrEmpty(lcolumn);
             }
@@ -426,7 +426,7 @@ namespace BlueDatabase {
                 // Tatsächlichen String ermitteln --------------------------------------------
                 var _String = string.Empty;
                 var fColumn = column;
-                if (column.Format is enDataFormat.LinkedCell or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
+                if (column.Format is enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                     var LinkedData = LinkedCellData(column, row, false, false);
                     if (LinkedData.column != null && LinkedData.row != null) {
                         _String = LinkedData.row.CellGetString(LinkedData.column);
@@ -495,7 +495,7 @@ namespace BlueDatabase {
             _database.BlockReload(false);
             if (column == null) { _database?.DevelopWarnung("Spalte ungültig!"); Develop.DebugPrint(enFehlerArt.Fehler, "Spalte ungültig!<br>" + _database.Filename); }
             if (row == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeile ungültig!!<br>" + _database.Filename); }
-            if (column.Format is enDataFormat.LinkedCell or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
+            if (column.Format is enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 (var lcolumn, var lrow, var _) = LinkedCellData(column, row, true, !string.IsNullOrEmpty(value));
                 lrow?.CellSet(lcolumn, value);
                 return;
@@ -649,7 +649,7 @@ namespace BlueDatabase {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Zeile ungültig!!<br>" + _database.Filename);
             }
 
-            if (column.Format is not enDataFormat.LinkedCell and not enDataFormat.Verknüpfung_zu_anderer_Datenbank) { value = column.AutoCorrect(value); }
+            if (column.Format is not enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert and not enDataFormat.Verknüpfung_zu_anderer_Datenbank) { value = column.AutoCorrect(value); }
 
             var CellKey = KeyOfCell(column.Key, row.Key);
             var OldValue = string.Empty;

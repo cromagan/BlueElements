@@ -57,7 +57,7 @@ namespace BlueBasics.Enums {
         // Relation_And_Event_Mixed = 72,
         Link_To_Filesystem = 73,
 
-        LinkedCell = 74,
+        Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert = 74,
         Columns_für_LinkedCellDropdown = 75,
 
         /// <summary>

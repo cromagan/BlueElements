@@ -1153,7 +1153,7 @@ namespace BlueDatabase {
                     if (_VorschlagsColumn > 0) { return "Diese Format kann keine Vorschlags-Spalte haben."; }
                     break;
 
-                case enDataFormat.LinkedCell:
+                case enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
                     //case enDataFormat.Verknüpfung_zu_anderer_Datenbank:
                     if (!string.IsNullOrEmpty(_CellInitValue)) { return "Dieses Format kann keinen Initial-Text haben."; }
                     if (_KeyColumnKey > -1) { return "Dieses Format darf keine Verknüpfung zu einer Schlüsselspalte haben."; }
@@ -1173,7 +1173,7 @@ namespace BlueDatabase {
                     break;
 
                 case enDataFormat.Values_für_LinkedCellDropdown:
-                    Develop.DebugPrint("Values_für_LinkedCellDropdown Verwendung bei:" + Database.Filename); //TODO: 29.07.2021 Values_für_LinkedCellDropdown Format entfernen
+                    //Develop.DebugPrint("Values_für_LinkedCellDropdown Verwendung bei:" + Database.Filename); //TODO: 29.07.2021 Values_für_LinkedCellDropdown Format entfernen
                     if (!string.IsNullOrEmpty(_CellInitValue)) { return "Dieses Format kann keinen Initial-Text haben."; }
                     if (KeyColumnKey > -1) { return "Dieses Format darf keine Verknüpfung zu einer Schlüsselspalte haben."; }
                     if (_VorschlagsColumn > 0) { return "Dieses Format kann keine Vorschlags-Spalte haben."; }
@@ -1265,7 +1265,7 @@ namespace BlueDatabase {
             if (IsFirst()) {
                 if (_KeyColumnKey > -1) { return "Die (intern) erste Spalte darf keine Verknüpfung zu einer andern Schlüsselspalte haben."; }
             }
-            if (_Format is not enDataFormat.LinkedCell and not enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
+            if (_Format is not enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert and not enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 if (_LinkedCell_RowKeyIsInColumn > -1) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
                 if (_LinkedCell_ColumnKeyOfLinkedDatabase > -1) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
             }
@@ -1502,6 +1502,9 @@ namespace BlueDatabase {
 
             //// bis 999 wird geprüft
             ///
+
+            CheckIfIAmAKeyColumn();
+
             try {
                 switch ((int)_Format) {
                     case (int)enDataFormat.Button:
@@ -1536,6 +1539,17 @@ namespace BlueDatabase {
                     case 70:
                         SetFormatForTextMitFormatierung();
                         break;
+
+                    case (int)enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
+
+                        if (LinkedCell_RowKeyIsInColumn != -9999) {
+                            _Format = enDataFormat.Verknüpfung_zu_anderer_Datenbank;
+                            LinkedCellFilter.Clear();
+                            LinkedCellFilter.Add(LinkedCell_RowKeyIsInColumn.ToString());
+                            LinkedCell_RowKeyIsInColumn = -1;
+                        }
+
+                        break;
                 }
 
                 if (ScriptType == enScriptType.undefiniert) {
@@ -1551,7 +1565,7 @@ namespace BlueDatabase {
                     }
                 }
 
-                if (_Format is enDataFormat.LinkedCell or enDataFormat.Verknüpfung_zu_anderer_Datenbank && _LinkedCell_RowKeyIsInColumn >= 0) {
+                if (_Format is enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank && _LinkedCell_RowKeyIsInColumn >= 0) {
                     var c = LinkedDatabase().Column.SearchByKey(_LinkedCell_ColumnKeyOfLinkedDatabase);
                     if (c != null) {
                         this.GetStyleFrom(c);
@@ -1614,6 +1628,7 @@ namespace BlueDatabase {
                 case "System: Chapter":
                     _Name = "SYS_Chapter";
                     _Format = enDataFormat.Text;
+                    _AfterEdit_AutoCorrect = true; // Verhindert \r am Ende und somit anzeigefehler
                     if (SetAll) {
                         Caption = "Kapitel";
                         ForeColor = Color.FromArgb(0, 0, 0);
@@ -1996,7 +2011,7 @@ namespace BlueDatabase {
     enDataFormat.RelationText => QuickImage.Get(enImageCode.Herz, 16),
     enDataFormat.FarbeInteger => QuickImage.Get(enImageCode.Pinsel, 16),
     enDataFormat.Verknüpfung_zu_anderer_Datenbank => QuickImage.Get(enImageCode.Fernglas, 16),
-    enDataFormat.LinkedCell => QuickImage.Get(enImageCode.Fernglas, 16),
+    enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert => QuickImage.Get(enImageCode.Fernglas, 16),
     enDataFormat.Columns_für_LinkedCellDropdown => QuickImage.Get(enImageCode.Fernglas, 16, "FF0000", ""),
     enDataFormat.Button => QuickImage.Get(enImageCode.Kugel, 16),
     _ => _Format.TextboxEditPossible()
@@ -2040,7 +2055,7 @@ namespace BlueDatabase {
                     if (!_MultiLine && editType_To_Check == enEditTypeFormula.Ja_Nein_Knopf) { return true; }
                     return false;
 
-                case enDataFormat.LinkedCell:
+                case enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
                 case enDataFormat.Verknüpfung_zu_anderer_Datenbank:
                     if (editType_To_Check == enEditTypeFormula.None) { return true; }
                     //if (EditType_To_Check != enEditTypeFormula.Textfeld &&
@@ -2141,11 +2156,8 @@ namespace BlueDatabase {
                         if (int.TryParse(thisV, out var key)) {
                             if (key == Key) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; }
                         }
-
                     }
-
                 }
-
             }
             if (_Format == enDataFormat.Columns_für_LinkedCellDropdown) { I_Am_A_Key_For_Other_Column = "Die Spalte selbst durch das Format"; }
         }
@@ -2676,7 +2688,7 @@ namespace BlueDatabase {
                 // 1/2 l Milch
                 // 3-5 Stunden
                 // 180°C
-                // Nach Zahlen KEINE leerzeichen einfügen. Es gibgt so viele dinge.... 90er Schichtsalat
+                // Nach Zahlen KEINE leerzeichen einfügen. Es gibt so viele dinge.... 90er Schichtsalat
                 TXT = TXT.Insert(" ", ",", "1234567890, \r");
                 TXT = TXT.Insert(" ", "!", " !?)\r");
                 TXT = TXT.Insert(" ", "?", " !?)\r");

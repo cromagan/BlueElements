@@ -122,11 +122,14 @@ namespace BlueDatabase {
             var vars = new List<Variable>();
 
             switch (column.Format) {
-                case enDataFormat.LinkedCell:
+                case enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
                 case enDataFormat.Verknüpfung_zu_anderer_Datenbank:
                     if (column.LinkedCell_RowKeyIsInColumn == -9999) {
                         wert = string.Empty; // Beim Skript-Start ist dieser Wert immer leer, da die Verlinkung erst erstellt werden muss.
                         vars.Add(new Variable(column.Name + "_link", string.Empty, enVariableDataType.String, true, true, "Dieser Wert kann nur mit SetLink verändert werden.\r\nBeim Skript-Start ist dieser Wert immer leer, da die Verlinkung erst erstellt werden muss."));
+                    } else {
+                        qi = "Spalte: " + column.ReadableText() + "\r\nDer Inhalt wird zur Startzeit des Skripts festgelegt.";
+                        ro = true;
                     }
                     break;
 
@@ -139,7 +142,6 @@ namespace BlueDatabase {
                     break;
 
                 case enDataFormat.Columns_für_LinkedCellDropdown:
-                    var nw = string.Empty;
                     if (int.TryParse(wert, out var ColKey)) {
                         var C = column.LinkedDatabase().Column.SearchByKey(ColKey);
                         if (C != null) { wert = C.Name; }
@@ -333,7 +335,7 @@ namespace BlueDatabase {
                     if (fullCheck) {
                         var x = CellGetString(ThisColum);
                         var x2 = ThisColum.AutoCorrect(x);
-                        if (ThisColum.Format is not enDataFormat.LinkedCell and not enDataFormat.Verknüpfung_zu_anderer_Datenbank && x != x2) {
+                        if (ThisColum.Format is not enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert and not enDataFormat.Verknüpfung_zu_anderer_Datenbank && x != x2) {
                             Database.Cell.Set(ThisColum, this, x2);
                         } else {
                             if (!ThisColum.IsFirst()) {
@@ -574,7 +576,7 @@ namespace BlueDatabase {
             if (!column.SaveContent) { return; }
             if (ColumnVar.Readonly) { return; }
 
-            if (column.Format is enDataFormat.LinkedCell or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
+            if (column.Format is enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 var ColumnLinkVar = vars.GetSystem(column.Name + "_Link");
                 if (ColumnLinkVar != null) {
                     column.Database.Cell.SetValueBehindLinkedValue(column, this, ColumnLinkVar.ValueString);
