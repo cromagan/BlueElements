@@ -636,7 +636,7 @@ namespace BlueControls.Controls {
             if (column == null) { return; }
             ItemCollectionList Item = new();
             if (column.DropdownBearbeitungErlaubt) {
-                ItemCollectionList.GetItemCollection(Item, column, null, enShortenStyle.Both, 10000);
+                ItemCollectionList.GetItemCollection(Item, column, null, enShortenStyle.Replaced, 10000);
                 if (!column.DropdownWerteAndererZellenAnzeigen) {
                     bool again;
                     do {
@@ -673,7 +673,7 @@ namespace BlueControls.Controls {
             Control.Item.CheckBehavior = enCheckBehavior.NoSelection;
             if (Column == null) { return; }
             ItemCollectionList Item = new();
-            ItemCollectionList.GetItemCollection(Item, Column, null, enShortenStyle.Both, 10000);
+            ItemCollectionList.GetItemCollection(Item, Column, null, enShortenStyle.Replaced, 10000);
             Control.SuggestionsAdd(Item);
             Control.AddAllowed = enAddType.UserDef;
         }

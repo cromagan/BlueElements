@@ -203,7 +203,9 @@ namespace BlueDatabase.Enums {
         //co_ID = 166
         co_LinkedDatabase = 166,
 
+        [Obsolete]
         co_LinkKeyKennung = 167,
+
         co_BestFile_StandardSuffix = 168,
         co_BestFile_StandardFolder = 169,
         co_BildCode_ConstantHeight = 170,

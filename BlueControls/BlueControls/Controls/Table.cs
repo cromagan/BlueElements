@@ -1121,7 +1121,12 @@ namespace BlueControls.Controls {
             return RowNr < 1 ? null : SortedRows()[RowNr - 1];
         }
 
-        public RowData View_RowFirst() => _Database == null ? null : SortedRows().Count == 0 ? null : SortedRows()[0];
+        public RowData View_RowFirst() {
+            if (_Database == null) { return null; }
+            var s = SortedRows();
+            if (s == null || s.Count == 0) { return null; }
+            return SortedRows()[0];
+        }
 
         public RowData View_RowLast() => _Database == null ? null : SortedRows().Count == 0 ? null : SortedRows()[SortedRows().Count - 1];
 
@@ -2312,10 +2317,12 @@ namespace BlueControls.Controls {
                 Appearance = enBlueListBoxAppearance.DropdownSelectbox
             };
 
-            ItemCollectionList.GetItemCollection(t, ContentHolderCellColumn, ContentHolderCellRow, enShortenStyle.Both, 1000);
+            ItemCollectionList.GetItemCollection(t, ContentHolderCellColumn, ContentHolderCellRow, enShortenStyle.Replaced, 1000);
             if (t.Count == 0) {
                 // Hm.. Dropdown kein Wert vorhanden.... also gar kein Dropdown öffnen!
-                if (ContentHolderCellColumn.TextBearbeitungErlaubt) { Cell_Edit(cellInThisDatabaseColumn, cellInThisDatabaseRow, false); }
+                if (ContentHolderCellColumn.TextBearbeitungErlaubt) { Cell_Edit(cellInThisDatabaseColumn, cellInThisDatabaseRow, false); } else {
+                    NotEditableInfo("Keine Items zum Auswählen vorhanden.");
+                }
                 return;
             }
 
@@ -2371,7 +2378,7 @@ namespace BlueControls.Controls {
 
             Box.Tag = CellCollection.KeyOfCell(cellInThisDatabaseColumn, cellInThisDatabaseRow?.Row); // ThisDatabase, der Wert wird beim einchecken in die Fremdzelle geschrieben
             if (Box is ComboBox box) {
-                ItemCollectionList.GetItemCollection(box.Item, ContentHolderCellColumn, ContentHolderCellRow, enShortenStyle.Both, 1000);
+                ItemCollectionList.GetItemCollection(box.Item, ContentHolderCellColumn, ContentHolderCellRow, enShortenStyle.Replaced, 1000);
                 if (box.Item.Count == 0) {
                     return Cell_Edit_TextBox(cellInThisDatabaseColumn, cellInThisDatabaseRow, ContentHolderCellColumn, ContentHolderCellRow, BTB, 0, 0);
                 }
@@ -3179,6 +3186,8 @@ namespace BlueControls.Controls {
         private RowData RowOnCoordinate(int pixelY) {
             if (_Database == null || pixelY <= HeadSize()) { return null; }
             var s = SortedRows();
+            if(s== null) { return null; }
+
             foreach (var ThisRowItem in s) {
                 if (ThisRowItem != null) {
                     if (pixelY >= DrawY(ThisRowItem) &&

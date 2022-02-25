@@ -18,7 +18,6 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using System;
-using System.ComponentModel;
 using System.Drawing;
 
 namespace BlueControls.Forms {
@@ -30,7 +29,7 @@ namespace BlueControls.Forms {
         private static readonly double SpeedIn = 250d;
 
         // Wegen Recheoperation
-        private static readonly double SpeedOut = 100d;
+        private static readonly double SpeedOut = 250d;
 
         // Wegen Recheoperation
         private DateTime _FirstTimer = DateTime.Now;
@@ -56,7 +55,7 @@ namespace BlueControls.Forms {
             var Wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
             Size = new Size(Wi + (capTXT.Left * 2), He + (capTXT.Top * 2));
             Location = new Point(-Width - 10, Height - 10);
-            _ScreenTime = Math.Max(3200, text.Length * 110);
+            _ScreenTime = Math.Max(3200, text.Length * 100);
 
             //Below müsste in Allboxes ja die letzte sein - außer sich selbst
             foreach (var thisParent in AllBoxes) {
@@ -70,19 +69,18 @@ namespace BlueControls.Forms {
             lowestY = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - Height - 1;// - Skin.Padding;
             //var pixelfromLower = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Bottom - lowestY;
             Top = lowestY;
-            Opacity = 0;
-            Visible = true;
+            Opacity = 0.001;
+            //Visible = true; // %$§!% !!!!!!!
 
-            //while (Opacity < 1) {
-            //    Timer_Tick(null, System.EventArgs.Empty);
-            //    Develop.DoEvents();
-            //    if (_hiddenNow) { return; }
-            //}
+            while (Opacity < 1) {
+                Timer_Tick(null, System.EventArgs.Empty);
+                Refresh();
+                //Develop.DoEvents();
+                if (_hiddenNow) { return; }
+            }
 
-            var timer = new System.Windows.Forms.Timer();
-            timer.Interval = 1;
-            timer.Tick += Timer_Tick;
-            timer.Enabled = true;
+            _FirstTimer = DateTime.Now;
+            timNote.Enabled = true;
         }
 
         #endregion
@@ -97,15 +95,8 @@ namespace BlueControls.Forms {
 
         public static void Show(string text) {
             if (string.IsNullOrEmpty(text)) { return; }
-
             Notification x = new(text);
             x.Show();
-
-            //var bg = new BackgroundWorker();
-            //bg.ReportProgress();
-            //bg.RunWorkerCompleted += Bg_RunWorkerCompleted;
-            //bg.DoWork += Movement;
-            //bg.RunWorkerAsync(x);
         }
 
         public static void Show(string text, enImageCode img) {
@@ -114,6 +105,8 @@ namespace BlueControls.Forms {
             }
             Show(text);
         }
+
+        private void capTXT_Click(object sender, System.EventArgs e) { }
 
         private void Timer_Tick(object sender, System.EventArgs e) {
             if (_isIn) { return; }

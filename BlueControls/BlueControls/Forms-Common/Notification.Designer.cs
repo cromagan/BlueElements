@@ -1,9 +1,7 @@
 ﻿using BlueControls.Enums;
 
-namespace BlueControls.Forms
-{
-    partial class Notification
-    {
+namespace BlueControls.Forms {
+    partial class Notification {
         /// <summary>
         /// Required designer variable.
         /// </summary>
@@ -12,10 +10,8 @@ namespace BlueControls.Forms
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null))
-            {
+        protected override void Dispose(bool disposing) {
+            if (disposing && (components != null)) {
                 components.Dispose();
             }
             base.Dispose(disposing);
@@ -26,11 +22,11 @@ namespace BlueControls.Forms
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
-        private void InitializeComponent()
-        {
+        private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Notification));
             this.capTXT = new BlueControls.Controls.Caption();
+            this.timNote = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // capTXT
@@ -41,6 +37,12 @@ namespace BlueControls.Forms
             this.capTXT.Size = new System.Drawing.Size(10, 10);
             this.capTXT.TextAnzeigeVerhalten = BlueControls.Enums.enSteuerelementVerhalten.Steuerelement_Anpassen;
             this.capTXT.Translate = false;
+            this.capTXT.Click += new System.EventHandler(this.capTXT_Click);
+            // 
+            // timNote
+            // 
+            this.timNote.Interval = 10;
+            this.timNote.Tick += new System.EventHandler(this.Timer_Tick);
             // 
             // Notification
             // 
@@ -50,10 +52,9 @@ namespace BlueControls.Forms
             this.Name = "Notification";
             this.ResumeLayout(false);
         }
-
-
         #endregion
 
         private Controls.Caption capTXT;
+        private System.Windows.Forms.Timer timNote;
     }
 }

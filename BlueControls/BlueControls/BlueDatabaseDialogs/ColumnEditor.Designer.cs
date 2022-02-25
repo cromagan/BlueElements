@@ -157,7 +157,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpLinkedDatabase = new BlueControls.Controls.GroupBox();
             this.grpColumnsForLinkedDatabase = new BlueControls.Controls.GroupBox();
             this.grpVerlinkteZellen = new BlueControls.Controls.GroupBox();
-            this.cbxRowKeyInColumn = new BlueControls.Controls.ComboBox();
             this.capRowKeyInColumn = new BlueControls.Controls.Caption();
             this.capTargetColumn = new BlueControls.Controls.Caption();
             this.capIntern = new BlueControls.Controls.Caption();
@@ -1651,7 +1650,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpVerlinkteZellen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.grpVerlinkteZellen.CausesValidation = false;
-            this.grpVerlinkteZellen.Controls.Add(this.cbxRowKeyInColumn);
             this.grpVerlinkteZellen.Controls.Add(this.capRowKeyInColumn);
             this.grpVerlinkteZellen.Location = new System.Drawing.Point(8, 88);
             this.grpVerlinkteZellen.Name = "grpVerlinkteZellen";
@@ -1659,18 +1657,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpVerlinkteZellen.TabIndex = 1;
             this.grpVerlinkteZellen.TabStop = false;
             this.grpVerlinkteZellen.Text = "Format: Verlinkte Zellen";
-            // 
-            // cbxRowKeyInColumn
-            // 
-            this.cbxRowKeyInColumn.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbxRowKeyInColumn.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxRowKeyInColumn.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxRowKeyInColumn.Location = new System.Drawing.Point(336, 24);
-            this.cbxRowKeyInColumn.Name = "cbxRowKeyInColumn";
-            this.cbxRowKeyInColumn.Regex = null;
-            this.cbxRowKeyInColumn.Size = new System.Drawing.Size(520, 24);
-            this.cbxRowKeyInColumn.TabIndex = 3;
             // 
             // capRowKeyInColumn
             // 
@@ -1840,7 +1826,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private TextBox txbBestFileStandardFolder;
         private GroupBox grpVerlinkteZellen;
         private ComboBox cbxTargetColumn;
-        private ComboBox cbxRowKeyInColumn;
         private Caption capTargetColumn;
         private Caption capRowKeyInColumn;
         private TextBox txbReplacer;

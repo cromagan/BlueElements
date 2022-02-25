@@ -169,11 +169,6 @@ namespace BlueControls.ItemCollection {
                 }
             }
             switch (column.Format) {
-                //case enDataFormat.Bit:
-                //    l.Add(true.ToPlusMinus());
-                //    l.Add(false.ToPlusMinus());
-                //    break;
-
                 case enDataFormat.Columns_für_LinkedCellDropdown:
                     var DB = column.LinkedDatabase();
                     if (DB != null && !string.IsNullOrEmpty(column.LinkedKeyKennung)) {
@@ -191,12 +186,30 @@ namespace BlueControls.ItemCollection {
 
                 case enDataFormat.Values_für_LinkedCellDropdown:
                     var DB2 = column.LinkedDatabase();
-                    l.AddRange(DB2.Column[0].Contents());
+                    if (DB2 == null) { Notification.Show("Verknüpfte Datenbank nicht vorhanden", enImageCode.Information); return; }
+
+
+                    /// Spalte aus der Ziel-Datenbank ermitteln
+                    var targetColumn = DB2.Column.SearchByKey(column.LinkedCell_ColumnKeyOfLinkedDatabase);
+                    if (targetColumn == null) { Notification.Show("Die Spalte ist in der Zieldatenbank nicht vorhanden."); return; }
+
+
+                    var (filter, info) = CellCollection.GetFilterFromLinkedCellData(DB2, column, checkedItemsAtRow);
+                    if (!string.IsNullOrEmpty(info)) {
+                        Notification.Show("Keine Zeilen in der Quell-Datenbank vorhanden.", enImageCode.Information);
+                    }
+
+                    //                    var r = LinkedDatabase.Row.CalculateFilteredRows(filter);
+
+                    //q
+
+                    l.AddRange(targetColumn.Contents(filter, null));
                     if (l.Count == 0) {
                         Notification.Show("Keine Zeilen in der Quell-Datenbank vorhanden.", enImageCode.Information);
                     }
                     break;
             }
+
             if (column.Database.Row.Count > 0) {
                 if (checkedItemsAtRow != null) {
                     if (!checkedItemsAtRow.CellIsNullOrEmpty(column)) {
@@ -210,7 +223,9 @@ namespace BlueControls.ItemCollection {
                 }
                 l = l.SortedDistinctList();
             }
-            if (maxItems > 0 && l.Count > maxItems) { return; }
+            if (maxItems > 0 && l.Count > maxItems) {
+                return;
+            }
             e.AddRange(l, column, style, column.BildTextVerhalten);
             if (checkedItemsAtRow != null) {
                 foreach (var t in Marked) {

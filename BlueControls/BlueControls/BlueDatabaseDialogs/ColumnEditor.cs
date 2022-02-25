@@ -22,6 +22,7 @@ using BlueControls.Forms;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using static BlueBasics.Converter;
@@ -244,21 +245,17 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void cbxLinkedDatabase_TextChanged(object sender, System.EventArgs e) {
             _Column.LinkedDatabaseFile = cbxLinkedDatabase.Text;
 
-            cbxRowKeyInColumn.Item.Clear();
-            cbxRowKeyInColumn.Item.Add("#Ohne", "-1");
-            cbxRowKeyInColumn.Item.Add("<Skript-gesteuert>", "-9999");
-
             cbxTargetColumn.Item.Clear();
 
             if (_Column.LinkedDatabase() != null) {
-                foreach (var ThisColumn in _Column.Database.Column) {
-                    if (ThisColumn.Format.CanBeCheckedByRules() && !ThisColumn.MultiLine && !ThisColumn.Format.NeedTargetDatabase()) {
-                        cbxRowKeyInColumn.Item.Add(ThisColumn);
-                    }
-                    if (ThisColumn.Format == enDataFormat.Values_für_LinkedCellDropdown && ThisColumn.LinkedDatabase() == _Column.LinkedDatabase()) {
-                        cbxRowKeyInColumn.Item.Add(ThisColumn);
-                    }
-                }
+                //foreach (var ThisColumn in _Column.Database.Column) {
+                //    if (ThisColumn.Format.CanBeCheckedByRules() && !ThisColumn.MultiLine && !ThisColumn.Format.NeedTargetDatabase()) {
+                //        cbxRowKeyInColumn.Item.Add(ThisColumn);
+                //    }
+                //    //if (ThisColumn.Format == enDataFormat.Values_für_LinkedCellDropdownx && ThisColumn.LinkedDatabase() == _Column.LinkedDatabase()) {
+                //    //    cbxRowKeyInColumn.Item.Add(ThisColumn);
+                //    //}
+                //}
                 foreach (var ThisLinkedColumn in _Column.LinkedDatabase().Column) {
                     if (!ThisLinkedColumn.IsFirst() && ThisLinkedColumn.Format.CanBeChangedByRules() && !ThisLinkedColumn.Format.NeedTargetDatabase()) {
                         cbxTargetColumn.Item.Add(ThisLinkedColumn);
@@ -266,9 +263,6 @@ namespace BlueControls.BlueDatabaseDialogs {
                 }
             }
             cbxTargetColumn.Item.Sort();
-            cbxRowKeyInColumn.Item.Sort();
-            cbxRowKeyInColumn.Enabled = cbxRowKeyInColumn.Item.Count > 0;
-            SetKeyTo(cbxRowKeyInColumn, _Column.LinkedCell_RowKeyIsInColumn);
             SetKeyTo(cbxTargetColumn, _Column.LinkedCell_ColumnKeyOfLinkedDatabase);
             cbxTargetColumn.Enabled = cbxTargetColumn.Item.Count > 0;
             capTargetColumn.Enabled = cbxTargetColumn.Enabled;
@@ -512,7 +506,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             _Column.LinkedDatabaseFile = cbxLinkedDatabase.Text; // Muss vor LinkedCell_RowKey zurückgeschrieben werden
             _Column.LinkedKeyKennung = txbLinkedKeyKennung.Text;
             _Column.KeyColumnKey = ColumKeyFrom(_Column.Database, cbxSchlüsselspalte.Text);
-            _Column.LinkedCell_RowKeyIsInColumn = ColumKeyFrom(_Column.Database, cbxRowKeyInColumn.Text);
             _Column.LinkedCell_ColumnKeyOfLinkedDatabase = ColumKeyFrom(_Column.LinkedDatabase(), cbxTargetColumn.Text); // LINKED DATABASE
             _Column.DropdownKey = ColumKeyFrom(_Column.Database, cbxDropDownKey.Text);
             _Column.VorschlagsColumn = ColumKeyFrom(_Column.Database, cbxVorschlagSpalte.Text);
@@ -523,7 +516,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             _Column.SortType = (enSortierTyp)int.Parse(cbxSort.Text);
             _Column.AutoRemove = txbAutoRemove.Text;
             _Column.SaveContent = butSaveContent.Checked;
-            GetSuchText();
+            GetLinkedCellFilter();
 
             _Column.Repair();
             //_Column.Database.Rules.Sort();
@@ -532,7 +525,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void Database_ShouldICancelDiscOperations(object sender, System.ComponentModel.CancelEventArgs e) => e.Cancel = true;
 
         private void GeneratFilterListe() {
-            GetSuchText();
+            GetLinkedCellFilter();
 
             _Column.LinkedDatabaseFile = cbxLinkedDatabase.Text;
 
@@ -551,17 +544,16 @@ namespace BlueControls.BlueDatabaseDialogs {
                 var sp = x.Column.Add("Spalte", "Spalte", enVarType.Text);
                 sp.Align = enAlignmentHorizontal.Rechts;
                 var b = x.Column.Add("Such", "Suchtext", enVarType.Text);
+                b.Quickinfo = "<b>Entweder</b> ~Spaltenname~<br><b>oder</b> fester Text zum suchen<br>Mischen wird nicht unterstützt.";
                 b.MultiLine = false;
-                //b.TextBearbeitungErlaubt = true;
+                b.TextBearbeitungErlaubt = true;
                 b.DropdownAllesAbwählenErlaubt = true;
                 b.DropdownBearbeitungErlaubt = true;
-                //b.Prefix = " = ";
-                //b.Suffix = ";";
 
                 foreach (var ThisColumn in _Column.Database.Column) {
-                    if (ThisColumn.Format.CanBeCheckedByRules() && !ThisColumn.MultiLine && !ThisColumn.Format.NeedTargetDatabase()) {
-                        b.DropDownItems.Add(ThisColumn.Key.ToString());
-                        b.OpticalReplace.Add(ThisColumn.Key.ToString() + "|[" + ThisColumn.ReadableText() + "]");
+                    if (ThisColumn.Format.CanBeCheckedByRules() && !ThisColumn.MultiLine) {
+                        b.DropDownItems.Add("~" + ThisColumn.Name.ToLower() + "~");
+                        b.OpticalReplace.Add("~" + ThisColumn.Name.ToLower() + "~|[Spalte: " + ThisColumn.ReadableText() + "]");
                     }
                 }
 
@@ -594,13 +586,13 @@ namespace BlueControls.BlueDatabaseDialogs {
 
                 r.CellSet("Spalte", col.ReadableText() + " = ");
 
-                if (col.Format.Autofilter_möglich() && col.Format.MultilinePossible() && !col.MultiLine && col != SpalteauDB && !col.Format.NeedTargetDatabase() && string.IsNullOrEmpty(col.Identifier)) {
+                if (col.Format.Autofilter_möglich() && !col.MultiLine && col != SpalteauDB && col != SpalteauDB && !col.Format.NeedTargetDatabase() && string.IsNullOrEmpty(col.Identifier)) {
                     r.CellSet("visible", true);
                 } else {
                     r.CellSet("visible", false);
                 }
 
-                WriteSuchText();
+                SetLinkedCellFilter();
             }
         }
 
@@ -608,16 +600,27 @@ namespace BlueControls.BlueDatabaseDialogs {
         /// Holt die Werte aus tblFilterliste und schreibt sie in _Column.LinkedCellFilter
         /// Hat tblFilterliste keine Datenbank, bleibt die Variable _Column.LinkedCellFilter unverändert
         /// </summary>
-        private void GetSuchText() {
+        private void GetLinkedCellFilter() {
             if (tblFilterliste.Database == null) { return; }
 
-            var nf = new ListExt<string>();
+            var nf = new List<string>();
             foreach (var thisr in tblFilterliste.Database.Row) {
                 var x = thisr.CellGetInteger("Count");
 
                 while (nf.Count <= x) { nf.Add(string.Empty); }
-                if (thisr.CellGetBoolean("visible")) { nf[x] = thisr.CellGetString("Such"); }
+                if (thisr.CellGetBoolean("visible")) {
+                    var tmp = "@" + thisr.CellGetString("Such");
+
+                    foreach (var thisColumn in _Column.Database.Column) {
+                        if ("@~" + thisColumn.Name.ToLower() + "~" == tmp) { tmp = thisColumn.Key.ToString(); }
+                    }
+                    if (tmp == "@") { tmp = string.Empty; }
+
+                    nf[x] = tmp;
+                }
             }
+
+            nf = nf.JoinWithCr().SplitAndCutByCRToList();
 
             if (_Column.LinkedCellFilter.IsDifferentTo(nf)) {
                 _Column.LinkedCellFilter.Clear();
@@ -631,12 +634,27 @@ namespace BlueControls.BlueDatabaseDialogs {
         /// Holt die Werte aus _Column.LinkedCellFilter und schreibt sie in tblFilterliste
         ///Leer evtl. Werte aus tblFilterliste
         /// </summary>
-        private void WriteSuchText() {
+        private void SetLinkedCellFilter() {
             foreach (var thisr in tblFilterliste.Database.Row) {
                 var x = thisr.CellGetInteger("Count");
 
                 if (x < _Column.LinkedCellFilter.Count) {
-                    thisr.CellSet("Such", _Column.LinkedCellFilter[x]);
+                    var tmp = _Column.LinkedCellFilter[x];
+
+                    if (int.TryParse(tmp, out var key)) {
+                        var col = _Column.Database.Column.SearchByKey(key);
+                        if (col != null) {
+                            tmp = "~" + col.Name.ToLower() + "~";
+                        } else {
+                            tmp = string.Empty;
+                        }
+                    } else if (tmp.StartsWith("@")) {
+                        tmp = tmp.Substring(1);
+                    } else {
+                        tmp = string.Empty;
+                    }
+
+                    thisr.CellSet("Such", tmp);
                 } else {
                     thisr.CellSet("Such", string.Empty);
                 }

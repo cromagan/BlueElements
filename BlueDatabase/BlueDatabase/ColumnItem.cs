@@ -98,6 +98,7 @@ namespace BlueDatabase {
         /// Die zu suchende Zeile ist in dieser Spalte zu finden.
         /// Ist der Wrt -9999 wird die Verknüpfung über das Script gesetzt.
         /// </summary>
+        [Obsolete]
         private long _LinkedCell_RowKeyIsInColumn;
 
         private string _LinkedDatabaseFile;
@@ -625,6 +626,7 @@ namespace BlueDatabase {
             }
         }
 
+        [Obsolete]
         public string LinkedKeyKennung {
             get => _LinkedKeyKennung;
             set {
@@ -1265,8 +1267,8 @@ namespace BlueDatabase {
             if (IsFirst()) {
                 if (_KeyColumnKey > -1) { return "Die (intern) erste Spalte darf keine Verknüpfung zu einer andern Schlüsselspalte haben."; }
             }
-            if (_Format is not enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert and not enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
-                if (_LinkedCell_RowKeyIsInColumn > -1) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
+            if (_Format is not enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert and not enDataFormat.Verknüpfung_zu_anderer_Datenbank and not enDataFormat.Values_für_LinkedCellDropdown) {
+                //if (_LinkedCell_RowKeyIsInColumn > -1) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
                 if (_LinkedCell_ColumnKeyOfLinkedDatabase > -1) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }
             }
             return string.Empty;

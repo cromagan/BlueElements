@@ -144,6 +144,25 @@ namespace BlueDatabase {
                 : string.Empty;
         }
 
+        public static (List<FilterItem> filter, string info) GetFilterFromLinkedCellData(Database linkedDatabase, ColumnItem column, RowItem row) {
+            var fi = new List<FilterItem>();
+
+            for (var z = 0; z < Math.Min(column.LinkedCellFilter.Count, linkedDatabase.Column.Count); z++) {
+                if (int.TryParse(column.LinkedCellFilter[z], out var key)) {
+                    var c = column.Database.Column.SearchByKey(key);
+                    if (c == null) { return (null, "Eine Spalte, aus der der Zeilenschlüssel kommen soll, existiert nicht."); }
+                    var value = row.CellGetString(c);
+                    if (string.IsNullOrEmpty(value)) { return (null, "Leere Suchwerte werden nicht unterstützt."); }
+                    fi.Add(new FilterItem(linkedDatabase.Column[z], enFilterType.Istgleich, value));
+                } else {
+                    if (z == 0) { return (null, "Die erste Spalte, aus der der Zeilenschlüssel kommen soll, muss einen Suchwert enthalten."); }
+                }
+            }
+            //if (fi.Count == 0) { return (null, "Keine gültigen Suchkriterien definiert."); }
+
+            return (fi, string.Empty);
+        }
+
         public static string KeyOfCell(long ColKey, long RowKey) => ColKey + "|" + RowKey;
 
         public static string KeyOfCell(ColumnItem Column, RowItem Row) {
@@ -176,7 +195,7 @@ namespace BlueDatabase {
             var LinkedDatabase = column.LinkedDatabase();
             if (LinkedDatabase == null) { return (null, null, "Verlinkte Datenbank nicht gefunden."); }
 
-            var skriptgesteuert = column.LinkedCell_RowKeyIsInColumn == -9999;
+            var skriptgesteuert = column.LinkedCell_RowKeyIsInColumn == -9999 && column.Format == enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert;
 
             if (repairLinkedValue && !skriptgesteuert) { return RepairLinkedCellValue(LinkedDatabase, column, row, addRowIfNotExists); }
 
@@ -704,26 +723,15 @@ namespace BlueDatabase {
                     targetRow = linkedDatabase.Row.Add(row.CellGetString(LinkedCell_RowIsInColumn));
                 }
             } else {
-                var fi = new List<FilterItem>();
+                var (filter, info) = GetFilterFromLinkedCellData(linkedDatabase, column, row);
+                if (!string.IsNullOrEmpty(info)) { return Ergebnis(info); }
 
-                for (var z = 0; z < Math.Min(column.LinkedCellFilter.Count, linkedDatabase.Column.Count); z++) {
-                    if (int.TryParse(column.LinkedCellFilter[z], out var key)) {
-                        var c = column.Database.Column.SearchByKey(key);
-                        if (c == null) { return Ergebnis("Eine Spalte, aus der der Zeilenschlüssel kommen soll, existiert nicht."); }
-                        var value = row.CellGetString(c);
-                        if (string.IsNullOrEmpty(value)) { return Ergebnis("Leere Suchwerte werden nicht unterstützt."); }
-                        fi.Add(new FilterItem(linkedDatabase.Column[z], enFilterType.Istgleich, value));
-                    } else {
-                        if (z == 0) { return Ergebnis("Die erste Spalte, aus der der Zeilenschlüssel kommen soll, muss einen Suchwert enthalten."); }
-                    }
-                }
-                if (fi.Count == 0) { return Ergebnis("Keine gültigen Suchkriterien definiert."); }
-                var r = linkedDatabase.Row.CalculateFilteredRows(fi);
+                var r = linkedDatabase.Row.CalculateFilteredRows(filter);
                 if (r.Count > 1) { return Ergebnis("Suchergebnis liefert mehrere Ergebnisse."); } else if (r.Count == 1) {
                     targetRow = r[0];
                 } else {
                     if (addRowIfNotExists) {
-                        targetRow = linkedDatabase.Row.Add(fi);
+                        targetRow = linkedDatabase.Row.Add(filter);
                     }
                 }
             }
@@ -969,8 +977,6 @@ namespace BlueDatabase {
                         }
                     }
                 }
-
-
 
                 if (ThisColumn.KeyColumnKey == column.Key) {
                     if (Rows == null) {
