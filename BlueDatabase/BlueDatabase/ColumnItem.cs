@@ -759,8 +759,7 @@ namespace BlueDatabase {
 
         public bool TextBearbeitungErlaubt {
             get {
-                if (Database.PowerEdit.Subtract(DateTime.Now).TotalSeconds > 0) { return true; }
-                return _TextBearbeitungErlaubt;
+                return Database.PowerEdit.Subtract(DateTime.Now).TotalSeconds > 0 || _TextBearbeitungErlaubt;
             }
             set {
                 if (_TextBearbeitungErlaubt == value) { return; }
@@ -1070,7 +1069,7 @@ namespace BlueDatabase {
 
         public List<string> Contents() => Contents((FilterCollection)null, null);
 
-        public List<string> Contents(List<FilterItem> fi, List<RowItem> pinned) {
+        public List<string> Contents(List<FilterItem>? fi, List<RowItem>? pinned) {
             if (fi == null || fi.Count == 0) { return Contents((FilterCollection)null, null); }
             var ficol = new FilterCollection(fi[0].Database);
             ficol.AddRange(fi);

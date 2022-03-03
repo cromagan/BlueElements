@@ -45,7 +45,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         #region Constructors
 
-        public AutoFilter(ColumnItem column, FilterCollection filter, List<RowItem> pinned) : base(enDesign.Form_AutoFilter) {
+        public AutoFilter(ColumnItem column, FilterCollection filter, List<RowItem>? pinned) : base(enDesign.Form_AutoFilter) {
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
             InitializeComponent();
             //Me.SetNotFocusable()

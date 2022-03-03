@@ -132,7 +132,7 @@ namespace BlueControls.ItemCollection {
             return null;
         }
 
-        public override bool FilterMatch(string FilterText) => base.FilterMatch(FilterText) || Caption.ToUpper().Contains(FilterText.ToUpper()) || _ImageFilename != null && _ImageFilename.ToUpper().Contains(FilterText.ToUpper());
+        public override bool FilterMatch(string FilterText) => base.FilterMatch(FilterText) || Caption.ToUpper().Contains(FilterText.ToUpper()) || (_ImageFilename != null && _ImageFilename.ToUpper().Contains(FilterText.ToUpper()));
 
         public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) {
             if (style == enBlueListBoxAppearance.FileSystem) {

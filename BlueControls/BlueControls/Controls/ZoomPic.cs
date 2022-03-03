@@ -33,8 +33,8 @@ namespace BlueControls.Controls {
         #region Fields
 
         private Bitmap _bmp = null;
-        private MouseEventArgs1_1 _MouseCurrent = null;
-        private MouseEventArgs1_1 _MouseDown = null;
+        private MouseEventArgs1_1? _MouseCurrent = null;
+        private MouseEventArgs1_1? _MouseDown = null;
 
         #endregion
 

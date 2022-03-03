@@ -611,7 +611,7 @@ namespace BlueControls.ItemCollection {
             OnDoInvalidate();
         }
 
-        internal RectangleF MaxBounds(List<BasicPadItem> ZoomItems) {
+        internal RectangleF MaxBounds(List<BasicPadItem>? ZoomItems) {
             var r = Count == 0 ? new RectangleF(0, 0, 0, 0) : MaximumBounds(ZoomItems);
             if (SheetSizeInMM.Width > 0 && SheetSizeInMM.Height > 0) {
                 var X1 = Math.Min(r.Left, 0);
@@ -685,7 +685,8 @@ namespace BlueControls.ItemCollection {
             OnDoInvalidate();
         }
 
-        private RectangleF MaximumBounds(List<BasicPadItem> ZoomItems) {
+        private RectangleF MaximumBounds(List<BasicPadItem>? zoomItems) {
+            if (zoomItems is null) { return RectangleF.Empty; }
             var x1 = float.MaxValue;
             var y1 = float.MaxValue;
             var x2 = float.MinValue;
@@ -693,7 +694,7 @@ namespace BlueControls.ItemCollection {
             var Done = false;
             foreach (var ThisItem in this) {
                 if (ThisItem != null) {
-                    if (ZoomItems == null || ZoomItems.Contains(ThisItem)) {
+                    if (zoomItems == null || zoomItems.Contains(ThisItem)) {
                         var UA = ThisItem.ZoomToArea();
                         x1 = Math.Min(x1, UA.Left);
                         y1 = Math.Min(y1, UA.Top);

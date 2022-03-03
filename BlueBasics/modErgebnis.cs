@@ -32,9 +32,9 @@ namespace BlueBasics {
 
         public static double? Ergebnis(string formel) {
             formel = formel.Replace(" ", string.Empty);
-            if (string.IsNullOrEmpty(formel)) { return null; }
-
-            return formel != formel.ReduceToChars(Constants.Char_Numerals + ".,()+-/*") ? null : ErgebnisCore(formel);
+            return string.IsNullOrEmpty(formel)
+                ? null
+                : formel != formel.ReduceToChars(Constants.Char_Numerals + ".,()+-/*") ? null : ErgebnisCore(formel);
         }
 
         public static int LastMinusIndex(string formel) {

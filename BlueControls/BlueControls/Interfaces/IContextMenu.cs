@@ -60,7 +60,7 @@ namespace BlueControls.Interfaces {
         /// <param name="Tags"></param>
         /// <param name="Cancel"></param>
         /// <param name="Translate"></param>
-        void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate);
+        void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate);
 
         /// <summary>
         /// Hier wird dem übergeordneten Steuerelement die Möglichkeit gegeben, Einträge in das Kontextmenu hinzuzufügen.

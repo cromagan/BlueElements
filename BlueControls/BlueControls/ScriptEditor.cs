@@ -36,7 +36,7 @@ namespace BlueControls {
     {
         #region Fields
 
-        private frmBefehlsreferenz _befehlsReferenz;
+        private frmBefehlsreferenz? _befehlsReferenz;
         private string _LastVariableContent = string.Empty;
         private string _LastWord = string.Empty;
         private bool _MenuDone = false;
@@ -86,7 +86,7 @@ namespace BlueControls {
             return false;
         }
 
-        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollection.ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
+        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollection.ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
             if (!string.IsNullOrEmpty(_LastVariableContent)) {
                 Items.Add("Variableninhalt kopieren");
             }

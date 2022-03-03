@@ -35,7 +35,7 @@ namespace BlueControls.Controls {
 
         private long _ShowingRowKey = -1;
 
-        private RowItem _tmpShowingRow = null;
+        private RowItem? _tmpShowingRow = null;
 
         #endregion
 

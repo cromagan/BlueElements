@@ -483,10 +483,9 @@ namespace BlueDatabase {
             if (!string.IsNullOrEmpty(f)) { return f; }
             if (mode == enErrorReason.OnlyRead) { return string.Empty; }
 
-            if (int.Parse(LoadedVersion.Replace(".", "")) > int.Parse(DatabaseVersion.Replace(".", ""))) {
-                return "Diese Programm kann nur Datenbanken bis Version " + DatabaseVersion + " speichern.";
-            }
-            return string.Empty;
+            return int.Parse(LoadedVersion.Replace(".", "")) > int.Parse(DatabaseVersion.Replace(".", ""))
+                ? "Diese Programm kann nur Datenbanken bis Version " + DatabaseVersion + " speichern."
+                : string.Empty;
         }
 
         /// <summary>
@@ -773,8 +772,7 @@ namespace BlueDatabase {
             if (DatenbankAdmin == null || DatenbankAdmin.Count == 0) { return false; }
             if (DatenbankAdmin.Contains("#EVERYBODY", false)) { return true; }
             if (!string.IsNullOrEmpty(UserName) && DatenbankAdmin.Contains("#User: " + UserName, false)) { return true; }
-            if (!string.IsNullOrEmpty(UserGroup) && DatenbankAdmin.Contains(UserGroup, false)) { return true; }
-            return false;
+            return !string.IsNullOrEmpty(UserGroup) && DatenbankAdmin.Contains(UserGroup, false);
         }
 
         public void OnScriptError(RowCancelEventArgs e) {
@@ -923,7 +921,7 @@ namespace BlueDatabase {
             return e.SortedDistinctList();
         }
 
-        public bool PermissionCheck(ListExt<string> allowed, RowItem row) {
+        public bool PermissionCheck(ListExt<string> allowed, RowItem? row) {
             try {
                 if (IsAdministrator()) { return true; }
                 if (PowerEdit.Subtract(DateTime.Now).TotalSeconds > 0) { return true; }
@@ -1423,19 +1421,7 @@ namespace BlueDatabase {
             }
         }
 
-        private void Column_ItemAdded(object sender, ListEventArgs e) {
-            CheckViewsAndArrangements();
-            //            protected override void OnItemAdded(ColumnItem item) {
-            //    base.OnItemAdded(item);
-            //    Database.CheckViewsAndArrangements();
-
-            //}
-            //protected override void OnItemRemoved() {
-            //    base.OnItemRemoved();
-            //    Database.CheckViewsAndArrangements();
-            //    Database.Layouts.Check();
-            //}
-        }
+        private void Column_ItemAdded(object sender, ListEventArgs e) => CheckViewsAndArrangements();//            protected override void OnItemAdded(ColumnItem item) {//    base.OnItemAdded(item);//    Database.CheckViewsAndArrangements();//}//protected override void OnItemRemoved() {//    base.OnItemRemoved();//    Database.CheckViewsAndArrangements();//    Database.Layouts.Check();//}
 
         //private void ChangeColumnKeyInPending(int oldKey, int newKey) {
         //    foreach (var ThisPending in Works) {
@@ -1920,10 +1906,13 @@ namespace BlueDatabase {
                     return string.Empty;
 
                 default:
-                    LoadedVersion = "9.99";
-                    if (!ReadOnly) {
-                        Develop.DebugPrint(enFehlerArt.Fehler, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Datei: " + Filename);
+                    if (LoadedVersion == DatabaseVersion) {
+                        LoadedVersion = "9.99";
+                        if (!ReadOnly) {
+                            Develop.DebugPrint(enFehlerArt.Fehler, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Datei: " + Filename);
+                        }
                     }
+
                     break;
             }
             return string.Empty;

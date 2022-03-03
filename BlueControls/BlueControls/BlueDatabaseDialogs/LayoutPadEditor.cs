@@ -49,7 +49,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         #region Properties
 
-        public Database Database { get; private set; }
+        public Database? Database { get; private set; }
 
         #endregion
 

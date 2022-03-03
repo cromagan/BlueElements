@@ -30,7 +30,7 @@ namespace BlueControls {
 
         private enDesign _Design = enDesign.Undefiniert;
 
-        private BlueFont _Font = null;
+        private BlueFont? _Font = null;
 
         private SizeF _Size = SizeF.Empty;
         private enStates _State = enStates.Undefiniert;
@@ -118,13 +118,11 @@ namespace BlueControls {
         /// <param name="zoom"></param>
         /// <param name="drawingPos">Muss bereits Skaliert sein</param>
         /// <returns></returns>
-        public bool IsVisible(float zoom, Point drawingPos, Rectangle drawingArea) {
-            return (drawingArea.Width < 1 && drawingArea.Height < 1) ||
+        public bool IsVisible(float zoom, Point drawingPos, Rectangle drawingArea) => (drawingArea.Width < 1 && drawingArea.Height < 1) ||
                 ((drawingArea.Width <= 0 || (Pos.X * zoom) + drawingPos.X <= drawingArea.Right)
                 && (drawingArea.Height <= 0 || (Pos.Y * zoom) + drawingPos.Y <= drawingArea.Bottom)
                 && ((Pos.X + Size.Width) * zoom) + drawingPos.X >= drawingArea.Left
                 && ((Pos.Y + Size.Height) * zoom) + drawingPos.Y >= drawingArea.Top);
-        }
 
         public abstract bool isWordSeperator();
 

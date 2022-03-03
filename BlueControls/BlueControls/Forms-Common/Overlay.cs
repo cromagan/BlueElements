@@ -9,7 +9,7 @@ namespace BlueControls {
 
         #region Fields
 
-        private readonly GenericControl Control;
+        private readonly GenericControl? Control;
         private readonly int Modus;
         private int Count;
 

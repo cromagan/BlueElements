@@ -32,15 +32,14 @@ namespace BlueControls.Forms {
         private static readonly double SpeedOut = 250d;
 
         // Wegen Recheoperation
-        private DateTime _FirstTimer = DateTime.Now;
+        private readonly DateTime _FirstTimer = DateTime.Now;
 
+        private readonly int _ScreenTime = -999;
+        private readonly bool _userClicked = false;
+        private readonly int lowestY;
         private bool _hiddenNow = false;
         private bool _isIn = false;
         private DateTime _outime = new(0);
-        private int _ScreenTime = -999;
-        private bool _userClicked = false;
-
-        private int lowestY;
 
         #endregion
 
@@ -108,7 +107,7 @@ namespace BlueControls.Forms {
 
         private void capTXT_Click(object sender, System.EventArgs e) { }
 
-        private void Timer_Tick(object sender, System.EventArgs e) {
+        private void Timer_Tick(object? sender, System.EventArgs e) {
             if (_isIn) { return; }
             _isIn = true;
 

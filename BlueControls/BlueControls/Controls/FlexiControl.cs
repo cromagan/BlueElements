@@ -73,7 +73,7 @@ namespace BlueControls.Controls {
         private bool _FormatierungErlaubt;
 
         //private enVarType _Format = enVarType.Text;
-        private Caption _InfoCaption;
+        private Caption? _InfoCaption;
 
         private string _InfoText = string.Empty;
         private string _Regex = string.Empty;

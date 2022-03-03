@@ -43,7 +43,7 @@ namespace BlueBasics {
         public readonly int Transparenz;
         public readonly string Zweitsymbol;
         private static readonly Dictionary<string, QuickImage> _pics = new();
-        private static object Locker = new();
+        private static readonly object Locker = new();
 
         #endregion
 
@@ -116,10 +116,7 @@ namespace BlueBasics {
 
         #region Methods
 
-        public static bool Exists(string imageCode) {
-            if (string.IsNullOrEmpty(imageCode)) { return false; }
-            return _pics.ContainsKey(imageCode);
-        }
+        public static bool Exists(string imageCode) => !string.IsNullOrEmpty(imageCode) && _pics.ContainsKey(imageCode);
 
         public static enImageCode FileTypeImage(enFileFormat file) {
             switch (file) {
@@ -384,8 +381,7 @@ namespace BlueBasics {
             if (vbmp != null) { return vbmp; }
 
             if (_pics.TryGetValue(tmpname, out var p) && p != this) {
-                if (p.IsError) { return null; }
-                return p;
+                return p.IsError ? null : (Bitmap)p;
             }
 
             NeedImageEventArgs e = new(tmpname);
@@ -393,9 +389,7 @@ namespace BlueBasics {
 
             // Evtl. hat die "OnNeedImage" das Bild auch in den Stack hochgeladen
             // Falls nicht, hier noch erledigen
-            if (Exists(tmpname) && Get(tmpname) != this) { return Get(tmpname); }
-
-            return e.BMP;
+            return Exists(tmpname) && Get(tmpname) != this ? Get(tmpname) : (Bitmap)e.BMP;
         }
 
         #endregion

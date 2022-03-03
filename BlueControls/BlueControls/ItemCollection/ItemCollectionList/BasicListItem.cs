@@ -70,7 +70,7 @@ namespace BlueControls.ItemCollection {
         /// <remarks></remarks>
         private bool _Checked;
 
-        private ItemCollectionList _Parent = null;
+        private ItemCollectionList? _Parent;
         private Size _SizeUntouchedForListBox = Size.Empty;
 
         private string _UserDefCompareKey = "";
@@ -166,7 +166,7 @@ namespace BlueControls.ItemCollection {
         public string CompareKey() {
             if (!string.IsNullOrEmpty(_UserDefCompareKey)) {
                 if (Convert.ToChar(_UserDefCompareKey.Substring(0, 1)) < 32) { Develop.DebugPrint("Sortierung inkorrekt: " + _UserDefCompareKey); }
-                return _UserDefCompareKey + Constants.FirstSortChar + Parent.IndexOf(this).ToString(Constants.Format_Integer6);
+                return _UserDefCompareKey + Constants.FirstSortChar + Parent?.IndexOf(this).ToString(Constants.Format_Integer6);
             }
             return GetCompareKey();
         }

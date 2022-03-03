@@ -38,18 +38,18 @@ namespace BlueDatabase {
 
         #region Properties
 
-        public Database Database { get; private set; }
-        public ColumnItem SysChapter { get; private set; }
+        public Database? Database { get; private set; }
+        public ColumnItem? SysChapter { get; private set; }
 
-        public ColumnItem SysCorrect { get; private set; }
+        public ColumnItem? SysCorrect { get; private set; }
 
-        public ColumnItem SysLocked { get; private set; }
+        public ColumnItem? SysLocked { get; private set; }
 
-        public ColumnItem SysRowChangeDate { get; private set; }
+        public ColumnItem? SysRowChangeDate { get; private set; }
 
-        public ColumnItem SysRowChanger { get; private set; }
+        public ColumnItem? SysRowChanger { get; private set; }
 
-        public ColumnItem SysRowCreateDate { get; private set; }
+        public ColumnItem? SysRowCreateDate { get; private set; }
 
         public ColumnItem SysRowCreator { get; private set; }
 

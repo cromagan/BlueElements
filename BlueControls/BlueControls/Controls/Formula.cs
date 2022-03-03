@@ -50,7 +50,7 @@ namespace BlueControls.Controls {
 
         private long _ShowingRowKey = -1;
 
-        private RowItem _tmpShowingRow = null;
+        private RowItem? _tmpShowingRow = null;
 
         private long TabGeneratorCount;
 
@@ -214,7 +214,7 @@ namespace BlueControls.Controls {
             _Control?.Clear();
         }
 
-        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
+        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
             HotItem = null;
             if (_Database == null) {
                 Cancel = true;

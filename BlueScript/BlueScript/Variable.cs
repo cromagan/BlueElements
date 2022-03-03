@@ -394,8 +394,7 @@ namespace BlueScript {
                     Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Fehler, "Objekttypfehler: " + _ValueString);
                 }
                 var x = _ValueString.Substring(0, _ValueString.Length - 1);
-                if (string.IsNullOrEmpty(x)) { return new List<string>() { string.Empty }; }
-                return x.SplitByCRToList();
+                return string.IsNullOrEmpty(x) ? new List<string>() { string.Empty } : x.SplitByCRToList();
             }
             set => ValueString = value == null || value.Count == 0 ? string.Empty : value.JoinWithCr() + "\r";
         }
@@ -666,8 +665,9 @@ namespace BlueScript {
             if (txt.Length > 1 && txt.StartsWith("\"") && txt.EndsWith("\"")) {
                 var tmp = txt.Substring(1, txt.Length - 2); // Nicht Trimmen! Ansonsten wird sowas falsch: "X=" + "";
                 tmp = tmp.Replace("\"+\"", string.Empty); // Zuvor die " entfernen! dann verketten! Ansonsten wird "+" mit nix ersetzte, anstelle einem  +
-                if (tmp.Contains("\"")) { return new strDoItFeedback("Verkettungsfehler: " + txt); } // Beispiel: s ist nicht definiert und "jj" + s + "kk
-                return new strDoItFeedback("\"" + tmp + "\"", enVariableDataType.NotDefinedYet);
+                return tmp.Contains("\"")
+                    ? new strDoItFeedback("Verkettungsfehler: " + txt)
+                    : new strDoItFeedback("\"" + tmp + "\"", enVariableDataType.NotDefinedYet); // Beispiel: s ist nicht definiert und "jj" + s + "kk
             }
 
             #endregion
@@ -753,13 +753,13 @@ namespace BlueScript {
         public string ReplaceInText(string txt) {
             if (!txt.ToLower().Contains("~" + Name.ToLower() + "~")) { return txt; }
 
-            if (Type is not enVariableDataType.String and
+            return Type is not enVariableDataType.String and
                         not enVariableDataType.List and
                         not enVariableDataType.Integer and
                         not enVariableDataType.Bool and
-                        not enVariableDataType.Numeral) { return txt; }
-
-            return txt.Replace("~" + Name + "~", ValueString, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                        not enVariableDataType.Numeral
+                ? txt
+                : txt.Replace("~" + Name + "~", ValueString, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
         }
 
         public override string ToString() {

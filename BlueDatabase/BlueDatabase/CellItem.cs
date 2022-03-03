@@ -278,9 +278,7 @@ namespace BlueDatabase {
             }
 
             var defaultImage = QuickImage.Get(replacedText + "|" + gr.ToString());
-            if (defaultImage != null && !defaultImage.IsError) { return defaultImage; }
-
-            return StandardErrorImage(gr, bildTextverhalten, replacedText, column);
+            return defaultImage != null && !defaultImage.IsError ? defaultImage : StandardErrorImage(gr, bildTextverhalten, replacedText, column);
         }
 
         #endregion

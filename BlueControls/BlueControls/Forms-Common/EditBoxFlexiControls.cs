@@ -34,23 +34,26 @@ namespace BlueControls.Forms {
 
         private EditBoxFlexiControl() : this(null) { }
 
-        private EditBoxFlexiControl(List<FlexiControl> flexis) : base(true, false) {
+        private EditBoxFlexiControl(List<FlexiControl>? flexis) : base(true, false) {
             InitializeComponent();
             var top = Skin.Padding;
             var we = 300 + (Skin.Padding * 4);
-            foreach (var ThisFlexi in flexis) {
-                Controls.Add(ThisFlexi);
-                ThisFlexi.DisabledReason = string.Empty;
-                ThisFlexi.Left = Skin.Padding;
-                ThisFlexi.Top = top;
-                ThisFlexi.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-                top = top + Skin.Padding + ThisFlexi.Height;
-                we = Math.Max(we, ThisFlexi.Width + (Skin.Padding * 4));
-                ThisFlexi.ButtonClicked += FlexiButtonClick;
-            }
-            we = Math.Min(we, 1500);
-            foreach (var ThisFlexi in flexis) {
-                ThisFlexi.Width = Width - (Skin.Padding * 4);
+
+            if (flexis != null) {
+                foreach (var ThisFlexi in flexis) {
+                    Controls.Add(ThisFlexi);
+                    ThisFlexi.DisabledReason = string.Empty;
+                    ThisFlexi.Left = Skin.Padding;
+                    ThisFlexi.Top = top;
+                    ThisFlexi.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+                    top = top + Skin.Padding + ThisFlexi.Height;
+                    we = Math.Max(we, ThisFlexi.Width + (Skin.Padding * 4));
+                    ThisFlexi.ButtonClicked += FlexiButtonClick;
+                }
+                we = Math.Min(we, 1500);
+                foreach (var ThisFlexi in flexis) {
+                    ThisFlexi.Width = Width - (Skin.Padding * 4);
+                }
             }
             Setup(we, top);
         }

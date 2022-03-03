@@ -876,9 +876,9 @@ namespace BlueControls {
             }
         }
 
-        public static void Draw_Back(Graphics gr, enDesign design, enStates state, Rectangle r, System.Windows.Forms.Control control, bool needTransparenz) => Draw_Back(gr, DesignOf(design, state), r, control, needTransparenz);
+        public static void Draw_Back(Graphics gr, enDesign design, enStates state, Rectangle r, System.Windows.Forms.Control? control, bool needTransparenz) => Draw_Back(gr, DesignOf(design, state), r, control, needTransparenz);
 
-        public static void Draw_Back(Graphics gr, clsDesign design, Rectangle r, System.Windows.Forms.Control control, bool needTransparenz) {
+        public static void Draw_Back(Graphics gr, clsDesign design, Rectangle r, System.Windows.Forms.Control? control, bool needTransparenz) {
             try {
                 if (design.Need) {
                     if (!needTransparenz) { design.Need = false; }
@@ -953,7 +953,7 @@ namespace BlueControls {
             }
         }
 
-        public static void Draw_Back_Transparent(Graphics gr, Rectangle r, System.Windows.Forms.Control control) {
+        public static void Draw_Back_Transparent(Graphics gr, Rectangle r, System.Windows.Forms.Control? control) {
             if (control?.Parent == null) { return; }
             switch (control.Parent) {
                 case IBackgroundNone _:
@@ -1083,7 +1083,7 @@ namespace BlueControls {
         /// <param name="fitInRect"></param>
         /// <param name="child"></param>
         /// <param name="deleteBack"></param>
-        public static void Draw_FormatedText(Graphics gr, string txt, enDesign design, enStates state, QuickImage imageCode, enAlignment align, Rectangle fitInRect, System.Windows.Forms.Control child, bool deleteBack, bool translate) => Draw_FormatedText(gr, txt, imageCode, DesignOf(design, state), align, fitInRect, child, deleteBack, translate);
+        public static void Draw_FormatedText(Graphics gr, string txt, enDesign design, enStates state, QuickImage? imageCode, enAlignment align, Rectangle fitInRect, System.Windows.Forms.Control? child, bool deleteBack, bool translate) => Draw_FormatedText(gr, txt, imageCode, DesignOf(design, state), align, fitInRect, child, deleteBack, translate);
 
         //private static void Draw_Border_DuoColor(Graphics GR, RowItem Row, Rectangle r, bool NurOben) {
         //    var c1 = Color.FromArgb(Value(Row, col_Color_Border_2, 0));
@@ -1129,7 +1129,7 @@ namespace BlueControls {
         /// <param name="Child"></param>
         /// <param name="deleteBack"></param>
         /// <param name="bFont"></param>
-        public static void Draw_FormatedText(Graphics gr, string txt, QuickImage qi, enAlignment align, Rectangle fitInRect, System.Windows.Forms.Control Child, bool deleteBack, BlueFont bFont, bool translate) {
+        public static void Draw_FormatedText(Graphics gr, string txt, QuickImage? qi, enAlignment align, Rectangle fitInRect, System.Windows.Forms.Control Child, bool deleteBack, BlueFont bFont, bool translate) {
             var pSize = SizeF.Empty;
             var tSize = SizeF.Empty;
             float XP = 0;
@@ -1164,7 +1164,7 @@ namespace BlueControls {
             }
         }
 
-        public static Size FormatedText_NeededSize(string text, QuickImage image, BlueFont font, int minSie) {
+        public static Size FormatedText_NeededSize(string text, QuickImage? image, BlueFont font, int minSie) {
             try {
                 var pSize = SizeF.Empty;
                 var tSize = SizeF.Empty;

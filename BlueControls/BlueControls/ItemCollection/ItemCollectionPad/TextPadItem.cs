@@ -47,7 +47,7 @@ namespace BlueControls.ItemCollection {
         /// Dieses Element ist nur temporär und ist der tatsächlich angezeigte Text - mit Bildern, verschieden Größen, etc.
         /// Wird immer von _text_replaced abgeleitet.
         /// </summary>
-        private ExtText _txt;
+        private ExtText? _txt;
 
         #endregion
 

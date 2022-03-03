@@ -115,7 +115,7 @@ namespace BlueControls.Forms {
 
         public static FloatingInputBoxListBoxStyle Show(ItemCollectionList Items, object Tag, System.Windows.Forms.Control ConnectedControl, bool Translate) => new(Items, System.Windows.Forms.Cursor.Position.X - 8, System.Windows.Forms.Cursor.Position.Y - 8, -1, Tag, ConnectedControl, Translate);
 
-        public static FloatingInputBoxListBoxStyle Show(ItemCollectionList Items, int Xpos, int Ypos, int SteuerWi, object Tag, System.Windows.Forms.Control ConnectedControl, bool Translate) => new(Items, Xpos, Ypos, SteuerWi, Tag, ConnectedControl, Translate);
+        public static FloatingInputBoxListBoxStyle Show(ItemCollectionList Items, int Xpos, int Ypos, int SteuerWi, object? Tag, System.Windows.Forms.Control ConnectedControl, bool Translate) => new(Items, Xpos, Ypos, SteuerWi, Tag, ConnectedControl, Translate);
 
         public void Generate_ListBox1(ItemCollectionList items, int MinWidth, enAddType AddNewAllowed, bool Translate) {
             //var itemsClone = (ItemCollectionList)ItemsOri.Clone();

@@ -31,7 +31,7 @@ namespace BlueControls.Forms {
         #region Fields
 
         private readonly ColumnItem _column;
-        private Database Database;
+        private Database? Database;
 
         #endregion
 

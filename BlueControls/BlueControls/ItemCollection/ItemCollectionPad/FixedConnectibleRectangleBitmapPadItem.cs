@@ -52,7 +52,7 @@ namespace BlueControls.ItemCollection {
 
         protected PointM p_U;
 
-        private Bitmap _GeneratedBitmap = null;
+        private Bitmap? _GeneratedBitmap = null;
         private bool disposedValue;
 
         #endregion
@@ -191,9 +191,7 @@ namespace BlueControls.ItemCollection {
         //        case "fixsize": // TODO: Entfernt am 24.05.2021
         //            //_größe_fixiert = value.FromPlusMinus();
         //            return true;
-        public void SetLeftTopPoint(float x, float y) {
-            p_LO.SetTo(x, y);
-        }
+        public void SetLeftTopPoint(float x, float y) => p_LO.SetTo(x, y);
 
         public virtual void SizeChanged() {
             // Punkte immer komplett setzen. Um eventuelle Parsing-Fehler auszugleichen
@@ -334,9 +332,7 @@ namespace BlueControls.ItemCollection {
             x.Item.Changed -= Item_Changed;
         }
 
-        private void Item_Changed(object sender, System.EventArgs e) {
-            OnChanged();
-        }
+        private void Item_Changed(object sender, System.EventArgs e) => OnChanged();
 
         #endregion
 

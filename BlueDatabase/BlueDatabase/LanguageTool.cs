@@ -24,7 +24,7 @@ namespace BlueDatabase {
 
         #region Fields
 
-        public static Database Translation = null;
+        public static Database? Translation = null;
         private static readonly object[] EmptyArgs = new object[0];
         private static string English = string.Empty;
         private static string German = string.Empty;
@@ -101,10 +101,7 @@ namespace BlueDatabase {
             }
         }
 
-        private static string ColumnReplaceTranslated(string newTXT, ColumnItem column) {
-            if (column.Translate == enTranslationType.Übersetzen) { return DoTranslate(newTXT, false); }
-            return newTXT;
-        }
+        private static string ColumnReplaceTranslated(string newTXT, ColumnItem column) => column.Translate == enTranslationType.Übersetzen ? DoTranslate(newTXT, false) : newTXT;
 
         #endregion
     }

@@ -70,9 +70,9 @@ namespace BlueControls {
         public Point DrawingPos;
 
         public bool Multiline;
+        private readonly RowItem? _Row;
         private enDesign _Design;
         private int? _Height = null;
-        private RowItem _Row;
         private enStates _State;
         private Size _TextDimensions;
         private string? _TMPHtmlText = null;
@@ -371,9 +371,7 @@ namespace BlueControls {
             }
         }
 
-        internal void InsertCRLF(int position) {
-            Insert(position, new ExtCharCRLFCode());
-        }
+        internal void InsertCRLF(int position) => Insert(position, new ExtCharCRLFCode());
 
         internal void Mark(enMarkState markstate, int first, int last) {
             try {
@@ -596,7 +594,7 @@ namespace BlueControls {
                     break;
 
                 case "IMAGECODE":
-                    QuickImage x = !Attribut.Contains("|") && font != null ? QuickImage.Get(Attribut, (int)font.Oberlänge(1)) : QuickImage.Get(Attribut);
+                    var x = !Attribut.Contains("|") && font != null ? QuickImage.Get(Attribut, (int)font.Oberlänge(1)) : QuickImage.Get(Attribut);
                     Position++;
                     this.Add(new ExtCharImageCode(x, _Design, _State, font, Stufe));
                     break;

@@ -201,9 +201,9 @@ namespace BlueDatabase {
 
             var Key = column.Database.Cell.GetStringBehindLinkedValue(column, row);
             if (string.IsNullOrEmpty(Key)) {
-                if (skriptgesteuert) { return (LinkedDatabase.Column.SearchByKey(column.LinkedCell_ColumnKeyOfLinkedDatabase), null, "Verlinkung vom Skript nicht gesetzt. Zeile prüfen?"); }
-
-                return (LinkedDatabase.Column.SearchByKey(column.LinkedCell_ColumnKeyOfLinkedDatabase), null, "Kein Verlinkung vorhanden.");
+                return skriptgesteuert
+                    ? ((ColumnItem column, RowItem row, string info))(LinkedDatabase.Column.SearchByKey(column.LinkedCell_ColumnKeyOfLinkedDatabase), null, "Verlinkung vom Skript nicht gesetzt. Zeile prüfen?")
+                    : ((ColumnItem column, RowItem row, string info))(LinkedDatabase.Column.SearchByKey(column.LinkedCell_ColumnKeyOfLinkedDatabase), null, "Kein Verlinkung vorhanden.");
             }
 
             var V = Key.SplitAndCutBy("|");
@@ -244,7 +244,7 @@ namespace BlueDatabase {
         /// <returns></returns>
         public string BestFile(ColumnItem column, RowItem row) => column.BestFile(GetString(column, row), false);
 
-        public void DataOfCellKey(string CellKey, out ColumnItem Column, out RowItem Row) {
+        public void DataOfCellKey(string CellKey, out ColumnItem? Column, out RowItem? Row) {
             if (string.IsNullOrEmpty(CellKey)) {
                 Column = null;
                 Row = null;

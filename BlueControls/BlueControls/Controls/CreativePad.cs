@@ -44,7 +44,7 @@ namespace BlueControls.Controls {
 
         private readonly List<IMoveable> _ItemsToMove = new();
 
-        private IMouseAndKeyHandle _GivesMouseComandsTo;
+        private IMouseAndKeyHandle? _GivesMouseComandsTo;
 
         private ItemCollectionPad _Item;
 
@@ -240,7 +240,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object selectedHotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
+        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList Items, out object selectedHotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
             CheckHotItem(e, true);
             selectedHotItem = HotItem;
             if (selectedHotItem != null) {

@@ -41,8 +41,9 @@ namespace BlueScript {
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
-            return new strDoItFeedback(attvar.Attributes[0].ValueString.Replace(attvar.Attributes[1].ValueString, "\r") + "\r", enVariableDataType.List);
+            return !string.IsNullOrEmpty(attvar.ErrorMessage)
+                ? strDoItFeedback.AttributFehler(this, attvar)
+                : new strDoItFeedback(attvar.Attributes[0].ValueString.Replace(attvar.Attributes[1].ValueString, "\r") + "\r", enVariableDataType.List);
         }
 
         #endregion

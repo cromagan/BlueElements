@@ -75,7 +75,7 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public CreativePad PadInternal {
+        public CreativePad? PadInternal {
             get => _PadInternal;
             set {
                 if (_PadInternal != null) {

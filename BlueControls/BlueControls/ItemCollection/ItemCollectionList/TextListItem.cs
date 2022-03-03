@@ -27,13 +27,13 @@ namespace BlueControls.ItemCollection {
         #region Fields
 
         private string _ReadableText;
-        private QuickImage _Symbol;
+        private QuickImage? _Symbol;
 
         #endregion
 
         #region Constructors
 
-        public TextListItem(string readableText, string internalname, QuickImage symbol, bool isCaption, bool enabled, string userDefCompareKey) : base(internalname) {
+        public TextListItem(string readableText, string internalname, QuickImage? symbol, bool isCaption, bool enabled, string userDefCompareKey) : base(internalname) {
             IsCaption = isCaption;
             _ReadableText = readableText;
             _Symbol = symbol;

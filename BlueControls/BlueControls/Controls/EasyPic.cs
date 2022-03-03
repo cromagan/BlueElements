@@ -170,7 +170,7 @@ namespace BlueControls.Controls {
             OnImageChanged();
         }
 
-        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
+        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
             HotItem = null;
             if (_Bitmap != null) {
                 Items.Add("Externes Fenster öffnen", "ExF");

@@ -341,7 +341,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
         }
 
-        private void SetDatabase(Database database) {
+        private void SetDatabase(Database? database) {
             if (tmpDatabase != null) {
                 tmpDatabase.ShouldICancelSaveOperations -= TmpDatabase_ShouldICancelDiscOperations;
             }

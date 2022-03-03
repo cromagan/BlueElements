@@ -28,7 +28,7 @@ namespace BlueControls.Forms {
 
         #region Fields
 
-        private Button Pressed = null;
+        private Button? Pressed = null;
 
         #endregion
 

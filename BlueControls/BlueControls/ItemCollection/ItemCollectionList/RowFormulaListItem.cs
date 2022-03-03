@@ -64,10 +64,9 @@ namespace BlueControls.ItemCollection {
             get {
                 if (_Row == null) { return null; }
 
-                if (!string.IsNullOrEmpty(_Row.Database.ZeilenQuickInfo)) {
-                    return _Row.QuickInfo.CreateHtmlCodes(true);
-                }
-                return _Row.CellFirstString().CreateHtmlCodes(true);
+                return !string.IsNullOrEmpty(_Row.Database.ZeilenQuickInfo)
+                    ? _Row.QuickInfo.CreateHtmlCodes(true)
+                    : _Row.CellFirstString().CreateHtmlCodes(true);
             }
         }
 
@@ -92,9 +91,7 @@ namespace BlueControls.ItemCollection {
 
         public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) {
             if (_tmpBMP == null) { GeneratePic(); }
-            if (_tmpBMP == null) { return 200; }
-
-            return _tmpBMP.Height;
+            return _tmpBMP == null ? 200 : _tmpBMP.Height;
 
             //var sc = ((float)_tmpBMP.Height / _tmpBMP.Width);
 
@@ -105,9 +102,7 @@ namespace BlueControls.ItemCollection {
 
         protected override Size ComputeSizeUntouchedForListBox() {
             if (_tmpBMP == null) { GeneratePic(); }
-            if (_tmpBMP == null) { return new Size(200, 200); }
-
-            return _tmpBMP.Size;
+            return _tmpBMP == null ? new Size(200, 200) : _tmpBMP.Size;
 
             //var sc = ((float)_tmpBMP.Height / _tmpBMP.Width);
 

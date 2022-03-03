@@ -28,7 +28,7 @@ namespace BlueControls.Forms {
 
         #region Fields
 
-        private BasicListItem _giveBack;
+        private BasicListItem? _giveBack;
 
         #endregion
 

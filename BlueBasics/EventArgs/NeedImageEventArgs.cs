@@ -30,7 +30,7 @@ namespace BlueBasics.EventArgs {
 
         #region Properties
 
-        public BitmapExt BMP { get; set; }
+        public BitmapExt? BMP { get; set; }
         public string Name { get; }
 
         #endregion

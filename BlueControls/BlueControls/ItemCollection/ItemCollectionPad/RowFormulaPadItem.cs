@@ -31,7 +31,7 @@ namespace BlueControls.ItemCollection {
 
         #region Fields
 
-        private Database _Database;
+        private Database? _Database;
         private string _lastQuickInfo;
         private string _LayoutID;
         private long _RowKey;
@@ -49,9 +49,9 @@ namespace BlueControls.ItemCollection {
 
         public RowFormulaPadItem(Database database, long rowkey, string layoutID) : this(string.Empty, database, rowkey, layoutID) { }
 
-        public RowFormulaPadItem(string internalname, Database database, long rowkey, string layoutID) : base(internalname) {
+        public RowFormulaPadItem(string internalname, Database? database, long rowkey, string layoutID) : base(internalname) {
             _Database = database;
-            _Database.Disposing += _Database_Disposing;
+            if (_Database != null) { _Database.Disposing += _Database_Disposing; }
             _RowKey = rowkey;
             if (_Database != null && string.IsNullOrEmpty(layoutID)) {
                 ItemCollectionPad p = new(_Database.Layouts[0], string.Empty);

@@ -75,11 +75,9 @@ namespace BlueBasics {
                 case enSortierTyp.ZahlenwertInt:
                     if (string.IsNullOrEmpty(isValue)) { return CompareKey_S_NOK + "A0000000000"; }
                     if (int.TryParse(isValue, out var w)) {
-                        if (w >= 0) {
-                            return CompareKey_S_OK + "A" + w.ToString(Constants.Format_Integer10);
-                        } else {
-                            return CompareKey_S_OK + w.ToString(Constants.Format_Integer10);
-                        }
+                        return w >= 0
+                            ? CompareKey_S_OK + "A" + w.ToString(Constants.Format_Integer10)
+                            : CompareKey_S_OK + w.ToString(Constants.Format_Integer10);
                     } else {
                         return CompareKey_S_NOK + isValue;
                     }
@@ -106,11 +104,7 @@ namespace BlueBasics {
                     }
 
                 case enSortierTyp.Datum_Uhrzeit:
-                    if (DateTimeTryParse(isValue, out var d)) {
-                        return CompareKey_S_NOK + d.ToString(Constants.Format_Date);
-                    } else {
-                        return CompareKey_S_NOK + isValue;
-                    }
+                    return DateTimeTryParse(isValue, out var d) ? CompareKey_S_NOK + d.ToString(Constants.Format_Date) : CompareKey_S_NOK + isValue;
 
                 default:
                     Develop.DebugPrint(format);
@@ -190,10 +184,9 @@ namespace BlueBasics {
                 return txt.Substring(1, txt.Length - 2).DeKlammere(klammern, geschklammern, gänsef, trimspace);
             }
 
-            if (gänsef && txt.CanCut("\"", "\"")) {
-                return txt.Substring(1, txt.Length - 2).DeKlammere(klammern, geschklammern, gänsef, trimspace);
-            }
-            return txt;
+            return gänsef && txt.CanCut("\"", "\"")
+                ? txt.Substring(1, txt.Length - 2).DeKlammere(klammern, geschklammern, gänsef, trimspace)
+                : txt;
         }
 
         public static string FromNonCritical(this string txt) {
@@ -365,7 +358,7 @@ namespace BlueBasics {
 
         public static bool IsLong(this string txt) => txt is not null && long.TryParse(txt, out var _);
 
-        public static bool IsNumeral(this string txt) => txt is not null && txt.IsLong() || txt.IsDouble();
+        public static bool IsNumeral(this string txt) => (txt is not null && txt.IsLong()) || txt.IsDouble();
 
         // public static List<byte> ToByteList(this string TXT) {
         //    var x = new List<byte>();
@@ -383,7 +376,7 @@ namespace BlueBasics {
             return char.IsPunctuation(value) || char.IsSeparator(value) || TR.Contains(value.ToString());
         }
 
-        public static (int pos, string which) NextText(string txt, int startpos, List<string> searchfor, bool checkforSeparatorbefore, bool checkforSeparatorafter, List<List<string>> klammern) {
+        public static (int pos, string which) NextText(string txt, int startpos, List<string> searchfor, bool checkforSeparatorbefore, bool checkforSeparatorafter, List<List<string>>? klammern) {
             var Gans = false;
             var pos = startpos;
             var maxl = txt.Length;

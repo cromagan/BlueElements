@@ -393,7 +393,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             btnÄhnliche.Enabled = false;
         }
 
-        private void btnAlleFilterAus_Click(object sender, System.EventArgs e) {
+        private void btnAlleFilterAus_Click(object sender, System.EventArgs? e) {
             _LastLooked = string.Empty;
             if (_TableView.Database != null) {
                 _TableView.Filter.Clear();

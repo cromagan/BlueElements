@@ -79,7 +79,7 @@ namespace BlueDatabase {
         /// </summary>
         public static bool DoingScript { get; private set; } = false;
 
-        public Database Database { get; private set; }
+        public Database? Database { get; private set; }
         public long Key { get; }
 
         public string QuickInfo {

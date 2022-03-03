@@ -114,7 +114,7 @@ namespace BlueControls.Controls {
         //private bool ISIN_Resize;
         private bool ISIN_VisibleChanged;
 
-        private Progressbar PG = null;
+        private Progressbar? PG = null;
 
         // Die Sortierung der Zeile
         private int Pix16 = 16;
@@ -202,7 +202,7 @@ namespace BlueControls.Controls {
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public Database Database {
+        public Database? Database {
             get => _Database;
             set {
                 if (_Database == value) { return; }
@@ -823,7 +823,7 @@ namespace BlueControls.Controls {
             #region Sortierrichtung Zeichnen
 
             var tmpSortDefinition = SortUsed();
-            if (tmpSortDefinition != null && tmpSortDefinition.UsedForRowSort(viewItem.Column) || viewItem.Column == Database.Column.SysChapter) {
+            if ((tmpSortDefinition != null && tmpSortDefinition.UsedForRowSort(viewItem.Column)) || viewItem.Column == Database.Column.SysChapter) {
                 if (tmpSortDefinition.Reverse) {
                     gr.DrawImage(QuickImage.Get("ZA|11|5||||50"), (float)(viewItem.OrderTMP_Spalte_X1 + (Column_DrawWidth(viewItem, displayRectangleWOSlider) / 2.0) - 6), HeadSize() - 6 - _AutoFilterSize);
                 } else {
@@ -877,7 +877,7 @@ namespace BlueControls.Controls {
 
         public new bool Focused() => base.Focused || SliderY.Focused() || SliderX.Focused() || BTB.Focused || BCB.Focused;
 
-        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
+        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
             HotItem = null;
             if (_Database.IsParsing || _Database.IsLoading) {
                 Cancel = true;
@@ -1033,13 +1033,9 @@ namespace BlueControls.Controls {
                 var expanded = true;
                 var LastCap = string.Empty;
 
-                List<RowData> _SortedRowDataNew;
-                if (Database == null) {
-                    _SortedRowDataNew = new List<RowData>();
-                } else {
-                    _SortedRowDataNew = Database.Row.CalculateSortedRows(FilteredRows(), SortUsed(), PinnedRows, _SortedRowData);
-                }
-
+                var _SortedRowDataNew = Database == null
+                    ? new List<RowData>()
+                    : Database.Row.CalculateSortedRows(FilteredRows(), SortUsed(), PinnedRows, _SortedRowData);
                 if (!_SortedRowData.IsDifferentTo(_SortedRowDataNew)) { return _SortedRowData; }
 
                 _SortedRowData = new List<RowData>();
@@ -1124,8 +1120,7 @@ namespace BlueControls.Controls {
         public RowData View_RowFirst() {
             if (_Database == null) { return null; }
             var s = SortedRows();
-            if (s == null || s.Count == 0) { return null; }
-            return SortedRows()[0];
+            return s == null || s.Count == 0 ? null : SortedRows()[0];
         }
 
         public RowData View_RowLast() => _Database == null ? null : SortedRows().Count == 0 ? null : SortedRows()[SortedRows().Count - 1];
@@ -2426,11 +2421,9 @@ namespace BlueControls.Controls {
             if (ViewItem._TMP_Reduced) {
                 ViewItem._TMP_DrawWidth = 16;
             } else {
-                if (ViewItem.ViewType == enViewType.PermanentColumn) {
-                    ViewItem._TMP_DrawWidth = Math.Min(tmpColumnContentWidth(this, ViewItem.Column, _Cell_Font, Pix16), (int)(displayRectangleWOSlider.Width * 0.3));
-                } else {
-                    ViewItem._TMP_DrawWidth = Math.Min(tmpColumnContentWidth(this, ViewItem.Column, _Cell_Font, Pix16), (int)(displayRectangleWOSlider.Width * 0.75));
-                }
+                ViewItem._TMP_DrawWidth = ViewItem.ViewType == enViewType.PermanentColumn
+                    ? Math.Min(tmpColumnContentWidth(this, ViewItem.Column, _Cell_Font, Pix16), (int)(displayRectangleWOSlider.Width * 0.3))
+                    : Math.Min(tmpColumnContentWidth(this, ViewItem.Column, _Cell_Font, Pix16), (int)(displayRectangleWOSlider.Width * 0.75));
             }
 
             ViewItem._TMP_DrawWidth = Math.Max((int)ViewItem._TMP_DrawWidth, _AutoFilterSize); // Mindestens so groß wie der Autofilter;
@@ -3186,7 +3179,7 @@ namespace BlueControls.Controls {
         private RowData RowOnCoordinate(int pixelY) {
             if (_Database == null || pixelY <= HeadSize()) { return null; }
             var s = SortedRows();
-            if(s== null) { return null; }
+            if (s == null) { return null; }
 
             foreach (var ThisRowItem in s) {
                 if (ThisRowItem != null) {
@@ -3230,10 +3223,9 @@ namespace BlueControls.Controls {
             }
         }
 
-        private RowSortDefinition SortUsed() {
-            if (_sortDefinitionTemporary?.Columns != null) { return _sortDefinitionTemporary; }
-            return _Database.SortDefinition?.Columns != null ? _Database.SortDefinition : null;
-        }
+        private RowSortDefinition SortUsed() => _sortDefinitionTemporary?.Columns != null
+                ? _sortDefinitionTemporary
+                : _Database.SortDefinition?.Columns != null ? _Database.SortDefinition : null;
 
         private void TXTBox_Close(TextBox BTBxx) {
             if (BTBxx == null) { return; }
@@ -3260,8 +3252,7 @@ namespace BlueControls.Controls {
 
             if (PowerEdit.Subtract(DateTime.Now).TotalSeconds > 0) { return true; }
 
-            if (!CellCollection.UserEditPossible(_Database.Column[0], null, enErrorReason.EditNormaly)) { return false; }
-            return true;
+            return CellCollection.UserEditPossible(_Database.Column[0], null, enErrorReason.EditNormaly);
         }
 
         #endregion

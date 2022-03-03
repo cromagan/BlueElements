@@ -30,7 +30,7 @@ namespace BlueControls.Forms {
         #region Fields
 
         private bool Doing;
-        private PrintDocument GiveBack = null;
+        private PrintDocument? GiveBack = null;
 
         #endregion
 

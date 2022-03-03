@@ -51,9 +51,9 @@ namespace BlueControls.Controls {
 
         private long _RowKey = -1;
 
-        private ColumnItem _tmpColumn = null;
+        private ColumnItem? _tmpColumn = null;
 
-        private RowItem _tmpRow = null;
+        private RowItem? _tmpRow = null;
 
         #endregion
 
@@ -194,7 +194,7 @@ namespace BlueControls.Controls {
             return false;
         }
 
-        public void GetContextMenuItems(MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
+        public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
             GetTmpVariables();
             if (_tmpColumn != null && _tmpColumn.Database.IsAdministrator()) {
                 Items.Add(enContextMenuComands.SpaltenEigenschaftenBearbeiten);

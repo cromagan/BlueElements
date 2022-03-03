@@ -40,14 +40,10 @@ namespace BlueControls {
 
         #region Fields
 
+        private readonly int _DrawSize = 20;
+        private readonly string _DrawText = string.Empty;
+        private readonly clsScreenData _FeedBack;
         private Bitmap _ClipedArea;
-
-        private int _DrawSize = 20;
-
-        private string _DrawText = string.Empty;
-
-        private clsScreenData _FeedBack;
-
         private bool _MousesWasUp;
 
         private Bitmap _ScreenShotBMP;
@@ -115,7 +111,7 @@ namespace BlueControls {
         /// <param name="MaxH">Die Maximale Höhe des Bildes. Evtl. wird das Bild herunterskaliert.</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static clsScreenData GrabArea(System.Windows.Forms.Form frm) {
+        public static clsScreenData GrabArea(System.Windows.Forms.Form? frm) {
             using ScreenShot x = new("Bitte ziehen sie einen Rahmen\r\num den gewünschten Bereich.");
             return x.GrabAreaInternal(frm);
         }
@@ -184,7 +180,7 @@ namespace BlueControls {
             Close();
         }
 
-        private clsScreenData GrabAreaInternal(System.Windows.Forms.Form frm) {
+        private clsScreenData GrabAreaInternal(System.Windows.Forms.Form? frm) {
             try {
                 System.Windows.Forms.FormWindowState WS = 0;
 

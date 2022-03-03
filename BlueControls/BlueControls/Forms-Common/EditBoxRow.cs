@@ -25,7 +25,7 @@ namespace BlueControls.Forms {
 
         private EditBoxRow() : this(string.Empty, null) { }
 
-        private EditBoxRow(string txt, RowItem row) : base(false, true) {
+        private EditBoxRow(string txt, RowItem? row) : base(false, true) {
             InitializeComponent();
 
             formToEdit.Database = row.Database;

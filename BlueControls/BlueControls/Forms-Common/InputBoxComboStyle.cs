@@ -32,12 +32,13 @@ namespace BlueControls.Forms {
 
         private InputBoxComboStyle() : this(string.Empty, string.Empty, null, false) { }
 
-        private InputBoxComboStyle(string txt, string vorschlagsText, ItemCollectionList suggestOriginal, bool texteingabeErlaubt) : base(true, true) {
+        private InputBoxComboStyle(string txt, string vorschlagsText, ItemCollectionList? suggestOriginal, bool texteingabeErlaubt) : base(true, true) {
             InitializeComponent();
             cbxText.Text = vorschlagsText;
-            var SuggestClone = (ItemCollectionList)suggestOriginal.Clone();
-            cbxText.Item.CheckBehavior = SuggestClone.CheckBehavior;
-            cbxText.Item.AddClonesFrom(SuggestClone);
+            if (suggestOriginal != null) {
+                cbxText.Item.CheckBehavior = suggestOriginal.CheckBehavior;
+                cbxText.Item.AddClonesFrom(suggestOriginal);
+            }
             cbxText.DropDownStyle = texteingabeErlaubt ? System.Windows.Forms.ComboBoxStyle.DropDown : System.Windows.Forms.ComboBoxStyle.DropDownList;
             Setup(txt, cbxText, 250);
             _giveBack = vorschlagsText;

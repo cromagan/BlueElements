@@ -50,11 +50,9 @@ namespace BlueScript {
             }
 
             var ok2 = DateTimeTryParse(attvar.Attributes[1].ValueString, out var d2);
-            if (!ok2) {
-                return new strDoItFeedback("Der Wert '" + attvar.Attributes[1].ValueString + "' wurde nicht als Zeitformat erkannt.");
-            }
-
-            return new strDoItFeedback(d1.Subtract(d2).TotalDays.ToString(), enVariableDataType.Numeral);
+            return !ok2
+                ? new strDoItFeedback("Der Wert '" + attvar.Attributes[1].ValueString + "' wurde nicht als Zeitformat erkannt.")
+                : new strDoItFeedback(d1.Subtract(d2).TotalDays.ToString(), enVariableDataType.Numeral);
         }
 
         #endregion

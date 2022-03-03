@@ -79,7 +79,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         #region Methods
 
-        public static void CheckDatabase(object sender, LoadedEventArgs e) {
+        public static void CheckDatabase(object? sender, LoadedEventArgs e) {
             var _database = (Database)sender;
             if (_database != null && !_database.ReadOnly) {
                 if (_database.IsAdministrator()) {
@@ -273,7 +273,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             _TableView.Database.Row.Remove(_TableView.Filter, _TableView.PinnedRows);
         }
 
-        private void ChangeDatabase(Database database) {
+        private void ChangeDatabase(Database? database) {
             if (_originalDB != null) {
                 _originalDB.Disposing -= _originalDB_Disposing;
             }

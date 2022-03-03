@@ -51,9 +51,9 @@ namespace BlueControls {
 
         public PointM(PointF startPoint, float laenge, float alpha) : this(null, string.Empty, startPoint.X, startPoint.Y, laenge, alpha) { }
 
-        public PointM(object parent, string codeToParse) : this(parent) => Parse(codeToParse);
+        public PointM(object? parent, string codeToParse) : this(parent) => Parse(codeToParse);
 
-        public PointM(object parent, string name, float x, float y, string tag) {
+        public PointM(object? parent, string name, float x, float y, string tag) {
             Parent = parent;
             _x = x;
             _y = y;
@@ -63,7 +63,7 @@ namespace BlueControls {
 
         public PointM() : this(null, string.Empty, 0f, 0f, string.Empty) { }
 
-        public PointM(object parent) : this(parent, string.Empty, 0f, 0f, string.Empty) { }
+        public PointM(object? parent) : this(parent, string.Empty, 0f, 0f, string.Empty) { }
 
         public PointM(string name, float x, float y) : this(null, name, x, y, string.Empty) { }
 
@@ -95,7 +95,7 @@ namespace BlueControls {
 
         public float Magnitude => (float)Math.Sqrt((float)((_x * _x) + (_y * _y)));
         public string Name { get; private set; }
-        public object Parent { get; set; }
+        public object? Parent { get; set; }
 
         public string Tag { get; set; }
 

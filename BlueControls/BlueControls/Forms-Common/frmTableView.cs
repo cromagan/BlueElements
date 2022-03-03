@@ -47,9 +47,9 @@ namespace BlueControls.Forms {
 
         public frmTableView() : this(null, true, true) { }
 
-        public frmTableView(Database Database) : this(Database, false, false) { }
+        public frmTableView(Database? Database) : this(Database, false, false) { }
 
-        public frmTableView(Database database, bool loadTabVisible, bool adminTabVisible) {
+        public frmTableView(Database? database, bool loadTabVisible, bool adminTabVisible) {
             InitializeComponent();
             //var bmp = new System.Drawing.Bitmap(111,112);
             //var gr = System.Drawing.Graphics.FromImage(bmp);
@@ -331,7 +331,7 @@ namespace BlueControls.Forms {
             DatabaseSet(tmpDatabase);
         }
 
-        private void DatabaseSet(Database database) {
+        private void DatabaseSet(Database? database) {
             TableView.Database = database;
             Formula.Database = database;
             Filter.Table = TableView;
@@ -479,14 +479,9 @@ namespace BlueControls.Forms {
         }
 
         private void Neu_Click(object sender, System.EventArgs e) {
-            RowItem r = null;
-
-            if (TableView.Database.Column.First().SortType == enSortierTyp.Datum_Uhrzeit) {
-                r = TableView.Database.Row.Add(NameRepair(DateTime.Now.ToString(Constants.Format_Date5), null));
-            } else {
-                r = TableView.Database.Row.Add(NameRepair("Neuer Eintrag", null));
-            }
-
+            var r = TableView.Database.Column.First().SortType == enSortierTyp.Datum_Uhrzeit
+                ? TableView.Database.Row.Add(NameRepair(DateTime.Now.ToString(Constants.Format_Date5), null))
+                : TableView.Database.Row.Add(NameRepair("Neuer Eintrag", null));
             TableView.CursorPos_Set(TableView.Database.Column.First(), TableView.SortedRows().Get(r), true);
         }
 

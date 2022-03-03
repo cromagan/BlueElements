@@ -57,7 +57,7 @@ namespace BlueControls.Controls {
             // InitializeComponent();
         }
 
-        public FlexiControlForFilter(Table tableView, FilterItem filter, Filterleiste myParent) {
+        public FlexiControlForFilter(Table? tableView, FilterItem? filter, Filterleiste? myParent) {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
@@ -123,7 +123,7 @@ namespace BlueControls.Controls {
             return false;
         }
 
-        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
+        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
             HotItem = null;
             if (Filter == null || Filter.Column == null || !Filter.Column.Database.IsAdministrator()) { return; }
 

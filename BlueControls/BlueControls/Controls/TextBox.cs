@@ -60,7 +60,7 @@ namespace BlueControls.Controls {
         private bool _Multiline;
         private bool _MustCheck = true;
         private string _Regex = string.Empty;
-        private Slider _SliderY = null;
+        private Slider? _SliderY = null;
 
         private bool _SpellChecking;
 
@@ -344,7 +344,7 @@ namespace BlueControls.Controls {
         //    if (Focused()) { return; }
         //    base.Focus();
         //}
-        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList items, out object hotItem, List<string> tags, ref bool cancel, ref bool translate) {
+        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList items, out object hotItem, List<string> tags, ref bool cancel, ref bool translate) {
             AbortSpellChecking();
             hotItem = null;
             tags.TagSet("CursorPosBeforeClick", _Cursor_CharPos.ToString());
@@ -519,7 +519,7 @@ namespace BlueControls.Controls {
             _eTxt.State = state;
 
             var effectWidth = Width;
-            bool sliderVisible = _Multiline ? _eTxt.Height() > (Height - 16) : _eTxt.Height() > Height;
+            var sliderVisible = _Multiline ? _eTxt.Height() > (Height - 16) : _eTxt.Height() > Height;
             if (sliderVisible) { effectWidth = Width - 18; }
 
             switch (_Verhalten) {
@@ -781,9 +781,7 @@ namespace BlueControls.Controls {
         /// </summary>
         protected virtual void OnTextChanged() => TextChanged?.Invoke(this, System.EventArgs.Empty);
 
-        private void _eTxt_Changed(object sender, System.EventArgs e) {
-            Invalidate();
-        }
+        private void _eTxt_Changed(object sender, System.EventArgs e) => Invalidate();
 
         private void AbortSpellChecking() {
             if (SpellChecker.IsBusy) { SpellChecker.CancelAsync(); }

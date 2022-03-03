@@ -22,28 +22,12 @@ using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.ItemCollection;
 using BlueDatabase;
-using System.ComponentModel;
 using static BlueBasics.FileOperations;
-
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Controls;
-
 using BlueControls.Enums;
-
-using BlueControls.EventArgs;
-using BlueControls.Forms;
-using BlueControls.ItemCollection;
-using BlueDatabase;
-
-using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using static BlueBasics.Converter;
-
-using static BlueBasics.FileOperations;
 
 namespace BlueControls.BlueDatabaseDialogs {
 
@@ -51,7 +35,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         #region Fields
 
-        public readonly Database Database = null;
+        public readonly Database? Database = null;
 
         public bool Generating = false;
 

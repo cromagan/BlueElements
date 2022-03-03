@@ -188,11 +188,9 @@ namespace BlueControls.ItemCollection {
                     var DB2 = column.LinkedDatabase();
                     if (DB2 == null) { Notification.Show("Verknüpfte Datenbank nicht vorhanden", enImageCode.Information); return; }
 
-
                     /// Spalte aus der Ziel-Datenbank ermitteln
                     var targetColumn = DB2.Column.SearchByKey(column.LinkedCell_ColumnKeyOfLinkedDatabase);
                     if (targetColumn == null) { Notification.Show("Die Spalte ist in der Zieldatenbank nicht vorhanden."); return; }
-
 
                     var (filter, info) = CellCollection.GetFilterFromLinkedCellData(DB2, column, checkedItemsAtRow);
                     if (!string.IsNullOrEmpty(info)) {
@@ -283,19 +281,19 @@ namespace BlueControls.ItemCollection {
 
         public TextListItem Add(string readableText, string internalname, enImageCode symbol, bool enabled, string userDefCompareKey) => Add(readableText, internalname, symbol, false, enabled, userDefCompareKey);
 
-        public TextListItem Add(string readableText, string internalname, QuickImage symbol, bool enabled) => Add(readableText, internalname, symbol, false, enabled, string.Empty);
+        public TextListItem Add(string readableText, string internalname, QuickImage? symbol, bool enabled) => Add(readableText, internalname, symbol, false, enabled, string.Empty);
 
-        public TextListItem Add(string readableText, string internalname, QuickImage symbol, bool enabled, string userDefCompareKey) => Add(readableText, internalname, symbol, false, enabled, userDefCompareKey);
+        public TextListItem Add(string readableText, string internalname, QuickImage? symbol, bool enabled, string userDefCompareKey) => Add(readableText, internalname, symbol, false, enabled, userDefCompareKey);
 
         public TextListItem Add(string readableText, string internalname) => Add(readableText, internalname, null, false, true, string.Empty);
 
         public TextListItem Add(string readableText, string internalname, enImageCode symbol) => Add(readableText, internalname, symbol, false, true, string.Empty);
 
-        public TextListItem Add(string readableText, string internalname, QuickImage symbol) => Add(readableText, internalname, symbol, false, true, string.Empty);
+        public TextListItem Add(string readableText, string internalname, QuickImage? symbol) => Add(readableText, internalname, symbol, false, true, string.Empty);
 
         public TextListItem Add(string readableText, string internalname, enImageCode symbol, bool isCaption, bool enabled, string userDefCompareKey) => Add(readableText, internalname, QuickImage.Get(symbol, 16), isCaption, enabled, userDefCompareKey);
 
-        public TextListItem Add(string readableText, string internalname, QuickImage symbol, bool isCaption, bool enabled, string userDefCompareKey) {
+        public TextListItem Add(string readableText, string internalname, QuickImage? symbol, bool isCaption, bool enabled, string userDefCompareKey) {
             TextListItem x = new(readableText, internalname, symbol, isCaption, enabled, userDefCompareKey);
             Add(x);
             return x;

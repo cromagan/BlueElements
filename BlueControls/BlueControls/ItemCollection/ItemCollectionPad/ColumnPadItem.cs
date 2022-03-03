@@ -19,26 +19,9 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
-using BlueControls.Interfaces;
-using BlueScript;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
-
-using BlueBasics.Enums;
-using BlueControls.Controls;
-using BlueControls.Enums;
-
-using BlueControls.EventArgs;
-using BlueControls.Forms;
-using BlueControls.ItemCollection;
 using BlueDatabase;
-
-using System;
-using System.Drawing;
-
-using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection {
 
@@ -59,7 +42,7 @@ namespace BlueControls.ItemCollection {
         #region Constructors
 
         //public static BlueFont Column_Filter_Font = BlueFont.Get(Column_Font.FontName, Column_Font.FontSize, false, false, false, false, true, Color.White, Color.Red, false, false, false);
-        public ColumnPadItem(ColumnItem c) : base(c.Name) { Column = c; }
+        public ColumnPadItem(ColumnItem c) : base(c.Name) => Column = c;
 
         #endregion
 

@@ -242,7 +242,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void cbxLinkedDatabase_TextChanged(object sender, System.EventArgs e) {
+        private void cbxLinkedDatabase_TextChanged(object? sender, System.EventArgs e) {
             _Column.LinkedDatabaseFile = cbxLinkedDatabase.Text;
 
             cbxTargetColumn.Item.Clear();
@@ -273,9 +273,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             GeneratFilterListe();
         }
 
-        private void cbxTargetColumn_TextChanged(object sender, System.EventArgs e) {
-            GeneratFilterListe();
-        }
+        private void cbxTargetColumn_TextChanged(object sender, System.EventArgs e) => GeneratFilterListe();
 
         private int ColumKeyFrom(Database database, string columnKey) => database == null || string.IsNullOrEmpty(columnKey) ? -1 : IntParse(columnKey);
 
@@ -643,17 +641,10 @@ namespace BlueControls.BlueDatabaseDialogs {
 
                     if (int.TryParse(tmp, out var key)) {
                         var col = _Column.Database.Column.SearchByKey(key);
-                        if (col != null) {
-                            tmp = "~" + col.Name.ToLower() + "~";
-                        } else {
-                            tmp = string.Empty;
-                        }
-                    } else if (tmp.StartsWith("@")) {
-                        tmp = tmp.Substring(1);
+                        tmp = col != null ? "~" + col.Name.ToLower() + "~" : string.Empty;
                     } else {
-                        tmp = string.Empty;
+                        tmp = tmp.StartsWith("@") ? tmp.Substring(1) : string.Empty;
                     }
-
                     thisr.CellSet("Such", tmp);
                 } else {
                     thisr.CellSet("Such", string.Empty);

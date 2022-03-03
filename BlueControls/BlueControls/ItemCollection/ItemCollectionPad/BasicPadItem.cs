@@ -247,7 +247,7 @@ namespace BlueControls.ItemCollection {
             return "Auto " + NeueZeit + " IDX" + UniqueInternal_Count;
         }
 
-        public object Clone() { return NewByParsing(ToString()); }
+        public object Clone() => NewByParsing(ToString());
 
         /// <summary>
         /// Prüft, ob die angegebenen Koordinaten das Element berühren.

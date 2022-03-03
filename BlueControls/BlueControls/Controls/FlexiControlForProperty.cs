@@ -22,7 +22,7 @@ namespace BlueControls.Controls {
 
         #region Fields
 
-        private MethodInfo _methInfo;
+        private MethodInfo? _methInfo;
         private string _propertyName;
         private string _propertynamecpl;
         private object _propertyObject;

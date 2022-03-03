@@ -48,7 +48,7 @@ namespace BlueControls.Controls {
         /// <summary>
         // Timer-Objekt und Variablen für Dauer-Feuer-Buttonn
         /// </summary>
-        private System.Windows.Forms.Timer _ClickFirerer;
+        private System.Windows.Forms.Timer? _ClickFirerer;
 
         private string _ImageCode = string.Empty;
 
@@ -62,9 +62,7 @@ namespace BlueControls.Controls {
 
         #region Constructors
 
-        public Button() : base(true, false) {
-            _etxt = new ExtText(enDesign.Button, enStates.Standard);
-        }
+        public Button() : base(true, false) => _etxt = new ExtText(enDesign.Button, enStates.Standard);
 
         #endregion
 
@@ -192,7 +190,6 @@ namespace BlueControls.Controls {
                 //var Zoom = Math.Min((control.Width - 6) / (double)pic.Width, 28 / (double)pic.Height);
                 var tmpPic = QuickImage.Get(QuickImage.GenerateCode(pic.Name, control.Width - 6, 28, pic.Effekt, pic.Färbung, pic.ChangeGreenTo, pic.Sättigung, pic.Helligkeit, pic.DrehWinkel, pic.Transparenz, pic.Zweitsymbol));
                 Skin.Draw_FormatedText(gr, string.Empty, tmpPic, Design, enAlignment.Horizontal_Vertical_Center, new Rectangle(0, 0, control.Width, 44), control, false, translate);
-
 
                 var tt = BlueDatabase.LanguageTool.DoTranslate(text, translate);
 
