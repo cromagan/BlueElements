@@ -21,7 +21,7 @@ namespace BlueDatabase.EventArgs {
 
         #region Constructors
 
-        public CellEventArgs(ColumnItem column, RowItem row) {
+        public CellEventArgs(ColumnItem? column, RowItem? row) {
             Column = column;
             Row = row;
         }
@@ -30,8 +30,8 @@ namespace BlueDatabase.EventArgs {
 
         #region Properties
 
-        public ColumnItem Column { get; set; }
-        public RowItem Row { get; set; }
+        public ColumnItem? Column { get; set; }
+        public RowItem? Row { get; set; }
 
         #endregion
     }

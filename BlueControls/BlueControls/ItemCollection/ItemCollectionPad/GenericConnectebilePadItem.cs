@@ -49,7 +49,7 @@ namespace BlueControls.ItemCollection {
             t = t.Substring(0, t.Length - 1) + ", ";
 
             t = t + "Text=" + Text.ToNonCritical() + ", ";
-            t = t + "Size=" + Size.ToString() + ", ";
+            t = t + "Size=" + Size + ", ";
 
             return t.Trim(", ") + "}";
         }
@@ -62,12 +62,14 @@ namespace BlueControls.ItemCollection {
 
             gr.Clear(Color.White);
 
-            var Font = Skin.GetBlueFont(Stil, Parent.SheetStyle);
+            var font = Skin.GetBlueFont(Stil, Parent.SheetStyle);
 
-            if (Font != null) {
-                Skin.Draw_FormatedText(gr, Text, null, enAlignment.Horizontal_Vertical_Center, new Rectangle(0, 0, Size.Width, Size.Height), null, false, Font, false);
-                gr.DrawRectangle(Font.Pen(1), new Rectangle(0, 0, Size.Width, Size.Height));
+            if (font == null) {
+                return bmp;
             }
+
+            Skin.Draw_FormatedText(gr, Text, null, enAlignment.Horizontal_Vertical_Center, new Rectangle(0, 0, Size.Width, Size.Height), null, false, font, false);
+            gr.DrawRectangle(font.Pen(1), new Rectangle(0, 0, Size.Width, Size.Height));
 
             return bmp;
         }

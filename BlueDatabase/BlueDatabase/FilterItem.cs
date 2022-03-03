@@ -24,17 +24,16 @@ using System.Collections.Generic;
 
 namespace BlueDatabase {
 
-    public sealed class FilterItem : IParseable, ICompareKey, IReadableTextWithChanging, ICanBeEmpty, IDisposable {
+    public sealed class FilterItem : IParseable, IReadableTextWithChanging, ICanBeEmpty, IDisposable {
 
         #region Fields
 
         public string Herkunft = string.Empty;
 
-        private ColumnItem _Column;
+        private ColumnItem? _column;
 
-        private enFilterType _FilterType = enFilterType.KeinFilter;
-
-        private bool disposedValue;
+        private bool _disposedValue;
+        private enFilterType _filterType = enFilterType.KeinFilter;
 
         #endregion
 
@@ -42,17 +41,23 @@ namespace BlueDatabase {
 
         public FilterItem(Database database, enFilterType filterType, string searchValue) : this(database, filterType, new List<string>() { searchValue }) { }
 
-        public FilterItem(Database database, enFilterType filterType, List<string> searchValue) {
+        public FilterItem(Database database, enFilterType filterType, IReadOnlyCollection<string> searchValue) {
             Database = database;
-            Database.Disposing += Database_Disposing;
-            _FilterType = filterType;
+            if (Database != null) {
+                Database.Disposing += Database_Disposing;
+            }
+
+            _filterType = filterType;
             if (searchValue != null && searchValue.Count > 0) { SearchValue.AddRange(searchValue); }
             SearchValue.Changed += SearchValue_ListOrItemChanged;
         }
 
         public FilterItem(Database database, string filterCode) {
             Database = database;
-            Database.Disposing += Database_Disposing;
+            if (Database != null) {
+                Database.Disposing += Database_Disposing;
+            }
+
             Parse(filterCode);
             SearchValue.Changed += SearchValue_ListOrItemChanged;
         }
@@ -66,26 +71,26 @@ namespace BlueDatabase {
             SearchValue.Changed += SearchValue_ListOrItemChanged;
         }
 
-        public FilterItem(ColumnItem column, enFilterType filterType, string searchValue) : this(column, filterType, new List<string>() { searchValue }, string.Empty) {
+        public FilterItem(ColumnItem? column, enFilterType filterType, string searchValue) : this(column, filterType, new List<string>() { searchValue }, string.Empty) {
         }
 
-        public FilterItem(ColumnItem column, enFilterType filterType, string searchValue, string tag) : this(column, filterType, new List<string>() { searchValue }, tag) {
+        public FilterItem(ColumnItem? column, enFilterType filterType, string searchValue, string tag) : this(column, filterType, new List<string>() { searchValue }, tag) {
         }
 
-        public FilterItem(ColumnItem column, enFilterType filterType, List<string> searchValue) : this(column, filterType, searchValue, string.Empty) {
+        public FilterItem(ColumnItem? column, enFilterType filterType, List<string>? searchValue) : this(column, filterType, searchValue, string.Empty) {
         }
 
-        public FilterItem(ColumnItem column, enFilterType filterType, List<string> searchValue, string herkunft) {
+        public FilterItem(ColumnItem? column, enFilterType filterType, IReadOnlyCollection<string>? searchValue, string herkunft) {
             if (column == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Spalte nicht vorhanden."); }
             Database = column.Database;
-            _Column = column;
-            _FilterType = filterType;
+            _column = column;
+            _filterType = filterType;
             Herkunft = herkunft;
             if (searchValue != null && searchValue.Count > 0) { SearchValue.AddRange(searchValue); }
             SearchValue.Changed += SearchValue_ListOrItemChanged;
         }
 
-        public FilterItem(ColumnItem column, RowItem rowWithValue) : this(column, enFilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, rowWithValue.CellGetString(column)) {
+        public FilterItem(ColumnItem? column, RowItem rowWithValue) : this(column, enFilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, rowWithValue.CellGetString(column)) {
         }
 
         #endregion
@@ -98,10 +103,10 @@ namespace BlueDatabase {
 
         #region Properties
 
-        public ColumnItem Column {
-            get => _Column;
+        public ColumnItem? Column {
+            get => _column;
             set {
-                _Column = value;
+                _column = value;
                 OnChanged();
             }
         }
@@ -112,15 +117,15 @@ namespace BlueDatabase {
         public Database Database { get; private set; }
 
         public enFilterType FilterType {
-            get => _FilterType;
+            get => _filterType;
             set {
-                _FilterType = value;
+                _filterType = value;
                 OnChanged();
             }
         }
 
         public bool IsParsing { get; private set; }
-        public ListExt<string> SearchValue { get; private set; } = new ListExt<string>();
+        public ListExt<string> SearchValue { get; } = new();
 
         #endregion
 
@@ -130,14 +135,14 @@ namespace BlueDatabase {
             SearchValue.ThrowEvents = false;
             SearchValue.Clear();
             SearchValue.Add(searchvalue);
-            _FilterType = type;
+            _filterType = type;
             SearchValue.ThrowEvents = true;
             OnChanged();
         }
 
         public object Clone() => new FilterItem(Database, ToString());
 
-        public string CompareKey() => ((int)_FilterType).ToString(Constants.Format_Integer10);
+        public string CompareKey() => ((int)_filterType).ToString(Constants.Format_Integer10);
 
         // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
         // ~FilterItem()
@@ -147,13 +152,13 @@ namespace BlueDatabase {
         // }
         public void Dispose() {
             // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-            Dispose(disposing: true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
-        public string ErrorReason() => _FilterType == enFilterType.KeinFilter ? "'Kein Filter' angegeben" : string.Empty;
+        public string ErrorReason() => _filterType == enFilterType.KeinFilter ? "'Kein Filter' angegeben" : string.Empty;
 
-        public bool IsNullOrEmpty() => _FilterType == enFilterType.KeinFilter;
+        public bool IsNullOrEmpty() => _filterType == enFilterType.KeinFilter;
 
         public bool IsOk() => string.IsNullOrEmpty(ErrorReason());
 
@@ -162,9 +167,9 @@ namespace BlueDatabase {
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
-        public void Parse(string ToParse) {
+        public void Parse(string toParse) {
             IsParsing = true;
-            foreach (var pair in ToParse.GetAllTags()) {
+            foreach (var pair in toParse.GetAllTags()) {
                 switch (pair.Key) {
                     case "identifier":
                         if (pair.Value != "Filter") {
@@ -179,15 +184,15 @@ namespace BlueDatabase {
                         break;
 
                     case "type":
-                        _FilterType = (enFilterType)int.Parse(pair.Value);
+                        _filterType = (enFilterType)int.Parse(pair.Value);
                         break;
 
                     case "column":
-                        _Column = Database.Column[pair.Value];
+                        _column = Database.Column[pair.Value];
                         break;
 
                     case "columnkey":
-                        _Column = Database.Column.SearchByKey(long.Parse(pair.Value));
+                        _column = Database.Column.SearchByKey(long.Parse(pair.Value));
                         break;
 
                     case "value":
@@ -203,27 +208,27 @@ namespace BlueDatabase {
                         break;
                 }
             }
-            if (ToParse.Contains(", Value=}") || ToParse.Contains(", Value=,")) { SearchValue.Add(""); }
+            if (toParse.Contains(", Value=}") || toParse.Contains(", Value=,")) { SearchValue.Add(""); }
             IsParsing = false;
         }
 
         public string ReadableText() {
-            if (_FilterType == enFilterType.KeinFilter) { return "Filter ohne Funktion"; }
-            if (_Column == null) { return "Zeilen-Filter"; }
-            var nam = _Column.ReadableText();
+            if (_filterType == enFilterType.KeinFilter) { return "Filter ohne Funktion"; }
+            if (_column == null) { return "Zeilen-Filter"; }
+            var nam = _column.ReadableText();
             if (SearchValue == null || SearchValue.Count < 1) { return "#### Filter-Fehler ####"; }
             if (SearchValue.Count > 1) {
-                return _FilterType switch {
+                return _filterType switch {
                     enFilterType.Istgleich or enFilterType.IstGleich_ODER or enFilterType.Istgleich_GroßKleinEgal or enFilterType.Istgleich_ODER_GroßKleinEgal => nam + " - eins davon: '" + SearchValue.JoinWith("', '") + "'",
                     enFilterType.IstGleich_UND or enFilterType.Istgleich_UND_GroßKleinEgal => nam + " - alle: '" + SearchValue.JoinWith("', '") + "'",
-                    _ => nam + ": Spezial-Filter",
+                    _ => nam + ": Spezial-Filter"
                 };
             }
-            if (_Column == Database.Column.SysCorrect && _FilterType.HasFlag(enFilterType.Istgleich)) {
+            if (_column == Database.Column.SysCorrect && _filterType.HasFlag(enFilterType.Istgleich)) {
                 if (SearchValue[0].FromPlusMinus()) { return "Fehlerfreie Zeilen"; }
                 if (!SearchValue[0].FromPlusMinus()) { return "Fehlerhafte Zeilen"; }
             }
-            switch (_FilterType) {
+            switch (_filterType) {
                 case enFilterType.Istgleich:
 
                 case enFilterType.Istgleich_GroßKleinEgal:
@@ -264,20 +269,20 @@ namespace BlueDatabase {
             }
         }
 
-        public QuickImage SymbolForReadableText() => null;
+        public QuickImage? SymbolForReadableText() => null;
 
         public string ToString(bool withdatabaseTag) {
             if (!IsOk()) { return string.Empty; }
-            var Result = "{Type=" + (int)_FilterType;
+            var result = "{Type=" + (int)_filterType;
 
-            if (Database != null && withdatabaseTag) { Result = Result + ", Database=" + Database.Filename.ToNonCritical(); }
+            if (Database != null && withdatabaseTag) { result = result + ", Database=" + Database.Filename.ToNonCritical(); }
 
-            if (_Column != null) { Result = Result + ", " + _Column.ParsableColumnKey(); }
+            if (_column != null) { result = result + ", " + _column.ParsableColumnKey(); }
             foreach (var t in SearchValue) {
-                Result = Result + ", Value=" + t.ToNonCritical();
+                result = result + ", Value=" + t.ToNonCritical();
             }
-            if (!string.IsNullOrEmpty(Herkunft)) { Result = Result + ", Herkunft=" + Herkunft.ToNonCritical(); }
-            return Result + "}";
+            if (!string.IsNullOrEmpty(Herkunft)) { result = result + ", Herkunft=" + Herkunft.ToNonCritical(); }
+            return result + "}";
         }
 
         public override string ToString() => ToString(false);
@@ -285,7 +290,7 @@ namespace BlueDatabase {
         private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
 
         private void Dispose(bool disposing) {
-            if (!disposedValue) {
+            if (!_disposedValue) {
                 if (disposing) {
                     // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
                 }
@@ -296,7 +301,7 @@ namespace BlueDatabase {
                 }
                 // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
                 // TODO: Große Felder auf NULL setzen
-                disposedValue = true;
+                _disposedValue = true;
             }
         }
 

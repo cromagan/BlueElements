@@ -15,7 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueControls.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -48,9 +47,9 @@ namespace BlueControls.ItemCollection {
             get {
                 float totalX = 0;
                 float totalY = 0;
-                for (var i = 0; i < MovablePoint.Count; i++) {
-                    totalX += MovablePoint[i].X;
-                    totalY += MovablePoint[i].Y;
+                foreach (var thisPoint in MovablePoint) {
+                    totalX += thisPoint.X;
+                    totalY += thisPoint.Y;
                 }
                 return new PointM(totalX / MovablePoint.Count, totalY / MovablePoint.Count);
             }
@@ -87,7 +86,7 @@ namespace BlueControls.ItemCollection {
             // Get the cross product.
             var cross_product = CrossProductLength(Ax, Ay, Bx, By, Cx, Cy);
             // Calculate the angle.
-            return (float)Math.Atan2((float)cross_product, (float)dot_product);
+            return (float)Math.Atan2(cross_product, dot_product);
         }
 
         // Calculate the distance between [minA, maxA] and [minB, maxB]
@@ -95,8 +94,8 @@ namespace BlueControls.ItemCollection {
         public static float IntervalDistance(float minA, float maxA, float minB, float maxB) => minA < minB ? minB - maxA : minA - maxB;
 
         // Check if polygon A is going to collide with polygon B for the given velocity
-        public static strPolygonCollisionResult PolygonCollision(clsAbstractPhysicPadItem polygonA, clsAbstractPhysicPadItem polygonB, PointM velocity) {
-            strPolygonCollisionResult result = new() {
+        public static StrPolygonCollisionResult PolygonCollision(clsAbstractPhysicPadItem polygonA, clsAbstractPhysicPadItem polygonB, PointM? velocity) {
+            StrPolygonCollisionResult result = new() {
                 CheckedObjectA = polygonA,
                 CheckedObjectB = polygonB,
                 Intersect = true,
@@ -106,21 +105,16 @@ namespace BlueControls.ItemCollection {
             var edgeCountB = polygonB.Edges.Count;
             var minIntervalDistance = float.MaxValue;
             PointM translationAxis = new(0, 0);
-            PointM edge;
             // Loop through all the edges of both polygons
             for (var edgeIndex = 0; edgeIndex < edgeCountA + edgeCountB; edgeIndex++) {
-                edge = edgeIndex < edgeCountA ? polygonA.Edges[edgeIndex] : polygonB.Edges[edgeIndex - edgeCountA];
+                var edge = edgeIndex < edgeCountA ? polygonA.Edges[edgeIndex] : polygonB.Edges[edgeIndex - edgeCountA];
                 // ===== 1. Find if the polygons are currently intersecting =====
                 // Find the axis perpendicular to the current edge
                 PointM axis = new(-edge.Y, edge.X);
                 axis.Normalize();
                 // Find the projection of the polygon on the current axis
-                var minA = 0f;
-                var minB = 0f;
-                var maxA = 0f;
-                var maxB = 0f;
-                ProjectPolygon(axis, polygonA, ref minA, ref maxA);
-                ProjectPolygon(axis, polygonB, ref minB, ref maxB);
+                ProjectPolygon(axis, polygonA, out var minA, out var maxA);
+                ProjectPolygon(axis, polygonB, out var minB, out var maxB);
                 // Check if the polygon projections are currentlty intersecting
                 if (IntervalDistance(minA, maxA, minB, maxB) > 0) {
                     result.Intersect = false;
@@ -180,13 +174,13 @@ namespace BlueControls.ItemCollection {
         }
 
         // Calculate the projection of a polygon on an axis and returns it as a [min, max] interval
-        public static void ProjectPolygon(PointM axis, clsAbstractPhysicPadItem polygon, ref float min, ref float max) {
+        public static void ProjectPolygon(PointM? axis, clsAbstractPhysicPadItem polygon, out float min, out float max) {
             // To project a point on an axis use the dot product
             var d = axis.DotProduct(polygon.MovablePoint[0]);
             min = d;
             max = d;
-            for (var i = 0; i < polygon.MovablePoint.Count; i++) {
-                d = polygon.MovablePoint[i].DotProduct(axis);
+            foreach (var t in polygon.MovablePoint) {
+                d = t.DotProduct(axis);
                 if (d < min) {
                     min = d;
                 } else {
@@ -209,24 +203,22 @@ namespace BlueControls.ItemCollection {
         }
 
         // https://www.codeproject.com/Articles/15573/2D-Polygon-Collision-Detection
-        public strPolygonCollisionResult ColidesWith(clsAbstractPhysicPadItem polygonB, PointM velocity) => PolygonCollision(this, polygonB, velocity);
+        public StrPolygonCollisionResult ColidesWith(clsAbstractPhysicPadItem polygonB, PointM? velocity) => PolygonCollision(this, polygonB, velocity);
 
         //   http://csharphelper.com/blog/2014/07/find-the-centroid-of-a-polygon-in-c/
         // Find the polygon's centroid.
         public PointM FindCentroid() {
             // Add the first point at the end of the array.
             var num_points = MovablePoint.Count - 1;
-            var pts = new PointM[num_points + 1];
+            var pts = new PointM?[num_points + 1];
             MovablePoint.CopyTo(pts, 0);
             pts[num_points] = MovablePoint[0];
             // Find the centroid.
             float X = 0;
             float Y = 0;
-            float second_factor;
             for (var i = 0; i < num_points; i++) {
-                second_factor =
-                    (pts[i].X * pts[i + 1].Y) -
-                    (pts[i + 1].X * pts[i].Y);
+                var second_factor = (pts[i].X * pts[i + 1].Y) -
+                                    (pts[i + 1].X * pts[i].Y);
                 X += (pts[i].X + pts[i + 1].X) * second_factor;
                 Y += (pts[i].Y + pts[i + 1].Y) * second_factor;
             }
@@ -377,10 +369,9 @@ namespace BlueControls.ItemCollection {
             var got_negative = false;
             var got_positive = false;
             var num_points = MovablePoint.Count - 1;
-            int B, C;
             for (var A = 0; A < num_points; A++) {
-                B = (A + 1) % num_points;
-                C = (B + 1) % num_points;
+                var B = (A + 1) % num_points;
+                var C = (B + 1) % num_points;
                 var cross_product =
                     CrossProductLength(
                         MovablePoint[A].X, MovablePoint[A].Y,
@@ -441,7 +432,7 @@ namespace BlueControls.ItemCollection {
 
         // Find the point of intersection between
         // the lines p1 --> p2 and p3 --> p4.
-        private void FindIntersection(PointF p1, PointF p2, PointF p3, PointF p4,
+        private static void FindIntersection(PointF p1, PointF p2, PointF p3, PointF p4,
             out bool lines_intersect, out bool segments_intersect,
             out PointF intersection, out PointF close_p1, out PointF close_p2,
             out float t1, out float t2) {
@@ -484,7 +475,7 @@ namespace BlueControls.ItemCollection {
             close_p2 = new PointF(p3.X + (dx34 * t2), p3.Y + (dy34 * t2));
         }
 
-        private float SignedPolygonArea(List<PointF> points) {
+        private static float SignedPolygonArea(IList<PointF> points) {
             // Add the first point to the end.
             var num_points = points.Count;
             var pts = new PointF[num_points + 1];
@@ -508,7 +499,7 @@ namespace BlueControls.ItemCollection {
         private float SignedPolygonArea() {
             // Add the first point to the end.
             var num_points = MovablePoint.Count - 1;
-            var pts = new PointM[num_points + 1];
+            var pts = new PointM?[num_points + 1];
             MovablePoint.CopyTo(pts, 0);
             pts[num_points] = MovablePoint[0];
             // Get the areas.

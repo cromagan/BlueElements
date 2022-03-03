@@ -37,7 +37,7 @@ namespace BlueBasics {
 
         #region Fields
 
-        private static string _GotUserName = string.Empty;
+        private static string _gotUserName = string.Empty;
 
         #endregion
 
@@ -65,39 +65,37 @@ namespace BlueBasics {
         }
 
         public static bool CreateInternetLink(string saveTo, string linkUrl) {
-            var Title = "unbekannt";
+            var title = "unbekannt";
             // string deskDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
             try {
                 using WebClient x = new();
                 var source = x.DownloadString(linkUrl);
-                Title = Regex.Match(source, @"\<title\b[^>]*\>\s*(?<Title>[\s\S]*?)\</title\>", RegexOptions.IgnoreCase).Groups["Title"].Value;
-                Title = Title.RemoveChars(Constants.Char_DateiSonderZeichen);
+                title = Regex.Match(source, @"\<title\b[^>]*\>\s*(?<Title>[\s\S]*?)\</title\>", RegexOptions.IgnoreCase).Groups["Title"].Value;
+                title = title.RemoveChars(Constants.Char_DateiSonderZeichen);
             } catch {
                 // Title = "unbekannt";
                 // DebugPrint(enFehlerArt.Warnung, ex);
                 // return false;
             }
-            Title = Title.ReduceToChars(Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + "!.,()+-_ " + Constants.Char_Numerals);
-            using (StreamWriter writer = new(TempFile(saveTo.TrimEnd("\\") + "\\" + Title + ".url"))) {
-                writer.WriteLine("[InternetShortcut]");
-                writer.WriteLine("URL=" + linkUrl);
-                writer.Flush();
-            }
+            title = title.ReduceToChars(Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + "!.,()+-_ " + Constants.Char_Numerals);
+            using StreamWriter writer = new(TempFile(saveTo.TrimEnd("\\") + "\\" + title + ".url"));
+            writer.WriteLine("[InternetShortcut]");
+            writer.WriteLine("URL=" + linkUrl);
+            writer.Flush();
             return true;
         }
 
         public static bool CreateShortCut(string saveTo, string linkName) {
             try {
                 // string deskDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-                using (StreamWriter writer = new(TempFile(saveTo + linkName + ".url"))) {
-                    var app = Assembly.GetExecutingAssembly().Location;
-                    writer.WriteLine("[InternetShortcut]");
-                    writer.WriteLine("URL=file:///" + app);
-                    writer.WriteLine("IconIndex=0");
-                    var icon = app.Replace('\\', '/');
-                    writer.WriteLine("IconFile=" + icon);
-                    writer.Flush();
-                }
+                using StreamWriter writer = new(TempFile(saveTo + linkName + ".url"));
+                var app = Assembly.GetExecutingAssembly().Location;
+                writer.WriteLine("[InternetShortcut]");
+                writer.WriteLine("URL=file:///" + app);
+                writer.WriteLine("IconIndex=0");
+                var icon = app.Replace('\\', '/');
+                writer.WriteLine("IconFile=" + icon);
+                writer.Flush();
                 return true;
             } catch (Exception ex) {
                 Develop.DebugPrint(enFehlerArt.Warnung, ex);
@@ -119,16 +117,19 @@ namespace BlueBasics {
             StreamReader readStream = new(remoteStream);
             var img = Image.FromStream(remoteStream);
             response.Close();
-            remoteStream.Close();
+            if (remoteStream != null) {
+                remoteStream.Close();
+            }
+
             readStream.Close();
             return img;
         }
 
-        public static Stream GetEmmbedResource(Assembly assembly, string name) => (from ThisString in assembly.GetManifestResourceNames() where ThisString.EndsWith("." + name) select assembly.GetManifestResourceStream(ThisString)).FirstOrDefault();
+        public static Stream GetEmmbedResource(Assembly assembly, string name) => (from thisString in assembly.GetManifestResourceNames() where thisString.EndsWith("." + name) select assembly.GetManifestResourceStream(thisString)).FirstOrDefault();
 
         public static string GetUrlFileDestination(string filename) {
-            var D = File.ReadAllText(filename, Encoding.UTF8).SplitAndCutByCRToList();
-            return D.TagGet("URL");
+            var d = File.ReadAllText(filename, Encoding.UTF8).SplitAndCutByCRToList();
+            return d.TagGet("URL");
         }
 
         public static void LaunchBrowser(string url) {
@@ -180,18 +181,18 @@ namespace BlueBasics {
                 Thread.Sleep((int)(sekunden * 1000));
                 return;
             }
-            TimeSpan AkTimer;
-            var FirstTimer = DateTime.Now;
+            TimeSpan akTimer;
+            var firstTimer = DateTime.Now;
             do {
                 Develop.DoEvents();
-                AkTimer = DateTime.Now.Subtract(FirstTimer);
-            } while (AkTimer.TotalSeconds < sekunden);
+                akTimer = DateTime.Now.Subtract(firstTimer);
+            } while (akTimer.TotalSeconds < sekunden);
         }
 
         public static int PointOnScreenNr(System.Drawing.Point pointToCheck) {
-            for (var zSC = 0; zSC <= System.Windows.Forms.Screen.AllScreens.GetUpperBound(0); zSC++) {
-                if (pointToCheck.X >= System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Left && pointToCheck.Y >= System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Top && pointToCheck.X < System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Right && pointToCheck.Y < System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Bottom) {
-                    return zSC;
+            for (var zSc = 0; zSc <= System.Windows.Forms.Screen.AllScreens.GetUpperBound(0); zSc++) {
+                if (pointToCheck.X >= System.Windows.Forms.Screen.AllScreens[zSc].Bounds.Left && pointToCheck.Y >= System.Windows.Forms.Screen.AllScreens[zSc].Bounds.Top && pointToCheck.X < System.Windows.Forms.Screen.AllScreens[zSc].Bounds.Right && pointToCheck.Y < System.Windows.Forms.Screen.AllScreens[zSc].Bounds.Bottom) {
+                    return zSc;
                 }
             }
             return 0;
@@ -202,15 +203,15 @@ namespace BlueBasics {
             var y1 = int.MaxValue;
             var x2 = int.MinValue;
             var y2 = int.MinValue;
-            for (var zSC = 0; zSC <= System.Windows.Forms.Screen.AllScreens.GetUpperBound(0); zSC++) {
-                x1 = Math.Min(x1, System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Left);
-                y1 = Math.Min(y1, System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Top);
-                x2 = Math.Max(x2, System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Right);
-                y2 = Math.Max(y2, System.Windows.Forms.Screen.AllScreens[zSC].Bounds.Bottom);
+            for (var zSc = 0; zSc <= System.Windows.Forms.Screen.AllScreens.GetUpperBound(0); zSc++) {
+                x1 = Math.Min(x1, System.Windows.Forms.Screen.AllScreens[zSc].Bounds.Left);
+                y1 = Math.Min(y1, System.Windows.Forms.Screen.AllScreens[zSc].Bounds.Top);
+                x2 = Math.Max(x2, System.Windows.Forms.Screen.AllScreens[zSc].Bounds.Right);
+                y2 = Math.Max(y2, System.Windows.Forms.Screen.AllScreens[zSc].Bounds.Bottom);
             }
-            System.Drawing.Point GP = new(x1, y1);
+            System.Drawing.Point gp = new(x1, y1);
             System.Drawing.Size sz = new(-x1 + x2, -y1 + y2);
-            return new Rectangle(GP, sz);
+            return new Rectangle(gp, sz);
         }
 
         /// <summary>
@@ -221,9 +222,9 @@ namespace BlueBasics {
         public static double Sigmoid(double x) => 1 / (1 + Math.Exp(-x));
 
         public static void Swap<T>(ref T w1, ref T w2) {
-            var W3 = w1;
+            var w3 = w1;
             w1 = w2;
-            w2 = W3;
+            w2 = w3;
         }
 
         /// <summary>
@@ -238,10 +239,10 @@ namespace BlueBasics {
         }
 
         public static string UserName() {
-            if (!string.IsNullOrEmpty(_GotUserName)) { return _GotUserName; }
-            _GotUserName = WindowsIdentity.GetCurrent().Name;
-            if (_GotUserName.Contains("\\")) { _GotUserName = _GotUserName.FileNameWithSuffix(); }
-            return _GotUserName;
+            if (!string.IsNullOrEmpty(_gotUserName)) { return _gotUserName; }
+            _gotUserName = WindowsIdentity.GetCurrent().Name;
+            if (_gotUserName.Contains("\\")) { _gotUserName = _gotUserName.FileNameWithSuffix(); }
+            return _gotUserName;
         }
 
         #endregion

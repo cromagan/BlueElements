@@ -33,9 +33,9 @@ namespace BlueDatabase {
 
         #region Fields
 
-        private readonly ConcurrentDictionary<long, RowItem> _Internal = new();
+        private readonly ConcurrentDictionary<long, RowItem?> _internal = new();
 
-        private bool disposedValue;
+        private bool _disposedValue;
 
         #endregion
 
@@ -54,7 +54,7 @@ namespace BlueDatabase {
         // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
         ~RowCollection() {
             // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-            Dispose(disposing: false);
+            Dispose(false);
         }
 
         #endregion
@@ -75,10 +75,10 @@ namespace BlueDatabase {
 
         #region Properties
 
-        public int Count => _Internal.Count;
+        public int Count => _internal.Count;
         public Database Database { get; private set; }
 
-        public long VisibleRowCount { get; private set; } = 0;
+        public long VisibleRowCount { get; private set; }
 
         #endregion
 
@@ -91,9 +91,9 @@ namespace BlueDatabase {
         /// <returns>Die Zeile, dessen erste Spalte den Primärschlüssel enthält oder - falls nicht gefunden - NULL.</returns>
         public RowItem this[string primärSchlüssel] => this[new FilterItem(Database.Column[0], enFilterType.Istgleich_GroßKleinEgal | enFilterType.MultiRowIgnorieren, primärSchlüssel)];
 
-        public RowItem this[params FilterItem[] filter] {
+        public RowItem? this[params FilterItem[]? filter] {
             get {
-                if (filter == null || filter.Count() == 0) {
+                if (filter == null || filter.Length == 0) {
                     Develop.DebugPrint("Kein Filter angekommen!");
                     return null;
                 }
@@ -103,7 +103,7 @@ namespace BlueDatabase {
             }
         }
 
-        public RowItem this[FilterCollection filter] => Database == null ? null : _Internal.Values.FirstOrDefault(ThisRow => ThisRow != null && ThisRow.MatchesTo(filter));
+        public RowItem this[FilterCollection? filter] => Database == null ? null : _internal.Values.FirstOrDefault(thisRow => thisRow != null && thisRow.MatchesTo(filter));
 
         #endregion
 
@@ -122,7 +122,7 @@ namespace BlueDatabase {
                 var unique = ("X" + DateTime.Now.ToString("mm.fff") + x.ToString(Constants.Format_Integer5)).RemoveChars(Constants.Char_DateiSonderZeichen + ".");
                 var ok = true;
 
-                foreach (var thisfile in BlueBasics.MultiUserFile.clsMultiUserFile.AllFiles) {
+                foreach (var thisfile in BlueBasics.MultiUserFile.ClsMultiUserFile.AllFiles) {
                     if (thisfile is Database db) {
                         var row = db.Row[unique];
                         if (row != null) { ok = false; break; }
@@ -133,12 +133,12 @@ namespace BlueDatabase {
             } while (true);
         }
 
-        public void Add(RowItem Row) {
-            if (!_Internal.TryAdd(Row.Key, Row)) { Develop.DebugPrint(enFehlerArt.Fehler, "Add Failed"); }
-            OnRowAdded(new RowEventArgs(Row));
+        public void Add(RowItem? row) {
+            if (!_internal.TryAdd(row.Key, row)) { Develop.DebugPrint(enFehlerArt.Fehler, "Add Failed"); }
+            OnRowAdded(new RowEventArgs(row));
         }
 
-        public RowItem Add(string valueOfCellInFirstColumn) => Add(valueOfCellInFirstColumn, true);
+        public RowItem? Add(string valueOfCellInFirstColumn) => Add(valueOfCellInFirstColumn, true);
 
         /// <summary>
         /// Erstellt eine neue Spalte mit den aus den Filterkriterien. nur Fiter IstGleich wird unterstützt.
@@ -148,7 +148,7 @@ namespace BlueDatabase {
         /// </summary>
         /// <param name="fi"></param>
         /// <returns></returns>
-        public RowItem Add(List<FilterItem> fi) {
+        public RowItem? Add(List<FilterItem>? fi) {
             List<string> first = null;
 
             foreach (var thisfi in fi) {
@@ -163,37 +163,37 @@ namespace BlueDatabase {
 
             if (first == null) { return null; }
 
-            var Row = Add(first.JoinWithCr(), false);
+            var row = Add(first.JoinWithCr(), false);
 
-            if (Row == null) { return null; }
+            if (row == null) { return null; }
 
             foreach (var thisfi in fi) {
-                Row.CellSet(thisfi.Column, thisfi.SearchValue);
+                row.CellSet(thisfi.Column, thisfi.SearchValue);
             }
 
-            Row.DoAutomatic(false, false, 1, "new row");
+            row.DoAutomatic(false, false, 1, "new row");
 
-            return Row;
+            return row;
         }
 
-        public RowItem Add(string valueOfCellInFirstColumn, bool runScriptOfNewRow) {
+        public RowItem? Add(string valueOfCellInFirstColumn, bool runScriptOfNewRow) {
             if (string.IsNullOrEmpty(valueOfCellInFirstColumn)) {
                 Develop.DebugPrint("Value = 0");
                 return null;
             }
-            RowItem Row = new(Database);
-            Add(Row);
-            Row.CellSet(Database.Column[0], valueOfCellInFirstColumn);
-            Database.Cell.SystemSet(Database.Column.SysRowCreator, Row, Database.UserName);
-            Database.Cell.SystemSet(Database.Column.SysRowCreateDate, Row, DateTime.Now.ToString(Constants.Format_Date5));
+            RowItem row = new(Database);
+            Add(row);
+            row.CellSet(Database.Column[0], valueOfCellInFirstColumn);
+            Database.Cell.SystemSet(Database.Column.SysRowCreator, row, Database.UserName);
+            Database.Cell.SystemSet(Database.Column.SysRowCreateDate, row, DateTime.Now.ToString(Constants.Format_Date5));
             // Dann die Inital-Werte reinschreiben
-            foreach (var ThisColum in Database.Column) {
-                if (ThisColum != null && !string.IsNullOrEmpty(ThisColum.CellInitValue)) { Row.CellSet(ThisColum, ThisColum.CellInitValue); }
+            foreach (var thisColum in Database.Column.Where(thisColum => thisColum != null && !string.IsNullOrEmpty(thisColum.CellInitValue))) {
+                row.CellSet(thisColum, thisColum.CellInitValue);
             }
 
-            if (runScriptOfNewRow) { Row.DoAutomatic(false, false, 1, "new row"); }
+            if (runScriptOfNewRow) { row.DoAutomatic(false, false, 1, "new row"); }
 
-            return Row;
+            return row;
         }
 
         /// <summary>
@@ -202,15 +202,15 @@ namespace BlueDatabase {
         /// <param name="filter"></param>
         /// <param name="pinnedRows"></param>
         /// <returns></returns>
-        public List<RowItem> CalculateFilteredRows(List<FilterItem> filter) {
-            List<RowItem> _tmpVisibleRows = new();
+        public List<RowItem?> CalculateFilteredRows(List<FilterItem>? filter) {
+            List<RowItem?> tmpVisibleRows = new();
 
             try {
                 var lockMe = new object();
                 Parallel.ForEach(Database.Row, thisRowItem => {
                     if (thisRowItem != null) {
                         if (thisRowItem.MatchesTo(filter)) {
-                            lock (lockMe) { _tmpVisibleRows.Add(thisRowItem); }
+                            lock (lockMe) { tmpVisibleRows.Add(thisRowItem); }
                         }
                     }
                 });
@@ -218,12 +218,12 @@ namespace BlueDatabase {
                 return CalculateFilteredRows(filter);
             }
 
-            return _tmpVisibleRows;
+            return tmpVisibleRows;
         }
 
-        public List<RowData> CalculateSortedRows(List<FilterItem> filter, RowSortDefinition rowSortDefinition, List<RowItem> pinnedRows, List<RowData> reUseMe) => CalculateSortedRows(CalculateFilteredRows(filter), rowSortDefinition, pinnedRows, reUseMe);
+        public List<RowData?> CalculateSortedRows(List<FilterItem>? filter, RowSortDefinition rowSortDefinition, List<RowItem?> pinnedRows, List<RowData?> reUseMe) => CalculateSortedRows(CalculateFilteredRows(filter), rowSortDefinition, pinnedRows, reUseMe);
 
-        public List<RowData> CalculateSortedRows(List<RowItem> filteredRows, RowSortDefinition rowSortDefinition, List<RowItem> pinnedRows, List<RowData> reUseMe) {
+        public List<RowData?> CalculateSortedRows(List<RowItem?> filteredRows, RowSortDefinition rowSortDefinition, List<RowItem?> pinnedRows, List<RowData?> reUseMe) {
             var lockMe = new object();
             VisibleRowCount = 0;
 
@@ -231,11 +231,8 @@ namespace BlueDatabase {
 
             var capName = pinnedRows != null && pinnedRows.Count > 0;
             if (!capName) {
-                foreach (var thisRow in filteredRows) {
-                    if (!thisRow.CellIsNullOrEmpty(thisRow.Database.Column.SysChapter)) {
-                        capName = true;
-                        break;
-                    }
+                if (filteredRows.Any(thisRow => !thisRow.CellIsNullOrEmpty(thisRow.Database.Column.SysChapter))) {
+                    capName = true;
                 }
             }
 
@@ -243,17 +240,17 @@ namespace BlueDatabase {
 
             #region _Angepinnten Zeilen erstellen (_pinnedData)
 
-            List<RowData> _pinnedData = new();
+            List<RowData> pinnedData = new();
             if (pinnedRows != null) {
                 Parallel.ForEach(pinnedRows, thisRow => {
                     var rd = reUseMe.Get(thisRow, "Angepinnt") is RowData r ? r : new RowData(thisRow, "Angepinnt");
                     rd.AdditinalSort = "1";
                     rd.MarkYellow = true;
-                    rd.AdditionalSort = rowSortDefinition == null ? thisRow.CompareKey(null) : thisRow.CompareKey(rowSortDefinition.Columns); ;
+                    rd.AdditionalSort = rowSortDefinition == null ? thisRow.CompareKey(null) : thisRow.CompareKey(rowSortDefinition.Columns);
 
                     lock (lockMe) {
                         VisibleRowCount++;
-                        _pinnedData.Add(rd);
+                        pinnedData.Add(rd);
                     }
                 });
             }
@@ -262,12 +259,12 @@ namespace BlueDatabase {
 
             #region Gefiltere Zeilen erstellen (_rowData)
 
-            List<RowData> _rowData = new();
+            List<RowData?> rowData = new();
             Parallel.ForEach(filteredRows, thisRow => {
                 var adk = rowSortDefinition == null ? thisRow.CompareKey(null) : thisRow.CompareKey(rowSortDefinition.Columns);
 
-                var MarkYellow = pinnedRows != null && pinnedRows.Contains(thisRow);
-                var added = MarkYellow;
+                var markYellow = pinnedRows != null && pinnedRows.Contains(thisRow);
+                var added = markYellow;
 
                 var caps = thisRow.CellGetList(thisRow.Database.Column.SysChapter);
 
@@ -285,10 +282,10 @@ namespace BlueDatabase {
                     var rd = reUseMe.Get(thisRow, thisCap) is RowData r ? r : new RowData(thisRow, thisCap);
 
                     rd.AdditinalSort = "2";
-                    rd.MarkYellow = MarkYellow;
+                    rd.MarkYellow = markYellow;
                     rd.AdditionalSort = adk;
                     lock (lockMe) {
-                        _rowData.Add(rd);
+                        rowData.Add(rd);
                         if (!added) { VisibleRowCount++; added = true; }
                     }
                 }
@@ -296,13 +293,13 @@ namespace BlueDatabase {
 
             #endregion
 
-            _pinnedData.Sort();
-            _rowData.Sort();
+            pinnedData.Sort();
+            rowData.Sort();
 
-            if (rowSortDefinition != null && rowSortDefinition.Reverse) { _rowData.Reverse(); }
+            if (rowSortDefinition != null && rowSortDefinition.Reverse) { rowData.Reverse(); }
 
-            _rowData.InsertRange(0, _pinnedData);
-            return _rowData;
+            rowData.InsertRange(0, pinnedData);
+            return rowData;
         }
 
         /// <summary>
@@ -311,15 +308,15 @@ namespace BlueDatabase {
         /// <param name="filter"></param>
         /// <param name="pinnedRows"></param>
         /// <returns></returns>
-        public List<RowItem> CalculateVisibleRows(List<FilterItem> filter, List<RowItem> pinnedRows) {
-            List<RowItem> _tmpVisibleRows = new();
-            if (pinnedRows == null) { pinnedRows = new List<RowItem>(); }
+        public List<RowItem?> CalculateVisibleRows(List<FilterItem>? filter, List<RowItem?> pinnedRows) {
+            List<RowItem?> tmpVisibleRows = new();
+            if (pinnedRows == null) { pinnedRows = new List<RowItem?>(); }
 
             var lockMe = new object();
             Parallel.ForEach(Database.Row, thisRowItem => {
                 if (thisRowItem != null) {
                     if (thisRowItem.MatchesTo(filter) || pinnedRows.Contains(thisRowItem)) {
-                        lock (lockMe) { _tmpVisibleRows.Add(thisRowItem); }
+                        lock (lockMe) { tmpVisibleRows.Add(thisRowItem); }
                     }
                 }
             });
@@ -332,34 +329,34 @@ namespace BlueDatabase {
             //    }
             //}
 
-            return _tmpVisibleRows;
+            return tmpVisibleRows;
         }
 
         public bool Clear() => Remove(new FilterCollection(Database), null);
 
         public void Dispose() {
             // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-            Dispose(disposing: true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
-        public void DoAutomatic(FilterCollection filter, bool fullCheck, List<RowItem> pinned, string startroutine) {
+        public void DoAutomatic(FilterCollection? filter, bool fullCheck, List<RowItem?> pinned, string startroutine) {
             if (Database.ReadOnly) { return; }
             DoAutomatic(CalculateVisibleRows(filter, pinned), fullCheck, startroutine);
         }
 
-        public void DoAutomatic(List<RowItem> x, bool fullCheck, string startroutine) {
+        public void DoAutomatic(List<RowItem?> x, bool fullCheck, string startroutine) {
             if (Database.ReadOnly) { return; }
 
-            if (x == null || x.Count() == 0) { return; }
+            if (x == null || x.Count == 0) { return; }
 
-            Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", 0, x.Count(), true, false));
+            Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", 0, x.Count, true, false));
 
             var all = x.Count;
             while (x.Count > 0) {
-                Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", all - x.Count(), all, false, false));
+                Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", all - x.Count, all, false, false));
 
-                (var checkPerformed, var _, var skript) = x[0].DoAutomatic(true, fullCheck, startroutine);
+                var (checkPerformed, _, skript) = x[0].DoAutomatic(true, fullCheck, startroutine);
 
                 if (skript != null && !string.IsNullOrEmpty(skript.Error)) {
                     var w = x[0].CellFirstString();
@@ -369,12 +366,12 @@ namespace BlueDatabase {
                 }
                 if (checkPerformed) { x.RemoveAt(0); }
             }
-            Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", x.Count(), x.Count(), false, true));
+            Database.OnProgressbarInfo(new ProgressbarEventArgs("Datenüberprüfung", x.Count, x.Count, false, true));
         }
 
-        public RowItem First() => _Internal.Values.FirstOrDefault(ThisRowItem => ThisRowItem != null);
+        public RowItem? First() => _internal.Values.FirstOrDefault(thisRowItem => thisRowItem != null);
 
-        public IEnumerator<RowItem> GetEnumerator() => _Internal.Values.GetEnumerator();
+        public IEnumerator<RowItem> GetEnumerator() => _internal.Values.GetEnumerator();
 
         //foreach (var ThisRowItem in _Internal.Values)//{//    if (ThisRowItem != null) { return ThisRowItem; }//}//return null;
         IEnumerator IEnumerable.GetEnumerator() => IEnumerable_GetEnumerator();
@@ -383,44 +380,35 @@ namespace BlueDatabase {
             var e = SearchByKey(key);
             if (e == null) { return false; }
             OnRowRemoving(new RowEventArgs(e));
-            foreach (var ThisColumnItem in Database.Column) {
-                if (ThisColumnItem != null) {
-                    Database.Cell.Delete(ThisColumnItem, key);
-                }
+            foreach (var thisColumnItem in Database.Column.Where(thisColumnItem => thisColumnItem != null)) {
+                Database.Cell.Delete(thisColumnItem, key);
             }
-            if (!_Internal.TryRemove(key, out _)) { Develop.DebugPrint(enFehlerArt.Fehler, "Remove Failed"); }
+            if (!_internal.TryRemove(key, out _)) { Develop.DebugPrint(enFehlerArt.Fehler, "Remove Failed"); }
             OnRowRemoved();
             return true;
         }
 
-        public bool Remove(FilterItem filter, List<RowItem> pinned) {
-            FilterCollection NF = new(Database)
+        public bool Remove(FilterItem filter, List<RowItem?> pinned) {
+            FilterCollection nf = new(Database)
             {
                 filter
             };
-            return Remove(NF, pinned);
+            return Remove(nf, pinned);
         }
 
-        public bool Remove(FilterCollection filter, List<RowItem> pinned) {
-            var Keys = (from thisrowitem in _Internal.Values where thisrowitem != null && thisrowitem.MatchesTo(filter) select thisrowitem.Key).Select(dummy => dummy).ToList();
-            var did = false;
-            foreach (var thisKey in Keys) {
-                if (Remove(thisKey)) { did = true; }
-            }
+        public bool Remove(FilterCollection? filter, List<RowItem?> pinned) {
+            var keys = (from thisrowitem in _internal.Values where thisrowitem != null && thisrowitem.MatchesTo(filter) select thisrowitem.Key).Select(dummy => dummy).ToList();
+            var did = keys.Count(thisKey => Remove(thisKey)) > 0;
 
-            if (pinned != null) {
-                foreach (var thisRow in pinned) {
-                    if (Remove(thisRow)) { did = true; }
-                }
-            }
+            did = pinned?.Count(thisRow => Remove(thisRow)) > 0 || did;
 
             return did;
         }
 
-        public bool Remove(RowItem row) => row != null && Remove(row.Key);
+        public bool Remove(RowItem? row) => row != null && Remove(row.Key);
 
         public bool RemoveOlderThan(float inHours) {
-            var x = (from thisrowitem in _Internal.Values where thisrowitem != null let D = thisrowitem.CellGetDateTime(Database.Column.SysRowCreateDate) where DateTime.Now.Subtract(D).TotalHours > inHours select thisrowitem.Key).Select(dummy => dummy).ToList();
+            var x = (from thisrowitem in _internal.Values where thisrowitem != null let d = thisrowitem.CellGetDateTime(Database.Column.SysRowCreateDate) where DateTime.Now.Subtract(d).TotalHours > inHours select thisrowitem.Key).Select(dummy => dummy).ToList();
             //foreach (var thisrowitem in _Internal.Values)
             //{
             //    if (thisrowitem != null)
@@ -430,41 +418,37 @@ namespace BlueDatabase {
             //    }
             //}
             if (x.Count == 0) { return false; }
-            foreach (var ThisKey in x) {
-                Remove(ThisKey);
+            foreach (var thisKey in x) {
+                Remove(thisKey);
             }
             return true;
         }
 
-        public RowItem SearchByKey(long Key) {
+        public RowItem? SearchByKey(long key) {
             try {
-                return Key < 0 ? null : !_Internal.ContainsKey(Key) ? null : _Internal[Key];
+                return key < 0 ? null : !_internal.ContainsKey(key) ? null : _internal[key];
             } catch {
-                return SearchByKey(Key);
+                return SearchByKey(key);
             }
         }
 
-        internal static List<RowItem> MatchesTo(FilterItem filterItem) {
-            List<RowItem> l = new();
+        internal static List<RowItem?> MatchesTo(FilterItem filterItem) {
+            List<RowItem?> l = new();
 
             if (filterItem == null) { return l; }
 
-            foreach (var ThisRow in filterItem.Database.Row) {
-                if (ThisRow.MatchesTo(filterItem)) {
-                    l.Add(ThisRow);
-                }
-            }
+            l.AddRange(filterItem.Database.Row.Where(thisRow => thisRow.MatchesTo(filterItem)));
             return l;
         }
 
-        internal static List<RowItem> MatchesTo(List<FilterItem> filterItem) {
+        internal static List<RowItem> MatchesTo(List<FilterItem>? filterItem) {
             List<RowItem> l = new();
 
             if (filterItem == null || filterItem.Count < 1) { return l; }
 
-            foreach (var ThisRow in filterItem[0].Database.Row) {
-                if (ThisRow.MatchesTo(filterItem)) {
-                    l.Add(ThisRow);
+            foreach (var thisRow in filterItem[0].Database.Row) {
+                if (thisRow.MatchesTo(filterItem)) {
+                    l.Add(thisRow);
                 }
             }
             return l;
@@ -517,7 +501,7 @@ namespace BlueDatabase {
             RowRemoving?.Invoke(this, e);
         }
 
-        internal void RemoveNullOrEmpty() => _Internal.RemoveNullOrEmpty();
+        internal void RemoveNullOrEmpty() => _internal.RemoveNullOrEmpty();
 
         //internal void Repair() {
         //    foreach (var ThisRowItem in _Internal.Values) {
@@ -533,20 +517,20 @@ namespace BlueDatabase {
         private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
 
         private void Dispose(bool disposing) {
-            if (!disposedValue) {
+            if (!_disposedValue) {
                 if (disposing) {
                     // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
                 }
                 Database.Disposing -= Database_Disposing;
                 Database = null;
-                _Internal.Clear();
+                _internal.Clear();
                 // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
                 // TODO: Große Felder auf NULL setzen
-                disposedValue = true;
+                _disposedValue = true;
             }
         }
 
-        private IEnumerator IEnumerable_GetEnumerator() => _Internal.Values.GetEnumerator();
+        private IEnumerator IEnumerable_GetEnumerator() => _internal.Values.GetEnumerator();
 
         private void OnDoSpecialRules(object sender, DoRowAutomaticEventArgs e) => DoSpecialRules?.Invoke(this, e);
 

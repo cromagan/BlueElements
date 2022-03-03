@@ -45,7 +45,7 @@ namespace BlueBasics {
         // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
         ~ListExt() {
             // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-            Dispose(disposing: false);
+            Dispose(false);
         }
 
         #endregion
@@ -68,7 +68,7 @@ namespace BlueBasics {
 
         #region Properties
 
-        public bool Disposed { get; private set; } = false;
+        public bool Disposed { get; private set; }
 
         public bool ThrowEvents {
             get => !Disposed && _ThrowEvents;
@@ -118,7 +118,7 @@ namespace BlueBasics {
             OnItemAdded(item);
         }
 
-        public void AddClonesFrom<T1>(List<T1> itemstoclone) where T1 : T, ICloneable {
+        public void AddClonesFrom<T1>(List<T1>? itemstoclone) where T1 : T, ICloneable {
             if (itemstoclone == null || itemstoclone.Count == 0) { return; }
 
             foreach (var thisItem in itemstoclone) {
@@ -160,7 +160,7 @@ namespace BlueBasics {
         /// </summary>
         public void Dispose() {
             // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-            Dispose(disposing: true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 

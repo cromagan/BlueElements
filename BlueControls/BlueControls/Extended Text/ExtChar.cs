@@ -15,12 +15,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
 using BlueControls.Enums;
-using System;
 using System.Drawing;
 
-namespace BlueControls {
+namespace BlueControls.Extended_Text {
 
     public abstract class ExtChar {
 
@@ -28,20 +26,20 @@ namespace BlueControls {
 
         public PointF Pos = PointF.Empty;
 
-        private enDesign _Design = enDesign.Undefiniert;
+        private enDesign _Design;
 
-        private BlueFont? _Font = null;
+        private BlueFont? _Font;
 
-        private SizeF _Size = SizeF.Empty;
-        private enStates _State = enStates.Undefiniert;
+        private SizeF _Size;
+        private enStates _State;
 
-        private int _Stufe = 4;
+        private int _Stufe;
 
         #endregion
 
         #region Constructors
 
-        public ExtChar(enDesign design, enStates state, BlueFont font, int stufe) : base() {
+        protected ExtChar(enDesign design, enStates state, BlueFont? font, int stufe) : base() {
             _Design = design;
             _State = state;
             _Stufe = stufe;
@@ -61,12 +59,14 @@ namespace BlueControls {
             }
         }
 
-        public BlueFont Font {
+        public BlueFont? Font {
             get {
-                if (_Font == null) {
-                    _Font = Design == enDesign.Undefiniert || State == enStates.Undefiniert ? null : Skin.GetBlueFont(Design, State, Stufe);
-                    _Size = SizeF.Empty;
+                if (_Font != null) {
+                    return _Font;
                 }
+
+                _Font = Design == enDesign.Undefiniert || State == enStates.Undefiniert ? null : Skin.GetBlueFont(Design, State, Stufe);
+                _Size = SizeF.Empty;
                 return _Font;
             }
 

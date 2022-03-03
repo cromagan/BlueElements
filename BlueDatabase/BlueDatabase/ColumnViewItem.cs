@@ -27,29 +27,29 @@ namespace BlueDatabase {
 
         #region Fields
 
-        public Rectangle _TMP_AutoFilterLocation;
-        public int? _TMP_DrawWidth;
-        public bool _TMP_Reduced;
-        public Rectangle _TMP_ReduceLocation;
-        public int? OrderTMP_Spalte_X1;
+        public int? OrderTmpSpalteX1;
+        public Rectangle TmpAutoFilterLocation;
+        public int? TmpDrawWidth;
+        public bool TmpReduced;
+        public Rectangle TmpReduceLocation;
 
         /// <summary>
         /// // Koordinaten Angabe in "Spalten"
         /// </summary>
-        private int _Spalte_Height;
+        private int _spalteHeight;
 
         /// <summary>
         /// Koordinaten Angabe in "Spalten"
         /// </summary>
-        private int _Spalte_Width;
+        private int _spalteWidth;
 
         /// <summary>
         /// Koordinaten Angabe in "Spalten"
         /// </summary>
-        private int _Spalte_X1;
+        private int _spalteX1;
 
-        private enÜberschriftAnordnung _ÜberschriftAnordnung;
-        private enViewType _ViewType;
+        private enÜberschriftAnordnung _überschriftAnordnung;
+        private enViewType _viewType;
 
         #endregion
 
@@ -58,22 +58,22 @@ namespace BlueDatabase {
         /// <summary>
         /// Info: Es wird keine Änderung ausgelöst
         /// </summary>
-        public ColumnViewItem(ColumnItem Column, enViewType Type) {
+        public ColumnViewItem(ColumnItem? column, enViewType type) {
             Initialize();
-            this.Column = Column;
-            _ViewType = Type;
-            this.Column.CheckFormulaEditType();
+            Column = column;
+            _viewType = type;
+            Column.CheckFormulaEditType();
         }
 
         /// <summary>
         /// Info: Es wird keine Änderung ausgelöst
         /// </summary>
-        public ColumnViewItem(ColumnItem Column, enÜberschriftAnordnung Überschrift) {
+        public ColumnViewItem(ColumnItem? column, enÜberschriftAnordnung überschrift) {
             Initialize();
-            this.Column = Column;
-            _ViewType = enViewType.Column;
-            _ÜberschriftAnordnung = Überschrift;
-            this.Column.CheckFormulaEditType();
+            Column = column;
+            _viewType = enViewType.Column;
+            _überschriftAnordnung = überschrift;
+            Column.CheckFormulaEditType();
         }
 
         /// <summary>
@@ -96,27 +96,27 @@ namespace BlueDatabase {
                         break;
 
                     case "x":
-                        _Spalte_X1 = int.Parse(pair.Value);
+                        _spalteX1 = int.Parse(pair.Value);
                         break;
 
                     case "width":
-                        _Spalte_Width = int.Parse(pair.Value);
+                        _spalteWidth = int.Parse(pair.Value);
                         break;
 
                     case "height":
-                        _Spalte_Height = int.Parse(pair.Value);
+                        _spalteHeight = int.Parse(pair.Value);
                         break;
 
                     case "caption": // Todo: Alt 06.09.2019
-                        _ÜberschriftAnordnung = (enÜberschriftAnordnung)int.Parse(pair.Value);
+                        _überschriftAnordnung = (enÜberschriftAnordnung)int.Parse(pair.Value);
                         break;
 
                     case "permanent": // Todo: Alten Code Entfernen, Permanent wird nicht mehr verstringt 06.09.2019
-                        _ViewType = enViewType.PermanentColumn;
+                        _viewType = enViewType.PermanentColumn;
                         break;
 
                     case "type":
-                        _ViewType = (enViewType)int.Parse(pair.Value);
+                        _viewType = (enViewType)int.Parse(pair.Value);
                         break;
 
                     default:
@@ -124,8 +124,8 @@ namespace BlueDatabase {
                         break;
                 }
             }
-            if (Column != null && _ViewType == enViewType.None) { _ViewType = enViewType.Column; }
-            if (Column != null && _ViewType != enViewType.None) { Column.CheckFormulaEditType(); }
+            if (Column != null && _viewType == enViewType.None) { _viewType = enViewType.Column; }
+            if (Column != null && _viewType != enViewType.None) { Column.CheckFormulaEditType(); }
         }
 
         #endregion
@@ -138,13 +138,13 @@ namespace BlueDatabase {
 
         #region Properties
 
-        public ColumnItem Column { get; private set; }
+        public ColumnItem? Column { get; private set; }
 
         public int Height {
-            get => _Spalte_Height;
+            get => _spalteHeight;
             set {
-                if (value == _Spalte_Height) { return; }
-                _Spalte_Height = value;
+                if (value == _spalteHeight) { return; }
+                _spalteHeight = value;
                 OnChanged();
             }
         }
@@ -153,28 +153,28 @@ namespace BlueDatabase {
         /// Nur wichtig für Formular
         /// </summary>
         public int Spalte_X1 {
-            get => _Spalte_X1;
+            get => _spalteX1;
             set {
-                if (value == _Spalte_X1) { return; }
-                _Spalte_X1 = value;
+                if (value == _spalteX1) { return; }
+                _spalteX1 = value;
                 OnChanged();
             }
         }
 
         public enÜberschriftAnordnung ÜberschriftAnordnung {
-            get => _ÜberschriftAnordnung;
+            get => _überschriftAnordnung;
             set {
-                if (value == _ÜberschriftAnordnung) { return; }
-                _ÜberschriftAnordnung = value;
+                if (value == _überschriftAnordnung) { return; }
+                _überschriftAnordnung = value;
                 OnChanged();
             }
         }
 
         public enViewType ViewType {
-            get => _ViewType;
+            get => _viewType;
             set {
-                if (value == _ViewType) { return; }
-                _ViewType = value;
+                if (value == _viewType) { return; }
+                _viewType = value;
                 OnChanged();
             }
         }
@@ -183,10 +183,10 @@ namespace BlueDatabase {
         /// Nur wichtig für Formular
         /// </summary>
         public int Width {
-            get => _Spalte_Width;
+            get => _spalteWidth;
             set {
-                if (value == _Spalte_Width) { return; }
-                _Spalte_Width = value;
+                if (value == _spalteWidth) { return; }
+                _spalteWidth = value;
                 OnChanged();
             }
         }
@@ -195,64 +195,64 @@ namespace BlueDatabase {
 
         #region Methods
 
-        public void Invalidate_DrawWidth() => _TMP_DrawWidth = null;
+        public void Invalidate_DrawWidth() => TmpDrawWidth = null;
 
         /// <summary>
         /// Info: Es wird keine Änderung ausgelöst
         /// </summary>
-        public void KoordÄndern(int ModX, int ModW, int ModH) {
-            _Spalte_X1 += ModX;
-            _Spalte_Width += ModW;
-            _Spalte_Height += ModH;
-            if (_Spalte_X1 < 0) { _Spalte_X1 = 0; }
-            if (_Spalte_X1 > 18) { _Spalte_X1 = 18; }
-            if (_Spalte_Width < 1) { _Spalte_Width = 1; }
-            if (_Spalte_Width > 20) { _Spalte_Width = 20; }
-            if (_Spalte_Height < 1) { _Spalte_Height = 1; }
-            if (_Spalte_Height > 30 && ModH > 0) {
+        public void KoordÄndern(int modX, int modW, int modH) {
+            _spalteX1 += modX;
+            _spalteWidth += modW;
+            _spalteHeight += modH;
+            if (_spalteX1 < 0) { _spalteX1 = 0; }
+            if (_spalteX1 > 18) { _spalteX1 = 18; }
+            if (_spalteWidth < 1) { _spalteWidth = 1; }
+            if (_spalteWidth > 20) { _spalteWidth = 20; }
+            if (_spalteHeight < 1) { _spalteHeight = 1; }
+            if (_spalteHeight > 30 && modH > 0) {
                 //if (MessageBox.Show("Resthöhe benutzen?", enImageCode.Frage, "Ja", "Nein") == 1)
                 //{
                 //    _Spalte_Height = 30;
                 //}
                 //else
                 //{
-                _Spalte_Height = 31;
+                _spalteHeight = 31;
                 //}
             }
             OnChanged();
         }
 
-        public ColumnViewItem NextVisible(ColumnViewCollection _Parent) => _Parent?.NextVisible(this);
+        public ColumnViewItem? NextVisible(ColumnViewCollection? parent) => parent?.NextVisible(this);
 
         public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 
-        public ColumnViewItem PreviewsVisible(ColumnViewCollection _Parent) => _Parent?.PreviousVisible(this);
+        public ColumnViewItem? PreviewsVisible(ColumnViewCollection? parent) => parent?.PreviousVisible(this);
 
         public override string ToString() {
-            var Result = "{Type=" + (int)_ViewType;
-            if (Column != null) { Result = Result + ", " + Column.ParsableColumnKey(); }
-            if (_Spalte_X1 > 0) { Result = Result + ", X=" + _Spalte_X1; }
-            if (_Spalte_Width > 1) { Result = Result + ", Width=" + _Spalte_Width; }
-            if (_Spalte_Height > 1) { Result = Result + ", Height=" + _Spalte_Height; }
-            if (_ÜberschriftAnordnung != enÜberschriftAnordnung.Über_dem_Feld) { Result = Result + ", Caption=" + (int)_ÜberschriftAnordnung; }
-            return Result + "}";
+            var result = "{Type=" + (int)_viewType;
+            if (Column != null) { result = result + ", " + Column.ParsableColumnKey(); }
+            if (_spalteX1 > 0) { result = result + ", X=" + _spalteX1; }
+            if (_spalteWidth > 1) { result = result + ", Width=" + _spalteWidth; }
+            if (_spalteHeight > 1) { result = result + ", Height=" + _spalteHeight; }
+            if (_überschriftAnordnung != enÜberschriftAnordnung.Über_dem_Feld) { result = result + ", Caption=" + (int)_überschriftAnordnung; }
+            return result + "}";
         }
 
         /// <summary>
         /// Info: Es wird keine Änderung ausgelöst
         /// </summary>
         private void Initialize() {
-            _ViewType = enViewType.None;
+            _viewType = enViewType.None;
             Column = null;
-            _Spalte_X1 = 0;
-            _Spalte_Width = 1;
-            _Spalte_Height = 1;
-            _ÜberschriftAnordnung = enÜberschriftAnordnung.Über_dem_Feld;
-            OrderTMP_Spalte_X1 = null;
-            _TMP_AutoFilterLocation = Rectangle.Empty;
-            _TMP_ReduceLocation = Rectangle.Empty;
-            _TMP_DrawWidth = null;
-            _TMP_Reduced = false;
+            _spalteX1 = 0;
+            _spalteWidth = 1;
+            _spalteHeight = 1;
+            _überschriftAnordnung = enÜberschriftAnordnung.Über_dem_Feld;
+            OrderTmpSpalteX1 = null;
+            TmpAutoFilterLocation = Rectangle.Empty;
+            TmpReduceLocation = Rectangle.Empty;
+            TmpDrawWidth = null;
+            TmpReduced = false;
         }
 
         #endregion

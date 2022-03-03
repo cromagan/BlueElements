@@ -22,6 +22,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using static BlueBasics.Generic;
 
 namespace BlueBasics {
@@ -30,13 +31,13 @@ namespace BlueBasics {
 
         #region Fields
 
-        private static readonly int _canWrite_tryintervall = 10;
-        private static readonly List<string> _noWriteAccess = new();
-        private static readonly List<string> _writeAccess = new();
-        private static DateTime _canWrite_LastCheck = DateTime.Now.Subtract(new TimeSpan(10, 10, 10));
-        private static string _canWrite_LastFile = string.Empty;
-        private static bool _canWrite_LastResult;
-        private static string _LastFilePath = string.Empty;
+        private const int CanWriteTryintervall = 10;
+        private static readonly List<string> NoWriteAccess = new();
+        private static readonly List<string> WriteAccess = new();
+        private static DateTime _canWriteLastCheck = DateTime.Now.Subtract(new TimeSpan(10, 10, 10));
+        private static string _canWriteLastFile = string.Empty;
+        private static bool _canWriteLastResult;
+        private static string _lastFilePath = string.Empty;
 
         #endregion
 
@@ -48,7 +49,7 @@ namespace BlueBasics {
 
         #region Methods
 
-        public static string CalculateMD5(string filename) {
+        public static string CalculateMd5(string filename) {
             if (!FileExists(filename)) { return string.Empty; }
             using var md5 = MD5.Create();
             using var stream = File.OpenRead(filename);
@@ -61,7 +62,7 @@ namespace BlueBasics {
             var s = DateTime.Now;
             while (true) {
                 if (CanWrite(filename)) { return true; }
-                if (tryItForSeconds < _canWrite_tryintervall) { return false; }
+                if (tryItForSeconds < CanWriteTryintervall) { return false; }
                 if (DateTime.Now.Subtract(s).TotalSeconds > tryItForSeconds) { return false; }
             }
         }
@@ -96,15 +97,15 @@ namespace BlueBasics {
         // }
         public static bool CanWriteInDirectory(string directory) {
             if (string.IsNullOrEmpty(directory)) { return false; }
-            var DirUpper = directory.ToUpper();
-            if (_writeAccess.Contains(DirUpper)) { return true; }
-            if (_noWriteAccess.Contains(DirUpper)) { return false; }
+            var dirUpper = directory.ToUpper();
+            if (WriteAccess.Contains(dirUpper)) { return true; }
+            if (NoWriteAccess.Contains(dirUpper)) { return false; }
             try {
                 using (var fs = File.Create(Path.Combine(directory, Path.GetRandomFileName()), 1, FileOptions.DeleteOnClose)) { }
-                _writeAccess.AddIfNotExists(DirUpper); // Multitasking
+                WriteAccess.AddIfNotExists(dirUpper); // Multitasking
                 return true;
             } catch {
-                _noWriteAccess.AddIfNotExists(DirUpper); // Multitasking
+                NoWriteAccess.AddIfNotExists(dirUpper); // Multitasking
                 return false;
             }
         }
@@ -193,14 +194,14 @@ namespace BlueBasics {
 
         public static bool DeleteFile(string file, bool toBeSure) => !FileExists(file) || ProcessFile(TryDeleteFile, file, file, toBeSure);
 
-        public static bool ExecuteFile(string fileName, string arguments = null, bool waitForExit = false, bool logException = true) {
+        public static bool ExecuteFile(string fileName, string arguments = "", bool waitForExit = false, bool logException = true) {
             try {
                 if (string.IsNullOrEmpty(fileName) && string.IsNullOrEmpty(arguments)) { return false; }
-                var Processx = arguments == null ? Process.Start(fileName) : Process.Start(fileName, arguments);
+                var processx = string.IsNullOrWhiteSpace(arguments) ? Process.Start(fileName) : Process.Start(fileName, arguments);
                 if (waitForExit) {
-                    if (Processx == null) { return true; }// Windows 8, DANKE!
-                    Processx.WaitForExit();
-                    Processx.Dispose();
+                    if (processx == null) { return true; }// Windows 8, DANKE!
+                    processx.WaitForExit();
+                    processx.Dispose();
                 }
             } catch (Exception ex) {
                 if (logException) { Develop.DebugPrint("ExecuteFile konnte nicht ausgeführt werden:<br>" + ex.Message + "<br>Datei: " + fileName); }
@@ -271,7 +272,7 @@ namespace BlueBasics {
     "DB" or "MDB" => enFileFormat.Database,
     "LNK" or "URL" => enFileFormat.Link,
     "BCR" => enFileFormat.BlueCreativeFile,
-    _ => enFileFormat.Unknown,
+    _ => enFileFormat.Unknown
 };
 
         public static string Folder(this string pathx) {
@@ -308,7 +309,7 @@ namespace BlueBasics {
         public static string GetFileInfo(string filename, bool mustDo) {
             try {
                 FileInfo f = new(filename);
-                return f.LastWriteTimeUtc.ToString(Constants.Format_Date) + "-" + f.Length.ToString();
+                return f.LastWriteTimeUtc.ToString(Constants.Format_Date) + "-" + f.Length;
             } catch {
                 if (!mustDo) { return string.Empty; }
                 Develop.CheckStackForOverflow();
@@ -317,18 +318,18 @@ namespace BlueBasics {
             }
         }
 
-        public static List<string> GetFilesWithFileSelector(string defaultpath, bool multi) {
-            if (string.IsNullOrEmpty(_LastFilePath)) {
+        public static List<string>? GetFilesWithFileSelector(string defaultpath, bool multi) {
+            if (string.IsNullOrEmpty(_lastFilePath)) {
                 if (!string.IsNullOrEmpty(defaultpath)) {
-                    _LastFilePath = defaultpath;
+                    _lastFilePath = defaultpath;
                 }
             }
 
-            using System.Windows.Forms.OpenFileDialog f = new();
+            using OpenFileDialog f = new();
             f.CheckFileExists = true;
             f.CheckPathExists = true;
             f.Multiselect = multi;
-            f.InitialDirectory = _LastFilePath;
+            f.InitialDirectory = _lastFilePath;
             f.Title = "Datei hinzufügen:";
             f.ShowDialog();
             if (f.FileNames == null) { return null; }
@@ -337,7 +338,7 @@ namespace BlueBasics {
             var x = new List<string>();
             x.AddRange(f.FileNames);
             if (f.FileNames != null && f.FileNames.GetUpperBound(0) > 0) {
-                _LastFilePath = f.FileNames[0].FilePath();
+                _lastFilePath = f.FileNames[0].FilePath();
             }
 
             return x;
@@ -387,7 +388,7 @@ namespace BlueBasics {
             pfad = pfad.CheckPath();
             if (!PathExists(pfad)) { Directory.CreateDirectory(pfad); }
             wunschname = wunschname.RemoveChars(Constants.Char_DateiSonderZeichen);
-            string filename;
+            string? filename;
             do {
                 z++;
                 filename = z > 0 ? pfad + wunschname + "_" + z.ToString(Constants.Format_Integer5) + "." + suffix : pfad + wunschname + "." + suffix;
@@ -420,26 +421,26 @@ namespace BlueBasics {
             // Private lassen, das andere CanWrite greift auf diese zu.
             // Aber das andere prüft zusätzlich die Schreibrechte im Verzeichnis
             // http://www.vbarchiv.net/tipps/tipp_1281.html
-            if (_canWrite_LastResult) { _canWrite_LastFile = string.Empty; }
-            if (DateTime.Now.Subtract(_canWrite_LastCheck).TotalSeconds > _canWrite_tryintervall) { _canWrite_LastFile = string.Empty; }
-            if (_canWrite_LastFile != file.ToUpper()) {
-                var StartTime = DateTime.Now;
+            if (_canWriteLastResult) { _canWriteLastFile = string.Empty; }
+            if (DateTime.Now.Subtract(_canWriteLastCheck).TotalSeconds > CanWriteTryintervall) { _canWriteLastFile = string.Empty; }
+            if (_canWriteLastFile != file.ToUpper()) {
+                var startTime = DateTime.Now;
                 if (FileExists(file)) {
                     try {
                         // Versuch, Datei EXKLUSIV zu öffnen
                         using (FileStream obFi = new(file, FileMode.Open, FileAccess.Read, FileShare.Read)) {
                             obFi.Close();
                         }
-                        _canWrite_LastResult = Convert.ToBoolean(DateTime.Now.Subtract(StartTime).TotalSeconds < 1);
+                        _canWriteLastResult = Convert.ToBoolean(DateTime.Now.Subtract(startTime).TotalSeconds < 1);
                     } catch {
                         // Bei Fehler ist die Datei in Benutzung
-                        _canWrite_LastResult = false;
+                        _canWriteLastResult = false;
                     }
                 }
-                _canWrite_LastCheck = DateTime.Now;
+                _canWriteLastCheck = DateTime.Now;
             }
-            _canWrite_LastFile = file.ToUpper();
-            return _canWrite_LastResult;
+            _canWriteLastFile = file.ToUpper();
+            return _canWriteLastResult;
         }
 
         private static bool ProcessFile(DoThis processMethod, string file1, string file2, bool toBeSure) {

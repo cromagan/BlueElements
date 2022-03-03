@@ -17,6 +17,7 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueControls.Extended_Text;
 using BlueControls.Forms;
 using BlueDatabase;
 using BlueDatabase.Enums;
@@ -62,12 +63,12 @@ namespace BlueControls {
 
         public static bool IsWriteable() => _DictWords != null && !string.IsNullOrEmpty(_DictWords.Filename);
 
-        public static List<string> SimilarTo(string Word) {
+        public static List<string>? SimilarTo(string Word) {
             if (IsWordOk(Word)) { return null; }
             List<string> l = new();
-            foreach (var ThisRowItem in _DictWords.Row) {
-                if (ThisRowItem != null) {
-                    var w = ThisRowItem.CellFirstString();
+            foreach (var thisRowItem in _DictWords.Row) {
+                if (thisRowItem != null) {
+                    var w = thisRowItem.CellFirstString();
                     var di = Generic.LevenshteinDistance(Word.ToLower(), w.ToLower());
                     if (di < Word.Length / 2.0 || di < w.Length / 2.0) {
                         l.Add(di.ToString(Constants.Format_Integer5) + w);

@@ -5,6 +5,7 @@ using BlueControls.ItemCollection;
 using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.Linq;
 
 namespace BlueControls.Controls {
 
@@ -18,15 +19,15 @@ namespace BlueControls.Controls {
 
         #region Events
 
-        public event EventHandler AddClicked;
+        public event EventHandler? AddClicked;
 
-        public event EventHandler<ListEventArgs> ItemAdded;
+        public event EventHandler<ListEventArgs>? ItemAdded;
 
         /// <summary>
         /// Wird nach jedem entfernen eines Items ausgelöst. Auch beim Initialisiern oder bei einem Clear.
         /// Soll eine Benutzerinteraktion abgefragt werden, ist RemoveClicked besser.
         /// </summary>
-        public event EventHandler ItemRemoved;
+        public event EventHandler? ItemRemoved;
 
         #endregion
 
@@ -48,12 +49,10 @@ namespace BlueControls.Controls {
 
         public void OnAddClicked() => AddClicked?.Invoke(this, System.EventArgs.Empty);
 
-        internal void SuggestionsAdd(ItemCollectionList item) {
-            foreach (var thisi in item) {
-                if (Main.Item[thisi.Internal] == null && Suggest.Item[thisi.Internal] == null) {
-                    thisi.Checked = false;
-                    Suggest.Item.Add((BasicListItem)thisi.Clone());
-                }
+        internal void SuggestionsAdd(ItemCollectionList? item) {
+            foreach (var thisi in item.Where(thisi => Main.Item[thisi.Internal] == null && Suggest.Item[thisi.Internal] == null)) {
+                thisi.Checked = false;
+                Suggest.Item.Add((BasicListItem)thisi.Clone());
             }
         }
 

@@ -17,7 +17,7 @@
 
 namespace BlueControls.Enums {
 
-    public enum PadStyles : int {
+    public enum PadStyles {
         Undefiniert = -1, // Braucht man
 
         // 10000 = Grenze für UniPaint, diese Objecte werden mit der Poligon-Routine erzeugt

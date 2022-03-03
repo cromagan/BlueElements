@@ -45,11 +45,14 @@ namespace BlueControls.EventArgs {
 
         #region Methods
 
-        public void DrawImage(Bitmap BMP) {
-            var r = new RectangleF(0, 0, BMP.Width, BMP.Height).ZoomAndMoveRect(Zoom, ShiftX, ShiftY, true);
+        public void DrawImage(Bitmap? bmp) {
+            if (bmp == null) {
+                return;
+            }
+
+            var r = new RectangleF(0, 0, bmp.Width, bmp.Height).ZoomAndMoveRect(Zoom, ShiftX, ShiftY, true);
             G.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
-            G.DrawImage(BMP, r);
-            //            G.DrawImage(BMP, p1.X, p1.Y, p2.X - p1.X, p2.Y - p1.Y);
+            G.DrawImage(bmp, r);
         }
 
         public void DrawLine(Pen pen, float x1, float y1, float x2, float y2) {
@@ -58,12 +61,12 @@ namespace BlueControls.EventArgs {
             G.DrawLine(pen, p1, p2);
         }
 
-        public void FillCircle(Color C, int X, int Y, int R) {
-            SolidBrush B = new(C);
-            for (var adx = -R; adx <= R; adx++) {
-                for (var ady = -R; ady <= R; ady++) {
+        public void FillCircle(Color c, int x, int y, int r) {
+            SolidBrush b = new(c);
+            for (var adx = -r; adx <= r; adx++) {
+                for (var ady = -r; ady <= r; ady++) {
                     var d = Math.Sqrt((adx * adx) + (ady * ady)) - 0.5;
-                    if (d <= R) { FillRectangle(B, new Rectangle(X + adx, Y + ady, 1, 1)); }
+                    if (d <= r) { FillRectangle(b, new Rectangle(x + adx, y + ady, 1, 1)); }
                 }
             }
         }

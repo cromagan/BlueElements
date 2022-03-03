@@ -28,8 +28,10 @@ namespace BlueControls.Forms {
         private EditBoxRow(string txt, RowItem? row) : base(false, true) {
             InitializeComponent();
 
-            formToEdit.Database = row.Database;
-            formToEdit.ShowingRowKey = row.Key;
+            if (row != null) {
+                formToEdit.Database = row.Database;
+                formToEdit.ShowingRowKey = row.Key;
+            }
 
             Setup(txt, formToEdit, formToEdit.MinimumSize.Width + 50);
         }
@@ -38,7 +40,7 @@ namespace BlueControls.Forms {
 
         #region Methods
 
-        public static void Show(string txt, RowItem row, bool isDialog) {
+        public static void Show(string txt, RowItem? row, bool isDialog) {
             EditBoxRow MB = new(txt, row);
             if (isDialog) {
                 MB.ShowDialog();

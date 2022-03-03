@@ -24,7 +24,7 @@ namespace BlueControls.Forms {
 
         #region Fields
 
-        private string _giveBack = string.Empty;
+        private string _giveBack;
 
         #endregion
 
@@ -48,7 +48,7 @@ namespace BlueControls.Forms {
 
         #region Methods
 
-        public static string Show(string txt, ItemCollectionList suggest, bool texteingabeErlaubt) => Show(txt, string.Empty, suggest, texteingabeErlaubt);
+        public static string Show(string txt, ItemCollectionList? suggest, bool texteingabeErlaubt) => Show(txt, string.Empty, suggest, texteingabeErlaubt);
 
         public static string Show(string txt, List<string> suggest, bool texteingabeErlaubt) {
             ItemCollectionList Suggest = new();
@@ -66,7 +66,7 @@ namespace BlueControls.Forms {
         /// <param name="vorschlagsText"></param>
         /// <param name="suggest">Wird geklont, es kann auch aus einer Listbox kommen, und dann stimmen die Events nicht mehr. Es muss auch einbe ItemCollection bleiben, damit aus der Datenbank auch Bilder etc. angezeigt werden können.</param>
         /// <returns></returns>
-        private static string Show(string txt, string vorschlagsText, ItemCollectionList suggest, bool texteingabeErlaubt) {
+        private static string Show(string txt, string vorschlagsText, ItemCollectionList? suggest, bool texteingabeErlaubt) {
             var MB = new InputBoxComboStyle(txt, vorschlagsText, suggest, texteingabeErlaubt);
             MB.ShowDialog();
             return MB._giveBack;

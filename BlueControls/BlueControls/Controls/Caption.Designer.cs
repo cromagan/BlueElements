@@ -12,7 +12,7 @@ namespace BlueControls.Controls
             {
                 if (disposing)
                 {
-                    eText = null;
+                    _eText = null;
                 }
             }
             finally

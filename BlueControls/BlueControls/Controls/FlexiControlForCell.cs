@@ -32,6 +32,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Linq;
 using System.Windows.Forms;
 using static BlueBasics.FileOperations;
 
@@ -47,13 +48,13 @@ namespace BlueControls.Controls {
 
         private string _ColumnName = string.Empty;
 
-        private Database _Database = null;
+        private Database _Database;
 
         private long _RowKey = -1;
 
-        private ColumnItem? _tmpColumn = null;
+        private ColumnItem? _tmpColumn;
 
-        private RowItem? _tmpRow = null;
+        private RowItem? _tmpRow;
 
         #endregion
 
@@ -194,7 +195,7 @@ namespace BlueControls.Controls {
             return false;
         }
 
-        public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
+        public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList? Items, out object? HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
             GetTmpVariables();
             if (_tmpColumn != null && _tmpColumn.Database.IsAdministrator()) {
                 Items.Add(enContextMenuComands.SpaltenEigenschaftenBearbeiten);
@@ -204,7 +205,7 @@ namespace BlueControls.Controls {
             }
             if (Parent is Formula f) {
                 ItemCollectionList x = new(enBlueListBoxAppearance.KontextMenu);
-                f.GetContextMenuItems(null, x, out var _, Tags, ref Cancel, ref Translate);
+                f.GetContextMenuItems(null, x, out _, Tags, ref Cancel, ref Translate);
                 if (x.Count > 0) {
                     if (Items.Count > 0) {
                         Items.AddSeparator();
@@ -281,7 +282,7 @@ namespace BlueControls.Controls {
                     swapListBox.AddClicked += ListBox_AddClicked;
                     break;
 
-                case Button _:
+                case Button:
                     break;
                 //case Caption _:
                 //    break;
@@ -324,10 +325,10 @@ namespace BlueControls.Controls {
                 case Caption _:
                     break;
 
-                case Button _:
+                case Button:
                     break;
 
-                case Line _:
+                case Line:
                     break;
 
                 default:
@@ -353,6 +354,20 @@ namespace BlueControls.Controls {
         //    GetTmpVariables();
         //    SetValueFromCell();
         //}
+
+        private static void ListBox_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
+            if (e.HotItem is TextListItem t) {
+                if (FileExists(t.Internal)) {
+                    e.UserMenu.Add(enContextMenuComands.DateiÖffnen);
+                }
+            }
+            if (e.HotItem is BitmapListItem) {
+                //if (FileExists(t.Internal))
+                //{
+                e.UserMenu.Add("Bild öffnen");
+                //}
+            }
+        }
 
         private void _Database_Disposing(object sender, System.EventArgs e) => Database = null;
 
@@ -450,7 +465,7 @@ namespace BlueControls.Controls {
         }
 
         private void FillCellNow() {
-            if (_IsFilling) { return; }
+            if (IsFilling) { return; }
             if (!Enabled) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.
             GetTmpVariables(); // Falls der Key inzwischen nicht mehr in der Collection ist, deswegen neu prüfen. RowREmoved greift zwar, kann aber durchaus erst nach RowSortesd/CursorposChanges auftreten.
             if (_tmpColumn == null || _tmpRow == null) { return; }
@@ -459,10 +474,7 @@ namespace BlueControls.Controls {
             switch (_tmpColumn.Format) {
                 case enDataFormat.Link_To_Filesystem:
                     var tmp = Value.SplitAndCutByCRToList();
-                    List<string> tmp2 = new();
-                    foreach (var file in tmp) {
-                        tmp2.Add(_tmpColumn.SimplyFile(file));
-                    }
+                    var tmp2 = tmp.Select(file => _tmpColumn.SimplyFile(file)).ToList();
                     NewValue = tmp2.JoinWithCr();
                     break;
 
@@ -480,8 +492,8 @@ namespace BlueControls.Controls {
             if (OldVal != _tmpRow.CellGetString(_tmpC2)) { _tmpR2.DoAutomatic(false, false, 1, "value changed"); }
         }
 
-        private ColumnItem GetRealColumn(ColumnItem column, RowItem row) {
-            ColumnItem gbColumn;
+        private ColumnItem? GetRealColumn(ColumnItem? column, RowItem? row) {
+            ColumnItem? gbColumn;
 
             if (column?.Format is enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 //var skriptgesteuert = column.LinkedCell_RowKey == -9999;
@@ -577,20 +589,6 @@ namespace BlueControls.Controls {
                 default:
                     Develop.DebugPrint(Dia);
                     return;
-            }
-        }
-
-        private void ListBox_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-            if (e.HotItem is TextListItem t) {
-                if (FileExists(t.Internal)) {
-                    e.UserMenu.Add(enContextMenuComands.DateiÖffnen);
-                }
-            }
-            if (e.HotItem is BitmapListItem) {
-                //if (FileExists(t.Internal))
-                //{
-                e.UserMenu.Add("Bild öffnen");
-                //}
             }
         }
 

@@ -25,7 +25,7 @@ using System.Windows.Forms;
 
 namespace BlueBasics {
 
-    public static partial class WindowsRemoteControl {
+    public static class WindowsRemoteControl {
 
         #region Fields
 
@@ -42,10 +42,10 @@ namespace BlueBasics {
         private enum InputType {
             INPUT_MOUSE = 0,
             INPUT_KEYBOARD = 1,
-            INPUT_HARDWARE = 2,
+            INPUT_HARDWARE = 2
         }
 
-        [Flags()]
+        [Flags]
         private enum MOUSEEVENTF {
             MOVE = 0x0001,  // mouse move
             LEFTDOWN = 0x0002,  // left button down
@@ -58,7 +58,7 @@ namespace BlueBasics {
             XUP = 0x0100,  // x button down
             WHEEL = 0x0800,  // wheel button rolled
             VIRTUALDESK = 0x4000,  // map to entire virtual desktop
-            ABSOLUTE = 0x8000,  // absolute move
+            ABSOLUTE = 0x8000 // absolute move
         }
 
         #endregion
@@ -169,7 +169,7 @@ namespace BlueBasics {
         }
 
         public static void RebootComputer() {
-            MultiUserFile.clsMultiUserFile.SaveAll(true);
+            MultiUserFile.ClsMultiUserFile.SaveAll(true);
             Develop.TraceLogging_End();
 
             var psi = new ProcessStartInfo("shutdown.exe", "-r -f -t 0") {
@@ -187,7 +187,7 @@ namespace BlueBasics {
         public static extern int ShowWindow(IntPtr hWnd, int nCmdShow);
 
         public static void ShutdownComputer() {
-            MultiUserFile.clsMultiUserFile.SaveAll(true);
+            MultiUserFile.ClsMultiUserFile.SaveAll(true);
             Develop.TraceLogging_End();
 
             var psi = new ProcessStartInfo("shutdown", "/s /t 0") {

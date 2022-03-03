@@ -27,17 +27,17 @@ namespace BlueBasics {
         #region Methods
 
         public static void AddRad(this GraphicsPath gP, PointF middle, PointF startP, float wink) {
-            var radius = (float)Math.Abs(Geometry.GetLenght(middle, startP));
-            var startw = (float)Geometry.GetAngle(middle, startP);
+            var radius = Math.Abs(Geometry.GetLenght(middle, startP));
+            var startw = Geometry.GetAngle(middle, startP);
             gP.AddArc(middle.X - radius, middle.Y - radius, radius * 2, radius * 2, -startw, -wink);
         }
 
         public static GraphicsPath Poly_Arrow(Rectangle rect) {
             GraphicsPath p = new();
-            /// --------+  >
-            ///         | /
-            ///         |/
-            ///
+            // --------+  >
+            //         | /
+            //         |/
+            //
             PointF plusOben = new((float)(rect.Left + (rect.Width * 0.5)), (float)(rect.PointOf(enAlignment.VerticalCenter_Right).Y - (rect.Height * 0.18)));
             PointF plusUnten = new((float)(rect.Left + (rect.Width * 0.5)), (float)(rect.PointOf(enAlignment.VerticalCenter_Right).Y + (rect.Height * 0.18)));
             p.AddLine(rect.PointOf(enAlignment.VerticalCenter_Right), new PointF(plusUnten.X, rect.Bottom));
@@ -75,11 +75,11 @@ namespace BlueBasics {
             return tempPoly_Rechteck;
         }
 
-        public static GraphicsPath Poly_RoundRec(Rectangle rect, int radius) => Poly_RoundRec(rect.X, rect.Y, rect.Width, rect.Height, radius);
+        public static GraphicsPath? Poly_RoundRec(Rectangle rect, int radius) => Poly_RoundRec(rect.X, rect.Y, rect.Width, rect.Height, radius);
 
-        public static GraphicsPath Poly_RoundRec(int x, int y, int width, int height, int radius) {
+        public static GraphicsPath? Poly_RoundRec(int x, int y, int width, int height, int radius) {
             if (width < 1 || height < 1) { return null; }
-            GraphicsPath tempPoly_RoundRec = new();
+            GraphicsPath? tempPoly_RoundRec = new();
             if (radius > (height / 2.0) + 2) { radius = (int)(height / 2.0) + 2; }
             if (radius > (width / 2.0) + 2) { radius = (int)(width / 2.0) + 2; }
 
@@ -94,7 +94,9 @@ namespace BlueBasics {
             tempPoly_RoundRec.CloseFigure();
             return tempPoly_RoundRec;
 
-            void AddRad90(int mxX, int mxY, int Radius, int gradStart) => tempPoly_RoundRec.AddArc(mxX, mxY, Radius, Radius, gradStart, 90);
+            void AddRad90(int mxX, int mxY, int Radius, int gradStart) {
+                tempPoly_RoundRec.AddArc(mxX, mxY, Radius, Radius, gradStart, 90);
+            }
         }
 
         public static GraphicsPath Poly_Triangle(PointF p1, PointF p2, PointF p3) {

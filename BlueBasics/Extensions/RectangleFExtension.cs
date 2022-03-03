@@ -16,7 +16,6 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics.Enums;
-using System;
 using System.Collections.Generic;
 using System.Drawing;
 
@@ -29,6 +28,7 @@ namespace BlueBasics {
         /// <summary>
         /// Erweitert das Rechteck, dass der Angegebene Punkt ebenfalls umschlossen wird.
         /// </summary>
+        /// <param name="r"></param>
         /// <param name="P"></param>
         public static RectangleF ExpandTo(this RectangleF r, PointF P) {
             if (P.X < r.X) {
@@ -52,8 +52,6 @@ namespace BlueBasics {
         /// <summary>
         /// Erweitert das Rechteck, dass ein Kreis mit den angegebenen Parametern ebenfalls umschlossen wird.
         /// </summary>
-        /// <param name="P"></param>
-        /// <param name="maxrad"></param>
         public static RectangleF ExpandTo(this RectangleF r, PointF middle, float radius) {
             r = r.ExpandTo(new PointF(middle.X, middle.Y + radius));
             r = r.ExpandTo(new PointF(middle.X, middle.Y - radius));
@@ -63,20 +61,24 @@ namespace BlueBasics {
         }
 
         public static PointF NearestCornerOF(this RectangleF r, PointF p) {
-            var pl = new List<PointF>();
-            pl.Add(r.PointOf(enAlignment.Top_Left));
-            pl.Add(r.PointOf(enAlignment.Top_Right));
-            pl.Add(r.PointOf(enAlignment.Bottom_Right));
-            pl.Add(r.PointOf(enAlignment.Bottom_Left));
+            var pl = new List<PointF>
+            {
+                r.PointOf(enAlignment.Top_Left),
+                r.PointOf(enAlignment.Top_Right),
+                r.PointOf(enAlignment.Bottom_Right),
+                r.PointOf(enAlignment.Bottom_Left)
+            };
             return p.NearestPoint(pl);
         }
 
         public static PointF NearestLineMiddle(this RectangleF r, PointF p) {
-            var pl = new List<PointF>();
-            pl.Add(r.PointOf(enAlignment.Bottom_HorizontalCenter));
-            pl.Add(r.PointOf(enAlignment.Top_HorizontalCenter));
-            pl.Add(r.PointOf(enAlignment.VerticalCenter_Left));
-            pl.Add(r.PointOf(enAlignment.VerticalCenter_Right));
+            var pl = new List<PointF>
+            {
+                r.PointOf(enAlignment.Bottom_HorizontalCenter),
+                r.PointOf(enAlignment.Top_HorizontalCenter),
+                r.PointOf(enAlignment.VerticalCenter_Left),
+                r.PointOf(enAlignment.VerticalCenter_Right)
+            };
             return p.NearestPoint(pl);
         }
 
@@ -111,19 +113,19 @@ namespace BlueBasics {
             if (outerLine) {
                 // Beispiel: bei X=0 und Width=5 muss bei einen zoom von 5
                 //               0 und 25 rauskommen
-                return new RectangleF((float)((r.X * zoom) - shiftX),
-                      (float)((r.Y * zoom) - shiftY),
-                      (float)(r.Width * zoom),
-                      (float)(r.Height * zoom));
-            } else {
-                // Beispiel: bei X=0 und Width=5 muss bei einen zoom von 5
-                //               2,5 und 27,5 rauskommen
-                var add = zoom / 2;
-                return new RectangleF((r.X * zoom) - shiftX + add,
-                                      (r.Y * zoom) - shiftY + add,
-                                      r.Width * zoom,
-                                      r.Height * zoom);
+                return new RectangleF((r.X * zoom) - shiftX,
+                      (r.Y * zoom) - shiftY,
+                      r.Width * zoom,
+                      r.Height * zoom);
             }
+
+            // Beispiel: bei X=0 und Width=5 muss bei einen zoom von 5
+            //               2,5 und 27,5 rauskommen
+            var add = zoom / 2;
+            return new RectangleF((r.X * zoom) - shiftX + add,
+                (r.Y * zoom) - shiftY + add,
+                r.Width * zoom,
+                r.Height * zoom);
         }
 
         #endregion

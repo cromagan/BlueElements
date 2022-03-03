@@ -26,6 +26,7 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BlueControls.BlueDatabaseDialogs {
 
@@ -33,7 +34,7 @@ namespace BlueControls.BlueDatabaseDialogs {
     {
         #region Fields
 
-        private readonly ColumnItem Column;
+        private readonly ColumnItem? Column;
 
         private bool MultiAuswahlODER;
 
@@ -45,7 +46,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         #region Constructors
 
-        public AutoFilter(ColumnItem column, FilterCollection filter, List<RowItem>? pinned) : base(enDesign.Form_AutoFilter) {
+        public AutoFilter(ColumnItem? column, FilterCollection? filter, List<RowItem>? pinned) : base(enDesign.Form_AutoFilter) {
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
             InitializeComponent();
             //Me.SetNotFocusable()
@@ -74,7 +75,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         #region Methods
 
-        public void GenerateAll(FilterCollection filter, List<RowItem> pinned) {
+        public void GenerateAll(FilterCollection? filter, List<RowItem?> pinned) {
             var nochOk = true;
             var List_FilterString = Column.Autofilter_ItemList(filter, pinned);
             var F = Skin.GetBlueFont(enDesign.Table_Cell, enStates.Standard);
@@ -83,13 +84,13 @@ namespace BlueControls.BlueDatabaseDialogs {
             // Column ist für die Filter in dieser Datenbank zuständig
             // lColumn für das Aussehen und Verhalten des FilterDialogs
 
-            ColumnItem lColumn = null;
+            ColumnItem? lColumn = null;
             if (Column.Format is enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 (lColumn, _, _) = CellCollection.LinkedCellData(Column, null, false, false);
             }
             if (lColumn == null) { lColumn = Column; }
 
-            Width = Math.Max(txbEingabe.Width + (Skin.Padding * 2), Table.tmpColumnContentWidth(null, lColumn, F, 16));
+            Width = Math.Max(txbEingabe.Width + (Skin.Padding * 2), Table.TmpColumnContentWidth(null, lColumn, F, 16));
             lsbFilterItems.Item.Clear();
             lsbFilterItems.CheckBehavior = enCheckBehavior.MultiSelection;
 
@@ -103,7 +104,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             var PrefSize = lsbFilterItems.Item.CalculateColumnAndSize();
             lsbFilterItems.Anchor = System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Top;
-            lsbFilterItems.Width = Math.Min(Table.tmpColumnContentWidth(null, lColumn, F, 16), Width - (Skin.PaddingSmal * 2));
+            lsbFilterItems.Width = Math.Min(Table.TmpColumnContentWidth(null, lColumn, F, 16), Width - (Skin.PaddingSmal * 2));
             lsbFilterItems.Width = Math.Max(lsbFilterItems.Width, PrefSize.Width);
             lsbFilterItems.Height = Math.Max(lsbFilterItems.Height, PrefSize.Height);
             lsbFilterItems.Width = Math.Max(lsbFilterItems.Width, Width - (Skin.PaddingSmal * 2));
@@ -141,24 +142,20 @@ namespace BlueControls.BlueDatabaseDialogs {
             Width = Math.Max(lsbFilterItems.Right + (Skin.PaddingSmal * 2), Width);
             Height = lsbFilterItems.Bottom + Skin.PaddingSmal;
             if (filter != null) {
-                foreach (var Thisfilter in filter) {
-                    if (Thisfilter != null && Thisfilter.FilterType != enFilterType.KeinFilter) {
-                        if (Thisfilter.Column == Column) {
-                            if (Thisfilter.FilterType.HasFlag(enFilterType.Istgleich)) {
-                                foreach (var ThisValue in Thisfilter.SearchValue) {
-                                    if (lsbFilterItems.Item[ThisValue] != null) {
-                                        lsbFilterItems.Item[ThisValue].Checked = true;
-                                    } else if (string.IsNullOrEmpty(ThisValue)) {
-                                        lsbStandardFilter.Item["filterleere"].Checked = true;
-                                    }
-                                }
-                            } else if (Thisfilter.FilterType.HasFlag(enFilterType.Instr)) {
-                                txbEingabe.Text = Thisfilter.SearchValue[0];
-                            } else if (Convert.ToBoolean((int)Thisfilter.FilterType & 2)) {
-                                if (Thisfilter.SearchValue.Count == 1 && string.IsNullOrEmpty(Thisfilter.SearchValue[0])) {
-                                    lsbStandardFilter.Item["filternichtleere"].Checked = true;
-                                }
+                foreach (var Thisfilter in filter.Where(Thisfilter => Thisfilter != null && Thisfilter.FilterType != enFilterType.KeinFilter).Where(Thisfilter => Thisfilter.Column == Column)) {
+                    if (Thisfilter.FilterType.HasFlag(enFilterType.Istgleich)) {
+                        foreach (var ThisValue in Thisfilter.SearchValue) {
+                            if (lsbFilterItems.Item[ThisValue] != null) {
+                                lsbFilterItems.Item[ThisValue].Checked = true;
+                            } else if (string.IsNullOrEmpty(ThisValue)) {
+                                lsbStandardFilter.Item["filterleere"].Checked = true;
                             }
+                        }
+                    } else if (Thisfilter.FilterType.HasFlag(enFilterType.Instr)) {
+                        txbEingabe.Text = Thisfilter.SearchValue[0];
+                    } else if (Convert.ToBoolean((int)Thisfilter.FilterType & 2)) {
+                        if (Thisfilter.SearchValue.Count == 1 && string.IsNullOrEmpty(Thisfilter.SearchValue[0])) {
+                            lsbStandardFilter.Item["filternichtleere"].Checked = true;
                         }
                     }
                 }
@@ -205,14 +202,14 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void ChangeToMultiOder() {
             var F = Skin.GetBlueFont(enDesign.Caption, enStates.Standard);
             MultiAuswahlODER = true;
-            capInfo.Text = LanguageTool.DoTranslate("<fontsize=15><b><u>ODER-Filterung:</u></b><fontsize=" + F.FontSize.ToString() + "><br><br>Wählen sie Einträge, von denen <b>einer</b> zutreffen muss:");
+            capInfo.Text = LanguageTool.DoTranslate("<fontsize=15><b><u>ODER-Filterung:</u></b><fontsize=" + F.FontSize + "><br><br>Wählen sie Einträge, von denen <b>einer</b> zutreffen muss:");
             ChangeDesign();
         }
 
         private void ChangeToMultiUnd() {
             MultiAuswahlUND = true;
             var F = Skin.GetBlueFont(enDesign.Caption, enStates.Standard);
-            capInfo.Text = LanguageTool.DoTranslate("<fontsize=15><b><u>UND-Filterung:</u></b><fontsize=" + F.FontSize.ToString() + "><br><br>Wählen sie welche Einträge <b>alle</b> zutreffen müssen:");
+            capInfo.Text = LanguageTool.DoTranslate("<fontsize=15><b><u>UND-Filterung:</u></b><fontsize=" + F.FontSize + "><br><br>Wählen sie welche Einträge <b>alle</b> zutreffen müssen:");
             ChangeDesign();
         }
 
@@ -224,8 +221,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void FiltItems_ItemClicked(object sender, BasicListItemEventArgs e) {
             if (MultiAuswahlUND || MultiAuswahlODER) { return; }
-            var DoJoker = true;
-            if (string.IsNullOrEmpty(Column.AutoFilterJoker)) { DoJoker = false; }
+            var DoJoker = !string.IsNullOrEmpty(Column.AutoFilterJoker);
             if (NegativAuswahl) { DoJoker = false; }
             List<string> l = new()
             {

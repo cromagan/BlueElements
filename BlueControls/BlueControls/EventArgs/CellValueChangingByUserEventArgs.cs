@@ -24,7 +24,7 @@ namespace BlueControls.EventArgs {
         #region Constructors
 
         //   ColumnItem Column, RowItem Row, Point MousePos, string NewVal, ref string CancelReason
-        public CellValueChangingByUserEventArgs(ColumnItem column, RowItem row, string newVal, string cancelReason) : base(column, row, cancelReason) => NewVal = newVal;
+        public CellValueChangingByUserEventArgs(ColumnItem? column, RowItem? row, string newVal, string cancelReason) : base(column, row, cancelReason) => NewVal = newVal;
 
         #endregion
 

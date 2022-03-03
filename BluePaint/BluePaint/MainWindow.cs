@@ -23,7 +23,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using static BlueBasics.BitmapExt;
-using static BlueBasics.Extensions;
 using static BlueBasics.FileOperations;
 
 namespace BluePaint {
@@ -32,15 +31,15 @@ namespace BluePaint {
 
         #region Fields
 
-        private static List<string> _macro = null;
+        private static List<string> _macro;
 
         // Merkt sich im Falle einer Aufnahme die benutzen Tools. So können sie ganz einfach wieder aufgerufen werden
-        private static List<GenericTool> _merker = null;
+        private static List<GenericTool> _merker;
 
-        private bool _aufnahme = false;
+        private bool _aufnahme;
         private string _filename = string.Empty;
         private bool _isSaved = true;
-        private Bitmap _PicUndo = null;
+        private Bitmap? _PicUndo;
         private GenericTool CurrentTool;
 
         #endregion
@@ -66,7 +65,7 @@ namespace BluePaint {
         /// Filename wird entfernt!
         /// </summary>
         /// <param name="bmp"></param>
-        public void SetPic(Bitmap bmp) {
+        public void SetPic(Bitmap? bmp) {
             CurrentTool_OverridePic(this, new BitmapEventArgs(bmp));
             _filename = string.Empty;
         }
@@ -122,7 +121,7 @@ namespace BluePaint {
             }
         }
 
-        public new Bitmap ShowDialog() {
+        public new Bitmap? ShowDialog() {
             if (Visible) { Visible = false; }
             base.ShowDialog();
             return P.BMP;
@@ -133,7 +132,7 @@ namespace BluePaint {
             base.OnFormClosing(e);
         }
 
-        private bool AreSame(object a, object b) {
+        private static bool AreSame(object a, object b) {
             if (a == null || b == null) { return false; }
             var t = a.GetType();
             var u = b.GetType();
@@ -363,9 +362,8 @@ namespace BluePaint {
             if (_aufnahme) {
                 _macro.RemoveAt(_macro.Count - 1);
             }
-            if (CurrentTool != null) {
-                CurrentTool.PictureChangedByMainWindow();
-            }
+
+            CurrentTool?.PictureChangedByMainWindow();
         }
 
         private void Screenshot_Click(object sender, System.EventArgs e) => SetTool(new Tool_Screenshot(), !_aufnahme);

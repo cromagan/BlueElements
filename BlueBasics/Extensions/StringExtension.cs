@@ -33,8 +33,8 @@ namespace BlueBasics {
         public static List<string> GeschKlammerZu = new() { "}" };
         public static List<string> Gleich = new() { "=" };
         public static List<string> KlammerAuf = new() { "(" };
-        public static List<List<string>> KlammernGeschweift = new() { new() { "{", "}" } };
-        public static List<List<string>> KlammernStd = new() { new() { "(", ")" }, new() { "{", "}" }, new() { "[", "]" } };
+        public static List<List<string>> KlammernGeschweift = new() { new List<string> { "{", "}" } };
+        public static List<List<string>> KlammernStd = new() { new List<string> { "(", ")" }, new List<string> { "{", "}" }, new List<string> { "[", "]" } };
         public static List<string> KlammerZu = new() { ")" };
         public static List<string> Komma = new() { "," };
         public static List<string> Tilde = new() { "~" };
@@ -51,19 +51,22 @@ namespace BlueBasics {
             while (true) {
                 position++;
                 if (position >= input.Length) { return l; }
-                if (input[position].isWordSeperator()) {
-                    if (position > LastSeperator + 1) {
-                        l.Add(input.Substring(LastSeperator + 1, position - LastSeperator - 1));
-                    }
-                    LastSeperator = position;
+
+                if (!input[position].isWordSeperator()) {
+                    continue;
                 }
+
+                if (position > LastSeperator + 1) {
+                    l.Add(input.Substring(LastSeperator + 1, position - LastSeperator - 1));
+                }
+                LastSeperator = position;
             }
         }
 
         public static bool CanCut(this string txt, string start, string ende) {
             if (!txt.StartsWith(start) || !txt.EndsWith(ende)) { return false; }
 
-            (var pose, var _) = NextText(txt, 0, new List<string> { ende }, false, false, KlammernStd);
+            var (pose, _) = NextText(txt, 0, new List<string> { ende }, false, false, KlammernStd);
             return pose == txt.Length - 1;
         }
 
@@ -95,7 +98,8 @@ namespace BlueBasics {
                     if (string.IsNullOrEmpty(isValue)) { return "A0000000000,000"; }
                     if (double.TryParse(isValue, out var dw)) {
                         var t = dw.ToString(Constants.Format_Float10_3);
-                        if (!t.Contains(",")) { t += ",000"; };
+                        if (!t.Contains(",")) { t += ",000"; }
+
                         if (dw >= 0) { t = "A" + t; }
                         while (t.Length < 15) { t += "0"; }
                         return CompareKey_S_OK + t;
@@ -257,7 +261,7 @@ namespace BlueBasics {
             var start = 1;
             var noarunde = true;
             do {
-                (var gleichpos, var _) = NextText(value, start, Gleich, false, false, KlammernGeschweift);
+                var (gleichpos, _) = NextText(value, start, Gleich, false, false, KlammernGeschweift);
                 if (gleichpos < 0) {
                     Develop.DebugPrint(enFehlerArt.Fehler, "Parsen nicht möglich:" + value);
                 }
@@ -265,7 +269,7 @@ namespace BlueBasics {
                 if (string.IsNullOrEmpty(tag)) {
                     Develop.DebugPrint(enFehlerArt.Fehler, "Parsen nicht möglich:" + value);
                 }
-                (var kommapos, var _) = NextText(value, gleichpos, Komma, false, true, KlammernGeschweift);
+                var (kommapos, _) = NextText(value, gleichpos, Komma, false, true, KlammernGeschweift);
                 string tagval;
                 if (kommapos < 0) {
                     tagval = value.Substring(gleichpos + 1, value.Length - gleichpos - 2).Trim();
@@ -350,13 +354,13 @@ namespace BlueBasics {
             return tXT;
         }
 
-        public static bool IsDateTime(this string txt) => DateTimeTryParse(txt, out var _);
+        public static bool IsDateTime(this string txt) => DateTimeTryParse(txt, out _);
 
-        public static bool IsDouble(this string txt) => txt is not null && double.TryParse(txt.Replace(".", ","), out var _);
+        public static bool IsDouble(this string txt) => txt is not null && double.TryParse(txt.Replace(".", ","), out _);
 
-        public static bool IsHTMLColorCode(this string txt) => !string.IsNullOrEmpty(txt) && (txt.Length == 6 || txt.Length == 8) && txt.ContainsOnlyChars(Constants.Char_Numerals + "abcdefABCDEF");
+        public static bool IsHTMLColorCode(this string txt) => !string.IsNullOrEmpty(txt) && txt.Length is 6 or 8 && txt.ContainsOnlyChars(Constants.Char_Numerals + "abcdefABCDEF");
 
-        public static bool IsLong(this string txt) => txt is not null && long.TryParse(txt, out var _);
+        public static bool IsLong(this string txt) => txt is not null && long.TryParse(txt, out _);
 
         public static bool IsNumeral(this string txt) => (txt is not null && txt.IsLong()) || txt.IsDouble();
 
@@ -398,13 +402,11 @@ namespace BlueBasics {
                     if (ch == "\"") { Gans = false; machtezu = true; }
                 } else {
                     if (klammern != null) {
-                        foreach (var thisc in klammern) {
-                            if (ch == thisc[1]) {
-                                if (!historie.EndsWith(thisc[0])) { return (-1, string.Empty); }
-                                historie = historie.Substring(0, historie.Length - 1);
-                                machtezu = true;
-                                break;
-                            }
+                        foreach (var thisc in klammern.Where(thisc => ch == thisc[1])) {
+                            if (!historie.EndsWith(thisc[0])) { return (-1, string.Empty); }
+                            historie = historie.Substring(0, historie.Length - 1);
+                            machtezu = true;
+                            break;
                         }
                     }
                 }
@@ -477,7 +479,7 @@ namespace BlueBasics {
         /// <param name="vSearch">Beispiel: Hund * Kochen.</param>
         /// <returns>Beispiel: frißt \r\n vergräbt</returns>
         /// <remarks></remarks>
-        public static List<string> ReduceToMulti(this string vText, string vSearch) {
+        public static List<string>? ReduceToMulti(this string vText, string vSearch) {
             if (vSearch.CountString("*") != 1) { return null; }
             var e = vSearch.Split('*');
             if (e.Length != 2) { return null; }
@@ -561,7 +563,7 @@ namespace BlueBasics {
         /// <param name="trennzeichen"></param>
         /// <returns></returns>
         public static string[] SplitAndCutBy(this string textToSplit, string trennzeichen) {
-            var w = new string[0];
+            var w = Array.Empty<string>();
             if (string.IsNullOrEmpty(textToSplit)) { return w; }
 
             textToSplit = textToSplit.TrimEnd(trennzeichen);
@@ -579,7 +581,7 @@ namespace BlueBasics {
         /// <param name="textToSplit"></param>
         /// <returns></returns>
         public static string[] SplitAndCutByCR(this string textToSplit) {
-            var w = new string[0];
+            var w = Array.Empty<string>();
             if (string.IsNullOrEmpty(textToSplit)) { return w; }
             textToSplit = textToSplit.Replace("\r\n", "\r").Replace("\n", "\r");
             return textToSplit.SplitAndCutBy("\r");
@@ -590,7 +592,7 @@ namespace BlueBasics {
         /// </summary>
         /// <param name="textToSplit"></param>
         /// <returns></returns>
-        public static List<string> SplitAndCutByCRToList(this string textToSplit) {
+        public static List<string?> SplitAndCutByCRToList(this string textToSplit) {
             List<string> w = new();
             if (string.IsNullOrEmpty(textToSplit)) { return w; }
             w.AddRange(textToSplit.SplitAndCutByCR());
@@ -603,21 +605,21 @@ namespace BlueBasics {
         /// <param name="textToSplit"></param>
         /// <param name="trennzeichen"></param>
         /// <returns></returns>
-        public static string[] SplitBy(this string textToSplit, string trennzeichen) => string.IsNullOrEmpty(textToSplit) ? new string[0] : textToSplit.Split(new[] { trennzeichen }, StringSplitOptions.None);
+        public static string[] SplitBy(this string textToSplit, string trennzeichen) => string.IsNullOrEmpty(textToSplit) ? Array.Empty<string>() : textToSplit.Split(new[] { trennzeichen }, StringSplitOptions.None);
 
         /// <summary>
         /// Splittet den String, ohne etwas zu kürzen. Zeilenumrüche werden aber vereinfach (\r\n => \r). ACHTUNG: Wenn der Text leer ist, wird ein Array mit der Länge 0 zurückgegeben.
         /// </summary>
         /// <param name="textToSplit"></param>
         /// <returns></returns>
-        public static string[] SplitByCR(this string textToSplit) => string.IsNullOrEmpty(textToSplit) ? new string[0] : textToSplit.Replace("\r\n", "\r").Replace("\n", "\r").SplitBy("\r");
+        public static string[] SplitByCR(this string textToSplit) => string.IsNullOrEmpty(textToSplit) ? Array.Empty<string>() : textToSplit.Replace("\r\n", "\r").Replace("\n", "\r").SplitBy("\r");
 
         /// <summary>
         /// Splittet den String, ohne etwas zu kürzen. Zeilenumrüche werden aber vereinfach (\r\n => \r). ACHTUNG: Wenn der Text leer ist, wird eine Liste mit der Länge 0 zurückgegeben.
         /// </summary>
         /// <param name="textToSplit"></param>
         /// <returns></returns>
-        public static List<string> SplitByCRToList(this string textToSplit) {
+        public static List<string?> SplitByCRToList(this string textToSplit) {
             List<string> w = new();
             if (string.IsNullOrEmpty(textToSplit)) { return w; }
             w.AddRange(textToSplit.SplitByCR());

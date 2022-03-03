@@ -65,7 +65,7 @@ namespace BlueScript {
             for (var z = 2; z < attvar.Attributes.Count; z++) {
                 if (!attvar.Attributes[z].ObjectType("rowfilter")) { return new strDoItFeedback("Kein Filter übergeben."); }
 
-                var fi = new BlueDatabase.FilterItem(attvar.Attributes[z].ObjectData());
+                var fi = new FilterItem(attvar.Attributes[z].ObjectData());
 
                 if (!fi.IsOk()) { return new strDoItFeedback("Filter fehlerhaft"); }
 

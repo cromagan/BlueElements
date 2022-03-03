@@ -23,7 +23,7 @@ public struct strSplittedAttributesFeedback {
 
     #region Fields
 
-    public List<Variable> Attributes;
+    public List<Variable?>? Attributes;
 
     public string ErrorMessage;
 
@@ -33,7 +33,7 @@ public struct strSplittedAttributesFeedback {
 
     #region Constructors
 
-    public strSplittedAttributesFeedback(List<Variable> atts) {
+    public strSplittedAttributesFeedback(List<Variable?>? atts) {
         Attributes = atts;
         ErrorMessage = string.Empty;
         FehlerTyp = enSkriptFehlerTyp.ohne;

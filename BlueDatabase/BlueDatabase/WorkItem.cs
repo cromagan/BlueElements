@@ -24,7 +24,7 @@ using static BlueBasics.Converter;
 
 namespace BlueDatabase {
 
-    public class WorkItem : IParseable, ICompareKey {
+    public class WorkItem : IParseable {
 
         #region Fields
 
@@ -212,14 +212,14 @@ namespace BlueDatabase {
         }
 
         public new string ToString() => "{ST=" + (int)_state +
-", CO=" + (int)Comand +
-", CK=" + _colKey +
-", RK=" + _rowKey +
-", D=" + Date +
-", U=" + User.ToNonCritical() +
-", P=" + PreviousValue.ToNonCriticalWithQuote() +
-", C=" + _changedTo.ToNonCriticalWithQuote() +
-"}";
+                                        ", CO=" + (int)Comand +
+                                        ", CK=" + _colKey +
+                                        ", RK=" + _rowKey +
+                                        ", D=" + Date +
+                                        ", U=" + User.ToNonCritical() +
+                                        ", P=" + PreviousValue.ToNonCriticalWithQuote() +
+                                        ", C=" + _changedTo.ToNonCriticalWithQuote() +
+                                        "}";
 
         public string UndoTextTableMouseOver() {
             var a = "'" + PreviousValue + "'";

@@ -31,21 +31,21 @@ namespace BlueControls.ItemCollection {
 
         private string _LayoutID;
 
-        private RowItem _Row;
+        private RowItem? _Row;
 
-        private Bitmap _tmpBMP;
+        private Bitmap? _tmpBMP;
 
         #endregion
 
         #region Constructors
 
-        public RowFormulaListItem(RowItem row, string internalname, string layoutID, string userDefCompareKey) : base(internalname) {
+        public RowFormulaListItem(RowItem? row, string internalname, string layoutID, string userDefCompareKey) : base(internalname) {
             _Row = row;
             _LayoutID = layoutID;
             UserDefCompareKey = userDefCompareKey;
         }
 
-        public RowFormulaListItem(RowItem row, string layoutID, string userDefCompareKey) : this(row, string.Empty, layoutID, userDefCompareKey) { }
+        public RowFormulaListItem(RowItem? row, string layoutID, string userDefCompareKey) : this(row, string.Empty, layoutID, userDefCompareKey) { }
 
         #endregion
 
@@ -60,7 +60,7 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public override string? QuickInfo {
+        public override string QuickInfo {
             get {
                 if (_Row == null) { return null; }
 
@@ -70,7 +70,7 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        public RowItem Row {
+        public RowItem? Row {
             get => _Row;
             set {
                 if (_Row == value) { return; }

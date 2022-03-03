@@ -33,11 +33,13 @@ namespace BlueControls.Designer_Support {
             get {
                 for (var z = 0; z < 100; z++) {
                     var st = (enVarType)z;
-                    if (st.ToString() != z.ToString()) {
-                        var x = new TextBox();
-                        x.SetFormat(st);
-                        if (x.IsFormatIdentical(ReverenceControl)) { return st; }
+                    if (st.ToString() == z.ToString()) {
+                        continue;
                     }
+
+                    var x = new TextBox();
+                    x.SetFormat(st);
+                    if (x.IsFormatIdentical(ReverenceControl)) { return st; }
                 }
                 return enVarType.Unbekannt;
             }

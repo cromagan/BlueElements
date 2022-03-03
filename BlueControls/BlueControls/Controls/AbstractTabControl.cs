@@ -26,17 +26,17 @@ using System.Windows.Forms;
 namespace BlueControls.Controls {
 
     [ToolboxBitmap(typeof(System.Windows.Forms.TabControl))]
-    public abstract partial class AbstractTabControl : System.Windows.Forms.TabControl {
+    public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
 
         #region Fields
 
-        private bool _IndexChanged = false;
+        private bool _IndexChanged;
 
         #endregion
 
         #region Constructors
 
-        public AbstractTabControl() : base() {
+        protected AbstractTabControl() : base() {
             //This call is required by the Windows Form Designer.
             //Add any initialization after the InitializeComponent() call
             //   Me.SetStyle(System.Windows.Forms.ControlStyles.AllPaintingInWmPaint Or System.Windows.Forms.ControlStyles.OptimizedDoubleBuffer Or System.Windows.Forms.ControlStyles.ResizeRedraw Or System.Windows.Forms.ControlStyles.UserPaint, True)
@@ -44,7 +44,7 @@ namespace BlueControls.Controls {
             SetStyle(ControlStyles.SupportsTransparentBackColor, false);
             SetStyle(ControlStyles.Opaque, true);
 
-            //The next 3 styles are allefor double buffering
+            //The next 3 styles are all for double buffering
             SetStyle(ControlStyles.DoubleBuffer, true);
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
             SetStyle(ControlStyles.UserPaint, true);
@@ -60,7 +60,7 @@ namespace BlueControls.Controls {
             set => base.AutoSize = false;
         }
 
-        public System.Windows.Forms.TabPage HotTab { get; private set; }
+        public TabPage? HotTab { get; private set; }
 
         [Category("Verhalten")]
         public TabPage TabDefault { get; set; }
@@ -80,7 +80,7 @@ namespace BlueControls.Controls {
         public void Scale() { }
 
         //public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
-        protected void DrawControl(System.Windows.Forms.PaintEventArgs e, enDesign design) {
+        protected void DrawControl(PaintEventArgs e, enDesign design) {
             Skin.Draw_Back(e.Graphics, design, enStates.Standard, new Rectangle(0, 0, Width, Height), this, true);
 
             if (TabCount == 0 && DesignMode) {
@@ -99,7 +99,7 @@ namespace BlueControls.Controls {
         }
 
         //public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) => HotItem = e != null ? TestTab(new Point(e.X, e.Y)) : null;
-        protected override Rectangle GetScaledBounds(Rectangle tbounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified) => tbounds;
+        protected override Rectangle GetScaledBounds(Rectangle tbounds, SizeF factor, BoundsSpecified specified) => tbounds;
 
         // NIX TUN!!!!
         protected override void OnMouseLeave(System.EventArgs e) {
@@ -117,7 +117,7 @@ namespace BlueControls.Controls {
         //        Invalidate();
         //    }
         //}
-        protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
+        protected override void OnMouseMove(MouseEventArgs e) {
             if (!HotTrack) { HotTrack = true; }
             HotTab = TestTab(new Point(e.X, e.Y));
             base.OnMouseMove(e);
@@ -127,7 +127,7 @@ namespace BlueControls.Controls {
         //    base.OnMouseUp(e);
         //    if (e.Button == MouseButtons.Right) { FloatingInputBoxListBoxStyle.ContextMenuShow(this, e); }
         //}
-        protected override void OnPaintBackground(System.Windows.Forms.PaintEventArgs pevent) {
+        protected override void OnPaintBackground(PaintEventArgs pevent) {
             // do not allow the background to be painted
             // Um flimmern zu vermeiden!
         }
@@ -177,12 +177,9 @@ namespace BlueControls.Controls {
             } catch { }
         }
 
-        protected override void ScaleControl(SizeF factor, System.Windows.Forms.BoundsSpecified specified) {
-            factor = new SizeF(1, 1);
-            base.ScaleControl(factor, specified);
-        }
+        protected override void ScaleControl(SizeF factor, BoundsSpecified specified) => base.ScaleControl(new SizeF(1, 1), specified);
 
-        protected override void WndProc(ref System.Windows.Forms.Message m) {
+        protected override void WndProc(ref Message m) {
             if (m.Msg == (int)enWndProc.WM_ERASEBKGND) { return; }
             base.WndProc(ref m);
         }
@@ -223,7 +220,7 @@ namespace BlueControls.Controls {
             } catch { }
         }
 
-        private System.Windows.Forms.TabPage TestTab(Point pt) {
+        private TabPage? TestTab(Point pt) {
             for (var index = 0; index < TabCount; index++) {
                 if (GetTabRect(index).Contains(pt.X, pt.Y)) {
                     return TabPages[index];

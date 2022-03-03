@@ -24,19 +24,12 @@ namespace BlueControls.ItemCollection {
 
     public class TextListItem : BasicListItem {
 
-        #region Fields
-
-        private string _ReadableText;
-        private QuickImage? _Symbol;
-
-        #endregion
-
         #region Constructors
 
         public TextListItem(string readableText, string internalname, QuickImage? symbol, bool isCaption, bool enabled, string userDefCompareKey) : base(internalname) {
             IsCaption = isCaption;
-            _ReadableText = readableText;
-            _Symbol = symbol;
+            Text = readableText;
+            Symbol = symbol;
             _Enabled = enabled;
             //_Format = format;
             UserDefCompareKey = userDefCompareKey;
@@ -46,44 +39,30 @@ namespace BlueControls.ItemCollection {
 
         #region Properties
 
-        public override string QuickInfo => _ReadableText.CreateHtmlCodes(true);
+        public override string QuickInfo => Text.CreateHtmlCodes(true);
 
-        public QuickImage Symbol {
-            get => _Symbol;
-            set {
-                if (value == _Symbol) { return; }
-                _Symbol = value;
-                //OnChanged();
-            }
-        }
+        public QuickImage? Symbol { get; set; }
 
-        public string Text {
-            get => _ReadableText;
-            set {
-                if (value == _ReadableText) { return; }
-                _ReadableText = value;
-                //OnChanged();
-            }
-        }
+        public string Text { get; set; }
 
         #endregion
 
         #region Methods
 
-        public override object Clone() => new TextListItem(_ReadableText, Internal, _Symbol, IsCaption, _Enabled, UserDefCompareKey);
+        public override object Clone() => new TextListItem(Text, Internal, Symbol, IsCaption, _Enabled, UserDefCompareKey);
 
-        public override bool FilterMatch(string FilterText) => base.FilterMatch(FilterText) || _ReadableText.ToUpper().Contains(FilterText.ToUpper());
+        public override bool FilterMatch(string FilterText) => base.FilterMatch(FilterText) || Text.ToUpper().Contains(FilterText.ToUpper());
 
         public override int HeightForListBox(enBlueListBoxAppearance style, int columnWidth) => SizeUntouchedForListBox().Height;
 
-        protected override Size ComputeSizeUntouchedForListBox() => Skin.FormatedText_NeededSize(_ReadableText, _Symbol, Skin.GetBlueFont(tempDesign(Parent.ItemDesign), enStates.Standard), 16);
+        protected override Size ComputeSizeUntouchedForListBox() => Skin.FormatedText_NeededSize(Text, Symbol, Skin.GetBlueFont(tempDesign(Parent.ItemDesign), enStates.Standard), 16);
 
         protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign design, enStates vState, bool DrawBorderAndBack, bool Translate) {
             var tmpd = tempDesign(design);
             if (DrawBorderAndBack) {
                 Skin.Draw_Back(GR, tmpd, vState, PositionModified, null, false);
             }
-            Skin.Draw_FormatedText(GR, _ReadableText, tmpd, vState, _Symbol, enAlignment.VerticalCenter_Left, PositionModified, null, false, Translate);
+            Skin.Draw_FormatedText(GR, Text, tmpd, vState, Symbol, enAlignment.VerticalCenter_Left, PositionModified, null, false, Translate);
             if (DrawBorderAndBack) {
                 Skin.Draw_Border(GR, tmpd, vState, PositionModified);
             }

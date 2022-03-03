@@ -41,18 +41,18 @@ namespace BlueDatabase {
         //    };
         //    return InternalCreateLayout(TMPList, LoadedFile, string.Empty, ToNonCriticalText);
         //}
-        public static void CreateLayout(RowItem Row, string LoadFile, string SaveFile) {
-            if (!FileExists(LoadFile)) { return; }
-            List<RowItem> TMPList = new()
+        public static void CreateLayout(RowItem row, string loadFile, string saveFile) {
+            if (!FileExists(loadFile)) { return; }
+            List<RowItem?> tmpList = new()
             {
-                Row
+                row
             };
-            InternalCreateLayout(TMPList, File.ReadAllText(LoadFile, Constants.Win1252), SaveFile);
+            InternalCreateLayout(tmpList, File.ReadAllText(loadFile, Constants.Win1252), saveFile);
         }
 
-        public static void CreateLayout(List<RowItem> Rows, string LoadFile, string SaveFile) {
-            if (!FileExists(LoadFile)) { return; }
-            InternalCreateLayout(Rows, File.ReadAllText(LoadFile, Constants.Win1252), SaveFile);
+        public static void CreateLayout(List<RowItem?> rows, string loadFile, string saveFile) {
+            if (!FileExists(loadFile)) { return; }
+            InternalCreateLayout(rows, File.ReadAllText(loadFile, Constants.Win1252), saveFile);
         }
 
         //Shared Sub SaveAsBitmap(Row As RowItem)
@@ -71,22 +71,22 @@ namespace BlueDatabase {
         //    GenerateLayout_Internal(Row, 0, False, True, String.Empty)
         //    '   End If
         //End Sub
-        public static List<string> GenerateLayout_FileSystem(List<RowItem> Liste, string Lad, string OptionalFileName, bool EineGrosseDatei, string ZielPfad) {
+        public static List<string> GenerateLayout_FileSystem(List<RowItem?> liste, string lad, string optionalFileName, bool eineGrosseDatei, string zielPfad) {
             List<string> l = new();
-            if (Liste == null) { return l; }
+            if (liste == null) { return l; }
             string sav;
-            if (Liste.Count == 1 || EineGrosseDatei) {
-                sav = !string.IsNullOrEmpty(OptionalFileName)
-                    ? TempFile(OptionalFileName.FilePath(), OptionalFileName.FileNameWithoutSuffix(), Lad.FileSuffix())
-                    : TempFile(ZielPfad, Liste[0].CellFirstString(), Lad.FileSuffix());
-                CreateLayout(Liste, Lad, sav);
+            if (liste.Count == 1 || eineGrosseDatei) {
+                sav = !string.IsNullOrEmpty(optionalFileName)
+                    ? TempFile(optionalFileName.FilePath(), optionalFileName.FileNameWithoutSuffix(), lad.FileSuffix())
+                    : TempFile(zielPfad, liste[0].CellFirstString(), lad.FileSuffix());
+                CreateLayout(liste, lad, sav);
                 l.Add(sav);
             } else {
-                foreach (var ThisRow in Liste) {
-                    sav = !string.IsNullOrEmpty(OptionalFileName)
-                        ? TempFile(OptionalFileName.FilePath(), OptionalFileName.FileNameWithoutSuffix(), Lad.FileSuffix())
-                        : TempFile(ZielPfad, ThisRow.CellFirstString(), Lad.FileSuffix());
-                    CreateLayout(ThisRow, Lad, sav);
+                foreach (var thisRow in liste) {
+                    sav = !string.IsNullOrEmpty(optionalFileName)
+                        ? TempFile(optionalFileName.FilePath(), optionalFileName.FileNameWithoutSuffix(), lad.FileSuffix())
+                        : TempFile(zielPfad, thisRow.CellFirstString(), lad.FileSuffix());
+                    CreateLayout(thisRow, lad, sav);
                     l.Add(sav);
                 }
                 //    If OpenIt Then ExecuteFile(ZielPfad)
@@ -468,45 +468,45 @@ namespace BlueDatabase {
         //        }
         //    } while (true);
         //}
-        public static List<string> SaveAs(RowItem Row, string Layout, string DestinationFile) {
-            List<RowItem> l = new()
+        public static List<string> SaveAs(RowItem row, string layout, string destinationFile) {
+            List<RowItem?> l = new()
             {
-                Row
+                row
             };
-            return GenerateLayout_FileSystem(l, Layout, DestinationFile, false, string.Empty);
+            return GenerateLayout_FileSystem(l, layout, destinationFile, false, string.Empty);
         }
 
-        public static List<string> SaveAsBitmap(List<RowItem> Row, string LayoutID, string Path) {
+        public static List<string> SaveAsBitmap(List<RowItem?> row, string layoutId, string path) {
             List<string> l = new();
-            foreach (var ThisRow in Row) {
-                var FN = TempFile(Path, ThisRow.CellFirstString(), "PNG");
-                ThisRow.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventargs(ThisRow, LayoutID, FN));
-                l.Add(FN);
+            foreach (var thisRow in row) {
+                var fn = TempFile(path, thisRow.CellFirstString(), "PNG");
+                thisRow.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventargs(thisRow, layoutId, fn));
+                l.Add(fn);
             }
             return l;
         }
 
-        public static void SaveAsBitmap(RowItem Row, string LayoutID, string Filename) => Row.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventargs(Row, LayoutID, Filename));
+        public static void SaveAsBitmap(RowItem row, string layoutId, string filename) => row.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventargs(row, layoutId, filename));
 
-        private static void InternalCreateLayout(List<RowItem> rows, string fileLoaded, string saveFileName) {
-            var Head = string.Empty;
-            var Foot = string.Empty;
-            var Body = fileLoaded;
+        private static void InternalCreateLayout(List<RowItem?> rows, string fileLoaded, string saveFileName) {
+            var head = string.Empty;
+            var foot = string.Empty;
+            var body = fileLoaded;
             var stx = fileLoaded.ToUpper().IndexOf("//AS/300/AE");
             var enx = fileLoaded.ToUpper().IndexOf("//AS/301/AE");
             if (stx > -1 && enx > stx) {
-                Head = fileLoaded.Substring(0, stx);
-                Body = fileLoaded.Substring(stx + 11, enx - stx - 11);
-                Foot = fileLoaded.Substring(enx + 11);
+                head = fileLoaded.Substring(0, stx);
+                body = fileLoaded.Substring(stx + 11, enx - stx - 11);
+                foot = fileLoaded.Substring(enx + 11);
             }
-            var tmpSave = Head;
+            var tmpSave = head;
             if (rows != null) {
                 foreach (var thisRow in rows) // As Integer = 0 To Rows.GetUpperBound(0)
                 {
                     if (thisRow != null) {
-                        var tmpBody = Body;
+                        var tmpBody = body;
 
-                        (_, _, var script) = thisRow.DoAutomatic("export");
+                        var (_, _, script) = thisRow.DoAutomatic("export");
                         if (script == null) { return; }
                         foreach (var thisV in script.Variablen) {
                             tmpBody = thisV.ReplaceInText(tmpBody);
@@ -516,7 +516,7 @@ namespace BlueDatabase {
                     }
                 }
             }
-            tmpSave += Foot;
+            tmpSave += foot;
             if (!string.IsNullOrEmpty(saveFileName)) // Dateien ohne SUfiix-Angabe könenn nicht gespeichert werden
             {
                 WriteAllText(saveFileName, tmpSave, Constants.Win1252, false);

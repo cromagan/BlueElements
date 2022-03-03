@@ -26,8 +26,8 @@ namespace BlueControls.Forms {
 
         #region Fields
 
-        protected List<string> _FileList;
-        private int _NR = -1;
+        protected List<string>? FileList;
+        private int _nr = -1;
 
         #endregion
 
@@ -40,34 +40,34 @@ namespace BlueControls.Forms {
             InitWindow(false, "", -1);
         }
 
-        public PictureView(List<string> FileList, bool MitScreenResize, string WindowCaption) {
+        public PictureView(List<string>? fileList, bool mitScreenResize, string windowCaption) {
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
             InitializeComponent();
-            _FileList = FileList;
+            FileList = fileList;
             LoadPic(0);
-            InitWindow(MitScreenResize, WindowCaption, -1);
+            InitWindow(mitScreenResize, windowCaption, -1);
             btnZoomIn.Checked = true;
             btnChoose.Enabled = false;
         }
 
-        public PictureView(Bitmap BMP) {
+        public PictureView(Bitmap? bmp) {
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
             InitializeComponent();
-            _FileList = new List<string>();
+            FileList = new List<string>();
             InitWindow(false, "", -1);
-            Pad.BMP = BMP;
+            Pad.BMP = bmp;
             Pad.ZoomFit();
             btnZoomIn.Checked = true;
             btnChoose.Enabled = false;
         }
 
-        public PictureView(List<string> FileList, bool MitScreenResize, string WindowCaption, int OpenOnScreen) {
+        public PictureView(List<string>? fileList, bool mitScreenResize, string windowCaption, int openOnScreen) {
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
             InitializeComponent();
-            _FileList = FileList;
+            FileList = fileList;
             LoadPic(0);
-            InitWindow(MitScreenResize, WindowCaption, OpenOnScreen);
-            grpSeiten.Visible = FileList != null && FileList.Count > 1;
+            InitWindow(mitScreenResize, windowCaption, openOnScreen);
+            grpSeiten.Visible = fileList != null && fileList.Count > 1;
             btnZoomIn.Checked = true;
             btnChoose.Enabled = false;
         }
@@ -94,53 +94,53 @@ namespace BlueControls.Forms {
         //    Pad.RepairAll(1, true);
         //    InitWindow(false, Title, Title, -1, Pad.SheetStyle);
         //}
-        protected void LoadPic(int Nr) {
-            _NR = Nr;
-            if (_FileList != null && Nr < _FileList.Count) {
+        protected void LoadPic(int nr) {
+            _nr = nr;
+            if (FileList != null && nr < FileList.Count) {
                 try {
-                    Pad.BMP = (Bitmap)BitmapExt.Image_FromFile(_FileList[Nr]);
+                    Pad.BMP = (Bitmap)BitmapExt.Image_FromFile(FileList[nr]);
                 } catch (Exception ex) {
                     Pad.BMP = null;
                     Develop.DebugPrint(ex);
                 }
             }
             Ribbon.SelectedIndex = 1;
-            grpSeiten.Visible = _FileList != null && _FileList.Count > 1;
-            if (_FileList == null || _FileList.Count == 0) {
+            grpSeiten.Visible = FileList != null && FileList.Count > 1;
+            if (FileList == null || FileList.Count == 0) {
                 btnZurueck.Enabled = false;
                 btnVor.Enabled = false;
             } else {
                 grpSeiten.Enabled = true;
-                btnZurueck.Enabled = Convert.ToBoolean(_NR > 0);
-                btnVor.Enabled = Convert.ToBoolean(_NR < _FileList.Count - 1);
+                btnZurueck.Enabled = Convert.ToBoolean(_nr > 0);
+                btnVor.Enabled = Convert.ToBoolean(_nr < FileList.Count - 1);
             }
             Pad.ZoomFit();
         }
 
         private void btnVor_Click(object sender, System.EventArgs e) {
-            _NR++;
-            if (_NR >= _FileList.Count - 1) { _NR = _FileList.Count - 1; }
-            LoadPic(_NR);
+            _nr++;
+            if (_nr >= FileList.Count - 1) { _nr = FileList.Count - 1; }
+            LoadPic(_nr);
         }
 
         private void btnZoomFit_Click(object sender, System.EventArgs e) => Pad.ZoomFit();
 
         private void btnZurueck_Click(object sender, System.EventArgs e) {
-            _NR--;
-            if (_NR <= 0) { _NR = 0; }
-            LoadPic(_NR);
+            _nr--;
+            if (_nr <= 0) { _nr = 0; }
+            LoadPic(_nr);
         }
 
         private void InitWindow(bool fitWindowToBest, string windowCaption, int openOnScreen) {
             //    Me.ShowInTaskbar = False
-            if (_FileList == null || _FileList.Count < 2) { grpSeiten.Enabled = false; }
+            if (FileList == null || FileList.Count < 2) { grpSeiten.Enabled = false; }
             if (fitWindowToBest) {
                 if (System.Windows.Forms.Screen.AllScreens.Length == 1 || openOnScreen < 0) {
-                    var OpScNr = Generic.PointOnScreenNr(System.Windows.Forms.Cursor.Position);
-                    Width = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Width / 1.5);
-                    Height = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Height / 1.5);
-                    Left = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Left + ((System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Width - Width) / 2.0));
-                    Top = (int)(System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Top + ((System.Windows.Forms.Screen.AllScreens[OpScNr].WorkingArea.Height - Height) / 2.0));
+                    var opScNr = Generic.PointOnScreenNr(System.Windows.Forms.Cursor.Position);
+                    Width = (int)(System.Windows.Forms.Screen.AllScreens[opScNr].WorkingArea.Width / 1.5);
+                    Height = (int)(System.Windows.Forms.Screen.AllScreens[opScNr].WorkingArea.Height / 1.5);
+                    Left = (int)(System.Windows.Forms.Screen.AllScreens[opScNr].WorkingArea.Left + ((System.Windows.Forms.Screen.AllScreens[opScNr].WorkingArea.Width - Width) / 2.0));
+                    Top = (int)(System.Windows.Forms.Screen.AllScreens[opScNr].WorkingArea.Top + ((System.Windows.Forms.Screen.AllScreens[opScNr].WorkingArea.Height - Height) / 2.0));
                 } else {
                     Width = System.Windows.Forms.Screen.AllScreens[openOnScreen].WorkingArea.Width;
                     Height = System.Windows.Forms.Screen.AllScreens[openOnScreen].WorkingArea.Height;

@@ -29,7 +29,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Printing;
-using static BlueBasics.Extensions;
+using System.Linq;
 using static BlueBasics.Geometry;
 
 namespace BlueControls.Controls {
@@ -40,19 +40,15 @@ namespace BlueControls.Controls {
 
         #region Fields
 
-        public bool _editAllowed = true;
+        private readonly List<IMoveable?> _itemsToMove = new();
+        private IMouseAndKeyHandle? _givesMouseComandsTo;
 
-        private readonly List<IMoveable> _ItemsToMove = new();
+        private ItemCollectionPad _item;
 
-        private IMouseAndKeyHandle? _GivesMouseComandsTo;
+        private string _lastQuickInfo = string.Empty;
 
-        private ItemCollectionPad _Item;
-
-        private string _LastQuickInfo = string.Empty;
-
-        private bool _ShowInPrintMode;
-
-        private bool RepairPrinterData_Prepaired;
+        private bool _repairPrinterDataPrepaired;
+        private bool _showInPrintMode;
 
         #endregion
 
@@ -95,47 +91,44 @@ namespace BlueControls.Controls {
         #region Properties
 
         [DefaultValue(true)]
-        public bool EditAllowed {
-            get => _editAllowed;
-            set => _editAllowed = value;
-        }
+        public bool EditAllowed { get; set; } = true;
 
-        public BasicPadItem HotItem { get; private set; } = null;
+        public BasicPadItem? HotItem { get; private set; }
 
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public ItemCollectionPad Item {
-            get => _Item;
+            get => _item;
             set {
-                if (_Item == value) { return; }
-                if (_Item != null) {
-                    _Item.ItemRemoved -= _Item_ItemRemoved;
-                    _Item.ItemAdded -= _Item_ItemAdded;
-                    _Item.DoInvalidate -= Item_DoInvalidate;
+                if (_item == value) { return; }
+                if (_item != null) {
+                    _item.ItemRemoved -= _Item_ItemRemoved;
+                    _item.ItemAdded -= _Item_ItemAdded;
+                    _item.DoInvalidate -= Item_DoInvalidate;
                 }
-                _Item = value;
-                if (_Item != null) {
-                    _Item.ItemRemoved += _Item_ItemRemoved;
-                    _Item.ItemAdded += _Item_ItemAdded;
-                    _Item.DoInvalidate += Item_DoInvalidate;
-                    _Item.OnDoInvalidate();
+                _item = value;
+                if (_item != null) {
+                    _item.ItemRemoved += _Item_ItemRemoved;
+                    _item.ItemAdded += _Item_ItemAdded;
+                    _item.DoInvalidate += Item_DoInvalidate;
+                    _item.OnDoInvalidate();
                 }
 
                 OnGotNewItemCollection();
             }
         }
 
-        public BasicPadItem LastClickedItem { get; private set; } = null;
+        public BasicPadItem? LastClickedItem { get; private set; }
 
-        public override string QuickInfoText => _LastQuickInfo;
+        public override string QuickInfoText => _lastQuickInfo;
 
         [DefaultValue(false)]
         public bool ShowInPrintMode {
-            get => _ShowInPrintMode;
+            get => _showInPrintMode;
             set {
-                if (_ShowInPrintMode == value) { return; }
-                _ShowInPrintMode = value;
+                if (_showInPrintMode == value) { return; }
+                _showInPrintMode = value;
                 OnPreviewModeChanged();
                 Invalidate();
             }
@@ -148,52 +141,47 @@ namespace BlueControls.Controls {
         public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
             BasicPadItem thisItem = null;
             if (e.HotItem is BasicPadItem item) { thisItem = item; }
-            var Done = false;
+            var done = false;
             if (thisItem != null) {
                 switch (e.ClickedComand.ToLower()) {
-                    case "#erweitert":
-                        Done = true;
-                        ShowErweitertMenü(thisItem);
-                        break;
-
                     case "#vordergrund":
-                        Done = true;
+                        done = true;
                         thisItem.InDenVordergrund();
                         break;
 
                     case "#hintergrund":
-                        Done = true;
+                        done = true;
                         thisItem.InDenHintergrund();
                         break;
 
                     case "#vorne":
-                        Done = true;
+                        done = true;
                         thisItem.EineEbeneNachVorne();
                         break;
 
                     case "#hinten":
-                        Done = true;
+                        done = true;
                         thisItem.EineEbeneNachHinten();
                         break;
 
                     case "#duplicate":
-                        Done = true;
-                        _Item.Add((BasicPadItem)((ICloneable)thisItem).Clone());
+                        done = true;
+                        _item.Add((BasicPadItem)((ICloneable)thisItem).Clone());
                         break;
                 }
             }
             Invalidate();
-            return Done;
+            return done;
         }
 
         public void CopyPrinterSettingsToWorkingArea() {
             if (DruckerDokument.DefaultPageSettings.Landscape) {
-                _Item.SheetSizeInMM = new SizeF((int)(DruckerDokument.DefaultPageSettings.PaperSize.Height * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.PaperSize.Width * 25.4 / 100));
-                _Item.RandinMM = new System.Windows.Forms.Padding((int)(DruckerDokument.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
+                _item.SheetSizeInMm = new SizeF((int)(DruckerDokument.DefaultPageSettings.PaperSize.Height * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.PaperSize.Width * 25.4 / 100));
+                _item.RandinMm = new System.Windows.Forms.Padding((int)(DruckerDokument.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
             } else {
                 // Hochformat
-                _Item.SheetSizeInMM = new SizeF((int)(DruckerDokument.DefaultPageSettings.PaperSize.Width * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.PaperSize.Height * 25.4 / 100));
-                _Item.RandinMM = new System.Windows.Forms.Padding((int)(DruckerDokument.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
+                _item.SheetSizeInMm = new SizeF((int)(DruckerDokument.DefaultPageSettings.PaperSize.Width * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.PaperSize.Height * 25.4 / 100));
+                _item.RandinMm = new System.Windows.Forms.Padding((int)(DruckerDokument.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(DruckerDokument.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
             }
         }
 
@@ -201,71 +189,65 @@ namespace BlueControls.Controls {
             // Ganz seltsam: Wird BAse.OnKeyUp IMMER ausgelöst, passiert folgendes:
             // Wird ein Objekt gelöscht, wird anschließend das OnKeyUp Ereignis nicht mehr ausgelöst.
             if (hasbase) { base.OnKeyUp(e); }
-            if (!_editAllowed) { return; }
-            if (_GivesMouseComandsTo != null) {
-                if (_GivesMouseComandsTo.KeyUp(this, e, _Zoom, _shiftX, _shiftY)) { return; }
+            if (!EditAllowed) { return; }
+            if (_givesMouseComandsTo != null) {
+                if (_givesMouseComandsTo.KeyUp(this, e, Zoom, ShiftX, ShiftY)) { return; }
             }
-            var Multi = 1f;
+            var multi = 1f;
             if (Item.SnapMode == enSnapMode.SnapToGrid) {
-                Multi = Converter.mmToPixel(Item.GridSnap, ItemCollectionPad.DPI);
+                multi = Converter.mmToPixel(Item.GridSnap, ItemCollectionPad.Dpi);
             }
-            if (Multi < 1) { Multi = 1f; }
+            if (multi < 1) { multi = 1f; }
             switch (e.KeyCode) {
                 case System.Windows.Forms.Keys.Delete:
 
                 case System.Windows.Forms.Keys.Back:
-                    List<BasicPadItem> ItemsDoDelete = new();
-                    foreach (var thisit in _ItemsToMove) {
-                        if (thisit is BasicPadItem bi) { ItemsDoDelete.Add(bi); }
+                    List<BasicPadItem> itemsDoDelete = new();
+                    foreach (var thisit in _itemsToMove) {
+                        if (thisit is BasicPadItem bi) { itemsDoDelete.Add(bi); }
                     }
                     Unselect();
-                    _Item.RemoveRange(ItemsDoDelete);
+                    _item.RemoveRange(itemsDoDelete);
                     break;
 
                 case System.Windows.Forms.Keys.Up:
-                    MoveItems(0, -1 * Multi, false, false);
+                    MoveItems(0, -1 * multi, false, false);
                     break;
 
                 case System.Windows.Forms.Keys.Down:
-                    MoveItems(0, 1 * Multi, false, false);
+                    MoveItems(0, 1 * multi, false, false);
                     break;
 
                 case System.Windows.Forms.Keys.Left:
-                    MoveItems(-1 * Multi, 0, false, false);
+                    MoveItems(-1 * multi, 0, false, false);
                     break;
 
                 case System.Windows.Forms.Keys.Right:
-                    MoveItems(1 * Multi, 0, false, false);
+                    MoveItems(1 * multi, 0, false, false);
                     break;
             }
         }
 
-        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList Items, out object selectedHotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
+        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList? items, out object? selectedHotItem, List<string> tags, ref bool cancel, ref bool translate) {
             CheckHotItem(e, true);
             selectedHotItem = HotItem;
             if (selectedHotItem != null) {
-                Items.Add("Allgemeine Element-Aktionen", true);
-                Items.Add("Objekt bearbeiten", "#Erweitert", enImageCode.Stift);
-                Items.AddSeparator();
-                Items.Add("Objekt duplizieren", "#Duplicate", enImageCode.Kopieren, selectedHotItem is ICloneable);
-                Items.AddSeparator();
-                Items.Add("In den Vordergrund", "#Vordergrund", enImageCode.InDenVordergrund);
-                Items.Add("In den Hintergrund", "#Hintergrund", enImageCode.InDenHintergrund);
-                Items.Add("Eine Ebene nach vorne", "#Vorne", enImageCode.EbeneNachVorne);
-                Items.Add("Eine Ebene nach hinten", "#Hinten", enImageCode.EbeneNachHinten);
+                items.Add("Allgemeine Element-Aktionen", true);
+                items.Add("Objekt bearbeiten", "#Erweitert", enImageCode.Stift);
+                items.AddSeparator();
+                items.Add("Objekt duplizieren", "#Duplicate", enImageCode.Kopieren, selectedHotItem is ICloneable);
+                items.AddSeparator();
+                items.Add("In den Vordergrund", "#Vordergrund", enImageCode.InDenVordergrund);
+                items.Add("In den Hintergrund", "#Hintergrund", enImageCode.InDenHintergrund);
+                items.Add("Eine Ebene nach vorne", "#Vorne", enImageCode.EbeneNachVorne);
+                items.Add("Eine Ebene nach hinten", "#Hinten", enImageCode.EbeneNachHinten);
             }
         }
 
-        public List<BasicPadItem> HotItems(System.Windows.Forms.MouseEventArgs e) {
-            if (e == null) { return new List<BasicPadItem>(); }
-            Point P = new((int)((e.X + _shiftX) / _Zoom), (int)((e.Y + _shiftY) / _Zoom));
-            List<BasicPadItem> l = new();
-            foreach (var ThisItem in _Item) {
-                if (ThisItem != null && ThisItem.Contains(P, _Zoom)) {
-                    l.Add(ThisItem);
-                }
-            }
-            return l;
+        public List<BasicPadItem?> HotItems(System.Windows.Forms.MouseEventArgs e) {
+            if (e == null) { return new List<BasicPadItem?>(); }
+            Point p = new((int)((e.X + ShiftX) / Zoom), (int)((e.Y + ShiftY) / Zoom));
+            return _item.Where(thisItem => thisItem != null && thisItem.Contains(p, Zoom)).ToList();
         }
 
         public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
@@ -286,20 +268,11 @@ namespace BlueControls.Controls {
             RepairPrinterData();
         }
 
-        public void SelectItem(IMoveable item, bool additional) {
+        public void SelectItem(IMoveable? item, bool additional) {
             if (!additional) { Unselect(); }
             if (item == null) { return; }
-            _ItemsToMove.Add(item);
+            _itemsToMove.Add(item);
             Invalidate();
-        }
-
-        public void ShowErweitertMenü(BasicPadItem Item) {
-            var l = Item.GetStyleOptions();
-            if (l.Count == 0) {
-                MessageBox.Show("Objekt hat keine<br>Bearbeitungsmöglichkeiten.", enImageCode.Information);
-                return;
-            }
-            EditBoxFlexiControl.Show(l);
         }
 
         public void ShowPrinterPageSetup() {
@@ -316,42 +289,42 @@ namespace BlueControls.Controls {
         }
 
         public void ShowWorkingAreaSetup() {
-            PrintDocument OriD = new();
-            OriD.DefaultPageSettings.Landscape = false;
-            OriD.DefaultPageSettings.PaperSize = new PaperSize("Benutzerdefiniert", (int)(_Item.SheetSizeInMM.Width / 25.4 * 100), (int)(_Item.SheetSizeInMM.Height / 25.4 * 100));
-            OriD.DefaultPageSettings.Margins.Top = (int)(_Item.RandinMM.Top / 25.4 * 100);
-            OriD.DefaultPageSettings.Margins.Bottom = (int)(_Item.RandinMM.Bottom / 25.4 * 100);
-            OriD.DefaultPageSettings.Margins.Left = (int)(_Item.RandinMM.Left / 25.4 * 100);
-            OriD.DefaultPageSettings.Margins.Right = (int)(_Item.RandinMM.Right / 25.4 * 100);
-            var nOriD = PageSetupDialog.Show(OriD, true);
+            PrintDocument oriD = new();
+            oriD.DefaultPageSettings.Landscape = false;
+            oriD.DefaultPageSettings.PaperSize = new PaperSize("Benutzerdefiniert", (int)(_item.SheetSizeInMm.Width / 25.4 * 100), (int)(_item.SheetSizeInMm.Height / 25.4 * 100));
+            oriD.DefaultPageSettings.Margins.Top = (int)(_item.RandinMm.Top / 25.4 * 100);
+            oriD.DefaultPageSettings.Margins.Bottom = (int)(_item.RandinMm.Bottom / 25.4 * 100);
+            oriD.DefaultPageSettings.Margins.Left = (int)(_item.RandinMm.Left / 25.4 * 100);
+            oriD.DefaultPageSettings.Margins.Right = (int)(_item.RandinMm.Right / 25.4 * 100);
+            var nOriD = PageSetupDialog.Show(oriD, true);
             if (nOriD == null) { return; }
-            _Item.SheetSizeInMM = new SizeF((int)(nOriD.DefaultPageSettings.PaperSize.Width * 25.4 / 100), (int)(nOriD.DefaultPageSettings.PaperSize.Height * 25.4 / 100));
-            _Item.RandinMM = new System.Windows.Forms.Padding((int)(nOriD.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(nOriD.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(nOriD.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(nOriD.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
+            _item.SheetSizeInMm = new SizeF((int)(nOriD.DefaultPageSettings.PaperSize.Width * 25.4 / 100), (int)(nOriD.DefaultPageSettings.PaperSize.Height * 25.4 / 100));
+            _item.RandinMm = new System.Windows.Forms.Padding((int)(nOriD.DefaultPageSettings.Margins.Left * 25.4 / 100), (int)(nOriD.DefaultPageSettings.Margins.Top * 25.4 / 100), (int)(nOriD.DefaultPageSettings.Margins.Right * 25.4 / 100), (int)(nOriD.DefaultPageSettings.Margins.Bottom * 25.4 / 100));
         }
 
         public void Unselect() {
-            _ItemsToMove.Clear();
+            _itemsToMove.Clear();
             Invalidate();
         }
 
         internal void DoMouseDown(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseDown(e);
             CheckHotItem(e, true);
-            if (!_editAllowed) { return; }
-            _LastQuickInfo = string.Empty;
+            if (!EditAllowed) { return; }
+            _lastQuickInfo = string.Empty;
             if (HotItem is IMouseAndKeyHandle ho2) {
-                if (ho2.MouseDown(this, e, _Zoom, _shiftX, _shiftY)) {
-                    _GivesMouseComandsTo = ho2;
+                if (ho2.MouseDown(this, e, Zoom, ShiftX, ShiftY)) {
+                    _givesMouseComandsTo = ho2;
                     return;
                 }
             }
             if (e.Button == System.Windows.Forms.MouseButtons.Left) {
                 var p = KoordinatesUnscaled(e);
-                if (_ItemsToMove.Count > 0) {
-                    foreach (var thisItem in _ItemsToMove) {
-                        if (thisItem is BasicPadItem BPI) {
-                            foreach (var thisPoint in BPI.MovablePoint) {
-                                if (Länge(thisPoint, p) < 5f / _Zoom) {
+                if (_itemsToMove.Count > 0) {
+                    foreach (var thisItem in _itemsToMove) {
+                        if (thisItem is BasicPadItem bpi) {
+                            foreach (var thisPoint in bpi.MovablePoint) {
+                                if (Länge(thisPoint, p) < 5f / Zoom) {
                                     SelectItem(thisPoint, false);
                                     return;
                                 }
@@ -368,31 +341,31 @@ namespace BlueControls.Controls {
             if (e.Button == System.Windows.Forms.MouseButtons.None) {
                 CheckHotItem(e, false); // Für QuickInfo usw.
             }
-            if (!_editAllowed) { return; }
-            if (_GivesMouseComandsTo != null) {
-                if (e.Button == System.Windows.Forms.MouseButtons.None && HotItem != _GivesMouseComandsTo) {
-                    _GivesMouseComandsTo = null;
+            if (!EditAllowed) { return; }
+            if (_givesMouseComandsTo != null) {
+                if (e.Button == System.Windows.Forms.MouseButtons.None && HotItem != _givesMouseComandsTo) {
+                    _givesMouseComandsTo = null;
                     Invalidate();
                 } else {
-                    if (!_GivesMouseComandsTo.MouseMove(this, e, _Zoom, _shiftX, _shiftY)) {
-                        _GivesMouseComandsTo = null;
+                    if (!_givesMouseComandsTo.MouseMove(this, e, Zoom, ShiftX, ShiftY)) {
+                        _givesMouseComandsTo = null;
                         Invalidate();
                     } else {
                         return;
                     }
                 }
             } else {
-                if (HotItem is IMouseAndKeyHandle Ho2) {
-                    if (Ho2.MouseMove(this, e, _Zoom, _shiftX, _shiftY)) {
-                        _GivesMouseComandsTo = Ho2;
+                if (HotItem is IMouseAndKeyHandle ho2) {
+                    if (ho2.MouseMove(this, e, Zoom, ShiftX, ShiftY)) {
+                        _givesMouseComandsTo = ho2;
                         Invalidate();
                         return;
                     }
                 }
-                _LastQuickInfo = HotItem != null && e.Button == System.Windows.Forms.MouseButtons.None ? HotItem.QuickInfo : string.Empty;
+                _lastQuickInfo = HotItem != null && e.Button == System.Windows.Forms.MouseButtons.None ? HotItem.QuickInfo : string.Empty;
             }
             if (e.Button == System.Windows.Forms.MouseButtons.Left) {
-                _LastQuickInfo = string.Empty;
+                _lastQuickInfo = string.Empty;
                 MoveItemsWithMouse();
                 Refresh(); // Ansonsten werden einige Redraws übersprungen
             }
@@ -400,20 +373,20 @@ namespace BlueControls.Controls {
 
         internal void DoMouseUp(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseUp(e);
-            if (_GivesMouseComandsTo != null) {
-                if (!_GivesMouseComandsTo.MouseUp(this, e, _Zoom, _shiftX, _shiftY)) {
-                    _GivesMouseComandsTo = null;
+            if (_givesMouseComandsTo != null) {
+                if (!_givesMouseComandsTo.MouseUp(this, e, Zoom, ShiftX, ShiftY)) {
+                    _givesMouseComandsTo = null;
                 } else {
                     return;
                 }
             }
             switch (e.Button) {
                 case System.Windows.Forms.MouseButtons.Left:
-                    if (!_editAllowed) { return; }
+                    if (!EditAllowed) { return; }
                     // Da ja evtl. nur ein Punkt verschoben wird, das Ursprüngliche Element wieder komplett auswählen.
-                    BasicPadItem select = null;
-                    if (_ItemsToMove.Count == 1 && _ItemsToMove[0] is PointM Thispoint) {
-                        if (Thispoint.Parent is BasicPadItem item) {
+                    BasicPadItem? select = null;
+                    if (_itemsToMove.Count == 1 && _itemsToMove[0] is PointM thispoint) {
+                        if (thispoint.Parent is BasicPadItem item) {
                             select = item;
                         }
                     } else {
@@ -425,39 +398,36 @@ namespace BlueControls.Controls {
                 case System.Windows.Forms.MouseButtons.Right:
                     FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
                     break;
-
-                default:
-                    break;
             }
             Invalidate();
         }
 
-        internal Point MiddleOfVisiblesScreen() => new((int)(((Width / 2) + _shiftX) / _Zoom), (int)(((Height / 2) + _shiftY) / _Zoom));
+        internal Point MiddleOfVisiblesScreen() => new((int)(((Width / 2) + ShiftX) / Zoom), (int)(((Height / 2) + ShiftY) / Zoom));
 
         protected override void DrawControl(Graphics gr, enStates state) {
             LinearGradientBrush lgb = new(ClientRectangle, Color.White, Color.LightGray, LinearGradientMode.Vertical);
             gr.FillRectangle(lgb, ClientRectangle);
-            _Item.DrawCreativePadTo(gr, Size, state, _Zoom, _shiftX, _shiftY, null, _ShowInPrintMode);
+            _item.DrawCreativePadTo(gr, Size, state, Zoom, ShiftX, ShiftY, null, _showInPrintMode);
 
             #region Dann die selectiereren Punkte
 
-            foreach (var thisItem in _ItemsToMove) {
-                if (thisItem is BasicPadItem BPI) {
-                    foreach (var P in BPI.MovablePoint) {
-                        P.Draw(gr, _Zoom, _shiftX, _shiftY, enDesign.Button_EckpunktSchieber, enStates.Standard);
+            foreach (var thisItem in _itemsToMove) {
+                if (thisItem is BasicPadItem bpi) {
+                    foreach (var p in bpi.MovablePoint) {
+                        p.Draw(gr, Zoom, ShiftX, ShiftY, enDesign.Button_EckpunktSchieber, enStates.Standard);
                     }
                 }
-                if (thisItem is PointM P2) {
-                    if (P2.Parent is BasicPadItem BPI2) {
-                        foreach (var P in BPI2.MovablePoint) {
-                            P.Draw(gr, _Zoom, _shiftX, _shiftY, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard);
+                if (thisItem is PointM p2) {
+                    if (p2.Parent is BasicPadItem bpi2) {
+                        foreach (var p in bpi2.MovablePoint) {
+                            p.Draw(gr, Zoom, ShiftX, ShiftY, enDesign.Button_EckpunktSchieber_Phantom, enStates.Standard);
                         }
                     }
-                    P2.Draw(gr, _Zoom, _shiftX, _shiftY, enDesign.Button_EckpunktSchieber, enStates.Standard);
+                    p2.Draw(gr, Zoom, ShiftX, ShiftY, enDesign.Button_EckpunktSchieber, enStates.Standard);
                 }
             }
-            if (_GivesMouseComandsTo is BasicPadItem PA) {
-                var drawingCoordinates = PA.UsedArea.ZoomAndMoveRect(_Zoom, _shiftX, _shiftY, false);
+            if (_givesMouseComandsTo is BasicPadItem pa) {
+                var drawingCoordinates = pa.UsedArea.ZoomAndMoveRect(Zoom, ShiftX, ShiftY, false);
                 gr.DrawRectangle(new Pen(Brushes.Red, 3), drawingCoordinates);
             }
 
@@ -472,10 +442,10 @@ namespace BlueControls.Controls {
             // http://technet.microsoft.com/de-de/subscriptions/control.isinputkey%28v=vs.100%29
             keyData switch {
                 System.Windows.Forms.Keys.Up or System.Windows.Forms.Keys.Down or System.Windows.Forms.Keys.Left or System.Windows.Forms.Keys.Right => true,
-                _ => false,
+                _ => false
             };
 
-        protected override RectangleF MaxBounds() => _Item == null ? new RectangleF(0, 0, 0, 0) : _Item.MaxBounds(null);
+        protected override RectangleF MaxBounds() => _item == null ? new RectangleF(0, 0, 0, 0) : _item.MaxBounds(null);
 
         protected override void OnKeyUp(System.Windows.Forms.KeyEventArgs e) => DoKeyUp(e, true);
 
@@ -487,7 +457,7 @@ namespace BlueControls.Controls {
 
         private void _Item_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
             CalculateZoomFitAndSliders(-1);
-            if (_Item.Count == 1 || _Fitting) { ZoomFit(); }
+            if (_item.Count == 1 || Fitting) { ZoomFit(); }
         }
 
         // Kann nicht public gemacht werden, deswegen Umleitung
@@ -499,7 +469,7 @@ namespace BlueControls.Controls {
         private void _Item_ItemRemoved(object sender, System.EventArgs e) {
             CalculateZoomFitAndSliders(-1);
 
-            if (_Fitting) { ZoomFit(); }
+            if (Fitting) { ZoomFit(); }
 
             CheckHotItem(null, true);
             Unselect();
@@ -508,21 +478,21 @@ namespace BlueControls.Controls {
         }
 
         private void CheckHotItem(System.Windows.Forms.MouseEventArgs e, bool doLastClicked) {
-            var OldClicked = LastClickedItem;
+            var oldClicked = LastClickedItem;
             var l = HotItems(e);
-            var Mina = long.MaxValue;
+            var mina = long.MaxValue;
             HotItem = null;
             if (e != null) {
-                foreach (var ThisItem in l) {
-                    var a = (long)Math.Abs(ThisItem.UsedArea.Width) * (long)Math.Abs(ThisItem.UsedArea.Height);
-                    if (a <= Mina) {
+                foreach (var thisItem in l) {
+                    var a = (long)Math.Abs(thisItem.UsedArea.Width) * (long)Math.Abs(thisItem.UsedArea.Height);
+                    if (a <= mina) {
                         // Gleich deswegen, dass neuere, IDENTISCHE Items dass oberste gewählt wird.
-                        Mina = a;
-                        HotItem = ThisItem;
+                        mina = a;
+                        HotItem = thisItem;
                     }
                 }
             }
-            if (doLastClicked && HotItem != OldClicked) {
+            if (doLastClicked && HotItem != oldClicked) {
                 LastClickedItem = HotItem;
                 OnClickedItemChanged();
             }
@@ -535,7 +505,7 @@ namespace BlueControls.Controls {
         private void DruckerDokument_PrintPage(object sender, PrintPageEventArgs e) {
             e.HasMorePages = false;
             OnPrintPage(e);
-            var i = _Item.ToBitmap(3);
+            var i = _item.ToBitmap(3);
             if (i == null) { return; }
             e.Graphics.DrawImageInRectAspectRatio(i, 0, 0, e.PageBounds.Width, e.PageBounds.Height);
         }
@@ -543,14 +513,14 @@ namespace BlueControls.Controls {
         private void Item_DoInvalidate(object sender, System.EventArgs e) => Invalidate();
 
         private void MoveItems(float x, float y, bool doSnap, bool modifyMouseDown) {
-            PointM pointToMove = null;
-            foreach (var thisIt in _ItemsToMove) {
+            PointM? pointToMove = null;
+            foreach (var thisIt in _itemsToMove) {
                 if (thisIt is PointM p) { pointToMove = p; break; }
             }
             if (pointToMove == null) {
-                foreach (var thisIt in _ItemsToMove) {
-                    if (thisIt is BasicPadItem BPI && BPI.PointsForSuccesfullyMove.Count > 0) {
-                        pointToMove = BPI.PointsForSuccesfullyMove[0]; break;
+                foreach (var thisIt in _itemsToMove) {
+                    if (thisIt is BasicPadItem bpi && bpi.PointsForSuccesfullyMove.Count > 0) {
+                        pointToMove = bpi.PointsForSuccesfullyMove[0]; break;
                     }
                 }
             }
@@ -559,16 +529,16 @@ namespace BlueControls.Controls {
 
             if (x == 0d && y == 0d) { return; }
 
-            foreach (var thisIt in _ItemsToMove) {
+            foreach (var thisIt in _itemsToMove) {
                 thisIt.Move(x, y);
             }
             if (doSnap && modifyMouseDown) {
                 // Maus-Daten modifizieren, da ja die tasächliche Bewegung wegen der SnapPoints abweichen kann.
-                MouseDownPos_1_1 = new Point((int)(MouseDownPos_1_1.X + x), (int)(MouseDownPos_1_1.Y + y));
+                MouseDownPos11 = new Point((int)(MouseDownPos11.X + x), (int)(MouseDownPos11.Y + y));
             }
         }
 
-        private void MoveItemsWithMouse() => MoveItems(MousePos_1_1.X - MouseDownPos_1_1.X, MousePos_1_1.Y - MouseDownPos_1_1.Y, true, true);
+        private void MoveItemsWithMouse() => MoveItems(MousePos11.X - MouseDownPos11.X, MousePos11.Y - MouseDownPos11.Y, true, true);
 
         private void OnBeginnPrint(PrintEventArgs e) => BeginnPrint?.Invoke(this, e);
 
@@ -584,44 +554,44 @@ namespace BlueControls.Controls {
 
         private void PicsSave_FileOk(object sender, CancelEventArgs e) {
             if (e.Cancel) { return; }
-            _Item.SaveAsBitmap(PicsSave.FileName);
+            _item.SaveAsBitmap(PicsSave.FileName);
         }
 
         private void RepairPrinterData() {
-            if (RepairPrinterData_Prepaired) { return; }
-            RepairPrinterData_Prepaired = true;
-            DruckerDokument.DocumentName = _Item.Caption;
+            if (_repairPrinterDataPrepaired) { return; }
+            _repairPrinterDataPrepaired = true;
+            DruckerDokument.DocumentName = _item.Caption;
             var done = false;
             foreach (PaperSize ps in DruckerDokument.PrinterSettings.PaperSizes) {
-                if (ps.Width == (int)(_Item.SheetSizeInMM.Width / 25.4 * 100) && ps.Height == (int)(_Item.SheetSizeInMM.Height / 25.4 * 100)) {
+                if (ps.Width == (int)(_item.SheetSizeInMm.Width / 25.4 * 100) && ps.Height == (int)(_item.SheetSizeInMm.Height / 25.4 * 100)) {
                     done = true;
                     DruckerDokument.DefaultPageSettings.PaperSize = ps;
                     break;
                 }
             }
             if (!done) {
-                DruckerDokument.DefaultPageSettings.PaperSize = new PaperSize("Custom", (int)(_Item.SheetSizeInMM.Width / 25.4 * 100), (int)(_Item.SheetSizeInMM.Height / 25.4 * 100));
+                DruckerDokument.DefaultPageSettings.PaperSize = new PaperSize("Custom", (int)(_item.SheetSizeInMm.Width / 25.4 * 100), (int)(_item.SheetSizeInMm.Height / 25.4 * 100));
             }
             DruckerDokument.DefaultPageSettings.PrinterResolution = DruckerDokument.DefaultPageSettings.PrinterSettings.PrinterResolutions[0];
             DruckerDokument.OriginAtMargins = true;
-            DruckerDokument.DefaultPageSettings.Margins = new Margins((int)(_Item.RandinMM.Left / 25.4 * 100), (int)(_Item.RandinMM.Right / 25.4 * 100), (int)(_Item.RandinMM.Top / 25.4 * 100), (int)(_Item.RandinMM.Bottom / 25.4 * 100));
+            DruckerDokument.DefaultPageSettings.Margins = new Margins((int)(_item.RandinMm.Left / 25.4 * 100), (int)(_item.RandinMm.Right / 25.4 * 100), (int)(_item.RandinMm.Top / 25.4 * 100), (int)(_item.RandinMm.Bottom / 25.4 * 100));
         }
 
-        private float SnapToGrid(bool doX, PointM movedPoint, float mouseMovedTo) {
+        private float SnapToGrid(bool doX, PointM? movedPoint, float mouseMovedTo) {
             if (Item.SnapMode != enSnapMode.SnapToGrid || Math.Abs(Item.GridSnap) < 0.001) { return mouseMovedTo; }
             if (movedPoint is null) { return 0f; }
 
-            var Multi = Converter.mmToPixel(Item.GridSnap, ItemCollectionPad.DPI);
-            float Value;
+            var multi = Converter.mmToPixel(Item.GridSnap, ItemCollectionPad.Dpi);
+            float value;
             if (doX) {
-                Value = movedPoint.X + mouseMovedTo;
-                Value = (int)(Value / Multi) * Multi;
+                value = movedPoint.X + mouseMovedTo;
+                value = (int)(value / multi) * multi;
                 // Formel umgestellt
-                return Value - movedPoint.X;
+                return value - movedPoint.X;
             }
-            Value = movedPoint.Y + mouseMovedTo;
-            Value = (int)(Value / Multi) * Multi;
-            return Value - movedPoint.Y;
+            value = movedPoint.Y + mouseMovedTo;
+            value = (int)(value / multi) * multi;
+            return value - movedPoint.Y;
         }
 
         #endregion

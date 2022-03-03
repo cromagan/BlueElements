@@ -19,12 +19,6 @@ namespace BlueBasics.Interfaces {
 
     public interface IParseable : IChangedFeedback {
 
-        #region Properties
-
-        bool IsParsing { get; }
-
-        #endregion
-
         #region Methods
 
         void Parse(string toParse);

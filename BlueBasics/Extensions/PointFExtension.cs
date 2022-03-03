@@ -33,10 +33,12 @@ namespace BlueBasics {
 
             foreach (var thisP in pl) {
                 var l = Geometry.GetLenght(p, thisP);
-                if (l < minl) {
-                    minl = l;
-                    rp = thisP;
+                if (!(l < minl)) {
+                    continue;
                 }
+
+                minl = l;
+                rp = thisP;
             }
 
             return rp;
@@ -48,7 +50,7 @@ namespace BlueBasics {
             return r.Contains(p);
         }
 
-        public static PointF ZoomAndMove(this PointF p, float zoom, float shiftX, float shiftY) => new((float)((p.X * zoom) - shiftX + (zoom / 2)), (float)((p.Y * zoom) - shiftY + (zoom / 2)));
+        public static PointF ZoomAndMove(this PointF p, float zoom, float shiftX, float shiftY) => new((p.X * zoom) - shiftX + (zoom / 2), (p.Y * zoom) - shiftY + (zoom / 2));
 
         #endregion
     }

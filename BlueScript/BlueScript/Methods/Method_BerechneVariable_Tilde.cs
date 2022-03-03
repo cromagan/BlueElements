@@ -43,8 +43,8 @@ namespace BlueScript {
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             if (infos.AttributText.Length < 5) { return new strDoItFeedback("Variablen-Namen-Berechung kann nicht durchgeführt werden."); }
 
-            (var postilde, var _) = NextText(infos.AttributText, 0, Tilde, false, false, KlammernStd);
-            (var posgleich, var _) = NextText(infos.AttributText, 0, Gleich, false, false, KlammernStd);
+            var (postilde, _) = NextText(infos.AttributText, 0, Tilde, false, false, KlammernStd);
+            var (posgleich, _) = NextText(infos.AttributText, 0, Gleich, false, false, KlammernStd);
 
             if (postilde + 1 != posgleich) { return new strDoItFeedback("Variablen-Namen-Berechung kein gültiges End-~-Zeichen gefunden."); }
 

@@ -1,7 +1,7 @@
 ﻿using BlueControls;
 using BlueControls.ItemCollection;
 
-public struct strPolygonCollisionResult {
+public struct StrPolygonCollisionResult {
 
     #region Fields
 

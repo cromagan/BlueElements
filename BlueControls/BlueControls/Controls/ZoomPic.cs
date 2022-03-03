@@ -32,9 +32,9 @@ namespace BlueControls.Controls {
 
         #region Fields
 
-        private Bitmap _bmp = null;
-        private MouseEventArgs1_1? _MouseCurrent = null;
-        private MouseEventArgs1_1? _MouseDown = null;
+        private Bitmap? _bmp;
+        private MouseEventArgs1_1? _MouseCurrent;
+        private MouseEventArgs1_1? _MouseDown;
 
         #endregion
 
@@ -67,7 +67,7 @@ namespace BlueControls.Controls {
         [DefaultValue(false)]
         public bool AlwaysSmooth { get; set; } = false;
 
-        public Bitmap BMP {
+        public Bitmap? BMP {
             get => _bmp;
             set {
                 if (value == _bmp) { return; }
@@ -106,8 +106,8 @@ namespace BlueControls.Controls {
             LinearGradientBrush lgb = new(ClientRectangle, Color.White, Color.LightGray, LinearGradientMode.Vertical);
             gr.FillRectangle(lgb, ClientRectangle);
             if (_bmp != null) {
-                var r = new RectangleF(0, 0, _bmp.Width, _bmp.Height).ZoomAndMoveRect(_Zoom, _shiftX, _shiftY, true);
-                if (_Zoom < 1 || AlwaysSmooth) {
+                var r = new RectangleF(0, 0, _bmp.Width, _bmp.Height).ZoomAndMoveRect(Zoom, ShiftX, ShiftY, true);
+                if (Zoom < 1 || AlwaysSmooth) {
                     gr.SmoothingMode = SmoothingMode.AntiAlias;
                     gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
                 } else {
@@ -121,7 +121,7 @@ namespace BlueControls.Controls {
                 //    TMPGR.DrawImage(OverlayBMP, r);
                 //}
             }
-            OnDoAdditionalDrawing(new AdditionalDrawing(gr, _Zoom, _shiftX, _shiftY, _MouseDown, _MouseCurrent));
+            OnDoAdditionalDrawing(new AdditionalDrawing(gr, Zoom, ShiftX, ShiftY, _MouseDown, _MouseCurrent));
             Skin.Draw_Border(gr, enDesign.Table_And_Pad, state, new Rectangle(1, 1, Size.Width - SliderY.Width, Size.Height - SliderX.Height));
             //gr.DrawImage(_BitmapOfControl, 0, 0);
         }
@@ -168,7 +168,7 @@ namespace BlueControls.Controls {
         protected void OnOverwriteMouseImageData(PositionEventArgs e) => OverwriteMouseImageData?.Invoke(this, e);
 
         private MouseEventArgs1_1 GenerateNewMouseEventArgs(MouseEventArgs e) {
-            PositionEventArgs en = new(MousePos_1_1.X, MousePos_1_1.Y);
+            PositionEventArgs en = new(MousePos11.X, MousePos11.Y);
             OnOverwriteMouseImageData(en);
             var p = PointInsidePic(en.X, en.Y);
             return new MouseEventArgs1_1(e.Button, e.Clicks, en.X, en.Y, e.Delta, p.X, p.Y, IsInBitmap(en.X, en.Y));

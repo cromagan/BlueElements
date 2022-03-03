@@ -40,13 +40,13 @@ namespace BlueControls.ItemCollection {
         /// Nach welche Spalte sich der Stil richten muss.
         /// Wichtig, dass es ein Spalten-item ist, da bei neuen Datenbanken zwar die Spalte vorhnden ist, aber wenn keine Zeile Vorhanden ist, logischgerweise auch keine Zelle da ist.
         /// </summary>
-        private readonly ColumnItem _StyleLikeThis;
+        private readonly ColumnItem? _StyleLikeThis;
 
         #endregion
 
         #region Constructors
 
-        public CellLikeListItem(string internalAndReadableText, ColumnItem columnStyle, enShortenStyle style, bool enabled, enBildTextVerhalten bildTextverhalten) : base(internalAndReadableText) {
+        public CellLikeListItem(string internalAndReadableText, ColumnItem? columnStyle, enShortenStyle style, bool enabled, enBildTextVerhalten bildTextverhalten) : base(internalAndReadableText) {
             _StyleLikeThis = columnStyle;
             _style = style;
             _Enabled = enabled;

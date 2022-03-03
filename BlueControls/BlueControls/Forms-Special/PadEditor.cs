@@ -54,7 +54,7 @@ namespace BlueControls.Forms {
             PadDesign.Item.Clear();
             PadDesign.Item.AddRange(Skin.AllStyles());
             PadDesign.Text = PadDesign.Item[0].Internal;
-            Pad.Item.SheetStyle = Skin.StyleDB.Row[PadDesign.Text];
+            Pad.Item.SheetStyle = Skin.StyleDb.Row[PadDesign.Text];
             cbxSchriftGröße.Item.Add("30%", "030");
             cbxSchriftGröße.Item.Add("40%", "040");
             cbxSchriftGröße.Item.Add("50%", "050");
@@ -176,7 +176,7 @@ namespace BlueControls.Forms {
             }
         }
 
-        private void PadDesign_ItemClicked(object sender, BasicListItemEventArgs e) => Pad.Item.SheetStyle = Skin.StyleDB.Row[e.Item.Internal];
+        private void PadDesign_ItemClicked(object sender, BasicListItemEventArgs e) => Pad.Item.SheetStyle = Skin.StyleDb.Row[e.Item.Internal];
 
         private void txbRasterAnzeige_TextChanged(object sender, System.EventArgs e) {
             if (!txbRasterAnzeige.Text.IsNumeral()) { return; }

@@ -49,14 +49,14 @@ namespace BlueControls.ItemCollection {
 
         public Color Randfarbe { get; set; }
 
-        public enSymbol Symbol { get; set; } = enSymbol.Pfeil;
+        public enSymbol Symbol { get; set; }
 
         #endregion
 
         #region Methods
 
         public override List<FlexiControl> GetStyleOptions() {
-            ItemCollectionList Comms = new()
+            ItemCollectionList comms = new()
             {
                 { "Ohne", ((int)enSymbol.Ohne).ToString(), QuickImage.Get("Datei|32") },
                 { "Rechteck", ((int)enSymbol.Rechteck).ToString(), QuickImage.Get("Stop|32") },
@@ -64,11 +64,13 @@ namespace BlueControls.ItemCollection {
                 { "Pfeil", ((int)enSymbol.Pfeil).ToString(), QuickImage.Get("Pfeil_Rechts|32") },
                 { "Bruchlinie", ((int)enSymbol.Bruchlinie).ToString() }
             };
-            List<FlexiControl> l = new();
-            l.Add(new FlexiControlForProperty(this, "Symbol", Comms));
-            l.Add(new FlexiControlForProperty(this, "Randdicke"));
-            l.Add(new FlexiControlForProperty(this, "Randfarbe"));
-            l.Add(new FlexiControlForProperty(this, "Hintergrundfarbe"));
+            List<FlexiControl> l = new()
+            {
+                new FlexiControlForProperty(this, "Symbol", comms),
+                new FlexiControlForProperty(this, "Randdicke"),
+                new FlexiControlForProperty(this, "Randfarbe"),
+                new FlexiControlForProperty(this, "Hintergrundfarbe")
+            };
             l.AddRange(base.GetStyleOptions());
             return l;
         }
@@ -116,7 +118,7 @@ namespace BlueControls.ItemCollection {
             var trp = drawingCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
             gr.TranslateTransform(trp.X, trp.Y);
             gr.RotateTransform(-Drehwinkel);
-            GraphicsPath p = null;
+            GraphicsPath? p = null;
 
             // Wegen der Nullpunktverschiebung wird ein temporäres Rechteck benötigt
             var d2 = drawingCoordinates;
@@ -150,7 +152,7 @@ namespace BlueControls.ItemCollection {
 
             if (p != null) {
                 gr.FillPath(new SolidBrush(Hintergrundfarbe), p);
-                gr.DrawPath(new Pen(Randfarbe, (float)(Randdicke * zoom * Parent.SheetStyleScale)), p);
+                gr.DrawPath(new Pen(Randfarbe, Randdicke * zoom * Parent.SheetStyleScale), p);
             }
 
             gr.TranslateTransform(-trp.X, -trp.Y);

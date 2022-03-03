@@ -26,7 +26,7 @@ namespace BlueScript {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { };
+        public override List<enVariableDataType> Args => new();
         public override string Description => "Gibt die akutelle UTC-Uhrzeit im Format\r" + Format_Date7 + " zurück.";
         public override bool EndlessArgs => false;
         public override string EndSequence => ")";

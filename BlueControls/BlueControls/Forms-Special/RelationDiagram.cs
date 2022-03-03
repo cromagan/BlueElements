@@ -22,7 +22,7 @@ using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using System.Collections.Generic;
-using System.Drawing;
+using System.Linq;
 
 namespace BlueControls.Forms {
 
@@ -30,7 +30,7 @@ namespace BlueControls.Forms {
 
         #region Fields
 
-        private readonly ColumnItem _column;
+        private readonly ColumnItem? _column;
         private Database? Database;
 
         #endregion
@@ -45,13 +45,9 @@ namespace BlueControls.Forms {
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             Database = database;
             Database.Disposing += Database_Disposing;
-            foreach (var ThisColumnItem in Database.Column) {
-                if (ThisColumnItem != null) {
-                    if (ThisColumnItem.Format == enDataFormat.RelationText) {
-                        _column = ThisColumnItem;
-                        break;
-                    }
-                }
+            foreach (var ThisColumnItem in Database.Column.Where(ThisColumnItem => ThisColumnItem != null && ThisColumnItem.Format == enDataFormat.RelationText)) {
+                _column = ThisColumnItem;
+                break;
             }
         }
 
@@ -59,7 +55,7 @@ namespace BlueControls.Forms {
 
         #region Methods
 
-        public RowFormulaPadItem AddOne(string What, int xPos, int Ypos, string layoutID) {
+        public RowFormulaPadItem? AddOne(string What, int xPos, int Ypos, string layoutID) {
             if (string.IsNullOrEmpty(What)) { return null; }
             if (Pad.Item[What] != null) { return null; }
             var r = Database.Row[What];
@@ -77,20 +73,23 @@ namespace BlueControls.Forms {
             return i2;
         }
 
-        public RowFormulaPadItem ItemOfRow(RowItem R) {
+        public RowFormulaPadItem? ItemOfRow(RowItem R) {
             foreach (var ThisItem in Pad.Item) {
-                if (ThisItem != null && ThisItem is RowFormulaPadItem tempVar && tempVar.Row == R) { return tempVar; }
+                if (ThisItem is RowFormulaPadItem tempVar && tempVar.Row == R) { return tempVar; }
             }
             return null;
         }
 
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
             base.OnFormClosing(e);
-            Database.Disposing -= Database_Disposing;
+            if (Database != null) {
+                Database.Disposing -= Database_Disposing;
+            }
+
             Database = null;
         }
 
-        private void BezPlus(RowFormulaPadItem initialItem) {
+        private void BezPlus(RowFormulaPadItem? initialItem) {
             // Den Beziehungstext holen
             var t = initialItem.Row.CellGetString(_column).ToUpper();
             if (string.IsNullOrEmpty(t)) { return; }
@@ -99,11 +98,9 @@ namespace BlueControls.Forms {
             Names.AddRange(Database.Column[0].GetUcaseNamesSortedByLenght());
             // Namen ermitteln, die relevant sind
             List<string> bez = new();
-            foreach (var thisN in Names) {
-                if (t.Contains(thisN)) {
-                    bez.AddIfNotExists(thisN);
-                    t.Replace(thisN, string.Empty);
-                }
+            foreach (var thisN in Names.Where(thisN => t.Contains(thisN))) {
+                bez.AddIfNotExists(thisN);
+                t = t.Replace(thisN, string.Empty);
             }
             if (bez.Count == 0) { return; }
             // Namen in der Übersicht hinzufügen
@@ -113,7 +110,7 @@ namespace BlueControls.Forms {
                 var it = ItemOfRow(ro);
                 if (it == null) {
                     //lastit = AddOne(thisn, (int)lastit.p_RO.X, (int)lastit.p_RO.Y, lastit.Layout_ID);
-                    lastit = AddOne(thisn, 0, 0, lastit.Layout_ID);
+                    lastit = AddOne(thisn, 0, 0, lastit.Layout_Id);
                 }
             }
             //var Plus = 0;
@@ -321,16 +318,14 @@ namespace BlueControls.Forms {
         }
 
         private void Pad_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-            if (e.HotItem == null) { return; }
             //Dim i As BasicItem = DirectCast(MouseOver, BasicItem)
             if (e.HotItem is not RowFormulaPadItem) { return; }
             e.UserMenu.Add("Alle Einträge hinzufügen, die mit diesem hier Beziehungen haben", "Bez+", enImageCode.PlusZeichen);
         }
 
         private void Pad_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-            if (e.HotItem == null) { return; }
-            if (e.HotItem is not RowFormulaPadItem) { return; }
-            var i = (RowFormulaPadItem)e.HotItem;
+            if (e.HotItem is not RowFormulaPadItem i) { return; }
+
             switch (e.ClickedComand) {
                 case "Bez+":
                     BezPlus(i);

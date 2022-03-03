@@ -19,12 +19,14 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
+using BlueControls.Extended_Text;
 using BlueControls.Interfaces;
 using BlueDatabase.Interfaces;
 using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Design;
+using System.Windows.Forms;
 
 namespace BlueControls.Controls {
 
@@ -34,11 +36,11 @@ namespace BlueControls.Controls {
 
         #region Fields
 
-        private readonly ExtText _etxt = null;
+        private readonly ExtText _etxt;
 
         private enButtonStyle _ButtonStyle = enButtonStyle.Button;
 
-        private bool _Checked = false;
+        private bool _Checked;
 
         /// <summary>
         /// Verhindert, dass ein Timer und vom System generierter Click ausgelöst wird.
@@ -46,9 +48,9 @@ namespace BlueControls.Controls {
         private bool _ClickFired;
 
         /// <summary>
-        // Timer-Objekt und Variablen für Dauer-Feuer-Buttonn
+        /// Timer-Objekt und Variablen für Dauer-Feuer-Buttonn
         /// </summary>
-        private System.Windows.Forms.Timer? _ClickFirerer;
+        private Timer? _ClickFirerer;
 
         private string _ImageCode = string.Empty;
 
@@ -90,7 +92,7 @@ namespace BlueControls.Controls {
 
                 if (value == enButtonStyle.SliderButton) {
                     if (_ClickFirerer != null) { return; }
-                    _ClickFirerer = new System.Windows.Forms.Timer {
+                    _ClickFirerer = new Timer {
                         Enabled = false
                     };
                     _ClickFirerer.Tick += ClickFirerer_Tick;
@@ -101,7 +103,7 @@ namespace BlueControls.Controls {
                 if (Parent is Slider) {
                     SetNotFocusable();
                 } else {
-                    SetStyle(System.Windows.Forms.ControlStyles.Selectable, true);
+                    SetStyle(ControlStyles.Selectable, true);
                 }
                 CheckType();
 
@@ -177,7 +179,7 @@ namespace BlueControls.Controls {
             if (par is enPartentType.Slider) { _ButtonStyle = enButtonStyle.SliderButton; }
         }
 
-        internal static void DrawButton(System.Windows.Forms.Control control, Graphics gr, enDesign buttontype, enStates state, QuickImage pic, enAlignment align, bool picHeight44, ExtText etxt, string text, Rectangle displayRectangle, bool translate) {
+        internal static void DrawButton(Control? control, Graphics gr, enDesign buttontype, enStates state, QuickImage? pic, enAlignment align, bool picHeight44, ExtText etxt, string text, Rectangle displayRectangle, bool translate) {
             var Design = Skin.DesignOf(buttontype, state);
             Skin.Draw_Back(gr, Design, displayRectangle, control, true);
             Skin.Draw_Border(gr, Design, displayRectangle);
@@ -217,7 +219,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        internal static Size StandardSize(string text, QuickImage image) {
+        internal static Size StandardSize(string text, QuickImage? image) {
             var s = Skin.FormatedText_NeededSize(text, image, Skin.GetBlueFont(enDesign.Button_CheckBox, enStates.Standard), 16);
             s.Width += 10;
             s.Height += 4;
@@ -338,7 +340,7 @@ namespace BlueControls.Controls {
             if (DesignMode) { DisableOtherOptionButtons(); }
         }
 
-        protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
+        protected override void OnMouseDown(MouseEventArgs e) {
             _ClickFired = false;
 
             base.OnMouseDown(e);
@@ -365,7 +367,7 @@ namespace BlueControls.Controls {
             Invalidate();
         }
 
-        protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
+        protected override void OnMouseUp(MouseEventArgs e) {
             if (_ClickFirerer != null) {
                 _ClickFirerer.Enabled = false;
                 _ClickFirerer.Interval = 500;

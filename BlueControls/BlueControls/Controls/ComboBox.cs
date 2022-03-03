@@ -21,6 +21,7 @@ using BlueBasics.EventArgs;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using BlueControls.Extended_Text;
 using BlueControls.Forms;
 using BlueControls.ItemCollection;
 using BlueDatabase.Interfaces;
@@ -28,6 +29,7 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Design;
+using System.Linq;
 
 namespace BlueControls.Controls {
 
@@ -37,7 +39,7 @@ namespace BlueControls.Controls {
 
         #region Fields
 
-        private bool _btnDropDownIsIn = false;
+        private bool _btnDropDownIsIn;
         private enComboboxStyle _DrawStyle = enComboboxStyle.TextBox;
         private System.Windows.Forms.ComboBoxStyle _DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown;
         private ExtText _eTxt2;
@@ -49,7 +51,7 @@ namespace BlueControls.Controls {
         /// </summary>
         private string _Initialtext;
 
-        private string? _LastClickedText = null;
+        private string _LastClickedText;
 
         #endregion
 
@@ -120,7 +122,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        public ItemCollectionList Item { get; }
+        public ItemCollectionList? Item { get; }
 
         [DefaultValue(true)]
         public bool Translate { get; set; } = true;
@@ -130,11 +132,8 @@ namespace BlueControls.Controls {
         #region Methods
 
         public void SetTextIfItemExists(string text) {
-            foreach (var thisItem in Item) {
-                if (thisItem.Internal == text) {
-                    Text = text;
-                    return;
-                }
+            if (Item.Any(thisItem => thisItem.Internal == text)) {
+                Text = text;
             }
         }
 

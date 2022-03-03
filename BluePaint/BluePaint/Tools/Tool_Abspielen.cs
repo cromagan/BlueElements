@@ -20,6 +20,7 @@ using BlueControls.Forms;
 using BluePaint.EventArgs;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using static BlueBasics.FileOperations;
 
 namespace BluePaint {
@@ -88,15 +89,13 @@ namespace BluePaint {
 
         private void DoMakro(string thisS) {
             var t = thisS.SplitAndCutBy(";");
-            foreach (var ThisTool in _merker) {
-                if (ThisTool.MacroKennung() == t[0].FromNonCritical()) {
-                    ThisTool.OverridePic += ThisTool_OverridePic;
-                    ThisTool.NeedCurrentPic += ThisTool_NeedCurrentPic;
-                    ThisTool.ExcuteCommand(t[1].FromNonCritical());
-                    ThisTool.OverridePic -= ThisTool_OverridePic;
-                    ThisTool.NeedCurrentPic -= ThisTool_NeedCurrentPic;
-                    return; // keine weiteren kennungen reagieren lassen
-                }
+            foreach (var ThisTool in _merker.Where(ThisTool => ThisTool.MacroKennung() == t[0].FromNonCritical())) {
+                ThisTool.OverridePic += ThisTool_OverridePic;
+                ThisTool.NeedCurrentPic += ThisTool_NeedCurrentPic;
+                ThisTool.ExcuteCommand(t[1].FromNonCritical());
+                ThisTool.OverridePic -= ThisTool_OverridePic;
+                ThisTool.NeedCurrentPic -= ThisTool_NeedCurrentPic;
+                return; // keine weiteren kennungen reagieren lassen
             }
         }
 

@@ -17,11 +17,11 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 
 namespace BlueControls.ItemCollection {
 
@@ -33,20 +33,14 @@ namespace BlueControls.ItemCollection {
             List<string> w = new();
             if (Items == null) { return w; }
 
-            foreach (var ThisItem in Items) {
-                if (ThisItem != null) {
-                    if (!string.IsNullOrEmpty(ThisItem.Internal)) {
-                        w.Add(ThisItem.Internal);
-                    }
-                }
-            }
+            w.AddRange(from ThisItem in Items where ThisItem != null where !string.IsNullOrEmpty(ThisItem.Internal) select ThisItem.Internal);
             return w;
         }
 
         #endregion
     }
 
-    public abstract class BasicListItem : ICompareKey, IComparable, ICloneable {
+    public abstract class BasicListItem : IComparable, ICloneable {
 
         #region Fields
 
@@ -73,22 +67,16 @@ namespace BlueControls.ItemCollection {
         private ItemCollectionList? _Parent;
         private Size _SizeUntouchedForListBox = Size.Empty;
 
-        private string _UserDefCompareKey = "";
-
         #endregion
 
         #region Constructors
 
         protected BasicListItem(string internalname) {
-            if (string.IsNullOrEmpty(internalname)) {
-                Internal = BasicPadItem.UniqueInternal(); // Wiederverwenden ;-)
-            } else {
-                Internal = internalname;
-            }
+            Internal = string.IsNullOrEmpty(internalname) ? BasicPadItem.UniqueInternal() : internalname;
             if (string.IsNullOrEmpty(Internal)) { Develop.DebugPrint(enFehlerArt.Fehler, "Interner Name nicht vergeben."); }
             _Checked = false;
             Pos = Rectangle.Empty;
-            _UserDefCompareKey = string.Empty;
+            UserDefCompareKey = string.Empty;
         }
 
         #endregion
@@ -119,7 +107,7 @@ namespace BlueControls.ItemCollection {
 
         public bool IsCaption { get; protected set; }
 
-        public ItemCollectionList Parent {
+        public ItemCollectionList? Parent {
             get => _Parent;
             set {
                 if (_Parent == null || _Parent == value) {
@@ -133,14 +121,7 @@ namespace BlueControls.ItemCollection {
 
         public abstract string QuickInfo { get; }
 
-        public string UserDefCompareKey {
-            get => _UserDefCompareKey;
-            set {
-                if (value == _UserDefCompareKey) { return; }
-                _UserDefCompareKey = value;
-                //OnChanged();
-            }
-        }
+        public string UserDefCompareKey { get; set; }
 
         #endregion
 
@@ -164,9 +145,9 @@ namespace BlueControls.ItemCollection {
         }
 
         public string CompareKey() {
-            if (!string.IsNullOrEmpty(_UserDefCompareKey)) {
-                if (Convert.ToChar(_UserDefCompareKey.Substring(0, 1)) < 32) { Develop.DebugPrint("Sortierung inkorrekt: " + _UserDefCompareKey); }
-                return _UserDefCompareKey + Constants.FirstSortChar + Parent?.IndexOf(this).ToString(Constants.Format_Integer6);
+            if (!string.IsNullOrEmpty(UserDefCompareKey)) {
+                if (Convert.ToChar(UserDefCompareKey.Substring(0, 1)) < 32) { Develop.DebugPrint("Sortierung inkorrekt: " + UserDefCompareKey); }
+                return UserDefCompareKey + Constants.FirstSortChar + Parent?.IndexOf(this).ToString(Constants.Format_Integer6);
             }
             return GetCompareKey();
         }
@@ -174,10 +155,10 @@ namespace BlueControls.ItemCollection {
         public int CompareTo(object obj) {
             if (obj is BasicListItem tobj) {
                 return CompareKey().CompareTo(tobj.CompareKey());
-            } else {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Objecttyp!");
-                return 0;
             }
+
+            Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Objecttyp!");
+            return 0;
         }
 
         public bool Contains(int x, int y) => Pos.Contains(x, y);

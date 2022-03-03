@@ -37,13 +37,15 @@ namespace BlueControls.Controls {
 
         protected override void OnControlAdded(ControlEventArgs e) {
             base.OnControlAdded(e);
-            if (e.Control is TabPage tp) {
-                tp.BackColor = Skin.Color_Back(enDesign.RibbonBar_Body, enStates.Standard);
-                Invalidate();
+            if (e.Control is not TabPage tp) {
+                return;
             }
+
+            tp.BackColor = Skin.Color_Back(enDesign.RibbonBar_Body, enStates.Standard);
+            Invalidate();
         }
 
-        protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) => DrawControl(e, enDesign.RibbonBar_Back);
+        protected override void OnPaint(PaintEventArgs e) => DrawControl(e, enDesign.RibbonBar_Back);
 
         #endregion
     }

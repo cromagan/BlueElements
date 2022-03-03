@@ -44,21 +44,17 @@ namespace BlueBasics {
 
         public static bool AddIfNotExists<T>(this List<T> l, List<T> values) {
             if (values == null || values.Count == 0) { return false; }
-            var ok1 = false;
-            foreach (var thivalue in values) {
-                if (l.AddIfNotExists(thivalue)) {
-                    ok1 = true;
-                }
-            }
+            var ok1 = values.Count(thivalue => l.AddIfNotExists(thivalue)) > 0;
             return ok1;
         }
 
         public static bool AddIfNotExists<T>(this List<T> l, T value) {
-            if (!l.Contains(value)) {
-                l.Add(value);
-                return true;
+            if (l.Contains(value)) {
+                return false;
             }
-            return false;
+
+            l.Add(value);
+            return true;
         }
 
         public static void CloneFrom<T>(this List<T> list1, List<T> list2) where T : IComparable {
@@ -147,7 +143,7 @@ namespace BlueBasics {
         //        L.Remove(Item);
         //    }
         // }
-        public static void RemoveNullOrEmpty(this List<string> l) {
+        public static void RemoveNullOrEmpty(this List<string?>? l) {
             var z = 0;
             while (z < l.Count) {
                 if (string.IsNullOrEmpty(l[z])) {
@@ -158,7 +154,7 @@ namespace BlueBasics {
             }
         }
 
-        public static void RemoveString(this List<string> l, string value, bool caseSensitive) {
+        public static void RemoveString(this List<string?>? l, string value, bool caseSensitive) {
             var cas = StringComparison.OrdinalIgnoreCase;
             if (!caseSensitive) { cas = StringComparison.Ordinal; }
             var z = 0;
@@ -171,7 +167,7 @@ namespace BlueBasics {
             }
         }
 
-        public static void RemoveString(this List<string> l, List<string> value, bool caseSensitive) {
+        public static void RemoveString(this List<string?>? l, List<string?>? value, bool caseSensitive) {
             foreach (var t in value) {
                 l.RemoveString(t, caseSensitive);
             }
@@ -219,8 +215,8 @@ namespace BlueBasics {
             }
         }
 
-        public static void SplitAndCutByCR(this List<string> list, string textToSplit) {
-            List<string> l = new();
+        public static void SplitAndCutByCR(this List<string?> list, string textToSplit) {
+            List<string?> l = new();
             l.AddRange(textToSplit.SplitAndCutByCR());
             if (!list.IsDifferentTo(l)) { return; }
             if (list.Count > 0) { list.Clear(); }
@@ -228,7 +224,7 @@ namespace BlueBasics {
         }
 
         public static void SplitAndCutByCR_QuickSortAndRemoveDouble(this List<string> list, string textToSplit) {
-            List<string> l = new();
+            List<string?> l = new();
             l.AddRange(textToSplit.SplitAndCutByCR());
             l = l.SortedDistinctList();
 
@@ -238,7 +234,7 @@ namespace BlueBasics {
             list.AddRange(l);
         }
 
-        public static string TagGet(this ICollection<string> _String, string tagName) {
+        public static string TagGet(this ICollection<string?>? _String, string tagName) {
             if (_String == null) { return string.Empty; }
             var uTagName = tagName.ToUpper().Trim();
             foreach (var ThisString in _String) {
@@ -273,9 +269,9 @@ namespace BlueBasics {
             return l;
         }
 
-        public static double TagGetDouble(this ICollection<string> col, string tagname) => DoubleParse(TagGet(col, tagname));
+        public static double TagGetDouble(this ICollection<string?>? col, string tagname) => DoubleParse(TagGet(col, tagname));
 
-        public static int TagGetInt(this ICollection<string> col, string tagname) => IntParse(TagGet(col, tagname));
+        public static int TagGetInt(this ICollection<string?>? col, string tagname) => IntParse(TagGet(col, tagname));
 
         public static void TagRemove(this ICollection<string> col, string tagname) {
             var Found = col.TagGetPosition(tagname);
@@ -284,7 +280,7 @@ namespace BlueBasics {
             }
         }
 
-        public static void TagSet(this ICollection<string> col, string tagname, string value) {
+        public static void TagSet(this ICollection<string?>? col, string tagname, string value) {
             var Found = col.TagGetPosition(tagname);
             var n = tagname + ": " + value;
 
@@ -303,7 +299,7 @@ namespace BlueBasics {
         /// <param name="l"></param>
         /// <param name="removeEmpty"></param>
         /// <returns></returns>
-        public static string ToString<T>(this List<T> l, bool removeEmpty) where T : IParseable {
+        public static string ToString<T>(this List<T> l, bool removeEmpty) where T : IParseable? {
             // Remove Empty sollte eigentlich selbstverständlich seih. Ist nur als Dummy drinnen, dass der Interpreter zwischen der Internen und Extension unterscheiden kann.
             var tmp = string.Empty;
             foreach (var Item in l) {
@@ -317,7 +313,7 @@ namespace BlueBasics {
             return tmp.TrimCr();
         }
 
-        private static int TagGetPosition(this ICollection<string> col, string tagname) {
+        private static int TagGetPosition(this ICollection<string?>? col, string tagname) {
             var UTagName = tagname.ToUpper() + ":";
 
             for (var z = 0; z < col.Count; z++) {

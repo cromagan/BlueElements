@@ -19,9 +19,9 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using BlueDatabase;
 using System;
 using System.Drawing;
-using BlueDatabase;
 
 namespace BlueControls.ItemCollection {
 
@@ -29,20 +29,20 @@ namespace BlueControls.ItemCollection {
 
         #region Fields
 
-        public static BlueFont CellFont = Skin.GetBlueFont(enDesign.Table_Cell, enStates.Standard);
+        public static BlueFont? CellFont = Skin.GetBlueFont(enDesign.Table_Cell, enStates.Standard);
 
-        public static BlueFont Chapter_Font = Skin.GetBlueFont(enDesign.Table_Cell_Chapter, enStates.Standard);
+        public static BlueFont? ChapterFont = Skin.GetBlueFont(enDesign.Table_Cell_Chapter, enStates.Standard);
 
-        public static BlueFont Column_Font = Skin.GetBlueFont(enDesign.Table_Column, enStates.Standard);
+        public static BlueFont? ColumnFont = Skin.GetBlueFont(enDesign.Table_Column, enStates.Standard);
 
-        public readonly ColumnItem Column;
+        public readonly ColumnItem? Column;
 
         #endregion
 
         #region Constructors
 
         //public static BlueFont Column_Filter_Font = BlueFont.Get(Column_Font.FontName, Column_Font.FontSize, false, false, false, false, true, Color.White, Color.Red, false, false, false);
-        public ColumnPadItem(ColumnItem c) : base(c.Name) => Column = c;
+        public ColumnPadItem(ColumnItem? c) : base(c.Name) => Column = c;
 
         #endregion
 
@@ -61,12 +61,12 @@ namespace BlueControls.ItemCollection {
 
         protected override string ClassId() => "Column";
 
-        protected override Bitmap GeneratePic() {
+        protected override Bitmap? GeneratePic() {
             if (Column == null) {
                 return QuickImage.Get(enImageCode.Warnung, 128);
             }
 
-            var wi = Table.tmpColumnContentWidth(null, Column, CellFont, 16);
+            var wi = Table.TmpColumnContentWidth(null, Column, CellFont, 16);
 
             var bmp = new Bitmap(Math.Max((int)(wi * 0.7), 30), 300);
             var gr = Graphics.FromImage(bmp);
@@ -76,15 +76,15 @@ namespace BlueControls.ItemCollection {
             //Table.Draw_FormatedText(gr,)
 
             for (var z = 0; z < 3; z++) {
-                var N = Column.Ueberschrift(z);
-                if (!string.IsNullOrEmpty(N)) {
-                    Skin.Draw_FormatedText(gr, N, null, enAlignment.Horizontal_Vertical_Center, new Rectangle(0, z * 16, bmp.Width, 61), null, false, Column_Font, true);
+                var n = Column.Ueberschrift(z);
+                if (!string.IsNullOrEmpty(n)) {
+                    Skin.Draw_FormatedText(gr, n, null, enAlignment.Horizontal_Vertical_Center, new Rectangle(0, z * 16, bmp.Width, 61), null, false, ColumnFont, true);
                 }
             }
 
             gr.TranslateTransform(bmp.Width / 2, 50);
             gr.RotateTransform(-90);
-            Skin.Draw_FormatedText(gr, Column.Caption, null, enAlignment.VerticalCenter_Left, new Rectangle(-150, -150, 300, 300), null, false, Column_Font, true);
+            Skin.Draw_FormatedText(gr, Column.Caption, null, enAlignment.VerticalCenter_Left, new Rectangle(-150, -150, 300, 300), null, false, ColumnFont, true);
 
             gr.TranslateTransform(-bmp.Width / 2, -50);
             gr.ResetTransform();

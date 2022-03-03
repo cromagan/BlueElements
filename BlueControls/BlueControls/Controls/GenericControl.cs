@@ -39,9 +39,9 @@ namespace BlueControls.Controls {
 
         protected bool _MouseHighlight = true;
 
-        private readonly bool _UseBackBitmap = false;
+        private readonly bool _UseBackBitmap;
 
-        private Bitmap _BitmapOfControl;
+        private Bitmap? _BitmapOfControl;
 
         private bool _GeneratingBitmapOfControl;
 
@@ -109,7 +109,7 @@ namespace BlueControls.Controls {
 
         #region Methods
 
-        public static System.Windows.Forms.Form ParentForm(System.Windows.Forms.Control o) {
+        public static System.Windows.Forms.Form? ParentForm(System.Windows.Forms.Control o) {
             if (o == null || o.IsDisposed) { return null; }
 
             do {
@@ -132,7 +132,7 @@ namespace BlueControls.Controls {
                 case null:
                     return enPartentType.Nothing;
 
-                case GroupBox _: {
+                case GroupBox: {
                         if (control.Parent is System.Windows.Forms.TabPage TP) {
                             if (TP.Parent == null) { return enPartentType.Unbekannt; }
                             if (TP.Parent is RibbonBar) { return enPartentType.RibbonGroupBox; }
@@ -140,77 +140,77 @@ namespace BlueControls.Controls {
                         return enPartentType.GroupBox;
                     }
 
-                case LastFilesCombo _:
+                case LastFilesCombo:
                     return enPartentType.LastFilesCombo;
                 //Is = "BlueBasics.ComboBox"
 
-                case ComboBox _ when ((ComboBox)control).ParentType() == enPartentType.RibbonPage:
+                case ComboBox box when box.ParentType() == enPartentType.RibbonPage:
                     return enPartentType.RibbonBarCombobox;
 
-                case ComboBox _:
+                case ComboBox:
                     return enPartentType.ComboBox;
                 // Is = "BlueBasics.TabControl"
 
-                case RibbonBar _:
+                case RibbonBar:
                     return enPartentType.RibbonControl;
 
-                case TabControl _:
+                case TabControl:
                     return enPartentType.TabControl;
                 // Is = "BlueBasics.TabPage"
 
-                case tabAdministration _:
+                case tabAdministration:
 
-                case System.Windows.Forms.TabPage _ when control.Parent is RibbonBar:
+                case System.Windows.Forms.TabPage when control.Parent is RibbonBar:
                     return enPartentType.RibbonPage;
 
-                case System.Windows.Forms.TabPage _:
+                case System.Windows.Forms.TabPage:
                     return enPartentType.TabPage;
                 //Is = "BlueBasics.Slider"
 
-                case Slider _:
+                case Slider:
                     return enPartentType.Slider;
                 //Is = "FRMMSGBOX"
 
-                case FloatingForm _:
+                case FloatingForm:
                     return enPartentType.MsgBox;
 
-                case DialogWithOkAndCancel _:
+                case DialogWithOkAndCancel:
                     return enPartentType.MsgBox;
 
-                case TextBox _:
+                case TextBox:
                     return enPartentType.TextBox;
 
-                case ListBox _:
+                case ListBox:
                     return enPartentType.ListBox;
 
-                case EasyPic _:
+                case EasyPic:
                     return enPartentType.EasyPic;
 
-                case Button _:
+                case Button:
                     return enPartentType.Button;
 
-                case Line _:
+                case Line:
                     return enPartentType.Line;
 
-                case Caption _:
+                case Caption:
                     return enPartentType.Caption;
 
-                case Formula _:
+                case Formula:
                     return enPartentType.Formula;
 
-                case Form _:
+                case Form:
                     return enPartentType.Form;
 
-                case Table _:
+                case Table:
                     return enPartentType.Table;
 
-                case System.Windows.Forms.Panel _:
+                case System.Windows.Forms.Panel:
                     return enPartentType.Panel;
 
-                case FlexiControlForCell _:
+                case FlexiControlForCell:
                     return enPartentType.FlexiControlForCell;
 
-                case FlexiControl _:
+                case FlexiControl:
                     return enPartentType.FlexiControl;
 
                 default:
@@ -218,7 +218,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        public Bitmap BitmapOfControl() {
+        public Bitmap? BitmapOfControl() {
             if (!_UseBackBitmap || _GeneratingBitmapOfControl) { return null; }
             _GeneratingBitmapOfControl = true;
             if (_BitmapOfControl == null) { Refresh(); }
@@ -242,7 +242,7 @@ namespace BlueControls.Controls {
 
         public Point MousePos() {
             if (InvokeRequired) {
-                return (Point)Invoke(new Func<Point>(() => MousePos()));
+                return (Point)Invoke(new Func<Point>(MousePos));
             }
             Develop.DebugPrint_Disposed(IsDisposed);
             return PointToClient(System.Windows.Forms.Cursor.Position);
@@ -407,7 +407,7 @@ namespace BlueControls.Controls {
             base.OnSizeChanged(e);
         }
 
-        protected System.Windows.Forms.Form ParentForm() => ParentForm(Parent);
+        protected System.Windows.Forms.Form? ParentForm() => ParentForm(Parent);
 
         protected enPartentType ParentType() {
             if (Parent == null) { return enPartentType.Unbekannt; }
@@ -416,10 +416,7 @@ namespace BlueControls.Controls {
             return _MyParentType;
         }
 
-        protected override void ScaleControl(SizeF factor, System.Windows.Forms.BoundsSpecified specified) {
-            factor = new SizeF(1, 1);
-            base.ScaleControl(factor, specified);
-        }
+        protected override void ScaleControl(SizeF factor, System.Windows.Forms.BoundsSpecified specified) => base.ScaleControl(new SizeF(1, 1), specified);
 
         protected void SetDoubleBuffering() => SetStyle(System.Windows.Forms.ControlStyles.DoubleBuffer, true);
 
@@ -451,7 +448,7 @@ namespace BlueControls.Controls {
 
             if (Develop.Exited || IsDisposed || !Visible) { return; }
             lock (this) {
-                if (!Skin.inited) {
+                if (!Skin.Inited) {
                     if (DesignMode) {
                         Skin.LoadSkin();
                     } else {

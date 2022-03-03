@@ -17,7 +17,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using static BlueBasics.Extensions;
 
 namespace BluePaint {
 
@@ -52,14 +51,14 @@ namespace BluePaint {
             DoCapInfo();
         }
 
-        private void btnDoResize_Click(object sender, System.EventArgs e) {
+        private void btnDoResize_Click(object? sender, System.EventArgs? e) {
             var p = OnNeedCurrentPic();
             if (p == null) { return; }
             if (!double.TryParse(flxProzent.Value, out var pr)) { return; }
             pr /= 100;
             var wi = (int)(p.Width * pr);
             var he = (int)(p.Height * pr);
-            if (pr == 1 || pr < 0.01 || pr > 1000 || wi < 1 || he < 1) { return; }
+            if (pr is 1 or < 0.01 or > 1000 || wi < 1 || he < 1) { return; }
             var _BMP2 = BitmapExt.Resize(p, wi, he, enSizeModes.Verzerren, System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic, true);
             OnOverridePic(_BMP2);
             OnZoomFit();
@@ -80,7 +79,7 @@ namespace BluePaint {
             pr /= 100;
             var wi = (int)(p.Width * pr);
             var he = (int)(p.Height * pr);
-            if (pr == 1 || pr < 0.01 || pr > 1000 || wi < 1 || he < 1) {
+            if (pr is 1 or < 0.01 or > 1000 || wi < 1 || he < 1) {
                 capInfo.Text = "Bitte gültigen Wert angeben.";
                 return;
             }

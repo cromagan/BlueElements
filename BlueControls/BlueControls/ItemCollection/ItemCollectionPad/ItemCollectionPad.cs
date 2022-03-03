@@ -28,6 +28,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Linq;
 
 namespace BlueControls.ItemCollection {
 
@@ -35,45 +36,45 @@ namespace BlueControls.ItemCollection {
 
         #region Fields
 
-        public static readonly int DPI = 300;
-        public string Caption = string.Empty;
-        public string ID = string.Empty;
-        public PointM P_rLO;
-        public PointM P_rLU;
-        public PointM P_rRO;
-        public PointM P_rRU;
+        public static readonly int Dpi = 300;
+        public string Caption;
+        public string Id;
+        public PointM PRLo;
+        public PointM PRLu;
+        public PointM PRRo;
+        public PointM PRRu;
 
         /// <summary>
         /// Für automatische Generierungen, die zu schnell hintereinander kommen, ein Counter für den Dateinamen
         /// </summary>
-        private readonly int IDCount = 0;
+        private readonly int _idCount;
 
-        private float _GridShow = 10;
-        private float _Gridsnap = 1;
-        private System.Windows.Forms.Padding _RandinMM = System.Windows.Forms.Padding.Empty;
-        private SizeF _SheetSizeInMM = SizeF.Empty;
-        private RowItem _SheetStyle;
-        private float _SheetStyleScale;
-        private enSnapMode _SnapMode = enSnapMode.SnapToGrid;
+        private float _gridShow = 10;
+        private float _gridsnap = 1;
+        private System.Windows.Forms.Padding _randinMm = System.Windows.Forms.Padding.Empty;
+        private SizeF _sheetSizeInMm = SizeF.Empty;
+        private RowItem? _sheetStyle;
+        private float _sheetStyleScale;
+        private enSnapMode _snapMode = enSnapMode.SnapToGrid;
 
         #endregion
 
         #region Constructors
 
         public ItemCollectionPad() : base() {
-            if (Skin.StyleDB == null) { Skin.InitStyles(); }
-            SheetSizeInMM = Size.Empty;
-            RandinMM = System.Windows.Forms.Padding.Empty;
+            if (Skin.StyleDb == null) { Skin.InitStyles(); }
+            SheetSizeInMm = Size.Empty;
+            RandinMm = System.Windows.Forms.Padding.Empty;
             Caption = "";
-            IDCount++;
-            ID = "#" + DateTime.UtcNow.ToString(Constants.Format_Date) + IDCount; // # ist die erkennung, dass es kein Dateiname sondern ein Item ist
-            if (Skin.StyleDB == null) { Skin.InitStyles(); }
-            _SheetStyle = null;
-            _SheetStyleScale = 1f;
-            if (Skin.StyleDB != null) { _SheetStyle = Skin.StyleDB.Row.First(); }
+            _idCount++;
+            Id = "#" + DateTime.UtcNow.ToString(Constants.Format_Date) + _idCount; // # ist die erkennung, dass es kein Dateiname sondern ein Item ist
+            if (Skin.StyleDb == null) { Skin.InitStyles(); }
+            _sheetStyle = null;
+            _sheetStyleScale = 1f;
+            if (Skin.StyleDb != null) { _sheetStyle = Skin.StyleDb.Row.First(); }
         }
 
-        public ItemCollectionPad(string layoutID, Database database, long rowkey) : this(database.Layouts[database.Layouts.LayoutIDToIndex(layoutID)], string.Empty) {
+        public ItemCollectionPad(string layoutId, Database database, long rowkey) : this(database.Layouts[database.Layouts.LayoutIDToIndex(layoutId)], string.Empty) {
             // Wenn nur die Row ankommt und diese null ist, kann gar nix generiert werden
             ResetVariables();
             ParseVariable(database.Row.SearchByKey(rowkey));
@@ -84,20 +85,20 @@ namespace BlueControls.ItemCollection {
         /// </summary>
         /// <param name="value"></param>
         /// <param name="needPrinterData"></param>
-        /// <param name="useThisID">Wenn das Blatt bereits eine Id hat, muss die Id verwendet werden. Wird das Feld leer gelassen, wird die beinhaltete Id benutzt.</param>
-        public ItemCollectionPad(string ToParse, string useThisID) : this() {
-            if (string.IsNullOrEmpty(ToParse) || ToParse.Length < 3) { return; }
-            if (ToParse.Substring(0, 1) != "{") { return; }// Alte Daten gehen eben verloren.
-            ID = useThisID;
-            foreach (var pair in ToParse.GetAllTags()) {
+        /// <param name="useThisId">Wenn das Blatt bereits eine Id hat, muss die Id verwendet werden. Wird das Feld leer gelassen, wird die beinhaltete Id benutzt.</param>
+        public ItemCollectionPad(string toParse, string useThisId) : this() {
+            if (string.IsNullOrEmpty(toParse) || toParse.Length < 3) { return; }
+            if (toParse.Substring(0, 1) != "{") { return; }// Alte Daten gehen eben verloren.
+            Id = useThisId;
+            foreach (var pair in toParse.GetAllTags()) {
                 switch (pair.Key.ToLower()) {
                     case "sheetsize":
-                        _SheetSizeInMM = Extensions.SizeFParse(pair.Value);
+                        _sheetSizeInMm = pair.Value.SizeFParse();
                         GenPoints();
                         break;
 
                     case "printarea":
-                        _RandinMM = Extensions.PaddingParse(pair.Value);
+                        _randinMm = pair.Value.PaddingParse();
                         GenPoints();
                         break;
                     //case "items":
@@ -116,20 +117,20 @@ namespace BlueControls.ItemCollection {
                         break;
 
                     case "id":
-                        if (string.IsNullOrEmpty(ID)) { ID = pair.Value.FromNonCritical(); }
+                        if (string.IsNullOrEmpty(Id)) { Id = pair.Value.FromNonCritical(); }
                         break;
 
                     case "style":
-                        _SheetStyle = Skin.StyleDB.Row[pair.Value];
-                        if (_SheetStyle == null) { _SheetStyle = Skin.StyleDB.Row.First(); }// Einfach die Erste nehmen
+                        _sheetStyle = Skin.StyleDb.Row[pair.Value];
+                        if (_sheetStyle == null) { _sheetStyle = Skin.StyleDb.Row.First(); }// Einfach die Erste nehmen
                         break;
 
                     case "fontscale":
-                        _SheetStyleScale = float.Parse(pair.Value);
+                        _sheetStyleScale = float.Parse(pair.Value);
                         break;
 
                     case "snapmode":
-                        _SnapMode = (enSnapMode)int.Parse(pair.Value);
+                        _snapMode = (enSnapMode)int.Parse(pair.Value);
                         break;
 
                     case "grid":
@@ -137,11 +138,11 @@ namespace BlueControls.ItemCollection {
                         break;
 
                     case "gridshow":
-                        _GridShow = float.Parse(pair.Value);
+                        _gridShow = float.Parse(pair.Value);
                         break;
 
                     case "gridsnap":
-                        _Gridsnap = float.Parse(pair.Value);
+                        _gridsnap = float.Parse(pair.Value);
                         break;
 
                     case "format": //_Format = DirectCast(Integer.Parse(pair.Value.Value), enDataFormat)
@@ -152,18 +153,18 @@ namespace BlueControls.ItemCollection {
                         break;
 
                     case "dpi":
-                        if (int.Parse(pair.Value) != DPI) {
-                            Develop.DebugPrint("DPI Unterschied: " + DPI + " <> " + pair.Value);
+                        if (int.Parse(pair.Value) != Dpi) {
+                            Develop.DebugPrint("DPI Unterschied: " + Dpi + " <> " + pair.Value);
                         }
                         break;
 
                     case "sheetstyle":
-                        if (Skin.StyleDB == null) { Skin.InitStyles(); }
-                        _SheetStyle = Skin.StyleDB.Row[pair.Value];
+                        if (Skin.StyleDb == null) { Skin.InitStyles(); }
+                        _sheetStyle = Skin.StyleDb.Row[pair.Value];
                         break;
 
                     case "sheetstylescale":
-                        _SheetStyleScale = float.Parse(pair.Value);
+                        _sheetStyleScale = float.Parse(pair.Value);
                         break;
 
                     default:
@@ -187,55 +188,53 @@ namespace BlueControls.ItemCollection {
 
         [DefaultValue(10.0)]
         public float GridShow {
-            get => _GridShow;
+            get => _gridShow;
             set {
-                if (_GridShow == value) { return; }
-                _GridShow = value;
+                if (_gridShow == value) { return; }
+                _gridShow = value;
                 OnDoInvalidate();
             }
         }
 
         [DefaultValue(10.0)]
         public float GridSnap {
-            get => _Gridsnap;
+            get => _gridsnap;
             set {
-                if (_Gridsnap == value) { return; }
-                _Gridsnap = value;
+                if (_gridsnap == value) { return; }
+                _gridsnap = value;
                 OnDoInvalidate();
             }
         }
 
-        public bool IsParsing { get; private set; }
-
         [DefaultValue(true)]
         public bool IsSaved { get; set; }
 
-        public System.Windows.Forms.Padding RandinMM {
-            get => _RandinMM;
+        public System.Windows.Forms.Padding RandinMm {
+            get => _randinMm;
             set {
-                _RandinMM = new System.Windows.Forms.Padding(Math.Max(0, value.Left), Math.Max(0, value.Top), Math.Max(0, value.Right), Math.Max(0, value.Bottom));
+                _randinMm = new System.Windows.Forms.Padding(Math.Max(0, value.Left), Math.Max(0, value.Top), Math.Max(0, value.Right), Math.Max(0, value.Bottom));
                 GenPoints();
             }
         }
 
-        public SizeF SheetSizeInMM {
-            get => _SheetSizeInMM;
+        public SizeF SheetSizeInMm {
+            get => _sheetSizeInMm;
             set {
-                if (value == _SheetSizeInMM) { return; }
-                _SheetSizeInMM = new SizeF(value.Width, value.Height);
+                if (value == _sheetSizeInMm) { return; }
+                _sheetSizeInMm = new SizeF(value.Width, value.Height);
                 GenPoints();
             }
         }
 
-        public RowItem SheetStyle {
-            get => _SheetStyle;
+        public RowItem? SheetStyle {
+            get => _sheetStyle;
             set {
-                if (_SheetStyle == value) { return; }
+                if (_sheetStyle == value) { return; }
                 //        if (!_isParsing && value == SheetStyle) { return; }
                 //if (Skin.StyleDB == null) { Skin.InitStyles(); }
                 /// /       Item.SheetStyle = Skin.StyleDB.Row[value];
                 //   if (Item.SheetStyle == null) { Item.SheetStyle = Skin.StyleDB.Row.First(); }// Einfach die Erste nehmen
-                _SheetStyle = value;
+                _sheetStyle = value;
                 DesignOrStyleChanged();
                 //RepairAll(0, false);
                 OnDoInvalidate();
@@ -244,11 +243,11 @@ namespace BlueControls.ItemCollection {
 
         [DefaultValue(1.0)]
         public float SheetStyleScale {
-            get => _SheetStyleScale;
+            get => _sheetStyleScale;
             set {
                 if (value < 0.1d) { value = 0.1f; }
-                if (_SheetStyleScale == value) { return; }
-                _SheetStyleScale = value;
+                if (_sheetStyleScale == value) { return; }
+                _sheetStyleScale = value;
                 DesignOrStyleChanged();
                 OnDoInvalidate();
             }
@@ -256,10 +255,10 @@ namespace BlueControls.ItemCollection {
 
         [DefaultValue(false)]
         public enSnapMode SnapMode {
-            get => _SnapMode;
+            get => _snapMode;
             set {
-                if (_SnapMode == value) { return; }
-                _SnapMode = value;
+                if (_snapMode == value) { return; }
+                _snapMode = value;
                 OnDoInvalidate();
             }
         }
@@ -268,35 +267,19 @@ namespace BlueControls.ItemCollection {
 
         #region Indexers
 
-        public BasicPadItem this[string Internal] {
+        public BasicPadItem? this[string @internal] {
             get {
-                if (string.IsNullOrEmpty(Internal)) {
+                if (string.IsNullOrEmpty(@internal)) {
                     return null;
                 }
-                foreach (var ThisItem in this) {
-                    if (ThisItem != null) {
-                        if (Internal.ToUpper() == ThisItem.Internal.ToUpper()) {
-                            return ThisItem;
-                        }
-                    }
-                }
-                return null;
+
+                return this.FirstOrDefault(thisItem => thisItem != null && @internal.ToUpper() == thisItem.Internal.ToUpper());
             }
         }
 
-        public List<BasicPadItem> this[int x, int Y] => this[new Point(x, Y)];
+        public List<BasicPadItem> this[int x, int y] => this[new Point(x, y)];
 
-        public List<BasicPadItem> this[Point p] {
-            get {
-                List<BasicPadItem> l = new();
-                foreach (var ThisItem in this) {
-                    if (ThisItem != null && ThisItem.Contains(p, 1)) {
-                        l.Add(ThisItem);
-                    }
-                }
-                return l;
-            }
-        }
+        public List<BasicPadItem> this[Point p] => this.Where(thisItem => thisItem != null && thisItem.Contains(p, 1)).ToList();
 
         #endregion
 
@@ -309,21 +292,19 @@ namespace BlueControls.ItemCollection {
             OnDoInvalidate();
         }
 
-        public void DrawCreativePadToBitmap(Bitmap BMP, enStates vState, float zoomf, float X, float Y, List<BasicPadItem> visibleItems) {
-            var gr = Graphics.FromImage(BMP);
-            DrawCreativePadTo(gr, BMP.Size, vState, zoomf, X, Y, visibleItems, true);
+        public void DrawCreativePadToBitmap(Bitmap? bmp, enStates vState, float zoomf, float x, float y, List<BasicPadItem>? visibleItems) {
+            var gr = Graphics.FromImage(bmp);
+            DrawCreativePadTo(gr, bmp.Size, vState, zoomf, x, y, visibleItems, true);
             gr.Dispose();
         }
 
-        public bool DrawItems(Graphics gr, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting, List<BasicPadItem> visibleItems) {
+        public bool DrawItems(Graphics gr, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting, List<BasicPadItem>? visibleItems) {
             try {
                 if (SheetStyle == null || SheetStyleScale < 0.1d) { return true; }
-                foreach (var thisItem in this) {
-                    if (thisItem != null) {
-                        gr.PixelOffsetMode = PixelOffsetMode.None;
-                        if (visibleItems == null || visibleItems.Contains(thisItem)) {
-                            thisItem.Draw(gr, zoom, shiftX, shiftY, sizeOfParentControl, forPrinting);
-                        }
+                foreach (var thisItem in this.Where(thisItem => thisItem != null)) {
+                    gr.PixelOffsetMode = PixelOffsetMode.None;
+                    if (visibleItems == null || visibleItems.Contains(thisItem)) {
+                        thisItem.Draw(gr, zoom, shiftX, shiftY, sizeOfParentControl, forPrinting);
                     }
                 }
                 return true;
@@ -353,9 +334,9 @@ namespace BlueControls.ItemCollection {
             return did;
         }
 
-        public void ParseVariable(RowItem row) {
+        public void ParseVariable(RowItem? row) {
             if (row != null) {
-                (_, _, var script) = row.DoAutomatic("export");
+                var (_, _, script) = row.DoAutomatic("export");
                 if (script == null) { return; }
                 foreach (var thisV in script.Variablen) {
                     ParseVariable(script, thisV);
@@ -369,11 +350,9 @@ namespace BlueControls.ItemCollection {
             if (item == null || !Contains(item)) { return; }
             base.Remove(item);
             if (string.IsNullOrEmpty(item.Gruppenzugehörigkeit)) { return; }
-            foreach (var ThisToo in this) {
-                if (item.Gruppenzugehörigkeit.ToLower() == ThisToo.Gruppenzugehörigkeit?.ToLower()) {
-                    Remove(ThisToo);
-                    return; // Wird eh eine Kettenreaktion ausgelöst -  und der Iteraor hier wird beschädigt
-                }
+            foreach (var thisToo in this.Where(thisToo => item.Gruppenzugehörigkeit.ToLower() == thisToo.Gruppenzugehörigkeit?.ToLower())) {
+                Remove(thisToo);
+                return; // Wird eh eine Kettenreaktion ausgelöst -  und der Iteraor hier wird beschädigt
             }
         }
 
@@ -456,7 +435,7 @@ namespace BlueControls.ItemCollection {
             OnDoInvalidate();
         }
 
-        public Bitmap ToBitmap(float scale) {
+        public Bitmap? ToBitmap(float scale) {
             var r = MaxBounds(null);
             if (r.Width == 0) { return null; }
 
@@ -476,64 +455,64 @@ namespace BlueControls.ItemCollection {
 
             Bitmap I = new((int)(r.Width * scale), (int)(r.Height * scale));
 
-            using (var gr = Graphics.FromImage(I)) {
-                gr.Clear(BackColor);
-                if (!DrawCreativePadTo(gr, I.Size, enStates.Standard, scale, r.Left * scale, r.Top * scale, null, true)) {
-                    return ToBitmap(scale);
-                }
+            using var gr = Graphics.FromImage(I);
+            gr.Clear(BackColor);
+            if (!DrawCreativePadTo(gr, I.Size, enStates.Standard, scale, r.Left * scale, r.Top * scale, null, true)) {
+                return ToBitmap(scale);
             }
+
             return I;
         }
 
         public new string ToString() {
             var t = "{";
-            if (!string.IsNullOrEmpty(ID)) { t = t + "ID=" + ID.ToNonCritical() + ", "; }
+            if (!string.IsNullOrEmpty(Id)) { t = t + "ID=" + Id.ToNonCritical() + ", "; }
             if (!string.IsNullOrEmpty(Caption)) { t = t + "Caption=" + Caption.ToNonCritical() + ", "; }
             if (SheetStyle != null) { t = t + "Style=" + SheetStyle.CellFirstString().ToNonCritical() + ", "; }
             if (SheetStyleScale < 0.1d) { SheetStyleScale = 1.0f; }
             t = t + "BackColor=" + BackColor.ToArgb() + ", ";
             if (Math.Abs(SheetStyleScale - 1) > 0.001d) { t = t + "FontScale=" + SheetStyleScale + ", "; }
-            if (SheetSizeInMM.Width > 0 && SheetSizeInMM.Height > 0) {
-                t = t + "SheetSize=" + SheetSizeInMM + ", ";
-                t = t + "PrintArea=" + RandinMM + ", ";
+            if (SheetSizeInMm.Width > 0 && SheetSizeInMm.Height > 0) {
+                t = t + "SheetSize=" + SheetSizeInMm + ", ";
+                t = t + "PrintArea=" + RandinMm + ", ";
             }
             //t = t + "DPI=" + DPI + ", "; // TODO: Nach Update wieder aktivieren
             t += "Items={";
-            foreach (var Thisitem in this) {
-                if (Thisitem != null) {
-                    t = t + "Item=" + Thisitem.ToString() + ", ";
+            foreach (var thisitem in this) {
+                if (thisitem != null) {
+                    t = t + "Item=" + thisitem + ", ";
                 }
             }
             t = t.TrimEnd(", ") + "}, ";
-            t = t + "SnapMode=" + ((int)_SnapMode).ToString() + ", ";
-            t = t + "GridShow=" + _GridShow + ", ";
-            t = t + "GridSnap=" + _Gridsnap + ", ";
+            t = t + "SnapMode=" + ((int)_snapMode) + ", ";
+            t = t + "GridShow=" + _gridShow + ", ";
+            t = t + "GridSnap=" + _gridsnap + ", ";
             return t.TrimEnd(", ") + "}";
         }
 
-        internal bool DrawCreativePadTo(Graphics gr, Size sizeOfParentControl, enStates state, float zoom, float shiftX, float shiftY, List<BasicPadItem> visibleItems, bool showinprintmode) {
+        internal bool DrawCreativePadTo(Graphics gr, Size sizeOfParentControl, enStates state, float zoom, float shiftX, float shiftY, List<BasicPadItem>? visibleItems, bool showinprintmode) {
             try {
                 gr.PixelOffsetMode = PixelOffsetMode.None;
 
                 #region Hintergrund und evtl. Zeichenbereich
 
-                if (SheetSizeInMM.Width > 0 && SheetSizeInMM.Height > 0) {
+                if (SheetSizeInMm.Width > 0 && SheetSizeInMm.Height > 0) {
                     //Skin.Draw_Back(gr, enDesign.Table_And_Pad, state, DisplayRectangle, this, true);
-                    var SSW = (float)Math.Round(Converter.mmToPixel(SheetSizeInMM.Width, DPI), 1);
-                    var SSH = (float)Math.Round(Converter.mmToPixel(SheetSizeInMM.Height, DPI), 1);
-                    var LO = new PointM(0f, 0f).ZoomAndMove(zoom, shiftX, shiftY);
-                    var RU = new PointM(SSW, SSH).ZoomAndMove(zoom, shiftX, shiftY);
+                    var ssw = (float)Math.Round(Converter.mmToPixel(SheetSizeInMm.Width, Dpi), 1);
+                    var ssh = (float)Math.Round(Converter.mmToPixel(SheetSizeInMm.Height, Dpi), 1);
+                    var lo = new PointM(0f, 0f).ZoomAndMove(zoom, shiftX, shiftY);
+                    var ru = new PointM(ssw, ssh).ZoomAndMove(zoom, shiftX, shiftY);
 
                     if (BackColor.A > 0) {
-                        Rectangle R = new((int)LO.X, (int)LO.Y, (int)(RU.X - LO.X), (int)(RU.Y - LO.Y));
-                        gr.FillRectangle(new SolidBrush(BackColor), R);
+                        Rectangle r = new((int)lo.X, (int)lo.Y, (int)(ru.X - lo.X), (int)(ru.Y - lo.Y));
+                        gr.FillRectangle(new SolidBrush(BackColor), r);
                     }
 
                     if (!showinprintmode) {
-                        var rLO = new PointM(P_rLO.X, P_rLO.Y).ZoomAndMove(zoom, shiftX, shiftY);
-                        var rRU = new PointM(P_rRU.X, P_rRU.Y).ZoomAndMove(zoom, shiftX, shiftY);
-                        Rectangle Rr = new((int)rLO.X, (int)rLO.Y, (int)(rRU.X - rLO.X), (int)(rRU.Y - rLO.Y));
-                        gr.DrawRectangle(ZoomPad.PenGray, Rr);
+                        var rLo = new PointM(PRLo.X, PRLo.Y).ZoomAndMove(zoom, shiftX, shiftY);
+                        var rRu = new PointM(PRRu.X, PRRu.Y).ZoomAndMove(zoom, shiftX, shiftY);
+                        Rectangle rr = new((int)rLo.X, (int)rLo.Y, (int)(rRu.X - rLo.X), (int)(rRu.Y - rLo.Y));
+                        gr.DrawRectangle(ZoomPad.PenGray, rr);
                     }
                 } else {
                     if (BackColor.A > 0) {
@@ -545,9 +524,9 @@ namespace BlueControls.ItemCollection {
 
                 #region Grid
 
-                if (_GridShow > 0.1) {
+                if (_gridShow > 0.1) {
                     var po = new PointM(0, 0).ZoomAndMove(zoom, shiftX, shiftY);
-                    var mo = Converter.mmToPixel(_GridShow, DPI) * zoom;
+                    var mo = Converter.mmToPixel(_gridShow, Dpi) * zoom;
 
                     var p = new Pen(Color.FromArgb(10, 0, 0, 0));
                     float ex = 0;
@@ -589,36 +568,36 @@ namespace BlueControls.ItemCollection {
             return true;
         }
 
-        internal Rectangle DruckbereichRect() => P_rLO == null ? new Rectangle(0, 0, 0, 0) : new Rectangle((int)P_rLO.X, (int)P_rLO.Y, (int)(P_rRU.X - P_rLO.X), (int)(P_rRU.Y - P_rLO.Y));
+        internal Rectangle DruckbereichRect() => PRLo == null ? new Rectangle(0, 0, 0, 0) : new Rectangle((int)PRLo.X, (int)PRLo.Y, (int)(PRRu.X - PRLo.X), (int)(PRRu.Y - PRLo.Y));
 
-        internal void InDenHintergrund(BasicPadItem ThisItem) {
-            if (IndexOf(ThisItem) == 0) { return; }
-            var g1 = ThisItem.Gruppenzugehörigkeit;
-            ThisItem.Gruppenzugehörigkeit = string.Empty;
-            Remove(ThisItem);
-            Insert(0, ThisItem);
-            ThisItem.Gruppenzugehörigkeit = g1;
+        internal void InDenHintergrund(BasicPadItem thisItem) {
+            if (IndexOf(thisItem) == 0) { return; }
+            var g1 = thisItem.Gruppenzugehörigkeit;
+            thisItem.Gruppenzugehörigkeit = string.Empty;
+            Remove(thisItem);
+            Insert(0, thisItem);
+            thisItem.Gruppenzugehörigkeit = g1;
             OnDoInvalidate();
         }
 
-        internal void InDenVordergrund(BasicPadItem ThisItem) {
-            if (IndexOf(ThisItem) == Count - 1) { return; }
-            var g1 = ThisItem.Gruppenzugehörigkeit;
-            ThisItem.Gruppenzugehörigkeit = string.Empty;
-            Remove(ThisItem);
-            Add(ThisItem);
-            ThisItem.Gruppenzugehörigkeit = g1;
+        internal void InDenVordergrund(BasicPadItem thisItem) {
+            if (IndexOf(thisItem) == Count - 1) { return; }
+            var g1 = thisItem.Gruppenzugehörigkeit;
+            thisItem.Gruppenzugehörigkeit = string.Empty;
+            Remove(thisItem);
+            Add(thisItem);
+            thisItem.Gruppenzugehörigkeit = g1;
             OnDoInvalidate();
         }
 
-        internal RectangleF MaxBounds(List<BasicPadItem>? ZoomItems) {
-            var r = Count == 0 ? new RectangleF(0, 0, 0, 0) : MaximumBounds(ZoomItems);
-            if (SheetSizeInMM.Width > 0 && SheetSizeInMM.Height > 0) {
-                var X1 = Math.Min(r.Left, 0);
+        internal RectangleF MaxBounds(List<BasicPadItem>? zoomItems) {
+            var r = Count == 0 ? new RectangleF(0, 0, 0, 0) : MaximumBounds(zoomItems);
+            if (SheetSizeInMm.Width > 0 && SheetSizeInMm.Height > 0) {
+                var x1 = Math.Min(r.Left, 0);
                 var y1 = Math.Min(r.Top, 0);
-                var x2 = Math.Max(r.Right, Converter.mmToPixel(SheetSizeInMM.Width, DPI));
-                var y2 = Math.Max(r.Bottom, Converter.mmToPixel(SheetSizeInMM.Height, DPI));
-                return new RectangleF(X1, y1, x2 - X1, y2 - y1);
+                var x2 = Math.Max(r.Right, Converter.mmToPixel(SheetSizeInMm.Width, Dpi));
+                var y2 = Math.Max(r.Bottom, Converter.mmToPixel(SheetSizeInMm.Height, Dpi));
+                return new RectangleF(x1, y1, x2 - x1, y2 - y1);
             }
             return r;
         }
@@ -652,35 +631,35 @@ namespace BlueControls.ItemCollection {
         }
 
         private void GenPoints() {
-            if (Math.Abs(_SheetSizeInMM.Width) < 0.001 || Math.Abs(_SheetSizeInMM.Height) < 0.001) {
-                if (P_rLO != null) {
-                    P_rLO.Parent = null;
-                    P_rLO = null;
-                    P_rRO.Parent = null;
-                    P_rRO = null;
-                    P_rRU.Parent = null;
-                    P_rRU = null;
-                    P_rLU.Parent = null;
-                    P_rLU = null;
+            if (Math.Abs(_sheetSizeInMm.Width) < 0.001 || Math.Abs(_sheetSizeInMm.Height) < 0.001) {
+                if (PRLo != null) {
+                    PRLo.Parent = null;
+                    PRLo = null;
+                    PRRo.Parent = null;
+                    PRRo = null;
+                    PRRu.Parent = null;
+                    PRRu = null;
+                    PRLu.Parent = null;
+                    PRLu = null;
                 }
                 return;
             }
-            if (P_rLO == null) {
-                P_rLO = new PointM(this, "Druckbereich LO", 0, 0);
-                P_rRO = new PointM(this, "Druckbereich RO", 0, 0);
-                P_rRU = new PointM(this, "Druckbereich RU", 0, 0);
-                P_rLU = new PointM(this, "Druckbereich LU", 0, 0);
+            if (PRLo == null) {
+                PRLo = new PointM(this, "Druckbereich LO", 0, 0);
+                PRRo = new PointM(this, "Druckbereich RO", 0, 0);
+                PRRu = new PointM(this, "Druckbereich RU", 0, 0);
+                PRLu = new PointM(this, "Druckbereich LU", 0, 0);
             }
-            var SSW = (float)Math.Round(Converter.mmToPixel(_SheetSizeInMM.Width, DPI), 1);
-            var SSH = (float)Math.Round(Converter.mmToPixel(_SheetSizeInMM.Height, DPI), 1);
-            var rr = (float)Math.Round(Converter.mmToPixel(_RandinMM.Right, DPI), 1);
-            var rl = (float)Math.Round(Converter.mmToPixel(_RandinMM.Left, DPI), 1);
-            var ro = (float)Math.Round(Converter.mmToPixel(_RandinMM.Top, DPI), 1);
-            var ru = (float)Math.Round(Converter.mmToPixel(_RandinMM.Bottom, DPI), 1);
-            P_rLO.SetTo(rl, ro);
-            P_rRO.SetTo(SSW - rr, ro);
-            P_rRU.SetTo(SSW - rr, SSH - ru);
-            P_rLU.SetTo(rl, SSH - ru);
+            var ssw = (float)Math.Round(Converter.mmToPixel(_sheetSizeInMm.Width, Dpi), 1);
+            var ssh = (float)Math.Round(Converter.mmToPixel(_sheetSizeInMm.Height, Dpi), 1);
+            var rr = (float)Math.Round(Converter.mmToPixel(_randinMm.Right, Dpi), 1);
+            var rl = (float)Math.Round(Converter.mmToPixel(_randinMm.Left, Dpi), 1);
+            var ro = (float)Math.Round(Converter.mmToPixel(_randinMm.Top, Dpi), 1);
+            var ru = (float)Math.Round(Converter.mmToPixel(_randinMm.Bottom, Dpi), 1);
+            PRLo.SetTo(rl, ro);
+            PRRo.SetTo(ssw - rr, ro);
+            PRRu.SetTo(ssw - rr, ssh - ru);
+            PRLu.SetTo(rl, ssh - ru);
             OnDoInvalidate();
             OnDoInvalidate();
         }
@@ -691,23 +670,23 @@ namespace BlueControls.ItemCollection {
             var y1 = float.MaxValue;
             var x2 = float.MinValue;
             var y2 = float.MinValue;
-            var Done = false;
-            foreach (var ThisItem in this) {
-                if (ThisItem != null) {
-                    if (zoomItems == null || zoomItems.Contains(ThisItem)) {
-                        var UA = ThisItem.ZoomToArea();
-                        x1 = Math.Min(x1, UA.Left);
-                        y1 = Math.Min(y1, UA.Top);
-                        x2 = Math.Max(x2, UA.Right);
-                        y2 = Math.Max(y2, UA.Bottom);
-                        Done = true;
+            var done = false;
+            foreach (var thisItem in this) {
+                if (thisItem != null) {
+                    if (zoomItems == null || zoomItems.Contains(thisItem)) {
+                        var ua = thisItem.ZoomToArea();
+                        x1 = Math.Min(x1, ua.Left);
+                        y1 = Math.Min(y1, ua.Top);
+                        x2 = Math.Max(x2, ua.Right);
+                        y2 = Math.Max(y2, ua.Bottom);
+                        done = true;
                     }
                 }
             }
-            return !Done ? RectangleF.Empty : new RectangleF(x1, y1, x2 - x1, y2 - y1);
+            return !done ? RectangleF.Empty : new RectangleF(x1, y1, x2 - x1, y2 - y1);
         }
 
-        private void ParseItems(string ToParse) {
+        private void ParseItems(string toParse) {
             //ToParse = ToParse.Replace("}, Item={ClassID=TEXT", ", Item={ClassID=TEXT");
             //ToParse = ToParse.Replace(", Item={ClassID=TEXT", "}, Item={ClassID=TEXT");
             //ToParse = ToParse.Replace(", }", "}");
@@ -715,7 +694,7 @@ namespace BlueControls.ItemCollection {
 
             //ToParse = "{" + ToParse.Substring(tmp);
 
-            foreach (var pair in ToParse.GetAllTags()) {
+            foreach (var pair in toParse.GetAllTags()) {
                 switch (pair.Key.ToLower()) {
                     //case "sheetsize":
                     //    _SheetSizeInMM = Extensions.SizeFParse(pair.Value);
@@ -761,8 +740,8 @@ namespace BlueControls.ItemCollection {
                         break;
 
                     case "dpi": // TODO: LÖschen 26.02.2020
-                        if (int.Parse(pair.Value) != DPI) {
-                            Develop.DebugPrint("DPI Unterschied: " + DPI + " <> " + pair.Value);
+                        if (int.Parse(pair.Value) != Dpi) {
+                            Develop.DebugPrint("DPI Unterschied: " + Dpi + " <> " + pair.Value);
                         }
                         break;
 

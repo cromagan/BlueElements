@@ -27,6 +27,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Reflection;
+using System.Windows.Forms;
 using static BlueBasics.Polygons;
 
 //  = A3 & ".Design.Add(enStates."&B3&", enKontur."& C3 & ", " &D3&", "&E3&", "&F3&","&G3&", enHintergrundArt."&H3&","&I3&",'"&J3&"','"&K3&"','"&L3&"',enRahmenArt."&M3&",'"&N3&"','"&O3&"','"&P3&"','"&Q3&"','"&R3&"');"
@@ -832,25 +833,25 @@ namespace BlueControls {
         public static readonly Dictionary<enDesign, Dictionary<enStates, clsDesign>> Design = new();
         public static readonly int Padding = 9;
         public static readonly int PaddingSmal = 3;
-        public static readonly float Scale = (float)Math.Round(System.Windows.Forms.SystemInformation.VirtualScreen.Width / System.Windows.SystemParameters.VirtualScreenWidth, 2);
+        public static readonly float Scale = (float)Math.Round(SystemInformation.VirtualScreen.Width / System.Windows.SystemParameters.VirtualScreenWidth, 2);
         public static string DummyStandardFont = "<Name=Arial, Size=10>";
         public static string ErrorFont = "<Name=Arial, Size=8, Color=FF0000>";
-        public static bool inited = false;
-        public static Database StyleDB;
-        internal static Pen Pen_LinieDick;
-        internal static Pen Pen_LinieDünn;
-        internal static Pen Pen_LinieKräftig;
-        private static readonly enImageCodeEffect[] ST = new enImageCodeEffect[1];
+        public static bool Inited;
+        public static Database StyleDb;
+        internal static Pen PenLinieDick;
+        internal static Pen PenLinieDünn;
+        internal static Pen PenLinieKräftig;
+        private static readonly enImageCodeEffect[] St = new enImageCodeEffect[1];
 
         #endregion
 
         #region Methods
 
-        public static enImageCodeEffect AdditionalState(enStates vState) => vState.HasFlag(enStates.Standard_Disabled) ? ST[0] : enImageCodeEffect.Ohne;
+        public static enImageCodeEffect AdditionalState(enStates vState) => vState.HasFlag(enStates.Standard_Disabled) ? St[0] : enImageCodeEffect.Ohne;
 
         public static List<string> AllStyles() {
-            if (StyleDB == null) { InitStyles(); }
-            return StyleDB?.Column[0].Contents();
+            if (StyleDb == null) { InitStyles(); }
+            return StyleDb?.Column[0].Contents();
         }
 
         public static void ChangeDesign(enDesign ds, enStates status, enKontur enKontur, int x1, int y1, int x2, int y2, enHintergrundArt hint, float verlauf, string bc1, string bc2, string bc3, enRahmenArt rahm, string boc1, string boc2, string boc3, string f, string pic) {
@@ -876,9 +877,9 @@ namespace BlueControls {
             }
         }
 
-        public static void Draw_Back(Graphics gr, enDesign design, enStates state, Rectangle r, System.Windows.Forms.Control? control, bool needTransparenz) => Draw_Back(gr, DesignOf(design, state), r, control, needTransparenz);
+        public static void Draw_Back(Graphics gr, enDesign design, enStates state, Rectangle r, Control? control, bool needTransparenz) => Draw_Back(gr, DesignOf(design, state), r, control, needTransparenz);
 
-        public static void Draw_Back(Graphics gr, clsDesign design, Rectangle r, System.Windows.Forms.Control? control, bool needTransparenz) {
+        public static void Draw_Back(Graphics gr, clsDesign design, Rectangle r, Control? control, bool needTransparenz) {
             try {
                 if (design.Need) {
                     if (!needTransparenz) { design.Need = false; }
@@ -953,42 +954,42 @@ namespace BlueControls {
             }
         }
 
-        public static void Draw_Back_Transparent(Graphics gr, Rectangle r, System.Windows.Forms.Control? control) {
+        public static void Draw_Back_Transparent(Graphics gr, Rectangle r, Control? control) {
             if (control?.Parent == null) { return; }
             switch (control.Parent) {
-                case IBackgroundNone _:
+                case IBackgroundNone:
                     Draw_Back_Transparent(gr, r, control.Parent);
                     break;
 
-                case GenericControl TRB:
-                    if (TRB.BitmapOfControl() == null) {
+                case GenericControl trb:
+                    if (trb.BitmapOfControl() == null) {
                         gr.FillRectangle(new SolidBrush(control.Parent.BackColor), r);
                         return;
                     }
-                    gr.DrawImage(TRB.BitmapOfControl(), r, new Rectangle(control.Left + r.Left, control.Top + r.Top, r.Width, r.Height), GraphicsUnit.Pixel);
+                    gr.DrawImage(trb.BitmapOfControl(), r, new Rectangle(control.Left + r.Left, control.Top + r.Top, r.Width, r.Height), GraphicsUnit.Pixel);
                     break;
 
-                case System.Windows.Forms.Form frm:
+                case Form frm:
                     gr.FillRectangle(new SolidBrush(frm.BackColor), r);
                     break;
 
-                case System.Windows.Forms.SplitContainer _:
+                case SplitContainer:
                     Draw_Back_Transparent(gr, r, control.Parent);
                     break;
 
-                case System.Windows.Forms.SplitterPanel _:
+                case SplitterPanel:
                     Draw_Back_Transparent(gr, r, control.Parent);
                     break;
 
-                case System.Windows.Forms.TableLayoutPanel _:
+                case TableLayoutPanel:
                     Draw_Back_Transparent(gr, r, control.Parent);
                     break;
 
-                case System.Windows.Forms.TabPage _: // TabPage leitet sich von Panel ab!
+                case TabPage: // TabPage leitet sich von Panel ab!
                     gr.FillRectangle(new SolidBrush(control.Parent.BackColor), r);
                     break;
 
-                case System.Windows.Forms.Panel _:
+                case Panel:
                     Draw_Back_Transparent(gr, r, control.Parent);
                     break;
 
@@ -998,9 +999,9 @@ namespace BlueControls {
             }
         }
 
-        public static void Draw_Border(Graphics GR, enDesign vDesign, enStates vState, Rectangle r) => Draw_Border(GR, DesignOf(vDesign, vState), r);
+        public static void Draw_Border(Graphics gr, enDesign vDesign, enStates vState, Rectangle r) => Draw_Border(gr, DesignOf(vDesign, vState), r);
 
-        public static void Draw_Border(Graphics GR, clsDesign design, Rectangle r) {
+        public static void Draw_Border(Graphics gr, clsDesign design, Rectangle r) {
             if (design.Kontur == enKontur.Ohne || design.RahmenArt == enRahmenArt.Ohne) { return; }
 
             if (design.Kontur == enKontur.Unbekannt) {
@@ -1016,53 +1017,53 @@ namespace BlueControls {
             if (r.Width < 1 || r.Height < 1) { return; }
 
             // PathX kann durch die ganzen Expand mal zu klein werden, dann wird nothing zurückgegeben
-            GraphicsPath PathX;
-            Pen PenX;
             try {
+                Pen penX;
+                GraphicsPath? pathX;
                 switch (design.RahmenArt) {
                     case enRahmenArt.Solide_1px:
-                        PathX = Kontur(design.Kontur, r);
-                        PenX = new Pen(design.BorderColor1);
-                        if (PathX != null) { GR.DrawPath(PenX, PathX); }
+                        pathX = Kontur(design.Kontur, r);
+                        penX = new Pen(design.BorderColor1);
+                        if (pathX != null) { gr.DrawPath(penX, pathX); }
                         break;
 
                     case enRahmenArt.Solide_1px_FocusDotLine:
-                        PathX = Kontur(design.Kontur, r);
-                        PenX = new Pen(design.BorderColor1);
-                        GR.DrawPath(PenX, PathX);
+                        pathX = Kontur(design.Kontur, r);
+                        penX = new Pen(design.BorderColor1);
+                        gr.DrawPath(penX, pathX);
                         r.Inflate(-3, -3);
-                        PathX = Kontur(design.Kontur, r);
-                        PenX = new Pen(design.BorderColor3) {
+                        pathX = Kontur(design.Kontur, r);
+                        penX = new Pen(design.BorderColor3) {
                             DashStyle = DashStyle.Dot
                         };
-                        if (PathX != null) { GR.DrawPath(PenX, PathX); }
+                        if (pathX != null) { gr.DrawPath(penX, pathX); }
                         break;
 
                     case enRahmenArt.FocusDotLine:
-                        PenX = new Pen(design.BorderColor3) {
+                        penX = new Pen(design.BorderColor3) {
                             DashStyle = DashStyle.Dot
                         };
                         r.Inflate(-3, -3);
-                        PathX = Kontur(design.Kontur, r);
-                        if (PathX != null) { GR.DrawPath(PenX, PathX); }
+                        pathX = Kontur(design.Kontur, r);
+                        if (pathX != null) { gr.DrawPath(penX, pathX); }
                         break;
 
                     case enRahmenArt.Solide_3px:
-                        PathX = Kontur(design.Kontur, r);
-                        PenX = new Pen(design.BorderColor1, 3);
-                        if (PathX != null) { GR.DrawPath(PenX, PathX); }
+                        pathX = Kontur(design.Kontur, r);
+                        penX = new Pen(design.BorderColor1, 3);
+                        if (pathX != null) { gr.DrawPath(penX, pathX); }
                         break;
 
                     case enRahmenArt.Solide_21px:
-                        PathX = Kontur(design.Kontur, r);
-                        PenX = new Pen(design.BorderColor1, 21);
-                        if (PathX != null) { GR.DrawPath(PenX, PathX); }
+                        pathX = Kontur(design.Kontur, r);
+                        penX = new Pen(design.BorderColor1, 21);
+                        if (pathX != null) { gr.DrawPath(penX, pathX); }
                         break;
 
                     default:
-                        PathX = Kontur(design.Kontur, r);
-                        PenX = new Pen(Color.Red);
-                        if (PathX != null) { GR.DrawPath(PenX, PathX); }
+                        pathX = Kontur(design.Kontur, r);
+                        penX = new Pen(Color.Red);
+                        if (pathX != null) { gr.DrawPath(penX, pathX); }
                         Develop.DebugPrint(design.RahmenArt);
                         break;
                 }
@@ -1083,7 +1084,7 @@ namespace BlueControls {
         /// <param name="fitInRect"></param>
         /// <param name="child"></param>
         /// <param name="deleteBack"></param>
-        public static void Draw_FormatedText(Graphics gr, string txt, enDesign design, enStates state, QuickImage? imageCode, enAlignment align, Rectangle fitInRect, System.Windows.Forms.Control? child, bool deleteBack, bool translate) => Draw_FormatedText(gr, txt, imageCode, DesignOf(design, state), align, fitInRect, child, deleteBack, translate);
+        public static void Draw_FormatedText(Graphics gr, string txt, enDesign design, enStates state, QuickImage? imageCode, enAlignment align, Rectangle fitInRect, Control? child, bool deleteBack, bool translate) => Draw_FormatedText(gr, txt, imageCode, DesignOf(design, state), align, fitInRect, child, deleteBack, translate);
 
         //private static void Draw_Border_DuoColor(Graphics GR, RowItem Row, Rectangle r, bool NurOben) {
         //    var c1 = Color.FromArgb(Value(Row, col_Color_Border_2, 0));
@@ -1111,9 +1112,9 @@ namespace BlueControls {
         /// <param name="fitInRect"></param>
         /// <param name="child"></param>
         /// <param name="deleteBack"></param>
-        public static void Draw_FormatedText(Graphics gr, string txt, QuickImage qi, clsDesign design, enAlignment align, Rectangle fitInRect, System.Windows.Forms.Control child, bool deleteBack, bool translate) {
+        public static void Draw_FormatedText(Graphics gr, string txt, QuickImage? qi, clsDesign design, enAlignment align, Rectangle fitInRect, Control? child, bool deleteBack, bool translate) {
             if (string.IsNullOrEmpty(txt) && qi == null) { return; }
-            QuickImage tmpImage = null;
+            QuickImage? tmpImage = null;
             if (qi != null) { tmpImage = QuickImage.Get(qi, AdditionalState(design.Status)); }
             Draw_FormatedText(gr, txt, tmpImage, align, fitInRect, child, deleteBack, design.bFont, translate);
         }
@@ -1126,45 +1127,45 @@ namespace BlueControls {
         /// <param name="qi"></param>
         /// <param name="align"></param>
         /// <param name="fitInRect"></param>
-        /// <param name="Child"></param>
+        /// <param name="child"></param>
         /// <param name="deleteBack"></param>
         /// <param name="bFont"></param>
-        public static void Draw_FormatedText(Graphics gr, string txt, QuickImage? qi, enAlignment align, Rectangle fitInRect, System.Windows.Forms.Control Child, bool deleteBack, BlueFont bFont, bool translate) {
+        public static void Draw_FormatedText(Graphics gr, string txt, QuickImage? qi, enAlignment align, Rectangle fitInRect, Control? child, bool deleteBack, BlueFont? bFont, bool translate) {
             var pSize = SizeF.Empty;
             var tSize = SizeF.Empty;
-            float XP = 0;
-            float YP1 = 0;
-            float YP2 = 0;
+            float xp = 0;
+            float yp1 = 0;
+            float yp2 = 0;
             if (qi != null) { pSize = qi.Size; }
             if (LanguageTool.Translation != null) { txt = LanguageTool.DoTranslate(txt, translate); }
             if (bFont != null) {
                 if (fitInRect.Width > 0) { txt = bFont.TrimByWidth(txt, fitInRect.Width - pSize.Width); }
                 tSize = gr.MeasureString(txt, bFont.Font());
             }
-            if (align.HasFlag(enAlignment.Right)) { XP = fitInRect.Width - pSize.Width - tSize.Width; }
-            if (align.HasFlag(enAlignment.HorizontalCenter)) { XP = (float)((fitInRect.Width - pSize.Width - tSize.Width) / 2.0); }
+            if (align.HasFlag(enAlignment.Right)) { xp = fitInRect.Width - pSize.Width - tSize.Width; }
+            if (align.HasFlag(enAlignment.HorizontalCenter)) { xp = (float)((fitInRect.Width - pSize.Width - tSize.Width) / 2.0); }
             if (align.HasFlag(enAlignment.VerticalCenter)) {
-                YP1 = (float)((fitInRect.Height - pSize.Height) / 2.0);
-                YP2 = (float)((fitInRect.Height - tSize.Height) / 2.0);
+                yp1 = (float)((fitInRect.Height - pSize.Height) / 2.0);
+                yp2 = (float)((fitInRect.Height - tSize.Height) / 2.0);
             }
             if (align.HasFlag(enAlignment.Bottom)) {
-                YP1 = fitInRect.Height - pSize.Height;
-                YP2 = fitInRect.Height - tSize.Height;
+                yp1 = fitInRect.Height - pSize.Height;
+                yp2 = fitInRect.Height - tSize.Height;
             }
             if (deleteBack) {
-                if (!string.IsNullOrEmpty(txt)) { Draw_Back_Transparent(gr, new Rectangle((int)(fitInRect.X + pSize.Width + XP - 1), (int)(fitInRect.Y + YP2 - 1), (int)(tSize.Width + 2), (int)(tSize.Height + 2)), Child); }
-                if (qi != null) { Draw_Back_Transparent(gr, new Rectangle((int)(fitInRect.X + XP), (int)(fitInRect.Y + YP1), (int)pSize.Width, (int)pSize.Height), Child); }
+                if (!string.IsNullOrEmpty(txt)) { Draw_Back_Transparent(gr, new Rectangle((int)(fitInRect.X + pSize.Width + xp - 1), (int)(fitInRect.Y + yp2 - 1), (int)(tSize.Width + 2), (int)(tSize.Height + 2)), child); }
+                if (qi != null) { Draw_Back_Transparent(gr, new Rectangle((int)(fitInRect.X + xp), (int)(fitInRect.Y + yp1), (int)pSize.Width, (int)pSize.Height), child); }
             }
             try {
-                if (qi != null) { gr.DrawImage(qi, (int)(fitInRect.X + XP), (int)(fitInRect.Y + YP1)); }
-                if (!string.IsNullOrEmpty(txt)) { bFont.DrawString(gr, txt, fitInRect.X + pSize.Width + XP, fitInRect.Y + YP2); }
+                if (qi != null) { gr.DrawImage(qi, (int)(fitInRect.X + xp), (int)(fitInRect.Y + yp1)); }
+                if (!string.IsNullOrEmpty(txt)) { bFont.DrawString(gr, txt, fitInRect.X + pSize.Width + xp, fitInRect.Y + yp2); }
             } catch (Exception) {
                 // es kommt selten vor, dass das Graphics-Objekt an anderer Stelle verwendet wird. Was immer das auch heißen mag...
                 //Develop.DebugPrint(ex);
             }
         }
 
-        public static Size FormatedText_NeededSize(string text, QuickImage? image, BlueFont font, int minSie) {
+        public static Size FormatedText_NeededSize(string text, QuickImage? image, BlueFont? font, int minSie) {
             try {
                 var pSize = SizeF.Empty;
                 var tSize = SizeF.Empty;
@@ -1182,31 +1183,31 @@ namespace BlueControls {
             }
         }
 
-        public static BlueFont GetBlueFont(PadStyles format, RowItem rowOfStyle) {
-            if (StyleDB == null) { InitStyles(); }
-            return StyleDB == null || rowOfStyle == null ? BlueFont.Get(ErrorFont) : GetBlueFont(StyleDB, ((int)format).ToString(), rowOfStyle);
+        public static BlueFont? GetBlueFont(PadStyles format, RowItem? rowOfStyle) {
+            if (StyleDb == null) { InitStyles(); }
+            return StyleDb == null || rowOfStyle == null ? BlueFont.Get(ErrorFont) : GetBlueFont(StyleDb, ((int)format).ToString(), rowOfStyle);
         }
 
-        public static BlueFont GetBlueFont(Database styleDB, string column, RowItem row) => GetBlueFont(styleDB, styleDB.Column[column], row);
+        public static BlueFont? GetBlueFont(Database styleDb, string column, RowItem? row) => GetBlueFont(styleDb, styleDb.Column[column], row);
 
-        public static BlueFont GetBlueFont(Database styleDB, ColumnItem column, RowItem row) {
-            var _String = styleDB.Cell.GetString(column, row);
-            if (string.IsNullOrEmpty(_String)) {
-                Develop.DebugPrint("Schrift nicht definiert: " + styleDB.Filename + " - " + column.Name + " - " + row.CellFirstString());
+        public static BlueFont? GetBlueFont(Database styleDb, ColumnItem? column, RowItem? row) {
+            var @string = styleDb.Cell.GetString(column, row);
+            if (string.IsNullOrEmpty(@string)) {
+                Develop.DebugPrint("Schrift nicht definiert: " + styleDb.Filename + " - " + column.Name + " - " + row.CellFirstString());
                 return null;
             }
-            return BlueFont.Get(_String);
+            return BlueFont.Get(@string);
         }
 
-        public static BlueFont GetBlueFont(enDesign design, enStates state) => DesignOf(design, state).bFont;
+        public static BlueFont? GetBlueFont(enDesign design, enStates state) => DesignOf(design, state).bFont;
 
         /// <summary>
         /// Gibt eine Liste aller Fonts zurück, die mit dem gewählten Sheetstyle möglich sind.
         /// </summary>
         /// <param name="sheetStyle"></param>
         /// <returns></returns>
-        public static ItemCollectionList GetFonts(RowItem sheetStyle) {
-            ItemCollectionList Rahms = new()
+        public static ItemCollectionList GetFonts(RowItem? sheetStyle) {
+            ItemCollectionList rahms = new()
             {
                 //   Rahms.Add(New ItemCollection.TextListItem(CInt(PadStyles.Undefiniert).ToString, "Ohne Rahmen", enImageCode.Kreuz))
                 { "Haupt-Überschrift", ((int)PadStyles.Style_Überschrift_Haupt).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Haupt, sheetStyle).SymbolForReadableText() },
@@ -1217,27 +1218,27 @@ namespace BlueControls {
                 { "Standard Alternativ-Design", ((int)PadStyles.Style_StandardAlternativ).ToString(), GetBlueFont(PadStyles.Style_StandardAlternativ, sheetStyle).SymbolForReadableText() },
                 { "Kleiner Zusatz", ((int)PadStyles.Style_KleinerZusatz).ToString(), GetBlueFont(PadStyles.Style_KleinerZusatz, sheetStyle).SymbolForReadableText() }
             };
-            Rahms.Sort();
-            return Rahms;
+            rahms.Sort();
+            return rahms;
         }
 
-        public static ItemCollectionList GetRahmenArt(RowItem SheetStyle, bool MitOhne) {
-            ItemCollectionList Rahms = new();
-            if (MitOhne) {
-                Rahms.Add("Ohne Rahmen", ((int)PadStyles.Undefiniert).ToString(), enImageCode.Kreuz);
+        public static ItemCollectionList GetRahmenArt(RowItem? sheetStyle, bool mitOhne) {
+            ItemCollectionList rahms = new();
+            if (mitOhne) {
+                rahms.Add("Ohne Rahmen", ((int)PadStyles.Undefiniert).ToString(), enImageCode.Kreuz);
             }
-            Rahms.Add("Haupt-Überschrift", ((int)PadStyles.Style_Überschrift_Haupt).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Haupt, SheetStyle).SymbolOfLine());
-            Rahms.Add("Untertitel für Haupt-Überschrift", ((int)PadStyles.Style_Überschrift_Untertitel).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Untertitel, SheetStyle).SymbolOfLine());
-            Rahms.Add("Überschrift für Kapitel", ((int)PadStyles.Style_Überschrift_Kapitel).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Kapitel, SheetStyle).SymbolOfLine());
-            Rahms.Add("Standard", ((int)PadStyles.Style_Standard).ToString(), GetBlueFont(PadStyles.Style_Standard, SheetStyle).SymbolOfLine());
-            Rahms.Add("Standard Fett", ((int)PadStyles.Style_StandardFett).ToString(), GetBlueFont(PadStyles.Style_StandardFett, SheetStyle).SymbolOfLine());
-            Rahms.Add("Standard Alternativ-Design", ((int)PadStyles.Style_StandardAlternativ).ToString(), GetBlueFont(PadStyles.Style_StandardAlternativ, SheetStyle).SymbolOfLine());
-            Rahms.Add("Kleiner Zusatz", ((int)PadStyles.Style_KleinerZusatz).ToString(), GetBlueFont(PadStyles.Style_KleinerZusatz, SheetStyle).SymbolOfLine());
-            Rahms.Sort();
-            return Rahms;
+            rahms.Add("Haupt-Überschrift", ((int)PadStyles.Style_Überschrift_Haupt).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Haupt, sheetStyle).SymbolOfLine());
+            rahms.Add("Untertitel für Haupt-Überschrift", ((int)PadStyles.Style_Überschrift_Untertitel).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Untertitel, sheetStyle).SymbolOfLine());
+            rahms.Add("Überschrift für Kapitel", ((int)PadStyles.Style_Überschrift_Kapitel).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Kapitel, sheetStyle).SymbolOfLine());
+            rahms.Add("Standard", ((int)PadStyles.Style_Standard).ToString(), GetBlueFont(PadStyles.Style_Standard, sheetStyle).SymbolOfLine());
+            rahms.Add("Standard Fett", ((int)PadStyles.Style_StandardFett).ToString(), GetBlueFont(PadStyles.Style_StandardFett, sheetStyle).SymbolOfLine());
+            rahms.Add("Standard Alternativ-Design", ((int)PadStyles.Style_StandardAlternativ).ToString(), GetBlueFont(PadStyles.Style_StandardAlternativ, sheetStyle).SymbolOfLine());
+            rahms.Add("Kleiner Zusatz", ((int)PadStyles.Style_KleinerZusatz).ToString(), GetBlueFont(PadStyles.Style_KleinerZusatz, sheetStyle).SymbolOfLine());
+            rahms.Sort();
+            return rahms;
         }
 
-        public static void InitStyles() => StyleDB = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Styles.MDB", "Styles", true, false);
+        public static void InitStyles() => StyleDb = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Styles.MDB", "Styles", true, false);
 
         // Der Abstand von z.B. in Textboxen: Text Linke Koordinate
         public static void LoadSkin() {
@@ -1509,13 +1510,13 @@ namespace BlueControls {
             Design.Add(enDesign.Table_Cell_New, enStates.Standard, enKontur.Ohne, 0, 0, 0, 0, enHintergrundArt.Ohne, 0, "", "", "", enRahmenArt.Ohne, "", "", "", "{Name=Calibri, Size=10[K]15,Italic=True}", "");
             Design.Add(enDesign.Table_Column, enStates.Standard, enKontur.Ohne, 0, 0, 0, 0, enHintergrundArt.Ohne, 0, "", "", "", enRahmenArt.Ohne, "", "", "", "{Name=Calibri, Size=10[K]15,Bold=True}", "");
             Design.Add(enDesign.Table_Cell_Chapter, enStates.Standard, enKontur.Ohne, 0, 0, 0, 0, enHintergrundArt.Ohne, 0, "", "", "", enRahmenArt.Ohne, "", "", "", "{Name=Calibri, Size=15,Bold=True,Underline=True}", "");
-            inited = true;
+            Inited = true;
 
-            ST[0] = enImageCodeEffect.WindowsXPDisabled;
+            St[0] = enImageCodeEffect.WindowsXPDisabled;
 
-            Pen_LinieDünn = new Pen(Color_Border(enDesign.Table_Lines_thin, enStates.Standard));
-            Pen_LinieKräftig = new Pen(Color_Border(enDesign.Table_Lines_thick, enStates.Standard));
-            Pen_LinieDick = new Pen(Color_Border(enDesign.Table_Lines_thick, enStates.Standard), 3);
+            PenLinieDünn = new Pen(Color_Border(enDesign.Table_Lines_thin, enStates.Standard));
+            PenLinieKräftig = new Pen(Color_Border(enDesign.Table_Lines_thick, enStates.Standard));
+            PenLinieDick = new Pen(Color_Border(enDesign.Table_Lines_thick, enStates.Standard), 3);
         }
 
         internal static Color Color_Border(enDesign vDesign, enStates vState) => DesignOf(vDesign, vState).BorderColor1;
@@ -1619,9 +1620,9 @@ namespace BlueControls {
         //    GR.FillRectangle(b, new Rectangle(rect.Left, rect.Top + r2, rect.Width, rect.Height - r));
         //}
 
-        internal static BlueFont GetBlueFont(int design, enStates state, RowItem rowOfStyle, int stufe) => design > 10000 ? GetBlueFont((PadStyles)design, rowOfStyle, stufe) : GetBlueFont((enDesign)design, state, stufe);
+        internal static BlueFont? GetBlueFont(int design, enStates state, RowItem? rowOfStyle, int stufe) => design > 10000 ? GetBlueFont((PadStyles)design, rowOfStyle, stufe) : GetBlueFont((enDesign)design, state, stufe);
 
-        internal static BlueFont GetBlueFont(PadStyles padStyle, RowItem rowOfStyle, int stufe) {
+        internal static BlueFont? GetBlueFont(PadStyles padStyle, RowItem? rowOfStyle, int stufe) {
             switch (stufe) {
                 case 4:
                     return GetBlueFont(padStyle, rowOfStyle);
@@ -1674,7 +1675,7 @@ namespace BlueControls {
             return null;
         }
 
-        internal static BlueFont GetBlueFont(enDesign design, enStates state, int stufe) {
+        internal static BlueFont? GetBlueFont(enDesign design, enStates state, int stufe) {
             if (stufe != 4 && design != enDesign.TextBox) {
                 if (design == enDesign.Form_QuickInfo) { return GetBlueFont(design, state); } // QuickInfo kann jeden Text enthatlten
                 Develop.DebugPrint(enFehlerArt.Warnung, "Design unbekannt: " + (int)design);
@@ -1700,11 +1701,11 @@ namespace BlueControls {
             return GetBlueFont(design, state);
         }
 
-        private static GraphicsPath Kontur(enKontur Kon, Rectangle r) => Kon switch {
+        private static GraphicsPath? Kontur(enKontur kon, Rectangle r) => kon switch {
             enKontur.Rechteck => Poly_Rechteck(r),// GR.SmoothingModex = Drawing2D.SmoothingMode.None
             enKontur.Rechteck_R4 => Poly_RoundRec(r, 4),// GR.SmoothingModex = Drawing2D.SmoothingMode.HighQuality
             enKontur.Ohne => null,
-            _ => Poly_Rechteck(r),//  GR.SmoothingModex = Drawing2D.SmoothingMode.None
+            _ => Poly_Rechteck(r) //  GR.SmoothingModex = Drawing2D.SmoothingMode.None
         };
 
         #endregion

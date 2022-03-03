@@ -30,7 +30,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using static BlueBasics.Extensions;
 using static BlueBasics.FileOperations;
 
 namespace BlueControls.Controls {
@@ -44,9 +43,9 @@ namespace BlueControls.Controls {
         /// ACHTUNG: Das Control wird niemals den Filter selbst ändern.
         /// Der Filter wird nur zur einfacheren Identifizierung der nachfolgenden Steuerelemente behalten.
         /// </summary>
-        public readonly FilterItem Filter = null;
+        public readonly FilterItem Filter;
 
-        public readonly Table TableView = null;
+        public readonly Table TableView;
 
         #endregion
 
@@ -123,9 +122,9 @@ namespace BlueControls.Controls {
             return false;
         }
 
-        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
+        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList? Items, out object? HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
             HotItem = null;
-            if (Filter == null || Filter.Column == null || !Filter.Column.Database.IsAdministrator()) { return; }
+            if (Filter?.Column == null || !Filter.Column.Database.IsAdministrator()) { return; }
 
             HotItem = Filter.Column;
             Items.Add("Spalte bearbeiten", "#ColumnEdit", QuickImage.Get(enImageCode.Spalte));
@@ -142,7 +141,7 @@ namespace BlueControls.Controls {
 
         public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
-        internal ComboBox GetComboBox() {
+        internal ComboBox? GetComboBox() {
             foreach (var thisc in Controls) {
                 if (thisc is ComboBox cbx) {
                     return cbx;
@@ -179,7 +178,7 @@ namespace BlueControls.Controls {
                     btn.ImageCode = "Trichter|16||1";
                     btn.Text = Filter.ReadableText();
                 } else {
-                    if (Filter != null && Filter.SearchValue != null && Filter.SearchValue.Count > 0 && !string.IsNullOrEmpty(Filter.SearchValue[0])) {
+                    if (Filter?.SearchValue != null && Filter.SearchValue.Count > 0 && !string.IsNullOrEmpty(Filter.SearchValue[0])) {
                         btn.ImageCode = "Trichter|16";
                         btn.Text = LanguageTool.DoTranslate("wählen ({0})", true, Filter.SearchValue.Count.ToString());
                     } else {
@@ -225,7 +224,7 @@ namespace BlueControls.Controls {
         private void Filter_Changed(object sender, System.EventArgs e) => UpdateFilterData((Filterleiste)Parent);
 
         private void UpdateFilterData(Filterleiste myParent) {
-            if (Filter == null || Filter.Column == null) {
+            if (Filter?.Column == null) {
                 DisabledReason = "Bezug zum Filter verloren.";
                 Caption = string.Empty;
                 EditType = enEditTypeFormula.None;

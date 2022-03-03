@@ -89,15 +89,15 @@ namespace BlueBasics {
                       (r.Y * zoom) - shiftY,
                       r.Width * zoom,
                       r.Height * zoom);
-            } else {
-                // Beispiel: bei X=0 und Width=5 muss bei einen zoom von 5
-                //               2,5 und 27,5 rauskommen
-                var add = zoom / 2;
-                return new RectangleF((r.X * zoom) - shiftX + add,
-                                      (r.Y * zoom) - shiftY + add,
-                                     r.Width * zoom,
-                                      r.Height * zoom);
             }
+
+            // Beispiel: bei X=0 und Width=5 muss bei einen zoom von 5
+            //               2,5 und 27,5 rauskommen
+            var add = zoom / 2;
+            return new RectangleF((r.X * zoom) - shiftX + add,
+                (r.Y * zoom) - shiftY + add,
+                r.Width * zoom,
+                r.Height * zoom);
         }
 
         #endregion

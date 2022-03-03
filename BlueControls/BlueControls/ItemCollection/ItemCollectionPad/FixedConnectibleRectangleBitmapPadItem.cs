@@ -18,12 +18,9 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
-using BlueControls.Enums;
 using BlueControls.EventArgs;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
-using static BlueBasics.Extensions;
 
 namespace BlueControls.ItemCollection {
 
@@ -33,50 +30,50 @@ namespace BlueControls.ItemCollection {
 
         public readonly ListExt<clsConnection> ConnectsTo = new();
 
-        protected PointM p_L;
+        protected PointM? PL;
 
         /// <summary>
         /// Dieser Punkt bestimmt die ganzen Koordinaten. Die anderen werden nur mitgeschleift
         /// </summary>
-        protected PointM p_LO;
+        protected PointM? PLo;
 
-        protected PointM p_LU;
+        protected PointM? PLu;
 
-        protected PointM p_O;
+        protected PointM? PO;
 
-        protected PointM p_R;
+        protected PointM? PR;
 
-        protected PointM p_RO;
+        protected PointM? PRo;
 
-        protected PointM p_RU;
+        protected PointM? PRu;
 
-        protected PointM p_U;
+        protected PointM? PU;
 
-        private Bitmap? _GeneratedBitmap = null;
-        private bool disposedValue;
+        private bool _disposedValue;
+        private Bitmap? _generatedBitmap;
 
         #endregion
 
         #region Constructors
 
-        public FixedRectangleBitmapPadItem(string internalname) : base(internalname) {
-            p_LO = new PointM(this, "LO", 0, 0);
-            p_RO = new PointM(this, "RO", 0, 0);
-            p_RU = new PointM(this, "RU", 0, 0);
-            p_LU = new PointM(this, "LU", 0, 0);
-            p_L = new PointM(this, "L", 0, 0);
-            p_R = new PointM(this, "R", 0, 0);
-            p_O = new PointM(this, "O", 0, 0);
-            p_U = new PointM(this, "U", 0, 0);
-            MovablePoint.Add(p_LO);
-            MovablePoint.Add(p_RO);
-            MovablePoint.Add(p_LU);
-            MovablePoint.Add(p_RU);
-            MovablePoint.Add(p_L);
-            MovablePoint.Add(p_R);
-            MovablePoint.Add(p_U);
-            MovablePoint.Add(p_O);
-            PointsForSuccesfullyMove.Add(p_LO);
+        protected FixedRectangleBitmapPadItem(string internalname) : base(internalname) {
+            PLo = new PointM(this, "LO", 0, 0);
+            PRo = new PointM(this, "RO", 0, 0);
+            PRu = new PointM(this, "RU", 0, 0);
+            PLu = new PointM(this, "LU", 0, 0);
+            PL = new PointM(this, "L", 0, 0);
+            PR = new PointM(this, "R", 0, 0);
+            PO = new PointM(this, "O", 0, 0);
+            PU = new PointM(this, "U", 0, 0);
+            MovablePoint.Add(PLo);
+            MovablePoint.Add(PRo);
+            MovablePoint.Add(PLu);
+            MovablePoint.Add(PRu);
+            MovablePoint.Add(PL);
+            MovablePoint.Add(PR);
+            MovablePoint.Add(PU);
+            MovablePoint.Add(PO);
+            PointsForSuccesfullyMove.Add(PLo);
 
             ConnectsTo.ItemAdded += ConnectsTo_ItemAdded;
             ConnectsTo.ItemRemoving += ConnectsTo_ItemRemoving;
@@ -91,9 +88,9 @@ namespace BlueControls.ItemCollection {
 
         public Bitmap GeneratedBitmap {
             get {
-                if (_GeneratedBitmap != null) { return _GeneratedBitmap; }
-                _GeneratedBitmap = GeneratePic();
-                return _GeneratedBitmap;
+                if (_generatedBitmap != null) { return _generatedBitmap; }
+                _generatedBitmap = GeneratePic();
+                return _generatedBitmap;
             }
         }
 
@@ -103,7 +100,7 @@ namespace BlueControls.ItemCollection {
 
         public void Dispose() {
             // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-            Dispose(disposing: true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -119,56 +116,56 @@ namespace BlueControls.ItemCollection {
                 y = point.Y;
             }
 
-            if (point == p_LO) {
+            if (point == PLo) {
                 if (e.Y) {
-                    p_RU.Y = y + GeneratedBitmap.Height;
-                    p_O.Y = y;
+                    PRu.Y = y + GeneratedBitmap.Height;
+                    PO.Y = y;
                 }
                 if (e.X) {
-                    p_RU.X = x + GeneratedBitmap.Width;
-                    p_L.X = x;
+                    PRu.X = x + GeneratedBitmap.Width;
+                    PL.X = x;
                 }
             }
 
-            if (point == p_RU) {
+            if (point == PRu) {
                 if (e.X) {
-                    p_LO.X = x - GeneratedBitmap.Width;
-                    p_R.X = x;
+                    PLo.X = x - GeneratedBitmap.Width;
+                    PR.X = x;
                 }
                 if (e.Y) {
-                    p_LO.Y = y - GeneratedBitmap.Height;
-                    p_U.Y = y;
+                    PLo.Y = y - GeneratedBitmap.Height;
+                    PU.Y = y;
                 }
             }
 
-            if (point == p_RO) {
-                if (e.Y) { p_O.Y = y; }
-                if (e.X) { p_R.X = x; }
+            if (point == PRo) {
+                if (e.Y) { PO.Y = y; }
+                if (e.X) { PR.X = x; }
             }
 
-            if (point == p_LU) {
-                if (e.X) { p_L.X = x; }
-                if (e.Y) { p_U.Y = y; }
+            if (point == PLu) {
+                if (e.X) { PL.X = x; }
+                if (e.Y) { PU.Y = y; }
             }
 
-            if (point == p_O && e.Y) {
-                p_LO.Y = y;
-                p_RO.Y = y;
+            if (point == PO && e.Y) {
+                PLo.Y = y;
+                PRo.Y = y;
             }
 
-            if (point == p_U && e.Y) {
-                p_LU.Y = y;
-                p_RU.Y = y;
+            if (point == PU && e.Y) {
+                PLu.Y = y;
+                PRu.Y = y;
             }
 
-            if (point == p_L && e.X) {
-                p_LO.X = x;
-                p_LU.X = x;
+            if (point == PL && e.X) {
+                PLo.X = x;
+                PLu.X = x;
             }
 
-            if (point == p_R && e.X) {
-                p_RO.X = x;
-                p_RU.X = x;
+            if (point == PR && e.X) {
+                PRo.X = x;
+                PRu.X = x;
             }
 
             SizeChanged();
@@ -181,8 +178,8 @@ namespace BlueControls.ItemCollection {
         //    return false;
         //}
         public void RemovePic() {
-            if (_GeneratedBitmap != null) { _GeneratedBitmap.Dispose(); }
-            _GeneratedBitmap = null;
+            _generatedBitmap?.Dispose();
+            _generatedBitmap = null;
         }
 
         //public override bool ParseThis(string tag, string value) {
@@ -191,20 +188,20 @@ namespace BlueControls.ItemCollection {
         //        case "fixsize": // TODO: Entfernt am 24.05.2021
         //            //_größe_fixiert = value.FromPlusMinus();
         //            return true;
-        public void SetLeftTopPoint(float x, float y) => p_LO.SetTo(x, y);
+        public void SetLeftTopPoint(float x, float y) => PLo.SetTo(x, y);
 
         public virtual void SizeChanged() {
             // Punkte immer komplett setzen. Um eventuelle Parsing-Fehler auszugleichen
-            p_L.SetTo(p_LO.X, p_LO.Y + ((p_LU.Y - p_LO.Y) / 2));
-            p_R.SetTo(p_RO.X, p_LO.Y + ((p_LU.Y - p_LO.Y) / 2));
-            p_U.SetTo(p_LO.X + ((p_RO.X - p_LO.X) / 2), p_RU.Y);
-            p_O.SetTo(p_LO.X + ((p_RO.X - p_LO.X) / 2), p_RO.Y);
+            PL.SetTo(PLo.X, PLo.Y + ((PLu.Y - PLo.Y) / 2));
+            PR.SetTo(PRo.X, PLo.Y + ((PLu.Y - PLo.Y) / 2));
+            PU.SetTo(PLo.X + ((PRo.X - PLo.X) / 2), PRu.Y);
+            PO.SetTo(PLo.X + ((PRo.X - PLo.X) / 2), PRo.Y);
         }
 
         protected override RectangleF CalculateUsedArea() {
             var bmp = GeneratedBitmap;
-            if (bmp == null || p_LO == null) { return RectangleF.Empty; }
-            var r = new RectangleF(p_LO.X, p_LO.Y, bmp.Width, bmp.Height);
+            if (bmp == null || PLo == null) { return RectangleF.Empty; }
+            var r = new RectangleF(PLo.X, PLo.Y, bmp.Width, bmp.Height);
 
             if (ConnectsTo == null) { return r; }
 
@@ -217,7 +214,7 @@ namespace BlueControls.ItemCollection {
         }
 
         protected virtual void Dispose(bool disposing) {
-            if (!disposedValue) {
+            if (!_disposedValue) {
                 if (disposing) {
                     // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
                     ConnectsTo.ItemAdded -= ConnectsTo_ItemAdded;
@@ -228,7 +225,7 @@ namespace BlueControls.ItemCollection {
 
                 // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
                 // TODO: Große Felder auf NULL setzen
-                disposedValue = true;
+                _disposedValue = true;
             }
         }
 
@@ -243,7 +240,7 @@ namespace BlueControls.ItemCollection {
             #region Bild zeichnen
 
             try {
-                if (_GeneratedBitmap != null) {
+                if (_generatedBitmap != null) {
                     if (forPrinting) {
                         gr.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
                         gr.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
@@ -251,20 +248,20 @@ namespace BlueControls.ItemCollection {
                         gr.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Low;
                         gr.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
                     }
-                    gr.DrawImage(_GeneratedBitmap, drawingCoordinates);
+                    gr.DrawImage(_generatedBitmap, drawingCoordinates);
                 }
             } catch { }
 
             #endregion
 
-            var Line = 1f;
-            if (zoom > 1) { Line = zoom; }
+            var line = 1f;
+            if (zoom > 1) { line = zoom; }
 
             #region Umrandung Zeichnen
 
             try {
-                if (!forPrinting || _GeneratedBitmap == null) {
-                    gr.DrawRectangle(new Pen(Color.Gray, Line), drawingCoordinates);
+                if (!forPrinting || _generatedBitmap == null) {
+                    gr.DrawRectangle(new Pen(Color.Gray, line), drawingCoordinates);
 
                     if (drawingCoordinates.Width < 1 || drawingCoordinates.Height < 1) {
                         gr.DrawEllipse(new Pen(Color.Gray, 3), drawingCoordinates.Left - 5, drawingCoordinates.Top + 5, 10, 10);
@@ -286,7 +283,7 @@ namespace BlueControls.ItemCollection {
                     var t1 = thisV.Item.UsedArea.NearestLineMiddle(m1).ZoomAndMove(zoom, shiftX, shiftY);
 
                     if (Geometry.GetLenght(t1, t2) > 1) {
-                        gr.DrawLine(new Pen(Color.Gray, Line), t1, t2);
+                        gr.DrawLine(new Pen(Color.Gray, line), t1, t2);
                     }
                 }
             }
@@ -317,7 +314,7 @@ namespace BlueControls.ItemCollection {
         //    p_U.SetTo(p_LO.X + ((p_RO.X - p_LO.X) / 2), p_RU.Y);
         //    p_O.SetTo(p_LO.X + ((p_RO.X - p_LO.X) / 2), p_RO.Y);
         //}
-        protected abstract Bitmap GeneratePic();
+        protected abstract Bitmap? GeneratePic();
 
         protected override void ParseFinished() => SizeChanged();
 

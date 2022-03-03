@@ -33,14 +33,16 @@ namespace BluePaint {
 
         public Tool_Clipping(bool aufnahme) : base() {
             InitializeComponent();
-            if (aufnahme) {
-                CheckMinMax();
-                AutoZ_Click(null, null);
-                ZuschnittOK_Click(null, null);
-                Enabled = false;
-                MessageBox.Show("Automatisch zugeschnitten.");
-                OnCommandForMacro("AutoZuschnitt");
+            if (!aufnahme) {
+                return;
             }
+
+            CheckMinMax();
+            AutoZ_Click(null, null);
+            ZuschnittOK_Click(null, null);
+            Enabled = false;
+            MessageBox.Show("Automatisch zugeschnitten.");
+            OnCommandForMacro("AutoZuschnitt");
         }
 
         #endregion
@@ -48,40 +50,41 @@ namespace BluePaint {
         #region Methods
 
         public void CheckMinMax() {
-            var _Pic = OnNeedCurrentPic();
-            if (_Pic == null) { return; }
-            Links.Maximum = _Pic.Width - 1;
-            Recht.Minimum = -_Pic.Width + 1;
-            Oben.Maximum = _Pic.Height - 1;
-            Unten.Minimum = -_Pic.Height - 1;
+            var pic = OnNeedCurrentPic();
+            if (pic == null) { return; }
+            Links.Maximum = pic.Width - 1;
+            Recht.Minimum = -pic.Width + 1;
+            Oben.Maximum = pic.Height - 1;
+            Unten.Minimum = -pic.Height - 1;
         }
 
-        public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic) {
-            if (OriginalPic == null) { return; }
-            Pen Pen_Blau = new(Color.FromArgb(150, 0, 0, 255));
-            DrawZusatz(e, OriginalPic);
+        public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap? originalPic) {
+            if (originalPic == null) { return; }
+            Pen penBlau = new(Color.FromArgb(150, 0, 0, 255));
+            DrawZusatz(e, originalPic);
             if (e.Current == null) { return; }
-            e.DrawLine(Pen_Blau, e.Current.TrimmedX, -1, e.Current.TrimmedX, OriginalPic.Height);
-            e.DrawLine(Pen_Blau, -1, e.Current.TrimmedY, OriginalPic.Width, e.Current.TrimmedY);
+            e.DrawLine(penBlau, e.Current.TrimmedX, -1, e.Current.TrimmedX, originalPic.Height);
+            e.DrawLine(penBlau, -1, e.Current.TrimmedY, originalPic.Width, e.Current.TrimmedY);
+
             if (e.Current.Button == System.Windows.Forms.MouseButtons.Left && e.MouseDown != null) {
-                e.DrawLine(Pen_Blau, e.MouseDown.X, -1, e.MouseDown.X, OriginalPic.Height);
-                e.DrawLine(Pen_Blau, -1, e.MouseDown.Y, OriginalPic.Width, e.MouseDown.Y);
+                e.DrawLine(penBlau, e.MouseDown.X, -1, e.MouseDown.X, originalPic.Height);
+                e.DrawLine(penBlau, -1, e.MouseDown.Y, originalPic.Width, e.MouseDown.Y);
             }
         }
 
-        public void DrawZusatz(AdditionalDrawing e, Bitmap OriginalPic) {
-            SolidBrush Brush_Blau = new(Color.FromArgb(120, 0, 0, 255));
+        public void DrawZusatz(AdditionalDrawing e, Bitmap? originalPic) {
+            SolidBrush brushBlau = new(Color.FromArgb(120, 0, 0, 255));
             if (Links.Value != 0) {
-                e.FillRectangle(Brush_Blau, new Rectangle(0, 0, Convert.ToInt32(Links.Value), OriginalPic.Height));
+                e.FillRectangle(brushBlau, new Rectangle(0, 0, Convert.ToInt32(Links.Value), originalPic.Height));
             }
             if (Recht.Value != 0) {
-                e.FillRectangle(Brush_Blau, new Rectangle(OriginalPic.Width + Convert.ToInt32(Recht.Value), 0, (int)-Recht.Value, OriginalPic.Height));
+                e.FillRectangle(brushBlau, new Rectangle(originalPic.Width + Convert.ToInt32(Recht.Value), 0, (int)-Recht.Value, originalPic.Height));
             }
             if (Oben.Value != 0) {
-                e.FillRectangle(Brush_Blau, new Rectangle(0, 0, OriginalPic.Width, Convert.ToInt32(Oben.Value)));
+                e.FillRectangle(brushBlau, new Rectangle(0, 0, originalPic.Width, Convert.ToInt32(Oben.Value)));
             }
             if (Unten.Value != 0) {
-                e.FillRectangle(Brush_Blau, new Rectangle(0, OriginalPic.Height + Convert.ToInt32(Unten.Value), OriginalPic.Width, (int)-Unten.Value));
+                e.FillRectangle(brushBlau, new Rectangle(0, originalPic.Height + Convert.ToInt32(Unten.Value), originalPic.Width, (int)-Unten.Value));
             }
         }
 
@@ -98,30 +101,30 @@ namespace BluePaint {
 
         public override string MacroKennung() => "Clipping";
 
-        public override void MouseDown(MouseEventArgs1_1 e, Bitmap OriginalPic) => OnDoInvalidate();
+        public override void MouseDown(MouseEventArgs1_1 e, Bitmap? originalPic) => OnDoInvalidate();
 
-        public override void MouseMove(MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) => OnDoInvalidate();
+        public override void MouseMove(MouseEventArgs1_1DownAndCurrent e, Bitmap? originalPic) => OnDoInvalidate();
 
-        public override void MouseUp(MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) {
-            if (OriginalPic == null) { return; }
+        public override void MouseUp(MouseEventArgs1_1DownAndCurrent e, Bitmap? originalPic) {
+            if (originalPic == null) { return; }
             Links.Value = Math.Min(e.Current.TrimmedX, e.MouseDown.TrimmedX) + 1;
-            Recht.Value = -(OriginalPic.Width - Math.Max(e.Current.TrimmedX, e.MouseDown.TrimmedX));
+            Recht.Value = -(originalPic.Width - Math.Max(e.Current.TrimmedX, e.MouseDown.TrimmedX));
             Oben.Value = Math.Min(e.Current.TrimmedY, e.MouseDown.TrimmedY) + 1;
-            Unten.Value = -(OriginalPic.Height - Math.Max(e.Current.TrimmedY, e.MouseDown.TrimmedY));
+            Unten.Value = -(originalPic.Height - Math.Max(e.Current.TrimmedY, e.MouseDown.TrimmedY));
             ValueChangedByClicking(this, System.EventArgs.Empty);
         }
 
         public override void OnToolChanging() => WollenSieDenZuschnittÜbernehmen();
 
-        public void Set(int Left, int Top, int Right, int Bottom) {
-            if (Left < 0 || Top < 0 || Right > 0 || Bottom > 0) {
+        public void Set(int left, int top, int right, int bottom) {
+            if (left < 0 || top < 0 || right > 0 || bottom > 0) {
                 DebugPrint(enFehlerArt.Warnung, "Fehler in den Angaben");
             }
             CheckMinMax();
-            Links.Value = Left;
-            Oben.Value = Top;
-            Recht.Value = Right;
-            Unten.Value = Bottom;
+            Links.Value = left;
+            Oben.Value = top;
+            Recht.Value = right;
+            Unten.Value = bottom;
         }
 
         public override void ToolFirstShown() {
@@ -129,11 +132,11 @@ namespace BluePaint {
             AutoZ_Click(null, null);
         }
 
-        private void AutoZ_Click(object sender, System.EventArgs e) {
+        private void AutoZ_Click(object? sender, System.EventArgs? e) {
             WollenSieDenZuschnittÜbernehmen();
-            var _Pic = base.OnNeedCurrentPic();
+            var pic = base.OnNeedCurrentPic();
             OnZoomFit();
-            var pa = GetAutoValuesForCrop(_Pic, 0.9);
+            var pa = GetAutoValuesForCrop(pic, 0.9);
             Links.Value = pa.Left;
             Recht.Value = pa.Right;
             Oben.Value = pa.Top;
@@ -149,10 +152,10 @@ namespace BluePaint {
             ZuschnittOK_Click(null, System.EventArgs.Empty);
         }
 
-        private void ZuschnittOK_Click(object sender, System.EventArgs e) {
-            var _Pic = OnNeedCurrentPic();
-            var _BMP2 = Crop(_Pic, (int)Links.Value, (int)Recht.Value, (int)Oben.Value, (int)Unten.Value);
-            OnOverridePic(_BMP2);
+        private void ZuschnittOK_Click(object? sender, System.EventArgs? e) {
+            var pic = OnNeedCurrentPic();
+            var bmp2 = Crop(pic, (int)Links.Value, (int)Recht.Value, (int)Oben.Value, (int)Unten.Value);
+            OnOverridePic(bmp2);
             Links.Value = 0;
             Recht.Value = 0;
             Oben.Value = 0;

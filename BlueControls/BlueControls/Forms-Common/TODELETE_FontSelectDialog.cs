@@ -42,14 +42,16 @@ namespace BlueControls.Forms {
             if (FNList == null) {
                 FNList = new ItemCollectionList();
                 foreach (var f in FontFamily.Families) {
-                    if (!string.IsNullOrEmpty(f.Name)) {
-                        if (f.IsStyleAvailable(FontStyle.Regular)) {
-                            Font fo = new(f.Name, 100);
-                            try {
-                                BlueFont.MeasureString("T", fo);
-                                FNList.Add(string.Empty, f.Name, BlueFont.Get(f, 12).NameInStyle(), true);
-                            } catch (Exception) { }
-                        }
+                    if (string.IsNullOrEmpty(f.Name)) {
+                        continue;
+                    }
+
+                    if (f.IsStyleAvailable(FontStyle.Regular)) {
+                        Font fo = new(f.Name, 100);
+                        try {
+                            BlueFont.MeasureString("T", fo);
+                            FNList.Add(string.Empty, f.Name, BlueFont.Get(f, 12).NameInStyle(), true);
+                        } catch (Exception) { }
                     }
                 }
                 FNList.Sort();
@@ -86,7 +88,7 @@ namespace BlueControls.Forms {
 
         #region Properties
 
-        public new BlueFont Font {
+        public new BlueFont? Font {
             get => BlueFont.Get(FName.Item.Checked()[0].Internal, float.Parse(FSize.Item.Checked()[0].Internal), fFett.Checked, fKursiv.Checked, fUnterstrichen.Checked, fDurchge.Checked, fOutline.Checked, QuickImage.Get(cFarbe.ImageCode).ChangeGreenTo, QuickImage.Get(cRandF.ImageCode).ChangeGreenTo, fKap.Checked, OnlyUpper.Checked, OnlyLow.Checked);
             set {
                 Adding = true;

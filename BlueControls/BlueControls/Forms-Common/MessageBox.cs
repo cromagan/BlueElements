@@ -19,6 +19,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using BlueControls.Extended_Text;
 using System.Collections.Generic;
 using System.Drawing;
 
@@ -28,7 +29,7 @@ namespace BlueControls.Forms {
 
         #region Fields
 
-        private Button? Pressed = null;
+        private Button? Pressed;
 
         #endregion
 

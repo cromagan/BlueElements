@@ -21,13 +21,13 @@ using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
+using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueScript;
 using FastColoredTextBoxNS;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
 using static BlueBasics.Extensions;
 
 namespace BlueControls {
@@ -38,8 +38,8 @@ namespace BlueControls {
 
         private frmBefehlsreferenz? _befehlsReferenz;
         private string _LastVariableContent = string.Empty;
-        private string _LastWord = string.Empty;
-        private bool _MenuDone = false;
+        private string? _LastWord = string.Empty;
+        private bool _MenuDone;
         private AutocompleteMenu _PopupMenu;
 
         #endregion
@@ -86,7 +86,7 @@ namespace BlueControls {
             return false;
         }
 
-        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollection.ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
+        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList? Items, out object? HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
             if (!string.IsNullOrEmpty(_LastVariableContent)) {
                 Items.Add("Variableninhalt kopieren");
             }
@@ -106,9 +106,7 @@ namespace BlueControls {
         /// <param name="disposing">True, wenn verwaltete Ressourcen gelöscht werden sollen; andernfalls False.</param>
         protected override void Dispose(bool disposing) {
             if (disposing) {
-                if (components != null) {
-                    components.Dispose();
-                }
+                components?.Dispose();
 
                 if (_befehlsReferenz != null && _befehlsReferenz.Visible) {
                     _befehlsReferenz.Close();
@@ -119,7 +117,7 @@ namespace BlueControls {
             base.Dispose(disposing);
         }
 
-        protected virtual Script GenerateAndDoScript() {
+        protected virtual Script? GenerateAndDoScript() {
             var s = new Script(null);
             s.Parse();
             return s;
@@ -138,11 +136,10 @@ namespace BlueControls {
                     foreach (var thisc in Script.Comands) {
                         items.Add(new SnippetAutocompleteItem(thisc.Syntax + " "));
                         if (thisc.Returns != Skript.Enums.enVariableDataType.Null) {
-                            items.Add(new SnippetAutocompleteItem("var " + thisc.Returns.ToString() + " = " + thisc.Syntax + "; "));
+                            items.Add(new SnippetAutocompleteItem("var " + thisc.Returns + " = " + thisc.Syntax + "; "));
                         }
-                        foreach (var thiscom in thisc.Comand(s)) {
-                            items.Add(new AutocompleteItem(thiscom));
-                        }
+
+                        items.AddRange(thisc.Comand(s).Select(thiscom => new AutocompleteItem(thiscom)));
                     }
                 }
                 //set as autocomplete source
@@ -151,7 +148,7 @@ namespace BlueControls {
         }
 
         protected void WriteVariablesToTable(Script s) {
-            if (s != null && s.Variablen != null) {
+            if (s?.Variablen != null) {
                 foreach (var thisv in s.Variablen) {
                     var ro = tableVariablen.Database.Row.Add(thisv.Name);
                     ro.CellSet("typ", thisv.Type.ToString());
@@ -196,7 +193,7 @@ namespace BlueControls {
             if (string.IsNullOrEmpty(s.Error)) {
                 Message("Erfolgreich, wenn auch IF-Routinen nicht geprüft wurden.");
             } else {
-                Message("Fehler in Zeile: " + s.Line.ToString() + "\r\n" + s.Error + "\r\n >>> " + s.ErrorCode.RestoreEscape());
+                Message("Fehler in Zeile: " + s.Line + "\r\n" + s.Error + "\r\n >>> " + s.ErrorCode.RestoreEscape());
             }
         }
 
@@ -209,12 +206,10 @@ namespace BlueControls {
             x.Column.Add("Inhalt", "I", enVarType.Text, "Inhalt (gekürzte Ansicht)");
             x.Column.Add("Kommentar", "K", enVarType.Text, "Komentar");
 
-            foreach (var ThisColumn in x.Column) {
-                if (string.IsNullOrEmpty(ThisColumn.Identifier)) {
-                    ThisColumn.MultiLine = true;
-                    ThisColumn.TextBearbeitungErlaubt = false;
-                    ThisColumn.DropdownBearbeitungErlaubt = false;
-                }
+            foreach (var ThisColumn in x.Column.Where(ThisColumn => string.IsNullOrEmpty(ThisColumn.Identifier))) {
+                ThisColumn.MultiLine = true;
+                ThisColumn.TextBearbeitungErlaubt = false;
+                ThisColumn.DropdownBearbeitungErlaubt = false;
             }
 
             x.RepairAfterParse();
@@ -235,7 +230,7 @@ namespace BlueControls {
             var sc = Script.ReduceText(txtSkript.Text).ToLower();
             var x = new List<string>() { "sub" + e.Item.Internal.ToLower() + "()" };
 
-            (var pos, var _) = NextText(sc, 0, x, true, false, KlammernStd);
+            var (pos, _) = NextText(sc, 0, x, true, false, KlammernStd);
             if (pos < 1) {
                 MessageBox.Show("Routine " + e.Item.Internal + " nicht gefunden.<br>Skript starten, um diese<br>Liste zu aktualisieren.", enImageCode.Information, "OK");
                 return;
@@ -256,12 +251,10 @@ namespace BlueControls {
             try {
                 _LastWord = string.Empty;
                 _LastVariableContent = string.Empty;
-                foreach (var thisc in Script.Comands) {
-                    if (thisc.Comand(null).Contains(e.HoveredWord, false)) {
-                        e.ToolTipTitle = thisc.Syntax;
-                        e.ToolTipText = thisc.HintText();
-                        return;
-                    }
+                foreach (var thisc in Script.Comands.Where(thisc => thisc.Comand(null).Contains(e.HoveredWord, false))) {
+                    e.ToolTipTitle = thisc.Syntax;
+                    e.ToolTipText = thisc.HintText();
+                    return;
                 }
                 var hoveredWordnew = new Range(txtSkript, e.Place, e.Place).GetFragment("[A-Za-z0-9_]").Text;
                 _LastWord = hoveredWordnew;
@@ -298,10 +291,10 @@ namespace BlueControls {
 
             var pos = 0;
             do {
-                (var stp, _) = NextText(s, pos, st, true, false, KlammernStd);
+                var (stp, _) = NextText(s, pos, st, true, false, KlammernStd);
 
                 if (stp > 0) {
-                    (var endp, _) = NextText(s, stp, en, false, false, KlammernStd);
+                    var (endp, _) = NextText(s, stp, en, false, false, KlammernStd);
 
                     if (endp > stp) {
                         var n = s.Substring(stp + 3, endp - stp - 3);

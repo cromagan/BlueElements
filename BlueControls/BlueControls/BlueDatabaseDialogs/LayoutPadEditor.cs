@@ -39,8 +39,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             Database = database;
             scriptEditor.Database = database;
-            Database.Disposing += Database_Disposing;
-            Database.ShouldICancelSaveOperations += Database_ShouldICancelDiscOperations;
+            if (Database != null) {
+                Database.Disposing += Database_Disposing;
+                Database.ShouldICancelSaveOperations += Database_ShouldICancelDiscOperations;
+            }
+
             befülleLayoutDropdown();
             CheckButtons();
         }
@@ -49,7 +52,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         #region Properties
 
-        public Database? Database { get; private set; }
+        public Database Database { get; private set; }
 
         #endregion
 
@@ -87,13 +90,17 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
-            Database.Disposing -= Database_Disposing;
-            Database.ShouldICancelSaveOperations -= Database_ShouldICancelDiscOperations;
+            if (Database != null) {
+                Database.Disposing -= Database_Disposing;
+                Database.ShouldICancelSaveOperations -= Database_ShouldICancelDiscOperations;
+            }
             SaveCurrentLayout();
             scriptEditor.Database = null;
             Database = null;
             base.OnFormClosing(e);
         }
+
+        private static void Database_ShouldICancelDiscOperations(object sender, CancelEventArgs e) => e.Cancel = true;
 
         private void befülleLayoutDropdown() {
             if (Database != null) {
@@ -104,7 +111,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void btnCopyID_Click(object sender, System.EventArgs e) {
             SaveCurrentLayout();
-            Generic.CopytoClipboard(Pad.Item.ID);
+            Generic.CopytoClipboard(Pad.Item.Id);
             Notification.Show("ID kopiert.", enImageCode.Clipboard);
         }
 
@@ -117,13 +124,13 @@ namespace BlueControls.BlueDatabaseDialogs {
             c.Item.Caption = ex;
             Database.Layouts.Add(c.Item.ToString());
             befülleLayoutDropdown();
-            LoadLayout(c.Item.ID);
+            LoadLayout(c.Item.Id);
             CheckButtons();
         }
 
         private void btnLayoutLöschen_Click(object sender, System.EventArgs e) {
             SaveCurrentLayout();
-            var ind = Database.Layouts.LayoutIDToIndex(Pad.Item.ID);
+            var ind = Database.Layouts.LayoutIDToIndex(Pad.Item.Id);
             if (ind < 0) {
                 MessageBox.Show("Layout kann nur manuell gelöscht werden.");
                 return;
@@ -139,7 +146,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void btnLayoutUmbenennen_Click(object sender, System.EventArgs e) {
             SaveCurrentLayout();
-            var ind = Database.Layouts.LayoutIDToIndex(Pad.Item.ID);
+            var ind = Database.Layouts.LayoutIDToIndex(Pad.Item.Id);
             if (ind < 0) {
                 MessageBox.Show("Layout kann nur manuell umbenannt werden.");
                 return;
@@ -205,18 +212,16 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void Database_Disposing(object sender, System.EventArgs e) => Close();
 
-        private void Database_ShouldICancelDiscOperations(object sender, CancelEventArgs e) => e.Cancel = true;
-
         private void SaveCurrentLayout() {
             scriptEditor.WriteScriptBack();
             if (Database == null) { return; }
             var newl = Pad.Item.ToString();
-            var ind = Database.Layouts.LayoutIDToIndex(Pad.Item.ID);
+            var ind = Database.Layouts.LayoutIDToIndex(Pad.Item.Id);
             if (ind > -1) {
                 if (Database.Layouts[ind] == newl) { return; }
                 Database.Layouts[ind] = newl;
-            } else if (Pad.Item.ID.FileSuffix().ToUpper() == "BCR") {
-                WriteAllText(Pad.Item.ID, newl, System.Text.Encoding.UTF8, false);
+            } else if (Pad.Item.Id.FileSuffix().ToUpper() == "BCR") {
+                WriteAllText(Pad.Item.Id, newl, System.Text.Encoding.UTF8, false);
             }
         }
 

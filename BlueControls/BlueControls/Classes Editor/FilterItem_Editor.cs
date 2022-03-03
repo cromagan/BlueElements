@@ -47,6 +47,11 @@ namespace BlueControls.Classes_Editor {
                 Notification.Show("Diese Funktion wird nicht unterstützt,<br>abbruch.");
                 return;
             }
+
+            if (Item == null) {
+                return;
+            }
+
             Item.FilterType = e.Filter.FilterType;
             Item.SearchValue.Clear();
             Item.SearchValue.AddRange(e.Filter.SearchValue);

@@ -19,6 +19,7 @@ using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
 using static BlueScript.Extensions;
@@ -36,30 +37,14 @@ namespace BlueScript {
             }
         }
 
-        public static List<string> AllNames(this List<Variable> vars) {
-            List<string> l = new();
-            foreach (var thisvar in vars) {
-                l.Add(thisvar.Name);
-            }
-            return l;
-        }
+        public static List<string> AllNames(this List<Variable> vars) => vars.Select(thisvar => thisvar.Name).ToList();
 
-        public static List<string> AllValues(this List<Variable> vars) {
-            List<string> l = new();
-            foreach (var thisvar in vars) {
-                l.Add(thisvar.ValueString);
-            }
-            return l;
-        }
+        public static List<string> AllValues(this List<Variable?>? vars) => vars.Select(thisvar => thisvar.ValueString).ToList();
 
-        public static Variable Get(this List<Variable> vars, string name) {
+        public static Variable? Get(this List<Variable?> vars, string name) {
             if (vars == null || vars.Count == 0) { return null; }
-            foreach (var thisv in vars) {
-                if (!thisv.SystemVariable && thisv.Name.ToLower() == name.ToLower()) {
-                    return thisv;
-                }
-            }
-            return null;
+
+            return vars.FirstOrDefault(thisv => !thisv.SystemVariable && thisv.Name.ToLower() == name.ToLower());
         }
 
         /// <summary>
@@ -80,7 +65,7 @@ namespace BlueScript {
         /// <param name="name"></param>
         public static double GetDouble(this List<Variable> vars, string name) {
             var v = vars.Get(name);
-            return v == null ? 0d : (double)v.ValueDouble;
+            return v == null ? 0d : v.ValueDouble;
         }
 
         /// <summary>
@@ -98,9 +83,9 @@ namespace BlueScript {
         /// </summary>
         /// <param name="vars"></param>
         /// <param name="name"></param>
-        public static List<string> GetList(this List<Variable> vars, string name) {
+        public static List<string?>? GetList(this List<Variable> vars, string name) {
             var v = vars.Get(name);
-            return v == null ? new List<string>() : v.ValueListString;
+            return v == null ? new List<string?>() : v.ValueListString;
         }
 
         /// <summary>
@@ -114,16 +99,9 @@ namespace BlueScript {
             return v == null ? string.Empty : v.ValueString;
         }
 
-        public static Variable GetSystem(this List<Variable> vars, string name) {
-            foreach (var thisv in vars) {
-                if (thisv.SystemVariable && thisv.Name.ToUpper() == "*" + name.ToUpper()) {
-                    return thisv;
-                }
-            }
-            return null;
-        }
+        public static Variable? GetSystem(this List<Variable?> vars, string name) => vars.FirstOrDefault(thisv => thisv.SystemVariable && thisv.Name.ToUpper() == "*" + name.ToUpper());
 
-        public static void RemoveWithComent(this List<Variable> vars, string coment) {
+        public static void RemoveWithComent(this List<Variable> vars, string? coment) {
             var z = 0;
             do {
                 if (vars[z].Coment != null && vars[z].Coment.Contains(coment)) {
@@ -183,7 +161,7 @@ namespace BlueScript {
         /// <param name="vars"></param>
         /// <param name="name"></param>
         /// <param name="value"></param>
-        public static void Set(this List<Variable> vars, string name, List<string> value) {
+        public static void Set(this List<Variable> vars, string name, List<string?>? value) {
             var v = vars.Get(name);
             if (v == null) {
                 v = new Variable(name);
@@ -341,7 +319,7 @@ namespace BlueScript {
             Coment = coment;
         }
 
-        public Variable(string name, List<string> value, bool ronly, bool system, string coment) : this(name) {
+        public Variable(string name, List<string?>? value, bool ronly, bool system, string coment) : this(name) {
             Name = system ? "*" + name.ToLower() : name.ToLower();
             ValueListString = value;
             Type = enVariableDataType.List;
@@ -389,12 +367,12 @@ namespace BlueScript {
         /// </summary>
         public List<string> ValueListString {
             get {
-                if (string.IsNullOrEmpty(_ValueString)) { return new List<string>(); }
+                if (string.IsNullOrEmpty(_ValueString)) { return new List<string?>(); }
                 if (!_ValueString.EndsWith("\r")) {
                     Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Fehler, "Objekttypfehler: " + _ValueString);
                 }
                 var x = _ValueString.Substring(0, _ValueString.Length - 1);
-                return string.IsNullOrEmpty(x) ? new List<string>() { string.Empty } : x.SplitByCRToList();
+                return string.IsNullOrEmpty(x) ? new List<string?>() { string.Empty } : x.SplitByCRToList();
             }
             set => ValueString = value == null || value.Count == 0 ? string.Empty : value.JoinWithCr() + "\r";
         }
@@ -421,7 +399,7 @@ namespace BlueScript {
             #region Prüfen, Ob noch mehre Klammern da sind, oder Anfangs/End-Klammern entfernen
 
             if (txt.StartsWith("(")) {
-                (var pose, var _) = NextText(txt, 0, KlammerZu, false, false, KlammernStd);
+                var (pose, _) = NextText(txt, 0, KlammerZu, false, false, KlammernStd);
                 if (pose < txt.Length - 1) {
                     /// Wir haben so einen Fall: (true) || (true)
                     var txt1 = AttributeAuflösen(txt.Substring(1, pose - 1), s);
@@ -439,7 +417,7 @@ namespace BlueScript {
 
             #region AndAlso
 
-            (var uu, var _) = NextText(txt, 0, Method_if.UndUnd, false, false, KlammernStd);
+            var (uu, _) = NextText(txt, 0, Method_if.UndUnd, false, false, KlammernStd);
             if (uu > 0) {
                 var txt1 = AttributeAuflösen(txt.Substring(0, uu), s);
                 return !string.IsNullOrEmpty(txt1.ErrorMessage) ? new strDoItFeedback("Befehls-Berechnungsfehler vor &&: " + txt1.ErrorMessage)
@@ -451,7 +429,7 @@ namespace BlueScript {
 
             #region OrElse
 
-            (var oo, var _) = NextText(txt, 0, Method_if.OderOder, false, false, KlammernStd);
+            var (oo, _) = NextText(txt, 0, Method_if.OderOder, false, false, KlammernStd);
             if (oo > 0) {
                 var txt1 = AttributeAuflösen(txt.Substring(0, oo), s);
                 return !string.IsNullOrEmpty(txt1.ErrorMessage)
@@ -489,9 +467,9 @@ namespace BlueScript {
 
             #region Klammern am Ende berechnen, das ansonsten Min(x,y,z) falsch anschlägt
 
-            (var posa, var _) = NextText(txt, 0, KlammerAuf, false, false, KlammernStd);
+            var (posa, _) = NextText(txt, 0, KlammerAuf, false, false, KlammernStd);
             if (posa > -1) {
-                (var pose, var _) = NextText(txt, posa, KlammerZu, false, false, KlammernStd);
+                var (pose, _) = NextText(txt, posa, KlammerZu, false, false, KlammernStd);
                 if (pose <= posa) { return strDoItFeedback.Klammerfehler(); }
                 var tmp = AttributeAuflösen(txt.Substring(posa + 1, pose - posa - 1), s);
                 return !string.IsNullOrEmpty(tmp.ErrorMessage)
@@ -515,7 +493,7 @@ namespace BlueScript {
             #region Auf Restliche Boolsche Operationen testen
 
             //foreach (var check in Method_if.VergleichsOperatoren) {
-            (var i, var check) = NextText(txt, 0, Method_if.VergleichsOperatoren, false, false, KlammernStd);
+            var (i, check) = NextText(txt, 0, Method_if.VergleichsOperatoren, false, false, KlammernStd);
             if (i > -1) {
                 if (i < 1 && check != "!") { return new strDoItFeedback("Operator (" + check + ") am String-Start nicht erlaubt: " + txt); } // <1, weil ja mindestens ein Zeichen vorher sein MUSS!
                 if (i >= txt.Length - 1) { return new strDoItFeedback("Operator (" + check + ") am String-Ende nicht erlaubt: " + txt); } // siehe oben
@@ -549,7 +527,7 @@ namespace BlueScript {
                 if (string.IsNullOrEmpty(s1) && check != "!") { return new strDoItFeedback("Wert vor Operator (" + check + ") nicht gefunden: " + txt); }
                 if (!string.IsNullOrEmpty(s1)) {
                     var tmp1 = AttributeAuflösen(s1, s);
-                    if (!string.IsNullOrEmpty(tmp1.ErrorMessage)) { new strDoItFeedback("Befehls-Berechnungsfehler in ():" + tmp1.ErrorMessage); }
+                    if (!string.IsNullOrEmpty(tmp1.ErrorMessage)) { return new strDoItFeedback("Befehls-Berechnungsfehler in ():" + tmp1.ErrorMessage); }
                     s1 = tmp1.Value;
                 }
 
@@ -568,9 +546,11 @@ namespace BlueScript {
                 var s2 = txt.Substring(i + check.Length);
                 if (string.IsNullOrEmpty(s2)) {
                     return new strDoItFeedback("Wert nach Operator (" + check + ") nicht gefunden: " + txt);
-                } else {
+                }
+
+                {
                     var tmp1 = AttributeAuflösen(s2, s);
-                    if (!string.IsNullOrEmpty(tmp1.ErrorMessage)) { new strDoItFeedback("Befehls-Berechnungsfehler in ():" + tmp1.ErrorMessage); }
+                    if (!string.IsNullOrEmpty(tmp1.ErrorMessage)) { return new strDoItFeedback("Befehls-Berechnungsfehler in ():" + tmp1.ErrorMessage); }
                     s2 = tmp1.Value;
                 }
 
@@ -641,8 +621,6 @@ namespace BlueScript {
                         break;
 
                     default:
-                        replacer = string.Empty;
-                        //Develop.DebugPrint_NichtImplementiert();
                         return new strDoItFeedback("Operator (" + check + ") unbekannt: " + txt);
                 }
                 if (!string.IsNullOrEmpty(replacer)) { txt = replacer; }
@@ -675,7 +653,7 @@ namespace BlueScript {
             #region Rechenoperatoren ersetzen und vereinfachen
 
             // String wird vorher abgebrochen, um nicht nochmal auf Gänsefüsschen zutesten
-            (var pos2, var _) = NextText(txt, 0, modErgebnis.RechenOperatoren, false, false, KlammernStd);
+            var (pos2, _) = NextText(txt, 0, modErgebnis.RechenOperatoren, false, false, KlammernStd);
             if (pos2 >= 0) {
                 var erg = modErgebnis.Ergebnis(txt);
                 if (erg == null) { return new strDoItFeedback("Berechnungsfehler der Formel: " + txt); }
@@ -773,11 +751,11 @@ namespace BlueScript {
                 enVariableDataType.Bitmap => "{bmp} " + zusatz + Name + " = [BitmapData]",
                 enVariableDataType.Object => "{obj} " + zusatz + Name + " = [ObjectData]",
                 enVariableDataType.Error => "{err} " + zusatz + Name + " = " + ValueString,
-                _ => "{ukn} " + zusatz + Name + " = " + ValueString,
+                _ => "{ukn} " + zusatz + Name + " = " + ValueString
             };
         }
 
-        public Bitmap ValueBitmap(Script s) => s.BitmapCache[ValueInt];
+        public Bitmap? ValueBitmap(Script s) => s.BitmapCache[ValueInt];
 
         private void SetError(string coment) {
             Readonly = false;

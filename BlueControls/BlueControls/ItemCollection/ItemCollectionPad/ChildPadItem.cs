@@ -32,15 +32,15 @@ namespace BlueControls.ItemCollection {
 
         #region Fields
 
-        public List<BasicPadItem> VisibleItems = null;
+        public List<BasicPadItem>? VisibleItems;
 
-        public List<BasicPadItem> ZoomItems = null;
+        public List<BasicPadItem> ZoomItems;
 
-        private string _Name;
+        private string _name;
 
-        private CreativePad _PadInternal;
+        private CreativePad _padInternal;
 
-        private Bitmap _tmpBMP;
+        private Bitmap? _tmpBmp;
 
         #endregion
 
@@ -52,7 +52,7 @@ namespace BlueControls.ItemCollection {
             PadInternal = null; // new CreativePad();
             VisibleItems = null;
             ZoomItems = null;
-            _Name = string.Empty;
+            _name = string.Empty;
             Textlage = (enAlignment)(-1);
             Randfarbe = Color.Transparent;
             Eingebettete_Ansichten = new List<string>();
@@ -63,34 +63,34 @@ namespace BlueControls.ItemCollection {
         #region Properties
 
         [Description("Soll eine Umrandung einer anderen Ansicht hier angezeigt werden,<br>muss dessen Name hier eingegeben werden.")]
-        public List<string> Eingebettete_Ansichten { get; set; } = new List<string>();
+        public List<string> Eingebettete_Ansichten { get; set; }
 
         [Description("Name und gleichzeitig eventuelle Beschriftung dieser Ansicht.")]
         public string Name {
-            get => _Name;
+            get => _name;
             set {
-                if (value == _Name) { return; }
-                _Name = value;
+                if (value == _name) { return; }
+                _name = value;
                 OnChanged();
             }
         }
 
         public CreativePad? PadInternal {
-            get => _PadInternal;
+            get => _padInternal;
             set {
-                if (_PadInternal != null) {
-                    _PadInternal.Item.DoInvalidate -= _Pad_DoInvalidate;
+                if (_padInternal != null) {
+                    _padInternal.Item.DoInvalidate -= _Pad_DoInvalidate;
                 }
-                _PadInternal = value;
+                _padInternal = value;
                 if (value != null) {
-                    _PadInternal.Item.DoInvalidate += _Pad_DoInvalidate;
+                    _padInternal.Item.DoInvalidate += _Pad_DoInvalidate;
                 }
             }
         }
 
-        public Color Randfarbe { get; set; } = Color.Transparent;
+        public Color Randfarbe { get; set; }
 
-        public enAlignment Textlage { get; set; } = (enAlignment)(-1);
+        public enAlignment Textlage { get; set; }
 
         #endregion
 
@@ -108,12 +108,12 @@ namespace BlueControls.ItemCollection {
                 new FlexiControlForProperty(this, "Name"),
                 new FlexiControlForProperty(this, "Randfarbe")
             };
-            ItemCollectionList Lage = new()
+            ItemCollectionList lage = new()
             {
                 { "ohne", "-1" },
                 { "Links oben", ((int)enAlignment.Top_Left).ToString() }
             };
-            l.Add(new FlexiControlForProperty(this, "Textlage", Lage));
+            l.Add(new FlexiControlForProperty(this, "Textlage", lage));
             l.Add(new FlexiControlForProperty(this, "Eingebettete Ansichten", 5));
             l.AddRange(base.GetStyleOptions());
             return l;
@@ -133,8 +133,8 @@ namespace BlueControls.ItemCollection {
             var tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height);
             PadInternal.SetZoom(1);
             // Coordinaten auf Maßstab 1/1 scalieren
-            var x = (e.X - (float)l1.X) / tZo;
-            var y = (e.Y - (float)l1.Y) / tZo;
+            var x = (e.X - l1.X) / tZo;
+            var y = (e.Y - l1.Y) / tZo;
             // Nullpunkt verschiebung laut Maxbounds
             x += l2.X;
             y += l2.Y;
@@ -159,8 +159,8 @@ namespace BlueControls.ItemCollection {
             if (l2.Width > 0 && l2.Height > 0) { tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height); }
             PadInternal.SetZoom(1);
             // Coordinaten auf Maßstab 1/1 scalieren
-            var x = (e.X - (float)l1.X) / tZo;
-            var y = (e.Y - (float)l1.Y) / tZo;
+            var x = (e.X - l1.X) / tZo;
+            var y = (e.Y - l1.Y) / tZo;
             // Nullpunkt verschiebung laut Maxbounds
             x += l2.X;
             y += l2.Y;
@@ -184,8 +184,8 @@ namespace BlueControls.ItemCollection {
             var tZo = Math.Min(l1.Width / l2.Width, l1.Height / l2.Height);
             PadInternal.SetZoom(1);
             // Coordinaten auf Maßstab 1/1 scalieren
-            var x = (e.X - (float)l1.X) / tZo;
-            var y = (e.Y - (float)l1.Y) / tZo;
+            var x = (e.X - l1.X) / tZo;
+            var y = (e.Y - l1.Y) / tZo;
             // Nullpunkt verschiebung laut Maxbounds
             x += l2.X;
             y += l2.Y;
@@ -215,7 +215,7 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "name":
-                    _Name = value.FromNonCritical();
+                    _name = value.FromNonCritical();
                     return true;
 
                 case "data":
@@ -240,7 +240,7 @@ namespace BlueControls.ItemCollection {
             return false;
         }
 
-        public bool ReplaceVariable(Script s, BlueScript.Variable variable) {
+        public bool ReplaceVariable(Script s, Variable variable) {
             if (PadInternal == null) { return false; }
             var b = PadInternal.Item.ParseVariable(s, variable);
             if (b) { OnChanged(); }
@@ -257,7 +257,7 @@ namespace BlueControls.ItemCollection {
         public override string ToString() {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
-            if (!string.IsNullOrEmpty(_Name)) { t = t + "Name=" + _Name.ToNonCritical() + ", "; }
+            if (!string.IsNullOrEmpty(_name)) { t = t + "Name=" + _name.ToNonCritical() + ", "; }
             //if (!string.IsNullOrEmpty(_ReadableText)) { t = t + "ReadableText=" + _ReadableText.ToNonCritical() + ", "; }
             if (Textlage != (enAlignment)(-1)) { t = t + "Pos=" + (int)Textlage + ", "; }
             if (Eingebettete_Ansichten.Count > 0) { t = t + "Embedded=" + Eingebettete_Ansichten.JoinWithCr().ToNonCritical() + ", "; }
@@ -275,63 +275,63 @@ namespace BlueControls.ItemCollection {
                 var trp = drawingCoordinates.PointOf(enAlignment.Horizontal_Vertical_Center);
                 gr.TranslateTransform(trp.X, trp.Y);
                 gr.RotateTransform(-Drehwinkel);
-                Font font = new("Arial", (float)(30 * zoom));
+                Font font = new("Arial", 30 * zoom);
                 if (PadInternal != null) {
                     PadInternal.Item.SheetStyle = Parent.SheetStyle;
                     PadInternal.Item.SheetStyleScale = Parent.SheetStyleScale;
-                    if (_tmpBMP != null) {
-                        if (_tmpBMP.Width != drawingCoordinates.Width || drawingCoordinates.Height != _tmpBMP.Height) {
-                            _tmpBMP.Dispose();
+                    if (_tmpBmp != null) {
+                        if (_tmpBmp.Width != drawingCoordinates.Width || drawingCoordinates.Height != _tmpBmp.Height) {
+                            _tmpBmp.Dispose();
                             RemovePic();
                             Generic.CollectGarbage();
                         }
                     }
                     if (drawingCoordinates.Width < 1 || drawingCoordinates.Height < 1 || drawingCoordinates.Width > 20000 || drawingCoordinates.Height > 20000) { return; }
-                    if (_tmpBMP == null) {
-                        _tmpBMP = new Bitmap((int)Math.Abs(drawingCoordinates.Width), (int)Math.Abs(drawingCoordinates.Height));
+                    if (_tmpBmp == null) {
+                        _tmpBmp = new Bitmap((int)Math.Abs(drawingCoordinates.Width), (int)Math.Abs(drawingCoordinates.Height));
                     }
                     var mb = PadInternal.Item.MaxBounds(ZoomItems);
-                    var zoomv = PadInternal.ZoomFitValue(mb, false, _tmpBMP.Size);
-                    var centerpos = PadInternal.CenterPos(mb, false, _tmpBMP.Size, zoomv);
+                    var zoomv = PadInternal.ZoomFitValue(mb, false, _tmpBmp.Size);
+                    var centerpos = PadInternal.CenterPos(mb, false, _tmpBmp.Size, zoomv);
                     var slidervalues = PadInternal.SliderValues(mb, zoomv, centerpos);
                     PadInternal.ShowInPrintMode = forPrinting;
                     if (forPrinting) { PadInternal.Unselect(); }
-                    PadInternal.Item.DrawCreativePadToBitmap(_tmpBMP, enStates.Standard, zoomv, slidervalues.X, slidervalues.Y, VisibleItems);
-                    if (_tmpBMP != null) {
+                    PadInternal.Item.DrawCreativePadToBitmap(_tmpBmp, enStates.Standard, zoomv, slidervalues.X, slidervalues.Y, VisibleItems);
+                    if (_tmpBmp != null) {
                         foreach (var thisA in Eingebettete_Ansichten) {
-                            ChildPadItem Pad = null;
-                            foreach (var It in Parent) {
-                                if (It is ChildPadItem CP) {
-                                    if (CP.Name.ToUpper() == thisA.ToUpper()) {
-                                        Pad = CP;
+                            ChildPadItem pad = null;
+                            foreach (var it in Parent) {
+                                if (it is ChildPadItem cp) {
+                                    if (cp.Name.ToUpper() == thisA.ToUpper()) {
+                                        pad = cp;
                                         break;
                                     }
                                 }
                             }
-                            if (Pad != null) {
-                                var mb2 = Pad.PadInternal.Item.MaxBounds(Pad.ZoomItems);
+                            if (pad != null) {
+                                var mb2 = pad.PadInternal.Item.MaxBounds(pad.ZoomItems);
                                 mb2.Inflate(-1, -1);
-                                var tmpG = Graphics.FromImage(_tmpBMP);
-                                Pen p = new(Pad.Randfarbe, (float)(8.7d * zoom));
+                                var tmpG = Graphics.FromImage(_tmpBmp);
+                                Pen p = new(pad.Randfarbe, (float)(8.7d * zoom));
                                 Pen p2 = new(Color.White, (float)(8.7d * zoom) + 2f);
                                 p.DashPattern = new float[] { 5, 1, 1, 1 };
-                                var DC2 = mb2.ZoomAndMoveRect(zoomv, slidervalues.X, slidervalues.Y, false);
-                                tmpG.DrawRectangle(p2, DC2);
-                                tmpG.DrawRectangle(p, DC2);
-                                if (Pad.Textlage != (enAlignment)(-1)) {
-                                    var s = tmpG.MeasureString(Pad.Name, font);
-                                    tmpG.FillRectangle(Brushes.White, new RectangleF((float)DC2.Left, (float)(DC2.Top - s.Height - (9f * zoom)), s.Width, s.Height));
-                                    BlueFont.DrawString(tmpG, Pad.Name, font, new SolidBrush(Pad.Randfarbe), (float)DC2.Left, (float)(DC2.Top - s.Height - (9f * zoom)));
+                                var dc2 = mb2.ZoomAndMoveRect(zoomv, slidervalues.X, slidervalues.Y, false);
+                                tmpG.DrawRectangle(p2, dc2);
+                                tmpG.DrawRectangle(p, dc2);
+                                if (pad.Textlage != (enAlignment)(-1)) {
+                                    var s = tmpG.MeasureString(pad.Name, font);
+                                    tmpG.FillRectangle(Brushes.White, new RectangleF(dc2.Left, dc2.Top - s.Height - (9f * zoom), s.Width, s.Height));
+                                    BlueFont.DrawString(tmpG, pad.Name, font, new SolidBrush(pad.Randfarbe), dc2.Left, dc2.Top - s.Height - (9f * zoom));
                                 }
                             }
                         }
-                        gr.DrawImage(_tmpBMP, new Rectangle((int)-drawingCoordinates.Width / 2, (int)-drawingCoordinates.Height / 2, (int)drawingCoordinates.Width, (int)drawingCoordinates.Height));
+                        gr.DrawImage(_tmpBmp, new Rectangle((int)-drawingCoordinates.Width / 2, (int)-drawingCoordinates.Height / 2, (int)drawingCoordinates.Width, (int)drawingCoordinates.Height));
                     }
                 }
                 gr.TranslateTransform(-trp.X, -trp.Y);
                 gr.ResetTransform();
                 if (!forPrinting) {
-                    BlueFont.DrawString(gr, Name, font, Brushes.Gray, (float)drawingCoordinates.Left, (float)drawingCoordinates.Top);
+                    BlueFont.DrawString(gr, Name, font, Brushes.Gray, drawingCoordinates.Left, drawingCoordinates.Top);
                 }
                 if (Textlage != (enAlignment)(-1)) {
                     Pen p = new(Randfarbe, (float)(8.7d * zoom)) {
@@ -339,7 +339,7 @@ namespace BlueControls.ItemCollection {
                     };
                     gr.DrawRectangle(p, drawingCoordinates);
                     var s = gr.MeasureString(Name, font);
-                    BlueFont.DrawString(gr, Name, font, new SolidBrush(Randfarbe), (float)drawingCoordinates.Left, (float)(drawingCoordinates.Top - s.Height - (9f * zoom)));
+                    BlueFont.DrawString(gr, Name, font, new SolidBrush(Randfarbe), drawingCoordinates.Left, drawingCoordinates.Top - s.Height - (9f * zoom));
                 }
             } catch {
             }
@@ -352,9 +352,9 @@ namespace BlueControls.ItemCollection {
         }
 
         private void RemovePic() {
-            if (_tmpBMP != null) {
-                _tmpBMP.Dispose();
-                _tmpBMP = null;
+            if (_tmpBmp != null) {
+                _tmpBmp.Dispose();
+                _tmpBmp = null;
             }
         }
 

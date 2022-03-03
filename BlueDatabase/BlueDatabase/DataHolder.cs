@@ -20,6 +20,7 @@ using BlueBasics.Enums;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 
 namespace BlueDatabase {
 
@@ -34,12 +35,7 @@ namespace BlueDatabase {
         /// <param name="items">Die Items, in denen gesucht werden soll.</param>
         /// <param name="id">Die ID, nach der gesucht werden soll.</param>
         /// <returns>Wenn in der Liste die ID vorhanden ist, wird dieses Objekt zurückgegeben, ansonsten wird NULL zurückgegeben.</returns>
-        public static t GetByID<t>(this List<t> items, string id) where t : DataHolder {
-            foreach (var thisit in items) {
-                if (thisit.ID.ToUpper() == id.ToUpper()) { return thisit; }
-            }
-            return null;
-        }
+        public static t? GetByID<t>(this List<t?> items, string id) where t : DataHolder => items.FirstOrDefault(thisit => thisit.ID.ToUpper() == id.ToUpper());
 
         #endregion
     }
@@ -50,9 +46,9 @@ namespace BlueDatabase {
 
         #region Fields
 
-        public readonly string ID = string.Empty;
-        public readonly DataHolder Parent = null;
-        public readonly string Typ = string.Empty;
+        public readonly string ID;
+        public readonly DataHolder Parent;
+        public readonly string Typ;
         private bool disposedValue;
 
         #endregion
@@ -64,7 +60,7 @@ namespace BlueDatabase {
         /// </summary>
         /// <param name="parent"></param>
         /// <param name="id"></param>
-        public DataHolder(DataHolder parent, string id) {
+        protected DataHolder(DataHolder parent, string id) {
             if (UseExtraFile()) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Falsche Routine!");
             }
@@ -78,7 +74,7 @@ namespace BlueDatabase {
         /// Erzeugt eine eigenständige Datei. Der Typ wird dabei immer auf MAIN gesetzt
         /// </summary>
         /// <param name="id"></param>
-        public DataHolder(string id) {
+        protected DataHolder(string id) {
             if (!UseExtraFile()) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Falsche Routine!");
             }
@@ -119,7 +115,7 @@ namespace BlueDatabase {
             }
             InternalDatabase.Caption = id;
             InternalDatabase.ReloadDelaySecond = 240;
-            InternalDatabase.AutoDeleteBAK = true;
+            InternalDatabase.AutoDeleteBak = true;
             InternalDatabase.Disposing += InternalDatabase_Disposing;
         }
 
@@ -130,7 +126,7 @@ namespace BlueDatabase {
         // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
         ~DataHolder() {
             // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-            Dispose(disposing: false);
+            Dispose(false);
         }
 
         #endregion
@@ -175,7 +171,7 @@ namespace BlueDatabase {
                 c.Format = enDataFormat.Text;
                 c.MultiLine = true;
                 c.TextBearbeitungErlaubt = true;
-                c.PermissionGroups_ChangeCell.Add("#Everybody");
+                c.PermissionGroupsChangeCell.Add("#Everybody");
                 c.Ueberschrift1 = Typ;
                 if (!string.IsNullOrEmpty(message)) {
                     c.Caption = "!!!" + c.Caption;
@@ -190,7 +186,7 @@ namespace BlueDatabase {
 
         public void Dispose() {
             // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-            Dispose(disposing: true);
+            Dispose(true);
             System.GC.SuppressFinalize(this);
         }
 
@@ -198,7 +194,7 @@ namespace BlueDatabase {
 
         public int GetInt(string dataName) => Row().CellGetInteger(Column(dataName, string.Empty));
 
-        public List<string> GetList(string dataName) => Row().CellGetList(Column(dataName, string.Empty));
+        public List<string?>? GetList(string dataName) => Row().CellGetList(Column(dataName, string.Empty));
 
         public string GetString(string dataName) => Row().CellGetString(Column(dataName, string.Empty));
 
@@ -307,9 +303,9 @@ namespace BlueDatabase {
             //c.MultiLine = true;
             c.TextBearbeitungErlaubt = editable;
             if (editable) {
-                c.PermissionGroups_ChangeCell.AddIfNotExists("#Everybody");
+                c.PermissionGroupsChangeCell.AddIfNotExists("#Everybody");
             } else {
-                c.PermissionGroups_ChangeCell.Remove("#Everybody");
+                c.PermissionGroupsChangeCell.Remove("#Everybody");
             }
             c.Quickinfo = quickinfo;
         }

@@ -49,21 +49,20 @@ namespace BlueScript {
 
             if (!Variable.IsValidName(infos.AttributText)) { return new strDoItFeedback(infos.AttributText + " ist kein gültiger Subroutinen-Name."); }
 
-            var such = new List<string>() { "sub" + infos.AttributText.ToLower() + "()" };
+            var such = new List<string> { "sub" + infos.AttributText.ToLower() + "()" };
 
-            (var pos, var _) = NextText(s.ReducedScriptText.ToLower(), 0, such, true, false, KlammernStd);
+            var (pos, _) = NextText(s.ReducedScriptText.ToLower(), 0, such, true, false, KlammernStd);
 
             if (pos < 0) { return new strDoItFeedback("Subroutine " + infos.AttributText + " nicht definert."); }
 
-            (var pos2, var _) = NextText(s.ReducedScriptText.ToLower(), pos + 1, such, true, false, KlammernStd);
+            var (pos2, _) = NextText(s.ReducedScriptText.ToLower(), pos + 1, such, true, false, KlammernStd);
             if (pos2 > 0) { return new strDoItFeedback("Subroutine " + infos.AttributText + " mehrfach definert."); }
 
             var weiterLine = s.Line;
 
+            var (item1, item2) = GetCodeBlockText(s.ReducedScriptText, pos + such[0].Length);
 
-            var code = GetCodeBlockText(s.ReducedScriptText, pos + such[0].Length);
-
-            if (!string.IsNullOrEmpty(code.Item2)) { return new strDoItFeedback("Subroutine " + infos.AttributText + ": " + code.Item2); }
+            if (!string.IsNullOrEmpty(item2)) { return new strDoItFeedback("Subroutine " + infos.AttributText + ": " + item2); }
 
             s.Line = s.ReducedScriptText.Substring(0, pos).Count(c => c == '¶') + 1;
             s.Sub++;
@@ -71,13 +70,12 @@ namespace BlueScript {
             var tmpv = new List<Variable>();
             tmpv.AddRange(s.Variablen);
 
-            (var err, var _) = s.Parse(code.Item1);
+            var (err, _) = s.Parse(item1);
             if (!string.IsNullOrEmpty(err)) { return new strDoItFeedback("Subroutine " + infos.AttributText + ": " + err); }
 
             s.Variablen.Clear();
             s.Variablen.AddRange(tmpv);
             s.Sub--;
-
 
             if (s.Schleife < 0) { return new strDoItFeedback("Subroutinen-Fehler"); }
 

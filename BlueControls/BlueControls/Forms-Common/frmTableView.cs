@@ -28,6 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using static BlueBasics.Develop;
 using static BlueBasics.FileOperations;
 
@@ -47,9 +48,9 @@ namespace BlueControls.Forms {
 
         public frmTableView() : this(null, true, true) { }
 
-        public frmTableView(Database? Database) : this(Database, false, false) { }
+        public frmTableView(Database Database) : this(Database, false, false) { }
 
-        public frmTableView(Database? database, bool loadTabVisible, bool adminTabVisible) {
+        public frmTableView(Database database, bool loadTabVisible, bool adminTabVisible) {
             InitializeComponent();
             //var bmp = new System.Drawing.Bitmap(111,112);
             //var gr = System.Drawing.Graphics.FromImage(bmp);
@@ -184,7 +185,7 @@ namespace BlueControls.Forms {
 
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
             SetDatabasetoNothing();
-            BlueBasics.MultiUserFile.clsMultiUserFile.SaveAll(true);
+            BlueBasics.MultiUserFile.ClsMultiUserFile.SaveAll(true);
             base.OnFormClosing(e);
         }
 
@@ -232,7 +233,7 @@ namespace BlueControls.Forms {
         private void btnAlleSchlieﬂen_Click(object sender, System.EventArgs e) => TableView.CollapesAll();
 
         private void btnNeuDB_SaveAs_Click(object sender, System.EventArgs e) {
-            BlueBasics.MultiUserFile.clsMultiUserFile.SaveAll(false);
+            BlueBasics.MultiUserFile.ClsMultiUserFile.SaveAll(false);
             var bu = (Button)sender;
             switch (bu.Name) {
                 case "btnSaveAs":
@@ -260,7 +261,7 @@ namespace BlueControls.Forms {
         }
 
         private void btnOeffnen_Click(object sender, System.EventArgs e) {
-            BlueBasics.MultiUserFile.clsMultiUserFile.SaveAll(false);
+            BlueBasics.MultiUserFile.ClsMultiUserFile.SaveAll(false);
             LoadTab.ShowDialog();
         }
 
@@ -295,13 +296,8 @@ namespace BlueControls.Forms {
             btnDatenbanken.Enabled = DatenbankDa && !string.IsNullOrEmpty(TableView.Database.Filename);
             BeziehungsEditor.Enabled = false;
             if (DatenbankDa) {
-                foreach (var ThisColumnItem in TableView.Database.Column) {
-                    if (ThisColumnItem != null) {
-                        if (ThisColumnItem.Format == enDataFormat.RelationText) {
-                            BeziehungsEditor.Enabled = true;
-                            break;
-                        }
-                    }
+                if (TableView.Database.Column.Any(ThisColumnItem => ThisColumnItem != null && ThisColumnItem.Format == enDataFormat.RelationText)) {
+                    BeziehungsEditor.Enabled = true;
                 }
             }
             cbxColumnArr.Enabled = DatenbankDa && TableView.Design != enBlueTableAppearance.OnlyMainColumnWithoutHead;
@@ -331,7 +327,7 @@ namespace BlueControls.Forms {
             DatabaseSet(tmpDatabase);
         }
 
-        private void DatabaseSet(Database? database) {
+        private void DatabaseSet(Database database) {
             TableView.Database = database;
             Formula.Database = database;
             Filter.Table = TableView;
@@ -355,11 +351,11 @@ namespace BlueControls.Forms {
         private void Daten¸berpr¸fung_Click(object sender, System.EventArgs e) => TableView.Database.Row.DoAutomatic(TableView.Filter, true, TableView.PinnedRows, "manual check");
 
         private void Drucken_ItemClicked(object sender, BasicListItemEventArgs e) {
-            BlueBasics.MultiUserFile.clsMultiUserFile.SaveAll(false);
+            BlueBasics.MultiUserFile.ClsMultiUserFile.SaveAll(false);
             switch (e.Item.Internal) {
                 case "erweitert":
                     Visible = false;
-                    List<RowItem> selectedRows = new();
+                    List<RowItem?> selectedRows = new();
                     if (Ansicht1.Checked && Formula.ShowingRow != null) {
                         selectedRows.Add(Formula.ShowingRow);
                     } else {
@@ -453,7 +449,7 @@ namespace BlueControls.Forms {
         }
 
         private void LastDatabases_ItemClicked(object sender, BasicListItemEventArgs e) {
-            BlueBasics.MultiUserFile.clsMultiUserFile.SaveAll(false);
+            BlueBasics.MultiUserFile.ClsMultiUserFile.SaveAll(false);
             DatabaseSet(e.Item.Internal);
         }
 
@@ -464,15 +460,10 @@ namespace BlueControls.Forms {
             var IstZ = 0;
             do {
                 var Changed = false;
-                foreach (var ThisRow in TableView.Database.Row) {
-                    if (ThisRow != null && ThisRow != vRow) {
-                        if (ThisRow.CellFirstString().ToUpper() == NewName.ToUpper()) {
-                            IstZ++;
-                            NewName = IstName + " (" + IstZ + ")";
-                            Changed = true;
-                            break;
-                        }
-                    }
+                if (TableView.Database.Row.Any(ThisRow => ThisRow != null && ThisRow != vRow && ThisRow.CellFirstString().ToUpper() == NewName.ToUpper())) {
+                    IstZ++;
+                    NewName = IstName + " (" + IstZ + ")";
+                    Changed = true;
                 }
                 if (!Changed) { return NewName; }
             } while (true);
@@ -486,7 +477,7 @@ namespace BlueControls.Forms {
         }
 
         private void Ordn_Click(object sender, System.EventArgs e) {
-            BlueBasics.MultiUserFile.clsMultiUserFile.SaveAll(false);
+            BlueBasics.MultiUserFile.ClsMultiUserFile.SaveAll(false);
             SelectStandardTab();
             ExecuteFile(TableView.Database.Filename.FilePath());
         }
@@ -569,7 +560,7 @@ namespace BlueControls.Forms {
             }
         }
 
-        private void SuchEintragNoSave(enDirection Richtung, out ColumnItem column, out RowData row) {
+        private void SuchEintragNoSave(enDirection Richtung, out ColumnItem? column, out RowData? row) {
             column = TableView.Database.Column[0];
             row = null;
             if (TableView.Database.Row.Count < 1) { return; }
@@ -644,13 +635,13 @@ namespace BlueControls.Forms {
         private void TableView_ViewChanged(object sender, System.EventArgs e) => Table.WriteColumnArrangementsInto(cbxColumnArr, TableView.Database, TableView.Arrangement);
 
         private void Tempor‰renSpeicherort÷ffnen_Click(object sender, System.EventArgs e) {
-            BlueBasics.MultiUserFile.clsMultiUserFile.SaveAll(false);
+            BlueBasics.MultiUserFile.ClsMultiUserFile.SaveAll(false);
             SelectStandardTab();
             ExecuteFile(Path.GetTempPath());
         }
 
         private void ‹berDiesesProgramm_Click(object sender, System.EventArgs e) {
-            BlueBasics.MultiUserFile.clsMultiUserFile.SaveAll(false);
+            BlueBasics.MultiUserFile.ClsMultiUserFile.SaveAll(false);
             MessageBox.Show("(c) Christian Peter<br>V " + _Version, enImageCode.Information, "OK");
         }
 

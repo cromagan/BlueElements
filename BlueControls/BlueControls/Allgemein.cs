@@ -27,29 +27,27 @@ namespace BlueControls {
 
         #region Methods
 
-        public static t ParentControl<t>(this object o) {
-            if (o is System.Windows.Forms.Control co) {
-                do {
-                    co = co.Parent;
-                    switch (co) {
-                        case null:
-                            return default;
-
-                        case t ctr:
-                            return ctr;
-
-                        default:
-                            break;
-                    }
-                } while (true);
+        public static t? ParentControl<t>(this object o) {
+            if (o is not System.Windows.Forms.Control co) {
+                return default;
             }
-            return default;
+
+            do {
+                co = co.Parent;
+                switch (co) {
+                    case null:
+                        return default;
+
+                    case t ctr:
+                        return ctr;
+                }
+            } while (true);
         }
 
-        public static IContextMenu ParentControlWithCommands(this object o) {
+        public static IContextMenu? ParentControlWithCommands(this object o) {
             var par = o.ParentControl<IContextMenu>();
             if (par == null) { return null; }
-            ItemCollectionList ThisContextMenu = new(enBlueListBoxAppearance.KontextMenu);
+            ItemCollectionList? ThisContextMenu = new(enBlueListBoxAppearance.KontextMenu);
             ItemCollectionList UserMenu = new(enBlueListBoxAppearance.KontextMenu);
             List<string> tags = new();
             var Cancel = false;

@@ -4,7 +4,7 @@ using BlueBasics.Interfaces;
 
 namespace BlueControls.Classes_Editor
 {
-    internal partial class AbstractClassEditor<T> : BlueControls.Controls.GroupBox where T : IParseable
+    internal partial class AbstractClassEditor<T> 
     {
         //UserControl überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]

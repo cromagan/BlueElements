@@ -9,9 +9,9 @@ namespace BlueControls {
 
         #region Fields
 
-        private readonly GenericControl? Control;
-        private readonly int Modus;
-        private int Count;
+        private readonly GenericControl? _control;
+        private readonly int _modus;
+        private int _count;
 
         #endregion
 
@@ -24,24 +24,24 @@ namespace BlueControls {
             //SetStyle(System.Windows.Forms.ControlStyles.Selectable, false);
             //SetStyle(System.Windows.Forms.ControlStyles.StandardClick, false);
             //SetStyle(System.Windows.Forms.ControlStyles.StandardDoubleClick, false);
-            Modus = 2;
-            Control = null;
-            var Radius = 10;
-            Width = Radius * 2;
-            Height = Radius * 2;
-            Left = -Radius * 3;
-            Top = -Radius * 3;
+            _modus = 2;
+            _control = null;
+            const int radius = 10;
+            Width = radius * 2;
+            Height = radius * 2;
+            Left = -radius * 3;
+            Top = -radius * 3;
         }
 
-        public Overlay(GenericControl OverControl) {
+        public Overlay(GenericControl overControl) {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             SetStyle(System.Windows.Forms.ControlStyles.Selectable, false);
             SetStyle(System.Windows.Forms.ControlStyles.StandardClick, false);
             SetStyle(System.Windows.Forms.ControlStyles.StandardDoubleClick, false);
-            Modus = 1;
-            Control = OverControl;
+            _modus = 1;
+            _control = overControl;
             SetControl();
         }
 
@@ -71,9 +71,9 @@ namespace BlueControls {
         }
 
         public void SetControl() {
-            Width = Control.Width;
-            Height = Control.Height;
-            var p = Control.PointToScreen(Point.Empty);
+            Width = _control.Width;
+            Height = _control.Height;
+            var p = _control.PointToScreen(Point.Empty);
             Left = p.X;
             Top = p.Y;
         }
@@ -81,7 +81,7 @@ namespace BlueControls {
         protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) {
             if (IsDisposed) { return; }
             base.OnPaint(e);
-            switch (Modus) {
+            switch (_modus) {
                 case 1:
                     Paint_RoterRahmenUmControlUndBlinken();
                     break;
@@ -98,8 +98,8 @@ namespace BlueControls {
 
         private void Blinker_Tick(object sender, System.EventArgs e) {
             Opacity = Opacity > 0.5 ? 0.01 : 1;
-            Count++;
-            if (Count > 4) {
+            _count++;
+            if (_count > 4) {
                 Blinker.Enabled = false;
                 Dispose();
             }

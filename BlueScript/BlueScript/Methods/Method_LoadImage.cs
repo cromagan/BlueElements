@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Enums;
 using Skript.Enums;
 using System.Collections.Generic;
 using System.Drawing;
@@ -45,7 +46,7 @@ namespace BlueScript {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
-            if (attvar.Attributes[0].ValueString.FileType() != BlueBasics.Enums.enFileFormat.Image) {
+            if (attvar.Attributes[0].ValueString.FileType() != enFileFormat.Image) {
                 return new strDoItFeedback("Datei ist kein Bildformat: " + attvar.Attributes[0].ValueString);
             }
 

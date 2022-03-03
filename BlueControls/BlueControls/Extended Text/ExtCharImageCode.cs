@@ -20,21 +20,21 @@ using BlueControls.Enums;
 using System;
 using System.Drawing;
 
-namespace BlueControls {
+namespace BlueControls.Extended_Text {
 
     internal class ExtCharImageCode : ExtChar {
 
         #region Fields
 
-        private readonly QuickImage _QI;
+        private readonly QuickImage? _QI;
 
         #endregion
 
         #region Constructors
 
-        public ExtCharImageCode(QuickImage qi, enDesign design, enStates state, BlueFont font, int stufe) : base(design, state, font, stufe) => _QI = qi;
+        public ExtCharImageCode(QuickImage? qi, enDesign design, enStates state, BlueFont? font, int stufe) : base(design, state, font, stufe) => _QI = qi;
 
-        public ExtCharImageCode(string imagecode, enDesign design, enStates state, BlueFont font, int stufe) : base(design, state, font, stufe) => _QI = QuickImage.Get(imagecode);
+        public ExtCharImageCode(string imagecode, enDesign design, enStates state, BlueFont? font, int stufe) : base(design, state, font, stufe) => _QI = QuickImage.Get(imagecode);
 
         #endregion
 

@@ -144,6 +144,8 @@ namespace BlueControls.Designer_Support {
             base.Dispose(NowDisposing);
         }
 
+        private static void SomethingCheckedChanged(object sender, System.EventArgs e) { }
+
         [DebuggerStepThrough]
         private void InitializeComponent() {
             LB = new ListBox();
@@ -536,8 +538,6 @@ namespace BlueControls.Designer_Support {
             Transpl.Text = Transp.Value + "%";
             GeneratePreview();
         }
-
-        private void SomethingCheckedChanged(object sender, System.EventArgs e) { }
 
         #endregion
     }

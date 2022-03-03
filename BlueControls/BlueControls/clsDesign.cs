@@ -16,10 +16,10 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueControls;
 using BlueControls.Enums;
 using System.Collections.Generic;
 using System.Drawing;
-using static BlueBasics.Extensions;
 
 public static class clsDesignExtensions {
 
@@ -57,7 +57,7 @@ public static class clsDesignExtensions {
         if (!string.IsNullOrEmpty(boc1)) { des.BorderColor1 = boc1.FromHTMLCode(); }
         if (!string.IsNullOrEmpty(boc2)) { des.BorderColor2 = boc2.FromHTMLCode(); }
         if (!string.IsNullOrEmpty(boc3)) { des.BorderColor3 = boc3.FromHTMLCode(); }
-        if (!string.IsNullOrEmpty(f)) { des.bFont = BlueControls.BlueFont.Get(f); }
+        if (!string.IsNullOrEmpty(f)) { des.bFont = BlueFont.Get(f); }
         //if (!string.IsNullOrEmpty(pic)) { des.Image = QuickImage.Get(pic); }
         des.Image = pic;
         des.Status = status;
@@ -80,7 +80,7 @@ public class clsDesign {
     public Color BackColor1;
     public Color BackColor2;
     public Color BackColor3;
-    public BlueControls.BlueFont bFont;
+    public BlueFont? bFont;
     public Color BorderColor1;
     public Color BorderColor2;
     public Color BorderColor3;

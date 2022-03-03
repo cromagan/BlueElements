@@ -46,19 +46,21 @@ namespace BlueScript {
             if (attvar.Attributes[0].Readonly) { return strDoItFeedback.Schreibgschützt(); }
 
             for (var z = 1; z < attvar.Attributes.Count; z++) {
-                if (attvar.Attributes[z].Type != enVariableDataType.Error) {
-                    if (attvar.Attributes[z].Type != attvar.Attributes[0].Type) { return new strDoItFeedback("Variablentyp zur Ausgangsvariable unterschiedlich."); }
+                if (attvar.Attributes[z].Type == enVariableDataType.Error) {
+                    continue;
+                }
 
-                    var hasvalue = false;
+                if (attvar.Attributes[z].Type != attvar.Attributes[0].Type) { return new strDoItFeedback("Variablentyp zur Ausgangsvariable unterschiedlich."); }
 
-                    if (attvar.Attributes[z].Type == enVariableDataType.String) { hasvalue = !string.IsNullOrEmpty(attvar.Attributes[z].ValueString); }
-                    if (attvar.Attributes[z].Type == enVariableDataType.Numeral) { hasvalue = attvar.Attributes[z].ValueDouble != 0; }
-                    if (attvar.Attributes[z].Type == enVariableDataType.List) { hasvalue = attvar.Attributes[z].ValueListString.Count > 0; }
+                var hasvalue = false;
 
-                    if (hasvalue) {
-                        attvar.Attributes[0].ValueString = attvar.Attributes[z].ValueString;
-                        return strDoItFeedback.Null();
-                    }
+                if (attvar.Attributes[z].Type == enVariableDataType.String) { hasvalue = !string.IsNullOrEmpty(attvar.Attributes[z].ValueString); }
+                if (attvar.Attributes[z].Type == enVariableDataType.Numeral) { hasvalue = attvar.Attributes[z].ValueDouble != 0; }
+                if (attvar.Attributes[z].Type == enVariableDataType.List) { hasvalue = attvar.Attributes[z].ValueListString.Count > 0; }
+
+                if (hasvalue) {
+                    attvar.Attributes[0].ValueString = attvar.Attributes[z].ValueString;
+                    return strDoItFeedback.Null();
                 }
             }
 

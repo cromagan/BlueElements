@@ -67,7 +67,7 @@ namespace BlueScript {
                 tmp++;
             } while (true);
 
-            (var posek, var _) = NextText(scriptText, start, GeschKlammerZu, false, false, KlammernStd);
+            var (posek, _) = NextText(scriptText, start, GeschKlammerZu, false, false, KlammernStd);
             if (posek < start) {
                 return (string.Empty, "Kein Codeblock Ende gefunden.");
             }
@@ -81,14 +81,12 @@ namespace BlueScript {
             List<string> c = new();
             foreach (var thisc in comands) {
                 if (thisc.Returns != enVariableDataType.Null) {
-                    foreach (var thiscs in thisc.Comand(s)) {
-                        c.Add(thiscs + thisc.StartSequence);
-                    }
+                    c.AddRange(thisc.Comand(s).Select(thiscs => thiscs + thisc.StartSequence));
                 }
             }
             var posc = 0;
             do {
-                (var pos, var _) = NextText(txt, posc, c, true, false, KlammernStd);
+                var (pos, _) = NextText(txt, posc, c, true, false, KlammernStd);
                 if (pos < 0) { return new strGetEndFeedback(0, txt); }
                 var f = Script.ComandOnPosition(txt, pos, s, true);
                 if (!string.IsNullOrEmpty(f.ErrorMessage)) {
@@ -104,20 +102,20 @@ namespace BlueScript {
             var v = s.Variablen.AllNames();
 
             do {
-                (var pos, var which) = NextText(txt, posc, v, true, true, KlammernStd);
+                var (pos, which) = NextText(txt, posc, v, true, true, KlammernStd);
 
                 if (txt.Contains("~")) {
-                    (var postmp, var _) = NextText(txt, posc, Tilde, false, false, KlammernStd);
+                    var (postmp, _) = NextText(txt, posc, Tilde, false, false, KlammernStd);
                     if ((postmp >= 0 && postmp < pos) || pos < 0) { pos = postmp; which = "~"; }
                 }
 
                 if (pos < 0) { return new strGetEndFeedback(0, txt); }
 
-                Variable thisV;
+                Variable? thisV;
                 int endz;
 
                 if (which == "~") {
-                    (var pose, var _) = NextText(txt, pos + 1, Tilde, false, false, KlammernStd);
+                    var (pose, _) = NextText(txt, pos + 1, Tilde, false, false, KlammernStd);
                     if (pose <= pos) { return new strGetEndFeedback("Variablen-Findung End-~-Zeichen nicht gefunden."); }
                     var x = new Variable("dummy1", txt.Substring(pos + 1, pose - pos - 1), s);
                     if (x.Type != enVariableDataType.String) { return new strGetEndFeedback("Fehler beim Berechnen des Variablen-Namens."); }
@@ -137,7 +135,7 @@ namespace BlueScript {
             } while (true);
         }
 
-        public static List<string> SplitAttributeToString(string attributtext) {
+        public static List<string>? SplitAttributeToString(string attributtext) {
             if (string.IsNullOrEmpty(attributtext)) { return null; }
             List<string> attributes = new();
 
@@ -145,7 +143,7 @@ namespace BlueScript {
 
             var posc = 0;
             do {
-                (var pos, var _) = NextText(attributtext, posc, Komma, false, false, KlammernStd);
+                var (pos, _) = NextText(attributtext, posc, Komma, false, false, KlammernStd);
                 if (pos < 0) {
                     attributes.Add(attributtext.Substring(posc).DeKlammere(true, false, false, true));
                     break;
@@ -162,17 +160,17 @@ namespace BlueScript {
         public static strSplittedAttributesFeedback SplitAttributeToVars(string attributtext, Script s, List<enVariableDataType> types, bool endlessArgs) {
             if (types.Count == 0) {
                 return string.IsNullOrEmpty(attributtext)
-                    ? new strSplittedAttributesFeedback(new List<Variable>())
+                    ? new strSplittedAttributesFeedback(new List<Variable?>())
                     : new strSplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Keine Attribute erwartet, aber erhalten.");
             }
 
             var attributes = SplitAttributeToString(attributtext);
             if (attributes == null || attributes.Count == 0) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Allgemeiner Fehler."); }
-            if (attributes.Count < types.Count) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Zu wenige Attribute erhalten."); ; }
+            if (attributes.Count < types.Count) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Zu wenige Attribute erhalten."); }
             if (!endlessArgs && attributes.Count > types.Count) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Zu viele Attribute erhalten."); }
 
             //  Variablen und Routinen ersetzen
-            List<Variable> vars = new();
+            List<Variable?> vars = new();
             for (var n = 0; n < attributes.Count; n++) {
                 var lb = attributes[n].Count(c => c == '¶'); // Zeilenzähler weitersetzen
                 attributes[n] = attributes[n].RemoveChars("¶"); // Zeilenzähler entfernen
@@ -180,33 +178,34 @@ namespace BlueScript {
                 var exceptetType = n < types.Count ? types[n] : types[types.Count - 1]; // Bei Endlessargs den letzten nehmen
 
                 // Variable ermitteln oder eine Dummy-Variable als Rückgabe ermitteln
-                Variable v = null;
+                Variable? v = null;
                 if (exceptetType.HasFlag(enVariableDataType.Variable)) {
                     var varn = attributes[n];
                     if (varn.StartsWith("~") && varn.EndsWith("~")) {
                         var tmp2 = new Variable("dummy2", varn.Substring(1, varn.Length - 2), s);
-                        if (tmp2.Type != enVariableDataType.String) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.VariablenNamenBerechnungFehler, "Variablenname konnte nicht berechnet werden bei Attribut " + (n + 1).ToString()); }
+                        if (tmp2.Type != enVariableDataType.String) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.VariablenNamenBerechnungFehler, "Variablenname konnte nicht berechnet werden bei Attribut " + (n + 1)); }
                         varn = tmp2.ValueString;
                     }
 
-                    if (!Variable.IsValidName(varn)) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.VariableErwartet, "Variablenname erwartet bei Attribut " + (n + 1).ToString()); }
-                    v = s.Variablen.Get(varn);
-                    if (v == null) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1).ToString()); }
+                    if (!Variable.IsValidName(varn)) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.VariableErwartet, "Variablenname erwartet bei Attribut " + (n + 1)); }
+
+                    if (s != null) { v = s.Variablen.Get(varn); }
+                    if (v == null) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1)); }
                 } else {
-                    v = new Variable("dummy3", attributes[n], s);
-                    if (v == null) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.BerechnungFehlgeschlagen, "Berechnungsfehler bei Attribut " + (n + 1).ToString()); }
+                    //v = new Variable("dummy3", attributes[n], s);
+                    return new strSplittedAttributesFeedback(enSkriptFehlerTyp.BerechnungFehlgeschlagen, "Berechnungsfehler bei Attribut " + (n + 1));
                 }
 
                 // Den Typ der Variable checken
                 if (!exceptetType.HasFlag(v.Type)) {
                     if (v.Type == enVariableDataType.Error) {
-                        return new strSplittedAttributesFeedback(enSkriptFehlerTyp.BerechnungFehlgeschlagen, "Attribut " + (n + 1).ToString() + ": " + v.Coment);
+                        return new strSplittedAttributesFeedback(enSkriptFehlerTyp.BerechnungFehlgeschlagen, "Attribut " + (n + 1) + ": " + v.Coment);
                     }
                     if (exceptetType == enVariableDataType.Integer) {
-                        if (v.Type != enVariableDataType.Numeral) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.FalscherDatentyp, "Attribut " + (n + 1).ToString() + " ist keine Ganzahl."); }
-                        if (v.ValueDouble != (int)v.ValueDouble) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.FalscherDatentyp, "Attribut " + (n + 1).ToString() + " ist keine Ganzahl."); }
+                        if (v.Type != enVariableDataType.Numeral) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.FalscherDatentyp, "Attribut " + (n + 1) + " ist keine Ganzahl."); }
+                        if (v.ValueDouble != (int)v.ValueDouble) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.FalscherDatentyp, "Attribut " + (n + 1) + " ist keine Ganzahl."); }
                     } else {
-                        return new strSplittedAttributesFeedback(enSkriptFehlerTyp.FalscherDatentyp, "Attribut " + (n + 1).ToString() + " ist nicht der erwartete Typ");
+                        return new strSplittedAttributesFeedback(enSkriptFehlerTyp.FalscherDatentyp, "Attribut " + (n + 1) + " ist nicht der erwartete Typ");
                     }
                 }
 
@@ -238,9 +237,9 @@ namespace BlueScript {
                         var cont = f.ContinuePosition;
                         var codebltxt = string.Empty;
                         if (GetCodeBlockAfter) {
-                            var x = GetCodeBlockText(scriptText, cont);
-                            if (!string.IsNullOrEmpty(x.Item2)) { return new strCanDoFeedback(f.ContinuePosition, x.Item2, true); }
-                            codebltxt = x.Item1;
+                            var (item1, item2) = GetCodeBlockText(scriptText, cont);
+                            if (!string.IsNullOrEmpty(item2)) { return new strCanDoFeedback(f.ContinuePosition, item2, true); }
+                            codebltxt = item1;
                             cont = cont + codebltxt.Length + 2;
                         }
                         return new strCanDoFeedback(cont, comandtext, f.AttributeText, codebltxt);
@@ -261,9 +260,9 @@ namespace BlueScript {
             co += "\r\n";
             co += "Argumente:\r\n";
             co += "~~~~~~~~~~\r\n";
-            for (var z = 0; z < Args.Count(); z++) {
-                co = co + "  - Argument " + (z + 1).ToString() + ": " + Args[z].ToString();
-                if (z == Args.Count() - 1 && EndlessArgs) {
+            for (var z = 0; z < Args.Count; z++) {
+                co = co + "  - Argument " + (z + 1) + ": " + Args[z];
+                if (z == Args.Count - 1 && EndlessArgs) {
                     co += " -> Dieses Argument kann beliebig oft wiederholt werden";
                 }
                 co += "\r\n";
@@ -271,7 +270,7 @@ namespace BlueScript {
             co += "\r\n";
             co += "Rückgabe:\r\n";
             co += "~~~~~~~~~\r\n";
-            co = co + "  - Rückgabetyp: " + Returns.ToString() + "\r\n";
+            co = co + "  - Rückgabetyp: " + Returns + "\r\n";
             co += "\r\n";
             co += "Beschreibung:\r\n";
             co += "~~~~~~~~~~~~\r\n";
@@ -281,7 +280,7 @@ namespace BlueScript {
 
         public string ReadableText() => Syntax;
 
-        public QuickImage SymbolForReadableText() => null;
+        public QuickImage? SymbolForReadableText() => null;
 
         private strGetEndFeedback GetEnd(string scriptText, int startpos, int lenghtStartSequence) {
             //z.B: beim Befehl DO
@@ -289,7 +288,7 @@ namespace BlueScript {
                 return new strGetEndFeedback(startpos, string.Empty);
             }
 
-            (var pos, var which) = NextText(scriptText, startpos, new List<string>() { EndSequence }, false, false, KlammernStd);
+            var (pos, which) = NextText(scriptText, startpos, new List<string> { EndSequence }, false, false, KlammernStd);
             if (pos < startpos) {
                 return new strGetEndFeedback("Keinen Endpunkt gefunden.");
             }

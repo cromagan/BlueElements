@@ -18,6 +18,7 @@
 using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace BlueScript {
 
@@ -67,7 +68,7 @@ namespace BlueScript {
                             tmpList[z] = tmpList[z].Replace(attvar.Attributes[3].ValueString, attvar.Attributes[4].ValueString);
                         } else {
                             // Not Case Sesitive
-                            tmpList[z] = tmpList[z].Replace(attvar.Attributes[3].ValueString, attvar.Attributes[4].ValueString, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                            tmpList[z] = tmpList[z].Replace(attvar.Attributes[3].ValueString, attvar.Attributes[4].ValueString, RegexOptions.IgnoreCase);
                         }
                         again = tmpList[z] != orignal;
                     } else {

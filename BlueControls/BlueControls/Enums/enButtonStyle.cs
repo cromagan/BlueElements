@@ -42,6 +42,6 @@ namespace BlueControls.Enums {
 
         Text = 131072,
 
-        Borderless = 65536,
+        Borderless = 65536
     }
 }

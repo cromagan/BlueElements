@@ -18,7 +18,6 @@
 using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
-using static BlueBasics.Extensions;
 
 namespace BlueScript {
 
@@ -39,7 +38,7 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => s == null ? (new()) : s.Variablen.AllNames();
+        public override List<string> Comand(Script s) => s == null ? (new List<string>()) : s.Variablen.AllNames();
 
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var variableName = infos.ComandText.ToLower().ReduceToChars(Constants.AllowedCharsVariableName);
@@ -47,7 +46,7 @@ namespace BlueScript {
             if (variable == null) { return new strDoItFeedback("Variable '" + variableName + "' nicht gefunden"); }
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
-            if (variable.Type != enVariableDataType.NotDefinedYet && attvar.Attributes[0].Type != variable.Type) { return new strDoItFeedback("Variable '" + variableName + "' ist nicht der erwartete Typ " + attvar.Attributes[0].Type.ToString() + ", sondern " + variable.Type.ToString()); }
+            if (variable.Type != enVariableDataType.NotDefinedYet && attvar.Attributes[0].Type != variable.Type) { return new strDoItFeedback("Variable '" + variableName + "' ist nicht der erwartete Typ " + attvar.Attributes[0].Type + ", sondern " + variable.Type); }
 
             if (variable.Readonly) { return strDoItFeedback.Schreibgschützt(); }
 

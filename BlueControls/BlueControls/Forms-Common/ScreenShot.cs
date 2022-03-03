@@ -16,15 +16,9 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
-using BlueBasics.Enums;
 using BlueControls.Forms;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-using System.Runtime.CompilerServices;
 using static BlueBasics.BitmapExt;
 
 namespace BlueControls {
@@ -40,7 +34,7 @@ namespace BlueControls {
 
         #region Fields
 
-        private readonly int _DrawSize = 20;
+        private const int _DrawSize = 20;
         private readonly string _DrawText = string.Empty;
         private readonly clsScreenData _FeedBack;
         private Bitmap _ClipedArea;
@@ -57,9 +51,7 @@ namespace BlueControls {
             _FeedBack = new clsScreenData();
         }
 
-        private ScreenShot(string text) : this() {
-            _DrawText = text;
-        }
+        private ScreenShot(string text) : this() => _DrawText = text;
 
         #endregion
 
@@ -89,9 +81,8 @@ namespace BlueControls {
                 try {
                     var r = Generic.RectangleOfAllScreens();
                     Bitmap b = new(r.Width, r.Height, PixelFormat.Format32bppPArgb);
-                    using (var GR = Graphics.FromImage(b)) {
-                        GR.CopyFromScreen(r.X, r.Y, 0, 0, b.Size);
-                    }
+                    using var GR = Graphics.FromImage(b);
+                    GR.CopyFromScreen(r.X, r.Y, 0, 0, b.Size);
                     return b;
                 } catch {
                     Generic.CollectGarbage();

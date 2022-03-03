@@ -39,7 +39,7 @@ namespace BlueControls.ItemCollection {
         public List<QuickImage> Overlays;
 
         public int Padding;
-        private bool disposedValue;
+        private bool _disposedValue;
 
         #endregion
 
@@ -47,19 +47,19 @@ namespace BlueControls.ItemCollection {
 
         public BitmapPadItem(string internalname) : this(internalname, null, Size.Empty) { }
 
-        public BitmapPadItem(string internalname, string FileToLoad) : this(internalname, (Bitmap)BitmapExt.Image_FromFile(FileToLoad), Size.Empty) { }
+        public BitmapPadItem(string internalname, string fileToLoad) : this(internalname, (Bitmap)BitmapExt.Image_FromFile(fileToLoad), Size.Empty) { }
 
-        public BitmapPadItem(string internalname, Bitmap bmp) : this(internalname, bmp, Size.Empty) { }
+        public BitmapPadItem(string internalname, Bitmap? bmp) : this(internalname, bmp, Size.Empty) { }
 
-        public BitmapPadItem(Bitmap bmp, Size size) : this(string.Empty, bmp, size) { }
+        public BitmapPadItem(Bitmap? bmp, Size size) : this(string.Empty, bmp, size) { }
 
-        public BitmapPadItem(Bitmap bmp) : this(string.Empty, bmp, Size.Empty) { }
+        public BitmapPadItem(Bitmap? bmp) : this(string.Empty, bmp, Size.Empty) { }
 
-        public BitmapPadItem(string internalname, Bitmap bmp, Size size) : base(internalname) {
+        public BitmapPadItem(string internalname, Bitmap? bmp, Size size) : base(internalname) {
             Bitmap = bmp;
             SetCoordinates(new RectangleF(0, 0, size.Width, size.Height), true);
             Overlays = new List<QuickImage>();
-            Hintergrund_weiß_füllen = true;
+            Hintergrund_Weiß_Füllen = true;
             Padding = 0;
             Bild_Modus = enSizeModes.EmptySpace;
             Stil = PadStyles.Undefiniert; // Kein Rahmen
@@ -71,12 +71,12 @@ namespace BlueControls.ItemCollection {
 
         public enSizeModes Bild_Modus { get; set; }
 
-        public Bitmap Bitmap { get; set; }
+        public Bitmap? Bitmap { get; set; }
 
-        public bool Hintergrund_weiß_füllen { get; set; }
+        public bool Hintergrund_Weiß_Füllen { get; set; }
 
         [Description("Hier kann ein Variablenname als Platzhalter eingegeben werden. Beispiel: ~Bild~")]
-        public string Platzhalter_für_Layout { get; set; }
+        public string Platzhalter_Für_Layout { get; set; }
 
         #endregion
 
@@ -106,7 +106,7 @@ namespace BlueControls.ItemCollection {
 
         public void Dispose() {
             // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-            Dispose(disposing: true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -119,13 +119,13 @@ namespace BlueControls.ItemCollection {
                 new FlexiControlForProperty(this, "Platzhalter_für_Layout", 2),
                 new FlexiControl()
             };
-            ItemCollectionList Comms = new()
+            ItemCollectionList comms = new()
             {
                 { "Abschneiden", ((int)enSizeModes.BildAbschneiden).ToString(), QuickImage.Get("BildmodusAbschneiden|32") },
                 { "Verzerren", ((int)enSizeModes.Verzerren).ToString(), QuickImage.Get("BildmodusVerzerren|32") },
                 { "Einpassen", ((int)enSizeModes.EmptySpace).ToString(), QuickImage.Get("BildmodusEinpassen|32") }
             };
-            l.Add(new FlexiControlForProperty(this, "Bild-Modus", Comms));
+            l.Add(new FlexiControlForProperty(this, "Bild-Modus", comms));
             l.Add(new FlexiControl());
             AddLineStyleOption(l);
             l.Add(new FlexiControlForProperty(this, "Hintergrund_weiß_füllen"));
@@ -144,7 +144,7 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "whiteback":
-                    Hintergrund_weiß_füllen = value.FromPlusMinus();
+                    Hintergrund_Weiß_Füllen = value.FromPlusMinus();
                     return true;
 
                 case "padding":
@@ -156,28 +156,28 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "placeholder":
-                    Platzhalter_für_Layout = value.FromNonCritical();
+                    Platzhalter_Für_Layout = value.FromNonCritical();
                     return true;
             }
             return false;
         }
 
         public bool ReplaceVariable(Script s, Variable variable) {
-            if (string.IsNullOrEmpty(Platzhalter_für_Layout)) { return false; }
-            if ("~" + variable.Name.ToLower() + "~" != Platzhalter_für_Layout.ToLower()) { return false; }
+            if (string.IsNullOrEmpty(Platzhalter_Für_Layout)) { return false; }
+            if ("~" + variable.Name.ToLower() + "~" != Platzhalter_Für_Layout.ToLower()) { return false; }
             if (variable.Type != Skript.Enums.enVariableDataType.Bitmap) { return false; }
             var ot = variable.ValueBitmap(s);
             if (ot is Bitmap bmp) {
                 Bitmap = bmp;
                 OnChanged();
                 return true;
-            } else {
-                return false;
             }
+
+            return false;
         }
 
         public bool ResetVariables() {
-            if (!string.IsNullOrEmpty(Platzhalter_für_Layout) && Bitmap != null) {
+            if (!string.IsNullOrEmpty(Platzhalter_Für_Layout) && Bitmap != null) {
                 Bitmap.Dispose();
                 Bitmap = null;
                 OnChanged();
@@ -190,12 +190,12 @@ namespace BlueControls.ItemCollection {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
             t = t + "Modus=" + (int)Bild_Modus + ", ";
-            if (!string.IsNullOrEmpty(Platzhalter_für_Layout)) {
-                t = t + "Placeholder=" + Platzhalter_für_Layout.ToNonCritical() + ", ";
+            if (!string.IsNullOrEmpty(Platzhalter_Für_Layout)) {
+                t = t + "Placeholder=" + Platzhalter_Für_Layout.ToNonCritical() + ", ";
             }
-            t = t + "WhiteBack=" + Hintergrund_weiß_füllen.ToPlusMinus() + ", ";
-            foreach (var thisQI in Overlays) {
-                t = t + "Overlay=" + thisQI + ", ";
+            t = t + "WhiteBack=" + Hintergrund_Weiß_Füllen.ToPlusMinus() + ", ";
+            foreach (var thisQi in Overlays) {
+                t = t + "Overlay=" + thisQi + ", ";
             }
             t = t + "Padding=" + Padding + ", ";
             if (Bitmap != null) {
@@ -207,7 +207,7 @@ namespace BlueControls.ItemCollection {
         protected override string ClassId() => "IMAGE";
 
         protected virtual void Dispose(bool disposing) {
-            if (!disposedValue) {
+            if (!_disposedValue) {
                 if (disposing) {
                     // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
                 }
@@ -219,7 +219,7 @@ namespace BlueControls.ItemCollection {
                     Bitmap = null;
                 }
 
-                disposedValue = true;
+                _disposedValue = true;
             }
         }
 
@@ -237,7 +237,7 @@ namespace BlueControls.ItemCollection {
                         }
 
                     case enSizeModes.BildAbschneiden: {
-                            var scale = (float)Math.Max((drawingCoordinates.Width - (Padding * 2)) / Bitmap.Width, (drawingCoordinates.Height - (Padding * 2)) / Bitmap.Height);
+                            var scale = Math.Max((drawingCoordinates.Width - (Padding * 2)) / Bitmap.Width, (drawingCoordinates.Height - (Padding * 2)) / Bitmap.Height);
                             var tmpw = (drawingCoordinates.Width - (Padding * 2)) / scale;
                             var tmph = (drawingCoordinates.Height - (Padding * 2)) / scale;
                             r3 = new RectangleF((Bitmap.Width - tmpw) / 2, (Bitmap.Height - tmph) / 2, tmpw, tmph);
@@ -246,7 +246,7 @@ namespace BlueControls.ItemCollection {
                         }
                     default: // Is = enSizeModes.WeißerRand
                         {
-                            var scale = (float)Math.Min((drawingCoordinates.Width - (Padding * 2)) / Bitmap.Width, (drawingCoordinates.Height - (Padding * 2)) / Bitmap.Height);
+                            var scale = Math.Min((drawingCoordinates.Width - (Padding * 2)) / Bitmap.Width, (drawingCoordinates.Height - (Padding * 2)) / Bitmap.Height);
                             r2 = new RectangleF(((drawingCoordinates.Width - (Bitmap.Width * scale)) / 2) + drawingCoordinates.Left, ((drawingCoordinates.Height - (Bitmap.Height * scale)) / 2) + drawingCoordinates.Top, Bitmap.Width * scale, Bitmap.Height * scale);
                             break;
                         }
@@ -257,7 +257,7 @@ namespace BlueControls.ItemCollection {
             gr.RotateTransform(-Drehwinkel);
             r1 = new RectangleF(r1.Left - trp.X, r1.Top - trp.Y, r1.Width, r1.Height);
             r2 = new RectangleF(r2.Left - trp.X, r2.Top - trp.Y, r2.Width, r2.Height);
-            if (Hintergrund_weiß_füllen) {
+            if (Hintergrund_Weiß_Füllen) {
                 gr.FillRectangle(Brushes.White, r1);
             }
             try {
@@ -279,15 +279,15 @@ namespace BlueControls.ItemCollection {
                     gr.DrawRectangle(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(zoom * Parent.SheetStyleScale), r1);
                 }
             }
-            foreach (var thisQI in Overlays) {
-                gr.DrawImage(thisQI, r2.Left + 8, r2.Top + 8);
+            foreach (var thisQi in Overlays) {
+                gr.DrawImage(thisQi, r2.Left + 8, r2.Top + 8);
             }
             gr.TranslateTransform(-trp.X, -trp.Y);
             gr.ResetTransform();
             if (!forPrinting) {
-                if (!string.IsNullOrEmpty(Platzhalter_für_Layout)) {
+                if (!string.IsNullOrEmpty(Platzhalter_Für_Layout)) {
                     Font f = new("Arial", 8);
-                    BlueFont.DrawString(gr, Platzhalter_für_Layout, f, Brushes.Black, drawingCoordinates.Left, drawingCoordinates.Top);
+                    BlueFont.DrawString(gr, Platzhalter_Für_Layout, f, Brushes.Black, drawingCoordinates.Left, drawingCoordinates.Top);
                 }
             }
             base.DrawExplicit(gr, drawingCoordinates, zoom, shiftX, shiftY, forPrinting);

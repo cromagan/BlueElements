@@ -18,7 +18,6 @@
 using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
-using static BlueBasics.Extensions;
 
 namespace BlueScript {
 
@@ -75,7 +74,7 @@ namespace BlueScript {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
             if (attvar.Attributes[0].ValueBool) {
-                (var err, var _) = s.Parse(infos.CodeBlockAfterText);
+                var (err, _) = s.Parse(infos.CodeBlockAfterText);
                 if (!string.IsNullOrEmpty(err)) { return new strDoItFeedback(err); }
             } else {
                 s.Line += infos.LineBreakInCodeBlock;

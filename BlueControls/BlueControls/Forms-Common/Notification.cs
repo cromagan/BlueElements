@@ -15,7 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
 using BlueBasics.Enums;
 using System;
 using System.Drawing;
@@ -26,19 +25,19 @@ namespace BlueControls.Forms {
 
         #region Fields
 
-        private static readonly double SpeedIn = 250d;
+        private const bool _userClicked = false;
+        private const double SpeedIn = 250d;
 
         // Wegen Recheoperation
-        private static readonly double SpeedOut = 250d;
+        private const double SpeedOut = 250d;
 
         // Wegen Recheoperation
         private readonly DateTime _FirstTimer = DateTime.Now;
 
         private readonly int _ScreenTime = -999;
-        private readonly bool _userClicked = false;
         private readonly int lowestY;
-        private bool _hiddenNow = false;
-        private bool _isIn = false;
+        private bool _hiddenNow;
+        private bool _isIn;
         private DateTime _outime = new(0);
 
         #endregion
@@ -86,7 +85,7 @@ namespace BlueControls.Forms {
 
         #region Properties
 
-        public Notification NoteBelow { get; private set; } = null;
+        public Notification NoteBelow { get; }
 
         #endregion
 

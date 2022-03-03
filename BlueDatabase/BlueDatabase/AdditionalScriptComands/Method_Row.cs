@@ -46,7 +46,7 @@ namespace BlueScript {
 
         #region Methods
 
-        public static RowItem ObjectToRow(Variable attribute) {
+        public static RowItem? ObjectToRow(Variable? attribute) {
             if (!attribute.ObjectType("row")) { return null; }
 
             var d = attribute.ObjectData();
@@ -59,9 +59,9 @@ namespace BlueScript {
             return db?.Row.SearchByKey(long.Parse(d2[1]));
         }
 
-        public static strDoItFeedback RowToObjectFeedback(RowItem row) => row == null
+        public static strDoItFeedback RowToObjectFeedback(RowItem? row) => row == null
 ? new strDoItFeedback("NULL", "row")
-: new strDoItFeedback(row.Database.Filename + "|" + row.Key.ToString(), "row");
+: new strDoItFeedback(row.Database.Filename + "|" + row.Key, "row");
 
         public override List<string> Comand(Script s) => new() { "row" };
 
@@ -74,7 +74,7 @@ namespace BlueScript {
 
             var r = RowCollection.MatchesTo(allFi);
 
-            return r == null || r.Count == 0 || r.Count > 1 ? RowToObjectFeedback(null) : RowToObjectFeedback(r[0]);
+            return r == null || r.Count is 0 or > 1 ? RowToObjectFeedback(null) : RowToObjectFeedback(r[0]);
         }
 
         #endregion

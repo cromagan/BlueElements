@@ -21,13 +21,13 @@ namespace BlueDatabase.EventArgs {
 
         #region Constructors
 
-        public RowEventArgs(RowItem row) => Row = row;
+        public RowEventArgs(RowItem? row) => Row = row;
 
         #endregion
 
         #region Properties
 
-        public RowItem Row { get; set; }
+        public RowItem? Row { get; set; }
 
         #endregion
     }

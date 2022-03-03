@@ -21,6 +21,7 @@ using BlueControls.ItemCollection;
 using BlueDatabase;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BlueControls.Forms {
 
@@ -34,7 +35,7 @@ namespace BlueControls.Forms {
 
         #region Constructors
 
-        private ItemSelect(List<BasicListItem> items) : base(true, true) {
+        private ItemSelect(List<BasicListItem?> items) : base(true, true) {
             InitializeComponent();
 
             List.Item.Clear();
@@ -51,12 +52,9 @@ namespace BlueControls.Forms {
 
         #region Methods
 
-        public static RowItem Show(List<RowItem> rows, string layoutID) {
+        public static RowItem? Show(List<RowItem?> rows, string layoutId) {
             try {
-                var items = new List<BasicListItem>();
-                foreach (var ThisRow in rows) {
-                    items.Add(new RowFormulaListItem(ThisRow, layoutID, string.Empty));
-                }
+                var items = rows.Select(thisRow => new RowFormulaListItem(thisRow, layoutId, string.Empty)).Cast<BasicListItem?>().ToList();
 
                 var x = Show(items);
                 return (x as RowFormulaListItem)?.Row;
@@ -67,7 +65,7 @@ namespace BlueControls.Forms {
         }
 
         public static string Show(List<string> files, string fileEncryptionKey) {
-            var items = new List<BasicListItem>();
+            var items = new List<BasicListItem?>();
 
             foreach (var thisString in files) {
                 if (thisString.FileType() == enFileFormat.Image) {
@@ -78,7 +76,7 @@ namespace BlueControls.Forms {
             return x != null ? x.Internal : string.Empty;
         }
 
-        public static BasicListItem Show(List<BasicListItem> items) {
+        public static BasicListItem? Show(List<BasicListItem?> items) {
             if (items == null || items.Count == 0) { return null; }
 
             var x = new ItemSelect(items);

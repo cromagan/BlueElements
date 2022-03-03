@@ -32,7 +32,6 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using static BlueBasics.BitmapExt;
-using static BlueBasics.Extensions;
 using static BlueBasics.FileOperations;
 
 namespace BlueControls.Controls {
@@ -43,11 +42,11 @@ namespace BlueControls.Controls {
 
         #region Fields
 
-        private Bitmap _Bitmap = null;
+        private Bitmap? _bitmap;
 
-        private int _MaxSize = -1;
+        private int _maxSize = -1;
 
-        private int _Richt;
+        private int _richt;
 
         #endregion
 
@@ -77,21 +76,21 @@ namespace BlueControls.Controls {
         #region Properties
 
         [DefaultValue((Bitmap)null)]
-        public Bitmap Bitmap {
-            get => _Bitmap;
+        public Bitmap? Bitmap {
+            get => _bitmap;
             private set {
-                if (_Bitmap == null && value == null) { return; }
-                _Bitmap = value;
+                if (_bitmap == null && value == null) { return; }
+                _bitmap = value;
                 ZoomFitInvalidateAndCheckButtons();
             }
         }
 
         [DefaultValue(-1)]
         public int MaxSize {
-            get => _MaxSize;
+            get => _maxSize;
             set {
                 if (value < 1) { value = -1; }
-                _MaxSize = value;
+                _maxSize = value;
             }
         }
 
@@ -118,8 +117,8 @@ namespace BlueControls.Controls {
         #region Methods
 
         public void Clear() {
-            if (_Bitmap != null || SorceType != enSorceType.Nichts || !string.IsNullOrEmpty(SorceName)) {
-                _Bitmap = null;
+            if (_bitmap != null || SorceType != enSorceType.Nichts || !string.IsNullOrEmpty(SorceName)) {
+                _bitmap = null;
                 SorceType = enSorceType.Nichts;
                 SorceName = string.Empty;
                 ZoomFitInvalidateAndCheckButtons();
@@ -130,51 +129,51 @@ namespace BlueControls.Controls {
         public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
             switch (e.ClickedComand) {
                 case "ExF":
-                    PictureView epv = new(_Bitmap);
+                    PictureView epv = new(_bitmap);
                     epv.Show();
                     return true;
 
                 case "Speichern":
-                    System.Windows.Forms.FolderBrowserDialog SavOrt = new();
-                    SavOrt.ShowDialog();
-                    if (!PathExists(SavOrt.SelectedPath)) {
+                    System.Windows.Forms.FolderBrowserDialog savOrt = new();
+                    savOrt.ShowDialog();
+                    if (!PathExists(savOrt.SelectedPath)) {
                         MessageBox.Show("Abbruch!", enImageCode.Warnung, "OK");
                         return true;
                     }
-                    var NDT = TempFile(SavOrt.SelectedPath + "\\Bild.png");
-                    _Bitmap.Save(NDT, ImageFormat.Png);
-                    ExecuteFile(NDT);
+                    var ndt = TempFile(savOrt.SelectedPath + "\\Bild.png");
+                    _bitmap.Save(ndt, ImageFormat.Png);
+                    ExecuteFile(ndt);
                     return true;
             }
             return false;
         }
 
-        public void FromFile(string Filename) {
-            if (!FileExists(Filename)) {
+        public void FromFile(string filename) {
+            if (!FileExists(filename)) {
                 //Develop.DebugPrint(enFehlerArt.Fehler, "Datei Existiert nicht: " + Filename);
                 Clear();
                 return;
             }
-            var ix = (Bitmap)Image_FromFile(Filename);
+            var ix = (Bitmap)Image_FromFile(filename);
             var i = Image_Clone(ix);
-            if (_MaxSize > 0) {
-                _Bitmap = BitmapExt.Resize(i, _MaxSize, _MaxSize, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true);
+            if (_maxSize > 0) {
+                _bitmap = BitmapExt.Resize(i, _maxSize, _maxSize, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true);
                 SorceType = enSorceType.LoadedFromDiskAndResized;
-                SorceName = Filename;
+                SorceName = filename;
             } else {
-                _Bitmap = i;
+                _bitmap = i;
                 SorceType = enSorceType.LoadedFromDisk;
-                SorceName = Filename;
+                SorceName = filename;
             }
             ZoomFitInvalidateAndCheckButtons();
             OnImageChanged();
         }
 
-        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
-            HotItem = null;
-            if (_Bitmap != null) {
-                Items.Add("Externes Fenster öffnen", "ExF");
-                Items.Add(enContextMenuComands.Speichern);
+        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList? items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
+            hotItem = null;
+            if (_bitmap != null) {
+                items.Add("Externes Fenster öffnen", "ExF");
+                items.Add(enContextMenuComands.Speichern);
             }
         }
 
@@ -182,8 +181,8 @@ namespace BlueControls.Controls {
 
         public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
-        public void SetBitmap(Bitmap BMP) {
-            _Bitmap = BMP;
+        public void SetBitmap(Bitmap? bmp) {
+            _bitmap = bmp;
             SorceType = enSorceType.SetedByProperty;
             SorceName = string.Empty;
             ZoomFitInvalidateAndCheckButtons();
@@ -193,22 +192,23 @@ namespace BlueControls.Controls {
         /// <summary>
         /// Ändert die Herkunft ab.
         /// </summary>
-        /// <param name="SorceName"></param>
-        /// <param name="SorceType"></param>
-        internal void ChangeSource(string SorceName, enSorceType SorceType, bool ThrowEvent) {
-            this.SorceName = SorceName;
-            this.SorceType = SorceType;
-            if (ThrowEvent) { OnImageChanged(); }
+        /// <param name="sorceName"></param>
+        /// <param name="sorceType"></param>
+        /// <param name="throwEvent"></param>
+        internal void ChangeSource(string sorceName, enSorceType sorceType, bool throwEvent) {
+            SorceName = sorceName;
+            SorceType = sorceType;
+            if (throwEvent) { OnImageChanged(); }
         }
 
-        protected override void DrawControl(Graphics GR, enStates vState) {
+        protected override void DrawControl(Graphics gr, enStates vState) {
             if (Convert.ToBoolean(vState & enStates.Standard_MouseOver)) { vState ^= enStates.Standard_MouseOver; }
             if (Convert.ToBoolean(vState & enStates.Standard_MousePressed)) { vState ^= enStates.Standard_MousePressed; }
-            Skin.Draw_Back(GR, enDesign.EasyPic, vState, DisplayRectangle, this, true);
-            if (_Bitmap != null) {
-                GR.DrawImageInRectAspectRatio(_Bitmap, 1, 1, Width - 2, Height - 2);
+            Skin.Draw_Back(gr, enDesign.EasyPic, vState, DisplayRectangle, this, true);
+            if (_bitmap != null) {
+                gr.DrawImageInRectAspectRatio(_bitmap, 1, 1, Width - 2, Height - 2);
             }
-            Skin.Draw_Border(GR, enDesign.EasyPic, vState, DisplayRectangle);
+            Skin.Draw_Border(gr, enDesign.EasyPic, vState, DisplayRectangle);
         }
 
         protected override void OnEnabledChanged(System.EventArgs e) {
@@ -216,7 +216,7 @@ namespace BlueControls.Controls {
             if (!Enabled) {
                 EditPanelFrame.Visible = false;
                 _PanelMover.Enabled = false;
-                _Richt = 0;
+                _richt = 0;
             }
         }
 
@@ -227,7 +227,7 @@ namespace BlueControls.Controls {
             };
             OnConnectedDatabase(ed);
             AusDatenbank.Enabled = ed.File != null;
-            _Richt = 1;
+            _richt = 1;
             _PanelMover.Enabled = true;
         }
 
@@ -253,12 +253,12 @@ namespace BlueControls.Controls {
                 File = null
             };
             OnConnectedDatabase(ed);
-            if (ed.File is Database DB) {
-                if (_Bitmap != null) {
+            if (ed.File is Database db) {
+                if (_bitmap != null) {
                     if (MessageBox.Show("Vorhandenes Bild überschreiben?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
                 }
 
-                var n = ItemSelect.Show(DB.AllConnectedFilesLCase(), DB.FileEncryptionKey);
+                var n = ItemSelect.Show(db.AllConnectedFilesLCase(), db.FileEncryptionKey);
 
                 if (string.IsNullOrEmpty(n)) { return; }
                 FromFile(n);
@@ -272,16 +272,16 @@ namespace BlueControls.Controls {
         }
 
         private void EditPanel_Tick(object sender, System.EventArgs e) {
-            if (_Richt == 0) {
+            if (_richt == 0) {
                 if (!EditPanelFrame.Visible) {
                     _PanelMover.Enabled = false;
                     return;
                 }
             }
-            if (_Richt >= 0) {
-                if (!ContainsMouse()) { _Richt = -1; }
+            if (_richt >= 0) {
+                if (!ContainsMouse()) { _richt = -1; }
             }
-            if (_Richt > 0) {
+            if (_richt > 0) {
                 if (!EditPanelFrame.Visible) {
                     EditPanelFrame.Top = -EditPanelFrame.Height;
                     EditPanelFrame.Visible = true;
@@ -289,16 +289,16 @@ namespace BlueControls.Controls {
                 }
                 if (EditPanelFrame.Top >= 0) {
                     EditPanelFrame.Top = 0;
-                    _Richt = 0;
+                    _richt = 0;
                     return;
                 }
                 EditPanelFrame.Top += 4;
                 return;
             }
-            if (_Richt < 0) {
+            if (_richt < 0) {
                 if (EditPanelFrame.Top < -EditPanelFrame.Height) {
                     EditPanelFrame.Visible = false;
-                    _Richt = 0;
+                    _richt = 0;
                     return;
                 }
                 EditPanelFrame.Top -= 4;
@@ -306,17 +306,17 @@ namespace BlueControls.Controls {
         }
 
         private void Lade_Click(object sender, System.EventArgs e) {
-            if (_Bitmap != null) {
+            if (_bitmap != null) {
                 if (MessageBox.Show("Vorhandenes Bild überschreiben?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
             }
             OpenDia.ShowDialog();
         }
 
         private void MakePic_Click(object sender, System.EventArgs e) {
-            if (_Bitmap != null) {
+            if (_bitmap != null) {
                 if (MessageBox.Show("Vorhandenes Bild überschreiben?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
             }
-            _Bitmap = ScreenShot.GrabArea(ParentForm());
+            _bitmap = ScreenShot.GrabArea(ParentForm());
             SorceType = enSorceType.ScreenShot;
             SorceName = string.Empty;
             ZoomFitInvalidateAndCheckButtons();
@@ -330,9 +330,9 @@ namespace BlueControls.Controls {
         private void OpenDia_FileOk(object sender, CancelEventArgs e) => FromFile(OpenDia.FileName);
 
         private void ZoomFitInvalidateAndCheckButtons() {
-            _Richt = -1;
+            _richt = -1;
             _PanelMover.Enabled = true;
-            if (_Bitmap == null) {
+            if (_bitmap == null) {
                 DelP.Enabled = false;
                 Invalidate();
                 return;

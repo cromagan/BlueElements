@@ -45,7 +45,7 @@ namespace BlueControls.ItemCollection {
 
         public override bool IsClickable() => false;
 
-        protected override Size ComputeSizeUntouchedForListBox() => Pos.X == 0 && Pos.X == 0 && Pos.Width == 0 && Pos.Height == 0 ? new Size(4, 4) : Pos.Size;
+        protected override Size ComputeSizeUntouchedForListBox() => Pos.X == 0 && Pos.Y == 0 && Pos.Width == 0 && Pos.Height == 0 ? new Size(4, 4) : Pos.Size;
 
         protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, bool Translate) => GR.DrawLine(Skin.GetBlueFont(itemdesign, enStates.Standard).Pen(1f), PositionModified.Left, (int)(PositionModified.Top + (PositionModified.Height / 2.0)), PositionModified.Right, (int)(PositionModified.Top + (PositionModified.Height / 2.0)));
 

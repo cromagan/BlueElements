@@ -18,7 +18,6 @@
 using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
-using static BlueBasics.Extensions;
 
 namespace BlueScript {
 
@@ -65,7 +64,7 @@ namespace BlueScript {
 
             nums.Sort();
 
-            attvar.Attributes[0].ValueListString = nums.ConvertAll<string>(delegate (double i) { return i.ToString(); });
+            attvar.Attributes[0].ValueListString = nums.ConvertAll<string>(i => i.ToString());
             return strDoItFeedback.Null();
         }
 

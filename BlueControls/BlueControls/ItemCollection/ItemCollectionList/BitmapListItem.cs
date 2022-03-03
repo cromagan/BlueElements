@@ -35,7 +35,7 @@ namespace BlueControls.ItemCollection {
 
         private readonly ListExt<QuickImage> _overlays = new();
 
-        private Bitmap _Bitmap;
+        private Bitmap? _Bitmap;
 
         private string _caption;
 
@@ -45,19 +45,17 @@ namespace BlueControls.ItemCollection {
 
         private string _ImageFilename;
 
-        private int _padding;
-
         #endregion
 
         #region Constructors
 
-        public BitmapListItem(Bitmap bmp, string internalname, string caption) : base(internalname) {
+        public BitmapListItem(Bitmap? bmp, string internalname, string caption) : base(internalname) {
             _caption = caption;
             _captiontmp.Clear();
             _Bitmap = bmp;
             //_ImageFilename = Filename;
             //_EncryptionKey = encryptionKey;
-            _padding = 0;
+            Padding = 0;
             _overlays.Clear();
             //_overlays.ListOrItemChanged += _overlays_ListOrItemChanged;
         }
@@ -68,7 +66,7 @@ namespace BlueControls.ItemCollection {
             //_Bitmap = bmp;
             _ImageFilename = Filename;
             _EncryptionKey = encryptionKey;
-            _padding = 0;
+            Padding = 0;
             _overlays.Clear();
             //_overlays.ListOrItemChanged += _overlays_ListOrItemChanged;
         }
@@ -77,7 +75,7 @@ namespace BlueControls.ItemCollection {
 
         #region Properties
 
-        public Bitmap Bitmap {
+        public Bitmap? Bitmap {
             get {
                 GetImage();
                 return _Bitmap;
@@ -112,14 +110,7 @@ namespace BlueControls.ItemCollection {
 
         public List<QuickImage> Overlays => _overlays;
 
-        public int Padding {
-            get => _padding;
-            set {
-                if (_padding == value) { return; }
-                _padding = value;
-                //OnChanged();
-            }
-        }
+        public int Padding { get; set; }
 
         public override string QuickInfo => string.Empty;
 
@@ -164,7 +155,7 @@ namespace BlueControls.ItemCollection {
             if (DrawBorderAndBack) { Skin.Draw_Back(GR, itemdesign, state, PositionModified, null, false); }
 
             var drawingCoordinates = PositionModified;
-            drawingCoordinates.Inflate(-_padding, -_padding);
+            drawingCoordinates.Inflate(-Padding, -Padding);
             var ScaledImagePosition = RectangleF.Empty;
             var AreaOfWholeImage = RectangleF.Empty;
             var bFont = Skin.GetBlueFont(itemdesign, state);
@@ -172,8 +163,8 @@ namespace BlueControls.ItemCollection {
             if (!string.IsNullOrEmpty(_caption) && _captiontmp.Count == 0) { _captiontmp = bFont.SplitByWidth(_caption, drawingCoordinates.Width, _captionlines); }
             if (_Bitmap != null) {
                 AreaOfWholeImage = new RectangleF(0, 0, _Bitmap.Width, _Bitmap.Height);
-                var scale = (float)Math.Min((drawingCoordinates.Width - (_padding * 2)) / (double)_Bitmap.Width,
-                                              (drawingCoordinates.Height - (_padding * 2) - (_captionlines * ConstMY)) / (double)_Bitmap.Height);
+                var scale = (float)Math.Min((drawingCoordinates.Width - (Padding * 2)) / (double)_Bitmap.Width,
+                                              (drawingCoordinates.Height - (Padding * 2) - (_captionlines * ConstMY)) / (double)_Bitmap.Height);
                 ScaledImagePosition = new RectangleF(((drawingCoordinates.Width - (_Bitmap.Width * scale)) / 2) + drawingCoordinates.Left,
                                                      ((drawingCoordinates.Height - (_Bitmap.Height * scale)) / 2) + drawingCoordinates.Top - (_captionlines * ConstMY / 2),
                                                     _Bitmap.Width * scale,

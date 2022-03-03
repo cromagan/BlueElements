@@ -48,7 +48,7 @@ namespace BlueScript {
             var tmp = attvar.Attributes[0].ValueListString;
 
             for (var z = 0; z < tmp.Count; z++) {
-                tmp[z] = tmp[z] + attvar.Attributes[1].ValueString;
+                tmp[z] += attvar.Attributes[1].ValueString;
             }
 
             attvar.Attributes[0].ValueListString = tmp;

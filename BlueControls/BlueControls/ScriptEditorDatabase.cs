@@ -27,7 +27,7 @@ namespace BlueControls {
        {
         #region Fields
 
-        private Database _Database = null;
+        private Database _Database;
 
         #endregion
 
@@ -47,10 +47,12 @@ namespace BlueControls {
                     _Database.Disposing -= _Database_Disposing;
                 }
                 _Database = value;
-                if (_Database != null) {
-                    ScriptText = _Database.RulesScript;
-                    _Database.Disposing += _Database_Disposing;
+                if (_Database == null) {
+                    return;
                 }
+
+                ScriptText = _Database.RulesScript;
+                _Database.Disposing += _Database_Disposing;
             }
         }
 
@@ -63,7 +65,7 @@ namespace BlueControls {
             _Database.RulesScript = ScriptText;
         }
 
-        protected override Script GenerateAndDoScript() {
+        protected override Script? GenerateAndDoScript() {
             if (_Database == null) {
                 Message("Keine Datenbank geladen.");
                 return null;
@@ -84,7 +86,7 @@ namespace BlueControls {
                 return null;
             }
 
-            (var _, var message, var s) = r.DoAutomatic("script testing");
+            var (_, message, s) = r.DoAutomatic("script testing");
 
             if (!string.IsNullOrEmpty(message)) {
                 Message("Allgemeiner Fehler: " + message);
@@ -105,7 +107,7 @@ namespace BlueControls {
         }
 
         private void scriptEditor_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-            ColumnItem c = null;
+            ColumnItem? c = null;
 
             if (e.HotItem is string txt) { c = _Database.Column.Exists(txt); }
 

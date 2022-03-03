@@ -23,6 +23,6 @@ namespace BlueBasics.Enums {
         Sprachneutral_String = 1,
         ZahlenwertInt = 100,
         ZahlenwertFloat = 101,
-        Datum_Uhrzeit = 200,
+        Datum_Uhrzeit = 200
     }
 }

@@ -4,7 +4,7 @@
         <name>BeCreative</name>
     </assembly>
     <members>
-        <member name="M:WindowsFormsApp1.Program.Main">
+        <member name="M:BeCreative.Program.Main">
             <summary>
             Der Haupteinstiegspunkt für die Anwendung.
             </summary>

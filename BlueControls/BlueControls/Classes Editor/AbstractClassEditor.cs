@@ -27,7 +27,7 @@ namespace BlueControls.Classes_Editor {
 
         #region Fields
 
-        private T _Item;
+        private T? _Item;
 
         private string _LastState = string.Empty;
 

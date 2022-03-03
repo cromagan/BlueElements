@@ -31,6 +31,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Linq;
 using static BlueBasics.Converter;
 
 namespace BlueControls.Controls {
@@ -40,19 +41,18 @@ namespace BlueControls.Controls {
 
         #region Fields
 
-        private List<FlexiControlForCell> _Control;
+        private List<FlexiControlForCell?> _control;
 
-        private Database _Database;
+        private Database _database;
 
-        private bool _Inited;
+        private bool _inited;
 
         private long _savedRowKey = long.MinValue;
 
-        private long _ShowingRowKey = -1;
+        private long _showingRowKey = -1;
 
-        private RowItem? _tmpShowingRow = null;
-
-        private long TabGeneratorCount;
+        private long _tabGeneratorCount;
+        private RowItem? _tmpShowingRow;
 
         #endregion
 
@@ -78,33 +78,33 @@ namespace BlueControls.Controls {
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Database Database {
-            get => _Database;
+            get => _database;
             set {
-                if (_Database == value) { return; }
+                if (_database == value) { return; }
                 if (grpEditor.Visible) { grpEditor.Visible = false; }
                 ShowingRowKey = -1; // Wichtig, dass ordenlich Showing-Row to Nothing gesetzt wird, weil dann alle Fokuse durch Enabled elemeniert werden und nachträglich nix mehr ausgelöst wird.
                 Control_Remove_All();
-                if (_Database != null) {
-                    _Database.Loading -= _Database_StoreView;
-                    _Database.Loaded -= _DatabaseLoaded;
-                    _Database.Row.RowRemoving -= Row_RowRemoving;
-                    _Database.Column.ItemRemoved -= _Database_ColumnRemoved;
-                    _Database.Column.ItemInternalChanged -= _Database_ItemInternalChanged;
+                if (_database != null) {
+                    _database.Loading -= _Database_StoreView;
+                    _database.Loaded -= _DatabaseLoaded;
+                    _database.Row.RowRemoving -= Row_RowRemoving;
+                    _database.Column.ItemRemoved -= _Database_ColumnRemoved;
+                    _database.Column.ItemInternalChanged -= _Database_ItemInternalChanged;
                     //_Database.RowKeyChanged -= _Database_RowKeyChanged;
-                    _Database.Disposing -= _Database_Disposing;
-                    _Database.Save(false); // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
+                    _database.Disposing -= _Database_Disposing;
+                    _database.Save(false); // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
                 }
-                _Database = value;
-                if (_Database != null) {
-                    _Database.Loading += _Database_StoreView;
-                    _Database.Loaded += _DatabaseLoaded;
-                    _Database.Row.RowRemoving += Row_RowRemoving;
-                    _Database.Column.ItemRemoved += _Database_ColumnRemoved;
-                    _Database.Column.ItemInternalChanged += _Database_ItemInternalChanged;
+                _database = value;
+                if (_database != null) {
+                    _database.Loading += _Database_StoreView;
+                    _database.Loaded += _DatabaseLoaded;
+                    _database.Row.RowRemoving += Row_RowRemoving;
+                    _database.Column.ItemRemoved += _Database_ColumnRemoved;
+                    _database.Column.ItemInternalChanged += _Database_ItemInternalChanged;
                     //_Database.RowKeyChanged += _Database_RowKeyChanged;
-                    _Database.Disposing += _Database_Disposing;
+                    _database.Disposing += _Database_Disposing;
                 }
-                _Inited = false;
+                _inited = false;
             }
         }
 
@@ -112,7 +112,7 @@ namespace BlueControls.Controls {
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public RowItem ShowingRow {
+        public RowItem? ShowingRow {
             get {
                 Develop.DebugPrint_Disposed(IsDisposed);
                 return _tmpShowingRow;
@@ -125,29 +125,29 @@ namespace BlueControls.Controls {
         public long ShowingRowKey {
             get {
                 Develop.DebugPrint_Disposed(IsDisposed);
-                return _ShowingRowKey;
+                return _showingRowKey;
             }
             set {
                 Develop.DebugPrint_Disposed(IsDisposed);
                 if (value < 0) { value = -1; }
                 if (grpEditor.Visible) { value = -1; }
-                if (value == _ShowingRowKey) { return; }
-                if (value > -1 && _Database == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Database is nothing"); }
-                if (!_Inited) {
+                if (value == _showingRowKey) { return; }
+                if (value > -1 && _database == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Database is nothing"); }
+                if (!_inited) {
                     if (value < 0) { return; }
                     View_Init();
                 }
-                _ShowingRowKey = value;
-                _tmpShowingRow = _Database?.Row.SearchByKey(_ShowingRowKey);
+                _showingRowKey = value;
+                _tmpShowingRow = _database?.Row.SearchByKey(_showingRowKey);
                 //Parallel.ForEach(_Control, thisFlex => {
                 //    if (thisFlex != null && !thisFlex.IsDisposed) {
                 //        thisFlex.RowKey = _ShowingRowKey;
                 //        thisFlex.CheckEnabledState();
                 //    }
                 //});
-                foreach (var thisFlex in _Control) {
+                foreach (var thisFlex in _control) {
                     if (thisFlex != null && !thisFlex.IsDisposed) {
-                        thisFlex.RowKey = _ShowingRowKey;
+                        thisFlex.RowKey = _showingRowKey;
                         thisFlex.CheckEnabledState();
                     }
                 }
@@ -160,14 +160,12 @@ namespace BlueControls.Controls {
 
         #region Methods
 
-        public static ColumnViewCollection SearchColumnView(ColumnItem column) {
+        public static ColumnViewCollection? SearchColumnView(ColumnItem? column) {
             if (column == null) { return null; }
-            foreach (var ThisView in column.Database.Views) {
-                if (ThisView != null) {
-                    foreach (var thisViewItem in ThisView) {
-                        if (thisViewItem?.Column != null) {
-                            if (thisViewItem.Column == column) { return ThisView; }
-                        }
+            foreach (var thisView in column.Database.Views) {
+                if (thisView != null) {
+                    if (thisView.Any(thisViewItem => thisViewItem?.Column != null && thisViewItem.Column == column)) {
+                        return thisView;
                     }
                 }
             }
@@ -175,7 +173,7 @@ namespace BlueControls.Controls {
         }
 
         public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
-            if (_Database == null) { return true; }
+            if (_database == null) { return true; }
             switch (e.ClickedComand.ToLower()) {
                 case "#schnelleingabe":
                     if (ShowingRow == null) { return true; }
@@ -192,38 +190,38 @@ namespace BlueControls.Controls {
 
         public void Control_Remove_All() {
             if (InvokeRequired) {
-                Invoke(new Action(() => Control_Remove_All()));
+                Invoke(new Action(Control_Remove_All));
                 return;
             }
-            var R = false;
+            bool r;
             do {
-                R = false;
+                r = false;
                 foreach (System.Windows.Forms.Control o in Controls) {
                     if (o is GroupBox g && g == grpEditor) {
                     } else if (o is TabControl t && t == Tabs) {
                         if (t.TabCount > 0) {
                             RemoveControl(o);
-                            R = true;
+                            r = true;
                         }
                     } else {
                         RemoveControl(o);
-                        R = true;
+                        r = true;
                     }
                 }
-            } while (R);
-            _Control?.Clear();
+            } while (r);
+            _control?.Clear();
         }
 
-        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
-            HotItem = null;
-            if (_Database == null) {
-                Cancel = true;
+        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList? items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
+            hotItem = null;
+            if (_database == null) {
+                cancel = true;
                 return;
             }
-            Items.Add("Allgemeine Schnelleingabe öffnen", "#Schnelleingabe", QuickImage.Get(enImageCode.Lupe), _Database != null && ShowingRow != null);
-            if (_Database.IsAdministrator()) {
-                Items.AddSeparator();
-                Items.Add("Formular bearbeiten", "#Ansicht", QuickImage.Get(enImageCode.Textfeld), _Database != null);
+            items.Add("Allgemeine Schnelleingabe öffnen", "#Schnelleingabe", QuickImage.Get(enImageCode.Lupe), _database != null && ShowingRow != null);
+            if (_database.IsAdministrator()) {
+                items.AddSeparator();
+                items.Add("Formular bearbeiten", "#Ansicht", QuickImage.Get(enImageCode.Textfeld), _database != null);
             }
         }
 
@@ -240,7 +238,7 @@ namespace BlueControls.Controls {
         protected override void Dispose(bool disposing) {
             try {
                 if (disposing) {
-                    _ShowingRowKey = -1;
+                    _showingRowKey = -1;
                     _tmpShowingRow = null;
                     Database = null; // Wichtig,  (nicht _Database) um events zu lösen.
                     //components?.Dispose();
@@ -255,11 +253,31 @@ namespace BlueControls.Controls {
         protected override void OnSizeChanged(System.EventArgs e) {
             if (IsDisposed) { return; }
             base.OnSizeChanged(e);
-            if (_Database != null && _Inited) {
+            if (_database != null && _inited) {
                 Control_RepairSize_All();
             }
             grpEditor.Left = Width - grpEditor.Width;
             grpEditor.Height = Height;
+        }
+
+        private static ColumnViewItem? SearchViewItem(ColumnItem? column) {
+            var thisView = SearchColumnView(column);
+            return thisView?[column];
+        }
+
+        /// <summary>
+        /// Ermittelt, wie viele Spalten die Ansicht benutzt.
+        /// </summary>
+        /// <param name="viewCollection"></param>
+        /// <returns></returns>
+        private static int View_AnzahlSpalten(ColumnViewCollection viewCollection) {
+            var maxS = 0;
+            foreach (var thisViewItem in viewCollection) {
+                if (thisViewItem != null) {
+                    maxS = Math.Max(maxS, thisViewItem.Spalte_X1 + thisViewItem.Width - 1); // Spalte_X2
+                }
+            }
+            return maxS;
         }
 
         private void _Database_ColumnRemoved(object sender, System.EventArgs e) {
@@ -271,7 +289,7 @@ namespace BlueControls.Controls {
 
         private void _Database_ItemInternalChanged(object sender, ListEventArgs e) {
             if (IsDisposed) { return; }
-            var r = _ShowingRowKey;
+            var r = _showingRowKey;
             ShowingRowKey = -1;
             View_Init();
             ShowingRowKey = r;
@@ -321,45 +339,45 @@ namespace BlueControls.Controls {
                 return;
             }
             if (IsDisposed) { return; }
-            _Inited = false;
+            _inited = false;
             ShowingRowKey = _savedRowKey;
         }
 
-        private void Arrangement_Swap(int Ri) {
-            var vn = _Database.Views.IndexOf(CurrentView());
-            if (vn < 1 || vn >= _Database.Views.Count) { return; }
-            if (Ri is 0 or > 1 or < -1) { return; }
-            if (vn < 2 && Ri < 0) { return; }
-            if (vn >= _Database.Views.Count - 1 && Ri > 0) { return; }
+        private void Arrangement_Swap(int ri) {
+            var vn = _database.Views.IndexOf(CurrentView());
+            if (vn < 1 || vn >= _database.Views.Count) { return; }
+            if (ri is 0 or > 1 or < -1) { return; }
+            if (vn < 2 && ri < 0) { return; }
+            if (vn >= _database.Views.Count - 1 && ri > 0) { return; }
 
-            var tmpx1 = _Database.Views[vn];
-            var tmpx2 = _Database.Views[vn + Ri];
+            var tmpx1 = _database.Views[vn];
+            var tmpx2 = _database.Views[vn + ri];
             // Binding List Changes müsste reagieren
-            _Database.Views[vn] = tmpx2;
-            _Database.Views[vn + Ri] = tmpx1;
+            _database.Views[vn] = tmpx2;
+            _database.Views[vn + ri] = tmpx1;
             RedoView();
         }
 
         private void Btb_IAmInvalid(object sender, System.EventArgs e) {
-            _Inited = false;
+            _inited = false;
             Control_Remove_All();
         }
 
         private void btnAnsichtHinzufuegen_Click(object sender, System.EventArgs e) {
             var ex = InputBox.Show("Geben sie den Namen<br>der neuen Ansicht ein:", "", enVarType.Text);
             if (string.IsNullOrEmpty(ex)) { return; }
-            _Database.Views.Add(new ColumnViewCollection(_Database, "", ex));
+            _database.Views.Add(new ColumnViewCollection(_database, "", ex));
             RedoView();
             SortColumnList();
         }
 
         private void btnAnsichtloeschen_Click(object sender, System.EventArgs e) {
-            var CurrView = CurrentView();
-            if (CurrView == null) { return; }
-            var i = _Database.Views.IndexOf(CurrView);
+            var currView = CurrentView();
+            if (currView == null) { return; }
+            var i = _database.Views.IndexOf(currView);
             if (i < 1) { return; } // 0 darf auch nicht gelöscht werden
-            if (MessageBox.Show("Ansicht <b>'" + CurrView.Name + "'</b><br>wirklich löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-            _Database.Views.RemoveAt(i);
+            if (MessageBox.Show("Ansicht <b>'" + currView.Name + "'</b><br>wirklich löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+            _database.Views.RemoveAt(i);
             RedoView();
             SortColumnList();
         }
@@ -371,73 +389,73 @@ namespace BlueControls.Controls {
         }
 
         private void btnGroesseLinks_Click(object sender, System.EventArgs e) {
-            var ViewItem = SearchViewItem(EditorSelectedColumn());
-            ViewItem?.KoordÄndern(0, -1, 0);
+            var viewItem = SearchViewItem(EditorSelectedColumn());
+            viewItem?.KoordÄndern(0, -1, 0);
             RedoView();
             SortColumnList();
         }
 
         private void btnGroesseOben_Click(object sender, System.EventArgs e) {
-            var ViewItem = SearchViewItem(EditorSelectedColumn());
-            ViewItem?.KoordÄndern(0, 0, -1);
+            var viewItem = SearchViewItem(EditorSelectedColumn());
+            viewItem?.KoordÄndern(0, 0, -1);
             RedoView();
             SortColumnList();
         }
 
         private void btnGroesseRechts_Click(object sender, System.EventArgs e) {
-            var ViewItem = SearchViewItem(EditorSelectedColumn());
-            ViewItem?.KoordÄndern(0, 1, 0);
+            var viewItem = SearchViewItem(EditorSelectedColumn());
+            viewItem?.KoordÄndern(0, 1, 0);
             RedoView();
             SortColumnList();
         }
 
         private void btnGroesseUnten_Click(object sender, System.EventArgs e) {
-            var ViewItem = SearchViewItem(EditorSelectedColumn());
-            ViewItem?.KoordÄndern(0, 0, 1);
+            var viewItem = SearchViewItem(EditorSelectedColumn());
+            viewItem?.KoordÄndern(0, 0, 1);
             RedoView();
             SortColumnList();
         }
 
         private void btnPositionLinks_Click(object sender, System.EventArgs e) {
-            var ViewItem = SearchViewItem(EditorSelectedColumn());
-            ViewItem?.KoordÄndern(-1, 0, 0);
+            var viewItem = SearchViewItem(EditorSelectedColumn());
+            viewItem?.KoordÄndern(-1, 0, 0);
             RedoView();
             SortColumnList();
         }
 
         private void btnPositionOben_Click(object sender, System.EventArgs e) {
-            var Column = EditorSelectedColumn();
-            var View = SearchColumnView(Column);
-            var ViewItem = SearchViewItem(Column);
-            if (ViewItem != null) { View.Swap(ViewItem, ViewItem.PreviewsVisible(View)); }
+            var column = EditorSelectedColumn();
+            var view = SearchColumnView(column);
+            var viewItem = SearchViewItem(column);
+            if (viewItem != null) { view.Swap(viewItem, viewItem.PreviewsVisible(view)); }
             RedoView();
             SortColumnList();
         }
 
         private void btnPositionRechts_Click(object sender, System.EventArgs e) {
-            var ViewItem = SearchViewItem(EditorSelectedColumn());
-            ViewItem?.KoordÄndern(1, 0, 0);
+            var viewItem = SearchViewItem(EditorSelectedColumn());
+            viewItem?.KoordÄndern(1, 0, 0);
             RedoView();
             SortColumnList();
         }
 
         private void btnRechteFuerAnsicht_Click(object sender, System.EventArgs e) {
-            var CurrView = CurrentView();
+            var currView = CurrentView();
             ItemCollectionList aa = new();
-            aa.AddRange(_Database.Permission_AllUsed(false));
+            aa.AddRange(_database.Permission_AllUsed(false));
             aa.CheckBehavior = enCheckBehavior.MultiSelection;
-            aa.Check(CurrView.PermissionGroups_Show, true);
-            if (_Database.Views.Count > 1 && CurrView == _Database.Views[1]) {
+            aa.Check(currView.PermissionGroups_Show, true);
+            if (_database.Views.Count > 1 && currView == _database.Views[1]) {
                 aa["#Everybody"].Enabled = false;
                 aa["#Everybody"].Checked = true;
             }
             aa.Sort();
             var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, enAddType.Text, true);
             if (b == null) { return; }
-            CurrView.PermissionGroups_Show.Clear();
-            CurrView.PermissionGroups_Show.AddRange(b.ToArray());
-            CurrView.PermissionGroups_Show.RemoveString("#Administrator", false);
-            if (CurrView == _Database.Views[1]) { CurrView.PermissionGroups_Show.Add("#Everybody"); }
+            currView.PermissionGroups_Show.Clear();
+            currView.PermissionGroups_Show.AddRange(b.ToArray());
+            currView.PermissionGroups_Show.RemoveString("#Administrator", false);
+            if (currView == _database.Views[1]) { currView.PermissionGroups_Show.Add("#Everybody"); }
         }
 
         private void btnReiterNachLinks_Click(object sender, System.EventArgs e) => Arrangement_Swap(-1);
@@ -445,24 +463,24 @@ namespace BlueControls.Controls {
         private void btnReiterNachRechts_Click(object sender, System.EventArgs e) => Arrangement_Swap(1);
 
         private void btnRename_Click(object sender, System.EventArgs e) {
-            var CurrView = CurrentView();
-            if (CurrView == null || CurrView == _Database.Views[0]) { return; }
-            var n = InputBox.Show("Umbenennen:", CurrView.Name, enVarType.Text);
-            if (!string.IsNullOrEmpty(n)) { CurrView.Name = n; }
+            var currView = CurrentView();
+            if (currView == null || currView == _database.Views[0]) { return; }
+            var n = InputBox.Show("Umbenennen:", currView.Name, enVarType.Text);
+            if (!string.IsNullOrEmpty(n)) { currView.Name = n; }
             RedoView();
             SortColumnList();
         }
 
         private void cbxCaptionPosition_ItemClicked(object sender, BasicListItemEventArgs e) {
-            var ViewItem = SearchViewItem(EditorSelectedColumn());
-            if (ViewItem != null) { ViewItem.ÜberschriftAnordnung = (enÜberschriftAnordnung)int.Parse(cbxCaptionPosition.Text); }
+            var viewItem = SearchViewItem(EditorSelectedColumn());
+            if (viewItem != null) { viewItem.ÜberschriftAnordnung = (enÜberschriftAnordnung)int.Parse(cbxCaptionPosition.Text); }
             RedoView();
             SortColumnList();
         }
 
         private void cbxControlType_ItemClicked(object sender, BasicListItemEventArgs e) {
-            var ViewItem = SearchViewItem(EditorSelectedColumn());
-            if (ViewItem != null) { ViewItem.Column.EditType = (enEditTypeFormula)int.Parse(cbxControlType.Text); }
+            var viewItem = SearchViewItem(EditorSelectedColumn());
+            if (viewItem != null) { viewItem.Column.EditType = (enEditTypeFormula)int.Parse(cbxControlType.Text); }
             RedoView();
             SortColumnList();
         }
@@ -476,22 +494,22 @@ namespace BlueControls.Controls {
             };
             btb.NeedRefresh += Btb_IAmInvalid;
             vParent.Controls.Add(btb);
-            _Control.Add(btb);
+            _control.Add(btb);
         }
 
         private void Control_Create_All() {
-            var Count = -1;
-            _Control = new List<FlexiControlForCell>();
-            foreach (var ThisView in _Database.Views) {
-                if (ThisView != null) {
-                    var Index = _Database.Views.IndexOf(ThisView);
-                    Count++;
-                    foreach (var ThisViewItem in ThisView) {
-                        if (ThisViewItem?.Column != null) {
-                            if (Index == 0) {
-                                Control_Create(ThisViewItem, this);
+            var count = -1;
+            _control = new List<FlexiControlForCell?>();
+            foreach (var thisView in _database.Views) {
+                if (thisView != null) {
+                    var index = _database.Views.IndexOf(thisView);
+                    count++;
+                    foreach (var thisViewItem in thisView) {
+                        if (thisViewItem?.Column != null) {
+                            if (index == 0) {
+                                Control_Create(thisViewItem, this);
                             } else {
-                                Control_Create(ThisViewItem, Tabs.TabPages[Count - 1]);
+                                Control_Create(thisViewItem, Tabs.TabPages[count - 1]);
                             }
                         }
                     }
@@ -500,60 +518,60 @@ namespace BlueControls.Controls {
         }
 
         private void Control_RepairSize_All() {
-            var Count = -1;
-            foreach (var ThisView in _Database.Views) {
-                Count++;
-                var View_Spalten = View_AnzahlSpalten(ThisView);
-                var _BelegterBereichTop = new int[View_Spalten + 1];
-                var ViewN = _Database.Views.IndexOf(ThisView);
-                var WidthInPixelOfParent = 0;
-                var HeightOfParent = 0;
-                var MoveIn = 0;
-                if (ViewN == 0) {
-                    WidthInPixelOfParent = Width - 4;
-                    HeightOfParent = Height;
-                    if (grpEditor.Visible) { WidthInPixelOfParent = Width - grpEditor.Width - 8; }
-                    MoveIn = 0;
+            var count = -1;
+            foreach (var thisView in _database.Views) {
+                count++;
+                var viewSpalten = View_AnzahlSpalten(thisView);
+                var belegterBereichTop = new int[viewSpalten + 1];
+                var viewN = _database.Views.IndexOf(thisView);
+                int widthInPixelOfParent;
+                int heightOfParent;
+                int moveIn;
+                if (viewN == 0) {
+                    widthInPixelOfParent = Width - 4;
+                    heightOfParent = Height;
+                    if (grpEditor.Visible) { widthInPixelOfParent = Width - grpEditor.Width - 8; }
+                    moveIn = 0;
                 } else {
-                    HeightOfParent = Tabs.Height - Tabs.TabPages[Count - 1].Top;
-                    WidthInPixelOfParent = Tabs.Width - 10 - (Skin.PaddingSmal * 4);
-                    MoveIn = Skin.PaddingSmal * 2;
+                    heightOfParent = Tabs.Height - Tabs.TabPages[count - 1].Top;
+                    widthInPixelOfParent = Tabs.Width - 10 - (Skin.PaddingSmal * 4);
+                    moveIn = Skin.PaddingSmal * 2;
                 }
-                var WidthInPixelOfColumn = (WidthInPixelOfParent - (View_Spalten * Skin.PaddingSmal)) / (View_Spalten + 1);
-                foreach (var ThisViewItem in ThisView) {
-                    if (ThisViewItem?.Column != null) {
-                        Rectangle ObjPX = new() {
-                            Width = (ThisViewItem.Width * WidthInPixelOfColumn) + ((ThisViewItem.Width - 1) * Skin.PaddingSmal),
-                            X = (ThisViewItem.Spalte_X1 * WidthInPixelOfColumn) + (ThisViewItem.Spalte_X1 * Skin.PaddingSmal) + MoveIn,
-                            Y = MoveIn
+                var widthInPixelOfColumn = (widthInPixelOfParent - (viewSpalten * Skin.PaddingSmal)) / (viewSpalten + 1);
+                foreach (var thisViewItem in thisView) {
+                    if (thisViewItem?.Column != null) {
+                        Rectangle objPx = new() {
+                            Width = (thisViewItem.Width * widthInPixelOfColumn) + ((thisViewItem.Width - 1) * Skin.PaddingSmal),
+                            X = (thisViewItem.Spalte_X1 * widthInPixelOfColumn) + (thisViewItem.Spalte_X1 * Skin.PaddingSmal) + moveIn,
+                            Y = moveIn
                         }; // Die Koordinaten in Pixel des Steuerelements
-                        for (var z = ThisViewItem.Spalte_X1; z < ThisViewItem.Spalte_X1 + ThisViewItem.Width; z++) // Spalte_X2
+                        for (var z = thisViewItem.Spalte_X1; z < thisViewItem.Spalte_X1 + thisViewItem.Width; z++) // Spalte_X2
                         {
-                            ObjPX.Y = Math.Max(_BelegterBereichTop[z], ObjPX.Y);
+                            objPx.Y = Math.Max(belegterBereichTop[z], objPx.Y);
                         }
-                        if (ObjPX.Y > 0) { ObjPX.Y += 8; }
-                        ObjPX.Height = (Math.Max(ThisViewItem.Height, 0) * 16) + 8;
-                        if (ThisViewItem.ÜberschriftAnordnung is enÜberschriftAnordnung.Ohne_mit_Abstand or enÜberschriftAnordnung.Über_dem_Feld) {
-                            ObjPX.Height += Skin.PaddingSmal + 16;
+                        if (objPx.Y > 0) { objPx.Y += 8; }
+                        objPx.Height = (Math.Max(thisViewItem.Height, 0) * 16) + 8;
+                        if (thisViewItem.ÜberschriftAnordnung is enÜberschriftAnordnung.Ohne_mit_Abstand or enÜberschriftAnordnung.Über_dem_Feld) {
+                            objPx.Height += Skin.PaddingSmal + 16;
                         }
-                        if (ThisViewItem.Height == 31) {
-                            ObjPX.Height = HeightOfParent - ObjPX.Y - (Skin.PaddingSmal * 3);
-                            if (ObjPX.Height < 16) { ObjPX.Height = 16; }
+                        if (thisViewItem.Height == 31) {
+                            objPx.Height = heightOfParent - objPx.Y - (Skin.PaddingSmal * 3);
+                            if (objPx.Height < 16) { objPx.Height = 16; }
                         }
-                        for (var z = ThisViewItem.Spalte_X1; z < ThisViewItem.Spalte_X1 + ThisViewItem.Width; z++) // Spalte_X2
+                        for (var z = thisViewItem.Spalte_X1; z < thisViewItem.Spalte_X1 + thisViewItem.Width; z++) // Spalte_X2
                         {
-                            _BelegterBereichTop[z] = Math.Max(_BelegterBereichTop[z], ObjPX.Bottom);
+                            belegterBereichTop[z] = Math.Max(belegterBereichTop[z], objPx.Bottom);
                         }
-                        GenericControl ConVI = ControlOf(ThisViewItem);
-                        if (ConVI != null) {
-                            ConVI.Location = new Point(ObjPX.X, ObjPX.Y);
-                            ConVI.Size = new Size(ObjPX.Width, ObjPX.Height);
-                            ConVI.Visible = true;
-                            ConVI.BringToFront();
+                        GenericControl? conVi = ControlOf(thisViewItem);
+                        if (conVi != null) {
+                            conVi.Location = new Point(objPx.X, objPx.Y);
+                            conVi.Size = new Size(objPx.Width, objPx.Height);
+                            conVi.Visible = true;
+                            conVi.BringToFront();
                         }
                     }
                 }
-                if (ViewN == 0) { SetButtonsToPosition(_BelegterBereichTop[0] + 3); }
+                if (viewN == 0) { SetButtonsToPosition(belegterBereichTop[0] + 3); }
             }
         }
 
@@ -561,70 +579,65 @@ namespace BlueControls.Controls {
         //{
         //    if (Editor.Visible) { ColumnsEinfärben(); }
         //}
-        private FlexiControlForCell ControlOf(ColumnViewItem ThisViewItem) {
-            foreach (var ThisControl in _Control) {
-                if (ThisControl != null && !ThisControl.IsDisposed && ThisControl.Tag == ThisViewItem) { return ThisControl; }
-            }
-            return null;
-        }
+        private FlexiControlForCell? ControlOf(ColumnViewItem thisViewItem) => _control.FirstOrDefault(thisControl => thisControl != null && !thisControl.IsDisposed && thisControl.Tag == thisViewItem);
 
         private void Controls_SetCorrectEnabledState_All() {
             Develop.DebugPrint_Disposed(IsDisposed);
-            foreach (var ThisControl in _Control) {
-                if (ThisControl != null && !ThisControl.IsDisposed) { ThisControl.CheckEnabledState(); }
+            foreach (var thisControl in _control) {
+                if (thisControl != null && !thisControl.IsDisposed) { thisControl.CheckEnabledState(); }
             }
         }
 
-        private ColumnViewCollection CurrentView() {
-            if (_Database.Views.Count == 0) { return null; }
-            if (Tabs.SelectedIndex + 1 > _Database.Views.Count - 1) { Develop.DebugPrint(enFehlerArt.Fehler, "Index zu hoch"); }
-            if (_Database.Views[Tabs.SelectedIndex + 1] == null) { Develop.DebugPrint(enFehlerArt.Fehler, "View ist Nothing"); }
-            return _Database.Views[Tabs.SelectedIndex + 1];
+        private ColumnViewCollection? CurrentView() {
+            if (_database.Views.Count == 0) { return null; }
+            if (Tabs.SelectedIndex + 1 > _database.Views.Count - 1) { Develop.DebugPrint(enFehlerArt.Fehler, "Index zu hoch"); }
+            if (_database.Views[Tabs.SelectedIndex + 1] == null) { Develop.DebugPrint(enFehlerArt.Fehler, "View ist Nothing"); }
+            return _database.Views[Tabs.SelectedIndex + 1];
         }
 
-        private void Editor_CheckButtons(bool Blinki) {
+        private void Editor_CheckButtons(bool blinki) {
             if (!grpEditor.Visible) { return; }
-            ColumnViewItem ViewItem = null;
+            ColumnViewItem? viewItem = null;
             if (lbxColumns.Item.Checked().Count == 1) {
-                ViewItem = SearchViewItem(_Database.Column.SearchByKey(LongParse(lbxColumns.Item.Checked()[0].Internal)));
+                viewItem = SearchViewItem(_database.Column.SearchByKey(LongParse(lbxColumns.Item.Checked()[0].Internal)));
             }
-            grpPosition.Enabled = ViewItem != null;
-            grpGroesse.Enabled = ViewItem != null;
-            cbxCaptionPosition.Enabled = ViewItem != null;
-            cbxControlType.Enabled = ViewItem != null;
-            if (ViewItem != null) {
-                cbxCaptionPosition.Text = ((int)ViewItem.ÜberschriftAnordnung).ToString();
-                if (ViewItem.Column != null) {
-                    if (Blinki) {
+            grpPosition.Enabled = viewItem != null;
+            grpGroesse.Enabled = viewItem != null;
+            cbxCaptionPosition.Enabled = viewItem != null;
+            cbxControlType.Enabled = viewItem != null;
+            if (viewItem != null) {
+                cbxCaptionPosition.Text = ((int)viewItem.ÜberschriftAnordnung).ToString();
+                if (viewItem.Column != null) {
+                    if (blinki) {
                         cbxControlType.Item.Clear();
                         for (var z = 0; z <= 999; z++) {
                             var w = (enEditTypeFormula)z;
                             if (w.ToString() != z.ToString()) {
-                                if (ViewItem.Column.UserEditDialogTypeInFormula(w)) {
+                                if (viewItem.Column.UserEditDialogTypeInFormula(w)) {
                                     cbxControlType.Item.Add(w.ToString(), z.ToString());
                                 }
                             }
                         }
                     }
-                    cbxControlType.Text = ((int)ViewItem.Column.EditType).ToString();
+                    cbxControlType.Text = ((int)viewItem.Column.EditType).ToString();
                 } else {
                     cbxControlType.Enabled = false;
                 }
             }
         }
 
-        private ColumnItem EditorSelectedColumn() => lbxColumns.Item.Checked().Count != 1 ? null : _Database.Column.SearchByKey(LongParse(lbxColumns.Item.Checked()[0].Internal));
+        private ColumnItem? EditorSelectedColumn() => lbxColumns.Item.Checked().Count != 1 ? null : _database.Column.SearchByKey(LongParse(lbxColumns.Item.Checked()[0].Internal));
 
         private void Generate_Tabs() {
-            if (_Database.Views.Count < 1) { return; }
-            foreach (var ThisView in _Database.Views) {
-                if (ThisView != null && ThisView != _Database.Views[0]) {
-                    TabGeneratorCount++;
+            if (_database.Views.Count < 1) { return; }
+            foreach (var thisView in _database.Views) {
+                if (thisView != null && thisView != _database.Views[0]) {
+                    _tabGeneratorCount++;
                     System.Windows.Forms.TabPage tempPage = new() {
-                        Text = "Seite #" + TabGeneratorCount
+                        Text = "Seite #" + _tabGeneratorCount
                     };
-                    tempPage.Text = ThisView.Name;
-                    tempPage.Enabled = _Database.PermissionCheck(ThisView.PermissionGroups_Show, null);
+                    tempPage.Text = thisView.Name;
+                    tempPage.Enabled = _database.PermissionCheck(thisView.PermissionGroups_Show, null);
                     Tabs.TabPages.Add(tempPage);
                     tempPage.MouseUp += Tabs_MouseUp;
                 }
@@ -635,37 +648,37 @@ namespace BlueControls.Controls {
             var item = (BasicListItem)e.HotItem;
             if (item == null) { return; }
             item.Checked = true;
-            var cd = SearchViewItem(_Database.Column.SearchByKey(LongParse(item.Internal)));
+            var cd = SearchViewItem(_database.Column.SearchByKey(LongParse(item.Internal)));
             if (cd == null) {
                 e.UserMenu.Add("Zum Kopfbereich hinzufügen", "#AddColumnToHead", enImageCode.Sonne);
-                e.UserMenu.Add("Zum Körperbereich hinzufügen", "#AddColumnToBody", enImageCode.Kreis, _Database.Views.Count > 1);
+                e.UserMenu.Add("Zum Körperbereich hinzufügen", "#AddColumnToBody", enImageCode.Kreis, _database.Views.Count > 1);
             } else {
                 e.UserMenu.Add("Dieses Feld ausblenden", "#RemoveColumnFromView", enImageCode.Kreuz, Convert.ToBoolean(cd != null));
             }
         }
 
         private void lbxColumns_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-            var Column = _Database.Column.SearchByKey(LongParse(((BasicListItem)e.HotItem).Internal));
+            var column = _database.Column.SearchByKey(LongParse(((BasicListItem)e.HotItem).Internal));
 
-            var ViewItem = SearchViewItem(Column);
-            var CurrView = CurrentView();
+            var viewItem = SearchViewItem(column);
+            var currView = CurrentView();
             switch (e.ClickedComand) {
                 case "#RemoveColumnFromView":
-                    if (ViewItem != null) {
-                        _Database.Views[0]?.Remove(ViewItem);
-                        CurrView?.Remove(ViewItem);
+                    if (viewItem != null) {
+                        _database.Views[0]?.Remove(viewItem);
+                        currView?.Remove(viewItem);
                     }
                     break;
 
                 case "#AddColumnToHead":
-                    if (_Database.Views.Count == 0) {
-                        _Database.Views.Add(new ColumnViewCollection(_Database, string.Empty, "##Head###"));
+                    if (_database.Views.Count == 0) {
+                        _database.Views.Add(new ColumnViewCollection(_database, string.Empty, "##Head###"));
                     }
-                    _Database.Views[0].Add(Column, false);
+                    _database.Views[0].Add(column, false);
                     break;
 
                 case "#AddColumnToBody":
-                    CurrView?.Add(Column, false);
+                    currView?.Add(column, false);
                     break;
             }
             RedoView();
@@ -678,7 +691,7 @@ namespace BlueControls.Controls {
 
         private void RedoView() {
             var i = Tabs.SelectedIndex;
-            _Inited = false;
+            _inited = false;
             View_Init();
             Editor_CheckButtons(true);
             if (i < 0) { i = 0; }
@@ -689,13 +702,13 @@ namespace BlueControls.Controls {
         private void RemoveControl(System.Windows.Forms.Control vObject) {
             if (vObject == null || vObject.IsDisposed) { return; }
             switch (vObject) {
-                case AbstractTabControl _:
+                case AbstractTabControl:
                     foreach (System.Windows.Forms.Control o in vObject.Controls) {
                         RemoveControl(o);
                     }
                     return; // Raus hier
 
-                case System.Windows.Forms.TabPage _:
+                case System.Windows.Forms.TabPage:
                     foreach (System.Windows.Forms.Control o in vObject.Controls) {
                         RemoveControl(o);
                     }
@@ -711,53 +724,48 @@ namespace BlueControls.Controls {
         }
 
         private void Row_RowRemoving(object sender, RowEventArgs e) {
-            if (_ShowingRowKey == e.Row.Key) {
+            if (_showingRowKey == e.Row.Key) {
                 ShowingRowKey = -1;
             }
         }
 
-        private ColumnViewItem SearchViewItem(ColumnItem Column) {
-            var ThisView = SearchColumnView(Column);
-            return ThisView?[Column];
-        }
-
-        private void SetButtonsToPosition(int TopPos) {
-            var SPH = 1;
-            var SPF = 1;
-            var WidthOfParent = Width - 4;
+        private void SetButtonsToPosition(int topPos) {
+            var sph = 1;
+            var spf = 1;
+            var widthOfParent = Width - 4;
             if (grpEditor.Visible) {
-                WidthOfParent = Width - grpEditor.Width - 8;
+                widthOfParent = Width - grpEditor.Width - 8;
             }
-            foreach (var ThisView in _Database.Views) {
-                if (_Database.Views.IndexOf(ThisView) == 0) {
-                    SPH = Math.Max(SPH, View_AnzahlSpalten(ThisView));
+            foreach (var thisView in _database.Views) {
+                if (_database.Views.IndexOf(thisView) == 0) {
+                    sph = Math.Max(sph, View_AnzahlSpalten(thisView));
                 } else {
-                    SPF = Math.Max(SPF, View_AnzahlSpalten(ThisView));
+                    spf = Math.Max(spf, View_AnzahlSpalten(thisView));
                 }
             }
-            Tabs.Top = TopPos;
+            Tabs.Top = topPos;
             Tabs.Left = 0;
-            if (SPF >= SPH || SPF == 0) {
-                Tabs.Width = WidthOfParent;
+            if (spf >= sph || spf == 0) {
+                Tabs.Width = widthOfParent;
             } else {
-                var WidthOfColum = (WidthOfParent - (SPH * Skin.PaddingSmal)) / (SPH + 1);
-                Tabs.Width = (WidthOfColum * (SPF + 1)) + (SPF * Skin.PaddingSmal);
+                var widthOfColum = (widthOfParent - (sph * Skin.PaddingSmal)) / (sph + 1);
+                Tabs.Width = (widthOfColum * (spf + 1)) + (spf * Skin.PaddingSmal);
             }
-            Tabs.Height = Height - TopPos;
+            Tabs.Height = Height - topPos;
         }
 
         private void ShowViewEditor() {
-            if (_Database == null || grpEditor.Visible || !_Database.IsAdministrator()) { return; }
+            if (_database == null || grpEditor.Visible || !_database.IsAdministrator()) { return; }
 
-            _Database.Load_Reload();
-            _Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
+            _database.Load_Reload();
+            _database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
 
-            if (!_Inited) { View_Init(); }
+            if (!_inited) { View_Init(); }
 
             ShowingRowKey = -1;
 
             lbxColumns.Item.Clear();
-            lbxColumns.Item.AddRange(_Database.Column, false);
+            lbxColumns.Item.AddRange(_database.Column, false);
             lbxColumns.Item.Sort();
 
             cbxCaptionPosition.Item.AddRange(typeof(enÜberschriftAnordnung));
@@ -773,27 +781,27 @@ namespace BlueControls.Controls {
 
             #region Zuerst die Überschriften (Namen der Views) erstellen oder löschen
 
-            for (var viewNo = -1; viewNo < _Database.Views.Count; viewNo++) {
-                string Nam;
+            for (var viewNo = -1; viewNo < _database.Views.Count; viewNo++) {
+                string? nam;
                 switch (viewNo) {
                     case -1:
-                        Nam = "Unbenutzt";
+                        nam = "Unbenutzt";
                         break;
 
                     case 0:
-                        Nam = "Kopfbereich";
+                        nam = "Kopfbereich";
                         break;
 
                     default:
-                        Nam = _Database.Views[viewNo] == null ? string.Empty : _Database.Views[viewNo].Name + " "; // Leerzeichen wegen evtl. leeren namen
+                        nam = _database.Views[viewNo] == null ? string.Empty : _database.Views[viewNo].Name + " "; // Leerzeichen wegen evtl. leeren namen
                         break;
                 }
 
-                var intName = "@Ansicht" + viewNo.ToString();
-                if (string.IsNullOrEmpty(Nam)) {
+                var intName = "@Ansicht" + viewNo;
+                if (string.IsNullOrEmpty(nam)) {
                     if (lbxColumns.Item[intName] != null) { lbxColumns.Item.Remove(intName); }
                 } else {
-                    if (lbxColumns.Item[intName] == null) { lbxColumns.Item.Add(Nam, intName, true, (viewNo + 1).ToString(Constants.Format_Integer3) + "|A"); }
+                    if (lbxColumns.Item[intName] == null) { lbxColumns.Item.Add(nam, intName, true, (viewNo + 1).ToString(Constants.Format_Integer3) + "|A"); }
                 }
             }
 
@@ -807,14 +815,14 @@ namespace BlueControls.Controls {
                 columNo++;
                 if (columNo > lbxColumns.Item.Count - 1) { break; }
 
-                if (lbxColumns.Item[columNo] is TextListItem ThisItem && ThisItem.IsClickable()) {
-                    var co = (ColumnItem)ThisItem.Tag;
+                if (lbxColumns.Item[columNo] is TextListItem thisItem && thisItem.IsClickable()) {
+                    var co = (ColumnItem)thisItem.Tag;
                     if (co == null) {
-                        lbxColumns.Item.Remove(ThisItem);
+                        lbxColumns.Item.Remove(thisItem);
                     } else {
                         var cv = SearchColumnView(co);
-                        var Sort = cv == null ? 0 : _Database.Views.IndexOf(cv) + 1;
-                        ThisItem.UserDefCompareKey = Sort.ToString(Constants.Format_Integer3) + "|Z" + ThisItem.CompareKey();
+                        var sort = cv == null ? 0 : _database.Views.IndexOf(cv) + 1;
+                        thisItem.UserDefCompareKey = sort.ToString(Constants.Format_Integer3) + "|Z" + thisItem.CompareKey();
                     }
                 }
             } while (true);
@@ -826,10 +834,10 @@ namespace BlueControls.Controls {
         }
 
         private void SUnten_Click(object sender, System.EventArgs e) {
-            var Column = EditorSelectedColumn();
-            var View = SearchColumnView(Column);
-            var ViewItem = SearchViewItem(Column);
-            if (ViewItem != null) { View.Swap(ViewItem, ViewItem.NextVisible(View)); }
+            var column = EditorSelectedColumn();
+            var view = SearchColumnView(column);
+            var viewItem = SearchViewItem(column);
+            if (viewItem != null) { view.Swap(viewItem, viewItem.NextVisible(view)); }
             RedoView();
             SortColumnList();
         }
@@ -838,28 +846,13 @@ namespace BlueControls.Controls {
             if (e.Button == System.Windows.Forms.MouseButtons.Right) { FloatingInputBoxListBoxStyle.ContextMenuShow(this, e); }
         }
 
-        /// <summary>
-        /// Ermittelt, wie viele Spalten die Ansicht benutzt.
-        /// </summary>
-        /// <param name="ViewCollection"></param>
-        /// <returns></returns>
-        private int View_AnzahlSpalten(ColumnViewCollection ViewCollection) {
-            var MaxS = 0;
-            foreach (var ThisViewItem in ViewCollection) {
-                if (ThisViewItem != null) {
-                    MaxS = Math.Max(MaxS, ThisViewItem.Spalte_X1 + ThisViewItem.Width - 1); // Spalte_X2
-                }
-            }
-            return MaxS;
-        }
-
         private void View_Init() {
-            if (_Database == null) { return; }
+            if (_database == null) { return; }
             if (Parent == null) { return; } // Irgend ein Formular reagiert nioch?!?
-            _Inited = false;
+            _inited = false;
             Control_Remove_All();
-            foreach (var ThisTabpage in Tabs.TabPages) {
-                if (ThisTabpage is System.Windows.Forms.TabPage tp) {
+            foreach (var thisTabpage in Tabs.TabPages) {
+                if (thisTabpage is System.Windows.Forms.TabPage tp) {
                     tp.MouseUp -= Tabs_MouseUp;
                     tp.Dispose();
                     Tabs.TabPages.Remove(tp);
@@ -870,8 +863,8 @@ namespace BlueControls.Controls {
             Control_Create_All();
             Control_RepairSize_All();
             Controls_SetCorrectEnabledState_All();
-            Tabs.Visible = _Database.Views.Count > 0;
-            _Inited = true;
+            Tabs.Visible = _database.Views.Count > 0;
+            _inited = true;
             if (Tabs.TabPages.Count >= 0) { Tabs.SelectedIndex = 0; }
         }
 

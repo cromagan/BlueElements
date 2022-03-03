@@ -19,7 +19,6 @@ using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
 using System.Linq;
-using static BlueBasics.Extensions;
 
 namespace BlueScript {
 
@@ -67,10 +66,8 @@ namespace BlueScript {
 
             if (attvar.Attributes[0].Type == enVariableDataType.List) {
                 var x = attvar.Attributes[0].ValueListString;
-                foreach (var thisW in wordlist) {
-                    if (x.Contains(thisW, attvar.Attributes[1].ValueBool)) {
-                        return strDoItFeedback.Wahr();
-                    }
+                if (wordlist.Any(thisW => x.Contains(thisW, attvar.Attributes[1].ValueBool))) {
+                    return strDoItFeedback.Wahr();
                 }
                 return strDoItFeedback.Falsch();
             }

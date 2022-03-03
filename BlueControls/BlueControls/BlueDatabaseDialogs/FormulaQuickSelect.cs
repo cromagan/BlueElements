@@ -29,13 +29,13 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         #region Fields
 
-        private readonly RowItem Row;
+        private readonly RowItem? Row;
 
         #endregion
 
         #region Constructors
 
-        public FormulaQuickSelect(RowItem RowItem) {
+        public FormulaQuickSelect(RowItem? RowItem) {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
@@ -86,21 +86,19 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (string.IsNullOrEmpty(t)) { return; }
             t = t.ToLower();
             foreach (var ThisColumn in Row.Database.Column) {
-                if (ThisColumn != null) {
-                    if (ThisColumn.EditType is enEditTypeFormula.SwapListBox or enEditTypeFormula.Listbox or enEditTypeFormula.Textfeld_mit_Auswahlknopf) {
-                        if (ThisColumn.DropdownBearbeitungErlaubt) {
-                            if (CellCollection.UserEditPossible(ThisColumn, Row, enErrorReason.OnlyRead)) {
-                                var ThisView = Formula.SearchColumnView(ThisColumn);
-                                if (ThisView != null) {
-                                    if (Row.Database.PermissionCheck(ThisView.PermissionGroups_Show, null)) {
-                                        ItemCollectionList dummy = new();
-                                        ItemCollectionList.GetItemCollection(dummy, ThisColumn, Row, enShortenStyle.Replaced, 1000);
-                                        if (dummy.Count > 0) {
-                                            foreach (var thisItem in dummy) {
-                                                if (thisItem.Internal.ToLower().Contains(t)) {
-                                                    var ni = Auswahl.Item.Add(ThisColumn.ReadableText() + ": " + thisItem.Internal, ThisColumn.Name.ToUpper() + "|" + thisItem.Internal);
-                                                    ni.Checked = thisItem.Checked;
-                                                }
+                if (ThisColumn?.EditType is enEditTypeFormula.SwapListBox or enEditTypeFormula.Listbox or enEditTypeFormula.Textfeld_mit_Auswahlknopf) {
+                    if (ThisColumn.DropdownBearbeitungErlaubt) {
+                        if (CellCollection.UserEditPossible(ThisColumn, Row, enErrorReason.OnlyRead)) {
+                            var ThisView = Formula.SearchColumnView(ThisColumn);
+                            if (ThisView != null) {
+                                if (Row.Database.PermissionCheck(ThisView.PermissionGroups_Show, null)) {
+                                    ItemCollectionList dummy = new();
+                                    ItemCollectionList.GetItemCollection(dummy, ThisColumn, Row, enShortenStyle.Replaced, 1000);
+                                    if (dummy.Count > 0) {
+                                        foreach (var thisItem in dummy) {
+                                            if (thisItem.Internal.ToLower().Contains(t)) {
+                                                var ni = Auswahl.Item.Add(ThisColumn.ReadableText() + ": " + thisItem.Internal, ThisColumn.Name.ToUpper() + "|" + thisItem.Internal);
+                                                ni.Checked = thisItem.Checked;
                                             }
                                         }
                                     }

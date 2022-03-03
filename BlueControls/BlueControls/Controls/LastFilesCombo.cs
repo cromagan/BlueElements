@@ -37,7 +37,7 @@ namespace BlueControls.Controls {
         public string _filename = string.Empty;
         public int _maxCount = 20;
         public bool _mustExists = true;
-        private List<string> LastD = new();
+        private List<string?> LastD = new();
 
         #endregion
 
@@ -159,7 +159,7 @@ namespace BlueControls.Controls {
         }
 
         private void LoadFromDisk() {
-            LastD = new List<string>();
+            LastD = new List<string?>();
             if (FileExists(SaveFileName())) {
                 var t = File.ReadAllText(SaveFileName(), System.Text.Encoding.UTF8);
                 t = t.RemoveChars("\n");

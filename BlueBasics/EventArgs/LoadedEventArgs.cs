@@ -27,7 +27,7 @@ namespace BlueBasics.EventArgs {
 
         #region Properties
 
-        public bool OnlyReload { get; private set; }
+        public bool OnlyReload { get; }
 
         #endregion
     }

@@ -33,25 +33,25 @@ namespace BlueBasics {
 
         #region Fields
 
-        private static readonly DateTime _ProgrammStarted = DateTime.Now;
-        private static readonly object _SyncLockObject = new();
-        private static string _CurrentTraceLogFile = string.Empty;
-        private static bool _DeleteTraceLog = true;
-        private static bool _IsTraceLogging;
-        private static string _LastDebugMessage = string.Empty;
-        private static DateTime _LastDebugTime = DateTime.Now;
-        private static DateTime _StopUhr = DateTime.Now;
-        private static TextWriterTraceListener _TraceListener;
+        private static readonly DateTime ProgrammStarted = DateTime.Now;
+        private static readonly object SyncLockObject = new();
+        private static string _currentTraceLogFile = string.Empty;
+        private static bool _deleteTraceLog = true;
+        private static bool _isTraceLogging;
+        private static string _lastDebugMessage = string.Empty;
+        private static DateTime _lastDebugTime = DateTime.Now;
+        private static DateTime _stopUhr = DateTime.Now;
+        private static TextWriterTraceListener? _traceListener;
 
         #endregion
 
         #region Properties
 
         [DefaultValue(false)]
-        public static bool Exited { get; private set; } = false;
+        public static bool Exited { get; private set; }
 
         [DefaultValue(false)]
-        public static bool ServiceStarted { get; private set; } = false;
+        public static bool ServiceStarted { get; private set; }
 
         #endregion
 
@@ -68,8 +68,8 @@ namespace BlueBasics {
 
         public static string AppName() {
             try {
-                var ex_a = Assembly.GetEntryAssembly();
-                return ex_a.GetName().Name;
+                var exA = Assembly.GetEntryAssembly();
+                return exA.GetName().Name;
             } catch {
                 return "Programm von Christian Peter";
             }
@@ -86,78 +86,78 @@ namespace BlueBasics {
 
         public static void DebugPrint(enFehlerArt art, Exception ex) {
             if (art != enFehlerArt.Info && art != enFehlerArt.DevelopInfo && IsHostRunning()) { Debugger.Break(); }
-            DebugPrint(art, "Es wurde ein allgemeiner Fehler abgefangen.\r\nMeldung: " + ex.Message + "\r\n" + ex.StackTrace.ToString());
+            DebugPrint(art, "Es wurde ein allgemeiner Fehler abgefangen.\r\nMeldung: " + ex.Message + "\r\n" + ex.StackTrace);
         }
 
         public static void DebugPrint(Exception warnung) => DebugPrint(enFehlerArt.Warnung, warnung);
 
-        public static void DebugPrint(object _Enum) => DebugPrint(enFehlerArt.Warnung, "Ein Wert einer Enumeration konnte nicht verarbeitet werden.\r\nEnumeration: " + _Enum.GetType().FullName + "\r\nParameter: " + _Enum);
+        public static void DebugPrint(object @enum) => DebugPrint(enFehlerArt.Warnung, "Ein Wert einer Enumeration konnte nicht verarbeitet werden.\r\nEnumeration: " + @enum.GetType().FullName + "\r\nParameter: " + @enum);
 
         public static void DebugPrint(enFehlerArt art, string meldung) {
-            lock (_SyncLockObject) {
+            lock (SyncLockObject) {
                 try {
-                    if (_IsTraceLogging) {
+                    if (_isTraceLogging) {
                         if (art == enFehlerArt.Fehler) { AbortExe(); }
                         return;
                     }
-                    _IsTraceLogging = true;
-                    if (art == enFehlerArt.Fehler) { _LastDebugMessage = string.Empty; }
-                    if (DateTime.Now.Subtract(_LastDebugTime).TotalSeconds > 5) { _LastDebugMessage = string.Empty; }
+                    _isTraceLogging = true;
+                    if (art == enFehlerArt.Fehler) { _lastDebugMessage = string.Empty; }
+                    if (DateTime.Now.Subtract(_lastDebugTime).TotalSeconds > 5) { _lastDebugMessage = string.Empty; }
                     var net = art + (";" + meldung);
-                    if (net == _LastDebugMessage) {
-                        _IsTraceLogging = false;
+                    if (net == _lastDebugMessage) {
+                        _isTraceLogging = false;
                         return;
                     }
-                    _LastDebugMessage = net;
-                    _LastDebugTime = DateTime.Now;
-                    var First = true;
-                    var tmp = _CurrentTraceLogFile;
+                    _lastDebugMessage = net;
+                    _lastDebugTime = DateTime.Now;
+                    var first = true;
+                    var tmp = _currentTraceLogFile;
                     StackTrace strace = new(true);
-                    var Nr = 100;
-                    List<string> l = null;
+                    var nr = 100;
+                    List<string>? l = null;
                     Trace.WriteLine("<tr>");
                     switch (art) {
                         case enFehlerArt.DevelopInfo:
                             if (!IsHostRunning()) {
-                                _IsTraceLogging = false;
+                                _isTraceLogging = false;
                                 return;
                             }
                             Trace.WriteLine("<th><font size = 3>Runtime-Info");
-                            Nr = 5;
+                            nr = 5;
                             break;
 
                         case enFehlerArt.Info:
                             Trace.WriteLine("<th><font size = 3>Info");
-                            Nr = 5;
+                            nr = 5;
                             break;
 
                         case enFehlerArt.Warnung:
                             if (IsHostRunning()) { Debugger.Break(); }
                             Trace.WriteLine("<th><font color =777700>Warnung<font color =000000>");
-                            _DeleteTraceLog = false;
+                            _deleteTraceLog = false;
                             break;
 
                         case enFehlerArt.Fehler:
                             if (IsHostRunning()) { Debugger.Break(); }
                             if (!FileExists(tmp)) { l = new List<string>(); }
                             Trace.WriteLine("<th><font color =FF0000>Fehler<font color =000000>");
-                            _DeleteTraceLog = false;
+                            _deleteTraceLog = false;
                             break;
 
                         default:
                             Trace.WriteLine("<th>?");
-                            _DeleteTraceLog = false;
+                            _deleteTraceLog = false;
                             break;
                     }
                     Trace.WriteLine("<br>" + DateTime.Now.ToString(Constants.Format_Date) + "<br>Thread-Id: " + Thread.CurrentThread.ManagedThreadId + "</th>");
                     Trace.WriteLine("<th ALIGN=LEFT>");
-                    for (var z = 0; z <= Math.Min(Nr + 2, strace.FrameCount - 2); z++) {
+                    for (var z = 0; z <= Math.Min(nr + 2, strace.FrameCount - 2); z++) {
                         if (!strace.GetFrame(z).GetMethod().Name.Contains("DebugPrint")) {
-                            if (First) { Trace.WriteLine("<font color =0000FF>"); }
+                            if (first) { Trace.WriteLine("<font color =0000FF>"); }
                             Trace.WriteLine("<font size = 1>" + strace.GetFrame(z).GetMethod().ReflectedType.FullName.CreateHtmlCodes(true) + "<font size = 2> " + strace.GetFrame(z).GetMethod().ToString().CreateHtmlCodes(true).TrimStart("Void ") + "<br>");
                             l?.Add("<font size = 1>" + strace.GetFrame(z).GetMethod().ReflectedType.FullName.CreateHtmlCodes(true) + "<font size = 2> " + strace.GetFrame(z).GetMethod().ToString().CreateHtmlCodes(true).TrimStart("Void ") + "<br>");
-                            if (First) { Trace.WriteLine("<font color =000000>"); }
-                            First = false;
+                            if (first) { Trace.WriteLine("<font color =000000>"); }
+                            first = false;
                         }
                     }
                     meldung = meldung.Replace("<br>", "\r", RegexOptions.IgnoreCase).CreateHtmlCodes(true);
@@ -188,7 +188,7 @@ namespace BlueBasics {
                         AbortExe();
                         return;
                     }
-                    _IsTraceLogging = false;
+                    _isTraceLogging = false;
                 } catch { }
             }
         }
@@ -259,10 +259,10 @@ namespace BlueBasics {
             CultureInfo.DefaultThreadCurrentCulture = ci;
             CultureInfo.DefaultThreadCurrentUICulture = ci;
             TraceLogging_Start(TempFile(string.Empty, AppName() + "-Trace.html"));
-            System.Windows.Forms.Timer Check = new();
-            Check.Tick += CloseAfter12Hours;
-            Check.Interval = 60000;
-            Check.Enabled = true;
+            System.Windows.Forms.Timer check = new();
+            check.Tick += CloseAfter12Hours;
+            check.Interval = 60000;
+            check.Enabled = true;
         }
 
         /// <summary>
@@ -272,39 +272,39 @@ namespace BlueBasics {
         /// <param name="txt"></param>
         public static void StopUhr(string txt) {
             if (!string.IsNullOrEmpty(txt)) {
-                var x = DateTime.Now.Subtract(_StopUhr);
+                var x = DateTime.Now.Subtract(_stopUhr);
                 Console.WriteLine("### STOPUHR ### " + x.TotalMilliseconds.ToString(Constants.Format_Float5_1) + " ms ----> " + txt);
             }
-            _StopUhr = DateTime.Now;
+            _stopUhr = DateTime.Now;
         }
 
         public static void TraceLogging_End() {
             try {
-                if (!string.IsNullOrEmpty(_CurrentTraceLogFile)) {
+                if (!string.IsNullOrEmpty(_currentTraceLogFile)) {
                     // Trace-Log soll umgeleitet werden
                     Trace.WriteLine("    </table>");
                     Trace.WriteLine("  </body>");
                     Trace.WriteLine(" </html>");
-                    Trace.Listeners.Remove(_TraceListener);
-                    _TraceListener.Flush();
-                    _TraceListener.Close();
-                    _TraceListener.Dispose();
-                    _TraceListener = null;
-                    if (_DeleteTraceLog && FileExists(_CurrentTraceLogFile)) { DeleteFile(_CurrentTraceLogFile, false); }
+                    Trace.Listeners.Remove(_traceListener);
+                    _traceListener.Flush();
+                    _traceListener.Close();
+                    _traceListener.Dispose();
+                    _traceListener = null;
+                    if (_deleteTraceLog && FileExists(_currentTraceLogFile)) { DeleteFile(_currentTraceLogFile, false); }
                 }
             } catch {
             }
-            _CurrentTraceLogFile = string.Empty;
-            _DeleteTraceLog = true;
+            _currentTraceLogFile = string.Empty;
+            _deleteTraceLog = true;
         }
 
         public static void TraceLogging_Start(string traceFileName) {
             TraceLogging_End();
-            _DeleteTraceLog = true;
-            if (FileExists(_CurrentTraceLogFile)) { File.Delete(_CurrentTraceLogFile); }
-            _CurrentTraceLogFile = TempFile(traceFileName);
-            _TraceListener = new TextWriterTraceListener(_CurrentTraceLogFile);
-            Trace.Listeners.Add(_TraceListener);
+            _deleteTraceLog = true;
+            if (FileExists(_currentTraceLogFile)) { File.Delete(_currentTraceLogFile); }
+            _currentTraceLogFile = TempFile(traceFileName);
+            _traceListener = new TextWriterTraceListener(_currentTraceLogFile);
+            Trace.Listeners.Add(_traceListener);
             try {
                 Trace.AutoFlush = true;
                 Trace.WriteLine("<!DOctypex HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"");
@@ -320,7 +320,7 @@ namespace BlueBasics {
         }
 
         private static void CloseAfter12Hours(object sender, System.EventArgs e) {
-            if (DateTime.Now.Subtract(_ProgrammStarted).TotalHours > 12) {
+            if (DateTime.Now.Subtract(ProgrammStarted).TotalHours > 12) {
                 if (IsHostRunning()) { return; }
                 DebugPrint(enFehlerArt.Info, "Das Programm wird nach 12 Stunden automatisch geschlossen.");
                 TraceLogging_End();

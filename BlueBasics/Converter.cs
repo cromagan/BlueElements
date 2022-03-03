@@ -30,7 +30,7 @@ namespace BlueBasics {
 
         #region Methods
 
-        public static Bitmap Base64ToBitmap(string base64) {
+        public static Bitmap? Base64ToBitmap(string base64) {
             try {
                 using MemoryStream memory = new(Convert.FromBase64String(base64));
                 Bitmap oBitmap = new(memory);
@@ -43,7 +43,7 @@ namespace BlueBasics {
 
         public static byte Bin8ToByte(string bIN8) => Convert.ToByte(bIN8, 2);
 
-        public static string BitmapToBase64(Bitmap bMP, ImageFormat bFormat) {
+        public static string BitmapToBase64(Bitmap? bMP, ImageFormat bFormat) {
             if (bMP == null) { return string.Empty; }
             if (bMP.PixelFormat != PixelFormat.Format32bppPArgb) { bMP = Bitmap_ChangePixelFormat(bMP); }
             MemoryStream memory = new();
@@ -53,7 +53,7 @@ namespace BlueBasics {
             return base64;
         }
 
-        public static byte[] BitmapToByte(Bitmap bMP, ImageFormat format) {
+        public static byte[]? BitmapToByte(Bitmap? bMP, ImageFormat format) {
             if (bMP == null) { return null; }
             if (bMP.PixelFormat != PixelFormat.Format32bppPArgb) { bMP = Bitmap_ChangePixelFormat(bMP); }
             MemoryStream MemSt = new();
@@ -61,7 +61,7 @@ namespace BlueBasics {
             return MemSt.ToArray();
         }
 
-        public static string BitmapToStringUnicode(Bitmap bMP, ImageFormat format) => bMP == null ? string.Empty : new string(Encoding.Unicode.GetChars(BitmapToByte(bMP, format)));
+        public static string BitmapToStringUnicode(Bitmap? bMP, ImageFormat format) => bMP == null ? string.Empty : new string(Encoding.Unicode.GetChars(BitmapToByte(bMP, format)));
 
         //private static readonly string SerialNr2Path_LastSearch = string.Empty;
         //private static readonly string SerialNr2Path_LastErgebnis = string.Empty;
@@ -73,7 +73,7 @@ namespace BlueBasics {
             }
         }
 
-        public static Bitmap ByteToBitmap(byte[] value) {
+        public static Bitmap? ByteToBitmap(byte[] value) {
             if (value == null || value.GetUpperBound(0) == 0) { return null; }
             try {
                 using MemoryStream ms = new(value);
@@ -106,7 +106,7 @@ namespace BlueBasics {
         //        return string.Empty;
         //    }
         // }
-        public static void CartesianToPolar(PointF ko, ref float r, ref float win) {
+        public static void CartesianToPolar(PointF ko, out float r, out float win) {
             r = (float)Math.Sqrt((ko.X * ko.X) + (ko.Y * ko.Y));
             win = Geometry.GetAngle(0, 0, ko.X, ko.Y);
         }
@@ -279,7 +279,7 @@ namespace BlueBasics {
         // }
         public static string StringtoUTF8(this string s) => Encoding.Default.GetString(Encoding.UTF8.GetBytes(s));
 
-        public static Bitmap StringUnicodeToBitmap(string unicodeTXT) {
+        public static Bitmap? StringUnicodeToBitmap(string unicodeTXT) {
             if (string.IsNullOrEmpty(unicodeTXT)) {
                 return null;
             }
@@ -288,7 +288,7 @@ namespace BlueBasics {
             return BMP;
         }
 
-        public static Bitmap StringWIN1252ToBitmap(string tXT) {
+        public static Bitmap? StringWIN1252ToBitmap(string tXT) {
             if (string.IsNullOrEmpty(tXT)) {
                 return null;
             }
@@ -297,7 +297,7 @@ namespace BlueBasics {
             return BMP;
         }
 
-        private static Bitmap Bitmap_ChangePixelFormat(Bitmap oldBmp) {
+        private static Bitmap Bitmap_ChangePixelFormat(Bitmap? oldBmp) {
             Generic.CollectGarbage();
             return new Bitmap(oldBmp);
             // Return oldBmp.Clone(New Rectangle(0, 0, oldBmp.Width, oldBmp.Height), NewFormat)

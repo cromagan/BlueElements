@@ -30,8 +30,8 @@ namespace BlueControls.BlueDatabaseDialogs {
         #region Fields
 
         private readonly Table _BlueTable;
-        private ColumnItem? _col = null;
-        private RowData? _row = null;
+        private ColumnItem? _col;
+        private RowData? _row;
 
         #endregion
 

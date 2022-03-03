@@ -20,22 +20,22 @@ using BlueControls.Enums;
 using System;
 using System.Drawing;
 
-namespace BlueControls {
+namespace BlueControls.Extended_Text {
 
-    public class ExtCharASCII : ExtChar {
+    public class ExtCharAscii : ExtChar {
         //public const char StoreX = (char)5;
         //public const char Top = (char)4;
 
         #region Fields
 
-        private readonly char _Char;
+        private readonly char _char;
 
         #endregion
 
         #region Constructors
 
-        internal ExtCharASCII(char charcode, enDesign design, enStates state, BlueFont font, int stufe, enMarkState markState) : base(design, state, font, stufe) {
-            _Char = charcode;
+        internal ExtCharAscii(char charcode, enDesign design, enStates state, BlueFont? font, int stufe, enMarkState markState) : base(design, state, font, stufe) {
+            _char = charcode;
             Marking = markState;
         }
 
@@ -43,19 +43,19 @@ namespace BlueControls {
 
         #region Properties
 
-        public int Char => _Char;
+        public int Char => _char;
 
         #endregion
 
         #region Methods
 
         public override void Draw(Graphics gr, Point posModificator, float zoom) {
-            if (_Char < 20) { return; }
-            var DrawX = (Pos.X * zoom) + posModificator.X;
-            var DrawY = (Pos.Y * zoom) + posModificator.Y;
+            if (_char < 20) { return; }
+            var drawX = (Pos.X * zoom) + posModificator.X;
+            var drawY = (Pos.Y * zoom) + posModificator.Y;
 
             try {
-                Font?.DrawString(gr, _Char.ToString(), DrawX, DrawY, zoom, StringFormat.GenericTypographic);
+                Font?.DrawString(gr, _char.ToString(), drawX, drawY, zoom, StringFormat.GenericTypographic);
             } catch { }
 
             //if (Math.Abs(zoom - 1) < 0.001) {
@@ -72,25 +72,25 @@ namespace BlueControls {
             //}
         }
 
-        public override string HTMLText() => Convert.ToChar(_Char).ToString().CreateHtmlCodes(false);
+        public override string HTMLText() => Convert.ToChar(_char).ToString().CreateHtmlCodes(false);
 
-        public override bool isLineBreak() => (int)_Char switch {
+        public override bool isLineBreak() => (int)_char switch {
             11 or 13 => true,
-            _ => false,
+            _ => false
         };
 
-        public override bool isPossibleLineBreak() => _Char.isPossibleLineBreak();
+        public override bool isPossibleLineBreak() => _char.isPossibleLineBreak();
 
-        public override bool isSpace() => (int)_Char switch {
+        public override bool isSpace() => (int)_char switch {
             32 or 0 or 9 => true,
-            _ => false,
+            _ => false
         };
 
-        public override bool isWordSeperator() => _Char.isWordSeperator();
+        public override bool isWordSeperator() => _char.isWordSeperator();
 
-        public override string PlainText() => Convert.ToChar(_Char).ToString();
+        public override string PlainText() => Convert.ToChar(_char).ToString();
 
-        protected override SizeF CalculateSize() => Font == null ? new SizeF(0, 16) : _Char < 0 ? Font.CharSize(0f) : Font.CharSize(_Char);
+        protected override SizeF CalculateSize() => Font == null ? new SizeF(0, 16) : _char < 0 ? Font.CharSize(0f) : Font.CharSize(_char);
 
         #endregion
     }

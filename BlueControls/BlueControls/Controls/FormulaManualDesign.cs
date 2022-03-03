@@ -35,7 +35,7 @@ namespace BlueControls.Controls {
 
         private long _ShowingRowKey = -1;
 
-        private RowItem? _tmpShowingRow = null;
+        private RowItem? _tmpShowingRow;
 
         #endregion
 
@@ -73,19 +73,21 @@ namespace BlueControls.Controls {
 
                 _Database = value;
 
-                if (_Database != null) {
-                    _Database.Loading += _Database_StoreView;
-                    _Database.Loaded += _DatabaseLoaded;
-                    //_Database.RowKeyChanged += _Database_RowKeyChanged;
-                    _Database.Disposing += _Database_Disposing;
+                if (_Database == null) {
+                    return;
                 }
+
+                _Database.Loading += _Database_StoreView;
+                _Database.Loaded += _DatabaseLoaded;
+                //_Database.RowKeyChanged += _Database_RowKeyChanged;
+                _Database.Disposing += _Database_Disposing;
             }
         }
 
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public RowItem ShowingRow {
+        public RowItem? ShowingRow {
             get {
                 Develop.DebugPrint_Disposed(IsDisposed);
                 return _tmpShowingRow;

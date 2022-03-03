@@ -17,10 +17,10 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 
 namespace BlueDatabase {
 
@@ -28,22 +28,16 @@ namespace BlueDatabase {
 
         #region Methods
 
-        public static RowData Get(this List<RowData> l, RowItem row) {
+        public static RowData? Get(this List<RowData?> l, RowItem? row) {
             if (l == null) { return null; }
 
-            foreach (var thisr in l) {
-                if (thisr?.Row == row) { return thisr; }
-            }
-            return null;
+            return l.FirstOrDefault(thisr => thisr?.Row == row);
         }
 
-        public static RowData Get(this List<RowData> l, RowItem row, string chapter) {
-            if (l == null) { return null; }
+        public static RowData? Get(this List<RowData?> l, RowItem? row, string chapter) {
+            if (l == null || row == null) { return null; }
 
-            foreach (var thisr in l) {
-                if (thisr?.Row == row && thisr.Chapter == chapter) { return thisr; }
-            }
-            return null;
+            return l.FirstOrDefault(thisr => thisr?.Row == row && thisr.Chapter == chapter);
         }
 
         #endregion
@@ -74,12 +68,12 @@ namespace BlueDatabase {
     /// RowData kann mehrfach in einer Tabelle angezeigt werden.
     /// Ein RowItem ist einzigartig, kann aber in mehreren RowData enthalten sein.
     /// </summary>
-    public class RowData : IComparable, ICompareKey {
+    public class RowData : IComparable {
 
         #region Fields
 
         public readonly string Chapter;
-        public readonly RowItem Row;
+        public readonly RowItem? Row;
         public string AdditinalSort;
         public string AdditionalSort;
         public Rectangle CaptionPos;
@@ -93,9 +87,9 @@ namespace BlueDatabase {
 
         #region Constructors
 
-        public RowData(RowItem row) : this(row, string.Empty) { }
+        public RowData(RowItem? row) : this(row, string.Empty) { }
 
-        public RowData(RowItem row, string chapter) {
+        public RowData(RowItem? row, string chapter) {
             Row = row;
             AdditinalSort = "2";
             Y = -1;
@@ -117,10 +111,10 @@ namespace BlueDatabase {
         public int CompareTo(object obj) {
             if (obj is RowData robj) {
                 return CompareKey().CompareTo(robj.CompareKey());
-            } else {
-                Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Objecttyp!");
-                return 0;
             }
+
+            Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Objecttyp!");
+            return 0;
         }
 
         public void GetDataFrom(RowData thisRowData) {

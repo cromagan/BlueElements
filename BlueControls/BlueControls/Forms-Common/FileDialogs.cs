@@ -49,25 +49,22 @@ namespace BlueControls.Forms {
         /// <summary>
         ///
         /// </summary>
-        /// <param name="Filelist"></param>
-        /// <param name="Meldungen"></param>
+        /// <param name="filelist"></param>
+        /// <param name="meldungen"></param>
         /// <returns>True, wenn mindestens eine DAtei gelöscht wurde.</returns>
-        public static bool DeleteFile(List<string> Filelist, bool Meldungen) {
-            var ButtonNumber = 0;
-            for (var Z = 0; Z < Filelist.Count; Z++) {
-                if (!FileExists(Filelist[Z])) { Filelist[Z] = ""; }
+        public static bool DeleteFile(List<string> filelist, bool meldungen) {
+            var buttonNumber = 0;
+            for (var z = 0; z < filelist.Count; z++) {
+                if (!FileExists(filelist[z])) { filelist[z] = ""; }
             }
-            Filelist = Filelist.SortedDistinctList();
-            if (Filelist.Count == 0) { return false; }
-            if (Meldungen) {
-                ButtonNumber = Filelist.Count == 1
-                    ? MessageBox.Show("Soll die Datei<br>\"" + Filelist[0] + "\"<br>wirklich <b>gelöscht</b> werden?\"", enImageCode.Warnung, "Ja - löschen", "Nein - abbrechen")
-                    : MessageBox.Show("Sollen wirklich " + Filelist.Count + " Dateien<br><b>gelöscht</b> werden?\"", enImageCode.Warnung, "Ja - löschen", "Nein - abbrechen");
+            filelist = filelist.SortedDistinctList();
+            if (filelist.Count == 0) { return false; }
+            if (meldungen) {
+                buttonNumber = filelist.Count == 1
+                    ? MessageBox.Show("Soll die Datei<br>\"" + filelist[0] + "\"<br>wirklich <b>gelöscht</b> werden?\"", enImageCode.Warnung, "Ja - löschen", "Nein - abbrechen")
+                    : MessageBox.Show("Sollen wirklich " + filelist.Count + " Dateien<br><b>gelöscht</b> werden?\"", enImageCode.Warnung, "Ja - löschen", "Nein - abbrechen");
             }
-            if (ButtonNumber == 0) {
-                return FileOperations.DeleteFile(Filelist);
-            }
-            return false; //nein geklickt
+            return buttonNumber == 0 && FileOperations.DeleteFile(filelist);
         }
 
         /// <summary>
@@ -76,12 +73,12 @@ namespace BlueControls.Forms {
         /// <param name="Filelist"></param>
         /// <param name="Meldungen"></param>
         /// <returns>True, wenn mindestens eine DAtei gelöscht wurde.</returns>
-        public static bool DeleteFile(string File, bool Rückfrage) {
+        public static bool DeleteFile(string file, bool rückfrage) {
             List<string> f = new()
             {
-                File
+                file
             };
-            return DeleteFile(f, Rückfrage);
+            return DeleteFile(f, rückfrage);
         }
 
         #endregion

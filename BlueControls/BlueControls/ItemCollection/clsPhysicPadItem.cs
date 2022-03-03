@@ -16,7 +16,6 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Generic;
-using System.Drawing;
 
 namespace BlueControls.ItemCollection {
 
@@ -24,7 +23,7 @@ namespace BlueControls.ItemCollection {
 
         #region Fields
 
-        public readonly List<clsKraft> Kraft = new();
+        public readonly List<ClsKraft> Kraft = new();
 
         #endregion
 

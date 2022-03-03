@@ -9,7 +9,7 @@ namespace BlueControls.Designer_Support {
 
         #region Fields
 
-        private readonly Button ReverenceControl;
+        private readonly Button _reverenceControl;
 
         #endregion
 
@@ -17,7 +17,7 @@ namespace BlueControls.Designer_Support {
 
         public ButtonActionList(IComponent component) : base(component) {
             // Save a reference to the control we are designing.
-            ReverenceControl = (Button)component;
+            _reverenceControl = (Button)component;
             // Save a reference to the DesignerActionUIService
             //  DesignerService = ctypex(GetService(GetType(DesignerActionUIService)), DesignerActionUIService)
             //Makes the Smart Tags open automatically
@@ -29,12 +29,12 @@ namespace BlueControls.Designer_Support {
         #region Properties
 
         public enButtonStyle ButtonStyle {
-            get => ReverenceControl.ButtonStyle;
+            get => _reverenceControl.ButtonStyle;
             set => SetControlProperty("ButtonStyle", value);
         }
 
         public bool Checked {
-            get => ReverenceControl.Checked;
+            get => _reverenceControl.Checked;
             set => SetControlProperty("Checked", value);
         }
 
@@ -48,7 +48,7 @@ namespace BlueControls.Designer_Support {
                 new DesignerActionHeaderItem("Allgemein"),
                 new DesignerActionPropertyItem("ButtonStyle", "ButtonStyle", "Allgemein", "Das Verhalten des Buttons.")
             };
-            if ((int)ReverenceControl.ButtonStyle % 1000 is ((int)enButtonStyle.Checkbox) or ((int)enButtonStyle.Yes_or_No) or ((int)enButtonStyle.Pic1_or_Pic2) or ((int)enButtonStyle.Optionbox)) {
+            if ((int)_reverenceControl.ButtonStyle % 1000 is ((int)enButtonStyle.Checkbox) or ((int)enButtonStyle.Yes_or_No) or ((int)enButtonStyle.Pic1_or_Pic2) or ((int)enButtonStyle.Optionbox)) {
                 items.Add(new DesignerActionPropertyItem("Checked", "Checked", "Allgemein", "Der Checked-Status."));
             }
             return items;
@@ -56,7 +56,7 @@ namespace BlueControls.Designer_Support {
 
         // Set a control property. This method makes Undo/Redo
         // work properly and marks the form as modified in the IDE.
-        private void SetControlProperty(string property_name, object Value) => TypeDescriptor.GetProperties(ReverenceControl)[property_name].SetValue(ReverenceControl, Value);
+        private void SetControlProperty(string propertyName, object value) => TypeDescriptor.GetProperties(_reverenceControl)[propertyName].SetValue(_reverenceControl, value);
 
         #endregion
     }

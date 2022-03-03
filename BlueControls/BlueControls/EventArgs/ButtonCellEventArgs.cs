@@ -25,14 +25,14 @@ namespace BlueControls.EventArgs {
 
         #region Constructors
 
-        public ButtonCellEventArgs(ColumnItem column, RowItem row) : base(column, row) => Text = "Click";
+        public ButtonCellEventArgs(ColumnItem? column, RowItem? row) : base(column, row) => Text = "Click";
 
         #endregion
 
         #region Properties
 
         public bool Cecked { get; set; }
-        public QuickImage Image { get; set; }
+        public QuickImage? Image { get; set; }
         public string Text { get; set; }
 
         #endregion

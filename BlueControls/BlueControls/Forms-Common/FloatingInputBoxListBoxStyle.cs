@@ -23,6 +23,7 @@ using BlueControls.ItemCollection;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Windows.Forms;
 
 namespace BlueControls.Forms {
 
@@ -33,7 +34,7 @@ namespace BlueControls.Forms {
 
         #region Fields
 
-        private bool _MouseWasDown = false;
+        private bool _MouseWasDown;
 
         #endregion
 
@@ -41,7 +42,7 @@ namespace BlueControls.Forms {
 
         private FloatingInputBoxListBoxStyle() : base(enDesign.Form_QuickInfo) => InitializeComponent();
 
-        private FloatingInputBoxListBoxStyle(ItemCollectionList Items, int Xpos, int Ypos, int SteuerWi, object Tag, System.Windows.Forms.Control ConnectedControl, bool Translate) : base(ConnectedControl, Items.ControlDesign) {
+        private FloatingInputBoxListBoxStyle(ItemCollectionList? Items, int Xpos, int Ypos, int SteuerWi, object Tag, Control? ConnectedControl, bool Translate) : base(ConnectedControl, Items.ControlDesign) {
             InitializeComponent();
             this.Tag = Tag;
             // Design = Items.ControlDesign;
@@ -69,7 +70,7 @@ namespace BlueControls.Forms {
 
         #region Methods
 
-        public static void ContextMenuShow(IContextMenu Control, System.Windows.Forms.MouseEventArgs e) {
+        public static void ContextMenuShow(IContextMenu Control, MouseEventArgs e) {
             Close(enBlueListBoxAppearance.KontextMenu);
             Close(Control);
 
@@ -97,14 +98,14 @@ namespace BlueControls.Forms {
                 }
                 ThisContextMenu.AddSeparator();
                 ThisContextMenu.Add(enContextMenuComands.Abbruch);
-                List<object> Infos = new()
+                List<object?> Infos = new()
                 {
                     UserMenu,
                     HotItem,
                     tags,
                     Control
                 };
-                var _ContextMenu = Show(ThisContextMenu, Infos, (System.Windows.Forms.Control)Control, Translate);
+                var _ContextMenu = Show(ThisContextMenu, Infos, (Control)Control, Translate);
                 _ContextMenu.ItemClicked += _ContextMenu_ItemClicked;
             } else {
                 if (par != null) {
@@ -113,13 +114,13 @@ namespace BlueControls.Forms {
             }
         }
 
-        public static FloatingInputBoxListBoxStyle Show(ItemCollectionList Items, object Tag, System.Windows.Forms.Control ConnectedControl, bool Translate) => new(Items, System.Windows.Forms.Cursor.Position.X - 8, System.Windows.Forms.Cursor.Position.Y - 8, -1, Tag, ConnectedControl, Translate);
+        public static FloatingInputBoxListBoxStyle Show(ItemCollectionList? Items, object Tag, Control? ConnectedControl, bool Translate) => new(Items, Cursor.Position.X - 8, Cursor.Position.Y - 8, -1, Tag, ConnectedControl, Translate);
 
-        public static FloatingInputBoxListBoxStyle Show(ItemCollectionList Items, int Xpos, int Ypos, int SteuerWi, object? Tag, System.Windows.Forms.Control ConnectedControl, bool Translate) => new(Items, Xpos, Ypos, SteuerWi, Tag, ConnectedControl, Translate);
+        public static FloatingInputBoxListBoxStyle Show(ItemCollectionList? Items, int Xpos, int Ypos, int SteuerWi, object? Tag, Control? ConnectedControl, bool Translate) => new(Items, Xpos, Ypos, SteuerWi, Tag, ConnectedControl, Translate);
 
-        public void Generate_ListBox1(ItemCollectionList items, int MinWidth, enAddType AddNewAllowed, bool Translate) {
+        public void Generate_ListBox1(ItemCollectionList? items, int MinWidth, enAddType AddNewAllowed, bool Translate) {
             //var itemsClone = (ItemCollectionList)ItemsOri.Clone();
-            (var BiggestItemX, var _, var HeightAdded, var _) = items.ItemData();
+            var (BiggestItemX, _, HeightAdded, _) = items.ItemData();
             if (AddNewAllowed != enAddType.None) { HeightAdded += 24; }
             lstbx.Appearance = (enBlueListBoxAppearance)items.ControlDesign;
             lstbx.Translate = Translate;
@@ -137,8 +138,8 @@ namespace BlueControls.Forms {
             BiggestItemX = Math.Max(BiggestItemX, 16);
             //}
             BiggestItemX = Math.Max(BiggestItemX, MinWidth);
-            var MaxWi = (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7);
-            var MaxHe = (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height * 0.7);
+            var MaxWi = (int)(Screen.PrimaryScreen.Bounds.Size.Width * 0.7);
+            var MaxHe = (int)(Screen.PrimaryScreen.Bounds.Size.Height * 0.7);
             if (BiggestItemX > MaxWi) { BiggestItemX = MaxWi; }
             if (HeightAdded > MaxHe) {
                 HeightAdded = MaxHe;
@@ -194,7 +195,6 @@ namespace BlueControls.Forms {
                 if (lstbx.Appearance is not enBlueListBoxAppearance.Listbox and not enBlueListBoxAppearance.Gallery and not enBlueListBoxAppearance.FileSystem) {
                     OnItemClicked(new ContextMenuItemClickedEventArgs(e.Item.Internal, Tag, null)); // Das Tag hier ist eigentlich das HotItem
                     if (!IsDisposed) { Close(); }
-                    return;
                 }
             }
         }

@@ -56,7 +56,7 @@ namespace BlueControls.Forms {
 
         public Form(enDesign design) : base() {
             Design = design;
-            if (!Skin.inited) { Skin.LoadSkin(); }
+            if (!Skin.Inited) { Skin.LoadSkin(); }
             BackColor = Skin.Color_Back(Design, enStates.Standard);
             InitializeComponent();
             BackColor = Skin.Color_Back(Design, enStates.Standard);
@@ -78,7 +78,7 @@ namespace BlueControls.Forms {
         [DefaultValue(enDesign.Form_Standard)]
         public enDesign Design {
             get;
-        } = enDesign.Form_Standard;
+        }
 
         public bool IsClosed { get; private set; }
 
@@ -156,10 +156,7 @@ namespace BlueControls.Forms {
             if (!IsClosed) { base.OnSizeChanged(e); }
         }
 
-        protected override void ScaleControl(SizeF factor, System.Windows.Forms.BoundsSpecified specified) {
-            factor = new SizeF(1, 1);
-            base.ScaleControl(factor, specified);
-        }
+        protected override void ScaleControl(SizeF factor, System.Windows.Forms.BoundsSpecified specified) => base.ScaleControl(new SizeF(1, 1), specified);
 
         #endregion
     }

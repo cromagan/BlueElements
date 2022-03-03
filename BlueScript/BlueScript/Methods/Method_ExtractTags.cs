@@ -18,7 +18,6 @@
 using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
-using static BlueBasics.Extensions;
 
 namespace BlueScript {
 
@@ -49,7 +48,7 @@ namespace BlueScript {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
-            var coment = "Mit dem Befehl 'ExtractTags' erstellt";
+            const string coment = "Mit dem Befehl 'ExtractTags' erstellt";
             s.Variablen.RemoveWithComent(coment);
 
             var tags = new List<string>();

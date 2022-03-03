@@ -67,7 +67,7 @@ namespace BlueControls {
 
         public PointM(string name, float x, float y) : this(null, name, x, y, string.Empty) { }
 
-        public PointM(object parent, string name, int x, int y) : this(parent, name, x, y, string.Empty) { }
+        public PointM(object? parent, string name, int x, int y) : this(parent, name, x, y, string.Empty) { }
 
         public PointM(object parent, string name, float x, float y) : this(parent, name, x, y, string.Empty) { }
 
@@ -75,7 +75,7 @@ namespace BlueControls {
 
         public PointM(int x, int y) : this(null, string.Empty, x, y, string.Empty) { }
 
-        public PointM(float x, float y) : this(null, string.Empty, (float)x, (float)y, string.Empty) { }
+        public PointM(float x, float y) : this(null, string.Empty, x, y, string.Empty) { }
 
         public PointM(PointM point) : this(null, string.Empty, point.X, point.Y, string.Empty) { }
 
@@ -93,7 +93,7 @@ namespace BlueControls {
 
         #region Properties
 
-        public float Magnitude => (float)Math.Sqrt((float)((_x * _x) + (_y * _y)));
+        public float Magnitude => (float)Math.Sqrt((_x * _x) + (_y * _y));
         public string Name { get; private set; }
         public object? Parent { get; set; }
 
@@ -121,23 +121,35 @@ namespace BlueControls {
 
         public static PointM Empty() => new(0f, 0f);
 
-        public static implicit operator Point(PointM p) => new((int)p.X, (int)p.Y);
+        public static implicit operator Point(PointM p) {
+            return new((int)p.X, (int)p.Y);
+        }
 
-        public static implicit operator PointF(PointM p) => new((float)p.X, (float)p.Y);
+        public static implicit operator PointF(PointM p) {
+            return new(p.X, p.Y);
+        }
 
-        public static PointM operator -(PointM a) => new(-a._x, -a._y);
+        public static PointM operator -(PointM? a) {
+            return new(-a._x, -a._y);
+        }
 
-        public static PointM operator -(PointM a, PointM b) => new(a._x - b._x, a._y - b._y);
+        public static PointM operator -(PointM? a, PointM? b) {
+            return new(a._x - b._x, a._y - b._y);
+        }
 
-        public static PointM operator *(PointM a, float b) => new(a._x * b, a._y * b);
+        public static PointM operator *(PointM? a, float b) {
+            return new(a._x * b, a._y * b);
+        }
 
-        public static PointM operator +(PointM a, PointM b) => new(a._x + b._x, a._y + b._y);
+        public static PointM operator +(PointM a, PointM b) {
+            return new(a._x + b._x, a._y + b._y);
+        }
 
-        public float DistanzZuLinie(PointM P1, PointM P2) => DistanzZuLinie(P1.X, P1.Y, P2.X, P2.Y);
+        public float DistanzZuLinie(PointM? P1, PointM? P2) => DistanzZuLinie(P1.X, P1.Y, P2.X, P2.Y);
 
         public float DistanzZuLinie(float X1, float Y1, float X2, float Y2) => Länge(this, PointOnLine(this, X1, Y1, X2, Y2));
 
-        public float DotProduct(PointM vector) => (_x * vector._x) + (_y * vector._y);
+        public float DotProduct(PointM? vector) => (_x * vector._x) + (_y * vector._y);
 
         public void Draw(Graphics gr, float zoom, float shiftX, float shiftY, enDesign type, enStates state) {
             var tx = (_x * zoom) - shiftX + (zoom / 2);
@@ -222,7 +234,7 @@ namespace BlueControls {
             OnMoved(new MoveEventArgs(mx, my));
         }
 
-        public void SetTo(PointM StartPoint, float Länge, float Alpha) {
+        public void SetTo(PointM? StartPoint, float Länge, float Alpha) {
             var tempVar = PolarToCartesian(Länge, Alpha);
             SetTo(StartPoint.X + tempVar.X, Y = StartPoint.Y + tempVar.Y);
         }
@@ -239,15 +251,15 @@ namespace BlueControls {
             var t = "{";
             if (Parent != null) {
                 switch (Parent) {
-                    case BasicPadItem _:
-                        t = t + "ParentName=" + ((BasicPadItem)Parent).Internal.ToNonCritical() + ", ";
+                    case BasicPadItem item:
+                        t = t + "ParentName=" + item.Internal.ToNonCritical() + ", ";
                         break;
 
-                    case CreativePad _:
+                    case CreativePad:
                         t += "ParentType=Main, ";
                         break;
 
-                    case ItemCollectionPad _:
+                    case ItemCollectionPad:
                         t += "ParentType=Main, ";
                         break;
 
@@ -265,7 +277,7 @@ namespace BlueControls {
 
         public PointF ZoomAndMove(AdditionalDrawing e) => ZoomAndMove(e.Zoom, e.ShiftX, e.ShiftY);
 
-        public PointF ZoomAndMove(float zoom, float shiftX, float shiftY) => new((float)((_x * zoom) - shiftX + (zoom / 2)), (float)((_y * zoom) - shiftY + (zoom / 2)));
+        public PointF ZoomAndMove(float zoom, float shiftX, float shiftY) => new((_x * zoom) - shiftX + (zoom / 2), (_y * zoom) - shiftY + (zoom / 2));
 
         #endregion
     }

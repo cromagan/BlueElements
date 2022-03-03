@@ -31,7 +31,7 @@ namespace BlueDatabase {
 
         #region Fields
 
-        private string _value = string.Empty;
+        private string _value;
 
         #endregion
 
@@ -65,17 +65,12 @@ namespace BlueDatabase {
 
         #region Methods
 
-        public static Tuple<string, QuickImage> GetDrawingData(ColumnItem column, string originalText, enShortenStyle style, enBildTextVerhalten bildTextverhalten) {
+        public static Tuple<string, QuickImage> GetDrawingData(ColumnItem? column, string originalText, enShortenStyle style, enBildTextVerhalten bildTextverhalten) {
             var tmpText = ValueReadable(column, originalText, style, bildTextverhalten, true);
             var tmpImageCode = StandardImage(column, originalText, tmpText, style, bildTextverhalten);
 
             if (bildTextverhalten is enBildTextVerhalten.Bild_oder_Text or enBildTextVerhalten.Interpretiere_Bool) {
                 if (tmpImageCode != null) { tmpText = string.Empty; }
-                //if (tmpImageCode == null && string.IsNullOrEmpty(tmpText) && !string.IsNullOrEmpty(originalText)) {
-                //    tmpImageCode = StandardErrorImage(16, enBildTextVerhalten.Fehlendes_Bild_zeige_Kritischzeichen);
-                //}
-
-                //q
             }
             return new Tuple<string, QuickImage>(tmpText, tmpImageCode);
         }
@@ -105,7 +100,7 @@ namespace BlueDatabase {
         //    }
         //}
 
-        public static QuickImage StandardErrorImage(string gr, enBildTextVerhalten bildTextverhalten, string originalText, ColumnItem column) {
+        public static QuickImage? StandardErrorImage(string gr, enBildTextVerhalten bildTextverhalten, string originalText, ColumnItem? column) {
             switch (bildTextverhalten) {
                 case enBildTextVerhalten.Fehlendes_Bild_zeige_Fragezeichen:
                     return QuickImage.Get("Fragezeichen|" + gr);
@@ -130,7 +125,7 @@ namespace BlueDatabase {
 
                 case enBildTextVerhalten.Interpretiere_Bool:
                     if (originalText == "+") {
-                        return column == column.Database.Column.SysCorrect ? QuickImage.Get("Häkchen|" + gr.ToString() + "||||||||80") : QuickImage.Get("Häkchen|" + gr);
+                        return column == column.Database.Column.SysCorrect ? QuickImage.Get("Häkchen|" + gr + "||||||||80") : QuickImage.Get("Häkchen|" + gr);
                     } else if (originalText == "-") {
                         return column == column.Database.Column.SysCorrect ? QuickImage.Get("Warnung|" + gr) :
                             QuickImage.Get("Kreuz|" + gr);
@@ -157,7 +152,7 @@ namespace BlueDatabase {
         /// <param name="style"></param>
         /// <param name="removeLineBreaks">bei TRUE werden Zeilenumbrüche mit Leerzeichen ersetzt</param>
         /// <returns></returns>
-        public static string ValueReadable(ColumnItem column, string txt, enShortenStyle style, enBildTextVerhalten bildTextverhalten, bool removeLineBreaks) {
+        public static string ValueReadable(ColumnItem? column, string txt, enShortenStyle style, enBildTextVerhalten bildTextverhalten, bool removeLineBreaks) {
             if (bildTextverhalten == enBildTextVerhalten.Nur_Bild && style != enShortenStyle.HTML) { return string.Empty; }
             switch (column.Format) {
                 case enDataFormat.Text:
@@ -236,7 +231,7 @@ namespace BlueDatabase {
         /// Jede Zeile für sich richtig formatiert.
         /// </summary>
         /// <returns></returns>
-        public static List<string> ValuesReadable(ColumnItem column, RowItem Row, enShortenStyle Style) {
+        public static List<string> ValuesReadable(ColumnItem? column, RowItem Row, enShortenStyle Style) {
             if (column.Format is enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 //var LinkedData = CellCollection.LinkedCellData(column, Row, false, false);
                 //if (LinkedData.Item1 != null && LinkedData.Item2 != null) { return ValuesReadable(LinkedData.Item1, LinkedData.Item2, Style); }
@@ -261,7 +256,7 @@ namespace BlueDatabase {
 
         internal void InvalidateSize() => Size = Size.Empty;
 
-        private static QuickImage StandardImage(ColumnItem column, string originalText, string replacedText, enShortenStyle style, enBildTextVerhalten bildTextverhalten) {
+        private static QuickImage? StandardImage(ColumnItem? column, string originalText, string replacedText, enShortenStyle style, enBildTextVerhalten bildTextverhalten) {
             // replacedText kann auch empty sein. z.B. wenn er nicht angezeigt wird
             if (bildTextverhalten == enBildTextVerhalten.Nur_Text) { return null; }
             if (style == enShortenStyle.HTML) { return null; }
@@ -277,7 +272,7 @@ namespace BlueDatabase {
                 replacedText = x[0];
             }
 
-            var defaultImage = QuickImage.Get(replacedText + "|" + gr.ToString());
+            var defaultImage = QuickImage.Get(replacedText + "|" + gr);
             return defaultImage != null && !defaultImage.IsError ? defaultImage : StandardErrorImage(gr, bildTextverhalten, replacedText, column);
         }
 

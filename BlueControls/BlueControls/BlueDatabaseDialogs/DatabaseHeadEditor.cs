@@ -26,7 +26,6 @@ using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -36,8 +35,8 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         #region Fields
 
-        private Database _Database;
-        private bool frmHeadEditor_FormClosing_isin;
+        private Database _database;
+        private bool _frmHeadEditorFormClosingIsin;
 
         #endregion
 
@@ -46,9 +45,9 @@ namespace BlueControls.BlueDatabaseDialogs {
         public DatabaseHeadEditor(Database cDatabase) {
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
             InitializeComponent();
-            _Database = cDatabase;
-            _Database.Disposing += Database_Disposing;
-            _Database.ShouldICancelSaveOperations += Database_ShouldICancelSaveOperations;
+            _database = cDatabase;
+            _database.Disposing += Database_Disposing;
+            _database.ShouldICancelSaveOperations += Database_ShouldICancelSaveOperations;
         }
 
         #endregion
@@ -56,96 +55,98 @@ namespace BlueControls.BlueDatabaseDialogs {
         #region Methods
 
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
-            if (frmHeadEditor_FormClosing_isin) { return; }
-            frmHeadEditor_FormClosing_isin = true;
+            if (_frmHeadEditorFormClosingIsin) { return; }
+            _frmHeadEditorFormClosingIsin = true;
             base.OnFormClosing(e);
-            if (_Database != null) {
-                WriteInfosBack();
-                RemoveDatabase();
+            if (_database == null) {
+                return;
             }
+
+            WriteInfosBack();
+            RemoveDatabase();
         }
 
         protected override void OnLoad(System.EventArgs e) {
             base.OnLoad(e);
             cbxVerwaisteDaten.Item.Clear();
             cbxVerwaisteDaten.Item.AddRange(typeof(enVerwaisteDaten));
-            cbxVerwaisteDaten.Text = ((int)_Database.VerwaisteDaten).ToString();
+            cbxVerwaisteDaten.Text = ((int)_database.VerwaisteDaten).ToString();
             cbxAnsicht.Item.Clear();
             cbxAnsicht.Item.AddRange(typeof(enAnsicht));
-            cbxAnsicht.Text = ((int)_Database.Ansicht).ToString();
+            cbxAnsicht.Text = ((int)_database.Ansicht).ToString();
             PermissionGroups_NewRow.Item.Clear();
-            PermissionGroups_NewRow.Item.AddRange(_Database.PermissionGroups_NewRow);
+            PermissionGroups_NewRow.Item.AddRange(_database.PermissionGroups_NewRow);
             DatenbankAdmin.Item.Clear();
-            DatenbankAdmin.Item.AddRange(_Database.DatenbankAdmin);
-            txbKennwort.Text = _Database.GlobalShowPass;
+            DatenbankAdmin.Item.AddRange(_database.DatenbankAdmin);
+            txbKennwort.Text = _database.GlobalShowPass;
             lbxSortierSpalten.Item.Clear();
-            if (_Database.SortDefinition != null) {
-                btnSortRichtung.Checked = _Database.SortDefinition.Reverse;
-                if (_Database.SortDefinition.Columns != null) {
-                    foreach (var ThisColumn in _Database.SortDefinition.Columns) {
-                        if (ThisColumn != null) { lbxSortierSpalten.Item.Add(ThisColumn); }
+            if (_database.SortDefinition != null) {
+                btnSortRichtung.Checked = _database.SortDefinition.Reverse;
+                if (_database.SortDefinition.Columns != null) {
+                    foreach (var thisColumn in _database.SortDefinition.Columns.Where(thisColumn => thisColumn != null)) {
+                        lbxSortierSpalten.Item.Add(thisColumn);
                     }
                 }
             }
-            tbxTags.Text = _Database.Tags.JoinWithCr();
+            tbxTags.Text = _database.Tags.JoinWithCr();
             // Exports ----------------
             lbxExportSets.Item.Clear();
-            foreach (var ThisSet in _Database.Export) {
-                if (ThisSet != null) {
-                    lbxExportSets.Item.Add(ThisSet);
-                }
+            foreach (var thisSet in _database.Export.Where(thisSet => thisSet != null)) {
+                lbxExportSets.Item.Add(thisSet);
             }
             lbxExportSets.Item.Sort();
             // -----------------------------
-            txbCaption.Text = _Database.Caption;
-            tbxReloadVerzoegerung.Text = _Database.ReloadDelaySecond.ToString();
-            txbGlobalScale.Text = _Database.GlobalScale.ToString();
-            txbFilterImagePath.Text = _Database.FilterImagePfad;
-            txbAdditionalFiles.Text = _Database.AdditionaFilesPfad;
-            txbZeilenQuickInfo.Text = _Database.ZeilenQuickInfo.Replace("<br>", "\r");
-            tbxUndoAnzahl.Text = _Database.UndoCount.ToString();
+            txbCaption.Text = _database.Caption;
+            tbxReloadVerzoegerung.Text = _database.ReloadDelaySecond.ToString();
+            txbGlobalScale.Text = _database.GlobalScale.ToString();
+            txbFilterImagePath.Text = _database.FilterImagePfad;
+            txbAdditionalFiles.Text = _database.AdditionaFilesPfad;
+            txbZeilenQuickInfo.Text = _database.ZeilenQuickInfo.Replace("<br>", "\r");
+            tbxUndoAnzahl.Text = _database.UndoCount.ToString();
             PermissionGroups_NewRow.Suggestions.Clear();
-            PermissionGroups_NewRow.Suggestions.AddRange(_Database.Permission_AllUsed(false));
+            PermissionGroups_NewRow.Suggestions.AddRange(_database.Permission_AllUsed(false));
             DatenbankAdmin.Suggestions.Clear();
-            DatenbankAdmin.Suggestions.AddRange(_Database.Permission_AllUsed(false));
+            DatenbankAdmin.Suggestions.AddRange(_database.Permission_AllUsed(false));
 
             lbxSortierSpalten.Suggestions.Clear();
-            lbxSortierSpalten.Suggestions.AddRange(_Database.Column, false);
+            lbxSortierSpalten.Suggestions.AddRange(_database.Column, false);
 
             CryptStatus();
             GenerateInfoText();
         }
+
+        private static void Database_ShouldICancelSaveOperations(object sender, System.ComponentModel.CancelEventArgs e) => e.Cancel = true;
 
         private void AddUndoToTable(WorkItem work, int index, string db, bool checkNeeded) {
             if (work.HistorischRelevant) {
                 if (checkNeeded && tblUndo.Database.Row[work.ToString()] != null) { return; }
 
                 var cd = work.CellKey.SplitAndCutBy("|");
-                _Database.Cell.DataOfCellKey(work.CellKey, out var Col, out var Row);
+                _database.Cell.DataOfCellKey(work.CellKey, out var col, out var row);
                 var r = tblUndo.Database.Row.Add(work.ToString());
                 r.CellSet("ColumnKey", cd[0]);
                 r.CellSet("RowKey", cd[1]);
                 r.CellSet("index", index);
                 r.CellSet("db", db);
-                if (Col != null) {
-                    r.CellSet("ColumnName", Col.Name);
-                    r.CellSet("columnCaption", Col.Caption);
+                if (col != null) {
+                    r.CellSet("ColumnName", col.Name);
+                    r.CellSet("columnCaption", col.Caption);
                 }
-                if (Row != null) {
-                    r.CellSet("RowFirst", Row.CellFirstString());
+                if (row != null) {
+                    r.CellSet("RowFirst", row.CellFirstString());
                 } else if (cd[1] != "-1") {
                     r.CellSet("RowFirst", "[gelöscht]");
                 }
                 r.CellSet("Aenderer", work.User);
                 r.CellSet("AenderZeit", work.CompareKey());
-                var Symb = enImageCode.Fragezeichen;
+                var symb = enImageCode.Fragezeichen;
                 var alt = work.PreviousValue;
                 var neu = work.ChangedTo;
                 var aenderung = work.Comand.ToString();
                 switch (work.Comand) {
                     case enDatabaseDataType.ce_UTF8Value_withoutSizeData:
                     case enDatabaseDataType.ce_Value_withoutSizeData:
-                        Symb = enImageCode.Textfeld;
+                        symb = enImageCode.Textfeld;
                         aenderung = "Wert geändert";
                         break;
 
@@ -153,94 +154,73 @@ namespace BlueControls.BlueDatabaseDialogs {
                         aenderung = "Export ausgeführt oder geändert";
                         alt = "";
                         neu = "";
-                        Symb = enImageCode.Karton;
+                        symb = enImageCode.Karton;
                         break;
 
                     case enDatabaseDataType.Layouts:
                         aenderung = "Layouts verändert";
                         alt = "";
                         neu = "";
-                        Symb = enImageCode.Layout;
+                        symb = enImageCode.Layout;
                         break;
 
                     case enDatabaseDataType.dummyComand_AddRow:
                         aenderung = "Neue Zeile";
-                        Symb = enImageCode.PlusZeichen;
+                        symb = enImageCode.PlusZeichen;
                         break;
 
                     case enDatabaseDataType.RulesScript:
                         //case enDatabaseDataType.Rules_ALT:
                         aenderung = "Regeln verändert";
-                        Symb = enImageCode.Formel;
+                        symb = enImageCode.Formel;
                         alt = "";
                         neu = "";
                         break;
 
                     case enDatabaseDataType.ColumnArrangement:
                         aenderung = "Spalten-Anordnungen verändert";
-                        Symb = enImageCode.Spalte;
+                        symb = enImageCode.Spalte;
                         alt = "";
                         neu = "";
                         break;
 
                     case enDatabaseDataType.dummyComand_RemoveRow:
                         aenderung = "Zeile gelöscht";
-                        Symb = enImageCode.MinusZeichen;
+                        symb = enImageCode.MinusZeichen;
                         break;
                 }
                 r.CellSet("Aenderung", aenderung);
-                r.CellSet("symbol", Symb + "|24");
+                r.CellSet("symbol", symb + "|24");
                 r.CellSet("Wertalt", alt);
                 r.CellSet("Wertneu", neu);
             }
         }
 
-        private void Bilder_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-            if (e.HotItem is not BitmapListItem) { return; }
-            e.UserMenu.Add(enContextMenuComands.Umbenennen);
-        }
-
-        private void Bilder_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-            if (e.HotItem == null) { return; }
-            if (e.HotItem is not BitmapListItem) { return; }
-            var l = (BitmapListItem)e.HotItem;
-            switch (e.ClickedComand) {
-                case "Umbenennen":
-                    var n = InputBox.Show("<b><u>Bild umbenennen:</u></b><br><br>Achtung! Dadruch können Bezüge<br> in Texten und Spalten verlorengehen!", l.Caption, enVarType.Text);
-                    if (!string.IsNullOrEmpty(n)) { l.Caption = n; }
-                    break;
-
-                default:
-                    Develop.DebugPrint(e);
-                    break;
-            }
-        }
-
         private void btnAlleUndos_Click(object sender, System.EventArgs e) {
             btnAlleUndos.Enabled = false;
-            var L = tabAdministration.Vorgängervsersionen(_Database);
-            if (L.Count < 1) {
+            var l = tabAdministration.Vorgängervsersionen(_database);
+            if (l.Count < 1) {
                 MessageBox.Show("Keine Vorgänger gefunden.");
                 return;
             }
-            L.CheckBehavior = enCheckBehavior.MultiSelection;
-            var alle = InputBoxListBoxStyle.Show("Datenbaken, die geladen werden sollen, wählen:", L, enAddType.None, true);
+            l.CheckBehavior = enCheckBehavior.MultiSelection;
+            var alle = InputBoxListBoxStyle.Show("Datenbaken, die geladen werden sollen, wählen:", l, enAddType.None, true);
             if (alle.Count < 1) {
                 MessageBox.Show("Abbruch.");
                 btnAlleUndos.Enabled = true;
                 return;
             }
-            var nDB = 0;
+            var nDb = 0;
             var x = Progressbar.Show("Lade Vorgänger Datenbanken", alle.Count);
             foreach (var thisf in alle) {
-                nDB++;
-                x.Update(nDB);
+                nDb++;
+                x.Update(nDb);
                 var db = Database.GetByFilename(thisf, false, true);
                 var disp = db == null;
                 if (db == null) {
                     db = new Database(thisf, true, false);
                 }
-                if (db.Caption == _Database.Caption) {
+                if (db.Caption == _database.Caption) {
                     for (var n = 0; n < db.Works.Count; n++) {
                         AddUndoToTable(db.Works[n], n, db.Filename.FileNameWithoutSuffix(), true);
                     }
@@ -253,15 +233,15 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void btnClipboard_Click(object sender, System.EventArgs e) => Generic.CopytoClipboard(tblUndo.Export_CSV(enFirstRow.ColumnCaption));
 
         private void btnFremdImport_Click(object sender, System.EventArgs e) {
-            if (_Database.ReadOnly) { return; }
+            if (_database.ReadOnly) { return; }
             WriteInfosBack();
-            string GetFromFile;
+            string getFromFile;
             System.Windows.Forms.OpenFileDialog openFileDialog1 = new() {
                 CheckFileExists = true,
                 Filter = "Datenbanken|*.mdb"
             };
             if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
-                GetFromFile = openFileDialog1.FileName;
+                getFromFile = openFileDialog1.FileName;
             } else {
                 return;
             }
@@ -278,26 +258,26 @@ namespace BlueControls.BlueDatabaseDialogs {
                 { "Standard-Sortierung", ((int)enDatabaseDataType.SortDefinition).ToString() }
             };
             I.Sort();
-            var What = InputBoxComboStyle.Show("Welchen Code:", I, false);
-            if (string.IsNullOrEmpty(What)) { return; }
-            var B = clsMultiUserFile.UnzipIt(File.ReadAllBytes(GetFromFile));
-            enDatabaseDataType Art = 0;
-            var Pointer = 0;
-            long ColKey = 0;
-            long RowKey = 0;
-            var X = 0;
-            var Y = 0;
-            var Inhalt = string.Empty;
-            var Such = (enDatabaseDataType)int.Parse(What);
+            var what = InputBoxComboStyle.Show("Welchen Code:", I, false);
+            if (string.IsNullOrEmpty(what)) { return; }
+            var b = ClsMultiUserFile.UnzipIt(File.ReadAllBytes(getFromFile));
+            enDatabaseDataType art = 0;
+            var pointer = 0;
+            long colKey = 0;
+            long rowKey = 0;
+            var x = 0;
+            var y = 0;
+            var inhalt = string.Empty;
+            var such = (enDatabaseDataType)int.Parse(what);
             do {
-                if (Pointer > B.Length) { break; }
-                _Database.Parse(B, ref Pointer, ref Art, ref ColKey, ref RowKey, ref Inhalt, ref X, ref Y);
-                if (Such == Art) {
-                    _Database.InjectCommand(Art, Inhalt);
+                if (pointer > b.Length) { break; }
+                _database.Parse(b, ref pointer, ref art, ref colKey, ref rowKey, ref inhalt, ref x, ref y);
+                if (such == art) {
+                    _database.InjectCommand(art, inhalt);
                     //_Database.AddPending(Art, -1, -1, "", Inhalt, true);
-                    MessageBox.Show("<b>Importiert:</b><br>" + Inhalt, enImageCode.Information, "OK");
+                    MessageBox.Show("<b>Importiert:</b><br>" + inhalt, enImageCode.Information, "OK");
                 }
-            } while (Art != enDatabaseDataType.EOF);
+            } while (art != enDatabaseDataType.EOF);
             RemoveDatabase();
             Close();
         }
@@ -307,9 +287,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             scriptEditor.Message("Speichervorgang...");
 
             var ok = false;
-            if (_Database != null) {
+            if (_database != null) {
                 WriteInfosBack();
-                ok = _Database.Save(false);
+                ok = _database.Save(false);
             }
             if (ok) {
                 scriptEditor.Message("Speichern erfolgreich.");
@@ -320,15 +300,15 @@ namespace BlueControls.BlueDatabaseDialogs {
             btnSave.Enabled = true;
         }
 
-        private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => _Database.Column.GenerateOverView();
+        private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => _database.Column.GenerateOverView();
 
         private void btnSperreAufheben_Click(object sender, System.EventArgs e) {
-            _Database.UnlockHard();
+            _database.UnlockHard();
             MessageBox.Show("Erledigt.", enImageCode.Information, "OK");
         }
 
         private void CryptStatus() {
-            if (string.IsNullOrEmpty(_Database.FileEncryptionKey)) {
+            if (string.IsNullOrEmpty(_database.FileEncryptionKey)) {
                 btnDateiSchluessel.Text = "Dateien verschlüsseln";
                 btnDateiSchluessel.QuickInfo = "Dazugehörige Dateien der Datenbank sind aktuell im Originalformat auf dem Laufwerk für jedem zugänglich.";
             } else {
@@ -342,31 +322,29 @@ namespace BlueControls.BlueDatabaseDialogs {
             Close();
         }
 
-        private void Database_ShouldICancelSaveOperations(object sender, System.ComponentModel.CancelEventArgs e) => e.Cancel = true;
-
         private void DateienSchlüssel_Click(object sender, System.EventArgs e) {
             btnDateiSchluessel.Enabled = false;
             btnDateiSchluessel.Text = "Dateien in Arbeit";
-            var lLCase = _Database.AllConnectedFilesLCase();
-            string NewKey;
-            if (string.IsNullOrEmpty(_Database.FileEncryptionKey)) {
-                NewKey = new string(Enumerable.Repeat("abcdefghijklmnopqrstuvwxyz äöü#_-<>ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 10).Select(s => s[Constants.GlobalRND.Next(s.Length)]).ToArray());
-                foreach (var ThisFile in lLCase) {
-                    var b = Converter.FileToByte(ThisFile);
-                    b = Cryptography.SimpleCrypt(b, NewKey, 1);
-                    FileOperations.DeleteFile(ThisFile, true);
-                    Converter.ByteToFile(ThisFile, b);
+            var lLCase = _database.AllConnectedFilesLCase();
+            string? newKey;
+            if (string.IsNullOrEmpty(_database.FileEncryptionKey)) {
+                newKey = new string(Enumerable.Repeat("abcdefghijklmnopqrstuvwxyz äöü#_-<>ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 10).Select(s => s[Constants.GlobalRND.Next(s.Length)]).ToArray());
+                foreach (var thisFile in lLCase) {
+                    var b = Converter.FileToByte(thisFile);
+                    b = Cryptography.SimpleCrypt(b, newKey, 1);
+                    FileOperations.DeleteFile(thisFile, true);
+                    Converter.ByteToFile(thisFile, b);
                 }
             } else {
-                NewKey = string.Empty;
-                foreach (var ThisFile in lLCase) {
-                    var b = Converter.FileToByte(ThisFile);
-                    b = Cryptography.SimpleCrypt(b, _Database.FileEncryptionKey, -1);
-                    FileOperations.DeleteFile(ThisFile, true);
-                    Converter.ByteToFile(ThisFile, b);
+                newKey = string.Empty;
+                foreach (var thisFile in lLCase) {
+                    var b = Converter.FileToByte(thisFile);
+                    b = Cryptography.SimpleCrypt(b, _database.FileEncryptionKey, -1);
+                    FileOperations.DeleteFile(thisFile, true);
+                    Converter.ByteToFile(thisFile, b);
                 }
             }
-            _Database.FileEncryptionKey = NewKey;
+            _database.FileEncryptionKey = newKey;
             btnDateiSchluessel.Enabled = true;
             CryptStatus();
         }
@@ -383,13 +361,13 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void ExportSets_AddClicked(object sender, System.EventArgs e) {
-            var NewExportItem = lbxExportSets.Item.Add(new ExportDefinition(_Database));
-            NewExportItem.Checked = true;
+            var newExportItem = lbxExportSets.Item.Add(new ExportDefinition(_database));
+            newExportItem.Checked = true;
         }
 
         private void GenerateInfoText() {
-            var t = "<b>Datei:</b><tab>" + _Database.Filename + "<br>";
-            t = t + "<b>Zeilen:</b><tab>" + (_Database.Row.Count() - 1);
+            var t = "<b>Datei:</b><tab>" + _database.Filename + "<br>";
+            t = t + "<b>Zeilen:</b><tab>" + (_database.Row.Count() - 1);
             capInfo.Text = t.TrimEnd("<br>");
         }
 
@@ -409,13 +387,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             x.Column.Add("Aenderung", "Änderung", enVarType.Text);
             x.Column.Add("WertAlt", "Wert alt", enVarType.Text);
             x.Column.Add("WertNeu", "Wert neu", enVarType.Text);
-            foreach (var ThisColumn in x.Column) {
-                if (string.IsNullOrEmpty(ThisColumn.Identifier)) {
-                    ThisColumn.MultiLine = true;
-                    ThisColumn.TextBearbeitungErlaubt = false;
-                    ThisColumn.DropdownBearbeitungErlaubt = false;
-                    ThisColumn.BildTextVerhalten = enBildTextVerhalten.Bild_oder_Text;
-                }
+            foreach (var thisColumn in x.Column.Where(thisColumn => string.IsNullOrEmpty(thisColumn.Identifier))) {
+                thisColumn.MultiLine = true;
+                thisColumn.TextBearbeitungErlaubt = false;
+                thisColumn.DropdownBearbeitungErlaubt = false;
+                thisColumn.BildTextVerhalten = enBildTextVerhalten.Bild_oder_Text;
             }
             x.RepairAfterParse();
             x.ColumnArrangements[1].ShowAllColumns();
@@ -424,14 +400,14 @@ namespace BlueControls.BlueDatabaseDialogs {
             x.SortDefinition = new RowSortDefinition(x, "Index", true);
             tblUndo.Database = x;
             tblUndo.Arrangement = 1;
-            for (var n = 0; n < _Database.Works.Count; n++) {
-                AddUndoToTable(_Database.Works[n], n, string.Empty, false);
+            for (var n = 0; n < _database.Works.Count; n++) {
+                AddUndoToTable(_database.Works[n], n, string.Empty, false);
             }
         }
 
         private void GlobalTab_Selecting(object sender, System.Windows.Forms.TabControlCancelEventArgs e) {
             if (e.TabPage == Tab_Regeln) {
-                scriptEditor.Database = _Database;
+                scriptEditor.Database = _database;
             }
             if (e.TabPage == Tab_Undo) {
                 if (tblUndo.Database == null) { GenerateUndoTabelle(); }
@@ -443,18 +419,18 @@ namespace BlueControls.BlueDatabaseDialogs {
                 ExportEditor.Item = null;
                 return;
             }
-            if (_Database.ReadOnly) {
+            if (_database.ReadOnly) {
                 ExportEditor.Item = null;
                 return;
             }
-            var SelectedExport = (ExportDefinition)((TextListItem)lbxExportSets.Item.Checked()[0]).Tag;
-            ExportEditor.Item = SelectedExport;
+            var selectedExport = (ExportDefinition)((TextListItem)lbxExportSets.Item.Checked()[0]).Tag;
+            ExportEditor.Item = selectedExport;
         }
 
         private void lbxExportSets_RemoveClicked(object sender, ListOfBasicListItemEventArgs e) {
             foreach (var thisitem in e.Items) {
-                if (thisitem is BasicListItem ThisItemBasic) {
-                    var tempVar = (ExportDefinition)((TextListItem)ThisItemBasic).Tag;
+                if (thisitem is BasicListItem thisItemBasic) {
+                    var tempVar = (ExportDefinition)((TextListItem)thisItemBasic).Tag;
                     tempVar.DeleteAllBackups();
                 }
             }
@@ -463,89 +439,83 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void OkBut_Click(object sender, System.EventArgs e) => Close();
 
         private void RemoveDatabase() {
-            if (_Database == null) { return; }
-            _Database.Disposing -= Database_Disposing;
-            _Database.ShouldICancelSaveOperations -= Database_ShouldICancelSaveOperations;
-            _Database = null;
+            if (_database == null) { return; }
+            _database.Disposing -= Database_Disposing;
+            _database.ShouldICancelSaveOperations -= Database_ShouldICancelSaveOperations;
+            _database = null;
         }
 
         private void tblUndo_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
             var bt = (Table)sender;
-            var CellKey = e.Tags.TagGet("Cellkey");
-            if (string.IsNullOrEmpty(CellKey)) { return; }
-            bt.Database.Cell.DataOfCellKey(CellKey, out var Column, out var Row);
+            var cellKey = e.Tags.TagGet("Cellkey");
+            if (string.IsNullOrEmpty(cellKey)) { return; }
+            bt.Database.Cell.DataOfCellKey(cellKey, out var column, out _);
             e.UserMenu.Add("Sortierung", true);
-            e.UserMenu.Add(enContextMenuComands.SpaltenSortierungAZ, Column != null && Column.Format.CanBeChangedByRules());
-            e.UserMenu.Add(enContextMenuComands.SpaltenSortierungZA, Column != null && Column.Format.CanBeChangedByRules());
+            e.UserMenu.Add(enContextMenuComands.SpaltenSortierungAZ, column != null && column.Format.CanBeChangedByRules());
+            e.UserMenu.Add(enContextMenuComands.SpaltenSortierungZA, column != null && column.Format.CanBeChangedByRules());
         }
 
         private void tblUndo_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
             var bt = (Table)sender;
-            var CellKey = e.Tags.TagGet("CellKey");
-            if (string.IsNullOrEmpty(CellKey)) { return; }
-            bt.Database.Cell.DataOfCellKey(CellKey, out var Column, out var Row);
+            var cellKey = e.Tags.TagGet("CellKey");
+            if (string.IsNullOrEmpty(cellKey)) { return; }
+            bt.Database.Cell.DataOfCellKey(cellKey, out var column, out _);
             switch (e.ClickedComand) {
                 case "SpaltenSortierungAZ":
-                    bt.SortDefinitionTemporary = new RowSortDefinition(bt.Database, Column.Name, false);
+                    bt.SortDefinitionTemporary = new RowSortDefinition(bt.Database, column.Name, false);
                     break;
 
                 case "SpaltenSortierungZA":
-                    bt.SortDefinitionTemporary = new RowSortDefinition(bt.Database, Column.Name, true);
+                    bt.SortDefinitionTemporary = new RowSortDefinition(bt.Database, column.Name, true);
                     break;
             }
         }
 
         private void WriteInfosBack() {
-            if (_Database == null) { return; } // Disposed
-            if (_Database.ReadOnly) { return; }
+            if (_database == null) { return; } // Disposed
+            if (_database.ReadOnly) { return; }
             scriptEditor.WriteScriptBack();
-            _Database.GlobalShowPass = txbKennwort.Text;
-            _Database.Caption = txbCaption.Text;
-            _Database.UndoCount = tbxUndoAnzahl.Text.IsLong() ? Math.Max(int.Parse(tbxUndoAnzahl.Text), 5) : 5;
-            _Database.ReloadDelaySecond = tbxReloadVerzoegerung.Text.IsLong() ? Math.Max(int.Parse(tbxReloadVerzoegerung.Text), 5) : 5;
+            _database.GlobalShowPass = txbKennwort.Text;
+            _database.Caption = txbCaption.Text;
+            _database.UndoCount = tbxUndoAnzahl.Text.IsLong() ? Math.Max(int.Parse(tbxUndoAnzahl.Text), 5) : 5;
+            _database.ReloadDelaySecond = tbxReloadVerzoegerung.Text.IsLong() ? Math.Max(int.Parse(tbxReloadVerzoegerung.Text), 5) : 5;
             if (txbGlobalScale.Text.IsDouble()) {
-                _Database.GlobalScale = Math.Min(double.Parse(txbGlobalScale.Text), 5);
-                _Database.GlobalScale = Math.Max(0.5, _Database.GlobalScale);
+                _database.GlobalScale = Math.Min(double.Parse(txbGlobalScale.Text), 5);
+                _database.GlobalScale = Math.Max(0.5, _database.GlobalScale);
             } else {
-                _Database.ReloadDelaySecond = 1;
+                _database.ReloadDelaySecond = 1;
             }
-            _Database.FilterImagePfad = txbFilterImagePath.Text;
-            _Database.AdditionaFilesPfad = txbAdditionalFiles.Text;
-            _Database.ZeilenQuickInfo = txbZeilenQuickInfo.Text.Replace("\r", "<br>");
-            if (tbxTags.Text != _Database.Tags.JoinWithCr()) {
-                _Database.Tags.Clear();
-                _Database.Tags.AddRange(tbxTags.Text.SplitAndCutByCR());
+            _database.FilterImagePfad = txbFilterImagePath.Text;
+            _database.AdditionaFilesPfad = txbAdditionalFiles.Text;
+            _database.ZeilenQuickInfo = txbZeilenQuickInfo.Text.Replace("\r", "<br>");
+            if (tbxTags.Text != _database.Tags.JoinWithCr()) {
+                _database.Tags.Clear();
+                _database.Tags.AddRange(tbxTags.Text.SplitAndCutByCR());
             }
-            if (DatenbankAdmin.Item.ToListOfString().IsDifferentTo(_Database.DatenbankAdmin)) {
-                _Database.DatenbankAdmin.Clear();
-                _Database.DatenbankAdmin.AddRange(DatenbankAdmin.Item.ToListOfString());
+            if (DatenbankAdmin.Item.ToListOfString().IsDifferentTo(_database.DatenbankAdmin)) {
+                _database.DatenbankAdmin.Clear();
+                _database.DatenbankAdmin.AddRange(DatenbankAdmin.Item.ToListOfString());
             }
-            if (PermissionGroups_NewRow.Item.ToListOfString().IsDifferentTo(_Database.PermissionGroups_NewRow)) {
-                _Database.PermissionGroups_NewRow.Clear();
-                _Database.PermissionGroups_NewRow.AddRange(PermissionGroups_NewRow.Item.ToListOfString());
-                _Database.PermissionGroups_NewRow.Remove("#Administrator");
+            if (PermissionGroups_NewRow.Item.ToListOfString().IsDifferentTo(_database.PermissionGroups_NewRow)) {
+                _database.PermissionGroups_NewRow.Clear();
+                _database.PermissionGroups_NewRow.AddRange(PermissionGroups_NewRow.Item.ToListOfString());
+                _database.PermissionGroups_NewRow.Remove("#Administrator");
             }
-            _Database.VerwaisteDaten = (enVerwaisteDaten)int.Parse(cbxVerwaisteDaten.Text);
-            _Database.Ansicht = (enAnsicht)int.Parse(cbxAnsicht.Text);
+            _database.VerwaisteDaten = (enVerwaisteDaten)int.Parse(cbxVerwaisteDaten.Text);
+            _database.Ansicht = (enAnsicht)int.Parse(cbxAnsicht.Text);
 
             #region Sortierung
 
-            var colnam = new List<string>();
-            foreach (var thisk in lbxSortierSpalten.Item) {
-                colnam.Add(((ColumnItem)thisk.Tag).Name);
-            }
-            _Database.SortDefinition = new RowSortDefinition(_Database, colnam, btnSortRichtung.Checked);
+            var colnam = lbxSortierSpalten.Item.Select(thisk => ((ColumnItem)thisk.Tag).Name).ToList();
+            _database.SortDefinition = new RowSortDefinition(_database, colnam, btnSortRichtung.Checked);
 
             #endregion
 
             // Export ------------
-            List<ExportDefinition> NewExports = new();
-            foreach (var ThisItem in lbxExportSets.Item) {
-                NewExports.Add((ExportDefinition)((TextListItem)ThisItem).Tag);
-            }
-            if (NewExports.IsDifferentTo(_Database.Export)) {
-                _Database.Export.Clear();
-                _Database.Export.AddRange(NewExports);
+            var newExports = lbxExportSets.Item.Select(thisItem => (ExportDefinition)((TextListItem)thisItem).Tag).ToList();
+            if (newExports.IsDifferentTo(_database.Export)) {
+                _database.Export.Clear();
+                _database.Export.AddRange(newExports);
             }
         }
 

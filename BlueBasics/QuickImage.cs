@@ -28,7 +28,7 @@ using static BlueBasics.Converter;
 
 namespace BlueBasics {
 
-    public sealed class QuickImage : BitmapExt, IReadableText, ICompareKey {
+    public sealed class QuickImage : BitmapExt, IReadableText {
 
         #region Fields
 
@@ -41,8 +41,8 @@ namespace BlueBasics {
         public readonly string Name;
         public readonly int Sättigung;
         public readonly int Transparenz;
-        public readonly string Zweitsymbol;
-        private static readonly Dictionary<string, QuickImage> _pics = new();
+        public readonly string? Zweitsymbol;
+        private static readonly Dictionary<string, QuickImage?> _pics = new();
         private static readonly object Locker = new();
 
         #endregion
@@ -108,7 +108,7 @@ namespace BlueBasics {
 
         public new int Height { get; private set; }
 
-        public bool IsError { get; private set; } = false;
+        public bool IsError { get; private set; }
 
         public new int Width { get; private set; }
 
@@ -147,7 +147,7 @@ namespace BlueBasics {
             }
         }
 
-        public static string GenerateCode(string name, int width, int height, enImageCodeEffect effekt, string färbung, string changeGreenTo, int sättigung, int helligkeit, int drehwinkel, int transparenz, string zweitsymbol) {
+        public static string GenerateCode(string name, int width, int height, enImageCodeEffect effekt, string färbung, string changeGreenTo, int sättigung, int helligkeit, int drehwinkel, int transparenz, string? zweitsymbol) {
             var c = new StringBuilder();
 
             c.Append(name);
@@ -174,13 +174,13 @@ namespace BlueBasics {
             return c.ToString().TrimEnd('|');
         }
 
-        public static QuickImage Get(QuickImage imageCode, enImageCodeEffect additionalState) => additionalState == enImageCodeEffect.Ohne ? imageCode
+        public static QuickImage? Get(QuickImage? imageCode, enImageCodeEffect additionalState) => additionalState == enImageCodeEffect.Ohne ? imageCode
 : Get(GenerateCode(imageCode.Name, imageCode.Width, imageCode.Height, imageCode.Effekt | additionalState, imageCode.Färbung, imageCode.ChangeGreenTo, imageCode.Sättigung, imageCode.Helligkeit, imageCode.DrehWinkel, imageCode.Transparenz, imageCode.Zweitsymbol));
 
-        public static QuickImage Get(string imageCode) {
+        public static QuickImage? Get(string imageCode) {
             if (string.IsNullOrEmpty(imageCode)) { return null; }
 
-            QuickImage x;
+            QuickImage? x;
             lock (Locker) {
                 if (_pics.TryGetValue(imageCode, out var p)) { return p; }
                 x = new QuickImage(imageCode, false);
@@ -191,7 +191,7 @@ namespace BlueBasics {
             return x;
         }
 
-        public static QuickImage Get(string image, int squareWidth) {
+        public static QuickImage? Get(string image, int squareWidth) {
             if (string.IsNullOrEmpty(image)) { return null; }
             if (image.Contains("|")) {
                 var w = (image + "||||||").Split('|');
@@ -202,19 +202,19 @@ namespace BlueBasics {
             return Get(GenerateCode(image, squareWidth, 0, enImageCodeEffect.Ohne, string.Empty, string.Empty, 100, 100, 0, 0, string.Empty));
         }
 
-        public static QuickImage Get(enImageCode image) => Get(image, 16);
+        public static QuickImage? Get(enImageCode image) => Get(image, 16);
 
-        public static QuickImage Get(enImageCode image, int squareWidth) => image == enImageCode.None ? null
+        public static QuickImage? Get(enImageCode image, int squareWidth) => image == enImageCode.None ? null
 : Get(GenerateCode(Enum.GetName(image.GetType(), image), squareWidth, 0, enImageCodeEffect.Ohne, string.Empty, string.Empty, 100, 100, 0, 0, string.Empty));
 
-        public static QuickImage Get(enImageCode image, int squareWidth, string färbung, string changeGreenTo) => image == enImageCode.None ? null
+        public static QuickImage? Get(enImageCode image, int squareWidth, string färbung, string changeGreenTo) => image == enImageCode.None ? null
 : Get(GenerateCode(Enum.GetName(image.GetType(), image), squareWidth, 0, enImageCodeEffect.Ohne, färbung, changeGreenTo, 100, 100, 0, 0, string.Empty));
 
-        public static QuickImage Get(enFileFormat file, int size) => Get(FileTypeImage(file), size);
+        public static QuickImage? Get(enFileFormat file, int size) => Get(FileTypeImage(file), size);
 
-        public static implicit operator Bitmap(QuickImage p) {
+        public static implicit operator Bitmap?(QuickImage? p) {
             //if (!p._generated && !p._generating) { p.Generate(); }
-            Bitmap bmp;
+            Bitmap? bmp;
             var tim = DateTime.Now;
 
             do {
@@ -249,7 +249,7 @@ namespace BlueBasics {
 
         public override string ToString() => Code;
 
-        private void CorrectSize(int width, int height, Bitmap bmp) {
+        private void CorrectSize(int width, int height, Image? bmp) {
             if (width > 0 && height > 0) {
                 Width = width;
                 Height = height;
@@ -330,8 +330,8 @@ namespace BlueBasics {
                         c = Color.FromArgb(0, 0, 0, 0);
                     } else {
                         if (colgreen != null && c.ToArgb() == -16711936) { c = (Color)colgreen; }
-                        if (colfärb != null) { c = Extensions.FromHSB(((Color)colfärb).GetHue(), ((Color)colfärb).GetSaturation(), c.GetBrightness(), c.A); }
-                        if (Sättigung != 100 || Helligkeit != 100) { c = Extensions.FromHSB(c.GetHue(), c.GetSaturation() * Sättigung / 100, c.GetBrightness() * Helligkeit / 100, c.A); }
+                        if (colfärb != null) { c = ((Color)colfärb).GetHue().FromHSB(((Color)colfärb).GetSaturation(), c.GetBrightness(), c.A); }
+                        if (Sättigung != 100 || Helligkeit != 100) { c = c.GetHue().FromHSB(c.GetSaturation() * Sättigung / 100, c.GetBrightness() * Helligkeit / 100, c.A); }
                         if (Effekt.HasFlag(enImageCodeEffect.WindowsXPDisabled)) {
                             var w = (int)(c.GetBrightness() * 100);
                             w = (int)(w / 2.8);
@@ -343,7 +343,7 @@ namespace BlueBasics {
                         if (c.IsMagentaOrTransparent()) {
                             c = bmpKreuz.GetPixel(X, Y);
                         } else {
-                            if (bmpKreuz.GetPixel(X, Y).A > 0) { c = Extensions.MixColor(bmpKreuz.GetPixel(X, Y), c, 0.5); }
+                            if (bmpKreuz.GetPixel(X, Y).A > 0) { c = bmpKreuz.GetPixel(X, Y).MixColor(c, 0.5); }
                         }
                     }
                     if (!c.IsMagentaOrTransparent() && Transparenz > 0 && Transparenz < 100) {
@@ -352,9 +352,7 @@ namespace BlueBasics {
                     if (Effekt.HasFlag(enImageCodeEffect.WindowsMEDisabled)) {
                         var c1 = Color.FromArgb(0, 0, 0, 0);
                         if (!c.IsMagentaOrTransparent()) {
-                            var RandPixel = false;
-                            if (X > 0 && bmpOri.GetPixel(X - 1, Y).IsMagentaOrTransparent()) { RandPixel = true; }
-                            if (Y > 0 && bmpOri.GetPixel(X, Y - 1).IsMagentaOrTransparent()) { RandPixel = true; }
+                            var RandPixel = X > 0 && bmpOri.GetPixel(X - 1, Y).IsMagentaOrTransparent() || Y > 0 && bmpOri.GetPixel(X, Y - 1).IsMagentaOrTransparent();
                             if (X < bmpOri.Width - 1 && bmpOri.GetPixel(X + 1, Y).IsMagentaOrTransparent()) { RandPixel = true; }
                             if (Y < bmpOri.Height - 1 && bmpOri.GetPixel(X, Y + 1).IsMagentaOrTransparent()) { RandPixel = true; }
                             if (c.B < 128 || RandPixel) {
@@ -376,7 +374,7 @@ namespace BlueBasics {
             CloneFromBitmap(bmpTMP);
         }
 
-        private Bitmap GetBitmap(string tmpname) {
+        private Bitmap? GetBitmap(string tmpname) {
             var vbmp = GetEmmbedBitmap(Assembly.GetAssembly(typeof(QuickImage)), tmpname + ".png");
             if (vbmp != null) { return vbmp; }
 

@@ -20,6 +20,7 @@ using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 
 namespace BlueScript {
 
@@ -27,20 +28,19 @@ namespace BlueScript {
 
         #region Fields
 
-        public static List<Method> Comands = null;
+        public static List<Method> Comands;
         public readonly List<Variable> Variablen;
-        public bool EndSkript = false;
+        public bool EndSkript;
 
         /// <summary>
         /// Dieses Feld enthält informationen, die nach dem Skript-Lauf abgegriffen werden können.
         /// </summary>
         public string Feedback = string.Empty;
 
-        internal readonly List<Bitmap> BitmapCache;
-        internal Method_BerechneVariable _berechneVariable = null; // Paralellisierung löscht ab und zu die Variable
+        internal readonly List<Bitmap?> BitmapCache;
+        internal Method_BerechneVariable _berechneVariable; // Paralellisierung löscht ab und zu die Variable
         private string _error;
         private string _errorCode;
-        private string _ScriptText = string.Empty;
 
         #endregion
 
@@ -81,7 +81,7 @@ namespace BlueScript {
                 Comands = GetEnumerableOfType<Method>();
             }
             Variablen = variablen;
-            BitmapCache = new();
+            BitmapCache = new List<Bitmap?>();
         }
 
         #endregion
@@ -111,14 +111,7 @@ namespace BlueScript {
         public string ReducedScriptText { get; private set; }
         public int Schleife { get; internal set; }
 
-        public string ScriptText {
-            get => _ScriptText;
-            set {
-                if (_ScriptText == value) { return; }
-                //_parsed = false;
-                _ScriptText = value;
-            }
-        }
+        public string ScriptText { get; set; } = string.Empty;
 
         public int Sub { get; internal set; }
 
@@ -138,8 +131,7 @@ namespace BlueScript {
 
             #region Prüfen für bessere Fehlermeldung, ob der Rückgabetyp falsch gesetzt wurde
 
-            foreach (var thisC in Comands) {
-                var f = thisC.CanDo(txt, pos, !expectedvariablefeedback, s);
+            foreach (var f in Comands.Select(thisC => thisC.CanDo(txt, pos, !expectedvariablefeedback, s))) {
                 if (f.MustAbort) { return new strDoItWithEndedPosFeedback(f.ErrorMessage); }
                 if (string.IsNullOrEmpty(f.ErrorMessage)) {
                     return expectedvariablefeedback
@@ -234,7 +226,7 @@ namespace BlueScript {
             return !string.IsNullOrEmpty(Error);
         }
 
-        internal int AddBitmapToCache(Bitmap bmp) {
+        internal int AddBitmapToCache(Bitmap? bmp) {
             BitmapCache.Add(bmp);
             return BitmapCache.IndexOf(bmp);
         }

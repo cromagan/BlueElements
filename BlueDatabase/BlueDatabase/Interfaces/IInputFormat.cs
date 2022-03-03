@@ -58,7 +58,7 @@ namespace BlueDatabase.Interfaces {
         /// </summary>
         /// <param name="t"></param>
         /// <param name="source"></param>
-        public static void GetStyleFrom(this IInputFormat t, IInputFormat source) {
+        public static void GetStyleFrom(this IInputFormat? t, IInputFormat? source) {
             t.AdditionalCheck = source.AdditionalCheck;
             t.AllowedChars = source.AllowedChars;
             t.Prefix = source.Prefix;
@@ -69,7 +69,7 @@ namespace BlueDatabase.Interfaces {
             t.FormatierungErlaubt = source.FormatierungErlaubt;
         }
 
-        public static bool IsFormat(this string txt, IInputFormat formatToCheck) {
+        public static bool IsFormat(this string txt, IInputFormat? formatToCheck) {
             var l = new List<string>();
 
             if (formatToCheck.MultiLine) {

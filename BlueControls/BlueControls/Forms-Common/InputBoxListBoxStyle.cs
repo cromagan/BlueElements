@@ -27,7 +27,7 @@ namespace BlueControls.Forms {
 
         #region Fields
 
-        private List<string> GiveBack = null;
+        private List<string> GiveBack;
 
         #endregion
 
@@ -35,7 +35,7 @@ namespace BlueControls.Forms {
 
         private InputBoxListBoxStyle() : this(string.Empty, null, enAddType.None, true) { }
 
-        private InputBoxListBoxStyle(string txt, ItemCollectionList itemsOriginal, enAddType addNewAllowed, bool cancelErl) : base(cancelErl, true) {
+        private InputBoxListBoxStyle(string txt, ItemCollectionList? itemsOriginal, enAddType addNewAllowed, bool cancelErl) : base(cancelErl, true) {
             InitializeComponent();
             if (itemsOriginal.Appearance != enBlueListBoxAppearance.Listbox) {
                 Develop.DebugPrint("Design nicht Listbox");
@@ -67,7 +67,7 @@ namespace BlueControls.Forms {
             return erg is null || erg.Count != 1 ? string.Empty : erg[0];
         }
 
-        public static List<string> Show(string txt, ItemCollectionList items, enAddType addNewAllowed, bool cancelErl) {
+        public static List<string> Show(string txt, ItemCollectionList? items, enAddType addNewAllowed, bool cancelErl) {
             InputBoxListBoxStyle MB = new(txt, items, addNewAllowed, cancelErl);
             MB.ShowDialog();
             return MB.GiveBack;

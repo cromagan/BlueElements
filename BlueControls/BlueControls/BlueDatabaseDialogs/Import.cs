@@ -27,7 +27,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         #region Fields
 
-        private readonly string _originalImportText = string.Empty;
+        private readonly string _originalImportText;
 
         #endregion
 
@@ -41,6 +41,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             var Ein = _originalImportText.SplitAndCutByCRToList();
             Eintr.Text = Ein.Count + " zum Importieren bereit.";
             Database = database;
+            if (Database == null) {
+                return;
+            }
+
             Database.Disposing += Database_Disposing;
             Database.ShouldICancelSaveOperations += Database_ShouldICancelDiscOperations;
         }
@@ -49,7 +53,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         #region Properties
 
-        public Database Database { get; private set; }
+        public Database Database { get; }
 
         #endregion
 
@@ -61,11 +65,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             base.OnClosing(e);
         }
 
+        private static void Database_ShouldICancelDiscOperations(object sender, CancelEventArgs e) => e.Cancel = true;
+
         private void Cancel_Click(object sender, System.EventArgs e) => Close();
 
         private void Database_Disposing(object sender, System.EventArgs e) => Close();
-
-        private void Database_ShouldICancelDiscOperations(object sender, CancelEventArgs e) => e.Cancel = true;
 
         private void Fertig_Click(object sender, System.EventArgs e) {
             var TR = string.Empty;

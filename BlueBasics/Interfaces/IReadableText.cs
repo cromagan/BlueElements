@@ -23,7 +23,7 @@ namespace BlueBasics.Interfaces {
 
         string ReadableText();
 
-        QuickImage SymbolForReadableText();
+        QuickImage? SymbolForReadableText();
 
         #endregion
     }

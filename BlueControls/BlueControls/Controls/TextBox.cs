@@ -21,6 +21,7 @@ using BlueBasics.EventArgs;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using BlueControls.Extended_Text;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
@@ -30,6 +31,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Linq;
 
 namespace BlueControls.Controls {
 
@@ -40,13 +42,12 @@ namespace BlueControls.Controls {
         #region Fields
 
         private readonly ExtText _eTxt;
-        private enAdditionalCheck _AdditionalCheck = enAdditionalCheck.None;
         private string _AllowedChars = string.Empty;
 
         private int _Cursor_CharPos = -1;
 
         private bool _Cursor_Visible;
-        private bool _FormatierungErlaubt = false;
+        private bool _FormatierungErlaubt;
         private string _LastCheckedText = string.Empty;
 
         private DateTime _LastUserActionForSpellChecking = DateTime.Now;
@@ -60,7 +61,7 @@ namespace BlueControls.Controls {
         private bool _Multiline;
         private bool _MustCheck = true;
         private string _Regex = string.Empty;
-        private Slider? _SliderY = null;
+        private Slider? _SliderY;
 
         private bool _SpellChecking;
 
@@ -106,14 +107,7 @@ namespace BlueControls.Controls {
         #region Properties
 
         [DefaultValue(enAdditionalCheck.None)]
-        public enAdditionalCheck AdditionalCheck {
-            get => _AdditionalCheck;
-            set {
-                if (_AdditionalCheck == value) { return; }
-                _AdditionalCheck = value;
-                //UpdateControls();
-            }
-        }
+        public enAdditionalCheck AdditionalCheck { get; set; } = enAdditionalCheck.None;
 
         [DefaultValue("")]
         public string AllowedChars {
@@ -125,7 +119,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        public override bool Focused { get => base.Focused || (_SliderY != null && _SliderY.Focused()); }
+        public override bool Focused => base.Focused || (_SliderY != null && _SliderY.Focused());
 
         [DefaultValue(false)]
         public bool FormatierungErlaubt {
@@ -344,7 +338,7 @@ namespace BlueControls.Controls {
         //    if (Focused()) { return; }
         //    base.Focus();
         //}
-        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList items, out object hotItem, List<string> tags, ref bool cancel, ref bool translate) {
+        public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList? items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
             AbortSpellChecking();
             hotItem = null;
             tags.TagSet("CursorPosBeforeClick", _Cursor_CharPos.ToString());
@@ -399,11 +393,9 @@ namespace BlueControls.Controls {
             nt = nt.Replace(Constants.beChrW1.ToString(), "\r");
             nt = nt.RemoveChars(Constants.Char_NotFromClip);
             if (!MultiLine) { nt = nt.RemoveChars("\r\t"); }
-            foreach (var t in nt) {
-                if (_eTxt.InsertChar((enASCIIKey)t, _Cursor_CharPos)) {
-                    _Cursor_CharPos++;
-                }
-            }
+
+            _Cursor_CharPos += nt.Count(t => _eTxt.InsertChar((enASCIIKey)t, _Cursor_CharPos));
+
             CheckIfTextIsChanded(_eTxt.HtmlText);
         }
 
@@ -443,7 +435,7 @@ namespace BlueControls.Controls {
                 case enASCIIKey.ENTER:
                     if (MultiLine) {
                         Char_DelBereich(-1, -1);
-                        _eTxt.InsertCRLF(_Cursor_CharPos);
+                        _eTxt.InsertCrlf(_Cursor_CharPos);
                         _Cursor_CharPos++;
                     }
                     break;
@@ -612,7 +604,7 @@ namespace BlueControls.Controls {
             // http://technet.microsoft.com/de-de/subscriptions/control.isinputkey%28v=vs.100%29
             keyData switch {
                 System.Windows.Forms.Keys.Up or System.Windows.Forms.Keys.Down or System.Windows.Forms.Keys.Left or System.Windows.Forms.Keys.Right => true,
-                _ => false,
+                _ => false
             };
 
         protected override void OnDoubleClick(System.EventArgs e) {
@@ -838,7 +830,6 @@ namespace BlueControls.Controls {
             _LastCheckedText = NewPlainText;
             if (Dictionary.DictionaryRunning(true)) { _MustCheck = true; }
             OnTextChanged();
-            return;
         }
 
         private void Clipboard_Copy() {
@@ -955,8 +946,10 @@ namespace BlueControls.Controls {
             }
         }
 
-        private Slider GetSlider() {
-            if (_SliderY != null) { return _SliderY; }
+        private void GetSlider() {
+            if (_SliderY != null) {
+                return;
+            }
             _SliderY = new Slider {
                 Dock = System.Windows.Forms.DockStyle.Right,
                 LargeChange = 10f,
@@ -975,7 +968,6 @@ namespace BlueControls.Controls {
             };
             _SliderY.ValueChanged += new EventHandler(SliderY_ValueChange);
             Controls.Add(_SliderY);
-            return _SliderY;
         }
 
         private int HotPosition() => _Cursor_CharPos > -1 ? _Cursor_CharPos

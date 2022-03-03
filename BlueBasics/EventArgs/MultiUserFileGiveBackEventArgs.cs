@@ -23,7 +23,7 @@ namespace BlueBasics.EventArgs {
 
         #region Properties
 
-        public clsMultiUserFile File { get; set; }
+        public ClsMultiUserFile File { get; set; }
 
         #endregion
     }

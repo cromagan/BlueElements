@@ -15,8 +15,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
+using System.Drawing.Imaging;
 
 namespace BlueScript {
 
@@ -47,11 +49,11 @@ namespace BlueScript {
 
             switch (attvar.Attributes[1].ValueString.ToUpper()) {
                 case "JPG":
-                    x = BlueBasics.Converter.BitmapToBase64(attvar.Attributes[0].ValueBitmap(s), System.Drawing.Imaging.ImageFormat.Jpeg);
+                    x = Converter.BitmapToBase64(attvar.Attributes[0].ValueBitmap(s), ImageFormat.Jpeg);
                     break;
 
                 case "PNG":
-                    x = BlueBasics.Converter.BitmapToBase64(attvar.Attributes[0].ValueBitmap(s), System.Drawing.Imaging.ImageFormat.Png);
+                    x = Converter.BitmapToBase64(attvar.Attributes[0].ValueBitmap(s), ImageFormat.Png);
                     break;
 
                 default:

@@ -24,18 +24,22 @@ namespace BlueBasics {
 
         #region Methods
 
-        public static void DrawImageInRectAspectRatio(this Graphics gR, Bitmap bmp, int x, int y, int width, int height) {
+        public static void DrawImageInRectAspectRatio(this Graphics gR, Bitmap? bmp, int x, int y, int width, int height) {
+            if (bmp == null) {
+                return;
+            }
+
             var Sc = Math.Min((float)width / bmp.Width, (float)height / bmp.Height);
             var dw = (int)(bmp.Width * Sc);
             var dh = (int)(bmp.Height * Sc);
             gR.DrawImage(bmp, x + ((width - dw) / 2), y + ((height - dh) / 2), dw, dh);
         }
 
-        public static void DrawImageInRectAspectRatio(this Graphics gR, Bitmap bmp, Rectangle r) => DrawImageInRectAspectRatio(gR, bmp, r.Left, r.Top, r.Width, r.Height);
+        public static void DrawImageInRectAspectRatio(this Graphics gR, Bitmap? bmp, Rectangle r) => DrawImageInRectAspectRatio(gR, bmp, r.Left, r.Top, r.Width, r.Height);
 
         public static void DrawRad(this Graphics gR, Pen pen, PointF middle, PointF startP, float wink) {
-            var radius = (float)Math.Abs(Geometry.GetLenght(middle, startP));
-            var startw = (float)Geometry.GetAngle(middle, startP);
+            var radius = Math.Abs(Geometry.GetLenght(middle, startP));
+            var startw = Geometry.GetAngle(middle, startP);
             gR.DrawArc(pen, middle.X - radius, middle.Y - radius, radius * 2, radius * 2, -startw, -wink);
         }
 

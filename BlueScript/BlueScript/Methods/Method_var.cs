@@ -43,7 +43,7 @@ namespace BlueScript {
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
 
-            (var pos, var _) = NextText(infos.AttributText, 0, Gleich, false, false, null);
+            var (pos, _) = NextText(infos.AttributText, 0, Gleich, false, false, null);
 
             if (pos < 1 || pos > infos.AttributText.Length - 2) { return new strDoItFeedback("Fehler mit = - Zeichen"); }
 

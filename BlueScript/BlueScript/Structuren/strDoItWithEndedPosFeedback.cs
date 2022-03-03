@@ -23,7 +23,7 @@ public struct strDoItWithEndedPosFeedback {
 
     public int Position;
 
-    public string? Value;
+    public string Value;
 
     #endregion
 

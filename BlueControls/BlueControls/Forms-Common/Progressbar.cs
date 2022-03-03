@@ -27,7 +27,7 @@ namespace BlueControls.Forms {
 
         private readonly Dictionary<int, DateTime> eProgressbar_TimeDic = new();
         private string _baseText = string.Empty;
-        private int _count = 0;
+        private int _count;
         private int eProgressbar_LastCalulatedSeconds = int.MinValue;
         private int eProgressbar_LastCurrent = int.MaxValue;
         private DateTime eProgressbar_LastTimeUpdate = DateTime.Now;
@@ -58,9 +58,9 @@ namespace BlueControls.Forms {
             return P;
         }
 
-        public static Progressbar Show(string Text, int Count) {
-            Progressbar P = new(Text) {
-                _baseText = Text,
+        public static Progressbar Show(string text, int Count) {
+            Progressbar P = new(text) {
+                _baseText = text,
                 _count = Count
             };
             P.Update(0);
@@ -69,9 +69,9 @@ namespace BlueControls.Forms {
             return P;
         }
 
-        public void Update(string Text) {
-            _baseText = Text;
-            UpdateInternal(Text);
+        public void Update(string text) {
+            _baseText = text;
+            UpdateInternal(text);
         }
 
         public void Update(int current) {
@@ -134,9 +134,9 @@ namespace BlueControls.Forms {
                       : "<br>100 % - ...abgeschlossen!<tab>");
         }
 
-        private void UpdateInternal(string Text) {
-            if (Text != capTXT.Text) {
-                capTXT.Text = Text;
+        private void UpdateInternal(string text) {
+            if (text != capTXT.Text) {
+                capTXT.Text = text;
                 var Wi = Math.Max(Size.Width, capTXT.Width + (Skin.Padding * 2));
                 var He = Math.Max(Size.Height, capTXT.Height + (Skin.Padding * 2));
                 Size = new Size(Wi, He);

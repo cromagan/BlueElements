@@ -21,6 +21,6 @@ namespace BlueControls.Enums {
         Unbekannt = -1,
         Ohne = 0,
         Rechteck = 1,
-        Rechteck_R4 = 50,
+        Rechteck_R4 = 50
     }
 }

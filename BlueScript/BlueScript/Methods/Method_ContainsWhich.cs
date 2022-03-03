@@ -18,8 +18,8 @@
 using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
-using static BlueBasics.Extensions;
 
 namespace BlueScript {
 
@@ -67,13 +67,11 @@ namespace BlueScript {
 
             #endregion
 
-            var rx = RegexOptions.IgnoreCase;
+            const RegexOptions rx = RegexOptions.IgnoreCase;
             //if (attvar.Attributes[1].ValueBool) { rx = RegexOptions.IgnoreCase; }
 
-            foreach (var thisW in wordlist) {
-                if (attvar.Attributes[0].ValueString.ContainsWord(thisW, rx)) {
-                    found.AddIfNotExists(thisW);
-                }
+            foreach (var thisW in wordlist.Where(thisW => attvar.Attributes[0].ValueString.ContainsWord(thisW, rx))) {
+                found.AddIfNotExists(thisW);
             }
 
             return new strDoItFeedback(found.JoinWithCr() + "\r", enVariableDataType.List);

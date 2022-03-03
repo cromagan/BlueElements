@@ -48,7 +48,7 @@ namespace BlueBasics {
 
         #region Properties
 
-        private List<string> Code { get; set; }
+        private List<string> Code { get; }
 
         #endregion
 

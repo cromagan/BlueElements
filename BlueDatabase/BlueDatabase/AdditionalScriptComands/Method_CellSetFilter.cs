@@ -58,7 +58,7 @@ namespace BlueScript {
             if (columnToSet == null) { return new strDoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[4].ValueString); }
 
             var r = RowCollection.MatchesTo(allFi);
-            if (r == null || r.Count == 0 || r.Count > 1) {
+            if (r == null || r.Count is 0 or > 1) {
                 return strDoItFeedback.Falsch();
             }
 

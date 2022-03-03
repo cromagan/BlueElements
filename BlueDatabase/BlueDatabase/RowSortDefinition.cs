@@ -20,6 +20,7 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BlueDatabase {
 
@@ -28,7 +29,7 @@ namespace BlueDatabase {
         #region Fields
 
         public Database Database;
-        private readonly ListExt<ColumnItem> _Columns = new();
+        private readonly ListExt<ColumnItem?> _columns = new();
 
         #endregion
 
@@ -63,7 +64,7 @@ namespace BlueDatabase {
 
         #region Properties
 
-        public List<ColumnItem> Columns => _Columns;
+        public List<ColumnItem?> Columns => _columns;
 
         public bool IsParsing { get; private set; }
 
@@ -78,10 +79,10 @@ namespace BlueDatabase {
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
-        public void Parse(string ToParse) {
+        public void Parse(string toParse) {
             IsParsing = true;
             Initialize();
-            foreach (var pair in ToParse.GetAllTags()) {
+            foreach (var pair in toParse.GetAllTags()) {
                 switch (pair.Key) {
                     case "identifier":
                         if (pair.Value != "SortDefinition") { Develop.DebugPrint(enFehlerArt.Fehler, "Identifier fehlerhaft: " + pair.Value); }
@@ -94,11 +95,11 @@ namespace BlueDatabase {
                     case "column":
 
                     case "columnname": // Columname wichtig wegen CopyLayout
-                        _Columns.Add(Database.Column[pair.Value]);
+                        _columns.Add(Database.Column[pair.Value]);
                         break;
 
                     case "columnkey":
-                        _Columns.Add(Database.Column.SearchByKey(long.Parse(pair.Value)));
+                        _columns.Add(Database.Column.SearchByKey(long.Parse(pair.Value)));
                         break;
 
                     default:
@@ -110,40 +111,38 @@ namespace BlueDatabase {
         }
 
         public override string ToString() {
-            var Result = "{";
+            var result = "{";
             if (Reverse) {
-                Result += "Direction=Z-A";
+                result += "Direction=Z-A";
             } else {
-                Result += "Direction=A-Z";
+                result += "Direction=A-Z";
             }
-            if (_Columns != null) {
-                foreach (var ThisColumn in _Columns) {
-                    if (ThisColumn != null) {
-                        Result = Result + ", " + ThisColumn.ParsableColumnKey();
+            if (_columns != null) {
+                foreach (var thisColumn in _columns) {
+                    if (thisColumn != null) {
+                        result = result + ", " + thisColumn.ParsableColumnKey();
                     }
                 }
             }
-            return Result + "}";
+            return result + "}";
         }
 
-        public bool UsedForRowSort(ColumnItem vcolumn) {
-            if (_Columns.Count == 0) { return false; }
-            foreach (var ThisColumn in _Columns) {
-                if (ThisColumn == vcolumn) { return true; }
-            }
-            return false;
+        public bool UsedForRowSort(ColumnItem? vcolumn) {
+            if (_columns.Count == 0) { return false; }
+
+            return _columns.Any(thisColumn => thisColumn == vcolumn);
         }
 
         private void Initialize() {
             Reverse = false;
-            _Columns.Clear();
+            _columns.Clear();
         }
 
         private void SetColumn(List<string> names) {
-            _Columns.Clear();
-            for (var z = 0; z < names.Count; z++) {
-                var c = Database.Column.Exists(names[z]);
-                if (c != null) { _Columns.Add(c); }
+            _columns.Clear();
+            foreach (var t in names) {
+                var c = Database.Column.Exists(t);
+                if (c != null) { _columns.Add(c); }
             }
         }
 

@@ -11,7 +11,6 @@ using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 
 namespace BlueControls.Controls {
 
@@ -41,14 +40,14 @@ namespace BlueControls.Controls {
 
         #region Constructors
 
-        public FlexiControlForProperty(object propertyObject, string propertyName, int rowCount, ItemCollectionList list, enImageCode image) : this() {
+        public FlexiControlForProperty(object propertyObject, string propertyName, int rowCount, ItemCollectionList? list, enImageCode image) : this() {
             _propertyObject = propertyObject;
             _propertyName = propertyName;
             UpdateControlData(true, rowCount, list, image);
             CheckEnabledState();
         }
 
-        public FlexiControlForProperty(object propertyObject, string propertyName, ItemCollectionList list) : this(propertyObject, propertyName, 1, list, enImageCode.None) {
+        public FlexiControlForProperty(object propertyObject, string propertyName, ItemCollectionList? list) : this(propertyObject, propertyName, 1, list, enImageCode.None) {
         }
 
         public FlexiControlForProperty(object propertyObject, string propertyName, int rowCount) : this(propertyObject, propertyName, rowCount, null, enImageCode.None) {
@@ -138,8 +137,8 @@ namespace BlueControls.Controls {
             }
         }
 
-        public ComboBox GetComboBox() {
-            if (!_allinitialized) { return null; }
+        public ComboBox? GetComboBox() {
+            if (!Allinitialized) { return null; }
             foreach (var thiscon in Controls) {
                 if (thiscon is ComboBox cbx) { return cbx; }
             }
@@ -206,14 +205,14 @@ namespace BlueControls.Controls {
 
         private void Checker_Tick(object sender, System.EventArgs e) {
             //if (_IsFilling) { return; }
-            if (!_allinitialized) { return; }
-            if (_LastTextChange != null) { return; } // Noch am bearbeiten
+            if (!Allinitialized) { return; }
+            if (LastTextChange != null) { return; } // Noch am bearbeiten
             SetValueFromProperty();
         }
 
         private void FillPropertyNow() {
             //if (_IsFilling) { return; }
-            if (!_allinitialized) { return; }
+            if (!Allinitialized) { return; }
             if (!CheckEnabledState()) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.
             if (_propertyObject == null || string.IsNullOrEmpty(_propertyName) || _propInfo == null || !_propInfo.CanRead) { return; }
             var OldVal = string.Empty;
@@ -313,7 +312,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        private void UpdateControlData(bool withCreate, int TextLines, ItemCollectionList list, enImageCode image) {
+        private void UpdateControlData(bool withCreate, int TextLines, ItemCollectionList? list, enImageCode image) {
 
             #region propInfo & _propertynamecpl befüllen
 
@@ -374,7 +373,7 @@ namespace BlueControls.Controls {
                                 EditType = enEditTypeFormula.Textfeld_mit_Auswahlknopf;
                                 list.Appearance = enBlueListBoxAppearance.ComboBox_Textbox;
                                 var s = BlueFont.MeasureStringOfCaption(_Caption);
-                                (var BiggestItemX, var BiggestItemY, var _, var _) = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
+                                var (BiggestItemX, BiggestItemY, _, _) = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
                                 var x = Math.Max((int)(BiggestItemX + 20 + s.Width), 200);
                                 var y = Math.Max(BiggestItemY + (Skin.PaddingSmal * 2), 24);
                                 Size = new Size(x, y);

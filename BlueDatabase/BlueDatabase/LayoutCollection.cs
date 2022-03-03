@@ -31,7 +31,7 @@ namespace BlueDatabase {
         public void Check() {
             for (var z = 0; z < Count; z++) {
                 if (!this[z].StartsWith("{ID=#")) {
-                    this[z] = "{ID=#Converted" + z.ToString() + ", " + this[z].Substring(1);
+                    this[z] = "{ID=#Converted" + z + ", " + this[z].Substring(1);
                 }
             }
         }

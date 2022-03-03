@@ -19,6 +19,7 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BlueBasics {
 
@@ -33,25 +34,18 @@ namespace BlueBasics {
                 if (pair.Value == null || pair.Value.IsNullOrEmpty()) { remo.Add(pair.Key); }
             }
             if (remo.Count == 0) { return false; }
-            foreach (var ThisInteger in remo) {
-                if (!l.TryRemove(ThisInteger, out _)) {
-                    Develop.DebugPrint(enFehlerArt.Fehler, "Remove failed: " + ThisInteger);
-                }
+            foreach (var ThisInteger in remo.Where(ThisInteger => !l.TryRemove(ThisInteger, out _))) {
+                Develop.DebugPrint(enFehlerArt.Fehler, "Remove failed: " + ThisInteger);
             }
             return true;
         }
 
-        public static bool RemoveNullOrEmpty<T>(this ConcurrentDictionary<long, T> l) where T : ICanBeEmpty {
+        public static bool RemoveNullOrEmpty<T>(this ConcurrentDictionary<long, T> l) where T : ICanBeEmpty? {
             if (l == null || l.Count == 0) { return false; }
-            List<long> remo = new();
-            foreach (var pair in l) {
-                if (pair.Value == null || pair.Value.IsNullOrEmpty()) { remo.Add(pair.Key); }
-            }
+            var remo = (from pair in l where pair.Value == null || pair.Value.IsNullOrEmpty() select pair.Key).ToList();
             if (remo.Count == 0) { return false; }
-            foreach (var ThisInteger in remo) {
-                if (!l.TryRemove(ThisInteger, out _)) {
-                    Develop.DebugPrint(enFehlerArt.Fehler, "Remove failed: " + ThisInteger);
-                }
+            foreach (var ThisInteger in remo.Where(ThisInteger => !l.TryRemove(ThisInteger, out _))) {
+                Develop.DebugPrint(enFehlerArt.Fehler, "Remove failed: " + ThisInteger);
             }
             return true;
         }

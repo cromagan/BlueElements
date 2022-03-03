@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using static BlueBasics.Converter;
 using static BlueBasics.FileOperations;
@@ -40,7 +41,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         #region Fields
 
         private Database _originalDB;
-        private Table _TableView;
+        private Table? _TableView;
 
         #endregion
 
@@ -56,7 +57,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         #region Properties
 
         [DefaultValue((Table)null)]
-        public Table Table {
+        public Table? Table {
             get => _TableView;
             set {
                 if (_TableView == value) { return; }
@@ -67,11 +68,13 @@ namespace BlueControls.BlueDatabaseDialogs {
                 }
                 _TableView = value;
                 Check_OrderButtons();
-                if (_TableView != null) {
-                    ChangeDatabase(_TableView.Database);
-                    _TableView.DatabaseChanged += TableView_DatabaseChanged;
-                    _TableView.EnabledChanged += TableView_EnabledChanged;
+                if (_TableView == null) {
+                    return;
                 }
+
+                ChangeDatabase(_TableView.Database);
+                _TableView.DatabaseChanged += TableView_DatabaseChanged;
+                _TableView.EnabledChanged += TableView_EnabledChanged;
             }
         }
 
@@ -79,7 +82,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         #region Methods
 
-        public static void CheckDatabase(object? sender, LoadedEventArgs e) {
+        public static void CheckDatabase(object sender, LoadedEventArgs e) {
             var _database = (Database)sender;
             if (_database != null && !_database.ReadOnly) {
                 if (_database.IsAdministrator()) {
@@ -94,13 +97,13 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
         }
 
-        public static void OpenColumnEditor(ColumnItem column, RowItem row, Table tableview) {
+        public static void OpenColumnEditor(ColumnItem? column, RowItem? row, Table? tableview) {
             if (column == null) { return; }
             if (row == null) {
                 OpenColumnEditor(column, tableview);
                 return;
             }
-            ColumnItem columnLinked = null;
+            ColumnItem? columnLinked = null;
             var PosError = false;
             switch (column.Format) {
                 case enDataFormat.Columns_für_LinkedCellDropdown:
@@ -132,10 +135,12 @@ namespace BlueControls.BlueDatabaseDialogs {
             bearbColumn.Repair();
         }
 
-        public static void OpenColumnEditor(ColumnItem column, Table tableview) {
+        public static void OpenColumnEditor(ColumnItem? column, Table? tableview) {
             using ColumnEditor w = new(column, tableview);
             w.ShowDialog();
-            column.Invalidate_ColumAndContent();
+            if (column != null) {
+                column.Invalidate_ColumAndContent();
+            }
         }
 
         /// <summary>
@@ -168,10 +173,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             foreach (var ThisExport in db.Export) {
                 if (ThisExport.Typ == enExportTyp.DatenbankOriginalFormat) {
                     var lockMe = new object();
-                    Parallel.ForEach(ThisExport.BereitsExportiert, (ThisString, state) => {
+                    Parallel.ForEach(ThisExport.BereitsExportiert, (ThisString, _) => {
                         var t = ThisString.SplitAndCutBy("|");
                         if (FileExists(t[0])) {
-                            var q1 = QuickImage.Get(enImageCode.Kugel, 16, Extensions.MixColor(Color.Red, Color.Green, DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / ThisExport.AutoDelete).ToHTMLCode(), "");
+                            var q1 = QuickImage.Get(enImageCode.Kugel, 16, Color.Red.MixColor(Color.Green, DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / ThisExport.AutoDelete).ToHTMLCode(), "");
                             lock (lockMe) {
                                 L.Add(t[1], t[0], q1, true, t[1].CompareKey(enSortierTyp.Datum_Uhrzeit));
                             }
@@ -188,10 +193,8 @@ namespace BlueControls.BlueDatabaseDialogs {
                     Zusatz.AddRange(Directory.GetFiles(ThisExport.Verzeichnis, db.Filename.FileNameWithoutSuffix() + "_*.MDB"));
                 }
             }
-            foreach (var ThisString in Zusatz) {
-                if (L[ThisString] == null) {
-                    L.Add(ThisString.FileNameWithSuffix(), ThisString, QuickImage.Get(enImageCode.Warnung), true, new FileInfo(ThisString).CreationTime.ToString().CompareKey(enSortierTyp.Datum_Uhrzeit));
-                }
+            foreach (var ThisString in Zusatz.Where(ThisString => L[ThisString] == null)) {
+                L.Add(ThisString.FileNameWithSuffix(), ThisString, QuickImage.Get(enImageCode.Warnung), true, new FileInfo(ThisString).CreationTime.ToString().CompareKey(enSortierTyp.Datum_Uhrzeit));
             }
             L.Sort();
             return L;
@@ -273,7 +276,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             _TableView.Database.Row.Remove(_TableView.Filter, _TableView.PinnedRows);
         }
 
-        private void ChangeDatabase(Database? database) {
+        private void ChangeDatabase(Database database) {
             if (_originalDB != null) {
                 _originalDB.Disposing -= _originalDB_Disposing;
             }
@@ -285,10 +288,10 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void Check_OrderButtons() {
             if (InvokeRequired) {
-                Invoke(new Action(() => Check_OrderButtons()));
+                Invoke(new Action(Check_OrderButtons));
                 return;
             }
-            var enTabAllgemein = true;
+            const bool enTabAllgemein = true;
             var enTabellenAnsicht = true;
             if (_TableView?.Database == null || !_TableView.Database.IsAdministrator()) {
                 Enabled = false;

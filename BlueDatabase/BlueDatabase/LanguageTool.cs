@@ -17,6 +17,7 @@
 
 using BlueBasics;
 using BlueDatabase.Enums;
+using System;
 
 namespace BlueDatabase {
 
@@ -25,7 +26,7 @@ namespace BlueDatabase {
         #region Fields
 
         public static Database? Translation = null;
-        private static readonly object[] EmptyArgs = new object[0];
+        private static readonly object?[] EmptyArgs = Array.Empty<object>();
         private static string English = string.Empty;
         private static string German = string.Empty;
 
@@ -40,7 +41,7 @@ namespace BlueDatabase {
         /// <param name="column"></param>
         /// <param name="style"></param>
         /// <returns></returns>
-        public static string ColumnReplace(string txt, ColumnItem column, enShortenStyle style) {
+        public static string ColumnReplace(string txt, ColumnItem? column, enShortenStyle style) {
             if (!string.IsNullOrEmpty(txt)) {
                 if (!string.IsNullOrEmpty(column.Prefix)) { txt = DoTranslate(column.Prefix, true) + " " + txt; }
                 if (!string.IsNullOrEmpty(column.Suffix)) { txt = txt + " " + DoTranslate(column.Suffix, true); }
@@ -59,7 +60,7 @@ namespace BlueDatabase {
                 }
                 if (x.Length == 1 && !ThisString.StartsWith("|")) { txt = txt.Replace(x[0], string.Empty); }
             }
-            return style == enShortenStyle.Replaced || style == enShortenStyle.HTML || OT == txt ? txt : OT + " (" + txt + ")";
+            return style is enShortenStyle.Replaced or enShortenStyle.HTML || OT == txt ? txt : OT + " (" + txt + ")";
         }
 
         public static string DoTranslate(string txt) => DoTranslate(txt, true, EmptyArgs);
@@ -70,7 +71,7 @@ namespace BlueDatabase {
         /// <param name="txt"></param>
         /// <param name="mustTranslate">TRUE erstellt einen Eintrag in der Englisch-Datenbank, falls nicht vorhanden.</param>
         /// <returns></returns>
-        public static string DoTranslate(string txt, bool mustTranslate, params object[] args) {
+        public static string DoTranslate(string txt, bool mustTranslate, params object?[] args) {
             try {
                 if (Translation == null) {
                     return args.GetUpperBound(0) < 0 ? txt : string.Format(txt, args);
@@ -101,7 +102,7 @@ namespace BlueDatabase {
             }
         }
 
-        private static string ColumnReplaceTranslated(string newTXT, ColumnItem column) => column.Translate == enTranslationType.Übersetzen ? DoTranslate(newTXT, false) : newTXT;
+        private static string ColumnReplaceTranslated(string newTXT, ColumnItem? column) => column.Translate == enTranslationType.Übersetzen ? DoTranslate(newTXT, false) : newTXT;
 
         #endregion
     }

@@ -22,6 +22,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
@@ -37,9 +38,9 @@ namespace BlueBasics {
 
         #region Fields
 
-        public PixelFormat _pixelformat = PixelFormat.Format32bppArgb;
+        public PixelFormat Pixelformat = PixelFormat.Format32bppArgb;
 
-        private Bitmap _bitmap;
+        private Bitmap? _bitmap;
 
         #endregion
 
@@ -66,14 +67,14 @@ namespace BlueBasics {
 
         #region Properties
 
-        public int[] Bits { get; private set; }
+        public int[]? Bits { get; private set; }
 
         // Int32 = int
         public bool Disposed { get; private set; }
 
         public int Height { get; private set; }
 
-        public Size Size { get => new(Width, Height); }
+        public Size Size => new(Width, Height);
 
         public int Width { get; private set; }
 
@@ -83,7 +84,7 @@ namespace BlueBasics {
 
         #region Methods
 
-        public static Bitmap AdjustBrightness(Bitmap image, float brightness) {
+        public static Bitmap AdjustBrightness(Bitmap? image, float brightness) {
             // http://csharphelper.com/blog/2014/10/use-an-imageattributes-object-to-adjust-an-images-brightness-in-c/
             // Make the ColorMatrix.
             var b = Math.Max(brightness, 0.001f);
@@ -93,7 +94,7 @@ namespace BlueBasics {
             new float[] {0, b, 0, 0, 0},
             new float[] {0, 0, b, 0, 0},
             new float[] {0, 0, 0, 1, 0},
-            new float[] {0, 0, 0, 0, 1},
+            new float[] {0, 0, 0, 0, 1}
                 });
             ImageAttributes attributes = new();
             attributes.SetColorMatrix(cm);
@@ -101,49 +102,48 @@ namespace BlueBasics {
             // the new ColorMatrix.
             Point[] points =
             {
-        new Point(0, 0),
-        new Point(image.Width, 0),
-        new Point(0, image.Height),
-    };
+        new(0, 0),
+        new(image.Width, 0),
+        new(0, image.Height)
+            };
             Rectangle rect = new(0, 0, image.Width, image.Height);
             // Make the result bitmap.
             Bitmap bm = new(image.Width, image.Height);
-            using (var gr = Graphics.FromImage(bm)) {
-                gr.DrawImage(image, points, rect,
-                    GraphicsUnit.Pixel, attributes);
-            }
+            using var gr = Graphics.FromImage(bm);
+            gr.DrawImage(image, points, rect,
+                GraphicsUnit.Pixel, attributes);
             // Return the result.
             return bm;
         }
 
-        public static Bitmap AdjustContrast(Bitmap image, float value) {
+        public static Bitmap AdjustContrast(Bitmap? image, float value) {
             value = (100.0f + value) / 100.0f;
             value *= value;
-            var NewBitmap = Image_Clone(image);
-            var data = NewBitmap.LockBits(new Rectangle(0, 0, NewBitmap.Width, NewBitmap.Height), ImageLockMode.ReadWrite, NewBitmap.PixelFormat);
-            var Height = NewBitmap.Height;
-            var Width = NewBitmap.Width;
+            var newBitmap = Image_Clone(image);
+            var data = newBitmap.LockBits(new Rectangle(0, 0, newBitmap.Width, newBitmap.Height), ImageLockMode.ReadWrite, newBitmap.PixelFormat);
+            var height = newBitmap.Height;
+            var width = newBitmap.Width;
             unsafe {
-                for (var y = 0; y < Height; ++y) {
+                for (var y = 0; y < height; ++y) {
                     var row = (byte*)data.Scan0 + (y * data.Stride);
                     var columnOffset = 0;
-                    for (var x = 0; x < Width; ++x) {
-                        var B = row[columnOffset];
-                        var G = row[columnOffset + 1];
-                        var R = row[columnOffset + 2];
-                        var Red = R / 255.0f;
-                        var Green = G / 255.0f;
-                        var Blue = B / 255.0f;
-                        Red = (((Red - 0.5f) * value) + 0.5f) * 255.0f;
-                        Green = (((Green - 0.5f) * value) + 0.5f) * 255.0f;
-                        Blue = (((Blue - 0.5f) * value) + 0.5f) * 255.0f;
-                        var iR = (int)Red;
+                    for (var x = 0; x < width; ++x) {
+                        var b = row[columnOffset];
+                        var g = row[columnOffset + 1];
+                        var r = row[columnOffset + 2];
+                        var red = r / 255.0f;
+                        var green = g / 255.0f;
+                        var blue = b / 255.0f;
+                        red = (((red - 0.5f) * value) + 0.5f) * 255.0f;
+                        green = (((green - 0.5f) * value) + 0.5f) * 255.0f;
+                        blue = (((blue - 0.5f) * value) + 0.5f) * 255.0f;
+                        var iR = (int)red;
                         iR = iR > 255 ? 255 : iR;
                         iR = iR < 0 ? 0 : iR;
-                        var iG = (int)Green;
+                        var iG = (int)green;
                         iG = iG > 255 ? 255 : iG;
                         iG = iG < 0 ? 0 : iG;
-                        var iB = (int)Blue;
+                        var iB = (int)blue;
                         iB = iB > 255 ? 255 : iB;
                         iB = iB < 0 ? 0 : iB;
                         row[columnOffset] = (byte)iB;
@@ -153,11 +153,11 @@ namespace BlueBasics {
                     }
                 }
             }
-            NewBitmap.UnlockBits(data);
-            return NewBitmap;
+            newBitmap.UnlockBits(data);
+            return newBitmap;
         }
 
-        public static Bitmap AdjustGamma(Bitmap image, float gamma) {
+        public static Bitmap AdjustGamma(Bitmap? image, float gamma) {
             // http://csharphelper.com/blog/2016/12/provide-gamma-correction-for-an-image-in-c/
             // Set the ImageAttributes object's gamma value.
             ImageAttributes attributes = new();
@@ -166,52 +166,50 @@ namespace BlueBasics {
             // while applying the new gamma value.
             Point[] points =
             {
-        new Point(0, 0),
-        new Point(image.Width, 0),
-        new Point(0, image.Height),
-    };
+        new(0, 0),
+        new(image.Width, 0),
+        new(0, image.Height)
+            };
             Rectangle rect =
                 new(0, 0, image.Width, image.Height);
             // Make the result bitmap.
             Bitmap bm = new(image.Width, image.Height);
-            using (var gr = Graphics.FromImage(bm)) {
-                gr.DrawImage(image, points, rect,
-                    GraphicsUnit.Pixel, attributes);
-            }
+            using var gr = Graphics.FromImage(bm);
+            gr.DrawImage(image, points, rect,
+                GraphicsUnit.Pixel, attributes);
             // Return the result.
             return bm;
         }
 
-        public static void AllePixelZuSchwarz(Bitmap _Pic, double nearWhiteSchwelle) {
-            for (var x = 0; x < _Pic.Width; x++) {
-                for (var y = 0; y < _Pic.Height; y++) {
-                    var ca = _Pic.GetPixel(x, y);
+        public static void AllePixelZuSchwarz(Bitmap pic, double nearWhiteSchwelle) {
+            for (var x = 0; x < pic.Width; x++) {
+                for (var y = 0; y < pic.Height; y++) {
+                    var ca = pic.GetPixel(x, y);
                     if (!ca.IsNearWhite(nearWhiteSchwelle)) {
-                        _Pic.SetPixel(x, y, Color.FromArgb(ca.A, 0, 0, 0));
+                        pic.SetPixel(x, y, Color.FromArgb(ca.A, 0, 0, 0));
                     }
                 }
             }
         }
 
-        public static void AllePixelZuWeiß(Bitmap _Pic, double nearBlackSchwelle) {
-            for (var x = 0; x < _Pic.Width; x++) {
-                for (var y = 0; y < _Pic.Height; y++) {
-                    var ca = _Pic.GetPixel(x, y);
+        public static void AllePixelZuWeiß(Bitmap pic, double nearBlackSchwelle) {
+            for (var x = 0; x < pic.Width; x++) {
+                for (var y = 0; y < pic.Height; y++) {
+                    var ca = pic.GetPixel(x, y);
                     if (!ca.IsNearBlack(nearBlackSchwelle)) {
-                        _Pic.SetPixel(x, y, Color.FromArgb(ca.A, 255, 255, 255));
+                        pic.SetPixel(x, y, Color.FromArgb(ca.A, 255, 255, 255));
                     }
                 }
             }
         }
 
-        public static Bitmap Area(Bitmap sourceBitmap, Rectangle r) {
+        public static Bitmap? Area(Bitmap sourceBitmap, Rectangle r) {
             if (r.Width < 2 || r.Height < 2) { return null; }
-            Bitmap ClipedArea = new(r.Width, r.Height);
-            using (var GR = Graphics.FromImage(ClipedArea)) {
-                GR.Clear(Color.Black);
-                GR.DrawImage(sourceBitmap, 0, 0, r, GraphicsUnit.Pixel);
-            }
-            return ClipedArea;
+            Bitmap clipedArea = new(r.Width, r.Height);
+            using var gr = Graphics.FromImage(clipedArea);
+            gr.Clear(Color.Black);
+            gr.DrawImage(sourceBitmap, 0, 0, r, GraphicsUnit.Pixel);
+            return clipedArea;
         }
 
         public static void Ausdünnen(Bitmap pic, int staerke) {
@@ -250,122 +248,124 @@ namespace BlueBasics {
                     }
                 }
             }
-            bool IsWhite(int x, int y) => x < 0 || y < 0 || x >= pic.Width || y >= pic.Height || pic.GetPixel(x, y).IsNearWhite(0.9);
+            bool IsWhite(int x, int y) {
+                return x < 0 || y < 0 || x >= pic.Width || y >= pic.Height || pic.GetPixel(x, y).IsNearWhite(0.9);
+            }
         }
 
-        public static Bitmap AutoCrop(Bitmap _Pic, double minBrightness) {
-            var pa = GetAutoValuesForCrop(_Pic, minBrightness);
-            return Crop(_Pic, pa.Left, pa.Right, pa.Top, pa.Bottom);
+        public static Bitmap? AutoCrop(Bitmap? pic, double minBrightness) {
+            var pa = GetAutoValuesForCrop(pic, minBrightness);
+            return Crop(pic, pa.Left, pa.Right, pa.Top, pa.Bottom);
         }
 
-        public static Bitmap Crop(Bitmap _Pic, Rectangle r) => Crop(_Pic, r.Left, -(_Pic.Width - r.Right), r.Top, -(_Pic.Height - r.Bottom));
+        public static Bitmap? Crop(Bitmap? pic, Rectangle r) => Crop(pic, r.Left, -(pic.Width - r.Right), r.Top, -(pic.Height - r.Bottom));
 
         /// <summary>
         ///
         /// </summary>
-        /// <param name="_Pic"></param>
+        /// <param name="pic"></param>
         /// <param name="left">Positiver Wert schneidet diese Anzahl von Pixel vom linken Rand weg.</param>
         /// <param name="right">Negativer Wert schneidet diese Anzahl von Pixel vom rechten Rand weg.</param>
         /// <param name="top">Positiver Wert schneidet diese Anzahl von Pixel vom oberen Rand weg.</param>
         /// <param name="bottom">Negativer Wert schneidet diese Anzahl von Pixel vom unteren Rand weg.</param>
         /// <returns></returns>
-        public static Bitmap Crop(Bitmap _Pic, int left, int right, int top, int bottom) {
-            if (left == 0 && right == 0 && top == 0 && bottom == 0) { return _Pic; }
-            if (_Pic == null) { return null; }
+        public static Bitmap? Crop(Bitmap? pic, int left, int right, int top, int bottom) {
+            if (left == 0 && right == 0 && top == 0 && bottom == 0) { return pic; }
+            if (pic == null) { return null; }
             Generic.CollectGarbage();
-            var w = Math.Max(_Pic.Width - left + right, 1);
-            var h = Math.Max(_Pic.Height - top + bottom, 1);
-            Bitmap _BMP2 = new(w, h);
-            using (var GR = Graphics.FromImage(_BMP2)) {
-                GR.DrawImage(_Pic, -left, -top, _Pic.Width, _Pic.Height); // Width und Height MUSS angegeben werden. Manche Bilder (Falsches Format?) schlagen fehl, wenn es fehlt.
+            var w = Math.Max(pic.Width - left + right, 1);
+            var h = Math.Max(pic.Height - top + bottom, 1);
+            Bitmap bmp2 = new(w, h);
+            using (var gr = Graphics.FromImage(bmp2)) {
+                gr.DrawImage(pic, -left, -top, pic.Width, pic.Height); // Width und Height MUSS angegeben werden. Manche Bilder (Falsches Format?) schlagen fehl, wenn es fehlt.
             }
             Generic.CollectGarbage();
-            return _BMP2;
+            return bmp2;
         }
 
-        public static void FillCircle(Bitmap bMP, Color c, int x, int y, int r) {
+        public static void FillCircle(Bitmap? bMp, Color c, int x, int y, int r) {
             for (var adx = -r; adx <= r; adx++) {
                 for (var ady = -r; ady <= r; ady++) {
                     var d = Math.Sqrt(Convert.ToDouble((adx * adx) + (ady * ady))) - 0.5;
                     var px = x + adx;
                     var py = y + ady;
-                    if (px >= 0 && py >= 0 && px < bMP.Width && py < bMP.Height && d <= r) {
-                        bMP.SetPixel(px, py, c);
+                    if (px >= 0 && py >= 0 && px < bMp.Width && py < bMp.Height && d <= r) {
+                        bMp.SetPixel(px, py, c);
                     }
                 }
             }
         }
 
-        public static System.Windows.Forms.Padding GetAutoValuesForCrop(Bitmap _Pic, double minBrightness) {
+        public static System.Windows.Forms.Padding GetAutoValuesForCrop(Bitmap? pic, double minBrightness) {
             System.Windows.Forms.Padding pa = new(0, 0, 0, 0);
-            if (_Pic == null) { return pa; }
+            if (pic == null) { return pa; }
             var x = 0;
-            var ExitNow = false;
-            int Y;
+            var exitNow = false;
+            int y;
             while (true) {
-                for (Y = 0; Y < _Pic.Height; Y++) {
-                    if (!_Pic.GetPixel(x, Y).IsNearWhite(minBrightness)) {
-                        ExitNow = true;
+                for (y = 0; y < pic.Height; y++) {
+                    if (!pic.GetPixel(x, y).IsNearWhite(minBrightness)) {
+                        exitNow = true;
                         break;
                     }
                 }
-                if (ExitNow) { break; }
+                if (exitNow) { break; }
                 x++;
-                if (x > _Pic.Width * 0.9) { break; }
+                if (x > pic.Width * 0.9) { break; }
             }
             pa.Left = x;
             // -------------
-            x = _Pic.Width - 1;
-            ExitNow = false;
+            x = pic.Width - 1;
+            exitNow = false;
             while (true) {
-                for (Y = 0; Y < _Pic.Height; Y++) {
-                    if (!_Pic.GetPixel(x, Y).IsNearWhite(minBrightness)) {
-                        ExitNow = true;
+                for (y = 0; y < pic.Height; y++) {
+                    if (!pic.GetPixel(x, y).IsNearWhite(minBrightness)) {
+                        exitNow = true;
                         break;
                     }
                 }
-                if (ExitNow) { break; }
+                if (exitNow) { break; }
                 x--;
-                if (x < _Pic.Width * 0.1) { break; }
+                if (x < pic.Width * 0.1) { break; }
             }
-            pa.Right = x - _Pic.Width + 1;
+            pa.Right = x - pic.Width + 1;
             // -------------
-            Y = 0;
-            ExitNow = false;
+            y = 0;
+            exitNow = false;
             while (true) {
-                for (x = 0; x < _Pic.Width; x++) {
-                    if (!_Pic.GetPixel(x, Y).IsNearWhite(minBrightness)) {
-                        ExitNow = true;
+                for (x = 0; x < pic.Width; x++) {
+                    if (!pic.GetPixel(x, y).IsNearWhite(minBrightness)) {
+                        exitNow = true;
                         break;
                     }
                 }
-                if (ExitNow) { break; }
-                Y++;
-                if (Y > _Pic.Height * 0.9) { break; }
+                if (exitNow) { break; }
+                y++;
+                if (y > pic.Height * 0.9) { break; }
             }
-            pa.Top = Y;
+            pa.Top = y;
             // -------------
-            Y = _Pic.Height - 1;
-            ExitNow = false;
+            y = pic.Height - 1;
+            exitNow = false;
             while (true) {
-                for (x = 0; x < _Pic.Width; x++) {
-                    if (!_Pic.GetPixel(x, Y).IsNearWhite(minBrightness)) {
-                        ExitNow = true;
+                for (x = 0; x < pic.Width; x++) {
+                    if (!pic.GetPixel(x, y).IsNearWhite(minBrightness)) {
+                        exitNow = true;
                         break;
                     }
                 }
-                if (ExitNow) { break; }
-                Y--;
-                if (Y < _Pic.Height * 0.1) { break; }
+                if (exitNow) { break; }
+                y--;
+                if (y < pic.Height * 0.1) { break; }
             }
-            pa.Bottom = Y - _Pic.Height + 1;
+            pa.Bottom = y - pic.Height + 1;
             return pa;
         }
 
-        public static Bitmap GetBitmap(BitmapSource bitmapsource, int maxSize) {
+        public static Bitmap? GetBitmap(BitmapSource bitmapsource, int maxSize) {
             Generic.CollectGarbage();
             Generic.Pause(0.1, true);
-            Bitmap bitmap;
+            Bitmap? bitmap;
             using (MemoryStream outStream = new()) {
                 BitmapEncoder enc = new BmpBitmapEncoder();
                 enc.Frames.Add(BitmapFrame.Create(bitmapsource));
@@ -378,7 +378,7 @@ namespace BlueBasics {
             return bitmap;
         }
 
-        public static BitmapExt GetEmmbedBitmap(Assembly assembly, string name) {
+        public static BitmapExt? GetEmmbedBitmap(Assembly assembly, string name) {
             if (name.Contains("|")) { return null; }
             if (name.Contains("[")) { return null; }
             using var d = Generic.GetEmmbedResource(assembly, name);
@@ -415,12 +415,11 @@ namespace BlueBasics {
             return newBitmap;
         }
 
-        public static Bitmap Image_Clone(Bitmap sourceBMP) {
-            if (sourceBMP == null) { return null; }
-            Bitmap bmp = new(sourceBMP.Width, sourceBMP.Height, PixelFormat.Format32bppArgb);
-            using (var g = Graphics.FromImage(bmp)) {
-                g.DrawImage(sourceBMP, 0, 0, sourceBMP.Width, sourceBMP.Height); // Unerklärlich, orgiImage.Width, orgiImage.Height muss stehen bleiben!
-            }
+        public static Bitmap? Image_Clone(Bitmap? sourceBmp) {
+            if (sourceBmp == null) { return null; }
+            Bitmap bmp = new(sourceBmp.Width, sourceBmp.Height, PixelFormat.Format32bppArgb);
+            using var g = Graphics.FromImage(bmp);
+            g.DrawImage(sourceBmp, 0, 0, sourceBmp.Width, sourceBmp.Height); // Unerklärlich, orgiImage.Width, orgiImage.Height muss stehen bleiben!
             return bmp;
         }
 
@@ -430,15 +429,15 @@ namespace BlueBasics {
         /// <param name="dateiName"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static Image Image_FromFile(string dateiName) {
+        public static Image? Image_FromFile(string dateiName) {
             if (string.IsNullOrEmpty(dateiName)) { return null; }
             if (!FileExists(dateiName)) { return null; }
             try {
                 FileStream fs = new(dateiName, FileMode.Open, FileAccess.Read, FileShare.Read);
-                var IM = Image.FromStream(fs);
+                var im = Image.FromStream(fs);
                 fs.Close();
                 fs.Dispose();
-                return IM;
+                return im;
             } catch (Exception) {
                 return null;
             }
@@ -448,64 +447,64 @@ namespace BlueBasics {
             Bitmap resultBitmap = null;
             switch (blurType) {
                 case BlurType.Mean3x3:
-                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.Mean3x3, 1.0 / 9.0, 0);
+                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.Mean3X3, 1.0 / 9.0, 0);
                     break;
 
                 case BlurType.Mean5x5:
-                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.Mean5x5, 1.0 / 25.0, 0);
+                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.Mean5X5, 1.0 / 25.0, 0);
                     break;
 
                 case BlurType.Mean7x7:
-                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.Mean7x7, 1.0 / 49.0, 0);
+                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.Mean7X7, 1.0 / 49.0, 0);
                     break;
 
                 case BlurType.Mean9x9:
-                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.Mean9x9, 1.0 / 81.0, 0);
+                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.Mean9X9, 1.0 / 81.0, 0);
 
                     break;
 
                 case BlurType.GaussianBlur3x3:
-                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.GaussianBlur3x3, 1.0 / 16.0, 0);
+                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.GaussianBlur3X3, 1.0 / 16.0, 0);
                     break;
 
                 case BlurType.GaussianBlur5x5:
-                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.GaussianBlur5x5, 1.0 / 159.0, 0);
+                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.GaussianBlur5X5, 1.0 / 159.0, 0);
                     break;
 
                 case BlurType.MotionBlur5x5:
-                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur5x5, 1.0 / 10.0, 0);
+                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur5X5, 1.0 / 10.0, 0);
                     break;
 
                 case BlurType.MotionBlur5x5At45Degrees:
-                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur5x5At45Degrees, 1.0 / 5.0, 0);
+                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur5X5At45Degrees, 1.0 / 5.0, 0);
                     break;
 
                 case BlurType.MotionBlur5x5At135Degrees:
-                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur5x5At135Degrees, 1.0 / 5.0, 0);
+                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur5X5At135Degrees, 1.0 / 5.0, 0);
                     break;
 
                 case BlurType.MotionBlur7x7:
-                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur7x7, 1.0 / 14.0, 0);
+                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur7X7, 1.0 / 14.0, 0);
                     break;
 
                 case BlurType.MotionBlur7x7At45Degrees:
-                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur7x7At45Degrees, 1.0 / 7.0, 0);
+                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur7X7At45Degrees, 1.0 / 7.0, 0);
                     break;
 
                 case BlurType.MotionBlur7x7At135Degrees:
-                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur7x7At135Degrees, 1.0 / 7.0, 0);
+                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur7X7At135Degrees, 1.0 / 7.0, 0);
                     break;
 
                 case BlurType.MotionBlur9x9:
-                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur9x9, 1.0 / 18.0, 0);
+                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur9X9, 1.0 / 18.0, 0);
                     break;
 
                 case BlurType.MotionBlur9x9At45Degrees:
-                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur9x9At45Degrees, 1.0 / 9.0, 0);
+                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur9X9At45Degrees, 1.0 / 9.0, 0);
                     break;
 
                 case BlurType.MotionBlur9x9At135Degrees:
-                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur9x9At135Degrees, 1.0 / 9.0, 0);
+                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur9X9At135Degrees, 1.0 / 9.0, 0);
                     break;
 
                 case BlurType.Median3x3:
@@ -531,13 +530,15 @@ namespace BlueBasics {
             return resultBitmap;
         }
 
-        public static implicit operator Bitmap(BitmapExt p) => p?._bitmap;
+        public static implicit operator Bitmap?(BitmapExt? p) {
+            return p?._bitmap;
+        }
 
-        public static void IntensifyBitmap(ref Bitmap bMP) {
-            for (var X = 0; X < bMP.Width; X++) {
-                for (var Y = 0; Y < bMP.Height; Y++) {
-                    var c = bMP.GetPixel(X, Y);
-                    if (c.A > 0.5 && bMP.GetPixel(X, Y).GetBrightness() < 0.9) { bMP.SetPixel(X, Y, Color.Black); }
+        public static void IntensifyBitmap(ref Bitmap bMp) {
+            for (var x = 0; x < bMp.Width; x++) {
+                for (var y = 0; y < bMp.Height; y++) {
+                    var c = bMp.GetPixel(x, y);
+                    if (c.A > 0.5 && bMp.GetPixel(x, y).GetBrightness() < 0.9) { bMp.SetPixel(x, y, Color.Black); }
                 }
             }
         }
@@ -553,14 +554,14 @@ namespace BlueBasics {
         /// <returns></returns>
         public static bool IntersectsWith(Bitmap image1, Point pos1, Bitmap image2, Point pos2, int accuracy) {
             if (image1 == null || image2 == null) { return false; }
-            Rectangle Koord1 = new(pos1, image1.Size);
-            Rectangle Koord2 = new(pos2, image2.Size);
-            if (!Koord1.IntersectsWith(Koord2)) { return false; }
-            Rectangle Schnitt = new(Koord1.Location, Koord1.Size);
-            Schnitt.Intersect(Koord2);
-            for (var x = Schnitt.Left; x < Schnitt.Right; x += accuracy) {
-                for (var y = Schnitt.Top; y < Schnitt.Bottom; y += accuracy) {
-                    if (!image1.GetPixel(x - Koord1.X, y - Koord1.Y).IsNearWhite(0.9) && !image2.GetPixel(x - Koord2.X, y - Koord2.Y).IsNearWhite(0.9)) {
+            Rectangle koord1 = new(pos1, image1.Size);
+            Rectangle koord2 = new(pos2, image2.Size);
+            if (!koord1.IntersectsWith(koord2)) { return false; }
+            Rectangle schnitt = new(koord1.Location, koord1.Size);
+            schnitt.Intersect(koord2);
+            for (var x = schnitt.Left; x < schnitt.Right; x += accuracy) {
+                for (var y = schnitt.Top; y < schnitt.Bottom; y += accuracy) {
+                    if (!image1.GetPixel(x - koord1.X, y - koord1.Y).IsNearWhite(0.9) && !image2.GetPixel(x - koord2.X, y - koord2.Y).IsNearWhite(0.9)) {
                         return true;
                     }
                 }
@@ -617,13 +618,13 @@ namespace BlueBasics {
             gR.PixelOffsetMode = PixelOffsetMode.Half;
             gR.DrawImage(screenshot, r, new Rectangle(point.X - w5, point.Y - w5, (w5 * 2) + 1, (w5 * 2) + 1), GraphicsUnit.Pixel);
             gR.DrawRectangle(Pens.Black, r);
-            var Mitte = r.PointOf(enAlignment.Horizontal_Vertical_Center);
-            gR.DrawLine(new Pen(Color.FromArgb(128, 255, 255, 255), 3), Mitte.X, Mitte.Y - 7, Mitte.X, Mitte.Y + 6);
-            gR.DrawLine(new Pen(Color.FromArgb(128, 255, 255, 255), 3), Mitte.X - 7, Mitte.Y, Mitte.X + 6, Mitte.Y);
-            gR.DrawLine(new Pen(Color.FromArgb(20, 255, 0, 0)), Mitte.X, r.Top, Mitte.X, r.Bottom);
-            gR.DrawLine(new Pen(Color.FromArgb(20, 255, 0, 0)), r.Left, Mitte.Y, r.Right, Mitte.Y);
-            gR.DrawLine(Pens.Red, Mitte.X, Mitte.Y - 6, Mitte.X, Mitte.Y + 5);
-            gR.DrawLine(Pens.Red, Mitte.X - 6, Mitte.Y, Mitte.X + 5, Mitte.Y);
+            var mitte = r.PointOf(enAlignment.Horizontal_Vertical_Center);
+            gR.DrawLine(new Pen(Color.FromArgb(128, 255, 255, 255), 3), mitte.X, mitte.Y - 7, mitte.X, mitte.Y + 6);
+            gR.DrawLine(new Pen(Color.FromArgb(128, 255, 255, 255), 3), mitte.X - 7, mitte.Y, mitte.X + 6, mitte.Y);
+            gR.DrawLine(new Pen(Color.FromArgb(20, 255, 0, 0)), mitte.X, r.Top, mitte.X, r.Bottom);
+            gR.DrawLine(new Pen(Color.FromArgb(20, 255, 0, 0)), r.Left, mitte.Y, r.Right, mitte.Y);
+            gR.DrawLine(Pens.Red, mitte.X, mitte.Y - 6, mitte.X, mitte.Y + 5);
+            gR.DrawLine(Pens.Red, mitte.X - 6, mitte.Y, mitte.X + 5, mitte.Y);
         }
 
         public static Bitmap MedianFilter(Bitmap sourceBitmap, int matrixSize) {
@@ -638,7 +639,6 @@ namespace BlueBasics {
             sourceBitmap.UnlockBits(sourceData);
             var filterOffset = (matrixSize - 1) / 2;
             List<int> neighbourPixels = new();
-            byte[] middlePixel;
             for (var offsetY = filterOffset; offsetY < sourceBitmap.Height - filterOffset; offsetY++) {
                 for (var offsetX = filterOffset; offsetX < sourceBitmap.Width - filterOffset; offsetX++) {
                     var byteOffset = (offsetY * sourceData.Stride) + (offsetX * 4);
@@ -650,7 +650,7 @@ namespace BlueBasics {
                         }
                     }
                     neighbourPixels.Sort();
-                    middlePixel = BitConverter.GetBytes(neighbourPixels[filterOffset]);
+                    var middlePixel = BitConverter.GetBytes(neighbourPixels[filterOffset]);
                     resultBuffer[byteOffset] = middlePixel[0];
                     resultBuffer[byteOffset + 1] = middlePixel[1];
                     resultBuffer[byteOffset + 2] = middlePixel[2];
@@ -664,11 +664,12 @@ namespace BlueBasics {
             return resultBitmap;
         }
 
-        public static unsafe Bitmap ReplaceColor(Bitmap source, Color toReplace, Color replacement) {
+        public static unsafe Bitmap ReplaceColor(Bitmap? source, Color toReplace, Color replacement) {
             // https://stackoverflow.com/questions/17208254/how-to-change-pixel-color-of-an-image-in-c-net
             const int pixelSize = 4; // 32 bits per pixel
             Bitmap target = new(source.Width, source.Height, PixelFormat.Format32bppArgb);
-            BitmapData sourceData = null, targetData = null;
+            BitmapData? sourceData = null;
+            BitmapData? targetData = null;
             try {
                 sourceData = source.LockBits(new Rectangle(0, 0, source.Width, source.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
                 targetData = target.LockBits(new Rectangle(0, 0, target.Width, target.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
@@ -699,13 +700,13 @@ namespace BlueBasics {
             return target;
         }
 
-        public static Bitmap Resize(Bitmap bmp, int width, int height, enSizeModes sizeMode, InterpolationMode interpolationMode, bool collectGarbage) {
+        public static Bitmap? Resize(Bitmap? bmp, int width, int height, enSizeModes sizeMode, InterpolationMode interpolationMode, bool collectGarbage) {
             if (bmp == null) { return null; }
             if (width < 1 && height < 1) { return null; }
             if (collectGarbage) { Generic.CollectGarbage(); }
             if (width < 1) { width = 1; }
             if (height < 1) { height = 1; }
-            var Scale = Math.Min(width / (double)bmp.Width, height / (double)bmp.Height);
+            var scale = Math.Min(width / (double)bmp.Width, height / (double)bmp.Height);
 
             switch (sizeMode) {
                 case enSizeModes.EmptySpace:
@@ -716,55 +717,55 @@ namespace BlueBasics {
 
                 case enSizeModes.Breite_oder_Höhe_Anpassen_MitVergrößern:
                     // Bei diesem Modus werden die Rückgabehöhe oder breite verändert!!!
-                    width = (int)(Scale * bmp.Width);
-                    height = (int)(Scale * bmp.Height);
+                    width = (int)(scale * bmp.Width);
+                    height = (int)(scale * bmp.Height);
                     break;
 
                 case enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern:
                     // Bei diesem Modus werden die Rückgabehöhe oder breite verändert!!!
-                    if (Scale >= 1) { return bmp; }
-                    width = (int)(Scale * bmp.Width);
-                    height = (int)(Scale * bmp.Height);
+                    if (scale >= 1) { return bmp; }
+                    width = (int)(scale * bmp.Width);
+                    height = (int)(scale * bmp.Height);
                     break;
 
                 case enSizeModes.Verzerren:
-                    Scale = 1; // Dummy setzen
+                    scale = 1; // Dummy setzen
                     break;
 
                 default:
                     Develop.DebugPrint(sizeMode);
                     return null;
             }
-            var nw = (int)(bmp.Width * Scale);
-            var nh = (int)(bmp.Height * Scale);
+            var nw = (int)(bmp.Width * scale);
+            var nh = (int)(bmp.Height * scale);
             if (sizeMode == enSizeModes.Verzerren) {
                 nw = width;
                 nh = height;
             }
 
             try {
-                Bitmap ImageResize = new(width, height); // Kein Format32bppPArgb --> Fehler
-                using (var GR = Graphics.FromImage(ImageResize)) {
-                    GR.InterpolationMode = interpolationMode;
-                    GR.PixelOffsetMode = PixelOffsetMode.Half;
-                    // 20000 / 4 = 5000, also noch 1000 zum kleiner machen
-                    if (bmp.Width > 20000 && nw < 4000) {
-                        var tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 4.0), (int)(bmp.Height / 4.0), null, IntPtr.Zero);
-                        GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
-                    } else if (bmp.Width > 15000 && nw < 4000) {
-                        var tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 3.0), (int)(bmp.Height / 3.0), null, IntPtr.Zero);
-                        GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
-                    } else if (bmp.Width > 10000 && nw < 2500) {
-                        var tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 3.0), (int)(bmp.Height / 3.0), null, IntPtr.Zero);
-                        GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
-                    } else if (bmp.Width > 8000 && nw < 2000) {
-                        var tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 2.5), (int)(bmp.Height / 2.5), null, IntPtr.Zero);
-                        GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
-                    } else {
-                        GR.DrawImage(bmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
-                    }
+                Bitmap imageResize = new(width, height); // Kein Format32bppPArgb --> Fehler
+                using var gr = Graphics.FromImage(imageResize);
+                gr.InterpolationMode = interpolationMode;
+                gr.PixelOffsetMode = PixelOffsetMode.Half;
+                // 20000 / 4 = 5000, also noch 1000 zum kleiner machen
+                if (bmp.Width > 20000 && nw < 4000) {
+                    var tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 4.0), (int)(bmp.Height / 4.0), null, IntPtr.Zero);
+                    gr.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
+                } else if (bmp.Width > 15000 && nw < 4000) {
+                    var tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 3.0), (int)(bmp.Height / 3.0), null, IntPtr.Zero);
+                    gr.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
+                } else if (bmp.Width > 10000 && nw < 2500) {
+                    var tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 3.0), (int)(bmp.Height / 3.0), null, IntPtr.Zero);
+                    gr.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
+                } else if (bmp.Width > 8000 && nw < 2000) {
+                    var tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 2.5), (int)(bmp.Height / 2.5), null, IntPtr.Zero);
+                    gr.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
+                } else {
+                    gr.DrawImage(bmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
                 }
-                return ImageResize;
+
+                return imageResize;
             } catch {
                 if (!collectGarbage) { Generic.CollectGarbage(); }
                 return sizeMode == enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern
@@ -790,44 +791,41 @@ namespace BlueBasics {
             // Gammawert darf nicht = 0 sein (Bug in GDI+)
             if (gamma == 0) { gamma = Convert.ToSingle(gamma + 1.0E-45); }
             // Zur korrekten Darstellung:
-            var Diff = (brightness / 2) - (contrast / 2);
+            var diff = (brightness / 2) - (contrast / 2);
             // ColorMatrix erstellen
-            ColorMatrix Matrix = new(new[]
+            ColorMatrix matrix = new(new[]
             {
                 new[] {1 + contrast, 0, 0, 0, 0},
                 new[] {0, 1 + contrast, 0, 0, 0},
                 new[] {0, 0, 1 + contrast, 0, 0},
                 new float[] {0, 0, 0, 1, 0},
-                new[] {brightness + Diff, brightness + Diff, brightness + Diff, 0, 1}
+                new[] {brightness + diff, brightness + diff, brightness + diff, 0, 1}
             });
             // Neue Bitmap erstellen
-            Bitmap NewBmp = new(inBitmap.Width, inBitmap.Height, PixelFormat.Format24bppRgb);
+            Bitmap newBmp = new(inBitmap.Width, inBitmap.Height, PixelFormat.Format24bppRgb);
             // ImageAttribute-Objekt erstellen
-            using (ImageAttributes ImageAttr = new()) {
-                // ColorMatrix für das ImageAttribute-Objekt setzen
-                ImageAttr.SetColorMatrix(Matrix);
-                // Gamma für das ImageAttribute-Objekt setzen
-                ImageAttr.SetGamma(gamma);
-                // Graphics-Objekt von NewBmp erstellen
-                using var NewBmpGra = Graphics.FromImage(NewBmp);                     // InBitmap in das Graphics-Objekt zeichnen
-                NewBmpGra.DrawImage(inBitmap, new Rectangle(0, 0, inBitmap.Width, inBitmap.Height), 0, 0, inBitmap.Width, inBitmap.Height, GraphicsUnit.Pixel, ImageAttr);
-                // Graphics-Objekt löschen
-                // ImageAttribute-Objekt löschen
-            }
-            return NewBmp;
+            using ImageAttributes imageAttr = new();
+            // ColorMatrix für das ImageAttribute-Objekt setzen
+            imageAttr.SetColorMatrix(matrix);
+            // Gamma für das ImageAttribute-Objekt setzen
+            imageAttr.SetGamma(gamma);
+            // Graphics-Objekt von NewBmp erstellen
+            using var newBmpGra = Graphics.FromImage(newBmp);                     // InBitmap in das Graphics-Objekt zeichnen
+            newBmpGra.DrawImage(inBitmap, new Rectangle(0, 0, inBitmap.Width, inBitmap.Height), 0, 0, inBitmap.Width, inBitmap.Height, GraphicsUnit.Pixel, imageAttr);
+            // Graphics-Objekt löschen
+            // ImageAttribute-Objekt löschen
+            return newBmp;
         }
 
-        public static List<Bitmap> SplitTiff(string fileName, int maxSize) {
+        public static List<Bitmap?> SplitTiff(string fileName, int maxSize) {
             // Open a Stream and decode a TIFF image
             FileStream imageStreamSource = new(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-            List<Bitmap> l = new();
+            List<Bitmap?> l = new();
             var frames = 1;
             try {
                 TiffBitmapDecoder decoder = new(imageStreamSource, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.Default);
                 frames = decoder.Frames.Count;
-                foreach (var frame in decoder.Frames) {
-                    l.Add(GetBitmap(frame, maxSize));
-                }
+                l.AddRange(decoder.Frames.Select(frame => GetBitmap(frame, maxSize)));
             } catch {
                 try {
                     l.Clear();
@@ -872,7 +870,7 @@ namespace BlueBasics {
                     Height = bmp.Height;
                     Bits = new int[Width * Height];
                     BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
-                    _bitmap = new Bitmap(Width, Height, Width * 4, _pixelformat, BitsHandle.AddrOfPinnedObject());
+                    _bitmap = new Bitmap(Width, Height, Width * 4, Pixelformat, BitsHandle.AddrOfPinnedObject());
                     using var gr = Graphics.FromImage(_bitmap);
                     gr.DrawImage(bmp, new Rectangle(0, 0, Width, Height));
                 } catch (Exception ex) {
@@ -889,19 +887,18 @@ namespace BlueBasics {
         }
 
         public BitmapExt Crop(Rectangle re) {
-            BitmapExt newBMP = new(re.Width, re.Height);
-            using (var GR = Graphics.FromImage(newBMP._bitmap)) {
-                GR.Clear(Color.Transparent);
-                GR.PixelOffsetMode = PixelOffsetMode.Half;
-                GR.DrawImage(_bitmap, new Rectangle(0, 0, re.Width, re.Height), re.Left, re.Top, re.Width, re.Height, GraphicsUnit.Pixel);
-            }
-            return newBMP;
+            BitmapExt newBmp = new(re.Width, re.Height);
+            using var gr = Graphics.FromImage(newBmp._bitmap);
+            gr.Clear(Color.Transparent);
+            gr.PixelOffsetMode = PixelOffsetMode.Half;
+            gr.DrawImage(_bitmap, new Rectangle(0, 0, re.Width, re.Height), re.Left, re.Top, re.Width, re.Height, GraphicsUnit.Pixel);
+            return newBmp;
         }
 
         public void Dispose() {
             if (Disposed) { return; }
             Disposed = true;
-            _bitmap.Dispose();
+            _bitmap?.Dispose();
             BitsHandle.Free();
         }
 
@@ -922,7 +919,7 @@ namespace BlueBasics {
             if (collectGarbage) { Generic.CollectGarbage(); }
             if (width < 1) { width = 1; }
             if (height < 1) { height = 1; }
-            var Scale = Math.Min(width / (double)Width, height / (double)Height);
+            var scale = Math.Min(width / (double)Width, height / (double)Height);
 
             switch (sizeMode) {
                 case enSizeModes.EmptySpace:
@@ -933,52 +930,52 @@ namespace BlueBasics {
 
                 case enSizeModes.Breite_oder_Höhe_Anpassen_MitVergrößern:
                     // Bei diesem Modus werden die Rückgabehöhe oder breite verändert!!!
-                    width = (int)(Scale * Width);
-                    height = (int)(Scale * Height);
+                    width = (int)(scale * Width);
+                    height = (int)(scale * Height);
                     break;
 
                 case enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern:
                     // Bei diesem Modus werden die Rückgabehöhe oder breite verändert!!!
-                    if (Scale >= 1) { return; }
-                    width = (int)(Scale * Width);
-                    height = (int)(Scale * Height);
+                    if (scale >= 1) { return; }
+                    width = (int)(scale * Width);
+                    height = (int)(scale * Height);
                     break;
 
                 case enSizeModes.Verzerren:
-                    Scale = 1; // Dummy setzen
+                    scale = 1; // Dummy setzen
                     break;
 
                 default:
                     Develop.DebugPrint(sizeMode);
                     return;
             }
-            var nw = (int)(Width * Scale);
-            var nh = (int)(Height * Scale);
+            var nw = (int)(Width * scale);
+            var nh = (int)(Height * scale);
             if (sizeMode == enSizeModes.Verzerren) {
                 nw = width;
                 nh = height;
             }
             try {
-                var oldBMP = _bitmap;
+                var oldBmp = _bitmap;
                 EmptyBitmap(width, height);
-                using var GR = Graphics.FromImage(_bitmap);
-                GR.InterpolationMode = interpolationMode;
-                GR.PixelOffsetMode = PixelOffsetMode.Half;
+                using var gr = Graphics.FromImage(_bitmap);
+                gr.InterpolationMode = interpolationMode;
+                gr.PixelOffsetMode = PixelOffsetMode.Half;
                 // 20000 / 4 = 5000, also noch 1000 zum kleiner machen
                 if (Width > 20000 && nw < 4000) {
-                    var tmp = (Bitmap)oldBMP.GetThumbnailImage((int)(oldBMP.Width / 4.0), (int)(oldBMP.Height / 4.0), null, IntPtr.Zero);
-                    GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
-                } else if (oldBMP.Width > 15000 && nw < 4000) {
-                    var tmp = (Bitmap)oldBMP.GetThumbnailImage((int)(oldBMP.Width / 3.0), (int)(oldBMP.Height / 3.0), null, IntPtr.Zero);
-                    GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
-                } else if (oldBMP.Width > 10000 && nw < 2500) {
-                    var tmp = (Bitmap)oldBMP.GetThumbnailImage((int)(oldBMP.Width / 3.0), (int)(oldBMP.Height / 3.0), null, IntPtr.Zero);
-                    GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
-                } else if (oldBMP.Width > 8000 && nw < 2000) {
-                    var tmp = (Bitmap)oldBMP.GetThumbnailImage((int)(oldBMP.Width / 2.5), (int)(oldBMP.Height / 2.5), null, IntPtr.Zero);
-                    GR.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
+                    var tmp = (Bitmap)oldBmp.GetThumbnailImage((int)(oldBmp.Width / 4.0), (int)(oldBmp.Height / 4.0), null, IntPtr.Zero);
+                    gr.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
+                } else if (oldBmp.Width > 15000 && nw < 4000) {
+                    var tmp = (Bitmap)oldBmp.GetThumbnailImage((int)(oldBmp.Width / 3.0), (int)(oldBmp.Height / 3.0), null, IntPtr.Zero);
+                    gr.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
+                } else if (oldBmp.Width > 10000 && nw < 2500) {
+                    var tmp = (Bitmap)oldBmp.GetThumbnailImage((int)(oldBmp.Width / 3.0), (int)(oldBmp.Height / 3.0), null, IntPtr.Zero);
+                    gr.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
+                } else if (oldBmp.Width > 8000 && nw < 2000) {
+                    var tmp = (Bitmap)oldBmp.GetThumbnailImage((int)(oldBmp.Width / 2.5), (int)(oldBmp.Height / 2.5), null, IntPtr.Zero);
+                    gr.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
                 } else {
-                    GR.DrawImage(oldBMP, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
+                    gr.DrawImage(oldBmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
                 }
             } catch (Exception ex) {
                 Develop.DebugPrint(ex);
@@ -1006,7 +1003,7 @@ namespace BlueBasics {
                 return;
             }
 
-            _bitmap = new Bitmap(Width, Height, Width * 4, _pixelformat, BitsHandle.AddrOfPinnedObject());
+            _bitmap = new Bitmap(Width, Height, Width * 4, Pixelformat, BitsHandle.AddrOfPinnedObject());
         }
 
         private static Bitmap ConvolutionFilter(Bitmap sourceBitmap, double[,] filterMatrix, double factor = 1, int bias = 0) {

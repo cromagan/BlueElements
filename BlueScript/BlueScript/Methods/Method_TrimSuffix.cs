@@ -45,16 +45,18 @@ namespace BlueScript {
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
             var val = attvar.Attributes[0].ValueString;
 
-            var tmp = Constants.Char_Numerals + " ";
+            const string tmp = Constants.Char_Numerals + " ";
 
             for (var z = 1; z < attvar.Attributes.Count; z++) {
                 var suf = attvar.Attributes[z].ValueString.ToLower();
-                if (val.Length > suf.Length) {
-                    if (val.ToLower().EndsWith(suf)) {
-                        var c = val.Substring(val.Length - suf.Length - 1, 1);
-                        if (tmp.Contains(c)) {
-                            return new strDoItFeedback(val.Substring(0, val.Length - suf.Length).TrimEnd(" "), enVariableDataType.String);
-                        }
+                if (val.Length <= suf.Length) {
+                    continue;
+                }
+
+                if (val.ToLower().EndsWith(suf)) {
+                    var c = val.Substring(val.Length - suf.Length - 1, 1);
+                    if (tmp.Contains(c)) {
+                        return new strDoItFeedback(val.Substring(0, val.Length - suf.Length).TrimEnd(" "), enVariableDataType.String);
                     }
                 }
             }

@@ -9,8 +9,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
-using static BlueBasics.Extensions;
 using static BlueBasics.FileOperations;
 
 namespace BlueControls.Controls {
@@ -22,19 +22,19 @@ namespace BlueControls.Controls {
 
         public string Feedback = string.Empty;
 
-        public List<string> Tags = new();
+        public List<string?>? Tags = new();
 
         private static readonly Brush Brush_RotTransp = new SolidBrush(Color.FromArgb(200, 255, 0, 0));
 
         private static readonly Pen Pen_RotTransp = new(Color.FromArgb(200, 255, 0, 0));
 
-        private readonly List<PointM> points = new();
+        private readonly List<PointM?> points = new();
 
         private enHelpers _Helper = enHelpers.Ohne;
 
         private enOrientation _MittelLinie = enOrientation.Ohne;
 
-        private bool _PointAdding = false;
+        private bool _PointAdding;
 
         #endregion
 
@@ -79,22 +79,22 @@ namespace BlueControls.Controls {
         public static string FilenameTXT(string PathOfPicture) => PathOfPicture.FilePath() + PathOfPicture.FileNameWithoutSuffix() + ".txt";
 
         public static BitmapListItem GenerateBitmapListItem(string pathOfPicture) {
-            var x = LoadFromDisk(pathOfPicture);
-            return GenerateBitmapListItem(x.Item1, x.Item2);
+            var (bitmap, list) = LoadFromDisk(pathOfPicture);
+            return GenerateBitmapListItem(bitmap, list);
         }
 
-        public static BitmapListItem GenerateBitmapListItem(Bitmap bmp, List<string> tags) {
+        public static BitmapListItem GenerateBitmapListItem(Bitmap? bmp, List<string?>? tags) {
             var FilenamePNG = tags.TagGet("ImageFile");
             BitmapListItem i = new(bmp, FilenamePNG, FilenamePNG.FileNameWithoutSuffix()) {
                 Padding = 10,
-                Tag = tags,
+                Tag = tags
             };
             return i;
         }
 
-        public static Tuple<Bitmap, List<string>> LoadFromDisk(string PathOfPicture) {
+        public static Tuple<Bitmap?, List<string?>?> LoadFromDisk(string PathOfPicture) {
             Bitmap bmp = null;
-            List<string> tags = new();
+            List<string?> tags = new();
             if (FileExists(PathOfPicture)) {
                 bmp = (Bitmap)BitmapExt.Image_FromFile(PathOfPicture);
             }
@@ -103,10 +103,10 @@ namespace BlueControls.Controls {
                 tags = File.ReadAllText(ftxt, System.Text.Encoding.UTF8).SplitAndCutByCRToList();
             }
             tags.TagSet("ImageFile", PathOfPicture);
-            return new Tuple<Bitmap, List<string>>(bmp, tags);
+            return new Tuple<Bitmap?, List<string?>?>(bmp, tags);
         }
 
-        public static Tuple<Bitmap, List<string>> ResizeData(Bitmap pic, List<string> tags, int width, int height) {
+        public static Tuple<Bitmap?, List<string>> ResizeData(Bitmap? pic, List<string> tags, int width, int height) {
             var zoomx = (float)width / pic.Width;
             var zoomy = (float)height / pic.Height;
             var pic2 = BitmapExt.Resize(pic, width, height, enSizeModes.Verzerren, System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic, true);
@@ -119,7 +119,7 @@ namespace BlueControls.Controls {
                 ThisP.Y *= zoomy;
                 tags2.TagSet(ThisP.Name, ThisP.ToString());
             }
-            return new Tuple<Bitmap, List<string>>(pic2, tags2);
+            return new Tuple<Bitmap?, List<string>>(pic2, tags2);
         }
 
         public BitmapListItem GenerateBitmapListItem() {
@@ -127,12 +127,7 @@ namespace BlueControls.Controls {
             return GenerateBitmapListItem(BMP, Tags);
         }
 
-        public PointM GetPoint(string name) {
-            foreach (var thisp in points) {
-                if (thisp != null && thisp.Name.ToUpper() == name.ToUpper()) { return thisp; }
-            }
-            return null;
-        }
+        public PointM? GetPoint(string name) => points.FirstOrDefault(thisp => thisp != null && thisp.Name.ToUpper() == name.ToUpper());
 
         public void LetUserAddAPoint(string pointName, enHelpers helper, enOrientation mittelline) {
             _MittelLinie = mittelline;
@@ -143,9 +138,9 @@ namespace BlueControls.Controls {
         }
 
         public void LoadData(string PathOfPicture) {
-            var x = LoadFromDisk(PathOfPicture);
-            BMP = x.Item1;
-            Tags = x.Item2;
+            var (bitmap, list) = LoadFromDisk(PathOfPicture);
+            BMP = bitmap;
+            Tags = list;
             GeneratePointsFromTags();
             Invalidate();
         }
@@ -188,9 +183,7 @@ namespace BlueControls.Controls {
             var Path = Tags.TagGet("ImageFile");
             var pathtxt = FilenameTXT(Path);
             try {
-                if (BMP != null) {
-                    BMP.Save(Path, System.Drawing.Imaging.ImageFormat.Png);
-                }
+                BMP?.Save(Path, System.Drawing.Imaging.ImageFormat.Png);
                 if (Tags != null) {
                     Tags.TagSet("Erstellt", Generic.UserName());
                     Tags.TagSet("Datum", DateTime.Now.ToString(Constants.Format_Date5));
@@ -261,7 +254,7 @@ namespace BlueControls.Controls {
         //            return PathOfPicture.TrimEnd(".PNG").TrimEnd(".JPG").TrimEnd(".JPG") + ".txt";
         private void DrawMittelLinien(AdditionalDrawing eg) {
             if (BMP == null) { return; }
-            PositionEventArgs e = new(MousePos_1_1.X, MousePos_1_1.Y);
+            PositionEventArgs e = new(MousePos11.X, MousePos11.Y);
             OnOverwriteMouseImageData(e);
             ///// Punkte
             //foreach (var ThisPoint in points)
@@ -288,7 +281,7 @@ namespace BlueControls.Controls {
                 eg.G.DrawLine(new Pen(Color.FromArgb(10, 0, 0, 0), 3), p1, p2);
                 eg.G.DrawLine(new Pen(Color.FromArgb(220, 100, 255, 100)), p1, p2);
             }
-            if (MousePos_1_1.IsEmpty) { return; }
+            if (MousePos11.IsEmpty) { return; }
             if (_Helper.HasFlag(enHelpers.HorizontalLine)) {
                 var p1 = new PointM(0, e.Y).ZoomAndMove(eg);
                 var p2 = new PointM(BMP.Width, e.Y).ZoomAndMove(eg);
@@ -309,16 +302,16 @@ namespace BlueControls.Controls {
             if (_Helper.HasFlag(enHelpers.MouseDownPoint)) {
                 var m1 = new PointM(e.X, e.Y).ZoomAndMove(eg);
                 eg.G.DrawEllipse(Pen_RotTransp, new RectangleF(m1.X - 3, m1.Y - 3, 6, 6));
-                if (!MouseDownPos_1_1.IsEmpty) {
-                    var md1 = new PointM(MouseDownPos_1_1).ZoomAndMove(eg);
+                if (!MouseDownPos11.IsEmpty) {
+                    var md1 = new PointM(MouseDownPos11).ZoomAndMove(eg);
                     var mc1 = new PointM(e.X, e.Y).ZoomAndMove(eg);
                     eg.G.DrawEllipse(Pen_RotTransp, new RectangleF(md1.X - 3, md1.Y - 3, 6, 6));
                     eg.G.DrawLine(Pen_RotTransp, mc1, md1);
                 }
             }
             if (_Helper.HasFlag(enHelpers.FilledRectancle)) {
-                if (!MouseDownPos_1_1.IsEmpty) {
-                    var md1 = new PointM(MouseDownPos_1_1).ZoomAndMove(eg);
+                if (!MouseDownPos11.IsEmpty) {
+                    var md1 = new PointM(MouseDownPos11).ZoomAndMove(eg);
                     var mc1 = new PointM(e.X, e.Y).ZoomAndMove(eg);
                     RectangleF r = new(Math.Min(md1.X, e.X), Math.Min(md1.Y, e.Y), Math.Abs(md1.X - mc1.X) + 1, Math.Abs(md1.Y - mc1.Y) + 1);
                     eg.G.FillRectangle(Brush_RotTransp, r);

@@ -23,6 +23,7 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using System;
 using System.Drawing;
+using System.Linq;
 using static BlueBasics.Converter;
 using static BlueBasics.FileOperations;
 
@@ -79,13 +80,11 @@ namespace BlueControls.Classes_Editor {
             ExportVerzeichnis.Text = Item.Verzeichnis;
             ExportIntervall.Text = Item.BackupInterval.ToString();
             ExportAutomatischLöschen.Text = Item.AutoDelete.ToString();
-            cbxExportFormularID.Text = Item.ExportFormularID;
+            cbxExportFormularID.Text = Item.ExportFormularId;
             ExportSpaltenAnsicht.Text = Item.ExportSpaltenAnsicht.ToString();
             lbxFilter.Item.Clear();
-            foreach (var thisFilter in Item.Filter) {
-                if (thisFilter != null) {
-                    lbxFilter.Item.Add(thisFilter);
-                }
+            foreach (var thisFilter in Item.Filter.Where(thisFilter => thisFilter != null)) {
+                lbxFilter.Item.Add(thisFilter);
             }
             lsbExportDateien.Item.Clear();
             foreach (var t1 in Item.BereitsExportiert) {
@@ -94,7 +93,7 @@ namespace BlueControls.Classes_Editor {
                     if (!FileExists(t[0])) {
                         lsbExportDateien.Item.Add(t[0], t1, QuickImage.Get(enImageCode.Kritisch), true, "0000");
                     } else {
-                        var q1 = QuickImage.Get(enImageCode.Kugel, 16, Extensions.MixColor(Color.Red, Color.Green, DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / Item.AutoDelete).ToHTMLCode(), "");
+                        var q1 = QuickImage.Get(enImageCode.Kugel, 16, Color.Red.MixColor(Color.Green, DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / Item.AutoDelete).ToHTMLCode(), "");
                         lsbExportDateien.Item.Add(t[0], t1, q1, true, t[1].CompareKey(enSortierTyp.Datum_Uhrzeit));
                     }
                 }
@@ -227,7 +226,7 @@ namespace BlueControls.Classes_Editor {
             if (!string.IsNullOrEmpty(ExportAutomatischLöschen.Text)) {
                 Item.AutoDelete = float.Parse(ExportAutomatischLöschen.Text);
             }
-            Item.ExportFormularID = cbxExportFormularID.Text;
+            Item.ExportFormularId = cbxExportFormularID.Text;
             Item.ExportSpaltenAnsicht = int.Parse(ExportSpaltenAnsicht.Text);
             Item.Filter.Clear();
             foreach (TextListItem thisFilter in lbxFilter.Item) {

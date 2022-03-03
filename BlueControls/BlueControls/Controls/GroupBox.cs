@@ -150,18 +150,18 @@ namespace BlueControls.Controls {
                         thisControl.Height = Math.Max((int)(thisControl.Height / 22.0) * 22, 22);
                         break;
 
-                    case Line _:
+                    case Line:
                         thisControl.Top = ((int)(thisControl.Top / 22.0) * 22) + 2;
                         thisControl.Height = Math.Max((int)(thisControl.Height / 22.0) * 22, 22);
                         break;
 
-                    case Button _:
+                    case Button:
 
-                    case ComboBox _:
+                    case ComboBox:
 
-                    case ListBox _:
+                    case ListBox:
 
-                    case TextBox _:
+                    case TextBox:
                         thisControl.Top = ((int)(thisControl.Top / 22.0) * 22) + 2;
                         thisControl.Height = Math.Max((int)(thisControl.Height / 22.0) * 22, 22);
                         break;

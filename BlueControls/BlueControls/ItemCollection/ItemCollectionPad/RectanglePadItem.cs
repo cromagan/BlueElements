@@ -18,12 +18,10 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
-using BlueControls.Enums;
 using BlueControls.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using static BlueBasics.Extensions;
 
 namespace BlueControls.ItemCollection {
 
@@ -31,39 +29,39 @@ namespace BlueControls.ItemCollection {
 
         #region Fields
 
-        protected PointM p_L;
-        protected PointM p_LO;
-        protected PointM p_LU;
-        protected PointM p_O;
-        protected PointM p_R;
-        protected PointM p_RO;
-        protected PointM p_RU;
-        protected PointM p_U;
-        private int _drehwinkel = 0;
+        protected PointM? PL;
+        protected PointM? PLo;
+        protected PointM? PLu;
+        protected PointM? PO;
+        protected PointM? PR;
+        protected PointM? PRo;
+        protected PointM? PRu;
+        protected PointM? PU;
+        private int _drehwinkel;
 
         #endregion
 
         #region Constructors
 
-        public RectanglePadItem(string internalname) : base(internalname) {
-            p_LO = new PointM(this, "LO", 0, 0);
-            p_RO = new PointM(this, "RO", 0, 0);
-            p_RU = new PointM(this, "RU", 0, 0);
-            p_LU = new PointM(this, "LU", 0, 0);
-            p_L = new PointM(this, "L", 0, 0);
-            p_R = new PointM(this, "R", 0, 0);
-            p_O = new PointM(this, "O", 0, 0);
-            p_U = new PointM(this, "U", 0, 0);
-            MovablePoint.Add(p_LO);
-            MovablePoint.Add(p_RO);
-            MovablePoint.Add(p_LU);
-            MovablePoint.Add(p_RU);
-            MovablePoint.Add(p_L);
-            MovablePoint.Add(p_R);
-            MovablePoint.Add(p_U);
-            MovablePoint.Add(p_O);
-            PointsForSuccesfullyMove.Add(p_LO);
-            PointsForSuccesfullyMove.Add(p_RU);
+        protected RectanglePadItem(string internalname) : base(internalname) {
+            PLo = new PointM(this, "LO", 0, 0);
+            PRo = new PointM(this, "RO", 0, 0);
+            PRu = new PointM(this, "RU", 0, 0);
+            PLu = new PointM(this, "LU", 0, 0);
+            PL = new PointM(this, "L", 0, 0);
+            PR = new PointM(this, "R", 0, 0);
+            PO = new PointM(this, "O", 0, 0);
+            PU = new PointM(this, "U", 0, 0);
+            MovablePoint.Add(PLo);
+            MovablePoint.Add(PRo);
+            MovablePoint.Add(PLu);
+            MovablePoint.Add(PRu);
+            MovablePoint.Add(PL);
+            MovablePoint.Add(PR);
+            MovablePoint.Add(PU);
+            MovablePoint.Add(PO);
+            PointsForSuccesfullyMove.Add(PLo);
+            PointsForSuccesfullyMove.Add(PRu);
             Drehwinkel = 0;
         }
 
@@ -121,44 +119,44 @@ namespace BlueControls.ItemCollection {
                 y = point.Y;
             }
 
-            if (point == p_LO) {
-                if (e.Y) { p_O.Y = y; }
-                if (e.X) { p_L.X = x; }
+            if (point == PLo) {
+                if (e.Y) { PO.Y = y; }
+                if (e.X) { PL.X = x; }
             }
 
-            if (point == p_RO) {
-                if (e.Y) { p_O.Y = y; }
-                if (e.X) { p_R.X = x; }
+            if (point == PRo) {
+                if (e.Y) { PO.Y = y; }
+                if (e.X) { PR.X = x; }
             }
 
-            if (point == p_LU) {
-                if (e.X) { p_L.X = x; }
-                if (e.Y) { p_U.Y = y; }
+            if (point == PLu) {
+                if (e.X) { PL.X = x; }
+                if (e.Y) { PU.Y = y; }
             }
 
-            if (point == p_RU) {
-                if (e.X) { p_R.X = x; }
-                if (e.Y) { p_U.Y = y; }
+            if (point == PRu) {
+                if (e.X) { PR.X = x; }
+                if (e.Y) { PU.Y = y; }
             }
 
-            if (point == p_O && e.Y) {
-                p_LO.Y = y;
-                p_RO.Y = y;
+            if (point == PO && e.Y) {
+                PLo.Y = y;
+                PRo.Y = y;
             }
 
-            if (point == p_U && e.Y) {
-                p_LU.Y = y;
-                p_RU.Y = y;
+            if (point == PU && e.Y) {
+                PLu.Y = y;
+                PRu.Y = y;
             }
 
-            if (point == p_L && e.X) {
-                p_LO.X = x;
-                p_LU.X = x;
+            if (point == PL && e.X) {
+                PLo.X = x;
+                PLu.X = x;
             }
 
-            if (point == p_R && e.X) {
-                p_RO.X = x;
-                p_RU.X = x;
+            if (point == PR && e.X) {
+                PRo.X = x;
+                PRu.X = x;
             }
 
             SizeChanged();
@@ -168,20 +166,20 @@ namespace BlueControls.ItemCollection {
             if (!overrideFixedSize) {
                 var vr = r.PointOf(enAlignment.Horizontal_Vertical_Center);
                 var ur = UsedArea;
-                p_LO.SetTo(vr.X - (ur.Width / 2), vr.Y - (ur.Height / 2));
-                p_RU.SetTo(p_LO.X + ur.Width, p_LO.Y + ur.Height);
+                PLo.SetTo(vr.X - (ur.Width / 2), vr.Y - (ur.Height / 2));
+                PRu.SetTo(PLo.X + ur.Width, PLo.Y + ur.Height);
             } else {
-                p_LO.SetTo(r.PointOf(enAlignment.Top_Left));
-                p_RU.SetTo(r.PointOf(enAlignment.Bottom_Right));
+                PLo.SetTo(r.PointOf(enAlignment.Top_Left));
+                PRu.SetTo(r.PointOf(enAlignment.Bottom_Right));
             }
         }
 
         public virtual void SizeChanged() {
             // Punkte immer komplett setzen. Um eventuelle Parsing-Fehler auszugleichen
-            p_L.SetTo(p_LO.X, p_LO.Y + ((p_LU.Y - p_LO.Y) / 2));
-            p_R.SetTo(p_RO.X, p_LO.Y + ((p_LU.Y - p_LO.Y) / 2));
-            p_U.SetTo(p_LO.X + ((p_RO.X - p_LO.X) / 2), p_RU.Y);
-            p_O.SetTo(p_LO.X + ((p_RO.X - p_LO.X) / 2), p_RO.Y);
+            PL.SetTo(PLo.X, PLo.Y + ((PLu.Y - PLo.Y) / 2));
+            PR.SetTo(PRo.X, PLo.Y + ((PLu.Y - PLo.Y) / 2));
+            PU.SetTo(PLo.X + ((PRo.X - PLo.X) / 2), PRu.Y);
+            PO.SetTo(PLo.X + ((PRo.X - PLo.X) / 2), PRo.Y);
         }
 
         public override string ToString() {
@@ -191,8 +189,8 @@ namespace BlueControls.ItemCollection {
             return t.Trim(", ") + "}";
         }
 
-        protected override RectangleF CalculateUsedArea() => p_LO == null || p_RU == null ? RectangleF.Empty
-: new RectangleF(Math.Min(p_LO.X, p_RU.X), Math.Min(p_LO.Y, p_RU.Y), Math.Abs(p_RU.X - p_LO.X), Math.Abs(p_RU.Y - p_LO.Y));
+        protected override RectangleF CalculateUsedArea() => PLo == null || PRu == null ? RectangleF.Empty
+: new RectangleF(Math.Min(PLo.X, PRu.X), Math.Min(PLo.Y, PRu.Y), Math.Abs(PRu.X - PLo.X), Math.Abs(PRu.Y - PLo.Y));
 
         protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, bool forPrinting) {
             try {

@@ -27,8 +27,8 @@ namespace BlueControls.Forms {
 
         public static string _AutoClosedTXT = string.Empty;
         public static string _shownTXT = string.Empty;
-        private bool _Shown = false;
-        private int Counter = 0;
+        private bool _Shown;
+        private int Counter;
 
         #endregion
 
@@ -50,7 +50,7 @@ namespace BlueControls.Forms {
 
         #region Methods
 
-        public static new void Close() => Close(false);
+        public new static void Close() => Close(false);
 
         public static void Show(string Text) {
             if (Text == _shownTXT) { return; }
@@ -69,15 +69,17 @@ namespace BlueControls.Forms {
                 _AutoClosedTXT = string.Empty;
             }
             foreach (var ThisForm in AllBoxes) {
-                if (!ThisForm.IsDisposed && ThisForm is QuickInfo QI) {
-                    try {
-                        QI.timQI.Enabled = false;
-                        ThisForm.Close();
-                        Close(AutoClose);
-                        return;
-                    } catch (Exception ex) {
-                        Develop.DebugPrint(ex);
-                    }
+                if (ThisForm.IsDisposed || ThisForm is not QuickInfo QI) {
+                    continue;
+                }
+
+                try {
+                    QI.timQI.Enabled = false;
+                    ThisForm.Close();
+                    Close(AutoClose);
+                    return;
+                } catch (Exception ex) {
+                    Develop.DebugPrint(ex);
                 }
             }
         }

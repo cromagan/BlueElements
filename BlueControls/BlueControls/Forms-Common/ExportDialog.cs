@@ -38,9 +38,9 @@ namespace BlueControls.Forms {
 
         #region Fields
 
-        private readonly List<RowItem> _RowsForExport;
+        private readonly List<RowItem?> _RowsForExport;
         private readonly string _SaveTo = "";
-        private readonly string _ZielPfad = "";
+        private readonly string _ZielPfad;
         private int _ItemNrForPrint;
 
         #endregion
@@ -50,10 +50,10 @@ namespace BlueControls.Forms {
         public ExportDialog(Database db, string autosaveFile) : this(db, null, autosaveFile) {
         }
 
-        public ExportDialog(Database db, List<RowItem> rows) : this(db, rows, string.Empty) {
+        public ExportDialog(Database db, List<RowItem?> rows) : this(db, rows, string.Empty) {
         }
 
-        public ExportDialog(Database db, List<RowItem> rows, string autosaveFile) {
+        public ExportDialog(Database db, List<RowItem?> rows, string autosaveFile) {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
@@ -80,17 +80,17 @@ namespace BlueControls.Forms {
 
         #region Properties
 
-        public Database Database { get; private set; } = null;
+        public Database Database { get; private set; }
 
         #endregion
 
         #region Methods
 
-        public static void AddLayoutsOff(ItemCollectionList addHere, Database database, bool addDiskLayouts) {
+        public static void AddLayoutsOff(ItemCollectionList? addHere, Database database, bool addDiskLayouts) {
             if (database != null) {
-                for (var z = 0; z < database.Layouts.Count; z++) {
-                    ItemCollectionPad p = new(database.Layouts[z], string.Empty);
-                    addHere.Add(p.Caption, p.ID, enImageCode.Stern);
+                foreach (var t in database.Layouts) {
+                    ItemCollectionPad p = new(t, string.Empty);
+                    addHere.Add(p.Caption, p.Id, enImageCode.Stern);
                 }
             }
             if (!addDiskLayouts) { return; }
@@ -117,7 +117,7 @@ namespace BlueControls.Forms {
         /// <param name="layout"></param>
         /// <param name="rowsForExport"></param>
         /// <returns>Gibt das Item zurück, dass nicht mehr auf den Druckbereich gepasst hat</returns>
-        public static int GeneratePrintPad(CreativePad pad, int startNr, string layout, List<RowItem> rowsForExport, float abstandMM) {
+        public static int GeneratePrintPad(CreativePad pad, int startNr, string layout, List<RowItem?> rowsForExport, float abstandMM) {
             pad.Item.Clear();
             Generic.CollectGarbage();
             CreativePad tmp = new(new ItemCollectionPad(layout, rowsForExport[0].Database, rowsForExport[0].Key));
@@ -126,7 +126,7 @@ namespace BlueControls.Forms {
             pad.Item.SheetStyleScale = tmp.Item.SheetStyleScale;
             tmp.Dispose();
             var DruckB = pad.Item.DruckbereichRect();
-            var abstand = (float)Math.Round(mmToPixel(abstandMM, ItemCollectionPad.DPI), 1);
+            var abstand = (float)Math.Round(mmToPixel(abstandMM, ItemCollectionPad.Dpi), 1);
             var tempVar = Math.Max(1, (int)Math.Floor((DruckB.Width / (double)(OneItem.Width + abstand)) + 0.01));
             for (var x = 0; x < tempVar; x++) {
                 var tempVar2 = Math.Max(1, (int)Math.Floor((DruckB.Height / (double)(OneItem.Height + abstand)) + 0.01));
@@ -162,8 +162,8 @@ namespace BlueControls.Forms {
             if (ab < 1) { ab = 0; }
             if (b < 10) { b = 10; }
             if (h < 10) { h = 10; }
-            padSchachteln.Item.SheetSizeInMM = new System.Drawing.SizeF(b, h);
-            padSchachteln.Item.RandinMM = Padding.Empty;
+            padSchachteln.Item.SheetSizeInMm = new SizeF(b, h);
+            padSchachteln.Item.RandinMm = Padding.Empty;
             padSchachteln.Item.BackColor = Color.Transparent;
             GeneratePrintPad(padSchachteln, 0, cbxLayoutWahl.Text, _RowsForExport, ab);
         }
@@ -198,15 +198,15 @@ namespace BlueControls.Forms {
             if (ab < 1) { ab = 0; }
             if (b < 10) { b = 10; }
             if (h < 10) { h = 10; }
-            padSchachteln.Item.SheetSizeInMM = new System.Drawing.SizeF(b, h);
-            padSchachteln.Item.RandinMM = Padding.Empty;
+            padSchachteln.Item.SheetSizeInMm = new SizeF(b, h);
+            padSchachteln.Item.RandinMm = Padding.Empty;
             List<string> l = new();
             _ItemNrForPrint = 0;
             do {
                 var nr = _ItemNrForPrint;
                 _ItemNrForPrint = GeneratePrintPad(padSchachteln, _ItemNrForPrint, cbxLayoutWahl.Text, _RowsForExport, ab);
 
-                var x = TempFile(_ZielPfad, _RowsForExport[0].Database.Caption + "_" + b.ToString() + "x" + h.ToString() + "_" + ab.ToString(), "png");
+                var x = TempFile(_ZielPfad, _RowsForExport[0].Database.Caption + "_" + b + "x" + h + "_" + ab, "png");
                 padSchachteln.Item.BackColor = Color.Transparent;
                 padSchachteln.Item.SaveAsBitmap(x);
                 l.Add(x);

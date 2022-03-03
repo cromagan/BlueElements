@@ -19,6 +19,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using BlueControls.Extended_Text;
 using BlueControls.Interfaces;
 using BlueScript;
 using System.Collections.Generic;
@@ -36,12 +37,12 @@ namespace BlueControls.ItemCollection {
         /// <summary>
         /// Der Original-Text. Bei änderungen deses Textes wird die Variable _text_replaced ebenfalls zurückgesetzt.
         /// </summary>
-        private string _text_original;
+        private string _textOriginal;
 
         /// <summary>
         /// Kopie von _text_original - aber mit evtl. ersetzten Variablen
         /// </summary>
-        private string _text_replaced;
+        private string _textReplaced;
 
         /// <summary>
         /// Dieses Element ist nur temporär und ist der tatsächlich angezeigte Text - mit Bildern, verschieden Größen, etc.
@@ -56,8 +57,8 @@ namespace BlueControls.ItemCollection {
         public TextPadItem() : this(string.Empty, string.Empty) { }
 
         public TextPadItem(string internalname, string readableText) : base(internalname) {
-            _text_replaced = readableText;
-            _text_original = readableText;
+            _textReplaced = readableText;
+            _textOriginal = readableText;
             _ausrichtung = enAlignment.Top_Left;
             InvalidateText();
         }
@@ -85,11 +86,11 @@ namespace BlueControls.ItemCollection {
         /// </summary>
         [Description("Text der angezeigt werden soll.<br>Alternativ kann ein (oder mehrere) Variablenname im Format ~Name~ angegeben werden.")]
         public string Text {
-            get => _text_original;
+            get => _textOriginal;
             set {
-                if (value == _text_original) { return; }
-                _text_original = value;
-                _text_replaced = value;
+                if (value == _textOriginal) { return; }
+                _textOriginal = value;
+                _textReplaced = value;
                 InvalidateText();
                 SizeChanged();
                 OnChanged();
@@ -109,14 +110,14 @@ namespace BlueControls.ItemCollection {
             {
                 new FlexiControlForProperty(this, "Text", 5)
             };
-            ItemCollectionList Aursicht = new()
+            ItemCollectionList aursicht = new()
             {
                 { "Linksbündig ausrichten", ((int)enAlignment.Top_Left).ToString(), enImageCode.Linksbündig },
                 { "Zentrieren", ((int)enAlignment.Top_HorizontalCenter).ToString(), enImageCode.Zentrieren },
                 { "Rechtsbündig ausrichten", ((int)enAlignment.Top_Right).ToString(), enImageCode.Rechtsbündig }
             };
-            Aursicht.Sort();
-            l.Add(new FlexiControlForProperty(this, "Ausrichtung", Aursicht));
+            aursicht.Sort();
+            l.Add(new FlexiControlForProperty(this, "Ausrichtung", aursicht));
             l.Add(new FlexiControlForProperty(this, "Skalierung"));
             AddStyleOption(l);
             l.AddRange(base.GetStyleOptions());
@@ -127,8 +128,8 @@ namespace BlueControls.ItemCollection {
             if (base.ParseThis(tag, value)) { return true; }
             switch (tag) {
                 case "readabletext":
-                    _text_replaced = value.FromNonCritical();
-                    _text_original = _text_replaced;
+                    _textReplaced = value.FromNonCritical();
+                    _textOriginal = _textReplaced;
                     return true;
 
                 case "alignment":
@@ -152,23 +153,23 @@ namespace BlueControls.ItemCollection {
         /// <param name="s"></param>
         /// <param name="variable"></param>
         /// <returns></returns>
-        public bool ReplaceVariable(Script s, BlueScript.Variable variable) {
-            var nt = variable.ReplaceInText(_text_replaced);
+        public bool ReplaceVariable(Script s, Variable variable) {
+            var nt = variable.ReplaceInText(_textReplaced);
 
             if (nt is string txt) {
-                if (txt == _text_replaced) { return false; }
-                _text_replaced = txt;
+                if (txt == _textReplaced) { return false; }
+                _textReplaced = txt;
                 InvalidateText();
                 OnChanged();
                 return true;
-            } else {
-                return false;
             }
+
+            return false;
         }
 
         public bool ResetVariables() {
-            if (_text_original == _text_replaced) { return false; }
-            _text_replaced = _text_original;
+            if (_textOriginal == _textReplaced) { return false; }
+            _textReplaced = _textOriginal;
             InvalidateText();
             OnChanged();
             return true;
@@ -182,7 +183,7 @@ namespace BlueControls.ItemCollection {
         public override string ToString() {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
-            if (!string.IsNullOrEmpty(_text_original)) { t = t + "ReadableText=" + _text_original.ToNonCritical() + ", "; }
+            if (!string.IsNullOrEmpty(_textOriginal)) { t = t + "ReadableText=" + _textOriginal.ToNonCritical() + ", "; }
             if (Format != enDataFormat.Text) { t = t + "Format=" + (int)Format + ", "; }
             if (_ausrichtung != enAlignment.Top_Left) { t = t + "Alignment=" + (int)_ausrichtung + ", "; }
             t = t + "AdditionalScale=" + Skalierung.ToString().ToNonCritical() + ", ";
@@ -203,8 +204,8 @@ namespace BlueControls.ItemCollection {
             if (_txt != null) {
                 _txt.DrawingPos = new Point((int)(drawingCoordinates.Left - trp.X), (int)(drawingCoordinates.Top - trp.Y));
                 _txt.DrawingArea = Rectangle.Empty; // new Rectangle(drawingCoordinates.Left, drawingCoordinates.Top, drawingCoordinates.Width, drawingCoordinates.Height);
-                if (!string.IsNullOrEmpty(_text_replaced) || !forPrinting) {
-                    _txt.Draw(gr, (float)(zoom * Skalierung * Parent.SheetStyleScale));
+                if (!string.IsNullOrEmpty(_textReplaced) || !forPrinting) {
+                    _txt.Draw(gr, zoom * Skalierung * Parent.SheetStyleScale);
                 }
             }
             gr.TranslateTransform(-trp.X, -trp.Y);
@@ -228,7 +229,7 @@ namespace BlueControls.ItemCollection {
                 } else {
                     _txt = new ExtText(Stil, Parent.SheetStyle);
                 }
-                _txt.HtmlText = !string.IsNullOrEmpty(_text_replaced) ? _text_replaced : "{Text}";
+                _txt.HtmlText = !string.IsNullOrEmpty(_textReplaced) ? _textReplaced : "{Text}";
                 //// da die Font 1:1 berechnet wird, aber bei der Ausgabe evtl. skaliert,
                 //// muss etxt vorgegaukelt werden, daß der Drawberehich xxx% größer ist
                 //etxt.DrawingArea = new Rectangle((int)UsedArea().Left, (int)UsedArea().Top, (int)(UsedArea().Width / AdditionalScale / Parent.SheetStyleScale), -1);

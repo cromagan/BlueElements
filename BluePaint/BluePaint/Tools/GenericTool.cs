@@ -34,7 +34,7 @@ namespace BluePaint {
 
         #region Constructors
 
-        public GenericTool() : base() => InitializeComponent();
+        protected GenericTool() : base() => InitializeComponent();
 
         #endregion
 
@@ -64,7 +64,7 @@ namespace BluePaint {
         ///
         /// </summary>
         /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
-        public virtual void DoAdditionalDrawing(BlueControls.EventArgs.AdditionalDrawing e, Bitmap OriginalPic) { }
+        public virtual void DoAdditionalDrawing(BlueControls.EventArgs.AdditionalDrawing e, Bitmap? OriginalPic) { }
 
         public virtual void ExcuteCommand(string command) => BlueBasics.Develop.DebugPrint_RoutineMussUeberschriebenWerden();
 
@@ -79,19 +79,19 @@ namespace BluePaint {
         ///
         /// </summary>
         /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
-        public new virtual void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap OriginalPic) { }
+        public new virtual void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap? OriginalPic) { }
 
         /// <summary>
         ///
         /// </summary>
         /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
-        public new virtual void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) { }
+        public new virtual void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap? OriginalPic) { }
 
         /// <summary>
         ///
         /// </summary>
         /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
-        public new virtual void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) { }
+        public new virtual void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap? OriginalPic) { }
 
         /// <summary>
         ///
@@ -116,7 +116,7 @@ namespace BluePaint {
 
         protected virtual void OnHideMainWindow() => HideMainWindow?.Invoke(this, System.EventArgs.Empty);
 
-        protected virtual Bitmap OnNeedCurrentPic() {
+        protected virtual Bitmap? OnNeedCurrentPic() {
             BitmapEventArgs e = new(null);
             NeedCurrentPic?.Invoke(this, e);
             return e.BMP;
@@ -127,7 +127,7 @@ namespace BluePaint {
         /// Wird benutzt, wenn ein neues Bild erstellt wurde und dieses in den Speicher soll.
         /// </summary>
         /// <param name="BMP"></param>
-        protected virtual void OnOverridePic(Bitmap BMP) => OverridePic?.Invoke(this, new BitmapEventArgs(BMP));
+        protected virtual void OnOverridePic(Bitmap? BMP) => OverridePic?.Invoke(this, new BitmapEventArgs(BMP));
 
         protected virtual void OnShowMainWindow() => ShowMainWindow?.Invoke(this, System.EventArgs.Empty);
 

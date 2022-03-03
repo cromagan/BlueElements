@@ -15,18 +15,16 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
 using BlueControls.Enums;
-using System;
 using System.Drawing;
 
-namespace BlueControls {
+namespace BlueControls.Extended_Text {
 
     internal class ExtCharTopCode : ExtChar {
 
         #region Constructors
 
-        internal ExtCharTopCode(enDesign design, enStates state, BlueFont font, int stufe) : base(design, state, font, stufe) { }
+        internal ExtCharTopCode(enDesign design, enStates state, BlueFont? font, int stufe) : base(design, state, font, stufe) { }
 
         #endregion
 

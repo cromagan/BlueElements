@@ -24,7 +24,7 @@ namespace BlueControls.Forms {
 
         #region Fields
 
-        private string _giveBack = string.Empty;
+        private string _giveBack;
 
         #endregion
 

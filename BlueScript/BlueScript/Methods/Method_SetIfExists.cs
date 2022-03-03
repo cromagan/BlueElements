@@ -46,11 +46,13 @@ namespace BlueScript {
             if (attvar.Attributes[0].Readonly) { return strDoItFeedback.Schreibgschützt(); }
 
             for (var z = 1; z < attvar.Attributes.Count; z++) {
-                if (attvar.Attributes[z].Type != enVariableDataType.Error) {
-                    if (attvar.Attributes[z].Type != attvar.Attributes[0].Type) { return new strDoItFeedback("Variablentyp zur Ausgangsvariable unterschiedlich."); }
-                    attvar.Attributes[0].ValueString = attvar.Attributes[z].ValueString;
-                    return strDoItFeedback.Null();
+                if (attvar.Attributes[z].Type == enVariableDataType.Error) {
+                    continue;
                 }
+
+                if (attvar.Attributes[z].Type != attvar.Attributes[0].Type) { return new strDoItFeedback("Variablentyp zur Ausgangsvariable unterschiedlich."); }
+                attvar.Attributes[0].ValueString = attvar.Attributes[z].ValueString;
+                return strDoItFeedback.Null();
             }
 
             return strDoItFeedback.Null();

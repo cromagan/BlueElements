@@ -43,7 +43,7 @@ namespace BlueScript {
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.Falsch(); }
-            var ok = DateTimeTryParse(attvar.Attributes[0].ValueString, out var _);
+            var ok = DateTimeTryParse(attvar.Attributes[0].ValueString, out _);
             return ok ? strDoItFeedback.Wahr() : strDoItFeedback.Falsch();
         }
 

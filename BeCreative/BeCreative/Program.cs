@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows.Forms;
 
-namespace WindowsFormsApp1 {
+namespace BeCreative {
 
     internal static class Program {
 
@@ -14,7 +14,7 @@ namespace WindowsFormsApp1 {
         [STAThread]
         private static void Main() {
             Application.EnableVisualStyles();
-            var culture = new System.Globalization.CultureInfo("de-DE");
+            var culture = new CultureInfo("de-DE");
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
             Application.SetCompatibleTextRenderingDefault(false);

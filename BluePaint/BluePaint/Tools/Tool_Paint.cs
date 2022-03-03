@@ -31,17 +31,17 @@ namespace BluePaint {
 
         #region Methods
 
-        public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap OriginalPic) {
+        public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap? OriginalPic) {
             var c = Color.FromArgb(50, 255, 0, 0);
             e.FillCircle(c, e.Current.TrimmedX, e.Current.TrimmedY, 2);
         }
 
-        public override void MouseDown(MouseEventArgs1_1 e, Bitmap OriginalPic) {
+        public override void MouseDown(MouseEventArgs1_1 e, Bitmap? OriginalPic) {
             OnForceUndoSaving();
             MouseMove(new MouseEventArgs1_1DownAndCurrent(e, e), OriginalPic);
         }
 
-        public override void MouseMove(MouseEventArgs1_1DownAndCurrent e, Bitmap OriginalPic) {
+        public override void MouseMove(MouseEventArgs1_1DownAndCurrent e, Bitmap? OriginalPic) {
             if (e.Current.Button == System.Windows.Forms.MouseButtons.Left) {
                 var _Pic = OnNeedCurrentPic();
                 FillCircle(_Pic, Color.Black, e.Current.TrimmedX, e.Current.TrimmedY, 2);

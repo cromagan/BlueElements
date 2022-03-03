@@ -24,6 +24,7 @@ using BlueDatabase;
 using BlueDatabase.EventArgs;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BlueControls.BlueDatabaseDialogs {
 
@@ -114,14 +115,12 @@ namespace BlueControls.BlueDatabaseDialogs {
             var SuchText = Alt.Text.Replace(";cr;", "\r").Replace(";tab;", "\t");
             var ErsetzText = Neu.Text.Replace(";cr;", "\r").Replace(";tab;", "\t");
             _BlueTable.Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
-            List<ColumnItem> sp = new();
+            List<ColumnItem?> sp = new();
             List<RowItem> ro = new();
             if (NurinAktuellerSpalte.Checked) {
                 sp.Add(_BlueTable.CursorPosColumn());
             } else {
-                foreach (var ThisColumn in _BlueTable.Database.Column) {
-                    if (ThisColumn != null && ThisColumn.Format.CanBeChangedByRules()) { sp.Add(ThisColumn); }
-                }
+                sp.AddRange(_BlueTable.Database.Column.Where(ThisColumn => ThisColumn != null && ThisColumn.Format.CanBeChangedByRules()));
             }
             foreach (var ThisRow in _BlueTable.Database.Row) {
                 if (ThisRow != null) {
@@ -154,7 +153,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                         } else if (ErsetzeKomplett.Checked) {
                             GeändeterText = ErsetzText;
                         } else if (FügeHinzu.Checked) {
-                            List<string> tmp = new(OriginalText.SplitAndCutByCR())
+                            List<string?> tmp = new(OriginalText.SplitAndCutByCR())
                             {
                                 ErsetzText
                             };

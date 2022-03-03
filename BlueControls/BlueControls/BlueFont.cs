@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
+using System.Linq;
 
 namespace BlueControls {
 
@@ -31,7 +32,7 @@ namespace BlueControls {
 
         #region Fields
 
-        private static readonly List<BlueFont> _FontsAll = new();
+        private static readonly List<BlueFont?> _FontsAll = new();
 
         private readonly SizeF[] _CharSize;
         private string _Code;
@@ -47,14 +48,14 @@ namespace BlueControls {
         private Font _FontOL;
 
         private float _KapitälchenPlus = -1;
-        private QuickImage _NameInStyle_sym;
+        private QuickImage? _NameInStyle_sym;
         private float _Oberlänge = -1;
         private Pen _Pen;
         private BitmapExt _SampleText_sym;
         private float _sizeTestedAndFailed = float.MaxValue;
         private float _sizeTestedAndOk = float.MinValue;
-        private QuickImage _SymbolForReadableText_sym;
-        private QuickImage _SymbolOfLine_sym;
+        private QuickImage? _SymbolForReadableText_sym;
+        private QuickImage? _SymbolOfLine_sym;
         private float _WidthOf2Points;
         private int _Zeilenabstand = -1;
 
@@ -144,19 +145,19 @@ namespace BlueControls {
             }
         }
 
-        public static BlueFont Get(FontFamily font, float fontSize) => Get(font.Name, fontSize, false, false, false, false, false, "000000", "FFFFFF", false, false, false);
+        public static BlueFont? Get(FontFamily font, float fontSize) => Get(font.Name, fontSize, false, false, false, false, false, "000000", "FFFFFF", false, false, false);
 
-        public static BlueFont Get(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, bool outLine, string color_Main, string color_Outline, bool kapitälchen, bool onlyUpper, bool onlyLower) => Get(ToString(fontName, fontSize, bold, italic, underline, strikeout, outLine, color_Main, color_Outline, kapitälchen, onlyUpper, onlyLower));
+        public static BlueFont? Get(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, bool outLine, string color_Main, string color_Outline, bool kapitälchen, bool onlyUpper, bool onlyLower) => Get(ToString(fontName, fontSize, bold, italic, underline, strikeout, outLine, color_Main, color_Outline, kapitälchen, onlyUpper, onlyLower));
 
-        public static BlueFont Get(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, bool outLine, Color color_Main, Color color_Outline, bool kapitälchen, bool onlyUpper, bool onlyLower) => Get(fontName, fontSize, bold, italic, underline, strikeout, outLine, color_Main.ToHTMLCode(), color_Outline.ToHTMLCode(), kapitälchen, onlyUpper, onlyLower);
+        public static BlueFont? Get(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, bool outLine, Color color_Main, Color color_Outline, bool kapitälchen, bool onlyUpper, bool onlyLower) => Get(fontName, fontSize, bold, italic, underline, strikeout, outLine, color_Main.ToHTMLCode(), color_Outline.ToHTMLCode(), kapitälchen, onlyUpper, onlyLower);
 
-        public static BlueFont Get(string code) {
+        public static BlueFont? Get(string code) {
             if (string.IsNullOrEmpty(code)) { return null; }
             if (!code.Contains("{")) { code = "{Name=Arial, Size=10, Color=ff0000}"; }
             var searchcode = code.ToUpper().Replace(" ", "");
             try {
-                foreach (var Thisfont in _FontsAll) {
-                    if (Thisfont.ToString().Replace(" ", "").ToUpper() == searchcode) { return Thisfont; }
+                foreach (var Thisfont in _FontsAll.Where(Thisfont => Thisfont.ToString().Replace(" ", "").ToUpper() == searchcode)) {
+                    return Thisfont;
                 }
             } catch {
                 return Get(code);
@@ -268,7 +269,7 @@ namespace BlueControls {
 
         public SizeF MeasureString(string text, StringFormat stringFormat) => MeasureString(text, _FontOL, stringFormat);
 
-        public QuickImage NameInStyle() {
+        public QuickImage? NameInStyle() {
             if (_NameInStyle_sym != null) { return _NameInStyle_sym; }
 
             var n = "FontName-" + ToString();
@@ -301,7 +302,7 @@ namespace BlueControls {
             return _SampleText_sym;
         }
 
-        public QuickImage SymbolForReadableText() {
+        public QuickImage? SymbolForReadableText() {
             if (_SymbolForReadableText_sym != null) { return _SymbolForReadableText_sym; }
 
             var n = "Font-" + ToString();
@@ -311,7 +312,7 @@ namespace BlueControls {
             return _SymbolForReadableText_sym;
         }
 
-        public QuickImage SymbolOfLine() {
+        public QuickImage? SymbolOfLine() {
             if (_SymbolOfLine_sym != null) { return _SymbolOfLine_sym; }
 
             BitmapExt bmp = new(32, 12);
@@ -339,7 +340,7 @@ namespace BlueControls {
                 if (_CharSize[c].Height <= 0) {
                     _CharSize[c] = Compute_Size(c);
                 }
-                return _CharSize[c].Width < 1 && c > 30 ? _CharSize[c] : _CharSize[c];
+                return _CharSize[c].Width < 1 && c > 30 ? Compute_Size(c) : _CharSize[c];
             }
             return Compute_Size(c);
         }
@@ -367,7 +368,7 @@ namespace BlueControls {
 
         internal float Oberlänge(float zoom) => _Oberlänge * zoom;
 
-        internal BlueFont Scale(double zoom) => Math.Abs(1 - zoom) < 0.01 ? this : Get(FontName, (float)(FontSize * zoom), Bold, Italic, Underline, StrikeOut, Outline, Color_Main, Color_Outline, Kapitälchen, OnlyUpper, OnlyLower);
+        internal BlueFont? Scale(double zoom) => Math.Abs(1 - zoom) < 0.01 ? this : Get(FontName, (float)(FontSize * zoom), Bold, Italic, Underline, StrikeOut, Outline, Color_Main, Color_Outline, Kapitälchen, OnlyUpper, OnlyLower);
 
         internal List<string> SplitByWidth(string text, float maxWidth, int maxLines) {
             List<string> _broken = new();

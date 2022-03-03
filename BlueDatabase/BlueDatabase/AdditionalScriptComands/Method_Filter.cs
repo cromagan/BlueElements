@@ -45,13 +45,13 @@ namespace BlueScript {
 
         #region Methods
 
-        public static List<FilterItem> ObjectToFilter(List<Variable> attributes, int ab) {
+        public static List<FilterItem>? ObjectToFilter(List<Variable?>? attributes, int ab) {
             var allFi = new List<FilterItem>();
 
             for (var z = ab; z < attributes.Count; z++) {
                 if (!attributes[z].ObjectType("rowfilter")) { return null; } // new strDoItFeedback("Kein Filter übergeben.");
 
-                var fi = new BlueDatabase.FilterItem(attributes[z].ObjectData());
+                var fi = new FilterItem(attributes[z].ObjectData());
 
                 if (!fi.IsOk()) { return null; }// new strDoItFeedback("Filter fehlerhaft"); }
 
@@ -94,7 +94,7 @@ namespace BlueScript {
 
             #endregion
 
-            var fii = new BlueDatabase.FilterItem(filterColumn, filtertype, attvar.Attributes[3].ValueString);
+            var fii = new FilterItem(filterColumn, filtertype, attvar.Attributes[3].ValueString);
             return new strDoItFeedback(fii.ToString(true), "rowfilter");
         }
 

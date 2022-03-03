@@ -21,7 +21,7 @@ namespace BluePaint.EventArgs {
 
         #region Constructors
 
-        public CommandForMacroArgs(string Command) => this.Command = Command;
+        public CommandForMacroArgs(string command) => Command = command;
 
         #endregion
 

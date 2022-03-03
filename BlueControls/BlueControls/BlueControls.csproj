@@ -26,7 +26,7 @@
     <CodeAnalysisRuleSet>
     </CodeAnalysisRuleSet>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	<Nullable>enable</Nullable>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -37,7 +37,7 @@
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>
     </CodeAnalysisRuleSet>
-	<Nullable>enable</Nullable>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -49,7 +49,7 @@
     <CodeAnalysisRuleSet>
     </CodeAnalysisRuleSet>
     <RunCodeAnalysis>false</RunCodeAnalysis>
-	<Nullable>enable</Nullable>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\x86\Release\</OutputPath>
@@ -60,7 +60,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>
     </CodeAnalysisRuleSet>
-	<Nullable>enable</Nullable>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="FastColoredTextBox, Version=2.16.24.0, Culture=neutral, PublicKeyToken=fb8aa12b994ef61b, processorArchitecture=MSIL">
@@ -201,12 +201,6 @@
     <Compile Include="Forms-Basics\DialogWithOkAndCancel.Designer.cs">
       <DependentUpon>DialogWithOkAndCancel.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms-Common\EditBoxFlexiControls.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms-Common\EditBoxFlexiControls.Designer.cs">
-      <DependentUpon>EditBoxFlexiControls.cs</DependentUpon>
-    </Compile>
     <Compile Include="Forms-Common\EditBoxRow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -300,7 +294,6 @@
     <Compile Include="Forms-Common\Notification.Designer.cs">
       <DependentUpon>Notification.cs</DependentUpon>
     </Compile>
-    <Compile Include="Interfaces\ILastSavedBy.cs" />
     <Compile Include="ItemCollection\clsConnection.cs" />
     <Compile Include="ItemCollection\clsPhysicPadItem.cs" />
     <Compile Include="ItemCollection\clsAbstractPhysicPadItem.cs" />
@@ -701,10 +694,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms-Basics\DialogWithOkAndCancel.resx">
       <DependentUpon>DialogWithOkAndCancel.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Common\EditBoxFlexiControls.resx">
-      <DependentUpon>EditBoxFlexiControls.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms-Common\EditBoxRow.resx">

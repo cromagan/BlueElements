@@ -44,32 +44,26 @@ namespace BlueScript {
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
             switch (attvar.Attributes[1].ValueString.ToLower()) {
                 case "num":
-                    if (attvar.Attributes[0].Type == enVariableDataType.Numeral) { return strDoItFeedback.Wahr(); }
-                    return strDoItFeedback.Falsch();
+                    return attvar.Attributes[0].Type == enVariableDataType.Numeral ? strDoItFeedback.Wahr() : strDoItFeedback.Falsch();
 
                 case "str":
-                    if (attvar.Attributes[0].Type == enVariableDataType.String) { return strDoItFeedback.Wahr(); }
-                    return strDoItFeedback.Falsch();
+                    return attvar.Attributes[0].Type == enVariableDataType.String ? strDoItFeedback.Wahr() : strDoItFeedback.Falsch();
 
                 case "lst":
-                    if (attvar.Attributes[0].Type == enVariableDataType.List) { return strDoItFeedback.Wahr(); }
-                    return strDoItFeedback.Falsch();
+                    return attvar.Attributes[0].Type == enVariableDataType.List ? strDoItFeedback.Wahr() : strDoItFeedback.Falsch();
                 //
                 case "dat":
                 //    if (attvar.Attributes[0].Type == enVariableDataType.Date) { return strDoItFeedback.Wahr(); }
                 //    return strDoItFeedback.Falsch();
 
                 case "bol":
-                    if (attvar.Attributes[0].Type == enVariableDataType.Bool) { return strDoItFeedback.Wahr(); }
-                    return strDoItFeedback.Falsch();
+                    return attvar.Attributes[0].Type == enVariableDataType.Bool ? strDoItFeedback.Wahr() : strDoItFeedback.Falsch();
 
                 case "err":
-                    if (attvar.Attributes[0].Type == enVariableDataType.Error) { return strDoItFeedback.Wahr(); }
-                    return strDoItFeedback.Falsch();
+                    return attvar.Attributes[0].Type == enVariableDataType.Error ? strDoItFeedback.Wahr() : strDoItFeedback.Falsch();
 
                 case "ukn":
-                    if (attvar.Attributes[0].Type == enVariableDataType.NotDefinedYet) { return strDoItFeedback.Wahr(); }
-                    return strDoItFeedback.Falsch();
+                    return attvar.Attributes[0].Type == enVariableDataType.NotDefinedYet ? strDoItFeedback.Wahr() : strDoItFeedback.Falsch();
 
                 default:
                     return new strDoItFeedback("Es wir als zweites Attribut ein String mit dem Inhalt num, str, lst, dat, bol, err oder ukn erwartet.");

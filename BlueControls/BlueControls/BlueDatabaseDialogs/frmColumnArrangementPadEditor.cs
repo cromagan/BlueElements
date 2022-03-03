@@ -18,12 +18,11 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
+using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.ItemCollection;
 using BlueDatabase;
-using static BlueBasics.FileOperations;
-using BlueControls.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -35,11 +34,11 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         #region Fields
 
-        public readonly Database? Database = null;
+        public readonly Database? Database;
 
-        public bool Generating = false;
+        public bool Generating;
 
-        public bool Sorting = false;
+        public bool Sorting;
 
         private int Arrangement = -1;
 
@@ -62,7 +61,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         #region Properties
 
-        public ColumnViewCollection CurrentArrangement => Database == null || Database.ColumnArrangements == null || Database.ColumnArrangements.Count <= Arrangement
+        public ColumnViewCollection CurrentArrangement => Database?.ColumnArrangements == null || Database.ColumnArrangements.Count <= Arrangement
                     ? null
                     : Database.ColumnArrangements[Arrangement];
 
@@ -75,8 +74,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             base.OnFormClosed(e);
         }
 
+        private static void TmpDatabase_ShouldICancelDiscOperations(object sender, System.ComponentModel.CancelEventArgs e) => e.Cancel = true;
+
         private void btnAktuelleAnsichtLoeschen_Click(object sender, System.EventArgs e) {
-            if (Arrangement < 2 || Arrangement >= Database.ColumnArrangements.Count) { return; }
+            if (Database == null || Arrangement < 2 || Arrangement >= Database.ColumnArrangements.Count) { return; }
             if (MessageBox.Show("Anordung <b>'" + CurrentArrangement.Name + "'</b><br>wirklich löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
             Database.ColumnArrangements.RemoveAt(Arrangement);
             Arrangement = 1;
@@ -243,9 +244,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                                     var rkcolit = (ColumnPadItem)Pad.Item[rkcol.Name];
 
                                     //...und auf die Datenbank zeigen lassen, wenn diese existiert
-                                    if (rkcolit != null) {
-                                        rkcolit.ConnectsTo.AddIfNotExists(new clsConnection(databItem, enConnectionType.Bottom, enConnectionType.Top));
-                                    }
+                                    rkcolit?.ConnectsTo.AddIfNotExists(new clsConnection(databItem, enConnectionType.Bottom, enConnectionType.Top));
                                 }
                             }
 
@@ -261,9 +260,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                             kx = it2.UsedArea.Right;
 
                             // und noch die Datenbank  auf die Spalte zeigen lassem
-                            if (databItem != null) {
-                                databItem.ConnectsTo.AddIfNotExists(new clsConnection(it, enConnectionType.Bottom, enConnectionType.Top));
-                            }
+                            databItem?.ConnectsTo.AddIfNotExists(new clsConnection(it, enConnectionType.Bottom, enConnectionType.Top));
                         }
 
                         #endregion
@@ -286,19 +283,18 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (Sorting) { Develop.DebugPrint("Sorting falsch!"); }
             Sorting = true;
             var done = new List<BasicPadItem>();
-            FixedRectangleBitmapPadItem x;
             var left = 0f;
             do {
-                x = null;
+                FixedRectangleBitmapPadItem x = null;
 
                 foreach (var thisIt in Pad.Item) {
-                    if (!done.Contains(thisIt) && thisIt is ColumnPadItem fi)
-
+                    if (!done.Contains(thisIt) && thisIt is ColumnPadItem fi) {
                         if (fi.Column.Database == Database) {
                             if (x == null || thisIt.UsedArea.X < x.UsedArea.X) {
                                 x = fi;
                             }
                         }
+                    }
                 }
 
                 if (x == null) { break; }
@@ -309,8 +305,6 @@ namespace BlueControls.BlueDatabaseDialogs {
 
             Sorting = false;
         }
-
-        private void TmpDatabase_ShouldICancelDiscOperations(object sender, System.ComponentModel.CancelEventArgs e) => e.Cancel = true;
 
         private void UpdateCombobox() => Table.WriteColumnArrangementsInto(cbxInternalColumnArrangementSelector, Database, Arrangement);
 

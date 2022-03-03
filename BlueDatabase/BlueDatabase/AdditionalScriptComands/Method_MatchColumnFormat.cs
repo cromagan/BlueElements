@@ -18,6 +18,7 @@
 using BlueDatabase.Interfaces;
 using Skript.Enums;
 using System.Collections.Generic;
+using System.Linq;
 using static BlueBasics.Extensions;
 
 namespace BlueScript {
@@ -46,7 +47,7 @@ namespace BlueScript {
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
 
             var column = Column(s, attvar.Attributes[1].Name);
-            if (column == null) { new strDoItFeedback("Spalte in Datenbank nicht gefunden"); }
+            if (column == null) { return new strDoItFeedback("Spalte in Datenbank nicht gefunden"); }
 
             var tocheck = new List<string>();
             if (attvar.Attributes[0].Type == enVariableDataType.List) {
@@ -57,8 +58,8 @@ namespace BlueScript {
 
             tocheck = tocheck.SortedDistinctList();
 
-            foreach (var thisstring in tocheck) {
-                if (!thisstring.IsFormat(column)) { return strDoItFeedback.Falsch(); }
+            if (tocheck.Any(thisstring => !thisstring.IsFormat(column))) {
+                return strDoItFeedback.Falsch();
             }
 
             return strDoItFeedback.Wahr();

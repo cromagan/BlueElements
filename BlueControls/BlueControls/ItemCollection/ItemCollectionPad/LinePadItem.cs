@@ -23,6 +23,7 @@ using BlueControls.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using static BlueBasics.Geometry;
 
 namespace BlueControls.ItemCollection {
@@ -31,15 +32,14 @@ namespace BlueControls.ItemCollection {
 
         #region Fields
 
-        internal PointM Point1;
+        internal PointM? Point1;
 
-        internal PointM Point2;
+        internal PointM? Point2;
 
-        private DateTime _LastRecalc = DateTime.Now.AddHours(-1);
+        private string _calcTempPointsCode = string.Empty;
+        private DateTime _lastRecalc = DateTime.Now.AddHours(-1);
 
-        private List<PointF>? _TempPoints;
-
-        private string CalcTempPoints_Code = string.Empty;
+        private List<PointF> _tempPoints;
 
         #endregion
 
@@ -58,7 +58,7 @@ namespace BlueControls.ItemCollection {
             MovablePoint.Add(Point2);
             PointsForSuccesfullyMove.AddRange(MovablePoint);
             Stil = format;
-            _TempPoints = new List<PointF>();
+            _tempPoints = new List<PointF>();
             Linien_Verhalten = enConectorStyle.Direct;
         }
 
@@ -75,10 +75,10 @@ namespace BlueControls.ItemCollection {
         public override bool Contains(PointF value, float zoomfactor) {
             var ne = 5 / zoomfactor;
             if (Point1.X == 0d && Point2.X == 0d && Point1.Y == 0d && Point2.Y == 0d) { return false; }
-            if (_TempPoints.Count == 0) { CalcTempPoints(); }
-            if (_TempPoints.Count == 0) { return false; }
-            for (var z = 0; z <= _TempPoints.Count - 2; z++) {
-                if (value.DistanzZuStrecke(_TempPoints[z], _TempPoints[z + 1]) < ne) { return true; }
+            if (_tempPoints != null && _tempPoints.Count == 0) { CalcTempPoints(); }
+            if (_tempPoints != null && _tempPoints.Count == 0) { return false; }
+            for (var z = 0; z <= _tempPoints.Count - 2; z++) {
+                if (value.DistanzZuStrecke(_tempPoints[z], _tempPoints[z + 1]) < ne) { return true; }
             }
             return false;
         }
@@ -97,13 +97,13 @@ namespace BlueControls.ItemCollection {
         //}
         public override List<FlexiControl> GetStyleOptions() {
             List<FlexiControl> l = new();
-            ItemCollectionList Verhalt = new()
+            ItemCollectionList verhalt = new()
             {
                 { "Linie direkt zwischen zwei Punkten", ((int)enConectorStyle.Direct).ToString(), QuickImage.Get(enImageCode.Linie) },
                 { "Linie soll Objekten ausweichen", ((int)enConectorStyle.Ausweichenx).ToString(), QuickImage.Get(enImageCode.Linie) },
                 { "Linie soll Objekten ausweichen und rechtwinklig sein", ((int)enConectorStyle.AusweichenUndGerade).ToString(), QuickImage.Get(enImageCode.Linie) }
             };
-            l.Add(new FlexiControlForProperty(this, "Linien-Verhalten", Verhalt));
+            l.Add(new FlexiControlForProperty(this, "Linien-Verhalten", verhalt));
             AddLineStyleOption(l);
             l.AddRange(base.GetStyleOptions());
             return l;
@@ -150,17 +150,17 @@ namespace BlueControls.ItemCollection {
 
         protected override RectangleF CalculateUsedArea() {
             if (Point1.X == 0d && Point2.X == 0d && Point1.Y == 0d && Point2.Y == 0d) { return RectangleF.Empty; }
-            if (_TempPoints.Count == 0) { CalcTempPoints(); }
-            if (_TempPoints.Count == 0) { return RectangleF.Empty; }
+            if (_tempPoints.Count == 0) { CalcTempPoints(); }
+            if (_tempPoints.Count == 0) { return RectangleF.Empty; }
             var x1 = float.MaxValue;
             var y1 = float.MaxValue;
             var x2 = float.MinValue;
             var y2 = float.MinValue;
-            foreach (var ThisPoint in _TempPoints) {
-                x1 = Math.Min(ThisPoint.X, x1);
-                y1 = Math.Min(ThisPoint.Y, y1);
-                x2 = Math.Max(ThisPoint.X, x2);
-                y2 = Math.Max(ThisPoint.Y, y2);
+            foreach (var thisPoint in _tempPoints) {
+                x1 = Math.Min(thisPoint.X, x1);
+                y1 = Math.Min(thisPoint.Y, y1);
+                x2 = Math.Max(thisPoint.X, x2);
+                y2 = Math.Max(thisPoint.Y, y2);
             }
             return new RectangleF(x1, y1, x2 - x1, y2 - y1);
             //Return New Rectangle(CInt(Math.Min(Point1.X, Point2.X)), CInt(Math.Min(Point1.Y, Point2.Y)), CInt(Math.Abs(Point2.X - Point1.X)), CInt(Math.Abs(Point2.Y - Point1.Y)))
@@ -171,51 +171,73 @@ namespace BlueControls.ItemCollection {
         protected override void DrawExplicit(Graphics gr, RectangleF drawingCoordinates, float zoom, float shiftX, float shiftY, bool forPrinting) {
             if (Stil == PadStyles.Undefiniert) { return; }
             CalcTempPoints();
-            if (_TempPoints.Count == 0) { return; }
-            for (var z = 0; z <= _TempPoints.Count - 2; z++) {
-                gr.DrawLine(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(zoom * Parent.SheetStyleScale), _TempPoints[z].ZoomAndMove(zoom, shiftX, shiftY), _TempPoints[z + 1].ZoomAndMove(zoom, shiftX, shiftY));
+            if (_tempPoints.Count == 0) { return; }
+            for (var z = 0; z <= _tempPoints.Count - 2; z++) {
+                gr.DrawLine(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(zoom * Parent.SheetStyleScale), _tempPoints[z].ZoomAndMove(zoom, shiftX, shiftY), _tempPoints[z + 1].ZoomAndMove(zoom, shiftX, shiftY));
             }
         }
 
         protected override void ParseFinished() { }
 
-        private bool Begradige(int P1) {
-            if (P1 >= _TempPoints.Count - 1) { return false; }
-            if ((int)_TempPoints[P1].X == (int)_TempPoints[P1 + 1].X || (int)_TempPoints[P1].Y == (int)_TempPoints[P1 + 1].Y) { return false; }
-            PointF NP1;
-            PointF NP2;
-            if ((int)(_TempPoints[P1].X - _TempPoints[P1 + 1].X) > (int)(_TempPoints[P1].Y - _TempPoints[P1 + 1].Y)) {
-                NP1 = new PointF(_TempPoints[P1].X, (_TempPoints[P1].Y + _TempPoints[P1 + 1].Y) / 2);
-                NP2 = new PointF(_TempPoints[P1 + 1].X, (_TempPoints[P1].Y + _TempPoints[P1 + 1].Y) / 2);
-                _TempPoints.Insert(P1 + 1, NP1);
-                _TempPoints.Insert(P1 + 2, NP2);
+        private static bool SchneidetDas(BasicPadItem thisBasicItem, PointM p1, PointM p2) {
+            if (thisBasicItem == null) { return false; }
+            if (thisBasicItem is not LinePadItem) {
+                var a = thisBasicItem.UsedArea;
+                if (a.Width > 0 && a.Height > 0) {
+                    a.Inflate(2, 2);
+
+                    PointF tP1 = p1;
+                    PointF tP2 = p2;
+                    var lo = a.PointOf(enAlignment.Top_Left);
+                    var ro = a.PointOf(enAlignment.Top_Right);
+                    var lu = a.PointOf(enAlignment.Bottom_Left);
+                    var ru = a.PointOf(enAlignment.Bottom_Right);
+                    if (!LinesIntersect(tP1, tP2, lo, ro, true).IsEmpty ||
+                        !LinesIntersect(tP1, tP2, lu, ru, true).IsEmpty ||
+                        !LinesIntersect(tP1, tP2, lo, lu, true).IsEmpty ||
+                        !LinesIntersect(tP1, tP2, ro, ru, true).IsEmpty) { return true; }
+                }
+            }
+            return false;
+        }
+
+        private bool Begradige(int p1) {
+            if (p1 >= _tempPoints.Count - 1) { return false; }
+            if ((int)_tempPoints[p1].X == (int)_tempPoints[p1 + 1].X || (int)_tempPoints[p1].Y == (int)_tempPoints[p1 + 1].Y) { return false; }
+            PointF np1;
+            PointF np2;
+            if ((int)(_tempPoints[p1].X - _tempPoints[p1 + 1].X) > (int)(_tempPoints[p1].Y - _tempPoints[p1 + 1].Y)) {
+                np1 = new PointF(_tempPoints[p1].X, (_tempPoints[p1].Y + _tempPoints[p1 + 1].Y) / 2);
+                np2 = new PointF(_tempPoints[p1 + 1].X, (_tempPoints[p1].Y + _tempPoints[p1 + 1].Y) / 2);
+                _tempPoints.Insert(p1 + 1, np1);
+                _tempPoints.Insert(p1 + 2, np2);
             } else {
-                NP1 = new PointF((_TempPoints[P1].X + _TempPoints[P1 + 1].X) / 2, _TempPoints[P1].Y);
-                NP2 = new PointF((_TempPoints[P1].X + _TempPoints[P1 + 1].X) / 2, _TempPoints[P1 + 1].Y);
-                _TempPoints.Insert(P1 + 1, NP1);
-                _TempPoints.Insert(P1 + 2, NP2);
+                np1 = new PointF((_tempPoints[p1].X + _tempPoints[p1 + 1].X) / 2, _tempPoints[p1].Y);
+                np2 = new PointF((_tempPoints[p1].X + _tempPoints[p1 + 1].X) / 2, _tempPoints[p1 + 1].Y);
+                _tempPoints.Insert(p1 + 1, np1);
+                _tempPoints.Insert(p1 + 2, np2);
             }
             return true;
         }
 
         private void CalcTempPoints() {
-            var NewCode = Point1 + Point2.ToString();
-            if (CalcTempPoints_Code != NewCode) {
-                CalcTempPoints_Code = NewCode;
-                _TempPoints = null;
+            var newCode = Point1 + Point2.ToString();
+            if (_calcTempPointsCode != newCode) {
+                _calcTempPointsCode = newCode;
+                _tempPoints = null;
             }
-            if (Linien_Verhalten != enConectorStyle.Direct && _TempPoints != null) {
-                if (DateTime.Now.Subtract(_LastRecalc).TotalSeconds > 5) {
-                    if (DateTime.Now.Subtract(_LastRecalc).TotalSeconds > 5 + Constants.GlobalRND.Next(10)) {
-                        _TempPoints = null;
+            if (Linien_Verhalten != enConectorStyle.Direct && _tempPoints != null) {
+                if (DateTime.Now.Subtract(_lastRecalc).TotalSeconds > 5) {
+                    if (DateTime.Now.Subtract(_lastRecalc).TotalSeconds > 5 + Constants.GlobalRND.Next(10)) {
+                        _tempPoints = null;
                     }
                     // r = Nothing
                 }
             }
-            if (_TempPoints != null && _TempPoints.Count > 1) { return; }
-            _LastRecalc = DateTime.Now;
-            CalcTempPoints_Code = NewCode;
-            _TempPoints = new List<PointF>
+            if (_tempPoints != null && _tempPoints.Count > 1) { return; }
+            _lastRecalc = DateTime.Now;
+            _calcTempPointsCode = newCode;
+            _tempPoints = new List<PointF>
             {
                 Point1,
                 Point2
@@ -225,10 +247,10 @@ namespace BlueControls.ItemCollection {
             do {
                 count++;
                 var again = false;
-                if (_TempPoints.Count > 100) {
+                if (_tempPoints.Count > 100) {
                     break;
                 }
-                for (var z = 0; z < _TempPoints.Count; z++) {
+                for (var z = 0; z < _tempPoints.Count; z++) {
                     if (LöscheVerdeckte(z)) {
                         again = true;
                         break;
@@ -253,14 +275,14 @@ namespace BlueControls.ItemCollection {
             } while (true);
         }
 
-        private bool IsVerdeckt(float X, float Y) {
-            foreach (var ThisBasicItem in Parent) {
-                if (ThisBasicItem != null) {
-                    if (ThisBasicItem is not LinePadItem) {
-                        var a = ThisBasicItem.UsedArea;
+        private bool IsVerdeckt(float x, float y) {
+            foreach (var thisBasicItem in Parent) {
+                if (thisBasicItem != null) {
+                    if (thisBasicItem is not LinePadItem) {
+                        var a = thisBasicItem.UsedArea;
                         if (a.Width > 0 && a.Height > 0) {
                             a.Inflate(2, 2);
-                            if (a.Contains(X, Y)) { return true; }
+                            if (a.Contains(x, y)) { return true; }
                         }
                     }
                 }
@@ -268,87 +290,62 @@ namespace BlueControls.ItemCollection {
             return false;
         }
 
-        private bool LöscheVerdeckte(int P1) {
-            if (_TempPoints[P1].Equals(Point1)) { return false; }
-            if (_TempPoints[P1].Equals(Point2)) { return false; }
+        private bool LöscheVerdeckte(int p1) {
+            if (_tempPoints[p1].Equals(Point1)) { return false; }
+            if (_tempPoints[p1].Equals(Point2)) { return false; }
 
-            if (IsVerdeckt(_TempPoints[P1].X, _TempPoints[P1].Y)) {
-                _TempPoints.RemoveAt(P1);
+            if (IsVerdeckt(_tempPoints[p1].X, _tempPoints[p1].Y)) {
+                _tempPoints.RemoveAt(p1);
                 return true;
             }
             return false;
         }
 
-        private bool SchneidetDas(BasicPadItem ThisBasicItem, PointM P1, PointM P2) {
-            if (ThisBasicItem == null) { return false; }
-            if (ThisBasicItem is not LinePadItem) {
-                var a = ThisBasicItem.UsedArea;
-                if (a.Width > 0 && a.Height > 0) {
-                    a.Inflate(2, 2);
-
-                    PointF tP1 = P1;
-                    PointF tP2 = P2;
-                    var lo = a.PointOf(enAlignment.Top_Left);
-                    var ro = a.PointOf(enAlignment.Top_Right);
-                    var lu = a.PointOf(enAlignment.Bottom_Left);
-                    var ru = a.PointOf(enAlignment.Bottom_Right);
-                    if (!LinesIntersect(tP1, tP2, lo, ro, true).IsEmpty ||
-                        !LinesIntersect(tP1, tP2, lu, ru, true).IsEmpty ||
-                        !LinesIntersect(tP1, tP2, lo, lu, true).IsEmpty ||
-                        !LinesIntersect(tP1, tP2, ro, ru, true).IsEmpty) { return true; }
-                }
-            }
-            return false;
+        private bool SchneidetWas(float x1, float y1, float x2, float y2) {
+            PointM p1 = new(x1, y1);
+            PointM p2 = new(x2, y2);
+            return Parent.Any(thisItemBasic => SchneidetDas(thisItemBasic, p1, p2));
         }
 
-        private bool SchneidetWas(float X1, float Y1, float X2, float Y2) {
-            PointM p1 = new(X1, Y1);
-            PointM p2 = new(X2, Y2);
-            foreach (var ThisItemBasic in Parent) {
-                if (SchneidetDas(ThisItemBasic, p1, p2)) { return true; }
-            }
-            return false;
-        }
-
-        private bool Vereinfache(int P1) {
+        private bool Vereinfache(int p1) {
             if (Linien_Verhalten != enConectorStyle.AusweichenUndGerade) {
-                if (P1 > 0 && P1 < _TempPoints.Count - 1) {
-                    if (!SchneidetWas(_TempPoints[P1 - 1].X, _TempPoints[P1 - 1].Y, _TempPoints[P1 + 1].X, _TempPoints[P1 + 1].Y)) {
-                        _TempPoints.RemoveAt(P1);
+                if (p1 > 0 && p1 < _tempPoints.Count - 1) {
+                    if (!SchneidetWas(_tempPoints[p1 - 1].X, _tempPoints[p1 - 1].Y, _tempPoints[p1 + 1].X, _tempPoints[p1 + 1].Y)) {
+                        _tempPoints.RemoveAt(p1);
                         return true;
                     }
                 }
             }
-            if (P1 < _TempPoints.Count - 3) {
-                if ((int)_TempPoints[P1].X == (int)_TempPoints[P1 + 1].X && (int)_TempPoints[P1].X == (int)_TempPoints[P1 + 2].X) {
-                    _TempPoints.RemoveAt(P1 + 1);
+            if (p1 < _tempPoints.Count - 3) {
+                if ((int)_tempPoints[p1].X == (int)_tempPoints[p1 + 1].X && (int)_tempPoints[p1].X == (int)_tempPoints[p1 + 2].X) {
+                    _tempPoints.RemoveAt(p1 + 1);
                     return true;
                 }
-                if ((int)_TempPoints[P1].Y == (int)_TempPoints[P1 + 1].Y && (int)_TempPoints[P1].Y == (int)_TempPoints[P1 + 2].Y) {
-                    _TempPoints.RemoveAt(P1 + 1);
+                if ((int)_tempPoints[p1].Y == (int)_tempPoints[p1 + 1].Y && (int)_tempPoints[p1].Y == (int)_tempPoints[p1 + 2].Y) {
+                    _tempPoints.RemoveAt(p1 + 1);
                     return true;
                 }
             }
-            if (P1 > 0 && P1 < _TempPoints.Count - 3) {
-                if ((int)_TempPoints[P1].X == (int)_TempPoints[P1 + 1].X && (int)_TempPoints[P1 + 1].Y == (int)_TempPoints[P1 + 2].Y) {
-                    if (!IsVerdeckt(_TempPoints[P1 + 2].X, _TempPoints[P1].Y)) {
-                        if (!SchneidetWas(_TempPoints[P1 - 1].X, _TempPoints[P1 - 1].Y, _TempPoints[P1 + 2].X, _TempPoints[P1].Y)) {
-                            if (!SchneidetWas(_TempPoints[P1 + 3].X, _TempPoints[P1 + 3].Y, _TempPoints[P1 + 2].X, _TempPoints[P1].Y)) {
-                                _TempPoints[P1] = new PointF(_TempPoints[P1 + 2].X, _TempPoints[P1].Y);
-                                _TempPoints.RemoveAt(P1 + 1);
-                                _TempPoints.RemoveAt(P1 + 1);
+            if (p1 > 0 && p1 < _tempPoints.Count - 3) {
+                if ((int)_tempPoints[p1].X == (int)_tempPoints[p1 + 1].X && (int)_tempPoints[p1 + 1].Y == (int)_tempPoints[p1 + 2].Y) {
+                    if (!IsVerdeckt(_tempPoints[p1 + 2].X, _tempPoints[p1].Y)) {
+                        if (!SchneidetWas(_tempPoints[p1 - 1].X, _tempPoints[p1 - 1].Y, _tempPoints[p1 + 2].X, _tempPoints[p1].Y)) {
+                            if (!SchneidetWas(_tempPoints[p1 + 3].X, _tempPoints[p1 + 3].Y, _tempPoints[p1 + 2].X, _tempPoints[p1].Y)) {
+                                _tempPoints[p1] = new PointF(_tempPoints[p1 + 2].X, _tempPoints[p1].Y);
+                                _tempPoints.RemoveAt(p1 + 1);
+                                _tempPoints.RemoveAt(p1 + 1);
                                 return true;
                             }
                         }
                     }
                 }
-                if ((int)_TempPoints[P1].Y == (int)_TempPoints[P1 + 1].Y && (int)_TempPoints[P1 + 1].X == (int)_TempPoints[P1 + 2].X) {
-                    if (!IsVerdeckt(_TempPoints[P1].X, _TempPoints[P1 + 2].Y)) {
-                        if (!SchneidetWas(_TempPoints[P1 - 1].X, _TempPoints[P1 - 1].Y, _TempPoints[P1].X, _TempPoints[P1 + 2].Y)) {
-                            if (!SchneidetWas(_TempPoints[P1 + 3].X, _TempPoints[P1 + 3].Y, _TempPoints[P1].X, _TempPoints[P1 + 2].Y)) {
-                                _TempPoints[P1] = new PointF(_TempPoints[P1].X, _TempPoints[P1 + 2].Y);
-                                _TempPoints.RemoveAt(P1 + 1);
-                                _TempPoints.RemoveAt(P1 + 1);
+                if ((int)_tempPoints[p1].Y == (int)_tempPoints[p1 + 1].Y && (int)_tempPoints[p1 + 1].X == (int)_tempPoints[p1 + 2].X) {
+                    if (!IsVerdeckt(_tempPoints[p1].X, _tempPoints[p1 + 2].Y)) {
+                        if (!SchneidetWas(_tempPoints[p1 - 1].X, _tempPoints[p1 - 1].Y, _tempPoints[p1].X, _tempPoints[p1 + 2].Y)) {
+                            if (!SchneidetWas(_tempPoints[p1 + 3].X, _tempPoints[p1 + 3].Y, _tempPoints[p1].X, _tempPoints[p1 + 2].Y)) {
+                                _tempPoints[p1] = new PointF(_tempPoints[p1].X, _tempPoints[p1 + 2].Y);
+                                _tempPoints.RemoveAt(p1 + 1);
+                                _tempPoints.RemoveAt(p1 + 1);
                                 return true;
                             }
                         }
@@ -358,25 +355,25 @@ namespace BlueControls.ItemCollection {
             return false;
         }
 
-        private bool WeicheAus(int P1) {
-            if (_TempPoints.Count > 100) { return false; }
-            if (P1 >= _TempPoints.Count - 1) { return false; }
+        private bool WeicheAus(int p1) {
+            if (_tempPoints.Count > 100) { return false; }
+            if (p1 >= _tempPoints.Count - 1) { return false; }
             //   If _TempPoints.Count > 4 Then Return False
-            foreach (var ThisItemBasic in Parent) {
-                if (ThisItemBasic != null) {
+            foreach (var thisItemBasic in Parent) {
+                if (thisItemBasic != null) {
                     //    If ThisBasicItem IsNot Object1 AndAlso ThisBasicItem IsNot Object2 Then
-                    if (ThisItemBasic is not LinePadItem) {
-                        var a = ThisItemBasic.UsedArea;
+                    if (thisItemBasic is not LinePadItem) {
+                        var a = thisItemBasic.UsedArea;
                         if (a.Width > 0 && a.Height > 0) {
                             a.Inflate(2, 2);
                             var lo = a.PointOf(enAlignment.Top_Left);
                             var ro = a.PointOf(enAlignment.Top_Right);
                             var lu = a.PointOf(enAlignment.Bottom_Left);
                             var ru = a.PointOf(enAlignment.Bottom_Right);
-                            var tOben = LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], lo, ro, true);
-                            var tUnten = LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], lu, ru, true);
-                            var tLinks = LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], lo, lu, true);
-                            var trechts = LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], ro, ru, true);
+                            var tOben = LinesIntersect(_tempPoints[p1], _tempPoints[p1 + 1], lo, ro, true);
+                            var tUnten = LinesIntersect(_tempPoints[p1], _tempPoints[p1 + 1], lu, ru, true);
+                            var tLinks = LinesIntersect(_tempPoints[p1], _tempPoints[p1 + 1], lo, lu, true);
+                            var trechts = LinesIntersect(_tempPoints[p1], _tempPoints[p1 + 1], ro, ru, true);
                             //    If DirectCast(Object2, RowFormulaItem).Row.CellFirst().String.Contains("Lilo") AndAlso DirectCast(Object1, RowFormulaItem).Row.CellFirst().String.Contains("Karl") Then Stop
                             if (tOben != null || tUnten != null || tLinks != null || trechts != null) {
                                 a.Inflate(-50, -50);
@@ -384,120 +381,120 @@ namespace BlueControls.ItemCollection {
                                 ro = a.PointOf(enAlignment.Top_Right);
                                 lu = a.PointOf(enAlignment.Bottom_Left);
                                 ru = a.PointOf(enAlignment.Bottom_Right);
-                                var Oben = LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], lo, ro, true);
-                                var Unten = LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], lu, ru, true);
-                                var Links = LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], lo, lu, true);
-                                var rechts = LinesIntersect(_TempPoints[P1], _TempPoints[P1 + 1], ro, ru, true);
-                                if (Oben == null && tOben != null) {
-                                    Oben = tOben;
+                                var oben = LinesIntersect(_tempPoints[p1], _tempPoints[p1 + 1], lo, ro, true);
+                                var unten = LinesIntersect(_tempPoints[p1], _tempPoints[p1 + 1], lu, ru, true);
+                                var links = LinesIntersect(_tempPoints[p1], _tempPoints[p1 + 1], lo, lu, true);
+                                var rechts = LinesIntersect(_tempPoints[p1], _tempPoints[p1 + 1], ro, ru, true);
+                                if (oben == null && tOben != null) {
+                                    oben = tOben;
                                 }
-                                if (Unten == null && tUnten != null) {
-                                    Unten = tUnten;
+                                if (unten == null && tUnten != null) {
+                                    unten = tUnten;
                                 }
-                                if (Links == null && tLinks != null) {
-                                    Links = tLinks;
+                                if (links == null && tLinks != null) {
+                                    links = tLinks;
                                 }
                                 if (rechts == null && trechts != null) {
                                     rechts = trechts;
                                 }
-                                if (Oben != null && Unten != null) {
-                                    if (_TempPoints[P1].Y < _TempPoints[P1 + 1].Y) {
+                                if (oben != null && unten != null) {
+                                    if (_tempPoints[p1].Y < _tempPoints[p1 + 1].Y) {
                                         // Schneidet durch, von oben nach unten
-                                        _TempPoints.Insert(P1 + 1, Oben);
-                                        if (Math.Abs(_TempPoints[P1].X - lo.X) > Math.Abs(_TempPoints[P1].X - ro.X)) {
-                                            _TempPoints.Insert(P1 + 2, ro);
-                                            _TempPoints.Insert(P1 + 3, ru);
+                                        _tempPoints.Insert(p1 + 1, oben);
+                                        if (Math.Abs(_tempPoints[p1].X - lo.X) > Math.Abs(_tempPoints[p1].X - ro.X)) {
+                                            _tempPoints.Insert(p1 + 2, ro);
+                                            _tempPoints.Insert(p1 + 3, ru);
                                         } else {
-                                            _TempPoints.Insert(P1 + 2, lo);
-                                            _TempPoints.Insert(P1 + 3, lu);
+                                            _tempPoints.Insert(p1 + 2, lo);
+                                            _tempPoints.Insert(p1 + 3, lu);
                                         }
-                                        _TempPoints.Insert(P1 + 4, Unten);
+                                        _tempPoints.Insert(p1 + 4, unten);
                                         return true;
                                     }
                                     // Schneidet durch, von unten nach oben
-                                    _TempPoints.Insert(P1 + 1, Unten);
-                                    if (Math.Abs(_TempPoints[P1].X - lo.X) > Math.Abs(_TempPoints[P1].X - ro.X)) {
-                                        _TempPoints.Insert(P1 + 2, ru);
-                                        _TempPoints.Insert(P1 + 3, ro);
+                                    _tempPoints.Insert(p1 + 1, unten);
+                                    if (Math.Abs(_tempPoints[p1].X - lo.X) > Math.Abs(_tempPoints[p1].X - ro.X)) {
+                                        _tempPoints.Insert(p1 + 2, ru);
+                                        _tempPoints.Insert(p1 + 3, ro);
                                     } else {
-                                        _TempPoints.Insert(P1 + 2, lu);
-                                        _TempPoints.Insert(P1 + 3, lo);
+                                        _tempPoints.Insert(p1 + 2, lu);
+                                        _tempPoints.Insert(p1 + 3, lo);
                                     }
-                                    _TempPoints.Insert(P1 + 4, Oben);
+                                    _tempPoints.Insert(p1 + 4, oben);
                                     return true;
                                 }
-                                if (Links != null && rechts != null) {
-                                    if (_TempPoints[P1].X < _TempPoints[P1 + 1].X) {
+                                if (links != null && rechts != null) {
+                                    if (_tempPoints[p1].X < _tempPoints[p1 + 1].X) {
                                         // Schneidet durch, von links nach rechts
-                                        _TempPoints.Insert(P1 + 1, Links);
-                                        if (Math.Abs(_TempPoints[P1].Y - lo.Y) > Math.Abs(_TempPoints[P1].Y - lu.Y)) {
-                                            _TempPoints.Insert(P1 + 2, lu);
-                                            _TempPoints.Insert(P1 + 3, ru);
+                                        _tempPoints.Insert(p1 + 1, links);
+                                        if (Math.Abs(_tempPoints[p1].Y - lo.Y) > Math.Abs(_tempPoints[p1].Y - lu.Y)) {
+                                            _tempPoints.Insert(p1 + 2, lu);
+                                            _tempPoints.Insert(p1 + 3, ru);
                                         } else {
-                                            _TempPoints.Insert(P1 + 2, lo);
-                                            _TempPoints.Insert(P1 + 3, ro);
+                                            _tempPoints.Insert(p1 + 2, lo);
+                                            _tempPoints.Insert(p1 + 3, ro);
                                         }
-                                        _TempPoints.Insert(P1 + 4, rechts);
+                                        _tempPoints.Insert(p1 + 4, rechts);
                                         return true;
                                     }
                                     // Schneidet durch, von rechts nach links
-                                    _TempPoints.Insert(P1 + 1, rechts);
-                                    if (Math.Abs(_TempPoints[P1].Y - lo.Y) > Math.Abs(_TempPoints[P1].Y - lu.Y)) {
-                                        _TempPoints.Insert(P1 + 2, ru);
-                                        _TempPoints.Insert(P1 + 3, lu);
+                                    _tempPoints.Insert(p1 + 1, rechts);
+                                    if (Math.Abs(_tempPoints[p1].Y - lo.Y) > Math.Abs(_tempPoints[p1].Y - lu.Y)) {
+                                        _tempPoints.Insert(p1 + 2, ru);
+                                        _tempPoints.Insert(p1 + 3, lu);
                                     } else {
-                                        _TempPoints.Insert(P1 + 2, ro);
-                                        _TempPoints.Insert(P1 + 3, lo);
+                                        _tempPoints.Insert(p1 + 2, ro);
+                                        _tempPoints.Insert(p1 + 3, lo);
                                     }
-                                    _TempPoints.Insert(P1 + 4, Links);
+                                    _tempPoints.Insert(p1 + 4, links);
                                     return true;
                                 }
-                                if (Unten != null && rechts != null) {
-                                    if (_TempPoints[P1].X < _TempPoints[P1 + 1].X) {
-                                        _TempPoints.Insert(P1 + 1, Unten);
-                                        _TempPoints.Insert(P1 + 2, ru);
-                                        _TempPoints.Insert(P1 + 3, rechts);
+                                if (unten != null && rechts != null) {
+                                    if (_tempPoints[p1].X < _tempPoints[p1 + 1].X) {
+                                        _tempPoints.Insert(p1 + 1, unten);
+                                        _tempPoints.Insert(p1 + 2, ru);
+                                        _tempPoints.Insert(p1 + 3, rechts);
                                         return true;
                                     }
-                                    _TempPoints.Insert(P1 + 1, rechts);
-                                    _TempPoints.Insert(P1 + 2, ru);
-                                    _TempPoints.Insert(P1 + 3, Unten);
+                                    _tempPoints.Insert(p1 + 1, rechts);
+                                    _tempPoints.Insert(p1 + 2, ru);
+                                    _tempPoints.Insert(p1 + 3, unten);
                                     return true;
                                 }
-                                if (Oben != null && rechts != null) {
-                                    if (_TempPoints[P1].X < _TempPoints[P1 + 1].X) {
-                                        _TempPoints.Insert(P1 + 1, Oben);
-                                        _TempPoints.Insert(P1 + 2, ro);
-                                        _TempPoints.Insert(P1 + 3, rechts);
+                                if (oben != null && rechts != null) {
+                                    if (_tempPoints[p1].X < _tempPoints[p1 + 1].X) {
+                                        _tempPoints.Insert(p1 + 1, oben);
+                                        _tempPoints.Insert(p1 + 2, ro);
+                                        _tempPoints.Insert(p1 + 3, rechts);
                                         return true;
                                     }
-                                    _TempPoints.Insert(P1 + 1, rechts);
-                                    _TempPoints.Insert(P1 + 2, ro);
-                                    _TempPoints.Insert(P1 + 3, Oben);
+                                    _tempPoints.Insert(p1 + 1, rechts);
+                                    _tempPoints.Insert(p1 + 2, ro);
+                                    _tempPoints.Insert(p1 + 3, oben);
                                     return true;
                                 }
-                                if (Unten != null && Links != null) {
-                                    if (_TempPoints[P1].X < _TempPoints[P1 + 1].X) {
-                                        _TempPoints.Insert(P1 + 1, Links);
-                                        _TempPoints.Insert(P1 + 2, lu);
-                                        _TempPoints.Insert(P1 + 3, Unten);
+                                if (unten != null && links != null) {
+                                    if (_tempPoints[p1].X < _tempPoints[p1 + 1].X) {
+                                        _tempPoints.Insert(p1 + 1, links);
+                                        _tempPoints.Insert(p1 + 2, lu);
+                                        _tempPoints.Insert(p1 + 3, unten);
                                         return true;
                                     }
-                                    _TempPoints.Insert(P1 + 1, Unten);
-                                    _TempPoints.Insert(P1 + 2, lu);
-                                    _TempPoints.Insert(P1 + 3, Links);
+                                    _tempPoints.Insert(p1 + 1, unten);
+                                    _tempPoints.Insert(p1 + 2, lu);
+                                    _tempPoints.Insert(p1 + 3, links);
                                     return true;
                                 }
-                                if (Oben != null && Links != null) {
-                                    if (_TempPoints[P1].X < _TempPoints[P1 + 1].X) {
-                                        _TempPoints.Insert(P1 + 1, Links);
-                                        _TempPoints.Insert(P1 + 2, lo);
-                                        _TempPoints.Insert(P1 + 3, Oben);
+                                if (oben != null && links != null) {
+                                    if (_tempPoints[p1].X < _tempPoints[p1 + 1].X) {
+                                        _tempPoints.Insert(p1 + 1, links);
+                                        _tempPoints.Insert(p1 + 2, lo);
+                                        _tempPoints.Insert(p1 + 3, oben);
                                         return true;
                                     }
-                                    _TempPoints.Insert(P1 + 1, Oben);
-                                    _TempPoints.Insert(P1 + 2, lo);
-                                    _TempPoints.Insert(P1 + 3, Links);
+                                    _tempPoints.Insert(p1 + 1, oben);
+                                    _tempPoints.Insert(p1 + 2, lo);
+                                    _tempPoints.Insert(p1 + 3, links);
                                     return true;
                                 }
                                 return false;

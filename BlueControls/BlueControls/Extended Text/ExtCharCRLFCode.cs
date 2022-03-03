@@ -15,12 +15,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
 using BlueControls.Enums;
-using System;
 using System.Drawing;
 
-namespace BlueControls {
+namespace BlueControls.Extended_Text {
 
     internal class ExtCharCRLFCode : ExtChar {
 
@@ -28,7 +26,7 @@ namespace BlueControls {
 
         internal ExtCharCRLFCode() : this(enDesign.TextBox, enStates.Standard, null, 4) { }
 
-        internal ExtCharCRLFCode(enDesign design, enStates state, BlueFont font, int stufe) : base(design, state, font, stufe) { }
+        internal ExtCharCRLFCode(enDesign design, enStates state, BlueFont? font, int stufe) : base(design, state, font, stufe) { }
 
         #endregion
 

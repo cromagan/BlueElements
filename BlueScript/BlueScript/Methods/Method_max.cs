@@ -16,8 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using Skript.Enums;
-using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BlueScript {
 
@@ -43,10 +43,7 @@ namespace BlueScript {
         public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
-            var val = double.MinValue;
-            foreach (var thisval in attvar.Attributes) {
-                val = Math.Max(thisval.ValueDouble, val);
-            }
+            var val = attvar.Attributes.Select(thisval => thisval.ValueDouble).Prepend(double.MinValue).Max();
             return new strDoItFeedback(val.ToString(), enVariableDataType.Numeral);
         }
 
