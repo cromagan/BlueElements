@@ -72,21 +72,21 @@ namespace BlueControls.Extended_Text {
             //}
         }
 
-        public override string HTMLText() => Convert.ToChar(_char).ToString().CreateHtmlCodes(false);
+        public override string HtmlText() => Convert.ToChar(_char).ToString().CreateHtmlCodes(false);
 
-        public override bool isLineBreak() => (int)_char switch {
+        public override bool IsLineBreak() => (int)_char switch {
             11 or 13 => true,
             _ => false
         };
 
-        public override bool isPossibleLineBreak() => _char.isPossibleLineBreak();
+        public override bool IsPossibleLineBreak() => _char.IsPossibleLineBreak();
 
-        public override bool isSpace() => (int)_char switch {
+        public override bool IsSpace() => (int)_char switch {
             32 or 0 or 9 => true,
             _ => false
         };
 
-        public override bool isWordSeperator() => _char.isWordSeperator();
+        public override bool IsWordSeperator() => _char.IsWordSeperator();
 
         public override string PlainText() => Convert.ToChar(_char).ToString();
 

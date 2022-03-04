@@ -38,10 +38,10 @@ namespace BlueControls.Forms {
 
         #region Fields
 
-        private readonly List<RowItem?> _RowsForExport;
-        private readonly string _SaveTo = "";
-        private readonly string _ZielPfad;
-        private int _ItemNrForPrint;
+        private readonly List<RowItem?> _rowsForExport;
+        private readonly string _saveTo = "";
+        private readonly string _zielPfad;
+        private int _itemNrForPrint;
 
         #endregion
 
@@ -59,16 +59,16 @@ namespace BlueControls.Forms {
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             Database = db;
             Database.Disposing += _Database_Disposing;
-            _RowsForExport = rows;
+            _rowsForExport = rows;
             if (!string.IsNullOrEmpty(autosaveFile)) {
-                _ZielPfad = autosaveFile.FilePath();
-                _SaveTo = autosaveFile;
+                _zielPfad = autosaveFile.FilePath();
+                _saveTo = autosaveFile;
             } else {
-                _ZielPfad = Path.GetTempPath();
+                _zielPfad = Path.GetTempPath();
             }
             try {
-                if (!PathExists(_ZielPfad)) {
-                    Directory.CreateDirectory(_ZielPfad);
+                if (!PathExists(_zielPfad)) {
+                    Directory.CreateDirectory(_zielPfad);
                 }
             } catch (Exception) { }
             BefülleLayoutDropdowns();
@@ -100,9 +100,9 @@ namespace BlueControls.Forms {
             foreach (var thisP in path) {
                 if (PathExists(thisP)) {
                     var e = Directory.GetFiles(thisP);
-                    foreach (var ThisFile in e) {
-                        if (ThisFile.FileType() is enFileFormat.HTML or enFileFormat.Textdocument or enFileFormat.Visitenkarte or enFileFormat.BlueCreativeFile or enFileFormat.XMLFile) {
-                            if (addHere[ThisFile] == null) { addHere.Add(ThisFile.FileNameWithSuffix(), ThisFile, QuickImage.Get(ThisFile.FileType(), 16)); }
+                    foreach (var thisFile in e) {
+                        if (thisFile.FileType() is enFileFormat.HTML or enFileFormat.Textdocument or enFileFormat.Visitenkarte or enFileFormat.BlueCreativeFile or enFileFormat.XMLFile) {
+                            if (addHere[thisFile] == null) { addHere.Add(thisFile.FileNameWithSuffix(), thisFile, QuickImage.Get(thisFile.FileType(), 16)); }
                         }
                     }
                 }
@@ -117,25 +117,25 @@ namespace BlueControls.Forms {
         /// <param name="layout"></param>
         /// <param name="rowsForExport"></param>
         /// <returns>Gibt das Item zurück, dass nicht mehr auf den Druckbereich gepasst hat</returns>
-        public static int GeneratePrintPad(CreativePad pad, int startNr, string layout, List<RowItem?> rowsForExport, float abstandMM) {
+        public static int GeneratePrintPad(CreativePad pad, int startNr, string layout, List<RowItem?> rowsForExport, float abstandMm) {
             pad.Item.Clear();
             Generic.CollectGarbage();
             CreativePad tmp = new(new ItemCollectionPad(layout, rowsForExport[0].Database, rowsForExport[0].Key));
-            var OneItem = tmp.Item.MaxBounds(null);
+            var oneItem = tmp.Item.MaxBounds(null);
             pad.Item.SheetStyle = tmp.Item.SheetStyle;
             pad.Item.SheetStyleScale = tmp.Item.SheetStyleScale;
             tmp.Dispose();
-            var DruckB = pad.Item.DruckbereichRect();
-            var abstand = (float)Math.Round(mmToPixel(abstandMM, ItemCollectionPad.Dpi), 1);
-            var tempVar = Math.Max(1, (int)Math.Floor((DruckB.Width / (double)(OneItem.Width + abstand)) + 0.01));
+            var druckB = pad.Item.DruckbereichRect();
+            var abstand = (float)Math.Round(mmToPixel(abstandMm, ItemCollectionPad.Dpi), 1);
+            var tempVar = Math.Max(1, (int)Math.Floor((druckB.Width / (double)(oneItem.Width + abstand)) + 0.01));
             for (var x = 0; x < tempVar; x++) {
-                var tempVar2 = Math.Max(1, (int)Math.Floor((DruckB.Height / (double)(OneItem.Height + abstand)) + 0.01));
+                var tempVar2 = Math.Max(1, (int)Math.Floor((druckB.Height / (double)(oneItem.Height + abstand)) + 0.01));
                 for (var y = 0; y < tempVar2; y++) {
-                    ChildPadItem It = new() {
+                    ChildPadItem it = new() {
                         PadInternal = new CreativePad(new ItemCollectionPad(layout, rowsForExport[startNr].Database, rowsForExport[startNr].Key))
                     };
-                    pad.Item.Add(It);
-                    It.SetCoordinates(new RectangleF(DruckB.Left + (x * (OneItem.Width + abstand)), DruckB.Top + (y * (OneItem.Height + abstand)), OneItem.Width, OneItem.Height), true);
+                    pad.Item.Add(it);
+                    it.SetCoordinates(new RectangleF(druckB.Left + (x * (oneItem.Width + abstand)), druckB.Top + (y * (oneItem.Height + abstand)), oneItem.Width, oneItem.Height), true);
                     startNr++;
                     if (startNr >= rowsForExport.Count) { break; }
                 }
@@ -165,7 +165,7 @@ namespace BlueControls.Forms {
             padSchachteln.Item.SheetSizeInMm = new SizeF(b, h);
             padSchachteln.Item.RandinMm = Padding.Empty;
             padSchachteln.Item.BackColor = Color.Transparent;
-            GeneratePrintPad(padSchachteln, 0, cbxLayoutWahl.Text, _RowsForExport, ab);
+            GeneratePrintPad(padSchachteln, 0, cbxLayoutWahl.Text, _rowsForExport, ab);
         }
 
         private void BefülleLayoutDropdowns() {
@@ -201,17 +201,17 @@ namespace BlueControls.Forms {
             padSchachteln.Item.SheetSizeInMm = new SizeF(b, h);
             padSchachteln.Item.RandinMm = Padding.Empty;
             List<string> l = new();
-            _ItemNrForPrint = 0;
+            _itemNrForPrint = 0;
             do {
-                var nr = _ItemNrForPrint;
-                _ItemNrForPrint = GeneratePrintPad(padSchachteln, _ItemNrForPrint, cbxLayoutWahl.Text, _RowsForExport, ab);
+                var nr = _itemNrForPrint;
+                _itemNrForPrint = GeneratePrintPad(padSchachteln, _itemNrForPrint, cbxLayoutWahl.Text, _rowsForExport, ab);
 
-                var x = TempFile(_ZielPfad, _RowsForExport[0].Database.Caption + "_" + b + "x" + h + "_" + ab, "png");
+                var x = TempFile(_zielPfad, _rowsForExport[0].Database.Caption + "_" + b + "x" + h + "_" + ab, "png");
                 padSchachteln.Item.BackColor = Color.Transparent;
                 padSchachteln.Item.SaveAsBitmap(x);
                 l.Add(x);
-                if (nr == _ItemNrForPrint) { break; }
-                if (_ItemNrForPrint >= _RowsForExport.Count) { break; }
+                if (nr == _itemNrForPrint) { break; }
+                if (_itemNrForPrint >= _rowsForExport.Count) { break; }
             } while (true);
             tabStart.Enabled = false;
             tabBildSchachteln.Enabled = false;
@@ -223,31 +223,31 @@ namespace BlueControls.Forms {
         private void Button_PageSetup_Click(object sender, System.EventArgs e) {
             padPrint.ShowPrinterPageSetup();
             padPrint.CopyPrinterSettingsToWorkingArea();
-            GeneratePrintPad(padPrint, 0, cbxLayoutWahl.Text, _RowsForExport, 0);
+            GeneratePrintPad(padPrint, 0, cbxLayoutWahl.Text, _rowsForExport, 0);
         }
 
-        private void Button1_Click(object sender, System.EventArgs e) => ExecuteFile(_ZielPfad);
+        private void Button1_Click(object sender, System.EventArgs e) => ExecuteFile(_zielPfad);
 
         private void cbxLayoutWahl_TextChanged(object sender, System.EventArgs e) {
             if (Database.Layouts.LayoutIDToIndex(cbxLayoutWahl.Text) > -1) {
                 padVorschau.ShowInPrintMode = true;
-                padVorschau.Item = new ItemCollectionPad(cbxLayoutWahl.Text, _RowsForExport[0].Database, _RowsForExport[0].Key);
+                padVorschau.Item = new ItemCollectionPad(cbxLayoutWahl.Text, _rowsForExport[0].Database, _rowsForExport[0].Key);
                 padVorschau.ZoomFit();
             } else {
                 padVorschau.Item.Clear();
             }
         }
 
-        private void EintragsText() => capAnzahlInfo.Text = _RowsForExport == null || _RowsForExport.Count == 0
+        private void EintragsText() => capAnzahlInfo.Text = _rowsForExport == null || _rowsForExport.Count == 0
 ? "Bitte wählen sie die Einträge für den Export."
-: _RowsForExport.Count == 1
-? "Es ist genau ein Eintrag gewählt:<br> <b>-" + _RowsForExport[0].CellFirstString().Replace("\r\n", " ")
-: "Es sind <b>" + _RowsForExport.Count + "</b> Einträge gewählt.";
+: _rowsForExport.Count == 1
+? "Es ist genau ein Eintrag gewählt:<br> <b>-" + _rowsForExport[0].CellFirstString().Replace("\r\n", " ")
+: "Es sind <b>" + _rowsForExport.Count + "</b> Einträge gewählt.";
 
         private void Exported_ItemClicked(object sender, BasicListItemEventArgs e) => ExecuteFile(e.Item.Internal);
 
         private string Fehler() {
-            if (_RowsForExport == null || _RowsForExport.Count == 0) { return "Es sind keine Einträge für den Export gewählt."; }
+            if (_rowsForExport == null || _rowsForExport.Count == 0) { return "Es sind keine Einträge für den Export gewählt."; }
             if (string.IsNullOrEmpty(cbxLayoutWahl.Text)) { return "Es sind keine Layout für den Export gewählt."; }
             if (Database.Layouts.LayoutIDToIndex(cbxLayoutWahl.Text) > -1) {
                 if (!optBildSchateln.Checked && !optDrucken.Checked && !optSpeichern.Checked) { return "Das gewählte Layout kann nur gedruckt, geschachtelt oder gespeichtert werden."; }
@@ -263,7 +263,7 @@ namespace BlueControls.Forms {
             Enabled = false;
             var n = cbxLayoutWahl.Text;
             cbxLayoutWahl.Text = string.Empty;
-            tabAdministration.OpenLayoutEditor(Database, n);
+            TabAdministration.OpenLayoutEditor(Database, n);
             BefülleLayoutDropdowns();
             if (cbxLayoutWahl.Item[n] != null) {
                 cbxLayoutWahl.Text = n;
@@ -300,13 +300,13 @@ namespace BlueControls.Forms {
             tabBildSchachteln.Enabled = false;
         }
 
-        private void PrintPad_BeginnPrint(object sender, PrintEventArgs e) => _ItemNrForPrint = 0;
+        private void PrintPad_BeginnPrint(object sender, PrintEventArgs e) => _itemNrForPrint = 0;
 
         private void PrintPad_PrintPage(object sender, PrintPageEventArgs e) {
-            var l = _ItemNrForPrint;
-            _ItemNrForPrint = GeneratePrintPad(padPrint, _ItemNrForPrint, cbxLayoutWahl.Text, _RowsForExport, 0);
-            if (l == _ItemNrForPrint) { return; }
-            e.HasMorePages = Convert.ToBoolean(_ItemNrForPrint < _RowsForExport.Count);
+            var l = _itemNrForPrint;
+            _itemNrForPrint = GeneratePrintPad(padPrint, _itemNrForPrint, cbxLayoutWahl.Text, _rowsForExport, 0);
+            if (l == _itemNrForPrint) { return; }
+            e.HasMorePages = Convert.ToBoolean(_itemNrForPrint < _rowsForExport.Count);
         }
 
         private void Tabs_SelectedIndexChanged(object sender, System.EventArgs e) {
@@ -333,15 +333,15 @@ namespace BlueControls.Forms {
                 tabDrucken.Enabled = true;
                 Tabs.SelectedTab = tabDrucken;
                 Button_PageSetup_Click(null, System.EventArgs.Empty);
-                GeneratePrintPad(padPrint, 0, cbxLayoutWahl.Text, _RowsForExport, 0);
+                GeneratePrintPad(padPrint, 0, cbxLayoutWahl.Text, _rowsForExport, 0);
             }
             if (optSpeichern.Checked || optSpezialFormat.Checked) {
                 tabStart.Enabled = false; // Geht ja gleich los
                 tabDateiExport.Enabled = true;
                 Tabs.SelectedTab = tabDateiExport;
                 var l = Database.Layouts.LayoutIDToIndex(cbxLayoutWahl.Text) > -1
-                    ? Export.SaveAsBitmap(_RowsForExport, cbxLayoutWahl.Text, _ZielPfad)
-                    : Export.GenerateLayout_FileSystem(_RowsForExport, cbxLayoutWahl.Text, _SaveTo, optSpezialFormat.Checked, _ZielPfad);
+                    ? Export.SaveAsBitmap(_rowsForExport, cbxLayoutWahl.Text, _zielPfad)
+                    : Export.GenerateLayout_FileSystem(_rowsForExport, cbxLayoutWahl.Text, _saveTo, optSpezialFormat.Checked, _zielPfad);
                 lstExported.Item.AddRange(l);
             }
         }

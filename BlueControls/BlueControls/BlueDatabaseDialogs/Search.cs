@@ -29,7 +29,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         #region Fields
 
-        private readonly Table _BlueTable;
+        private readonly Table _blueTable;
         private ColumnItem? _col;
         private RowData? _row;
 
@@ -41,9 +41,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            _BlueTable = table;
-            _BlueTable.CursorPosChanged += CursorPosChanged;
-            CursorPosChanged(_BlueTable, new CellExtEventArgs(_BlueTable.CursorPosColumn(), _BlueTable.CursorPosRow()));
+            _blueTable = table;
+            _blueTable.CursorPosChanged += CursorPosChanged;
+            CursorPosChanged(_blueTable, new CellExtEventArgs(_blueTable.CursorPosColumn(), _blueTable.CursorPosRow()));
         }
 
         #endregion
@@ -52,43 +52,43 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
             base.OnFormClosing(e);
-            _BlueTable.CursorPosChanged -= CursorPosChanged;
+            _blueTable.CursorPosChanged -= CursorPosChanged;
         }
 
         private void btnSuchInCell_Click(object sender, System.EventArgs e) {
-            var SuchtT = SuchText();
-            if (string.IsNullOrEmpty(SuchtT)) { return; }
-            Table.SearchNextText(SuchtT, _BlueTable, _col, _BlueTable.CursorPosRow(), out var found, out var GefRow, btnAehnliches.Checked);
+            var suchtT = SuchText();
+            if (string.IsNullOrEmpty(suchtT)) { return; }
+            Table.SearchNextText(suchtT, _blueTable, _col, _blueTable.CursorPosRow(), out var found, out var gefRow, btnAehnliches.Checked);
             if (found == null) {
                 MessageBox.Show("Text nicht gefunden", enImageCode.Information, "OK");
                 return;
             }
-            _BlueTable.CursorPos_Set(found, GefRow, true);
+            _blueTable.CursorPos_Set(found, gefRow, true);
             txbSuchText.Focus();
         }
 
         private void btnSuchSpalte_Click(object sender, System.EventArgs e) {
-            if (_BlueTable.Design == enBlueTableAppearance.OnlyMainColumnWithoutHead) {
+            if (_blueTable.Design == enBlueTableAppearance.OnlyMainColumnWithoutHead) {
                 MessageBox.Show("In dieser Ansicht nicht möglich", enImageCode.Information, "OK");
                 return;
             }
             var searchT = SuchText();
             if (string.IsNullOrEmpty(searchT)) { return; }
             var found = _col;
-            var ca = _BlueTable?.CurrentArrangement;
-            if (found == null) { found = _BlueTable.Database.Column.SysLocked; }
+            var ca = _blueTable?.CurrentArrangement;
+            if (found == null) { found = _blueTable.Database.Column.SysLocked; }
             var columnStarted = _col;
             do {
                 found = ca.NextVisible(found);
                 if (found == null) { found = ca[0].Column; }
-                var _Ist1 = found.ReadableText().ToLower();
-                if (!string.IsNullOrEmpty(_Ist1)) {
+                var ist1 = found.ReadableText().ToLower();
+                if (!string.IsNullOrEmpty(ist1)) {
                     // Allgemeine Prüfung
-                    if (_Ist1.Contains(searchT.ToLower())) { break; }
+                    if (ist1.Contains(searchT.ToLower())) { break; }
                     if (btnAehnliches.Checked) {
-                        var _Ist3 = _Ist1.StarkeVereinfachung(" ,");
-                        var _searchTXT3 = searchT.StarkeVereinfachung(" ,");
-                        if (!string.IsNullOrEmpty(_Ist3) && _Ist3.ToLower().Contains(_searchTXT3.ToLower())) {
+                        var ist3 = ist1.StarkeVereinfachung(" ,");
+                        var searchTxt3 = searchT.StarkeVereinfachung(" ,");
+                        if (!string.IsNullOrEmpty(ist3) && ist3.ToLower().Contains(searchTxt3.ToLower())) {
                             break;
                         }
                     }
@@ -102,7 +102,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 MessageBox.Show("Text in den Spalten nicht gefunden.", enImageCode.Information, "OK");
                 return;
             }
-            _BlueTable.CursorPos_Set(found, _row, true);
+            _blueTable.CursorPos_Set(found, _row, true);
             txbSuchText.Focus();
         }
 
@@ -114,12 +114,12 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void Search_Load(object sender, System.EventArgs e) => txbSuchText.Focus();
 
         private string SuchText() {
-            var SuchtT = txbSuchText.Text.Trim();
-            if (string.IsNullOrEmpty(SuchtT)) {
+            var suchtT = txbSuchText.Text.Trim();
+            if (string.IsNullOrEmpty(suchtT)) {
                 MessageBox.Show("Bitte Text zum Suchen eingeben.", enImageCode.Information, "OK");
                 return string.Empty;
             }
-            return SuchtT.Replace(";cr;", "\r").Replace(";tab;", "\t").ToLower();
+            return suchtT.Replace(";cr;", "\r").Replace(";tab;", "\t").ToLower();
         }
 
         private void txbSuchText_Enter(object sender, System.EventArgs e) => btnSuchInCell_Click(null, System.EventArgs.Empty);

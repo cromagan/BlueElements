@@ -88,13 +88,13 @@ namespace BlueBasics {
             // http://csharphelper.com/blog/2014/10/use-an-imageattributes-object-to-adjust-an-images-brightness-in-c/
             // Make the ColorMatrix.
             var b = Math.Max(brightness, 0.001f);
-            ColorMatrix cm = new(new float[][]
-                {
-            new float[] {b, 0, 0, 0, 0},
-            new float[] {0, b, 0, 0, 0},
-            new float[] {0, 0, b, 0, 0},
-            new float[] {0, 0, 0, 1, 0},
-            new float[] {0, 0, 0, 0, 1}
+            ColorMatrix cm = new(new[]
+            {
+            new[] {b, 0, 0, 0, 0},
+            new[] {0, b, 0, 0, 0},
+            new[] {0, 0, b, 0, 0},
+            new[] {0, 0, 0, 1f, 0},
+            new[] {0, 0, 0, 0, 1f}
                 });
             ImageAttributes attributes = new();
             attributes.SetColorMatrix(cm);
@@ -443,7 +443,7 @@ namespace BlueBasics {
             }
         }
 
-        public static Bitmap ImageBlurFilter(Bitmap bmp, BlurType blurType) {
+        public static Bitmap? ImageBlurFilter(Bitmap bmp, BlurType blurType) {
             Bitmap resultBitmap = null;
             switch (blurType) {
                 case BlurType.Mean3x3:

@@ -124,7 +124,7 @@ namespace BluePaint {
         public new Bitmap? ShowDialog() {
             if (Visible) { Visible = false; }
             base.ShowDialog();
-            return P.BMP;
+            return P.Bmp;
         }
 
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
@@ -152,7 +152,7 @@ namespace BluePaint {
         private void btn100_Click(object sender, System.EventArgs e) => P.Zoom100();
 
         private void btnAufnahme_Click(object sender, System.EventArgs e) {
-            if (P.BMP == null) {
+            if (P.Bmp == null) {
                 MessageBox.Show("Kein Bild vorhanden.");
                 return;
             }
@@ -170,11 +170,11 @@ namespace BluePaint {
 
         private void btnCopy_Click(object sender, System.EventArgs e) {
             SetTool(null, false); // um OnToolChangeAuszulösen
-            if (P.BMP == null) {
+            if (P.Bmp == null) {
                 MessageBox.Show("Kein Bild vorhanden.");
                 return;
             }
-            System.Windows.Forms.Clipboard.SetImage(P.BMP);
+            System.Windows.Forms.Clipboard.SetImage(P.Bmp);
             //System.Windows.Forms.Clipboard.SetDataObject(P.BMP, false);
             Notification.Show("Das Bild ist nun<br>in der Zwischenablage.", enImageCode.Clipboard);
         }
@@ -254,11 +254,11 @@ namespace BluePaint {
                 _PicUndo = null;
                 GC.Collect();
             }
-            if (P.BMP == null) {
+            if (P.Bmp == null) {
                 btnRückgänig.Enabled = false;
                 return;
             }
-            _PicUndo = Image_Clone(P.BMP);
+            _PicUndo = Image_Clone(P.Bmp);
             btnRückgänig.Enabled = true;
         }
 
@@ -268,11 +268,11 @@ namespace BluePaint {
         //}
         private void CurrentTool_HideMainWindow(object sender, System.EventArgs e) => Hide();
 
-        private void CurrentTool_NeedCurrentPic(object sender, BitmapEventArgs e) => e.BMP = P.BMP;
+        private void CurrentTool_NeedCurrentPic(object sender, BitmapEventArgs e) => e.Bmp = P.Bmp;
 
         private void CurrentTool_OverridePic(object sender, BitmapEventArgs e) {
             CurrentTool_ForceUndoSaving(this, System.EventArgs.Empty);
-            P.BMP = e.BMP;
+            P.Bmp = e.Bmp;
             //if (P.BMP != null)
             //{
             //    P.OverlayBMP = new Bitmap(P.BMP.Width, P.BMP.Height);
@@ -325,23 +325,23 @@ namespace BluePaint {
             Close();
         }
 
-        private void P_DoAdditionalDrawing(object sender, BlueControls.EventArgs.AdditionalDrawing e) => CurrentTool?.DoAdditionalDrawing(e, P.BMP);
+        private void P_DoAdditionalDrawing(object sender, BlueControls.EventArgs.AdditionalDrawing e) => CurrentTool?.DoAdditionalDrawing(e, P.Bmp);
 
-        private void P_ImageMouseDown(object sender, BlueControls.EventArgs.MouseEventArgs1_1 e) => CurrentTool?.MouseDown(e, P.BMP);
+        private void P_ImageMouseDown(object sender, BlueControls.EventArgs.MouseEventArgs1_1 e) => CurrentTool?.MouseDown(e, P.Bmp);
 
         private void P_ImageMouseMove(object sender, BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e) {
-            CurrentTool?.MouseMove(e, P.BMP);
+            CurrentTool?.MouseMove(e, P.Bmp);
             if (e.Current.IsInPic) {
-                var c = P.BMP.GetPixel(e.Current.TrimmedX, e.Current.TrimmedY);
+                var c = P.Bmp.GetPixel(e.Current.TrimmedX, e.Current.TrimmedY);
                 InfoText.Text = "X: " + e.Current.TrimmedX +
                                "<br>Y: " + e.Current.TrimmedY +
-                               "<br>Farbe: " + c.ToHTMLCode().ToUpper();
+                               "<br>Farbe: " + c.ToHtmlCode().ToUpper();
             } else {
                 InfoText.Text = "";
             }
         }
 
-        private void P_ImageMouseUp(object sender, BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e) => CurrentTool?.MouseUp(e, P.BMP);
+        private void P_ImageMouseUp(object sender, BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e) => CurrentTool?.MouseUp(e, P.Bmp);
 
         private void P_MouseLeave(object sender, System.EventArgs e) => InfoText.Text = "";
 
@@ -351,10 +351,10 @@ namespace BluePaint {
             if (_PicUndo == null) { return; }
             btnRückgänig.Enabled = false;
             _isSaved = false;
-            var _bmp = P.BMP;
+            var _bmp = P.Bmp;
             Generic.Swap(ref _bmp, ref _PicUndo);
-            P.BMP = _bmp;
-            if (P.BMP.Width != _PicUndo.Width || P.BMP.Height != _PicUndo.Height) {
+            P.Bmp = _bmp;
+            if (P.Bmp.Width != _PicUndo.Width || P.Bmp.Height != _PicUndo.Height) {
                 P.ZoomFit();
             } else {
                 P.Invalidate();
@@ -377,21 +377,21 @@ namespace BluePaint {
             try {
                 switch (_filename.FileSuffix().ToUpper()) {
                     case "JPG":
-                        P.BMP.Save(_filename, System.Drawing.Imaging.ImageFormat.Jpeg);
+                        P.Bmp.Save(_filename, System.Drawing.Imaging.ImageFormat.Jpeg);
                         _isSaved = true;
                         break;
 
                     case "BMP":
-                        P.BMP.Save(_filename, System.Drawing.Imaging.ImageFormat.Bmp);
+                        P.Bmp.Save(_filename, System.Drawing.Imaging.ImageFormat.Bmp);
                         _isSaved = true;
                         break;
 
                     case "PNG":
-                        P.BMP.Save(_filename, System.Drawing.Imaging.ImageFormat.Png);
+                        P.Bmp.Save(_filename, System.Drawing.Imaging.ImageFormat.Png);
                         _isSaved = true;
                         break;
                 }
-                P.BMP.Save(_filename);
+                P.Bmp.Save(_filename);
                 _isSaved = true;
             } catch {
                 _isSaved = false;

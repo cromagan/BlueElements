@@ -268,7 +268,7 @@ namespace BlueControls.Extended_Text {
                 x = this[charPos].Pos.X;
                 y = this[charPos].Pos.Y;
                 he = this[charPos].Size.Height;
-            } else if (charPos > 0 && charPos < Count + 1 && this[charPos - 1].isLineBreak()) {
+            } else if (charPos > 0 && charPos < Count + 1 && this[charPos - 1].IsLineBreak()) {
                 // Vorzeichen = Zeilenumbruch
                 y = this[charPos - 1].Pos.Y + this[charPos - 1].Size.Height;
                 he = this[charPos - 1].Size.Height;
@@ -393,22 +393,22 @@ namespace BlueControls.Extended_Text {
         internal int WordEnd(int pos) {
             if (Count == 0) { return -1; }
             if (pos < 0 || pos >= Count) { return -1; }
-            if (this[pos].isWordSeperator()) { return -1; }
+            if (this[pos].IsWordSeperator()) { return -1; }
             do {
                 pos++;
                 if (pos >= Count) { return Count; }
-                if (this[pos].isWordSeperator()) { return pos; }
+                if (this[pos].IsWordSeperator()) { return pos; }
             } while (true);
         }
 
         internal int WordStart(int pos) {
             if (Count == 0) { return -1; }
             if (pos < 0 || pos >= Count) { return -1; }
-            if (this[pos].isWordSeperator()) { return -1; }
+            if (this[pos].IsWordSeperator()) { return -1; }
             do {
                 pos--;
                 if (pos < 0) { return 0; }
-                if (this[pos].isWordSeperator()) { return pos + 1; }
+                if (this[pos].IsWordSeperator()) { return pos + 1; }
             } while (true);
         }
 
@@ -427,7 +427,7 @@ namespace BlueControls.Extended_Text {
                     lastStufe = this[first].Stufe;
                 }
 
-                t.Append(this[first].HTMLText());
+                t.Append(this[first].HtmlText());
             }
 
             return t.ToString();
@@ -555,11 +555,11 @@ namespace BlueControls.Extended_Text {
                     break;
 
                 case "FONTCOLOR":
-                    font = BlueFont.Get(font.FontName, font.FontSize, font.Bold, font.Italic, font.Underline, font.StrikeOut, font.Outline, attribut, font.Color_Outline.ToHTMLCode(), font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
+                    font = BlueFont.Get(font.FontName, font.FontSize, font.Bold, font.Italic, font.Underline, font.StrikeOut, font.Outline, attribut, font.Color_Outline.ToHtmlCode(), font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
                     break;
 
                 case "FONTOUTLINE":
-                    font = BlueFont.Get(font.FontName, font.FontSize, font.Bold, font.Italic, font.Underline, font.StrikeOut, font.Outline, font.Color_Main.ToHTMLCode(), attribut, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
+                    font = BlueFont.Get(font.FontName, font.FontSize, font.Bold, font.Italic, font.Underline, font.StrikeOut, font.Outline, font.Color_Main.ToHtmlCode(), attribut, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
                     break;
 
                 case "BR":
@@ -874,7 +874,7 @@ namespace BlueControls.Extended_Text {
                     isY = 0;
                 }
 
-                if (!this[akt].isSpace()) {
+                if (!this[akt].IsSpace()) {
                     if (akt > zbChar && _textDimensions.Width > 0) {
                         if (isX + this[akt].Size.Width + 0.5 > _textDimensions.Width) {
                             akt = WordBreaker(akt, zbChar);
@@ -894,7 +894,7 @@ namespace BlueControls.Extended_Text {
                 // Diese Zeile garantiert, dass immer genau EIN Pixel frei ist zwischen zwei Buchstaben.
                 isX = (float)(isX + Math.Truncate(this[akt].Size.Width + 0.5));
 
-                if (this[akt].isLineBreak()) {
+                if (this[akt].IsLineBreak()) {
                     isX = vZbxPixel;
                     if (this[akt] is ExtCharTopCode) {
                         Row_SetOnLine(zbChar, akt);
@@ -960,11 +960,11 @@ namespace BlueControls.Extended_Text {
             if (augZeichen < minZeichen + 1) { augZeichen = minZeichen + 1; }
             // AusnahmeFall auschließen:
             // Space-Zeichen - Dann Buchstabe
-            if (this[augZeichen - 1].isSpace() && !this[augZeichen].isPossibleLineBreak()) { return augZeichen; }
+            if (this[augZeichen - 1].IsSpace() && !this[augZeichen].IsPossibleLineBreak()) { return augZeichen; }
             var started = augZeichen;
             // Das Letzte Zeichen Search, das kein Trennzeichen ist
             do {
-                if (this[augZeichen].isPossibleLineBreak()) {
+                if (this[augZeichen].IsPossibleLineBreak()) {
                     augZeichen--;
                 } else {
                     break;
@@ -972,7 +972,7 @@ namespace BlueControls.Extended_Text {
                 if (augZeichen <= minZeichen) { return started; }
             } while (true);
             do {
-                if (this[augZeichen].isPossibleLineBreak()) { return augZeichen + 1; }
+                if (this[augZeichen].IsPossibleLineBreak()) { return augZeichen + 1; }
                 augZeichen--;
                 if (augZeichen <= minZeichen) { return started; }
             } while (true);

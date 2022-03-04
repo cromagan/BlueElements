@@ -21,7 +21,7 @@ namespace BlueDatabase.EventArgs {
 
         #region Constructors
 
-        public CellCancelEventArgs(ColumnItem? Column, RowItem? Row, string CancelReason) : base(Column, Row) => this.CancelReason = CancelReason;
+        public CellCancelEventArgs(ColumnItem? column, RowItem? row, string cancelReason) : base(column, row) => CancelReason = cancelReason;
 
         #endregion
 

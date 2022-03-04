@@ -158,7 +158,7 @@ namespace BlueControls.Controls {
                     return enPartentType.TabControl;
                 // Is = "BlueBasics.TabPage"
 
-                case tabAdministration:
+                case TabAdministration:
 
                 case System.Windows.Forms.TabPage when control.Parent is RibbonBar:
                     return enPartentType.RibbonPage;

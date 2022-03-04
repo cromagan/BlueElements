@@ -163,7 +163,7 @@ namespace BlueControls.Controls {
             if (FileExists(SaveFileName())) {
                 var t = File.ReadAllText(SaveFileName(), System.Text.Encoding.UTF8);
                 t = t.RemoveChars("\n");
-                LastD.AddRange(t.SplitAndCutByCR());
+                LastD.AddRange(t.SplitAndCutByCr());
             }
         }
 

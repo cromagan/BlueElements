@@ -23,13 +23,13 @@ namespace BluePaint.EventArgs {
 
         #region Constructors
 
-        public BitmapEventArgs(Bitmap? BMP) => this.BMP = BMP;
+        public BitmapEventArgs(Bitmap? bmp) => Bmp = bmp;
 
         #endregion
 
         #region Properties
 
-        public Bitmap? BMP { get; set; }
+        public Bitmap? Bmp { get; set; }
 
         #endregion
     }

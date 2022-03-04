@@ -104,8 +104,8 @@ namespace BlueControls.Forms {
                 fUnterstrichen.Checked = value.Underline;
                 fDurchge.Checked = value.StrikeOut;
                 fOutline.Checked = value.Outline;
-                cFarbe.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", value.Color_Main.ToHTMLCode()).ToString();
-                cRandF.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", value.Color_Outline.ToHTMLCode()).ToString();
+                cFarbe.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", value.Color_Main.ToHtmlCode()).ToString();
+                cRandF.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", value.Color_Outline.ToHtmlCode()).ToString();
                 fKap.Checked = value.Kapitälchen;
                 OnlyLow.Checked = value.OnlyLower;
                 OnlyUpper.Checked = value.OnlyUpper;
@@ -119,16 +119,16 @@ namespace BlueControls.Forms {
         #region Methods
 
         private void cFarbe_Click(object sender, System.EventArgs e) {
-            ColorDia.Color = QuickImage.Get(cFarbe.ImageCode).ChangeGreenTo.FromHTMLCode();
+            ColorDia.Color = QuickImage.Get(cFarbe.ImageCode).ChangeGreenTo.FromHtmlCode();
             ColorDia.ShowDialog();
-            cFarbe.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", ColorDia.Color.ToHTMLCode()).ToString();
+            cFarbe.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", ColorDia.Color.ToHtmlCode()).ToString();
             UpdateSampleText();
         }
 
         private void cRandF_Click(object sender, System.EventArgs e) {
-            ColorDia.Color = QuickImage.Get(cRandF.ImageCode).ChangeGreenTo.FromHTMLCode();
+            ColorDia.Color = QuickImage.Get(cRandF.ImageCode).ChangeGreenTo.FromHtmlCode();
             ColorDia.ShowDialog();
-            cRandF.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", ColorDia.Color.ToHTMLCode()).ToString();
+            cRandF.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", ColorDia.Color.ToHtmlCode()).ToString();
             UpdateSampleText();
         }
 

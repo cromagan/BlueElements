@@ -28,7 +28,7 @@ using TextBox = BlueControls.Controls.TextBox;
 
 namespace BlueControls.Forms
 {
-    public partial class frmTableView : Form
+    public partial class FrmTableView : Form
     {
         //Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
         protected override void Dispose(bool disposing)
@@ -98,7 +98,7 @@ namespace BlueControls.Forms
             this.grpEditor = new BlueControls.Controls.GroupBox();
             this.AllgemeinerEditor = new BlueControls.Controls.Button();
             this.BeziehungsEditor = new BlueControls.Controls.Button();
-            this.tabAdmin = new BlueControls.BlueDatabaseDialogs.tabAdministration();
+            this.tabAdmin = new BlueControls.BlueDatabaseDialogs.TabAdministration();
             this.Filter = new BlueControls.BlueDatabaseDialogs.Filterleiste();
             this.MainRibbon.SuspendLayout();
             this.tabDatei.SuspendLayout();
@@ -687,7 +687,7 @@ namespace BlueControls.Forms
             this.Controls.Add(this.Filter);
             this.Controls.Add(this.MainRibbon);
             this.MinimumSize = new System.Drawing.Size(1024, 768);
-            this.Name = "frmTableView";
+            this.Name = "FrmTableView";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.MainRibbon.ResumeLayout(false);
             this.tabDatei.ResumeLayout(false);
@@ -748,7 +748,7 @@ namespace BlueControls.Forms
         private GroupBox grpOrdner;
         private GroupBox grpDatei;
         private RibbonBar MainRibbon;
-        private tabAdministration tabAdmin;
+        private TabAdministration tabAdmin;
         private Filterleiste Filter;
         protected Button btnAlleSchließen;
         protected Button btnAlleErweitern;

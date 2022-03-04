@@ -25,16 +25,16 @@ namespace BlueBasics {
 
         public static Point PointParse(this string code) {
             code = code.RemoveChars("{}XYxy= ");
-            Point P = new();
+            Point p = new();
             if (string.IsNullOrEmpty(code)) {
-                P.X = 0;
-                P.Y = 0;
-                return P;
+                p.X = 0;
+                p.Y = 0;
+                return p;
             }
             var w = code.Split(',');
-            P.X = int.Parse(w[0]);
-            P.Y = int.Parse(w[1]);
-            return P;
+            p.X = int.Parse(w[0]);
+            p.Y = int.Parse(w[1]);
+            return p;
         }
 
         #endregion

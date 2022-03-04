@@ -29,11 +29,11 @@ namespace BlueControls.Controls {
 
         #region Fields
 
-        private Database _Database;
+        private Database _database;
 
         private long _savedRowKey = long.MinValue;
 
-        private long _ShowingRowKey = -1;
+        private long _showingRowKey = -1;
 
         private RowItem? _tmpShowingRow;
 
@@ -57,30 +57,30 @@ namespace BlueControls.Controls {
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Database Database {
-            get => _Database;
+            get => _database;
             set {
-                if (_Database == value) { return; }
+                if (_database == value) { return; }
 
                 ShowingRowKey = -1; // Wichtig, dass ordenlich Showing-Row to Nothing gesetzt wird, weil dann alle Fokuse durch Enabled elemeniert werden und nachträglich nix mehr ausgelöst wird.
 
-                if (_Database != null) {
-                    _Database.Loading -= _Database_StoreView;
-                    _Database.Loaded -= _DatabaseLoaded;
+                if (_database != null) {
+                    _database.Loading -= _Database_StoreView;
+                    _database.Loaded -= _DatabaseLoaded;
                     //_Database.RowKeyChanged -= _Database_RowKeyChanged;
-                    _Database.Disposing -= _Database_Disposing;
-                    _Database.Save(false); // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
+                    _database.Disposing -= _Database_Disposing;
+                    _database.Save(false); // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
                 }
 
-                _Database = value;
+                _database = value;
 
-                if (_Database == null) {
+                if (_database == null) {
                     return;
                 }
 
-                _Database.Loading += _Database_StoreView;
-                _Database.Loaded += _DatabaseLoaded;
+                _database.Loading += _Database_StoreView;
+                _database.Loaded += _DatabaseLoaded;
                 //_Database.RowKeyChanged += _Database_RowKeyChanged;
-                _Database.Disposing += _Database_Disposing;
+                _database.Disposing += _Database_Disposing;
             }
         }
 
@@ -100,21 +100,21 @@ namespace BlueControls.Controls {
         public long ShowingRowKey {
             get {
                 Develop.DebugPrint_Disposed(IsDisposed);
-                return _ShowingRowKey;
+                return _showingRowKey;
             }
             set {
                 Develop.DebugPrint_Disposed(IsDisposed);
                 if (value < 0) { value = -1; }
-                if (value == _ShowingRowKey) { return; }
-                if (value > -1 && _Database == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Database is nothing"); }
+                if (value == _showingRowKey) { return; }
+                if (value > -1 && _database == null) { Develop.DebugPrint(enFehlerArt.Fehler, "Database is nothing"); }
 
-                _ShowingRowKey = value;
-                _tmpShowingRow = _Database?.Row.SearchByKey(_ShowingRowKey);
+                _showingRowKey = value;
+                _tmpShowingRow = _database?.Row.SearchByKey(_showingRowKey);
 
                 foreach (var thisFlex in Controls) {
                     if (thisFlex is FlexiControlForCell flx && !flx.IsDisposed) {
-                        flx.Database = _Database;
-                        flx.RowKey = _ShowingRowKey;
+                        flx.Database = _database;
+                        flx.RowKey = _showingRowKey;
                         flx.CheckEnabledState();
                     }
                 }
@@ -131,7 +131,7 @@ namespace BlueControls.Controls {
         protected override void Dispose(bool disposing) {
             try {
                 if (disposing) {
-                    _ShowingRowKey = -1;
+                    _showingRowKey = -1;
                     _tmpShowingRow = null;
                     Database = null; // Wichtig,  (nicht _Database) um events zu lösen.
                     //components?.Dispose();

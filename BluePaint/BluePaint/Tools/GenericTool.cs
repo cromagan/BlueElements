@@ -119,7 +119,7 @@ namespace BluePaint {
         protected virtual Bitmap? OnNeedCurrentPic() {
             BitmapEventArgs e = new(null);
             NeedCurrentPic?.Invoke(this, e);
-            return e.BMP;
+            return e.Bmp;
         }
 
         /// <summary>

@@ -22,6 +22,7 @@ using BlueControls.Forms;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -79,7 +80,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
             // Diese Fehler sind so schwer und darf auf keinen Fall in die Umwelt gelassen werden
             if (string.IsNullOrEmpty(feh)) {
-                foreach (var _ in _column.Database.Column.Where(thisColumn => thisColumn != _column && thisColumn != null && tbxName.Text.ToUpper() == thisColumn.Name.ToUpper())) {
+                foreach (var _ in _column.Database.Column.Where(thisColumn => thisColumn != _column && thisColumn != null && string.Equals(tbxName.Text, thisColumn.Name, StringComparison.CurrentCultureIgnoreCase))) {
                     feh = "Spalten-Name bereits vorhanden.";
                 }
             }
@@ -97,9 +98,9 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void btnBackColor_Click(object sender, System.EventArgs e) {
-            ColorDia.Color = QuickImage.Get(btnBackColor.ImageCode).ChangeGreenTo.FromHTMLCode();
+            ColorDia.Color = QuickImage.Get(btnBackColor.ImageCode).ChangeGreenTo.FromHtmlCode();
             ColorDia.ShowDialog();
-            btnBackColor.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", ColorDia.Color.ToHTMLCode()).ToString();
+            btnBackColor.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", ColorDia.Color.ToHtmlCode()).ToString();
         }
 
         private void btnOk_Click(object sender, System.EventArgs e) {
@@ -182,9 +183,9 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void btnTextColor_Click(object sender, System.EventArgs e) {
-            ColorDia.Color = QuickImage.Get(btnTextColor.ImageCode).ChangeGreenTo.FromHTMLCode();
+            ColorDia.Color = QuickImage.Get(btnTextColor.ImageCode).ChangeGreenTo.FromHtmlCode();
             ColorDia.ShowDialog();
-            btnTextColor.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", ColorDia.Color.ToHTMLCode()).ToString();
+            btnTextColor.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", ColorDia.Color.ToHtmlCode()).ToString();
         }
 
         private void btnVerwendung_Click(object sender, System.EventArgs e) => MessageBox.Show(_column.Verwendung());
@@ -296,7 +297,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (!string.IsNullOrEmpty(_column.Database.Filename)) {
                 var all = Directory.GetFiles(_column.Database.Filename.FilePath(), "*.mdb", SearchOption.TopDirectoryOnly);
                 foreach (var thisString in all) {
-                    if (thisString.ToLower() != _column.Database.Filename.ToLower()) { cbxLinkedDatabase.Item.Add(thisString.FileNameWithSuffix()); }
+                    if (!string.Equals(thisString, _column.Database.Filename, StringComparison.CurrentCultureIgnoreCase)) { cbxLinkedDatabase.Item.Add(thisString.FileNameWithSuffix()); }
                 }
             }
             cbxLinkedDatabase.Item.Sort();
@@ -339,8 +340,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             tbxName.Text = _column.Name;
             tbxName.AllowedChars = Constants.AllowedCharsVariableName;
             tbxCaption.Text = _column.Caption;
-            btnBackColor.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", _column.BackColor.ToHTMLCode()).ToString();
-            btnTextColor.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", _column.ForeColor.ToHTMLCode()).ToString();
+            btnBackColor.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", _column.BackColor.ToHtmlCode()).ToString();
+            btnTextColor.ImageCode = QuickImage.Get(enImageCode.Kreis, 16, "", _column.ForeColor.ToHtmlCode()).ToString();
             btnMultiline.Checked = _column.MultiLine;
             cbxFormat.Text = ((int)_column.Format).ToString();
             cbxRandLinks.Text = ((int)_column.LineLeft).ToString();
@@ -431,8 +432,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             _column.Quickinfo = tbxQuickinfo.Text.Replace("\r", "<BR>");
             _column.AdminInfo = tbxAdminInfo.Text.Replace("\r", "<BR>");
             _column.Suffix = cbxEinheit.Text;
-            _column.BackColor = QuickImage.Get(btnBackColor.ImageCode).ChangeGreenTo.FromHTMLCode();
-            _column.ForeColor = QuickImage.Get(btnTextColor.ImageCode).ChangeGreenTo.FromHTMLCode();
+            _column.BackColor = QuickImage.Get(btnBackColor.ImageCode).ChangeGreenTo.FromHtmlCode();
+            _column.ForeColor = QuickImage.Get(btnTextColor.ImageCode).ChangeGreenTo.FromHtmlCode();
             _column.LineLeft = (enColumnLineStyle)int.Parse(cbxRandLinks.Text);
             _column.LineRight = (enColumnLineStyle)int.Parse(cbxRandRechts.Text);
             _column.MultiLine = btnMultiline.Checked;
@@ -465,17 +466,17 @@ namespace BlueControls.BlueDatabaseDialogs {
                 _column.PermissionGroupsChangeCell.Clear();
                 _column.PermissionGroupsChangeCell.AddRange(lbxCellEditor.Item.ToListOfString());
             }
-            var newDd = tbxAuswaehlbareWerte.Text.SplitAndCutByCRToList().SortedDistinctList();
+            var newDd = tbxAuswaehlbareWerte.Text.SplitAndCutByCrToList().SortedDistinctList();
             if (newDd.IsDifferentTo(_column.DropDownItems)) {
                 _column.DropDownItems.Clear();
                 _column.DropDownItems.AddRange(newDd);
             }
-            var newRep = txbReplacer.Text.SplitAndCutByCRToList();
+            var newRep = txbReplacer.Text.SplitAndCutByCrToList();
             if (newRep.IsDifferentTo(_column.OpticalReplace)) {
                 _column.OpticalReplace.Clear();
                 _column.OpticalReplace.AddRange(newRep);
             }
-            var newRep2 = txbAutoReplace.Text.SplitAndCutByCRToList();
+            var newRep2 = txbAutoReplace.Text.SplitAndCutByCrToList();
             if (newRep2.IsDifferentTo(_column.AfterEditAutoReplace)) {
                 _column.AfterEditAutoReplace.Clear();
                 _column.AfterEditAutoReplace.AddRange(newRep2);
@@ -487,7 +488,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             _column.Prefix = txbPrefix.Text;
             _column.CaptionBitmap = txbSpaltenbild.Text;
             _column.DauerFilterPos = txbDauerFilterPos.Text.PointParse();
-            var newTags = tbxTags.Text.SplitAndCutByCRToList();
+            var newTags = tbxTags.Text.SplitAndCutByCrToList();
             if (newTags.IsDifferentTo(_column.Tags)) {
                 _column.Tags.Clear();
                 _column.Tags.AddRange(newTags);
@@ -618,7 +619,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                 }
             }
 
-            nf = nf.JoinWithCr().SplitAndCutByCRToList();
+            nf = nf.JoinWithCr().SplitAndCutByCrToList();
 
             if (_column.LinkedCellFilter.IsDifferentTo(nf)) {
                 _column.LinkedCellFilter.Clear();

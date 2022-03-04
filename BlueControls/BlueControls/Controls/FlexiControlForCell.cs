@@ -44,13 +44,13 @@ namespace BlueControls.Controls {
         #region Fields
 
         // Für automatisches Datenbank-Management
-        private long _ColKey = -1;
+        private long _colKey = -1;
 
-        private string _ColumnName = string.Empty;
+        private string _columnName = string.Empty;
 
-        private Database _Database;
+        private Database _database;
 
-        private long _RowKey = -1;
+        private long _rowKey = -1;
 
         private ColumnItem? _tmpColumn;
 
@@ -92,9 +92,9 @@ namespace BlueControls.Controls {
             //    return _ColKey;
             //}
             set {
-                if (value == _ColKey) { return; }
+                if (value == _colKey) { return; }
                 FillCellNow();
-                _ColKey = value;
+                _colKey = value;
                 GetTmpVariables();
                 UpdateColumnData();
                 SetValueFromCell();
@@ -104,10 +104,10 @@ namespace BlueControls.Controls {
         [Description("Dieses Feld kann für den Forms-Editor verwendet werden. Falls ein Key und ein Name befüllt sind, ist der Name führend.")]
         [DefaultValue("")]
         public string ColumnName {
-            get => _ColumnName;
+            get => _columnName;
             set {
-                if (_ColumnName == value) { return; }
-                _ColumnName = value;
+                if (_columnName == value) { return; }
+                _columnName = value;
                 GetTmpVariables();
                 UpdateColumnData();
                 SetValueFromCell();
@@ -118,35 +118,35 @@ namespace BlueControls.Controls {
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Database Database {
-            get => _Database;
+            get => _database;
             set {
-                if (value == _Database) { return; }
+                if (value == _database) { return; }
                 FillCellNow();
-                if (_Database != null) {
-                    _Database.Cell.CellValueChanged -= Database_CellValueChanged;
-                    _Database.Row.RowRemoving -= Row_RowRemoving;
-                    _Database.Column.ItemInternalChanged -= Column_ItemInternalChanged;
-                    _Database.ConnectedControlsStopAllWorking -= Database_ConnectedControlsStopAllWorking;
-                    _Database.Row.RowChecked -= Database_RowChecked;
+                if (_database != null) {
+                    _database.Cell.CellValueChanged -= Database_CellValueChanged;
+                    _database.Row.RowRemoving -= Row_RowRemoving;
+                    _database.Column.ItemInternalChanged -= Column_ItemInternalChanged;
+                    _database.ConnectedControlsStopAllWorking -= Database_ConnectedControlsStopAllWorking;
+                    _database.Row.RowChecked -= Database_RowChecked;
                     //_Database.RowKeyChanged -= _Database_RowKeyChanged;
                     //_Database.ColumnKeyChanged -= _Database_ColumnKeyChanged;
-                    _Database.Loaded -= _Database_Loaded;
-                    _Database.Disposing -= _Database_Disposing;
+                    _database.Loaded -= _Database_Loaded;
+                    _database.Disposing -= _Database_Disposing;
                 }
-                _Database = value;
+                _database = value;
                 GetTmpVariables();
                 UpdateColumnData();
-                if (_Database != null) {
-                    _Database.Cell.CellValueChanged += Database_CellValueChanged;
+                if (_database != null) {
+                    _database.Cell.CellValueChanged += Database_CellValueChanged;
                     //_Database.Row.RowRemoved += Database_RowRemoved;
-                    _Database.Row.RowRemoving += Row_RowRemoving;
-                    _Database.Column.ItemInternalChanged += Column_ItemInternalChanged;
-                    _Database.ConnectedControlsStopAllWorking += Database_ConnectedControlsStopAllWorking;
-                    _Database.Row.RowChecked += Database_RowChecked;
+                    _database.Row.RowRemoving += Row_RowRemoving;
+                    _database.Column.ItemInternalChanged += Column_ItemInternalChanged;
+                    _database.ConnectedControlsStopAllWorking += Database_ConnectedControlsStopAllWorking;
+                    _database.Row.RowChecked += Database_RowChecked;
                     //_Database.RowKeyChanged += _Database_RowKeyChanged;
-                    _Database.Loaded += _Database_Loaded;
+                    _database.Loaded += _Database_Loaded;
                     //_Database.ColumnKeyChanged += _Database_ColumnKeyChanged;
-                    _Database.Disposing += _Database_Disposing;
+                    _database.Disposing += _Database_Disposing;
                 }
                 SetValueFromCell();
                 CheckEnabledState();
@@ -157,11 +157,11 @@ namespace BlueControls.Controls {
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public long RowKey {
-            get => _RowKey;
+            get => _rowKey;
             set {
-                if (value == _RowKey) { return; }
+                if (value == _rowKey) { return; }
                 FillCellNow();
-                _RowKey = value;
+                _rowKey = value;
                 GetTmpVariables();
                 SetValueFromCell();
                 CheckEnabledState();
@@ -179,7 +179,7 @@ namespace BlueControls.Controls {
             //TableView.Database.Cell.DataOfCellKey(CellKey, out var Column, out var Row);
             switch (e.ClickedComand.ToLower()) {
                 case "spalteneigenschaftenbearbeiten":
-                    tabAdministration.OpenColumnEditor(_tmpColumn, null);
+                    TabAdministration.OpenColumnEditor(_tmpColumn, null);
                     return true;
 
                 case "vorherigeninhaltwiederherstellen":
@@ -195,25 +195,25 @@ namespace BlueControls.Controls {
             return false;
         }
 
-        public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList? Items, out object? HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) {
+        public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList? items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
             GetTmpVariables();
             if (_tmpColumn != null && _tmpColumn.Database.IsAdministrator()) {
-                Items.Add(enContextMenuComands.SpaltenEigenschaftenBearbeiten);
+                items.Add(enContextMenuComands.SpaltenEigenschaftenBearbeiten);
             }
             if (_tmpColumn != null && _tmpRow != null && _tmpColumn.Database.IsAdministrator()) {
-                Items.Add(enContextMenuComands.VorherigenInhaltWiederherstellen);
+                items.Add(enContextMenuComands.VorherigenInhaltWiederherstellen);
             }
             if (Parent is Formula f) {
                 ItemCollectionList x = new(enBlueListBoxAppearance.KontextMenu);
-                f.GetContextMenuItems(null, x, out _, Tags, ref Cancel, ref Translate);
+                f.GetContextMenuItems(null, x, out _, tags, ref cancel, ref translate);
                 if (x.Count > 0) {
-                    if (Items.Count > 0) {
-                        Items.AddSeparator();
+                    if (items.Count > 0) {
+                        items.AddSeparator();
                     }
-                    Items.AddRange(x);
+                    items.AddRange(x);
                 }
             }
-            HotItem = _tmpColumn;
+            hotItem = _tmpColumn;
         }
 
         public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
@@ -242,12 +242,12 @@ namespace BlueControls.Controls {
 
             switch (e.Control) {
                 case ComboBox comboBox:
-                    ItemCollectionList Item2 = new();
-                    ItemCollectionList.GetItemCollection(Item2, column1, null, enShortenStyle.Replaced, 10000);
+                    ItemCollectionList item2 = new();
+                    ItemCollectionList.GetItemCollection(item2, column1, null, enShortenStyle.Replaced, 10000);
                     if (column1.TextBearbeitungErlaubt) {
-                        StyleComboBox(comboBox, Item2, ComboBoxStyle.DropDown);
+                        StyleComboBox(comboBox, item2, ComboBoxStyle.DropDown);
                     } else {
-                        StyleComboBox(comboBox, Item2, ComboBoxStyle.DropDownList);
+                        StyleComboBox(comboBox, item2, ComboBoxStyle.DropDownList);
                     }
                     comboBox.GotFocus += GotFocus_ComboBox;
                     break;
@@ -407,22 +407,22 @@ namespace BlueControls.Controls {
 
         private void Database_RowChecked(object sender, RowCheckedEventArgs e) {
             if (e.Row != _tmpRow) { return; }
-            var NewT = string.Empty;
-            foreach (var ThisString in e.ColumnsWithErrors) {
-                var X = ThisString.SplitAndCutBy("|");
-                if (_tmpColumn != null && X[0].ToUpper() == _tmpColumn.Name.ToUpper()) {
+            var newT = string.Empty;
+            foreach (var thisString in e.ColumnsWithErrors) {
+                var x = thisString.SplitAndCutBy("|");
+                if (_tmpColumn != null && string.Equals(x[0], _tmpColumn.Name, StringComparison.CurrentCultureIgnoreCase)) {
                     if (!string.IsNullOrEmpty(InfoText)) { InfoText += "<br><hr><br>"; }
-                    NewT += X[1];
+                    newT += x[1];
                 }
             }
-            InfoText = NewT;
+            InfoText = newT;
         }
 
-        private void EasyPicConnectedDatabase(object sender, MultiUserFileGiveBackEventArgs e) => e.File = _Database;
+        private void EasyPicConnectedDatabase(object sender, MultiUserFileGiveBackEventArgs e) => e.File = _database;
 
         private void EasyPicImageChanged(object sender, System.EventArgs e) {
-            foreach (Control ThisControl in Controls) {
-                if (ThisControl is EasyPic ep) {
+            foreach (Control thisControl in Controls) {
+                if (thisControl is EasyPic ep) {
                     if (_tmpColumn == null && _tmpRow == null) { Develop.DebugPrint_NichtImplementiert(); }
                     if (_tmpColumn.Format != enDataFormat.Link_To_Filesystem) { Develop.DebugPrint_NichtImplementiert(); }
                     switch (ep.SorceType) {
@@ -444,7 +444,7 @@ namespace BlueControls.Controls {
                                 return;
                             }
                             var fil2 = _tmpColumn.BestFile(_tmpColumn.Name + ".png", true);
-                            if (fil2.FilePath().ToUpper() != ep.SorceName.FilePath().ToUpper()) {
+                            if (!string.Equals(fil2.FilePath(), ep.SorceName.FilePath(), StringComparison.CurrentCultureIgnoreCase)) {
                                 ep.Bitmap.Save(fil2, ImageFormat.Png);
                             } else {
                                 fil2 = ep.SorceName;
@@ -469,27 +469,27 @@ namespace BlueControls.Controls {
             if (!Enabled) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.
             GetTmpVariables(); // Falls der Key inzwischen nicht mehr in der Collection ist, deswegen neu prüfen. RowREmoved greift zwar, kann aber durchaus erst nach RowSortesd/CursorposChanges auftreten.
             if (_tmpColumn == null || _tmpRow == null) { return; }
-            var OldVal = _tmpRow.CellGetString(_tmpColumn);
-            string NewValue;
+            var oldVal = _tmpRow.CellGetString(_tmpColumn);
+            string newValue;
             switch (_tmpColumn.Format) {
                 case enDataFormat.Link_To_Filesystem:
-                    var tmp = Value.SplitAndCutByCRToList();
+                    var tmp = Value.SplitAndCutByCrToList();
                     var tmp2 = tmp.Select(file => _tmpColumn.SimplyFile(file)).ToList();
-                    NewValue = tmp2.JoinWithCr();
+                    newValue = tmp2.JoinWithCr();
                     break;
 
                 default:
-                    NewValue = Value;
+                    newValue = Value;
                     break;
             }
-            if (OldVal == NewValue) { return; }
+            if (oldVal == newValue) { return; }
 
-            var _tmpR2 = _tmpRow; // Manchmal wird die Sortierung verändert, was zur Folge hat, dass der Cursor verschwindet, wass die _tmpRow verwirft....
-            var _tmpC2 = _tmpColumn;
+            var tmpR2 = _tmpRow; // Manchmal wird die Sortierung verändert, was zur Folge hat, dass der Cursor verschwindet, wass die _tmpRow verwirft....
+            var tmpC2 = _tmpColumn;
 
-            _tmpR2.Database.WaitEditable();
-            _tmpR2.CellSet(_tmpC2, NewValue);
-            if (OldVal != _tmpRow.CellGetString(_tmpC2)) { _tmpR2.DoAutomatic(false, false, 1, "value changed"); }
+            tmpR2.Database.WaitEditable();
+            tmpR2.CellSet(tmpC2, newValue);
+            if (oldVal != _tmpRow.CellGetString(tmpC2)) { tmpR2.DoAutomatic(false, false, 1, "value changed"); }
         }
 
         private ColumnItem? GetRealColumn(ColumnItem? column, RowItem? row) {
@@ -529,11 +529,11 @@ namespace BlueControls.Controls {
         }
 
         private void GetTmpVariables() {
-            if (_Database != null) {
-                _tmpColumn = !string.IsNullOrEmpty(_ColumnName)
-                    ? _Database.Column[DataHolder.ColumnName(_ColumnName)]
-                    : _Database.Column.SearchByKey(_ColKey);
-                _tmpRow = _Database.Row.SearchByKey(_RowKey);
+            if (_database != null) {
+                _tmpColumn = !string.IsNullOrEmpty(_columnName)
+                    ? _database.Column[DataHolder.ColumnName(_columnName)]
+                    : _database.Column.SearchByKey(_colKey);
+                _tmpRow = _database.Row.SearchByKey(_rowKey);
             } else {
                 _tmpColumn = null;
                 _tmpRow = null;
@@ -553,7 +553,7 @@ namespace BlueControls.Controls {
         }
 
         private void ListBox_AddClicked(object sender, System.EventArgs e) {
-            var Dia = ColumnItem.UserEditDialogTypeInTable(_tmpColumn, false);
+            var dia = ColumnItem.UserEditDialogTypeInTable(_tmpColumn, false);
 
             ListBox lbx = null;
 
@@ -562,7 +562,7 @@ namespace BlueControls.Controls {
 
             if (lbx == null) { return; }
 
-            switch (Dia) {
+            switch (dia) {
                 case enEditTypeTable.None:
                     return;
 
@@ -587,7 +587,7 @@ namespace BlueControls.Controls {
                     return;
 
                 default:
-                    Develop.DebugPrint(Dia);
+                    Develop.DebugPrint(dia);
                     return;
             }
         }
@@ -627,77 +627,77 @@ namespace BlueControls.Controls {
         }
 
         private void Marker_DoWork(object sender, DoWorkEventArgs e) {
-            TextBox TXB = null;
+            TextBox txb = null;
 
-            foreach (var Control in Controls) {
-                if (Control is TextBox t) { TXB = t; }
+            foreach (var control in Controls) {
+                if (control is TextBox t) { txb = t; }
             }
 
             if (Marker.CancellationPending) { return; }
-            if (TXB == null) { return; }
+            if (txb == null) { return; }
             if (_tmpRow == null) { return; }
             if (Marker.CancellationPending) { return; }
-            List<string> Names = new();
-            Names.AddRange(_Database.Column[0].GetUcaseNamesSortedByLenght());
+            List<string> names = new();
+            names.AddRange(_database.Column[0].GetUcaseNamesSortedByLenght());
             if (Marker.CancellationPending) { return; }
             var myname = _tmpRow.CellFirstString().ToUpper();
-            var InitT = TXB.Text;
-            bool Ok;
+            var initT = txb.Text;
+            bool ok;
 
             do {
-                Ok = true;
-                Marker.ReportProgress(0, new List<object> { TXB, "Unmark1" });
+                ok = true;
+                Marker.ReportProgress(0, new List<object> { txb, "Unmark1" });
                 Develop.DoEvents();
-                if (Marker.CancellationPending || InitT != TXB.Text) { return; }
-                Marker.ReportProgress(0, new List<object> { TXB, "Unmark2" });
+                if (Marker.CancellationPending || initT != txb.Text) { return; }
+                Marker.ReportProgress(0, new List<object> { txb, "Unmark2" });
                 Develop.DoEvents();
-                if (Marker.CancellationPending || InitT != TXB.Text) { return; }
+                if (Marker.CancellationPending || initT != txb.Text) { return; }
                 try {
-                    foreach (var ThisWord in Names) {
+                    foreach (var thisWord in names) {
                         var cap = 0;
                         do {
                             Develop.DoEvents();
-                            if (Marker.CancellationPending || InitT != TXB.Text) { return; }
-                            var fo = InitT.IndexOfWord(ThisWord, cap, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                            if (Marker.CancellationPending || initT != txb.Text) { return; }
+                            var fo = initT.IndexOfWord(thisWord, cap, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
                             if (fo < 0) { break; }
-                            if (ThisWord == myname) {
-                                Marker.ReportProgress(0, new List<object> { TXB, "Mark1", fo, fo + ThisWord.Length - 1 });
+                            if (thisWord == myname) {
+                                Marker.ReportProgress(0, new List<object> { txb, "Mark1", fo, fo + thisWord.Length - 1 });
                             } else {
-                                Marker.ReportProgress(0, new List<object> { TXB, "Mark2", fo, fo + ThisWord.Length - 1 });
+                                Marker.ReportProgress(0, new List<object> { txb, "Mark2", fo, fo + thisWord.Length - 1 });
                             }
-                            cap = fo + ThisWord.Length;
+                            cap = fo + thisWord.Length;
                         } while (true);
                     }
                 } catch {
-                    Ok = false;
+                    ok = false;
                 }
-            } while (!Ok);
+            } while (!ok);
         }
 
         private void Marker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
             //Ja, Multithreading ist kompliziert...
             if (Marker.CancellationPending) { return; }
             var x = (List<object>)e.UserState;
-            var TXB = (TextBox)x[0];
+            var txb = (TextBox)x[0];
             switch ((string)x[1]) {
                 case "Unmark1":
-                    TXB.Unmark(enMarkState.MyOwn);
-                    TXB.Invalidate();
+                    txb.Unmark(enMarkState.MyOwn);
+                    txb.Invalidate();
                     break;
 
                 case "Unmark2":
-                    TXB.Unmark(enMarkState.Other);
-                    TXB.Invalidate();
+                    txb.Unmark(enMarkState.Other);
+                    txb.Invalidate();
                     break;
 
                 case "Mark1":
-                    TXB.Mark(enMarkState.MyOwn, (int)x[2], (int)x[3]);
-                    TXB.Invalidate();
+                    txb.Mark(enMarkState.MyOwn, (int)x[2], (int)x[3]);
+                    txb.Invalidate();
                     break;
 
                 case "Mark2":
-                    TXB.Mark(enMarkState.Other, (int)x[2], (int)x[3]);
-                    TXB.Invalidate();
+                    txb.Mark(enMarkState.Other, (int)x[2], (int)x[3]);
+                    txb.Invalidate();
                     break;
 
                 default:
@@ -707,8 +707,8 @@ namespace BlueControls.Controls {
         }
 
         private void Row_RowRemoving(object sender, RowEventArgs e) {
-            if (e.Row.Key == _RowKey) {
-                _RowKey = -1;
+            if (e.Row.Key == _rowKey) {
+                _rowKey = -1;
                 GetTmpVariables();
             }
         }
@@ -752,7 +752,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        private void textBox_NeedDatabaseOfAdditinalSpecialChars(object sender, MultiUserFileGiveBackEventArgs e) => e.File = _Database;
+        private void textBox_NeedDatabaseOfAdditinalSpecialChars(object sender, MultiUserFileGiveBackEventArgs e) => e.File = _database;
 
         private void TextBox_TextChanged(object sender, System.EventArgs e) {
             while (Marker.IsBusy) {
@@ -766,18 +766,18 @@ namespace BlueControls.Controls {
 
         private void UpdateColumnData() {
             if (_tmpColumn == null) {
-                if (string.IsNullOrEmpty(_ColumnName)) {
+                if (string.IsNullOrEmpty(_columnName)) {
                     Caption = string.Empty;
                     EditType = enEditTypeFormula.None;
                     QuickInfo = string.Empty;
                     FileEncryptionKey = string.Empty;
                 } else {
-                    Caption = _ColumnName + ":";
+                    Caption = _columnName + ":";
                 }
             } else {
                 Caption = _tmpColumn.ReadableText() + ":";
-                FileEncryptionKey = _Database.FileEncryptionKey;
-                if (string.IsNullOrEmpty(_ColumnName)) {
+                FileEncryptionKey = _database.FileEncryptionKey;
+                if (string.IsNullOrEmpty(_columnName)) {
                     EditType = _tmpColumn.EditType;
                     QuickInfo = _tmpColumn.QuickInfoText(string.Empty);
                 } else {

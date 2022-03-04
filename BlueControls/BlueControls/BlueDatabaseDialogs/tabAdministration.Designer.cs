@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace BlueControls.BlueDatabaseDialogs
 {
-    partial class tabAdministration
+    partial class TabAdministration
     {
         /// <summary> 
         /// Erforderliche Designervariable.
@@ -223,7 +223,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.Controls.Add(this.grpBearbeiten);
             this.Controls.Add(this.grpAllgemein);
             this.Enabled = false;
-            this.Name = "tabAdministration";
+            this.Name = "TabAdministration";
             this.Size = new System.Drawing.Size(1400, 81);
             this.grpAllgemein.ResumeLayout(false);
             this.grpTabellenAnsicht.ResumeLayout(false);

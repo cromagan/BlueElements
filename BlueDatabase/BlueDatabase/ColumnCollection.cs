@@ -109,17 +109,17 @@ namespace BlueDatabase {
             return null;
         }
 
-        public ColumnItem? Add(string internalName) => Add(NextColumnKey(), internalName, internalName, string.Empty, enVarType.Text, string.Empty);
+        public ColumnItem Add(string internalName) => Add(NextColumnKey(), internalName, internalName, string.Empty, enVarType.Text, string.Empty);
 
-        public ColumnItem? Add(long colKey) => Add(colKey, string.Empty, string.Empty, string.Empty, enVarType.Text, string.Empty);
+        public ColumnItem Add(long colKey) => Add(colKey, string.Empty, string.Empty, string.Empty, enVarType.Text, string.Empty);
 
-        public ColumnItem? Add() => Add(NextColumnKey(), string.Empty, string.Empty, string.Empty, enVarType.Text, string.Empty);
+        public ColumnItem Add() => Add(NextColumnKey(), string.Empty, string.Empty, string.Empty, enVarType.Text, string.Empty);
 
-        public ColumnItem? Add(string internalName, string caption, enVarType format) => Add(NextColumnKey(), internalName, caption, string.Empty, format, string.Empty);
+        public ColumnItem Add(string internalName, string caption, enVarType format) => Add(NextColumnKey(), internalName, caption, string.Empty, format, string.Empty);
 
-        public ColumnItem? Add(string internalName, string caption, enVarType format, string quickinfo) => Add(NextColumnKey(), internalName, caption, string.Empty, format, quickinfo);
+        public ColumnItem Add(string internalName, string caption, enVarType format, string quickinfo) => Add(NextColumnKey(), internalName, caption, string.Empty, format, quickinfo);
 
-        public ColumnItem? Add(string internalName, string caption, string suffix, enVarType format) => Add(NextColumnKey(), internalName, caption, suffix, format, string.Empty);
+        public ColumnItem Add(string internalName, string caption, string suffix, enVarType format) => Add(NextColumnKey(), internalName, caption, suffix, format, string.Empty);
 
         public ColumnItem Add(long colKey, string internalName, string caption, string suffix, enVarType format, string quickinfo) {
             Database.AddPending(enDatabaseDataType.AddColumn, colKey, -1, string.Empty, colKey.ToString(), true);
@@ -177,7 +177,7 @@ namespace BlueDatabase {
         }
 
         public void GenerateOverView() {
-            HTML da = new(Database.Filename.FileNameWithoutSuffix());
+            Html da = new(Database.Filename.FileNameWithoutSuffix());
             da.AddCaption("Spaltenliste von: " + Database.Caption);
             da.Add("  <Font face=\"Arial\" Size=\"4\">" + Database.Filename + "</h1><br>");
             da.TableBeginn();
@@ -281,11 +281,11 @@ namespace BlueDatabase {
                     for (var s2 = s1 + 1; s2 < Count; s2++) {
                         if (base[s2] != null) {
                             // Evtl. Doppelte Namen einzigartig machen
-                            if (base[s1].Name.ToUpper() == base[s2].Name.ToUpper()) {
+                            if (string.Equals(base[s1].Name, base[s2].Name, StringComparison.CurrentCultureIgnoreCase)) {
                                 base[s2].Load(enDatabaseDataType.co_Name, base[s2].Name + "0");
                             }
                             // Evtl. Doppelte Identifier eleminieren
-                            if (!string.IsNullOrEmpty(base[s1].Identifier) && base[s1].Identifier.ToUpper() == base[s2].Identifier.ToUpper()) {
+                            if (!string.IsNullOrEmpty(base[s1].Identifier) && string.Equals(base[s1].Identifier, base[s2].Identifier, StringComparison.CurrentCultureIgnoreCase)) {
                                 base[s2].Load(enDatabaseDataType.co_Identifier, string.Empty);
                             }
                         }
@@ -388,7 +388,7 @@ namespace BlueDatabase {
         }
 
         private void AddSystem(string identifier) {
-            if (this.Any(ThisColumn => ThisColumn != null && ThisColumn.Identifier.ToUpper() == identifier.ToUpper())) {
+            if (this.Any(ThisColumn => ThisColumn != null && string.Equals(ThisColumn.Identifier, identifier, StringComparison.CurrentCultureIgnoreCase))) {
                 return;
             }
             var c = Add(identifier);

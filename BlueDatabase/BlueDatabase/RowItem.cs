@@ -35,15 +35,14 @@ namespace BlueDatabase {
 
         #region Fields
 
-        private string _tmpQuickInfo;
-
-        private bool disposedValue;
+        private bool _disposedValue;
+        private string? _tmpQuickInfo;
 
         #endregion
 
         #region Constructors
 
-        public RowItem(Database database, long key) {
+        public RowItem(Database? database, long key) {
             Database = database;
             Key = key;
             _tmpQuickInfo = null;
@@ -82,14 +81,14 @@ namespace BlueDatabase {
         /// </summary>
         public static bool DoingScript { get; private set; }
 
-        public Database Database { get; private set; }
+        public Database? Database { get; private set; }
         public long Key { get; }
 
         public string QuickInfo {
             get {
                 if (_tmpQuickInfo != null) { return _tmpQuickInfo; }
                 GenerateQuickInfo();
-                return _tmpQuickInfo;
+                return _tmpQuickInfo!;
             }
         }
 
@@ -145,9 +144,9 @@ namespace BlueDatabase {
                     break;
 
                 case enDataFormat.Columns_für_LinkedCellDropdown:
-                    if (int.TryParse(wert, out var ColKey)) {
-                        var C = column.LinkedDatabase().Column.SearchByKey(ColKey);
-                        if (C != null) { wert = C.Name; }
+                    if (int.TryParse(wert, out var colKey)) {
+                        var c = column.LinkedDatabase().Column.SearchByKey(colKey);
+                        if (c != null) { wert = c.Name; }
                     }
                     break;
             }
@@ -160,7 +159,7 @@ namespace BlueDatabase {
                     break;
 
                 case enScriptType.List:
-                    vars.Add(new Variable(column.Name, wert.SplitAndCutByCRToList(), ro, false, qi));
+                    vars.Add(new Variable(column.Name, wert.SplitAndCutByCrToList(), ro, false, qi));
                     break;
 
                 case enScriptType.Numeral:
@@ -193,7 +192,7 @@ namespace BlueDatabase {
 
         public Color CellGetColor(ColumnItem? column) => Database.Cell.GetColor(column, this);
 
-        public int CellGetColorBGR(ColumnItem? column) => Database.Cell.GetColorBgr(column, this);
+        public int CellGetColorBgr(ColumnItem? column) => Database.Cell.GetColorBgr(column, this);
 
         public DateTime CellGetDateTime(string columnName) => Database.Cell.GetDateTime(Database.Column[columnName], this);
 
@@ -207,9 +206,9 @@ namespace BlueDatabase {
 
         public int CellGetInteger(ColumnItem? column) => Database.Cell.GetInteger(column, this);
 
-        public List<string?>? CellGetList(string columnName) => Database.Cell.GetList(Database.Column[columnName], this);
+        public List<string?> CellGetList(string columnName) => Database.Cell.GetList(Database.Column[columnName], this);
 
-        public List<string?>? CellGetList(ColumnItem? column) => Database.Cell.GetList(column, this);
+        public List<string?> CellGetList(ColumnItem? column) => Database.Cell.GetList(column, this);
 
         public Point CellGetPoint(string columnName) => Database.Cell.GetPoint(Database.Column[columnName], this);
 
@@ -219,7 +218,7 @@ namespace BlueDatabase {
 
         public string CellGetString(ColumnItem? column) => Database.Cell.GetString(column, this);
 
-        public List<string> CellGetValuesReadable(ColumnItem? Column, enShortenStyle style) => Database.Cell.ValuesReadable(Column, this, style);
+        public List<string> CellGetValuesReadable(ColumnItem? column, enShortenStyle style) => Database.Cell.ValuesReadable(column, this, style);
 
         public bool CellIsNullOrEmpty(string columnName) => Database.Cell.IsNullOrEmpty(Database.Column[columnName], this);
 
@@ -331,37 +330,37 @@ namespace BlueDatabase {
             if (!script.Variablen.GetSystem("CellChangesEnabled").ValueBool) { return (true, string.Empty, script); }
 
             // Dann die Abschließenden Korrekturen vornehmen
-            foreach (var ThisColum in Database.Column.Where(ThisColum => ThisColum != null)) {
+            foreach (var thisColum in Database.Column.Where(thisColum => thisColum != null)) {
                 if (fullCheck) {
-                    var x = CellGetString(ThisColum);
-                    var x2 = ThisColum.AutoCorrect(x);
-                    if (ThisColum.Format is not enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert and not enDataFormat.Verknüpfung_zu_anderer_Datenbank && x != x2) {
-                        Database.Cell.Set(ThisColum, this, x2);
+                    var x = CellGetString(thisColum);
+                    var x2 = thisColum.AutoCorrect(x);
+                    if (thisColum.Format is not enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert and not enDataFormat.Verknüpfung_zu_anderer_Datenbank && x != x2) {
+                        Database.Cell.Set(thisColum, this, x2);
                     } else {
-                        if (!ThisColum.IsFirst()) {
-                            Database.Cell.DoSpecialFormats(ThisColum, Key, CellGetString(ThisColum), false);
+                        if (!thisColum.IsFirst()) {
+                            Database.Cell.DoSpecialFormats(thisColum, Key, CellGetString(thisColum), false);
                         }
                     }
-                    CellCollection.Invalidate_CellContentSize(ThisColum, this);
-                    ThisColum.Invalidate_TmpColumnContentWidth();
+                    CellCollection.Invalidate_CellContentSize(thisColum, this);
+                    thisColum.Invalidate_TmpColumnContentWidth();
                     doFemdZelleInvalidate = false; // Hier ja schon bei jedem gemacht
                 }
-                if (doFemdZelleInvalidate && ThisColum.LinkedDatabase() != null) {
-                    CellCollection.Invalidate_CellContentSize(ThisColum, this);
-                    ThisColum.Invalidate_TmpColumnContentWidth();
+                if (doFemdZelleInvalidate && thisColum.LinkedDatabase() != null) {
+                    CellCollection.Invalidate_CellContentSize(thisColum, this);
+                    thisColum.Invalidate_TmpColumnContentWidth();
                 }
             }
 
             List<string> cols = new();
-            var _InfoTXT = "<b><u>" + CellGetString(Database.Column[0]) + "</b></u><br><br>";
+            var infoTxt = "<b><u>" + CellGetString(Database.Column[0]) + "</b></u><br><br>";
 
-            var fs = script.Feedback.SplitAndCutByCRToList().SortedDistinctList();
+            var fs = script.Feedback.SplitAndCutByCrToList().SortedDistinctList();
             foreach (var thiss in fs) {
                 cols.AddIfNotExists(thiss);
                 var t = thiss.SplitBy("|");
                 var thisc = Database.Column[t[0]];
                 if (thisc != null) {
-                    _InfoTXT = _InfoTXT + "<b>" + thisc.ReadableText() + ":</b> " + t[1] + "<br><hr><br>";
+                    infoTxt = infoTxt + "<b>" + thisc.ReadableText() + ":</b> " + t[1] + "<br><hr><br>";
                 }
             }
 
@@ -374,7 +373,7 @@ namespace BlueDatabase {
             //    }
             //}
             if (cols.Count == 0) {
-                _InfoTXT += "Diese Zeile ist fehlerfrei.";
+                infoTxt += "Diese Zeile ist fehlerfrei.";
             }
             if (Database.Column.SysCorrect.SaveContent) {
                 if (IsNullOrEmpty(Database.Column.SysCorrect) || cols.Count == 0 != CellGetBoolean(Database.Column.SysCorrect)) {
@@ -382,27 +381,27 @@ namespace BlueDatabase {
                 }
             }
             OnRowChecked(new RowCheckedEventArgs(this, cols));
-            return (true, _InfoTXT, script);
+            return (true, infoTxt, script);
         }
 
-        public bool IsNullOrEmpty() => Database.Column.All(ThisColumnItem => ThisColumnItem != null && CellIsNullOrEmpty(ThisColumnItem));
+        public bool IsNullOrEmpty() => Database.Column.All(thisColumnItem => thisColumnItem != null && CellIsNullOrEmpty(thisColumnItem));
 
         public bool IsNullOrEmpty(ColumnItem? column) => Database.Cell.IsNullOrEmpty(column, this);
 
         public bool IsNullOrEmpty(string columnName) => Database.Cell.IsNullOrEmpty(Database.Column[columnName], this);
 
-        public bool MatchesTo(FilterItem Filter) {
-            if (Filter != null) {
-                if (Filter.FilterType is enFilterType.KeinFilter or enFilterType.GroßKleinEgal) { return true; } // Filter ohne Funktion
-                if (Filter.Column == null) {
-                    if (!Filter.FilterType.HasFlag(enFilterType.GroßKleinEgal)) { Filter.FilterType |= enFilterType.GroßKleinEgal; }
-                    if (Filter.FilterType is not enFilterType.Instr_GroßKleinEgal and not enFilterType.Instr_UND_GroßKleinEgal) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeilenfilter nur mit Instr möglich!"); }
-                    if (Filter.SearchValue.Count < 1) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeilenfilter nur mit mindestens einem Wert möglich"); }
+        public bool MatchesTo(FilterItem filter) {
+            if (filter != null) {
+                if (filter.FilterType is enFilterType.KeinFilter or enFilterType.GroßKleinEgal) { return true; } // Filter ohne Funktion
+                if (filter.Column == null) {
+                    if (!filter.FilterType.HasFlag(enFilterType.GroßKleinEgal)) { filter.FilterType |= enFilterType.GroßKleinEgal; }
+                    if (filter.FilterType is not enFilterType.Instr_GroßKleinEgal and not enFilterType.Instr_UND_GroßKleinEgal) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeilenfilter nur mit Instr möglich!"); }
+                    if (filter.SearchValue.Count < 1) { Develop.DebugPrint(enFehlerArt.Fehler, "Zeilenfilter nur mit mindestens einem Wert möglich"); }
 
-                    return Filter.SearchValue.All(t => RowFilterMatch(t));
+                    return filter.SearchValue.All(t => RowFilterMatch(t));
                 }
 
-                if (!Database.Cell.MatchesTo(Filter.Column, this, Filter)) { return false; }
+                if (!Database.Cell.MatchesTo(filter.Column, this, filter)) { return false; }
             }
             return true;
         }
@@ -410,10 +409,10 @@ namespace BlueDatabase {
         public bool MatchesTo(List<FilterItem>? filter) {
             if (Database == null) { return false; }
             if (filter == null || filter.Count == 0) { return true; }
-            foreach (var ThisFilter in filter) {
-                if (ThisFilter.Database != filter[0].Database) { Develop.DebugPrint_NichtImplementiert(); }
+            foreach (var thisFilter in filter) {
+                if (thisFilter.Database != filter[0].Database) { Develop.DebugPrint_NichtImplementiert(); }
 
-                if (!MatchesTo(ThisFilter)) { return false; }
+                if (!MatchesTo(thisFilter)) { return false; }
             }
             return true;
         }
@@ -447,8 +446,8 @@ namespace BlueDatabase {
                         var vals = ww.SplitAndCutBy(",");
                         if (vals.Length != 2) { return formel; }
                         if (vals[0] != "L") { return formel; }
-                        if (!int.TryParse(vals[1], out var Stellen)) { return formel; }
-                        var newW = txt.Substring(0, Math.Min(Stellen, txt.Length));
+                        if (!int.TryParse(vals[1], out var stellen)) { return formel; }
+                        var newW = txt.Substring(0, Math.Min(stellen, txt.Length));
                         erg = erg.Replace(erg.Substring(x, x2 - x + 1), newW);
                     }
                 }
@@ -468,7 +467,7 @@ namespace BlueDatabase {
         private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
 
         private void Dispose(bool disposing) {
-            if (!disposedValue) {
+            if (!_disposedValue) {
                 if (disposing) {
                     // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
                 }
@@ -478,7 +477,7 @@ namespace BlueDatabase {
                 Database.Disposing -= Database_Disposing;
                 Database = null;
                 _tmpQuickInfo = null;
-                disposedValue = true;
+                _disposedValue = true;
             }
         }
 
@@ -547,12 +546,12 @@ namespace BlueDatabase {
         private bool RowFilterMatch(string searchText) {
             if (string.IsNullOrEmpty(searchText)) { return true; }
             searchText = searchText.ToUpper();
-            foreach (var ThisColumnItem in Database.Column) {
+            foreach (var thisColumnItem in Database.Column) {
                 {
-                    if (!ThisColumnItem.IgnoreAtRowFilter) {
-                        var _String = CellGetString(ThisColumnItem);
-                        _String = LanguageTool.ColumnReplace(_String, ThisColumnItem, enShortenStyle.Both);
-                        if (!string.IsNullOrEmpty(_String) && _String.ToUpper().Contains(searchText)) { return true; }
+                    if (!thisColumnItem.IgnoreAtRowFilter) {
+                        var @string = CellGetString(thisColumnItem);
+                        @string = LanguageTool.ColumnReplace(@string, thisColumnItem, enShortenStyle.Both);
+                        if (!string.IsNullOrEmpty(@string) && @string.ToUpper().Contains(searchText)) { return true; }
                     }
                 }
             }
@@ -562,29 +561,29 @@ namespace BlueDatabase {
         private void VariableToCell(ColumnItem? column, List<Variable> vars) {
             if (Database.ReadOnly) { return; }
 
-            var ColumnVar = vars.Get(column.Name);
-            if (ColumnVar == null) { return; }
+            var columnVar = vars.Get(column.Name);
+            if (columnVar == null) { return; }
             if (!column.SaveContent) { return; }
-            if (ColumnVar.Readonly) { return; }
+            if (columnVar.Readonly) { return; }
 
             if (column.Format is enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert or enDataFormat.Verknüpfung_zu_anderer_Datenbank) {
-                var ColumnLinkVar = vars.GetSystem(column.Name + "_Link");
-                if (ColumnLinkVar != null) {
-                    column.Database.Cell.SetValueBehindLinkedValue(column, this, ColumnLinkVar.ValueString);
+                var columnLinkVar = vars.GetSystem(column.Name + "_Link");
+                if (columnLinkVar != null) {
+                    column.Database.Cell.SetValueBehindLinkedValue(column, this, columnLinkVar.ValueString);
                 }
             }
 
-            if (ColumnVar.Type == enVariableDataType.List) {
-                CellSet(column, ColumnVar.ValueListString);
+            if (columnVar.Type == enVariableDataType.List) {
+                CellSet(column, columnVar.ValueListString);
                 return;
             }
 
-            if (ColumnVar.Type == enVariableDataType.Bool) {
-                CellSet(column, ColumnVar.ValueBool);
+            if (columnVar.Type == enVariableDataType.Bool) {
+                CellSet(column, columnVar.ValueBool);
                 return;
             }
 
-            CellSet(column, ColumnVar.ValueString);
+            CellSet(column, columnVar.ValueString);
         }
 
         #endregion

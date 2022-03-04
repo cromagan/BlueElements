@@ -44,7 +44,7 @@ namespace BlueDatabase {
             Database = database;
             Initialize();
             Reverse = reverse;
-            SetColumn(new List<string>() { columnName });
+            SetColumn(new List<string> { columnName });
         }
 
         public RowSortDefinition(Database database, List<string> columnNames, bool reverse) {

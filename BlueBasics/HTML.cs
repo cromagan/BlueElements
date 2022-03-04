@@ -3,12 +3,12 @@ using System.Drawing;
 
 namespace BlueBasics {
 
-    public class HTML {
+    public class Html {
 
         #region Constructors
 
         // https://www.w3schools.com/html/html_tables.asp
-        public HTML(string title) => Code = new List<string>
+        public Html(string title) => Code = new List<string>
 {
                 "<!DOctypex HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\"",
                 "\"http://www.w3.org/TR/html4/strict.dtd\">",
@@ -56,20 +56,20 @@ namespace BlueBasics {
 
         public void Add(string what) => Code.Add(what);
 
-        public void AddCaption(string _Caption) => AddCaption(_Caption, 1);
+        public void AddCaption(string caption) => AddCaption(caption, 1);
 
-        public void AddCaption(string _caption, int size) {
+        public void AddCaption(string caption, int size) {
             switch (size) {
                 case 1:
-                    Code.Add("  <h1>" + _caption + "</h1><br>");
+                    Code.Add("  <h1>" + caption + "</h1><br>");
                     break;
 
                 case 2:
-                    Code.Add("  <h2>" + _caption + "</h2><br>");
+                    Code.Add("  <h2>" + caption + "</h2><br>");
                     break;
 
                 case 3:
-                    Code.Add("  <h3>" + _caption + "</h3><br>");
+                    Code.Add("  <h3>" + caption + "</h3><br>");
                     break;
 
                 default:
@@ -85,7 +85,7 @@ namespace BlueBasics {
 
         public void CellAdd(string content) => Code.Add("              <th>" + content + "</th>");
 
-        public void CellAdd(string content, Color c) => Code.Add("        <th  bgcolor=\"#" + c.ToHTMLCode() + "\">" + content + "</th>");
+        public void CellAdd(string content, Color c) => Code.Add("        <th  bgcolor=\"#" + c.ToHtmlCode() + "\">" + content + "</th>");
 
         public void ListAdd(List<string> items) {
             Code.Add("<ul>");

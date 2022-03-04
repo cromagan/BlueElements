@@ -21,10 +21,10 @@ namespace BlueDatabase.EventArgs {
 
         #region Constructors
 
-        public GenerateLayoutInternalEventargs(RowItem row, string layoutID, string SaveTo) {
+        public GenerateLayoutInternalEventargs(RowItem row, string layoutId, string saveTo) {
             Row = row;
-            LayoutID = layoutID;
-            Filename = SaveTo;
+            LayoutId = layoutId;
+            Filename = saveTo;
             Handled = false;
         }
 
@@ -37,7 +37,7 @@ namespace BlueDatabase.EventArgs {
         public string Filename { get; set; }
 
         public bool Handled { get; set; }
-        public string LayoutID { get; set; }
+        public string LayoutId { get; set; }
         public RowItem Row { get; set; }
 
         #endregion

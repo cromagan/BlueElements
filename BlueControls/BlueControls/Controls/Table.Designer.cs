@@ -47,8 +47,8 @@ namespace BlueControls.Controls
             this.BCB.Verhalten = enSteuerelementVerhalten.Steuerelement_Anpassen;
             this.BCB.Visible = false;
             this.BCB.Enter += new EventHandler(this.BB_Enter);
-            this.BCB.ESC += new EventHandler(this.BB_ESC);
-            this.BCB.TAB += new EventHandler(this.BB_TAB);
+            this.BCB.Esc += new EventHandler(this.BB_ESC);
+            this.BCB.Tab += new EventHandler(this.BB_TAB);
             this.BCB.LostFocus += new EventHandler(this.BB_LostFocus);
             // 
             // BTB
@@ -61,8 +61,8 @@ namespace BlueControls.Controls
             this.BTB.Verhalten = enSteuerelementVerhalten.Steuerelement_Anpassen;
             this.BTB.Visible = false;
             this.BTB.Enter += new EventHandler(this.BB_Enter);
-            this.BTB.ESC += new EventHandler(this.BB_ESC);
-            this.BTB.TAB += new EventHandler(this.BB_TAB);
+            this.BTB.Esc += new EventHandler(this.BB_ESC);
+            this.BTB.Tab += new EventHandler(this.BB_TAB);
             this.BTB.LostFocus += new EventHandler(this.BB_LostFocus);
             this.BTB.NeedDatabaseOfAdditinalSpecialChars += BTB_NeedDatabaseOfAdditinalSpecialChars;
             // 

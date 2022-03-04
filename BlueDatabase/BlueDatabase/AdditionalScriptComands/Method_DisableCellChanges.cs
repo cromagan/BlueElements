@@ -24,7 +24,7 @@ namespace BlueScript {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { };
+        public override List<enVariableDataType> Args => new();
 
         public override string Description => "Verhindert in dieser Datenbank, dass Änderungen, die im SKript vorgenommen wurden, zurückgespielt werden.\r\nSo können z.B. Variabelen für den Export verändert werden und es hat keine Auswirkungen\r\nauf diese Datenbank.";
 

@@ -27,7 +27,7 @@ namespace BlueControls.Forms {
 
         #region Fields
 
-        private List<string> GiveBack;
+        private List<string> _giveBack;
 
         #endregion
 
@@ -68,12 +68,12 @@ namespace BlueControls.Forms {
         }
 
         public static List<string> Show(string txt, ItemCollectionList? items, enAddType addNewAllowed, bool cancelErl) {
-            InputBoxListBoxStyle MB = new(txt, items, addNewAllowed, cancelErl);
-            MB.ShowDialog();
-            return MB.GiveBack;
+            InputBoxListBoxStyle mb = new(txt, items, addNewAllowed, cancelErl);
+            mb.ShowDialog();
+            return mb._giveBack;
         }
 
-        protected override void SetValue(bool canceled) => GiveBack = canceled ? null : txbText.Item.Checked().ToListOfString();
+        protected override void SetValue(bool canceled) => _giveBack = canceled ? null : txbText.Item.Checked().ToListOfString();
 
         private void InputBox_Shown(object sender, System.EventArgs e) => txbText.Focus();
 

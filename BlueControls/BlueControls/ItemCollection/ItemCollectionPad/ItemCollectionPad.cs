@@ -273,7 +273,7 @@ namespace BlueControls.ItemCollection {
                     return null;
                 }
 
-                return this.FirstOrDefault(thisItem => thisItem != null && @internal.ToUpper() == thisItem.Internal.ToUpper());
+                return this.FirstOrDefault(thisItem => thisItem != null && string.Equals(@internal, thisItem.Internal, StringComparison.CurrentCultureIgnoreCase));
             }
         }
 

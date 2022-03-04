@@ -101,7 +101,7 @@ namespace BlueBasics {
             if (WriteAccess.Contains(dirUpper)) { return true; }
             if (NoWriteAccess.Contains(dirUpper)) { return false; }
             try {
-                using (var fs = File.Create(Path.Combine(directory, Path.GetRandomFileName()), 1, FileOptions.DeleteOnClose)) { }
+                using (_ = File.Create(Path.Combine(directory, Path.GetRandomFileName()), 1, FileOptions.DeleteOnClose)) { }
                 WriteAccess.AddIfNotExists(dirUpper); // Multitasking
                 return true;
             } catch {

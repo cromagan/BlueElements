@@ -18,6 +18,7 @@
 using BlueBasics;
 using BlueBasics.Interfaces;
 using Skript.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using static BlueBasics.Extensions;
@@ -229,7 +230,7 @@ namespace BlueScript {
                 var comandtext = thiscomand + StartSequence;
                 var l = comandtext.Length;
                 if (pos + l < maxl) {
-                    if (scriptText.Substring(pos, l).ToLower() == comandtext.ToLower()) {
+                    if (string.Equals(scriptText.Substring(pos, l), comandtext, StringComparison.CurrentCultureIgnoreCase)) {
                         var f = GetEnd(scriptText, pos + thiscomand.Length, StartSequence.Length);
                         if (!string.IsNullOrEmpty(f.ErrorMessage)) {
                             return new strCanDoFeedback(f.ContinuePosition, "Fehler bei " + comandtext + ": " + f.ErrorMessage, true);

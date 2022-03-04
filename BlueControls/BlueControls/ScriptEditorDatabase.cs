@@ -27,7 +27,7 @@ namespace BlueControls {
        {
         #region Fields
 
-        private Database _Database;
+        private Database _database;
 
         #endregion
 
@@ -40,19 +40,19 @@ namespace BlueControls {
         #region Properties
 
         public Database Database {
-            get => _Database;
+            get => _database;
             set {
-                if (_Database != null) {
-                    _Database.RulesScript = ScriptText;
-                    _Database.Disposing -= _Database_Disposing;
+                if (_database != null) {
+                    _database.RulesScript = ScriptText;
+                    _database.Disposing -= _Database_Disposing;
                 }
-                _Database = value;
-                if (_Database == null) {
+                _database = value;
+                if (_database == null) {
                     return;
                 }
 
-                ScriptText = _Database.RulesScript;
-                _Database.Disposing += _Database_Disposing;
+                ScriptText = _database.RulesScript;
+                _database.Disposing += _Database_Disposing;
             }
         }
 
@@ -61,26 +61,26 @@ namespace BlueControls {
         #region Methods
 
         internal void WriteScriptBack() {
-            if (_Database == null) { return; }
-            _Database.RulesScript = ScriptText;
+            if (_database == null) { return; }
+            _database.RulesScript = ScriptText;
         }
 
         protected override Script? GenerateAndDoScript() {
-            if (_Database == null) {
+            if (_database == null) {
                 Message("Keine Datenbank geladen.");
                 return null;
             }
-            _Database.RulesScript = ScriptText;
+            _database.RulesScript = ScriptText;
 
-            if (_Database.Row.Count == 0) {
+            if (_database.Row.Count == 0) {
                 Message("Zum Test wird zumindest eine Zeile benötigt.");
                 return null;
             }
             if (string.IsNullOrEmpty(txbTestZeile.Text)) {
-                txbTestZeile.Text = _Database.Row.First().CellFirstString();
+                txbTestZeile.Text = _database.Row.First().CellFirstString();
             }
 
-            var r = _Database.Row[txbTestZeile.Text];
+            var r = _database.Row[txbTestZeile.Text];
             if (r == null) {
                 Message("Zeile nicht gefunden.");
                 return null;
@@ -100,7 +100,7 @@ namespace BlueControls {
 
         private void scriptEditor_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
             if (e.HotItem is string txt) {
-                var c = _Database.Column.Exists(txt);
+                var c = _database.Column.Exists(txt);
                 if (c is null) { return; }
                 e.UserMenu.Add(enContextMenuComands.SpaltenEigenschaftenBearbeiten);
             }
@@ -109,12 +109,12 @@ namespace BlueControls {
         private void scriptEditor_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
             ColumnItem? c = null;
 
-            if (e.HotItem is string txt) { c = _Database.Column.Exists(txt); }
+            if (e.HotItem is string txt) { c = _database.Column.Exists(txt); }
 
             switch (e.ClickedComand.ToLower()) {
                 case "spalteneigenschaftenbearbeiten":
                     if (c != null) {
-                        tabAdministration.OpenColumnEditor(c, null, null);
+                        TabAdministration.OpenColumnEditor(c, null, null);
                     }
 
                     break;

@@ -34,7 +34,7 @@ namespace BlueControls.ItemCollection {
 
         public List<BasicPadItem>? VisibleItems;
 
-        public List<BasicPadItem> ZoomItems;
+        public List<BasicPadItem>? ZoomItems;
 
         private string _name;
 
@@ -226,11 +226,11 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "embedded":
-                    Eingebettete_Ansichten = value.FromNonCritical().SplitAndCutByCRToList();
+                    Eingebettete_Ansichten = value.FromNonCritical().SplitAndCutByCrToList();
                     return true;
 
                 case "color":
-                    Randfarbe = value.FromHTMLCode();
+                    Randfarbe = value.FromHtmlCode();
                     return true;
 
                 case "pos":
@@ -261,7 +261,7 @@ namespace BlueControls.ItemCollection {
             //if (!string.IsNullOrEmpty(_ReadableText)) { t = t + "ReadableText=" + _ReadableText.ToNonCritical() + ", "; }
             if (Textlage != (enAlignment)(-1)) { t = t + "Pos=" + (int)Textlage + ", "; }
             if (Eingebettete_Ansichten.Count > 0) { t = t + "Embedded=" + Eingebettete_Ansichten.JoinWithCr().ToNonCritical() + ", "; }
-            t = t + "Color=" + Randfarbe.ToHTMLCode() + ", ";
+            t = t + "Color=" + Randfarbe.ToHtmlCode() + ", ";
             if (PadInternal != null) {
                 t = t + "Data=" + PadInternal.Item.ToString() + ", ";
             }
@@ -302,7 +302,7 @@ namespace BlueControls.ItemCollection {
                             ChildPadItem pad = null;
                             foreach (var it in Parent) {
                                 if (it is ChildPadItem cp) {
-                                    if (cp.Name.ToUpper() == thisA.ToUpper()) {
+                                    if (string.Equals(cp.Name, thisA, StringComparison.CurrentCultureIgnoreCase)) {
                                         pad = cp;
                                         break;
                                     }

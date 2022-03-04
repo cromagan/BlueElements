@@ -61,7 +61,7 @@ namespace BlueControls.ItemCollection {
 
         protected override string ClassId() => "Column";
 
-        protected override Bitmap? GeneratePic() {
+        protected override Bitmap GeneratePic() {
             if (Column == null) {
                 return QuickImage.Get(enImageCode.Warnung, 128);
             }

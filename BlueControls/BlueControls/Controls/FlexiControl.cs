@@ -993,7 +993,7 @@ namespace BlueControls.Controls {
                     break;
 
                 case enEditTypeFormula.Farb_Auswahl_Dialog:
-                    control.ImageCode = string.IsNullOrEmpty(Value) ? "Fragezeichen|24" : "Kreis|24|||" + Color.FromArgb(int.Parse(Value)).ToHTMLCode();
+                    control.ImageCode = string.IsNullOrEmpty(Value) ? "Fragezeichen|24" : "Kreis|24|||" + Color.FromArgb(int.Parse(Value)).ToHtmlCode();
                     break;
 
                 default:
@@ -1032,7 +1032,7 @@ namespace BlueControls.Controls {
         /// <summary>
         /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.
         /// </summary>
-        private void UpdateValueTo_ListBox(ItemCollectionList main) => main.SetValuesTo(Value.SplitAndCutByCRToList(), FileEncryptionKey);
+        private void UpdateValueTo_ListBox(ItemCollectionList main) => main.SetValuesTo(Value.SplitAndCutByCrToList(), FileEncryptionKey);
 
         /// <summary>
         /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.

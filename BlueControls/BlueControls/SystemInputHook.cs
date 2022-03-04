@@ -25,20 +25,20 @@ namespace BlueControls {
 
         #region Fields
 
+        private bool _keyIsPressing;
+
+        private System.Windows.Forms.Keys _keyLastKey;
+
+        private bool _mouseIsPressing;
+
+        private System.Windows.Forms.MouseButtons _mouseLastButton;
+
+        private int _mouseLastX;
+
+        private int _mouseLastY;
+
         [AccessedThroughProperty(nameof(Tim))]
-        private System.Windows.Forms.Timer _Tim;
-
-        private bool Key_IsPressing;
-
-        private System.Windows.Forms.Keys Key_LastKey;
-
-        private bool Mouse_IsPressing;
-
-        private System.Windows.Forms.MouseButtons Mouse_LastButton;
-
-        private int Mouse_LastX;
-
-        private int Mouse_LastY;
+        private System.Windows.Forms.Timer _tim;
 
         #endregion
 
@@ -66,16 +66,16 @@ namespace BlueControls {
 
         private System.Windows.Forms.Timer Tim {
             [DebuggerNonUserCode]
-            get => _Tim;
+            get => _tim;
             [MethodImpl(MethodImplOptions.Synchronized)]
             [DebuggerNonUserCode]
             set {
-                if (_Tim != null) {
-                    _Tim.Tick -= Tim_Tick;
+                if (_tim != null) {
+                    _tim.Tick -= Tim_Tick;
                 }
-                _Tim = value;
+                _tim = value;
                 if (value != null) {
-                    _Tim.Tick += Tim_Tick;
+                    _tim.Tick += Tim_Tick;
                 }
             }
         }
@@ -260,60 +260,60 @@ namespace BlueControls {
                 k |= System.Windows.Forms.Keys.Oem5;
             }
             System.Windows.Forms.KeyEventArgs kev = new(k);
-            System.Windows.Forms.KeyEventArgs kevold = new(Key_LastKey);
-            if (Key_IsPressing) {
+            System.Windows.Forms.KeyEventArgs kevold = new(_keyLastKey);
+            if (_keyIsPressing) {
                 if (k == System.Windows.Forms.Keys.None) {
                     OnKeyUp(kevold);
-                    Key_IsPressing = false;
-                } else if (k != Key_LastKey) {
+                    _keyIsPressing = false;
+                } else if (k != _keyLastKey) {
                     OnKeyDown(kev);
                 }
             } else {
                 if (k != System.Windows.Forms.Keys.None) {
                     OnKeyDown(kev);
-                    Key_IsPressing = true;
+                    _keyIsPressing = true;
                 }
             }
-            Key_LastKey = k;
+            _keyLastKey = k;
         }
 
         public void DoMouse() {
-            var B = System.Windows.Forms.MouseButtons.None;
+            var b = System.Windows.Forms.MouseButtons.None;
             if (GetAsyncKeyState(System.Windows.Forms.Keys.LButton) != 0) {
-                B |= System.Windows.Forms.MouseButtons.Left;
+                b |= System.Windows.Forms.MouseButtons.Left;
             }
             if (GetAsyncKeyState(System.Windows.Forms.Keys.RButton) != 0) {
-                B |= System.Windows.Forms.MouseButtons.Right;
+                b |= System.Windows.Forms.MouseButtons.Right;
             }
-            System.Windows.Forms.MouseEventArgs mev = new(B, 0, System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y, 0);
-            System.Windows.Forms.MouseEventArgs mevold = new(Mouse_LastButton, 0, System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y, 0);
-            if (Mouse_LastX != mev.X || Mouse_LastY != mev.Y) {
+            System.Windows.Forms.MouseEventArgs mev = new(b, 0, System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y, 0);
+            System.Windows.Forms.MouseEventArgs mevold = new(_mouseLastButton, 0, System.Windows.Forms.Cursor.Position.X, System.Windows.Forms.Cursor.Position.Y, 0);
+            if (_mouseLastX != mev.X || _mouseLastY != mev.Y) {
                 OnMouseMove(mev);
             }
-            if (Mouse_IsPressing) {
-                if (B == System.Windows.Forms.MouseButtons.None) {
+            if (_mouseIsPressing) {
+                if (b == System.Windows.Forms.MouseButtons.None) {
                     OnMouseUp(mevold);
-                    Mouse_IsPressing = false;
+                    _mouseIsPressing = false;
                 }
             } else {
-                if (B != System.Windows.Forms.MouseButtons.None) {
+                if (b != System.Windows.Forms.MouseButtons.None) {
                     OnMouseDown(mev);
-                    Mouse_IsPressing = true;
+                    _mouseIsPressing = true;
                 }
             }
-            Mouse_LastX = mev.X;
-            Mouse_LastY = mev.Y;
-            Mouse_LastButton = B;
+            _mouseLastX = mev.X;
+            _mouseLastY = mev.Y;
+            _mouseLastButton = b;
         }
 
         public void InstallHook() {
             Tim.Enabled = true;
-            Mouse_IsPressing = false;
-            Mouse_LastX = -1;
-            Mouse_LastY = -1;
-            Mouse_LastButton = 0;
-            Key_IsPressing = false;
-            Key_LastKey = 0;
+            _mouseIsPressing = false;
+            _mouseLastX = -1;
+            _mouseLastY = -1;
+            _mouseLastButton = 0;
+            _keyIsPressing = false;
+            _keyLastKey = 0;
         }
 
         public void RemoveHook() => Tim.Enabled = false;
@@ -326,11 +326,11 @@ namespace BlueControls {
                 Interval = 1,
                 Enabled = false
             };
-            Mouse_IsPressing = false;
-            Mouse_LastX = 0;
-            Mouse_LastY = 0;
-            Key_IsPressing = false;
-            Key_LastKey = 0;
+            _mouseIsPressing = false;
+            _mouseLastX = 0;
+            _mouseLastY = 0;
+            _keyIsPressing = false;
+            _keyLastKey = 0;
         }
 
         private void OnKeyDown(System.Windows.Forms.KeyEventArgs e) => KeyDown?.Invoke(this, e);

@@ -18,6 +18,7 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -160,7 +161,7 @@ namespace BlueControls.Controls {
                     foreach (var thisTabName in tmp) {
                         foreach (var thisTab in TabPages) {
                             if (thisTab is TabPage tb) {
-                                if (tb.Text.ToLower() == thisTabName.ToLower()) {
+                                if (string.Equals(tb.Text, thisTabName, StringComparison.CurrentCultureIgnoreCase)) {
                                     neworder.AddIfNotExists(tb);
                                 }
                             }

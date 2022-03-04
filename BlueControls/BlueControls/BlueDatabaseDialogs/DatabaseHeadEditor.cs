@@ -75,7 +75,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             cbxAnsicht.Item.AddRange(typeof(enAnsicht));
             cbxAnsicht.Text = ((int)_database.Ansicht).ToString();
             PermissionGroups_NewRow.Item.Clear();
-            PermissionGroups_NewRow.Item.AddRange(_database.PermissionGroups_NewRow);
+            PermissionGroups_NewRow.Item.AddRange(_database.PermissionGroupsNewRow);
             DatenbankAdmin.Item.Clear();
             DatenbankAdmin.Item.AddRange(_database.DatenbankAdmin);
             txbKennwort.Text = _database.GlobalShowPass;
@@ -198,7 +198,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void btnAlleUndos_Click(object sender, System.EventArgs e) {
             btnAlleUndos.Enabled = false;
-            var l = tabAdministration.Vorgängervsersionen(_database);
+            var l = TabAdministration.Vorgängervsersionen(_database);
             if (l.Count < 1) {
                 MessageBox.Show("Keine Vorgänger gefunden.");
                 return;
@@ -490,16 +490,16 @@ namespace BlueControls.BlueDatabaseDialogs {
             _database.ZeilenQuickInfo = txbZeilenQuickInfo.Text.Replace("\r", "<br>");
             if (tbxTags.Text != _database.Tags.JoinWithCr()) {
                 _database.Tags.Clear();
-                _database.Tags.AddRange(tbxTags.Text.SplitAndCutByCR());
+                _database.Tags.AddRange(tbxTags.Text.SplitAndCutByCr());
             }
             if (DatenbankAdmin.Item.ToListOfString().IsDifferentTo(_database.DatenbankAdmin)) {
                 _database.DatenbankAdmin.Clear();
                 _database.DatenbankAdmin.AddRange(DatenbankAdmin.Item.ToListOfString());
             }
-            if (PermissionGroups_NewRow.Item.ToListOfString().IsDifferentTo(_database.PermissionGroups_NewRow)) {
-                _database.PermissionGroups_NewRow.Clear();
-                _database.PermissionGroups_NewRow.AddRange(PermissionGroups_NewRow.Item.ToListOfString());
-                _database.PermissionGroups_NewRow.Remove("#Administrator");
+            if (PermissionGroups_NewRow.Item.ToListOfString().IsDifferentTo(_database.PermissionGroupsNewRow)) {
+                _database.PermissionGroupsNewRow.Clear();
+                _database.PermissionGroupsNewRow.AddRange(PermissionGroups_NewRow.Item.ToListOfString());
+                _database.PermissionGroupsNewRow.Remove("#Administrator");
             }
             _database.VerwaisteDaten = (enVerwaisteDaten)int.Parse(cbxVerwaisteDaten.Text);
             _database.Ansicht = (enAnsicht)int.Parse(cbxAnsicht.Text);

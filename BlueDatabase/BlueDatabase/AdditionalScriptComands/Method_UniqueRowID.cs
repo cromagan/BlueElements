@@ -25,7 +25,7 @@ namespace BlueScript {
 
         #region Properties
 
-        public override List<enVariableDataType> Args => new() { };
+        public override List<enVariableDataType> Args => new();
 
         public override string Description => "Gibt eine Systemweit einzigartige Zeilen-ID aller geladenen Datenbanken aus.";
 

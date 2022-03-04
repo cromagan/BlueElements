@@ -23,7 +23,7 @@ namespace BlueDatabase.EventArgs {
 
         #region Constructors
 
-        public RowCheckedEventArgs(RowItem? Row, List<string> ColumnsWithErrors) : base(Row) => this.ColumnsWithErrors = ColumnsWithErrors;
+        public RowCheckedEventArgs(RowItem row, List<string> columnsWithErrors) : base(row) => ColumnsWithErrors = columnsWithErrors;
 
         #endregion
 

@@ -213,7 +213,7 @@ namespace BlueControls.Controls {
 
         public TextListItem? Add_Text(string val) {
             if (val == null || string.IsNullOrEmpty(val)) { return null; }
-            if (Item.Any(thisItem => thisItem != null && thisItem.Internal.ToUpper() == val.ToUpper())) {
+            if (Item.Any(thisItem => thisItem != null && string.Equals(thisItem.Internal, val, StringComparison.CurrentCultureIgnoreCase))) {
                 return null;
             }
             var i = Item.Add(val, val);

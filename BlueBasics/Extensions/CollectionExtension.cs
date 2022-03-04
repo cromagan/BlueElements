@@ -69,7 +69,7 @@ namespace BlueBasics {
 
         // .TrimEnd(JoinChar);
 
-        public static void RemoveRange<t>(this ICollection<t> iC, List<t> remove) {
+        public static void RemoveRange<Tt>(this ICollection<Tt> iC, List<Tt> remove) {
             foreach (var thisItem in remove) {
                 iC.Remove(thisItem);
             }

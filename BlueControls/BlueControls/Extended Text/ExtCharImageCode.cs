@@ -26,15 +26,15 @@ namespace BlueControls.Extended_Text {
 
         #region Fields
 
-        private readonly QuickImage? _QI;
+        private readonly QuickImage? _qi;
 
         #endregion
 
         #region Constructors
 
-        public ExtCharImageCode(QuickImage? qi, enDesign design, enStates state, BlueFont? font, int stufe) : base(design, state, font, stufe) => _QI = qi;
+        public ExtCharImageCode(QuickImage? qi, enDesign design, enStates state, BlueFont? font, int stufe) : base(design, state, font, stufe) => _qi = qi;
 
-        public ExtCharImageCode(string imagecode, enDesign design, enStates state, BlueFont? font, int stufe) : base(design, state, font, stufe) => _QI = QuickImage.Get(imagecode);
+        public ExtCharImageCode(string imagecode, enDesign design, enStates state, BlueFont? font, int stufe) : base(design, state, font, stufe) => _qi = QuickImage.Get(imagecode);
 
         #endregion
 
@@ -43,31 +43,31 @@ namespace BlueControls.Extended_Text {
         public override void Draw(Graphics gr, Point posModificator, float zoom) {
             // Sind es KEINE Integer bei DrawX / DrawY, kommt es zu extrem unschönen Effekten. Gerade Linien scheinen verschwommen zu sein. (Checkbox-Kästchen)
 
-            var DrawX = (int)((Pos.X * zoom) + posModificator.X);
-            var DrawY = (int)((Pos.Y * zoom) + posModificator.Y);
+            var drawX = (int)((Pos.X * zoom) + posModificator.X);
+            var drawY = (int)((Pos.Y * zoom) + posModificator.Y);
 
             try {
                 if (Math.Abs(zoom - 1) < 0.001) {
-                    gr.DrawImage(_QI, DrawX, DrawY);
+                    gr.DrawImage(_qi, drawX, drawY);
                 } else {
-                    gr.DrawImage(QuickImage.Get(_QI.Name, (int)(_QI.Width * zoom)), DrawX, DrawY);
+                    gr.DrawImage(QuickImage.Get(_qi.Name, (int)(_qi.Width * zoom)), drawX, drawY);
                 }
             } catch { }
         }
 
-        public override string HTMLText() => "<IMAGECODE=" + _QI.Code + ">";
+        public override string HtmlText() => "<IMAGECODE=" + _qi.Code + ">";
 
-        public override bool isLineBreak() => false;
+        public override bool IsLineBreak() => false;
 
-        public override bool isPossibleLineBreak() => true;
+        public override bool IsPossibleLineBreak() => true;
 
-        public override bool isSpace() => false;
+        public override bool IsSpace() => false;
 
-        public override bool isWordSeperator() => true;
+        public override bool IsWordSeperator() => true;
 
         public override string PlainText() => string.Empty;
 
-        protected override SizeF CalculateSize() => _QI == null ? SizeF.Empty : new SizeF(_QI.Width + 1, _QI.Height + 1);
+        protected override SizeF CalculateSize() => _qi == null ? SizeF.Empty : new SizeF(_qi.Width + 1, _qi.Height + 1);
 
         #endregion
     }

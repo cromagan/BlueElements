@@ -109,7 +109,7 @@ namespace BlueControls.Forms
             // Pad
             // 
             this.Pad.AlwaysSmooth = true;
-            this.Pad.BMP = null;
+            this.Pad.Bmp = null;
             this.Pad.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Pad.Location = new System.Drawing.Point(0, 110);
             this.Pad.Name = "Pad";

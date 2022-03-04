@@ -105,9 +105,9 @@ namespace BluePaint {
 
         private void optZielordner_Click(object sender, System.EventArgs e) { }
 
-        private void ThisTool_NeedCurrentPic(object sender, BitmapEventArgs e) => e.BMP = OnNeedCurrentPic();
+        private void ThisTool_NeedCurrentPic(object sender, BitmapEventArgs e) => e.Bmp = OnNeedCurrentPic();
 
-        private void ThisTool_OverridePic(object sender, BitmapEventArgs e) => OnOverridePic(e.BMP);
+        private void ThisTool_OverridePic(object sender, BitmapEventArgs e) => OnOverridePic(e.Bmp);
 
         private void txbQuelle_TextChanged(object sender, System.EventArgs e) { }
 

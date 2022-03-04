@@ -24,13 +24,13 @@ namespace BlueBasics {
         public static System.Windows.Forms.Padding PaddingParse(this string code) {
             code = code.RemoveChars("{}LeftTopRightBm= ");
             var w = code.Split(',');
-            System.Windows.Forms.Padding P = new() {
+            System.Windows.Forms.Padding p = new() {
                 Left = int.Parse(w[0]),
                 Top = int.Parse(w[1]),
                 Right = int.Parse(w[2]),
                 Bottom = int.Parse(w[3])
             };
-            return P;
+            return p;
         }
 
         #endregion

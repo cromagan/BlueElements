@@ -19,6 +19,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -51,7 +52,7 @@ namespace BlueDatabase {
             set {
                 var f = this[null];
                 if (f != null) {
-                    if (f.SearchValue[0].ToLower() == value.ToLower()) { return; }
+                    if (string.Equals(f.SearchValue[0], value, StringComparison.CurrentCultureIgnoreCase)) { return; }
                     f.SearchValue[0] = value;
                     return;
                 }

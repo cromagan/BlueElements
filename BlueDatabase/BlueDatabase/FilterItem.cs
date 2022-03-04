@@ -39,7 +39,7 @@ namespace BlueDatabase {
 
         #region Constructors
 
-        public FilterItem(Database database, enFilterType filterType, string searchValue) : this(database, filterType, new List<string>() { searchValue }) { }
+        public FilterItem(Database database, enFilterType filterType, string searchValue) : this(database, filterType, new List<string> { searchValue }) { }
 
         public FilterItem(Database database, enFilterType filterType, IReadOnlyCollection<string> searchValue) {
             Database = database;
@@ -71,10 +71,10 @@ namespace BlueDatabase {
             SearchValue.Changed += SearchValue_ListOrItemChanged;
         }
 
-        public FilterItem(ColumnItem? column, enFilterType filterType, string searchValue) : this(column, filterType, new List<string>() { searchValue }, string.Empty) {
+        public FilterItem(ColumnItem? column, enFilterType filterType, string searchValue) : this(column, filterType, new List<string> { searchValue }, string.Empty) {
         }
 
-        public FilterItem(ColumnItem? column, enFilterType filterType, string searchValue, string tag) : this(column, filterType, new List<string>() { searchValue }, tag) {
+        public FilterItem(ColumnItem? column, enFilterType filterType, string searchValue, string tag) : this(column, filterType, new List<string> { searchValue }, tag) {
         }
 
         public FilterItem(ColumnItem? column, enFilterType filterType, List<string>? searchValue) : this(column, filterType, searchValue, string.Empty) {

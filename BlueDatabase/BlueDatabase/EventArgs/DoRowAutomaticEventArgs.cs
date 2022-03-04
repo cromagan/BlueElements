@@ -21,7 +21,7 @@ namespace BlueDatabase.EventArgs {
 
         #region Constructors
 
-        public DoRowAutomaticEventArgs(RowItem? Row) : base(Row) { }
+        public DoRowAutomaticEventArgs(RowItem? row) : base(row) { }
 
         #endregion
 

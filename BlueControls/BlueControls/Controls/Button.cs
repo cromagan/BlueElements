@@ -38,27 +38,27 @@ namespace BlueControls.Controls {
 
         private readonly ExtText _etxt;
 
-        private enButtonStyle _ButtonStyle = enButtonStyle.Button;
+        private enButtonStyle _buttonStyle = enButtonStyle.Button;
 
-        private bool _Checked;
+        private bool _checked;
 
         /// <summary>
         /// Verhindert, dass ein Timer und vom System generierter Click ausgelöst wird.
         /// </summary>
-        private bool _ClickFired;
+        private bool _clickFired;
 
         /// <summary>
         /// Timer-Objekt und Variablen für Dauer-Feuer-Buttonn
         /// </summary>
-        private Timer? _ClickFirerer;
+        private Timer? _clickFirerer;
 
-        private string _ImageCode = string.Empty;
+        private string _imageCode = string.Empty;
 
-        private string _ImageCode_Checked = string.Empty;
+        private string _imageCodeChecked = string.Empty;
 
-        private bool _IsFireing;
+        private bool _isFireing;
 
-        private string _Text = string.Empty;
+        private string _text = string.Empty;
 
         #endregion
 
@@ -78,24 +78,24 @@ namespace BlueControls.Controls {
 
         [DefaultValue(enButtonStyle.Button)]
         public enButtonStyle ButtonStyle {
-            get => _ButtonStyle;
+            get => _buttonStyle;
             set {
-                if (_ButtonStyle == value) { return; }
-                _ButtonStyle = value;
+                if (_buttonStyle == value) { return; }
+                _buttonStyle = value;
 
-                if (_ClickFirerer != null) {
-                    _ClickFirerer.Enabled = false;
-                    _ClickFirerer.Tick -= ClickFirerer_Tick;
-                    _ClickFirerer.Dispose();
-                    _ClickFirerer = null;
+                if (_clickFirerer != null) {
+                    _clickFirerer.Enabled = false;
+                    _clickFirerer.Tick -= ClickFirerer_Tick;
+                    _clickFirerer.Dispose();
+                    _clickFirerer = null;
                 }
 
                 if (value == enButtonStyle.SliderButton) {
-                    if (_ClickFirerer != null) { return; }
-                    _ClickFirerer = new Timer {
+                    if (_clickFirerer != null) { return; }
+                    _clickFirerer = new Timer {
                         Enabled = false
                     };
-                    _ClickFirerer.Tick += ClickFirerer_Tick;
+                    _clickFirerer.Tick += ClickFirerer_Tick;
                 }
 
                 if (DesignMode) { DisableOtherOptionButtons(); }
@@ -113,10 +113,10 @@ namespace BlueControls.Controls {
 
         [DefaultValue(false)]
         public bool Checked {
-            get => _Checked && (_ButtonStyle.HasFlag(enButtonStyle.Checkbox) || _ButtonStyle.HasFlag(enButtonStyle.Optionbox));
+            get => _checked && (_buttonStyle.HasFlag(enButtonStyle.Checkbox) || _buttonStyle.HasFlag(enButtonStyle.Optionbox));
             set {
-                if (_Checked == value) { return; }
-                _Checked = value;
+                if (_checked == value) { return; }
+                _checked = value;
                 DisableOtherOptionButtons();
                 Invalidate();
                 OnCheckedChanged();
@@ -127,10 +127,10 @@ namespace BlueControls.Controls {
         [Editor(typeof(QuickPicSelector), typeof(UITypeEditor))]
         [DefaultValue("")]
         public string ImageCode {
-            get => _ImageCode;
+            get => _imageCode;
             set {
-                if (_ImageCode == value) { return; }
-                _ImageCode = value;
+                if (_imageCode == value) { return; }
+                _imageCode = value;
                 Invalidate();
             }
         }
@@ -139,20 +139,20 @@ namespace BlueControls.Controls {
         [DefaultValue("")]
         [Editor(typeof(QuickPicSelector), typeof(UITypeEditor))]
         public string ImageCode_Checked {
-            get => _ImageCode_Checked;
+            get => _imageCodeChecked;
             set {
-                if (_ImageCode_Checked == value) { return; }
-                _ImageCode_Checked = value;
+                if (_imageCodeChecked == value) { return; }
+                _imageCodeChecked = value;
                 Invalidate();
             }
         }
 
         [DefaultValue("")]
         public new string Text {
-            get => _Text;
+            get => _text;
             set {
-                if (_Text == value) { return; }
-                _Text = value;
+                if (_text == value) { return; }
+                _text = value;
                 Invalidate();
             }
         }
@@ -165,24 +165,24 @@ namespace BlueControls.Controls {
         #region Methods
 
         public void CheckType() {
-            if (_ButtonStyle.HasFlag(enButtonStyle.Text)) { return; }
+            if (_buttonStyle.HasFlag(enButtonStyle.Text)) { return; }
 
             var par = ParentType();
 
             if (par is enPartentType.RibbonGroupBox or enPartentType.RibbonPage) {
-                if (!_ButtonStyle.HasFlag(enButtonStyle.Button_Big)) { _ButtonStyle |= enButtonStyle.Button_Big; }
-                if (!_ButtonStyle.HasFlag(enButtonStyle.Borderless)) { _ButtonStyle |= enButtonStyle.Borderless; }
+                if (!_buttonStyle.HasFlag(enButtonStyle.Button_Big)) { _buttonStyle |= enButtonStyle.Button_Big; }
+                if (!_buttonStyle.HasFlag(enButtonStyle.Borderless)) { _buttonStyle |= enButtonStyle.Borderless; }
             }
 
-            if (par is enPartentType.ComboBox) { _ButtonStyle = enButtonStyle.ComboBoxButton; }
-            if (par is enPartentType.RibbonBarCombobox) { _ButtonStyle = enButtonStyle.ComboBoxButton_Borderless; }
-            if (par is enPartentType.Slider) { _ButtonStyle = enButtonStyle.SliderButton; }
+            if (par is enPartentType.ComboBox) { _buttonStyle = enButtonStyle.ComboBoxButton; }
+            if (par is enPartentType.RibbonBarCombobox) { _buttonStyle = enButtonStyle.ComboBoxButton_Borderless; }
+            if (par is enPartentType.Slider) { _buttonStyle = enButtonStyle.SliderButton; }
         }
 
         internal static void DrawButton(Control? control, Graphics gr, enDesign buttontype, enStates state, QuickImage? pic, enAlignment align, bool picHeight44, ExtText etxt, string text, Rectangle displayRectangle, bool translate) {
-            var Design = Skin.DesignOf(buttontype, state);
-            Skin.Draw_Back(gr, Design, displayRectangle, control, true);
-            Skin.Draw_Border(gr, Design, displayRectangle);
+            var design = Skin.DesignOf(buttontype, state);
+            Skin.Draw_Back(gr, design, displayRectangle, control, true);
+            Skin.Draw_Border(gr, design, displayRectangle);
 
             picHeight44 = picHeight44 && control.Height >= 40 && pic != null;
 
@@ -191,7 +191,7 @@ namespace BlueControls.Controls {
                 //if (pic.Width != -1 || pic.Height != -1) { Develop.DebugPrint("Bei Bildcode " + pic + " die Größenangabe entfernen, da es ein grosses Bild wird!"); }
                 //var Zoom = Math.Min((control.Width - 6) / (double)pic.Width, 28 / (double)pic.Height);
                 var tmpPic = QuickImage.Get(QuickImage.GenerateCode(pic.Name, control.Width - 6, 28, pic.Effekt, pic.Färbung, pic.ChangeGreenTo, pic.Sättigung, pic.Helligkeit, pic.DrehWinkel, pic.Transparenz, pic.Zweitsymbol));
-                Skin.Draw_FormatedText(gr, string.Empty, tmpPic, Design, enAlignment.Horizontal_Vertical_Center, new Rectangle(0, 0, control.Width, 44), control, false, translate);
+                Skin.Draw_FormatedText(gr, string.Empty, tmpPic, design, enAlignment.Horizontal_Vertical_Center, new Rectangle(0, 0, control.Width, 44), control, false, translate);
 
                 var tt = BlueDatabase.LanguageTool.DoTranslate(text, translate);
 
@@ -207,9 +207,9 @@ namespace BlueControls.Controls {
                     etxt.Draw(gr, 1);
                 }
             } else if (buttontype is not enDesign.OptionButton_TextStyle and not enDesign.CheckBox_TextStyle) {
-                Skin.Draw_FormatedText(gr, text, pic, Design, align, displayRectangle, control, false, translate);
+                Skin.Draw_FormatedText(gr, text, pic, design, align, displayRectangle, control, false, translate);
             } else {
-                var tt = "<ImageCode=" + Design.Image + "> <zbx_store><top>" + BlueDatabase.LanguageTool.DoTranslate(text, translate);
+                var tt = "<ImageCode=" + design.Image + "> <zbx_store><top>" + BlueDatabase.LanguageTool.DoTranslate(text, translate);
                 //etxt = new ExtText(buttontype, state);
                 etxt.Design = buttontype;
                 etxt.State = state;
@@ -228,77 +228,77 @@ namespace BlueControls.Controls {
 
         protected override void DrawControl(Graphics gr, enStates state) {
             try {
-                var _Pic = (enButtonStyle)((int)_ButtonStyle % 1000) switch {
-                    enButtonStyle.Yes_or_No => _Checked || MousePressing() ? QuickImage.Get(enImageCode.Häkchen) : QuickImage.Get(enImageCode.Kreuz),
-                    enButtonStyle.Pic1_or_Pic2 => _Checked || MousePressing() ? QuickImage.Get(_ImageCode_Checked) : QuickImage.Get(_ImageCode),
-                    _ => string.IsNullOrEmpty(ImageCode) ? null : QuickImage.Get(_ImageCode)
+                var pic = (enButtonStyle)((int)_buttonStyle % 1000) switch {
+                    enButtonStyle.Yes_or_No => _checked || MousePressing() ? QuickImage.Get(enImageCode.Häkchen) : QuickImage.Get(enImageCode.Kreuz),
+                    enButtonStyle.Pic1_or_Pic2 => _checked || MousePressing() ? QuickImage.Get(_imageCodeChecked) : QuickImage.Get(_imageCode),
+                    _ => string.IsNullOrEmpty(ImageCode) ? null : QuickImage.Get(_imageCode)
                 };
 
                 #region State modifzieren
 
-                if (_IsFireing) { state = enStates.Standard_Disabled; } // Optische anzeige
+                if (_isFireing) { state = enStates.Standard_Disabled; } // Optische anzeige
 
-                if (_ButtonStyle.HasFlag(enButtonStyle.Checkbox) || _ButtonStyle.HasFlag(enButtonStyle.Optionbox)) {
-                    if (_Checked || MousePressing()) { state |= enStates.Checked; }
+                if (_buttonStyle.HasFlag(enButtonStyle.Checkbox) || _buttonStyle.HasFlag(enButtonStyle.Optionbox)) {
+                    if (_checked || MousePressing()) { state |= enStates.Checked; }
                 }
 
                 #endregion State modifzieren
 
-                switch (_ButtonStyle) {
+                switch (_buttonStyle) {
                     case enButtonStyle.Text:
                     case enButtonStyle.Borderless:
                     case enButtonStyle.Button:
-                        DrawButton(this, gr, enDesign.Button, state, _Pic, enAlignment.Horizontal_Vertical_Center, false, _etxt, _Text, DisplayRectangle, Translate);
+                        DrawButton(this, gr, enDesign.Button, state, pic, enAlignment.Horizontal_Vertical_Center, false, _etxt, _text, DisplayRectangle, Translate);
                         break;
 
                     case enButtonStyle.Button_Big_Borderless:
-                        DrawButton(this, gr, enDesign.Ribbonbar_Button, state, _Pic, enAlignment.VerticalCenter_Left, true, _etxt, _Text, DisplayRectangle, Translate);
+                        DrawButton(this, gr, enDesign.Ribbonbar_Button, state, pic, enAlignment.VerticalCenter_Left, true, _etxt, _text, DisplayRectangle, Translate);
                         break;
 
                     case enButtonStyle.Button_Big:
-                        DrawButton(this, gr, enDesign.Button, state, _Pic, enAlignment.VerticalCenter_Left, true, _etxt, _Text, DisplayRectangle, Translate);
+                        DrawButton(this, gr, enDesign.Button, state, pic, enAlignment.VerticalCenter_Left, true, _etxt, _text, DisplayRectangle, Translate);
                         break;
 
                     case enButtonStyle.SliderButton:
-                        DrawButton(this, gr, enDesign.Button_SliderDesign, state, _Pic, enAlignment.Horizontal_Vertical_Center, false, _etxt, _Text, DisplayRectangle, Translate);
+                        DrawButton(this, gr, enDesign.Button_SliderDesign, state, pic, enAlignment.Horizontal_Vertical_Center, false, _etxt, _text, DisplayRectangle, Translate);
                         break;
 
                     case enButtonStyle.Yes_or_No:
                     case enButtonStyle.Pic1_or_Pic2:
                     case enButtonStyle.Checkbox:
-                        DrawButton(this, gr, enDesign.Button_CheckBox, state, _Pic, enAlignment.Horizontal_Vertical_Center, false, _etxt, _Text, DisplayRectangle, Translate);
+                        DrawButton(this, gr, enDesign.Button_CheckBox, state, pic, enAlignment.Horizontal_Vertical_Center, false, _etxt, _text, DisplayRectangle, Translate);
                         break;
 
                     case enButtonStyle.Checkbox_Big_Borderless:
-                        DrawButton(this, gr, enDesign.Ribbonbar_Button_CheckBox, state, _Pic, enAlignment.VerticalCenter_Left, true, _etxt, _Text, DisplayRectangle, Translate);
+                        DrawButton(this, gr, enDesign.Ribbonbar_Button_CheckBox, state, pic, enAlignment.VerticalCenter_Left, true, _etxt, _text, DisplayRectangle, Translate);
                         break;
 
                     case enButtonStyle.Checkbox_Text:
-                        DrawButton(this, gr, enDesign.CheckBox_TextStyle, state, _Pic, enAlignment.Horizontal_Vertical_Center, false, _etxt, _Text, DisplayRectangle, Translate);
+                        DrawButton(this, gr, enDesign.CheckBox_TextStyle, state, pic, enAlignment.Horizontal_Vertical_Center, false, _etxt, _text, DisplayRectangle, Translate);
                         break;
 
                     case enButtonStyle.Optionbox:
-                        DrawButton(this, gr, enDesign.Button_OptionButton, state, _Pic, enAlignment.Horizontal_Vertical_Center, false, _etxt, _Text, DisplayRectangle, Translate);
+                        DrawButton(this, gr, enDesign.Button_OptionButton, state, pic, enAlignment.Horizontal_Vertical_Center, false, _etxt, _text, DisplayRectangle, Translate);
                         break;
 
                     case enButtonStyle.Optionbox_Big_Borderless:
-                        DrawButton(this, gr, enDesign.Ribbonbar_Button_OptionButton, state, _Pic, enAlignment.VerticalCenter_Left, true, _etxt, _Text, DisplayRectangle, Translate);
+                        DrawButton(this, gr, enDesign.Ribbonbar_Button_OptionButton, state, pic, enAlignment.VerticalCenter_Left, true, _etxt, _text, DisplayRectangle, Translate);
                         break;
 
                     case enButtonStyle.Optionbox_Text:
-                        DrawButton(this, gr, enDesign.OptionButton_TextStyle, state, _Pic, enAlignment.Horizontal_Vertical_Center, false, _etxt, _Text, DisplayRectangle, Translate);
+                        DrawButton(this, gr, enDesign.OptionButton_TextStyle, state, pic, enAlignment.Horizontal_Vertical_Center, false, _etxt, _text, DisplayRectangle, Translate);
                         break;
 
                     case enButtonStyle.ComboBoxButton:
-                        DrawButton(this, gr, enDesign.Button_ComboBox, state, _Pic, enAlignment.Horizontal_Vertical_Center, false, _etxt, _Text, DisplayRectangle, Translate);
+                        DrawButton(this, gr, enDesign.Button_ComboBox, state, pic, enAlignment.Horizontal_Vertical_Center, false, _etxt, _text, DisplayRectangle, Translate);
                         break;
 
                     case enButtonStyle.ComboBoxButton_Borderless:
-                        DrawButton(this, gr, enDesign.Ribbonbar_Button_Combobox, state, _Pic, enAlignment.Horizontal_Vertical_Center, false, _etxt, _Text, DisplayRectangle, Translate);
+                        DrawButton(this, gr, enDesign.Ribbonbar_Button_Combobox, state, pic, enAlignment.Horizontal_Vertical_Center, false, _etxt, _text, DisplayRectangle, Translate);
                         break;
 
                     default:
-                        Develop.DebugPrint_MissingCommand(_ButtonStyle.ToString());
+                        Develop.DebugPrint_MissingCommand(_buttonStyle.ToString());
                         break;
                 }
             } catch { }
@@ -306,24 +306,24 @@ namespace BlueControls.Controls {
 
         protected override void OnClick(System.EventArgs e) {
             // Click wird vor dem MouseUpEreigniss ausgelöst
-            if (_IsFireing || IsDisposed || !Enabled || _ClickFired) { return; }
+            if (_isFireing || IsDisposed || !Enabled || _clickFired) { return; }
 
-            _ClickFired = true;
-            _IsFireing = true;
+            _clickFired = true;
+            _isFireing = true;
             Refresh();
 
-            if (_ButtonStyle.HasFlag(enButtonStyle.Checkbox)) {
+            if (_buttonStyle.HasFlag(enButtonStyle.Checkbox)) {
                 Checked = !Checked;
             }
-            if (_ButtonStyle.HasFlag(enButtonStyle.Optionbox)) {
-                if (!_Checked) {
+            if (_buttonStyle.HasFlag(enButtonStyle.Optionbox)) {
+                if (!_checked) {
                     Checked = true;
                     DisableOtherOptionButtons();
                 }
             }
 
             base.OnClick(e);
-            _IsFireing = false;
+            _isFireing = false;
             Invalidate();
         }
 
@@ -341,14 +341,14 @@ namespace BlueControls.Controls {
         }
 
         protected override void OnMouseDown(MouseEventArgs e) {
-            _ClickFired = false;
+            _clickFired = false;
 
             base.OnMouseDown(e);
 
             if (!Enabled || IsDisposed) { return; }
 
-            if (_ButtonStyle == enButtonStyle.SliderButton) {
-                _ClickFirerer.Interval = 500;
+            if (_buttonStyle == enButtonStyle.SliderButton) {
+                _clickFirerer.Interval = 500;
                 ClickFirerer_Tick(null, e);
             }
 
@@ -368,9 +368,9 @@ namespace BlueControls.Controls {
         }
 
         protected override void OnMouseUp(MouseEventArgs e) {
-            if (_ClickFirerer != null) {
-                _ClickFirerer.Enabled = false;
-                _ClickFirerer.Interval = 500;
+            if (_clickFirerer != null) {
+                _clickFirerer.Enabled = false;
+                _clickFirerer.Interval = 500;
             }
 
             base.OnMouseUp(e);
@@ -379,19 +379,19 @@ namespace BlueControls.Controls {
         }
 
         private void ClickFirerer_Tick(object sender, System.EventArgs e) {
-            if (_ButtonStyle.HasFlag(enButtonStyle.SliderButton) && MousePressing() && ContainsMouse()) {
+            if (_buttonStyle.HasFlag(enButtonStyle.SliderButton) && MousePressing() && ContainsMouse()) {
                 // Focus egal, DauerFeuerbutton - Slider - Design kann keinen Focus erhalten!
-                _ClickFired = false;
+                _clickFired = false;
                 OnClick(e);
-                if (sender != null) { _ClickFirerer.Interval = 100; }
-                _ClickFirerer.Enabled = true;
+                if (sender != null) { _clickFirerer.Interval = 100; }
+                _clickFirerer.Enabled = true;
             } else {
-                _ClickFirerer.Enabled = false;
+                _clickFirerer.Enabled = false;
             }
         }
 
         private void DisableOtherOptionButtons() {
-            if (!_Checked || !_ButtonStyle.HasFlag(enButtonStyle.Optionbox) || Parent == null) { return; }
+            if (!_checked || !_buttonStyle.HasFlag(enButtonStyle.Optionbox) || Parent == null) { return; }
 
             if (string.IsNullOrEmpty(Name)) { return; }
 

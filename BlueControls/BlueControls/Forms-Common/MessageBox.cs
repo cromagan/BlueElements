@@ -29,7 +29,7 @@ namespace BlueControls.Forms {
 
         #region Fields
 
-        private Button? Pressed;
+        private Button? _pressed;
 
         #endregion
 
@@ -43,22 +43,22 @@ namespace BlueControls.Forms {
         //        StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
         //    }
         //}
-        private MessageBox(string TXT, enImageCode Pic, params string[] Buttons) : base(enDesign.Form_MsgBox) {
+        private MessageBox(string txt, enImageCode pic, params string[] buttons) : base(enDesign.Form_MsgBox) {
             InitializeComponent();
             Text = Develop.AppName();
-            capText.Text = Pic != enImageCode.None
-                ? "<ImageCode=" + QuickImage.Get(Pic, 32) + "> <zbx_store><top>" + BlueDatabase.LanguageTool.DoTranslate(TXT, false)
-                : BlueDatabase.LanguageTool.DoTranslate(TXT, false);
+            capText.Text = pic != enImageCode.None
+                ? "<ImageCode=" + QuickImage.Get(pic, 32) + "> <zbx_store><top>" + BlueDatabase.LanguageTool.DoTranslate(txt, false)
+                : BlueDatabase.LanguageTool.DoTranslate(txt, false);
             Size = new Size((capText.Left * 2) + capText.Width + BorderWidth, (capText.Top * 3) + capText.Height + 35 + BorderHeight);
-            if (Buttons.Length == 0) { Buttons = new[] { "OK" }; }
-            var B = Generate_Buttons(Buttons);
-            foreach (var ThisButton in B) {
-                ThisButton.Click += ThisButton_Click;
-                if (ThisButton.Left < BorderWidth) {
-                    Width = Width - ThisButton.Left + BorderWidth;
+            if (buttons.Length == 0) { buttons = new[] { "OK" }; }
+            var b = Generate_Buttons(buttons);
+            foreach (var thisButton in b) {
+                thisButton.Click += ThisButton_Click;
+                if (thisButton.Left < BorderWidth) {
+                    Width = Width - thisButton.Left + BorderWidth;
                 }
             }
-            Pressed = null;
+            _pressed = null;
             if (Owner == null) {
                 StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             }
@@ -68,93 +68,93 @@ namespace BlueControls.Forms {
 
         #region Methods
 
-        public static void Show(string TXT) => Show(TXT, enImageCode.None, true, "OK");
+        public static void Show(string txt) => Show(txt, enImageCode.None, true, "OK");
 
-        public static void Show(string TXT, enImageCode Pic, string Buttons) => Show(TXT, Pic, true, Buttons);
+        public static void Show(string txt, enImageCode pic, string buttons) => Show(txt, pic, true, buttons);
 
-        public static int Show(string TXT, enImageCode Pic, params string[] Buttons) => Show(TXT, Pic, true, Buttons);
+        public static int Show(string txt, enImageCode pic, params string[] buttons) => Show(txt, pic, true, buttons);
 
-        public static int Show(string TXT, enImageCode Pic, bool Dialog, params string[] Buttons) {
-            MessageBox MB = new(TXT, Pic, Buttons);
-            if (Dialog) {
-                MB.ShowDialog();
+        public static int Show(string txt, enImageCode pic, bool dialog, params string[] buttons) {
+            MessageBox mb = new(txt, pic, buttons);
+            if (dialog) {
+                mb.ShowDialog();
             } else {
-                MB.Show();
-                while (MB.Pressed == null) {
+                mb.Show();
+                while (mb._pressed == null) {
                     Generic.Pause(0.1, true);
                 }
             }
-            return int.Parse(MB.Pressed.Name);
+            return int.Parse(mb._pressed.Name);
         }
 
-        public List<Button> Generate_Buttons(string[] Names) {
-            var MyX = Width - Skin.Padding - BorderWidth;
+        public List<Button> Generate_Buttons(string[] names) {
+            var myX = Width - Skin.Padding - BorderWidth;
             ExtText erT = new(enDesign.Button, enStates.Standard);
-            List<Button> Buts = new();
-            for (var Z = Names.GetUpperBound(0); Z > -1; Z--) {
-                if (!string.IsNullOrEmpty(Names[Z])) {
+            List<Button> buts = new();
+            for (var z = names.GetUpperBound(0); z > -1; z--) {
+                if (!string.IsNullOrEmpty(names[z])) {
                     erT.TextDimensions = Size.Empty;
-                    erT.PlainText = Names[Z];
-                    Button B = new() {
-                        Name = Z.ToString(),
-                        Text = Names[Z]
+                    erT.PlainText = names[z];
+                    Button b = new() {
+                        Name = z.ToString(),
+                        Text = names[z]
                     };
-                    var W = 2;
-                    switch (B.Text.ToLower()) {
+                    var w = 2;
+                    switch (b.Text.ToLower()) {
                         case "ja":
                         case "ok":
-                            B.ImageCode = "Häkchen|16";
-                            W = 4;
+                            b.ImageCode = "Häkchen|16";
+                            w = 4;
                             break;
 
                         case "nein":
                         case "abbrechen":
                         case "abbruch":
-                            B.ImageCode = "Kreuz|16";
-                            W = 4;
+                            b.ImageCode = "Kreuz|16";
+                            w = 4;
                             break;
 
                         case "verwerfen":
                         case "löschen":
-                            B.ImageCode = "Papierkorb|16";
-                            W = 4;
+                            b.ImageCode = "Papierkorb|16";
+                            w = 4;
                             break;
 
                         case "speichern":
                         case "sichern":
-                            B.ImageCode = "Diskette|16";
-                            W = 4;
+                            b.ImageCode = "Diskette|16";
+                            w = 4;
                             break;
 
                         case "laden":
-                            B.ImageCode = "Ordner|16";
-                            W = 4;
+                            b.ImageCode = "Ordner|16";
+                            w = 4;
                             break;
 
                         case "anpinnen":
-                            B.ImageCode = "Pinnadel|16";
-                            W = 4;
+                            b.ImageCode = "Pinnadel|16";
+                            w = 4;
                             break;
 
                         default:
-                            B.ImageCode = string.Empty;
+                            b.ImageCode = string.Empty;
                             break;
                     }
-                    B.Size = new Size(erT.Width() + (Skin.Padding * W), erT.Height() + (Skin.Padding * 2));
-                    B.Location = new Point(MyX - B.Width, Height - BorderHeight - Skin.Padding - B.Height);
-                    MyX = B.Location.X - Skin.Padding;
-                    B.ButtonStyle = enButtonStyle.Button;
-                    B.Visible = true;
-                    B.Anchor = System.Windows.Forms.AnchorStyles.Right | System.Windows.Forms.AnchorStyles.Bottom;
-                    Controls.Add(B);
-                    Buts.Add(B);
+                    b.Size = new Size(erT.Width() + (Skin.Padding * w), erT.Height() + (Skin.Padding * 2));
+                    b.Location = new Point(myX - b.Width, Height - BorderHeight - Skin.Padding - b.Height);
+                    myX = b.Location.X - Skin.Padding;
+                    b.ButtonStyle = enButtonStyle.Button;
+                    b.Visible = true;
+                    b.Anchor = System.Windows.Forms.AnchorStyles.Right | System.Windows.Forms.AnchorStyles.Bottom;
+                    Controls.Add(b);
+                    buts.Add(b);
                 }
             }
-            return Buts;
+            return buts;
         }
 
         private void ThisButton_Click(object sender, System.EventArgs e) {
-            Pressed = (Button)sender;
+            _pressed = (Button)sender;
             Close();
         }
 

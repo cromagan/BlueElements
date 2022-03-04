@@ -32,15 +32,15 @@ namespace BlueControls.Extended_Text {
 
         public override void Draw(Graphics gr, Point posModificator, float zoom) { }
 
-        public override string HTMLText() => "<TAB>";
+        public override string HtmlText() => "<TAB>";
 
-        public override bool isLineBreak() => false;
+        public override bool IsLineBreak() => false;
 
-        public override bool isPossibleLineBreak() => true;
+        public override bool IsPossibleLineBreak() => true;
 
-        public override bool isSpace() => true;
+        public override bool IsSpace() => true;
 
-        public override bool isWordSeperator() => true;
+        public override bool IsWordSeperator() => true;
 
         public override string PlainText() => "\t";
 

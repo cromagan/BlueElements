@@ -227,13 +227,13 @@ namespace BlueControls.Controls {
                 toSet = Value;
             } else if (x is List<string> ls) {
                 OldVal = ls.JoinWithCr();
-                toSet = Value.SplitAndCutByCRToList();
+                toSet = Value.SplitAndCutByCrToList();
             } else if (x is bool bo) {
                 OldVal = bo.ToPlusMinus();
                 toSet = Value.FromPlusMinus();
             } else if (x is Color co) {
-                OldVal = co.ToHTMLCode();
-                toSet = Value.FromHTMLCode();
+                OldVal = co.ToHtmlCode();
+                toSet = Value.FromHtmlCode();
             } else if (x is int iv) {
                 OldVal = iv.ToString();
                 toSet = IntParse(Value);
@@ -306,7 +306,7 @@ namespace BlueControls.Controls {
             } else if (x is float fl) {
                 ValueSet(fl.ToString(Constants.Format_Float2), true, false);
             } else if (x is Color co) {
-                ValueSet(co.ToHTMLCode(), true, false);
+                ValueSet(co.ToHtmlCode(), true, false);
             } else {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Art unbekannt!");
             }

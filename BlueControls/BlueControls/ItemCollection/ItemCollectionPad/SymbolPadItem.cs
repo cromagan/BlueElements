@@ -83,11 +83,11 @@ namespace BlueControls.ItemCollection {
                     return true;
 
                 case "backcolor":
-                    Hintergrundfarbe = value.FromHTMLCode();
+                    Hintergrundfarbe = value.FromHtmlCode();
                     return true;
 
                 case "bordercolor":
-                    Randfarbe = value.FromHTMLCode();
+                    Randfarbe = value.FromHtmlCode();
                     return true;
 
                 case "borderwidth":
@@ -106,8 +106,8 @@ namespace BlueControls.ItemCollection {
             var t = base.ToString();
             t = t.Substring(0, t.Length - 1) + ", ";
             t = t + "Symbol=" + (int)Symbol + ", ";
-            t = t + "Backcolor=" + Hintergrundfarbe.ToHTMLCode() + ", ";
-            t = t + "BorderColor=" + Randfarbe.ToHTMLCode() + ", ";
+            t = t + "Backcolor=" + Hintergrundfarbe.ToHtmlCode() + ", ";
+            t = t + "BorderColor=" + Randfarbe.ToHtmlCode() + ", ";
             t = t + "BorderWidth=" + Randdicke.ToString().ToNonCritical() + ", ";
             return t.Trim(", ") + "}";
         }

@@ -33,8 +33,8 @@ namespace BlueControls.Controls {
         #region Fields
 
         private Bitmap? _bmp;
-        private MouseEventArgs1_1? _MouseCurrent;
-        private MouseEventArgs1_1? _MouseDown;
+        private MouseEventArgs1_1? _mouseCurrent;
+        private MouseEventArgs1_1? _mouseDown;
 
         #endregion
 
@@ -67,7 +67,7 @@ namespace BlueControls.Controls {
         [DefaultValue(false)]
         public bool AlwaysSmooth { get; set; } = false;
 
-        public Bitmap? BMP {
+        public Bitmap? Bmp {
             get => _bmp;
             set {
                 if (value == _bmp) { return; }
@@ -121,7 +121,7 @@ namespace BlueControls.Controls {
                 //    TMPGR.DrawImage(OverlayBMP, r);
                 //}
             }
-            OnDoAdditionalDrawing(new AdditionalDrawing(gr, Zoom, ShiftX, ShiftY, _MouseDown, _MouseCurrent));
+            OnDoAdditionalDrawing(new AdditionalDrawing(gr, Zoom, ShiftX, ShiftY, _mouseDown, _mouseCurrent));
             Skin.Draw_Border(gr, enDesign.Table_And_Pad, state, new Rectangle(1, 1, Size.Width - SliderY.Width, Size.Height - SliderX.Height));
             //gr.DrawImage(_BitmapOfControl, 0, 0);
         }
@@ -134,19 +134,19 @@ namespace BlueControls.Controls {
         /// Zuerst ImageMouseUp, dann MouseUp
         /// </summary>
         /// <param name="e"></param>
-        protected virtual void OnImageMouseUp(MouseEventArgs1_1 e) => ImageMouseUp?.Invoke(this, new MouseEventArgs1_1DownAndCurrent(_MouseDown, e));
+        protected virtual void OnImageMouseUp(MouseEventArgs1_1 e) => ImageMouseUp?.Invoke(this, new MouseEventArgs1_1DownAndCurrent(_mouseDown, e));
 
         protected override void OnMouseDown(MouseEventArgs e) {
             base.OnMouseDown(e);
-            _MouseCurrent = GenerateNewMouseEventArgs(e);
-            _MouseDown = _MouseCurrent;
-            OnImageMouseDown(_MouseDown);
+            _mouseCurrent = GenerateNewMouseEventArgs(e);
+            _mouseDown = _mouseCurrent;
+            OnImageMouseDown(_mouseDown);
         }
 
         protected override void OnMouseMove(MouseEventArgs e) {
             base.OnMouseMove(e);
-            _MouseCurrent = GenerateNewMouseEventArgs(e);
-            OnImageMouseMove(_MouseCurrent);
+            _mouseCurrent = GenerateNewMouseEventArgs(e);
+            OnImageMouseMove(_mouseCurrent);
         }
 
         //private bool IsInBitmap() {
@@ -159,8 +159,8 @@ namespace BlueControls.Controls {
         /// </summary>
         /// <param name="e"></param>
         protected override void OnMouseUp(MouseEventArgs e) {
-            _MouseCurrent = GenerateNewMouseEventArgs(e);
-            OnImageMouseUp(_MouseCurrent);
+            _mouseCurrent = GenerateNewMouseEventArgs(e);
+            OnImageMouseUp(_mouseCurrent);
             base.OnMouseUp(e);
             //_MouseDown = null; Wenn die Leute immer beide Maustasten gleichzeitig klicken.
         }
@@ -174,11 +174,11 @@ namespace BlueControls.Controls {
             return new MouseEventArgs1_1(e.Button, e.Clicks, en.X, en.Y, e.Delta, p.X, p.Y, IsInBitmap(en.X, en.Y));
         }
 
-        private bool IsInBitmap(int X, int Y) => _bmp != null && X >= 0 && Y >= 0 && X <= _bmp.Width && Y <= _bmp.Height;
+        private bool IsInBitmap(int x, int y) => _bmp != null && x >= 0 && y >= 0 && x <= _bmp.Width && y <= _bmp.Height;
 
         private void OnImageMouseDown(MouseEventArgs1_1 e) => ImageMouseDown?.Invoke(this, e);
 
-        private void OnImageMouseMove(MouseEventArgs1_1 e) => ImageMouseMove?.Invoke(this, new MouseEventArgs1_1DownAndCurrent(_MouseDown, e));
+        private void OnImageMouseMove(MouseEventArgs1_1 e) => ImageMouseMove?.Invoke(this, new MouseEventArgs1_1DownAndCurrent(_mouseDown, e));
 
         #endregion
     }

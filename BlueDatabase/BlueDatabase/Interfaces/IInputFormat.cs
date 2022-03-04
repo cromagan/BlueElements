@@ -19,6 +19,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BlueDatabase.Interfaces {
 
@@ -73,36 +74,34 @@ namespace BlueDatabase.Interfaces {
             var l = new List<string>();
 
             if (formatToCheck.MultiLine) {
-                l.AddRange(txt.SplitAndCutByCR());
+                l.AddRange(txt.SplitAndCutByCr());
             } else {
                 l.Add(txt);
             }
 
-            foreach (var thisString in l) {
-                if (!string.IsNullOrEmpty(thisString)) {
-                    if (!string.IsNullOrEmpty(formatToCheck.AllowedChars) && !thisString.ContainsOnlyChars(formatToCheck.AllowedChars)) { return false; }
-                    if (!string.IsNullOrEmpty(formatToCheck.Regex) && !thisString.RegexMatch(formatToCheck.Regex)) { return false; }
+            foreach (var thisString in l.Where(thisString => !string.IsNullOrEmpty(thisString))) {
+                if (!string.IsNullOrEmpty(formatToCheck.AllowedChars) && !thisString.ContainsOnlyChars(formatToCheck.AllowedChars)) { return false; }
+                if (!string.IsNullOrEmpty(formatToCheck.Regex) && !thisString.RegexMatch(formatToCheck.Regex)) { return false; }
 
-                    switch (formatToCheck.AdditionalCheck) {
-                        case enAdditionalCheck.None:
-                            break;
+                switch (formatToCheck.AdditionalCheck) {
+                    case enAdditionalCheck.None:
+                        break;
 
-                        case enAdditionalCheck.Integer:
-                            if (!thisString.IsLong()) { return false; }
-                            break;
+                    case enAdditionalCheck.Integer:
+                        if (!thisString.IsLong()) { return false; }
+                        break;
 
-                        case enAdditionalCheck.Float:
-                            if (!thisString.IsDouble()) { return false; }
-                            break;
+                    case enAdditionalCheck.Float:
+                        if (!thisString.IsDouble()) { return false; }
+                        break;
 
-                        case enAdditionalCheck.DateTime:
-                            if (!thisString.IsDateTime()) { return false; }
-                            break;
+                    case enAdditionalCheck.DateTime:
+                        if (!thisString.IsDateTime()) { return false; }
+                        break;
 
-                        default:
-                            Develop.DebugPrint(formatToCheck.AdditionalCheck);
-                            break;
-                    }
+                    default:
+                        Develop.DebugPrint(formatToCheck.AdditionalCheck);
+                        break;
                 }
             }
             return true;

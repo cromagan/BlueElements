@@ -25,10 +25,10 @@ namespace BlueControls.Forms {
 
         #region Fields
 
-        public static string _AutoClosedTXT = string.Empty;
-        public static string _shownTXT = string.Empty;
-        private bool _Shown;
-        private int Counter;
+        public static string AutoClosedTxt = string.Empty;
+        public static string ShownTxt = string.Empty;
+        private int _counter;
+        private bool _shown;
 
         #endregion
 
@@ -36,12 +36,12 @@ namespace BlueControls.Forms {
 
         private QuickInfo() : base(Enums.enDesign.Form_QuickInfo) => InitializeComponent();
 
-        private QuickInfo(string Text) : this() {
+        private QuickInfo(string text) : this() {
             //InitializeComponent();
-            capTXT.Text = Text;
-            var He = Math.Min(capTXT.TextRequiredSize().Height, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height * 0.7));
-            var Wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
-            Size = new Size(Wi + (capTXT.Left * 2), He + (capTXT.Top * 2));
+            capTXT.Text = text;
+            var he = Math.Min(capTXT.TextRequiredSize().Height, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height * 0.7));
+            var wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
+            Size = new Size(wi + (capTXT.Left * 2), he + (capTXT.Top * 2));
             Visible = false;
             timQI.Enabled = true;
         }
@@ -52,31 +52,31 @@ namespace BlueControls.Forms {
 
         public new static void Close() => Close(false);
 
-        public static void Show(string Text) {
-            if (Text == _shownTXT) { return; }
+        public static void Show(string text) {
+            if (text == ShownTxt) { return; }
             Close(false);
-            if (Text == _AutoClosedTXT) { return; }
-            _shownTXT = Text;
-            if (string.IsNullOrEmpty(Text)) { return; }
-            new QuickInfo(Text);
+            if (text == AutoClosedTxt) { return; }
+            ShownTxt = text;
+            if (string.IsNullOrEmpty(text)) { return; }
+            new QuickInfo(text);
         }
 
-        private static void Close(bool AutoClose) {
-            if (AutoClose) {
-                _AutoClosedTXT = _shownTXT;
+        private static void Close(bool autoClose) {
+            if (autoClose) {
+                AutoClosedTxt = ShownTxt;
             } else {
-                _shownTXT = string.Empty;
-                _AutoClosedTXT = string.Empty;
+                ShownTxt = string.Empty;
+                AutoClosedTxt = string.Empty;
             }
-            foreach (var ThisForm in AllBoxes) {
-                if (ThisForm.IsDisposed || ThisForm is not QuickInfo QI) {
+            foreach (var thisForm in AllBoxes) {
+                if (thisForm.IsDisposed || thisForm is not QuickInfo qi) {
                     continue;
                 }
 
                 try {
-                    QI.timQI.Enabled = false;
-                    ThisForm.Close();
-                    Close(AutoClose);
+                    qi.timQI.Enabled = false;
+                    thisForm.Close();
+                    Close(autoClose);
                     return;
                 } catch (Exception ex) {
                     Develop.DebugPrint(ex);
@@ -86,13 +86,13 @@ namespace BlueControls.Forms {
 
         private void timQI_Tick(object sender, System.EventArgs e) {
             Position_LocateToMouse();
-            if (!_Shown) {
-                _Shown = true;
+            if (!_shown) {
+                _shown = true;
                 Show();
                 timQI.Interval = 15;
             }
-            Counter++;
-            if (Counter * timQI.Interval > 10000) {
+            _counter++;
+            if (_counter * timQI.Interval > 10000) {
                 timQI.Enabled = false;
                 Close(true);
             }

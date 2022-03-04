@@ -31,7 +31,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Linq;
 
 namespace BlueControls.Controls {
 
@@ -42,32 +41,32 @@ namespace BlueControls.Controls {
         #region Fields
 
         private readonly ExtText _eTxt;
-        private string _AllowedChars = string.Empty;
+        private string _allowedChars = string.Empty;
 
-        private int _Cursor_CharPos = -1;
+        private int _cursorCharPos = -1;
 
-        private bool _Cursor_Visible;
-        private bool _FormatierungErlaubt;
-        private string _LastCheckedText = string.Empty;
+        private bool _cursorVisible;
+        private bool _formatierungErlaubt;
+        private string _lastCheckedText = string.Empty;
 
-        private DateTime _LastUserActionForSpellChecking = DateTime.Now;
+        private DateTime _lastUserActionForSpellChecking = DateTime.Now;
 
-        private int _MarkEnd = -1;
+        private int _markEnd = -1;
 
-        private int _MarkStart = -1;
+        private int _markStart = -1;
 
-        private int _MouseValue;
+        private int _mouseValue;
 
-        private bool _Multiline;
-        private bool _MustCheck = true;
-        private string _Regex = string.Empty;
-        private Slider? _SliderY;
+        private bool _multiline;
+        private bool _mustCheck = true;
+        private string _regex = string.Empty;
+        private Slider? _sliderY;
 
-        private bool _SpellChecking;
+        private bool _spellChecking;
 
-        private string _Suffix = string.Empty;
+        private string _suffix = string.Empty;
 
-        private enSteuerelementVerhalten _Verhalten = enSteuerelementVerhalten.Scrollen_ohne_Textumbruch;
+        private enSteuerelementVerhalten _verhalten = enSteuerelementVerhalten.Scrollen_ohne_Textumbruch;
 
         #endregion
 
@@ -94,11 +93,11 @@ namespace BlueControls.Controls {
 
         public new event EventHandler Enter;
 
-        public event EventHandler ESC;
+        public event EventHandler Esc;
 
         public event EventHandler<MultiUserFileGiveBackEventArgs> NeedDatabaseOfAdditinalSpecialChars;
 
-        public event EventHandler TAB;
+        public event EventHandler Tab;
 
         public new event EventHandler TextChanged;
 
@@ -111,36 +110,36 @@ namespace BlueControls.Controls {
 
         [DefaultValue("")]
         public string AllowedChars {
-            get => _AllowedChars;
+            get => _allowedChars;
             set {
-                if (value == _AllowedChars) { return; }
-                _AllowedChars = value;
-                GenerateETXT(false);
+                if (value == _allowedChars) { return; }
+                _allowedChars = value;
+                GenerateEtxt(false);
             }
         }
 
-        public override bool Focused => base.Focused || (_SliderY != null && _SliderY.Focused());
+        public override bool Focused => base.Focused || (_sliderY != null && _sliderY.Focused());
 
         [DefaultValue(false)]
         public bool FormatierungErlaubt {
-            get => _FormatierungErlaubt;
+            get => _formatierungErlaubt;
             set {
                 if (value == FormatierungErlaubt) { return; }
-                _FormatierungErlaubt = value;
-                GenerateETXT(false);
+                _formatierungErlaubt = value;
+                GenerateEtxt(false);
             }
         }
 
         [DefaultValue(false)]
         public bool MultiLine {
-            get => _Multiline;
+            get => _multiline;
             set {
-                if (value == _Multiline) { return; }
-                _Multiline = value;
-                GenerateETXT(false);
-                if (_SliderY != null) {
-                    _SliderY.Visible = false;
-                    _SliderY.Value = 0;
+                if (value == _multiline) { return; }
+                _multiline = value;
+                GenerateEtxt(false);
+                if (_sliderY != null) {
+                    _sliderY.Visible = false;
+                    _sliderY.Value = 0;
                 }
                 Invalidate();
             }
@@ -152,20 +151,20 @@ namespace BlueControls.Controls {
 
         [DefaultValue("")]
         public string Regex {
-            get => _Regex;
+            get => _regex;
             set {
-                if (value == _Regex) { return; }
-                _Regex = value;
-                GenerateETXT(false);
+                if (value == _regex) { return; }
+                _regex = value;
+                GenerateEtxt(false);
             }
         }
 
         [DefaultValue(false)]
         public bool SpellChecking {
-            get => _SpellChecking;
+            get => _spellChecking;
             set {
-                if (_SpellChecking == value) { return; }
-                _SpellChecking = value;
+                if (_spellChecking == value) { return; }
+                _spellChecking = value;
                 AbortSpellChecking();
                 Invalidate();
             }
@@ -173,24 +172,24 @@ namespace BlueControls.Controls {
 
         [DefaultValue("")]
         public string Suffix {
-            get => _Suffix;
+            get => _suffix;
             set {
-                if (value == _Suffix) { return; }
-                _Suffix = value;
+                if (value == _suffix) { return; }
+                _suffix = value;
                 Invalidate();
             }
         }
 
         [DefaultValue("")]
         public new string Text {
-            get => _eTxt == null ? string.Empty : _FormatierungErlaubt ? _eTxt.HtmlText : _eTxt.PlainText;
+            get => _eTxt == null ? string.Empty : _formatierungErlaubt ? _eTxt.HtmlText : _eTxt.PlainText;
             set {
                 if (!string.IsNullOrEmpty(value)) {
                     value = value.Replace("\n", string.Empty);
                     value = value.Replace("\r", "\r\n");
                 }
 
-                if (_FormatierungErlaubt) {
+                if (_formatierungErlaubt) {
                     if (_eTxt != null && value == _eTxt.HtmlText) { return; }
                 } else {
                     if (_eTxt != null && value == _eTxt.PlainText) { return; }
@@ -198,8 +197,8 @@ namespace BlueControls.Controls {
                 AbortSpellChecking();
 
                 lock (Dictionary.Lock_SpellChecking) {
-                    GenerateETXT(true);
-                    if (_FormatierungErlaubt) {
+                    GenerateEtxt(true);
+                    if (_formatierungErlaubt) {
                         _eTxt.HtmlText = value;
                     } else {
                         _eTxt.PlainText = value;
@@ -212,13 +211,13 @@ namespace BlueControls.Controls {
 
         [DefaultValue(enSteuerelementVerhalten.Scrollen_ohne_Textumbruch)]
         public enSteuerelementVerhalten Verhalten {
-            get => _Verhalten;
+            get => _verhalten;
             set {
-                if (_Verhalten == value) { return; }
-                _Verhalten = value;
-                if (_SliderY != null) {
-                    _SliderY.Visible = false;
-                    _SliderY.Value = 0;
+                if (_verhalten == value) { return; }
+                _verhalten = value;
+                if (_sliderY != null) {
+                    _sliderY.Visible = false;
+                    _sliderY.Value = 0;
                 }
                 Invalidate();
             }
@@ -228,58 +227,58 @@ namespace BlueControls.Controls {
 
         #region Methods
 
-        public void Char_DelBereich(int Von, int Bis) {
-            if (_MarkStart > -1 && _MarkEnd > -1) {
-                Von = _MarkStart;
-                Bis = _MarkEnd;
+        public void Char_DelBereich(int von, int bis) {
+            if (_markStart > -1 && _markEnd > -1) {
+                von = _markStart;
+                bis = _markEnd;
             }
             MarkClear();
-            _Cursor_Visible = true;
-            if (Von < 0 || Bis < 0) { return; }
-            _Cursor_CharPos = Von;
-            _eTxt.Delete(Von, Bis);
+            _cursorVisible = true;
+            if (von < 0 || bis < 0) { return; }
+            _cursorCharPos = von;
+            _eTxt.Delete(von, bis);
         }
 
         public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
             Focus();
-            var NewWord = "";
-            _MarkStart = int.Parse(e.Tags.TagGet("MarkStart"));
-            _MarkEnd = int.Parse(e.Tags.TagGet("MarkEnd"));
-            _Cursor_CharPos = int.Parse(e.Tags.TagGet("Cursorpos"));
+            var newWord = "";
+            _markStart = int.Parse(e.Tags.TagGet("MarkStart"));
+            _markEnd = int.Parse(e.Tags.TagGet("MarkEnd"));
+            _cursorCharPos = int.Parse(e.Tags.TagGet("Cursorpos"));
             var tmp = e.ClickedComand;
             if (e.ClickedComand.StartsWith("#ChangeTo:")) {
-                NewWord = e.ClickedComand.Substring(10);
+                newWord = e.ClickedComand.Substring(10);
                 tmp = "#ChangeTo";
             }
             switch (tmp) {
                 case "#SpellAdd":
                     Dictionary.WordAdd(e.Tags.TagGet("Word"));
-                    _MustCheck = true;
+                    _mustCheck = true;
                     Invalidate();
                     return true;
 
                 case "#SpellAddLower":
                     Dictionary.WordAdd(e.Tags.TagGet("Word".ToLower()));
-                    _MustCheck = true;
+                    _mustCheck = true;
                     Invalidate();
                     return true;
 
                 case "#SpellChecking":
                     FloatingForm.Close(this);
-                    if (_SpellChecking) {
-                        _MustCheck = false;
+                    if (_spellChecking) {
+                        _mustCheck = false;
                         Dictionary.SpellCheckingAll(_eTxt, false);
-                        _MustCheck = true;
+                        _mustCheck = true;
                         Invalidate();
                     }
                     return true;
 
                 case "#SpellChecking2":
                     FloatingForm.Close(this);
-                    if (_SpellChecking) {
-                        _MustCheck = false;
+                    if (_spellChecking) {
+                        _mustCheck = false;
                         Dictionary.SpellCheckingAll(_eTxt, true);
-                        _MustCheck = true;
+                        _mustCheck = true;
                         Invalidate();
                     }
                     break;
@@ -298,23 +297,23 @@ namespace BlueControls.Controls {
                     return true;
 
                 case "#Caption":
-                    if (_MarkStart < 0 || _MarkEnd < 0) { return true; }
+                    if (_markStart < 0 || _markEnd < 0) { return true; }
                     Selection_Repair(true);
-                    _eTxt.StufeÄndern(_MarkStart, _MarkEnd - 1, 3);
+                    _eTxt.StufeÄndern(_markStart, _markEnd - 1, 3);
                     CheckIfTextIsChanded(_eTxt.HtmlText);
                     return true;
 
                 case "#NoCaption":
-                    if (_MarkStart < 0 || _MarkEnd < 0) { return true; }
+                    if (_markStart < 0 || _markEnd < 0) { return true; }
                     Selection_Repair(true);
-                    _eTxt.StufeÄndern(_MarkStart, _MarkEnd - 1, 4);
+                    _eTxt.StufeÄndern(_markStart, _markEnd - 1, 4);
                     CheckIfTextIsChanded(_eTxt.HtmlText);
                     return true;
 
                 case "#Bold":
-                    if (_MarkStart < 0 || _MarkEnd < 0) { return true; }
+                    if (_markStart < 0 || _markEnd < 0) { return true; }
                     Selection_Repair(true);
-                    _eTxt.StufeÄndern(_MarkStart, _MarkEnd - 1, 7);
+                    _eTxt.StufeÄndern(_markStart, _markEnd - 1, 7);
                     CheckIfTextIsChanded(_eTxt.HtmlText);
                     return true;
 
@@ -323,12 +322,12 @@ namespace BlueControls.Controls {
                     return true;
 
                 case "#ChangeTo":
-                    var ws = _eTxt.WordStart(_Cursor_CharPos);
-                    var we = _eTxt.WordEnd(_Cursor_CharPos);
+                    var ws = _eTxt.WordStart(_cursorCharPos);
+                    var we = _eTxt.WordEnd(_cursorCharPos);
                     Char_DelBereich(ws, we);
-                    _Cursor_CharPos = ws;
-                    InsertText(NewWord);
-                    _Cursor_CharPos = _eTxt.WordEnd(_Cursor_CharPos);
+                    _cursorCharPos = ws;
+                    InsertText(newWord);
+                    _cursorCharPos = _eTxt.WordEnd(_cursorCharPos);
                     return true;
             }
             return false;
@@ -341,15 +340,15 @@ namespace BlueControls.Controls {
         public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList? items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
             AbortSpellChecking();
             hotItem = null;
-            tags.TagSet("CursorPosBeforeClick", _Cursor_CharPos.ToString());
+            tags.TagSet("CursorPosBeforeClick", _cursorCharPos.ToString());
             var tmp = Cursor_PosAt(e.X, e.Y);
             tags.TagSet("Char", tmp.ToString());
-            tags.TagSet("MarkStart", _MarkStart.ToString());
-            tags.TagSet("MarkEnd", _MarkEnd.ToString());
-            tags.TagSet("Cursorpos", _Cursor_CharPos.ToString());
+            tags.TagSet("MarkStart", _markStart.ToString());
+            tags.TagSet("MarkEnd", _markEnd.ToString());
+            tags.TagSet("Cursorpos", _cursorCharPos.ToString());
             var tmpWord = _eTxt.Word(tmp);
             tags.TagSet("Word", tmpWord);
-            if (_SpellChecking && !Dictionary.IsWordOk(tmpWord)) {
+            if (_spellChecking && !Dictionary.IsWordOk(tmpWord)) {
                 items.Add("Rechtschreibprüfung", true);
                 if (Dictionary.IsSpellChecking) {
                     items.Add("Gerade ausgelastet...", "Gerade ausgelastet...", false);
@@ -357,8 +356,8 @@ namespace BlueControls.Controls {
                 } else {
                     var sim = Dictionary.SimilarTo(tmpWord);
                     if (sim != null) {
-                        foreach (var ThisS in sim) {
-                            items.Add(" - " + ThisS, "#ChangeTo:" + ThisS);
+                        foreach (var thisS in sim) {
+                            items.Add(" - " + thisS, "#ChangeTo:" + thisS);
                         }
                         items.AddSeparator();
                     }
@@ -372,29 +371,31 @@ namespace BlueControls.Controls {
                 }
             }
             if (this is not ComboBox cbx || cbx.DropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDown) {
-                items.Add(enContextMenuComands.Ausschneiden, Convert.ToBoolean(_MarkStart >= 0) && Enabled);
-                items.Add(enContextMenuComands.Kopieren, Convert.ToBoolean(_MarkStart >= 0));
+                items.Add(enContextMenuComands.Ausschneiden, Convert.ToBoolean(_markStart >= 0) && Enabled);
+                items.Add(enContextMenuComands.Kopieren, Convert.ToBoolean(_markStart >= 0));
                 items.Add(enContextMenuComands.Einfügen, System.Windows.Forms.Clipboard.ContainsText() && Enabled);
-                if (_FormatierungErlaubt) {
+                if (_formatierungErlaubt) {
                     items.AddSeparator();
-                    items.Add("Sonderzeichen einfügen", "#Sonderzeichen", QuickImage.Get(enImageCode.Sonne, 16), _Cursor_CharPos > -1);
-                    if (Convert.ToBoolean(_MarkEnd > -1)) {
+                    items.Add("Sonderzeichen einfügen", "#Sonderzeichen", QuickImage.Get(enImageCode.Sonne, 16), _cursorCharPos > -1);
+                    if (Convert.ToBoolean(_markEnd > -1)) {
                         items.AddSeparator();
-                        items.Add("Als Überschrift markieren", "#Caption", Skin.GetBlueFont(enDesign.TextBox_Stufe3, enStates.Standard).SymbolForReadableText(), _MarkEnd > -1);
-                        items.Add("Fettschrift", "#Bold", Skin.GetBlueFont(enDesign.TextBox_Bold, enStates.Standard).SymbolForReadableText(), Convert.ToBoolean(_MarkEnd > -1));
-                        items.Add("Als normalen Text markieren", "#NoCaption", Skin.GetBlueFont(enDesign.TextBox, enStates.Standard).SymbolForReadableText(), Convert.ToBoolean(_MarkEnd > -1));
+                        items.Add("Als Überschrift markieren", "#Caption", Skin.GetBlueFont(enDesign.TextBox_Stufe3, enStates.Standard).SymbolForReadableText(), _markEnd > -1);
+                        items.Add("Fettschrift", "#Bold", Skin.GetBlueFont(enDesign.TextBox_Bold, enStates.Standard).SymbolForReadableText(), Convert.ToBoolean(_markEnd > -1));
+                        items.Add("Als normalen Text markieren", "#NoCaption", Skin.GetBlueFont(enDesign.TextBox, enStates.Standard).SymbolForReadableText(), Convert.ToBoolean(_markEnd > -1));
                     }
                 }
             }
         }
 
-        public void InsertText(string nt) {
-            if (nt == null) { nt = string.Empty; }
+        public void InsertText(string? nt) {
+            if (nt == null) { return; }
             nt = nt.Replace(Constants.beChrW1.ToString(), "\r");
             nt = nt.RemoveChars(Constants.Char_NotFromClip);
             if (!MultiLine) { nt = nt.RemoveChars("\r\t"); }
 
-            _Cursor_CharPos += nt.Count(t => _eTxt.InsertChar((enASCIIKey)t, _Cursor_CharPos));
+            foreach (var t in nt) {
+                if (_eTxt.InsertChar((enASCIIKey)t, _cursorCharPos)) { _cursorCharPos++; }
+            }
 
             CheckIfTextIsChanded(_eTxt.HtmlText);
         }
@@ -422,26 +423,26 @@ namespace BlueControls.Controls {
         public void Unmark(enMarkState markstate) => _eTxt?.Unmark(markstate);
 
         // Tastatur
-        internal new void KeyPress(enASCIIKey KeyAscii) {
+        internal new void KeyPress(enASCIIKey keyAscii) {
             // http://www.manderby.com/informatik/allgemeines/ascii.php
-            if (_MouseValue != 0) { return; }
+            if (_mouseValue != 0) { return; }
 
-            switch (KeyAscii) {
+            switch (keyAscii) {
                 case enASCIIKey.DEL:
                     // Eigentlich auch noch Ascii Code - steht bei ISO als Del
-                    Char_DelBereich(_Cursor_CharPos, _Cursor_CharPos + 1);
+                    Char_DelBereich(_cursorCharPos, _cursorCharPos + 1);
                     break;
 
                 case enASCIIKey.ENTER:
                     if (MultiLine) {
                         Char_DelBereich(-1, -1);
-                        _eTxt.InsertCrlf(_Cursor_CharPos);
-                        _Cursor_CharPos++;
+                        _eTxt.InsertCrlf(_cursorCharPos);
+                        _cursorCharPos++;
                     }
                     break;
 
                 case enASCIIKey.BackSpace:
-                    Char_DelBereich(_Cursor_CharPos - 1, _Cursor_CharPos);
+                    Char_DelBereich(_cursorCharPos - 1, _cursorCharPos);
                     break;
 
                 case enASCIIKey.StrgC:
@@ -467,10 +468,10 @@ namespace BlueControls.Controls {
                     break;
 
                 default:
-                    if (KeyAscii >= enASCIIKey.Space) //Ascii-Codes (Außer 127 = DEL)
+                    if (keyAscii >= enASCIIKey.Space) //Ascii-Codes (Außer 127 = DEL)
                     {
                         Char_DelBereich(-1, -1);
-                        if (_eTxt.InsertChar(KeyAscii, _Cursor_CharPos)) { _Cursor_CharPos++; }
+                        if (_eTxt.InsertChar(keyAscii, _cursorCharPos)) { _cursorCharPos++; }
                     }
                     break;
             }
@@ -483,13 +484,13 @@ namespace BlueControls.Controls {
                 return (bool)Invoke(new Func<bool>(() => WordStarts(word, position)));
             }
             try {
-                if (_eTxt == null) { GenerateETXT(true); }
+                if (_eTxt == null) { GenerateEtxt(true); }
                 if (_eTxt == null) { return false; }
                 if (position + word.Length > _eTxt.Count + 1) { return false; }
-                if (position > 0 && !_eTxt[position - 1].isWordSeperator()) { return false; }
-                if (position + word.Length < _eTxt.Count && !_eTxt[position + word.Length].isWordSeperator()) { return false; }
+                if (position > 0 && !_eTxt[position - 1].IsWordSeperator()) { return false; }
+                if (position + word.Length < _eTxt.Count && !_eTxt[position + word.Length].IsWordSeperator()) { return false; }
                 var tt = _eTxt.ConvertCharToPlainText(position, position + word.Length - 1);
-                return word.ToUpper() == tt.ToUpper();
+                return string.Equals(word, tt, StringComparison.CurrentCultureIgnoreCase);
             } catch (Exception) {
                 return WordStarts(word, position);
             }
@@ -511,10 +512,10 @@ namespace BlueControls.Controls {
             _eTxt.State = state;
 
             var effectWidth = Width;
-            var sliderVisible = _Multiline ? _eTxt.Height() > (Height - 16) : _eTxt.Height() > Height;
+            var sliderVisible = _multiline ? _eTxt.Height() > (Height - 16) : _eTxt.Height() > Height;
             if (sliderVisible) { effectWidth = Width - 18; }
 
-            switch (_Verhalten) {
+            switch (_verhalten) {
                 case enSteuerelementVerhalten.Scrollen_mit_Textumbruch:
                     _eTxt.TextDimensions = new Size(effectWidth - (Skin.PaddingSmal * 2), -1);
                     _eTxt.DrawingArea = new Rectangle(0, 0, effectWidth, Height);
@@ -558,23 +559,23 @@ namespace BlueControls.Controls {
                     break;
 
                 default:
-                    Develop.DebugPrint(_Verhalten);
+                    Develop.DebugPrint(_verhalten);
                     break;
             }
 
             if (sliderVisible) {
                 GetSlider();
-                _SliderY.Visible = true;
-                _SliderY.Width = 18;
-                _SliderY.Height = Height;
-                _SliderY.Left = Width - _SliderY.Width;
-                _SliderY.Top = 0;
-                _eTxt.DrawingPos.Y = (int)-_SliderY.Value;
-                _SliderY.Maximum = _eTxt.Height() + 16 - DisplayRectangle.Height;
+                _sliderY.Visible = true;
+                _sliderY.Width = 18;
+                _sliderY.Height = Height;
+                _sliderY.Left = Width - _sliderY.Width;
+                _sliderY.Top = 0;
+                _eTxt.DrawingPos.Y = (int)-_sliderY.Value;
+                _sliderY.Maximum = _eTxt.Height() + 16 - DisplayRectangle.Height;
             } else {
-                if (_SliderY != null) {
-                    _SliderY.Visible = false;
-                    _SliderY.Value = 0;
+                if (_sliderY != null) {
+                    _sliderY.Visible = false;
+                    _sliderY.Value = 0;
                 }
                 _eTxt.DrawingPos.Y = Skin.PaddingSmal;
             }
@@ -583,17 +584,17 @@ namespace BlueControls.Controls {
             Cursor_Show(gr);
             MarkAndGenerateZone(gr);
             _eTxt.Draw(gr, 1);
-            if (!string.IsNullOrEmpty(_Suffix)) {
+            if (!string.IsNullOrEmpty(_suffix)) {
                 Rectangle r = new(_eTxt.Width() + _eTxt.DrawingPos.X, _eTxt.DrawingPos.Y, 1000, 1000);
                 if (_eTxt.Count > 0) {
                     r.X += 2;
-                    Skin.Draw_FormatedText(gr, _Suffix, _eTxt.Design, enStates.Standard_Disabled, null, enAlignment.Top_Left, r, this, false, false);
+                    Skin.Draw_FormatedText(gr, _suffix, _eTxt.Design, enStates.Standard_Disabled, null, enAlignment.Top_Left, r, this, false, false);
                 } else {
-                    Skin.Draw_FormatedText(gr, "[in " + _Suffix + "]", _eTxt.Design, enStates.Standard_Disabled, null, enAlignment.Top_Left, r, this, false, true);
+                    Skin.Draw_FormatedText(gr, "[in " + _suffix + "]", _eTxt.Design, enStates.Standard_Disabled, null, enAlignment.Top_Left, r, this, false, true);
                 }
             }
             Skin.Draw_Border(gr, _eTxt.Design, state, DisplayRectangle);
-            if (_MustCheck && !Dictionary.IsSpellChecking && Dictionary.DictionaryRunning(true) && !SpellChecker.CancellationPending && !SpellChecker.IsBusy) { SpellChecker.RunWorkerAsync(); }
+            if (_mustCheck && !Dictionary.IsSpellChecking && Dictionary.DictionaryRunning(true) && !SpellChecker.CancellationPending && !SpellChecker.IsBusy) { SpellChecker.RunWorkerAsync(); }
         }
 
         protected virtual enDesign GetDesign() => enDesign.TextBox;
@@ -609,9 +610,9 @@ namespace BlueControls.Controls {
 
         protected override void OnDoubleClick(System.EventArgs e) {
             base.OnDoubleClick(e);
-            Selection_WortMarkieren(_MarkStart);
-            _LastUserActionForSpellChecking = DateTime.Now;
-            _MouseValue = 9999;
+            Selection_WortMarkieren(_markStart);
+            _lastUserActionForSpellChecking = DateTime.Now;
+            _mouseValue = 9999;
             Invalidate();
         }
 
@@ -623,11 +624,11 @@ namespace BlueControls.Controls {
         protected override void OnGotFocus(System.EventArgs e) {
             base.OnGotFocus(e);
             if (!Enabled) { return; }
-            if (_eTxt == null) { GenerateETXT(true); }
+            if (_eTxt == null) { GenerateEtxt(true); }
             if (!FloatingForm.IsShowing(this)) {
                 SetCursorToEnd();
                 if (!_eTxt.Multiline) { if (!ContainsMouse() || !MousePressing()) { MarkAll(); } }
-                _LastUserActionForSpellChecking = DateTime.Now.AddSeconds(-30);
+                _lastUserActionForSpellChecking = DateTime.Now.AddSeconds(-30);
             }
             Blinker.Enabled = true;
         }
@@ -637,8 +638,8 @@ namespace BlueControls.Controls {
             base.OnKeyDown(e);
 
             if (!Enabled) { return; }
-            _LastUserActionForSpellChecking = DateTime.Now;
-            if (_MouseValue != 0 || e == null) { return; }
+            _lastUserActionForSpellChecking = DateTime.Now;
+            if (_mouseValue != 0 || e == null) { return; }
 
             switch (e.KeyCode) {
                 case System.Windows.Forms.Keys.Left:
@@ -663,13 +664,13 @@ namespace BlueControls.Controls {
                     break;
             }
 
-            _Cursor_Visible = true;
+            _cursorVisible = true;
             Invalidate();
         }
 
         protected override void OnKeyPress(System.Windows.Forms.KeyPressEventArgs e) {
             base.OnKeyPress(e);
-            _LastUserActionForSpellChecking = DateTime.Now;
+            _lastUserActionForSpellChecking = DateTime.Now;
             if (!Enabled) {
                 if (e.KeyChar != (int)enASCIIKey.StrgX) { e.KeyChar = (char)enASCIIKey.StrgC; }
                 if (e.KeyChar != (int)enASCIIKey.StrgC) { return; }
@@ -700,7 +701,7 @@ namespace BlueControls.Controls {
         // Fokus
         protected override void OnLostFocus(System.EventArgs e) {
             base.OnLostFocus(e);
-            _LastUserActionForSpellChecking = DateTime.Now.AddSeconds(-30);
+            _lastUserActionForSpellChecking = DateTime.Now.AddSeconds(-30);
             if (!FloatingForm.IsShowing(this)) { MarkClear(); }
             Blinker.Enabled = false;
             CursorClear();
@@ -710,12 +711,12 @@ namespace BlueControls.Controls {
         // Mouse
         protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseDown(e);
-            _LastUserActionForSpellChecking = DateTime.Now;
+            _lastUserActionForSpellChecking = DateTime.Now;
             if (!Enabled) { return; }
             if (e.Button == System.Windows.Forms.MouseButtons.Right) { return; }
-            _MouseValue = 1;
-            _MarkStart = Cursor_PosAt(e.X, e.Y);
-            _MarkEnd = _MarkStart;
+            _mouseValue = 1;
+            _markStart = Cursor_PosAt(e.X, e.Y);
+            _markEnd = _markStart;
             CursorClear();
             Selection_Repair(false);
             Invalidate();
@@ -726,22 +727,22 @@ namespace BlueControls.Controls {
             if (_eTxt == null) { return; }
             if (e.Button != System.Windows.Forms.MouseButtons.Left) { return; }
             if (!Enabled) { return; }
-            _LastUserActionForSpellChecking = DateTime.Now;
+            _lastUserActionForSpellChecking = DateTime.Now;
             CursorClear();
-            _MarkEnd = Cursor_PosAt(e.X, e.Y);
+            _markEnd = Cursor_PosAt(e.X, e.Y);
             Selection_Repair(false);
             Invalidate();
         }
 
         protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseUp(e);
-            _LastUserActionForSpellChecking = DateTime.Now;
+            _lastUserActionForSpellChecking = DateTime.Now;
             if (Enabled) {
-                if (_MouseValue == 9999) {
+                if (_mouseValue == 9999) {
                     //es Wurde Doppelgeklickt
                 } else {
-                    if (_MarkStart == _MarkEnd || _MarkEnd < 0) {
-                        _Cursor_CharPos = Cursor_PosAt(e.X, e.Y);
+                    if (_markStart == _markEnd || _markEnd < 0) {
+                        _cursorCharPos = Cursor_PosAt(e.X, e.Y);
                         MarkClear();
                         if (e.Button == System.Windows.Forms.MouseButtons.Right) {
                             FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
@@ -754,7 +755,7 @@ namespace BlueControls.Controls {
                         }
                     }
                 }
-                _MouseValue = 0;
+                _mouseValue = 0;
             } else {
                 CursorClear();
             }
@@ -763,9 +764,9 @@ namespace BlueControls.Controls {
 
         protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseWheel(e);
-            if (_SliderY == null || !_SliderY.Visible) { return; }
-            _LastUserActionForSpellChecking = DateTime.Now;
-            _SliderY.DoMouseWheel(e);
+            if (_sliderY == null || !_sliderY.Visible) { return; }
+            _lastUserActionForSpellChecking = DateTime.Now;
+            _sliderY.DoMouseWheel(e);
         }
 
         /// <summary>
@@ -780,7 +781,7 @@ namespace BlueControls.Controls {
         }
 
         private void AddSpecialChar() {
-            var x = _Cursor_CharPos;
+            var x = _cursorCharPos;
             MultiUserFileGiveBackEventArgs e = new();
             OnNeedDatabaseOfAdditinalSpecialChars(e);
             ItemCollectionList i = new(enBlueListBoxAppearance.Listbox)
@@ -803,39 +804,39 @@ namespace BlueControls.Controls {
                 { "Frage", "Frage", QuickImage.Get(enImageCode.Frage, 20) }
             };
             var r = InputBoxListBoxStyle.Show("Wählen sie:", i, enAddType.None, true);
-            _Cursor_CharPos = x;
+            _cursorCharPos = x;
             if (r == null || r.Count != 1) { return; }
             Char_DelBereich(-1, -1);
-            if (_eTxt.InsertImage(r[0], _Cursor_CharPos)) { _Cursor_CharPos++; }
+            if (_eTxt.InsertImage(r[0], _cursorCharPos)) { _cursorCharPos++; }
             CheckIfTextIsChanded(_eTxt.HtmlText);
         }
 
         private void Blinker_Tick(object sender, System.EventArgs e) {
             if (!Focused) { return; }
             if (!Enabled) { return; }
-            if (_MarkStart > -1 && _MarkEnd > -1) { _Cursor_CharPos = -1; }
-            if (_Cursor_CharPos > -1) {
-                _Cursor_Visible = !_Cursor_Visible;
+            if (_markStart > -1 && _markEnd > -1) { _cursorCharPos = -1; }
+            if (_cursorCharPos > -1) {
+                _cursorVisible = !_cursorVisible;
                 Invalidate();
             } else {
-                if (_Cursor_Visible) {
-                    _Cursor_Visible = false;
+                if (_cursorVisible) {
+                    _cursorVisible = false;
                     Invalidate();
                 }
             }
         }
 
-        private void CheckIfTextIsChanded(string NewPlainText) {
-            if (NewPlainText == _LastCheckedText) { return; }
-            _LastCheckedText = NewPlainText;
-            if (Dictionary.DictionaryRunning(true)) { _MustCheck = true; }
+        private void CheckIfTextIsChanded(string newPlainText) {
+            if (newPlainText == _lastCheckedText) { return; }
+            _lastCheckedText = newPlainText;
+            if (Dictionary.DictionaryRunning(true)) { _mustCheck = true; }
             OnTextChanged();
         }
 
         private void Clipboard_Copy() {
-            if (_MarkStart < 0 || _MarkEnd < 0) { return; }
+            if (_markStart < 0 || _markEnd < 0) { return; }
             Selection_Repair(true);
-            var tt = _eTxt.ConvertCharToPlainText(_MarkStart, _MarkEnd - 1);
+            var tt = _eTxt.ConvertCharToPlainText(_markStart, _markEnd - 1);
             if (string.IsNullOrEmpty(tt)) { return; }
             tt = tt.Replace("\n", string.Empty);
             tt = tt.Replace("\r", "\r\n");
@@ -858,59 +859,59 @@ namespace BlueControls.Controls {
         /// Wird auf die hintere Hälfte eines Zeichens gewählt, wird der nächste Buchstabe angegeben.
         /// </summary>
         /// <remarks></remarks>
-        private int Cursor_PosAt(double PixX, double PixY) {
+        private int Cursor_PosAt(double pixX, double pixY) {
             if (_eTxt == null) { return -1; }
             // Das geht am Einfachsten....
-            if (PixX < _eTxt.DrawingPos.X && PixY < _eTxt.DrawingPos.Y) { return 0; }
-            PixX = Math.Max(PixX, _eTxt.DrawingPos.X);
-            PixY = Math.Max(PixY, _eTxt.DrawingPos.Y);
-            PixX = Math.Min(PixX, _eTxt.DrawingPos.X + _eTxt.Width());
-            PixY = Math.Min(PixY, _eTxt.DrawingPos.Y + _eTxt.Height());
-            var c = _eTxt.Char_Search(PixX, PixY);
+            if (pixX < _eTxt.DrawingPos.X && pixY < _eTxt.DrawingPos.Y) { return 0; }
+            pixX = Math.Max(pixX, _eTxt.DrawingPos.X);
+            pixY = Math.Max(pixY, _eTxt.DrawingPos.Y);
+            pixX = Math.Min(pixX, _eTxt.DrawingPos.X + _eTxt.Width());
+            pixY = Math.Min(pixY, _eTxt.DrawingPos.Y + _eTxt.Height());
+            var c = _eTxt.Char_Search(pixX, pixY);
             if (c < 0) { c = 0; }
-            return c < _eTxt.Count && PixX > _eTxt.DrawingPos.X + _eTxt[c].Pos.X + (_eTxt[c].Size.Width / 2.0) ? c + 1 : c;
+            return c < _eTxt.Count && pixX > _eTxt.DrawingPos.X + _eTxt[c].Pos.X + (_eTxt[c].Size.Width / 2.0) ? c + 1 : c;
         }
 
-        private void Cursor_Richtung(short X, short Y) {
-            if (X != 0) {
-                if (_Cursor_CharPos > -1) {
-                    if (X == -1 && _Cursor_CharPos > 0) { _Cursor_CharPos--; }
-                    if (X == 1 && _Cursor_CharPos < _eTxt.Count) { _Cursor_CharPos++; }
-                } else if (_MarkStart > -1 && _MarkEnd > -1) {
-                    if (X == -1) { _Cursor_CharPos = Math.Min(_MarkEnd, _MarkStart); }
-                    if (X == 1) { _Cursor_CharPos = Math.Max(_MarkEnd, _MarkStart) + 1; }
+        private void Cursor_Richtung(short x, short y) {
+            if (x != 0) {
+                if (_cursorCharPos > -1) {
+                    if (x == -1 && _cursorCharPos > 0) { _cursorCharPos--; }
+                    if (x == 1 && _cursorCharPos < _eTxt.Count) { _cursorCharPos++; }
+                } else if (_markStart > -1 && _markEnd > -1) {
+                    if (x == -1) { _cursorCharPos = Math.Min(_markEnd, _markStart); }
+                    if (x == 1) { _cursorCharPos = Math.Max(_markEnd, _markStart) + 1; }
                 } else {
-                    _Cursor_CharPos = 0;
+                    _cursorCharPos = 0;
                 }
             }
             MarkClear();
-            var ri = _eTxt.CursorPixelPosX(_Cursor_CharPos);
-            if (_Cursor_CharPos < 0) { _Cursor_CharPos = 0; }
-            if (Y > 0) {
-                _Cursor_CharPos = _Cursor_CharPos >= _eTxt.Count
+            var ri = _eTxt.CursorPixelPosX(_cursorCharPos);
+            if (_cursorCharPos < 0) { _cursorCharPos = 0; }
+            if (y > 0) {
+                _cursorCharPos = _cursorCharPos >= _eTxt.Count
                     ? _eTxt.Count
-                    : Cursor_PosAt(ri.Left + _eTxt.DrawingPos.X, ri.Top + (ri.Height / 2.0) + _eTxt[_Cursor_CharPos].Size.Height + _eTxt.DrawingPos.Y);
-            } else if (Y < 0) {
-                _Cursor_CharPos = _Cursor_CharPos >= _eTxt.Count
+                    : Cursor_PosAt(ri.Left + _eTxt.DrawingPos.X, ri.Top + (ri.Height / 2.0) + _eTxt[_cursorCharPos].Size.Height + _eTxt.DrawingPos.Y);
+            } else if (y < 0) {
+                _cursorCharPos = _cursorCharPos >= _eTxt.Count
                     ? _eTxt.Count > 0
-                        ? Cursor_PosAt(ri.Left + _eTxt.DrawingPos.X, ri.Top + (ri.Height / 2.0) - _eTxt[_Cursor_CharPos - 1].Size.Height + _eTxt.DrawingPos.Y)
+                        ? Cursor_PosAt(ri.Left + _eTxt.DrawingPos.X, ri.Top + (ri.Height / 2.0) - _eTxt[_cursorCharPos - 1].Size.Height + _eTxt.DrawingPos.Y)
                         : 0
-                    : Cursor_PosAt(ri.Left + _eTxt.DrawingPos.X, ri.Top + (ri.Height / 2.0) - _eTxt[_Cursor_CharPos].Size.Height + _eTxt.DrawingPos.Y);
+                    : Cursor_PosAt(ri.Left + _eTxt.DrawingPos.X, ri.Top + (ri.Height / 2.0) - _eTxt[_cursorCharPos].Size.Height + _eTxt.DrawingPos.Y);
             }
-            if (_Cursor_CharPos < 0) { _Cursor_CharPos = 0; }
-            _Cursor_Visible = true;
+            if (_cursorCharPos < 0) { _cursorCharPos = 0; }
+            _cursorVisible = true;
         }
 
-        private void Cursor_Show(Graphics GR) {
-            if (!_Cursor_Visible) { return; }
-            if (_Cursor_CharPos < 0) { return; }
-            var r = _eTxt.CursorPixelPosX(_Cursor_CharPos);
-            GR.DrawLine(new Pen(Color.Black), r.Left + _eTxt.DrawingPos.X, r.Top + _eTxt.DrawingPos.Y, r.Left + _eTxt.DrawingPos.X, r.Bottom + _eTxt.DrawingPos.Y);
+        private void Cursor_Show(Graphics gr) {
+            if (!_cursorVisible) { return; }
+            if (_cursorCharPos < 0) { return; }
+            var r = _eTxt.CursorPixelPosX(_cursorCharPos);
+            gr.DrawLine(new Pen(Color.Black), r.Left + _eTxt.DrawingPos.X, r.Top + _eTxt.DrawingPos.Y, r.Left + _eTxt.DrawingPos.X, r.Bottom + _eTxt.DrawingPos.Y);
         }
 
         private void CursorClear() {
-            _Cursor_CharPos = -1;
-            _Cursor_Visible = false;
+            _cursorCharPos = -1;
+            _cursorVisible = false;
         }
 
         /// <summary>
@@ -919,9 +920,9 @@ namespace BlueControls.Controls {
         /// z.B. wird beim Format Datum die Maxlänge auf 10 gesetzt und nur noch Ziffern und Punkt erlaubt.
         /// </summary>
         /// <remarks></remarks>
-        private void GenerateETXT(bool ResetCoords) {
+        private void GenerateEtxt(bool resetCoords) {
             if (InvokeRequired) {
-                Invoke(new Action(() => GenerateETXT(ResetCoords)));
+                Invoke(new Action(() => GenerateEtxt(resetCoords)));
                 return;
             }
 
@@ -930,14 +931,14 @@ namespace BlueControls.Controls {
             _eTxt.State = state;
             _eTxt.Design = GetDesign();
 
-            _eTxt.Multiline = _Multiline;
-            _eTxt.AllowedChars = _AllowedChars;
+            _eTxt.Multiline = _multiline;
+            _eTxt.AllowedChars = _allowedChars;
 
-            if (ResetCoords) {
+            if (resetCoords) {
                 // Hier Standard-Werte Setzen, die Draw-Routine setzt bei Bedarf um
-                if (_SliderY != null) {
-                    _SliderY.Visible = false;
-                    _SliderY.Value = 0;
+                if (_sliderY != null) {
+                    _sliderY.Visible = false;
+                    _sliderY.Value = 0;
                 }
                 _eTxt.DrawingPos.X = Skin.PaddingSmal;
                 _eTxt.DrawingPos.Y = Skin.PaddingSmal;
@@ -947,10 +948,10 @@ namespace BlueControls.Controls {
         }
 
         private void GetSlider() {
-            if (_SliderY != null) {
+            if (_sliderY != null) {
                 return;
             }
-            _SliderY = new Slider {
+            _sliderY = new Slider {
                 Dock = System.Windows.Forms.DockStyle.Right,
                 LargeChange = 10f,
                 Location = new Point(Width - 18, 0),
@@ -966,86 +967,86 @@ namespace BlueControls.Controls {
                 Value = 0f,
                 Visible = true
             };
-            _SliderY.ValueChanged += new EventHandler(SliderY_ValueChange);
-            Controls.Add(_SliderY);
+            _sliderY.ValueChanged += new EventHandler(SliderY_ValueChange);
+            Controls.Add(_sliderY);
         }
 
-        private int HotPosition() => _Cursor_CharPos > -1 ? _Cursor_CharPos
-                                   : _MarkStart > -1 && _MarkEnd < 0 ? _MarkEnd : _MarkStart > -1 && _MarkEnd > -1 ? _MarkEnd : -1;
+        private int HotPosition() => _cursorCharPos > -1 ? _cursorCharPos
+                                   : _markStart > -1 && _markEnd < 0 ? _markEnd : _markStart > -1 && _markEnd > -1 ? _markEnd : -1;
 
         private void MarkAll() {
             if (_eTxt != null && _eTxt.Count > 0) {
-                _MarkStart = 0;
-                _MarkEnd = _eTxt.Count;
-                _Cursor_Visible = false;
+                _markStart = 0;
+                _markEnd = _eTxt.Count;
+                _cursorVisible = false;
             } else {
                 MarkClear();
             }
         }
 
-        private void MarkAndGenerateZone(Graphics GR) {
+        private void MarkAndGenerateZone(Graphics gr) {
             _eTxt.Check(0, _eTxt.Count - 1, false);
-            if (_MarkStart < 0 || _MarkEnd < 0) { return; }
+            if (_markStart < 0 || _markEnd < 0) { return; }
             Selection_Repair(false);
-            var MaS = Math.Min(_MarkStart, _MarkEnd);
-            var MaE = Math.Max(_MarkStart, _MarkEnd);
-            if (MaS == MaE) { return; }
-            _eTxt.Check(MaS, MaE - 1, true);
-            var TmpcharS = MaS;
-            for (var cc = MaS; cc <= MaE; cc++) {
-                if (cc == MaE || _eTxt[cc].Pos.X < _eTxt[TmpcharS].Pos.X || Math.Abs(_eTxt[cc].Pos.Y - _eTxt[TmpcharS].Pos.Y) > 0.001) //Jetzt ist der Zeitpunkt zum Zeichen/start setzen
+            var maS = Math.Min(_markStart, _markEnd);
+            var maE = Math.Max(_markStart, _markEnd);
+            if (maS == maE) { return; }
+            _eTxt.Check(maS, maE - 1, true);
+            var tmpcharS = maS;
+            for (var cc = maS; cc <= maE; cc++) {
+                if (cc == maE || _eTxt[cc].Pos.X < _eTxt[tmpcharS].Pos.X || Math.Abs(_eTxt[cc].Pos.Y - _eTxt[tmpcharS].Pos.Y) > 0.001) //Jetzt ist der Zeitpunkt zum Zeichen/start setzen
                 {
-                    Rectangle r = new((int)(_eTxt[TmpcharS].Pos.X + _eTxt.DrawingPos.X), (int)(_eTxt[TmpcharS].Pos.Y + 2 + _eTxt.DrawingPos.Y), (int)(_eTxt[cc - 1].Pos.X + _eTxt[cc - 1].Size.Width - _eTxt[TmpcharS].Pos.X), (int)(_eTxt[cc - 1].Pos.Y + _eTxt[cc - 1].Size.Height - _eTxt[TmpcharS].Pos.Y));
+                    Rectangle r = new((int)(_eTxt[tmpcharS].Pos.X + _eTxt.DrawingPos.X), (int)(_eTxt[tmpcharS].Pos.Y + 2 + _eTxt.DrawingPos.Y), (int)(_eTxt[cc - 1].Pos.X + _eTxt[cc - 1].Size.Width - _eTxt[tmpcharS].Pos.X), (int)(_eTxt[cc - 1].Pos.Y + _eTxt[cc - 1].Size.Height - _eTxt[tmpcharS].Pos.Y));
                     if (r.Width < 2) { r = new Rectangle(r.Left, r.Top, 2, r.Height); }
-                    if (_eTxt[TmpcharS].State != enStates.Undefiniert) {
-                        Skin.Draw_Back(GR, _eTxt.Design, _eTxt[TmpcharS].State, r, null, false);
-                        Skin.Draw_Border(GR, _eTxt.Design, _eTxt[TmpcharS].State, r);
+                    if (_eTxt[tmpcharS].State != enStates.Undefiniert) {
+                        Skin.Draw_Back(gr, _eTxt.Design, _eTxt[tmpcharS].State, r, null, false);
+                        Skin.Draw_Border(gr, _eTxt.Design, _eTxt[tmpcharS].State, r);
                     }
-                    TmpcharS = cc;
+                    tmpcharS = cc;
                 }
             }
         }
 
         private void MarkClear() {
-            _MarkStart = -1;
-            _MarkEnd = -1;
+            _markStart = -1;
+            _markEnd = -1;
         }
 
         private void OnEnter() => Enter?.Invoke(this, System.EventArgs.Empty);
 
-        private void OnESC() => ESC?.Invoke(this, System.EventArgs.Empty);
+        private void OnESC() => Esc?.Invoke(this, System.EventArgs.Empty);
 
         private void OnNeedDatabaseOfAdditinalSpecialChars(MultiUserFileGiveBackEventArgs e) => NeedDatabaseOfAdditinalSpecialChars?.Invoke(this, e);
 
-        private void OnTAB() => TAB?.Invoke(this, System.EventArgs.Empty);
+        private void OnTAB() => Tab?.Invoke(this, System.EventArgs.Empty);
 
         /// <summary>
         /// Prüft die den Selektions-Bereich auf nicht erlaubte Werte und Repariert diese.
         /// </summary>
-        /// <param name="SwapThem">Bei True werden MarkStart und MarkEnd richtig angeordnet. (Start kleiner/gleich End) </param>
+        /// <param name="swapThem">Bei True werden MarkStart und MarkEnd richtig angeordnet. (Start kleiner/gleich End) </param>
         /// <remarks></remarks>
-        private void Selection_Repair(bool SwapThem) {
+        private void Selection_Repair(bool swapThem) {
             if (_eTxt == null || _eTxt.Count == 0) { MarkClear(); }
-            if (_MarkStart < 0 && _MarkEnd < 0) { return; }
+            if (_markStart < 0 && _markEnd < 0) { return; }
 
-            _MarkStart = Math.Max(_MarkStart, 0);
-            _MarkStart = Math.Min(_MarkStart, _eTxt.Count);
+            _markStart = Math.Max(_markStart, 0);
+            _markStart = Math.Min(_markStart, _eTxt.Count);
 
-            _MarkEnd = Math.Max(_MarkEnd, 0);
-            _MarkEnd = Math.Min(_MarkEnd, _eTxt.Count);
+            _markEnd = Math.Max(_markEnd, 0);
+            _markEnd = Math.Min(_markEnd, _eTxt.Count);
 
-            if (SwapThem && _MarkStart > _MarkEnd) {
-                Generic.Swap(ref _MarkStart, ref _MarkEnd);
+            if (swapThem && _markStart > _markEnd) {
+                Generic.Swap(ref _markStart, ref _markEnd);
             }
         }
 
-        private void Selection_WortMarkieren(int Pos) {
+        private void Selection_WortMarkieren(int pos) {
             if (_eTxt == null || _eTxt.Count == 0) {
                 MarkClear();
                 return;
             }
-            _MarkStart = _eTxt.WordStart(Pos);
-            _MarkEnd = _eTxt.WordEnd(Pos);
+            _markStart = _eTxt.WordStart(pos);
+            _markEnd = _eTxt.WordEnd(pos);
             CursorClear();
             Selection_Repair(true);
         }
@@ -1053,11 +1054,11 @@ namespace BlueControls.Controls {
         private void SetCursorToEnd() {
             if (_eTxt == null) {
                 // Beim Durchtabben...
-                _Cursor_CharPos = -1;
+                _cursorCharPos = -1;
             } else {
-                _Cursor_CharPos = _eTxt.Count;
+                _cursorCharPos = _eTxt.Count;
             }
-            _Cursor_Visible = true;
+            _cursorVisible = true;
         }
 
         private void SliderY_ValueChange(object sender, System.EventArgs e) => Invalidate();
@@ -1065,33 +1066,33 @@ namespace BlueControls.Controls {
         private void SpellChecker_DoWork(object sender, DoWorkEventArgs e) {
             try {
                 if (Dictionary.IsSpellChecking) { return; }
-                if (DateTime.Now.Subtract(_LastUserActionForSpellChecking).TotalSeconds < 2) { return; }
+                if (DateTime.Now.Subtract(_lastUserActionForSpellChecking).TotalSeconds < 2) { return; }
 
                 Dictionary.IsSpellChecking = true;
-                if (!_SpellChecking) { return; }
+                if (!_spellChecking) { return; }
 
                 if (!Dictionary.DictionaryRunning(true)) { return; }
                 if (_eTxt == null) { return; }
 
-                var Pos = 0;
+                var pos = 0;
                 var woEnd = -1;
-                bool Ok;
+                bool ok;
                 do {
-                    Ok = true;
+                    ok = true;
                     SpellChecker.ReportProgress(0, "Unmark");
                     try {
                         do {
                             if (SpellChecker.CancellationPending) { return; }
 
-                            Pos = Math.Max(woEnd + 1, Pos + 1);
+                            pos = Math.Max(woEnd + 1, pos + 1);
                             if (_eTxt == null) { return; }// Das Textfeld ist spontan geschlossen worden.
 
-                            if (Pos >= _eTxt.Count) { break; }
+                            if (pos >= _eTxt.Count) { break; }
 
-                            var woStart = _eTxt.WordStart(Pos);
+                            var woStart = _eTxt.WordStart(pos);
                             if (woStart > -1) {
-                                woEnd = _eTxt.WordEnd(Pos);
-                                var wort = _eTxt.Word(Pos);
+                                woEnd = _eTxt.WordEnd(pos);
+                                var wort = _eTxt.Word(pos);
                                 if (!Dictionary.IsWordOk(wort)) {
                                     if (SpellChecker.CancellationPending) { return; }
                                     SpellChecker.ReportProgress((int)(woEnd / (double)_eTxt.Count * 100), "Mark;" + woStart + ";" + (woEnd - 1));
@@ -1099,9 +1100,9 @@ namespace BlueControls.Controls {
                             }
                         } while (true);
                     } catch {
-                        Ok = false;
+                        ok = false;
                     }
-                } while (!Ok);
+                } while (!ok);
             } catch (Exception ex) {
                 Develop.DebugPrint(ex);
             }
@@ -1125,7 +1126,7 @@ namespace BlueControls.Controls {
                     break;
 
                 case "Done":
-                    _MustCheck = false;
+                    _mustCheck = false;
                     break;
 
                 default:

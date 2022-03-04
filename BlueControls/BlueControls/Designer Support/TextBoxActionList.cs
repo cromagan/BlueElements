@@ -10,7 +10,7 @@ namespace BlueControls.Designer_Support {
 
         #region Fields
 
-        private readonly TextBox ReverenceControl;
+        private readonly TextBox _reverenceControl;
 
         #endregion
 
@@ -18,7 +18,7 @@ namespace BlueControls.Designer_Support {
 
         public TextBoxActionList(IComponent component) : base(component) {
             // Save a reference to the control we are designing.
-            ReverenceControl = (TextBox)component;
+            _reverenceControl = (TextBox)component;
             // Save a reference to the DesignerActionUIService
             //  DesignerService = ctypex(GetService(GetType(DesignerActionUIService)), DesignerActionUIService)
             //Makes the Smart Tags open automatically
@@ -39,11 +39,11 @@ namespace BlueControls.Designer_Support {
 
                     var x = new TextBox();
                     x.SetFormat(st);
-                    if (x.IsFormatIdentical(ReverenceControl)) { return st; }
+                    if (x.IsFormatIdentical(_reverenceControl)) { return st; }
                 }
                 return enVarType.Unbekannt;
             }
-            set => ReverenceControl.SetFormat(value);
+            set => _reverenceControl.SetFormat(value);
         }
 
         #endregion

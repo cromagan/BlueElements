@@ -194,7 +194,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (_tableView?.Database != null && _tableView.Filter != null) {
                 List<ColumnItem?> columSort = new();
                 ColumnViewCollection? orderArrangement = null;
-                foreach (var thisArr in _tableView.Database.ColumnArrangements.Where(thisArr => thisArr.Name.ToUpper() == AnsichtName.ToUpper())) {
+                foreach (var thisArr in _tableView.Database.ColumnArrangements.Where(thisArr => string.Equals(thisArr.Name, AnsichtName, StringComparison.CurrentCultureIgnoreCase))) {
                     orderArrangement = thisArr;
                 }
                 if (orderArrangement is null) { orderArrangement = _tableView?.CurrentArrangement; }
@@ -406,7 +406,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             }
             var isF = _tableView.Filter.RowFilterText;
             var newF = txbZeilenFilter.Text;
-            if (isF.ToUpper() == newF.ToUpper()) { return; }
+            if (string.Equals(isF, newF, StringComparison.CurrentCultureIgnoreCase)) { return; }
             if (string.IsNullOrEmpty(newF)) {
                 _tableView.Filter.Remove_RowFilter();
                 DoÄhnlich();
@@ -479,7 +479,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private void GetÄhnlich() {
             _ähnliche = null;
             if (_tableView?.Database != null && !string.IsNullOrEmpty(_ähnlicheAnsichtName)) {
-                foreach (var thisArr in _tableView.Database.ColumnArrangements.Where(thisArr => thisArr.Name.ToUpper() == _ähnlicheAnsichtName.ToUpper())) {
+                foreach (var thisArr in _tableView.Database.ColumnArrangements.Where(thisArr => string.Equals(thisArr.Name, _ähnlicheAnsichtName, StringComparison.CurrentCultureIgnoreCase))) {
                     _ähnliche = thisArr;
                 }
             }

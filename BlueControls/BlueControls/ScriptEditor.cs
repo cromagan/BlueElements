@@ -228,7 +228,7 @@ namespace BlueControls {
             }
 
             var sc = Script.ReduceText(txtSkript.Text).ToLower();
-            var x = new List<string>() { "sub" + e.Item.Internal.ToLower() + "()" };
+            var x = new List<string> { "sub" + e.Item.Internal.ToLower() + "()" };
 
             var (pos, _) = NextText(sc, 0, x, true, false, KlammernStd);
             if (pos < 1) {
@@ -260,7 +260,7 @@ namespace BlueControls {
                 _LastWord = hoveredWordnew;
 
                 foreach (var r in tableVariablen.Database.Row) {
-                    if (r.CellFirstString().ToLower() == hoveredWordnew.ToLower()) {
+                    if (string.Equals(r.CellFirstString(), hoveredWordnew, StringComparison.CurrentCultureIgnoreCase)) {
                         var inh = r.CellGetString("Inhalt");
                         _LastVariableContent = inh;
                         inh = inh.Replace("\r", ";");
@@ -286,8 +286,8 @@ namespace BlueControls {
 
             if (s == null) { return; }
 
-            var st = new List<string>() { "sub" };
-            var en = new List<string>() { "()" };
+            var st = new List<string> { "sub" };
+            var en = new List<string> { "()" };
 
             var pos = 0;
             do {

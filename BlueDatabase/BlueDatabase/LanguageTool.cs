@@ -27,8 +27,8 @@ namespace BlueDatabase {
 
         public static Database? Translation = null;
         private static readonly object?[] EmptyArgs = Array.Empty<object>();
-        private static string English = string.Empty;
-        private static string German = string.Empty;
+        private static string _english = string.Empty;
+        private static string _german = string.Empty;
 
         #endregion
 
@@ -48,9 +48,9 @@ namespace BlueDatabase {
             }
             if (Translation != null) { return ColumnReplaceTranslated(txt, column); }
             if (style == enShortenStyle.Unreplaced || column.OpticalReplace.Count == 0) { return txt; }
-            var OT = txt;
-            foreach (var ThisString in column.OpticalReplace) {
-                var x = ThisString.SplitAndCutBy("|");
+            var ot = txt;
+            foreach (var thisString in column.OpticalReplace) {
+                var x = thisString.SplitAndCutBy("|");
                 if (x.Length == 2) {
                     if (string.IsNullOrEmpty(x[0])) {
                         if (string.IsNullOrEmpty(txt)) { txt = x[1]; }
@@ -58,9 +58,9 @@ namespace BlueDatabase {
                         txt = txt.Replace(x[0], x[1]);
                     }
                 }
-                if (x.Length == 1 && !ThisString.StartsWith("|")) { txt = txt.Replace(x[0], string.Empty); }
+                if (x.Length == 1 && !thisString.StartsWith("|")) { txt = txt.Replace(x[0], string.Empty); }
             }
-            return style is enShortenStyle.Replaced or enShortenStyle.HTML || OT == txt ? txt : OT + " (" + txt + ")";
+            return style is enShortenStyle.Replaced or enShortenStyle.HTML || ot == txt ? txt : ot + " (" + txt + ")";
         }
 
         public static string DoTranslate(string txt) => DoTranslate(txt, true, EmptyArgs);
@@ -77,8 +77,8 @@ namespace BlueDatabase {
                     return args.GetUpperBound(0) < 0 ? txt : string.Format(txt, args);
                 }
                 if (string.IsNullOrEmpty(txt)) { return string.Empty; }
-                if (German == txt) { return args.GetUpperBound(0) < 0 ? English : string.Format(English, args); }
-                German = txt;
+                if (_german == txt) { return args.GetUpperBound(0) < 0 ? _english : string.Format(_english, args); }
+                _german = txt;
                 //if (txt.ContainsChars(Constants.Char_Numerals)) { English = German; return string.Format(English, args); }
                 //if (txt.ToLower().Contains("imagecode")) { English = German; return string.Format(English, args); }
                 var addend = string.Empty;
@@ -89,20 +89,20 @@ namespace BlueDatabase {
                 txt = txt.Replace("\r\n", "\r");
                 var r = Translation.Row[txt];
                 if (r == null) {
-                    if (Translation.ReadOnly) { English = German; return args.GetUpperBound(0) < 0 ? English : string.Format(English, args); }
-                    if (!mustTranslate) { English = German; return args.GetUpperBound(0) < 0 ? English : string.Format(English, args); }
+                    if (Translation.ReadOnly) { _english = _german; return args.GetUpperBound(0) < 0 ? _english : string.Format(_english, args); }
+                    if (!mustTranslate) { _english = _german; return args.GetUpperBound(0) < 0 ? _english : string.Format(_english, args); }
                     r = Translation.Row.Add(txt);
                 }
                 var t = r.CellGetString("Translation");
-                if (string.IsNullOrEmpty(t)) { English = German; return args.GetUpperBound(0) < 0 ? English : string.Format(English, args); }
-                English = t + addend;
-                return args.GetUpperBound(0) < 0 ? English : string.Format(English, args);
+                if (string.IsNullOrEmpty(t)) { _english = _german; return args.GetUpperBound(0) < 0 ? _english : string.Format(_english, args); }
+                _english = t + addend;
+                return args.GetUpperBound(0) < 0 ? _english : string.Format(_english, args);
             } catch {
                 return txt;
             }
         }
 
-        private static string ColumnReplaceTranslated(string newTXT, ColumnItem? column) => column.Translate == enTranslationType.Übersetzen ? DoTranslate(newTXT, false) : newTXT;
+        private static string ColumnReplaceTranslated(string newTxt, ColumnItem? column) => column.Translate == enTranslationType.Übersetzen ? DoTranslate(newTxt, false) : newTxt;
 
         #endregion
     }

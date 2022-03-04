@@ -93,7 +93,7 @@ namespace BlueControls.Classes_Editor {
                     if (!FileExists(t[0])) {
                         lsbExportDateien.Item.Add(t[0], t1, QuickImage.Get(enImageCode.Kritisch), true, "0000");
                     } else {
-                        var q1 = QuickImage.Get(enImageCode.Kugel, 16, Color.Red.MixColor(Color.Green, DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / Item.AutoDelete).ToHTMLCode(), "");
+                        var q1 = QuickImage.Get(enImageCode.Kugel, 16, Color.Red.MixColor(Color.Green, DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / Item.AutoDelete).ToHtmlCode(), "");
                         lsbExportDateien.Item.Add(t[0], t1, q1, true, t[1].CompareKey(enSortierTyp.Datum_Uhrzeit));
                     }
                 }

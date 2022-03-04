@@ -55,7 +55,7 @@ namespace BlueControls.Forms {
             InitializeComponent();
             FileList = new List<string>();
             InitWindow(false, "", -1);
-            Pad.BMP = bmp;
+            Pad.Bmp = bmp;
             Pad.ZoomFit();
             btnZoomIn.Checked = true;
             btnChoose.Enabled = false;
@@ -98,9 +98,9 @@ namespace BlueControls.Forms {
             _nr = nr;
             if (FileList != null && nr < FileList.Count) {
                 try {
-                    Pad.BMP = (Bitmap)BitmapExt.Image_FromFile(FileList[nr]);
+                    Pad.Bmp = (Bitmap)BitmapExt.Image_FromFile(FileList[nr]);
                 } catch (Exception ex) {
-                    Pad.BMP = null;
+                    Pad.Bmp = null;
                     Develop.DebugPrint(ex);
                 }
             }

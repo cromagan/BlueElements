@@ -49,14 +49,14 @@ public static class clsDesignExtensions {
             HintergrundArt = hint,
             Verlauf = verlauf
         };
-        if (!string.IsNullOrEmpty(bc1)) { des.BackColor1 = bc1.FromHTMLCode(); }
-        if (!string.IsNullOrEmpty(bc2)) { des.BackColor2 = bc2.FromHTMLCode(); }
-        if (!string.IsNullOrEmpty(bc3)) { des.BackColor3 = bc3.FromHTMLCode(); }
+        if (!string.IsNullOrEmpty(bc1)) { des.BackColor1 = bc1.FromHtmlCode(); }
+        if (!string.IsNullOrEmpty(bc2)) { des.BackColor2 = bc2.FromHtmlCode(); }
+        if (!string.IsNullOrEmpty(bc3)) { des.BackColor3 = bc3.FromHtmlCode(); }
         des.HintergrundArt = hint;
         des.RahmenArt = rahm;
-        if (!string.IsNullOrEmpty(boc1)) { des.BorderColor1 = boc1.FromHTMLCode(); }
-        if (!string.IsNullOrEmpty(boc2)) { des.BorderColor2 = boc2.FromHTMLCode(); }
-        if (!string.IsNullOrEmpty(boc3)) { des.BorderColor3 = boc3.FromHTMLCode(); }
+        if (!string.IsNullOrEmpty(boc1)) { des.BorderColor1 = boc1.FromHtmlCode(); }
+        if (!string.IsNullOrEmpty(boc2)) { des.BorderColor2 = boc2.FromHtmlCode(); }
+        if (!string.IsNullOrEmpty(boc3)) { des.BorderColor3 = boc3.FromHtmlCode(); }
         if (!string.IsNullOrEmpty(f)) { des.bFont = BlueFont.Get(f); }
         //if (!string.IsNullOrEmpty(pic)) { des.Image = QuickImage.Get(pic); }
         des.Image = pic;

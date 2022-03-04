@@ -465,7 +465,7 @@ namespace BluePaint
             // 
             // P
             // 
-            this.P.BMP = null;
+            this.P.Bmp = null;
             this.P.Dock = System.Windows.Forms.DockStyle.Fill;
             this.P.Location = new System.Drawing.Point(0, 0);
             this.P.Name = "P";

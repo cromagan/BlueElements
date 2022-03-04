@@ -27,11 +27,11 @@ namespace BlueControls.Classes_Editor {
 
         #region Fields
 
-        private T? _Item;
+        private T? _item;
 
-        private string _LastState = string.Empty;
+        private string _lastState = string.Empty;
 
-        private bool _VisibleChanged_Done;
+        private bool _visibleChangedDone;
 
         #endregion
 
@@ -59,11 +59,11 @@ namespace BlueControls.Classes_Editor {
         /// <returns></returns>
         [DefaultValue(null)]
         internal T? Item {
-            get => _Item;
+            get => _item;
             set {
-                _Item = value;
-                if (_Item != null) {
-                    _LastState = _Item.ToString();
+                _item = value;
+                if (_item != null) {
+                    _lastState = _item.ToString();
                     if (!Inited) {
                         Inited = true;
                         PrepaireFormula();
@@ -72,7 +72,7 @@ namespace BlueControls.Classes_Editor {
                     EnabledAndFillFormula();
                     IsFilling = false;
                 } else {
-                    _LastState = string.Empty;
+                    _lastState = string.Empty;
                     IsFilling = true;
                     DisableAndClearFormula();
                     IsFilling = false;
@@ -95,20 +95,20 @@ namespace BlueControls.Classes_Editor {
         /// </summary>
         protected virtual void EnabledAndFillFormula() => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
 
-        protected void OnChanged(T Obj) {
+        protected void OnChanged(T obj) {
             if (IsFilling) { return; }
-            var newstatse = Obj.ToString();
-            if (newstatse == _LastState) { return; }
-            _LastState = newstatse;
+            var newstatse = obj.ToString();
+            if (newstatse == _lastState) { return; }
+            _lastState = newstatse;
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
         protected override void OnVisibleChanged(System.EventArgs e) {
             base.OnVisibleChanged(e);
             // Damit das Formular nach der Anzeige erstmal deaktiviert ist.
-            if (_VisibleChanged_Done) { return; }
-            _VisibleChanged_Done = true;
-            if (_Item == null) {
+            if (_visibleChangedDone) { return; }
+            _visibleChangedDone = true;
+            if (_item == null) {
                 IsFilling = true;
                 DisableAndClearFormula();
                 IsFilling = false;

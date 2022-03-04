@@ -41,7 +41,7 @@ namespace BlueControls.Forms
             this.txbText.Size = new System.Drawing.Size(232, 24);
             this.txbText.TabIndex = 4;
             this.txbText.Enter += new System.EventHandler(this.txbText_Enter);
-            this.txbText.ESC += new System.EventHandler(this.txbText_ESC);
+            this.txbText.Esc += new System.EventHandler(this.txbText_ESC);
             // 
             // InputBox
             // 

@@ -34,13 +34,13 @@ namespace BlueControls {
 
         #region Fields
 
-        private const int _DrawSize = 20;
-        private readonly string _DrawText = string.Empty;
-        private readonly clsScreenData _FeedBack;
-        private Bitmap _ClipedArea;
-        private bool _MousesWasUp;
+        private const int DrawSize = 20;
+        private readonly string _drawText = string.Empty;
+        private readonly clsScreenData _feedBack;
+        private Bitmap _clipedArea;
+        private bool _mousesWasUp;
 
-        private Bitmap _ScreenShotBMP;
+        private Bitmap _screenShotBmp;
 
         #endregion
 
@@ -48,10 +48,10 @@ namespace BlueControls {
 
         private ScreenShot() : base() {
             InitializeComponent();
-            _FeedBack = new clsScreenData();
+            _feedBack = new clsScreenData();
         }
 
-        private ScreenShot(string text) : this() => _DrawText = text;
+        private ScreenShot(string text) : this() => _drawText = text;
 
         #endregion
 
@@ -81,8 +81,8 @@ namespace BlueControls {
                 try {
                     var r = Generic.RectangleOfAllScreens();
                     Bitmap b = new(r.Width, r.Height, PixelFormat.Format32bppPArgb);
-                    using var GR = Graphics.FromImage(b);
-                    GR.CopyFromScreen(r.X, r.Y, 0, 0, b.Size);
+                    using var gr = Graphics.FromImage(b);
+                    gr.CopyFromScreen(r.X, r.Y, 0, 0, b.Size);
                     return b;
                 } catch {
                     Generic.CollectGarbage();
@@ -109,8 +109,8 @@ namespace BlueControls {
 
         protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseDown(e);
-            if (!_MousesWasUp) { return; }
-            _FeedBack.Point1 = new Point(e.X, e.Y);
+            if (!_mousesWasUp) { return; }
+            _feedBack.Point1 = new Point(e.X, e.Y);
         }
 
         //public static Bitmap GrabContinuus() {
@@ -122,8 +122,8 @@ namespace BlueControls {
         //}
         protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseMove(e);
-            if (e != null && e.Button == System.Windows.Forms.MouseButtons.None && !_MousesWasUp) {
-                _MousesWasUp = true;
+            if (e != null && e.Button == System.Windows.Forms.MouseButtons.None && !_mousesWasUp) {
+                _mousesWasUp = true;
                 return;
             }
             var r = Generic.RectangleOfAllScreens();
@@ -131,22 +131,22 @@ namespace BlueControls {
             Top = r.Top;
             Width = r.Width;
             Height = r.Height;
-            using var GR = Graphics.FromImage(BackgroundImage);
-            GR.Clear(Color.Black);
+            using var gr = Graphics.FromImage(BackgroundImage);
+            gr.Clear(Color.Black);
 
-            GR.DrawImage(_ScreenShotBMP, 0, 0);
+            gr.DrawImage(_screenShotBmp, 0, 0);
 
             if (e != null) {
-                PrintText(GR, e);
-                Magnify(_ScreenShotBMP, new Point(e.X, e.Y), GR, false);
+                PrintText(gr, e);
+                Magnify(_screenShotBmp, new Point(e.X, e.Y), gr, false);
                 if (e.Button != System.Windows.Forms.MouseButtons.None) {
-                    GR.DrawLine(new Pen(Color.Red), 0, _FeedBack.Point1.Y, Width, _FeedBack.Point1.Y);
-                    GR.DrawLine(new Pen(Color.Red), _FeedBack.Point1.X, 0, _FeedBack.Point1.X, Height);
-                    GR.DrawLine(new Pen(Color.Red), 0, e.Y, Width, e.Y);
-                    GR.DrawLine(new Pen(Color.Red), e.X, 0, e.X, Height);
+                    gr.DrawLine(new Pen(Color.Red), 0, _feedBack.Point1.Y, Width, _feedBack.Point1.Y);
+                    gr.DrawLine(new Pen(Color.Red), _feedBack.Point1.X, 0, _feedBack.Point1.X, Height);
+                    gr.DrawLine(new Pen(Color.Red), 0, e.Y, Width, e.Y);
+                    gr.DrawLine(new Pen(Color.Red), e.X, 0, e.X, Height);
                 } else {
-                    GR.DrawLine(new Pen(Color.Red), 0, e.Y, Width, e.Y);
-                    GR.DrawLine(new Pen(Color.Red), e.X, 0, e.X, Height);
+                    gr.DrawLine(new Pen(Color.Red), 0, e.Y, Width, e.Y);
+                    gr.DrawLine(new Pen(Color.Red), e.X, 0, e.X, Height);
                 }
             }
             Refresh();
@@ -154,38 +154,38 @@ namespace BlueControls {
 
         protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
             base.OnMouseUp(e);
-            if (!_MousesWasUp) {
-                _MousesWasUp = true;
+            if (!_mousesWasUp) {
+                _mousesWasUp = true;
                 return;
             }
-            _FeedBack.Point2 = new Point(e.X, e.Y);
+            _feedBack.Point2 = new Point(e.X, e.Y);
 
-            var r = _FeedBack.GrabedArea();
+            var r = _feedBack.GrabedArea();
             if (r.Width < 2 || r.Height < 2) { return; }
 
-            _ClipedArea = new Bitmap(r.Width, r.Height, PixelFormat.Format32bppPArgb);
-            using (var GR = Graphics.FromImage(_ClipedArea)) {
-                GR.Clear(Color.Black);
-                GR.DrawImage(_ScreenShotBMP, 0, 0, r, GraphicsUnit.Pixel);
+            _clipedArea = new Bitmap(r.Width, r.Height, PixelFormat.Format32bppPArgb);
+            using (var gr = Graphics.FromImage(_clipedArea)) {
+                gr.Clear(Color.Black);
+                gr.DrawImage(_screenShotBmp, 0, 0, r, GraphicsUnit.Pixel);
             }
             Close();
         }
 
         private clsScreenData GrabAreaInternal(System.Windows.Forms.Form? frm) {
             try {
-                System.Windows.Forms.FormWindowState WS = 0;
+                System.Windows.Forms.FormWindowState ws = 0;
 
                 QuickInfo.Close();
                 if (frm != null) {
-                    WS = frm.WindowState;
+                    ws = frm.WindowState;
                     frm.WindowState = System.Windows.Forms.FormWindowState.Minimized;
                     Generic.Pause(0.5, true); // 0.3 ist zu wenig!
                 }
 
-                _ScreenShotBMP = GrabAllScreens();
-                BackgroundImage = new Bitmap(_ScreenShotBMP.Width, _ScreenShotBMP.Height, PixelFormat.Format32bppPArgb);
-                using var GR = Graphics.FromImage(BackgroundImage);
-                GR.DrawImage(_ScreenShotBMP, 0, 0);
+                _screenShotBmp = GrabAllScreens();
+                BackgroundImage = new Bitmap(_screenShotBmp.Width, _screenShotBmp.Height, PixelFormat.Format32bppPArgb);
+                using var gr = Graphics.FromImage(BackgroundImage);
+                gr.DrawImage(_screenShotBmp, 0, 0);
 
                 var r = Generic.RectangleOfAllScreens();
                 Left = r.Left;
@@ -195,18 +195,18 @@ namespace BlueControls {
                 OnMouseMove(null);
                 ShowDialog();
 
-                if (frm != null) { frm.WindowState = WS; }
+                if (frm != null) { frm.WindowState = ws; }
                 // New Bitmap davor, um die Bitmaptiefe zu korrigiern
                 //if (MaxW > 0 && MaxH > 0) {
                 //    // Auch hier NEW Bitmap, da evtl. das Original-Bild zurück gegeben wird.
                 //    FeedBack.Pic = new Bitmap(BitmapExt.Resize(ClipedArea, MaxW, MaxH, enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true));
                 //    FeedBack.IsResized = true;
                 //} else {
-                _FeedBack.CloneFromBitmap(_ClipedArea);
+                _feedBack.CloneFromBitmap(_clipedArea);
                 //FeedBack.IsResized = false;
                 //}
-                _ClipedArea.Dispose();
-                return _FeedBack;
+                _clipedArea.Dispose();
+                return _feedBack;
             } catch {
                 return new clsScreenData();
             }
@@ -303,14 +303,14 @@ namespace BlueControls {
         //    if (e.Button == System.Windows.Forms.MouseButtons.Left) { HookEndPoint = new Point(LastMouse.X, LastMouse.Y); }
         //}
 
-        private void PrintText(Graphics GR, System.Windows.Forms.MouseEventArgs e) {
+        private void PrintText(Graphics gr, System.Windows.Forms.MouseEventArgs e) {
             Brush bs = new SolidBrush(Color.FromArgb(150, 0, 0, 0));
             Brush bf = new SolidBrush(Color.FromArgb(255, 255, 0, 0));
-            Font fn = new("Arial", _DrawSize, FontStyle.Bold);
-            var f = GR.MeasureString(_DrawText, fn);
+            Font fn = new("Arial", DrawSize, FontStyle.Bold);
+            var f = gr.MeasureString(_drawText, fn);
             var yPos = e == null ? 0 : e.Y > f.Height + 50 ? 0 : (int)(Height - f.Height - 5);
-            GR.FillRectangle(bs, 0, yPos - 5, Width, f.Height + 10);
-            BlueFont.DrawString(GR, _DrawText, fn, bf, 2, yPos + 2);
+            gr.FillRectangle(bs, 0, yPos - 5, Width, f.Height + 10);
+            BlueFont.DrawString(gr, _drawText, fn, bf, 2, yPos + 2);
         }
 
         #endregion

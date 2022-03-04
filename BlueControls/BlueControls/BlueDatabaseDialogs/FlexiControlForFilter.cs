@@ -56,7 +56,7 @@ namespace BlueControls.Controls {
             // InitializeComponent();
         }
 
-        public FlexiControlForFilter(Table? tableView, FilterItem? filter, Filterleiste? myParent) {
+        public FlexiControlForFilter(Table tableView, FilterItem filter, Filterleiste? myParent) {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
@@ -83,7 +83,7 @@ namespace BlueControls.Controls {
             switch (e.ClickedComand.ToLower()) {
                 case "#columnedit":
                     if (e.HotItem is ColumnItem col) {
-                        tabAdministration.OpenColumnEditor(col, null);
+                        TabAdministration.OpenColumnEditor(col, null);
                     }
                     return true;
 

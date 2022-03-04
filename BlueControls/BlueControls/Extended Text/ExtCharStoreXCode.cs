@@ -32,15 +32,15 @@ namespace BlueControls.Extended_Text {
 
         public override void Draw(Graphics gr, Point posModificator, float zoom) { }
 
-        public override string HTMLText() => "<ZBX_STORE>";
+        public override string HtmlText() => "<ZBX_STORE>";
 
-        public override bool isLineBreak() => false;
+        public override bool IsLineBreak() => false;
 
-        public override bool isPossibleLineBreak() => false;
+        public override bool IsPossibleLineBreak() => false;
 
-        public override bool isSpace() => false;
+        public override bool IsSpace() => false;
 
-        public override bool isWordSeperator() => false;
+        public override bool IsWordSeperator() => false;
 
         public override string PlainText() => string.Empty;
 

@@ -29,9 +29,9 @@ namespace BlueBasics {
                 return;
             }
 
-            var Sc = Math.Min((float)width / bmp.Width, (float)height / bmp.Height);
-            var dw = (int)(bmp.Width * Sc);
-            var dh = (int)(bmp.Height * Sc);
+            var sc = Math.Min((float)width / bmp.Width, (float)height / bmp.Height);
+            var dw = (int)(bmp.Width * sc);
+            var dh = (int)(bmp.Height * sc);
             gR.DrawImage(bmp, x + ((width - dw) / 2), y + ((height - dh) / 2), dw, dh);
         }
 

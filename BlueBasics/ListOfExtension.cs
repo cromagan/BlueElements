@@ -87,7 +87,7 @@ namespace BlueBasics {
         public static void Load(this List<string> l, string filename, System.Text.Encoding code) {
             var t = File.ReadAllText(filename, code);
             l.Clear();
-            l.AddRange(t.SplitAndCutByCR());
+            l.AddRange(t.SplitAndCutByCr());
         }
 
         /// <summary>
@@ -217,7 +217,7 @@ namespace BlueBasics {
 
         public static void SplitAndCutByCR(this List<string?> list, string textToSplit) {
             List<string?> l = new();
-            l.AddRange(textToSplit.SplitAndCutByCR());
+            l.AddRange(textToSplit.SplitAndCutByCr());
             if (!list.IsDifferentTo(l)) { return; }
             if (list.Count > 0) { list.Clear(); }
             list.AddRange(l);
@@ -225,7 +225,7 @@ namespace BlueBasics {
 
         public static void SplitAndCutByCR_QuickSortAndRemoveDouble(this List<string> list, string textToSplit) {
             List<string?> l = new();
-            l.AddRange(textToSplit.SplitAndCutByCR());
+            l.AddRange(textToSplit.SplitAndCutByCr());
             l = l.SortedDistinctList();
 
             if (!list.IsDifferentTo(l)) { return; }

@@ -32,7 +32,7 @@ namespace BlueBasics.MultiUserFile {
 
         #region Fields
 
-        public static readonly ListExt<ClsMultiUserFile?> AllFiles = new();
+        public static readonly ListExt<ClsMultiUserFile> AllFiles = new();
 
         protected byte[] DataOnDisk;
         protected int ReloadDelaySecond = 10;
@@ -832,7 +832,7 @@ namespace BlueBasics.MultiUserFile {
         /// </summary>
         /// <param name="checkmode"></param>
         /// <returns></returns>
-        private (byte[] data, string fileinfo) LoadBytesFromDisk(enErrorReason checkmode) {
+        private (byte[]? data, string fileinfo) LoadBytesFromDisk(enErrorReason checkmode) {
             string tmpLastSaveCode2;
             var startTime = DateTime.UtcNow;
             byte[] bLoaded;
@@ -1060,7 +1060,7 @@ namespace BlueBasics.MultiUserFile {
         /// </summary>
         /// <param name="iAmThePureBinSaver"></param>
         /// <returns>Dateiname, Stand der Originaldatei, was gespeichert wurde</returns>
-        private (string TMPFileName, string FileInfoBeforeSaving, byte[] DataUncompressed) WriteTempFileToDisk(bool iAmThePureBinSaver) {
+        private (string TMPFileName, string FileInfoBeforeSaving, byte[]? DataUncompressed) WriteTempFileToDisk(bool iAmThePureBinSaver) {
             string fileInfoBeforeSaving;
             string tmpFileName;
             byte[] dataUncompressed;

@@ -62,7 +62,7 @@ namespace BlueControls.ItemCollection {
 
         public override string QuickInfo {
             get {
-                if (_Row == null) { return null; }
+                if (_Row == null) { return string.Empty; }
 
                 return !string.IsNullOrEmpty(_Row.Database.ZeilenQuickInfo)
                     ? _Row.QuickInfo.CreateHtmlCodes(true)

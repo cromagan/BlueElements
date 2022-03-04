@@ -25,17 +25,17 @@ namespace BlueBasics {
 
         #region Methods
 
-        public static Point NearestCornerOF(this Rectangle r, Point p) {
-            var LO = r.PointOf(enAlignment.Top_Left);
+        public static Point NearestCornerOf(this Rectangle r, Point p) {
+            var lo = r.PointOf(enAlignment.Top_Left);
             var rO = r.PointOf(enAlignment.Top_Right);
             var ru = r.PointOf(enAlignment.Bottom_Right);
             var lu = r.PointOf(enAlignment.Bottom_Left);
-            var llo = Geometry.GetLenght(p, LO);
+            var llo = Geometry.GetLenght(p, lo);
             var lro = Geometry.GetLenght(p, rO);
             var llu = Geometry.GetLenght(p, lu);
             var lru = Geometry.GetLenght(p, ru);
-            var Erg = Math.Min(Math.Min(llo, lro), Math.Min(llu, lru));
-            return Erg == llo ? LO : Erg == lro ? rO : Erg == llu ? lu : Erg == lru ? ru : Point.Empty;
+            var erg = Math.Min(Math.Min(llo, lro), Math.Min(llu, lru));
+            return erg == llo ? lo : erg == lro ? rO : erg == llu ? lu : erg == lru ? ru : Point.Empty;
         }
 
         public static Point PointOf(this Rectangle r, enAlignment p) {

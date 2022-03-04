@@ -12,9 +12,9 @@ namespace BlueControls.Controls {
     {
         #region Fields
 
-        private readonly List<BitmapExt?> pic = new();
+        private readonly List<BitmapExt?> _pic = new();
+        private List<string>? _files = new();
         private int _nr;
-        private List<string>? files = new();
 
         #endregion
 
@@ -27,13 +27,13 @@ namespace BlueControls.Controls {
         #region Properties
 
         public List<string>? Files {
-            get => files;
+            get => _files;
             set {
-                pic.Clear();
-                files = value;
+                _pic.Clear();
+                _files = value;
                 _nr = 0;
-                if (files == null) { files = new List<string>(); }
-                while (pic.Count < files.Count) { pic.Add(null); }
+                if (_files == null) { _files = new List<string>(); }
+                while (_pic.Count < _files.Count) { _pic.Add(null); }
                 SetPic();
             }
         }
@@ -44,10 +44,10 @@ namespace BlueControls.Controls {
 
         #region Methods
 
-        protected override void DrawControl(Graphics GR, enStates vState) {
+        protected override void DrawControl(Graphics gr, enStates vState) {
             if (Convert.ToBoolean(vState & enStates.Standard_MouseOver)) { vState ^= enStates.Standard_MouseOver; }
             if (Convert.ToBoolean(vState & enStates.Standard_MousePressed)) { vState ^= enStates.Standard_MousePressed; }
-            Skin.Draw_Back(GR, enDesign.EasyPic, vState, DisplayRectangle, this, true);
+            Skin.Draw_Back(gr, enDesign.EasyPic, vState, DisplayRectangle, this, true);
             //Bitmap _Bitmap = null;
             //if (pic.Count > 0) {
             //    if (pic[_nr] == null) {
@@ -58,7 +58,7 @@ namespace BlueControls.Controls {
             //if (_Bitmap != null) {
             //    GR.DrawImageInRectAspectRatio(_Bitmap, 1, pnlControls.Height, Width - 2, Height - 2 - pnlControls.Height);
             //}
-            Skin.Draw_Border(GR, enDesign.EasyPic, vState, DisplayRectangle);
+            Skin.Draw_Border(gr, enDesign.EasyPic, vState, DisplayRectangle);
         }
 
         private void btnLeft_Click(object sender, System.EventArgs e) {
@@ -73,7 +73,7 @@ namespace BlueControls.Controls {
         //}
         private void btnRight_Click(object sender, System.EventArgs e) {
             _nr++;
-            if (_nr > pic.Count - 1) { _nr = pic.Count - 1; }
+            if (_nr > _pic.Count - 1) { _nr = _pic.Count - 1; }
             SetPic();
         }
 
@@ -83,14 +83,14 @@ namespace BlueControls.Controls {
         }
 
         private void SetPic() {
-            Bitmap _Bitmap = null;
-            if (pic.Count > 0) {
-                if (pic[_nr] == null) {
-                    pic[_nr] = new BitmapExt(files[_nr], true);
+            Bitmap bitmap = null;
+            if (_pic.Count > 0) {
+                if (_pic[_nr] == null) {
+                    _pic[_nr] = new BitmapExt(_files[_nr], true);
                 }
-                _Bitmap = pic[_nr];
+                bitmap = _pic[_nr];
             }
-            zoompic.BMP = _Bitmap;
+            zoompic.Bmp = bitmap;
         }
 
         #endregion

@@ -29,17 +29,17 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         #region Fields
 
-        private readonly RowItem? Row;
+        private readonly RowItem? _row;
 
         #endregion
 
         #region Constructors
 
-        public FormulaQuickSelect(RowItem? RowItem) {
+        public FormulaQuickSelect(RowItem? rowItem) {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-            Row = RowItem;
+            _row = rowItem;
         }
 
         #endregion
@@ -55,17 +55,17 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private void Auswahl_ItemClicked(object sender, BasicListItemEventArgs e) {
             var x = e.Item.Internal.SplitAndCutBy("|");
-            if (Row.Database.Column[x[0]].MultiLine) {
-                var val = Row.CellGetList(Row.Database.Column[x[0]]);
+            if (_row.Database.Column[x[0]].MultiLine) {
+                var val = _row.CellGetList(_row.Database.Column[x[0]]);
                 if (e.Item.Checked) {
                     val.AddIfNotExists(x[1]);
                 } else {
                     val.Remove(x[1]);
                 }
-                Row.CellSet(Row.Database.Column[x[0]], val);
+                _row.CellSet(_row.Database.Column[x[0]], val);
             } else {
                 if (e.Item.Checked) {
-                    Row.CellSet(Row.Database.Column[x[0]], x[1]);
+                    _row.CellSet(_row.Database.Column[x[0]], x[1]);
                 }
             }
             //       End If
@@ -73,11 +73,11 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         private void Init() {
-            if (Row == null) {
+            if (_row == null) {
                 Close();
                 return;
             }
-            Für.Text = "<b>" + Row.CellFirstString();
+            Für.Text = "<b>" + _row.CellFirstString();
         }
 
         private void Such_TextChanged(object sender, System.EventArgs e) {
@@ -85,19 +85,19 @@ namespace BlueControls.BlueDatabaseDialogs {
             var t = Such.Text;
             if (string.IsNullOrEmpty(t)) { return; }
             t = t.ToLower();
-            foreach (var ThisColumn in Row.Database.Column) {
-                if (ThisColumn?.EditType is enEditTypeFormula.SwapListBox or enEditTypeFormula.Listbox or enEditTypeFormula.Textfeld_mit_Auswahlknopf) {
-                    if (ThisColumn.DropdownBearbeitungErlaubt) {
-                        if (CellCollection.UserEditPossible(ThisColumn, Row, enErrorReason.OnlyRead)) {
-                            var ThisView = Formula.SearchColumnView(ThisColumn);
-                            if (ThisView != null) {
-                                if (Row.Database.PermissionCheck(ThisView.PermissionGroups_Show, null)) {
+            foreach (var thisColumn in _row.Database.Column) {
+                if (thisColumn?.EditType is enEditTypeFormula.SwapListBox or enEditTypeFormula.Listbox or enEditTypeFormula.Textfeld_mit_Auswahlknopf) {
+                    if (thisColumn.DropdownBearbeitungErlaubt) {
+                        if (CellCollection.UserEditPossible(thisColumn, _row, enErrorReason.OnlyRead)) {
+                            var thisView = Formula.SearchColumnView(thisColumn);
+                            if (thisView != null) {
+                                if (_row.Database.PermissionCheck(thisView.PermissionGroups_Show, null)) {
                                     ItemCollectionList dummy = new();
-                                    ItemCollectionList.GetItemCollection(dummy, ThisColumn, Row, enShortenStyle.Replaced, 1000);
+                                    ItemCollectionList.GetItemCollection(dummy, thisColumn, _row, enShortenStyle.Replaced, 1000);
                                     if (dummy.Count > 0) {
                                         foreach (var thisItem in dummy) {
                                             if (thisItem.Internal.ToLower().Contains(t)) {
-                                                var ni = Auswahl.Item.Add(ThisColumn.ReadableText() + ": " + thisItem.Internal, ThisColumn.Name.ToUpper() + "|" + thisItem.Internal);
+                                                var ni = Auswahl.Item.Add(thisColumn.ReadableText() + ": " + thisItem.Internal, thisColumn.Name.ToUpper() + "|" + thisItem.Internal);
                                                 ni.Checked = thisItem.Checked;
                                             }
                                         }

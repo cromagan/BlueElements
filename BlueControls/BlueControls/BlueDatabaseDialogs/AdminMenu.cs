@@ -206,7 +206,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             _TableView.CurrentArrangement.Remove(ViewItem);
         }
 
-        private void btnSpalteBearbeiten_Click(object sender, System.EventArgs e) => tabAdministration.OpenColumnEditor(_TableView.CursorPosColumn(), _TableView.CursorPosRow()?.Row, _TableView);
+        private void btnSpalteBearbeiten_Click(object sender, System.EventArgs e) => TabAdministration.OpenColumnEditor(_TableView.CursorPosColumn(), _TableView.CursorPosRow()?.Row, _TableView);
 
         private void btnSpalteDauerhaftloeschen_Click(object sender, System.EventArgs e) {
             if (MessageBox.Show("Spalte <b>" + _TableView.CursorPosColumn().ReadableText() + "</b> endgültig löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }

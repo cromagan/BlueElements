@@ -25,17 +25,18 @@ namespace BlueControls.Forms {
 
         #region Fields
 
-        private const bool _userClicked = false;
         private const double SpeedIn = 250d;
 
         // Wegen Recheoperation
         private const double SpeedOut = 250d;
 
-        // Wegen Recheoperation
-        private readonly DateTime _FirstTimer = DateTime.Now;
+        private const bool UserClicked = false;
 
-        private readonly int _ScreenTime = -999;
-        private readonly int lowestY;
+        // Wegen Recheoperation
+        private readonly DateTime _firstTimer = DateTime.Now;
+
+        private readonly int _lowestY;
+        private readonly int _screenTime = -999;
         private bool _hiddenNow;
         private bool _isIn;
         private DateTime _outime = new(0);
@@ -49,11 +50,11 @@ namespace BlueControls.Forms {
 
         private Notification(string text) : this() {
             capTXT.Text = text;
-            var He = Math.Min(capTXT.TextRequiredSize().Height, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height * 0.7));
-            var Wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
-            Size = new Size(Wi + (capTXT.Left * 2), He + (capTXT.Top * 2));
+            var he = Math.Min(capTXT.TextRequiredSize().Height, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height * 0.7));
+            var wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
+            Size = new Size(wi + (capTXT.Left * 2), he + (capTXT.Top * 2));
             Location = new Point(-Width - 10, Height - 10);
-            _ScreenTime = Math.Max(3200, text.Length * 100);
+            _screenTime = Math.Max(3200, text.Length * 100);
 
             //Below müsste in Allboxes ja die letzte sein - außer sich selbst
             foreach (var thisParent in AllBoxes) {
@@ -64,9 +65,9 @@ namespace BlueControls.Forms {
                 }
             }
 
-            lowestY = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - Height - 1;// - Skin.Padding;
+            _lowestY = System.Windows.Forms.Screen.PrimaryScreen.WorkingArea.Bottom - Height - 1;// - Skin.Padding;
             //var pixelfromLower = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Bottom - lowestY;
-            Top = lowestY;
+            Top = _lowestY;
             Opacity = 0.001;
             //Visible = true; // %$§!% !!!!!!!
 
@@ -77,7 +78,7 @@ namespace BlueControls.Forms {
                 if (_hiddenNow) { return; }
             }
 
-            _FirstTimer = DateTime.Now;
+            _firstTimer = DateTime.Now;
             timNote.Enabled = true;
         }
 
@@ -111,36 +112,36 @@ namespace BlueControls.Forms {
             _isIn = true;
 
             try {
-                var MS = DateTime.Now.Subtract(_FirstTimer).TotalMilliseconds;
+                var ms = DateTime.Now.Subtract(_firstTimer).TotalMilliseconds;
 
                 #region Anzeige-Status (Richtung, Prozent) bestimmen
 
                 var hasBelow = false;
 
                 var newLeft = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width - Width - 1;
-                var newTop = lowestY;
+                var newTop = _lowestY;
 
                 if (NoteBelow != null && AllBoxes.Contains(NoteBelow)) {
-                    newTop = Math.Min(NoteBelow.Top - Height - 1, lowestY);
+                    newTop = Math.Min(NoteBelow.Top - Height - 1, _lowestY);
                     hasBelow = true;
                 }
 
-                if (MS < SpeedIn) {
+                if (ms < SpeedIn) {
                     // Kommt von Rechts reingeflogen
-                    Opacity = MS / SpeedIn;
+                    Opacity = ms / SpeedIn;
                     //Left = (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width - (x.Width - (Skin.Padding * 2)) * x.Opacity); // Opacity == Prozent
-                    newTop = Math.Min(newTop, lowestY);
+                    newTop = Math.Min(newTop, _lowestY);
                 } else if (Top >= System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height || Opacity < 0.01) {
                     //Lebensdauer überschritten
                     _hiddenNow = true;
-                } else if (MS > _ScreenTime - SpeedIn) {
+                } else if (ms > _screenTime - SpeedIn) {
                     // War lange genug da, darf wieder raus
                     if (!hasBelow) {
                         if (_outime.Ticks == 0) { _outime = DateTime.Now; }
 
-                        var MSo = DateTime.Now.Subtract(_outime).TotalMilliseconds;
+                        var mSo = DateTime.Now.Subtract(_outime).TotalMilliseconds;
 
-                        Opacity = 1 - MSo / SpeedOut;
+                        Opacity = 1 - mSo / SpeedOut;
                         //Top = (int)(lowestY + pixelfromLower * (MSo / SpeedOut)) + 1;
                         //Left = x.Left + (int)Math.Max(diff / 17, 1);
                     } else {
@@ -149,7 +150,7 @@ namespace BlueControls.Forms {
                 } else {
                     //Hauptanzeige ist gerade
                     Opacity = 1;
-                    newTop = Math.Min(newTop, lowestY);
+                    newTop = Math.Min(newTop, _lowestY);
                 }
 
                 #endregion
@@ -162,7 +163,7 @@ namespace BlueControls.Forms {
                     //Develop.DoEvents();
                 }
 
-                if (_FirstTimer.Subtract(DateTime.Now).TotalMinutes > 2 || _userClicked) { _hiddenNow = true; }
+                if (_firstTimer.Subtract(DateTime.Now).TotalMinutes > 2 || UserClicked) { _hiddenNow = true; }
             } catch { }
 
             if (_hiddenNow) {

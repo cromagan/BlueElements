@@ -19,6 +19,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -91,7 +92,7 @@ namespace BlueDatabase {
         }
 
         public void Hide(string columnName) {
-            foreach (var thisViewItem in this.Where(thisViewItem => thisViewItem != null && (thisViewItem.Column == null || thisViewItem.Column.Name.ToUpper() == columnName.ToUpper()))) {
+            foreach (var thisViewItem in this.Where(thisViewItem => thisViewItem != null && (thisViewItem.Column == null || string.Equals(thisViewItem.Column.Name, columnName, StringComparison.CurrentCultureIgnoreCase)))) {
                 Remove(thisViewItem);
                 Hide(columnName);
                 return;

@@ -29,21 +29,21 @@ namespace BlueBasics {
         /// Erweitert das Rechteck, dass der Angegebene Punkt ebenfalls umschlossen wird.
         /// </summary>
         /// <param name="r"></param>
-        /// <param name="P"></param>
-        public static RectangleF ExpandTo(this RectangleF r, PointF P) {
-            if (P.X < r.X) {
-                r.Width = r.Right - P.X;
-                r.X = P.X;
+        /// <param name="p"></param>
+        public static RectangleF ExpandTo(this RectangleF r, PointF p) {
+            if (p.X < r.X) {
+                r.Width = r.Right - p.X;
+                r.X = p.X;
             }
-            if (P.Y < r.Y) {
-                r.Height = r.Bottom - P.Y;
-                r.Y = P.Y;
+            if (p.Y < r.Y) {
+                r.Height = r.Bottom - p.Y;
+                r.Y = p.Y;
             }
-            if (P.X > r.Right) {
-                r.Width = P.X - r.X;
+            if (p.X > r.Right) {
+                r.Width = p.X - r.X;
             }
-            if (P.Y > r.Bottom) {
-                r.Height = P.Y - r.Y;
+            if (p.Y > r.Bottom) {
+                r.Height = p.Y - r.Y;
             }
 
             return r;
@@ -60,7 +60,7 @@ namespace BlueBasics {
             return r;
         }
 
-        public static PointF NearestCornerOF(this RectangleF r, PointF p) {
+        public static PointF NearestCornerOf(this RectangleF r, PointF p) {
             var pl = new List<PointF>
             {
                 r.PointOf(enAlignment.Top_Left),

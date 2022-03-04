@@ -21,6 +21,7 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueDatabase;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 
@@ -30,7 +31,7 @@ namespace BlueControls.ItemCollection {
 
         #region Fields
 
-        private Database _database;
+        private Database? _database;
         private string _lastQuickInfo;
         private string _layoutId;
         private long _rowKey;
@@ -48,7 +49,7 @@ namespace BlueControls.ItemCollection {
 
         public RowFormulaPadItem(Database database, long rowkey, string layoutId) : this(string.Empty, database, rowkey, layoutId) { }
 
-        public RowFormulaPadItem(string internalname, Database database, long rowkey, string layoutId) : base(internalname) {
+        public RowFormulaPadItem(string internalname, Database? database, long rowkey, string layoutId) : base(internalname) {
             _database = database;
             if (_database != null) { _database.Disposing += _Database_Disposing; }
             _rowKey = rowkey;
@@ -140,7 +141,7 @@ namespace BlueControls.ItemCollection {
                 case "firstvalue":
                     var n = value.FromNonCritical();
                     if (Row != null) {
-                        if (Row.CellFirstString().ToUpper() != n.ToUpper()) {
+                        if (!string.Equals(Row.CellFirstString(), n, StringComparison.CurrentCultureIgnoreCase)) {
                             MessageBox.Show("<b><u>Eintrag hat sich geändert:</b></u><br><b>Von: </b> " + n + "<br><b>Nach: </b>" + Row.CellFirstString(), enImageCode.Information, "OK");
                         }
                         return true; // Alles beim Alten
@@ -169,7 +170,7 @@ namespace BlueControls.ItemCollection {
 
         protected override string ClassId() => "ROW";
 
-        protected override Bitmap? GeneratePic() {
+        protected override Bitmap GeneratePic() {
             if (string.IsNullOrEmpty(_layoutId) || !_layoutId.StartsWith("#")) {
                 return QuickImage.Get(enImageCode.Warnung, 128);
             }

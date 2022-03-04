@@ -35,7 +35,7 @@ namespace BlueBasics {
             return b;
         }
 
-        public static string SimpleCrypt(string content, string pass, int direction) => SimpleCrypt(content.WIN1252_toByte(), pass, direction).ToStringWIN1252();
+        public static string SimpleCrypt(string content, string pass, int direction) => SimpleCrypt(content.WIN1252_toByte(), pass, direction).ToStringWin1252();
 
         public static byte[] SimpleCrypt(byte[] b, string pass, int direction) => SimpleCrypt(b, pass, direction, 0, b.GetUpperBound(0));
 

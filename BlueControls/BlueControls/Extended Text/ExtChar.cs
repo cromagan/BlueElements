@@ -26,25 +26,25 @@ namespace BlueControls.Extended_Text {
 
         public PointF Pos = PointF.Empty;
 
-        private enDesign _Design;
+        private enDesign _design;
 
-        private BlueFont? _Font;
+        private BlueFont? _font;
 
-        private SizeF _Size;
-        private enStates _State;
+        private SizeF _size;
+        private enStates _state;
 
-        private int _Stufe;
+        private int _stufe;
 
         #endregion
 
         #region Constructors
 
         protected ExtChar(enDesign design, enStates state, BlueFont? font, int stufe) : base() {
-            _Design = design;
-            _State = state;
-            _Stufe = stufe;
-            _Font = font;
-            _Size = SizeF.Empty;
+            _design = design;
+            _state = state;
+            _stufe = stufe;
+            _font = font;
+            _size = SizeF.Empty;
         }
 
         #endregion
@@ -52,49 +52,49 @@ namespace BlueControls.Extended_Text {
         #region Properties
 
         public enDesign Design {
-            get => _Design;
+            get => _design;
             set {
-                if (value == _Design) { return; }
-                ChangeState(value, _State, _Stufe);
+                if (value == _design) { return; }
+                ChangeState(value, _state, _stufe);
             }
         }
 
         public BlueFont? Font {
             get {
-                if (_Font != null) {
-                    return _Font;
+                if (_font != null) {
+                    return _font;
                 }
 
-                _Font = Design == enDesign.Undefiniert || State == enStates.Undefiniert ? null : Skin.GetBlueFont(Design, State, Stufe);
-                _Size = SizeF.Empty;
-                return _Font;
+                _font = Design == enDesign.Undefiniert || State == enStates.Undefiniert ? null : Skin.GetBlueFont(Design, State, Stufe);
+                _size = SizeF.Empty;
+                return _font;
             }
 
-            protected set => _Font = value;
+            protected set => _font = value;
         }
 
         public enMarkState Marking { get; set; }
 
         public SizeF Size {
             get {
-                if (_Size.IsEmpty) { _Size = CalculateSize(); }
-                return _Size;
+                if (_size.IsEmpty) { _size = CalculateSize(); }
+                return _size;
             }
         }
 
         public enStates State {
-            get => _State;
+            get => _state;
             set {
-                if (value == _State) { return; }
-                ChangeState(_Design, value, _Stufe);
+                if (value == _state) { return; }
+                ChangeState(_design, value, _stufe);
             }
         }
 
         public int Stufe {
-            get => _Stufe;
+            get => _stufe;
             set {
-                if (_Stufe == value) { return; }
-                ChangeState(_Design, _State, value);
+                if (_stufe == value) { return; }
+                ChangeState(_design, _state, value);
             }
         }
 
@@ -104,13 +104,13 @@ namespace BlueControls.Extended_Text {
 
         public abstract void Draw(Graphics gr, Point posModificator, float zoom);
 
-        public abstract string HTMLText();
+        public abstract string HtmlText();
 
-        public abstract bool isLineBreak();
+        public abstract bool IsLineBreak();
 
-        public abstract bool isPossibleLineBreak();
+        public abstract bool IsPossibleLineBreak();
 
-        public abstract bool isSpace();
+        public abstract bool IsSpace();
 
         /// <summary>
         ///
@@ -124,7 +124,7 @@ namespace BlueControls.Extended_Text {
                 && ((Pos.X + Size.Width) * zoom) + drawingPos.X >= drawingArea.Left
                 && ((Pos.Y + Size.Height) * zoom) + drawingPos.Y >= drawingArea.Top);
 
-        public abstract bool isWordSeperator();
+        public abstract bool IsWordSeperator();
 
         public abstract string PlainText();
 
@@ -136,12 +136,12 @@ namespace BlueControls.Extended_Text {
         protected abstract SizeF CalculateSize();
 
         private void ChangeState(enDesign design, enStates state, int stufe) {
-            if (state == _State && stufe == _Stufe && design == _Design) { return; }
-            _Size = SizeF.Empty;
-            _Design = design;
-            _State = state;
-            _Stufe = stufe;
-            _Font = null;
+            if (state == _state && stufe == _stufe && design == _design) { return; }
+            _size = SizeF.Empty;
+            _design = design;
+            _state = state;
+            _stufe = stufe;
+            _font = null;
         }
 
         #endregion

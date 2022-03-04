@@ -24,12 +24,12 @@ namespace BlueBasics {
 
         #region Methods
 
-        public static string ToStringUTF8(this byte[] b) => Encoding.UTF8.GetString(b);
+        public static string ToStringUtf8(this byte[] b) => Encoding.UTF8.GetString(b);
 
-        public static string ToStringUTF8(this List<byte> b) => Encoding.UTF8.GetString(b.ToArray());
+        public static string ToStringUtf8(this List<byte> b) => Encoding.UTF8.GetString(b.ToArray());
 
         // static Encoding enc1252 = CodePagesEncodingProvider.Instance.GetEncoding(1252);
-        public static string ToStringWIN1252(this byte[] b) =>
+        public static string ToStringWin1252(this byte[] b) =>
             // https://stackoverflow.com/questions/37870084/net-core-doesnt-know-about-windows-1252-how-to-fix
             // Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             // var enc1252 = Encoding.GetEncoding(1252);

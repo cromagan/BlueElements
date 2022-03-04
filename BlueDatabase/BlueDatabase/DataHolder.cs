@@ -110,7 +110,7 @@ namespace BlueDatabase {
                     //                    "<b><u>Zugehöriger Behälter:</b></u><br>" +
                     //                    "<b>Nummer: </b> &BehaelterMatNr; <br> " +
                     //                    "<b>Volumen: </b> &Volumen;";
-                    InternalDatabase.SortDefinition = new RowSortDefinition(InternalDatabase, new List<string>() { "ID" }, false);
+                    InternalDatabase.SortDefinition = new RowSortDefinition(InternalDatabase, new List<string> { "ID" }, false);
                 }
             }
             InternalDatabase.Caption = id;
@@ -194,7 +194,7 @@ namespace BlueDatabase {
 
         public int GetInt(string dataName) => Row().CellGetInteger(Column(dataName, string.Empty));
 
-        public List<string?>? GetList(string dataName) => Row().CellGetList(Column(dataName, string.Empty));
+        public List<string?> GetList(string dataName) => Row().CellGetList(Column(dataName, string.Empty));
 
         public string GetString(string dataName) => Row().CellGetString(Column(dataName, string.Empty));
 

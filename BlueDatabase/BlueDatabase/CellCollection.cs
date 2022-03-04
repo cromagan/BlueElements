@@ -354,9 +354,9 @@ namespace BlueDatabase {
             return string.IsNullOrEmpty(x) ? 0 : int.Parse(x);
         }
 
-        public List<string?>? GetList(string columnName, RowItem? row) => GetList(_database.Column[columnName], row);
+        public List<string> GetList(string columnName, RowItem? row) => GetList(_database.Column[columnName], row);
 
-        public List<string?>? GetList(ColumnItem? column, RowItem? row) => GetString(column, row).SplitAndCutByCRToList();// Main Method
+        public List<string> GetList(ColumnItem? column, RowItem? row) => GetString(column, row).SplitAndCutByCrToList();// Main Method
 
         public Point GetPoint(string columnName, RowItem? row) => GetPoint(_database.Column[columnName], row);
 
@@ -476,7 +476,7 @@ namespace BlueDatabase {
                     }
                     return bedingungErfüllt;
                 }
-                List<string> vorhandenWerte = new(@string.SplitAndCutByCR());
+                List<string> vorhandenWerte = new(@string.SplitAndCutByCr());
                 if (vorhandenWerte.Count == 0) // Um den Filter, der nach 'Leere' Sucht, zu befriediegen
                 {
                     vorhandenWerte.Add("");
@@ -561,7 +561,7 @@ namespace BlueDatabase {
         internal static List<RowItem?> ConnectedRowsOfRelations(string completeRelationText, RowItem? row) {
             List<RowItem?> allRows = new();
             var names = row.Database.Column[0].GetUcaseNamesSortedByLenght();
-            var relationTextLine = completeRelationText.ToUpper().SplitAndCutByCR();
+            var relationTextLine = completeRelationText.ToUpper().SplitAndCutByCr();
             foreach (var thisTextLine in relationTextLine) {
                 var tmp = thisTextLine;
                 List<RowItem?> r = new();
@@ -906,11 +906,11 @@ namespace BlueDatabase {
                         if (!string.IsNullOrEmpty(oldValue) && t.ToUpper().Contains(oldValue.ToUpper())) {
                             t = ChangeTextToRowId(t, oldValue, newValue, rowKey);
                             t = ChangeTextFromRowId(t);
-                            var t2 = t.SplitAndCutByCRToList().SortedDistinctList();
+                            var t2 = t.SplitAndCutByCrToList().SortedDistinctList();
                             thisRowItem.CellSet(columnToRepair, t2);
                         }
                         if (t.ToUpper().Contains(newValue.ToUpper())) {
-                            MakeNewRelations(columnToRepair, thisRowItem, new List<string>(), t.SplitAndCutByCRToList());
+                            MakeNewRelations(columnToRepair, thisRowItem, new List<string>(), t.SplitAndCutByCrToList());
                         }
                     }
                 }
@@ -931,8 +931,8 @@ namespace BlueDatabase {
                 Set(column, row, currentString);
                 return;
             }
-            var oldBz = new List<string>(previewsValue.SplitAndCutByCR()).SortedDistinctList();
-            var newBz = new List<string>(currentString.SplitAndCutByCR()).SortedDistinctList();
+            var oldBz = new List<string>(previewsValue.SplitAndCutByCr()).SortedDistinctList();
+            var newBz = new List<string>(currentString.SplitAndCutByCr()).SortedDistinctList();
             // Zuerst Beziehungen LÖSCHEN
             foreach (var t in oldBz) {
                 if (!newBz.Contains(t)) {

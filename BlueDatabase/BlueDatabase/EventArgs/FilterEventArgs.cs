@@ -21,7 +21,7 @@ namespace BlueDatabase.EventArgs {
 
         #region Constructors
 
-        public FilterEventArgs(FilterItem Filter) => this.Filter = Filter;
+        public FilterEventArgs(FilterItem filter) => Filter = filter;
 
         #endregion
 

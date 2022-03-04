@@ -83,9 +83,9 @@ namespace BlueScript {
         /// </summary>
         /// <param name="vars"></param>
         /// <param name="name"></param>
-        public static List<string?>? GetList(this List<Variable> vars, string name) {
+        public static List<string> GetList(this List<Variable> vars, string name) {
             var v = vars.Get(name);
-            return v == null ? new List<string?>() : v.ValueListString;
+            return v == null ? new List<string>() : v.ValueListString;
         }
 
         /// <summary>
@@ -205,7 +205,7 @@ namespace BlueScript {
         /// <summary>
         /// Listen werden immer mit einem \r am Ende gespeichert, ausser die Länge ist 0
         /// </summary>
-        private string _ValueString = string.Empty;
+        private string _valueString = string.Empty;
 
         #endregion
 
@@ -271,7 +271,7 @@ namespace BlueScript {
                 if (string.IsNullOrEmpty(t)) {
                     ValueListString = new List<string>(); // Leere Liste
                 } else {
-                    var l = Method.SplitAttributeToVars(t, s, new List<enVariableDataType>() { enVariableDataType.String }, true);
+                    var l = Method.SplitAttributeToVars(t, s, new List<enVariableDataType> { enVariableDataType.String }, true);
                     if (!string.IsNullOrEmpty(l.ErrorMessage)) { SetError(l.ErrorMessage); return; }
                     ValueListString = l.Attributes.AllValues();
                 }
@@ -351,28 +351,28 @@ namespace BlueScript {
         public enVariableDataType Type { get; set; }
 
         public bool ValueBool {
-            get => _ValueString == "true";
+            get => _valueString == "true";
             set => ValueString = value ? "true" : "false";
         }
 
         public double ValueDouble {
-            get => DoubleParse(_ValueString);
+            get => DoubleParse(_valueString);
             set => ValueString = value.ToString();
         }
 
-        public int ValueInt => IntParse(_ValueString);
+        public int ValueInt => IntParse(_valueString);
 
         /// <summary>
         /// Es wird der String in eine Liste umgewandelt (bzw. andersrum). Leere Einträge auch am Ende bleiben erhalten.
         /// </summary>
         public List<string> ValueListString {
             get {
-                if (string.IsNullOrEmpty(_ValueString)) { return new List<string?>(); }
-                if (!_ValueString.EndsWith("\r")) {
-                    Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Fehler, "Objekttypfehler: " + _ValueString);
+                if (string.IsNullOrEmpty(_valueString)) { return new List<string>(); }
+                if (!_valueString.EndsWith("\r")) {
+                    Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Fehler, "Objekttypfehler: " + _valueString);
                 }
-                var x = _ValueString.Substring(0, _ValueString.Length - 1);
-                return string.IsNullOrEmpty(x) ? new List<string?>() { string.Empty } : x.SplitByCRToList();
+                var x = _valueString.Substring(0, _valueString.Length - 1);
+                return string.IsNullOrEmpty(x) ? new List<string> { string.Empty } : x.SplitByCrToList();
             }
             set => ValueString = value == null || value.Count == 0 ? string.Empty : value.JoinWithCr() + "\r";
         }
@@ -382,10 +382,10 @@ namespace BlueScript {
         /// Ohne Anführungsstrichchen. Falls es in Wahrheit eine Liste ist, ist der Text 'gejoined' mit \r
         /// </summary>
         public string ValueString {
-            get => _ValueString;
+            get => _valueString;
             set {
                 if (Readonly) { return; }
-                _ValueString = value.RestoreCriticalVariableChars(); // Variablen enthalten immer den richtigen Wert (außer List, wegen dem Endzeichne) und es werden nur beim Ersetzen im Script die kritischen Zeichen entfernt
+                _valueString = value.RestoreCriticalVariableChars(); // Variablen enthalten immer den richtigen Wert (außer List, wegen dem Endzeichne) und es werden nur beim Ersetzen im Script die kritischen Zeichen entfernt
             }
         }
 
@@ -693,7 +693,7 @@ namespace BlueScript {
                     }
 
                     var x = value.Substring(0, value.Length - 1);
-                    return "{\"" + x.RemoveCriticalVariableChars().SplitByCRToList().JoinWith("\", \"") + "\"}";
+                    return "{\"" + x.RemoveCriticalVariableChars().SplitByCrToList().JoinWith("\", \"") + "\"}";
 
                 case enVariableDataType.NotDefinedYet: // Wenn ne Routine die Werte einfach ersetzt.
                     return value;
@@ -715,7 +715,7 @@ namespace BlueScript {
 
         public string ObjectData() {
             if (Type != enVariableDataType.Object) { return string.Empty; }
-            var x = _ValueString.SplitAndCutBy("&");
+            var x = _valueString.SplitAndCutBy("&");
             return x == null || x.GetUpperBound(0) != 1
                     ? string.Empty
                     : x[1].FromNonCritical();
@@ -724,7 +724,7 @@ namespace BlueScript {
         public bool ObjectType(string toCheck) {
             if (Type != enVariableDataType.Object) { return false; }
 
-            var x = _ValueString.SplitAndCutBy("&");
+            var x = _valueString.SplitAndCutBy("&");
             return x != null && x.GetUpperBound(0) == 1 && x[0] == toCheck.ToUpper().ReduceToChars(Constants.Char_AZ + Constants.Char_Numerals);
         }
 

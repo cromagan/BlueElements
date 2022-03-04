@@ -244,8 +244,8 @@ namespace BlueControls.Controls {
             }
         }
 
-        public List<BasicPadItem?> HotItems(System.Windows.Forms.MouseEventArgs e) {
-            if (e == null) { return new List<BasicPadItem?>(); }
+        public List<BasicPadItem> HotItems(System.Windows.Forms.MouseEventArgs e) {
+            if (e == null) { return new List<BasicPadItem>(); }
             Point p = new((int)((e.X + ShiftX) / Zoom), (int)((e.Y + ShiftY) / Zoom));
             return _item.Where(thisItem => thisItem != null && thisItem.Contains(p, Zoom)).ToList();
         }

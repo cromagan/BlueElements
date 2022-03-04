@@ -22,12 +22,12 @@ namespace BlueControls.Controls
             {
                 base.Dispose(disposing);
                 //   Dictionary.Release()
-                _Cursor_CharPos = 0;
-                _MarkStart = 0;
-                _MarkEnd = 0;
-                _MouseValue = 0;
-                _Cursor_Visible = false;
-                _Suffix = null;
+                _cursorCharPos = 0;
+                _markStart = 0;
+                _markEnd = 0;
+                _mouseValue = 0;
+                _cursorVisible = false;
+                _suffix = null;
                 _eTxt.Changed -= _eTxt_Changed;
                 _eTxt.Dispose();
             }

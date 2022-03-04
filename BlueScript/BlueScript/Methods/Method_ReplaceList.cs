@@ -17,6 +17,7 @@
 
 using BlueBasics;
 using Skript.Enums;
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
@@ -50,7 +51,7 @@ namespace BlueScript {
             var tmpList = attvar.Attributes[0].ValueListString;
 
             if (attvar.Attributes[3].ValueString == attvar.Attributes[4].ValueString) { return new strDoItFeedback("Suchtext und Ersetzungstext sind identisch."); }
-            if (!attvar.Attributes[1].ValueBool && attvar.Attributes[3].ValueString.ToUpper() == attvar.Attributes[4].ValueString.ToUpper()) { return new strDoItFeedback("Suchtext und Ersetzungstext sind identisch."); }
+            if (!attvar.Attributes[1].ValueBool && string.Equals(attvar.Attributes[3].ValueString, attvar.Attributes[4].ValueString, StringComparison.CurrentCultureIgnoreCase)) { return new strDoItFeedback("Suchtext und Ersetzungstext sind identisch."); }
 
             var ct = 0;
             bool again;
@@ -81,7 +82,7 @@ namespace BlueScript {
                             }
                         } else {
                             // Not Case Sesitive
-                            if (tmpList[z].ToUpper() == attvar.Attributes[3].ValueString.ToUpper()) {
+                            if (string.Equals(tmpList[z], attvar.Attributes[3].ValueString, StringComparison.CurrentCultureIgnoreCase)) {
                                 tmpList[z] = attvar.Attributes[4].ValueString;
                                 again = true;
                             }

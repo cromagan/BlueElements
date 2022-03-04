@@ -46,7 +46,6 @@ namespace BlueDatabase {
         public SizeF TmpCaptionTextSize = new(-1, -1);
         public int? TmpColumnContentWidth;
         public int? TmpIfFilterRemoved = null;
-        internal Database TmpLinkedDatabase;
         internal List<string> UcaseNamesSortedByLenght;
         private enAdditionalCheck _additionalCheck;
         private string _adminInfo;
@@ -117,6 +116,7 @@ namespace BlueDatabase {
         private bool _spellCheckingEnabled;
         private string _suffix;
         private bool _textBearbeitungErlaubt;
+        private Database _tmpLinkedDatabase;
         private enTranslationType _translate;
         private string _ueberschrift1;
         private string _ueberschrift2;
@@ -819,15 +819,15 @@ namespace BlueDatabase {
 
         private Database Tmp_LinkedDatabase {
             set {
-                if (value == TmpLinkedDatabase) { return; }
+                if (value == _tmpLinkedDatabase) { return; }
                 Invalidate_TmpVariables();
-                TmpLinkedDatabase = value;
-                if (TmpLinkedDatabase != null) {
+                _tmpLinkedDatabase = value;
+                if (_tmpLinkedDatabase != null) {
                     //_TMP_LinkedDatabase.RowKeyChanged += _TMP_LinkedDatabase_RowKeyChanged;
                     //_TMP_LinkedDatabase.ColumnKeyChanged += _TMP_LinkedDatabase_ColumnKeyChanged;
-                    TmpLinkedDatabase.ConnectedControlsStopAllWorking += _TMP_LinkedDatabase_ConnectedControlsStopAllWorking;
-                    TmpLinkedDatabase.Cell.CellValueChanged += _TMP_LinkedDatabase_Cell_CellValueChanged;
-                    TmpLinkedDatabase.Disposing += _TMP_LinkedDatabase_Disposing;
+                    _tmpLinkedDatabase.ConnectedControlsStopAllWorking += _TMP_LinkedDatabase_ConnectedControlsStopAllWorking;
+                    _tmpLinkedDatabase.Cell.CellValueChanged += _TMP_LinkedDatabase_Cell_CellValueChanged;
+                    _tmpLinkedDatabase.Disposing += _TMP_LinkedDatabase_Disposing;
                 }
             }
         }
@@ -875,14 +875,14 @@ namespace BlueDatabase {
 
         public string AutoCorrect(string value) {
             if (Format == enDataFormat.Link_To_Filesystem) {
-                List<string> l = new(value.SplitAndCutByCR());
+                List<string> l = new(value.SplitAndCutByCr());
                 var l2 = l.Select(thisFile => SimplyFile(thisFile)).ToList();
                 value = l2.SortedDistinctList().JoinWithCr();
             }
             if (_afterEditDoUCase) { value = value.ToUpper(); }
             if (!string.IsNullOrEmpty(_autoRemove)) { value = value.RemoveChars(_autoRemove); }
             if (AfterEditAutoReplace.Count > 0) {
-                List<string> l = new(value.SplitAndCutByCR());
+                List<string> l = new(value.SplitAndCutByCr());
                 foreach (var thisar in AfterEditAutoReplace) {
                     var rep = thisar.SplitAndCutBy("|");
                     for (var z = 0; z < l.Count; z++) {
@@ -896,7 +896,7 @@ namespace BlueDatabase {
                             l[z] = l[z].Replace(rep[0], r, RegexOptions.IgnoreCase);
                             //if (l[z].ToLower() == rep[0].ToLower()) { l[z] = r; }
                         } else {
-                            if (l[z].ToLower() == rep[0].ToLower()) { l[z] = r; }
+                            if (string.Equals(l[z], rep[0], StringComparison.CurrentCultureIgnoreCase)) { l[z] = r; }
                         }
                     }
                 }
@@ -908,7 +908,7 @@ namespace BlueDatabase {
                 value = erg.ToString();
             }
             if (_afterEditQuickSortRemoveDouble) {
-                var l = new List<string>(value.SplitAndCutByCR()).SortedDistinctList();
+                var l = new List<string>(value.SplitAndCutByCr()).SortedDistinctList();
                 value = l.JoinWithCr();
             }
             return value;
@@ -1116,7 +1116,7 @@ namespace BlueDatabase {
 
             //if (!Constants.Char_AZ.Contains(Name.Substring(0, 1).ToUpper())) { return "Der Spaltenname muss mit einem Buchstaben beginnen."; }
 
-            if (Database.Column.Any(thisColumn => thisColumn != this && thisColumn != null && _name.ToUpper() == thisColumn.Name.ToUpper())) {
+            if (Database.Column.Any(thisColumn => thisColumn != this && thisColumn != null && string.Equals(_name, thisColumn.Name, StringComparison.CurrentCultureIgnoreCase))) {
                 return "Spalten-Name bereits vorhanden.";
             }
 
@@ -1358,16 +1358,16 @@ namespace BlueDatabase {
 
         public bool IsOk() => string.IsNullOrEmpty(ErrorReason());
 
-        public Database LinkedDatabase() {
-            if (TmpLinkedDatabase != null) { return TmpLinkedDatabase; }
+        public Database? LinkedDatabase() {
+            if (_tmpLinkedDatabase != null) { return _tmpLinkedDatabase; }
             if (string.IsNullOrEmpty(_linkedDatabaseFile)) { return null; }
 
             Tmp_LinkedDatabase = _linkedDatabaseFile.Contains(@"\")
                 ? Database.GetByFilename(_linkedDatabaseFile, true, false)
                 : Database.GetByFilename(Database.Filename.FilePath() + _linkedDatabaseFile, true, false);
 
-            if (TmpLinkedDatabase != null) { TmpLinkedDatabase.UserGroup = Database.UserGroup; }
-            return TmpLinkedDatabase;
+            if (_tmpLinkedDatabase != null) { _tmpLinkedDatabase.UserGroup = Database.UserGroup; }
+            return _tmpLinkedDatabase;
         }
 
         public ColumnItem? Next() {
@@ -1419,7 +1419,7 @@ namespace BlueDatabase {
 
         public string ReadableText() {
             var ret = _caption;
-            if (Database.Column.Any(thisColumnItem => thisColumnItem != null && thisColumnItem != this && thisColumnItem.Caption.ToUpper() == _caption.ToUpper())) {
+            if (Database.Column.Any(thisColumnItem => thisColumnItem != null && thisColumnItem != this && string.Equals(thisColumnItem.Caption, _caption, StringComparison.CurrentCultureIgnoreCase))) {
                 var done = false;
                 if (!string.IsNullOrEmpty(_ueberschrift3)) {
                     ret = _ueberschrift3 + "/" + ret;
@@ -1909,12 +1909,12 @@ namespace BlueDatabase {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Nur bei Link_To_Filesystem erlaubt!");
             }
             var tmpfile = fullFileName.FileNameWithoutSuffix();
-            if (tmpfile.ToLower() == fullFileName.ToLower()) { return tmpfile; }
+            if (string.Equals(tmpfile, fullFileName, StringComparison.CurrentCultureIgnoreCase)) { return tmpfile; }
             if (BestFile(tmpfile, false).ToLower() == fullFileName.ToLower()) { return tmpfile; }
             tmpfile = fullFileName.FileNameWithSuffix();
-            return tmpfile.ToLower() == fullFileName.ToLower()
+            return string.Equals(tmpfile, fullFileName, StringComparison.CurrentCultureIgnoreCase)
                 ? tmpfile
-                : BestFile(tmpfile, false).ToLower() == fullFileName.ToLower() ? tmpfile : fullFileName;
+                : string.Equals(BestFile(tmpfile, false), fullFileName, StringComparison.CurrentCultureIgnoreCase) ? tmpfile : fullFileName;
         }
 
         public void Statisik(List<FilterItem>? filter, List<RowItem?> pinnedRows) {
@@ -1925,18 +1925,18 @@ namespace BlueDatabase {
             var d = new Dictionary<string, int>();
 
             foreach (var thisRow in r) {
-                var KeyValue = thisRow.CellGetString(this);
-                if (string.IsNullOrEmpty(KeyValue)) { KeyValue = "[empty]"; }
+                var keyValue = thisRow.CellGetString(this);
+                if (string.IsNullOrEmpty(keyValue)) { keyValue = "[empty]"; }
 
-                KeyValue = KeyValue.Replace("\r", ";");
+                keyValue = keyValue.Replace("\r", ";");
 
-                var Count = 0;
-                if (d.ContainsKey(KeyValue)) {
-                    d.TryGetValue(KeyValue, out Count);
-                    d.Remove(KeyValue);
+                var count = 0;
+                if (d.ContainsKey(keyValue)) {
+                    d.TryGetValue(keyValue, out count);
+                    d.Remove(keyValue);
                 }
-                Count++;
-                d.Add(KeyValue, Count);
+                count++;
+                d.Add(keyValue, count);
             }
 
             var l = new List<string> {
@@ -2152,13 +2152,13 @@ namespace BlueDatabase {
         internal void Invalidate_TmpVariables() {
             TmpCaptionTextSize = new SizeF(-1, -1);
             TmpCaptionBitmap = null;
-            if (TmpLinkedDatabase != null) {
+            if (_tmpLinkedDatabase != null) {
                 //_TMP_LinkedDatabase.RowKeyChanged -= _TMP_LinkedDatabase_RowKeyChanged;
                 //_TMP_LinkedDatabase.ColumnKeyChanged -= _TMP_LinkedDatabase_ColumnKeyChanged;
-                TmpLinkedDatabase.ConnectedControlsStopAllWorking -= _TMP_LinkedDatabase_ConnectedControlsStopAllWorking;
-                TmpLinkedDatabase.Cell.CellValueChanged -= _TMP_LinkedDatabase_Cell_CellValueChanged;
-                TmpLinkedDatabase.Disposing -= _TMP_LinkedDatabase_Disposing;
-                TmpLinkedDatabase = null;
+                _tmpLinkedDatabase.ConnectedControlsStopAllWorking -= _TMP_LinkedDatabase_ConnectedControlsStopAllWorking;
+                _tmpLinkedDatabase.Cell.CellValueChanged -= _TMP_LinkedDatabase_Cell_CellValueChanged;
+                _tmpLinkedDatabase.Disposing -= _TMP_LinkedDatabase_Disposing;
+                _tmpLinkedDatabase = null;
             }
             TmpColumnContentWidth = null;
         }
@@ -2654,7 +2654,7 @@ namespace BlueDatabase {
             const char h2 = (char)1002; // überschrift
             const char h1 = (char)1001; // überschrift
             const char h7 = (char)1007; // bold
-            if (FormatierungErlaubt) { txt = txt.HTMLSpecialToNormalChar(false); }
+            if (FormatierungErlaubt) { txt = txt.HtmlSpecialToNormalChar(false); }
             string oTxt;
             do {
                 oTxt = txt;

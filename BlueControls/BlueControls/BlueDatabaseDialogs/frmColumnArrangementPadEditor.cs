@@ -61,7 +61,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         #region Properties
 
-        public ColumnViewCollection CurrentArrangement => Database?.ColumnArrangements == null || Database.ColumnArrangements.Count <= Arrangement
+        public ColumnViewCollection? CurrentArrangement => Database?.ColumnArrangements == null || Database.ColumnArrangements.Count <= Arrangement
                     ? null
                     : Database.ColumnArrangements[Arrangement];
 

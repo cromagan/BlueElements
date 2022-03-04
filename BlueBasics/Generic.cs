@@ -117,9 +117,7 @@ namespace BlueBasics {
             StreamReader readStream = new(remoteStream);
             var img = Image.FromStream(remoteStream);
             response.Close();
-            if (remoteStream != null) {
-                remoteStream.Close();
-            }
+            remoteStream?.Close();
 
             readStream.Close();
             return img;
@@ -128,7 +126,7 @@ namespace BlueBasics {
         public static Stream GetEmmbedResource(Assembly assembly, string name) => (from thisString in assembly.GetManifestResourceNames() where thisString.EndsWith("." + name) select assembly.GetManifestResourceStream(thisString)).FirstOrDefault();
 
         public static string GetUrlFileDestination(string filename) {
-            var d = File.ReadAllText(filename, Encoding.UTF8).SplitAndCutByCRToList();
+            var d = File.ReadAllText(filename, Encoding.UTF8).SplitAndCutByCrToList();
             return d.TagGet("URL");
         }
 

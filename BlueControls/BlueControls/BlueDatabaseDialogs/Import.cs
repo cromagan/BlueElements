@@ -38,7 +38,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             InitializeComponent();
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             _originalImportText = importtext.Replace("\r\n", "\r").Trim("\r");
-            var Ein = _originalImportText.SplitAndCutByCRToList();
+            var Ein = _originalImportText.SplitAndCutByCrToList();
             Eintr.Text = Ein.Count + " zum Importieren bereit.";
             Database = database;
             if (Database == null) {

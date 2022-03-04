@@ -446,11 +446,7 @@ namespace BlueDatabase {
 
             if (filterItem == null || filterItem.Count < 1) { return l; }
 
-            foreach (var thisRow in filterItem[0].Database.Row) {
-                if (thisRow.MatchesTo(filterItem)) {
-                    l.Add(thisRow);
-                }
-            }
+            l.AddRange(filterItem[0].Database.Row.Where(thisRow => thisRow.MatchesTo(filterItem)));
             return l;
         }
 

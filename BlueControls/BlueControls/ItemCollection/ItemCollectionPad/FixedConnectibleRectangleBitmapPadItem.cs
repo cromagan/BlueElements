@@ -314,7 +314,7 @@ namespace BlueControls.ItemCollection {
         //    p_U.SetTo(p_LO.X + ((p_RO.X - p_LO.X) / 2), p_RU.Y);
         //    p_O.SetTo(p_LO.X + ((p_RO.X - p_LO.X) / 2), p_RO.Y);
         //}
-        protected abstract Bitmap? GeneratePic();
+        protected abstract Bitmap GeneratePic();
 
         protected override void ParseFinished() => SizeChanged();
 

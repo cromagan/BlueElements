@@ -297,8 +297,8 @@ namespace BlueBasics {
             Bitmap bmpKreuz = null;
             Bitmap bmpSecond = null;
 
-            if (!string.IsNullOrEmpty(ChangeGreenTo)) { colgreen = ChangeGreenTo.FromHTMLCode(); }
-            if (!string.IsNullOrEmpty(Färbung)) { colfärb = Färbung.FromHTMLCode(); }
+            if (!string.IsNullOrEmpty(ChangeGreenTo)) { colgreen = ChangeGreenTo.FromHtmlCode(); }
+            if (!string.IsNullOrEmpty(Färbung)) { colfärb = Färbung.FromHtmlCode(); }
 
             if (Effekt.HasFlag(enImageCodeEffect.Durchgestrichen)) {
                 var tmpEx = Effekt ^ enImageCodeEffect.Durchgestrichen;
@@ -330,12 +330,12 @@ namespace BlueBasics {
                         c = Color.FromArgb(0, 0, 0, 0);
                     } else {
                         if (colgreen != null && c.ToArgb() == -16711936) { c = (Color)colgreen; }
-                        if (colfärb != null) { c = ((Color)colfärb).GetHue().FromHSB(((Color)colfärb).GetSaturation(), c.GetBrightness(), c.A); }
-                        if (Sättigung != 100 || Helligkeit != 100) { c = c.GetHue().FromHSB(c.GetSaturation() * Sättigung / 100, c.GetBrightness() * Helligkeit / 100, c.A); }
+                        if (colfärb != null) { c = ((Color)colfärb).GetHue().FromHsb(((Color)colfärb).GetSaturation(), c.GetBrightness(), c.A); }
+                        if (Sättigung != 100 || Helligkeit != 100) { c = c.GetHue().FromHsb(c.GetSaturation() * Sättigung / 100, c.GetBrightness() * Helligkeit / 100, c.A); }
                         if (Effekt.HasFlag(enImageCodeEffect.WindowsXPDisabled)) {
                             var w = (int)(c.GetBrightness() * 100);
                             w = (int)(w / 2.8);
-                            c = Extensions.FromHSB(0, 0, (float)((w / 100.0) + 0.5), c.A);
+                            c = Extensions.FromHsb(0, 0, (float)((w / 100.0) + 0.5), c.A);
                         }
                         if (Effekt.HasFlag(enImageCodeEffect.Graustufen)) { c = c.ToGrey(); }
                     }
