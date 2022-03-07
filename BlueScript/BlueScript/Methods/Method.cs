@@ -193,8 +193,8 @@ namespace BlueScript {
                     if (s != null) { v = s.Variablen.Get(varn); }
                     if (v == null) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1)); }
                 } else {
-                    //v = new Variable("dummy3", attributes[n], s);
-                    return new strSplittedAttributesFeedback(enSkriptFehlerTyp.BerechnungFehlgeschlagen, "Berechnungsfehler bei Attribut " + (n + 1));
+                    v = new Variable("dummy3", attributes[n], s);
+                    if (v == null) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.BerechnungFehlgeschlagen, "Berechnungsfehler bei Attribut " + (n + 1).ToString()); }
                 }
 
                 // Den Typ der Variable checken
