@@ -284,8 +284,8 @@ namespace BlueBasics {
                 return null;
             }
             var b = unicodeTXT.Unicode_ToByte();
-            var BMP = ByteToBitmap(b);
-            return BMP;
+            var Bmp = ByteToBitmap(b);
+            return Bmp;
         }
 
         public static Bitmap? StringWIN1252ToBitmap(string tXT) {
@@ -293,8 +293,8 @@ namespace BlueBasics {
                 return null;
             }
             var b = tXT.WIN1252_toByte();
-            var BMP = ByteToBitmap(b);
-            return BMP;
+            var Bmp = ByteToBitmap(b);
+            return Bmp;
         }
 
         private static Bitmap Bitmap_ChangePixelFormat(Bitmap? oldBmp) {

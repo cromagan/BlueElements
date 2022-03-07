@@ -1719,7 +1719,7 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.DatenbankAdmin:
-                    DatenbankAdmin.SplitAndCutByCR_QuickSortAndRemoveDouble(value);
+                    DatenbankAdmin.SplitAndCutByCr_QuickSortAndRemoveDouble(value);
                     break;
 
                 case enDatabaseDataType.SortDefinition:
@@ -1751,14 +1751,14 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.Tags:
-                    Tags.SplitAndCutByCR(value);
+                    Tags.SplitAndCutByCr(value);
                     break;
 
                 //case enDatabaseDataType.BinaryDataInOne:
                 //    break;
 
                 case enDatabaseDataType.Layouts:
-                    Layouts.SplitAndCutByCR_QuickSortAndRemoveDouble(value);
+                    Layouts.SplitAndCutByCr_QuickSortAndRemoveDouble(value);
                     break;
 
                 case enDatabaseDataType.AutoExport:
@@ -1771,7 +1771,7 @@ namespace BlueDatabase {
 
                 //case enDatabaseDataType.Rules_ALT:
                 //    //var Rules = new List<RuleItem_Old>();
-                //    //var RU = content.SplitAndCutByCR();
+                //    //var RU = content.SplitAndCutByCr();
                 //    //for (var z = 0; z <= RU.GetUpperBound(0); z++) {
                 //    //    Rules.Add(new RuleItem_Old(this, RU[z]));
                 //    //}
@@ -1795,7 +1795,7 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.PermissionGroups_NewRow:
-                    PermissionGroupsNewRow.SplitAndCutByCR_QuickSortAndRemoveDouble(value);
+                    PermissionGroupsNewRow.SplitAndCutByCr_QuickSortAndRemoveDouble(value);
                     break;
 
                 //case enDatabaseDataType.LastRowKey:
@@ -1944,11 +1944,11 @@ namespace BlueDatabase {
         }
 
         private void QuickImage_NeedImage(object sender, NeedImageEventArgs e) {
-            if (e.BMP != null) { return; }
+            if (e.Bmp != null) { return; }
             try {
                 if (string.IsNullOrWhiteSpace(AdditionaFilesPfadWhole())) { return; }
                 if (FileExists(AdditionaFilesPfadWhole() + e.Name + ".png")) {
-                    e.BMP = new BitmapExt(AdditionaFilesPfadWhole() + e.Name + ".png");
+                    e.Bmp = new BitmapExt(AdditionaFilesPfadWhole() + e.Name + ".png");
                 }
             } catch { }
         }

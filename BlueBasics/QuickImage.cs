@@ -387,7 +387,7 @@ namespace BlueBasics {
 
             // Evtl. hat die "OnNeedImage" das Bild auch in den Stack hochgeladen
             // Falls nicht, hier noch erledigen
-            return Exists(tmpname) && Get(tmpname) != this ? Get(tmpname) : (Bitmap)e.BMP;
+            return Exists(tmpname) && Get(tmpname) != this ? Get(tmpname) : (Bitmap)e.Bmp;
         }
 
         #endregion

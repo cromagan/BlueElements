@@ -154,7 +154,7 @@ namespace BlueControls.ItemCollection {
 
                     case "dpi":
                         if (int.Parse(pair.Value) != Dpi) {
-                            Develop.DebugPrint("DPI Unterschied: " + Dpi + " <> " + pair.Value);
+                            Develop.DebugPrint("Dpi Unterschied: " + Dpi + " <> " + pair.Value);
                         }
                         break;
 
@@ -412,7 +412,7 @@ namespace BlueControls.ItemCollection {
                     i.Save(filename, ImageFormat.Png);
                     break;
 
-                case "BMP":
+                case "Bmp":
                     i.Save(filename, ImageFormat.Bmp);
                     break;
 
@@ -476,7 +476,7 @@ namespace BlueControls.ItemCollection {
                 t = t + "SheetSize=" + SheetSizeInMm + ", ";
                 t = t + "PrintArea=" + RandinMm + ", ";
             }
-            //t = t + "DPI=" + DPI + ", "; // TODO: Nach Update wieder aktivieren
+            //t = t + "Dpi=" + Dpi + ", "; // TODO: Nach Update wieder aktivieren
             t += "Items={";
             foreach (var thisitem in this) {
                 if (thisitem != null) {
@@ -741,7 +741,7 @@ namespace BlueControls.ItemCollection {
 
                     case "dpi": // TODO: LÖschen 26.02.2020
                         if (int.Parse(pair.Value) != Dpi) {
-                            Develop.DebugPrint("DPI Unterschied: " + Dpi + " <> " + pair.Value);
+                            Develop.DebugPrint("Dpi Unterschied: " + Dpi + " <> " + pair.Value);
                         }
                         break;
 

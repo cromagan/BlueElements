@@ -102,7 +102,7 @@ namespace BluePaint {
                 }
                 Split.Panel1.Controls.Add(NewTool);
                 NewTool.Dock = System.Windows.Forms.DockStyle.Fill;
-                //CurrentTool.SetPics(P.BMP, P.OverlayBMP);
+                //CurrentTool.SetPics(P.Bmp, P.OverlayBmp);
                 CurrentTool.ZoomFit += CurrentTool_ZoomFit;
                 CurrentTool.HideMainWindow += CurrentTool_HideMainWindow;
                 CurrentTool.ShowMainWindow += CurrentTool_ShowMainWindow;
@@ -175,7 +175,7 @@ namespace BluePaint {
                 return;
             }
             System.Windows.Forms.Clipboard.SetImage(P.Bmp);
-            //System.Windows.Forms.Clipboard.SetDataObject(P.BMP, false);
+            //System.Windows.Forms.Clipboard.SetDataObject(P.Bmp, false);
             Notification.Show("Das Bild ist nun<br>in der Zwischenablage.", enImageCode.Clipboard);
         }
 
@@ -273,12 +273,12 @@ namespace BluePaint {
         private void CurrentTool_OverridePic(object sender, BitmapEventArgs e) {
             CurrentTool_ForceUndoSaving(this, System.EventArgs.Empty);
             P.Bmp = e.Bmp;
-            //if (P.BMP != null)
+            //if (P.Bmp != null)
             //{
-            //    P.OverlayBMP = new Bitmap(P.BMP.Width, P.BMP.Height);
+            //    P.OverlayBmp = new Bitmap(P.Bmp.Width, P.Bmp.Height);
             //}
             P.Invalidate();
-            //if (CurrentTool != null) { CurrentTool.SetPics(P.BMP, P.OverlayBMP); }
+            //if (CurrentTool != null) { CurrentTool.SetPics(P.Bmp, P.OverlayBmp); }
         }
 
         private void CurrentTool_ShowMainWindow(object sender, System.EventArgs e) => Show();
@@ -381,7 +381,7 @@ namespace BluePaint {
                         _isSaved = true;
                         break;
 
-                    case "BMP":
+                    case "Bmp":
                         P.Bmp.Save(_filename, System.Drawing.Imaging.ImageFormat.Bmp);
                         _isSaved = true;
                         break;

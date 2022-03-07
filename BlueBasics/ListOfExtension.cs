@@ -215,7 +215,7 @@ namespace BlueBasics {
             }
         }
 
-        public static void SplitAndCutByCR(this List<string?> list, string textToSplit) {
+        public static void SplitAndCutByCr(this List<string?> list, string textToSplit) {
             List<string?> l = new();
             l.AddRange(textToSplit.SplitAndCutByCr());
             if (!list.IsDifferentTo(l)) { return; }
@@ -223,7 +223,7 @@ namespace BlueBasics {
             list.AddRange(l);
         }
 
-        public static void SplitAndCutByCR_QuickSortAndRemoveDouble(this List<string> list, string textToSplit) {
+        public static void SplitAndCutByCr_QuickSortAndRemoveDouble(this List<string> list, string textToSplit) {
             List<string?> l = new();
             l.AddRange(textToSplit.SplitAndCutByCr());
             l = l.SortedDistinctList();

@@ -51,7 +51,7 @@ namespace BlueControls.Forms
             this.padPrint = new BlueControls.Controls.CreativePad();
             this.tabBildSchachteln = new System.Windows.Forms.TabPage();
             this.btnEinstellung = new BlueControls.Controls.Button();
-            this.capDPI = new BlueControls.Controls.Caption();
+            this.capDpi = new BlueControls.Controls.Caption();
             this.flxAbstand = new BlueControls.Controls.FlexiControl();
             this.flxHöhe = new BlueControls.Controls.FlexiControl();
             this.flxBreite = new BlueControls.Controls.FlexiControl();
@@ -338,7 +338,7 @@ namespace BlueControls.Forms
             // 
             this.tabBildSchachteln.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabBildSchachteln.Controls.Add(this.btnEinstellung);
-            this.tabBildSchachteln.Controls.Add(this.capDPI);
+            this.tabBildSchachteln.Controls.Add(this.capDpi);
             this.tabBildSchachteln.Controls.Add(this.flxAbstand);
             this.tabBildSchachteln.Controls.Add(this.flxHöhe);
             this.tabBildSchachteln.Controls.Add(this.flxBreite);
@@ -359,13 +359,13 @@ namespace BlueControls.Forms
             this.btnEinstellung.Text = "Einstellung laden";
             this.btnEinstellung.Click += new System.EventHandler(this.btnEinstellung_Click);
             // 
-            // capDPI
+            // capDpi
             // 
-            this.capDPI.CausesValidation = false;
-            this.capDPI.Location = new System.Drawing.Point(440, 8);
-            this.capDPI.Name = "capDPI";
-            this.capDPI.Size = new System.Drawing.Size(112, 24);
-            this.capDPI.Text = "DPI: 300";
+            this.capDpi.CausesValidation = false;
+            this.capDpi.Location = new System.Drawing.Point(440, 8);
+            this.capDpi.Name = "capDpi";
+            this.capDpi.Size = new System.Drawing.Size(112, 24);
+            this.capDpi.Text = "Dpi: 300";
             // 
             // flxAbstand
             // 
@@ -523,7 +523,7 @@ namespace BlueControls.Forms
         private FlexiControl flxAbstand;
         private FlexiControl flxHöhe;
         private FlexiControl flxBreite;
-        private Caption capDPI;
+        private Caption capDpi;
         private Button btnEinstellung;
     }
 	}

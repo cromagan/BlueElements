@@ -25,7 +25,7 @@ namespace BlueControls {
         //public Point HookP1;
         //public Point HookP2;
         //public bool IsResized;
-        //public BitmapExt BMP;
+        //public BitmapExt Bmp;
 
         #region Fields
 

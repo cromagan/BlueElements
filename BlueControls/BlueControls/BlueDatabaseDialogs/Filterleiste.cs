@@ -323,11 +323,11 @@ namespace BlueControls.BlueDatabaseDialogs {
         }
 
         //private void btnAdmin_Click(object sender, System.EventArgs e) {
-        //    BlueBasics.MultiUserFile.clsMultiUserFile.SaveAll(false);
+        //    BlueBasics.MultiUserFile.ClsMultiUserFile.SaveAll(false);
         //    frmTableView x = new(_TableView.Database, false, true);
         //    x.ShowDialog();
         //    x.Dispose();
-        //    BlueBasics.MultiUserFile.clsMultiUserFile.SaveAll(false);
+        //    BlueBasics.MultiUserFile.ClsMultiUserFile.SaveAll(false);
         //}
 
         private void btnÄhnliche_Click(object sender, System.EventArgs e) {

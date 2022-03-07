@@ -97,7 +97,7 @@ namespace BlueControls.ItemCollection {
                 CheckFileExists = true,
                 Multiselect = false,
                 Title = "Bild wählen:",
-                Filter = "PNG Portable Network Graphics|*.png|JPG Jpeg Interchange|*.jpg|BMP Windows Bitmap|*.bmp"
+                Filter = "PNG Portable Network Graphics|*.png|JPG Jpeg Interchange|*.jpg|Bmp Windows Bitmap|*.bmp"
             };
             e.ShowDialog();
             if (!FileExists(e.FileName)) { return; }
@@ -325,7 +325,7 @@ namespace BlueControls.ItemCollection {
         //        e.CheckFileExists = true;
         //        e.Multiselect = false;
         //        e.Title = "Bild wählen:";
-        //        e.Filter = "PNG Portable Network Graphics|*.png|JPG Jpeg Interchange|*.jpg|BMP Windows Bitmap|*.bmp";
+        //        e.Filter = "PNG Portable Network Graphics|*.png|JPG Jpeg Interchange|*.jpg|Bmp Windows Bitmap|*.bmp";
         //        e.ShowDialog();
         //        if (!FileExists(e.FileName))
         //        {

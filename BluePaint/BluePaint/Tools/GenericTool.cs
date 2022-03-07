@@ -79,19 +79,19 @@ namespace BluePaint {
         ///
         /// </summary>
         /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
-        public new virtual void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap? OriginalPic) { }
+        public virtual new void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap? OriginalPic) { }
 
         /// <summary>
         ///
         /// </summary>
         /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
-        public new virtual void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap? OriginalPic) { }
+        public virtual new void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap? OriginalPic) { }
 
         /// <summary>
         ///
         /// </summary>
         /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
-        public new virtual void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap? OriginalPic) { }
+        public virtual new void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap? OriginalPic) { }
 
         /// <summary>
         ///
@@ -126,8 +126,8 @@ namespace BluePaint {
         /// Es wird automatisch OnForceUndoSaving in der MainForm ausgelöst.
         /// Wird benutzt, wenn ein neues Bild erstellt wurde und dieses in den Speicher soll.
         /// </summary>
-        /// <param name="BMP"></param>
-        protected virtual void OnOverridePic(Bitmap? BMP) => OverridePic?.Invoke(this, new BitmapEventArgs(BMP));
+        /// <param name="Bmp"></param>
+        protected virtual void OnOverridePic(Bitmap? Bmp) => OverridePic?.Invoke(this, new BitmapEventArgs(Bmp));
 
         protected virtual void OnShowMainWindow() => ShowMainWindow?.Invoke(this, System.EventArgs.Empty);
 

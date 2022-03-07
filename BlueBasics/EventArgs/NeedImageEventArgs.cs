@@ -23,14 +23,14 @@ namespace BlueBasics.EventArgs {
 
         public NeedImageEventArgs(string name) {
             Name = name;
-            BMP = null;
+            Bmp = null;
         }
 
         #endregion
 
         #region Properties
 
-        public BitmapExt? BMP { get; set; }
+        public BitmapExt? Bmp { get; set; }
         public string Name { get; }
 
         #endregion

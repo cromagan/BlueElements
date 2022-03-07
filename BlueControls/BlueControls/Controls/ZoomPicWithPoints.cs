@@ -261,11 +261,11 @@ namespace BlueControls.Controls {
             //{
             //    ThisPoint.Draw(e.G, e.Zoom, e.MoveX, e.MoveY, enDesign.Button_EckpunktSchieber, enStates.Standard);
             //}
-            //if (OverlayBMP == null || OverlayBMP.Width != BMP.Width || OverlayBMP.Height != BMP.Height)
+            //if (OverlayBmp == null || OverlayBmp.Width != Bmp.Width || OverlayBmp.Height != Bmp.Height)
             //{
-            //    OverlayBMP = new Bitmap(BMP.Width, BMP.Height);
+            //    OverlayBmp = new Bitmap(Bmp.Width, Bmp.Height);
             //}
-            //var TMPGR = Graphics.FromImage(BMP);
+            //var TMPGR = Graphics.FromImage(Bmp);
             //TMPGR.Clear(Color.Transparent);
             // Mittellinie
             var picturePos = base.MaxBounds();

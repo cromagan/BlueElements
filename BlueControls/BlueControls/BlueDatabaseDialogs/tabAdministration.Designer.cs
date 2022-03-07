@@ -216,7 +216,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpBearbeiten.TabStop = false;
             this.grpBearbeiten.Text = "Bearbeiten";
             // 
-            // tabAdministration
+            // TabAdministration
             // 
             this.Controls.Add(this.grpZeilen);
             this.Controls.Add(this.grpTabellenAnsicht);

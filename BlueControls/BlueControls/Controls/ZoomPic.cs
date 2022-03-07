@@ -63,7 +63,7 @@ namespace BlueControls.Controls {
 
         #region Properties
 
-        //public Bitmap OverlayBMP = null;
+        //public Bitmap OverlayBmp = null;
         [DefaultValue(false)]
         public bool AlwaysSmooth { get; set; } = false;
 
@@ -116,9 +116,9 @@ namespace BlueControls.Controls {
                 }
                 gr.PixelOffsetMode = PixelOffsetMode.Half;
                 gr.DrawImage(_bmp, r);
-                //if (OverlayBMP != null)
+                //if (OverlayBmp != null)
                 //{
-                //    TMPGR.DrawImage(OverlayBMP, r);
+                //    TMPGR.DrawImage(OverlayBmp, r);
                 //}
             }
             OnDoAdditionalDrawing(new AdditionalDrawing(gr, Zoom, ShiftX, ShiftY, _mouseDown, _mouseCurrent));
@@ -151,8 +151,8 @@ namespace BlueControls.Controls {
 
         //private bool IsInBitmap() {
         //    if (_bmp == null) { return false; }
-        //    if (MousePos_1_1 == null) { return false; }
-        //    return IsInBitmap(MousePos_1_1.X, MousePos_1_1.Y);
+        //    if (MousePos11 == null) { return false; }
+        //    return IsInBitmap(MousePos11.X, MousePos11.Y);
         //}
         /// <summary>
         /// Zuerst ImageMouseUp, dann MouseUp

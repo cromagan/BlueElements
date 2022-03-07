@@ -2235,19 +2235,19 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.co_DropDownItems:
-                    DropDownItems.SplitAndCutByCR_QuickSortAndRemoveDouble(wert);
+                    DropDownItems.SplitAndCutByCr_QuickSortAndRemoveDouble(wert);
                     break;
 
                 case enDatabaseDataType.co_LinkedCellFilter:
-                    LinkedCellFilter.SplitAndCutByCR(wert);
+                    LinkedCellFilter.SplitAndCutByCr(wert);
                     break;
 
                 case enDatabaseDataType.co_OpticalReplace:
-                    OpticalReplace.SplitAndCutByCR(wert);
+                    OpticalReplace.SplitAndCutByCr(wert);
                     break;
 
                 case enDatabaseDataType.co_AfterEdit_AutoReplace:
-                    AfterEditAutoReplace.SplitAndCutByCR(wert);
+                    AfterEditAutoReplace.SplitAndCutByCr(wert);
                     break;
 
                 case enDatabaseDataType.co_Regex:
@@ -2255,7 +2255,7 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.co_Tags:
-                    Tags.SplitAndCutByCR(wert);
+                    Tags.SplitAndCutByCr(wert);
                     break;
 
                 case enDatabaseDataType.co_AutoFilterJoker:
@@ -2263,7 +2263,7 @@ namespace BlueDatabase {
                     break;
 
                 case enDatabaseDataType.co_PermissionGroups_ChangeCell:
-                    PermissionGroupsChangeCell.SplitAndCutByCR_QuickSortAndRemoveDouble(wert);
+                    PermissionGroupsChangeCell.SplitAndCutByCr_QuickSortAndRemoveDouble(wert);
                     break;
 
                 case enDatabaseDataType.co_AllowedChars:

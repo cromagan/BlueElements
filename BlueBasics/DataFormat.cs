@@ -99,7 +99,7 @@ namespace BlueBasics {
         ///// <remarks></remarks>
         //public static bool IsFormat(this string txt, enDataFormat format, bool multiLine, string additionalRegex) {
         //    if (multiLine) {
-        //        var ex = txt.SplitAndCutByCR();
+        //        var ex = txt.SplitAndCutByCr();
         //        return ex.All(thisString => string.IsNullOrEmpty(thisString) || thisString.IsFormat(format, additionalRegex));
         //    }
         //    return txt.IsFormat(format, additionalRegex);

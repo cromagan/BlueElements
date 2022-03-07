@@ -59,8 +59,8 @@ namespace BluePaint {
             var wi = (int)(p.Width * pr);
             var he = (int)(p.Height * pr);
             if (pr is 1 or < 0.01 or > 1000 || wi < 1 || he < 1) { return; }
-            var _BMP2 = BitmapExt.Resize(p, wi, he, enSizeModes.Verzerren, System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic, true);
-            OnOverridePic(_BMP2);
+            var _Bmp2 = BitmapExt.Resize(p, wi, he, enSizeModes.Verzerren, System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic, true);
+            OnOverridePic(_Bmp2);
             OnZoomFit();
             OnCommandForMacro("ResizeProzent;" + flxProzent.Value);
             DoCapInfo();

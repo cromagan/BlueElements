@@ -259,7 +259,7 @@ namespace BlueBasics {
     "MSG" or "EML" => enFileFormat.EMail,
     "PDF" => enFileFormat.Pdf,
     "HTM" or "HTML" => enFileFormat.HTML,
-    "JPG" or "JPEG" or "BMP" or "TIFF" or "TIF" or "GIF" or "PNG" => enFileFormat.Image,
+    "JPG" or "JPEG" or "Bmp" or "TIFF" or "TIF" or "GIF" or "PNG" => enFileFormat.Image,
     "ICO" => enFileFormat.Icon,
     "ZIP" or "RAR" or "7Z" => enFileFormat.CompressedArchive,
     "AVI" or "DIVX" or "MPG" or "MPEG" or "WMV" or "FLV" or "MP4" or "MKV" or "M4V" => enFileFormat.Movie,

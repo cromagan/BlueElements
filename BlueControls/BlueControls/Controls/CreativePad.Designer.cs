@@ -41,7 +41,7 @@ namespace BlueControls.Controls
             // 
             // PicsSave
             // 
-            this.PicsSave.Filter = "PNG Portable Network Graphics|*.png|JPG Jpeg Interchange|*.jpg|BMP Windows Bitmap" +
+            this.PicsSave.Filter = "PNG Portable Network Graphics|*.png|JPG Jpeg Interchange|*.jpg|Bmp Windows Bitmap" +
     "|*.bmp";
             this.PicsSave.Title = "Bitte neuen Dateinamen der Datei wählen.";
             this.PicsSave.FileOk += new System.ComponentModel.CancelEventHandler(this.PicsSave_FileOk);

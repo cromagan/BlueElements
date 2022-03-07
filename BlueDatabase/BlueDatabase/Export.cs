@@ -145,13 +145,13 @@ namespace BlueDatabase {
         //private static void DoSingleCode(string CodeNr, ref object value, RowItem row, ref ColumnItem column, ref int Wi, ref int He, ref string BT, string Code, ref bool Ended) {
         //    var TXT = string.Empty;
         //    var TextReturn = false;
-        //    Bitmap BMP = null;
+        //    Bitmap Bmp = null;
         //    if (value is string s) {
         //        TXT = s;
         //        TextReturn = true;
         //    }
         //    if (value is Bitmap s2) {
-        //        BMP = s2;
+        //        Bmp = s2;
         //        TextReturn = false;
         //    }
         //    switch (CodeNr.Substring(0, 3)) {
@@ -187,12 +187,12 @@ namespace BlueDatabase {
         //                    TXT = row.CellGetString(column);
         //                    switch (column.Format) {
         //                        case enDataFormat.Link_To_Filesystem:
-        //                            BMP = (Bitmap)BitmapExt.Image_FromFile(column.BestFile(row.CellGetString(column), false));
+        //                            Bmp = (Bitmap)BitmapExt.Image_FromFile(column.BestFile(row.CellGetString(column), false));
         //                            break;
         //                    }
         //                }
         //            }
-        //            if (BMP == null) { BMP = QuickImage.Get(enImageCode.Warnung, 32).BMP; }
+        //            if (Bmp == null) { Bmp = QuickImage.Get(enImageCode.Warnung, 32).Bmp; }
         //            break;
         //        case "003": // Spaltenname für Bedingugnen
         //            if (row != null) {
@@ -220,14 +220,14 @@ namespace BlueDatabase {
         //            TXT = TXT.Replace("\r", CodeNr.Substring(3));
         //            break;
         //        case "103": // Vortext
-        //            var ts = TXT.SplitAndCutByCR();
+        //            var ts = TXT.SplitAndCutByCr();
         //            for (var tz = 0; tz <= ts.GetUpperBound(0); tz++) {
         //                ts[tz] = CodeNr.Substring(3) + ts[tz];
         //            }
         //            TXT = string.Join("\r", ts);
         //            break;
         //        case "104": // Nachtext
-        //            var ts2 = TXT.SplitAndCutByCR();
+        //            var ts2 = TXT.SplitAndCutByCr();
         //            for (var tz = 0; tz <= ts2.GetUpperBound(0); tz++) {
         //                ts2[tz] = ts2[tz] + CodeNr.Substring(3);
         //            }
@@ -271,22 +271,22 @@ namespace BlueDatabase {
         //            TextReturn = false;
         //            Wi = Math.Max(4, Wi);
         //            He = Math.Max(4, He);
-        //            BMP = BitmapExt.Resize(BMP, Wi, He, enSizeModes.Breite_oder_Höhe_Anpassen_MitVergrößern, InterpolationMode.HighQualityBicubic, true);
+        //            Bmp = BitmapExt.Resize(Bmp, Wi, He, enSizeModes.Breite_oder_Höhe_Anpassen_MitVergrößern, InterpolationMode.HighQualityBicubic, true);
         //            break;
         //        case "211": // Exacte Größe, Weißer Rand
         //            TextReturn = false;
         //            Wi = Math.Max(4, Wi);
         //            He = Math.Max(4, He);
-        //            BMP = BitmapExt.Resize(BMP, Wi, He, enSizeModes.EmptySpace, InterpolationMode.HighQualityBicubic, true);
+        //            Bmp = BitmapExt.Resize(Bmp, Wi, He, enSizeModes.EmptySpace, InterpolationMode.HighQualityBicubic, true);
         //            break;
         //        case "212":// Exacte Größe, Auffüllen
         //            TextReturn = false;
         //            Wi = Math.Max(4, Wi);
         //            He = Math.Max(4, He);
-        //            BMP = BitmapExt.Resize(BMP, Wi, He, enSizeModes.BildAbschneiden, InterpolationMode.HighQualityBicubic, true);
+        //            Bmp = BitmapExt.Resize(Bmp, Wi, He, enSizeModes.BildAbschneiden, InterpolationMode.HighQualityBicubic, true);
         //            break;
         //        case "220":
-        //            TXT = modConverter.BitmapToBase64(BMP, ImageFormat.Jpeg);
+        //            TXT = modConverter.BitmapToBase64(Bmp, ImageFormat.Jpeg);
         //            TextReturn = true;
         //            break;
         //        case "302": // Bereinigung
@@ -305,7 +305,7 @@ namespace BlueDatabase {
         //            break;
         //        case "107":
         //            q
-        //            var ts3 = TXT.SplitAndCutByCR();
+        //            var ts3 = TXT.SplitAndCutByCr();
         //            for (var tz = 0; tz <= ts3.GetUpperBound(0); tz++) {
         //                ts3[tz] = CellItem.ValueReadable(column, ts3[tz], enShortenStyle.HTML, enBildTextVerhalten.Nur_Text, true);
         //            }
@@ -384,7 +384,7 @@ namespace BlueDatabase {
         //    if (TextReturn) {
         //        value = TXT;
         //    } else {
-        //        value = BMP;
+        //        value = Bmp;
         //    }
         //}
         //private static string CleanUpLayout(string t2) {
@@ -438,7 +438,7 @@ namespace BlueDatabase {
         //            T2 = T2.ToNonCritical();
         //        }
         //        tmpBody = tmpBody.Replace(T1, T2);
-        //        //  If Not tmpBody.Contains("{Type=BlueBasics.TextItem, InternalName=05.03.2015 12:31:071741881, DPI=300,") Then Stop
+        //        //  If Not tmpBody.Contains("{Type=BlueBasics.TextItem, InternalName=05.03.2015 12:31:071741881, Dpi=300,") Then Stop
         //    } while (true);
         //}
         //private static string GenerateLayoutString(string Code, RowItem vRow, string Art) {

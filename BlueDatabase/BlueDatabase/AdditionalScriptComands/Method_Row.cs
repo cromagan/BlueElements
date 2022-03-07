@@ -47,7 +47,7 @@ namespace BlueScript {
         #region Methods
 
         public static RowItem? ObjectToRow(Variable? attribute) {
-            if (!attribute.ObjectType("row")) { return null; }
+            if (attribute == null || !attribute.ObjectType("row")) { return null; }
 
             var d = attribute.ObjectData();
             if (d.ToUpper() == "NULL") { return null; }
