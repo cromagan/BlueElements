@@ -17,62 +17,65 @@
 
 using System.Linq;
 
-public struct strCanDoFeedback {
+namespace BlueScript.Structuren
+{
+    public struct strCanDoFeedback {
 
-    #region Fields
+        #region Fields
 
-    /// <summary>
-    /// Der Text zwischen dem StartString und dem EndString
-    /// </summary>
-    public string AttributText;
+        /// <summary>
+        /// Der Text zwischen dem StartString und dem EndString
+        /// </summary>
+        public string AttributText;
 
-    /// <summary>
-    /// Falls ein Codeblock { } direkt nach dem Befehl beginnt, dessen Inhalt
-    /// </summary>
-    public string CodeBlockAfterText;
+        /// <summary>
+        /// Falls ein Codeblock { } direkt nach dem Befehl beginnt, dessen Inhalt
+        /// </summary>
+        public string CodeBlockAfterText;
 
-    /// <summary>
-    /// Der Text, mit dem eingestiegen wird. Also der Befehl mit dem StartString.
-    /// </summary>
-    public string ComandText;
+        /// <summary>
+        /// Der Text, mit dem eingestiegen wird. Also der Befehl mit dem StartString.
+        /// </summary>
+        public string ComandText;
 
-    /// <summary>
-    /// Die Position, wo der Fehler stattgefunfden hat ODER die Position wo weiter geparsesd werden muss
-    /// </summary>
-    public int ContinueOrErrorPosition;
+        /// <summary>
+        /// Die Position, wo der Fehler stattgefunfden hat ODER die Position wo weiter geparsesd werden muss
+        /// </summary>
+        public int ContinueOrErrorPosition;
 
-    public string ErrorMessage;
+        public string ErrorMessage;
 
-    public int LineBreakInCodeBlock;
+        public int LineBreakInCodeBlock;
 
-    /// <summary>
-    /// TRUE, wenn der Befehl erkannt wurde, aber nicht ausgeführt werden kann.
-    /// </summary>
-    public bool MustAbort;
+        /// <summary>
+        /// TRUE, wenn der Befehl erkannt wurde, aber nicht ausgeführt werden kann.
+        /// </summary>
+        public bool MustAbort;
 
-    #endregion
+        #endregion
 
-    #region Constructors
+        #region Constructors
 
-    public strCanDoFeedback(int errorposition, string errormessage, bool mustabort) {
-        ContinueOrErrorPosition = errorposition;
-        ErrorMessage = errormessage;
-        MustAbort = mustabort;
-        ComandText = string.Empty;
-        AttributText = string.Empty;
-        CodeBlockAfterText = string.Empty;
-        LineBreakInCodeBlock = 0;
+        public strCanDoFeedback(int errorposition, string errormessage, bool mustabort) {
+            ContinueOrErrorPosition = errorposition;
+            ErrorMessage = errormessage;
+            MustAbort = mustabort;
+            ComandText = string.Empty;
+            AttributText = string.Empty;
+            CodeBlockAfterText = string.Empty;
+            LineBreakInCodeBlock = 0;
+        }
+
+        public strCanDoFeedback(int continuePosition, string comandText, string attributtext, string codeblockaftertext) {
+            ContinueOrErrorPosition = continuePosition;
+            ErrorMessage = string.Empty;
+            MustAbort = false;
+            ComandText = comandText;
+            AttributText = attributtext;
+            CodeBlockAfterText = codeblockaftertext;
+            LineBreakInCodeBlock = codeblockaftertext.Count(c => c == '¶');
+        }
+
+        #endregion
     }
-
-    public strCanDoFeedback(int continuePosition, string comandText, string attributtext, string codeblockaftertext) {
-        ContinueOrErrorPosition = continuePosition;
-        ErrorMessage = string.Empty;
-        MustAbort = false;
-        ComandText = comandText;
-        AttributText = attributtext;
-        CodeBlockAfterText = codeblockaftertext;
-        LineBreakInCodeBlock = codeblockaftertext.Count(c => c == '¶');
-    }
-
-    #endregion
 }

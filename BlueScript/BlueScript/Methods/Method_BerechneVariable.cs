@@ -18,6 +18,7 @@
 using BlueBasics;
 using Skript.Enums;
 using System.Collections.Generic;
+using BlueScript.Structuren;
 
 namespace BlueScript {
 

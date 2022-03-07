@@ -13,7 +13,7 @@
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
-	<LangVersion>latest</LangVersion>
+    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -27,7 +27,7 @@
     <CodeAnalysisRuleSet>
     </CodeAnalysisRuleSet>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	<LangVersion>latest</LangVersion>
+    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -39,7 +39,7 @@
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>
     </CodeAnalysisRuleSet>
-	<LangVersion>latest</LangVersion>
+    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
@@ -49,8 +49,9 @@
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet></CodeAnalysisRuleSet>
-	<LangVersion>latest</LangVersion>
+    <CodeAnalysisRuleSet>
+    </CodeAnalysisRuleSet>
+    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
@@ -60,8 +61,9 @@
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet></CodeAnalysisRuleSet>
-	<LangVersion>latest</LangVersion>
+    <CodeAnalysisRuleSet>
+    </CodeAnalysisRuleSet>
+    <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
@@ -197,89 +199,89 @@
     <Compile Include="Extended Text\ExtCharStoreXCode.cs" />
     <Compile Include="Extended Text\ExtCharImageCode.cs" />
     <Compile Include="Extended Text\ExtCharTopCode.cs" />
-    <Compile Include="Forms-Basics\DialogWithOkAndCancel.cs">
+    <Compile Include="Forms\DialogWithOkAndCancel.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms-Basics\DialogWithOkAndCancel.Designer.cs">
+    <Compile Include="Forms\DialogWithOkAndCancel.Designer.cs">
       <DependentUpon>DialogWithOkAndCancel.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms-Common\EditBoxRow.cs">
+    <Compile Include="Forms\EditBoxRow.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms-Common\EditBoxRow.Designer.cs">
+    <Compile Include="Forms\EditBoxRow.Designer.cs">
       <DependentUpon>EditBoxRow.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms-Common\frmTableView.cs">
+    <Compile Include="Forms\frmTableView.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms-Common\frmTableView.Designer.cs">
+    <Compile Include="Forms\frmTableView.Designer.cs">
       <DependentUpon>frmTableView.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms-Common\InputBoxListBoxStyle.cs">
+    <Compile Include="Forms\InputBoxListBoxStyle.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms-Common\InputBoxListBoxStyle.Designer.cs">
+    <Compile Include="Forms\InputBoxListBoxStyle.Designer.cs">
       <DependentUpon>InputBoxListBoxStyle.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms-Common\InputBoxComboStyle.cs">
+    <Compile Include="Forms\InputBoxComboStyle.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms-Common\InputBoxComboStyle.Designer.cs">
+    <Compile Include="Forms\InputBoxComboStyle.Designer.cs">
       <DependentUpon>InputBoxComboStyle.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms-Common\InputBox.cs">
+    <Compile Include="Forms\InputBox.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms-Common\InputBox.Designer.cs">
+    <Compile Include="Forms\InputBox.Designer.cs">
       <DependentUpon>InputBox.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms-Common\MessageBox.cs">
+    <Compile Include="Forms\MessageBox.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms-Common\MessageBox.Designer.cs">
+    <Compile Include="Forms\MessageBox.Designer.cs">
       <DependentUpon>MessageBox.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms-Common\Progressbar.cs">
+    <Compile Include="Forms\Progressbar.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms-Common\Progressbar.Designer.cs">
+    <Compile Include="Forms\Progressbar.Designer.cs">
       <DependentUpon>Progressbar.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms-Common\QuickInfo.cs">
+    <Compile Include="Forms\QuickInfo.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms-Common\QuickInfo.Designer.cs">
+    <Compile Include="Forms\QuickInfo.Designer.cs">
       <DependentUpon>QuickInfo.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms-Common\FloatingInputBoxListBoxStyle.cs">
+    <Compile Include="Forms\FloatingInputBoxListBoxStyle.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms-Common\FloatingInputBoxListBoxStyle.Designer.cs">
+    <Compile Include="Forms\FloatingInputBoxListBoxStyle.Designer.cs">
       <DependentUpon>FloatingInputBoxListBoxStyle.cs</DependentUpon>
     </Compile>
     <Compile Include="EventArgs\ContextMenuItemClickedEventArgs.cs" />
-    <Compile Include="Forms-Basics\FloatingForm.cs">
+    <Compile Include="Forms\FloatingForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms-Basics\FloatingForm.Designer.cs">
+    <Compile Include="Forms\FloatingForm.Designer.cs">
       <DependentUpon>FloatingForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms-Special\PadEditorReadOnly.cs">
+    <Compile Include="Forms\PadEditorReadOnly.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms-Special\PadEditorReadOnly.designer.cs">
+    <Compile Include="Forms\PadEditorReadOnly.designer.cs">
       <DependentUpon>PadEditorReadOnly.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms-Special\PadEditorWithFileAccess.cs">
+    <Compile Include="Forms\PadEditorWithFileAccess.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms-Special\PadEditorWithFileAccess.Designer.cs">
+    <Compile Include="Forms\PadEditorWithFileAccess.Designer.cs">
       <DependentUpon>PadEditorWithFileAccess.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms-Special\PictureView.cs">
+    <Compile Include="Forms\PictureView.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms-Special\PictureView.designer.cs">
+    <Compile Include="Forms\PictureView.designer.cs">
       <DependentUpon>PictureView.cs</DependentUpon>
     </Compile>
     <Compile Include="frmBefehlsreferenz.cs">
@@ -290,10 +292,10 @@
     </Compile>
     <Compile Include="Interfaces\IBackgroundNone.cs" />
     <Compile Include="Interfaces\IMoveable.cs" />
-    <Compile Include="Forms-Common\Notification.cs">
+    <Compile Include="Forms\Notification.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms-Common\Notification.Designer.cs">
+    <Compile Include="Forms\Notification.Designer.cs">
       <DependentUpon>Notification.cs</DependentUpon>
     </Compile>
     <Compile Include="ItemCollection\clsConnection.cs" />
@@ -351,7 +353,7 @@
     <Compile Include="Classes Editor\FilterItem_Editor.Designer.cs">
       <DependentUpon>FilterItem_Editor.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms-Common\FileDialogs.cs" />
+    <Compile Include="Forms\FileDialogs.cs" />
     <Compile Include="Enums\enBlueTableAppearance.cs" />
     <Compile Include="Enums\enButtonStyle.cs" />
     <Compile Include="Enums\enCheckBehavior.cs" />
@@ -450,46 +452,46 @@
     <Compile Include="Controls\FlexiControlForCell.Designer.cs">
       <DependentUpon>FlexiControlForCell.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms-Common\ExportDialog.cs">
+    <Compile Include="Forms\ExportDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms-Common\ExportDialog.Designer.cs">
+    <Compile Include="Forms\ExportDialog.Designer.cs">
       <DependentUpon>ExportDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms-Common\TODELETE_FontSelectDialog.cs">
+    <Compile Include="Forms\TODELETE_FontSelectDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms-Common\TODELETE_FontSelectDialog.Designer.cs">
+    <Compile Include="Forms\TODELETE_FontSelectDialog.Designer.cs">
       <DependentUpon>TODELETE_FontSelectDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms-Basics\Form.cs">
+    <Compile Include="Forms\Form.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms-Basics\Form.Designer.cs">
+    <Compile Include="Forms\Form.Designer.cs">
       <DependentUpon>Form.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms-Common\ItemSelect.cs">
+    <Compile Include="Forms\ItemSelect.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms-Common\ItemSelect.Designer.cs">
+    <Compile Include="Forms\ItemSelect.Designer.cs">
       <DependentUpon>ItemSelect.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms-Common\PageSetupDialog.cs">
+    <Compile Include="Forms\PageSetupDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms-Common\PageSetupDialog.Designer.cs">
+    <Compile Include="Forms\PageSetupDialog.Designer.cs">
       <DependentUpon>PageSetupDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms-Special\PadEditor.cs">
+    <Compile Include="Forms\PadEditor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms-Special\PadEditor.designer.cs">
+    <Compile Include="Forms\PadEditor.designer.cs">
       <DependentUpon>PadEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms-Special\RelationDiagram.cs">
+    <Compile Include="Forms\RelationDiagram.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms-Special\RelationDiagram.Designer.cs">
+    <Compile Include="Forms\RelationDiagram.Designer.cs">
       <DependentUpon>RelationDiagram.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\Formula.cs">
@@ -537,10 +539,10 @@
     <Compile Include="Controls\ListBox.Designer.cs">
       <DependentUpon>ListBox.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms-Common\Overlay.cs">
+    <Compile Include="Forms\Overlay.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms-Common\Overlay.Designer.cs">
+    <Compile Include="Forms\Overlay.Designer.cs">
       <DependentUpon>Overlay.cs</DependentUpon>
     </Compile>
     <Compile Include="PointM.cs" />
@@ -548,10 +550,10 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Forms-Common\ScreenShot.cs">
+    <Compile Include="Forms\ScreenShot.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms-Common\ScreenShot.designer.cs">
+    <Compile Include="Forms\ScreenShot.designer.cs">
       <DependentUpon>ScreenShot.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\Slider.cs">
@@ -694,85 +696,85 @@
       <DependentUpon>frmQuickPic.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Basics\DialogWithOkAndCancel.resx">
+    <EmbeddedResource Include="Forms\DialogWithOkAndCancel.resx">
       <DependentUpon>DialogWithOkAndCancel.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Common\EditBoxRow.resx">
+    <EmbeddedResource Include="Forms\EditBoxRow.resx">
       <DependentUpon>EditBoxRow.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Common\frmTableView.resx">
+    <EmbeddedResource Include="Forms\frmTableView.resx">
       <DependentUpon>frmTableView.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Common\InputBoxListBoxStyle.resx">
+    <EmbeddedResource Include="Forms\InputBoxListBoxStyle.resx">
       <DependentUpon>InputBoxListBoxStyle.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Common\InputBoxComboStyle.resx">
+    <EmbeddedResource Include="Forms\InputBoxComboStyle.resx">
       <DependentUpon>InputBoxComboStyle.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Common\Progressbar.resx">
+    <EmbeddedResource Include="Forms\Progressbar.resx">
       <DependentUpon>Progressbar.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Common\InputBox.resx">
+    <EmbeddedResource Include="Forms\InputBox.resx">
       <DependentUpon>InputBox.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Common\MessageBox.resx">
+    <EmbeddedResource Include="Forms\MessageBox.resx">
       <DependentUpon>MessageBox.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Common\QuickInfo.resx">
+    <EmbeddedResource Include="Forms\QuickInfo.resx">
       <DependentUpon>QuickInfo.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Common\FloatingInputBoxListBoxStyle.resx">
+    <EmbeddedResource Include="Forms\FloatingInputBoxListBoxStyle.resx">
       <DependentUpon>FloatingInputBoxListBoxStyle.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Common\ExportDialog.resx">
+    <EmbeddedResource Include="Forms\ExportDialog.resx">
       <DependentUpon>ExportDialog.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Basics\FloatingForm.resx">
+    <EmbeddedResource Include="Forms\FloatingForm.resx">
       <DependentUpon>FloatingForm.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Common\TODELETE_FontSelectDialog.resx">
+    <EmbeddedResource Include="Forms\TODELETE_FontSelectDialog.resx">
       <DependentUpon>TODELETE_FontSelectDialog.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Basics\Form.resx">
+    <EmbeddedResource Include="Forms\Form.resx">
       <DependentUpon>Form.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Common\ItemSelect.resx">
+    <EmbeddedResource Include="Forms\ItemSelect.resx">
       <DependentUpon>ItemSelect.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Common\PageSetupDialog.resx">
+    <EmbeddedResource Include="Forms\PageSetupDialog.resx">
       <DependentUpon>PageSetupDialog.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Special\PadEditorReadOnly.resx">
+    <EmbeddedResource Include="Forms\PadEditorReadOnly.resx">
       <DependentUpon>PadEditorReadOnly.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Special\PadEditor.resx">
+    <EmbeddedResource Include="Forms\PadEditor.resx">
       <DependentUpon>PadEditor.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Special\PadEditorWithFileAccess.resx">
+    <EmbeddedResource Include="Forms\PadEditorWithFileAccess.resx">
       <DependentUpon>PadEditorWithFileAccess.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Special\PictureView.resx">
+    <EmbeddedResource Include="Forms\PictureView.resx">
       <DependentUpon>PictureView.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Special\RelationDiagram.resx">
+    <EmbeddedResource Include="Forms\RelationDiagram.resx">
       <DependentUpon>RelationDiagram.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -784,7 +786,7 @@
       <DependentUpon>ListBox.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms-Common\ScreenShot.resx">
+    <EmbeddedResource Include="Forms\ScreenShot.resx">
       <DependentUpon>ScreenShot.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -829,7 +831,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Forms-Common\Notification.resx">
+    <EmbeddedResource Include="Forms\Notification.resx">
       <DependentUpon>Notification.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -841,5 +843,6 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

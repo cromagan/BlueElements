@@ -15,35 +15,37 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueScript;
-using Skript.Enums;
 using System.Collections.Generic;
+using Skript.Enums;
 
-public struct strSplittedAttributesFeedback {
+namespace BlueScript.Structuren
+{
+    public struct strSplittedAttributesFeedback {
 
-    #region Fields
+        #region Fields
 
-    public List<Variable?>? Attributes;
+        public List<Variable?>? Attributes;
 
-    public string ErrorMessage;
+        public string ErrorMessage;
 
-    public enSkriptFehlerTyp FehlerTyp;
+        public enSkriptFehlerTyp FehlerTyp;
 
-    #endregion
+        #endregion
 
-    #region Constructors
+        #region Constructors
 
-    public strSplittedAttributesFeedback(List<Variable?>? atts) {
-        Attributes = atts;
-        ErrorMessage = string.Empty;
-        FehlerTyp = enSkriptFehlerTyp.ohne;
+        public strSplittedAttributesFeedback(List<Variable?>? atts) {
+            Attributes = atts;
+            ErrorMessage = string.Empty;
+            FehlerTyp = enSkriptFehlerTyp.ohne;
+        }
+
+        public strSplittedAttributesFeedback(enSkriptFehlerTyp type, string error) {
+            Attributes = null;
+            ErrorMessage = error;
+            FehlerTyp = type;
+        }
+
+        #endregion
     }
-
-    public strSplittedAttributesFeedback(enSkriptFehlerTyp type, string error) {
-        Attributes = null;
-        ErrorMessage = error;
-        FehlerTyp = type;
-    }
-
-    #endregion
 }

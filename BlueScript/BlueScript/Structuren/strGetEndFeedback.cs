@@ -15,37 +15,40 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-public struct strGetEndFeedback {
+namespace BlueScript.Structuren
+{
+    public struct strGetEndFeedback {
 
-    #region Fields
+        #region Fields
 
-    public string AttributeText;
+        public string AttributeText;
 
-    //public strGetEndFeedback(string errormessage, int continuePosition, string attributetext) {
-    //    ContinuePosition = continuePosition;
-    //    ErrorMessage = errormessage;
-    //    AttributeText = attributetext;
-    //}
-    public int ContinuePosition;
+        //public strGetEndFeedback(string errormessage, int continuePosition, string attributetext) {
+        //    ContinuePosition = continuePosition;
+        //    ErrorMessage = errormessage;
+        //    AttributeText = attributetext;
+        //}
+        public int ContinuePosition;
 
-    public string ErrorMessage;
+        public string ErrorMessage;
 
-    #endregion
+        #endregion
 
-    #region Constructors
+        #region Constructors
 
-    public strGetEndFeedback(string errormessage) {
-        ContinuePosition = 0;
-        ErrorMessage = errormessage;
-        AttributeText = string.Empty;
-        //ComandText = string.Empty;
+        public strGetEndFeedback(string errormessage) {
+            ContinuePosition = 0;
+            ErrorMessage = errormessage;
+            AttributeText = string.Empty;
+            //ComandText = string.Empty;
+        }
+
+        public strGetEndFeedback(int continuePosition, string attributetext) {
+            ContinuePosition = continuePosition;
+            ErrorMessage = string.Empty;
+            AttributeText = attributetext;
+        }
+
+        #endregion
     }
-
-    public strGetEndFeedback(int continuePosition, string attributetext) {
-        ContinuePosition = continuePosition;
-        ErrorMessage = string.Empty;
-        AttributeText = attributetext;
-    }
-
-    #endregion
 }

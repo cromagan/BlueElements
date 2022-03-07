@@ -19,6 +19,7 @@ using BlueDatabase.Interfaces;
 using Skript.Enums;
 using System.Collections.Generic;
 using System.Linq;
+using BlueScript.Structuren;
 using static BlueBasics.Extensions;
 
 namespace BlueScript {

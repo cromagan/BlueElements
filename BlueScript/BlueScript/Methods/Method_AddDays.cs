@@ -17,6 +17,7 @@
 
 using Skript.Enums;
 using System.Collections.Generic;
+using BlueScript.Structuren;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 

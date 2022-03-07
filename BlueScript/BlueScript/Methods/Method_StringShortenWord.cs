@@ -18,6 +18,7 @@
 using Skript.Enums;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using BlueScript.Structuren;
 using static BlueBasics.Extensions;
 
 namespace BlueScript {
