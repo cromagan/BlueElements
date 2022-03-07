@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System.Collections.Concurrent;
@@ -27,7 +29,7 @@ namespace BlueBasics {
 
         #region Methods
 
-        public static bool RemoveNullOrEmpty<T>(this ConcurrentDictionary<int, T> l) where T : ICanBeEmpty {
+        public static bool RemoveNullOrEmpty<T>(this ConcurrentDictionary<int, T>? l) where T : ICanBeEmpty {
             if (l == null || l.Count == 0) { return false; }
             List<int> remo = new();
             foreach (var pair in l) {
@@ -40,7 +42,7 @@ namespace BlueBasics {
             return true;
         }
 
-        public static bool RemoveNullOrEmpty<T>(this ConcurrentDictionary<long, T> l) where T : ICanBeEmpty? {
+        public static bool RemoveNullOrEmpty<T>(this ConcurrentDictionary<long, T>? l) where T : ICanBeEmpty? {
             if (l == null || l.Count == 0) { return false; }
             var remo = (from pair in l where pair.Value == null || pair.Value.IsNullOrEmpty() select pair.Key).ToList();
             if (remo.Count == 0) { return false; }
