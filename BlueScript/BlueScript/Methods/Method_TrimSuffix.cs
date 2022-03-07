@@ -15,12 +15,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
-using Skript.Enums;
-using System.Collections.Generic;
-using BlueScript.Structuren;
+#nullable enable
 
-namespace BlueScript {
+using System.Collections.Generic;
+using BlueBasics;
+using BlueScript.Structuren;
+using Skript.Enums;
+
+namespace BlueScript.Methods {
 
     internal class Method_TrimSuffix : Method {
 
@@ -39,11 +41,11 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "trimsuffix" };
+        public override List<string> Comand(Script? s) => new() { "trimsuffix" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
             var val = attvar.Attributes[0].ValueString;
 
             const string tmp = Constants.Char_Numerals + " ";
@@ -57,12 +59,12 @@ namespace BlueScript {
                 if (val.ToLower().EndsWith(suf)) {
                     var c = val.Substring(val.Length - suf.Length - 1, 1);
                     if (tmp.Contains(c)) {
-                        return new strDoItFeedback(val.Substring(0, val.Length - suf.Length).TrimEnd(" "), enVariableDataType.String);
+                        return new DoItFeedback(val.Substring(0, val.Length - suf.Length).TrimEnd(" "), enVariableDataType.String);
                     }
                 }
             }
 
-            return new strDoItFeedback(val, enVariableDataType.String);
+            return new DoItFeedback(val, enVariableDataType.String);
         }
 
         #endregion

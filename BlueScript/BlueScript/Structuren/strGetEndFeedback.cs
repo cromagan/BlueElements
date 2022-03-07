@@ -15,9 +15,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueScript.Structuren
-{
-    public struct strGetEndFeedback {
+namespace BlueScript.Structuren {
+
+    public struct GetEndFeedback {
 
         #region Fields
 
@@ -36,14 +36,14 @@ namespace BlueScript.Structuren
 
         #region Constructors
 
-        public strGetEndFeedback(string errormessage) {
+        public GetEndFeedback(string errormessage) {
             ContinuePosition = 0;
             ErrorMessage = errormessage;
             AttributeText = string.Empty;
             //ComandText = string.Empty;
         }
 
-        public strGetEndFeedback(int continuePosition, string attributetext) {
+        public GetEndFeedback(int continuePosition, string attributetext) {
             ContinuePosition = continuePosition;
             ErrorMessage = string.Empty;
             AttributeText = attributetext;

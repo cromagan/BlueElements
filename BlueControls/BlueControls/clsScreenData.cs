@@ -21,7 +21,7 @@ using System.Drawing;
 
 namespace BlueControls {
 
-    public class clsScreenData : BitmapExt {
+    public class ScreenData : BitmapExt {
         //public Point HookP1;
         //public Point HookP2;
         //public bool IsResized;

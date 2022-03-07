@@ -1,13 +1,14 @@
 ﻿using BlueScript;
 using System.Windows.Forms;
+using BlueScript.Methods;
 
 namespace BlueControls {
 
-    public partial class frmBefehlsreferenz : Form {
+    public partial class Befehlsreferenz : Form {
 
         #region Constructors
 
-        public frmBefehlsreferenz() {
+        public Befehlsreferenz() {
             InitializeComponent();
 
             WriteComandsToList();

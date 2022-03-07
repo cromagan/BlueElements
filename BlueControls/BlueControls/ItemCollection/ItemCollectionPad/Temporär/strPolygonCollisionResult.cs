@@ -5,9 +5,9 @@ public struct StrPolygonCollisionResult {
 
     #region Fields
 
-    public clsAbstractPhysicPadItem CheckedObjectA;
+    public AbstractPhysicPadItem CheckedObjectA;
 
-    public clsAbstractPhysicPadItem CheckedObjectB;
+    public AbstractPhysicPadItem CheckedObjectB;
 
     /// <summary>
     /// Are the polygons currently intersecting

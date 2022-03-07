@@ -34,7 +34,7 @@ namespace BlueControls.Forms {
 
         #region Fields
 
-        private bool _MouseWasDown;
+        private bool _mouseWasDown;
 
         #endregion
 
@@ -42,15 +42,15 @@ namespace BlueControls.Forms {
 
         private FloatingInputBoxListBoxStyle() : base(enDesign.Form_QuickInfo) => InitializeComponent();
 
-        private FloatingInputBoxListBoxStyle(ItemCollectionList? Items, int Xpos, int Ypos, int SteuerWi, object Tag, Control? ConnectedControl, bool Translate) : base(ConnectedControl, Items.ControlDesign) {
+        private FloatingInputBoxListBoxStyle(ItemCollectionList? items, int xpos, int ypos, int steuerWi, object tag, Control? connectedControl, bool translate) : base(connectedControl, items.ControlDesign) {
             InitializeComponent();
-            this.Tag = Tag;
+            Tag = tag;
             // Design = Items.ControlDesign;
-            Xpos -= Skin.PaddingSmal;
-            Ypos -= Skin.PaddingSmal;
-            Generate_ListBox1(Items, SteuerWi, enAddType.None, Translate);
+            xpos -= Skin.PaddingSmal;
+            ypos -= Skin.PaddingSmal;
+            Generate_ListBox1(items, steuerWi, enAddType.None, translate);
             //UnloadLostFocus = true;
-            Position_SetWindowIntoScreen(Generic.PointOnScreenNr(new Point(Xpos, Ypos)), Xpos, Ypos);
+            Position_SetWindowIntoScreen(Generic.PointOnScreenNr(new Point(xpos, ypos)), xpos, ypos);
             //Develop.DoEvents();
             Show();
             while (!string.IsNullOrEmpty(WindowsRemoteControl.LastMouseButton())) { Develop.DoEvents(); }
@@ -70,43 +70,43 @@ namespace BlueControls.Forms {
 
         #region Methods
 
-        public static void ContextMenuShow(IContextMenu Control, MouseEventArgs e) {
+        public static void ContextMenuShow(IContextMenu control, MouseEventArgs? e) {
             Close(enBlueListBoxAppearance.KontextMenu);
-            Close(Control);
+            Close(control);
 
-            ItemCollectionList ThisContextMenu = new(enBlueListBoxAppearance.KontextMenu);
-            ItemCollectionList UserMenu = new(enBlueListBoxAppearance.KontextMenu);
+            ItemCollectionList thisContextMenu = new(enBlueListBoxAppearance.KontextMenu);
+            ItemCollectionList userMenu = new(enBlueListBoxAppearance.KontextMenu);
 
             List<string> tags = new();
-            var Cancel = false;
-            var Translate = true;
-            Control.GetContextMenuItems(e, ThisContextMenu, out var HotItem, tags, ref Cancel, ref Translate);
-            if (Cancel) { return; }
+            var cancel = false;
+            var translate = true;
+            control.GetContextMenuItems(e, thisContextMenu, out var hotItem, tags, ref cancel, ref translate);
+            if (cancel) { return; }
 
-            ContextMenuInitEventArgs ec = new(HotItem, tags, UserMenu);
-            Control.OnContextMenuInit(ec);
+            ContextMenuInitEventArgs ec = new(hotItem, tags, userMenu);
+            control.OnContextMenuInit(ec);
             if (ec.Cancel) { return; }
-            if (!ec.Translate) { Translate = false; }
-            if (ThisContextMenu.Count > 0 && UserMenu.Count > 0) { ThisContextMenu.AddSeparator(); }
-            if (UserMenu.Count > 0) { ThisContextMenu.AddClonesFrom(UserMenu); }
+            if (!ec.Translate) { translate = false; }
+            if (thisContextMenu.Count > 0 && userMenu.Count > 0) { thisContextMenu.AddSeparator(); }
+            if (userMenu.Count > 0) { thisContextMenu.AddClonesFrom(userMenu); }
 
-            var par = Control.ParentControlWithCommands();
-            if (ThisContextMenu.Count > 0) {
+            var par = control.ParentControlWithCommands();
+            if (thisContextMenu.Count > 0) {
                 if (par != null) {
-                    ThisContextMenu.AddSeparator();
-                    ThisContextMenu.Add(enContextMenuComands.WeitereBefehle);
+                    thisContextMenu.AddSeparator();
+                    thisContextMenu.Add(enContextMenuComands.WeitereBefehle);
                 }
-                ThisContextMenu.AddSeparator();
-                ThisContextMenu.Add(enContextMenuComands.Abbruch);
-                List<object?> Infos = new()
+                thisContextMenu.AddSeparator();
+                thisContextMenu.Add(enContextMenuComands.Abbruch);
+                List<object?> infos = new()
                 {
-                    UserMenu,
-                    HotItem,
+                    userMenu,
+                    hotItem,
                     tags,
-                    Control
+                    control
                 };
-                var _ContextMenu = Show(ThisContextMenu, Infos, (Control)Control, Translate);
-                _ContextMenu.ItemClicked += _ContextMenu_ItemClicked;
+                var contextMenu = Show(thisContextMenu, infos, (Control)control, translate);
+                contextMenu.ItemClicked += _ContextMenu_ItemClicked;
             } else {
                 if (par != null) {
                     ContextMenuShow(par, e);
@@ -114,16 +114,16 @@ namespace BlueControls.Forms {
             }
         }
 
-        public static FloatingInputBoxListBoxStyle Show(ItemCollectionList? Items, object Tag, Control? ConnectedControl, bool Translate) => new(Items, Cursor.Position.X - 8, Cursor.Position.Y - 8, -1, Tag, ConnectedControl, Translate);
+        public static FloatingInputBoxListBoxStyle Show(ItemCollectionList? items, object tag, Control? connectedControl, bool translate) => new(items, Cursor.Position.X - 8, Cursor.Position.Y - 8, -1, tag, connectedControl, translate);
 
-        public static FloatingInputBoxListBoxStyle Show(ItemCollectionList? Items, int Xpos, int Ypos, int SteuerWi, object? Tag, Control? ConnectedControl, bool Translate) => new(Items, Xpos, Ypos, SteuerWi, Tag, ConnectedControl, Translate);
+        public static FloatingInputBoxListBoxStyle Show(ItemCollectionList? items, int xpos, int ypos, int steuerWi, object? tag, Control? connectedControl, bool translate) => new(items, xpos, ypos, steuerWi, tag, connectedControl, translate);
 
-        public void Generate_ListBox1(ItemCollectionList? items, int MinWidth, enAddType AddNewAllowed, bool Translate) {
+        public void Generate_ListBox1(ItemCollectionList? items, int minWidth, enAddType addNewAllowed, bool translate) {
             //var itemsClone = (ItemCollectionList)ItemsOri.Clone();
-            var (BiggestItemX, _, HeightAdded, _) = items.ItemData();
-            if (AddNewAllowed != enAddType.None) { HeightAdded += 24; }
+            var (biggestItemX, _, heightAdded, _) = items.ItemData();
+            if (addNewAllowed != enAddType.None) { heightAdded += 24; }
             lstbx.Appearance = (enBlueListBoxAppearance)items.ControlDesign;
-            lstbx.Translate = Translate;
+            lstbx.Translate = translate;
             //if (data.Item4 == BlueBasics.Enums.enOrientation.Senkrecht)
             //{
             //    He += Skin.PaddingSmal * 2;
@@ -133,19 +133,19 @@ namespace BlueControls.Forms {
             //else
             //{
             //Wi = CInt(Wi * 1.05) 'Weil die Breite nur circa berechnet wird
-            HeightAdded++; // Um ja den Slider zu vermeiden!
-            HeightAdded = Math.Max(HeightAdded, 16);
-            BiggestItemX = Math.Max(BiggestItemX, 16);
+            heightAdded++; // Um ja den Slider zu vermeiden!
+            heightAdded = Math.Max(heightAdded, 16);
+            biggestItemX = Math.Max(biggestItemX, 16);
             //}
-            BiggestItemX = Math.Max(BiggestItemX, MinWidth);
-            var MaxWi = (int)(Screen.PrimaryScreen.Bounds.Size.Width * 0.7);
-            var MaxHe = (int)(Screen.PrimaryScreen.Bounds.Size.Height * 0.7);
-            if (BiggestItemX > MaxWi) { BiggestItemX = MaxWi; }
-            if (HeightAdded > MaxHe) {
-                HeightAdded = MaxHe;
-                BiggestItemX += 20;
+            biggestItemX = Math.Max(biggestItemX, minWidth);
+            var maxWi = (int)(Screen.PrimaryScreen.Bounds.Size.Width * 0.7);
+            var maxHe = (int)(Screen.PrimaryScreen.Bounds.Size.Height * 0.7);
+            if (biggestItemX > maxWi) { biggestItemX = maxWi; }
+            if (heightAdded > maxHe) {
+                heightAdded = maxHe;
+                biggestItemX += 20;
             }
-            Size = new Size(BiggestItemX + (lstbx.Left * 2), HeightAdded + (lstbx.Top * 2));
+            Size = new Size(biggestItemX + (lstbx.Left * 2), heightAdded + (lstbx.Top * 2));
             lstbx.Item.CheckBehavior = items.CheckBehavior;
             lstbx.Item.AddClonesFrom(items);
         }
@@ -157,11 +157,11 @@ namespace BlueControls.Forms {
         }
 
         private static void _ContextMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-            var Infos = (List<object>)e.HotItem;
-            var UserMmenu = (ItemCollectionList)Infos[0];
-            var HotItem = Infos[1];
-            var Tags = (List<string>)Infos[2];
-            var ob = (IContextMenu)Infos[3];
+            var infos = (List<object>)e.HotItem;
+            var userMmenu = (ItemCollectionList)infos[0];
+            var hotItem = infos[1];
+            var tags = (List<string>)infos[2];
+            var ob = (IContextMenu)infos[3];
             Close(enBlueListBoxAppearance.KontextMenu);
             Close(ob);
             if (e.ClickedComand.ToLower() == "weiterebefehle") {
@@ -172,9 +172,9 @@ namespace BlueControls.Forms {
                 return;
             }
             if (e.ClickedComand.ToLower() == "abbruch") { return; }
-            ContextMenuItemClickedEventArgs ex = new(e.ClickedComand, HotItem, Tags);
+            ContextMenuItemClickedEventArgs ex = new(e.ClickedComand, hotItem, tags);
             bool done;
-            if (UserMmenu[e.ClickedComand] == null) {
+            if (userMmenu[e.ClickedComand] == null) {
                 done = ob.ContextMenuItemClickedInternalProcessig(sender, ex);
             } else {
                 done = true; //keine Prüfung implementiert
@@ -204,19 +204,19 @@ namespace BlueControls.Forms {
         private void OnItemClicked(ContextMenuItemClickedEventArgs e) => ItemClicked?.Invoke(this, e);
 
         private void timer1_Tick(object sender, System.EventArgs e) {
-            var MouseIsDown = !string.IsNullOrEmpty(WindowsRemoteControl.LastMouseButton());
-            if (MouseIsDown && !_MouseWasDown && !IsMouseInForm()) {
+            var mouseIsDown = !string.IsNullOrEmpty(WindowsRemoteControl.LastMouseButton());
+            if (mouseIsDown && !_mouseWasDown && !IsMouseInForm()) {
                 // erster Klick ausserhalb des Forms
                 Close();
                 OnCancel();
                 return;
             }
-            if (_MouseWasDown && !MouseIsDown && IsMouseInForm()) {
+            if (_mouseWasDown && !mouseIsDown && IsMouseInForm()) {
                 // Maus ausserhalb der Form ausgelassen
-                _MouseWasDown = false;
+                _mouseWasDown = false;
                 return;
             }
-            if (MouseIsDown) { _MouseWasDown = true; }
+            if (mouseIsDown) { _mouseWasDown = true; }
         }
 
         #endregion

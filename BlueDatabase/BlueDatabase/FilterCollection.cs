@@ -40,7 +40,7 @@ namespace BlueDatabase {
 
         #region Properties
 
-        public Database Database { get; private set; }
+        public Database? Database { get; private set; }
 
         public bool IsParsing { get; private set; }
 

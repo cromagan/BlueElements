@@ -1,6 +1,6 @@
 ﻿
 namespace BlueControls {
-    partial class frmBefehlsreferenz {
+    partial class Befehlsreferenz {
         /// <summary>
         /// Required designer variable.
         /// </summary>
@@ -56,7 +56,7 @@ namespace BlueControls {
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.txbComms);
             this.Controls.Add(this.lstComands);
-            this.Name = "frmBefehlsreferenz";
+            this.Name = "Befehlsreferenz";
             this.Text = "Befehlsübersicht";
             this.ResumeLayout(false);
 

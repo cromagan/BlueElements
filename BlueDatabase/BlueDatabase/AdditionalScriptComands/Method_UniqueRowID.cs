@@ -15,12 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueDatabase;
-using Skript.Enums;
 using System.Collections.Generic;
+using BlueScript;
 using BlueScript.Structuren;
+using Skript.Enums;
 
-namespace BlueScript {
+namespace BlueDatabase.AdditionalScriptComands {
 
     public class Method_UniqueRowID : MethodDatabase {
 
@@ -46,13 +46,13 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "uniquerowid" };
+        public override List<string> Comand(Script? s) => new() { "uniquerowid" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             return !string.IsNullOrEmpty(attvar.ErrorMessage)
-                ? strDoItFeedback.AttributFehler(this, attvar)
-                : new strDoItFeedback(RowCollection.UniqueKeyValue(), enVariableDataType.String);
+                ? DoItFeedback.AttributFehler(this, attvar)
+                : new DoItFeedback(RowCollection.UniqueKeyValue(), enVariableDataType.String);
         }
 
         #endregion

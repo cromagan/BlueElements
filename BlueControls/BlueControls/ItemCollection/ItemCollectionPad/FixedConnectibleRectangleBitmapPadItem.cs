@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -28,7 +30,7 @@ namespace BlueControls.ItemCollection {
 
         #region Fields
 
-        public readonly ListExt<clsConnection> ConnectsTo = new();
+        public readonly ListExt<ItemConnection> ConnectsTo = new();
 
         protected PointM? PL;
 
@@ -319,13 +321,13 @@ namespace BlueControls.ItemCollection {
         protected override void ParseFinished() => SizeChanged();
 
         private void ConnectsTo_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
-            var x = (clsConnection)e.Item;
+            var x = (ItemConnection)e.Item;
 
             x.Item.Changed += Item_Changed;
         }
 
         private void ConnectsTo_ItemRemoving(object sender, BlueBasics.EventArgs.ListEventArgs e) {
-            var x = (clsConnection)e.Item;
+            var x = (ItemConnection)e.Item;
             x.Item.Changed -= Item_Changed;
         }
 

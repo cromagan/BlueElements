@@ -18,6 +18,8 @@
 using BlueBasics;
 using BlueBasics.Enums;
 
+#nullable enable
+
 namespace BluePaint {
 
     public partial class Tool_Resize : GenericTool //BlueControls.Forms.Form //

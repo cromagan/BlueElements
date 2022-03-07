@@ -19,7 +19,7 @@ using BlueControls.Enums;
 
 namespace BlueControls.ItemCollection {
 
-    public class clsConnection {
+    public class ItemConnection {
 
         #region Fields
 
@@ -33,7 +33,7 @@ namespace BlueControls.ItemCollection {
 
         #region Constructors
 
-        public clsConnection(FixedRectangleBitmapPadItem item, enConnectionType otherItemType, enConnectionType myItemType) {
+        public ItemConnection(FixedRectangleBitmapPadItem item, enConnectionType otherItemType, enConnectionType myItemType) {
             Item = item;
             OtherItemType = otherItemType;
             MyItemType = myItemType;

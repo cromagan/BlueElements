@@ -28,7 +28,7 @@ namespace BlueControls.Controls {
 
         #region Fields
 
-        private int wProzent = 100;
+        private int _Prozent = 100;
 
         #endregion
 
@@ -43,7 +43,7 @@ namespace BlueControls.Controls {
 
         [DefaultValue(100)]
         public int Prozent {
-            get => wProzent;
+            get => _Prozent;
             set {
                 if (value < 0) {
                     value = 0;
@@ -51,10 +51,10 @@ namespace BlueControls.Controls {
                 if (value > 100) {
                     value = 100;
                 }
-                if (wProzent == value) {
+                if (_Prozent == value) {
                     return;
                 }
-                wProzent = value;
+                _Prozent = value;
                 Invalidate();
             }
         }
@@ -69,8 +69,8 @@ namespace BlueControls.Controls {
         // Private Sub EventDrawControl(GR as graphics, vState As enStates) Handles MyBase.DrawControl
         protected override void DrawControl(Graphics gr, enStates state) {
             Skin.Draw_Back(gr, enDesign.Progressbar, state, DisplayRectangle, this, true);
-            if (wProzent > 0) {
-                Rectangle r = new(DisplayRectangle.X, DisplayRectangle.Y, (int)Math.Truncate(DisplayRectangle.Width * wProzent / 100.0), DisplayRectangle.Height);
+            if (_Prozent > 0) {
+                Rectangle r = new(DisplayRectangle.X, DisplayRectangle.Y, (int)Math.Truncate(DisplayRectangle.Width * _Prozent / 100.0), DisplayRectangle.Height);
                 //r = New Rectangle(DisplayRectangle)
                 //r.Width = CInt(r.Width * wProzent / 100)
                 Skin.Draw_Back(gr, enDesign.Progressbar_Füller, state, r, this, true);

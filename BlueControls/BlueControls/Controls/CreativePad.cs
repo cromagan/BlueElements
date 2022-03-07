@@ -244,7 +244,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        public List<BasicPadItem> HotItems(System.Windows.Forms.MouseEventArgs e) {
+        public List<BasicPadItem> HotItems(System.Windows.Forms.MouseEventArgs? e) {
             if (e == null) { return new List<BasicPadItem>(); }
             Point p = new((int)((e.X + ShiftX) / Zoom), (int)((e.Y + ShiftY) / Zoom));
             return _item.Where(thisItem => thisItem != null && thisItem.Contains(p, Zoom)).ToList();
@@ -477,7 +477,7 @@ namespace BlueControls.Controls {
             Invalidate();
         }
 
-        private void CheckHotItem(System.Windows.Forms.MouseEventArgs e, bool doLastClicked) {
+        private void CheckHotItem(System.Windows.Forms.MouseEventArgs? e, bool doLastClicked) {
             var oldClicked = LastClickedItem;
             var l = HotItems(e);
             var mina = long.MaxValue;

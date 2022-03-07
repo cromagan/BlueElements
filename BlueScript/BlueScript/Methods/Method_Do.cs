@@ -15,11 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using Skript.Enums;
 using System.Collections.Generic;
 using BlueScript.Structuren;
+using Skript.Enums;
 
-namespace BlueScript {
+namespace BlueScript.Methods {
 
     internal class Method_Do : Method {
 
@@ -38,24 +38,24 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "do" };
+        public override List<string> Comand(Script? s) => new() { "do" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
             var tmpline = s.Line;
             var du = 0;
             s.Schleife++;
             do {
                 s.Line = tmpline;
                 du++;
-                if (du > 100000) { return new strDoItFeedback("Do-Schleife nach 100.000 Durchläufen abgebrochen."); }
+                if (du > 100000) { return new DoItFeedback("Do-Schleife nach 100.000 Durchläufen abgebrochen."); }
 
                 var tmpv = new List<Variable>();
                 tmpv.AddRange(s.Variablen);
 
                 var (err, _) = s.Parse(infos.CodeBlockAfterText);
-                if (!string.IsNullOrEmpty(err)) { return new strDoItFeedback(err); }
+                if (!string.IsNullOrEmpty(err)) { return new DoItFeedback(err); }
 
                 s.Variablen.Clear();
                 s.Variablen.AddRange(tmpv);
@@ -65,11 +65,11 @@ namespace BlueScript {
 
             s.Schleife--;
 
-            if (s.Schleife < 0) { return new strDoItFeedback("Schleifenfehler"); }
+            if (s.Schleife < 0) { return new DoItFeedback("Schleifenfehler"); }
 
             s.BreakFired = false;
             s.Line = tmpline + infos.LineBreakInCodeBlock;
-            return new strDoItFeedback(string.Empty);
+            return new DoItFeedback(string.Empty);
         }
 
         #endregion

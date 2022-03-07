@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueControls.EventArgs;
 using System;
@@ -27,11 +29,11 @@ namespace BluePaint {
 
         #region Constructors
 
-        public Tool_Eraser(bool Aufnahme) : base() {
+        public Tool_Eraser(bool aufnahme) : base() {
             InitializeComponent();
-            DrawBox.Enabled = !Aufnahme;
-            Razi.Enabled = !Aufnahme;
-            if (Aufnahme) {
+            DrawBox.Enabled = !aufnahme;
+            Razi.Enabled = !aufnahme;
+            if (aufnahme) {
                 Eleminate.Checked = true;
             }
         }
@@ -40,7 +42,7 @@ namespace BluePaint {
 
         #region Methods
 
-        public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap? OriginalPic) {
+        public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap? originalPic) {
             if (Razi.Checked && e.Current != null) {
                 e.FillCircle(ColorRedTransp, e.Current.TrimmedX, e.Current.TrimmedY, 3);
             }
@@ -49,20 +51,20 @@ namespace BluePaint {
                 return;
             }
 
-            var _Pic = OnNeedCurrentPic();
+            var pic = OnNeedCurrentPic();
             Point p1, p2;
             if (e.Current.Button == System.Windows.Forms.MouseButtons.Left && e.MouseDown != null) {
                 p1 = new Point(Math.Min(e.Current.TrimmedX, e.MouseDown.TrimmedX), Math.Min(e.Current.TrimmedY, e.MouseDown.TrimmedY));
                 p2 = new Point(Math.Max(e.Current.TrimmedX, e.MouseDown.TrimmedX), Math.Max(e.Current.TrimmedY, e.MouseDown.TrimmedY));
-                e.FillRectangle(Brush_RedTransp, e.TrimmedRectangle());
+                e.FillRectangle(BrushRedTransp, e.TrimmedRectangle());
             } else {
                 p1 = new Point(e.Current.TrimmedX, e.Current.TrimmedY);
                 p2 = new Point(e.Current.TrimmedX, e.Current.TrimmedY);
             }
-            e.DrawLine(Pen_RedTransp, -0.5f, p1.Y - 0.5f, _Pic.Width + 0.5f, p1.Y - 0.5f);
-            e.DrawLine(Pen_RedTransp, p1.X - 0.5f, -0.5f, p1.X - 0.5f, _Pic.Height + 0.5f);
-            e.DrawLine(Pen_RedTransp, -0.5f, p2.Y + 0.5f, _Pic.Width + 0.5f, p2.Y + 0.5f);
-            e.DrawLine(Pen_RedTransp, p2.X + 0.5f, 0, p2.X + 0.5f, _Pic.Height + 0.5f);
+            e.DrawLine(PenRedTransp, -0.5f, p1.Y - 0.5f, pic.Width + 0.5f, p1.Y - 0.5f);
+            e.DrawLine(PenRedTransp, p1.X - 0.5f, -0.5f, p1.X - 0.5f, pic.Height + 0.5f);
+            e.DrawLine(PenRedTransp, -0.5f, p2.Y + 0.5f, pic.Width + 0.5f, p2.Y + 0.5f);
+            e.DrawLine(PenRedTransp, p2.X + 0.5f, 0, p2.X + 0.5f, pic.Height + 0.5f);
             //if (e.Current.Button == System.Windows.Forms.MouseButtons.Left && e.MouseDown != null) {
             //    e.DrawLine(Pen_RedTransp, -1, e.MouseDown.TrimmedY, _Pic.Width, e.MouseDown.TrimmedY);
             //    e.DrawLine(Pen_RedTransp, e.MouseDown.TrimmedX, -1, e.MouseDown.TrimmedX, _Pic.Height);
@@ -73,9 +75,9 @@ namespace BluePaint {
         public override void ExcuteCommand(string command) {
             var c = command.SplitAndCutBy(";");
             if (c[0] == "Replace") {
-                var OriginalPic = OnNeedCurrentPic();
+                var originalPic = OnNeedCurrentPic();
                 var cc = Color.FromArgb(int.Parse(c[1]));
-                OnOverridePic(ReplaceColor(OriginalPic, cc, Color.Transparent));
+                OnOverridePic(ReplaceColor(originalPic, cc, Color.Transparent));
             } else {
                 Develop.DebugPrint_NichtImplementiert();
             }
@@ -83,22 +85,22 @@ namespace BluePaint {
 
         public override string MacroKennung() => "Eraser";
 
-        public override void MouseDown(MouseEventArgs1_1 e, Bitmap? OriginalPic) {
+        public override void MouseDown(MouseEventArgs1_1 e, Bitmap? originalPic) {
             OnForceUndoSaving();
-            MouseMove(new MouseEventArgs1_1DownAndCurrent(e, e), OriginalPic);
+            MouseMove(new MouseEventArgs1_1DownAndCurrent(e, e), originalPic);
         }
 
-        public override void MouseMove(MouseEventArgs1_1DownAndCurrent e, Bitmap? OriginalPic) {
+        public override void MouseMove(MouseEventArgs1_1DownAndCurrent e, Bitmap? originalPic) {
             if (e.Current.Button == System.Windows.Forms.MouseButtons.Left) {
                 if (Razi.Checked) {
-                    var _Pic = OnNeedCurrentPic();
-                    FillCircle(_Pic, Color.White, e.Current.TrimmedX, e.Current.TrimmedY, 3);
+                    var pic = OnNeedCurrentPic();
+                    FillCircle(pic, Color.White, e.Current.TrimmedX, e.Current.TrimmedY, 3);
                 }
             }
             OnDoInvalidate();
         }
 
-        public override void MouseUp(MouseEventArgs1_1DownAndCurrent e, Bitmap? OriginalPic) {
+        public override void MouseUp(MouseEventArgs1_1DownAndCurrent e, Bitmap? originalPic) {
             if (e == null) {
                 Develop.DebugPrint(BlueBasics.Enums.enFehlerArt.Warnung, "e = null");
                 return;
@@ -106,18 +108,18 @@ namespace BluePaint {
             if (e.Current.Button != System.Windows.Forms.MouseButtons.Left) { return; }
 
             if (Razi.Checked) { return; }
-            var _Pic = OnNeedCurrentPic();
+            var pic = OnNeedCurrentPic();
             if (Eleminate.Checked) {
                 if (e.Current.IsInPic) {
-                    var cc = _Pic.GetPixel(e.Current.X, e.Current.Y);
+                    var cc = pic.GetPixel(e.Current.X, e.Current.Y);
                     if (cc.ToArgb() == 0) { return; }
                     OnCommandForMacro("Replace;" + cc.ToArgb());
-                    OnOverridePic(ReplaceColor(OriginalPic, cc, Color.Transparent));
+                    OnOverridePic(ReplaceColor(originalPic, cc, Color.Transparent));
                     return;
                 }
             }
             if (DrawBox.Checked) {
-                var g = Graphics.FromImage(_Pic);
+                var g = Graphics.FromImage(pic);
                 g.FillRectangle(Brushes.White, e.TrimmedRectangle());
                 OnDoInvalidate();
             }

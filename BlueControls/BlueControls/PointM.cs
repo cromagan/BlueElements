@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -39,7 +41,7 @@ namespace BlueControls {
 
         #region Constructors
 
-        public PointM(object parent, string name, float startX, float startY, float laenge, float alpha) : this(parent) {
+        public PointM(object? parent, string name, float startX, float startY, float laenge, float alpha) : this(parent) {
             Name = name;
             var tempVar = PolarToCartesian(laenge, alpha);
             _x = startX + tempVar.X;

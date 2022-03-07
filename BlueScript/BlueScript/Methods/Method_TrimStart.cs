@@ -15,12 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
-using Skript.Enums;
 using System.Collections.Generic;
+using BlueBasics;
 using BlueScript.Structuren;
+using Skript.Enums;
 
-namespace BlueScript {
+namespace BlueScript.Methods {
 
     internal class Method_TrimStart : Method {
 
@@ -39,11 +39,11 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "trimstart" };
+        public override List<string> Comand(Script? s) => new() { "trimstart" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
             var val = attvar.Attributes[0].ValueString;
 
             string txt;
@@ -55,7 +55,7 @@ namespace BlueScript {
                 }
             } while (txt != val);
 
-            return new strDoItFeedback(val, enVariableDataType.String);
+            return new DoItFeedback(val, enVariableDataType.String);
         }
 
         #endregion

@@ -15,13 +15,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using Skript.Enums;
 using System.Collections.Generic;
 using BlueScript.Structuren;
+using Skript.Enums;
 using static BlueBasics.Constants;
 using static BlueBasics.Converter;
 
-namespace BlueScript {
+namespace BlueScript.Methods {
 
     internal class Method_AddDays : Method {
 
@@ -40,17 +40,17 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "adddays" };
+        public override List<string> Comand(Script? s) => new() { "adddays" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
             var ok = DateTimeTryParse(attvar.Attributes[0].ValueString, out var d);
             if (!ok) {
-                return new strDoItFeedback("Der Wert '" + attvar.Attributes[0].ValueString + "' wurde nicht als Zeitformat erkannt.");
+                return new DoItFeedback("Der Wert '" + attvar.Attributes[0].ValueString + "' wurde nicht als Zeitformat erkannt.");
             }
             d = d.AddDays(attvar.Attributes[1].ValueDouble);
-            return new strDoItFeedback(d.ToString(Format_Date7), enVariableDataType.String);
+            return new DoItFeedback(d.ToString(Format_Date7), enVariableDataType.String);
         }
 
         #endregion

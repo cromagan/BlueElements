@@ -15,11 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using Skript.Enums;
 using System.Collections.Generic;
 using BlueScript.Structuren;
+using Skript.Enums;
 
-namespace BlueScript {
+namespace BlueScript.Methods {
 
     internal class Method_Element : Method {
 
@@ -38,15 +38,15 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "element" };
+        public override List<string> Comand(Script? s) => new() { "element" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
             var i = attvar.Attributes[1].ValueInt;
             var list = attvar.Attributes[0].ValueListString;
-            return i < 0 || i >= list.Count ? new strDoItFeedback("Element nicht in Liste")
-                                            : new strDoItFeedback(list[i], enVariableDataType.String);
+            return i < 0 || i >= list.Count ? new DoItFeedback("Element nicht in Liste")
+                                            : new DoItFeedback(list[i], enVariableDataType.String);
         }
 
         #endregion

@@ -27,7 +27,7 @@ namespace BlueControls {
        {
         #region Fields
 
-        private Database _database;
+        private Database? _database;
 
         #endregion
 
@@ -39,7 +39,7 @@ namespace BlueControls {
 
         #region Properties
 
-        public Database Database {
+        public Database? Database {
             get => _database;
             set {
                 if (_database != null) {

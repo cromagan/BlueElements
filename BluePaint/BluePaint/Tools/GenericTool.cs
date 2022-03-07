@@ -19,16 +19,18 @@ using BlueControls.Controls;
 using BluePaint.EventArgs;
 using System.Drawing;
 
+#nullable enable
+
 namespace BluePaint {
 
     public abstract partial class GenericTool : GroupBox // System.Windows.Forms.UserControl //
     {
         #region Fields
 
-        protected static SolidBrush Brush_RedTransp = new(Color.FromArgb(128, 255, 0, 0));
+        protected static SolidBrush BrushRedTransp = new(Color.FromArgb(128, 255, 0, 0));
         protected static Color ColorRedTransp = Color.FromArgb(50, 255, 0, 0);
-        protected static Pen Pen_LightWhite = new(Color.FromArgb(150, 255, 255, 255), 3);
-        protected static Pen Pen_RedTransp = new(ColorRedTransp);
+        protected static Pen PenLightWhite = new(Color.FromArgb(150, 255, 255, 255), 3);
+        protected static Pen PenRedTransp = new(ColorRedTransp);
 
         #endregion
 
@@ -64,7 +66,7 @@ namespace BluePaint {
         ///
         /// </summary>
         /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
-        public virtual void DoAdditionalDrawing(BlueControls.EventArgs.AdditionalDrawing e, Bitmap? OriginalPic) { }
+        public virtual void DoAdditionalDrawing(BlueControls.EventArgs.AdditionalDrawing e, Bitmap? originalPic) { }
 
         public virtual void ExcuteCommand(string command) => BlueBasics.Develop.DebugPrint_RoutineMussUeberschriebenWerden();
 
@@ -79,19 +81,19 @@ namespace BluePaint {
         ///
         /// </summary>
         /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
-        public virtual new void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap? OriginalPic) { }
+        public virtual new void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap? originalPic) { }
 
         /// <summary>
         ///
         /// </summary>
         /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
-        public virtual new void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap? OriginalPic) { }
+        public virtual new void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap? originalPic) { }
 
         /// <summary>
         ///
         /// </summary>
         /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
-        public virtual new void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap? OriginalPic) { }
+        public virtual new void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap? originalPic) { }
 
         /// <summary>
         ///
@@ -126,8 +128,8 @@ namespace BluePaint {
         /// Es wird automatisch OnForceUndoSaving in der MainForm ausgelöst.
         /// Wird benutzt, wenn ein neues Bild erstellt wurde und dieses in den Speicher soll.
         /// </summary>
-        /// <param name="Bmp"></param>
-        protected virtual void OnOverridePic(Bitmap? Bmp) => OverridePic?.Invoke(this, new BitmapEventArgs(Bmp));
+        /// <param name="bmp"></param>
+        protected virtual void OnOverridePic(Bitmap? bmp) => OverridePic?.Invoke(this, new BitmapEventArgs(bmp));
 
         protected virtual void OnShowMainWindow() => ShowMainWindow?.Invoke(this, System.EventArgs.Empty);
 

@@ -34,6 +34,8 @@ using System.Drawing;
 using System.Linq;
 using static BlueBasics.Converter;
 
+#nullable enable
+
 namespace BlueControls.Controls {
 
     [Designer(typeof(BasicDesigner))]
@@ -41,9 +43,9 @@ namespace BlueControls.Controls {
 
         #region Fields
 
-        private List<FlexiControlForCell?> _control;
+        private List<FlexiControlForCell>? _control;
 
-        private Database _database;
+        private Database? _database;
 
         private bool _inited;
 
@@ -77,7 +79,7 @@ namespace BlueControls.Controls {
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public Database Database {
+        public Database? Database {
             get => _database;
             set {
                 if (_database == value) { return; }

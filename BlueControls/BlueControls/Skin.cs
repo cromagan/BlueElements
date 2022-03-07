@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -837,7 +839,7 @@ namespace BlueControls {
         public static string DummyStandardFont = "<Name=Arial, Size=10>";
         public static string ErrorFont = "<Name=Arial, Size=8, Color=FF0000>";
         public static bool Inited;
-        public static Database StyleDb;
+        public static Database? StyleDb;
         internal static Pen PenLinieDick;
         internal static Pen PenLinieDünn;
         internal static Pen PenLinieKräftig;

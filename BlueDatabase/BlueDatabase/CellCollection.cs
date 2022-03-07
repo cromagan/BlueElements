@@ -27,13 +27,15 @@ using System.Text.RegularExpressions;
 using static BlueBasics.Converter;
 using static BlueBasics.Generic;
 
+#nullable enable
+
 namespace BlueDatabase {
 
     public sealed class CellCollection : Dictionary<string, CellItem>, IDisposable {
 
         #region Fields
 
-        private Database _database;
+        private Database? _database;
         private bool _disposedValue;
 
         #endregion

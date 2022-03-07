@@ -15,12 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using Skript.Enums;
 using System.Collections.Generic;
 using BlueScript.Structuren;
+using Skript.Enums;
 using static BlueBasics.Converter;
 
-namespace BlueScript {
+namespace BlueScript.Methods {
 
     internal class Method_DateTimeDifferenceInDays : Method {
 
@@ -39,21 +39,21 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "datetimedifferenceindays" };
+        public override List<string> Comand(Script? s) => new() { "datetimedifferenceindays" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
             var ok1 = DateTimeTryParse(attvar.Attributes[0].ValueString, out var d1);
             if (!ok1) {
-                return new strDoItFeedback("Der Wert '" + attvar.Attributes[0].ValueString + "' wurde nicht als Zeitformat erkannt.");
+                return new DoItFeedback("Der Wert '" + attvar.Attributes[0].ValueString + "' wurde nicht als Zeitformat erkannt.");
             }
 
             var ok2 = DateTimeTryParse(attvar.Attributes[1].ValueString, out var d2);
             return !ok2
-                ? new strDoItFeedback("Der Wert '" + attvar.Attributes[1].ValueString + "' wurde nicht als Zeitformat erkannt.")
-                : new strDoItFeedback(d1.Subtract(d2).TotalDays.ToString(), enVariableDataType.Numeral);
+                ? new DoItFeedback("Der Wert '" + attvar.Attributes[1].ValueString + "' wurde nicht als Zeitformat erkannt.")
+                : new DoItFeedback(d1.Subtract(d2).TotalDays.ToString(), enVariableDataType.Numeral);
         }
 
         #endregion

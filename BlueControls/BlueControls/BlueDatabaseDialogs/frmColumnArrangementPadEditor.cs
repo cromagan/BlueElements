@@ -244,7 +244,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                                     var rkcolit = (ColumnPadItem)Pad.Item[rkcol.Name];
 
                                     //...und auf die Datenbank zeigen lassen, wenn diese existiert
-                                    rkcolit?.ConnectsTo.AddIfNotExists(new clsConnection(databItem, enConnectionType.Bottom, enConnectionType.Top));
+                                    rkcolit?.ConnectsTo.AddIfNotExists(new ItemConnection(databItem, enConnectionType.Bottom, enConnectionType.Top));
                                 }
                             }
 
@@ -256,11 +256,11 @@ namespace BlueControls.BlueDatabaseDialogs {
                             var it2 = new ColumnPadItem(c2);
                             Pad.Item.Add(it2);
                             it2.SetLeftTopPoint(kx, 600);
-                            it2.ConnectsTo.Add(new clsConnection(it, enConnectionType.Left, enConnectionType.Right));
+                            it2.ConnectsTo.Add(new ItemConnection(it, enConnectionType.Left, enConnectionType.Right));
                             kx = it2.UsedArea.Right;
 
                             // und noch die Datenbank  auf die Spalte zeigen lassem
-                            databItem?.ConnectsTo.AddIfNotExists(new clsConnection(it, enConnectionType.Bottom, enConnectionType.Top));
+                            databItem?.ConnectsTo.AddIfNotExists(new ItemConnection(it, enConnectionType.Bottom, enConnectionType.Top));
                         }
 
                         #endregion

@@ -55,7 +55,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             _blueTable.CursorPosChanged -= CursorPosChanged;
         }
 
-        private void btnSuchInCell_Click(object sender, System.EventArgs e) {
+        private void btnSuchInCell_Click(object? sender, System.EventArgs e) {
             var suchtT = SuchText();
             if (string.IsNullOrEmpty(suchtT)) { return; }
             Table.SearchNextText(suchtT, _blueTable, _col, _blueTable.CursorPosRow(), out var found, out var gefRow, btnAehnliches.Checked);

@@ -15,11 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using Skript.Enums;
 using System.Collections.Generic;
 using BlueScript.Structuren;
+using Skript.Enums;
 
-namespace BlueScript {
+namespace BlueScript.Methods {
 
     internal class Method_IsType : Method {
 
@@ -38,36 +38,36 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "istype" };
+        public override List<string> Comand(Script? s) => new() { "istype" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
             switch (attvar.Attributes[1].ValueString.ToLower()) {
                 case "num":
-                    return attvar.Attributes[0].Type == enVariableDataType.Numeral ? strDoItFeedback.Wahr() : strDoItFeedback.Falsch();
+                    return attvar.Attributes[0].Type == enVariableDataType.Numeral ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
 
                 case "str":
-                    return attvar.Attributes[0].Type == enVariableDataType.String ? strDoItFeedback.Wahr() : strDoItFeedback.Falsch();
+                    return attvar.Attributes[0].Type == enVariableDataType.String ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
 
                 case "lst":
-                    return attvar.Attributes[0].Type == enVariableDataType.List ? strDoItFeedback.Wahr() : strDoItFeedback.Falsch();
+                    return attvar.Attributes[0].Type == enVariableDataType.List ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
                 //
                 case "dat":
                 //    if (attvar.Attributes[0].Type == enVariableDataType.Date) { return strDoItFeedback.Wahr(); }
                 //    return strDoItFeedback.Falsch();
 
                 case "bol":
-                    return attvar.Attributes[0].Type == enVariableDataType.Bool ? strDoItFeedback.Wahr() : strDoItFeedback.Falsch();
+                    return attvar.Attributes[0].Type == enVariableDataType.Bool ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
 
                 case "err":
-                    return attvar.Attributes[0].Type == enVariableDataType.Error ? strDoItFeedback.Wahr() : strDoItFeedback.Falsch();
+                    return attvar.Attributes[0].Type == enVariableDataType.Error ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
 
                 case "ukn":
-                    return attvar.Attributes[0].Type == enVariableDataType.NotDefinedYet ? strDoItFeedback.Wahr() : strDoItFeedback.Falsch();
+                    return attvar.Attributes[0].Type == enVariableDataType.NotDefinedYet ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
 
                 default:
-                    return new strDoItFeedback("Es wir als zweites Attribut ein String mit dem Inhalt num, str, lst, dat, bol, err oder ukn erwartet.");
+                    return new DoItFeedback("Es wir als zweites Attribut ein String mit dem Inhalt num, str, lst, dat, bol, err oder ukn erwartet.");
             }
         }
 

@@ -102,7 +102,7 @@ namespace BlueControls.Forms {
         }
 
         private void btnAddPhsyik_Click(object sender, System.EventArgs e) {
-            clsPhysicPadItem b = new();
+            PhysicPadItem b = new();
             //b.SetCoordinates(new RectangleF(100, 100, 300, 300));
             Pad.Item.Add(b);
         }

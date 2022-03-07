@@ -15,13 +15,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
-using BlueDatabase;
-using Skript.Enums;
 using System.Collections.Generic;
+using BlueBasics;
+using BlueScript;
 using BlueScript.Structuren;
+using Skript.Enums;
 
-namespace BlueScript {
+namespace BlueDatabase.AdditionalScriptComands {
 
     public class Method_Row : MethodDatabase {
 
@@ -60,18 +60,18 @@ namespace BlueScript {
             return db?.Row.SearchByKey(long.Parse(d2[1]));
         }
 
-        public static strDoItFeedback RowToObjectFeedback(RowItem? row) => row == null
-? new strDoItFeedback("NULL", "row")
-: new strDoItFeedback(row.Database.Filename + "|" + row.Key, "row");
+        public static DoItFeedback RowToObjectFeedback(RowItem? row) => row == null
+? new DoItFeedback("NULL", "row")
+: new DoItFeedback(row.Database.Filename + "|" + row.Key, "row");
 
-        public override List<string> Comand(Script s) => new() { "row" };
+        public override List<string> Comand(Script? s) => new() { "row" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
             var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0);
-            if (allFi is null) { return new strDoItFeedback("Fehler im Filter"); }
+            if (allFi is null) { return new DoItFeedback("Fehler im Filter"); }
 
             var r = RowCollection.MatchesTo(allFi);
 

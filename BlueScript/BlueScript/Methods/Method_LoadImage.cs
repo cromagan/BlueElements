@@ -15,14 +15,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
-using BlueBasics.Enums;
-using Skript.Enums;
 using System.Collections.Generic;
 using System.Drawing;
+using BlueBasics;
+using BlueBasics.Enums;
 using BlueScript.Structuren;
+using Skript.Enums;
 
-namespace BlueScript {
+namespace BlueScript.Methods {
 
     internal class Method_LoadImage : Method {
 
@@ -41,18 +41,18 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "loadimage" };
+        public override List<string> Comand(Script? s) => new() { "loadimage" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
             if (attvar.Attributes[0].ValueString.FileType() != enFileFormat.Image) {
-                return new strDoItFeedback("Datei ist kein Bildformat: " + attvar.Attributes[0].ValueString);
+                return new DoItFeedback("Datei ist kein Bildformat: " + attvar.Attributes[0].ValueString);
             }
 
             if (!FileOperations.FileExists(attvar.Attributes[0].ValueString)) {
-                return new strDoItFeedback("Datei nicht gefunden: " + attvar.Attributes[0].ValueString);
+                return new DoItFeedback("Datei nicht gefunden: " + attvar.Attributes[0].ValueString);
             }
 
             try {
@@ -60,9 +60,9 @@ namespace BlueScript {
                 var bmp = (Bitmap)BitmapExt.Image_FromFile(attvar.Attributes[0].ValueString);
                 var nr = s.AddBitmapToCache(bmp);
 
-                return new strDoItFeedback(nr.ToString(), enVariableDataType.Bitmap);
+                return new DoItFeedback(nr.ToString(), enVariableDataType.Bitmap);
             } catch {
-                return new strDoItFeedback("Datei konnte nicht geladen werden: " + attvar.Attributes[0].ValueString);
+                return new DoItFeedback("Datei konnte nicht geladen werden: " + attvar.Attributes[0].ValueString);
             }
         }
 

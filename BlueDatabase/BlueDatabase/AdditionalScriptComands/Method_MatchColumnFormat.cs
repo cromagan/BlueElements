@@ -15,14 +15,17 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueDatabase.Interfaces;
-using Skript.Enums;
+#nullable enable
+
 using System.Collections.Generic;
 using System.Linq;
+using BlueDatabase.Interfaces;
+using BlueScript;
 using BlueScript.Structuren;
+using Skript.Enums;
 using static BlueBasics.Extensions;
 
-namespace BlueScript {
+namespace BlueDatabase.AdditionalScriptComands {
 
     internal class Method_MatchColumnFormat : MethodDatabase {
 
@@ -41,14 +44,14 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "matchcolumnformat" };
+        public override List<string> Comand(Script? s) => new() { "matchcolumnformat" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
             var column = Column(s, attvar.Attributes[1].Name);
-            if (column == null) { return new strDoItFeedback("Spalte in Datenbank nicht gefunden"); }
+            if (column == null) { return new DoItFeedback("Spalte in Datenbank nicht gefunden"); }
 
             var tocheck = new List<string>();
             if (attvar.Attributes[0].Type == enVariableDataType.List) {
@@ -60,10 +63,10 @@ namespace BlueScript {
             tocheck = tocheck.SortedDistinctList();
 
             if (tocheck.Any(thisstring => !thisstring.IsFormat(column))) {
-                return strDoItFeedback.Falsch();
+                return DoItFeedback.Falsch();
             }
 
-            return strDoItFeedback.Wahr();
+            return DoItFeedback.Wahr();
         }
 
         #endregion

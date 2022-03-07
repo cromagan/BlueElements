@@ -15,12 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using Skript.Enums;
 using System.Collections.Generic;
 using BlueScript.Structuren;
+using Skript.Enums;
 using static BlueBasics.Extensions;
 
-namespace BlueScript {
+namespace BlueScript.Methods {
 
     internal class Method_BerechneVariable_Tilde : Method {
 
@@ -39,18 +39,18 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "~" };
+        public override List<string> Comand(Script? s) => new() { "~" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            if (infos.AttributText.Length < 5) { return new strDoItFeedback("Variablen-Namen-Berechung kann nicht durchgeführt werden."); }
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+            if (infos.AttributText.Length < 5) { return new DoItFeedback("Variablen-Namen-Berechung kann nicht durchgeführt werden."); }
 
             var (postilde, _) = NextText(infos.AttributText, 0, Tilde, false, false, KlammernStd);
             var (posgleich, _) = NextText(infos.AttributText, 0, Gleich, false, false, KlammernStd);
 
-            if (postilde + 1 != posgleich) { return new strDoItFeedback("Variablen-Namen-Berechung kein gültiges End-~-Zeichen gefunden."); }
+            if (postilde + 1 != posgleich) { return new DoItFeedback("Variablen-Namen-Berechung kein gültiges End-~-Zeichen gefunden."); }
 
             var x = new Variable("dummy4", infos.AttributText.Substring(0, postilde), s);
-            if (x.Type != enVariableDataType.String) { return new strDoItFeedback("Fehler beim Berechnen des Variablen-Namens."); }
+            if (x.Type != enVariableDataType.String) { return new DoItFeedback("Fehler beim Berechnen des Variablen-Namens."); }
 
             var newcommand = x.ValueString + infos.AttributText.Substring(posgleich) + ";";
 

@@ -15,11 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using Skript.Enums;
 using System.Collections.Generic;
 using BlueScript.Structuren;
+using Skript.Enums;
 
-namespace BlueScript {
+namespace BlueScript.Methods {
 
     internal class Method_IsNullOrEmpty : Method {
 
@@ -38,21 +38,21 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "isnullorempty" };
+        public override List<string> Comand(Script? s) => new() { "isnullorempty" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
             return attvar.Attributes == null
                 ? attvar.FehlerTyp != enSkriptFehlerTyp.VariableNichtGefunden
-                    ? strDoItFeedback.AttributFehler(this, attvar)
-                    : strDoItFeedback.Wahr()
+                    ? DoItFeedback.AttributFehler(this, attvar)
+                    : DoItFeedback.Wahr()
                 : string.IsNullOrEmpty(attvar.Attributes[0].ValueString)
-                ? strDoItFeedback.Wahr()
+                ? DoItFeedback.Wahr()
                 : attvar.Attributes[0].Type is enVariableDataType.Null or
                                              enVariableDataType.Error or
                                              enVariableDataType.NotDefinedYet
-                ? strDoItFeedback.Wahr()
-                : strDoItFeedback.Falsch();
+                ? DoItFeedback.Wahr()
+                : DoItFeedback.Falsch();
         }
 
         #endregion

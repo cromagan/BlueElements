@@ -15,12 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using Skript.Enums;
 using System.Collections.Generic;
 using BlueScript.Structuren;
+using Skript.Enums;
 using static BlueBasics.Extensions;
 
-namespace BlueScript {
+namespace BlueScript.Methods {
 
     internal class Method_Var : Method {
 
@@ -39,20 +39,20 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "var" };
+        public override List<string> Comand(Script? s) => new() { "var" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+            if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback("Kein Text angekommen."); }
 
             var (pos, _) = NextText(infos.AttributText, 0, Gleich, false, false, null);
 
-            if (pos < 1 || pos > infos.AttributText.Length - 2) { return new strDoItFeedback("Fehler mit = - Zeichen"); }
+            if (pos < 1 || pos > infos.AttributText.Length - 2) { return new DoItFeedback("Fehler mit = - Zeichen"); }
 
             var varnam = infos.AttributText.Substring(0, pos);
 
-            if (!Variable.IsValidName(varnam)) { return new strDoItFeedback(varnam + " ist kein gültiger Variablen-Name"); }
+            if (!Variable.IsValidName(varnam)) { return new DoItFeedback(varnam + " ist kein gültiger Variablen-Name"); }
             var v = s.Variablen.Get(varnam);
-            if (v != null) { return new strDoItFeedback("Variable " + varnam + " ist bereits vorhanden."); }
+            if (v != null) { return new DoItFeedback("Variable " + varnam + " ist bereits vorhanden."); }
             s.Variablen.Add(new Variable(varnam));
 
             return s._berechneVariable.DoitKomplett(infos.AttributText + ";", s, infos);

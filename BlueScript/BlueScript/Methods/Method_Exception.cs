@@ -15,11 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using Skript.Enums;
 using System.Collections.Generic;
 using BlueScript.Structuren;
+using Skript.Enums;
 
-namespace BlueScript {
+namespace BlueScript.Methods {
 
     internal class Method_Exception : Method {
 
@@ -38,13 +38,13 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "Exception" };
+        public override List<string> Comand(Script? s) => new() { "Exception" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Die Ausführung wurde absichtlich abgebrochen."); }
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+            if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback("Die Ausführung wurde absichtlich abgebrochen."); }
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            return attvar.Attributes == null || attvar.Attributes.Count != 1 ? new strDoItFeedback("Die Ausführung wurde absichtlich abgebrochen.")
-                                                                             : new strDoItFeedback("Exception: " + attvar.Attributes[0].ValueString);
+            return attvar.Attributes == null || attvar.Attributes.Count != 1 ? new DoItFeedback("Die Ausführung wurde absichtlich abgebrochen.")
+                                                                             : new DoItFeedback("Exception: " + attvar.Attributes[0].ValueString);
         }
 
         #endregion

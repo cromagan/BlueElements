@@ -17,9 +17,9 @@
 
 using System.Linq;
 
-namespace BlueScript.Structuren
-{
-    public struct strCanDoFeedback {
+namespace BlueScript.Structuren {
+
+    public struct CanDoFeedback {
 
         #region Fields
 
@@ -56,7 +56,7 @@ namespace BlueScript.Structuren
 
         #region Constructors
 
-        public strCanDoFeedback(int errorposition, string errormessage, bool mustabort) {
+        public CanDoFeedback(int errorposition, string errormessage, bool mustabort) {
             ContinueOrErrorPosition = errorposition;
             ErrorMessage = errormessage;
             MustAbort = mustabort;
@@ -66,7 +66,7 @@ namespace BlueScript.Structuren
             LineBreakInCodeBlock = 0;
         }
 
-        public strCanDoFeedback(int continuePosition, string comandText, string attributtext, string codeblockaftertext) {
+        public CanDoFeedback(int continuePosition, string comandText, string attributtext, string codeblockaftertext) {
             ContinueOrErrorPosition = continuePosition;
             ErrorMessage = string.Empty;
             MustAbort = false;

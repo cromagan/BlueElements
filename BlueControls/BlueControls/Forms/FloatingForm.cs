@@ -154,7 +154,7 @@ namespace BlueControls.Forms {
 
         internal static bool IsShowing(object connectedControl) => AllBoxes.Any(thisForm => !thisForm.IsDisposed && connectedControl == thisForm._connectedControl);
 
-        protected override void OnPaint(PaintEventArgs e) {
+        protected override void OnPaint(PaintEventArgs? e) {
             // MyBase.OnPaint(e) - comment out - do not call  http://stackoverflow.com/questions/592538/how-to-create-a-transparent-control-which-works-when-on-top-of-other-controls
             if (IsClosed || IsDisposed) { return; }
             if (BackgroundImage == null || Width != BackgroundImage.Width || Height != BackgroundImage.Height) {

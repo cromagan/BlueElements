@@ -34,8 +34,8 @@ namespace BluePaint {
         #region Methods
 
         private void CreateDummy() {
-            var W = modErgebnis.Ergebnis(X.Text);
-            var H = modErgebnis.Ergebnis(Y.Text);
+            var W = Berechnung.Ergebnis(X.Text);
+            var H = Berechnung.Ergebnis(Y.Text);
             if (W == null || (int)W < 2) {
                 Notification.Show("Bitte Breite eingeben.", enImageCode.Information);
                 return;

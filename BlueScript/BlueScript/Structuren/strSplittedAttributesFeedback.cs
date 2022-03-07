@@ -18,9 +18,9 @@
 using System.Collections.Generic;
 using Skript.Enums;
 
-namespace BlueScript.Structuren
-{
-    public struct strSplittedAttributesFeedback {
+namespace BlueScript.Structuren {
+
+    public struct SplittedAttributesFeedback {
 
         #region Fields
 
@@ -34,13 +34,13 @@ namespace BlueScript.Structuren
 
         #region Constructors
 
-        public strSplittedAttributesFeedback(List<Variable?>? atts) {
+        public SplittedAttributesFeedback(List<Variable?>? atts) {
             Attributes = atts;
             ErrorMessage = string.Empty;
             FehlerTyp = enSkriptFehlerTyp.ohne;
         }
 
-        public strSplittedAttributesFeedback(enSkriptFehlerTyp type, string error) {
+        public SplittedAttributesFeedback(enSkriptFehlerTyp type, string error) {
             Attributes = null;
             ErrorMessage = error;
             FehlerTyp = type;

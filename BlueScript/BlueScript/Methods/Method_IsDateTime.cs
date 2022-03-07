@@ -15,12 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using Skript.Enums;
 using System.Collections.Generic;
 using BlueScript.Structuren;
+using Skript.Enums;
 using static BlueBasics.Converter;
 
-namespace BlueScript {
+namespace BlueScript.Methods {
 
     internal class Method_IsDateTime : Method {
 
@@ -39,13 +39,13 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "isdatetime" };
+        public override List<string> Comand(Script? s) => new() { "isdatetime" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.Falsch(); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.Falsch(); }
             var ok = DateTimeTryParse(attvar.Attributes[0].ValueString, out _);
-            return ok ? strDoItFeedback.Wahr() : strDoItFeedback.Falsch();
+            return ok ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
         }
 
         #endregion

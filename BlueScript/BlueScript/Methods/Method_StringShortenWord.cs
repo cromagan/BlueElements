@@ -15,13 +15,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using Skript.Enums;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using BlueScript.Structuren;
+using Skript.Enums;
 using static BlueBasics.Extensions;
 
-namespace BlueScript {
+namespace BlueScript.Methods {
 
     internal class Method_StringShortenWord : Method {
 
@@ -40,14 +40,14 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "stringshortenword" };
+        public override List<string> Comand(Script? s) => new() { "stringshortenword" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
             var TXT = attvar.Attributes[0].ValueString;
             if (string.IsNullOrEmpty(TXT)) {
-                return new strDoItFeedback(TXT, enVariableDataType.String);
+                return new DoItFeedback(TXT, enVariableDataType.String);
             }
             //TXT = TXT.HTMLSpecialToNormalChar();
             TXT = TXT.Replace("Sekunden", "Sek.");
@@ -107,7 +107,7 @@ namespace BlueScript {
             }
             TXT = TXT.Replace("Tiefkühl", "TK-");
             //TXT = TXT.CreateHtmlCodes(true);
-            return new strDoItFeedback(TXT, enVariableDataType.String);
+            return new DoItFeedback(TXT, enVariableDataType.String);
         }
 
         #endregion

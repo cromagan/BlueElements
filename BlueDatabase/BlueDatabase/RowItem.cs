@@ -194,6 +194,8 @@ namespace BlueDatabase {
 
         public int CellGetColorBgr(ColumnItem? column) => Database.Cell.GetColorBgr(column, this);
 
+        public string CellGetCompareKey(ColumnItem? column) => Database.Cell.CompareKey(column, this);
+
         public DateTime CellGetDateTime(string columnName) => Database.Cell.GetDateTime(Database.Column[columnName], this);
 
         public DateTime CellGetDateTime(ColumnItem? column) => Database.Cell.GetDateTime(column, this);
@@ -264,11 +266,11 @@ namespace BlueDatabase {
         /// </summary>
         /// <param name="columns">Nur diese Spalten in deser Reihenfolge werden berücksichtigt</param>
         /// <returns>Den String mit dem abschluß <<>key<>> und dessen Key.</returns>
-        public string CompareKey(List<ColumnItem?> columns) {
+        public string CompareKey(List<ColumnItem>? columns) {
             StringBuilder r = new();
             if (columns != null) {
-                foreach (var t in columns.Where(t => t != null)) {
-                    r.Append(Database.Cell.CompareKey(t, this) + Constants.FirstSortChar);
+                foreach (var t in columns) {
+                    r.Append(CellGetCompareKey(t) + Constants.FirstSortChar);
                 }
             }
             r.Append(Constants.SecondSortChar + "<key>" + Key);

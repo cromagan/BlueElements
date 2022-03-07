@@ -15,10 +15,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
-using BlueDatabase;
+#nullable enable
 
-namespace BlueScript {
+using BlueBasics;
+using BlueScript;
+using BlueScript.Methods;
+
+namespace BlueDatabase.AdditionalScriptComands {
 
     public abstract class MethodDatabase : Method {
 

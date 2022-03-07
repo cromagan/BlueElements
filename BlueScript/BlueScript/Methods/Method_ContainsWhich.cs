@@ -15,14 +15,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
-using Skript.Enums;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using BlueBasics;
 using BlueScript.Structuren;
+using Skript.Enums;
 
-namespace BlueScript {
+namespace BlueScript.Methods {
 
     internal class Method_ContainsWhitch : Method {
 
@@ -48,11 +48,11 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "containswhich" };
+        public override List<string> Comand(Script? s) => new() { "containswhich" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
             var found = new List<string>();
 
@@ -75,7 +75,7 @@ namespace BlueScript {
                 found.AddIfNotExists(thisW);
             }
 
-            return new strDoItFeedback(found.JoinWithCr() + "\r", enVariableDataType.List);
+            return new DoItFeedback(found.JoinWithCr() + "\r", enVariableDataType.List);
         }
 
         #endregion

@@ -20,10 +20,13 @@ using Skript.Enums;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using BlueScript.Methods;
 using BlueScript.Structuren;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
 using static BlueScript.Extensions;
+
+#nullable enable
 
 namespace BlueScript {
 
@@ -219,7 +222,7 @@ namespace BlueScript {
             Name = name.ToLower();
         }
 
-        public Variable(string name, string attributesText, Script s) : this(name) {
+        public Variable(string name, string attributesText, Script? s) : this(name) {
             var txt = AttributeAuflösen(attributesText, s);
             if (!string.IsNullOrEmpty(txt.ErrorMessage)) { SetError(txt.ErrorMessage); return; }
 
@@ -394,8 +397,8 @@ namespace BlueScript {
 
         #region Methods
 
-        public static strDoItFeedback AttributeAuflösen(string txt, Script s) {
-            Develop.CheckStackForOverflow();
+        public static DoItFeedback AttributeAuflösen(string txt, Script? s) {
+            //Develop.CheckStackForOverflow();
 
             #region Prüfen, Ob noch mehre Klammern da sind, oder Anfangs/End-Klammern entfernen
 
@@ -405,7 +408,7 @@ namespace BlueScript {
                     /// Wir haben so einen Fall: (true) || (true)
                     var txt1 = AttributeAuflösen(txt.Substring(1, pose - 1), s);
                     return !string.IsNullOrEmpty(txt1.ErrorMessage)
-                        ? new strDoItFeedback("Befehls-Berechnungsfehler in ():" + txt1.ErrorMessage)
+                        ? new DoItFeedback("Befehls-Berechnungsfehler in ():" + txt1.ErrorMessage)
                         : AttributeAuflösen(txt1.Value + txt.Substring(pose + 1), s);
                 }
             }
@@ -421,7 +424,7 @@ namespace BlueScript {
             var (uu, _) = NextText(txt, 0, Method_if.UndUnd, false, false, KlammernStd);
             if (uu > 0) {
                 var txt1 = AttributeAuflösen(txt.Substring(0, uu), s);
-                return !string.IsNullOrEmpty(txt1.ErrorMessage) ? new strDoItFeedback("Befehls-Berechnungsfehler vor &&: " + txt1.ErrorMessage)
+                return !string.IsNullOrEmpty(txt1.ErrorMessage) ? new DoItFeedback("Befehls-Berechnungsfehler vor &&: " + txt1.ErrorMessage)
                     : txt1.Value == "false" ? txt1
                     : AttributeAuflösen(txt.Substring(uu + 2), s);
             }
@@ -434,7 +437,7 @@ namespace BlueScript {
             if (oo > 0) {
                 var txt1 = AttributeAuflösen(txt.Substring(0, oo), s);
                 return !string.IsNullOrEmpty(txt1.ErrorMessage)
-                    ? new strDoItFeedback("Befehls-Berechnungsfehler vor ||: " + txt1.ErrorMessage)
+                    ? new DoItFeedback("Befehls-Berechnungsfehler vor ||: " + txt1.ErrorMessage)
                     : txt1.Value == "true" ? txt1 : AttributeAuflösen(txt.Substring(oo + 2), s);
             }
 
@@ -447,7 +450,7 @@ namespace BlueScript {
             if (s != null) {
                 var t = Method.ReplaceVariable(txt, s);
                 if (!string.IsNullOrEmpty(t.ErrorMessage)) {
-                    return new strDoItFeedback("Variablen-Berechnungsfehler: " + t.ErrorMessage);
+                    return new DoItFeedback("Variablen-Berechnungsfehler: " + t.ErrorMessage);
                 }
                 txt = t.AttributeText;
             }
@@ -459,7 +462,7 @@ namespace BlueScript {
             if (s != null) {
                 var t2 = Method.ReplaceComands(txt, Script.Comands, s);
                 if (!string.IsNullOrEmpty(t2.ErrorMessage)) {
-                    return new strDoItFeedback("Befehls-Berechnungsfehler: " + t2.ErrorMessage);
+                    return new DoItFeedback("Befehls-Berechnungsfehler: " + t2.ErrorMessage);
                 }
                 txt = t2.AttributeText;
             }
@@ -471,7 +474,7 @@ namespace BlueScript {
             var (posa, _) = NextText(txt, 0, KlammerAuf, false, false, KlammernStd);
             if (posa > -1) {
                 var (pose, _) = NextText(txt, posa, KlammerZu, false, false, KlammernStd);
-                if (pose <= posa) { return strDoItFeedback.Klammerfehler(); }
+                if (pose <= posa) { return DoItFeedback.Klammerfehler(); }
                 var tmp = AttributeAuflösen(txt.Substring(posa + 1, pose - posa - 1), s);
                 return !string.IsNullOrEmpty(tmp.ErrorMessage)
                     ? tmp
@@ -496,8 +499,8 @@ namespace BlueScript {
             //foreach (var check in Method_if.VergleichsOperatoren) {
             var (i, check) = NextText(txt, 0, Method_if.VergleichsOperatoren, false, false, KlammernStd);
             if (i > -1) {
-                if (i < 1 && check != "!") { return new strDoItFeedback("Operator (" + check + ") am String-Start nicht erlaubt: " + txt); } // <1, weil ja mindestens ein Zeichen vorher sein MUSS!
-                if (i >= txt.Length - 1) { return new strDoItFeedback("Operator (" + check + ") am String-Ende nicht erlaubt: " + txt); } // siehe oben
+                if (i < 1 && check != "!") { return new DoItFeedback("Operator (" + check + ") am String-Start nicht erlaubt: " + txt); } // <1, weil ja mindestens ein Zeichen vorher sein MUSS!
+                if (i >= txt.Length - 1) { return new DoItFeedback("Operator (" + check + ") am String-Ende nicht erlaubt: " + txt); } // siehe oben
 
                 #region Die Werte vor und nach dem Trennzeichen in den Variablen v1 und v2 ablegen
 
@@ -525,10 +528,10 @@ namespace BlueScript {
                 //}
 
                 var s1 = txt.Substring(0, i);
-                if (string.IsNullOrEmpty(s1) && check != "!") { return new strDoItFeedback("Wert vor Operator (" + check + ") nicht gefunden: " + txt); }
+                if (string.IsNullOrEmpty(s1) && check != "!") { return new DoItFeedback("Wert vor Operator (" + check + ") nicht gefunden: " + txt); }
                 if (!string.IsNullOrEmpty(s1)) {
                     var tmp1 = AttributeAuflösen(s1, s);
-                    if (!string.IsNullOrEmpty(tmp1.ErrorMessage)) { return new strDoItFeedback("Befehls-Berechnungsfehler in ():" + tmp1.ErrorMessage); }
+                    if (!string.IsNullOrEmpty(tmp1.ErrorMessage)) { return new DoItFeedback("Befehls-Berechnungsfehler in ():" + tmp1.ErrorMessage); }
                     s1 = tmp1.Value;
                 }
 
@@ -546,29 +549,29 @@ namespace BlueScript {
 
                 var s2 = txt.Substring(i + check.Length);
                 if (string.IsNullOrEmpty(s2)) {
-                    return new strDoItFeedback("Wert nach Operator (" + check + ") nicht gefunden: " + txt);
+                    return new DoItFeedback("Wert nach Operator (" + check + ") nicht gefunden: " + txt);
                 }
 
                 {
                     var tmp1 = AttributeAuflösen(s2, s);
-                    if (!string.IsNullOrEmpty(tmp1.ErrorMessage)) { return new strDoItFeedback("Befehls-Berechnungsfehler in ():" + tmp1.ErrorMessage); }
+                    if (!string.IsNullOrEmpty(tmp1.ErrorMessage)) { return new DoItFeedback("Befehls-Berechnungsfehler in ():" + tmp1.ErrorMessage); }
                     s2 = tmp1.Value;
                 }
 
                 #endregion
 
-                Variable v1 = null;
+                Variable? v1 = null;
                 if (check != "!") { v1 = new Variable("dummy7", s1, null); }
                 Variable v2 = new("dummy8", s2, null);
 
                 // V2 braucht nicht peprüft werden, muss ja eh der gleiche TYpe wie V1 sein
                 if (v1 != null) {
-                    if (v1.Type != v2.Type) { return new strDoItFeedback("Typen unterschiedlich: " + txt); }
+                    if (v1.Type != v2.Type) { return new DoItFeedback("Typen unterschiedlich: " + txt); }
                     if (v1.Type is not enVariableDataType.Bool and
                                    not enVariableDataType.Numeral and
-                                   not enVariableDataType.String) { return new strDoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
+                                   not enVariableDataType.String) { return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
                 } else {
-                    if (v2.Type != enVariableDataType.Bool) { return new strDoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
+                    if (v2.Type != enVariableDataType.Bool) { return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
                 }
 
                 #endregion
@@ -584,45 +587,45 @@ namespace BlueScript {
                         break;
 
                     case ">=":
-                        if (v1.Type != enVariableDataType.Numeral) { return new strDoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
+                        if (v1.Type != enVariableDataType.Numeral) { return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
                         if (v1.ValueDouble >= v2.ValueDouble) { replacer = "true"; }
                         break;
 
                     case "<=":
-                        if (v1.Type != enVariableDataType.Numeral) { return new strDoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
+                        if (v1.Type != enVariableDataType.Numeral) { return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
                         if (v1.ValueDouble <= v2.ValueDouble) { replacer = "true"; }
                         break;
 
                     case "<":
-                        if (v1.Type != enVariableDataType.Numeral) { return new strDoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
+                        if (v1.Type != enVariableDataType.Numeral) { return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
                         if (v1.ValueDouble < v2.ValueDouble) { replacer = "true"; }
                         break;
 
                     case ">":
-                        if (v1.Type != enVariableDataType.Numeral) { return new strDoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
+                        if (v1.Type != enVariableDataType.Numeral) { return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
                         if (v1.ValueDouble > v2.ValueDouble) { replacer = "true"; }
                         break;
 
                     case "||":
-                        if (v1.Type != enVariableDataType.Bool) { return new strDoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
+                        if (v1.Type != enVariableDataType.Bool) { return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
                         replacer = "false";
                         if (v1.ValueBool || v2.ValueBool) { replacer = "true"; }
                         break;
 
                     case "&&":
-                        if (v1.Type != enVariableDataType.Bool) { return new strDoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
+                        if (v1.Type != enVariableDataType.Bool) { return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
                         if (v1.ValueBool && v2.ValueBool) { replacer = "true"; }
                         break;
 
                     case "!":
                         // S1 dürfte eigentlich nie was sein: !False||!false
                         // entweder ist es ganz am anfang, oder direkt nach einem Trenneichen
-                        if (v2.Type != enVariableDataType.Bool) { return new strDoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
+                        if (v2.Type != enVariableDataType.Bool) { return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt); }
                         if (!v2.ValueBool) { replacer = "true"; }
                         break;
 
                     default:
-                        return new strDoItFeedback("Operator (" + check + ") unbekannt: " + txt);
+                        return new DoItFeedback("Operator (" + check + ") unbekannt: " + txt);
                 }
                 if (!string.IsNullOrEmpty(replacer)) { txt = replacer; }
 
@@ -635,7 +638,7 @@ namespace BlueScript {
             #region testen auf bool
 
             var x = Method_if.GetBool(txt);
-            if (x != null) { return new strDoItFeedback(x, enVariableDataType.NotDefinedYet); }
+            if (x != null) { return new DoItFeedback(x, enVariableDataType.NotDefinedYet); }
 
             #endregion
 
@@ -645,8 +648,8 @@ namespace BlueScript {
                 var tmp = txt.Substring(1, txt.Length - 2); // Nicht Trimmen! Ansonsten wird sowas falsch: "X=" + "";
                 tmp = tmp.Replace("\"+\"", string.Empty); // Zuvor die " entfernen! dann verketten! Ansonsten wird "+" mit nix ersetzte, anstelle einem  +
                 return tmp.Contains("\"")
-                    ? new strDoItFeedback("Verkettungsfehler: " + txt)
-                    : new strDoItFeedback("\"" + tmp + "\"", enVariableDataType.NotDefinedYet); // Beispiel: s ist nicht definiert und "jj" + s + "kk
+                    ? new DoItFeedback("Verkettungsfehler: " + txt)
+                    : new DoItFeedback("\"" + tmp + "\"", enVariableDataType.NotDefinedYet); // Beispiel: s ist nicht definiert und "jj" + s + "kk
             }
 
             #endregion
@@ -654,16 +657,16 @@ namespace BlueScript {
             #region Rechenoperatoren ersetzen und vereinfachen
 
             // String wird vorher abgebrochen, um nicht nochmal auf Gänsefüsschen zutesten
-            var (pos2, _) = NextText(txt, 0, modErgebnis.RechenOperatoren, false, false, KlammernStd);
+            var (pos2, _) = NextText(txt, 0, Berechnung.RechenOperatoren, false, false, KlammernStd);
             if (pos2 >= 0) {
-                var erg = modErgebnis.Ergebnis(txt);
-                if (erg == null) { return new strDoItFeedback("Berechnungsfehler der Formel: " + txt); }
+                var erg = Berechnung.Ergebnis(txt);
+                if (erg == null) { return new DoItFeedback("Berechnungsfehler der Formel: " + txt); }
                 txt = erg.ToString();
             }
 
             #endregion
 
-            return new strDoItFeedback(txt, enVariableDataType.NotDefinedYet);
+            return new DoItFeedback(txt, enVariableDataType.NotDefinedYet);
         }
 
         public static string GenerateObject(string objecttype, string value) => objecttype.ToUpper().ReduceToChars(Constants.Char_AZ + Constants.Char_Numerals) + "&" + value.ToNonCritical();

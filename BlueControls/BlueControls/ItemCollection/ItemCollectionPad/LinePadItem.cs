@@ -39,7 +39,7 @@ namespace BlueControls.ItemCollection {
         private string _calcTempPointsCode = string.Empty;
         private DateTime _lastRecalc = DateTime.Now.AddHours(-1);
 
-        private List<PointF> _tempPoints;
+        private List<PointF>? _tempPoints;
 
         #endregion
 

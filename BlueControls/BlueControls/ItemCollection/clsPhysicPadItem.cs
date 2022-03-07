@@ -19,7 +19,7 @@ using System.Collections.Generic;
 
 namespace BlueControls.ItemCollection {
 
-    internal class clsPhysicPadItem : clsAbstractPhysicPadItem {
+    internal class PhysicPadItem : AbstractPhysicPadItem {
 
         #region Fields
 
@@ -29,7 +29,7 @@ namespace BlueControls.ItemCollection {
 
         #region Constructors
 
-        public clsPhysicPadItem() : base(string.Empty) { }
+        public PhysicPadItem() : base(string.Empty) { }
 
         #endregion
 

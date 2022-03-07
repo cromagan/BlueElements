@@ -15,12 +15,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueDatabase;
-using Skript.Enums;
-using System.Collections.Generic;
-using BlueScript.Structuren;
+#nullable enable
 
-namespace BlueScript {
+using System.Collections.Generic;
+using BlueScript;
+using BlueScript.Structuren;
+using Skript.Enums;
+
+namespace BlueDatabase.AdditionalScriptComands {
 
     public class Method_CellSetFilter : MethodDatabase {
 
@@ -46,26 +48,26 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "cellsetfilter" };
+        public override List<string> Comand(Script? s) => new() { "cellsetfilter" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
             var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 2);
-            if (allFi is null) { return new strDoItFeedback("Fehler im Filter"); }
+            if (allFi is null) { return new DoItFeedback("Fehler im Filter"); }
 
             var columnToSet = allFi[0].Database.Column.Exists(attvar.Attributes[1].ValueString);
-            if (columnToSet == null) { return new strDoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[4].ValueString); }
+            if (columnToSet == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[4].ValueString); }
 
             var r = RowCollection.MatchesTo(allFi);
             if (r == null || r.Count is 0 or > 1) {
-                return strDoItFeedback.Falsch();
+                return DoItFeedback.Falsch();
             }
 
             r[0].CellSet(columnToSet, attvar.Attributes[0].ValueString);
 
-            return r[0].CellGetString(columnToSet) == attvar.Attributes[0].ValueString ? strDoItFeedback.Wahr() : strDoItFeedback.Falsch();
+            return r[0].CellGetString(columnToSet) == attvar.Attributes[0].ValueString ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
         }
 
         #endregion

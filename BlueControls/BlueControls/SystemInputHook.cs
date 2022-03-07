@@ -343,7 +343,7 @@ namespace BlueControls {
 
         private void OnMouseUp(System.Windows.Forms.MouseEventArgs e) => MouseUp?.Invoke(this, e);
 
-        private void Tim_Tick(object sender, System.EventArgs e) {
+        private void Tim_Tick(object? sender, System.EventArgs? e) {
             Tim.Enabled = false;
             DoMouse();
             DoKeyboard();

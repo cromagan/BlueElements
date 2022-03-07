@@ -41,6 +41,8 @@ using System.Threading.Tasks;
 using static BlueBasics.Converter;
 using static BlueBasics.FileOperations;
 
+#nullable enable
+
 namespace BlueControls.Controls {
 
     [Designer(typeof(BasicDesigner))]
@@ -74,11 +76,11 @@ namespace BlueControls.Controls {
         private BlueFont? _columnFont;
         private ColumnItem? _cursorPosColumn;
         private RowData? _cursorPosRow;
-        private Database _database;
+        private Database? _database;
         private enBlueTableAppearance _design = enBlueTableAppearance.Standard;
 
         // Die Sortierung der Zeile
-        private List<RowItem?> _filteredRows;
+        private List<RowItem>? _filteredRows;
 
         private int? _headSize;
 
@@ -129,7 +131,7 @@ namespace BlueControls.Controls {
         private List<RowData>? _sortedRowData;
         private string _storedView = string.Empty;
         private Rectangle _tmpCursorRect = Rectangle.Empty;
-        private RowItem _unterschiede;
+        private RowItem? _unterschiede;
         private int _wiederHolungsSpaltenWidth;
 
         #endregion
@@ -211,7 +213,7 @@ namespace BlueControls.Controls {
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public Database Database {
+        public Database? Database {
             get => _database;
             set {
                 if (_database == value) { return; }
@@ -1006,10 +1008,10 @@ namespace BlueControls.Controls {
             Invalidate_FilteredRows(); // beim Parsen wirft der Filter kein Event ab
         }
 
-        public void Pin(List<RowItem?> rows) {
+        public void Pin(List<RowItem>? rows) {
             // Arbeitet mit Rows, weil nur eine Anpinngug möglich ist
 
-            if (rows == null) { rows = new List<RowItem?>(); }
+            if (rows == null) { rows = new List<RowItem>(); }
 
             rows = rows.Distinct().ToList();
             if (!rows.IsDifferentTo(PinnedRows)) { return; }
@@ -1183,8 +1185,8 @@ namespace BlueControls.Controls {
         internal static void StartDatabaseService() {
             if (_serviceStarted) { return; }
             _serviceStarted = true;
-            BlueBasics.MultiUserFile.ClsMultiUserFile.AllFiles.ItemAdded += AllFiles_ItemAdded;
-            BlueBasics.MultiUserFile.ClsMultiUserFile.AllFiles.ItemRemoving += AllFiles_ItemRemoving;
+            BlueBasics.MultiUserFile.MultiUserFile.AllFiles.ItemAdded += AllFiles_ItemAdded;
+            BlueBasics.MultiUserFile.MultiUserFile.AllFiles.ItemRemoving += AllFiles_ItemRemoving;
             Database.DropConstructorMessage += Database_DropConstructorMessage;
         }
 

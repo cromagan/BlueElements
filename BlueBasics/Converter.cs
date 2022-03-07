@@ -24,6 +24,8 @@ using System.IO;
 using System.Text;
 using static BlueBasics.FileOperations;
 
+#nullable enable
+
 namespace BlueBasics {
 
     public static class Converter {

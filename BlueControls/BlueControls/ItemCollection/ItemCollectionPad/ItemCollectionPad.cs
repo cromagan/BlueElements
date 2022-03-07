@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -39,10 +41,10 @@ namespace BlueControls.ItemCollection {
         public static readonly int Dpi = 300;
         public string Caption;
         public string Id;
-        public PointM PRLo;
-        public PointM PRLu;
-        public PointM PRRo;
-        public PointM PRRu;
+        public PointM? PRLo;
+        public PointM? PRLu;
+        public PointM? PRRo;
+        public PointM? PRRu;
 
         /// <summary>
         /// Für automatische Generierungen, die zu schnell hintereinander kommen, ein Counter für den Dateinamen
@@ -324,7 +326,7 @@ namespace BlueControls.ItemCollection {
 
         public bool ParseVariable(string name, string wert) => ParseVariable(null, new BlueScript.Variable(name, wert, Skript.Enums.enVariableDataType.String));
 
-        public bool ParseVariable(BlueScript.Script s, BlueScript.Variable variable) {
+        public bool ParseVariable(BlueScript.Script? s, BlueScript.Variable variable) {
             var did = false;
             foreach (var thisItem in this) {
                 if (thisItem is ICanHaveColumnVariables variables) {

@@ -32,6 +32,8 @@ using System.Linq;
 using static BlueBasics.Develop;
 using static BlueBasics.FileOperations;
 
+#nullable enable
+
 namespace BlueControls.Forms {
 
     public partial class FrmTableView {
@@ -185,7 +187,7 @@ namespace BlueControls.Forms {
 
         protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
             SetDatabasetoNothing();
-            BlueBasics.MultiUserFile.ClsMultiUserFile.SaveAll(true);
+            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(true);
             base.OnFormClosing(e);
         }
 
@@ -233,7 +235,7 @@ namespace BlueControls.Forms {
         private void btnAlleSchlieﬂen_Click(object sender, System.EventArgs e) => TableView.CollapesAll();
 
         private void btnNeuDB_SaveAs_Click(object sender, System.EventArgs e) {
-            BlueBasics.MultiUserFile.ClsMultiUserFile.SaveAll(false);
+            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
             var bu = (Button)sender;
             switch (bu.Name) {
                 case "btnSaveAs":
@@ -261,7 +263,7 @@ namespace BlueControls.Forms {
         }
 
         private void btnOeffnen_Click(object sender, System.EventArgs e) {
-            BlueBasics.MultiUserFile.ClsMultiUserFile.SaveAll(false);
+            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
             LoadTab.ShowDialog();
         }
 
@@ -351,7 +353,7 @@ namespace BlueControls.Forms {
         private void Daten¸berpr¸fung_Click(object sender, System.EventArgs e) => TableView.Database.Row.DoAutomatic(TableView.Filter, true, TableView.PinnedRows, "manual check");
 
         private void Drucken_ItemClicked(object sender, BasicListItemEventArgs e) {
-            BlueBasics.MultiUserFile.ClsMultiUserFile.SaveAll(false);
+            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
             switch (e.Item.Internal) {
                 case "erweitert":
                     Visible = false;
@@ -449,13 +451,13 @@ namespace BlueControls.Forms {
         }
 
         private void LastDatabases_ItemClicked(object sender, BasicListItemEventArgs e) {
-            BlueBasics.MultiUserFile.ClsMultiUserFile.SaveAll(false);
+            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
             DatabaseSet(e.Item.Internal);
         }
 
         private void LoadTab_FileOk(object sender, CancelEventArgs e) => DatabaseSet(LoadTab.FileName);
 
-        private string NameRepair(string istName, RowItem vRow) {
+        private string NameRepair(string istName, RowItem? vRow) {
             var newName = istName;
             var istZ = 0;
             do {
@@ -477,7 +479,7 @@ namespace BlueControls.Forms {
         }
 
         private void Ordn_Click(object sender, System.EventArgs e) {
-            BlueBasics.MultiUserFile.ClsMultiUserFile.SaveAll(false);
+            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
             SelectStandardTab();
             ExecuteFile(TableView.Database.Filename.FilePath());
         }
@@ -490,7 +492,7 @@ namespace BlueControls.Forms {
         }
 
         private void such_Enter(object sender, System.EventArgs e) {
-            if (SuchB.Enabled) { SuchB_Click(SuchB, null); }
+            if (SuchB.Enabled) { SuchB_Click(SuchB, System.EventArgs.Empty); }
         }
 
         private void such_TextChanged(object sender, System.EventArgs e) => Check_SuchButton();
@@ -635,13 +637,13 @@ namespace BlueControls.Forms {
         private void TableView_ViewChanged(object sender, System.EventArgs e) => Table.WriteColumnArrangementsInto(cbxColumnArr, TableView.Database, TableView.Arrangement);
 
         private void Tempor‰renSpeicherort÷ffnen_Click(object sender, System.EventArgs e) {
-            BlueBasics.MultiUserFile.ClsMultiUserFile.SaveAll(false);
+            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
             SelectStandardTab();
             ExecuteFile(Path.GetTempPath());
         }
 
         private void ‹berDiesesProgramm_Click(object sender, System.EventArgs e) {
-            BlueBasics.MultiUserFile.ClsMultiUserFile.SaveAll(false);
+            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
             MessageBox.Show("(c) Christian Peter<br>V " + Version, enImageCode.Information, "OK");
         }
 

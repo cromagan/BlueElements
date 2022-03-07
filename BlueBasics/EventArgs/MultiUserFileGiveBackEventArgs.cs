@@ -15,7 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics.MultiUserFile;
+#nullable enable
 
 namespace BlueBasics.EventArgs {
 
@@ -23,7 +23,7 @@ namespace BlueBasics.EventArgs {
 
         #region Properties
 
-        public ClsMultiUserFile File { get; set; }
+        public MultiUserFile.MultiUserFile? File { get; set; }
 
         #endregion
     }

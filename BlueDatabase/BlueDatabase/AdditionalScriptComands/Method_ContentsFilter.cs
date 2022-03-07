@@ -15,12 +15,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using Skript.Enums;
 using System.Collections.Generic;
+using BlueScript;
 using BlueScript.Structuren;
+using Skript.Enums;
 using static BlueBasics.Extensions;
 
-namespace BlueScript {
+namespace BlueDatabase.AdditionalScriptComands {
 
     public class Method_ContentsFilter : MethodDatabase {
 
@@ -46,20 +47,20 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "contentsfilter" };
+        public override List<string> Comand(Script? s) => new() { "contentsfilter" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
             var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 1);
 
-            if (allFi is null) { return new strDoItFeedback("Fehler im Filter"); }
+            if (allFi is null) { return new DoItFeedback("Fehler im Filter"); }
 
             var returncolumn = allFi[0].Database.Column.Exists(attvar.Attributes[0].ValueString);
-            if (returncolumn == null) { return new strDoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[0].ValueString); }
+            if (returncolumn == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[0].ValueString); }
             var x = returncolumn.Contents(allFi, null);
-            return new strDoItFeedback(x.JoinWithCr() + "\r", enVariableDataType.List);
+            return new DoItFeedback(x.JoinWithCr() + "\r", enVariableDataType.List);
         }
 
         #endregion

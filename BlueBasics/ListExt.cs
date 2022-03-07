@@ -22,13 +22,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+#nullable enable
+
 namespace BlueBasics {
 
     public class ListExt<T> : List<T>, IChangedFeedback, IDisposable {
 
         #region Fields
 
-        private bool _ThrowEvents = true;
+        private bool _throwEvents = true;
 
         #endregion
 
@@ -71,10 +73,10 @@ namespace BlueBasics {
         public bool Disposed { get; private set; }
 
         public bool ThrowEvents {
-            get => !Disposed && _ThrowEvents;
+            get => !Disposed && _throwEvents;
             set {
-                if (_ThrowEvents == value) { Develop.DebugPrint(enFehlerArt.Fehler, "Set ThrowEvents-Fehler! " + value.ToPlusMinus()); }
-                _ThrowEvents = value;
+                if (_throwEvents == value) { Develop.DebugPrint(enFehlerArt.Fehler, "Set ThrowEvents-Fehler! " + value.ToPlusMinus()); }
+                _throwEvents = value;
             }
         }
 
@@ -175,7 +177,7 @@ namespace BlueBasics {
         public new void InsertRange(int index, IEnumerable<T> collection) => Develop.DebugPrint_NichtImplementiert();
 
         public virtual void OnChanged() {
-            if (!_ThrowEvents) { return; }
+            if (!_throwEvents) { return; }
             Changed?.Invoke(this, System.EventArgs.Empty);
         }
 
@@ -279,7 +281,7 @@ namespace BlueBasics {
                     // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
                 }
                 Disposed = true;  // Keine Events, fix!
-                _ThrowEvents = false;
+                _throwEvents = false;
                 base.Clear();
                 // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
                 // TODO: Große Felder auf NULL setzen
@@ -288,13 +290,13 @@ namespace BlueBasics {
 
         protected virtual void OnItemAdded(T item) {
             if (item is IChangedFeedback cItem) { cItem.Changed += CItem_Changed; }
-            if (!_ThrowEvents) { return; }
+            if (!_throwEvents) { return; }
             ItemAdded?.Invoke(this, new ListEventArgs(item));
             OnChanged();
         }
 
         protected virtual void OnItemRemoved() {
-            if (!_ThrowEvents) { return; }
+            if (!_throwEvents) { return; }
             ItemRemoved?.Invoke(this, System.EventArgs.Empty);
             OnChanged();
         }
@@ -305,18 +307,18 @@ namespace BlueBasics {
         /// <param name="item"></param>
         protected virtual void OnItemRemoving(T item) {
             if (item is IChangedFeedback cItem) { cItem.Changed -= CItem_Changed; }
-            if (!_ThrowEvents) { return; }
+            if (!_throwEvents) { return; }
             ItemRemoving?.Invoke(this, new ListEventArgs(item));
             // OnListOrItemChanged(); Wird bei REMOVED ausgelöst
         }
 
         private void CItem_Changed(object sender, System.EventArgs e) {
-            if (!_ThrowEvents) { return; }
+            if (!_throwEvents) { return; }
             OnItemInternalChanged(sender);
         }
 
         private void OnItemInternalChanged(object item) {
-            if (!_ThrowEvents) { return; }
+            if (!_throwEvents) { return; }
             ItemInternalChanged?.Invoke(this, new ListEventArgs(item));
             OnChanged();
         }
@@ -326,7 +328,7 @@ namespace BlueBasics {
         /// </summary>
         /// <param name="item"></param>
         private void OnItemSeted(T item) {
-            if (!_ThrowEvents) { return; }
+            if (!_throwEvents) { return; }
             ItemSeted?.Invoke(this, new ListEventArgs(item));
             // OnListOrItemChanged();
         }

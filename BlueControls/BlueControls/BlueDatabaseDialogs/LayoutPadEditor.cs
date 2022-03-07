@@ -39,12 +39,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
             Database = database;
             scriptEditor.Database = database;
-            if (Database != null) {
-                Database.Disposing += Database_Disposing;
-                Database.ShouldICancelSaveOperations += Database_ShouldICancelDiscOperations;
-            }
+            Database.Disposing += Database_Disposing;
+            Database.ShouldICancelSaveOperations += Database_ShouldICancelDiscOperations;
 
-            befülleLayoutDropdown();
+            BefülleLayoutDropdown();
             CheckButtons();
         }
 
@@ -52,7 +50,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         #region Properties
 
-        public Database Database { get; private set; }
+        public Database? Database { get; private set; }
 
         #endregion
 
@@ -63,19 +61,19 @@ namespace BlueControls.BlueDatabaseDialogs {
             CheckButtons();
         }
 
-        internal void LoadLayout(string fileOrLayoutID) {
+        internal void LoadLayout(string fileOrLayoutId) {
             SaveCurrentLayout();
-            cbxLayout.Text = fileOrLayoutID;
+            cbxLayout.Text = fileOrLayoutId;
 
-            if (string.IsNullOrEmpty(fileOrLayoutID)) {
+            if (string.IsNullOrEmpty(fileOrLayoutId)) {
                 DisablePad();
                 return;
             }
 
-            var ind = Database.Layouts.LayoutIDToIndex(fileOrLayoutID);
+            var ind = Database.Layouts.LayoutIDToIndex(fileOrLayoutId);
             if (ind < 0) {
-                if (fileOrLayoutID.FileSuffix().ToUpper() == "BCR") {
-                    LoadFile(fileOrLayoutID, fileOrLayoutID);
+                if (fileOrLayoutId.FileSuffix().ToUpper() == "BCR") {
+                    LoadFile(fileOrLayoutId, fileOrLayoutId);
                 } else {
                     DisablePad();
                     TextPadItem x = new("x", "Nicht editierbares Layout aus dem Dateisystem");
@@ -85,7 +83,7 @@ namespace BlueControls.BlueDatabaseDialogs {
                     ItemChanged();
                 }
             } else {
-                LoadFromString(Database.Layouts[ind], fileOrLayoutID);
+                LoadFromString(Database.Layouts[ind], fileOrLayoutId);
             }
         }
 
@@ -102,7 +100,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         private static void Database_ShouldICancelDiscOperations(object sender, CancelEventArgs e) => e.Cancel = true;
 
-        private void befülleLayoutDropdown() {
+        private void BefülleLayoutDropdown() {
             if (Database != null) {
                 cbxLayout.Item.Clear();
                 ExportDialog.AddLayoutsOff(cbxLayout.Item, Database, true);
@@ -123,7 +121,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             CreativePad c = new();
             c.Item.Caption = ex;
             Database.Layouts.Add(c.Item.ToString());
-            befülleLayoutDropdown();
+            BefülleLayoutDropdown();
             LoadLayout(c.Item.Id);
             CheckButtons();
         }
@@ -138,11 +136,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (MessageBox.Show("Layout <b>'" + Pad.Item.Caption + "'</b><br>wirklich löschen?", enImageCode.Warnung, "Ja", "Nein") != 0) { return; }
             Database.Layouts.RemoveAt(ind);
             LoadLayout(string.Empty);
-            befülleLayoutDropdown();
+            BefülleLayoutDropdown();
             CheckButtons();
         }
 
-        private void btnLayoutOeffnen_Click(object sender, System.EventArgs e) => ExecuteFile(cbxLayout.Text, null, false);
+        private void btnLayoutOeffnen_Click(object sender, System.EventArgs e) => ExecuteFile(cbxLayout.Text, string.Empty, false);
 
         private void btnLayoutUmbenennen_Click(object sender, System.EventArgs e) {
             SaveCurrentLayout();
@@ -155,7 +153,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (string.IsNullOrEmpty(ex)) { return; }
             Pad.Item.Caption = ex;
             SaveCurrentLayout();
-            befülleLayoutDropdown();
+            BefülleLayoutDropdown();
             CheckButtons();
         }
 

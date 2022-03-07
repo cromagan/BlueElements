@@ -43,9 +43,9 @@ namespace BlueControls.Controls {
         /// ACHTUNG: Das Control wird niemals den Filter selbst ändern.
         /// Der Filter wird nur zur einfacheren Identifizierung der nachfolgenden Steuerelemente behalten.
         /// </summary>
-        public readonly FilterItem Filter;
+        public readonly FilterItem? Filter;
 
-        public readonly Table TableView;
+        public readonly Table? TableView;
 
         #endregion
 
@@ -56,7 +56,7 @@ namespace BlueControls.Controls {
             // InitializeComponent();
         }
 
-        public FlexiControlForFilter(Table tableView, FilterItem filter, Filterleiste? myParent) {
+        public FlexiControlForFilter(Table? tableView, FilterItem? filter, Filterleiste? myParent) {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
@@ -223,7 +223,7 @@ namespace BlueControls.Controls {
 
         private void Filter_Changed(object sender, System.EventArgs e) => UpdateFilterData((Filterleiste)Parent);
 
-        private void UpdateFilterData(Filterleiste myParent) {
+        private void UpdateFilterData(Filterleiste? myParent) {
             if (Filter?.Column == null) {
                 DisabledReason = "Bezug zum Filter verloren.";
                 Caption = string.Empty;

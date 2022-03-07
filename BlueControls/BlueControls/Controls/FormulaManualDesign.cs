@@ -25,11 +25,12 @@ using System.ComponentModel;
 
 namespace BlueControls.Controls {
 
+    [Obsolete]
     public partial class FormulaManualDesign : System.Windows.Forms.Panel {
 
         #region Fields
 
-        private Database _database;
+        private Database? _database;
 
         private long _savedRowKey = long.MinValue;
 
@@ -56,7 +57,7 @@ namespace BlueControls.Controls {
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public Database Database {
+        public Database? Database {
             get => _database;
             set {
                 if (_database == value) { return; }

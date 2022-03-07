@@ -15,11 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using Skript.Enums;
 using System.Collections.Generic;
 using BlueScript.Structuren;
+using Skript.Enums;
 
-namespace BlueScript {
+namespace BlueScript.Methods {
 
     internal class Method_Break : Method {
 
@@ -45,14 +45,14 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "break" };
+        public override List<string> Comand(Script? s) => new() { "break" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            if (s.Schleife < 1 && s.Sub < 1) { return new strDoItFeedback("Break nur innerhalb einer Schleife oder Subroutine erlaubt."); }
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+            if (s.Schleife < 1 && s.Sub < 1) { return new DoItFeedback("Break nur innerhalb einer Schleife oder Subroutine erlaubt."); }
 
-            if (s.BreakFired) { return new strDoItFeedback("Break doppelt ausgelöst."); }
+            if (s.BreakFired) { return new DoItFeedback("Break doppelt ausgelöst."); }
             s.BreakFired = true;
-            return strDoItFeedback.Null();
+            return DoItFeedback.Null();
         }
 
         #endregion

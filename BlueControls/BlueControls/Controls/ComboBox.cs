@@ -137,7 +137,7 @@ namespace BlueControls.Controls {
             }
         }
 
-        public void ShowMenu(object sender, System.Windows.Forms.MouseEventArgs ex) {
+        public void ShowMenu(object? sender, System.Windows.Forms.MouseEventArgs? ex) {
             if (_btnDropDownIsIn || IsDisposed || !Enabled) { return; }
             _btnDropDownIsIn = true;
             OnDropDownShowing();

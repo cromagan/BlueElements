@@ -28,6 +28,8 @@ using System.Runtime.InteropServices;
 using System.Windows.Media.Imaging;
 using static BlueBasics.FileOperations;
 
+#nullable enable
+
 namespace BlueBasics {
 
     // https://stackoverflow.com/questions/24701703/c-sharp-faster-alternatives-to-setpixel-and-getpixel-for-bitmaps-for-windows-f
@@ -447,64 +449,64 @@ namespace BlueBasics {
             Bitmap resultBitmap = null;
             switch (blurType) {
                 case BlurType.Mean3x3:
-                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.Mean3X3, 1.0 / 9.0, 0);
+                    resultBitmap = ConvolutionFilter(bmp, ImageMatrix.Mean3X3, 1.0 / 9.0, 0);
                     break;
 
                 case BlurType.Mean5x5:
-                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.Mean5X5, 1.0 / 25.0, 0);
+                    resultBitmap = ConvolutionFilter(bmp, ImageMatrix.Mean5X5, 1.0 / 25.0, 0);
                     break;
 
                 case BlurType.Mean7x7:
-                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.Mean7X7, 1.0 / 49.0, 0);
+                    resultBitmap = ConvolutionFilter(bmp, ImageMatrix.Mean7X7, 1.0 / 49.0, 0);
                     break;
 
                 case BlurType.Mean9x9:
-                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.Mean9X9, 1.0 / 81.0, 0);
+                    resultBitmap = ConvolutionFilter(bmp, ImageMatrix.Mean9X9, 1.0 / 81.0, 0);
 
                     break;
 
                 case BlurType.GaussianBlur3x3:
-                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.GaussianBlur3X3, 1.0 / 16.0, 0);
+                    resultBitmap = ConvolutionFilter(bmp, ImageMatrix.GaussianBlur3X3, 1.0 / 16.0, 0);
                     break;
 
                 case BlurType.GaussianBlur5x5:
-                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.GaussianBlur5X5, 1.0 / 159.0, 0);
+                    resultBitmap = ConvolutionFilter(bmp, ImageMatrix.GaussianBlur5X5, 1.0 / 159.0, 0);
                     break;
 
                 case BlurType.MotionBlur5x5:
-                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur5X5, 1.0 / 10.0, 0);
+                    resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur5X5, 1.0 / 10.0, 0);
                     break;
 
                 case BlurType.MotionBlur5x5At45Degrees:
-                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur5X5At45Degrees, 1.0 / 5.0, 0);
+                    resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur5X5At45Degrees, 1.0 / 5.0, 0);
                     break;
 
                 case BlurType.MotionBlur5x5At135Degrees:
-                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur5X5At135Degrees, 1.0 / 5.0, 0);
+                    resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur5X5At135Degrees, 1.0 / 5.0, 0);
                     break;
 
                 case BlurType.MotionBlur7x7:
-                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur7X7, 1.0 / 14.0, 0);
+                    resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur7X7, 1.0 / 14.0, 0);
                     break;
 
                 case BlurType.MotionBlur7x7At45Degrees:
-                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur7X7At45Degrees, 1.0 / 7.0, 0);
+                    resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur7X7At45Degrees, 1.0 / 7.0, 0);
                     break;
 
                 case BlurType.MotionBlur7x7At135Degrees:
-                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur7X7At135Degrees, 1.0 / 7.0, 0);
+                    resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur7X7At135Degrees, 1.0 / 7.0, 0);
                     break;
 
                 case BlurType.MotionBlur9x9:
-                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur9X9, 1.0 / 18.0, 0);
+                    resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur9X9, 1.0 / 18.0, 0);
                     break;
 
                 case BlurType.MotionBlur9x9At45Degrees:
-                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur9X9At45Degrees, 1.0 / 9.0, 0);
+                    resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur9X9At45Degrees, 1.0 / 9.0, 0);
                     break;
 
                 case BlurType.MotionBlur9x9At135Degrees:
-                    resultBitmap = ConvolutionFilter(bmp, clsImageMatrix.MotionBlur9X9At135Degrees, 1.0 / 9.0, 0);
+                    resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur9X9At135Degrees, 1.0 / 9.0, 0);
                     break;
 
                 case BlurType.Median3x3:

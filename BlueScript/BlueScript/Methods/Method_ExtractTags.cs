@@ -15,12 +15,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
-using Skript.Enums;
 using System.Collections.Generic;
+using BlueBasics;
 using BlueScript.Structuren;
+using Skript.Enums;
 
-namespace BlueScript {
+#nullable enable
+
+namespace BlueScript.Methods {
 
     internal class Method_ExtractTags : Method {
 
@@ -43,11 +45,11 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "extracttags" };
+        public override List<string> Comand(Script? s) => new() { "extracttags" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
             const string coment = "Mit dem Befehl 'ExtractTags' erstellt";
             s.Variablen.RemoveWithComent(coment);
@@ -71,7 +73,7 @@ namespace BlueScript {
                 }
             }
 
-            return strDoItFeedback.Null();
+            return DoItFeedback.Null();
         }
 
         #endregion

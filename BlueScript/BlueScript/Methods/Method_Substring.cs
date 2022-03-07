@@ -15,11 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using Skript.Enums;
 using System.Collections.Generic;
 using BlueScript.Structuren;
+using Skript.Enums;
 
-namespace BlueScript {
+namespace BlueScript.Methods {
 
     internal class Method_Substring : Method {
 
@@ -38,11 +38,11 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "substring" };
+        public override List<string> Comand(Script? s) => new() { "substring" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
             var st = attvar.Attributes[1].ValueInt;
             var en = attvar.Attributes[2].ValueInt;
             if (st < 0) {
@@ -52,7 +52,7 @@ namespace BlueScript {
             if (st + en > attvar.Attributes[0].ValueString.Length) {
                 en = attvar.Attributes[0].ValueString.Length - st;
             }
-            return new strDoItFeedback(attvar.Attributes[0].ValueString.Substring(st, en), enVariableDataType.String);
+            return new DoItFeedback(attvar.Attributes[0].ValueString.Substring(st, en), enVariableDataType.String);
         }
 
         #endregion

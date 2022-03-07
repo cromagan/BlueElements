@@ -44,16 +44,16 @@ namespace BluePaint {
         public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap? originalPic) {
             if (!_ausricht) { return; }
             var pic = OnNeedCurrentPic();
-            e.DrawLine(Pen_RedTransp, -1, e.Current.TrimmedY, pic.Width, e.Current.TrimmedY);
-            e.DrawLine(Pen_RedTransp, e.Current.TrimmedX, -1, e.Current.TrimmedX, pic.Height);
+            e.DrawLine(PenRedTransp, -1, e.Current.TrimmedY, pic.Width, e.Current.TrimmedY);
+            e.DrawLine(PenRedTransp, e.Current.TrimmedX, -1, e.Current.TrimmedX, pic.Height);
             if (e.Current.Button != System.Windows.Forms.MouseButtons.Left || e.MouseDown == null) {
                 return;
             }
 
-            e.DrawLine(Pen_RedTransp, -1, e.MouseDown.TrimmedY, pic.Width, e.MouseDown.TrimmedY);
-            e.DrawLine(Pen_RedTransp, e.MouseDown.TrimmedX, -1, e.MouseDown.TrimmedX, pic.Height);
-            e.DrawLine(Pen_LightWhite, e.Current.TrimmedX, e.Current.TrimmedY, e.MouseDown.TrimmedX, e.MouseDown.TrimmedY);
-            e.DrawLine(Pen_RedTransp, e.Current.TrimmedX, e.Current.TrimmedY, e.MouseDown.TrimmedX, e.MouseDown.TrimmedY);
+            e.DrawLine(PenRedTransp, -1, e.MouseDown.TrimmedY, pic.Width, e.MouseDown.TrimmedY);
+            e.DrawLine(PenRedTransp, e.MouseDown.TrimmedX, -1, e.MouseDown.TrimmedX, pic.Height);
+            e.DrawLine(PenLightWhite, e.Current.TrimmedX, e.Current.TrimmedY, e.MouseDown.TrimmedX, e.MouseDown.TrimmedY);
+            e.DrawLine(PenRedTransp, e.Current.TrimmedX, e.Current.TrimmedY, e.MouseDown.TrimmedX, e.MouseDown.TrimmedY);
         }
 
         public override void MouseDown(MouseEventArgs1_1 e, Bitmap? originalPic) {

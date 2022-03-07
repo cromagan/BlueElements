@@ -32,41 +32,53 @@ namespace BlueControls {
 
         #region Fields
 
+        public readonly bool Bold;
+        public readonly Brush Brush_Color_Main;
+        public readonly Brush Brush_Color_Outline;
+        public readonly Color Color_Main;
+        public readonly Color Color_Outline;
+        public readonly string FontName;
+        public readonly float FontSize;
+        public readonly bool Italic;
+        public readonly bool Kapitälchen;
+        public readonly bool OnlyLower;
+        public readonly bool OnlyUpper;
+        public readonly bool Outline;
+        public readonly bool StrikeOut;
+        public readonly bool Underline;
         private static readonly List<BlueFont?> FontsAll = new();
 
         private readonly SizeF[] _charSize;
-        private string _code;
+        private readonly string _code;
 
         /// <summary>
         /// Die Schriftart, mit allen Attributen, die nativ unterstützt werden.
         /// </summary>
-        private Font _font;
+        private readonly Font _font;
 
         /// <summary>
         /// Die Schriftart, ohne den Stilen Strikeout und Underline
         /// </summary>
-        private Font _fontOl;
+        private readonly Font _fontOl;
 
-        private float _kapitälchenPlus = -1;
+        private readonly float _kapitälchenPlus = -1;
+        private readonly float _oberlänge = -1;
+        private readonly Pen _pen;
+        private readonly float _widthOf2Points;
+        private readonly int _zeilenabstand = -1;
         private QuickImage? _nameInStyleSym;
-        private float _oberlänge = -1;
-        private Pen _pen;
-        private BitmapExt _sampleTextSym;
+        private BitmapExt? _sampleTextSym;
         private float _sizeTestedAndFailed = float.MaxValue;
         private float _sizeTestedAndOk = float.MinValue;
         private QuickImage? _symbolForReadableTextSym;
         private QuickImage? _symbolOfLineSym;
-        private float _widthOf2Points;
-        private int _zeilenabstand = -1;
 
         #endregion
 
         #region Constructors
 
-        private BlueFont() {
+        private BlueFont(string toParse) {
             _code = string.Empty;
-            _font = null;
-            _fontOl = null;
             FontName = "Arial";
             FontSize = 9;
             Underline = false;
@@ -79,55 +91,130 @@ namespace BlueControls {
             OnlyUpper = false;
             Color_Main = Color.Black;
             Color_Outline = Color.Magenta;
-            _pen = null;
-            Brush_Color_Main = null;
-            Brush_Color_Outline = null;
             _widthOf2Points = 0;
             _charSize = new SizeF[256];
             for (var z = 0; z <= _charSize.GetUpperBound(0); z++) {
                 _charSize[z] = new SizeF(-1, -1);
             }
-        }
 
-        private BlueFont(string codeToParse) : this() => Parse(codeToParse);
+            var ftst = FontStyle.Regular;
+            var ftst2 = FontStyle.Regular;
+            toParse = toParse.Replace(",", ", "); // TODO: vor 01.10.2021 Entferen wenn inv bei den exports repariert wurde
+            foreach (var pair in toParse.GetAllTags()) {
+                switch (pair.Key) {
+                    case "name":
+
+                    case "fontname":
+                        FontName = pair.Value;
+                        break;
+
+                    case "size":
+
+                    case "fontsize":
+                        FontSize = float.Parse(pair.Value.FromNonCritical());
+                        if (FontSize < 0.1F) { Develop.DebugPrint(enFehlerArt.Fehler, "Fontsize=" + FontSize); }
+                        break;
+
+                    case "color":
+                        Color_Main = pair.Value.FromHtmlCode();
+                        break;
+
+                    case "italic":
+                        ftst |= FontStyle.Italic;
+                        ftst2 |= FontStyle.Italic;
+                        Italic = true;
+                        break;
+
+                    case "bold":
+                        ftst |= FontStyle.Bold;
+                        ftst2 |= FontStyle.Bold;
+                        Bold = true;
+                        break;
+
+                    case "underline":
+                        ftst |= FontStyle.Underline;
+                        Underline = true;
+                        break;
+
+                    case "capitals":
+                        Kapitälchen = true;
+                        break;
+
+                    case "strikeout":
+                        ftst |= FontStyle.Strikeout;
+                        StrikeOut = true;
+                        break;
+
+                    case "outline":
+                        Outline = true;
+                        break;
+
+                    case "outlinecolor":
+                        Color_Outline = pair.Value.FromHtmlCode();
+                        break;
+
+                    case "onlylower":
+                        OnlyLower = true;
+                        break;
+
+                    case "onlyupper":
+                        OnlyUpper = true;
+                        break;
+
+                    default:
+                        Develop.DebugPrint(enFehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
+                        break;
+                }
+            }
+            _font = new Font(FontName, FontSize / Skin.Scale, ftst);
+            _fontOl = new Font(FontName, FontSize / Skin.Scale, ftst2);
+            // Die Oberlänge immer berechnen, Symbole benötigen die exacte höhe
+            var multi = 50 / _fontOl.Size; // Zu große Schriften verursachen bei manchen Fonts Fehler!!!
+            Font tmpfont = new(_fontOl.Name, _fontOl.Size * multi / Skin.Scale, _fontOl.Style);
+            var f = MeasureString("Z", tmpfont);
+            Bitmap bmp = new((int)(f.Width + 1), (int)(f.Height + 1));
+            var gr = Graphics.FromImage(bmp);
+            for (var du = 0; du <= 1; du++) {
+                gr.Clear(Color.White);
+                if (du == 1) {
+                    tmpfont = new Font(_fontOl.Name, _fontOl.Size * multi * 0.8F / Skin.Scale, _fontOl.Style);
+                }
+                DrawString(gr, "Z", tmpfont, Brushes.Black, 0, 0);
+                var miny = (int)(f.Height / 2.0);
+
+                for (var x = 1; x <= (f.Width - 1); x++) {
+                    for (var y = (int)(f.Height - 1); y >= miny; y--) {
+                        if (y > miny && bmp.GetPixel(x, y).R == 0) { miny = y; }
+                    }
+                }
+                if (du == 0) {
+                    _oberlänge = miny / multi;
+                    if (!Kapitälchen) { break; }
+                } else {
+                    _kapitälchenPlus = _oberlänge - (miny / multi);
+                }
+            }
+
+            bmp.Dispose();
+            gr.Dispose();
+            tmpfont.Dispose();
+
+            _widthOf2Points = MeasureString("..", StringFormat.GenericTypographic).Width;
+            ///http://www.vb-helper.com/howto_net_rainbow_text.html
+            ///https://msdn.microsoft.com/de-de/library/xwf9s90b(v=vs.90).aspx
+            ///http://www.typo-info.de/schriftgrad.htm
+            _zeilenabstand = _fontOl.Height;
+            _pen = GeneratePen(1.0F);
+            Brush_Color_Main = new SolidBrush(Color_Main);
+            Brush_Color_Outline = new SolidBrush(Color_Outline);
+            _code = ToString(FontName, FontSize, Bold, Italic, Underline, StrikeOut, Outline, Color_Main.ToHtmlCode(), Color_Outline.ToHtmlCode(), Kapitälchen, OnlyUpper, OnlyLower);
+        }
 
         #endregion
 
         #region Events
 
         public event EventHandler Changed;
-
-        #endregion
-
-        #region Properties
-
-        public bool Bold { get; private set; }
-
-        public Brush Brush_Color_Main { get; private set; }
-
-        public Brush Brush_Color_Outline { get; private set; }
-
-        public Color Color_Main { get; private set; }
-
-        public Color Color_Outline { get; private set; }
-
-        public string FontName { get; private set; }
-
-        public float FontSize { get; private set; }
-
-        public bool Italic { get; private set; }
-
-        public bool Kapitälchen { get; private set; }
-
-        public bool OnlyLower { get; private set; }
-
-        public bool OnlyUpper { get; private set; }
-
-        public bool Outline { get; private set; }
-
-        public bool StrikeOut { get; private set; }
-
-        public bool Underline { get; private set; }
 
         #endregion
 
@@ -296,7 +383,7 @@ namespace BlueControls {
             return t.TrimEnd(", ");
         }
 
-        public BitmapExt SampleText() {
+        public BitmapExt? SampleText() {
             if (_sampleTextSym != null) { return _sampleTextSym; }
             _sampleTextSym = Symbol("AaBbCcÄä.,?!", false);
             return _sampleTextSym;
@@ -470,120 +557,6 @@ namespace BlueControls {
             return new Pen(Color_Main, linDi);
         }
 
-        private void Parse(string toParse) {
-            var ftst = FontStyle.Regular;
-            var ftst2 = FontStyle.Regular;
-            toParse = toParse.Replace(",", ", "); // TODO: vor 01.10.2021 Entferen wenn inv bei den exports repariert wurde
-            foreach (var pair in toParse.GetAllTags()) {
-                switch (pair.Key) {
-                    case "name":
-
-                    case "fontname":
-                        FontName = pair.Value;
-                        break;
-
-                    case "size":
-
-                    case "fontsize":
-                        FontSize = float.Parse(pair.Value.FromNonCritical());
-                        if (FontSize < 0.1F) { Develop.DebugPrint(enFehlerArt.Fehler, "Fontsize=" + FontSize); }
-                        break;
-
-                    case "color":
-                        Color_Main = pair.Value.FromHtmlCode();
-                        break;
-
-                    case "italic":
-                        ftst |= FontStyle.Italic;
-                        ftst2 |= FontStyle.Italic;
-                        Italic = true;
-                        break;
-
-                    case "bold":
-                        ftst |= FontStyle.Bold;
-                        ftst2 |= FontStyle.Bold;
-                        Bold = true;
-                        break;
-
-                    case "underline":
-                        ftst |= FontStyle.Underline;
-                        Underline = true;
-                        break;
-
-                    case "capitals":
-                        Kapitälchen = true;
-                        break;
-
-                    case "strikeout":
-                        ftst |= FontStyle.Strikeout;
-                        StrikeOut = true;
-                        break;
-
-                    case "outline":
-                        Outline = true;
-                        break;
-
-                    case "outlinecolor":
-                        Color_Outline = pair.Value.FromHtmlCode();
-                        break;
-
-                    case "onlylower":
-                        OnlyLower = true;
-                        break;
-
-                    case "onlyupper":
-                        OnlyUpper = true;
-                        break;
-
-                    default:
-                        Develop.DebugPrint(enFehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
-                        break;
-                }
-            }
-            _font = new Font(FontName, FontSize / Skin.Scale, ftst);
-            _fontOl = new Font(FontName, FontSize / Skin.Scale, ftst2);
-            // Die Oberlänge immer berechnen, Symbole benötigen die exacte höhe
-            var multi = 50 / _fontOl.Size; // Zu große Schriften verursachen bei manchen Fonts Fehler!!!
-            Font tmpfont = new(_fontOl.Name, _fontOl.Size * multi / Skin.Scale, _fontOl.Style);
-            var f = MeasureString("Z", tmpfont);
-            Bitmap bmp = new((int)(f.Width + 1), (int)(f.Height + 1));
-            var gr = Graphics.FromImage(bmp);
-            for (var du = 0; du <= 1; du++) {
-                gr.Clear(Color.White);
-                if (du == 1) {
-                    tmpfont = new Font(_fontOl.Name, _fontOl.Size * multi * 0.8F / Skin.Scale, _fontOl.Style);
-                }
-                DrawString(gr, "Z", tmpfont, Brushes.Black, 0, 0);
-                var miny = (int)(f.Height / 2.0);
-
-                for (var x = 1; x <= (f.Width - 1); x++) {
-                    for (var y = (int)(f.Height - 1); y >= miny; y--) {
-                        if (y > miny && bmp.GetPixel(x, y).R == 0) { miny = y; }
-                    }
-                }
-                if (du == 0) {
-                    _oberlänge = miny / multi;
-                    if (!Kapitälchen) { break; }
-                } else {
-                    _kapitälchenPlus = _oberlänge - (miny / multi);
-                }
-            }
-
-            bmp.Dispose();
-            gr.Dispose();
-            tmpfont.Dispose();
-
-            _widthOf2Points = MeasureString("..", StringFormat.GenericTypographic).Width;
-            ///http://www.vb-helper.com/howto_net_rainbow_text.html
-            ///https://msdn.microsoft.com/de-de/library/xwf9s90b(v=vs.90).aspx
-            ///http://www.typo-info.de/schriftgrad.htm
-            _zeilenabstand = _fontOl.Height;
-            _pen = GeneratePen(1.0F);
-            Brush_Color_Main = new SolidBrush(Color_Main);
-            Brush_Color_Outline = new SolidBrush(Color_Outline);
-            _code = ToString(FontName, FontSize, Bold, Italic, Underline, StrikeOut, Outline, Color_Main.ToHtmlCode(), Color_Outline.ToHtmlCode(), Kapitälchen, OnlyUpper, OnlyLower);
-        }
-
         private bool SizeOk(float sizeToCheck) {
             // Windwows macht seltsamerweiße bei manchen Schriften einen Fehler. Seit dem neuen Firmen-Windows-Update vom 08.06.2015
             if (sizeToCheck <= _sizeTestedAndOk) { return true; }
@@ -598,9 +571,9 @@ namespace BlueControls {
             }
         }
 
-        private BitmapExt Symbol(string text, bool transparent) {
+        private BitmapExt? Symbol(string text, bool transparent) {
             var s = MeasureString(text, Font());
-            BitmapExt bmp = new((int)(s.Width + 1), (int)(s.Height + 1));
+            BitmapExt? bmp = new((int)(s.Width + 1), (int)(s.Height + 1));
             using (var gr = Graphics.FromImage(bmp)) {
                 if (transparent) {
                     gr.Clear(Color.FromArgb(180, 180, 180));

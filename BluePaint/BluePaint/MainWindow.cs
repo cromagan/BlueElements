@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Forms;
@@ -37,10 +39,10 @@ namespace BluePaint {
         private static List<GenericTool> _merker;
 
         private bool _aufnahme;
+        private GenericTool? _currentTool;
         private string _filename = string.Empty;
         private bool _isSaved = true;
-        private Bitmap? _PicUndo;
-        private GenericTool CurrentTool;
+        private Bitmap? _picUndo;
 
         #endregion
 
@@ -53,7 +55,7 @@ namespace BluePaint {
             tabRibbonbar.SelectedIndex = 1;
         }
 
-        public MainWindow(string filename, bool LoadSaveEnabled) : this(LoadSaveEnabled) => LoadFromDisk(filename);
+        public MainWindow(string filename, bool loadSaveEnabled) : this(loadSaveEnabled) => LoadFromDisk(filename);
 
         private MainWindow() : this(true) { }
 
@@ -70,53 +72,53 @@ namespace BluePaint {
             _filename = string.Empty;
         }
 
-        public void SetTool(GenericTool NewTool, bool DoInitalizingAction) {
-            if (AreSame(NewTool, CurrentTool)) {
+        public void SetTool(GenericTool? newTool, bool doInitalizingAction) {
+            if (AreSame(newTool, _currentTool)) {
                 MessageBox.Show("Das Werkzeug ist aktuell schon gewählt.", enImageCode.Information, "OK");
                 return;
             }
-            if (CurrentTool != null) {
-                CurrentTool.OnToolChanging();
-                CurrentTool.Dispose();
-                Split.Panel1.Controls.Remove(CurrentTool);
-                CurrentTool.ZoomFit -= CurrentTool_ZoomFit;
-                CurrentTool.HideMainWindow -= CurrentTool_HideMainWindow;
-                CurrentTool.ShowMainWindow -= CurrentTool_ShowMainWindow;
-                CurrentTool.ForceUndoSaving -= CurrentTool_ForceUndoSaving;
+            if (_currentTool != null) {
+                _currentTool.OnToolChanging();
+                _currentTool.Dispose();
+                Split.Panel1.Controls.Remove(_currentTool);
+                _currentTool.ZoomFit -= CurrentTool_ZoomFit;
+                _currentTool.HideMainWindow -= CurrentTool_HideMainWindow;
+                _currentTool.ShowMainWindow -= CurrentTool_ShowMainWindow;
+                _currentTool.ForceUndoSaving -= CurrentTool_ForceUndoSaving;
                 //CurrentTool.PicChangedByTool -= CurrentTool_PicChangedByTool;
-                CurrentTool.OverridePic -= CurrentTool_OverridePic;
-                CurrentTool.DoInvalidate -= CurrentTool_DoInvalidate;
-                CurrentTool.NeedCurrentPic -= CurrentTool_NeedCurrentPic;
-                CurrentTool.CommandForMacro -= CurrentTool_CommandForMacro;
-                CurrentTool = null;
+                _currentTool.OverridePic -= CurrentTool_OverridePic;
+                _currentTool.DoInvalidate -= CurrentTool_DoInvalidate;
+                _currentTool.NeedCurrentPic -= CurrentTool_NeedCurrentPic;
+                _currentTool.CommandForMacro -= CurrentTool_CommandForMacro;
+                _currentTool = null;
             }
             P.Invalidate();
-            if (NewTool != null) {
-                CurrentTool = NewTool;
+            if (newTool != null) {
+                _currentTool = newTool;
                 if (_aufnahme) {
-                    if (string.IsNullOrEmpty(NewTool.MacroKennung())) {
+                    if (string.IsNullOrEmpty(newTool.MacroKennung())) {
                         MessageBox.Show("Während einer Aufnahme<br>nicht möglich.", enImageCode.Information, "OK");
                         return;
                     }
-                    _merker.Add(NewTool);
+                    _merker.Add(newTool);
                 }
-                Split.Panel1.Controls.Add(NewTool);
-                NewTool.Dock = System.Windows.Forms.DockStyle.Fill;
+                Split.Panel1.Controls.Add(newTool);
+                newTool.Dock = System.Windows.Forms.DockStyle.Fill;
                 //CurrentTool.SetPics(P.Bmp, P.OverlayBmp);
-                CurrentTool.ZoomFit += CurrentTool_ZoomFit;
-                CurrentTool.HideMainWindow += CurrentTool_HideMainWindow;
-                CurrentTool.ShowMainWindow += CurrentTool_ShowMainWindow;
+                _currentTool.ZoomFit += CurrentTool_ZoomFit;
+                _currentTool.HideMainWindow += CurrentTool_HideMainWindow;
+                _currentTool.ShowMainWindow += CurrentTool_ShowMainWindow;
                 //CurrentTool.PicChangedByTool += CurrentTool_PicChangedByTool;
-                CurrentTool.OverridePic += CurrentTool_OverridePic;
-                CurrentTool.ForceUndoSaving += CurrentTool_ForceUndoSaving;
-                CurrentTool.DoInvalidate += CurrentTool_DoInvalidate;
-                CurrentTool.NeedCurrentPic += CurrentTool_NeedCurrentPic;
-                CurrentTool.CommandForMacro += CurrentTool_CommandForMacro;
-                if (DoInitalizingAction) {
-                    NewTool.ToolFirstShown();
+                _currentTool.OverridePic += CurrentTool_OverridePic;
+                _currentTool.ForceUndoSaving += CurrentTool_ForceUndoSaving;
+                _currentTool.DoInvalidate += CurrentTool_DoInvalidate;
+                _currentTool.NeedCurrentPic += CurrentTool_NeedCurrentPic;
+                _currentTool.CommandForMacro += CurrentTool_CommandForMacro;
+                if (doInitalizingAction) {
+                    newTool.ToolFirstShown();
                 }
-                if (_aufnahme && _merker.Contains(NewTool)) {
-                    _merker.Add(NewTool);
+                if (_aufnahme && _merker.Contains(newTool)) {
+                    _merker.Add(newTool);
                 }
             }
         }
@@ -132,7 +134,7 @@ namespace BluePaint {
             base.OnFormClosing(e);
         }
 
-        private static bool AreSame(object a, object b) {
+        private static bool AreSame(object? a, object? b) {
             if (a == null || b == null) { return false; }
             var t = a.GetType();
             var u = b.GetType();
@@ -160,7 +162,7 @@ namespace BluePaint {
             _macro = new List<string>();
             _merker = new List<GenericTool>();
             _aufnahme = true;
-            _PicUndo = null;
+            _picUndo = null;
             btnRückgänig.Enabled = false;
             btnAufnahme.Enabled = false;
             btnStop.Enabled = true;
@@ -242,23 +244,23 @@ namespace BluePaint {
 
         private void CurrentTool_CommandForMacro(object sender, CommandForMacroArgs e) {
             if (!_aufnahme) { return; }
-            _macro.Add(CurrentTool.MacroKennung().ToNonCritical() + ";" + e.Command.ToNonCritical());
+            _macro.Add(_currentTool.MacroKennung().ToNonCritical() + ";" + e.Command.ToNonCritical());
         }
 
         private void CurrentTool_DoInvalidate(object sender, System.EventArgs e) => P.Invalidate();
 
         private void CurrentTool_ForceUndoSaving(object sender, System.EventArgs e) {
             _isSaved = false;
-            if (_PicUndo != null) {
-                _PicUndo.Dispose();
-                _PicUndo = null;
+            if (_picUndo != null) {
+                _picUndo.Dispose();
+                _picUndo = null;
                 GC.Collect();
             }
             if (P.Bmp == null) {
                 btnRückgänig.Enabled = false;
                 return;
             }
-            _PicUndo = Image_Clone(P.Bmp);
+            _picUndo = Image_Clone(P.Bmp);
             btnRückgänig.Enabled = true;
         }
 
@@ -325,12 +327,12 @@ namespace BluePaint {
             Close();
         }
 
-        private void P_DoAdditionalDrawing(object sender, BlueControls.EventArgs.AdditionalDrawing e) => CurrentTool?.DoAdditionalDrawing(e, P.Bmp);
+        private void P_DoAdditionalDrawing(object sender, BlueControls.EventArgs.AdditionalDrawing e) => _currentTool?.DoAdditionalDrawing(e, P.Bmp);
 
-        private void P_ImageMouseDown(object sender, BlueControls.EventArgs.MouseEventArgs1_1 e) => CurrentTool?.MouseDown(e, P.Bmp);
+        private void P_ImageMouseDown(object sender, BlueControls.EventArgs.MouseEventArgs1_1 e) => _currentTool?.MouseDown(e, P.Bmp);
 
         private void P_ImageMouseMove(object sender, BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e) {
-            CurrentTool?.MouseMove(e, P.Bmp);
+            _currentTool?.MouseMove(e, P.Bmp);
             if (e.Current.IsInPic) {
                 var c = P.Bmp.GetPixel(e.Current.TrimmedX, e.Current.TrimmedY);
                 InfoText.Text = "X: " + e.Current.TrimmedX +
@@ -341,20 +343,20 @@ namespace BluePaint {
             }
         }
 
-        private void P_ImageMouseUp(object sender, BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e) => CurrentTool?.MouseUp(e, P.Bmp);
+        private void P_ImageMouseUp(object sender, BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e) => _currentTool?.MouseUp(e, P.Bmp);
 
         private void P_MouseLeave(object sender, System.EventArgs e) => InfoText.Text = "";
 
         private void Radiergummi_Click(object sender, System.EventArgs e) => SetTool(new Tool_Eraser(_aufnahme), !_aufnahme);
 
         private void Rückg_Click(object sender, System.EventArgs e) {
-            if (_PicUndo == null) { return; }
+            if (_picUndo == null) { return; }
             btnRückgänig.Enabled = false;
             _isSaved = false;
-            var _bmp = P.Bmp;
-            Generic.Swap(ref _bmp, ref _PicUndo);
-            P.Bmp = _bmp;
-            if (P.Bmp.Width != _PicUndo.Width || P.Bmp.Height != _PicUndo.Height) {
+            var bmp = P.Bmp;
+            Generic.Swap(ref bmp, ref _picUndo);
+            P.Bmp = bmp;
+            if (P.Bmp.Width != _picUndo.Width || P.Bmp.Height != _picUndo.Height) {
                 P.ZoomFit();
             } else {
                 P.Invalidate();
@@ -363,7 +365,7 @@ namespace BluePaint {
                 _macro.RemoveAt(_macro.Count - 1);
             }
 
-            CurrentTool?.PictureChangedByMainWindow();
+            _currentTool?.PictureChangedByMainWindow();
         }
 
         private void Screenshot_Click(object sender, System.EventArgs e) => SetTool(new Tool_Screenshot(), !_aufnahme);

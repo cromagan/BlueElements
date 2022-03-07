@@ -23,7 +23,7 @@ using System.Windows.Forms;
 
 namespace BlueControls.Designer_Support {
 
-    internal sealed class frmQuickPic : Panel {
+    internal sealed class QuickPic : Panel {
 
         #region Fields
 
@@ -91,7 +91,7 @@ namespace BlueControls.Designer_Support {
 
         #region Constructors
 
-        public frmQuickPic() =>
+        public QuickPic() =>
             // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
             InitializeComponent();
 
@@ -512,7 +512,7 @@ namespace BlueControls.Designer_Support {
             Controls.Add(GroupBox2);
             Controls.Add(GroupBox1);
             Controls.Add(ButOK);
-            Name = "frmQuickPic";
+            Name = "QuickPic";
             Size = new System.Drawing.Size(591, 362);
             GroupBox1.ResumeLayout(false);
             GroupBox1.PerformLayout();

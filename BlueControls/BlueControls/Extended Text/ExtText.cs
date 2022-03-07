@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
@@ -76,8 +78,8 @@ namespace BlueControls.Extended_Text {
         private int? _height;
         private enStates _state;
         private Size _textDimensions;
-        private string _tmpHtmlText;
-        private string _tmpPlainText;
+        private string? _tmpHtmlText;
+        private string? _tmpPlainText;
         private int? _width;
         private float _zeilenabstand;
 

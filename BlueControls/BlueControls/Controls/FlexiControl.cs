@@ -61,7 +61,7 @@ namespace BlueControls.Controls {
         protected bool TranslateCaption = true;
         private enAdditionalCheck _additionalCheck = enAdditionalCheck.None;
         private string _allowedChars = string.Empty;
-        private Caption _captionObject;
+        private Caption? _captionObject;
 
         // None ist -1 und muss gesetzt sein!
         private int _controlX = -1;

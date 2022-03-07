@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.BlueDatabaseDialogs;
@@ -38,7 +40,7 @@ namespace BlueControls.Forms {
 
         #region Fields
 
-        private readonly List<RowItem?> _rowsForExport;
+        private readonly List<RowItem>? _rowsForExport;
         private readonly string _saveTo = "";
         private readonly string _zielPfad;
         private int _itemNrForPrint;
@@ -47,13 +49,11 @@ namespace BlueControls.Forms {
 
         #region Constructors
 
-        public ExportDialog(Database db, string autosaveFile) : this(db, null, autosaveFile) {
-        }
+        public ExportDialog(Database db, string autosaveFile) : this(db, null, autosaveFile) { }
 
-        public ExportDialog(Database db, List<RowItem?> rows) : this(db, rows, string.Empty) {
-        }
+        public ExportDialog(Database db, List<RowItem>? rows) : this(db, rows, string.Empty) { }
 
-        public ExportDialog(Database db, List<RowItem?> rows, string autosaveFile) {
+        public ExportDialog(Database db, List<RowItem>? rows, string autosaveFile) {
             // Dieser Aufruf ist für den Designer erforderlich.
             InitializeComponent();
             // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
@@ -70,7 +70,8 @@ namespace BlueControls.Forms {
                 if (!PathExists(_zielPfad)) {
                     Directory.CreateDirectory(_zielPfad);
                 }
-            } catch (Exception) { }
+            } catch { }
+
             BefülleLayoutDropdowns();
             EintragsText();
             NurStartEnablen();
@@ -80,13 +81,13 @@ namespace BlueControls.Forms {
 
         #region Properties
 
-        public Database Database { get; private set; }
+        public Database? Database { get; private set; }
 
         #endregion
 
         #region Methods
 
-        public static void AddLayoutsOff(ItemCollectionList? addHere, Database database, bool addDiskLayouts) {
+        public static void AddLayoutsOff(ItemCollectionList addHere, Database database, bool addDiskLayouts) {
             if (database != null) {
                 foreach (var t in database.Layouts) {
                     ItemCollectionPad p = new(t, string.Empty);
@@ -155,7 +156,7 @@ namespace BlueControls.Forms {
 
         private void _Database_Disposing(object sender, System.EventArgs e) => Close();
 
-        private void Attribute_Changed(object sender, System.EventArgs e) {
+        private void Attribute_Changed(object? sender, System.EventArgs? e) {
             var b = FloatParse(flxBreite.Value);
             var h = FloatParse(flxHöhe.Value);
             var ab = FloatParse(flxAbstand.Value);
@@ -220,7 +221,7 @@ namespace BlueControls.Forms {
             lstExported.Item.AddRange(l);
         }
 
-        private void Button_PageSetup_Click(object sender, System.EventArgs e) {
+        private void Button_PageSetup_Click(object? sender, System.EventArgs e) {
             padPrint.ShowPrinterPageSetup();
             padPrint.CopyPrinterSettingsToWorkingArea();
             GeneratePrintPad(padPrint, 0, cbxLayoutWahl.Text, _rowsForExport, 0);

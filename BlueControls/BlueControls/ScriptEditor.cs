@@ -36,7 +36,7 @@ namespace BlueControls {
     {
         #region Fields
 
-        private frmBefehlsreferenz? _befehlsReferenz;
+        private Befehlsreferenz? _befehlsReferenz;
         private string _LastVariableContent = string.Empty;
         private string? _LastWord = string.Empty;
         private bool _MenuDone;
@@ -117,7 +117,7 @@ namespace BlueControls {
             base.Dispose(disposing);
         }
 
-        protected virtual Script? GenerateAndDoScript() {
+        protected virtual Script GenerateAndDoScript() {
             var s = new Script(null);
             s.Parse();
             return s;
@@ -171,7 +171,7 @@ namespace BlueControls {
                 _befehlsReferenz = null;
             }
 
-            _befehlsReferenz = new frmBefehlsreferenz();
+            _befehlsReferenz = new Befehlsreferenz();
             _befehlsReferenz.Show();
         }
 

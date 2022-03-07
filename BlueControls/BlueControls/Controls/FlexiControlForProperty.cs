@@ -24,7 +24,7 @@ namespace BlueControls.Controls {
         private MethodInfo? _methInfo;
         private string _propertyName;
         private string _propertynamecpl;
-        private object _propertyObject;
+        private object? _propertyObject;
         private PropertyInfo _propInfo;
 
         #endregion

@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -911,11 +913,11 @@ namespace BlueControls.ItemCollection {
             }
         }
 
-        private void ValidateCheckStates(BasicListItem thisMustBeChecked) {
+        private void ValidateCheckStates(BasicListItem? thisMustBeChecked) {
             _validating = true;
             var somethingDonex = false;
             var done = false;
-            BasicListItem f = null;
+            BasicListItem? f = null;
             switch (_checkBehavior) {
                 case enCheckBehavior.NoSelection:
                     UncheckAll();

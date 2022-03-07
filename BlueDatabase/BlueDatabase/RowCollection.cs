@@ -76,7 +76,7 @@ namespace BlueDatabase {
         #region Properties
 
         public int Count => _internal.Count;
-        public Database Database { get; private set; }
+        public Database? Database { get; private set; }
 
         public long VisibleRowCount { get; private set; }
 
@@ -122,7 +122,7 @@ namespace BlueDatabase {
                 var unique = ("X" + DateTime.Now.ToString("mm.fff") + x.ToString(Constants.Format_Integer5)).RemoveChars(Constants.Char_DateiSonderZeichen + ".");
                 var ok = true;
 
-                foreach (var thisfile in BlueBasics.MultiUserFile.ClsMultiUserFile.AllFiles) {
+                foreach (var thisfile in BlueBasics.MultiUserFile.MultiUserFile.AllFiles) {
                     if (thisfile is Database db) {
                         var row = db.Row[unique];
                         if (row != null) { ok = false; break; }
@@ -221,9 +221,9 @@ namespace BlueDatabase {
             return tmpVisibleRows;
         }
 
-        public List<RowData?> CalculateSortedRows(List<FilterItem>? filter, RowSortDefinition rowSortDefinition, List<RowItem?> pinnedRows, List<RowData?> reUseMe) => CalculateSortedRows(CalculateFilteredRows(filter), rowSortDefinition, pinnedRows, reUseMe);
+        public List<RowData?> CalculateSortedRows(List<FilterItem>? filter, RowSortDefinition rowSortDefinition, List<RowItem>? pinnedRows, List<RowData>? reUseMe) => CalculateSortedRows(CalculateFilteredRows(filter), rowSortDefinition, pinnedRows, reUseMe);
 
-        public List<RowData?> CalculateSortedRows(List<RowItem?> filteredRows, RowSortDefinition rowSortDefinition, List<RowItem?> pinnedRows, List<RowData?> reUseMe) {
+        public List<RowData?> CalculateSortedRows(List<RowItem?> filteredRows, RowSortDefinition rowSortDefinition, List<RowItem>? pinnedRows, List<RowData>? reUseMe) {
             var lockMe = new object();
             VisibleRowCount = 0;
 
@@ -396,7 +396,7 @@ namespace BlueDatabase {
             return Remove(nf, pinned);
         }
 
-        public bool Remove(FilterCollection? filter, List<RowItem?> pinned) {
+        public bool Remove(FilterCollection? filter, List<RowItem>? pinned) {
             var keys = (from thisrowitem in _internal.Values where thisrowitem != null && thisrowitem.MatchesTo(filter) select thisrowitem.Key).Select(dummy => dummy).ToList();
             var did = keys.Count(thisKey => Remove(thisKey)) > 0;
 

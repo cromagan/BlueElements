@@ -15,12 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
-using Skript.Enums;
 using System.Collections.Generic;
+using BlueBasics;
 using BlueScript.Structuren;
+using Skript.Enums;
 
-namespace BlueScript {
+namespace BlueScript.Methods {
 
     internal class Method_if : Method {
 
@@ -69,18 +69,18 @@ namespace BlueScript {
             return null;
         }
 
-        public override List<string> Comand(Script s) => new() { "if" };
+        public override List<string> Comand(Script? s) => new() { "if" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
             if (attvar.Attributes[0].ValueBool) {
                 var (err, _) = s.Parse(infos.CodeBlockAfterText);
-                if (!string.IsNullOrEmpty(err)) { return new strDoItFeedback(err); }
+                if (!string.IsNullOrEmpty(err)) { return new DoItFeedback(err); }
             } else {
                 s.Line += infos.LineBreakInCodeBlock;
             }
-            return new strDoItFeedback(string.Empty);
+            return new DoItFeedback(string.Empty);
         }
 
         #endregion

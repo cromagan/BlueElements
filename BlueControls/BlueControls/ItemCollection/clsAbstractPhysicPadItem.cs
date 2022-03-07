@@ -15,13 +15,15 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 
 namespace BlueControls.ItemCollection {
 
-    public abstract class clsAbstractPhysicPadItem : BasicPadItem {
+    public abstract class AbstractPhysicPadItem : BasicPadItem {
 
         #region Fields
 
@@ -31,7 +33,7 @@ namespace BlueControls.ItemCollection {
 
         #region Constructors
 
-        protected clsAbstractPhysicPadItem(string internalname) : base(internalname) {
+        protected AbstractPhysicPadItem(string internalname) : base(internalname) {
             MovablePoint.Add(new PointM(5, 0));
             MovablePoint.Add(new PointM(10, 10));
             MovablePoint.Add(new PointM(0, 10));
@@ -94,7 +96,7 @@ namespace BlueControls.ItemCollection {
         public static float IntervalDistance(float minA, float maxA, float minB, float maxB) => minA < minB ? minB - maxA : minA - maxB;
 
         // Check if polygon A is going to collide with polygon B for the given velocity
-        public static StrPolygonCollisionResult PolygonCollision(clsAbstractPhysicPadItem polygonA, clsAbstractPhysicPadItem polygonB, PointM? velocity) {
+        public static StrPolygonCollisionResult PolygonCollision(AbstractPhysicPadItem polygonA, AbstractPhysicPadItem polygonB, PointM? velocity) {
             StrPolygonCollisionResult result = new() {
                 CheckedObjectA = polygonA,
                 CheckedObjectB = polygonB,
@@ -174,7 +176,7 @@ namespace BlueControls.ItemCollection {
         }
 
         // Calculate the projection of a polygon on an axis and returns it as a [min, max] interval
-        public static void ProjectPolygon(PointM? axis, clsAbstractPhysicPadItem polygon, out float min, out float max) {
+        public static void ProjectPolygon(PointM? axis, AbstractPhysicPadItem polygon, out float min, out float max) {
             // To project a point on an axis use the dot product
             var d = axis.DotProduct(polygon.MovablePoint[0]);
             min = d;
@@ -203,7 +205,7 @@ namespace BlueControls.ItemCollection {
         }
 
         // https://www.codeproject.com/Articles/15573/2D-Polygon-Collision-Detection
-        public StrPolygonCollisionResult ColidesWith(clsAbstractPhysicPadItem polygonB, PointM? velocity) => PolygonCollision(this, polygonB, velocity);
+        public StrPolygonCollisionResult ColidesWith(AbstractPhysicPadItem polygonB, PointM? velocity) => PolygonCollision(this, polygonB, velocity);
 
         //   http://csharphelper.com/blog/2014/07/find-the-centroid-of-a-polygon-in-c/
         // Find the polygon's centroid.

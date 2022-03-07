@@ -40,7 +40,7 @@ namespace BlueControls.Controls {
 
         private enDesign _design = enDesign.Undefiniert;
 
-        private ExtText _eText;
+        private ExtText? _eText;
         private string _text = string.Empty;
 
         private enSteuerelementVerhalten _textAnzeigeverhalten = enSteuerelementVerhalten.Text_Abschneiden;
@@ -173,7 +173,7 @@ namespace BlueControls.Controls {
             return _eText != null ? _eText.LastSize() : new Size(1, 1);
         }
 
-        protected override void DrawControl(Graphics gr, enStates state) {
+        protected override void DrawControl(Graphics? gr, enStates state) {
             try {
                 if (_design == enDesign.Undefiniert) {
                     GetDesign();
@@ -221,8 +221,7 @@ namespace BlueControls.Controls {
                 if (gr == null) { return; }// Wenn vorab die Größe abgefragt wird
                 Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
                 if (!string.IsNullOrEmpty(_text)) { _eText.Draw(gr, 1); }
-            } catch {
-            }
+            } catch { }
         }
 
         protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {

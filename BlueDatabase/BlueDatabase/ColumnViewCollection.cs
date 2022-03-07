@@ -25,7 +25,7 @@ using System.Linq;
 
 namespace BlueDatabase {
 
-    public sealed class ColumnViewCollection : ListExt<ColumnViewItem>, IParseable {
+    public sealed class ColumnViewCollection : ListExt<ColumnViewItem?>, IParseable {
         //NICHT IReadableText, das gibt zu viele Probleme (Dropdownboxen)
 
         #region Fields
@@ -53,7 +53,7 @@ namespace BlueDatabase {
 
         #region Properties
 
-        public Database Database { get; private set; }
+        public Database? Database { get; private set; }
         public bool IsParsing { get; private set; }
 
         public string Name {
@@ -250,7 +250,6 @@ namespace BlueDatabase {
         }
 
         internal void Repair(int number, bool isTableView) {
-            if (this == null) { return; }
 
             #region Ungültige Spalten entfernen
 

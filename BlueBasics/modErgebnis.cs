@@ -20,7 +20,7 @@ using System.Collections.Generic;
 
 namespace BlueBasics {
 
-    public static class modErgebnis {
+    public static class Berechnung {
 
         #region Fields
 
@@ -39,16 +39,16 @@ namespace BlueBasics {
 
         public static int LastMinusIndex(string formel) {
             if (!formel.Contains("-")) { return -1; }
-            var LastMin = 1;
-            var OkMin = -1;
+            var lastMin = 1;
+            var okMin = -1;
             while (true) {
-                LastMin = formel.IndexOf("-", LastMin);
-                if (LastMin < 1) { break; }
-                var VorZ = formel.Substring(LastMin - 1, 1);
-                if (VorZ.IsNumeral()) { OkMin = LastMin; }
-                LastMin++;
+                lastMin = formel.IndexOf("-", lastMin);
+                if (lastMin < 1) { break; }
+                var vorZ = formel.Substring(lastMin - 1, 1);
+                if (vorZ.IsNumeral()) { okMin = lastMin; }
+                lastMin++;
             }
-            return OkMin;
+            return okMin;
         }
 
         private static double? ErgebnisCore(string formel) {
@@ -129,10 +129,10 @@ namespace BlueBasics {
                 // }
                 // else // Es ist KEINE Funktion, also den Inhalt der Klammer normal berechnen
                 // {
-                var Replacer = ErgebnisCore(formel.Substring(a + 1, e - a - 1));
+                var replacer = ErgebnisCore(formel.Substring(a + 1, e - a - 1));
                 // }
-                if (Replacer == null) { return null; }
-                formel = formel.Replace(formel.Substring(a, e - a + 1), ((double)Replacer).ToString("F99").TrimEnd('0').TrimEnd(',').Replace(",", "."));
+                if (replacer == null) { return null; }
+                formel = formel.Replace(formel.Substring(a, e - a + 1), ((double)replacer).ToString("F99").TrimEnd('0').TrimEnd(',').Replace(",", "."));
                 return ErgebnisCore(formel);
             } // Ende Klammer Vorhanden-----------------------------------------------------------
             // --------------------------------------------------------------------------------------------------------------------------------
@@ -140,13 +140,13 @@ namespace BlueBasics {
             // --------------------------------------------------------------------------------------------------------------------------------
             if (formel.Replace(".", ",").IsNumeral()) { return double.Parse(formel.Replace(".", ",")); }
             // TMP = Math.Max(Math.Max(-1, Formel.LastIndexOf("=")), Math.Max(Formel.LastIndexOf("<"), Formel.LastIndexOf(">")));
-            var TMP = Math.Max(formel.LastIndexOf("+"), LastMinusIndex(formel));
-            if (TMP < 0) { TMP = Math.Max(formel.LastIndexOf("/"), formel.LastIndexOf("*")); }
-            if (TMP < 1) { return null; }
+            var tmp = Math.Max(formel.LastIndexOf("+"), LastMinusIndex(formel));
+            if (tmp < 0) { tmp = Math.Max(formel.LastIndexOf("/"), formel.LastIndexOf("*")); }
+            if (tmp < 1) { return null; }
             // --------------------------------------------------------------------------------------------------------------------------------
             // --- Berechnung nötig, String Splitten berechnen und das Ergebnis zurückgeben
             // --------------------------------------------------------------------------------------------------------------------------------
-            var Seperator = formel.Substring(TMP, 1);
+            var seperator = formel.Substring(tmp, 1);
             // if (Seperator == "<" || Seperator == ">" || Seperator == "=")
             // {
             //    if (TMP < 1 || TMP > Formel.Length - 2) { return null; }
@@ -155,11 +155,11 @@ namespace BlueBasics {
             //    sep2 = Formel.Substring(TMP + 1, 1);
             //    if (sep2 == "<" || sep2 == ">" || sep2 == "=") { Seperator = Formel.Substring(TMP, 2); }
             // }
-            var w1 = ErgebnisCore(formel.Substring(0, TMP));
+            var w1 = ErgebnisCore(formel.Substring(0, tmp));
             if (w1 == null) { return null; }
-            var w2 = ErgebnisCore(formel.Substring(TMP + Seperator.Length));
+            var w2 = ErgebnisCore(formel.Substring(tmp + seperator.Length));
             if (w2 == null) { return null; }
-            switch (Seperator) {
+            switch (seperator) {
                 case "/":
                     if (w2 == 0) { return null; }
                     return w1 / w2;

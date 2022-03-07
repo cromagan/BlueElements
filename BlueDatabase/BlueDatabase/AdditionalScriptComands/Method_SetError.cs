@@ -15,11 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using Skript.Enums;
 using System.Collections.Generic;
+using BlueScript;
 using BlueScript.Structuren;
+using Skript.Enums;
 
-namespace BlueScript {
+namespace BlueDatabase.AdditionalScriptComands {
 
     public class Method_SetError : MethodDatabase {
 
@@ -45,15 +46,15 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "seterror" };
+        public override List<string> Comand(Script? s) => new() { "seterror" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
             for (var z = 1; z < attvar.Attributes.Count; z++) {
                 var column = Column(s, attvar.Attributes[z].Name);
-                if (column == null) { return new strDoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[z].Name); }
+                if (column == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[z].Name); }
 
                 s.Feedback = s.Feedback + attvar.Attributes[z].Name.ToUpper() + "|" + attvar.Attributes[0].ValueString + "\r";
 
@@ -70,7 +71,7 @@ namespace BlueScript {
                 //ve.Readonly = true;
             }
 
-            return strDoItFeedback.Null();
+            return DoItFeedback.Null();
         }
 
         #endregion

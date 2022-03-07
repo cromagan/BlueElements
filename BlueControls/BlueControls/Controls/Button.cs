@@ -179,7 +179,7 @@ namespace BlueControls.Controls {
             if (par is enPartentType.Slider) { _buttonStyle = enButtonStyle.SliderButton; }
         }
 
-        internal static void DrawButton(Control? control, Graphics gr, enDesign buttontype, enStates state, QuickImage? pic, enAlignment align, bool picHeight44, ExtText etxt, string text, Rectangle displayRectangle, bool translate) {
+        internal static void DrawButton(Control? control, Graphics gr, enDesign buttontype, enStates state, QuickImage? pic, enAlignment align, bool picHeight44, ExtText? etxt, string text, Rectangle displayRectangle, bool translate) {
             var design = Skin.DesignOf(buttontype, state);
             Skin.Draw_Back(gr, design, displayRectangle, control, true);
             Skin.Draw_Border(gr, design, displayRectangle);
@@ -378,7 +378,7 @@ namespace BlueControls.Controls {
             Invalidate();
         }
 
-        private void ClickFirerer_Tick(object sender, System.EventArgs e) {
+        private void ClickFirerer_Tick(object? sender, System.EventArgs e) {
             if (_buttonStyle.HasFlag(enButtonStyle.SliderButton) && MousePressing() && ContainsMouse()) {
                 // Focus egal, DauerFeuerbutton - Slider - Design kann keinen Focus erhalten!
                 _clickFired = false;

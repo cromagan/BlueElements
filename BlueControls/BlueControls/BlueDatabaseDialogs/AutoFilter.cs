@@ -213,7 +213,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             ChangeDesign();
         }
 
-        private void CloseAndDispose(string comand, FilterItem newFilter) {
+        private void CloseAndDispose(string comand, FilterItem? newFilter) {
             if (IsClosed) { return; }
             Close();
             OnFilterComand(new FilterComandEventArgs(comand, _column, newFilter));
@@ -351,7 +351,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             if (_column.SortType is enSortierTyp.ZahlenwertFloat or enSortierTyp.ZahlenwertInt) {
                 if (txbEingabe.Text.Contains("-")) {
                     var tmp = txbEingabe.Text.Replace(" ", "");
-                    var l = modErgebnis.LastMinusIndex(tmp);
+                    var l = Berechnung.LastMinusIndex(tmp);
                     if (l > 0 && l < tmp.Length - 1) {
                         var z1 = tmp.Substring(0, l);
                         var z2 = tmp.Substring(l + 1);

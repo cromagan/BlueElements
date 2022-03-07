@@ -48,7 +48,7 @@ namespace BlueControls.Controls {
 
         private string _columnName = string.Empty;
 
-        private Database _database;
+        private Database? _database;
 
         private long _rowKey = -1;
 
@@ -58,9 +58,9 @@ namespace BlueControls.Controls {
 
         #endregion
 
-        #region Constructors
+        //public FlexiControlForCell() : this(null, -1, enÜberschriftAnordnung.Über_dem_Feld) { }
 
-        public FlexiControlForCell() : this(null, -1, enÜberschriftAnordnung.Über_dem_Feld) { }
+        #region Constructors
 
         public FlexiControlForCell(Database database, long columnKey, enÜberschriftAnordnung captionPosition) : base() {
             // Dieser Aufruf ist für den Designer erforderlich.
@@ -117,7 +117,7 @@ namespace BlueControls.Controls {
         [Browsable(false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public Database Database {
+        public Database? Database {
             get => _database;
             set {
                 if (value == _database) { return; }
@@ -601,7 +601,7 @@ namespace BlueControls.Controls {
                             b = Cryptography.SimpleCrypt(b, FileEncryptionKey, -1);
                             var tmp = TempFile(string.Empty, string.Empty, t.Internal.FileSuffix());
                             Converter.ByteToFile(tmp, b);
-                            ExecuteFile(tmp, null, true, false);
+                            ExecuteFile(tmp, string.Empty, true, false);
                             MessageBox.Show("Warte...");
                             DeleteFile(tmp, true);
                         }

@@ -30,7 +30,7 @@ namespace BlueControls.Forms {
         #region Fields
 
         private bool _doing;
-        private PrintDocument _giveBack;
+        private PrintDocument? _giveBack;
 
         #endregion
 
@@ -77,7 +77,7 @@ namespace BlueControls.Forms {
 
         #region Methods
 
-        public static PrintDocument Show(PrintDocument printDocument1, bool nurHochformat) {
+        public static PrintDocument? Show(PrintDocument printDocument1, bool nurHochformat) {
             PageSetupDialog mb = new(printDocument1, nurHochformat);
             mb.ShowDialog();
             return mb._giveBack;

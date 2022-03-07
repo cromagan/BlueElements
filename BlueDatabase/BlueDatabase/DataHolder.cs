@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System;
 using BlueBasics;
 using BlueBasics.Enums;
 using System.Collections;
@@ -35,21 +36,23 @@ namespace BlueDatabase {
         /// <param name="items">Die Items, in denen gesucht werden soll.</param>
         /// <param name="id">Die ID, nach der gesucht werden soll.</param>
         /// <returns>Wenn in der Liste die ID vorhanden ist, wird dieses Objekt zurückgegeben, ansonsten wird NULL zurückgegeben.</returns>
-        public static t? GetByID<t>(this List<t?> items, string id) where t : DataHolder => items.FirstOrDefault(thisit => thisit.ID.ToUpper() == id.ToUpper());
+        [Obsolete]
+        public static t? GetByID<t>(this List<t?> items, string id) where t : DataHolder => items.FirstOrDefault(thisit => thisit.Id.ToUpper() == id.ToUpper());
 
         #endregion
     }
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
+    [Obsolete]
     public abstract class DataHolder : System.IDisposable {
 
         #region Fields
 
-        public readonly string ID;
-        public readonly DataHolder Parent;
+        public readonly string Id;
+        public readonly DataHolder? Parent;
         public readonly string Typ;
-        private bool disposedValue;
+        private bool _disposedValue;
 
         #endregion
 
@@ -67,7 +70,7 @@ namespace BlueDatabase {
             InternalDatabase = parent.InternalDatabase;
             InternalDatabase.Disposing += InternalDatabase_Disposing;
             Typ = parent.Row().CellFirstString() + "/" + MyDefaultSubTyp();
-            ID = id;
+            Id = id;
         }
 
         /// <summary>
@@ -78,7 +81,7 @@ namespace BlueDatabase {
             if (!UseExtraFile()) {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Falsche Routine!");
             }
-            ID = id;
+            Id = id;
             Typ = "MAIN";
             var filename = MyDefaultFileName();
             InternalDatabase = Database.GetByFilename(filename, false, false);
@@ -143,7 +146,7 @@ namespace BlueDatabase {
             set => InternalDatabase.Creator = value;
         }
 
-        public Database InternalDatabase { get; private set; }
+        public Database? InternalDatabase { get; private set; }
 
         #endregion
 
@@ -219,16 +222,16 @@ namespace BlueDatabase {
         //        synchronData.Add(v);
         //    }
         //}
-        public void Register<t>(out ListExt<t> data, bool separateFiles) where t : DataHolder {
-            data = new ListExt<t>();
+        public void Register<Tt>(out ListExt<Tt> data, bool separateFiles) where Tt : DataHolder {
+            data = new ListExt<Tt>();
             var name = data.GetType().ToString();
-            var IDS = GetList(name);
-            foreach (var thisID in IDS) {
+            var ids = GetList(name);
+            foreach (var thisId in ids) {
                 if (!separateFiles) {
-                    var v = (t)System.Activator.CreateInstance(typeof(t), this, thisID.ToUpper());
+                    var v = (Tt)System.Activator.CreateInstance(typeof(Tt), this, thisId.ToUpper());
                     data.Add(v);
                 } else {
-                    var v = (t)System.Activator.CreateInstance(typeof(t), thisID.ToUpper());
+                    var v = (Tt)System.Activator.CreateInstance(typeof(Tt), thisId.ToUpper());
                     data.Add(v);
                 }
             }
@@ -236,7 +239,7 @@ namespace BlueDatabase {
         }
 
         public RowItem Row() {
-            var rn = Typ + "/" + ID;
+            var rn = Typ + "/" + Id;
             var r = InternalDatabase.Row[rn];
             if (r == null) {
                 r = InternalDatabase.Row.Add(rn);
@@ -310,10 +313,10 @@ namespace BlueDatabase {
             c.Quickinfo = quickinfo;
         }
 
-        public void SetSynchronizedFiles<t>(string dataName, string value, ref t synchronData) where t : DataHolder {
+        public void SetSynchronizedFiles<Tt>(string dataName, string value, ref Tt synchronData) where Tt : DataHolder {
             Row().CellSet(Column(dataName, string.Empty), value);
-            if (synchronData == null || synchronData.ID.ToUpper() != value.ToUpper()) {
-                synchronData = (t)System.Activator.CreateInstance(typeof(t), value);
+            if (synchronData == null || synchronData.Id.ToUpper() != value.ToUpper()) {
+                synchronData = (Tt)System.Activator.CreateInstance(typeof(Tt), value);
             }
         }
 
@@ -325,7 +328,7 @@ namespace BlueDatabase {
         public abstract bool UseExtraFile();
 
         protected virtual void Dispose(bool disposing) {
-            if (!disposedValue) {
+            if (!_disposedValue) {
                 if (disposing) {
                     // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
                 }
@@ -334,23 +337,23 @@ namespace BlueDatabase {
                 InternalDatabase = null;
                 // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
                 // TODO: Große Felder auf NULL setzen
-                disposedValue = true;
+                _disposedValue = true;
             }
         }
 
         private void Data_Changed(object sender, System.EventArgs e) {
-            List<string> IDS = new();
+            List<string> ids = new();
             if (sender is IEnumerable enumerable) {
                 foreach (var thisd in enumerable) {
                     if (thisd is DataHolder dh) {
-                        IDS.Add(dh.ID);
+                        ids.Add(dh.Id);
                     }
                 }
             } else {
                 Develop.DebugPrint(enFehlerArt.Fehler, "Falscher Typ");
             }
             var name = sender.GetType().ToString();
-            Set(name, IDS);
+            Set(name, ids);
         }
 
         private void InternalDatabase_Disposing(object sender, System.EventArgs e) => Dispose();

@@ -26,6 +26,8 @@ using System.Reflection;
 using System.Text;
 using static BlueBasics.Converter;
 
+#nullable enable
+
 namespace BlueBasics {
 
     public sealed class QuickImage : BitmapExt, IReadableText {

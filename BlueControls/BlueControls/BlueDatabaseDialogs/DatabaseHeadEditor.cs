@@ -35,7 +35,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         #region Fields
 
-        private Database _database;
+        private Database? _database;
         private bool _frmHeadEditorFormClosingIsin;
 
         #endregion
@@ -260,7 +260,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             I.Sort();
             var what = InputBoxComboStyle.Show("Welchen Code:", I, false);
             if (string.IsNullOrEmpty(what)) { return; }
-            var b = ClsMultiUserFile.UnzipIt(File.ReadAllBytes(getFromFile));
+            var b = MultiUserFile.UnzipIt(File.ReadAllBytes(getFromFile));
             enDatabaseDataType art = 0;
             var pointer = 0;
             long colKey = 0;

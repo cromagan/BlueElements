@@ -15,16 +15,18 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
-using BlueBasics.Interfaces;
-using Skript.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using BlueBasics;
+using BlueBasics.Interfaces;
 using BlueScript.Structuren;
+using Skript.Enums;
 using static BlueBasics.Extensions;
 
-namespace BlueScript {
+#nullable enable
+
+namespace BlueScript.Methods {
 
     public abstract class Method : IReadableText {
 
@@ -79,7 +81,7 @@ namespace BlueScript {
             return (s, string.Empty);
         }
 
-        public static strGetEndFeedback ReplaceComands(string txt, IEnumerable<Method> comands, Script s) {
+        public static GetEndFeedback ReplaceComands(string txt, IEnumerable<Method> comands, Script s) {
             List<string> c = new();
             foreach (var thisc in comands) {
                 if (thisc.Returns != enVariableDataType.Null) {
@@ -89,17 +91,17 @@ namespace BlueScript {
             var posc = 0;
             do {
                 var (pos, _) = NextText(txt, posc, c, true, false, KlammernStd);
-                if (pos < 0) { return new strGetEndFeedback(0, txt); }
+                if (pos < 0) { return new GetEndFeedback(0, txt); }
                 var f = Script.ComandOnPosition(txt, pos, s, true);
                 if (!string.IsNullOrEmpty(f.ErrorMessage)) {
-                    return new strGetEndFeedback(f.ErrorMessage);
+                    return new GetEndFeedback(f.ErrorMessage);
                 }
                 txt = txt.Substring(0, pos) + f.Value + txt.Substring(f.Position);
                 posc = pos;
             } while (true);
         }
 
-        public static strGetEndFeedback ReplaceVariable(string txt, Script s) {
+        public static GetEndFeedback ReplaceVariable(string txt, Script s) {
             var posc = 0;
             var v = s.Variablen.AllNames();
 
@@ -111,26 +113,26 @@ namespace BlueScript {
                     if ((postmp >= 0 && postmp < pos) || pos < 0) { pos = postmp; which = "~"; }
                 }
 
-                if (pos < 0) { return new strGetEndFeedback(0, txt); }
+                if (pos < 0) { return new GetEndFeedback(0, txt); }
 
                 Variable? thisV;
                 int endz;
 
                 if (which == "~") {
                     var (pose, _) = NextText(txt, pos + 1, Tilde, false, false, KlammernStd);
-                    if (pose <= pos) { return new strGetEndFeedback("Variablen-Findung End-~-Zeichen nicht gefunden."); }
+                    if (pose <= pos) { return new GetEndFeedback("Variablen-Findung End-~-Zeichen nicht gefunden."); }
                     var x = new Variable("dummy1", txt.Substring(pos + 1, pose - pos - 1), s);
-                    if (x.Type != enVariableDataType.String) { return new strGetEndFeedback("Fehler beim Berechnen des Variablen-Namens."); }
+                    if (x.Type != enVariableDataType.String) { return new GetEndFeedback("Fehler beim Berechnen des Variablen-Namens."); }
                     thisV = s.Variablen.Get(x.ValueString);
                     endz = pose + 1;
                 } else {
                     thisV = s.Variablen.Get(which);
                     endz = pos + which.Length;
                 }
-                if (thisV == null) { return new strGetEndFeedback("Variablen-Fehler " + which); }
+                if (thisV == null) { return new GetEndFeedback("Variablen-Fehler " + which); }
 
-                if (thisV.Type == enVariableDataType.NotDefinedYet) { return new strGetEndFeedback("Variable " + thisV.Name + " ist keinem Typ zugeordnet"); }
-                if (thisV.Type == enVariableDataType.List && !string.IsNullOrEmpty(thisV.ValueString) && !thisV.ValueString.EndsWith("\r")) { return new strGetEndFeedback("List-Variable " + thisV.Name + " fehlerhaft"); }
+                if (thisV.Type == enVariableDataType.NotDefinedYet) { return new GetEndFeedback("Variable " + thisV.Name + " ist keinem Typ zugeordnet"); }
+                if (thisV.Type == enVariableDataType.List && !string.IsNullOrEmpty(thisV.ValueString) && !thisV.ValueString.EndsWith("\r")) { return new GetEndFeedback("List-Variable " + thisV.Name + " fehlerhaft"); }
 
                 txt = txt.Substring(0, pos) + Variable.ValueForReplace(thisV.ValueString, thisV.Type) + txt.Substring(endz);
                 posc = pos;
@@ -159,17 +161,17 @@ namespace BlueScript {
             return attributes;
         }
 
-        public static strSplittedAttributesFeedback SplitAttributeToVars(string attributtext, Script s, List<enVariableDataType> types, bool endlessArgs) {
+        public static SplittedAttributesFeedback SplitAttributeToVars(string attributtext, Script s, List<enVariableDataType> types, bool endlessArgs) {
             if (types.Count == 0) {
                 return string.IsNullOrEmpty(attributtext)
-                    ? new strSplittedAttributesFeedback(new List<Variable?>())
-                    : new strSplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Keine Attribute erwartet, aber erhalten.");
+                    ? new SplittedAttributesFeedback(new List<Variable?>())
+                    : new SplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Keine Attribute erwartet, aber erhalten.");
             }
 
             var attributes = SplitAttributeToString(attributtext);
-            if (attributes == null || attributes.Count == 0) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Allgemeiner Fehler."); }
-            if (attributes.Count < types.Count) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Zu wenige Attribute erhalten."); }
-            if (!endlessArgs && attributes.Count > types.Count) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Zu viele Attribute erhalten."); }
+            if (attributes == null || attributes.Count == 0) { return new SplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Allgemeiner Fehler."); }
+            if (attributes.Count < types.Count) { return new SplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Zu wenige Attribute erhalten."); }
+            if (!endlessArgs && attributes.Count > types.Count) { return new SplittedAttributesFeedback(enSkriptFehlerTyp.AttributAnzahl, "Zu viele Attribute erhalten."); }
 
             //  Variablen und Routinen ersetzen
             List<Variable?> vars = new();
@@ -185,29 +187,29 @@ namespace BlueScript {
                     var varn = attributes[n];
                     if (varn.StartsWith("~") && varn.EndsWith("~")) {
                         var tmp2 = new Variable("dummy2", varn.Substring(1, varn.Length - 2), s);
-                        if (tmp2.Type != enVariableDataType.String) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.VariablenNamenBerechnungFehler, "Variablenname konnte nicht berechnet werden bei Attribut " + (n + 1)); }
+                        if (tmp2.Type != enVariableDataType.String) { return new SplittedAttributesFeedback(enSkriptFehlerTyp.VariablenNamenBerechnungFehler, "Variablenname konnte nicht berechnet werden bei Attribut " + (n + 1)); }
                         varn = tmp2.ValueString;
                     }
 
-                    if (!Variable.IsValidName(varn)) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.VariableErwartet, "Variablenname erwartet bei Attribut " + (n + 1)); }
+                    if (!Variable.IsValidName(varn)) { return new SplittedAttributesFeedback(enSkriptFehlerTyp.VariableErwartet, "Variablenname erwartet bei Attribut " + (n + 1)); }
 
                     if (s != null) { v = s.Variablen.Get(varn); }
-                    if (v == null) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1)); }
+                    if (v == null) { return new SplittedAttributesFeedback(enSkriptFehlerTyp.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1)); }
                 } else {
                     v = new Variable("dummy3", attributes[n], s);
-                    if (v == null) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.BerechnungFehlgeschlagen, "Berechnungsfehler bei Attribut " + (n + 1).ToString()); }
+                    if (v == null) { return new SplittedAttributesFeedback(enSkriptFehlerTyp.BerechnungFehlgeschlagen, "Berechnungsfehler bei Attribut " + (n + 1).ToString()); }
                 }
 
                 // Den Typ der Variable checken
                 if (!exceptetType.HasFlag(v.Type)) {
                     if (v.Type == enVariableDataType.Error) {
-                        return new strSplittedAttributesFeedback(enSkriptFehlerTyp.BerechnungFehlgeschlagen, "Attribut " + (n + 1) + ": " + v.Coment);
+                        return new SplittedAttributesFeedback(enSkriptFehlerTyp.BerechnungFehlgeschlagen, "Attribut " + (n + 1) + ": " + v.Coment);
                     }
                     if (exceptetType == enVariableDataType.Integer) {
-                        if (v.Type != enVariableDataType.Numeral) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.FalscherDatentyp, "Attribut " + (n + 1) + " ist keine Ganzahl."); }
-                        if (v.ValueDouble != (int)v.ValueDouble) { return new strSplittedAttributesFeedback(enSkriptFehlerTyp.FalscherDatentyp, "Attribut " + (n + 1) + " ist keine Ganzahl."); }
+                        if (v.Type != enVariableDataType.Numeral) { return new SplittedAttributesFeedback(enSkriptFehlerTyp.FalscherDatentyp, "Attribut " + (n + 1) + " ist keine Ganzahl."); }
+                        if (v.ValueDouble != (int)v.ValueDouble) { return new SplittedAttributesFeedback(enSkriptFehlerTyp.FalscherDatentyp, "Attribut " + (n + 1) + " ist keine Ganzahl."); }
                     } else {
-                        return new strSplittedAttributesFeedback(enSkriptFehlerTyp.FalscherDatentyp, "Attribut " + (n + 1) + " ist nicht der erwartete Typ");
+                        return new SplittedAttributesFeedback(enSkriptFehlerTyp.FalscherDatentyp, "Attribut " + (n + 1) + " ist nicht der erwartete Typ");
                     }
                 }
 
@@ -215,15 +217,15 @@ namespace BlueScript {
 
                 if (s != null) { s.Line += lb; }
             }
-            return new strSplittedAttributesFeedback(vars);
+            return new SplittedAttributesFeedback(vars);
         }
 
-        public strCanDoFeedback CanDo(string scriptText, int pos, bool expectedvariablefeedback, Script s) {
+        public CanDoFeedback CanDo(string scriptText, int pos, bool expectedvariablefeedback, Script s) {
             if (!expectedvariablefeedback && Returns != enVariableDataType.Null) {
-                return new strCanDoFeedback(pos, "Befehl an dieser Stelle nicht möglich", false);
+                return new CanDoFeedback(pos, "Befehl an dieser Stelle nicht möglich", false);
             }
             if (expectedvariablefeedback && Returns == enVariableDataType.Null) {
-                return new strCanDoFeedback(pos, "Befehl an dieser Stelle nicht möglich", false);
+                return new CanDoFeedback(pos, "Befehl an dieser Stelle nicht möglich", false);
             }
             var maxl = scriptText.Length;
 
@@ -234,26 +236,26 @@ namespace BlueScript {
                     if (string.Equals(scriptText.Substring(pos, l), comandtext, StringComparison.CurrentCultureIgnoreCase)) {
                         var f = GetEnd(scriptText, pos + thiscomand.Length, StartSequence.Length);
                         if (!string.IsNullOrEmpty(f.ErrorMessage)) {
-                            return new strCanDoFeedback(f.ContinuePosition, "Fehler bei " + comandtext + ": " + f.ErrorMessage, true);
+                            return new CanDoFeedback(f.ContinuePosition, "Fehler bei " + comandtext + ": " + f.ErrorMessage, true);
                         }
                         var cont = f.ContinuePosition;
                         var codebltxt = string.Empty;
                         if (GetCodeBlockAfter) {
                             var (item1, item2) = GetCodeBlockText(scriptText, cont);
-                            if (!string.IsNullOrEmpty(item2)) { return new strCanDoFeedback(f.ContinuePosition, item2, true); }
+                            if (!string.IsNullOrEmpty(item2)) { return new CanDoFeedback(f.ContinuePosition, item2, true); }
                             codebltxt = item1;
                             cont = cont + codebltxt.Length + 2;
                         }
-                        return new strCanDoFeedback(cont, comandtext, f.AttributeText, codebltxt);
+                        return new CanDoFeedback(cont, comandtext, f.AttributeText, codebltxt);
                     }
                 }
             }
-            return new strCanDoFeedback(pos, "Kann nicht geparst werden", false);
+            return new CanDoFeedback(pos, "Kann nicht geparst werden", false);
         }
 
-        public abstract List<string> Comand(Script s);
+        public abstract List<string> Comand(Script? s);
 
-        public abstract strDoItFeedback DoIt(strCanDoFeedback infos, Script s);
+        public abstract DoItFeedback DoIt(CanDoFeedback infos, Script s);
 
         public string HintText() {
             var co = "Syntax:\r\n";
@@ -284,19 +286,19 @@ namespace BlueScript {
 
         public QuickImage? SymbolForReadableText() => null;
 
-        private strGetEndFeedback GetEnd(string scriptText, int startpos, int lenghtStartSequence) {
+        private GetEndFeedback GetEnd(string scriptText, int startpos, int lenghtStartSequence) {
             //z.B: beim Befehl DO
             if (string.IsNullOrEmpty(EndSequence)) {
-                return new strGetEndFeedback(startpos, string.Empty);
+                return new GetEndFeedback(startpos, string.Empty);
             }
 
             var (pos, which) = NextText(scriptText, startpos, new List<string> { EndSequence }, false, false, KlammernStd);
             if (pos < startpos) {
-                return new strGetEndFeedback("Keinen Endpunkt gefunden.");
+                return new GetEndFeedback("Keinen Endpunkt gefunden.");
             }
 
             var txtBTW = scriptText.Substring(startpos + lenghtStartSequence, pos - startpos - lenghtStartSequence);
-            return new strGetEndFeedback(pos + which.Length, txtBTW);
+            return new GetEndFeedback(pos + which.Length, txtBTW);
         }
 
         #endregion

@@ -15,11 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using Skript.Enums;
 using System.Collections.Generic;
+using BlueScript;
 using BlueScript.Structuren;
+using Skript.Enums;
 
-namespace BlueScript {
+namespace BlueDatabase.AdditionalScriptComands {
 
     public class Method_RowIsNull : MethodDatabase {
 
@@ -45,17 +46,17 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "rowisnull" };
+        public override List<string> Comand(Script? s) => new() { "rowisnull" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-            if (!attvar.Attributes[0].ObjectType("row")) { return new strDoItFeedback("Kein Zeilenobjekt übergeben."); }
+            if (!attvar.Attributes[0].ObjectType("row")) { return new DoItFeedback("Kein Zeilenobjekt übergeben."); }
 
             var r = Method_Row.ObjectToRow(attvar.Attributes[0]);
 
-            return r == null ? strDoItFeedback.Wahr() : strDoItFeedback.Falsch();
+            return r == null ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
         }
 
         #endregion

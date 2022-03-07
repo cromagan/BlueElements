@@ -15,11 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueScript.Methods;
 using Skript.Enums;
 
-namespace BlueScript.Structuren
-{
-    public struct strDoItFeedback {
+namespace BlueScript.Structuren {
+
+    public struct DoItFeedback {
 
         #region Fields
 
@@ -35,17 +36,17 @@ namespace BlueScript.Structuren
 
         #region Constructors
 
-        public strDoItFeedback(string errormessage) {
+        public DoItFeedback(string errormessage) {
             ErrorMessage = errormessage;
             Value = string.Empty;
         }
 
-        public strDoItFeedback(string value, enVariableDataType type) {
+        public DoItFeedback(string value, enVariableDataType type) {
             Value = Variable.ValueForReplace(value, type);
             ErrorMessage = string.Empty;
         }
 
-        public strDoItFeedback(string value, string objecttype) {
+        public DoItFeedback(string value, string objecttype) {
             Value = Variable.ValueForReplace(Variable.GenerateObject(objecttype, value), enVariableDataType.Object);
             ErrorMessage = string.Empty;
         }
@@ -54,19 +55,19 @@ namespace BlueScript.Structuren
 
         #region Methods
 
-        public static strDoItFeedback AttributFehler(Method method, strSplittedAttributesFeedback f) => new(f.ErrorMessage + " > " + method.Syntax);
+        public static DoItFeedback AttributFehler(Method method, SplittedAttributesFeedback f) => new(f.ErrorMessage + " > " + method.Syntax);
 
-        public static strDoItFeedback Falsch() => new("false", enVariableDataType.Bool);
+        public static DoItFeedback Falsch() => new("false", enVariableDataType.Bool);
 
-        public static strDoItFeedback FalscherDatentyp() => new("Falscher Datentyp.");
+        public static DoItFeedback FalscherDatentyp() => new("Falscher Datentyp.");
 
-        public static strDoItFeedback Klammerfehler() => new("Fehler bei der Klammersetzung.");
+        public static DoItFeedback Klammerfehler() => new("Fehler bei der Klammersetzung.");
 
-        public static strDoItFeedback Null() => new();
+        public static DoItFeedback Null() => new();
 
-        public static strDoItFeedback Schreibgschützt() => new("Variable ist schreibgeschützt.");
+        public static DoItFeedback Schreibgschützt() => new("Variable ist schreibgeschützt.");
 
-        public static strDoItFeedback Wahr() => new("true", enVariableDataType.Bool);
+        public static DoItFeedback Wahr() => new("true", enVariableDataType.Bool);
 
         #endregion
     }

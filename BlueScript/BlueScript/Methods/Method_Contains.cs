@@ -15,13 +15,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
-using Skript.Enums;
 using System.Collections.Generic;
 using System.Linq;
+using BlueBasics;
 using BlueScript.Structuren;
+using Skript.Enums;
 
-namespace BlueScript {
+namespace BlueScript.Methods {
 
     internal class Method_Contains : Method {
 
@@ -47,11 +47,11 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "contains" };
+        public override List<string> Comand(Script? s) => new() { "contains" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
             #region Wortliste erzeugen
 
@@ -68,27 +68,27 @@ namespace BlueScript {
             if (attvar.Attributes[0].Type == enVariableDataType.List) {
                 var x = attvar.Attributes[0].ValueListString;
                 if (wordlist.Any(thisW => x.Contains(thisW, attvar.Attributes[1].ValueBool))) {
-                    return strDoItFeedback.Wahr();
+                    return DoItFeedback.Wahr();
                 }
-                return strDoItFeedback.Falsch();
+                return DoItFeedback.Falsch();
             }
 
             if (attvar.Attributes[0].Type == enVariableDataType.String) {
                 foreach (var thisW in wordlist) {
                     if (attvar.Attributes[1].ValueBool) {
                         if (attvar.Attributes[0].ValueString.Contains(thisW)) {
-                            return strDoItFeedback.Wahr();
+                            return DoItFeedback.Wahr();
                         }
                     } else {
                         if (attvar.Attributes[0].ValueString.ToLower().Contains(thisW.ToLower())) {
-                            return strDoItFeedback.Wahr();
+                            return DoItFeedback.Wahr();
                         }
                     }
                 }
-                return strDoItFeedback.Falsch();
+                return DoItFeedback.Falsch();
             }
 
-            return strDoItFeedback.FalscherDatentyp();
+            return DoItFeedback.FalscherDatentyp();
         }
 
         #endregion

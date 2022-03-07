@@ -82,7 +82,7 @@ namespace BlueControls.BlueDatabaseDialogs {
 
         #region Methods
 
-        public static void CheckDatabase(object sender, LoadedEventArgs e) {
+        public static void CheckDatabase(object? sender, LoadedEventArgs? e) {
             var database = (Database)sender;
             if (database != null && !database.ReadOnly) {
                 if (database.IsAdministrator()) {

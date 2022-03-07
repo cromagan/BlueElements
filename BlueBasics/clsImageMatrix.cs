@@ -1,6 +1,6 @@
 ﻿namespace BlueBasics {
 
-    public static class clsImageMatrix {
+    public static class ImageMatrix {
 
         #region Properties
 

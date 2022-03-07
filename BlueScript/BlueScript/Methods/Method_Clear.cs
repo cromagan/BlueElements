@@ -15,11 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using Skript.Enums;
 using System.Collections.Generic;
 using BlueScript.Structuren;
+using Skript.Enums;
 
-namespace BlueScript {
+namespace BlueScript.Methods {
 
     internal class Method_Clear : Method {
 
@@ -38,14 +38,14 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "clear" };
+        public override List<string> Comand(Script? s) => new() { "clear" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
-            if (attvar.Attributes[0].Readonly) { return strDoItFeedback.Schreibgschützt(); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
+            if (attvar.Attributes[0].Readonly) { return DoItFeedback.Schreibgschützt(); }
             attvar.Attributes[0].ValueListString = new List<string>();
-            return strDoItFeedback.Null();
+            return DoItFeedback.Null();
         }
 
         #endregion

@@ -28,11 +28,11 @@ using static BlueBasics.Generic;
 
 namespace BlueBasics.MultiUserFile {
 
-    public abstract class ClsMultiUserFile : IDisposable {
+    public abstract class MultiUserFile : IDisposable {
 
         #region Fields
 
-        public static readonly ListExt<ClsMultiUserFile> AllFiles = new();
+        public static readonly ListExt<MultiUserFile> AllFiles = new();
 
         protected byte[] DataOnDisk;
         protected int ReloadDelaySecond = 10;
@@ -56,13 +56,13 @@ namespace BlueBasics.MultiUserFile {
         private string _lastSaveCode;
         private DateTime _lastUserActionUtc = new(1900, 1, 1);
         private int _loadingThreadId = -1;
-        private FileSystemWatcher _watcher;
+        private FileSystemWatcher? _watcher;
 
         #endregion
 
         #region Constructors
 
-        protected ClsMultiUserFile(bool readOnly, bool zipped) {
+        protected MultiUserFile(bool readOnly, bool zipped) {
             _zipped = zipped;
             AllFiles.Add(this);
             //OnMultiUserFileCreated(this); // Ruft ein statisches Event auf, deswegen geht das.
@@ -93,7 +93,7 @@ namespace BlueBasics.MultiUserFile {
         #region Destructors
 
         // TODO: Finalizer nur überschreiben, wenn Dispose(bool disposing) weiter oben Code für die Freigabe nicht verwalteter Ressourcen enthält.
-        ~ClsMultiUserFile() {
+        ~MultiUserFile() {
             // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in Dispose(bool disposing) weiter oben ein.
             Dispose(false);
         }
@@ -554,7 +554,7 @@ namespace BlueBasics.MultiUserFile {
         /// <param name="filePath"></param>
         /// <param name="checkOnlyFilenameToo">Prüft, ob die Datei ohne Dateipfad - also nur Dateiname und Suffix - existiert und gibt diese zurück.</param>
         /// <returns></returns>
-        protected static ClsMultiUserFile? GetByFilename(string filePath, bool checkOnlyFilenameToo) {
+        protected static MultiUserFile? GetByFilename(string filePath, bool checkOnlyFilenameToo) {
             foreach (var thisFile in AllFiles) {
                 if (thisFile != null && string.Equals(thisFile.Filename, filePath, StringComparison.OrdinalIgnoreCase)) {
                     thisFile.BlockReload(false);

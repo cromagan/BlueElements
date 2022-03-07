@@ -15,11 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using Skript.Enums;
 using System.Collections.Generic;
+using BlueScript;
 using BlueScript.Structuren;
+using Skript.Enums;
 
-namespace BlueScript {
+namespace BlueDatabase.AdditionalScriptComands {
 
     public class Method_CellSetRow : MethodDatabase {
 
@@ -45,21 +46,21 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "cellsetrow" };
+        public override List<string> Comand(Script? s) => new() { "cellsetrow" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
             var row = Method_Row.ObjectToRow(attvar.Attributes[2]);
-            if (row is null) { return new strDoItFeedback("Fehler in der Zeile"); }
+            if (row is null) { return new DoItFeedback("Fehler in der Zeile"); }
 
             var columnToSet = row.Database.Column.Exists(attvar.Attributes[1].ValueString);
-            if (columnToSet == null) { return new strDoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[1].ValueString); }
+            if (columnToSet == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[1].ValueString); }
 
             row.CellSet(columnToSet, attvar.Attributes[0].ValueString);
 
-            return row.CellGetString(columnToSet) == attvar.Attributes[0].ValueString ? strDoItFeedback.Wahr() : strDoItFeedback.Falsch();
+            return row.CellGetString(columnToSet) == attvar.Attributes[0].ValueString ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
         }
 
         #endregion

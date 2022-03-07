@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -39,9 +41,9 @@ namespace BlueDatabase {
 
         #region Constructors
 
-        public FilterItem(Database database, enFilterType filterType, string searchValue) : this(database, filterType, new List<string> { searchValue }) { }
+        public FilterItem(Database? database, enFilterType filterType, string searchValue) : this(database, filterType, new List<string> { searchValue }) { }
 
-        public FilterItem(Database database, enFilterType filterType, IReadOnlyCollection<string> searchValue) {
+        public FilterItem(Database? database, enFilterType filterType, IReadOnlyCollection<string>? searchValue) {
             Database = database;
             if (Database != null) {
                 Database.Disposing += Database_Disposing;
@@ -114,7 +116,7 @@ namespace BlueDatabase {
         /// <summary>
         /// Der Edit-Dialog braucht die Datenbank, um mit Texten die Spalte zu suchen.
         /// </summary>
-        public Database Database { get; private set; }
+        public Database? Database { get; private set; }
 
         public enFilterType FilterType {
             get => _filterType;
@@ -140,9 +142,9 @@ namespace BlueDatabase {
             OnChanged();
         }
 
-        public object Clone() => new FilterItem(Database, ToString());
+        //public object Clone() => new FilterItem(Database, ToString());
 
-        public string CompareKey() => ((int)_filterType).ToString(Constants.Format_Integer10);
+        //public string CompareKey() => ((int)_filterType).ToString(Constants.Format_Integer10);
 
         // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
         // ~FilterItem()

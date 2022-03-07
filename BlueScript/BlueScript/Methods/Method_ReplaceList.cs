@@ -15,14 +15,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
-using Skript.Enums;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using BlueBasics;
 using BlueScript.Structuren;
+using Skript.Enums;
 
-namespace BlueScript {
+namespace BlueScript.Methods {
 
     internal class Method_ReplaceList : Method {
 
@@ -41,24 +41,24 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "replacelist" };
+        public override List<string> Comand(Script? s) => new() { "replacelist" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-            if (attvar.Attributes[0].Readonly) { return strDoItFeedback.Schreibgschützt(); }
+            if (attvar.Attributes[0].Readonly) { return DoItFeedback.Schreibgschützt(); }
 
             var tmpList = attvar.Attributes[0].ValueListString;
 
-            if (attvar.Attributes[3].ValueString == attvar.Attributes[4].ValueString) { return new strDoItFeedback("Suchtext und Ersetzungstext sind identisch."); }
-            if (!attvar.Attributes[1].ValueBool && string.Equals(attvar.Attributes[3].ValueString, attvar.Attributes[4].ValueString, StringComparison.CurrentCultureIgnoreCase)) { return new strDoItFeedback("Suchtext und Ersetzungstext sind identisch."); }
+            if (attvar.Attributes[3].ValueString == attvar.Attributes[4].ValueString) { return new DoItFeedback("Suchtext und Ersetzungstext sind identisch."); }
+            if (!attvar.Attributes[1].ValueBool && string.Equals(attvar.Attributes[3].ValueString, attvar.Attributes[4].ValueString, StringComparison.CurrentCultureIgnoreCase)) { return new DoItFeedback("Suchtext und Ersetzungstext sind identisch."); }
 
             var ct = 0;
             bool again;
             do {
                 ct++;
-                if (ct > 10000) { return new strDoItFeedback("Überlauf bei ReplaceList."); }
+                if (ct > 10000) { return new DoItFeedback("Überlauf bei ReplaceList."); }
                 again = false;
                 for (var z = 0; z < tmpList.Count; z++) {
                     if (attvar.Attributes[2].ValueBool) {
@@ -93,7 +93,7 @@ namespace BlueScript {
             } while (again);
 
             attvar.Attributes[0].ValueListString = tmpList;
-            return strDoItFeedback.Null();
+            return DoItFeedback.Null();
         }
 
         #endregion

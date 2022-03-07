@@ -132,7 +132,7 @@ namespace BlueDatabase {
         }
 
         public ListExt<string> BereitsExportiert { get; private set; }
-        public Database Database { get; private set; }
+        public Database? Database { get; private set; }
 
         public string ExportFormularId {
             get => _exportFormularId;

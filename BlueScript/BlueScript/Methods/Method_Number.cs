@@ -15,12 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
-using Skript.Enums;
 using System.Collections.Generic;
+using BlueBasics;
 using BlueScript.Structuren;
+using Skript.Enums;
 
-namespace BlueScript {
+namespace BlueScript.Methods {
 
     internal class Method_Number : Method {
 
@@ -39,13 +39,13 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "number" };
+        public override List<string> Comand(Script? s) => new() { "number" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            return !string.IsNullOrEmpty(attvar.ErrorMessage) ? strDoItFeedback.AttributFehler(this, attvar)
-                 : attvar.Attributes[0].ValueString.IsNumeral() ? new strDoItFeedback(attvar.Attributes[0].ValueString, enVariableDataType.Numeral)
-                 : new strDoItFeedback(attvar.Attributes[1].ValueString, enVariableDataType.Numeral);
+            return !string.IsNullOrEmpty(attvar.ErrorMessage) ? DoItFeedback.AttributFehler(this, attvar)
+                 : attvar.Attributes[0].ValueString.IsNumeral() ? new DoItFeedback(attvar.Attributes[0].ValueString, enVariableDataType.Numeral)
+                 : new DoItFeedback(attvar.Attributes[1].ValueString, enVariableDataType.Numeral);
         }
 
         #endregion

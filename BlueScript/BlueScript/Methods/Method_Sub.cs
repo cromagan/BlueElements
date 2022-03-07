@@ -15,11 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using Skript.Enums;
 using System.Collections.Generic;
 using BlueScript.Structuren;
+using Skript.Enums;
 
-namespace BlueScript {
+namespace BlueScript.Methods {
 
     internal class Method_Sub : Method {
 
@@ -38,15 +38,15 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "sub" };
+        public override List<string> Comand(Script? s) => new() { "sub" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
-            if (string.IsNullOrEmpty(infos.AttributText)) { return new strDoItFeedback("Kein Text angekommen."); }
-            if (!Variable.IsValidName(infos.AttributText)) { return new strDoItFeedback(infos.AttributText + " ist kein gültiger Subroutinen-Name."); }
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+            if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback("Kein Text angekommen."); }
+            if (!Variable.IsValidName(infos.AttributText)) { return new DoItFeedback(infos.AttributText + " ist kein gültiger Subroutinen-Name."); }
 
             //Subroutinen werden einfach übersprungen
             s.Line += infos.LineBreakInCodeBlock;
-            return new strDoItFeedback(string.Empty);
+            return new DoItFeedback(string.Empty);
         }
 
         #endregion

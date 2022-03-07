@@ -15,11 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using Skript.Enums;
 using System.Collections.Generic;
 using BlueScript.Structuren;
+using Skript.Enums;
 
-namespace BlueScript {
+namespace BlueScript.Methods {
 
     internal class Method_StartsWith : Method {
 
@@ -38,23 +38,23 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "startswith" };
+        public override List<string> Comand(Script? s) => new() { "startswith" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
             for (var z = 2; z < attvar.Attributes.Count; z++) {
                 if (attvar.Attributes[1].ValueBool) {
                     if (attvar.Attributes[0].ValueString.StartsWith(attvar.Attributes[z].ValueString)) {
-                        return strDoItFeedback.Wahr();
+                        return DoItFeedback.Wahr();
                     }
                 } else {
                     if (attvar.Attributes[0].ValueString.ToLower().StartsWith(attvar.Attributes[z].ValueString.ToLower())) {
-                        return strDoItFeedback.Wahr();
+                        return DoItFeedback.Wahr();
                     }
                 }
             }
-            return strDoItFeedback.Falsch();
+            return DoItFeedback.Falsch();
         }
 
         #endregion

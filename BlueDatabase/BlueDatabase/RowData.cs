@@ -24,17 +24,17 @@ using System.Linq;
 
 namespace BlueDatabase {
 
-    public static class clsRowDrawDataExtensions {
+    public static class RowDrawDataExtensions {
 
         #region Methods
 
-        public static RowData? Get(this List<RowData?> l, RowItem? row) {
+        public static RowData? Get(this List<RowData>? l, RowItem? row) {
             if (l == null) { return null; }
 
             return l.FirstOrDefault(thisr => thisr?.Row == row);
         }
 
-        public static RowData? Get(this List<RowData?> l, RowItem? row, string chapter) {
+        public static RowData? Get(this List<RowData>? l, RowItem? row, string chapter) {
             if (l == null || row == null) { return null; }
 
             return l.FirstOrDefault(thisr => thisr?.Row == row && thisr.Chapter == chapter);

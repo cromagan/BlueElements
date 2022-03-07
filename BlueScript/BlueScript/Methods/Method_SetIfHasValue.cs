@@ -15,11 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using Skript.Enums;
 using System.Collections.Generic;
 using BlueScript.Structuren;
+using Skript.Enums;
 
-namespace BlueScript {
+namespace BlueScript.Methods {
 
     internal class Method_SetIfHasValue : Method {
 
@@ -38,20 +38,20 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "SetIfHasValue" };
+        public override List<string> Comand(Script? s) => new() { "SetIfHasValue" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
-            if (attvar.Attributes[0].Readonly) { return strDoItFeedback.Schreibgschützt(); }
+            if (attvar.Attributes[0].Readonly) { return DoItFeedback.Schreibgschützt(); }
 
             for (var z = 1; z < attvar.Attributes.Count; z++) {
                 if (attvar.Attributes[z].Type == enVariableDataType.Error) {
                     continue;
                 }
 
-                if (attvar.Attributes[z].Type != attvar.Attributes[0].Type) { return new strDoItFeedback("Variablentyp zur Ausgangsvariable unterschiedlich."); }
+                if (attvar.Attributes[z].Type != attvar.Attributes[0].Type) { return new DoItFeedback("Variablentyp zur Ausgangsvariable unterschiedlich."); }
 
                 var hasvalue = false;
 
@@ -61,11 +61,11 @@ namespace BlueScript {
 
                 if (hasvalue) {
                     attvar.Attributes[0].ValueString = attvar.Attributes[z].ValueString;
-                    return strDoItFeedback.Null();
+                    return DoItFeedback.Null();
                 }
             }
 
-            return strDoItFeedback.Null();
+            return DoItFeedback.Null();
         }
 
         #endregion

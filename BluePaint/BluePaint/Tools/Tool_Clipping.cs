@@ -25,6 +25,8 @@ using static BlueBasics.BitmapExt;
 using static BlueBasics.Develop;
 using static BlueBasics.Generic;
 
+#nullable enable
+
 namespace BluePaint {
 
     public partial class Tool_Clipping {

@@ -15,12 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using Skript.Enums;
 using System.Collections.Generic;
 using BlueScript.Structuren;
+using Skript.Enums;
 using static BlueBasics.Extensions;
 
-namespace BlueScript {
+namespace BlueScript.Methods {
 
     internal class Method_StringHTMLToAscii : Method {
 
@@ -39,12 +39,12 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "stringhtmltoascii" };
+        public override List<string> Comand(Script? s) => new() { "stringhtmltoascii" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            return string.IsNullOrEmpty(attvar.ErrorMessage) ? new strDoItFeedback(attvar.Attributes[0].ValueString.HtmlSpecialToNormalChar(attvar.Attributes[1].ValueBool), enVariableDataType.String)
-                                                             : strDoItFeedback.AttributFehler(this, attvar);
+            return string.IsNullOrEmpty(attvar.ErrorMessage) ? new DoItFeedback(attvar.Attributes[0].ValueString.HtmlSpecialToNormalChar(attvar.Attributes[1].ValueBool), enVariableDataType.String)
+                                                             : DoItFeedback.AttributFehler(this, attvar);
         }
 
         #endregion

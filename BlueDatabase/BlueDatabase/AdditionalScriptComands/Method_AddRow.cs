@@ -15,12 +15,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using Skript.Enums;
 using System.Collections.Generic;
 using System.Diagnostics;
+using BlueScript;
 using BlueScript.Structuren;
+using Skript.Enums;
 
-namespace BlueScript {
+namespace BlueDatabase.AdditionalScriptComands {
 
     public class Method_AddRow : MethodDatabase {
 
@@ -46,18 +47,18 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "addrow" };
+        public override List<string> Comand(Script? s) => new() { "addrow" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
             var db = DatabaseOf(s, attvar.Attributes[0].ValueString);
-            if (db == null) { return new strDoItFeedback("Datenbank '" + attvar.Attributes[0].ValueString + "' nicht gefunden"); }
+            if (db == null) { return new DoItFeedback("Datenbank '" + attvar.Attributes[0].ValueString + "' nicht gefunden"); }
 
-            if (db.ReadOnly) { return strDoItFeedback.Falsch(); }
+            if (db.ReadOnly) { return DoItFeedback.Falsch(); }
 
-            if (string.IsNullOrEmpty(attvar.Attributes[1].ValueString)) { return new strDoItFeedback("KeyValue muss einen Wert enthalten."); }
+            if (string.IsNullOrEmpty(attvar.Attributes[1].ValueString)) { return new DoItFeedback("KeyValue muss einen Wert enthalten."); }
             //var r = db.Row[attvar.Attributes[1].ValueString];
 
             //if (r != null && !attvar.Attributes[2].ValueBool) { return Method_Row.RowToObject(r); }
@@ -66,7 +67,7 @@ namespace BlueScript {
                 StackTrace stackTrace = new();
 
                 if (stackTrace.FrameCount > 400) {
-                    return new strDoItFeedback("Stapelspeicherüberlauf");
+                    return new DoItFeedback("Stapelspeicherüberlauf");
                 }
             }
 

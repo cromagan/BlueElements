@@ -15,10 +15,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueControls.Forms;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Windows.Forms;
 using static BlueBasics.BitmapExt;
 
 namespace BlueControls {
@@ -36,7 +39,7 @@ namespace BlueControls {
 
         private const int DrawSize = 20;
         private readonly string _drawText = string.Empty;
-        private readonly clsScreenData _feedBack;
+        private readonly ScreenData _feedBack;
         private Bitmap _clipedArea;
         private bool _mousesWasUp;
 
@@ -48,7 +51,7 @@ namespace BlueControls {
 
         private ScreenShot() : base() {
             InitializeComponent();
-            _feedBack = new clsScreenData();
+            _feedBack = new ScreenData();
         }
 
         private ScreenShot(string text) : this() => _drawText = text;
@@ -92,7 +95,7 @@ namespace BlueControls {
 
         //public static Bitmap GrabArea(Rectangle r) => r.Width < 2 || r.Height < 2 ? null : Area(GrabAllScreens(), r);
 
-        public static clsScreenData GrabArea() => GrabArea(null);
+        public static ScreenData GrabArea() => GrabArea(null);
 
         /// <summary>
         /// Erstellt einen Screenshot, dann kann der User einen Bereich wählen - und gibt diesen zurück.
@@ -102,7 +105,7 @@ namespace BlueControls {
         /// <param name="MaxH">Die Maximale Höhe des Bildes. Evtl. wird das Bild herunterskaliert.</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static clsScreenData GrabArea(System.Windows.Forms.Form? frm) {
+        public static ScreenData GrabArea(System.Windows.Forms.Form? frm) {
             using ScreenShot x = new("Bitte ziehen sie einen Rahmen\r\num den gewünschten Bereich.");
             return x.GrabAreaInternal(frm);
         }
@@ -120,7 +123,7 @@ namespace BlueControls {
         //    Generic.CollectGarbage();
         //    return im;
         //}
-        protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
+        protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs? e) {
             base.OnMouseMove(e);
             if (e != null && e.Button == System.Windows.Forms.MouseButtons.None && !_mousesWasUp) {
                 _mousesWasUp = true;
@@ -171,7 +174,7 @@ namespace BlueControls {
             Close();
         }
 
-        private clsScreenData GrabAreaInternal(System.Windows.Forms.Form? frm) {
+        private ScreenData GrabAreaInternal(System.Windows.Forms.Form? frm) {
             try {
                 System.Windows.Forms.FormWindowState ws = 0;
 
@@ -208,7 +211,7 @@ namespace BlueControls {
                 _clipedArea.Dispose();
                 return _feedBack;
             } catch {
-                return new clsScreenData();
+                return new ScreenData();
             }
         }
 

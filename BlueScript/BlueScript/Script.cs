@@ -15,12 +15,15 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using BlueScript.Methods;
 using BlueScript.Structuren;
 
 namespace BlueScript {
@@ -29,7 +32,7 @@ namespace BlueScript {
 
         #region Fields
 
-        public static List<Method> Comands;
+        public static List<Method>? Comands;
         public readonly List<Variable> Variablen;
         public bool EndSkript;
 
@@ -38,8 +41,8 @@ namespace BlueScript {
         /// </summary>
         public string Feedback = string.Empty;
 
-        internal readonly List<Bitmap?> BitmapCache;
-        internal Method_BerechneVariable _berechneVariable; // Paralellisierung löscht ab und zu die Variable
+        internal readonly List<Bitmap> BitmapCache;
+        internal Method_BerechneVariable? _berechneVariable; // Paralellisierung löscht ab und zu die Variable
         private string _error;
         private string _errorCode;
 
@@ -77,7 +80,7 @@ namespace BlueScript {
         //    //   //objects.Sort();
         //    return objects;
         //}
-        public Script(List<Variable> variablen) {
+        public Script(List<Variable>? variablen) {
             if (Comands == null) {
                 Comands = GetEnumerableOfType<Method>();
             }

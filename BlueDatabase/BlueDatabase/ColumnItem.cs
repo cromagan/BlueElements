@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -46,7 +48,7 @@ namespace BlueDatabase {
         public SizeF TmpCaptionTextSize = new(-1, -1);
         public int? TmpColumnContentWidth;
         public int? TmpIfFilterRemoved = null;
-        internal List<string> UcaseNamesSortedByLenght;
+        internal List<string>? UcaseNamesSortedByLenght;
         private enAdditionalCheck _additionalCheck;
         private string _adminInfo;
         private bool _afterEditAutoCorrect;
@@ -116,7 +118,7 @@ namespace BlueDatabase {
         private bool _spellCheckingEnabled;
         private string _suffix;
         private bool _textBearbeitungErlaubt;
-        private Database _tmpLinkedDatabase;
+        private Database? _tmpLinkedDatabase;
         private enTranslationType _translate;
         private string _ueberschrift1;
         private string _ueberschrift2;
@@ -1075,7 +1077,7 @@ namespace BlueDatabase {
             return Contents(x, pinned);
         }
 
-        public List<string> Contents(FilterCollection? filter, List<RowItem?> pinned) {
+        public List<string> Contents(FilterCollection? filter, List<RowItem>? pinned) {
             List<string> list = new();
             foreach (var thisRowItem in Database.Row) {
                 if (thisRowItem != null) {

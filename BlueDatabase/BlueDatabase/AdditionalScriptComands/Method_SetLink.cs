@@ -15,12 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueDatabase;
-using Skript.Enums;
 using System.Collections.Generic;
+using BlueScript;
 using BlueScript.Structuren;
+using Skript.Enums;
 
-namespace BlueScript {
+namespace BlueDatabase.AdditionalScriptComands {
 
     public class Method_SetLink : MethodDatabase {
 
@@ -50,45 +50,45 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "setlink" };
+        public override List<string> Comand(Script? s) => new() { "setlink" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
             var db = MyDatabase(s);
-            if (db == null) { return new strDoItFeedback("Interner Fehler, eigene Datenbank nicht gefunden"); }
+            if (db == null) { return new DoItFeedback("Interner Fehler, eigene Datenbank nicht gefunden"); }
 
             #region Filter prüfen: allFi
 
             var allFi = new List<FilterItem>();
 
             for (var z = 2; z < attvar.Attributes.Count; z++) {
-                if (!attvar.Attributes[z].ObjectType("rowfilter")) { return new strDoItFeedback("Kein Filter übergeben."); }
+                if (!attvar.Attributes[z].ObjectType("rowfilter")) { return new DoItFeedback("Kein Filter übergeben."); }
 
                 var fi = new FilterItem(attvar.Attributes[z].ObjectData());
 
-                if (!fi.IsOk()) { return new strDoItFeedback("Filter fehlerhaft"); }
+                if (!fi.IsOk()) { return new DoItFeedback("Filter fehlerhaft"); }
 
                 if (z > 2) {
-                    if (fi.Database != allFi[0].Database) { return new strDoItFeedback("Filter über verschiedene Datenbanken wird nicht unterstützt."); }
+                    if (fi.Database != allFi[0].Database) { return new DoItFeedback("Filter über verschiedene Datenbanken wird nicht unterstützt."); }
                 }
                 allFi.Add(fi);
             }
 
-            if (allFi.Count < 1) { return new strDoItFeedback("Fehler im Filter"); }
+            if (allFi.Count < 1) { return new DoItFeedback("Fehler im Filter"); }
 
             #endregion
 
             #region Spalte, die geändert werden soll, finden: ChangeColumn
 
             var ChangeColumn = db.Column.Exists(attvar.Attributes[0].Name);
-            if (ChangeColumn.Format is not BlueBasics.Enums.enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert and not BlueBasics.Enums.enDataFormat.Verknüpfung_zu_anderer_Datenbank) { return new strDoItFeedback("Spalte hat das falsche Format: " + attvar.Attributes[1].ValueString); }
-            if (ChangeColumn.LinkedCell_RowKeyIsInColumn >= -1) { return new strDoItFeedback("Spalte wird automatisiert befüllt: " + attvar.Attributes[1].ValueString); }
+            if (ChangeColumn.Format is not BlueBasics.Enums.enDataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert and not BlueBasics.Enums.enDataFormat.Verknüpfung_zu_anderer_Datenbank) { return new DoItFeedback("Spalte hat das falsche Format: " + attvar.Attributes[1].ValueString); }
+            if (ChangeColumn.LinkedCell_RowKeyIsInColumn >= -1) { return new DoItFeedback("Spalte wird automatisiert befüllt: " + attvar.Attributes[1].ValueString); }
 
             #endregion
 
-            if (allFi[0].Database != ChangeColumn.LinkedDatabase()) { return new strDoItFeedback("Filter zeigen auf eine andere Datenbank als die, die in der Spalte als Verlinkung angegeben ist."); }
+            if (allFi[0].Database != ChangeColumn.LinkedDatabase()) { return new DoItFeedback("Filter zeigen auf eine andere Datenbank als die, die in der Spalte als Verlinkung angegeben ist."); }
 
             #region Spalte mit den Link-Daten finden: Linkvar
 
@@ -104,7 +104,7 @@ namespace BlueScript {
                 Linkvar.ValueString = string.Empty;
                 attvar.Attributes[0].ValueString = string.Empty;
                 Linkvar.Readonly = true;
-                return strDoItFeedback.Falsch();
+                return DoItFeedback.Falsch();
             }
 
             #endregion
@@ -116,13 +116,13 @@ namespace BlueScript {
                 Linkvar.ValueString = string.Empty;
                 attvar.Attributes[0].ValueString = string.Empty;
                 Linkvar.Readonly = true;
-                return strDoItFeedback.Falsch();
+                return DoItFeedback.Falsch();
             }
 
             #endregion
 
             var tmpv = RowItem.CellToVariable(LinkTaregtColumn, r[0]);
-            if (tmpv == null || tmpv.Count != 1) { return new strDoItFeedback("Wert konnte nicht erzeugt werden: " + attvar.Attributes[4].ValueString); }
+            if (tmpv == null || tmpv.Count != 1) { return new DoItFeedback("Wert konnte nicht erzeugt werden: " + attvar.Attributes[4].ValueString); }
             tmpv[0].Type = enVariableDataType.List;
 
             attvar.Attributes[0].ValueString = tmpv[0].ValueString;
@@ -133,7 +133,7 @@ namespace BlueScript {
 
             Linkvar.ValueString = CellCollection.KeyOfCell(LinkTaregtColumn, r[0]);
             Linkvar.Readonly = true;
-            return strDoItFeedback.Wahr();
+            return DoItFeedback.Wahr();
         }
 
         #endregion

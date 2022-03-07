@@ -15,12 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueDatabase;
-using Skript.Enums;
 using System.Collections.Generic;
+using BlueScript;
 using BlueScript.Structuren;
+using Skript.Enums;
 
-namespace BlueScript {
+namespace BlueDatabase.AdditionalScriptComands {
 
     public class Method_LookupFilter : MethodDatabase {
 
@@ -47,37 +47,37 @@ namespace BlueScript {
 
         #region Methods
 
-        public override List<string> Comand(Script s) => new() { "lookupfilter" };
+        public override List<string> Comand(Script? s) => new() { "lookupfilter" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
             var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 3);
 
-            if (allFi is null) { return new strDoItFeedback("Fehler im Filter"); }
+            if (allFi is null) { return new DoItFeedback("Fehler im Filter"); }
 
             var returncolumn = allFi[0].Database.Column.Exists(attvar.Attributes[0].ValueString);
-            if (returncolumn == null) { return new strDoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[0].ValueString); }
+            if (returncolumn == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[0].ValueString); }
 
             var r = RowCollection.MatchesTo(allFi);
             if (r == null || r.Count == 0) {
                 attvar.Attributes[1].Readonly = false; // 5 = NothingFoundValue
                 attvar.Attributes[1].Type = enVariableDataType.List;
-                return new strDoItFeedback(attvar.Attributes[1].ValueString + "\r", enVariableDataType.List);
+                return new DoItFeedback(attvar.Attributes[1].ValueString + "\r", enVariableDataType.List);
             }
             if (r.Count > 1) {
                 attvar.Attributes[2].Readonly = false; // 6 = to MuchFound
                 attvar.Attributes[2].Type = enVariableDataType.List;
-                return new strDoItFeedback(attvar.Attributes[2].ValueString + "\r", enVariableDataType.List);
+                return new DoItFeedback(attvar.Attributes[2].ValueString + "\r", enVariableDataType.List);
             }
 
             var v = RowItem.CellToVariable(returncolumn, r[0]);
-            if (v == null || v.Count != 1) { return new strDoItFeedback("Wert konnte nicht erzeugt werden: " + attvar.Attributes[4].ValueString); }
+            if (v == null || v.Count != 1) { return new DoItFeedback("Wert konnte nicht erzeugt werden: " + attvar.Attributes[4].ValueString); }
 
             return v[0].Type != enVariableDataType.List
-                ? new strDoItFeedback(v[0].ValueString + "\r", enVariableDataType.List)
-                : new strDoItFeedback(v[0].ValueString, enVariableDataType.List);
+                ? new DoItFeedback(v[0].ValueString + "\r", enVariableDataType.List)
+                : new DoItFeedback(v[0].ValueString, enVariableDataType.List);
         }
 
         #endregion

@@ -80,7 +80,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             Für.Text = "<b>" + _row.CellFirstString();
         }
 
-        private void Such_TextChanged(object sender, System.EventArgs e) {
+        private void Such_TextChanged(object? sender, System.EventArgs e) {
             Auswahl.Item.Clear();
             var t = Such.Text;
             if (string.IsNullOrEmpty(t)) { return; }

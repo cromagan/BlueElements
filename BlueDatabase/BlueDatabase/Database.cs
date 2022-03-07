@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -36,7 +38,7 @@ namespace BlueDatabase {
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public sealed class Database : BlueBasics.MultiUserFile.ClsMultiUserFile {
+    public sealed class Database : BlueBasics.MultiUserFile.MultiUserFile {
 
         #region Fields
 
@@ -46,7 +48,7 @@ namespace BlueDatabase {
 
         public readonly ColumnCollection Column;
 
-        public readonly ListExt<ColumnViewCollection?> ColumnArrangements = new();
+        public readonly ListExt<ColumnViewCollection> ColumnArrangements = new();
 
         public readonly ListExt<string> DatenbankAdmin = new();
 
@@ -103,7 +105,7 @@ namespace BlueDatabase {
 
         private string _rulesScript;
 
-        private RowSortDefinition _sortDefinition;
+        private RowSortDefinition? _sortDefinition;
 
         private int _undoCount;
 
@@ -123,7 +125,7 @@ namespace BlueDatabase {
 
         public Database(string filename, bool readOnly, bool create) : this(null, filename, readOnly, create) { }
 
-        private Database(Stream stream, string filename, bool readOnly, bool create) : base(readOnly, true) {
+        private Database(Stream? stream, string filename, bool readOnly, bool create) : base(readOnly, true) {
             CultureInfo culture = new("de-DE");
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
@@ -572,19 +574,19 @@ namespace BlueDatabase {
         /// <param name="arrangement">Die Spalten, die zurückgegeben werden. NULL gibt alle Spalten zurück.</param>
         /// <param name="sortedRows">Die Zeilen, die zurückgegeben werden. NULL gibt alle ZEilen zurück.</param>
         /// <returns></returns>
-        public string Export_CSV(enFirstRow firstRow, ColumnViewCollection? arrangement, List<RowData?> sortedRows) => Export_CSV(firstRow, arrangement.ListOfUsedColumn(), sortedRows);
+        public string Export_CSV(enFirstRow firstRow, ColumnViewCollection? arrangement, List<RowData>? sortedRows) => Export_CSV(firstRow, arrangement.ListOfUsedColumn(), sortedRows);
 
         /// <summary>
         /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
         /// </summary>
         /// <returns></returns>
-        public string Export_CSV(enFirstRow firstRow, int arrangementNo, FilterCollection? filter, List<RowItem?> pinned) => Export_CSV(firstRow, ColumnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateSortedRows(filter, SortDefinition, pinned, null));
+        public string Export_CSV(enFirstRow firstRow, int arrangementNo, FilterCollection? filter, List<RowItem>? pinned) => Export_CSV(firstRow, ColumnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateSortedRows(filter, SortDefinition, pinned, null));
 
         /// <summary>
         /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
         /// </summary>
         /// <returns></returns>
-        public void Export_HTML(string filename, int arrangementNo, FilterCollection? filter, List<RowItem?> pinned) => Export_HTML(filename, ColumnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateSortedRows(filter, SortDefinition, pinned, null), false);
+        public void Export_HTML(string filename, int arrangementNo, FilterCollection? filter, List<RowItem>? pinned) => Export_HTML(filename, ColumnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateSortedRows(filter, SortDefinition, pinned, null), false);
 
         /// <summary>
         /// TableViews haben eigene Export-Routinen, die hierauf zugreifen

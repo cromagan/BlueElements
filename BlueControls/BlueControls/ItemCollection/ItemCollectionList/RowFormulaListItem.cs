@@ -29,9 +29,9 @@ namespace BlueControls.ItemCollection {
 
         #region Fields
 
-        private string _LayoutID;
+        private string _layoutId;
 
-        private RowItem? _Row;
+        private RowItem? _row;
 
         private Bitmap? _tmpBmp;
 
@@ -39,42 +39,42 @@ namespace BlueControls.ItemCollection {
 
         #region Constructors
 
-        public RowFormulaListItem(RowItem? row, string internalname, string layoutID, string userDefCompareKey) : base(internalname) {
-            _Row = row;
-            _LayoutID = layoutID;
+        public RowFormulaListItem(RowItem? row, string internalname, string layoutId, string userDefCompareKey) : base(internalname) {
+            _row = row;
+            _layoutId = layoutId;
             UserDefCompareKey = userDefCompareKey;
         }
 
-        public RowFormulaListItem(RowItem? row, string layoutID, string userDefCompareKey) : this(row, string.Empty, layoutID, userDefCompareKey) { }
+        public RowFormulaListItem(RowItem? row, string layoutId, string userDefCompareKey) : this(row, string.Empty, layoutId, userDefCompareKey) { }
 
         #endregion
 
         #region Properties
 
-        public string LayoutID {
-            get => _LayoutID;
+        public string LayoutId {
+            get => _layoutId;
             set {
-                if (value == _LayoutID) { return; }
-                _LayoutID = value;
+                if (value == _layoutId) { return; }
+                _layoutId = value;
                 RemovePic();
             }
         }
 
         public override string QuickInfo {
             get {
-                if (_Row == null) { return string.Empty; }
+                if (_row == null) { return string.Empty; }
 
-                return !string.IsNullOrEmpty(_Row.Database.ZeilenQuickInfo)
-                    ? _Row.QuickInfo.CreateHtmlCodes(true)
-                    : _Row.CellFirstString().CreateHtmlCodes(true);
+                return !string.IsNullOrEmpty(_row.Database.ZeilenQuickInfo)
+                    ? _row.QuickInfo.CreateHtmlCodes(true)
+                    : _row.CellFirstString().CreateHtmlCodes(true);
             }
         }
 
         public RowItem? Row {
-            get => _Row;
+            get => _row;
             set {
-                if (_Row == value) { return; }
-                _Row = value;
+                if (_row == value) { return; }
+                _row = value;
                 RemovePic();
             }
         }
@@ -84,7 +84,7 @@ namespace BlueControls.ItemCollection {
         #region Methods
 
         public override object Clone() {
-            var x = new RowFormulaListItem(_Row, Internal, _LayoutID, UserDefCompareKey);
+            var x = new RowFormulaListItem(_row, Internal, _layoutId, UserDefCompareKey);
             x.CloneBasicStatesFrom(this);
             return x;
         }
@@ -111,46 +111,46 @@ namespace BlueControls.ItemCollection {
             //return new Size(300, (int)(sc * 300));
         }
 
-        protected override void DrawExplicit(Graphics GR, Rectangle PositionModified, enDesign itemdesign, enStates vState, bool DrawBorderAndBack, bool Translate) {
+        protected override void DrawExplicit(Graphics gr, Rectangle positionModified, enDesign itemdesign, enStates vState, bool drawBorderAndBack, bool translate) {
             if (_tmpBmp == null) { GeneratePic(); }
-            if (DrawBorderAndBack) {
-                Skin.Draw_Back(GR, itemdesign, vState, PositionModified, null, false);
+            if (drawBorderAndBack) {
+                Skin.Draw_Back(gr, itemdesign, vState, positionModified, null, false);
             }
             if (_tmpBmp != null) {
-                var scale = (float)Math.Min(PositionModified.Width / (double)_tmpBmp.Width, PositionModified.Height / (double)_tmpBmp.Height);
-                RectangleF r2 = new(((PositionModified.Width - (_tmpBmp.Width * scale)) / 2) + PositionModified.Left, ((PositionModified.Height - (_tmpBmp.Height * scale)) / 2) + PositionModified.Top, _tmpBmp.Width * scale, _tmpBmp.Height * scale);
-                GR.DrawImage(_tmpBmp, r2, new RectangleF(0, 0, _tmpBmp.Width, _tmpBmp.Height), GraphicsUnit.Pixel);
+                var scale = (float)Math.Min(positionModified.Width / (double)_tmpBmp.Width, positionModified.Height / (double)_tmpBmp.Height);
+                RectangleF r2 = new(((positionModified.Width - (_tmpBmp.Width * scale)) / 2) + positionModified.Left, ((positionModified.Height - (_tmpBmp.Height * scale)) / 2) + positionModified.Top, _tmpBmp.Width * scale, _tmpBmp.Height * scale);
+                gr.DrawImage(_tmpBmp, r2, new RectangleF(0, 0, _tmpBmp.Width, _tmpBmp.Height), GraphicsUnit.Pixel);
             }
-            if (DrawBorderAndBack) {
-                Skin.Draw_Border(GR, itemdesign, vState, PositionModified);
+            if (drawBorderAndBack) {
+                Skin.Draw_Border(gr, itemdesign, vState, positionModified);
             }
         }
 
-        protected override string GetCompareKey() => _Row.CompareKey();
+        protected override string GetCompareKey() => _row.CompareKey();
 
         private void GeneratePic() {
-            if (string.IsNullOrEmpty(_LayoutID) || !_LayoutID.StartsWith("#")) {
+            if (string.IsNullOrEmpty(_layoutId) || !_layoutId.StartsWith("#")) {
                 _tmpBmp = QuickImage.Get(enImageCode.Warnung, 128);
                 return;
             }
-            CreativePad _pad = new(new ItemCollectionPad(_LayoutID, Row.Database, Row.Key));
-            var mb = _pad.Item.MaxBounds(null);
+            CreativePad pad = new(new ItemCollectionPad(_layoutId, Row.Database, Row.Key));
+            var mb = pad.Item.MaxBounds(null);
             if (_tmpBmp != null) {
                 if (_tmpBmp.Width != mb.Width || _tmpBmp.Height != mb.Height) {
                     RemovePic();
                 }
             }
 
-            var InternalZoom = Math.Min(500 / mb.Width, 500 / mb.Height);
-            InternalZoom = Math.Min(1, InternalZoom);
+            var internalZoom = Math.Min(500 / mb.Width, 500 / mb.Height);
+            internalZoom = Math.Min(1, internalZoom);
 
-            if (_tmpBmp == null) { _tmpBmp = new Bitmap((int)(mb.Width * InternalZoom), (int)(mb.Height * InternalZoom)); }
-            var zoomv = _pad.ZoomFitValue(mb, false, _tmpBmp.Size);
-            var centerpos = _pad.CenterPos(mb, false, _tmpBmp.Size, zoomv);
-            var slidervalues = _pad.SliderValues(mb, zoomv, centerpos);
-            _pad.ShowInPrintMode = true;
-            _pad.Unselect();
-            _pad.Item.DrawCreativePadToBitmap(_tmpBmp, enStates.Standard, zoomv, slidervalues.X, slidervalues.Y, null);
+            if (_tmpBmp == null) { _tmpBmp = new Bitmap((int)(mb.Width * internalZoom), (int)(mb.Height * internalZoom)); }
+            var zoomv = pad.ZoomFitValue(mb, false, _tmpBmp.Size);
+            var centerpos = pad.CenterPos(mb, false, _tmpBmp.Size, zoomv);
+            var slidervalues = pad.SliderValues(mb, zoomv, centerpos);
+            pad.ShowInPrintMode = true;
+            pad.Unselect();
+            pad.Item.DrawCreativePadToBitmap(_tmpBmp, enStates.Standard, zoomv, slidervalues.X, slidervalues.Y, null);
         }
 
         private void RemovePic() {

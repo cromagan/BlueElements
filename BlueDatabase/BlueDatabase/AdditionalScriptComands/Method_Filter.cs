@@ -15,12 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueDatabase;
-using Skript.Enums;
 using System.Collections.Generic;
+using BlueScript;
 using BlueScript.Structuren;
+using Skript.Enums;
 
-namespace BlueScript {
+namespace BlueDatabase.AdditionalScriptComands {
 
     public class Method_Filter : MethodDatabase {
 
@@ -65,19 +65,19 @@ namespace BlueScript {
             return allFi.Count < 1 ? null : allFi;
         }
 
-        public override List<string> Comand(Script s) => new() { "filter" };
+        public override List<string> Comand(Script? s) => new() { "filter" };
 
-        public override strDoItFeedback DoIt(strCanDoFeedback infos, Script s) {
+        public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
             var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return strDoItFeedback.AttributFehler(this, attvar); }
+            if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar); }
 
             var db = DatabaseOf(s, attvar.Attributes[0].ValueString);
-            if (db == null) { return new strDoItFeedback("Datenbank '" + attvar.Attributes[0].ValueString + "' nicht gefunden"); }
+            if (db == null) { return new DoItFeedback("Datenbank '" + attvar.Attributes[0].ValueString + "' nicht gefunden"); }
 
             #region Spalte ermitteln
 
             var filterColumn = db.Column.Exists(attvar.Attributes[1].ValueString);
-            if (filterColumn == null) { return new strDoItFeedback("Spalte '" + attvar.Attributes[1].ValueString + "' in Ziel-Datenbank nicht gefunden"); }
+            if (filterColumn == null) { return new DoItFeedback("Spalte '" + attvar.Attributes[1].ValueString + "' in Ziel-Datenbank nicht gefunden"); }
 
             #endregion
 
@@ -90,13 +90,13 @@ namespace BlueScript {
                     break;
 
                 default:
-                    return new strDoItFeedback("Filtertype unbekannt: " + attvar.Attributes[2].ValueString);
+                    return new DoItFeedback("Filtertype unbekannt: " + attvar.Attributes[2].ValueString);
             }
 
             #endregion
 
             var fii = new FilterItem(filterColumn, filtertype, attvar.Attributes[3].ValueString);
-            return new strDoItFeedback(fii.ToString(true), "rowfilter");
+            return new DoItFeedback(fii.ToString(true), "rowfilter");
         }
 
         #endregion

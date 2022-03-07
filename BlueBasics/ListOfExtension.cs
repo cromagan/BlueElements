@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System;
@@ -80,7 +82,7 @@ namespace BlueBasics {
             }
         }
 
-        public static bool IsDifferentTo<T>(this List<T> list1, List<T> list2) =>
+        public static bool IsDifferentTo<T>(this List<T>? list1, List<T>? list2) =>
             // https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.sequenceequal?redirectedfrom=MSDN&view=netcore-3.1#System_Linq_Enumerable_SequenceEqual__1_System_Collections_Generic_IEnumerable___0__System_Collections_Generic_IEnumerable___0__
             list1 != list2 && (list1 is null || list2 is null || !list1.SequenceEqual(list2));
 
